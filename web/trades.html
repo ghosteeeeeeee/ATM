@@ -3,364 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Jo's Trades - Tokyo</title>
+    <title>Hermes Trades</title>
+    <meta http-equiv="refresh" content="60">
     <style>
-        :root { --bg: #0a0a0f; --card-bg: #12121a; --border: #2a2a3a; --text: #e8e8ed; --text-dim: #8888a0; --green: #00d4aa; --red: #ff4466; --blue: #4488ff; --purple: #aa44ff; }
+        :root {
+            --bg: #0a0a0f;
+            --card-bg: #12121a;
+            --border: #2a2a3a;
+            --text: #e8e8ed;
+            --text-dim: #8888a0;
+            --green: #3fb950;
+            --red: #f85149;
+            --blue: #58a6ff;
+            --purple: #bc8cff;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'SF Pro', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 15px; }
-        h1 { font-size: 2rem; background: linear-gradient(135deg, var(--purple), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .controls { display: flex; gap: 10px; align-items: center; }
-        .btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
-        .btn:hover { background: var(--border); }
-        .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-        .btn-reset { background: var(--red); border-color: var(--red); color: #fff; opacity: 0.8; }
-        .btn-reset:hover { opacity: 1; }
+        body {
+            font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: var(--purple);
+        }
         .refresh-info { color: var(--text-dim); font-size: 0.9rem; }
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; }
-        .stat-label { color: var(--text-dim); font-size: 0.8rem; margin-top: 5px; }
-        .green { color: var(--green); }
-        .red { color: var(--red); }
-        
-        .section-title { font-size: 1.1rem; font-weight: 600; margin: 25px 0 15px; color: var(--text); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
-        .section-title .count { background: var(--card-bg); padding: 2px 10px; border-radius: 12px; font-size: 0.85rem; color: var(--text-dim); }
-        .section-title.open { color: var(--green); }
-        .section-title.closed { color: var(--text-dim); }
-        
-        .trades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-        .trade-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 15px; transition: all 0.2s; }
-        .trade-card:hover { transform: translateY(-2px); border-color: var(--blue); }
-        .trade-card.open { border-left: 3px solid var(--green); }
-        .trade-card.closed { border-left: 3px solid var(--text-dim); }
-        .trade-card.long { border-left-color: var(--green); }
-        .trade-card.short { border-left-color: var(--red); }
-        
-        .trade-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .trade-title { display: flex; align-items: center; gap: 8px; }
-        .trade-id { color: var(--text-dim); font-size: 0.8rem; font-weight: normal; }
-        .token { font-size: 1.2rem; font-weight: 700; }
-        .token { font-size: 1.2rem; font-weight: 700; }
-        .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
-        .status-badge.open { background: rgba(0, 212, 170, 0.2); color: var(--green); }
-        .status-badge.closed { background: rgba(136, 136, 160, 0.2); color: var(--text-dim); }
-        
-        .trade-details { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.85rem; }
-        .detail-row { display: flex; justify; }
-        .-content: space-betweendetail-label { color: var(--text-dim); }
-        
-        .pnl { text-align: center; padding: 8px; margin-top: 10px; border-radius: 6px; font-weight: 600; font-size: 1rem; }
-        .pnl.positive { background: rgba(0, 212, 170, 0.15); color: var(--green); }
-        .pnl.negative { background: rgba(255, 68, 102, 0.15); color: var(--red); }
-        .pnl.neutral { background: rgba(136, 136, 160, 0.15); color: var(--text-dim); }
-        
-        .tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-        .tag { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
-        .tag-paper { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
-        .tag-real { background: rgba(0, 212, 170, 0.2); color: var(--green); }
-        .tag-exchange { background: rgba(68, 136, 255, 0.2); color: var(--blue); }
-        .tag-direction { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
-        .tag-leverage { background: rgba(170, 68, 255, 0.2); color: var(--purple); }
-        
-        .loading { text-align: center; padding: 30px; color: var(--text-dim); }
-        .empty { text-align: center; padding: 20px; color: var(--text-dim); font-size: 0.9rem; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .updating { animation: pulse 1s infinite; }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .stat-label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; }
+        .stat-value.green { color: var(--green); }
+        .stat-value.red { color: var(--red); }
+        .stat-value.blue { color: var(--blue); }
+        .section { margin-bottom: 40px; }
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .trades-list { display: flex; flex-direction: column; gap: 10px; }
+        .trade {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .trade.long { border-left: 4px solid var(--green); }
+        .trade.short { border-left: 4px solid var(--red); }
+        .trade-main { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .trade-token { font-size: 1.2rem; font-weight: 700; }
+        .trade-dir.long { color: var(--green); font-weight: 600; }
+        .trade-dir.short { color: var(--red); font-weight: 600; }
+        .trade-price { color: var(--text-dim); font-size: 0.85rem; }
+        .trade-meta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .trade-stat { text-align: right; }
+        .trade-stat-label { color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; }
+        .trade-stat-val { font-size: 0.95rem; font-weight: 600; }
+        .trade-pnl { font-size: 1.1rem; font-weight: 700; }
+        .trade-pnl.positive { color: var(--green); }
+        .trade-pnl.negative { color: var(--red); }
+        .trade-pnl.neutral { color: var(--text-dim); }
+        .no-trades { color: var(--text-dim); font-style: italic; padding: 30px; text-align: center; background: var(--card-bg); border-radius: 10px; border: 1px dashed var(--border); }
+        .badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge.hermes { background: #1f2937; color: var(--purple); border: 1px solid var(--purple); }
+        .none { color: var(--text-dim); font-style: italic; text-align: center; padding: 40px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div id="debug" style="color: orange; font-size: 12px; margin-bottom: 10px;">Loading...</div>
-        <h1>🤖 Jo's Trades - Tokyo</h1>
-        <div class="controls">
-            <select class="btn" id="serverFilter" onchange="filterByServer()" style="background: var(--card-bg); color: var(--text);">
-                <option value="all">All Servers</option>
-                <option value="Tokyo">Tokyo</option>
-                <option value="Dallas">Dallas</option>
-            </select>
-            <button class="btn btn-primary" onclick="refreshTrades()">🔄 Refresh</button>
-            <button class="btn btn-reset" onclick="resetPortfolio()">💰 Reset to $1000</button>
-            <span class="refresh-info" id="lastUpdate">Loading...</span>
-        </div>
+        <h1>Hermes Trades</h1>
+        <div class="refresh-info">Auto-refreshes every 60s</div>
     </div>
-    
-    <div class="stats-row">
-        <div class="stat-card" style="border-color: var(--purple);">
-            <div class="stat-value" id="portfolioBalance" style="color: var(--purple);">$1000.00</div>
-            <div class="stat-label">Portfolio Balance</div>
-        </div>
-        <div class="stat-card"><div class="stat-value" id="totalTrades">-</div><div class="stat-label">Total</div></div>
-        <div class="stat-card"><div class="stat-value green" id="openTrades">-</div><div class="stat-label">Open</div></div>
-        <div class="stat-card"><div class="stat-value" id="closedTrades">-</div><div class="stat-label">Closed</div></div>
-        <div class="stat-card"><div class="stat-value" id="totalPnL">-</div><div class="stat-label">Total P&L</div></div>
-        <div class="stat-card"><div class="stat-value" id="winRate">-</div><div class="stat-label">Win Rate</div></div>
-        <div id="debug" style="display:none;"></div>
+
+    <div class="stats-row" id="stats"></div>
+
+    <div class="section">
+        <div class="section-title">Open Positions</div>
+        <div class="trades-list" id="open-trades"></div>
     </div>
-    
-    <div class="section-title open">
-        🎯 Open Positions <span class="count" id="openCount">0</span>
+
+    <div class="section">
+        <div class="section-title">Closed Positions</div>
+        <div class="trades-list" id="closed-trades"></div>
     </div>
-    <div id="openTradesContainer" class="trades-grid">
-        <div class="loading">Loading...</div>
-    </div>
-    
-    <div class="section-title closed">
-        ✅ Closed Positions <span class="count" id="closedCount">0</span>
-    </div>
-    <div id="closedTradesContainer" class="trades-grid">
-        <div class="loading">Loading...</div>
-    </div>
-    
+
     <script>
-        const API_URL = '/trades_data.json';
-        const INITIAL_BALANCE = 1000;
-        let allTrades = [];
-        let currentServerFilter = 'all';
-        
-        function filterByServer() {
-            currentServerFilter = document.getElementById('serverFilter').value;
-            renderFilteredTrades();
-        }
-        
-        function renderFilteredTrades() {
-            let openTrades, closedTrades;
-            
-            if (currentServerFilter === 'all') {
-                openTrades = allTrades.filter(t => t.status === 'open');
-                closedTrades = allTrades.filter(t => t.status === 'closed');
-            } else {
-                openTrades = allTrades.filter(t => t.status === 'open' && t.server === currentServerFilter);
-                closedTrades = allTrades.filter(t => t.status === 'closed' && t.server === currentServerFilter);
-            }
-            
-            document.getElementById('openTradesContainer').innerHTML = openTrades.length 
-                ? openTrades.map(renderTradeCard).join('') 
-                : '<div class="empty">No open positions</div>';
-            
-            document.getElementById('closedTradesContainer').innerHTML = closedTrades.length 
-                ? closedTrades.map(renderTradeCard).join('') 
-                : '<div class="empty">No closed positions</div>';
-            
-            document.getElementById('openCount').textContent = openTrades.length;
-            document.getElementById('closedCount').textContent = closedTrades.length;
-            
-            updateStats(openTrades, closedTrades);
-            document.getElementById('lastUpdate').textContent = 'Updated: ' + new Date().toLocaleTimeString() + ' (' + (currentServerFilter === 'all' ? 'All' : currentServerFilter) + ')';
-        }
-        
-        // Portfolio balance management
-        function getPortfolioBalance() {
-            const stored = localStorage.getItem('portfolioBalance');
-            return stored ? parseFloat(stored) : INITIAL_BALANCE;
-        }
-        
-        function setPortfolioBalance(balance) {
-            localStorage.setItem('portfolioBalance', balance.toFixed(2));
-            document.getElementById('portfolioBalance').textContent = '$' + balance.toFixed(2);
-            document.getElementById('portfolioBalance').className = 'stat-value ' + (balance >= INITIAL_BALANCE ? 'green' : 'red');
-        }
-        
-        function resetPortfolio() {
-            if (confirm('Reset Tokyo trades only - delete ALL trades (open + closed) and reset balance to $1000?')) {
-                fetch('/api/trades/delete_all', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ server: 'Tokyo' })
-                })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success) {
-                            setPortfolioBalance(INITIAL_BALANCE);
-                            localStorage.setItem('lastTradeId', '0');
-                            alert(`Deleted ${data.deleted} trades. Portfolio reset to $1000.`);
-                            refreshTrades();
-                        }
-                    })
-                    .catch(e => {
-                        alert('Error resetting: ' + e);
-                    });
-            }
-        }
-        
-        async function fetchTrades() {
-        // DEBUG: Log API call
-        console.log('DEBUG: Fetching from', API_URL);
-
+        async function load() {
             try {
-                const res = await fetch(API_URL);
-                console.log('DEBUG: Response status:', res.status, 'size:', res.headers.get('content-length'));
+                const res = await fetch('/trades_data.json');
                 const data = await res.json();
-                console.log('DEBUG: Data keys:', Object.keys(data), 'open count:', data.open?.length, 'closed count:', data.closed?.length);
-                return (data.trades || data.open || data.closed || []);
-            } catch (e) {
-                console.error('Fetch error:', e);
-                return [];
-            }
-        }
-        
-        function renderTradeCard(trade) {
-            const isOpen = trade.status === 'open';
-            const isPaper = trade.paper === true || trade.paper === 't';
-            const direction = (trade.side || trade.direction || trade.type || 'long').toLowerCase();
-            // Smart price formatting - show appropriate decimals
-        function formatPrice(price) {
-            if (price === undefined || price === null || price === '') return '-';
-            const p = parseFloat(price);
-            if (isNaN(p) || p === 0) return '$0.00';
-            if (p < 0.01) return '$' + p.toFixed(6);
-            if (p < 1) return '$' + p.toFixed(4);
-            if (p < 100) return '$' + p.toFixed(2);
-            return '$' + p.toFixed(0);
-        }
-        
-        // Smart PnL formatting
-        function formatPnL(pnl) {
-            if (pnl === undefined || pnl === null || isNaN(pnl)) return '-';
-            return (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2);
-        }
-        
-        // Smart PnL % formatting
-        function formatPnLPct(pnlPct) {
-            if (pnlPct === undefined || pnlPct === null || isNaN(pnlPct)) return '-';
-            return (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(1) + '%';
-        }
 
-        const entry = parseFloat(trade.entry_price || 0);
-            const current = parseFloat(trade.current_price || entry);
-            const leverage = parseFloat(trade.leverage || 1);
-            
-            // Calculate live P&L for open trades
-            let pnl = 0;
-            let pnlPercent = 0;
-            let pnlText = '';
-            
-            if (isOpen) {
-                const amount = parseFloat(trade.amount_usdt || 50);
-                if (direction === 'long' || direction === 'buy') {
-                    pnl = (current - entry) * leverage * (amount / entry);
-                    pnlPercent = ((current - entry) / entry) * 100;
-                } else if (direction === 'short' || direction === 'sell') {
-                    pnl = (entry - current) * leverage * (amount / entry);
-                    pnlPercent = ((entry - current) / entry) * 100;
-                }
-                pnlText = `${formatPnL(pnl)} (${formatPnLPct(pnlPercent)})`;
-            } else {
-                pnl = parseFloat(trade.pnl_usdt || 0);
-                pnlPercent = ((pnl / (trade.amount_usdt || 50)) * 100);
-                pnlText = `${formatPnL(pnl)} (${formatPnLPct(pnlPercent)})`;
-            }
-            
-            const pnlClass = pnl > 0 ? 'positive' : (pnl < 0 ? 'negative' : 'neutral');
-            
-            return `
-                <div class="trade-card ${isOpen ? 'open' : 'closed'} ${direction}">
-                    <div class="trade-header">
-                        <div class="trade-title">
-                            <span class="token">${trade.token}</span>
-                            <span class="trade-id">#${trade.id}</span>
-                        </div>
-                        <span class="status-badge ${isOpen ? 'open' : 'closed'}">${trade.status}</span>
-                    </div>
-                    <div class="trade-details">
-                        <div class="detail-row"><span class="detail-label">Entry</span><span>${formatPrice(entry)}</span></div>
-                        <div class="detail-row"><span class="detail-label">Current</span><span>${formatPrice(current)}</span></div>
-                        <div class="detail-row"><span class="detail-label">Amount</span><span>$${parseFloat(trade.amount_usdt || 50).toFixed(0)}</span></div>
-                        <div class="detail-row"><span class="detail-label">SL</span><span>${formatPrice(trade.stop_loss)}</span></div>
-                        <div class="detail-row"><span class="detail-label">TP</span><span>${formatPrice(trade.target)}</span></div>
-                        <div class="detail-row"><span class="detail-label">Lev</span><span>${leverage}x</span></div>
-                    </div>
-                    <div class="pnl ${pnlClass}">${pnlText}</div>
-                    <div class="tags">
-                        <span class="tag ${isPaper ? 'tag-paper' : 'tag-real'}">${isPaper ? '📝 Paper' : '🚀 Real'}</span>
-                        <span class="tag tag-exchange">${trade.exchange === 'Solana' ? '🟡 Solana' : '🔴 Hype'}</span>
-                        <span class="tag tag-direction">${direction.toUpperCase()}</span>
-                        ${trade.leverage ? `<span class="tag tag-leverage">${trade.leverage}x</span>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-        
-        async function refreshTrades() {
-            allTrades = await fetchTrades();
-            renderFilteredTrades();
-        }
-        
-        function updateStats(open, closed) {
-            const total = open.length + closed.length;
-            let totalPnL = 0, wins = 0, losses = 0;
-            
-            // Track portfolio balance from closed trades
-            let lastTradeId = localStorage.getItem('lastTradeId') || '0';
-            let newLastTradeId = lastTradeId;
-            let balance = getPortfolioBalance();
-            
-            // Calculate unrealized P&L from open trades
-            let unrealizedPnL = 0;
-            
-            open.forEach(t => {
-                const amount = parseFloat(t.amount_usdt || 50);
-                const entry = parseFloat(t.entry_price || 0);
-                const current = parseFloat(t.current_price || entry);
-                const leverage = parseFloat(t.leverage || 1);
-                const side = (t.side || 'long').toLowerCase();
-                
-                // Calculate unrealized P&L (guard against division by zero)
-                let pnl = 0;
-                if (entry > 0) {
-                    if (side === 'long') {
-                        pnl = (current - entry) * leverage * (amount / entry);
-                    } else {
-                        pnl = (entry - current) * leverage * (amount / entry);
-                    }
-                }
-                if (!isFinite(pnl)) pnl = 0;  // Guard against Infinity/NaN
-                unrealizedPnL += pnl;
-            });
-            
-            closed.forEach(t => {
-                if (t.pnl_usdt) {
-                    const pnl = parseFloat(t.pnl_usdt);
-                    totalPnL += pnl;
+                const open = data.open || [];
+                const closed = data.closed || [];
+                const openCount = data.open_count || open.length;
+                const closedCount = data.closed_count || closed.length;
+
+                // Stats
+                let totalPnl = 0, wins = 0, losses = 0;
+                closed.forEach(t => {
+                    const pnl = parseFloat(t.pnl_pct || 0);
+                    totalPnl += pnl;
                     if (pnl > 0) wins++;
                     else if (pnl < 0) losses++;
-                    
-                    // Update balance if this is a new trade
-                    const tradeId = String(t.id);
-                    if (parseInt(tradeId) > parseInt(lastTradeId)) {
-                        balance += pnl;
-                        newLastTradeId = tradeId;
-                    }
+                });
+                const winRate = closedCount > 0 ? ((wins / closedCount) * 100).toFixed(0) : 0;
+
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label">Open</div>
+                        <div class="stat-value blue">${openCount}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Closed</div>
+                        <div class="stat-value">${closedCount}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value ${winRate >= 50 ? 'green' : 'red'}">${winRate}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total PnL</div>
+                        <div class="stat-value ${totalPnl >= 0 ? 'green' : 'red'}">${totalPnl > 0 ? '+' : ''}${totalPnl.toFixed(2)}%</div>
+                    </div>
+                `;
+
+                // Open trades
+                if (open.length === 0) {
+                    document.getElementById('open-trades').innerHTML = '<div class="no-trades">No open positions</div>';
+                } else {
+                    document.getElementById('open-trades').innerHTML = open.map(t => `
+                        <div class="trade ${(t.direction || 'LONG').toLowerCase()}">
+                            <div class="trade-main">
+                                <span class="trade-token">${t.token || t.symbol || '?'}</span>
+                                <span class="trade-dir ${(t.direction || 'LONG').toLowerCase()}">${t.direction || 'LONG'}</span>
+                                <span class="trade-price">Entry: $${t.entry_price || '?'}</span>
+                            </div>
+                            <div class="trade-meta">
+                                ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
+                                ${t.amount_usdt ? `<span class="trade-stat"><div class="trade-stat-label">Size</div><div class="trade-stat-val">$${t.amount_usdt}</div></span>` : ''}
+                                ${t.pnl_pct !== undefined ? `<span class="trade-pnl neutral">${parseFloat(t.pnl_pct) >= 0 ? '+' : ''}${parseFloat(t.pnl_pct).toFixed(2)}%</span>` : ''}
+                            </div>
+                        </div>
+                    `).join('');
                 }
-            });
-            
-            // Apply unrealized P&L to balance
-            balance += unrealizedPnL;
-            
-            // Save new balance and last trade ID
-            if (newLastTradeId !== lastTradeId) {
-                localStorage.setItem('lastTradeId', newLastTradeId);
+
+                // Closed trades
+                if (closed.length === 0) {
+                    document.getElementById('closed-trades').innerHTML = '<div class="no-trades">No closed positions</div>';
+                } else {
+                    document.getElementById('closed-trades').innerHTML = closed.map(t => {
+                        const pnl = parseFloat(t.pnl_pct || 0);
+                        return `
+                        <div class="trade ${pnl >= 0 ? 'long' : 'short'}">
+                            <div class="trade-main">
+                                <span class="trade-token">${t.token || t.symbol || '?'}</span>
+                                <span class="trade-dir ${(t.direction || 'LONG').toLowerCase()}">${t.direction || 'LONG'}</span>
+                                <span class="trade-price">Entry: $${t.entry_price || '?'}</span>
+                                ${t.exit_price ? `<span class="trade-price">Exit: $${t.exit_price}</span>` : ''}
+                            </div>
+                            <div class="trade-meta">
+                                ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
+                                ${t.amount_usdt ? `<span class="trade-stat"><div class="trade-stat-label">Size</div><div class="trade-stat-val">$${t.amount_usdt}</div></span>` : ''}
+                                <span class="trade-pnl ${pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            } catch(e) {
+                document.getElementById('open-trades').innerHTML = '<div class="no-trades">Error: ' + e.message + '</div>';
             }
-            setPortfolioBalance(balance);
-            
-            const winRate = (wins + losses) > 0 ? ((wins / (wins + losses)) * 100).toFixed(0) + '%' : '-';
-            
-            document.getElementById('totalTrades').textContent = total;
-            document.getElementById('openTrades').textContent = open.length;
-            document.getElementById('closedTrades').textContent = closed.length;
-            
-            const pnlEl = document.getElementById('totalPnL');
-            pnlEl.textContent = (totalPnL >= 0 ? '+' : '') + '$' + totalPnL.toFixed(2);
-            pnlEl.className = 'stat-value ' + (totalPnL >= 0 ? 'green' : 'red');
-            
-            document.getElementById('winRate').textContent = winRate;
         }
-        
-        // Initialize portfolio balance display
-        setPortfolioBalance(getPortfolioBalance());
-        
-        refreshTrades();
-        setInterval(refreshTrades, 30000);
+        load();
     </script>
 </body>
 </html>

@@ -1,409 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Signals</title>
-    <meta http-equiv="refresh" content="10">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Hermes Signals</title>
+    <meta http-equiv="refresh" content="60">
     <style>
-        :root {
-            --background: oklch(0.145 0 0);
-            --surface: oklch(0.21 0 0);
-            --surface-elevated: oklch(0.26 0 0);
-            --border: oklch(0.3 0 0);
-            --foreground: oklch(0.95 0 0);
-            --foreground-muted: oklch(0.65 0 0);
-            --primary: oklch(0.7 0.15 250);
-            --primary-foreground: oklch(0.98 0 0);
-            --green: oklch(0.72 0.18 150);
-            --red: oklch(0.65 0.18 25);
-            --yellow: oklch(0.8 0.15 90);
-            --cyan: oklch(0.8 0.15 220);
-            --purple: oklch(0.75 0.15 320);
-            --radius: 0.5rem;
-            --font-sans: 'Outfit', system-ui, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            font-family: var(--font-sans);
-            background: var(--background);
-            color: var(--foreground);
-            min-height: 100vh;
-            padding: 1.5rem;
-        }
-        
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .header h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .header h1 span { font-size: 1.5rem; }
-        
-        .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--foreground-muted);
-        }
-        
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--green);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .section {
-            margin-bottom: 2rem;
-        }
-        
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        
-        .section-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .tokyo-badge {
-            background: var(--cyan);
-            color: var(--background);
-            padding: 0.125rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .dallas-badge {
-            background: var(--purple);
-            color: var(--foreground);
-            padding: 0.125rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .signal-count {
-            font-size: 0.875rem;
-            color: var(--foreground-muted);
-            font-family: var(--font-mono);
-        }
-        
-        .signals-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .signal-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 0.875rem 1rem;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 0.75rem;
-            align-items: center;
-            transition: all 0.15s ease;
-        }
-        
-        .signal-card:hover {
-            background: var(--surface-elevated);
-            transform: translateX(2px);
-        }
-        
-        .signal-card.tokyo { border-left: 3px solid var(--cyan); }
-        .signal-card.dallas { border-left: 3px solid var(--purple); }
-        
-        .direction {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.875rem;
-        }
-        
-        .direction.long {
-            background: rgba(120, 220, 120, 0.15);
-            color: var(--green);
-        }
-        
-        .direction.short {
-            background: rgba(255, 100, 100, 0.15);
-            color: var(--red);
-        }
-        
-        .signal-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-        
-        .signal-token {
-            font-family: var(--font-mono);
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-        
-        .signal-meta {
-            font-size: 0.75rem;
-            color: var(--foreground-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .signal-price {
-            font-family: var(--font-mono);
-            font-size: 0.875rem;
-            color: var(--foreground-muted);
-            text-align: right;
-        }
-        
-        .confidence {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            font-family: var(--font-mono);
-        }
-        
-        .confidence.high {
-            background: rgba(120, 220, 120, 0.15);
-            color: var(--green);
-        }
-        
-        .confidence.medium {
-            background: rgba(255, 220, 100, 0.15);
-            color: var(--yellow);
-        }
-        
-        .confidence.low {
-            background: rgba(255, 100, 100, 0.15);
-            color: var(--red);
-        }
-        
-        .timestamp {
-            font-size: 0.75rem;
-            color: var(--foreground-muted);
-            font-family: var(--font-mono);
-        }
-        
-        .decision-badge {
-            display: inline-block;
-            padding: 0.125rem 0.375rem;
-            border-radius: 4px;
-            font-size: 0.625rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-left: 0.5rem;
-            letter-spacing: 0.5px;
-        }
-        
-        .decision-badge.approved { background: var(--green); color: var(--background); }
-        .decision-badge.pending { background: var(--yellow); color: var(--background); }
-        .decision-badge.wait { background: var(--cyan); color: var(--background); }
-        .decision-badge.failed { background: var(--red); color: var(--background); }
-        .decision-badge.skipped { background: var(--foreground-muted); color: var(--background); }
-        
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--foreground-muted);
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px dashed var(--border);
-        }
-        
-        .empty-state span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+        body { font-family: monospace; background: #0d0d0d; color: #e0e0e0; padding: 20px; }
+        h1 { color: #58a6ff; font-size: 1.4rem; margin-bottom: 20px; }
+        h1 span { color: #8b949e; font-size: 0.8rem; font-weight: normal; }
+        .stats { display: flex; gap: 20px; margin-bottom: 20px; font-size: 0.85rem; }
+        .stat { background: #161b22; padding: 8px 14px; border-radius: 6px; }
+        .stat-val { color: #58a6ff; font-weight: bold; }
+        .signal { background: #161b22; border: 1px solid #21262d; border-left: 4px solid #58a6ff; padding: 12px 16px; margin-bottom: 8px; border-radius: 4px; }
+        .signal.long { border-left-color: #3fb950; }
+        .signal.short { border-left-color: #f85149; }
+        .signal.pending { opacity: 0.8; }
+        .signal.approved { border-left-color: #d29922; background: #1c1f24; }
+        .signal.executed { border-left-color: #3fb950; }
+        .signal-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .signal-main { display: flex; align-items: baseline; gap: 12px; }
+        .token { font-size: 1.1rem; font-weight: bold; color: #f0f6fc; }
+        .direction.long { color: #3fb950; }
+        .direction.short { color: #f85149; }
+        .confidence { color: #d29922; }
+        .price { color: #8b949e; font-size: 0.85rem; }
+        .meta { text-align: right; font-size: 0.8rem; color: #8b949e; }
+        .meta-row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+        .decision { font-weight: bold; }
+        .decision.PENDING { color: #f0883e; }
+        .decision.APPROVED { color: #d29922; }
+        .decision.EXECUTED { color: #3fb950; }
+        .decision.REJECTED { color: #f85149; }
+        .source { color: #388bfd; }
+        .zscore { color: #bc8cff; }
+        .none { color: #484f58; font-style: italic; text-align: center; padding: 40px; }
+        .updated { color: #484f58; font-size: 0.75rem; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1><span>📡</span> Live Signals</h1>
-        <div class="live-indicator">
-            <div class="live-dot"></div>
-            Auto-refresh
-        </div>
+    <h1>Hermes Signals <span>| Hermes Trading System</span></h1>
+    <div class="stats" id="stats"></div>
+    <div id="signals">
+        <div class="none">Loading...</div>
     </div>
-    
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title">
-                Tokyo 
-                <span class="tokyo-badge">TOKYO</span>
-            </div>
-            <span class="signal-count" id="tokyo-count">0 signals</span>
-        </div>
-        <div class="signals-grid" id="tokyo-signals">
-            <div class="empty-state"><span>📡</span>Loading Tokyo signals...</div>
-        </div>
-    </div>
-    
-    <div class="section">
-        <div class="section-header">
-            <div class="section-title">
-                Dallas
-                <span class="dallas-badge">DALLAS</span>
-            </div>
-            <span class="signal-count" id="dallas-count">0 signals</span>
-        </div>
-        <div class="signals-grid" id="dallas-signals">
-            <div class="empty-state"><span>🌵</span>Loading Dallas signals...</div>
-        </div>
-    </div>
-    
+    <div class="updated" id="updated"></div>
+
     <script>
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: false 
-            });
-        }
-        
-        function parseSignalLine(line) {
-            // Format: 2026-03-21T05:15:52+00:00 SIGNAL: SOL LONG @ 94.9545 (70%) [hyperliquid]
-            const match = line.match(/(\d{4}-\d{2}-\d{2}T[\d:+]+).*?SIGNAL:\s*(\S+)\s+(LONG|SHORT)\s+@\s*([\d.]+)\s+\((\d+)%/);
-            if (match) {
-                return {
-                    time: match[1],
-                    token: match[2],
-                    direction: match[3].toLowerCase(),
-                    price: parseFloat(match[4]),
-                    confidence: parseInt(match[5]),
-                    source: line.includes('[hyperliquid]') ? 'hyperliquid' : 
-                            line.includes('[raydium]') ? 'raydium' : 'other'
-                };
-            }
-            return null;
-        }
-        
-        function renderSignal(signal, source) {
-            const confClass = signal.confidence >= 70 ? 'high' : 
-                             signal.confidence >= 50 ? 'medium' : 'low';
-            const decision = signal.decision ? signal.decision.toLowerCase() : '';
-            const decisionHtml = decision && decision !== 'pending' 
-                ? `<span class="decision-badge ${decision}">${decision}</span>` 
-                : '';
-            return `
-                <div class="signal-card ${source}">
-                    <div class="direction ${signal.direction}">
-                        ${signal.direction === 'long' ? '↗' : '↘'}
-                    </div>
-                    <div class="signal-info">
-                        <div class="signal-token">${signal.token}${decisionHtml}</div>
-                        <div class="signal-meta">
-                            <span class="confidence ${confClass}">${signal.confidence}%</span>
-                            <span>${signal.source}</span>
+        async function load() {
+            try {
+                const res = await fetch('/signals_data.json');
+                const data = await res.json();
+
+                // Stats bar
+                document.getElementById('stats').innerHTML =
+                    `<div class="stat">Total: <span class="stat-val">${data.total}</span></div>
+                     <div class="stat">Pending: <span class="stat-val">${data.pending}</span></div>
+                     <div class="stat">Approved: <span class="stat-val">${data.approved}</span></div>
+                     <div class="stat">Executed: <span class="stat-val">${data.executed}</span></div>
+                     <div class="stat">Win rate: <span class="stat-val">${data.stats.win_rate}%</span></div>`;
+
+                // Signals list
+                if (!data.signals || data.signals.length === 0) {
+                    document.getElementById('signals').innerHTML = '<div class="none">No signals</div>';
+                } else {
+                    document.getElementById('signals').innerHTML = data.signals.map(s => `
+                        <div class="signal ${s.direction.toLowerCase()} ${s.decision.toLowerCase()}">
+                            <div class="signal-row">
+                                <div class="signal-main">
+                                    <span class="token">${s.token}</span>
+                                    <span class="direction ${s.direction.toLowerCase()}">${s.direction}</span>
+                                    <span class="confidence">${s.confidence}%</span>
+                                    <span class="price">$${s.price}</span>
+                                </div>
+                                <div class="meta">
+                                    <div class="meta-row">
+                                        <span class="decision ${s.decision}">${s.decision}</span>
+                                        <span class="source">${s.source}</span>
+                                        <span class="zscore">z=${s.zscore}</span>
+                                    </div>
+                                    <div style="margin-top:4px">${s.time}</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="signal-price">
-                        <div>$${signal.price.toFixed(2)}</div>
-                        <div class="timestamp">${formatTime(signal.time)}</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        async function loadSignals() {
-            const tokyoSignals = [];
-            const dallasSignals = [];
-            
-            // Get Tokyo signals from JSON
-            try {
-                const resp = await fetch('/signals_data.json');
-                const data = await resp.json();
-                const signals = data.signals || [];
-                // Get recent signals (last 50)
-                signals.slice(-50).forEach(s => {
-                    if (s && s.token) {
-                        tokyoSignals.push({
-                            token: s.token,
-                            direction: (s.direction || 'long').toLowerCase(),
-                            price: parseFloat(s.price) || 0,
-                            confidence: parseInt(s.confidence) || 50,
-                            time: s.time || '',
-                            source: s.source || s.type || 'unknown',
-                            decision: s.decision || 'PENDING'
-                        });
-                    }
-                });
+                    `).join('');
+                }
+
+                document.getElementById('updated').textContent = 'Updated: ' + data.updated;
             } catch(e) {
-                console.error('Tokyo error:', e);
+                document.getElementById('signals').innerHTML = '<div class="none">Error loading signals: ' + e.message + '</div>';
             }
-            
-            // Get Dallas signals from API
-            try {
-                const dallas = await fetch('http://127.0.0.1:12346/api/signals').then(r => r.json());
-                dallas.forEach(s => {
-                    dallasSignals.push({
-                        time: s.time,
-                        token: s.token,
-                        direction: s.side?.toLowerCase() || 'long',
-                        price: parseFloat(s.price) || 0,
-                        confidence: parseInt(s.confidence) || 50,
-                        source: 'dallas'
-                    });
-                });
-            } catch(e) {
-                console.error('Dallas error:', e);
-            }
-            
-            // Render Tokyo
-            document.getElementById('tokyo-count').textContent = `${tokyoSignals.length} signals`;
-            document.getElementById('tokyo-signals').innerHTML = tokyoSignals.length > 0 
-                ? tokyoSignals.map(s => renderSignal(s, 'tokyo')).join('')
-                : '<div class="empty-state"><span>📡</span>No Tokyo signals yet</div>';
-            
-            // Render Dallas
-            document.getElementById('dallas-count').textContent = `${dallasSignals.length} signals`;
-            document.getElementById('dallas-signals').innerHTML = dallasSignals.length > 0
-                ? dallasSignals.map(s => renderSignal(s, 'dallas')).join('')
-                : '<div class="empty-state"><span>🌵</span>No Dallas signals yet</div>';
         }
-        
-        loadSignals();
+        load();
     </script>
 </body>
 </html>
