@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes Trading Pipeline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/run_pipeline.py
+WorkingDirectory=/root/.hermes/scripts
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
