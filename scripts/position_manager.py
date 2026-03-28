@@ -306,15 +306,11 @@ def close_position(trade_id: int, reason: str) -> bool:
                 exit_price = %s,
                 pnl_pct = %s,
                 pnl_usdt = %s,
-                entry_fee = %s,
-                exit_fee = %s,
-                fee_total = %s,
-                net_pnl = %s
+                fees = %s
             WHERE id = %s AND paper = TRUE
         """, (now, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt, 4),
-              round(entry_fee_paid, 6), round(exit_fee, 6),
-              round(fee_total, 6), round(net_pnl, 6),
+              json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               trade_id))
         conn.commit()
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")

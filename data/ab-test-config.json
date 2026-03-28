@@ -5,51 +5,11 @@
       "name": "sl-distance-test",
       "description": "Test different stop-loss distances",
       "variants": [
-        {
-          "id": "SL-0p5",
-          "name": "0.5% SL",
-          "weight": 15,
-          "enabled": true,
-          "config": {
-            "slPct": 0.5
-          }
-        },
-        {
-          "id": "SL-1p0",
-          "name": "1.0% SL",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "slPct": 1.0
-          }
-        },
-        {
-          "id": "SL-1p5",
-          "name": "1.5% SL",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "slPct": 1.5
-          }
-        },
-        {
-          "id": "SL-2p0",
-          "name": "2.0% SL",
-          "weight": 20,
-          "enabled": true,
-          "config": {
-            "slPct": 2.0
-          }
-        },
-        {
-          "id": "SL-3p0",
-          "name": "3.0% SL",
-          "weight": 15,
-          "enabled": true,
-          "config": {
-            "slPct": 3.0
-          }
-        }
+        {"id": "SL-0p5", "name": "0.5% SL", "weight": 15, "enabled": true, "config": {"slPct": 0.5}},
+        {"id": "SL-1p0", "name": "1.0% SL", "weight": 25, "enabled": true, "config": {"slPct": 1.0}},
+        {"id": "SL-1p5", "name": "1.5% SL", "weight": 25, "enabled": true, "config": {"slPct": 1.5}},
+        {"id": "SL-2p0", "name": "2.0% SL", "weight": 20, "enabled": true, "config": {"slPct": 2.0}},
+        {"id": "SL-3p0", "name": "3.0% SL", "weight": 15, "enabled": true, "config": {"slPct": 3.0}}
       ]
     },
     {
@@ -57,44 +17,24 @@
       "description": "Test different trailing stop activation thresholds",
       "variants": [
         {
-          "id": "TS-0p5-0p3",
-          "name": "0.5% act / 0.3% dist",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 0.5,
-            "trailingDistancePct": 0.3
-          }
+          "id": "TS-0p5-0p3", "name": "0.5% act / 0.3% dist",
+          "weight": 25, "enabled": true,
+          "config": {"trailingActivationPct": 0.005, "trailingDistancePct": 0.003}
         },
         {
-          "id": "TS-1p0-0p5",
-          "name": "1.0% act / 0.5% dist",
-          "weight": 30,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 1.0,
-            "trailingDistancePct": 0.5
-          }
+          "id": "TS-1p0-0p5", "name": "1.0% act / 0.5% dist",
+          "weight": 30, "enabled": true,
+          "config": {"trailingActivationPct": 0.01, "trailingDistancePct": 0.005}
         },
         {
-          "id": "TS-1p5-0p8",
-          "name": "1.5% act / 0.8% dist",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 1.5,
-            "trailingDistancePct": 0.8
-          }
+          "id": "TS-1p5-0p8", "name": "1.5% act / 0.8% dist",
+          "weight": 25, "enabled": true,
+          "config": {"trailingActivationPct": 0.015, "trailingDistancePct": 0.008}
         },
         {
-          "id": "TS-2p0-1p0",
-          "name": "2.0% act / 1.0% dist",
-          "weight": 20,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 2.0,
-            "trailingDistancePct": 1.0
-          }
+          "id": "TS-2p0-1p0", "name": "2.0% act / 1.0% dist",
+          "weight": 20, "enabled": true,
+          "config": {"trailingActivationPct": 0.02, "trailingDistancePct": 0.01}
         }
       ]
     },
@@ -103,34 +43,19 @@
       "description": "Test immediate vs retrace entry timing",
       "variants": [
         {
-          "id": "IMMEDIATE",
-          "name": "Enter Immediately",
-          "weight": 50,
-          "enabled": true,
-          "config": {
-            "wait_percent": 0,
-            "max_wait_minutes": 0
-          }
+          "id": "IMMEDIATE", "name": "Enter Immediately",
+          "weight": 50, "enabled": true,
+          "config": {"wait_percent": 0.0, "max_wait_minutes": 0}
         },
         {
-          "id": "RETRACE-2",
-          "name": "Wait 2% Retrace",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "wait_percent": 0.02,
-            "max_wait_minutes": 30
-          }
+          "id": "RETRACE-2", "name": "Wait 0.2% Retrace",
+          "weight": 25, "enabled": true,
+          "config": {"wait_percent": 0.002, "max_wait_minutes": 30}
         },
         {
-          "id": "RETRACE-5",
-          "name": "Wait 5% Retrace",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "wait_percent": 0.05,
-            "max_wait_minutes": 60
-          }
+          "id": "RETRACE-5", "name": "Wait 0.5% Retrace",
+          "weight": 25, "enabled": true,
+          "config": {"wait_percent": 0.005, "max_wait_minutes": 60}
         }
       ]
     }

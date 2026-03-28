@@ -404,7 +404,11 @@ def execute_trade(token, direction, price, confidence, source,
         sl = price * 1.01  # fallback: 1% SL
         log(f'  [WARN] SL sanity check triggered for SHORT {token}, reset to 1%')
 
-    exp_arg = []  # --experiment not supported by this brain.py version
+    # Build experiment JSON for brain.py
+    import json as _json
+    exp_json = None
+    if experiment and variant_id and test_name:
+        exp_json = _json.dumps({'experiment': experiment, 'variant_id': variant_id, 'test_name': test_name})
 
     cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
             token, cmd_side, str(POSITION_SIZE_USD), str(round(price, 6)),
@@ -416,7 +420,15 @@ def execute_trade(token, direction, price, confidence, source,
             '--server', SERVER,
             '--signal', source,
             '--confidence', str(round(confidence, 1)),
-            '--leverage', str(leverage)] + exp_arg)
+            '--leverage', str(leverage),
+            '--sl-distance', str(float(sl_pct) / 100),   # AB sl_pct (0.5→0.005)
+            '--trailing-threshold', str(trailing_activation),
+            '--trailing-distance', str(trailing_distance),
+            '--experiment', exp_json] if exp_json else [
+            '--sl-distance', str(float(sl_pct) / 100),
+            '--trailing-threshold', str(trailing_activation),
+            '--trailing-distance', str(trailing_distance)
+        ])
     cmd = [c for c in cmd if c]  # strip empty strings
 
     try:
