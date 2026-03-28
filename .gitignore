@@ -34,3 +34,4 @@ models_dev_cache.json
 # ─── Seed data (download from /git endpoint instead) ─────────────────────
 seed/
 seed/*.sql
+.secrets.local
