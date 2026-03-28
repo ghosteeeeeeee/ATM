@@ -1046,25 +1046,20 @@ LLM CANDLE PREDICTION (for reference):
             print(f"   ⏸️ SKIPPED - No pump momentum (need >3% 24h + volume)")
             log_signal(t, direction, entry, conf, f"SKIPPED-{exchange}")
             mark_signal_processed(t, 'SKIPPED')
-        # Check if already open position for this token
         elif is_token_open(t):
             print(f"   ⏸️ SKIPPED - {t} already has open position")
             log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
             mark_signal_processed(t, 'SKIPPED')
-        # Double-check: race condition fallback - check again immediately before executing
-        elif is_token_open(t):
-            print(f"   ⏸️ SKIPPED - {t} already has open position (race condition check)")
-            log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
-            mark_signal_processed(t, 'SKIPPED')
         else:
             # Record approval
-            mark_signal_processed(t, 'APPROVED')
-            print(f"   ✅ APPROVED: {t} {decision.upper()} — decider-run will execute")
-            log_signal(t, decision, entry, ai_conf, exchange)
-        else:
-            print(f"   ❌ Failed to record approval")
-            log_signal(t, decision, entry, ai_conf, f"FAILED-{exchange}")
-            mark_signal_processed(t, 'FAILED')
+            ok = mark_signal_processed(t, 'APPROVED')
+            if ok:
+                print(f"   ✅ APPROVED: {t} {decision.upper()} — decider-run will execute")
+                log_signal(t, decision, entry, ai_conf, exchange)
+            else:
+                print(f"   ❌ Failed to record approval")
+                log_signal(t, decision, entry, ai_conf, f"FAILED-{exchange}")
+                mark_signal_processed(t, 'FAILED')
     else:
         print(f"   ⏸️ AI said WAIT")
         log_signal(t, direction, entry, ai_conf, f"WAIT-{exchange}")

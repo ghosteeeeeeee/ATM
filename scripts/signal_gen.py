@@ -16,7 +16,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import (
     init_db, DB_PATH, get_all_latest_prices, get_price_history,
     get_latest_price, add_signal, set_cooldown, get_cooldown,
-    price_age_minutes, approve_signal, update_signal_decision
+    price_age_minutes, approve_signal, update_signal_decision,
+    mark_signal_processed
 )
 
 LOG_FILE = '/var/www/hermes/logs/signals.log'

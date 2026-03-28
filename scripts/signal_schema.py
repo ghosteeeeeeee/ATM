@@ -308,14 +308,39 @@ def get_approved_signals(hours=24):
     return results
 
 def mark_signal_processed(token, decision):
-    """Mark all pending signals for token as processed. Returns rows updated."""
+    """Mark signals as processed. Only sets executed=1 for non-APPROVED decisions.
+    APPROVED signals keep executed=0 so decider-run can pick them up."""
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        # Only mark executed=1 for SKIPPED/WAIT/FAILED, NOT for APPROVED
+        if decision == 'APPROVED':
+            c.execute('''
+                UPDATE signals
+                SET decision=?, updated_at=CURRENT_TIMESTAMP
+                WHERE token=? AND executed IN (0, 1)
+            ''', (decision, token.upper()))
+        else:
+            c.execute('''
+                UPDATE signals
+                SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
+                WHERE token=? AND executed IN (0, 1)
+            ''', (decision, token.upper()))
+        conn.commit()
+        return c.rowcount
+    except Exception as e:
+        conn.close()
+        return 0
+
+def mark_signal_approved(token, decision):
+    """Approve a signal WITHOUT marking it executed. decider-run handles execution."""
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
         c.execute('''
             UPDATE signals
-            SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
-            WHERE token=? AND executed IN (0, 1)
+            SET decision=?, updated_at=CURRENT_TIMESTAMP
+            WHERE token=? AND decision='PENDING'
         ''', (decision, token.upper()))
         conn.commit()
         return c.rowcount

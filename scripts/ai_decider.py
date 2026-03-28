@@ -1,0 +1,1 @@
+/root/.hermes/scripts/ai-decider.py

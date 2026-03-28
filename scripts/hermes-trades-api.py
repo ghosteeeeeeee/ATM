@@ -68,8 +68,11 @@ def get_trades(status='open', limit=20, offset=0):
                    trailing_activation, trailing_distance, exit_price
             FROM trades
             WHERE (server = 'Hermes' OR server IS NULL) AND status = %s
-            ORDER BY close_time DESC LIMIT %s OFFSET %s
-        """, (status, limit, offset))
+            ORDER BY
+                CASE WHEN %s = 'open' THEN id END DESC,
+                CASE WHEN %s = 'closed' THEN close_time END DESC
+            LIMIT %s OFFSET %s
+        """, (status, status, status, limit, offset))
         rows = cur.fetchall()
         cur.close(); conn.close()
         return rows

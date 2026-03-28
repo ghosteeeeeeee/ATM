@@ -17,7 +17,7 @@ MAX_POS         = 10
 POSITION_SIZE_USD = 50.0   # $50 actual capital per trade
 LOG_FILE        = '/var/www/hermes/logs/signals.log'
 DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
-AB_CONFIG_FILE  = '/root/.openclaw/workspace/data/ab-test-config.json'
+AB_CONFIG_FILE  = '/root/.hermes/data/ab-test-config.json'
 EPSILON         = 0.20   # 20% exploration rate
 
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
@@ -230,7 +230,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
     """
     # SL test
     sl_variant = _get_ab_variant_for_test('sl-distance-test', direction)
-    sl_pct = sl_variant.get('config', {}).get('slPct', 0.02)  # e.g. 1.0=1%, 1.5=1.5%, 2.0=2%
+    sl_pct = max(0.5, sl_variant.get('config', {}).get('slPct', 0.02))  # floor at 0.5%
 
     # Entry timing test
     entry_variant = _get_ab_variant_for_test('entry-timing-test', direction)
@@ -355,8 +355,6 @@ def process_delayed_entries():
                 '--paper',
                 '--sl', str(round(sl, 6)),
                 '--target', str(round(tp, 6)),
-                '--sl-distance', str(round(sl_pct_val, 3)),
-                '--trailing-threshold', '0.010',
                 '--server', SERVER,
                 '--signal', 'delayed-entry',
                 '--confidence', str(round(conf, 1)),
@@ -406,10 +404,7 @@ def execute_trade(token, direction, price, confidence, source,
         sl = price * 1.01  # fallback: 1% SL
         log(f'  [WARN] SL sanity check triggered for SHORT {token}, reset to 1%')
 
-    exp_arg = []
-    if experiment and experiment != 'control':
-        exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
-        exp_arg = ['--experiment', exp_json]
+    exp_arg = []  # --experiment not supported by this brain.py version
 
     cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
             token, cmd_side, str(POSITION_SIZE_USD), str(round(price, 6)),
@@ -418,8 +413,6 @@ def execute_trade(token, direction, price, confidence, source,
             '--paper' if paper else '',
             '--sl', str(round(sl, 6)),
             '--target', str(round(tp, 6)),
-            '--sl-distance', str(round(sl_pct_val, 3)),
-            '--trailing-threshold', str(round(trailing_activation, 3)),
             '--server', SERVER,
             '--signal', source,
             '--confidence', str(round(confidence, 1)),
@@ -567,13 +560,13 @@ def run(dry_run=False):
             token, direction, price, confidence, source,
             leverage=lev, paper=True, sl_pct=sl_pct,
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
-            experiment=experiment, variant_id=sl_variant, test_name='sl-distance-test')
+            experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test')
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')
             mark_signal_executed(token, direction)
             # Record in ab_results — all three experiments
-            _record_ab_trade_opened(token, direction, experiment, sl_variant, 'sl-distance-test')
+            _record_ab_trade_opened(token, direction, experiment, ab.get('sl_variant', ''), 'sl-distance-test')
             _record_ab_trade_opened(token, direction, experiment, ab.get('entry_variant', ''), 'entry-timing-test')
             _record_ab_trade_opened(token, direction, experiment, ab.get('ts_variant', ''), 'trailing-stop-test')
             entered += 1
