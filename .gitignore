@@ -1,0 +1,32 @@
+# ─── Runtime Data (never commit) ────────────────────────────────────────────
+data/
+logs/
+sessions/
+state.db*
+memories/MEMORY.md.lock
+audio_cache/
+image_cache/
+whatsapp/
+pairing/
+auth.lock
+.hermes_history
+
+# ─── Generated / cached ──────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+scripts/__pycache__/
+scripts/signals.json
+scripts/loss_cooldowns.json
+scripts/pending-delayed-entries.json
+scripts/trailing_stops.json
+scripts/trade_patterns.json
+migration/
+*.zip
+*.tar.gz
+
+# ─── Environment secrets ──────────────────────────────────────────────────────
+.env
+
+# ─── Large / downloadable artifacts ─────────────────────────────────────────
+checkpoints/
+models_dev_cache.json

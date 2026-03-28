@@ -1,0 +1,36 @@
+{
+  "jobs": [
+    {
+      "id": "928399af0484",
+      "name": "hermes-pipeline",
+      "prompt": "cd /root/.hermes/scripts && python3 run_pipeline.py 2>&1 | tail -1",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "* * * * *",
+        "display": "* * * * *"
+      },
+      "schedule_display": "* * * * *",
+      "repeat": {
+        "times": null,
+        "completed": 0
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-03-28T16:07:39.447933+00:00",
+      "next_run_at": "2026-03-28T16:08:00+00:00",
+      "last_run_at": null,
+      "last_status": null,
+      "last_error": null,
+      "deliver": "local",
+      "origin": null
+    }
+  ],
+  "updated_at": "2026-03-28T16:07:39.449570+00:00"
+}

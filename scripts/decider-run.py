@@ -1,0 +1,591 @@
+#!/usr/bin/env python3
+"""
+decider-run.py — Execute approved signals as paper trades via brain.py.
+Reads APPROVED signals, checks position limits, computes SL/TP, places trades.
+Also processes delayed-entry signals from pending-delayed-entries.json.
+"""
+import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2
+sys.path.insert(0, '/root/.hermes/scripts')
+from signal_schema import init_db, get_approved_signals, mark_signal_executed
+from position_manager import (get_position_count, is_position_open, enforce_max_positions,
+                              get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
+                              _is_win_cooldown_active)
+
+BRAIN_CMD       = '/usr/local/bin/brain.py'
+SERVER          = 'Hermes'
+MAX_POS         = 10
+POSITION_SIZE_USD = 50.0   # $50 actual capital per trade
+LOG_FILE        = '/var/www/hermes/logs/signals.log'
+DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
+AB_CONFIG_FILE  = '/root/.openclaw/workspace/data/ab-test-config.json'
+EPSILON         = 0.20   # 20% exploration rate
+
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+os.makedirs(os.path.dirname(DELAYED_FILE), exist_ok=True)
+
+# ─── Direction Awareness ─────────────────────────────────────────────────────
+# If a direction has < 50% win rate in recent history, pause it.
+# This prevents the system from bleeding on a consistently losing direction.
+_DIR_WR_CACHE = {}      # {(token, direction): (wr, count, timestamp)}
+_DIR_WR_TTL    = 3600    # 1 hour
+
+def _get_direction_wr(token: str, direction: str) -> tuple:
+    """Return (win_rate_pct, trade_count) for a token+direction in last 7 days."""
+    import time
+    key = (token.upper(), direction.upper())
+    now = time.time()
+    if key in _DIR_WR_CACHE:
+        cached_wr, cached_count, cached_at = _DIR_WR_CACHE[key]
+        if now - cached_at < _DIR_WR_TTL:
+            return cached_wr, cached_count
+
+    try:
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins
+            FROM trades
+            WHERE token = %s AND direction = %s
+              AND status = 'closed'
+              AND close_time >= NOW() - INTERVAL '7 days'
+        """, (token.upper(), direction.upper()))
+        row = cur.fetchone()
+        cur.close(); conn.close()
+        total = row[0] or 0
+        wins = row[1] or 0
+        wr = (wins / total * 100) if total >= 3 else 50.0  # need at least 3 trades to judge
+        _DIR_WR_CACHE[key] = (wr, total, now)
+        return wr, total
+    except Exception:
+        return 50.0, 0  # neutral if DB error
+
+
+# ─── Per-token Leverage Cache ──────────────────────────────────────────────────
+_LEVERAGE_CACHE = {}          # {token: {'leverage': int, 'cached_at': float}}
+_LEVERAGE_CACHE_TTL = 3600   # 1 hour
+
+def log(msg):
+    ts = time.strftime('%Y-%m-%d %H:%M:%S')
+    line = f'{ts} {msg}'
+    print(line)
+    try:
+        with open(LOG_FILE, 'a') as f:
+            f.write(line + '\n')
+    except:
+        pass
+
+
+def get_current_price(token):
+    """Fetch current price from Hyperliquid."""
+    try:
+        r = requests.post('https://api.hyperliquid.xyz/info',
+                          json={'type': 'allMids'}, timeout=10)
+        return float(r.json().get(token, 0)) or None
+    except:
+        return None
+
+
+def get_max_leverage(token: str) -> int:
+    """
+    Get max leverage for a token from Hyperliquid meta API.
+    Cached for 1 hour to avoid rate limiting.
+    Returns 1-50, capped at MAX_LEVERAGE (10).
+    """
+    import time
+    token_upper = token.upper()
+    now = time.time()
+
+    if token in _LEVERAGE_CACHE:
+        cached = _LEVERAGE_CACHE[token]
+        if now - cached.get('cached_at', 0) < _LEVERAGE_CACHE_TTL:
+            return cached['leverage']
+
+    try:
+        r = requests.post('https://api.hyperliquid.xyz/info',
+                          json={'type': 'meta'}, timeout=15)
+        if r.ok:
+            data = r.json()
+            for u in data.get('universe', []):
+                if u.get('name') == token_upper:
+                    max_lev = int(u.get('maxLeverage', 10))
+                    lev = min(max_lev, 10)  # cap at 10x
+                    _LEVERAGE_CACHE[token] = {'leverage': lev, 'cached_at': now}
+                    return lev
+    except Exception:
+        pass
+
+    # Cache negative (fetch failed) for 5 min to avoid hammering API
+    _LEVERAGE_CACHE[token] = {'leverage': 10, 'cached_at': now - _LEVERAGE_CACHE_TTL + 300}
+    return 10  # fallback
+
+
+# ─── Delayed Entry Processor ──────────────────────────────────────
+
+def _load_delayed():
+    """Load pending delayed entries."""
+    try:
+        with open(DELAYED_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def _save_delayed(entries):
+    """Save pending delayed entries."""
+    with open(DELAYED_FILE, 'w') as f:
+        json.dump(entries, f, indent=2)
+
+
+# ─── Epsilon-Greedy A/B Selection ──────────────────────────────────────────────
+
+def _load_ab_config():
+    try:
+        with open(AB_CONFIG_FILE) as f:
+            return json.load(f)
+    except Exception:
+        return {'enabled': False, 'tests': []}
+
+
+def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
+    """
+    Pick variant for a test using epsilon-greedy.
+    Exploitation: best win_rate from ab_results.
+    Exploration: weighted random from config.
+    """
+    cfg = _load_ab_config()
+    if not cfg.get('enabled', False):
+        return {}
+
+    test = next((t for t in cfg.get('tests', []) if t['name'] == test_name), None)
+    if not test:
+        return {}
+
+    # Try exploitation — read from ab_results
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT variant_id, win_rate_pct
+            FROM ab_results
+            WHERE test_name=%s AND trades >= 5
+            ORDER BY win_rate_pct DESC
+            LIMIT 1
+        """, (test_name,))
+        row = cur.fetchone()
+        cur.close(); conn.close()
+        exploit_vid = row[0] if row else None
+    except Exception:
+        exploit_vid = None
+
+    if random.random() >= EPSILON and exploit_vid:
+        # Exploitation — use best variant
+        for v in test.get('variants', []):
+            if v.get('id') == exploit_vid:
+                log(f'  [AB] EXPLOIT: {test_name} → {v["id"]} (win_rate={row[1]:.0f}%)')
+                return v
+
+    # Exploration — weighted random
+    variants = [v for v in test.get('variants', []) if v.get('enabled', True)]
+    if not variants:
+        return {}
+    total = sum(v.get('weight', 1) for v in variants)
+    r = random.uniform(0, total)
+    for v in variants:
+        r -= v.get('weight', 1)
+        if r <= 0:
+            log(f'  [AB] EXPLORE: {test_name} → {v["id"]} (random)')
+            return v
+    return variants[0]
+
+
+def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name):
+    """Record trade open in ab_results table."""
+    if not experiment:
+        return
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
+                                    total_pnl_pct, total_pnl_usdt, updated_at)
+            VALUES (%s, %s, 1, 0, 0, 0, 0, now())
+            ON CONFLICT (test_name, variant_id)
+            DO UPDATE SET
+                trades = ab_results.trades + 1,
+                updated_at = now()
+        """, (test_name, variant_id))
+        conn.commit()
+        cur.close(); conn.close()
+    except Exception as e:
+        log(f'[AB] record opened error: {e}')
+
+
+def get_ab_params_for_trade(direction: str) -> dict:
+    """
+    Get all A/B params for a trade using epsilon-greedy selection.
+    Returns dict with sl_pct, trailing_activation, trailing_distance, experiment metadata.
+    """
+    # SL test
+    sl_variant = _get_ab_variant_for_test('sl-distance-test', direction)
+    sl_pct = sl_variant.get('config', {}).get('slPct', 0.02)  # e.g. 1.0=1%, 1.5=1.5%, 2.0=2%
+
+    # Entry timing test
+    entry_variant = _get_ab_variant_for_test('entry-timing-test', direction)
+    entry_mode = entry_variant.get('config', {}).get('entryMode', 'immediate')
+
+    # Trailing stop test
+    ts_variant = _get_ab_variant_for_test('trailing-stop-test', direction)
+    trailing_activation = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
+    trailing_distance   = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
+
+    # Experiment metadata
+    experiments = []
+    if sl_variant:
+        experiments.append(('sl-distance-test', sl_variant.get('id', '')))
+    if entry_variant:
+        experiments.append(('entry-timing-test', entry_variant.get('id', '')))
+    if ts_variant:
+        experiments.append(('trailing-stop-test', ts_variant.get('id', '')))
+
+    experiment_str = None
+    if experiments:
+        parts = [f'{t}:{v}' for t, v in experiments]
+        experiment_str = '|'.join(parts)
+
+    return {
+        'sl_pct': sl_pct,
+        'entry_mode': entry_mode,
+        'trailing_activation': trailing_activation,
+        'trailing_distance': trailing_distance,
+        'experiment': experiment_str,
+        'sl_variant': sl_variant.get('id', '') if sl_variant else '',
+        'entry_variant': entry_variant.get('id', '') if entry_variant else '',
+        'ts_variant': ts_variant.get('id', '') if ts_variant else '',
+    }
+
+
+def process_delayed_entries():
+    """
+    Check pending delayed-entry signals.
+    For each: if pullback reached OR max_wait expired → execute or expire.
+    Returns (executed, expired).
+    """
+    pending = _load_delayed()
+    if not pending:
+        return 0, 0
+
+    executed = 0
+    expired = 0
+    still_pending = []
+
+    for entry in pending:
+        token      = entry['token']
+        direction  = entry['direction']
+        sig_price = entry['signal_price']   # price when signal fired
+        pullback   = entry.get('pullback_pct', 0.01)
+        max_wait   = entry.get('max_wait_minutes', 30)
+        sl_pct     = entry.get('sl_pct', 0.02)
+        conf       = entry.get('confidence', 50)
+        queued_at  = entry.get('queued_at', '')
+
+        # Check expiry
+        if queued_at:
+            try:
+                queued_time = time.mktime(time.strptime(queued_at, '%Y-%m-%dT%H:%M:%S.%f'))
+            except ValueError:
+                try:
+                    queued_time = time.mktime(time.strptime(queued_at, '%Y-%m-%dT%H:%M:%S'))
+                except ValueError:
+                    queued_time = time.time()
+            if time.time() - queued_time > max_wait * 60:
+                log(f'⏰ DELAYED EXPIRED: {token} {direction} (waited {max_wait}min, no pullback)')
+                expired += 1
+                continue
+
+        # Get current price
+        cur_price = get_current_price(token)
+        if not cur_price:
+            still_pending.append(entry)
+            continue
+
+        # Determine if pullback reached
+        if direction.upper() == 'LONG':
+            # Pullback = price dropped from sig_price
+            drop_pct = (sig_price - cur_price) / sig_price
+            triggered = drop_pct >= pullback
+        else:
+            # SHORT: pullback = price rose from sig_price
+            rise_pct = (cur_price - sig_price) / sig_price
+            triggered = rise_pct >= pullback
+
+        if not triggered:
+            still_pending.append(entry)
+            continue
+
+        # Pullback reached → execute trade
+        log(f'🎯 DELAYED ENTRY: {token} {direction} @ ${cur_price:.6f} '
+            f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
+
+        sl_pct_val = float(sl_pct)
+        if direction.upper() == 'LONG':
+            sl = cur_price * (1 - sl_pct_val)
+            tp = cur_price * 1.05
+            cmd_side = 'buy'
+        else:
+            sl = cur_price * (1 + sl_pct_val)
+            tp = cur_price * 0.95
+            cmd_side = 'sell'
+
+        experiment = entry.get('experiment', 'control')
+        variant_id = entry.get('variant_id', '')
+        test_name  = entry.get('test_name', '')
+
+        exp_arg = []
+        if experiment and experiment != 'control':
+            exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
+            exp_arg = ['--experiment', exp_json]
+
+        cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
+                token, cmd_side, str(POSITION_SIZE_USD), str(round(cur_price, 6)),
+                '--exchange', 'Hyperliquid',
+                '--strategy', 'delayed-entry',
+                '--paper',
+                '--sl', str(round(sl, 6)),
+                '--target', str(round(tp, 6)),
+                '--sl-distance', str(round(sl_pct_val, 3)),
+                '--trailing-threshold', '0.010',
+                '--server', SERVER,
+                '--signal', 'delayed-entry',
+                '--confidence', str(round(conf, 1)),
+                '--leverage', '5']
+               + exp_arg)
+
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if result.returncode == 0 and 'trade' in result.stdout.lower():
+                log(f'  ✅ DELAYED ENTERED: {token} {direction}')
+                executed += 1
+            else:
+                log(f'  ❌ DELAYED FAILED: {result.stderr.strip()[:80]}')
+                still_pending.append(entry)  # keep for retry
+        except Exception as e:
+            log(f'  ❌ DELAYED ERROR: {e}')
+            still_pending.append(entry)
+
+    _save_delayed(still_pending)
+    if expired > 0 or executed > 0:
+        log(f'  Delayed entries: {executed} executed | {expired} expired | {len(still_pending)} still waiting')
+    return executed, expired
+
+
+# ─── Trade Execution ──────────────────────────────────────────────
+
+def execute_trade(token, direction, price, confidence, source,
+                  leverage=10, paper=True, sl_pct=0.02,
+                  trailing_activation=0.01, trailing_distance=0.01,
+                  experiment=None, variant_id=None, test_name=None):
+    """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
+    cmd_side = direction.lower()  # long or short
+
+    sl_pct_val = float(sl_pct) / 100  # sl_pct in percent (1.0=1%), convert to fraction
+    if direction == 'LONG':
+        sl = price * (1 - sl_pct_val)
+        tp = price * 1.05
+    else:
+        sl = price * (1 + sl_pct_val)
+        tp = price * 0.95
+
+    # Sanity check: SL must provide real protection
+    if direction == 'LONG' and sl >= price:
+        sl = price * 0.99  # fallback: 1% SL
+        log(f'  [WARN] SL sanity check triggered for LONG {token}, reset to 1%')
+    elif direction == 'SHORT' and sl <= price:
+        sl = price * 1.01  # fallback: 1% SL
+        log(f'  [WARN] SL sanity check triggered for SHORT {token}, reset to 1%')
+
+    exp_arg = []
+    if experiment and experiment != 'control':
+        exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
+        exp_arg = ['--experiment', exp_json]
+
+    cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
+            token, cmd_side, str(POSITION_SIZE_USD), str(round(price, 6)),
+            '--exchange', 'Hyperliquid',
+            '--strategy', f'Hermes-{source}',
+            '--paper' if paper else '',
+            '--sl', str(round(sl, 6)),
+            '--target', str(round(tp, 6)),
+            '--sl-distance', str(round(sl_pct_val, 3)),
+            '--trailing-threshold', str(round(trailing_activation, 3)),
+            '--server', SERVER,
+            '--signal', source,
+            '--confidence', str(round(confidence, 1)),
+            '--leverage', str(leverage)] + exp_arg)
+    cmd = [c for c in cmd if c]  # strip empty strings
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            for line in result.stdout.split('\n'):
+                if 'trade #' in line.lower():
+                    tid = line.lower().split('trade #')[1].split()[0]
+                    return True, f'trade #{tid}'
+            return True, result.stdout.strip()[:80]
+        else:
+            return False, result.stderr.strip()[:80]
+    except Exception as e:
+        return False, str(e)[:80]
+
+
+def close_position(token, reason):
+    """Close an open position directly via brain.py."""
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
+                                user='postgres', password='Brain123')
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE trades
+            SET status='closed', close_time=NOW(),
+                exit_price=entry_price, pnl_pct=0, pnl_usdt=0
+            WHERE server=%s AND token=%s AND status='open'
+            RETURNING id
+        """, (SERVER, token))
+        row = cur.fetchone()
+        conn.commit()
+        cur.close(); conn.close()
+        if row:
+            log(f'CLOSED: {token} {reason} (trade #{row[0]})')
+            return True
+        return False
+    except Exception as e:
+        log(f'CLOSE ERROR: {token} — {e}')
+        return False
+
+
+# ─── Main Run ────────────────────────────────────────────────────
+
+def run(dry_run=False):
+    init_db()
+    log(f'=== Decider Run ({"LIVE" if not dry_run else "PAPER"}) ===')
+
+    # Process delayed-entry signals first
+    de_exec, de_exp = process_delayed_entries()
+
+    # Check position count
+    open_count = get_position_count()
+    log(f'Open positions: {open_count}/{MAX_POS}')
+
+    # Get approved signals
+    approved = get_approved_signals(hours=24)
+    log(f'Approved signals: {len(approved)}')
+
+    entered = 0
+    skipped = 0
+
+    for sig in approved:
+        token = sig['token']
+        direction = sig['direction']
+        confidence = sig['final_confidence']
+        price = sig.get('price') or get_current_price(token)
+
+        if not price:
+            log(f'SKIP: {token} — no price available')
+            skipped += 1
+            continue
+
+        # Check if already open
+        if is_position_open(token):
+            log(f'SKIP: {token} already open')
+            mark_signal_executed(token, direction)
+            skipped += 1
+            continue
+
+        # Check loss cooldown — block same direction after a loss
+        if is_loss_cooldown_active(token, direction):
+            log(f'SKIP: {token} {direction} in loss cooldown')
+            skipped += 1
+            continue
+
+        # Check win cooldown — block same direction after a win (prevents re-entry loop)
+        if _is_win_cooldown_active(token, direction):
+            log(f'SKIP: {token} {direction} in win cooldown')
+            skipped += 1
+            continue
+
+        # ── Direction Awareness ───────────────────────────────────
+        # Skip LONG/SHORT if it has < 50% win rate in recent history (min 3 trades)
+        wr, wr_count = _get_direction_wr(token, direction)
+        if wr < 50 and wr_count >= 3:
+            log(f'SKIP: {token} {direction} WR={wr:.0f}% ({wr_count} trades) — direction paused')
+            skipped += 1
+            continue
+
+        # Check position limit
+        if open_count >= MAX_POS:
+            log(f'SKIP: Max positions reached ({MAX_POS})')
+            break
+
+        source = f'conf-{sig.get("count", 1)}s'
+
+        # ── Epsilon-greedy A/B variant selection ──────────────────
+        ab = get_ab_params_for_trade(direction)
+        sl_pct = ab['sl_pct']
+        trailing_activation = ab['trailing_activation']
+        trailing_distance  = ab['trailing_distance']
+        experiment = ab['experiment']
+        sl_variant = ab.get('sl_variant', '')
+        ts_variant = ab.get('ts_variant', '')
+
+        # sl_pct is in percent (1.0 = 1%) so divide by 100 for price calc
+        if direction == 'LONG':
+            sl = price * (1 - sl_pct / 100)
+            tp = price * 1.05
+        else:
+            sl = price * (1 + sl_pct / 100)
+            tp = price * 0.95
+
+        log(f'EXEC: {token} {direction} @ ${price:.6f} conf={confidence:.0f}% '
+            f'SL=${sl:.4f} TP=${tp:.4f} [{source}] '
+            f'[SL={sl_pct:.1f}% trail={trailing_activation*100:.1f}%/{trailing_distance*100:.1f}%]')
+
+        if dry_run:
+            log(f'  → [DRY-RUN] Would enter {token} {direction}')
+            mark_signal_executed(token, direction)
+            entered += 1
+            # Don't increment open_count in dry-run — no real position opened
+            continue
+
+        # Get per-token leverage from Hyperliquid
+        lev = get_max_leverage(token)
+        lev = min(lev, 5)   # hard cap at 5x (safer for all directions)
+
+        success, msg = execute_trade(
+            token, direction, price, confidence, source,
+            leverage=lev, paper=True, sl_pct=sl_pct,
+            trailing_activation=trailing_activation, trailing_distance=trailing_distance,
+            experiment=experiment, variant_id=sl_variant, test_name='sl-distance-test')
+
+        if success:
+            log(f'  → ENTERED: {token} {direction} ({msg})')
+            mark_signal_executed(token, direction)
+            # Record in ab_results — all three experiments
+            _record_ab_trade_opened(token, direction, experiment, sl_variant, 'sl-distance-test')
+            _record_ab_trade_opened(token, direction, experiment, ab.get('entry_variant', ''), 'entry-timing-test')
+            _record_ab_trade_opened(token, direction, experiment, ab.get('ts_variant', ''), 'trailing-stop-test')
+            entered += 1
+            open_count += 1
+        else:
+            log(f'  → FAILED: {msg}')
+
+    log(f'=== Decider Done: {entered} entered | {skipped} skipped '
+        f'| {de_exec} delayed exec | {de_exp} delayed expired ===')
+    return entered, skipped
+
+
+if __name__ == '__main__':
+    dry = '--dry-run' in sys.argv
+    run(dry_run=dry)
