@@ -30,3 +30,7 @@ migration/
 # ─── Large / downloadable artifacts ─────────────────────────────────────────
 checkpoints/
 models_dev_cache.json
+
+# ─── Seed data (download from /git endpoint instead) ─────────────────────
+seed/
+seed/*.sql
