@@ -22,6 +22,14 @@ echo -e "\n[2/4] Creating directories..."
 mkdir -p data logs seed sessions
 echo "  OK: data/ logs/ seed/ sessions/"
 
+# 2b. Load seed SQL if it was extracted alongside setup.sh (from git zip)
+SEED_ZIP=$(find . -maxdepth 1 -name "*_seed.sql" 2>/dev/null | head -1)
+if [[ -f "$SEED_ZIP" && ! -s seed/signals_hermes.sql ]]; then
+    echo -e "\n[2b] Found seed SQL — copying to seed/signals_hermes.sql ..."
+    cp "$SEED_ZIP" seed/signals_hermes.sql
+    echo "  Loaded: $(wc -l < seed/signals_hermes.sql) lines"
+fi
+
 # 3. Init DBs (auto-loads seed if empty)
 echo -e "\n[3/4] Initializing databases..."
 python3 scripts/signal_schema.py
