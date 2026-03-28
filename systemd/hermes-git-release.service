@@ -1,0 +1,14 @@
+[Unit]
+Description=Build Hermes git release + lean seed zip
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/build-hermes-release 7 /var/www/git
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
