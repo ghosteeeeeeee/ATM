@@ -484,6 +484,22 @@ def run(dry_run=False):
     open_count = get_position_count()
     log(f'Open positions: {open_count}/{MAX_POS}')
 
+    # ── Rate limit: minimum 15 seconds between new entries ─────────
+    try:
+        conn_rate = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='brain123')
+        c_rate = conn_rate.cursor()
+        c_rate.execute("SELECT open_time FROM trades WHERE status='open' ORDER BY open_time DESC LIMIT 1")
+        row = c_rate.fetchone()
+        conn_rate.close()
+        if row and row[0]:
+            import datetime
+            gap = (datetime.datetime.now() - row[0].replace(tzinfo=None)).total_seconds()
+            if gap < 15:
+                log(f'SKIP: Rate limit — last entry {gap:.0f}s ago (min 15s gap)')
+                return 0, 0
+    except Exception:
+        pass  # no trades yet, proceed
+
     # Get approved signals
     approved = get_approved_signals(hours=24)
     log(f'Approved signals: {len(approved)}')
@@ -491,7 +507,7 @@ def run(dry_run=False):
     # Fallback: if no approved signals, take high-confidence PENDING signals
     if not approved:
         pending = get_pending_signals(hours=1, limit=30)
-        high_conf = [p for p in pending if p.get('confidence', 0) >= 75 and p.get('executed', 0) == 0]
+        high_conf = [p for p in pending if p.get('confidence', 0) >= 80 and p.get('executed', 0) == 0]
         log(f'Pending fallback: {len(high_conf)} signals above 75% (from {len(pending)} total)')
         for p in high_conf:
             p['final_confidence'] = p['confidence']
