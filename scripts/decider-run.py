@@ -11,7 +11,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active)
 
-BRAIN_CMD       = '/usr/local/bin/brain.py'
+BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
 MAX_POS         = 10
 POSITION_SIZE_USD = 50.0   # $50 actual capital per trade

@@ -17,7 +17,7 @@ DB_CONFIG = {
     'port': 5432,
     'database': 'brain',
     'user': 'postgres',
-    'password': 'postgres'
+    'password': 'brain123'
 }
 
 OLLAMA_URL = "http://localhost:11434"
@@ -305,15 +305,15 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     cur = conn.cursor()
     
     cur.execute("""
-        INSERT INTO trades (token, type, amount_usdt, entry_price,
+        INSERT INTO trades (token, direction, amount_usdt, entry_price,
                           exchange, strategy, paper, stop_loss, target, server, status, open_time,
-                          signal, confidence, token_address, side, direction, pnl_usdt, pnl_pct,
-                          sl_group, sl_distance, trailing_activation, trailing_distance, leverage, experiment)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                          signal, confidence, token_address, pnl_usdt, pnl_pct,
+                          sl_distance, trailing_activation, trailing_distance, leverage, experiment)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
-    """, (token, side_type.upper(), amount_usdt, entry_price,
-          exchange, strategy, paper, stop_loss, target, server, 'open', None, signal, confidence, address, side_type, direction, 0, 0,
-          sl_group, sl_distance, trailing_activation, trailing_distance, leverage, experiment))
+    """, (token, direction, amount_usdt, entry_price,
+          exchange, strategy, paper, stop_loss, target, server, 'open', None, signal, confidence, address, 0, 0,
+          sl_distance, trailing_activation, trailing_distance, leverage, experiment))
     
     trade_id = cur.fetchone()[0]
     conn.commit()
@@ -330,12 +330,12 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None, notes:
     
     # Get entry price to calculate pnl if not provided
     if pnl_usdt is None:
-        cur.execute("SELECT entry_price, amount_usdt, type, leverage FROM trades WHERE id = %s", (trade_id,))
+        cur.execute("SELECT entry_price, amount_usdt, direction, leverage FROM trades WHERE id = %s", (trade_id,))
         row = cur.fetchone()
         if row:
-            entry_price, amount_usdt, side, stored_lev = row
+            entry_price, amount_usdt, direction, stored_lev = row
             lev = float(stored_lev or 1)
-            if side.lower() in ['buy', 'long']:
+            if direction and direction.upper() == 'LONG':
                 pnl_usdt = (float(exit_price) - float(entry_price)) * (float(amount_usdt or 0) * lev / float(entry_price or 1))
             else:
                 pnl_usdt = (float(entry_price) - float(exit_price)) * (float(amount_usdt or 0) * lev / float(entry_price or 1))
