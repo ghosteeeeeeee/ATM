@@ -575,9 +575,9 @@ def get_pending_signals():
             SELECT token, direction, signal_type, confidence, value, decision, exchange, z_score_tier, z_score
             FROM signals 
             WHERE decision = 'PENDING' 
-            AND created_at > datetime('now', '-15 minutes')
+            AND created_at > datetime('now', '-5 minutes')
             ORDER BY confidence DESC
-            LIMIT 20
+            LIMIT 10
         """)
         rows = c.fetchall()
         conn.close()

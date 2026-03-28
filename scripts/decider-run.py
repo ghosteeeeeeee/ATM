@@ -6,7 +6,7 @@ Also processes delayed-entry signals from pending-delayed-entries.json.
 """
 import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
-from signal_schema import init_db, get_approved_signals, mark_signal_executed
+from signal_schema import init_db, get_approved_signals, get_pending_signals, mark_signal_executed
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active)
@@ -487,6 +487,17 @@ def run(dry_run=False):
     # Get approved signals
     approved = get_approved_signals(hours=24)
     log(f'Approved signals: {len(approved)}')
+
+    # Fallback: if no approved signals, take high-confidence PENDING signals
+    if not approved:
+        pending = get_pending_signals(hours=1, limit=30)
+        high_conf = [p for p in pending if p.get('confidence', 0) >= 75 and p.get('executed', 0) == 0]
+        log(f'Pending fallback: {len(high_conf)} signals above 75% (from {len(pending)} total)')
+        for p in high_conf:
+            p['final_confidence'] = p['confidence']
+            p['price'] = p.get('price') or get_current_price(p['token'])
+            p['source'] = f'pending-{p.get("signal_type","momentum")}'
+            approved.append(p)
 
     entered = 0
     skipped = 0

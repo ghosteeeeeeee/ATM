@@ -32,7 +32,7 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 
 # Entry score thresholds
 ENTRY_THRESHOLD   = 65    # min score to add signal
-AUTO_APPROVE      = 85    # ≥ this → auto-approve
+AUTO_APPROVE      = 70    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
@@ -735,7 +735,7 @@ def run():
                         z_score_tier=mom['z_direction'] if mom else None,
                     )
                     if score >= AUTO_APPROVE:
-                        mark_signal_processed(token, 'LONG')
+                        approve_signal(token, 'LONG')
                         log_trade(token)
                         log(f'APPROVED: {token} LONG @{price:.6f} {score:.1f}% {reasons}')
                         print(f'  LONG  {token:8s} {score:5.1f}% [AUTO]  {reasons}')
@@ -761,7 +761,7 @@ def run():
                     z_score_tier=mom['z_direction'] if mom else None,
                 )
                 if score >= AUTO_APPROVE:
-                    mark_signal_processed(token, 'SHORT')
+                    approve_signal(token, 'SHORT')
                     log_trade(token)
                     log(f'APPROVED: {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
                     print(f'  SHORT {token:8s} {score:5.1f}% [AUTO]  {reasons}')
