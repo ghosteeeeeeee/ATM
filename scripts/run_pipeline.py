@@ -9,7 +9,7 @@ SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'pipeline.log')
 
 # Which steps run every minute vs every N minutes
-STEPS_EVERY_MIN  = ['price_collector', 'signal_gen', 'decider-run', 'position_manager', 'hermes-trades-api']
+STEPS_EVERY_MIN  = ['price_collector', '4h_regime_scanner', 'signal_gen', 'decider-run', 'position_manager', 'hermes-trades-api']
 STEPS_EVERY_10M  = ['ai_decider', 'strategy_optimizer', 'ab_optimizer', 'ab_learner']
 
 
