@@ -253,7 +253,7 @@ def update_signal_decision(token, direction, decision, reason=None):
         UPDATE signals
         SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
             updated_at=CURRENT_TIMESTAMP
-        WHERE token=? AND direction=? AND decision='PENDING'
+        WHERE token=*** AND direction=? AND decision IN ('PENDING', 'APPROVED')
     ''', (decision, decision, token.upper(), direction.upper()))
     conn.commit()
     count = c.rowcount
