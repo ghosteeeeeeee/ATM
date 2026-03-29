@@ -103,6 +103,7 @@
             text-transform: uppercase;
         }
         .badge.hermes { background: #1f2937; color: var(--purple); border: 1px solid var(--purple); }
+        .badge.reason { background: #1f2937; color: var(--text-dim); border: 1px solid #374151; font-size: 0.65rem; }
         .none { color: var(--text-dim); font-style: italic; text-align: center; padding: 40px; }
     </style>
 </head>
@@ -201,6 +202,7 @@
                             <div class="trade-meta">
                                 ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
                                 ${t.amount_usdt ? `<span class="trade-stat"><div class="trade-stat-label">Size</div><div class="trade-stat-val">$${t.amount_usdt}</div></span>` : ''}
+                                ${t.close_reason ? `<span class="badge reason">${t.close_reason}</span>` : ''}
                                 <span class="trade-pnl ${pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</span>
                             </div>
                         </div>`;
