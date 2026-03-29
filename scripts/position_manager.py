@@ -18,7 +18,8 @@ from typing import List, Dict, Optional, Tuple
 try:
     from hyperliquid_exchange import (
         mirror_open, mirror_close, hype_coin,
-        get_open_hype_positions,
+        get_open_hype_positions_curl as get_open_hype_positions,
+        is_live_trading_enabled,
     )
     HYPE_AVAILABLE = True
 except Exception as e:
@@ -328,12 +329,17 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
         # ── Mirror to Hyperliquid (real trade) ───────────────────────
-        if HYPE_AVAILABLE:
-            hype_token = hype_coin(token)
+        # Respects kill switch: mirror_close checks is_live_trading_enabled() internally.
+        if HYPE_AVAILABLE and is_live_trading_enabled():
+            hype_token=hype_coin(token)
             try:
-                mirror_close(hype_token, direction)
+                result = mirror_close(hype_token, direction)
+                if not result.get("success"):
+                    print(f"[Position Manager] HYPE mirror_close failed: {result.get('message')}")
             except Exception as me:
                 print(f"[Position Manager] HYPE mirror_close failed: {me}")
+        elif HYPE_AVAILABLE:
+            print(f"[Position Manager] Live trading OFF — paper close not mirrored")
 
         # Record to ab_results on close
         if experiment and sl_dist:

@@ -321,14 +321,18 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     conn.close()
 
     # ── Mirror to Hyperliquid (real trade) ───────────────────────
-    # Non-blocking: failures are logged but don't stop paper trading.
+    # Respects kill switch: mirror_open checks is_live_trading_enabled() internally.
     try:
         import sys, os
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from hyperliquid_exchange import mirror_open, hype_coin, HYPE_AVAILABLE as _hype_ok
-        if _hype_ok:
-            hype_token = hype_coin(token)
-            mirror_open(hype_token, direction, float(entry_price))
+        from hyperliquid_exchange import mirror_open, hype_coin, is_live_trading_enabled
+        if is_live_trading_enabled():
+            hype_token=hype_coin(token)
+            result = mirror_open(hype_token, direction, float(entry_price))
+            if not result.get("success"):
+                print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
+        else:
+            print(f"[brain.py] Live trading OFF — paper trade {trade_id} not mirrored")
     except Exception as e:
         print(f"[brain.py] HYPE mirror_open failed (non-fatal): {e}")
 
