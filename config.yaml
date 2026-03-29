@@ -1,4 +1,4 @@
-model: minimax/MiniMax-M2.5
+model: minimax/MiniMax-M2.7
 toolsets:
 - hermes-cli
 agent:
