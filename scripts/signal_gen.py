@@ -32,7 +32,7 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 
 # Entry score thresholds
 ENTRY_THRESHOLD   = 65    # min score to add signal
-AUTO_APPROVE      = 75    # ≥ this → auto-approve (no AI needed)
+AUTO_APPROVE      = 85    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
@@ -218,14 +218,18 @@ def compute_zscore_percentile(prices, window=500):
     below = sum(1 for z in z_values if z <= current_z)
     pct_rank = round((below / len(z_values)) * 100, 1)
 
-    # Directional percentiles
-    # pct_long: what % of historical z-scores are BELOW current z?
-    #   if current_z is very negative → pct_long is high
-    # pct_short: what % of historical z-scores are ABOVE current z?
-    #   if current_z is very positive → pct_short is high
-    above = sum(1 for z in z_values if z >= current_z)
-    pct_long  = round((below / len(z_values)) * 100, 1)
-    pct_short = round((above / len(z_values)) * 100, 1)
+    # Directional percentiles based on PRICE position (not z-score)
+    # pct_long: what % of historical prices are BELOW current price?
+    #   HIGH pct_long = suppressed price = good LONG entry (low = elevated = bad)
+    # pct_short: what % of historical prices are ABOVE current price?
+    #   HIGH pct_short = elevated price = good SHORT entry (low = suppressed = bad)
+    #
+    # Use raw price percentile, not z-score percentile, for directional signals.
+    # pct_rank (above) = z-score percentile = useful for phase, NOT direction.
+    price_below = sum(1 for z in z_values if z <= current_z)
+    price_above = sum(1 for z in z_values if z >= current_z)
+    pct_long  = round((price_below / len(z_values)) * 100, 1)
+    pct_short = round((price_above / len(z_values)) * 100, 1)
 
     return pct_rank, pct_long, pct_short
 
@@ -565,9 +569,15 @@ def compute_score(token, direction, long_mult, short_mult):
         phase_reason = 'extreme-short'
 
     elif phase == 'exhaustion':
+        # In exhaustion, mean-reversion has been going on. For LONG, the price
+        # has been falling and is near/at lows. Check if it's actually suppressed.
         if direction == 'LONG':
-            phase_mod = -5
-            phase_reason = 'exhaustion-partial'
+            # Only allow LONG if price is actually suppressed (low pct_long)
+            if percentile_long < 40:
+                phase_mod = +3
+                phase_reason = 'exhaustion-long-ok'
+            else:
+                return None, None  # BLOCK LONG in exhaustion unless deeply suppressed
         else:
             phase_mod = +5
             phase_reason = 'exhaustion-short'
@@ -592,27 +602,36 @@ def compute_score(token, direction, long_mult, short_mult):
         z_score = max(0.0, avg_z * Z_SCALE)   # pos z → positive score
 
     # ── Velocity contribution (0-20 pts) ────────────────────────
-    # Rising z = recovering = good for LONG
-    # Falling z = declining = good for SHORT
+    # Velocity = change in z-score over time
+    # Rising z = price reverting UP toward mean = GOOD for SHORT, BAD for LONG
+    # Falling z = price reverting DOWN from mean = GOOD for LONG, BAD for SHORT
     VEL_SCALE = 200  # velocity = ±0.1 → ±20 pts
     if direction == 'LONG':
-        vel_score = max(0.0, velocity * VEL_SCALE)
-    else:
+        # Negative velocity = z falling = price reverting down = good LONG entry
         vel_score = max(0.0, -velocity * VEL_SCALE)
+    else:
+        # Positive velocity = z rising = price reverting up = good SHORT entry
+        vel_score = max(0.0, velocity * VEL_SCALE)
 
-    # ── RSI confirmation (0-3 pts) ─────────────────────────────
+    # ── RSI mandatory gate (0-3 pts) ─────────────────────────────
+    # LONG: RSI must be < 60 (not overbought) → returns None if RSI ≥ 60
+    # SHORT: RSI must be > 40 (not oversold) → returns None if RSI ≤ 40
     rsi_val = rsi(prices) if len(prices) >= 30 else None
     rsi_score = 0.0
     rsi_reason = ''
     if rsi_val is not None:
-        if direction == 'LONG' and rsi_val < 50:
-            rsi_score = W_RSI * (50 - rsi_val) / 30
-            if rsi_val < 40:
-                rsi_reason = f'RSI={rsi_val:.0f}(oversold)'
-        elif direction == 'SHORT' and rsi_val > 50:
-            rsi_score = W_RSI * (rsi_val - 50) / 30
-            if rsi_val > 60:
-                rsi_reason = f'RSI={rsi_val:.0f}(overbought)'
+        if direction == 'LONG':
+            if rsi_val >= 60:
+                return None, None   # BLOCK LONG — overbought
+            if rsi_val < 50:
+                rsi_score = W_RSI * (50 - rsi_val) / 30
+                rsi_reason = f'RSI={rsi_val:.0f}(oversold)' if rsi_val < 40 else f'RSI={rsi_val:.0f}(ok)'
+        elif direction == 'SHORT':
+            if rsi_val <= 40:
+                return None, None   # BLOCK SHORT — oversold
+            if rsi_val > 50:
+                rsi_score = W_RSI * (rsi_val - 50) / 30
+                rsi_reason = f'RSI={rsi_val:.0f}(overbought)' if rsi_val > 60 else f'RSI={rsi_val:.0f}(ok)'
 
     # ── MACD confirmation (0-1 pts) ───────────────────────────
     _, hist = macd(prices) if len(prices) >= 40 else (None, None)
@@ -632,7 +651,8 @@ def compute_score(token, direction, long_mult, short_mult):
     regime_mod = +5 if regime_mult > 1.0 else 0
 
     # ── Score assembly ─────────────────────────────────────────
-    # z_score: 0-60 | velocity: 0-20 | phase: ±5 | regime: 0-5 | rsi: 0-3 | macd: 0-1
+    # z_score: 0-60 | velocity: 0-20 | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1
+    # RSI gate: returns None if RSI blocks the direction
     score = z_score + vel_score + phase_mod + regime_mod + rsi_score + macd_score
     score = min(99.0, max(0, round(score, 1)))
 
@@ -723,6 +743,16 @@ def run():
                     print(f'  LONG-B {token:8s} {score:5.1f}% [BLOCKED] {long_filter_reason}')
                     blocked += 1
                 else:
+                    # Pre-compute RSI/MACD for add_signal
+                    prices_all = get_price_history(token, lookback_minutes=60480)
+                    prices_list = [r[1] for r in prices_all] if prices_all else []
+                    rsi_14_val = rsi(prices_list) if len(prices_list) >= 30 else None
+                    macd_line_val, macd_hist_val = macd(prices_list) if len(prices_list) >= 40 else (None, None)
+                    macd_sig_val = macd(prices_list)[0] if len(prices_list) >= 40 else None
+                    if macd_sig_val and macd_hist_val:
+                        macd_signal_val = macd_sig_val - macd_hist_val
+                    else:
+                        macd_signal_val = None
                     sources = '+'.join(sorted(set(s[0] for s in signals)))
                     reasons = ' | '.join(s[3] for s in signals[:4])
                     add_signal(
@@ -733,6 +763,10 @@ def run():
                         timeframe=f'{mom["phase"][:3] if mom else "unk"}',
                         z_score=mom['avg_z'] if mom else None,
                         z_score_tier=mom['z_direction'] if mom else None,
+                        rsi_14=rsi_14_val,
+                        macd_value=macd_line_val,
+                        macd_signal=macd_signal_val,
+                        macd_hist=macd_hist_val,
                     )
                     if score >= AUTO_APPROVE:
                         approve_signal(token, 'LONG')

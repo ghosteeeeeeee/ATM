@@ -201,10 +201,14 @@ whatsapp: {}
 approvals:
   mode: manual
 command_allowlist:
-- overwrite system config
 - shell command via -c/-lc flag
-- delete in root path
 - recursive delete
+- overwrite system config
+- SQL DELETE without WHERE
+- delete in root path
+- force kill processes
+- xargs with rm
+- overwrite system file via tee
 quick_commands: {}
 personalities: {}
 security:

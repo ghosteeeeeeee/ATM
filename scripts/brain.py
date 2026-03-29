@@ -327,8 +327,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from hyperliquid_exchange import mirror_open, hype_coin, is_live_trading_enabled
         if is_live_trading_enabled():
-            hype_token=hype_coin(token)
-            result = mirror_open(hype_token, direction, float(entry_price))
+            # Read back leverage for this trade
+            conn2 = get_db_connection()
+            cur2 = conn2.cursor()
+            cur2.execute("SELECT leverage FROM trades WHERE id = %s", (trade_id,))
+            row = cur2.fetchone()
+            lev = int(row[0]) if row else 1
+            cur2.close(); conn2.close()
+
+            hype_token = hype_coin(token)
+            result = mirror_open(hype_token, direction, float(entry_price), leverage=lev)
             if not result.get("success"):
                 print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
         else:

@@ -1,0 +1,4 @@
+18:34:35 ENTER: queued interrupt msg='still there?', agent_running=True
+18:34:35 interrupt fired: msg='still there?', children=0, parent._interrupt=True
+00:06:29 ENTER: queued interrupt msg='continue', agent_running=True
+00:06:29 interrupt fired: msg='continue', children=0, parent._interrupt=True

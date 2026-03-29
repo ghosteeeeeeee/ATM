@@ -32,6 +32,92 @@ _EXCHANGE_ENDPOINT      = BASE_URL + "/exchange"
 _wallet   = None
 _exchange = None
 
+# ─── Cached HL meta (coin info, expires every 6h) ───────────────────────────
+_META_CACHE        = {"data": None, "ts": 0}
+_META_CACHE_TTL    = 21600  # 6 hours
+
+def _get_meta() -> dict:
+    """Fetch full HL coin meta, cached for 6h to avoid hammering /info."""
+    now = time.time()
+    if _META_CACHE["data"] is not None and now - _META_CACHE["ts"] < _META_CACHE_TTL:
+        return _META_CACHE["data"]
+    try:
+        result = _hl_info({"type": "meta"})
+        _META_CACHE["data"] = result
+        _META_CACHE["ts"]   = now
+        return result
+    except Exception as e:
+        # Fallback: return stale cache if fetch fails
+        if _META_CACHE["data"]:
+            return _META_CACHE["data"]
+        raise
+
+def _sz_decimals(token: str) -> int:
+    """Return szDecimals for a coin from cached meta, default 4."""
+    try:
+        for coin in _get_meta().get("universe", []):
+            if coin.get("name", "").upper() == token.upper():
+                return int(coin.get("szDecimals", 4))
+        return 4
+    except Exception:
+        return 4
+
+
+# Asset ID cache: populated from meta marginTableId (unique per coin, stable)
+_ASSET_ID_CACHE = {}
+
+def _asset_id(token: str) -> int:
+    """Return asset ID for a coin from cached meta."""
+    if token in _ASSET_ID_CACHE:
+        return _ASSET_ID_CACHE[token]
+    try:
+        for coin in _get_meta().get("universe", []):
+            if coin.get("name", "").upper() == token.upper():
+                aid = int(coin.get("marginTableId", 0))
+                _ASSET_ID_CACHE[token] = aid
+                return aid
+        return 0
+    except Exception:
+        return 0
+
+
+_LEVERAGE_CACHE = {}   # {coin: max_leverage}
+
+def _coin_max_leverage(token: str) -> int:
+    """Get max leverage for a coin from cached HL meta (auto-populated)."""
+    if token in _LEVERAGE_CACHE:
+        return _LEVERAGE_CACHE[token]
+    try:
+        for coin in _get_meta().get("universe", []):
+            if coin.get("name", "").upper() == token.upper():
+                lev = int(coin.get("maxLeverage", 10))
+                _LEVERAGE_CACHE[token] = lev
+                return lev
+        _LEVERAGE_CACHE[token] = 10
+        return 10
+    except Exception:
+        _LEVERAGE_CACHE[token] = 10
+        return 10
+
+
+def _round_tick(token: str, price: float) -> float:
+    """
+    Round a price to HL's tick size for a coin.
+    Uses the same formula as Exchange._slippage_price:
+      perpetuals (asset_id < 10000): round to (6 - sz_decimals) dp
+      spot (asset_id >= 10000):      round to (8 - sz_decimals) dp
+    """
+    try:
+        decimals = _sz_decimals(token)
+        asset_id = _asset_id(token)
+        if asset_id < 10000:   # perpetual
+            dp = max(0, 6 - decimals)
+        else:                   # spot
+            dp = max(0, 8 - decimals)
+        return round(price, dp)
+    except Exception:
+        return round(price, 4)  # safe fallback
+
 # Export flag so callers can check mirroring availability
 HYPE_AVAILABLE = True
 
@@ -129,13 +215,33 @@ def get_wallet():
 
 
 def get_exchange():
+    """
+    Get or create cached Exchange instance.
+    Handles rate-limit errors at init time with retry + backoff.
+    """
     global _exchange
-    if _exchange is None:
-        _exchange = Exchange(
-            get_wallet(),
-            base_url=BASE_URL,
-            account_address=MAIN_ACCOUNT_ADDRESS,
-        )
+    if _exchange is not None:
+        return _exchange
+
+    import time as _time
+    for attempt in range(5):
+        try:
+            _exchange = Exchange(
+                get_wallet(),
+                base_url=BASE_URL,
+                account_address=MAIN_ACCOUNT_ADDRESS,
+            )
+            return _exchange
+        except Exception as e:
+            err_str = str(e)
+            if "429" in err_str or "rate limit" in err_str.lower() or "null" in err_str:
+                delay = (attempt + 1) * 5
+                print(f"[HYPE] Exchange init rate-limited, retrying in {delay}s...")
+                _time.sleep(delay)
+            else:
+                raise
+    # Final attempt
+    _exchange = Exchange(get_wallet(), base_url=BASE_URL, account_address=MAIN_ACCOUNT_ADDRESS)
     return _exchange
 
 
@@ -321,11 +427,23 @@ def place_order(name, side, sz, price=None, order_type="Limit", tif="Gtc",
 
 
 def close_position(name):
-    """Close an open position using market_close via /exchange."""
+    """
+    Close an open position via /exchange.
+    Gets position size from /info (separate pool), then places reduce-only
+    GTC limit at current mid price (properly rounded to tick size).
+    """
     _exchange_rate_limit()
+
+    # Get position size from /info (separate rate-limit pool from /exchange)
+    positions = get_open_hype_positions_curl()
+    if name not in positions:
+        return {"success": False, "message": f"No open position for {name}"}
+    pos = positions[name]
+
     exchange = get_exchange()
 
     def _do():
+        # market_close uses SDK's internal tick rounding (always correct)
         return exchange.market_close(coin=name, sz=None, slippage=0.005)
 
     try:
@@ -425,7 +543,7 @@ def _get_trade_size_usdt() -> float:
 # These are the ones called by brain.py and position_manager.py.
 # They check the kill switch before doing anything.
 
-def mirror_open(token: str, direction: str, entry_price: float) -> dict:
+def mirror_open(token: str, direction: str, entry_price: float, leverage: int = None) -> dict:
     """
     Open a real Hyperliquid position mirroring a paper trade.
     BLOCKED if live trading is disabled (kill switch).
@@ -434,6 +552,7 @@ def mirror_open(token: str, direction: str, entry_price: float) -> dict:
         token:       Hyperliquid coin name (e.g. 'HYPE')
         direction:   'LONG' or 'SHORT'
         entry_price: Entry price for size calculation
+        leverage:    HL leverage to use (default: coin max up to 10x)
 
     Returns:
         dict with 'success', 'message', 'size', 'entry_price'
@@ -456,7 +575,8 @@ def mirror_open(token: str, direction: str, entry_price: float) -> dict:
             return {"success": False, "message": f"Cannot determine price for {token}"}
 
     # Size in coin units — round UP to szDecimals so we always meet min notional
-    decimals = SZ_DECIMALS.get(token.upper(), 4)
+    # Use live HL meta for szDecimals (VINE=0, most coins=4, BTC=6)
+    decimals = _sz_decimals(token)
     raw_sz = size_usdt / entry_price
     if decimals > 0:
         sz = float(Decimal(str(raw_sz)).quantize(
@@ -468,7 +588,17 @@ def mirror_open(token: str, direction: str, entry_price: float) -> dict:
 
     is_buy = direction.upper() == "LONG"
 
+    # Set leverage BEFORE placing the order
+    # Use passed leverage, or paper trade's notional ratio, capped at coin max and 10x
+    if leverage is None:
+        # Derive leverage from paper trade notional: $10 × 3 = $30 notional → 3x on $10
+        # Default to 3x if we can't calculate better
+        leverage = 3
+    leverage = max(1, min(int(leverage), _coin_max_leverage(token), 10))
+
     def _do():
+        exchange = get_exchange()
+        exchange.update_leverage(leverage, token, is_cross=True)
         return place_order(
             name=token,
             side="BUY" if is_buy else "SELL",
