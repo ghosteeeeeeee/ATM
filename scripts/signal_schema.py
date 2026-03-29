@@ -177,18 +177,37 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                exchange='hyperliquid', timeframe='1h', z_score=None, z_score_tier=None,
                momentum_state=None, rsi_14=None, macd_value=None, macd_signal=None,
                macd_hist=None, leverage=None, **kwargs):
-    """Add a new signal. Skips if same token+direction+source in last 30 min."""
+    """Add a new signal. Combines with existing PENDING signal for same token+direction (any source)
+    within 30 min — takes max confidence, merges sources list."""
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
+        # Check for existing PENDING signal for same token+direction in last 30 min
         c.execute('''
-            SELECT 1 FROM signals
-            WHERE token=? AND direction=? AND source=?
-            AND created_at > datetime('now', '-30 minutes') LIMIT 1
-        ''', (token.upper(), direction.upper(), source))
-        if c.fetchone():
+            SELECT id, source, confidence FROM signals
+            WHERE token=? AND direction=? AND executed=0 AND decision='PENDING'
+            AND created_at > datetime('now', '-30 minutes')
+            LIMIT 1
+        ''', (token.upper(), direction.upper()))
+        existing = c.fetchone()
+        if existing:
+            sig_id, existing_source, existing_conf = existing
+            # Combine: use max confidence (strongest signal wins)
+            new_conf = max(existing_conf, confidence)
+            # Merge sources — list unique sources
+            sources = list(set(existing_source.split('+')) | set(source.split('+')))
+            new_sources = '+'.join(sources)
+            if len(sources) > 1:
+                # Multiple confirmations — boost confidence slightly
+                new_conf = min(100, new_conf + 5)
+            c.execute('''
+                UPDATE signals SET confidence=?, source=?, updated_at=CURRENT_TIMESTAMP
+                WHERE id=?
+            ''', (new_conf, new_sources, sig_id))
+            conn.commit()
             conn.close()
-            return None
+            return sig_id  # return existing signal id (updated)
+        # No existing — insert new
         c.execute('''
             INSERT INTO signals
             (token, direction, signal_type, source, confidence, value, price,
@@ -254,6 +273,7 @@ def update_signal_decision(token, direction, decision, reason=None):
         SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
             updated_at=CURRENT_TIMESTAMP
         WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
+        AND executed=0
     ''', (decision, decision, token.upper(), direction.upper()))
     conn.commit()
     count = c.rowcount

@@ -967,7 +967,7 @@ LLM CANDLE PREDICTION (for reference):
 
     # All PENDING signals (65-94%) go to AI for review
     print(f"\n🤔 AI reviewing: {t} {direction} @ ${entry} (signal confidence: {conf}%)")
-    macd_data = get_macd(t)
+    macd_data = {}
     decision, ai_conf, reason = ai_decide(t, direction, entry, conf, prices, market_z, macd_data, pred_str, z_tier, z)
     
     print(f"   AI Decision: {decision.upper()} (conf: {ai_conf}%)")
