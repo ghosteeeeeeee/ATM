@@ -4,6 +4,7 @@ AI Decider - Actually thinks and decides using all available info
 """
 import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback
 from datetime import datetime
+import pandas as pd
 
 LOG_FILE = '/var/www/hermes/logs/trading.log'
 
@@ -713,16 +714,54 @@ def update_trade_prices():
         print(f"⚠️ Price update error: {e}")
 
 def get_macd(token):
-    # Sanitize token before shell execution
+    """Compute MACD from price_history in signals_hermes.db (Python, no node needed).
+    Returns dict with signal, histogram, trend, confidence.
+    EMA periods: fast=12, slow=26, signal=9 (standard MACD).
+    """
+    import numpy as np
     if not token or not token.replace('_','').isalnum():
         return {}
-    cmd = ["node", "/root/.openclaw/workspace/scripts/macd-analyzer.js", token]
-    out = subprocess.run(cmd, capture_output=True, text=True, timeout=15).stdout
     try:
-        return json.loads(out)
-    except Exception as e:
-        log_error(f'get_macd: json.loads failed: {e}')
+        conn = sqlite3.connect('/root/.hermes/data/signals_hermes.db')
+        df = pd.read_sql(
+            "SELECT timestamp, price FROM price_history WHERE token=? ORDER BY timestamp ASC",
+            conn, params=(token.upper(),))
+        conn.close()
+        if len(df) < 35:
+            return {}
+        prices = df['price'].values
+        ema_fast = _ema(prices, 12)
+        ema_slow = _ema(prices, 26)
+        macd_line = ema_fast - ema_slow
+        signal_line = _ema(macd_line, 9)
+        hist = macd_line - signal_line
+        cur_macd = float(macd_line[-1])
+        cur_signal = float(signal_line[-1])
+        cur_hist = float(hist[-1])
+        bullish = cur_macd > cur_signal
+        avg_price = float(np.mean(prices[-50:])) if len(prices) >= 50 else float(prices[-1])
+        conf = min(100, round(abs(cur_hist) / (abs(cur_macd) + 1e-10) * 100))
+        return {
+            "signal": "bullish" if bullish else "bearish",
+            "histogram": round(cur_hist, 6),
+            "macd_line": round(cur_macd, 6),
+            "signal_line": round(cur_signal, 6),
+            "confidence": conf,
+            "histogram_trend": "rising" if len(hist) > 5 and hist[-1] > hist[-3] else "falling"
+        }
+    except Exception:
         return {}
+
+def _ema(series, period):
+    """Compute EMA of a 1D array (list/ndarray) without talib."""
+    import numpy as np
+    arr = np.array(series, dtype=float)
+    alpha = 2.0 / (period + 1)
+    ema = np.empty_like(arr)
+    ema[0] = arr[0]
+    for i in range(1, len(arr)):
+        ema[i] = alpha * arr[i] + (1 - alpha) * ema[i-1]
+    return ema
 
 def is_real_pump(token):
     """Check if token is in a real pump - less strict now"""
@@ -967,7 +1006,7 @@ LLM CANDLE PREDICTION (for reference):
 
     # All PENDING signals (65-94%) go to AI for review
     print(f"\n🤔 AI reviewing: {t} {direction} @ ${entry} (signal confidence: {conf}%)")
-    macd_data = {}
+    macd_data = get_macd(t)
     decision, ai_conf, reason = ai_decide(t, direction, entry, conf, prices, market_z, macd_data, pred_str, z_tier, z)
     
     print(f"   AI Decision: {decision.upper()} (conf: {ai_conf}%)")

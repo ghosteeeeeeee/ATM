@@ -10,7 +10,7 @@ Rate limit strategy:
 
 from eth_account import Account
 from hyperliquid.exchange import Exchange
-import pathlib, time, json, os as _os, math, urllib.request, urllib.error
+import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error
 from decimal import Decimal, ROUND_UP
 
 # ─── Wallet Credentials ──────────────────────────────────────────────────────
