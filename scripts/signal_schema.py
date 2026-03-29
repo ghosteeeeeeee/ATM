@@ -192,14 +192,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         existing = c.fetchone()
         if existing:
             sig_id, existing_source, existing_conf = existing
-            # Combine: use max confidence (strongest signal wins)
-            new_conf = max(existing_conf, confidence)
-            # Merge sources — list unique sources
-            sources = list(set(existing_source.split('+')) | set(source.split('+')))
-            new_sources = '+'.join(sources)
-            if len(sources) > 1:
-                # Multiple confirmations — boost confidence slightly
-                new_conf = min(100, new_conf + 5)
+            old_sources = set(existing_source.split('+'))
+            new_sources_set = set(source.split('+'))
+            all_sources = old_sources | new_sources_set
+            new_sources = '+'.join(sorted(all_sources))
+            num_sources_gained = len(new_sources_set - old_sources)
+
+            if confidence < existing_conf:
+                # Declining confidence: penalize. Reduce by 40% of the drop + credit for new sources.
+                decay = (existing_conf - confidence) * 0.4
+                new_conf = max(existing_conf - decay + (num_sources_gained * 1.0), min(existing_conf, confidence))
+                new_conf = max(1, min(99, new_conf))
+            else:
+                # Rising or equal confidence: boost for new sources, take max
+                new_conf = max(existing_conf, confidence)
+                if num_sources_gained > 0:
+                    new_conf = min(100, new_conf + num_sources_gained)
+
             c.execute('''
                 UPDATE signals SET confidence=?, source=?, updated_at=CURRENT_TIMESTAMP
                 WHERE id=?

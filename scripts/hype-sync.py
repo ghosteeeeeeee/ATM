@@ -15,20 +15,45 @@ What it does:
 """
 import sys, argparse, time
 sys.path.insert(0, '/root/.hermes/scripts')
-
 from hyperliquid_exchange import (
     mirror_open, mirror_close, is_live_trading_enabled,
     get_open_hype_positions_curl, is_delisted, get_tradeable_tokens
 )
-from position_manager import get_open_positions as pm_get_open
+import psycopg2
 
 DRY = True  # overridden by --apply
+
+DB = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
 
 
 def log(msg, tag="INFO"):
     ts = time.strftime("%H:%M:%S")
     print(f"[{ts}] [{tag}] {msg}")
 
+
+def get_brain_positions():
+    """Get all live (non-paper) open positions from brain DB for Hermes server.
+    This is the single source of truth for Hyperliquid trades.
+    """
+    conn = psycopg2.connect(**DB)
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT token, direction, entry_price, leverage, server, paper
+            FROM trades
+            WHERE status = 'open'
+              AND paper = FALSE
+              AND server = 'Hermes'
+            ORDER BY token
+        """)
+        rows = cur.fetchall()
+        return [{'token': r[0], 'direction': r[1], 'entry_price': r[2],
+                 'leverage': r[3], 'server': r[4], 'paper': r[5]} for r in rows]
+    except Exception as e:
+        log(f"Failed to query brain trades: {e}", "FAIL")
+        return []
+    finally:
+        conn.close()
 
 
 def get_hype_positions():
@@ -136,10 +161,10 @@ def main():
     if not live:
         log("Live trading is DISABLED — opens will be blocked by hyperliquid_exchange", "WARN")
 
-    brain_pos = pm_get_open()
-    log(f"Brain open positions: {len(brain_pos)}", "INFO")
+    brain_pos = get_brain_positions()
+    log(f"Brain live positions: {len(brain_pos)}", "INFO")
     for p in brain_pos:
-        log(f"  {p['token']} {p['direction']} @ ${p['entry_price']:.4f} lev={p['leverage']}x", "INFO")
+        log(f"  [{p['server']}] {p['token']} {p['direction']} @ ${float(p['entry_price']):.4f} lev={p['leverage']}x paper={p['paper']}", "INFO")
 
     hype_pos = get_hype_positions()
     log(f"HL open positions: {len(hype_pos)}", "INFO")
