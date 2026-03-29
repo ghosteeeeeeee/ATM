@@ -35,3 +35,4 @@ models_dev_cache.json
 seed/
 seed/*.sql
 .secrets.local
+skills/openclaw-imports/
