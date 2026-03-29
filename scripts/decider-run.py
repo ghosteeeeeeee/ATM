@@ -507,8 +507,8 @@ def run(dry_run=False):
     # Fallback: if no approved signals, take high-confidence PENDING signals
     if not approved:
         pending = get_pending_signals(hours=1, limit=30)
-        high_conf = [p for p in pending if p.get('confidence', 0) >= 80 and p.get('executed', 0) == 0]
-        log(f'Pending fallback: {len(high_conf)} signals above 80% (from {len(pending)} total)')
+        high_conf = [p for p in pending if p.get('confidence', 0) >= 90 and p.get('executed', 0) == 0]
+        log(f'Pending fallback: {len(high_conf)} signals above 90% (from {len(pending)} total)')
         for p in high_conf:
             p['final_confidence'] = p['confidence']
             p['price'] = p.get('price') or get_current_price(p['token'])

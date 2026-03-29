@@ -32,7 +32,7 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 
 # Entry score thresholds
 ENTRY_THRESHOLD   = 65    # min score to add signal
-AUTO_APPROVE      = 85    # ≥ this → auto-approve (no AI needed)
+AUTO_APPROVE      = 95    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
@@ -43,6 +43,7 @@ W_PERCENTILE      = 3.0   # percentile rank is primary signal
 W_VELOCITY        = 2.0   # momentum direction (rising/falling z)
 W_RSI             = 1.0   # RSI confirmation
 W_MACD            = 0.8   # MACD confirmation
+W_VOLUME          = 1.5   # volume rate-of-change confirmation
 
 # ─── Timeframe windows ──────────────────────────────────────────
 TF_WINDOWS = [
@@ -304,6 +305,66 @@ def detect_phase(percentile, velocity):
 
 
 # ═══════════════════════════════════════════════════════════════
+# Volume Rate-of-Change (from Hyperliquid recentTrades)
+# ═══════════════════════════════════════════════════════════════
+_VOL_CACHE = {}   # token → (timestamp, data)
+_VOL_TTL   = 60   # seconds
+
+def _hl_trades_cached(token):
+    """Fetch recent HL trades, cached for VOL_TTL seconds."""
+    now = time.time()
+    key = token.upper()
+    if key in _VOL_CACHE and now - _VOL_CACHE[key][0] < _VOL_TTL:
+        return _VOL_CACHE[key][1]
+    try:
+        import sys as _sys
+        _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from hyperliquid_exchange import _hl_info
+        r = _hl_info({'type': 'recentTrades', 'coin': token.upper()})
+        _VOL_CACHE[key] = (now, r)
+        return r
+    except Exception:
+        _VOL_CACHE[key] = (now, [])
+        return []
+
+def get_volume_roc(token):
+    """
+    Volume rate-of-change from HL recentTrades.
+    Returns (vol_roc, vol_score, vol_reason):
+      vol_roc:  recent_avg / older_avg - 1  (normalized, can be negative)
+      vol_score: 0-10 pts contribution to signal score
+      vol_reason: human-readable string
+    Higher recent volume confirms directional momentum.
+    """
+    trades = _hl_trades_cached(token)
+    if not trades or len(trades) < 4:
+        return 0.0, 0.0, None
+
+    sizes = [abs(float(t['sz'])) for t in trades]
+    recent = sizes[:3]
+    older  = sizes[3:7] if len(sizes) > 3 else sizes
+
+    avg_recent = sum(recent) / len(recent)
+    avg_older  = sum(older)  / len(older)
+
+    if avg_older <= 0:
+        return 0.0, 0.0, None
+
+    vol_roc = (avg_recent / avg_older) - 1.0  # e.g. +1.5 = 150% surge
+
+    # Score: cap at ±10 pts. Negative = volume dying (weakens signal)
+    # vol_roc of 1.0 = 100% increase → +8 pts
+    vol_score = max(-5.0, min(10.0, vol_roc * 5.0))
+    vol_score = round(vol_score, 2)
+
+    if abs(vol_roc) < 0.2:
+        return vol_roc, 0.0, None  # not enough change to matter
+
+    vol_reason = f'vol={vol_roc:+.0%}'
+    return vol_roc, vol_score, vol_reason
+
+
+# ═══════════════════════════════════════════════════════════════
 # Z-Score Multi-Timeframe Analysis
 # ═══════════════════════════════════════════════════════════════
 
@@ -347,6 +408,8 @@ def get_momentum_stats(token):
     min_z   = min(z_vals) if z_vals else 0
     z_direction = 'rising' if avg_z > 0.3 else 'falling' if avg_z < -0.3 else 'neutral'
 
+    vol_roc, vol_score, vol_reason = get_volume_roc(token)
+
     return {
         'percentile': percentile,
         'percentile_long': pct_long,
@@ -357,6 +420,9 @@ def get_momentum_stats(token):
         'max_z':     round(max_z, 3),
         'min_z':     round(min_z, 3),
         'z_direction': z_direction,
+        'volume_roc': vol_roc,
+        'vol_score': vol_score,
+        'vol_reason': vol_reason,
     }
 
 
@@ -537,28 +603,36 @@ def compute_score(token, direction, long_mult, short_mult):
     # Target: suppressed pct_long=35 → ~50 pts + good phase/vel → hits 65+
     def pct_long_score_fn(pct):
         # pct_long = % below current → LOW = suppressed = good for LONG
-        # Give positive score for suppressed prices, 0 for elevated
-        # Threshold: pct_long < 50 = suppressed (below median), score based on depth
-        # pct 50→0pts, pct 35→60pts, pct 20→120pts (capped)
+        # pct 50→0pts, pct 35→30pts, pct 20→60pts (capped)
         if pct >= 50:
             return 0.0
-        return max(0.0, (50 - pct) / 15 * 60)
+        if pct <= 20:
+            return min(60.0, (50 - pct) / 10 * 60)
+        return (50 - pct) / 30 * 30
 
     def pct_short_score_fn(pct):
         # pct_short = % above current → HIGH = elevated = good for SHORT
         # Give positive score for elevated prices, 0 for suppressed
-        # Threshold lowered to 35 (moderate elevation triggers shorts)
-        # pct 35→0pts, pct 50→60pts, pct 65→120pts (capped)
-        if pct <= 35:
+        # pct 40→0pts, pct 55→30pts, pct 70→60pts (capped)
+        if pct <= 40:
             return 0.0
-        return max(0.0, (pct - 35) / 15 * 60)
+        if pct >= 70:
+            return min(60.0, (pct - 40) / 10 * 60)
+        return (pct - 40) / 30 * 30
 
     p_long  = pct_long_score_fn(percentile_long)
     p_short = pct_short_score_fn(percentile_short)
     pct_score = p_long if direction == 'LONG' else p_short
 
-    # ── Phase filter ──────────────────────────────────────────
-    if phase == 'quiet':
+    # ── Volume ROC ─────────────────────────────────────────────
+    # High volume confirms directional momentum; negative = weakening
+    vol_roc_val, vol_score_adj, vol_reason = get_volume_roc(token)
+    vol_score = vol_score_adj  # 0 to +10, or negative
+
+    # Slightly loosen phase gate if volume strongly confirms direction
+    # (vol_roc > 1.0 = 100%+ surge → gives one additional grace pass)
+    vol_grace = vol_roc_val >= 1.0 and pct_score >= 10  # strong vol + some pct signal
+    if phase == 'quiet' and not vol_grace:
         return None, None
 
     elif phase == 'extreme':
@@ -595,23 +669,23 @@ def compute_score(token, direction, long_mult, short_mult):
     # Negative z = below mean = good for LONG entry
     # Positive z = above mean = good for SHORT entry
     # Scale: z = ±1.5 → ±60 pts
-    Z_SCALE = 40  # z=-1.5 → 60 pts for LONG
+    Z_SCALE = 20  # z=-1.5 → 30 pts for LONG (capped)
     if direction == 'LONG':
-        z_score = max(0.0, -avg_z * Z_SCALE)  # neg z → positive score
+        z_score = min(30.0, max(0.0, -avg_z * Z_SCALE))  # neg z → positive score, cap at 30
     else:
-        z_score = max(0.0, avg_z * Z_SCALE)   # pos z → positive score
+        z_score = min(30.0, max(0.0, avg_z * Z_SCALE))   # pos z → positive score, cap at 30
 
     # ── Velocity contribution (0-20 pts) ────────────────────────
     # Velocity = change in z-score over time
     # Rising z = price reverting UP toward mean = GOOD for SHORT, BAD for LONG
     # Falling z = price reverting DOWN from mean = GOOD for LONG, BAD for SHORT
-    VEL_SCALE = 200  # velocity = ±0.1 → ±20 pts
+    VEL_SCALE = 100  # velocity = ±0.1 → ±10 pts (capped)
     if direction == 'LONG':
         # Negative velocity = z falling = price reverting down = good LONG entry
-        vel_score = max(0.0, -velocity * VEL_SCALE)
+        vel_score = min(10.0, max(0.0, -velocity * VEL_SCALE))
     else:
         # Positive velocity = z rising = price reverting up = good SHORT entry
-        vel_score = max(0.0, velocity * VEL_SCALE)
+        vel_score = min(10.0, max(0.0, velocity * VEL_SCALE))
 
     # ── RSI mandatory gate (0-3 pts) ─────────────────────────────
     # LONG: RSI must be < 60 (not overbought) → returns None if RSI ≥ 60
@@ -651,9 +725,8 @@ def compute_score(token, direction, long_mult, short_mult):
     regime_mod = +5 if regime_mult > 1.0 else 0
 
     # ── Score assembly ─────────────────────────────────────────
-    # z_score: 0-60 | velocity: 0-20 | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1
-    # RSI gate: returns None if RSI blocks the direction
-    score = z_score + vel_score + phase_mod + regime_mod + rsi_score + macd_score
+    # z_score: 0-30 | velocity: 0-10 | volume: 0-10 (or negative) | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1
+    score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score
     score = min(99.0, max(0, round(score, 1)))
 
     if score < ENTRY_THRESHOLD:
@@ -666,12 +739,16 @@ def compute_score(token, direction, long_mult, short_mult):
         f'z={avg_z:+.2f}({mom["z_direction"]})',
         f'vel={velocity:+.3f}',
     ]
+    if vol_reason:
+        reasons.append(vol_reason)
     if rsi_reason:
         reasons.append(rsi_reason)
     if macd_reason:
         reasons.append(macd_reason)
 
     signals = [('momentum', '1h', score, reasons[0])]
+    if vol_reason:
+        signals.append(('volume', '1m', vol_score, vol_reason))
     if rsi_reason:
         signals.append(('rsi', '1h', rsi_score, rsi_reason))
     if macd_reason:

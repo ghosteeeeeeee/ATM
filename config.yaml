@@ -202,8 +202,10 @@ approvals:
   mode: manual
 command_allowlist:
 - shell command via -c/-lc flag
+- stop/disable system service
 - recursive delete
 - overwrite system config
+- SQL DROP
 - SQL DELETE without WHERE
 - delete in root path
 - force kill processes

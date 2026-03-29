@@ -523,11 +523,17 @@ def get_open_hype_positions():
 
 
 # ─── Mirroring Config ─────────────────────────────────────────────────────────
-MARGIN_USAGE_PCT = 0.07    # 7% of withdrawable margin per trade
-MIN_TRADE_USDT   = 10.0    # Hyperliquid minimum order value ($10)
+# Size decimal overrides — MUST match HL live meta (check via /info meta endpoint).
+# These override whatever _sz_decimals() returns from the live meta.
+# Only needed when _get_meta() cache is cold or the meta endpoint is unavailable.
 SZ_DECIMALS = {
     "HYPE": 2, "BTC": 6, "ETH": 4, "SOL": 4,
 }
+
+# ─── Mirroring Config ─────────────────────────────────────────────────────────
+MARGIN_USAGE_PCT = 0.07    # 7% of withdrawable margin per trade
+MIN_TRADE_USDT   = 10.0    # Hyperliquid minimum order value ($10)
+MIN_ORDER_BUFFER = 0.10    # extra $ to ensure we comfortably clear HL min ($10.10 vs $10.00)
 
 
 def _get_trade_size_usdt() -> float:
@@ -564,27 +570,30 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     if size_usdt < MIN_TRADE_USDT:
         return {"success": False, "message": f"Balance too low (${size_usdt:.2f} < ${MIN_TRADE_USDT})"}
 
-    # Get current price if needed
-    if entry_price <= 0:
-        try:
-            prices = get_prices_curl([token])
-            entry_price = prices.get(token)
-        except Exception:
-            pass
-        if not entry_price or entry_price <= 0:
-            return {"success": False, "message": f"Cannot determine price for {token}"}
+    # Apply buffer to guarantee we clear HL's $10 min even with rounding edge cases
+    # (e.g. SOPH at 4 decimals: 1111.1112 × $0.009 = $9.999990 — too close)
+    size_usdt += MIN_ORDER_BUFFER
+
+    # Always use LIVE HL price for size calculation — signal prices can be stale
+    try:
+        prices = get_prices_curl([token])
+        live_price = prices.get(token)
+    except Exception:
+        live_price = None
+    if not live_price or live_price <= 0:
+        return {"success": False, "message": f"Cannot fetch live price for {token}"}
 
     # Size in coin units — round UP to szDecimals so we always meet min notional
     # Use live HL meta for szDecimals (VINE=0, most coins=4, BTC=6)
     decimals = _sz_decimals(token)
-    raw_sz = size_usdt / entry_price
+    raw_sz = size_usdt / live_price
     if decimals > 0:
         sz = float(Decimal(str(raw_sz)).quantize(
             Decimal(f"0.{'0' * decimals}"), rounding=ROUND_UP))
     else:
         sz = math.ceil(raw_sz)
     if sz <= 0:
-        return {"success": False, "message": f"Size too small for {token} at ${entry_price}"}
+        return {"success": False, "message": f"Size too small for {token} at ${live_price}"}
 
     is_buy = direction.upper() == "LONG"
 
@@ -609,9 +618,9 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     try:
         result = _exchange_retry(_do)
         if result.get("success"):
-            print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${entry_price:.4f} (${size_usdt:.2f})")
+            print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${live_price:.4f} (${size_usdt:.2f})")
             return {"success": True, "message": f"Opened {direction} {sz} {token}",
-                    "size": sz, "entry_price": entry_price,
+                    "size": sz, "entry_price": live_price,
                     "side": "BUY" if is_buy else "SELL", "usdt": size_usdt}
         else:
             print(f"[HYPE Mirror] FAILED open {direction} {token}: {result.get('error')}")

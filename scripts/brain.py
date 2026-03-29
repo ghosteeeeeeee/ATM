@@ -337,7 +337,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
 
             hype_token = hype_coin(token)
             result = mirror_open(hype_token, direction, float(entry_price), leverage=lev)
-            if not result.get("success"):
+            if result.get("success"):
+                print(f"[brain.py] HYPE ✅ mirror_open SUCCESS: {direction} {result.get('size')} {hype_token} @ ${result.get('entry_price')} leverage={lev}x (trade #{trade_id})")
+            else:
                 print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
         else:
             print(f"[brain.py] Live trading OFF — paper trade {trade_id} not mirrored")
