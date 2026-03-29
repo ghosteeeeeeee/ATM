@@ -21,7 +21,7 @@ HL_CACHE    = "/var/www/hermes/data/hl_cache.json"
 LIVESWITCH  = "/var/www/hermes/data/hype_live_trading.json"
 PIPELINE_LOG = "/root/.hermes/logs/pipeline.log"
 ERRORS_LOG  = "/root/.hermes/logs/errors.log"
-TRADES_API  = "/var/www/hermes/trades.json"
+TRADES_API  = "/var/www/hermes/data/trades.json"
 
 Bugs = []  # collected issues
 
@@ -333,6 +333,10 @@ def check_mirror():
         bug("WARNING", "hl-mirror", f"Cannot fetch HL mids to check mirror: {e}")
         return
 
+    if not mids:
+        bug("INFO", "hl-mirror", "HL allMids returned empty — likely rate-limited, skipping check")
+        return
+
     # Check: every brain LONG should have positive szi on HL, SHORT should have negative
     # (approximate — exact matching would need accountState)
     missing = []
@@ -422,13 +426,19 @@ def check_ab_testing():
 # ═══════════════════════════════════════════════════════════════════════════
 def check_regime():
     # Check regime_log in static DB
+    # Check regime output file freshness (written by 4h_regime_scanner)
+    regime_file = "/var/www/html/regime_4h.json"
+    regime_age = file_age(regime_file)
+    if regime_age > 8 * 3600:
+        bug("WARNING", "regime", f"regime_4h.json is {regime_age/3600:.1f}h old (expected <4h)")
+
+    # Also check regime_log table (if being populated)
     recent_regime = sqlite(STATIC_DB, """
-        SELECT COUNT(*) as cnt, MAX(timestamp) as last_regime
-        FROM regime_log
-        WHERE timestamp > datetime('now', '-24 hours')
+        SELECT COUNT(*) as cnt FROM regime_log
+        WHERE timestamp > datetime('now', '-48 hours')
     """)
     if recent_regime and recent_regime[0]["cnt"] == 0:
-        bug("WARNING", "regime", "No regime changes recorded in last 24h — scanner may be broken")
+        bug("INFO", "regime", "regime_log table has no entries (scanner may not be writing to it)")
 
     # Check momentum_cache freshness
     mom = sqlite(RUNTIME_DB,
