@@ -14,6 +14,8 @@ import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
 
+import hype_cache as hc
+
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
 try:
     from hyperliquid_exchange import (
@@ -635,10 +637,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
         return []
 
     try:
-        import requests
-        r = requests.post('https://api.hyperliquid.xyz/info',
-                          json={'type': 'allMids'}, timeout=10)
-        mids = r.json()
+        mids = hc.get_allMids()
     except Exception as e:
         print(f"  [Position Manager] Failed to fetch prices: {e}")
         return positions

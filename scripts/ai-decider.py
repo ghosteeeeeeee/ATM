@@ -32,9 +32,7 @@ AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
 _ab_variant_cache = {}
 
 # Batch cache for Hyperliquid API calls (valid for 30 seconds)
-_hype_all_mids_cache = {"data": None, "timestamp": 0}
-_hype_meta_cache = {"data": None, "timestamp": 0}
-CACHE_TTL = 30  # 30 seconds
+import hype_cache as hc  # shared 60s cache written by price_collector
 
 # Local prices file (written by combined-trading.py)
 LOCAL_PRICES_FILE = "/var/www/html/token_intel.json"
@@ -57,43 +55,12 @@ def get_local_prices():
     return {}
 
 def get_hype_all_mids_batched():
-    """Get all mids - prefer local prices, fallback to API"""
-    global _hype_all_mids_cache
-    now = time.time()
-    
-    # First try local file (written by combined-trading.py)
-    local_prices = get_local_prices()
-    if local_prices:
-        return local_prices
-    
-    # Fallback to API with cache
-    if _hype_all_mids_cache["data"] and (now - _hype_all_mids_cache["timestamp"]) < CACHE_TTL:
-        return _hype_all_mids_cache["data"]
-    
-    try:
-        r = requests.post('https://api.hyperliquid.xyz/info', json={'type':'allMids'}, timeout=10)
-        if r.ok:
-            _hype_all_mids_cache = {"data": r.json(), "timestamp": now}
-            return _hype_all_mids_cache["data"]
-    except Exception as e:
-        print(f"   ⚠️ Failed to fetch allMids: {e}")
-    return None
+    """Get all mids from shared HL cache (written by price_collector)."""
+    return hc.get_allMids()
 
 def get_hype_meta_batched():
-    """Get meta from Hyperliquid - cached for 30 seconds"""
-    global _hype_meta_cache
-    now = time.time()
-    if _hype_meta_cache["data"] and (now - _hype_meta_cache["timestamp"]) < CACHE_TTL:
-        return _hype_meta_cache["data"]
-    
-    try:
-        r = requests.post('https://api.hyperliquid.xyz/info', json={'type':'meta'}, timeout=15)
-        if r.ok:
-            _hype_meta_cache = {"data": r.json(), "timestamp": now}
-            return _hype_meta_cache["data"]
-    except Exception as e:
-        print(f"   ⚠️ Failed to fetch meta: {e}")
-    return None
+    """Get meta from shared HL cache (written by price_collector)."""
+    return hc.get_meta()
 
 def get_cached_ab_variant(token, direction, test_name):
     """Get cached A/B variant or select new one"""
@@ -512,11 +479,13 @@ def cleanup_stale_signals():
             cleaned = cur.rowcount
             conn_sqlite.commit()
             
-            # Also fix any inconsistent signals (decision set but executed=0)
+            # Fix inconsistent signals — only for non-PENDING decisions
+            # PENDING signals stay untouched so ai-decider can review them
             cur.execute("""
-                UPDATE signals 
+                UPDATE signals
                 SET executed = 1, updated_at = CURRENT_TIMESTAMP
-                WHERE decision IS NOT NULL AND executed = 0 AND decision = 'PENDING'
+                WHERE decision IS NOT NULL AND executed = 0
+                  AND decision NOT IN ('PENDING', 'APPROVED')
             """)
             conn_sqlite.commit()
             

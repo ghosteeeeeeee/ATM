@@ -77,13 +77,10 @@ def log(msg):
 
 
 def get_current_price(token):
-    """Fetch current price from Hyperliquid."""
-    try:
-        r = requests.post('https://api.hyperliquid.xyz/info',
-                          json={'type': 'allMids'}, timeout=10)
-        return float(r.json().get(token, 0)) or None
-    except:
-        return None
+    """Fetch current price — uses shared HL cache first, falls back to live."""
+    import hype_cache as hc
+    mids = hc.get_allMids()
+    return float(mids.get(token, 0)) or None
 
 
 def get_max_leverage(token: str) -> int:

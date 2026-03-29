@@ -8,6 +8,7 @@ import sys, os, json, time, sqlite3
 sys.path.insert(0, os.path.dirname(__file__))
 import requests
 from signal_schema import init_db, STATIC_DB, RUNTIME_DB
+import hype_cache as hc
 # price_history + latest_prices → static DB; signals → runtime DB
 STATIC = STATIC_DB
 init_db()  # Ensure tables exist
@@ -17,15 +18,28 @@ TTL_FILE = '/root/.hermes/data/prices.json'
 BATCH_SIZE = 500  # Hyperliquid universe ~500 tokens
 
 def fetch_all_prices():
-    """Fetch full token universe + allMids from Hyperliquid."""
+    """Fetch full token universe + allMids from Hyperliquid.
+    Writes shared HL cache (for other scripts) then returns tokens + prices.
+    """
+    # Try to read from shared HL cache first (written by last price_collector run)
+    cached = hc._read()
+    if cached.get("allMids") and cached.get("meta"):
+        mids = cached["allMids"]
+        universe = cached["meta"].get("universe", [])
+        tokens = {u['name']: u.get('maxLeverage', 10) for u in universe if mids.get(u['name'])}
+        prices = {k: float(v) for k, v in mids.items() if v}
+        if tokens:
+            # Freshen the cache in background (non-blocking)
+            hc.fetch_and_cache()
+            return tokens, prices
+
+    # Cache miss or stale — do fresh fetch + write cache
     headers = {'Content-Type': 'application/json'}
     try:
-        # Get meta for token names and max leverage
         r1 = requests.post(API, json={'type': 'meta'}, headers=headers, timeout=30)
         r1.raise_for_status()
         universe = r1.json().get('universe', [])
 
-        # Get current prices
         r2 = requests.post(API, json={'type': 'allMids'}, headers=headers, timeout=30)
         r2.raise_for_status()
         mids = r2.json()
@@ -33,9 +47,20 @@ def fetch_all_prices():
         tokens = {u['name']: u.get('maxLeverage', 10) for u in universe if mids.get(u['name'])}
         prices = {k: float(v) for k, v in mids.items() if v}
 
+        # Write shared cache for other scripts
+        hc.fetch_and_cache()
+
         return tokens, prices
     except Exception as e:
         print(f'fetch_all_prices error: {e}')
+        # Last resort: try to read whatever is in cache
+        cached = hc._read()
+        if cached.get("allMids"):
+            mids = cached["allMids"]
+            universe = cached["meta"].get("universe", []) if cached.get("meta") else []
+            tokens = {u['name']: u.get('maxLeverage', 10) for u in universe if mids.get(u['name'])}
+            prices = {k: float(v) for k, v in mids.items() if v}
+            return tokens, prices
         return {}, {}
 
 def save_prices(tokens, prices):
