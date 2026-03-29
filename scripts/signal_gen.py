@@ -32,7 +32,7 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 
 # Entry score thresholds
 ENTRY_THRESHOLD   = 65    # min score to add signal
-AUTO_APPROVE      = 95    # ≥ this → auto-approve (no AI needed)
+AUTO_APPROVE      = 80    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
