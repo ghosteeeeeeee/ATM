@@ -309,12 +309,12 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                           exchange, strategy, paper, stop_loss, target, server, status, open_time,
                           signal, confidence, token_address, pnl_usdt, pnl_pct,
                           sl_distance, trailing_activation, trailing_distance, leverage, experiment)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """, (token, direction, amount_usdt, entry_price,
-          exchange, strategy, paper, stop_loss, target, server, 'open', None, signal, confidence, address, 0, 0,
+          exchange, strategy, paper, stop_loss, target, server, 'open',
+          signal, confidence, address, 0, 0,
           sl_distance, trailing_activation, trailing_distance, leverage, experiment))
-    
     trade_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
