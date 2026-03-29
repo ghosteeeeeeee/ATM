@@ -43,14 +43,17 @@ def _get_meta() -> dict:
         return _META_CACHE["data"]
     try:
         result = _hl_info({"type": "meta"})
-        _META_CACHE["data"] = result
-        _META_CACHE["ts"]   = now
-        return result
+        if result:
+            _META_CACHE["data"] = result
+            _META_CACHE["ts"]   = now
+            return result
     except Exception as e:
-        # Fallback: return stale cache if fetch fails
-        if _META_CACHE["data"]:
-            return _META_CACHE["data"]
-        raise
+        print(f"[_get_meta] fetch failed: {e}")
+    # Fallback: return stale cache even if expired (better than nothing)
+    if _META_CACHE["data"] is not None:
+        print(f"[_get_meta] using stale cache (age: {now - _META_CACHE['ts']:.0f}s)")
+        return _META_CACHE["data"]
+    raise RuntimeError(f"[_get_meta] Cannot fetch HL meta and no cache available")
 
 def _sz_decimals(token: str) -> int:
     """Return szDecimals for a coin from cached meta, default 4."""
@@ -61,6 +64,33 @@ def _sz_decimals(token: str) -> int:
         return 4
     except Exception:
         return 4
+
+
+def is_delisted(token: str) -> bool:
+    """Return True if token is delisted/halted on Hyperliquid (no new positions)."""
+    try:
+        for coin in _get_meta().get("universe", []):
+            if coin.get("name", "").upper() == token.upper():
+                return bool(coin.get("isDelisted", False))
+        return False
+    except Exception:
+        return False
+
+
+def is_tradeable(token: str) -> bool:
+    """Return True if token can be traded on Hyperliquid."""
+    return not is_delisted(token)
+
+
+def get_tradeable_tokens() -> set:
+    """Return set of tradeable (non-delisted) token names from HL meta."""
+    try:
+        return {
+            c["name"] for c in _get_meta().get("universe", [])
+            if not c.get("isDelisted", False)
+        }
+    except Exception:
+        return set()
 
 
 # Asset ID cache: populated from meta marginTableId (unique per coin, stable)
@@ -285,28 +315,37 @@ def _info_rate_limit():
 
 
 def _http_post(endpoint: str, payload: dict, timeout: int = 10) -> dict:
-    """Make an HTTP POST request with error handling."""
+    """Make an HTTP POST request with exponential backoff retry on rate-limiting."""
     data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        endpoint,
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            result = json.loads(resp.read().decode())
-            # Hyperliquid returns "null" as a string on rate limit
-            if result is None or (isinstance(result, str) and result.strip() == "rate limited"):
-                raise Exception("Rate limited")
-            return result
-    except urllib.error.HTTPError as e:
-        body = e.read().decode() if e.fp else ""
-        if e.code == 429 or "rate limited" in body.lower():
-            raise Exception(f"429 Rate limited: {body}")
-        raise Exception(f"HTTP {e.code}: {body}")
-    except Exception as e:
-        raise
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    }
+    req = urllib.request.Request(endpoint, data=data, headers=headers, method="POST")
+
+    for attempt in range(8):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                result = json.loads(resp.read().decode())
+                if result is None or (isinstance(result, str) and result.strip() in ("rate limited", "null")):
+                    raise Exception("Rate limited")
+                return result
+        except urllib.error.HTTPError as e:
+            body = e.read().decode() if e.fp else ""
+            if e.code == 429 or "rate limited" in body.lower() or body.strip() in ("rate limited", "null"):
+                wait = 4 ** attempt  # 1s, 4s, 16s, 64s...
+                print(f"[_http_post] 429 rate-limited, attempt {attempt+1}/8, waiting {wait}s...")
+                time.sleep(wait)
+                continue
+            raise Exception(f"HTTP {e.code}: {body}")
+        except Exception as e:
+            if "429" in str(e) or "rate limited" in str(e).lower():
+                wait = 4 ** attempt
+                print(f"[_http_post] rate-limited (try {attempt+1}/8), waiting {wait}s...")
+                time.sleep(wait)
+                continue
+            raise
+    raise RuntimeError("[_http_post] All 8 attempts rate-limited — HL is overloaded")
 
 
 # ─── /info endpoint (read-only, separate rate limit pool) ────────────────────
@@ -317,11 +356,16 @@ def _hl_info(payload: dict) -> dict:
 
 
 def get_prices_curl(tokens=None):
-    """Get mid prices via curl to /info (bypasses SDK rate limit)."""
+    """Get mid prices via curl to /info (bypasses SDK rate limit).
+
+    Returns {} if HL returns empty (rate-limited) — callers must handle this.
+    """
     result = _hl_info({"type": "allMids"})
+    if not result:  # HL returns {} when rate-limited
+        return {}
     if tokens:
         return {t: float(result[t]) for t in tokens if t in result}
-    return {t: float(v) for t, v in result.items()}
+    return {t: float(v) for t, v in result.items() if v}
 
 
 def get_account_value_curl():
@@ -347,7 +391,10 @@ def get_open_hype_positions_curl():
             "type": "clearinghouseState",
             "user": MAIN_ACCOUNT_ADDRESS,
         })
-        positions = result.get("assetPositions", [])
+        if not result:
+            print("[HYPE] get_open_hype_positions_curl: HL returned empty response (rate-limited?)")
+            return {}
+        positions = result.get("assetPositions", []) or []
         out = {}
         for p in positions:
             pos = p.get("position", {})
@@ -566,6 +613,9 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     if not is_live_trading_enabled():
         return {"success": False, "message": "Live trading disabled (kill switch)"}
 
+    if is_delisted(token):
+        return {"success": False, "message": f"{token} is delisted on Hyperliquid — cannot open new positions"}
+
     size_usdt = _get_trade_size_usdt()
     if size_usdt < MIN_TRADE_USDT:
         return {"success": False, "message": f"Balance too low (${size_usdt:.2f} < ${MIN_TRADE_USDT})"}
@@ -575,13 +625,20 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     size_usdt += MIN_ORDER_BUFFER
 
     # Always use LIVE HL price for size calculation — signal prices can be stale
+    # Fall back to signal entry_price if live price fetch fails (rate limit, etc.)
     try:
         prices = get_prices_curl([token])
         live_price = prices.get(token)
-    except Exception:
+    except Exception as e:
+        print(f"[mirror_open] get_prices_curl failed for {token}: {e}")
         live_price = None
     if not live_price or live_price <= 0:
-        return {"success": False, "message": f"Cannot fetch live price for {token}"}
+        # Fall back to signal entry_price — don't block the mirror trade
+        if entry_price and entry_price > 0:
+            print(f"[mirror_open] Using signal price ${entry_price:.4f} for {token} (live fetch failed)")
+            live_price = entry_price
+        else:
+            return {"success": False, "message": f"Cannot fetch price for {token}"}
 
     # Size in coin units — round UP to szDecimals so we always meet min notional
     # Use live HL meta for szDecimals (VINE=0, most coins=4, BTC=6)

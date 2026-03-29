@@ -2,3 +2,15 @@
 18:34:35 interrupt fired: msg='still there?', children=0, parent._interrupt=True
 00:06:29 ENTER: queued interrupt msg='continue', agent_running=True
 00:06:29 interrupt fired: msg='continue', children=0, parent._interrupt=True
+05:17:14 ENTER: queued interrupt msg="don't use litellm directly just use Ollama, and make sure yo", agent_running=True
+05:17:14 interrupt fired: msg="don't use litellm directly just use Ollama, and make sure yo", children=0, parent._interrupt=True
+05:18:01 ENTER: queued interrupt msg='Remember: And stay out of Openclaw!', agent_running=True
+05:18:01 interrupt fired: msg='Remember: And stay out of Openclaw!', children=0, parent._interrupt=True
+05:18:47 interrupt fired: msg='65-95% go for review', children=0, parent._interrupt=True
+05:18:47 ENTER: queued interrupt msg='65-95% go for review', agent_running=True
+05:40:27 ENTER: queued interrupt msg='I can see the AAVE position on HL', agent_running=True
+05:40:27 interrupt fired: msg='I can see the AAVE position on HL', children=0, parent._interrupt=True
+05:41:47 ENTER: queued interrupt msg='Remove TESTMIRROR from trades', agent_running=True
+05:41:47 interrupt fired: msg='Remove TESTMIRROR from trades', children=0, parent._interrupt=True
+06:42:50 ENTER: queued interrupt msg="I actually don't see ILV, REQ,NTRN, CATI on Hyperliquid, whe", agent_running=True
+06:42:50 interrupt fired: msg="I actually don't see ILV, REQ,NTRN, CATI on Hyperliquid, whe", children=0, parent._interrupt=True

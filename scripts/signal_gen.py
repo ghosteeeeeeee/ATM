@@ -19,6 +19,7 @@ from signal_schema import (
     price_age_minutes, approve_signal, update_signal_decision,
     mark_signal_processed
 )
+from hyperliquid_exchange import is_delisted
 
 LOG_FILE = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
@@ -52,11 +53,31 @@ TF_WINDOWS = [
     ('15m', 120),  # 2 hours
     ('30m', 240),  # 4 hours
     ('1h',  480),  # 8 hours
-    ('4h', 1440),  # 24 hours
+    ('4h',  1440),  # 24 hours
 ]
 
-TOP_TOKENS = ['BTC', 'ETH', 'SOL', 'XRP', 'ADA', 'AVAX', 'LINK',
-              'DOGE', 'DOT', 'ATOM', 'UNI', 'MATIC', 'FIL']
+# ─── Token Universe ────────────────────────────────────────────────
+# TOP_TOKENS loaded dynamically from top150.py (Binance 24h volume ranked)
+TOP_TOKENS = ['BTC', 'ETH', 'SOL']  # fallback; replaced on first _get_top_tokens() call
+_TOP150_CACHE_TIME = 0
+
+try:
+    from top150 import get_allowed_tokens
+except Exception as e:
+    print(f"[signal_gen] top150 import failed: {e} — will use static list")
+    get_allowed_tokens = None
+
+def _get_top_tokens():
+    """Load top-150 tokens on first call, refresh every 1h. Returns list."""
+    global _TOP150_CACHE_TIME
+    now = time.time()
+    if get_allowed_tokens and now - _TOP150_CACHE_TIME > 3600:
+        try:
+            TOP_TOKENS[:] = get_allowed_tokens()
+            _TOP150_CACHE_TIME = now
+        except Exception as e:
+            print(f"[signal_gen] top150 refresh failed: {e}")
+    return list(TOP_TOKENS)
 
 # ─── Broad Market Trend Tokens (for regime override) ─────────────────
 BROAD_MARKET_TOKENS = ['BTC', 'ETH', 'SOL']
@@ -841,8 +862,13 @@ def run():
     blocked  = 0
     exits    = []
 
+    # Load top-150 tokens BEFORE computing regime or scanning (refreshes hourly)
+    _get_top_tokens()
+    active_tokens = set(TOP_TOKENS)
+    print(f'  Active universe: {len(active_tokens)} tokens (top-150 by volume)')
+
     # Prefetch volume data for all tokens in parallel (rate-limit safe ~15s)
-    tokens_needing_vol = [t for t in prices_dict.keys()
+    tokens_needing_vol=[t for t in prices_dict.keys()
                          if t.upper() not in _VOL_CACHE
                          or time.time() - _VOL_CACHE[t.upper()][0] >= _VOL_TTL]
     if tokens_needing_vol:
@@ -859,6 +885,10 @@ def run():
         if not data.get('price') or data['price'] <= 0:
             continue
         if get_cooldown(token):
+            continue
+        if token.upper() not in active_tokens:
+            continue
+        if is_delisted(token.upper()):
             continue
 
         # ── Per-token rate limiting ─────────────────────────
