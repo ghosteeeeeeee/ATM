@@ -483,8 +483,8 @@ if not acquire_lock():
 
 def log_signal(token, direction, price, confidence, source):
     """Log signal to signals.log for signals.html display"""
-    from datetime import datetime
-    timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00")
+    from datetime import datetime, timezone
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
     with open(SIGNAL_LOG, "a") as f:
         f.write(f"{timestamp} SIGNAL: {token} {direction.upper()} @ {price} ({confidence}%) [{source}]\n")
 
