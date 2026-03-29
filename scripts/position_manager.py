@@ -3,6 +3,7 @@
 Position Manager for Hermes Trading System
 Manages open positions, SL/TP, max 10 positions.
 Paper trading only — no real money.
+Mirrors trades to Hyperliquid (real money) via hyperliquid_exchange.
 """
 
 import psycopg2
@@ -12,6 +13,17 @@ import os
 import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
+
+# Hyperliquid mirroring — non-blocking, failures don't stop paper trading
+try:
+    from hyperliquid_exchange import (
+        mirror_open, mirror_close, hype_coin,
+        get_open_hype_positions,
+    )
+    HYPE_AVAILABLE = True
+except Exception as e:
+    HYPE_AVAILABLE = False
+    print(f"[Position Manager] Hyperliquid mirroring unavailable: {e}")
 
 # ─── DB Config ────────────────────────────────────────────────────────────────
 DB_CONFIG = {
@@ -232,8 +244,8 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
         print(f"[Position Manager] ab_results close error: {e}")
 
 
-def close_position(trade_id: int, reason: str) -> bool:
-    """Close a position via direct SQL UPDATE (paper mode)."""
+def close_paper_position(trade_id: int, reason: str) -> bool:
+    """Close a paper position via direct SQL UPDATE."""
     conn = get_db_connection()
     if conn is None:
         return False
@@ -314,6 +326,14 @@ def close_position(trade_id: int, reason: str) -> bool:
               trade_id))
         conn.commit()
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
+
+        # ── Mirror to Hyperliquid (real trade) ───────────────────────
+        if HYPE_AVAILABLE:
+            hype_token = hype_coin(token)
+            try:
+                mirror_close(hype_token, direction)
+            except Exception as me:
+                print(f"[Position Manager] HYPE mirror_close failed: {me}")
 
         # Record to ab_results on close
         if experiment and sl_dist:
@@ -731,7 +751,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             trailing_sl = get_trailing_stop(pos, live_pnl=live_pnl)
             if check_trailing_stop(pos, live_pnl=live_pnl):
                 reason = f"trailing_exit_{live_pnl:+.2f}%"
-                close_position(trade_id, reason)
+                close_paper_position(trade_id, reason)
                 closed_count += 1
                 print(f"  TRAILING EXIT {token} {direction} {live_pnl:+.2f}% (SL: {trailing_sl:.6f})")
 
@@ -740,7 +760,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # After trailing activates, the trailing SL is the only exit.
         if not trailing_active and should_cut_loser(live_pnl, pos):
             reason = f"cut_loser_{live_pnl:+.2f}%"
-            close_position(trade_id, reason)
+            close_paper_position(trade_id, reason)
             closed_count += 1
             print(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 

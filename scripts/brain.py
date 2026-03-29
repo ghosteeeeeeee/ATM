@@ -319,6 +319,19 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     conn.commit()
     cur.close()
     conn.close()
+
+    # ── Mirror to Hyperliquid (real trade) ───────────────────────
+    # Non-blocking: failures are logged but don't stop paper trading.
+    try:
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from hyperliquid_exchange import mirror_open, hype_coin, HYPE_AVAILABLE as _hype_ok
+        if _hype_ok:
+            hype_token = hype_coin(token)
+            mirror_open(hype_token, direction, float(entry_price))
+    except Exception as e:
+        print(f"[brain.py] HYPE mirror_open failed (non-fatal): {e}")
+
     return trade_id
 
 def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None, notes: str = None):
