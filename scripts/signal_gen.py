@@ -308,24 +308,37 @@ def detect_phase(percentile, velocity):
 # Volume Rate-of-Change (from Hyperliquid recentTrades)
 # ═══════════════════════════════════════════════════════════════
 _VOL_CACHE = {}   # token → (timestamp, data)
-_VOL_TTL   = 60   # seconds
+_VOL_TTL   = 55   # seconds — within 1-min pipeline cadence
 
-def _hl_trades_cached(token):
-    """Fetch recent HL trades, cached for VOL_TTL seconds."""
-    now = time.time()
+def _fetch_trades_sync(token):
+    """Fetch recentTrades for one token (called from background thread)."""
     key = token.upper()
-    if key in _VOL_CACHE and now - _VOL_CACHE[key][0] < _VOL_TTL:
-        return _VOL_CACHE[key][1]
+    now = time.time()
     try:
         import sys as _sys
         _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from hyperliquid_exchange import _hl_info
-        r = _hl_info({'type': 'recentTrades', 'coin': token.upper()})
-        _VOL_CACHE[key] = (now, r)
-        return r
+        r = _hl_info({'type': 'recentTrades', 'coin': key})
+        # Only cache non-empty results; empty means rate-limited or no data
+        if r:
+            _VOL_CACHE[key] = (now, r)
     except Exception:
-        _VOL_CACHE[key] = (now, [])
-        return []
+        pass   # Don't cache failures — leave existing entry or skip
+
+def prefetch_volume(tokens):
+    """
+    Batch-fetch recentTrades for all tokens in parallel using threads.
+    Runs in background — pipeline continues without waiting.
+    Populates _VOL_CACHE for all tokens within ~3-5 seconds.
+    """
+    import concurrent.futures
+    tokens_to_fetch = [t for t in tokens if t.upper() not in _VOL_CACHE
+                       or time.time() - _VOL_CACHE[t.upper()][0] >= _VOL_TTL]
+    if not tokens_to_fetch:
+        return
+    # Use ThreadPoolExecutor — parallel HL calls, ~3-5 sec for 50 tokens
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
+        ex.map(_fetch_trades_sync, tokens_to_fetch)
 
 def get_volume_roc(token):
     """
@@ -336,7 +349,7 @@ def get_volume_roc(token):
       vol_reason: human-readable string
     Higher recent volume confirms directional momentum.
     """
-    trades = _hl_trades_cached(token)
+    trades = _VOL_CACHE.get(token.upper(), (0, []))[1]
     if not trades or len(trades) < 4:
         return 0.0, 0.0, None
 
@@ -408,7 +421,8 @@ def get_momentum_stats(token):
     min_z   = min(z_vals) if z_vals else 0
     z_direction = 'rising' if avg_z > 0.3 else 'falling' if avg_z < -0.3 else 'neutral'
 
-    vol_roc, vol_score, vol_reason = get_volume_roc(token)
+    # NOTE: volume_roc is NOT cached here — fetch it AFTER prefetch completes
+    # via get_volume_roc() in compute_score, which reads the shared _VOL_CACHE
 
     return {
         'percentile': percentile,
@@ -420,9 +434,6 @@ def get_momentum_stats(token):
         'max_z':     round(max_z, 3),
         'min_z':     round(min_z, 3),
         'z_direction': z_direction,
-        'volume_roc': vol_roc,
-        'vol_score': vol_score,
-        'vol_reason': vol_reason,
     }
 
 
@@ -586,8 +597,26 @@ def compute_score(token, direction, long_mult, short_mult):
     percentile_short = mom['percentile_short']
     percentile       = mom['percentile']   # overall for phase
     velocity         = mom['velocity']
-    phase            = mom['phase']
+    phase            = mom['phase']        # default (built from pct_long)
     avg_z            = mom['avg_z']
+
+    # Recompute phase using direction-appropriate percentile
+    # pct_long for LONG: low = suppressed = potential long zone
+    # pct_short for SHORT: high = elevated = potential short zone (invert)
+    if direction == 'LONG':
+        dir_percentile = percentile_long
+        # At extreme suppression: treat as extreme even if velocity neutral
+        if percentile_long <= 10:
+            phase = 'extreme'
+        else:
+            phase = detect_phase(dir_percentile, velocity)
+    else:
+        dir_percentile = 100 - percentile_short   # invert: pct_short=100 → 0
+        # At extreme elevation: never quiet, treat as extreme
+        if percentile_short >= 90:
+            phase = 'extreme'
+        else:
+            phase = detect_phase(dir_percentile, velocity)
 
     # Directional percentile scoring
     # pct_long: % of z-scores BELOW current z
@@ -632,21 +661,25 @@ def compute_score(token, direction, long_mult, short_mult):
     # Slightly loosen phase gate if volume strongly confirms direction
     # (vol_roc > 1.0 = 100%+ surge → gives one additional grace pass)
     vol_grace = vol_roc_val >= 1.0 and pct_score >= 10  # strong vol + some pct signal
-    if phase == 'quiet' and not vol_grace:
-        return None, None
+    if phase == 'quiet':
+        # Loosen: allow quiet phase signals for mean reversion setups
+        # LONG: pct_long must be suppressed enough to score points
+        # SHORT: pct_short must be elevated enough to score points
+        has_pct_signal = (direction == 'LONG' and percentile_long <= 40) or \
+                         (direction == 'SHORT' and percentile_short >= 60)
+        if not (vol_grace or has_pct_signal):
+            return None, None
+        phase_mod = +1
+        phase_reason = 'quiet-mean-reversion' if has_pct_signal else 'quiet-vol-surge'
 
     elif phase == 'extreme':
         if direction == 'LONG':
             return None, None   # never long in extreme zone
-        # Shorts in extreme get full score
         phase_mod = +5
         phase_reason = 'extreme-short'
 
     elif phase == 'exhaustion':
-        # In exhaustion, mean-reversion has been going on. For LONG, the price
-        # has been falling and is near/at lows. Check if it's actually suppressed.
         if direction == 'LONG':
-            # Only allow LONG if price is actually suppressed (low pct_long)
             if percentile_long < 40:
                 phase_mod = +3
                 phase_reason = 'exhaustion-long-ok'
@@ -730,7 +763,21 @@ def compute_score(token, direction, long_mult, short_mult):
     score = min(99.0, max(0, round(score, 1)))
 
     if score < ENTRY_THRESHOLD:
-        return None, None
+        # Mean reversion bonus: extreme phase + good z + decent percentile
+        z_bonus = 0
+        if phase == 'extreme' and abs(avg_z) >= 1.0 and pct_score >= 50:
+            z_bonus = 25
+        elif phase == 'extreme' and abs(avg_z) >= 0.7:
+            z_bonus = 15
+        elif abs(avg_z) >= 1.5 and vol_score >= 3:
+            z_bonus = 15
+        elif abs(avg_z) >= 1.0 and vol_score >= 3:
+            z_bonus = 8
+        score = min(99.0, score + z_bonus)
+        if score >= ENTRY_THRESHOLD:
+            phase_reason += '-zbonus'
+        if score < ENTRY_THRESHOLD:
+            return None, None
 
     # ── Build signal reasons ───────────────────────────────────
     pct_dir = percentile_long if direction == 'LONG' else percentile_short
@@ -793,6 +840,18 @@ def run():
     added    = 0
     blocked  = 0
     exits    = []
+
+    # Prefetch volume data for all tokens in parallel (rate-limit safe ~15s)
+    tokens_needing_vol = [t for t in prices_dict.keys()
+                         if t.upper() not in _VOL_CACHE
+                         or time.time() - _VOL_CACHE[t.upper()][0] >= _VOL_TTL]
+    if tokens_needing_vol:
+        t0 = time.time()
+        import concurrent.futures
+        # 8 workers: fast enough without hitting HL rate limits
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+            ex.map(_fetch_trades_sync, tokens_needing_vol)
+        print(f'  Vol prefetch: {len(tokens_needing_vol)} tokens in {time.time()-t0:.1f}s')
 
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
