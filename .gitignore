@@ -36,3 +36,9 @@ seed/
 seed/*.sql
 .secrets.local
 skills/openclaw-imports/
+channel_directory.json
+gateway.pid
+gateway_state.json
+cron/output/
+cron/.tick.lock
+cron/jobs.json

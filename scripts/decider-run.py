@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-decider-run.py — Execute approved signals as paper trades via brain.py.
+decider-run.py — Execute approved signals via brain.py.
+Respects hype_live_trading.json: paper=True when disabled, real orders when enabled.
 Reads APPROVED signals, checks position limits, computes SL/TP, places trades.
 Also processes delayed-entry signals from pending-delayed-entries.json.
 """
@@ -10,6 +11,7 @@ from signal_schema import init_db, get_approved_signals, get_pending_signals, ma
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active)
+from hyperliquid_exchange import is_live_trading_enabled
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
@@ -264,7 +266,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
     }
 
 
-def process_delayed_entries():
+def process_delayed_entries(paper=True):
     """
     Check pending delayed-entry signals.
     For each: if pullback reached OR max_wait expired → execute or expire.
@@ -349,7 +351,7 @@ def process_delayed_entries():
                 token, cmd_side, str(POSITION_SIZE_USD), str(round(cur_price, 6)),
                 '--exchange', 'Hyperliquid',
                 '--strategy', 'delayed-entry',
-                '--paper',
+                '--paper' if paper else '--real',
                 '--sl', str(round(sl, 6)),
                 '--target', str(round(tp, 6)),
                 '--server', SERVER,
@@ -381,7 +383,8 @@ def process_delayed_entries():
 def execute_trade(token, direction, price, confidence, source,
                   leverage=10, paper=True, sl_pct=0.02,
                   trailing_activation=0.01, trailing_distance=0.01,
-                  experiment=None, variant_id=None, test_name=None):
+                  experiment=None, variant_id=None, test_name=None,
+                  live_trading=False):
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
@@ -407,26 +410,25 @@ def execute_trade(token, direction, price, confidence, source,
     if experiment and variant_id and test_name:
         exp_json = _json.dumps({'experiment': experiment, 'variant_id': variant_id, 'test_name': test_name})
 
-    cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
-            token, cmd_side, str(POSITION_SIZE_USD), str(round(price, 6)),
-            '--exchange', 'Hyperliquid',
-            '--strategy', f'Hermes-{source}',
-            '--paper' if paper else '',
-            '--sl', str(round(sl, 6)),
-            '--target', str(round(tp, 6)),
-            '--server', SERVER,
-            '--signal', source,
-            '--confidence', str(round(confidence, 1)),
-            '--leverage', str(leverage),
-            '--sl-distance', str(float(sl_pct) / 100),   # AB sl_pct (0.5→0.005)
-            '--trailing-threshold', str(trailing_activation),
-            '--trailing-distance', str(trailing_distance),
-            '--experiment', exp_json] if exp_json else [
-            '--sl-distance', str(float(sl_pct) / 100),
-            '--trailing-threshold', str(trailing_activation),
-            '--trailing-distance', str(trailing_distance)
-        ])
-    cmd = [c for c in cmd if c]  # strip empty strings
+    # --paper when live_trading=False, --real when live_trading=True
+    paper_flag = '--paper' if not live_trading else '--real'
+
+    cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
+           token, cmd_side, str(POSITION_SIZE_USD), str(round(price, 6)),
+           '--exchange', 'Hyperliquid',
+           '--strategy', f'Hermes-{source}',
+           paper_flag,
+           '--sl', str(round(sl, 6)),
+           '--target', str(round(tp, 6)),
+           '--server', SERVER,
+           '--signal', source,
+           '--confidence', str(round(confidence, 1)),
+           '--leverage', str(leverage),
+           '--sl-distance', str(float(sl_pct) / 100),
+           '--trailing-threshold', str(trailing_activation),
+           '--trailing-distance', str(trailing_distance)]
+    if exp_json:
+        cmd += ['--experiment', exp_json]
 
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
@@ -471,11 +473,13 @@ def close_position(token, reason):
 # ─── Main Run ────────────────────────────────────────────────────
 
 def run(dry_run=False):
+    paper = not is_live_trading_enabled()
+    mode = "LIVE" if not paper else "PAPER"
+    log(f'=== Decider Run ({mode}) ===')
     init_db()
-    log(f'=== Decider Run ({"LIVE" if not dry_run else "PAPER"}) ===')
 
     # Process delayed-entry signals first
-    de_exec, de_exp = process_delayed_entries()
+    de_exec, de_exp = process_delayed_entries(paper=paper)
 
     # Check position count
     open_count = get_position_count()
@@ -594,9 +598,10 @@ def run(dry_run=False):
 
         success, msg = execute_trade(
             token, direction, price, confidence, source,
-            leverage=lev, paper=True, sl_pct=sl_pct,
+            leverage=lev, sl_pct=sl_pct,
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
-            experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test')
+            experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
+            live_trading=not paper)
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')
