@@ -266,7 +266,7 @@ def get_exchange():
             err_str = str(e)
             if "429" in err_str or "rate limit" in err_str.lower() or "null" in err_str:
                 delay = (attempt + 1) * 5
-                print(f"[HYPE] Exchange init rate-limited, retrying in {delay}s...")
+                sys.stderr.write(f"[HYPE] Exchange init rate-limited, retrying in {delay}s...\n"); sys.stderr.flush()
                 _time.sleep(delay)
             else:
                 raise
@@ -334,14 +334,14 @@ def _http_post(endpoint: str, payload: dict, timeout: int = 10) -> dict:
             body = e.read().decode() if e.fp else ""
             if e.code == 429 or "rate limited" in body.lower() or body.strip() in ("rate limited", "null"):
                 wait = 4 ** attempt  # 1s, 4s, 16s, 64s...
-                print(f"[_http_post] 429 rate-limited, attempt {attempt+1}/8, waiting {wait}s...")
+                sys.stderr.write(f"[_http_post] 429 rate-limited, attempt {attempt+1}/8, waiting {wait}s...\n"); sys.stderr.flush()
                 time.sleep(wait)
                 continue
             raise Exception(f"HTTP {e.code}: {body}")
         except Exception as e:
             if "429" in str(e) or "rate limited" in str(e).lower():
                 wait = 4 ** attempt
-                print(f"[_http_post] rate-limited (try {attempt+1}/8), waiting {wait}s...")
+                sys.stderr.write(f"[_http_post] rate-limited (try {attempt+1}/8), waiting {wait}s...\n"); sys.stderr.flush()
                 time.sleep(wait)
                 continue
             raise
@@ -392,7 +392,7 @@ def get_open_hype_positions_curl():
             "user": MAIN_ACCOUNT_ADDRESS,
         })
         if not result:
-            print("[HYPE] get_open_hype_positions_curl: HL returned empty response (rate-limited?)")
+            sys.stderr.write("[HYPE] get_open_hype_positions_curl: HL returned empty response (rate-limited?)\n"); sys.stderr.flush()
             return {}
         positions = result.get("assetPositions", []) or []
         out = {}

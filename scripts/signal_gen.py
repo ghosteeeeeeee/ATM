@@ -57,27 +57,13 @@ TF_WINDOWS = [
 ]
 
 # ─── Token Universe ────────────────────────────────────────────────
-# TOP_TOKENS loaded dynamically from top150.py (Binance 24h volume ranked)
-TOP_TOKENS = ['BTC', 'ETH', 'SOL']  # fallback; replaced on first _get_top_tokens() call
-_TOP150_CACHE_TIME = 0
-
-try:
-    from top150 import get_allowed_tokens
-except Exception as e:
-    print(f"[signal_gen] top150 import failed: {e} — will use static list")
-    get_allowed_tokens = None
+# Scan all tokens with prices, filtered by is_delisted at scan time.
+# No top-150 restriction needed — is_delisted() handles dead tokens.
 
 def _get_top_tokens():
-    """Load top-150 tokens on first call, refresh every 1h. Returns list."""
-    global _TOP150_CACHE_TIME
-    now = time.time()
-    if get_allowed_tokens and now - _TOP150_CACHE_TIME > 3600:
-        try:
-            TOP_TOKENS[:] = get_allowed_tokens()
-            _TOP150_CACHE_TIME = now
-        except Exception as e:
-            print(f"[signal_gen] top150 refresh failed: {e}")
-    return list(TOP_TOKENS)
+    """Return all tokens that have a price (full universe, no volume cap)."""
+    prices = get_all_latest_prices()
+    return list(prices.keys())
 
 # ─── Broad Market Trend Tokens (for regime override) ─────────────────
 BROAD_MARKET_TOKENS = ['BTC', 'ETH', 'SOL']
@@ -469,7 +455,7 @@ def compute_regime():
     broad_trending_up: bool — BTC/ETH/SOL 4h avg z > BROAD_UPTEND_Z
     """
     short_z, med_z = [], []
-    for tok in TOP_TOKENS:
+    for tok in _get_top_tokens():
         zscores = get_tf_zscores(tok)
         if '1m'   in zscores: short_z.append(zscores['1m'][0])
         if '30m'  in zscores: med_z.append(zscores['30m'][0])
@@ -829,19 +815,7 @@ def compute_score(token, direction, long_mult, short_mult):
 # Open Positions
 # ═══════════════════════════════════════════════════════════════
 
-def get_open_positions():
-    """Return {token: direction} for all open Hermes positions."""
-    try:
-        import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
-                                user='postgres', password='Brain123')
-        cur = conn.cursor()
-        cur.execute("SELECT token, direction FROM trades WHERE server='Hermes' AND status='open'")
-        rows = cur.fetchall()
-        cur.close(); conn.close()
-        return {r[0]: r[1] for r in rows}
-    except:
-        return {}
+
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -857,27 +831,32 @@ def run():
     print(f'=== Signal Gen | Regime: {regime.upper()} (L:x{long_mult:.1f} S:x{short_mult:.1f}) | Broad BTC/ETH/SOL 4h z={broad_z_avg:+.2f}{trend_flag} | {len(prices_dict)} tokens')
     log(f'REGIME: {regime.upper()} L:x{long_mult:.1f} S:x{short_mult:.1f} broad_z={broad_z_avg:+.2f}{trend_flag} | {len(prices_dict)} tokens')
 
-    open_pos = get_open_positions()
+    from position_manager import get_open_positions as _get_open_pos
+    open_pos = _get_open_pos()
     added    = 0
     blocked  = 0
     exits    = []
 
-    # Load top-150 tokens BEFORE computing regime or scanning (refreshes hourly)
-    _get_top_tokens()
-    active_tokens = set(TOP_TOKENS)
-    print(f'  Active universe: {len(active_tokens)} tokens (top-150 by volume)')
+    # Build active universe from all tokens with prices
+    active_tokens = _get_top_tokens()
+    print(f'  Active universe: {len(active_tokens)} tokens (full universe)')
 
     # Prefetch volume data for all tokens in parallel (rate-limit safe ~15s)
     tokens_needing_vol=[t for t in prices_dict.keys()
                          if t.upper() not in _VOL_CACHE
                          or time.time() - _VOL_CACHE[t.upper()][0] >= _VOL_TTL]
     if tokens_needing_vol:
-        t0 = time.time()
-        import concurrent.futures
-        # 8 workers: fast enough without hitting HL rate limits
-        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
-            ex.map(_fetch_trades_sync, tokens_needing_vol)
-        print(f'  Vol prefetch: {len(tokens_needing_vol)} tokens in {time.time()-t0:.1f}s')
+        # Prefetch volume data — fire-and-forget, don't block
+        import concurrent.futures, threading
+        def bg_prefetch():
+            try:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
+                    ex.map(_fetch_trades_sync, tokens_needing_vol)
+            except Exception:
+                pass
+        t = threading.Thread(target=bg_prefetch)
+        t.start()
+        # Don't wait — scan loop finishes quickly without this data
 
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
