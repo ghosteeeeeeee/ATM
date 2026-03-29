@@ -114,7 +114,7 @@ def get_position_count(server: str = SERVER_NAME) -> int:
         cur = get_cursor(conn)
         cur.execute("""
             SELECT COUNT(*) as cnt FROM trades
-            WHERE status = 'open' AND paper = TRUE AND server = %s
+            WHERE status = 'open' AND server = %s
         """, (server,))
         row = cur.fetchone()
         return int(row["cnt"]) if row else 0
@@ -136,7 +136,6 @@ def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
         cur.execute("""
             SELECT COUNT(*) as cnt FROM trades
             WHERE status = 'open'
-              AND paper = TRUE
               AND server = %s
               AND LOWER(token) = LOWER(%s)
         """, (server, token))
