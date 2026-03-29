@@ -611,7 +611,8 @@ def run(dry_run=False):
             log(f'  → FAILED: {msg}')
 
     log(f'=== Decider Done: {entered} entered | {skipped} skipped '
-        f'| {de_exec} delayed exec | {de_exp} delayed expired ===')
+        f'| {de_exec} delayed exec | {de_exp} delayed expired '
+        f'(open: {open_count}/{MAX_POS})')
     return entered, skipped
 
 
