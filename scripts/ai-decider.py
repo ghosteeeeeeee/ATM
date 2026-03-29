@@ -573,11 +573,11 @@ def get_pending_signals():
         c = conn.cursor()
         c.execute("""
             SELECT token, direction, signal_type, confidence, value, decision, exchange, z_score_tier, z_score
-            FROM signals 
-            WHERE decision = 'PENDING' 
-            AND created_at > datetime('now', '-5 minutes')
+            FROM signals
+            WHERE decision = 'PENDING'
+            AND executed = 0
             ORDER BY confidence DESC
-            LIMIT 10
+            LIMIT 20
         """)
         rows = c.fetchall()
         conn.close()
@@ -816,74 +816,53 @@ Z-Score Tier: {z_score_tier}"""
         elif z_score_tier == "exhaustion_long_only":
             momentum_context += "\n- Z < -3.5: EXTREME oversold → Long only (counter-trend)"
     
-    prompt = f"""You are a crypto trading decider. Analyze this trade opportunity:
+    prompt = f"""You are a crypto trading decider. A momentum signal generator flagged this trade — your job is to validate or reject it using all available context.
 
 TOKEN: {token}
 CURRENT PRICE: ${current}
 PROPOSED ENTRY: ${entry}
 PROPOSED DIRECTION: {direction.upper()}
-SIGNAL CONFIDENCE: {conf}/2
+MOMENTUM SIGNAL CONFIDENCE: {conf}% (this is the system's raw score — not gospel, use it as context)
+
 {momentum_context}
 
-=== TRADING RULES FROM HISTORICAL DATA (MUST FOLLOW) ===
+=== DECISION GATE ===
+- DECISION: LONG → approve as LONG
+- DECISION: SHORT → approve as SHORT
+- DECISION: WAIT → reject, don't enter
 
-1. TOKEN BLACKLIST - BLOCK these tokens on SHORT:
-   - SUI: 12.5% WR (ALWAYS REJECT SHORT)
-   - FET: 0% WR (ALWAYS REJECT SHORT)
-   - SPX: 17.6% WR (ALWAYS REJECT SHORT)
-   - ARK: 0% WR (ALWAYS REJECT SHORT)
-   - TON: 0% WR (ALWAYS REJECT SHORT)
-   - ONDO, CRV, RUNE: Also poor shorts
+=== HARD RULES ===
+1. TOKEN BLACKLIST (SHORT always blocked):
+   SUI, FET, SPX, ARK, TON, ONDO, CRV, RUNE, AR, NXPC, DASH, ARB, TRUMP, LDO, NEAR, APT, CELO, SEI, ACE
 
-2. DIRECTION BIAS:
-   - LONGS win 55.6% (profitable)
-   - SHORTS win 51.1% (losing money)
-   - Prefer LONG over SHORT when uncertain
+2. DIRECTION BIAS — LONGS outperform SHORTS historically. When uncertain, favor LONG.
 
-3. CONFIDENCE THRESHOLDS:
-   - 90%+ confidence: AUTO_APPROVE (only trust very high)
-   - 80-89%: REVIEW carefully (these lose money historically)
-   - Below 80%: REJECT (too risky)
+3. EXECUTE vs WAIT thresholds:
+   - AI confidence ≥ 50% + aligned with momentum signal → EXECUTE
+   - AI confidence < 50% → WAIT
+   - AI contradicts signal direction → WAIT
+   - Shorting a blacklisted token → WAIT
 
-4. LEVERAGE:
-   - 10x: Best (56% WR, +$9.07)
-   - 5x: OK (54% WR, -$14.02)
-   - 3x: AVOID (29% WR, -$5.77)
-   - Default to 10x
+4. LEVERAGE: Default 10x unless token is high-volatility (>50% daily range) → 5x max
 
-5. BEST SHORT TOKENS (only these for shorts):
-   - HYPE, AXS, FIL, LINK, TIA, BERA (70%+ WR)
+5. MARKET REGIME:
+   Regime: {regime} ({regime_conf}% confidence)
+   Align with regime direction. Fight it only with very high confidence.
 
-REFERENCE DATA: 442 historical trades available in /root/.openclaw/workspace/data/llm_training_full.jsonl
-
-===
-
-TECHNICAL INDICATORS:
+=== TECHNICAL INDICATORS ===
 - MACD Signal: {macd} (confidence: {macd_conf}%)
-- RSI: (check if oversold <35 or overbought >65)
-- MA Crossover: (check 9/21 trend)
+- RSI: oversold <35 or overbought >65 is significant
+- MA Crossover: 9/21 trend direction
 
-MARKET REGIME (4h timeframe):
-- Regime: {regime} ({regime_conf}% confidence)
-- If LONG_BIAS with high confidence, favor LONGs
-- If SHORT_BIAS with high confidence, favor SHORTs
-- If NEUTRAL, be more cautious
-
-MARKET CONTEXT:
-- Market Z-Score Trend: {market_z} (shows market-wide overbought/oversold)
-- Current BTC price: ${prices.get('BTC', 'N/A')}
-- Current ETH price: ${prices.get('ETH', 'N/A')}
+=== MARKET CONTEXT ===
+- Market Z-Score Trend: {market_z}
+- BTC: ${prices.get('BTC', 'N/A')} | ETH: ${prices.get('ETH', 'N/A')}
 {pred_str}
 
-QUESTIONS TO ANSWER:
-1. Is this a good entry point? Why?
-2. Should we go LONG or SHORT or WAIT?
-3. What's your confidence 0-100%?
-
-Respond in format:
+Respond with exactly:
 DECISION: [LONG/SHORT/WAIT]
 CONFIDENCE: [0-100]
-REASON: [brief explanation]
+REASON: [1-sentence explanation]
 """
     
     # Use local Ollama for AI decision
@@ -1011,23 +990,16 @@ LLM CANDLE PREDICTION (for reference):
 - Model Historical Accuracy: {prediction['accuracy']}%
 {token_info}"""""
     
-    # 3. Auto-approve high confidence signals (>=90%)
-    if conf >= 90:
-        print(f"\n🚀 AUTO-APPROVE {t} {direction}: {conf}% confidence")
-        decision = direction
-        ai_conf = conf
-        reason = "Auto-approved: high confidence signal"
-    else:
-        # Get z-score tier from signal
-        z_tier = s.get('z_score_tier')
-        z = s.get('z_score')
-        if z_tier:
-            print(f"   📊 Z-Score Tier: {z_tier} (z={z:.2f})")
-        
-        # AI makes decision
-        print(f"\n🤔 AI analyzing: {t} {direction} @ ${entry}")
-        macd_data = get_macd(t)
-        decision, ai_conf, reason = ai_decide(t, direction, entry, conf, prices, market_z, macd_data, pred_str, z_tier, z)
+    # Get z-score tier from signal
+    z_tier = s.get('z_score_tier')
+    z = s.get('z_score')
+    if z_tier:
+        print(f"   📊 Z-Score Tier: {z_tier} (z={z:.2f})")
+
+    # All PENDING signals (65-94%) go to AI for review
+    print(f"\n🤔 AI reviewing: {t} {direction} @ ${entry} (signal confidence: {conf}%)")
+    macd_data = get_macd(t)
+    decision, ai_conf, reason = ai_decide(t, direction, entry, conf, prices, market_z, macd_data, pred_str, z_tier, z)
     
     print(f"   AI Decision: {decision.upper()} (conf: {ai_conf}%)")
     print(f"   Reason: {reason[:100]}...")
@@ -1039,8 +1011,8 @@ LLM CANDLE PREDICTION (for reference):
         ai_conf = int(ai_conf + learned.get('confidence_boost', 0))
         print(f"   🧠 LEARNED: +{learned.get('confidence_boost', 0)}% conf (patterns: {', '.join(learned.get('patterns', []))})")
     
-    # Execute if AI says go
-    if decision != "wait" and ai_conf >= 30:
+    # Execute if AI says go (prompt enforces ≥50% confidence threshold)
+    if decision != "wait" and ai_conf >= 50:
         # Only trade real pumps, not slow grind
         if not is_real_pump(t):
             print(f"   ⏸️ SKIPPED - No pump momentum (need >3% 24h + volume)")
