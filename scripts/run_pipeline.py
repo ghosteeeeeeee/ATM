@@ -3,10 +3,11 @@
 run_pipeline.py — Hermes Trading Pipeline
 Runs every 1 minute via cron. A/B optimizer every 10 minutes.
 """
-import sys, subprocess, time, os, argparse, os
+import sys, subprocess, time, os, argparse, os, fcntl
 
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'pipeline.log')
+LOCK    = '/tmp/hermes-pipeline.lock'
 
 # Which steps run every minute vs every N minutes
 STEPS_EVERY_MIN  = ['price_collector', '4h_regime_scanner', 'signal_gen', 'decider-run', 'position_manager', 'hermes-trades-api']
@@ -30,10 +31,9 @@ def run(name, args=None):
     cmd = [sys.executable, script] + (args or [])
     log(f'Running {name}...')
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, timeout=300)
         out = (r.stdout or '').strip()
         err = (r.stderr or '').strip()
-        # Log step output
         if out:
             for line in out.split('\n')[-5:]:
                 if line.strip():
@@ -58,6 +58,14 @@ def main():
 
     minute = int(time.strftime('%M'))
     every_10 = (minute % 10 == 0)
+
+    # Prevent overlapping pipeline runs (systemd can fire twice)
+    try:
+        lock_fd = os.open(LOCK, os.O_CREAT | os.O_RDWR)
+        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (IOError, OSError):
+        log(f'=== Pipeline skipped (already running) ===')
+        sys.exit(0)
 
     log(f'=== Pipeline {mode} ({"1m+10m" if every_10 else "1m"}) ===')
 
