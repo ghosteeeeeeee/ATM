@@ -56,7 +56,7 @@ TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
 # This prevents the loss spiral: trade → cut → immediately re-enter → cut again
 LOSS_COOLDOWN_FILE = '/var/www/hermes/data/loss_cooldowns.json'
 LOSS_COOLDOWN_HOURS = 4  # block same direction for 4 hours after a loss
-WIN_COOLDOWN_MINUTES = 30  # block same direction for 30 min after a win (prevents re-entry loop)
+WIN_COOLDOWN_MINUTES = 5   # block same direction for 5 min after a win (prevents re-entry loop)
 
 # ─── DB Helpers ────────────────────────────────────────────────────────────────
 def get_db_connection():

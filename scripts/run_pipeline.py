@@ -31,13 +31,26 @@ def run(name, args=None):
     cmd = [sys.executable, script] + (args or [])
     log(f'Running {name}...')
     try:
-        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, timeout=300)
-        out = (r.stdout or '').strip()
-        err = (r.stderr or '').strip()
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, timeout=300)
+        out = (r.stdout or b'').decode(errors='replace').strip()
+        err = (r.stderr or b'').decode(errors='replace').strip()
+
+        # Always log last 5 lines of output for position_manager, decider-run, signal_gen
+        # This is critical for monitoring trade decisions in real-time
         if out:
-            for line in out.split('\n')[-5:]:
-                if line.strip():
-                    log(f'  {line.strip()}')
+            lines = out.split('\n')
+            # For noisy steps (price_collector etc.) only log errors
+            if name in ('position_manager', 'decider-run', 'signal_gen', 'ai_decider', 'live-decider'):
+                log_lines = [l.strip() for l in lines if l.strip()]
+                if log_lines:
+                    for l in log_lines[-8:]:
+                        log(f'  {l}')
+            else:
+                # For other steps, just tail the output
+                tail = [l.strip() for l in lines[-3:] if l.strip()]
+                for l in tail:
+                    log(f'  {l}')
+
         if r.returncode != 0 and err:
             for line in err.strip().split('\n')[:2]:
                 if line.strip():
