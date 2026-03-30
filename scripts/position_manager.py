@@ -233,36 +233,42 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     is_win = float(record_pnl or 0) > 0
 
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
         cur = conn.cursor()
         for test_name, variant_id in test_map.items():
             if not test_name or not variant_id:
                 continue
-            cur.execute("""
-                INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
-                                       total_pnl_pct, total_pnl_usdt, updated_at)
-                VALUES (%s, %s, 1, %s, %s, %s, %s, now())
-                ON CONFLICT (test_name, variant_id)
-                DO UPDATE SET
-                    trades = ab_results.trades + 1,
-                    wins = ab_results.wins + %s,
-                    losses = ab_results.losses + %s,
-                    total_pnl_pct = ab_results.total_pnl_pct + %s,
-                    total_pnl_usdt = ab_results.total_pnl_usdt + %s,
-                    win_rate_pct = CASE
-                        WHEN ab_results.trades + 1 > 0
-                        THEN (ab_results.wins + %s)::float / (ab_results.trades + 1) * 100
-                        ELSE 0 END,
-                    updated_at = now()
-            """, (test_name, variant_id,
-                  1 if is_win else 0, 0 if is_win else 1,
-                  float(pnl_pct or 0), float(record_pnl or 0),
-                  1 if is_win else 0, 0 if is_win else 1,
-                  float(pnl_pct or 0), float(record_pnl or 0),
-                  1 if is_win else 0))
+            try:
+                cur.execute("""
+                    INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
+                                           total_pnl_pct, total_pnl_usdt, updated_at)
+                    VALUES (%s, %s, 1, %s, %s, %s, %s, now())
+                    ON CONFLICT (test_name, variant_id)
+                    DO UPDATE SET
+                        trades = ab_results.trades + 1,
+                        wins = ab_results.wins + %s,
+                        losses = ab_results.losses + %s,
+                        total_pnl_pct = ab_results.total_pnl_pct + %s,
+                        total_pnl_usdt = ab_results.total_pnl_usdt + %s,
+                        win_rate_pct = CASE
+                            WHEN ab_results.trades + 1 > 0
+                            THEN (ab_results.wins + %s)::float / (ab_results.trades + 1) * 100
+                            ELSE 0 END,
+                        updated_at = now()
+                """, (test_name, variant_id,
+                      1 if is_win else 0, 0 if is_win else 1,
+                      float(pnl_pct or 0), float(record_pnl or 0),
+                      1 if is_win else 0, 0 if is_win else 1,
+                      float(pnl_pct or 0), float(record_pnl or 0),
+                      1 if is_win else 0))
+                print(f"[Position Manager] AB UPSERT OK: test={test_name} variant={variant_id} is_win={is_win}")
+            except Exception as ue:
+                import traceback; traceback.print_exc()
+                print(f"[Position Manager] AB UPSERT FAIL: test={test_name} variant={variant_id} — {ue}")
         conn.commit()
         cur.close(); conn.close()
     except Exception as e:
+        import traceback; traceback.print_exc()
         print(f"[Position Manager] ab_results close error: {e}")
 
 
@@ -374,9 +380,9 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             # No HYPE available at all
             conn.commit()
 
-        # Record to ab_results on close
+        # Record to ab_results on close — wrap with verbose logging so failures are never silent
+        ab_errors = []
         if experiment and sl_dist:
-            # experiment is a JSON dict from the DB — extract the experiment string
             exp_str = ''
             if isinstance(experiment, dict):
                 exp_str = experiment.get('experiment', '')
@@ -384,11 +390,25 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 import json as _json
                 try:
                     exp_str = _json.loads(experiment).get('experiment', '')
-                except Exception:
+                except Exception as _e:
                     exp_str = experiment
+                    ab_errors.append(f"json parse fail: {_e}")
             else:
                 exp_str = str(experiment)
-            _record_ab_close(token, direction, pnl_pct, pnl_usdt, exp_str, sl_dist, net_pnl=net_pnl)
+            print(f"[Position Manager] AB tracking: trade_id={trade_id} pnl_usdt={pnl_usdt:.2f} is_win={is_win} exp_str={exp_str!r}")
+            try:
+                _record_ab_close(token, direction, pnl_pct, pnl_usdt, exp_str, sl_dist, net_pnl=net_pnl)
+                print(f"[Position Manager] AB recorded: {token} {direction} {'WIN' if is_win else 'LOSS'} pnl={pnl_usdt:.2f}")
+            except Exception as _e:
+                import traceback
+                traceback.print_exc()
+                print(f"[Position Manager] AB RECORD FAIL: trade_id={trade_id} token={token} — {_e}")
+                ab_errors.append(str(_e))
+        elif experiment is None:
+            print(f"[Position Manager] AB SKIP: experiment=None for trade_id={trade_id} (no A/B data on this trade)")
+        elif not sl_dist:
+            print(f"[Position Manager] AB SKIP: sl_distance=None for trade_id={trade_id} (pre-AB trade)")
+
         return True
     except Exception as e:
         conn.rollback()
@@ -681,17 +701,30 @@ def refresh_current_prices(server: str = SERVER_NAME):
             # This runs even when DB has 0 open positions (prevents orphaned HL trades)
 
             # ── Ghosts: DB open, HL closed ────────────────────────
-            cur_recon.execute("SELECT id, token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
+            # Only close PAPER trades (paper=FALSE) — live HL trades need manual handling.
+            # Use close_paper_position to properly record AB results before HL close.
+            cur_recon.execute("SELECT id, token, experiment, sl_distance FROM trades WHERE status='open' AND exchange='Hyperliquid' AND paper=FALSE")
             for row in cur_recon.fetchall():
                 tok_id = row['id']
                 tok = row['token']
+                experiment = row.get('experiment')
+                sl_dist = row.get('sl_distance')
                 if tok not in hl_live:
-                    print(f"  [Sync] Ghost: {tok} in DB but not HL")
+                    print(f"  [Sync] Ghost: {tok} in DB but not HL (paper=FALSE)")
+                    # Record AB results before closing so wins are tracked
+                    if experiment and sl_dist:
+                        try:
+                            cur_recon.execute("SELECT pnl_usdt, pnl_pct FROM trades WHERE id=%s", (tok_id,))
+                            pr = cur_recon.fetchone()
+                            if pr:
+                                _record_ab_close(tok, 'UNKNOWN', pr.pnl_pct, pr.pnl_usdt, experiment, sl_dist)
+                        except Exception as e:
+                            print(f"  [Sync] Ghost AB record error: {e}")
+                    cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (tok_id,))
                     try:
                         hl_close_position(hype_coin(tok))
                     except Exception:
                         pass
-                    cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (tok_id,))
                     print(f"  [Sync] Ghost closed: {tok} (id={tok_id})")
 
             # ── Orphans: HL open, DB closed/missing ─────────────────
