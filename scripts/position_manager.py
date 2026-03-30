@@ -91,7 +91,6 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
                    trailing_activation, trailing_distance
             FROM trades
             WHERE status = 'open'
-              AND paper = TRUE
               AND server = %s
             ORDER BY open_time DESC
         """, (server,))
@@ -151,15 +150,35 @@ def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
 # ─── Decision Helpers ─────────────────────────────────────────────────────────
 def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
     """
-    Return True if pnl_pct crosses the trade's stop-loss threshold.
+    Return True if price has crossed the trade's stop-loss threshold.
 
-    Uses the trade's sl_distance if set (from A/B test), otherwise falls back
-    to the global CUT_LOSER_PNL (-3%).
-
-    The trade record is the source of truth — sl_distance is written at entry
-    time by the A/B variant, position_manager reads it back.
+    Checks in order of priority:
+    1. Actual stop_loss price (if set in DB) — compares live price vs SL price
+    2. Trade's sl_distance (A/B test param, e.g. 0.015 = -1.5% threshold)
+    3. Global CUT_LOSER_PNT (-3% default fallback)
     """
     if trade:
+        sl_price = trade.get('stop_loss')
+        entry_price = trade.get('entry_price')
+        direction = trade.get('direction', '').upper()
+        live_price = trade.get('current_price')
+
+        # Priority 1: check actual stop_loss price if we have all values
+        if sl_price and entry_price and live_price and direction:
+            try:
+                sl = float(sl_price)
+                entry = float(entry_price)
+                live = float(live_price)
+                if direction == 'SHORT':
+                    if live >= sl:
+                        return True
+                elif direction == 'LONG':
+                    if live <= sl:
+                        return True
+            except (TypeError, ValueError):
+                pass
+
+        # Priority 2: sl_distance from A/B test
         sl_dist = trade.get('sl_distance') or trade.get('sl_group')
         if sl_dist is not None:
             try:
@@ -167,7 +186,8 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
                 return pnl_pct <= threshold
             except (TypeError, ValueError):
                 pass
-    # Fallback: global hard stop
+
+    # Priority 3: global hard stop
     return pnl_pct <= CUT_LOSER_PNL
 
 
@@ -663,20 +683,21 @@ def refresh_current_prices(server: str = SERVER_NAME):
             # ── Ghosts: DB open, HL closed ────────────────────────
             cur_recon.execute("SELECT id, token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
             for row in cur_recon.fetchall():
-                tok = row[1]
+                tok_id = row['id']
+                tok = row['token']
                 if tok not in hl_live:
                     print(f"  [Sync] Ghost: {tok} in DB but not HL")
                     try:
                         hl_close_position(hype_coin(tok))
                     except Exception:
                         pass
-                    cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (row[0],))
-                    print(f"  [Sync] Ghost closed: {tok} (id={row[0]})")
+                    cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (tok_id,))
+                    print(f"  [Sync] Ghost closed: {tok} (id={tok_id})")
 
             # ── Orphans: HL open, DB closed/missing ─────────────────
             cur_recon.execute("SELECT DISTINCT ON (token) id, token, status FROM trades WHERE token IN %s ORDER BY token, id DESC",
                               (tuple(hl_live.keys()),) if hl_live else (('',),))
-            db_token_status = {r[1]: r[2] for r in cur_recon.fetchall()}
+            db_token_status = {row['token']: row['status'] for row in cur_recon.fetchall()}
             for tok, hdata in hl_live.items():
                 db_status = db_token_status.get(tok, 'MISSING')
                 if db_status != 'open':
@@ -706,6 +727,8 @@ def refresh_current_prices(server: str = SERVER_NAME):
             conn_recon.close()
 
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             print(f"  [Sync] Reconciliation error: {e}")
 
     positions = get_open_positions(server)
