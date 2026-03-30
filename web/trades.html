@@ -1,242 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hermes Trades</title>
-    <meta http-equiv="refresh" content="60">
-    <style>
-        :root {
-            --bg: #0a0a0f;
-            --card-bg: #12121a;
-            --border: #2a2a3a;
-            --text: #e8e8ed;
-            --text-dim: #8888a0;
-            --green: #3fb950;
-            --red: #f85149;
-            --blue: #58a6ff;
-            --purple: #bc8cff;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        h1 {
-            font-size: 1.8rem;
-            color: var(--purple);
-        }
-        .refresh-info { color: var(--text-dim); font-size: 0.9rem; }
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
-        }
-        .stat-label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-        .stat-value { font-size: 1.4rem; font-weight: 700; }
-        .stat-value.green { color: var(--green); }
-        .stat-value.red { color: var(--red); }
-        .stat-value.blue { color: var(--blue); }
-        .section { margin-bottom: 40px; }
-        .section-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-dim);
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-        .trades-list { display: flex; flex-direction: column; gap: 10px; }
-        .trade {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .trade.long { border-left: 4px solid var(--green); }
-        .trade.short { border-left: 4px solid var(--red); }
-        .trade-main { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-        .trade-token { font-size: 1.2rem; font-weight: 700; }
-        .trade-dir.long { color: var(--green); font-weight: 600; }
-        .trade-dir.short { color: var(--red); font-weight: 600; }
-        .trade-price { color: var(--text-dim); font-size: 0.85rem; }
-        .trade-meta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-        .trade-stat { text-align: right; }
-        .trade-stat-label { color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; }
-        .trade-stat-val { font-size: 0.95rem; font-weight: 600; }
-        .trade-pnl { font-size: 1.1rem; font-weight: 700; }
-        .trade-pnl.positive { color: var(--green); }
-        .trade-pnl.negative { color: var(--red); }
-        .trade-pnl.neutral { color: var(--text-dim); }
-        .no-trades { color: var(--text-dim); font-style: italic; padding: 30px; text-align: center; background: var(--card-bg); border-radius: 10px; border: 1px dashed var(--border); }
-        .badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .badge.hermes { background: #1f2937; color: var(--purple); border: 1px solid var(--purple); }
-        .badge.reason { background: #1f2937; color: var(--text-dim); border: 1px solid #374151; font-size: 0.65rem; }
-        .none { color: var(--text-dim); font-style: italic; text-align: center; padding: 40px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Trades</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: monospace; background: #0a0a0f; color: #e0e0e0; padding: 20px; font-size: 0.85em; }
+    h1 { color: #00ff88; font-size: 1.4em; margin-bottom: 15px; border-bottom: 1px solid #00ff8833; padding-bottom: 10px; }
+    h1 .subtitle { color: #666; font-size: 0.6em; font-weight: normal; margin-left: 15px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #1a1a2e; color: #00ff88; padding: 8px 10px; text-align: left; border-bottom: 2px solid #00ff88; font-size: 0.8em; white-space: nowrap; }
+    td { padding: 7px 10px; border-bottom: 1px solid #1a1a2e; }
+    tr:hover { background: #1a1a2e; }
+    .win { color: #00ff88; }
+    .loss { color: #ff4444; }
+    .neutral { color: #888; }
+    .long { color: #00ff88; }
+    .short { color: #ff4444; }
+    .open-badge { background: #00ff8833; color: #00ff88; padding: 2px 6px; border-radius: 3px; font-size: 0.75em; }
+    .closed-badge { color: #666; font-size: 0.75em; }
+    #status { color: #666; font-size: 0.75em; margin-bottom: 15px; }
+    .section-title { color: #4488ff; font-size: 0.9em; margin: 20px 0 8px; border-left: 3px solid #4488ff; padding-left: 8px; }
+    .empty { color: #444; text-align: center; padding: 20px; }
+    /* Pagination */
+    #pagination { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+    .page-btn { background: #1a1a2e; color: #00ff88; border: 1px solid #00ff8844; padding: 5px 12px; cursor: pointer; font-family: monospace; font-size: 0.8em; border-radius: 3px; }
+    .page-btn:hover { background: #00ff8822; }
+    .page-btn.active { background: #00ff8833; border-color: #00ff88; }
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+    .page-info { color: #666; font-size: 0.8em; }
+    /* Stats bar */
+    .stats-bar { display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap; }
+    .stat { background: #1a1a2e; padding: 8px 14px; border-radius: 4px; border-left: 3px solid #00ff88; }
+    .stat .label { color: #666; font-size: 0.75em; }
+    .stat .value { color: #00ff88; font-size: 1.1em; font-weight: bold; }
+    .stat .value.neg { color: #ff4444; }
+    .stat .value.neutral { color: #888; }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Hermes Trades</h1>
-        <div class="refresh-info">Auto-refreshes every 60s</div>
+  <h1>Hermes Trades <span class="subtitle">Hyperliquid Paper Trading</span></h1>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="label">OPEN POSITIONS</div>
+      <div class="value" id="stat-open">--</div>
     </div>
-
-    <div class="stats-row" id="stats"></div>
-
-    <div class="section">
-        <div class="section-title">Open Positions</div>
-        <div class="trades-list" id="open-trades"></div>
+    <div class="stat">
+      <div class="label">TOTAL CLOSED</div>
+      <div class="value" id="stat-closed">--</div>
     </div>
-
-    <div class="section">
-        <div class="section-title">Closed Positions</div>
-        <div class="trades-list" id="closed-trades"></div>
+    <div class="stat">
+      <div class="label">WIN RATE</div>
+      <div class="value" id="stat-wr">--</div>
     </div>
+    <div class="stat">
+      <div class="label">TOTAL P&L</div>
+      <div class="value" id="stat-pnl">--</div>
+    </div>
+    <div class="stat">
+      <div class="label">LAST UPDATED</div>
+      <div class="value" id="stat-updated" style="font-size:0.8em;color:#888">--</div>
+    </div>
+  </div>
 
-    <script>
-        async function load() {
-            try {
-                const res = await fetch('/trades_data.json');
-                const raw = await res.json();
+  <div id="status" style="margin-bottom:5px">Loading...</div>
 
-                // Handle both API formats:
-                // 1. New: {trades: [...], generated: "..."} with status field
-                // 2. Original: {open: [...], closed: [...], open_count: N, closed_count: N}
-                let open, closed, openCount, closedCount;
-                if (raw.trades) {
-                    // New format — separate by status
-                    const all = raw.trades;
-                    open = all.filter(t => t.status === 'open' || t.status === 'OPEN' || t.status === true);
-                    closed = all.filter(t => t.status !== 'open' && t.status !== 'OPEN' && t.status !== true);
-                    openCount = open.length;
-                    closedCount = closed.length;
-                } else {
-                    // Original format
-                    open = raw.open || [];
-                    closed = raw.closed || [];
-                    openCount = raw.open_count || open.length;
-                    closedCount = raw.closed_count || closed.length;
-                }
+  <div class="section-title">Open Positions</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Token</th><th>Dir</th><th>Entry</th><th>Current</th>
+        <th>P&L %</th><th>P&L $</th><th>Size</th><th>Eff. Size</th>
+        <th>Lev</th><th>SL</th><th>TP</th><th>Signal</th><th>Opened</th>
+      </tr>
+    </thead>
+    <tbody id="open-tbody"><tr><td colspan="13" class="empty">Loading...</td></tr></tbody>
+  </table>
 
-                // Stats
-                let totalPnl = 0, wins = 0, losses = 0;
-                closed.forEach(t => {
-                    const pnl = parseFloat(t.pnl_pct || 0);
-                    totalPnl += pnl;
-                    if (pnl > 0) wins++;
-                    else if (pnl < 0) losses++;
-                });
-                const winRate = closedCount > 0 ? ((wins / closedCount) * 100).toFixed(0) : 0;
+  <div class="section-title">Closed Trades</div>
+  <div id="pagination"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Token</th><th>Dir</th><th>Entry</th><th>Exit</th>
+        <th>P&L %</th><th>P&L $</th><th>Lev</th><th>Size</th>
+        <th>Reason</th><th>Signal</th><th>Closed</th>
+      </tr>
+    </thead>
+    <tbody id="closed-tbody"><tr><td colspan="12" class="empty">Loading...</td></tr></tbody>
+  </table>
+  <div id="pagination-bottom"></div>
 
-                document.getElementById('stats').innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-label">Open</div>
-                        <div class="stat-value blue">${openCount}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Closed</div>
-                        <div class="stat-value">${closedCount}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Win Rate</div>
-                        <div class="stat-value ${winRate >= 50 ? 'green' : 'red'}">${winRate}%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total PnL</div>
-                        <div class="stat-value ${totalPnl >= 0 ? 'green' : 'red'}">${totalPnl > 0 ? '+' : ''}${totalPnl.toFixed(2)}%</div>
-                    </div>
-                `;
+  <script>
+    const PAGE_SIZE = 50;
+    let currentPage = 1;
+    let allClosed = [];
+    let totalClosed = 0;
 
-                // Open trades
-                if (open.length === 0) {
-                    document.getElementById('open-trades').innerHTML = '<div class="no-trades">No open positions</div>';
-                } else {
-                    document.getElementById('open-trades').innerHTML = open.map(t => `
-                        <div class="trade ${(t.direction || 'LONG').toLowerCase()}">
-                            <div class="trade-main">
-                                <span class="trade-token">${t.token || t.symbol || '?'}</span>
-                                <span class="trade-dir ${(t.direction || 'LONG').toLowerCase()}">${t.direction || 'LONG'}</span>
-                                <span class="trade-price">Entry: $${t.entry_price || '?'}</span>
-                                ${t.current_price ? `<span class="trade-price">Now: $${parseFloat(t.current_price).toFixed(parseFloat(t.current_price) > 1 ? 2 : 5)}</span>` : ''}
-                            </div>
-                            <div class="trade-meta">
-                                ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
-                                ${t.amount_usdt ? `<span class="trade-stat"><div class="trade-stat-label">Size</div><div class="trade-stat-val">$${t.amount_usdt}</div></span>` : ''}
-                                ${t.stop_loss ? `<span class="trade-stat"><div class="trade-stat-label">SL</div><div class="trade-stat-val red">$${parseFloat(t.stop_loss).toFixed(parseFloat(t.stop_loss) > 1 ? 2 : 5)}</div></span>` : ''}
-                                ${t.target ? `<span class="trade-stat"><div class="trade-stat-label">TP</div><div class="trade-stat-val green">$${parseFloat(t.target).toFixed(parseFloat(t.target) > 1 ? 2 : 5)}</div></span>` : ''}
-                                ${t.pnl_pct !== undefined ? `<span class="trade-pnl ${parseFloat(t.pnl_pct) >= 0 ? 'positive' : 'negative'}">${parseFloat(t.pnl_pct) >= 0 ? '+' : ''}${parseFloat(t.pnl_pct).toFixed(2)}%</span>` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                }
+    async function load() {
+      try {
+        const r = await fetch('/data/trades.json?t=' + Date.now());
+        const d = await r.json();
 
-                // Closed trades
-                if (closed.length === 0) {
-                    document.getElementById('closed-trades').innerHTML = '<div class="no-trades">No closed positions</div>';
-                } else {
-                    document.getElementById('closed-trades').innerHTML = closed.map(t => {
-                        const pnl = parseFloat(t.pnl_pct || 0);
-                        const ep = parseFloat(t.entry_price);
-                        const sl = parseFloat(t.stop_loss);
-                        const tp = parseFloat(t.target);
-                        const slDist = ep && sl ? (((ep - sl) / ep) * 100 * (t.direction === 'LONG' ? 1 : -1)).toFixed(2) : null;
-                        const tpDist = ep && tp ? (((tp - ep) / ep) * 100 * (t.direction === 'LONG' ? 1 : -1)).toFixed(2) : null;
-                        return `
-                        <div class="trade ${pnl >= 0 ? 'long' : 'short'}">
-                            <div class="trade-main">
-                                <span class="trade-token">${t.token || t.symbol || '?'}</span>
-                                <span class="trade-dir ${(t.direction || 'LONG').toLowerCase()}">${t.direction || 'LONG'}</span>
-                                <span class="trade-price">Entry: $${t.entry_price || '?'}</span>
-                                ${t.exit_price ? `<span class="trade-price">Exit: $${t.exit_price}</span>` : ''}
-                                ${slDist !== null ? `<span class="trade-stat"><div class="trade-stat-label">SL</div><div class="trade-stat-val red">-$${Math.abs(slDist)}%</div></span>` : ''}
-                                ${tpDist !== null ? `<span class="trade-stat"><div class="trade-stat-label">TP</div><div class="trade-stat-val green">+${tpDist}%</div></span>` : ''}
-                            </div>
-                            <div class="trade-meta">
-                                ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
-                                ${t.amount_usdt ? `<span class="trade-stat"><div class="trade-stat-label">Size</div><div class="trade-stat-val">$${t.amount_usdt}</div></span>` : ''}
-                                ${t.close_reason ? `<span class="badge reason">${t.close_reason}</span>` : ''}
-                                <span class="trade-pnl ${pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</span>
-                            </div>
-                        </div>`;
-                    }).join('');
-                }
-            } catch(e) {
-                document.getElementById('open-trades').innerHTML = '<div class="no-trades">Error: ' + e.message + '</div>';
-            }
+        document.getElementById('stat-open').textContent = d.open_count;
+        document.getElementById('stat-closed').textContent = d.closed_count;
+        document.getElementById('stat-updated').textContent = new Date(d.updated).toLocaleTimeString();
+        document.getElementById('status').textContent =
+          `Updated: ${new Date(d.updated).toLocaleString()} | Open: ${d.open_count} | Closed: ${d.closed_count}`;
+
+        // Render open positions
+        const ot = document.getElementById('open-tbody');
+        if (!d.open || !d.open.length) {
+          ot.innerHTML = '<tr><td colspan="13" class="empty">No open positions</td></tr>';
+        } else {
+          ot.innerHTML = d.open.map(t => {
+            const dir = (t.direction || '').toUpperCase();
+            const size = t.amount_usdt || 50;
+            const lev  = t.leverage || 1;
+            const entry  = t.entry || 0;
+            const current = t.current || entry;
+            const priceDelta = current - entry;
+            const directionSign = dir === 'LONG' ? 1 : dir === 'SHORT' ? -1 : 0;
+            // Use DB pnl values directly
+            const pnlUsdt = parseFloat(t.pnl_usdt) || 0;
+            const pnlPct  = parseFloat(t.pnl_pct)  || 0;
+            const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
+            const effSize = size * lev;
+            const sl = t.trailing_sl || t.sl || 0;
+            return `<tr>
+              <td>${t.token}</td>
+              <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
+              <td>$${entry.toFixed(4)}</td>
+              <td>$${current.toFixed(4)}</td>
+              <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
+              <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
+              <td>$${size.toFixed(1)}</td>
+              <td>$${effSize.toFixed(1)}</td>
+              <td>${lev}x</td>
+              <td>$${sl.toFixed(6)}</td>
+              <td>$${(t.tp||0).toFixed(4)}</td>
+              <td style="color:#888;font-size:0.8em">${t.signal||''}</td>
+              <td style="color:#666;font-size:0.75em">${(t.opened||'').replace('T',' ').slice(0,16)}</td>
+            </tr>`;
+          }).join('');
         }
-        load();
-    </script>
+
+        // Store closed trades and render pagination
+        allClosed = d.closed || [];
+        totalClosed = d.closed_count || allClosed.length;
+        currentPage = 1;
+        renderPagination();
+        renderClosedPage();
+
+      } catch(e) {
+        document.getElementById('status').textContent = 'Error loading: ' + e.message;
+        document.getElementById('open-tbody').innerHTML = '<tr><td colspan="13" class="empty">Error: ' + e.message + '</td></tr>';
+        document.getElementById('closed-tbody').innerHTML = '<tr><td colspan="12" class="empty">Error: ' + e.message + '</td></tr>';
+      }
+    }
+
+    function renderClosedPage() {
+      const ct = document.getElementById('closed-tbody');
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const page = allClosed.slice(start, start + PAGE_SIZE);
+
+      if (!page.length) {
+        ct.innerHTML = '<tr><td colspan="12" class="empty">No closed trades</td></tr>';
+        return;
+      }
+
+      // Get stats for this page
+      const pagePnls = page.map(t => parseFloat(t.pnl_usdt) || 0);
+      const pageWins = pagePnls.filter(p => p > 0).length;
+      const pagePnl  = pagePnls.reduce((a, b) => a + b, 0);
+
+      ct.innerHTML = page.map((t, i) => {
+        const globalIdx = start + i + 1;
+        const dir = (t.direction || '').toUpperCase();
+        const pnlUsdt = parseFloat(t.pnl_usdt) || 0;
+        const pnlPct  = parseFloat(t.pnl_pct)  || 0;
+        const lev = t.leverage || 1;
+        const size = t.amount_usdt || 50;
+        const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
+        const result = pnlPct >= 0 ? 'WIN' : 'LOSS';
+        const closedTime = (t.closed || '').replace('T', ' ').slice(0, 19);
+        const reason = t.close_reason || '';
+        return `<tr>
+          <td style="color:#444;font-size:0.75em">${globalIdx}</td>
+          <td>${t.token}</td>
+          <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
+          <td>$${(t.entry||0).toFixed(4)}</td>
+          <td>$${(t.exit||0).toFixed(4)}</td>
+          <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
+          <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
+          <td>${lev}x</td>
+          <td>$${size.toFixed(1)}</td>
+          <td style="color:#888;font-size:0.75em">${reason}</td>
+          <td style="color:#555;font-size:0.75em">${t.signal||''}</td>
+          <td style="color:#666;font-size:0.75em">${closedTime}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(totalClosed / PAGE_SIZE) || 1;
+      currentPage = Math.min(currentPage, totalPages);
+
+      // Stats summary for this page
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const page = allClosed.slice(start, start + PAGE_SIZE);
+      const pagePnls = page.map(t => parseFloat(t.pnl_usdt) || 0);
+      const pageWins = pagePnls.filter(p => p > 0).length;
+      const pagePnl  = pagePnls.reduce((a, b) => a + b, 0);
+      const pnlClass = pagePnl > 0 ? 'win' : pagePnl < 0 ? 'loss' : 'neutral';
+
+      let html = '';
+
+      // Page info
+      html += `<span class="page-info">Page ${currentPage}/${totalPages} &nbsp;|&nbsp; Showing ${start+1}–${Math.min(start+PAGE_SIZE, totalClosed)} of ${totalClosed} trades &nbsp;|&nbsp; This page: ${pageWins}W/${page.length}L P&L=<span class="${pnlClass}">${pagePnl>=0?'+':''}$${pagePnl.toFixed(2)}</span></span> &nbsp; `;
+
+      // Prev button
+      html += `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>Prev</button>`;
+
+      // Page number buttons (show up to 7 around current)
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - 3 && p <= currentPage + 3)) {
+          html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+        } else if (p === currentPage - 4 || p === currentPage + 4) {
+          html += `<span style="color:#444">...</span>`;
+        }
+      }
+
+      // Next button
+      html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next</button>`;
+
+      document.getElementById('pagination').innerHTML = html;
+      document.getElementById('pagination-bottom').innerHTML = html;
+    }
+
+    function goPage(p) {
+      const totalPages = Math.ceil(totalClosed / PAGE_SIZE) || 1;
+      currentPage = Math.max(1, Math.min(p, totalPages));
+      renderPagination();
+      renderClosedPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    load();
+    setInterval(load, 30000);
+  </script>
 </body>
 </html>
