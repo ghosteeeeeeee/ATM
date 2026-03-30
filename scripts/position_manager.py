@@ -326,21 +326,33 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
               round(pnl_pct, 4), round(pnl_usdt, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               trade_id))
-        conn.commit()
+        # DB UPDATE done — do NOT commit yet. Commit only after HL confirms, or rollback if HL fails.
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
         # ── Mirror to Hyperliquid (real trade) ───────────────────────
-        # Respects kill switch: mirror_close checks is_live_trading_enabled() internally.
+        # Fails loudly: HL must confirm before we commit DB.
+        # If HL fails → rollback DB (keeps DB and HL in sync).
         if HYPE_AVAILABLE and is_live_trading_enabled():
-            hype_token=hype_coin(token)
+            hype_token = hype_coin(token)
             try:
-                result = mirror_close(hype_token, direction)
-                if not result.get("success"):
-                    print(f"[Position Manager] HYPE mirror_close failed: {result.get('message')}")
+                mirror_close(hype_token, direction)
+                print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
+                conn.commit()  # HL confirmed → commit DB
+            except RuntimeError as me:
+                print(f"[Position Manager] HYPE mirror_close FAILED: {me}")
+                conn.rollback()
+                raise  # re-raise so caller knows HL is still open
             except Exception as me:
-                print(f"[Position Manager] HYPE mirror_close failed: {me}")
+                print(f"[Position Manager] HYPE mirror_close ERROR: {me}")
+                conn.rollback()
+                raise
         elif HYPE_AVAILABLE:
-            print(f"[Position Manager] Live trading OFF — paper close not mirrored")
+            # Live trading OFF → paper only, safe to commit
+            print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
+            conn.commit()
+        else:
+            # No HYPE available at all
+            conn.commit()
 
         # Record to ab_results on close
         if experiment and sl_dist:

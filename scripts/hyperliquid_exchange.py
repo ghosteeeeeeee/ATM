@@ -707,9 +707,10 @@ def mirror_close(token: str, direction: str, exit_price: float = None) -> dict:
     """
     Close a real Hyperliquid position mirroring a paper close.
     BLOCKED if live trading is disabled (kill switch).
+    RAISES RuntimeError on failure (fails loudly, never silently).
     """
     if not is_live_trading_enabled():
-        return {"success": False, "message": "Live trading disabled (kill switch)"}
+        raise RuntimeError(f"mirror_close({token}): live trading disabled (kill switch)")
 
     result = close_position(token)
 
@@ -717,8 +718,8 @@ def mirror_close(token: str, direction: str, exit_price: float = None) -> dict:
         print(f"[HYPE Mirror] CLOSED {direction} {token}")
         return {"success": True, "message": f"Closed {direction} {token}"}
     else:
-        print(f"[HYPE Mirror] FAILED close {token}: {result.get('error')}")
-        return {"success": False, "message": result.get("error", "Unknown error")}
+        err = result.get("error", "Unknown error")
+        raise RuntimeError(f"mirror_close({token}): HL API failed — {err}")
 
 
 # ─── Token Symbol Mapping ─────────────────────────────────────────────────────
