@@ -10,7 +10,7 @@ Rate limit strategy:
 
 from eth_account import Account
 from hyperliquid.exchange import Exchange
-import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error
+import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error, subprocess
 from decimal import Decimal, ROUND_UP
 
 # ─── Wallet Credentials ──────────────────────────────────────────────────────
@@ -22,8 +22,22 @@ if _SECRETS.exists():
             globals()[k] = v.strip('"')
 
 _SIGNING_KEY            = globals().get("SIGNING_KEY", "")
-SIGNING_WALLET_ADDRESS  = "0x5AB4AC1b62A255284b54230b980AbA66d882D80A"  # funding/signing
-MAIN_ACCOUNT_ADDRESS    = "0x324a9713603863FE3A678E83d7a81E20186126E7"   # main trading
+SIGNING_WALLET_ADDRESS  = "0x5AB4AC1b62A255284b54230b980AbA66d882D80A"  # funding/signing wallet
+
+# MAIN_ACCOUNT_ADDRESS = trading account (separate from signing wallet)
+# .secrets.local has it but it's filtered above, so hardcode here
+# Both wallets are loaded from .secrets.local but /info queries use this address
+try:
+    _SECRETS2 = pathlib.Path(__file__).parent.parent / ".secrets.local"
+    for line in _SECRETS2.read_text().splitlines():
+        k, _, v = line.strip().partition("=")
+        if k == "MAIN_ACCOUNT_ADDRESS":
+            MAIN_ACCOUNT_ADDRESS = v.strip('"')
+            break
+    else:
+        MAIN_ACCOUNT_ADDRESS = "0x324a9713603863FE3A678E83d7a81E20186126E7"
+except Exception:
+    MAIN_ACCOUNT_ADDRESS = "0x324a9713603863FE3A678E83d7a81E20186126E7"
 BASE_URL                = "https://api.hyperliquid.xyz"
 _INFO_ENDPOINT          = BASE_URL + "/info"
 _EXCHANGE_ENDPOINT      = BASE_URL + "/exchange"
@@ -385,18 +399,14 @@ def get_account_value_curl():
 
 
 def get_open_hype_positions_curl():
-    """Get open positions via curl to /info (separate rate limit pool)."""
+    """Get open positions from Hyperliquid using SDK user_state (uses MAIN_ACCOUNT_ADDRESS).
+    SDK's user_state() is more reliable than raw curl for this account."""
     try:
-        result = _hl_info({
-            "type": "clearinghouseState",
-            "user": MAIN_ACCOUNT_ADDRESS,
-        })
-        if not result:
-            sys.stderr.write("[HYPE] get_open_hype_positions_curl: HL returned empty response (rate-limited?)\n"); sys.stderr.flush()
-            return {}
-        positions = result.get("assetPositions", []) or []
+        _exchange = get_exchange()
+        state = _exchange.info.user_state(MAIN_ACCOUNT_ADDRESS)
+        aps = state.get("assetPositions", [])
         out = {}
-        for p in positions:
+        for p in aps:
             pos = p.get("position", {})
             coin = pos.get("coin", "")
             sz = float(pos.get("szi", 0) or 0)
@@ -545,25 +555,31 @@ def get_account_value():
 
 
 def get_open_hype_positions():
-    """Get open positions via SDK (uses /info pool — prefer get_open_hype_positions_curl)."""
-    from hyperliquid.info import Info
-    info = Info(base_url=BASE_URL, skip_ws=True)
+    """Get open positions. Uses subprocess curl to avoid SDK caching issues and
+    because clearinghouseState can return empty for some accounts even with correct address."""
     try:
-        state = info.user_state(MAIN_ACCOUNT_ADDRESS)
-        result = {}
-        for p in state.get("assetPositions", []):
-            pos = p["position"]
-            coin = pos["coin"]
+        result = subprocess.run(
+            ['curl', '-s', '-X', 'POST', _INFO_ENDPOINT,
+             '-H', 'Content-Type: application/json',
+             '-d', json.dumps({'type': 'clearinghouseState', 'user': MAIN_ACCOUNT_ADDRESS})],
+            capture_output=True, text=True, timeout=15
+        )
+        data = json.loads(result.stdout)
+        positions = data.get("assetPositions", []) or []
+        out = {}
+        for p in positions:
+            pos = p.get("position", {})
+            coin = pos.get("coin", "")
             sz = float(pos.get("szi", 0) or 0)
             if sz == 0:
                 continue
-            result[coin] = {
+            out[coin] = {
                 "size": abs(sz),
                 "direction": "LONG" if sz > 0 else "SHORT",
                 "entry_px": float(pos.get("entryPx", 0) or 0),
                 "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
             }
-        return result
+        return out
     except Exception as e:
         print(f"[HYPE] get_open_hype_positions error: {e}")
         return {}
@@ -714,6 +730,88 @@ TOKEN_MAP = {
 def hype_coin(paper_token: str) -> str:
     """Convert paper token name to Hyperliquid coin name."""
     return TOKEN_MAP.get(paper_token.upper(), paper_token.upper())
+
+
+# ─── TP / SL Order Placement ───────────────────────────────────────────────────
+
+# HL tick sizes (minimum price increment for TP/SL orders)
+# BTC=1, ETH=0.1, SOL=0.01, STX=0.01, AVAX=0.001, TRX=0.01
+_HL_TICK_DECIMALS = {
+    "BTC": 0, "ETH": 1, "SOL": 2, "STX": 2, "AVAX": 3, "TRX": 2,
+    "MEGA": 6, "DOGE": 5, "XRP": 4, "ADA": 5, "DOT": 3, "LINK": 3,
+}
+
+
+def _hl_tick_round(px: float, decimals: int) -> float:
+    """Round price to HL tick size."""
+    import decimal
+    rounded = round(px, decimals)
+    if decimals == 0:
+        rounded = int(rounded)
+    normalized = decimal.Decimal(str(rounded)).normalize()
+    return float(normalized)
+
+
+def place_tp(coin: str, direction: str, tp_price: float, size: float) -> dict:
+    """Place a take-profit order on Hyperliquid. Sells if LONG, buys if SHORT.
+    Uses market trigger (isMarket=True) so it executes immediately when triggered.
+
+    Key rules learned from HL API:
+    - TP must be on correct side of current price (above for LONG, below for SHORT)
+    - Price must be rounded to HL tick size (coin-specific)
+    - Pass limit_px = triggerPx (works for both LONG and SHORT)
+    - BTC needs integer prices, ETH needs 1-decimal, SOL/STX need 2-decimal, etc."""
+    exchange = get_exchange()
+    is_buy = direction.upper() == "SHORT"
+
+    decimals = _HL_TICK_DECIMALS.get(coin, 6)
+    tp_rounded = _hl_tick_round(tp_price, decimals)
+
+    order_type = {
+        "trigger": {
+            "triggerPx": tp_rounded,
+            "isMarket": True,
+            "tpsl": "tp",
+        }
+    }
+    try:
+        result = exchange.order(coin, is_buy, float(size), tp_rounded, order_type, reduce_only=True)
+        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+        for s in statuses:
+            if "error" in s:
+                return {"success": False, "error": s["error"], "coin": coin, "type": "TP",
+                        "hint": "Check: price on correct side of current? price rounded to tick size?"}
+        return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size}
+    except Exception as e:
+        return {"success": False, "error": str(e), "coin": coin, "type": "TP"}
+
+
+def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
+    """Place a stop-loss order on Hyperliquid. Sells if LONG → triggers below entry,
+    buys if SHORT → triggers above current price."""
+    exchange = get_exchange()
+    is_buy = direction.upper() == "SHORT"
+
+    decimals = _HL_TICK_DECIMALS.get(coin, 6)
+    sl_rounded = _hl_tick_round(sl_price, decimals)
+
+    order_type = {
+        "trigger": {
+            "triggerPx": sl_rounded,
+            "isMarket": True,
+            "tpsl": "sl",
+        }
+    }
+    try:
+        result = exchange.order(coin, is_buy, float(size), sl_rounded, order_type, reduce_only=True)
+        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+        for s in statuses:
+            if "error" in s:
+                return {"success": False, "error": s["error"], "coin": coin, "type": "SL",
+                        "hint": "Check: price on correct side of current? price rounded to tick size?"}
+        return {"success": True, "coin": coin, "type": "SL", "price": sl_rounded, "size": size}
+    except Exception as e:
+        return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
 
 
 # ─── CLI Entry Point ──────────────────────────────────────────────────────────

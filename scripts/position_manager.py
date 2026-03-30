@@ -321,7 +321,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 pnl_pct = %s,
                 pnl_usdt = %s,
                 fees = %s
-            WHERE id = %s AND paper = TRUE
+            WHERE id = %s
         """, (now, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
@@ -631,6 +631,36 @@ def activate_trailing_stop(trade_id: int, trade: Dict) -> None:
 
 def refresh_current_prices(server: str = SERVER_NAME):
     """Fetch live prices from Hyperliquid, update pnl_pct in brain DB for open positions of given server."""
+
+    # ── RECONCILIATION: sync DB ↔ HL ─────────────────────────────────────────
+    # This prevents orphan/ghost positions where DB and HL diverge.
+    # Runs every pipeline cycle so drift is always caught.
+    if HYPE_AVAILABLE and is_live_trading_enabled():
+        try:
+            from hyperliquid_exchange import get_open_hype_positions, close_position as hl_close_position, hype_coin
+            hl_live = get_open_hype_positions()
+            if hl_live:
+                conn_recon = get_db_connection()
+                if conn_recon:
+                    cur_recon = get_cursor(conn_recon)
+                    # Ghosts: open in DB but not in HL → close the HL order (already closed on HL)
+                    cur_recon.execute("SELECT id, token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
+                    for row in cur_recon.fetchall():
+                        tok = row[1]
+                        if tok not in hl_live:
+                            print(f"  [Sync] Ghost: {tok} in DB but not HL — closing via mirror")
+                            try:
+                                hl_close_position(hype_coin(tok))
+                            except Exception:
+                                pass
+                            cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (row[0],))
+                            print(f"  [Sync] Ghost closed: {tok} (id={row[0]})")
+                    conn_recon.commit()
+                    cur_recon.close()
+                    conn_recon.close()
+        except Exception as e:
+            print(f"  [Sync] Reconciliation error: {e}")
+
     positions = get_open_positions(server)
     if not positions:
         return []

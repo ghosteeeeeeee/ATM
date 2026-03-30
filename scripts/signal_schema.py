@@ -337,16 +337,16 @@ def get_approved_signals(hours=24):
     return results
 
 def mark_signal_processed(token, decision):
-    """Mark signals as processed. Only sets executed=1 for non-APPROVED decisions.
-    APPROVED signals keep executed=0 so decider-run can pick them up."""
+    """Mark signals as processed. APPROVED signals always reset executed=0 so decider-run can pick them up."""
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
-        # Only mark executed=1 for SKIPPED/WAIT/FAILED, NOT for APPROVED
         if decision == 'APPROVED':
+            # APPROVED must always reset executed=0 — a re-processed signal that was
+            # previously SKIPPED/FALLED (executed=1) needs to be re-queued.
             c.execute('''
                 UPDATE signals
-                SET decision=?, updated_at=CURRENT_TIMESTAMP
+                SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
                 WHERE token=? AND executed IN (0, 1)
             ''', (decision, token.upper()))
         else:
@@ -358,24 +358,11 @@ def mark_signal_processed(token, decision):
         conn.commit()
         return c.rowcount
     except Exception as e:
-        conn.close()
+        conn.rollback()
         return 0
+    finally:
+        conn.close()
 
-def mark_signal_approved(token, decision):
-    """Approve a signal WITHOUT marking it executed. decider-run handles execution."""
-    conn = _get_conn(_runtime())
-    c = conn.cursor()
-    try:
-        c.execute('''
-            UPDATE signals
-            SET decision=?, updated_at=CURRENT_TIMESTAMP
-            WHERE token=? AND decision='PENDING'
-        ''', (decision, token.upper()))
-        conn.commit()
-        return c.rowcount
-    except Exception as e:
-        conn.close()
-        return 0
 
 # ── Price History & Indicators (static DB) ────────────────────────────────────
 def get_price_history(token, lookback_minutes=60*24):

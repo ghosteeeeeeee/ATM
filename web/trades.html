@@ -129,12 +129,26 @@
         async function load() {
             try {
                 const res = await fetch('/trades_data.json');
-                const data = await res.json();
+                const raw = await res.json();
 
-                const open = data.open || [];
-                const closed = data.closed || [];
-                const openCount = data.open_count || open.length;
-                const closedCount = data.closed_count || closed.length;
+                // Handle both API formats:
+                // 1. New: {trades: [...], generated: "..."} with status field
+                // 2. Original: {open: [...], closed: [...], open_count: N, closed_count: N}
+                let open, closed, openCount, closedCount;
+                if (raw.trades) {
+                    // New format — separate by status
+                    const all = raw.trades;
+                    open = all.filter(t => t.status === 'open' || t.status === 'OPEN' || t.status === true);
+                    closed = all.filter(t => t.status !== 'open' && t.status !== 'OPEN' && t.status !== true);
+                    openCount = open.length;
+                    closedCount = closed.length;
+                } else {
+                    // Original format
+                    open = raw.open || [];
+                    closed = raw.closed || [];
+                    openCount = raw.open_count || open.length;
+                    closedCount = raw.closed_count || closed.length;
+                }
 
                 // Stats
                 let totalPnl = 0, wins = 0, losses = 0;
@@ -175,11 +189,14 @@
                                 <span class="trade-token">${t.token || t.symbol || '?'}</span>
                                 <span class="trade-dir ${(t.direction || 'LONG').toLowerCase()}">${t.direction || 'LONG'}</span>
                                 <span class="trade-price">Entry: $${t.entry_price || '?'}</span>
+                                ${t.current_price ? `<span class="trade-price">Now: $${parseFloat(t.current_price).toFixed(parseFloat(t.current_price) > 1 ? 2 : 5)}</span>` : ''}
                             </div>
                             <div class="trade-meta">
                                 ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
                                 ${t.amount_usdt ? `<span class="trade-stat"><div class="trade-stat-label">Size</div><div class="trade-stat-val">$${t.amount_usdt}</div></span>` : ''}
-                                ${t.pnl_pct !== undefined ? `<span class="trade-pnl neutral">${parseFloat(t.pnl_pct) >= 0 ? '+' : ''}${parseFloat(t.pnl_pct).toFixed(2)}%</span>` : ''}
+                                ${t.stop_loss ? `<span class="trade-stat"><div class="trade-stat-label">SL</div><div class="trade-stat-val red">$${parseFloat(t.stop_loss).toFixed(parseFloat(t.stop_loss) > 1 ? 2 : 5)}</div></span>` : ''}
+                                ${t.target ? `<span class="trade-stat"><div class="trade-stat-label">TP</div><div class="trade-stat-val green">$${parseFloat(t.target).toFixed(parseFloat(t.target) > 1 ? 2 : 5)}</div></span>` : ''}
+                                ${t.pnl_pct !== undefined ? `<span class="trade-pnl ${parseFloat(t.pnl_pct) >= 0 ? 'positive' : 'negative'}">${parseFloat(t.pnl_pct) >= 0 ? '+' : ''}${parseFloat(t.pnl_pct).toFixed(2)}%</span>` : ''}
                             </div>
                         </div>
                     `).join('');
@@ -191,6 +208,11 @@
                 } else {
                     document.getElementById('closed-trades').innerHTML = closed.map(t => {
                         const pnl = parseFloat(t.pnl_pct || 0);
+                        const ep = parseFloat(t.entry_price);
+                        const sl = parseFloat(t.stop_loss);
+                        const tp = parseFloat(t.target);
+                        const slDist = ep && sl ? (((ep - sl) / ep) * 100 * (t.direction === 'LONG' ? 1 : -1)).toFixed(2) : null;
+                        const tpDist = ep && tp ? (((tp - ep) / ep) * 100 * (t.direction === 'LONG' ? 1 : -1)).toFixed(2) : null;
                         return `
                         <div class="trade ${pnl >= 0 ? 'long' : 'short'}">
                             <div class="trade-main">
@@ -198,6 +220,8 @@
                                 <span class="trade-dir ${(t.direction || 'LONG').toLowerCase()}">${t.direction || 'LONG'}</span>
                                 <span class="trade-price">Entry: $${t.entry_price || '?'}</span>
                                 ${t.exit_price ? `<span class="trade-price">Exit: $${t.exit_price}</span>` : ''}
+                                ${slDist !== null ? `<span class="trade-stat"><div class="trade-stat-label">SL</div><div class="trade-stat-val red">-$${Math.abs(slDist)}%</div></span>` : ''}
+                                ${tpDist !== null ? `<span class="trade-stat"><div class="trade-stat-label">TP</div><div class="trade-stat-val green">+${tpDist}%</div></span>` : ''}
                             </div>
                             <div class="trade-meta">
                                 ${t.leverage ? `<span class="badge">${t.leverage}x</span>` : ''}
