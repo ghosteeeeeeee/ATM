@@ -640,55 +640,59 @@ def refresh_current_prices(server: str = SERVER_NAME):
             from hyperliquid_exchange import get_open_hype_positions, close_position as hl_close_position, hype_coin
             hl_live = get_open_hype_positions()
             conn_recon = get_db_connection()
-            if conn_recon:
-                cur_recon = get_cursor(conn_recon)
+            if not conn_recon:
+                return []  # fall through to normal path
 
-                # ── Ghosts: DB open, HL closed ────────────────────────
-                cur_recon.execute("SELECT id, token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
-                for row in cur_recon.fetchall():
-                    tok = row[1]
-                    if tok not in hl_live:
-                        print(f"  [Sync] Ghost: {tok} in DB but not HL")
-                        try:
-                            hl_close_position(hype_coin(tok))
-                        except Exception:
-                            pass
-                        cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (row[0],))
-                        print(f"  [Sync] Ghost closed: {tok} (id={row[0]})")
+            cur_recon = get_cursor(conn_recon)
 
-                # ── Orphans: HL open, DB closed/missing ─────────────────
-                cur_recon.execute("SELECT DISTINCT ON (token) id, token, status FROM trades WHERE token IN %s ORDER BY token, id DESC",
-                                  (tuple(hl_live.keys()),) if hl_live else (('',),))
-                db_token_status = {r[1]: r[2] for r in cur_recon.fetchall()}
-                for tok, hdata in hl_live.items():
-                    db_status = db_token_status.get(tok, 'MISSING')
-                    if db_status != 'open':
-                        print(f"  [Sync] Orphan: {tok} on HL but DB={db_status} — closing on HL")
-                        try:
-                            close_res = hl_close_position(hype_coin(tok))
-                            if close_res.get('success'):
-                                print(f"  [Sync] Orphan closed on HL: {tok}")
-                                # Get current price for exit
-                                try:
-                                    mids = hc.get_allMids()
-                                    exit_px = mids.get(tok, hdata['entry_px'])
-                                except Exception:
-                                    exit_px = hdata['entry_px']
-                                unreal = hdata.get('unrealized_pnl', 0)
-                                # Insert closed record
-                                cur_recon.execute("""
-                                    INSERT INTO trades (token, direction, amount_usdt, entry_price, exit_price,
-                                        status, exchange, server, paper, pnl_pct, pnl_usdt, close_time, close_reason, open_time)
-                                    VALUES (%s, %s, %s, %s, %s, 'closed', 'Hyperliquid', %s, FALSE, %s, %s, NOW(), 'orphan_recovery', NOW())
-                                """, (tok, hdata['direction'], 50.0, hdata['entry_px'], exit_px,
-                                      SERVER_NAME, unreal, unreal * 50.0))
-                                print(f"  [Sync] Orphan record inserted: {tok}")
-                        except Exception as e:
-                            print(f"  [Sync] Orphan close error {tok}: {e}")
+            # ── Always reconcile: fetch fresh HL state and compare ─────────────
+            # This runs even when DB has 0 open positions (prevents orphaned HL trades)
 
-                conn_recon.commit()
-                cur_recon.close()
-                conn_recon.close()
+            # ── Ghosts: DB open, HL closed ────────────────────────
+            cur_recon.execute("SELECT id, token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
+            for row in cur_recon.fetchall():
+                tok = row[1]
+                if tok not in hl_live:
+                    print(f"  [Sync] Ghost: {tok} in DB but not HL")
+                    try:
+                        hl_close_position(hype_coin(tok))
+                    except Exception:
+                        pass
+                    cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (row[0],))
+                    print(f"  [Sync] Ghost closed: {tok} (id={row[0]})")
+
+            # ── Orphans: HL open, DB closed/missing ─────────────────
+            cur_recon.execute("SELECT DISTINCT ON (token) id, token, status FROM trades WHERE token IN %s ORDER BY token, id DESC",
+                              (tuple(hl_live.keys()),) if hl_live else (('',),))
+            db_token_status = {r[1]: r[2] for r in cur_recon.fetchall()}
+            for tok, hdata in hl_live.items():
+                db_status = db_token_status.get(tok, 'MISSING')
+                if db_status != 'open':
+                    print(f"  [Sync] Orphan: {tok} on HL but DB={db_status} — closing on HL")
+                    try:
+                        close_res = hl_close_position(hype_coin(tok))
+                        if close_res.get('success'):
+                            print(f"  [Sync] Orphan closed on HL: {tok}")
+                            try:
+                                mids = hc.get_allMids()
+                                exit_px = mids.get(tok, hdata['entry_px'])
+                            except Exception:
+                                exit_px = hdata['entry_px']
+                            unreal = hdata.get('unrealized_pnl', 0)
+                            cur_recon.execute("""
+                                INSERT INTO trades (token, direction, amount_usdt, entry_price, exit_price,
+                                    status, exchange, server, paper, pnl_pct, pnl_usdt, close_time, close_reason, open_time)
+                                VALUES (%s, %s, %s, %s, %s, 'closed', 'Hyperliquid', %s, FALSE, %s, %s, NOW(), 'orphan_recovery', NOW())
+                            """, (tok, hdata['direction'], 50.0, hdata['entry_px'], exit_px,
+                                  SERVER_NAME, unreal, unreal * 50.0))
+                            print(f"  [Sync] Orphan record inserted: {tok}")
+                    except Exception as e:
+                        print(f"  [Sync] Orphan close error {tok}: {e}")
+
+            conn_recon.commit()
+            cur_recon.close()
+            conn_recon.close()
+
         except Exception as e:
             print(f"  [Sync] Reconciliation error: {e}")
 
