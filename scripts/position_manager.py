@@ -879,7 +879,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # price at the START of this pipeline run, giving consistent activation.
         if not trailing_active:
             trailing_start_pct = float(pos.get('trailing_activation') or TRAILING_START_PCT_DEFAULT)
-            if pnl_pct >= trailing_start_pct:
+            # SHORTs in loss have negative pnl_pct — use abs() so 2% adverse move activates TS
+            adverse_pct = abs(pnl_pct) if direction == 'SHORT' else pnl_pct
+            if adverse_pct >= trailing_start_pct:
                 activate_trailing_stop(trade_id, pos)
                 adjusted_count += 1
                 trailing_active = True
