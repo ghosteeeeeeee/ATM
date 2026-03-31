@@ -433,9 +433,12 @@ def check_regime():
         bug("WARNING", "regime", f"regime_4h.json is {regime_age/3600:.1f}h old (expected <4h)")
 
     # Also check regime_log table (if being populated)
-    recent_regime = sqlite(STATIC_DB, """
+    # Check both INTEGER unix timestamp and any ISO timestamp columns
+    import time
+    cutoff = int(time.time()) - 48 * 3600
+    recent_regime = sqlite(STATIC_DB, f"""
         SELECT COUNT(*) as cnt FROM regime_log
-        WHERE timestamp > datetime('now', '-48 hours')
+        WHERE timestamp > {cutoff}
     """)
     if recent_regime and recent_regime[0]["cnt"] == 0:
         bug("INFO", "regime", "regime_log table has no entries (scanner may not be writing to it)")

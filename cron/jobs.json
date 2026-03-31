@@ -17,20 +17,51 @@
       "schedule_display": "* * * * *",
       "repeat": {
         "times": null,
-        "completed": 0
+        "completed": 10
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-03-28T16:07:39.447933+00:00",
-      "next_run_at": "2026-03-28T16:08:00+00:00",
-      "last_run_at": null,
-      "last_status": null,
+      "next_run_at": "2026-03-29T08:45:00+00:00",
+      "last_run_at": "2026-03-29T08:44:06.870246+00:00",
+      "last_status": "ok",
       "last_error": null,
       "deliver": "local",
       "origin": null
+    },
+    {
+      "id": "bab3fb3750c4",
+      "name": "hype-paper-sync",
+      "prompt": "Run hype-paper-sync.py in apply mode to keep HL in sync with paper trades.\n\nSteps:\n1. cd /root/.hermes/scripts\n2. python3 hype-paper-sync.py --apply\n\nThis checks paper trades.json against live HL positions and closes any HL positions that are closed in paper DB but still open on HL. It uses the updated get_open_hype_positions_curl which now correctly uses MAIN_ACCOUNT_ADDRESS (0x324a9...) and SDK user_state.\n\nReport summary: how many positions confirmed in sync, how many orphaned closed.",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "schedule": {
+        "kind": "interval",
+        "minutes": 10,
+        "display": "every 10m"
+      },
+      "schedule_display": "every 10m",
+      "repeat": {
+        "times": null,
+        "completed": 0
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-03-29T17:45:33.149788+00:00",
+      "next_run_at": "2026-03-29T17:55:33.149822+00:00",
+      "last_run_at": null,
+      "last_status": null,
+      "last_error": null,
+      "deliver": "origin",
+      "origin": null
     }
   ],
-  "updated_at": "2026-03-28T16:07:39.449570+00:00"
+  "updated_at": "2026-03-29T17:45:33.150422+00:00"
 }

@@ -607,6 +607,118 @@ def _get_trade_size_usdt() -> float:
         withdrawable = float(state.get("account_value", 0) or 0)
     return max(withdrawable * MARGIN_USAGE_PCT, MIN_TRADE_USDT)
 
+# ─── Trade History (for HL ground-truth sync) ─────────────────────────────────
+
+def get_trade_history(start_time_ms: int, end_time_ms: int = None) -> list:
+    """
+    Fetch user's fill history from Hyperliquid /info endpoint.
+    Used to sync brain.py trades with actual HL realized PnL.
+
+    Args:
+        start_time_ms: Unix timestamp in milliseconds (e.g. 1709308800000)
+        end_time_ms:   Unix timestamp in ms (default: now)
+
+    Returns list of fill dicts, newest first:
+        {
+            "coin": str,
+            "side": str,          # "A" = Open fill, "B" = Close fill (with realized PnL)
+            "dir": str,           # "L" (Long) or "S" (Short)
+            "px": float,          # fill price
+            "sz": float,          # fill size
+            "closed_pnl": float,  # realized PnL (only on close fills)
+            "hash": str,
+            "oid": int,
+            "time_ms": int,
+        }
+    """
+    # Retry with exponential backoff for CloudFront / HL rate limits
+    for attempt in range(4):
+        _info_rate_limit()
+        info = get_exchange().info
+        if end_time_ms is None:
+            end_time_ms = int(time.time() * 1000)
+        try:
+            raw = info.user_fills_by_time(MAIN_ACCOUNT_ADDRESS, start_time_ms, end_time_ms)
+            fills = []
+            for f in raw:
+                fills.append({
+                    "coin":       f["coin"],
+                    "side":       f.get("side", ""),
+                    "dir":        f.get("dir", ""),
+                    "px":         float(f["px"]),
+                    "sz":         float(f["sz"]),
+                    "closed_pnl": float(f["closedPnl"]) if f.get("closedPnl") else 0.0,
+                    "hash":       f.get("hash", ""),
+                    "oid":        f.get("oid", 0),
+                    "time_ms":    f.get("time", 0),
+                })
+            fills.sort(key=lambda x: x["time_ms"], reverse=True)
+            return fills
+        except Exception as e:
+            err_str = str(e)
+            if "429" in err_str:
+                wait = 2 ** attempt + 1
+                print(f"[HL get_trade_history] 429 on attempt {attempt+1}, retrying in {wait}s...")
+                time.sleep(wait)
+                continue
+            print(f"[HL get_trade_history] error: {e}")
+            return []
+    return []
+
+
+def get_realized_pnl(token: str, start_time_ms: int, end_time_ms: int = None) -> dict:
+    """
+    Get realized PnL for a specific token within a time window.
+    Returns weighted-avg entry/exit prices and total realized PnL from HL fills.
+    """
+    fills = get_trade_history(start_time_ms, end_time_ms)
+    token_fills = [f for f in fills if f["coin"].upper() == token.upper()]
+    if not token_fills:
+        return {"realized_pnl": 0.0, "entry_price": 0.0, "exit_price": 0.0,
+                "total_size": 0.0, "fills": 0}
+
+    # HL uses: side="A" = open fill, side="B" = close fill (has realized PnL)
+    open_fills  = [f for f in token_fills if f["side"] == "A"]
+    close_fills = [f for f in token_fills if f["side"] == "B"]
+
+    def wavg_price(fills_list):
+        if not fills_list:
+            return 0.0
+        total = sum(f["sz"] for f in fills_list)
+        return sum(f["px"] * f["sz"] for f in fills_list) / total if total else 0.0
+
+    return {
+        "realized_pnl": sum(f["closed_pnl"] for f in close_fills),
+        "entry_price":  wavg_price(open_fills),
+        "exit_price":   wavg_price(close_fills),
+        "total_size":   sum(f["sz"] for f in token_fills),
+        "fills":        len(token_fills),
+    }
+
+
+def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000) -> dict:
+    """
+    Get actual exit fill for a recently-closed position.
+    Looks up fills within window_ms after start_time_ms (default: 5 min).
+
+    Returns {"success": True, "exit_price": float, "realized_pnl": float}
+            or {"success": False} if no exit fill found.
+    """
+    end_ms = start_time_ms + window_ms
+    fills = get_trade_history(start_time_ms, end_ms)
+    close_fills = [f for f in fills
+                   if f["coin"].upper() == token.upper() and f["side"] == "B"]
+    if not close_fills:
+        return {"success": False}
+    total_sz = sum(f["sz"] for f in close_fills)
+    return {
+        "success":      True,
+        "exit_price":   sum(f["px"] * f["sz"] for f in close_fills) / total_sz,
+        "realized_pnl": sum(f["closed_pnl"] for f in close_fills),
+        "time_ms":      close_fills[0]["time_ms"],
+    }
+
+
 
 # ─── Mirror Functions ─────────────────────────────────────────────────────────
 # These are the ones called by brain.py and position_manager.py.
@@ -691,10 +803,23 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     try:
         result = _exchange_retry(_do)
         if result.get("success"):
-            print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${live_price:.4f} (${size_usdt:.2f})")
+            # Calculate actual HL fill price (Plan A: ground truth entry)
+            # market_open uses 0.5% slippage: LONG pays +0.5%, SHORT receives -0.5%
+            slippage = 0.005
+            fill_price = mid_price * (1 + slippage) if is_buy else mid_price * (1 - slippage)
+            decimals = _sz_decimals(token)
+            fill_price = round(fill_price, decimals)
+
+            print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${live_price:.4f} (${size_usdt:.2f}) "
+                  f"HL_fill=${fill_price:.4f}")
             return {"success": True, "message": f"Opened {direction} {sz} {token}",
-                    "size": sz, "entry_price": live_price,
-                    "side": "BUY" if is_buy else "SELL", "usdt": size_usdt}
+                    "size": sz,
+                    "entry_price": live_price,
+                    "hl_entry_price": fill_price,   # actual HL fill — use this for PnL calc
+                    "mid_price": mid_price,
+                    "slippage_pct": slippage,
+                    "side": "BUY" if is_buy else "SELL",
+                    "usdt": size_usdt}
         else:
             print(f"[HYPE Mirror] FAILED open {direction} {token}: {result.get('error')}")
             return {"success": False, "message": result.get("error", "Unknown error")}
@@ -715,8 +840,13 @@ def mirror_close(token: str, direction: str, exit_price: float = None) -> dict:
     result = close_position(token)
 
     if result.get("success"):
-        print(f"[HYPE Mirror] CLOSED {direction} {token}")
-        return {"success": True, "message": f"Closed {direction} {token}"}
+        # Get actual exit fill from HL (Plan B: ground truth exit)
+        exit_info = mirror_get_exit_fill(token, int(time.time() * 1000) - 300000)
+        print(f"[HYPE Mirror] CLOSED {direction} {token} "
+              f"(HL exit ${exit_info.get('exit_price', 0):.6f} pnl={exit_info.get('realized_pnl', 0):+.4f})")
+        return {"success": True, "message": f"Closed {direction} {token}",
+                "hl_exit_price": exit_info.get("exit_price"),
+                "hl_realized_pnl": exit_info.get("realized_pnl")}
     else:
         err = result.get("error", "Unknown error")
         raise RuntimeError(f"mirror_close({token}): HL API failed — {err}")

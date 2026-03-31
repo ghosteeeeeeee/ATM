@@ -7,11 +7,13 @@ Adds regime bias to signal weight calculation
 import requests
 import json
 import sys
+import time
 import psycopg2
 from datetime import datetime
 
 INFO_URL = "https://api.hyperliquid.xyz/info"
 OUTPUT_FILE = "/var/www/html/regime_4h.json"
+STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
 LOG_FILE = "/root/.openclaw/workspace/logs/4h_regime.log"
 
 def log(msg):
@@ -258,6 +260,27 @@ def main():
     # Save to file
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
+    
+    # Also write aggregate regime to static DB (wasp.py checks this table)
+    try:
+        import sqlite3
+        n = len(results) or 1
+        broad_z = (short_count - long_count) / n  # -1 to +1
+        if aggregate['overall'] == 'LONG_BIAS':
+            long_mult, short_mult = 1.2, 0.8
+        elif aggregate['overall'] == 'SHORT_BIAS':
+            long_mult, short_mult = 0.8, 1.2
+        else:
+            long_mult, short_mult = 1.0, 1.0
+        sc = sqlite3.connect(STATIC_DB)
+        sc.execute("""
+            INSERT INTO regime_log (regime, broad_z, long_mult, short_mult, timestamp)
+            VALUES (?, ?, ?, ?, ?)
+        """, (aggregate['overall'], round(broad_z, 3), long_mult, short_mult, int(time.time())))
+        sc.commit()
+        sc.close()
+    except Exception as e:
+        log(f"DB write error: {e}")
     
     log(f"Overall market bias: {aggregate['overall']} ({long_count}L/{short_count}S/{neutral_count}N)")
     print(json.dumps(output, indent=2))

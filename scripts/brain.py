@@ -338,7 +338,19 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             hype_token = hype_coin(token)
             result = mirror_open(hype_token, direction, float(entry_price), leverage=lev)
             if result.get("success"):
-                print(f"[brain.py] HYPE ✅ mirror_open SUCCESS: {direction} {result.get('size')} {hype_token} @ ${result.get('entry_price')} leverage={lev}x (trade #{trade_id})")
+                # Plan A: record actual HL fill price as ground truth entry
+                hl_entry = result.get("hl_entry_price") or result.get("entry_price")
+                print(f"[brain.py] HYPE ✅ mirror_open SUCCESS: {direction} {result.get('size')} {hype_token} @ ${result.get('entry_price')} "
+                      f"(HL_fill=${hl_entry:.6f}) leverage={lev}x (trade #{trade_id})")
+                # Update trade with ground-truth HL entry price
+                conn3 = get_db_connection()
+                cur3 = conn3.cursor()
+                cur3.execute("""
+                    UPDATE trades SET entry_price = %s, token = %s
+                    WHERE id = %s
+                """, (hl_entry, hype_token, trade_id))
+                conn3.commit()
+                cur3.close(); conn3.close()
             else:
                 print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
         else:
@@ -349,37 +361,91 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     return trade_id
 
 def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None, notes: str = None):
-    """Close an existing trade"""
+    """Close an existing trade. Uses Hyperliquid as ground truth for PnL (Plan B).
+
+    After closing, queries HL /my_trades for realized PnL and updates:
+        hype_pnl_usdt, hype_pnl_pct, exit_price (HL ground truth)
+    Falls back to signal-based PnL calculation if HL query fails.
+    """
     conn = get_db_connection()
     cur = conn.cursor()
-    
-    amount_usdt = None
-    
-    # Get entry price to calculate pnl if not provided
-    if pnl_usdt is None:
-        cur.execute("SELECT entry_price, amount_usdt, direction, leverage FROM trades WHERE id = %s", (trade_id,))
-        row = cur.fetchone()
-        if row:
-            entry_price, amount_usdt, direction, stored_lev = row
-            lev = float(stored_lev or 1)
-            if direction and direction.upper() == 'LONG':
-                pnl_usdt = (float(exit_price) - float(entry_price)) * (float(amount_usdt or 0) * lev / float(entry_price or 1))
+
+    # Get trade metadata
+    cur.execute("""SELECT entry_price, amount_usdt, direction, leverage,
+                          token, open_time FROM trades WHERE id = %s""", (trade_id,))
+    row = cur.fetchone()
+    if not row:
+        cur.close(); conn.close()
+        return False
+
+    entry_price, amount_usdt, direction, stored_lev, token, open_time = row
+    lev = float(stored_lev or 1)
+    amount_usdt = float(amount_usdt or 50)
+
+    # ── Plan B: Get HL realized PnL (ground truth) ─────────────────────────────
+    hype_pnl_usdt = None
+    hype_pnl_pct  = None
+    hl_exit_price = None
+
+    try:
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from hyperliquid_exchange import get_realized_pnl, mirror_close
+        from datetime import datetime
+
+        # Convert open_time to ms timestamp
+        if open_time:
+            if isinstance(open_time, str):
+                dt = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
             else:
-                pnl_usdt = (float(entry_price) - float(exit_price)) * (float(amount_usdt or 0) * lev / float(entry_price or 1))
-    
-    pnl_pct = (pnl_usdt / float(amount_usdt or 1) * 100) if amount_usdt else 0
-    
+                dt = open_time
+            start_ms = int(dt.timestamp() * 1000)
+        else:
+            # Fallback: last 24 hours
+            start_ms = int((datetime.now().timestamp() - 86400) * 1000)
+
+        # Query HL for realized PnL for this token
+        hl_data = get_realized_pnl(token.upper(), start_ms)
+
+        if hl_data and hl_data.get("realized_pnl") != 0.0:
+            hype_pnl_usdt = hl_data["realized_pnl"]
+            hype_pnl_pct  = (hype_pnl_usdt / amount_usdt * 100) if amount_usdt else 0
+            hl_exit_price = hl_data.get("exit_price") or exit_price
+            print(f"[close_trade] HL ground truth — {token} pnl={hype_pnl_usdt:+.4f} ({hype_pnl_pct:+.2f}%) "
+                  f"exit={hl_exit_price:.6f}")
+        else:
+            print(f"[close_trade] HL no fill data for {token}, using signal calc")
+
+    except Exception as e:
+        print(f"[close_trade] HL sync failed (non-fatal): {e}")
+
+    # ── Fallback: signal-based PnL ─────────────────────────────────────────────
+    if hype_pnl_usdt is None:
+        if direction and direction.upper() == 'LONG':
+            hype_pnl_usdt = ((float(exit_price) - float(entry_price or 1))
+                             * amount_usdt * lev / float(entry_price or 1))
+        else:
+            hype_pnl_usdt = ((float(entry_price or 1) - float(exit_price))
+                             * amount_usdt * lev / float(entry_price or 1))
+        hype_pnl_pct = (hype_pnl_usdt / amount_usdt * 100) if amount_usdt else 0
+
+    # Use HL exit price if available, else signal exit price
+    final_exit = hl_exit_price or exit_price
+
+    # ── Write to DB ────────────────────────────────────────────────────────────
     cur.execute("""
-        UPDATE trades SET 
-            exit_price = %s, 
-            pnl_usdt = %s, 
-            pnl_pct = %s,
-            status = 'closed',
-            close_time = NOW(),
-            notes = COALESCE(notes, '')
+        UPDATE trades SET
+            exit_price    = %s,
+            pnl_usdt      = %s,
+            pnl_pct       = %s,
+            hype_pnl_usdt = %s,
+            hype_pnl_pct  = %s,
+            status        = 'closed',
+            close_time    = NOW(),
+            notes         = COALESCE(notes, '')
         WHERE id = %s
-    """, (exit_price, pnl_usdt, pnl_pct, trade_id))
-    
+    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, trade_id))
+
     conn.commit()
     cur.close()
     conn.close()

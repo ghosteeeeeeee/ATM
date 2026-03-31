@@ -14,3 +14,29 @@
 05:41:47 interrupt fired: msg='Remove TESTMIRROR from trades', children=0, parent._interrupt=True
 06:42:50 ENTER: queued interrupt msg="I actually don't see ILV, REQ,NTRN, CATI on Hyperliquid, whe", agent_running=True
 06:42:50 interrupt fired: msg="I actually don't see ILV, REQ,NTRN, CATI on Hyperliquid, whe", children=0, parent._interrupt=True
+08:46:35 ENTER: queued interrupt msg='Dallas??? Ollama is running locally here 11434!', agent_running=True
+08:46:35 interrupt fired: msg='Dallas??? Ollama is running locally here 11434!', children=0, parent._interrupt=True
+08:47:25 ENTER: queued interrupt msg='Why? -> `ai-decider.py` has a remote SSH call to Dallas', agent_running=True
+08:47:25 interrupt fired: msg='Why? -> `ai-decider.py` has a remote SSH call to Dallas', children=0, parent._interrupt=True
+09:03:33 ENTER: queued interrupt msg='Same issue with FOO', agent_running=True
+09:03:33 interrupt fired: msg='Same issue with FOO', children=0, parent._interrupt=True
+09:41:51 ENTER: queued interrupt msg='Ideally all your trades are "Hermes" not Tokyo', agent_running=True
+09:41:51 interrupt fired: msg='Ideally all your trades are "Hermes" not Tokyo', children=0, parent._interrupt=True
+09:49:11 interrupt fired: msg='SKR and TRX were closed again on HL', children=0, parent._interrupt=True
+09:49:11 ENTER: queued interrupt msg='SKR and TRX were closed again on HL', agent_running=True
+09:56:53 ENTER: queued interrupt msg='SKR and TRX were closed again on HL, there is a stray cron s', agent_running=True
+09:56:53 interrupt fired: msg='SKR and TRX were closed again on HL, there is a stray cron s', children=0, parent._interrupt=True
+10:00:00 interrupt fired: msg='Definitely do this -> **Disable `combined-trading.py', children=0, parent._interrupt=True
+10:00:00 ENTER: queued interrupt msg='Definitely do this -> **Disable `combined-trading.py', agent_running=True
+17:07:44 ENTER: queued interrupt msg='Those were probably trailing SL if they were over the price ', agent_running=True
+17:07:45 interrupt fired: msg='Those were probably trailing SL if they were over the price ', children=0, parent._interrupt=True
+17:08:44 ENTER: queued interrupt msg='Can you add the TP/SL into the trade?', agent_running=True
+17:08:44 interrupt fired: msg='Can you add the TP/SL into the trade?', children=0, parent._interrupt=True
+17:14:44 ENTER: queued interrupt msg='MEGA is already closed', agent_running=True
+17:14:44 interrupt fired: msg='MEGA is already closed', children=0, parent._interrupt=True
+17:19:24 ENTER: queued interrupt msg='Looks like multiple oreders for each trade: Reduce Only\rTrig', agent_running=True
+17:19:24 interrupt fired: msg='Looks like multiple oreders for each trade: Reduce Only\rTrig', children=0, parent._interrupt=True
+12:45:01 ENTER: queued interrupt msg='Signal pipiline looks blocked as well', agent_running=True
+12:45:01 interrupt fired: msg='Signal pipiline looks blocked as well', children=0, parent._interrupt=True
+01:20:32 ENTER: queued interrupt msg='SKR is a new trade', agent_running=True
+01:20:32 interrupt fired: msg='SKR is a new trade', children=0, parent._interrupt=True
