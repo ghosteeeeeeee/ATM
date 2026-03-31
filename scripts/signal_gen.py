@@ -27,6 +27,36 @@ from typing import Tuple, List, Optional
 import sys, sqlite3, time, os, json, statistics, math
 from functools import lru_cache
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           os.pardir, 'data', 'signals_hermes_runtime.db')
+
+def _persist_momentum_state(token, momentum_state, state_confidence,
+                             pct_long, pct_short, avg_z, phase, z_direction):
+    """Save momentum state to DB for tracking state transitions over time."""
+    try:
+        conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO momentum_cache
+              (token, phase, percentile_long, percentile_short, velocity, avg_z,
+               z_direction, momentum_state, state_confidence, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(token) DO UPDATE SET
+              momentum_state    = excluded.momentum_state,
+              state_confidence  = excluded.state_confidence,
+              percentile_long   = excluded.percentile_long,
+              percentile_short  = excluded.percentile_short,
+              avg_z            = excluded.avg_z,
+              phase            = excluded.phase,
+              z_direction      = excluded.z_direction,
+              updated_at       = excluded.updated_at
+        """, (token, phase, pct_long, pct_short, 0.0, avg_z,
+              z_direction, momentum_state, state_confidence, int(time.time())))
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass   # Never block on DB errors
+
 from signal_schema import (
     init_db, DB_PATH, get_all_latest_prices, get_price_history,
     get_latest_price, add_signal, set_cooldown, get_cooldown,
