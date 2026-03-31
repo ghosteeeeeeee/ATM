@@ -40,3 +40,5 @@
 12:45:01 interrupt fired: msg='Signal pipiline looks blocked as well', children=0, parent._interrupt=True
 01:20:32 ENTER: queued interrupt msg='SKR is a new trade', agent_running=True
 01:20:32 interrupt fired: msg='SKR is a new trade', children=0, parent._interrupt=True
+02:56:49 ENTER: queued interrupt msg='Sometimes when RSI is greater than 80 it does not cooldwon f', agent_running=True
+02:56:49 interrupt fired: msg='Sometimes when RSI is greater than 80 it does not cooldwon f', children=0, parent._interrupt=True

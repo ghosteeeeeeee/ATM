@@ -57,7 +57,7 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 # Entry score thresholds
 ENTRY_THRESHOLD      = 70    # min score to add signal
 AI_DECIDER_THRESHOLD  = 70    # ≥ this + < AUTO_APPROVE → pending → AI decider
-AUTO_APPROVE          = 85    # ≥ this → auto-approve (no AI needed)
+AUTO_APPROVE          = 90    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
@@ -763,25 +763,48 @@ def compute_score(token, direction, long_mult, short_mult):
         # Positive velocity = z rising = price reverting up = good SHORT entry
         vel_score = min(10.0, max(0.0, velocity * VEL_SCALE))
 
-    # ── RSI mandatory gate (0-3 pts) ─────────────────────────────
-    # LONG: RSI must be < 60 (not overbought) → returns None if RSI ≥ 60
-    # SHORT: RSI must be > 40 (not oversold) → returns None if RSI ≤ 40
+    # ── RSI advisory (tiered penalty, not hard block) ─────────────
+    # RSI informs confidence but doesn't hard-block. Extreme RSI penalizes heavily.
+    # SHORT: RSI > 60 (overbought) = confirmed short, positive score
+    # SHORT: RSI < 40 (oversold) = squeeze risk, heavy negative penalty
+    # LONG:  RSI < 40 (oversold) = confirmed long, positive score
+    # LONG:  RSI > 60 (overbought) = squeeze risk, heavy negative penalty
     rsi_val = rsi(prices) if len(prices) >= 30 else None
     rsi_score = 0.0
     rsi_reason = ''
     if rsi_val is not None:
-        if direction == 'LONG':
-            if rsi_val >= 60:
-                return None, None   # BLOCK LONG — overbought
-            if rsi_val < 50:
-                rsi_score = W_RSI * (50 - rsi_val) / 30
-                rsi_reason = f'RSI={rsi_val:.0f}(oversold)' if rsi_val < 40 else f'RSI={rsi_val:.0f}(ok)'
-        elif direction == 'SHORT':
-            if rsi_val <= 40:
-                return None, None   # BLOCK SHORT — oversold
-            if rsi_val > 50:
-                rsi_score = W_RSI * (rsi_val - 50) / 30
-                rsi_reason = f'RSI={rsi_val:.0f}(overbought)' if rsi_val > 60 else f'RSI={rsi_val:.0f}(ok)'
+        if direction == 'SHORT':
+            if rsi_val >= 70:   # overbought — confirmed SHORT
+                rsi_score = +3.0
+                rsi_reason = f'RSI={rsi_val:.0f}(overbought-confirm)'
+            elif rsi_val >= 60:  # mildly overbought
+                rsi_score = +1.0
+                rsi_reason = f'RSI={rsi_val:.0f}(overbought)'
+            elif rsi_val >= 40:  # neutral zone
+                rsi_score = 0.0
+                rsi_reason = f'RSI={rsi_val:.0f}(neutral)'
+            elif rsi_val >= 30:  # oversold — squeeze risk for SHORT
+                rsi_score = -5.0
+                rsi_reason = f'RSI={rsi_val:.0f}(oversold-caution)'
+            else:                # severely oversold — squeeze risk
+                rsi_score = -20.0
+                rsi_reason = f'RSI={rsi_val:.0f}(oversold-squeeze-risk)'
+        elif direction == 'LONG':
+            if rsi_val <= 30:    # oversold — confirmed LONG
+                rsi_score = +3.0
+                rsi_reason = f'RSI={rsi_val:.0f}(oversold-confirm)'
+            elif rsi_val <= 40:  # mildly oversold
+                rsi_score = +1.0
+                rsi_reason = f'RSI={rsi_val:.0f}(oversold)'
+            elif rsi_val <= 60:  # neutral zone
+                rsi_score = 0.0
+                rsi_reason = f'RSI={rsi_val:.0f}(neutral)'
+            elif rsi_val <= 70:  # overbought — squeeze risk for LONG
+                rsi_score = -5.0
+                rsi_reason = f'RSI={rsi_val:.0f}(overbought-caution)'
+            else:                 # severely overbought — squeeze risk
+                rsi_score = -20.0
+                rsi_reason = f'RSI={rsi_val:.0f}(overbought-squeeze-risk)'
 
     # ── MACD confirmation (0-1 pts) ───────────────────────────
     _, hist = macd(prices) if len(prices) >= 40 else (None, None)
