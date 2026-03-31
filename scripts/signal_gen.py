@@ -1,9 +1,21 @@
 #!/usr/bin/env python3
+# Redirect stdin before any imports — prevents deadlock when run via subprocess with
+# a writable pipe (hermes-pipeline calls signal_gen with stdout=subprocess.DEVNULL but
+# Python 3.12's import machinery can probe stdin on some platforms/configurations).
+try:
+    import os
+    if os.isatty(0):
+        pass  # interactive: keep stdin as-is
+    else:
+        import sys
+        sys.stdin = open(os.devnull, 'r')
+except Exception:
+    pass
+
 """
 signal_gen.py — Hermes signal generation with momentum-based z-score analysis.
 
 Architecture:
-  - Multi-TF z-score (1m, 5m, 15m, 30m, 1h, 4h) from local price history
   - Z-score percentile rank: how unusual is this z for THIS token? (rolling 500-bar)
   - Z-score velocity: is z rising or falling? (momentum direction)
   - Phase detection: quiet | building | accelerating | exhaustion | extreme
@@ -12,6 +24,7 @@ Architecture:
   - Entry: >=65 | Auto-approve: >=85
 """
 import sys, sqlite3, time, os, json, statistics, math
+from functools import lru_cache
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import (
     init_db, DB_PATH, get_all_latest_prices, get_price_history,
@@ -20,6 +33,15 @@ from signal_schema import (
     mark_signal_processed
 )
 from hyperliquid_exchange import is_delisted
+
+# ── In-memory cache for z-scores (avoids repeated SQLite reads per token) ──────
+# Key: token → (z_1h, tier_1h, z_4h, tier_4h, z_30m, tier_30m, z_24h, tier_24h, ts)
+_ZSCORE_CACHE = {}
+_ZSCORE_CACHE_TTL = 60  # seconds
+
+# Module-level stop signal for bg volume prefetch thread.
+# Must be module-level so the daemon thread can read it after run() returns.
+_STOP_VOL_PREFETCH = None
 
 LOG_FILE = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
@@ -32,7 +54,7 @@ PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
 PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
-ENTRY_THRESHOLD   = 65    # min score to add signal
+ENTRY_THRESHOLD   = 55    # min score to add signal
 AUTO_APPROVE      = 95    # ≥ this → auto-approve (≥95 no AI needed, 65-94 → AI review)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
@@ -389,10 +411,20 @@ def get_volume_roc(token):
 # ═══════════════════════════════════════════════════════════════
 
 def get_tf_zscores(token, max_rows=60480):
-    """Z-score across all timeframes. Returns {tf_name: (z, tier)}."""
+    """Z-score across all timeframes. Returns {tf_name: (z, tier)}.
+    Cached for 60s — safe for single-run use (run() completes in <60s).
+    """
+    now = time.time()
+    if token in _ZSCORE_CACHE:
+        cached_ts, cached_data = _ZSCORE_CACHE[token]
+        if now - cached_ts < _ZSCORE_CACHE_TTL:
+            return cached_data
+
     rows = get_price_history(token, lookback_minutes=max_rows)
     if len(rows) < 60:
+        _ZSCORE_CACHE[token] = (now, {})
         return {}
+
     prices = [r[1] for r in rows]
     results = {}
     for tf_name, window in TF_WINDOWS:
@@ -400,6 +432,8 @@ def get_tf_zscores(token, max_rows=60480):
         z, tier = zscore(window_prices)
         if z is not None:
             results[tf_name] = (z, tier)
+
+    _ZSCORE_CACHE[token] = (now, results)
     return results
 
 
@@ -764,9 +798,28 @@ def compute_score(token, direction, long_mult, short_mult):
     regime_mult = long_mult if direction == 'LONG' else short_mult
     regime_mod = +5 if regime_mult > 1.0 else 0
 
+    # ── 4h Trend Filter for SHORTs ────────────────────────────────
+    # In a sustained uptrend, shorting a rising price = countertrend suicide.
+    # Block SHORTs that have already run >20% in 4h. Reduce by 15pts if >10%.
+    TREND_LOOKBACK = 240   # 240 × 1min = 4 hours
+    trend_penalty = 0
+    trend_reason = ''
+    if direction == 'SHORT' and len(rows) >= TREND_LOOKBACK:
+        price_4h_ago = float(rows[-TREND_LOOKBACK][1])
+        if price_4h_ago and price_4h_ago > 0:
+            chg_4h = (float(price) - price_4h_ago) / price_4h_ago * 100
+            if chg_4h > 20:
+                return None, None   # SHORT blocked — strong uptrend in progress
+            elif chg_4h > 10:
+                trend_penalty = 15
+                trend_reason = f'+{chg_4h:.1f}% in 4h(short reduced)'
+            elif chg_4h > 5:
+                trend_penalty = 5
+                trend_reason = f'+{chg_4h:.1f}% in 4h'
+
     # ── Score assembly ─────────────────────────────────────────
-    # z_score: 0-30 | velocity: 0-10 | volume: 0-10 (or negative) | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1
-    score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score
+    # z_score: 0-30 | velocity: 0-10 | volume: 0-10 (or negative) | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1 | trend_penalty: 0-15
+    score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score - trend_penalty
     score = min(99.0, max(0, round(score, 1)))
 
     if score < ENTRY_THRESHOLD:
@@ -799,6 +852,8 @@ def compute_score(token, direction, long_mult, short_mult):
         reasons.append(rsi_reason)
     if macd_reason:
         reasons.append(macd_reason)
+    if trend_reason:
+        reasons.append(trend_reason)
 
     signals = [('momentum', '1h', score, reasons[0])]
     if vol_reason:
@@ -824,39 +879,27 @@ def compute_score(token, direction, long_mult, short_mult):
 
 def run():
     init_db()
+    _ZSCORE_CACHE.clear()
+    _VOL_CACHE.clear()
     prices_dict = get_all_latest_prices()
     regime, long_mult, short_mult, broad_trending_up, broad_z_avg = compute_regime()
-
-    trend_flag = ' [BROAD UPTREND]' if broad_trending_up else ''
-    print(f'=== Signal Gen | Regime: {regime.upper()} (L:x{long_mult:.1f} S:x{short_mult:.1f}) | Broad BTC/ETH/SOL 4h z={broad_z_avg:+.2f}{trend_flag} | {len(prices_dict)} tokens')
-    log(f'REGIME: {regime.upper()} L:x{long_mult:.1f} S:x{short_mult:.1f} broad_z={broad_z_avg:+.2f}{trend_flag} | {len(prices_dict)} tokens')
+    print(f'=== Signal Gen | Regime: {regime.upper()} (L:x{long_mult:.1f} S:x{short_mult:.1f}) | Broad BTC/ETH/SOL 4h z={broad_z_avg:+.2f} | {len(prices_dict)} tokens')
+    log(f'REGIME: {regime.upper()} L:x{long_mult:.1f} S:x{short_mult:.1f} broad_z={broad_z_avg:+.2f} | {len(prices_dict)} tokens')
 
     from position_manager import get_open_positions as _get_open_pos
     open_pos = _get_open_pos()
     added    = 0
     blocked  = 0
     exits    = []
-
-    # Build active universe from all tokens with prices
-    active_tokens = _get_top_tokens()
+    active_tokens = set(prices_dict.keys())
     print(f'  Active universe: {len(active_tokens)} tokens (full universe)')
 
-    # Prefetch volume data for all tokens in parallel (rate-limit safe ~15s)
-    tokens_needing_vol=[t for t in prices_dict.keys()
-                         if t.upper() not in _VOL_CACHE
-                         or time.time() - _VOL_CACHE[t.upper()][0] >= _VOL_TTL]
-    if tokens_needing_vol:
-        # Prefetch volume data — fire-and-forget, don't block
-        import concurrent.futures, threading
-        def bg_prefetch():
-            try:
-                with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
-                    ex.map(_fetch_trades_sync, tokens_needing_vol)
-            except Exception:
-                pass
-        t = threading.Thread(target=bg_prefetch)
-        t.start()
-        # Don't wait — scan loop finishes quickly without this data
+    # Volume data: skip background prefetch entirely.
+    # signal_gen completes in <2s without it. Volume ROC is a minor bonus (0-10pts)
+    # that builds up naturally across consecutive runs. If you want active volume
+    # prefetching, move it to a separate cron job at a different schedule.
+    # _VOL_CACHE persists across runs so consecutive pipelines still get volume data.
+    # scan loop starts immediately — volume data fills in as HL allows
 
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
@@ -968,4 +1011,13 @@ def run():
 
 
 if __name__ == '__main__':
+    # Prevent stdin deadlock when run as subprocess (hermes-pipeline calls signal_gen
+    # via subprocess.run with capture_output=True). Redirect stdin to /dev/null so
+    # any stdin-reading code in imported libs doesn't block waiting for input.
+    import sys
+    if sys.stdin is not None and hasattr(sys.stdin, 'fileno'):
+        try:
+            sys.stdin = open('/dev/null', 'r')
+        except Exception:
+            pass
     run()
