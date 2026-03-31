@@ -467,7 +467,38 @@ def get_momentum_stats(token):
     # NOTE: volume_roc is NOT cached here — fetch it AFTER prefetch completes
     # via get_volume_roc() in compute_score, which reads the shared _VOL_CACHE
 
-    return {
+    # ── Momentum state ─────────────────────────────────────────
+    # Fine-grained: bullish / bearish / neutral
+    #   bullish: z elevated (mean-reverting UP) OR suppressed price catching bid
+    #   bearish: z elevated (elevated price ripe for SHORT) OR expanding down
+    #   neutral: ranging, weak signals
+    # Use pct_short (how elevated the price is) as primary signal
+    #   pct_short HIGH → price elevated → bearish
+    #   pct_short LOW  → price suppressed → bullish
+    # Use avg_z direction for confirmation
+    if pct_short >= 70 and avg_z > 0.2:
+        momentum_state = 'bearish'
+        state_confidence = min(1.0, (pct_short - 70) / 30 + max(0, avg_z - 0.2))
+    elif pct_short >= 60 and avg_z > 0.3:
+        momentum_state = 'bearish'
+        state_confidence = min(1.0, (pct_short - 60) / 40 + max(0, avg_z - 0.3) * 0.5)
+    elif pct_short <= 30 and avg_z < -0.2:
+        momentum_state = 'bullish'
+        state_confidence = min(1.0, (30 - pct_short) / 30 + max(0, abs(avg_z) - 0.2))
+    elif pct_short <= 40 and avg_z < -0.3:
+        momentum_state = 'bullish'
+        state_confidence = min(1.0, (40 - pct_short) / 40 + max(0, abs(avg_z) - 0.3) * 0.5)
+    elif z_direction == 'rising' and phase in ('accelerating', 'exhaustion'):
+        momentum_state = 'bullish'
+        state_confidence = 0.5
+    elif z_direction == 'falling' and phase in ('accelerating',):
+        momentum_state = 'bearish'
+        state_confidence = 0.5
+    else:
+        momentum_state = 'neutral'
+        state_confidence = 0.3
+
+    result = {
         'percentile': percentile,
         'percentile_long': pct_long,
         'percentile_short': pct_short,
@@ -477,7 +508,14 @@ def get_momentum_stats(token):
         'max_z':     round(max_z, 3),
         'min_z':     round(min_z, 3),
         'z_direction': z_direction,
+        'momentum_state': momentum_state,
+        'state_confidence': round(state_confidence, 3),
     }
+
+    # Persist to DB
+    _persist_momentum_state(token, momentum_state, state_confidence, pct_long, pct_short, avg_z, phase, z_direction)
+
+    return result
 
 
 # ═══════════════════════════════════════════════════════════════
