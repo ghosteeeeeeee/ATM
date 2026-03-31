@@ -55,8 +55,8 @@ PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
 PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
-ENTRY_THRESHOLD      = 60    # min score to add signal
-AI_DECIDER_THRESHOLD  = 65    # ≥ this + < AUTO_APPROVE → pending → AI decider
+ENTRY_THRESHOLD      = 70    # min score to add signal
+AI_DECIDER_THRESHOLD  = 70    # ≥ this + < AUTO_APPROVE → pending → AI decider
 AUTO_APPROVE          = 85    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
