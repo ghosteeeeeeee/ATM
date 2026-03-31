@@ -55,8 +55,9 @@ PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
 PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
-ENTRY_THRESHOLD   = 55    # min score to add signal
-AUTO_APPROVE      = 95    # ≥ this → auto-approve (≥95 no AI needed, 65-94 → AI review)
+ENTRY_THRESHOLD      = 60    # min score to add signal
+AI_DECIDER_THRESHOLD  = 60    # ≥ this + < AUTO_APPROVE → pending → AI decider
+AUTO_APPROVE          = 90    # ≥ this → auto-approve (no AI needed)
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
@@ -1099,7 +1100,7 @@ def run():
                             print(f'  LONG  {token:8s} {score:5.1f}% [AUTO]  {reasons}')
                         else:
                             log(f'SIGNAL:  {token} LONG @{price:.6f} {score:.1f}% {reasons}')
-                            print(f'  LONG  {token:8s} {score:5.1f}% [WAIT]  {reasons}')
+                            print(f'  LONG  {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
                         set_cooldown(token, 'LONG', hours=1)
                         added += 1
 
@@ -1162,7 +1163,7 @@ def run():
                         print(f'  SHORT {token:8s} {score:5.1f}% [AUTO]  {reasons}')
                     else:
                         log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
-                        print(f'  SHORT {token:8s} {score:5.1f}% [WAIT]  {reasons}')
+                        print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
                     set_cooldown(token, 'SHORT', hours=1)
                     added += 1
 

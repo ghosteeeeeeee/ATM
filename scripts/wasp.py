@@ -144,7 +144,8 @@ def check_signals():
 
     # APPROVED but never executed (> 1h)
     stuck_approved = sqlite(RUNTIME_DB, """
-        SELECT token, direction, decision, executed, created_at
+        SELECT token, direction, confidence, created_at,
+               ROUND((julianday('now') - julianday(created_at)) * 24, 1) as age_h
         FROM signals
         WHERE decision='APPROVED' AND executed=0
           AND created_at < datetime('now', '-1 hours')

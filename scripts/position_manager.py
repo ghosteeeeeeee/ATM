@@ -360,24 +360,24 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
         # ── Mirror to Hyperliquid (real trade) ───────────────────────
-        # Fails loudly: HL must confirm before we commit DB.
-        # If HL fails → rollback DB (keeps DB and HL in sync).
+        # Commit DB FIRST, then close on HL. This prevents the worst-case scenario
+        # where HL closes but DB rollback leaves them permanently divergent.
+        # If DB commit succeeds but HL close fails → hype-sync catches it next run.
+        # If DB commit fails → rollback (safe), HL is still open for retry.
         if HYPE_AVAILABLE and is_live_trading_enabled():
             hype_token = hype_coin(token)
+            conn.commit()  # lock in DB close
             try:
                 mirror_close(hype_token, direction)
                 print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
-                conn.commit()  # HL confirmed → commit DB
             except RuntimeError as me:
-                print(f"[Position Manager] HYPE mirror_close FAILED: {me}")
-                conn.rollback()
-                raise  # re-raise so caller knows HL is still open
+                print(f"[Position Manager] HYPE mirror_close FAILED (DB committed, HL still open): {me}")
+                print(f"[Position Manager] hype-sync will reconcile on next run")
             except Exception as me:
-                print(f"[Position Manager] HYPE mirror_close ERROR: {me}")
-                conn.rollback()
-                raise
+                print(f"[Position Manager] HYPE mirror_close ERROR (DB committed, HL still open): {me}")
+                print(f"[Position Manager] hype-sync will reconcile on next run")
         elif HYPE_AVAILABLE:
-            # Live trading OFF → paper only, safe to commit
+            # Live trading OFF → paper only
             print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
             conn.commit()
         else:
