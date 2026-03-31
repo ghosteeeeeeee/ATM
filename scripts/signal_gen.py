@@ -1295,7 +1295,11 @@ def run_confluence_detection():
         mtf_confs    = [conf for _, conf in mtf_rows]
         hermes_avg   = statistics.mean(hermes_confs) if hermes_confs else 0
         mtf_avg      = statistics.mean(mtf_confs) if mtf_confs else 0
-        base_avg     = (hermes_avg + mtf_avg) / 2 if (hermes_avg or mtf_avg) else 0
+        # Take the HIGHER of hermes_avg vs mtf_avg, not the average.
+        # If only Hermes signals exist: base = hermes_avg.
+        # If only mtf signals exist: base = mtf_avg.
+        # If both exist: base = max(hermes_avg, mtf_avg) — the stronger signal wins.
+        base_avg     = max(hermes_avg, mtf_avg) if (hermes_avg or mtf_avg) else 0
         mtf_sources_str    = ','.join(sorted(set(src for src, _ in mtf_rows))) if mtf_rows else 'none'
         hermes_sources_str = ','.join(sorted(set(src for src, _ in hermes_rows))) if hermes_rows else 'none'
 
