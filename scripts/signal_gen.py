@@ -656,7 +656,7 @@ def compute_score(token, direction, long_mult, short_mult):
     else:
         dir_percentile = 100 - percentile_short   # invert: pct_short=100 → 0
         # At extreme elevation: never quiet, treat as extreme
-        if percentile_short >= 90:
+        if percentile_short >= 80:
             phase = 'extreme'
         else:
             phase = detect_phase(dir_percentile, velocity)
@@ -859,12 +859,16 @@ def compute_score(token, direction, long_mult, short_mult):
     score = min(99.0, max(0, round(score, 1)))
 
     if score < ENTRY_THRESHOLD:
-        # Mean reversion bonus: extreme phase + good z + decent percentile
+        # Mean reversion bonus: extreme phase + z + percentile signal
         z_bonus = 0
-        if phase == 'extreme' and abs(avg_z) >= 1.0 and pct_score >= 50:
+        if phase == 'extreme' and abs(avg_z) >= 1.0 and pct_score >= 40:
             z_bonus = 25
-        elif phase == 'extreme' and abs(avg_z) >= 0.7:
+        elif phase == 'extreme' and abs(avg_z) >= 0.7 and pct_score >= 40:
             z_bonus = 15
+        elif phase == 'extreme' and abs(avg_z) >= 0.5 and pct_score >= 40:
+            z_bonus = 8
+        elif abs(avg_z) >= 0.5 and pct_score >= 40:
+            z_bonus = 5
         elif abs(avg_z) >= 1.5 and vol_score >= 3:
             z_bonus = 15
         elif abs(avg_z) >= 1.0 and vol_score >= 3:
