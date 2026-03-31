@@ -58,12 +58,13 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
         pass   # Never block on DB errors
 
 from signal_schema import (
-    init_db, DB_PATH, get_all_latest_prices, get_price_history,
+    init_db, get_all_latest_prices, get_price_history,
     get_latest_price, add_signal, set_cooldown, get_cooldown,
     price_age_minutes, approve_signal, update_signal_decision,
-    mark_signal_processed
+    mark_signal_processed, add_confluence_signal, get_confluence_signals
 )
 from hyperliquid_exchange import is_delisted
+from position_manager import get_open_positions as _get_open_pos
 
 # ── In-memory cache for z-scores (avoids repeated SQLite reads per token) ──────
 # Key: token → (z_1h, tier_1h, z_4h, tier_4h, z_30m, tier_30m, z_24h, tier_24h, ts)
@@ -88,6 +89,19 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 ENTRY_THRESHOLD      = 70    # min score to add signal
 AI_DECIDER_THRESHOLD  = 70    # ≥ this + < AUTO_APPROVE → pending → AI decider
 AUTO_APPROVE          = 90    # ≥ this → auto-approve (no AI needed)
+
+# Confluence detection: require ≥2 agreeing signals before firing
+CONFLUENCE_MIN_SIGNALS = 2   # minimum agreeing signals to trigger confluence
+CONFLUENCE_BOOST_2     = 1.25 # 1.25x confidence boost for 2 signals
+CONFLUENCE_BOOST_3PLUS = 1.50 # 1.5x confidence boost for 3+ signals
+CONFLUENCE_AUTO_APPROVE = 85  # confluence signal ≥ this → auto-approve (no AI needed)
+
+# Individual signal thresholds for confluence-ready signal table population
+# These are LOWER than ENTRY_THRESHOLD so confluence can combine weak-but-aligned signals
+CONFLUENCE_RSI_LOW   = 35   # RSI < this → LONG (oversold = potential reversal LONG)
+CONFLUENCE_RSI_HIGH  = 65   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
+CONFLUENCE_MACD_HIST_THRESH = 0.000005  # MACD histogram magnitude to add individual signal
+
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
@@ -1066,6 +1080,152 @@ def score_for_counter_spike(token: str, direction: str, long_mult: float, short_
 
 # ═══════════════════════════════════════════════════════════════
 # Main
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Confluence helpers — defined BEFORE run() so they're in scope
+# ═══════════════════════════════════════════════════════════════════════════
+# ── RSI signals for confluence ────────────────────────────────────────────────
+def _run_rsi_signals_for_confluence():
+    """Add RSI as standalone signal regardless of momentum score — needed for confluence."""
+    from signal_schema import compute_rsi
+    prices_dict = get_all_latest_prices()
+    open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
+    added = 0
+    for token, data in prices_dict.items():
+        if price_age_minutes(token) > 10:
+            continue
+        if not data.get('price') or data['price'] <= 0:
+            continue
+        if token.upper() in open_pos:
+            continue
+        if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
+            continue
+        rsi = compute_rsi(token, lookback_minutes=60*4)
+        if not rsi:
+            continue
+        price = data['price']
+        if rsi < CONFLUENCE_RSI_LOW:
+            conf = min(80, 60 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+            add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
+                       confidence=conf, value=rsi, price=price, exchange='hyperliquid')
+            added += 1
+        elif rsi > CONFLUENCE_RSI_HIGH:
+            conf = min(80, 60 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
+            add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
+                       confidence=conf, value=rsi, price=price, exchange='hyperliquid')
+            added += 1
+    return added
+
+
+# ── MACD signals for confluence ───────────────────────────────────────────────
+def _run_macd_signals_for_confluence():
+    """Add MACD histogram as standalone signal — needed for confluence."""
+    from signal_schema import compute_macd
+    prices_dict = get_all_latest_prices()
+    open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
+    added = 0
+    for token, data in prices_dict.items():
+        if price_age_minutes(token) > 10:
+            continue
+        if not data.get('price') or data['price'] <= 0:
+            continue
+        if token.upper() in open_pos:
+            continue
+        if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
+            continue
+        macd = compute_macd(token, lookback_minutes=60*24)
+        if not macd:
+            continue
+        h = macd['histogram']
+        price = data['price']
+        if abs(h) < CONFLUENCE_MACD_HIST_THRESH:
+            continue
+        direction = 'LONG' if h > 0 else 'SHORT'
+        conf = min(78, 60 + abs(h) * 300)
+        add_signal(token, direction, 'macd_confluence', 'macd-confluence',
+                   confidence=conf, value=h, price=price,
+                   macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
+                   macd_hist=h, exchange='hyperliquid')
+        added += 1
+    return added
+
+
+# ── Confluence Detection ───────────────────────────────────────────────────────
+# After all individual signals (momentum, RSI, MACD) are added to the DB,
+# detect tokens where ≥2 signal types agree and add a boosted confluence signal.
+# Confluence boosts: 2 agreeing signals → 1.25x, 3+ → 1.5x
+# Auto-approve: ≥CONFLUENCE_AUTO_APPROVE (85%) → no AI decider needed
+# This replicates the "conf-2s" / "conf-4s" / "conf-8s" pattern that OpenClaw
+# used successfully to filter noise and improve hit rate.
+
+
+
+def run_confluence_detection():
+    """Check for tokens where ≥2 signal types agree, add boosted confluence signal."""
+    # Query open positions locally (open_pos is in run() scope, not accessible here)
+    open_pos_local = {t: d for t, d in [(p['token'], p['direction']) for p in _get_open_pos()]}
+
+    # Get confluence groups: tokens with ≥2 PENDING signal types in last 60 min
+    confluences = get_confluence_signals(hours=1, min_signals=CONFLUENCE_MIN_SIGNALS)
+
+    confluences_added = 0
+    for c in confluences:
+        token = c['token']
+        direction = c['direction']
+        num_signals = c.get('num_types') or c.get('count')
+        avg_conf = c['avg_conf']
+
+        # Don't add confluence for tokens we already have a position on
+        if token in open_pos_local:
+            continue
+
+        # Rate limit
+        if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
+            continue
+
+        # Calculate boosted confidence
+        if num_signals >= 3:
+            boosted = min(99, avg_conf * CONFLUENCE_BOOST_3PLUS)
+        else:
+            boosted = min(99, avg_conf * CONFLUENCE_BOOST_2)
+
+        # Check: only add if individual signals haven't already hit ENTRY_THRESHOLD
+        # (prevents double-signals for same token+direction)
+        prices_dict = get_all_latest_prices()
+        price = prices_dict.get(token, {}).get('price') if prices_dict else None
+        if not price:
+            continue
+
+        # Add the confluence signal as a distinct row (ai_decider reads it by confidence)
+        sid = add_confluence_signal(
+            token=token,
+            direction=direction,
+            confidence=boosted,
+            num_signals=num_signals,
+            price=price,
+            z_score=c.get('z_score'),
+            rsi_14=c.get('rsi_14'),
+            macd_hist=c.get('macd_hist'),
+        )
+
+        if boosted >= CONFLUENCE_AUTO_APPROVE:
+            approve_signal(token, direction)
+            log(f'CONFLUENCE APPROVED: {token} {direction} @{price:.6f} '
+                f'{boosted:.1f}% ({num_signals}s: {c.get("types","")})')
+            print(f'  CONFLUENCE {token:8s} {direction:6s} {boosted:5.1f}% [{num_signals}s AUTO]')
+        else:
+            log(f'CONFLUENCE SIGNAL: {token} {direction} @{price:.6f} '
+                f'{boosted:.1f}% ({num_signals}s → AI-DECIDER)')
+            print(f'  CONFLUENCE {token:8s} {direction:6s} {boosted:5.1f}% [{num_signals}s AI-DEC]')
+
+        set_cooldown(token, direction, hours=1)
+        confluences_added += 1
+
+    print(f'  Confluence: {confluences_added} confluence signals added')
+    return confluences_added
+
+
 # ═══════════════════════════════════════════════════════════════
 
 def run():
@@ -1276,13 +1436,66 @@ def run():
                 log(f'EXIT ALERT: {token} {open_dir} → {opp_dir} {opp_score:.1f}%')
 
     print(f'=== Done: {added} signals | {blocked} blocked | {len(exits)} exit alerts ===')
+
+    # ── Standalone RSI signals (for confluence) ───────────────────
+    # Add RSI as its own signal even if < ENTRY_THRESHOLD — confluence needs it
+    open_pos_keys = {p['token'] for p in open_pos}
+    try:
+        from signal_schema import compute_rsi
+        for token, data in prices_dict.items():
+            if price_age_minutes(token) > 10: continue
+            if not data.get('price') or data['price'] <= 0: continue
+            if token.upper() in open_pos_keys: continue
+            if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES): continue
+            rsi = compute_rsi(token, lookback_minutes=60*4)
+            if not rsi: continue
+            price = data['price']
+            if rsi < CONFLUENCE_RSI_LOW:
+                conf = min(80, 60 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+                add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
+                           confidence=conf, value=rsi, price=price, exchange='hyperliquid')
+            elif rsi > CONFLUENCE_RSI_HIGH:
+                conf = min(80, 60 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
+                add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
+                           confidence=conf, value=rsi, price=price, exchange='hyperliquid')
+    except Exception as e:
+        print(f'  RSI confluence pass error: {e}')
+
+    # ── Standalone MACD signals (for confluence) ──────────────────
+    try:
+        from signal_schema import compute_macd
+        for token, data in prices_dict.items():
+            if price_age_minutes(token) > 10: continue
+            if not data.get('price') or data['price'] <= 0: continue
+            if token.upper() in open_pos_keys: continue
+            if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES): continue
+            macd = compute_macd(token, lookback_minutes=60*24)
+            if not macd: continue
+            h = macd['histogram']
+            price = data['price']
+            if abs(h) < CONFLUENCE_MACD_HIST_THRESH: continue
+            direction = 'LONG' if h > 0 else 'SHORT'
+            conf = min(78, 60 + abs(h) * 300)
+            add_signal(token, direction, 'macd_confluence', 'macd-confluence',
+                       confidence=conf, value=h, price=price,
+                       macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
+                       macd_hist=h, exchange='hyperliquid')
+    except Exception as e:
+        print(f'  MACD confluence pass error: {e}')
+
+    # ── Confluence Detection ────────────────────────────────────
+    # Check if any tokens have ≥2 agreeing signal types → add boosted confluence signal
+    confluences_added = 0
+    try:
+        confluences_added = run_confluence_detection()
+    except Exception as e:
+        print(f'  Confluence detection error: {e}')
+    print(f'  Confluence: {confluences_added} confluence signals added')
+
     return added, exits
 
 
 if __name__ == '__main__':
-    # Prevent stdin deadlock when run as subprocess (hermes-pipeline calls signal_gen
-    # via subprocess.run with capture_output=True). Redirect stdin to /dev/null so
-    # any stdin-reading code in imported libs doesn't block waiting for input.
     import sys
     if sys.stdin is not None and hasattr(sys.stdin, 'fileno'):
         try:

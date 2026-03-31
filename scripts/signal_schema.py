@@ -250,29 +250,58 @@ def get_pending_signals(hours=24, limit=50):
 
 get_pending_signals_as_dict = get_pending_signals  # alias
 
-def get_confluence_signals(hours=24):
+def get_confluence_signals(hours=24, min_signals=2):
+    """Return tokens where ≥min_signals PENDING signal types agree.
+    Used by ai_decider / decider-run. Boosts confidence by 1.25x (2 signals)
+    or 1.5x (3+ signals)."""
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
     c.execute('''
-        SELECT token, direction, COUNT(*) as count, AVG(confidence) as avg_conf,
+        SELECT token, direction,
+               COUNT(DISTINCT signal_type) as num_types,
+               COUNT(*) as total_rows,
+               AVG(confidence) as avg_conf,
                MAX(confidence) as max_conf,
-               GROUP_CONCAT(DISTINCT signal_type) as types, MAX(price) as price
+               GROUP_CONCAT(DISTINCT signal_type) as types,
+               MAX(price) as price,
+               MAX(z_score) as z_score,
+               MAX(rsi_14) as rsi_14
         FROM signals
         WHERE decision='PENDING'
         AND created_at > datetime('now','-'||?||' hours')
-        GROUP BY token, direction, leverage
+        GROUP BY token, direction
+        HAVING COUNT(DISTINCT signal_type) >= ?
         ORDER BY avg_conf DESC
-    ''', (hours,))
+    ''', (hours, min_signals))
     results = []
     for r in c.fetchall():
         d = dict(r)
-        mult = 1.5 if d['count'] >= 3 else 1.25 if d['count'] == 2 else 1.0
+        mult = 1.5 if d['num_types'] >= 3 else 1.25 if d['num_types'] == 2 else 1.0
         d['final_confidence'] = min(99, d['avg_conf'] * mult)
+        d['num_agreeing'] = d['num_types']
         if d.get('types'):
             d['signal_types'] = d['types'].split(',')
         results.append(d)
     conn.close()
     return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+
+
+def add_confluence_signal(token, direction, confidence, num_signals, price, z_score=None, rsi_14=None, macd_hist=None):
+    """Add a confluence signal (when ≥2 indicator signals agree on same token+direction).
+    Confidence is pre-boosted by caller (1.25x for 2 signals, 1.5x for 3+)."""
+    return add_signal(
+        token=token.upper(), direction=direction.upper(),
+        signal_type='confluence',
+        source=f'conf-{num_signals}s',
+        confidence=confidence,
+        value=confidence,
+        price=price,
+        exchange='hyperliquid',
+        timeframe='multi',
+        z_score=z_score,
+        rsi_14=rsi_14,
+        macd_hist=macd_hist,
+    )
 
 def update_signal_decision(token, direction, decision, reason=None):
     conn = _get_conn(_runtime())
