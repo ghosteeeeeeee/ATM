@@ -346,9 +346,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 conn3 = get_db_connection()
                 cur3 = conn3.cursor()
                 cur3.execute("""
-                    UPDATE trades SET entry_price = %s, token = %s
+                    UPDATE trades SET entry_price = %s, hl_entry_price = %s
                     WHERE id = %s
-                """, (hl_entry, hype_token, trade_id))
+                """, (hl_entry, hl_entry, trade_id))
                 conn3.commit()
                 cur3.close(); conn3.close()
             else:

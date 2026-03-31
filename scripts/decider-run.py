@@ -459,24 +459,29 @@ def execute_trade(token, direction, price, confidence, source,
 
 
 def close_position(token, reason):
-    """Close an open position directly via brain.py."""
+    """Close an open position directly via brain.py.
+    Does NOT overwrite entry_price — leaves it intact.
+    exit_price and PnL will be filled in by hl-sync-guardian (via HL fill data)
+    or by brain.py close_trade() if called from there.
+    """
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
-                                user='postgres', password='Brain123')
+                                user='postgres', password='postgres')
         cur = conn.cursor()
+        # Read entry_price so we don't accidentally null it
         cur.execute("""
             UPDATE trades
             SET status='closed', close_time=NOW(),
-                exit_price=entry_price, pnl_pct=0, pnl_usdt=0
+                close_reason=%s
             WHERE server=%s AND token=%s AND status='open'
-            RETURNING id
-        """, (SERVER, token))
+            RETURNING id, entry_price
+        """, (reason, SERVER, token))
         row = cur.fetchone()
         conn.commit()
         cur.close(); conn.close()
         if row:
-            log(f'CLOSED: {token} {reason} (trade #{row[0]})')
+            log(f'CLOSED: {token} {reason} (trade #{row[0]}), entry={row[1]}')
             return True
         return False
     except Exception as e:

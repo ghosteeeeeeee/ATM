@@ -696,6 +696,34 @@ def get_realized_pnl(token: str, start_time_ms: int, end_time_ms: int = None) ->
     }
 
 
+def mirror_get_entry_fill(token: str, start_time_ms: int, window_ms: int = 300000) -> dict:
+    """
+    Get actual entry fill price for a position that was just opened.
+    Looks up OPEN fills (side=A for LONG, side=B for SHORT) within window_ms
+    after start_time_ms. Computes size-weighted average fill price.
+
+    Returns {"success": True, "entry_price": float, "realized_pnl": float}
+            or {"success": False} if no entry fill found.
+    """
+    end_ms = start_time_ms + window_ms
+    fills = get_trade_history(start_time_ms, end_ms)
+    token_upper = token.upper()
+    # side=A = opens a long or closes a short
+    # side=B = opens a short or closes a long
+    entry_fills = [f for f in fills
+                   if f["coin"].upper() == token_upper
+                   and f["side"] in ("A", "B")]
+    if not entry_fills:
+        return {"success": False}
+    total_sz = sum(abs(f["sz"]) for f in entry_fills)
+    return {
+        "success":      True,
+        "entry_price":  sum(f["px"] * abs(f["sz"]) for f in entry_fills) / total_sz,
+        "total_sz":     total_sz,
+        "fill_count":   len(entry_fills),
+    }
+
+
 def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000) -> dict:
     """
     Get actual exit fill for a recently-closed position.
@@ -717,7 +745,6 @@ def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000
         "realized_pnl": sum(f["closed_pnl"] for f in close_fills),
         "time_ms":      close_fills[0]["time_ms"],
     }
-
 
 
 # ─── Mirror Functions ─────────────────────────────────────────────────────────
@@ -803,21 +830,28 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
     try:
         result = _exchange_retry(_do)
         if result.get("success"):
-            # Calculate actual HL fill price (Plan A: ground truth entry)
-            # market_open uses 0.5% slippage: LONG pays +0.5%, SHORT receives -0.5%
-            slippage = 0.005
-            fill_price = mid_price * (1 + slippage) if is_buy else mid_price * (1 - slippage)
-            decimals = _sz_decimals(token)
-            fill_price = round(fill_price, decimals)
+            # ── Ground truth: poll HL fill history for actual entry price ──
+            order_time_ms = int(time.time() * 1000)
+            entry_info = mirror_get_entry_fill(token, order_time_ms - 2000, window_ms=10000)
+            if entry_info.get("success"):
+                fill_price = entry_info["entry_price"]
+                print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ signal=${live_price:.6f} "
+                      f"→ HL_fill=${fill_price:.6f} ({entry_info.get('fill_count',1)} fills)")
+            else:
+                # Fall back to slippage estimate
+                slippage = 0.005
+                fill_price = mid_price * (1 + slippage) if is_buy else mid_price * (1 - slippage)
+                decimals = _sz_decimals(token)
+                fill_price = round(fill_price, decimals)
+                print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${live_price:.6f} "
+                      f"(no HL fill data, estimated ${fill_price:.6f})")
 
-            print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${live_price:.4f} (${size_usdt:.2f}) "
-                  f"HL_fill=${fill_price:.4f}")
             return {"success": True, "message": f"Opened {direction} {sz} {token}",
                     "size": sz,
-                    "entry_price": live_price,
-                    "hl_entry_price": fill_price,   # actual HL fill — use this for PnL calc
+                    "entry_price": fill_price,       # actual HL fill price for PnL
+                    "hl_entry_price": fill_price,     # alias
                     "mid_price": mid_price,
-                    "slippage_pct": slippage,
+                    "slippage_pct": abs(fill_price - mid_price) / mid_price if mid_price else 0,
                     "side": "BUY" if is_buy else "SELL",
                     "usdt": size_usdt}
         else:
