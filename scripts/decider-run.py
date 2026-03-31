@@ -519,14 +519,14 @@ def run(dry_run=False):
     approved = get_approved_signals(hours=24)
     log(f'Approved signals: {len(approved)}')
 
-    # Fallback: if no approved signals, take high-confidence PENDING signals
+        # Fallback: if no approved signals, take high-confidence PENDING signals
     if not approved:
         pending = get_pending_signals(hours=1, limit=30)
-        # 60-89% confidence → pending → AI decider (not auto-approved)
+        # 80-89% confidence → pending → AI decider (raised from 60 to filter noise)
         high_conf = [p for p in pending
-                     if 60 <= p.get('confidence', 0) < 90
+                     if 80 <= p.get('confidence', 0) < 90
                      and p.get('executed', 0) == 0]
-        log(f'Pending AI-decider: {len(high_conf)} signals 60-89% (from {len(pending)} total)')
+        log(f'Pending AI-decider: {len(high_conf)} signals 80-89% (from {len(pending)} total)')
         for p in high_conf:
             p['final_confidence'] = p['confidence']
             p['price'] = p.get('price') or get_current_price(p['token'])

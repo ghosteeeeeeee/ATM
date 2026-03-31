@@ -26,7 +26,7 @@ def log_error(msg, exc=None):
     log(error_msg, 'ERROR')
 
 AB_CONFIG_FILE = '/root/.openclaw/workspace/data/ab-test-config.json'
-AB_RESULTS_FILE = '/root/.openclaw/workspace/logs/ab-test-results.json'
+AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
 AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
 
 # In-memory cache for A/B variants per token+direction (cleared on restart)

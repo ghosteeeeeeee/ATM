@@ -88,7 +88,7 @@ PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion terri
 # Entry score thresholds
 ENTRY_THRESHOLD      = 70    # min score to add signal
 AI_DECIDER_THRESHOLD  = 70    # ≥ this + < AUTO_APPROVE → pending → AI decider
-AUTO_APPROVE          = 90    # ≥ this → auto-approve (no AI needed)
+AUTO_APPROVE          = 95    # ≥ this → auto-approve (momentum uses PENDING only; this is a safety cap)
 
 # Confluence detection: require ≥2 agreeing signals before firing
 CONFLUENCE_MIN_SIGNALS = 2   # minimum agreeing signals to trigger confluence
@@ -197,7 +197,10 @@ def rsi(prices, period=14):
         avg_gain = (avg_gain * (period-1) + gains[i]) / period
         avg_loss = (avg_loss * (period-1) + losses[i]) / period
     if avg_loss == 0:
-        return 100.0
+        # No pullbacks at all = can't compute meaningful RSI
+        # Return a high-but-not-extreme value so confluence can still fire
+        # but won't get auto-approved by RSI alone
+        return 85.0
     return round(100 - (100 / (1 + avg_gain / avg_loss)), 2)
 
 
@@ -1087,10 +1090,20 @@ def score_for_counter_spike(token: str, direction: str, long_mult: float, short_
 # ═══════════════════════════════════════════════════════════════════════════
 # ── RSI signals for confluence ────────────────────────────────────────────────
 def _run_rsi_signals_for_confluence():
-    """Add RSI as standalone signal regardless of momentum score — needed for confluence."""
+    """Add RSI as standalone signal — filtered to only fire when trend aligns."""
     from signal_schema import compute_rsi
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
+    # Get broad market trend once
+    broad_z_vals = []
+    for tok in BROAD_MARKET_TOKENS:
+        zs = get_tf_zscores(tok)
+        if '4h' in zs and zs['4h'][0] is not None:
+            broad_z_vals.append(zs['4h'][0])
+    broad_avg = statistics.mean(broad_z_vals) if broad_z_vals else 0
+    # Blacklist: tokens with 0-20% SHORT win rate
+    SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
+                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
     added = 0
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
@@ -1104,26 +1117,42 @@ def _run_rsi_signals_for_confluence():
         rsi = compute_rsi(token, lookback_minutes=60*4)
         if not rsi:
             continue
+        z = compute_zscore(token)
+        z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
         price = data['price']
         if rsi < CONFLUENCE_RSI_LOW:
-            conf = min(80, 60 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+            # ── LONG filter: RSI oversold + z-score suppressed + broad not uptrending ──
+            if broad_avg > BROAD_UPTEND_Z:
+                continue  # broad market too bullish, skip LONG
+            if z is None or z > LONG_1H_Z_MAX:
+                continue  # token not suppressed enough
+            conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
             add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
-                       confidence=conf, value=rsi, price=price, exchange='hyperliquid')
+                       confidence=conf, value=rsi, price=price, exchange='hyperliquid',
+                       z_score=z, z_score_tier=z_tier)
             added += 1
         elif rsi > CONFLUENCE_RSI_HIGH:
-            conf = min(80, 60 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
+            # ── SHORT filter: RSI overbought + not on blacklist ──
+            # No z-score filter for SHORTs — suppressed prices are valid short targets
+            if token.upper() in SHORT_BLACKLIST:
+                continue
+            conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
             add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
-                       confidence=conf, value=rsi, price=price, exchange='hyperliquid')
+                       confidence=conf, value=rsi, price=price, exchange='hyperliquid',
+                       z_score=z, z_score_tier=z_tier)
             added += 1
     return added
 
 
 # ── MACD signals for confluence ───────────────────────────────────────────────
 def _run_macd_signals_for_confluence():
-    """Add MACD histogram as standalone signal — needed for confluence."""
+    """Add MACD histogram as standalone signal — filtered like RSI to stay in pipeline."""
     from signal_schema import compute_macd
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
+    # Blacklist: tokens with 0-20% SHORT win rate
+    SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
+                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
     added = 0
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
@@ -1138,15 +1167,26 @@ def _run_macd_signals_for_confluence():
         if not macd:
             continue
         h = macd['histogram']
+        z = compute_zscore(token)
+        z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
         price = data['price']
         if abs(h) < CONFLUENCE_MACD_HIST_THRESH:
             continue
         direction = 'LONG' if h > 0 else 'SHORT'
-        conf = min(78, 60 + abs(h) * 300)
+        # ── Apply same directional + blacklist filters as RSI signals ──
+        if direction == 'LONG':
+            if z is None or z > LONG_1H_Z_MAX:
+                continue  # not suppressed enough for LONG
+        else:  # SHORT
+            if token.upper() in SHORT_BLACKLIST:
+                continue
+            # No z-score filter for SHORTs — suppressed prices are valid short targets
+        conf = min(50, 30 + abs(h) * 300)
         add_signal(token, direction, 'macd_confluence', 'macd-confluence',
                    confidence=conf, value=h, price=price,
                    macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
-                   macd_hist=h, exchange='hyperliquid')
+                   macd_hist=h, exchange='hyperliquid',
+                   z_score=z, z_score_tier=z_tier)
         added += 1
     return added
 
@@ -1185,10 +1225,13 @@ def run_confluence_detection():
             continue
 
         # Calculate boosted confidence
+        # Boost the raw avg by the signal-count multiplier so decider-run's
+        # ENTRY_THRESHOLD (75) acts as the real gate. Individual signals
+        # capped at 50 ensure RSI/MACD alone can't auto-trade.
         if num_signals >= 3:
-            boosted = min(99, avg_conf * CONFLUENCE_BOOST_3PLUS)
+            boosted = min(99, avg_conf * 2.0)
         else:
-            boosted = min(99, avg_conf * CONFLUENCE_BOOST_2)
+            boosted = min(99, avg_conf * 1.5)
 
         # Check: only add if individual signals haven't already hit ENTRY_THRESHOLD
         # (prevents double-signals for same token+direction)
@@ -1198,6 +1241,8 @@ def run_confluence_detection():
             continue
 
         # Add the confluence signal as a distinct row (ai_decider reads it by confidence)
+        # Add as PENDING — decider-run handles entry decision (filters, SL, AB assignment)
+        # Confluence signal_type is informational: tells decider this is a multi-signal agreement
         sid = add_confluence_signal(
             token=token,
             direction=direction,
@@ -1209,15 +1254,12 @@ def run_confluence_detection():
             macd_hist=c.get('macd_hist'),
         )
 
-        if boosted >= CONFLUENCE_AUTO_APPROVE:
-            approve_signal(token, direction)
-            log(f'CONFLUENCE APPROVED: {token} {direction} @{price:.6f} '
-                f'{boosted:.1f}% ({num_signals}s: {c.get("types","")})')
-            print(f'  CONFLUENCE {token:8s} {direction:6s} {boosted:5.1f}% [{num_signals}s AUTO]')
+        if boosted >= 85:
+            log(f'CONFLUENCE: {token} {direction} @{price:.6f} '
+                f'{boosted:.1f}% ({num_signals}s: {c.get("types","")}) — HIGH CONF → decider')
         else:
-            log(f'CONFLUENCE SIGNAL: {token} {direction} @{price:.6f} '
-                f'{boosted:.1f}% ({num_signals}s → AI-DECIDER)')
-            print(f'  CONFLUENCE {token:8s} {direction:6s} {boosted:5.1f}% [{num_signals}s AI-DEC]')
+            log(f'CONFLUENCE: {token} {direction} @{price:.6f} '
+                f'{boosted:.1f}% ({num_signals}s: {c.get("types","")}) → decider')
 
         set_cooldown(token, direction, hours=1)
         confluences_added += 1
@@ -1326,12 +1368,8 @@ def run():
                                 macd_signal=macd_signal_val,
                                 macd_hist=macd_hist_val,
                             )
-                            if opp_score >= AUTO_APPROVE:
-                                approve_signal(token, opp_dir)
-                                log_trade(token)
-                                log(f'APPROVED: {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
-                            else:
-                                log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
+                            # All momentum signals → PENDING → decider-run (no auto-approve)
+                            log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
                             set_cooldown(token, opp_dir, hours=1)
                             added += 1
                     else:
@@ -1348,14 +1386,9 @@ def run():
                             macd_signal=macd_signal_val,
                             macd_hist=macd_hist_val,
                         )
-                        if score >= AUTO_APPROVE:
-                            approve_signal(token, 'LONG')
-                            log_trade(token)
-                            log(f'APPROVED: {token} LONG @{price:.6f} {score:.1f}% {reasons}')
-                            print(f'  LONG  {token:8s} {score:5.1f}% [AUTO]  {reasons}')
-                        else:
-                            log(f'SIGNAL:  {token} LONG @{price:.6f} {score:.1f}% {reasons}')
-                            print(f'  LONG  {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
+                        # All momentum signals → PENDING → decider-run (no auto-approve)
+                        log(f'SIGNAL:  {token} LONG @{price:.6f} {score:.1f}% {reasons}')
+                        print(f'  LONG  {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
                         set_cooldown(token, 'LONG', hours=1)
                         added += 1
 
@@ -1393,12 +1426,8 @@ def run():
                             z_score=mom['avg_z'] if mom else None,
                             z_score_tier=mom['z_direction'] if mom else None,
                         )
-                        if opp_score >= AUTO_APPROVE:
-                            approve_signal(token, opp_dir)
-                            log_trade(token)
-                            log(f'APPROVED: {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
-                        else:
-                            log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
+                        # All momentum signals → PENDING → decider-run (no auto-approve)
+                        log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
                         set_cooldown(token, opp_dir, hours=1)
                         added += 1
                 else:
@@ -1411,14 +1440,9 @@ def run():
                         z_score=mom['avg_z'] if mom else None,
                         z_score_tier=mom['z_direction'] if mom else None,
                     )
-                    if score >= AUTO_APPROVE:
-                        approve_signal(token, 'SHORT')
-                        log_trade(token)
-                        log(f'APPROVED: {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
-                        print(f'  SHORT {token:8s} {score:5.1f}% [AUTO]  {reasons}')
-                    else:
-                        log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
-                        print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
+                    # All momentum signals → PENDING → decider-run (no auto-approve)
+                    log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
+                    print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
                     set_cooldown(token, 'SHORT', hours=1)
                     added += 1
 
@@ -1437,54 +1461,8 @@ def run():
 
     print(f'=== Done: {added} signals | {blocked} blocked | {len(exits)} exit alerts ===')
 
-    # ── Standalone RSI signals (for confluence) ───────────────────
-    # Add RSI as its own signal even if < ENTRY_THRESHOLD — confluence needs it
-    open_pos_keys = {p['token'] for p in open_pos}
-    try:
-        from signal_schema import compute_rsi
-        for token, data in prices_dict.items():
-            if price_age_minutes(token) > 10: continue
-            if not data.get('price') or data['price'] <= 0: continue
-            if token.upper() in open_pos_keys: continue
-            if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES): continue
-            rsi = compute_rsi(token, lookback_minutes=60*4)
-            if not rsi: continue
-            price = data['price']
-            if rsi < CONFLUENCE_RSI_LOW:
-                conf = min(80, 60 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
-                add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
-                           confidence=conf, value=rsi, price=price, exchange='hyperliquid')
-            elif rsi > CONFLUENCE_RSI_HIGH:
-                conf = min(80, 60 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
-                add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
-                           confidence=conf, value=rsi, price=price, exchange='hyperliquid')
-    except Exception as e:
-        print(f'  RSI confluence pass error: {e}')
-
-    # ── Standalone MACD signals (for confluence) ──────────────────
-    try:
-        from signal_schema import compute_macd
-        for token, data in prices_dict.items():
-            if price_age_minutes(token) > 10: continue
-            if not data.get('price') or data['price'] <= 0: continue
-            if token.upper() in open_pos_keys: continue
-            if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES): continue
-            macd = compute_macd(token, lookback_minutes=60*24)
-            if not macd: continue
-            h = macd['histogram']
-            price = data['price']
-            if abs(h) < CONFLUENCE_MACD_HIST_THRESH: continue
-            direction = 'LONG' if h > 0 else 'SHORT'
-            conf = min(78, 60 + abs(h) * 300)
-            add_signal(token, direction, 'macd_confluence', 'macd-confluence',
-                       confidence=conf, value=h, price=price,
-                       macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
-                       macd_hist=h, exchange='hyperliquid')
-    except Exception as e:
-        print(f'  MACD confluence pass error: {e}')
-
     # ── Confluence Detection ────────────────────────────────────
-    # Check if any tokens have ≥2 agreeing signal types → add boosted confluence signal
+    # Run patched _run_rsi/macd functions (with z_score + filters), then check for confluence
     confluences_added = 0
     try:
         confluences_added = run_confluence_detection()
@@ -1493,7 +1471,6 @@ def run():
     print(f'  Confluence: {confluences_added} confluence signals added')
 
     return added, exits
-
 
 if __name__ == '__main__':
     import sys
