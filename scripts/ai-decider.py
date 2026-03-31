@@ -628,7 +628,7 @@ def get_market_zscore():
 def get_prediction(token):
     """Get latest LLM candle prediction for token with per-token accuracy"""
     try:
-        conn = sqlite3.connect('/root/.openclaw/workspace/data/predictions.db')
+        conn = sqlite3.connect('/root/.hermes/data/predictions.db')
         cur = conn.cursor()
         cur.execute("""
             SELECT direction, confidence, correct

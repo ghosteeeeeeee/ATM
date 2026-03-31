@@ -169,17 +169,27 @@ def get_token_data_for_prediction(token):
     rsi_val        = _rsi(prices)
     macd_hist      = _macd_hist(prices)
     
-    # Regime (from compute_regime)
-    conn3 = get_runtime_db()
-    cur3 = conn3.cursor()
-    cur3.execute("SELECT COUNT(*) FROM regime_log ORDER BY created_at DESC LIMIT 1")
-    has_regime = cur3.fetchone()[0] > 0
+    # Regime: derive from momentum state (no regime_log table)
     regime = 'neutral'
-    if has_regime:
-        cur3.execute("SELECT regime FROM regime_log ORDER BY created_at DESC LIMIT 1")
+    if momentum_state == 'bullish' and pct_short < 40:
+        regime = 'bullish'
+    elif momentum_state == 'bearish' and pct_short > 60:
+        regime = 'bearish'
+    elif z_dir == 'rising' and phase in ('accelerating', 'exhaustion'):
+        regime = 'bullish'
+    elif z_dir == 'falling' and phase == 'accelerating':
+        regime = 'bearish'
+    # Also try decisions table for recent signal direction
+    try:
+        conn3 = get_runtime_db()
+        cur3 = conn3.cursor()
+        cur3.execute("SELECT direction FROM decisions WHERE token=? ORDER BY created_at DESC LIMIT 1", (token,))
         r = cur3.fetchone()
-        regime = r[0] if r else 'neutral'
-    conn3.close()
+        if r:
+            regime = 'bullish' if r[0].upper() == 'LONG' else 'bearish'
+        conn3.close()
+    except:
+        pass
     
     return {
         'token': token,
@@ -226,7 +236,7 @@ def build_prediction_prompt(token_data):
     
     return f"""You are a crypto 4-hour candle direction predictor.
 
-{pct_short} 4h candles of {d['token']} history + momentum indicators:
+{d['pct_short']:.0f} 4h candles of {d['token']} history + momentum indicators:
 
 LAST PRICE: ${d['price']:.6f}
 {d['chg_1h']:+.2f}% in 1h | {d['chg_4h']:+.2f}% in 4h | {d['chg_24h']:+.2f}% in 24h
@@ -452,7 +462,7 @@ def main():
                 store_prediction(conn, pred, token_data)
                 predicted += 1
         
-        time.sleep(1.5)  # Ollama rate limit
+        time.sleep(1.0)  # Ollama rate limit
     
     log(f"=== Predicted {predicted} tokens ===")
     conn.close()
