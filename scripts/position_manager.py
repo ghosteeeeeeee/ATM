@@ -54,9 +54,12 @@ TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
 # ─── Loss Cooldown Config ─────────────────────────────────────────────────────
 # After a losing trade, block the SAME direction for N hours
 # This prevents the loss spiral: trade → cut → immediately re-enter → cut again
-LOSS_COOLDOWN_FILE = '/var/www/hermes/data/loss_cooldowns.json'
-LOSS_COOLDOWN_HOURS = 4  # block same direction for 4 hours after a loss
-WIN_COOLDOWN_MINUTES = 5   # block same direction for 5 min after a win (prevents re-entry loop)
+# INCREMENTAL: consecutive losses double the cooldown (2h → 4h → 8h), wins reset streak
+LOSS_COOLDOWN_FILE     = '/var/www/hermes/data/loss_cooldowns.json'
+LOSS_COOLDOWN_BASE     = 2.0   # hours for 1st consecutive loss
+LOSS_COOLDOWN_MAX       = 8.0   # cap at 8 hours after 3+ consecutive losses
+LOSS_STREAK_RESET_WIN   = True   # reset streak to 0 after a win (good trend continuation)
+WIN_COOLDOWN_MINUTES    = 5     # block same direction for 5 min after a win
 
 # ─── DB Helpers ────────────────────────────────────────────────────────────────
 def get_db_connection():
@@ -324,19 +327,20 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # Net PnL after fees
         net_pnl = pnl_usdt - fee_total
 
-        # ── Trigger loss cooldown ─────────────────────────────────
-        # After a losing trade, block the SAME direction for N hours.
-        # This prevents the loss spiral: cut → immediately re-enter → cut again.
+        # ── Trigger loss cooldown (incremental: 2h → 4h → 8h per consecutive loss) ──
         is_loss = float(pnl_usdt or 0) < 0
         if is_loss:
             set_loss_cooldown(token, direction)
+            # Post-mortem: if we lost on a direction, was the market moving against us first?
+            _analyze_loss_direction(token, direction, entry_price, exit_price)
 
         # ── Trigger win cooldown ──────────────────────────────────
-        # After a winning trade, block the SAME direction for 30 min.
-        # This prevents the re-entry loop: signal closes → same signal re-enters every minute.
+        # Also: clear loss streak since WIN confirms this was the right direction
         is_win = float(pnl_usdt or 0) > 0
         if is_win:
             _set_win_cooldown(token, direction)
+            if LOSS_STREAK_RESET_WIN:
+                clear_loss_streak(token, direction)
 
         cur.execute("""
             UPDATE trades
@@ -920,51 +924,267 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     return open_count, closed_count, adjusted_count
 
 
-# ─── Loss Cooldown ─────────────────────────────────────────────────────────────
-def _load_loss_cooldown() -> Dict:
-    """Load loss cooldown data from JSON file."""
+# ─── Loss Cooldown (Incremental) ──────────────────────────────────────────────
+# Entries store: {key: {"expires": unix_ts, "streak": 3}}
+# Each consecutive loss: streak++, hours doubles (2h → 4h → 8h cap)
+# Wins optionally reset the streak (LOSS_STREAK_RESET_WIN)
+
+def _load_cooldowns() -> Dict:
+    """Load cooldown data from JSON file.
+
+    Handles two formats:
+    - Old: {"KEY": unix_timestamp} — convert to new format
+    - New: {"KEY": {"expires": unix_ts, "streak": N, ...}}
+    """
     try:
         if os.path.exists(LOSS_COOLDOWN_FILE):
             with open(LOSS_COOLDOWN_FILE) as f:
-                return json.load(f)
+                raw = json.load(f)
+            # Migrate old float entries to new dict format
+            migrated = False
+            for k, v in raw.items():
+                if isinstance(v, float):
+                    raw[k] = {"expires": v, "streak": 1}
+                    migrated = True
+            if migrated:
+                _save_cooldowns(raw)
+                print(f"[Position Manager] Migrated {migrated} old cooldown entries to new format")
+            return raw
     except Exception as e:
-        print(f"[Position Manager] Error loading loss cooldown: {e}")
+        print(f"[Position Manager] Error loading cooldowns: {e}")
     return {}
 
 
-def _save_loss_cooldown(data: Dict) -> None:
-    """Save loss cooldown data to JSON file."""
+def _save_cooldowns(data: Dict) -> None:
+    """Save cooldown data to JSON file."""
     try:
         os.makedirs(os.path.dirname(LOSS_COOLDOWN_FILE), exist_ok=True)
         with open(LOSS_COOLDOWN_FILE, "w") as f:
             json.dump(data, f, indent=2, default=str)
     except Exception as e:
-        print(f"[Position Manager] Error saving loss cooldown: {e}")
+        print(f"[Position Manager] Error saving cooldowns: {e}")
+
+
+def _clean_expired(data: Dict) -> Dict:
+    """Remove expired entries. Handles both old float and new dict formats."""
+    now = datetime.now(timezone.utc).timestamp()
+    def expiry(v):
+        if isinstance(v, dict):
+            return v.get("expires", 0)
+        return v  # old float format
+    return {k: v for k, v in data.items() if expiry(v) > now}
 
 
 def is_loss_cooldown_active(token: str, direction: str) -> bool:
     """Return True if token+direction is in loss cooldown."""
     key = f"{token.upper()}:{direction.upper()}"
-    data = _load_loss_cooldown()
-    if key not in data:
-        return False
-    expiry = data[key]
-    if datetime.now(timezone.utc).timestamp() >= expiry:
-        # Expired — clean up
-        del data[key]
-        _save_loss_cooldown(data)
-        return False
-    return True
+    data = _clean_expired(_load_cooldowns())
+    return key in data
 
 
-def set_loss_cooldown(token: str, direction: str, hours: float = LOSS_COOLDOWN_HOURS) -> None:
-    """Set a loss cooldown for token+direction after a losing trade."""
+def set_loss_cooldown(token: str, direction: str, hours: float = None) -> None:
+    """Increment loss streak and set cooldown for token+direction."""
     key = f"{token.upper()}:{direction.upper()}"
-    expiry = datetime.now(timezone.utc).timestamp() + (hours * 3600)
-    data = _load_loss_cooldown()
-    data[key] = expiry
-    _save_loss_cooldown(data)
-    print(f"[Position Manager] LOSS COOLDOWN: {token} {direction} blocked for {hours}h")
+    data = _load_cooldowns()
+    entry = data.get(key, None)
+
+    # Handle old float format: convert to new dict
+    if entry is None:
+        streak = 1
+    elif isinstance(entry, float):
+        streak = 1  # old entry expired already in this case, start fresh
+    else:
+        streak = entry.get("streak", 0) + 1
+
+    # Incremental hours: 2 → 4 → 8 (capped)
+    if hours is None:
+        hours = min(LOSS_COOLDOWN_BASE * (2 ** (streak - 1)), LOSS_COOLDOWN_MAX)
+
+    now = datetime.now(timezone.utc).timestamp()
+    expiry = now + (hours * 3600)
+    data[key] = {"expires": expiry, "streak": streak, "hours": hours}
+    _save_cooldowns(data)
+    print(f"[Position Manager] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h")
+
+
+def clear_loss_streak(token: str, direction: str) -> None:
+    """Clear loss cooldown and streak entirely. Used when a win confirms the direction."""
+    key = f"{token.upper()}:{direction.upper()}"
+    data = _load_cooldowns()
+    if key in data:
+        del data[key]
+        _save_cooldowns(data)
+        print(f"[Position Manager] LOSS STREAK CLEARED: {token} {direction}")
+
+
+def get_loss_streak(token: str, direction: str) -> int:
+    """Return current loss streak for token+direction, or 0."""
+    key = f"{token.upper()}:{direction.upper()}"
+    data = _clean_expired(_load_cooldowns())
+    return data.get(key, {}).get("streak", 0)
+
+
+def get_loss_cooldown_remaining(token: str, direction: str) -> float:
+    """Return hours remaining on loss cooldown, or 0 if none."""
+    key = f"{token.upper()}:{direction.upper()}"
+    data = _load_cooldowns()
+    entry = data.get(key, {})
+    # Old format: entry is a float (unix ts). New: entry is a dict.
+    if isinstance(entry, float):
+        expiry = entry
+    else:
+        expiry = entry.get("expires", 0)
+    now = datetime.now(timezone.utc).timestamp()
+    if expiry <= now:
+        return 0.0
+    return max(0, (expiry - now) / 3600)
+
+
+# ─── Wrong-Side Learning ────────────────────────────────────────────────────────
+# After a loss, analyze whether the market moved against us FIRST
+# before eventually moving in our favor (wrong-side entry = we faded a real move)
+# Stores findings in a JSON file for decider to use as a pre-trade filter
+
+WRONG_SIDE_FILE = '/var/www/hermes/data/wrong_side_learning.json'
+
+
+def _load_wrong_side() -> Dict:
+    """Load wrong-side learning data."""
+    try:
+        if os.path.exists(WRONG_SIDE_FILE):
+            with open(WRONG_SIDE_FILE) as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+
+def _save_wrong_side(data: Dict) -> None:
+    """Save wrong-side learning data."""
+    try:
+        os.makedirs(os.path.dirname(WRONG_SIDE_FILE), exist_ok=True)
+        with open(WRONG_SIDE_FILE, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+    except Exception:
+        pass
+
+
+def _analyze_loss_direction(token: str, direction: str, entry_price: float, exit_price: float) -> None:
+    """
+    Post-mortem on a losing trade.
+
+    Check: did price move AGAINST us first (counter-move), before eventually
+    moving in our favor and hitting our SL?
+
+    Example: we SHORT at $10, price spikes to $10.50 (we're wrong), then
+    eventually drifts back down and we exit near $10.30 via trailing SL.
+    This tells us the initial move was real — we were on the wrong side.
+
+    Stores count + avg counter-move % per token+direction.
+    Future SHORTs on KAITO will check this and require stronger confirmation.
+    """
+    import sqlite3 as _sqlite3
+
+    token_upper = token.upper()
+    key = f"{token_upper}:{direction.upper()}"
+
+    try:
+        # Get price history for the last ~4 hours to find the counter-move
+        conn = _sqlite3.connect('/root/.hermes/data/signals_hermes.db')
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT timestamp, price FROM price_history
+            WHERE token=? AND timestamp > datetime('now', '-4 hours')
+            ORDER BY timestamp ASC
+        """, (token_upper,))
+        rows = cur.fetchall()
+        conn.close()
+
+        if len(rows) < 5:
+            return
+
+        prices = [(int(r[0]), float(r[1])) for r in rows]  # (unix_ts, price)
+        entry_ts = None
+
+        # Find the bar closest to entry_price (within 2%)
+        entry_val = float(entry_price or 0)
+        for ts, p in prices:
+            if entry_val > 0 and abs(p - entry_val) / entry_val < 0.02:
+                entry_ts = ts
+                break
+
+        if entry_ts is None:
+            return
+
+        # Slice prices from entry onward
+        post_entry = [(ts, p) for ts, p in prices if ts >= entry_ts]
+        if len(post_entry) < 2:
+            return
+
+        if direction.upper() == 'SHORT':
+            # For SHORT: we want price to go DOWN. Bad = price went UP first (counter-move)
+            worst_idx = max(range(len(post_entry)), key=lambda i: post_entry[i][1])
+            worst_ts, worst_price = post_entry[worst_idx]
+            counter_move = (worst_price - entry_val) / entry_val * 100
+        else:  # LONG
+            # For LONG: we want price to go UP. Bad = price went DOWN first (counter-move)
+            worst_idx = min(range(len(post_entry)), key=lambda i: post_entry[i][1])
+            worst_ts, worst_price = post_entry[worst_idx]
+            counter_move = (entry_val - worst_price) / worst_price * 100
+
+        # Only record if counter-move > 0.5% (small noise doesn't count)
+        if counter_move < 0.5:
+            print(f"[Loss Analysis] {token} {direction}: no counter-move ({counter_move:.2f}%)")
+            return
+
+        # Check how long until the counter-move peak (in minutes)
+        counter_minutes = (worst_ts - entry_ts) / 60 if worst_ts > entry_ts else 0
+
+        # Update learning data
+        data = _load_wrong_side()
+        if key not in data:
+            data[key] = {"count": 0, "total_counter_pct": 0.0, "total_minutes": 0, "last_seen": None}
+
+        entry = data[key]
+        entry["count"] = entry.get("count", 0) + 1
+        entry["total_counter_pct"] = entry.get("total_counter_pct", 0.0) + counter_move
+        entry["total_minutes"] = entry.get("total_minutes", 0) + counter_minutes
+        entry["last_seen"] = datetime.now(timezone.utc).isoformat()
+        entry["avg_counter_pct"] = round(entry["total_counter_pct"] / entry["count"], 2)
+        entry["avg_minutes"] = round(entry["total_minutes"] / entry["count"], 1)
+
+        _save_wrong_side(data)
+        print(f"[Loss Analysis] WRONG SIDE: {token} {direction} counter-move=+{counter_move:.2f}% "
+              f"(took {counter_minutes:.0f}min) | avg now={entry['avg_counter_pct']:.2f}% | n={entry['count']}")
+
+    except Exception as e:
+        print(f"[Loss Analysis] Error analyzing {token} {direction}: {e}")
+
+
+def is_wrong_side_risky(token: str, direction: str, confidence: float = 70) -> Tuple[bool, str]:
+    """
+    Pre-trade check: should we be more careful entering this token+direction?
+
+    Returns (is_risky, reason_str)
+    - True if wrong-side entries are common (>3 occurrences) AND avg counter-move > 1.5%
+    - Reduces confidence by 15 pts as a penalty for wrong-side history
+    """
+    key = f"{token.upper()}:{direction.upper()}"
+    data = _load_wrong_side()
+    entry = data.get(key, {})
+
+    if not entry:
+        return False, ""
+
+    count = entry.get("count", 0)
+    avg_pct = entry.get("avg_counter_pct", 0)
+    avg_min = entry.get("avg_minutes", 0)
+
+    if count >= 3 and avg_pct >= 1.5:
+        reason = f"wrong-side x{count} avg+{avg_pct:.1f}%/{avg_min:.0f}min"
+        return True, reason
+
+    return False, ""
 
 
 # ─── Win Cooldown ────────────────────────────────────────────────────────────────
@@ -977,35 +1197,17 @@ def _set_win_cooldown(token: str, direction: str, minutes: float = WIN_COOLDOWN_
     """Block re-entry for same token+direction for N minutes after a win."""
     key = _win_cd_key(token, direction)
     expiry = datetime.now(timezone.utc).timestamp() + (minutes * 60)
-    data = _load_loss_cooldown()  # reuse the same file
-    data[key] = expiry
-    _save_loss_cooldown(data)
-    print(f"[Position Manager] WIN COOLDOWN: {token} {direction} blocked for {minutes}min")
+    data = _load_cooldowns()
+    data[key] = {"expires": expiry, "streak": 0}
+    _save_cooldowns(data)
+    print(f"[Position Manager] WIN COOLDOWN: {token} {direction} blocked for {minutes:.0f}min")
 
 
 def _is_win_cooldown_active(token: str, direction: str) -> bool:
     """Return True if token+direction is in win cooldown."""
     key = _win_cd_key(token, direction)
-    data = _load_loss_cooldown()
-    if key not in data:
-        return False
-    expiry = data[key]
-    if datetime.now(timezone.utc).timestamp() >= expiry:
-        del data[key]
-        _save_loss_cooldown(data)
-        return False
-    return True
-
-
-def get_loss_cooldown_remaining(token: str, direction: str) -> float:
-    """Return hours remaining on loss cooldown, or 0 if none."""
-    key = f"{token.upper()}:{direction.upper()}"
-    data = _load_loss_cooldown()
-    if key not in data:
-        return 0
-    expiry = data[key]
-    remaining = expiry - datetime.now(timezone.utc).timestamp()
-    return max(0, remaining / 3600)
+    data = _clean_expired(_load_cooldowns())
+    return key in data
 
 
 # ─── Main / Test ──────────────────────────────────────────────────────────────

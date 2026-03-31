@@ -10,7 +10,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import init_db, get_approved_signals, get_pending_signals, mark_signal_executed
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
-                              _is_win_cooldown_active)
+                              _is_win_cooldown_active, is_wrong_side_risky)
 from hyperliquid_exchange import is_live_trading_enabled
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
@@ -548,6 +548,19 @@ def run(dry_run=False):
             log(f'SKIP: {token} {direction} in win cooldown')
             skipped += 1
             continue
+
+        # ── Wrong-Side Learning ───────────────────────────────────
+        # If this token+direction has a history of wrong-side entries (>3x avg counter-move >1.5%),
+        # penalize confidence by 15 pts. If below threshold after penalty, skip.
+        is_risky, risk_reason = is_wrong_side_risky(token, direction, confidence)
+        if is_risky:
+            adjusted_conf = confidence - 15
+            if adjusted_conf < 55:  # below new threshold
+                log(f'SKIP: {token} {direction} {risk_reason} (conf {confidence:.0f}% -> {adjusted_conf:.0f}%)')
+                skipped += 1
+                continue
+            log(f'WARN: {token} {direction} {risk_reason} (conf {confidence:.0f}% -> {adjusted_conf:.0f}%)')
+            confidence = adjusted_conf
 
         # ── Direction Awareness ───────────────────────────────────
         # Skip LONG/SHORT if it has < 50% win rate in recent history (min 3 trades)

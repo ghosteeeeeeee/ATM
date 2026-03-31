@@ -798,24 +798,35 @@ def compute_score(token, direction, long_mult, short_mult):
     regime_mult = long_mult if direction == 'LONG' else short_mult
     regime_mod = +5 if regime_mult > 1.0 else 0
 
-    # ── 4h Trend Filter for SHORTs ────────────────────────────────
-    # In a sustained uptrend, shorting a rising price = countertrend suicide.
-    # Block SHORTs that have already run >20% in 4h. Reduce by 15pts if >10%.
+    # ── 4h Trend Filter ─────────────────────────────────────────────
+    # Block or penalize entries that are fighting a strong established trend.
+    # SHORTs: block if +20% in 4h, -15 if +10%, -5 if +5%
+    # LONGs:  block if -20% in 4h, -15 if -10%, -5 if -5%
     TREND_LOOKBACK = 240   # 240 × 1min = 4 hours
     trend_penalty = 0
     trend_reason = ''
-    if direction == 'SHORT' and len(rows) >= TREND_LOOKBACK:
+    if len(rows) >= TREND_LOOKBACK:
         price_4h_ago = float(rows[-TREND_LOOKBACK][1])
         if price_4h_ago and price_4h_ago > 0:
             chg_4h = (float(price) - price_4h_ago) / price_4h_ago * 100
-            if chg_4h > 20:
-                return None, None   # SHORT blocked — strong uptrend in progress
-            elif chg_4h > 10:
-                trend_penalty = 15
-                trend_reason = f'+{chg_4h:.1f}% in 4h(short reduced)'
-            elif chg_4h > 5:
-                trend_penalty = 5
-                trend_reason = f'+{chg_4h:.1f}% in 4h'
+            if direction == 'SHORT':
+                if chg_4h > 20:
+                    return None, None
+                elif chg_4h > 10:
+                    trend_penalty = 15
+                    trend_reason = f'+{chg_4h:.1f}% in 4h(short reduced)'
+                elif chg_4h > 5:
+                    trend_penalty = 5
+                    trend_reason = f'+{chg_4h:.1f}% in 4h'
+            else:  # LONG
+                if chg_4h < -20:
+                    return None, None
+                elif chg_4h < -10:
+                    trend_penalty = 15
+                    trend_reason = f'{chg_4h:.1f}% in 4h(long reduced)'
+                elif chg_4h < -5:
+                    trend_penalty = 5
+                    trend_reason = f'{chg_4h:.1f}% in 4h'
 
     # ── Score assembly ─────────────────────────────────────────
     # z_score: 0-30 | velocity: 0-10 | volume: 0-10 (or negative) | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1 | trend_penalty: 0-15
