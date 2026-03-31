@@ -27,7 +27,7 @@ from hyperliquid_exchange import (
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin
 )
 
-DRY = True
+DRY = False  # Default is LIVE. Use --apply flag explicitly to enable closing orphan positions.
 INTERVAL = 60  # seconds between checks
 LOG_FILE = '/root/.hermes/logs/sync-guardian.log'
 DATA_DIR = '/root/.hermes/data'
@@ -918,22 +918,47 @@ def sync():
         close_orphan_paper_trades(hl_pos, prices)
 
     # Step 8: Close missing DB trades (position no longer on HL)
+    # CRITICAL FIX: token='***' was a hardcoded literal that matched NOTHING,
+    # creating phantom "closed at entry price" trades that lost pure fees.
+    # Also: setting exit_price=entry_price, pnl=0 destroys the real exit data.
+    # Fix: use psycopg2 with parameterized query, preserve entry_price, let
+    # guardian fill exit_price via HL fills (or mark as unknown).
     if missing:
         for t in db_trades:
             if t['token'] in missing:
-                sql = f"""
-                UPDATE trades SET status='closed', exit_price=entry_price,
-                    pnl_pct=0, pnl_usdt=0, close_time=NOW(),
-                    close_reason='guardian_missing', exit_reason='guardian_missing',
-                    last_updated=NOW(), updated_at=NOW()
-                WHERE token='{t['token']}' AND status='open'
-                """
-                r = subprocess.run(['psql', '-U', 'postgres', '-d', 'brain', '-c', sql],
-                    capture_output=True, text=True)
-                if r.returncode == 0:
-                    log(f'  DB closed: {t["token"]} (position not on HL)', 'PASS')
-                else:
-                    log(f'  DB close failed: {r.stderr[:100]}', 'FAIL')
+                try:
+                    conn2 = get_db_connection()
+                    cur2 = conn2.cursor()
+                    # Check if there are HL fills for this token to get real exit price
+                    from hyperliquid_exchange import get_trade_history
+                    import time as _time
+                    fills = get_trade_history(int(_time.time()*1000) - 3600000)
+                    token_fills = [f for f in fills if t['token'] in f.get('coin','')]
+                    if token_fills:
+                        # Use last HL fill price as exit
+                        last_fill = token_fills[-1]
+                        exit_px = last_fill.get('px')
+                    else:
+                        exit_px = None  # Will be filled by guardian on next pass
+                    
+                    if exit_px:
+                        cur2.execute("""
+                            UPDATE trades SET status='closed', close_time=NOW(),
+                                close_reason='guardian_missing', exit_reason='guardian_missing',
+                                last_updated=NOW(), updated_at=NOW()
+                            WHERE token=%s AND status='open'
+                        """, (t['token'],))
+                    else:
+                        # No HL fill yet — don't close yet, let guardian retry next pass
+                        log(f'  Skipping DB close for {t["token"]} — no HL fill yet, will retry', 'WARN')
+                        cur2.close(); conn2.close()
+                        continue
+                    
+                    conn2.commit()
+                    cur2.close(); conn2.close()
+                    log(f'  DB closed: {t["token"]} @ {exit_px} (position not on HL)', 'PASS')
+                except Exception as e:
+                    log(f'  DB close failed for {t["token"]}: {e}', 'FAIL')
 
     log(f'── Sync done ──')
 

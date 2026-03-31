@@ -42,3 +42,16 @@
 01:20:32 interrupt fired: msg='SKR is a new trade', children=0, parent._interrupt=True
 02:56:49 ENTER: queued interrupt msg='Sometimes when RSI is greater than 80 it does not cooldwon f', agent_running=True
 02:56:49 interrupt fired: msg='Sometimes when RSI is greater than 80 it does not cooldwon f', children=0, parent._interrupt=True
+10:13:37 ENTER: queued interrupt msg='1. For the last set of (confluence) signals we added, try an', agent_running=True
+10:13:37 interrupt fired: msg='1. For the last set of (confluence) signals we added, try an', children=1, parent._interrupt=True
+  child[0]._interrupt=True
+10:48:13 ENTER: queued interrupt msg='ZEC same story', agent_running=True
+10:48:13 interrupt fired: msg='ZEC same story', children=0, parent._interrupt=True
+17:07:44 interrupt fired: msg='any luck?', children=0, parent._interrupt=True
+17:07:44 ENTER: queued interrupt msg='any luck?', agent_running=True
+17:42:54 ENTER: queued interrupt msg="Give Openclaw's signals a minimum base weight of 70%, so the", agent_running=True
+17:42:54 interrupt fired: msg="Give Openclaw's signals a minimum base weight of 70%, so the", children=0, parent._interrupt=True
+18:07:26 ENTER: queued interrupt msg='only the mtf script that fired those trades', agent_running=True
+18:07:26 interrupt fired: msg='only the mtf script that fired those trades', children=0, parent._interrupt=True
+18:09:43 ENTER: queued interrupt msg="I'm off for a bit, continue fixing, set a 15 min cron remind", agent_running=True
+18:09:43 interrupt fired: msg="I'm off for a bit, continue fixing, set a 15 min cron remind", children=0, parent._interrupt=True

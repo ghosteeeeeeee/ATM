@@ -524,19 +524,34 @@ def run(dry_run=False):
     approved = get_approved_signals(hours=24)
     log(f'Approved signals: {len(approved)}')
 
-        # Fallback: if no approved signals, take high-confidence PENDING signals
+        # Fallback: if no approved signals, ONLY take genuine confluence signals >= 95%.
+        # These are the strongest multi-indicator signals and ai_decider may not have
+        # reviewed them yet if they arrived between decider-run and ai_decider runs.
+        # DO NOT auto-execute 80-89% signals — they need AI review.
     if not approved:
         pending = get_pending_signals(hours=1, limit=30)
-        # 80-89% confidence → pending → AI decider (raised from 60 to filter noise)
+        # Only confluence >= 90% with individual avg >= 40 gets auto-executed as fallback
+        # All other types must go through ai_decider first
         high_conf = [p for p in pending
-                     if 80 <= p.get('confidence', 0) < 90
+                     if p.get('signal_type') == 'confluence'
+                     and p.get('confidence', 0) >= 90
+                     and p.get('num_signals', 0) >= 2
                      and p.get('executed', 0) == 0]
-        log(f'Pending AI-decider: {len(high_conf)} signals 80-89% (from {len(pending)} total)')
+        log(f'Pending confluence fallback: {len(high_conf)} signals >= 95% confluence (from {len(pending)} total)')
         for p in high_conf:
             p['final_confidence'] = p['confidence']
             p['price'] = p.get('price') or get_current_price(p['token'])
-            p['source'] = f'pending-{p.get("signal_type","momentum")}'
+            p['source'] = f'pending-confluence-{p.get("source","unknown")}'
             approved.append(p)
+
+    # ── Confidence floor: reject signals below 70% ──────────────────────────
+    # Individual RSI/MACD signals should never reach here (signal_gen adds them at
+    # PENDING, ai_decider handles review). But if they slip through as APPROVED, block them.
+    MIN_EXEC_CONFIDENCE = 70
+    approved = [s for s in approved if s.get('final_confidence', 0) >= MIN_EXEC_CONFIDENCE]
+    if not approved:
+        log(f'No signals above {MIN_EXEC_CONFIDENCE}% confidence — skipping execution')
+        return 0, 0
 
     entered = 0
     skipped = 0

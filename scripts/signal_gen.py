@@ -94,7 +94,7 @@ AUTO_APPROVE          = 95    # ≥ this → auto-approve (momentum uses PENDING
 CONFLUENCE_MIN_SIGNALS = 2   # minimum agreeing signals to trigger confluence
 CONFLUENCE_BOOST_2     = 1.25 # 1.25x confidence boost for 2 signals
 CONFLUENCE_BOOST_3PLUS = 1.50 # 1.5x confidence boost for 3+ signals
-CONFLUENCE_AUTO_APPROVE = 85  # confluence signal ≥ this → auto-approve (no AI needed)
+CONFLUENCE_AUTO_APPROVE = 75  # confluence signal ≥ this → auto-approve (no AI needed)
 
 # Individual signal thresholds for confluence-ready signal table population
 # These are LOWER than ENTRY_THRESHOLD so confluence can combine weak-but-aligned signals
@@ -143,7 +143,7 @@ LONG_4H_Z_MAX   = +0.3    # 4H z-score must be below this
 LONG_30M_Z_MAX  = +0.5    # 30m z-score must be below this
 LONG_AGREE_TFS  = 2       # Require at least 2 of (1h, 4h, 30m) to agree
 # Broad market trend: if BTC+ETH+SOL avg 4h z > this, block LONGs
-BROAD_UPTEND_Z   = +1.0    # If avg 4h z > +1.0 → block all LONG entries
+BROAD_UPTEND_Z   = +2.0    # If avg 4h z > +2.0 → block all LONG entries (relaxed from 1.0 — BTC/ETH trending up is healthy, don't block longs on that alone)
 
 # ─── Per-Token Rate Limiting ─────────────────────────────────────────
 MIN_TRADE_INTERVAL_MINUTES = 10   # min minutes between trades on same token
@@ -300,15 +300,17 @@ def compute_zscore_percentile(prices, window=500):
     # Directional percentiles based on PRICE position (not z-score)
     # pct_long: what % of historical prices are BELOW current price?
     #   HIGH pct_long = suppressed price = good LONG entry (low = elevated = bad)
-    # pct_short: what % of historical prices are ABOVE current price?
-    #   HIGH pct_short = elevated price = good SHORT entry (low = suppressed = bad)
+    # pct_short: what % of historical prices are BELOW current price?
+    #   HIGH pct_short = suppressed = BAD for SHORT (low = elevated = good for SHORT)
     #
     # Use raw price percentile, not z-score percentile, for directional signals.
     # pct_rank (above) = z-score percentile = useful for phase, NOT direction.
     price_below = sum(1 for z in z_values if z <= current_z)
     price_above = sum(1 for z in z_values if z >= current_z)
     pct_long  = round((price_below / len(z_values)) * 100, 1)
-    pct_short = round((price_above / len(z_values)) * 100, 1)
+    # FIX: pct_short should be % BELOW current (inverted from % ABOVE)
+    # High pct_short = suppressed = bad for SHORT; Low pct_short = elevated = good for SHORT
+    pct_short = round(((len(z_values) - price_below) / len(z_values)) * 100, 1)
 
     return pct_rank, pct_long, pct_short
 
@@ -545,6 +547,12 @@ def get_momentum_stats(token):
         momentum_state = 'neutral'
         state_confidence = 0.3
 
+    # ── RSI and MACD (computed once, reused by compute_score and run loop) ──
+    rsi_14_val = rsi(prices) if len(prices) >= 30 else None
+    macd_line_val, macd_hist_val = macd(prices) if len(prices) >= 40 else (None, None)
+    macd_sig_val = macd(prices)[0] if len(prices) >= 40 else None
+    macd_signal_val = (macd_sig_val - macd_hist_val) if (macd_sig_val is not None and macd_hist_val is not None) else None
+
     result = {
         'percentile': percentile,
         'percentile_long': pct_long,
@@ -557,6 +565,11 @@ def get_momentum_stats(token):
         'z_direction': z_direction,
         'momentum_state': momentum_state,
         'state_confidence': round(state_confidence, 3),
+        # RSI and MACD cached here to avoid recomputation
+        'rsi_14': rsi_14_val,
+        'macd_line': macd_line_val,
+        'macd_hist': macd_hist_val,
+        'macd_signal': macd_signal_val,
     }
 
     # Persist to DB
@@ -713,7 +726,7 @@ def compute_score(token, direction, long_mult, short_mult):
 
     rows   = get_price_history(token, lookback_minutes=60480)
     prices = [r[1] for r in rows] if rows else []
-    if len(prices) < 60:
+    if len(prices) < 30:
         return None, None
 
     # ── Core momentum metrics ──────────────────────────────────
@@ -739,8 +752,9 @@ def compute_score(token, direction, long_mult, short_mult):
         else:
             phase = detect_phase(dir_percentile, velocity)
     else:
-        dir_percentile = 100 - percentile_short   # invert: pct_short=100 → 0
-        # At extreme elevation: never quiet, treat as extreme
+        # pct_short = % BELOW current price (same direction as pct_long)
+        dir_percentile = percentile_short
+        # At extreme suppression: never long, treat as extreme
         if percentile_short >= 80:
             phase = 'extreme'
         else:
@@ -759,23 +773,34 @@ def compute_score(token, direction, long_mult, short_mult):
     # pct_contrib is 0-60, velocity + phase give another 0-30
     # Target: suppressed pct_long=35 → ~50 pts + good phase/vel → hits 65+
     def pct_long_score_fn(pct):
-        # pct_long = % below current → LOW = suppressed = good for LONG
-        # pct 50→0pts, pct 35→30pts, pct 20→60pts (capped)
+        # pct_long = % BELOW current price
+        # In BULL markets, price trending UP means pct_long stays elevated
+        #   → pct_long=65 in a bull market = still valid long (suppressed vs recent pumps)
+        #   → pct_long=40 = better long (more discounted)
+        # In neutral/bear markets: pct_long elevated = bad (don't long near highs)
+        #
+        # SCORING (bull regime): pct_long=65 → 0pts, pct_long=50 → 30pts, pct_long=30 → 50pts
+        # SCORING (bear/neutral): pct_long=50 → 0pts, pct_long=30 → 50pts, pct_long=20 → 60pts
         if pct >= 50:
-            return 0.0
+            # Elevated — still give some score in bull regime (trend continuation)
+            bull_mult = 1.5 if (phase == 'accelerating' and avg_z < 0) else 1.0
+            return max(0.0, (50 - pct) / 20 * 15) * bull_mult  # 50→0pts, 65→0pts
         if pct <= 20:
-            return min(60.0, (50 - pct) / 10 * 60)
-        return (50 - pct) / 30 * 30
+            return min(60.0, (50 - pct) / 10 * 60)  # deeply suppressed = strong long
+        return (50 - pct) / 30 * 50  # 50→0, 30→33, 20→50
 
     def pct_short_score_fn(pct):
-        # pct_short = % above current → HIGH = elevated = good for SHORT
-        # Give positive score for elevated prices, 0 for suppressed
-        # pct 40→0pts, pct 55→30pts, pct 70→60pts (capped)
-        if pct <= 40:
+        # pct_short = % BELOW current price
+        # HIGH pct_short = suppressed price = bad for SHORT (price near highs = good SHORT)
+        # pct_short=50 → 50% below → at median → neutral → 0 pts
+        # pct_short=70 → 70% below → elevated → moderate SHORT signal → 27 pts
+        # pct_short=85 → 85% below → very elevated → strong SHORT signal → 60 pts
+        # pct_short=90 → 90% below → extreme elevation → capped at 60 pts
+        if pct <= 50:
             return 0.0
-        if pct >= 70:
-            return min(60.0, (pct - 40) / 10 * 60)
-        return (pct - 40) / 30 * 30
+        if pct <= 85:
+            return (pct - 50) / 35 * 45   # 50→0pts, 70→26pts, 85→45pts
+        return min(60.0, 45.0 + (pct - 85) / 15 * 15)  # 85→45pts, 100→60pts (hard cap)
 
     p_long  = pct_long_score_fn(percentile_long)
     p_short = pct_short_score_fn(percentile_short)
@@ -790,20 +815,25 @@ def compute_score(token, direction, long_mult, short_mult):
     # (vol_roc > 1.0 = 100%+ surge → gives one additional grace pass)
     vol_grace = vol_roc_val >= 1.0 and pct_score >= 10  # strong vol + some pct signal
     if phase == 'quiet':
-        # Loosen: allow quiet phase signals for mean reversion setups
-        # LONG: pct_long must be suppressed enough to score points
-        # SHORT: pct_short must be elevated enough to score points
+        # Quiet = ranging/sideways = ideal mean reversion setup for BOTH directions
+        # LONG:  pct_long must be <= 40 (suppressed enough to mean-revert up)
+        # SHORT: pct_short must be >= 60 (elevated enough to mean-revert down)
         has_pct_signal = (direction == 'LONG' and percentile_long <= 40) or \
                          (direction == 'SHORT' and percentile_short >= 60)
         if not (vol_grace or has_pct_signal):
             return None, None
-        phase_mod = +1
+        # Give strong phase_mod for quiet mean reversion (vs +1 before)
+        # Enough to let suppressed/elevated setups with good z hit 65+
+        phase_mod = +5
         phase_reason = 'quiet-mean-reversion' if has_pct_signal else 'quiet-vol-surge'
 
     elif phase == 'extreme':
         if direction == 'LONG':
             return None, None   # never long in extreme zone
-        phase_mod = +5
+        # SHORT in extreme zone: cap boost at +3 (vs +5 for other phases)
+        # Extreme = extreme elevation = very risky reversal candidate
+        # We still allow it but don't reward disproportionately
+        phase_mod = +3
         phase_reason = 'extreme-short'
 
     elif phase == 'exhaustion':
@@ -854,7 +884,8 @@ def compute_score(token, direction, long_mult, short_mult):
     # SHORT: RSI < 40 (oversold) = squeeze risk, heavy negative penalty
     # LONG:  RSI < 40 (oversold) = confirmed long, positive score
     # LONG:  RSI > 60 (overbought) = squeeze risk, heavy negative penalty
-    rsi_val = rsi(prices) if len(prices) >= 30 else None
+    # NOTE: RSI is cached in get_momentum_stats() — reuse it here
+    rsi_val = mom.get('rsi_14')
     rsi_score = 0.0
     rsi_reason = ''
     if rsi_val is not None:
@@ -892,7 +923,8 @@ def compute_score(token, direction, long_mult, short_mult):
                 rsi_reason = f'RSI={rsi_val:.0f}(overbought-squeeze-risk)'
 
     # ── MACD confirmation (0-1 pts) ───────────────────────────
-    _, hist = macd(prices) if len(prices) >= 40 else (None, None)
+    # NOTE: MACD is cached in get_momentum_stats() — reuse it here
+    hist = mom.get('macd_hist')
     macd_score = 0.0
     macd_reason = ''
     if hist is not None:
@@ -1091,7 +1123,7 @@ def score_for_counter_spike(token: str, direction: str, long_mult: float, short_
 # ── RSI signals for confluence ────────────────────────────────────────────────
 def _run_rsi_signals_for_confluence():
     """Add RSI as standalone signal — filtered to only fire when trend aligns."""
-    from signal_schema import compute_rsi
+    from signal_schema import compute_rsi, compute_zscore
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     # Get broad market trend once
@@ -1147,7 +1179,7 @@ def _run_rsi_signals_for_confluence():
 # ── MACD signals for confluence ───────────────────────────────────────────────
 def _run_macd_signals_for_confluence():
     """Add MACD histogram as standalone signal — filtered like RSI to stay in pipeline."""
-    from signal_schema import compute_macd
+    from signal_schema import compute_macd, compute_zscore
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     # Blacklist: tokens with 0-20% SHORT win rate
@@ -1206,8 +1238,12 @@ def run_confluence_detection():
     # Query open positions locally (open_pos is in run() scope, not accessible here)
     open_pos_local = {t: d for t, d in [(p['token'], p['direction']) for p in _get_open_pos()]}
 
-    # Get confluence groups: tokens with ≥2 PENDING signal types in last 60 min
-    confluences = get_confluence_signals(hours=1, min_signals=CONFLUENCE_MIN_SIGNALS)
+    # Get confluence groups: tokens with ≥2 PENDING signal types in last 60 min.
+    # Includes ALL signal types — both Hermes (rsi_confluence, macd_confluence, momentum)
+    # and OpenClaw (mtf_macd, rsi, z_score, mtf-momentum+rsi, etc).
+    # The mtf- vs Hermes distinction is determined by source prefix, not signal_type.
+    confluences = get_confluence_signals(hours=1, min_signals=CONFLUENCE_MIN_SIGNALS,
+                                         signal_types=None)  # query all types
 
     confluences_added = 0
     for c in confluences:
@@ -1224,25 +1260,60 @@ def run_confluence_detection():
         if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
             continue
 
-        # Calculate boosted confidence
-        # Boost the raw avg by the signal-count multiplier so decider-run's
-        # ENTRY_THRESHOLD (75) acts as the real gate. Individual signals
-        # capped at 50 ensure RSI/MACD alone can't auto-trade.
-        if num_signals >= 3:
-            boosted = min(99, avg_conf * 2.0)
-        else:
-            boosted = min(99, avg_conf * 1.5)
+        # Fetch per-source confidences from both DBs for accurate scoring.
+        # OpenClaw mtf- signals are floored at 70%.
+        # Hermes RSI/MACD contribute their actual confidence.
+        conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+        cc = conn.cursor()
+        if os.path.exists('/root/.openclaw/workspace/data/signals.db'):
+            try:
+                cc.execute("ATTACH DATABASE '/root/.openclaw/workspace/data/signals.db' AS oc")
+            except Exception:
+                pass
+        cc.execute('''
+            SELECT source, confidence FROM (
+                SELECT source, confidence FROM signals
+                WHERE token=? AND direction=? AND decision='PENDING'
+                AND created_at > datetime('now','-60 minutes')
+                AND source NOT LIKE 'mtf-%%'  -- Hermes signals only
+                UNION ALL
+                SELECT source, confidence FROM oc.signals
+                WHERE token=? AND direction=? AND decision='PENDING'
+                AND created_at > datetime('now','-60 minutes')
+                AND source LIKE 'mtf-%%'  -- OpenClaw mtf signals only
+            )
+        ''', (token, direction, token, direction))
+        all_rows = cc.fetchall()
+        conn.close()
+        if not all_rows:
+            continue
 
-        # Check: only add if individual signals haven't already hit ENTRY_THRESHOLD
-        # (prevents double-signals for same token+direction)
+        # Separate and score
+        mtf_rows     = [(src, max(70, conf)) for src, conf in all_rows if src and src.startswith('mtf-')]
+        hermes_rows  = [(src, conf) for src, conf in all_rows if src and not src.startswith('mtf-')]
+        hermes_confs = [conf for _, conf in hermes_rows]
+        mtf_confs    = [conf for _, conf in mtf_rows]
+        hermes_avg   = statistics.mean(hermes_confs) if hermes_confs else 0
+        mtf_avg      = statistics.mean(mtf_confs) if mtf_confs else 0
+        base_avg     = (hermes_avg + mtf_avg) / 2 if (hermes_avg or mtf_avg) else 0
+        mtf_sources_str    = ','.join(sorted(set(src for src, _ in mtf_rows))) if mtf_rows else 'none'
+        hermes_sources_str = ','.join(sorted(set(src for src, _ in hermes_rows))) if hermes_rows else 'none'
+
+        if base_avg < 35:
+            continue
+        if num_signals >= 3:
+            boosted = min(99, base_avg * 1.5)
+        else:
+            boosted = min(99, base_avg * 1.25)
+
+        mtf_sources    = mtf_sources_str
+        hermes_sources = hermes_sources_str
+
         prices_dict = get_all_latest_prices()
         price = prices_dict.get(token, {}).get('price') if prices_dict else None
         if not price:
             continue
 
-        # Add the confluence signal as a distinct row (ai_decider reads it by confidence)
-        # Add as PENDING — decider-run handles entry decision (filters, SL, AB assignment)
-        # Confluence signal_type is informational: tells decider this is a multi-signal agreement
         sid = add_confluence_signal(
             token=token,
             direction=direction,
@@ -1254,12 +1325,13 @@ def run_confluence_detection():
             macd_hist=c.get('macd_hist'),
         )
 
-        if boosted >= 85:
-            log(f'CONFLUENCE: {token} {direction} @{price:.6f} '
-                f'{boosted:.1f}% ({num_signals}s: {c.get("types","")}) — HIGH CONF → decider')
-        else:
-            log(f'CONFLUENCE: {token} {direction} @{price:.6f} '
-                f'{boosted:.1f}% ({num_signals}s: {c.get("types","")}) → decider')
+        # Log full source breakdown for post-trade study — which combo worked?
+        log(f'CONFLUENCE: {token} {direction} @{price:.6f} '
+            f'conf={boosted:.1f}% ({num_signals}s) '
+            f'mtf=[{mtf_sources}] hermes=[{hermes_sources}] '
+            f'mtf_avg={mtf_avg:.1f}% hermes_avg={hermes_avg:.1f}%')
+        print(f'  CONFLUENCE {token:8s} {direction:5s} conf={boosted:5.1f}% ({num_signals}s) '
+              f'mtf=[{mtf_sources}] hermes=[{hermes_sources}]')
 
         set_cooldown(token, direction, hours=1)
         confluences_added += 1
@@ -1287,7 +1359,10 @@ def run():
     active_tokens = set(prices_dict.keys())
     print(f'  Active universe: {len(active_tokens)} tokens (full universe)')
 
-    # Volume data: skip background prefetch entirely.
+    # Volume prefetch DISABLED — HL rate limits aggressively on /info recentTrades.
+    # Volume ROC is 0-10 bonus pts only. Cold cache means vol_score=0 for all tokens,
+    # which is fine — the scoring model still works, just without the volume bonus.
+    # To re-enable: fetch volume in a separate slower cron job (e.g. every 5 min).
     # signal_gen completes in <2s without it. Volume ROC is a minor bonus (0-10pts)
     # that builds up naturally across consecutive runs. If you want active volume
     # prefetching, move it to a separate cron job at a different schedule.
@@ -1324,16 +1399,11 @@ def run():
                     print(f'  LONG-B {token:8s} {score:5.1f}% [BLOCKED] {long_filter_reason}')
                     blocked += 1
                 else:
-                    # Pre-compute RSI/MACD for add_signal
-                    prices_all = get_price_history(token, lookback_minutes=60480)
-                    prices_list = [r[1] for r in prices_all] if prices_all else []
-                    rsi_14_val = rsi(prices_list) if len(prices_list) >= 30 else None
-                    macd_line_val, macd_hist_val = macd(prices_list) if len(prices_list) >= 40 else (None, None)
-                    macd_sig_val = macd(prices_list)[0] if len(prices_list) >= 40 else None
-                    if macd_sig_val and macd_hist_val:
-                        macd_signal_val = macd_sig_val - macd_hist_val
-                    else:
-                        macd_signal_val = None
+                    # Use RSI/MACD cached in get_momentum_stats() (called at line 1349)
+                    rsi_14_val = mom.get('rsi_14') if mom else None
+                    macd_line_val = mom.get('macd_line') if mom else None
+                    macd_hist_val = mom.get('macd_hist') if mom else None
+                    macd_signal_val = mom.get('macd_signal') if mom else None
                     sources = '+'.join(sorted(set(s[0] for s in signals)))
                     reasons = ' | '.join(s[3] for s in signals[:4])
 
@@ -1462,9 +1532,15 @@ def run():
     print(f'=== Done: {added} signals | {blocked} blocked | {len(exits)} exit alerts ===')
 
     # ── Confluence Detection ────────────────────────────────────
-    # Run patched _run_rsi/macd functions (with z_score + filters), then check for confluence
+    # FIXED: must run RSI and MACD individual signal generators FIRST,
+    # THEN detect confluences. Previously the RSI/MACD functions were
+    # defined but never called, so confluence detection always found 0.
     confluences_added = 0
     try:
+        rsi_added = _run_rsi_signals_for_confluence()
+        macd_added = _run_macd_signals_for_confluence()
+        if rsi_added or macd_added:
+            print(f'  RSI/MACD signals: {rsi_added} RSI + {macd_added} MACD added')
         confluences_added = run_confluence_detection()
     except Exception as e:
         print(f'  Confluence detection error: {e}')

@@ -332,7 +332,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         if is_loss:
             set_loss_cooldown(token, direction)
             # Post-mortem: if we lost on a direction, was the market moving against us first?
-            _analyze_loss_direction(token, direction, entry_price, exit_price)
+            _analyze_loss_direction(token, direction, entry_price, current_price)
 
         # ── Trigger win cooldown ──────────────────────────────────
         # Also: clear loss streak since WIN confirms this was the right direction

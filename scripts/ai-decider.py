@@ -415,6 +415,8 @@ def record_ab_trade_closed(token, pnl_pct, pnl_usdt):
         log_error(f'record_ab_trade_closed: {e}')
 
 PENDING = "/root/.openclaw/workspace/data/pending-signals.json"
+# FIXED: ai_decider now reads from signals_hermes_runtime.db (Hermes's DB)
+# signal_gen writes to runtime DB, not OpenClaw's signals.db
 from signal_schema import RUNTIME_DB as SIGNALS_DB
 SIGNAL_LOG = "/var/www/hermes/logs/signals.log"
 LOCK_FILE = "/tmp/ai-decider.lock"
@@ -537,7 +539,11 @@ def is_token_open(token):
         return False
 
 def get_pending_signals():
-    """Get PENDING signals from signals.db - reads from unified_scanner output"""
+    """Get PENDING signals from signals_hermes_runtime.db (Hermes's DB).
+    
+    FIXED: was reading OpenClaw's signals.db instead of Hermes runtime DB.
+    signal_gen.py writes to signals_hermes_runtime.db, not OpenClaw's signals.db.
+    """
     try:
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
@@ -763,22 +769,26 @@ def _ema(series, period):
         ema[i] = alpha * arr[i] + (1 - alpha) * ema[i-1]
     return ema
 
-def is_real_pump(token):
-    """Check if token is in a real pump - less strict now"""
+def is_real_pump(token, direction="long"):
+    """Check if token is in a real pump.
+    
+    For SHORT signals: require volume > $5000 on Gate.io (confirm bearish move is real).
+    For LONG signals: always allow — confluence LONGs are recovery/reversal plays,
+                     they don't need a pump, they need oversold conditions.
+    """
+    # LONG signals: always allow (confluence LONGs are reversal plays, not pumps)
+    if direction.lower() == "long":
+        return True
+    
+    # SHORT signals: check volume on Gate.io
     try:
-        # Try Gate.io first
         r = requests.get(f"https://api.gateio.ws/api/v4/spot/tickers?currency_pair={token}_USDT", timeout=5)
         if r.status_code == 200:
             data = r.json()
             if data:
-                t = data[0]
-                change_24h = float(t.get("change_percentage", 0))
-                volume = float(t.get("quote_volume", 0))
-                # Less strict: allow any move, lower volume threshold
-                is_pump = volume > 5000  # Lowered from 10000
-                return is_pump
-        # If Gate fails, allow based on price change from our data
-        return True  # Allow if we can't check
+                volume = float(data[0].get("quote_volume", 0))
+                return volume > 5000
+        return True  # Allow if Gate fails
     except Exception as e:
         log_error(f'is_real_pump: {e}')
         return True  # Allow if check fails
@@ -941,9 +951,19 @@ prices = get_prices()
 update_trade_prices()  # Update current_price for all open trades
 print(f"Market: Z-Score={market_z}, BTC=${prices.get('BTC','N/A')}")
 
+processed_this_run = set()  # token+direction already reviewed this run
+
 for s in pending:
     t = s.get("token")
     direction = s.get("direction", "long")
+
+    # Skip if already reviewed this run (signal still PENDING means ai_decider
+    # marked it WAIT/SKIPPED — don't re-review, it'll stay PENDING forever)
+    key = f"{t}:{direction}"
+    if key in processed_this_run:
+        continue
+    processed_this_run.add(key)  # mark reviewed regardless of outcome
+
     entry = float(s.get("entry", 0))  # Ensure entry is float
     conf = s.get("confidence", 0)
     atr = s.get("atr", s.get("atrPercent", 2))
@@ -1021,8 +1041,8 @@ LLM CANDLE PREDICTION (for reference):
     
     # Execute if AI says go (prompt enforces ≥50% confidence threshold)
     if decision != "wait" and ai_conf >= 50:
-        # Only trade real pumps, not slow grind
-        if not is_real_pump(t):
+        # Only trade real pumps, not slow grind (LONG always allowed — reversal plays)
+        if not is_real_pump(t, direction):
             print(f"   ⏸️ SKIPPED - No pump momentum (need >3% 24h + volume)")
             log_signal(t, direction, entry, conf, f"SKIPPED-{exchange}")
             mark_signal_processed(t, 'SKIPPED')

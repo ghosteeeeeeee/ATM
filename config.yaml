@@ -204,6 +204,7 @@ command_allowlist:
 - shell command via -c/-lc flag
 - stop/disable system service
 - recursive delete
+- find -delete
 - overwrite system config
 - SQL DROP
 - SQL DELETE without WHERE

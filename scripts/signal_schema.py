@@ -177,18 +177,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                exchange='hyperliquid', timeframe='1h', z_score=None, z_score_tier=None,
                momentum_state=None, rsi_14=None, macd_value=None, macd_signal=None,
                macd_hist=None, leverage=None, **kwargs):
-    """Add a new signal. Combines with existing PENDING signal for same token+direction (any source)
-    within 30 min — takes max confidence, merges sources list."""
+    """Add a new signal. Combines with existing PENDING signal for same token+direction+signal_type
+    within 30 min — takes max confidence, merges sources list.
+    
+    KEY FIX: Only merges signals with the SAME signal_type. Different signal_types
+    (e.g. 'rsi_confluence' vs 'macd_confluence') always create SEPARATE rows so that
+    get_confluence_signals() can detect them as distinct agreeing indicators."""
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
-        # Check for existing PENDING signal for same token+direction in last 30 min
+        # Check for existing PENDING signal for SAME token+direction+signal_type in last 30 min
+        # Only merge identical signal_type so that RSI+MACD create distinct rows → confluence detection works
         c.execute('''
             SELECT id, source, confidence FROM signals
-            WHERE token=? AND direction=? AND executed=0 AND decision='PENDING'
+            WHERE token=? AND direction=? AND signal_type=? AND executed=0 AND decision='PENDING'
             AND created_at > datetime('now', '-30 minutes')
             LIMIT 1
-        ''', (token.upper(), direction.upper()))
+        ''', (token.upper(), direction.upper(), signal_type))
         existing = c.fetchone()
         if existing:
             sig_id, existing_source, existing_conf = existing
@@ -250,29 +255,77 @@ def get_pending_signals(hours=24, limit=50):
 
 get_pending_signals_as_dict = get_pending_signals  # alias
 
-def get_confluence_signals(hours=24, min_signals=2):
+def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     """Return tokens where ≥min_signals PENDING signal types agree.
     Used by ai_decider / decider-run. Boosts confidence by 1.25x (2 signals)
-    or 1.5x (3+ signals)."""
+    or 1.5x (3+ signals).
+
+    Sources signals from BOTH Hermes runtime DB AND OpenClaw's signals.db.
+    OpenClaw's multi-timeframe (mtf-*) signals are included via ATTACH so
+    they can combine with Hermes RSI/MACD signals in confluence detection.
+
+    Args:
+        signal_types: optional list of signal_type strings to filter.
+                      e.g. ['rsi_confluence', 'macd_confluence'] to exclude 'momentum'.
+    """
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
-    c.execute('''
+
+    # Attach OpenClaw's signals.db so we can query both DBs together.
+    # OpenClaw signals have source='mtf-*' and signal_type='mtf_macd'.
+    # Hermes signals have source='mtf-*' and signal_type='momentum'.
+    if os.path.exists(LEGACY_DB):
+        try:
+            c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
+        except Exception:
+            pass  # Already attached or permission issue
+
+    # Build dynamic WHERE clause for signal_type filter
+    if signal_types:
+        st_list = list(signal_types)
+        type_filter = "AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
+        params = (hours,) + tuple(st_list) + (hours,) + tuple(st_list) + (min_signals,)
+    else:
+        type_filter = ""
+        params = (hours, hours, min_signals)
+
+    # Query both DBs using UNION ALL. Use GROUP_CONCAT to track which
+    # DB each signal came from (oc_ vs Hermes) for study logging.
+    query = f"""
+        WITH all_signals AS (
+            SELECT token, direction, signal_type, source, confidence, price,
+                   z_score, rsi_14, macd_hist,
+                   'hermes' as db_source
+            FROM signals
+            WHERE decision='PENDING'
+            AND created_at > datetime('now','-'||?||' hours')
+            {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if signal_types else ""}
+            UNION ALL
+            SELECT token, direction, signal_type, source, confidence, price,
+                   z_score, rsi_14, macd_hist,
+                   'openclaw' as db_source
+            FROM oc.signals
+            WHERE decision='PENDING'
+            AND created_at > datetime('now','-'||?||' hours')
+            {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if signal_types else ""}
+        )
         SELECT token, direction,
                COUNT(DISTINCT signal_type) as num_types,
                COUNT(*) as total_rows,
                AVG(confidence) as avg_conf,
                MAX(confidence) as max_conf,
                GROUP_CONCAT(DISTINCT signal_type) as types,
+               GROUP_CONCAT(DISTINCT db_source) as db_sources,
+               GROUP_CONCAT(DISTINCT source) as all_sources,
                MAX(price) as price,
                MAX(z_score) as z_score,
                MAX(rsi_14) as rsi_14
-        FROM signals
-        WHERE decision='PENDING'
-        AND created_at > datetime('now','-'||?||' hours')
+        FROM all_signals
         GROUP BY token, direction
         HAVING COUNT(DISTINCT signal_type) >= ?
         ORDER BY avg_conf DESC
-    ''', (hours, min_signals))
+    """
+    c.execute(query, params)
     results = []
     for r in c.fetchall():
         d = dict(r)
@@ -281,6 +334,14 @@ def get_confluence_signals(hours=24, min_signals=2):
         d['num_agreeing'] = d['num_types']
         if d.get('types'):
             d['signal_types'] = d['types'].split(',')
+        # Track OpenClaw vs Hermes sources for study logging
+        if d.get('all_sources'):
+            all_srcs = d['all_sources'].split(',')
+            d['openclaw_sources'] = sorted(s for s in all_srcs if s.startswith('mtf-'))
+            d['hermes_sources']   = sorted(s for s in all_srcs if not s.startswith('mtf-'))
+        if d.get('db_sources'):
+            d['has_openclaw'] = 'openclaw' in d['db_sources']
+            d['has_hermes']   = 'hermes'   in d['db_sources']
         results.append(d)
     conn.close()
     return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
