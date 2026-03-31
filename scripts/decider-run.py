@@ -11,6 +11,7 @@ from signal_schema import init_db, get_approved_signals, get_pending_signals, ma
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
+from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hyperliquid_exchange import is_live_trading_enabled
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
@@ -388,20 +389,33 @@ def execute_trade(token, direction, price, confidence, source,
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
-    sl_pct_val = float(sl_pct) / 100  # sl_pct in percent (1.0=1%), convert to fraction
+    # ── Pump Mode ─────────────────────────────────────────────
+    # Spike/pump trades: tight SL/TP, NO trailing. Enter fast, exit fast.
+    is_pump = 'pump-' in (source or '')
+
+    if is_pump:
+        sl_pct_val = PUMP_SL_PCT    # 1.5% SL
+        tp_pct_val = PUMP_TP_PCT    # 2.5% TP
+        trailing_activation = 0      # disable trailing
+        trailing_distance   = 0
+        log(f'  [PUMP MODE] {token} {direction} — SL={PUMP_SL_PCT*100:.1f}% TP={PUMP_TP_PCT*100:.1f}% NO trailing')
+    else:
+        sl_pct_val = float(sl_pct) / 100  # sl_pct in percent (1.0=1%), convert to fraction
+        tp_pct_val = 0.05                 # 5% TP
+
     if direction == 'LONG':
         sl = price * (1 - sl_pct_val)
-        tp = price * 1.05
+        tp = price * (1 + tp_pct_val)
     else:
         sl = price * (1 + sl_pct_val)
-        tp = price * 0.95
+        tp = price * (1 - tp_pct_val)
 
     # Sanity check: SL must provide real protection
     if direction == 'LONG' and sl >= price:
-        sl = price * 0.99  # fallback: 1% SL
+        sl = price * 0.99
         log(f'  [WARN] SL sanity check triggered for LONG {token}, reset to 1%')
     elif direction == 'SHORT' and sl <= price:
-        sl = price * 1.01  # fallback: 1% SL
+        sl = price * 1.01
         log(f'  [WARN] SL sanity check triggered for SHORT {token}, reset to 1%')
 
     # Build experiment JSON for brain.py
@@ -424,7 +438,7 @@ def execute_trade(token, direction, price, confidence, source,
            '--signal', source,
            '--confidence', str(round(confidence, 1)),
            '--leverage', str(leverage),
-           '--sl-distance', str(float(sl_pct) / 100),
+           '--sl-distance', str(sl_pct_val),
            '--trailing-threshold', str(trailing_activation),
            '--trailing-distance', str(trailing_distance)]
     if exp_json:
