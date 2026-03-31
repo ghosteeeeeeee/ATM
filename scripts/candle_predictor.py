@@ -234,7 +234,7 @@ Price trend (oldest→newest): {price_trend}
 
 MOMENTUM INDICATORS:
 - RSI(14): {d['rsi']:.1f} (overbought>70, oversold<30)
-- MACD Histogram: {d['macd_hist']':+.4f} (positive=bullish momentum)
+- MACD Histogram: {d['macd_hist']:+.4f} (positive=bullish momentum)
 - Z-score: {d['z_score']:+.2f} (price vs 20-candle mean; +2=elevated, -2=suppressed)
 - Avg Z (multi-TF): {d['avg_z']:+.2f}
 
