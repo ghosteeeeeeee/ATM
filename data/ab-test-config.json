@@ -1,136 +1,337 @@
 {
   "enabled": true,
+  "updated_at": "2026-03-31T23:50:00Z",
+  "notes": "Major update: exploit path now picks by PnL% not WR (fixes bug where SL-2p0 was exploited over SL-1p5). Kill thresholds tightened: PnL<-15% primary, WR<5% secondary. EPSILON lowered to 15%. Historical data shows: IMMEDIATE (-57%!), TS-0p5-0p3 (-62%!), SL-2p0 (-48%!) should have been killed earlier. Winners: SL-1p5, TS-1p0-0p5, RETRACE-2.",
   "tests": [
     {
       "name": "sl-distance-test",
-      "description": "Test different stop-loss distances",
+      "description": "Stop-loss distance. WINNER: SL-1p5 (1.5%). Key insight: 73% of closes happen in <5min — SL distance matters less than avoiding fee-driven micro-stops. Wider SL (1.5%) avoids noise; tighter SLs (0.5%, 1.0%) get fee-whipsawed; 3.0% holds losers too long.",
       "variants": [
         {
-          "id": "SL-0p5",
-          "name": "0.5% SL",
-          "weight": 15,
+          "id": "SL-1p5",
+          "name": "WINNER — SL 1.5%",
+          "weight": 40,
           "enabled": true,
           "config": {
-            "slPct": 0.5
-          }
+            "slPct": 0.015
+          },
+          "trades": 162,
+          "wins": 19,
+          "losses": 143,
+          "winRate": 11.7,
+          "totalPnlPct": 7.38,
+          "avg_win_pct": 0.389,
+          "avg_loss_pct": -0.052,
+          "lastUpdated": "2026-03-31 23:01:20.435203",
+          "learnings": "Clear winner. avg_win=0.389% > avg_loss=0.052% in magnitude = positive expectancy. Survives despite low WR because wins are 7.5x larger than losses. EXPLOIT THIS."
         },
         {
           "id": "SL-1p0",
-          "name": "1.0% SL",
-          "weight": 25,
+          "name": "Runner-up — SL 1.0%",
+          "weight": 18,
           "enabled": true,
           "config": {
-            "slPct": 1.0
-          }
-        },
-        {
-          "id": "SL-1p5",
-          "name": "1.5% SL",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "slPct": 1.5
-          }
-        },
-        {
-          "id": "SL-2p0",
-          "name": "2.0% SL",
-          "weight": 20,
-          "enabled": true,
-          "config": {
-            "slPct": 2.0
-          }
+            "slPct": 0.01
+          },
+          "trades": 43,
+          "wins": 10,
+          "losses": 28,
+          "winRate": 23.8,
+          "totalPnlPct": -1.77,
+          "avg_win_pct": -0.085,
+          "avg_loss_pct": -0.034,
+          "lastUpdated": "2026-03-31 23:19:20.103416",
+          "learnings": "Best WR (23.8%) but negative PnL. avg_win=-0.085% (NEGATIVE!) means winners are smaller than losers in absolute terms — fee drag + direction failures. Explore only, not exploit."
         },
         {
           "id": "SL-3p0",
-          "name": "3.0% SL",
-          "weight": 15,
+          "name": "Loser — SL 3.0% (reduced weight, monitor)",
+          "weight": 9,
           "enabled": true,
           "config": {
-            "slPct": 3.0
-          }
+            "slPct": 0.03
+          },
+          "trades": 167,
+          "wins": 28,
+          "losses": 139,
+          "winRate": 16.8,
+          "totalPnlPct": -6.8,
+          "avg_win_pct": -0.228,
+          "avg_loss_pct": -0.047,
+          "lastUpdated": "2026-03-31 23:10:15.610311",
+          "learnings": "PnL=-6.8% but above PnL_KILL=-15% so not auto-killed. avg_win negative = losing when right. Holds losers too long. Keep at low weight for more data."
+        },
+        {
+          "id": "SL-0p5",
+          "name": "WORST — SL 0.5% (minimal weight)",
+          "weight": 4,
+          "enabled": true,
+          "config": {
+            "slPct": 0.005
+          },
+          "trades": 19,
+          "wins": 2,
+          "losses": 16,
+          "winRate": 11.1,
+          "totalPnlPct": -4.01,
+          "lastUpdated": "2026-03-31 23:19:25.058675",
+          "learnings": "Too tight — gets stopped by noise. 73% closes <5min makes 0.5% SL essentially random. Minimal weight for data only."
+        },
+        {
+          "id": "SL80pct-E5",
+          "name": "EVOLVED: Dynamic 0.8% SL that widens on profit",
+          "weight": 4,
+          "enabled": true,
+          "config": {
+            "slDistance": 0.008,
+            "slPct": 0.008,
+            "dynamic": true,
+            "description": "Start tight (0.8%), widen to 1.5% once position is +0.5% in profit. Hypothesis: best of both worlds."
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null,
+          "learnings": "New hypothesis: SL tightens/widens based on position state. Needs trades to evaluate."
+        },
+        {
+          "id": "SL-1p2",
+          "name": "NEW: SL 1.2% (between 1.0% and 1.5%)",
+          "weight": 14,
+          "enabled": true,
+          "config": {
+            "slPct": 0.012
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null,
+          "learnings": "New: test if 1.2% is the sweet spot. 1.0% gets fee-whipsawed, 1.5% wins. 1.2% might split the difference."
         }
       ]
     },
     {
       "name": "trailing-stop-test",
-      "description": "Test different trailing stop activation thresholds",
+      "description": "Trailing stop activation and distance. WINNER: TS-1p0-0p5 (+10.72%). Critical insight: 73% of closes happen in <5min — tight trailing lock-in is essential. 1% activate is enough to catch micro-rallies without being too loose.",
       "variants": [
         {
-          "id": "TS-0p5-0p3",
-          "name": "0.5% act / 0.3% dist",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 0.005,
-            "trailingDistancePct": 0.003
-          }
-        },
-        {
           "id": "TS-1p0-0p5",
-          "name": "1.0% act / 0.5% dist",
-          "weight": 30,
+          "name": "WINNER — TS 1% activate / 0.5% trail",
+          "weight": 49,
           "enabled": true,
           "config": {
             "trailingActivationPct": 0.01,
             "trailingDistancePct": 0.005
-          }
-        },
-        {
-          "id": "TS-1p5-0p8",
-          "name": "1.5% act / 0.8% dist",
-          "weight": 25,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 0.015,
-            "trailingDistancePct": 0.008
-          }
+          },
+          "trades": 126,
+          "wins": 30,
+          "losses": 93,
+          "winRate": 23.8,
+          "totalPnlPct": 10.72,
+          "avg_win_pct": 0.387,
+          "avg_loss_pct": -0.127,
+          "lastUpdated": "2026-03-31 23:18:23.632053",
+          "learnings": "CLEAR WINNER. Best PnL across all tests. avg_win=0.387% vs avg_loss=-0.127% = 3:1 reward/risk. Best combo: SL-1p5 + TS-1p0-0p5."
         },
         {
           "id": "TS-2p0-1p0",
-          "name": "2.0% act / 1.0% dist",
-          "weight": 20,
+          "name": "Marginal — TS 2% activate / 1% trail",
+          "weight": 16,
           "enabled": true,
           "config": {
             "trailingActivationPct": 0.02,
             "trailingDistancePct": 0.01
-          }
+          },
+          "trades": 44,
+          "wins": 10,
+          "losses": 31,
+          "winRate": 24.4,
+          "totalPnlPct": 0.31,
+          "avg_win_pct": 0.031,
+          "avg_loss_pct": -0.01,
+          "lastUpdated": "2026-03-31 23:19:25.067684",
+          "learnings": "Best WR (24.4%) but barely profitable (PnL=0.31%). 2% activation too high — by the time price moves 2%, momentum often reverses. Explore weight kept for more data."
+        },
+        {
+          "id": "TS-1p5-0p8",
+          "name": "Loser — TS 1.5% activate / 0.8% trail",
+          "weight": 8,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 0.015,
+            "trailingDistancePct": 0.008
+          },
+          "trades": 24,
+          "wins": 4,
+          "losses": 20,
+          "winRate": 16.7,
+          "totalPnlPct": -2.51,
+          "lastUpdated": "2026-03-31 23:01:20.437004",
+          "learnings": "Both too wide. avg_loss=-0.626% means it holds losers too long before trailing kicks in. Low weight for data."
+        },
+        {
+          "id": "TSEVO-4",
+          "name": "EVOLVED: TS 0.5% activate / 0.4% trail",
+          "weight": 4,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 0.005,
+            "trailingDistancePct": 0.004,
+            "description": "Even tighter than winner. Hypothesis: in choppy market with 73% closes <5min, 0.5% activate catches micro-rallies faster."
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null,
+          "learnings": "Hypothesis: tighter than winner might win even more. Risk: activates on noise. Low weight explore."
+        },
+        {
+          "id": "TS-NO",
+          "name": "CONTROL: No trailing stop",
+          "weight": 12,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": null,
+            "trailingDistancePct": null,
+            "description": "No trailing stop. Pure SL/TP management. Tests if TS adds value vs. pure SL."
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null,
+          "learnings": "Control to measure TS value. Does trailing actually improve PnL, or is it just noise?"
+        },
+        {
+          "id": "TSEVO-6",
+          "name": "TS-Evolve-6",
+          "weight": 10,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 0.005,
+            "trailingDistancePct": 0.004,
+            "description": "EVOLVED: TS activate at +0.50% (from TS-1p0-0p5)",
+            "evolved_from": "TS-1p0-0p5",
+            "spawned_at": "2026-04-01T00:00:37.297490"
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null
         }
       ]
     },
     {
       "name": "entry-timing-test",
-      "description": "Test immediate vs retrace entry timing",
+      "description": "Entry timing. WINNER: RETRACE-2 (+3.99%). Fast entry (0.2% max wait) beats waiting for pullbacks. Market doesn't give second chances — enter when signal fires.",
       "variants": [
         {
-          "id": "IMMEDIATE",
-          "name": "Enter Immediately",
-          "weight": 50,
-          "enabled": true,
-          "config": {
-            "wait_percent": 0.0,
-            "max_wait_minutes": 0
-          }
-        },
-        {
           "id": "RETRACE-2",
-          "name": "Wait 0.2% Retrace",
-          "weight": 25,
+          "name": "WINNER — Fast entry (0.2% wait / 30min)",
+          "weight": 40,
           "enabled": true,
           "config": {
             "wait_percent": 0.002,
             "max_wait_minutes": 30
-          }
+          },
+          "trades": 33,
+          "wins": 5,
+          "losses": 25,
+          "winRate": 15.2,
+          "totalPnlPct": 3.99,
+          "avg_win_pct": 0.974,
+          "avg_loss_pct": -0.212,
+          "lastUpdated": "2026-03-31 23:18:23.632053",
+          "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {
           "id": "RETRACE-5",
-          "name": "Wait 0.5% Retrace",
-          "weight": 25,
+          "name": "Loser — Slow entry (0.5% wait / 60min)",
+          "weight": 14,
           "enabled": true,
           "config": {
             "wait_percent": 0.005,
             "max_wait_minutes": 60
-          }
+          },
+          "trades": 36,
+          "wins": 4,
+          "losses": 30,
+          "winRate": 11.8,
+          "totalPnlPct": -0.54,
+          "avg_win_pct": -0.135,
+          "avg_loss_pct": -0.018,
+          "lastUpdated": "2026-03-31 23:19:20.107915",
+          "learnings": "Waiting for bigger pullbacks loses. avg_win negative = even winners are losing after fees. Reduce weight."
+        },
+        {
+          "id": "EVO-3",
+          "name": "Pullback + confirmation filter",
+          "weight": 14,
+          "enabled": true,
+          "config": {
+            "entryMode": "pullback",
+            "pullbackPct": 0.005,
+            "maxWaitMinutes": 60,
+            "confirmation": true,
+            "description": "Wait 0.5% pullback but require RSI/momentum confirmation. Tests if RETRACE-5 fails due to lack of filter."
+          },
+          "trades": 1,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-03-31 23:19:25.063000",
+          "learnings": "Hypothesis: RETRACE-5 fails because no confirmation on pullback. Add RSI/momentum filter."
+        },
+        {
+          "id": "IMMEDIATE-CF",
+          "name": "NEW: Immediate + confirmation filter",
+          "weight": 22,
+          "enabled": true,
+          "config": {
+            "entryMode": "immediate",
+            "wait_percent": 0.0,
+            "max_wait_minutes": 0,
+            "confirmation_required": true,
+            "min_confidence": 85,
+            "description": "Enter immediately on signal but require high confidence (>=85%) + momentum confirmation. Fixes IMMEDIATE's flaw (no filter) while keeping fast entry."
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null,
+          "learnings": "IMMEDIATE was catastrophic because it had no quality filter. This variant adds confidence threshold + momentum confirmation to fix that while keeping the fast-entry advantage."
+        },
+        {
+          "id": "EVO-5",
+          "name": "Entry-Evolve-5",
+          "weight": 10,
+          "enabled": true,
+          "config": {
+            "entryMode": "pullback",
+            "pullbackPct": 0.005,
+            "maxWaitMinutes": 60,
+            "description": "EVOLVED: pullback 0.5% pullback",
+            "evolved_from": "RETRACE-2",
+            "spawned_at": "2026-04-01T00:00:37.313913"
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null
         }
       ]
     }

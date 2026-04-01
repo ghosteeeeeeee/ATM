@@ -1305,6 +1305,11 @@ def run_confluence_detection():
 
         if base_avg < 35:
             continue
+        # Sanity cap: no more than 3 agreeing signal types can contribute to a confluence.
+        # Any query returning >3 is a bug (OpenClaw ATTACH issue, stale archives, or
+        # counting sources instead of signal_types). Cap at 3 to prevent conf-4s, conf-10s, etc.
+        num_signals = min(num_signals, 3)
+
         if num_signals >= 3:
             boosted = min(99, base_avg * 1.5)
         else:

@@ -31,12 +31,18 @@ os.makedirs(os.path.dirname(EVOLUTION_LOG), exist_ok=True)
 
 
 # ─── Evolution Thresholds ──────────────────────────────────────────────────────
-MIN_TRADES_EVOLVE   = 30    # trades needed before evaluating a variant (raised to give slow-holding variants time to generate data)
-WIN_RATE_KILL       = 0.50  # retire if win_rate below this (50%, lowered to be less aggressive)
-PNL_KILL            = -5.0  # retire if total_pnl_pct below this (-5%, widened for longer-hold strategies)
-EVOLVE_EVERY_MINUTES = 60   # run evolution at most once per hour
-EPSILON             = 0.10  # 10% of trades go to exploration (reduced — let proven variants dominate)
-MIN_TRADES_RANDOM   = 5     # variant must have this many trades before competing
+# ── Real-data-calibrated (updated 2026-03-31) ──────────────────────────────────
+# Historical data shows: PnL% is more important than win rate for this system.
+# Winners: SL-1p5 (+7.4%), TS-1p0-0p5 (+10.7%), RETRACE-2 (+4.0%)
+# Historical bad actors: IMMEDIATE (416 trades, -57%!), TS-0p5-0p3 (292 trades, -62%!)
+# These should have been killed — the WIN_RATE_KILL threshold missed them because
+# they had 13-17% WR which was above 10% threshold but catastrophically negative PnL.
+# FIX: PnL% kill is now primary; win rate secondary.
+MIN_TRADES_EVOLVE   = 15    # trades needed before evaluating
+WIN_RATE_KILL       = 0.05  # retire if WR below 5% (much stricter — 13% WR is still catastrophic if avg_loss >> avg_win)
+PNL_KILL            = -15.0 # retire if PnL% below -15% (primary kill signal)
+EPSILON             = 0.15  # 15% exploration — shift toward exploiting winners now
+MIN_TRADES_RANDOM   = 10    # need minimum sample before competing for exploit slot
 
 
 def log(msg: str, level: str = 'INFO'):
@@ -58,14 +64,17 @@ def _db_conn():
 # ─── 1. Epsilon-Greedy Variant Selection ──────────────────────────────────────
 
 def get_best_variant_for_test(test_name: str) -> Optional[Dict]:
-    """Return the variant with the highest win rate from ab_results."""
+    """Return the variant with the highest TOTAL PnL% from ab_results.
+    Win rate is misleading — we care about net PnL, not how often we win.
+    Example: SL-2p0 has 24% WR but -48.7% PnL. SL-1p5 has 11.7% WR but +7.4% PnL.
+    """
     conn = _db_conn()
     cur = conn.cursor()
     cur.execute("""
         SELECT variant_id, win_rate_pct, total_pnl_pct, trades, total_pnl_usdt, avg_r
         FROM ab_results
         WHERE test_name=%s AND trades >= %s
-        ORDER BY win_rate_pct DESC, total_pnl_pct DESC
+        ORDER BY total_pnl_pct DESC
         LIMIT 1
     """, (test_name, MIN_TRADES_RANDOM))
     row = cur.fetchone()
@@ -106,7 +115,9 @@ def epsilon_greedy_pick(test_name: str, config: Dict) -> Optional[Dict]:
     Epsilon-greedy selection for a single A/B test.
 
     With probability EPSILON: explore → random variant (weighted)
-    With probability 1-EPSILON: exploit → best-performing variant by win rate
+    With probability 1-EPSILON: exploit → best-performing variant by TOTAL PnL (not win rate)
+    NOTE: Win rate is misleading — high WR with small wins < low WR with big wins.
+    PnL% is the true bottom line for this system.
 
     Returns the selected variant dict (or None).
     """
@@ -124,7 +135,7 @@ def epsilon_greedy_pick(test_name: str, config: Dict) -> Optional[Dict]:
             for v in config.get('variants', []):
                 if v.get('id') == vid:
                     log(f'EPSILON EXPLOIT: {test_name} → {vid} '
-                        f'(win_rate={best["win_rate_pct"]:.0f}%, trades={best["trades"]}, pnl={best["total_pnl_pct"]:+.1f}%)')
+                        f'(PnL={best["total_pnl_pct"]:+.1f}%, WR={best["win_rate_pct"]:.0f}%, {best["trades"]} trades)')
                     return v
         # Not enough data — fall back to random
         return get_exploration_variant_for_test(test_name, config)
@@ -197,19 +208,29 @@ def evolve_test(test: Dict, results: List[Dict]) -> tuple[List[Dict], str]:
         status = 'ACTIVE'
 
         if trades >= MIN_TRADES_EVOLVE:
-            # ── Kill condition ────────────────────────────────
-            if win_rate < WIN_RATE_KILL * 100 or pnl < PNL_KILL:
+            # ── Kill conditions (primary: PnL, secondary: WR) ──────────────────
+            # Primary: any variant with PnL% < -15% gets killed regardless of WR
+            # This catches the catastrophic cases (IMMEDIATE=-57%, TS-0p5=-62%) that
+            # had decent WR but destroyed PnL through fee drag + small wins
+            should_kill = pnl < PNL_KILL
+            # Secondary: very low WR AND negative PnL (both bad signals)
+            should_kill = should_kill or (win_rate < WIN_RATE_KILL * 100 and pnl < 0)
+            if should_kill:
                 status = 'KILLED'
                 killed_any = True
-                log_lines.append(f'    ❌ {vid}: win_rate={win_rate:.0f}% pnl={pnl:+.1f}% '
-                                 f'→ KILLED (thr: win_rate<{WIN_RATE_KILL*100:.0f}% OR pnl<{PNL_KILL}%)')
+                kill_reason = []
+                if pnl < PNL_KILL:
+                    kill_reason.append(f'pnl={pnl:+.1f}% < {PNL_KILL}%')
+                if win_rate < WIN_RATE_KILL * 100 and pnl < 0:
+                    kill_reason.append(f'low WR + neg PnL')
+                log_lines.append(f'    ❌ {vid}: WR={win_rate:.0f}% PnL={pnl:+.1f}% → KILLED ({", ".join(kill_reason)})')
                 continue  # skip — variant removed
-            # ── Promote condition ────────────────────────────
-            elif win_rate >= 60 and pnl >= 10:
+            # ── Promote condition: strong PnL AND reasonable WR ────────────────────
+            elif pnl >= 10 and win_rate >= 15:
                 new_weight = min(weight * 1.5, 60)
                 variant['weight'] = int(new_weight)
                 status = f'PROMOTED (+50% → {new_weight:.0f}%)'
-                log_lines.append(f'    🏆 {vid}: win_rate={win_rate:.0f}% pnl={pnl:+.1f}% → PROMOTED')
+                log_lines.append(f'    🏆 {vid}: WR={win_rate:.0f}% PnL={pnl:+.1f}% → PROMOTED')
         else:
             status = f'learning ({trades}/{MIN_TRADES_EVOLVE} trades)'
 
@@ -223,30 +244,40 @@ def evolve_test(test: Dict, results: List[Dict]) -> tuple[List[Dict], str]:
                             results_by_vid.get(v.get('id', ''), {}).get('trades', 0) >= MIN_TRADES_EVOLVE and
                             (results_by_vid.get(v.get('id', ''), {}).get('win_rate_pct', 0) < WIN_RATE_KILL * 100 or
                              results_by_vid.get(v.get('id', ''), {}).get('total_pnl_pct', 0) < PNL_KILL))
-        freed_weight = killed_weight  # already removed from evolved list
-        if evolved and freed_weight > 0:
-            boost_per_winner = freed_weight / len(evolved)
+        # Only redistribute 60% of freed weight — leave 40% headroom for new variant spawns.
+        # Prevents total hitting exactly 100 and blocking spawn conditions.
+        redistribute_weight = int(killed_weight * 0.6)
+        if evolved and redistribute_weight > 0:
+            boost_per_winner = redistribute_weight / len(evolved)
             for v in evolved:
                 v['weight'] = int(v.get('weight', 1) + boost_per_winner)
-            log_lines.append(f'    📦 Redistributed {freed_weight:.0f} weight across {len(evolved)} survivors')
+            log_lines.append(f'    📦 Redistributed {redistribute_weight:.0f} (of {killed_weight:.0f} freed) across {len(evolved)} survivors')
 
-    # ── Spawn new variant if market changed significantly ─────
-    # Only spawn if we have ≥2 surviving variants and total surviving weight < 90
+    # ── Normalize weights to ~90, leaving 10 for new spawn ─────────
+    # Always normalize, even when nothing was killed (the initial config has
+    # weights summing to 100, which would block spawns).
+    total = sum(v.get('weight', 1) for v in evolved)
+    if total > 0:
+        target = 90  # leave 10 for new variant to get spawned with weight 10
+        for v in evolved:
+            v['weight'] = max(1, round(v.get('weight', 1) / total * target))
+
+    # ── Spawn new variant ────────────────────────────────────────────
+    # Spawn if: ≥2 variants, no spawned variant exists yet, under 6 variants.
+    # Weights are now ~90 total so a 10-weight spawn fits under 100.
     total_surviving_weight = sum(v.get('weight', 1) for v in evolved)
-    if len(evolved) >= 2 and total_surviving_weight < 90:
+    has_spawned_variant = any(v.get('config', {}).get('evolved_from') for v in evolved)
+    if len(evolved) >= 2 and total_surviving_weight < 95 and not has_spawned_variant and len(evolved) < 6:
         new_variant = _spawn_new_variant(test_name, evolved)
         if new_variant:
             evolved.append(new_variant)
             log_lines.append(f'    🆕 SPAWNED: {new_variant["id"]} — {new_variant["config"].get("description","")}')
 
-    # ── Normalize weights to 100 ───────────────────────────────
-    total = sum(v.get('weight', 1) for v in evolved)
-    if total > 0:
-        for v in evolved:
-            v['weight'] = max(1, round(v.get('weight', 1) / total * 100))
+    # ── Clip weights to valid range ─────────────────────────────
+    for v in evolved:
+        v['weight'] = max(1, min(v['weight'], 60))
 
     return evolved, '\n'.join(log_lines)
-
 
 def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
     """
@@ -383,7 +414,19 @@ def run_evolution() -> Dict[str, Any]:
         old_count = len(test.get('variants', []))
         test['variants'] = evolved_variants
 
-        killed = old_count - len(evived_variants)
+        # ── Backfill ab_results stats into each variant so they survive across restarts ─
+        results_by_vid = {r['variant_id']: r for r in test_results}
+        for variant in evolved_variants:
+            vid = variant.get('id', '')
+            result = results_by_vid.get(vid, {})
+            variant['trades'] = result.get('trades', 0)
+            variant['wins'] = result.get('wins', 0)
+            variant['losses'] = result.get('losses', 0)
+            variant['winRate'] = round(result.get('win_rate_pct', 0), 1)
+            variant['totalPnlPct'] = round(result.get('total_pnl_pct', 0), 2)
+            variant['lastUpdated'] = str(result.get('updated_at', '')) if result.get('updated_at') else None
+
+        killed = old_count - len(evolved_variants)
         spawned = sum(1 for v in evolved_variants
                       if v.get('config', {}).get('evolved_from'))
         promoted = old_count - killed  # rough

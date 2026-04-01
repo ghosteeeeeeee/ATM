@@ -3,7 +3,7 @@
 run_pipeline.py — Hermes Trading Pipeline
 Runs every 1 minute via cron. A/B optimizer every 10 minutes.
 """
-import sys, subprocess, time, os, argparse, os, fcntl
+import sys, subprocess, time, os, argparse, os, fcntl, json
 
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'pipeline.log')
@@ -67,6 +67,14 @@ def run(name, args=None):
 def main():
     args = sys.argv[1:]
     is_live = '--live' in args
+    # Also check hype_live_trading.json for live mode
+    try:
+        with open('/var/www/hermes/data/hype_live_trading.json') as f:
+            flags = json.load(f)
+            if flags.get('live_trading'):
+                is_live = True
+    except Exception:
+        pass
     mode = 'LIVE' if is_live else 'PAPER'
 
     minute = int(time.strftime('%M'))

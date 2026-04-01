@@ -55,3 +55,5 @@
 18:07:26 interrupt fired: msg='only the mtf script that fired those trades', children=0, parent._interrupt=True
 18:09:43 ENTER: queued interrupt msg="I'm off for a bit, continue fixing, set a 15 min cron remind", agent_running=True
 18:09:43 interrupt fired: msg="I'm off for a bit, continue fixing, set a 15 min cron remind", children=0, parent._interrupt=True
+22:26:06 ENTER: queued interrupt msg="This trade isn't on HL, something is triggering Solana pumps", agent_running=True
+22:26:06 interrupt fired: msg="This trade isn't on HL, something is triggering Solana pumps", children=0, parent._interrupt=True
