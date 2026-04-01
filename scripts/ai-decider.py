@@ -113,14 +113,22 @@ def _load_hot_rounds():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # Query signals table for tokens that survived 2+ ai-decider review passes
+        # FIX (2026-04-01): Exclude tokens that already have an active APPROVED signal
+        # (executed=0 means it's queued for entry but hasn't been filled yet).
+        # Without this, every new signal for an already-approved token re-enters the hot set,
+        # causing the same token to be auto-approved repeatedly each pipeline run.
+        # Tokens are only removed from hot set after position enters (executed=1).
         c.execute("""
             SELECT token, direction, MAX(review_count) as rounds,
                    GROUP_CONCAT(DISTINCT signal_type) as types, source
             FROM signals
-            WHERE decision IN ('PENDING', 'APPROVED')
-              AND review_count >= 2
+            WHERE decision IN ('PENDING', 'APPROVED', 'WAIT')
+              AND review_count >= 1
               AND created_at > datetime('now', '-3 hours')
+              AND token || direction NOT IN (
+                  SELECT token || direction FROM signals
+                  WHERE decision = 'APPROVED' AND executed = 0
+              )
             GROUP BY token, direction
             HAVING COUNT(*) >= 1
         """)
@@ -133,17 +141,27 @@ def _load_hot_rounds():
             types_list = [x for x in (row[3] or '').split(',') if x]
             source = row[4] or 'unknown'
 
-            # Get PENDING signal IDs and quality metrics for this token+direction
+            # Get ALL non-executed signal IDs and quality metrics for this token+direction.
+            # FIX (2026-04-01): Previously only queried decision='PENDING', so signals that
+            # advanced to APPROVED or WAIT had their avg_conf/num_types computed from nothing
+            # (defaulting to 50.0/0), causing them to fail the quality gate and stagnate.
             c.execute("""
                 SELECT id, AVG(confidence) as avg_conf, COUNT(DISTINCT signal_type) as num_types
                 FROM signals
-                WHERE token=? AND direction=? AND decision='PENDING' AND executed=0
+                WHERE token=? AND direction=? AND decision IN ('PENDING','APPROVED','WAIT') AND executed=0
             """, (t, direction))
             sig_row = c.fetchone()
             sig_id = sig_row[0] if sig_row else None
             avg_conf = sig_row[1] if sig_row else 50.0
             num_types = sig_row[2] if sig_row else len(types_list)
             ids_list = [sig_id] if sig_id else []
+
+            # Get all signal IDs for this token+direction (for mark_signal_processed)
+            c.execute("""
+                SELECT id FROM signals
+                WHERE token=? AND direction=? AND decision IN ('PENDING','APPROVED','WAIT') AND executed=0
+            """, (t, direction))
+            ids_list = [r[0] for r in c.fetchall()]
 
             _hot_rounds[t] = {
                 'direction': direction,
@@ -1370,15 +1388,18 @@ for s in pending:
         print(f"⏸️ {t}: max trades reached")
         log_signal(t, direction, entry, conf, f"SKIPPED-max-{exchange}")
         continue
-    # ── Hot set: r2+ auto-approval ──────────────────────────────────────────
+    # ── Hot set: r1+ auto-approval ──────────────────────────────────────────
     hot = _hot_rounds.get(t.upper())
-    if hot and hot['rounds'] >= 2:
-        # Proven by AI across 2+ compaction rounds — skip AI review, auto-approve
+    if hot and hot['rounds'] >= 1:
+        # Proven by AI across 1+ review round — skip AI review, auto-approve
+        # FIX (2026-04-01): Lowered from r2+ to r1+ — signals were expiring before
+        # reaching r2 due to 15-min TTL, and many legitimate signals stay WAIT
+        # (AI needs more data) instead of going straight to EXEC.
 
-        # Quality gate: require 2+ distinct signal types and avg_conf >= 30%
+        # Quality gate: require 1+ distinct signal types and avg_conf >= 30%
         num_types = hot.get('num_types', 0)
         avg_conf = hot.get('avg_conf', 0)
-        if num_types < 2 or avg_conf < 30:
+        if num_types < 1 or avg_conf < 30:
             print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
             log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
             mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-quality-gate')

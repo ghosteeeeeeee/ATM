@@ -19,7 +19,17 @@ Migrated from combined-trading.py:
   - record_entry_features() / record_exit_features() — feature logging
   - close_orphan_paper_trades() — paper→HL mirroring
 """
-import sys, time, json, subprocess, argparse, os, re
+import sys, time, json, subprocess, argparse, os, re, fcntl
+
+# ── Process lock: prevent multiple guardian instances ───────────────────────
+_LOCK_FILE = '/tmp/hermes-guardian.lock'
+_lock_fd = os.open(_LOCK_FILE, os.O_CREAT | os.O_RDWR, 0o644)
+try:
+    fcntl.flock(_lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except (IOError, OSError):
+    print("[FATAL] Guardian already running — exiting")
+    os.close(_lock_fd)
+    sys.exit(1)
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from hyperliquid_exchange import (
@@ -29,12 +39,61 @@ from hyperliquid_exchange import (
 
 import json  # for json.dumps in penalty recording
 
-DRY = True   # Default is DRY RUN (safe). Use --apply flag to enable LIVE closing of orphan positions.
+DRY = False  # Default is LIVE. Use --dry flag (not --apply) for dry-run mode.
+# NOTE: systemd service runs WITHOUT --apply by default — set DRY=False here to enable guardian closes.
+# Override with --apply flag if you need temporary dry-run without changing this file.
 INTERVAL = 60  # seconds between checks
 MAX_CONSECUTIVE_FAILURES = 5
 LOG_FILE = '/root/.hermes/logs/sync-guardian.log'
 DATA_DIR = '/root/.hermes/data'
 COPIED_TRADES_FILE = os.path.join(DATA_DIR, 'copied-trades-state.json')
+
+# FIX (2026-04-01): Persistent reconciliation state — prevents guardian from creating
+# duplicate trade records when the same HL position is seen across multiple guardian cycles.
+# Key: token.upper() -> {trade_id, entry_px, direction, reconciled_at}
+# When guardian reconciles an HL position, record it here.
+# Next cycle: if HL pos exists AND token is in reconciled state with a live trade_id,
+# DO NOT create a new record — the existing one is the source of truth.
+_RECONCILED_STATE_FILE = os.path.join(DATA_DIR, 'reconciled-hl-positions.json')
+
+def _load_reconciled_state():
+    """Load persisted reconciled state from disk."""
+    try:
+        with open(_RECONCILED_STATE_FILE) as f:
+            return json.load(f)
+    except:
+        return {}
+
+def _save_reconciled_state(state):
+    """Persist reconciled state to disk."""
+    try:
+        with open(_RECONCILED_STATE_FILE, 'w') as f:
+            json.dump(state, f)
+    except Exception as e:
+        log(f'  Warning: could not save reconciled state: {e}', 'WARN')
+
+def _mark_hl_reconciled(token, trade_id, entry_px, direction):
+    """Record that an HL position has been reconciled to a specific trade_id."""
+    state = _load_reconciled_state()
+    state[token.upper()] = {
+        'trade_id': trade_id,
+        'entry_px': entry_px,
+        'direction': direction,
+        'reconciled_at': time.strftime('%Y-%m-%d %H:%M:%S')
+    }
+    _save_reconciled_state(state)
+
+def _get_reconciled_trade_id(token):
+    """Get the trade_id that was reconciled for this HL position, or None."""
+    state = _load_reconciled_state()
+    return state.get(token.upper(), {}).get('trade_id')
+
+def _clear_reconciled_token(token):
+    """Clear reconciled state when an HL position is gone (closed on HL)."""
+    state = _load_reconciled_state()
+    if token.upper() in state:
+        del state[token.upper()]
+        _save_reconciled_state(state)
 
 # Deduplication: track trade IDs closed this cycle to prevent duplicate closes.
 # Both record_closed_trade() (Step 6) and _close_paper_trade_db() (Steps 7-8)
@@ -100,10 +159,10 @@ def get_db_connection():
 
 
 def get_db_open_trades():
-    """Get open trades from paper DB where exchange = Hyperliquid."""
+    """Get open trades from paper DB where exchange = Hyperliquid. Includes 'id' for Step 8."""
     r = subprocess.run([
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
-        "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid'"
+        "SELECT id, token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid'"
     ], capture_output=True, text=True, timeout=10)
     if r.returncode != 0:
         log(f'get_db_open_trades FAILED: {r.stderr}', 'FAIL')
@@ -114,12 +173,13 @@ def get_db_open_trades():
             parts = [p.strip() for p in line.split('|')]
             if len(parts) >= 5:
                 trades.append({
-                    'token': parts[0],
-                    'direction': parts[1],
-                    'entry_price': float(parts[2]) if parts[2] else 0,
-                    'leverage': float(parts[3]) if parts[3] else 1,
-                    'amount_usdt': float(parts[4]) if parts[4] else 50,
-                    'paper': parts[5].lower() == 't' if len(parts) > 5 else True,
+                    'id': int(parts[0]) if parts[0] else None,
+                    'token': parts[1],
+                    'direction': parts[2],
+                    'entry_price': float(parts[3]) if parts[3] else 0,
+                    'leverage': float(parts[4]) if parts[4] else 1,
+                    'amount_usdt': float(parts[5]) if parts[5] else 50,
+                    'paper': parts[6].lower() == 't' if len(parts) > 6 else True,
                 })
     return trades
 
@@ -158,6 +218,9 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
     Create a paper trade in the brain DB (equivalent to brain.py add_trade).
     Returns the new trade_id, or None if creation failed.
     This is used for orphan recovery: create the paper trade first, then close it.
+
+    FIX: Uses atomic INSERT with NOT EXISTS to prevent race-condition duplicates
+    when guardian and pipeline run simultaneously.
     """
     if DRY:
         log(f'  [DRY] Would add_orphan_trade: {token} {direction} @ {entry_price} x{leverage}', 'WARN')
@@ -168,31 +231,33 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
         return None
     try:
         cur = conn.cursor()
-        # Check for existing open trade first
-        cur.execute(
-            "SELECT id FROM trades WHERE token=%s AND server = 'Hermes' AND status = 'open'",
-            (token,)
-        )
-        if cur.fetchone():
+        # Atomic: INSERT only if no open trade exists for this token.
+        # Eliminates race condition between SELECT-then-INSERT.
+        cur.execute("""
+            INSERT INTO trades (token, direction, amount_usdt, entry_price,
+                exchange, paper, stop_loss, target, server, status, open_time,
+                pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance)
+            SELECT %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
+                   0, 0, %s, 0.03, 0.01, 0.01
+            WHERE NOT EXISTS (
+                SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
+            )
+            RETURNING id
+        """, (token, direction, amount_usdt, entry_price,
+              stop_loss, target, leverage, token))
+        row = cur.fetchone()
+        if row is None:
+            # No row returned = INSERT was skipped (open trade already exists)
             cur.close()
             conn.close()
             log(f'  {token} already has an open trade in DB — skipping add', 'WARN')
             return None
 
-        cur.execute("""
-            INSERT INTO trades (token, direction, amount_usdt, entry_price,
-                exchange, paper, stop_loss, target, server, status, open_time,
-                pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance)
-            VALUES (%s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
-                0, 0, %s, 0.03, 0.01, 0.01)
-            RETURNING id
-        """, (token, direction, amount_usdt, entry_price,
-              stop_loss, target, leverage))
-        trade_id = cur.fetchone()[0]
+        trade_id = row[0]
         conn.commit()
         cur.close()
         conn.close()
-        log(f'  Created orphan recovery trade #{trade_id}: {token} {direction}', 'PASS')
+        log(f'  Created orphan recovery trade #{trade_id}: {token} {direction} @ {entry_price} x{leverage}', 'PASS')
         return trade_id
     except Exception as e:
         try:
@@ -200,7 +265,7 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
             conn.close()
         except:
             pass
-        log(f'  add_orphan_trade failed for {token}: {e}', 'FAIL')
+        log(f'  add_orphan_trade FAILED for {token}: {e}', 'FAIL')
         return None
 
 
@@ -231,12 +296,13 @@ def _poll_hl_fills_for_close(token: str, close_start_ms: int):
     """
     Poll get_trade_history() up to 3 times with 2s delay to get actual HL fill data
     for a recently-closed position.
-    Returns (hl_exit_price, realized_pnl) or (0.0, 0.0) if no fills found.
+    Returns (hl_exit_price, realized_pnl) or (0.0, None) if no fills found.
+    Returns (wavg_exit, float) for breakeven or losing/winning trades.
     """
     for attempt in range(3):
         time.sleep(2)
         fills = get_trade_history(close_start_ms, int(time.time() * 1000))
-        token_closes = [f for f in fills
+        token_closes=[f for f in fills
                         if f['coin'].upper() == token.upper() and f['side'] == 'B']
         if token_closes:
             total_sz = sum(f['sz'] for f in token_closes)
@@ -245,24 +311,27 @@ def _poll_hl_fills_for_close(token: str, close_start_ms: int):
             return wavg_exit, realized_pnl
         log(f'  Fill poll attempt {attempt+1}/3 — no close fills yet for {token}', 'WARN')
     log(f'  No HL close fills found for {token} after 3 polls', 'FAIL')
-    return 0.0, 0.0
+    return 0.0, None  # None = no data found, distinguish from breakeven (0.0)
 
 
 def _get_hl_exit_price(token: str, fallback: float = 0.0) -> float:
     """
     Attempt to get the actual HL fill price for a recently-closed position.
     Polls trade history up to 3 times with 2s delay.
-    Returns the weighted-average fill price, or fallback if no fills found.
+    Returns the weighted-average close-fill price, or fallback if no fills found.
+    Only considers side='B' (close) fills — not entry fills (side='A').
     """
     for attempt in range(3):
         time.sleep(2)
         try:
             fills = get_trade_history(int(time.time() * 1000) - 120_000, int(time.time() * 1000))
-            token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
-            if token_fills:
-                total_sz = sum(f['sz'] for f in token_fills)
-                wavg = sum(f['px'] * f['sz'] for f in token_fills) / total_sz
-                log(f'  HL exit price for {token}: {wavg:.4f} (from {len(token_fills)} fills)')
+            # Only use close fills (side='B'), not entry fills (side='A')
+            token_closes = [f for f in fills
+                           if f['coin'].upper() == token.upper() and f.get('side') == 'B']
+            if token_closes:
+                total_sz = sum(f['sz'] for f in token_closes)
+                wavg = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
+                log(f'  HL exit price for {token}: {wavg:.4f} (from {len(token_closes)} close fills)')
                 return wavg
         except Exception as e:
             log(f'  HL fill poll attempt {attempt+1} failed for {token}: {e}', 'WARN')
@@ -320,9 +389,11 @@ def reconcile_hype_to_paper(hl_pos, prices):
             sl_pct = 0.02
             tp_pct = 0.05
             if direction == 'SHORT':
+                # SHORT: SL above entry (price rises = bad), TP below entry (price falls = good)
                 sl_price = round(entry_px * (1 + sl_pct), 8)
                 tp_price = round(entry_px * (1 - tp_pct), 8)
             else:
+                # LONG: SL below entry (price drops = bad), TP above entry (price rises = good)
                 sl_price = round(entry_px * (1 - sl_pct), 8)
                 tp_price = round(entry_px * (1 + tp_pct), 8)
 
@@ -386,9 +457,31 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     updated += 1
                     updated_tokens.append(coin)
             else:
-                # ── KEY FIX: Orphan HL position — create paper trade FIRST, then close ──
-                # This is the core fix for KAITO/WLFI/FARTCOIN problem.
-                # Previous guardian just closed positions without recording them.
+                # KEY FIX: Orphan HL position — check if already reconciled first.
+                # FIX (2026-04-01): Previously guardian would create a new record each cycle
+                # because _CLOSED_THIS_CYCLE cleared between cycles while copied_state persisted.
+                # Solution: use persistent _reconciled_state to track token→trade_id mapping.
+                reconciled_id = _get_reconciled_trade_id(coin)
+                if reconciled_id:
+                    # Already reconciled this HL position to a specific trade_id.
+                    # HL is source of truth — update that existing record instead of creating new.
+                    log(f'  ✅ {coin} already reconciled to trade #{reconciled_id} — updating', 'PASS')
+                    # Update entry price / direction / leverage from HL
+                    try:
+                        conn_upd = get_db_connection()
+                        cur_upd = conn_upd.cursor()
+                        cur_upd.execute("""
+                            UPDATE trades SET entry_price=%s, direction=%s, leverage=%s,
+                                stop_loss=%s, target=%s
+                            WHERE id=%s AND status='open'
+                        """, (entry_px, direction, int(lev), sl_price, tp_price, reconciled_id))
+                        conn_upd.commit()
+                        cur_upd.close()
+                        conn_upd.close()
+                    except Exception as upd_err:
+                        log(f'  Update reconciled trade failed: {upd_err}', 'WARN')
+                    continue  # Don't create new record, don't add to updated_tokens
+
                 log(f'  ⚠️ Orphan HL position: {coin} — creating paper trade before close', 'WARN')
 
                 # Calculate approximate position USD value
@@ -406,14 +499,10 @@ def reconcile_hype_to_paper(hl_pos, prices):
 
                 # Create paper trade
                 trade_id = add_orphan_trade(
-                    token=coin,
-                    direction=direction,
-                    entry_price=hl_entry,
-                    amount_usdt=amount_usdt,
-                    leverage=int(lev),
-                    stop_loss=sl_price,
-                    target=tp_price,
+                    coin, direction, amount_usdt, hl_entry, lev, sl_price, tp_price
                 )
+                if trade_id:
+                    _mark_hl_reconciled(coin, trade_id, hl_entry, direction)
 
                 # KEY FIX: Actually close the orphan HL position after creating the paper trade.
                 # Previously, add_orphan_trade() was called but the HL position was never closed.
@@ -422,6 +511,7 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     close_result = close_position_hl(coin, f"orphan_recovery_trade_{trade_id}")
                     if close_result:
                         log(f'  Orphan {coin} HL position closed via market order', 'PASS')
+                        _CLOSED_HL_TOKENS.add(coin.upper())  # Prevent Step 6 double-close
                     else:
                         log(f'  ⚠️ Orphan {coin} created in DB (trade #{trade_id}) but HL close failed', 'WARN')
 
@@ -816,7 +906,8 @@ def close_orphan_paper_trades(hl_pos, prices):
 
 
 def _close_paper_trade_db(trade_id, token, exit_price, reason):
-    """Close a paper trade in the DB without touching HL. Idempotent — checks status='open'."""
+    """Close a paper trade in the DB without touching HL. Idempotent — checks status='open'.
+    Calculates pnl_usdt and pnl_pct from entry_price stored in DB."""
     if DRY:
         log(f'  [DRY] Would close paper trade #{trade_id} ({reason})', 'WARN')
         return
@@ -830,15 +921,77 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         return
     try:
         cur = conn.cursor()
+        # Look up entry price, direction, amount, and leverage for PnL calc
+        cur.execute(
+            "SELECT entry_price, direction, amount_usdt, leverage FROM trades WHERE id=%s AND status='open'",
+            (trade_id,))
+        row = cur.fetchone()
+        if not row:
+            log(f'  Dedup: trade #{trade_id} ({token}) already closed, skipping', 'WARN')
+            cur.close(); conn.close()
+            return
+
+        entry_price, direction, amount_usdt, leverage = row
+        if not entry_price or not exit_price or exit_price <= 0:
+            log(f'  Skipping trade #{trade_id} ({token}): missing entry/exit price', 'WARN')
+            cur.close(); conn.close()
+            return
+
+        amount_usdt = float(amount_usdt or 50)
+        leverage = float(leverage or 1)
+
+        # ── Try HL ground truth first ───────────────────────────────────
+        hype_pnl_usdt = None
+        try:
+            from hyperliquid_exchange import get_trade_history
+            close_start_ms = int(time.time() * 1000) - 120_000
+            fills = get_trade_history(close_start_ms, int(time.time() * 1000))
+            token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
+            close_fills = [f for f in token_fills if f['side'] == 'B']
+            if close_fills:
+                hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
+                log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
+        except Exception as hl_err:
+            log(f'  {token} HL PnL fetch failed (using calc): {hl_err}', 'WARN')
+
+        # Calculate PnL
+        if direction and direction.upper() == 'SHORT':
+            pnl_pct = round((float(entry_price) - exit_price) / float(entry_price) * 100, 4)
+        else:
+            pnl_pct = round((exit_price - float(entry_price)) / float(entry_price) * 100, 4)
+        pnl_usdt = round(pnl_pct / 100 * amount_usdt, 4)
+
+        # Use HL ground truth if available
+        if hype_pnl_usdt is not None and hype_pnl_usdt != 0:
+            hype_pnl_pct = round(hype_pnl_usdt / amount_usdt * 100, 4)
+            final_pnl_usdt = round(hype_pnl_usdt, 4)
+            final_pnl_pct = hype_pnl_pct
+        else:
+            final_pnl_usdt = pnl_usdt
+            final_pnl_pct = pnl_pct
+
         cur.execute("""
             UPDATE trades SET status = 'closed', exit_price = %s,
-                close_time = NOW(), close_reason = %s, exit_reason = %s
+                pnl_pct = %s, pnl_usdt = %s,
+                close_time = NOW(), close_reason = %s, exit_reason = %s,
+                is_guardian_close = TRUE, guardian_reason = %s,
+                hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s
             WHERE id = %s AND status = 'open'
-        """, (exit_price, reason, reason, trade_id))
-        conn.commit()
+        """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, reason, reason,
+              hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
+              trade_id))
+        # Verify the UPDATE actually hit a row — if 0, trade was already closed
+        if cur.rowcount == 0:
+            log(f'  Dedup: trade #{trade_id} ({token}) already closed, skipping', 'WARN')
+            conn.rollback()
+        else:
+            conn.commit()
+            log(f'  Closed paper trade #{trade_id} ({reason}): {token} @ {exit_price} '
+                f'pnl={final_pnl_pct:+.4f}% ({final_pnl_usdt:+.2f})', 'PASS')
+            # FIX (2026-04-01): Clear reconciled state so token can be re-reconciled on next open.
+            _clear_reconciled_token(token)
         cur.close()
         conn.close()
-        log(f'  Closed paper trade #{trade_id} ({reason}): {token} @ {exit_price}', 'PASS')
     except Exception as e:
         try:
             conn.rollback()
@@ -872,14 +1025,35 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         log(f'  No HL fill for {token} trade #{trade_id}, will retry next cycle', 'WARN')
         return
 
-    # Calculate PnL
-    amount = 20.0  # default
-    if direction.upper() == 'SHORT':
-        computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
-        computed_pnl_usdt = realized_pnl if realized_pnl != 0 else round(amount * computed_pnl_pct / 100, 4)
+    # Look up amount_usdt and leverage from DB (don't use hardcoded 20.0)
+    conn_lookup = get_db_connection()
+    amount_usdt = 50.0
+    lev = 1
+    if conn_lookup:
+        try:
+            cl = conn_lookup.cursor()
+            cl.execute("SELECT amount_usdt, leverage FROM trades WHERE id=%s", (trade_id,))
+            row = cl.fetchone()
+            if row:
+                amount_usdt = float(row[0] or 50)
+                lev = float(row[1] or 1)
+            cl.close()
+        except:
+            pass
+        finally:
+            conn_lookup.close()
+
+    # Calculate PnL — prefer HL realized_pnl, fall back to price-based calc
+    if realized_pnl is not None and realized_pnl != 0:
+        computed_pnl_pct = round(realized_pnl / amount_usdt * 100, 4)
+        computed_pnl_usdt = round(realized_pnl, 4)
     else:
-        computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
-        computed_pnl_usdt = realized_pnl if realized_pnl != 0 else round(amount * computed_pnl_pct / 100, 4)
+        # Fallback: price-based calculation
+        if direction.upper() == 'SHORT':
+            computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
+        else:
+            computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
+        computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
 
     is_win = float(computed_pnl_pct or 0) > 0
 
@@ -892,15 +1066,24 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
             UPDATE trades SET status='closed', exit_price=%s,
                 pnl_pct=%s, pnl_usdt=%s,
                 close_time=NOW(), close_reason=%s, exit_reason=%s,
-                last_updated=NOW(), updated_at=NOW()
+                last_updated=NOW(), updated_at=NOW(),
+                is_guardian_close=TRUE, guardian_reason=%s,
+                hype_realized_pnl_usdt=%s, hype_realized_pnl_pct=%s
             WHERE id=%s AND status='open'
         """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
-              reason, reason, trade_id))
-        conn.commit()
+              reason, reason, reason,
+              realized_pnl if realized_pnl else None,
+              computed_pnl_pct if realized_pnl else None,
+              trade_id))
+        if cur.rowcount == 0:
+            log(f'  Dedup: orphan trade #{trade_id} ({token}) already closed, skipping', 'WARN')
+            conn.rollback()
+        else:
+            conn.commit()
+            log(f'  Closed orphan trade #{trade_id}: {token} {direction} exit={hl_exit_px:.6f} '
+                f'pnl={computed_pnl_pct:+.4f}% {"WIN" if is_win else "LOSS"}', 'PASS')
         cur.close()
         conn.close()
-        log(f'  Closed orphan trade #{trade_id}: {token} {direction} exit={hl_exit_px:.6f} '
-            f'pnl={computed_pnl_pct:+.4f}% {"WIN" if is_win else "LOSS"}', 'PASS')
 
         # ── Signal outcome recording + self-correction ────────────────────────
         _record_trade_outcome(token, direction.upper(), computed_pnl_pct,
@@ -913,6 +1096,9 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         except:
             pass
         log(f'  _close_orphan_paper_trade_by_id error: {e}', 'FAIL')
+    # FIX (2026-04-01): Clear reconciled state when position is closed on HL.
+    # This allows the token to be re-reconciled if a new position opens.
+    _clear_reconciled_token(token)
 
 
 def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
@@ -927,6 +1113,18 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         import sqlite3
         conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
         cur_s = conn_s.cursor()
+        # Dedup: check if we already recorded this exact outcome recently
+        # (same token, direction, pnl — protects against the function being
+        # called twice for the same trade close in the same sync cycle)
+        cur_s.execute("""
+            SELECT id FROM signal_outcomes
+            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+            AND created_at > datetime('now', '-5 minutes')
+        """, (token.upper(), direction.upper(), pnl_pct))
+        if cur_s.fetchone():
+            log(f'  Signal outcome dedup: {token} {direction} already recorded recently, skipping', 'WARN')
+            conn_s.close()
+            return
         cur_s.execute("""
             INSERT INTO signal_outcomes (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
             VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -1116,11 +1314,11 @@ def main():
     global DRY
 
     parser = argparse.ArgumentParser(description='HL sync guardian daemon')
-    parser.add_argument('--apply', action='store_true', help='Actually close/record positions (default is dry-run)')
+    parser.add_argument('--dry', action='store_true', help='Dry-run mode (no closes/records)')
     parser.add_argument('--interval', type=int, default=60, help='Seconds between checks (default: 60)')
     args = parser.parse_args()
 
-    DRY = not args.apply
+    DRY = args.dry
 
     mode = 'DRY RUN' if DRY else 'LIVE SYNC'
     log(f'hl-sync-guardian starting — {mode}', 'INFO')

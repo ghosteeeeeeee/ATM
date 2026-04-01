@@ -1002,7 +1002,9 @@ def compute_score(token, direction, long_mult, short_mult):
         # Negative velocity = z falling = price reverting down = good LONG entry
         vel_score = min(10.0, max(0.0, -velocity * VEL_SCALE))
     else:
-        # Positive velocity = z rising = price reverting up = good SHORT entry
+        # FIX: Positive velocity = z rising = price reverting up = good SHORT entry
+        # Bug was: `max(0.0, velocity * VEL_SCALE)` which gave 0 for positive velocity (SHORT=0pts)
+        # Correct: reward positive velocity for SHORT (price reverting up = potential short entry)
         vel_score = min(10.0, max(0.0, velocity * VEL_SCALE))
 
     # ── RSI advisory — SHORT: hard block if oversold, LONG: hard block if overbought ──
@@ -1415,7 +1417,9 @@ def _run_mtf_macd_signals():
 
         # Confidence based on TF agreement strength
         base_conf = 40 + strength * 15  # 2tf=70, 3tf=85, 1tf=55
-        conf = min(95, base_conf)
+        # Boost: MTF MACD crossovers are strong indicators — give them extra weight
+        # so they can compete with Hermes signals in the max(hermes_avg, mtf_avg) scoring
+        conf = min(95, base_conf * 1.15)  # 2tf=80, 3tf=97, 1tf=63
 
         # ── Write mtf_macd signal ────────────────────────────────
         # Source = 'hmacd-' — prefixed so add_signal() merge combines
@@ -1448,10 +1452,17 @@ def _run_mtf_macd_signals():
 
         # ── Percentile rank signal (Hermes-only) ──────────────────────────
         # Fires when price is at historical extreme (suppressed or elevated)
+        # FIX: pct_long/pct_short are INVERTED from what the names suggest.
+        # pct_long = % of prices BELOW current price (high = elevated = SHORT opportunity)
+        # pct_short = % of prices ABOVE current price (high = suppressed = LONG opportunity)
         pct_signal_dir = None
-        if pct_long >= 85 or pct_short >= 85:
-            pct_signal_dir = 'LONG' if pct_long >= 85 else 'SHORT'
-            pct_val = max(pct_long, pct_short)
+        if pct_long >= 85:  # price elevated (85% of history is below current) → SHORT
+            pct_signal_dir = 'SHORT'
+            pct_val = pct_long
+        elif pct_short >= 85:  # price suppressed (85% of history is above current) → LONG
+            pct_signal_dir = 'LONG'
+            pct_val = pct_short
+        if pct_signal_dir:
             # Normalize percentile_rank to signal-strength equivalent.
             # pct_val 85→15pts, pct_val 100→50pts. Cap at 50 so it contributes
             # proportionally to other signals (z_score: 0-30, velocity: 0-10).
@@ -1481,28 +1492,30 @@ def _run_mtf_macd_signals():
 
         # ── MTF Z-Score Agreement ────────────────────────────────
         # Fires when z-score agrees across multiple timeframes (4H/1H/15m)
-        # All agreeing = strong momentum; mixed = weak signal; all disagree = skip
+        # FIX: Only fire when local MTF z-direction matches the regime-aware z_dir
+        # from get_momentum_stats(). This prevents MTF signals from contradicting
+        # the broader market phase (e.g., firing LONG when z=+2.613 in bear phase).
+        # Mean reversion: only valid in trending markets — uptrend → LONG on pullback,
+        # downtrend → SHORT on rallies. Extended z alone isn't enough.
         zscores = get_tf_zscores(token)
         z_4h  = zscores.get('4h',  (None, None))[0]
         z_1h  = zscores.get('1h',  (None, None))[0]
         z_15m = zscores.get('15m', (None, None))[0]
         valid_z = [v for v in [z_4h, z_1h, z_15m] if v is not None]
         if len(valid_z) >= 2:
-            agreeing = sum(1 for v in valid_z if v > 0)   # bullish TFs
-            disagreeing = len(valid_z) - agreeing            # bearish TFs
-            if agreeing >= 2:
-                z_dir = 'LONG'
-                z_conf = min(80, 45 + len(valid_z) * 8 + agreeing * 5)
-                z_tf_str = f'{agreeing}z{len(valid_z)}'
-            elif disagreeing >= 2:
-                z_dir = 'SHORT'
-                z_conf = min(80, 45 + len(valid_z) * 8 + disagreeing * 5)
-                z_tf_str = f'{disagreeing}z{len(valid_z)}'
-            else:
-                z_tf_str = None  # mixed, skip
-
-            if z_tf_str:
-                add_signal(token, z_dir, 'mtf_zscore', 'hzscore',
+            bullish_tfs = sum(1 for v in valid_z if v > 0)
+            bearish_tfs = len(valid_z) - bullish_tfs
+            # Local direction from raw MTF agreement
+            local_dir = 'LONG' if bullish_tfs >= 2 else ('SHORT' if bearish_tfs >= 2 else None)
+            # Map z_direction ('falling'→LONG, 'rising'→SHORT) for comparison
+            # z_dir from get_momentum_stats is 'falling'/'rising'/'neutral'
+            z_dir_map = {'falling': 'LONG', 'rising': 'SHORT'}
+            regime_dir = z_dir_map.get(z_dir.lower(), None)
+            # Only fire if MTF direction matches regime direction (or regime is neutral)
+            if local_dir and (regime_dir is None or local_dir == regime_dir):
+                z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
+                z_tf_str = f'{max(bullish_tfs, bearish_tfs)}z{len(valid_z)}'
+                add_signal(token, local_dir, 'mtf_zscore', 'hzscore',
                            confidence=z_conf, value=round(statistics.mean(valid_z), 3),
                            price=price, exchange='hyperliquid', timeframe=z_tf_str,
                            z_score=avg_z, z_score_tier=z_dir,
@@ -1568,21 +1581,24 @@ def _run_macd_signals_for_confluence():
 
 
 
-def run_confluence_detection():
-    """Check for tokens where ≥2 signal types agree, add boosted confluence signal."""
+def run_confluence_detection(regime, long_mult, short_mult):
+    """Check for tokens where ≥2 signal types agree, add boosted confluence signal.
+    
+    Args:
+        regime: current regime ('bull', 'bear', 'neutral', 'volatile')
+        long_mult: regime multiplier for LONG signals (1.0 = neutral, >1 = favorable)
+        short_mult: regime multiplier for SHORT signals (1.0 = neutral, >1 = favorable)
+    """
     # Query open positions locally (open_pos is in run() scope, not accessible here)
     open_pos_local = {t: d for t, d in [(p['token'], p['direction']) for p in _get_open_pos()]}
 
     # Get confluence groups: tokens with ≥2 PENDING signal types in last 60 min.
-    # Includes ALL signal types — both Hermes (rsi_confluence, macd_confluence, momentum)
-    # and OpenClaw (mtf_macd, rsi, z_score, mtf-momentum+rsi, etc).
-    # The mtf- vs Hermes distinction is determined by source prefix, not signal_type.
     confluences = get_confluence_signals(hours=1, min_signals=CONFLUENCE_MIN_SIGNALS,
-                                         signal_types=None)  # query all types
+                                         signal_types=None)
 
     confluences_added = 0
     for c in confluences:
-        token = c['token']
+        token=***
         direction = c['direction']
         num_signals = c.get('num_types') or c.get('count')
         avg_conf = c['avg_conf']
@@ -1595,6 +1611,20 @@ def run_confluence_detection():
             continue
         if direction.upper() == 'LONG' and token.upper() in LONG_BLACKLIST:
             continue
+
+        # FIX (2026-04-01): Regime filter — don't fire LONG confluences in bear regime,
+        # don't fire SHORT confluences in bull regime.
+        # The ANIME/BNB LONG entries at 21:00 fired because indicators agreed internally
+        # but the market regime was rolling over. Regime multiplier shows how favorable
+        # the market is for each direction.
+        reg_mult = long_mult if direction.upper() == 'LONG' else short_mult
+        if reg_mult < 0.7:
+            # Regime strongly opposes this direction — skip confluence
+            continue
+        elif reg_mult < 0.9:
+            # Regime somewhat opposes — only allow if confluence is very strong (3+ types)
+            if num_signals < 3:
+                continue
 
         # Rate limit
         if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
@@ -1900,7 +1930,7 @@ def run():
         mtf_added   = _run_mtf_macd_signals()  # native MTF-MACD + sub-signal writers
         if rsi_added or macd_added:
             print(f'  RSI/MACD signals: {rsi_added} RSI + {macd_added} MACD + {mtf_added} MTF-MACD added')
-        confluences_added = run_confluence_detection()
+        confluences_added =    run_confluence_detection(regime, long_mult, short_mult)
     except Exception as e:
         print(f'  Confluence detection error: {e}')
     print(f'  Confluence: {confluences_added} confluence signals added')

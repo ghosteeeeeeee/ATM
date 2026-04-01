@@ -15,7 +15,12 @@ SHORT_BLACKLIST = {
     'VIRTUAL', 'MELANIA', 'FARTCOIN',  # meme coins
     # 2026-04-01: tokens with negative avg SHORT returns
     'RENDER', 'WLD', 'PORT3', 'JUP',
+    # 2026-04-01: sketchy volume and price action
+    'BOME',
+    # 2026-04-01: persistent losses on both sides
+    'USTC',   # both sides losing: avg LONG=-4.5%, avg SHORT=-0.3%
+    'RSR',    # both sides losing: avg LONG=-3.5%, avg SHORT=-1.1%
 }
-LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE'}  # trade analysis 2026-04-01
+LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR'}  # trade analysis 2026-04-01
 BROAD_MARKET_TOKENS = ['ETH', 'SOL', 'BTC']
 SERVER_NAME = 'Hermes'

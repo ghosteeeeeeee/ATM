@@ -407,6 +407,17 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
     try:
         conn = sqlite3.connect(SIGNAL_DB)
         c = conn.cursor()
+        # Dedup: skip if we already recorded this exact outcome in the last 5 min
+        c.execute("""
+            SELECT id FROM signal_outcomes
+            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+            AND created_at > datetime('now', '-5 minutes')
+        """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
+        if c.fetchone():
+            print(f"[Signal Quality] Dedup: {signal_type or 'decider'} {direction} {token} "
+                  f"already recorded recently, skipping")
+            conn.close()
+            return
         c.execute("""
             INSERT INTO signal_outcomes
                 (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
@@ -610,12 +621,20 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 exit_price = %s,
                 pnl_pct = %s,
                 pnl_usdt = %s,
-                fees = %s
-            WHERE id = %s
+                fees = %s,
+                is_guardian_close = FALSE,
+                hype_realized_pnl_usdt = %s,
+                hype_realized_pnl_pct = %s
+            WHERE id = %s AND status = 'open'
         """, (now, reason, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
+              None, None,  # hype_realized_pnl_* will be backfilled after HL confirms
               trade_id))
+        if cur.rowcount == 0:
+            print(f"[Position Manager] Dedup: trade {trade_id} already closed, skipping")
+            conn.rollback()
+            return
         # DB UPDATE done — do NOT commit yet. Commit only after HL confirms, or rollback if HL fails.
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
@@ -624,18 +643,22 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # where HL closes but DB rollback leaves them permanently divergent.
         # If DB commit succeeds but HL close fails → hype-sync catches it next run.
         # If DB commit fails → rollback (safe), HL is still open for retry.
+        # Capture HL exit info for backfill — but don't let errors prevent DB commit
+        hl_exit_info = None
         if HYPE_AVAILABLE and is_live_trading_enabled():
             hype_token = hype_coin(token)
             conn.commit()  # lock in DB close
             try:
-                mirror_close(hype_token, direction)
+                hl_exit_info = mirror_close(hype_token, direction)
                 print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
             except RuntimeError as me:
                 print(f"[Position Manager] HYPE mirror_close FAILED (DB committed, HL still open): {me}")
                 print(f"[Position Manager] hype-sync will reconcile on next run")
+                hl_exit_info = None
             except Exception as me:
                 print(f"[Position Manager] HYPE mirror_close ERROR (DB committed, HL still open): {me}")
                 print(f"[Position Manager] hype-sync will reconcile on next run")
+                hl_exit_info = None
         elif HYPE_AVAILABLE:
             # Live trading OFF → paper only
             print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
@@ -643,6 +666,37 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         else:
             # No HYPE available at all
             conn.commit()
+
+        # ── Backfill HL ground truth after close ───────────────────
+        # mirror_close returns {hl_exit_price, hl_realized_pnl} — backfill these
+        # into hype_realized_pnl_* columns so we have ground-truth PnL going forward.
+        if hl_exit_info and hl_exit_info.get('hl_realized_pnl') is not None:
+            try:
+                conn2 = get_db_connection()
+                if conn2:
+                    cur2 = conn2.cursor()
+                    hl_rp = hl_exit_info.get('hl_realized_pnl', 0)
+                    hl_ep = hl_exit_info.get('hl_exit_price')
+                    # Use stored amount_usdt for pct calculation
+                    cur2.execute(
+                        "SELECT amount_usdt FROM trades WHERE id=%s",
+                        (trade_id,))
+                    row = cur2.fetchone()
+                    amt = float(row[0] or 50) if row else 50
+                    hype_pct = round(hl_rp / amt * 100, 4)
+                    cur2.execute("""
+                        UPDATE trades SET
+                            hype_realized_pnl_usdt = %s,
+                            hype_realized_pnl_pct = %s
+                        WHERE id=%s
+                    """, (round(hl_rp, 4), hype_pct, trade_id))
+                    conn2.commit()
+                    cur2.close()
+                    conn2.close()
+                    print(f"[Position Manager] Backfilled HL realized_pnl={hl_rp:+.4f} "
+                          f"({hype_pct:+.4f}%) for trade {trade_id}")
+            except Exception as e:
+                print(f"[Position Manager] HL backfill failed (non-fatal): {e}")
 
         # Record to ab_results on close — wrap with verbose logging so failures are never silent
         ab_errors = []

@@ -335,11 +335,13 @@ def get_pending_signals(hours=24, limit=50):
 
 get_pending_signals_as_dict = get_pending_signals  # alias
 
-def expire_pending_signals(minutes=15):
+def expire_pending_signals(minutes=30):
     """Expire PENDING signals older than `minutes`. Called every signal_gen run
     to prevent the queue from accumulating stale signals. Signals that haven't
     been acted on within the window are cleared — the next signal generation
-    cycle will create fresh ones if the conditions still exist."""
+    cycle will create fresh ones if the conditions still exist.
+    FIX (2026-04-01): Changed from 15 to 30 minutes to allow hot-set signals
+    to survive long enough for review_count to accumulate to >= 2."""
     conn = _get_conn(_runtime())
     c = conn.cursor()
     c.execute("""

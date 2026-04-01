@@ -291,10 +291,18 @@ def get_ab_params_for_trade(direction: str) -> dict:
     entry_mode = entry_variant.get('config', {}).get('entryMode', 'immediate')
 
     # Trailing stop test
+    # FIX (2026-04-01): ab_tests.json stores trailingActivationPct/trailingDistancePct as
+    # percentage numbers (0.5 = 0.5%, 1.0 = 1.0%) — need to normalize to decimal fractions.
+    # Normalize: > 1 means it's a percentage (e.g. 1.0 = 1%), divide by 100 → 0.01.
+    # Values <= 1 are already in fraction form (e.g. 0.01 = 1%).
     ts_variant = get_ab_variant('trailing-stop-test', direction)
-    trailing_activation  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
-    trailing_distance    = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
+    raw_act  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
+    raw_dist = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
+    trailing_activation  = raw_act / 100.0 if raw_act > 1.0 else raw_act
+    trailing_distance    = raw_dist / 100.0 if raw_dist > 1.0 else raw_dist
     trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
+    if trailing_phase2_dist is not None and trailing_phase2_dist > 1.0:
+        trailing_phase2_dist = trailing_phase2_dist / 100.0
 
     # Experiment metadata
     experiments = []

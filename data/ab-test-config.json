@@ -238,7 +238,7 @@
         {
           "id": "RETRACE-2",
           "name": "WINNER — Fast entry (0.2% wait / 30min)",
-          "weight": 42,
+          "weight": 50,
           "enabled": true,
           "config": {
             "wait_percent": 0.002,
@@ -255,28 +255,9 @@
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {
-          "id": "RETRACE-5",
-          "name": "Loser — Slow entry (0.5% wait / 60min)",
-          "weight": 17,
-          "enabled": true,
-          "config": {
-            "wait_percent": 0.005,
-            "max_wait_minutes": 60
-          },
-          "trades": 1,
-          "wins": 0,
-          "losses": 0,
-          "winRate": 50.0,
-          "totalPnlPct": 0,
-          "avg_win_pct": -0.135,
-          "avg_loss_pct": -0.018,
-          "lastUpdated": "2026-04-01 20:08:26.258965",
-          "learnings": "Waiting for bigger pullbacks loses. avg_win negative = even winners are losing after fees. Reduce weight."
-        },
-        {
           "id": "EVO-3",
           "name": "Pullback + confirmation filter",
-          "weight": 17,
+          "weight": 22,
           "enabled": true,
           "config": {
             "entryMode": "pullback",
@@ -296,7 +277,7 @@
         {
           "id": "EVO-5",
           "name": "Entry-Evolve-5",
-          "weight": 13,
+          "weight": 18,
           "enabled": true,
           "config": {
             "entryMode": "pullback",
