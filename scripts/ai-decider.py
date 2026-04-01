@@ -128,8 +128,9 @@ def _load_hot_rounds():
                     'num_types': len(types_list),
                 }
         conn.close()
-    except Exception:
-        pass
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print(f"[ai-decider] WARNING: _load_hot_rounds failed: {e} — hot-set system disabled")
 
 
 def _kill_hot_signal(token):
@@ -360,8 +361,8 @@ def get_learned_adjustments(token, direction='long'):
         cur.execute("""
             SELECT pattern_name, confidence, adjustment, sample_count
             FROM trade_patterns
-            WHERE token = %s 
-              AND (side = %s OR side = 'any')
+            WHERE token=%s 
+              AND (LOWER(side) = LOWER(%s) OR side = 'any')
               AND sample_count >= 3
             ORDER BY confidence DESC
             LIMIT 3

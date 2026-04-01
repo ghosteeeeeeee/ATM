@@ -37,16 +37,14 @@ def get_closed_trades(since_hours=168):
         SELECT
             t.id, t.token, t.direction, t.entry_price, t.exit_price,
             t.pnl_pct, t.pnl_usdt, t.sl_distance, t.experiment,
-            t.created_at, t.close_time,
-            s.direction, s.final_confidence
+            t.created_at, t.close_time
         FROM trades t
-        LEFT JOIN signals s ON s.token = t.token
         WHERE t.status = 'closed'
           AND t.close_time IS NOT NULL
-          AND t.close_time >= NOW() - INTERVAL %s
+          AND t.close_time >= NOW() - (%s || ' hours')::interval
           AND t.sl_distance IS NOT NULL
         ORDER BY t.close_time DESC
-    """, (since_hours,))
+    """, (str(since_hours),))
     rows = cur.fetchall()
     cur.close(); conn.close()
     return rows

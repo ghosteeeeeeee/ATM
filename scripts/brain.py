@@ -680,7 +680,7 @@ if __name__ == "__main__":
                 exit_price = t.get('exit_price') or 0
                 amount = t.get('amount_usdt') or 0
                 entry = t.get('entry_price') or 0
-                print(f"{t['id']:<4} {t['token']:<10} {t['type']:<6} ${amount:<9.2f} ${entry:<9.2f} ${exit_price:<8.2f} {pnl:>6.2f}% {t['status']:<8} {t.get('server', 'Tokyo'):<8}")
+                print(f"{t['id']:<4} {t['token']:<10} {t.get('direction', 'N/A'):<6} ${amount:<9.2f} ${entry:<9.2f} ${exit_price:<8.2f} {pnl:>6.2f}% {t['status']:<8} {t.get('server', 'Tokyo'):<8}")
         
         else:
             parser.print_help()

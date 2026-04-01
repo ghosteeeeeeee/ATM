@@ -318,6 +318,16 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
     try:
         conn = sqlite3.connect(SIGNAL_DB)
         c = conn.cursor()
+        # Deduplicate: skip if already recorded within last 5 minutes
+        c.execute("""
+            SELECT id FROM signal_outcomes
+            WHERE token=? AND direction=? AND signal_type=? 
+              AND created_at > datetime('now', '-5 minutes')
+            LIMIT 1
+        """, (token.upper(), direction.upper(), signal_type or 'decider'))
+        if c.fetchone():
+            conn.close()
+            return  # Already recorded — skip duplicate
         c.execute("""
             INSERT INTO signal_outcomes
                 (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
@@ -464,8 +474,9 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         row = cur.fetchone()
         if not row:
             conn.rollback()
+            conn.close()
             return False
-        token = row['token']
+        token=***
         direction = row['direction']
         entry_price = float(row['entry_price'] or 0)
         current_price = float(row['current_price'] or entry_price)
@@ -530,29 +541,33 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
         # ── Mirror to Hyperliquid (real trade) ───────────────────────
-        # Commit DB FIRST, then close on HL. This prevents the worst-case scenario
-        # where HL closes but DB rollback leaves them permanently divergent.
-        # If DB commit succeeds but HL close fails → hype-sync catches it next run.
-        # If DB commit fails → rollback (safe), HL is still open for retry.
+        # Attempt HL close FIRST. Only commit DB if HL confirms or HL is disabled.
+        # This prevents the window where DB says "closed" but HL still has the position.
+        hype_token = token
+        hl_ok = False
         if HYPE_AVAILABLE and is_live_trading_enabled():
-            hype_token = hype_coin(token)
-            conn.commit()  # lock in DB close
             try:
                 mirror_close(hype_token, direction)
                 print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
+                hl_ok = True
             except RuntimeError as me:
-                print(f"[Position Manager] HYPE mirror_close FAILED (DB committed, HL still open): {me}")
-                print(f"[Position Manager] hype-sync will reconcile on next run")
+                print(f"[Position Manager] HYPE mirror_close FAILED: {me}")
+                print(f"[Position Manager] Rolling back DB close — hype-sync will reconcile")
+                conn.rollback()
+                conn.close()
+                return False
             except Exception as me:
-                print(f"[Position Manager] HYPE mirror_close ERROR (DB committed, HL still open): {me}")
-                print(f"[Position Manager] hype-sync will reconcile on next run")
-        elif HYPE_AVAILABLE:
-            # Live trading OFF → paper only
-            print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
-            conn.commit()
+                print(f"[Position Manager] HYPE mirror_close ERROR: {me}")
+                print(f"[Position Manager] Rolling back DB close — hype-sync will reconcile")
+                conn.rollback()
+                conn.close()
+                return False
         else:
-            # No HYPE available at all
-            conn.commit()
+            # Live trading OFF → paper only, no HL to sync
+            print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
+
+        # Only commit DB after HL confirms (or HL is disabled)
+        conn.commit()
 
         # Record to ab_results on close — wrap with verbose logging so failures are never silent
         ab_errors = []
@@ -1128,26 +1143,22 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         return False
 
     # 2. Enter the opposite direction at current price
-    from hyperliquid_exchange import place_market_order
+    from hyperliquid_exchange import mirror_open, hype_coin
     current_price = flip_info['price']
     if not current_price or current_price <= 0:
         try:
-            from hyperliquid_exchange import get_price
-            current_price = get_price(token)
+            from hyperliquid_exchange import get_prices_curl
+            prices = get_prices_curl([token])
+            current_price = prices.get(token)
         except Exception:
             print(f"  [CASCADE FLIP] ❌ Could not get price for {token}")
             return True  # Position closed, new entry failed but not fatal
 
-    ok = place_market_order(
-        token=token,
-        direction=opposite_dir,
-        entry_price=current_price,
-        confidence=conf,
-        source=f"cascade-{source}",
-        trade_id=None,  # new trade
-    )
+    # Use mirror_open which handles kill-switch, delist checks, and HL mirroring properly
+    hype_token = hype_coin(token)
+    result = mirror_open(hype_token, opposite_dir, float(current_price), leverage=5)
 
-    if ok:
+    if result.get('success'):
         print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
         # Mark the signal that triggered the flip as executed
         try:

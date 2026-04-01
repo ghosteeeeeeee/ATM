@@ -15,14 +15,14 @@
           "config": {
             "slPct": 0.01
           },
-          "trades": 14,
+          "trades": 16,
           "wins": 1,
           "losses": 5,
           "winRate": 7.7,
           "totalPnlPct": -2.12,
           "avg_win_pct": -0.085,
           "avg_loss_pct": -0.034,
-          "lastUpdated": "2026-04-01 07:24:08.293140",
+          "lastUpdated": "2026-04-01 07:55:35.884382",
           "learnings": "Best WR (23.8%) but negative PnL. avg_win=-0.085% (NEGATIVE!) means winners are smaller than losers in absolute terms — fee drag + direction failures. Explore only, not exploit."
         },
         {
@@ -33,14 +33,14 @@
           "config": {
             "slPct": 0.03
           },
-          "trades": 1,
-          "wins": 1,
+          "trades": 2,
+          "wins": 2,
           "losses": 0,
-          "winRate": 0,
-          "totalPnlPct": 2.15,
+          "winRate": 100.0,
+          "totalPnlPct": 4.01,
           "avg_win_pct": -0.228,
           "avg_loss_pct": -0.047,
-          "lastUpdated": "2026-04-01 06:53:02.448849",
+          "lastUpdated": "2026-04-01 07:53:33.282905",
           "learnings": "PnL=-6.8% but above PnL_KILL=-15% so not auto-killed. avg_win negative = losing when right. Holds losers too long. Keep at low weight for more data."
         },
         {
@@ -128,14 +128,14 @@
             "trailingActivationPct": 0.01,
             "trailingDistancePct": 0.005
           },
-          "trades": 36,
+          "trades": 38,
           "wins": 4,
           "losses": 10,
           "winRate": 11.1,
           "totalPnlPct": 1.45,
           "avg_win_pct": 0.387,
           "avg_loss_pct": -0.127,
-          "lastUpdated": "2026-04-01 07:21:15.868929",
+          "lastUpdated": "2026-04-01 07:55:35.892464",
           "learnings": "CLEAR WINNER. Best PnL across all tests. avg_win=0.387% vs avg_loss=-0.127% = 3:1 reward/risk. Best combo: SL-1p5 + TS-1p0-0p5."
         },
         {
@@ -166,12 +166,12 @@
             "trailingActivationPct": 0.015,
             "trailingDistancePct": 0.008
           },
-          "trades": 3,
-          "wins": 1,
+          "trades": 4,
+          "wins": 2,
           "losses": 0,
-          "winRate": 0,
-          "totalPnlPct": 2.15,
-          "lastUpdated": "2026-04-01 07:24:08.300768",
+          "winRate": 50.0,
+          "totalPnlPct": 4.01,
+          "lastUpdated": "2026-04-01 07:53:33.282905",
           "learnings": "Both too wide. avg_loss=-0.626% means it holds losers too long before trailing kicks in. Low weight for data."
         },
         {
@@ -244,14 +244,14 @@
             "wait_percent": 0.002,
             "max_wait_minutes": 30
           },
-          "trades": 28,
-          "wins": 3,
+          "trades": 30,
+          "wins": 4,
           "losses": 6,
-          "winRate": 10.7,
-          "totalPnlPct": 2.02,
+          "winRate": 13.8,
+          "totalPnlPct": 3.87,
           "avg_win_pct": 0.974,
           "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-01 07:21:15.868929",
+          "lastUpdated": "2026-04-01 07:55:35.888535",
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {
@@ -263,14 +263,14 @@
             "wait_percent": 0.005,
             "max_wait_minutes": 60
           },
-          "trades": 10,
+          "trades": 11,
           "wins": 1,
           "losses": 3,
           "winRate": 12.5,
           "totalPnlPct": 0.37,
           "avg_win_pct": -0.135,
           "avg_loss_pct": -0.018,
-          "lastUpdated": "2026-04-01 07:24:08.297116",
+          "lastUpdated": "2026-04-01 07:50:34.406561",
           "learnings": "Waiting for bigger pullbacks loses. avg_win negative = even winners are losing after fees. Reduce weight."
         },
         {

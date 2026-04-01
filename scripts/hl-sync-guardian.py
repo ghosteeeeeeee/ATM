@@ -105,6 +105,9 @@ def get_db_open_trades():
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
         "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid'"
     ], capture_output=True, text=True, timeout=10)
+    if r.returncode != 0:
+        log(f'get_db_open_trades FAILED: {r.stderr}', 'FAIL')
+        return []
     trades = []
     for line in r.stdout.strip().splitlines():
         if '|' in line:
@@ -127,6 +130,9 @@ def get_all_open_trades():
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
         "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open'"
     ], capture_output=True, text=True, timeout=10)
+    if r.returncode != 0:
+        log(f'get_all_open_trades FAILED: {r.stderr}', 'FAIL')
+        return []
     trades = []
     for line in r.stdout.strip().splitlines():
         if '|' in line:
@@ -386,6 +392,16 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     stop_loss=sl_price,
                     target=tp_price,
                 )
+
+                # KEY FIX: Actually close the orphan HL position after creating the paper trade.
+                # Previously, add_orphan_trade() was called but the HL position was never closed.
+                # This left real money at risk on Hyperliquid.
+                if trade_id and not DRY:
+                    close_result = close_position_hl(coin, f"orphan_recovery_trade_{trade_id}")
+                    if close_result:
+                        log(f'  Orphan {coin} HL position closed via market order', 'PASS')
+                    else:
+                        log(f'  ⚠️ Orphan {coin} created in DB (trade #{trade_id}) but HL close failed', 'WARN')
 
                 # If we created the paper trade, mark it as copied so we don't try to mirror it again
                 if trade_id and not DRY:

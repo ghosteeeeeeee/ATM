@@ -128,6 +128,26 @@ def init_db():
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
+
+    # ── Signal History (compaction tracking for self-learning) ───────────────
+    # ai-decider.py writes to this table during signal compaction.
+    # Without it, all INSERT INTO signal_history calls silently fail.
+    rc.execute("""
+        CREATE TABLE IF NOT EXISTS signal_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT NOT NULL,
+            direction TEXT NOT NULL,
+            signal_type TEXT NOT NULL,
+            compact_round INTEGER NOT NULL,
+            survived INTEGER NOT NULL,
+            score_before REAL,
+            score_after REAL,
+            reason TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    rc.execute('CREATE INDEX IF NOT EXISTS idx_sh_token ON signal_history(token)')
+    rc.execute('CREATE INDEX IF NOT EXISTS idx_sh_round ON signal_history(compact_round)')
     rc.execute("""
         CREATE TABLE IF NOT EXISTS momentum_cache (
             token TEXT PRIMARY KEY,
@@ -158,10 +178,26 @@ def init_db():
             decision TEXT NOT NULL, reason TEXT,
             server TEXT DEFAULT 'Hermes',
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )""")
+        )
+    """)
+    # signal_history table — stores compacted signal lifecycle for AI learning
+    rc.execute("""
+        CREATE TABLE IF NOT EXISTS signal_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT NOT NULL,
+            direction TEXT NOT NULL,
+            signal_type TEXT NOT NULL,
+            compact_round INTEGER NOT NULL,
+            survived INTEGER NOT NULL,
+            score_before REAL,
+            score_after REAL,
+            reason TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    rc.execute("CREATE INDEX IF NOT EXISTS idx_sighist_token ON signal_history(token, direction)")
     rc.commit()
     rc.close()
-
     # ── Migrate legacy backfill data to static DB ──
     if os.path.exists(LEGACY_DB) and os.path.getsize(LEGACY_DB) > 0:
         sc = _get_conn(STATIC_DB)
@@ -339,8 +375,13 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     if os.path.exists(LEGACY_DB):
         try:
             c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
-        except Exception:
-            pass  # Already attached or permission issue
+        except sqlite3.IntegrityError:
+            pass  # Already attached — safe to ignore
+        except sqlite3.OperationalError as e:
+            if "already exists" not in str(e):
+                print(f"WARNING: Could not attach {LEGACY_DB}: {e}")
+        except Exception as e:
+            print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
 
     # Build dynamic WHERE clause for signal_type filter
     if signal_types:
@@ -480,8 +521,13 @@ def get_approved_signals(hours=24):
     if os.path.exists(LEGACY_DB):
         try:
             c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
-        except Exception:
-            pass
+        except sqlite3.IntegrityError:
+            pass  # Already attached — safe to ignore
+        except sqlite3.OperationalError as e:
+            if "already exists" not in str(e):
+                print(f"WARNING: Could not attach {LEGACY_DB}: {e}")
+        except Exception as e:
+            print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
 
     c.execute('''
         SELECT token, direction,

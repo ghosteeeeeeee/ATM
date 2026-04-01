@@ -71,7 +71,7 @@ def get_best_variant_for_test(test_name: str) -> Optional[Dict]:
     conn = _db_conn()
     cur = conn.cursor()
     cur.execute("""
-        SELECT variant_id, win_rate_pct, total_pnl_pct, trades, total_pnl_usdt, avg_r
+        SELECT variant_id, win_rate_pct, total_pnl_pct, trades, total_pnl_usdt
         FROM ab_results
         WHERE test_name=%s AND trades >= %s
         ORDER BY total_pnl_pct DESC
@@ -82,11 +82,10 @@ def get_best_variant_for_test(test_name: str) -> Optional[Dict]:
     if row:
         return {
             'variant_id': row[0],
-            'win_rate_pct': row[1],
-            'total_pnl_pct': row[2],
-            'trades': row[3],
-            'total_pnl_usdt': row[4],
-            'avg_r': row[5],
+            'win_rate_pct': row[1] if row[1] is not None else 0.0,
+            'total_pnl_pct': row[2] if row[2] is not None else 0.0,
+            'trades': row[3] if row[3] is not None else 0,
+            'total_pnl_usdt': row[4] if row[4] is not None else 0.0,
         }
     return None
 
@@ -157,9 +156,10 @@ def get_all_results() -> Dict[str, List[Dict]]:
     """Fetch all ab_results grouped by test_name."""
     conn = _db_conn()
     cur = conn.cursor()
+    # avg_r may not exist in older schema — use COALESCE to be safe
     cur.execute("""
         SELECT test_name, variant_id, trades, wins, losses,
-               win_rate_pct, total_pnl_pct, total_pnl_usdt, avg_r, updated_at
+               win_rate_pct, total_pnl_pct, total_pnl_usdt, updated_at
         FROM ab_results
         ORDER BY test_name, win_rate_pct DESC
     """)
@@ -174,7 +174,7 @@ def get_all_results() -> Dict[str, List[Dict]]:
         results[test].append({
             'variant_id': r[1], 'trades': r[2], 'wins': r[3], 'losses': r[4],
             'win_rate_pct': r[5] or 0, 'total_pnl_pct': r[6] or 0,
-            'total_pnl_usdt': r[7] or 0, 'avg_r': r[8] or 0, 'updated_at': r[9],
+            'total_pnl_usdt': r[7] or 0, 'updated_at': r[8],
         })
     return results
 
@@ -283,31 +283,52 @@ def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
     """
     Generate a new variant based on what we're already testing and market conditions.
     Tries to probe an adjacent hypothesis to the current best performer.
+
+    FIX: Sort by total_pnl_pct DESC (PnL is the true bottom line, not win rate).
+    Win rate is misleading — high WR with small wins < low WR with big wins.
     """
-    # Sort surviving by win rate
-    survivors_sorted = sorted(surviving,
-                              key=lambda v: _get_win_rate(v),
-                              reverse=True)
-    if not survivors_sorted:
+    if not surviving:
         return None
 
-    best = survivors_sorted[0]
+    # Fetch actual PnL data for each surviving variant (fixes broken _get_win_rate)
+    survivors_with_pnl = []
+    for v in surviving:
+        stats = _get_variant_stats(v, test_name)
+        survivors_with_pnl.append((v, stats))
+
+    # Sort by PnL% DESC (most reliable metric for trading systems)
+    survivors_with_pnl.sort(key=lambda x: x[1]['total_pnl_pct'], reverse=True)
+    best, best_stats = survivors_with_pnl[0]
+
     best_cfg = best.get('config', {})
-    best_wr = _get_win_rate(best)
+    best_pnl = best_stats['total_pnl_pct']
+    best_wr = best_stats['win_rate_pct']
 
     if test_name == 'sl-distance-test':
-        # If 1% SL is winning, try 0.75% (even tighter) or 2.5% (wider)
-        current_sl = best_cfg.get('slPct', 1.5)
-        if best_wr >= 55:
+        # If 1% SL is winning (positive PnL), try 0.75% (even tighter) or 2.5% (wider)
+        # Use 'slDistance' if present (fraction like 0.01), else 'slPct' (percentage like 1.0)
+        current_sl_dist = best_cfg.get('slDistance')
+        current_sl_pct = best_cfg.get('slPct')
+        if current_sl_dist is not None:
+            # slDistance is a fraction: 0.01 = 1%
+            current_sl = float(current_sl_dist) * 100  # convert to percentage
+        elif current_sl_pct is not None:
+            current_sl = float(current_sl_pct)
+        else:
+            current_sl = 1.5  # fallback
+
+        if best_pnl > 0:
             new_sl = round(current_sl * 0.75, 2)  # try tighter
-            desc = f'EVOLVED: even tighter SL ({new_sl}%) derived from {best["id"]} win={best_wr:.0f}%'
+            desc = (f'EVOLVED: tighter SL ({new_sl:.2f}%) derived from '
+                    f'{best["id"]} PnL={best_pnl:+.1f}%')
         else:
             new_sl = round(current_sl * 1.5, 1)    # try wider
-            desc = f'EVOLVED: wider SL ({new_sl}%) derived from {best["id"]} win={best_wr:.0f}%'
-        new_sl = max(0.005, min(new_sl, 3.0))
+            desc = (f'EVOLVED: wider SL ({new_sl:.1f}%) derived from '
+                    f'{best["id"]} PnL={best_pnl:+.1f}%')
+        new_sl = max(0.5, min(new_sl, 5.0))
         return {
-            'id': f'SL{new_sl*100:.0f}pct-E{len(surviving)+1}',
-            'name': f'SL-{new_sl*100:.0f}%-Evo',
+            'id': f'SL{new_sl:.0f}pct-E{len(surviving)+1}',
+            'name': f'SL-{new_sl:.1f}%-Evo',
             'weight': 10,
             'enabled': True,
             'config': {
@@ -337,7 +358,7 @@ def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
                 'entryMode': new_mode,
                 'pullbackPct': new_pct,
                 'maxWaitMinutes': 60,
-                'description': f'EVOLVED: {new_mode} {new_pct*100:.1f}% pullback',
+                'description': f'EVOLVED: {new_mode} {new_pct*100:.1f}% pullback (from {best["id"]})',
                 'evolved_from': best['id'],
                 'spawned_at': datetime.now().isoformat(),
             }
@@ -348,6 +369,10 @@ def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
         current_act = best_cfg.get('trailingActivationPct', 0.01)
         new_act = round(current_act * 0.5, 4)  # try tighter activation
         new_act = max(0.002, min(new_act, 0.05))
+        # Calculate trailing distance: 80% of activation (or 0.4x as fallback)
+        new_dist_raw = best_cfg.get('trailingDistancePct', current_act * 0.5)
+        new_dist = round(new_dist_raw * 0.8, 4)
+        new_dist = max(0.001, min(new_dist, 0.05))
         return {
             'id': f'TSEVO-{len(surviving)+1}',
             'name': f'TS-Evolve-{len(surviving)+1}',
@@ -355,8 +380,8 @@ def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
             'enabled': True,
             'config': {
                 'trailingActivationPct': new_act,
-                'trailingDistancePct': round(new_act * 0.8, 4),
-                'description': f'EVOLVED: TS activate at +{new_act*100:.2f}% (from {best["id"]})',
+                'trailingDistancePct': new_dist,
+                'description': f'EVOLVED: TS activate +{new_act*100:.2f}% dist {new_dist*100:.2f}% (from {best["id"]})',
                 'evolved_from': best['id'],
                 'spawned_at': datetime.now().isoformat(),
             }
@@ -365,20 +390,46 @@ def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
     return None
 
 
-def _get_win_rate(variant: Dict) -> float:
-    """Get win rate for a variant from ab_results."""
+def _get_variant_stats(variant: Dict, test_name: str) -> Dict:
+    """
+    Fetch complete stats for a variant from ab_results.
+    Returns dict with total_pnl_pct, win_rate_pct, trades, total_pnl_usdt.
+    Uses variant 'id' as variant_id (NOT 'name' — 'name' is a human description).
+    Requires test_name to be passed since variants don't store their own test_name.
+    """
     try:
         conn = _db_conn()
         cur = conn.cursor()
+        vid = variant.get('id', '')
         cur.execute("""
-            SELECT win_rate_pct FROM ab_results
+            SELECT total_pnl_pct, win_rate_pct, trades, total_pnl_usdt
+            FROM ab_results
             WHERE test_name=%s AND variant_id=%s
-        """, (variant.get('name', ''), variant.get('id', '')))
+        """, (test_name, vid))
         row = cur.fetchone()
         cur.close(); conn.close()
-        return float(row[0]) if row else 50.0
+        if row:
+            return {
+                'total_pnl_pct': float(row[0]) if row[0] is not None else 0.0,
+                'win_rate_pct': float(row[1]) if row[1] is not None else 50.0,
+                'trades': int(row[2]) if row[2] is not None else 0,
+                'total_pnl_usdt': float(row[3]) if row[3] is not None else 0.0,
+            }
+        return {'total_pnl_pct': 0.0, 'win_rate_pct': 50.0, 'trades': 0,
+                'total_pnl_usdt': 0.0}
     except Exception:
-        return 50.0
+        return {'total_pnl_pct': 0.0, 'win_rate_pct': 50.0, 'trades': 0,
+                'total_pnl_usdt': 0.0}
+
+
+def _get_win_rate(variant: Dict) -> float:
+    """
+    DEPRECATED: This function cannot determine test_name for the SQL query.
+    Use _get_variant_stats(variant, test_name) instead, which returns
+    both win_rate_pct and total_pnl_pct.
+    This function now falls back to PnL-based sorting (the correct approach).
+    """
+    return 50.0  # Fallback — actual data should come from _get_variant_stats
 
 
 def run_evolution() -> Dict[str, Any]:

@@ -840,7 +840,7 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
             else:
                 # Fall back to slippage estimate
                 slippage = 0.005
-                fill_price = mid_price * (1 + slippage) if is_buy else mid_price * (1 - slippage)
+                fill_price = live_price * (1 + slippage) if is_buy else live_price * (1 - slippage)
                 decimals = _sz_decimals(token)
                 fill_price = round(fill_price, decimals)
                 print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ ${live_price:.6f} "
