@@ -97,7 +97,7 @@ def main():
         "target_commitish": "main",
         "name": f"Hermes {date_str}",
         "body": f"**{commit_msg}**\n\nFull repo ({zip_mb:.1f}MB)",
-        "draft": False, "prerelease": False,
+        "draft": True, "prerelease": False,  # draft=True = immutable until published
     })
     rid = release["id"]
     upload_url = release["upload_url"].replace("{?name,label}", "?name=")
@@ -119,6 +119,10 @@ def main():
         asset = json.loads(resp.read())
     github_dl = asset["browser_download_url"]
     print(f"  GitHub: {github_dl}")
+
+    # Publish the draft release
+    github("PATCH", f"releases/{rid}", data={"draft": False})
+    print(f"  Published!")
 
     WWW_GIT.mkdir(parents=True, exist_ok=True)
     local_dest = WWW_GIT / os.path.basename(full_zip)
