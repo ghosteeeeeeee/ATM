@@ -36,6 +36,12 @@ LOG_FILE = '/root/.hermes/logs/sync-guardian.log'
 DATA_DIR = '/root/.hermes/data'
 COPIED_TRADES_FILE = os.path.join(DATA_DIR, 'copied-trades-state.json')
 
+# Deduplication: track trade IDs closed this cycle to prevent duplicate closes.
+# Both record_closed_trade() (Step 6) and _close_paper_trade_db() (Steps 7-8)
+# may fire for the same trade. Once a trade_id is closed this cycle, skip re-closes.
+_CLOSED_THIS_CYCLE = set()
+_CLOSED_HL_TOKENS = set()  # tokens where HL position was closed this cycle
+
 # Ensure data dir exists
 os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -240,143 +246,12 @@ def record_closed_trade(token: str, direction: str, entry_px: float, exit_px: fl
                         pnl_pct: float, lev: float, amount: float, reason: str,
                         use_hl_fills: bool = True):
     """
-    Record (or update) a closed trade in the paper DB.
-    If use_hl_fills=True (default): poll HL get_trade_history() for actual exit price
-    and realized_pnl. Falls back to signal-based prices if HL fills not available.
-    close_reason will be set to '{reason}_hl_verified' if HL fills were found.
+    DEPRECATED — Orphan HL positions are now handled by _close_orphan_paper_trade_by_id
+    which does an UPDATE (not INSERT) to avoid duplicate trade records.
+    This function is kept for backward compatibility but does nothing.
     """
-    hl_exit_px  = 0.0
-    real_pnl    = 0.0
-    hl_verified = False
-
-    if use_hl_fills and not DRY:
-        close_start_ms = int(time.time() * 1000) - 300000  # look back 5 min
-        hl_exit_px, real_pnl = _poll_hl_fills_for_close(token, close_start_ms)
-
-    # Compute pnl_pct from HL or signal prices
-    if hl_exit_px > 0 and entry_px > 0:
-        if direction == 'SHORT':
-            computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
-        else:
-            computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
-        computed_exit = hl_exit_px
-        computed_pnl_usdt = real_pnl if real_pnl != 0 else round(amount * computed_pnl_pct / 100, 4)
-        hl_verified = (real_pnl != 0) or (hl_exit_px != exit_px)
-    else:
-        computed_pnl_pct  = pnl_pct
-        computed_exit     = exit_px
-        computed_pnl_usdt = round(amount * pnl_pct / 100, 2)
-
-    actual_reason = reason if not hl_verified else f'{reason}_hl_verified'
-
-    if DRY:
-        log(f'  [DRY] Would record {token}: exit={computed_exit:.6f}, '
-            f'pnl={computed_pnl_pct:.4f}%, hl_verified={hl_verified}', 'WARN')
-        return
-
-    try:
-        # Use psycopg2 with parameterized queries — NEVER interpolate user input into SQL.
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
-                                user='postgres', password='***')
-        cur = conn.cursor()
-        cur.execute("""
-            INSERT INTO trades (token, direction, entry_price, exit_price, status,
-                pnl_pct, pnl_usdt, leverage, amount_usdt, exchange, paper,
-                hl_entry_price, hl_exit_price, hype_pnl_usdt, hype_pnl_pct,
-                close_time, close_reason, exit_reason, last_updated, updated_at)
-            VALUES (%s, %s, %s, %s, 'closed',
-                %s, %s, %s, %s, 'Hyperliquid', FALSE,
-                %s, %s, %s, %s,
-                NOW(), %s, %s, NOW(), NOW())
-        """, (token, direction, entry_px, computed_exit,
-              computed_pnl_pct, computed_pnl_usdt, lev, amount,
-              entry_px, computed_exit, real_pnl, computed_pnl_pct,
-              actual_reason, actual_reason))
-        conn.commit()
-        cur.close()
-        conn.close()
-        log(f'  DB recorded: {token} exit={computed_exit:.6f} '
-            f'pnl={computed_pnl_pct:.4f}% hl_verified={hl_verified}', 'PASS')
-
-        # ── Signal outcome recording + self-correction ─────────────────────────
-        # Record outcome so signal streaks learn over time
-        is_win = float(computed_pnl_pct or 0) > 0
-        try:
-            import sqlite3
-            from signal_schema import get_signal_streak
-            conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-            cur_s = conn_s.cursor()
-            cur_s.execute("""
-                INSERT INTO signal_outcomes
-                    (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (token.upper(), direction.upper(),
-                  'decider', 1 if is_win else 0,
-                  computed_pnl_pct, computed_pnl_usdt, None))
-            conn_s.commit()
-            conn_s.close()
-            log(f'  Signal outcome: {token} {direction} → {"WIN" if is_win else "LOSS"} '
-                f'(pnl={computed_pnl_pct:+.4f}%)', 'PASS')
-        except Exception as sig_err:
-            log(f'  Signal outcome record error: {sig_err}', 'WARN')
-
-        # ── Self-correction: flip direction + penalize on loss ─────────────────
-        if not is_win:
-            from signal_schema import set_cooldown, get_latest_price
-            # Flip: wrong direction was signalled → opposite is now the play
-            opposite = 'LONG' if direction.upper() == 'SHORT' else 'SHORT'
-            cooldown_minutes = 60  # 1hr cooldown before considering flip signal
-            try:
-                set_cooldown(token.upper(), opposite, minutes=cooldown_minutes,
-                             reason=f'flip_after_loss_{direction.lower()}')
-                log(f'  🔄 FLIP: {token} {direction.upper()} lost → setting {opposite} cooldown '
-                    f'({cooldown_minutes}min). {opposite} signal will be prioritized next cycle.',
-                    'INFO')
-            except Exception as cd_err:
-                log(f'  Flip cooldown error: {cd_err}', 'WARN')
-
-            # Penalize future signals in same wrong direction
-            try:
-                import psycopg2 as _pg2
-                conn_b = _pg2.connect(host='/var/run/postgresql', dbname='brain',
-                                      user='postgres', password='***')
-                cur_b = conn_b.cursor()
-                # Look up the most recent signal record for this token/direction
-                cur_b.execute("""
-                    SELECT signal, confidence FROM trades
-                    WHERE token=%s AND direction=%s AND server='Hermes'
-                    ORDER BY id DESC LIMIT 1
-                """, (token.upper(), direction.upper()))
-                row_trade = cur_b.fetchone()
-                cur_b.close()
-                conn_b.close()
-                signal_type = row_trade[0] if row_trade else 'decider'
-                conf = float(row_trade[1] or 50)
-                penalty = min(15, conf * 0.3)  # -30% of signal confidence, capped at -15
-                new_conf = max(0, conf - penalty)
-                # Insert a losing pattern record to bias future get_learned_adjustments
-                _pg2_conn = _pg2.connect(host='/var/run/postgresql', dbname='brain',
-                                        user='postgres', password='***')
-                _pg2_cur = _pg2_conn.cursor()
-                _pg2_cur.execute("""
-                    INSERT INTO trade_patterns
-                        (token, side, pattern_name, confidence, adjustment, sample_count)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    ON CONFLICT DO NOTHING
-                """, (token.upper(), direction.upper(), 'wrong_direction_signal',
-                      0.5, json.dumps({'confidence_adj': -penalty, 'sl_mult': 0.9}),
-                      1))
-                _pg2_conn.commit()
-                _pg2_cur.close()
-                _pg2_conn.close()
-                log(f'  📉 PENALTY: {token} {direction.upper()} future signals down '
-                    f'{penalty:.1f}pts (conf {conf:.0f}→{new_conf:.0f})', 'INFO')
-            except Exception as pen_err:
-                log(f'  Penalty record error: {pen_err}', 'WARN')
-
-        return
-    except Exception as e:
-        log(f'  DB record exception: {e}', 'FAIL')
+    log(f'  record_closed_trade() is deprecated — orphan closes now use '
+        f'_close_orphan_paper_trade_by_id (UPDATE not INSERT)', 'WARN')
 
 
 # ─── Reconcile HL→Paper (migrated from combined-trading.py) ───────────────────
@@ -889,10 +764,14 @@ def close_orphan_paper_trades(hl_pos, prices):
 
 
 def _close_paper_trade_db(trade_id, token, exit_price, reason):
-    """Close a paper trade in the DB without touching HL."""
+    """Close a paper trade in the DB without touching HL. Idempotent — checks status='open'."""
     if DRY:
         log(f'  [DRY] Would close paper trade #{trade_id} ({reason})', 'WARN')
         return
+    if trade_id in _CLOSED_THIS_CYCLE:
+        log(f'  Dedup: trade #{trade_id} already closed this cycle, skipping', 'WARN')
+        return
+    _CLOSED_THIS_CYCLE.add(trade_id)
 
     conn = get_db_connection()
     if conn is None:
@@ -917,10 +796,147 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         log(f'  _close_paper_trade_db error: {e}', 'FAIL')
 
 
+def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, reason):
+    """
+    Close a specific orphan paper trade by ID using actual HL fill data.
+    Looks up the HL exit price + realized PnL, then updates the trade and
+    records signal_outcomes + self-correction (flip+penalty on loss).
+
+    This replaces the old approach of calling record_closed_trade() which
+    INSERTS a new row (creating duplicates) instead of updating the existing orphan.
+    """
+    if DRY:
+        log(f'  [DRY] Would _close_orphan_paper_trade_by_id #{trade_id} ({reason})', 'WARN')
+        return
+
+    from hyperliquid_exchange import get_trade_history
+    import time as _time
+
+    # Poll HL for the close fill
+    close_start_ms = int(_time.time() * 1000) - 120000
+    hl_exit_px, realized_pnl = _poll_hl_fills_for_close(token, close_start_ms)
+
+    if hl_exit_px == 0.0:
+        log(f'  No HL fill for {token} trade #{trade_id}, will retry next cycle', 'WARN')
+        return
+
+    # Calculate PnL
+    amount = 20.0  # default
+    if direction.upper() == 'SHORT':
+        computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
+        computed_pnl_usdt = realized_pnl if realized_pnl != 0 else round(amount * computed_pnl_pct / 100, 4)
+    else:
+        computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
+        computed_pnl_usdt = realized_pnl if realized_pnl != 0 else round(amount * computed_pnl_pct / 100, 4)
+
+    is_win = float(computed_pnl_pct or 0) > 0
+
+    conn = get_db_connection()
+    if conn is None:
+        return
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE trades SET status='closed', exit_price=%s,
+                pnl_pct=%s, pnl_usdt=%s,
+                close_time=NOW(), close_reason=%s, exit_reason=%s,
+                last_updated=NOW(), updated_at=NOW()
+            WHERE id=%s AND status='open'
+        """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
+              reason, reason, trade_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        log(f'  Closed orphan trade #{trade_id}: {token} {direction} exit={hl_exit_px:.6f} '
+            f'pnl={computed_pnl_pct:+.4f}% {"WIN" if is_win else "LOSS"}', 'PASS')
+
+        # ── Signal outcome recording + self-correction ────────────────────────
+        _record_trade_outcome(token, direction.upper(), computed_pnl_pct,
+                              computed_pnl_usdt, trade_id)
+
+    except Exception as e:
+        try:
+            conn.rollback()
+            conn.close()
+        except:
+            pass
+        log(f'  _close_orphan_paper_trade_by_id error: {e}', 'FAIL')
+
+
+def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
+    """
+    Record trade outcome to signal_outcomes + self-correct on loss.
+    Called whenever any trade closes (guardian or position_manager).
+    """
+    is_win = float(pnl_pct or 0) > 0
+
+    # ── Record to signal_outcomes (SQLite) ─────────────────────────────────
+    try:
+        import sqlite3
+        conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+        cur_s = conn_s.cursor()
+        cur_s.execute("""
+            INSERT INTO signal_outcomes (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (token.upper(), direction.upper(), 'decider',
+              1 if is_win else 0, pnl_pct, pnl_usdt, None))
+        conn_s.commit()
+        conn_s.close()
+        log(f'  Signal outcome: {token} {direction} -> {"WIN" if is_win else "LOSS"} '
+            f'(pnl={pnl_pct:+.4f}%)', 'PASS')
+    except Exception as sig_err:
+        log(f'  Signal outcome record error: {sig_err}', 'WARN')
+
+    # ── Self-correction on loss ───────────────────────────────────────────
+    if not is_win:
+        opposite = 'LONG' if direction.upper() == 'SHORT' else 'SHORT'
+        try:
+            from signal_schema import set_cooldown
+            set_cooldown(token.upper(), opposite, minutes=60,
+                         reason=f'flip_after_loss_{direction.lower()}')
+            log(f'  FLIP: {token} {direction} lost -> {opposite} cooldown (60min)', 'INFO')
+        except Exception as cd_err:
+            log(f'  Flip cooldown error: {cd_err}', 'WARN')
+
+        # Record penalty to trade_patterns
+        try:
+            import psycopg2 as _pg2, json as _json
+            conn_b = _pg2.connect(host='/var/run/postgresql', dbname='brain',
+                                  user='postgres', password='***')
+            cur_b = conn_b.cursor()
+            cur_b.execute("""
+                SELECT signal, confidence FROM trades
+                WHERE token=%s AND direction=%s AND server='Hermes'
+                ORDER BY id DESC LIMIT 1
+            """, (token.upper(), direction.upper()))
+            row = cur_b.fetchone()
+            cur_b.close()
+            conf = float(row[1] or 50) if row else 50
+            penalty = min(15, conf * 0.3)
+            cur_b2 = conn_b.cursor()
+            cur_b2.execute("""
+                INSERT INTO trade_patterns
+                    (token, side, pattern_name, confidence, adjustment, sample_count)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT DO NOTHING
+            """, (token.upper(), direction.upper(), 'wrong_direction_signal',
+                  0.5, _json.dumps({'confidence_adj': -penalty, 'sl_mult': 0.9}), 1))
+            conn_b.commit()
+            cur_b2.close()
+            conn_b.close()
+            log(f'  PENALTY: {token} {direction} future signals -{penalty:.1f}pts '
+                f'(conf {conf:.0f}->{max(0,conf-penalty):.0f})', 'INFO')
+        except Exception as pen_err:
+            log(f'  Penalty record error: {pen_err}', 'WARN')
+
+
 # ─── Main Sync Cycle ──────────────────────────────────────────────────────────
 
 def sync():
     """Run one full sync cycle."""
+    global _CLOSED_THIS_CYCLE, _CLOSED_HL_TOKENS
+    _CLOSED_THIS_CYCLE.clear()
+    _CLOSED_HL_TOKENS.clear()
     log(f'── Sync cycle ──')
 
     # Step 1: Get HL positions
@@ -962,40 +978,47 @@ def sync():
     # Step 5: Sync PnL from HL
     sync_pnl_from_hype(prices)
 
-    # Step 6: Close orphan HL positions (paper trade was already created above)
+    # Step 6: Close orphan HL positions (paper trade was already created by reconcile_hype_to_paper)
+    # IMPORTANT: close the existing orphan paper trade directly by ID using the actual
+    # HL exit price. Do NOT call record_closed_trade() — that INSERTS a new row which
+    # duplicates the orphan paper trade that reconcile_hype_to_paper already created.
+    # Token set is tracked so Step 7-8 skip these tokens.
     if orphans:
         log(f'Closing {len(orphans)} orphan HL position(s)...', 'WARN')
         for coin in orphans:
+            _CLOSED_HL_TOKENS.add(coin.upper())
             p = hl_pos.get(coin, {})
             entry_px = float(p.get('entry_px', 0))
             direction = p.get('direction', 'LONG')
             lev = float(p.get('leverage', 1)) or 1
 
-            # Calculate position size
-            sz = float(p.get('size', 0)) or 0
-            position_usd = abs(sz) * entry_px if entry_px > 0 else 20
-            amount = min(position_usd, 20.0) or 20
-
-            # Get current price
-            exit_px = prices.get(coin, entry_px) if prices else entry_px
-
-            # Calculate PnL
-            if exit_px > 0 and entry_px > 0:
-                if direction == 'SHORT':
-                    raw_pnl_pct = (entry_px - exit_px) / entry_px * 100
-                else:
-                    raw_pnl_pct = (exit_px - entry_px) / entry_px * 100
-                pnl_pct = round(raw_pnl_pct, 4)
-            else:
-                pnl_pct = 0
-
             success = close_position_hl(coin, 'guardian_orphan')
             if success:
                 time.sleep(6)  # Wait for fills to appear
-                record_closed_trade(
-                    coin, direction, entry_px, exit_px,
-                    pnl_pct, lev, amount, 'guardian_orphan'
-                )
+
+                # Find the orphan paper trade that reconcile_hype_to_paper created
+                # and close it directly with the actual HL exit price.
+                # Skip if already closed this cycle (dedup).
+                conn_orphan = get_db_connection()
+                if conn_orphan:
+                    cur_orphan = conn_orphan.cursor()
+                    cur_orphan.execute(
+                        "SELECT id FROM trades WHERE token=%s AND status='open' "
+                        "AND exchange='Hyperliquid' LIMIT 1",
+                        (coin.upper(),))
+                    orphan_row = cur_orphan.fetchone()
+                    if orphan_row:
+                        orphan_id = orphan_row[0]
+                        if orphan_id in _CLOSED_THIS_CYCLE:
+                            log(f'  Dedup: orphan trade #{orphan_id} already closed, skipping', 'WARN')
+                        else:
+                            _CLOSED_THIS_CYCLE.add(orphan_id)
+                            _close_orphan_paper_trade_by_id(
+                                orphan_id, coin, direction, entry_px, lev,
+                                'guardian_orphan'
+                            )
+                    cur_orphan.close()
+                    conn_orphan.close()
             time.sleep(3)
 
     # Step 7: Close orphan paper trades (mirror paper→HL or close)
@@ -1003,48 +1026,24 @@ def sync():
         log(f'Syncing {len(missing)} paper-only trade(s)...', 'WARN')
         close_orphan_paper_trades(hl_pos, prices)
 
-    # Step 8: Close missing DB trades (position no longer on HL)
-    # CRITICAL FIX: token='***' was a hardcoded literal that matched NOTHING,
-    # creating phantom "closed at entry price" trades that lost pure fees.
-    # Also: setting exit_price=entry_price, pnl=0 destroys the real exit data.
-    # Fix: use psycopg2 with parameterized query, preserve entry_price, let
-    # guardian fill exit_price via HL fills (or mark as unknown).
+    # Step 8: Close any remaining "missing" DB trades that close_orphan_paper_trades
+    # didn't handle. All closes now go through _close_paper_trade_db (has dedup guard)
+    # OR _close_orphan_paper_trade_by_id (has dedup + outcome recording).
+    # Skip tokens that were already closed in Step 6 (_CLOSED_HL_TOKENS).
     if missing:
         for t in db_trades:
-            if t['token'] in missing:
+            tok = t['token'].upper()
+            if tok in _CLOSED_HL_TOKENS:
+                continue  # Already closed in Step 6
+            if tok in [x.upper() for x in missing]:
                 try:
-                    conn2 = get_db_connection()
-                    cur2 = conn2.cursor()
-                    # Check if there are HL fills for this token to get real exit price
-                    from hyperliquid_exchange import get_trade_history
-                    import time as _time
-                    fills = get_trade_history(int(_time.time()*1000) - 3600000)
-                    token_fills = [f for f in fills if t['token'] in f.get('coin','')]
-                    if token_fills:
-                        # Use last HL fill price as exit
-                        last_fill = token_fills[-1]
-                        exit_px = last_fill.get('px')
-                    else:
-                        exit_px = None  # Will be filled by guardian on next pass
-                    
-                    if exit_px:
-                        cur2.execute("""
-                            UPDATE trades SET status='closed', close_time=NOW(),
-                                close_reason='guardian_missing', exit_reason='guardian_missing',
-                                last_updated=NOW(), updated_at=NOW()
-                            WHERE token=%s AND status='open'
-                        """, (t['token'],))
-                    else:
-                        # No HL fill yet — don't close yet, let guardian retry next pass
-                        log(f'  Skipping DB close for {t["token"]} — no HL fill yet, will retry', 'WARN')
-                        cur2.close(); conn2.close()
-                        continue
-                    
-                    conn2.commit()
-                    cur2.close(); conn2.close()
-                    log(f'  DB closed: {t["token"]} @ {exit_px} (position not on HL)', 'PASS')
+                    _close_paper_trade_db(
+                        t['id'], tok,
+                        prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0,
+                        'guardian_missing'
+                    )
                 except Exception as e:
-                    log(f'  DB close failed for {t["token"]}: {e}', 'FAIL')
+                    log(f'  DB close failed for {tok}: {e}', 'FAIL')
 
     log(f'── Sync done ──')
 
@@ -1063,16 +1062,31 @@ def main():
     log(f'hl-sync-guardian starting — {mode}', 'INFO')
     log(f'PID: {os.getpid()}', 'INFO')
 
+    # Module-level counter — persists across loop iterations
+    _failure_count = 0
+
     while True:
+        # ── VmSize context window monitoring ──────────────────────────────
+        try:
+            import resource
+            rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            if rss_mb > 1024:
+                log(f'FATAL: VmSize {rss_mb:.0f}MB > 1GB — context window risk. Exiting.', 'FAIL')
+                sys.exit(1)
+            elif rss_mb > 500:
+                log(f'VmSize warning: {rss_mb:.0f}MB (>{500}MB threshold)', 'WARN')
+        except Exception as vm_err:
+            pass  # Non-critical
+
         try:
             sync()
+            _failure_count = 0  # Reset on success
         except Exception as e:
-            global _consecutive_failures
-            _consecutive_failures = getattr(sys.modules[__name__], '_consecutive_failures', 0) + 1
+            _failure_count += 1
             import traceback; traceback.print_exc()
-            log(f'Sync cycle error #{_consecutive_failures}: {e}', 'FAIL')
-            if _consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
-                log(f'FATAL: {_consecutive_failures} consecutive failures — exiting', 'FAIL')
+            log(f'Sync cycle error #{_failure_count}: {e}', 'FAIL')
+            if _failure_count >= MAX_CONSECUTIVE_FAILURES:
+                log(f'FATAL: {_failure_count} consecutive failures — exiting', 'FAIL')
                 sys.exit(1)
 
         log(f'Sleeping {INTERVAL}s...', 'INFO')
