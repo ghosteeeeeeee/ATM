@@ -606,12 +606,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             SET status = 'closed',
                 close_time = %s,
                 close_reason = %s,
+                exit_reason = %s,
                 exit_price = %s,
                 pnl_pct = %s,
                 pnl_usdt = %s,
                 fees = %s
             WHERE id = %s
-        """, (now, reason, current_price,
+        """, (now, reason, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               trade_id))
@@ -1194,6 +1195,22 @@ def check_cascade_flip(token: str, position_direction: str,
     try:
         conn = sqlite3.connect(db_path, timeout=5)
         c = conn.cursor()
+        # First: count distinct signal types agreeing on this direction (confluence)
+        c.execute("""
+            SELECT COUNT(DISTINCT signal_type)
+            FROM signals
+            WHERE UPPER(token) = ?
+              AND direction = ?
+              AND decision IN ('PENDING', 'WAIT')
+              AND confidence >= ?
+              AND created_at >= datetime('now', ?)
+        """, (token.upper(), opposite_dir, CASCADE_FLIP_MIN_CONF,
+              f'-{CASCADE_FLIP_MAX_AGE_M} minutes'))
+        agreeing_types = c.fetchone()[0]
+        if agreeing_types < CASCADE_FLIP_MIN_TYPES:
+            conn.close()
+            return None
+
         c.execute("""
             SELECT id, signal_type, source, confidence, price, created_at
             FROM signals

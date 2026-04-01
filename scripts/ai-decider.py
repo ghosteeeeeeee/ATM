@@ -1307,6 +1307,27 @@ print(f"Market: Z-Score={market_z}, BTC=${prices.get('BTC','N/A')}")
 
 processed_this_run = set()  # token+direction already reviewed this run
 
+# ── Confluence auto-approval: ≥75% confluence signals skip AI review ───────────
+CONFLUENCE_THRESHOLD = 75
+for s in pending:
+    if s.get('signal_type') == 'confluence' and s.get('confidence', 0) >= CONFLUENCE_THRESHOLD:
+        t = (s.get('token') or '').upper()
+        direction = (s.get('direction') or '').upper()
+        key = f"{t}:{direction}"
+        if key in processed_this_run:
+            continue
+        if is_token_open(t):
+            print(f"   ⏸️ [CONF-AUTO] {t}: already open")
+            mark_signal_processed(t, 'SKIPPED', decision_reason='confluence-auto-position-open')
+        else:
+            ok = mark_signal_processed(t, 'APPROVED')
+            if ok:
+                print(f"   ✅ [CONF-AUTO] {t} {direction} conf={s.get('confidence'):.0f}% — auto-approved (confluence ≥75%)")
+                log_signal(t, direction, s.get('entry', 0), s.get('confidence', 0), f"conf-auto-{s.get('source','')}")
+            else:
+                mark_signal_processed(t, 'FAILED', decision_reason='confluence-auto-approval-failed')
+        processed_this_run.add(key)
+
 for s in pending:
     t = s.get("token")
     direction = s.get("direction", "long")
