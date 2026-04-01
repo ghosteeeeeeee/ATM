@@ -642,14 +642,17 @@ def compute_regime():
     if avg_s < -1.5 and avg_m < -1.0:
         return 'bullish', 1.4, 0.9, broad_trending_up, broad_z_avg
     # Consensus overbought → bearish bias
+    # NOTE: SHORT multiplier capped at 1.1 (was 1.4). With shorts losing badly
+    # in recent history (-0.5% avg vs longs +1.9%), over-weighting SHORT is costly.
+    # A mild 1.1x keeps SHORT signals alive without letting regime dominate actual scores.
     if avg_s > 1.5 and avg_m > 1.0:
-        return 'bearish', 0.9, 1.4, broad_trending_up, broad_z_avg
+        return 'bearish', 0.9, 1.1, broad_trending_up, broad_z_avg
     # Short mean-reverting UP from medium → bullish
     if avg_s < avg_m - 0.3:
         return 'bullish', 1.2, 1.0, broad_trending_up, broad_z_avg
     # Short mean-reverting DOWN from medium → bearish
     if avg_s > avg_m + 0.3:
-        return 'bearish', 1.0, 1.2, broad_trending_up, broad_z_avg
+        return 'bearish', 1.0, 1.1, broad_trending_up, broad_z_avg
     return 'neutral', 1.0, 1.0, broad_trending_up, broad_z_avg
 
 

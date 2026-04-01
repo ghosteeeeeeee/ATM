@@ -27,6 +27,8 @@ from hyperliquid_exchange import (
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin
 )
 
+import json  # for json.dumps in penalty recording
+
 DRY = True   # Default is DRY RUN (safe). Use --apply flag to enable LIVE closing of orphan positions.
 INTERVAL = 60  # seconds between checks
 MAX_CONSECUTIVE_FAILURES = 5
@@ -295,6 +297,83 @@ def record_closed_trade(token: str, direction: str, entry_px: float, exit_px: fl
         conn.close()
         log(f'  DB recorded: {token} exit={computed_exit:.6f} '
             f'pnl={computed_pnl_pct:.4f}% hl_verified={hl_verified}', 'PASS')
+
+        # ── Signal outcome recording + self-correction ─────────────────────────
+        # Record outcome so signal streaks learn over time
+        is_win = float(computed_pnl_pct or 0) > 0
+        try:
+            import sqlite3
+            from signal_schema import get_signal_streak
+            conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+            cur_s = conn_s.cursor()
+            cur_s.execute("""
+                INSERT INTO signal_outcomes
+                    (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (token.upper(), direction.upper(),
+                  'decider', 1 if is_win else 0,
+                  computed_pnl_pct, computed_pnl_usdt, None))
+            conn_s.commit()
+            conn_s.close()
+            log(f'  Signal outcome: {token} {direction} → {"WIN" if is_win else "LOSS"} '
+                f'(pnl={computed_pnl_pct:+.4f}%)', 'PASS')
+        except Exception as sig_err:
+            log(f'  Signal outcome record error: {sig_err}', 'WARN')
+
+        # ── Self-correction: flip direction + penalize on loss ─────────────────
+        if not is_win:
+            from signal_schema import set_cooldown, get_latest_price
+            # Flip: wrong direction was signalled → opposite is now the play
+            opposite = 'LONG' if direction.upper() == 'SHORT' else 'SHORT'
+            cooldown_minutes = 60  # 1hr cooldown before considering flip signal
+            try:
+                set_cooldown(token.upper(), opposite, minutes=cooldown_minutes,
+                             reason=f'flip_after_loss_{direction.lower()}')
+                log(f'  🔄 FLIP: {token} {direction.upper()} lost → setting {opposite} cooldown '
+                    f'({cooldown_minutes}min). {opposite} signal will be prioritized next cycle.',
+                    'INFO')
+            except Exception as cd_err:
+                log(f'  Flip cooldown error: {cd_err}', 'WARN')
+
+            # Penalize future signals in same wrong direction
+            try:
+                import psycopg2 as _pg2
+                conn_b = _pg2.connect(host='/var/run/postgresql', dbname='brain',
+                                      user='postgres', password='***')
+                cur_b = conn_b.cursor()
+                # Look up the most recent signal record for this token/direction
+                cur_b.execute("""
+                    SELECT signal, confidence FROM trades
+                    WHERE token=%s AND direction=%s AND server='Hermes'
+                    ORDER BY id DESC LIMIT 1
+                """, (token.upper(), direction.upper()))
+                row_trade = cur_b.fetchone()
+                cur_b.close()
+                conn_b.close()
+                signal_type = row_trade[0] if row_trade else 'decider'
+                conf = float(row_trade[1] or 50)
+                penalty = min(15, conf * 0.3)  # -30% of signal confidence, capped at -15
+                new_conf = max(0, conf - penalty)
+                # Insert a losing pattern record to bias future get_learned_adjustments
+                _pg2_conn = _pg2.connect(host='/var/run/postgresql', dbname='brain',
+                                        user='postgres', password='***')
+                _pg2_cur = _pg2_conn.cursor()
+                _pg2_cur.execute("""
+                    INSERT INTO trade_patterns
+                        (token, side, pattern_name, confidence, adjustment, sample_count)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT DO NOTHING
+                """, (token.upper(), direction.upper(), 'wrong_direction_signal',
+                      0.5, json.dumps({'confidence_adj': -penalty, 'sl_mult': 0.9}),
+                      1))
+                _pg2_conn.commit()
+                _pg2_cur.close()
+                _pg2_conn.close()
+                log(f'  📉 PENALTY: {token} {direction.upper()} future signals down '
+                    f'{penalty:.1f}pts (conf {conf:.0f}→{new_conf:.0f})', 'INFO')
+            except Exception as pen_err:
+                log(f'  Penalty record error: {pen_err}', 'WARN')
+
         return
     except Exception as e:
         log(f'  DB record exception: {e}', 'FAIL')

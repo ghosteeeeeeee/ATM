@@ -15,14 +15,14 @@
           "config": {
             "slPct": 0.015
           },
-          "trades": 9,
+          "trades": 10,
           "wins": 1,
           "losses": 3,
           "winRate": 12.5,
           "totalPnlPct": -1.34,
           "avg_win_pct": 0.389,
           "avg_loss_pct": -0.052,
-          "lastUpdated": "2026-04-01 06:39:23.117978",
+          "lastUpdated": "2026-04-01 06:46:28.176389",
           "learnings": "Clear winner. avg_win=0.389% > avg_loss=0.052% in magnitude = positive expectancy. Survives despite low WR because wins are 7.5x larger than losses. EXPLOIT THIS."
         },
         {
@@ -33,14 +33,14 @@
           "config": {
             "slPct": 0.01
           },
-          "trades": 11,
+          "trades": 12,
           "wins": 0,
-          "losses": 4,
+          "losses": 5,
           "winRate": 0,
-          "totalPnlPct": -2.31,
+          "totalPnlPct": -2.75,
           "avg_win_pct": -0.085,
           "avg_loss_pct": -0.034,
-          "lastUpdated": "2026-04-01 06:39:28.109168",
+          "lastUpdated": "2026-04-01 06:45:25.648302",
           "learnings": "Best WR (23.8%) but negative PnL. avg_win=-0.085% (NEGATIVE!) means winners are smaller than losers in absolute terms — fee drag + direction failures. Explore only, not exploit."
         },
         {
@@ -127,14 +127,14 @@
             "trailingActivationPct": 0.01,
             "trailingDistancePct": 0.005
           },
-          "trades": 20,
+          "trades": 22,
           "wins": 3,
-          "losses": 7,
-          "winRate": 15.8,
-          "totalPnlPct": 1.77,
+          "losses": 8,
+          "winRate": 14.3,
+          "totalPnlPct": 1.33,
           "avg_win_pct": 0.387,
           "avg_loss_pct": -0.127,
-          "lastUpdated": "2026-04-01 06:39:28.116048",
+          "lastUpdated": "2026-04-01 06:46:28.183214",
           "learnings": "CLEAR WINNER. Best PnL across all tests. avg_win=0.387% vs avg_loss=-0.127% = 3:1 reward/risk. Best combo: SL-1p5 + TS-1p0-0p5."
         },
         {
@@ -243,14 +243,14 @@
             "wait_percent": 0.002,
             "max_wait_minutes": 30
           },
-          "trades": 10,
+          "trades": 12,
           "wins": 2,
-          "losses": 3,
-          "winRate": 28.6,
-          "totalPnlPct": 2.35,
+          "losses": 4,
+          "winRate": 18.2,
+          "totalPnlPct": 1.9,
           "avg_win_pct": 0.974,
           "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-01 06:39:28.112768",
+          "lastUpdated": "2026-04-01 06:46:28.179982",
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {

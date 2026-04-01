@@ -43,10 +43,10 @@ def get_closed_trades(since_hours=168):
         LEFT JOIN signals s ON s.token = t.token
         WHERE t.status = 'closed'
           AND t.close_time IS NOT NULL
-          AND t.close_time >= NOW() - INTERVAL '%s hours'
+          AND t.close_time >= NOW() - INTERVAL %s
           AND t.sl_distance IS NOT NULL
         ORDER BY t.close_time DESC
-    """, (str(since_hours),))
+    """, (since_hours,))
     rows = cur.fetchall()
     cur.close(); conn.close()
     return rows
