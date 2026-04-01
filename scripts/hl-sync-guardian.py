@@ -248,6 +248,28 @@ def _poll_hl_fills_for_close(token: str, close_start_ms: int):
     return 0.0, 0.0
 
 
+def _get_hl_exit_price(token: str, fallback: float = 0.0) -> float:
+    """
+    Attempt to get the actual HL fill price for a recently-closed position.
+    Polls trade history up to 3 times with 2s delay.
+    Returns the weighted-average fill price, or fallback if no fills found.
+    """
+    for attempt in range(3):
+        time.sleep(2)
+        try:
+            fills = get_trade_history(int(time.time() * 1000) - 120_000, int(time.time() * 1000))
+            token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
+            if token_fills:
+                total_sz = sum(f['sz'] for f in token_fills)
+                wavg = sum(f['px'] * f['sz'] for f in token_fills) / total_sz
+                log(f'  HL exit price for {token}: {wavg:.4f} (from {len(token_fills)} fills)')
+                return wavg
+        except Exception as e:
+            log(f'  HL fill poll attempt {attempt+1} failed for {token}: {e}', 'WARN')
+    log(f'  ⚠️ guardian_missing {token}: using estimated exit price (HL fill not available)', 'WARN')
+    return fallback
+
+
 def record_closed_trade(token: str, direction: str, entry_px: float, exit_px: float,
                         pnl_pct: float, lev: float, amount: float, reason: str,
                         use_hl_fills: bool = True):
@@ -709,10 +731,24 @@ def close_orphan_paper_trades(hl_pos, prices):
                 if token in hl_pos and float(hl_pos[token].get('size', 0)) != 0:
                     log(f'  ✅ {token} verified on HL (copied trade #{trade_id})')
                 else:
-                    # Paper trade still open but HL position gone → close paper
-                    log(f'  ⚠️ {token} copied but no HL position — closing paper', 'WARN')
-                    _close_paper_trade_db(trade_id, token, prices.get(token, entry), 'hl_position_missing')
-                    closed_count += 1
+                    # HL position not yet registered — wait before assuming missing.
+                    # Race: paper trade created, HL order submitted, but HL hasn't confirmed yet.
+                    # Retry up to 3 times with 5s delay.
+                    registered = False
+                    for retry in range(3):
+                        time.sleep(5)
+                        try:
+                            hl_pos_retry = get_open_hype_positions_curl()
+                            if token in hl_pos_retry and float(hl_pos_retry[token].get('size', 0)) != 0:
+                                log(f'  ✅ {token} verified on HL after {retry+1} retries')
+                                registered = True
+                                break
+                        except Exception as e:
+                            log(f'  ⚠️ Retry {retry+1} failed for {token}: {e}', 'WARN')
+                    if not registered:
+                        log(f'  ⚠️ {token} copied but no HL position after retries — closing paper', 'WARN')
+                        _close_paper_trade_db(trade_id, token, prices.get(token, entry), 'hl_position_missing')
+                        closed_count += 1
                     # Remove from copied list
                     try:
                         copied_state['copied'].remove(trade_id_str)
@@ -1063,9 +1099,11 @@ def sync():
                 continue  # Already closed in Step 6
             if tok in [x.upper() for x in missing]:
                 try:
+                    fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
+                    exit_price = _get_hl_exit_price(tok, fallback_price)
                     _close_paper_trade_db(
                         t['id'], tok,
-                        prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0,
+                        exit_price,
                         'guardian_missing'
                     )
                 except Exception as e:
