@@ -1,0 +1,135 @@
+{
+  "enabled": true,
+  "tests": [
+    {
+      "name": "sl-distance-test",
+      "description": "Stop-loss distance optimization — test 1%, 2%, 3% SL distances",
+      "variants": [
+        {
+          "id": "SL1pct",
+          "label": "1% SL (tight)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 1.0
+          }
+        },
+        {
+          "id": "SL2pct",
+          "label": "2% SL (control)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 2.0
+          }
+        },
+        {
+          "id": "SL3pct",
+          "label": "3% SL (loose)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 3.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "entry-timing-test",
+      "description": "Entry timing — immediate vs retrace 2% vs retrace 5% pullback",
+      "variants": [
+        {
+          "id": "IMMEDIATE",
+          "label": "Immediate entry",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "entryMode": "immediate"
+          }
+        },
+        {
+          "id": "RETRACE-2",
+          "label": "Retrace 2% pullback",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "entryMode": "retrace",
+            "pullbackThreshold": 2.0
+          }
+        },
+        {
+          "id": "RETRACE-5",
+          "label": "Retrace 5% pullback",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "entryMode": "retrace",
+            "pullbackThreshold": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "trailing-stop-test",
+      "description": "Trailing stop parameters — activation threshold and distance",
+      "variants": [
+        {
+          "id": "TS-tight",
+          "label": "Tight trailing: 0.5% activation / 0.5% distance",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 0.5,
+            "trailingDistancePct": 0.5
+          }
+        },
+        {
+          "id": "TS-normal",
+          "label": "Normal trailing: 1% activation / 1% distance",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 1.0,
+            "trailingDistancePct": 1.0
+          }
+        },
+        {
+          "id": "TS-loose",
+          "label": "Loose trailing: 2% activation / 1% distance",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 2.0,
+            "trailingDistancePct": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "short-strategy-comparison",
+      "description": "SHORT direction strategy variants",
+      "variants": [
+        {
+          "id": "SHORT-aggressive",
+          "label": "Aggressive SHORT — tighter SL",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 2.0,
+            "tpPct": 6.0
+          }
+        },
+        {
+          "id": "SHORT-conservative",
+          "label": "Conservative SHORT — wider SL",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 3.0,
+            "tpPct": 5.0
+          }
+        }
+      ]
+    }
+  ]
+}
