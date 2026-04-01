@@ -601,71 +601,74 @@ def get_approved_signals(hours=24):
     conn.close()
     return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
 
-def mark_signal_processed(token, decision, signal_ids=None):
+def mark_signal_processed(token, decision, signal_ids=None, decision_reason=None):
     """
-    Mark signals as processed.
+    Mark signals as processed with optional reason.
 
     Args:
         token: token symbol
         decision: APPROVED, SKIPPED, FAILED, EXPIRED, WAIT
         signal_ids: optional list of specific signal IDs to update.
                     If None, updates ALL PENDING signals for token (legacy behavior).
-                    IMPORTANT: always include direction for safety.
+        decision_reason: optional human-readable reason string. ALWAYS pass this
+                         so the decision audit trail is complete. The DB must never
+                         have NULL reasons for SKIPPED/WAIT decisions.
     """
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
         tok = token.upper()
+        reason = decision_reason or f'processed-{decision.lower()}'
+        increment_rc = decision in ('SKIPPED', 'WAIT')
+
         if signal_ids:
             # Targeted update: only specific IDs
             placeholders = ','.join(['?' for _ in signal_ids])
-            # Increment review_count on SKIPPED/WAIT so hot set can track survival
-            increment_rc = decision in ('SKIPPED', 'WAIT')
+            params = (decision, reason) + tuple(signal_ids)
             if decision == 'APPROVED':
                 c.execute(f'''
                     UPDATE signals
-                    SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
+                    SET decision=?, decision_reason=?, executed=0, updated_at=CURRENT_TIMESTAMP
                     WHERE id IN ({placeholders}) AND executed IN (0, 1)
-                ''', (decision,) + tuple(signal_ids))
+                ''', params)
+            elif increment_rc:
+                c.execute(f'''
+                    UPDATE signals
+                    SET decision=?, decision_reason=?, executed=1,
+                        review_count = COALESCE(review_count, 0) + 1,
+                        updated_at=CURRENT_TIMESTAMP
+                    WHERE id IN ({placeholders}) AND executed IN (0, 1)
+                ''', params)
             else:
-                if increment_rc:
-                    c.execute(f'''
-                        UPDATE signals
-                        SET decision=?, executed=1,
-                            review_count = COALESCE(review_count, 0) + 1,
-                            updated_at=CURRENT_TIMESTAMP
-                        WHERE id IN ({placeholders}) AND executed IN (0, 1)
-                    ''', (decision,) + tuple(signal_ids))
-                else:
-                    c.execute(f'''
-                        UPDATE signals
-                        SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
-                        WHERE id IN ({placeholders}) AND executed IN (0, 1)
-                    ''', (decision,) + tuple(signal_ids))
+                c.execute(f'''
+                    UPDATE signals
+                    SET decision=?, decision_reason=?, executed=1, updated_at=CURRENT_TIMESTAMP
+                    WHERE id IN ({placeholders}) AND executed IN (0, 1)
+                ''', params)
         else:
             # Legacy: update ALL PENDING for token (use with caution)
+            params_approved = (decision, tok)
+            params_other = (decision, reason, tok)
             if decision == 'APPROVED':
                 c.execute('''
                     UPDATE signals
                     SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
                     WHERE token=? AND executed IN (0, 1)
-                ''', (decision, tok))
+                ''', params_approved)
+            elif increment_rc:
+                c.execute('''
+                    UPDATE signals
+                    SET decision=?, decision_reason=?, executed=1,
+                        review_count = COALESCE(review_count, 0) + 1,
+                        updated_at=CURRENT_TIMESTAMP
+                    WHERE token=? AND executed IN (0, 1)
+                ''', params_other)
             else:
-                increment_rc = decision in ('SKIPPED', 'WAIT')
-                if increment_rc:
-                    c.execute('''
-                        UPDATE signals
-                        SET decision=?, executed=1,
-                            review_count = COALESCE(review_count, 0) + 1,
-                            updated_at=CURRENT_TIMESTAMP
-                        WHERE token=*** AND executed IN (0, 1)
-                    ''', (decision, tok))
-                else:
-                    c.execute('''
-                        UPDATE signals
-                        SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
-                        WHERE token=*** AND executed IN (0, 1)
-                    ''', (decision, tok))
+                c.execute('''
+                    UPDATE signals
+                    SET decision=?, decision_reason=?, executed=1, updated_at=CURRENT_TIMESTAMP
+                    WHERE token=? AND executed IN (0, 1)
+                ''', params_other)
         conn.commit()
         return c.rowcount
     except Exception as e:

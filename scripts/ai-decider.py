@@ -1326,7 +1326,7 @@ for s in pending:
     exchange = s.get("exchange")
     if exchange is None:
         print(f"❌ {t}: Cannot determine valid exchange - token not available on any supported exchange")
-        mark_signal_processed(t, 'SKIPPED')
+        mark_signal_processed(t, 'SKIPPED', decision_reason='exchange-unavailable')
         continue
     
     # SHORT_BLACKLIST and LONG_BLACKLIST are imported from hermes_constants at module level
@@ -1334,13 +1334,13 @@ for s in pending:
     if direction.lower() == "short" and t.upper() in SHORT_BLACKLIST:
         print(f"   🚫 {t}: BLACKLISTED - skipping SHORT completely (0-20% WR historically)")
         log_signal(t, direction, entry, s.get('confidence', 0), f"SKIPPED-blacklist-{exchange}")
-        mark_signal_processed(t, 'SKIPPED')
+        mark_signal_processed(t, 'SKIPPED', decision_reason=f'blacklist-short-{exchange}')
         continue
     
     if direction.lower() == "long" and t.upper() in LONG_BLACKLIST:
         print(f"   🚫 {t}: BLACKLISTED - skipping LONG (poor performance)")
         log_signal(t, direction, entry, s.get('confidence', 0), f"SKIPPED-long-blacklist-{exchange}")
-        mark_signal_processed(t, 'SKIPPED')
+        mark_signal_processed(t, 'SKIPPED', decision_reason='blacklist-long')
         continue
     
     # Check open slots
@@ -1359,14 +1359,14 @@ for s in pending:
         if num_types < 2 or avg_conf < 30:
             print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
             log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
-            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
+            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-quality-gate')
             processed_this_run.add(key)
             continue
 
         if is_token_open(t):
             print(f"   ⏸️ 🔥 HOT r{hot['rounds']} {t} [{hot.get('source','?')}]: already has open position")
             log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
-            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
+            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-position-open')
             processed_this_run.add(key)
             continue
 
@@ -1374,7 +1374,7 @@ for s in pending:
         if direction.lower() == "short" and t.upper() in SHORT_BLACKLIST:
             print(f"   🚫 🔥 HOT r{hot['rounds']} {t}: BLACKLISTED — skipping SHORT")
             log_signal(t, direction, entry, conf, f"SKIPPED-blacklist-{exchange}")
-            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
+            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-blacklist')
             processed_this_run.add(key)
             continue
 
@@ -1394,7 +1394,7 @@ for s in pending:
         else:
             print(f"   ❌🔥 HOT r{hot['rounds']} {t}: failed to record approval")
             log_signal(t, direction, entry, conf, f"FAILED-hot-{exchange}")
-            mark_signal_processed(t, 'FAILED', hot.get('signal_ids'))
+            mark_signal_processed(t, 'FAILED', hot.get('signal_ids'), decision_reason='hot-set-approval-failed')
         processed_this_run.add(key)
         continue
 
@@ -1402,7 +1402,7 @@ for s in pending:
     if exchange == "raydium" and direction.lower() == "short":
         print(f"⏸️ {t}: SOL tokens can only go LONG on Raydium")
         log_signal(t, direction, entry, conf, "SKIPPED-sol-short")
-        mark_signal_processed(t, 'SKIPPED')
+        mark_signal_processed(t, 'SKIPPED', decision_reason='sol-short-unsupported')
         continue
     
     # Get LLM candle prediction for this token
@@ -1462,11 +1462,11 @@ LLM CANDLE PREDICTION (for reference):
         if not is_real_pump(t, direction):
             print(f"   ⏸️ SKIPPED - No pump momentum (need >3% 24h + volume)")
             log_signal(t, direction, entry, conf, f"SKIPPED-{exchange}")
-            mark_signal_processed(t, 'SKIPPED')
+            mark_signal_processed(t, 'SKIPPED', decision_reason='no-pump-momentum')
         elif is_token_open(t):
             print(f"   ⏸️ SKIPPED - {t} already has open position")
             log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
-            mark_signal_processed(t, 'SKIPPED')
+            mark_signal_processed(t, 'SKIPPED', decision_reason='position-already-open')
         else:
             # Record approval
             ok = mark_signal_processed(t, 'APPROVED')
@@ -1476,11 +1476,11 @@ LLM CANDLE PREDICTION (for reference):
             else:
                 print(f"   ❌ Failed to record approval")
                 log_signal(t, decision, entry, ai_conf, f"FAILED-{exchange}")
-                mark_signal_processed(t, 'FAILED')
+                mark_signal_processed(t, 'FAILED', decision_reason='approval-record-failed')
     else:
         print(f"   ⏸️ AI said WAIT")
         log_signal(t, direction, entry, ai_conf, f"WAIT-{exchange}")
-        mark_signal_processed(t, 'WAIT')
+        mark_signal_processed(t, 'WAIT', decision_reason=f'ai-wait-{decision}')
 
 
 # ── Pipeline heartbeat ─────────────────────────────────────────────────────────
