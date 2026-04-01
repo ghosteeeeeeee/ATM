@@ -31,9 +31,11 @@ def get_token():
 TOKEN = get_token()
 
 def sh(*cmd, cwd=HERMES, check=True):
+    # Accept either sh("cmd arg1 arg2") string or sh("cmd", "arg1", "arg2") args
     if len(cmd) == 1 and isinstance(cmd[0], str):
-        cmd = cmd[0].split()
-    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+        import shlex
+        cmd = tuple(shlex.split(cmd[0]))
+    r = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True)
     if r.returncode and check:
         sys.exit(f"FAIL: {' '.join(cmd)}\n{r.stderr}")
     return r.stdout.strip()
@@ -69,7 +71,7 @@ def main():
         print(f"[!] SYMLINKS FOUND — resolve before zipping")
         sys.exit(1)
 
-    commit = sh("git", "rev-parse", "--short=HEAD")
+    commit = sh("git rev-parse --short HEAD")
     ts = time.strftime("%Y%m%d-%H%M")
     full_zip = f"/tmp/ATM-Hermes-{ts}-full-{commit}.zip"
     commit_msg = sh("git", "log", "-1", "--format=%s")
