@@ -5,7 +5,7 @@ SHORT_BLACKLIST = {
     'ACE','YZY','ZEREBRO','WLFI','HBAR','MEGA',
     # Trade analysis 2026-04-01 (SHORTs with 0 wins, avg < -50%):
     'SOL','XPL','ZRO','NEO','GMT','FTT','HYPE','XLM','DOGE','MERL',
-    'YGG','IO','USUAL'
+    'YGG','IO','USUAL','FOGO'
 }
 LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE'}  # trade analysis 2026-04-01
 BROAD_MARKET_TOKENS = ['ETH', 'SOL', 'BTC']
