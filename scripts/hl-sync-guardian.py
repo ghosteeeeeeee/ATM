@@ -914,12 +914,13 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         except Exception as cd_err:
             log(f'  Flip cooldown error: {cd_err}', 'WARN')
 
-        # Record penalty to trade_patterns
+        # Record penalty to trade_patterns via UPSERT (incrementing sample_count each time)
         try:
-            import psycopg2 as _pg2, json as _json
+            import psycopg2 as _pg2
             conn_b = _pg2.connect(host='/var/run/postgresql', dbname='brain',
                                   user='postgres', password='***')
             cur_b = conn_b.cursor()
+            # Look up original signal confidence to compute penalty
             cur_b.execute("""
                 SELECT signal, confidence FROM trades
                 WHERE token=%s AND direction=%s AND server='Hermes'
@@ -929,14 +930,23 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
             cur_b.close()
             conf = float(row[1] or 50) if row else 50
             penalty = min(15, conf * 0.3)
+            # psycopg2 JSONB accepts Python dict directly — no json.dumps() needed.
+            # ON CONFLICT (token, side, regime, pattern_name): increments sample_count.
+            # Also upserts adjustment so the latest penalty is always stored.
             cur_b2 = conn_b.cursor()
             cur_b2.execute("""
                 INSERT INTO trade_patterns
-                    (token, side, pattern_name, confidence, adjustment, sample_count)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                ON CONFLICT DO NOTHING
-            """, (token.upper(), direction.upper(), 'wrong_direction_signal',
-                  0.5, _json.dumps({'confidence_adj': -penalty, 'sl_mult': 0.9}), 1))
+                    (token, side, regime, pattern_name, confidence, adjustment, sample_count)
+                VALUES (UPPER(%s), UPPER(%s), 'unknown', 'wrong_direction_signal',
+                        0.5, (%s), 1)
+                ON CONFLICT (token, side, regime, pattern_name)
+                DO UPDATE SET
+                    confidence = GREATEST(trade_patterns.confidence, EXCLUDED.confidence),
+                    adjustment = EXCLUDED.adjustment,
+                    sample_count = trade_patterns.sample_count + 1,
+                    last_seen = NOW()
+            """, (token.upper(), direction.upper(),
+                  _pg2.extras.Json({'confidence_adj': -penalty, 'sl_mult': 0.9})))
             conn_b.commit()
             cur_b2.close()
             conn_b.close()

@@ -354,16 +354,24 @@ GOAL_PRESETS = {
 BRAIN_DB = "host=/var/run/postgresql dbname=brain user=postgres password=postgres"
 
 def get_learned_adjustments(token, direction='long'):
-    """Get learned pattern adjustments from brain for a token"""
+    """
+    Get learned pattern adjustments from brain.trade_patterns for a token/direction.
+    
+    Key fixes:
+    - psycopg2 JSONB columns return Python dict (not JSON string) — no json.loads() needed.
+      But the DB may contain legacy string values, so we handle both gracefully.
+    - sample_count >= 1 (was >= 3, which blocked all patterns since most have count=1).
+    - Token comparison is case-insensitive via UPPER().
+    """
     try:
         conn = psycopg2.connect(BRAIN_DB)
         cur = conn.cursor()
         cur.execute("""
             SELECT pattern_name, confidence, adjustment, sample_count
             FROM trade_patterns
-            WHERE token=%s 
+            WHERE UPPER(token) = UPPER(%s)
               AND (LOWER(side) = LOWER(%s) OR side = 'any')
-              AND sample_count >= 3
+              AND sample_count >= 1
             ORDER BY confidence DESC
             LIMIT 3
         """, (token, direction))
@@ -380,12 +388,24 @@ def get_learned_adjustments(token, direction='long'):
         total_weight = 0
         
         for p in patterns:
-            weight = (p[2] or 0.5) * min(p[3], 10) / 10
-            try:
-                adj = json.loads(p[2]) if p[2] else {}
-            except (json.JSONDecodeError, ValueError) as e:
-                log_error(f'get_learned_adjustments: json.loads failed for pattern {p[0]}: {e}')
+            # psycopg2 JSONB returns dict; legacy strings are possible (handle both)
+            raw_adj = p[2]
+            if raw_adj is None:
                 adj = {}
+            elif isinstance(raw_adj, dict):
+                adj = raw_adj
+            else:
+                try:
+                    adj = json.loads(raw_adj) if isinstance(raw_adj, str) else {}
+                except (json.JSONDecodeError, ValueError) as e:
+                    log_error(f'get_learned_adjustments: json.loads failed for pattern {p[0]}: {e}')
+                    adj = {}
+            
+            # Weight by confidence and sample_count
+            conf_val = float(p[1] or 0.5)
+            sample = int(p[3] or 1)
+            weight = conf_val * min(sample, 10) / 10
+            
             conf_adj += adj.get('confidence_adj', 0) * weight
             sl_mult = (sl_mult * (1 - weight)) + ((adj.get('sl_mult', 1.0) or 1.0) * weight)
             total_weight += weight
