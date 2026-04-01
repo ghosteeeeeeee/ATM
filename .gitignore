@@ -57,3 +57,4 @@ config.yaml
 
 # ─── Secrets ─────────────────────────────────────────────────────────────────
 .secrets.local
+.skills_prompt_snapshot.json
