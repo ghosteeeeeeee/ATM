@@ -11,9 +11,17 @@ WWW_GIT = Path("/var/www/git")
 GITHUB_REPO = "ghosteeeeeeee/ATM"
 
 def get_token():
+    # 1. Env var (highest priority)
     token = os.environ.get("GITHUB_TOKEN")
     if token:
         return token
+    # 2. .secrets.local (Hermes secrets file)
+    secrets = HERMES / ".secrets.local"
+    if secrets.exists():
+        for line in secrets.read_text().splitlines():
+            if line.startswith("GITHUB_TOKEN="):
+                return line.split("=", 1)[1].strip().strip('"')
+    # 3. ~/.netrc (legacy fallback)
     try:
         netrc = Path.home() / ".netrc"
         if netrc.exists():
@@ -26,7 +34,7 @@ def get_token():
                             return parts[idx + 1]
     except Exception:
         pass
-    sys.exit("ERROR: No GITHUB_TOKEN env var or ~/.netrc machine login found")
+    sys.exit("ERROR: No GITHUB_TOKEN env var, .secrets.local, or ~/.netrc found")
 
 TOKEN = get_token()
 
