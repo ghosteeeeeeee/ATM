@@ -1,5 +1,7 @@
 # ─── Runtime Data (never commit) ────────────────────────────────────────────
 data/
+# Exception: web/data/ contains sample data files for the standalone HTML dashboards
+!web/data/
 logs/
 sessions/
 state.db*

@@ -163,6 +163,21 @@ grep -c "${FULL_ZIP}" /var/www/git/index.html  # expect 3
 - If no changes since last zip, just skip (exit 0)
 - **Naming format is strict:** `ATM-Hermes-YYYYMMDD-HHMM-full-COMMIT.zip`
 
+## CRITICAL: Symlink Prevention
+Before zipping, verify NO symlinks exist in the repo:
+```bash
+find /root/.hermes -type l 2>/dev/null
+```
+If any symlinks are found, they MUST be replaced with real files before zipping. Use:
+```bash
+# For a symlink that points to another file in the repo:
+cp /path/to/target /path/to/link
+rm /path/to/link
+# Then commit the change before zipping
+```
+Symlinks with absolute paths (e.g. `/root/.hermes/...`) will break on any other machine.
+Symlinks are resolved by `git archive` but still cause issues for users who clone or unzip.
+
 ## Verification
 ```bash
 ls -lh /var/www/git/${FULL_ZIP}
