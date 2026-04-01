@@ -3,7 +3,7 @@
 AI Decider - Actually thinks and decides using all available info
 """
 import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 
 LOG_FILE = '/var/www/hermes/logs/trading.log'
@@ -28,6 +28,42 @@ def log_error(msg, exc=None):
 AB_CONFIG_FILE = '/root/.openclaw/workspace/data/ab-test-config.json'
 AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
 AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
+
+# Lazy-load signal streak from position_manager (avoids circular import at module load)
+_signal_streak_cache = {}  # key: (token, direction, signal_type) -> streak dict
+_streak_fetched_at = 0
+_STREAK_TTL = 300  # refresh streak data every 5 minutes
+
+def _get_signal_streak(token, direction, signal_type):
+    """Get cached signal streak, refreshed every 5 minutes."""
+    global _streak_fetched_at
+    key = (token.upper(), direction.upper(), (signal_type or '').lower())
+    now = time.time()
+    if key not in _signal_streak_cache or (now - _streak_fetched_at) > _STREAK_TTL:
+        try:
+            sys.path.insert(0, '/root/.hermes/scripts')
+            from position_manager import get_signal_streak as _gs
+            # Fetch all streaks in one go (batch per token/direction in candidates)
+            # For simplicity, cache a single batch dict; first call populates it
+            _streak_fetched_at = now
+        except Exception:
+            return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
+    return _signal_streak_cache.get(key, {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0})
+
+def _load_signal_streaks_batch(rows):
+    """Pre-load streaks for all signal_type keys in a batch of candidates."""
+    global _signal_streak_cache, _streak_fetched_at
+    try:
+        sys.path.insert(0, '/root/.hermes/scripts')
+        from position_manager import get_signal_streak as _gs
+        for row in rows:
+            sid, token, direction, stype, conf, source, created = row
+            key = (token.upper(), direction.upper(), (stype or '').lower())
+            if key not in _signal_streak_cache:
+                _signal_streak_cache[key] = _gs(token, direction, stype)
+        _streak_fetched_at = time.time()
+    except Exception:
+        pass  # fail silently — decider keeps working
 
 # In-memory cache for A/B variants per token+direction (cleared on restart)
 _ab_variant_cache = {}
@@ -453,7 +489,6 @@ if not acquire_lock():
 
 def log_signal(token, direction, price, confidence, source):
     """Log signal to signals.log for signals.html display"""
-    from datetime import datetime, timezone
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
     with open(SIGNAL_LOG, "a") as f:
         f.write(f"{timestamp} SIGNAL: {token} {direction.upper()} @ {price} ({confidence}%) [{source}]\n")
@@ -539,33 +574,190 @@ def is_token_open(token):
         return False
 
 def get_pending_signals():
-    """Get PENDING signals from signals_hermes_runtime.db (Hermes's DB).
-    
-    FIXED: was reading OpenClaw's signals.db instead of Hermes runtime DB.
-    signal_gen.py writes to signals_hermes_runtime.db, not OpenClaw's signals.db.
+    """Get PENDING signals from signals_hermes_runtime.db.
+
+    LIFO + confidence ordering: newest signals first, confidence breaks ties.
+    Only signals within 15 minutes are returned (auto-expired older ones).
+    Compacts the DB to top 20 signals on each call — AI picks which to keep
+    based on freshness + confidence + agreement across indicators.
     """
     try:
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
+
+        # ── 1. Auto-expire: mark signals older than 15 min as EXPIRED ─────────
         c.execute("""
-            SELECT token, direction, signal_type, confidence, value, decision, exchange, z_score_tier, z_score
+            UPDATE signals
+            SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
+            WHERE decision = 'PENDING'
+              AND executed = 0
+              AND created_at < datetime('now', '-15 minutes')
+        """)
+        expired = c.rowcount
+        conn.commit()
+
+        # ── 2. AI-guided compaction: score and keep top 20 ─────────────────────
+        # Score = recency_boost + confidence + confluence_bonus
+        # recency_boost: newer signals get exponentially higher scores
+        # confidence: direct bonus
+        # confluence_bonus: tokens with multiple agreeing signal types get a boost
+        c.execute("""
+            SELECT id, token, direction, signal_type, confidence, source, created_at
             FROM signals
             WHERE decision = 'PENDING'
-            AND executed = 0
-            ORDER BY confidence DESC
+              AND executed = 0
+              AND created_at > datetime('now', '-15 minutes')
+        """)
+        candidates = c.fetchall()
+
+        if len(candidates) > 20:
+            # Pre-load signal streaks for all candidates (batched, single DB connection)
+            _load_signal_streaks_batch(candidates)
+
+            # Score each signal: confluence > confidence > survival_meta > streak > recency
+            # Survival meta: if a signal has survived previous compaction rounds, it earns a
+            # compounding bonus — the fish finder effect. Surviving = confluence+streak agree.
+            scored = []
+            now_ts = time.time()
+            now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            for row in candidates:
+                sid, token, direction, stype, conf, source, created = row
+
+                # Fetch survival data from signal record
+                c.execute("SELECT compact_rounds, survival_score FROM signals WHERE id = ?", (sid,))
+                surv_row = c.fetchone()
+                compact_rounds = surv_row[0] if surv_row else 0
+                survival_meta = surv_row[1] if surv_row else 0.0
+
+                # Confluence: count agreeing signal types for same token+direction
+                agreeing = sum(1 for r in candidates
+                               if r[1] == token and r[2] == direction and r[3] != stype)
+                confluence_score = 1.0 + (agreeing * 0.5)
+
+                # Confidence
+                conf_score = conf / 100.0
+
+                # Recency
+                try:
+                    created_dt = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
+                    created_ts = created_dt.replace(tzinfo=timezone.utc).timestamp()
+                    age_min = (now_ts - created_ts) / 60.0
+                    recency_score = max(0.0, 1.0 + (0.3 * max(0, (5 - age_min) / 5)))
+                except (ValueError, TypeError):
+                    recency_score = 1.0
+
+                # Signal quality streak (hot boost, cold suppress)
+                streak = _get_signal_streak(token, direction, stype)
+                streak_mult = streak.get('multiplier', 1.0)
+
+                # Survival meta: compounding bonus per round survived
+                # Round 1: +0.2, Round 2: +0.4, Round 3: +0.7, Round 4+: capped at +1.0
+                # This means a signal surviving 3 rounds gets the equivalent of
+                # an extra confluence agreement — it passed the filter 3 times already
+                survival_bonus = min(1.0, compact_rounds * 0.2 + survival_meta * 0.3)
+                survival_score_raw = 1.0 + survival_bonus
+
+                # Score = confluence(35%) + confidence(25%) + survival(20%) + streak(15%) + recency(5%)
+                # Recency weight dropped to 5% — freshness matters less when a signal
+                # has already proven itself by surviving multiple compaction rounds
+                raw_score = (
+                    confluence_score * 0.35 +
+                    conf_score       * 0.25 +
+                    survival_score_raw * 0.20 +
+                    streak_mult      * 0.15 +
+                    recency_score    * 0.05
+                )
+                scored.append({
+                    'score': raw_score,
+                    'raw': raw_score,
+                    'survival_bonus': survival_bonus,
+                    'streak_mult': streak_mult,
+                    'confluence_score': confluence_score,
+                    'conf_score': conf_score,
+                    'recency_score': recency_score,
+                    'compact_rounds': compact_rounds,
+                    'survival_meta': survival_meta,
+                    'sid': sid,
+                    'token': token,
+                    'direction': direction,
+                    'stype': stype,
+                    'conf': conf,
+                    'row': row,
+                })
+
+            # Sort and partition: top 20 survive, rest are compacted
+            scored.sort(key=lambda x: -x['score'])
+            keep_ids = {s['sid'] for s in scored[:20]}
+            expire_ids = [s['sid'] for s in scored[20:]]
+
+            # Update kept signals: increment compact_rounds, update survival_score, record history
+            for s in scored[:20]:
+                new_survival = s['survival_meta'] + 0.5  # each survival adds +0.5 to survival_score
+                c.execute("""
+                    UPDATE signals
+                    SET compact_rounds = compact_rounds + 1,
+                        survival_score = ?,
+                        last_compact_at = ?
+                    WHERE id = ?
+                """, (round(new_survival, 3), now_str, s['sid']))
+
+            # Record survival history for kept signals
+            compact_round = int(time.time())  # use timestamp as round ID
+            for s in scored[:20]:
+                c.execute("""
+                    INSERT INTO signal_history
+                        (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
+                    VALUES (?, ?, ?, ?, 1, ?, ?, ?)
+                """, (s['token'], s['direction'], s['stype'], compact_round,
+                      round(s['raw'], 3), round(s['score'], 3),
+                      f'survived_r{s["compact_rounds"]+1}_conf{s["conf"]:.0f}'))
+
+            compacted = len(expire_ids)
+            if expire_ids:
+                placeholders = ','.join(['?' for _ in expire_ids])
+                # Record compaction history for expired signals
+                for s in scored[20:]:
+                    c.execute("""
+                        INSERT INTO signal_history
+                            (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
+                        VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+                    """, (s['token'], s['direction'], s['stype'], compact_round,
+                          round(s['raw'], 3), 0.0,
+                          f'compacted_r{s["compact_rounds"]}_losing_conf{s["conf"]:.0f}'))
+                c.execute(f"""
+                    UPDATE signals
+                    SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
+                    WHERE id IN ({placeholders})
+                """, expire_ids)
+                conn.commit()
+
+            if compacted > 0 or expired > 0:
+                top = scored[0]
+                print(f'  [compaction] kept=20 expired_auto={expired} compacted={compacted} '
+                      f'(top: {top["token"]}/{top["direction"]} r{top["compact_rounds"]+1}+, '
+                      f'survival={top["survival_bonus"]:.2f} streak={top["streak_mult"]:.2f}x, '
+                      f'confluence={top["confluence_score"]:.2f}, conf={top["conf_score"]:.0%})')
+
+        # ── 3. Fetch top 20 LIFO + confidence ────────────────────────────────
+        c.execute("""
+            SELECT token, direction, signal_type, confidence, value, exchange, z_score_tier, z_score
+            FROM signals
+            WHERE decision = 'PENDING'
+              AND executed = 0
+            ORDER BY created_at DESC, confidence DESC
             LIMIT 20
         """)
         rows = c.fetchall()
         conn.close()
-        
+
         signals = []
-        for token, direction, signal_type, confidence, value, decision, exchange, z_tier, z_score in rows:
+        for token, direction, stype, confidence, value, exchange, z_tier, z_score in rows:
             signals.append({
                 "token": token,
                 "direction": direction.lower(),
                 "entry": value if value else 0,
                 "confidence": confidence,
-                "signal_type": signal_type,
+                "signal_type": stype,
                 "exchange": exchange if exchange else 'hyperliquid',
                 "z_score_tier": z_tier,
                 "z_score": z_score

@@ -196,8 +196,139 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
 
 # ─── Trade Operations ─────────────────────────────────────────────────────────
 
-def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=None):
-    """Record trade close to ab_results table.
+# ─── Signal Quality Tracking ──────────────────────────────────────────────────
+
+SIGNAL_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+
+def _ensure_signal_outcomes_table():
+    """Create signal_outcomes table if it doesn't exist."""
+    import sqlite3
+    try:
+        conn = sqlite3.connect(SIGNAL_DB)
+        c = conn.cursor()
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS signal_outcomes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                signal_type TEXT NOT NULL,
+                is_win INTEGER NOT NULL,
+                pnl_pct REAL NOT NULL,
+                pnl_usdt REAL NOT NULL,
+                confidence REAL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                closed_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        c.execute("""
+            CREATE INDEX IF NOT EXISTS idx_sigout_token ON signal_outcomes(token, direction)
+        """)
+        c.execute("""
+            CREATE INDEX IF NOT EXISTS idx_sigout_stype ON signal_outcomes(signal_type)
+        """)
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[Position Manager] signal_outcomes table error: {e}")
+
+
+def get_signal_streak(token: str, direction: str, signal_type: str = None) -> Dict:
+    """Get recent win/loss streak and streak-adjusted weight for a signal.
+
+    Returns:
+        streak: net wins - losses over last 20 outcomes (positive = hot, negative = cold)
+        multiplier: 1.0 base, +0.1 per consecutive win, -0.1 per consecutive loss
+                    Cap at 2.0x (very hot) and 0.5x (very cold)
+        win_rate_20: win rate over last 20 outcomes
+    """
+    _ensure_signal_outcomes_table()
+    import sqlite3
+    conn = sqlite3.connect(SIGNAL_DB)
+    c = conn.cursor()
+    try:
+        base_query = """
+            SELECT is_win, pnl_pct FROM signal_outcomes
+            WHERE token = ? AND direction = ?
+        """
+        if signal_type:
+            base_query += " AND signal_type = ?"
+            params = (token.upper(), direction.upper(), signal_type)
+        else:
+            params = (token.upper(), direction.upper())
+
+        base_query += " ORDER BY id DESC LIMIT 20"
+        c.execute(base_query, params)
+        rows = c.fetchall()
+        conn.close()
+
+        if not rows:
+            return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
+
+        wins = sum(1 for r in rows if r[0])
+        losses = len(rows) - wins
+        streak = wins - losses
+
+        # Streak multiplier: consecutive wins/losses at the tail
+        # Walk backwards from most recent to find run length
+        consecutive = 0
+        direction_run = None
+        for r in rows:
+            if direction_run is None:
+                direction_run = r[0]
+                consecutive = 1
+            elif r[0] == direction_run:
+                consecutive += 1
+            else:
+                break
+
+        # multiplier: +0.1 per consecutive win, -0.1 per consecutive loss, capped [0.5, 2.0]
+        if direction_run == 1:  # last outcome was a win
+            mult = min(2.0, 1.0 + (consecutive * 0.1))
+        else:  # last outcome was a loss
+            mult = max(0.5, 1.0 - (consecutive * 0.1))
+
+        return {
+            'streak': streak,
+            'multiplier': round(mult, 2),
+            'win_rate_20': round(wins / len(rows), 3),
+            'n': len(rows),
+            'consecutive': consecutive,
+            'last_was_win': rows[0][0] if rows else None
+        }
+    except Exception as e:
+        print(f"[Position Manager] get_signal_streak error: {e}")
+        return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
+
+
+def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt: float,
+                            signal_type: str = None, confidence: float = None):
+    """Record outcome for a signal type so we can track win/loss streaks."""
+    _ensure_signal_outcomes_table()
+    import sqlite3
+    is_win = 1 if float(pnl_usdt or 0) > 0 else 0
+    try:
+        conn = sqlite3.connect(SIGNAL_DB)
+        c = conn.cursor()
+        c.execute("""
+            INSERT INTO signal_outcomes
+                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (token.upper(), direction.upper(),
+              signal_type or 'decider', is_win,
+              float(pnl_pct or 0), float(pnl_usdt or 0), confidence))
+        conn.commit()
+        conn.close()
+        print(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
+              f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
+    except Exception as e:
+        print(f"[Position Manager] _record_signal_outcome error: {e}")
+
+
+# ─── A/B Results Recording ─────────────────────────────────────────────────────
+
+def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=None,
+                     signal_type=None, confidence=None):
+    """Record trade close to ab_results table + signal_outcomes table.
 
     experiment can be:
       - A pipe-separated string: "sl-distance-test:SL1pct|entry-timing-test:IMMEDIATE|..."
@@ -206,73 +337,103 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
 
     net_pnl is the true PnL after Hyperliquid fees (0.045% per side on notional).
     Used for win/loss determination if provided.
+
+    signal_type and confidence: if not provided, fetches from trades DB.
     """
     import psycopg2, json, re
-    if not experiment:
-        return
+    ab_data_present = bool(experiment and experiment != 'None')
 
-    # Normalize experiment to a plain string
-    if isinstance(experiment, dict):
-        exp_str = experiment.get('experiment', '')
-    elif isinstance(experiment, str) and experiment.startswith('{'):
+    # ── Auto-fetch signal_type and confidence from trades DB if not provided ───
+    if signal_type is None or confidence is None:
         try:
-            exp_str = json.loads(experiment).get('experiment', '')
-        except Exception:
-            exp_str = experiment
-    else:
-        exp_str = str(experiment)
+            conn_fetch = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
+                                          user='postgres', password='***')
+            cur_fetch = conn_fetch.cursor()
+            cur_fetch.execute(
+                "SELECT signal, confidence FROM trades WHERE token=%s AND server='Tokyo' "
+                "AND status IN ('closed','open') ORDER BY id DESC LIMIT 1",
+                (token.upper(),))
+            row = cur_fetch.fetchone()
+            if row:
+                if signal_type is None:
+                    signal_type = row[0]  # e.g. 'conf-2s', 'rsi_confluence', etc.
+                if confidence is None:
+                    confidence = row[1]
+            cur_fetch.close()
+            conn_fetch.close()
+        except Exception as fetch_err:
+            print(f"[Position Manager] signal fetch fallback error: {fetch_err}")
 
-    # Parse test_name:variant_id pairs from pipe-separated string
-    test_map = {}
-    for part in exp_str.split('|'):
-        if ':' in part:
-            test_name, variant_id = part.split(':', 1)
-            test_name = test_name.strip()
-            variant_id = variant_id.strip()
-            test_map[test_name] = variant_id
 
     # Use net_pnl for win/loss and recording (or raw pnl_usdt if fees not available)
     record_pnl = net_pnl if net_pnl is not None else pnl_usdt
     is_win = float(record_pnl or 0) > 0
 
-    try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
-        cur = conn.cursor()
-        for test_name, variant_id in test_map.items():
-            if not test_name or not variant_id:
-                continue
+    # ── A/B Results recording — only if we have experiment data ─────────────
+    if ab_data_present:
+        # Normalize experiment to a plain string
+        if isinstance(experiment, dict):
+            exp_str = experiment.get('experiment', '')
+        elif isinstance(experiment, str) and experiment.startswith('{'):
             try:
-                cur.execute("""
-                    INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
-                                           total_pnl_pct, total_pnl_usdt, updated_at)
-                    VALUES (%s, %s, 1, %s, %s, %s, %s, now())
-                    ON CONFLICT (test_name, variant_id)
-                    DO UPDATE SET
-                        trades = ab_results.trades + 1,
-                        wins = ab_results.wins + %s,
-                        losses = ab_results.losses + %s,
-                        total_pnl_pct = ab_results.total_pnl_pct + %s,
-                        total_pnl_usdt = ab_results.total_pnl_usdt + %s,
-                        win_rate_pct = CASE
-                            WHEN ab_results.trades + 1 > 0
-                            THEN (ab_results.wins + %s)::float / (ab_results.trades + 1) * 100
-                            ELSE 0 END,
-                        updated_at = now()
-                """, (test_name, variant_id,
-                      1 if is_win else 0, 0 if is_win else 1,
-                      float(pnl_pct or 0), float(record_pnl or 0),
-                      1 if is_win else 0, 0 if is_win else 1,
-                      float(pnl_pct or 0), float(record_pnl or 0),
-                      1 if is_win else 0))
-                print(f"[Position Manager] AB UPSERT OK: test={test_name} variant={variant_id} is_win={is_win}")
-            except Exception as ue:
-                import traceback; traceback.print_exc()
-                print(f"[Position Manager] AB UPSERT FAIL: test={test_name} variant={variant_id} — {ue}")
-        conn.commit()
-        cur.close(); conn.close()
-    except Exception as e:
-        import traceback; traceback.print_exc()
-        print(f"[Position Manager] ab_results close error: {e}")
+                exp_str = json.loads(experiment).get('experiment', '')
+            except Exception:
+                exp_str = experiment
+        else:
+            exp_str = str(experiment)
+
+        # Parse test_name:variant_id pairs from pipe-separated string
+        test_map = {}
+        for part in exp_str.split('|'):
+            if ':' in part:
+                test_name, variant_id = part.split(':', 1)
+                test_name = test_name.strip()
+                variant_id = variant_id.strip()
+                test_map[test_name] = variant_id
+
+        try:
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
+            cur = conn.cursor()
+            for test_name, variant_id in test_map.items():
+                if not test_name or not variant_id:
+                    continue
+                try:
+                    cur.execute("""
+                        INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
+                                               total_pnl_pct, total_pnl_usdt, updated_at)
+                        VALUES (%s, %s, 1, %s, %s, %s, %s, now())
+                        ON CONFLICT (test_name, variant_id)
+                        DO UPDATE SET
+                            trades = ab_results.trades + 1,
+                            wins = ab_results.wins + %s,
+                            losses = ab_results.losses + %s,
+                            total_pnl_pct = ab_results.total_pnl_pct + %s,
+                            total_pnl_usdt = ab_results.total_pnl_usdt + %s,
+                            win_rate_pct = CASE
+                                WHEN ab_results.trades + 1 > 0
+                                THEN (ab_results.wins + %s)::float / (ab_results.trades + 1) * 100
+                                ELSE 0 END,
+                            updated_at = now()
+                    """, (test_name, variant_id,
+                          1 if is_win else 0, 0 if is_win else 1,
+                          float(pnl_pct or 0), float(record_pnl or 0),
+                          1 if is_win else 0, 0 if is_win else 1,
+                          float(pnl_pct or 0), float(record_pnl or 0),
+                          1 if is_win else 0))
+                    print(f"[Position Manager] AB UPSERT OK: test={test_name} variant={variant_id} is_win={is_win}")
+                except Exception as ue:
+                    import traceback; traceback.print_exc()
+                    print(f"[Position Manager] AB UPSERT FAIL: test={test_name} variant={variant_id} — {ue}")
+            conn.commit()
+            cur.close(); conn.close()
+        except Exception as e:
+            import traceback; traceback.print_exc()
+            print(f"[Position Manager] ab_results close error: {e}")
+
+    # ── Signal Outcomes recording — ALWAYS (independent of A/B data) ─────────
+    # This feeds the self-learning streak system so even pre-A/B trades contribute
+    _record_signal_outcome(token, direction, pnl_pct, pnl_usdt,
+                          signal_type=signal_type, confidence=confidence)
 
 
 def close_paper_position(trade_id: int, reason: str) -> bool:
@@ -399,19 +560,9 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                     ab_errors.append(f"json parse fail: {_e}")
             else:
                 exp_str = str(experiment)
-            print(f"[Position Manager] AB tracking: trade_id={trade_id} pnl_usdt={pnl_usdt:.2f} is_win={is_win} exp_str={exp_str!r}")
-            try:
-                _record_ab_close(token, direction, pnl_pct, pnl_usdt, exp_str, sl_dist, net_pnl=net_pnl)
-                print(f"[Position Manager] AB recorded: {token} {direction} {'WIN' if is_win else 'LOSS'} pnl={pnl_usdt:.2f}")
-            except Exception as _e:
-                import traceback
-                traceback.print_exc()
-                print(f"[Position Manager] AB RECORD FAIL: trade_id={trade_id} token={token} — {_e}")
-                ab_errors.append(str(_e))
-        elif experiment is None:
-            print(f"[Position Manager] AB SKIP: experiment=None for trade_id={trade_id} (no A/B data on this trade)")
-        elif not sl_dist:
-            print(f"[Position Manager] AB SKIP: sl_distance=None for trade_id={trade_id} (pre-AB trade)")
+        # ── Always record outcome (A/B + signal_outcomes) — single call ─────────
+        # _record_ab_close handles both: A/B data if present, signal_outcomes always
+        _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=net_pnl)
 
         return True
     except Exception as e:
@@ -982,6 +1133,29 @@ def is_loss_cooldown_active(token: str, direction: str) -> bool:
     key = f"{token.upper()}:{direction.upper()}"
     data = _clean_expired(_load_cooldowns())
     return key in data
+
+
+def get_opposite_direction_cooldown_hours(token: str, direction: str) -> float:
+    """
+    Return hours remaining on the OPPOSITE direction's cooldown.
+    Used by scanner to boost signals when the opposing trade is about to clear —
+    a cooldown clears because the direction was wrong, so the opposite is now
+    more likely correct.
+    Returns 0.0 if no cooldown or already expired.
+    """
+    opp_dir = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
+    key = f"{token.upper()}:{opp_dir.upper()}"
+    data = _load_cooldowns()
+    entry = data.get(key)
+    if not entry:
+        return 0.0
+    now = datetime.now(timezone.utc).timestamp()
+    if isinstance(entry, dict):
+        expires = entry.get("expires", 0)
+    else:
+        expires = entry  # old float format
+    remaining = (expires - now) / 3600.0
+    return max(0.0, remaining)
 
 
 def set_loss_cooldown(token: str, direction: str, hours: float = None) -> None:

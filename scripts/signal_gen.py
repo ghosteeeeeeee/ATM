@@ -30,6 +30,34 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 _RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            os.pardir, 'data', 'signals_hermes_runtime.db')
 
+def _has_confluence_partners(token: str, direction: str, exclude_type: str = None) -> bool:
+    """
+    Check if there's at least one OTHER signal type for this token+direction
+    in the last 60 minutes. Used to gate sub-threshold individual signals —
+    we only want to emit RSI/MACD sub-signals when they're genuinely contributing
+    to a potential confluence, not generating noise in a vacuum.
+    """
+    conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
+    c = conn.cursor()
+    try:
+        if exclude_type:
+            c.execute("""
+                SELECT COUNT(DISTINCT signal_type) FROM signals
+                WHERE token=? AND direction=? AND decision='PENDING'
+                AND created_at > datetime('now', '-60 minutes')
+                AND signal_type != ?
+            """, (token.upper(), direction.upper(), exclude_type))
+        else:
+            c.execute("""
+                SELECT COUNT(DISTINCT signal_type) FROM signals
+                WHERE token=? AND direction=? AND decision='PENDING'
+                AND created_at > datetime('now', '-60 minutes')
+            """, (token.upper(), direction.upper()))
+        return c.fetchone()[0] > 0
+    finally:
+        conn.close()
+
+
 def _persist_momentum_state(token, momentum_state, state_confidence,
                              pct_long, pct_short, avg_z, phase, z_direction):
     """Save momentum state to DB for tracking state transitions over time."""
@@ -64,7 +92,7 @@ from signal_schema import (
     mark_signal_processed, add_confluence_signal, get_confluence_signals
 )
 from hyperliquid_exchange import is_delisted
-from position_manager import get_open_positions as _get_open_pos
+from position_manager import get_open_positions as _get_open_pos, get_opposite_direction_cooldown_hours
 
 # ── In-memory cache for z-scores (avoids repeated SQLite reads per token) ──────
 # Key: token → (z_1h, tier_1h, z_4h, tier_4h, z_30m, tier_30m, z_24h, tier_24h, ts)
@@ -970,9 +998,18 @@ def compute_score(token, direction, long_mult, short_mult):
                     trend_penalty = 5
                     trend_reason = f'{chg_4h:.1f}% in 4h'
 
+    # ── Cooldown expiry bonus ─────────────────────────────────────
+    # If the opposing direction's cooldown is about to clear (within 30 min),
+    # boost this direction's score. The opposing cooldown means that direction
+    # was wrong — when it clears, the other side becomes the correct play.
+    # Bonus: +15 if clearing within 15 min, +8 if within 30 min, else 0
+    opp_cd_hours = get_opposite_direction_cooldown_hours(token, direction)
+    cooldown_bonus = 15 if opp_cd_hours <= 0.25 else (8 if opp_cd_hours <= 0.5 else 0)
+    cooldown_reason = f' opp_cd_clr+{cooldown_bonus}' if cooldown_bonus > 0 else ''
+
     # ── Score assembly ─────────────────────────────────────────
-    # z_score: 0-30 | velocity: 0-10 | volume: 0-10 (or negative) | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1 | trend_penalty: 0-15
-    score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score - trend_penalty
+    # z_score: 0-30 | velocity: 0-10 | volume: 0-10 | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1 | cooldown: 0-15 | trend_penalty: 0-15
+    score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score + cooldown_bonus - trend_penalty
     score = min(99.0, max(0, round(score, 1)))
 
     if score < ENTRY_THRESHOLD:
@@ -1011,6 +1048,8 @@ def compute_score(token, direction, long_mult, short_mult):
         reasons.append(macd_reason)
     if trend_reason:
         reasons.append(trend_reason)
+    if cooldown_reason:
+        reasons.append(cooldown_reason.lstrip())
 
     signals = [('momentum', '1h', score, reasons[0])]
     if vol_reason:
@@ -1159,6 +1198,11 @@ def _run_rsi_signals_for_confluence():
             if z is None or z > LONG_1H_Z_MAX:
                 continue  # token not suppressed enough
             conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+            # Only emit sub-threshold RSI signals when there's a confluence partner
+            # (other signal types already in DB) OR RSI is extreme enough to stand alone
+            has_partner = _has_confluence_partners(token, 'LONG', exclude_type='rsi_confluence')
+            if conf < ENTRY_THRESHOLD and not has_partner and not (rsi < 25):
+                continue  # weak signal, no partner, not extreme → skip entirely
             add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
@@ -1169,6 +1213,10 @@ def _run_rsi_signals_for_confluence():
             if token.upper() in SHORT_BLACKLIST:
                 continue
             conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
+            # Only emit sub-threshold RSI signals when there's a confluence partner
+            has_partner = _has_confluence_partners(token, 'SHORT', exclude_type='rsi_confluence')
+            if conf < ENTRY_THRESHOLD and not has_partner and not (rsi > 85):
+                continue  # weak signal, no partner, not extreme → skip entirely
             add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
@@ -1214,6 +1262,11 @@ def _run_macd_signals_for_confluence():
                 continue
             # No z-score filter for SHORTs — suppressed prices are valid short targets
         conf = min(50, 30 + abs(h) * 300)
+        # Only emit sub-threshold MACD signals when there's a confluence partner
+        # (other signal types already in DB) OR MACD is extreme enough to stand alone
+        has_partner = _has_confluence_partners(token, direction, exclude_type='macd_confluence')
+        if conf < ENTRY_THRESHOLD and not has_partner and not (abs(h) > 0.05):
+            continue  # weak signal, no partner, not extreme → skip entirely
         add_signal(token, direction, 'macd_confluence', 'macd-confluence',
                    confidence=conf, value=h, price=price,
                    macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
@@ -1360,7 +1413,7 @@ def run():
     print(f'=== Signal Gen | Regime: {regime.upper()} (L:x{long_mult:.1f} S:x{short_mult:.1f}) | Broad BTC/ETH/SOL 4h z={broad_z_avg:+.2f} | {len(prices_dict)} tokens')
     log(f'REGIME: {regime.upper()} L:x{long_mult:.1f} S:x{short_mult:.1f} broad_z={broad_z_avg:+.2f} | {len(prices_dict)} tokens')
 
-    from position_manager import get_open_positions as _get_open_pos
+    from position_manager import get_open_positions as _get_open_pos, get_opposite_direction_cooldown_hours
     open_pos = _get_open_pos()
     added    = 0
     blocked  = 0
