@@ -263,14 +263,14 @@
             "wait_percent": 0.005,
             "max_wait_minutes": 60
           },
-          "trades": 0,
+          "trades": 1,
           "wins": 0,
           "losses": 0,
           "winRate": 50.0,
           "totalPnlPct": 0,
           "avg_win_pct": -0.135,
           "avg_loss_pct": -0.018,
-          "lastUpdated": "2026-04-01 19:40:07.947481",
+          "lastUpdated": "2026-04-01 20:08:26.258965",
           "learnings": "Waiting for bigger pullbacks loses. avg_win negative = even winners are losing after fees. Reduce weight."
         },
         {
