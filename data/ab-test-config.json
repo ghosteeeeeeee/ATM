@@ -128,14 +128,14 @@
             "trailingActivationPct": 0.01,
             "trailingDistancePct": 0.005
           },
-          "trades": 57,
-          "wins": 7,
+          "trades": 58,
+          "wins": 8,
           "losses": 13,
-          "winRate": 12.3,
-          "totalPnlPct": 2.52,
+          "winRate": 13.8,
+          "totalPnlPct": 3.77,
           "avg_win_pct": 0.387,
           "avg_loss_pct": -0.127,
-          "lastUpdated": "2026-04-01 10:48:52.347148",
+          "lastUpdated": "2026-04-01 12:45:59.707769",
           "learnings": "CLEAR WINNER. Best PnL across all tests. avg_win=0.387% vs avg_loss=-0.127% = 3:1 reward/risk. Best combo: SL-1p5 + TS-1p0-0p5."
         },
         {
@@ -147,14 +147,14 @@
             "trailingActivationPct": 0.02,
             "trailingDistancePct": 0.01
           },
-          "trades": 6,
+          "trades": 7,
           "wins": 0,
-          "losses": 2,
+          "losses": 3,
           "winRate": 0,
-          "totalPnlPct": -2.19,
+          "totalPnlPct": -2.51,
           "avg_win_pct": 0.031,
           "avg_loss_pct": -0.01,
-          "lastUpdated": "2026-04-01 07:14:00.733149",
+          "lastUpdated": "2026-04-01 11:39:24.762670",
           "learnings": "Best WR (24.4%) but barely profitable (PnL=0.31%). 2% activation too high — by the time price moves 2%, momentum often reverses. Explore weight kept for more data."
         },
         {
@@ -244,14 +244,14 @@
             "wait_percent": 0.002,
             "max_wait_minutes": 30
           },
-          "trades": 45,
-          "wins": 7,
-          "losses": 7,
-          "winRate": 15.6,
-          "totalPnlPct": 5.92,
+          "trades": 47,
+          "wins": 8,
+          "losses": 8,
+          "winRate": 17.0,
+          "totalPnlPct": 6.86,
           "avg_win_pct": 0.974,
           "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-01 10:48:52.347148",
+          "lastUpdated": "2026-04-01 12:45:59.707769",
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {
