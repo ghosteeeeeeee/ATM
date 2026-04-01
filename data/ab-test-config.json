@@ -128,14 +128,14 @@
             "trailingActivationPct": 0.01,
             "trailingDistancePct": 0.005
           },
-          "trades": 56,
-          "wins": 6,
+          "trades": 57,
+          "wins": 7,
           "losses": 13,
-          "winRate": 10.7,
-          "totalPnlPct": 1.95,
+          "winRate": 12.3,
+          "totalPnlPct": 2.52,
           "avg_win_pct": 0.387,
           "avg_loss_pct": -0.127,
-          "lastUpdated": "2026-04-01 10:24:05.390058",
+          "lastUpdated": "2026-04-01 10:48:52.347148",
           "learnings": "CLEAR WINNER. Best PnL across all tests. avg_win=0.387% vs avg_loss=-0.127% = 3:1 reward/risk. Best combo: SL-1p5 + TS-1p0-0p5."
         },
         {
@@ -244,14 +244,14 @@
             "wait_percent": 0.002,
             "max_wait_minutes": 30
           },
-          "trades": 44,
-          "wins": 6,
+          "trades": 45,
+          "wins": 7,
           "losses": 7,
-          "winRate": 15.4,
-          "totalPnlPct": 5.35,
+          "winRate": 15.6,
+          "totalPnlPct": 5.92,
           "avg_win_pct": 0.974,
           "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-01 10:18:10.237028",
+          "lastUpdated": "2026-04-01 10:48:52.347148",
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {

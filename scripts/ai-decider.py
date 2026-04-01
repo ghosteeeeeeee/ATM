@@ -114,12 +114,15 @@ def _load_hot_rounds():
 
         # Query signal_history for tokens that survived 2+ rounds in last 30 minutes
         c.execute("""
-            SELECT token, direction, COUNT(*) as survive_count,
-                   GROUP_CONCAT(DISTINCT signal_type) as types
-            FROM signal_history
-            WHERE survived = 1
-              AND created_at > datetime('now', '-30 minutes')
-            GROUP BY token, direction
+            SELECT sh.token, sh.direction, COUNT(*) as survive_count,
+                   GROUP_CONCAT(DISTINCT sh.signal_type) as types,
+                   s.source
+            FROM signal_history sh
+            LEFT JOIN signals s ON s.token=sh.token AND s.direction=sh.direction
+                                  AND s.decision='PENDING' AND s.executed=0
+            WHERE sh.survived = 1
+              AND sh.created_at > datetime('now', '-30 minutes')
+            GROUP BY sh.token, sh.direction
             HAVING survive_count >= 2
         """)
         history_rows = c.fetchall()
@@ -129,6 +132,7 @@ def _load_hot_rounds():
             rounds = row[2] or 0
             types_list = [x for x in (row[3] or '').split(',') if x]
             direction = row[1]
+            source = row[4] or 'unknown'
 
             # Get the corresponding PENDING signal IDs and quality metrics
             c.execute("""
@@ -149,6 +153,7 @@ def _load_hot_rounds():
                 'signal_ids': ids_list,
                 'avg_conf': avg_conf,
                 'num_types': num_types,
+                'source': source,
             }
 
         conn.close()
@@ -711,13 +716,15 @@ def get_pending_signals():
         """)
         candidates = c.fetchall()
 
-        if len(candidates) > 20:
+        # Always score all candidates — this increments compact_rounds for EVERY signal
+        # each cycle, building their survival history so the hot set populates even
+        # with <20 signals. With <=20 candidates, ALL survive (no compaction).
+        # With >20, top 20 survive and rest are compacted (existing behavior).
+        if candidates:
             # Pre-load signal streaks for all candidates (batched, single DB connection)
             _load_signal_streaks_batch(candidates)
 
             # Score each signal: confluence > confidence > survival_meta > streak > recency
-            # Survival meta: if a signal has survived previous compaction rounds, it earns a
-            # compounding bonus — the fish finder effect. Surviving = confluence+streak agree.
             scored = []
             now_ts = time.time()
             now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
@@ -752,15 +759,10 @@ def get_pending_signals():
                 streak_mult = streak.get('multiplier', 1.0)
 
                 # Survival meta: compounding bonus per round survived
-                # Round 1: +0.2, Round 2: +0.4, Round 3: +0.7, Round 4+: capped at +1.0
-                # This means a signal surviving 3 rounds gets the equivalent of
-                # an extra confluence agreement — it passed the filter 3 times already
                 survival_bonus = min(1.0, compact_rounds * 0.2 + survival_meta * 0.3)
                 survival_score_raw = 1.0 + survival_bonus
 
                 # Score = confluence(35%) + confidence(25%) + survival(20%) + streak(15%) + recency(5%)
-                # Recency weight dropped to 5% — freshness matters less when a signal
-                # has already proven itself by surviving multiple compaction rounds
                 raw_score = (
                     confluence_score * 0.35 +
                     conf_score       * 0.25 +
@@ -783,17 +785,20 @@ def get_pending_signals():
                     'direction': direction,
                     'stype': stype,
                     'conf': conf,
+                    'source': source,
                     'row': row,
                 })
 
-            # Sort and partition: top 20 survive, rest are compacted
+            # Sort and partition: top 20 survive, rest are compacted (only when >20)
             scored.sort(key=lambda x: -x['score'])
-            keep_ids = {s['sid'] for s in scored[:20]}
-            expire_ids = [s['sid'] for s in scored[20:]]
+            keep_all = len(candidates) <= 20  # when few signals, ALL survive
+            compacted_count = 0
+            compact_round = int(time.time())
+            keep_sids = {s['sid'] for s in scored[:20]}  # O(1) set for membership test
 
-            # Update kept signals: increment compact_rounds, update survival_score, record history
-            for s in scored[:20]:
-                new_survival = s['survival_meta'] + 0.5  # each survival adds +0.5 to survival_score
+            # Update ALL signals: increment compact_rounds, update survival_score, record history
+            for s in scored:
+                new_survival = s['survival_meta'] + 0.5
                 c.execute("""
                     UPDATE signals
                     SET compact_rounds = compact_rounds + 1,
@@ -802,9 +807,7 @@ def get_pending_signals():
                     WHERE id = ?
                 """, (round(new_survival, 3), now_str, s['sid']))
 
-            # Record survival history for kept signals
-            compact_round = int(time.time())  # use timestamp as round ID
-            for s in scored[:20]:
+                # Record survival history for ALL signals (survived=1)
                 c.execute("""
                     INSERT INTO signal_history
                         (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
@@ -813,35 +816,39 @@ def get_pending_signals():
                       round(s['raw'], 3), round(s['score'], 3),
                       f'survived_r{s["compact_rounds"]+1}_conf{s["conf"]:.0f}'))
 
-            compacted = len(expire_ids)
-            if expire_ids:
-                placeholders = ','.join(['?' for _ in expire_ids])
-                # Record compaction history for expired signals
-                for s in scored[20:]:
-                    c.execute("""
-                        INSERT INTO signal_history
-                            (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
-                        VALUES (?, ?, ?, ?, 0, ?, ?, ?)
-                    """, (s['token'], s['direction'], s['stype'], compact_round,
-                          round(s['raw'], 3), 0.0,
-                          f'compacted_r{s["compact_rounds"]}_losing_conf{s["conf"]:.0f}'))
-                c.execute(f"""
-                    UPDATE signals
-                    SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
-                    WHERE id IN ({placeholders})
-                """, expire_ids)
-                conn.commit()
+            # Only compact (expire bottom signals) when we have >20 candidates
+            if not keep_all:
+                expire_ids = [s['sid'] for s in scored[20:]]
+                compacted_count = len(expire_ids)
+                if expire_ids:
+                    placeholders = ','.join(['?' for _ in expire_ids])
+                    for s in scored[20:]:
+                        c.execute("""
+                            INSERT INTO signal_history
+                                (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
+                            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+                        """, (s['token'], s['direction'], s['stype'], compact_round,
+                              round(s['raw'], 3), 0.0,
+                              f'compacted_r{s["compact_rounds"]}_losing_conf{s["conf"]:.0f}'))
+                    c.execute(f"""
+                        UPDATE signals
+                        SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
+                        WHERE id IN ({placeholders})
+                    """, expire_ids)
 
-            if compacted > 0 or expired > 0:
+            conn.commit()
+
+            # Log compaction activity
+            if compacted_count > 0 or expired > 0:
                 top = scored[0]
-                print(f'  [compaction] kept=20 expired_auto={expired} compacted={compacted} '
+                print(f'  [compaction] kept={"all" if keep_all else "20"} expired_auto={expired} compacted={compacted_count} '
                       f'(top: {top["token"]}/{top["direction"]} r{top["compact_rounds"]+1}+, '
                       f'survival={top["survival_bonus"]:.2f} streak={top["streak_mult"]:.2f}x, '
                       f'confluence={top["confluence_score"]:.2f}, conf={top["conf_score"]:.0%})')
 
         # ── 3. Fetch top 20 LIFO + confidence ────────────────────────────────
         c.execute("""
-            SELECT token, direction, signal_type, confidence, value, exchange, z_score_tier, z_score, compact_rounds
+            SELECT token, direction, signal_type, confidence, value, exchange, z_score_tier, z_score, compact_rounds, source
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
@@ -858,7 +865,7 @@ def get_pending_signals():
         hot_signals = []
         non_hot_signals = []
         for row in rows:
-            token, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds = row
+            token, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds, source = row
             sig = {
                 "token": token,
                 "direction": direction.lower(),
@@ -869,6 +876,7 @@ def get_pending_signals():
                 "z_score_tier": z_tier,
                 "z_score": z_score,
                 "compact_rounds": compact_rounds or 0,
+                "source": source,
             }
             if token.upper() in hot_tokens:
                 hot_signals.append(sig)
@@ -1325,14 +1333,14 @@ for s in pending:
         num_types = hot.get('num_types', 0)
         avg_conf = hot.get('avg_conf', 0)
         if num_types < 2 or avg_conf < 30:
-            print(f"   ⏸️ 🔥 r{hot['rounds']} {t}: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
+            print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
             log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
             mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
             processed_this_run.add(key)
             continue
 
         if is_token_open(t):
-            print(f"   ⏸️ 🔥 HOT r{hot['rounds']} {t}: already has open position")
+            print(f"   ⏸️ 🔥 HOT r{hot['rounds']} {t} [{hot.get('source','?')}]: already has open position")
             log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
             mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
             processed_this_run.add(key)
@@ -1349,11 +1357,13 @@ for s in pending:
         # Targeted update: only specific signal IDs
         ok = mark_signal_processed(t, 'APPROVED', hot.get('signal_ids'))
         if ok:
+            # Remove from hot_rounds so it won't be re-processed
+            del _hot_rounds[t.upper()]
             # Quality-aware confidence boost
             diversity_bonus = min(20, num_types * 5)
             hot_bonus = min(20, hot['rounds'] * 5)
             final_conf = min(99, round(avg_conf + diversity_bonus + hot_bonus))
-            print(f"   ✅🔥 AUTO-APPROVED r{hot['rounds']} {t} {direction} "
+            print(f"   ✅🔥 AUTO-APPROVED r{hot['rounds']} {t} [{hot.get('source','?')}] {direction} "
                   f"conf={final_conf}% (+{hot_bonus}% hot +{diversity_bonus}% diversity, "
                   f"types={num_types}, avg={avg_conf:.0f}%)")
             log_signal(t, direction, entry, final_conf, f"hot-set-r{hot['rounds']}-{exchange}")
