@@ -369,6 +369,10 @@
       1774921834086667138,
       5936
     ],
+    "reality-checker/SKILL.md": [
+      1775063603576988074,
+      8212
+    ],
     "red-teaming/godmode/SKILL.md": [
       1774669862963305665,
       20155
@@ -1771,6 +1775,19 @@
       "category": "productivity",
       "frontmatter_name": "update-git",
       "description": "Package Hermes repo and update /var/www/git/index.html do...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "reality-checker",
+      "category": "reality-checker",
+      "frontmatter_name": "reality-checker",
+      "description": "Reality-based certification for Hermes — default to NEEDS...",
       "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],

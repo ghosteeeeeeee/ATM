@@ -125,6 +125,10 @@ def init_db():
             rc.execute("ALTER TABLE signals ADD COLUMN learned_sl_multiplier REAL DEFAULT 1.0")
         except Exception:
             pass
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN review_count INTEGER DEFAULT 0")
+    except Exception:
+        pass  # column may already exist
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
@@ -921,6 +925,19 @@ def clear_cooldown(token, direction=None):
 
 # ── Legacy DB_PATH alias (for any scripts still referencing it) ───────────────
 DB_PATH = RUNTIME_DB  # backwards compat alias
+
+def update_signal_review_count(signal_id: int) -> None:
+    """Increment review_count for a signal (used for hot set tracking)."""
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        c.execute(
+            "UPDATE signals SET review_count = COALESCE(review_count, 0) + 1 WHERE id = ?",
+            (signal_id,)
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
 def get_db():
     return _get_conn(_runtime(), row_factory=True)

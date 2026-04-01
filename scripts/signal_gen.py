@@ -60,6 +60,41 @@ def _has_confluence_partners(token: str, direction: str, exclude_type: str = Non
         conn.close()
 
 
+def _process_signal(sig_id: int, decision: str, reason: str = None) -> None:
+    """
+    Process a signal decision (called by external ai-decider pipeline).
+    Increments review_count on SKIPPED/WAIT so the hot set can track survivors.
+    """
+    if decision in ('SKIPPED', 'WAIT'):
+        from signal_schema import update_signal_review_count
+        update_signal_review_count(sig_id)
+
+
+def _load_hot_rounds() -> List[dict]:
+    """
+    Load tokens that have survived multiple ai-decider review passes.
+    Uses review_count on signals table (incremented each time signal is reviewed
+    without being executed or hard-skipped).
+    """
+    conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
+    c = conn.cursor()
+    try:
+        rows = c.execute("""
+            SELECT token, direction, MAX(review_count) as rounds
+            FROM signals
+            WHERE decision IN ('PENDING', 'APPROVED')
+              AND review_count >= 2
+              AND created_at > datetime('now', '-3 hours')
+            GROUP BY token, direction
+            HAVING COUNT(*) >= 1
+        """).fetchall()
+        return [{'token': r[0], 'direction': r[1], 'rounds': r[2]} for r in rows]
+    except Exception:
+        return []
+    finally:
+        conn.close()
+
+
 def _persist_momentum_state(token, momentum_state, state_confidence,
                              pct_long, pct_short, avg_z, phase, z_direction):
     """Save momentum state to DB for tracking state transitions over time."""
@@ -117,8 +152,8 @@ PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
 PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
-ENTRY_THRESHOLD      = 70    # min score to add signal
-AI_DECIDER_THRESHOLD  = 70    # ≥ this + < AUTO_APPROVE → pending → AI decider
+ENTRY_THRESHOLD      = 65    # min score to add signal
+AI_DECIDER_THRESHOLD  = 65    # ≥ this + < AUTO_APPROVE → pending → AI decider
 AUTO_APPROVE          = 95    # ≥ this → auto-approve (momentum uses PENDING only; this is a safety cap)
 
 # Confluence detection: require ≥2 agreeing signals before firing
@@ -129,8 +164,8 @@ CONFLUENCE_AUTO_APPROVE = 75  # confluence signal ≥ this → auto-approve (no 
 
 # Individual signal thresholds for confluence-ready signal table population
 # These are LOWER than ENTRY_THRESHOLD so confluence can combine weak-but-aligned signals
-CONFLUENCE_RSI_LOW   = 35   # RSI < this → LONG (oversold = potential reversal LONG)
-CONFLUENCE_RSI_HIGH  = 65   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
+CONFLUENCE_RSI_LOW   = 65   # RSI < this → LONG (oversold = potential reversal LONG)
+CONFLUENCE_RSI_HIGH  = 35   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
 CONFLUENCE_MACD_HIST_THRESH = 0.000005  # MACD histogram magnitude to add individual signal
 
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
@@ -859,7 +894,7 @@ def compute_score(token, direction, long_mult, short_mult):
     # pct_long_score_fn: 0-60 pts (suppressed → strong long)
     # pct_short_score_fn: 0-60 pts (elevated → strong short)
     # pct_contrib is 0-60, velocity + phase give another 0-30
-    # Target: suppressed pct_long=35 → ~50 pts + good phase/vel → hits 65+
+    # Target: suppressed pct_long=35 → ~50 pts + good phase/vel → hits 65+ (ENTRY_THRESHOLD)
     def pct_long_score_fn(pct):
         # pct_long = % BELOW current price
         # In BULL markets, price trending UP means pct_long stays elevated
@@ -1074,10 +1109,10 @@ def compute_score(token, direction, long_mult, short_mult):
     score = min(99.0, max(0, round(score, 1)))
 
     # Mean reversion rescue: push borderline signals over threshold
-    # REQUIREMENT: natural score (excl. cooldown bonus) must reach 65 before rescue applies.
+    # REQUIREMENT: natural score (excl. cooldown bonus) must reach ENTRY_THRESHOLD before rescue applies.
     # Rescue only rescues borderline cases, not weak signals inflated by cooldown bonuses.
     # CAP: bonus max +3 pts (was +15 pts — too generous).
-    if score < ENTRY_THRESHOLD and natural_score >= 65:
+    if score < ENTRY_THRESHOLD and natural_score >= ENTRY_THRESHOLD:
         z_bonus = 0
         if phase == 'extreme' and abs(avg_z) >= 1.0 and pct_score >= 40:
             z_bonus = 3
@@ -1241,38 +1276,39 @@ def _run_rsi_signals_for_confluence():
             continue
         if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
             continue
+        if token.upper() in SHORT_BLACKLIST:
+            continue
         rsi = compute_rsi(token, lookback_minutes=60*4)
         if not rsi:
             continue
         z = compute_zscore(token)
         z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
         price = data['price']
-        if rsi < CONFLUENCE_RSI_LOW:
-            # ── LONG filter: RSI oversold + z-score suppressed + broad not uptrending ──
+        if rsi > CONFLUENCE_RSI_HIGH:
+            # ── LONG filter: RSI oversold (above high threshold = deeply oversold) + z-score suppressed ──
             if broad_avg > BROAD_UPTEND_Z:
                 continue  # broad market too bullish, skip LONG
             if z is None or z > LONG_1H_Z_MAX:
                 continue  # token not suppressed enough
-            conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+            conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
             # Only emit sub-threshold RSI signals when there's a confluence partner
             # (other signal types already in DB) OR RSI is extreme enough to stand alone
             has_partner = _has_confluence_partners(token, 'LONG', exclude_type='rsi_confluence')
-            if conf < ENTRY_THRESHOLD and not has_partner and not (rsi < 25):
-                continue  # weak signal, no partner, not extreme → skip entirely
+            if conf < ENTRY_THRESHOLD and not (rsi > 85):
+                continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
             added += 1
-        elif rsi > CONFLUENCE_RSI_HIGH:
-            # ── SHORT filter: RSI overbought + not on blacklist ──
+        elif rsi < CONFLUENCE_RSI_LOW:
+            # ── SHORT filter: RSI overbought (below low threshold = deeply overbought) ──
             # No z-score filter for SHORTs — suppressed prices are valid short targets
             if token.upper() in SHORT_BLACKLIST:
                 continue
-            conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
-            # Only emit sub-threshold RSI signals when there's a confluence partner
+            conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
             has_partner = _has_confluence_partners(token, 'SHORT', exclude_type='rsi_confluence')
-            if conf < ENTRY_THRESHOLD and not has_partner and not (rsi > 85):
-                continue  # weak signal, no partner, not extreme → skip entirely
+            if conf < ENTRY_THRESHOLD and not (rsi < 25):
+                continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
@@ -1320,6 +1356,8 @@ def _run_mtf_macd_signals():
         if token.upper() in open_pos:
             continue
         if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
+            continue
+        if token.upper() in SHORT_BLACKLIST:
             continue
 
         price = data['price']
@@ -1512,7 +1550,7 @@ def _run_macd_signals_for_confluence():
                 continue
         conf = min(50, 30 + abs(h) * 300)
         has_partner = _has_confluence_partners(token, direction, exclude_type='macd_confluence')
-        if conf < ENTRY_THRESHOLD and not has_partner and not (abs(h) > 0.05):
+        if conf < ENTRY_THRESHOLD and not (abs(h) > 0.05):
             continue
         add_signal(token, direction, 'macd_confluence', 'macd-confluence',
                    confidence=conf, value=h, price=price,
@@ -1554,6 +1592,11 @@ def run_confluence_detection():
 
         # Don't add confluence for tokens we already have a position on
         if token in open_pos_local:
+            continue
+        # Blacklist enforcement at confluence level
+        if direction.upper() == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            continue
+        if direction.upper() == 'LONG' and token.upper() in LONG_BLACKLIST:
             continue
 
         # Rate limit
