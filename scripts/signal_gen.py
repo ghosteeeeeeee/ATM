@@ -1230,10 +1230,7 @@ def _run_rsi_signals_for_confluence():
         if '4h' in zs and zs['4h'][0] is not None:
             broad_z_vals.append(zs['4h'][0])
     broad_avg = statistics.mean(broad_z_vals) if broad_z_vals else 0
-    # Blacklist: tokens with 0-20% SHORT win rate
-    SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
-                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE',
-                       'WLFI'}
+    # SHORT_BLACKLIST is imported from hermes_constants at module level
     added = 0
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
@@ -1301,8 +1298,7 @@ def _run_mtf_macd_signals():
 
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
-    SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
-                        'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
+    # SHORT_BLACKLIST is imported from hermes_constants at module level
     added = 0
 
     def _macd_line(token, minutes):
@@ -1487,9 +1483,7 @@ def _run_macd_signals_for_confluence():
     from signal_schema import compute_macd, compute_zscore
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
-    SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
-                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE',
-                       'WLFI'}
+    # SHORT_BLACKLIST is imported from hermes_constants at module level
     added = 0
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:

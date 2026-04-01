@@ -12,12 +12,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
-
-# Shared blacklist — tokens that are too volatile/manipulable for certain directions
-SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
-                   'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI',
-                   'ACE','YZY','ZEREBRO'}
-LONG_BLACKLIST  = {'SEI', 'ACE'}  # Tokens that don't work well as LONG either
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import is_live_trading_enabled
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'

@@ -26,6 +26,8 @@ def log_error(msg, exc=None):
     log(error_msg, 'ERROR')
 
 AB_CONFIG_FILE = '/root/.openclaw/workspace/data/ab-test-config.json'
+sys.path.insert(0, '/root/.hermes/scripts')
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
 AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
@@ -93,45 +95,62 @@ _hot_rounds = {}   # token.upper() -> {direction, rounds, survival}
 
 def _load_hot_rounds():
     """
-    Load compact_rounds + quality info for all PENDING non-executed signals.
+    Load hot signals based on REAL survival data from signal_history table.
+
+    A hot signal is one where the token survived 2+ compaction rounds in the past
+    30 minutes (proven by AI across multiple cycles). This is much more reliable
+    than signals.compact_rounds which rarely increments with ~20 candidates.
+
+    Also enriches with PENDING signal data (signal_ids, avg_conf, num_types).
 
     Returns:
-        dict: token -> {direction, rounds, survival, signal_ids, avg_conf, num_types}
-              signal_ids = list of specific DB row IDs for targeted updates
+        dict: token.upper() -> {direction, rounds, survival, signal_ids, avg_conf, num_types}
     """
     global _hot_rounds
     _hot_rounds = {}
     try:
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
+
+        # Query signal_history for tokens that survived 2+ rounds in last 30 minutes
         c.execute("""
-            SELECT token, direction,
-                   MAX(compact_rounds) as max_rounds,
-                   MAX(survival_score) as max_survival,
-                   AVG(confidence) as avg_conf,
-                   GROUP_CONCAT(DISTINCT signal_type) as types,
-                   GROUP_CONCAT(id) as ids
-            FROM signals
-            WHERE decision = 'PENDING' AND executed = 0
-              AND confidence >= 25
+            SELECT token, direction, COUNT(*) as survive_count,
+                   GROUP_CONCAT(DISTINCT signal_type) as types
+            FROM signal_history
+            WHERE survived = 1
+              AND created_at > datetime('now', '-30 minutes')
             GROUP BY token, direction
+            HAVING survive_count >= 2
         """)
-        for row in c.fetchall():
+        history_rows = c.fetchall()
+
+        for row in history_rows:
             t = row[0].upper()
             rounds = row[2] or 0
-            types_list = [x for x in (row[5] or '').split(',') if x]
-            ids_list = [int(x) for x in (row[6] or '').split(',') if x]
-            avg_conf = row[4] or 50
+            types_list = [x for x in (row[3] or '').split(',') if x]
+            direction = row[1]
 
-            if t not in _hot_rounds or rounds > _hot_rounds[t]['rounds']:
-                _hot_rounds[t] = {
-                    'direction': row[1],
-                    'rounds': rounds,
-                    'survival': row[3] or 0,
-                    'signal_ids': ids_list,
-                    'avg_conf': avg_conf,
-                    'num_types': len(types_list),
-                }
+            # Get the corresponding PENDING signal IDs and quality metrics
+            c.execute("""
+                SELECT id, AVG(confidence) as avg_conf, COUNT(DISTINCT signal_type) as num_types
+                FROM signals
+                WHERE token=? AND direction=? AND decision='PENDING' AND executed=0
+            """, (t, direction))
+            sig_row = c.fetchone()
+            sig_id = sig_row[0] if sig_row else None
+            avg_conf = sig_row[1] if sig_row else 50.0
+            num_types = sig_row[2] if sig_row else len(types_list)
+            ids_list = [sig_id] if sig_id else []
+
+            _hot_rounds[t] = {
+                'direction': direction,
+                'rounds': rounds,
+                'survival': rounds * 0.5,
+                'signal_ids': ids_list,
+                'avg_conf': avg_conf,
+                'num_types': num_types,
+            }
+
         conn.close()
     except Exception as e:
         import traceback; traceback.print_exc()
@@ -822,7 +841,7 @@ def get_pending_signals():
 
         # ── 3. Fetch top 20 LIFO + confidence ────────────────────────────────
         c.execute("""
-            SELECT token, direction, signal_type, confidence, value, exchange, z_score_tier, z_score
+            SELECT token, direction, signal_type, confidence, value, exchange, z_score_tier, z_score, compact_rounds
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
@@ -832,9 +851,15 @@ def get_pending_signals():
         rows = c.fetchall()
         conn.close()
 
+        # Build hot set: tokens with signal_history survival data (hot signals first)
+        hot_tokens = set(_hot_rounds.keys())
+
         signals = []
-        for token, direction, stype, confidence, value, exchange, z_tier, z_score in rows:
-            signals.append({
+        hot_signals = []
+        non_hot_signals = []
+        for row in rows:
+            token, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds = row
+            sig = {
                 "token": token,
                 "direction": direction.lower(),
                 "entry": value if value else 0,
@@ -842,9 +867,16 @@ def get_pending_signals():
                 "signal_type": stype,
                 "exchange": exchange if exchange else 'hyperliquid',
                 "z_score_tier": z_tier,
-                "z_score": z_score
-            })
-        return signals
+                "z_score": z_score,
+                "compact_rounds": compact_rounds or 0,
+            }
+            if token.upper() in hot_tokens:
+                hot_signals.append(sig)
+            else:
+                non_hot_signals.append(sig)
+
+        # Hot signals first, then the rest (hot = proven by AI across 2+ rounds)
+        return hot_signals + non_hot_signals
     except Exception as e:
         import traceback; traceback.print_exc()
         log_error(f"get_pending_signals DB read error: {e}")
@@ -1265,10 +1297,7 @@ for s in pending:
         mark_signal_processed(t, 'SKIPPED')
         continue
     
-    # Token blacklist - these tokens have 0-20% win rate on SHORTs (from trade analysis)
-    # HARDBLOCK - skip these completely
-    SHORT_BLACKLIST = ['SUI', 'FET', 'SPX', 'ARK', 'TON', 'ONDO', 'CRV', 'RUNE', 'AR', 'NXPC', 'DASH', 'ARB', 'TRUMP', 'LDO', 'NEAR', 'APT', 'CELO', 'SEI', 'ACE', 'YZY', 'ZEREBRO']
-    LONG_BLACKLIST = ['SEI', 'ACE']  # Tokens that don't work well as LONG either
+    # SHORT_BLACKLIST and LONG_BLACKLIST are imported from hermes_constants at module level
     
     if direction.lower() == "short" and t.upper() in SHORT_BLACKLIST:
         print(f"   🚫 {t}: BLACKLISTED - skipping SHORT completely (0-20% WR historically)")
