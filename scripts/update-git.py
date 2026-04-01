@@ -31,6 +31,8 @@ def get_token():
 TOKEN = get_token()
 
 def sh(*cmd, cwd=HERMES, check=True):
+    if len(cmd) == 1 and isinstance(cmd[0], str):
+        cmd = cmd[0].split()
     r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
     if r.returncode and check:
         sys.exit(f"FAIL: {' '.join(cmd)}\n{r.stderr}")
