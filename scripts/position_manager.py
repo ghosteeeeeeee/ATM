@@ -318,16 +318,6 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
     try:
         conn = sqlite3.connect(SIGNAL_DB)
         c = conn.cursor()
-        # Deduplicate: skip if already recorded within last 5 minutes
-        c.execute("""
-            SELECT id FROM signal_outcomes
-            WHERE token=? AND direction=? AND signal_type=? 
-              AND created_at > datetime('now', '-5 minutes')
-            LIMIT 1
-        """, (token.upper(), direction.upper(), signal_type or 'decider'))
-        if c.fetchone():
-            conn.close()
-            return  # Already recorded — skip duplicate
         c.execute("""
             INSERT INTO signal_outcomes
                 (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
@@ -369,9 +359,9 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                                           user='postgres', password='***')
             cur_fetch = conn_fetch.cursor()
             cur_fetch.execute(
-                "SELECT signal, confidence FROM trades WHERE token=%s AND server=%s "
+                "SELECT signal, confidence FROM trades WHERE token=%s AND server='Tokyo' "
                 "AND status IN ('closed','open') ORDER BY id DESC LIMIT 1",
-                (token.upper(), SERVER_NAME))
+                (token.upper(),))
             row = cur_fetch.fetchone()
             if row:
                 if signal_type is None:
@@ -474,9 +464,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         row = cur.fetchone()
         if not row:
             conn.rollback()
-            conn.close()
             return False
-        token=***
+        token = row['token']
         direction = row['direction']
         entry_price = float(row['entry_price'] or 0)
         current_price = float(row['current_price'] or entry_price)
@@ -541,33 +530,29 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
         # ── Mirror to Hyperliquid (real trade) ───────────────────────
-        # Attempt HL close FIRST. Only commit DB if HL confirms or HL is disabled.
-        # This prevents the window where DB says "closed" but HL still has the position.
-        hype_token = token
-        hl_ok = False
+        # Commit DB FIRST, then close on HL. This prevents the worst-case scenario
+        # where HL closes but DB rollback leaves them permanently divergent.
+        # If DB commit succeeds but HL close fails → hype-sync catches it next run.
+        # If DB commit fails → rollback (safe), HL is still open for retry.
         if HYPE_AVAILABLE and is_live_trading_enabled():
+            hype_token = hype_coin(token)
+            conn.commit()  # lock in DB close
             try:
                 mirror_close(hype_token, direction)
                 print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
-                hl_ok = True
             except RuntimeError as me:
-                print(f"[Position Manager] HYPE mirror_close FAILED: {me}")
-                print(f"[Position Manager] Rolling back DB close — hype-sync will reconcile")
-                conn.rollback()
-                conn.close()
-                return False
+                print(f"[Position Manager] HYPE mirror_close FAILED (DB committed, HL still open): {me}")
+                print(f"[Position Manager] hype-sync will reconcile on next run")
             except Exception as me:
-                print(f"[Position Manager] HYPE mirror_close ERROR: {me}")
-                print(f"[Position Manager] Rolling back DB close — hype-sync will reconcile")
-                conn.rollback()
-                conn.close()
-                return False
-        else:
-            # Live trading OFF → paper only, no HL to sync
+                print(f"[Position Manager] HYPE mirror_close ERROR (DB committed, HL still open): {me}")
+                print(f"[Position Manager] hype-sync will reconcile on next run")
+        elif HYPE_AVAILABLE:
+            # Live trading OFF → paper only
             print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
-
-        # Only commit DB after HL confirms (or HL is disabled)
-        conn.commit()
+            conn.commit()
+        else:
+            # No HYPE available at all
+            conn.commit()
 
         # Record to ab_results on close — wrap with verbose logging so failures are never silent
         ab_errors = []
@@ -772,23 +757,32 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
     # Use phase 2 buffer if activated, otherwise phase 1
     active_buffer = float(phase2_dist) if trade_data.get("phase2_activated") and phase2_dist else trailing_buffer
 
-    # Calculate buffer (tightens as profit grows, but floor is the active buffer)
+    # Calculate buffer — tighter floor, faster tighten as profit grows.
+    # SHORT pnl is positive when in profit (entry > current).
+    # Formula: 0.5% at 5% pnl → 0.3% at 15% → 0.2% floor at 25%+.
+    # Floor = 0.2% (2x max daily move for most alts, won't stop you out on noise).
+    # Tighten rate: every 10% pnl reduces buffer by 0.1%.
     if TRAILING_TIGHTEN:
-        buffer_pct = max(active_buffer * 0.4, active_buffer / (1 + pnl_pct / 10))
+        tighten_per_10pnl = 0.001  # 0.1% tighter per 10% pnl gained
+        buffer_pct = max(0.002, active_buffer - (pnl_pct / 10) * tighten_per_10pnl)
+        buffer_pct = max(0.002, buffer_pct)  # 0.2% floor — won't stop on daily noise
     else:
         buffer_pct = active_buffer
 
     # Track best price
+    # best_price from JSON is float; current_price from PostgreSQL may be Decimal
+    # (psycopg2 returns numeric/decimal columns as Python Decimal).
+    # Always coerce to float for comparison/arithmetic.
     if direction == "LONG":
-        best_price = trade_data.get("best_price", current_price)
-        if current_price > best_price:
+        best_price = float(trade_data.get("best_price", current_price))
+        if float(current_price) > best_price:
             best_price = current_price
             data[str(trade_id)]["best_price"] = best_price
             _save_trailing_data(data)
         trailing_sl = best_price * (1 - buffer_pct)
     elif direction == "SHORT":
-        best_price = trade_data.get("best_price", current_price)
-        if current_price < best_price:
+        best_price = float(trade_data.get("best_price", current_price))
+        if float(current_price) < best_price:
             best_price = current_price
             data[str(trade_id)]["best_price"] = best_price
             _save_trailing_data(data)
@@ -1143,22 +1137,26 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         return False
 
     # 2. Enter the opposite direction at current price
-    from hyperliquid_exchange import mirror_open, hype_coin
+    from hyperliquid_exchange import place_market_order
     current_price = flip_info['price']
     if not current_price or current_price <= 0:
         try:
-            from hyperliquid_exchange import get_prices_curl
-            prices = get_prices_curl([token])
-            current_price = prices.get(token)
+            from hyperliquid_exchange import get_price
+            current_price = get_price(token)
         except Exception:
             print(f"  [CASCADE FLIP] ❌ Could not get price for {token}")
             return True  # Position closed, new entry failed but not fatal
 
-    # Use mirror_open which handles kill-switch, delist checks, and HL mirroring properly
-    hype_token = hype_coin(token)
-    result = mirror_open(hype_token, opposite_dir, float(current_price), leverage=5)
+    ok = place_market_order(
+        token=token,
+        direction=opposite_dir,
+        entry_price=current_price,
+        confidence=conf,
+        source=f"cascade-{source}",
+        trade_id=None,  # new trade
+    )
 
-    if result.get('success'):
+    if ok:
         print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
         # Mark the signal that triggered the flip as executed
         try:

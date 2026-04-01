@@ -17,6 +17,10 @@
       1774669862930305736,
       2442
     ],
+    "autonomous-ai-agents/ai-engineer/SKILL.md": [
+      1775037552463075933,
+      3169
+    ],
     "autonomous-ai-agents/claude-code/SKILL.md": [
       1774669862931305734,
       3147
@@ -624,6 +628,19 @@
       "platforms": [
         "macos"
       ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ai-engineer",
+      "category": "autonomous-ai-agents",
+      "frontmatter_name": "ai-engineer",
+      "description": "Expert AI/ML engineer persona for AI engineering subagent...",
+      "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],
         "requires_toolsets": [],

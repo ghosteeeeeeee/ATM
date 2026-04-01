@@ -15,14 +15,14 @@
           "config": {
             "slPct": 0.01
           },
-          "trades": 16,
-          "wins": 1,
-          "losses": 5,
-          "winRate": 7.7,
-          "totalPnlPct": -2.12,
+          "trades": 25,
+          "wins": 2,
+          "losses": 6,
+          "winRate": 8.0,
+          "totalPnlPct": -1.78,
           "avg_win_pct": -0.085,
           "avg_loss_pct": -0.034,
-          "lastUpdated": "2026-04-01 07:55:35.884382",
+          "lastUpdated": "2026-04-01 10:01:20.450893",
           "learnings": "Best WR (23.8%) but negative PnL. avg_win=-0.085% (NEGATIVE!) means winners are smaller than losers in absolute terms — fee drag + direction failures. Explore only, not exploit."
         },
         {
@@ -128,14 +128,14 @@
             "trailingActivationPct": 0.01,
             "trailingDistancePct": 0.005
           },
-          "trades": 38,
-          "wins": 4,
-          "losses": 10,
-          "winRate": 11.1,
-          "totalPnlPct": 1.45,
+          "trades": 49,
+          "wins": 6,
+          "losses": 12,
+          "winRate": 12.2,
+          "totalPnlPct": 2.42,
           "avg_win_pct": 0.387,
           "avg_loss_pct": -0.127,
-          "lastUpdated": "2026-04-01 07:55:35.892464",
+          "lastUpdated": "2026-04-01 10:01:20.450893",
           "learnings": "CLEAR WINNER. Best PnL across all tests. avg_win=0.387% vs avg_loss=-0.127% = 3:1 reward/risk. Best combo: SL-1p5 + TS-1p0-0p5."
         },
         {
@@ -244,14 +244,14 @@
             "wait_percent": 0.002,
             "max_wait_minutes": 30
           },
-          "trades": 30,
-          "wins": 4,
-          "losses": 6,
-          "winRate": 13.8,
-          "totalPnlPct": 3.87,
+          "trades": 39,
+          "wins": 6,
+          "losses": 7,
+          "winRate": 15.4,
+          "totalPnlPct": 5.35,
           "avg_win_pct": 0.974,
           "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-01 07:55:35.888535",
+          "lastUpdated": "2026-04-01 10:01:20.450893",
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {
@@ -306,12 +306,12 @@
             "evolved_from": "RETRACE-2",
             "spawned_at": "2026-04-01T00:00:37.313913"
           },
-          "trades": 3,
+          "trades": 5,
           "wins": 0,
-          "losses": 1,
+          "losses": 2,
           "winRate": 0,
-          "totalPnlPct": -0.52,
-          "lastUpdated": "2026-04-01 06:33:14.101008"
+          "totalPnlPct": -1.02,
+          "lastUpdated": "2026-04-01 09:56:07.550669"
         }
       ]
     }
