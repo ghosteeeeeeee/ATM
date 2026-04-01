@@ -1443,13 +1443,13 @@ LLM CANDLE PREDICTION (for reference):
     
     # Persist sl_multiplier on the signal row so decider-run can apply it
     try:
-        from signal_schema import _get_conn, SIGNAL_RUNTIME
-        conn_s = _get_conn(SIGNAL_RUNTIME)
+        from signal_schema import _get_conn, RUNTIME_DB
+        conn_s = _get_conn(RUNTIME_DB)
         cur_s = conn_s.cursor()
         cur_s.execute('''
             UPDATE signals 
-            SET learned_sl_multiplier = %s, updated_at = datetime('now')
-            WHERE token=%s AND direction=%s AND decision='APPROVED' AND executed=0
+            SET learned_sl_multiplier = ?, updated_at = datetime('now')
+            WHERE token=? AND direction=? AND decision='APPROVED' AND executed=0
         ''', (sl_mult, t, direction))
         conn_s.commit()
         conn_s.close()
