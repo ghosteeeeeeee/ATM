@@ -882,7 +882,7 @@ def set_cooldown(token, direction=None, hours=1):
         key = "%s:%s" % (key, direction.upper())
     expires = datetime.now() + timedelta(hours=hours)
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signal_cooldowns (token, expires_at, reason, direction) "
@@ -892,8 +892,8 @@ def set_cooldown(token, direction=None, hours=1):
         conn.commit()
         conn.close()
         return
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[signal_schema] set_cooldown PostgreSQL failed: {e} — falling back to JSON file")
     # Fallback: JSON file
     try:
         try:
@@ -905,7 +905,7 @@ def set_cooldown(token, direction=None, hours=1):
         with open(COOLDOWN_FILE, 'w') as f:
             json.dump(data, f, indent=2)
     except Exception as e:
-        print('Cooldown write error: ' + str(e))
+        print(f'[signal_schema] set_cooldown fallback (JSON) failed: {e} — cooldown may not persist')
 
 def clear_cooldown(token, direction=None):
     try:

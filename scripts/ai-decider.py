@@ -26,8 +26,12 @@ def log_error(msg, exc=None):
     log(error_msg, 'ERROR')
 
 AB_CONFIG_FILE = '/root/.openclaw/workspace/data/ab-test-config.json'
+SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
 AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
+
+# Hot-set failure tracking — persists across cycles so warnings keep appearing
+_hot_set_failure_count = 0
 
 # Lazy-load signal streak from position_manager (avoids circular import at module load)
 _signal_streak_cache = {}  # key: (token, direction, signal_type) -> {'streak': N, 'fetched_at': float}
@@ -47,6 +51,7 @@ def _get_signal_streak(token, direction, signal_type):
             _signal_streak_cache[key] = _gs(token, direction, signal_type)
             _signal_streak_timestamps[key] = now
         except Exception:
+            log(f'[ai-decider] WARNING: streak cache fetch failed for {token} {direction} — using defaults')
             return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
     return _signal_streak_cache.get(key, {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0})
 
@@ -130,7 +135,10 @@ def _load_hot_rounds():
         conn.close()
     except Exception as e:
         import traceback; traceback.print_exc()
-        print(f"[ai-decider] WARNING: _load_hot_rounds failed: {e} — hot-set system disabled")
+        global _hot_set_failure_count
+        _hot_set_failure_count += 1
+        print(f"[ai-decider] CRITICAL: _load_hot_rounds FAILED (cycle #{_hot_set_failure_count}): {e} — hot-set system DISABLED. "
+              f"Check signals_hermes_runtime.db integrity.")
 
 
 def _kill_hot_signal(token):
@@ -214,48 +222,17 @@ def load_ab_config():
 
 def select_ab_variant(test_name):
     """
-    Select a variant for a given A/B test using EPSILON-GREEDY selection.
-
-    Exploitation (1-epsilon): pick the best-performing variant by win rate.
-    Exploration (epsilon):   pick a random variant weighted by config weight.
-
-    Falls back to weighted-random if not enough data for exploitation.
+    Select a variant for a given A/B test.
+    Uses Thompson sampling from ab_utils (canonical implementation).
+    Thompson sampling is superior to epsilon-greedy: it samples from posterior
+    distributions rather than greedily picking the best-known option.
     """
     try:
-        import ab_optimizer
-        config = load_ab_config()
-        if not config.get("enabled", False):
-            return None
-        test = next((t for t in config.get("tests", []) if t["name"] == test_name), None)
-        if not test:
-            return None
-        variant = ab_optimizer.epsilon_greedy_pick(test_name, test)
-        return variant
-    except ImportError:
-        # Fallback to old weighted-random
-        pass
-
-    config = load_ab_config()
-    if not config.get("enabled", False):
+        from ab_utils import get_ab_variant
+        return get_ab_variant(test_name, direction='both')
+    except Exception as e:
+        log_error(f'select_ab_variant Thompson sampling failed: {e}')
         return None
-
-    test = next((t for t in config.get("tests", []) if t["name"] == test_name), None)
-    if not test:
-        return None
-
-    enabled = [v for v in test.get("variants", []) if v.get("enabled", False)]
-    if not enabled:
-        return None
-
-    total_weight = sum(v.get("weight", 1) for v in enabled)
-    r = random.random() * total_weight
-    
-    for v in enabled:
-        r -= v.get("weight", 1)
-        if r <= 0:
-            return v
-    
-    return enabled[0]
 
 def get_ab_params(token, direction='long'):
     """
@@ -1442,8 +1419,29 @@ LLM CANDLE PREDICTION (for reference):
         log_signal(t, direction, entry, ai_conf, f"WAIT-{exchange}")
         mark_signal_processed(t, 'WAIT')
 
+
+# ── Pipeline heartbeat ─────────────────────────────────────────────────────────
+def _update_heartbeat_ai(stage: str):
+    """Update pipeline heartbeat."""
+    import json, time as _time, os as _os
+    hb_file = '/var/www/hermes/data/pipeline_heartbeat.json'
+    try:
+        data = {}
+        if _os.path.exists(hb_file):
+            with open(hb_file) as f:
+                data = json.load(f)
+        data[stage] = {"timestamp": _time.strftime('%Y-%m-%dT%H:%M:%SZ', _time.gmtime()), "status": "ok"}
+        with open(hb_file, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass  # never crash on heartbeat failures
+
+
 # Don't write back to pending-signals.json - we read from signals.db now
 print(f"\n=== Done: {len(pending)} signals processed ===")
+
+# Pipeline heartbeat
+_update_heartbeat_ai('ai_decider')
 
 # Release lock
 release_lock()

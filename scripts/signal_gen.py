@@ -85,7 +85,7 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
         conn.commit()
         conn.close()
     except Exception as e:
-        pass   # Never block on DB errors
+        print(f"[signal_gen] _persist_momentum_state DB error: {e}")  # logged, not silently swallowed
 
 from signal_schema import (
     init_db, get_all_latest_prices, get_price_history,
@@ -200,6 +200,26 @@ def log(msg):
             f.write(line + '\n')
     except:
         pass
+
+
+_HEARTBEAT_FILE = '/var/www/hermes/data/pipeline_heartbeat.json'
+
+
+def _update_heartbeat(stage: str):
+    """Update the pipeline heartbeat file for a given stage."""
+    try:
+        data = {}
+        if os.path.exists(_HEARTBEAT_FILE):
+            try:
+                with open(_HEARTBEAT_FILE) as f:
+                    data = json.load(f)
+            except Exception:
+                pass
+        data[stage] = {"timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), "status": "ok"}
+        with open(_HEARTBEAT_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass  # Never crash on heartbeat failures
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1049,27 +1069,22 @@ def compute_score(token, direction, long_mult, short_mult):
 
     # ── Score assembly ─────────────────────────────────────────
     # z_score: 0-30 | velocity: 0-10 | volume: 0-10 | phase: 0-5 | regime: 0-5 | rsi: 0-3 | macd: 0-1 | cooldown: 0-15 | trend_penalty: 0-15
-    score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score + cooldown_bonus - trend_penalty
+    natural_score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score
+    score = natural_score + cooldown_bonus - trend_penalty
     score = min(99.0, max(0, round(score, 1)))
 
     # Mean reversion rescue: push borderline signals over threshold
-    # NOTE: cap bonus at 15 and final score at 75 — prevents SKY/POL/MEGA 99% clustering.
-    # The base score already includes pct_score via pct_short_score_fn/pct_long_score_fn.
-    # Adding 25 bonus pts was double-amplification. Reduced to 15 max rescue.
-    if score < ENTRY_THRESHOLD:
+    # REQUIREMENT: natural score (excl. cooldown bonus) must reach 65 before rescue applies.
+    # Rescue only rescues borderline cases, not weak signals inflated by cooldown bonuses.
+    # CAP: bonus max +3 pts (was +15 pts — too generous).
+    if score < ENTRY_THRESHOLD and natural_score >= 65:
         z_bonus = 0
         if phase == 'extreme' and abs(avg_z) >= 1.0 and pct_score >= 40:
-            z_bonus = 15
-        elif phase == 'extreme' and abs(avg_z) >= 0.7 and pct_score >= 40:
-            z_bonus = 10
-        elif phase == 'extreme' and abs(avg_z) >= 0.5 and pct_score >= 40:
-            z_bonus = 5
-        elif abs(avg_z) >= 0.5 and pct_score >= 40:
             z_bonus = 3
-        elif abs(avg_z) >= 1.5 and vol_score >= 3:
-            z_bonus = 10
-        elif abs(avg_z) >= 1.0 and vol_score >= 3:
-            z_bonus = 5
+        elif phase == 'extreme' and abs(avg_z) >= 0.7 and pct_score >= 40:
+            z_bonus = 2
+        elif abs(avg_z) >= 0.5 and pct_score >= 40:
+            z_bonus = 1
         score = min(75.0, score + z_bonus)
         if score >= ENTRY_THRESHOLD:
             phase_reason += '-zbonus'
@@ -1217,7 +1232,8 @@ def _run_rsi_signals_for_confluence():
     broad_avg = statistics.mean(broad_z_vals) if broad_z_vals else 0
     # Blacklist: tokens with 0-20% SHORT win rate
     SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
-                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
+                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE',
+                       'WLFI'}
     added = 0
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
@@ -1472,7 +1488,8 @@ def _run_macd_signals_for_confluence():
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
-                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
+                       'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE',
+                       'WLFI'}
     added = 0
     for token, data in prices_dict.items():
         if price_age_minutes(token) > 10:
@@ -1853,6 +1870,9 @@ def run():
     except Exception as e:
         print(f'  Confluence detection error: {e}')
     print(f'  Confluence: {confluences_added} confluence signals added')
+
+    # ── Pipeline heartbeat ─────────────────────────────────────────────────────
+    _update_heartbeat('signal_gen')
 
     return added, exits
 

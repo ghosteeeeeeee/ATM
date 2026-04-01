@@ -24,6 +24,9 @@ OLLAMA_URL = "http://localhost:11434"
 MODEL = "qwen2.5:1.5b"
 EMBED_MODEL = "nomic-embed-text"
 
+# Ollama health/robustness tracking
+ollama_truncation_count = 0
+
 EXTRACTION_PROMPT = """Extract structured metadata from the following thought/input.
 
 Return ONLY valid JSON (no markdown, no explanation) with these fields:
@@ -39,27 +42,48 @@ Input: "{content}"
 Output JSON:"""
 
 def call_ollama(prompt: str) -> dict:
-    """Call Ollama API to extract metadata"""
+    """Call Ollama API to extract metadata. Truncates prompts >3000 tokens."""
+    global ollama_truncation_count
+
+    # ── Context guard: truncate prompts >3000 tokens (rough: len/4) ─────────────
+    rough_tokens = len(prompt) // 4
+    if rough_tokens > 3000:
+        prompt = prompt[-8000:]   # last ~2000 tokens
+        ollama_truncation_count += 1
+        print(f"[brain.py] Ollama prompt truncated ({rough_tokens}→~2000 tokens, "
+              f"total truncations={ollama_truncation_count})")
+
     payload = {
         "model": MODEL,
         "prompt": prompt,
         "stream": False,
         "format": "json"
     }
-    
-    result = subprocess.run(
-        ["curl", "-s", "-X", "POST", f"{OLLAMA_URL}/api/generate",
-         "-d", json.dumps(payload)],
-        capture_output=True,
-        text=True,
-        timeout=60
-    )
-    
-    if result.returncode != 0:
-        raise Exception(f"Ollama error: {result.stderr}")
-    
-    response = json.loads(result.stdout)
-    return json.loads(response.get("response", "{}"))
+
+    try:
+        result = subprocess.run(
+            ["curl", "-s", "-X", "POST", f"{OLLAMA_URL}/api/generate",
+             "-d", json.dumps(payload)],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+
+        if result.returncode != 0:
+            raise Exception(f"Ollama error: {result.stderr}")
+
+        response = json.loads(result.stdout)
+        raw_resp = response.get("response", "{}")
+
+        # ── Validate response contains required fields ──────────────────────────
+        if "DECISION:" not in raw_resp or "CONFIDENCE:" not in raw_resp:
+            print(f"[brain.py] Ollama response validation failed — missing DECISION/CONFIDENCE")
+            return {}  # safe default
+
+        return json.loads(raw_resp)
+    except Exception as e:
+        print(f"[brain.py] Ollama call failed: {e}")
+        return {}  # safe default
 
 def get_embedding(text: str) -> list:
     """Get vector embedding for text using nomic-embed-text"""
@@ -270,7 +294,7 @@ def get_thoughts_by_tag(tag: str) -> list:
 
 def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float,
                exchange: str = "Hyperliquid", strategy: str = None, paper: bool = True,
-               stop_loss: float = None, target: float = None, server: str = "Tokyo",
+               stop_loss: float = None, target: float = None, server: str = "Hermes",
                signal: str = None, confidence: float = None, address: str = None,
                sl_group: str = "control", sl_distance: float = None,
                trailing_activation: float = None, trailing_distance: float = None,

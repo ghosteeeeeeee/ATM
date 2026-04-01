@@ -89,6 +89,22 @@ def log(msg):
         pass
 
 
+def _update_decider_heartbeat():
+    """Update pipeline heartbeat for decider-run."""
+    import json
+    hb_file = '/var/www/hermes/data/pipeline_heartbeat.json'
+    try:
+        data = {}
+        if os.path.exists(hb_file):
+            with open(hb_file) as f:
+                data = json.load(f)
+        data['decider_run'] = {"timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), "status": "ok"}
+        with open(hb_file, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass  # never crash on heartbeat failures
+
+
 def get_current_price(token):
     """Fetch current price — uses shared HL cache first, falls back to live."""
     import hype_cache as hc
@@ -159,120 +175,11 @@ def _load_ab_config():
 
 def get_ab_variant(test_name: str, direction: str) -> dict:
     """
-    Select A/B variant using Thompson sampling from brain DB (ab_results).
-    Fallback chain:
-      1. Thompson sampling (if all variants have >= 5 trials in last 30 days)
-      2. Epsilon-greedy weighted random (90% exploitation, 10% exploration)
-      3. Pure weighted random from config
-      4. First enabled variant (ultimate fallback)
-    Returns the variant dict (or empty dict if AB disabled/no config).
+    Canonical A/B variant selection — delegates to ab_utils.get_ab_variant().
+    This ensures Thompson sampling is used consistently everywhere.
     """
-    cfg = _load_ab_config()
-    if not cfg.get('enabled', False):
-        return {}
-
-    test = next((t for t in cfg.get('tests', []) if t['name'] == test_name), None)
-    if not test:
-        return {}
-
-    variants = [v for v in test.get('variants', []) if v.get('enabled', True)]
-    if not variants:
-        return {}
-
-    # ── 1. Try Thompson sampling from DB ─────────────────────────────────────
-    try:
-        conn = psycopg2.connect(
-            host='/var/run/postgresql',
-            dbname='brain',
-            user='postgres',
-            password='***',
-            connect_timeout=2
-        )
-        # Apply socket timeout to ensure the 2-second budget is respected
-        cur = conn.cursor()
-        cur.execute("SET statement_timeout = '2000ms'")
-        cur.execute("""
-            SELECT variant_id, wins, losses
-            FROM ab_results
-            WHERE test_name = %s
-              AND updated_at >= NOW() - INTERVAL '30 days'
-        """, (test_name,))
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-
-        if rows:
-            # Map variant_id -> (wins, losses)
-            variant_stats = {str(r[0]): (int(r[1] or 0), int(r[2] or 0)) for r in rows}
-
-            # Only use Thompson sampling if ALL variants have >= 5 total trials
-            total_trials = {vid: w + l for vid, (w, l) in variant_stats.items()}
-            all_have_data = all(total_trials.get(v.get('id'), 0) >= 5 for v in variants)
-
-            if all_have_data:
-                samples = {}
-                for v in variants:
-                    vid = v.get('id')
-                    wins, losses = variant_stats.get(vid, (0, 0))
-                    samples[vid] = random.betavariate(wins + 1, losses + 1)
-
-                winner_vid = max(samples, key=samples.get)
-                for v in variants:
-                    if v.get('id') == winner_vid:
-                        wins, losses = variant_stats.get(winner_vid, (0, 0))
-                        log(f'[AB] Thompson: {test_name} -> {winner_vid} (wins={wins}, losses={losses}, sample={samples[winner_vid]:.4f})')
-                        return v
-
-    except Exception:
-        pass  # Fall through to epsilon-greedy
-
-    # ── 2. Epsilon-greedy weighted random (90% exploitation, 10% exploration) ─
-    try:
-        exploit_vid = None
-        try:
-            conn = psycopg2.connect(
-                host='/var/run/postgresql',
-                dbname='brain',
-                user='postgres',
-                password='***',
-                connect_timeout=2
-            )
-            cur = conn.cursor()
-            cur.execute("SET statement_timeout = '2000ms'")
-            cur.execute("""
-                SELECT variant_id, win_rate_pct
-                FROM ab_results
-                WHERE test_name=%s AND trades >= 5
-                ORDER BY win_rate_pct DESC
-                LIMIT 1
-            """, (test_name,))
-            row = cur.fetchone()
-            cur.close()
-            conn.close()
-            exploit_vid = row[0] if row else None
-        except Exception:
-            exploit_vid = None
-
-        if random.random() < (1.0 - EPSILON) and exploit_vid:
-            for v in variants:
-                if v.get('id') == exploit_vid:
-                    log(f'[AB] Epsilon-greedy EXPLOIT: {test_name} -> {v["id"]}')
-                    return v
-
-    except Exception:
-        pass
-
-    # ── 3. Pure weighted random from config ───────────────────────────────────
-    total_weight = sum(v.get('weight', 1) for v in variants)
-    r = random.uniform(0, total_weight)
-    for v in variants:
-        r -= v.get('weight', 1)
-        if r <= 0:
-            log(f'[AB] Weighted random: {test_name} -> {v["id"]}')
-            return v
-
-    # ── 4. Ultimate fallback ──────────────────────────────────────────────────
-    return variants[0]
+    from ab_utils import get_ab_variant as _get
+    return _get(test_name, direction)
 
 
 def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
@@ -334,7 +241,31 @@ def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name)
         return
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
+                                    total_pnl_pct, total_pnl_usdt, updated_at)
+            VALUES (%s, %s, 1, 0, 0, 0, 0, now())
+            ON CONFLICT (test_name, variant_id)
+            DO UPDATE SET
+                trades = ab_results.trades + 1,
+                updated_at = now()
+        """, (test_name, variant_id))
+        conn.commit()
+        cur.close(); conn.close()
+    except Exception as e:
+        log(f'[AB] record opened error: {e}')
+
+
+
+def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name):
+    """Record trade open in ab_results table."""
+    if not experiment:
+        return
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
@@ -353,7 +284,7 @@ def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name)
 
 def get_ab_params_for_trade(direction: str) -> dict:
     """
-    Get all A/B params for a trade using epsilon-greedy selection.
+    Get all A/B params for a trade using Thompson sampling (via ab_utils).
     Returns dict with sl_pct, trailing_activation, trailing_distance, experiment metadata.
     """
     # SL test
@@ -531,7 +462,7 @@ def execute_trade(token, direction, price, confidence, source,
         trailing_distance   = 0
         log(f'  [PUMP MODE] {token} {direction} — SL={PUMP_SL_PCT*100:.1f}% TP={PUMP_TP_PCT*100:.1f}% NO trailing')
     else:
-        sl_pct_val = float(sl_pct) / 100  # sl_pct in percent (1.0=1%), convert to fraction
+        sl_pct_val = float(sl_pct)  # sl_pct is already a fraction (0.01 = 1%)
         tp_pct_val = 0.05                 # 5% TP
 
     if direction == 'LONG':
@@ -816,6 +747,10 @@ def run(dry_run=False):
     log(f'=== Decider Done: {entered} entered | {skipped} skipped '
         f'| {de_exec} delayed exec | {de_exp} delayed expired '
         f'(open: {open_count}/{MAX_POS})')
+
+    # ── Pipeline heartbeat ─────────────────────────────────────────────────────
+    _update_decider_heartbeat()
+
     return entered, skipped
 
 

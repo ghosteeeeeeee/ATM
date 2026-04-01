@@ -36,6 +36,9 @@ DB_CONFIG = {
     "password": "postgres",
 }
 SERVER_NAME = "Hermes"
+
+# Pipeline heartbeat file
+_PM_HEARTBEAT_FILE = '/var/www/hermes/data/pipeline_heartbeat.json'
 MAX_POSITIONS = 10
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
@@ -309,6 +312,92 @@ def get_signal_streak(token: str, direction: str, signal_type: str = None) -> Di
         return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
 
 
+def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int,
+                                       is_win: bool, compact_rounds: int = 0):
+    """
+    Bridge hot-set signal_history data → brain.trade_patterns.
+
+    When a trade closes with compact_rounds >= 3, record the signal as a
+    permanent pattern in brain.trade_patterns so survival knowledge persists
+    beyond the 5-minute hot-set window.
+
+    WIN  → positive pattern (survived AI review and turned profitable)
+    LOSS → cautionary pattern (survived review but lost — weaker signal)
+    """
+    if compact_rounds < 3:
+        return  # only record patterns from signals that survived >= 3 AI reviews
+
+    try:
+        import sqlite3 as _sqlite3
+    except ImportError:
+        return
+
+    # Read signals from signal_history for this trade_id
+    sig_db = '/root/.hermes/data/signals_hermes_runtime.db'
+    try:
+        conn_sig = _sqlite3.connect(sig_db, timeout=5)
+        c_sig = conn_sig.cursor()
+        c_sig.execute("""
+            SELECT signal_type, compact_round, survived, score_before, score_after, reason
+            FROM signal_history
+            WHERE trade_id=? AND survived=1
+            ORDER BY compact_round DESC
+            LIMIT 10
+        """, (trade_id,))
+        rows = c_sig.fetchall()
+        conn_sig.close()
+    except Exception as e:
+        print(f"[Position Manager] _bridge: failed to read signal_history: {e}")
+        return
+
+    if not rows:
+        return  # no survival data
+
+    # Write to brain.trade_patterns
+    try:
+        conn_brain = psycopg2.connect(
+            host='/var/run/postgresql', dbname='brain',
+            user='postgres', password='postgres'
+        )
+        cur_brain = conn_brain.cursor()
+
+        for row in rows:
+            sig_type, cround, survived, score_b, score_a, reason = row
+            # Pattern name: direction + token + signal_type + outcome
+            pattern_name = f"survival_{direction.lower()}_{token.lower()}_{sig_type}_{'win' if is_win else 'loss'}"
+            is_positive = 1 if is_win else 0
+
+            cur_brain.execute("""
+                INSERT INTO trade_patterns
+                    (pattern_name, token, side, is_positive, confidence,
+                     adjustment, sample_count, reason, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, 1, %s, NOW())
+                ON CONFLICT (pattern_name, token) DO UPDATE SET
+                    sample_count = trade_patterns.sample_count + 1,
+                    is_positive = CASE
+                        WHEN trade_patterns.is_positive = 1 THEN 1
+                        WHEN trade_patterns.is_positive = 0 AND %s = 1 THEN 1
+                        ELSE trade_patterns.is_positive END,
+                    confidence = (trade_patterns.confidence * trade_patterns.sample_count + %s)
+                                / (trade_patterns.sample_count + 1),
+                    updated_at = NOW()
+            """, (
+                pattern_name, token.upper(), direction.upper(), is_positive,
+                0.7 if is_win else 0.4,
+                json.dumps({'compact_rounds': cround, 'score_before': score_b,
+                            'score_after': score_a, 'survival_reason': reason}),
+                is_positive,
+                0.7 if is_win else 0.4,
+            ))
+
+        conn_brain.commit()
+        cur_brain.close()
+        conn_brain.close()
+        print(f"[Position Manager] _bridge: wrote {len(rows)} patterns for {token} {direction} ({'WIN' if is_win else 'LOSS'})")
+    except Exception as e:
+        print(f"[Position Manager] _bridge: failed to write to trade_patterns: {e}")
+
+
 def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt: float,
                             signal_type: str = None, confidence: float = None):
     """Record outcome for a signal type so we can track win/loss streaks."""
@@ -359,7 +448,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                                           user='postgres', password='***')
             cur_fetch = conn_fetch.cursor()
             cur_fetch.execute(
-                "SELECT signal, confidence FROM trades WHERE token=%s AND server='Tokyo' "
+                "SELECT signal, confidence FROM trades WHERE token=%s AND server='Hermes' "
                 "AND status IN ('closed','open') ORDER BY id DESC LIMIT 1",
                 (token.upper(),))
             row = cur_fetch.fetchone()
@@ -572,6 +661,25 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # ── Always record outcome (A/B + signal_outcomes) — single call ─────────
         # _record_ab_close handles both: A/B data if present, signal_outcomes always
         _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=net_pnl)
+
+        # ── Bridge signal_history → brain.trade_patterns ─────────────────────────
+        # Persist hot-set survival data as permanent knowledge in brain DB.
+        # compact_rounds >= 3 means the AI reviewed the signal multiple times
+        # and kept it alive — good signal. Record the pattern.
+        try:
+            import sqlite3 as _sqlite3
+            conn_s = _sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db', timeout=5)
+            c_s = conn_s.cursor()
+            c_s.execute("""
+                SELECT MAX(compact_round) FROM signal_history
+                WHERE token=? AND direction=? AND trade_id=? AND survived=1
+            """, (token.upper(), direction.upper(), trade_id))
+            row_cr = c_s.fetchone()
+            conn_s.close()
+            compact_rounds_val = row_cr[0] or 0 if row_cr else 0
+        except Exception:
+            compact_rounds_val = 0
+        _bridge_signal_history_to_patterns(token, direction, trade_id, is_win, compact_rounds_val)
 
         return True
     except Exception as e:
@@ -1049,6 +1157,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 pass
 
     print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
+
+    # ── Pipeline heartbeat ─────────────────────────────────────────────────────
+    _update_pm_heartbeat()
+
     return open_count, closed_count, adjusted_count
 
 
@@ -1481,6 +1593,24 @@ def _is_win_cooldown_active(token: str, direction: str) -> bool:
     key = _win_cd_key(token, direction)
     data = _clean_expired(_load_cooldowns())
     return key in data
+
+
+
+def _update_pm_heartbeat():
+    """Update pipeline heartbeat for position_manager."""
+    try:
+        data = {}
+        if os.path.exists(_PM_HEARTBEAT_FILE):
+            with open(_PM_HEARTBEAT_FILE) as f:
+                data = json.load(f)
+        data['position_manager'] = {
+            "timestamp": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            "status": "ok"
+        }
+        with open(_PM_HEARTBEAT_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass  # never crash on heartbeat failures
 
 
 # ─── Main / Test ──────────────────────────────────────────────────────────────
