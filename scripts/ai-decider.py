@@ -137,7 +137,7 @@ def _load_hot_rounds():
             c.execute("""
                 SELECT id, AVG(confidence) as avg_conf, COUNT(DISTINCT signal_type) as num_types
                 FROM signals
-                WHERE token=*** AND direction=? AND decision='PENDING' AND executed=0
+                WHERE token=? AND direction=? AND decision='PENDING' AND executed=0
             """, (t, direction))
             sig_row = c.fetchone()
             sig_id = sig_row[0] if sig_row else None
@@ -823,7 +823,8 @@ def get_pending_signals():
                     UPDATE signals
                     SET compact_rounds = compact_rounds + 1,
                         survival_score = ?,
-                        last_compact_at = ?
+                        last_compact_at = ?,
+                        review_count = COALESCE(review_count, 0) + 1
                     WHERE id = ?
                 """, (round(new_survival, 3), now_str, s['sid']))
 

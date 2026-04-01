@@ -152,7 +152,9 @@ PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
 PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
-ENTRY_THRESHOLD      = 65    # min score to add signal
+ENTRY_THRESHOLD      = 65    # min score to add signal (LONG)
+SHORT_ENTRY_THRESHOLD = 72   # min score for SHORT — raised to reduce excess SHORT signals
+                             # Historical: SHORT 26% WR vs LONG 46% WR (2026-04-01)
 AI_DECIDER_THRESHOLD  = 65    # ≥ this + < AUTO_APPROVE → pending → AI decider
 AUTO_APPROVE          = 95    # ≥ this → auto-approve (momentum uses PENDING only; this is a safety cap)
 
@@ -210,9 +212,11 @@ LONG_30M_Z_MAX  = +0.5    # 30m z-score must be below this
 LONG_AGREE_TFS  = 2       # Require at least 2 of (1h, 4h, 30m) to agree
 
 # SHORT: require longer TFs to be above these z-scores (elevated = ready to short)
-SHORT_4H_Z_MAX  = +2.5    # BLOCK SHORT if 4h z > +2.5 (catching a falling knife)
-SHORT_1H_Z_MAX  = +2.5
-SHORT_30M_Z_MAX = +2.5
+# P1-1 fix: tightened from +2.5 → +2.0 to reduce catching falling knives
+# Historical SHORT 26% WR vs LONG 46% WR (2026-04-01)
+SHORT_4H_Z_MAX  = +2.0    # BLOCK SHORT if 4h z > +2.0 (was +2.5)
+SHORT_1H_Z_MAX  = +2.0    # BLOCK SHORT if 1h z > +2.0 (was +2.5)
+SHORT_30M_Z_MAX = +2.0    # BLOCK SHORT if 30m z > +2.0 (was +2.5)
 SHORT_AGREE_TFS = 2       # Require at least 2 of (1h, 4h, 30m) to be elevated
 
 # Broad market: if BTC+ETH+SOL avg 4h z > 0 → block SHORTs (ride the wave, not against it)
@@ -1001,34 +1005,29 @@ def compute_score(token, direction, long_mult, short_mult):
         # Positive velocity = z rising = price reverting up = good SHORT entry
         vel_score = min(10.0, max(0.0, velocity * VEL_SCALE))
 
-    # ── RSI advisory (tiered penalty, not hard block) ─────────────
-    # RSI informs confidence but doesn't hard-block. Extreme RSI penalizes heavily.
-    # SHORT: RSI > 60 (overbought) = confirmed short, positive score
-    # SHORT: RSI < 40 (oversold) = squeeze risk, heavy negative penalty
-    # LONG:  RSI < 40 (oversold) = confirmed long, positive score
-    # LONG:  RSI > 60 (overbought) = squeeze risk, heavy negative penalty
+    # ── RSI advisory — SHORT: hard block if oversold, LONG: hard block if overbought ──
+    # P1-1 fix: Added hard blocks to prevent SHORT signals in oversold territory
+    # (SHORT 26% WR vs LONG 46% WR — oversold SHORT = squeeze risk).
     # NOTE: RSI is cached in get_momentum_stats() — reuse it here
     rsi_val = mom.get('rsi_14')
     rsi_score = 0.0
     rsi_reason = ''
     if rsi_val is not None:
         if direction == 'SHORT':
+            # P1-1: HARD BLOCK — no SHORT in oversold territory (catches knives)
+            if rsi_val <= 45:
+                return None, None
             if rsi_val >= 70:   # overbought — confirmed SHORT
                 rsi_score = +3.0
                 rsi_reason = f'RSI={rsi_val:.0f}(overbought-confirm)'
             elif rsi_val >= 60:  # mildly overbought
                 rsi_score = +1.0
                 rsi_reason = f'RSI={rsi_val:.0f}(overbought)'
-            elif rsi_val >= 40:  # neutral zone
+            else:                # 45 < rsi < 60 — near-neutral
                 rsi_score = 0.0
                 rsi_reason = f'RSI={rsi_val:.0f}(neutral)'
-            elif rsi_val >= 30:  # oversold — squeeze risk for SHORT
-                rsi_score = -5.0
-                rsi_reason = f'RSI={rsi_val:.0f}(oversold-caution)'
-            else:                # severely oversold — squeeze risk
-                rsi_score = -20.0
-                rsi_reason = f'RSI={rsi_val:.0f}(oversold-squeeze-risk)'
         elif direction == 'LONG':
+            # LONG: oversold = good, overbought = squeeze risk
             if rsi_val <= 30:    # oversold — confirmed LONG
                 rsi_score = +3.0
                 rsi_reason = f'RSI={rsi_val:.0f}(oversold-confirm)'
@@ -1814,10 +1813,10 @@ def run():
                         set_cooldown(token, 'LONG', hours=1)
                         added += 1
 
-        # ── SHORT signals ─────────────────────────────────────
+        # ── SHORT signals — raised threshold to reduce excess SHORT signals ─────
         if token not in open_pos or open_pos[token] != 'SHORT':
             score, signals = compute_score(token, 'SHORT', long_mult, short_mult)
-            if score and score >= ENTRY_THRESHOLD:
+            if score and score >= SHORT_ENTRY_THRESHOLD:
                 # ── Trend filter ────────────────────────────────
                 short_ok, short_filter_reason = check_short_trend_filter(token)
                 if not short_ok:
