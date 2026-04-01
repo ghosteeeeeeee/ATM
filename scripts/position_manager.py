@@ -359,9 +359,9 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                                           user='postgres', password='***')
             cur_fetch = conn_fetch.cursor()
             cur_fetch.execute(
-                "SELECT signal, confidence FROM trades WHERE token=%s AND server='Tokyo' "
+                "SELECT signal, confidence FROM trades WHERE token=%s AND server=%s "
                 "AND status IN ('closed','open') ORDER BY id DESC LIMIT 1",
-                (token.upper(),))
+                (token.upper(), SERVER_NAME))
             row = cur_fetch.fetchone()
             if row:
                 if signal_type is None:

@@ -8,6 +8,7 @@ Also processes delayed-entry signals from pending-delayed-entries.json.
 import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import init_db, get_approved_signals, get_pending_signals, mark_signal_executed, cleanup_stale_approved
+from hermes_constants import SERVER_NAME
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
@@ -275,59 +276,6 @@ def get_ab_variant(test_name: str, direction: str) -> dict:
     return variants[0]
 
 
-def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
-    """
-    Pick variant for a test using epsilon-greedy.
-    Exploitation: best win_rate from ab_results.
-    Exploration: weighted random from config.
-    """
-    cfg = _load_ab_config()
-    if not cfg.get('enabled', False):
-        return {}
-
-    test = next((t for t in cfg.get('tests', []) if t['name'] == test_name), None)
-    if not test:
-        return {}
-
-    # Try exploitation — read from ab_results
-    try:
-        import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT variant_id, win_rate_pct
-            FROM ab_results
-            WHERE test_name=%s AND trades >= 5
-            ORDER BY win_rate_pct DESC
-            LIMIT 1
-        """, (test_name,))
-        row = cur.fetchone()
-        cur.close(); conn.close()
-        exploit_vid = row[0] if row else None
-    except Exception:
-        exploit_vid = None
-
-    if random.random() >= EPSILON and exploit_vid:
-        # Exploitation — use best variant
-        for v in test.get('variants', []):
-            if v.get('id') == exploit_vid:
-                log(f'  [AB] EXPLOIT: {test_name} → {v["id"]} (win_rate={row[1]:.0f}%)')
-                return v
-
-    # Exploration — weighted random
-    variants = [v for v in test.get('variants', []) if v.get('enabled', True)]
-    if not variants:
-        return {}
-    total = sum(v.get('weight', 1) for v in variants)
-    r = random.uniform(0, total)
-    for v in variants:
-        r -= v.get('weight', 1)
-        if r <= 0:
-            log(f'  [AB] EXPLORE: {test_name} → {v["id"]} (random)')
-            return v
-    return variants[0]
-
-
 def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name):
     """Record trade open in ab_results table."""
     if not experiment:
@@ -459,7 +407,27 @@ def process_delayed_entries(paper=True):
         log(f'🎯 DELAYED ENTRY: {token} {direction} @ ${cur_price:.6f} '
             f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
 
+        # Look up learned SL multiplier for this token/direction
+        learned_sl_mult = 1.0
+        try:
+            conn_l = sqlite3.connect(SIGNALS_DB)
+            cur_l = conn_l.cursor()
+            cur_l.execute('''
+                SELECT learned_sl_multiplier FROM signals
+                WHERE token=? AND direction=? AND decision='APPROVED'
+                ORDER BY created_at DESC LIMIT 1
+            ''', (token, direction))
+            row_l = cur_l.fetchone()
+            if row_l:
+                learned_sl_mult = float(row_l[0] or 1.0)
+            conn_l.close()
+        except Exception as e:
+            log(f'  [WARN] Failed to lookup learned_sl_mult: {e}')
+
         sl_pct_val = float(sl_pct)
+        if learned_sl_mult != 1.0:
+            sl_pct_val = round(sl_pct_val * learned_sl_mult, 4)
+            log(f'  [LEARNED] SL adjusted by {learned_sl_mult:.2f}x → {sl_pct_val*100:.2f}%')
         if direction.upper() == 'LONG':
             sl = cur_price * (1 - sl_pct_val)
             tp = cur_price * 1.05
@@ -516,7 +484,8 @@ def execute_trade(token, direction, price, confidence, source,
                   trailing_activation=0.01, trailing_distance=0.01,
                   trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
-                  live_trading=False):
+                  live_trading=False,
+                  learned_sl_mult=1.0):
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
@@ -533,6 +502,11 @@ def execute_trade(token, direction, price, confidence, source,
     else:
         sl_pct_val = float(sl_pct) / 100  # sl_pct in percent (1.0=1%), convert to fraction
         tp_pct_val = 0.05                 # 5% TP
+
+    # Apply learned SL multiplier from brain's trade_patterns
+    if learned_sl_mult != 1.0 and not is_pump:
+        sl_pct_val = round(sl_pct_val * learned_sl_mult, 4)
+        log(f'  [LEARNED] SL adjusted by {learned_sl_mult:.2f}x → {sl_pct_val*100:.2f}%')
 
     if direction == 'LONG':
         sl = price * (1 - sl_pct_val)
@@ -799,7 +773,8 @@ def run(dry_run=False):
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
-            live_trading=not paper)
+            live_trading=not paper,
+            learned_sl_mult=sig.get('learned_sl_multiplier', 1.0))
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')

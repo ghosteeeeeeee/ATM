@@ -29,6 +29,8 @@ from functools import lru_cache
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 _RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            os.pardir, 'data', 'signals_hermes_runtime.db')
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+
 
 def _has_confluence_partners(token: str, direction: str, exclude_type: str = None) -> bool:
     """
@@ -82,7 +84,7 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
               z_direction, momentum_state, state_confidence, int(time.time())))
         conn.commit()
         conn.close()
-    except Exception:
+    except Exception as e:
         pass   # Never block on DB errors
 
 from signal_schema import (
@@ -1397,9 +1399,12 @@ def _run_mtf_macd_signals():
         if pct_long >= 85 or pct_short >= 85:
             pct_signal_dir = 'LONG' if pct_long >= 85 else 'SHORT'
             pct_val = max(pct_long, pct_short)
-            pct_conf = min(75, 40 + (pct_val - 70) * 1.2)
+            # Normalize percentile_rank to signal-strength equivalent.
+            # pct_val 85→15pts, pct_val 100→50pts. Cap at 50 so it contributes
+            # proportionally to other signals (z_score: 0-30, velocity: 0-10).
+            pct_conf = min(50, (pct_val - 70) * (50.0 / 30.0))
             add_signal(token, pct_signal_dir, 'percentile_rank', 'pct-hermes',
-                        confidence=pct_conf, value=pct_val, price=price,
+                        confidence=round(pct_conf, 1), value=pct_val, price=price,
                         exchange='hyperliquid', timeframe='4h',
                         z_score=avg_z, z_score_tier=z_dir,
                         rsi_14=rsi_val)
@@ -1546,8 +1551,9 @@ def run_confluence_detection():
         if os.path.exists('/root/.openclaw/workspace/data/signals.db'):
             try:
                 cc.execute("ATTACH DATABASE '/root/.openclaw/workspace/data/signals.db' AS oc")
-            except Exception:
-                pass
+            except Exception as e:
+                import traceback; traceback.print_exc()
+                print(f"[signal_gen] Non-fatal error: {e}")
         cc.execute('''
             SELECT source, confidence FROM (
                 SELECT source, confidence FROM signals

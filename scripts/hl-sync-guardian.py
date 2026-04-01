@@ -29,6 +29,7 @@ from hyperliquid_exchange import (
 
 DRY = True   # Default is DRY RUN (safe). Use --apply flag to enable LIVE closing of orphan positions.
 INTERVAL = 60  # seconds between checks
+MAX_CONSECUTIVE_FAILURES = 5
 LOG_FILE = '/root/.hermes/logs/sync-guardian.log'
 DATA_DIR = '/root/.hermes/data'
 COPIED_TRADES_FILE = os.path.join(DATA_DIR, 'copied-trades-state.json')
@@ -987,7 +988,13 @@ def main():
         try:
             sync()
         except Exception as e:
-            log(f'Sync cycle error: {e}', 'FAIL')
+            global _consecutive_failures
+            _consecutive_failures = getattr(sys.modules[__name__], '_consecutive_failures', 0) + 1
+            import traceback; traceback.print_exc()
+            log(f'Sync cycle error #{_consecutive_failures}: {e}', 'FAIL')
+            if _consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                log(f'FATAL: {_consecutive_failures} consecutive failures — exiting', 'FAIL')
+                sys.exit(1)
 
         log(f'Sleeping {INTERVAL}s...', 'INFO')
         time.sleep(INTERVAL)

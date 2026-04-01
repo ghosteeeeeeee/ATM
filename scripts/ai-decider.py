@@ -51,19 +51,32 @@ def _get_signal_streak(token, direction, signal_type):
     return _signal_streak_cache.get(key, {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0})
 
 def _load_signal_streaks_batch(rows):
-    """Pre-load streaks for all signal_type keys in a batch of candidates."""
+    """Pre-load streaks for all signal_type keys in a batch of candidates.
+    Respects TTL per-key (refreshes stale entries). Logs failures instead of silent pass."""
     global _signal_streak_cache, _streak_fetched_at
+    now = time.time()
+    loaded = 0
+    skipped = 0
     try:
         sys.path.insert(0, '/root/.hermes/scripts')
         from position_manager import get_signal_streak as _gs
         for row in rows:
             sid, token, direction, stype, conf, source, created = row
             key = (token.upper(), direction.upper(), (stype or '').lower())
-            if key not in _signal_streak_cache:
+            # Always refresh — enforce TTL per-cache-entry, not globally
+            cache_entry = _signal_streak_cache.get(key)
+            is_stale = (cache_entry is None or (now - _streak_fetched_at) > _STREAK_TTL)
+            if is_stale:
                 _signal_streak_cache[key] = _gs(token, direction, stype)
-        _streak_fetched_at = time.time()
-    except Exception:
-        pass  # fail silently — decider keeps working
+                loaded += 1
+            else:
+                skipped += 1
+        _streak_fetched_at = now
+        if loaded > 0:
+            print(f'[ai-decider] Streaks loaded: {loaded} fresh, {skipped} cached')
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print(f'[ai-decider] WARNING: streak batch load failed: {e} — using defaults')
 
 # In-memory cache for A/B variants per token+direction (cleared on restart)
 _ab_variant_cache = {}
@@ -1362,10 +1375,27 @@ LLM CANDLE PREDICTION (for reference):
     
     # Apply learned adjustments from past trades
     learned = get_learned_adjustments(t, direction)
+    sl_mult = 1.0
     if learned:
         old_conf = ai_conf
         ai_conf = int(ai_conf + learned.get('confidence_boost', 0))
-        print(f"   🧠 LEARNED: +{learned.get('confidence_boost', 0)}% conf (patterns: {', '.join(learned.get('patterns', []))})")
+        sl_mult = learned.get('sl_multiplier', 1.0)
+        print(f"   🧠 LEARNED: +{learned.get('confidence_boost', 0)}% conf, SL_mult={sl_mult:.2f} (patterns: {', '.join(learned.get('patterns', []))})")
+    
+    # Persist sl_multiplier on the signal row so decider-run can apply it
+    try:
+        from signal_schema import _get_conn, SIGNAL_RUNTIME
+        conn_s = _get_conn(SIGNAL_RUNTIME)
+        cur_s = conn_s.cursor()
+        cur_s.execute('''
+            UPDATE signals 
+            SET learned_sl_multiplier = %s, updated_at = datetime('now')
+            WHERE token=%s AND direction=%s AND decision='APPROVED' AND executed=0
+        ''', (sl_mult, t, direction))
+        conn_s.commit()
+        conn_s.close()
+    except Exception as e:
+        log_error(f'learned_sl_multiplier persist error: {e}')
     
     # Execute if AI says go (prompt enforces ≥50% confidence threshold)
     if decision != "wait" and ai_conf >= 50:

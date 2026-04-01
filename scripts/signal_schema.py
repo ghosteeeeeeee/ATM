@@ -94,6 +94,37 @@ def init_db():
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )""")
+    # Add columns for hot-set signal tracking (compact_rounds, survival_score).
+    # Safe to run on every init — ADD COLUMN is idempotent if column exists.
+    # SQLite 3.35+ supports IF NOT EXISTS; fallback to try/except for older versions.
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS compact_rounds INTEGER DEFAULT 0")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN compact_rounds INTEGER DEFAULT 0")
+        except Exception:
+            pass  # column already exists
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS survival_score REAL DEFAULT 0")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN survival_score REAL DEFAULT 0")
+        except Exception:
+            pass
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN last_compact_at TEXT")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN last_compact_at TEXT")
+        except Exception:
+            pass
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS learned_sl_multiplier REAL DEFAULT 1.0")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN learned_sl_multiplier REAL DEFAULT 1.0")
+        except Exception:
+            pass
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
@@ -463,12 +494,20 @@ def get_approved_signals(hours=24):
                MAX(leverage) as leverage,
                MAX(COALESCE(
                    (SELECT compact_rounds FROM signals s2
-                    WHERE s2.token = signals.token
+                    WHERE s2.token=signals.token
                       AND s2.direction = signals.direction
                       AND s2.decision = 'APPROVED'
                       AND s2.executed = 0
                     ORDER BY compact_rounds DESC LIMIT 1), 0
-               )) as hot_rounds
+               )) as hot_rounds,
+               MAX(COALESCE(
+                   (SELECT learned_sl_multiplier FROM signals s3
+                    WHERE s3.token=signals.token
+                      AND s3.direction = signals.direction
+                      AND s3.decision = 'APPROVED'
+                      AND s3.executed = 0
+                    ORDER BY created_at DESC LIMIT 1), 1.0
+               )) as learned_sl_multiplier
         FROM signals
         WHERE decision='APPROVED' AND executed=0
           AND created_at > datetime('now','-'||?||' hours')
