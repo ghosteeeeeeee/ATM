@@ -87,6 +87,7 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
 
 from signal_schema import (
     init_db, get_all_latest_prices, get_price_history,
+    expire_pending_signals,
     get_latest_price, add_signal, set_cooldown, get_cooldown,
     price_age_minutes, approve_signal, update_signal_decision,
     mark_signal_processed, add_confluence_signal, get_confluence_signals
@@ -164,14 +165,21 @@ def _get_top_tokens():
 # ─── Broad Market Trend Tokens (for regime override) ─────────────────
 BROAD_MARKET_TOKENS = ['BTC', 'ETH', 'SOL']
 
-# ─── LONG Trend Filter Thresholds ───────────────────────────────────
-# Require longer TFs to be below these z-score thresholds for LONG entry
+# ─── Trend Filter Thresholds ────────────────────────────────────────
+# LONG: require longer TFs to be below these z-scores
 LONG_1H_Z_MAX   = +0.5    # 1H z-score must be below this (negative = suppressed)
 LONG_4H_Z_MAX   = +0.3    # 4H z-score must be below this
 LONG_30M_Z_MAX  = +0.5    # 30m z-score must be below this
 LONG_AGREE_TFS  = 2       # Require at least 2 of (1h, 4h, 30m) to agree
-# Broad market trend: if BTC+ETH+SOL avg 4h z > this, block LONGs
-BROAD_UPTEND_Z   = +2.0    # If avg 4h z > +2.0 → block all LONG entries (relaxed from 1.0 — BTC/ETH trending up is healthy, don't block longs on that alone)
+
+# SHORT: require longer TFs to be above these z-scores (elevated = ready to short)
+SHORT_4H_Z_MAX  = +2.5    # BLOCK SHORT if 4h z > +2.5 (catching a falling knife)
+SHORT_1H_Z_MAX  = +2.5
+SHORT_30M_Z_MAX = +2.5
+SHORT_AGREE_TFS = 2       # Require at least 2 of (1h, 4h, 30m) to be elevated
+
+# Broad market: if BTC+ETH+SOL avg 4h z > 0 → block SHORTs (ride the wave, not against it)
+BROAD_UPTEND_Z   = +0.0
 
 # ─── Per-Token Rate Limiting ─────────────────────────────────────────
 MIN_TRADE_INTERVAL_MINUTES = 10   # min minutes between trades on same token
@@ -292,11 +300,13 @@ def macd(prices, fast=12, slow=26, signal=9):
 
 def compute_zscore_percentile(prices, window=500):
     """
-    Compute directional percentile ranks for the current z-score.
+    Compute directional percentile ranks for the current price.
     Returns: (pct_rank, pct_long, pct_short)
-      pct_rank   = overall percentile (0-100)
-      pct_long   = directional percentile for LONG (how far below mean historically?)
-      pct_short  = directional percentile for SHORT (how far above mean historically?)
+      pct_rank   = z-score percentile (how unusual is current price vs rolling mean?)
+      pct_long   = % of historical prices BELOW current price
+                   HIGH pct_long = suppressed = good LONG entry
+      pct_short  = % of historical prices ABOVE current price
+                   HIGH pct_short = elevated = good SHORT entry
     """
     if len(prices) < 60:
         return 50.0, 50.0, 50.0
@@ -304,7 +314,13 @@ def compute_zscore_percentile(prices, window=500):
     lookback = prices[-window:] if len(prices) >= window else prices
     current_price = prices[-1]
 
-    # Compute rolling z-scores over lookback window (every 5 bars for speed)
+    # True price percentile: compare each historical price to current price
+    price_below  = sum(1 for p in lookback if p <= current_price)
+    price_above  = sum(1 for p in lookback if p >= current_price)
+    pct_long  = round((price_below  / len(lookback)) * 100, 1)
+    pct_short = round((price_above  / len(lookback)) * 100, 1)
+
+    # Z-score percentile: how unusual is the current price vs its rolling windows?
     step = max(1, len(lookback) // 100)
     z_values = []
     for i in range(20, len(lookback), step):
@@ -316,29 +332,12 @@ def compute_zscore_percentile(prices, window=500):
         if std > 0:
             z_values.append((current_price - mu) / std)
 
-    if not z_values:
-        return 50.0, 50.0, 50.0
-
-    current_z = z_values[-1]
-
-    # Overall percentile
-    below = sum(1 for z in z_values if z <= current_z)
-    pct_rank = round((below / len(z_values)) * 100, 1)
-
-    # Directional percentiles based on PRICE position (not z-score)
-    # pct_long: what % of historical prices are BELOW current price?
-    #   HIGH pct_long = suppressed price = good LONG entry (low = elevated = bad)
-    # pct_short: what % of historical prices are BELOW current price?
-    #   HIGH pct_short = suppressed = BAD for SHORT (low = elevated = good for SHORT)
-    #
-    # Use raw price percentile, not z-score percentile, for directional signals.
-    # pct_rank (above) = z-score percentile = useful for phase, NOT direction.
-    price_below = sum(1 for z in z_values if z <= current_z)
-    price_above = sum(1 for z in z_values if z >= current_z)
-    pct_long  = round((price_below / len(z_values)) * 100, 1)
-    # FIX: pct_short should be % BELOW current (inverted from % ABOVE)
-    # High pct_short = suppressed = bad for SHORT; Low pct_short = elevated = good for SHORT
-    pct_short = round(((len(z_values) - price_below) / len(z_values)) * 100, 1)
+    if z_values:
+        current_z = z_values[-1]
+        below_z = sum(1 for z in z_values if z <= current_z)
+        pct_rank = round((below_z / len(z_values)) * 100, 1)
+    else:
+        pct_rank = 50.0
 
     return pct_rank, pct_long, pct_short
 
@@ -684,6 +683,42 @@ def check_long_trend_filter(token):
         z30m = zscores.get('30m', (None, None))[0]
         def fmt(z): return f'{z:+.2f}' if z is not None else 'N/A'
         return False, f'long_tfs={agreeing}/{LONG_AGREE_TFS} agree (1h={fmt(z1h)} 4h={fmt(z4h)} 30m={fmt(z30m)})'
+
+    return True, 'passed'
+
+
+def check_short_trend_filter(token):
+    """
+    Check if token passes the SHORT trend filter.
+    Returns (passes, reason).
+    BLOCKS SHORT if:
+      1. Broad market (BTC/ETH/SOL) avg 4h z > 0 (don't short a rising market)
+      2. Fewer than SHORT_AGREE_TFS of (1h, 4h, 30m) z-scores are elevated
+    """
+    # ── Broad market trend ─────────────────────────────────────────
+    broad_z_vals = []
+    for tok in BROAD_MARKET_TOKENS:
+        zs = get_tf_zscores(tok)
+        if '4h' in zs and zs['4h'][0] is not None:
+            broad_z_vals.append(zs['4h'][0])
+    if broad_z_vals:
+        broad_avg = statistics.mean(broad_z_vals)
+        if broad_avg > BROAD_UPTEND_Z:
+            return False, f'broad_market_z={broad_avg:+.2f}>+{BROAD_UPTEND_Z} (rising market, no shorts)'
+
+    # ── Token-specific multi-TF check ──────────────────────────────
+    zscores = get_tf_zscores(token)
+    elevated = 0
+    if '1h'  in zscores and zscores['1h'][0]  is not None and zscores['1h'][0]  >= SHORT_1H_Z_MAX:  elevated += 1
+    if '4h'  in zscores and zscores['4h'][0]  is not None and zscores['4h'][0]  >= SHORT_4H_Z_MAX:  elevated += 1
+    if '30m' in zscores and zscores['30m'][0] is not None and zscores['30m'][0] >= SHORT_30M_Z_MAX: elevated += 1
+
+    if elevated < SHORT_AGREE_TFS:
+        z1h  = zscores.get('1h',  (None, None))[0]
+        z4h  = zscores.get('4h',  (None, None))[0]
+        z30m = zscores.get('30m', (None, None))[0]
+        def fmt(z): return f'{z:+.2f}' if z is not None else 'N/A'
+        return False, f'short_tfs={elevated}/{SHORT_AGREE_TFS} elevated (1h={fmt(z1h)} 4h={fmt(z4h)} 30m={fmt(z30m)})'
 
     return True, 'passed'
 
@@ -1224,13 +1259,207 @@ def _run_rsi_signals_for_confluence():
     return added
 
 
-# ── MACD signals for confluence ───────────────────────────────────────────────
+# ── MTF-MACD: Multi-Timeframe MACD confirmation ───────────────────────────────
+# Replaces the broken OpenClaw mtf_macd_signals.py pipeline.
+# Detects when MACD is bullish/bearish across 4H+1H+15m timeframes.
+# Writes as 'mtf_macd' signal_type so confluence detection can cross-match it.
+
+def _run_mtf_macd_signals():
+    """
+    Native Hermes MTF-MACD: check if MACD histogram agrees across 4H/1H/15m.
+    Replaces OpenClaw mtf_macd_signals.py which is broken (PENDING-duplicate blocker).
+
+    Logic: for each token, fetch closes at 4H/1H/15m windows, compute MACD fast
+    (12/26/9 equivalent), count bullish TFs (macd_line > 0).
+    3/3 = STRONG, 2/3 = NORMAL, 1/3 = WEAK.
+    """
+    from signal_schema import compute_macd, compute_zscore
+
+    prices_dict = get_all_latest_prices()
+    open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
+    SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
+                        'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
+    added = 0
+
+    def _macd_line(token, minutes):
+        """Compute MACD fast line for a token using its price_data table."""
+        # Use the existing compute_macd via 1m data — same underlying data source
+        # compute_macd reads from price_data table directly, no fetch needed
+        m = compute_macd(token, lookback_minutes=minutes)
+        return m.get('macd') if m else None
+
+    # ── Individual RSI + MACD signals for sub-component confluence ──────────
+    # These write to DB with distinct signal_types so confluence can cross-match.
+    # Excluded from OC pipeline (source != 'mtf-*') — Hermes-only.
+
+    for token, data in prices_dict.items():
+        if price_age_minutes(token) > 10:
+            continue
+        if not data.get('price') or data['price'] <= 0:
+            continue
+        if token.upper() in open_pos:
+            continue
+        if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
+            continue
+
+        price = data['price']
+        mom = get_momentum_stats(token)
+        if not mom:
+            continue
+
+        rsi_val  = mom.get('rsi_14')
+        macd_val = mom.get('macd_line')
+        macd_hist = mom.get('macd_hist')
+        pct_long  = mom.get('percentile_long', 50)
+        pct_short = mom.get('percentile_short', 50)
+        velocity  = mom.get('velocity', 0)
+        avg_z     = mom.get('avg_z', 0)
+        phase     = mom.get('phase', 'quiet')
+        z_dir     = mom.get('z_direction', 'neutral')
+
+        # ── MTF MACD check ────────────────────────────────────────
+        macd_4h  = _macd_line(token, 60*4)
+        macd_1h  = _macd_line(token, 60*1)
+        macd_15m = _macd_line(token, 15)
+        macd_results = {'4h': macd_4h, '1h': macd_1h, '15m': macd_15m}
+        valid_tfs = {tf: v for tf, v in macd_results.items() if v is not None}
+        if not valid_tfs:
+            macd_4h = macd_1h = macd_15m = None
+        else:
+            macd_4h  = valid_tfs.get('4h')
+            macd_1h  = valid_tfs.get('1h')
+            macd_15m = valid_tfs.get('15m')
+
+        # Count bullish TFs (macd_line > 0 = price above signal = bullish)
+        if macd_4h is not None and macd_1h is not None and macd_15m is not None:
+            bullish_tfs = sum(1 for v in [macd_4h, macd_1h, macd_15m] if v > 0)
+            total_tfs   = 3
+            direction   = 'LONG' if bullish_tfs >= 2 else 'SHORT'
+            strength    = bullish_tfs  # 3=strong, 2=normal, 1=weak
+            timeframe_str = f'{min(bullish_tfs,3)}tf+'
+        else:
+            # Fallback: use macd_line sign (more reliable than histogram) if not all TFs available
+            if macd_val is not None:
+                direction = 'LONG' if macd_val > 0 else 'SHORT'
+                strength  = 1
+                timeframe_str = '1h'
+            elif macd_hist is not None:
+                direction = 'LONG' if macd_hist > 0 else 'SHORT'
+                strength  = 1
+                timeframe_str = '1h'
+            else:
+                continue  # no MACD data at all
+
+        # Blacklist + z-score filters
+        if direction == 'LONG':
+            if avg_z is None or avg_z > LONG_1H_Z_MAX:
+                continue
+        else:
+            if token.upper() in SHORT_BLACKLIST:
+                continue
+
+        # Confidence based on TF agreement strength
+        base_conf = 40 + strength * 15  # 2tf=70, 3tf=85, 1tf=55
+        conf = min(95, base_conf)
+
+        # ── Write mtf_macd signal ────────────────────────────────
+        # Source = 'hmacd-' — prefixed so add_signal() merge combines
+        # Hermes rows separately from OC 'mtf-macd' rows (different source string)
+        add_signal(token, direction, 'mtf_macd', 'hmacd-',
+                   confidence=conf, value=strength, price=price,
+                   exchange='hyperliquid', timeframe=timeframe_str,
+                   macd_value=macd_val, macd_hist=macd_hist,
+                   z_score=avg_z, z_score_tier=z_dir,
+                   rsi_14=rsi_val)
+
+        # ── Individual RSI signal (Hermes-only, distinct signal_type) ────
+        if rsi_val is not None:
+            if rsi_val < 40:  # oversold → potential LONG
+                if direction == 'LONG':  # only when aligned
+                    rsi_conf = min(60, 30 + (40 - rsi_val) * 1.5)
+                    add_signal(token, 'LONG', 'rsi_individual', 'rsi-hermes',
+                                confidence=rsi_conf, value=rsi_val, price=price,
+                                exchange='hyperliquid', timeframe='4h',
+                                rsi_14=rsi_val, z_score=avg_z, z_score_tier=z_dir)
+                    added += 1
+            elif rsi_val > 65:  # overbought → potential SHORT
+                if direction == 'SHORT':
+                    rsi_conf = min(60, 30 + (rsi_val - 65) * 1.5)
+                    add_signal(token, 'SHORT', 'rsi_individual', 'rsi-hermes',
+                                confidence=rsi_conf, value=rsi_val, price=price,
+                                exchange='hyperliquid', timeframe='4h',
+                                rsi_14=rsi_val, z_score=avg_z, z_score_tier=z_dir)
+                    added += 1
+
+        # ── Percentile rank signal (Hermes-only) ──────────────────────────
+        # Fires when price is at historical extreme (suppressed or elevated)
+        pct_signal_dir = None
+        if pct_long >= 85 or pct_short >= 85:
+            pct_signal_dir = 'LONG' if pct_long >= 85 else 'SHORT'
+            pct_val = max(pct_long, pct_short)
+            pct_conf = min(75, 40 + (pct_val - 70) * 1.2)
+            add_signal(token, pct_signal_dir, 'percentile_rank', 'pct-hermes',
+                        confidence=pct_conf, value=pct_val, price=price,
+                        exchange='hyperliquid', timeframe='4h',
+                        z_score=avg_z, z_score_tier=z_dir,
+                        rsi_14=rsi_val)
+            added += 1
+
+        # ── Velocity signal (rising/falling z-score) ──────────────────────
+        # Fires when z-score momentum is strong and aligned with direction
+        vel_signal_dir = None
+        if abs(velocity) >= 0.03:  # meaningful momentum
+            vel_signal_dir = 'SHORT' if velocity > 0 else 'LONG'
+            if vel_signal_dir == direction:  # aligned
+                vel_conf = min(65, 35 + abs(velocity) * 500)
+                add_signal(token, vel_signal_dir, 'velocity', 'vel-hermes',
+                            confidence=vel_conf, value=round(velocity, 4), price=price,
+                            exchange='hyperliquid', timeframe='1h',
+                            z_score=avg_z, z_score_tier=z_dir,
+                            rsi_14=rsi_val)
+                added += 1
+
+        added += 1  # count mtf_macd
+
+        # ── MTF Z-Score Agreement ────────────────────────────────
+        # Fires when z-score agrees across multiple timeframes (4H/1H/15m)
+        # All agreeing = strong momentum; mixed = weak signal; all disagree = skip
+        zscores = get_tf_zscores(token)
+        z_4h  = zscores.get('4h',  (None, None))[0]
+        z_1h  = zscores.get('1h',  (None, None))[0]
+        z_15m = zscores.get('15m', (None, None))[0]
+        valid_z = [v for v in [z_4h, z_1h, z_15m] if v is not None]
+        if len(valid_z) >= 2:
+            agreeing = sum(1 for v in valid_z if v > 0)   # bullish TFs
+            disagreeing = len(valid_z) - agreeing            # bearish TFs
+            if agreeing >= 2:
+                z_dir = 'LONG'
+                z_conf = min(80, 45 + len(valid_z) * 8 + agreeing * 5)
+                z_tf_str = f'{agreeing}z{len(valid_z)}'
+            elif disagreeing >= 2:
+                z_dir = 'SHORT'
+                z_conf = min(80, 45 + len(valid_z) * 8 + disagreeing * 5)
+                z_tf_str = f'{disagreeing}z{len(valid_z)}'
+            else:
+                z_tf_str = None  # mixed, skip
+
+            if z_tf_str:
+                add_signal(token, z_dir, 'mtf_zscore', 'hzscore',
+                           confidence=z_conf, value=round(statistics.mean(valid_z), 3),
+                           price=price, exchange='hyperliquid', timeframe=z_tf_str,
+                           z_score=avg_z, z_score_tier=z_dir,
+                           rsi_14=rsi_val)
+                added += 1
+
+    return added
+
+
+# ── MACD signals for confluence (legacy — kept for signal_type compat) ───────
 def _run_macd_signals_for_confluence():
-    """Add MACD histogram as standalone signal — filtered like RSI to stay in pipeline."""
+    """Legacy MACD histogram signal — kept for confluence compatibility."""
     from signal_schema import compute_macd, compute_zscore
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
-    # Blacklist: tokens with 0-20% SHORT win rate
     SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
                        'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI','ACE'}
     added = 0
@@ -1253,20 +1482,16 @@ def _run_macd_signals_for_confluence():
         if abs(h) < CONFLUENCE_MACD_HIST_THRESH:
             continue
         direction = 'LONG' if h > 0 else 'SHORT'
-        # ── Apply same directional + blacklist filters as RSI signals ──
         if direction == 'LONG':
             if z is None or z > LONG_1H_Z_MAX:
-                continue  # not suppressed enough for LONG
-        else:  # SHORT
+                continue
+        else:
             if token.upper() in SHORT_BLACKLIST:
                 continue
-            # No z-score filter for SHORTs — suppressed prices are valid short targets
         conf = min(50, 30 + abs(h) * 300)
-        # Only emit sub-threshold MACD signals when there's a confluence partner
-        # (other signal types already in DB) OR MACD is extreme enough to stand alone
         has_partner = _has_confluence_partners(token, direction, exclude_type='macd_confluence')
         if conf < ENTRY_THRESHOLD and not has_partner and not (abs(h) > 0.05):
-            continue  # weak signal, no partner, not extreme → skip entirely
+            continue
         add_signal(token, direction, 'macd_confluence', 'macd-confluence',
                    confidence=conf, value=h, price=price,
                    macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
@@ -1332,7 +1557,7 @@ def run_confluence_detection():
                 UNION ALL
                 SELECT source, confidence FROM oc.signals
                 WHERE token=? AND direction=? AND decision='PENDING'
-                AND created_at > datetime('now','-60 minutes')
+                AND created_at > datetime('now','-30 minutes')  -- OC signals: stricter 30-min freshness
                 AND source LIKE 'mtf-%%'  -- OpenClaw mtf signals only
             )
         ''', (token, direction, token, direction))
@@ -1406,6 +1631,7 @@ def run_confluence_detection():
 
 def run():
     init_db()
+    expire_pending_signals(minutes=15)  # Reset stale PENDING signals each cycle
     _ZSCORE_CACHE.clear()
     _VOL_CACHE.clear()
     prices_dict = get_all_latest_prices()
@@ -1528,55 +1754,62 @@ def run():
         if token not in open_pos or open_pos[token] != 'SHORT':
             score, signals = compute_score(token, 'SHORT', long_mult, short_mult)
             if score and score >= ENTRY_THRESHOLD:
-                sources = '+'.join(sorted(set(s[0] for s in signals)))
-                reasons = ' | '.join(s[3] for s in signals[:4])
+                # ── Trend filter ────────────────────────────────
+                short_ok, short_filter_reason = check_short_trend_filter(token)
+                if not short_ok:
+                    log(f'BLOCKED SHORT: {token} @{price:.6f} {score:.1f}% [{short_filter_reason}]')
+                    print(f'  SHORT-B {token:8s} {score:5.1f}% [BLOCKED] {short_filter_reason}')
+                    blocked += 1
+                else:
+                    sources = '+'.join(sorted(set(s[0] for s in signals)))
+                    reasons = ' | '.join(s[3] for s in signals[:4])
 
-                # ── Spike Detection ───────────────────────────────
-                spike_type, pct_chg, do_reverse, is_pump = detect_spike(token, 'SHORT', price)
-                if do_reverse:
-                    opp_score, opp_signals, pump_tag = score_for_counter_spike(
-                        token, 'SHORT', long_mult, short_mult)
-                    opp_dir = _get_reverse_signal_name('SHORT')
-                    opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
-                    opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
-                    if is_pump:
-                        pump_tag = f'pump-{opp_dir.lower()}'
-                        log(f'PUMP:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
-                            f'[spike-{spike_type}+{pct_chg:.1f}%] {pump_tag} {opp_reasons}')
-                        print(f'  PUMP  {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} spike-{spike_type}+{pct_chg:.1f}%]')
+                    # ── Spike Detection ───────────────────────────────
+                    spike_type, pct_chg, do_reverse, is_pump = detect_spike(token, 'SHORT', price)
+                    if do_reverse:
+                        opp_score, opp_signals, pump_tag = score_for_counter_spike(
+                            token, 'SHORT', long_mult, short_mult)
+                        opp_dir = _get_reverse_signal_name('SHORT')
+                        opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
+                        opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
+                        if is_pump:
+                            pump_tag = f'pump-{opp_dir.lower()}'
+                            log(f'PUMP:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
+                                f'[spike-{spike_type}+{pct_chg:.1f}%] {pump_tag} {opp_reasons}')
+                            print(f'  PUMP  {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} spike-{spike_type}+{pct_chg:.1f}%]')
+                        else:
+                            log(f'REV:   {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
+                                f'[counter-spike{spike_type}+{pct_chg:.1f}%] {opp_reasons}')
+                            print(f'  REV   {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} ctx-spike-{spike_type}+{pct_chg:.1f}%]')
+                        if opp_score and opp_score >= ENTRY_THRESHOLD:
+                            add_signal(
+                                token=token, direction=opp_dir, signal_type='momentum',
+                                source=f'mtf-{opp_sources}', confidence=opp_score,
+                                value=opp_score, price=price,
+                                exchange='hyperliquid',
+                                timeframe=f'{mom["phase"][:3] if mom else "unk"}',
+                                z_score=mom['avg_z'] if mom else None,
+                                z_score_tier=mom['z_direction'] if mom else None,
+                            )
+                            # All momentum signals → PENDING → decider-run (no auto-approve)
+                            log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
+                            set_cooldown(token, opp_dir, hours=1)
+                            added += 1
                     else:
-                        log(f'REV:   {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
-                            f'[counter-spike{spike_type}+{pct_chg:.1f}%] {opp_reasons}')
-                        print(f'  REV   {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} ctx-spike-{spike_type}+{pct_chg:.1f}%]')
-                    if opp_score and opp_score >= ENTRY_THRESHOLD:
                         add_signal(
-                            token=token, direction=opp_dir, signal_type='momentum',
-                            source=f'mtf-{opp_sources}', confidence=opp_score,
-                            value=opp_score, price=price,
+                            token=token, direction='SHORT', signal_type='momentum',
+                            source=f'mtf-{sources}', confidence=score,
+                            value=score, price=price,
                             exchange='hyperliquid',
                             timeframe=f'{mom["phase"][:3] if mom else "unk"}',
                             z_score=mom['avg_z'] if mom else None,
                             z_score_tier=mom['z_direction'] if mom else None,
                         )
                         # All momentum signals → PENDING → decider-run (no auto-approve)
-                        log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
-                        set_cooldown(token, opp_dir, hours=1)
+                        log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
+                        print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
+                        set_cooldown(token, 'SHORT', hours=1)
                         added += 1
-                else:
-                    add_signal(
-                        token=token, direction='SHORT', signal_type='momentum',
-                        source=f'mtf-{sources}', confidence=score,
-                        value=score, price=price,
-                        exchange='hyperliquid',
-                        timeframe=f'{mom["phase"][:3] if mom else "unk"}',
-                        z_score=mom['avg_z'] if mom else None,
-                        z_score_tier=mom['z_direction'] if mom else None,
-                    )
-                    # All momentum signals → PENDING → decider-run (no auto-approve)
-                    log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
-                    print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
-                    set_cooldown(token, 'SHORT', hours=1)
-                    added += 1
 
         # ── Exit signals (check open positions) ───────────────
         if token in open_pos:
@@ -1599,10 +1832,11 @@ def run():
     # defined but never called, so confluence detection always found 0.
     confluences_added = 0
     try:
-        rsi_added = _run_rsi_signals_for_confluence()
-        macd_added = _run_macd_signals_for_confluence()
+        rsi_added   = _run_rsi_signals_for_confluence()
+        macd_added  = _run_macd_signals_for_confluence()
+        mtf_added   = _run_mtf_macd_signals()  # native MTF-MACD + sub-signal writers
         if rsi_added or macd_added:
-            print(f'  RSI/MACD signals: {rsi_added} RSI + {macd_added} MACD added')
+            print(f'  RSI/MACD signals: {rsi_added} RSI + {macd_added} MACD + {mtf_added} MTF-MACD added')
         confluences_added = run_confluence_detection()
     except Exception as e:
         print(f'  Confluence detection error: {e}')

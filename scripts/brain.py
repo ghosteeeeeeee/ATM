@@ -274,6 +274,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                signal: str = None, confidence: float = None, address: str = None,
                sl_group: str = "control", sl_distance: float = None,
                trailing_activation: float = None, trailing_distance: float = None,
+               trailing_phase2_dist: float = None,
                leverage: int = 1, experiment: str = None):
     """Add a new trade to the trades table"""
     # Pre-check: dont consume ID if trade already exists
@@ -308,13 +309,15 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         INSERT INTO trades (token, direction, amount_usdt, entry_price,
                           exchange, strategy, paper, stop_loss, target, server, status, open_time,
                           signal, confidence, token_address, pnl_usdt, pnl_pct,
-                          sl_distance, trailing_activation, trailing_distance, leverage, experiment)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                          sl_distance, trailing_activation, trailing_distance,
+                          trailing_phase2_dist, leverage, experiment)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """, (token, direction, amount_usdt, entry_price,
           exchange, strategy, paper, stop_loss, target, server, 'open',
           signal, confidence, address, 0, 0,
-          sl_distance, trailing_activation, trailing_distance, leverage, experiment))
+          sl_distance, trailing_activation, trailing_distance,
+          trailing_phase2_dist, leverage, experiment))
     trade_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
@@ -622,6 +625,7 @@ if __name__ == "__main__":
         add_parser.add_argument("--sl-distance", type=float, help="SL distance (0.005 = 0.5%%, 0.01 = 1%%)")
         add_parser.add_argument("--trailing-threshold", type=float, dest="trailing_activation", help="Trailing activation threshold")
         add_parser.add_argument("--trailing-distance", type=float, dest="trailing_distance", help="Trailing distance (e.g. 0.010 = 1%)")
+        add_parser.add_argument("--trailing-phase2", type=float, dest="trailing_phase2", help="Phase 2 trailing distance (tighter, activates after phase 1)")
         add_parser.add_argument("--leverage", type=int, default=1, help="Leverage (1-10)")
         add_parser.add_argument("--experiment", help="A/B test experiment info (JSON)")
         
@@ -656,6 +660,7 @@ if __name__ == "__main__":
                 sl_distance=args.sl_distance,
                 trailing_activation=args.trailing_activation or None,
                 trailing_distance=args.trailing_distance or None,
+                trailing_phase2_dist=args.trailing_phase2 or None,
                 leverage=args.leverage,
                 experiment=args.experiment
             )

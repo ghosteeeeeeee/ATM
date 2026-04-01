@@ -7,7 +7,7 @@ Also processes delayed-entry signals from pending-delayed-entries.json.
 """
 import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
-from signal_schema import init_db, get_approved_signals, get_pending_signals, mark_signal_executed
+from signal_schema import init_db, get_approved_signals, get_pending_signals, mark_signal_executed, cleanup_stale_approved
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
@@ -238,8 +238,9 @@ def get_ab_params_for_trade(direction: str) -> dict:
 
     # Trailing stop test
     ts_variant = _get_ab_variant_for_test('trailing-stop-test', direction)
-    trailing_activation = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
-    trailing_distance   = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
+    trailing_activation  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
+    trailing_distance    = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
+    trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
 
     # Experiment metadata
     experiments = []
@@ -260,6 +261,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
         'entry_mode': entry_mode,
         'trailing_activation': trailing_activation,
         'trailing_distance': trailing_distance,
+        'trailing_phase2_dist': trailing_phase2_dist,
         'experiment': experiment_str,
         'sl_variant': sl_variant.get('id', '') if sl_variant else '',
         'entry_variant': entry_variant.get('id', '') if entry_variant else '',
@@ -384,6 +386,7 @@ def process_delayed_entries(paper=True):
 def execute_trade(token, direction, price, confidence, source,
                   leverage=10, paper=True, sl_pct=0.02,
                   trailing_activation=0.01, trailing_distance=0.01,
+                  trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
                   live_trading=False):
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
@@ -441,6 +444,8 @@ def execute_trade(token, direction, price, confidence, source,
            '--sl-distance', str(sl_pct_val),
            '--trailing-threshold', str(trailing_activation),
            '--trailing-distance', str(trailing_distance)]
+    if trailing_phase2_dist is not None:
+        cmd += ['--trailing-phase2', str(trailing_phase2_dist)]
     if exp_json:
         cmd += ['--experiment', exp_json]
 
@@ -521,6 +526,11 @@ def run(dry_run=False):
         pass  # no trades yet, proceed
 
     # Get approved signals
+    # Clean up stale approvals before fetching (expire anything >1h old)
+    stale = cleanup_stale_approved(hours=1)
+    if stale > 0:
+        log(f'Expired {stale} stale approved signals (>1h old)')
+
     approved = get_approved_signals(hours=24)
     log(f'Approved signals: {len(approved)}')
 
@@ -619,6 +629,7 @@ def run(dry_run=False):
         sl_pct = ab['sl_pct']
         trailing_activation = ab['trailing_activation']
         trailing_distance  = ab['trailing_distance']
+        trailing_phase2    = ab.get('trailing_phase2_dist')
         experiment = ab['experiment']
         sl_variant = ab.get('sl_variant', '')
         ts_variant = ab.get('ts_variant', '')
@@ -650,6 +661,7 @@ def run(dry_run=False):
             token, direction, price, confidence, source,
             leverage=lev, sl_pct=sl_pct,
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
+            trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
             live_trading=not paper)
 

@@ -241,19 +241,49 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         return None
 
 def get_pending_signals(hours=24, limit=50):
+    """Get PENDING signals, sorted LIFO + confidence.
+    
+    NOTE: This function is used by signal_gen.py for confluence detection.
+    For ai-decider.py decisioning, use get_pending_signals() in ai-decider.py
+    which has 15-min expiry + AI-guided compaction built in.
+    This function is kept for backward compat with a slightly different query path.
+    """
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
     c.execute('''
         SELECT * FROM signals
         WHERE decision='PENDING'
+        AND executed=0
         AND created_at > datetime('now','-'||?||' hours')
-        ORDER BY confidence DESC LIMIT ?
+        ORDER BY created_at DESC, confidence DESC LIMIT ?
     ''', (hours, limit))
     rows = c.fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
 get_pending_signals_as_dict = get_pending_signals  # alias
+
+def expire_pending_signals(minutes=15):
+    """Expire PENDING signals older than `minutes`. Called every signal_gen run
+    to prevent the queue from accumulating stale signals. Signals that haven't
+    been acted on within the window are cleared — the next signal generation
+    cycle will create fresh ones if the conditions still exist."""
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    c.execute("""
+        UPDATE signals
+        SET decision = 'EXPIRED'
+        WHERE decision = 'PENDING'
+          AND created_at < datetime('now', ?)
+          AND executed = 0
+    """, (f'-{minutes} minutes',))
+    conn.commit()
+    expired = c.rowcount
+    c.close()
+    if expired > 0:
+        print(f'  [Signal Expiry] Cleared {expired} stale PENDING signals (>15 min old)')
+    return expired
+
 
 def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     """Return tokens where ≥min_signals PENDING signal types agree.
@@ -402,52 +432,158 @@ def approve_signal(token, direction, leverage=None):
         conn.close()
 
 def get_approved_signals(hours=24):
+    """
+    Get approved signals for execution.
+
+    Quality scoring:
+    - Base: max confidence (not avg — avoids low-confidence noise dragging down strong signals)
+    - Diversity bonus: +5% per distinct signal_type present (max +20%)
+    - Only consider individual signals >= 25% confidence
+    - Hot-set bonus: signals with compact_rounds > 0 get +10% base (proven by market)
+    """
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
+
+    # Attach OpenClaw DB for hot-set compact_rounds lookup
+    if os.path.exists(LEGACY_DB):
+        try:
+            c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
+        except Exception:
+            pass
+
     c.execute('''
-        SELECT token, direction, COUNT(*) as count, AVG(confidence) as avg_conf,
+        SELECT token, direction,
+               COUNT(*) as count,
+               AVG(confidence) as avg_conf,
                MAX(confidence) as max_conf,
+               MIN(confidence) as min_conf,
                GROUP_CONCAT(DISTINCT signal_type) as types,
-               MAX(price) as price, MAX(leverage) as leverage
+               MAX(price) as price,
+               MAX(leverage) as leverage,
+               MAX(COALESCE(
+                   (SELECT compact_rounds FROM signals s2
+                    WHERE s2.token = signals.token
+                      AND s2.direction = signals.direction
+                      AND s2.decision = 'APPROVED'
+                      AND s2.executed = 0
+                    ORDER BY compact_rounds DESC LIMIT 1), 0
+               )) as hot_rounds
         FROM signals
         WHERE decision='APPROVED' AND executed=0
-        AND created_at > datetime('now','-'||?||' hours')
-        GROUP BY token, direction, leverage
-        ORDER BY avg_conf DESC
+          AND created_at > datetime('now','-'||?||' hours')
+          AND confidence >= 25   -- filter noise
+        GROUP BY token, direction
+        ORDER BY count DESC, max_conf DESC
     ''', (hours,))
+
     results = []
     for r in c.fetchall():
         d = dict(r)
-        mult = 1.5 if d['count'] >= 3 else 1.25 if d['count'] == 2 else 1.0
-        d['final_confidence'] = min(99, d['avg_conf'] * mult)
-        if d.get('types'):
-            d['signal_types'] = d['types'].split(',')
-        results.append(d)
-    conn.close()
-    return results
+        types = d.get('types', '').split(',') if d.get('types') else []
+        # Filter types (remove empty strings)
+        types = [t for t in types if t]
+        num_types = len(types)
 
-def mark_signal_processed(token, decision):
-    """Mark signals as processed. APPROVED signals always reset executed=0 so decider-run can pick them up."""
+        # Quality base: weight strongest signals more
+        # penalize if min_conf is very low compared to max
+        min_c = d.get('min_conf', 0) or 0
+        max_c = d.get('max_conf', 0) or 0
+        range_ratio = (max_c - min_c) / max_c if max_c > 0 else 0
+
+        # Base score = weighted average favoring higher confs
+        # (simple avg penalized if range_ratio is high)
+        quality_penalty = range_ratio * 0.3  # up to 30% penalty for mixed quality
+        base = d.get('avg_conf', 0) * (1 - quality_penalty)
+
+        # Diversity bonus: distinct strong types add signal
+        diversity_bonus = min(20, num_types * 5)
+
+        # Hot-set bonus: signals proven by market cycles
+        hot_rounds = d.get('hot_rounds', 0) or 0
+        hot_bonus = min(20, hot_rounds * 5)
+
+        final_conf = min(99, base + diversity_bonus + hot_bonus)
+        d['final_confidence'] = round(final_conf, 1)
+        d['signal_types'] = types
+        d['hot_rounds'] = hot_rounds
+        results.append(d)
+
+    conn.close()
+    return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+
+def mark_signal_processed(token, decision, signal_ids=None):
+    """
+    Mark signals as processed.
+
+    Args:
+        token: token symbol
+        decision: APPROVED, SKIPPED, FAILED, EXPIRED, WAIT
+        signal_ids: optional list of specific signal IDs to update.
+                    If None, updates ALL PENDING signals for token (legacy behavior).
+                    IMPORTANT: always include direction for safety.
+    """
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
-        if decision == 'APPROVED':
-            # APPROVED must always reset executed=0 — a re-processed signal that was
-            # previously SKIPPED/FALLED (executed=1) needs to be re-queued.
-            c.execute('''
-                UPDATE signals
-                SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
-                WHERE token=? AND executed IN (0, 1)
-            ''', (decision, token.upper()))
+        tok = token.upper()
+        if signal_ids:
+            # Targeted update: only specific IDs
+            placeholders = ','.join(['?' for _ in signal_ids])
+            if decision == 'APPROVED':
+                c.execute(f'''
+                    UPDATE signals
+                    SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
+                    WHERE id IN ({placeholders}) AND executed IN (0, 1)
+                ''', (decision,) + tuple(signal_ids))
+            else:
+                c.execute(f'''
+                    UPDATE signals
+                    SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
+                    WHERE id IN ({placeholders}) AND executed IN (0, 1)
+                ''', (decision,) + tuple(signal_ids))
         else:
-            c.execute('''
-                UPDATE signals
-                SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
-                WHERE token=? AND executed IN (0, 1)
-            ''', (decision, token.upper()))
+            # Legacy: update ALL PENDING for token (use with caution)
+            if decision == 'APPROVED':
+                c.execute('''
+                    UPDATE signals
+                    SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
+                    WHERE token=? AND executed IN (0, 1)
+                ''', (decision, tok))
+            else:
+                c.execute('''
+                    UPDATE signals
+                    SET decision=?, executed=1, updated_at=CURRENT_TIMESTAMP
+                    WHERE token=? AND executed IN (0, 1)
+                ''', (decision, tok))
         conn.commit()
         return c.rowcount
     except Exception as e:
+        conn.rollback()
+        return 0
+    finally:
+        conn.close()
+
+
+def cleanup_stale_approved(hours=1):
+    """
+    Mark APPROVED-but-not-executed signals as EXPIRED if older than `hours`.
+    Prevents stale approvals from polluting get_approved_signals and wasting slots.
+    Returns count of expired signals.
+    """
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        c.execute('''
+            UPDATE signals
+            SET decision='EXPIRED', executed=1, updated_at=CURRENT_TIMESTAMP
+            WHERE decision='APPROVED'
+              AND executed=0
+              AND created_at <= datetime('now', '-'||?||' hours')
+        ''', (hours,))
+        conn.commit()
+        expired = c.rowcount
+        return expired
+    except Exception:
         conn.rollback()
         return 0
     finally:

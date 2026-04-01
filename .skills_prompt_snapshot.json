@@ -433,6 +433,14 @@
       1774669862972305646,
       7309
     ],
+    "trading/analyze-trades/SKILL.md": [
+      1775020014116206090,
+      3505
+    ],
+    "trading/fresh-run/SKILL.md": [
+      1774941404607027773,
+      5864
+    ],
     "trading/wasp/SKILL.md": [
       1774923212641163904,
       2641
@@ -1968,6 +1976,32 @@
       "category": "software-development",
       "frontmatter_name": "writing-plans",
       "description": "Use when you have a spec or requirements for a multi-step...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "analyze-trades",
+      "category": "trading",
+      "frontmatter_name": "analyze-trades",
+      "description": "Archive closed trades, reconcile prices, rebuild A/B test...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "fresh-run",
+      "category": "trading",
+      "frontmatter_name": "fresh-run",
+      "description": "Fresh state reset for Hermes trading system — clears sign...",
       "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],

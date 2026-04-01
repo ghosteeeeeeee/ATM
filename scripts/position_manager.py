@@ -51,6 +51,15 @@ TRAILING_BUFFER_PCT_DEFAULT = 0.005  # keep 0.5% buffer above entry when first a
 TRAILING_TIGHTEN = True     # tighten buffer as profit grows
 TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
 
+# ─── Cascade Flip Config ──────────────────────────────────────────────────────
+# When an open position is losing AND an opposite signal fires with strong conf,
+# cascade flip: close the losing position AND enter the opposite direction.
+# This prevents riding losing trades while the market has already reversed.
+CASCADE_FLIP_MIN_LOSS  = -0.5   # Position must be down >= this % to qualify
+CASCADE_FLIP_MIN_CONF   = 70.0   # Opposite signal must have conf >= this %
+CASCADE_FLIP_MAX_AGE_M  = 15     # Opposite signal must be created within this many minutes
+CASCADE_FLIP_MIN_TYPES  = 1      # Opposite signal must have at least this many agreeing signal types
+
 # ─── Loss Cooldown Config ─────────────────────────────────────────────────────
 # After a losing trade, block the SAME direction for N hours
 # This prevents the loss spiral: trade → cut → immediately re-enter → cut again
@@ -718,8 +727,11 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
     is_active = trade_data.get("active", False)
 
     # Per-trade trailing settings (from A/B test), else defaults
-    trailing_start  = float(trade.get('trailing_activation') or TRAILING_START_PCT_DEFAULT)
-    trailing_buffer = float(trade.get('trailing_distance') or TRAILING_BUFFER_PCT_DEFAULT)
+    trailing_start   = float(trade.get('trailing_activation') or TRAILING_START_PCT_DEFAULT)
+    trailing_buffer  = float(trade.get('trailing_distance') or TRAILING_BUFFER_PCT_DEFAULT)
+    # Phase 2: tighter trailing once profit doubles from activation threshold
+    phase2_dist      = trade.get('trailingPhase2DistancePct')
+    phase2_threshold = trailing_start * 2  # phase2 activates at 2x activation profit
 
     # If not yet activated and profit < threshold → skip activation check
     # pnl_pct is already in percentage (e.g. 1.23 = 1.23%), trailing_start is a fraction (0.01 = 1%)
@@ -733,11 +745,23 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
     # Trailing is active → always compute current SL regardless of pnl_pct
     # (pnl might dip but the trailing SL from the peak still protects)
 
-    # Calculate buffer (tightens as profit grows)
+    # ── Phase 2: tighten buffer once profit doubles from activation ─────────────
+    # Check if phase 2 should activate (and persist to file so it sticks across calls)
+    if phase2_dist is not None and not trade_data.get("phase2_activated", False):
+        if pnl_pct >= phase2_threshold:
+            data[str(trade_id)]["phase2_activated"] = True
+            data[str(trade_id)]["phase2_at_pnl"] = pnl_pct
+            _save_trailing_data(data)
+            trade_data = data.get(str(trade_id), {})
+
+    # Use phase 2 buffer if activated, otherwise phase 1
+    active_buffer = float(phase2_dist) if trade_data.get("phase2_activated") and phase2_dist else trailing_buffer
+
+    # Calculate buffer (tightens as profit grows, but floor is the active buffer)
     if TRAILING_TIGHTEN:
-        buffer_pct = max(0.002, trailing_buffer / (1 + pnl_pct / 10))
+        buffer_pct = max(active_buffer * 0.4, active_buffer / (1 + pnl_pct / 10))
     else:
-        buffer_pct = trailing_buffer
+        buffer_pct = active_buffer
 
     # Track best price
     if direction == "LONG":
@@ -1049,7 +1073,21 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 closed_count += 1
                 print(f"  TRAILING EXIT {token} {direction} {live_pnl:+.2f}% (SL: {trailing_sl:.6f})")
 
-        # ── 3. Cut loser (fallback — only fires if trailing is NOT active) ──
+        # ── 3. Cascade flip (proactive reversal — fires before cut_loser) ────
+        # Only fires if trailing is NOT active (don't flip during trailing)
+        # and only if position is losing AND an opposite signal exists with conf >= 70%
+        cascade_flipped = False
+        if not trailing_active and live_pnl <= CASCADE_FLIP_MIN_LOSS:
+            flip_info = check_cascade_flip(token, direction, live_pnl)
+            if flip_info:
+                cascade_flipped = cascade_flip(token, direction, trade_id,
+                                               live_pnl, flip_info,
+                                               entry=float(pos.get('entry_price') or 0))
+                if cascade_flipped:
+                    closed_count += 1
+                    continue  # Position was flipped — skip remaining checks for this pos
+
+        # ── 4. Cut loser (fallback — only fires if trailing is NOT active) ──
         # Cut_loser is a safety net for new positions before trailing activates.
         # After trailing activates, the trailing SL is the only exit.
         if not trailing_active and should_cut_loser(live_pnl, pos):
@@ -1075,6 +1113,128 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
     print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
     return open_count, closed_count, adjusted_count
+
+
+# ─── Cascade Flip ─────────────────────────────────────────────────────────────
+# When an open position is losing and an opposite signal fires, close and reverse.
+
+
+def check_cascade_flip(token: str, position_direction: str,
+                      live_pnl: float) -> Optional[Dict]:
+    """
+    Check if an open position should be cascade-flipped.
+
+    Trigger: position is losing >= CASCADE_FLIP_MIN_LOSS AND
+             an OPPOSITE direction signal exists in the DB with
+             conf >= CASCADE_FLIP_MIN_CONF within CASCADE_FLIP_MAX_AGE_M minutes.
+
+    Returns: Dict with flip details {opposite_dir, conf, source, sig_id, price}
+             or None if no flip warranted.
+    """
+    if live_pnl > CASCADE_FLIP_MIN_LOSS:
+        return None  # Not losing enough
+
+    opposite_dir = 'SHORT' if position_direction == 'LONG' else 'LONG'
+
+    # Query signals DB for opposite-direction signals
+    import sqlite3
+    db_path = '/root/.hermes/data/signals_hermes_runtime.db'
+    if not os.path.exists(db_path):
+        return None
+
+    try:
+        conn = sqlite3.connect(db_path, timeout=5)
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, signal_type, source, confidence, price, created_at
+            FROM signals
+            WHERE UPPER(token) = ?
+              AND direction = ?
+              AND decision IN ('PENDING', 'WAIT')
+              AND confidence >= ?
+              AND created_at >= datetime('now', ?)
+            ORDER BY confidence DESC, created_at DESC
+            LIMIT 1
+        """, (token.upper(), opposite_dir, CASCADE_FLIP_MIN_CONF,
+              f'-{CASCADE_FLIP_MAX_AGE_M} minutes'))
+        row = c.fetchone()
+        conn.close()
+
+        if not row:
+            return None
+
+        sig_id, sig_type, source, conf, price, created_at = row
+        return {
+            'opposite_dir': opposite_dir,
+            'conf': conf,
+            'source': source,
+            'sig_id': sig_id,
+            'price': price,
+            'created_at': created_at,
+            'signal_type': sig_type,
+        }
+    except Exception as e:
+        print(f"  [Cascade Flip] DB error checking {token}: {e}")
+        return None
+
+
+def cascade_flip(token: str, position_direction: str, trade_id: int,
+                 live_pnl: float, flip_info: Dict,
+                 entry_price: float) -> bool:
+    """
+    Execute a cascade flip: close losing position, enter opposite direction.
+    Returns True if both close and new entry succeeded.
+    """
+    opposite_dir = flip_info['opposite_dir']
+    conf = flip_info['conf']
+    source = flip_info['source']
+    sig_id = flip_info['sig_id']
+
+    print(f"  [CASCADE FLIP] {token} {position_direction}→{opposite_dir} "
+          f"(loss={live_pnl:+.2f}%, opp_conf={conf:.1f}%, src={source})")
+
+    # 1. Close the losing position
+    close_ok = close_paper_position(trade_id, f"cascade_flip_{live_pnl:+.2f}%")
+    if not close_ok:
+        print(f"  [CASCADE FLIP] ❌ Failed to close {token} #{trade_id}")
+        return False
+
+    # 2. Enter the opposite direction at current price
+    from hyperliquid_exchange import place_market_order
+    current_price = flip_info['price']
+    if not current_price or current_price <= 0:
+        try:
+            from hyperliquid_exchange import get_price
+            current_price = get_price(token)
+        except Exception:
+            print(f"  [CASCADE FLIP] ❌ Could not get price for {token}")
+            return True  # Position closed, new entry failed but not fatal
+
+    ok = place_market_order(
+        token=token,
+        direction=opposite_dir,
+        entry_price=current_price,
+        confidence=conf,
+        source=f"cascade-{source}",
+        trade_id=None,  # new trade
+    )
+
+    if ok:
+        print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
+        # Mark the signal that triggered the flip as executed
+        try:
+            conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+            c = conn.cursor()
+            c.execute("UPDATE signals SET decision='EXECUTED', trade_id=? WHERE id=?",
+                      (trade_id, sig_id))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+    else:
+        print(f"  [CASCADE FLIP] ⚠️ {token} {opposite_dir} entry failed (position closed)")
+
+    return True
 
 
 # ─── Loss Cooldown (Incremental) ──────────────────────────────────────────────

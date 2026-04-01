@@ -68,6 +68,79 @@ def _load_signal_streaks_batch(rows):
 # In-memory cache for A/B variants per token+direction (cleared on restart)
 _ab_variant_cache = {}
 
+# ── Hot set tracker ────────────────────────────────────────────────────────────
+# token -> {direction, compact_rounds, survival_score} for PENDING hot signals.
+# Loaded once per ai_decider run, used to:
+#   1. Auto-approve r2+ signals (proven by AI across multiple rounds)
+#   2. Kill hot set signals when an opposite-direction signal flips the view
+_hot_rounds = {}   # token.upper() -> {direction, rounds, survival}
+
+def _load_hot_rounds():
+    """
+    Load compact_rounds + quality info for all PENDING non-executed signals.
+
+    Returns:
+        dict: token -> {direction, rounds, survival, signal_ids, avg_conf, num_types}
+              signal_ids = list of specific DB row IDs for targeted updates
+    """
+    global _hot_rounds
+    _hot_rounds = {}
+    try:
+        conn = sqlite3.connect(SIGNALS_DB)
+        c = conn.cursor()
+        c.execute("""
+            SELECT token, direction,
+                   MAX(compact_rounds) as max_rounds,
+                   MAX(survival_score) as max_survival,
+                   AVG(confidence) as avg_conf,
+                   GROUP_CONCAT(DISTINCT signal_type) as types,
+                   GROUP_CONCAT(id) as ids
+            FROM signals
+            WHERE decision = 'PENDING' AND executed = 0
+              AND confidence >= 25
+            GROUP BY token, direction
+        """)
+        for row in c.fetchall():
+            t = row[0].upper()
+            rounds = row[2] or 0
+            types_list = [x for x in (row[5] or '').split(',') if x]
+            ids_list = [int(x) for x in (row[6] or '').split(',') if x]
+            avg_conf = row[4] or 50
+
+            if t not in _hot_rounds or rounds > _hot_rounds[t]['rounds']:
+                _hot_rounds[t] = {
+                    'direction': row[1],
+                    'rounds': rounds,
+                    'survival': row[3] or 0,
+                    'signal_ids': ids_list,
+                    'avg_conf': avg_conf,
+                    'num_types': len(types_list),
+                }
+        conn.close()
+    except Exception:
+        pass
+
+
+def _kill_hot_signal(token):
+    """Kill a hot set signal (mark COMPACTED so it's removed from hot set immediately."""
+    try:
+        conn = sqlite3.connect(SIGNALS_DB)
+        c = conn.cursor()
+        c.execute("""
+            UPDATE signals
+            SET decision = 'COMPACTED', executed = 1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE token=? AND decision = 'PENDING' AND executed = 0
+              AND compact_rounds > 0
+            LIMIT 1
+        """, (token,))
+        killed = c.rowcount
+        conn.commit()
+        conn.close()
+        return killed
+    except Exception:
+        return 0
+
 # Batch cache for Hyperliquid API calls (valid for 30 seconds)
 import hype_cache as hc  # shared 60s cache written by price_collector
 
@@ -1135,7 +1208,22 @@ try:
 except:
     pending = []
 
-print(f"=== AI Decider: {len(pending)} pending | Open: {get_open()}/{MAX_OPEN} ===")
+# Load hot set rounds and apply flip detection BEFORE reviewing signals
+_load_hot_rounds()
+print(f"=== AI Decider: {len(pending)} pending | Open: {get_open()}/{MAX_OPEN} | Hot: {len(_hot_rounds)} ===")
+
+# Pre-scan: for any token in hot set, check if a PENDING signal now exists
+# in the OPPOSITE direction — if so, kill the hot set entry (flip protection)
+for s in pending:
+    tok = (s.get('token') or '').upper()
+    sig_dir = (s.get('direction') or '').upper()
+    if tok in _hot_rounds:
+        hot_dir = _hot_rounds[tok]['direction'].upper()
+        if sig_dir != hot_dir and sig_dir in ('LONG', 'SHORT'):
+            killed = _kill_hot_signal(tok)
+            if killed:
+                print(f"   🔥 FLIP KILL: {tok} hot set killed — {sig_dir} signal overriding {hot_dir}")
+                del _hot_rounds[tok]
 
 # Get market context once
 market_z = get_market_zscore()
@@ -1169,7 +1257,7 @@ for s in pending:
     
     # Token blacklist - these tokens have 0-20% win rate on SHORTs (from trade analysis)
     # HARDBLOCK - skip these completely
-    SHORT_BLACKLIST = ['SUI', 'FET', 'SPX', 'ARK', 'TON', 'ONDO', 'CRV', 'RUNE', 'AR', 'NXPC', 'DASH', 'ARB', 'TRUMP', 'LDO', 'NEAR', 'APT', 'CELO', 'SEI', 'ACE']
+    SHORT_BLACKLIST = ['SUI', 'FET', 'SPX', 'ARK', 'TON', 'ONDO', 'CRV', 'RUNE', 'AR', 'NXPC', 'DASH', 'ARB', 'TRUMP', 'LDO', 'NEAR', 'APT', 'CELO', 'SEI', 'ACE', 'YZY', 'ZEREBRO']
     LONG_BLACKLIST = ['SEI', 'ACE']  # Tokens that don't work well as LONG either
     
     if direction.lower() == "short" and t.upper() in SHORT_BLACKLIST:
@@ -1189,7 +1277,54 @@ for s in pending:
         print(f"⏸️ {t}: max trades reached")
         log_signal(t, direction, entry, conf, f"SKIPPED-max-{exchange}")
         continue
-    
+    # ── Hot set: r2+ auto-approval ──────────────────────────────────────────
+    hot = _hot_rounds.get(t.upper())
+    if hot and hot['rounds'] >= 2:
+        # Proven by AI across 2+ compaction rounds — skip AI review, auto-approve
+
+        # Quality gate: require 2+ distinct signal types and avg_conf >= 30%
+        num_types = hot.get('num_types', 0)
+        avg_conf = hot.get('avg_conf', 0)
+        if num_types < 2 or avg_conf < 30:
+            print(f"   ⏸️ 🔥 r{hot['rounds']} {t}: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
+            log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
+            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
+            processed_this_run.add(key)
+            continue
+
+        if is_token_open(t):
+            print(f"   ⏸️ 🔥 HOT r{hot['rounds']} {t}: already has open position")
+            log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
+            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
+            processed_this_run.add(key)
+            continue
+
+        # Blacklist double-check
+        if direction.lower() == "short" and t.upper() in SHORT_BLACKLIST:
+            print(f"   🚫 🔥 HOT r{hot['rounds']} {t}: BLACKLISTED — skipping SHORT")
+            log_signal(t, direction, entry, conf, f"SKIPPED-blacklist-{exchange}")
+            mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'))
+            processed_this_run.add(key)
+            continue
+
+        # Targeted update: only specific signal IDs
+        ok = mark_signal_processed(t, 'APPROVED', hot.get('signal_ids'))
+        if ok:
+            # Quality-aware confidence boost
+            diversity_bonus = min(20, num_types * 5)
+            hot_bonus = min(20, hot['rounds'] * 5)
+            final_conf = min(99, round(avg_conf + diversity_bonus + hot_bonus))
+            print(f"   ✅🔥 AUTO-APPROVED r{hot['rounds']} {t} {direction} "
+                  f"conf={final_conf}% (+{hot_bonus}% hot +{diversity_bonus}% diversity, "
+                  f"types={num_types}, avg={avg_conf:.0f}%)")
+            log_signal(t, direction, entry, final_conf, f"hot-set-r{hot['rounds']}-{exchange}")
+        else:
+            print(f"   ❌🔥 HOT r{hot['rounds']} {t}: failed to record approval")
+            log_signal(t, direction, entry, conf, f"FAILED-hot-{exchange}")
+            mark_signal_processed(t, 'FAILED', hot.get('signal_ids'))
+        processed_this_run.add(key)
+        continue
+
     # 2. Check if SOL token but signal says short (SOL tokens can only go long)
     if exchange == "raydium" and direction.lower() == "short":
         print(f"⏸️ {t}: SOL tokens can only go LONG on Raydium")
