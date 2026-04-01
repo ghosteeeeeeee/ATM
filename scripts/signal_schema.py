@@ -841,7 +841,7 @@ def set_cooldown(token, direction=None, hours=1):
         cur.execute(
             "INSERT INTO signal_cooldowns (token, expires_at, reason, direction) "
             "VALUES (%s, %s, 'signal', %s) "
-            "ON CONFLICT (token) DO UPDATE SET expires_at = %s",
+            "ON CONFLICT (token, direction) DO UPDATE SET expires_at = %s",
             (key, expires, direction, expires))
         conn.commit()
         conn.close()

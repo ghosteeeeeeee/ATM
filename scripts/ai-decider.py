@@ -30,22 +30,22 @@ AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
 AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
 
 # Lazy-load signal streak from position_manager (avoids circular import at module load)
-_signal_streak_cache = {}  # key: (token, direction, signal_type) -> streak dict
-_streak_fetched_at = 0
+_signal_streak_cache = {}  # key: (token, direction, signal_type) -> {'streak': N, 'fetched_at': float}
+_signal_streak_timestamps = {}  # key -> last-fetched timestamp (TTL per-key)
 _STREAK_TTL = 300  # refresh streak data every 5 minutes
 
 def _get_signal_streak(token, direction, signal_type):
-    """Get cached signal streak, refreshed every 5 minutes."""
-    global _streak_fetched_at
+    """Get cached signal streak, refreshed every 5 minutes (per-key TTL)."""
+    global _signal_streak_cache, _signal_streak_timestamps
     key = (token.upper(), direction.upper(), (signal_type or '').lower())
     now = time.time()
-    if key not in _signal_streak_cache or (now - _streak_fetched_at) > _STREAK_TTL:
+    ts = _signal_streak_timestamps.get(key, 0)
+    if key not in _signal_streak_cache or (now - ts) > _STREAK_TTL:
         try:
             sys.path.insert(0, '/root/.hermes/scripts')
             from position_manager import get_signal_streak as _gs
-            # Fetch all streaks in one go (batch per token/direction in candidates)
-            # For simplicity, cache a single batch dict; first call populates it
-            _streak_fetched_at = now
+            _signal_streak_cache[key] = _gs(token, direction, signal_type)
+            _signal_streak_timestamps[key] = now
         except Exception:
             return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
     return _signal_streak_cache.get(key, {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0})
@@ -53,7 +53,7 @@ def _get_signal_streak(token, direction, signal_type):
 def _load_signal_streaks_batch(rows):
     """Pre-load streaks for all signal_type keys in a batch of candidates.
     Respects TTL per-key (refreshes stale entries). Logs failures instead of silent pass."""
-    global _signal_streak_cache, _streak_fetched_at
+    global _signal_streak_cache, _signal_streak_timestamps
     now = time.time()
     loaded = 0
     skipped = 0
@@ -63,15 +63,13 @@ def _load_signal_streaks_batch(rows):
         for row in rows:
             sid, token, direction, stype, conf, source, created = row
             key = (token.upper(), direction.upper(), (stype or '').lower())
-            # Always refresh — enforce TTL per-cache-entry, not globally
-            cache_entry = _signal_streak_cache.get(key)
-            is_stale = (cache_entry is None or (now - _streak_fetched_at) > _STREAK_TTL)
-            if is_stale:
+            ts = _signal_streak_timestamps.get(key, 0)
+            if (now - ts) > _STREAK_TTL:
                 _signal_streak_cache[key] = _gs(token, direction, stype)
+                _signal_streak_timestamps[key] = now
                 loaded += 1
             else:
                 skipped += 1
-        _streak_fetched_at = now
         if loaded > 0:
             print(f'[ai-decider] Streaks loaded: {loaded} fresh, {skipped} cached')
     except Exception as e:

@@ -1052,22 +1052,25 @@ def compute_score(token, direction, long_mult, short_mult):
     score = z_score + vel_score + vol_score + phase_mod + regime_mod + rsi_score + macd_score + cooldown_bonus - trend_penalty
     score = min(99.0, max(0, round(score, 1)))
 
+    # Mean reversion rescue: push borderline signals over threshold
+    # NOTE: cap bonus at 15 and final score at 75 — prevents SKY/POL/MEGA 99% clustering.
+    # The base score already includes pct_score via pct_short_score_fn/pct_long_score_fn.
+    # Adding 25 bonus pts was double-amplification. Reduced to 15 max rescue.
     if score < ENTRY_THRESHOLD:
-        # Mean reversion bonus: extreme phase + z + percentile signal
         z_bonus = 0
         if phase == 'extreme' and abs(avg_z) >= 1.0 and pct_score >= 40:
-            z_bonus = 25
+            z_bonus = 15
         elif phase == 'extreme' and abs(avg_z) >= 0.7 and pct_score >= 40:
-            z_bonus = 15
+            z_bonus = 10
         elif phase == 'extreme' and abs(avg_z) >= 0.5 and pct_score >= 40:
-            z_bonus = 8
-        elif abs(avg_z) >= 0.5 and pct_score >= 40:
             z_bonus = 5
+        elif abs(avg_z) >= 0.5 and pct_score >= 40:
+            z_bonus = 3
         elif abs(avg_z) >= 1.5 and vol_score >= 3:
-            z_bonus = 15
+            z_bonus = 10
         elif abs(avg_z) >= 1.0 and vol_score >= 3:
-            z_bonus = 8
-        score = min(99.0, score + z_bonus)
+            z_bonus = 5
+        score = min(75.0, score + z_bonus)
         if score >= ENTRY_THRESHOLD:
             phase_reason += '-zbonus'
         if score < ENTRY_THRESHOLD:
