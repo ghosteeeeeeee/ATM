@@ -863,85 +863,12 @@ def activate_trailing_stop(trade_id: int, trade: Dict) -> None:
 def refresh_current_prices(server: str = SERVER_NAME):
     """Fetch live prices from Hyperliquid, update pnl_pct in brain DB for open positions of given server."""
 
-    # ── RECONCILIATION: sync DB ↔ HL ─────────────────────────────────────────
-    # This prevents orphan/ghost positions where DB and HL diverge.
-    # Runs every pipeline cycle so drift is always caught.
-    if HYPE_AVAILABLE and is_live_trading_enabled():
-        try:
-            from hyperliquid_exchange import get_open_hype_positions, close_position as hl_close_position, hype_coin
-            hl_live = get_open_hype_positions()
-            conn_recon = get_db_connection()
-            if not conn_recon:
-                return []  # fall through to normal path
-
-            cur_recon = get_cursor(conn_recon)
-
-            # ── Always reconcile: fetch fresh HL state and compare ─────────────
-            # This runs even when DB has 0 open positions (prevents orphaned HL trades)
-
-            # ── Ghosts: DB open, HL closed ────────────────────────
-            # Only close PAPER trades (paper=FALSE) — live HL trades need manual handling.
-            # Use close_paper_position to properly record AB results before HL close.
-            cur_recon.execute("SELECT id, token, experiment, sl_distance FROM trades WHERE status='open' AND exchange='Hyperliquid' AND paper=FALSE")
-            for row in cur_recon.fetchall():
-                tok_id = row['id']
-                tok = row['token']
-                experiment = row.get('experiment')
-                sl_dist = row.get('sl_distance')
-                if tok not in hl_live:
-                    print(f"  [Sync] Ghost: {tok} in DB but not HL (paper=FALSE)")
-                    # Record AB results before closing so wins are tracked
-                    if experiment and sl_dist:
-                        try:
-                            cur_recon.execute("SELECT pnl_usdt, pnl_pct FROM trades WHERE id=%s", (tok_id,))
-                            pr = cur_recon.fetchone()
-                            if pr:
-                                _record_ab_close(tok, 'UNKNOWN', pr.pnl_pct, pr.pnl_usdt, experiment, sl_dist)
-                        except Exception as e:
-                            print(f"  [Sync] Ghost AB record error: {e}")
-                    cur_recon.execute("UPDATE trades SET status='closed', close_time=NOW(), close_reason='ghost_recovery' WHERE id=%s", (tok_id,))
-                    try:
-                        hl_close_position(hype_coin(tok))
-                    except Exception:
-                        pass
-                    print(f"  [Sync] Ghost closed: {tok} (id={tok_id})")
-
-            # ── Orphans: HL open, DB closed/missing ─────────────────
-            cur_recon.execute("SELECT DISTINCT ON (token) id, token, status FROM trades WHERE token IN %s ORDER BY token, id DESC",
-                              (tuple(hl_live.keys()),) if hl_live else (('',),))
-            db_token_status = {row['token']: row['status'] for row in cur_recon.fetchall()}
-            for tok, hdata in hl_live.items():
-                db_status = db_token_status.get(tok, 'MISSING')
-                if db_status != 'open':
-                    print(f"  [Sync] Orphan: {tok} on HL but DB={db_status} — closing on HL")
-                    try:
-                        close_res = hl_close_position(hype_coin(tok))
-                        if close_res.get('success'):
-                            print(f"  [Sync] Orphan closed on HL: {tok}")
-                            try:
-                                mids = hc.get_allMids()
-                                exit_px = mids.get(tok, hdata['entry_px'])
-                            except Exception:
-                                exit_px = hdata['entry_px']
-                            unreal = hdata.get('unrealized_pnl', 0)
-                            cur_recon.execute("""
-                                INSERT INTO trades (token, direction, amount_usdt, entry_price, exit_price,
-                                    status, exchange, server, paper, pnl_pct, pnl_usdt, close_time, close_reason, open_time)
-                                VALUES (%s, %s, %s, %s, %s, 'closed', 'Hyperliquid', %s, FALSE, %s, %s, NOW(), 'orphan_recovery', NOW())
-                            """, (tok, hdata['direction'], 50.0, hdata['entry_px'], exit_px,
-                                  SERVER_NAME, unreal, unreal * 50.0))
-                            print(f"  [Sync] Orphan record inserted: {tok}")
-                    except Exception as e:
-                        print(f"  [Sync] Orphan close error {tok}: {e}")
-
-            conn_recon.commit()
-            cur_recon.close()
-            conn_recon.close()
-
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            print(f"  [Sync] Reconciliation error: {e}")
+    # ── RECONCILIATION OWNED BY GUARDIAN ──────────────────────────────────────
+    # DB↔HL reconciliation (orphans/ghosts) is handled exclusively by
+    # hl-sync-guardian.py (60s cycle). This function ONLY updates current_price
+    # and pnl_pct for positions already confirmed in the DB.
+    # Having two processes reconcile independently causes race conditions and
+    # duplicate trade records (the orphan_recovery/guardian_missing bug).
 
     positions = get_open_positions(server)
     if not positions:
@@ -1054,8 +981,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # price at the START of this pipeline run, giving consistent activation.
         if not trailing_active:
             trailing_start_pct = float(pos.get('trailing_activation') or TRAILING_START_PCT_DEFAULT)
-            # SHORTs in loss have negative pnl_pct — use abs() so 2% adverse move activates TS
-            adverse_pct = abs(pnl_pct) if direction == 'SHORT' else pnl_pct
+            # SHORTs activate trailing only when in profit (pnl_pct positive = price moved down).
+            # Never activate on loss — cascade_flip handles reversals, cut_loser is the safety net.
+            adverse_pct = pnl_pct if direction == 'SHORT' else pnl_pct
             if adverse_pct >= trailing_start_pct:
                 activate_trailing_stop(trade_id, pos)
                 adjusted_count += 1

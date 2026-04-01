@@ -5,7 +5,8 @@ STATIC DB  (/root/.hermes/data/signals_hermes.db)   — backfill data, git-track
 RUNTIME DB (/root/.hermes/data/signals_hermes_runtime.db) — signals, decisions, local state
 """
 import sqlite3, time, json, os
-from datetime import datetime
+from datetime import datetime, timedelta
+import psycopg2
 
 # ── Database paths ────────────────────────────────────────────────────────────
 HERMES_DATA = os.environ.get('HERMES_DATA_DIR', '/root/.hermes/data')
@@ -599,6 +600,7 @@ def get_price_history(token, lookback_minutes=60*24):
         SELECT timestamp, price FROM price_history
         WHERE token=? AND timestamp>?
         ORDER BY timestamp ASC
+        LIMIT 2000
     ''', (token.upper(), cutoff))
     rows = c.fetchall()
     conn.close()
@@ -762,32 +764,63 @@ def price_age_minutes(token):
 COOLDOWN_FILE = '/root/.openclaw/workspace/data/signal-cooldowns.json'
 
 def get_cooldown(token, direction=None):
+    # Primary: PostgreSQL (durable). Fallback: JSON file.
+    key = token.upper()
+    if direction:
+        key = "%s:%s" % (key, direction.upper())
+    try:
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT expires_at FROM signal_cooldowns WHERE token=%s AND expires_at > NOW()",
+            (key,))
+        row = cur.fetchone()
+        conn.close()
+        if row:
+            return True
+    except Exception:
+        pass
+    # Fallback: JSON file
     try:
         with open(COOLDOWN_FILE) as f:
             data = json.load(f)
-        key = token.upper()
-        if direction:
-            key = f"{key}:{direction.upper()}"
         if key in data and data[key] > time.time():
             return data[key]
-    except: pass
+    except:
+        pass
     return None
 
 def set_cooldown(token, direction=None, hours=1):
+    # Primary: PostgreSQL (durable). Fallback: JSON file.
+    key = token.upper()
+    if direction:
+        key = "%s:%s" % (key, direction.upper())
+    expires = datetime.now() + timedelta(hours=hours)
+    try:
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO signal_cooldowns (token, expires_at, reason, direction) "
+            "VALUES (%s, %s, 'signal', %s) "
+            "ON CONFLICT (token) DO UPDATE SET expires_at = %s",
+            (key, expires, direction, expires))
+        conn.commit()
+        conn.close()
+        return
+    except Exception:
+        pass
+    # Fallback: JSON file
     try:
         try:
             with open(COOLDOWN_FILE) as f:
                 data = json.load(f)
         except:
             data = {}
-        key = token.upper()
-        if direction:
-            key = f"{key}:{direction.upper()}"
         data[key] = time.time() + (hours * 3600)
         with open(COOLDOWN_FILE, 'w') as f:
             json.dump(data, f, indent=2)
     except Exception as e:
-        print(f'Cooldown write error: {e}')
+        print('Cooldown write error: ' + str(e))
 
 def clear_cooldown(token, direction=None):
     try:

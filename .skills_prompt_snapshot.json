@@ -441,6 +441,10 @@
       1774941404607027773,
       5864
     ],
+    "trading/full-review/SKILL.md": [
+      1775021012548925876,
+      4333
+    ],
     "trading/wasp/SKILL.md": [
       1774923212641163904,
       2641
@@ -2002,6 +2006,19 @@
       "category": "trading",
       "frontmatter_name": "fresh-run",
       "description": "Fresh state reset for Hermes trading system — clears sign...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "full-review",
+      "category": "trading",
+      "frontmatter_name": "full-review",
+      "description": "Run complete Hermes review: git commit+package, fire code...",
       "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],

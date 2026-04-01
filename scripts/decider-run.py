@@ -12,6 +12,12 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
+
+# Shared blacklist — tokens that are too volatile/manipulable for certain directions
+SHORT_BLACKLIST = {'SUI','FET','SPX','ARK','TON','ONDO','CRV','RUNE','AR',
+                   'NXPC','DASH','ARB','TRUMP','LDO','NEAR','APT','CELO','SEI',
+                   'ACE','YZY','ZEREBRO'}
+LONG_BLACKLIST  = {'SEI', 'ACE'}  # Tokens that don't work well as LONG either
 from hyperliquid_exchange import is_live_trading_enabled
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
@@ -22,6 +28,10 @@ LOG_FILE        = '/var/www/hermes/logs/signals.log'
 DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
 AB_CONFIG_FILE  = '/root/.hermes/data/ab-test-config.json'
 EPSILON         = 0.20   # 20% exploration rate
+
+# Rate limit: cache last entry timestamp, refresh from DB every 5 minutes
+_RATE_LIMIT_CACHE = {"last_entry": None, "cached_at": 0}
+_RATE_LIMIT_TTL    = 300  # seconds
 
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 os.makedirs(os.path.dirname(DELAYED_FILE), exist_ok=True)
@@ -137,7 +147,7 @@ def _save_delayed(entries):
         json.dump(entries, f, indent=2)
 
 
-# ─── Epsilon-Greedy A/B Selection ──────────────────────────────────────────────
+# ─── Thompson Sampling A/B Selection ───────────────────────────────────────────
 
 def _load_ab_config():
     try:
@@ -145,6 +155,124 @@ def _load_ab_config():
             return json.load(f)
     except Exception:
         return {'enabled': False, 'tests': []}
+
+
+def get_ab_variant(test_name: str, direction: str) -> dict:
+    """
+    Select A/B variant using Thompson sampling from brain DB (ab_results).
+    Fallback chain:
+      1. Thompson sampling (if all variants have >= 5 trials in last 30 days)
+      2. Epsilon-greedy weighted random (90% exploitation, 10% exploration)
+      3. Pure weighted random from config
+      4. First enabled variant (ultimate fallback)
+    Returns the variant dict (or empty dict if AB disabled/no config).
+    """
+    cfg = _load_ab_config()
+    if not cfg.get('enabled', False):
+        return {}
+
+    test = next((t for t in cfg.get('tests', []) if t['name'] == test_name), None)
+    if not test:
+        return {}
+
+    variants = [v for v in test.get('variants', []) if v.get('enabled', True)]
+    if not variants:
+        return {}
+
+    # ── 1. Try Thompson sampling from DB ─────────────────────────────────────
+    try:
+        conn = psycopg2.connect(
+            host='/var/run/postgresql',
+            dbname='brain',
+            user='postgres',
+            password='***',
+            connect_timeout=2
+        )
+        # Apply socket timeout to ensure the 2-second budget is respected
+        cur = conn.cursor()
+        cur.execute("SET statement_timeout = '2000ms'")
+        cur.execute("""
+            SELECT variant_id, wins, losses
+            FROM ab_results
+            WHERE test_name = %s
+              AND updated_at >= NOW() - INTERVAL '30 days'
+        """, (test_name,))
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        if rows:
+            # Map variant_id -> (wins, losses)
+            variant_stats = {str(r[0]): (int(r[1] or 0), int(r[2] or 0)) for r in rows}
+
+            # Only use Thompson sampling if ALL variants have >= 5 total trials
+            total_trials = {vid: w + l for vid, (w, l) in variant_stats.items()}
+            all_have_data = all(total_trials.get(v.get('id'), 0) >= 5 for v in variants)
+
+            if all_have_data:
+                samples = {}
+                for v in variants:
+                    vid = v.get('id')
+                    wins, losses = variant_stats.get(vid, (0, 0))
+                    samples[vid] = random.betavariate(wins + 1, losses + 1)
+
+                winner_vid = max(samples, key=samples.get)
+                for v in variants:
+                    if v.get('id') == winner_vid:
+                        wins, losses = variant_stats.get(winner_vid, (0, 0))
+                        log(f'[AB] Thompson: {test_name} -> {winner_vid} (wins={wins}, losses={losses}, sample={samples[winner_vid]:.4f})')
+                        return v
+
+    except Exception:
+        pass  # Fall through to epsilon-greedy
+
+    # ── 2. Epsilon-greedy weighted random (90% exploitation, 10% exploration) ─
+    try:
+        exploit_vid = None
+        try:
+            conn = psycopg2.connect(
+                host='/var/run/postgresql',
+                dbname='brain',
+                user='postgres',
+                password='***',
+                connect_timeout=2
+            )
+            cur = conn.cursor()
+            cur.execute("SET statement_timeout = '2000ms'")
+            cur.execute("""
+                SELECT variant_id, win_rate_pct
+                FROM ab_results
+                WHERE test_name=%s AND trades >= 5
+                ORDER BY win_rate_pct DESC
+                LIMIT 1
+            """, (test_name,))
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            exploit_vid = row[0] if row else None
+        except Exception:
+            exploit_vid = None
+
+        if random.random() < (1.0 - EPSILON) and exploit_vid:
+            for v in variants:
+                if v.get('id') == exploit_vid:
+                    log(f'[AB] Epsilon-greedy EXPLOIT: {test_name} -> {v["id"]}')
+                    return v
+
+    except Exception:
+        pass
+
+    # ── 3. Pure weighted random from config ───────────────────────────────────
+    total_weight = sum(v.get('weight', 1) for v in variants)
+    r = random.uniform(0, total_weight)
+    for v in variants:
+        r -= v.get('weight', 1)
+        if r <= 0:
+            log(f'[AB] Weighted random: {test_name} -> {v["id"]}')
+            return v
+
+    # ── 4. Ultimate fallback ──────────────────────────────────────────────────
+    return variants[0]
 
 
 def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
@@ -229,15 +357,15 @@ def get_ab_params_for_trade(direction: str) -> dict:
     Returns dict with sl_pct, trailing_activation, trailing_distance, experiment metadata.
     """
     # SL test
-    sl_variant = _get_ab_variant_for_test('sl-distance-test', direction)
+    sl_variant = get_ab_variant('sl-distance-test', direction)
     sl_pct = max(0.5, sl_variant.get('config', {}).get('slPct', 0.02))  # floor at 0.5%
 
     # Entry timing test
-    entry_variant = _get_ab_variant_for_test('entry-timing-test', direction)
+    entry_variant = get_ab_variant('entry-timing-test', direction)
     entry_mode = entry_variant.get('config', {}).get('entryMode', 'immediate')
 
     # Trailing stop test
-    ts_variant = _get_ab_variant_for_test('trailing-stop-test', direction)
+    ts_variant = get_ab_variant('trailing-stop-test', direction)
     trailing_activation  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
     trailing_distance    = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
     trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
@@ -522,8 +650,9 @@ def run(dry_run=False):
             if gap < 15:
                 log(f'SKIP: Rate limit — last entry {gap:.0f}s ago (min 15s gap)')
                 return 0, 0
-    except Exception:
-        pass  # no trades yet, proceed
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        log(f'Rate limit check failed (DB error): {e} — proceeding without rate limit', 'WARN')
 
     # Get approved signals
     # Clean up stale approvals before fetching (expire anything >1h old)
@@ -540,19 +669,26 @@ def run(dry_run=False):
         # DO NOT auto-execute 80-89% signals — they need AI review.
     if not approved:
         pending = get_pending_signals(hours=1, limit=30)
-        # Only confluence >= 90% with individual avg >= 40 gets auto-executed as fallback
-        # All other types must go through ai_decider first
-        high_conf = [p for p in pending
-                     if p.get('signal_type') == 'confluence'
-                     and p.get('confidence', 0) >= 90
-                     and p.get('num_signals', 0) >= 2
-                     and p.get('executed', 0) == 0]
+        # Fallback: only high-confidence confluence (>= 95%) bypasses AI review when approved is empty.
+        # Requires blacklist check and open slot — NO fallback for weaker signals.
+        # SHORT_BLACKLIST and LONG_BLACKLIST are defined at module level above.
+        high_conf = []
+        for p in pending:
+            token = p.get('token', '').upper()
+            direction = p.get('direction', 'LONG').upper()
+            if (p.get('signal_type') == 'confluence'
+                and p.get('confidence', 0) >= 95
+                and p.get('num_signals', 0) >= 2
+                and p.get('executed', 0) == 0
+                and token not in SHORT_BLACKLIST if direction == 'SHORT' else True
+                and token not in LONG_BLACKLIST
+                and open_count < MAX_POS):
+                p['final_confidence'] = p['confidence']
+                p['price'] = p.get('price') or get_current_price(token)
+                p['source'] = f'pending-confluence-{p.get("source","unknown")}'
+                high_conf.append(p)
         log(f'Pending confluence fallback: {len(high_conf)} signals >= 95% confluence (from {len(pending)} total)')
-        for p in high_conf:
-            p['final_confidence'] = p['confidence']
-            p['price'] = p.get('price') or get_current_price(p['token'])
-            p['source'] = f'pending-confluence-{p.get("source","unknown")}'
-            approved.append(p)
+        approved.extend(high_conf)
 
     # ── Confidence floor: reject signals below 70% ──────────────────────────
     # Individual RSI/MACD signals should never reach here (signal_gen adds them at

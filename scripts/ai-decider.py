@@ -837,7 +837,8 @@ def get_pending_signals():
             })
         return signals
     except Exception as e:
-        print(f"Error reading signals.db: {e}")
+        import traceback; traceback.print_exc()
+        log_error(f"get_pending_signals DB read error: {e}")
         return []
 
 from signal_schema import mark_signal_processed  # now from signal_schema

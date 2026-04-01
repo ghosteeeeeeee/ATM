@@ -27,7 +27,7 @@ from hyperliquid_exchange import (
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin
 )
 
-DRY = False  # Default is LIVE. Use --apply flag explicitly to enable closing orphan positions.
+DRY = True   # Default is DRY RUN (safe). Use --apply flag to enable LIVE closing of orphan positions.
 INTERVAL = 60  # seconds between checks
 LOG_FILE = '/root/.hermes/logs/sync-guardian.log'
 DATA_DIR = '/root/.hermes/data'
@@ -272,23 +272,29 @@ def record_closed_trade(token: str, direction: str, entry_px: float, exit_px: fl
         return
 
     try:
-        sql = f"""
-        INSERT INTO trades (token, direction, entry_price, exit_price, status,
-            pnl_pct, pnl_usdt, leverage, amount_usdt, exchange, paper,
-            hl_entry_price, hl_exit_price, hype_pnl_usdt, hype_pnl_pct,
-            close_time, close_reason, exit_reason, last_updated, updated_at)
-        VALUES ('{token}', '{direction}', {entry_px}, {computed_exit}, 'closed',
-            {computed_pnl_pct}, {computed_pnl_usdt}, {lev}, {amount}, 'Hyperliquid', false,
-            {entry_px}, {computed_exit}, {real_pnl}, {computed_pnl_pct},
-            NOW(), '{actual_reason}', '{actual_reason}', NOW(), NOW())
-        """
-        r = subprocess.run(['psql', '-U', 'postgres', '-d', 'brain', '-c', sql],
-            capture_output=True, text=True)
-        if r.returncode == 0:
-            log(f'  DB recorded: {token} exit={computed_exit:.6f} '
-                f'pnl={computed_pnl_pct:.4f}% hl_verified={hl_verified}', 'PASS')
-        else:
-            log(f'  DB record failed: {r.stderr[:100]}', 'FAIL')
+        # Use psycopg2 with parameterized queries — NEVER interpolate user input into SQL.
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
+                                user='postgres', password='***')
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO trades (token, direction, entry_price, exit_price, status,
+                pnl_pct, pnl_usdt, leverage, amount_usdt, exchange, paper,
+                hl_entry_price, hl_exit_price, hype_pnl_usdt, hype_pnl_pct,
+                close_time, close_reason, exit_reason, last_updated, updated_at)
+            VALUES (%s, %s, %s, %s, 'closed',
+                %s, %s, %s, %s, 'Hyperliquid', FALSE,
+                %s, %s, %s, %s,
+                NOW(), %s, %s, NOW(), NOW())
+        """, (token, direction, entry_px, computed_exit,
+              computed_pnl_pct, computed_pnl_usdt, lev, amount,
+              entry_px, computed_exit, real_pnl, computed_pnl_pct,
+              actual_reason, actual_reason))
+        conn.commit()
+        cur.close()
+        conn.close()
+        log(f'  DB recorded: {token} exit={computed_exit:.6f} '
+            f'pnl={computed_pnl_pct:.4f}% hl_verified={hl_verified}', 'PASS')
+        return
     except Exception as e:
         log(f'  DB record exception: {e}', 'FAIL')
 
