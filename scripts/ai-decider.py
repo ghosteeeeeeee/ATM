@@ -95,16 +95,17 @@ _hot_rounds = {}   # token.upper() -> {direction, rounds, survival}
 
 def _load_hot_rounds():
     """
-    Load hot signals based on REAL survival data from signal_history table.
+    Load hot signals based on review_count (ai-decider survival passes).
 
-    A hot signal is one where the token survived 2+ compaction rounds in the past
-    30 minutes (proven by AI across multiple cycles). This is much more reliable
-    than signals.compact_rounds which rarely increments with ~20 candidates.
+    A hot signal is one where ai-decider reviewed the same token/direction
+    as PENDING at least 2 times without executing or hard-skipping it.
+    review_count is incremented every time ai-decider marks a signal SKIPPED
+    or WAIT (via mark_signal_processed in signal_schema.py).
 
     Also enriches with PENDING signal data (signal_ids, avg_conf, num_types).
 
     Returns:
-        dict: token.upper() -> {direction, rounds, survival, signal_ids, avg_conf, num_types}
+        dict: token.upper() -> {direction, rounds, signal_ids, avg_conf, num_types}
     """
     global _hot_rounds
     _hot_rounds = {}
@@ -112,33 +113,31 @@ def _load_hot_rounds():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # Query signal_history for tokens that survived 2+ rounds in last 30 minutes
+        # Query signals table for tokens that survived 2+ ai-decider review passes
         c.execute("""
-            SELECT sh.token, sh.direction, COUNT(*) as survive_count,
-                   GROUP_CONCAT(DISTINCT sh.signal_type) as types,
-                   s.source
-            FROM signal_history sh
-            LEFT JOIN signals s ON s.token=sh.token AND s.direction=sh.direction
-                                  AND s.decision='PENDING' AND s.executed=0
-            WHERE sh.survived = 1
-              AND sh.created_at > datetime('now', '-30 minutes')
-            GROUP BY sh.token, sh.direction
-            HAVING survive_count >= 2
+            SELECT token, direction, MAX(review_count) as rounds,
+                   GROUP_CONCAT(DISTINCT signal_type) as types, source
+            FROM signals
+            WHERE decision IN ('PENDING', 'APPROVED')
+              AND review_count >= 2
+              AND created_at > datetime('now', '-3 hours')
+            GROUP BY token, direction
+            HAVING COUNT(*) >= 1
         """)
-        history_rows = c.fetchall()
+        rows = c.fetchall()
 
-        for row in history_rows:
+        for row in rows:
             t = row[0].upper()
+            direction = row[1]
             rounds = row[2] or 0
             types_list = [x for x in (row[3] or '').split(',') if x]
-            direction = row[1]
             source = row[4] or 'unknown'
 
-            # Get the corresponding PENDING signal IDs and quality metrics
+            # Get PENDING signal IDs and quality metrics for this token+direction
             c.execute("""
                 SELECT id, AVG(confidence) as avg_conf, COUNT(DISTINCT signal_type) as num_types
                 FROM signals
-                WHERE token=? AND direction=? AND decision='PENDING' AND executed=0
+                WHERE token=*** AND direction=? AND decision='PENDING' AND executed=0
             """, (t, direction))
             sig_row = c.fetchone()
             sig_id = sig_row[0] if sig_row else None
@@ -149,7 +148,6 @@ def _load_hot_rounds():
             _hot_rounds[t] = {
                 'direction': direction,
                 'rounds': rounds,
-                'survival': rounds * 0.5,
                 'signal_ids': ids_list,
                 'avg_conf': avg_conf,
                 'num_types': num_types,
@@ -174,10 +172,32 @@ def _kill_hot_signal(token):
             UPDATE signals
             SET decision = 'COMPACTED', executed = 1,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE token=? AND decision = 'PENDING' AND executed = 0
-              AND compact_rounds > 0
+            WHERE token=? AND decision IN ('PENDING','APPROVED') AND executed = 0
             LIMIT 1
         """, (token,))
+        killed = c.rowcount
+        conn.commit()
+        conn.close()
+        return killed
+    except Exception:
+        return 0
+
+def _kill_pending_opposite(token, hot_direction):
+    """
+    Kill PENDING signals in the OPPOSITE direction to the hot set.
+    Hot direction has priority — newer signals in the wrong direction get killed.
+    """
+    opposite = 'SHORT' if hot_direction.upper() == 'LONG' else 'LONG'
+    try:
+        conn = sqlite3.connect(SIGNALS_DB)
+        c = conn.cursor()
+        c.execute("""
+            UPDATE signals
+            SET decision = 'COMPACTED', executed = 1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE token=? AND direction=? AND decision='PENDING' AND executed=0
+            LIMIT 5
+        """, (token.upper(), opposite))
         killed = c.rowcount
         conn.commit()
         conn.close()
@@ -1263,17 +1283,21 @@ _load_hot_rounds()
 print(f"=== AI Decider: {len(pending)} pending | Open: {get_open()}/{MAX_OPEN} | Hot: {len(_hot_rounds)} ===")
 
 # Pre-scan: for any token in hot set, check if a PENDING signal now exists
-# in the OPPOSITE direction — if so, kill the hot set entry (flip protection)
+# in the OPPOSITE direction — if so, kill the PENDING (not the hot set).
+# Hot set has priority: it survived multiple review cycles, newer signals don't override it.
 for s in pending:
     tok = (s.get('token') or '').upper()
     sig_dir = (s.get('direction') or '').upper()
     if tok in _hot_rounds:
         hot_dir = _hot_rounds[tok]['direction'].upper()
         if sig_dir != hot_dir and sig_dir in ('LONG', 'SHORT'):
-            killed = _kill_hot_signal(tok)
+            # Kill the newer PENDING opposite signal — hot set has priority
+            killed = _kill_pending_opposite(tok, hot_dir)
             if killed:
-                print(f"   🔥 FLIP KILL: {tok} hot set killed — {sig_dir} signal overriding {hot_dir}")
-                del _hot_rounds[tok]
+                print(f"   🔥 FLIP KILL: {tok} {hot_dir} hot set kept — killed {sig_dir} PENDING")
+            else:
+                # No PENDING opposite found (already processed this cycle) — keep hot set
+                print(f"   🔥 HOT KEEP:  {tok} {hot_dir} hot set survived PENDING {sig_dir}")
 
 # Get market context once
 market_z = get_market_zscore()

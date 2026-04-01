@@ -164,8 +164,8 @@ CONFLUENCE_AUTO_APPROVE = 75  # confluence signal ≥ this → auto-approve (no 
 
 # Individual signal thresholds for confluence-ready signal table population
 # These are LOWER than ENTRY_THRESHOLD so confluence can combine weak-but-aligned signals
-CONFLUENCE_RSI_LOW   = 65   # RSI < this → LONG (oversold = potential reversal LONG)
-CONFLUENCE_RSI_HIGH  = 35   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
+CONFLUENCE_RSI_LOW   = 35   # RSI < this → LONG (oversold = potential reversal LONG)
+CONFLUENCE_RSI_HIGH  = 65   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
 CONFLUENCE_MACD_HIST_THRESH = 0.000005  # MACD histogram magnitude to add individual signal
 
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
@@ -1284,30 +1284,26 @@ def _run_rsi_signals_for_confluence():
         z = compute_zscore(token)
         z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
         price = data['price']
-        if rsi > CONFLUENCE_RSI_HIGH:
-            # ── LONG filter: RSI oversold (above high threshold = deeply oversold) + z-score suppressed ──
+        if rsi < CONFLUENCE_RSI_LOW:
+            # ── LONG: RSI oversold (below LOW threshold = deeply oversold) + z-score suppressed ──
             if broad_avg > BROAD_UPTEND_Z:
                 continue  # broad market too bullish, skip LONG
             if z is None or z > LONG_1H_Z_MAX:
                 continue  # token not suppressed enough
-            conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
-            # Only emit sub-threshold RSI signals when there's a confluence partner
-            # (other signal types already in DB) OR RSI is extreme enough to stand alone
-            has_partner = _has_confluence_partners(token, 'LONG', exclude_type='rsi_confluence')
-            if conf < ENTRY_THRESHOLD and not (rsi > 85):
+            conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+            if conf < ENTRY_THRESHOLD and not (rsi < 15):
                 continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
             added += 1
-        elif rsi < CONFLUENCE_RSI_LOW:
-            # ── SHORT filter: RSI overbought (below low threshold = deeply overbought) ──
-            # No z-score filter for SHORTs — suppressed prices are valid short targets
+        elif rsi > CONFLUENCE_RSI_HIGH:
+            # ── SHORT: RSI overbought (above HIGH threshold = overbought) ──
+            # No z-score filter for SHORTs — elevated prices are valid short targets
             if token.upper() in SHORT_BLACKLIST:
                 continue
-            conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
-            has_partner = _has_confluence_partners(token, 'SHORT', exclude_type='rsi_confluence')
-            if conf < ENTRY_THRESHOLD and not (rsi < 25):
+            conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
+            if conf < ENTRY_THRESHOLD and not (rsi > 85):
                 continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
@@ -1337,12 +1333,17 @@ def _run_mtf_macd_signals():
     # SHORT_BLACKLIST is imported from hermes_constants at module level
     added = 0
 
-    def _macd_line(token, minutes):
-        """Compute MACD fast line for a token using its price_data table."""
-        # Use the existing compute_macd via 1m data — same underlying data source
-        # compute_macd reads from price_data table directly, no fetch needed
+    def _macd_crossover(token, minutes):
+        """
+        Compute MACD crossover for a token at given timeframe.
+        Returns (histogram: float, macd_line: float, signal_line: float) or None.
+        histogram > 0 means MACD line is ABOVE signal line → bullish  → LONG
+        histogram < 0 means MACD line is BELOW signal line → bearish → SHORT
+        """
         m = compute_macd(token, lookback_minutes=minutes)
-        return m.get('macd') if m else None
+        if not m:
+            return None
+        return (m.get('histogram', 0), m.get('macd', 0), m.get('signal', 0))
 
     # ── Individual RSI + MACD signals for sub-component confluence ──────────
     # These write to DB with distinct signal_types so confluence can cross-match.
@@ -1376,37 +1377,34 @@ def _run_mtf_macd_signals():
         z_dir     = mom.get('z_direction', 'neutral')
 
         # ── MTF MACD check ────────────────────────────────────────
-        macd_4h  = _macd_line(token, 60*4)
-        macd_1h  = _macd_line(token, 60*1)
-        macd_15m = _macd_line(token, 15)
-        macd_results = {'4h': macd_4h, '1h': macd_1h, '15m': macd_15m}
-        valid_tfs = {tf: v for tf, v in macd_results.items() if v is not None}
-        if not valid_tfs:
-            macd_4h = macd_1h = macd_15m = None
-        else:
-            macd_4h  = valid_tfs.get('4h')
-            macd_1h  = valid_tfs.get('1h')
-            macd_15m = valid_tfs.get('15m')
+        # Use histogram (MACD line - signal line) for direction, NOT raw MACD line.
+        # histogram > 0 = MACD above signal = bullish → LONG
+        # histogram < 0 = MACD below signal = bearish → SHORT
+        xo_4h  = _macd_crossover(token, 60*4)
+        xo_1h  = _macd_crossover(token, 60*1)
+        xo_15m = _macd_crossover(token, 15)
 
-        # Count bullish TFs (macd_line > 0 = price above signal = bullish)
-        if macd_4h is not None and macd_1h is not None and macd_15m is not None:
-            bullish_tfs = sum(1 for v in [macd_4h, macd_1h, macd_15m] if v > 0)
-            total_tfs   = 3
-            direction   = 'LONG' if bullish_tfs >= 2 else 'SHORT'
-            strength    = bullish_tfs  # 3=strong, 2=normal, 1=weak
-            timeframe_str = f'{min(bullish_tfs,3)}tf+'
+        # Collect valid (histogram, macd, signal) tuples per TF
+        valid = {}
+        for tf, xo in [('4h', xo_4h), ('1h', xo_1h), ('15m', xo_15m)]:
+            if xo is not None:
+                valid[tf] = xo
+
+        if len(valid) >= 2:
+            # At least 2 TFs have MACD data → use crossover agreement across TFs
+            bullish_tfs = sum(1 for tf, (h, m, s) in valid.items() if h > 0)
+            total_tfs   = len(valid)
+            direction   = 'LONG' if bullish_tfs >= total_tfs / 2 else 'SHORT'
+            strength    = bullish_tfs  # how many TFs agree
+            timeframe_str = f'{min(bullish_tfs, total_tfs)}tf+'
+        elif len(valid) == 1:
+            # Single TF → use histogram direction
+            tf, (h, m, s) = next(iter(valid.items()))
+            direction = 'LONG' if h > 0 else 'SHORT'
+            strength  = 1
+            timeframe_str = tf
         else:
-            # Fallback: use macd_line sign (more reliable than histogram) if not all TFs available
-            if macd_val is not None:
-                direction = 'LONG' if macd_val > 0 else 'SHORT'
-                strength  = 1
-                timeframe_str = '1h'
-            elif macd_hist is not None:
-                direction = 'LONG' if macd_hist > 0 else 'SHORT'
-                strength  = 1
-                timeframe_str = '1h'
-            else:
-                continue  # no MACD data at all
+            continue  # no MACD data at all
 
         # Blacklist + z-score filters
         if direction == 'LONG':
