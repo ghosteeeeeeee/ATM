@@ -872,8 +872,8 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
                     "size": sz,
                     "entry_price": fill_price,       # actual HL fill price for PnL
                     "hl_entry_price": fill_price,     # alias
-                    "mid_price": mid_price,
-                    "slippage_pct": abs(fill_price - mid_price) / mid_price if mid_price else 0,
+                    "mid_price": live_price,
+                    "slippage_pct": abs(fill_price - live_price) / live_price if live_price else 0,
                     "side": "BUY" if is_buy else "SELL",
                     "usdt": size_usdt}
         else:

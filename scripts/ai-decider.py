@@ -310,7 +310,7 @@ def get_cached_ab_variant(coin, direction, test_name):
 
 def clear_ab_cache(coin = None, direction=None):
     """Clear A/B cache - optionally for specific token"""
-    if token:
+    if coin:
         key = f"{coin}:{direction or 'long'}"
         _ab_variant_cache.pop(key, None)
     else:

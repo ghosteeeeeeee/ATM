@@ -7,6 +7,7 @@ import sys, subprocess, requests, json, os
 sys.path.insert(0, '/root/.openclaw/workspace/scripts')
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import add_signal, get_confluence_signals, get_pending_signals as schema_get_pending
+from hype_cache import get_meta
 from tokens import SOLANA_ONLY_TOKENS, HYPERLIQUID_TOKENS, HYPERLIQUID_EXCLUDE, PREFER_HYPERLIQUID_TOKENS, is_solana_only, is_hyperliquid, get_token_chain, can_short
 from _secrets import BRAIN_DB_DICT
 import psycopg2
@@ -27,9 +28,9 @@ def get_hyperliquid_tokens():
     if _HYPERLIQUID_TOKENS_CACHE is not None and (now - _HYPERLIQUID_TOKENS_EXPIRY) < 300:
         return _HYPERLIQUID_TOKENS_CACHE
     try:
-        r = requests.post('https://api.hyperliquid.xyz/info', json={'type':'meta'}, timeout=30)
-        _HYPERLIQUID_TOKENS_CACHE = {x['name'] for x in r.json().get('universe', [])}
-        _HYPERLIQUID_TOKENS_EXPIRY = now
+        meta = get_meta()
+        _HYPERLIQUID_TOKENS_CACHE = {x['name'] for x in meta.get('universe', [])}
+        _HYPERLIQUID_TOKENS_EXPIRY = time.time()
         return _HYPERLIQUID_TOKENS_CACHE
     except Exception as e:
         if _HYPERLIQUID_TOKENS_CACHE is None or len(_HYPERLIQUID_TOKENS_CACHE) < 100:
@@ -176,8 +177,8 @@ def get_max_leverage(token, is_sol=False):
     if HYPERLIQUID_MAX_LEVERAGE_EXPIRY and (now - HYPERLIQUID_MAX_LEVERAGE_EXPIRY) < 300:
         return HYPERLIQUID_MAX_LEVERAGE.get(token, 10)
     try:
-        r = requests.post('https://api.hyperliquid.xyz/info', json={"type":"meta"}, timeout=30)
-        HYPERLIQUID_MAX_LEVERAGE = {u["name"]: u.get("maxLeverage", 10) for u in r.json().get("universe", [])}
+        meta = get_meta()
+        HYPERLIQUID_MAX_LEVERAGE = {u["name"]: u.get("maxLeverage", 10) for u in meta.get("universe", [])}
         HYPERLIQUID_MAX_LEVERAGE_EXPIRY = now
     except:
         pass
