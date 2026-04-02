@@ -4,6 +4,7 @@
 STATIC DB  (/root/.hermes/data/signals_hermes.db)   — backfill data, git-tracked
 RUNTIME DB (/root/.hermes/data/signals_hermes_runtime.db) — signals, decisions, local state
 """
+import sys
 import sqlite3, time, json, os
 from datetime import datetime, timedelta
 import psycopg2
