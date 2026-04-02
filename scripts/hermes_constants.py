@@ -30,7 +30,6 @@ SHORT_BLACKLIST = {
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
     # 2026-04-02: persistent losing SHORT directions (loss cooldown streak)
     'MINA',   # SHORT: streak=2, 4h cooldown, persistent losses
-    'ZEC',    # SHORT: persistent loss cooldown
     # 2026-04-02: manual additions (no trade history, blocking by token type)
     'BNB',    # major token, inverse-beta behavior, not tradeable on HL
     # 2026-04-02: phantom positions — guardian_missing loop (all +0.00%)
