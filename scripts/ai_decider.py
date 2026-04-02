@@ -743,10 +743,10 @@ def get_open():
         log_error(f'get_open: {e}')
         return 0
 
-def is_token_open(coin):
+def is_token_open(token):
     """Check if token already has open position - with input sanitization"""
     # Validate token - only allow alphanumeric
-    if not coin or not coin.replace('_','').isalnum():
+    if not token or not token.replace('_','').isalnum():
         return False
     try:
         conn = psycopg2.connect(BRAIN_DB)
@@ -772,16 +772,15 @@ def get_pending_signals():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # FIX (2026-04-02): Changed from 15 to 30 min. Previously signals were
-        # being expired before they could accumulate meaningful review_count or survive
-        # the compaction scoring. 30min gives ~15 ai-decider cycles for a signal
-        # to be re-scored before expiry. Note: this is the compaction window; the
-        # signal_schema.expire_pending_signals() TTL (60min) is for batch expiry.
+        # FIX (2026-04-02): Changed from 30 to 720 min (12 hours).
+        # The 30-minute window was too short — signals were expiring before the
+        # hot-set could review them. With 12h TTL, signals have ample time to
+        # accumulate review_count through multiple ai-decider passes.
         c.execute("""
             UPDATE signals
             SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
             WHERE decision = 'PENDING'
-              AND created_at < datetime('now', '-30 minutes')
+              AND created_at < datetime('now', '-720 minutes')
         """)
         expired = c.rowcount
         conn.commit()

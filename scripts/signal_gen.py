@@ -136,7 +136,10 @@ CONFLUENCE_AUTO_APPROVE = 75  # confluence signal ≥ this → auto-approve (no 
 # Individual signal thresholds for confluence-ready signal table population
 # These are LOWER than ENTRY_THRESHOLD so confluence can combine weak-but-aligned signals
 CONFLUENCE_RSI_LOW   = 35   # RSI < this → LONG (oversold = potential reversal LONG)
-CONFLUENCE_RSI_HIGH  = 65   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
+CONFLUENCE_RSI_HIGH  = 70   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
+                             # FIX: Was 65 — changed to 70 to restore symmetric RSI 30/70 split.
+                             # RSI 35-65 was a dead zone where both LONG and SHORT could fire,
+                             # causing the asymmetric bias. Now: RSI<35=LONG, RSI>70=SHORT.
 CONFLUENCE_MACD_HIST_THRESH = 0.000005  # MACD histogram magnitude to add individual signal
 
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
@@ -1446,9 +1449,12 @@ def _run_mtf_macd_signals():
 
         # ── Velocity signal (rising/falling z-score) ──────────────────────
         # Fires when z-score momentum is strong and aligned with direction
+        # FIX: Positive velocity = z-score rising = price reverting UP = GOOD for LONG, BAD for SHORT
+        #       Negative velocity = z-score falling = price reverting DOWN = GOOD for SHORT, BAD for LONG
+        # Bug was: vel_signal_dir = 'SHORT' if velocity > 0 (inverted — all velocity was generating LONG)
         vel_signal_dir = None
         if abs(velocity) >= 0.03:  # meaningful momentum
-            vel_signal_dir = 'SHORT' if velocity > 0 else 'LONG'
+            vel_signal_dir = 'LONG' if velocity > 0 else 'SHORT'
             if vel_signal_dir == direction:  # aligned
                 vel_conf = min(65, 35 + abs(velocity) * 500)
                 add_signal(token, vel_signal_dir, 'velocity', 'vel-hermes',

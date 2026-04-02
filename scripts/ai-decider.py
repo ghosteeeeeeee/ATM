@@ -746,7 +746,7 @@ def get_open():
 def is_token_open(token):
     """Check if token already has open position - with input sanitization"""
     # Validate token - only allow alphanumeric
-    if not coin or not coin.replace('_','').isalnum():
+    if not token or not token.replace('_','').isalnum():
         return False
     try:
         conn = psycopg2.connect(BRAIN_DB)
@@ -772,16 +772,15 @@ def get_pending_signals():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # FIX (2026-04-02): Changed from 15 to 30 min. Previously signals were
-        # being expired before they could accumulate meaningful review_count or survive
-        # the compaction scoring. 30min gives ~15 ai-decider cycles for a signal
-        # to be re-scored before expiry. Note: this is the compaction window; the
-        # signal_schema.expire_pending_signals() TTL (60min) is for batch expiry.
+        # FIX (2026-04-02): Changed from 30 to 720 min (12 hours).
+        # The 30-minute window was too short — signals were expiring before the
+        # hot-set could review them. With 12h TTL, signals have ample time to
+        # accumulate review_count through multiple ai-decider passes.
         c.execute("""
             UPDATE signals
             SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
             WHERE decision = 'PENDING'
-              AND created_at < datetime('now', '-30 minutes')
+              AND created_at < datetime('now', '-720 minutes')
         """)
         expired = c.rowcount
         conn.commit()
@@ -943,12 +942,22 @@ def get_pending_signals():
                       f'survived_r{s["compact_rounds"]+1}_conf{s["conf"]:.0f}'))
 
             # Only compact (expire bottom signals) when we have >20 candidates
+            # FIX (2026-04-02): Signals with confidence >= 85% are EXEMPT from compaction.
+            # These are strong signals that have survived multiple AI review passes
+            # and deserve a chance to reach APPROVED/execution. Compacting them
+            # at 286 signals (avg 94% conf) was destroying good opportunities.
+            EXEMPT_CONFIDENCE = 85
             if not keep_all:
-                expire_ids = [s['sid'] for s in scored[20:]]
+                # Separate exempt signals from compactable ones
+                exempt_sids = {s['sid'] for s in scored if s['conf'] >= EXEMPT_CONFIDENCE}
+                compactable = [s for s in scored if s['sid'] not in exempt_sids]
+                # Keep top 20 compactable signals, compact the rest
+                keep_sids = {s['sid'] for s in compactable[:20]} | exempt_sids
+                expire_ids = [s['sid'] for s in compactable[20:]]
                 compacted_count = len(expire_ids)
                 if expire_ids:
                     placeholders = ','.join(['?' for _ in expire_ids])
-                    for s in scored[20:]:
+                    for s in compactable[20:]:
                         c.execute("""
                             INSERT INTO signal_history
                                 (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
@@ -961,6 +970,8 @@ def get_pending_signals():
                         SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
                         WHERE id IN ({placeholders})
                     """, expire_ids)
+                    if exempt_sids:
+                        print(f"  [compaction] EXEMPT: {len(exempt_sids)} high-confidence signals protected from compaction (conf>={EXEMPT_CONFIDENCE}%)")
 
             conn.commit()
 
