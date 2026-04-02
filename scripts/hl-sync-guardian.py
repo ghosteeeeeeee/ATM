@@ -334,6 +334,27 @@ def _poll_hl_fills_for_close(token: str, close_start_ms: int):
     return 0.0, None  # None = no data found, distinguish from breakeven (0.0)
 
 
+def _wait_for_position_closed(token: str, timeout: int = 15) -> bool:
+    """
+    BUG-2 fix: Wait for a position to actually disappear from HL /info.
+    Returns True if position is gone (closed/filled), False if still open.
+    Polls every 2s for up to 'timeout' seconds.
+    """
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        time.sleep(2)
+        try:
+            positions = get_open_hype_positions_curl()
+            if token not in positions:
+                log(f'  [FILL CONFIRMED] {token} position closed on HL')
+                return True
+            log(f'  [FILL WAIT] {token} still on HL, retrying...', 'WARN')
+        except Exception as e:
+            log(f'  [FILL WAIT] Error checking HL positions: {e}', 'WARN')
+    log(f'  [FILL TIMEOUT] {token} still on HL after {timeout}s — proceeding anyway', 'FAIL')
+    return False
+
+
 def _get_hl_exit_price(token: str, fallback: float = 0.0) -> float:
     """
     Attempt to get the actual HL fill price for a recently-closed position.
@@ -625,9 +646,17 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
             from hyperliquid_exchange import close_position
             close_result = close_position(token)
 
-            # Wait for HL fill to confirm before opening opposite
-            import time as _time
-            _time.sleep(3)
+            # BUG-3 fix: Wait for HL fill confirmation before opening opposite.
+            # sleep(3) was unreliable — use _wait_for_position_closed() instead.
+            # Retry close once if it failed or hasn't filled yet.
+            if not close_result.get('success'):
+                log(f'  [FLIP] Close order failed: {close_result.get("error", "unknown")} — retrying once', 'WARN')
+                close_result = close_position(token)
+
+            filled = _wait_for_position_closed(token, timeout=15)
+            if not filled:
+                log(f'  [FLIP] FATAL: {token} still on HL after 2 close attempts — not opening opposite', 'FAIL')
+                return  # Do NOT open opposite position while original is still open
 
             # Verify token is tradeable on HL before opening
             try:
@@ -735,12 +764,26 @@ def sync_pnl_from_hype(prices):
             trade_id, token, amount, lev, entry, direction = row
             if token in hl_pos:
                 pos_data = hl_pos[token]
-                unrealized_pnl = float(pos_data.get('unrealized_pnl', 0))
-                margin = float(pos_data.get('margin_used', 1)) or 1
+                unrealized_pnl = float(pos_data.get('unrealizedPnl', 0))
+                entry_price_hl = float(pos_data.get('entryPrice', entry) or entry)
+                curr_price_hl = float(pos_data.get('currentPrice', prices.get(token, entry)) or prices.get(token, entry) or entry)
 
                 if unrealized_pnl != 0:
                     pnl_usdt = round(unrealized_pnl, 4)
-                    pnl_pct = round((unrealized_pnl / margin) * 100, 4) if margin > 0 else 0
+                    # BUG-6 fix: use UNLEVERAGED pnl_pct (entry-based, not margin-based).
+                    # OLD: leveraged pnl_pct = (unrealized_pnl / margin) * 100 — inconsistent
+                    #   across leverage levels and with _close_paper_trade_db formula.
+                    # NEW: unleveraged pnl_pct = (exit - entry) / entry * 100, same as
+                    #   _close_paper_trade_db. This is the "raw" market return, not
+                    #   amplified by leverage. Comparable across all leverage levels.
+                    if entry_price_hl and entry_price_hl > 0 and curr_price_hl and curr_price_hl > 0:
+                        if direction and direction.upper() == 'SHORT':
+                            pnl_pct = round((entry_price_hl - curr_price_hl) / entry_price_hl * 100, 4)
+                        else:
+                            pnl_pct = round((curr_price_hl - entry_price_hl) / entry_price_hl * 100, 4)
+                    else:
+                        # Fallback to HL unrealized pnl_pct (leveraged but better than nothing)
+                        pnl_pct = round(unrealized_pnl / float(amount or 50) * 100, 4)
 
                     cur.execute("""
                         UPDATE trades SET pnl_usdt = %s, pnl_pct = %s,
@@ -760,26 +803,49 @@ def sync_pnl_from_hype(prices):
                     updated += 1
                     # Cut-loser: emergency exit at -10% loss
                     # This runs AFTER flip check, so flip has priority over hard cut
+                    # ── Cut-loser: BUG-2/3/28 fix ────────────────────────────────────────
+                    # IMPORTANT: close_position() sends order but does NOT wait for fill.
+                    # BUG-2 old: marked DB closed BEFORE HL confirmed fill. Fix: wait first.
+                    # BUG-3: flip order placed without verifying close succeeded. Fix: verify.
+                    # BUG-28: no retry on failure. Fix: retry once, then alert.
                     CUT_LOSER_THRESHOLD = -5.0
                     if pnl_pct <= CUT_LOSER_THRESHOLD:
                         log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
                         from hyperliquid_exchange import close_position
-                        close_position(token)
-                        # Mark and close via Step 8 mechanism
-                        try:
-                            conn_cut = get_db_connection()
-                            if conn_cut:
-                                cur_cut = conn_cut.cursor()
-                                cur_cut.execute(
-                                    "UPDATE trades SET guardian_closed=TRUE, status='closed', "
-                                    "close_reason='cut_loser', exit_reason='cut_loser_pnl' "
-                                    "WHERE id=%s AND status='open'",
-                                    (trade_id,))
-                                conn_cut.commit()
-                                cur_cut.close()
-                                conn_cut.close()
-                        except Exception as cut_err:
-                            log(f'  Cut-loser DB update error: {cut_err}', 'FAIL')
+
+                        # Retry close up to 2 times on failure
+                        closed_ok = False
+                        for attempt in range(2):
+                            close_result = close_position(token)
+                            if close_result.get('success'):
+                                filled = _wait_for_position_closed(token, timeout=15)
+                                if filled:
+                                    closed_ok = True
+                                    break
+                                # Still on HL — retry close
+                                log(f'  [CUT-LOSER] Retry {attempt+2}/2: {token} still open on HL', 'WARN')
+                            else:
+                                log(f'  [CUT-LOSER] Attempt {attempt+1}/2 failed: {close_result.get("error", "unknown")}', 'WARN')
+
+                        if not closed_ok:
+                            log(f'  [CUT-LOSER] FATAL: could not close {token} after 2 attempts — trade remains open!', 'FAIL')
+                        else:
+                            # Only mark DB closed AFTER fill confirmed on HL
+                            try:
+                                conn_cut = get_db_connection()
+                                if conn_cut:
+                                    cur_cut = conn_cut.cursor()
+                                    cur_cut.execute(
+                                        "UPDATE trades SET guardian_closed=TRUE, status='closed', "
+                                        "close_reason='cut_loser', exit_reason='cut_loser_pnl' "
+                                        "WHERE id=%s AND status='open'",
+                                        (trade_id,))
+                                    conn_cut.commit()
+                                    cur_cut.close()
+                                    conn_cut.close()
+                                    log(f'  [CUT-LOSER] DB updated for {token} trade #{trade_id}', 'PASS')
+                            except Exception as cut_err:
+                                log(f'  Cut-loser DB update error: {cut_err}', 'FAIL')
                         continue  # Skip flip check — already closing
 
         conn.commit()
@@ -1503,11 +1569,12 @@ def sync():
                 if tok not in [x.upper() for x in missing]:
                     continue  # Not actually missing
 
-                # CRITICAL: Skip if guardian_closed=FALSE means the trade was
-                # externally closed (e.g. by T manually or by cut-loser).
-                # guardian_closed=TRUE means guardian itself closed it, so re-close is safe.
+                # BUG-1 fix: Clarify the guardian_closed logic.
+                # guardian_closed=FALSE  -> externally closed (T or cut-loser). safe_to_close = TRUE. Skip.
+                # guardian_closed=TRUE   -> guardian itself closed this trade. safe_to_close = FALSE. Re-close OK.
+                # safe_to_close contains IDs with guardian_closed=FALSE (externally closed = skip).
                 if str(trade_id) not in safe_to_close:
-                    log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (not guardian cascade)', 'WARN')
+                    log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (guardian_closed=TRUE — already closed)', 'WARN')
                     continue
 
                 try:

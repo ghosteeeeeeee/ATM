@@ -587,3 +587,174 @@ tokens (0G, XMR) at wrong prices ($10 vs $0.50), closing those at catastrophic l
 
 ---
 
+
+---
+
+## 2026-04-02 — Full Trading System Bug Audit (ai-engineer agent)
+
+30 bugs found across 7 severity levels. Source: ai-engineer subagent, 2026-04-02 ~06:20 UTC.
+
+### CRITICAL (causing financial loss / market risk)
+
+**BUG-1: hl-sync-guardian.py — guardian_closed flag comment is logically inverted**
+Lines 1506-1510. The `safe_to_close` dict is built `WHERE guardian_closed=FALSE` (externally closed = safe to close). The comment says the opposite. Code works but comment is a hazard for future maintainers.
+Fix: rewrite comment to match logic.
+
+**BUG-2: hl-sync-guardian.py — cut-loser marks DB closed BEFORE HL confirms fill**
+Lines 766-783. `close_position(token)` sends order and returns immediately. Then DB is updated to `status='closed'` before the HL fill is confirmed. If HL rejects/fails, trade is open on HL but DB thinks closed. No further protection, real money locked.
+Fix: verify close_result['status'] == 'filled' before updating DB, retry on failure.
+
+**BUG-3: hl-sync-guardian.py — flip opens opposite without verifying close succeeded**
+Lines 624-644. `close_position(token)` may fail silently (margin issues, HL error). `sleep(3)` is arbitrary. `place_order()` opens opposite without checking `close_result`. Double position at 10-20X leverage = blowup risk.
+Fix: check close_result['success'] before placing flip order.
+
+**BUG-4: hl-sync-guardian.py — dedup set resets on process restart**
+Lines 53, 1101. `_CLOSED_THIS_CYCLE` is process-local Python set. Guardian crash/restart or subprocess call reinitializes it to `{}`. Cascade fix partially mitigates, but dedup mechanism is fragile.
+Fix: persist closed set to file or use DB-based dedup.
+
+**BUG-5: hyperliquid_exchange.py — market orders without explicit slippage in cut-loser path**
+Cut-loser calls `close_position()` without explicit slippage parameter. SDK defaults apply. In volatile markets, 1% slippage may not be enough.
+Fix: pass explicit slippage=0.02 (2%) for cut-loser and flip closes.
+
+**BUG-6: hl-sync-guardian.py — pnl_pct formula inconsistent (leveraged vs unleveraged)**
+Lines 738-743. sync_pnl_from_hype: `pnl_pct = (unrealized_pnl / margin) * 100` = leveraged %. _close_paper_trade_db: `pnl_pct = (exit - entry) / entry * 100` = raw unleveraged %. Same trade shows different pnl_pct depending on close path. Cut-loser threshold -5% applied to leveraged % — at 10X, 0.5% raw loss = 5% leveraged = cut-loser fires. At 3X, 1.7% raw = 5% leveraged = same.
+Fix: standardize to unleveraged pnl_pct everywhere, adjust cut-loser threshold accordingly.
+
+### HIGH (logic errors / data corruption risk)
+
+**BUG-7: decider-run.py — duplicate _record_ab_trade_opened function definition**
+Lines 233-253 and 257-277. Two identical definitions. Python uses second (lines 257-277). First is dead code. Future fixes applied to first definition silently have no effect.
+Fix: remove first definition.
+
+**BUG-8: hl-sync-guardian.py — predicted_return written as regime string not number**
+Line 882. `predicted_return = intel.get('regime_4h')` writes string like 'BULL' or 'BEAR' into a field presumably meant for numeric prediction. Downstream A/B analysis expecting float will crash or return nonsense.
+Fix: write actual predicted return value, not regime string.
+
+**BUG-9: ab_utils.py — A/B variant cache per-token defeats Thompson sampling**
+Lines 145-150. `get_cached_ab_variant` caches per `token:direction`. Thompson sampling operates on aggregate across ALL tokens. Caching per-token biases the sampler — if variant A loses on BTC then ETH is requested, cache may serve A despite aggregate suggesting B is better.
+Fix: remove token from cache key, or cache globally per test_name.
+
+**BUG-10: ai_decider.py vs ai-decider.py — pipeline runs older version missing EXPIRED signal fix**
+run_pipeline.py uses `ai_decider` (underscore version, 1690 lines). `ai-decider.py` (dash version, 1532 lines) has fix for EXPIRED signals with `review_count >= 1` that the underscore version lacks. Pipeline silently runs the broken version.
+Fix: have run_pipeline.py import the dash version, or merge fixes into underscore version.
+
+**BUG-11: ai-decider.py — _hot_set_failure_count never resets**
+Line 182. `_hot_set_failure_count` increments on SQLite failures but is never reset. After 10 failures, hot set permanently disabled with repeated CRITICAL messages. No circuit breaker recovery.
+Fix: reset counter after N successful hot set loads.
+
+**BUG-12: ai-decider.py — signal source not validated against whitelist**
+Source field routes to A/B test params via `get_ab_params()`. No validation that source is a known/good source. Malformed signal could route to unintended A/B variant.
+Fix: add source whitelist validation.
+
+**BUG-13: hl-sync-guardian.py — regime string written where numeric expected**
+Line 653. `entry_regime_4h = 'unknown'` written as string when `get_token_intel` fails. Later read by `record_exit_features` for PnL correlation analysis. String vs numeric handling inconsistent.
+Fix: use numeric encoding (0=NEUTRAL, 1=BULL, -1=BEAR) or NULL.
+
+### MEDIUM (race conditions / state inconsistency)
+
+**BUG-14: hl-sync-guardian.py — orphan recovery race window**
+Lines 505-546. Creates paper trade in Postgres, marks copied, sends HL close order, sleeps 6s. Concurrent run_pipeline call between paper creation and HL close could mirror the orphan, creating double-open.
+Fix: use `_CLOSED_HL_TOKENS` set or DB-level locking.
+
+**BUG-15: hl-sync-guardian.py — _clear_reconciled_token called outside try/except**
+Line 1288. Called after `conn.close()` in exception handler. If UPDATE succeeds but outer try rolls back, reconciled state cleared for potentially unclosed trade.
+Fix: move _clear_reconciled_token inside try block after commit.
+
+**BUG-16: hl-sync-guardian.py — 120s fill lookback too short**
+Lines 1134, 1208. `close_start_ms = int(time.time() * 1000) - 120_000`. In volatile markets or HL latency, fills may take >2min. Code silently falls back to price-based PnL which may be materially wrong.
+Fix: increase to 300s (5min) or use HL fill webhooks.
+
+**BUG-17: hl-sync-guardian.py — duplicate queries on paper trades with race**
+Lines 968, 990. Two separate DB connections, 1s apart. Trade could be closed by another process between queries. Step 6 orphan handling would try to mirror an already-closed trade.
+Fix: single query, single connection, filter in Python after.
+
+**BUG-18: hl-sync-guardian.py — copied_trades.json not locked**
+Line 158. JSON write not atomic. Concurrent guardian instances corrupt file.
+Fix: use fcntl.flock or temp file + atomic rename.
+
+**BUG-19: hl-sync-guardian.py — reconciled_state.json not locked**
+Line 87. Same issue as BUG-18.
+Fix: use fcntl.flock or temp file + atomic rename.
+
+**BUG-20: DB schema — missing indexes on guardian fields**
+No indexes on `guardian_closed`, `is_guardian_close`, `guardian_reason`. Full table scans on Step 8 and cut-loser queries with thousands of historical trades.
+Fix: add partial indexes for `status='open' AND guardian_closed=FALSE`.
+
+**BUG-21: hl-sync-guardian.py — DRY=False default, no safety interlock**
+Line 62. Default is LIVE. systemd service runs without --dry. `python3 hl-sync-guardian.py` without args = live mode. No env var or flag file safety check.
+Fix: require explicit --live flag or check HERMES_LIVE=1 env var.
+
+**BUG-22: hl-sync-guardian.py — token case mismatch silently returns no fills**
+Line 1137. `f['coin'].upper() == token.upper()` — if HL canonical name differs from DB name, fill filter silently returns empty. PnL silently calculated wrong.
+Fix: log warning when no fills found despite close order sent.
+
+**BUG-23: decider-run.py — trailing_phase2_dist=None handling unclear**
+Line 306. `get_ab_params_for_trade` returns `trailing_phase2_dist=None` when no phase 2. Unclear if callers handle None gracefully.
+Fix: audit all callers of get_ab_params_for_trade.
+
+**BUG-24: hl-sync-guardian.py — signal_outcomes SQLite writes silently fail**
+Lines 1291-1323. `_record_trade_outcome` catches its own exceptions silently. SQLite write failure means Thompson sampler gets incomplete data — degraded A/B decisions.
+Fix: log failure to guardian log, increment error counter.
+
+**BUG-25: hl-sync-guardian.py — no sanity check on HL exit price**
+Lines 1209-1213. If HL fill price is clearly wrong (e.g., 10x entry due to bad tick data), code proceeds and records wild PnL.
+Fix: add sanity check: if abs(exit - entry) / entry > 0.5, log warning and use fallback price.
+
+**BUG-26: decider-run.py / live-decider.py — potential double-execution**
+decider-run.py marks `executed=1` AFTER `brain.py trade add` returns. Race window between approval and execution mark. If both scripts run same minute, same approved signal could be executed twice.
+Fix: set `executed=1` BEFORE calling brain.py, rollback on failure.
+
+**BUG-27: signal_gen.py — legacy script disable not enforced**
+Crontab disables legacy RSI/MACD scripts but signal_gen.py calls native equivalents. No enforcement mechanism. If legacy scripts re-enabled, duplicate signals generated.
+Fix: add lock file check in legacy scripts.
+
+**BUG-28: hl-sync-guardian.py — cut-loser continue without retry on failure**
+Line 783. If `close_position` fails (order rejected), `continue` skips flip check. Trade stuck at large loss with no protection. No retry.
+Fix: on close failure, retry once after 2s, then alert T via log.
+
+**BUG-29: hl-sync-guardian.py — pnl_usdt and hype_pnl_usdt set identically**
+Line 750. Both get same unrealized_pnl value. Distinguishes nowhere in DB. Downstream realized vs unrealized analysis confused.
+Fix: separate columns — hype_pnl_usdt should be realized PnL from HL fills.
+
+**BUG-30: ab_optimizer.py, ab_learner.py — not analyzed**
+These scripts modify `ab_tests.json` and `ab_results` table. Not reviewed in detail. Bugs here could corrupt all A/B test configuration.
+
+---
+
+### Bug Fix Status
+
+| # | Severity | Status | Fix Applied |
+|---|----------|--------|-------------|
+| BUG-1 | CRITICAL | PENDING | Comment fix needed |
+| BUG-2 | CRITICAL | IN PROGRESS | Verify HL close before marking DB closed |
+| BUG-3 | CRITICAL | IN PROGRESS | Check close_result before flip order |
+| BUG-4 | HIGH | PENDING | Persist dedup set to file |
+| BUG-5 | HIGH | PENDING | Explicit slippage 2% on cut-loser/flip |
+| BUG-6 | HIGH | PENDING | Standardize pnl_pct to unleveraged |
+| BUG-7 | HIGH | PENDING | Remove duplicate function |
+| BUG-8 | MEDIUM | PENDING | Write numeric predicted_return |
+| BUG-9 | HIGH | PENDING | Remove token from cache key |
+| BUG-10 | HIGH | PENDING | Merge EXPIRED fix into ai_decider.py |
+| BUG-11 | MEDIUM | PENDING | Reset hot_set failure counter |
+| BUG-12 | MEDIUM | PENDING | Add source whitelist |
+| BUG-13 | MEDIUM | PENDING | Numeric regime encoding |
+| BUG-14 | MEDIUM | PENDING | DB locking for orphan recovery |
+| BUG-15 | MEDIUM | PENDING | Move _clear_reconciled_token inside try |
+| BUG-16 | MEDIUM | PENDING | Increase fill lookback to 300s |
+| BUG-17 | MEDIUM | PENDING | Single query single connection |
+| BUG-18 | LOW | PENDING | fcntl.flock on copied_trades.json |
+| BUG-19 | LOW | PENDING | fcntl.flock on reconciled_state.json |
+| BUG-20 | LOW | PENDING | Add partial indexes |
+| BUG-21 | LOW | PENDING | Require --live flag |
+| BUG-22 | LOW | PENDING | Log warning on no fills |
+| BUG-23 | LOW | PENDING | Audit None handling callers |
+| BUG-24 | LOW | PENDING | Log signal_outcomes failure |
+| BUG-25 | LOW | PENDING | Sanity check on exit price |
+| BUG-26 | MEDIUM | PENDING | exec=1 before brain.py call |
+| BUG-27 | LOW | PENDING | Lock file in legacy scripts |
+| BUG-28 | MEDIUM | PENDING | Retry on cut-loser failure |
+| BUG-29 | MEDIUM | PENDING | Separate realized vs unrealized columns |
+| BUG-30 | LOW | PENDING | Not reviewed |
+
+---
+

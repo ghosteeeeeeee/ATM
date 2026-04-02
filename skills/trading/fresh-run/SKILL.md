@@ -28,7 +28,7 @@ from datetime import datetime
 ts = datetime.now().strftime('%Y%m%d_%H%M')
 
 # ── PostgreSQL (brain) ──────────────────────────────────────────────
-BRAIN = {'host': '/var/run/postgresql', 'dbname': 'brain', 'user': 'postgres', 'password': 'postgres'}
+BRAIN = {'host': '/var/run/postgresql', 'dbname': 'brain', 'user': 'postgres', 'password': 'Brain123'}
 conn = psycopg2.connect(**BRAIN)
 cur = conn.cursor()
 
