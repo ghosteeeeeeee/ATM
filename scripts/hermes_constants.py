@@ -32,6 +32,9 @@ SHORT_BLACKLIST = {
     'MINA',   # SHORT: streak=2, 4h cooldown, persistent losses
     # 2026-04-02: manual additions (no trade history, blocking by token type)
     'BNB',    # major token, inverse-beta behavior, not tradeable on HL
+    # 2026-04-02: phantom positions — guardian_missing loop (all +0.00%)
+    'RLB', 'RNDR', 'SHIA', 'AI16Z', 'BADGER', 'BLZ', 'FXS',
+    'HPOS', 'MATIC', 'UNIBOT', 'MKR', 'MYRO',
 }
 LONG_BLACKLIST = {
     'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',

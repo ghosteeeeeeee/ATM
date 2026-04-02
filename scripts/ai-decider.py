@@ -113,17 +113,19 @@ def _load_hot_rounds():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # FIX (2026-04-02): Also include tokens with rc=1 EXPIRED signals.
-        # When positions are full, strong signals get SKIPPED→EXPIRED immediately.
-        # Those tokens never enter the hot set because EXPIRED is not in the decision list.
-        # Including EXPIRED means a token that was reviewed once (even if skipped due to
-        # full positions) gets auto-approved on the next signal without AI re-review.
-        # The review_count=1 proves: "AI already looked at this token, it's valid."
+        # FIX (2026-04-02): Also include tokens with rc>=1 EXPIRED signals.
+        # When positions are full, strong signals get SKIPPED→EXPIRED.
+        # rc=1 EXPIRED = reviewed once by AI, then expired (never reached rc=2).
+        # IMPORTANT: We only include EXPIRED with rc>=1, not rc=0 — rc=0 EXPIRED
+        # signals were NEVER reviewed by AI (just aged out of signal_gen), and
+        # including them floods the hot set with tokens that never passed AI review.
+        # review_count>=1 proves: "AI already looked at this token."
         c.execute("""
             SELECT token, direction, MAX(review_count) as rounds,
                    GROUP_CONCAT(DISTINCT signal_type) as types, source
             FROM signals
-            WHERE decision IN ('PENDING', 'APPROVED', 'WAIT', 'EXPIRED')
+            WHERE (decision IN ('PENDING', 'APPROVED', 'WAIT')
+                   OR (decision = 'EXPIRED' AND review_count >= 1))
               AND review_count >= 1
               AND created_at > datetime('now', '-3 hours')
               AND token || direction NOT IN (
