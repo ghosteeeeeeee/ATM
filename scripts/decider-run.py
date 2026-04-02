@@ -59,7 +59,7 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
             SELECT COUNT(*) as total,
                    SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins
             FROM trades
-            WHERE token = %s AND direction = %s
+            WHERE token=? AND direction = %s
               AND status = 'closed'
               AND close_time >= NOW() - INTERVAL '7 days'
         """, (token.upper(), direction.upper()))
@@ -718,7 +718,6 @@ def _run_hot_set():
 def _record_hotset_failure(token: str, direction: str, failures: dict):
     """Record a failed trade for back-to-back cooldown tracking."""
     import time
-    token = token.upper()
     now = time.time()
     if token not in failures:
         failures[token] = {'LONG': {'count': 0, 'last': 0}, 'SHORT': {'count': 0, 'last': 0}}
