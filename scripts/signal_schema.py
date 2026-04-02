@@ -377,15 +377,14 @@ def expire_pending_signals(minutes=60):
 
     # Expire stale APPROVED signals (not executed, too old)
     # These block hot-set signals from auto-approving for the same token.
+    # FIX (2026-04-02): Was updated_at — touched on every read, never expired.
+    # Now uses created_at so APPROVED signals clear 30 min after approval.
     c.execute("""
         UPDATE signals
         SET decision = 'EXPIRED', executed = 1
         WHERE decision = 'APPROVED'
           AND executed = 0
           AND created_at < datetime('now', '-30 minutes')
-          # FIX (2026-04-02): Was updated_at — but updated_at gets touched on every
-          # read, so APPROVED signals never actually expired. Using created_at ensures
-          # signals are cleared 30 min after they were first approved.
     """)
     approved_expired = c.rowcount
 
