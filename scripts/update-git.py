@@ -37,8 +37,8 @@ def _get_token():
 
 GH = _get_token()
 
-def sh(*cmd, cwd=HERMES, check=True):
-    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+def sh(*cmd, cwd=None, check=True):
+    r = subprocess.run(cmd, cwd=str(cwd or HERMES), capture_output=True, text=True)
     if r.returncode and check:
         sys.exit(f"FAIL: {chr(10).join(str(c) for c in cmd)}{chr(10)}{r.stderr}")
     return r.stdout.strip()
