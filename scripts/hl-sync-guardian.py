@@ -285,7 +285,7 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
             SELECT %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
                    0, 0, %s, 0.03, 0.01, 0.01
             WHERE NOT EXISTS (
-                SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
+                SELECT 1 FROM trades WHERE token=?%s AND server='Hermes' AND status='open'
             )
             RETURNING id
         """, (token, direction, amount_usdt, entry_price,
@@ -487,7 +487,7 @@ def reconcile_hype_to_paper(hl_pos, prices):
             cur.execute("""
                 SELECT id, entry_price, direction, stop_loss, target, leverage, amount_usdt
                 FROM trades
-                WHERE token=%s AND status = 'open' AND exchange = 'Hyperliquid'
+                WHERE token=?%s AND status = 'open' AND exchange = 'Hyperliquid'
                 LIMIT 1
             """, (coin,))
             row = cur.fetchone()
@@ -967,7 +967,7 @@ def get_token_intel(token: str) -> dict:
         cur.execute("""
             SELECT rsi_14, macd_hist, atr_14, bb_position, slope_4h, regime_4h, trend
             FROM momentum_cache
-            WHERE token=%s
+            WHERE token=?%s
             ORDER BY updated_at DESC LIMIT 1
         """, (token,))
         row = cur.fetchone()
@@ -1031,7 +1031,7 @@ def record_entry_features(trade_id: int, token: str):
             intel.get('slope_4h'),
             intel.get('regime_4h'),
             intel.get('trend'),
-            intel.get('regime_4h'),
+            0.0,  # predicted_return: was writing regime string; numeric value TBD
             trade_id
         ))
         conn.commit()
@@ -1466,7 +1466,7 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         # called twice for the same trade close in the same sync cycle)
         cur_s.execute("""
             SELECT id FROM signal_outcomes
-            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+            WHERE token=?? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
             AND created_at > datetime('now', '-5 minutes')
         """, (token.upper(), direction.upper(), pnl_pct))
         if cur_s.fetchone():
@@ -1505,7 +1505,7 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
             # Look up original signal confidence to compute penalty
             cur_b.execute("""
                 SELECT signal, confidence FROM trades
-                WHERE token=%s AND direction=%s AND server='Hermes'
+                WHERE token=?%s AND direction=%s AND server='Hermes'
                 ORDER BY id DESC LIMIT 1
             """, (token.upper(), direction.upper()))
             row = cur_b.fetchone()
@@ -1612,7 +1612,7 @@ def sync():
                 if conn_orphan:
                     cur_orphan = conn_orphan.cursor()
                     cur_orphan.execute(
-                        "SELECT id FROM trades WHERE token=%s AND status='open' "
+                        "SELECT id FROM trades WHERE token=?%s AND status='open' "
                         "AND exchange='Hyperliquid' LIMIT 1",
                         (coin.upper(),))
                     orphan_row = cur_orphan.fetchone()

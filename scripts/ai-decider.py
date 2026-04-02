@@ -1495,7 +1495,7 @@ for s in pending:
                     counter_detected = 1,
                     deescalation_reason = 'counter-signal-opposite-open',
                     updated_at = ?
-                WHERE token = ?
+                WHERE token=?
                   AND direction = ?
                   AND decision = 'PENDING'
             """, (now_str, tok, sig_dir))
