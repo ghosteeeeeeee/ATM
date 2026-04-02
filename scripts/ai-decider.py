@@ -729,16 +729,36 @@ def get_pending_signals():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # ── 1. Auto-expire: mark signals older than 15 min as EXPIRED ─────────
+        # FIX (2026-04-02): Changed from 15 to 30 min. Previously signals were
+        # being expired before they could accumulate meaningful review_count or survive
+        # the compaction scoring. 30min gives ~15 ai-decider cycles for a signal
+        # to be re-scored before expiry. Note: this is the compaction window; the
+        # signal_schema.expire_pending_signals() TTL (60min) is for batch expiry.
         c.execute("""
             UPDATE signals
             SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
             WHERE decision = 'PENDING'
-              AND executed = 0
-              AND created_at < datetime('now', '-15 minutes')
+              AND created_at < datetime('now', '-30 minutes')
         """)
         expired = c.rowcount
         conn.commit()
+
+        # ── RULE 3: PURGE — expire signals surviving too many compaction rounds ──
+        # If a PENDING signal has survived 20+ compaction rounds, it's stuck.
+        # It keeps accumulating survival_score but never gets acted on (wrong direction,
+        # wrong regime, etc.). Force-expire it so new fresh signals can take its place.
+        PURGE_THRESHOLD = 20  # compaction rounds
+        c.execute("""
+            UPDATE signals
+            SET decision = 'EXPIRED', executed = 1,
+                deescalation_reason = 'purge-surviving-signal',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE decision = 'PENDING'
+              AND compact_rounds >= ?
+        """, (PURGE_THRESHOLD,))
+        purged = c.rowcount
+        if purged > 0:
+            print(f"  [Compaction PURGE] {purged} PENDING signals expired (>={PURGE_THRESHOLD} compaction rounds survived)")
 
         # ── 2. AI-guided compaction: score and keep top 20 ─────────────────────
         # Score = recency_boost + confidence + confluence_bonus
@@ -750,7 +770,7 @@ def get_pending_signals():
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
-              AND created_at > datetime('now', '-15 minutes')
+              AND created_at > datetime('now', '-30 minutes')
         """)
         candidates = c.fetchall()
 
@@ -1299,24 +1319,109 @@ except:
 
 # Load hot set rounds and apply flip detection BEFORE reviewing signals
 _load_hot_rounds()
-print(f"=== AI Decider: {len(pending)} pending | Open: {get_open()}/{MAX_OPEN} | Hot: {len(_hot_rounds)} ===")
 
-# Pre-scan: for any token in hot set, check if a PENDING signal now exists
-# in the OPPOSITE direction — if so, kill the PENDING (not the hot set).
-# Hot set has priority: it survived multiple review cycles, newer signals don't override it.
+# ── DE-ESCALATION PROTOCOL (2026-04-02) ─────────────────────────────────────
+# Hot set signals can get stuck in APPROVED but never executed (positions full,
+# blacklisted, opposite position open). Without de-escalation they stay in the
+# hot set forever, blocking new signals. This protocol forces them out.
+#
+# Rules:
+# 1. DE-ESCALATE: hot set APPROVED signals not executed after 5 cycles → back to PENDING
+# 2. COUNTER-SIGNAL: new PENDING signal opposite to open position → skip with reason
+# 3. PURGE: any PENDING signal surviving 20+ compaction rounds → force-expire
+#
+# De-escalation counter is tracked in hot_cycle_count column (reset on any new signal).
+conn_deesc = sqlite3.connect(SIGNALS_DB)
+cur_deesc = conn_deesc.cursor()
+now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+# RULE 1 — DE-ESCALATE stale hot-set APPROVED signals back to PENDING
+# If a hot-set signal was approved but not executed after 5+ cycles, it gets
+# de-escalated so new signals can enter the hot set pipeline for that token.
+DEESCALATE_THRESHOLD = 5  # cycles without execution before de-escalation
+cur_deesc.execute("""
+    UPDATE signals
+    SET decision = 'PENDING',
+        executed = 0,
+        deescalation_reason = 'deescalated-hot-set',
+        hot_cycle_count = 0,
+        updated_at = ?
+    WHERE decision = 'APPROVED'
+      AND executed = 0
+      AND hot_cycle_count >= ?
+      AND hot_cycle_count > 0
+""", (now_str, DEESCALATE_THRESHOLD))
+deesc_count = cur_deesc.rowcount
+if deesc_count > 0:
+    print(f"   🔻 DEESCALATED {deesc_count} stale hot-set APPROVED → PENDING (>{DEESCALATE_THRESHOLD} cycles)")
+
+# RULE 2 — COUNTER-SIGNAL DETECTION
+# For every PENDING signal, check if there's an open position in the OPPOSITE direction.
+# This catches when the market is moving against an open trade and a counter-signal fires.
+# Counter-signals are skipped, not acted on (position management handles exits).
+# Build a set of open token+direction pairs from brain DB for fast lookup.
+open_positions = {}  # token_upper -> direction_upper
+try:
+    import psycopg2
+    conn_pg = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
+    cur_pg = conn_pg.cursor()
+    cur_pg.execute("SELECT token, direction FROM trades WHERE status = 'open'")
+    for (tok, d) in cur_pg.fetchall():
+        open_positions[tok.upper()] = d.upper()
+    conn_pg.close()
+except Exception as e:
+    log_error(f"counter-signal DB fetch failed: {e}")
+
+counter_killed = 0
+for s in pending:
+    tok = (s.get('token') or '').upper()
+    sig_dir = (s.get('direction') or '').upper()
+    if tok in open_positions:
+        open_dir = open_positions[tok]
+        if sig_dir != open_dir and sig_dir in ('LONG', 'SHORT'):
+            # Counter-signal: opposite direction to open position
+            # Mark it so we can track it, then skip it
+            cur_deesc.execute("""
+                UPDATE signals
+                SET decision = 'SKIPPED',
+                    counter_detected = 1,
+                    deescalation_reason = 'counter-signal-opposite-open',
+                    updated_at = ?
+                WHERE id = ?
+            """, (now_str, s.get('id')))
+            counter_killed += 1
+conn_deesc.commit()
+if counter_killed > 0:
+    print(f"   🚫 COUNTER-SIGNAL: {counter_killed} PENDING signals skipped (opposite open position)")
+
+# RULE 3 — HOT SET ENTRY TRACKING: increment hot_cycle_count for all hot set APPROVED
+# Track how many cycles each hot-set APPROVED signal has gone without executing.
+# Reset counter when a new signal arrives for the same token (conditions changed).
+cur_deesc.execute("""
+    UPDATE signals
+    SET hot_cycle_count = hot_cycle_count + 1,
+        last_hot_at = ?
+    WHERE decision = 'APPROVED'
+      AND executed = 0
+      AND hot_cycle_count >= 0
+""", (now_str,))
+conn_deesc.commit()
+conn_deesc.close()
+
+# HOT SET FLIP KILL (existing logic — keep it, runs after de-escalation above)
 for s in pending:
     tok = (s.get('token') or '').upper()
     sig_dir = (s.get('direction') or '').upper()
     if tok in _hot_rounds:
         hot_dir = _hot_rounds[tok]['direction'].upper()
         if sig_dir != hot_dir and sig_dir in ('LONG', 'SHORT'):
-            # Kill the newer PENDING opposite signal — hot set has priority
             killed = _kill_pending_opposite(tok, hot_dir)
             if killed:
                 print(f"   🔥 FLIP KILL: {tok} {hot_dir} hot set kept — killed {sig_dir} PENDING")
             else:
-                # No PENDING opposite found (already processed this cycle) — keep hot set
                 print(f"   🔥 HOT KEEP:  {tok} {hot_dir} hot set survived PENDING {sig_dir}")
+
+print(f"=== AI Decider: {len(pending)} pending | Open: {get_open()}/{MAX_OPEN} | Hot: {len(_hot_rounds)} | Counter: {counter_killed} | Deesc: {deesc_count} ===")
 
 # Get market context once
 market_z = get_market_zscore()

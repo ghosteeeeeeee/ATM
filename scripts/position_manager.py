@@ -54,9 +54,18 @@ TRAILING_BUFFER_PCT_DEFAULT = 0.005  # keep 0.5% buffer above entry when first a
 TRAILING_TIGHTEN = True     # tighten buffer as profit grows
 TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
 
-# ─── Cascade Flip Config ──────────────────────────────────────────────────────
+# ── Cascade Flip Config ──────────────────────────────────────────────────────
 # When an open position is losing AND an opposite signal fires with strong conf,
 # cascade flip: close the losing position AND enter the opposite direction.
+
+# TODO (2026-04-02): Push trailing SL updates to Hyperliquid.
+# Currently position_manager computes the trailing SL and writes it to the brain DB,
+# but it never pushes the updated SL order to HL. The guardian only syncs HL → DB
+# (PnL, fills, prices) but has no code to push SL modifications back.
+# We need to add a call to hyperliquid_exchange to cancel the existing SL order
+# and place a new one when the trailing SL moves. This is critical for protecting
+# profits on leveraged positions — the local trailing SL fires correctly but the
+# remote HL order stays static until manually closed.
 # This prevents riding losing trades while the market has already reversed.
 CASCADE_FLIP_MIN_LOSS  = -0.5   # Position must be down >= this % to qualify
 CASCADE_FLIP_MIN_CONF   = 70.0   # Opposite signal must have conf >= this %

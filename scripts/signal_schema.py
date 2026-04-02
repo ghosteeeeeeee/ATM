@@ -294,12 +294,24 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             conn.close()
             return sig_id  # return existing signal id (updated)
         # No existing — insert new
+        # FIX (2026-04-02): Reset hot_cycle_count when new signal arrives.
+        # If a token has APPROVED signals stuck waiting to execute, a new signal means
+        # conditions changed — fresh data. Reset the de-escalation counter so the new
+        # signal doesn't inherit the stuck one's history.
+        c.execute("""
+            UPDATE signals
+            SET hot_cycle_count = 0
+            WHERE token = ? AND direction = ?
+              AND decision IN ('PENDING', 'APPROVED', 'WAIT')
+              AND executed = 0
+        """, (token.upper(), direction.upper()))
         c.execute('''
             INSERT INTO signals
             (token, direction, signal_type, source, confidence, value, price,
              exchange, timeframe, z_score, z_score_tier, momentum_state,
-             rsi_14, macd_value, macd_signal, macd_hist, decision, executed, leverage)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?)
+             rsi_14, macd_value, macd_signal, macd_hist, decision, executed, leverage,
+             hot_cycle_count, counter_detected)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0)
         ''', (token.upper(), direction.upper(), signal_type, source, confidence, value,
               price, exchange, timeframe, z_score, z_score_tier, momentum_state,
               rsi_14, macd_value, macd_signal, macd_hist, leverage))
