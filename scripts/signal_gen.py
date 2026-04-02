@@ -98,6 +98,14 @@ from signal_schema import (
     price_age_minutes, approve_signal, update_signal_decision,
     mark_signal_processed, add_confluence_signal, get_confluence_signals
 )
+
+# Speed feature: filter signals by token momentum
+try:
+    from speed_tracker import SpeedTracker, get_token_speed
+    speed_tracker = SpeedTracker()
+except Exception as e:
+    print(f"[signal_gen] SpeedTracker unavailable: {e}")
+    speed_tracker = None
 from hyperliquid_exchange import is_delisted
 from position_manager import get_open_positions as _get_open_pos, get_opposite_direction_cooldown_hours
 
@@ -153,6 +161,13 @@ W_VELOCITY        = 2.0   # momentum direction (rising/falling z)
 W_RSI             = 1.0   # RSI confirmation
 W_MACD            = 0.8   # MACD confirmation
 W_VOLUME          = 1.5   # volume rate-of-change confirmation
+
+# ─── Speed Feature thresholds ───────────────────────────────────────────
+# SPEED FEATURE: filter low-momentum tokens from signal generation.
+# Rationale: don't generate signals for flat/stale tokens, focus on movers.
+SPEED_MIN_THRESHOLD = 20   # tokens with speed_percentile < 20 rarely get signals
+SPEED_BOOST_THRESHOLD = 70  # tokens with speed_percentile >= 70 get 5% easier entry
+SPEED_BOOST_FACTOR = 0.95   # multiply entry threshold by this (lower = easier)
 
 # ─── Timeframe windows ──────────────────────────────────────────
 TF_WINDOWS = [
@@ -1781,41 +1796,81 @@ def run():
             long_ok, long_filter_reason = check_long_trend_filter(token)
             score, signals = compute_score(token, 'LONG', long_mult, short_mult)
             if score and score >= ENTRY_THRESHOLD:
-                if not long_ok:
+                # ── SPEED FILTER ───────────────────────────────────────────────
+                # Block low-momentum tokens unless strong momentum signal.
+                # Rationale: don't generate signals for flat/stale tokens — focus on movers.
+                speed_pctl = 50.0
+                vel_5m = 0.0
+                if speed_tracker is not None:
+                    spd = speed_tracker.get_token_speed(token)
+                    if spd:
+                        speed_pctl = spd.get('speed_percentile', 50.0)
+                        vel_5m = spd.get('price_velocity_5m', 0.0)
+
+                # Block: speed_percentile too low AND not strong momentum
+                is_strong_momentum = (score >= 80) or (abs(vel_5m) > 1.0)
+                if speed_pctl < SPEED_MIN_THRESHOLD and not is_strong_momentum:
+                    log(f'BLOCKED LONG SPEED: {token} @{price:.6f} speed_pctl={speed_pctl:.0f}')
+                    print(f'  LONG-S {token:8s} {score:5.1f}% [BLOCKED-slow speed_pctl={speed_pctl:.0f}]')
+                    blocked += 1
+                elif not long_ok:
                     log(f'BLOCKED LONG: {token} @{price:.6f} {score:.1f}% [{long_filter_reason}]')
                     print(f'  LONG-B {token:8s} {score:5.1f}% [BLOCKED] {long_filter_reason}')
                     blocked += 1
                 else:
-                    # Use RSI/MACD cached in get_momentum_stats() (called at line 1349)
-                    rsi_14_val = mom.get('rsi_14') if mom else None
-                    macd_line_val = mom.get('macd_line') if mom else None
-                    macd_hist_val = mom.get('macd_hist') if mom else None
-                    macd_signal_val = mom.get('macd_signal') if mom else None
-                    sources = '+'.join(sorted(set(s[0] for s in signals)))
-                    reasons = ' | '.join(s[3] for s in signals[:4])
+                    # Apply speed boost: high-speed tokens get easier entry threshold
+                    effective_threshold = ENTRY_THRESHOLD
+                    if speed_pctl >= SPEED_BOOST_THRESHOLD:
+                        effective_threshold = ENTRY_THRESHOLD * SPEED_BOOST_FACTOR  # 5% easier
 
-                    # ── Spike Detection ───────────────────────────────
-                    spike_type, pct_chg, do_reverse, is_pump = detect_spike(token, 'LONG', price)
-                    if do_reverse:
-                        opp_score, opp_signals, pump_tag = score_for_counter_spike(
-                            token, 'LONG', long_mult, short_mult)
-                        opp_dir = _get_reverse_signal_name('LONG')
-                        opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
-                        opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
-                        if is_pump:
-                            pump_tag = f'pump-{opp_dir.lower()}'
-                            log(f'PUMP:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
-                                f'[spike{spike_type}+{pct_chg:.1f}%] {pump_tag} {opp_reasons}')
-                            print(f'  PUMP  {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} spike-{spike_type}+{pct_chg:.1f}%]')
+                    if score >= effective_threshold:
+                        # Use RSI/MACD cached in get_momentum_stats() (called at line 1349)
+                        rsi_14_val = mom.get('rsi_14') if mom else None
+                        macd_line_val = mom.get('macd_line') if mom else None
+                        macd_hist_val = mom.get('macd_hist') if mom else None
+                        macd_signal_val = mom.get('macd_signal') if mom else None
+                        sources = '+'.join(sorted(set(s[0] for s in signals)))
+                        reasons = ' | '.join(s[3] for s in signals[:4])
+
+                        # ── Spike Detection ───────────────────────────────
+                        spike_type, pct_chg, do_reverse, is_pump = detect_spike(token, 'LONG', price)
+                        if do_reverse:
+                            opp_score, opp_signals, pump_tag = score_for_counter_spike(
+                                token, 'LONG', long_mult, short_mult)
+                            opp_dir = _get_reverse_signal_name('LONG')
+                            opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
+                            opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
+                            if is_pump:
+                                pump_tag = f'pump-{opp_dir.lower()}'
+                                log(f'PUMP:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
+                                    f'[spike{spike_type}+{pct_chg:.1f}%] {pump_tag} {opp_reasons}')
+                                print(f'  PUMP  {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} spike-{spike_type}+{pct_chg:.1f}%]')
+                            else:
+                                log(f'REV:   {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
+                                    f'[counter-spike{spike_type}+{pct_chg:.1f}%] {opp_reasons}')
+                                print(f'  REV   {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} ctx-spike-{spike_type}+{pct_chg:.1f}%]')
+                            if opp_score and opp_score >= ENTRY_THRESHOLD:
+                                add_signal(
+                                    token=token, direction=opp_dir, signal_type='momentum',
+                                    source=f'mtf-{opp_sources}', confidence=opp_score,
+                                    value=opp_score, price=price,
+                                    exchange='hyperliquid',
+                                    timeframe=f'{mom["phase"][:3] if mom else "unk"}',
+                                    z_score=mom['avg_z'] if mom else None,
+                                    z_score_tier=mom['z_direction'] if mom else None,
+                                    rsi_14=rsi_14_val,
+                                    macd_value=macd_line_val,
+                                    macd_signal=macd_signal_val,
+                                    macd_hist=macd_hist_val,
+                                )
+                                log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
+                                set_cooldown(token, opp_dir, hours=1)
+                                added += 1
                         else:
-                            log(f'REV:   {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
-                                f'[counter-spike{spike_type}+{pct_chg:.1f}%] {opp_reasons}')
-                            print(f'  REV   {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} ctx-spike-{spike_type}+{pct_chg:.1f}%]')
-                        if opp_score and opp_score >= ENTRY_THRESHOLD:
                             add_signal(
-                                token=token, direction=opp_dir, signal_type='momentum',
-                                source=f'mtf-{opp_sources}', confidence=opp_score,
-                                value=opp_score, price=price,
+                                token=token, direction='LONG', signal_type='momentum',
+                                source=f'mtf-{sources}', confidence=score,
+                                value=score, price=price,
                                 exchange='hyperliquid',
                                 timeframe=f'{mom["phase"][:3] if mom else "unk"}',
                                 z_score=mom['avg_z'] if mom else None,
@@ -1825,90 +1880,91 @@ def run():
                                 macd_signal=macd_signal_val,
                                 macd_hist=macd_hist_val,
                             )
-                            # All momentum signals → PENDING → decider-run (no auto-approve)
-                            log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
-                            set_cooldown(token, opp_dir, hours=1)
+                            log(f'SIGNAL:  {token} LONG @{price:.6f} {score:.1f}% {reasons}')
+                            print(f'  LONG  {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
+                            set_cooldown(token, 'LONG', hours=1)
                             added += 1
-                    else:
-                        add_signal(
-                            token=token, direction='LONG', signal_type='momentum',
-                            source=f'mtf-{sources}', confidence=score,
-                            value=score, price=price,
-                            exchange='hyperliquid',
-                            timeframe=f'{mom["phase"][:3] if mom else "unk"}',
-                            z_score=mom['avg_z'] if mom else None,
-                            z_score_tier=mom['z_direction'] if mom else None,
-                            rsi_14=rsi_14_val,
-                            macd_value=macd_line_val,
-                            macd_signal=macd_signal_val,
-                            macd_hist=macd_hist_val,
-                        )
-                        # All momentum signals → PENDING → decider-run (no auto-approve)
-                        log(f'SIGNAL:  {token} LONG @{price:.6f} {score:.1f}% {reasons}')
-                        print(f'  LONG  {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
-                        set_cooldown(token, 'LONG', hours=1)
-                        added += 1
 
         # ── SHORT signals — raised threshold to reduce excess SHORT signals ─────
         if token not in open_pos or open_pos[token] != 'SHORT':
             score, signals = compute_score(token, 'SHORT', long_mult, short_mult)
             if score and score >= SHORT_ENTRY_THRESHOLD:
-                # ── Trend filter ────────────────────────────────
-                short_ok, short_filter_reason = check_short_trend_filter(token)
-                if not short_ok:
-                    log(f'BLOCKED SHORT: {token} @{price:.6f} {score:.1f}% [{short_filter_reason}]')
-                    print(f'  SHORT-B {token:8s} {score:5.1f}% [BLOCKED] {short_filter_reason}')
+                # ── SPEED FILTER for SHORT ───────────────────────────────
+                # Same logic as LONG: block flat/slow tokens, boost fast movers.
+                speed_pctl = 50.0
+                vel_5m = 0.0
+                if speed_tracker is not None:
+                    spd = speed_tracker.get_token_speed(token)
+                    if spd:
+                        speed_pctl = spd.get('speed_percentile', 50.0)
+                        vel_5m = spd.get('price_velocity_5m', 0.0)
+
+                is_strong_momentum = (score >= 80) or (abs(vel_5m) > 1.0)
+                if speed_pctl < SPEED_MIN_THRESHOLD and not is_strong_momentum:
+                    log(f'BLOCKED SHORT SPEED: {token} @{price:.6f} speed_pctl={speed_pctl:.0f}')
+                    print(f'  SHORT-S {token:8s} {score:5.1f}% [BLOCKED-slow speed_pctl={speed_pctl:.0f}]')
                     blocked += 1
                 else:
-                    sources = '+'.join(sorted(set(s[0] for s in signals)))
-                    reasons = ' | '.join(s[3] for s in signals[:4])
+                    # Apply speed boost: high-speed tokens get easier entry threshold
+                    effective_threshold = SHORT_ENTRY_THRESHOLD
+                    if speed_pctl >= SPEED_BOOST_THRESHOLD:
+                        effective_threshold = SHORT_ENTRY_THRESHOLD * SPEED_BOOST_FACTOR  # 5% easier
 
-                    # ── Spike Detection ───────────────────────────────
-                    spike_type, pct_chg, do_reverse, is_pump = detect_spike(token, 'SHORT', price)
-                    if do_reverse:
-                        opp_score, opp_signals, pump_tag = score_for_counter_spike(
-                            token, 'SHORT', long_mult, short_mult)
-                        opp_dir = _get_reverse_signal_name('SHORT')
-                        opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
-                        opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
-                        if is_pump:
-                            pump_tag = f'pump-{opp_dir.lower()}'
-                            log(f'PUMP:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
-                                f'[spike-{spike_type}+{pct_chg:.1f}%] {pump_tag} {opp_reasons}')
-                            print(f'  PUMP  {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} spike-{spike_type}+{pct_chg:.1f}%]')
+                    if score >= effective_threshold:
+                        # ── Trend filter ────────────────────────────────
+                        short_ok, short_filter_reason = check_short_trend_filter(token)
+                        if not short_ok:
+                            log(f'BLOCKED SHORT: {token} @{price:.6f} {score:.1f}% [{short_filter_reason}]')
+                            print(f'  SHORT-B {token:8s} {score:5.1f}% [BLOCKED] {short_filter_reason}')
+                            blocked += 1
                         else:
-                            log(f'REV:   {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
-                                f'[counter-spike{spike_type}+{pct_chg:.1f}%] {opp_reasons}')
-                            print(f'  REV   {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} ctx-spike-{spike_type}+{pct_chg:.1f}%]')
-                        if opp_score and opp_score >= ENTRY_THRESHOLD:
-                            add_signal(
-                                token=token, direction=opp_dir, signal_type='momentum',
-                                source=f'mtf-{opp_sources}', confidence=opp_score,
-                                value=opp_score, price=price,
-                                exchange='hyperliquid',
-                                timeframe=f'{mom["phase"][:3] if mom else "unk"}',
-                                z_score=mom['avg_z'] if mom else None,
-                                z_score_tier=mom['z_direction'] if mom else None,
-                            )
-                            # All momentum signals → PENDING → decider-run (no auto-approve)
-                            log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
-                            set_cooldown(token, opp_dir, hours=1)
-                            added += 1
-                    else:
-                        add_signal(
-                            token=token, direction='SHORT', signal_type='momentum',
-                            source=f'mtf-{sources}', confidence=score,
-                            value=score, price=price,
-                            exchange='hyperliquid',
-                            timeframe=f'{mom["phase"][:3] if mom else "unk"}',
-                            z_score=mom['avg_z'] if mom else None,
-                            z_score_tier=mom['z_direction'] if mom else None,
-                        )
-                        # All momentum signals → PENDING → decider-run (no auto-approve)
-                        log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
-                        print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
-                        set_cooldown(token, 'SHORT', hours=1)
-                        added += 1
+                            sources = '+'.join(sorted(set(s[0] for s in signals)))
+                            reasons = ' | '.join(s[3] for s in signals[:4])
+
+                            # ── Spike Detection ───────────────────────────────
+                            spike_type, pct_chg, do_reverse, is_pump = detect_spike(token, 'SHORT', price)
+                            if do_reverse:
+                                opp_score, opp_signals, pump_tag = score_for_counter_spike(
+                                    token, 'SHORT', long_mult, short_mult)
+                                opp_dir = _get_reverse_signal_name('SHORT')
+                                opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
+                                opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
+                                if is_pump:
+                                    pump_tag = f'pump-{opp_dir.lower()}'
+                                    log(f'PUMP:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
+                                        f'[spike-{spike_type}+{pct_chg:.1f}%] {pump_tag} {opp_reasons}')
+                                    print(f'  PUMP  {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} spike-{spike_type}+{pct_chg:.1f}%]')
+                                else:
+                                    log(f'REV:   {token} {opp_dir} @{price:.6f} {opp_score:.1f}% '
+                                        f'[counter-spike{spike_type}+{pct_chg:.1f}%] {opp_reasons}')
+                                    print(f'  REV   {token:8s} {opp_score:5.1f}% [REVERSE->{opp_dir} ctx-spike-{spike_type}+{pct_chg:.1f}%]')
+                                if opp_score and opp_score >= ENTRY_THRESHOLD:
+                                    add_signal(
+                                        token=token, direction=opp_dir, signal_type='momentum',
+                                        source=f'mtf-{opp_sources}', confidence=opp_score,
+                                        value=opp_score, price=price,
+                                        exchange='hyperliquid',
+                                        timeframe=f'{mom["phase"][:3] if mom else "unk"}',
+                                        z_score=mom['avg_z'] if mom else None,
+                                        z_score_tier=mom['z_direction'] if mom else None,
+                                    )
+                                    log(f'SIGNAL:  {token} {opp_dir} @{price:.6f} {opp_score:.1f}% [{pump_tag}] {opp_reasons}')
+                                    set_cooldown(token, opp_dir, hours=1)
+                                    added += 1
+                            else:
+                                add_signal(
+                                    token=token, direction='SHORT', signal_type='momentum',
+                                    source=f'mtf-{sources}', confidence=score,
+                                    value=score, price=price,
+                                    exchange='hyperliquid',
+                                    timeframe=f'{mom["phase"][:3] if mom else "unk"}',
+                                    z_score=mom['avg_z'] if mom else None,
+                                    z_score_tier=mom['z_direction'] if mom else None,
+                                )
+                                log(f'SIGNAL:  {token} SHORT @{price:.6f} {score:.1f}% {reasons}')
+                                print(f'  SHORT {token:8s} {score:5.1f}% [AI-DECIDER]  {reasons}')
+                                set_cooldown(token, 'SHORT', hours=1)
+                                added += 1
 
         # ── Exit signals (check open positions) ───────────────
         if token in open_pos:

@@ -8,6 +8,14 @@ import pandas as pd
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 
+# Speed feature: speed percentile boosts compaction survival
+try:
+    from speed_tracker import SpeedTracker
+    speed_tracker_ai = SpeedTracker()
+except Exception as e:
+    print(f"[ai-decider] SpeedTracker unavailable: {e}")
+    speed_tracker_ai = None
+
 LOG_FILE = '/var/www/hermes/logs/trading.log'
 
 def log(msg, level='INFO'):
@@ -887,16 +895,25 @@ def get_pending_signals():
                 survival_bonus = min(1.0, compact_rounds * 0.2 + survival_meta * 0.3)
                 survival_score_raw = 1.0 + survival_bonus
 
-                # Score = confluence(5%) + confidence(40%) + survival(20%) + streak(20%) + recency(15%)
+                # SPEED FEATURE: speed percentile boosts survival in compaction
+                # Fast-moving tokens survive compaction longer — we want to be in movers.
+                # speed_score = speed_percentile / 100 * 0.10 (10% weight)
+                speed_score = 0.0
+                if speed_tracker_ai is not None:
+                    spd = speed_tracker_ai.get_token_speed(coin)
+                    if spd:
+                        speed_score = (spd.get('speed_percentile', 50.0) / 100.0) * 0.10
+
+                # Score = confluence(5%) + confidence(40%) + survival(20%) + streak(20%) + recency(15%) + speed(10%)
                 # FIX (2026-04-02): Confluence weight cut to 5% — conf-2s noise was dominating.
-                # conf-2s now scores ~0.04-0.08 max (was 0.40), conf-3s ~0.11-0.22.
-                # Confidence and survival/streak are the real quality signals.
+                # SPEED: Added 10% weight for speed percentile — fast movers survive longer.
                 raw_score = (
-                    confluence_score * 0.05 +
-                    conf_score       * 0.40 +
+                    confluence_score   * 0.05 +
+                    conf_score         * 0.40 +
                     survival_score_raw * 0.20 +
-                    streak_mult      * 0.20 +
-                    recency_score    * 0.15
+                    streak_mult        * 0.20 +
+                    recency_score      * 0.15 +
+                    speed_score        * 0.10
                 )
                 scored.append({
                     'score': raw_score,
@@ -907,6 +924,7 @@ def get_pending_signals():
                     'conf_score': conf_score,
                     'source_weight': source_weight,
                     'recency_score': recency_score,
+                    'speed_score': speed_score,
                     'compact_rounds': compact_rounds,
                     'survival_meta': survival_meta,
                     'sid': sid,
@@ -986,7 +1004,7 @@ def get_pending_signals():
                 print(f'  [compaction] kept={"all" if keep_all else "20"} expired_auto={expired} compacted={compacted_count} '
                       f'(top: {top["token"]}/{top["direction"]} r{top["compact_rounds"]+1}+, '
                       f'survival={top["survival_bonus"]:.2f} streak={top["streak_mult"]:.2f}x, '
-                      f'confluence={top["confluence_score"]:.2f}, conf={top["conf_score"]:.0%})')
+                      f'speed={top["speed_score"]:.3f}, conf={top["conf_score"]:.0%})')
 
         # ── 3. Fetch top 20 LIFO + confidence ────────────────────────────────
         c.execute("""

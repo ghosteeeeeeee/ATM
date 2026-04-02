@@ -18,6 +18,24 @@ from _secrets import BRAIN_DB_DICT
 
 import hype_cache as hc
 
+# Speed tracker for stale winner/loser detection
+try:
+    from speed_tracker import SpeedTracker, get_token_speed
+    SPEED_TRACKER = SpeedTracker()
+except Exception as e:
+    print(f"[Position Manager] SpeedTracker unavailable: {e}")
+    SPEED_TRACKER = None
+
+# Speed feature: stale winner/loser exit logic
+# Tokens that are in profit but flat for 15+ min should be closed (book profits).
+# Tokens that are in loss but flat for 30+ min should be cut (dead positions).
+STALE_WINNER_TIMEOUT_MINUTES = 15  # close winners who've been stale for 15+ min
+STALE_LOSER_TIMEOUT_MINUTES = 30  # close losers who've been stale for 30+ min
+STALE_WINNER_MIN_PROFIT = 1.0    # % profit required to be a "winner"
+STALE_LOSER_MAX_LOSS = -1.0      # % loss (more negative) required to be a "loser"
+# Speed threshold: velocity < 0.2% over 5 min = stale
+STALE_VELOCITY_THRESHOLD = 0.2   # % change — below this = flat/stale
+
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
 try:
     from hyperliquid_exchange import (
@@ -205,6 +223,60 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
 
     # Priority 3: global hard stop
     return pnl_pct <= CUT_LOSER_PNL
+
+
+def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[bool, str]:
+    """
+    SPEED FEATURE: Check if a position should be closed due to being stale.
+
+    Two scenarios:
+    1. STALE WINNER: pnl > +1% AND token velocity_5m < 0.2% (flat for 15+ min)
+       → Book profits, find something faster. Don't let winners go cold.
+    2. STALE LOSER: pnl < -1% AND token velocity_5m < 0.2% (flat for 30+ min)
+       → Cut it. No point holding a dead position.
+
+    Returns: (should_close, reason)
+    """
+    if SPEED_TRACKER is None:
+        return False, ""
+
+    speed_data = SPEED_TRACKER.get_token_speed(token)
+    if speed_data is None:
+        return False, ""
+
+    vel_5m = speed_data.get('price_velocity_5m', 0)
+    is_stale = speed_data.get('is_stale', False)
+    last_move_at = speed_data.get('last_move_at')
+
+    # Determine how long the token has been stale
+    from datetime import datetime
+    stale_minutes = 0
+    if last_move_at:
+        try:
+            last_dt = datetime.strptime(last_move_at, '%Y-%m-%d %H:%M:%S')
+            stale_minutes = int((time.time() - last_dt.timestamp()) / 60)
+        except Exception:
+            stale_minutes = 0
+
+    # ── 1. Stale winner: in profit but flat ─────────────────────────────────
+    # Close winners that have been stale for 15+ min — take the profit and move on.
+    # Rationale: if a winning position isn't making new highs, it's effectively
+    # a stagnant position. Better to book the gain and find something trending.
+    if live_pnl >= STALE_WINNER_MIN_PROFIT:
+        if abs(vel_5m) < STALE_VELOCITY_THRESHOLD and stale_minutes >= STALE_WINNER_TIMEOUT_MINUTES:
+            reason = f"stale_winner_pnl{live_pnl:+.1f}%_vel{vel_5m:+.3f}%_{stale_minutes}m"
+            return True, reason
+
+    # ── 2. Stale loser: in loss but flat ─────────────────────────────────────
+    # Close losers that have been stale for 30+ min — cut dead positions.
+    # Rationale: if it's not going your way AND not moving, it's a dead position.
+    # A flat loser at -1% could stay flat forever — better to cut and redeploy.
+    if live_pnl <= STALE_LOSER_MAX_LOSS:
+        if abs(vel_5m) < STALE_VELOCITY_THRESHOLD and stale_minutes >= STALE_LOSER_TIMEOUT_MINUTES:
+            reason = f"stale_loser_pnl{live_pnl:+.1f}%_vel{vel_5m:+.3f}%_{stale_minutes}m"
+            return True, reason
+
+    return False, ""
 
 
 # ─── Trade Operations ─────────────────────────────────────────────────────────
@@ -1193,7 +1265,20 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             closed_count += 1
             print(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 
-        # ── 4. Update trailing SL in DB and push to Hyperliquid ─────
+        # ── 5. SPEED: Stale winner/loser exit ─────────────────────────────────
+        # SPEED FEATURE: closes positions that are in profit but flat (stale winner)
+        # or in loss but flat for 30+ min (stale loser).
+        # Fires alongside trailing SL — doesn't replace it. Compliments cascade_flip.
+        # Only fires when trailing is NOT active (don't interfere with trailing exits).
+        if not trailing_active:
+            stale_close, stale_reason = check_stale_position(token, live_pnl, direction)
+            if stale_close:
+                close_paper_position(trade_id, f"stale_exit_{stale_reason}")
+                closed_count += 1
+                print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
+                continue  # Skip trailing SL update for closed position
+
+        # ── 6. Update trailing SL in DB and push to Hyperliquid ─────
         if trailing_sl:
             try:
                 conn_pm = get_db_connection()

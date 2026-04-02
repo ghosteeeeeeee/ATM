@@ -20,6 +20,15 @@ from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import is_live_trading_enabled
 import hype_cache as hc
 
+# Speed feature: speed-weighted hot set scoring
+SPEED_WEIGHT = 0.15  # 15% of total hot-set score comes from speed percentile
+try:
+    from speed_tracker import SpeedTracker
+    speed_tracker_dr = SpeedTracker()
+except Exception as e:
+    print(f"[decider-run] SpeedTracker unavailable: {e}")
+    speed_tracker_dr = None
+
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
 MAX_POS         = 10
@@ -663,6 +672,28 @@ def _run_hot_set():
             sig_id, sig_type, sig_src, sig_conf = best
             should_approve, reason = False, ''
 
+            # SPEED FEATURE: tokens with speed_percentile >= 80 get a threshold boost
+            # The faster a token moves, the easier it is to approve (up to 20% easier).
+            # Rationale: we want to be IN the fastest movers, not chasing dead coins.
+            effective_conf = float(sig_conf)
+            if speed_tracker_dr is not None:
+                spd = speed_tracker_dr.get_token_speed(t)
+                if spd:
+                    speed_pctl = spd.get('speed_percentile', 50.0)
+                    # Speed bonus: 0-20% boost depending on percentile
+                    # pctl 80+ → max 20% boost (threshold drops from 65 → 52)
+                    # pctl 90+ → max 20% boost already captured at 80
+                    if speed_pctl >= 80:
+                        speed_boost = min(0.20, (speed_pctl - 80) / 100 + 0.10)
+                        effective_conf = float(sig_conf) / (1.0 - speed_boost)
+                        reason_suffix = f'+speed@{speed_pctl:.0f}pctl'
+                    else:
+                        reason_suffix = ''
+                else:
+                    reason_suffix = ''
+            else:
+                reason_suffix = ''
+
             # FIX (2026-04-02): Regime check for confluence signals only.
             # hmacd signals are checked separately below (and don't use per-token regime).
             # Use ai-decider's get_regime() for per-token regime.
@@ -684,20 +715,20 @@ def _run_hot_set():
                     num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
                 except (ValueError, IndexError):
                     num_src = 1
+                # Use effective_conf (speed-boosted) for threshold comparison
+                base_threshold = 65
                 if num_src >= 3:
-                    should_approve = sig_conf >= 65
-                    reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%'
+                    should_approve = effective_conf >= base_threshold
+                    reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
                 else:
-                    should_approve = sig_conf >= 65
-                    reason = f'hot-conf-2s @{sig_conf:.0f}%'
+                    should_approve = effective_conf >= base_threshold
+                    reason = f'hot-conf-2s @{sig_conf:.0f}%{reason_suffix}'
             elif sig_src and sig_src.startswith('hmacd-'):
                 # Apply centralized source weight from ai-decider
-                # mtf_macd + hmacd- = 1.2x → threshold 65/1.2 = 54%
-                # pct-hermes + hmacd- = 0.6x → threshold 65/0.6 = 108% → effectively never
                 sw = _get_source_weight(sig_type, sig_src)
                 threshold = min(99, 65.0 / sw)
-                should_approve = sig_conf >= threshold
-                reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]'
+                should_approve = effective_conf >= threshold
+                reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]{reason_suffix}'
 
             if should_approve:
                 c.execute("""
