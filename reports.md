@@ -725,16 +725,16 @@ These scripts modify `ab_tests.json` and `ab_results` table. Not reviewed in det
 
 | # | Severity | Status | Fix Applied |
 |---|----------|--------|-------------|
-| BUG-1 | CRITICAL | PENDING | Comment fix needed |
-| BUG-2 | CRITICAL | IN PROGRESS | Verify HL close before marking DB closed |
-| BUG-3 | CRITICAL | IN PROGRESS | Check close_result before flip order |
+| BUG-1 | CRITICAL | FIXED 3738499 | Comment rewritten, logic unchanged |
+| BUG-2 | CRITICAL | FIXED 3738499 | _wait_for_position_closed(), retries, no DB write until confirmed |
+| BUG-3 | CRITICAL | FIXED 3738499 | _wait_for_position_closed() before flip order, returns early on failure |
 | BUG-4 | HIGH | PENDING | Persist dedup set to file |
 | BUG-5 | HIGH | PENDING | Explicit slippage 2% on cut-loser/flip |
-| BUG-6 | HIGH | PENDING | Standardize pnl_pct to unleveraged |
+| BUG-6 | HIGH | FIXED 3738499 | Unleveraged pnl_pct from entryPrice/currentPrice (HL API), matching _close_paper_trade_db |
 | BUG-7 | HIGH | PENDING | Remove duplicate function |
 | BUG-8 | MEDIUM | PENDING | Write numeric predicted_return |
 | BUG-9 | HIGH | PENDING | Remove token from cache key |
-| BUG-10 | HIGH | PENDING | Merge EXPIRED fix into ai_decider.py |
+| BUG-10 | HIGH | IN PROGRESS | Check which decider file pipeline actually runs |
 | BUG-11 | MEDIUM | PENDING | Reset hot_set failure counter |
 | BUG-12 | MEDIUM | PENDING | Add source whitelist |
 | BUG-13 | MEDIUM | PENDING | Numeric regime encoding |
@@ -752,7 +752,7 @@ These scripts modify `ab_tests.json` and `ab_results` table. Not reviewed in det
 | BUG-25 | LOW | PENDING | Sanity check on exit price |
 | BUG-26 | MEDIUM | PENDING | exec=1 before brain.py call |
 | BUG-27 | LOW | PENDING | Lock file in legacy scripts |
-| BUG-28 | MEDIUM | PENDING | Retry on cut-loser failure |
+| BUG-28 | MEDIUM | FIXED 3738499 | Retries in cut-loser (same commit as BUG-2) |
 | BUG-29 | MEDIUM | PENDING | Separate realized vs unrealized columns |
 | BUG-30 | LOW | PENDING | Not reviewed |
 

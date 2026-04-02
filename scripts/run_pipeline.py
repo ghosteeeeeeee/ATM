@@ -11,7 +11,7 @@ LOCK    = '/tmp/hermes-pipeline.lock'
 
 # Which steps run every minute vs every N minutes
 STEPS_EVERY_MIN  = ['price_collector', '4h_regime_scanner', 'signal_gen', 'decider-run', 'position_manager', 'hermes-trades-api']
-STEPS_EVERY_10M  = ['ai_decider', 'strategy_optimizer', 'ab_optimizer', 'ab_learner']
+STEPS_EVERY_10M  = ['ai-decider', 'strategy_optimizer', 'ab_optimizer', 'ab_learner']
 
 
 def log(msg):
@@ -40,7 +40,7 @@ def run(name, args=None):
         if out:
             lines = out.split('\n')
             # For noisy steps (price_collector etc.) only log errors
-            if name in ('position_manager', 'decider-run', 'signal_gen', 'ai_decider', 'live-decider'):
+            if name in ('position_manager', 'decider-run', 'signal_gen', 'ai-decider', 'live-decider'):
                 log_lines = [l.strip() for l in lines if l.strip()]
                 if log_lines:
                     for l in log_lines[-8:]:
