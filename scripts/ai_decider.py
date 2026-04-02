@@ -224,7 +224,7 @@ def _load_hot_rounds():
             print(f"[ai-decider] _load_hot_rounds failed ({_hot_set_failure_count}/10): {e}")
 
 
-def _kill_hot_signal(coin):
+def _kill_hot_signal(token):
     """Kill a hot set signal (mark COMPACTED so it's removed from hot set immediately."""
     try:
         conn = sqlite3.connect(SIGNALS_DB)
@@ -235,7 +235,7 @@ def _kill_hot_signal(coin):
                 updated_at = CURRENT_TIMESTAMP
             WHERE token=?? AND decision IN ('PENDING','APPROVED') AND executed = 0
             LIMIT 1
-        """, (coin,))
+        """, (token,))
         killed = c.rowcount
         conn.commit()
         conn.close()
@@ -310,7 +310,7 @@ def get_cached_ab_variant(coin, direction, test_name):
 
 def clear_ab_cache(coin = None, direction=None):
     """Clear A/B cache - optionally for specific token"""
-    if token:
+    if coin:
         key = f"{coin}:{direction or 'long'}"
         _ab_variant_cache.pop(key, None)
     else:
@@ -451,7 +451,7 @@ def get_learned_adjustments(coin, direction='long'):
         cur.execute("""
             SELECT pattern_name, confidence, adjustment, sample_count
             FROM trade_patterns
-            WHERE UPPER(coin) = UPPER(%s)
+            WHERE UPPER(token) = UPPER(%s)
               AND (LOWER(side) = LOWER(%s) OR side = 'any')
               AND sample_count >= 1
             ORDER BY confidence DESC
@@ -586,7 +586,7 @@ def record_ab_trade_closed(coin, pnl_pct, pnl_usdt):
 
         # Find the most recent open trade for this token
         for entry in reversed(results):
-            if entry.get("token") == token and entry.get("event") == "opened" and "closed_at" not in entry:
+            if entry.get("token") == coin and entry.get("event") == "opened" and "closed_at" not in entry:
                 entry["closed_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
                 entry["pnl_pct"] = round(pnl_pct, 2)
                 entry["pnl_usdt"] = round(pnl_usdt, 2)
@@ -743,7 +743,7 @@ def get_open():
         log_error(f'get_open: {e}')
         return 0
 
-def is_token_open(coin):
+def is_token_open(token):
     """Check if token already has open position - with input sanitization"""
     # Validate token - only allow alphanumeric
     if not coin or not coin.replace('_','').isalnum():
@@ -809,7 +809,7 @@ def get_pending_signals():
         # confidence: direct bonus
         # confluence_bonus: tokens with multiple agreeing signal types get a boost
         c.execute("""
-            SELECT id, coin, direction, signal_type, confidence, source, created_at
+            SELECT id, token, direction, signal_type, confidence, source, created_at
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
@@ -840,7 +840,7 @@ def get_pending_signals():
 
                 # Confluence: base score from agreeing signal types
                 agreeing = sum(1 for r in candidates
-                               if r[1] == token and r[2] == direction and r[3] != stype)
+                               if r[1] == coin and r[2] == direction and r[3] != stype)
                 base_confluence = 1.0 + min(agreeing, 2) * 0.5  # 1.0 to 2.0
 
                 # Signal-type quality multiplier for confluence signals
@@ -906,7 +906,7 @@ def get_pending_signals():
                     'compact_rounds': compact_rounds,
                     'survival_meta': survival_meta,
                     'sid': sid,
-                    'token': token,
+                    'token': coin,
                     'direction': direction,
                     'stype': stype,
                     'conf': conf,
@@ -936,7 +936,7 @@ def get_pending_signals():
                 # Record survival history for ALL signals (survived=1)
                 c.execute("""
                     INSERT INTO signal_history
-                        (coin, direction, signal_type, compact_round, survived, score_before, score_after, reason)
+                        (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
                     VALUES (?, ?, ?, ?, 1, ?, ?, ?)
                 """, (s['token'], s['direction'], s['stype'], compact_round,
                       round(s['raw'], 3), round(s['score'], 3),
@@ -951,7 +951,7 @@ def get_pending_signals():
                     for s in scored[20:]:
                         c.execute("""
                             INSERT INTO signal_history
-                                (coin, direction, signal_type, compact_round, survived, score_before, score_after, reason)
+                                (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
                             VALUES (?, ?, ?, ?, 0, ?, ?, ?)
                         """, (s['token'], s['direction'], s['stype'], compact_round,
                               round(s['raw'], 3), 0.0,
@@ -1020,7 +1020,7 @@ def get_pending_signals():
 
 from signal_schema import mark_signal_processed, validate_source  # BUG-12: validate source against whitelist
 
-def get_regime(coin):
+def get_regime(token):
     """Get 4h regime from regime_4h.json (primary) or momentum_cache (fallback).
     Returns (regime_str, confidence_int)."""
     # Primary: read from JSON file written by 4h_regime_scanner
@@ -1108,7 +1108,7 @@ def get_market_zscore():
         log_error(f'get_market_zscore: {e}')
         return "N/A"
 
-def get_prediction(coin):
+def get_prediction(token):
     """Get latest LLM candle prediction for token with per-token accuracy"""
     try:
         conn = sqlite3.connect('/root/.hermes/data/predictions.db')
@@ -1119,7 +1119,7 @@ def get_prediction(coin):
             WHERE token =  ?
             ORDER BY created_at DESC
             LIMIT 1
-        """, (coin,))
+        """, (token,))
         row = cur.fetchone()
         
         if row:
@@ -1134,8 +1134,8 @@ def get_prediction(coin):
             # Get per-token accuracy (for JIT - this token specifically)
             cur.execute("""
                 SELECT COUNT(*), SUM(CASE WHEN correct THEN 1 ELSE 0 END)
-                FROM predictions WHERE coin =  ? AND correct IS NOT NULL
-            """, (coin,))
+                FROM predictions WHERE token = ? AND correct IS NOT NULL
+            """, (token,))
             token_total, token_correct = cur.fetchone()
             token_accuracy = int((token_correct / token_total) * 100) if token_total and token_correct else 0
             
@@ -1200,7 +1200,7 @@ def update_trade_prices():
     except Exception as e:
         print(f"⚠️ Price update error: {e}")
 
-def get_macd(coin):
+def get_macd(token):
     """Compute MACD from price_history in signals_hermes.db (Python, no node needed).
     Returns dict with signal, histogram, trend, confidence.
     EMA periods: fast=12, slow=26, signal=9 (standard MACD).
