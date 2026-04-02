@@ -1654,12 +1654,6 @@ def run_confluence_detection(regime, long_mult, short_mult):
         mtf_rows     = [(src, max(70, conf)) for src, conf in all_rows if src and src.startswith('mtf-')]
         hermes_rows  = [(src, conf) for src, conf in all_rows if src and not src.startswith('mtf-')]
         hermes_confs = [conf for _, conf in hermes_rows]
-        # hmacd- is the primary trend signal — give it a confidence floor of 90%.
-        # Strong MACD crossovers are the clearest momentum signals. Elevating hmacd
-        # ensures strong trend signals auto-approve without needing AI review,
-        # reducing context window bloat from repeated AI review cycles.
-        hermes_confs = [max(conf, 90.0) if src == 'hmacd-' else conf
-                        for src, conf in hermes_rows]
         mtf_confs    = [conf for _, conf in mtf_rows]
         hermes_avg   = statistics.mean(hermes_confs) if hermes_confs else 0
         mtf_avg      = statistics.mean(mtf_confs) if mtf_confs else 0
@@ -1679,9 +1673,13 @@ def run_confluence_detection(regime, long_mult, short_mult):
         num_signals = min(num_signals, 3)
 
         if num_signals >= 3:
-            boosted = min(99, base_avg * 1.5 * reversal_mult)
+            boosted = min(90, base_avg * 1.5 * reversal_mult)
         else:
-            boosted = min(99, base_avg * 1.25 * reversal_mult)
+            # conf-2s: only 2 agreeing signals. Cap at 70%.
+            # Two sources = weak confluence. Even with hmacd at 90%, pairing with
+            # a noisy secondary (pct-hermes at 35-50%) doesn't make a strong signal.
+            # Let ai-decider hot-set scoring decide if it's worth keeping.
+            boosted = min(70, base_avg * 1.25 * reversal_mult)
 
         mtf_sources    = mtf_sources_str
         hermes_sources = hermes_sources_str

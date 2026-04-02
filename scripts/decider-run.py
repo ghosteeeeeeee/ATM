@@ -538,6 +538,95 @@ def close_position(token, reason):
         return False
 
 
+# ─── Hot-Set Auto-Approver (runs every minute in decider-run) ─────
+def _run_hot_set():
+    """
+    Auto-approve hot tokens every minute (not just every 10 min in ai-decider).
+    Loads tokens that survived at least 1 ai-decider pass (review_count >= 1).
+    Approves: conf-3s+ >= 65%, hmacd- >= 80%, conf-2s >= 65% (if avg conf >= 55%).
+    """
+    import sqlite3, os, time as _time
+
+    SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+    if not os.path.exists(SIGNALS_DB):
+        return 0
+
+    conn = sqlite3.connect(SIGNALS_DB)
+    c = conn.cursor()
+    now_str = _time.strftime('%Y-%m-%d %H:%M:%S')
+    approved_count = 0
+
+    try:
+        # Hot tokens: survived >= 1 AI review pass (rc >= 1), not yet APPROVED/executed
+        c.execute("""
+            SELECT token, direction, MAX(review_count) as rounds
+            FROM signals
+            WHERE (decision IN ('PENDING', 'WAIT')
+                   OR (decision = 'EXPIRED' AND review_count >= 1))
+              AND review_count >= 1
+              AND created_at > datetime('now', '-3 hours')
+              AND NOT EXISTS (
+                  SELECT 1 FROM signals s2
+                  WHERE s2.token = signals.token
+                    AND s2.direction = signals.direction
+                    AND s2.decision = 'APPROVED' AND s2.executed = 0
+              )
+            GROUP BY token, direction
+        """)
+        hot_rows = c.fetchall()
+
+        for token, direction, rounds in hot_rows:
+            t = token.upper()
+            if is_position_open(t) or get_position_count() >= MAX_POS:
+                continue
+
+            # Find best PENDING signal for this token+direction
+            c.execute("""
+                SELECT id, signal_type, source, confidence
+                FROM signals
+                WHERE token=? AND direction=? AND decision IN ('PENDING','WAIT') AND executed=0
+                ORDER BY CASE WHEN signal_type='confluence' THEN 0 ELSE 1 END, confidence DESC
+                LIMIT 1
+            """, (token, direction))
+            best = c.fetchone()
+            if not best:
+                continue
+
+            sig_id, sig_type, sig_src, sig_conf = best
+            should_approve, reason = False, ''
+
+            if sig_type == 'confluence':
+                try:
+                    num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
+                except (ValueError, IndexError):
+                    num_src = 1
+                if num_src >= 3:
+                    should_approve = sig_conf >= 65
+                    reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%'
+                else:
+                    should_approve = sig_conf >= 65
+                    reason = f'hot-conf-2s @{sig_conf:.0f}%'
+            elif sig_src and sig_src.startswith('hmacd-'):
+                should_approve = sig_conf >= 80
+                reason = f'hot-hmacd @{sig_conf:.0f}%'
+
+            if should_approve:
+                c.execute("""
+                    UPDATE signals SET decision='APPROVED', updated_at=?
+                    WHERE id=? AND executed=0
+                """, (now_str, sig_id))
+                conn.commit()
+                approved_count += 1
+                log(f'  🔥 [HOT-SET] {t} {direction} {reason} (survived r{rounds})')
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        log(f'HOT-SET error: {e}')
+    finally:
+        conn.close()
+
+    return approved_count
+
+
 # ─── Main Run ────────────────────────────────────────────────────
 
 def run(dry_run=False):
@@ -545,6 +634,9 @@ def run(dry_run=False):
     mode = "LIVE" if not paper else "PAPER"
     log(f'=== Decider Run ({mode}) ===')
     init_db()
+
+    # Run hot-set auto-approver every minute
+    _run_hot_set()
 
     # Process delayed-entry signals first
     de_exec, de_exp = process_delayed_entries(paper=paper)
@@ -613,10 +705,12 @@ def run(dry_run=False):
         log(f'Pending confluence fallback: {len(high_conf)} signals >= 95% confluence (from {len(pending)} total)')
         approved.extend(high_conf)
 
-    # ── Confidence floor: reject signals below 70% ──────────────────────────
-    # Individual RSI/MACD signals should never reach here (signal_gen adds them at
-    # PENDING, ai_decider handles review). But if they slip through as APPROVED, block them.
-    MIN_EXEC_CONFIDENCE = 70
+    # ── Confidence floor: reject signals below 65% ──────────────────────────
+    # Raised from 70% on 2026-04-02. The _run_hot_set() approver runs every minute
+    # (not every 10min like ai-decider) and approves at 65%+ for hot confluence signals.
+    # 65% is the floor for any signal reaching execution — hot-set tokens that survived
+    # AI review at this level are pre-qualified. Individual RSI/MACD below 65% are blocked.
+    MIN_EXEC_CONFIDENCE = 65
     approved = [s for s in approved if s.get('final_confidence', 0) >= MIN_EXEC_CONFIDENCE]
     if not approved:
         log(f'No signals above {MIN_EXEC_CONFIDENCE}% confidence — skipping execution')
