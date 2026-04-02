@@ -1,129 +1,156 @@
 ---
 name: fresh-run
-description: Fresh state reset for Hermes trading system — clears signals DB, archives brain trades, resets cooldowns, then runs clean pipeline test.
+description: Fresh state reset for Hermes trading system — archives closed trades, clears signals DB, resets cooldowns, clears clogs. Does NOT run the pipeline.
 category: trading
-tags: [hermes, trading, reset, signals, pipeline]
+tags: [hermes, trading, reset, signals, cooldowns]
 author: T
 created: 2026-03-31
+updated: 2026-04-02
 ---
 
 # Fresh Run — Reset Hermes Trading State
 
-Complete reset of the Hermes trading system to clean state. Archives all closed trades, clears stale signals, resets cooldowns, then runs pipeline to verify.
+Archives all closed trades, clears stale signals from all DBs, resets cooldowns, and clears system clogs. Does NOT run the pipeline — T controls when that happens.
 
 ## When to Use
 - After any major system change (new signal logic, A/B test, pipeline refactor)
 - When debugging signal confidence issues or ghost trades
 - After disabling competing processes
-- Before any live trading session
+- Before any live trading session (run pipeline manually after verifying state)
 
-## Step 1 — Archive + Reset
-
-Run as a Python script (not inline — complex multi-database transaction):
+## Step 1 — Archive Closed Trades
 
 ```python
 #!/usr/bin/env python3
-import psycopg2, sqlite3, json
+import psycopg2, sqlite3, json, subprocess
+from datetime import datetime
+
+ts = datetime.now().strftime('%Y%m%d_%H%M')
 
 # ── PostgreSQL (brain) ──────────────────────────────────────────────
-BRAIN_DB = {'host': '/var/run/postgresql', 'dbname': 'brain', 'user': 'postgres', 'password': 'postgres'}
-conn = psycopg2.connect(**BRAIN_DB)
+BRAIN = {'host': '/var/run/postgresql', 'dbname': 'brain', 'user': 'postgres', 'password': 'postgres'}
+conn = psycopg2.connect(**BRAIN)
 cur = conn.cursor()
 
-# Archive closed trades (before deleting!)
-import datetime
-ts = datetime.datetime.now().strftime('%Y%m%d_%H%M')
-cur.execute(f"""CREATE TABLE IF NOT EXISTS trades_archive_{ts} AS 
+# Show open trades first (don't lose track)
+cur.execute("SELECT id, token, direction, entry_price, pnl_pct, leverage, created_at FROM trades WHERE status='open'")
+open_trades = cur.fetchall()
+print(f"[brain] Open trades: {len(open_trades)}")
+for t in open_trades:
+    print(f"  id={t[0]} {t[1]} {t[2]} entry={float(t[3]):.4f} pnl={float(t[4]):.2f}% {t[6]}")
+
+# Archive closed trades to a timestamped table
+cur.execute(f"""CREATE TABLE IF NOT EXISTS trades_archive_{ts} AS
                SELECT * FROM trades WHERE status='closed'""")
+n_archive = cur.rowcount
 cur.execute("DELETE FROM trades WHERE status='closed'")
-cur.execute("DELETE FROM ab_results")  # AB test assignments for closed trades only
+cur.execute("DELETE FROM ab_results")
 conn.commit()
 
-cur.execute("SELECT COUNT(*) FROM trades WHERE status='open'")
-open_after = cur.fetchone()[0]
 cur.execute(f"SELECT COUNT(*) FROM trades_archive_{ts}")
 archived = cur.fetchone()[0]
-print(f"[brain] Archived {archived} closed trades | Open remaining: {open_after}")
+print(f"[brain] Archived {archived} closed trades -> trades_archive_{ts}")
 cur.close(); conn.close()
 
-# ── SQLite (signals) ───────────────────────────────────────────────
-SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
-conn2 = sqlite3.connect(SIGNALS_DB)
+# ── Signals DBs ─────────────────────────────────────────────────────
+# Hermes runtime signals
+SIGNALS_HERMES = '/root/.hermes/data/signals_hermes_runtime.db'
+conn2 = sqlite3.connect(SIGNALS_HERMES)
 c = conn2.cursor()
 c.execute("SELECT COUNT(*) FROM signals")
-sig_before = c.fetchone()[0]
+n_hermes = c.fetchone()[0]
 c.execute(f"CREATE TABLE IF NOT EXISTS signals_archive_{ts} AS SELECT * FROM signals")
 c.execute("DELETE FROM signals")
 conn2.commit()
 conn2.close()
-conn3 = sqlite3.connect(SIGNALS_DB)
+conn3 = sqlite3.connect(SIGNALS_HERMES)
 conn3.execute("VACUUM")
 conn3.close()
-print(f"[signals] Cleared {sig_before} signals")
+print(f"[signals/hermes] Purged {n_hermes} signals, VACUUM'd")
 
-# ── Clear cooldowns (JSON file, NOT a DB table) ───────────────────
+# OpenClaw signals (separate DB)
+SIGNALS_OC = '/root/.openclaw/workspace/data/signals.db'
+try:
+    conn4 = sqlite3.connect(SIGNALS_OC, timeout=5)
+    c4 = conn4.cursor()
+    c4.execute("SELECT COUNT(*) FROM signals")
+    n_oc = c4.fetchone()[0]
+    c4.execute(f"CREATE TABLE IF NOT EXISTS signals_archive_{ts} AS SELECT * FROM signals")
+    c4.execute("DELETE FROM signals")
+    conn4.commit()
+    conn4.close()
+    conn5 = sqlite3.connect(SIGNALS_OC)
+    conn5.execute("VACUUM")
+    conn5.close()
+    print(f"[signals/openclaw] Purged {n_oc} signals, VACUUM'd")
+except Exception as e:
+    print(f"[signals/openclaw] Skipped: {e}")
+
+# ── Cooldowns ──────────────────────────────────────────────────────
 COOLDOWN_FILE = '/root/.openclaw/workspace/data/signal-cooldowns.json'
 with open(COOLDOWN_FILE, 'w') as f:
     json.dump({}, f)
 print("[cooldowns] Cleared")
 
-print("DONE — fresh state ready")
+# ── Clear stale bytecode ───────────────────────────────────────────
+subprocess.run(['find', '/root/.hermes/scripts/', '-name', '*.pyc', '-delete'],
+               capture_output=True)
+print("[pycache] Cleared .pyc bytecode")
+
+print(f"\nDONE — archive: trades_archive_{ts}")
 ```
 
 Save as `/tmp/fresh_reset.py`, run with: `python3 /tmp/fresh_reset.py`
 
-## Step 2 — Clear Stale Bytecode (IMPORTANT)
+## Step 2 — Clear System Clogs
 
-**Always clear pycache after patching Python files** — stale `.pyc` files can silently revert your patches. Pipeline will appear to work but run old code.
-
-```bash
-find /root/.hermes/scripts/ -name "*.pyc" -delete
-```
-
-## Step 3 — Run Pipeline
+These commonly cause the pipeline to hang, skip, or re-execute same signals:
 
 ```bash
+# Remove stale lock files
 rm -f /tmp/hermes-pipeline.lock
-cd /root/.hermes/scripts
-python3 run_pipeline.py
+rm -f /tmp/*.lock
+
+# Remove orphaned .pid files
+find /tmp /root -name "*.pid" -type f 2>/dev/null | head -20
+
+# Check for stuck pipeline processes
+ps aux | grep -E "run_pipeline|signal_gen|decider" | grep -v grep
+
+# Clear any stuck cron/mcp-agent jobs
+# List them first:  mcp_cronjob(action='list')
 ```
 
-## Step 4 — Verify Clean Output
+## Step 3 — Verify Clean State
 
-Expected: 0 EXEC, 0 AUTO signals, signals go to AI-DECIDER. Check:
-- No `EXEC:` lines in output
-- No `[AUTO]` tags in signal output
-- z_score populated in signals DB:
-  ```sql
-  sqlite3 /root/.hermes/data/signals_hermes_runtime.db \
-    "SELECT token, confidence, z_score, z_score_tier FROM signals ORDER BY created_at DESC LIMIT 5;"
-  ```
-- Confluence signals show `→ decider` (not `AUTO`)
-- Ghost/orphan trades gone from DB
+```bash
+# Signals DBs should be empty
+sqlite3 /root/.hermes/data/signals_hermes_runtime.db "SELECT COUNT(*) FROM signals"
+sqlite3 /root/.openclaw/workspace/data/signals.db "SELECT COUNT(*) FROM signals" 2>/dev/null
 
-## Troubleshooting
+# Brain should have only open trades
+psql -h /var/run/postgresql -U postgres -d brain -c "SELECT COUNT(*) FROM trades WHERE status='closed'"
+psql -h /var/run/postgresql -U postgres -d brain -c "SELECT COUNT(*) FROM trades WHERE status='open'"
 
-**z_score still NULL after fix:**
-- Run pipeline again — pycache might not have cleared on first attempt
-- Check signals DB directly: `SELECT token, z_score FROM signals WHERE z_score IS NOT NULL LIMIT 5;`
-- Verify patched function is at correct line in file
+# Cooldowns should be empty
+cat /root/.openclaw/workspace/data/signal-cooldowns.json
 
-**Duplicate return statement / duplicate function blocks:**
-- grep for duplicate function defs: `grep -n "^def " signal_gen.py`
-- Check for duplicate RSI/MACD signal blocks at end of run() function
-- Always remove old code blocks before adding patched ones
+# No pipeline locks
+ls /tmp/hermes-pipeline.lock 2>/dev/null && echo "LOCK EXISTS" || echo "No lock — clean"
+```
 
-**Pipeline runs but signals still auto-execute:**
-- Check for duplicate RSI/MACD signal blocks (they bypass patched functions)
-- Momentum signals (score=80) enter without any z_score gate — may need ENTRY_THRESHOLD in decider-run
-- Confirm live_trading is OFF in hype_live_trading.json: `cat /var/www/hermes/data/hype_live_trading.json`
+## What NOT to Do
 
-## Key Lessons Learned (2026-03-31)
+- **Do NOT run the pipeline** as part of this skill — T decides when to run it
+- **Do NOT close open trades** — they are live positions on HL
+- **Do NOT delete archive tables** — historical record
 
-1. **Two versions of RSI/MACD signal functions** existed in signal_gen.py — the patched `_run_rsi_signals_for_confluence()` was called by `run_confluence_detection()`, but the ORIGINAL inline RSI/MACD blocks at lines ~1482-1520 (cap=80, no z_score, no filters) ran AFTER momentum signal loop and were still firing. Both had to be removed.
-2. **Stale pycache**: patched Python code doesn't run until `.pyc` is regenerated. Always `find ... -name "*.pyc" -delete` after patching.
-3. **z_score=NULL in signals DB**: caused by duplicate RSI/MACD blocks bypassing patched z_score code path.
-4. **No entry threshold in decider-run**: decider-run takes any PENDING signal 60-89% and executes it. No ENTRY_THRESHOLD check exists there.
-5. **Cooldowns are in a JSON file** (`/root/.openclaw/workspace/data/signal-cooldowns.json`), NOT in any database table.
-6. **Live trading file** is at `/var/www/hermes/data/hype_live_trading.json`, not `/root/.hermes/hype_live_trading.json`.
-7. **ghost_recovery trades** = real live positions that reconciliation code incorrectly closed. Position exists on HL but DB recorded it with paper=FALSE, so reconciliation saw DB-open/HL-missing and force-closed it.
+## Key Lessons Learned
+
+1. **Live trading file** is at `/var/www/hermes/data/hype_live_trading.json`, NOT `/root/.hermes/`. Check before running pipeline.
+2. **Two signals DBs exist**: Hermes (`/root/.hermes/data/signals_hermes_runtime.db`) and OpenClaw (`/root/.openclaw/workspace/data/signals.db`). Purge both.
+3. **Cooldowns are in a JSON file** (`/root/.openclaw/workspace/data/signal-cooldowns.json`), NOT in any database table.
+4. **ghost_recovery trades** = real live positions incorrectly closed by reconciliation. Don't re-close them during reset.
+5. **ZEC SHORT belongs on blacklist** — it has catastrophic loss history (-2291%, -4170%) from phantom re-entry loops.
+6. **Stale pycache reverts patches** — always clear after any Python file change.
+7. **confluence >= 98%** is the winning SHORT trigger. All other LONG and SHORT trades have been losers.
