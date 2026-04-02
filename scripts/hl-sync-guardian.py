@@ -21,6 +21,25 @@ Migrated from combined-trading.py:
 """
 import sys, time, json, subprocess, argparse, os, re, fcntl
 
+# Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
+HL_TOKEN_BLOCKLIST = frozenset({'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA',
+    'LOOM', 'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
+    'SAGE', 'SAMO', 'DUST', 'HNT', 'STABLE', 'STBL'})
+
+def _is_token_tradeable(token: str) -> bool:
+    """Check if token is on HL blocklist (non-tradeable phantom tokens)."""
+    if token.upper() in HL_TOKEN_BLOCKLIST:
+        return False
+    # Also verify via HL API
+    try:
+        mids = exchange.info.all_mids()
+        if token not in mids:
+            return False
+    except:
+        pass
+    return True
+
+
 # ── Process lock: prevent multiple guardian instances ───────────────────────
 _LOCK_FILE = '/tmp/hermes-guardian.lock'
 _lock_fd = os.open(_LOCK_FILE, os.O_CREAT | os.O_RDWR, 0o644)
@@ -610,6 +629,15 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
             import time as _time
             _time.sleep(3)
 
+            # Verify token is tradeable on HL before opening
+            try:
+                mids_check = exchange.info.all_mids()
+                if token not in mids_check:
+                    log(f'  [FLIP] SKIP: {token} not tradeable on HL (not in all_mids)', 'FAIL')
+                    return
+            except Exception as mid_err:
+                log(f'  [FLIP] Could not verify HL token list: {mid_err}', 'WARN')
+
             # Open opposite position
             flip_side = 'BUY' if opposite == 'LONG' else 'SELL'
             open_result = place_order(token, flip_side, sz, price=None,
@@ -636,10 +664,11 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                     variant_id, trade_id
                 ))
 
-                # Close original trade
+                # Mark guardian_closed so Step 8 won't re-process this trade
                 cur.execute("""
                     UPDATE trades SET status='closed', close_reason='flipped',
-                        exit_reason='flipped_hard_sl', flip_variant=%s
+                        exit_reason='flipped_hard_sl', flip_variant=%s,
+                        guardian_closed=TRUE
                     WHERE id=%s
                 """, (variant_id, trade_id))
 
@@ -729,6 +758,29 @@ def sync_pnl_from_hype(prices):
                         pnl_pct, prices)
 
                     updated += 1
+                    # Cut-loser: emergency exit at -10% loss
+                    # This runs AFTER flip check, so flip has priority over hard cut
+                    CUT_LOSER_THRESHOLD = -10.0
+                    if pnl_pct <= CUT_LOSER_THRESHOLD:
+                        log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
+                        from hyperliquid_exchange import close_position
+                        close_position(token)
+                        # Mark and close via Step 8 mechanism
+                        try:
+                            conn_cut = get_db_connection()
+                            if conn_cut:
+                                cur_cut = conn_cut.cursor()
+                                cur_cut.execute(
+                                    "UPDATE trades SET guardian_closed=TRUE, status='closed', "
+                                    "close_reason='cut_loser', exit_reason='cut_loser_pnl' "
+                                    "WHERE id=%s AND status='open'",
+                                    (trade_id,))
+                                conn_cut.commit()
+                                cur_cut.close()
+                                conn_cut.close()
+                        except Exception as cut_err:
+                            log(f'  Cut-loser DB update error: {cut_err}', 'FAIL')
+                        continue  # Skip flip check — already closing
 
         conn.commit()
         cur.close()
@@ -1421,24 +1473,59 @@ def sync():
         log(f'Syncing {len(missing)} paper-only trade(s)...', 'WARN')
         close_orphan_paper_trades(hl_pos, prices)
 
-    # Step 8: Close any remaining "missing" DB trades that close_orphan_paper_trades
-    # didn't handle. All closes now go through _close_paper_trade_db (has dedup guard)
-    # OR _close_orphan_paper_trade_by_id (has dedup + outcome recording).
-    # Skip tokens that were already closed in Step 6 (_CLOSED_HL_TOKENS).
+    # Step 8: Close remaining "missing" DB trades ONLY if they weren't externally closed.
+    # Bug fix (2026-04-02): T manually closed STABLE. Without guardian_closed flag,
+    # guardian detected it as "missing from HL" and closed ALL other DB trades in cascade.
+    # Safeguard: only close if guardian_closed=FALSE and the trade wasn't manually closed.
     if missing:
-        for t in db_trades:
-            tok = t['token'].upper()
-            if tok in _CLOSED_HL_TOKENS:
-                continue  # Already closed in Step 6
-            if tok in [x.upper() for x in missing]:
+        conn_guard = get_db_connection()
+        if conn_guard:
+            try:
+                cur_guard = conn_guard.cursor()
+                # Pre-fetch which trades are guardian_closed
+                cur_guard.execute("""
+                    SELECT id, token FROM trades
+                    WHERE status='open' AND exchange='Hyperliquid'
+                    AND guardian_closed=FALSE
+                """)
+                safe_to_close = {str(r[0]): r[1] for r in cur_guard.fetchall()}
+                cur_guard.close()
+                conn_guard.close()
+            except Exception:
+                safe_to_close = {}
+
+            for t in db_trades:
+                tok = t['token'].upper()
+                trade_id = t['id']
+
+                if tok in _CLOSED_HL_TOKENS:
+                    continue  # Already closed in Step 6
+                if tok not in [x.upper() for x in missing]:
+                    continue  # Not actually missing
+
+                # CRITICAL: Skip if guardian_closed=FALSE means the trade was
+                # externally closed (e.g. by T manually or by cut-loser).
+                # guardian_closed=TRUE means guardian itself closed it, so re-close is safe.
+                if str(trade_id) not in safe_to_close:
+                    log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (not guardian cascade)', 'WARN')
+                    continue
+
                 try:
                     fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
                     exit_price = _get_hl_exit_price(tok, fallback_price)
-                    _close_paper_trade_db(
-                        t['id'], tok,
-                        exit_price,
-                        'guardian_missing'
-                    )
+
+                    # Mark as guardian_closed BEFORE closing to prevent double-close
+                    conn_upd = get_db_connection()
+                    if conn_upd:
+                        cur_upd = conn_upd.cursor()
+                        cur_upd.execute(
+                            "UPDATE trades SET guardian_closed=TRUE WHERE id=%s",
+                            (trade_id,))
+                        conn_upd.commit()
+                        cur_upd.close()
+                        conn_upd.close()
+
+                    _close_paper_trade_db(trade_id, tok, exit_price, 'guardian_missing')
                 except Exception as e:
                     log(f'  DB close failed for {tok}: {e}', 'FAIL')
 

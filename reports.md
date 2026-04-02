@@ -529,3 +529,61 @@ If the improved prompt (funding rates, OHLCV indicators, volume, accuracy contex
 18. A/B test: run half predictions with inversion, half without. Measure real performance difference.
 19. Retrain: use predictions.db correctness labels to fine-tune a local model
 20. Dynamic threshold: instead of fixed 45% inversion threshold, use a rolling accuracy window (e.g., last 50 predictions) to dynamically adjust
+
+---
+
+## 2026-04-02 — Cascade Massacre Incident
+
+### What happened
+At ~05:40 UTC, T manually closed a STABLE LONG position to stop a loss. The guardian
+detected it as "missing from HL" (step 8: DB open, HL gone) and proceeded to
+close ALL 19 remaining open trades in the DB — even though they were still live on HL.
+
+**Timeline:**
+- 05:40:59 — STABLE LONG opened by confluence signal (99% confidence, signal: conf-3s)
+- 05:41-05:49 — STABLE drops from $0.029374 to $0.028691 (-6.8%, $0.23 loss)
+- 05:41 — T manually closes STABLE on HL UI
+- 05:48:56-05:49:57 — Guardian cascade fires, closes 9 trades (BNB, CAKE, 0G, XMR, RESOLV, MORPHO, SKY, ME)
+- 05:52:46-05:54:02 — Guardian orphan recovery creates new trades, then closes them
+- Net result: STABLE closed correctly, but 18 other trades were incorrectly force-closed
+
+**Financial damage:**
+- XMR SHORT phantom: -$10,300.78 (price mismatch on recovery trades — entry $332 vs exit $10)
+- 0G LONG: closed twice at loss
+- Most other trades: small gains wiped (+$0.11 to +$1.29)
+
+### Root cause: Cascade bug in Step 8
+```python
+# Step 8 blindly closes ALL "missing" DB trades without checking
+# whether they were manually closed by T or closed by cut-loser
+for t in db_trades:
+    if tok in missing:
+        _close_paper_trade_db(t['id'], tok, exit_price, 'guardian_missing')
+```
+When T manually closed STABLE, the guardian saw it gone from HL, put it in `missing`,
+then closed every DB trade that matched the `missing` set — including ones that WERE
+still live on HL. The guardian then created "orphan recovery trades" for the still-live
+tokens (0G, XMR) at wrong prices ($10 vs $0.50), closing those at catastrophic losses.
+
+### Fixes applied (2026-04-02)
+1. **guardian_closed flag** — added to trades table. Guardian marks `guardian_closed=TRUE`
+   on every trade it closes. Step 8 now skips trades that are `guardian_closed=FALSE`
+   (meaning they were closed externally by T or cut-loser, not by guardian).
+2. **Cut-loser integrated into guardian** — sync_pnl_from_hype now checks if PnL <= -10%
+   and emergency-closes before flip logic. Previously cut-loser only ran in position_manager
+   daemon which wasn't running.
+3. **HL_TOKEN_BLOCKLIST** — added STABLE and STBL to non-tradeable token list.
+   Guardian now verifies token is on HL via `all_mids()` before opening any position.
+4. **Flip trade HL verification** — before opening a flip position, guardian confirms
+   token exists in HL `all_mids()`.
+
+### Still pending (2026-04-02)
+- `momentum_cache` has 0 rows — regime scanner cron may not be running. Regime data
+  needed for regime-based signal decisions.
+- Flip evolution loop has no terminal state — keeps widening trailing forever.
+- Flip evolution doesn't guard on profitability — can evolve losing strategies forward.
+- STABLE is a real HL token (0.028605) but extremely illiquid. Consider adding a
+  minimum volume/liquidity filter before trading any token.
+
+---
+
