@@ -25,10 +25,16 @@ SHORT_BLACKLIST = {
     'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
     'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
     'SAGE', 'SAMO', 'DUST', 'HNT',
+    # 2026-04-02: phantom orders — tokens generating guardian_missing closes via
+    # openclaw systemd timers firing. Add to both SHORT and LONG blacklists.
+    'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
 }
 LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
                    # Solana tokens blocked on LONG side too
                    'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
-                   'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS'}
+                   'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
+                   # 2026-04-02: phantom orders via openclaw systemd timers
+                   'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
+}
 BROAD_MARKET_TOKENS = ['ETH', 'SOL', 'BTC']
 SERVER_NAME = 'Hermes'

@@ -616,7 +616,10 @@ def run(dry_run=False):
             direction = p.get('direction', 'LONG').upper()
             # Extract num_signals from source string (e.g. 'conf-3s' → 3)
             raw_source = p.get('source', 'conf-1s')
-            num_src = int(raw_source.split('-')[-1].rstrip('s')) if raw_source else 1
+            try:
+                num_src = int(raw_source.split('-')[-1].rstrip('s')) if raw_source else 1
+            except ValueError:
+                num_src = 1  # malformed source string — skip fallback
             if (p.get('signal_type') == 'confluence'
                 and p.get('confidence', 0) >= 95
                 and num_src >= 3  # minimum 3 sources — single/dual source is noise
