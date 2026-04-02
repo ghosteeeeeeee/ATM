@@ -28,13 +28,18 @@ SHORT_BLACKLIST = {
     # 2026-04-02: phantom orders — tokens generating guardian_missing closes via
     # openclaw systemd timers firing. Add to both SHORT and LONG blacklists.
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
+    # 2026-04-02: persistent losing SHORT directions (loss cooldown streak)
+    'MINA',   # SHORT: streak=2, 4h cooldown, persistent losses
 }
-LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
-                   # Solana tokens blocked on LONG side too
-                   'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
-                   'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
-                   # 2026-04-02: phantom orders via openclaw systemd timers
-                   'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
+LONG_BLACKLIST = {
+    'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
+    # Solana chain tokens — indexed on HL but NOT tradeable
+    'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
+    'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
+    # 2026-04-02: phantom orders via openclaw systemd timers
+    'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
+    # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)
+    'AERO', 'CHILLGUY', 'LIT', 'DOT', 'ANIME',  # LONG losing streaks
 }
-BROAD_MARKET_TOKENS = ['ETH', 'SOL', 'BTC']
+BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 SERVER_NAME = 'Hermes'

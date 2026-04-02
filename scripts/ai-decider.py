@@ -113,16 +113,17 @@ def _load_hot_rounds():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # FIX (2026-04-01): Exclude tokens that already have an active APPROVED signal
-        # (executed=0 means it's queued for entry but hasn't been filled yet).
-        # Without this, every new signal for an already-approved token re-enters the hot set,
-        # causing the same token to be auto-approved repeatedly each pipeline run.
-        # Tokens are only removed from hot set after position enters (executed=1).
+        # FIX (2026-04-02): Also include tokens with rc=1 EXPIRED signals.
+        # When positions are full, strong signals get SKIPPED→EXPIRED immediately.
+        # Those tokens never enter the hot set because EXPIRED is not in the decision list.
+        # Including EXPIRED means a token that was reviewed once (even if skipped due to
+        # full positions) gets auto-approved on the next signal without AI re-review.
+        # The review_count=1 proves: "AI already looked at this token, it's valid."
         c.execute("""
             SELECT token, direction, MAX(review_count) as rounds,
                    GROUP_CONCAT(DISTINCT signal_type) as types, source
             FROM signals
-            WHERE decision IN ('PENDING', 'APPROVED', 'WAIT')
+            WHERE decision IN ('PENDING', 'APPROVED', 'WAIT', 'EXPIRED')
               AND review_count >= 1
               AND created_at > datetime('now', '-3 hours')
               AND token || direction NOT IN (
