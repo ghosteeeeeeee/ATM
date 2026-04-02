@@ -30,6 +30,38 @@ def log_error(msg, exc=None):
 AB_CONFIG_FILE = '/root/.openclaw/workspace/data/ab-test-config.json'
 sys.path.insert(0, '/root/.hermes/scripts')
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+
+# ─── Source confidence weights ────────────────────────────────────────────────
+# Single config for all signal source multipliers applied to raw confidence.
+# > 1.0 = boost (trust more), < 1.0 = suppress (trust less).
+# mtf_macd with hmacd- source = MACD crossovers = clearest trend signals = 1.2x.
+# Other hmacd-* sources = weaker/secondary = 0.6x (penalize, don't trust alone).
+# All others = 1.0 (neutral).
+SOURCE_WEIGHTS = {
+    'hmacd-mtf_macd': 1.2,   # MACD crossovers — strong trend confirmation
+    'hmacd-default': 0.6,   # Other hmacd-derived signals — penalize
+}
+# Master map: (signal_type, source_prefix) -> weight
+# Checked in order; first match wins. None = neutral 1.0.
+SOURCE_WEIGHT_OVERRIDES = [
+    ('mtf_macd',  'hmacd-',  1.2),   # hmacd- + mtf_macd = MACD crossover
+    # All other hmacd-* sources (pct-hermes, etc.) fall through to default 0.6
+]
+DEFAULT_SOURCE_WEIGHT = 1.0
+
+def _get_source_weight(stype, source):
+    """Return confidence multiplier for (signal_type, source)."""
+    if not source:
+        return DEFAULT_SOURCE_WEIGHT
+    # Check explicit overrides first
+    for stype_pattern, source_prefix, weight in SOURCE_WEIGHT_OVERRIDES:
+        if stype == stype_pattern and source.startswith(source_prefix):
+            return weight
+    # hmacd-* but not mtf_macd → penalize
+    if source.startswith('hmacd-'):
+        return SOURCE_WEIGHTS.get('hmacd-default', 0.6)
+    return DEFAULT_SOURCE_WEIGHT
+
 SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
 AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
@@ -828,14 +860,11 @@ def get_pending_signals():
                         base_confluence *= 1.4   # 1.4 to 2.8 — very rare, very strong
                 confluence_score = base_confluence
 
-                # hmacd source boost: mtf_macd signals from hmacd-* source
-                # are MACD crossovers — the clearest trend signals. 1.2x multiplier.
-                source_mult = 1.0
-                if source and source.startswith('hmacd-'):
-                    source_mult = 1.2
+                # Source confidence weight from centralized config
+                source_weight = _get_source_weight(stype, source)
 
-                # Confidence (scaled by hmacd source multiplier)
-                conf_score = (conf / 100.0) * source_mult
+                # Confidence (scaled by source weight)
+                conf_score = (conf / 100.0) * source_weight
 
                 # Recency
                 try:
@@ -872,7 +901,7 @@ def get_pending_signals():
                     'streak_mult': streak_mult,
                     'confluence_score': confluence_score,
                     'conf_score': conf_score,
-                    'source_mult': source_mult,
+                    'source_weight': source_weight,
                     'recency_score': recency_score,
                     'compact_rounds': compact_rounds,
                     'survival_meta': survival_meta,

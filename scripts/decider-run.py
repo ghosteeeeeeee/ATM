@@ -10,7 +10,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
                            update_signal_decision, validate_source)
-from ai_decider import get_regime
+from ai_decider import get_regime, _get_source_weight
 from _secrets import BRAIN_DB_DICT
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
@@ -597,8 +597,10 @@ def _run_hot_set():
     """
     Auto-approve hot tokens every minute (not just every 10 min in ai-decider).
     Loads tokens that survived at least 1 ai-decider pass (review_count >= 1).
-    Approves: conf-3s+ >= 65%, hmacd- >= 80%, conf-2s >= 65% (if avg conf >= 55%).
-    
+    Approves: conf-3s+ >= 65%, hmacd- (weight-based threshold), conf-2s >= 65%.
+    Hot-set thresholds now use centralized _get_source_weight() from ai-decider:
+      mtf_macd + hmacd- = 1.2x → threshold 65/1.2 = 54% (boosted)
+      pct-hermes + hmacd- = 0.6x → threshold 65/0.6 = 108% → effectively never
     FIX (2026-04-02):
     - Adds per-token regime check for confluence signals (NOT hmacd, which uses separate logic).
     - Adds back-to-back failure cooldown: 2+ same-direction failures → block that direction for 1hr.
@@ -689,10 +691,13 @@ def _run_hot_set():
                     should_approve = sig_conf >= 65
                     reason = f'hot-conf-2s @{sig_conf:.0f}%'
             elif sig_src and sig_src.startswith('hmacd-'):
-                # hmacd signals: no regime check (use different approval criteria)
-                # Reduced from 70→80% (2026-04-02): hmacd was triggering too many weak signals
-                should_approve = sig_conf >= 80
-                reason = f'hot-hmacd @{sig_conf:.0f}%'
+                # Apply centralized source weight from ai-decider
+                # mtf_macd + hmacd- = 1.2x → threshold 65/1.2 = 54%
+                # pct-hermes + hmacd- = 0.6x → threshold 65/0.6 = 108% → effectively never
+                sw = _get_source_weight(sig_type, sig_src)
+                threshold = min(99, 65.0 / sw)
+                should_approve = sig_conf >= threshold
+                reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]'
 
             if should_approve:
                 c.execute("""
