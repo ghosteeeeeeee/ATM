@@ -812,10 +812,15 @@ def get_pending_signals():
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
-              AND created_at > datetime('now', '-30 minutes')
+              AND created_at > datetime('now', '-720 minutes')
         """)
         candidates = c.fetchall()
 
+        # FIX (2026-04-02): Extended compaction window from 30min to 12h.
+        # Previously signals older than 30min were invisible to the AI's hot-set
+        # scoring — they'd never accumulate survival_score or reach review_count.
+        # With 12h window, signals get proper review cycles (ai-decider runs ~every
+        # 1min) before compaction decisions are made.
         # Always score all candidates — this increments compact_rounds for EVERY signal
         # each cycle, building their survival history so the hot set populates even
         # with <20 signals. With <=20 candidates, ALL survive (no compaction).
@@ -942,12 +947,22 @@ def get_pending_signals():
                       f'survived_r{s["compact_rounds"]+1}_conf{s["conf"]:.0f}'))
 
             # Only compact (expire bottom signals) when we have >20 candidates
+            # FIX (2026-04-02): Signals with confidence >= 85% are EXEMPT from compaction.
+            # These are strong signals that have survived multiple AI review passes
+            # and deserve a chance to reach APPROVED/execution. Compacting them
+            # at 286 signals (avg 94% conf) was destroying good opportunities.
+            EXEMPT_CONFIDENCE = 85
             if not keep_all:
-                expire_ids = [s['sid'] for s in scored[20:]]
+                # Separate exempt signals from compactable ones
+                exempt_sids = {s['sid'] for s in scored if s['conf'] >= EXEMPT_CONFIDENCE}
+                compactable = [s for s in scored if s['sid'] not in exempt_sids]
+                # Keep top 20 compactable signals, compact the rest
+                keep_sids = {s['sid'] for s in compactable[:20]} | exempt_sids
+                expire_ids = [s['sid'] for s in compactable[20:]]
                 compacted_count = len(expire_ids)
                 if expire_ids:
                     placeholders = ','.join(['?' for _ in expire_ids])
-                    for s in scored[20:]:
+                    for s in compactable[20:]:
                         c.execute("""
                             INSERT INTO signal_history
                                 (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
@@ -960,6 +975,8 @@ def get_pending_signals():
                         SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
                         WHERE id IN ({placeholders})
                     """, expire_ids)
+                    if exempt_sids:
+                        print(f"  [compaction] EXEMPT: {len(exempt_sids)} high-confidence signals protected from compaction (conf>={EXEMPT_CONFIDENCE}%)")
 
             conn.commit()
 

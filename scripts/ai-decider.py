@@ -812,10 +812,15 @@ def get_pending_signals():
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
-              AND created_at > datetime('now', '-30 minutes')
+              AND created_at > datetime('now', '-720 minutes')
         """)
         candidates = c.fetchall()
 
+        # FIX (2026-04-02): Extended compaction window from 30min to 12h.
+        # Previously signals older than 30min were invisible to the AI's hot-set
+        # scoring — they'd never accumulate survival_score or reach review_count.
+        # With 12h window, signals get proper review cycles (ai-decider runs ~every
+        # 1min) before compaction decisions are made.
         # Always score all candidates — this increments compact_rounds for EVERY signal
         # each cycle, building their survival history so the hot set populates even
         # with <20 signals. With <=20 candidates, ALL survive (no compaction).
