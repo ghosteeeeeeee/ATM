@@ -126,7 +126,7 @@ def main():
         f"{upload_url}{zip_basename}",
         data=zip_data,
         headers={
-            "Authorization": f"token {TOKEN}",
+            "Authorization": f"token {GH}",
             "Content-Type": "application/zip",
         },
         method="POST",
