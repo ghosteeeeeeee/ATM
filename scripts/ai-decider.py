@@ -799,9 +799,12 @@ def get_pending_signals():
                 survival_meta = surv_row[1] if surv_row else 0.0
 
                 # Confluence: count agreeing signal types for same token+direction
+                # FIX (2026-04-02): Cap at 2 agreeing signals max (was unbounded).
+                # STABLE had 5 agreeing signals -> score 3.0, dominating all other factors.
+                # Capping at 2 gives score 2.0 max, prevents confluence flooding.
                 agreeing = sum(1 for r in candidates
                                if r[1] == token and r[2] == direction and r[3] != stype)
-                confluence_score = 1.0 + (agreeing * 0.5)
+                confluence_score = 1.0 + min(agreeing, 2) * 0.5  # max 2.0
 
                 # Confidence
                 conf_score = conf / 100.0
@@ -823,13 +826,16 @@ def get_pending_signals():
                 survival_bonus = min(1.0, compact_rounds * 0.2 + survival_meta * 0.3)
                 survival_score_raw = 1.0 + survival_bonus
 
-                # Score = confluence(35%) + confidence(25%) + survival(20%) + streak(15%) + recency(5%)
+                # Score = confluence(20%) + confidence(35%) + survival(20%) + streak(15%) + recency(10%)
+                # FIX (2026-04-02): Reduced confluence from 35% -> 20%. STABLE confluence signal
+                # scored 99% but was fundamentally wrong — confluence was counting noise agreeing
+                # across bad indicators, not genuine signal strength. Confidence now leads.
                 raw_score = (
-                    confluence_score * 0.35 +
-                    conf_score       * 0.25 +
+                    confluence_score * 0.20 +
+                    conf_score       * 0.35 +
                     survival_score_raw * 0.20 +
                     streak_mult      * 0.15 +
-                    recency_score    * 0.05
+                    recency_score    * 0.10
                 )
                 scored.append({
                     'score': raw_score,
@@ -1497,8 +1503,17 @@ for s in pending:
     
     if direction.lower() == "long" and t.upper() in LONG_BLACKLIST:
         print(f"   🚫 {t}: BLACKLISTED - skipping LONG (poor performance)")
-        log_signal(t, direction, entry, s.get('confidence', 0), f"SKIPPED-long-blacklist-{exchange}")
-        mark_signal_processed(t, 'SKIPPED', decision_reason='blacklist-long')
+        log_signal(t, direction, entry, s.get("confidence", 0), f"SKIPPED-blacklist-{exchange}")
+        mark_signal_processed(t, 'SKIPPED', decision_reason=f'blacklist-long')
+        continue
+
+    # FIX (2026-04-02): Block STABLE/STBL tokens. These are illiquid, error-prone
+    # tokens that appear in HL data but frequently generate bad signals.
+    # STABLE incident: confluence 99% signal, wrong direction, cascade massacre.
+    if t.upper() in ('STABLE', 'STBL'):
+        print(f"   🚫 {t}: BLOCKED — illiquid/non-standard token (2026-04-02 incident)")
+        log_signal(t, direction, entry, s.get("confidence", 0), "SKIPPED-stable-block")
+        mark_signal_processed(t, 'SKIPPED', decision_reason='blocked-illiquid-token')
         continue
     
     # Check open slots
