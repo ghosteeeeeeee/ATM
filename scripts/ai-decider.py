@@ -1098,9 +1098,9 @@ def get_prices():
         return {}
 
 def update_trade_prices():
-    """Update current_price for all open trades"""
+    """Update current_price for all open trades using Hyperliquid prices"""
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', database="brain", user="postgres", password='Brain123')
+        conn = psycopg2.connect(host='/var/run/postgresql', database="brain", user="postgres", password='***')
         cur = conn.cursor()
         
         # Get all open trades
@@ -1108,17 +1108,21 @@ def update_trade_prices():
         open_trades = cur.fetchall()
         
         if not open_trades:
+            cur.close()
+            conn.close()
             return
         
-        # Fetch prices from Gate.io
-        r = requests.get("https://api.gateio.ws/api/v4/spot/tickers", timeout=10)
-        tickers = {t["currency_pair"]: float(t["last"]) for t in r.json()}
+        # BUG-10 fix: fetch prices from Hyperliquid via hype_cache instead of Gate.io
+        try:
+            mids = hc.get_allMids()
+        except Exception:
+            mids = {}
         
         updated = 0
         for trade_id, token in open_trades:
-            pair = f"{token}_USDT"
-            if pair in tickers:
-                current_price = tickers[pair]
+            # Hyperliquid uses just the token symbol (e.g. "BTC", not "BTC_USDT")
+            if token in mids:
+                current_price = float(mids[token])
                 cur.execute("UPDATE trades SET current_price = %s, last_updated = NOW() WHERE id = %s", 
                           (current_price, trade_id))
                 updated += 1
@@ -1127,7 +1131,7 @@ def update_trade_prices():
         cur.close()
         conn.close()
         if updated > 0:
-            print(f"✅ Updated {updated} trade prices")
+            print(f"✅ Updated {updated} trade prices from Hyperliquid")
     except Exception as e:
         print(f"⚠️ Price update error: {e}")
 
@@ -1426,8 +1430,11 @@ for s in pending:
                     counter_detected = 1,
                     deescalation_reason = 'counter-signal-opposite-open',
                     updated_at = ?
-                WHERE id = ?
-            """, (now_str, s.get('id')))
+                WHERE token = ?
+                  AND direction = ?
+                  AND decision = 'PENDING'
+            """, (now_str, tok, sig_dir))
+            processed_this_run.add(f"{tok}:{sig_dir}")  # BUG-3 fix: dedup counter-killed signals
             counter_killed += 1
 conn_deesc.commit()
 if counter_killed > 0:

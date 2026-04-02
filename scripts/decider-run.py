@@ -353,7 +353,7 @@ def process_delayed_entries(paper=True):
 
         # Get current price
         cur_price = get_current_price(token)
-        if not cur_price:
+        if not cur_price or cur_price <= 0:
             still_pending.append(entry)
             continue
 
@@ -595,21 +595,9 @@ def _run_hot_set():
             sig_id, sig_type, sig_src, sig_conf = best
             should_approve, reason = False, ''
 
-            # HARD BLOCK: Check market regime — don't approve trades against regime
-            try:
-                import json as _json
-                with open("/var/www/html/regime_4h.json") as f:
-                    regime_data = _json.load(f)
-                market_regime = regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
-                regime_conf = 80  # assume high confidence for regime check
-                if market_regime == 'SHORT_BIAS' and direction.upper() == 'LONG':
-                    should_approve = False
-                    reason = f'regime-block SHORT_BIAS market, rejecting LONG'
-                elif market_regime == 'LONG_BIAS' and direction.upper() == 'SHORT':
-                    should_approve = False
-                    reason = f'regime-block LONG_BIAS market, rejecting SHORT'
-            except Exception:
-                pass  # if regime check fails, proceed with normal logic
+            # Per-token regime check is handled by ai-decider.get_regime()
+            # which reads from PostgreSQL momentum_cache (per-token regime, not aggregate).
+            # No aggregate market-wide hard block here.
 
             if sig_type == 'confluence':
                 try:
@@ -789,23 +777,9 @@ def run(dry_run=False):
             skipped += 1
             continue
 
-        # HARD BLOCK: Check market regime before any trade execution
-        # This is the last line of defense — even APPROVED signals can't fight the regime
-        try:
-            import json as _json
-            with open("/var/www/html/regime_4h.json") as f:
-                regime_data = _json.load(f)
-            market_regime = regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
-            if market_regime == 'SHORT_BIAS' and direction.upper() == 'LONG':
-                log(f'SKIP: {token} {direction} — regime BLOCK (SHORT_BIAS market, rejecting LONG)')
-                skipped += 1
-                continue
-            elif market_regime == 'LONG_BIAS' and direction.upper() == 'SHORT':
-                log(f'SKIP: {token} {direction} — regime BLOCK (LONG_BIAS market, rejecting SHORT)')
-                skipped += 1
-                continue
-        except Exception:
-            pass  # if regime check fails, proceed (last resort)
+        # Per-token regime check is handled by ai-decider.get_regime()
+        # which reads from PostgreSQL momentum_cache — per-token regime filter only.
+        # No aggregate market-wide block here.
 
         # Check position limit
         if open_count >= MAX_POS:

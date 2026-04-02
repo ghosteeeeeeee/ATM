@@ -58,15 +58,10 @@ TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
 # When an open position is losing AND an opposite signal fires with strong conf,
 # cascade flip: close the losing position AND enter the opposite direction.
 
-# TODO (2026-04-02): Push trailing SL updates to Hyperliquid.
-# Currently position_manager computes the trailing SL and writes it to the brain DB,
-# but it never pushes the updated SL order to HL. The guardian only syncs HL → DB
-# (PnL, fills, prices) but has no code to push SL modifications back.
-# We need to add a call to hyperliquid_exchange to cancel the existing SL order
-# and place a new one when the trailing SL moves. This is critical for protecting
-# profits on leveraged positions — the local trailing SL fires correctly but the
-# remote HL order stays static until manually closed.
-# This prevents riding losing trades while the market has already reversed.
+# BUG-8 fix: Push trailing SL updates to Hyperliquid.
+# The position_manager computes trailing SL and writes it to brain DB, but the
+# actual HL stop-loss order was never updated when trailing tightened.
+# We now push updated SL orders to HL when trailing tightens.
 CASCADE_FLIP_MIN_LOSS  = -0.5   # Position must be down >= this % to qualify
 CASCADE_FLIP_MIN_CONF   = 70.0   # Opposite signal must have conf >= this %
 CASCADE_FLIP_MAX_AGE_M  = 15     # Opposite signal must be created within this many minutes
@@ -1205,7 +1200,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             closed_count += 1
             print(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 
-        # ── 4. Update trailing SL in DB for dashboard display ───────
+        # ── 4. Update trailing SL in DB and push to Hyperliquid ─────
         if trailing_sl:
             try:
                 conn_pm = get_db_connection()
@@ -1216,9 +1211,37 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         (round(trailing_sl, 8), trade_id)
                     )
                     conn_pm.commit()
+                    cur_pm.close()
                     conn_pm.close()
             except Exception:
                 pass
+            # BUG-8 fix: push updated trailing SL to Hyperliquid
+            try:
+                from hyperliquid_exchange import get_exchange, _hl_tick_round, _HL_TICK_DECIMALS
+                exchange = get_exchange()
+                decimals = _HL_TICK_DECIMALS.get(token, 6)
+                sl_rounded = _hl_tick_round(trailing_sl, decimals)
+                # Get position size from HL to set SL at correct size
+                from hyperliquid_exchange import get_open_hype_positions
+                positions = get_open_hype_positions() or []
+                size = 0.0
+                for p in positions:
+                    if p.get('coin', '').upper() == token.upper():
+                        size = float(p.get('szi', 0) or 0)
+                        break
+                if size > 0:
+                    is_buy = direction.upper() == "SHORT"
+                    order_type = {
+                        "trigger": {
+                            "triggerPx": sl_rounded,
+                            "isMarket": True,
+                            "tpsl": "sl",
+                        }
+                    }
+                    exchange.order(token, is_buy, abs(size), sl_rounded, order_type, reduce_only=True)
+                    print(f"  [BUG-8] Pushed trailing SL to HL: {token} {direction} SL=${sl_rounded:.6f}")
+            except Exception as e:
+                print(f"  [BUG-8] Failed to push trailing SL to HL: {e}")
 
     print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
 
@@ -1329,15 +1352,17 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         return False
 
     # 2. Enter the opposite direction at current price
-    from hyperliquid_exchange import place_market_order
-    current_price = flip_info['price']
+    # BUG-7 fix: fetch current market price instead of using stale signal record price
+    from hyperliquid_exchange import place_market_order, get_price
+    try:
+        current_price = get_price(token)
+        if not current_price or current_price <= 0:
+            current_price = flip_info.get('price') or 0
+    except Exception:
+        current_price = flip_info.get('price') or 0
     if not current_price or current_price <= 0:
-        try:
-            from hyperliquid_exchange import get_price
-            current_price = get_price(token)
-        except Exception:
-            print(f"  [CASCADE FLIP] ❌ Could not get price for {token}")
-            return True  # Position closed, new entry failed but not fatal
+        print(f"  [CASCADE FLIP] ❌ Could not get price for {token}")
+        return True  # Position closed, new entry failed but not fatal
 
     ok = place_market_order(
         token=token,

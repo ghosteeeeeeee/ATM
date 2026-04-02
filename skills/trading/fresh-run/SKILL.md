@@ -44,7 +44,7 @@ cur.execute(f"""CREATE TABLE IF NOT EXISTS trades_archive_{ts} AS
                SELECT * FROM trades WHERE status='closed'""")
 n_archive = cur.rowcount
 cur.execute("DELETE FROM trades WHERE status='closed'")
-cur.execute("DELETE FROM ab_results")
+# NOTE: Do NOT DELETE ab_results — preserve A/B test data across resets
 conn.commit()
 
 cur.execute(f"SELECT COUNT(*) FROM trades_archive_{ts}")
@@ -152,5 +152,7 @@ ls /tmp/hermes-pipeline.lock 2>/dev/null && echo "LOCK EXISTS" || echo "No lock 
 3. **Cooldowns are in a JSON file** (`/root/.openclaw/workspace/data/signal-cooldowns.json`), NOT in any database table.
 4. **ghost_recovery trades** = real live positions incorrectly closed by reconciliation. Don't re-close them during reset.
 5. **ZEC SHORT belongs on blacklist** — it has catastrophic loss history (-2291%, -4170%) from phantom re-entry loops.
-6. **Stale pycache reverts patches** — always clear after any Python file change.
-7. **confluence >= 98%** is the winning SHORT trigger. All other LONG and SHORT trades have been losers.
+7. **Stale pycache reverts patches** — always clear after any Python file change.
+8. **Per-token regime filter** — regime hard-blocks read from PostgreSQL momentum_cache (per-token regime via `get_regime()`), NOT from aggregate `regime_4h.json`. Each token's regime is computed independently by 4h_regime_scanner. No aggregate market-wide filter exists.
+9. **HOT-SET uses cooldown_tracker table** — not the cooldowns JSON file. Both must be cleared on fresh-run.
+10. **confluence >= 98%** is the winning SHORT trigger. All other LONG and SHORT trades have been losers.

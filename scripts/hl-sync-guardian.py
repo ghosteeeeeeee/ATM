@@ -128,7 +128,7 @@ def _load_closed_set() -> set:
     try:
         with open(_CLOSED_SET_FILE) as f:
             data = json.load(f)
-        return set(str(x) for x in data)
+        return set(int(x) for x in data)  # BUG-6 fix: return integers to match _close_paper_trade_db trade_id type
     except:
         return set()
 
@@ -715,7 +715,8 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                 # BUG-8/13 fix: look up actual regime from momentum_cache instead of 'unknown'.
                 flip_intel = get_token_intel(token)
                 # BUG-8 fix: use numeric encoding for regime (BULL=1, BEAR=-1, unknown=0)
-                _REGIME_MAP = {'BULL': 1, 'bull': 1, 'BEAR': -1, 'bear': -1}
+                # BUG-9 fix: added LONG_BIAS/SHORT_BIAS/NEUTRAL
+                _REGIME_MAP = {'BULL': 1, 'bull': 1, 'BEAR': -1, 'bear': -1, 'LONG_BIAS': 1, 'SHORT_BIAS': -1, 'NEUTRAL': 0}
                 flip_regime_4h = _REGIME_MAP.get(str(flip_intel.get('regime_4h', 'unknown')), 0)
                 flip_regime_1h = _REGIME_MAP.get(str(flip_intel.get('regime_1h', 'unknown')), 0)
                 flip_regime_15m = _REGIME_MAP.get(str(flip_intel.get('regime_15m', 'unknown')), 0)

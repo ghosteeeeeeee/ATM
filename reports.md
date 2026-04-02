@@ -758,3 +758,203 @@ These scripts modify `ab_tests.json` and `ab_results` table. Not reviewed in det
 
 ---
 
+
+---
+
+# Code Review: Trading System Bugs (2026-04-02)
+
+## Bug Summary
+
+| # | File | Severity | Status | Description |
+|---|------|----------|--------|-------------|
+| 1 | ai-decider.py:1452 | CRITICAL | OPEN | `s.get('id')` always None — counter-signal updates never execute |
+| 2 | ai-decider.py:199-227 | CRITICAL | OPEN | `_kill_hot_signal` and `_kill_pending_opposite` UPDATE queries never bind `token` |
+| 3 | ai-decider.py:1493 | HIGH | OPEN | `processed_this_run` dedup set not populated from counter-killed signals |
+| 4 | ai-decider.py:151-167 | HIGH | OPEN | `_load_hot_rounds` avg_conf query missing direction filter |
+| 5 | decider-run.py:355 | MEDIUM | OPEN | Zero price could cause division-by-zero in `process_delayed_entries` |
+| 6 | hl-sync-guardian.py:1217 | HIGH | OPEN | `_load_closed_set` converts to strings, dedup fails after restart |
+| 7 | position_manager.py:1333 | MEDIUM | OPEN | Cascade flip uses stale entry price from signal record |
+| 8 | position_manager.py:61-69 | HIGH | OPEN | Trailing SL never pushed to Hyperliquid |
+| 9 | hl-sync-guardian.py:718 | MEDIUM | OPEN | `get_token_intel` regime mapping missing LONG_BIAS/SHORT_BIAS |
+| 10 | ai-decider.py:1122 | MEDIUM | OPEN | `update_trade_prices` uses Gate.io instead of Hyperliquid |
+
+---
+
+## BUG-1: Counter-signal update uses wrong key
+
+**File:** ai-decider.py  
+**Line:** 1452  
+**Severity:** CRITICAL  
+**Status:** OPEN
+
+### Issue
+`pending` list from `get_pending_signals()` builds dicts with keys: `token, direction, entry, confidence, signal_type, exchange, z_score_tier, z_score, compact_rounds, source`. There is **NO `id` key**. So `s.get('id')` always returns `None`, and the UPDATE at line 1445-1451 does `WHERE id = NULL` — matches nothing.
+
+### Impact
+Counter-signal detection never actually marks signals as SKIPPED. Counter-signals can be re-reviewed in the same cycle or next cycle, causing duplicate processing and potential wrong-direction trades.
+
+### Fix
+The dedup uses `token:direction` keys. Change the UPDATE to use `WHERE token=? AND direction=? AND decision IN ('PENDING','WAIT')`.
+
+---
+
+## BUG-2: HOT-SET kill functions never bind `token` parameter
+
+**File:** ai-decider.py  
+**Lines:** 199-204, 221-227  
+**Severity:** CRITICAL  
+**Status:** OPEN
+
+### Issue
+Both `_kill_hot_signal` and `_kill_pending_opposite` have UPDATE queries that use `token=%s` but **never bind the token parameter**. The parameterized query executes with `token` unbound, which in psycopg2 causes the query to either fail silently or (more likely) the unbound parameter causes all rows to match or zero rows to match unpredictably.
+
+### Impact
+HOT-SET is completely non-functional. Hot signals are never killed, opposite-direction signals are never killed on flip. Signals accumulate indefinitely.
+
+### Fix
+Bind `token` as a parameter to both UPDATE queries.
+
+---
+
+## BUG-3: `processed_this_run` dedup set not populated from counter-killed signals
+
+**File:** ai-decider.py  
+**Lines:** 1493, 1532-1535  
+**Severity:** HIGH  
+**Status:** OPEN
+
+### Issue
+The counter-killed signals (lines 1436-1456) run BEFORE the main loop populates `processed_this_run`. Counter-killed signals are NOT added to the dedup set.
+
+### Impact
+Counter-killed signals could theoretically be re-processed in the same run (though BUG-2 prevents the kills from actually working, so this is latent).
+
+### Fix
+Add counter-killed signal keys to `processed_this_run` after the kill logic.
+
+---
+
+## BUG-4: `_load_hot_rounds` missing direction filter
+
+**File:** ai-decider.py  
+**Lines:** 151-167  
+**Severity:** HIGH  
+**Status:** OPEN
+
+### Issue
+The quality gate query computes `avg_conf` across ALL non-executed signals for the token regardless of direction. But `_hot_rounds[t]['direction']` is specific to one direction. If both LONG and SHORT signals exist for a token, avg_conf could be contaminated by signals of the wrong direction.
+
+### Impact
+Quality gate could pass or fail incorrectly when both directions have signals for the same token.
+
+### Fix
+Add `AND direction=?` to both queries, binding `(t, direction)`.
+
+---
+
+## BUG-5: Zero price could cause division-by-zero
+
+**File:** decider-run.py  
+**Line:** 355  
+**Severity:** MEDIUM  
+**Status:** OPEN
+
+### Issue
+`process_delayed_entries` uses `get_current_price(token)` which can return `0`. The falsy check `if not cur_price` handles `0` correctly, but if `cur_price` is `0.0` and the check somehow passes, line 363 could produce division-by-zero in `drop_pct` calculation.
+
+### Impact
+Rare edge case — requires HL cache to return exactly `0` for the token.
+
+### Fix
+Change guard to `if not cur_price or cur_price <= 0:`.
+
+---
+
+## BUG-6: Dedup set type mismatch after guardian restart
+
+**File:** hl-sync-guardian.py  
+**Lines:** 1217, 127  
+**Severity:** HIGH  
+**Status:** OPEN
+
+### Issue
+`_load_closed_set` converts all trade_ids to **strings** (`set(str(x) for x in data)`). But `_close_paper_trade_db` passes `trade_id` as an **integer**. Python set membership: `12 in {'12'}` is `False`. After guardian restart, already-closed trades can be closed again (double-close).
+
+### Impact
+After guardian restart, the dedup check fails and trades that were already closed by the previous cycle get closed again (or attempted to be closed again).
+
+### Fix
+Make `_load_closed_set` return a set of integers, not strings. Or convert `trade_id` to string before passing to `_close_paper_trade_db`.
+
+---
+
+## BUG-7: Cascade flip uses stale entry price
+
+**File:** position_manager.py  
+**Line:** 1333  
+**Severity:** MEDIUM  
+**Status:** OPEN
+
+### Issue
+Cascade flip entry uses `current_price = flip_info['price']` — the price stored IN the signal record when it was created. This could be minutes old. SL/TP computed from stale price may not reflect current market.
+
+### Impact
+Cascade flip entries execute at a price that may be significantly different from current market price, reducing the effectiveness of the SL/TP protection.
+
+### Fix
+Fetch current market price at the time of flip execution instead of using signal record price.
+
+---
+
+## BUG-8: Trailing SL never pushed to Hyperliquid
+
+**File:** position_manager.py  
+**Lines:** 61-69 comment  
+**Severity:** HIGH  
+**Status:** OPEN
+
+### Issue
+Trailing SL is computed locally and written to `trailing_stops.json`. The guardian syncs HL → DB but has no code to push SL modifications back to HL. The TODO comment explicitly documents this.
+
+### Impact
+Trailing SL fires locally → DB marks position closed → HL position stays open → guardian sees orphan → tries to reconcile. Live trades can go unmanaged.
+
+### Fix
+Implement a function to push SL updates to Hyperliquid when the local trailing stop tightens.
+
+---
+
+## BUG-9: Regime mapping doesn't cover LONG_BIAS/SHORT_BIAS
+
+**File:** hl-sync-guardian.py  
+**Line:** 718-721  
+**Severity:** MEDIUM  
+**Status:** OPEN
+
+### Issue
+`_REGIME_MAP = {'BULL': 1, 'bull': 1, 'BEAR': -1, 'bear': -1}` maps to 'LONG_BIAS', 'SHORT_BIAS', 'NEUTRAL' which are the actual values in the DB. The mapping doesn't include them, so flip trades always get `regime_4h=0` (unknown).
+
+### Impact
+Flip trades lose regime information — cannot track whether the flip aligned with regime.
+
+### Fix
+Update `_REGIME_MAP` to include 'LONG_BIAS': 1, 'SHORT_BIAS': -1, 'NEUTRAL': 0.
+
+---
+
+## BUG-10: `update_trade_prices` uses Gate.io instead of Hyperliquid
+
+**File:** ai-decider.py  
+**Line:** 1122-1154  
+**Severity:** MEDIUM  
+**Status:** OPEN
+
+### Issue
+`update_trade_prices()` fetches from Gate.io API. The rest of the system uses Hyperliquid prices via `hype_cache`. Price data may differ between exchanges.
+
+### Impact
+Inconsistent pricing — PnL calculations and SL checks may use different prices than actual execution on HL.
+
+### Fix
+Replace Gate.io fetch with Hyperliquid price lookup using the existing `hype_cache` or `get_current_price()`.
+
