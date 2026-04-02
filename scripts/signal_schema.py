@@ -335,15 +335,25 @@ def get_pending_signals(hours=24, limit=50):
 
 get_pending_signals_as_dict = get_pending_signals  # alias
 
-def expire_pending_signals(minutes=30):
-    """Expire PENDING signals older than `minutes`. Called every signal_gen run
-    to prevent the queue from accumulating stale signals. Signals that haven't
-    been acted on within the window are cleared — the next signal generation
-    cycle will create fresh ones if the conditions still exist.
-    FIX (2026-04-01): Changed from 15 to 30 minutes to allow hot-set signals
-    to survive long enough for review_count to accumulate to >= 2."""
+def expire_pending_signals(minutes=60):
+    """Expire stale PENDING and APPROVED signals. Called every signal_gen run
+    to prevent the queue from accumulating stale signals.
+
+    PENDING: cleared if older than 60 minutes — new signals will regenerate if conditions persist.
+
+    APPROVED: cleared if older than 30 minutes AND not executed.
+    This is critical: auto-approved signals (from confluence ≥90% or hot-set r1)
+    accumulate when positions are full. After 30 minutes without execution, they're
+    blocking hot-set signals from auto-approving for the same token. Stale APPROVED
+    entries need to be released so fresh signals can take their place.
+
+    FIX (2026-04-02): Added APPROVED expiry. Previously 476 APPROVED signals were
+    stuck in queue, blocking hot-set overrides for MINA/BIO/SUSHI/TURBO. Also changed
+    PENDING from 15min to 60min to allow review_count to accumulate for hot-set."""
     conn = _get_conn(_runtime())
     c = conn.cursor()
+
+    # Expire stale PENDING signals
     c.execute("""
         UPDATE signals
         SET decision = 'EXPIRED'
@@ -351,12 +361,25 @@ def expire_pending_signals(minutes=30):
           AND created_at < datetime('now', ?)
           AND executed = 0
     """, (f'-{minutes} minutes',))
+    pending_expired = c.rowcount
+
+    # Expire stale APPROVED signals (not executed, too old)
+    # These block hot-set signals from auto-approving for the same token.
+    c.execute("""
+        UPDATE signals
+        SET decision = 'EXPIRED', executed = 1
+        WHERE decision = 'APPROVED'
+          AND executed = 0
+          AND updated_at < datetime('now', '-30 minutes')
+    """)
+    approved_expired = c.rowcount
+
     conn.commit()
-    expired = c.rowcount
     c.close()
-    if expired > 0:
-        print(f'  [Signal Expiry] Cleared {expired} stale PENDING signals (>15 min old)')
-    return expired
+    total_expired = pending_expired + approved_expired
+    if total_expired > 0:
+        print(f'  [Signal Expiry] Cleared {pending_expired} PENDING + {approved_expired} APPROVED ({minutes}min PENDING / 30min APPROVED)')
+    return total_expired
 
 
 def get_confluence_signals(hours=24, min_signals=2, signal_types=None):

@@ -1598,7 +1598,7 @@ def run_confluence_detection(regime, long_mult, short_mult):
 
     confluences_added = 0
     for c in confluences:
-        token=***
+        token = c['token']
         direction = c['direction']
         num_signals = c.get('num_types') or c.get('count')
         avg_conf = c['avg_conf']
@@ -1724,7 +1724,12 @@ def run_confluence_detection(regime, long_mult, short_mult):
 
 def run():
     init_db()
-    expire_pending_signals(minutes=15)  # Reset stale PENDING signals each cycle
+    expire_pending_signals(minutes=60)  # FIX (2026-04-02): was 15min — signals need time to accumulate
+                                         # review_count through multiple ai-decider passes. 15min was too
+                                         # tight: ai-decider runs every ~1min, needs 3-5 cycles to build
+                                         # confidence, but signals were being deleted before that.
+                                         # 60min gives review_count room to grow while still clearing
+                                         # genuinely stale entries within a few hours.
     _ZSCORE_CACHE.clear()
     _VOL_CACHE.clear()
     prices_dict = get_all_latest_prices()

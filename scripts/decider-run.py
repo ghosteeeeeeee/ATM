@@ -298,8 +298,12 @@ def get_ab_params_for_trade(direction: str) -> dict:
     ts_variant = get_ab_variant('trailing-stop-test', direction)
     raw_act  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
     raw_dist = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
-    trailing_activation  = raw_act / 100.0 if raw_act > 1.0 else raw_act
-    trailing_distance    = raw_dist / 100.0 if raw_dist > 1.0 else raw_dist
+    # FIX (2026-04-02): >= 1.0 instead of > 1.0. The AB config stores values as
+    # percentage numbers (0.5 = 0.5%, 1.0 = 1.0%, 2.0 = 2.0%). Values >= 1.0 must
+    # be divided by 100. Bug: TS-loose variant had trailingDistancePct=1.0 (1.0%)
+    # but the > check left it as 1.0 (=100%), completely disabling trailing stops.
+    trailing_activation  = raw_act / 100.0 if raw_act >= 1.0 else raw_act
+    trailing_distance    = raw_dist / 100.0 if raw_dist >= 1.0 else raw_dist
     trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
     if trailing_phase2_dist is not None and trailing_phase2_dist > 1.0:
         trailing_phase2_dist = trailing_phase2_dist / 100.0
@@ -603,23 +607,27 @@ def run(dry_run=False):
         # DO NOT auto-execute 80-89% signals — they need AI review.
     if not approved:
         pending = get_pending_signals(hours=1, limit=30)
-        # Fallback: only high-confidence confluence (>= 95%) bypasses AI review when approved is empty.
-        # Requires blacklist check and open slot — NO fallback for weaker signals.
-        # SHORT_BLACKLIST and LONG_BLACKLIST are defined at module level above.
+        # Fallback: only high-confidence confluence (>= 95%) with 3+ sources bypasses AI
+        # review when approved is empty. Single and dual-source confluences go to AI.
+        # num_signals is extracted from source like 'conf-3s' (the trailing number).
         high_conf = []
         for p in pending:
             token = p.get('token', '').upper()
             direction = p.get('direction', 'LONG').upper()
+            # Extract num_signals from source string (e.g. 'conf-3s' → 3)
+            raw_source = p.get('source', 'conf-1s')
+            num_src = int(raw_source.split('-')[-1].rstrip('s')) if raw_source else 1
             if (p.get('signal_type') == 'confluence'
                 and p.get('confidence', 0) >= 95
-                and p.get('num_signals', 0) >= 2
+                and num_src >= 3  # minimum 3 sources — single/dual source is noise
                 and p.get('executed', 0) == 0
-                and token not in SHORT_BLACKLIST if direction == 'SHORT' else True
+                and (direction != 'SHORT' or token not in SHORT_BLACKLIST)
                 and token not in LONG_BLACKLIST
                 and open_count < MAX_POS):
                 p['final_confidence'] = p['confidence']
+                p['count'] = num_src  # so execute_trade gets correct source label
                 p['price'] = p.get('price') or get_current_price(token)
-                p['source'] = f'pending-confluence-{p.get("source","unknown")}'
+                p['source'] = f'fallback-conf-{num_src}s'
                 high_conf.append(p)
         log(f'Pending confluence fallback: {len(high_conf)} signals >= 95% confluence (from {len(pending)} total)')
         approved.extend(high_conf)
@@ -692,7 +700,7 @@ def run(dry_run=False):
             log(f'SKIP: Max positions reached ({MAX_POS})')
             break
 
-        source = f'conf-{sig.get("count", 1)}s'
+        source = f'conf-{sig.get("count", sig.get("num_signals", 1))}s'
 
         # ── Epsilon-greedy A/B variant selection ──────────────────
         ab = get_ab_params_for_trade(direction)
@@ -704,12 +712,13 @@ def run(dry_run=False):
         sl_variant = ab.get('sl_variant', '')
         ts_variant = ab.get('ts_variant', '')
 
-        # sl_pct is in percent (1.0 = 1%) so divide by 100 for price calc
+        # sl_pct is from get_ab_params_for_trade() as a fraction (0.015 = 1.5% SL)
+        sl_pct_val = float(sl_pct)
         if direction == 'LONG':
-            sl = price * (1 - sl_pct / 100)
+            sl = price * (1 - sl_pct_val)
             tp = price * 1.05
         else:
-            sl = price * (1 + sl_pct / 100)
+            sl = price * (1 + sl_pct_val)
             tp = price * 0.95
 
         log(f'EXEC: {token} {direction} @ ${price:.6f} conf={confidence:.0f}% '

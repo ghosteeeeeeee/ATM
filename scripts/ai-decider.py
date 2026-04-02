@@ -1326,8 +1326,13 @@ print(f"Market: Z-Score={market_z}, BTC=${prices.get('BTC','N/A')}")
 
 processed_this_run = set()  # token+direction already reviewed this run
 
-# ── Confluence auto-approval: ≥75% confluence signals skip AI review ───────────
-CONFLUENCE_THRESHOLD = 75
+# ── Confluence auto-approval: ≥90% confluence signals skip AI review ───────────
+# FIX (2026-04-02): Raised from 75% to 90%. Previously too many single-source
+# confluence signals were auto-approved at 75-85% confidence, bypassing the hot
+# set entirely. The hot set exists to add +10% hot-bonus confidence to signals that
+# survived review — we should let it do its job instead of auto-approving prematurely.
+# Any token already in _hot_rounds is also skipped here — hot set handles those.
+CONFLUENCE_THRESHOLD = 90
 for s in pending:
     if s.get('signal_type') == 'confluence' and s.get('confidence', 0) >= CONFLUENCE_THRESHOLD:
         t = (s.get('token') or '').upper()
@@ -1335,13 +1340,18 @@ for s in pending:
         key = f"{t}:{direction}"
         if key in processed_this_run:
             continue
+        # Skip if token is in hot set — hot set has its own auto-approval logic
+        # with confidence bonuses. Don't bypass it with a premature confluence approve.
+        if t in _hot_rounds:
+            print(f"   ⏸️ [CONF-AUTO] {t}: in hot set (r{_hot_rounds[t]['rounds']}) — letting hot set handle")
+            continue
         if is_token_open(t):
             print(f"   ⏸️ [CONF-AUTO] {t}: already open")
             mark_signal_processed(t, 'SKIPPED', decision_reason='confluence-auto-position-open')
         else:
             ok = mark_signal_processed(t, 'APPROVED')
             if ok:
-                print(f"   ✅ [CONF-AUTO] {t} {direction} conf={s.get('confidence'):.0f}% — auto-approved (confluence ≥75%)")
+                print(f"   ✅ [CONF-AUTO] {t} {direction} conf={s.get('confidence'):.0f}% — auto-approved (confluence ≥90%)")
                 log_signal(t, direction, s.get('entry', 0), s.get('confidence', 0), f"conf-auto-{s.get('source','')}")
             else:
                 mark_signal_processed(t, 'FAILED', decision_reason='confluence-auto-approval-failed')
@@ -1396,10 +1406,14 @@ for s in pending:
         # reaching r2 due to 15-min TTL, and many legitimate signals stay WAIT
         # (AI needs more data) instead of going straight to EXEC.
 
-        # Quality gate: require 1+ distinct signal types and avg_conf >= 30%
+        # Quality gate: require 2+ distinct signal types and avg_conf >= 40%
+        # FIX (2026-04-02): Was 1 type / 30%. Single-type hot signals were too noisy.
+        # Two different signal types (e.g. RSI + MACD both agree) is a real signal;
+        # one signal type being reviewed multiple times is just the same data point.
+        # Also require avg_conf >= 40% — signals below that have no business auto-approving.
         num_types = hot.get('num_types', 0)
         avg_conf = hot.get('avg_conf', 0)
-        if num_types < 1 or avg_conf < 30:
+        if num_types < 2 or avg_conf < 40:
             print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
             log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
             mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-quality-gate')
