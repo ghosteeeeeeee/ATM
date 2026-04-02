@@ -728,14 +728,14 @@ These scripts modify `ab_tests.json` and `ab_results` table. Not reviewed in det
 | BUG-1 | CRITICAL | FIXED 3738499 | Comment rewritten, logic unchanged |
 | BUG-2 | CRITICAL | FIXED 3738499 | _wait_for_position_closed(), retries, no DB write until confirmed |
 | BUG-3 | CRITICAL | FIXED 3738499 | _wait_for_position_closed() before flip order, returns early on failure |
-| BUG-4 | HIGH | PENDING | Persist dedup set to file |
+| BUG-4 | HIGH | FIXED 40e9b89 | Persisted dedup set to JSON file, survives restart | Persist dedup set to file |
 | BUG-5 | HIGH | PENDING | Explicit slippage 2% on cut-loser/flip |
 | BUG-6 | HIGH | FIXED 3738499 | Unleveraged pnl_pct from entryPrice/currentPrice (HL API), matching _close_paper_trade_db |
-| BUG-7 | HIGH | PENDING | Remove duplicate function |
+| BUG-7 | HIGH | FIXED 40e9b89 | Duplicate function removed from decider-run.py | Remove duplicate function |
 | BUG-8 | MEDIUM | PENDING | Write numeric predicted_return |
-| BUG-9 | HIGH | PENDING | Remove token from cache key |
-| BUG-10 | HIGH | IN PROGRESS | Check which decider file pipeline actually runs |
-| BUG-11 | MEDIUM | PENDING | Reset hot_set failure counter |
+| BUG-9 | HIGH | FIXED 40e9b89 | Cache key changed to test_name only, Thompson sampling now global | Remove token from cache key |
+| BUG-10 | HIGH | FIXED 36c9dec | Pipeline now runs ai-decider (dash, newer) | Check which decider file pipeline actually runs |
+| BUG-11 | MEDIUM | FIXED 40e9b89 | Hot-set recovers after failures, disabled only after 10x | Reset hot_set failure counter |
 | BUG-12 | MEDIUM | PENDING | Add source whitelist |
 | BUG-13 | MEDIUM | PENDING | Numeric regime encoding |
 | BUG-14 | MEDIUM | PENDING | DB locking for orphan recovery |
@@ -744,7 +744,7 @@ These scripts modify `ab_tests.json` and `ab_results` table. Not reviewed in det
 | BUG-17 | MEDIUM | PENDING | Single query single connection |
 | BUG-18 | LOW | PENDING | fcntl.flock on copied_trades.json |
 | BUG-19 | LOW | PENDING | fcntl.flock on reconciled_state.json |
-| BUG-20 | LOW | PENDING | Add partial indexes |
+| BUG-20 | LOW | FIXED 40e9b89 | Partial indexes on guardian_closed, open trades | Add partial indexes |
 | BUG-21 | LOW | PENDING | Require --live flag |
 | BUG-22 | LOW | PENDING | Log warning on no fills |
 | BUG-23 | LOW | PENDING | Audit None handling callers |
