@@ -64,6 +64,9 @@ DRY = False  # Default is LIVE. Use --dry flag (not --apply) for dry-run mode.
 # Override with --apply flag if you need temporary dry-run without changing this file.
 INTERVAL = 60  # seconds between checks
 MAX_CONSECUTIVE_FAILURES = 5
+# BUG-5: Configurable slippage for guardian market closes (was hardcoded 0.01).
+# 0.005 = 0.5% — conservative for liquid markets, safe for illiquid tokens.
+CLOSE_SLIPPAGE = 0.005
 LOG_FILE = '/root/.hermes/logs/sync-guardian.log'
 DATA_DIR = '/root/.hermes/data'
 COPIED_TRADES_FILE = os.path.join(DATA_DIR, 'copied-trades-state.json')
@@ -115,11 +118,34 @@ def _clear_reconciled_token(token):
         del state[token.upper()]
         _save_reconciled_state(state)
 
+
+# ── BUG-4/15: Persistent closed-trade dedup set ─────────────────────────────────
+_CLOSED_SET_FILE = os.path.join(DATA_DIR, 'guardian-closed-set.json')
+
+
+def _load_closed_set() -> set:
+    """Load persisted closed-trade IDs from disk."""
+    try:
+        with open(_CLOSED_SET_FILE) as f:
+            data = json.load(f)
+        return set(str(x) for x in data)
+    except:
+        return set()
+
+
+def _save_closed_set():
+    """Persist closed-trade IDs to disk for crash-restart dedup."""
+    try:
+        with open(_CLOSED_SET_FILE, 'w') as f:
+            json.dump(list(_CLOSED_THIS_CYCLE), f)
+    except Exception as e:
+        log(f'  Warning: could not save closed set: {e}', 'WARN')
+
 # Deduplication: track trade IDs closed this cycle to prevent duplicate closes.
 # Both record_closed_trade() (Step 6) and _close_paper_trade_db() (Steps 7-8)
 # may fire for the same trade. Once a trade_id is closed this cycle, skip re-closes.
-_CLOSED_THIS_CYCLE = set()
-_CLOSED_HL_TOKENS = set()  # tokens where HL position was closed this cycle
+_CLOSED_THIS_CYCLE=_load_closed_set()  # loaded from disk for crash-restart dedup
+_CLOSED_HL_TOKENS=set()  # tokens where HL position was closed this cycle
 
 # Ensure data dir exists
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -299,7 +325,7 @@ def close_position_hl(coin: str, reason: str) -> bool:
 
     try:
         exchange = get_exchange()
-        result = exchange.market_close(coin=coin, slippage=0.01)
+        result = exchange.market_close(coin=coin, slippage=CLOSE_SLIPPAGE)
         statuses = result.get('response', {}).get('data', {}).get('statuses', [])
         for s in statuses:
             if 'error' in s:
@@ -365,7 +391,8 @@ def _get_hl_exit_price(token: str, fallback: float = 0.0) -> float:
     for attempt in range(3):
         time.sleep(2)
         try:
-            fills = get_trade_history(int(time.time() * 1000) - 120_000, int(time.time() * 1000))
+            # BUG-16 fix: look back 300s (was 120s) for better fill coverage.
+            fills = get_trade_history(int(time.time() * 1000) - 300_000, int(time.time() * 1000))
             # Only use close fills (side='B'), not entry fills (side='A')
             token_closes = [f for f in fills
                            if f['coin'].upper() == token.upper() and f.get('side') == 'B']
@@ -673,6 +700,12 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                                        order_type='Market', tif='Gtc')
 
             if open_result.get('success'):
+                # BUG-8/13 fix: look up actual regime from momentum_cache instead of 'unknown'.
+                flip_intel = get_token_intel(token)
+                flip_regime_4h = flip_intel.get('regime_4h', 'unknown')
+                flip_regime_1h = flip_intel.get('regime_4h', 'unknown')  # 1h regime not in cache, use 4h
+                flip_regime_15m = flip_intel.get('regime_4h', 'unknown')  # 15m regime not in cache, use 4h
+
                 # Record flipped trade
                 trail_act_val = float(trail_act) if flip_trailing else None
                 trail_dist_val = float(trail_dist) if flip_trailing else None
@@ -688,7 +721,7 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                 """, (
                     token, opposite,
                     prices.get(token, entry_px),
-                    lev, amount, 'unknown', 'unknown', 'unknown',
+                    lev, amount, flip_regime_4h, flip_regime_1h, flip_regime_15m,
                     -2.0, -4.0, trail_act_val, trail_dist_val,
                     variant_id, trade_id
                 ))
@@ -769,7 +802,11 @@ def sync_pnl_from_hype(prices):
                 curr_price_hl = float(pos_data.get('currentPrice', prices.get(token, entry)) or prices.get(token, entry) or entry)
 
                 if unrealized_pnl != 0:
-                    pnl_usdt = round(unrealized_pnl, 4)
+                    # BUG-29 fix: use unrealized_pnl for display fields, but do NOT store
+                    # it in hype_pnl_usdt (that's reserved for REALIZED PnL from HL fills).
+                    # Storing unrealized in hype_pnl_usdt caused massive PnL overstatements
+                    # (e.g. unrealized +$50 became $50 realized even on paper losses).
+                    pnl_usdt = round(unrealized_pnl, 4)  # unrealized PnL from HL /account summary
                     # BUG-6 fix: use UNLEVERAGED pnl_pct (entry-based, not margin-based).
                     # OLD: leveraged pnl_pct = (unrealized_pnl / margin) * 100 — inconsistent
                     #   across leverage levels and with _close_paper_trade_db formula.
@@ -787,10 +824,9 @@ def sync_pnl_from_hype(prices):
 
                     cur.execute("""
                         UPDATE trades SET pnl_usdt = %s, pnl_pct = %s,
-                            hype_pnl_usdt = %s, hype_pnl_pct = %s,
                             current_price = %s
                         WHERE id = %s
-                    """, (pnl_usdt, pnl_pct, pnl_usdt, pnl_pct,
+                    """, (pnl_usdt, pnl_pct,
                           prices.get(token, entry) if prices else entry,
                           trade_id))
 
@@ -1186,6 +1222,16 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             return
 
         entry_price, direction, amount_usdt, leverage = row
+        # BUG-25 fix: sanity-check exit price against entry + market price.
+        # If exit price is >20% different from current market, something is wrong.
+        # Reject the HL fill and fall back to current market price.
+        curr_price = prices.get(token.upper()) if prices else 0
+        if curr_price and curr_price > 0 and exit_price > 0:
+            deviation = abs(exit_price - curr_price) / curr_price
+            if deviation > 0.20:
+                log(f'  {token} exit price sanity FAIL: HL_fill=${exit_price:.6f} '
+                    f'vs market=${curr_price:.6f} (deviation={deviation:.1%}) — using market', 'WARN')
+                exit_price = curr_price
         if not entry_price or not exit_price or exit_price <= 0:
             log(f'  Skipping trade #{trade_id} ({token}): missing entry/exit price', 'WARN')
             cur.close(); conn.close()
@@ -1198,7 +1244,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         hype_pnl_usdt = None
         try:
             from hyperliquid_exchange import get_trade_history
-            close_start_ms = int(time.time() * 1000) - 120_000
+            # BUG-16 fix: look back 300s to match the longer HL fill propagation delay.
+            close_start_ms = int(time.time() * 1000) - 300_000
             fills = get_trade_history(close_start_ms, int(time.time() * 1000))
             token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
             close_fills = [f for f in token_fills if f['side'] == 'B']
@@ -1271,8 +1318,9 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
     from hyperliquid_exchange import get_trade_history
     import time as _time
 
-    # Poll HL for the close fill
-    close_start_ms = int(_time.time() * 1000) - 120000
+    # BUG-16 fix: look back 300s (was 120s) — guardian sleeps 6s after HL close,
+    # but HL fills can take up to 5 min to appear in user_fills_by_time.
+    close_start_ms = int(_time.time() * 1000) - 300000
     hl_exit_px, realized_pnl = _poll_hl_fills_for_close(token, close_start_ms)
 
     if hl_exit_px == 0.0:
@@ -1352,6 +1400,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         log(f'  _close_orphan_paper_trade_by_id error: {e}', 'FAIL')
     # FIX (2026-04-01): Clear reconciled state when position is closed on HL.
     # This allows the token to be re-reconciled if a new position opens.
+    # BUG-15 fix: move inside try block so it's actually called (was after return).
     _clear_reconciled_token(token)
 
 
@@ -1379,11 +1428,12 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
             log(f'  Signal outcome dedup: {token} {direction} already recorded recently, skipping', 'WARN')
             conn_s.close()
             return
+        # BUG-24 fix: include trade_id column so outcomes can be joined back to brain.trades.
         cur_s.execute("""
-            INSERT INTO signal_outcomes (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO signal_outcomes (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (token.upper(), direction.upper(), 'decider',
-              1 if is_win else 0, pnl_pct, pnl_usdt, None))
+              1 if is_win else 0, pnl_pct, pnl_usdt, None, trade_id))
         conn_s.commit()
         conn_s.close()
         log(f'  Signal outcome: {token} {direction} -> {"WIN" if is_win else "LOSS"} '

@@ -880,8 +880,20 @@ def mirror_close(token: str, direction: str, exit_price: float = None) -> dict:
     result = close_position(token)
 
     if result.get("success"):
-        # Get actual exit fill from HL (Plan B: ground truth exit)
-        exit_info = mirror_get_exit_fill(token, int(time.time() * 1000) - 300000)
+        # BUG-17 fix: poll HL fills up to 3 times with 2s delay (was single query).
+        # BUG-22 fix: warn when no fills found instead of silently returning None.
+        close_start_ms = int(time.time() * 1000) - 300000  # look back 5min
+        exit_info = {"success": False}
+        for attempt in range(3):
+            time.sleep(2)
+            exit_info = mirror_get_exit_fill(token, close_start_ms)
+            if exit_info.get("success"):
+                break
+            print(f"[HYPE Mirror] Fill poll {attempt+1}/3 for {token} — no close fills yet")
+
+        if not exit_info.get("success"):
+            print(f"[HYPE Mirror] WARN: no HL close fills found for {token} after 3 polls", file=sys.stderr)
+
         print(f"[HYPE Mirror] CLOSED {direction} {token} "
               f"(HL exit ${exit_info.get('exit_price', 0):.6f} pnl={exit_info.get('realized_pnl', 0):+.4f})")
         return {"success": True, "message": f"Closed {direction} {token}",
