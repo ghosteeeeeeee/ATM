@@ -1612,3 +1612,34 @@ All 5 modified files now use `hype_cache.get_meta()` or `hype_cache.get_allMids(
 070ef38 fix: ai-decider token->coin rename, SQL *** bugs
 ```
 
+
+---
+
+## Pipeline Review — 2026-04-02 (pipeline-review skill, subagent run)
+
+**Why all signals are EXPIRED:**
+
+The signal TTL is ~3.8 hours. This is shorter than the human review → approval → execution cycle. Signals get approved but expire before the execution worker processes them. **This is the root cause.**
+
+**Key numbers:**
+- 54,730 signals generated in last 24h — generation is healthy ✓
+- 64% EXPIRED (35,037) — signals timing out before review
+- 97 APPROVED, only 11 EXECUTED — execution bottleneck
+- Confluence avg_conf 81-90% but execution rate 0.02% — good signals expiring
+- Net PnL: -2.86 USDT, 38% WR over 8 closed trades
+
+**Directional bias — CRITICAL:**
+- rsi_individual: 144:1 LONG bias
+- rsi_confluence: 85:1 SHORT bias
+- momentum: 100% LONG, 0 SHORT ever
+
+**Recommended fixes (ranked):**
+1. [CRITICAL] Increase signal TTL from ~3.8h to 8-12h — find in `signal_schema.py`
+2. [CRITICAL] Fix APPROVED→EXECUTED bottleneck — check `decider-run.py` and `position_manager.py`
+3. [CRITICAL] Audit RSI/momentum signal generation for directional bias bugs
+4. [HIGH] Lower confluence auto-approval threshold
+5. [HIGH] Review COMPACTOR logic — 286 signals (94% avg conf) compacted without review
+6. [MEDIUM] Review trailing stop parameters — many `trailing_exit_-0.9%` small losses
+
+**Skill created:** `pipeline-review` at `skills/pipeline-review/SKILL.md`
+
