@@ -30,6 +30,8 @@ SHORT_BLACKLIST = {
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
     # 2026-04-02: persistent losing SHORT directions (loss cooldown streak)
     'MINA',   # SHORT: streak=2, 4h cooldown, persistent losses
+    # 2026-04-02: manual additions (no trade history, blocking by token type)
+    'BNB',    # major token, inverse-beta behavior, not tradeable on HL
 }
 LONG_BLACKLIST = {
     'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
@@ -40,6 +42,8 @@ LONG_BLACKLIST = {
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
     # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)
     'AERO', 'CHILLGUY', 'LIT', 'DOT', 'ANIME',  # LONG losing streaks
+    # 2026-04-02: manual additions
+    'BIO', 'TAO', 'GAS',   # blocking both directions: no trade history, high-risk profiles
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 SERVER_NAME = 'Hermes'
