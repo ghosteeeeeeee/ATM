@@ -176,12 +176,20 @@ def _load_hot_rounds():
             }
 
         conn.close()
+        # BUG-11 fix: reset failure count on successful load
+        global _hot_set_failure_count
+        if _hot_set_failure_count > 0:
+            print(f"[ai-decider] Hot set recovered after {_hot_set_failure_count} failure(s)")
+        _hot_set_failure_count = 0
     except Exception as e:
         import traceback; traceback.print_exc()
         global _hot_set_failure_count
         _hot_set_failure_count += 1
-        print(f"[ai-decider] CRITICAL: _load_hot_rounds FAILED (cycle #{_hot_set_failure_count}): {e} — hot-set system DISABLED. "
-              f"Check signals_hermes_runtime.db integrity.")
+        # Only disable permanently after 10 consecutive failures
+        if _hot_set_failure_count >= 10:
+            print(f"[ai-decider] CRITICAL: _load_hot_rounds FAILED 10x — hot-set DISABLED. {e}")
+        else:
+            print(f"[ai-decider] _load_hot_rounds failed ({_hot_set_failure_count}/10): {e}")
 
 
 def _kill_hot_signal(token):

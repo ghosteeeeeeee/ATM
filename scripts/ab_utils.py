@@ -133,18 +133,18 @@ def get_ab_variant(test_name: str, direction: str = 'both') -> dict:
 
 # ─── Cached variant selection (used by hl-sync-guardian.py) ──────────────────
 
-_variant_cache = {}
+# BUG-9 fix: cache key is test_name only, NOT token:direction.
+# Thompson sampling in get_ab_variant() operates on AGGREGATE performance across ALL tokens.
+# Caching per token biases the sampler — variant A losing on BTC should not affect
+# the sampling decision for ETH. Now global per test_name.
+_ab_variant_cache = {}
 
 def get_cached_ab_variant(token: str, direction: str, test_name: str) -> dict:
     """
-    Get A/B variant for a token/direction pair, cached per call.
-    Uses token+direction as cache key so the same pair always gets the same variant.
-    Falls back to get_ab_variant (ignores token/direction — Thompson sampling
-    handles fairness across tokens automatically).
+    Get A/B variant for test_name, cached globally per test_name.
+    Token and direction are accepted for API compatibility but do NOT affect
+    the cache key — Thompson sampling operates on aggregate across all tokens.
     """
-    key = f"{token}:{direction}"
-    if key not in _variant_cache:
-        _variant_cache[key] = {}
-    if test_name not in _variant_cache[key]:
-        _variant_cache[key][test_name] = get_ab_variant(test_name, direction)
-    return _variant_cache[key][test_name]
+    if test_name not in _ab_variant_cache:
+        _ab_variant_cache[test_name] = get_ab_variant(test_name, direction)
+    return _ab_variant_cache[test_name]

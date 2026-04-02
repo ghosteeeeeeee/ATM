@@ -1168,6 +1168,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         log(f'  Dedup: trade #{trade_id} already closed this cycle, skipping', 'WARN')
         return
     _CLOSED_THIS_CYCLE.add(trade_id)
+    _save_closed_set()  # BUG-4: persist so crash/restart doesn't lose dedup
 
     conn = get_db_connection()
     if conn is None:
@@ -1450,6 +1451,7 @@ def sync():
     global _CLOSED_THIS_CYCLE, _CLOSED_HL_TOKENS
     _CLOSED_THIS_CYCLE.clear()
     _CLOSED_HL_TOKENS.clear()
+    _save_closed_set()  # BUG-4: persist cleared state
     log(f'── Sync cycle ──')
 
     # Step 1: Get HL positions
@@ -1526,6 +1528,7 @@ def sync():
                             log(f'  Dedup: orphan trade #{orphan_id} already closed, skipping', 'WARN')
                         else:
                             _CLOSED_THIS_CYCLE.add(orphan_id)
+                            _save_closed_set()  # BUG-4: persist orphan close
                             _close_orphan_paper_trade_by_id(
                                 orphan_id, coin, direction, entry_px, lev,
                                 'guardian_orphan'

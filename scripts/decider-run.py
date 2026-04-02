@@ -230,29 +230,6 @@ def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
     return variants[0]
 
 
-def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name):
-    """Record trade open in ab_results table."""
-    if not experiment:
-        return
-    try:
-        import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
-        cur = conn.cursor()
-        cur.execute("""
-            INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
-                                    total_pnl_pct, total_pnl_usdt, updated_at)
-            VALUES (%s, %s, 1, 0, 0, 0, 0, now())
-            ON CONFLICT (test_name, variant_id)
-            DO UPDATE SET
-                trades = ab_results.trades + 1,
-                updated_at = now()
-        """, (test_name, variant_id))
-        conn.commit()
-        cur.close(); conn.close()
-    except Exception as e:
-        log(f'[AB] record opened error: {e}')
-
-
 
 def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name):
     """Record trade open in ab_results table."""
