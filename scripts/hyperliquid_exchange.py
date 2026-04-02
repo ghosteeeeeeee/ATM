@@ -444,6 +444,12 @@ def _exchange_retry(fn, max_attempts=5, base_delay=5):
 def place_order(name, side, sz, price=None, order_type="Limit", tif="Gtc",
                 reduce_only=False):
     """Place an order on Hyperliquid via /exchange."""
+    # EMERGENCY GUARD (2026-04-02): Solana tokens are indexed but NOT tradeable on HL.
+    # Orders fail silently, guardian opens/closes phantom positions. Block all trades.
+    if name.upper() in ('PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
+                         'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
+                         'SAGE', 'SAMO', 'DUST', 'HNT'):
+        return {"success": False, "error": f"SOLANA_TOKEN_BLOCKED: {name} is not tradeable on Hyperliquid"}
     _exchange_rate_limit()
     exchange = get_exchange()
 

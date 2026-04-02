@@ -20,7 +20,15 @@ SHORT_BLACKLIST = {
     # 2026-04-01: persistent losses on both sides
     'USTC',   # both sides losing: avg LONG=-4.5%, avg SHORT=-0.3%
     'RSR',    # both sides losing: avg LONG=-3.5%, avg SHORT=-1.1%
+    # Solana chain tokens — indexed on HL but NOT tradeable (orders fail silently,
+    # guardian opens/closes phantom positions). Block both directions.
+    'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
+    'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
+    'SAGE', 'SAMO', 'DUST', 'HNT',
 }
-LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR'}  # trade analysis 2026-04-01
+LONG_BLACKLIST = {'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
+                   # Solana tokens blocked on LONG side too
+                   'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
+                   'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS'}
 BROAD_MARKET_TOKENS = ['ETH', 'SOL', 'BTC']
 SERVER_NAME = 'Hermes'
