@@ -465,7 +465,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     if signal_type is None or confidence is None:
         try:
             conn_fetch = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
-                                          user='postgres', password='Brain123'')
+                                          user='postgres', password='Brain123')
             cur_fetch = conn_fetch.cursor()
             cur_fetch.execute(
                 "SELECT signal, confidence FROM trades WHERE token=%s AND server='Hermes' "
@@ -510,7 +510,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                 test_map[test_name] = variant_id
 
         try:
-            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123'')
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
             cur = conn.cursor()
             for test_name, variant_id in test_map.items():
                 if not test_name or not variant_id:

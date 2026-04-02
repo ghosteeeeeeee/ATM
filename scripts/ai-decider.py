@@ -107,7 +107,7 @@ def _load_hot_rounds():
     Returns:
         dict: token.upper() -> {direction, rounds, signal_ids, avg_conf, num_types}
     """
-    global _hot_rounds
+    global _hot_rounds, _hot_set_failure_count  # BUG-11 fix: declare before use in except block
     _hot_rounds = {}
     try:
         conn = sqlite3.connect(SIGNALS_DB)
@@ -177,13 +177,11 @@ def _load_hot_rounds():
 
         conn.close()
         # BUG-11 fix: reset failure count on successful load
-        global _hot_set_failure_count
         if _hot_set_failure_count > 0:
             print(f"[ai-decider] Hot set recovered after {_hot_set_failure_count} failure(s)")
         _hot_set_failure_count = 0
     except Exception as e:
         import traceback; traceback.print_exc()
-        global _hot_set_failure_count
         _hot_set_failure_count += 1
         # Only disable permanently after 10 consecutive failures
         if _hot_set_failure_count >= 10:
@@ -806,13 +804,27 @@ def get_pending_signals():
                 compact_rounds = surv_row[0] if surv_row else 0
                 survival_meta = surv_row[1] if surv_row else 0.0
 
-                # Confluence: count agreeing signal types for same token+direction
-                # FIX (2026-04-02): Cap at 2 agreeing signals max (was unbounded).
-                # STABLE had 5 agreeing signals -> score 3.0, dominating all other factors.
-                # Capping at 2 gives score 2.0 max, prevents confluence flooding.
+                # Confluence: base score from agreeing signal types
                 agreeing = sum(1 for r in candidates
                                if r[1] == token and r[2] == direction and r[3] != stype)
-                confluence_score = 1.0 + min(agreeing, 2) * 0.5  # max 2.0
+                base_confluence = 1.0 + min(agreeing, 2) * 0.5  # 1.0 to 2.0
+
+                # Signal-type quality multiplier for confluence signals
+                # conf-2s: weak (only 2 agreeing indicators, often noise)
+                # conf-3s+: strong (3+ indicators = genuine confluence)
+                # conf-4s+: very strong (rare, high conviction)
+                if stype == 'confluence' and source and source.startswith('conf-'):
+                    try:
+                        n = int(source.split('-')[1].rstrip('s'))  # e.g. 'conf-2s' -> 2
+                    except (ValueError, IndexError):
+                        n = 2
+                    if n == 2:
+                        base_confluence *= 0.4   # 0.4 to 0.8 — penalize weak 2-signal confluence
+                    elif n == 3:
+                        base_confluence *= 1.1   # 1.1 to 2.2 — reward strong 3-signal
+                    elif n >= 4:
+                        base_confluence *= 1.4   # 1.4 to 2.8 — very rare, very strong
+                confluence_score = base_confluence
 
                 # Confidence
                 conf_score = conf / 100.0
@@ -834,16 +846,16 @@ def get_pending_signals():
                 survival_bonus = min(1.0, compact_rounds * 0.2 + survival_meta * 0.3)
                 survival_score_raw = 1.0 + survival_bonus
 
-                # Score = confluence(20%) + confidence(35%) + survival(20%) + streak(15%) + recency(10%)
-                # FIX (2026-04-02): Reduced confluence from 35% -> 20%. STABLE confluence signal
-                # scored 99% but was fundamentally wrong — confluence was counting noise agreeing
-                # across bad indicators, not genuine signal strength. Confidence now leads.
+                # Score = confluence(5%) + confidence(40%) + survival(20%) + streak(20%) + recency(15%)
+                # FIX (2026-04-02): Confluence weight cut to 5% — conf-2s noise was dominating.
+                # conf-2s now scores ~0.04-0.08 max (was 0.40), conf-3s ~0.11-0.22.
+                # Confidence and survival/streak are the real quality signals.
                 raw_score = (
-                    confluence_score * 0.20 +
-                    conf_score       * 0.35 +
+                    confluence_score * 0.05 +
+                    conf_score       * 0.40 +
                     survival_score_raw * 0.20 +
-                    streak_mult      * 0.15 +
-                    recency_score    * 0.10
+                    streak_mult      * 0.20 +
+                    recency_score    * 0.15
                 )
                 scored.append({
                     'score': raw_score,
@@ -942,6 +954,8 @@ def get_pending_signals():
         non_hot_signals = []
         for row in rows:
             token, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds, source = row
+            # BUG-12 fix: validate source against whitelist before using in A/B routing/logging
+            safe_source = validate_source(source) if source else 'unknown'
             sig = {
                 "token": token,
                 "direction": direction.lower(),
@@ -952,7 +966,7 @@ def get_pending_signals():
                 "z_score_tier": z_tier,
                 "z_score": z_score,
                 "compact_rounds": compact_rounds or 0,
-                "source": source,
+                "source": safe_source,  # BUG-12: validated source
             }
             if token.upper() in hot_tokens:
                 hot_signals.append(sig)
@@ -966,7 +980,7 @@ def get_pending_signals():
         log_error(f"get_pending_signals DB read error: {e}")
         return []
 
-from signal_schema import mark_signal_processed  # now from signal_schema
+from signal_schema import mark_signal_processed, validate_source  # BUG-12: validate source against whitelist
 
 def get_regime(token):
     """Get 4h regime from token_intel data"""

@@ -702,9 +702,11 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
             if open_result.get('success'):
                 # BUG-8/13 fix: look up actual regime from momentum_cache instead of 'unknown'.
                 flip_intel = get_token_intel(token)
-                flip_regime_4h = flip_intel.get('regime_4h', 'unknown')
-                flip_regime_1h = flip_intel.get('regime_4h', 'unknown')  # 1h regime not in cache, use 4h
-                flip_regime_15m = flip_intel.get('regime_4h', 'unknown')  # 15m regime not in cache, use 4h
+                # BUG-8 fix: use numeric encoding for regime (BULL=1, BEAR=-1, unknown=0)
+                _REGIME_MAP = {'BULL': 1, 'bull': 1, 'BEAR': -1, 'bear': -1}
+                flip_regime_4h = _REGIME_MAP.get(str(flip_intel.get('regime_4h', 'unknown')), 0)
+                flip_regime_1h = _REGIME_MAP.get(str(flip_intel.get('regime_1h', 'unknown')), 0)
+                flip_regime_15m = _REGIME_MAP.get(str(flip_intel.get('regime_15m', 'unknown')), 0)
 
                 # Record flipped trade
                 trail_act_val = float(trail_act) if flip_trailing else None

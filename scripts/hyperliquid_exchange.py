@@ -489,11 +489,17 @@ def place_order(name, side, sz, price=None, order_type="Limit", tif="Gtc",
         return {"success": False, "error": str(e)}
 
 
-def close_position(name):
+def close_position(name, slippage=0.02):
     """
     Close an open position via /exchange.
     Gets position size from /info (separate pool), then places reduce-only
     GTC limit at current mid price (properly rounded to tick size).
+
+    Args:
+        name: token symbol
+        slippage: slippage tolerance. Default 0.02 (2%) — BUG-5 fix.
+                  Emergency closes (cut-loser, flip) need wider slippage
+                  than normal closes to avoid partial fills in volatile markets.
     """
     _exchange_rate_limit()
 
@@ -507,7 +513,7 @@ def close_position(name):
 
     def _do():
         # market_close uses SDK's internal tick rounding (always correct)
-        return exchange.market_close(coin=name, sz=None, slippage=0.005)
+        return exchange.market_close(coin=name, sz=None, slippage=slippage)
 
     try:
         result = _exchange_retry(_do)

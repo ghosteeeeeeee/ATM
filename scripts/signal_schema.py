@@ -488,6 +488,9 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
         if d.get('db_sources'):
             d['has_openclaw'] = 'openclaw' in d['db_sources']
             d['has_hermes']   = 'hermes'   in d['db_sources']
+        # BUG-12 fix: validate top-level source field against whitelist
+        top_source = d.get('all_sources', '').split(',')[0] if d.get('all_sources') else ''
+        d['source'] = validate_source(top_source) if top_source else 'unknown'
         results.append(d)
     conn.close()
     return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
@@ -510,23 +513,76 @@ def add_confluence_signal(token, direction, confidence, num_signals, price, z_sc
         macd_hist=macd_hist,
     )
 
-def update_signal_decision(token, direction, decision, reason=None):
+# BUG-26 fix: approved source whitelist — prevents malformed source fields
+# from routing to unintended A/B variants in get_ab_params().
+ALLOWED_SIGNAL_SOURCES = frozenset({
+    # Confluence sources
+    'conf-1s', 'conf-2s', 'conf-3s', 'conf-4s', 'conf-5s',
+    'fallback-conf-2s', 'fallback-conf-3s', 'fallback-conf-4s', 'fallback-conf-5s',
+    # Indicator sources
+    'rsi-local', 'rsi-confluence', 'macd-local', 'macd-confluence',
+    'momentum', 'momentum-mtf', 'zscore-local', 'zscore-confluence',
+    # Multi-timeframe
+    'mtf-rsi', 'mtf-macd', 'mtf-momentum',
+    # Pump modes
+    'pump-momentum', 'pump-rsi', 'pump-confluence',
+    # Legacy
+    'hot-set', 'ai-decider', 'r1', 'r2', 'r3',
+})
+
+
+def validate_source(source: str) -> str:
+    """
+    BUG-12 fix: Validate source against whitelist.
+    Returns the original source if valid, 'unknown' if not.
+    Prevents malformed signals from routing to unintended A/B variants.
+    """
+    if source and source in ALLOWED_SIGNAL_SOURCES:
+        return source
+    return 'unknown'
+
+
+def update_signal_decision(token, direction, decision, reason=None, signal_id=None):
+    """
+    BUG-26 fix: Added optional signal_id parameter for atomic claim.
+
+    When signal_id is provided, updates only that specific signal
+    (UPDATE WHERE id=? AND executed=0) — prevents double-execution
+    when multiple scripts run the same minute.
+
+    When signal_id is None, falls back to legacy behavior:
+    updates ALL matching token+direction signals (for backward compat).
+    """
     conn = _get_conn(_runtime())
     c = conn.cursor()
-    c.execute('''
-        UPDATE signals
-        SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
-            updated_at=CURRENT_TIMESTAMP
-        WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
-        AND executed=0
-    ''', (decision, decision, token.upper(), direction.upper()))
+    if signal_id is not None:
+        # Atomic claim: only update the specific signal row
+        c.execute('''
+            UPDATE signals
+            SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE id=? AND executed=0
+        ''', (decision, decision, signal_id))
+    else:
+        # Legacy: update all matching token+direction
+        c.execute('''
+            UPDATE signals
+            SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
+            AND executed=0
+        ''', (decision, decision, token.upper(), direction.upper()))
     conn.commit()
     count = c.rowcount
     conn.close()
     return count
 
-def mark_signal_executed(token, direction):
-    return update_signal_decision(token, direction, 'EXECUTED')
+def mark_signal_executed(token, direction, signal_id=None):
+    """
+    BUG-26 fix: accepts optional signal_id for atomic claim.
+    When signal_id is provided, marks only that specific signal.
+    """
+    return update_signal_decision(token, direction, 'EXECUTED', signal_id=signal_id)
 
 def approve_signal(token, direction, leverage=None):
     conn = _get_conn(_runtime())
@@ -572,8 +628,9 @@ def get_approved_signals(hours=24):
         except Exception as e:
             print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
 
+    # BUG-26 fix: select id so callers can do atomic claim with signal_id
     c.execute('''
-        SELECT token, direction,
+        SELECT id, token, direction,
                COUNT(*) as count,
                AVG(confidence) as avg_conf,
                MAX(confidence) as max_conf,
@@ -608,6 +665,8 @@ def get_approved_signals(hours=24):
     results = []
     for r in c.fetchall():
         d = dict(r)
+        # BUG-26 fix: extract id from result for atomic claim
+        sig_id = d.pop('id', None)
         types = d.get('types', '').split(',') if d.get('types') else []
         # Filter types (remove empty strings)
         types = [t for t in types if t]
@@ -635,6 +694,7 @@ def get_approved_signals(hours=24):
         d['final_confidence'] = round(final_conf, 1)
         d['signal_types'] = types
         d['hot_rounds'] = hot_rounds
+        d['signal_id'] = sig_id  # BUG-26: pass to decider for atomic claim
         results.append(d)
 
     conn.close()
@@ -921,7 +981,7 @@ def get_cooldown(token, direction=None):
     if direction:
         key = "%s:%s" % (key, direction.upper())
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123'')
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
         cur = conn.cursor()
         cur.execute(
             "SELECT expires_at FROM signal_cooldowns WHERE token=%s AND expires_at > NOW()",
@@ -949,7 +1009,7 @@ def set_cooldown(token, direction=None, hours=1):
         key = "%s:%s" % (key, direction.upper())
     expires = datetime.now() + timedelta(hours=hours)
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password="postgres")
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signal_cooldowns (token, expires_at, reason, direction) "

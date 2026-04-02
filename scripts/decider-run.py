@@ -7,7 +7,9 @@ Also processes delayed-entry signals from pending-delayed-entries.json.
 """
 import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
-from signal_schema import init_db, get_approved_signals, get_pending_signals, mark_signal_executed, cleanup_stale_approved
+from signal_schema import (init_db, get_approved_signals, get_pending_signals,
+                           mark_signal_executed, cleanup_stale_approved,
+                           update_signal_decision, validate_source)
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
@@ -624,6 +626,9 @@ def run(dry_run=False):
     skipped = 0
 
     for sig in approved:
+        # BUG-26: extract signal_id for atomic claim BEFORE any trade execution.
+        # This prevents double-execution when multiple scripts run same minute.
+        sig_id = sig.get('signal_id')
         token = sig['token']
         direction = sig['direction']
         confidence = sig['final_confidence']
@@ -679,7 +684,13 @@ def run(dry_run=False):
             log(f'SKIP: Max positions reached ({MAX_POS})')
             break
 
-        source = f'conf-{sig.get("count", sig.get("num_signals", 1))}s'
+        # BUG-12 fix: validate source against whitelist before routing to A/B params
+        raw_source = f'conf-{sig.get("count", sig.get("num_signals", 1))}s'
+        source = validate_source(raw_source)
+        if source == 'unknown':
+            log(f'SKIP: {token} — unknown source "{raw_source}" (not in whitelist)')
+            skipped += 1
+            continue
 
         # ── Epsilon-greedy A/B variant selection ──────────────────
         ab = get_ab_params_for_trade(direction)
@@ -715,6 +726,16 @@ def run(dry_run=False):
         lev = get_max_leverage(token)
         lev = min(lev, 5)   # hard cap at 5x (safer for all directions)
 
+        # BUG-26 fix: claim signal atomically BEFORE brain.py call.
+        # This prevents double-execution when multiple scripts run same minute.
+        # Use signal_id if available, else fall back to legacy token+direction match.
+        claimed = mark_signal_executed(token, direction, signal_id=sig_id)
+        if sig_id is not None and claimed == 0:
+            # Signal already claimed by another process — skip this one
+            log(f'SKIP: {token} {direction} — signal {sig_id} already claimed (executed by another runner)')
+            skipped += 1
+            continue
+
         success, msg = execute_trade(
             token, direction, price, confidence, source,
             leverage=lev, sl_pct=sl_pct,
@@ -725,7 +746,7 @@ def run(dry_run=False):
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')
-            mark_signal_executed(token, direction)
+            # BUG-26 fix: mark_signal_executed was already called atomically above (before brain.py).
             # Record in ab_results — all three experiments
             _record_ab_trade_opened(token, direction, experiment, ab.get('sl_variant', ''), 'sl-distance-test')
             _record_ab_trade_opened(token, direction, experiment, ab.get('entry_variant', ''), 'entry-timing-test')
@@ -733,6 +754,20 @@ def run(dry_run=False):
             entered += 1
             open_count += 1
         else:
+            # BUG-26 fix: rollback the atomic claim since trade failed.
+            # Revert executed=0 so the signal can be picked up on next run.
+            if sig_id:
+                try:
+                    from signal_schema import _get_conn, _runtime
+                    conn = _get_conn(_runtime())
+                    conn.execute(
+                        "UPDATE signals SET executed=0, decision='APPROVED', updated_at=CURRENT_TIMESTAMP WHERE id=?",
+                        (sig_id,))
+                    conn.commit()
+                    conn.close()
+                    log(f'  → ROLLED BACK signal {sig_id} (trade failed: {msg[:60]})')
+                except Exception as rb_e:
+                    log(f'  → rollback warning for signal {sig_id}: {rb_e}')
             log(f'  → FAILED: {msg}')
 
     log(f'=== Decider Done: {entered} entered | {skipped} skipped '
