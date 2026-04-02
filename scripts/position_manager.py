@@ -433,7 +433,7 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (token.upper(), direction.upper(),
               signal_type or 'decider', is_win,
-              float(pnl_pct or 0), float(pnl_usdt or 0), confidence))
+              float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0)))
         conn.commit()
         conn.close()
         print(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "

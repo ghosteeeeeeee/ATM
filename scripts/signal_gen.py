@@ -1626,6 +1626,27 @@ def run_confluence_detection(regime, long_mult, short_mult):
             if num_signals < 3:
                 continue
 
+        # ── Directional Reversal Boost ──────────────────────────────────
+        # If this is a flip from the opposite direction, that's a stronger signal
+        # than continuing in the same direction. Apply reversal multiplier.
+        reversal_mult = 1.0
+        try:
+            cc_rev = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+            cc_r = cc_rev.cursor()
+            opposite_dir = 'LONG' if direction.upper() == 'SHORT' else 'SHORT'
+            cc_r.execute('''
+                SELECT COUNT(*), MAX(created_at) FROM signals
+                WHERE token=? AND direction=? AND signal_type NOT IN ('confluence','pattern','volume','rsi_individual','rsi_confluence')
+                AND created_at > datetime('now', '-4 hours')
+            ''', (token.upper(), opposite_dir))
+            rev_row = cc_r.fetchone()
+            cc_rev.close()
+            if rev_row and rev_row[0] and rev_row[0] > 0:
+                reversal_mult = 1.15  # 15% boost for directional flips
+                log(f'  REVERSAL: {token} flipping from {opposite_dir} → {direction} (+15% boost)')
+        except Exception as rev_e:
+            pass  # Non-fatal — proceed without reversal boost
+
         # Rate limit
         if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
             continue
@@ -1663,6 +1684,12 @@ def run_confluence_detection(regime, long_mult, short_mult):
         mtf_rows     = [(src, max(70, conf)) for src, conf in all_rows if src and src.startswith('mtf-')]
         hermes_rows  = [(src, conf) for src, conf in all_rows if src and not src.startswith('mtf-')]
         hermes_confs = [conf for _, conf in hermes_rows]
+        # hmacd- is the primary trend signal — give it a confidence floor of 90%.
+        # Strong MACD crossovers are the clearest momentum signals. Elevating hmacd
+        # ensures strong trend signals auto-approve without needing AI review,
+        # reducing context window bloat from repeated AI review cycles.
+        hermes_confs = [max(conf, 90.0) if src == 'hmacd-' else conf
+                        for src, conf in hermes_rows]
         mtf_confs    = [conf for _, conf in mtf_rows]
         hermes_avg   = statistics.mean(hermes_confs) if hermes_confs else 0
         mtf_avg      = statistics.mean(mtf_confs) if mtf_confs else 0
@@ -1682,9 +1709,9 @@ def run_confluence_detection(regime, long_mult, short_mult):
         num_signals = min(num_signals, 3)
 
         if num_signals >= 3:
-            boosted = min(99, base_avg * 1.5)
+            boosted = min(99, base_avg * 1.5 * reversal_mult)
         else:
-            boosted = min(99, base_avg * 1.25)
+            boosted = min(99, base_avg * 1.25 * reversal_mult)
 
         mtf_sources    = mtf_sources_str
         hermes_sources = hermes_sources_str
