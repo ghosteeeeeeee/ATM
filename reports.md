@@ -1538,3 +1538,77 @@ Source weights only in `ai-decider.py` (the single source of truth). No weight d
 5a14a32 fix(audit): clear_ab_cache token->coin, mirror_open mid_price, unified_scanner hype_cache, add code-audit skill
 ```
 
+
+---
+
+## Verification Session — 2026-04-02 (follow-up)
+
+### New Bugs Found
+
+| # | File | Line | Severity | Issue | Fix |
+|---|------|------|----------|-------|-----|
+| 6 | `ai-decider.py` + `ai_decider.py` | 1203, 1023 | **HIGH** | `get_macd(token)` and `get_regime(token)` function bodies referenced undefined `coin` → `NameError` on every call | Renamed def params: `get_macd(coin)`, `get_regime(coin)` |
+| 7 | `ai-decider.py` + `ai_decider.py` | 746, 454, 1111, 1214, 1285 | **MEDIUM** | Multiple functions renamed `def fn(coin)` but body used `token`, and vice versa — calls passed wrong variable type to SQL params | Full sync pass on `ai_decider.py` to match `ai-decider.py` |
+| 8 | `ai_decider.py` | 749, 1209 | **HIGH** | Same `coin`/`token` mismatch in `is_token_open` and `get_macd` | Byte-level param rename |
+| 9 | `ai_decider.py` | multiple | **HIGH** | `_kill_hot_signal`, `get_prediction`, `is_token_open`, `get_regime`, `get_macd` — all had def params out of sync with bodies | Single multi-fix pass matching `ai-decider.py` state |
+
+### De-Escalation — WORKING CORRECTLY ✓
+
+Confirmed via runtime output:
+```
+🔻 DEESCALATED 27 stale hot-set APPROVED → PENDING (>5 cycles)
+=== AI Decider: 20 pending | Open: 6/10 | Hot: 0 | Counter: 0 | Deesc: 27 ===
+```
+
+- `DEESCALATE_THRESHOLD = 5` (cycles without execution)
+- Hot-set APPROVED signals with `hot_cycle_count >= 5` → reset to PENDING
+- Counter-signal detection still fires independently
+- No regressions in hot-set handling logic
+
+### Live Trade Discrepancy — PENDLE Orphan
+
+**Before:** PENDLE open in HL but closed in DB (`trailing_exit_-0.15%`)
+
+**Root cause:** `close_paper_position()` in `position_manager.py` updates DB → `close_reason = 'trailing_exit_...'`, but **does not actually close the HL position**. HL close requires `hyperliquid_exchange.close_position()`.
+
+**Fix:** Closed PENDLE manually via `close_position('PENDLE')` → `{'success': True, ... 'avgPx': '1.0782'}`
+
+**Gap:** `position_manager.close_paper_position()` only updates DB, not HL. The guardian (`hl-sync-guardian.py`) should reconcile this, but only runs periodically. This is a known architecture gap — not a regression introduced today.
+
+**Current state (after manual fix):**
+- HL: 6 open (ETH, GRIFFAIN, ME, SAND, SKY, ZORA)
+- DB: 6 open — fully synchronized
+
+### All Syntax Checks — PASS
+
+```
+decider-run.py        ✓ OK
+hl-sync-guardian.py   ✓ OK
+wasp.py               ✓ OK
+unified_scanner.py    ✓ OK
+ai-decider.py         ✓ OK
+ai_decider.py         ✓ OK
+signal_gen.py         ✓ OK
+position_manager.py   ✓ OK (token=*** is valid: token = row['token'])
+hyperliquid_exchange.py ✓ OK
+```
+
+### HL API Consistency — PASS
+
+Direct `requests.post` to Hyperliquid only in:
+- `hype_cache.py` (canonical writer)
+- `price_collector.py` (cache feeder)
+- `hyperliquid_exchange.py` (SDK)
+- `hyperliquid-trader.py` (separate trader — legitimate)
+
+All 5 modified files now use `hype_cache.get_meta()` or `hype_cache.get_allMids()`.
+
+### Git Commits (this session)
+
+```
+0037fcb fix: ai-decider+ai_decider get_macd/get_regime param token->coin
+88c7b42 fix: sync ai_decider.py fully to ai-decider.py
+5a14a32 fix(audit): clear_ab_cache, mirror_open mid_price, unified_scanner hype_cache, code-audit skill
+070ef38 fix: ai-decider token->coin rename, SQL *** bugs
+```
+
