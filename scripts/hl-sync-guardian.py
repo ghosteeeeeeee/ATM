@@ -1624,13 +1624,17 @@ def sync():
                 if tok not in [x.upper() for x in missing]:
                     continue  # Not actually missing
 
-                # BUG-1 fix: Clarify the guardian_closed logic.
-                # guardian_closed=FALSE  -> externally closed (T or cut-loser). safe_to_close = TRUE. Skip.
-                # guardian_closed=TRUE   -> guardian itself closed this trade. safe_to_close = FALSE. Re-close OK.
-                # safe_to_close contains IDs with guardian_closed=FALSE (externally closed = skip).
-                if str(trade_id) not in safe_to_close:
-                    log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (guardian_closed=TRUE — already closed)', 'WARN')
+                # BUG-FIX: guardian_closed logic was INVERTED.
+                # guardian_closed=FALSE  → externally closed by T/cut-loser → skip (don't re-close)
+                # guardian_closed=TRUE   → guardian set flag but close failed (stale) → attempt close
+                # safe_to_close = guardian_closed=FALSE trades → skip these
+                # NOT in safe_to_close = guardian_closed=TRUE → stale flag, try to close
+                if str(trade_id) in safe_to_close:
+                    log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (guardian_closed=FALSE)', 'WARN')
                     continue
+
+                # guardian_closed=TRUE but trade is missing from HL — stale flag, close now
+                log(f'  Step8 closing {tok} #{trade_id}: guardian_closed=TRUE but missing from HL — closing stale orphan', 'WARN')
 
                 try:
                     fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0

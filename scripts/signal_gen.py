@@ -1388,7 +1388,8 @@ def _run_mtf_macd_signals():
         base_conf = 40 + strength * 15  # 2tf=70, 3tf=85, 1tf=55
         # Boost: MTF MACD crossovers are strong indicators — give them extra weight
         # so they can compete with Hermes signals in the max(hermes_avg, mtf_avg) scoring
-        conf = min(95, base_conf * 1.15)  # 2tf=80, 3tf=97, 1tf=63
+        # Raised from 1.15x to 1.35x — MACD crossovers are primary trend signals
+        conf = min(95, base_conf * 1.35)  # 2tf=94, 3tf=99, 1tf=74
 
         # ── Write mtf_macd signal ────────────────────────────────
         # Source = 'hmacd-' — prefixed so add_signal() merge combines

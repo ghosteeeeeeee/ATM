@@ -826,8 +826,14 @@ def get_pending_signals():
                         base_confluence *= 1.4   # 1.4 to 2.8 — very rare, very strong
                 confluence_score = base_confluence
 
-                # Confidence
-                conf_score = conf / 100.0
+                # hmacd source boost: mtf_macd signals from hmacd-* source
+                # are MACD crossovers — the clearest trend signals. Give 1.3x multiplier.
+                source_mult = 1.0
+                if source and source.startswith('hmacd-'):
+                    source_mult = 1.3
+
+                # Confidence (scaled by hmacd source multiplier)
+                conf_score = (conf / 100.0) * source_mult
 
                 # Recency
                 try:
@@ -864,6 +870,7 @@ def get_pending_signals():
                     'streak_mult': streak_mult,
                     'confluence_score': confluence_score,
                     'conf_score': conf_score,
+                    'source_mult': source_mult,
                     'recency_score': recency_score,
                     'compact_rounds': compact_rounds,
                     'survival_meta': survival_meta,
