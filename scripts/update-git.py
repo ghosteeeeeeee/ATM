@@ -46,7 +46,7 @@ def sh(*cmd, cwd=None, check=True):
 def github_api(method, path, data=None, base="https://api.github.com"):
     url = f"{base}/repos/{GITHUB_REPO}/{path}"
     hdrs = {
-        "Authorization": f"token {TOKEN}",
+        "Authorization": f"token {GITHUB_TOKEN}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
