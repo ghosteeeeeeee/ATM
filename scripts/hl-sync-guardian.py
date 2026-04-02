@@ -20,6 +20,8 @@ Migrated from combined-trading.py:
   - close_orphan_paper_trades() — paper→HL mirroring
 """
 import sys, time, json, subprocess, argparse, os, re, fcntl
+sys.path.insert(0, '/root/.hermes/scripts')
+from _secrets import BRAIN_DB_DICT
 
 # Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
 HL_TOKEN_BLOCKLIST = frozenset({'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA',
@@ -193,12 +195,7 @@ def get_db_connection():
     """Get a psycopg2 connection to the brain DB."""
     import psycopg2
     try:
-        return psycopg2.connect(
-            host='/var/run/postgresql',
-            dbname='brain',
-            user='postgres',
-            password='Brain123'
-        )
+        return psycopg2.connect(**BRAIN_DB_DICT)
     except Exception as e:
         log(f'DB connection error: {e}', 'FAIL')
         return None
@@ -1465,8 +1462,7 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         # Record penalty to trade_patterns via UPSERT (incrementing sample_count each time)
         try:
             import psycopg2 as _pg2
-            conn_b = _pg2.connect(host='/var/run/postgresql', dbname='brain',
-                                  user='postgres',            password='Brain123')
+            conn_b = _pg2.connect(**BRAIN_DB_DICT)
             cur_b = conn_b.cursor()
             # Look up original signal confidence to compute penalty
             cur_b.execute("""

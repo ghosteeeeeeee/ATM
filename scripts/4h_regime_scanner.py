@@ -10,12 +10,14 @@ import sys
 import time
 import psycopg2
 from datetime import datetime
+sys.path.insert(0, '/root/.hermes/scripts')
+from _secrets import BRAIN_DB_DICT
 
 INFO_URL = "https://api.hyperliquid.xyz/info"
 OUTPUT_FILE = "/var/www/html/regime_4h.json"
 STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
 LOG_FILE = "/root/.openclaw/workspace/logs/4h_regime.log"
-BRAIN_DB = dict(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+BRAIN_DB = BRAIN_DB_DICT
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
@@ -148,7 +150,7 @@ def get_tokens_to_scan():
     
     # Get from open trades
     try:
-        conn = psycopg2.connect(host='localhost', database='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("SELECT DISTINCT token FROM trades WHERE status = 'open'")
         for row in cur.fetchall():

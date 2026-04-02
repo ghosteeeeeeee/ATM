@@ -13,6 +13,8 @@ import os
 import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
+sys.path.insert(0, '/root/.hermes/scripts')
+from _secrets import BRAIN_DB_DICT
 
 import hype_cache as hc
 
@@ -29,12 +31,7 @@ except Exception as e:
     print(f"[Position Manager] Hyperliquid mirroring unavailable: {e}")
 
 # ─── DB Config ────────────────────────────────────────────────────────────────
-DB_CONFIG = {
-    "host": "/var/run/postgresql",
-    "dbname": "brain",
-    "user": "postgres",
-    "password": "postgres",
-}
+DB_CONFIG = BRAIN_DB_DICT
 SERVER_NAME = "Hermes"
 
 # Pipeline heartbeat file
@@ -359,10 +356,7 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
 
     # Write to brain.trade_patterns
     try:
-        conn_brain = psycopg2.connect(
-            host='/var/run/postgresql', dbname='brain',
-            user='postgres', password='postgres'
-        )
+        conn_brain = psycopg2.connect(**BRAIN_DB_DICT)
         cur_brain = conn_brain.cursor()
 
         for row in rows:
@@ -459,8 +453,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     # ── Auto-fetch signal_type and confidence from trades DB if not provided ───
     if signal_type is None or confidence is None:
         try:
-            conn_fetch = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
-                                          user='postgres', password='Brain123')
+            conn_fetch = psycopg2.connect(**BRAIN_DB_DICT)
             cur_fetch = conn_fetch.cursor()
             cur_fetch.execute(
                 "SELECT signal, confidence FROM trades WHERE token=%s AND server='Hermes' "
@@ -505,7 +498,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                 test_map[test_name] = variant_id
 
         try:
-            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+            conn = psycopg2.connect(**BRAIN_DB_DICT)
             cur = conn.cursor()
             for test_name, variant_id in test_map.items():
                 if not test_name or not variant_id:

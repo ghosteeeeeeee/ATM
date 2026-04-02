@@ -5,6 +5,8 @@ AI Decider - Actually thinks and decides using all available info
 import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback
 from datetime import datetime, timezone
 import pandas as pd
+sys.path.insert(0, '/root/.hermes/scripts')
+from _secrets import BRAIN_DB_DICT
 
 LOG_FILE = '/var/www/hermes/logs/trading.log'
 
@@ -399,7 +401,7 @@ GOAL_PRESETS = {
     "data_first": {"optimize": "win_rate", "min_trades": 3, "confidence_threshold": 3, "sl_adjustment": 1.0, "pattern_strength_threshold": 0.4},
 }
 
-BRAIN_DB = "host=/var/run/postgresql dbname=brain user=postgres password=postgres"
+BRAIN_DB = f"host={BRAIN_DB_DICT['host']} dbname={BRAIN_DB_DICT['database']} user={BRAIN_DB_DICT['user']} password=***"
 
 def get_learned_adjustments(token, direction='long'):
     """
@@ -653,7 +655,7 @@ def cleanup_stale_signals():
         cur = conn_sqlite.cursor()
         
         # Get open tokens from PostgreSQL
-        conn_pg = psycopg2.connect(host='/var/run/postgresql', database="brain", user="postgres", password='Brain123')
+        conn_pg = psycopg2.connect(**BRAIN_DB_DICT)
         cur_pg = conn_pg.cursor()
         # Only block signals for THIS server's open positions
         cur_pg.execute("SELECT token FROM trades WHERE status = 'open' AND server = 'Hermes'")
@@ -1100,7 +1102,7 @@ def get_prices():
 def update_trade_prices():
     """Update current_price for all open trades using Hyperliquid prices"""
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', database="brain", user="postgres", password='***')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         
         # Get all open trades
@@ -1406,7 +1408,7 @@ if deesc_count > 0:
 open_positions = {}  # token_upper -> direction_upper
 try:
     import psycopg2
-    conn_pg = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
+    conn_pg = psycopg2.connect(**BRAIN_DB_DICT)
     cur_pg = conn_pg.cursor()
     cur_pg.execute("SELECT token, direction FROM trades WHERE status = 'open'")
     for (tok, d) in cur_pg.fetchall():

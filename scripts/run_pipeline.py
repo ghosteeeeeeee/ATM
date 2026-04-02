@@ -4,6 +4,7 @@ run_pipeline.py — Hermes Trading Pipeline
 Runs every 1 minute via cron. A/B optimizer every 10 minutes.
 """
 import sys, subprocess, time, os, argparse, os, fcntl, json
+from _secrets import BRAIN_DB_DICT
 
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'pipeline.log')
@@ -110,7 +111,7 @@ def main():
     # Quick summary
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM trades WHERE server='Hermes' AND status='open'")
         open_c = cur.fetchone()[0]

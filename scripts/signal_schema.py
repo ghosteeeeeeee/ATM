@@ -7,6 +7,8 @@ RUNTIME DB (/root/.hermes/data/signals_hermes_runtime.db) — signals, decisions
 import sqlite3, time, json, os
 from datetime import datetime, timedelta
 import psycopg2
+sys.path.insert(0, '/root/.hermes/scripts')
+from _secrets import BRAIN_DB_DICT
 
 # ── Database paths ────────────────────────────────────────────────────────────
 HERMES_DATA = os.environ.get('HERMES_DATA_DIR', '/root/.hermes/data')
@@ -933,7 +935,7 @@ def get_cooldown(token, direction=None):
     if direction:
         key = "%s:%s" % (key, direction.upper())
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute(
             "SELECT expires_at FROM signal_cooldowns WHERE token=%s AND expires_at > NOW()",
@@ -961,7 +963,7 @@ def set_cooldown(token, direction=None, hours=1):
         key = "%s:%s" % (key, direction.upper())
     expires = datetime.now() + timedelta(hours=hours)
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password="postgres")
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO signal_cooldowns (token, expires_at, reason, direction) "

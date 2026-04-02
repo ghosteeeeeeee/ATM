@@ -10,6 +10,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
                            update_signal_decision, validate_source)
+from _secrets import BRAIN_DB_DICT
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
                               _is_win_cooldown_active, is_wrong_side_risky)
@@ -50,7 +51,7 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
             return cached_wr, cached_count
 
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("""
             SELECT COUNT(*) as total,
@@ -196,7 +197,7 @@ def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
     # Try exploitation — read from ab_results
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("""
             SELECT variant_id, win_rate_pct
@@ -239,7 +240,7 @@ def _record_ab_trade_opened(token, direction, experiment, variant_id, test_name)
         return
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='postgres')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO ab_results (test_name, variant_id, trades, wins, losses,
@@ -515,8 +516,7 @@ def close_position(token, reason):
     """
     try:
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
-                                user='postgres', password='postgres')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         # Read entry_price so we don't accidentally null it
         cur.execute("""
@@ -651,7 +651,7 @@ def run(dry_run=False):
 
     # ── Rate limit: minimum 15 seconds between new entries ─────────
     try:
-        conn_rate = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+        conn_rate = psycopg2.connect(**BRAIN_DB_DICT)
         c_rate = conn_rate.cursor()
         c_rate.execute("SELECT open_time FROM trades WHERE status='open' ORDER BY open_time DESC LIMIT 1")
         row = c_rate.fetchone()

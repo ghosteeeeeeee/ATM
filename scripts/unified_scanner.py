@@ -8,6 +8,7 @@ sys.path.insert(0, '/root/.openclaw/workspace/scripts')
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import add_signal, get_confluence_signals, get_pending_signals as schema_get_pending
 from tokens import SOLANA_ONLY_TOKENS, HYPERLIQUID_TOKENS, HYPERLIQUID_EXCLUDE, PREFER_HYPERLIQUID_TOKENS, is_solana_only, is_hyperliquid, get_token_chain, can_short
+from _secrets import BRAIN_DB_DICT
 import psycopg2
 
 LOG_FILE = '/root/.hermes/logs/unified-scanner.log'
@@ -329,7 +330,7 @@ def get_token_exchange(token):
 def get_open_trades():
     """Get current open trades count by type"""
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM trades WHERE status = 'open' AND server='Hermes'")
         total = cur.fetchone()[0]
