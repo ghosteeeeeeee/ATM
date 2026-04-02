@@ -70,24 +70,24 @@ AB_CACHE_FILE = '/root/.openclaw/workspace/data/ab-variant-cache.json'
 _hot_set_failure_count = 0
 
 # Lazy-load signal streak from position_manager (avoids circular import at module load)
-_signal_streak_cache = {}  # key: (token, direction, signal_type) -> {'streak': N, 'fetched_at': float}
+_signal_streak_cache = {}  # key: (coin, direction, signal_type) -> {'streak': N, 'fetched_at': float}
 _signal_streak_timestamps = {}  # key -> last-fetched timestamp (TTL per-key)
 _STREAK_TTL = 300  # refresh streak data every 5 minutes
 
-def _get_signal_streak(token, direction, signal_type):
+def _get_signal_streak(coin, direction, signal_type):
     """Get cached signal streak, refreshed every 5 minutes (per-key TTL)."""
     global _signal_streak_cache, _signal_streak_timestamps
-    key = (token.upper(), direction.upper(), (signal_type or '').lower())
+    key = (coin.upper(), direction.upper(), (signal_type or '').lower())
     now = time.time()
     ts = _signal_streak_timestamps.get(key, 0)
     if key not in _signal_streak_cache or (now - ts) > _STREAK_TTL:
         try:
             sys.path.insert(0, '/root/.hermes/scripts')
             from position_manager import get_signal_streak as _gs
-            _signal_streak_cache[key] = _gs(token, direction, signal_type)
+            _signal_streak_cache[key] = _gs(coin, direction, signal_type)
             _signal_streak_timestamps[key] = now
         except Exception:
-            log(f'[ai-decider] WARNING: streak cache fetch failed for {token} {direction} — using defaults')
+            log(f'[ai-decider] WARNING: streak cache fetch failed for {coin} {direction} — using defaults')
             return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
     return _signal_streak_cache.get(key, {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0})
 
@@ -102,11 +102,11 @@ def _load_signal_streaks_batch(rows):
         sys.path.insert(0, '/root/.hermes/scripts')
         from position_manager import get_signal_streak as _gs
         for row in rows:
-            sid, token, direction, stype, conf, source, created = row
-            key = (token.upper(), direction.upper(), (stype or '').lower())
+            sid, coin, direction, stype, conf, source, created = row
+            key = (coin.upper(), direction.upper(), (stype or '').lower())
             ts = _signal_streak_timestamps.get(key, 0)
             if (now - ts) > _STREAK_TTL:
-                _signal_streak_cache[key] = _gs(token, direction, stype)
+                _signal_streak_cache[key] = _gs(coin, direction, stype)
                 _signal_streak_timestamps[key] = now
                 loaded += 1
             else:
@@ -125,7 +125,7 @@ _ab_variant_cache = {}
 # Loaded once per ai_decider run, used to:
 #   1. Auto-approve r2+ signals (proven by AI across multiple rounds)
 #   2. Kill hot set signals when an opposite-direction signal flips the view
-_hot_rounds = {}   # token.upper() -> {direction, rounds, survival}
+_hot_rounds = {}   # coin.upper() -> {direction, rounds, survival}
 
 def _load_hot_rounds():
     """
@@ -139,7 +139,7 @@ def _load_hot_rounds():
     Also enriches with PENDING signal data (signal_ids, avg_conf, num_types).
 
     Returns:
-        dict: token.upper() -> {direction, rounds, signal_ids, avg_conf, num_types}
+        dict: coin.upper() -> {direction, rounds, signal_ids, avg_conf, num_types}
     """
     global _hot_rounds, _hot_set_failure_count  # BUG-11 fix: declare before use in except block
     _hot_rounds = {}
@@ -243,7 +243,7 @@ def _kill_hot_signal(token):
     except Exception:
         return 0
 
-def _kill_pending_opposite(token, hot_direction):
+def _kill_pending_opposite(coin, hot_direction):
     """
     Kill PENDING signals in the OPPOSITE direction to the hot set.
     Hot direction has priority — newer signals in the wrong direction get killed.
@@ -258,7 +258,7 @@ def _kill_pending_opposite(token, hot_direction):
                 updated_at = CURRENT_TIMESTAMP
             WHERE token=? AND direction=? AND decision='PENDING' AND executed=0
             LIMIT 5
-        """, (token.upper(), opposite))
+        """, (coin.upper(), opposite))
         killed = c.rowcount
         conn.commit()
         conn.close()
@@ -281,9 +281,9 @@ def get_local_prices():
                 # Extract just the prices from the token data
                 prices = {}
                 if isinstance(data, dict):
-                    for token, info in data.items():
+                    for coin, info in data.items():
                         if isinstance(info, dict) and 'price' in info:
-                            prices[token] = str(info['price'])
+                            prices[coin] = str(info['price'])
                 return prices
     except Exception as e:
         print(f"   ⚠️ Failed to read local prices: {e}")
@@ -297,9 +297,9 @@ def get_hype_meta_batched():
     """Get meta from shared HL cache (written by price_collector)."""
     return hc.get_meta()
 
-def get_cached_ab_variant(token, direction, test_name):
+def get_cached_ab_variant(coin, direction, test_name):
     """Get cached A/B variant or select new one"""
-    key = f"{token}:{direction}"
+    key = f"{coin}:{direction}"
     if key not in _ab_variant_cache:
         _ab_variant_cache[key] = {}
     
@@ -308,10 +308,10 @@ def get_cached_ab_variant(token, direction, test_name):
     
     return _ab_variant_cache[key][test_name]
 
-def clear_ab_cache(token=None, direction=None):
+def clear_ab_cache(coin = None, direction=None):
     """Clear A/B cache - optionally for specific token"""
     if token:
-        key = f"{token}:{direction or 'long'}"
+        key = f"{coin}:{direction or 'long'}"
         _ab_variant_cache.pop(key, None)
     else:
         _ab_variant_cache.clear()
@@ -339,7 +339,7 @@ def select_ab_variant(test_name):
         log_error(f'select_ab_variant Thompson sampling failed: {e}')
         return None
 
-def get_ab_params(token, direction='long'):
+def get_ab_params(coin, direction='long'):
     """
     Get A/B test parameters for a trade.
     Returns a dict with all relevant params. Each token+direction gets a cached variant
@@ -365,7 +365,7 @@ def get_ab_params(token, direction='long'):
     result = _default_ab_params()
 
     # ── SL Distance Test ─────────────────────────────────────────
-    sl_test = get_cached_ab_variant(token, direction, 'sl-distance-test')
+    sl_test = get_cached_ab_variant(coin, direction, 'sl-distance-test')
     if sl_test:
         cfg = sl_test.get("config", {})
         sl_pct = cfg.get("slPct", 0.01)
@@ -377,7 +377,7 @@ def get_ab_params(token, direction='long'):
         print(f"  [AB] SL Distance: {sl_pct*100:g}% (variant: {sl_test.get('id')})")
 
     # ── Entry Timing Test ─────────────────────────────────────────
-    entry_test = get_cached_ab_variant(token, direction, 'entry-timing-test')
+    entry_test = get_cached_ab_variant(coin, direction, 'entry-timing-test')
     if entry_test:
         cfg = entry_test.get("config", {})
         result['entry_mode'] = cfg.get("entryMode", "immediate")
@@ -388,7 +388,7 @@ def get_ab_params(token, direction='long'):
         print(f"  [AB] Entry Mode: {result['entry_mode']} (variant: {entry_test.get('id')})")
 
     # ── Trailing Stop Test ─────────────────────────────────────────
-    ts_test = get_cached_ab_variant(token, direction, 'trailing-stop-test')
+    ts_test = get_cached_ab_variant(coin, direction, 'trailing-stop-test')
     if ts_test:
         cfg = ts_test.get("config", {})
         result['trailing_activation'] = cfg.get("trailingActivationPct", 0.01)
@@ -435,7 +435,7 @@ GOAL_PRESETS = {
 
 BRAIN_DB = f"host={BRAIN_DB_DICT['host']} dbname={BRAIN_DB_DICT['database']} user={BRAIN_DB_DICT['user']} password=***"
 
-def get_learned_adjustments(token, direction='long'):
+def get_learned_adjustments(coin, direction='long'):
     """
     Get learned pattern adjustments from brain.trade_patterns for a token/direction.
     
@@ -456,7 +456,7 @@ def get_learned_adjustments(token, direction='long'):
               AND sample_count >= 1
             ORDER BY confidence DESC
             LIMIT 3
-        """, (token, direction))
+        """, (coin, direction))
         patterns = cur.fetchall()
         cur.close()
         conn.close()
@@ -504,7 +504,7 @@ def get_learned_adjustments(token, direction='long'):
         log_error(f'get_learned_adjustments: {e}')
         return None
 
-def log_ab_trade_opened(token, direction, tp_multiplier, sl_pct, risk_reward, tp_pct, sl_pct_display,
+def log_ab_trade_opened(coin, direction, tp_multiplier, sl_pct, risk_reward, tp_pct, sl_pct_display,
                         leverage=None, strategy=None, experiment=None, variant_id=None, test_name=None):
     """
     Log when a trade is opened with A/B test variant info.
@@ -527,7 +527,7 @@ def log_ab_trade_opened(token, direction, tp_multiplier, sl_pct, risk_reward, tp
 
         entry = {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "token": token,
+            "token": coin,
             "direction": direction,
             "event": "opened",
             "tp_multiplier": tp_multiplier,
@@ -565,7 +565,7 @@ def log_ab_trade_opened(token, direction, tp_multiplier, sl_pct, risk_reward, tp
     except Exception as e:
         log_error(f'log_ab_trade_opened: {e}')
 
-def record_ab_trade_closed(token, pnl_pct, pnl_usdt):
+def record_ab_trade_closed(coin, pnl_pct, pnl_usdt):
     """
     Record outcome when a trade closes.
     Updates both the JSON file (legacy) and the brain DB ab_results table.
@@ -586,7 +586,7 @@ def record_ab_trade_closed(token, pnl_pct, pnl_usdt):
 
         # Find the most recent open trade for this token
         for entry in reversed(results):
-            if entry.get("token") == token and entry.get("event") == "opened" and "closed_at" not in entry:
+            if entry.get("token") == coin and entry.get("event") == "opened" and "closed_at" not in entry:
                 entry["closed_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
                 entry["pnl_pct"] = round(pnl_pct, 2)
                 entry["pnl_usdt"] = round(pnl_usdt, 2)
@@ -674,11 +674,11 @@ def release_lock():
 if not acquire_lock():
     sys.exit(0)
 
-def log_signal(token, direction, price, confidence, source):
+def log_signal(coin, direction, price, confidence, source):
     """Log signal to signals.log for signals.html display"""
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
     with open(SIGNAL_LOG, "a") as f:
-        f.write(f"{timestamp} SIGNAL: {token} {direction.upper()} @ {price} ({confidence}%) [{source}]\n")
+        f.write(f"{timestamp} SIGNAL: {coin} {direction.upper()} @ {price} ({confidence}%) [{source}]\n")
 
 def cleanup_stale_signals():
     """Clean up stale signals on startup - prevents backlog"""
@@ -746,7 +746,7 @@ def get_open():
 def is_token_open(token):
     """Check if token already has open position - with input sanitization"""
     # Validate token - only allow alphanumeric
-    if not token or not token.replace('_','').isalnum():
+    if not coin or not coin.replace('_','').isalnum():
         return False
     try:
         conn = psycopg2.connect(BRAIN_DB)
@@ -830,7 +830,7 @@ def get_pending_signals():
             now_ts = time.time()
             now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
             for row in candidates:
-                sid, token, direction, stype, conf, source, created = row
+                sid, coin, direction, stype, conf, source, created = row
 
                 # Fetch survival data from signal record
                 c.execute("SELECT compact_rounds, survival_score FROM signals WHERE id = ?", (sid,))
@@ -840,7 +840,7 @@ def get_pending_signals():
 
                 # Confluence: base score from agreeing signal types
                 agreeing = sum(1 for r in candidates
-                               if r[1] == token and r[2] == direction and r[3] != stype)
+                               if r[1] == coin and r[2] == direction and r[3] != stype)
                 base_confluence = 1.0 + min(agreeing, 2) * 0.5  # 1.0 to 2.0
 
                 # Signal-type quality multiplier for confluence signals
@@ -876,7 +876,7 @@ def get_pending_signals():
                     recency_score = 1.0
 
                 # Signal quality streak (hot boost, cold suppress)
-                streak = _get_signal_streak(token, direction, stype)
+                streak = _get_signal_streak(coin, direction, stype)
                 streak_mult = streak.get('multiplier', 1.0)
 
                 # Survival meta: compounding bonus per round survived
@@ -906,7 +906,7 @@ def get_pending_signals():
                     'compact_rounds': compact_rounds,
                     'survival_meta': survival_meta,
                     'sid': sid,
-                    'token': token,
+                    'token': coin,
                     'direction': direction,
                     'stype': stype,
                     'conf': conf,
@@ -991,11 +991,11 @@ def get_pending_signals():
         hot_signals = []
         non_hot_signals = []
         for row in rows:
-            token, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds, source = row
+            coin, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds, source = row
             # BUG-12 fix: validate source against whitelist before using in A/B routing/logging
             safe_source = validate_source(source) if source else 'unknown'
             sig = {
-                "token": token,
+                "token": coin,
                 "direction": direction.lower(),
                 "entry": value if value else 0,
                 "confidence": confidence,
@@ -1006,7 +1006,7 @@ def get_pending_signals():
                 "compact_rounds": compact_rounds or 0,
                 "source": safe_source,  # BUG-12: validated source
             }
-            if token.upper() in hot_tokens:
+            if coin.upper() in hot_tokens:
                 hot_signals.append(sig)
             else:
                 non_hot_signals.append(sig)
@@ -1027,8 +1027,8 @@ def get_regime(token):
     try:
         with open("/var/www/html/regime_4h.json") as f:
             data = json.load(f)
-        if token.upper() in data.get('regimes', {}):
-            reg = data['regimes'][token.upper()]
+        if coin.upper() in data.get('regimes', {}):
+            reg = data['regimes'][coin.upper()]
             return reg.get('regime', 'NEUTRAL'), reg.get('confidence', 0)
     except Exception as e:
         log_error(f'get_regime JSON: {e}')
@@ -1042,7 +1042,7 @@ def get_regime(token):
             SELECT regime_4h, updated_at FROM momentum_cache
             WHERE token = %s
             ORDER BY updated_at DESC LIMIT 1
-        """, (token.upper(),))
+        """, (coin.upper(),))
         row = cur.fetchone()
         cur.close()
         conn.close()
@@ -1085,8 +1085,8 @@ def get_market_zscore():
         neg_count = 0
         pos_count = 0
         
-        for token in tokens:
-            match = re.search(rf'{token}USDT.*z=([-+]?\d+\.?\d*)', content)
+        for coin in tokens:
+            match = re.search(rf'{coin}USDT.*z=([-+]?\d+\.?\d*)', content)
             if match:
                 z = float(match.group(1))
                 if z < 0:
@@ -1116,7 +1116,7 @@ def get_prediction(token):
         cur.execute("""
             SELECT direction, confidence, correct
             FROM predictions
-            WHERE token = ?
+            WHERE token =  ?
             ORDER BY created_at DESC
             LIMIT 1
         """, (token,))
@@ -1184,10 +1184,10 @@ def update_trade_prices():
             mids = {}
         
         updated = 0
-        for trade_id, token in open_trades:
+        for trade_id, coin in open_trades:
             # Hyperliquid uses just the token symbol (e.g. "BTC", not "BTC_USDT")
-            if token in mids:
-                current_price = float(mids[token])
+            if coin in mids:
+                current_price = float(mids[coin])
                 cur.execute("UPDATE trades SET current_price = %s, last_updated = NOW() WHERE id = %s", 
                           (current_price, trade_id))
                 updated += 1
@@ -1206,13 +1206,13 @@ def get_macd(token):
     EMA periods: fast=12, slow=26, signal=9 (standard MACD).
     """
     import numpy as np
-    if not token or not token.replace('_','').isalnum():
+    if not coin or not coin.replace('_','').isalnum():
         return {}
     try:
         conn = sqlite3.connect('/root/.hermes/data/signals_hermes.db')
         df = pd.read_sql(
             "SELECT timestamp, price FROM price_history WHERE token=? ORDER BY timestamp ASC",
-            conn, params=(token.upper(),))
+            conn, params=(coin.upper(),))
         conn.close()
         if len(df) < 35:
             return {}
@@ -1250,7 +1250,7 @@ def _ema(series, period):
         ema[i] = alpha * arr[i] + (1 - alpha) * ema[i-1]
     return ema
 
-def is_real_pump(token, direction="long"):
+def is_real_pump(coin, direction="long"):
     """Check if token is in a real pump.
     
     For SHORT signals: require volume > $5000 on Gate.io (confirm bearish move is real).
@@ -1263,7 +1263,7 @@ def is_real_pump(token, direction="long"):
     
     # SHORT signals: check volume on Gate.io
     try:
-        r = requests.get(f"https://api.gateio.ws/api/v4/spot/tickers?currency_pair={token}_USDT", timeout=5)
+        r = requests.get(f"https://api.gateio.ws/api/v4/spot/tickers?currency_pair={coin}_USDT", timeout=5)
         if r.status_code == 200:
             data = r.json()
             if data:
@@ -1274,10 +1274,10 @@ def is_real_pump(token, direction="long"):
         log_error(f'is_real_pump: {e}')
         return True  # Allow if check fails
 
-def ai_decide(token, direction, entry, conf, prices, market_z, macd_data, pred_str="", z_score_tier=None, z_score=None):
+def ai_decide(coin, direction, entry, conf, prices, market_z, macd_data, pred_str="", z_score_tier=None, z_score=None):
     """Send prompt to AI to make actual decision"""
     
-    current = prices.get(token, entry)
+    current = prices.get(coin, entry)
     macd = macd_data.get("signal", "N/A")
     macd_conf = macd_data.get("confidence", "N/A")
     
@@ -1317,7 +1317,7 @@ Z-Score Tier: {z_score_tier}"""
     
     prompt = f"""You are a crypto trading decider. A momentum signal generator flagged this trade — your job is to validate or reject it using all available context.
 
-TOKEN: {token}
+TOKEN: {coin}
 CURRENT PRICE: ${current}
 PROPOSED ENTRY: ${entry}
 PROPOSED DIRECTION: {direction.upper()}
@@ -1413,7 +1413,7 @@ REASON: [1-sentence explanation]
         # Fallback to rule-based
         return direction, abs(conf) * 30, "Fallback to rules"
 
-def execute_trade(token, direction, entry, conf, atr, exchange='hyperliquid', learned=None):
+def execute_trade(coin, direction, entry, conf, atr, exchange='hyperliquid', learned=None):
     """
     DEPRECATED — all trade execution is handled exclusively by decider-run.py.
     This stub prevents import errors only.
@@ -1482,7 +1482,7 @@ except Exception as e:
 
 counter_killed = 0
 for s in pending:
-    tok = (s.get('token') or '').upper()
+    tok = (s.get('coin') or '').upper()
     sig_dir = (s.get('direction') or '').upper()
     if tok in open_positions:
         open_dir = open_positions[tok]
@@ -1521,7 +1521,7 @@ conn_deesc.close()
 
 # HOT SET FLIP KILL (existing logic — keep it, runs after de-escalation above)
 for s in pending:
-    tok = (s.get('token') or '').upper()
+    tok = (s.get('coin') or '').upper()
     sig_dir = (s.get('direction') or '').upper()
     if tok in _hot_rounds:
         hot_dir = _hot_rounds[tok]['direction'].upper()
@@ -1551,7 +1551,7 @@ processed_this_run = set()  # token+direction already reviewed this run
 CONFLUENCE_THRESHOLD = 90
 for s in pending:
     if s.get('signal_type') == 'confluence' and s.get('confidence', 0) >= CONFLUENCE_THRESHOLD:
-        t = (s.get('token') or '').upper()
+        t = (s.get('coin') or '').upper()
         direction = (s.get('direction') or '').upper()
         key = f"{t}:{direction}"
         if key in processed_this_run:
