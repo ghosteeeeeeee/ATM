@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """
-update-git — Build Hermes zip + publish to GitHub releases + update local index.
+update-git -- Build Hermes zip + publish to GitHub releases + update local index.
 Usage: python3 scripts/update-git.py [--no-push] [--dry-run]
 """
-import subprocess, os, re, json, sys, tempfile, time
+import subprocess, os, re, json, sys, time
 from pathlib import Path
 
 HERMES = Path("/root/.hermes")
 WWW_GIT = Path("/var/www/git")
 GITHUB_REPO = "ghosteeeeeeee/ATM"
 
-# ── Token: read from _secrets (which loads .secrets.local at runtime) ─────────
 def _get_token():
     t = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if t:
@@ -36,12 +35,12 @@ def _get_token():
         pass
     sys.exit("ERROR: No GITHUB_TOKEN found in env, _secrets, or ~/.netrc")
 
-TOKEN = _get_token()
+GH = _get_token()
 
 def sh(*cmd, cwd=HERMES, check=True):
     r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
     if r.returncode and check:
-        sys.exit(f"FAIL: {' '.join(cmd)}\n{r.stderr}")
+        sys.exit(f"FAIL: {chr(10).join(str(c) for c in cmd)}{chr(10)}{r.stderr}")
     return r.stdout.strip()
 
 def github_api(method, path, data=None, base="https://api.github.com"):
@@ -63,63 +62,54 @@ def main():
     dry = "--dry-run" in sys.argv
     no_push = "--no-push" in sys.argv
 
-    # 1. Ensure clean state
     dirty = sh("git", "status", "--porcelain")
     if dirty:
-        print(f"[!] Uncommitted changes:\n{dirty}")
-        print("    Run: cd /root/.hermes && git add -A && git commit -m 'msg'")
+        print(f"[!] Uncommitted changes:{chr(10)}{dirty}")
+        print("    Run: cd /root/.hermes && git add -A && git commit -m msg")
         if not dry:
             sys.exit(1)
 
-    # 2. Check symlinks (break standalone zips)
-    symlinks = sh("find . -type l", check=False)
+    symlinks = sh("find", ".", "-type", "l", check=False)
     if symlinks:
-        print(f"[!] SYMLINKS FOUND — must resolve before zipping:")
-        print(symlinks)
+        print(f"[!] SYMLINKS FOUND:{chr(10)}{symlinks}")
         sys.exit(1)
 
-    # 3. Get version info
     commit = sh("git", "rev-parse", "--short=HEAD")
     ts = time.strftime("%Y%m%d-%H%M")
     full_zip = f"/tmp/ATM-Hermes-{ts}-full-{commit}.zip"
     commit_msg = sh("git", "log", "-1", "--format=%s")
     date_str = time.strftime("%b %d, %Y %H:%M UTC")
 
-    # 4. Check if already released
     if not dry:
         try:
             releases = github_api("GET", "releases")
             existing = next((r for r in releases if r["tag_name"] == f"v{ts}"), None)
             if existing:
-                print(f"Release v{ts} already exists — skipping")
+                print(f"Release v{ts} already exists -- skipping")
                 return
         except Exception:
             pass
 
-    # 5. Build zip
     print(f"Building: {full_zip}")
     sh("git", "archive", "--prefix=hermes/", "-o", full_zip, "HEAD")
     zip_size = os.path.getsize(full_zip)
     zip_mb = zip_size / 1024 / 1024
-    print(f"  {zip_mb:.1f}MB, {sh('unzip', '-l', full_zip, check=False).count(chr(10))} entries")
+    print(f"  {zip_mb:.1f}MB")
 
     if dry:
         print(f"[dry-run] Would create release v{ts}")
         return
 
-    # 6. Push to GitHub
     if not no_push:
         print("Pushing to GitHub...")
         sh("git", "push", "github", "main", "--force", check=False)
-        print("  Pushed to github/main")
 
-    # 7. Create GitHub release
     print("Creating GitHub release...")
     release_data = {
         "tag_name": f"v{ts}",
         "target_commitish": "main",
         "name": f"Hermes {date_str}",
-        "body": f"**{commit_msg}**\n\nFull repo: `{full_zip}` ({zip_mb:.1f}MB)",
+        "body": f"**{commit_msg}**{chr(10)}{chr(10)}Full repo: `{full_zip}` ({zip_mb:.1f}MB)",
         "draft": False,
         "prerelease": False,
     }
@@ -127,7 +117,6 @@ def main():
     release_id = release["id"]
     upload_url = release["upload_url"].replace("{?name,label}", "?name=")
 
-    # 8. Upload zip
     zip_basename = os.path.basename(full_zip)
     with open(full_zip, "rb") as f:
         zip_data = f.read()
@@ -139,8 +128,6 @@ def main():
         headers={
             "Authorization": f"token {TOKEN}",
             "Content-Type": "application/zip",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
         },
         method="POST",
     )
@@ -150,35 +137,22 @@ def main():
     github_dl = asset["browser_download_url"]
     print(f"  GitHub: {github_dl}")
 
-    # 9. Copy to local /var/www/git/
     WWW_GIT.mkdir(parents=True, exist_ok=True)
     local_dest = WWW_GIT / zip_basename
-    with open(full_zip, "rb") as src, open(local_dest, "wb") as dst:
+    with open(local_dest, "wb") as dst:
         dst.write(zip_data)
     print(f"  Local:  http://localhost:54321/git/{zip_basename}")
 
-    # 10. Update index.html
     index_path = WWW_GIT / "index.html"
     if index_path.exists():
         html = index_path.read_text()
-        if '<span class="tag-latest">' in html:
-            html = re.sub(r' <span class="tag-latest">LATEST</span>', '', html)
-        new_row = f"""<tr>
-  <td><a href="{zip_basename}">{zip_basename}</a> <span class="tag-latest">LATEST</span></td>
-  <td class="date">{date_str}</td>
-  <td class="size">{zip_mb:.1f}MB</td>
-  <td><a href="{github_dl}" target="_blank">GitHub</a> {commit_msg}</td>
-</tr>"""
-        header = '<tr><th>File</th><th>Date</th><th>Size</th><th>Contents</th></tr>'
-        html = html.replace(header, header + "\n" + new_row)
-        html = re.sub(r'(Download Latest Full [^<]+</a>)',
-                      rf'\1 | <a href="{github_dl}" target="_blank">GitHub</a>', html, count=1)
+        new_row = f"<tr>{chr(10)}  <td><a href=\"{zip_basename}\">{zip_basename}</a> <span class=\"tag-latest\">LATEST</span></td>{chr(10)}  <td class=\"date\">{date_str}</td>{chr(10)}  <td class=\"size\">{zip_mb:.1f}MB</td>{chr(10)}  <td><a href=\"{github_dl}\" target=\"_blank\">GitHub</a> {commit_msg}</td>{chr(10)}</tr>"
+        header = "<tr><th>File</th><th>Date</th><th>Size</th><th>Contents</th></tr>"
+        html = html.replace(header, header + chr(10) + new_row)
         index_path.write_text(html)
-        print(f"  Updated: {index_path}")
 
-    # 11. Cleanup
     os.unlink(full_zip)
-    print(f"\nDone! Release: https://github.com/{GITHUB_REPO}/releases/tag/v{ts}")
+    print(f"{chr(10)}Done! https://github.com/{GITHUB_REPO}/releases/tag/v{ts}")
 
 if __name__ == "__main__":
     main()
