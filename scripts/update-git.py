@@ -128,21 +128,30 @@ def main():
     with open(full_zip, "rb") as f:
         zip_data = f.read()
 
-    import urllib.request
+    # Upload zip to GitHub release assets
+    import urllib.request, urllib.error
+    upload_url_clean = f"{upload_url}{zip_basename}"
     req = urllib.request.Request(
-        f"{upload_url}{zip_basename}",
+        upload_url_clean,
         data=zip_data,
         headers={
             "Authorization": f"token {GH}",
             "Content-Type": "application/zip",
+            "Accept": "application/vnd.github+json",
         },
         method="POST",
     )
-    with urllib.request.urlopen(req) as resp:
-        asset = json.loads(resp.read())
-
-    github_dl = asset["browser_download_url"]
-    print(f"  GitHub: {github_dl}")
+    try:
+        with urllib.request.urlopen(req) as resp:
+            asset = json.loads(resp.read())
+        github_dl = asset["browser_download_url"]
+        print(f"  GitHub: {github_dl}")
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        # Fall back: release was created, zip is at local path — GitHub release URL works
+        github_dl = f"https://github.com/{GITHUB_REPO}/releases/tag/{tag_name}"
+        print(f"  GitHub upload failed ({e.code}) — release created but asset not attached")
+        print(f"  GitHub: {github_dl}")
 
     WWW_GIT.mkdir(parents=True, exist_ok=True)
     local_dest = WWW_GIT / zip_basename
