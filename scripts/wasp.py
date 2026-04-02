@@ -326,10 +326,8 @@ def check_mirror():
     # Try to get HL positions
     try:
         from hyperliquid_exchange import get_open_hype_positions_curl
-        import requests
-        r = requests.post("https://api.hyperliquid.xyz/info",
-            json={"type": "allMids"}, timeout=8)
-        mids = r.json() if r.ok else {}
+        import hype_cache as hc
+        mids = hc.get_allMids()
     except Exception as e:
         bug("WARNING", "hl-mirror", f"Cannot fetch HL mids to check mirror: {e}")
         return

@@ -236,28 +236,9 @@
       "description": "Entry timing. WINNER: RETRACE-2 (+3.99%). Fast entry (0.2% max wait) beats waiting for pullbacks. Market doesn't give second chances — enter when signal fires.",
       "variants": [
         {
-          "id": "RETRACE-2",
-          "name": "WINNER — Fast entry (0.2% wait / 30min)",
-          "weight": 50,
-          "enabled": true,
-          "config": {
-            "wait_percent": 0.002,
-            "max_wait_minutes": 30
-          },
-          "trades": 4,
-          "wins": 1,
-          "losses": 1,
-          "winRate": 33.3,
-          "totalPnlPct": 1.24,
-          "avg_win_pct": 0.974,
-          "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-02 15:58:16.616114",
-          "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
-        },
-        {
           "id": "EVO-3",
           "name": "Pullback + confirmation filter",
-          "weight": 22,
+          "weight": 48,
           "enabled": true,
           "config": {
             "entryMode": "pullback",
@@ -277,7 +258,7 @@
         {
           "id": "EVO-5",
           "name": "Entry-Evolve-5",
-          "weight": 18,
+          "weight": 42,
           "enabled": true,
           "config": {
             "entryMode": "pullback",

@@ -10,6 +10,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
                            update_signal_decision, validate_source)
+from ai_decider import get_regime
 from _secrets import BRAIN_DB_DICT
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
@@ -17,6 +18,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import is_live_trading_enabled
+import hype_cache as hc
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
@@ -126,16 +128,14 @@ def get_max_leverage(token: str) -> int:
             return cached['leverage']
 
     try:
-        r = requests.post('https://api.hyperliquid.xyz/info',
-                          json={'type': 'meta'}, timeout=15)
-        if r.ok:
-            data = r.json()
-            for u in data.get('universe', []):
-                if u.get('name') == token_upper:
-                    max_lev = int(u.get('maxLeverage', 10))
-                    lev = min(max_lev, 10)  # cap at 10x
-                    _LEVERAGE_CACHE[token] = {'leverage': lev, 'cached_at': now}
-                    return lev
+        # Use shared cache (written by price_collector) instead of direct HL API call
+        meta = hc.get_meta()
+        for u in meta.get('universe', []):
+            if u.get('name') == token_upper:
+                max_lev = int(u.get('maxLeverage', 10))
+                lev = min(max_lev, 10)  # cap at 10x
+                _LEVERAGE_CACHE[token] = {'leverage': lev, 'cached_at': now}
+                return lev
     except Exception:
         pass
 
@@ -539,11 +539,69 @@ def close_position(token, reason):
 
 
 # ─── Hot-Set Auto-Approver (runs every minute in decider-run) ─────
+# Per-token failure tracking for back-to-back cooldown
+_HOTSET_FAILURE_FILE = '/var/www/hermes/data/hotset-failures.json'
+
+def _load_hotset_failures():
+    """Load per-direction failure counts. {TOKEN: {'LONG': {'count': N, 'last': ts}, 'SHORT': {...}}}"""
+    try:
+        with open(_HOTSET_FAILURE_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def _save_hotset_failures(data):
+    try:
+        with open(_HOTSET_FAILURE_FILE) as f:
+            existing = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        existing = {}
+    existing.update(data)
+    with open(_HOTSET_FAILURE_FILE, 'w') as f:
+        json.dump(existing, f)
+
+def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
+    """
+    Returns (blocked: bool, reason: str) for back-to-back failure cooldown.
+    
+    Rule: If 2+ same-direction trades failed recently, block that direction for 1hr.
+    Only allow opposite-direction trades from hot-set during cooldown.
+    """
+    import time
+    token = token.upper()
+    now = time.time()
+    # Cooldown: 1 hour = 3600 seconds
+    COOLDOWN_SECS = 3600
+    
+    token_failures = failures.get(token, {})
+    dir_failures = token_failures.get(direction, {})
+    opp_direction = 'SHORT' if direction == 'LONG' else 'LONG'
+    opp_failures = token_failures.get(opp_direction, {})
+    
+    # Check if this direction is in cooldown (2+ failures within 1hr)
+    dir_count = dir_failures.get('count', 0)
+    dir_last = dir_failures.get('last', 0)
+    if dir_count >= 2 and (now - dir_last) < COOLDOWN_SECS:
+        remaining = int(COOLDOWN_SECS - (now - dir_last))
+        return True, f'{direction} in cooldown ({remaining}s left, {dir_count} failures)'
+    
+    # Check if opposite direction has failures (to allow opposite signals through)
+    opp_count = opp_failures.get('count', 0)
+    opp_last = opp_failures.get('last', 0)
+    if opp_count >= 2 and (now - opp_last) < COOLDOWN_SECS:
+        return False, f'opposite {opp_direction} in cooldown ({opp_count} failures) — allowing {direction}'
+    
+    return False, ''
+
 def _run_hot_set():
     """
     Auto-approve hot tokens every minute (not just every 10 min in ai-decider).
     Loads tokens that survived at least 1 ai-decider pass (review_count >= 1).
     Approves: conf-3s+ >= 65%, hmacd- >= 80%, conf-2s >= 65% (if avg conf >= 55%).
+    
+    FIX (2026-04-02):
+    - Adds per-token regime check for confluence signals (NOT hmacd, which uses separate logic).
+    - Adds back-to-back failure cooldown: 2+ same-direction failures → block that direction for 1hr.
     """
     import sqlite3, os, time as _time
 
@@ -557,6 +615,9 @@ def _run_hot_set():
     approved_count = 0
 
     try:
+        # Load hot-set failure tracking
+        failures = _load_hotset_failures()
+
         # Hot tokens: survived >= 1 AI review pass (rc >= 1), not yet APPROVED/executed
         c.execute("""
             SELECT token, direction, MAX(review_count) as rounds
@@ -567,8 +628,7 @@ def _run_hot_set():
               AND created_at > datetime('now', '-3 hours')
               AND NOT EXISTS (
                   SELECT 1 FROM signals s2
-                  WHERE s2.token = signals.token
-                    AND s2.direction = signals.direction
+                  WHERE s2.token=*** AND s2.direction = signals.direction
                     AND s2.decision = 'APPROVED' AND s2.executed = 0
               )
             GROUP BY token, direction
@@ -580,11 +640,17 @@ def _run_hot_set():
             if is_position_open(t) or get_position_count() >= MAX_POS:
                 continue
 
+            # NEW: Back-to-back failure cooldown check
+            blocked, block_reason = _check_hotset_cooldown(t, direction, failures)
+            if blocked:
+                log(f'  🧊 [HOT-SET] {t} {direction} blocked by cooldown: {block_reason}')
+                continue
+
             # Find best PENDING signal for this token+direction
             c.execute("""
                 SELECT id, signal_type, source, confidence
                 FROM signals
-                WHERE token=? AND direction=? AND decision IN ('PENDING','WAIT') AND executed=0
+                WHERE token=*** AND direction=? AND decision IN ('PENDING','WAIT') AND executed=0
                 ORDER BY CASE WHEN signal_type='confluence' THEN 0 ELSE 1 END, confidence DESC
                 LIMIT 1
             """, (token, direction))
@@ -595,11 +661,23 @@ def _run_hot_set():
             sig_id, sig_type, sig_src, sig_conf = best
             should_approve, reason = False, ''
 
-            # Per-token regime check is handled by ai-decider.get_regime()
-            # which reads from PostgreSQL momentum_cache (per-token regime, not aggregate).
-            # No aggregate market-wide hard block here.
-
+            # FIX (2026-04-02): Regime check for confluence signals only.
+            # hmacd signals are checked separately below (and don't use per-token regime).
+            # Use ai-decider's get_regime() for per-token regime.
             if sig_type == 'confluence':
+                # Regime check: block if LONG_BIAS + short signal, or SHORT_BIAS + long signal
+                try:
+                    regime, regime_conf = get_regime(t)
+                    if regime != 'NEUTRAL' and regime_conf > 50:
+                        if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+                           (regime == 'SHORT_BIAS' and direction == 'LONG'):
+                            log(f'  🧊 [HOT-SET] {t} {direction} blocked: regime={regime} ({regime_conf}%) fights direction')
+                            # Record this as a failure
+                            _record_hotset_failure(t, direction, failures)
+                            continue
+                except Exception as e:
+                    log(f'  ⚠️ [HOT-SET] {t} regime check error: {e}')
+
                 try:
                     num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
                 except (ValueError, IndexError):
@@ -611,7 +689,9 @@ def _run_hot_set():
                     should_approve = sig_conf >= 65
                     reason = f'hot-conf-2s @{sig_conf:.0f}%'
             elif sig_src and sig_src.startswith('hmacd-'):
-                should_approve = sig_conf >= 70
+                # hmacd signals: no regime check (use different approval criteria)
+                # Reduced from 70→80% (2026-04-02): hmacd was triggering too many weak signals
+                should_approve = sig_conf >= 80
                 reason = f'hot-hmacd @{sig_conf:.0f}%'
 
             if should_approve:
@@ -629,6 +709,18 @@ def _run_hot_set():
         conn.close()
 
     return approved_count
+
+def _record_hotset_failure(token: str, direction: str, failures: dict):
+    """Record a failed trade for back-to-back cooldown tracking."""
+    import time
+    token = token.upper()
+    now = time.time()
+    if token not in failures:
+        failures[token] = {'LONG': {'count': 0, 'last': 0}, 'SHORT': {'count': 0, 'last': 0}}
+    dir_data = failures[token].setdefault(direction, {'count': 0, 'last': 0})
+    dir_data['count'] = dir_data.get('count', 0) + 1
+    dir_data['last'] = now
+    _save_hotset_failures(failures)
 
 
 # ─── Main Run ────────────────────────────────────────────────────

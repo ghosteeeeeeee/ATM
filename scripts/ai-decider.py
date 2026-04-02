@@ -992,7 +992,9 @@ def get_pending_signals():
 from signal_schema import mark_signal_processed, validate_source  # BUG-12: validate source against whitelist
 
 def get_regime(token):
-    """Get 4h regime from token_intel data"""
+    """Get 4h regime from regime_4h.json (primary) or momentum_cache (fallback).
+    Returns (regime_str, confidence_int)."""
+    # Primary: read from JSON file written by 4h_regime_scanner
     try:
         with open("/var/www/html/regime_4h.json") as f:
             data = json.load(f)
@@ -1000,7 +1002,39 @@ def get_regime(token):
             reg = data['regimes'][token.upper()]
             return reg.get('regime', 'NEUTRAL'), reg.get('confidence', 0)
     except Exception as e:
-        log_error(f'get_regime: {e}')
+        log_error(f'get_regime JSON: {e}')
+
+    # Fallback: query momentum_cache in PostgreSQL brain DB directly
+    # This covers tokens that the scanner scanned but didn't write to the JSON
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT regime_4h, updated_at FROM momentum_cache
+            WHERE token = %s
+            ORDER BY updated_at DESC LIMIT 1
+        """, (token.upper(),))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row and row[0]:
+            # Map stored regime to confidence: HIGH if recent (<2h), MEDIUM if stale
+            regime = row[0]
+            updated_at = row[1]
+            if updated_at:
+                now = datetime.now(timezone.utc)
+                # Handle both naive (local) and aware (UTC) datetimes
+                if updated_at.tzinfo is None:
+                    from datetime import timezone as tz_local
+                    now = datetime.now(tz_local)
+                age_seconds = (now - updated_at).total_seconds()
+                confidence = 75 if age_seconds < 7200 else 40
+            else:
+                confidence = 50
+            return regime, confidence
+    except Exception as e:
+        log_error(f'get_regime DB: {e}')
+
     return 'NEUTRAL', 0
 
 def get_fear():

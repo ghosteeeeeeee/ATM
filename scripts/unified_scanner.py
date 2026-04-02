@@ -62,21 +62,14 @@ def log(msg):
 # Price & Indicator Fetching
 # ============================================
 def get_cached_prices():
-    """Fetch all prices from Hyperliquid public API. Falls back to cache."""
+    """Fetch all prices from shared hype_cache (written by price_collector)."""
     try:
-        r = requests.post('https://api.hyperliquid.xyz/info', json={'type':'allMids'}, timeout=10)
-        if r.ok:
-            all_data = r.json()
-            # Use ALL tokens from Hyperliquid response (not a hardcoded subset)
-            fresh = {k: float(v) for k, v in all_data.items() if v and float(v) > 0}
-            if fresh:
-                # Cache locally
-                os.makedirs('/root/.hermes/data', exist_ok=True)
-                with open('/root/.hermes/data/prices.json', 'w') as f:
-                    json.dump(fresh, f)
-                return fresh
+        import hype_cache as hc
+        all_data = hc.get_allMids()
+        if all_data:
+            return {k: float(v) for k, v in all_data.items() if v and float(v) > 0}
     except Exception as e:
-        log(f'get_cached_prices API error: {e}')
+        log(f'get_cached_prices cache error: {e}')
 
     # Fallback to local cache
     try:

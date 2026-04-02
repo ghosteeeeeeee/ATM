@@ -412,11 +412,21 @@ def get_open_hype_positions_curl():
             sz = float(pos.get("szi", 0) or 0)
             if sz == 0:
                 continue
+            # BUG FIX (2026-04-02): extract leverage before dict literal
+            # HL returns leverage as dict {'type': 'cross', 'value': 5}, extract numeric value
+            lev_data = pos.get("leverage", {})
+            if isinstance(lev_data, dict):
+                lev = float(lev_data.get("value", 1)) or 1
+            elif isinstance(lev_data, (int, float)):
+                lev = float(lev_data)
+            else:
+                lev = 1
             out[coin] = {
                 "size": abs(sz),
                 "direction": "LONG" if sz > 0 else "SHORT",
                 "entry_px": float(pos.get("entryPx", 0) or 0),
                 "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
+                "leverage": lev,
             }
         return out
     except Exception as e:

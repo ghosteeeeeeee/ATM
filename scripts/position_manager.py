@@ -1216,10 +1216,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 sl_rounded = _hl_tick_round(trailing_sl, decimals)
                 # Get position size from HL to set SL at correct size
                 from hyperliquid_exchange import get_open_hype_positions
-                positions = get_open_hype_positions() or []
+                positions = get_open_hype_positions() or {}
                 size = 0.0
-                for p in positions:
-                    if p.get('coin', '').upper() == token.upper():
+                for coin_name, p in positions.items():
+                    if coin_name.upper() == token.upper():
                         size = float(p.get('szi', 0) or 0)
                         break
                 if size > 0:
@@ -1234,7 +1234,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     exchange.order(token, is_buy, abs(size), sl_rounded, order_type, reduce_only=True)
                     print(f"  [BUG-8] Pushed trailing SL to HL: {token} {direction} SL=${sl_rounded:.6f}")
             except Exception as e:
-                print(f"  [BUG-8] Failed to push trailing SL to HL: {e}")
+                import traceback
+                print(f"  [BUG-8] Failed to push trailing SL to HL ({token}): {e}")
+                traceback.print_exc()
 
     print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
 
@@ -1714,15 +1716,27 @@ def _update_pm_heartbeat():
 # ─── Main / Test ──────────────────────────────────────────────────────────────
 def main():
     """Test run — print current position state and run management check."""
-    print(f"[Position Manager] Starting check at {datetime.now()}")
-    print(f"[Position Manager] Connecting to DB: {DB_CONFIG['host']}/{DB_CONFIG['dbname']}")
+    try:
+        print(f"[Position Manager] Starting check at {datetime.now()}")
+        print(f"[Position Manager] Connecting to DB: {DB_CONFIG.get('host')}/{DB_CONFIG.get('database','?')}")
 
-    # refresh_current_prices() is called inside check_and_manage_positions()
-    # Run management check (it calls refresh_current_prices internally)
-    print()
-    open_n, closed_n, adjusted_n = check_and_manage_positions()
-    print(f"\n[Position Manager] Done. Open: {open_n} | Closed: {closed_n} | Adjusted: {adjusted_n}")
+        # refresh_current_prices() is called inside check_and_manage_positions()
+        # Run management check (it calls refresh_current_prices internally)
+        print()
+        open_n, closed_n, adjusted_n = check_and_manage_positions()
+        print(f"\n[Position Manager] Done. Open: {open_n} | Closed: {closed_n} | Adjusted: {adjusted_n}")
+    except Exception as e:
+        import traceback
+        print(f"[Position Manager] FATAL in main(): {e}")
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        print(f"[Position Manager] FATAL: {e}")
+        traceback.print_exc()
+        exit(1)

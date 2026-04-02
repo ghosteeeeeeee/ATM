@@ -958,3 +958,385 @@ Inconsistent pricing — PnL calculations and SL checks may use different prices
 ### Fix
 Replace Gate.io fetch with Hyperliquid price lookup using the existing `hype_cache` or `get_current_price()`.
 
+---
+
+## BUG-11: ALL leverage reset to 1x (CRITICAL)
+
+**File:** hyperliquid_exchange.py
+**Line:** 415-420
+**Severity:** CRITICAL
+**Status:** FIXED (2026-04-02)
+
+### Issue
+`get_open_hype_positions_curl()` returned a position dict WITHOUT a `leverage` field, defaulting to `1` everywhere it was read. `reconcile_hype_to_paper()` in hl-sync-guardian used this to update every trade's leverage to 1x.
+
+### Root Cause
+HL's `user_state()` response does NOT directly contain leverage — it's calculated from `margin_used / position_value`. The code was reading `pos.get("leverage", 1)` but HL's assetPositions don't include a `leverage` key, so it always got 1.
+
+### Impact
+All 10 real open trades (XMR, TAO, HEMI, RESOLV, ZEC, PROVE, DYDX, CHILLGUY, APEX, ETH) had their leverage reset to 1x, destroying the system's risk management. All trades were entered at 3-5x, corrected to 1x by guardian.
+
+### Fix Applied
+```python
+# hyperliquid_exchange.py line 419 — added leverage field
+"leverage": float(pos.get("leverage", 1) or 1),
+```
+Also need to verify HL actually provides this field. If not, leverage must be derived from margin_used/size/entry_px.
+
+---
+
+## BUG-12: Guardian creating phantom paper trades for blocked tokens
+
+**File:** hl-sync-guardian.py
+**Line:** 571 (orphan creation path)
+**Severity:** HIGH
+**Status:** FIXED (2026-04-02)
+
+### Issue
+`reconcile_hype_to_paper()` would create orphan paper trades for ANY token HL reported, without checking `_is_token_tradeable()`. STBL was on `HL_TOKEN_BLOCKLIST` yet got a paper trade created (trade #3487 @ 17:23).
+
+### Root Cause
+The orphan-creation path (lines 571-592) had no `_is_token_tradeable()` check, while the normal mirror path (Step 5) did.
+
+### Impact
+Blocked tokens like STBL got phantom paper trades. These were auto-closed by guardian but contaminated the trade log and triggered unnecessary close events.
+
+### Fix Applied
+```python
+# hl-sync-guardian.py line 572 — added blocklist check
+if not _is_token_tradeable(coin):
+    log(f'  🚫 {coin} on blocklist or not tradeable — skipping orphan creation', 'WARN')
+    continue
+```
+
+---
+
+## BUG-13: Hot-set auto-approver bypasses per-token regime filter
+
+**File:** decider-run.py
+**Line:** 597-599
+**Severity:** HIGH
+**Status:** FIXED (2026-04-02)
+
+### Issue
+`_run_hot_set()` had a comment "Per-token regime check is handled by ai-decider.get_regime()" but did NOT actually call `get_regime()`. Signals were auto-approved by hot-set WITHOUT regime verification.
+
+### Root Cause
+The regime check was only in ai-decider's `ai_decide()` function. The hot-set auto-approver runs every minute (not every 10 min) and had no regime check.
+
+### Impact
+Confluence signals were hot-approved even when the token's regime (from momentum_cache) was opposite to the signal direction. This caused the system to push LONGs when the regime was SHORT_BIAS and vice versa.
+
+### Fix Applied
+```python
+# decider-run.py — added regime check in _run_hot_set()
+if sig_type == 'confluence':
+    regime, regime_conf = get_regime(t)
+    if regime != 'NEUTRAL' and regime_conf > 50:
+        if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+           (regime == 'SHORT_BIAS' and direction == 'LONG'):
+            _record_hotset_failure(t, direction, failures)
+            continue  # blocked
+```
+
+---
+
+## BUG-14: hmacd approval threshold too low (70%)
+
+**File:** decider-run.py
+**Line:** 613-614
+**Severity:** MEDIUM
+**Status:** FIXED (2026-04-02)
+
+### Issue
+Hot-set auto-approver accepted hmacd signals at 70% confidence, which was too permissive. Many weak hmacd signals (54-74%) were being approved and executed.
+
+### Fix Applied
+```python
+# Raised from 70% → 80%
+should_approve = sig_conf >= 80  # was 70
+```
+
+---
+
+## BUG-15: No back-to-back failure cooldown in hot-set
+
+**File:** decider-run.py
+**Line:** New (541-597)
+**Severity:** MEDIUM
+**Status:** FIXED (2026-04-02)
+
+### Issue
+If 2+ trades in the same direction failed consecutively, the hot-set kept approving same-direction signals with no cooldown.
+
+### Fix Applied
+Added `_check_hotset_cooldown()` + failure tracking:
+- 2+ same-direction failures in 1hr → block that direction
+- Opposite direction signals CAN still be approved during cooldown
+- Failure state persisted to `/var/www/hermes/data/hotset-failures.json`
+
+---
+
+## BUG-16: Blocklist too broad — removing tradeable tokens
+
+**File:** hl-sync-guardian.py
+**Line:** 27-29
+**Severity:** MEDIUM
+**Status:** FIXED (2026-04-02)
+
+### Issue
+`HL_TOKEN_BLOCKLIST` included WIF, BONK, PYTH, JTO, MNGO, APTOS, RAY which ARE tradeable on Hyperliquid.
+
+### Fix Applied
+```python
+# Removed: BONK, WIF, PYTH, JTO, MNGO, APTOS, RAY
+HL_TOKEN_BLOCKLIST = frozenset({
+    'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA',
+    'LOOM', 'SRM', 'SAGE', 'SAMO', 'DUST', 'HNT', 'STABLE', 'STBL'
+})
+```
+
+---
+
+## BUG-17: Position Manager crash every cycle
+
+**File:** position_manager.py
+**Line:** 1728
+**Severity:** HIGH
+**Status:** OPEN
+
+### Issue
+Pipeline log shows `ERR position_manager: Traceback (most recent call last):` followed by `File ".../position_manager.py", line 1728, in <module>` every cycle. Line 1728 is just `main()` call.
+
+### Root Cause
+Unknown — the error message is truncated in logs. Likely an exception in `check_and_manage_positions()` that isn't being caught.
+
+### Impact
+Position manager fails silently (crashes) every cycle. SL/TP management, trailing stops, cut-loser all not running.
+
+### Fix Needed
+Add comprehensive error handling around `check_and_manage_positions()` call at line 1723. Catch and log full traceback instead of crashing.
+
+---
+
+## BUG-18 (session): Trade flip uses hardcoded SL/TP instead of A/B test params
+
+**File:** hl-sync-guardian.py
+**Line:** 751-778
+**Severity:** LOW (hasn't been triggering)
+**Status:** FIXED (2026-04-02)
+
+### Issue
+`_check_and_execute_flip()` created flip trades with hardcoded SL=-2.0%, TP=-4.0% instead of reading from the A/B test config.
+
+### Fix Applied
+```python
+# FIX (2026-04-02): read SL/TP from A/B test config instead of hardcoding -2.0/-4.0
+sl_ab_cfg = get_cached_ab_variant(token, opposite, 'sl-distance-test')
+sl_pct = 2.0  # default fallback
+tp_pct = 4.0  # default fallback (2x risk:reward)
+if sl_ab_cfg and sl_ab_cfg.get('config', {}).get('slPct'):
+    sl_pct = float(sl_ab_cfg['config']['slPct'])
+    tp_pct = sl_pct * 2  # standard 2:1 risk:reward ratio
+log(f'  [FLIP] Using SL={sl_pct}% TP={tp_pct}% (from sl-distance-test A/B)', 'INFO')
+```
+Then uses `sl_pct`/`tp_pct` in the INSERT instead of hardcoded `-2.0/-4.0`.
+
+---
+
+## FINDING: conf-1s signal source — NOT A BUG
+
+Signal source `conf-1s` appears in DB but is NOT generated by any code. It comes from a harmless fallback in decider-run.py line 603:
+
+```python
+num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
+```
+
+If a signal has no `source` field, it defaults to `conf-1s`. This is cosmetic only — the actual signal type (confluence, RSI, etc.) is stored in `signal_type`.
+
+---
+
+## CODE REVIEW: Original Task Verification (2026-04-02)
+
+### Task 1: decider-run.py get_max_leverage() → hype_cache.get_meta()
+**Status:** PASS
+- `import hype_cache as hc` at module level ✅
+- Graceful fallback: try/except returns 10 on failure ✅
+- No syntax errors ✅
+
+### Task 2: hl-sync-guardian.py allMids → hype_cache.get_allMids()
+**Status:** PASS
+- 3 call sites verified: check_hl_mirror (L39), _check_and_execute_flip (L728), sync_cycle (L1546) ✅
+- Each has `import hype_cache as hc` ✅
+- No `exchange.info.all_mids()` remaining ✅
+- No syntax errors ✅
+
+### Task 3: wasp.py check_hl_mirror() → hype_cache.get_allMids()
+**Status:** PASS
+- `import hype_cache as hc` at L329 ✅
+- `hc.get_allMids()` at L330 ✅
+- No syntax errors ✅
+
+### Task 4: unified_scanner.py get_cached_prices() → hype_cache.get_allMids()
+**Status:** PASS (with note)
+- `import hype_cache as hc` at L67 ✅
+- `get_cached_prices()` uses `hc.get_allMids()` ✅
+- Remaining direct requests.post calls (L30, L179) target `meta` (token list refresh), not `allMids` ✅
+- No syntax errors ✅
+
+### Task 5: ai-decider.py psycopg2 fallback
+**Status:** PASS
+- `psycopg2` imported L5 ✅
+- `get_regime()` falls back to momentum_cache PostgreSQL table ✅
+- SQL query correct ✅
+- No syntax errors ✅
+
+### Task 6: py_compile on all modified files
+**Status:** ALL PASS
+- decider-run.py ✅
+- hl-sync-guardian.py ✅
+- wasp.py ✅
+- unified_scanner.py ✅
+- ai-decider.py ✅
+- hyperliquid_exchange.py ✅
+
+### Task 7: No remaining direct HL allMids calls outside hype_cache.py / hyperliquid_exchange.py
+**Status:** PASS
+- Only remaining: unified_scanner.py L30/L179 (meta, not allMids) ✅
+
+---
+
+## BUG-19 (session): Trailing SL push failing — 'str' has no .get()
+
+**File:** position_manager.py
+**Line:** 1219-1222
+**Severity:** HIGH
+**Status:** FIXED (2026-04-02)
+
+### Issue
+`get_open_hype_positions()` returns a `dict[coin -> data]` but the code iterated dict keys (strings) with `for p in positions` then called `p.get('coin', ...)`. This always failed since `str` has no `.get()` method.
+
+### Root Cause
+`get_open_hype_positions()` returns `dict[coin -> data]` but the calling code did `for p in positions` (iterating keys = strings) then `p.get('coin', ...)`.
+
+### Impact
+Trailing SL was never pushed to HL for any position. BUG-8 error appeared every cycle.
+
+### Fix Applied
+```python
+# Before (broken — iterating dict keys as strings):
+for p in positions:
+    if p.get('coin', '').upper() == token.upper():
+        size = float(p.get('szi', 0) or 0)
+
+# After (fixed — iterate items):
+for coin_name, p in positions.items():
+    if coin_name.upper() == token.upper():
+        size = float(p.get('szi', 0) or 0)
+```
+
+### Verification
+`position_manager.py` now runs cleanly: `9 open | 0 closed | 1 adjusted` on first corrected run. No more BUG-8 error messages.
+
+---
+
+## BUG-20 (session): HL positions leverage dict format
+
+**File:** hyperliquid_exchange.py
+**Line:** 419
+**Severity:** HIGH
+**Status:** FIXED (2026-04-02)
+
+### Issue
+HL API returns leverage as `{'type': 'cross', 'value': 5}` (a dict), not a number. Original fix tried `float(pos.get("leverage", 1))` which called `float({'type': ..., 'value': 5})` → TypeError.
+
+### Fix Applied
+```python
+lev_data = pos.get("leverage", {})
+if isinstance(lev_data, dict):
+    lev = float(lev_data.get("value", 1)) or 1
+elif isinstance(lev_data, (int, float)):
+    lev = float(lev_data)
+else:
+    lev = 1
+"leverage": lev,
+```
+
+### Impact
+All 10 trades had leverage=1 in DB despite being 3-5x on HL. DB corrected via SQL UPDATE. `get_open_hype_positions_curl()` now returns correct leverage.
+
+---
+
+## CURRENT POSITIONS (2026-04-02 18:30 UTC)
+
+| Token   | Direction | Leverage | Entry Price | HL Price |
+|---------|-----------|----------|-------------|----------|
+| CHILLGUY| SHORT     | 3x      | 0.00752     | 0.00755  |
+| All others | FLAT   | —       | (closed)    | —        |
+
+---
+
+## SESSION FIXES LOG — 2026-04-02 Evening
+
+### BUG-11: ALL leverage reset to 1x (CRITICAL)
+**File:** hyperliquid_exchange.py line 419
+**Status:** FIXED
+
+HL returns leverage as dict `{'type': 'cross', 'value': 5}`. Original fix tried `float(dict)` → TypeError. Fixed with proper isinstance check and `.get('value')` extraction. All 10 trades corrected via SQL. `get_open_hype_positions_curl()` now returns correct float leverage.
+
+### BUG-12: Phantom trades for blocked tokens
+**File:** hl-sync-guardian.py line 572
+**Status:** FIXED
+
+`reconcile_hype_to_paper()` orphan-creation path was missing `_is_token_tradeable()` check. Added check before creating orphan trades. STBL and other blocklist tokens can no longer spawn phantom paper trades.
+
+### BUG-13: Hot-set bypasses regime filter
+**File:** decider-run.py lines 664-679
+**Status:** FIXED
+
+`_run_hot_set()` claimed regime was checked by ai-decider but never called `get_regime()`. Added `get_regime(t)` call for confluence signals — blocks if regime fights signal direction. Also imported `get_regime` from `ai_decider`.
+
+### BUG-14: hmacd threshold too low (70%→80%)
+**File:** decider-run.py line 614
+**Status:** FIXED
+
+Raised hmacd hot-approve threshold from 70% to 80%.
+
+### BUG-15: No back-to-back failure cooldown
+**File:** decider-run.py lines 541-597
+**Status:** FIXED
+
+Added `_check_hotset_cooldown()` + failure tracking functions. 2+ same-direction failures in 1hr blocks that direction. Opposite direction still allowed.
+
+### BUG-16: Blocklist too broad
+**File:** hl-sync-guardian.py lines 27-29
+**Status:** FIXED
+
+Removed WIF, BONK, PYTH, JTO, MNGO, APTOS, RAY from `HL_TOKEN_BLOCKLIST` (these ARE tradeable on Hyperliquid).
+
+### BUG-17: Position manager crash (DB key error)
+**File:** position_manager.py line 1718
+**Status:** FIXED
+
+`DB_CONFIG['dbname']` → key doesn't exist (correct key is `database`). Fixed to use `DB_CONFIG.get('database', '?')`. Also added comprehensive error handling around `main()` and `check_and_manage_positions()`.
+
+### BUG-18: Trade flip hardcoded SL/TP
+**File:** hl-sync-guardian.py lines 751-778
+**Status:** FIXED
+
+Flip trades used hardcoded SL=-2.0%, TP=-4.0% regardless of A/B config. Now reads `slPct` from `sl-distance-test` A/B variant and computes TP at 2x risk:reward ratio.
+
+### BUG-19: Trailing SL push failing (.get on str)
+**File:** position_manager.py lines 1219-1222
+**Status:** FIXED
+
+`get_open_hype_positions()` returns `dict[coin -> data]` but code did `for p in positions` then `p.get('coin')` — iterating dict keys (strings). Fixed to `for coin_name, p in positions.items()`.
+
+### BUG-20: HL leverage dict format
+**File:** hyperliquid_exchange.py line 419
+**Status:** FIXED
+
+See BUG-11.
+
+### Current Position: CHILLGUY SHORT 3x (HL + DB in sync)
+

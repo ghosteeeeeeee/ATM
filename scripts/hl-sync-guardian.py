@@ -24,17 +24,19 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 
 # Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
+# Pruned 2026-04-02: removed WIF, BONK, PYTH, JTO, MNGO, APTOS, RAY (these ARE tradeable)
 HL_TOKEN_BLOCKLIST = frozenset({'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA',
-    'LOOM', 'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
-    'SAGE', 'SAMO', 'DUST', 'HNT', 'STABLE', 'STBL'})
+    'LOOM', 'SRM', 'SAGE', 'SAMO', 'DUST', 'HNT', 'STABLE', 'STBL'})
 
 def _is_token_tradeable(token: str) -> bool:
-    """Check if token is on HL blocklist (non-tradeable phantom tokens)."""
+    """Check if token is on HL blocklist (non-tradeable phantom tokens).
+    Uses shared hype_cache instead of direct HL API call."""
     if token.upper() in HL_TOKEN_BLOCKLIST:
         return False
-    # Also verify via HL API
+    # Verify via shared cache (written by price_collector)
     try:
-        mids = exchange.info.all_mids()
+        import hype_cache as hc
+        mids = hc.get_allMids()
         if token not in mids:
             return False
     except:
@@ -323,9 +325,28 @@ def close_position_hl(coin: str, reason: str) -> bool:
     try:
         exchange = get_exchange()
         result = exchange.market_close(coin=coin, slippage=CLOSE_SLIPPAGE)
-        statuses = result.get('response', {}).get('data', {}).get('statuses', [])
+
+        # Defensive: handle None, non-dict, or unexpected result structures
+        if result is None:
+            log(f'  ❌ {coin}: market_close returned None (rate-limited?)', 'FAIL')
+            return False
+        if not isinstance(result, dict):
+            log(f'  ❌ {coin}: market_close returned {type(result).__name__}: {str(result)[:100]}', 'FAIL')
+            return False
+
+        # Try expected path: response.data.statuses
+        response_data = result.get('response')
+        if isinstance(response_data, dict):
+            statuses = response_data.get('data', {}).get('statuses', [])
+        else:
+            # Unexpected: log it as a warning but treat as success (HL filled it)
+            log(f'  ⚠️ {coin}: unexpected result structure: {str(result)[:200]}', 'WARN')
+            return True
+
+        if statuses is None:
+            statuses = []
         for s in statuses:
-            if 'error' in s:
+            if isinstance(s, dict) and 'error' in s:
                 log(f'  ❌ {coin}: {s["error"]}', 'FAIL')
                 return False
         log(f'  ✅ {coin} closed ({reason})', 'PASS')
@@ -549,6 +570,13 @@ def reconcile_hype_to_paper(hl_pos, prices):
 
                 log(f'  ⚠️ Orphan HL position: {coin} — creating paper trade before close', 'WARN')
 
+                # FIX (2026-04-02): Check if token is tradeable before creating orphan trade.
+                # Previously _is_token_tradeable() was not called here, allowing blocked tokens
+                # (e.g. STBL) to be created as phantom paper trades.
+                if not _is_token_tradeable(coin):
+                    log(f'  🚫 {coin} on blocklist or not tradeable — skipping orphan creation', 'WARN')
+                    continue
+
                 # Calculate approximate position USD value
                 # Size is in contracts, price in USD per token
                 curr_price = prices.get(coin) if prices else entry_px
@@ -694,9 +722,10 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                 log(f'  [FLIP] FATAL: {token} still on HL after 2 close attempts — not opening opposite', 'FAIL')
                 return  # Do NOT open opposite position while original is still open
 
-            # Verify token is tradeable on HL before opening
+            # Verify token is tradeable on HL before opening (use cache)
             try:
-                mids_check = exchange.info.all_mids()
+                import hype_cache as hc
+                mids_check = hc.get_allMids()
                 if token not in mids_check:
                     log(f'  [FLIP] SKIP: {token} not tradeable on HL (not in all_mids)', 'FAIL')
                     return
@@ -706,7 +735,7 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
             # Open opposite position
             flip_side = 'BUY' if opposite == 'LONG' else 'SELL'
             open_result = place_order(token, flip_side, sz, price=None,
-                                       order_type='Market', tif='Gtc')
+                                      order_type='Market', tif='Gtc')
 
             if open_result.get('success'):
                 # BUG-8/13 fix: look up actual regime from momentum_cache instead of 'unknown'.
@@ -717,6 +746,15 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                 flip_regime_4h = _REGIME_MAP.get(str(flip_intel.get('regime_4h', 'unknown')), 0)
                 flip_regime_1h = _REGIME_MAP.get(str(flip_intel.get('regime_1h', 'unknown')), 0)
                 flip_regime_15m = _REGIME_MAP.get(str(flip_intel.get('regime_15m', 'unknown')), 0)
+
+                # FIX (2026-04-02): read SL/TP from A/B test config instead of hardcoding -2.0/-4.0
+                sl_ab_cfg = get_cached_ab_variant(token, opposite, 'sl-distance-test')
+                sl_pct = 2.0  # default fallback
+                tp_pct = 4.0  # default fallback (2x risk:reward)
+                if sl_ab_cfg and sl_ab_cfg.get('config', {}).get('slPct'):
+                    sl_pct = float(sl_ab_cfg['config']['slPct'])
+                    tp_pct = sl_pct * 2  # standard 2:1 risk:reward ratio
+                log(f'  [FLIP] Using SL={sl_pct}% TP={tp_pct}% (from sl-distance-test A/B)', 'INFO')
 
                 # Record flipped trade
                 trail_act_val = float(trail_act) if flip_trailing else None
@@ -734,7 +772,7 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                     token, opposite,
                     prices.get(token, entry_px),
                     lev, amount, flip_regime_4h, flip_regime_1h, flip_regime_15m,
-                    -2.0, -4.0, trail_act_val, trail_dist_val,
+                    -sl_pct, -tp_pct, trail_act_val, trail_dist_val,
                     variant_id, trade_id
                 ))
 
@@ -1517,11 +1555,11 @@ def sync():
         log(f'Failed to fetch HL positions: {e}', 'FAIL')
         return
 
-    # Step 2: Get current prices
+    # Step 2: Get current prices from shared cache (written by price_collector)
     prices = {}
     try:
-        exchange = get_exchange()
-        mids = exchange.info.all_mids()
+        import hype_cache as hc
+        mids = hc.get_allMids()
         prices = {k: float(v) for k, v in mids.items()}
     except Exception as e:
         log(f'Failed to fetch prices: {e}', 'WARN')
