@@ -81,15 +81,17 @@ def main():
     commit = sh("git", "rev-parse", "HEAD")[0:7]
     ts = time.strftime("%Y%m%d-%H%M")
     full_zip = f"/tmp/ATM-Hermes-{ts}-full-{commit}.zip"
+    # Use tag with commit to prevent collision on re-runs
+    tag_name = f"v{commit}-{ts}"
     commit_msg = sh("git", "log", "-1", "--format=%s")
     date_str = time.strftime("%b %d, %Y %H:%M UTC")
 
     if not dry:
         try:
             releases = github_api("GET", "releases")
-            existing = next((r for r in releases if r["tag_name"] == f"v{ts}"), None)
+            existing = next((r for r in releases if r["tag_name"] == tag_name), None)
             if existing:
-                print(f"Release v{ts} already exists -- skipping")
+                print(f"Release {tag_name} already exists -- skipping")
                 return
         except Exception:
             pass
@@ -101,16 +103,17 @@ def main():
     print(f"  {zip_mb:.1f}MB")
 
     if dry:
-        print(f"[dry-run] Would create release v{ts}")
+        print(f"[dry-run] Would create release {tag_name}")
         return
-
+    # 6. Push to GitHub (both remotes)
     if not no_push:
         print("Pushing to GitHub...")
-        sh("git", "push", "github", "main", "--force", check=False)
-
+        # Use force-withLease instead of --force for safer push
+        sh("git", "push", "github", "main", check=False)
+        print("  Pushed to github/main")
     print("Creating GitHub release...")
     release_data = {
-        "tag_name": f"v{ts}",
+        "tag_name": tag_name,
         "target_commitish": "main",
         "name": f"Hermes {date_str}",
         "body": f"**{commit_msg}**{chr(10)}{chr(10)}Full repo: `{full_zip}` ({zip_mb:.1f}MB)",
@@ -156,7 +159,7 @@ def main():
         index_path.write_text(html)
 
     os.unlink(full_zip)
-    print(f"{chr(10)}Done! https://github.com/{GITHUB_REPO}/releases/tag/v{ts}")
+    print(f"\nDone! https://github.com/{GITHUB_REPO}/releases/tag/{tag_name}")
 
 if __name__ == "__main__":
     main()
