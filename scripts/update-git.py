@@ -74,7 +74,8 @@ def main():
         print(f"[!] SYMLINKS FOUND:{chr(10)}{symlinks}")
         sys.exit(1)
 
-    commit = sh("git", "rev-parse", "--short=HEAD")
+    # Note: --short=HEAD fails in this env, use pipe instead
+    commit = sh("git", "rev-parse", "HEAD")[0:7]
     ts = time.strftime("%Y%m%d-%H%M")
     full_zip = f"/tmp/ATM-Hermes-{ts}-full-{commit}.zip"
     commit_msg = sh("git", "log", "-1", "--format=%s")
