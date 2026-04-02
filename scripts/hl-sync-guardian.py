@@ -32,6 +32,7 @@ except (IOError, OSError):
     sys.exit(1)
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from ab_utils import get_cached_ab_variant
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin
@@ -151,7 +152,7 @@ def get_db_connection():
             host='/var/run/postgresql',
             dbname='brain',
             user='postgres',
-            password='brain123'
+            password='Brain123'
         )
     except Exception as e:
         log(f'DB connection error: {e}', 'FAIL')
@@ -542,6 +543,133 @@ def reconcile_hype_to_paper(hl_pos, prices):
 
 # ─── Sync PnL from HL (migrated from combined-trading.py) ──────────────────────
 
+
+# ─── Flip Trade Logic ─────────────────────────────────────────────────────────
+
+def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
+    """
+    Check if trade should be flipped based on A/B test config and PnL thresholds.
+    - Soft SL (1% loss): arm the flip (ready to trigger on next check)
+    - Hard SL (2% loss): execute the flip immediately (close + open opposite)
+    Uses flip-trade-strategy A/B test to determine behavior.
+    """
+    if DRY:
+        return
+
+    from hyperliquid_exchange import place_order, get_open_hype_positions_curl
+
+    token = trade['token']
+    direction = trade['direction']
+    trade_id = trade['id']
+    lev = float(trade.get('leverage') or 10)
+    amount = float(trade.get('amount_usdt') or 50)
+    entry_px = float(trade.get('entry_price') or prices.get(token, 0))
+
+    # Get flip A/B variant
+    flip_cfg = get_cached_ab_variant(token, direction, 'flip-trade-strategy')
+    if not flip_cfg:
+        return
+
+    cfg = flip_cfg.get('config', {})
+    flip_on_soft = cfg.get('flipOnSoftSL', False)
+    flip_on_hard = cfg.get('flipOnHardSL', False)
+    flip_trailing = cfg.get('flipTrailing', False)
+    trail_act = cfg.get('flipTrailingActivation', 0.005)
+    trail_dist = cfg.get('flipTrailingDistance', 0.005)
+    variant_id = flip_cfg.get('id', 'unknown')
+
+    # Thresholds
+    SOFT_SL = -1.0   # 1% loss → arm flip
+    HARD_SL = -2.0   # 2% loss → execute flip
+
+    conn = get_db_connection()
+    if conn is None:
+        return
+
+    try:
+        cur = conn.cursor()
+
+        # Check current flip state
+        cur.execute("SELECT flip_armed FROM trades WHERE id=%s", (trade_id,))
+        row = cur.fetchone()
+        flip_armed = bool(row[0]) if row else False
+
+        if pnl_pct <= HARD_SL and flip_on_hard:
+            # HARD SL HIT — execute flip
+            opposite = 'SHORT' if direction == 'LONG' else 'LONG'
+            sz = round(amount / (prices.get(token, entry_px) or entry_px), 4)
+
+            log(f'  [FLIP] HARD SL hit on {token} trade#{trade_id} | PnL={pnl_pct:.2f}% | variant={variant_id}', 'WARN')
+            log(f'  [FLIP] Closing {direction} → opening {opposite} | sz={sz} | lev={lev}', 'WARN')
+
+            # Close current position
+            from hyperliquid_exchange import close_position
+            close_result = close_position(token)
+
+            # Wait for HL fill to confirm before opening opposite
+            import time as _time
+            _time.sleep(3)
+
+            # Open opposite position
+            flip_side = 'BUY' if opposite == 'LONG' else 'SELL'
+            open_result = place_order(token, flip_side, sz, price=None,
+                                       order_type='Market', tif='Gtc')
+
+            if open_result.get('success'):
+                # Record flipped trade
+                trail_act_val = float(trail_act) if flip_trailing else None
+                trail_dist_val = float(trail_dist) if flip_trailing else None
+                cur.execute("""
+                    INSERT INTO trades (token, direction, entry_price, leverage,
+                        amount_usdt, exchange, status, paper,
+                        entry_regime_4h, entry_regime_1h, entry_regime_15m,
+                        stop_loss, target, trailing_activation, trailing_distance,
+                        flip_armed, flip_variant, flipped_from_trade, created_at)
+                    VALUES (%s, %s, %s, %s, %s, 'Hyperliquid', 'open', FALSE,
+                        %s, %s, %s, %s, %s, %s, %s,
+                        FALSE, %s, %s, NOW())
+                """, (
+                    token, opposite,
+                    prices.get(token, entry_px),
+                    lev, amount, 'unknown', 'unknown', 'unknown',
+                    -2.0, -4.0, trail_act_val, trail_dist_val,
+                    variant_id, trade_id
+                ))
+
+                # Close original trade
+                cur.execute("""
+                    UPDATE trades SET status='closed', close_reason='flipped',
+                        exit_reason='flipped_hard_sl', flip_variant=%s
+                    WHERE id=%s
+                """, (variant_id, trade_id))
+
+                log(f'  [FLIP] Done: opened trade #{trade_id} opposite direction', 'INFO')
+            else:
+                log(f'  [FLIP] FAILED: {open_result.get("error")}', 'FAIL')
+
+        elif SOFT_SL <= pnl_pct < 0 and flip_on_soft and not flip_armed:
+            # SOFT SL HIT — arm the flip for next cycle
+            cur.execute("UPDATE trades SET flip_armed=TRUE WHERE id=%s", (trade_id,))
+            log(f'  [FLIP] {token} armed for flip (soft SL {pnl_pct:.2f}%) | variant={variant_id}', 'WARN')
+
+        elif flip_armed and pnl_pct > 0:
+            # Recovered from soft SL — disarm
+            cur.execute("UPDATE trades SET flip_armed=FALSE WHERE id=%s", (trade_id,))
+            log(f'  [FLIP] {token} disarmed (recovered to {pnl_pct:.2f}%)', 'INFO')
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        try:
+            conn.rollback()
+            conn.close()
+        except:
+            pass
+        log(f'  [FLIP] error: {e}', 'FAIL')
+
+
 def sync_pnl_from_hype(prices):
     """
     Sync HL unrealized PnL to paper trades.
@@ -568,14 +696,14 @@ def sync_pnl_from_hype(prices):
 
         # Update each open trade with HL's PnL data
         cur.execute("""
-            SELECT id, token, amount_usdt, leverage, entry_price
+            SELECT id, token, amount_usdt, leverage, entry_price, direction
             FROM trades
             WHERE status='open' AND exchange='Hyperliquid'
         """)
 
         updated = 0
         for row in cur.fetchall():
-            trade_id, token, amount, lev, entry = row
+            trade_id, token, amount, lev, entry, direction = row
             if token in hl_pos:
                 pos_data = hl_pos[token]
                 unrealized_pnl = float(pos_data.get('unrealized_pnl', 0))
@@ -593,6 +721,13 @@ def sync_pnl_from_hype(prices):
                     """, (pnl_usdt, pnl_pct, pnl_usdt, pnl_pct,
                           prices.get(token, entry) if prices else entry,
                           trade_id))
+
+                    # Check flip trade triggers (A/B tested: soft SL arm / hard SL flip)
+                    _check_and_execute_flip(
+                        {'id': trade_id, 'token': token, 'direction': direction,
+                         'leverage': lev, 'amount_usdt': amount},
+                        pnl_pct, prices)
+
                     updated += 1
 
         conn.commit()
@@ -1152,7 +1287,7 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         try:
             import psycopg2 as _pg2
             conn_b = _pg2.connect(host='/var/run/postgresql', dbname='brain',
-                                  user='postgres', password='***')
+                                  user='postgres',            password='Brain123')
             cur_b = conn_b.cursor()
             # Look up original signal confidence to compute penalty
             cur_b.execute("""

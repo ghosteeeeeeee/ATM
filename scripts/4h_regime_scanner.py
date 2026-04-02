@@ -147,7 +147,7 @@ def get_tokens_to_scan():
     
     # Get from open trades
     try:
-        conn = psycopg2.connect(host='localhost', database='brain', user='postgres', password='brain123')
+        conn = psycopg2.connect(host='localhost', database='brain', user='postgres', password='Brain123')
         cur = conn.cursor()
         cur.execute("SELECT DISTINCT token FROM trades WHERE status = 'open'")
         for row in cur.fetchall():

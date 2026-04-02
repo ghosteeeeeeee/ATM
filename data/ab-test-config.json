@@ -244,14 +244,14 @@
             "wait_percent": 0.002,
             "max_wait_minutes": 30
           },
-          "trades": 1,
-          "wins": 0,
+          "trades": 2,
+          "wins": 1,
           "losses": 0,
-          "winRate": 0,
-          "totalPnlPct": 0,
+          "winRate": 50.0,
+          "totalPnlPct": 1.13,
           "avg_win_pct": 0.974,
           "avg_loss_pct": -0.212,
-          "lastUpdated": "2026-04-02 04:32:57.773464",
+          "lastUpdated": "2026-04-02 05:41:08.593342",
           "learnings": "WINNER despite lower WR. avg_win=0.974% vs avg_loss=-0.212% = 4.6:1 reward/risk. Fast entry catches moves before reversals. EXPLOIT."
         },
         {

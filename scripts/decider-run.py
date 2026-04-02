@@ -576,7 +576,7 @@ def run(dry_run=False):
 
     # ── Rate limit: minimum 15 seconds between new entries ─────────
     try:
-        conn_rate = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='brain123')
+        conn_rate = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
         c_rate = conn_rate.cursor()
         c_rate.execute("SELECT open_time FROM trades WHERE status='open' ORDER BY open_time DESC LIMIT 1")
         row = c_rate.fetchone()

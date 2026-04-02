@@ -921,7 +921,7 @@ def get_cooldown(token, direction=None):
     if direction:
         key = "%s:%s" % (key, direction.upper())
     try:
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123'')
         cur = conn.cursor()
         cur.execute(
             "SELECT expires_at FROM signal_cooldowns WHERE token=%s AND expires_at > NOW()",

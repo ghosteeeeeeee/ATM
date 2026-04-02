@@ -387,6 +387,71 @@ def _spawn_new_variant(test_name: str, surviving: List[Dict]) -> Optional[Dict]:
             }
         }
 
+    elif test_name == 'flip-trade-strategy':
+        # Evolve flip strategy: learn when flipping is profitable
+        # If no-flip is winning: test tighter flip triggers
+        # If flip is winning: add trailing to flipped position
+        flip_on_hard = best_cfg.get('flipOnHardSL', False)
+        flip_on_soft = best_cfg.get('flipOnSoftSL', False)
+        has_trailing = best_cfg.get('flipTrailing', False)
+        trail_act = best_cfg.get('flipTrailingActivation', 0.005)
+        trail_dist = best_cfg.get('flipTrailingDistance', 0.005)
+
+        if not flip_on_hard and not flip_on_soft:
+            # Control (no flip) is winning — try flipping on hard SL only
+            return {
+                'id': f'FLIP-EVO-{len(surviving)+1}',
+                'name': f'Flip-Evolve-{len(surviving)+1}',
+                'weight': 10,
+                'enabled': True,
+                'config': {
+                    'flipOnSoftSL': False,
+                    'flipOnHardSL': True,
+                    'flipTrailing': False,
+                    'flipTrailingActivation': None,
+                    'flipTrailingDistance': None,
+                    'description': f'EVOLVED: flip on hard SL only (from {best["id"]})',
+                    'evolved_from': best['id'],
+                    'spawned_at': datetime.now().isoformat(),
+                }
+            }
+        elif flip_on_hard and not flip_on_soft and not has_trailing:
+            # Hard SL flip is winning — add trailing to the flipped position
+            return {
+                'id': f'FLIP-EVO-{len(surviving)+1}',
+                'name': f'Flip-Evolve-{len(surviving)+1}',
+                'weight': 10,
+                'enabled': True,
+                'config': {
+                    'flipOnSoftSL': False,
+                    'flipOnHardSL': True,
+                    'flipTrailing': True,
+                    'flipTrailingActivation': 0.005,
+                    'flipTrailingDistance': 0.005,
+                    'description': f'EVOLVED: hard flip + tight trailing (from {best["id"]})',
+                    'evolved_from': best['id'],
+                    'spawned_at': datetime.now().isoformat(),
+                }
+            }
+        elif flip_on_hard and has_trailing:
+            # Try softer trailing on the flipped position
+            return {
+                'id': f'FLIP-EVO-{len(surviving)+1}',
+                'name': f'Flip-Evolve-{len(surviving)+1}',
+                'weight': 10,
+                'enabled': True,
+                'config': {
+                    'flipOnSoftSL': True,
+                    'flipOnHardSL': True,
+                    'flipTrailing': True,
+                    'flipTrailingActivation': round(trail_act * 1.5, 4),
+                    'flipTrailingDistance': round(trail_dist * 1.5, 4),
+                    'description': f'EVOLVED: soft+hard flip + looser trail (from {best["id"]})',
+                    'evolved_from': best['id'],
+                    'spawned_at': datetime.now().isoformat(),
+                }
+            }
+
     return None
 
 

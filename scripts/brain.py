@@ -17,7 +17,7 @@ DB_CONFIG = {
     'port': 5432,
     'database': 'brain',
     'user': 'postgres',
-    'password': 'brain123'
+    'password': 'Brain123'
 }
 
 OLLAMA_URL = "http://localhost:11434"
@@ -61,18 +61,10 @@ def call_ollama(prompt: str) -> dict:
     }
 
     try:
-        result = subprocess.run(
-            ["curl", "-s", "-X", "POST", f"{OLLAMA_URL}/api/generate",
-             "-d", json.dumps(payload)],
-            capture_output=True,
-            text=True,
-            timeout=60
-        )
-
-        if result.returncode != 0:
-            raise Exception(f"Ollama error: {result.stderr}")
-
-        response = json.loads(result.stdout)
+        import requests as _req
+        resp = _req.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=60)
+        resp.raise_for_status()
+        response = resp.json()
         raw_resp = response.get("response", "{}")
 
         # ── Validate response contains required fields ──────────────────────────
@@ -92,18 +84,10 @@ def get_embedding(text: str) -> list:
         "prompt": text
     }
     
-    result = subprocess.run(
-        ["curl", "-s", "-X", "POST", f"{OLLAMA_URL}/api/embeddings",
-         "-d", json.dumps(payload)],
-        capture_output=True,
-        text=True,
-        timeout=30
-    )
-    
-    if result.returncode != 0:
-        raise Exception(f"Embedding error: {result.stderr}")
-    
-    response = json.loads(result.stdout)
+    import requests as _req
+    resp = _req.post(f"{OLLAMA_URL}/api/embeddings", json=payload, timeout=30)
+    resp.raise_for_status()
+    response = resp.json()
     return response.get("embedding", [])
 
 def get_db_connection():

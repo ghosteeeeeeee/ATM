@@ -3,7 +3,7 @@
   "tests": [
     {
       "name": "sl-distance-test",
-      "description": "Stop-loss distance optimization — test 1%, 2%, 3% SL distances",
+      "description": "Stop-loss distance optimization \u2014 test 1%, 2%, 3% SL distances",
       "variants": [
         {
           "id": "SL1pct",
@@ -36,7 +36,7 @@
     },
     {
       "name": "entry-timing-test",
-      "description": "Entry timing — immediate vs retrace 2% vs retrace 5% pullback",
+      "description": "Entry timing \u2014 immediate vs retrace 2% vs retrace 5% pullback",
       "variants": [
         {
           "id": "IMMEDIATE",
@@ -71,7 +71,7 @@
     },
     {
       "name": "trailing-stop-test",
-      "description": "Trailing stop parameters — activation threshold and distance",
+      "description": "Trailing stop parameters \u2014 activation threshold and distance",
       "variants": [
         {
           "id": "TS-tight",
@@ -111,7 +111,7 @@
       "variants": [
         {
           "id": "SHORT-aggressive",
-          "label": "Aggressive SHORT — tighter SL",
+          "label": "Aggressive SHORT \u2014 tighter SL",
           "weight": 1,
           "enabled": true,
           "config": {
@@ -121,12 +121,70 @@
         },
         {
           "id": "SHORT-conservative",
-          "label": "Conservative SHORT — wider SL",
+          "label": "Conservative SHORT \u2014 wider SL",
           "weight": 1,
           "enabled": true,
           "config": {
             "slPct": 3.0,
             "tpPct": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "flip-trade-strategy",
+      "description": "Flip trade strategy after SL hit \u2014 test when to flip and with what parameters",
+      "variants": [
+        {
+          "id": "FLIP-NONE",
+          "label": "No flip (control)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": false,
+            "flipOnHardSL": false,
+            "flipTrailing": false,
+            "flipTrailingActivation": null,
+            "flipTrailingDistance": null
+          }
+        },
+        {
+          "id": "FLIP-HARD-ONLY",
+          "label": "Flip on 2% hard SL only",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": false,
+            "flipOnHardSL": true,
+            "flipTrailing": false,
+            "flipTrailingActivation": null,
+            "flipTrailingDistance": null
+          }
+        },
+        {
+          "id": "FLIP-SOFT-HARD",
+          "label": "Flip on 1% soft SL + 2% hard SL",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": true,
+            "flipOnHardSL": true,
+            "flipTrailing": false,
+            "flipTrailingActivation": null,
+            "flipTrailingDistance": null
+          }
+        },
+        {
+          "id": "FLIP-HARD-TRAIL",
+          "label": "Flip on 2% hard SL + tight trailing stop",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": false,
+            "flipOnHardSL": true,
+            "flipTrailing": true,
+            "flipTrailingActivation": 0.5,
+            "flipTrailingDistance": 0.5
           }
         }
       ]
