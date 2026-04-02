@@ -1602,15 +1602,14 @@ for s in pending:
         # reaching r2 due to 15-min TTL, and many legitimate signals stay WAIT
         # (AI needs more data) instead of going straight to EXEC.
 
-        # Quality gate: require 2+ distinct signal types and avg_conf >= 40%
-        # FIX (2026-04-02): Was 1 type / 30%. Single-type hot signals were too noisy.
-        # Two different signal types (e.g. RSI + MACD both agree) is a real signal;
-        # one signal type being reviewed multiple times is just the same data point.
-        # Also require avg_conf >= 40% — signals below that have no business auto-approving.
+        # Quality gate: require 1+ distinct signal types and avg_conf >= 40%
+        # FIX (2026-04-02): Was < 2 types. Lowered to allow single-source hmacd signals
+        # through. avg_conf >= 40% is the real quality filter — it measures conviction.
         num_types = hot.get('num_types', 0)
         avg_conf = hot.get('avg_conf', 0)
-        if num_types < 2 or avg_conf < 40:
-            print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf:.0f}%)")
+        if num_types < 1 or avg_conf < 40:
+            avg_conf_str = f"{avg_conf:.0f}%" if avg_conf is not None else "N/A"
+            print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf_str})")
             log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
             mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-quality-gate')
             processed_this_run.add(key)

@@ -58,7 +58,7 @@ def sh(*cmd, cwd=HERMES, check=True):
 def github_api(method, path, data=None, base="https://api.github.com"):
     url = f"{base}/repos/{GITHUB_REPO}/{path}"
     hdrs = {
-        "Authorization": f"token {GITHUB_TOKEN}",
+        "Authorization": f"token {GH}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
@@ -90,7 +90,7 @@ def main():
         sys.exit(1)
 
     # 3. Get version info
-    commit = sh("git", "rev-parse", "--short=HEAD")
+    commit = sh("git", "rev-parse", "HEAD")[0:7]
     ts = time.strftime("%Y%m%d-%H%M")
     full_zip = f"/tmp/ATM-Hermes-{ts}-full-{commit}.zip"
     commit_msg = sh("git", "log", "-1", "--format=%s")
@@ -148,7 +148,7 @@ def main():
         f"{upload_url}{zip_basename}",
         data=zip_data,
         headers={
-            "Authorization": f"token {GITHUB_TOKEN}",
+            "Authorization": f"token {GH}",
             "Content-Type": "application/zip",
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",

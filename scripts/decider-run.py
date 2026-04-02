@@ -628,7 +628,7 @@ def _run_hot_set():
               AND created_at > datetime('now', '-3 hours')
               AND NOT EXISTS (
                   SELECT 1 FROM signals s2
-                  WHERE s2.token=*** AND s2.direction = signals.direction
+                  WHERE s2.token = signals.token AND s2.direction = signals.direction
                     AND s2.decision = 'APPROVED' AND s2.executed = 0
               )
             GROUP BY token, direction
@@ -650,7 +650,7 @@ def _run_hot_set():
             c.execute("""
                 SELECT id, signal_type, source, confidence
                 FROM signals
-                WHERE token=*** AND direction=? AND decision IN ('PENDING','WAIT') AND executed=0
+                WHERE token=? AND direction=? AND decision IN ('PENDING','WAIT') AND executed=0
                 ORDER BY CASE WHEN signal_type='confluence' THEN 0 ELSE 1 END, confidence DESC
                 LIMIT 1
             """, (token, direction))
