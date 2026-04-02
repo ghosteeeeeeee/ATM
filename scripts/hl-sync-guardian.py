@@ -760,7 +760,7 @@ def sync_pnl_from_hype(prices):
                     updated += 1
                     # Cut-loser: emergency exit at -10% loss
                     # This runs AFTER flip check, so flip has priority over hard cut
-                    CUT_LOSER_THRESHOLD = -10.0
+                    CUT_LOSER_THRESHOLD = -5.0
                     if pnl_pct <= CUT_LOSER_THRESHOLD:
                         log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
                         from hyperliquid_exchange import close_position
