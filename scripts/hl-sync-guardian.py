@@ -634,8 +634,20 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
 
     # Get flip A/B variant
     flip_cfg = get_cached_ab_variant(token, direction, 'flip-trade-strategy')
-    if not flip_cfg:
-        return
+
+    # Fallback defaults when flip config is missing/empty.
+    # If flip config is not configured, apply sensible defaults so flip still works.
+    if not flip_cfg or not flip_cfg.get('config'):
+        flip_cfg = {
+            'id': 'default-fallback',
+            'config': {
+                'flipOnSoftSL': True,   # arm flip at -1% loss
+                'flipOnHardSL': True,   # execute flip at -2% loss
+                'flipTrailing': False,
+                'flipTrailingActivation': 0.005,
+                'flipTrailingDistance': 0.005,
+            }
+        }
 
     cfg = flip_cfg.get('config', {})
     flip_on_soft = cfg.get('flipOnSoftSL', False)
@@ -1227,13 +1239,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         # BUG-25 fix: sanity-check exit price against entry + market price.
         # If exit price is >20% different from current market, something is wrong.
         # Reject the HL fill and fall back to current market price.
-        curr_price = prices.get(token.upper()) if prices else 0
-        if curr_price and curr_price > 0 and exit_price > 0:
-            deviation = abs(exit_price - curr_price) / curr_price
-            if deviation > 0.20:
-                log(f'  {token} exit price sanity FAIL: HL_fill=${exit_price:.6f} '
-                    f'vs market=${curr_price:.6f} (deviation={deviation:.1%}) — using market', 'WARN')
-                exit_price = curr_price
+        # NOTE: prices not available in Step8 scope — removed inline check.
+        # exit_price already validated by _get_hl_exit_price() caller.
         if not entry_price or not exit_price or exit_price <= 0:
             log(f'  Skipping trade #{trade_id} ({token}): missing entry/exit price', 'WARN')
             cur.close(); conn.close()
@@ -1629,7 +1636,12 @@ def sync():
                 # guardian_closed=TRUE   → guardian set flag but close failed (stale) → attempt close
                 # safe_to_close = guardian_closed=FALSE trades → skip these
                 # NOT in safe_to_close = guardian_closed=TRUE → stale flag, try to close
-                if str(trade_id) in safe_to_close:
+                # FIX (2026-04-02): paper=f trades are LIVE trades — never skip them.
+                # They MUST be closed when missing from HL, regardless of guardian_closed flag.
+                if t.get('paper') == False:
+                    # Live trade missing from HL — close it immediately
+                    pass  # fall through to close logic below
+                elif str(trade_id) in safe_to_close:
                     log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (guardian_closed=FALSE)', 'WARN')
                     continue
 

@@ -15,6 +15,7 @@ INFO_URL = "https://api.hyperliquid.xyz/info"
 OUTPUT_FILE = "/var/www/html/regime_4h.json"
 STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
 LOG_FILE = "/root/.openclaw/workspace/logs/4h_regime.log"
+BRAIN_DB = dict(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
@@ -225,6 +226,35 @@ def calculate_weight_adjustment(regime, side):
     
     return 1.0
 
+def write_to_brain_cache(results):
+    """Write per-token regime data to PostgreSQL momentum_cache (brain DB)"""
+    if not results:
+        return
+    try:
+        conn = psycopg2.connect(**BRAIN_DB)
+        cur = conn.cursor()
+        now = datetime.now()
+        for token, r in results.items():
+            regime = r.get('regime', 'NEUTRAL')
+            slope_pct = r.get('slope_pct', 0)
+            # Map regime to trend (simplified)
+            trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
+            cur.execute("""
+                INSERT INTO momentum_cache (token, slope_4h, regime_4h, trend, updated_at)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (token) DO UPDATE SET
+                    slope_4h = EXCLUDED.slope_4h,
+                    regime_4h = EXCLUDED.regime_4h,
+                    trend = EXCLUDED.trend,
+                    updated_at = EXCLUDED.updated_at
+            """, (token, slope_pct, regime, trend, now))
+        conn.commit()
+        cur.close()
+        conn.close()
+        log(f"Brain momentum_cache: wrote {len(results)} tokens")
+    except Exception as e:
+        log(f"Brain momentum_cache write error: {e}")
+
 def main():
     log("=== 4h Regime Scanner Started ===")
     
@@ -260,6 +290,9 @@ def main():
     # Save to file
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
+    
+    # Write per-token regime to PostgreSQL brain momentum_cache
+    write_to_brain_cache(results)
     
     # Also write aggregate regime to static DB (wasp.py checks this table)
     try:

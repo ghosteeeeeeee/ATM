@@ -35,6 +35,8 @@ SHORT_BLACKLIST = {
     # 2026-04-02: phantom positions — guardian_missing loop (all +0.00%)
     'RLB', 'RNDR', 'SHIA', 'AI16Z', 'BADGER', 'BLZ', 'FXS',
     'HPOS', 'MATIC', 'UNIBOT', 'MKR', 'MYRO',
+    # 2026-04-02: HMSTR — phantom SHORT, manually closed, catastrophic history
+    'HMSTR',
 }
 LONG_BLACKLIST = {
     'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
@@ -47,6 +49,8 @@ LONG_BLACKLIST = {
     'AERO', 'CHILLGUY', 'LIT', 'DOT', 'ANIME',  # LONG losing streaks
     # 2026-04-02: manual additions
     'BIO', 'TAO', 'GAS',   # blocking both directions: no trade history, high-risk profiles
+    # 2026-04-02: HMSTR — phantom SHORT, manually closed, catastrophic history
+    'HMSTR',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 SERVER_NAME = 'Hermes'

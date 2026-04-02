@@ -827,10 +827,10 @@ def get_pending_signals():
                 confluence_score = base_confluence
 
                 # hmacd source boost: mtf_macd signals from hmacd-* source
-                # are MACD crossovers — the clearest trend signals. Give 1.3x multiplier.
+                # are MACD crossovers — the clearest trend signals. 1.2x multiplier.
                 source_mult = 1.0
                 if source and source.startswith('hmacd-'):
-                    source_mult = 1.3
+                    source_mult = 1.2
 
                 # Confidence (scaled by hmacd source multiplier)
                 conf_score = (conf / 100.0) * source_mult
@@ -1324,18 +1324,19 @@ REASON: [1-sentence explanation]
                 except Exception as e:
                     log_error(f'ai_decide: confidence parse error: {e}')
         
-        # Adjust confidence based on regime alignment
-        if decision != "wait" and regime != "NEUTRAL" and regime_conf > 50:
-            if (regime == "LONG_BIAS" and decision == "long") or \
-               (regime == "SHORT_BIAS" and decision == "short"):
-                # Boost confidence if aligned with regime
-                regime_bonus = min(15, (regime_conf - 50) // 5)
-                confidence = min(100, confidence + regime_bonus)
-            elif (regime == "LONG_BIAS" and decision == "short") or \
-                 (regime == "SHORT_BIAS" and decision == "long"):
-                # Reduce confidence if fighting the regime
-                regime_penalty = min(20, (regime_conf - 50) // 3)
-                confidence = max(0, confidence - regime_penalty)
+                # HARD BLOCK: If market regime is against the trade direction, skip it entirely
+                # Regime must align with direction (or be NEUTRAL) to proceed
+                if decision != "wait" and regime != "NEUTRAL" and regime_conf > 50:
+                    if (regime == "LONG_BIAS" and decision == "short") or \
+                       (regime == "SHORT_BIAS" and decision == "long"):
+                        # Fighting the regime — hard block
+                        decision = "wait"
+                        confidence = 0
+                    elif (regime == "LONG_BIAS" and decision == "long") or \
+                         (regime == "SHORT_BIAS" and decision == "short"):
+                        # Aligned with regime — small boost
+                        regime_bonus = min(10, (regime_conf - 50) // 5)
+                        confidence = min(100, confidence + regime_bonus)
         
         return decision, confidence, result[:500]
     except Exception as e:

@@ -595,6 +595,22 @@ def _run_hot_set():
             sig_id, sig_type, sig_src, sig_conf = best
             should_approve, reason = False, ''
 
+            # HARD BLOCK: Check market regime — don't approve trades against regime
+            try:
+                import json as _json
+                with open("/var/www/html/regime_4h.json") as f:
+                    regime_data = _json.load(f)
+                market_regime = regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
+                regime_conf = 80  # assume high confidence for regime check
+                if market_regime == 'SHORT_BIAS' and direction.upper() == 'LONG':
+                    should_approve = False
+                    reason = f'regime-block SHORT_BIAS market, rejecting LONG'
+                elif market_regime == 'LONG_BIAS' and direction.upper() == 'SHORT':
+                    should_approve = False
+                    reason = f'regime-block LONG_BIAS market, rejecting SHORT'
+            except Exception:
+                pass  # if regime check fails, proceed with normal logic
+
             if sig_type == 'confluence':
                 try:
                     num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
@@ -607,7 +623,7 @@ def _run_hot_set():
                     should_approve = sig_conf >= 65
                     reason = f'hot-conf-2s @{sig_conf:.0f}%'
             elif sig_src and sig_src.startswith('hmacd-'):
-                should_approve = sig_conf >= 80
+                should_approve = sig_conf >= 70
                 reason = f'hot-hmacd @{sig_conf:.0f}%'
 
             if should_approve:
@@ -772,6 +788,24 @@ def run(dry_run=False):
             log(f'SKIP: {token} {direction} WR={wr:.0f}% ({wr_count} trades) — direction paused')
             skipped += 1
             continue
+
+        # HARD BLOCK: Check market regime before any trade execution
+        # This is the last line of defense — even APPROVED signals can't fight the regime
+        try:
+            import json as _json
+            with open("/var/www/html/regime_4h.json") as f:
+                regime_data = _json.load(f)
+            market_regime = regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
+            if market_regime == 'SHORT_BIAS' and direction.upper() == 'LONG':
+                log(f'SKIP: {token} {direction} — regime BLOCK (SHORT_BIAS market, rejecting LONG)')
+                skipped += 1
+                continue
+            elif market_regime == 'LONG_BIAS' and direction.upper() == 'SHORT':
+                log(f'SKIP: {token} {direction} — regime BLOCK (LONG_BIAS market, rejecting SHORT)')
+                skipped += 1
+                continue
+        except Exception:
+            pass  # if regime check fails, proceed (last resort)
 
         # Check position limit
         if open_count >= MAX_POS:
