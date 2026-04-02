@@ -163,9 +163,14 @@ def main():
     if index_path.exists():
         html = index_path.read_text()
         new_row = f"<tr>{chr(10)}  <td><a href=\"{zip_basename}\">{zip_basename}</a> <span class=\"tag-latest\">LATEST</span></td>{chr(10)}  <td class=\"date\">{date_str}</td>{chr(10)}  <td class=\"size\">{zip_mb:.1f}MB</td>{chr(10)}  <td><a href=\"{github_dl}\" target=\"_blank\">GitHub</a> {commit_msg}</td>{chr(10)}</tr>"
-        header = "<tr><th>File</th><th>Date</th><th>Size</th><th>Contents</th></tr>"
-        html = html.replace(header, header + chr(10) + new_row)
+        header_row = "<tr><th>File</th><th>Date</th><th>Size</th><th>Contents</th></tr>"
+        if header_row in html:
+            html = html.replace(header_row, header_row + chr(10) + new_row)
+        elif "</table>" in html:
+            # Table empty — insert header + row before </table>
+            html = html.replace("</table>", f"{header_row}{chr(10)}{new_row}{chr(10)}</table>")
         index_path.write_text(html)
+        print(f"  Updated index: /var/www/git/index.html")
 
     os.unlink(full_zip)
     print(f"\nDone! https://github.com/{GITHUB_REPO}/releases/tag/{tag_name}")
