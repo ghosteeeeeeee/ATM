@@ -418,7 +418,7 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None, notes:
         # Query HL for realized PnL for this token
         hl_data = get_realized_pnl(token.upper(), start_ms)
 
-        if hl_data and hl_data.get("realized_pnl") != 0.0:
+        if hl_data and hl_data.get("realized_pnl") is not None:
             hype_pnl_usdt = hl_data["realized_pnl"]
             hype_pnl_pct  = (hype_pnl_usdt / amount_usdt * 100) if amount_usdt else 0
             hl_exit_price = hl_data.get("exit_price") or exit_price

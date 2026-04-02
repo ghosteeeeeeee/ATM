@@ -150,56 +150,8 @@ def init_db():
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    rc.execute('CREATE INDEX IF NOT EXISTS idx_sh_token ON signal_history(token)')
-    rc.execute('CREATE INDEX IF NOT EXISTS idx_sh_round ON signal_history(compact_round)')
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS momentum_cache (
-            token TEXT PRIMARY KEY,
-            phase TEXT, percentile_long REAL, percentile_short REAL,
-            velocity REAL, avg_z REAL, z_direction TEXT,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )""")
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS token_intel (
-            token TEXT PRIMARY KEY,
-            exchange TEXT, max_leverage INTEGER, base_position_size REAL,
-            open_positions INTEGER DEFAULT 0,
-            last_signal_at TEXT,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )""")
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS cooldown_tracker (
-            token TEXT NOT NULL,
-            direction TEXT NOT NULL,
-            expires_at INTEGER NOT NULL,
-            PRIMARY KEY(token, direction)
-        )""")
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS decisions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL, direction TEXT NOT NULL,
-            confidence REAL NOT NULL, entry_price REAL, exchange TEXT,
-            decision TEXT NOT NULL, reason TEXT,
-            server TEXT DEFAULT 'Hermes',
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    # signal_history table — stores compacted signal lifecycle for AI learning
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS signal_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            direction TEXT NOT NULL,
-            signal_type TEXT NOT NULL,
-            compact_round INTEGER NOT NULL,
-            survived INTEGER NOT NULL,
-            score_before REAL,
-            score_after REAL,
-            reason TEXT,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
     rc.execute("CREATE INDEX IF NOT EXISTS idx_sighist_token ON signal_history(token, direction)")
+    rc.execute("CREATE INDEX IF NOT EXISTS idx_sh_round ON signal_history(compact_round)")
     rc.commit()
     rc.close()
     # ── Migrate legacy backfill data to static DB ──
@@ -284,7 +236,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 # Rising or equal confidence: boost for new sources, take max
                 new_conf = max(existing_conf, confidence)
                 if num_sources_gained > 0:
-                    new_conf = min(100, new_conf + num_sources_gained)
+                    new_conf = min(100, new_conf + min(num_sources_gained, 2))
 
             c.execute('''
                 UPDATE signals SET confidence=?, source=?, updated_at=CURRENT_TIMESTAMP
