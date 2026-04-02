@@ -1340,3 +1340,86 @@ See BUG-11.
 
 ### Current Position: CHILLGUY SHORT 3x (HL + DB in sync)
 
+
+---
+
+# OUTSTANDING ITEMS — 2026-04-02 (Post-Audit)
+
+Consolidated from all sections of reports.md. Items marked with source and severity.
+
+## CRITICAL (financial loss risk)
+
+| # | Source | File | Description |
+|---|--------|------|-------------|
+| C1 | code-review | ai-decider.py:1452 | BUG-1: Counter-signal update uses `s.get('id')` which is always None — UPDATE matches nothing |
+| C2 | code-review | ai-decider.py:199-227 | BUG-2: `_kill_hot_signal` and `_kill_pending_opposite` never bind `token` param in UPDATE queries |
+| C3 | ai-engineer | decider-run.py | 4x SQL `***` placeholder bugs — all fixed in commit 916fe7f |
+| C4 | ai-engineer | hl-sync-guardian.py | 15 bare `except:` blocks silently swallow errors — HIGH risk for production |
+
+## HIGH (logic errors / data corruption)
+
+| # | Source | File | Description |
+|---|--------|------|-------------|
+| H1 | code-review | ai-decider.py:1493 | BUG-3: `processed_this_run` dedup set not populated from counter-killed signals |
+| H2 | code-review | ai-decider.py:151-167 | BUG-4: `_load_hot_rounds` avg_conf query missing `direction` filter |
+| H3 | code-review | hl-sync-guardian.py:1217 | BUG-6: Dedup set type mismatch after restart — str vs int trade_id |
+| H4 | code-review | position_manager.py:61-69 | BUG-8: Trailing SL never pushed to Hyperliquid |
+| H5 | code-review | hl-sync-guardian.py:718 | BUG-9: Regime mapping missing LONG_BIAS/SHORT_BIAS |
+| H6 | code-review | ai-decider.py:1122 | BUG-10: `update_trade_prices` uses Gate.io instead of Hyperliquid |
+| H7 | code-review | position_manager.py:1728 | BUG-17: Position Manager crash every cycle (unknown cause) |
+| H8 | audit-table | decider-run.py | BUG-5: Cut-loser/flip without explicit slippage — defaults may be insufficient |
+| H9 | audit-table | hl-sync-guardian.py:882 | BUG-8: `predicted_return` written as regime string, not number |
+
+## MEDIUM (race conditions / data inconsistency)
+
+| # | Source | File | Description |
+|---|--------|------|-------------|
+| M1 | code-review | decider-run.py:355 | BUG-5: Zero price guard should be `cur_price <= 0` not `not cur_price` |
+| M2 | code-review | position_manager.py:1333 | BUG-7: Cascade flip uses stale entry price from signal record |
+| M3 | audit-table | hl-sync-guardian.py:505-546 | BUG-14: Orphan recovery race window — no DB locking |
+| M4 | audit-table | hl-sync-guardian.py:1288 | BUG-15: `_clear_reconciled_token` called outside try/except |
+| M5 | audit-table | hl-sync-guardian.py:1134 | BUG-16: 120s fill lookback too short — should be 300s |
+| M6 | audit-table | hl-sync-guardian.py:968,990 | BUG-17: Duplicate queries on paper trades with race |
+| M7 | audit-table | decider-run.py | BUG-26: exec=1 marked AFTER brain.py call — race window for double-execution |
+| M8 | audit-table | hl-sync-guardian.py:783 | BUG-28: Cut-loser continue without retry on failure |
+| M9 | ai-engineer | position_manager.py | 3x bare `except: pass` at lines 991, 1064 (trailing SL, price parsing) |
+| M10 | ai-engineer | decider-run.py:88 | Bare `except: pass` in log file write |
+
+## LOW (minor / nice to have)
+
+| # | Source | File | Description |
+|---|--------|------|-------------|
+| L1 | audit-table | hl-sync-guardian.py:158 | BUG-18: `copied_trades.json` not locked — concurrent write corruption |
+| L2 | audit-table | hl-sync-guardian.py:87 | BUG-19: `reconciled_state.json` not locked |
+| L3 | audit-table | hl-sync-guardian.py:62 | BUG-21: DRY=False default — no `--live` safety flag |
+| L4 | audit-table | hl-sync-guardian.py:1137 | BUG-22: No warning when no fills found despite close order sent |
+| L5 | audit-table | decider-run.py:306 | BUG-23: `trailing_phase2_dist=None` handling unclear |
+| L6 | audit-table | hl-sync-guardian.py:1291 | BUG-24: `signal_outcomes` SQLite writes silently fail |
+| L7 | audit-table | hl-sync-guardian.py:1209 | BUG-25: No sanity check on HL exit price |
+| L8 | audit-table | signal_gen.py | BUG-27: Legacy RSI/MACD scripts not disabled — duplicate signal risk |
+| L9 | audit-table | hl-sync-guardian.py:750 | BUG-29: `pnl_usdt` and `hype_pnl_usdt` set identically — no real/unreal distinction |
+| L10 | audit-table | ab_optimizer.py, ab_learner.py | BUG-30: Never reviewed — could corrupt A/B config |
+
+## PHASE 2 ITEMS (from candle predictor roadmap)
+
+| # | Priority | Description |
+|---|----------|-------------|
+| P1 | HIGH | Backfill inversion analysis — re-run predictions.db with inversion rule |
+| P2 | HIGH | Per-token inversion thresholds in config table |
+| P3 | MED | Momentum-state-aware prompt templates |
+| P4 | MED | Volume-weighted confidence |
+
+## PHASE 3 ITEMS
+
+| # | Priority | Description |
+|---|----------|-------------|
+| P5 | HIGH | Add open interest data from HL `openInterest` |
+| P6 | MED | Add liquidation data from HL fills CSV |
+| P7 | LOW | Model upgrade to larger model |
+| P8 | LOW | Ensemble — majority vote across 2-3 models |
+
+## LEGEND
+- **Fixed**: Already resolved in a committed fix
+- **PENDING**: Not yet fixed
+- Source tags: `code-review` = manual review; `ai-engineer` = subagent audit; `audit-table` = BUG table from 2026-04-02
+
