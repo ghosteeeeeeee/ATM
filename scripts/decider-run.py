@@ -290,20 +290,19 @@ def get_ab_params_for_trade(direction: str) -> dict:
     entry_variant = get_ab_variant('entry-timing-test', direction)
     entry_mode = entry_variant.get('config', {}).get('entryMode', 'immediate')
 
-    # Trailing stop test
-    # FIX (2026-04-01): ab_tests.json stores trailingActivationPct/trailingDistancePct as
-    # percentage numbers (0.5 = 0.5%, 1.0 = 1.0%) — need to normalize to decimal fractions.
-    # Normalize: > 1 means it's a percentage (e.g. 1.0 = 1%), divide by 100 → 0.01.
-    # Values <= 1 are already in fraction form (e.g. 0.01 = 1%).
+    # Trailing stop test — ab_tests.json stores values like 0.5 (= 50%) or 1.0 (= 100%)
+    # FIX (2026-04-02): old condition raw >= 1.0 never triggered for 0.5 → trailing = 50%!
     ts_variant = get_ab_variant('trailing-stop-test', direction)
     raw_act  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
     raw_dist = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
-    # FIX (2026-04-02): >= 1.0 instead of > 1.0. The AB config stores values as
-    # percentage numbers (0.5 = 0.5%, 1.0 = 1.0%, 2.0 = 2.0%). Values >= 1.0 must
-    # be divided by 100. Bug: TS-loose variant had trailingDistancePct=1.0 (1.0%)
-    # but the > check left it as 1.0 (=100%), completely disabling trailing stops.
-    trailing_activation  = raw_act / 100.0 if raw_act >= 1.0 else raw_act
-    trailing_distance    = raw_dist / 100.0 if raw_dist >= 1.0 else raw_dist
+    def _norm_pct(val, default=0.01):
+        if val is None or val <= 0:
+            return default
+        if val > 0.01:   # value like 0.5 (= 50%) or 1.0 (= 100%) — divide by 100
+            return val / 100.0
+        return val        # already a small fraction like 0.005 (= 0.5%)
+    trailing_activation = _norm_pct(raw_act)
+    trailing_distance   = _norm_pct(raw_dist)
     trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
     if trailing_phase2_dist is not None and trailing_phase2_dist > 1.0:
         trailing_phase2_dist = trailing_phase2_dist / 100.0

@@ -382,7 +382,10 @@ def expire_pending_signals(minutes=60):
         SET decision = 'EXPIRED', executed = 1
         WHERE decision = 'APPROVED'
           AND executed = 0
-          AND updated_at < datetime('now', '-30 minutes')
+          AND created_at < datetime('now', '-30 minutes')
+          # FIX (2026-04-02): Was updated_at — but updated_at gets touched on every
+          # read, so APPROVED signals never actually expired. Using created_at ensures
+          # signals are cleared 30 min after they were first approved.
     """)
     approved_expired = c.rowcount
 

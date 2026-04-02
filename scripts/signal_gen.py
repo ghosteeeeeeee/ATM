@@ -60,41 +60,10 @@ def _has_confluence_partners(token: str, direction: str, exclude_type: str = Non
         conn.close()
 
 
-def _process_signal(sig_id: int, decision: str, reason: str = None) -> None:
-    """
-    Process a signal decision (called by external ai-decider pipeline).
-    Increments review_count on SKIPPED/WAIT so the hot set can track survivors.
-    """
-    if decision in ('SKIPPED', 'WAIT'):
-        from signal_schema import update_signal_review_count
-        update_signal_review_count(sig_id)
-
-
-def _load_hot_rounds() -> List[dict]:
-    """
-    Load tokens that have survived multiple ai-decider review passes.
-    Uses review_count on signals table (incremented each time signal is reviewed
-    without being executed or hard-skipped).
-    """
-    conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
-    c = conn.cursor()
-    try:
-        rows = c.execute("""
-            SELECT token, direction, MAX(review_count) as rounds
-            FROM signals
-            WHERE decision IN ('PENDING', 'APPROVED')
-              AND review_count >= 2
-              AND created_at > datetime('now', '-3 hours')
-            GROUP BY token, direction
-            HAVING COUNT(*) >= 1
-        """).fetchall()
-        return [{'token': r[0], 'direction': r[1], 'rounds': r[2]} for r in rows]
-    except Exception:
-        return []
-    finally:
-        conn.close()
-
-
+# _process_signal and _load_hot_rounds were removed (2026-04-02).
+# _load_hot_rounds lived in signal_gen.py but was NEVER CALLED — the authoritative
+# hot set logic lives in ai-decider.py (_load_hot_rounds at line 96).
+# signal_gen.py also had _process_signal defined but never imported/called.
 def _persist_momentum_state(token, momentum_state, state_confidence,
                              pct_long, pct_short, avg_z, phase, z_direction):
     """Save momentum state to DB for tracking state transitions over time."""
