@@ -224,7 +224,7 @@ def _load_hot_rounds():
             print(f"[ai-decider] _load_hot_rounds failed ({_hot_set_failure_count}/10): {e}")
 
 
-def _kill_hot_signal(token):
+def _kill_hot_signal(coin):
     """Kill a hot set signal (mark COMPACTED so it's removed from hot set immediately."""
     try:
         conn = sqlite3.connect(SIGNALS_DB)
@@ -743,7 +743,7 @@ def get_open():
         log_error(f'get_open: {e}')
         return 0
 
-def is_token_open(token):
+def is_token_open(coin):
     """Check if token already has open position - with input sanitization"""
     # Validate token - only allow alphanumeric
     if not coin or not coin.replace('_','').isalnum():
@@ -1020,7 +1020,7 @@ def get_pending_signals():
 
 from signal_schema import mark_signal_processed, validate_source  # BUG-12: validate source against whitelist
 
-def get_regime(token):
+def get_regime(coin):
     """Get 4h regime from regime_4h.json (primary) or momentum_cache (fallback).
     Returns (regime_str, confidence_int)."""
     # Primary: read from JSON file written by 4h_regime_scanner
@@ -1108,7 +1108,7 @@ def get_market_zscore():
         log_error(f'get_market_zscore: {e}')
         return "N/A"
 
-def get_prediction(token):
+def get_prediction(coin):
     """Get latest LLM candle prediction for token with per-token accuracy"""
     try:
         conn = sqlite3.connect('/root/.hermes/data/predictions.db')
@@ -1200,7 +1200,7 @@ def update_trade_prices():
     except Exception as e:
         print(f"⚠️ Price update error: {e}")
 
-def get_macd(token):
+def get_macd(coin):
     """Compute MACD from price_history in signals_hermes.db (Python, no node needed).
     Returns dict with signal, histogram, trend, confidence.
     EMA periods: fast=12, slow=26, signal=9 (standard MACD).
