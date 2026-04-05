@@ -486,50 +486,52 @@ def decide_inversion(token, direction, momentum_state, conn):
     """
     Decide whether to INVERT a prediction based on historical accuracy.
     Returns (final_direction, was_inverted, reason).
-    
-    Logic:
-    - Check if this direction has < 45% accuracy in this momentum_state
-    - If yes AND overall direction accuracy < 45%, invert it
-    - Special: NEVER invert UP predictions in bullish/neutral states (they have > 50% accuracy)
+
+    FIX (2026-04-05): Complete rewrite based on real prediction.db stats:
+    - UP is 60.5% accurate overall — NEVER invert UP (regardless of state)
+    - DOWN is 35% accurate overall — invert when down_performance < 40% in state
+    - The inversion must IMPROVE accuracy, not make it worse
+
+    Data-backed rules:
+    - UP: 64% bullish, 56% neutral, 0% bearish → always keep UP
+    - DOWN: 37% neutral, 38% bearish, 89% bullish → invert only in neutral/bearish
     """
     stats = get_accuracy_stats(conn, token, momentum_state)
+    state_data = stats.get('by_state', {})
+    overall_data = stats.get('overall', {})
 
-    # Use momentum_state-specific stats if available, otherwise overall
-    state_data = stats['by_state']
-    overall_data = stats['overall']
-
-    # Get accuracy for this direction in this state
+    # Get accuracy for this direction in this momentum_state
     state_acc = state_data.get(direction, {}).get('acc', None)
-    overall_acc = overall_data.get(direction, {}).get('acc', None)
+    overall_dir_acc = overall_data.get(direction, {}).get('acc', None)
+    state_sample = state_data.get(direction, {}).get('n', 0)
 
-    # If state-specific accuracy is available and below threshold, invert
-    should_invert = False
-    reason = ""
+    # ── RULE 1: NEVER INVERT UP ──────────────────────────────────────────────
+    # UP predictions are 60.5% accurate overall, 64% in bullish, 56% in neutral.
+    # Even in bearish (0% on 3 samples), the sample size is too small to justify inversion.
+    # The model should predict UP more often, not less.
+    if direction == 'UP':
+        return 'UP', False, "UP predictions are 60.5% accurate — never invert"
 
-    if state_acc is not None:
-        if state_acc < 45 and direction == 'DOWN':
-            # DOWN is consistently wrong in this state — invert
-            should_invert = True
-            reason = f"state_acc={state_acc:.1f}% < 45% in {momentum_state}"
-        elif state_acc < 40 and direction == 'UP':
-            should_invert = True
-            reason = f"state_acc={state_acc:.1f}% < 40% in {momentum_state}"
-    elif overall_acc is not None:
-        if overall_acc < 40 and direction == 'DOWN':
-            should_invert = True
-            reason = f"overall_acc={overall_acc:.1f}% < 40%"
-        elif overall_acc < 40 and direction == 'UP':
-            should_invert = True
-            reason = f"overall_acc={overall_acc:.1f}% < 40%"
+    # ── RULE 2: INVERT DOWN only when statistically justified ────────────────
+    # DOWN predictions: 35% overall, 38% in bearish, 37% in neutral, 89% in bullish
+    # Inverting DOWN→UP in bearish/neutral gives 63% accuracy (vs 35% raw).
+    # Only invert when:
+    #   a) We have enough samples (>=10) in this state to trust the accuracy
+    #   b) State accuracy is below 42% (improvement threshold)
+    #   c) Overall direction accuracy is also below 45% (confirm it's not just state noise)
+    if direction == 'DOWN':
+        if state_acc is not None and state_sample >= 10:
+            # Enough samples — use state-specific accuracy
+            if state_acc < 42 and (overall_dir_acc is None or overall_dir_acc < 45):
+                return 'UP', True, f"DOWN in {momentum_state}: acc={state_acc:.1f}% < 42%, overall_dir={overall_dir_acc:.1f}% — invert to UP"
+            return 'DOWN', False, f"DOWN in {momentum_state}: acc={state_acc:.1f}% >= 42% (n={state_sample})"
+        elif overall_dir_acc is not None and overall_dir_acc < 42:
+            # No state data — use overall DOWN accuracy
+            return 'UP', True, f"DOWN overall: acc={overall_dir_acc:.1f}% < 42% — invert to UP"
+        elif overall_dir_acc is not None and overall_dir_acc >= 42:
+            return 'DOWN', False, f"DOWN overall: acc={overall_dir_acc:.1f}% >= 42%, keep DOWN"
 
-    # NEVER invert UP in bullish or neutral state (UP has > 50% accuracy there)
-    if direction == 'UP' and momentum_state in ('bullish', 'neutral'):
-        should_invert = False
-        reason = "UP in bullish/neutral state has > 50% accuracy, never invert"
-
-    if should_invert:
-        return 'UP' if direction == 'DOWN' else 'DOWN', True, reason
-    return direction, False, reason
+    return direction, False, "insufficient data to decide inversion"
 
 
 # ── Data fetching (from signal_gen) ──────────────────────────────────────────
@@ -777,15 +779,18 @@ Consider: current momentum, regime, momentum_state, z-score direction, RSI level
 historical accuracy patterns, funding rates, volume.
 
 FEW-SHOT EXAMPLES (learn from these patterns):
-- If RSI < 35 in bullish regime → UP (oversold bounce, not continuation)
-- If RSI > 65 in bearish regime → DOWN (overbought rejection, not reversal)
-- If Z-score is decelerating from extreme → OPPOSITE direction (exhaustion)
-- If funding rate is deeply negative → UP (bearish sentiment, long squeeze)
+- bullish + RSI < 35 → UP (oversold bounce, continuation bias)
+- bearish + RSI > 65 → DOWN (overbought rejection, continuation bias)
+- bullish regime + DOWN predicted → KEEP DOWN (DOWN is 89% accurate in bullish!)
+- neutral/bearish + DOWN predicted → consider inversion (DOWN is only 37% accurate)
+- RSI near 50 in neutral → consider UP (markets mean-revert)
 
-IMPORTANT: This model historically underpredicts UP (only 1.6% of predictions).
-You MUST predict UP at least 20% of the time when conditions warrant it.
-If momentum is neutral and RSI is near 50 → default to UP (market mean-reverts).
-Never default to DOWN — it will be wrong more often than right.
+IMPORTANT: Your historical accuracy varies by regime and momentum_state.
+Real data from prediction.db:
+- UP: 60.5% overall, 64% bullish, 56% neutral — predict UP freely
+- DOWN: 35% overall, BUT 89% in bullish, 38% in bearish, 37% in neutral
+- When momentum is bearish/neutral AND you predict DOWN → the inversion (UP) is 63% accurate
+Trust momentum_state guidance — bearish means bearish continuation, not reversal.
 
 Respond STRICTLY in this format (one line each):
 DIRECTION: [UP or DOWN]
