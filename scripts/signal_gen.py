@@ -1850,6 +1850,11 @@ def run_confluence_detection(regime, long_mult, short_mult):
             # conf-2s: only 2 agreeing signals. Cap at 70%.
             boosted = min(70, base_avg * 1.25 * reversal_mult)
 
+        if num_signals < 2:
+            # Single-source — not confluence, skip. Let the individual signal type
+            # fire on its own if it's strong enough. conf-1s should never be created.
+            continue
+
         prices_dict = get_all_latest_prices()
         price = prices_dict.get(token, {}).get('price') if prices_dict else None
         if not price:

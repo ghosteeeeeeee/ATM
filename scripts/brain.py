@@ -288,6 +288,22 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                trailing_phase2_dist: float = None,
                leverage: int = 1, experiment: str = None):
     """Add a new trade to the trades table"""
+    # FIX (2026-04-05): Block conf-1s at the trades DB level — confluence means
+    # ≥2 signals agreeing. num_signals=1 is not confluence, it's a single source.
+    # This catches cases where the signal DB source passed the conf-1s block but
+    # the strategy field (Hermes-conf-1s) slipped through to the trades DB.
+    if strategy and strategy.startswith('Hermes-conf-'):
+        try:
+            num = int(strategy.split('-')[-1].rstrip('s'))
+            if num == 1:
+                print(f"✗ REJECTED: {token} {side_type} — conf-1s (single-source, min 2 required)")
+                print(f"  Signal: '{signal}' | Strategy: '{strategy}'")
+                return None
+        except (ValueError, IndexError):
+            pass
+    if signal == 'conf-1s':
+        print(f"✗ REJECTED: {token} {side_type} — conf-1s (single-source, min 2 required)")
+        return None
     # Pre-check: dont consume ID if trade already exists
     conn_check = get_db_connection()
     cur_check = conn_check.cursor()
