@@ -1717,8 +1717,8 @@ def _run_macd_signals_for_confluence():
 # detect tokens where ≥2 signal types agree and add a boosted confluence signal.
 # Confluence boosts: 2 agreeing signals → 1.25x, 3+ → 1.5x
 # Auto-approve: ≥CONFLUENCE_AUTO_APPROVE (85%) → no AI decider needed
-# This replicates the "conf-2s" / "conf-4s" / "conf-8s" pattern that OpenClaw
-# used successfully to filter noise and improve hit rate.
+# Confluence detection: tokens where ≥2 signal types agree within 1 hour.
+# Generates conf-2s / conf-3s signals for the hot-set pipeline.
 
 
 
@@ -1821,68 +1821,34 @@ def run_confluence_detection(regime, long_mult, short_mult):
         if not _in_hs:
             continue  # BLOCK — not in current hot-set
 
-        # Fetch per-source confidences from both DBs for accurate scoring.
-        # OpenClaw mtf- signals are floored at 70%.
-        # Hermes RSI/MACD contribute their actual confidence.
+        # Fetch per-source confidences from Hermes runtime DB only.
         conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
         cc = conn.cursor()
-        if os.path.exists('/root/.hermes/data/openclaw_signals.db'):
-            try:
-                cc.execute("ATTACH DATABASE '/root/.hermes/data/openclaw_signals.db' AS oc")
-            except Exception as e:
-                import traceback; traceback.print_exc()
-                print(f"[signal_gen] Non-fatal error: {e}")
         cc.execute('''
-            SELECT source, confidence FROM (
-                SELECT source, confidence FROM signals
-                WHERE token=? AND direction=? AND decision='PENDING'
-                AND created_at > datetime('now','-60 minutes')
-                AND source NOT LIKE 'mtf-%%'  -- Hermes signals only
-                UNION ALL
-                SELECT source, confidence FROM oc.signals
-                WHERE token=? AND direction=? AND decision='PENDING'
-                AND created_at > datetime('now','-30 minutes')  -- OC signals: stricter 30-min freshness
-                AND source LIKE 'mtf-%%'  -- OpenClaw mtf signals only
-            )
-        ''', (token, direction, token, direction))
+            SELECT source, confidence FROM signals
+            WHERE token=? AND direction=? AND decision='PENDING'
+            AND created_at > datetime('now','-60 minutes')
+        ''', (token, direction))
         all_rows = cc.fetchall()
         conn.close()
         if not all_rows:
             continue
 
-        # Separate and score
-        mtf_rows     = [(src, max(70, conf)) for src, conf in all_rows if src and src.startswith('mtf-')]
-        hermes_rows  = [(src, conf) for src, conf in all_rows if src and not src.startswith('mtf-')]
-        hermes_confs = [conf for _, conf in hermes_rows]
-        mtf_confs    = [conf for _, conf in mtf_rows]
-        hermes_avg   = statistics.mean(hermes_confs) if hermes_confs else 0
-        mtf_avg      = statistics.mean(mtf_confs) if mtf_confs else 0
-        # Take the HIGHER of hermes_avg vs mtf_avg, not the average.
-        # If only Hermes signals exist: base = hermes_avg.
-        # If only mtf signals exist: base = mtf_avg.
-        # If both exist: base = max(hermes_avg, mtf_avg) — the stronger signal wins.
-        base_avg     = max(hermes_avg, mtf_avg) if (hermes_avg or mtf_avg) else 0
-        mtf_sources_str    = ','.join(sorted(set(src for src, _ in mtf_rows))) if mtf_rows else 'none'
-        hermes_sources_str = ','.join(sorted(set(src for src, _ in hermes_rows))) if hermes_rows else 'none'
+        # Score all sources
+        all_confs = [conf for _, conf in all_rows]
+        base_avg = statistics.mean(all_confs) if all_confs else 0
+        sources_str = ','.join(sorted(set(src for src, _ in all_rows)))
 
         if base_avg < 35:
             continue
         # Sanity cap: no more than 3 agreeing signal types can contribute to a confluence.
-        # Any query returning >3 is a bug (OpenClaw ATTACH issue, stale archives, or
-        # counting sources instead of signal_types). Cap at 3 to prevent conf-4s, conf-10s, etc.
         num_signals = min(num_signals, 3)
 
         if num_signals >= 3:
             boosted = min(90, base_avg * 1.5 * reversal_mult)
         else:
             # conf-2s: only 2 agreeing signals. Cap at 70%.
-            # Two sources = weak confluence. Even with hmacd at 90%, pairing with
-            # a noisy secondary (pct-hermes at 35-50%) doesn't make a strong signal.
-            # Let ai-decider hot-set scoring decide if it's worth keeping.
             boosted = min(70, base_avg * 1.25 * reversal_mult)
-
-        mtf_sources    = mtf_sources_str
-        hermes_sources = hermes_sources_str
 
         prices_dict = get_all_latest_prices()
         price = prices_dict.get(token, {}).get('price') if prices_dict else None
@@ -1902,11 +1868,9 @@ def run_confluence_detection(regime, long_mult, short_mult):
 
         # Log full source breakdown for post-trade study — which combo worked?
         log(f'CONFLUENCE: {token} {direction} @{price:.6f} '
-            f'conf={boosted:.1f}% ({num_signals}s) '
-            f'mtf=[{mtf_sources}] hermes=[{hermes_sources}] '
-            f'mtf_avg={mtf_avg:.1f}% hermes_avg={hermes_avg:.1f}%')
+            f'conf={boosted:.1f}% ({num_signals}s) sources=[{sources_str}]')
         print(f'  CONFLUENCE {token:8s} {direction:5s} conf={boosted:5.1f}% ({num_signals}s) '
-              f'mtf=[{mtf_sources}] hermes=[{hermes_sources}]')
+              f'sources=[{sources_str}]')
 
         set_cooldown(token, direction, hours=1)
         confluences_added += 1

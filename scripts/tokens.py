@@ -86,13 +86,21 @@ TOKEN_BLACKLIST = {
 # ============================================
 
 def is_solana_only(token: str) -> bool:
-    """Check if token is Solana-only (Raydium, LONG only)."""
-    token = token.upper()
+    """Check if token is Solana-only (Raydium, LONG only).
+    FIX (2026-04-05):
+    1. Check Hyperliquid first — if it's on HL, it's not Solana-only.
+       This fixes cross-chain tokens (SUSHI, XMR, ZEN, DYDX, WLD, PEPE, SHIB, etc.)
+       being incorrectly blocked.
+    2. Unknown tokens (not in either list) default to NOT Solana-only —
+       let Hyperliquid's own availability check handle that.
+    """
+    token=token.upper()
+    # If it's on Hyperliquid (or excluded from it), it's not Solana-only
+    if token in HYPERLIQUID_TOKENS or token in HYPERLIQUID_EXCLUDE:
+        return False
     if token in SOLANA_ONLY_TOKENS:
         return True
-    # If not on Hyperliquid and not excluded, treat as Solana
-    if token not in HYPERLIQUID_TOKENS and token not in HYPERLIQUID_EXCLUDE:
-        return True
+    # Unknown tokens — don't auto-block. They might be on Hyperliquid.
     return False
 
 def is_hyperliquid(token: str) -> bool:

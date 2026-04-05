@@ -796,8 +796,8 @@ def is_token_open(token):
 def get_pending_signals():
     """Get PENDING signals from signals_hermes_runtime.db.
 
-    LIFO + confidence ordering: newest signals first, confidence breaks ties.
-    Only signals within 15 minutes are returned (auto-expired older ones).
+    FIX (2026-04-05): Extended window from 30min to 3 hours.
+    Signals with review_count>=1 are protected from expiry (handled by PURGE instead).
     Compacts the DB to top 20 signals on each call — AI picks which to keep
     based on freshness + confidence + agreement across indicators.
     """
@@ -805,13 +805,18 @@ def get_pending_signals():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # Compaction window: 30 minutes
-        # Signals older than 30 min without enough review_count are expired.
+        # Compaction window: 60 minutes (FIX 2026-04-05: extended from 30min)
+        # Signals older than 60 min that have never been reviewed (review_count=0)
+        # are expired — they arrived but ai_decider never got to them.
+        # IMPORTANT: signals with review_count>=1 are PROTECTED from expiry even if old.
+        # If ai_decider has seen a signal at least once, it has survival_score and
+        # the PURGE rule (compact_rounds >= 5) handles it instead.
         c.execute("""
             UPDATE signals
             SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
             WHERE decision = 'PENDING'
-              AND created_at < datetime('now', '-30 minutes')
+              AND created_at < datetime('now', '-60 minutes')
+              AND review_count = 0
         """)
         expired = c.rowcount
         conn.commit()
@@ -839,12 +844,15 @@ def get_pending_signals():
         if speed_tracker_ai is not None:
             speed_tracker_ai().update()
 
+        # FIX (2026-04-05): Extended from 30min to 3 hours to match the hot-set
+        # 3-hour window. Signals with review_count>=1 are protected by PURGE
+        # (compact_rounds >= 5) so they won't accumulate forever.
         c.execute("""
             SELECT id, token, direction, signal_type, confidence, source, created_at
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
-              AND created_at > datetime('now', '-30 minutes')
+              AND created_at > datetime('now', '-3 hours')
         """)
         candidates = c.fetchall()
         # Always score all candidates — this increments compact_rounds for EVERY signal

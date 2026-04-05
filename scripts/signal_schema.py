@@ -16,8 +16,8 @@ HERMES_DATA = os.environ.get('HERMES_DATA_DIR', '/root/.hermes/data')
 STATIC_DB   = os.path.join(HERMES_DATA, 'signals_hermes.db')
 RUNTIME_DB  = os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')
 
-# Legacy path — fall back to it if new DBs don't exist yet
-LEGACY_DB   = '/root/.openclaw/workspace/data/signals.db'
+# Legacy path (deprecated — kept for migration reference only)
+LEGACY_DB   = '/root/.openclaw/workspace/data/signals.db'  # noqa: F841
 
 def _get_conn(path, row_factory=False):
     conn = sqlite3.connect(path, timeout=30)
@@ -426,84 +426,31 @@ def expire_pending_signals(minutes=60):
 
 
 def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
-    """Return tokens where ≥min_signals PENDING signal types agree.
+    """Return tokens where ≥min_signals PENDING signal types agree (Hermes-only).
     Used by ai_decider / decider-run. Boosts confidence by 1.25x (2 signals)
     or 1.5x (3+ signals).
-
-    Sources signals from BOTH Hermes runtime DB AND OpenClaw's signals.db.
-    OpenClaw's multi-timeframe (mtf-*) signals are included via ATTACH so
-    they can combine with Hermes RSI/MACD signals in confluence detection.
-
-    Args:
-        signal_types: optional list of signal_type strings to filter.
-                      e.g. ['rsi_confluence', 'macd_confluence'] to exclude 'momentum'.
     """
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
 
-    # Attach OpenClaw's signals.db so we can query both DBs together.
-    # OpenClaw signals have source='mtf-*' and signal_type='mtf_macd'.
-    # Hermes signals have source='mtf-*' and signal_type='momentum'.
-    # FAST PATH: skip ATTACH entirely if OpenClaw has no signals (common case).
-    _openclaw_has_signals = False
-    if os.path.exists(LEGACY_DB):
-        try:
-            lc = sqlite3.connect(LEGACY_DB, timeout=3).cursor()
-            row = lc.execute("SELECT 1 FROM signals LIMIT 1").fetchone()
-            _openclaw_has_signals = row is not None
-        except Exception:
-            _openclaw_has_signals = False
-        if _openclaw_has_signals:
-            try:
-                c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
-            except sqlite3.IntegrityError:
-                pass  # Already attached — safe to ignore
-            except sqlite3.OperationalError as e:
-                if "already exists" not in str(e):
-                    print(f"WARNING: Could not attach {LEGACY_DB}: {e}")
-            except Exception as e:
-                print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
-
     # Build dynamic WHERE clause for signal_type filter
     st_list = list(signal_types) if signal_types else []
 
-    # Build the CTE dynamically — skip OpenClaw UNION if it has no signals.
-    hermes_select = f"""
+    hermes_select = """
         SELECT token, direction, signal_type, source, confidence, price,
-               z_score, rsi_14, macd_hist,
-               'hermes' as db_source
+               z_score, rsi_14, macd_hist
         FROM signals
         WHERE decision='PENDING'
         AND created_at > datetime('now','-'||?||' hours')
-        {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if st_list else ""}
     """
-    oc_select = f"""
-        UNION ALL
-        SELECT token, direction, signal_type, source, confidence, price,
-               z_score, rsi_14, macd_hist,
-               'openclaw' as db_source
-        FROM oc.signals
-        WHERE decision='PENDING'
-        AND created_at > datetime('now','-'||?||' hours')
-        {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if st_list else ""}
-    """
+    if st_list:
+        hermes_select += " AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
 
-    if _openclaw_has_signals:
-        cte_body = hermes_select + oc_select
-        if st_list:
-            params = (hours,) + tuple(st_list) + (hours,) + tuple(st_list) + (min_signals,)
-        else:
-            params = (hours, hours, min_signals)
-    else:
-        cte_body = hermes_select
-        if st_list:
-            params = (hours,) + tuple(st_list) + (min_signals,)
-        else:
-            params = (hours, min_signals)
+    params = (hours,) + tuple(st_list) if st_list else (hours,)
 
     query = f"""
         WITH all_signals AS (
-            {cte_body.strip()}
+            {hermes_select}
         )
         SELECT token, direction,
                COUNT(DISTINCT signal_type) as num_types,
@@ -511,7 +458,6 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
                AVG(confidence) as avg_conf,
                MAX(confidence) as max_conf,
                GROUP_CONCAT(DISTINCT signal_type) as types,
-               GROUP_CONCAT(DISTINCT db_source) as db_sources,
                GROUP_CONCAT(DISTINCT source) as all_sources,
                MAX(price) as price,
                MAX(z_score) as z_score,
@@ -521,7 +467,7 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
         HAVING COUNT(DISTINCT signal_type) >= ?
         ORDER BY avg_conf DESC
     """
-    c.execute(query, params)
+    c.execute(query, params + (min_signals,))
     results = []
     for r in c.fetchall():
         d = dict(r)
@@ -530,14 +476,8 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
         d['num_agreeing'] = d['num_types']
         if d.get('types'):
             d['signal_types'] = d['types'].split(',')
-        # Track OpenClaw vs Hermes sources for study logging
         if d.get('all_sources'):
-            all_srcs = d['all_sources'].split(',')
-            d['openclaw_sources'] = sorted(s for s in all_srcs if s.startswith('mtf-'))
-            d['hermes_sources']   = sorted(s for s in all_srcs if not s.startswith('mtf-'))
-        if d.get('db_sources'):
-            d['has_openclaw'] = 'openclaw' in d['db_sources']
-            d['has_hermes']   = 'hermes'   in d['db_sources']
+            d['hermes_sources'] = sorted(d['all_sources'].split(','))
         # BUG-12 fix: validate top-level source field against whitelist
         top_source = d.get('all_sources', '').split(',')[0] if d.get('all_sources') else ''
         d['source'] = validate_source(top_source) if top_source else 'unknown'
@@ -665,18 +605,6 @@ def get_approved_signals(hours=24):
     """
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
-
-    # Attach OpenClaw DB for hot-set compact_rounds lookup
-    if os.path.exists(LEGACY_DB):
-        try:
-            c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
-        except sqlite3.IntegrityError:
-            pass  # Already attached — safe to ignore
-        except sqlite3.OperationalError as e:
-            if "already exists" not in str(e):
-                print(f"WARNING: Could not attach {LEGACY_DB}: {e}")
-        except Exception as e:
-            print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
 
     # BUG-26 fix: select id so callers can do atomic claim with signal_id
     c.execute('''
