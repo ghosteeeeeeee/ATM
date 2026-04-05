@@ -79,7 +79,7 @@ def main():
 
     # Note: --short=HEAD fails in this env, use pipe instead
     commit = sh("git", "rev-parse", "HEAD")[0:7]
-    ts = time.strftime("%Y%m%d-%H%M")
+    ts = time.strftime("%Y%m%d-%H%M%S")
     full_zip = f"/tmp/ATM-Hermes-{ts}-full-{commit}.zip"
     # Use tag with commit to prevent collision on re-runs
     tag_name = f"v{commit}-{ts}"
