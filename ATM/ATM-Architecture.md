@@ -42,9 +42,6 @@ position_manager.py          ──→ trailing stops, stale winner/loser exits,
     │                              ro-trailing-stop.service (Dallas, Python only)
     │
     ▼
-hl-sync-guardian.py         ──→ background service (60s interval)
-    │                              reconciles HL positions ↔ paper DB
-    │                              marks guardian_missing / hl_position_missing closes
 hermes-trades-api.py        ──→ writes signals.json for web dashboard
 ```
 
