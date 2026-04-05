@@ -1076,26 +1076,35 @@ def get_pending_signals():
                 c_hot = conn.cursor()
                 # Deduplicate by token+direction, keeping the row with highest survival_score
                 # This prevents duplicate entries (e.g., BTC appearing twice with 94.5% and 90.0%)
+                # FIX (2026-04-05): GROUP BY token+direction to prevent duplicates.
+                # Same token+direction with multiple signal_types (mtf_zscore+mtf_macd both
+                # agreeing = confluence) should appear as ONE row with max confidence.
+                # JOIN + ORDER BY alone still returns duplicates when survival_scores tie.
                 c_hot.execute("""
-                    SELECT s.token, s.direction, s.signal_type, s.confidence, s.compact_rounds,
-                           s.survival_score, s.z_score_tier, s.z_score, s.review_count
-                    FROM signals s
-                    INNER JOIN (
-                        SELECT token, direction, MAX(survival_score) as max_ss
-                        FROM signals
-                        WHERE decision = 'PENDING'
-                          AND executed = 0
-                          AND review_count >= 1
-                          AND created_at > datetime('now', '-3 hours')
-                        GROUP BY token, direction
-                    ) best ON s.token = best.token
-                       AND s.direction = best.direction
-                       AND s.survival_score = best.max_ss
-                    WHERE s.decision = 'PENDING'
-                      AND s.executed = 0
-                      AND s.review_count >= 1
-                      AND s.created_at > datetime('now', '-3 hours')
-                    ORDER BY best.max_ss DESC, s.confidence DESC
+                    SELECT token, direction,
+                           -- Best signal_type = the one with highest confidence
+                           (SELECT signal_type FROM signals s2
+                            WHERE s2.token=signals.token
+                              AND s2.direction=signals.direction
+                              AND s2.decision IN ('PENDING','APPROVED')
+                              AND s2.executed=0
+                              AND s2.review_count>=1
+                              AND s2.created_at > datetime('now','-3 hours')
+                            ORDER BY s2.confidence DESC LIMIT 1) as signal_type,
+                           MAX(confidence) as confidence,
+                           MAX(compact_rounds) as compact_rounds,
+                           MAX(survival_score) as survival_score,
+                           MAX(z_score_tier) as z_score_tier,
+                           MAX(z_score) as z_score,
+                           MAX(review_count) as review_count
+                    FROM signals
+                    WHERE decision IN ('PENDING', 'APPROVED')
+                      AND executed = 0
+                      AND review_count >= 1
+                      AND created_at > datetime('now', '-3 hours')
+                    GROUP BY token, direction
+                    HAVING MAX(confidence) >= 50
+                    ORDER BY MAX(survival_score) DESC, MAX(confidence) DESC
                     LIMIT 50
                 """)
                 hot_rows = c_hot.fetchall()
