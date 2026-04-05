@@ -719,13 +719,18 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         fee_total = entry_fee_paid + exit_fee
 
         # Calculate pnl_usdt at close (direction-aware)
+        # pnl_pct = raw % price change (e.g., 10 = 10% move)
+        # pnl_usdt = amount_usdt * |pnl_pct|/100 (proportional to actual capital, NO leverage)
+        # NOTE: leverage is already embedded in the % change when using notional PnL from HL,
+        # but here pnl_pct is raw market return so we don't double-apply leverage.
         if direction == 'LONG':
             pnl_pct = ((current_price - entry_price) / entry_price * 100) if entry_price > 0 else 0
         else:
             pnl_pct = ((entry_price - current_price) / entry_price * 100) if entry_price > 0 else 0
-        pnl_usdt = amount_usdt * leverage * (pnl_pct / 100)
+        pnl_usdt = amount_usdt * (abs(pnl_pct) / 100) * (1 if pnl_pct >= 0 else -1)
+        pnl_usdt_val = float(pnl_usdt or 0)
 
-        # Net PnL after fees (use corrected pnl_usdt_val)
+        # Net PnL after fees
         net_pnl = pnl_usdt_val - fee_total
 
         # ── Trigger loss cooldown (incremental: 2h → 4h → 8h per consecutive loss) ──
@@ -733,14 +738,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # (e.g. "trailing_exit_-0.55%"), use that to determine loss/win.
         # close_paper_position() uses current_price which may have reverted to entry
         # by the time the exit is processed, losing the realized PnL info.
-        pnl_usdt_val = float(pnl_usdt or 0)
         if pnl_usdt_val == 0 and reason:
             import re
             m = re.search(r'([+-]\d+\.\d+)%', reason)
             if m:
                 pnl_pct_from_reason = float(m.group(1))
                 # pnl_pct_from_reason is the realized pnl% at time of exit
-                pnl_usdt_val = amount_usdt * leverage * (pnl_pct_from_reason / 100)
+                pnl_usdt_val = amount_usdt * (abs(pnl_pct_from_reason) / 100) * (1 if pnl_pct_from_reason >= 0 else -1)
                 pnl_pct = pnl_pct_from_reason  # also correct the stored pnl_pct
         is_loss = pnl_usdt_val < 0
         if is_loss:

@@ -1313,7 +1313,7 @@ def run(dry_run=False):
 
         success, msg = execute_trade(
             token, direction, price, confidence, source,
-            leverage=lev, sl_pct=sl_pct,
+            leverage=lev, paper=paper, sl_pct=sl_pct,
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',

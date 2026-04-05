@@ -1514,7 +1514,7 @@ def _run_mtf_macd_signals():
                 elif xo_dir == 0 and h > 0:  # no crossover, but MACD above signal
                     bullish_tfs += 1
             total_tfs   = len(valid)
-            direction   = 'LONG' if bullish_tfs > total_tfs else 'SHORT'
+            direction   = 'LONG' if bullish_tfs >= total_tfs else 'SHORT'
             strength    = bullish_tfs  # weighted count
             timeframe_str = f'{min(bullish_tfs, total_tfs*2)}tf+'
         elif len(valid) == 1:
