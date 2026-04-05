@@ -1316,7 +1316,7 @@ def _run_rsi_signals_for_confluence():
             if is_delisted(token.upper()):
                 continue
             conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
-            if conf < ENTRY_THRESHOLD and not (rsi > 85):
+            if conf < SHORT_ENTRY_THRESHOLD and not (rsi > 85):
                 continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
@@ -1525,6 +1525,8 @@ def _run_mtf_macd_signals():
             elif xo_dir == -1:
                 direction = 'SHORT'; strength = 2
             else:
+                if h == 0:
+                    continue  # no crossover, flat histogram — no momentum
                 direction = 'LONG' if h > 0 else 'SHORT'; strength = 1
             timeframe_str = tf
         else:
@@ -1535,6 +1537,9 @@ def _run_mtf_macd_signals():
             if avg_z is None or avg_z > LONG_1H_Z_MAX:
                 continue
         else:
+            # Don't SHORT extremely suppressed tokens — mean reversion targets
+            if avg_z is not None and avg_z < -0.5:
+                continue
             if token.upper() in SHORT_BLACKLIST:
                 continue
 

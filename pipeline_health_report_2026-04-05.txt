@@ -1,0 +1,156 @@
+============================================================
+  PIPELINE HEALTH REPORT — 2026-04-05 06:01
+============================================================
+
+## SIGNAL FUNNEL SUMMARY
+
+  Total signals:     654  (all generated ~05:23-06:00 today)
+  PENDING:          336  (51.4%)  avg_conf=70.2
+  EXPIRED:          247  (37.8%)  avg_conf=71.0  ← HIGH expiry rate
+  WAIT:              32  (4.9%)   avg_conf=83.4
+  EXECUTED:         31  (4.7%)   avg_conf=82.4
+  APPROVED:           6  (0.9%)   avg_conf=83.2  ← stuck
+  SKIPPED:            2  (0.3%)   avg_conf=86.8
+
+  Execution rate: 4.7% of all signals → 1 in 21 signals executes
+
+============================================================
+## CRITICAL FINDINGS
+============================================================
+
+### [CRITICAL-1] Directional Bias — 3 signal types are 1-directional
+
+  mtf_macd:       SHORT=233  LONG=0    ratio=∞ (ALL SHORT, zero LONG)
+  rsi_confluence: SHORT=0    LONG=35   ratio=0.00 (ALL LONG, zero SHORT)
+  percentile_rank:SHORT=13   LONG=135  ratio=0.10 (10:1 LONG bias)
+  velocity:       SHORT=10   LONG=0    ratio=∞ (ALL SHORT)
+  mtf_zscore:     SHORT=50   LONG=167  ratio=0.30 (3:1 LONG bias)
+  macd_confluence:SHORT=6    LONG=5    ratio=1.20 (OK)
+
+  → mtf_macd has generated 233 SHORT signals with ZERO LONG.
+    This is clearly a bug, not market conditions.
+  → rsi_confluence: 35 LONG signals, zero SHORT (all conf=50.0)
+  → velocity: 10 SHORT signals, zero LONG
+
+### [CRITICAL-2] Signals Expiring Before Execution
+
+  EXPIRED: 247 (37.8%) — avg age at expiry: ~0.2-0.6h
+  avg_conf EXPIRED (71.0) ≈ avg_conf PENDING (70.2) — same quality, just dying
+
+  Worst offender: mtf_macd SHORT — 88 expired, avg_conf=62.6
+  While 14 mtf_macd SHORT executed at avg_conf=90.2
+
+  PENDING still has 114 mtf_macd SHORT at avg_conf=66.3 aging
+  → These will likely expire before reaching execution
+
+  TTL appears to be ~1h based on age data. Signals that get
+  WAIT/APPROVED status don't expire, but high-quality PENDING signals
+  are expiring before the executor picks them up.
+
+### [CRITICAL-3] BABY Signals Bottlenecked — 6 APPROVED, 0 Executed
+
+  BABY SHORT (6 signals) has been APPROVED for 0.2-0.5h with:
+    - mtf_macd SHORT    conf=95  APPROVED  age=0.5h  ← oldest
+    - percentile_rank SHORT conf=75 APPROVED  age=0.5h
+    - mtf_zscore SHORT  conf=80  APPROVED  age=0.5h
+    - mtf_macd SHORT    conf=94  APPROVED  age=0.2h
+    - percentile_rank SHORT conf=75 APPROVED  age=0.2h
+    - mtf_zscore SHORT  conf=80  APPROVED  age=0.2h
+
+  All others (ATOM, AAVE, BLUR, etc.) still PENDING (not yet approved)
+  BABY has the highest conf (95) but hasn't executed in 30 min.
+  → Approver or executor is stuck on BABY — investigate decider-run
+
+### [HIGH-1] Execution Quality Paradox
+
+  EXECUTED avg_conf=82.4, PENDING avg_conf=70.2 — executor IS picking
+  the higher-quality signals. GOOD.
+
+  BUT: mtf_zscore LONG — EXPIRED avg_conf=79.9 > EXECUTED avg_conf=79.6
+  The executor rejected a slightly higher-conf signal in favor of a
+  marginally lower-conf one. Minor but worth noting.
+
+### [HIGH-2] WAIT Signals Not Processing
+
+  32 signals in WAIT with avg_conf=83.4 — highest conf of any bucket
+  WAIT means "market conditions not right yet" — these are correct signals
+  waiting for a price trigger.
+
+  BUT they are aging faster than PENDING signals (0.2-0.5h) and may
+  expire before conditions become favorable.
+
+============================================================
+## WHAT'S WORKING WELL
+============================================================
+
+  ✓ Pipeline is fresh — 654 signals generated in last 37 min
+  ✓ All-time P&L positive — +$0.85, 50% WR over 12 closed trades
+  ✓ SHORT direction profitable — 55.6% WR, +$0.92
+  ✓ No corrupted entry prices in current open positions
+  ✓ 8 open positions confirmed on HL, all SHORT
+  ✓ Price sanity check fixes just applied (decider-run.py + signal_gen.py)
+  ✓ 30 corrupted closed trades removed from DB
+  ✓ Orphaned paper/brain entries cleaned
+
+============================================================
+## TRADE PERFORMANCE (PostgreSQL)
+============================================================
+
+  All time:   12 trades  WR=50%  Net=+$0.85
+  30 days:    12 trades  WR=50%  Net=+$0.85
+
+  By direction:
+    SHORT:  9 trades  WR=55.6%  Net=+$0.92
+    LONG:   3 trades  WR=33.3%  Net=-$0.07
+
+  By signal type:
+    conf-1s SHORT:  8 trades  Net=+$0.92  avg=+$0.12
+    conf-2s LONG:   2 trades  Net=-$0.12  avg=-$0.06
+
+  All closed trades are "conf" type (conf-1s, conf-2s) — no direct
+  mtf_macd / mtf_zscore / percentile_rank executions observed in the
+  12 closed trades.
+
+  Open positions (8, all SHORT on HL):
+    ASTER, MORPHO, SKY, TRX, TST, UNI, ZEC, ZORA
+
+============================================================
+## RECOMMENDATIONS (Priority Order)
+============================================================
+
+  1. [CRITICAL] Fix mtf_macd directional bias (233 SHORT, 0 LONG)
+     → Root cause likely in _run_mtf_macd_signals() where price comparison
+       logic inverts direction. Check signal_gen.py around line 1316.
+
+  2. [CRITICAL] Fix rsi_confluence (35 LONG, 0 SHORT) and velocity
+     (10 SHORT, 0 LONG) directional bias — these are clearly broken.
+
+  3. [CRITICAL] Investigate BABY APPROVED bottleneck — 6 signals approved
+     0.2-0.5h ago, none executed. Check decider-run execution loop
+     for why APPROVED signals aren't progressing to EXECUTED.
+
+  4. [HIGH] TTL review — 37.8% expiry rate is too high. Current TTL
+     appears to be ~1h. Consider increasing to 4-6h for PENDING signals
+     given the review workflow cadence.
+
+  5. [HIGH] WAIT signal aging — 32 signals stuck in WAIT with 83.4%
+     avg conf. Either expand the wait conditions or let them expire
+     gracefully rather than consuming pipeline slots.
+
+  6. [MEDIUM] The APPROVED queue (6 signals) should be checked every
+     cycle, not just when new signals arrive. Add a periodic flush.
+
+============================================================
+## CHANGES MADE THIS SESSION
+============================================================
+
+  1. signal_gen.py — added is_reasonable_price() checks at 4 choke points
+     to block corrupted $10.x entry prices from entering signal DB
+  2. decider-run.py — added pre-execution price sanity check (>5x vs
+     cached, absolute bounds) to skip execution of corrupted signals
+  3. PostgreSQL — deleted 30 corrupted closed trades (entry ~$10.x,
+     exit cents) plus AAVE LONG (entry corrupted)
+  4. Orphan cleanup — removed NIL SHORT, S LONG from paper+brain
+  5. Live trading remains OFF (hype_live_trading.json = OFF)
+
+============================================================
