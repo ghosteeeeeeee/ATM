@@ -260,20 +260,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                exchange='hyperliquid', timeframe='1h', z_score=None, z_score_tier=None,
                momentum_state=None, rsi_14=None, macd_value=None, macd_signal=None,
                macd_hist=None, leverage=None, **kwargs):
-    """Add a new signal. Combines with existing PENDING signal for same token+direction+signal_type
-    within 30 min — takes max confidence, merges sources list.
-    
-    KEY FIX: Only merges signals with the SAME signal_type. Different signal_types
-    (e.g. 'rsi_confluence' vs 'macd_confluence') always create SEPARATE rows so that
-    get_confluence_signals() can detect them as distinct agreeing indicators.
-    
+    """Add a new signal. ONE row per token+direction (all signal_types merged).
+
+    FIX (2026-04-05): Changed from merge-by-token+direction+signal_type to
+    merge-by-token+direction. All signal_types for the same token+direction now
+    consolidate into ONE row with:
+    - signal_types column: comma-separated list of all contributing types
+    - confidence: max of all contributing signals
+    - source: comma-separated list of all sources
+    - confluence bonus: +5% per distinct signal_type (max +20%)
+
+    This eliminates duplicate rows and ensures one-row-per-token-direction from birth.
+
     MINIMUM CONFIDENCE FLOOR: Signals with confidence below 50 are silently rejected.
     The AI decider requires ≥50% confidence to execute. Individual signals below this
     threshold generate noise without ever reaching execution — they just create WAIT
     records. This floor prevents signal spam from low-quality indicators."""
     # ── Minimum confidence floor ─────────────────────────────────────────────
-    # Reject signals below 50% — AI decider needs ≥50% to act, so lower signals
-    # are pure noise that create stale WAIT records (Issue 2 fix).
     MIN_CONFIDENCE_FLOOR = 50
     if confidence < MIN_CONFIDENCE_FLOOR:
         return None  # Silently skip low-confidence signals
@@ -281,81 +284,104 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
-        # ── CONFLICT GUARD (FIX 2026-04-05) ─────────────────────────────────────
+        token = token.upper()
+        direction = direction.upper()
+
+        # ── CONFLICT GUARD ─────────────────────────────────────────────────────
         # Before writing any new signal, expire any OPPOSITE-direction signals
-        # for this token (both PENDING and APPROVED). This prevents:
-        # 1. mtf_zscore and mtf_macd from simultaneously writing LONG+SHORT
-        # 2. A new signal from creating an opposite APPROVED that survives
-        #    alongside an existing opposite APPROVED (ICP SHORT + LONG problem).
-        # Only expires signals from the last 3 hours — older signals from
-        # previous market regimes are allowed to stand.
-        opp_dir = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
+        # for this token (both PENDING and APPROVED). This prevents a new signal
+        # from creating an opposite direction that survives alongside the existing one.
+        opp_dir = 'SHORT' if direction == 'LONG' else 'LONG'
         c.execute('''
             UPDATE signals
             SET decision='EXPIRED', executed=1, updated_at=CURRENT_TIMESTAMP
             WHERE token=? AND direction=? AND executed=0
               AND decision IN ('PENDING', 'APPROVED')
               AND created_at > datetime('now', '-3 hours')
-        ''', (token.upper(), opp_dir))
+        ''', (token, opp_dir))
         if c.rowcount > 0:
             print(f'  🗑️ [CONFLICT-GUARD] expired {c.rowcount} {opp_dir} signals for {token} (new: {direction})')
 
-        # Check for existing PENDING signal for SAME token+direction+signal_type in last 30 min
-        # Only merge identical signal_type so that RSI+MACD create distinct rows → confluence detection works
+        # ── MERGE by token+direction (not token+direction+signal_type) ─────────
+        # Check for existing PENDING signal for same token+direction in last 30 min
         c.execute('''
-            SELECT id, source, confidence FROM signals
-            WHERE token=? AND direction=? AND signal_type=? AND executed=0 AND decision='PENDING'
-            AND created_at > datetime('now', '-30 minutes')
+            SELECT id, source, signal_types, confidence,
+                   z_score, z_score_tier, rsi_14, macd_value, macd_signal, macd_hist
+            FROM signals
+            WHERE token=? AND direction=? AND executed=0 AND decision='PENDING'
+              AND created_at > datetime('now', '-30 minutes')
             LIMIT 1
-        ''', (token.upper(), direction.upper(), signal_type))
+        ''', (token, direction))
         existing = c.fetchone()
         if existing:
-            sig_id, existing_source, existing_conf = existing
-            old_sources = set(existing_source.split('+'))
-            new_sources_set = set(source.split('+'))
-            all_sources = old_sources | new_sources_set
-            new_sources = '+'.join(sorted(all_sources))
-            num_sources_gained = len(new_sources_set - old_sources)
+            sig_id, existing_source, existing_types, existing_conf = existing[0], existing[1], existing[2], existing[3]
+            existing_z = existing[4]; existing_z_tier = existing[5]
+            existing_rsi = existing[6]; existing_macd = existing[7]
+            existing_sig = existing[8]; existing_hist = existing[9]
+
+            # Build merged sources
+            old_srcs = set(existing_source.split(',')) if existing_source else set()
+            new_srcs = set(source.split(',')) if source else set()
+            all_srcs = old_srcs | new_srcs
+            merged_sources = ','.join(sorted(all_srcs))
+
+            # Build merged signal_types
+            old_types = set(existing_types.split(',')) if existing_types else set()
+            new_types = {signal_type}
+            all_types = old_types | new_types
+            merged_types = ','.join(sorted(all_types))
+            num_types = len(all_types)
+
+            num_srcs_gained = len(new_srcs - old_srcs)
 
             if confidence < existing_conf:
-                # Declining confidence: penalize. Reduce by 40% of the drop + credit for new sources.
                 decay = (existing_conf - confidence) * 0.4
-                new_conf = max(existing_conf - decay + (num_sources_gained * 1.0), min(existing_conf, confidence))
+                new_conf = max(existing_conf - decay + (num_srcs_gained * 1.0), min(existing_conf, confidence))
                 new_conf = max(1, min(99, new_conf))
             else:
-                # Rising or equal confidence: boost for new sources, take max
                 new_conf = max(existing_conf, confidence)
-                if num_sources_gained > 0:
-                    new_conf = min(100, new_conf + min(num_sources_gained, 2))
+                if num_srcs_gained > 0:
+                    new_conf = min(100, new_conf + min(num_srcs_gained, 2))
+                # Confluence bonus: +5% per new distinct signal_type
+                if num_types > 1:
+                    new_conf = min(100, new_conf + min(5 * num_types, 20))
 
+            # Keep most recent indicator values (update to latest)
             c.execute('''
-                UPDATE signals SET confidence=?, source=?, updated_at=CURRENT_TIMESTAMP
+                UPDATE signals SET
+                    confidence=?, source=?, signal_types=?,
+                    z_score=?, z_score_tier=?, rsi_14=?,
+                    macd_value=?, macd_signal=?, macd_hist=?,
+                    updated_at=CURRENT_TIMESTAMP
                 WHERE id=?
-            ''', (new_conf, new_sources, sig_id))
+            ''', (new_conf, merged_sources, merged_types,
+                  z_score, z_score_tier, rsi_14,
+                  macd_value, macd_signal, macd_hist,
+                  sig_id))
             conn.commit()
             conn.close()
-            return sig_id  # return existing signal id (updated)
+            return sig_id
+
         # No existing — insert new
-        # FIX (2026-04-02): Reset hot_cycle_count when new signal arrives.
-        # If a token has APPROVED signals stuck waiting to execute, a new signal means
-        # conditions changed — fresh data. Reset the de-escalation counter so the new
-        # signal doesn't inherit the stuck one's history.
+        # Reset hot_cycle_count so a new signal doesn't inherit stuck signal's history
         c.execute("""
             UPDATE signals
             SET hot_cycle_count = 0
-            WHERE token = ? AND direction = ?
+            WHERE token=? AND direction=?
               AND decision IN ('PENDING', 'APPROVED', 'WAIT')
               AND executed = 0
-        """, (token.upper(), direction.upper()))
+        """, (token, direction))
+
         c.execute('''
             INSERT INTO signals
-            (token, direction, signal_type, source, confidence, value, price,
+            (token, direction, signal_type, source, signal_types, confidence, value, price,
              exchange, timeframe, z_score, z_score_tier, momentum_state,
              rsi_14, macd_value, macd_signal, macd_hist, decision, executed, leverage,
              hot_cycle_count, counter_detected)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0)
-        ''', (token.upper(), direction.upper(), signal_type, source, confidence, value,
-              price, exchange, timeframe, z_score, z_score_tier, momentum_state,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0)
+        ''', (token, direction, signal_type, source, signal_type,
+              confidence, value, price, exchange, timeframe,
+              z_score, z_score_tier, momentum_state,
               rsi_14, macd_value, macd_signal, macd_hist, leverage))
         conn.commit()
         sid = c.lastrowid
@@ -448,29 +474,126 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     """Return tokens where ≥min_signals PENDING signal types agree (Hermes-only).
     Used by ai_decider / decider-run. Boosts confidence by 1.25x (2 signals)
     or 1.5x (3+ signals).
-    """
+
+    FIX (2026-04-05): After the add_signal merge-by-token+direction fix,
+    PENDING rows are now ONE per token+direction with all signal_types in the
+    signal_types column. This function detects that and uses the column directly.
+    Legacy rows (NULL signal_types) fall back to GROUP BY COUNT approach."""
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
 
-    # Build dynamic WHERE clause for signal_type filter
     st_list = list(signal_types) if signal_types else []
 
+    # New approach (2026-04-05+): signal_types column is pre-populated by add_signal.
+    # Count types by splitting the comma-separated signal_types column.
+    # SQLite: use xml_table trick or simple string manipulation.
+    # Safer: use a subquery that counts commas + 1.
+    new_query = f"""
+        SELECT
+            token, direction,
+            signal_types,
+            -- Count types in signal_types column: number of commas + 1
+            (LENGTH(signal_types) - LENGTH(REPLACE(signal_types, ',', '')) + 1) as num_types,
+            confidence as avg_conf,
+            confidence as max_conf,
+            signal_type as types,       -- legacy compat: single type
+            source as all_sources,
+            price,
+            z_score,
+            rsi_14,
+            1 as use_merged
+        FROM signals
+        WHERE decision='PENDING'
+          AND signal_types IS NOT NULL AND signal_types != ''
+          AND created_at > datetime('now','-'||?||' hours')
+    """
+    # Legacy approach: GROUP BY for rows without signal_types
+    legacy_select = f"""
+        SELECT token, direction,
+               COUNT(DISTINCT signal_type) as num_types,
+               COUNT(*) as total_rows,
+               AVG(confidence) as avg_conf,
+               MAX(confidence) as max_conf,
+               GROUP_CONCAT(DISTINCT signal_type) as types,
+               GROUP_CONCAT(DISTINCT source) as all_sources,
+               MAX(price) as price,
+               MAX(z_score) as z_score,
+               MAX(rsi_14) as rsi_14,
+               0 as use_merged
+        FROM signals
+        WHERE decision='PENDING'
+          AND (signal_types IS NULL OR signal_types = '')
+          AND created_at > datetime('now','-'||?||' hours')
+        GROUP BY token, direction
+    """
+
+    params = (hours,) + tuple(st_list) if st_list else (hours,)
+    legacy_params = params
+
+    if st_list:
+        st_placeholder = " AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
+        new_query += st_placeholder
+        legacy_select += st_placeholder
+        params = (hours,) + tuple(st_list)
+        legacy_params = params
+
+    new_query += f"\nUNION ALL\n{legacy_select}"
+
+    try:
+        c.execute(new_query, params + legacy_params)
+        results_raw = c.fetchall()
+    except Exception as e:
+        # Fallback: legacy GROUP BY only
+        conn.close()
+        return _get_confluence_signals_legacy(hours, min_signals, signal_types)
+
+    results = []
+    for r in c.fetchall():
+        d = dict(r)
+        num_types = d.get('num_types', 1) or 1
+        mult = 1.5 if num_types >= 3 else 1.25 if num_types == 2 else 1.0
+        avg_conf = d.get('avg_conf', 0) or 0
+        d['final_confidence'] = min(99, avg_conf * mult)
+        d['num_agreeing'] = num_types
+        # Parse signal_types from column
+        st_col = d.get('signal_types', '')
+        if st_col:
+            d['signal_types_list'] = [t.strip() for t in st_col.split(',') if t.strip()]
+            d['signal_types'] = d['signal_types_list']
+        else:
+            types_str = d.get('types', '')
+            d['signal_types'] = types_str.split(',') if types_str else []
+        # Legacy compat
+        all_srcs = d.get('all_sources', '')
+        if all_srcs:
+            d['hermes_sources'] = sorted(all_srcs.split(','))
+        top_source = all_srcs.split(',')[0] if all_srcs else ''
+        d['source'] = validate_source(top_source) if top_source else 'unknown'
+        if num_types >= min_signals:
+            results.append(d)
+
+    conn.close()
+    return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+
+
+def _get_confluence_signals_legacy(hours=24, min_signals=2, signal_types=None):
+    """Fallback for legacy rows without signal_types column populated."""
+    conn = _get_conn(_runtime(), row_factory=True)
+    c = conn.cursor()
+    st_list = list(signal_types) if signal_types else []
     hermes_select = """
         SELECT token, direction, signal_type, source, confidence, price,
                z_score, rsi_14, macd_hist
         FROM signals
         WHERE decision='PENDING'
-        AND created_at > datetime('now','-'||?||' hours')
+          AND (signal_types IS NULL OR signal_types = '')
+          AND created_at > datetime('now','-'||?||' hours')
     """
     if st_list:
         hermes_select += " AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
-
     params = (hours,) + tuple(st_list) if st_list else (hours,)
-
     query = f"""
-        WITH all_signals AS (
-            {hermes_select}
-        )
+        WITH all_signals AS ({hermes_select})
         SELECT token, direction,
                COUNT(DISTINCT signal_type) as num_types,
                COUNT(*) as total_rows,
@@ -497,7 +620,6 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
             d['signal_types'] = d['types'].split(',')
         if d.get('all_sources'):
             d['hermes_sources'] = sorted(d['all_sources'].split(','))
-        # BUG-12 fix: validate top-level source field against whitelist
         top_source = d.get('all_sources', '').split(',')[0] if d.get('all_sources') else ''
         d['source'] = validate_source(top_source) if top_source else 'unknown'
         results.append(d)
