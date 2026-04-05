@@ -164,14 +164,19 @@ class SpeedTracker:
                 # falling      = vel and accel both negative → continuing down
                 vel = speed["price_velocity_5m"]
                 accel = speed["price_acceleration"]
-                if vel > 0 and accel > 0:
-                    wave_phase = "accelerating"
-                elif vel > 0 and accel < 0:
-                    wave_phase = "decelerating"
-                elif vel < 0 and accel > 0:
-                    wave_phase = "bottoming"
-                elif vel < 0 and accel < 0:
-                    wave_phase = "falling"
+                # BUG FIX (2026-04-05): None guards added — _compute_speed() returns None
+                # for vel/accel when there's insufficient history, causing TypeError on comparison
+                if vel is not None and accel is not None:
+                    if vel > 0 and accel > 0:
+                        wave_phase = "accelerating"
+                    elif vel > 0 and accel < 0:
+                        wave_phase = "decelerating"
+                    elif vel < 0 and accel > 0:
+                        wave_phase = "bottoming"
+                    elif vel < 0 and accel < 0:
+                        wave_phase = "falling"
+                    else:
+                        wave_phase = "neutral"
                 else:
                     wave_phase = "neutral"
                 speed["wave_phase"] = wave_phase
