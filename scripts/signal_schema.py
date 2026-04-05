@@ -35,9 +35,34 @@ def _runtime():
 
 # ── Init both DBs ─────────────────────────────────────────────────────────────
 _init_done = False
+_migration_done = False
+
+def _was_migration_done():
+    """Check if legacy migration has already run (idempotent — safe to call on every init_db)."""
+    try:
+        sc = _get_conn(STATIC_DB)
+        sc.execute("""
+            CREATE TABLE IF NOT EXISTS _meta (key TEXT PRIMARY KEY, val TEXT)
+        """)
+        row = sc.execute("SELECT val FROM _meta WHERE key='migration_done'").fetchone()
+        sc.close()
+        return row is not None
+    except Exception:
+        return False
+
+def _mark_migration_done():
+    """Persist that legacy migration has completed."""
+    try:
+        sc = _get_conn(STATIC_DB)
+        sc.execute("INSERT OR REPLACE INTO _meta VALUES ('migration_done','1')")
+        sc.commit()
+        sc.close()
+    except Exception:
+        pass
+
 def init_db():
     """Initialize both static and runtime DBs with proper schemas."""
-    global _init_done
+    global _init_done, _migration_done
     if _init_done:
         return
     os.makedirs(HERMES_DATA, exist_ok=True)
@@ -175,8 +200,11 @@ def init_db():
 
     rc.commit()
     rc.close()
-    # ── Migrate legacy backfill data to static DB ──
-    if os.path.exists(LEGACY_DB) and os.path.getsize(LEGACY_DB) > 0:
+    # ── Migrate legacy backfill data to static DB (once, persisted) ──
+    global _migration_done
+    if _migration_done or _was_migration_done():
+        _migration_done = True
+    elif os.path.exists(LEGACY_DB) and os.path.getsize(LEGACY_DB) > 0:
         sc = _get_conn(STATIC_DB)
         leg = _get_conn(LEGACY_DB)
         lc = leg.cursor()
@@ -200,7 +228,11 @@ def init_db():
             leg.close()
             if after > before:
                 print(f'DB migration: +{after - before} rows migrated to {STATIC_DB}')
+        _migration_done = True
+        _mark_migration_done()
     else:
+        _migration_done = True
+        _mark_migration_done()
         print('No legacy DB to migrate')
 
     # Auto-load backfill seed if static DB is empty
@@ -233,7 +265,19 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     
     KEY FIX: Only merges signals with the SAME signal_type. Different signal_types
     (e.g. 'rsi_confluence' vs 'macd_confluence') always create SEPARATE rows so that
-    get_confluence_signals() can detect them as distinct agreeing indicators."""
+    get_confluence_signals() can detect them as distinct agreeing indicators.
+    
+    MINIMUM CONFIDENCE FLOOR: Signals with confidence below 50 are silently rejected.
+    The AI decider requires ≥50% confidence to execute. Individual signals below this
+    threshold generate noise without ever reaching execution — they just create WAIT
+    records. This floor prevents signal spam from low-quality indicators."""
+    # ── Minimum confidence floor ─────────────────────────────────────────────
+    # Reject signals below 50% — AI decider needs ≥50% to act, so lower signals
+    # are pure noise that create stale WAIT records (Issue 2 fix).
+    MIN_CONFIDENCE_FLOOR = 50
+    if confidence < MIN_CONFIDENCE_FLOOR:
+        return None  # Silently skip low-confidence signals
+    # ─────────────────────────────────────────────────────────────────────────
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
@@ -400,45 +444,66 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     # Attach OpenClaw's signals.db so we can query both DBs together.
     # OpenClaw signals have source='mtf-*' and signal_type='mtf_macd'.
     # Hermes signals have source='mtf-*' and signal_type='momentum'.
+    # FAST PATH: skip ATTACH entirely if OpenClaw has no signals (common case).
+    _openclaw_has_signals = False
     if os.path.exists(LEGACY_DB):
         try:
-            c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
-        except sqlite3.IntegrityError:
-            pass  # Already attached — safe to ignore
-        except sqlite3.OperationalError as e:
-            if "already exists" not in str(e):
-                print(f"WARNING: Could not attach {LEGACY_DB}: {e}")
-        except Exception as e:
-            print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
+            lc = sqlite3.connect(LEGACY_DB, timeout=3).cursor()
+            row = lc.execute("SELECT 1 FROM signals LIMIT 1").fetchone()
+            _openclaw_has_signals = row is not None
+        except Exception:
+            _openclaw_has_signals = False
+        if _openclaw_has_signals:
+            try:
+                c.execute(f"ATTACH DATABASE ? AS oc", (LEGACY_DB,))
+            except sqlite3.IntegrityError:
+                pass  # Already attached — safe to ignore
+            except sqlite3.OperationalError as e:
+                if "already exists" not in str(e):
+                    print(f"WARNING: Could not attach {LEGACY_DB}: {e}")
+            except Exception as e:
+                print(f"WARNING: Unexpected error attaching {LEGACY_DB}: {e}")
 
     # Build dynamic WHERE clause for signal_type filter
-    if signal_types:
-        st_list = list(signal_types)
-        type_filter = "AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
-        params = (hours,) + tuple(st_list) + (hours,) + tuple(st_list) + (min_signals,)
-    else:
-        type_filter = ""
-        params = (hours, hours, min_signals)
+    st_list = list(signal_types) if signal_types else []
 
-    # Query both DBs using UNION ALL. Use GROUP_CONCAT to track which
-    # DB each signal came from (oc_ vs Hermes) for study logging.
+    # Build the CTE dynamically — skip OpenClaw UNION if it has no signals.
+    hermes_select = f"""
+        SELECT token, direction, signal_type, source, confidence, price,
+               z_score, rsi_14, macd_hist,
+               'hermes' as db_source
+        FROM signals
+        WHERE decision='PENDING'
+        AND created_at > datetime('now','-'||?||' hours')
+        {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if st_list else ""}
+    """
+    oc_select = f"""
+        UNION ALL
+        SELECT token, direction, signal_type, source, confidence, price,
+               z_score, rsi_14, macd_hist,
+               'openclaw' as db_source
+        FROM oc.signals
+        WHERE decision='PENDING'
+        AND created_at > datetime('now','-'||?||' hours')
+        {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if st_list else ""}
+    """
+
+    if _openclaw_has_signals:
+        cte_body = hermes_select + oc_select
+        if st_list:
+            params = (hours,) + tuple(st_list) + (hours,) + tuple(st_list) + (min_signals,)
+        else:
+            params = (hours, hours, min_signals)
+    else:
+        cte_body = hermes_select
+        if st_list:
+            params = (hours,) + tuple(st_list) + (min_signals,)
+        else:
+            params = (hours, min_signals)
+
     query = f"""
         WITH all_signals AS (
-            SELECT token, direction, signal_type, source, confidence, price,
-                   z_score, rsi_14, macd_hist,
-                   'hermes' as db_source
-            FROM signals
-            WHERE decision='PENDING'
-            AND created_at > datetime('now','-'||?||' hours')
-            {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if signal_types else ""}
-            UNION ALL
-            SELECT token, direction, signal_type, source, confidence, price,
-                   z_score, rsi_14, macd_hist,
-                   'openclaw' as db_source
-            FROM oc.signals
-            WHERE decision='PENDING'
-            AND created_at > datetime('now','-'||?||' hours')
-            {"AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")" if signal_types else ""}
+            {cte_body.strip()}
         )
         SELECT token, direction,
                COUNT(DISTINCT signal_type) as num_types,

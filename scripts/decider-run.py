@@ -576,6 +576,34 @@ def close_position(token, reason):
 # Per-token failure tracking for back-to-back cooldown
 _HOTSET_FAILURE_FILE = '/var/www/hermes/data/hotset-failures.json'
 
+# Rate limit: max 3 new hot-set approvals per minute (NEW RULE)
+_HOTSET_APPROVAL_RATE_FILE = '/var/www/hermes/data/hotset-approval-rate.json'
+
+def _get_hotset_approval_rate() -> tuple:
+    """Return (count, window_start_ts). Resets if window expired (>60s)."""
+    try:
+        if os.path.exists(_HOTSET_APPROVAL_RATE_FILE):
+            with open(_HOTSET_APPROVAL_RATE_FILE) as f:
+                data = json.load(f)
+        else:
+            return 0, 0
+        count = data.get('count', 0)
+        window_start = data.get('window_start', 0)
+        now = time.time()
+        if now - window_start > 60:
+            return 0, now  # new window
+        return count, window_start
+    except Exception:
+        return 0, time.time()
+
+def _increment_hotset_approval_rate(count: int, window_start: float):
+    """Save updated approval rate counter."""
+    try:
+        with open(_HOTSET_APPROVAL_RATE_FILE, 'w') as f:
+            json.dump({'count': count, 'window_start': window_start}, f)
+    except Exception:
+        pass
+
 def _load_hotset_failures():
     """Load per-direction failure counts. {TOKEN: {'LONG': {'count': N, 'last': ts}, 'SHORT': {...}}}"""
     try:
@@ -690,6 +718,14 @@ def _run_hot_set():
         return 0
 
     log(f'  🔥 [HOT-SET] {len(hotset)} tokens in hot-set (age={age:.0f}s)')
+
+    # NEW RULE (2026-04-05): max 3 new approvals per minute — prevent flooding
+    rate_count, rate_window = _get_hotset_approval_rate()
+    if rate_count >= 3:
+        log(f'  🚫 [HOT-SET] Rate limit: 3 approvals already this minute — skipping')
+        conn.close()
+        return 0
+    log(f'  ⚡ [HOT-SET] Approval rate: {rate_count}/3 this minute')
 
     try:
         # Load hot-set failure tracking
@@ -846,15 +882,18 @@ def _run_hot_set():
                 log(f'  ⚠️ [HOT-SET] {token} regime check error: {e}')
 
             # ── TOKEN-LEVEL REGIME CHECK (SPEED FEATURE, 2026-04-03) ───────
-            # Each token has its own regime: rising / falling / neutral / bottoming.
+            # Each token has its own regime: rising / falling / neutral.
             # Use z_score_tier from hotset.json (computed per token at signal time).
-            # The MARKET regime (from get_regime above) is the macro context.
-            # Both must agree for an entry to be clean.
+            #
+            # SEMANTICS (fixed 2026-04-05):
+            #   z_direction = 'rising'  → z-score is rising = price mean-reverting UP = LOCAL BOTTOM
+            #   z_direction = 'falling' → z-score is falling = price mean-reverting DOWN = LOCAL TOP
+            # signal_gen.py was inverted (avg_z > 0 labeled 'rising'), now fixed.
             _z_tier = (hot_sig.get('z_score_tier') or '').lower()
             _z = hot_sig.get('z_score', 0.0)
             if _z_tier and _z is not None:
-                # Token at local bottom (rising z-score) + LONG → ideal entry
-                # Token at local top (falling z-score) + SHORT → ideal entry
+                # Local bottom (rising) + LONG → ideal entry
+                # Local top (falling) + SHORT → ideal entry
                 if _z_tier == 'rising' and direction == 'LONG':
                     token_regime_ok = True
                 elif _z_tier == 'falling' and direction == 'SHORT':
@@ -863,11 +902,11 @@ def _run_hot_set():
                     # Neutral zone — use market regime as tiebreaker
                     token_regime_ok = True  # let market regime handle it
                 elif _z_tier == 'rising' and direction == 'SHORT':
-                    # Token bottoming while market wants SHORT — catch the bounce instead
-                    # Only allow if momentum is favorable (bottoming phase)
+                    # Price at local bottom but SHORT direction — catch the bounce instead.
+                    # Only allow if momentum is low (bottoming phase allows SHORT entry).
                     token_regime_ok = (_wave in ('bottoming', 'neutral'))
                 elif _z_tier == 'falling' and direction == 'LONG':
-                    # Token topping while market wants LONG — skip unless bottoming
+                    # Price at local top but LONG direction — skip unless bottoming
                     token_regime_ok = (_wave in ('bottoming',))
                 else:
                     token_regime_ok = False
@@ -898,13 +937,19 @@ def _run_hot_set():
                 reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]{reason_suffix}'
 
             if should_approve:
+                # Rate limit check: only 3 new approvals per minute
+                rate_count, rate_window = _get_hotset_approval_rate()
+                if rate_count >= 3:
+                    log(f'  🚫 [HOT-SET] Rate limit reached ({rate_count}/3) — {token} {direction} queued for next window')
+                    break  # stop approving more; next cycle will pick up
                 c.execute("""
                     UPDATE signals SET decision='APPROVED', updated_at=?
                     WHERE id=? AND executed=0
                 """, (now_str, sig_id))
                 conn.commit()
                 approved_count += 1
-                log(f'  🔥 [HOT-SET] {token} {direction} {reason} (survived r{rounds})')
+                _increment_hotset_approval_rate(rate_count + 1, rate_window)
+                log(f'  🔥 [HOT-SET] {token} {direction} {reason} (survived r{rounds}) [{rate_count+1}/3]')
     except Exception as e:
         import traceback; traceback.print_exc()
         log(f'HOT-SET error: {e}')
@@ -1075,6 +1120,23 @@ def run(dry_run=False):
             skipped += 1
             continue
 
+        # ── Pre-execution price sanity check ─────────────────────────────
+        # Guard against corrupted/stale signal prices (>5x from cached)
+        # or out-of-bounds absolute values to prevent bad fills.
+        cached = get_current_price(token)
+        if cached and cached > 0 and price > 0:
+            ratio = price / cached
+            if ratio > 5:
+                log(f'SKIP: {token} SUSPICIOUS PRICE {price} vs cached {cached} (ratio {ratio:.2f}x) — skipping')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
+        if price > 1_000_000 or price < 0.00001:
+            log(f'SKIP: {token} price {price} out of absolute bounds [$0.00001-$1_000_000]')
+            mark_signal_executed(token, direction)
+            skipped += 1
+            continue
+
         # Check if already open
         if is_position_open(token):
             log(f'SKIP: {token} already open')
@@ -1091,6 +1153,20 @@ def run(dry_run=False):
             mark_signal_executed(token, direction)
             skipped += 1
             continue
+
+        # ── Regime filter for approved signals (same as HOT-SET, 2026-04-05) ─
+        # Approved signals bypass HOT-SET regime check — close that gap here.
+        try:
+            regime, regime_conf = get_regime(token)
+            if regime != 'NEUTRAL' and regime_conf > 50:
+                if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+                   (regime == 'SHORT_BIAS' and direction == 'LONG'):
+                    log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: regime={regime} ({regime_conf}%) fights direction')
+                    mark_signal_executed(token, direction)
+                    skipped += 1
+                    continue
+        except Exception as e:
+            log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 
         # Check loss cooldown — block same direction after a loss
         if is_loss_cooldown_active(token, direction):

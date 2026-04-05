@@ -52,17 +52,18 @@ from tokens import is_solana_only
 # ─── Source confidence weights ────────────────────────────────────────────────
 # Single config for all signal source multipliers applied to raw confidence.
 # > 1.0 = boost (trust more), < 1.0 = suppress (trust less).
-# mtf_macd with hmacd- source = MACD crossovers = clearest trend signals = 1.2x.
+# mtf_macd with hmacd- source = MACD crossovers = clearest trend signals = 1.0 (neutral).
+# Dialed back from 1.2 — was dominating compaction and pushing other signal types out.
 # Other hmacd-* sources = weaker/secondary = 0.6x (penalize, don't trust alone).
 # All others = 1.0 (neutral).
 SOURCE_WEIGHTS = {
-    'hmacd-mtf_macd': 1.2,   # MACD crossovers — strong trend confirmation
+    'hmacd-mtf_macd': 1.0,   # MACD crossovers — neutral weight (was 1.2)
     'hmacd-default': 0.6,   # Other hmacd-derived signals — penalize
 }
 # Master map: (signal_type, source_prefix) -> weight
 # Checked in order; first match wins. None = neutral 1.0.
 SOURCE_WEIGHT_OVERRIDES = [
-    ('mtf_macd',  'hmacd-',  1.2),   # hmacd- + mtf_macd = MACD crossover
+    ('mtf_macd',  'hmacd-',  1.0),   # hmacd- + mtf_macd = MACD crossover (was 1.2)
     # All other hmacd-* sources (pct-hermes, etc.) fall through to default 0.6
 ]
 DEFAULT_SOURCE_WEIGHT = 1.0
@@ -762,11 +763,11 @@ def ssh(cmd):
                         shell=True, capture_output=True, text=True, timeout=30).stdout
 
 def get_open():
-    # Query locally - brain DB is local
+    """Count open PAPER trades only — live HL trades should not constrain paper trading."""
     try:
         conn = psycopg2.connect(BRAIN_DB)
         cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM trades WHERE status='open' AND server='Hermes'")
+        cur.execute("SELECT COUNT(*) FROM trades WHERE status='open' AND server='Hermes' AND paper=true")
         count = cur.fetchone()[0]
         cur.close()
         conn.close()
@@ -819,7 +820,7 @@ def get_pending_signals():
         # If a PENDING signal has survived 20+ compaction rounds, it's stuck.
         # It keeps accumulating survival_score but never gets acted on (wrong direction,
         # wrong regime, etc.). Force-expire it so new fresh signals can take its place.
-        PURGE_THRESHOLD = 20  # compaction rounds
+        PURGE_THRESHOLD = 5  # compaction rounds (lowered from 20 — max cr observed was 3 in 4 days; 20 = weeks to trigger)
         c.execute("""
             UPDATE signals
             SET decision = 'EXPIRED', executed = 1,
@@ -1539,15 +1540,42 @@ CONFIDENCE: [0-100]
 REASON: [1-sentence explanation]
 """
     
-    # Use local Ollama for AI decision
+    # Use minimax (OpenAI-compatible API) for AI decision
     try:
-        payload = {
-            "model": "qwen2.5:1.5b",
-            "prompt": prompt,
-            "stream": False
-        }
-        r = requests.post("http://localhost:11434/api/generate", json=payload, timeout=60)
-        result = r.json().get("response", "")
+        import os, json as _json
+        from openai import OpenAI
+
+        # Load minimax credentials from auth.json
+        _auth_path = '/root/.hermes/auth.json'
+        _minimax_token = None
+        _minimax_url = 'https://api.minimax.io/v1'
+        try:
+            with open(_auth_path) as _f:
+                _auth = _json.load(_f)
+            _creds = (_auth.get('credential_pool', {}) or {}).get('minimax', [])
+            if _creds and isinstance(_creds, list):
+                _minimax_token = _creds[0].get('access_token', '')
+        except Exception:
+            pass
+
+        if not _minimax_token:
+            raise RuntimeError("no minimax token")
+
+        try:
+            _client = OpenAI(api_key=_minimax_token, base_url=_minimax_url)
+            _resp = _client.chat.completions.create(
+                model="MiniMax-M2",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=300,
+            )
+            result = _resp.choices[0].message.content
+        except Exception as _mm_err:
+            # Fallback to Ollama
+            _pl = {"model": "qwen2.5:1.5b", "prompt": prompt, "stream": False}
+            _r = requests.post("http://localhost:11434/api/generate", json=_pl, timeout=60)
+            result = _r.json().get("response", "")
+            print(f"[ai_decider] minimax failed ({_mm_err}), fell back to Ollama")
         
         # Parse response
         decision = "WAIT"
@@ -1708,7 +1736,7 @@ if __name__ == '__main__':
                 else:
                     print(f"   🔥 HOT KEEP:  {tok} {hot_dir} hot set survived PENDING {sig_dir}")
 
-    print(f"=== AI Decider: {len(pending)} pending | Open: {get_open()}/{MAX_OPEN} | Hot: {len(_hot_rounds)} | Counter: {counter_killed} | Deesc: {deesc_count} ===")
+    print(f"=== AI Decider: {len(pending)} pending | Paper Open: {get_open()}/{MAX_OPEN} | Hot: {len(_hot_rounds)} | Counter: {counter_killed} | Deesc: {deesc_count} ===")
 
     # Get market context once
     market_z = get_market_zscore()
@@ -1763,9 +1791,10 @@ if __name__ == '__main__':
             mark_signal_processed(t, 'SKIPPED', decision_reason='blocked-illiquid-token')
             continue
     
-        # Check open slots
+        # Check open PAPER slots only — live HL trades should not block paper trading.
+        # is_token_open() below handles per-token dedup regardless of paper/live.
         if get_open() >= MAX_OPEN:
-            print(f"⏸️ {t}: max trades reached")
+            print(f"⏸️ {t}: max paper trades reached ({get_open()}/{MAX_OPEN})")
             log_signal(t, direction, entry, conf, f"SKIPPED-max-{exchange}")
             continue
         # ── Hot set: r1+ auto-approval ──────────────────────────────────────────
@@ -1839,10 +1868,13 @@ if __name__ == '__main__':
             if prediction['token_total'] < 3:
                 token_info = f"- Token-Specific Accuracy: {prediction['token_accuracy']}% ({prediction['token_total']} predictions) - building history"
             pred_str = f"""
-    LLM CANDLE PREDICTION (for reference):
+    LLM CANDLE PREDICTION (for reference — low weight):
     - Predicted Direction: {prediction['direction']} ({prediction['confidence']}% confidence)
     - Model Historical Accuracy: {prediction['accuracy']}%
-    {token_info}"""""
+    {token_info}
+    IMPORTANT: The candle predictor is unreliable (35% accuracy, 0% in last 24h).
+    Treat its predictions as weak signal at best. Primary trust: momentum signal + MACD + RSI.
+    """""
     
         # Get z-score tier from signal
         z_tier = s.get('z_score_tier')

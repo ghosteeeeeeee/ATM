@@ -25,7 +25,7 @@ BRAIN_DB = {
     'host': '/var/run/postgresql', 'dbname': 'brain',
     'user': 'postgres',  'password': 'postgres'
 }
-AB_CONFIG_FILE = '/root/.hermes/data/ab-test-config.json'
+AB_CONFIG_FILE = '/root/.hermes/config/ab_tests.json'
 EVOLUTION_LOG   = '/var/www/hermes/logs/ab_evolution.log'
 os.makedirs(os.path.dirname(EVOLUTION_LOG), exist_ok=True)
 

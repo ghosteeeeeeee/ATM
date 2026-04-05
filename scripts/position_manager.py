@@ -1527,7 +1527,7 @@ def check_cascade_flip(token: str, position_direction: str,
             FROM signals
             WHERE UPPER(token) = ?
               AND direction = ?
-              AND decision IN ('PENDING', 'WAIT')
+              AND decision IN ('PENDING', 'WAIT', 'APPROVED')
               AND confidence >= ?
               AND created_at >= datetime('now', ?)
         """, (token.upper(), opposite_dir, CASCADE_FLIP_MIN_CONF,
@@ -1544,7 +1544,7 @@ def check_cascade_flip(token: str, position_direction: str,
             FROM signals
             WHERE UPPER(token) = ?
               AND direction = ?
-              AND decision IN ('PENDING', 'WAIT')
+              AND decision IN ('PENDING', 'WAIT', 'APPROVED')
               AND confidence >= ?
               AND created_at >= datetime('now', ?)
             ORDER BY confidence DESC, created_at DESC

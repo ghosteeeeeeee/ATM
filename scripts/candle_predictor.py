@@ -31,7 +31,7 @@ MODEL        = 'qwen2.5:1.5b'
 TOP_TOKENS=['BTC','ETH','SOL','AVAX','DOGE','XRP','ADA','DOT','LINK','MATIC',
                 'MATIC','LTC','UNI','ATOM','XLM','ETC','ALGO','VET','FIL','THETA',
                 'AAVE','MKR','COMP','SNX','YFI','SUSHI','CRV','RUNE','KAVA','BAT']
-INVERSION_THRESHOLD = 0.45  # invert if direction accuracy < 45% in this momentum_state
+INVERSION_THRESHOLD = 0.40  # invert if direction accuracy < 40% in this momentum_state
 
 
 def log(msg, level='INFO'):
@@ -515,9 +515,9 @@ def decide_inversion(token, direction, momentum_state, conn):
             should_invert = True
             reason = f"state_acc={state_acc:.1f}% < 40% in {momentum_state}"
     elif overall_acc is not None:
-        if overall_acc < 45 and direction == 'DOWN':
+        if overall_acc < 40 and direction == 'DOWN':
             should_invert = True
-            reason = f"overall_acc={overall_acc:.1f}% < 45%"
+            reason = f"overall_acc={overall_acc:.1f}% < 40%"
         elif overall_acc < 40 and direction == 'UP':
             should_invert = True
             reason = f"overall_acc={overall_acc:.1f}% < 40%"
@@ -775,8 +775,17 @@ MARKET CONTEXT (Hyperliquid orderbook):
 TASK: Predict whether the NEXT 4-hour candle will close UP or DOWN.
 Consider: current momentum, regime, momentum_state, z-score direction, RSI level,
 historical accuracy patterns, funding rates, volume.
-NOTE: This model historically underpredicts UP — if momentum is bullish and RSI is
-oversold, strongly consider UP despite any SHORT bias.
+
+FEW-SHOT EXAMPLES (learn from these patterns):
+- If RSI < 35 in bullish regime → UP (oversold bounce, not continuation)
+- If RSI > 65 in bearish regime → DOWN (overbought rejection, not reversal)
+- If Z-score is decelerating from extreme → OPPOSITE direction (exhaustion)
+- If funding rate is deeply negative → UP (bearish sentiment, long squeeze)
+
+IMPORTANT: This model historically underpredicts UP (only 1.6% of predictions).
+You MUST predict UP at least 20% of the time when conditions warrant it.
+If momentum is neutral and RSI is near 50 → default to UP (market mean-reverts).
+Never default to DOWN — it will be wrong more often than right.
 
 Respond STRICTLY in this format (one line each):
 DIRECTION: [UP or DOWN]

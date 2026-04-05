@@ -1,0 +1,6 @@
+🎣
+Hot Set — survived AI compaction rounds
+Token	Dir	Confidence	Entries	Sources	Price	RSI	MACD	Z-Score	Rounds	Survival	Speed	Vel 5m	Last Seen
+AVAX	SHORT	94.5% (base 95%)	3x	mtf_macd	$8.973700	39.5	-0.0005	-1.194	r3+	1.5	31%	+0.031%	1775357474.31574
+XRP	SHORT	94.5% (base 95%)	3x	mtf_macd	$1.316050	59.4	-0.0000	-1.591	r3+	1.5	31%	+0.030%	1775357474.31574
+TRX	SHORT	94.5% (base 95%)	3x	mtf_macd	$0.317690	54.1	-0.0000	-0.963	r3+	1.5	28%	-0.019%	1775357474.31574

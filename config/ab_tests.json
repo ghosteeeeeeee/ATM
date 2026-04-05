@@ -3,105 +3,155 @@
   "tests": [
     {
       "name": "sl-distance-test",
-      "description": "Stop-loss distance optimization \u2014 test 1%, 2%, 3% SL distances",
+      "description": "Stop-loss distance optimization — test 1%, 2%, 3% SL distances",
       "variants": [
         {
           "id": "SL1pct",
           "label": "1% SL (tight)",
-          "weight": 1,
+          "weight": 59,
           "enabled": true,
           "config": {
             "slPct": 1.0
-          }
+          },
+          "trades": 15,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-05 05:36:47.443343"
         },
         {
-          "id": "SL2pct",
-          "label": "2% SL (control)",
-          "weight": 1,
+          "id": "SL2pct-E3",
+          "name": "SL-1.5%-Evo",
+          "weight": 31,
           "enabled": true,
           "config": {
-            "slPct": 2.0
-          }
-        },
-        {
-          "id": "SL3pct",
-          "label": "3% SL (loose)",
-          "weight": 1,
-          "enabled": true,
-          "config": {
-            "slPct": 3.0
-          }
+            "slDistance": 0.015,
+            "slPct": 1.5,
+            "description": "EVOLVED: wider SL (1.5%) derived from SL1pct PnL=+0.0%",
+            "evolved_from": "SL1pct",
+            "spawned_at": "2026-04-05T04:08:30.499110"
+          },
+          "trades": 6,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-05 05:28:09.336274"
         }
       ]
     },
     {
       "name": "entry-timing-test",
-      "description": "Entry timing \u2014 immediate vs retrace 2% vs retrace 5% pullback",
+      "description": "Entry timing — immediate vs retrace 2% vs retrace 5% pullback",
       "variants": [
         {
           "id": "IMMEDIATE",
           "label": "Immediate entry",
-          "weight": 1,
+          "weight": 40,
           "enabled": true,
           "config": {
             "entryMode": "immediate"
-          }
+          },
+          "trades": 36,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-05 05:33:45.972272"
         },
         {
           "id": "RETRACE-2",
           "label": "Retrace 2% pullback",
-          "weight": 1,
+          "weight": 40,
           "enabled": true,
           "config": {
             "entryMode": "retrace",
             "pullbackThreshold": 2.0
-          }
+          },
+          "trades": 18,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-05 05:37:48.871454"
         },
         {
-          "id": "RETRACE-5",
-          "label": "Retrace 5% pullback",
-          "weight": 1,
+          "id": "EVO-3",
+          "name": "Entry-Evolve-3",
+          "weight": 9,
           "enabled": true,
           "config": {
-            "entryMode": "retrace",
-            "pullbackThreshold": 5.0
-          }
+            "entryMode": "pullback",
+            "pullbackPct": 0.005,
+            "maxWaitMinutes": 60,
+            "description": "EVOLVED: pullback 0.5% pullback (from IMMEDIATE)",
+            "evolved_from": "IMMEDIATE",
+            "spawned_at": "2026-04-05T04:08:30.504948"
+          },
+          "trades": 1,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-05 04:18:10.742673"
         }
       ]
     },
     {
       "name": "trailing-stop-test",
-      "description": "Trailing stop parameters \u2014 activation threshold and distance",
+      "description": "Trailing stop parameters — activation threshold and distance",
       "variants": [
         {
           "id": "TS-tight",
           "label": "Tight trailing: 0.5% activation / 0.5% distance",
-          "weight": 1,
+          "weight": 40,
           "enabled": true,
           "config": {
             "trailingActivationPct": 0.5,
             "trailingDistancePct": 0.5
-          }
-        },
-        {
-          "id": "TS-normal",
-          "label": "Normal trailing: 1% activation / 1% distance",
-          "weight": 1,
-          "enabled": true,
-          "config": {
-            "trailingActivationPct": 1.0,
-            "trailingDistancePct": 1.0
-          }
+          },
+          "trades": 2,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-04 23:04:15.449088"
         },
         {
           "id": "TS-loose",
           "label": "Loose trailing: 2% activation / 1% distance",
-          "weight": 1,
+          "weight": 40,
           "enabled": true,
           "config": {
             "trailingActivationPct": 2.0,
             "trailingDistancePct": 1.0
-          }
+          },
+          "trades": 58,
+          "wins": 1,
+          "losses": 3,
+          "winRate": 2.4,
+          "totalPnlPct": 0.28,
+          "lastUpdated": "2026-04-05 05:37:48.875631"
+        },
+        {
+          "id": "TSEVO-3",
+          "name": "TS-Evolve-3",
+          "weight": 9,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 0.05,
+            "trailingDistancePct": 0.05,
+            "description": "EVOLVED: TS activate +5.00% dist 5.00% (from TS-loose)",
+            "evolved_from": "TS-loose",
+            "spawned_at": "2026-04-05T04:08:30.510438"
+          },
+          "trades": 1,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": "2026-04-05 05:36:47.450836"
         }
       ]
     },
@@ -111,7 +161,7 @@
       "variants": [
         {
           "id": "SHORT-aggressive",
-          "label": "Aggressive SHORT \u2014 tighter SL",
+          "label": "Aggressive SHORT — tighter SL",
           "weight": 1,
           "enabled": true,
           "config": {
@@ -121,7 +171,7 @@
         },
         {
           "id": "SHORT-conservative",
-          "label": "Conservative SHORT \u2014 wider SL",
+          "label": "Conservative SHORT — wider SL",
           "weight": 1,
           "enabled": true,
           "config": {
@@ -133,7 +183,7 @@
     },
     {
       "name": "flip-trade-strategy",
-      "description": "Flip trade strategy after SL hit \u2014 test when to flip and with what parameters",
+      "description": "Flip trade strategy after SL hit — test when to flip and with what parameters",
       "variants": [
         {
           "id": "FLIP-NONE",

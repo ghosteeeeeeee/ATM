@@ -33,6 +33,22 @@ def _load_prices(token):
         _px_cache[token] = []
 
 
+def _get_current_price(token):
+    """Get the most recent price for a token, bypassing cache freshness check."""
+    try:
+        conn_p = sqlite3.connect(PRICE_DB)
+        cur_p = conn_p.cursor()
+        cur_p.execute(
+            "SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 1",
+            (token,)
+        )
+        row = cur_p.fetchone()
+        conn_p.close()
+        return float(row[0]) if row else None
+    except Exception:
+        return None
+
+
 def live_rsi(token, period=14):
     _load_prices(token)
     data = _px_cache.get(token, [])
@@ -209,24 +225,7 @@ def write_trades():
         "open_count": len(open_t),
         "closed_count": total_closed,
         "page_size": 50,
-        "open": [{
-            "token": r[1], "direction": r[2],
-            "entry": float(r[3]) if r[3] else 0,
-            "current": float(r[4]) if r[4] else 0,
-            "pnl_pct": round(float(r[5]), 2) if r[5] else 0,
-            # pnl_usdt from DB already includes leverage — use directly
-            "pnl_usdt": round(float(r[6]), 2) if r[6] else 0,
-            "sl": round(float(r[7]), 6) if r[7] else 0,
-            "tp": round(float(r[8]), 6) if r[8] else 0,
-            "exchange": r[9], "opened": str(r[10]) if r[10] else "",
-            "signal": r[14], "confidence": float(r[15]) if r[15] else 0,
-            "leverage": float(r[16]) if r[16] else 1,
-            "amount_usdt": float(r[17]) if r[17] else 50.0,
-            "effective_size": round(float(r[17]) * float(r[16]), 2) if r[17] and r[16] else 50.0,
-            "trailing_activation": float(r[18]) if r[18] else 0.01,
-            "trailing_distance": float(r[19]) if r[19] else 0.01,
-            "trailing_sl": _live_trailing_sl(r[0], r[2], r[3], r[4], float(r[18]) if r[18] else 0.01, float(r[19]) if r[19] else 0.01)
-        } for r in open_t],
+        "open": _build_open_trades(open_t),
         "closed": [{
             "token": r[1], "direction": r[2],
             "entry": float(r[3]) if r[3] else 0,
@@ -247,22 +246,133 @@ def write_trades():
         json.dump(result, f, indent=2)
 
 
-def write_signals():
-    """Export signals from DB + win rate stats for the web dashboard."""
-    signals = get_signals_from_db(200)
+def _build_open_trades(open_t):
+    """Build open trades with live P&L calculated from current market prices."""
+    out = []
+    for r in open_t:
+        token     = r[1]
+        direction = r[2]
+        entry_px  = float(r[3]) if r[3] else 0
+        lev       = float(r[16]) if r[16] else 1
+        amt       = float(r[17]) if r[17] else 50.0
 
-    # Hot set: signals that survived compaction (compact_rounds > 0)
-    # • Exclude executed signals (trade already opened)
-    # • Flip protection: if a token appears in BOTH directions, only keep the
-    #   one with more compact_rounds (or higher survival), drop the weaker one
-    # • Live-compute rsi/macd/zscore from price_history every call
+        # Get live current price (most recent from price_history)
+        current_px = _get_current_price(token)
+        if not current_px or current_px <= 0:
+            current_px = entry_px  # fallback to entry if no live price
+
+        # Compute live P&L from current market price
+        if entry_px > 0:
+            if direction and direction.upper() == 'SHORT':
+                pnl_pct = round((entry_px - current_px) / entry_px * 100, 4)
+            else:  # LONG or unknown
+                pnl_pct = round((current_px - entry_px) / entry_px * 100, 4)
+            pnl_usdt = round(pnl_pct / 100 * amt, 4)
+        else:
+            pnl_pct = 0
+            pnl_usdt = 0
+
+        out.append({
+            "token": token,
+            "direction": direction,
+            "entry": entry_px,
+            "current": round(current_px, 6),
+            "pnl_pct": round(pnl_pct, 2),
+            "pnl_usdt": round(pnl_usdt, 2),
+            "sl": round(float(r[7]), 6) if r[7] else 0,
+            "tp": round(float(r[8]), 6) if r[8] else 0,
+            "exchange": r[9],
+            "opened": str(r[10]) if r[10] else "",
+            "signal": r[14],
+            "confidence": float(r[15]) if r[15] else 0,
+            "leverage": lev,
+            "amount_usdt": amt,
+            "effective_size": round(amt * lev, 2),
+            "trailing_activation": float(r[18]) if r[18] else 0.01,
+            "trailing_distance": float(r[19]) if r[19] else 0.01,
+            "trailing_sl": _live_trailing_sl(r[0], direction, entry_px, current_px, float(r[18]) if r[18] else 0.01, float(r[19]) if r[19] else 0.01)
+        })
+    return out
+
+
+# ── Helper: read hot_set from hotset.json ─────────────────────────────────────
+def _get_hotset_from_file():
+    """
+    Read the authoritative hot-set from hotset.json (written by ai_decider).
+    Enrich each entry with live RSI/MACD computed from price_history for the
+    web dashboard. Returns None if the file is missing or stale (>11 min).
+    """
+    HOTSET_FILE = '/var/www/hermes/data/hotset.json'
+    try:
+        with open(HOTSET_FILE) as f:
+            data = json.load(f)
+        entries = data.get('hotset', [])
+        if not entries:
+            return None
+        # Stale check: block if hotset.json is older than 11 minutes
+        ts = data.get('timestamp', 0)
+        if ts > 0 and (time.time() - ts) > 660:
+            print(f"[hotset] hotset.json stale ({time.time()-ts:.0f}s) — using fallback DB query")
+            return None
+
+        # Pre-load prices for all tokens (batch, single call per token)
+        for entry in entries:
+            _load_prices(entry['token'])
+
+        result = []
+        for e in entries:
+            tok = e['token']
+            rsi_val = live_rsi(tok)
+            _, macd_val = live_macd(tok)
+            live_price = _px_cache[tok][-1][1] if tok in _px_cache and _px_cache[tok] else 0
+
+            result.append({
+                'token':          tok,
+                'direction':      e.get('direction', 'SHORT'),
+                'type':           'hot set',
+                'sources':        e.get('signal_type', ''),
+                'confidence':     round(e.get('confidence', 0), 1),
+                'base_conf':      round(e.get('confidence', 0), 1),
+                'entry_count':    e.get('review_count', 1),
+                'price':          live_price or e.get('price', 0),
+                'rsi':            rsi_val,
+                'macd':           macd_val,
+                'zscore':         e.get('z_score', 0),
+                'rounds':         e.get('compact_rounds', 0),
+                'survival':       e.get('survival_score', 0),
+                'last_seen':      str(e.get('timestamp', ts)),
+                # SPEED FEATURE fields (from hotset.json)
+                'speed_pctl':     round(e.get('momentum_score', 50.0), 1),
+                'vel_5m':         round(e.get('price_velocity_5m', 0), 3),
+                'accel':          round(e.get('price_acceleration', 0), 3),
+                'is_stale':       False,
+                # Additional enrichments from hotset.json
+                'wave_phase':     e.get('wave_phase', 'neutral'),
+                'is_overextended': e.get('is_overextended', False),
+            })
+        print(f"[hotset] loaded {len(result)} tokens from hotset.json")
+        return result
+    except FileNotFoundError:
+        print("[hotset] hotset.json not found — using fallback DB query")
+        return None
+    except Exception as ex:
+        print(f"[hotset] error reading hotset.json: {ex} — using fallback DB query")
+        return None
+
+
+# ── Helper: fallback hot-set from DB (legacy logic) ────────────────────────────
+def _build_hotset_from_db():
+    """
+    Fallback: build hot-set directly from DB.
+    Used only when hotset.json is missing or stale.
+    Preserves the original flip-protection + live RSI/MACD/Zscore logic.
+    """
     hot_set = []
     try:
         conn_rt = sqlite3.connect(SIGNALS_DB)
         conn_rt.row_factory = sqlite3.Row
         c_rt = conn_rt.cursor()
 
-        # Pre-load price_history for all hot tokens (batch, single call per token)
         c_rt.execute("SELECT DISTINCT token FROM signals WHERE compact_rounds > 0 AND executed = 0")
         for (tok,) in c_rt.fetchall():
             _load_prices(tok)
@@ -294,7 +404,6 @@ def write_signals():
         raw = c_rt.fetchall()
         conn_rt.close()
 
-        # Flip detection: pick best direction per token by rounds/survival
         best = {}
         for r in raw:
             t = r['token']
@@ -307,7 +416,7 @@ def write_signals():
         for r in raw:
             t = r['token']
             if best[t]['direction'] != r['direction']:
-                continue  # skip weaker direction
+                continue
 
             tok = r['token']
             avg_conf = float(r['avg_conf']) if r['avg_conf'] else 0
@@ -320,17 +429,15 @@ def write_signals():
             z_val = live_zscore(tok)
             live_price = _px_cache[tok][-1][1] if tok in _px_cache and _px_cache[tok] else 0
 
-            # ── Hot set validation: all required columns must be non-NULL ──
             missing = []
-            if z_val is None:       missing.append('z_score')
-            if rsi_val is None:    missing.append('rsi_14')
-            if macd_val is None:   missing.append('macd_hist')
-            if live_price <= 0:    missing.append('price')
+            if z_val is None:      missing.append('z_score')
+            if rsi_val is None:   missing.append('rsi_14')
+            if macd_val is None:  missing.append('macd_hist')
+            if live_price <= 0:   missing.append('price')
             if missing:
                 import logging as _log
-                _log.warning(f"HOT_SET_DISQUALIFIED: {tok} missing [{','.join(missing)}] "
-                             f"(z={z_val}, rsi={rsi_val}, macd={macd_val}, price={live_price})")
-                continue  # skip token — incomplete data, not safe to trade
+                _log.warning(f"HOT_SET_DISQUALIFIED: {tok} missing [{','.join(missing)}]")
+                continue
 
             hot_set.append({
                 'token': tok,
@@ -347,16 +454,33 @@ def write_signals():
                 'rounds': max_r,
                 'survival': float(r['max_survival']) if r['max_survival'] else 0,
                 'last_seen': r['last_seen'] or str(r['created']),
-                # SPEED FEATURE: speed data for hot set UI
                 'speed_pctl': round(float(r['speed_percentile']), 1) if r['speed_percentile'] is not None else 50.0,
                 'vel_5m':    round(float(r['price_velocity_5m']), 3)  if r['price_velocity_5m'] is not None else 0.0,
                 'accel':     round(float(r['price_acceleration']), 3) if r['price_acceleration'] is not None else 0.0,
                 'is_stale':  bool(r['is_stale']) if r['is_stale'] is not None else False,
             })
+        print(f"[hotset] fallback DB query returned {len(hot_set)} tokens")
     except Exception as e:
         import traceback
         print(f"Hot set query failed: {e}")
         traceback.print_exc()
+    return hot_set
+
+
+def write_signals():
+    """Export signals from DB + win rate stats for the web dashboard."""
+    signals = get_signals_from_db(200)
+
+    # ── HOT SET: read from hotset.json (authoritative) ──────────────────────────
+    # hotset.json is written by ai_decider after every compaction pass.
+    # It is the SOLE source of truth for what survived — NOT a parallel DB query.
+    # We enrich with live RSI computed from price_history for the dashboard.
+    hot_set = _get_hotset_from_file()
+
+    # Fallback: if hotset.json is missing/stale, use DB query (preserves the
+    # old flip-protection, live-rsi/macd/zscore logic as a safety net).
+    if hot_set is None:
+        hot_set = _build_hotset_from_db()
 
     # Compute win rate from brain DB using pnl_pct (after fees)
     # Filter out corrupted trades: exit_price sanity check

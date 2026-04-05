@@ -42,6 +42,14 @@ cd /root/.hermes/scripts && python3 wasp.py
 - **Cause**: Old cron-based wasp was dead
 - **Fix**: Already migrated to systemd (see systemd timer setup)
 
+### Runtime DB is 195MB (should be < 50MB)
+- **Cause**: Terminal signals (SKIPPED, EXPIRED, EXECUTED, COMPACTED, WAIT) never deleted
+- **Fix**: Nightly cron `signals-compact` (00:04 UTC daily) runs `archive-signals.py --apply`
+  - Archives rows >6h old to `/root/.hermes/archive/signals/signals_2026-04.jsonl.gz`
+  - Deletes archived rows from runtime DB
+  - Runs VACUUM to reclaim space
+  - Run manually: `python3 /root/.hermes/scripts/archive-signals.py --stats`
+
 ### 1 WAIT signal never re-reviewed (old label)
 - **Cause**: Signals generated before threshold change have `[WAIT]` label in DB but aren't being picked up
 - **Fix**: Either delete stale signals or re-run signal_gen

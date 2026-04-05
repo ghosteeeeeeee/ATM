@@ -1,0 +1,9 @@
+Current Usage
+How do usage limits work
+
+Text Generation
+5 Hours
+Time Range: 20:00-00:00(UTC)
+Reset Time: Resets in 2 hr 27 min
+503/1500
+34% Used

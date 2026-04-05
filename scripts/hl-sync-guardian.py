@@ -593,8 +593,12 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     hl_entry = entry_px
 
                 # Create paper trade
+                # FIX (2026-04-05): entry_price and amount_usdt were SWAPPED in the call.
+                # add_orphan_trade signature: (token, direction, entry_price, amount_usdt, leverage, ...)
+                # This caused entry_price to receive amount_usdt (~$10 for BTC) and amount_usdt
+                # to receive hl_entry (~$67K for BTC), corrupting all PnL calculations.
                 trade_id = add_orphan_trade(
-                    coin, direction, amount_usdt, hl_entry, lev, sl_price, tp_price
+                    coin, direction, hl_entry, amount_usdt, lev, sl_price, tp_price
                 )
                 if trade_id:
                     _mark_hl_reconciled(coin, trade_id, hl_entry, direction)
@@ -1166,9 +1170,9 @@ def close_orphan_paper_trades(hl_pos, prices):
                 else:
                     # HL position not yet registered — wait before assuming missing.
                     # Race: paper trade created, HL order submitted, but HL hasn't confirmed yet.
-                    # Retry up to 3 times with 5s delay.
+                    # Retry up to 6 times with 5s delay = 30s total (was 3×5s=15s).
                     registered = False
-                    for retry in range(3):
+                    for retry in range(6):
                         time.sleep(5)
                         try:
                             hl_pos_retry = get_open_hype_positions_curl()
@@ -1290,6 +1294,24 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             return
 
         entry_price, direction, amount_usdt, leverage = row
+
+        # FIX (2026-04-05): Sanity-check entry_price against current market price.
+        # If entry_price is <10% or >10x current market, the entry was corrupted (e.g.
+        # add_orphan_trade swapped entry_price and amount_usdt, causing ep=~$10 for BTC).
+        # This is separate from the PnL>1000% check which validates exit price via HL PnL.
+        # When entry is corrupted, use current market price as entry to get a realistic close.
+        try:
+            curr_mkt = float(exit_price)  # exit_price is already validated as current mkt price
+            ep_f = float(entry_price)
+            if ep_f > 0 and curr_mkt > 0:
+                ratio = ep_f / curr_mkt
+                if ratio < 0.1 or ratio > 10:
+                    log(f'  ⚠️ {token} entry_price {ep_f:.4f} is {ratio:.4f}x market price '
+                        f'{curr_mkt:.4f} — corrupted (swap bug?). Using market price as entry.', 'WARN')
+                    entry_price = curr_mkt
+        except Exception as ep_err:
+            log(f'  Entry price sanity check failed: {ep_err}', 'WARN')
+
         # BUG-25 fix: sanity-check exit price against entry + market price.
         # If exit price is >20% different from current market, something is wrong.
         # Reject the HL fill and fall back to current market price.

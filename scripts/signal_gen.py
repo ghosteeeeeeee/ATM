@@ -91,6 +91,21 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
     except Exception as e:
         print(f"[signal_gen] _persist_momentum_state DB error: {e}")  # logged, not silently swallowed
 
+
+def is_reasonable_price(token: str, price) -> bool:
+    """
+    Return False if price is corrupted (None, zero, negative, impossibly high/low).
+    Prevents corrupted prices from entering the signal DB.
+    """
+    if price is None or price <= 0:
+        return False
+    if price > 1_000_000:
+        return False
+    if price < 0.00001:
+        return False
+    return True
+
+
 from signal_schema import (
     init_db, get_all_latest_prices, get_price_history,
     expire_pending_signals,
@@ -586,7 +601,11 @@ def get_momentum_stats(token):
     avg_z   = statistics.mean(z_vals) if z_vals else 0
     max_z   = max(z_vals) if z_vals else 0
     min_z   = min(z_vals) if z_vals else 0
-    z_direction = 'rising' if avg_z > 0.3 else 'falling' if avg_z < -0.3 else 'neutral'
+    # FIX (2026-04-05): z_direction semantics were INVERTED.
+    # 'rising' means z-score is rising = price mean-reverting UP = at local BOTTOM (good for LONG)
+    # 'falling' means z-score is falling = price mean-reverting DOWN = at local TOP (good for SHORT)
+    # Previous code had it backwards: avg_z > 0 (elevated price) was labeled 'rising'.
+    z_direction = 'rising' if avg_z < -0.3 else 'falling' if avg_z > 0.3 else 'neutral'
 
     # NOTE: volume_roc is NOT cached here — fetch it AFTER prefetch completes
     # via get_volume_roc() in compute_score, which reads the shared _VOL_CACHE
@@ -1274,6 +1293,8 @@ def _run_rsi_signals_for_confluence():
         z = compute_zscore(token)
         z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
         price = data['price']
+        if not is_reasonable_price(token, price):
+            continue
         if rsi < CONFLUENCE_RSI_LOW:
             # ── LONG: RSI oversold (below LOW threshold = deeply oversold) + z-score suppressed ──
             if broad_avg > BROAD_UPTEND_Z:
@@ -1328,14 +1349,110 @@ def _run_mtf_macd_signals():
     def _macd_crossover(token, minutes):
         """
         Compute MACD crossover for a token at given timeframe.
-        Returns (histogram: float, macd_line: float, signal_line: float) or None.
-        histogram > 0 means MACD line is ABOVE signal line → bullish  → LONG
-        histogram < 0 means MACD line is BELOW signal line → bearish → SHORT
+        Aggregates raw minute-candles into the target timeframe, computes MACD(12/26/9)
+        on those TF candles, then detects whether a crossover occurred between the
+        previous bar and current bar.
+
+        Returns (histogram: float, macd_line: float, signal_line: float,
+                 crossover_dir: int) or None.
+
+        crossover_dir:  1 = bullish crossover (MACD crossed ABOVE signal → LONG)
+                      -1 = bearish crossover (MACD crossed BELOW signal → SHORT)
+                       0 = no crossover (MACD still on same side of signal)
         """
-        m = compute_macd(token, lookback_minutes=minutes)
-        if not m:
+        # Fetch enough raw candles to form ≥2 TF bars for crossover detection.
+        # Each TF candle needs (tf_minutes) of raw data. Fetch enough for 40 TF bars.
+        tf_minutes = minutes
+        lookback_raw = tf_minutes * 40
+        rows = get_price_history(token, lookback_minutes=lookback_raw)
+        if not rows or len(rows) < 40:
             return None
-        return (m.get('histogram', 0), m.get('macd', 0), m.get('signal', 0))
+
+        # Aggregate raw 90-sec candles into TF candles (OHLC)
+        tf_sec = tf_minutes * 60
+        buckets = {}
+        for ts, close in rows:
+            bucket_ts = (ts // tf_sec) * tf_sec
+            if bucket_ts not in buckets:
+                buckets[bucket_ts] = [close, close, close, close]  # open, high, low, close
+            else:
+                buckets[bucket_ts][1] = max(buckets[bucket_ts][1], close)   # high
+                buckets[bucket_ts][2] = min(buckets[bucket_ts][2], close)  # low
+                buckets[bucket_ts][3] = close                                # close
+
+        sorted_ts = sorted(buckets.keys())
+        if len(sorted_ts) < 4:   # need at least a few TF bars
+            return None
+
+        closes_all = [buckets[ts][3] for ts in sorted_ts]
+
+        # Select MACD params based on how many TF bars we have.
+        # Standard MACD(12,26,9) needs 35 bars — use it when available (1H, 15m).
+        # 4H: DB caps at 2000 rows (~2 days) → ~10 4H bars. Use fast MACD(2,4,2).
+        # FIX B (2026-04-05): use closes_all[:-1] (prev bar count) to determine params.
+        # This ensures BOTH current and prev bars use the same compatible params —
+        # prev has 1 fewer bar, so using closes_all count could select standard MACD(12,26,9)
+        # for current (35 bars) but prev would get None (34 bars < 35), silently skipping
+        # the crossover detection at exactly 35 bars.
+        n_bars = len(closes_all[:-1])
+        if n_bars >= 35:
+            fast, slow, sig = 12, 26, 9
+        elif n_bars >= 6:
+            fast, slow, sig = 2, 4, 2   # fast MACD for sparse-data TFs (4H ~10 bars)
+        else:
+            return None  # not enough bars for any MACD
+
+        def _macd_from_closes(closes_list, _fast=fast, _slow=slow, _sig=sig):
+            """Compute MACD on closes with adaptive params."""
+            if len(closes_list) < _slow + _sig:
+                return None, None, None
+            def ema(data, period):
+                if len(data) < period:
+                    return None
+                k = 2 / (period + 1)
+                ema_val = sum(data[:period]) / period
+                for price in data[period:]:
+                    ema_val = price * k + ema_val * (1 - k)
+                return ema_val
+            ef = ema(closes_list, _fast)
+            es = ema(closes_list, _slow)
+            if ef is None or es is None:
+                return None, None, None
+            macd_line = ef - es
+            macd_vals = []
+            for i in range(_slow, len(closes_list)):
+                efa = ema(closes_list[:i+1], _fast)
+                esa = ema(closes_list[:i+1], _slow)
+                if efa and esa:
+                    macd_vals.append(efa - esa)
+            if len(macd_vals) < _sig:
+                return None, None, None
+            sig_val = ema(macd_vals, _sig)
+            if sig_val is None:
+                return None, None, None
+            return round(macd_line, 6), round(sig_val, 6), round(macd_line - sig_val, 6)
+
+        # Previous bar: all TF closes except the last one
+        closes_prev = closes_all[:-1]
+        macd_prev, sig_prev, hist_prev = _macd_from_closes(closes_prev)
+        # Current bar: all TF closes including the last one
+        macd_cur, sig_cur, hist_cur = _macd_from_closes(closes_all)
+
+        if macd_cur is None or macd_prev is None:
+            return None
+
+        # Crossover: MACD line crossed ABOVE signal (prev ≤ 0, cur > 0) → bullish
+        #             MACD line crossed BELOW signal (prev ≥ 0, cur < 0) → bearish
+        prev_macd_above_sig = (macd_prev - sig_prev) >= 0
+        cur_macd_above_sig  = (macd_cur  - sig_cur)  >  0
+        if not prev_macd_above_sig and cur_macd_above_sig:
+            crossover_dir =  1   # bullish — MACD crossed above signal
+        elif prev_macd_above_sig and not cur_macd_above_sig:
+            crossover_dir = -1   # bearish — MACD crossed below signal
+        else:
+            crossover_dir =  0   # no crossover event
+
+        return (hist_cur, macd_cur, sig_cur, crossover_dir)
 
     # ── Individual RSI + MACD signals for sub-component confluence ──────────
     # These write to DB with distinct signal_types so confluence can cross-match.
@@ -1356,6 +1473,8 @@ def _run_mtf_macd_signals():
             continue
 
         price = data['price']
+        if not is_reasonable_price(token, price):
+            continue
         mom = get_momentum_stats(token)
         if not mom:
             continue
@@ -1378,24 +1497,35 @@ def _run_mtf_macd_signals():
         xo_1h  = _macd_crossover(token, 60*1)
         xo_15m = _macd_crossover(token, 15)
 
-        # Collect valid (histogram, macd, signal) tuples per TF
+        # Collect valid (histogram, macd, signal, crossover_dir) tuples per TF
         valid = {}
         for tf, xo in [('4h', xo_4h), ('1h', xo_1h), ('15m', xo_15m)]:
             if xo is not None:
                 valid[tf] = xo
 
         if len(valid) >= 2:
-            # At least 2 TFs have MACD data → use crossover agreement across TFs
-            bullish_tfs = sum(1 for tf, (h, m, s) in valid.items() if h > 0)
+            # At least 2 TFs have MACD data → use crossover agreement across TFs.
+            # PRIMARY signal: crossover_dir (actual MACD line crossing signal line).
+            # Falls back to histogram sign if no crossover detected (crossover_dir == 0).
+            bullish_tfs = 0
+            for tf, (h, m, s, xo_dir) in valid.items():
+                if xo_dir == 1:       # bullish crossover confirmed
+                    bullish_tfs += 2  # crossover is strong signal — weight 2x
+                elif xo_dir == 0 and h > 0:  # no crossover, but MACD above signal
+                    bullish_tfs += 1
             total_tfs   = len(valid)
-            direction   = 'LONG' if bullish_tfs >= total_tfs / 2 else 'SHORT'
-            strength    = bullish_tfs  # how many TFs agree
-            timeframe_str = f'{min(bullish_tfs, total_tfs)}tf+'
+            direction   = 'LONG' if bullish_tfs > total_tfs else 'SHORT'
+            strength    = bullish_tfs  # weighted count
+            timeframe_str = f'{min(bullish_tfs, total_tfs*2)}tf+'
         elif len(valid) == 1:
-            # Single TF → use histogram direction
-            tf, (h, m, s) = next(iter(valid.items()))
-            direction = 'LONG' if h > 0 else 'SHORT'
-            strength  = 1
+            # Single TF → use crossover_dir, fallback to histogram sign
+            tf, (h, m, s, xo_dir) = next(iter(valid.items()))
+            if xo_dir == 1:
+                direction = 'LONG'; strength = 2
+            elif xo_dir == -1:
+                direction = 'SHORT'; strength = 2
+            else:
+                direction = 'LONG' if h > 0 else 'SHORT'; strength = 1
             timeframe_str = tf
         else:
             continue  # no MACD data at all
@@ -1458,9 +1588,10 @@ def _run_mtf_macd_signals():
             pct_val = pct_short
         if pct_signal_dir:
             # Normalize percentile_rank to signal-strength equivalent.
-            # pct_val 85→15pts, pct_val 100→50pts. Cap at 50 so it contributes
-            # proportionally to other signals (z_score: 0-30, velocity: 0-10).
-            pct_conf = min(50, (pct_val - 70) * (50.0 / 30.0))
+            # pct_val 85→60pts, pct_val 100→75pts. Reaches MIN_CONFIDENCE_FLOOR (50)
+            # at pct_val=85 so it now passes the confidence threshold. Cap at 75 so it
+            # contributes proportionally to other signals (z_score: 0-30, velocity: 0-65).
+            pct_conf = min(75, (pct_val - 70) * 4.0)
             add_signal(token, pct_signal_dir, 'percentile_rank', 'pct-hermes',
                         confidence=round(pct_conf, 1), value=pct_val, price=price,
                         exchange='hyperliquid', timeframe='4h',
@@ -1502,12 +1633,16 @@ def _run_mtf_macd_signals():
         if len(valid_z) >= 2:
             bullish_tfs = sum(1 for v in valid_z if v > 0)
             bearish_tfs = len(valid_z) - bullish_tfs
-            # Local direction from raw MTF agreement
-            local_dir = 'LONG' if bullish_tfs >= 2 else ('SHORT' if bearish_tfs >= 2 else None)
-            # Map z_direction ('falling'→LONG, 'rising'→SHORT) for comparison
-            # z_dir from get_momentum_stats is 'falling'/'rising'/'neutral'
-            z_dir_map = {'falling': 'LONG', 'rising': 'SHORT'}
-            regime_dir = z_dir_map.get(z_dir.lower(), None)
+            # FIX (2026-04-05): z > 0 = price above mean = bearish = SHORT
+            #                   z < 0 = price below mean = bullish = LONG
+            local_dir = 'SHORT' if bullish_tfs >= 2 else ('LONG' if bearish_tfs >= 2 else None)
+            # Map z_direction to regime direction for MTF agreement check.
+            # z_dir: 'rising' = price at local BOTTOM (bullish for LONG in bear phase),
+            #        'falling' = price at local TOP (bullish for SHORT in bull phase).
+            # With corrected semantics (2026-04-05): 'rising'→'LONG', 'falling'→'SHORT'.
+            # FIX A (2026-04-05): explicit 'neutral' key — neutral → regime_dir=None → skip
+            z_dir_map = {'rising': 'LONG', 'falling': 'SHORT', 'neutral': None}
+            regime_dir = z_dir_map.get(z_dir.lower(), 'neutral')
             # Only fire if MTF direction matches regime direction (or regime is neutral)
             if local_dir and (regime_dir is None or local_dir == regime_dir):
                 z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
@@ -1548,6 +1683,8 @@ def _run_macd_signals_for_confluence():
         z = compute_zscore(token)
         z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
         price = data['price']
+        if not is_reasonable_price(token, price):
+            continue
         if abs(h) < CONFLUENCE_MACD_HIST_THRESH:
             continue
         direction = 'LONG' if h > 0 else 'SHORT'
@@ -1653,40 +1790,31 @@ def run_confluence_detection(regime, long_mult, short_mult):
         if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
             continue
 
-        # ── HOT-SET GATE (2026-04-03) ───────────────────────────────────────────
+        # ── HOT-SET GATE (2026-04-03, FIXED 2026-04-05) ─────────────────────────
         # HOT-SET DISCIPLINE: Only generate confluence signals for tokens that
         # survived ai_decider compaction. All entry points must route through
         # the hot-set. The conf-1s path via _run_hot_set() is the sole arbiter.
         # Confluence signals for non-hot-set tokens are BLOCKED here — they bypassed
         # ai_decider review and would violate the "hot-set only" discipline.
         #
-        # Exception: tokens with compact_rounds > 0 have survived ai_decider review
-        # and are eligible. Tokens in hotset.json are also eligible (may have been
-        # promoted since the last ai_decider pass).
-        try:
-            _hs_conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-            _hs_cr = _hs_conn.execute(
-                "SELECT MAX(COALESCE(compact_rounds, 0)) FROM signals WHERE token=? AND direction=? AND executed=0",
-                (token.upper(), direction.upper())
-            ).fetchone()[0] or 0
-            _hs_conn.close()
-        except Exception:
-            _hs_cr = 0
-        if _hs_cr <= 0:
-            _in_hs = False
-            if os.path.exists('/var/www/hermes/data/hotset.json'):
-                try:
-                    with open('/var/www/hermes/data/hotset.json') as _f:
-                        _hs_data = _json.load(_f)
-                    _in_hs = any(
-                        h.get('token', '').upper() == token.upper()
-                        and h.get('direction', '').upper() == direction.upper()
-                        for h in _hs_data.get('hotset', [])
-                    )
-                except Exception:
-                    pass
-            if not _in_hs:
-                continue  # BLOCK — not in hot-set and never compacted
+        # A token must be in hotset.json to pass. compact_rounds > 0 in the DB is NOT
+        # sufficient on its own — a token can accumulate compact_rounds and then be
+        # evicted from hotset.json. stale signals would still fire and produce trades
+        # that hl-sync-guardian closes with hotset_blocked.
+        _in_hs = False
+        if os.path.exists('/var/www/hermes/data/hotset.json'):
+            try:
+                with open('/var/www/hermes/data/hotset.json') as _f:
+                    _hs_data = _json.load(_f)
+                _in_hs = any(
+                    h.get('token', '').upper() == token.upper()
+                    and h.get('direction', '').upper() == direction.upper()
+                    for h in _hs_data.get('hotset', [])
+                )
+            except Exception:
+                pass
+        if not _in_hs:
+            continue  # BLOCK — not in current hot-set
 
         # Fetch per-source confidences from both DBs for accurate scoring.
         # OpenClaw mtf- signals are floored at 70%.
@@ -1839,6 +1967,8 @@ def run():
             continue
 
         price = data['price']
+        if not is_reasonable_price(token, price):
+            continue
         mom = get_momentum_stats(token)
 
         # ── LONG signals ──────────────────────────────────────

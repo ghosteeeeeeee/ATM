@@ -1,0 +1,27 @@
+# CONTEXT.md - Hermes ATM
+This is where our current workflow will be documented. Things you should remember for today and the next week. Important things, Key decisions, Things that would break if we forgot one of these pieces. Update it frequently and keep things short and tidy, use bullet points.
+
+## Active Projects
+
+| Project | Status | Notes |
+|---------|--------|-------|
+| [Project] | [Status] | [Brief note] |
+
+
+### Trading System 
+- **Win rate:** 45% (working on improvements)
+- **Exit manager:** Fixed - now monitors Raydium + Hyperliquid
+- **JLP trade:** Closed at SL (-4.77%)
+- **BTC trade:** Closed at TP (+11.4%)
+
+### System Fixes This Session
+- ✅ Hyperliquid trades now show "(1X)" leverage
+- ✅ Trade exit manager monitors all exchanges
+- ✅ Price cache cleared (was causing stale data)
+
+## Recently Resolved
+- ✅ Added JLP to CoinGecko price mapping
+- ✅ Fixed leveraged P&L display for Raydium trades
+
+---
+*Updated: 2026-03-14 15:27 UTC*

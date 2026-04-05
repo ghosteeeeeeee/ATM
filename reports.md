@@ -354,3 +354,67 @@ Top suggestions:
 - Net PnL: +$3.1M (dominated by PAXG +$1.54M, BCH +$18.7K)
 - Win rate: 28% (45/158 trades)
 - LONG: 149 trades, avg +$20,867 | SHORT: 9 trades, avg -$1.70
+
+---
+
+## 2026-04-05 AI Engineer Subagent Report (Session 2026-04-05 02:35)
+
+### ISSUE 1: All Open Trades Randomly Closed — ROOT CAUSE
+
+**Finding: `hl-sync-guardian.py` mass-close on HL position non-confirmation**
+
+- `hl-sync-guardian.py` runs every 60s independently of the pipeline
+- When a paper trade is submitted to HL, it waits **3 retries × 5s = 15 seconds max** for HL to confirm
+- At 02:45, 8 paper trades were submitted; HL didn't confirm within 15s → guardian closed them as `hl_position_missing`
+- Exit prices were garbage (0.08, 0.66 etc.) — guardian used estimated prices since no fill was found
+- 2 additional live trades closed as `guardian_missing` (fell out of HL's `safe_to_close` list)
+- **Root cause**: 15s timeout too short for HL API latency during busy periods
+
+**Fix applied**: `hl-sync-guardian.py` line 1175 — increased `range(3)` → `range(6)` (30s total)
+
+---
+
+### ISSUE 2: 694 Signals Below 55% Confidence (Signal Noise)
+
+**Finding: `add_signal()` had no minimum confidence floor — signals as low as 30-50% were written**
+
+- Root cause: `MIN_CONFIDENCE_FLOOR` was missing; signals with 30-50% confidence (esp. `percentile_rank`) were inserted but never passed the 65% entry threshold
+- These generated stale WAIT records that never expired, bloating the DB
+
+**Fix applied** (`signal_schema.py`): Added `MIN_CONFIDENCE_FLOOR = 50` — signals below 50% silently rejected at write time
+
+**Bonus fix** (`signal_gen.py`): `percentile_rank` formula was capped at 50%, conflicting with the new 50% floor (all pct_rank signals rejected). Formula adjusted from:
+- `min(50, (pct_val - 70) * (50.0/30.0))` → `min(75, (pct_val - 70) * 4.0)`
+- pct_val=85 now → 60% (passes floor), pct_val<85 correctly rejected
+
+---
+
+### ISSUE 3: 5 WAIT Signals Cleared (SUPER/TNSR)
+
+**Action**: Reset 5 oldest WAIT signals to PENDING for re-review.
+
+| ID | Token | Direction | Signal Type | Was → Now |
+|----|-------|-----------|-------------|-----------|
+| 278813 | SUPER | SHORT | rsi_confluence | WAIT → PENDING |
+| 278911 | SUPER | LONG | mtf_macd | WAIT → PENDING |
+| 278912 | SUPER | LONG | rsi_individual | WAIT → PENDING |
+| 278913 | SUPER | LONG | percentile_rank | WAIT → PENDING |
+| 278953 | TNSR | SHORT | mtf_macd | WAIT → PENDING |
+
+Note: No AAVE WAIT signals existed — all 5 were SUPER/TNSR from 2026-04-03.
+
+---
+
+### Runtime DB Size (195MB) — NOT RESOLVED
+
+- WASP warning: "Runtime DB is 195MB (should be < 50MB)"
+- Main culprit: `signal_history` table has **697,570 rows** (compaction tracking)
+- `signals` table: 89,164 rows
+- The `init_db()` / `get_confluence_signals()` fixes from earlier session addressed **latency** (134MB static DB scan), not runtime DB size
+- **Separate issue requiring compaction or archival of signal_history**
+
+### Files Modified
+1. `/root/.hermes/scripts/hl-sync-guardian.py` — timeout 15s→30s (line 1175)
+2. `/root/.hermes/scripts/signal_schema.py` — `MIN_CONFIDENCE_FLOOR = 50` in `add_signal()`
+3. `/root/.hermes/scripts/signal_gen.py` — `percentile_rank` formula boosted to 60-75% range
+4. `/root/.hermes/scripts/signal_schema.py` — 5 WAIT signals reset to PENDING

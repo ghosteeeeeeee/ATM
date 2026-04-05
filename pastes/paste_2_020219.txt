@@ -1,0 +1,13 @@
+ALGO	LONG	$0.1200	$0.1192	-0.64%	$-0.32	5x	$50.0	guardian_missing	conf-1s	2026-04-05 00:47:52
+8	XMR	LONG	$324.8500	$324.8500	+0.00%	+$0.00	5x	$50.0	hotset_blocked	conf-4s	2026-04-05 00:46:51
+9	CC	LONG	$10.1996	$0.1398	-98.63%	$-0.14	3x	$0.1	hl_position_missing		2026-04-05 00:46:49
+10	RESOLV	LONG	$10.1327	$0.0398	-99.61%	$-0.04	3x	$0.0	hl_position_missing		2026-04-05 00:46:34
+11	TNSR	LONG	$10.1172	$0.0360	-99.64%	$-0.04	3x	$0.0	hl_position_missing		2026-04-05 00:46:19
+12	ETHFI	LONG	$10.1087	$0.4389	-95.66%	$-0.42	5x	$0.4	hl_position_missing		2026-04-05 00:46:04
+13	STRK	LONG	$10.1058	$0.0332	-99.67%	$-0.03	5x	$0.0	hl_position_missing		2026-04-05 00:45:48
+14	ALT	LONG	$10.1092	$0.0064	-99.94%	$-0.01	3x	$0.0	hl_position_missing		2026-04-05 00:45:33
+15	PENDLE	LONG	$10.4930	$1.0483	-90.01%	$-0.95	5x	$1.1	hl_position_missing		2026-04-05 00:45:18
+16	ATOM	LONG	$10.1120	$1.7098	-83.09%	$-1.41	5x	$1.7	hl_position_missing		2026-04-05 00:45:02
+17	XMR	SHORT	$324.9500	$324.9500	+0.00%	+$0.00	5x	$50.0	hotset_blocked	conf-1s	2026-04-05 00:44:59
+18	CC	LONG	$0.1397	$0.1397	+0.00%	+$0.00	3x	$50.0	guardian_missing	conf-1s	2026-04-05 00:41:52
+19	ETHFI	LONG	$0.4395	$0.4395	+0.00%	+$0.00	5x	$50.0	guardian_missing	conf-2s	2026-04-05 00:41:49

@@ -1,0 +1,42 @@
+# LESSONS.md — Principles and Patterns
+
+> Hard-won lessons. Never repeat these mistakes.
+
+---
+
+## Trading
+
+### Stop Losses
+- **Always calculate P&L correctly for shorts** — profit is `(entry - current) / entry`, not the other way around
+- **Trailing stops need activation threshold** — don't trail from entry; wait for proof (e.g., +2% profit)
+- **Lock minimum profit** — when activating trailing, set a floor SL at breakeven + X% before trailing
+- **One place for trailing logic** — don't duplicate in heartbeat AND trailing-stop-manager; use the service
+- **The trailing-stop-manager.py service** — runs via `ro-trailing-stop.service` on Dallas, NOT the JS version
+
+### Position Sizing
+- 20X only for high confidence (80+, multiple confluences, multi-timeframe)
+- Low confidence = 5X-10X for breathing room
+- Win rate improves → tighten leverage requirements
+
+### Trade Execution
+- Always check current price before updating SL in DB
+- Verify trade side (long/short) in ALL calculations
+
+---
+
+## Technical
+
+### Database Queries
+- Use `::numeric` cast for PostgreSQL decimal fields
+- Always include `side` column when querying trades
+- Quote strings properly: `status='open'` not `status=open`
+
+### SSH Connections
+- Use `-o ConnectTimeout=5` to avoid hanging
+- Quote SQL properly in nested SSH commands: `\"column = 'value'\"`
+- Test queries locally before scripting
+
+### Scripting Patterns
+- **Lock files** — prevent overlapping runs in services
+- **State files** — persist peak prices, activation status across runs
+- **Log everything** — include timestamps, use consistent format
