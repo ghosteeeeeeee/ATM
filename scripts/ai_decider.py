@@ -1076,17 +1076,17 @@ def get_pending_signals():
                 c_hot = conn.cursor()
                 # Deduplicate by token+direction, keeping the row with highest survival_score
                 # This prevents duplicate entries (e.g., BTC appearing twice with 94.5% and 90.0%)
-                # FIX (2026-04-05): GROUP BY token+direction to prevent duplicates.
-                # Same token+direction with multiple signal_types (mtf_zscore+mtf_macd both
-                # agreeing = confluence) should appear as ONE row with max confidence.
-                # JOIN + ORDER BY alone still returns duplicates when survival_scores tie.
+                # FIX (2026-04-05): APPROVED only — PENDING means "awaiting AI review",
+                # should not appear in hot-set until approved. GROUP BY token+direction
+                # to prevent same token+direction from appearing twice (e.g. mtf_zscore+
+                # mtf_macd both agreeing = confluence, shown as one row with max conf).
                 c_hot.execute("""
                     SELECT token, direction,
                            -- Best signal_type = the one with highest confidence
                            (SELECT signal_type FROM signals s2
                             WHERE s2.token=signals.token
                               AND s2.direction=signals.direction
-                              AND s2.decision IN ('PENDING','APPROVED')
+                              AND s2.decision='APPROVED'
                               AND s2.executed=0
                               AND s2.review_count>=1
                               AND s2.created_at > datetime('now','-3 hours')
@@ -1098,7 +1098,7 @@ def get_pending_signals():
                            MAX(z_score) as z_score,
                            MAX(review_count) as review_count
                     FROM signals
-                    WHERE decision IN ('PENDING', 'APPROVED')
+                    WHERE decision='APPROVED'
                       AND executed = 0
                       AND review_count >= 1
                       AND created_at > datetime('now', '-3 hours')
@@ -1822,12 +1822,13 @@ if __name__ == '__main__':
             # reaching r2 due to 15-min TTL, and many legitimate signals stay WAIT
             # (AI needs more data) instead of going straight to EXEC.
 
-            # Quality gate: require 1+ distinct signal types and avg_conf >= 40%
-            # FIX (2026-04-02): Was < 2 types. Lowered to allow single-source hmacd signals
-            # through. avg_conf >= 40% is the real quality filter — it measures conviction.
+            # Quality gate: require 1+ distinct signal types and avg_conf >= 80%
+            # FIX (2026-04-05): Raised from 40% → 80% because hot-set now has 20+ tokens.
+            # With more tokens competing for 10 slots, we need higher conviction to avoid
+            # low-confidence noise from filling our portfolio and blocking real signals.
             num_types = hot.get('num_types', 0)
             avg_conf = hot.get('avg_conf', 0)
-            if num_types < 1 or avg_conf < 40:
+            if num_types < 1 or avg_conf < 80:
                 avg_conf_str = f"{avg_conf:.0f}%" if avg_conf is not None else "N/A"
                 print(f"   ⏸️ 🔥 r{hot['rounds']} {t} [{hot.get('source','?')}]: quality gate failed (types={num_types}, avg_conf={avg_conf_str})")
                 log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
