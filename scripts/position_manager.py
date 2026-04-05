@@ -119,7 +119,12 @@ def _speed_increasing(token: str, speed_tracker) -> tuple:
     if speed_tracker is None:
         return (True, 50.0)  # Fail open: allow flip if no speed data
     try:
-        speed, percentile = speed_tracker.get_speed(token)
+        # BUG FIX (2026-04-05): get_speed doesn't exist, should be get_token_speed
+        # which returns dict, not tuple. Also add None guard for percentile.
+        speed_data = speed_tracker.get_token_speed(token)
+        percentile = speed_data.get("speed_percentile", 50)
+        if percentile is None:
+            percentile = 50
         return (percentile >= 50.0, percentile)
     except Exception:
         return (True, 50.0)  # Fail open
