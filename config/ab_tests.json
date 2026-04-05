@@ -17,12 +17,12 @@
             "evolved_from": "SL1pct",
             "spawned_at": "2026-04-05T04:08:30.499110"
           },
-          "trades": 174,
+          "trades": 177,
           "wins": 0,
           "losses": 2,
           "winRate": 0,
           "totalPnlPct": 0.08,
-          "lastUpdated": "2026-04-05 15:23:54.202217"
+          "lastUpdated": "2026-04-05 15:32:01.064830"
         }
       ]
     },
@@ -38,12 +38,12 @@
           "config": {
             "entryMode": "immediate"
           },
-          "trades": 222,
+          "trades": 224,
           "wins": 0,
           "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0.08,
-          "lastUpdated": "2026-04-05 15:23:54.206219"
+          "lastUpdated": "2026-04-05 15:32:01.069492"
         },
         {
           "id": "EVO-3",
@@ -58,12 +58,12 @@
             "evolved_from": "IMMEDIATE",
             "spawned_at": "2026-04-05T04:08:30.504948"
           },
-          "trades": 46,
+          "trades": 47,
           "wins": 0,
           "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 15:22:54.530516"
+          "lastUpdated": "2026-04-05 15:32:00.840869"
         }
       ]
     },
@@ -96,12 +96,12 @@
             "trailingActivationPct": 2.0,
             "trailingDistancePct": 1.0
           },
-          "trades": 447,
-          "wins": 1,
+          "trades": 451,
+          "wins": 2,
           "losses": 5,
-          "winRate": 0.2,
-          "totalPnlPct": 0.21,
-          "lastUpdated": "2026-04-05 15:23:54.210218"
+          "winRate": 0.4,
+          "totalPnlPct": 1.65,
+          "lastUpdated": "2026-04-05 15:40:11.481566"
         },
         {
           "id": "TSEVO-3",

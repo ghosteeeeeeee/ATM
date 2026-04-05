@@ -1984,7 +1984,7 @@ def run():
                         macd_line_val = mom.get('macd_line') if mom else None
                         macd_hist_val = mom.get('macd_hist') if mom else None
                         macd_signal_val = mom.get('macd_signal') if mom else None
-                        sources = '+'.join(sorted(set(s[0] for s in signals)))
+                        sources = ','.join(sorted(set(s[0] for s in signals)))
                         reasons = ' | '.join(s[3] for s in signals[:4])
 
                         # ── Spike Detection ───────────────────────────────
@@ -1993,7 +1993,7 @@ def run():
                             opp_score, opp_signals, pump_tag = score_for_counter_spike(
                                 token, 'LONG', long_mult, short_mult)
                             opp_dir = _get_reverse_signal_name('LONG')
-                            opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
+                            opp_sources = ','.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
                             opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
                             if is_pump:
                                 pump_tag = f'pump-{opp_dir.lower()}'
@@ -2073,7 +2073,7 @@ def run():
                             print(f'  SHORT-B {token:8s} {score:5.1f}% [BLOCKED] {short_filter_reason}')
                             blocked += 1
                         else:
-                            sources = '+'.join(sorted(set(s[0] for s in signals)))
+                            sources = ','.join(sorted(set(s[0] for s in signals)))
                             reasons = ' | '.join(s[3] for s in signals[:4])
 
                             # ── Spike Detection ───────────────────────────────
@@ -2082,7 +2082,7 @@ def run():
                                 opp_score, opp_signals, pump_tag = score_for_counter_spike(
                                     token, 'SHORT', long_mult, short_mult)
                                 opp_dir = _get_reverse_signal_name('SHORT')
-                                opp_sources = '+'.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
+                                opp_sources = ','.join(sorted(set(s[0] for s in opp_signals))) if opp_signals else 'momentum'
                                 opp_reasons = ' | '.join(s[3] for s in opp_signals[:3]) if opp_signals else 'reverse'
                                 if is_pump:
                                     pump_tag = f'pump-{opp_dir.lower()}'
