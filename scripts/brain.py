@@ -664,7 +664,7 @@ if __name__ == "__main__":
         add_parser.add_argument("entry", type=float, help="Entry price")
         add_parser.add_argument("--exchange", default="Hyperliquid", help="Exchange name")
         add_parser.add_argument("--strategy", help="Strategy name")
-        add_parser.add_argument("--paper", action="store_true", default=True, help="Paper trade (default)")
+        add_parser.add_argument("--paper", action="store_true", default=False, help="Paper trade")
         add_parser.add_argument("--real", action="store_true", help="Real trade (not paper)")
         add_parser.add_argument("--sl", type=float, help="Stop loss price")
         add_parser.add_argument("--target", type=float, help="Target price")

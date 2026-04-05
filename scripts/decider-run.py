@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 decider-run.py — Execute approved signals via brain.py.
-Respects hype_live_trading.json: paper=True when disabled, real orders when enabled.
+Respects hype_live_trading.json: paper=False (live by default).
 Reads APPROVED signals, checks position limits, computes SL/TP, places trades.
 Also processes delayed-entry signals from pending-delayed-entries.json.
 """
@@ -348,7 +348,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
     }
 
 
-def process_delayed_entries(paper=True):
+def process_delayed_entries(paper=False):
     """
     Check pending delayed-entry signals.
     For each: if pullback reached OR max_wait expired → execute or expire.
@@ -463,7 +463,7 @@ def process_delayed_entries(paper=True):
 # ─── Trade Execution ──────────────────────────────────────────────
 
 def execute_trade(token, direction, price, confidence, source,
-                  leverage=10, paper=True, sl_pct=0.02,
+                  leverage=10, paper=False, sl_pct=0.02,
                   trailing_activation=0.01, trailing_distance=0.01,
                   trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
