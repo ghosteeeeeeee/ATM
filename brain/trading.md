@@ -252,4 +252,25 @@ What happened for ME:
 
 ---
 
-*This document is updated every 10 minutes by the pipeline. Last write: 2026-04-05 04:11 UTC*
+*This document is updated every 10 minutes by the pipeline. Last write: 2026-04-05 07:30 UTC*
+
+## Stale Trade Rotation (2026-04-05)
+
+**Problem:** Trades that don't move >1% in 15 minutes are dead weight — capital locked, no progress, opportunity cost.
+
+**Solution:** In `hl-sync-guardian.py`, added `_check_stale_rotation()`:
+
+1. Check if trade's `price_velocity_5m < 1%` → stale
+2. Load hot-set, find tokens with higher `speed_percentile` AND `velocity >= 1%`
+3. Exclude tokens already with open positions
+4. Rate-limit: max 1 rotation per token per 3 min
+5. Close stale trade on HL, mark DB `close_reason='stale_rotation'`
+6. ai_decider picks up the slot on next run from hot-set qualified tokens
+
+**Guards:**
+- Skips cut-loser trades (<-5%)
+- Skips DRY mode
+- Waits for HL fill confirmation before marking DB closed
+- Uses 180s cooldown file (`/root/.hermes/data/stale-rotation-rate.json`)
+
+**Files modified:** `scripts/hl-sync-guardian.py` (+189 lines)

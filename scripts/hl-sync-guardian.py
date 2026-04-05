@@ -894,8 +894,21 @@ def sync_pnl_from_hype(prices):
                          'leverage': lev, 'amount_usdt': amount},
                         pnl_pct, prices)
 
+                    # ── Stale Trade Rotation (2026-04-05) ────────────────────────────────
+                    # If trade hasn't moved >1% in 15min AND a faster hot-set token exists
+                    # → close stale trade, let ai_decider refill from hot-set.
+                    # Runs after flip check; skipped for trades already being cut (<-5%).
+                    if pnl_pct > CUT_LOSER_THRESHOLD:
+                        try:
+                            _check_stale_rotation(
+                                {'id': trade_id, 'token': token, 'direction': direction,
+                                 'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
+                                pnl_pct, prices, conn, cur)
+                        except Exception as stale_err:
+                            log(f'  [STALE-ROTATION] {token} error: {stale_err}', 'WARN')
+
                     updated += 1
-                    # Cut-loser: emergency exit at -10% loss
+                    # Cut-loser: emergency exit at -5% loss
                     # This runs AFTER flip check, so flip has priority over hard cut
                     # ── Cut-loser: BUG-2/3/28 fix ────────────────────────────────────────
                     # IMPORTANT: close_position() sends order but does NOT wait for fill.
@@ -956,6 +969,189 @@ def sync_pnl_from_hype(prices):
         except:
             pass
         log(f'  sync_pnl_from_hype error: {e}', 'FAIL')
+
+
+# ─── Stale Trade Rotation (2026-04-05) ───────────────────────────────────────
+
+def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
+                           db_conn, db_cur):
+    """
+    Stale Trade Rotation: close trades that haven't moved >1% in 15min
+    if a faster hot-set token is available.
+
+    Rule: if any open trade has price_velocity_5m < 1% (flat for 15min)
+    AND hot-set contains a token with higher speed_percentile
+    → close the stale trade, let ai_decider refill from hot-set.
+
+    Guards:
+    - Skips trades already in cut-loser territory (<-5%)
+    - Skips trades with flip_armed=True
+    - Skips if DRY mode
+    - Rate-limited: max 1 rotation per 3 minutes per token
+    """
+    if DRY:
+        return
+
+    import json as _json, time as _time, sqlite3 as _sqlite3
+
+    token = trade['token']
+    trade_id = trade['id']
+    entry_px = float(trade.get('entry_price') or 0)
+    direction = trade.get('direction', 'SHORT')
+
+    STALE_VEL_PCT = 1.0        # trade must have moved >1% to be "alive"
+    STALE_AGE_MIN = 15         # look back 15 minutes
+    MAX_ROTATIONS = 2           # max 2 rotations per cycle
+    RATE_LIMIT_SEC = 180       # 3 min cooldown between rotations
+
+    # ── 1. Load speed data from runtime signals DB ──────────────────────────────
+    db_path = '/root/.hermes/data/signals_hermes_runtime.db'
+    if not os.path.exists(db_path):
+        return
+
+    speed_data = {}
+    try:
+        conn_s = _sqlite3.connect(db_path, timeout=5)
+        c_s = conn_s.cursor()
+        c_s.execute("""
+            SELECT token, speed_percentile, price_velocity_5m, is_stale, updated_at
+            FROM token_speeds
+            WHERE token = ?
+        """, (token,))
+        row = c_s.fetchone()
+        if row:
+            speed_data = {
+                'token': row[0],
+                'speed_percentile': row[1] or 50,
+                'price_velocity_5m': row[2] or 0,
+                'is_stale': bool(row[3]),
+                'updated_at': row[4],
+            }
+        conn_s.close()
+    except Exception as e:
+        log(f'  [STALE-ROTATION] {token} speed query failed: {e}', 'WARN')
+        return
+
+    vel = abs(speed_data.get('price_velocity_5m', 0) or 0)
+    sp = speed_data.get('speed_percentile', 50) or 50
+
+    # ── 2. Check if this trade is stale ───────────────────────────────────────
+    # Only SHORT trades: stale = price hasn't dropped enough (velocity near 0 or positive)
+    # LONG trades: stale = price hasn't risen enough (velocity near 0 or negative)
+    if direction.upper() == 'SHORT':
+        is_stale = vel < STALE_VEL_PCT   # SHORT needs price to fall; flat = stale
+    else:
+        is_stale = vel < STALE_VEL_PCT   # LONG needs price to rise; flat = stale
+
+    if not is_stale:
+        return  # Trade is moving fine
+
+    # ── 3. Load hot-set and find a faster replacement ──────────────────────────
+    hotset_path = '/var/www/hermes/data/hotset.json'
+    if not os.path.exists(hotset_path):
+        return
+
+    try:
+        with open(hotset_path) as f:
+            hs = _json.load(f)
+        hotset = hs.get('hotset', [])
+    except Exception as e:
+        log(f'  [STALE-ROTATION] hotset.json load error: {e}', 'WARN')
+        return
+
+    # Find tokens in hot-set with higher speed than this trade's token
+    # Exclude: same token, opposite direction (conflicts), tokens already have open positions
+    db_cur.execute("SELECT token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
+    open_tokens = {r[0] for r in db_cur.fetchall()}
+
+    candidates = []
+    for h in hotset:
+        ht = h['token']
+        hd = h['direction']
+        if ht == token:
+            continue  # same token
+        if ht in open_tokens:
+            continue  # already has open position
+        # Get speed for this hot-set token
+        try:
+            conn_hs = _sqlite3.connect(db_path, timeout=5)
+            c_hs = conn_hs.cursor()
+            c_hs.execute("SELECT speed_percentile, price_velocity_5m FROM token_speeds WHERE token=?", (ht,))
+            hr = c_hs.fetchone()
+            conn_hs.close()
+            if hr:
+                hs_sp = hr[0] or 50
+                hs_vel = abs(hr[1] or 0)
+                if hs_sp > sp and hs_vel >= STALE_VEL_PCT:
+                    candidates.append({
+                        'token': ht, 'direction': hd,
+                        'speed_percentile': hs_sp,
+                        'velocity_5m': hs_vel,
+                        'confidence': h.get('confidence', 80),
+                    })
+        except:
+            pass
+
+    if not candidates:
+        return  # No faster replacement available
+
+    # Sort by speed_percentile descending
+    candidates.sort(key=lambda x: -x['speed_percentile'])
+    best = candidates[0]
+
+    # ── 4. Rate-limit: don't rotate same token more than once per 3 min ─────────
+    rate_file = '/root/.hermes/data/stale-rotation-rate.json'
+    try:
+        rate_data = {}
+        if os.path.exists(rate_file):
+            with open(rate_file) as f:
+                rate_data = _json.load(f)
+        last_rot = rate_data.get(token, 0)
+        if _time.time() - last_rot < RATE_LIMIT_SEC:
+            return  # still in cooldown
+    except:
+        pass
+
+    # ── 5. Execute the rotation ────────────────────────────────────────────────
+    log(f'  [STALE-ROTATION] {token} {direction} stale (vel={vel:.2f}%, sp={sp:.0f}) → '
+        f'closing for {best["token"]} {best["direction"]} (sp={best["speed_percentile"]:.0f}%, vel={best["velocity_5m"]:.2f}%)',
+        'WARN')
+
+    from hyperliquid_exchange import close_position
+
+    close_result = close_position(token)
+    if not close_result.get('success'):
+        log(f'  [STALE-ROTATION] {token} close failed: {close_result.get("error")}', 'FAIL')
+        return
+
+    filled = _wait_for_position_closed(token, timeout=15)
+    if not filled:
+        log(f'  [STALE-ROTATION] {token} NOT closed after 15s — aborting rotation', 'FAIL')
+        return
+
+    # Mark trade as closed in DB
+    try:
+        db_cur.execute("""
+            UPDATE trades SET status='closed', guardian_closed=TRUE,
+                close_reason='stale_rotation', exit_reason='stale_velocity_low',
+                pnl_pct=%s, current_price=%s
+            WHERE id=%s AND status='open'
+        """, (pnl_pct, prices.get(token, entry_px), trade_id))
+        db_conn.commit()
+        log(f'  [STALE-ROTATION] {token} trade #{trade_id} closed (stale)', 'PASS')
+    except Exception as db_err:
+        log(f'  [STALE-ROTATION] DB update error: {db_err}', 'FAIL')
+
+    # Update rate limit
+    try:
+        rate_data[token] = _time.time()
+        with open(rate_file, 'w') as f:
+            _json.dump(rate_data, f)
+    except:
+        pass
+
+    log(f'  [STALE-ROTATION] Replaced {token} → {best["token"]} ({best["direction"]}) '
+        f'conf={best["confidence"]:.0f}% sp={best["speed_percentile"]:.0f}%', 'INFO')
 
 
 # ─── Token Intel (simplified from combined-trading.py) ───────────────────────

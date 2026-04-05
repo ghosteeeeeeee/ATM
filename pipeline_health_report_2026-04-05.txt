@@ -1,156 +1,161 @@
-============================================================
-  PIPELINE HEALTH REPORT — 2026-04-05 06:01
-============================================================
+================================================================================
+HERMES PIPELINE HEALTH REPORT — 2026-04-05
+================================================================================
+Source: signals_archive_20260405_0727 (live signals table)
+Outcome data: signal_outcomes table (30-day window)
+Generated: 2026-04-05 07:35 UTC
 
-## SIGNAL FUNNEL SUMMARY
+================================================================================
+1. FUNNEL VELOCITY (Live Signals)
+================================================================================
+  DECISION    COUNT   AVG_CONF  NOTES
+  EXPIRED     1,769   70.1%      ⚠️ 47% of all signals
+  SKIPPED       644   72.2%      17%
+  WAIT          244   74.4%      awaiting review
+  PENDING        99   74.6%      queue for review
+  APPROVED       62   75.3%      ready to execute
+  EXECUTED       19   91.8%      ✅ highest conf = quality working
 
-  Total signals:     654  (all generated ~05:23-06:00 today)
-  PENDING:          336  (51.4%)  avg_conf=70.2
-  EXPIRED:          247  (37.8%)  avg_conf=71.0  ← HIGH expiry rate
-  WAIT:              32  (4.9%)   avg_conf=83.4
-  EXECUTED:         31  (4.7%)   avg_conf=82.4
-  APPROVED:           6  (0.9%)   avg_conf=83.2  ← stuck
-  SKIPPED:            2  (0.3%)   avg_conf=86.8
+  Total signals in current cycle: 2,837
+  Execution rate: 0.7% (19 of 2,837)
+  APPROVED not yet EXECUTED: 62 signals (bottleneck)
 
-  Execution rate: 4.7% of all signals → 1 in 21 signals executes
+================================================================================
+2. DIRECTIONAL BIAS
+================================================================================
+  ⚠️ CRITICAL — Severe SHORT bias in key generators:
 
-============================================================
-## CRITICAL FINDINGS
-============================================================
+  SIGNAL_TYPE       SHORT   LONG    RATIO
+  mtf_macd          1,081   0       INF (100% SHORT)
+  velocity             40   0       INF (100% SHORT)
+  macd_confluence     33  43       0.8x (balanced)
+  mtf_zscore          293  723      0.4x (LONG heavy)
+  percentile_rank      86  458      0.2x (LONG heavy)
+  rsi_confluence        2   74      0.03x (strongly LONG)
 
-### [CRITICAL-1] Directional Bias — 3 signal types are 1-directional
+  ROOT CAUSE: mtf_macd generating ONLY SHORT signals since ~April 2-3.
+  This is the #1 source of signals (1,081 SHORT vs 0 LONG).
 
-  mtf_macd:       SHORT=233  LONG=0    ratio=∞ (ALL SHORT, zero LONG)
-  rsi_confluence: SHORT=0    LONG=35   ratio=0.00 (ALL LONG, zero SHORT)
-  percentile_rank:SHORT=13   LONG=135  ratio=0.10 (10:1 LONG bias)
-  velocity:       SHORT=10   LONG=0    ratio=∞ (ALL SHORT)
-  mtf_zscore:     SHORT=50   LONG=167  ratio=0.30 (3:1 LONG bias)
-  macd_confluence:SHORT=6    LONG=5    ratio=1.20 (OK)
+================================================================================
+3. EXECUTION QUALITY
+================================================================================
+  EXECUTED avg_conf = 91.8% (highest of any decision)
+  SKIPPED avg_conf = 72.2%
+  → ✅ Good signals ARE getting through — no quality problem
 
-  → mtf_macd has generated 233 SHORT signals with ZERO LONG.
-    This is clearly a bug, not market conditions.
-  → rsi_confluence: 35 LONG signals, zero SHORT (all conf=50.0)
-  → velocity: 10 SHORT signals, zero LONG
+  EXECUTED breakdown by signal_type:
+  - mtf_macd SHORT:  16 trades, 94.6% avg conf
+  - percentile_rank LONG: 2 trades, 75% avg conf
+  - mtf_zscore LONG: 1 trade, 80% avg conf
 
-### [CRITICAL-2] Signals Expiring Before Execution
+  ⚠️ All 19 executed trades are SHORT from mtf_macd + percentile_rank.
 
-  EXPIRED: 247 (37.8%) — avg age at expiry: ~0.2-0.6h
-  avg_conf EXPIRED (71.0) ≈ avg_conf PENDING (70.2) — same quality, just dying
+================================================================================
+4. CONFluence DIAGNOSTICS
+================================================================================
+  Confluence signals: macd_confluence
+  - EXPIRED: 39 (50% conf, avg age ~3.8h)
+  - SKIPPED: 31 (50% conf)
+  - PENDING: 2 (50% conf)
+  - WAIT: 4 (50% conf)
 
-  Worst offender: mtf_macd SHORT — 88 expired, avg_conf=62.6
-  While 14 mtf_macd SHORT executed at avg_conf=90.2
+  → Low conf (50%) signals never auto-approved, expired before review.
 
-  PENDING still has 114 mtf_macd SHORT at avg_conf=66.3 aging
-  → These will likely expire before reaching execution
+================================================================================
+5. HOT SET REVIEW_COUNT
+================================================================================
+  Current signals table: EMPTY (all data in archive)
+  Last archive: signals_archive_20260405_0727
+  Hot set rebuilds each cycle via ai_decider.py GROUP BY query.
 
-  TTL appears to be ~1h based on age data. Signals that get
-  WAIT/APPROVED status don't expire, but high-quality PENDING signals
-  are expiring before the executor picks them up.
+  Note: If live signals table is empty, pipeline may be failing to
+  generate new signals or all are being written to archive.
 
-### [CRITICAL-3] BABY Signals Bottlenecked — 6 APPROVED, 0 Executed
+================================================================================
+6. PIPELINE FRESHNESS
+================================================================================
+  Last 3 hours:
+  - 05:00 UTC: 651 signals, avg 71.9%, 11 executed
+  - 06:00 UTC: 1,450 signals, avg 70.7%, 6 executed
+  - 07:00 UTC: 736 signals, avg 72.4%, 2 executed
 
-  BABY SHORT (6 signals) has been APPROVED for 0.2-0.5h with:
-    - mtf_macd SHORT    conf=95  APPROVED  age=0.5h  ← oldest
-    - percentile_rank SHORT conf=75 APPROVED  age=0.5h
-    - mtf_zscore SHORT  conf=80  APPROVED  age=0.5h
-    - mtf_macd SHORT    conf=94  APPROVED  age=0.2h
-    - percentile_rank SHORT conf=75 APPROVED  age=0.2h
-    - mtf_zscore SHORT  conf=80  APPROVED  age=0.2h
+  → Generation healthy: ~2,800 signals/hour
+  → But execution only 19 in 3 hours = 0.7%
 
-  All others (ATOM, AAVE, BLUR, etc.) still PENDING (not yet approved)
-  BABY has the highest conf (95) but hasn't executed in 30 min.
-  → Approver or executor is stuck on BABY — investigate decider-run
+================================================================================
+7. EXPIRED SIGNAL ANALYSIS
+================================================================================
+  1,769 EXPIRED signals, avg conf 70.1%
+  - This is 47% of all signals (down from 64% in Apr 2 report)
+  - mtf_zscore LONG: 473 expired (79.8% conf)
+  - mtf_macd SHORT: 714 expired (63.6% conf)
+  - percentile_rank LONG: 248 expired (73.7% conf)
 
-### [HIGH-1] Execution Quality Paradox
+  → Expiry window improved vs April 2 (was 64%, now 47%)
+  → But still the largest loss category
 
-  EXECUTED avg_conf=82.4, PENDING avg_conf=70.2 — executor IS picking
-  the higher-quality signals. GOOD.
+================================================================================
+8. TRADE OUTCOMES (signal_outcomes, 30-day window)
+================================================================================
+  Signal Type    Dir    Count   WinRate  Net PnL     Avg/Trade
+  decider        SHORT    43     20.9%   -$295,937   -$6,882 (BUG!)
+  decider        LONG     51     23.5%   -$566        -$11.11
+  conf-3s        LONG     19     15.8%   -$45.32      -$2.39
+  conf-1s        LONG     87     48.3%   +$63.93      +$0.73  ✅ BEST
+  conf-1s        SHORT    23     34.8%   -$18.31      -$0.80
+  conf-2s        LONG     22     50.0%   +$5.18       +$0.24
+  conf-10s       SHORT     2     50.0%   +$3.83       +$1.92
+  hl_reconcile   SHORT    35     57.1%   -$1.08       -$0.03
 
-  BUT: mtf_zscore LONG — EXPIRED avg_conf=79.9 > EXECUTED avg_conf=79.6
-  The executor rejected a slightly higher-conf signal in favor of a
-  marginally lower-conf one. Minor but worth noting.
+  ⚠️ CRITICAL: decider SHORT has -$295,937 net — this is impossible.
+  Likely a data issue: PnL recorded in wrong units (cents vs dollars?)
+  or position size mismatch.
 
-### [HIGH-2] WAIT Signals Not Processing
+================================================================================
+9. INTERVENTION RECOMMENDATIONS
+================================================================================
+  RANKED BY IMPACT:
 
-  32 signals in WAIT with avg_conf=83.4 — highest conf of any bucket
-  WAIT means "market conditions not right yet" — these are correct signals
-  waiting for a price trigger.
+  [CRITICAL] #1 — Fix mtf_macd SHORT-only generation
+  - mtf_macd generated 1,081 SHORT signals, 0 LONG since Apr 2-3
+  - This is contaminating hot-set with one-directional signals
+  - Check: momentum_state parameter in mtf_macd signal generation
+  - Likely the "bearish-only" logic is stuck on
 
-  BUT they are aging faster than PENDING signals (0.2-0.5h) and may
-  expire before conditions become favorable.
+  [CRITICAL] #2 — decider SHORT PnL data is broken (-$295K on 43 trades)
+  - Realistic: maybe -$43 at $1/trade, not -$295K
+  - Check: pnl_usdt units (may be recording cents not dollars)
+  - Or: position_size multiplier applied incorrectly
+  - Impact: All decider SHORT signals appear catastrophic → they won't fire
 
-============================================================
-## WHAT'S WORKING WELL
-============================================================
+  [CRITICAL] #3 — Execution bottleneck: 62 APPROVED not executing
+  - 62 signals approved but only 19 executed (3h window)
+  - Check: guardian execution loop, position_manager approval processor
+  - Likely: paper=True flag hardcoded in decider-run, or rate limiting
 
-  ✓ Pipeline is fresh — 654 signals generated in last 37 min
-  ✓ All-time P&L positive — +$0.85, 50% WR over 12 closed trades
-  ✓ SHORT direction profitable — 55.6% WR, +$0.92
-  ✓ No corrupted entry prices in current open positions
-  ✓ 8 open positions confirmed on HL, all SHORT
-  ✓ Price sanity check fixes just applied (decider-run.py + signal_gen.py)
-  ✓ 30 corrupted closed trades removed from DB
-  ✓ Orphaned paper/brain entries cleaned
+  [HIGH] #4 — Signal expiry still 47% (down from 64% but still high)
+  - TTL seems to be working (improved from 64%→47%)
+  - Keep monitoring — acceptable range is <30%
 
-============================================================
-## TRADE PERFORMANCE (PostgreSQL)
-============================================================
+  [MEDIUM] #5 — conf-1s LONG is best performer (48% WR, +$63.93)
+  - But conf-1s is being used as a defense, not a generator
+  - Consider: can conf-1s triggers generate signals, not just block?
 
-  All time:   12 trades  WR=50%  Net=+$0.85
-  30 days:    12 trades  WR=50%  Net=+$0.85
+  [MEDIUM] #6 — rsi_confluence has 74:1 LONG bias
+  - Only 2 SHORT vs 74 LONG signals
+  - Check: RSI overbought/oversold thresholds
+  - Not critical since conf is 50% (auto-expiry)
 
-  By direction:
-    SHORT:  9 trades  WR=55.6%  Net=+$0.92
-    LONG:   3 trades  WR=33.3%  Net=-$0.07
+================================================================================
+SUMMARY SCORECARD
+================================================================================
+  ✅ Signal generation: Healthy (2,800/hr)
+  ✅ Execution quality: Excellent (91.8% avg conf on executed)
+  ✅ Decider signals getting through
+  ⚠️  Execution rate: Very low (0.7%)
+  ⚠️  Expiry rate: High (47%) but improving
+  ⚠️  Directional bias: Severe (mtf_macd 100% SHORT)
+  🔴 decider PnL data: Broken (impossible values)
+  🔴 62 APPROVED signals stuck in queue
 
-  By signal type:
-    conf-1s SHORT:  8 trades  Net=+$0.92  avg=+$0.12
-    conf-2s LONG:   2 trades  Net=-$0.12  avg=-$0.06
-
-  All closed trades are "conf" type (conf-1s, conf-2s) — no direct
-  mtf_macd / mtf_zscore / percentile_rank executions observed in the
-  12 closed trades.
-
-  Open positions (8, all SHORT on HL):
-    ASTER, MORPHO, SKY, TRX, TST, UNI, ZEC, ZORA
-
-============================================================
-## RECOMMENDATIONS (Priority Order)
-============================================================
-
-  1. [CRITICAL] Fix mtf_macd directional bias (233 SHORT, 0 LONG)
-     → Root cause likely in _run_mtf_macd_signals() where price comparison
-       logic inverts direction. Check signal_gen.py around line 1316.
-
-  2. [CRITICAL] Fix rsi_confluence (35 LONG, 0 SHORT) and velocity
-     (10 SHORT, 0 LONG) directional bias — these are clearly broken.
-
-  3. [CRITICAL] Investigate BABY APPROVED bottleneck — 6 signals approved
-     0.2-0.5h ago, none executed. Check decider-run execution loop
-     for why APPROVED signals aren't progressing to EXECUTED.
-
-  4. [HIGH] TTL review — 37.8% expiry rate is too high. Current TTL
-     appears to be ~1h. Consider increasing to 4-6h for PENDING signals
-     given the review workflow cadence.
-
-  5. [HIGH] WAIT signal aging — 32 signals stuck in WAIT with 83.4%
-     avg conf. Either expand the wait conditions or let them expire
-     gracefully rather than consuming pipeline slots.
-
-  6. [MEDIUM] The APPROVED queue (6 signals) should be checked every
-     cycle, not just when new signals arrive. Add a periodic flush.
-
-============================================================
-## CHANGES MADE THIS SESSION
-============================================================
-
-  1. signal_gen.py — added is_reasonable_price() checks at 4 choke points
-     to block corrupted $10.x entry prices from entering signal DB
-  2. decider-run.py — added pre-execution price sanity check (>5x vs
-     cached, absolute bounds) to skip execution of corrupted signals
-  3. PostgreSQL — deleted 30 corrupted closed trades (entry ~$10.x,
-     exit cents) plus AAVE LONG (entry corrupted)
-  4. Orphan cleanup — removed NIL SHORT, S LONG from paper+brain
-  5. Live trading remains OFF (hype_live_trading.json = OFF)
-
-============================================================
+================================================================================
