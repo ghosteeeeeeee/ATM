@@ -1,0 +1,12 @@
+hl-sync-guardian.py         ──→ background service (60s interval)
+    │                              THE KILL SWITCH: reads hype_live_trading.json
+    │                              If live_trading=true: mirror_open() to real HL orders
+    │                              Reconciles HL positions ↔ paper DB
+    │                              Marks guardian_missing / hl_position_missing closes
+position_manager.py          ──→ trailing stops, stale winner/loser exits, cascade flips
+    │                              ro-trailing-stop.service (Dallas, Python only)
+    │
+    ▼
+hl-sync-guardian.py         ──→ background service (60s interval)
+    │                              reconciles HL positions ↔ paper DB
+    │                              marks guardian_missing / hl_position_missing closes
