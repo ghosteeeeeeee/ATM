@@ -1807,7 +1807,17 @@ if __name__ == '__main__':
             log_signal(t, direction, entry, s.get("confidence", 0), "SKIPPED-stable-block")
             mark_signal_processed(t, 'SKIPPED', decision_reason='blocked-illiquid-token')
             continue
-    
+
+        # FIX (2026-04-05): Solana-only tokens (Raydium) are NOT tradeable on Hyperliquid.
+        # This check was ONLY in the hot-set building path (line ~231) but was MISSING
+        # from the execution path. KAS SHORT was executed at 14:25 despite being Solana-only.
+        # Defense-in-depth: check here AND in decider-run.py line ~754.
+        if is_solana_only(t):
+            print(f"   🚫 {t}: BLOCKED — Solana-only token (not on Hyperliquid)")
+            log_signal(t, direction, entry, s.get('confidence', 0), f"SKIPPED-solana-only-{exchange}")
+            mark_signal_processed(t, 'SKIPPED', decision_reason=f'solana-only-{exchange}')
+            continue
+
         # Check open PAPER slots only — live HL trades should not block paper trading.
         # is_token_open() below handles per-token dedup regardless of paper/live.
         if get_open() >= MAX_OPEN:

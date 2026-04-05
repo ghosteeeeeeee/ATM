@@ -17,6 +17,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               _is_win_cooldown_active, is_wrong_side_risky)
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+from tokens import is_solana_only
 from hyperliquid_exchange import is_live_trading_enabled
 import hype_cache as hc
 
@@ -751,6 +752,12 @@ def _run_hot_set():
                 continue
             if direction == 'LONG' and token in LONG_BLACKLIST:
                 log(f'  🚫 [HOT-SET] {token} LONG BLOCKED — in LONG_BLACKLIST')
+                continue
+
+            # FIX (2026-04-05): Defense-in-depth. is_solana_only tokens can't be traded
+            # on Hyperliquid. ai_decider.py also checks this, but decider-run is the final gate.
+            if is_solana_only(token):
+                log(f'  🚫 [HOT-SET] {token} BLOCKED — Solana-only (not on Hyperliquid)')
                 continue
 
             # Back-to-back failure cooldown check (2+ failures in 1hr → block for 1hr)
