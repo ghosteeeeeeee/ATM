@@ -20,12 +20,14 @@ ai_decider.py               ──→ compact_signals() → hotset.json (top 20 
     │                              review_count increments on WAIT/SKIPPED
     │
     ▼
-decider-run.py              ──→ TWO PATHS:
+decider-run.py              ──→ TWO PATHS (both enforce bans):
     │                              1. _run_hot_set() → hotset.json
     │                                 Enforces: wave-phase, counter-trend trap, regime alignment,
     │                                 overextended filter, cooldown, 10-max-open-positions gate
+    │                                 HARD BANS: conf-1s (single-source), speed=0% (stale token)
     │                              2. get_approved_signals() → reads APPROVED from DB
-    │                                 Enforces: counter-trend trap, regime alignment (fixed 2026-04-05)
+    │                                 Enforces: counter-trend trap, regime alignment
+    │                                 HARD BANS: conf-1s, speed=0%, loss/win cooldown
     │                                 Both paths write to paper trades DB only.
     │
     ▼
