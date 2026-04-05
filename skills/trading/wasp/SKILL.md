@@ -18,6 +18,7 @@ cd /root/.hermes/scripts && python3 wasp.py
 |---|---|---|
 | `check_signals()` | signals DB | stuck APPROVED signals, stale PENDING, duplicates |
 | `check_ai_decider()` | signals DB | empty pending queue, 0 confidence signals |
+| `check_ollama()` | localhost:11434 | service down, no model loaded, slow response >10s |
 | `check_positions()` | signals DB | NULL close_reason, per-token limits, stale mirror positions |
 | `check_trailing_stops()` | signals DB | trailing not activated, TS activation ratio |
 | `check_ab_testing()` | signals DB | cell_A vs cell_B win rate divergence |
@@ -25,8 +26,10 @@ cd /root/.hermes/scripts && python3 wasp.py
 | `check_pipeline()` | systemd journal + logs | pipeline failures, double-runs |
 | `check_mirror()` | hyperliquid_exchange.py | HL position count vs DB count |
 | `check_web_api()` | /var/www/hermes/ | stale data files |
-| `check_cooldowns()` | cooldowns.json | cooldowns file missing |
+| `check_cooldowns()` | cooldown_tracker table | duplicate cooldowns, cooldowns >48h |
 | `check_db_integrity()` | both DBs | DB file missing or empty |
+| `check_hotset()` | hotset.json | hotset at capacity, duplicate tokens, stale entries, avg confidence |
+| `check_paper_hl_sync()` | trades.json vs HL | orphaned paper tokens, phantom HL tokens, stale heartbeat |
 
 ## Common Issues & Fixes
 
@@ -59,6 +62,8 @@ cd /root/.hermes/scripts && python3 wasp.py
 - Stops and trailing stops will free up slots
 
 ## Systemd Setup
+**Timer: every 30 minutes** (`OnUnitActiveSec=1800`)
+
 ```bash
 # Install
 cp hermes-wasp.service /etc/systemd/system/

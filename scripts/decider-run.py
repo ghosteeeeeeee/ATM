@@ -21,6 +21,24 @@ from tokens import is_solana_only
 from hyperliquid_exchange import is_live_trading_enabled
 import hype_cache as hc
 
+# ── OPTION 1: Signal Direction Flip ──────────────────────────────────────
+# Signal direction flip — disabled 2026-04-05 (flip test concluded)
+# Previously enabled to test if signals were direction-inverted (WR 13.8%).
+# KILL SWITCH: set to True to re-enable flip. Effect takes place on next pipeline run (~1 min).
+_FLIP_SIGNALS = False
+
+# ── Checkpoint & Event-log instrumentation ───────────────────────────────
+try:
+    from checkpoint_utils import checkpoint_write, checkpoint_read_last, detect_incomplete_run
+except Exception:
+    checkpoint_write = lambda *a, **k: ''
+    checkpoint_read_last = detect_incomplete_run = lambda *a, **a2: None
+
+try:
+    from event_log import log_event, EVENT_TRADE_ENTERED, EVENT_TRADE_FAILED, EVENT_HOTSET_UPDATED
+except Exception:
+    log_event = lambda *a, **k: None
+
 # Speed feature: speed-weighted hot set scoring
 SPEED_WEIGHT = 0.15  # 15% of total hot-set score comes from speed percentile
 try:
@@ -364,8 +382,12 @@ def process_delayed_entries(paper=False):
     still_pending = []
 
     for entry in pending:
-        token      = entry['token']
+        token = entry['token'];
         direction  = entry['direction']
+        # ── OPTION 1: Flip delayed entries too ─────────────────────────────
+        if _FLIP_SIGNALS:
+            direction = 'SHORT' if direction == 'LONG' else 'LONG'
+            entry['direction'] = direction  # persist flipped direction
         sig_price = entry['signal_price']   # price when signal fired
         pullback   = entry.get('pullback_pct', 0.01)
         max_wait   = entry.get('max_wait_minutes', 30)
@@ -468,7 +490,7 @@ def execute_trade(token, direction, price, confidence, source,
                   trailing_activation=0.01, trailing_distance=0.01,
                   trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
-                  live_trading=False):
+                  live_trading=False, flipped=False):
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
@@ -528,6 +550,8 @@ def execute_trade(token, direction, price, confidence, source,
         cmd += ['--trailing-phase2', str(trailing_phase2_dist)]
     if exp_json:
         cmd += ['--experiment', exp_json]
+    if flipped:
+        cmd += ['--flipped']
 
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
@@ -535,6 +559,8 @@ def execute_trade(token, direction, price, confidence, source,
             for line in result.stdout.split('\n'):
                 if 'trade #' in line.lower():
                     tid = line.lower().split('trade #')[1].split()[0]
+                    if tid == 'none':
+                        return False, f'brain.py rejected: conf-1s or HOTSET_BLOCKLIST blocked (output: {result.stdout.strip()[:80]})'
                     return True, f'trade #{tid}'
             return True, result.stdout.strip()[:80]
         else:
@@ -985,6 +1011,12 @@ def _run_hot_set():
                 approved_count += 1
                 _increment_hotset_approval_rate(rate_count + 1, rate_window)
                 log(f'  🔥 [HOT-SET] {token} {direction} {reason} (survived r{rounds}) [{rate_count+1}/3]')
+                # ── Hotset checkpoint & event ─────────────────────────────
+                try:
+                    checkpoint_write('hotset_built', {'approved_count': approved_count + 1, 'hotset_size': len(hotset)})
+                    log_event(EVENT_HOTSET_UPDATED, {'approved_count': approved_count + 1, 'hotset_size': len(hotset)})
+                except Exception as e:
+                    pass  # never crash pipeline
     except Exception as e:
         import traceback; traceback.print_exc()
         log(f'HOT-SET error: {e}')
@@ -1067,6 +1099,18 @@ def run(dry_run=False):
     mode = "LIVE" if not paper else "PAPER"
     log(f'=== Decider Run ({mode}) ===')
     init_db()
+
+    # ── Checkpoint recovery ───────────────────────────────────────────────
+    try:
+        incomplete = detect_incomplete_run()
+        if incomplete:
+            print(f'[RECOVERY] Detected incomplete run from {incomplete.get("ts")}')
+            last = checkpoint_read_last('trade_pending')
+            if last:
+                print(f'[RECOVERY] Last trade: {last.get("token")} {last.get("direction")}')
+            checkpoint_write('decider_recovery_complete', {'workflow_state': 'IDLE'})
+    except Exception as e:
+        print(f'[RECOVERY] Check failed: {e}')
 
     # Run hot-set auto-approver every minute
     _run_hot_set()
@@ -1268,7 +1312,8 @@ def run(dry_run=False):
             break
 
         # BUG-12 fix: validate source against whitelist before routing to A/B params
-        raw_source = f'conf-{sig.get("count", sig.get("num_signals", 1))}s'
+        # FIX: Use actual source from DB if available (e.g. 'hmacd-,hzscore' from merged signals)
+        raw_source = sig.get('source') or f'conf-{sig.get("count", sig.get("num_signals", 1))}s'
         source = validate_source(raw_source)
         if source == 'unknown':
             log(f'SKIP: {token} — unknown source "{raw_source}" (not in whitelist)')
@@ -1323,13 +1368,27 @@ def run(dry_run=False):
             skipped += 1
             continue
 
+        # ── OPTION 1: Flip signal direction before trading ───────────────
+        # See INCIDENT_WR_FAILURE.md — test if signals are direction-inverted
+        flipped_direction = None
+        if _FLIP_SIGNALS:
+            flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
+            log(f'  [FLIP] {token} {direction} → {flipped_direction} (WR incident fix)')
+            direction = flipped_direction
+
+        # ── Trade pending checkpoint ───────────────────────────────────
+        try:
+            checkpoint_write('trade_pending', {'token': token, 'direction': direction, 'original_direction': flipped_direction})
+        except Exception:
+            pass
+
         success, msg = execute_trade(
             token, direction, price, confidence, source,
             leverage=lev, paper=paper, sl_pct=sl_pct,
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
-            live_trading=not paper)
+            live_trading=not paper, flipped=bool(flipped_direction))
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')
@@ -1340,6 +1399,11 @@ def run(dry_run=False):
             _record_ab_trade_opened(token, direction, experiment, ab.get('ts_variant', ''), 'trailing-stop-test')
             entered += 1
             open_count += 1
+            # ── Trade entered event ─────────────────────────────────────
+            try:
+                log_event(EVENT_TRADE_ENTERED, {'token': token, 'direction': direction, 'price': price, 'confidence': confidence})
+            except Exception:
+                pass
         else:
             # BUG-26 fix: rollback the atomic claim since trade failed.
             # Revert executed=0 so the signal can be picked up on next run.
@@ -1356,6 +1420,11 @@ def run(dry_run=False):
                 except Exception as rb_e:
                     log(f'  → rollback warning for signal {sig_id}: {rb_e}')
             log(f'  → FAILED: {msg}')
+            # ── Trade failed event ───────────────────────────────────────
+            try:
+                log_event(EVENT_TRADE_FAILED, {'token': token, 'reason': str(msg)[:200]})
+            except Exception:
+                pass
 
     log(f'=== Decider Done: {entered} entered | {skipped} skipped '
         f'| {de_exec} delayed exec | {de_exp} delayed expired '

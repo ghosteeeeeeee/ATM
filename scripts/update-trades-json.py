@@ -48,15 +48,15 @@ cur.close(); conn.close()
 out = []
 closed_out = []
 for r in open_t:
-    token=r[1]; direction=r[2]; entry_px=float(r[3]); lev=float(r[4]); amt=float(r[5])
-    cp = get_current_price(token) or entry_px
+    tkn=r[1]; direction=r[2]; entry_px=float(r[3]); lev=float(r[4]); amt=float(r[5] or 0)
+    cp = get_current_price(tkn) or entry_px
     if entry_px > 0:
         pnl_pct = round((entry_px-cp)/entry_px*100, 4) if direction=='SHORT' else round((cp-entry_px)/entry_px*100, 4)
         pnl_usdt = round(pnl_pct/100*amt, 4)
     else:
         pnl_pct = 0.0; pnl_usdt = 0.0
     out.append({
-        'token': token, 'direction': direction,
+        'token': tkn, 'direction': direction,
         'entry': entry_px, 'current': round(cp, 6),
         'pnl_pct': round(pnl_pct, 2), 'pnl_usdt': round(pnl_usdt, 2)
     })

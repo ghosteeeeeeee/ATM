@@ -17,12 +17,12 @@
             "evolved_from": "SL1pct",
             "spawned_at": "2026-04-05T04:08:30.499110"
           },
-          "trades": 177,
+          "trades": 281,
           "wins": 0,
-          "losses": 2,
+          "losses": 7,
           "winRate": 0,
-          "totalPnlPct": 0.08,
-          "lastUpdated": "2026-04-05 15:32:01.064830"
+          "totalPnlPct": 0.62,
+          "lastUpdated": "2026-04-05 21:30:55.522079"
         }
       ]
     },
@@ -38,12 +38,12 @@
           "config": {
             "entryMode": "immediate"
           },
-          "trades": 224,
+          "trades": 297,
           "wins": 0,
-          "losses": 1,
+          "losses": 6,
           "winRate": 0,
-          "totalPnlPct": 0.08,
-          "lastUpdated": "2026-04-05 15:32:01.069492"
+          "totalPnlPct": 0.62,
+          "lastUpdated": "2026-04-05 21:30:45.481744"
         },
         {
           "id": "EVO-3",
@@ -58,12 +58,12 @@
             "evolved_from": "IMMEDIATE",
             "spawned_at": "2026-04-05T04:08:30.504948"
           },
-          "trades": 47,
+          "trades": 78,
           "wins": 0,
           "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 15:32:00.840869"
+          "lastUpdated": "2026-04-05 21:30:55.525574"
         }
       ]
     },
@@ -80,12 +80,12 @@
             "trailingActivationPct": 0.5,
             "trailingDistancePct": 0.5
           },
-          "trades": 23,
+          "trades": 30,
           "wins": 0,
-          "losses": 1,
+          "losses": 3,
           "winRate": 0,
-          "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 15:22:54.331547"
+          "totalPnlPct": 0.07,
+          "lastUpdated": "2026-04-05 19:38:27.713254"
         },
         {
           "id": "TS-loose",
@@ -96,12 +96,12 @@
             "trailingActivationPct": 2.0,
             "trailingDistancePct": 1.0
           },
-          "trades": 451,
-          "wins": 2,
-          "losses": 5,
-          "winRate": 0.4,
-          "totalPnlPct": 1.65,
-          "lastUpdated": "2026-04-05 15:40:11.481566"
+          "trades": 546,
+          "wins": 3,
+          "losses": 8,
+          "winRate": 0.6,
+          "totalPnlPct": 3.27,
+          "lastUpdated": "2026-04-05 21:30:55.530840"
         },
         {
           "id": "TSEVO-3",
@@ -115,12 +115,12 @@
             "evolved_from": "TS-loose",
             "spawned_at": "2026-04-05T04:08:30.510438"
           },
-          "trades": 7,
+          "trades": 10,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 15:22:53.610266"
+          "lastUpdated": "2026-04-05 17:54:36.729931"
         }
       ]
     },

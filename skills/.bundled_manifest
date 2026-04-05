@@ -6,7 +6,7 @@ ascii-video:c1f34196bcf066d948ff91f2ffdcc362
 audiocraft:41d06b6ec94d1cdb3d864efe452780fd
 axolotl:710b8e88805a85efc461dcd70c937cae
 blogwatcher:dbc943bed4df5e6a6de8006761286d5d
-claude-code:92f2b823162c240ef83792d3a7f3fa4f
+claude-code:1b94564fef16f64eefe3902c6f376ffb
 clip:2a3807ccf83a39e5b981884e5a34ef5f
 codebase-inspection:5b1f99e926f347fe7c8c2658c9cc15b9
 codex:79bb6b5d9b47453cd0d7ac25df5a3c97
@@ -51,6 +51,7 @@ peft:72f5c4becba0b358cb7baf8a983f7ec5
 plan:86a38cbbed14813087a6c3edb5058cde
 pokemon-player:2a30ed51c1179b22967fb4a33e6e57e4
 polymarket:b4a7d758f2fb29efb290dce1094cc625
+popular-web-designs:a77ef442dcf747d8d534f5acb6b6f0cf
 powerpoint:57052a3c399e7b357e7fbf85e4ae3978
 pytorch-fsdp:bf252a436e718d7c0a864a786674809a
 requesting-code-review:f9cc90df11a9ce1cc23595c574eacd75

@@ -2,7 +2,7 @@
 """
 WASP — Hermes System Health & Anomaly Wasp 🐝
 Checks every layer of the trading pipeline for bugs, inconsistencies,
-and silent failures. Runs every 30 minutes via cron.
+and silent failures. Runs every 30 minutes via systemd timer.
 
 Bug severity: CRITICAL > ERROR > WARNING > INFO
 """
@@ -198,7 +198,7 @@ def check_signals():
             bug("INFO", "signals", f"Decision skew: {pct:.0f}% PENDING (normal if AI review is slow)")
 
 # ═══════════════════════════════════════════════════════════════════════════
-# 3. AI DECIDER / OLLAMA
+# 3. AI DECIDER
 # ═══════════════════════════════════════════════════════════════════════════
 def check_ai_decider():
     # Check if signals are getting reviewed in last 2h
@@ -216,18 +216,55 @@ def check_ai_decider():
         bug("INFO", "signals", f"{len(stuck_wait)} WAIT signals never re-reviewed",
             ", ".join(f"{r['token']}({r['direction']})" for r in stuck_wait))
 
-    # Check Ollama availability
+# ═══════════════════════════════════════════════════════════════════════════
+# 3b. OLLAMA HEALTH
+# ═══════════════════════════════════════════════════════════════════════════
+def check_ollama():
+    import requests as _req
+    OLLAMA = "http://localhost:11434"
+
+    # Service availability
     try:
-        import requests
-        r = requests.get("http://localhost:11434/api/tags", timeout=5)
+        r = _req.get(f"{OLLAMA}/api/tags", timeout=5)
         if r.status_code != 200:
             bug("ERROR", "ollama", f"Ollama returned {r.status_code}")
-        else:
-            models = r.json().get("models", [])
-            if not models:
-                bug("WARNING", "ollama", "No models loaded")
+            return
     except Exception as e:
-        bug("ERROR", "ollama", f"Ollama unreachable: {e}")
+        bug("CRITICAL", "ollama", f"Ollama unreachable: {e}")
+        return
+
+    # Model loaded
+    try:
+        models = r.json().get("models", [])
+        if not models:
+            bug("ERROR", "ollama", "No models loaded")
+            return
+        model_names = [m.get("name","?") for m in models]
+        # Primary model is the first one usually
+        primary = model_names[0] if model_names else "?"
+        print(f"   Ollama models: {', '.join(model_names)}")
+    except Exception as e:
+        bug("ERROR", "ollama", f"Failed to parse model list: {e}")
+        return
+
+    # Response time check — quick generate call
+    try:
+        start = time.time()
+        rp = _req.post(f"{OLLAMA}/api/generate", json={
+            "model": primary,
+            "prompt": "hi",
+            "stream": False,
+            "options": {"num_predict": 3}
+        }, timeout=15)
+        elapsed = time.time() - start
+        if rp.status_code != 200:
+            bug("ERROR", "ollama", f"Generate request returned {rp.status_code}")
+        elif elapsed > 10:
+            bug("WARNING", "ollama", f"Slow response: {elapsed:.1f}s (model={primary})")
+        else:
+            print(f"   Ollama response: {elapsed:.2f}s ({primary})")
+    except Exception as e:
+        bug("ERROR", "ollama", f"Generate check failed: {e}")
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 4. PAPER POSITIONS / BRAIN
@@ -623,6 +660,137 @@ def check_db_integrity():
             ", ".join(f"{r['token']}({r['cnt']})" for r in dup_mom))
 
 # ═══════════════════════════════════════════════════════════════════════════
+# 13. HOT-SET HEALTH
+# ═══════════════════════════════════════════════════════════════════════════
+def check_hotset():
+    HOTSET_FILE = "/var/www/hermes/data/hotset.json"
+    HOTSET_META = "/var/www/hermes/data/hotset_last_updated.json"
+    TRADES_JSON = "/var/www/hermes/data/trades.json"
+
+    # Freshness check
+    meta = read_json(HOTSET_META, {})
+    if meta:
+        age_m = (time.time() - meta.get("last_updated", 0)) / 60
+        if age_m > 30:
+            bug("WARNING", "hotset", f"Hotset metadata is {age_m:.0f}m old")
+    else:
+        bug("INFO", "hotset", "No hotset metadata file")
+
+    # Load hotset
+    data = read_json(HOTSET_FILE, {"hotset": []})
+    hotset = data.get("hotset", [])
+    print(f"   Hotset: {len(hotset)} tokens")
+
+    if not hotset:
+        bug("INFO", "hotset", "Hotset is empty")
+        return
+
+    # Token count vs position limit
+    if len(hotset) >= 10:
+        bug("INFO", "hotset", f"Hotset at capacity: {len(hotset)}/10")
+
+    # Duplicate token+direction check
+    seen = {}
+    for t in hotset:
+        key = (t.get("token"), t.get("direction"))
+        seen[key] = seen.get(key, 0) + 1
+    dups = {k: v for k, v in seen.items() if v > 1}
+    if dups:
+        bug("WARNING", "hotset", "Duplicate token+direction in hotset",
+            ", ".join(f"{k[0]}({k[1]}) x{v}" for k, v in list(dups.items())[:5]))
+
+    # Confidence bands
+    below_70 = [t for t in hotset if t.get("confidence", 0) < 70]
+    below_80 = [t for t in hotset if 70 <= t.get("confidence", 0) < 80]
+    if below_70:
+        bug("INFO", "hotset", f"{len(below_70)} tokens below 70% confidence (will be blocked)",
+            ", ".join(f"{t['token']}({t['confidence']:.0f}%)" for t in below_70[:5]))
+
+    # Check for stale entries (compact_rounds not increasing = not being re-evaluated)
+    stale_rounds = [t for t in hotset if t.get("compact_rounds", 0) >= 5 and t.get("confidence", 0) < 80]
+    if stale_rounds:
+        bug("WARNING", "hotset", f"{len(stale_rounds)} stale tokens (5+ rounds, <80%)",
+            ", ".join(f"{t['token']}(r{t['compact_rounds']},c{t['confidence']:.0f}%)" for t in stale_rounds[:3]))
+
+    # Compare hotset tokens against open positions
+    open_tokens = {r[0] for r in psql("SELECT token FROM trades WHERE status='open' AND server='Hermes'")}
+    in_both = [t["token"] for t in hotset if t.get("token") in open_tokens]
+    print(f"   Hotset tokens with open positions: {len(in_both)}")
+    if len(in_both) == 0 and len(hotset) > 0:
+        bug("WARNING", "hotset", "No hotset tokens have open positions (possible execution gap)")
+
+    # Confidence distribution
+    confs = [t.get("confidence", 0) for t in hotset]
+    if confs:
+        avg_conf = sum(confs) / len(confs)
+        print(f"   Avg confidence: {avg_conf:.1f}%")
+        if avg_conf < 70:
+            bug("INFO", "hotset", f"Avg confidence low: {avg_conf:.1f}% (signals weakening)")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 14. PAPER-TO-HL SYNC
+# ═══════════════════════════════════════════════════════════════════════════
+def check_paper_hl_sync():
+    TRADES_JSON = "/var/www/hermes/data/trades.json"
+    LIVESWITCH  = "/var/www/hermes/data/hype_live_trading.json"
+
+    switch = read_json(LIVESWITCH, {})
+    if not switch.get("live_trading"):
+        print("   Paper-HL sync: live trading OFF, skipping")
+        return
+
+    # Load paper open positions
+    paper = read_json(TRADES_JSON, {"open": []}).get("open", [])
+    paper_tokens = {p.get("token") for p in paper if p.get("token")}
+    print(f"   Paper open: {len(paper_tokens)} tokens")
+
+    if not paper_tokens:
+        return
+
+    # Fetch live HL positions
+    try:
+        from hyperliquid_exchange import get_open_hype_positions_curl
+        import hype_cache as hc
+        hl_mids = hc.get_allMids()
+    except Exception as e:
+        bug("WARNING", "paper-hl-sync", f"Cannot fetch HL data to verify sync: {e}")
+        return
+
+    if not hl_mids:
+        bug("INFO", "paper-hl-sync", "HL mids empty (rate-limited), skipping sync check")
+        return
+
+    # Try to get actual HL position sizes
+    try:
+        hl_positions = get_open_hype_positions_curl()
+        hl_tokens = {p.get("token") for p in hl_positions if p.get("token")}
+        print(f"   HL positions: {len(hl_tokens)} tokens")
+    except Exception as e:
+        bug("WARNING", "paper-hl-sync", f"Cannot fetch HL positions: {e}")
+        return
+
+    # Orphaned paper entries: in paper but not on HL
+    orphaned = paper_tokens - hl_tokens
+    if orphaned:
+        bug("WARNING", "paper-hl-sync", f"{len(orphaned)} paper-only tokens (not on HL)",
+            ", ".join(sorted(orphaned)[:10]))
+
+    # Phantom HL entries: on HL but not in paper
+    phantom = hl_tokens - paper_tokens
+    if phantom:
+        bug("INFO", "paper-hl-sync", f"{len(phantom)} HL-only tokens (not in paper)",
+            ", ".join(sorted(phantom)[:10]))
+
+    # Sync staleness: check pipeline_heartbeat.json
+    hb = read_json("/var/www/hermes/data/pipeline_heartbeat.json", {})
+    if hb:
+        hb_age = (time.time() - hb.get("timestamp", 0)) / 60
+        if hb_age > 15:
+            bug("WARNING", "paper-hl-sync", f"Pipeline heartbeat is {hb_age:.0f}m old (sync may be stale)")
+        else:
+            print(f"   Pipeline heartbeat: {hb_age:.1f}m ago")
+
+# ═══════════════════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════
 def main():
@@ -632,6 +800,7 @@ def main():
     check_prices()
     check_signals()
     check_ai_decider()
+    check_ollama()
     check_positions()
     check_mirror()
     check_trailing_stops()
@@ -641,6 +810,8 @@ def main():
     check_db_integrity()
     check_pipeline()
     check_web_api()
+    check_hotset()
+    check_paper_hl_sync()
 
     # Sort by severity
     Bugs.sort(key=lambda x: x[0])

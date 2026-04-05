@@ -10,7 +10,7 @@ from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import get_open_hype_positions_curl
 
-PAPER_JSON = "/var/www/hermes/data/trades.json"
+PAPER_JSON = "/var/www/hermes/data/trades.json"  # NOTE: /var/www/hermes is a symlink to /root/.hermes
 BRAIN_DB   = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
 
 def log(msg, tag="INFO"):

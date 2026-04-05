@@ -5,6 +5,13 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import init_db
 import psycopg2
 from datetime import datetime, timezone
+try:
+    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+    from tokens import is_solana_only
+except Exception:
+    SHORT_BLACKLIST = set()
+    LONG_BLACKLIST = set()
+    is_solana_only = lambda t: False
 
 BRAIN_DB   = "host=/var/run/postgresql dbname=brain user=postgres password=***"
 PRICE_DB   = '/root/.hermes/data/signals_hermes.db'
@@ -309,11 +316,12 @@ def _get_hotset_from_file():
         entries = data.get('hotset', [])
         if not entries:
             return None
-        # Stale check: block if hotset.json is older than 11 minutes
+        # Stale check: if hotset.json is stale, return empty — do NOT fall back to DB.
+        # ONE writer only: ai_decider.py writes hotset.json. Everyone else reads it.
         ts = data.get('timestamp', 0)
         if ts > 0 and (time.time() - ts) > 660:
-            print(f"[hotset] hotset.json stale ({time.time()-ts:.0f}s) — using fallback DB query")
-            return None
+            print(f"[hotset] hotset.json stale ({time.time()-ts:.0f}s) — returning empty (ai_decider should refresh)")
+            return []
 
         # Pre-load prices for all tokens (batch, single call per token)
         for entry in entries:
@@ -342,8 +350,8 @@ def _get_hotset_from_file():
                 'survival':       e.get('survival_score', 0),
                 'last_seen':      str(e.get('timestamp', ts)),
                 # SPEED FEATURE fields (from hotset.json)
-                'speed_pctl':     round(e.get('momentum_score', 50.0), 1),
-                'vel_5m':         round(e.get('price_velocity_5m', 0), 3),
+                'speed_pctl':     round(e.get('momentum_score') or 50.0, 1),
+                'vel_5m':         round(e.get('price_velocity_5m') or 0, 3),
                 'accel':          round(e.get('price_acceleration', 0), 3),
                 'is_stale':       False,
                 # Additional enrichments from hotset.json
@@ -383,6 +391,7 @@ def _build_hotset_from_db():
                 s.direction,
                 MAX(s.compact_rounds) as max_rounds,
                 MAX(s.survival_score) as max_survival,
+                MAX(s.confidence) as max_conf,
                 AVG(s.confidence) as avg_conf,
                 COUNT(*) as entry_count,
                 GROUP_CONCAT(DISTINCT s.source) as sources,
@@ -397,6 +406,10 @@ def _build_hotset_from_db():
             LEFT JOIN token_speeds sp ON UPPER(s.token) = UPPER(sp.token)
             WHERE s.compact_rounds > 0
               AND s.executed = 0
+              AND s.review_count >= 1
+              AND s.created_at > datetime('now', '-3 hours')
+              AND s.confidence >= 70
+              AND (sp.speed_percentile IS NULL OR sp.speed_percentile > 0)
             GROUP BY s.token, s.direction
             ORDER BY max_rounds DESC, max_survival DESC, avg_conf DESC
             LIMIT 20
@@ -439,6 +452,23 @@ def _build_hotset_from_db():
                 _log.warning(f"HOT_SET_DISQUALIFIED: {tok} missing [{','.join(missing)}]")
                 continue
 
+            # T's filters (2026-04-05): confidence >= 70 and momentum > 0
+            conf = float(r['avg_conf']) if r['avg_conf'] else 0.0
+            if conf < 70.0:
+                continue
+            speed = float(r['speed_percentile']) if r['speed_percentile'] is not None else 50.0
+            if speed == 0.0:
+                continue
+
+            # Blacklist filters
+            direction = r['direction'].upper()
+            if direction == 'SHORT' and tok in SHORT_BLACKLIST:
+                continue
+            if direction == 'LONG' and tok in LONG_BLACKLIST:
+                continue
+            if is_solana_only(tok):
+                continue
+
             hot_set.append({
                 'token': tok,
                 'direction': r['direction'],
@@ -473,14 +503,17 @@ def write_signals():
 
     # ── HOT SET: read from hotset.json (authoritative) ──────────────────────────
     # hotset.json is written by ai_decider after every compaction pass.
-    # It is the SOLE source of truth for what survived — NOT a parallel DB query.
-    # We enrich with live RSI computed from price_history for the dashboard.
+    # It is the SOLE source of truth. NO FALLBACK WRITER — if file is missing
+    # or stale, we return empty rather than rebuilding from DB with no filters.
     hot_set = _get_hotset_from_file()
 
-    # Fallback: if hotset.json is missing/stale, use DB query (preserves the
-    # old flip-protection, live-rsi/macd/zscore logic as a safety net).
-    if hot_set is None:
-        hot_set = _build_hotset_from_db()
+    # _get_hotset_from_file() returns:
+    #   - None  : file not found or read error
+    #   - []    : file is stale (>11 min) or empty
+    #   - [..]  : valid enriched hot-set
+    # In all cases, treat None or [] the same — return empty to dashboard.
+    if not hot_set:
+        hot_set = []
 
     # Compute win rate from brain DB using pnl_pct (after fees)
     # Filter out corrupted trades: exit_price sanity check

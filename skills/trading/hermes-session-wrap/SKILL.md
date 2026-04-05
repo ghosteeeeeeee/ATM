@@ -201,28 +201,22 @@ conn.commit()
 cur.close(); conn.close()
 print(f"\n[brain] Archived {n} closed -> trades_archive_{ts}")
 
-# Signals DBs
-for db_path, label in [
-    ('/root/.hermes/data/signals_hermes_runtime.db', 'hermes'),
-    ('/root/.openclaw/workspace/data/signals.db', 'openclaw'),
-]:
-    try:
-        conn = sqlite3.connect(db_path, timeout=5)
-        c = conn.cursor()
-        c.execute("SELECT COUNT(*) FROM signals")
-        n = c.fetchone()[0]
-        c.execute(f"CREATE TABLE IF NOT EXISTS signals_archive_{ts} AS SELECT * FROM signals")
-        c.execute("DELETE FROM signals")
-        conn.commit()
-        conn.close()
-        conn2 = sqlite3.connect(db_path)
-        conn2.execute("VACUUM"); conn2.close()
-        print(f"[signals/{label}] Purged {n}, VACUUM'd")
-    except Exception as e:
-        print(f"[signals/{label}] Skipped: {e}")
+# Signals DB
+SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+conn = sqlite3.connect(SIGNALS_DB, timeout=5)
+c = conn.cursor()
+c.execute("SELECT COUNT(*) FROM signals")
+n = c.fetchone()[0]
+c.execute(f"CREATE TABLE IF NOT EXISTS signals_archive_{ts} AS SELECT * FROM signals")
+c.execute("DELETE FROM signals")
+conn.commit()
+conn.close()
+conn2 = sqlite3.connect(SIGNALS_DB)
+conn2.execute("VACUUM"); conn2.close()
+print(f"[signals/hermes] Purged {n}, VACUUM'd")
 
 # Cooldowns
-json.dump({}, open('/root/.openclaw/workspace/data/signal-cooldowns.json', 'w'))
+json.dump({}, open('/root/.hermes/data/signal-cooldowns.json', 'w'))
 print(f"[cooldowns] Cleared")
 
 # Hot-set cooldown tracker
@@ -252,18 +246,12 @@ print(f"Open positions intact: {len(open_trades)}")
 ```python
 import sqlite3, psycopg2, json
 
-# Signals DBs
-for db_path, label in [
-    ('/root/.hermes/data/signals_hermes_runtime.db', 'hermes'),
-    ('/root/.openclaw/workspace/data/signals.db', 'openclaw'),
-]:
-    try:
-        conn = sqlite3.connect(db_path, timeout=5)
-        c = conn.cursor()
-        c.execute("SELECT COUNT(*) FROM signals")
-        print(f"[signals/{label}] remaining: {c.fetchone()[0]}")
-        conn.close()
-    except: pass
+# Signals DB
+conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db', timeout=5)
+c = conn.cursor()
+c.execute("SELECT COUNT(*) FROM signals")
+print(f"[signals/hermes] remaining: {c.fetchone()[0]}")
+conn.close()
 
 # Brain
 conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='***')
@@ -275,7 +263,7 @@ print(f"[brain] open: {cur.fetchone()[0]}")
 conn.close()
 
 # Cooldowns
-cd = json.load(open('/root/.openclaw/workspace/data/signal-cooldowns.json'))
+cd = json.load(open('/root/.hermes/data/signal-cooldowns.json'))
 print(f"[cooldowns] entries: {len(cd)}")
 ```
 

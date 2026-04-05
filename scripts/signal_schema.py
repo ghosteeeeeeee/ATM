@@ -280,6 +280,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     MIN_CONFIDENCE_FLOOR = 50
     if confidence < MIN_CONFIDENCE_FLOOR:
         return None  # Silently skip low-confidence signals
+
+    # ── HOTSET_BLOCKLIST guard — block at source ───────────────────────────
+    # Import lazily to avoid circular deps
+    try:
+        from hermes_constants import HOTSET_BLOCKLIST
+        if token.upper() in HOTSET_BLOCKLIST:
+            return None  # Silently skip blocklisted tokens
+    except ImportError:
+        pass  # hermes_constants may not be available in all contexts
     # ─────────────────────────────────────────────────────────────────────────
     conn = _get_conn(_runtime())
     c = conn.cursor()
@@ -667,6 +676,12 @@ ALLOWED_SIGNAL_SOURCES = frozenset({
     'hmacd-', 'hmacd-mtf_macd', 'hmacd-mtf_zscore', 'hmacd-default',
     'hzscore', 'pct-hermes', 'vel-hermes', 'rsi-hermes',
     'counter-hermes', 'counter-mtf_macd', 'counter-mtf_zscore',
+    # Merged indicator sources (comma-separated from GROUP_CONCAT)
+    'hmacd-,hzscore', 'hmacd-,hzscore,pct-hermes', 'hmacd-,hzscore,vel-hermes',
+    'hmacd-,pct-hermes', 'hmacd-,vel-hermes',
+    'hzscore,pct-hermes', 'hzscore,vel-hermes',
+    'mtf_macd,hzscore', 'mtf_macd,pct-hermes',
+    'rsi-confluence,hzscore', 'rsi-confluence,pct-hermes',
     # Standard signal types used throughout the system
     'mtf_macd', 'mtf_zscore', 'mtf_rsi', 'mtf_momentum',
     'percentile_rank', 'velocity', 'rsi_local', 'macd_local',
@@ -683,9 +698,25 @@ def validate_source(source: str) -> str:
     BUG-12 fix: Validate source against whitelist.
     Returns the original source if valid, 'unknown' if not.
     Prevents malformed signals from routing to unintended A/B variants.
+
+    FIX: Also handles merged indicator sources (comma-separated) like 'hmacd-,hzscore,pct-hermes'.
+    Validates each component against the whitelist or accepts hmacd-* prefix patterns.
     """
-    if source and source in ALLOWED_SIGNAL_SOURCES:
+    if not source:
+        return 'unknown'
+    if source in ALLOWED_SIGNAL_SOURCES:
         return source
+    # Handle merged indicator sources (comma-separated list of indicators)
+    if ',' in source:
+        components = [c.strip() for c in source.split(',') if c.strip()]
+        # All components must be valid individually
+        for comp in components:
+            if comp not in ALLOWED_SIGNAL_SOURCES:
+                # Allow hmacd-* style prefixes as valid merged components
+                if not any(comp.startswith(prefix) for prefix in
+                           ['hmacd-', 'mtf_', 'counter-', 'pct-', 'vel-', 'rsi-', 'hzscore']):
+                    return 'unknown'
+        return source  # Valid merged source
     return 'unknown'
 
 
@@ -771,6 +802,7 @@ def get_approved_signals(hours=24):
                MAX(confidence) as max_conf,
                MIN(confidence) as min_conf,
                GROUP_CONCAT(DISTINCT signal_type) as types,
+               MAX(source) as source,
                MAX(price) as price,
                MAX(leverage) as leverage,
                MAX(COALESCE(
@@ -802,6 +834,9 @@ def get_approved_signals(hours=24):
         d = dict(r)
         # BUG-26 fix: extract id from result for atomic claim
         sig_id = d.pop('id', None)
+        # FIX: source field from MAX(source) aggregation — needed by decider-run
+        # to route merged indicator signals (e.g. 'hmacd-,hzscore') to brain.py
+        d['source'] = d.get('source', None)
         types = d.get('types', '').split(',') if d.get('types') else []
         # Filter types (remove empty strings)
         types = [t for t in types if t]
@@ -1196,6 +1231,58 @@ def update_signal_review_count(signal_id: int) -> None:
         conn.commit()
     finally:
         conn.close()
+
+# ── Trade Workflow State (PostgreSQL brain DB) ──────────────────────────────
+
+WORKFLOW_STATES = ('IDLE', 'POSITION_OPEN', 'CLOSE_PENDING', 'ERROR_RECOVERY')
+
+
+def update_trade_workflow_state(trade_id: int, state: str) -> bool:
+    """
+    Update the workflow_state column for a trade in the PostgreSQL brain DB.
+
+    Valid states: IDLE | POSITION_OPEN | CLOSE_PENDING | ERROR_RECOVERY
+    """
+    if state not in WORKFLOW_STATES:
+        print(f'[signal_schema] Invalid workflow_state: {state}')
+        return False
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE trades
+            SET workflow_state = %s, workflow_updated_at = NOW()
+            WHERE id = %s
+        """, (state, trade_id))
+        conn.commit()
+        rows = cur.rowcount
+        cur.close()
+        conn.close()
+        if rows == 0:
+            print(f'[signal_schema] update_trade_workflow_state: trade {trade_id} not found')
+            return False
+        return True
+    except Exception as e:
+        print(f'[signal_schema] update_trade_workflow_state error: {e}')
+        return False
+
+
+def get_trade_workflow_state(trade_id: int) -> str | None:
+    """Return the current workflow_state for a trade, or None if not found."""
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT workflow_state FROM trades WHERE id = %s
+        """, (trade_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        return row[0] if row else None
+    except Exception as e:
+        print(f'[signal_schema] get_trade_workflow_state error: {e}')
+        return None
+
 
 def get_db():
     return _get_conn(_runtime(), row_factory=True)

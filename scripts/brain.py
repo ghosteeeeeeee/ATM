@@ -286,7 +286,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                sl_group: str = "control", sl_distance: float = None,
                trailing_activation: float = None, trailing_distance: float = None,
                trailing_phase2_dist: float = None,
-               leverage: int = 1, experiment: str = None):
+               leverage: int = 1, experiment: str = None,
+               flipped_from_trade: bool = False):
     """Add a new trade to the trades table"""
     # FIX (2026-04-05): Block conf-1s at the trades DB level — confluence means
     # ≥2 signals agreeing. num_signals=1 is not confluence, it's a single source.
@@ -337,14 +338,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                           exchange, strategy, paper, stop_loss, target, server, status, open_time,
                           signal, confidence, token_address, pnl_usdt, pnl_pct,
                           sl_distance, trailing_activation, trailing_distance,
-                          trailing_phase2_dist, leverage, experiment)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                          trailing_phase2_dist, leverage, experiment,
+                          flipped_from_trade, flip_variant)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """, (token, direction, amount_usdt, entry_price,
           exchange, strategy, paper, stop_loss, target, server, 'open',
           signal, confidence, address, 0, 0,
           sl_distance, trailing_activation, trailing_distance,
-          trailing_phase2_dist, leverage, experiment))
+          trailing_phase2_dist, leverage, experiment,
+          int(flipped_from_trade) if flipped_from_trade else 0, 'signal-flip'))
     trade_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
@@ -370,14 +373,11 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             except Exception:
                 in_hot = False  # Fail open on DB errors
             blocked = hype_token.upper() in HOTSET_BLOCKLIST
-            if not in_hot:
-                print(f"[brain.py] {hype_token}: NOT in hot-set — paper only, live mirror blocked")
-            elif blocked:
-                print(f"[brain.py] {hype_token}: on HOTSET_BLOCKLIST ({direction}) — closing paper trade #{trade_id}")
-                try:
-                    close_trade(trade_id, entry_price, notes='hotset_blocked')
-                except Exception as ce:
-                    print(f"[brain.py] failed to close blocked paper trade: {ce}")
+            if blocked:
+                # FIX (2026-04-05): Don't close the paper trade. Keep it open for
+                # tracking/audit. Just skip the HL mirror — don't destroy the paper trail.
+                print(f"[brain.py] {hype_token}: on HOTSET_BLOCKLIST ({direction}) — paper trade #{trade_id} kept (no HL mirror)")
+                # Return trade_id so brain DB has the paper record, but no HL position
             else:
                 # Read back leverage for this trade
                 conn2 = get_db_connection()
@@ -679,6 +679,8 @@ if __name__ == "__main__":
         add_parser.add_argument("--trailing-phase2", type=float, dest="trailing_phase2", help="Phase 2 trailing distance (tighter, activates after phase 1)")
         add_parser.add_argument("--leverage", type=int, default=1, help="Leverage (1-10)")
         add_parser.add_argument("--experiment", help="A/B test experiment info (JSON)")
+        add_parser.add_argument("--flipped", action="store_true", default=False,
+                                help="Mark this trade as flipped from original signal direction")
         
         close_parser = subparsers.add_parser("close", help="Close a trade")
         close_parser.add_argument("id", type=int, help="Trade ID")
@@ -713,8 +715,11 @@ if __name__ == "__main__":
                 trailing_distance=args.trailing_distance or None,
                 trailing_phase2_dist=args.trailing_phase2 or None,
                 leverage=args.leverage,
-                experiment=args.experiment
+                experiment=args.experiment,
+                flipped_from_trade=args.flipped
             )
+            if trade_id is None:
+                sys.exit(1)  # Signal was rejected — propagate failure to caller
             print(f"✓ Added trade #{trade_id}: {args.side.upper()} {args.amount} USDT {args.token} @ ${args.entry}")
             print(f"  Exchange: {args.exchange} | Server: {args.server} | Paper: {not args.real} | Signal: {args.signal or 'N/A'} | Lev: {args.leverage}x")
         

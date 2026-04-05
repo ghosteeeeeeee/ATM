@@ -25,6 +25,18 @@ except Exception as e:
     print(f"[ai-decider] SpeedTracker unavailable: {e}")
     speed_tracker_ai = lambda: None
 
+# Token budget enforcement
+_MAX_TOKENS_PER_RUN = 8000    # hard cap per ai_decider invocation
+_DAILY_TOKEN_BUDGET = 500000  # daily cap
+_DAILY_TOKENS_USED = 0
+_DAILY_BUDGET_FILE = '/root/.hermes/data/ai_decider_daily_tokens.json'
+
+# Event log integration
+try:
+    from event_log import log_event
+except Exception:
+    log_event = lambda *a, **k: None
+
 LOG_FILE = '/var/www/hermes/logs/trading.log'
 
 def log(msg, level='INFO'):
@@ -43,6 +55,49 @@ def log_error(msg, exc=None):
         error_msg += f': {exc}'
         error_msg += f'\n{traceback.format_exc()}'
     log(error_msg, 'ERROR')
+
+def _check_token_budget(estimated_tokens: int) -> bool:
+    """Check if estimated_tokens would exceed daily or per-run budget. Returns True to proceed, False to skip."""
+    global _DAILY_TOKENS_USED
+    today = datetime.now().strftime('%Y-%m-%d')
+    try:
+        if os.path.exists(_DAILY_BUDGET_FILE):
+            with open(_DAILY_BUDGET_FILE, 'r') as f:
+                data = json.load(f)
+            if data.get('date') != today:
+                # New day — reset counter
+                _DAILY_TOKENS_USED = 0
+                data = {'date': today, 'used': 0}
+            else:
+                _DAILY_TOKENS_USED = data.get('used', 0)
+    except Exception:
+        _DAILY_TOKENS_USED = 0
+
+    # Per-run check
+    if estimated_tokens > _MAX_TOKENS_PER_RUN:
+        print(f"[BUDGET] Blocked call: {estimated_tokens} > {_MAX_TOKENS_PER_RUN} per-run limit")
+        log_event('BUDGET_EXCEEDED', {'reason': 'per_run_limit', 'estimated': estimated_tokens, 'limit': _MAX_TOKENS_PER_RUN}, 'WARN')
+        return False
+
+    # Daily budget check
+    if (_DAILY_TOKENS_USED + estimated_tokens) > _DAILY_TOKEN_BUDGET:
+        print(f"[BUDGET] Blocked call: {_DAILY_TOKENS_USED} + {estimated_tokens} > {_DAILY_TOKEN_BUDGET} daily limit")
+        log_event('BUDGET_EXCEEDED', {'reason': 'daily_limit', 'estimated': estimated_tokens, 'used': _DAILY_TOKENS_USED, 'limit': _DAILY_TOKEN_BUDGET}, 'WARN')
+        return False
+
+    return True
+
+def _record_token_usage(tokens_used: int):
+    """Record tokens used and persist to daily budget file."""
+    global _DAILY_TOKENS_USED
+    _DAILY_TOKENS_USED += tokens_used
+    today = datetime.now().strftime('%Y-%m-%d')
+    try:
+        os.makedirs(os.path.dirname(_DAILY_BUDGET_FILE), exist_ok=True)
+        with open(_DAILY_BUDGET_FILE, 'w') as f:
+            json.dump({'date': today, 'used': _DAILY_TOKENS_USED}, f)
+    except Exception as e:
+        print(f"[BUDGET] Failed to write token usage: {e}")
 
 AB_CONFIG_FILE = '/root/.hermes/data/ab-test-config.json'
 sys.path.insert(0, '/root/.hermes/scripts')
@@ -1076,17 +1131,21 @@ def get_pending_signals():
                 c_hot = conn.cursor()
                 # Deduplicate by token+direction, keeping the row with highest survival_score
                 # This prevents duplicate entries (e.g., BTC appearing twice with 94.5% and 90.0%)
-                # FIX (2026-04-05): APPROVED only — PENDING means "awaiting AI review",
-                # should not appear in hot-set until approved. GROUP BY token+direction
-                # to prevent same token+direction from appearing twice (e.g. mtf_zscore+
-                # mtf_macd both agreeing = confluence, shown as one row with max conf).
+                # FIX (2026-05): Include PENDING signals with review_count>=1.
+                # BUG: The hot-set query required decision='APPROVED' but signals were
+                # never reaching APPROVED state (ai_decider marks them PENDING after review).
+                # Now includes PENDING/APPROVED/WAIT with review_count>=1 that have been
+                # reviewed by ai_decider at least once (survived compaction).
+                # GROUP BY token+direction to prevent same token+direction from appearing
+                # twice (e.g. mtf_zscore+mtf_macd both agreeing = confluence, shown as
+                # one row with max conf).
                 c_hot.execute("""
                     SELECT token, direction,
                            -- Best signal_type = the one with highest confidence
                            (SELECT signal_type FROM signals s2
                             WHERE s2.token=signals.token
                               AND s2.direction=signals.direction
-                              AND s2.decision='APPROVED'
+                              AND s2.decision IN ('PENDING','APPROVED','WAIT')
                               AND s2.executed=0
                               AND s2.review_count>=1
                               AND s2.created_at > datetime('now','-3 hours')
@@ -1098,12 +1157,12 @@ def get_pending_signals():
                            MAX(z_score) as z_score,
                            MAX(review_count) as review_count
                     FROM signals
-                    WHERE decision='APPROVED'
+                    WHERE decision IN ('PENDING','APPROVED','WAIT')
                       AND executed = 0
                       AND review_count >= 1
                       AND created_at > datetime('now', '-3 hours')
                     GROUP BY token, direction
-                    HAVING MAX(confidence) >= 50
+                    HAVING MAX(confidence) >= 70
                     ORDER BY MAX(survival_score) DESC, MAX(confidence) DESC
                     LIMIT 50
                 """)
@@ -1132,11 +1191,20 @@ def get_pending_signals():
                         print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — Solana-only (not on Hyperliquid)")
                         continue
                     spd = _speed_cache.get(tkn, {})
+                    conf = float(r[3]) if r[3] else 0.0
+                    momentum = spd.get('momentum_score', 50.0)
+                    # T's filters: skip if confidence < 70% OR momentum (speed) = 0%
+                    if conf < 70.0:
+                        print(f"  🚫 [HOTSET-FILTER] {tkn} {direction}: conf={conf:.0f}% — below 70% threshold")
+                        continue
+                    if momentum == 0.0:
+                        print(f"  🚫 [HOTSET-FILTER] {tkn} {direction}: momentum=0% — speed stalled")
+                        continue
                     hotset.append({
                         'token': tkn,
                         'direction': r[1],
                         'signal_type': r[2],
-                        'confidence': r[3],
+                        'confidence': conf,
                         'compact_rounds': r[4] or 0,
                         'survival_score': r[5] or 0,
                         'z_score_tier': r[6],
@@ -1147,7 +1215,7 @@ def get_pending_signals():
                         'is_overextended':  spd.get('is_overextended', False),
                         'price_acceleration': spd.get('price_acceleration', 0.0),
                         'price_velocity_5m':   spd.get('price_velocity_5m', 0.0),
-                        'momentum_score':   spd.get('momentum_score', 50.0),
+                        'momentum_score':   momentum,
                     })
                 with open(hotset_file, 'w') as _f:
                     _json.dump({'hotset': hotset, 'timestamp': time.time()}, _f)
@@ -1578,21 +1646,42 @@ REASON: [1-sentence explanation]
         if not _minimax_token:
             raise RuntimeError("no minimax token")
 
+        # Token budget check — estimate ~4000 tokens per call (prompt + completion)
+        if not _check_token_budget(4000):
+            print("[ai_decider] Token budget exceeded, skipping LLM call")
+            return direction, abs(conf) * 30, "Budget exceeded"
+
         try:
             _client = OpenAI(api_key=_minimax_token, base_url=_minimax_url)
             _resp = _client.chat.completions.create(
                 model="MiniMax-M2",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
-                max_tokens=300,
+                max_tokens=300
             )
             result = _resp.choices[0].message.content
+            # Record token usage: estimate ~2000 prompt + actual output tokens
+            try:
+                _usage = _resp.usage
+                _output_tokens = getattr(_usage, 'completion_tokens', 0) or len(result.split()) * 1.3
+                _record_token_usage(int(2000 + _output_tokens))
+                log_event('API_CALL', {'tokens_used': int(2000 + _output_tokens), 'model': 'MiniMax-M2'})
+            except Exception:
+                _record_token_usage(4000)  # fallback estimate
+                log_event('API_CALL', {'tokens_used': 4000, 'model': 'MiniMax-M2'})
         except Exception as _mm_err:
             # Fallback to Ollama
             _pl = {"model": "qwen2.5:1.5b", "prompt": prompt, "stream": False}
             _r = requests.post("http://localhost:11434/api/generate", json=_pl, timeout=60)
             result = _r.json().get("response", "")
             print(f"[ai_decider] minimax failed ({_mm_err}), fell back to Ollama")
+            # Record Ollama fallback usage (cheaper model, fewer tokens)
+            try:
+                _ollama_tokens = int(2000 + len(result.split()) * 1.3)
+                _record_token_usage(_ollama_tokens)
+                log_event('API_CALL', {'tokens_used': _ollama_tokens, 'model': 'Ollama-qwen2.5:1.5b'})
+            except Exception:
+                pass
         
         # Parse response
         decision = "WAIT"

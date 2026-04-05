@@ -65,6 +65,18 @@ from hyperliquid_exchange import (
 
 import json  # for json.dumps in penalty recording
 
+# ── Instrumented checkpoint + event logging ──────────────────────────────────
+try:
+    from checkpoint_utils import checkpoint_write, checkpoint_read_last, detect_incomplete_run
+except Exception:
+    checkpoint_write = lambda *a, **k: ''
+    checkpoint_read_last = detect_incomplete_run = lambda *a, **a2: None
+
+try:
+    from event_log import log_event, EVENT_POSITION_OPEN, EVENT_POSITION_CLOSED, EVENT_CHECKPOINT_RECOVERY
+except Exception:
+    log_event = lambda *a, **k: None
+
 DRY = False  # Default is LIVE. Use --dry flag (not --apply) for dry-run mode.
 # NOTE: systemd service runs WITHOUT --apply by default — set DRY=False here to enable guardian closes.
 # Override with --apply flag if you need temporary dry-run without changing this file.
@@ -574,6 +586,15 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     continue  # Don't create new record, don't add to updated_tokens
 
                 log(f'  ⚠️ Orphan HL position: {coin} — creating paper trade before close', 'WARN')
+
+                # ── Orphan detected checkpoint ─────────────────────────────────────
+                try:
+                    checkpoint_write('orphan_detected', {
+                        'token': coin, 'trade_id': trade_id if 'trade_id' in dir() else None,
+                        'workflow_state': 'ERROR_RECOVERY'
+                    })
+                except Exception:
+                    pass
 
                 # FIX (2026-04-02): Check if token is tradeable before creating orphan trade.
                 # Previously _is_token_tradeable() was not called here, allowing blocked tokens
@@ -1702,6 +1723,12 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
 
     is_win = float(computed_pnl_pct or 0) > 0
 
+    # ── Position closed event log ───────────────────────────────────────────────
+    try:
+        log_event(EVENT_POSITION_CLOSED, {'token': token, 'close_reason': reason})
+    except Exception:
+        pass
+
     conn = get_db_connection()
     if conn is None:
         return
@@ -1929,8 +1956,14 @@ def sync():
         log(f'Failed to fetch DB trades: {e}', 'FAIL')
         return
 
-    hl_tokens = set(hl_pos.keys())
-    db_tokens = {t['token'] for t in db_trades}
+    # ── Guardian cycle checkpoint ───────────────────────────────────────────────
+    try:
+        checkpoint_write('guardian_cycle', {'workflow_state': 'IDLE', 'open_trade_count': len(db_trades)})
+    except Exception:
+        pass
+
+    hl_tokens=set(hl_pos.keys())
+    db_tokens={t['token'] for t in db_trades}
 
     orphans = sorted(hl_tokens - db_tokens)       # on HL, not in DB
     missing = sorted(db_tokens - hl_tokens)      # in DB, not on HL
@@ -2088,7 +2121,16 @@ def main():
     log(f'PID: {os.getpid()}', 'INFO')
 
     # Module-level counter — persists across loop iterations
-    _failure_count = 0
+    global _failure_count
+
+    # ── Checkpoint recovery on startup ─────────────────────────────────────────
+    try:
+        recovered = detect_incomplete_run()
+        if recovered:
+            log_event(EVENT_CHECKPOINT_RECOVERY, {'recovered': recovered})
+            log(f'[CHECKPOINT] Recovered from incomplete run: {recovered}', 'WARN')
+    except Exception:
+        pass
 
     while True:
         # ── VmSize context window monitoring ──────────────────────────────
