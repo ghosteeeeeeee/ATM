@@ -56,7 +56,7 @@ except (IOError, OSError):
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from ab_utils import get_cached_ab_variant
-from hermes_constants import HOTSET_BLOCKLIST
+from hermes_constants import HOTSET_BLOCKLIST, SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin,
@@ -1590,6 +1590,66 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
 
 # ─── Main Sync Cycle ──────────────────────────────────────────────────────────
 
+def _sweep_blocklist_trades(prices):
+    """
+    Step 9 (2026-04-05): Sweep all open paper trades and close any on HOTSET_BLOCKLIST.
+    This is the last line of defense against external systems writing blocklisted tokens.
+    Only closes paper=true trades — live trades get real HL fill data.
+    """
+    if DRY:
+        log('[DRY] _sweep_blocklist_trades: would check all open paper trades against HOTSET_BLOCKLIST')
+        return 0
+
+    conn = get_db_connection()
+    if conn is None:
+        return 0
+
+    closed = 0
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, token, direction, entry_price, leverage
+            FROM trades
+            WHERE status = 'open'
+              AND paper = TRUE
+              AND exchange = 'Hyperliquid'
+        """)
+        for (trade_id, token, direction, entry_px, lev) in cur.fetchall():
+            ht = token.upper()
+            if ht not in HOTSET_BLOCKLIST:
+                continue
+
+            # Determine direction-appropriate close reason
+            reason = (
+                'hotset_blocked_short' if direction.upper() == 'SHORT' and ht in SHORT_BLACKLIST else
+                'hotset_blocked_long'  if direction.upper() == 'LONG'  and ht in LONG_BLACKLIST  else
+                'hotset_blocked'
+            )
+            exit_price = prices.get(ht) or prices.get(token) or entry_px or 0
+
+            trade_id_str = str(trade_id)
+            if trade_id_str in _CLOSED_THIS_CYCLE:
+                continue
+
+            _close_paper_trade_db(trade_id, token, exit_price, reason)
+            _CLOSED_THIS_CYCLE.add(trade_id_str)
+            _save_closed_set()
+            closed += 1
+            log(f'  [BLOCKLIST SWEEP] {token} {direction} (#{trade_id}) — closed: {reason}', 'WARN')
+
+        cur.close()
+        conn.close()
+    except Exception as e:
+        log(f'_sweep_blocklist_trades error: {e}', 'FAIL')
+        try:
+            cur.close()
+            conn.close()
+        except:
+            pass
+
+    return closed
+
+
 def sync():
     """Run one full sync cycle."""
     global _CLOSED_THIS_CYCLE, _CLOSED_HL_COINS
@@ -1751,6 +1811,16 @@ def sync():
                     _close_paper_trade_db(trade_id, tok, exit_price, 'guardian_missing')
                 except Exception as e:
                     log(f'  DB close failed for {tok}: {e}', 'FAIL')
+
+    # Step 9: SWEEP HOTSET_BLOCKLIST — close any paper trades on the blocklist.
+    # External systems (e.g. OpenClaw) can write directly to brain.trades, bypassing
+    # signal_gen.py blacklist checks. This is the last line of defense: any paper trade
+    # on HOTSET_BLOCKLIST (SHORT_BLACKLIST ∪ LONG_BLACKLIST) gets closed regardless
+    # of how it was created. Only closes paper=true trades — live trades use HL fills.
+    if True:  # always run, even when live trading is OFF
+        sweep_closed = _sweep_blocklist_trades(prices)
+        if sweep_closed > 0:
+            log(f'Step9 blocklist sweep: closed {sweep_closed} paper trades on HOTSET_BLOCKLIST')
 
     log(f'── Sync done ──')
 
