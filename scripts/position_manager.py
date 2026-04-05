@@ -725,11 +725,24 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             pnl_pct = ((entry_price - current_price) / entry_price * 100) if entry_price > 0 else 0
         pnl_usdt = amount_usdt * leverage * (pnl_pct / 100)
 
-        # Net PnL after fees
-        net_pnl = pnl_usdt - fee_total
+        # Net PnL after fees (use corrected pnl_usdt_val)
+        net_pnl = pnl_usdt_val - fee_total
 
         # ── Trigger loss cooldown (incremental: 2h → 4h → 8h per consecutive loss) ──
-        is_loss = float(pnl_usdt or 0) < 0
+        # FIX (2026-04-05): if pnl_usdt is 0 but reason contains a realized PnL%
+        # (e.g. "trailing_exit_-0.55%"), use that to determine loss/win.
+        # close_paper_position() uses current_price which may have reverted to entry
+        # by the time the exit is processed, losing the realized PnL info.
+        pnl_usdt_val = float(pnl_usdt or 0)
+        if pnl_usdt_val == 0 and reason:
+            import re
+            m = re.search(r'([+-]\d+\.\d+)%', reason)
+            if m:
+                pnl_pct_from_reason = float(m.group(1))
+                # pnl_pct_from_reason is the realized pnl% at time of exit
+                pnl_usdt_val = amount_usdt * leverage * (pnl_pct_from_reason / 100)
+                pnl_pct = pnl_pct_from_reason  # also correct the stored pnl_pct
+        is_loss = pnl_usdt_val < 0
         if is_loss:
             set_loss_cooldown(token, direction)
             # Post-mortem: if we lost on a direction, was the market moving against us first?
@@ -737,7 +750,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
 
         # ── Trigger win cooldown ──────────────────────────────────
         # Also: clear loss streak since WIN confirms this was the right direction
-        is_win = float(pnl_usdt or 0) > 0
+        is_win = pnl_usdt_val > 0
         if is_win:
             _set_win_cooldown(token, direction)
             if LOSS_STREAK_RESET_WIN:
@@ -758,7 +771,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 hype_realized_pnl_pct = %s
             WHERE id = %s AND status = 'open'
         """, (now, reason, reason, current_price,
-              round(pnl_pct, 4), round(pnl_usdt, 4),
+              round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               None, None,  # hype_realized_pnl_* will be backfilled after HL confirms
               trade_id))
