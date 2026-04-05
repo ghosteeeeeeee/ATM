@@ -12,6 +12,7 @@
 - **Lock minimum profit** — when activating trailing, set a floor SL at breakeven + X% before trailing
 - **One place for trailing logic** — don't duplicate in heartbeat AND trailing-stop-manager; use the service
 - **The trailing-stop-manager.py service** — runs via `ro-trailing-stop.service` on Dallas, NOT the JS version
+- **close_paper_position uses current_price, not trigger price** — when a trailing stop fires, the current_price may have reverted by the time the exit is processed, making realized PnL appear as $0. Always extract the realized PnL% from the exit reason string (e.g., "trailing_exit_-0.55%") to correctly determine loss vs win for cooldown logic
 
 ### Position Sizing
 - 20X only for high confidence (80+, multiple confluences, multi-timeframe)
