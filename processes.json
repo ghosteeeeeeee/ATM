@@ -1,15 +1,1 @@
-[
-  {
-    "session_id": "proc_a3bec0160bb1",
-    "command": "cd /root/.hermes && git add -A && git status --short && git commit -m \"hermes-session-wrap: hot-set-reset added to wrap skill, 24-token hot-set on pause\" 2>&1",
-    "pid": 921678,
-    "cwd": "/root",
-    "started_at": 1775373776.9684489,
-    "task_id": "20260404_202329_736578",
-    "session_key": "",
-    "watcher_platform": "",
-    "watcher_chat_id": "",
-    "watcher_thread_id": "",
-    "watcher_interval": 0
-  }
-]
+[]
