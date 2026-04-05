@@ -1,34 +1,51 @@
 # CONTEXT.md — Hermes ATM
 ## Quick Status
 ```
-WIN RATE:  43% (7d) | PNL: -$26.56 (7d) | POSITIONS: 5 open / 10 max
-BIAS: SHORT | LIVE TRADING: OFF (emergency-off)
+WIN RATE:  46% (7d) | PNL: -$23.50 (7d) | POSITIONS: 8 open (all SHORT, all real HL)
+BIAS: SHORT | LIVE TRADING: ON
 ```
-**5 real HL positions:** TRX, UNI, MORPHO, ZORA, ASTER — all SHORT
+**8 real HL positions (all SHORT):** MORPHO, ZORA, TRX, UNI, ASTER, ZEC, SKY, TST
 
 ## Active
-- 5 open positions (real HL), all SHORT
+- 8 open positions (real HL), all SHORT — Guardian actively mirroring
+- hype_live_trading.json: ON (2026-04-05 05:45 UTC)
 - Regime: SHORT bias
-- DB: 172MB (signal_archiver + vacuum needed)
-- 5 stale momentum_cache entries > 2h old
+- DB: vacuum'd (signals compacted, 99 closed trades archived)
 
-## This Session (2026-04-05 ~05:30 UTC)
-- **EMERGENCY:** hype_live_trading.json was LIVE — 10 paper trades executed as real HL orders
-  - Guardian's mirror_open() was the execution path (decider-run hardcodes paper=True)
-  - Guardian closed 10 phantom trades when HL didn't confirm positions (APE, STX, AAVE, etc.)
-  - 5 real HL positions remain (TRX, UNI, MORPHO, ZORA, ASTER — all SHORT)
-  - hype_live_trading.json → `{"live_trading": false, "reason": "emergency-off"}`
-- **Fix applied:** decider-run.py approved-signals loop now has regime check (was HOT-SET only)
+## Pipeline Health
+- Pipeline: RUNNING ✅
+- WASP: 0 ERRORS, 5 warnings (non-blocking) ✅
+- WASP cron: INSTALLED ✅
+- hermes-pipeline cron: restart needed (was stale since Apr 2)
+- HL cache: FRESH ✅
+- 222 stale momentum_cache entries: CLEARED ✅
 
-## In Flight
-- WASP service: broken since 03:06
-- 5 stale momentum_cache entries > 2h old
-- 297 signals below 55% confidence in last hour (signal gen flooding)
+## This Session (2026-04-05 ~05:40 UTC)
+- **Emergency resolved:** live trading was OFF, pipeline verified healthy, re-enabled
+- **Fix:** decider-run.py approved-signals loop now has regime check (was HOT-SET only)
+- **Fix:** 222 stale momentum_cache entries cleared
+- **Fix:** WASP cron installed (every 5min)
+- **Fresh-run:** 99 closed trades archived, 11662 signals purged, DB vacuum'd
+- **Git:** committed + pushed v3bcee80-20260405-0546
 
-## Decisions Made
-- Live trading KILL SWITCH: /var/www/hermes/data/hype_live_trading.json — must be false to prevent real orders
-- Signal DB: /root/.hermes/data/signals_hermes_runtime.db (local SQLite) — Tokyo PG not reachable
-- PnL dashboard: accurate — computed live from prices, DB only writes on close
+## Critical Bugs Fixed
+- AAVE/STX contrarian trades: regime filter now applies to APPROVED signals path
+- Guardian mirror_open: missing `import sys` (hyperliquid_exchange.py)
+
+## Signal DBs
+- Hermes: /root/.hermes/data/signals_hermes_runtime.db (local SQLite)
+- OpenClaw: /root/.openclaw/workspace/data/signals.db (empty)
+- Tokyo PG: not reachable (sleep mode)
+
+## HL Wallet
+- 0x324a9713603863FE3A678E83d7a81E20186126E7
+- Fills: /root/.hermes/data/hl_fills_*_raw.csv (2000 fills, Mar 10-25 2026)
+
+## In Flight / Known Issues
+- 5 WAIT signals never re-reviewed: BIGTIME, SNX, ORDI, DYDX, ZETA
+- 3 AB test variants with < 5 trades: entry-timing, trailing-stop (2 variants)
+- 282 signals below 55% confidence in last hour (signal gen flooding)
+- hype_live_trading.json is the KILL SWITCH — must be false to prevent real orders
 
 ---
-*Updated: 2026-04-05 05:38 UTC*
+*Updated: 2026-04-05 05:48 UTC*
