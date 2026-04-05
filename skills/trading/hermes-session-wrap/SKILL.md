@@ -91,7 +91,86 @@ conn.close()
 - Adjust confluence minimum if single/dual-source signals underperforming
 - Note systematic issues (guardian_missing, hl_position_missing, etc.)
 
-## Step 3 — fresh-run
+## Step 3 — hot-set-reset
+
+Analyze the hot-set queue and generate a reset recommendation. Include this step every session wrap so stale/low-confidence tokens are evicted before the next pipeline run.
+
+```bash
+cd /root/.hermes/scripts && python3 << 'EOF'
+import json, sqlite3, psycopg2
+from _secrets import BRAIN_DB_DICT
+from collections import defaultdict
+
+with open('/var/www/hermes/data/hotset.json') as f:
+    hs = json.load(f)
+hotset = hs.get('hotset', [])
+hotset_map = {(t['token'], t['direction']) for t in hotset}
+
+print(f"=== HOT-SET: {len(hotset)} tokens ===")
+for t in sorted(hotset, key=lambda x: -x['confidence']):
+    print(f"  {t['token']:8s} {t['direction']:5s} r{t.get('compact_rounds',0)} conf={t['confidence']:.0f}% {t.get('signal_type','?')}")
+
+conn_pg = psycopg2.connect(**BRAIN_DB_DICT)
+cur_pg = conn_pg.cursor()
+cur_pg.execute("SELECT token, direction, pnl_pct FROM trades WHERE status='open' AND server='Hermes'")
+open_rows = cur_pg.fetchall()
+open_tokens = {r[0] for r in open_rows}
+print(f"\n=== OPEN POSITIONS: {len(open_rows)}/10 ===")
+for r in open_rows:
+    print(f"  {r[0]} {r[1]} pnl={r[2]:+.2f}%")
+conn_pg.close()
+
+conn_sql = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+cur_sql = conn_sql.cursor()
+cur_sql.execute('''
+    SELECT token, direction, signal_type, source, confidence, decision,
+           review_count, compact_rounds
+    FROM signals
+    WHERE decision IN ("PENDING","APPROVED")
+    ORDER BY confidence DESC
+    LIMIT 50
+''')
+pending = cur_sql.fetchall()
+
+by_token = defaultdict(lambda: {'best_conf': 0, 'sources': set(), 'signal_types': set(), 'decision': ''})
+for r in pending:
+    key = (r[0], r[1])
+    if r[4] > by_token[key]['best_conf']:
+        by_token[key]['best_conf'] = r[4]
+    by_token[key]['sources'].add(str(r[3])[:20])
+    by_token[key]['signal_types'].add(str(r[2]))
+    by_token[key]['decision'] = r[5]
+
+print(f"\n=== TOP PENDING SIGNALS ===")
+for (token, direction), data in sorted(by_token.items(), key=lambda x: -x[1]['best_conf'])[:20]:
+    sources = ','.join(sorted(data['sources']))[:23]
+    types = ','.join(sorted(data['signal_types']))[:18]
+    in_hs = 'IN-HS' if (token, direction) in hotset_map else ''
+    has_open = 'OPEN' if token in open_tokens else ''
+    flags = ' '.join(f for f in [in_hs, has_open] if f)
+    print(f"  {token:8s} {direction:5s} {data['best_conf']:5.1f}% {sources:23s} {types:18s} {data['decision']} {flags}")
+conn_sql.close()
+
+bands = {'90+': [], '80-89': [], '70-79': [], '<70': []}
+for t in hotset:
+    c = t['confidence']
+    if c >= 90: bands['90+'].append(t['token'])
+    elif c >= 80: bands['80-89'].append(t['token'])
+    elif c >= 70: bands['70-79'].append(t['token'])
+    else: bands['<70'].append(t['token'])
+print(f"\n=== HOT-SET DISTRIBUTION ===")
+for band, tokens in bands.items():
+    print(f"  {band}: {len(tokens)} — {', '.join(tokens)}")
+below = len(bands['70-79']) + len(bands['<70'])
+print(f"\n  → Below 80%: {below} tokens (will be blocked in next ai_decider pass)")
+print(f"  → Open slots: {10 - len(open_rows)}")
+print(f"  → KEEP: {len(bands['90+']) + len(bands['80-89'])} tokens | EVICT: {below} tokens")
+EOF
+```
+
+**Action:** Review output. If below 80% tokens exist and slots are available, ai_decider will evict them on next run. If all slots full, eviction still applies to future passes when positions close.
+
+## Step 4 — fresh-run
 
 Archive closed trades, clear signals DB, reset cooldowns. **DO NOT close open positions.**
 
