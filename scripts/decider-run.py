@@ -921,6 +921,18 @@ def _run_hot_set():
                     num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
                 except (ValueError, IndexError):
                     num_src = 1
+                # FIX (2026-04-05): conf-1s = single-source = too weak, hard ban
+                if num_src < 2:
+                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: conf-1s (single-source, min 2 required)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+                # FIX (2026-04-05): speed=0% = stale token, hard ban
+                spd = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
+                sp = spd.get('speed_percentile', 50.0) if spd else 50.0
+                if sp == 0:
+                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
                 # Use effective_conf (speed-boosted) for threshold comparison
                 base_threshold = 65
                 if num_src >= 3:
@@ -928,13 +940,29 @@ def _run_hot_set():
                     reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
                 else:
                     should_approve = effective_conf >= base_threshold
-                    reason = f'hot-conf-2s @{sig_conf:.0f}%{reason_suffix}'
+                    reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
             elif sig_src and sig_src.startswith('hmacd-'):
+                # FIX (2026-04-05): speed=0% = stale token, hard ban
+                spd2 = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
+                sp2 = spd2.get('speed_percentile', 50.0) if spd2 else 50.0
+                if sp2 == 0:
+                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
                 # Apply centralized source weight from ai-decider
                 sw = _get_source_weight(sig_type, sig_src)
                 threshold = min(99, 65.0 / sw)
                 should_approve = effective_conf >= threshold
                 reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]{reason_suffix}'
+            else:
+                # Any other signal type (mtf_macd, mtf_zscore, percentile_rank, etc.)
+                # must also pass speed=0% ban
+                spd3 = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
+                sp3 = spd3.get('speed_percentile', 50.0) if spd3 else 50.0
+                if sp3 == 0:
+                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
 
             if should_approve:
                 # Rate limit check: only 3 new approvals per minute
@@ -1167,6 +1195,23 @@ def run(dry_run=False):
                     continue
         except Exception as e:
             log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
+
+        # FIX (2026-04-05): conf-1s = single-source, too weak — hard ban on approved signals too
+        sig_src = sig.get('source', '') or ''
+        if 'conf-1s' in sig_src or sig_src == 'conf-1s':
+            log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: conf-1s (single-source, min 2 required)')
+            mark_signal_executed(token, direction)
+            skipped += 1
+            continue
+
+        # FIX (2026-04-05): speed=0% = stale token — hard ban
+        sp_exec = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
+        sp_exec_val = sp_exec.get('speed_percentile', 50.0) if sp_exec else 50.0
+        if sp_exec_val == 0:
+            log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: speed=0% (stale token)')
+            mark_signal_executed(token, direction)
+            skipped += 1
+            continue
 
         # Check loss cooldown — block same direction after a loss
         if is_loss_cooldown_active(token, direction):
