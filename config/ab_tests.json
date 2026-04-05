@@ -32,12 +32,12 @@
             "evolved_from": "SL1pct",
             "spawned_at": "2026-04-05T04:08:30.499110"
           },
-          "trades": 14,
+          "trades": 17,
           "wins": 0,
-          "losses": 0,
+          "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 06:11:03.943475"
+          "lastUpdated": "2026-04-05 06:17:33.773088"
         }
       ]
     },
@@ -69,12 +69,12 @@
             "entryMode": "retrace",
             "pullbackThreshold": 2.0
           },
-          "trades": 28,
+          "trades": 29,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 06:05:58.325974"
+          "lastUpdated": "2026-04-05 06:17:33.777015"
         },
         {
           "id": "EVO-3",
@@ -89,12 +89,12 @@
             "evolved_from": "IMMEDIATE",
             "spawned_at": "2026-04-05T04:08:30.504948"
           },
-          "trades": 6,
+          "trades": 8,
           "wins": 0,
-          "losses": 0,
+          "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 06:11:03.947365"
+          "lastUpdated": "2026-04-05 06:16:32.491001"
         }
       ]
     },
@@ -111,12 +111,12 @@
             "trailingActivationPct": 0.5,
             "trailingDistancePct": 0.5
           },
-          "trades": 3,
+          "trades": 6,
           "wins": 0,
-          "losses": 0,
+          "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 05:45:30.634709"
+          "lastUpdated": "2026-04-05 06:17:33.780693"
         },
         {
           "id": "TS-loose",

@@ -1,0 +1,19 @@
+#	Token	Dir	Entry	Exit	P&L %	P&L $	Lev	Size	Reason	Signal	Closed
+1	ZK	LONG	$0.0158	$0.0157	-0.80%	$-0.40	5x	$50.0	guardian_missing	conf-2s	2026-04-05 06:11:23
+2	ZK	LONG	$0.0158	$0.0157	-0.48%	$-0.24	5x	$50.0	guardian_missing	conf-3s	2026-04-05 06:10:16
+3	ZK	LONG	$0.0158	$0.0157	-0.34%	$-0.17	5x	$50.0	guardian_missing	conf-4s	2026-04-05 06:09:09
+4	0G	SHORT	$0.5036	$0.4947	+1.76%	+$0.88	3x	$50.0	guardian_missing	conf-2s	2026-04-05 06:08:02
+5	PROVE	SHORT	$0.2152	$0.2154	-0.11%	$-0.05	3x	$50.0	guardian_missing	conf-2s	2026-04-05 06:06:54
+6	KAITO	SHORT	$0.4150	$0.4175	-0.60%	$-0.30	5x	$50.0	guardian_missing	conf-1s	2026-04-05 06:05:47
+7	KAITO	SHORT	$0.4153	$0.4168	-0.37%	$-0.19	5x	$50.0	guardian_missing	conf-2s	2026-04-05 06:04:39
+8	ALGO	SHORT	$0.1183	$0.1174	+0.77%	+$0.39	5x	$50.0	guardian_missing	conf-2s	2026-04-05 06:04:32
+9	NIL	SHORT	$0.0326	$0.0322	+1.40%	+$0.70	3x	$50.0	guardian_missing	conf-1s	2026-04-05 05:58:23
+10	NIL	SHORT	$0.0326	$0.0326	+0.00%	+$0.00	3x	$50.0	orphan_sync	conf-2s	2026-04-05 05:57:16
+11	ICP	SHORT	$2.2719	$2.2639	+0.35%	+$0.17	5x	$50.0	guardian_missing	conf-1s	2026-04-05 05:56:10
+12	ZK	LONG	$0.0158	$0.0158	+0.10%	+$0.05	5x	$50.0	guardian_missing	conf-1s	2026-04-05 05:56:03
+13	S	LONG	$0.0412	$0.0411	-0.24%	$-0.12	5x	$50.0	guardian_missing	conf-2s	2026-04-05 05:54:55
+14	ZK	LONG	$0.0158	$0.0158	+0.01%	+$0.00	5x	$50.0	guardian_missing	conf-2s	2026-04-05 05:54:48
+15	S	SHORT	$0.0412	$0.0411	+0.22%	+$0.11	5x	$50.0	guardian_missing	conf-1s	2026-04-05 05:53:40
+16	KAITO	SHORT	$0.4153	$0.4142	+0.27%	+$0.13	5x	$50.0	guardian_missing	conf-1s	2026-04-05 05:53:33
+17	ALGO	SHORT	$0.1184	$0.1181	+0.21%	+$0.11	5x	$50.0	guardian_missing	conf-1s	2026-04-05 05:51:26
+18	ALGO	SHORT	$0.1181	$0.1183	-0.22%	$-0.11	5x	$50.0	guardian_missing	conf-1s	2026-04-05 05:50:19
