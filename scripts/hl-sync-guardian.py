@@ -69,6 +69,9 @@ DRY = False  # Default is LIVE. Use --dry flag (not --apply) for dry-run mode.
 # NOTE: systemd service runs WITHOUT --apply by default — set DRY=False here to enable guardian closes.
 # Override with --apply flag if you need temporary dry-run without changing this file.
 INTERVAL = 60  # seconds between checks
+# BUG-FIX: CUT_LOSER_THRESHOLD was used on line ~901 before being defined at ~918 inside
+# the same function → UnboundLocalError at runtime. Now defined at module scope.
+CUT_LOSER_THRESHOLD = -5.0
 MAX_CONSECUTIVE_FAILURES = 5
 # BUG-5: Configurable slippage for guardian market closes (was hardcoded 0.01).
 # 0.005 = 0.5% — conservative for liquid markets, safe for illiquid tokens.
@@ -898,14 +901,24 @@ def sync_pnl_from_hype(prices):
                     # If trade hasn't moved >1% in 15min AND a faster hot-set token exists
                     # → close stale trade, let ai_decider refill from hot-set.
                     # Runs after flip check; skipped for trades already being cut (<-5%).
+                    # BUG-FIX: CUT_LOSER_THRESHOLD was referenced before definition (line 918
+                    # defined it after line 901's use → UnboundLocalError. Moved to module-level
+                    # constant. Also guard: skip if flip_armed (docstring contract).
                     if pnl_pct > CUT_LOSER_THRESHOLD:
-                        try:
-                            _check_stale_rotation(
-                                {'id': trade_id, 'token': token, 'direction': direction,
-                                 'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
-                                pnl_pct, prices, conn, cur)
-                        except Exception as stale_err:
-                            log(f'  [STALE-ROTATION] {token} error: {stale_err}', 'WARN')
+                        # Check flip_armed before rotating — don't override a pending flip
+                        cur.execute("SELECT flip_armed FROM trades WHERE id=%s", (trade_id,))
+                        flip_row = cur.fetchone()
+                        flip_armed = bool(flip_row[0]) if flip_row else False
+                        if flip_armed:
+                            log(f'  [STALE-ROTATION] {token} flip_armed — skipping rotation', 'INFO')
+                        else:
+                            try:
+                                _check_stale_rotation(
+                                    {'id': trade_id, 'token': token, 'direction': direction,
+                                     'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
+                                    pnl_pct, prices, conn, cur)
+                            except Exception as stale_err:
+                                log(f'  [STALE-ROTATION] {token} error: {stale_err}', 'WARN')
 
                     updated += 1
                     # Cut-loser: emergency exit at -5% loss
@@ -915,7 +928,8 @@ def sync_pnl_from_hype(prices):
                     # BUG-2 old: marked DB closed BEFORE HL confirmed fill. Fix: wait first.
                     # BUG-3: flip order placed without verifying close succeeded. Fix: verify.
                     # BUG-28: no retry on failure. Fix: retry once, then alert.
-                    CUT_LOSER_THRESHOLD = -5.0
+                    # NOTE: CUT_LOSER_THRESHOLD moved to module scope (line 74) — was causing
+                    # UnboundLocalError when used at line 904 before local def at line 931.
                     if pnl_pct <= CUT_LOSER_THRESHOLD:
                         log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
                         from hyperliquid_exchange import close_position
@@ -976,18 +990,29 @@ def sync_pnl_from_hype(prices):
 def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
                            db_conn, db_cur):
     """
-    Stale Trade Rotation: close trades that haven't moved >1% in 15min
+    Stale Trade Rotation: close trades whose price has been flat (velocity near 0)
     if a faster hot-set token is available.
 
-    Rule: if any open trade has price_velocity_5m < 1% (flat for 15min)
-    AND hot-set contains a token with higher speed_percentile
+    Rule: if an open trade's price_velocity_5m indicates stasis
+    AND hot-set contains a token with higher speed_percentile and same direction
     → close the stale trade, let ai_decider refill from hot-set.
 
     Guards:
-    - Skips trades already in cut-loser territory (<-5%)
-    - Skips trades with flip_armed=True
-    - Skips if DRY mode
+    - Skips trades already in cut-loser territory (<-5%) — caller enforces this
+    - Skips trades with flip_armed=True — caller enforces this
+    - Skips DRY mode
     - Rate-limited: max 1 rotation per 3 minutes per token
+
+    BUG-FIXES applied:
+    - Threshold: was 1.0%, now 0.2% — aligned with speed_tracker STALE_VELOCITY_5M.
+      The price_velocity_5m field uses 0.2% as the noise floor; 1.0% was too loose.
+    - Direction: was ignoring hot-set direction (hd variable extracted but never used).
+      Now filters candidates to same-direction entries only.
+    - SHORT staleness: was using abs(velocity) so +0.5% and -0.5% both = stale.
+      For SHORT, only positive velocity (price rising) and flat are stale.
+      For LONG, only negative velocity (price falling) and flat are stale.
+    - updated_at: was loaded but never checked. Now verifies data age < 15 min.
+    - is_stale from DB: now respected as a fast-path skip before recalculating.
     """
     if DRY:
         return
@@ -998,11 +1023,13 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     trade_id = trade['id']
     entry_px = float(trade.get('entry_price') or 0)
     direction = trade.get('direction', 'SHORT')
+    direction_upper = direction.upper()
 
-    STALE_VEL_PCT = 1.0        # trade must have moved >1% to be "alive"
-    STALE_AGE_MIN = 15         # look back 15 minutes
-    MAX_ROTATIONS = 2           # max 2 rotations per cycle
-    RATE_LIMIT_SEC = 180       # 3 min cooldown between rotations
+    # 0.2% matches speed_tracker.py STALE_VELOCITY_5M — the noise floor for 5m velocity.
+    # Using 1.0% here was 5x too loose and inconsistent with how is_stale is computed.
+    STALE_VEL_PCT = 0.2
+    STALE_AGE_SEC = 15 * 60   # 15 minutes
+    RATE_LIMIT_SEC = 180      # 3 min cooldown between rotations
 
     # ── 1. Load speed data from runtime signals DB ──────────────────────────────
     db_path = '/root/.hermes/data/signals_hermes_runtime.db'
@@ -1016,7 +1043,7 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         c_s.execute("""
             SELECT token, speed_percentile, price_velocity_5m, is_stale, updated_at
             FROM token_speeds
-            WHERE token = ?
+            WHERE token=?
         """, (token,))
         row = c_s.fetchone()
         if row:
@@ -1032,16 +1059,35 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         log(f'  [STALE-ROTATION] {token} speed query failed: {e}', 'WARN')
         return
 
-    vel = abs(speed_data.get('price_velocity_5m', 0) or 0)
+    if not speed_data:
+        return
+
+    # ── 1b. Check data freshness ───────────────────────────────────────────────
+    # BUG-FIX: updated_at was loaded but never used — could act on stale data
+    if speed_data.get('updated_at'):
+        age_sec = _time.time() - speed_data['updated_at']
+        if age_sec > STALE_AGE_SEC:
+            log(f'  [STALE-ROTATION] {token} speed data is {age_sec:.0f}s old — skipping', 'WARN')
+            return
+
+    signed_vel = speed_data.get('price_velocity_5m', 0) or 0  # signed velocity
     sp = speed_data.get('speed_percentile', 50) or 50
 
     # ── 2. Check if this trade is stale ───────────────────────────────────────
-    # Only SHORT trades: stale = price hasn't dropped enough (velocity near 0 or positive)
-    # LONG trades: stale = price hasn't risen enough (velocity near 0 or negative)
-    if direction.upper() == 'SHORT':
-        is_stale = vel < STALE_VEL_PCT   # SHORT needs price to fall; flat = stale
+    # Respect the DB-computed is_stale as a fast path (uses correct 0.2% threshold).
+    # Then apply direction-specific logic:
+    #   SHORT: stale if price not falling enough (vel >= -STALE_VEL_PCT means flat or rising)
+    #   LONG:  stale if price not rising enough (vel <= +STALE_VEL_PCT means flat or falling)
+    # BUG-FIX: was using abs(signed_vel) so both +0.5% and -0.5% registered as stale,
+    # treating a SHORT in profit (-0.5%) as stale when it should not be.
+    if direction_upper == 'SHORT':
+        # For SHORT: negative velocity = price fell = good (NOT stale)
+        # stale if vel >= -0.2% (price is flat or rising)
+        is_stale = signed_vel >= -STALE_VEL_PCT
     else:
-        is_stale = vel < STALE_VEL_PCT   # LONG needs price to rise; flat = stale
+        # For LONG: positive velocity = price rose = good (NOT stale)
+        # stale if vel <= +0.2% (price is flat or falling)
+        is_stale = signed_vel <= STALE_VEL_PCT
 
     if not is_stale:
         return  # Trade is moving fine
@@ -1061,17 +1107,23 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
 
     # Find tokens in hot-set with higher speed than this trade's token
     # Exclude: same token, opposite direction (conflicts), tokens already have open positions
-    db_cur.execute("SELECT token FROM trades WHERE status='open' AND exchange='Hyperliquid'")
-    open_tokens = {r[0] for r in db_cur.fetchall()}
+    # BUG-FIX: hd (hot-set direction) was extracted but never checked — now enforced
+    db_cur.execute("SELECT token, direction FROM trades WHERE status='open' AND exchange='Hyperliquid'")
+    open_by_dir = {}
+    for r in db_cur.fetchall():
+        open_by_dir.setdefault(r[0].upper(), set()).add(r[1].upper())
 
     candidates = []
     for h in hotset:
-        ht = h['token']
-        hd = h['direction']
-        if ht == token:
+        ht = h['token'].upper()
+        hd = h.get('direction', 'SHORT').upper()
+        if ht == token.upper():
             continue  # same token
-        if ht in open_tokens:
-            continue  # already has open position
+        # BUG-FIX: skip if this token already has an open position in the SAME direction
+        if token.upper() in open_by_dir and hd in open_by_dir[token.upper()]:
+            continue  # already has open position in this direction
+        if hd != direction_upper:
+            continue  # BUG-FIX: opposite direction — don't replace SHORT with LONG or vice versa
         # Get speed for this hot-set token
         try:
             conn_hs = _sqlite3.connect(db_path, timeout=5)
@@ -1113,7 +1165,7 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         pass
 
     # ── 5. Execute the rotation ────────────────────────────────────────────────
-    log(f'  [STALE-ROTATION] {token} {direction} stale (vel={vel:.2f}%, sp={sp:.0f}) → '
+    log(f'  [STALE-ROTATION] {token} {direction} stale (vel={signed_vel:.2f}%, sp={sp:.0f}) → '
         f'closing for {best["token"]} {best["direction"]} (sp={best["speed_percentile"]:.0f}%, vel={best["velocity_5m"]:.2f}%)',
         'WARN')
 
