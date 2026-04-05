@@ -6,24 +6,9 @@
       "description": "Stop-loss distance optimization — test 1%, 2%, 3% SL distances",
       "variants": [
         {
-          "id": "SL1pct",
-          "label": "1% SL (tight)",
-          "weight": 59,
-          "enabled": true,
-          "config": {
-            "slPct": 1.0
-          },
-          "trades": 246,
-          "wins": 0,
-          "losses": 0,
-          "winRate": 0,
-          "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 14:41:03.455164"
-        },
-        {
           "id": "SL2pct-E3",
           "name": "SL-1.5%-Evo",
-          "weight": 31,
+          "weight": 60,
           "enabled": true,
           "config": {
             "slDistance": 0.015,
@@ -32,12 +17,12 @@
             "evolved_from": "SL1pct",
             "spawned_at": "2026-04-05T04:08:30.499110"
           },
-          "trades": 150,
+          "trades": 174,
           "wins": 0,
           "losses": 2,
           "winRate": 0,
           "totalPnlPct": 0.08,
-          "lastUpdated": "2026-04-05 14:41:03.570215"
+          "lastUpdated": "2026-04-05 15:23:54.202217"
         }
       ]
     },
@@ -48,38 +33,22 @@
         {
           "id": "IMMEDIATE",
           "label": "Immediate entry",
-          "weight": 40,
+          "weight": 59,
           "enabled": true,
           "config": {
             "entryMode": "immediate"
           },
-          "trades": 200,
+          "trades": 222,
           "wins": 0,
           "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0.08,
-          "lastUpdated": "2026-04-05 14:40:03.130635"
-        },
-        {
-          "id": "RETRACE-2",
-          "label": "Retrace 2% pullback",
-          "weight": 40,
-          "enabled": true,
-          "config": {
-            "entryMode": "retrace",
-            "pullbackThreshold": 2.0
-          },
-          "trades": 187,
-          "wins": 0,
-          "losses": 0,
-          "winRate": 0,
-          "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 14:41:03.574398"
+          "lastUpdated": "2026-04-05 15:23:54.206219"
         },
         {
           "id": "EVO-3",
           "name": "Entry-Evolve-3",
-          "weight": 9,
+          "weight": 31,
           "enabled": true,
           "config": {
             "entryMode": "pullback",
@@ -89,12 +58,12 @@
             "evolved_from": "IMMEDIATE",
             "spawned_at": "2026-04-05T04:08:30.504948"
           },
-          "trades": 43,
+          "trades": 46,
           "wins": 0,
           "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 14:41:03.338546"
+          "lastUpdated": "2026-04-05 15:22:54.530516"
         }
       ]
     },
@@ -111,12 +80,12 @@
             "trailingActivationPct": 0.5,
             "trailingDistancePct": 0.5
           },
-          "trades": 21,
+          "trades": 23,
           "wins": 0,
           "losses": 1,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 14:40:03.134541"
+          "lastUpdated": "2026-04-05 15:22:54.331547"
         },
         {
           "id": "TS-loose",
@@ -127,12 +96,12 @@
             "trailingActivationPct": 2.0,
             "trailingDistancePct": 1.0
           },
-          "trades": 410,
+          "trades": 447,
           "wins": 1,
-          "losses": 4,
-          "winRate": 0.5,
-          "totalPnlPct": 0.36,
-          "lastUpdated": "2026-04-05 14:41:03.578203"
+          "losses": 5,
+          "winRate": 0.2,
+          "totalPnlPct": 0.21,
+          "lastUpdated": "2026-04-05 15:23:54.210218"
         },
         {
           "id": "TSEVO-3",
@@ -146,12 +115,12 @@
             "evolved_from": "TS-loose",
             "spawned_at": "2026-04-05T04:08:30.510438"
           },
-          "trades": 5,
+          "trades": 7,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-05 14:40:03.786297"
+          "lastUpdated": "2026-04-05 15:22:53.610266"
         }
       ]
     },

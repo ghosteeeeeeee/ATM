@@ -1203,13 +1203,18 @@ def run(dry_run=False):
         except Exception as e:
             log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 
-        # FIX (2026-04-05): conf-1s = single-source, too weak — hard ban on approved signals too
+        # FIX (2026-04-05): conf-1s = single-source, too weak — hard ban on approved signals too.
+        # Only block conf-1s (true single-source confluence). Merged signals with 1 type
+        # (count=1) have legitimate sources like 'mtf_macd', 'hzscore' — don't block those.
+        # Block conf-1s, conf-2s etc. (not 'hzscore' or 'hmacd-').
         sig_src = sig.get('source', '') or ''
-        if 'conf-1s' in sig_src or sig_src == 'conf-1s':
-            log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: conf-1s (single-source, min 2 required)')
-            mark_signal_executed(token, direction)
-            skipped += 1
-            continue
+        if sig_src.startswith('conf-') or sig_src.endswith('s'):
+            # It's a confluence source (conf-1s, conf-2s, fallback-conf-3s, etc.)
+            if sig_src == 'conf-1s' or sig_src.startswith('conf-1s'):
+                log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: {sig_src} (single-source, min 2 required)')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
 
         # FIX (2026-04-05): speed=0% = stale token — hard ban
         sp_exec = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None

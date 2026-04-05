@@ -660,6 +660,17 @@ ALLOWED_SIGNAL_SOURCES = frozenset({
     'momentum', 'momentum-mtf', 'zscore-local', 'zscore-confluence',
     # Multi-timeframe
     'mtf-rsi', 'mtf-macd', 'mtf-momentum',
+    # FIX (2026-04-05): Add hmacd sources — these are valid indicator sources used by
+    # hot-set auto-approval. Without these, all hot-set signals are blocked as 'unknown'.
+    # The hmacd-* sources come from merged signals where source='hmacd-,hzscore,...'
+    # (comma-separated list of sources). The individual components are valid signals.
+    'hmacd-', 'hmacd-mtf_macd', 'hmacd-mtf_zscore', 'hmacd-default',
+    'hzscore', 'pct-hermes', 'vel-hermes', 'rsi-hermes',
+    'counter-hermes', 'counter-mtf_macd', 'counter-mtf_zscore',
+    # Standard signal types used throughout the system
+    'mtf_macd', 'mtf_zscore', 'mtf_rsi', 'mtf_momentum',
+    'percentile_rank', 'velocity', 'rsi_local', 'macd_local',
+    'macd_crossover', 'rsi_confluence', 'macd_confluence', 'zscore_confluence',
     # Pump modes
     'pump-momentum', 'pump-rsi', 'pump-confluence',
     # Legacy
