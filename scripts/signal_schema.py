@@ -281,6 +281,21 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
+        # ── CONFLICT GUARD (FIX 2026-04-05) ─────────────────────────────────────
+        # Before writing any new signal, expire any OPPOSITE-direction PENDING signals
+        # for this token. This prevents mtf_zscore and mtf_macd from simultaneously
+        # writing LONG+SHORT for the same token/candle (contradictory signals).
+        # E.g. mtf_zscore fires LONG while mtf_macd fires SHORT — only the newest survives.
+        opp_dir = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
+        c.execute('''
+            UPDATE signals
+            SET decision='EXPIRED', executed=1, updated_at=CURRENT_TIMESTAMP
+            WHERE token=? AND direction=? AND executed=0 AND decision='PENDING'
+              AND created_at > datetime('now', '-30 minutes')
+        ''', (token.upper(), opp_dir))
+        if c.rowcount > 0:
+            print(f'  🗑️ [CONFLICT-GUARD] expired {c.rowcount} {opp_dir} signals for {token} (new: {direction})')
+
         # Check for existing PENDING signal for SAME token+direction+signal_type in last 30 min
         # Only merge identical signal_type so that RSI+MACD create distinct rows → confluence detection works
         c.execute('''
@@ -489,6 +504,11 @@ def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
 def add_confluence_signal(token, direction, confidence, num_signals, price, z_score=None, rsi_14=None, macd_hist=None):
     """Add a confluence signal (when ≥2 indicator signals agree on same token+direction).
     Confidence is pre-boosted by caller (1.25x for 2 signals, 1.5x for 3+)."""
+    # FIX (2026-04-05): Defensive block — conf-1s is not confluence. Single-source
+    # signals should use their own signal type (hmacd-, counter-), not confluence.
+    if num_signals < 2:
+        print(f"[add_confluence_signal] REJECTED {token} {direction} conf-{num_signals}s — requires ≥2 signals")
+        return None
     return add_signal(
         token=token.upper(), direction=direction.upper(),
         signal_type='confluence',
