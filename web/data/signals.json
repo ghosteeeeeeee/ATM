@@ -1,0 +1,38 @@
+{
+  "updated": "2026-04-01T00:00:00.000000Z",
+  "approved": 0,
+  "executed": 0,
+  "pending": 1,
+  "total": 1,
+  "stats": {
+    "avg_confidence": 72.5,
+    "avg_z_score": 1.2,
+    "regime": "trending",
+    "momentum": "bullish",
+    "rsi_14": 58,
+    "top_tokens": [
+      "HYPE"
+    ]
+  },
+  "signals": [
+    {
+      "id": 1,
+      "token": "HYPE",
+      "direction": "LONG",
+      "confidence": 75.0,
+      "z_score": 1.5,
+      "z_tier": "mid",
+      "rsi_14": 55,
+      "macd_hist": 0.12,
+      "regime": "trending",
+      "momentum": "bullish",
+      "mcap_tier": "mid",
+      "source": "top150",
+      "leverage": 10,
+      "decision": "approved",
+      "decision_reason": "Strong momentum + z-score entry",
+      "created_at": "2026-04-01T11:00:00Z"
+    }
+  ],
+  "hot_set": []
+}

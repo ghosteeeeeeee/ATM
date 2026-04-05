@@ -1,0 +1,193 @@
+{
+  "enabled": true,
+  "tests": [
+    {
+      "name": "sl-distance-test",
+      "description": "Stop-loss distance optimization \u2014 test 1%, 2%, 3% SL distances",
+      "variants": [
+        {
+          "id": "SL1pct",
+          "label": "1% SL (tight)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 1.0
+          }
+        },
+        {
+          "id": "SL2pct",
+          "label": "2% SL (control)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 2.0
+          }
+        },
+        {
+          "id": "SL3pct",
+          "label": "3% SL (loose)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 3.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "entry-timing-test",
+      "description": "Entry timing \u2014 immediate vs retrace 2% vs retrace 5% pullback",
+      "variants": [
+        {
+          "id": "IMMEDIATE",
+          "label": "Immediate entry",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "entryMode": "immediate"
+          }
+        },
+        {
+          "id": "RETRACE-2",
+          "label": "Retrace 2% pullback",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "entryMode": "retrace",
+            "pullbackThreshold": 2.0
+          }
+        },
+        {
+          "id": "RETRACE-5",
+          "label": "Retrace 5% pullback",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "entryMode": "retrace",
+            "pullbackThreshold": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "trailing-stop-test",
+      "description": "Trailing stop parameters \u2014 activation threshold and distance",
+      "variants": [
+        {
+          "id": "TS-tight",
+          "label": "Tight trailing: 0.5% activation / 0.5% distance",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 0.5,
+            "trailingDistancePct": 0.5
+          }
+        },
+        {
+          "id": "TS-normal",
+          "label": "Normal trailing: 1% activation / 1% distance",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 1.0,
+            "trailingDistancePct": 1.0
+          }
+        },
+        {
+          "id": "TS-loose",
+          "label": "Loose trailing: 2% activation / 1% distance",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "trailingActivationPct": 2.0,
+            "trailingDistancePct": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "short-strategy-comparison",
+      "description": "SHORT direction strategy variants",
+      "variants": [
+        {
+          "id": "SHORT-aggressive",
+          "label": "Aggressive SHORT \u2014 tighter SL",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 2.0,
+            "tpPct": 6.0
+          }
+        },
+        {
+          "id": "SHORT-conservative",
+          "label": "Conservative SHORT \u2014 wider SL",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "slPct": 3.0,
+            "tpPct": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "flip-trade-strategy",
+      "description": "Flip trade strategy after SL hit \u2014 test when to flip and with what parameters",
+      "variants": [
+        {
+          "id": "FLIP-NONE",
+          "label": "No flip (control)",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": false,
+            "flipOnHardSL": false,
+            "flipTrailing": false,
+            "flipTrailingActivation": null,
+            "flipTrailingDistance": null
+          }
+        },
+        {
+          "id": "FLIP-HARD-ONLY",
+          "label": "Flip on 2% hard SL only",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": false,
+            "flipOnHardSL": true,
+            "flipTrailing": false,
+            "flipTrailingActivation": null,
+            "flipTrailingDistance": null
+          }
+        },
+        {
+          "id": "FLIP-SOFT-HARD",
+          "label": "Flip on 1% soft SL + 2% hard SL",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": true,
+            "flipOnHardSL": true,
+            "flipTrailing": false,
+            "flipTrailingActivation": null,
+            "flipTrailingDistance": null
+          }
+        },
+        {
+          "id": "FLIP-HARD-TRAIL",
+          "label": "Flip on 2% hard SL + tight trailing stop",
+          "weight": 1,
+          "enabled": true,
+          "config": {
+            "flipOnSoftSL": false,
+            "flipOnHardSL": true,
+            "flipTrailing": true,
+            "flipTrailingActivation": 0.5,
+            "flipTrailingDistance": 0.5
+          }
+        }
+      ]
+    }
+  ]
+}

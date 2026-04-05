@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hermes Signals</title>
+    <meta http-equiv="refresh" content="60">
+    <style>
+        body { font-family: monospace; background: #0d0d0d; color: #e0e0e0; padding: 20px; }
+        h1 { color: #58a6ff; font-size: 1.4rem; margin-bottom: 20px; }
+        h1 span { color: #8b949e; font-size: 0.8rem; font-weight: normal; }
+        .stats { display: flex; gap: 20px; margin-bottom: 20px; font-size: 0.85rem; }
+        .stat { background: #161b22; padding: 8px 14px; border-radius: 6px; }
+        .stat-val { color: #58a6ff; font-weight: bold; }
+        .signal { background: #161b22; border: 1px solid #21262d; border-left: 4px solid #58a6ff; padding: 12px 16px; margin-bottom: 8px; border-radius: 4px; }
+        .signal.long { border-left-color: #3fb950; }
+        .signal.short { border-left-color: #f85149; }
+        .signal.pending { opacity: 0.8; }
+        .signal.approved { border-left-color: #d29922; background: #1c1f24; }
+        .signal.executed { border-left-color: #3fb950; }
+        .signal-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .signal-main { display: flex; align-items: baseline; gap: 12px; }
+        .token { font-size: 1.1rem; font-weight: bold; color: #f0f6fc; }
+        .direction.long { color: #3fb950; }
+        .direction.short { color: #f85149; }
+        .confidence { color: #d29922; }
+        .price { color: #8b949e; font-size: 0.85rem; }
+        .meta { text-align: right; font-size: 0.8rem; color: #8b949e; }
+        .meta-row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+        .decision { font-weight: bold; }
+        .decision.PENDING { color: #f0883e; }
+        .decision.APPROVED { color: #d29922; }
+        .decision.EXECUTED { color: #3fb950; }
+        .decision.REJECTED { color: #f85149; }
+        .source { color: #388bfd; }
+        .zscore { color: #bc8cff; }
+        .none { color: #484f58; font-style: italic; text-align: center; padding: 40px; }
+        .updated { color: #484f58; font-size: 0.75rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Hermes Signals <span>| Hermes Trading System</span></h1>
+    <div class="stats" id="stats"></div>
+    <div id="signals">
+        <div class="none">Loading...</div>
+    </div>
+    <div class="updated" id="updated"></div>
+
+    <script>
+        async function load() {
+            try {
+                const res = await fetch('/signals_data.json');
+                const data = await res.json();
+
+                // Stats bar
+                document.getElementById('stats').innerHTML =
+                    `<div class="stat">Total: <span class="stat-val">${data.total}</span></div>
+                     <div class="stat">Pending: <span class="stat-val">${data.pending}</span></div>
+                     <div class="stat">Approved: <span class="stat-val">${data.approved}</span></div>
+                     <div class="stat">Executed: <span class="stat-val">${data.executed}</span></div>
+                     <div class="stat">Win rate: <span class="stat-val">${data.stats.win_rate}%</span></div>`;
+
+                // Signals list
+                if (!data.signals || data.signals.length === 0) {
+                    document.getElementById('signals').innerHTML = '<div class="none">No signals</div>';
+                } else {
+                    document.getElementById('signals').innerHTML = data.signals.map(s => `
+                        <div class="signal ${s.direction.toLowerCase()} ${s.decision.toLowerCase()}">
+                            <div class="signal-row">
+                                <div class="signal-main">
+                                    <span class="token">${s.token}</span>
+                                    <span class="direction ${s.direction.toLowerCase()}">${s.direction}</span>
+                                    <span class="confidence">${s.confidence}%</span>
+                                    <span class="price">$${s.price}</span>
+                                </div>
+                                <div class="meta">
+                                    <div class="meta-row">
+                                        <span class="decision ${s.decision}">${s.decision}</span>
+                                        <span class="source">${s.source}</span>
+                                        <span class="zscore">z=${s.zscore}</span>
+                                    </div>
+                                    <div style="margin-top:4px">${s.time}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                document.getElementById('updated').textContent = 'Updated: ' + data.updated;
+            } catch(e) {
+                document.getElementById('signals').innerHTML = '<div class="none">Error loading signals: ' + e.message + '</div>';
+            }
+        }
+        load();
+    </script>
+</body>
+</html>

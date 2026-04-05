@@ -1,0 +1,61 @@
+# ─── Runtime Data (never commit) ────────────────────────────────────────────
+data/
+# Exception: web/data/ contains sample data files for the standalone HTML dashboards
+!web/data/
+logs/
+sessions/
+state.db*
+memories/MEMORY.md.lock
+audio_cache/
+image_cache/
+whatsapp/
+pairing/
+auth.lock
+.hermes_history
+
+# ─── Generated / cached ──────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+scripts/__pycache__/
+scripts/signals.json
+scripts/loss_cooldowns.json
+scripts/pending-delayed-entries.json
+scripts/trailing_stops.json
+scripts/trade_patterns.json
+migration/
+*.zip
+*.tar.gz
+
+# ─── Environment secrets ──────────────────────────────────────────────────────
+.env
+
+# ─── Large / downloadable artifacts ─────────────────────────────────────────
+bin/
+checkpoints/
+models_dev_cache.json
+
+# ─── Seed data (download from /git endpoint instead) ─────────────────────
+seed/
+seed/*.sql
+.secrets.local
+skills/openclaw-imports/
+channel_directory.json
+gateway.pid
+gateway_state.json
+cron/output/
+cron/.tick.lock
+cron/jobs.json
+
+# ─── Sensitive / Personal (never commit) ────────────────────────────────────
+memories/MEMORY.md
+memories/MEMORY.md.lock
+memories/USER.md
+memories/memory-index.md
+memories/hyperliquid.md
+interrupt_debug.log
+config.yaml
+
+# ─── Secrets ─────────────────────────────────────────────────────────────────
+.secrets.local
+.skills_prompt_snapshot.json
+scripts/signals_hermes_runtime.db

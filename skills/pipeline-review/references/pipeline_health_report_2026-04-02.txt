@@ -1,0 +1,238 @@
+================================================================================
+              HERMES TRADING SYSTEM - PIPELINE HEALTH REPORT
+                    Generated: 2026-04-02 22:32 UTC
+================================================================================
+
+===========================
+1. FUNNEL VELOCITY
+===========================
+Total Signals in DB: 54,730
+
+Decision Distribution:
+  EXECUTED:      11  (  0.02%)  avg_conf=82.31
+  APPROVED:      97  (  0.18%)  avg_conf=61.25
+  COMPACTED:    286  (  0.52%)  avg_conf=94.19
+  PENDING:       20  (  0.04%)  avg_conf=94.10
+  WAIT:        1959  (  3.58%)  avg_conf=67.06
+  SKIPPED:    17320  ( 31.64%)  avg_conf=66.46
+  EXPIRED:    35037  ( 64.01%)  avg_conf=62.61
+
+CRITICAL FINDING: EXPIRED = 64% of total signals
+  --> Signals are timing out before execution
+
+Confidence by Decision:
+  COMPACTED  94.19 (highest - signals compacted before review)
+  PENDING    94.10
+  EXECUTED   82.31
+  WAIT       67.06
+  SKIPPED    66.46
+  EXPIRED    62.61
+  APPROVED   61.25 (lowest - approved signals have lowest avg conf)
+
+===========================
+2. DIRECTIONAL BIAS
+===========================
+SHORT vs LONG ratios per signal type:
+
+  momentum:         0 :  280  (100% LONG) - NO SHORT SIGNALS
+  velocity:        32 : 5032  (99.4% LONG) - ratio 157x  CRITICAL
+  rsi_individual:   46 : 6632  (99.3% LONG) - ratio 144x  CRITICAL
+  rsi_confluence: 2049 :   24  (98.9% SHORT) - ratio  85x  CRITICAL
+  mtf_zscore:      315 : 2829  (90.0% LONG) - ratio    9x
+  macd_confluence:  312 :  152  (67.2% SHORT) - ratio   2x
+  percentile_rank:2939 : 6070  (67.3% LONG) - ratio   2x
+  mtf_macd:      10762 : 7441  (59.1% SHORT) - ratio   1.5x
+  confluence:     3054 : 6761  (68.9% LONG) - ratio   2.2x
+
+CRITICAL FINDINGS:
+  - velocity signals: 157x more LONG than SHORT
+  - rsi_individual: 144x more LONG than SHORT  
+  - rsi_confluence: 85x more SHORT than LONG
+  - momentum: 0 SHORT signals ever generated
+
+===========================
+3. EXECUTION QUALITY
+===========================
+Are we executing high-confidence signals?
+
+  EXECUTED avg_conf:  82.31  (11 signals)
+  SKIPPED avg_conf:   66.46  (17,320 signals)
+  EXPIRED avg_conf:   62.61  (35,037 signals)
+
+VERDICT: SKIPPED avg_conf (66.46) is LOWER than EXECUTED (82.31)
+  --> ai-decider is NOT rejecting better signals; quality filtering OK
+
+However, the problem is VOLUME:
+  - Only 11/54,730 signals (0.02%) reach EXECUTED
+  - 64% expire without any human review
+  - 31.6% are skipped (possibly by human or auto-skip logic)
+
+===========================
+4. CONFLUENCE DIAGNOSTICS
+===========================
+Confluence signals (avg_conf ~82-90%) breakdown:
+
+  EXECUTED:     2  avg_conf=90.18
+  APPROVED:    27  avg_conf=83.36
+  COMPACTED:    7  avg_conf=90.00
+  WAIT:       378  avg_conf=85.43
+  SKIPPED:  2,702  avg_conf=84.58
+  EXPIRED:  6,699  avg_conf=81.94  <-- MAJORITY
+
+EXECUTION RATE for confluence: 2/9,808 = 0.02%
+
+CRITICAL FINDING:
+  - Confluence signals have avg_conf 81-90% (high quality)
+  - Only 2 confluence signals EXECUTED
+  - 6,699 confluence signals EXPIRED (68% of all confluence)
+  - avg_conf ~82% but execution rate < 5%
+  
+ROOT CAUSE: signals are expiring before review happens
+
+===========================
+5. HOT SET HEALTH
+===========================
+review_count distribution:
+
+  review_count=0:      10 signals  (0.02%) - NOT CRITICAL (minimal)
+  review_count=1:  27,379 signals  (50.0%)
+  review_count=2:  15,939 signals  (29.1%)
+  review_count=3:   7,961 signals  (14.5%)
+  review_count>=4:   3,441 signals  (6.3%)
+
+VERDICT: review_count distribution looks reasonable
+  - Most signals reviewed 1-3 times
+  - Low count of 0 reviews (only 10 signals)
+  - NOT a hot set failure
+
+===========================
+6. PIPELINE FRESHNESS
+===========================
+Last 24 hours:
+  Signals generated: 54,730
+  Latest signal: 2026-04-02 22:32:47
+  Earliest signal: 2026-04-02 18:44:45
+
+VERDICT: OK - pipeline is generating signals actively
+  NOT CRITICAL - signal_gen is running
+
+===========================
+7. EXPIRED SIGNALS ANALYSIS
+===========================
+Age at expiry for EXPIRED signals:
+  - min_age: ~0.0005 days (~43 seconds) 
+  - max_age: ~0.16 days (~3.8 hours)
+  - avg_age: ~3.8 hours
+
+Sample EXPIRED signals:
+  token    direction  signal_type      conf   age_hours
+  OP       LONG       momentum         65.3   3.8
+  BTC      LONG       mtf_macd         94.5   3.8  <-- HIGH CONF EXPIRED
+  BTC      LONG       rsi_individual   55.3   3.8
+  rsi_confluence SHORT signals (50.0)   50.0   3.8
+
+KEY INSIGHT:
+  - Signals with 94.5 confidence are EXPIRING
+  - Same expiry time (3.8h) as 50.0 confidence signals
+  - Expiry threshold is TIME-BASED, not quality-based
+
+CRITICAL: High-quality signals (mtf_macd 94.5 conf) expiring at same
+          rate as low-quality signals (rsi 50.0 conf)
+
+ROOT CAUSE: Expiry window (~3.8 hours) is too short for the review
+           workflow. Signals get approved but expire before execution.
+
+===========================
+8. TRADE OUTCOMES
+===========================
+Win Rate (PostgreSQL trades DB):
+  Total closed trades: 8
+  Wins: 3
+  Losses: 5
+  Win Rate: 38%
+  Net PnL: -2.86 USDT
+
+Win Rate by Direction:
+  LONG:  7 trades, 3 wins, 42.9% WR, Net=-2.86 USDT
+  SHORT: 1 trade,  0 wins,  0.0% WR,  Net=null
+
+Signal Source Analysis (closed trades):
+  conf-1s LONG: 7 trades, Net=-2.86 USDT, avg=-0.41 USDT
+  null SHORT:   1 trade
+
+Open Positions: 10 trades
+  ETH SHORT: pnl=+0.42
+  SKY SHORT: pnl=-0.44
+  SAND LONG: pnl=-0.85
+  CFX LONG:  pnl=-0.80
+  ... (10 open positions, most underwater)
+
+HIGH FINDING: Net PnL < 0 across 8 closed trades
+  --> Signal quality not translating to profit
+
+===========================
+9. INTERVENTION RECOMMENDATIONS
+===========================
+
+RANKED BY IMPACT:
+
+[CRITICAL] #1: FIX SIGNAL EXPIRY TIMEOUT
+  Problem: 64% of signals expire before review/execution
+           signals with 94.5 conf expiring at same rate as 50 conf
+  Fix: Increase expiry window from ~3.8h to 8-12h
+  Impact: Would recover ~35,000 expired signals
+  Revenue Impact: HIGH - these are valid signals being lost
+
+[CRITICAL] #2: INVESTIGATE APPROVED→EXECUTED BOTTLENECK
+  Problem: 97 APPROVED signals but only 11 EXECUTED
+           Approved signals avg age 0.01-0.02 days (14-30 min)
+  Fix: Check execution worker - why aren't approved signals trading?
+  Impact: Could 8-10x execution rate
+  Revenue Impact: HIGH - approved signals have good avg conf
+
+[CRITICAL] #3: FIX RSI AND MOMENTUM SIGNAL TYPES
+  Problem: rsi_individual 144:1 LONG bias
+           rsi_confluence 85:1 SHORT bias
+           momentum: 100% LONG, 0 SHORT
+  Fix: Review signal generation code for these types
+  Impact: Would diversify directional exposure
+  Revenue Impact: MEDIUM - current bias limits alpha
+
+[HIGH] #4: TUNE CONFLUENCE AUTO-APPROVAL THRESHOLD
+  Problem: avg_conf 82-90% but <1% execution rate
+  Fix: Lower confluence auto-approval threshold or increase expiry
+  Impact: More high-quality signals reaching execution
+  Revenue Impact: MEDIUM
+
+[HIGH] #5: REDUCE COMPACTOR AGING THRESHOLD  
+  Problem: 286 COMPACTED signals (avg 94.2 conf) never reviewed
+  Fix: Review compact logic - are good signals being dropped?
+  Impact: Recover signals in compaction pipeline
+  Revenue Impact: MEDIUM
+
+[MEDIUM] #6: IMPROVE TRADE EXIT STRATEGY
+  Problem: Win rate 38%, many small losses (trailing_exit_-0.9%)
+  Fix: Review trailing stop parameters
+  Impact: Better win rate on executed signals
+  Revenue Impact: MEDIUM
+
+================================================================================
+SUMMARY: PIPELINE IS GENERATING SIGNALS BUT DYING AT REVIEW/EXECUTION STAGE
+================================================================================
+
+The core issue is NOT signal generation (54,730 signals in 24h is healthy).
+The pipeline is dying at the EXPIRY step. High-confidence signals (mtf_macd
+94.5, confluence 90) are expiring at the same ~3.8h rate as low-confidence
+signals. The expiry window is too short for the human review workflow.
+
+Additionally, there's a bottleneck between APPROVED (97) and EXECUTED (11),
+suggesting the execution worker may not be processing approved signals.
+
+RECOMMENDED IMMEDIATE ACTION:
+  1. Increase signal TTL from ~3.8h to 8-12h
+  2. Check execution worker logs for APPROVED signal processing
+  3. Fix directional bias in rsi_individual, rsi_confluence, momentum
+
+================================================================================
+                           END OF PIPELINE HEALTH REPORT
+================================================================================

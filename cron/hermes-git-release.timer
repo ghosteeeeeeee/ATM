@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Hermes release build — git archive + lean seed zip
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+Persistent=true
+RandomizedDelaySec=30m
+
+[Install]
+WantedBy=timers.target

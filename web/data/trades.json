@@ -1,0 +1,42 @@
+{
+  "updated": "2026-04-01T00:00:00.000000Z",
+  "open_count": 1,
+  "closed_count": 1,
+  "page_size": 50,
+  "open": [
+    {
+      "trade_id": 1,
+      "token": "HYPE",
+      "direction": "LONG",
+      "entry_price": 12.5,
+      "current_price": 13.2,
+      "pnl_pct": 5.6,
+      "pnl_usdt": 11.2,
+      "leverage": 10,
+      "opened_at": "2026-04-01T12:00:00Z",
+      "sl": 12.0,
+      "tp": 14.0,
+      "exit_reason": null,
+      "signal_id": 1,
+      "experiment": "sl-distance-test:SL2pct"
+    }
+  ],
+  "closed": [
+    {
+      "trade_id": 2,
+      "token": "SOL",
+      "direction": "LONG",
+      "entry_price": 145.0,
+      "exit_price": 147.5,
+      "pnl_pct": 1.72,
+      "pnl_usdt": 8.6,
+      "leverage": 10,
+      "opened_at": "2026-03-30T08:00:00Z",
+      "closed_at": "2026-03-30T15:30:00Z",
+      "exit_reason": "tp_hit",
+      "duration_h": 7.5,
+      "signal_id": 2,
+      "experiment": "sl-distance-test:SL2pct|entry-timing-test:RETRACE-2"
+    }
+  ]
+}
