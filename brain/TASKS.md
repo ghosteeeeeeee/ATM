@@ -8,61 +8,36 @@
 
 ## Priority Tasks
 
-### [🚨] CRITICAL: WR 13.8%, signals direction-inverted — test flip theory
-**Project:** Win Rate Investigation
-**Owner:** T + Agent
-**Due:** 2026-04-06 (initial test)
-**What:** Option 1 per incident report: flip signal direction before trading.
-79% of SHORT signals had price go UP (wrong direction). ACE = 45% of all trades, 98% of ACE shorts went up.
-**Action:** Code flip as 1-line change, run paper trading 24-48h, measure WR.
-**Reference:** [INCIDENT_WR_FAILURE.md] — 4 options (flip, fix flip, fix source, wider SL)
+### [P] W&B self-learning tracking — all 3 systems (Self-Learning)
+**Owner:** Agent + T
+**Status:** ✅ DONE 2026-04-06 — Added to: candle_predictor, ab_utils, ai_decider. All run in offline mode, local JSONL backups written. Sweep config ready. T to provide W&B API key to enable cloud sync.
 
----
-
-### [!] WAIT signals never re-reviewed (Signal Quality)
-**Project:** Signal Quality Improvement
+### [🚨] CRITICAL: Cascade flip DONE — thresholds lowered, SKIPPED signals added
+**Project:** Cascade Flip Enhancement
 **Owner:** Agent
-**Due:** 2026-04-06
-**What:** 5 signals in WAIT state: BIGTIME, SNX, ORDI, DYDX, ZETA
-**Action:** Review each in signals DB — approve, reject, or keep waiting.
+**Status:** ✅ DONE 2026-04-06 — Thresholds lowered: ARM=-0.25%, TRIGGER=-0.50%, HF_TRIGGER=-0.35%. MIN_CONF=60%, MAX_AGE=30min. SKIPPED signals now in confluence check alongside PENDING/WAIT/APPROVED. Volume-confirmation buffer added (0.35% when vol confirms, 0.25% when not).
+**Reference:** [DECISIONS.md#2026-04-06 | Cascade flip thresholds lowered + SKIPPED signals added]
 
 ---
 
-### [!] Hermes Gateway — systemd service install (Gateway Setup)
-**Project:** Hermes Gateway Production Setup
-**Owner:** T
-**Blocked by:** T provides platform tokens
-**What:** Install `hermes-gateway` as a proper systemd service instead of running via nohup.
-**Steps:**
-1. T provides: `TELEGRAM_BOT_TOKEN`, `DISCORD_BOT_TOKEN`, etc.
-2. Configure in `~/.hermes/.env`
-3. Change bind from `127.0.0.1` to `0.0.0.0` (if exposing externally)
-4. Run: `hermes-gateway install && hermes-gateway start`
-**Current state:** Running on port 18790 via nohup (PID 1196631)
-**Link:** [PROJECTS.md#Hermes Gateway Production Setup]
+### [!] WR flip test — outcome documented (Win Rate Investigation)
+**Project:** Win Rate Investigation
+**Status:** ❌ CLOSED — Flip test FAILED on 2 trades. Historical 79% SHORT-wrong finding did NOT replicate. System continues without signal flip.
+**Action:** No further action needed.
 
 ---
 
-### [!] Tokyo PG server wake (Tokyo <-> Dallas Sync)
-**Project:** Tokyo <-> Dallas Sync
-**Owner:** T
-**What:** Wake Tokyo server (10.60.72.219) from sleep mode so PostgreSQL brain DB is reachable.
-**Why it matters:** `signal_schema.py` functions (workflow state, trade metadata) can't reach the authoritative DB while Tokyo is asleep.
-**Action:** T wakes Tokyo server via AWS console or similar.
-**Link:** [PROJECTS.md#Tokyo <-> Dallas Sync]
+### [!] Tokyo PG — accept SQLite-only mode permanently
+**Status:** ❌ CLOSED — SQLite-only mode. PostgreSQL workflow_state feature decommissioned.
+**Action:** No further action needed.
 
 ---
 
 ## Queued Tasks (Next Sprint)
 
-### [ ] Cascade flip: check APPROVED signals (Signal Enhancement)
+### [ ] Cascade flip: check APPROVED+SKIPPED signals (Signal Enhancement)
 **Project:** Cascade Flip Enhancement
-**Owner:** TBD
-**Effort:** ~1 hr
-**What:** Modify `check_cascade_flip()` in `position_manager.py` to query `decision IN ('PENDING', 'APPROVED')` instead of just PENDING.
-**Benefit:** Faster flip confirmation — APPROVED signals (conf=80%+) fire before PENDING in the signal lifecycle.
-**Reference:** [DECISIONS.md#2026-04-05 | Regime filter applies to APPROVED signals path]
-**Link:** [PROJECTS.md#Cascade Flip Enhancement]
+**Status:** ✅ DONE 2026-04-06 — Already included in thresholds-lowered fix. SKIPPED signals added to confluence check. APPROVED signals were already included.
 
 ---
 
@@ -99,7 +74,81 @@
 
 ---
 
+---
+
+## Chart Pattern Recognition (Phase 1 — Bull Flag)
+
+### [P] Build pattern_scanner.py — flag detection (Phase 1)
+**Project:** Chart Pattern Recognition
+**Owner:** Agent
+**Status:** ✅ DONE — 2026-04-06
+**What:** Created `/root/.hermes/scripts/pattern_scanner.py` with:
+- `detect_bull_flag()` — flag pole (>= 3% impulse in <= 8 candles) + consolidation (< 1.5% range) + breakout confirmation
+- `detect_bear_flag()` — mirror for shorts
+- `detect_ascending_triangle()` — higher lows + horizontal resistance breakout
+- `detect_descending_triangle()` — mirror for shorts
+- `write_pattern_signal()` — emits to signals DB with `source='pattern_scanner'`
+- Tested on synthetic data: bull flag detected at 68.2% ✅
+- IMX confirmed: no breakout yet (resistance $0.1364, last close $0.1360) ✅
+**Reference:** [PROJECTS.md#Chart Pattern Recognition]
+
+### [P] Integrate pattern_scanner into signal_gen.py (all tokens, run FIRST)
+**Project:** Chart Pattern Recognition
+**Owner:** Agent
+**Status:** ✅ DONE — 2026-04-06
+**What:** Added `_run_pattern_signals()` to `signal_gen.py`:
+- `import pattern_scanner` at top of signal_gen.py
+- `_run_pattern_signals(prices_dict)` — iterates ALL tokens, calls `scan_and_write()` per token
+- Called FIRST in `run()` before mtf_macd loop (line ~1941)
+- 0.46s for 50 tokens — fast, non-blocking
+- Pattern signals compete equally with momentum in the DB
+**Reference:** [PROJECTS.md#Chart Pattern Recognition]
+
+### [P] Add WR-based calibration for ALL signals (auto-multiplier)
+**Project:** Chart Pattern Recognition
+**Owner:** Agent
+**Status:** ✅ DONE — 2026-04-06
+**What:** Full calibration system added to `ai_decider.py`:
+- `get_signal_type_stats()` — queries `signal_outcomes`, computes WR per signal type
+- `get_calibration_summary()` — human-readable calibration report
+- `get_category_multipliers()` — aggregated category-level multipliers
+- `_wr_to_multiplier()` — WR→multiplier mapping
+- `SIGNAL_TYPE_CATEGORY_MAP` — maps composite signal types to categories
+- `_get_source_weight()` updated to apply WR-based calibration on top of baselines
+- `PERF_CAL_MIN_TRADES = 15` — min trades before calibration kicks in
+
+Calibration rules (ALL signals):
+  WR >= 55%  → 1.5×  |  WR 45-55%  → 1.25×  |  WR 40-45%  → 0.75×  |  WR < 40%  → 0.0× (disabled)
+
+**Current live calibration findings:**
+  decider:         22.8% WR / 101 trades → DISABLED (0.0×)
+  conf-2s:         33.3% WR / 39 trades → DISABLED (0.0×)
+  conf-3s:         24.0% WR / 25 trades → DISABLED (0.0×)
+  conf-1s:         45.5% WR / 110 trades → 1.25× (calibrated good)
+  hl_reconcile:    51.0% WR / 51 trades → 1.25×
+  pattern_scanner: no data yet → 1.0× baseline (1.25× override active)
+
+Check status: `python3 -c "from ai_decider import get_calibration_summary; print(get_calibration_summary())"`
+**Reference:** [PROJECTS.md#Chart Pattern Recognition]
+
+### [ ] Test pattern_scanner on IMX ascending triangle
+**Project:** Chart Pattern Recognition
+**Owner:** Agent
+**What:** Validate live pattern detection. When IMX breaks $0.1366 to upside with volume → first live pattern_flag signal. Track in trading.md.
+**Current state:** Ascending triangle forming. Resistance $0.1364, support $0.1350, last close $0.1360. Not yet triggered.
+**Reference:** [PROJECTS.md#Chart Pattern Recognition]
+
+---
+
 ## Future Build Ideas (Backlog)
+
+### [ ] Trading-Docker — Step 1: Audit pipeline scripts
+**Project:** Trading-Docker
+**Owner:** Agent
+**What:** Audit `/root/.hermes/scripts/` — confirm entry points, startup order, dependencies. Output: confirmed script list + run order for docker-entrypoint.sh
+**Reference:** [PROJECTS.md#Trading-Docker], `/root/.hermes/plans/2026-04-05_183622-can-we-set-up-a-new-docker-container.md`
+
+---
 
 > These are exploratory — not yet scheduled. See [PROJECTS.md#Signal Quality Improvement] for context.
 
@@ -113,8 +162,85 @@
 
 ---
 
+## Queued Tasks (Next Sprint)
+
+### [ ] Runtime DB archival strategy — 195MB, signal_history has 697K rows
+**Project:** AI Trading Machine (ATM)
+**Status:** ⬜ Open
+**What:** WASP warning: Runtime DB 192MB (should be < 50MB). `signal_history` table is main culprit. Need compaction or archival strategy.
+**Reference:** reports.md (WASP findings)
+
+### [ ] context_window_flooding — add threshold warning to ai_decider
+**Project:** Signal Quality Improvement
+**Status:** ⬜ Open — reported reports.md
+**What:** ai_decider context_window_flooding identified as MEDIUM. Needs a threshold warning when context is getting too large.
+**Reference:** reports.md
+
+### [ ] all_signals conf clustering at 65% — add jitter to ENTRY_THRESHOLD
+**Project:** Signal Quality Improvement
+**Status:** ⬜ Open — reported reports.md
+**What:** all_signals 65.6% conf (clustering at ENTRY_THRESHOLD=65). Need jitter fix so signals don't all cluster at the exact threshold.
+**Reference:** reports.md
+
+### [ ] orphan_recovery partial — decider-run doesn't handle paper-only
+**Project:** Win Rate Investigation
+**Status:** ⬜ Open — reported reports.md
+**What:** 13 orphan_recovery trades — decider-run.py doesn't handle paper-only mode correctly.
+**Reference:** reports.md
+
+### [ ] Funding rate integration — negative funding = tailwind for SHORTs
+**Project:** Signal Quality Improvement
+**Status:** ⬜ Open
+**What:** Use funding rate as additional signal — negative funding is tailwind for SHORT positions.
+**Reference:** trading.md Future Build Ideas
+
+### [ ] Wave-of-interest filter — top 50 tokens in regime direction + speed > 50
+**Project:** Signal Quality Improvement
+**Status:** ⬜ Open
+**What:** Add wave-of-interest filter — only consider top 50 tokens in regime direction with speed > 50.
+**Reference:** trading.md Future Build Ideas
+
+### [ ] 30% WR winners large losers small — is this sustainable?
+**Project:** Win Rate Investigation
+**Status:** ⬜ Open — NEEDS ANALYSIS
+**What:** 30% WR with avg +7.12% — winners large, losers small. NEEDS ANALYSIS — is cut-loser too tight?
+**Reference:** trading.md Known Issues
+
+### [ ] 9 open SHORTs concentration risk — monitor and reduce
+**Project:** Win Rate Investigation
+**Status:** ⬜ Open — MONITOR
+**What:** 9 open SHORTs with SHORT regime bias — concentration risk. MONITOR — consider reducing SHORT concentration.
+**Reference:** trading.md Known Issues
+
+### [ ] Verify stale timeouts: winners 15 min, losers 30 min — is this intentional?
+**Project:** AI Trading Machine (ATM)
+**Status:** ⬜ Open — reported 2026-04-06
+**What:** Stale winner = 15 min, stale loser = 30 min. Code is consistent (both correct in code and comment). But should losers be cut faster than 30 min? Current: losers get MORE time than winners. This may be backwards — losers should probably close faster.
+**Current:** `STALE_WINNER_TIMEOUT_MINUTES = 15` | `STALE_LOSER_TIMEOUT_MINUTES = 30`
+**Question:** Should losers be 15 min and winners 30 min (give winners more time to develop)?
+**Reference:** ATM/config/stoploss.md
+
+---
+
+### [ ] Check guardian cron error: "No module named 'fire'"
+**Project:** AI Trading Machine (ATM)
+**Status:** ⬜ Open — reported 2026-04-06
+**What:** `errors.log` shows `No module named 'fire'` every 60s from a cron job trying to call hl-sync-guardian. The guardian daemon itself is running (process alive) but something else (wasp or a sub-cron) is trying to invoke it incorrectly.
+**Fix:** Find what's calling hl-sync-guardian with `fire` CLI, fix the invocation
+**Reference:** `/root/.hermes/logs/errors.log`
+
+---
+
 ## Completed (this session)
 
+- [x] **Kanban board at `/projects`** (port 54321) — Flask API on :3461, nginx proxied, systemd service, 42 tasks seeded from TASKS.md
+  - API: `/api/config/projects` (GET/POST), data at `/var/www/hermes/data/kanban.json`
+  - HTML: `/var/www/hermes/projects.html` — drag-and-drop, inline edit, priority, project labels
+- [x] ATM folder created: `/root/.hermes/ATM/`
+- [x] `ATM/config/stoploss.md` written — full exit rules reference (7 exit types, all constants, cascade flip state machine, volume-tightening logic, runtime file paths)
+- [x] SOPs.md updated — ATM header + links to ATM-Architecture.md and ATM/config/stoploss.md
+- [x] PROJECTS.md: Trading-Docker → renamed AI Trading Machine (ATM), ATM folder structure documented
+- [x] DECISIONS.md: Added "ATM folder created" + "Cut-loser DISABLED" entries
 - [x] Run signal compaction — expired 903 stale WAIT signals, rebuilt hot-set 4→13 tokens
 - [x] Build checkpoint_utils.py — crash recovery snapshots
 - [x] Build event_log.py — structured audit trail
@@ -130,6 +256,25 @@
 - [x] Create DECISIONS.md — decision log
 - [x] Create PROJECTS.md — project tracker
 - [x] Create TASKS.md — task tracker (this file)
+
+---
+
+## Post-Fix Verification (3-day monitoring)
+
+### [ ] (P) Verify SL ATR adjustments improved win rate — owner: ai-engineer — 2026-04-09
+Baseline: 51.9% WR / +13.68 USDT net (7d pre-fix). After 3 days, compare WR and net PnL to determine if ATR-based SL is more protective without being too tight.
+
+### [ ] (P) Verify trailing stops no longer false-trigger — owner: ai-engineer — 2026-04-09
+Previously `trailing_active = True` was always set due to indentation bug. Check `trailing_stops.json` and PostgreSQL `exit_reason='trailing_exit_*'` for any anomalous early trailing exits in the 3 days post-fix.
+
+### [ ] (P) Verify phase2 buffer ATR logic working correctly — owner: ai-engineer — 2026-04-09
+Inspect `trailing_stops.json` for phase2 entries. Confirm `phase2_buffer_atr` values are being used (not falling back to volume-confirmed) for trades where ATR is available.
+
+### [ ] (P) Compare pre/post fix PnL (need baseline from before 2026-04-06) — owner: ai-engineer — 2026-04-09
+Query PostgreSQL for 30-day pre-fix baseline. Current post-fix baseline: 54 trades, 51.9% WR, +13.68 USDT net over 7 days. Need historical data from before 2026-04-06 to compute delta.
+
+### [ ] (P) Investigate Speed=50% anomaly — why only hot-set filtering through? — owner: ai-engineer — 2026-04-09
+Signals DB has NO `speed` column in schema. "Speed=50%" is a display-layer calculation. Hot-set (review_count>=1) has 1056 signals; review_count=0 has 360 signals. Need to find where Speed is calculated and why all displayed entries show 50%.
 
 ---
 

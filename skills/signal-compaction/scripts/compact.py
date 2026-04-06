@@ -237,34 +237,19 @@ def rebuild_hotset():
     conn = get_conn()
     cur = conn.cursor()
 
-    # Build speed cache — query token_speeds table directly from DB
-    # (SpeedTracker singleton is process-local and empty in compact.py's fresh process)
+    # Build speed cache — use live SpeedTracker (same approach as ai_decider.py).
+    # DO NOT query token_speeds table — it may not exist or be stale.
+    # SpeedTracker.update() fetches fresh prices and computes all metrics in <1s.
+    # Fallback: empty cache → tokens get default momentum=50.0 (no filter triggered).
     speed_cache = {}
     try:
-        sp_conn = sqlite3.connect(SIGNALS_DB, timeout=5)
-        sp_cur = sp_conn.cursor()
-        sp_cur.execute("""
-            SELECT UPPER(token), price_velocity_5m, price_velocity_15m,
-                   price_acceleration, speed_percentile, is_stale,
-                   wave_phase, is_overextended, momentum_score
-            FROM token_speeds
-            WHERE momentum_score > 0
-        """)
-        for row in sp_cur.fetchall():
-            tok, vel_5m, vel_15m, accel, sp_pctl, is_stale, wave, overext, mom = row
-            speed_cache[tok] = {
-                "price_velocity_5m": vel_5m,
-                "price_velocity_15m": vel_15m,
-                "price_acceleration": accel,
-                "speed_percentile": sp_pctl,
-                "is_stale": bool(is_stale),
-                "wave_phase": wave or "neutral",
-                "is_overextended": bool(overext),
-                "momentum_score": mom or 50.0,
-            }
-        sp_conn.close()
+        from speed_tracker import SpeedTracker
+        st = SpeedTracker()
+        st.update()
+        speed_cache = st.get_all_speeds()
+        print(f"[SpeedTracker] Loaded {len(speed_cache)} token speeds")
     except Exception as e:
-        print(f"[WARN] Could not load token_speeds from DB: {e}")
+        print(f"[WARN] SpeedTracker unavailable: {e} — hot-set will use default momentum=50.0")
 
     # Query — matches _load_hot_rounds() hot-set SELECT
     cur.execute("""

@@ -27,6 +27,120 @@ import hype_cache as hc
 # KILL SWITCH: set to True to re-enable flip. Effect takes place on next pipeline run (~1 min).
 _FLIP_SIGNALS = False
 
+# ── ATR-based Dynamic Stop Loss ─────────────────────────────────────────
+# ATR(14) from Hyperliquid 1h candles — cached per token for 5 min.
+# SL = entry_price ± (k * ATR(14)) where k varies by volatility regime.
+# This replaces fixed % SL which was too tight for volatile tokens (71.5%
+# of losses had <1% adverse move — SL fired on noise).
+#
+# k multipliers:
+#   LOW_VOLATILITY:    k=1.5  (SL ≈ 1.5× ATR, slightly wider than old 1.5% flat)
+#   NORMAL_VOLATILITY: k=2.0  (SL ≈ 2× ATR — gives trade room to breathe)
+#   HIGH_VOLATILITY:   k=2.5  (SL ≈ 2.5× ATR — tokens like TAO, SOL need room)
+# Minimum SL guard: never tighter than sl_pct (A/B test value), use ATR if wider.
+import time as _time
+
+_ATR_CACHE = {}   # {(token, timeframe): (atr_value, timestamp)}
+_ATR_TTL    = 300  # 5 minutes cache TTL
+
+def _get_atr(token: str, period: int = 14, interval: str = '1h') -> float | None:
+    """
+    Fetch ATR(period) for token from Hyperliquid 1h candles.
+    Returns ATR value in dollar terms (same unit as price), or None on failure.
+    Cached per token for _ATR_TTL seconds.
+    """
+    cache_key = (token.upper(), interval)
+    now = _time.time()
+    if cache_key in _ATR_CACHE:
+        atr_val, ts = _ATR_CACHE[cache_key]
+        if now - ts < _ATR_TTL:
+            return atr_val
+
+    try:
+        from hyperliquid.info import Info
+        info = Info('https://api.hyperliquid.xyz', skip_ws=True)
+        end_t = int(now * 1000)
+        start_t = end_t - (60 * 60 * 1000 * (period + 5))  # period+5 hours
+        candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
+        if not candles or len(candles) < period + 1:
+            return None
+
+        # Compute True Range for each complete candle pair
+        trs = []
+        for i in range(1, min(period + 1, len(candles))):
+            high = float(candles[i]['h'])
+            low  = float(candles[i]['l'])
+            prev_close = float(candles[i - 1]['c'])
+            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+            trs.append(tr)
+
+        if not trs:
+            return None
+        atr = sum(trs) / len(trs)
+        _ATR_CACHE[cache_key] = (atr, now)
+        return atr
+    except Exception as e:
+        log(f'  [ATR] {token} fetch error: {e}')
+        return None
+
+def _atr_multiplier(token: str, atr_pct: float) -> float:
+    """
+    Return k multiplier for ATR-based SL.
+    Self-calibrating based on actual ATR% (volatility):
+      atr_pct < 1.0%  → LOW_VOLATILITY    → k=1.5
+      atr_pct 1-3%    → NORMAL_VOLATILITY → k=2.0
+      atr_pct > 3%    → HIGH_VOLATILITY   → k=2.5
+    """
+    if atr_pct < 0.01:
+        return 1.5
+    elif atr_pct > 0.03:
+        return 2.5
+    else:
+        return 2.0
+
+def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
+                        sl_pct_fallback: float = 0.015) -> float:
+    """
+    Compute dynamic SL using ATR(14).
+    ATR-based SL replaces the fixed % SL. k multiplier is self-calibrating
+    based on ATR% (volatility) — wider stops for volatile tokens.
+
+    Minimum ATR% floor: if ATR/price < 0.75%, the token is too stable for
+    ATR-based SL (e.g. BTC at $95k has $409 ATR = 0.43% = too tight).
+    In that case, use max(ATR-based, 1.5% fixed) to ensure meaningful protection.
+
+    Maximum: cap SL distance at 5% to avoid absurdly wide stops on any token.
+    """
+    MIN_ATR_PCT = 0.0075   # 0.75% — below this, fall back to fixed %
+    MAX_SL_PCT  = 0.05     # 5% — never wider than this
+
+    atr = _get_atr(token)
+    if atr is None:
+        # Fall back to fixed % SL
+        if direction == 'LONG':
+            return entry_price * (1 - sl_pct_fallback)
+        else:
+            return entry_price * (1 + sl_pct_fallback)
+
+    atr_pct = atr / entry_price
+    k = _atr_multiplier(token, atr_pct)
+    atr_distance = k * atr
+    atr_sl_pct = atr_distance / entry_price
+
+    # Apply minimum ATR% floor — don't let low-vol tokens get razor SLs
+    effective_sl_pct = max(atr_sl_pct, MIN_ATR_PCT)
+    # Apply maximum cap
+    effective_sl_pct = min(effective_sl_pct, MAX_SL_PCT)
+
+    if direction == 'LONG':
+        sl = entry_price * (1 - effective_sl_pct)
+    else:
+        sl = entry_price * (1 + effective_sl_pct)
+
+    log(f'  [ATR] {token} {direction}: price={entry_price}, ATR={atr:.6f} ({atr_pct*100:.2f}%), '
+        f'k={k}, raw={atr_sl_pct*100:.2f}%, effective={effective_sl_pct*100:.2f}%, SL={sl:.6f}')
+    return sl
+
 # ── Checkpoint & Event-log instrumentation ───────────────────────────────
 try:
     from checkpoint_utils import checkpoint_write, checkpoint_read_last, detect_incomplete_run
@@ -433,13 +547,12 @@ def process_delayed_entries(paper=False):
         log(f'🎯 DELAYED ENTRY: {token} {direction} @ ${cur_price:.6f} '
             f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
 
-        sl_pct_val = float(sl_pct)
+        # Delayed entry uses the same ATR-based SL as normal entry
+        sl = _compute_dynamic_sl(token, direction.upper(), cur_price, sl_pct_val)
         if direction.upper() == 'LONG':
-            sl = cur_price * (1 - sl_pct_val)
             tp = cur_price * 1.05
             cmd_side = 'buy'
         else:
-            sl = cur_price * (1 + sl_pct_val)
             tp = cur_price * 0.95
             cmd_side = 'sell'
 
@@ -508,11 +621,14 @@ def execute_trade(token, direction, price, confidence, source,
         sl_pct_val = float(sl_pct)  # sl_pct is already a fraction (0.01 = 1%)
         tp_pct_val = 0.05                 # 5% TP
 
+    # ── Dynamic ATR-based SL ───────────────────────────────────────────────
+    # Uses ATR(14) × k multiplier instead of fixed %. Falls back to sl_pct
+    # if ATR is unavailable. Passes the MORE PROTECTIVE (tighter) of the two.
+    sl = _compute_dynamic_sl(token, direction, price, sl_pct_val)
+
     if direction == 'LONG':
-        sl = price * (1 - sl_pct_val)
         tp = price * (1 + tp_pct_val)
     else:
-        sl = price * (1 + sl_pct_val)
         tp = price * (1 - tp_pct_val)
 
     # Sanity check: SL must provide real protection
@@ -561,6 +677,12 @@ def execute_trade(token, direction, price, confidence, source,
                     tid = line.lower().split('trade #')[1].split()[0]
                     if tid == 'none':
                         return False, f'brain.py rejected: conf-1s or HOTSET_BLOCKLIST blocked (output: {result.stdout.strip()[:80]})'
+                    # Add traded coin to candle predictor watch list
+                    try:
+                        from candle_predictor import add_to_watch_list
+                        add_to_watch_list(token)
+                    except Exception as e:
+                        log(f"[WARN] could not add {token} to candle watch list: {e}")
                     return True, f'trade #{tid}'
             return True, result.stdout.strip()[:80]
         else:

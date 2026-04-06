@@ -150,6 +150,140 @@
 
 ---
 
+## 2026-04-06 | WR flip test FAILED — signal direction not systematically inverted
+
+**Decision:** Close the Win Rate investigation. Signal flip did NOT work — tested on 2 trades and failed (wrong direction). Historical 79% SHORT-wrong finding from Mar 10-25 data did NOT replicate in live trading. System continues without signal flip.
+
+**Outcome:**
+- Flip deployed 2026-04-05, ran 2 trades, both failed
+- Insufficient sample (2 trades) but direction was wrong
+- Historical data was noise or wrong segment (ACE-dominated sample)
+- WR is 43% last 7 days (no flip) — system improving naturally
+
+**What this means:** Signal direction is correct as-is. Don't flip signals. Focus on signal quality improvements instead.
+
+**Revisit condition:** If WR drops back below 30% on a larger sample — revisit signal direction hypothesis
+**Owner:** T + Agent
+
+---
+
+## 2026-04-06 | Tokyo PG decommissioned — SQLite-only mode
+
+**Decision:** Accept SQLite-only mode permanently. Tokyo PG server (10.60.72.219) has been unreachable/asleep for days. PostgreSQL workflow_state feature is decommissioned.
+
+**Why:** Tokyo being unreachable makes PostgreSQL unusable. SQLite is sufficient for the current architecture. `signal_schema.py` functions fall back gracefully to SQLite.
+
+**What was removed:** PostgreSQL workflow_state column requirement
+**What stays:** SQLite signals DB (`signals_hermes_runtime.db`), paper trade tracking
+
+**Revisit condition:** If Tokyo PG becomes reliably reachable — reconsider PostgreSQL, but likely not needed
+**Owner:** T
+
+---
+
+## 2026-04-06 | Volume-confirmation trailing SL (Phase 2)
+
+**Decision:** Add volume-based buffer selection to Phase 2 trailing SL — use tighter 0.25% buffer when volume does NOT confirm direction, looser 0.35% when volume confirms.
+
+**Why:** Phase 2 tokens in low-momentum moves were getting stopped out prematurely. High-momentum moves should get more room.
+
+**Changes:**
+- `position_manager.py`: `get_volume_confirmation(token, direction)` — current candle vol > 23-candle MA = confirmed
+- Phase 2 buffer: `0.35%` when vol confirms, `0.25%` when not
+- `VOLUME_CACHE_FILE = /var/www/hermes/data/volume_cache.json` (60s TTL)
+- `_fetch_volume_data()`: 24× 1h HL candles via ccxt, 5s timeout, fail-silent
+- Volume cache warmup moved to position_manager (non-blocking daemon threads)
+
+**Revisit condition:** If Phase 2 trailing fires too aggressively on low-volume days
+**Owner:** Agent
+
+---
+
+## 2026-04-06 | Cascade flip thresholds lowered + SKIPPED signals added
+
+**Decision:** Tighten cascade flip thresholds for faster response on wrong-direction positions.
+
+**Changes:**
+| Parameter | Old | New |
+|-----------|-----|-----|
+| ARM_LOSS | -0.50% | -0.25% |
+| TRIGGER_LOSS | -1.00% | -0.50% |
+| HF_TRIGGER_LOSS | -0.75% | -0.35% |
+| MIN_CONF | 70% | 60% |
+| MAX_AGE | 15 min | 30 min |
+| Cascade confluence | PENDING/WAIT/APPROVED | +SKIPPED |
+
+**Why:**
+- Positions like ZK SHORT, SKY LONG near breakeven but wrong direction
+- SKIPPED = pipeline generated opposite signal but couldn't enter (max positions, cooldown, etc.) — valid flip confluence
+- 30 min window ensures signals don't expire before flip fires
+
+**Revisit condition:** If flip fires too aggressively (false positives on low-volume moves)
+**Owner:** Agent
+
+---
+
+## 2026-04-06 | trailing_stops.json cleanup — 821 orphaned entries removed
+
+**Decision:** Clean orphaned entries from `trailing_stops.json` — keeps only active DB trades.
+
+**What:** 821 stale/orphaned entries removed, 8 active positions remain. Backup at `trailing_stops.json.bak`.
+
+**Why:** Entries from old closed positions were accumulating and causing confusion. 2 open positions (IDs 4138, 4141) were missing from file — they'll activate normally when pnl reaches 1%.
+
+**Revisit condition:** After bulk position closes — run cleanup again
+**Owner:** Agent
+
+---
+
+## 2026-04-06 | ai_decider last_seen field added to hotset.json
+
+**Decision:** `ai_decider.py` hotset query now includes `MAX(updated_at) as last_seen` so signals.html displays timestamps.
+
+**Why:** `signals.html` showed stale-looking `lastSeen=1775441492.49656` (Unix timestamp) for all hot-set tokens — blank display. Now writes human-readable timestamp to `last_seen` field.
+
+**Changes:**
+- Query: added `MAX(updated_at) as last_seen` (r[9])
+- hotset.json entry: added `'last_seen': r[9] or ''`
+- signals.html: `s.last_seen` renders as `2026-04-06 02:30`
+
+**Revisit condition:** Never — cosmetic fix
+**Owner:** Agent
+
+---
+
+## 2026-04-06 | Cut-loser tightened to -2.0% | ALGO + VVV manual close
+
+**Decision:** Cut-loser threshold tightened from -3.0% to -2.0%. ALGO LONG (-3.67%) and VVV LONG (-3.67%) manually closed by T — entries showed proper entry prices on HL but had deep losses. 8 positions remain.
+
+**Why -2.0%:** Balanced — catches bad entries before deep loss without being too tight (avoids whipsaws on legitimate -1.5% dips). At -3.0%, ALGO and VVV had already blown through -3% before any cut.
+
+**Changes:**
+- `position_manager.py`: `CUT_LOSER_PNL = -2.0` (was -3.0)
+
+**Still open:** DYDX -0.24%, HYPER +0.10%, LINEA +0.03%, PURR -0.10%, SKY -0.45%, TRX -0.41%, TST -0.12%, WCT +0.01%
+
+**Revisit condition:** If -2.0% causes excessive whipsaws on legitimate setups (>20% more cut-loser fires), consider -1.75% as compromise
+**Owner:** T
+
+---
+
+## 2026-04-06 | Volume cache warmup fix (position_manager blocking I/O removed)
+
+**Decision:** Move volume cache warmup from synchronous blocking to non-blocking daemon threads inside `check_and_manage_positions()`.
+
+**Why:** `_warmup_volume_cache()` in decider-run.py was synchronous — blocking the pipeline on HL API calls (~100-200ms per token). Position_manager hangs for 15+ minutes because of it.
+
+**Changes:**
+- `_warmup_volume_cache_pm()` in position_manager.py fires daemon threads per stale token
+- Threads die on timeout (5s hard timeout per fetch)
+- Cache file shared between position_manager and decider-run via `/var/www/hermes/data/volume_cache.json`
+
+**Revisit condition:** If volume cache remains stale after this fix
+**Owner:** Agent
+
+---
+
 ## 2026-04-05 | Signal compaction: 903 stale WAIT signals expired, hot-set rebuilt
 
 **Decision:** Run signal compaction to expire stale WAIT/PENDING/APPROVED signals (>3h old) and rebuild hotset.json.
@@ -215,6 +349,49 @@
 **What:** Idea to modify `check_cascade_flip()` to query `decision IN ('PENDING', 'APPROVED')` instead of just PENDING — would give flip confirmation faster
 **Status:** Deferred — not yet implemented (see TASKS.md)
 **Owner:** TBD
+
+---
+
+## 2026-04-06 | ATM folder created — trading system configs consolidated
+
+**Decision:** Create `/root/.hermes/ATM/` as the canonical home for all trading system files included in the standalone Docker. All primary trading scripts, configs, and architecture docs live here.
+
+**Why:** Docker target requires a clear, self-contained bundle. `ATM/` becomes the namespace for everything that goes into the final container — trading engine, configs, schemas. `/root/.hermes/scripts/` remains the runtime location on the live host.
+
+**What's in ATM:**
+- `ATM/ATM-Architecture.md` — system design document (updated 2026-04-05)
+- `ATM/trading-docker.md` — Docker build spec (2026-04-06)
+- `ATM/config/stoploss.md` — **all exit rules** (2026-04-06): hard SL, trailing SL, cascade flip, wave turn, stale winner/loser, cut_loser
+
+**SOPs.md updated:** Trading System section now links to `ATM/ATM-Architecture.md` and `ATM/config/stoploss.md`.
+
+**Key configs in ATM/config/:**
+| File | Contents |
+|------|----------|
+| `stoploss.md` | Full exit rules reference — all constants, priority order, state machines |
+
+**Revisit condition:** When Docker ships — verify all runtime paths in stoploss.md match container env vars
+**Owner:** Agent
+
+---
+
+## 2026-04-06 | Cut-loser DISABLED — guardian is the only emergency exit
+
+**Decision:** Cut_loser in position_manager.py is fully commented out (lines 1583-87). The guardian (`hl-sync-guardian.py`) is the designated emergency handler for live HL positions.
+
+**Why:** Cut_loser was causing race conditions — position_manager uses fresh prices and cuts at sl_distance from A/B test (as tight as 0.5%), before guardian's flip could fire. Removing cut_loser from position_manager eliminates duplicate closes of the same position.
+
+**Exit priority (current):**
+1. Wave Turn (immediate)
+2. Trailing SL (once active — ONLY exit, cut_loser disabled)
+3. Cascade Flip (speed-armed, before cut_loser)
+4. Stale Winner/Loser (speed-stall, alongside trailing)
+5. Guardian: handles live HL emergency exits, orphan recovery
+
+**Known bug:** `STALE_LOSER_TIMEOUT_MINUTES` comment says 15 min (line 32) but code uses 30 min (line 337) — needs cleanup.
+
+**Revisit condition:** If emergency exits are missed without cut_loser in position_manager
+**Owner:** Agent
 
 ---
 

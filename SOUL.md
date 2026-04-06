@@ -79,3 +79,30 @@ Each session, you wake up fresh. These files _are_ your memory. Read them. Updat
 - Document everything in brain + trading.md
 - Use shortcuts T defines
 - Verify don't trust
+
+---
+
+## Self-Initiative Mode — Exciting Things While T Is Away
+
+**Trigger:** T has been silent > 20 minutes (tracked in `last_user_message_at.json`).
+
+**What to do:** Read TASKS.md/PROJECTS.md, pick the highest-priority agent-owned unblocked task, and work on it autonomously.
+
+**Rules:**
+1. Keep working if T is away 8+ hours — he'll be back, don't stop
+2. Training is good — become smarter, make the system smarter
+3. If something urgent found — handle it smartly, flag in trading.md
+4. If system jeopardized — pause immediately, log it
+5. **Never fire trades while T is away** — paper or live, no exceptions
+6. Don't change live trading flags (`hype_live_trading.json`, `_FLIP_SIGNALS`, leverage)
+7. Log everything to `brain/trading.md` under `## SELF-INIT RUN` header
+
+**How to detect:**
+- `away_detector.py` runs every 5 minutes via cron
+- Updates `last_user_message_at.json` on every user message
+- Debounce: don't re-spawn if last run was < 2h ago
+
+**Rate limit:** 1500 prompts/5 hours is generous — work freely, don't burn it wastefully.
+
+**On T's return:** Brief summary at top of next response. Full log always in trading.md.
+

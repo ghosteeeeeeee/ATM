@@ -57,16 +57,23 @@ _PM_HEARTBEAT_FILE = '/var/www/hermes/data/pipeline_heartbeat.json'
 MAX_POSITIONS = 10
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
-CUT_LOSER_PNL = -3.0   # cut if pnl_pct <= -3%
+CUT_LOSER_PNL = -2.0   # cut if pnl_pct <= -2.0%
+TP_PCT        = 0.08          # 8% target (used in get_trade_params for reference)
 SL_PCT = 0.03          # 3% stop loss (cut loser threshold — DEFAULT fallback)
 SL_PCT_MIN = 0.01      # minimum SL for any trade
 MAX_LEVERAGE = 5
 
 # ─── Trailing Stop-Loss Config ─────────────────────────────────────────────────
 # Default fallback values (used when trade has no per-trade trailing settings)
-TRAILING_START_PCT_DEFAULT   = 0.01   # engage at +1% profit
-TRAILING_BUFFER_PCT_DEFAULT  = 0.003  # keep 0.3% buffer above entry when first activated (tightened 2026-04-05)
+TRAILING_START_PCT_DEFAULT   = 0.01   # engage at +1% profit (ATR-aware below)
+TRAILING_BUFFER_PCT_DEFAULT  = 0.003  # keep 0.3% buffer above entry when first activated
 TRAILING_PHASE2_BUFFER_DEFAULT = 0.002 # Phase 2: 0.2% buffer (floor — tightened 2026-04-05)
+# ── ATR-aware trailing parameters ───────────────────────────────────────────
+# These are multipliers on ATR.  Activate trailing when profit >= ATR_MULT_START × ATR.
+# Buffer = ATR_MULT_BUFFER × ATR (floored at TRAILING_BUFFER_MIN_ABS).
+TRAILING_ATR_MULT_START   = 1.0   # activate at 1× ATR profit
+TRAILING_ATR_MULT_BUFFER = 0.30  # buffer = 30% of ATR
+TRAILING_BUFFER_MIN_ABS  = 0.002 # 0.2% absolute floor (per 1% trailing)
 # Volume-confirmed tightening: when candle volume > 24h MA in trade direction
 # LONG → buy volume > MA  |  SHORT → sell volume > MA
 # Gives more room on high-momentum moves, tighter on low-volume
@@ -86,11 +93,11 @@ VOLUME_CACHE_TTL  = 60       # seconds — one fetch per pipeline minute
 # The position_manager computes trailing SL and writes it to brain DB, but the
 # actual HL stop-loss order was never updated when trailing tightened.
 # We now push updated SL orders to HL when trailing tightens.
-CASCADE_FLIP_ARM_LOSS       = -0.5   # System ARMED at this loss % (speed check activates)
-CASCADE_FLIP_TRIGGER_LOSS   = -1.0   # FLIP fires at this loss % (if armed + speed increasing)
-CASCADE_FLIP_HF_TRIGGER_LOSS = -0.75  # Fast flip: high-momentum tokens (speed pctl > 80)
-CASCADE_FLIP_MIN_CONF        = 70.0   # Opposite signal must have conf >= this %
-CASCADE_FLIP_MAX_AGE_M       = 15     # Opposite signal must be created within this many minutes
+CASCADE_FLIP_ARM_LOSS        = -0.25  # System ARMED at this loss % (speed check activates)
+CASCADE_FLIP_TRIGGER_LOSS   = -0.50  # FLIP fires at this loss % (if armed + speed increasing)
+CASCADE_FLIP_HF_TRIGGER_LOSS = -0.35  # Fast flip: high-momentum tokens (speed pctl > 80)
+CASCADE_FLIP_MIN_CONF        = 60.0   # Opposite signal must have conf >= this % (lowered from 70)
+CASCADE_FLIP_MAX_AGE_M       = 30     # Opposite signal must be created within this many minutes (expanded from 15)
 CASCADE_FLIP_MIN_TYPES       = 1     # Opposite signal must have at least this many agreeing signal types
 CASCADE_FLIP_MAX             = 3      # Max flips per token (permanent lockout after)
 CASCADE_FLIP_POST_TRAIL_PCT  = 0.5    # Post-flip trailing SL window (tight — 0.5%)
@@ -684,6 +691,20 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
             import traceback; traceback.print_exc()
             print(f"[Position Manager] ab_results close error: {e}")
 
+        # ── Also write to ab-tests.jsonl for the dashboard ─────────────────────
+        for test_name, variant_id in test_map.items():
+            if test_name and variant_id:
+                try:
+                    from ab_utils import record_ab_outcome
+                    record_ab_outcome(
+                        test_name,
+                        variant_id,
+                        "win" if is_win else "loss",
+                        metric_value=float(pnl_pct or 0)
+                    )
+                except Exception as ab_e:
+                    print(f"[Position Manager] ab_utils.record_ab_outcome error: {ab_e}")
+
     # ── Signal Outcomes recording — ALWAYS (independent of A/B data) ─────────
     # This feeds the self-learning streak system so even pre-A/B trades contribute
     _record_signal_outcome(token, direction, pnl_pct, pnl_usdt,
@@ -935,25 +956,98 @@ def enforce_max_positions(max_pos: int = MAX_POSITIONS) -> bool:
 
 
 # ─── Trade Parameters ─────────────────────────────────────────────────────────
-def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVERAGE) -> Dict:
+# ATR-based SL for position_manager internal use.
+# Imports the same ATR engine from decider-run (shared module-level cache).
+
+def _pm_get_atr(token: str, period: int = 14, interval: str = '1h') -> float | None:
+    """
+    Fetch ATR(14) for token. Reuses _ATR_CACHE from decider-run if available
+    via module-level cache. Falls back to direct HL API call.
+    """
+    import time as _time
+    _ATR_TTL = 300
+
+    # Try decider-run's cache first (shared process memory)
+    try:
+        from decider_run import _ATR_CACHE as _dr_cache
+        cache_key = (token.upper(), interval)
+        if cache_key in _dr_cache:
+            atr_val, ts = _dr_cache[cache_key]
+            if _time.time() - ts < _ATR_TTL:
+                return atr_val
+    except Exception:
+        pass
+
+    # Direct fetch
+    try:
+        from hyperliquid.info import Info
+        info = Info('https://api.hyperliquid.xyz', skip_ws=True)
+        now = _time.time()
+        end_t = int(now * 1000)
+        start_t = end_t - (60 * 60 * 1000 * (period + 5))
+        candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
+        if not candles or len(candles) < period + 1:
+            return None
+        trs = []
+        for i in range(1, min(period + 1, len(candles))):
+            high = float(candles[i]['h'])
+            low  = float(candles[i]['l'])
+            prev_close = float(candles[i - 1]['c'])
+            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+            trs.append(tr)
+        return sum(trs) / len(trs) if trs else None
+    except Exception:
+        return None
+
+
+def _pm_atr_multiplier(atr_pct: float) -> float:
+    if atr_pct < 0.01:
+        return 1.5
+    elif atr_pct > 0.03:
+        return 2.5
+    else:
+        return 2.0
+
+
+def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVERAGE,
+                     token: str = '', sl_pct_fallback: float = 0.015) -> Dict:
     """
     Compute SL and TP for a new trade.
-    LONG:  SL = price * 0.97 (3% stop), TP = price * 1.08 (8% target)
-    SHORT: SL = price * 1.03 (3% stop), TP = price * 0.92 (8% target)
-    Leverage: min(max_leverage, 10) capped
-    
-    NOTE: Trailing SL engages at +1% profit (see TRAILING_START_PCT).
-    - At +1%, trailing SL is set 0.5% above entry (locks in 0.5%)
-    - As profit grows, trailing SL tightens (TRAILING_TIGHTEN=True)
+    SL is ATR(14)-based:
+      ATR < 1%  → k=1.5 (LOW_VOL)
+      ATR 1-3%  → k=2.0 (NORMAL)
+      ATR > 3%  → k=2.5 (HIGH_VOL)
+    Falls back to sl_pct_fallback if ATR unavailable or token not provided.
+    TP is fixed 8% target.
     """
+    MIN_ATR_PCT = 0.0075
+    MAX_SL_PCT  = 0.05
+    STOP_LOSS_DEFAULT = 0.03   # 3% fallback SL if everything fails
+
     direction = direction.upper()
     leverage = min(max_leverage, MAX_LEVERAGE)
 
+    token = token.upper().strip()
+
+    # ── ATR-based SL ─────────────────────────────────────────────────────
+    if token:
+        atr = _pm_get_atr(token)
+        if atr is not None:
+            atr_pct = atr / price
+            k = _pm_atr_multiplier(atr_pct)
+            atr_sl_pct = (k * atr) / price
+            effective_sl_pct = max(atr_sl_pct, MIN_ATR_PCT)
+            effective_sl_pct = min(effective_sl_pct, MAX_SL_PCT)
+        else:
+            effective_sl_pct = sl_pct_fallback
+    else:
+        effective_sl_pct = sl_pct_fallback
+
     if direction == "LONG":
-        stop_loss = round(price * (1 - SL_PCT), 8)
+        stop_loss = round(price * (1 - effective_sl_pct), 8)
         target = round(price * (1 + TP_PCT), 8)
     elif direction == "SHORT":
-        stop_loss = round(price * (1 + SL_PCT), 8)
+        stop_loss = round(price * (1 + effective_sl_pct), 8)
         target = round(price * (1 - TP_PCT), 8)
     else:
         raise ValueError(f"Invalid direction: {direction}")
@@ -1180,18 +1274,33 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
             _save_trailing_data(data)
             trade_data = data.get(str(trade_id), {})
 
-    # Use phase 2 buffer if activated, otherwise phase 1
+    # ATR-aware buffer: buffer = 30% of ATR (floored at absolute minimum).
+    # Falls back to per-trade / global defaults if ATR unavailable.
+    atr_for_buffer = _pm_get_atr(token) if token else None
+    if atr_for_buffer is not None:
+        atr_buffer_pct = TRAILING_ATR_MULT_BUFFER * atr_for_buffer / entry_price
+        # Absolute floor so low-price tokens don't get razor buffers
+        atr_buffer_pct = max(atr_buffer_pct, TRAILING_BUFFER_MIN_ABS)
+        if trailing_buffer == 0:
+            trailing_buffer = atr_buffer_pct
+        # Phase 2 also gets ATR treatment
+        if phase2_dist == 0 or phase2_dist is None:
+            phase2_buffer_atr = TRAILING_ATR_MULT_BUFFER * 0.7 * atr_for_buffer / entry_price
+            phase2_buffer_atr = max(phase2_buffer_atr, TRAILING_BUFFER_MIN_ABS * 0.7)
     # If phase2 activated but per-trade phase2_dist is None, use global default
     if trade_data.get("phase2_activated") and phase2_dist:
         active_buffer = float(phase2_dist)
     elif trade_data.get("phase2_activated"):
-        # Phase 2 base: looser when volume confirms direction, tighter when it doesn't
-        token = str(trade.get("token", "")).upper()
-        vol_confirmed = has_volume_confirmation(token, direction)
-        if vol_confirmed:
-            active_buffer = TRAILING_VOL_CONF_BUFFER   # 0.35% — room for high-momentum
+        # Phase 2: use ATR-based buffer if available, else volume-confirmed
+        if 'phase2_buffer_atr' in dir() and atr_for_buffer is not None:
+            active_buffer = phase2_buffer_atr
         else:
-            active_buffer = TRAILING_VOL_NO_CONF_BUFFER  # 0.25% — tighten on weak volume
+            token=str(trade.get("token", "")).upper()
+            vol_confirmed = has_volume_confirmation(token, direction)
+            if vol_confirmed:
+                active_buffer = TRAILING_VOL_CONF_BUFFER   # 0.35% — room for high-momentum
+            else:
+                active_buffer = TRAILING_VOL_NO_CONF_BUFFER  # 0.25% — tighten on weak volume
     else:
         active_buffer = trailing_buffer
 
@@ -1479,20 +1588,25 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         trailing_active = is_trailing_active(trade_id)
 
         # ── 1. Trailing stop management ────────────────────────────
-        # IMPORTANT: Use stored pnl_pct (not live_pnl) for activation.
-        # live_pnl is recalculated from the freshest price but using it can cause
-        # a race condition: price moves +1% between the price fetch and the
-        # activation check, triggering immediately. Stored pnl_pct reflects the
-        # price at the START of this pipeline run, giving consistent activation.
-        if not trailing_active:
-            trailing_start_pct = float(pos.get('trailing_activation') or TRAILING_START_PCT_DEFAULT)
-            # SHORTs activate trailing only when in profit (pnl_pct positive = price moved down).
-            # Never activate on loss — cascade_flip handles reversals, cut_loser is the safety net.
-            profit_pct = pnl_pct if direction == 'SHORT' else pnl_pct
-            if profit_pct >= trailing_start_pct:
-                activate_trailing_stop(trade_id, pos)
-                adjusted_count += 1
-                trailing_active = True
+        # ATR-aware activation: use ATR-based threshold unless A/B test overrides.
+        # SHORTs activate trailing only when in profit (pnl_pct positive = price moved down).
+        # Never activate on loss — cascade_flip handles reversals, cut_loser is the safety net.
+        token_for_atr = token if token else ''
+        atr_for_trailing = _pm_get_atr(token_for_atr) if token_for_atr else None
+        trailing_start_pct = float(pos.get('trailing_activation') or 0)  # A/B override?
+        if atr_for_trailing is not None and trailing_start_pct == 0:
+            # No A/B override — use ATR-based activation threshold
+            trailing_start_atr = atr_for_trailing * TRAILING_ATR_MULT_START  # 1× ATR profit
+            trailing_start_pct = trailing_start_atr  # in absolute % terms (pnl_pct already %)
+        elif trailing_start_pct == 0:
+            # No ATR available and no A/B override — use global default
+            trailing_start_pct = TRAILING_START_PCT_DEFAULT
+
+        profit_pct = pnl_pct if direction == 'SHORT' else pnl_pct
+        if profit_pct >= trailing_start_pct:
+            activate_trailing_stop(trade_id, pos)
+            adjusted_count += 1
+            trailing_active = True
 
         # ── 2. Trailing SL exit (primary) ─────────────────────────
         # Once trailing is active, it is the ONLY exit — cut_loser is DISABLED.
@@ -1509,9 +1623,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── 3. Cascade flip (speed-armed reversal — fires before cut_loser) ───
         # Only fires if trailing is NOT active (don't flip during trailing).
         # Speed-armed state machine inside check_cascade_flip():
-        #   loss > -0.5%  → not armed, nothing fires
-        #   loss <= -0.5% → armed: speed check, log state, wait for trigger
-        #   loss <= -1.0% (pctl 50-80) OR -0.75% (pctl > 80) → FLIP
+        #   loss > -0.25%  → not armed, nothing fires
+        #   loss <= -0.25% → armed: speed check, log, wait for trigger
+        #   loss <= -0.50% (pctl 50-80) OR -0.35% (pctl > 80) → FLIP
         cascade_flipped = False
         if not trailing_active and live_pnl <= CASCADE_FLIP_ARM_LOSS:
             flip_info = check_cascade_flip(token, direction, live_pnl, SPEED_TRACKER)
@@ -1561,14 +1675,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         print(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
                         continue  # Position closed — skip remaining checks
 
-        # ── 5. Cut loser (fallback — only fires if trailing is NOT active) ──
-        # Cut_loser is a safety net for new positions before trailing activates.
-        # After trailing activates, the trailing SL is the only exit.
-        if not trailing_active and should_cut_loser(live_pnl, pos):
-            reason = f"cut_loser_{live_pnl:+.2f}%"
-            close_paper_position(trade_id, reason)
-            closed_count += 1
-            print(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
+        # ── 5. Cut loser (DISABLED — guardian handles all emergency exits) ──
+        # Cut_loser was causing races: position_manager uses fresh prices and cuts tight
+        # (sl_distance from A/B test can be 0.5%), before guardian's flip can fire.
+        # Guardian is the designated emergency handler (flip, hard SL, cut_loser at -5%).
+        # Cut_loser is DISABLED here to prevent duplicate closing of the same position.
+        # if not trailing_active and should_cut_loser(live_pnl, pos):
+        #     reason = f"cut_loser_{live_pnl:+.2f}%"
+        #     close_paper_position(trade_id, reason)
+        #     closed_count += 1
+        #     print(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 
         # ── 6. SPEED: Stale winner/loser exit ─────────────────────────────────
         # SPEED FEATURE: closes positions that are in profit but flat (stale winner)
@@ -1645,12 +1761,18 @@ def check_cascade_flip(token: str, position_direction: str,
     """
     Speed-armed cascade flip check.
 
-    State machine:
-      pnl > -0.5%                              → NOT ARMED: nothing fires
-      -1.0% < pnl <= -0.5%  (pctl 50-80)     → ARMED: speed check, log, wait
-      -0.75% < pnl <= -0.5% (pctl > 80)       → ARMED: speed check, log, wait
-      pnl <= -1.0% (pctl 50-80)               → FLIP TRIGGERED
-      pnl <= -0.75% (pctl > 80)               → FAST FLIP (high momentum)
+    State machine (tightened 2026-04-06):
+      pnl > -0.25%                             → NOT ARMED: nothing fires
+      -0.50% < pnl <= -0.25% (pctl 50-80)    → ARMED: speed check, log, wait
+      -0.35% < pnl <= -0.25% (pctl > 80)      → ARMED: speed check, log, wait
+      pnl <= -0.50% (pctl 50-80)              → FLIP TRIGGERED
+      pnl <= -0.35% (pctl > 80)               → FAST FLIP (high momentum)
+
+    Opposite signal confluence required:
+      - Signal in PENDING/WAIT/APPROVED state
+      - Confidence >= 60% (lowered from 70 to catch near-breakeven wrong-direction)
+      - Created within last 30 minutes (expanded from 15 — signals expire before flip fires)
+      - At least 1 distinct signal type agreeing
 
     Returns: Dict with flip details {opposite_dir, conf, source, sig_id, price}
              or None if no flip warranted.
@@ -1696,12 +1818,14 @@ def check_cascade_flip(token: str, position_direction: str,
         conn = sqlite3.connect(db_path, timeout=5)
         c = conn.cursor()
         # Confluence check: count distinct signal types agreeing on opposite direction
+        # SKIPPED is included — the pipeline generated an opposite-direction signal but
+        # couldn't enter (max positions, cooldown, etc.). That's valid confluence.
         c.execute("""
             SELECT COUNT(DISTINCT signal_type)
             FROM signals
             WHERE UPPER(token) = ?
               AND direction = ?
-              AND decision IN ('PENDING', 'WAIT', 'APPROVED')
+              AND decision IN ('PENDING', 'WAIT', 'APPROVED', 'SKIPPED')
               AND confidence >= ?
               AND created_at >= datetime('now', ?)
         """, (token.upper(), opposite_dir, CASCADE_FLIP_MIN_CONF,
@@ -1709,6 +1833,50 @@ def check_cascade_flip(token: str, position_direction: str,
         agreeing_types = c.fetchone()[0]
         if agreeing_types < CASCADE_FLIP_MIN_TYPES:
             conn.close()
+            # ── 5b. No-confluence fallback: use coin-specific momentum as entry signal ─
+            # If cascade flip triggers but there's no opposite signal in the DB,
+            # use the token's own momentum/velocity as a coin-specific regime check.
+            # This is the fallback for when the entire signal pipeline is wrong-dir
+            # (like VVV SHORT — every signal was SHORT, nothing to flip into).
+            #
+            # Entry conditions (regime acts as the signal source for the opposite trade):
+            #   LONG + price_velocity_5m < -1.0  → momentum turning down → flip to SHORT
+            #   SHORT + price_velocity_5m > +1.0  → momentum turning up   → flip to LONG
+            # Acceleration is directional confirmation (speed must be increasing).
+            if speed_tracker is not None:
+                try:
+                    spd = speed_tracker.get_token_speed(token)
+                    vel = spd.get('price_velocity_5m', 0) or 0
+                    accel = spd.get('price_acceleration', 0) or 0
+                    regime_conf = min(100.0, max(0.0, abs(vel) * 30))  # vel 1.0→30%, 2.0→60%
+                    if position_direction == 'LONG' and vel < -1.0:
+                        print(f"  [CASCADE FLIP] {token} no opposite signal confluence "
+                              f"(need {CASCADE_FLIP_MIN_TYPES}, got {agreeing_types}), "
+                              f"using coin-regime as entry signal: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
+                        return {
+                            'opposite_dir': opposite_dir,
+                            'conf': regime_conf,
+                            'source': 'coin-regime-fallback',
+                            'sig_id': None,   # No DB signal — regime IS the signal
+                            'price': 0,
+                            'created_at': None,
+                            'signal_type': 'coin-regime',
+                        }
+                    elif position_direction == 'SHORT' and vel > +1.0:
+                        print(f"  [CASCADE FLIP] {token} no opposite signal confluence "
+                              f"(need {CASCADE_FLIP_MIN_TYPES}, got {agreeing_types}), "
+                              f"using coin-regime as entry signal: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
+                        return {
+                            'opposite_dir': opposite_dir,
+                            'conf': regime_conf,
+                            'source': 'coin-regime-fallback',
+                            'sig_id': None,
+                            'price': 0,
+                            'created_at': None,
+                            'signal_type': 'coin-regime',
+                        }
+                except Exception:
+                    pass
             print(f"  [CASCADE FLIP] {token} flip triggered but no opposite confluence "
                   f"(need {CASCADE_FLIP_MIN_TYPES}, got {agreeing_types})")
             return None
@@ -1718,7 +1886,7 @@ def check_cascade_flip(token: str, position_direction: str,
             FROM signals
             WHERE UPPER(token) = ?
               AND direction = ?
-              AND decision IN ('PENDING', 'WAIT', 'APPROVED')
+              AND decision IN ('PENDING', 'WAIT', 'APPROVED', 'SKIPPED')
               AND confidence >= ?
               AND created_at >= datetime('now', ?)
             ORDER BY confidence DESC, created_at DESC
@@ -1780,6 +1948,8 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         return False
 
     # ── 2. Enter the opposite direction at current market price ───────────────
+    # sig_id=None case: coin-regime-fallback — regime momentum IS the entry signal,
+    # no DB signal to mark as executed. Proceed to entry with regime-based confidence.
     from hyperliquid_exchange import place_order, get_price
     try:
         current_price = get_price(token)
@@ -1823,17 +1993,19 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         print(f"  [CASCADE FLIP] {token} flip count: "
               f"{flip_counts[token.upper()]['flips']}/{CASCADE_FLIP_MAX}")
         # ── 4. Mark triggering signal as executed ─────────────────────────────
-        try:
-            conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-            c = conn.cursor()
-            c.execute(
-                "UPDATE signals SET decision='EXECUTED', trade_id=? WHERE id=?",
-                (trade_id, sig_id)
-            )
-            conn.commit()
-            conn.close()
-        except Exception:
-            pass
+        # Skip for coin-regime-fallback (sig_id=None) — no DB signal to update.
+        if sig_id is not None:
+            try:
+                conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+                c = conn.cursor()
+                c.execute(
+                    "UPDATE signals SET decision='EXECUTED', trade_id=? WHERE id=?",
+                    (trade_id, sig_id)
+                )
+                conn.commit()
+                conn.close()
+            except Exception:
+                pass
     else:
         err = ok.get('error', 'unknown') if ok else 'no response'
         print(f"  [CASCADE FLIP] ⚠️ {token} {opposite_dir} entry failed: {err} "

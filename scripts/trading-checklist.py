@@ -293,6 +293,8 @@ def check_trailing_stops():
 # ─── Check 10: Cooldowns file ────────────────────────────────────────
 def check_cooldowns():
     issues = []
+    data = {}
+    expired = 0
     try:
         import json
         fpath = '/root/.hermes/data/signal-cooldowns.json'
@@ -307,7 +309,7 @@ def check_cooldowns():
             if expired > 50:
                 issues.append(f'{expired} expired cooldowns still in file')
         return (len(issues) == 0,
-                f'cooldowns: {len(data)} entries ({expired if "expired" in locals() else 0} expired)',
+                f'cooldowns: {len(data)} entries ({expired} expired)',
                 issues)
     except Exception as e:
         return False, f'cooldowns check error: {e}', [str(e)]

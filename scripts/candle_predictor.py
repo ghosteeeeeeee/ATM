@@ -15,8 +15,9 @@ FIXED v2 (2026-04-02):
   - Added HL bid-ask spread from orderbook
   - Proper candle-aggregated close prices for all technical indicators
 """
-import sqlite3, json, time, os, sys, subprocess, statistics
+import sqlite3, json, time, os, sys, subprocess, statistics, argparse
 from collections import defaultdict
+import wandb
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +32,13 @@ MODEL        = 'qwen2.5:1.5b'
 TOP_TOKENS=['BTC','ETH','SOL','AVAX','DOGE','XRP','ADA','DOT','LINK','MATIC',
                 'MATIC','LTC','UNI','ATOM','XLM','ETC','ALGO','VET','FIL','THETA',
                 'AAVE','MKR','COMP','SNX','YFI','SUSHI','CRV','RUNE','KAVA','BAT']
+# ── Runtime config (set by CLI args) ──────────────────────────────────────────
+CANDLE_MINUTES = 240   # default 4h; override with --interval 15/60/240
+MINIMAX_CHECK   = False  # enable with --minimax (post-prediction check with minimax API)
 INVERSION_THRESHOLD = 0.40  # invert if direction accuracy < 40% in this momentum_state
+
+# Token watch list: coins added when traded, persisted to this file
+WATCH_LIST_FILE = '/root/.hermes/data/candle-watched-tokens.json'
 
 # Token-specific overrides discovered by candle_tuner.py (auto-updated hourly)
 # Format: {TOKEN: {'direction': X, 'threshold': Y}} — applies token-specific inversion
@@ -583,8 +590,8 @@ def get_token_data_for_prediction(token):
     if not rows:
         return None
 
-    # Build OHLCV 4h candles (240 min)
-    ohlcv = build_ohlcv(token, candle_minutes=240)
+    # Build OHLCV candles using runtime interval (default 4h, configurable via --interval)
+    ohlcv = build_ohlcv(token, candle_minutes=CANDLE_MINUTES)
     if not ohlcv or len(ohlcv) < 30:
         # Fallback: use raw ticks
         prices = [r[1] for r in rows]
@@ -682,142 +689,64 @@ def get_token_data_for_prediction(token):
 
 
 def build_prediction_prompt(token_data, hl_data, accuracy_stats):
-    """Build Ollama prompt with momentum data, HL context, and accuracy stats."""
+    """Build Ollama prompt — pure text categories, no numeric values.
+
+    Research findings (2026-04-06):
+    - LLM does NOT compute with numbers — RSI=55.3 behaves same as RSI=overbought
+    - Only text categories work reliably: RSI=(overbought/neutral/oversold)
+    - Z-score also works as category: elevated/normal/suppressed
+    - Regime and momentum: strong levers (bearish regime flips trend)
+    - Prev 3 candles: strong micro-momentum signal
+    - MACD, raw numbers: skip — no improvement or hurts
+    """
     d = token_data
     if not d:
         return None
 
-    # Price trend from candle closes
-    ph = d['price_history']
-    price_trend = ' → '.join([f"${p:.4f}" for p in ph[:5][::-1]])
+    # ── Compute indicators from price_history ───────────────────────
+    ph = d.get('price_history', [])
 
-    # Regime context
-    regime_emoji = {'bullish': '📈', 'bearish': '📉', 'neutral': '↔️'}.get(d['regime'], '?')
-
-    # Bias from momentum state
-    if d['momentum_state'] == 'bullish':
-        bias = 'LONG bias (suppressed price catching bid)'
-    elif d['momentum_state'] == 'bearish':
-        bias = 'SHORT bias (elevated price ripe for reversal)'
+    # 5-candle trend
+    if len(ph) >= 5:
+        trend = 'UP' if ph[-1] > ph[-5] else 'DOWN' if ph[-1] < ph[-5] else 'FLAT'
     else:
-        bias = 'neutral / ranging'
+        trend = 'FLAT'
 
-    # Accuracy context from predictions.db
-    acc_lines = []
-    token = d['token']
-    if accuracy_stats:
-        overall = accuracy_stats.get('overall', {})
-        by_state = accuracy_stats.get('by_state', {})
+    # 3-candle micro-momentum
+    if len(ph) >= 4:
+        prev3 = [('UP' if ph[i] > ph[i-1] else 'DOWN') for i in range(-4, -1)]
+        prev3_str = ','.join(prev3)
+        prev3_all = len(set(prev3)) == 1  # all same direction
+    else:
+        prev3_str = None
+        prev3_all = False
 
-        # Overall per-direction accuracy
-        for direction in ('UP', 'DOWN'):
-            if direction in overall:
-                info = overall[direction]
-                acc_lines.append(
-                    f"- Overall {direction}: {info['acc']:.1f}% accuracy ({info['correct']}/{info['n']} correct)"
-                )
+    # RSI category (not numeric — LLM doesn't compute with numbers)
+    rsi = d.get('rsi', 50)
+    rsi_cat = 'overbought' if rsi > 65 else 'oversold' if rsi < 35 else 'neutral'
 
-        # Momentum_state-specific accuracy
-        state = d['momentum_state']
-        if state in by_state:
-            for direction in ('UP', 'DOWN'):
-                if direction in by_state:
-                    info = by_state[direction]
-                    acc_lines.append(
-                        f"- In {state} regime, {direction}: {info['acc']:.1f}% accuracy ({info['correct']}/{info['n']})"
-                    )
+    # Z-score category
+    z = d.get('z_score', 0)
+    z_cat = 'elevated' if z > 1.5 else 'suppressed' if z < -1.5 else 'normal'
 
-    acc_context = ""
-    if acc_lines:
-        acc_context = "\nPREDICTION HISTORY (learn from this):\n" + "\n".join(acc_lines)
+    # Regime and momentum (from Hermes momentum_cache)
+    regime = d.get('regime', 'neutral')
+    momentum = d.get('momentum_state', 'neutral')
 
-    # HL data context
-    hl_ctx = []
-    token_hl = hl_data.get(d['token'], {})
-    if 'funding_rate' in token_hl:
-        fr = token_hl['funding_rate']
-        sign = '+' if fr >= 0 else ''
-        hl_ctx.append(f"- Funding rate (8h): {sign}{fr*100:.4f}%")
-    if 'spread_bps' in token_hl:
-        hl_ctx.append(f"- Bid-ask spread: {token_hl['spread_bps']:.2f} bps")
-    if 'volume_ratio' in token_hl:
-        vr = token_hl['volume_ratio']
-        direction = "INCREASING" if vr > 1.2 else "DECREASING" if vr < 0.8 else "STABLE"
-        hl_ctx.append(f"- Volume: {direction} (ratio: {vr}x)")
+    # ── Build parts (pure text only) ─────────────────────────────────
+    parts = ["BTC:"]
+    parts.append(f"RSI={rsi_cat}")          # no numeric value
+    parts.append(f"Z={z_cat}")              # no numeric value
+    if prev3_str:
+        parts.append(f"prev3=[{prev3_str}]")
+    parts.append(f"trend={trend}")
+    if regime != 'neutral':
+        parts.append(f"regime={regime}")
+    if momentum != 'neutral':
+        parts.append(f"momentum={momentum}")
 
-    # Volume context
-    vol_ctx = ""
-    if d.get('volume_ratio') is not None:
-        vr = d['volume_ratio']
-        direction = "INCREASING" if vr > 1.2 else "DECREASING" if vr < 0.8 else "STABLE"
-        vol_ctx = f"- Volume trend: {direction} (ratio: {vr}x vs prior period)\n"
-
-    # MTF MACD crossover context
-    mtf_macd_ctx = ""
-    if d.get('mtf_macd'):
-        mtf_macd_ctx = "\n" + _get_mtf_macd_summary(d['mtf_macd']) + "\n"
-
-    # Build HL context for other top tokens (contextual awareness)
-    top_token_fr=[]
-    for t in ['BTC', 'ETH', 'SOL', 'AVAX', 'XRP']:
-        if t in hl_data and 'funding_rate' in hl_data[t]:
-            fr = hl_data[t]['funding_rate']
-            sign = '+' if fr >= 0 else ''
-            top_token_fr.append(f"{t}: {sign}{fr*100:.4f}%")
-    fr_context = ""
-    if top_token_fr:
-        fr_context = "\nMARKET FUNDING RATES (8h):\n  " + " | ".join(top_token_fr)
-
-    return f"""You are a crypto 4-hour candle direction predictor.
-
-{d['pct_short']:.0f} 4h candles of {d['token']} history + momentum indicators:
-
-LAST PRICE: ${d['price']:.6f}
-{d['chg_1h']:+.2f}% in 1h | {d['chg_4h']:+.2f}% in 4h | {d['chg_24h']:+.2f}% in 24h
-Price trend (oldest→newest): {price_trend}
-
-MOMENTUM INDICATORS (computed from OHLCV candle closes):
-- RSI(14): {d['rsi']:.1f} (overbought>70, oversold<30)
-- MACD Histogram: {d['macd_hist']:+.6f} (positive=bullish momentum)
-- Z-score: {d['z_score']:+.2f} (price vs 20-candle mean; +2=elevated, -2=suppressed)
-- Avg Z (multi-TF): {d['avg_z']:+.2f}
-{mtf_macd_ctx}
-
-HERMES MOMENTUM STATE: {d['momentum_state']} ({d['state_confidence']:.0%} confidence)
-Regime: {d['regime']} {regime_emoji}
-Phase: {d['phase']} | Z-direction: {d['z_direction']}
-Percentile: short={d['pct_short']:.0f}% long={d['pct_long']:.0f}%
-
-Trading bias from Hermes momentum model: {bias}
-{vol_ctx}{acc_context}{fr_context}
-
-MARKET CONTEXT (Hyperliquid orderbook):
-{chr(10).join(hl_ctx) if hl_ctx else "  (no live data available)"}
-
-TASK: Predict whether the NEXT 4-hour candle will close UP or DOWN.
-Consider: current momentum, regime, momentum_state, z-score direction, RSI level,
-historical accuracy patterns, funding rates, volume.
-
-FEW-SHOT EXAMPLES (learn from these patterns):
-- bullish + RSI < 35 → UP (oversold bounce, continuation bias)
-- bearish + RSI > 65 → DOWN (overbought rejection, continuation bias)
-- bullish regime + DOWN predicted → KEEP DOWN (DOWN is 89% accurate in bullish!)
-- neutral/bearish + DOWN predicted → consider inversion (DOWN is only 37% accurate)
-- RSI near 50 in neutral → consider UP (markets mean-revert)
-
-IMPORTANT: Your historical accuracy varies by regime and momentum_state.
-Real data from prediction.db:
-- UP: 60.5% overall, 64% bullish, 56% neutral — predict UP freely
-- DOWN: 35% overall, BUT 89% in bullish, 38% in bearish, 37% in neutral
-- When momentum is bearish/neutral AND you predict DOWN → the inversion (UP) is 63% accurate
-Trust momentum_state guidance — bearish means bearish continuation, not reversal.
-
-Respond STRICTLY in this format (one line each):
-DIRECTION: [UP or DOWN]
-CONFIDENCE: [0-100]
-MOVE_PCT: [estimated % move, e.g. +1.5 or -0.8]
-REASON: [one sentence]
-"""
+    prompt = ', '.join(parts) + '. Reply ONLY UP or DOWN:\n\nDIRECTION:'
+    return prompt
 
 
 def query_llm(prompt):
@@ -830,7 +759,7 @@ def query_llm(prompt):
                 'model': MODEL,
                 'prompt': prompt,
                 'stream': False,
-                'options': {'temperature': 0.3, 'num_predict': 80}
+                'options': {'temperature': 0.3, 'num_predict': 150}
             },
             timeout=30
         )
@@ -842,18 +771,34 @@ def query_llm(prompt):
 
 
 def parse_prediction(response, token):
-    """Parse LLM response into structured dict."""
+    """Parse LLM response into structured dict.
+
+    Supports two formats:
+    - Minimal (new): plain "UP" or "DOWN" as first word
+    - Structured (legacy): DIRECTION: UP, CONFIDENCE: 70, MOVE_PCT: +1.5
+    """
     if not response:
         return None
     direction = None
     confidence = None
     move_pct = None
 
+    t = response.upper().strip()
+
+    # Try minimal format first: standalone UP or DOWN as first word
+    first_word = t.split()[0] if t.split() else ''
+    if first_word in ('UP', 'DOWN'):
+        direction = first_word
+        # For minimal format, set default confidence based on signal strength
+        # (override via parse of numeric lines if present)
+        confidence = 55  # default for minimal format
+
+    # Try structured format lines
     for line in response.split('\n'):
         line = line.strip()
         if 'DIRECTION:' in line.upper():
             d = line.upper().split('DIRECTION:')[1].strip().split()[0]
-            direction = d if d in ('UP', 'DOWN') else None
+            direction = d if d in ('UP', 'DOWN') else direction
         if 'CONFIDENCE:' in line.upper():
             try:
                 confidence = int(line.upper().split('CONFIDENCE:')[1].strip().replace('%','').split()[0])
@@ -987,14 +932,33 @@ def get_prediction_accuracy(conn, token):
     return None, total or 0
 
 
-def main():
-    if not acquire_lock():
-        log("Already running, exiting")
-        sys.exit(0)
+def run_with_wandb(args=None):
+    """Main entry wrapped for wandb tracking — parse args before wandb.init."""
+    parser = argparse.ArgumentParser(description='Candle Predictor')
+    parser.add_argument('--wandb-project', default='candle-predictor')
+    parser.add_argument('--wandb-entity', default=None)
+    parsed, _ = parser.parse_known_args(args or [])
+    return parsed, main_loop()
+
+def main_loop():
+    """
+    Core prediction loop (extracted from main() so wandb can wrap it).
+    Returns dict with run stats: {predicted, inverted_total, tokens_processed, errors}
+    """
+    # ── Hyperparameters (for wandb config) ─────────────────────────────────
+    hyperparams = {
+        'model': MODEL,
+        'ollama_url': OLLAMA_URL,
+        'top_tokens_count': len(TOP_TOKENS),
+        'inversion_threshold': INVERSION_THRESHOLD,
+        'candle_minutes': 240,
+    }
 
     log("=== Candle Predictor Starting (v2 - with HL data + inversion) ===")
 
     conn = init_predictions_db()
+
+    stats = {'predicted': 0, 'inverted_total': 0, 'tokens_processed': 0, 'errors': 0}
 
     # 1. Validate old predictions
     validate_predictions(conn)
@@ -1005,18 +969,20 @@ def main():
     log(f"  HL data for {len(hl_data)} tokens: {list(hl_data.keys())}")
 
     # 3. Generate new predictions
-    predicted = 0
-    inverted_total = 0
-
-    for token in TOP_TOKENS:
+    tokens_to_predict = get_effective_tokens()
+    log(f"  Predicting {len(tokens_to_predict)} tokens (base={len(TOP_TOKENS)}, watched={len(tokens_to_predict)-len(TOP_TOKENS)})")
+    for token in tokens_to_predict:
+        stats['tokens_processed'] += 1
         token_data = get_token_data_for_prediction(token)
         if not token_data:
             log(f"  {token}: no price data, skipping", 'WARN')
             continue
 
-        # Check accuracy - skip if model is cold for this token
+        # Check accuracy - skip if model is performing near-random on this token
+        # NOTE: lowered from 40→25 on 2026-04-06 to let new prompt variants accumulate
+        # predictions. If acc stays <25% across 50+ predictions, the prompt needs work.
         acc, n = get_prediction_accuracy(conn, token)
-        if acc is not None and acc < 40 and n >= 15:
+        if acc is not None and acc < 25 and n >= 50:
             log(f"  {token}: very low accuracy ({acc:.0f}%/{n}), skipping this round")
             time.sleep(0.5)
             continue
@@ -1031,27 +997,221 @@ def main():
 
         # Query LLM
         response = query_llm(prompt)
+        if not response:
+            stats['errors'] += 1
+            continue
 
-        if response:
-            pred = parse_prediction(response, token)
-            if pred:
-                # Apply inversion logic
-                final_dir, was_inverted, inv_reason = decide_inversion(
-                    token, pred['direction'], token_data['momentum_state'], conn
-                )
+        pred = parse_prediction(response, token)
+        if pred:
+            # Apply inversion logic
+            final_dir, was_inverted, inv_reason = decide_inversion(
+                token, pred['direction'], token_data['momentum_state'], conn
+            )
 
-                original_dir = pred['direction']
-                if was_inverted:
-                    pred['direction'] = final_dir
-                    inverted_total += 1
+            if was_inverted:
+                pred['direction'] = final_dir
+                stats['inverted_total'] += 1
 
-                store_prediction(conn, pred, token_data, was_inverted, inv_reason)
-                predicted += 1
+            # Minimax final-check (if enabled)
+            if MINIMAX_CHECK:
+                mx = minimax_check(token, pred['direction'], prompt, pred.get('confidence', 50))
+                if not mx['agree']:
+                    prev = pred['direction']
+                    pred['direction'] = mx['minimax_direction']
+                    inv_reason = f"MINIMAX OVERRIDE: {mx['reason'][:80]}"
+                    log(f"  {token}: MINIMAX overrode {prev} → {pred['direction']}: {mx['reason'][:60]}")
+                else:
+                    log(f"  {token}: MINIMAX agreed {pred['direction']}")
+
+            store_prediction(conn, pred, token_data, was_inverted, inv_reason)
+            stats['predicted'] += 1
 
         time.sleep(1.0)
 
-    log(f"=== Predicted {predicted} tokens, {inverted_total} inverted ===")
+    log(f"=== Predicted {stats['predicted']} tokens, {stats['inverted_total']} inverted ===")
     conn.close()
+    return stats
+
+
+# ── Watch list management ───────────────────────────────────────────────────────
+def load_watch_list():
+    """Load dynamically-added tokens (from traded coins)."""
+    try:
+        if os.path.exists(WATCH_LIST_FILE):
+            with open(WATCH_LIST_FILE) as f:
+                data = json.load(f)
+                return set(data.get('tokens', []))
+    except Exception:
+        pass
+    return set()
+
+def add_to_watch_list(token):
+    """Add a token to the watch list (called when a coin is traded)."""
+    watched = load_watch_list()
+    watched.add(token.upper())
+    try:
+        os.makedirs(os.path.dirname(WATCH_LIST_FILE), exist_ok=True)
+        with open(WATCH_LIST_FILE, 'w') as f:
+            json.dump({'tokens': sorted(watched)}, f)
+    except Exception as e:
+        log(f"Failed to save watch list: {e}", 'WARN')
+
+def get_effective_tokens():
+    """TOP_TOKENS + dynamically watched tokens (recently traded)."""
+    base = set(TOP_TOKENS)
+    watched = load_watch_list()
+    return sorted(base | watched)
+
+# ── Minimax final check ────────────────────────────────────────────────────────
+MINIMAX_API = 'https://api.minimaxi.chat/v1/text/chatcompletion_v2'
+MINIMAX_MODEL = 'MiniMax-Text-01'
+
+def minimax_check(token, direction, prompt_used, conf) -> dict:
+    """
+    Second-opinion check via Minimax API.
+    Returns {'agree': bool, 'minimax_direction': str, 'reason': str}
+    Falls back to agree=True if API fails (never override on error).
+    """
+    if not MINIMAX_CHECK:
+        return {'agree': True, 'minimax_direction': direction, 'reason': 'disabled'}
+
+    # Build a concise summary for minimax
+    interval_label = f"{CANDLE_MINUTES // 60}h" if CANDLE_MINUTES >= 60 else f"{CANDLE_MINUTES}m"
+    summary = (
+        f"{token} {interval_label} candle prediction:\n"
+        f"  Local model (qwen2.5) predicted: {direction} (confidence: {conf})\n"
+        f"  Prompt used: {prompt_used[:200]}\n"
+        f"Should we trust this prediction? Answer YES or NO and explain briefly."
+    )
+
+    try:
+        import yaml
+        with open('/root/.hermes/config.yaml') as f:
+            cfg = yaml.safe_load(f)
+        api_key = cfg.get('minimax_api_key') or os.environ.get('MINIMAX_API_KEY', '')
+    except Exception:
+        api_key = os.environ.get('MINIMAX_API_KEY', '')
+
+    if not api_key:
+        log("Minimax check skipped: no API key found", 'WARN')
+        return {'agree': True, 'minimax_direction': direction, 'reason': 'no_api_key'}
+
+    try:
+        import urllib.request, json as _json
+        req_body = {
+            'model': MINIMAX_MODEL,
+            'messages': [
+                {'role': 'user', 'content': summary}
+            ],
+            'max_tokens': 100,
+            'temperature': 0.3,
+        }
+        req = urllib.request.Request(
+            MINIMAX_API,
+            data=_json.dumps(req_body).encode(),
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json',
+            },
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            result = _json.loads(resp.read())
+            content = result.get('choices', [{}])[0].get('message', {}).get('content', '')
+            t = content.upper()
+            agree = 'YES' in t or 'AGREE' in t or 'TRUST' in t
+            return {
+                'agree': agree,
+                'minimax_direction': direction if agree else ('UP' if direction == 'DOWN' else 'DOWN'),
+                'reason': content[:150]
+            }
+    except Exception as e:
+        log(f"Minimax check failed: {e} — defaulting to agree", 'WARN')
+        return {'agree': True, 'minimax_direction': direction, 'reason': f'error: {e}'}
+
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+def main():
+    """CLI: candle_predictor.py [--nowandb] [--interval 15|60|240] [--minimax]"""
+    import sys
+    use_wandb = '--nowandb' not in sys.argv
+
+    # Parse interval arg
+    global CANDLE_MINUTES, MINIMAX_CHECK
+    for arg in sys.argv:
+        if arg.startswith('--interval='):
+            mins = int(arg.split('=')[1])
+            if mins not in (15, 60, 240):
+                print(f"ERROR: --interval must be 15, 60, or 240. Got {mins}")
+                sys.exit(1)
+            CANDLE_MINUTES = mins
+        if arg == '--minimax':
+            MINIMAX_CHECK = True
+
+    interval_label = f"{CANDLE_MINUTES // 60}h" if CANDLE_MINUTES >= 60 else f"{CANDLE_MINUTES}m"
+    log(f"=== Candle Predictor Starting ({interval_label} candles, minimax={'ON' if MINIMAX_CHECK else 'off'}) ===")
+
+    if not acquire_lock():
+        log("Already running, exiting")
+        sys.exit(0)
+
+    if use_wandb:
+        # Try to get wandb API key from env or _secrets
+        wandb_key = os.environ.get('WANDB_API_KEY', '')
+        try:
+            from _secrets import WANDB_API_KEY
+            wandb_key = WANDB_API_KEY
+        except ImportError:
+            pass
+
+        # W&B offline/anonymous — runs queued locally, synced later with `wandb sync`
+        wandb.init(
+            project='hermes-ai',
+            entity=None,
+            mode='offline',
+            config={
+                'model': MODEL,
+                'ollama_url': OLLAMA_URL,
+                'top_tokens': TOP_TOKENS,
+                'inversion_threshold': INVERSION_THRESHOLD,
+                'candle_minutes': CANDLE_MINUTES,
+                'minimax_check': MINIMAX_CHECK,
+            },
+            settings=wandb.Settings(anonymous='allow'),
+        )
+        log("W&B tracking enabled (offline, project=hermes-ai)")
+
+    try:
+        stats = main_loop()
+        if use_wandb:
+            wandb.log({
+                'run_predicted': stats['predicted'],
+                'run_inverted': stats['inverted_total'],
+                'run_tokens_processed': stats['tokens_processed'],
+                'run_errors': stats['errors'],
+                'run_success': 1,
+            })
+            # Local backup — always saved regardless of W&B sync state
+            import json
+            from datetime import datetime
+            local_path = f'/root/.hermes/wandb-local/candle-predictor-{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.json'
+            os.makedirs('/root/.hermes/wandb-local', exist_ok=True)
+            with open(local_path, 'w') as f:
+                json.dump({
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'model': MODEL,
+                    'top_tokens': TOP_TOKENS,
+                    'inversion_threshold': INVERSION_THRESHOLD,
+                    'predicted': stats['predicted'],
+                    'inverted_total': stats['inverted_total'],
+                    'tokens_processed': stats['tokens_processed'],
+                    'errors': stats['errors'],
+                }, f, indent=2)
+            log(f"Local W&B backup saved: {local_path}")
+    finally:
+        if use_wandb:
+            wandb.finish()
+            log("W&B run finished")
 
     try:
         os.remove(LOCK_FILE)

@@ -95,6 +95,22 @@ def init_db():
             short_mult REAL NOT NULL,
             timestamp INTEGER NOT NULL
         )""")
+    sc.execute("""
+        CREATE TABLE IF NOT EXISTS ohlcv_1m (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT NOT NULL,
+            open_time INTEGER NOT NULL,
+            open REAL NOT NULL,
+            high REAL NOT NULL,
+            low REAL NOT NULL,
+            close REAL NOT NULL,
+            volume REAL NOT NULL,
+            close_time INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            UNIQUE(token, open_time)
+        )""")
+    sc.execute('CREATE INDEX IF NOT EXISTS idx_ohlcv_token_time ON ohlcv_1m(token, open_time)')
+    sc.execute('CREATE INDEX IF NOT EXISTS idx_ohlcv_ts ON ohlcv_1m(open_time)')
     sc.commit()
     sc.close()
 
@@ -1286,3 +1302,218 @@ def get_trade_workflow_state(trade_id: int) -> str | None:
 
 def get_db():
     return _get_conn(_runtime(), row_factory=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  Price Architecture — Local DB First
+#
+#  RULE: All price reads MUST route to local SQLite first.
+#        The local DB is seeded by price_collector.py (every minute via cron).
+#        All external API calls (HL allMids, Binance candles) are WRITE-ONLY
+#        into the local DB — no script should ever read price from an API
+#        directly when the local DB has the data.
+#
+#  Single source of truth for prices: local SQLite (signals_hermes.db)
+#  • latest_prices   → current price (upserted every minute by price_collector)
+#  • price_history   → historical price series (used for RSI, z-score, etc.)
+#  • ohlcv_1m        → 1-minute OHLCV candles (written by fetch_binance_candles)
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
+    """
+    Write latest prices from HL allMids into local SQLite.
+    Seeds both latest_prices (current) and price_history (time series).
+
+    This is called by price_collector.py on every run.
+    Any script that fetches allMids should call this afterward.
+
+    Args:
+        allMids:  {token_symbol: price_string} from hc.get_allMids()
+        tokens:   {token_symbol: max_leverage} from HL meta universe
+
+    Returns:
+        Number of rows inserted into price_history.
+    """
+    if not allMids:
+        return 0
+    now = int(time.time())
+    conn = _get_conn(STATIC_DB)
+    c = conn.cursor()
+    rows = 0
+    for sym, price_str in allMids.items():
+        # SAFETY: reject @XXX numeric coin IDs — Hyperliquid allMids returns these for
+        # some coins instead of proper symbol names. They must never enter SQLite.
+        if sym.startswith('@'):
+            continue
+        try:
+            price = float(price_str)
+            if price <= 0:
+                continue
+            lev = tokens.get(sym, 10) if tokens else 10
+            # latest_prices: upsert
+            c.execute(
+                'INSERT OR REPLACE INTO latest_prices(token, price, updated_at, max_leverage) VALUES(?, ?, ?, ?)',
+                (sym.upper(), price, now, lev)
+            )
+            # price_history: insert (one row per tick for historical series)
+            c.execute(
+                'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
+                (sym.upper(), price, now)
+            )
+            rows += 1
+        except (ValueError, TypeError):
+            continue
+    conn.commit()
+    conn.close()
+    return rows
+
+
+def fetch_binance_candles(symbol: str, interval: str = '1m', limit: int = 240) -> list:
+    """
+    Fetch OHLCV candles from Binance public API (no auth required).
+    Writes results to local ohlcv_1m table in SQLite.
+
+    Binance symbol format: 'IMXUSDT' (base + quote)
+    HL symbol format:      'IMX'    (base only)
+
+    Args:
+        symbol:    Binance symbol e.g. 'IMXUSDT' or HL symbol e.g. 'IMX'
+        interval:  '1m', '5m', '15m', '1h', '4h', '1d'
+        limit:     Number of candles to fetch (max 1000 for Binance)
+
+    Returns:
+        List of candle dicts: [{open_time, open, high, low, close, volume}, ...]
+    """
+    import requests as _requests
+
+    # Convert HL symbol to Binance format if needed
+    if not symbol.endswith('USDT'):
+        symbol = symbol.upper() + 'USDT'
+
+    url = 'https://api.binance.com/api/v3/klines'
+    params = {'symbol': symbol, 'interval': interval, 'limit': min(limit, 1000)}
+    try:
+        resp = _requests.get(url, params=params, timeout=10)
+        resp.raise_for_status()
+        raw = resp.json()
+    except Exception as e:
+        print(f'[fetch_binance_candles] {symbol}: {e}')
+        return []
+
+    now = int(time.time())
+    conn = _get_conn(STATIC_DB)
+    c = conn.cursor()
+    candles = []
+    for k in raw:
+        # Binance kline format:
+        # [open_time, open, high, low, close, volume, close_time, ...]
+        try:
+            ot = int(k[0])
+            ct = int(k[6])
+            o, h, l, c_, v = float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])
+            # Derive HL symbol (strip USDT suffix)
+            hl_sym = symbol.replace('USDT', '').upper()
+            c.execute("""
+                INSERT OR REPLACE INTO ohlcv_1m
+                (token, open_time, open, high, low, close, volume, close_time, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (hl_sym, ot, o, h, l, c_, v, ct, now))
+            candles.append({
+                'token': hl_sym,
+                'open_time': ot,
+                'open': o,
+                'high': h,
+                'low': l,
+                'close': c_,
+                'volume': v,
+                'close_time': ct,
+            })
+        except (ValueError, TypeError):
+            continue
+    conn.commit()
+    conn.close()
+    if candles:
+        print(f'[fetch_binance_candles] {symbol} → {len(candles)} candles written '
+              f'({interval}, {candles[0]["open_time"]} → {candles[-1]["open_time"]})')
+    return candles
+
+
+def get_ohlcv_1m(token: str, lookback_minutes: int = 60) -> list:
+    """
+    Read 1m OHLCV candles from local SQLite.
+    Returns candles sorted oldest → newest.
+
+    ALL price reads must route here (local DB first).
+    Only falls back to live Binance fetch if local DB is empty or stale.
+
+    Args:
+        token:           HL symbol e.g. 'IMX'
+        lookback_minutes: how far back to read (default: last 60 minutes)
+
+    Returns:
+        List of candle dicts: [{open_time, open, high, low, close, volume}, ...]
+    """
+    cutoff = int(time.time()) - (lookback_minutes * 60)
+    conn = _get_conn(STATIC_DB)
+    c = conn.cursor()
+    c.execute("""
+        SELECT open_time, open, high, low, close, volume
+        FROM ohlcv_1m
+        WHERE token=? AND open_time > ?
+        ORDER BY open_time ASC
+    """, (token.upper(), cutoff))
+    rows = c.fetchall()
+    conn.close()
+    return [
+        {'open_time': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5]}
+        for r in rows
+    ]
+
+
+def get_latest_price(token: str) -> float | None:
+    """
+    Read current price for a token from local SQLite latest_prices table.
+
+    ALL price reads MUST use this (local DB first).
+    """
+    conn = _get_conn(STATIC_DB)
+    c = conn.cursor()
+    c.execute('SELECT price FROM latest_prices WHERE token=?', (token.upper(),))
+    row = c.fetchone()
+    conn.close()
+    return row[0] if row else None
+
+
+def get_price_history(token: str, lookback_minutes: int = 60*24) -> list:
+    """
+    Read historical price series from local SQLite price_history table.
+
+    ALL price reads for historical analysis (RSI, z-score, etc.) MUST use this.
+    """
+    conn = _get_conn(STATIC_DB)
+    c = conn.cursor()
+    cutoff = int(time.time()) - (lookback_minutes * 60)
+    c.execute("""
+        SELECT timestamp, price FROM price_history
+        WHERE token=? AND timestamp>?
+        ORDER BY timestamp ASC
+        LIMIT 2000
+    """, (token.upper(), cutoff))
+    rows = c.fetchall()
+    conn.close()
+    return rows
+
+
+def get_all_latest_prices() -> dict:
+    """
+    Read all current prices from local SQLite latest_prices table.
+
+    ALL bulk price reads MUST use this (local DB first).
+    """
+    conn = _get_conn(STATIC_DB)
+    c = conn.cursor()
+    c.execute('SELECT token, price FROM latest_prices')
+    rows = c.fetchall()
+    conn.close()
+    return {r[0]: {'price': r[1]} for r in rows}

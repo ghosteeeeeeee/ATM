@@ -316,10 +316,12 @@ def _get_hotset_from_file():
         entries = data.get('hotset', [])
         if not entries:
             return None
-        # Stale check: if hotset.json is stale, return empty — do NOT fall back to DB.
+        # Stale check: if hotset.json is stale (>20 min), return empty — do NOT fall back to DB.
+        # Fallback uses token_speeds table which has incomplete/NULL speed_percentile → all 50%.
         # ONE writer only: ai_decider.py writes hotset.json. Everyone else reads it.
+        # Keep threshold at 20 min (timer fires every 10 min, pipeline takes ~2 min).
         ts = data.get('timestamp', 0)
-        if ts > 0 and (time.time() - ts) > 660:
+        if ts > 0 and (time.time() - ts) > 1200:
             print(f"[hotset] hotset.json stale ({time.time()-ts:.0f}s) — returning empty (ai_decider should refresh)")
             return []
 
@@ -350,7 +352,7 @@ def _get_hotset_from_file():
                 'survival':       e.get('survival_score', 0),
                 'last_seen':      str(e.get('timestamp', ts)),
                 # SPEED FEATURE fields (from hotset.json)
-                'speed_pctl':     round(e.get('momentum_score') or 50.0, 1),
+                'speed_pctl':     round(e.get('speed_percentile') or e.get('momentum_score') or 50.0, 1),
                 'vel_5m':         round(e.get('price_velocity_5m') or 0, 3),
                 'accel':          round(e.get('price_acceleration', 0), 3),
                 'is_stale':       False,
@@ -559,13 +561,13 @@ def write_signals():
 
     cur.close(); conn.close()
 
-    approved = sum(1 for s in signals if s['decision'] == 'APPROVED')
-    executed = sum(1 for s in signals if s['decision'] == 'EXECUTED')
-    pending  = sum(1 for s in signals if s['decision'] == 'PENDING')
+    pending_list  = [s for s in signals if s['decision'] == 'PENDING']
+    approved_list = [s for s in signals if s['decision'] == 'APPROVED']
+    executed_list = [s for s in signals if s['decision'] == 'EXECUTED']
 
     result = {
         "updated": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
-        "approved": approved, "executed": executed, "pending": pending,
+        "approved": approved_list, "executed": executed_list, "pending": pending_list,
         "total": len(signals),
         "stats": {
             "total_executed": total_closed,

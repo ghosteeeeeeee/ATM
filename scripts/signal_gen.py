@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 _RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            os.pardir, 'data', 'signals_hermes_runtime.db')
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+import pattern_scanner  # Chart pattern detection — runs first, all active tokens
 
 
 def _has_confluence_partners(token: str, direction: str, exclude_type: str = None) -> bool:
@@ -1275,6 +1276,9 @@ def _run_rsi_signals_for_confluence():
     # SHORT_BLACKLIST is imported from hermes_constants at module level
     added = 0
     for token, data in prices_dict.items():
+        # Skip @XXX numeric coin IDs — not real token symbols
+        if token.startswith('@'):
+            continue
         if price_age_minutes(token) > 10:
             continue
         if not data.get('price') or data['price'] <= 0:
@@ -1459,6 +1463,9 @@ def _run_mtf_macd_signals():
     # Excluded from OC pipeline (source != 'mtf-*') — Hermes-only.
 
     for token, data in prices_dict.items():
+        # Skip @XXX numeric coin IDs — not real token symbols
+        if token.startswith('@'):
+            continue
         if price_age_minutes(token) > 10:
             continue
         if not data.get('price') or data['price'] <= 0:
@@ -1671,6 +1678,9 @@ def _run_macd_signals_for_confluence():
     # SHORT_BLACKLIST is imported from hermes_constants at module level
     added = 0
     for token, data in prices_dict.items():
+        # Skip @XXX numeric coin IDs — not real token symbols
+        if token.startswith('@'):
+            continue
         if price_age_minutes(token) > 10:
             continue
         if not data.get('price') or data['price'] <= 0:
@@ -1885,6 +1895,46 @@ def run_confluence_detection(regime, long_mult, short_mult):
 
 
 # ═══════════════════════════════════════════════════════════════
+# PATTERN SCANNER — runs FIRST, independent primary signals
+
+def _run_pattern_signals(prices_dict: dict) -> int:
+    """
+    Run chart pattern detection on active tokens.
+    Pattern signals are INDEPENDENT primary signals — they compete with
+    mtf_macd signals equally in the hot-set scoring. Not cascade flip confluence.
+
+    Runs on: tokens that have local 1m candle data (hot-set + open positions).
+    Tokens without candle data are skipped (pattern_scanner falls back to Binance
+    fetch internally, but we skip here to avoid per-run rate limits).
+
+    Returns: number of pattern signals written to DB.
+    """
+    added = 0
+    skipped_no_candles = 0
+
+    for token in prices_dict:
+        # Skip tokens without valid price
+        data = prices_dict.get(token, {})
+        if not data.get('price') or data['price'] <= 0:
+            continue
+        if is_delisted(token.upper()):
+            continue
+
+        try:
+            patterns = pattern_scanner.scan_and_write(token.upper(), lookback_minutes=240)
+            added += len(patterns)
+            if patterns is None:
+                skipped_no_candles += 1
+        except Exception as e:
+            # Pattern scanner errors are non-fatal — mtf_macd still runs
+            pass
+
+    if added > 0:
+        print(f'  Pattern signals: {added} written to DB')
+    return added
+
+
+# ═══════════════════════════════════════════════════════════════
 
 def run():
     init_db()
@@ -1897,6 +1947,9 @@ def run():
     _ZSCORE_CACHE.clear()
     _VOL_CACHE.clear()
     prices_dict = get_all_latest_prices()
+
+    # ── PATTERN SIGNALS — run FIRST, independent primary signals ──────
+    pattern_added = _run_pattern_signals(prices_dict)
 
     # SPEED FEATURE: update speed tracker once per run (<2s) — must be before the loop
     if speed_tracker is not None:
@@ -1925,6 +1978,9 @@ def run():
     # scan loop starts immediately — volume data fills in as HL allows
 
     for token, data in prices_dict.items():
+        # Skip @XXX numeric coin IDs — not real token symbols
+        if token.startswith('@'):
+            continue
         if price_age_minutes(token) > 10:
             continue
         if not data.get('price') or data['price'] <= 0:

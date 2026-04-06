@@ -418,3 +418,192 @@ Note: No AAVE WAIT signals existed — all 5 were SUPER/TNSR from 2026-04-03.
 2. `/root/.hermes/scripts/signal_schema.py` — `MIN_CONFIDENCE_FLOOR = 50` in `add_signal()`
 3. `/root/.hermes/scripts/signal_gen.py` — `percentile_rank` formula boosted to 60-75% range
 4. `/root/.hermes/scripts/signal_schema.py` — 5 WAIT signals reset to PENDING
+
+---
+
+## 2026-04-06 — Trading Analysis Session (DYDX + Full Portfolio Mar 26-Apr 6)
+
+### Data Sources
+- HL fills API: 2,000 fills, 1,981 positions, wallet 0x324a9713603863FE3A678E83d7a81E20186126E7
+- Period: 2026-03-26 00:00 UTC → 2026-04-06
+- Subagents: analytics-reporter, experiment-tracker, reality-checker + SHORTs audit subagent
+
+---
+
+### Executive Summary
+| Metric | Value |
+|--------|-------|
+| Total positions | 1,981 |
+| Closed positions | 997 |
+| Open positions | ~10 (rest were misread as open — all closed) |
+| Win Rate | 22.2% (221W / 338L / 438BE) |
+| Gross PnL | $6.09 |
+| Fees Paid | $5.49 (90% of gross) |
+| Net PnL | $0.60 |
+| Avg Win | $0.107 vs Avg Loss: -$0.052 |
+| Expectancy | -$0.0168/trade |
+
+**Key insight**: The system is barely profitable gross, fees destroy it. Fixes must focus on reducing trade frequency and improving WR, not increasing volume.
+
+---
+
+### DYDX Analysis
+- 19 positions, 9 still open (carrying exposure)
+- 2W / 3L on closed trades, net: -$0.43
+- Old CSV (Mar 19-20): 4 SHORTs in 2.5 hours = classic overtrading into a losing position
+- Mar 26-Apr 6: fresh shorts mostly open/unresolved
+- **DYDX currently in hot-set with 86% confidence SHORT — confirm this aligns with regime before acting**
+
+---
+
+### Critical Finding #1 — 44% Breakeven Rate
+438 out of 997 closed trades (43.9%) closed at exactly $0.00 PnL.
+- Root cause: SL placed at or very near entry price
+- Fees burned with no net gain: ~$2.41 in fees on BE trades
+- **This is the clearest signal that our fixed % SL is firing on micro-volatility noise**
+
+---
+
+### Critical Finding #2 — SHORT Direction is Broken
+
+| Direction | Win Rate | Net PnL |
+|-----------|----------|---------|
+| LONG | 63.4% | +$3.08 |
+| SHORT | 59.4% | **-$10.87** |
+
+- SOL shorts alone: -$4.50 (entered at local top of $90.86)
+- 51.9% of shorts fired in rising markets = fighting regime
+- **Not a volatility issue — a systematic direction bug**
+
+#### SHORT Bug #1 (CRITICAL) — z_direction was inverted before 2026-04-05
+**File**: `signal_gen.py` line 609
+Pre-fix code had inverted z_direction semantics:
+- z < -0.3 was labeled `'rising'` (should be falling = bullish for SHORT)
+- z > 0.3 was labeled `'falling'` (should be rising = bearish for SHORT)
+
+The token-level regime filter in decider-run.py checked:
+- `z_direction='falling' + direction='SHORT'` → PASSED (anti-regime SHORT at local bottom passed as "good SHORT")
+- This caused anti-regime SHORTs to bypass the token-level regime check.
+
+Fix applied 2026-04-05, but **existing signals in DB still have inverted z_direction baked in**.
+
+#### SHORT Bug #2 (CRITICAL) — z_score_tier tier names never matched stored values
+**File**: `ai_decider.py` lines 1769-1796
+The AI prompt checks for tier names like `'accelerating_long'`, `'accelerating_short'`, `'decelerating_from_long'` etc.
+But the signals DB stores completely different values: `'suppressed'`, `'normal'`, `'elevated'` (from RSI signals) or `'rising'`, `'falling'`, `'neutral'` (from z_direction).
+
+**The AI momentum context section is completely silent for ALL signals.** The AI only sees the raw z_score number with no tier guidance.
+
+#### SHORT Bug #3 (HIGH) — AI prompt hard-codes "When Uncertain, Favor LONG"
+**File**: `ai_decider.py` line 1817
+Every AI decision prompt contains: "LONGS outperform SHORTS historically. When uncertain, favor LONG."
+This systematic bias, combined with broken momentum context, means SHORTs are evaluated with degraded information.
+
+#### SHORT Bug #4 (MEDIUM) — Regime filter only penalizes, doesn't block
+**File**: `ai_decider.py` lines 1209-1211
+Counter-regime signals get a 0.4x score penalty but can still survive if confidence is high enough.
+A 90% confidence SHORT in LONG_BIAS regime gets penalized but could still auto-approve via hot-set.
+
+---
+
+### Critical Finding #3 — Fixed SL is Wrong for Volatile Tokens
+- 71.5% of losses had <1% adverse move before SL hit
+- 88.3% of losses had <2% adverse move
+- TAO (20% range): SL at 1.5% is far too tight — cuts winners before they develop
+- SOL (12% range): Same problem
+- BTC (5.6% range): 1.5% is appropriate
+
+**Rule needed: ATR(14)-based dynamic SL**
+- SL = entry_px ± (k × ATR(14)) where k varies by direction and volatility regime
+- Suggested starting point: k=1.5 for SHORTs in volatile market, k=1.0 for LOW_VOLATILITY regime
+
+---
+
+### Critical Finding #4 — Overtrading / Fast Re-Entry
+- 32 instances of re-entering same coin within 30 min after a loss
+- Worst offenders: SKR (5), TRX (4), FET (3)
+- 0-minute re-entries observed (same second as close) on DOGE, SOL, AVAX
+- **Mandatory 15-min cooldown rule needed after any close before re-entering same coin**
+
+---
+
+### Recommendations (Priority Order)
+
+1. **[CRITICAL] Retroactively fix or clear pre-2026-04-05 signals with inverted z_direction**
+   - Option A: DELETE all signals created before 2026-04-05
+   - Option B: Write a migration script to recompute z_direction for all historical signals
+   - This alone could fix the SHORT regime filter for historical signals
+
+2. **[CRITICAL] Wire up correct z_score_tier names in ai_decider.py**
+   - Create a mapping function that translates actual stored z_direction values into the tier names the AI prompt expects
+   - Or update signal_gen.py to store the correct tier names when signals are created
+
+3. **[HIGH] Remove or quantify the "favor LONG" AI bias**
+   - Either remove the instruction or replace with quantitative performance data
+   - SHORTs should be evaluated with same rigor as LONGs
+
+4. **[HIGH] Implement ATR-based dynamic SL**
+   - Replace fixed % SL with ATR(14)-based SL
+   - k multiplier varies by volatility regime and direction
+
+5. **[MEDIUM] Add blocking regime filter in compaction**
+   - Convert the 0.4x penalty to a hard block for counter-regime signals
+   - Counter-regime signals should never reach hot-set regardless of confidence
+
+6. **[MEDIUM] Mandatory 15-min cooldown before re-entering same coin**
+   - Prevents revenge trading and fast re-entry clustering
+
+---
+
+### Files Modified
+- `signal_gen.py` — z_direction fix applied 2026-04-05 (pre-existing)
+- `ai_decider.py` — SHORT audit findings logged (no code changes yet)
+- `decider-run.py` — _FLIP_SIGNALS confirmed correctly disabled (not the issue)
+
+### Open Questions
+- Did the z_direction fix in signal_gen.py propagate correctly to all signal types, or only mtf_macd?
+- Is there a `created_at` gate needed to apply the inverted semantics fix retroactively?
+- Should SHORTs be temporarily disabled until bugs #1-3 are fixed?
+
+---
+
+### Implementation: ATR-based Dynamic SL (2026-04-06)
+
+**File modified:** `/root/.hermes/scripts/decider-run.py`
+
+**What was added:**
+- `_get_atr(token)` — fetches ATR(14) from HL 1h candles, cached per token for 5 min
+- `_atr_multiplier(token, atr_pct)` — self-calibrating k multiplier based on ATR%:
+  - `atr_pct < 1.0%` (LOW_VOL) → k=1.5
+  - `atr_pct 1-3%` (NORMAL) → k=2.0
+  - `atr_pct > 3%` (HIGH_VOL) → k=2.5
+- `_compute_dynamic_sl(token, direction, entry_price, sl_pct_fallback)` — computes SL as `entry ± (k × ATR)`
+- Guards: `MIN_ATR_PCT = 0.75%` floor (prevents razor-thin SL on BTC), `MAX_SL_PCT = 5%` cap
+
+**Applied in two places:**
+1. `execute_trade()` — normal entry SL
+2. `_execute_delayed_entries()` — delayed entry SL (pullback entries)
+
+**How it works:**
+1. At execution time, `execute_trade()` calls `_compute_dynamic_sl()`
+2. ATR(14) is fetched from HL → cached 5 min per token
+3. SL = entry_price × (1 ± `effective_sl_pct`) where `effective_sl_pct = max(atr_sl_pct, 0.75%)`
+4. The actual SL price is passed to brain.py via `--sl` flag
+5. `position_manager.get_effective_sl()` uses the stored `stop_loss` price directly (Priority 1 check)
+6. Falls back to fixed `sl_pct_fallback` (A/B test value) if ATR API fails
+
+**Live test results (2026-04-06):**
+```
+DYDX LONG/SHORT: entry=$0.102, ATR=0.0011 (1.08%), k=2.0, eff=2.16% → SL=$0.0998/$0.1042
+SOL  LONG/SHORT: entry=$90,   ATR=0.756  (0.84%), k=1.5, eff=1.26% → SL=$88.87/$91.13
+BTC  LONG/SHORT: entry=$95000,ATR=$409   (0.43%), k=1.5, eff=0.75% → SL=$94287/$95712
+TAO  LONG/SHORT: entry=$250,  ATR=3.84   (1.54%), k=2.0, eff=3.07% → SL=$242.32/$257.68
+```
+
+**Comparison vs old fixed 1.5% SL:**
+- TAO (high vol): 3.07% vs 1.5% → 2× wider, gives trade room to develop ✓
+- DYDX: 2.16% vs 1.5% → wider, appropriate for 1.08% ATR ✓
+- SOL: 1.26% vs 1.5% → slightly tighter (but SOL's ATR% is very low), still meaningful
+- BTC: 0.75% vs 1.5% → floor prevents razor SL, still provides stop-loss protection
+
+**Next for trailing SL:** The trailing activation threshold (1% profit) and buffer (0.3%) in `position_manager.py` are still fixed %. A future enhancement would make these also ATR-aware (e.g., activate trailing at 2× ATR profit, buffer = 0.3× ATR).

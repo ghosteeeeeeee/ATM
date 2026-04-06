@@ -3,8 +3,32 @@ Shared A/B testing utilities — canonical Thompson sampling implementation.
 Both ai-decider.py and decider-run.py use this for A/B variant selection.
 """
 import random, sys, json, os
+from typing import Optional
 
 EPSILON = 0.1  # 10% exploration rate in epsilon-greedy fallback
+
+# ── W&B tracking (lazy init) ────────────────────────────────────────────────
+_wandb_run = None
+
+def _get_wandb_run(run_name: Optional[str] = None):
+    """Lazily initialize W&B run for Hermes A/B tests (offline, project=hermes-ai)."""
+    global _wandb_run
+    if _wandb_run is None:
+        import wandb, os
+        wandb.init(
+            project='hermes-ai',
+            entity=None,
+            name=run_name,
+            mode='offline',
+            config={
+                'test_name': None,
+                'variant_id': None,
+            },
+            settings=wandb.Settings(anonymous='allow'),
+        )
+        wandb.define_metric('step')
+        _wandb_run = wandb
+    return _wandb_run
 
 
 def _load_ab_config():
@@ -147,4 +171,51 @@ def get_cached_ab_variant(token: str, direction: str, test_name: str) -> dict:
     """
     if test_name not in _ab_variant_cache:
         _ab_variant_cache[test_name] = get_ab_variant(test_name, direction)
-    return _ab_variant_cache[test_name]
+
+    variant = _ab_variant_cache[test_name]
+    if variant:
+        try:
+            wb = _get_wandb_run(run_name=f'{test_name}-{variant.get("id","unknown")}')
+            wb.log({
+                'variant': variant.get('id'),
+                'variant_name': variant.get('name'),
+                'test_name': test_name,
+                'token': token,
+                'direction': direction,
+            }, step=0)
+        except Exception:
+            pass  # W&B logging must never break A/B logic
+    return variant
+
+
+def record_ab_outcome(test_name: str, variant_id: str, outcome: str,
+                      metric_value: Optional[float] = None) -> None:
+    """
+    Log an A/B test outcome to W&B (offline) for visual comparison.
+    Also appends a local JSON backup to /root/.hermes/wandb-local/ab-tests.jsonl.
+    Call this from trading code when an outcome (win/loss/metric) is recorded.
+    """
+    from datetime import datetime, timezone
+    log_data = {
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'test_name': test_name,
+        'variant': variant_id,
+        'outcome': outcome,
+    }
+    if metric_value is not None:
+        log_data['metric_value'] = metric_value
+
+    # Local backup always (JSON Lines — append-only, no overwrite)
+    try:
+        os.makedirs('/root/.hermes/wandb-local', exist_ok=True)
+        with open('/root/.hermes/wandb-local/ab-tests.jsonl', 'a') as f:
+            f.write(json.dumps(log_data) + '\n')
+    except Exception as e:
+        log(f'[W&B local backup fail] {e}', 'WARN')
+
+    # W&B offline
+    try:
+        wb = _get_wandb_run(run_name=f'{test_name}-{variant_id}')
+        wb.log(log_data)
+    except Exception:
+        pass  # W&B logging must never break trading logic

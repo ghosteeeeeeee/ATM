@@ -109,10 +109,27 @@ def _load_reconciled_state():
         return {}
 
 def _save_reconciled_state(state):
-    """Persist reconciled state to disk."""
+    """Persist reconciled state to disk, pruning entries older than 24 hours."""
     try:
+        # Prune stale entries (not updated in >24h — position was closed and forgotten)
+        cutoff = time.time() - 86400  # 24 hours ago
+        pruned = 0
+        cleaned = {}
+        for tok, entry in state.items():
+            reconciled_at_str = entry.get('reconciled_at', '')
+            if reconciled_at_str:
+                try:
+                    entry_ts = time.mktime(time.strptime(reconciled_at_str, '%Y-%m-%d %H:%M:%S'))
+                    if entry_ts < cutoff:
+                        pruned += 1
+                        continue
+                except (ValueError, TypeError):
+                    pass  # malformed timestamp — keep entry
+            cleaned[tok] = entry
+        if pruned > 0:
+            log(f'  [STALE-CLEANUP] removed {pruned} stale reconciled entries (>24h old)')
         with open(_RECONCILED_STATE_FILE, 'w') as f:
-            json.dump(state, f)
+            json.dump(cleaned, f)
     except Exception as e:
         log(f'  Warning: could not save reconciled state: {e}', 'WARN')
 
@@ -173,14 +190,10 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 
 def log(msg, level='INFO'):
+    # Logs to stdout only — systemd service redirects stdout to sync-guardian.log
+    # via StandardOutput=append:. Direct file writes removed to prevent doubling.
     ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] [{level}] {msg}'
-    print(line)
-    try:
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except:
-        pass
+    print(f'[{ts}] [{level}] {msg}')
 
 
 # ─── Copied Trades State (migrated from combined-trading.py) ──────────────────

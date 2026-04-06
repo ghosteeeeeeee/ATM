@@ -4,6 +4,15 @@ AI Decider - Actually thinks and decides using all available info
 """
 import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback, math
 from datetime import datetime, timezone
+
+# W&B decision audit logging — audit trail of every hot-set decision
+try:
+    import wandb
+    _wandb_available = True
+except ImportError:
+    _wandb_available = False
+    def _noop(*a, **k): pass
+    wandb = type('obj', (), {'init': _noop, 'log': _noop, 'finish': _noop, 'config': type('obj', (), {'update': _noop})()})()
 import pandas as pd
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
@@ -103,6 +112,7 @@ AB_CONFIG_FILE = '/root/.hermes/data/ab-test-config.json'
 sys.path.insert(0, '/root/.hermes/scripts')
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from tokens import is_solana_only
+from hyperliquid_exchange import is_delisted
 
 # ─── Source confidence weights ────────────────────────────────────────────────
 # Single config for all signal source multipliers applied to raw confidence.
@@ -120,21 +130,202 @@ SOURCE_WEIGHTS = {
 SOURCE_WEIGHT_OVERRIDES = [
     ('mtf_macd',  'hmacd-',  1.0),   # hmacd- + mtf_macd = MACD crossover (was 1.2)
     # All other hmacd-* sources (pct-hermes, etc.) fall through to default 0.6
+    # Pattern signals: 1.25× multiplier — independent primary signals, need to
+    # bubble up so T can observe their performance vs mtf_macd in hot-set
+    ('pattern_flag',   'pattern_scanner', 1.25),
+    ('pattern_hns',   'pattern_scanner', 1.25),
+    ('pattern_wyckoff','pattern_scanner', 1.25),
+    ('pattern_elliot', 'pattern_scanner', 1.25),
 ]
 DEFAULT_SOURCE_WEIGHT = 1.0
 
+# ── Performance Calibration (WR-Based Auto-Multiplier) ──────────────────────
+# Applies to ALL signal types. After PERF_CAL_MIN_TRADES samples, WR drives weight.
+# WR > 55% → multiplier 1.5×  |  WR 45-55% → keep 1.25×  |  WR 40-45% → 0.75×  |  WR < 40% → disable
+
+PERF_CAL_MIN_TRADES = 15   # min closed trades before adjusting a signal type's weight
+PERF_CAL_MAX_WEIGHT = 1.5  # cap on boost multiplier
+PERF_CAL_MIN_WEIGHT = 0.0  # below this = exclude from hot-set entirely
+
+# Map composite signal_type values (from signal_outcomes) to source categories
+# so we can calibrate the same way across related signal types.
+SIGNAL_TYPE_CATEGORY_MAP = {
+    # Pattern scanner sources
+    'pattern_flag':    'pattern_scanner',
+    'pattern_hns':     'pattern_scanner',
+    'pattern_wyckoff': 'pattern_scanner',
+    'pattern_elliot':  'pattern_scanner',
+    # Momentum / MTF sources
+    'mtf_macd':  'mtf_macd',
+    'hmacd-,hzscore':              'hmacd-momentum',
+    'hmacd-,hzscore,pct-hermes':   'hmacd-momentum',
+    'hmacd-,hzscore,pct-hermes,rsi-hermes': 'hmacd-momentum',
+    'hmacd-,hzscore,pct-hermes,vel-hermes': 'hmacd-momentum',
+    # Confluence sources
+    'conf-1s':  'confluence',
+    'conf-2s':  'confluence',
+    'conf-3s':  'confluence',
+    'conf-4s':  'confluence',
+    'conf-5s':  'confluence',
+    'conf-6s':  'confluence',
+    'conf-7s':  'confluence',
+    'conf-8s':  'confluence',
+    'conf-9s':  'confluence',
+    'conf-10s': 'confluence',
+    # Decider / speed-review
+    'decider':        'decider',
+    'speed-review':   'speed-review',
+    # Reconciliation
+    'hl_reconcile':   'hl_reconcile',
+}
+
+# Category-level WR thresholds → multiplier
+def _wr_to_multiplier(wr: float) -> float:
+    if wr is None:
+        return 1.0  # neutral when no data
+    if wr >= 55.0:
+        return 1.5
+    elif wr >= 45.0:
+        return 1.25
+    elif wr >= 40.0:
+        return 0.75
+    else:
+        return 0.0  # disable — losing signal type
+
+
+def get_signal_type_stats(conn=None) -> dict:
+    """
+    Query signal_outcomes for per-signal-type win rate stats.
+    Returns dict: {signal_type: {n, wins, wr, avg_pnl, category, multiplier}}
+    """
+    import sqlite3, os
+    if conn is None:
+        db = '/root/.hermes/data/signals_hermes_runtime.db'
+        conn = sqlite3.connect(db, timeout=5)
+    c = conn.cursor()
+    c.execute("""
+        SELECT signal_type, COUNT(*) as n,
+               SUM(is_win) as wins,
+               ROUND(100.0*SUM(is_win)/COUNT(*), 1) as wr,
+               ROUND(AVG(pnl_pct), 3) as avg_pnl
+        FROM signal_outcomes
+        GROUP BY signal_type
+        ORDER BY n DESC
+    """)
+    rows = c.fetchall()
+    stats = {}
+    for row in rows:
+        sig_type, n, wins, wr, avg_pnl = row
+        category = SIGNAL_TYPE_CATEGORY_MAP.get(sig_type, 'other')
+        multiplier = _wr_to_multiplier(wr) if n >= PERF_CAL_MIN_TRADES else None
+        stats[sig_type] = {
+            'n': n, 'wins': wins, 'wr': wr, 'avg_pnl': avg_pnl,
+            'category': category, 'multiplier': multiplier,
+            'calibrated': n >= PERF_CAL_MIN_TRADES
+        }
+    conn.close()
+    return stats
+
+
+def get_calibration_summary() -> str:
+    """Human-readable calibration report for all signal types with enough data."""
+    stats = get_signal_type_stats()
+    lines = ['=== Signal Type Calibration Report ===']
+    lines.append(f'(min trades before calibration: {PERF_CAL_MIN_TRADES})')
+    lines.append(f'{"signal_type":35s} {"n":4s} {"WR%":6s} {"mult":5s} {"calibrated":9s}  category')
+    lines.append('-'*70)
+    for sig_type, s in sorted(stats.items(), key=lambda x: -x[1]['n']):
+        n = s['n']
+        wr = f"{s['wr']:.1f}%" if s['wr'] else 'N/A'
+        if s['calibrated']:
+            mult = f"{s['multiplier']:.2f}×"
+            cal = 'YES'
+        else:
+            mult = f"1.00×"  # neutral until enough data
+            cal = f"NO({n}/{PERF_CAL_MIN_TRADES})"
+        lines.append(f'{sig_type:35s} {n:4d} {wr:6s} {mult:5s} {cal:9s}  {s["category"]}')
+    return '\n'.join(lines)
+
+
+# Per-category aggregated stats (for SOURCE_WEIGHT_OVERRIDES auto-tuning)
+def get_category_multipliers() -> dict:
+    """
+    Aggregate per-signal-type stats into category multipliers.
+    Returns: {category: (multiplier, calibrated)}
+    """
+    stats = get_signal_type_stats()
+    # Group by category
+    cat_stats = {}
+    for sig_type, s in stats.items():
+        cat = s['category']
+        if cat not in cat_stats:
+            cat_stats[cat] = []
+        if s['calibrated']:
+            cat_stats[cat].append((s['wr'], s['n']))
+
+    # Compute weighted average WR per category
+    result = {}
+    for cat, samples in cat_stats.items():
+        total_n = sum(n for _, n in samples)
+        weighted_wr = sum(wr * n for wr, n in samples) / total_n if total_n > 0 else None
+        result[cat] = (_wr_to_multiplier(weighted_wr), True)
+
+    # Add uncalibrated categories with neutral weight
+    ALL_CATS = {'pattern_scanner', 'mtf_macd', 'hmacd-momentum', 'confluence', 'decider', 'speed-review', 'hl_reconcile', 'other'}
+    for cat in ALL_CATS:
+        if cat not in result:
+            result[cat] = (1.0, False)
+
+    return result
+
+
 def _get_source_weight(stype, source):
-    """Return confidence multiplier for (signal_type, source)."""
+    """
+    Return confidence multiplier for (signal_type, source).
+
+    Two-layer system:
+    1. Explicit SOURCE_WEIGHT_OVERRIDES (hardcoded baselines, e.g. patterns start at 1.25)
+    2. WR-based calibration from signal_outcomes — overrides baseline when enough data
+
+    Calibration rules (applied to ALL signal types after PERF_CAL_MIN_TRADES samples):
+      WR >= 55%  → 1.5×  (boost winning signals)
+      WR 45-55%  → 1.25× (keep baseline)
+      WR 40-45%  → 0.75× (suppress losing signals)
+      WR < 40%   → 0.0×  (disable — exclude from hot-set)
+    """
     if not source:
         return DEFAULT_SOURCE_WEIGHT
-    # Check explicit overrides first
+
+    # Layer 1: explicit overrides (pattern signals start at 1.25× baseline)
     for stype_pattern, source_prefix, weight in SOURCE_WEIGHT_OVERRIDES:
         if stype == stype_pattern and source.startswith(source_prefix):
-            return weight
-    # hmacd-* but not mtf_macd → penalize
-    if source.startswith('hmacd-'):
-        return SOURCE_WEIGHTS.get('hmacd-default', 0.6)
-    return DEFAULT_SOURCE_WEIGHT
+            base_weight = weight
+            break
+    else:
+        # hmacd-* but not mtf_macd → penalize baseline
+        if source.startswith('hmacd-'):
+            base_weight = SOURCE_WEIGHTS.get('hmacd-default', 0.6)
+        else:
+            base_weight = DEFAULT_SOURCE_WEIGHT
+
+    # Layer 2: WR-based calibration — override baseline if enough data
+    # Uses category-level calibration to smooth across related signal types
+    category = None
+    for sig_type, cat in SIGNAL_TYPE_CATEGORY_MAP.items():
+        if sig_type == stype or (source.startswith('pattern_') and cat == 'pattern_scanner'):
+            category = cat
+            break
+    if category is None:
+        category = 'other'
+
+    cat_mults = get_category_multipliers()
+    if category in cat_mults:
+        calibrated_mult, is_calibrated = cat_mults[category]
+        if is_calibrated and calibrated_mult != 1.0:
+            # Calibrated value overrides baseline
+            return calibrated_mult
+
+    return base_weight
 
 SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 AB_RESULTS_FILE = '/root/.hermes/data/ab-test-results.json'
@@ -718,6 +909,18 @@ def record_ab_trade_closed(coin, pnl_pct, pnl_usdt):
                     except Exception as e2:
                         log(f'record_ab_trade_closed DB error: {e2}', 'WARN')
 
+                # ── Also write to ab-tests.jsonl for the dashboard ─────────────
+                try:
+                    from ab_utils import record_ab_outcome
+                    record_ab_outcome(
+                        test_name,
+                        variant_id,
+                        "win" if is_win else "loss",
+                        metric_value=round(pnl_pct, 4)
+                    )
+                except Exception as ab_e:
+                    log(f'record_ab_trade_closed ab_utils error: {ab_e}', 'WARN')
+
                 break
 
         with open(AB_RESULTS_FILE, 'w') as f:
@@ -1149,18 +1352,21 @@ def get_pending_signals():
                               AND s2.executed=0
                               AND s2.review_count>=1
                               AND s2.created_at > datetime('now','-3 hours')
+                              AND s2.token NOT LIKE '@%'
                             ORDER BY s2.confidence DESC LIMIT 1) as signal_type,
                            MAX(confidence) as confidence,
                            MAX(compact_rounds) as compact_rounds,
                            MAX(survival_score) as survival_score,
                            MAX(z_score_tier) as z_score_tier,
                            MAX(z_score) as z_score,
-                           MAX(review_count) as review_count
+                           MAX(review_count) as review_count,
+                           MAX(updated_at) as last_seen
                     FROM signals
                     WHERE decision IN ('PENDING','APPROVED','WAIT')
                       AND executed = 0
                       AND review_count >= 1
                       AND created_at > datetime('now', '-3 hours')
+                      AND token NOT LIKE '@%'   -- FIX: exclude @XXX numeric coin IDs
                     GROUP BY token, direction
                     HAVING MAX(confidence) >= 70
                     ORDER BY MAX(survival_score) DESC, MAX(confidence) DESC
@@ -1180,6 +1386,10 @@ def get_pending_signals():
                 for r in hot_rows:
                     tkn = r[0]
                     direction = r[1]
+                    # SAFETY FILTER: skip @XXX numeric coin IDs (shouldn't reach here after
+                    # SQL filter, but defense-in-depth)
+                    if tkn.startswith('@'):
+                        continue
                     # SAFETY FILTER: never write blacklisted or Solana-only tokens to hotset.json
                     if direction.upper() == 'SHORT' and tkn in SHORT_BLACKLIST:
                         print(f"  🚫 [HOTSET-FILTER] {tkn}: SHORT blocked — in SHORT_BLACKLIST")
@@ -1190,9 +1400,13 @@ def get_pending_signals():
                     if is_solana_only(tkn):
                         print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — Solana-only (not on Hyperliquid)")
                         continue
+                    if is_delisted(tkn):
+                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted on Hyperliquid")
+                        continue
                     spd = _speed_cache.get(tkn, {})
                     conf = float(r[3]) if r[3] else 0.0
                     momentum = spd.get('momentum_score', 50.0)
+                    speed_pctl = spd.get('speed_percentile', 50.0)
                     # T's filters: skip if confidence < 70% OR momentum (speed) = 0%
                     if conf < 70.0:
                         print(f"  🚫 [HOTSET-FILTER] {tkn} {direction}: conf={conf:.0f}% — below 70% threshold")
@@ -1210,12 +1424,14 @@ def get_pending_signals():
                         'z_score_tier': r[6],
                         'z_score': r[7] if r[7] is not None else 0.0,
                         'review_count': r[8] or 0,
+                        'last_seen': r[9] or '',   # MAX(updated_at) from hotset query
                         # SPEED FEATURE (2026-04-03): wave-aware hot-set
                         'wave_phase':       spd.get('wave_phase', 'neutral'),
                         'is_overextended':  spd.get('is_overextended', False),
                         'price_acceleration': spd.get('price_acceleration', 0.0),
                         'price_velocity_5m':   spd.get('price_velocity_5m', 0.0),
                         'momentum_score':   momentum,
+                        'speed_percentile': speed_pctl,
                     })
                 # Cap at 20 tokens
                 if len(hotset) > 20:
@@ -1415,6 +1631,268 @@ def get_prediction(token):
     except Exception as e:
         log_error(f'get_prediction: {e}')
     return None
+
+
+def get_open_trade_details():
+    """Fetch open trades with entry price, direction, and SL info for batch review."""
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        # Get trade details including entry_price and SL if stored
+        cur.execute("""
+            SELECT token, direction, entry_price,
+                   COALESCE(stop_loss, 0) as stop_loss,
+                   COALESCE(current_price, entry_price) as current_price,
+                   status, pnl_pct, updated_at
+            FROM trades
+            WHERE status = 'open' AND server='Hermes'
+            ORDER BY opened_at DESC
+        """)
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [
+            {
+                'token': r[0],
+                'direction': r[1],
+                'entry': float(r[2]) if r[2] else 0,
+                'sl': float(r[3]) if r[3] else 0,
+                'current': float(r[4]) if r[4] else 0,
+                'pnl_pct': float(r[6]) if r[6] else 0,
+                'updated_at': r[7],
+            }
+            for r in rows
+        ]
+    except Exception as e:
+        log_error(f'get_open_trade_details: {e}')
+        return []
+
+
+def ai_decide_batch(signals, market_z, prices):
+    """Batch decision-maker: one Minimax call for ALL pending signals + open trade monitoring.
+
+    Args:
+        signals: list of pending signal dicts from get_pending_signals()
+        market_z: market z-score string
+        prices: dict of token -> current price
+
+    Returns:
+        dict: {f"{token}:{direction}": {'decision': 'long'/'short'/'wait', 'confidence': int, 'reason': str},
+               '_open_trades': [{'token': x, 'alert': 'SL_VIOLATION'/'HARD_SL'/'CLOSE', 'reason': str}, ...]}
+    """
+    import re as _re
+
+    open_trades = get_open_trade_details()
+    regime_cache = {s['token'].upper(): get_regime(s['token']) for s in signals}
+    fear_greed = get_fear()
+
+    # ── Build open trades section ────────────────────────────────────────────
+    open_trades_section = ""
+    if open_trades:
+        open_lines = ["=== OPEN TRADES (Monitor for SL violations) ==="]
+        for t in open_trades:
+            entry = t['entry']
+            current = t['current']
+            sl = t['sl']
+            direction = t['direction'].upper()
+            pnl = t['pnl_pct']
+
+            # Compute distance to SL
+            if entry > 0 and sl > 0:
+                if direction == 'LONG':
+                    dist_to_sl = (entry - sl) / entry * 100
+                    dist_pnl = (current - entry) / entry * 100
+                else:
+                    dist_to_sl = (sl - entry) / entry * 100
+                    dist_pnl = (entry - current) / entry * 100
+            else:
+                dist_to_sl = 0
+                dist_pnl = 0
+
+            open_lines.append(
+                f"- {t['token']} {direction}: entry=${entry:.4f}, current=${current:.4f}, "
+                f"SL=${sl:.4f} ({dist_to_sl:.1f}% away), PnL={pnl:+.2f}%"
+            )
+        open_trades_section = "\n".join(open_lines)
+    else:
+        open_trades_section = "=== OPEN TRADES: None ==="
+
+    # ── Build signals section ───────────────────────────────────────────────
+    if not signals:
+        signals_section = "=== PENDING SIGNALS: None ==="
+    else:
+        sig_lines = ["=== PENDING SIGNALS (approve/reject/close) ==="]
+        for i, s in enumerate(signals, 1):
+            token = s.get('token', '?')
+            direction = s.get('direction', 'long').upper()
+            conf = s.get('confidence', 0)
+            entry = s.get('entry', prices.get(token, 0)) or prices.get(token, 0)
+            regime_val, regime_conf = regime_cache.get(token.upper(), ('NEUTRAL', 0))
+            z_tier = s.get('z_score_tier', 'N/A')
+            z_val = s.get('z_score', 0)
+            source = s.get('source', 'unknown')
+            exchange = s.get('exchange', 'hyperliquid')
+
+            sig_lines.append(
+                f"[{i}] {token} | {direction} | conf={conf:.0f}% | entry=${entry:.4f} | "
+                f"regime={regime_val}({regime_conf}%) | z={z_tier}({z_val:+.2f}) | src={source}"
+            )
+        signals_section = "\n".join(sig_lines)
+
+    # ── Assemble batch prompt ─────────────────────────────────────────────────
+    prompt = f"""You are a crypto trading command center. Review ALL pending signals AND open trades in ONE pass.
+
+{open_trades_section}
+
+{signals_section}
+
+=== GLOBAL CONTEXT ===
+Market Z-Score: {market_z}
+Fear & Greed: {fear_greed}
+
+=== YOUR TASKS ===
+
+1. OPEN TRADES — Check each for:
+   - SL_VIOLATION: price has moved >80% of distance to SL (high risk)
+   - HARD_SL: price at or beyond SL level (CLOSE THE TRADE)
+   - REGIME_BREAK: market regime shifted against the trade direction
+   - HOLD: trade is fine
+
+2. PENDING SIGNALS — For each, decide:
+   - DECIDE: [TOKEN] [DIRECTION] [CONF] [REASON]
+   Example: DECIDE: BTC LONG 75 The momentum is bullish and aligned with regime
+   If you want to REJECT: DECIDE: BTC LONG 0 Low confidence and counter-regime
+
+=== HARD RULES ===
+- BLACKLISTED TOKENS for SHORT: SUI FET SPX ARK TON ONDO CRV RUNE AR NXPC DASH ARB TRUMP LDO NEAR APT CELO SEI ACE
+- DIRECTION BIAS: LONGS outperform SHORTS historically. When uncertain, favor LONG.
+- CONFIDENCE THRESHOLD: reject signals with raw confidence < 50% (always WAIT on low confidence)
+- EXECUTE thresholds: AI confidence ≥ 50% AND aligned with momentum → EXECUTE
+- Regime contradiction: if regime strongly opposes direction (conf>55%) → WAIT
+- HARD SL rule: NEVER let a losing trade run. If current price has crossed SL → CLOSE immediately
+
+=== OUTPUT FORMAT ===
+First, list each open trade action on its own line:
+  ACTION: [TOKEN] [CLOSE/SL_VIOLATION/HOLD] [REASON]
+
+Then list each signal decision:
+  DECIDE: [TOKEN] [LONG/SHORT/WAIT] [CONFIDENCE] [REASON]
+
+End with:
+  SUMMARY: [N] trades to close, [N] signals approved, [N] signals rejected
+"""
+
+    # ── Fire ONE Minimax call ─────────────────────────────────────────────────
+    try:
+        import os, json as _json
+        from openai import OpenAI as _OpenAI
+
+        _auth_path = '/root/.hermes/auth.json'
+        with open(_auth_path) as _f:
+            _auth = _json.load(_f)
+        _creds = (_auth.get('credential_pool', {}) or {}).get('minimax', [])
+        _token = _creds[0].get('access_token', '') if _creds else ''
+        if not _token:
+            raise RuntimeError("no minimax token")
+
+        if not _check_token_budget(6000):
+            print("[ai_decider-batch] Token budget exceeded, returning all WAIT")
+            _record_token_usage(0)  # record the call even though we skipped
+            log_event('BATCH_BUDGET_EXCEEDED', {'n_signals': len(signals)})
+            _result = {f"{s['token']}:{s['direction']}": {'decision': 'wait', 'confidence': 0, 'reason': 'budget_exceeded'}
+                       for s in signals}
+            _result['_open_trades'] = []
+            return _result
+
+        _client = _OpenAI(api_key=_token, base_url='https://api.minimax.io/v1')
+        _resp = _client.chat.completions.create(
+            model="MiniMax-M2",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=800
+        )
+        result = _resp.choices[0].message.content
+        # Record token usage
+        try:
+            _usage = _resp.usage
+            _out = getattr(_usage, 'completion_tokens', 0) or len(result.split()) * 1.3
+            _record_token_usage(int(3000 + _out))
+            log_event('API_CALL', {'tokens_used': int(3000 + _out), 'model': 'MiniMax-M2-batch'})
+        except Exception:
+            _record_token_usage(6000)
+            log_event('API_CALL', {'tokens_used': 6000, 'model': 'MiniMax-M2-batch'})
+
+    except Exception as _mm_err:
+        # QWEN IS OUT — no unsupervised decisions. Return all WAIT.
+        print(f"[ai_decider-batch] ⚠️ MINIMAX FAILED ({_mm_err}) — qwen fallback BLOCKED. All WAIT.")
+        _record_token_usage(0)  # record the failed API call attempt
+        log_event('MINIMAX_FAILED_BATCH', {
+            'error': str(_mm_err),
+            'n_signals': len(signals),
+            'n_open_trades': len(open_trades),
+            'action': 'BLOCKED_qwen-WAIT_all'
+        }, level='WARN')
+        # Telegram alert
+        try:
+            with open('/root/.hermes/auth.json') as _f:
+                _auth = _json.load(_f)
+            _telegram = (_auth.get('notifications', {}) or {}).get('telegram', {})
+            _tele_token = _telegram.get('bot_token', '')
+            _tele_chat = _telegram.get('chat_id', '')
+            if _tele_token and _tele_chat:
+                import urllib.request
+                _msg = urllib.parse.quote(
+                    f"⚠️ ai_decider BATCH MODE — MINIMAX DOWN\n"
+                    f"qwen blocked. {len(signals)} signals=WAIT, {len(open_trades)} open trades unmonitored.\n"
+                    f"Check Minimax API ASAP."
+                )
+                urllib.request.urlopen(
+                    f"https://api.telegram.org/bot{_tele_token}/sendMessage?chat_id={_tele_chat}&text={_msg}",
+                    timeout=5
+                )
+        except Exception:
+            pass
+        _result = {f"{s['token']}:{s['direction']}": {'decision': 'wait', 'confidence': 0, 'reason': 'minimax_failed'}
+                   for s in signals}
+        _result['_open_trades'] = []
+        return _result
+
+    # ── Parse batch response ─────────────────────────────────────────────────
+    decisions = {}
+    open_trade_alerts = []
+
+    lines = result.split('\n')
+    for line in lines:
+        line = line.strip()
+        # Open trade actions
+        if line.startswith('ACTION:'):
+            parts = line.split(None, 3)
+            if len(parts) >= 3:
+                token = parts[1]
+                action = parts[2].upper()
+                reason = parts[3] if len(parts) > 3 else ''
+                if action in ('CLOSE', 'SL_VIOLATION', 'HARD_SL'):
+                    open_trade_alerts.append({'token': token, 'alert': action, 'reason': reason})
+        # Signal decisions
+        elif line.startswith('DECIDE:'):
+            parts = line.split(None, 4)
+            if len(parts) >= 4:
+                token = parts[1]
+                direction = parts[2].upper()
+                try:
+                    confidence = int(min(100, max(0, float(parts[3]))))
+                except (ValueError, IndexError):
+                    confidence = 0
+                reason = parts[4] if len(parts) > 4 else ''
+                decisions[f"{token}:{direction}"] = {
+                    'decision': direction.lower() if direction in ('LONG', 'SHORT') else 'wait',
+                    'confidence': confidence,
+                    'reason': reason[:200]
+                }
+
+    decisions['_open_trades'] = open_trade_alerts
+    return decisions
+
 
 def get_prices():
     try:
@@ -1673,18 +2151,33 @@ REASON: [1-sentence explanation]
                 _record_token_usage(4000)  # fallback estimate
                 log_event('API_CALL', {'tokens_used': 4000, 'model': 'MiniMax-M2'})
         except Exception as _mm_err:
-            # Fallback to Ollama
-            _pl = {"model": "qwen2.5:1.5b", "prompt": prompt, "stream": False}
-            _r = requests.post("http://localhost:11434/api/generate", json=_pl, timeout=60)
-            result = _r.json().get("response", "")
-            print(f"[ai_decider] minimax failed ({_mm_err}), fell back to Ollama")
-            # Record Ollama fallback usage (cheaper model, fewer tokens)
+            # QWEN IS OUT — no unsupervised decisions. Return WAIT and alert.
+            print(f"[ai_decider] ⚠️ MINIMAX FAILED ({_mm_err}) — qwen fallback BLOCKED. Returning WAIT.")
+            log_event('MINIMAX_FAILED', {
+                'error': str(_mm_err),
+                'coin': coin,
+                'direction': direction,
+                'action': 'BLOCKED_qwen_fallback-WAIT_returned'
+            }, level='WARN')
+            # Send Telegram alert if configured
             try:
-                _ollama_tokens = int(2000 + len(result.split()) * 1.3)
-                _record_token_usage(_ollama_tokens)
-                log_event('API_CALL', {'tokens_used': _ollama_tokens, 'model': 'Ollama-qwen2.5:1.5b'})
+                import os, json as _json
+                _auth_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'auth.json')
+                with open(_auth_path) as _f:
+                    _auth = _json.load(_f)
+                _telegram = (_auth.get('notifications', {}) or {}).get('telegram', {})
+                _token = _telegram.get('bot_token')
+                _chat_id = _telegram.get('chat_id')
+                if _token and _chat_id:
+                    import urllib.request
+                    _msg = urllib.parse.quote(f"⚠️ ai_decider MINIMAX DOWN — qwen fallback blocked. {coin} {direction} = WAIT. Check Minimax API.")
+                    urllib.request.urlopen(
+                        f"https://api.telegram.org/bot{_token}/sendMessage?chat_id={_chat_id}&text={_msg}",
+                        timeout=5
+                    )
             except Exception:
-                pass
+                pass  # Never crash on alert failure
+            return "wait", 0, "minimax_failed-blocked-qwen"
         
         # Parse response
         decision = "WAIT"
@@ -1740,6 +2233,95 @@ if __name__ == '__main__':
 
     # Load hot set rounds and apply flip detection BEFORE reviewing signals
     _load_hot_rounds()
+
+    # ── W&B Decision Audit Logging ─────────────────────────────────────────────
+    _wandb_run = None
+    _wandb_cycle = 0
+    _pending_before = len(pending)  # capture once at top of run
+    _n_pattern_signals = sum(1 for s in pending if s.get('signal_type', '').startswith('pattern_'))
+
+    def _log_wandb(decision, token, direction, confidence, is_hot, is_pattern, reason=''):
+        """Log a hot-set decision to W&B."""
+        global _wandb_cycle
+        if not _wandb_available or _wandb_run is None:
+            return
+        _wandb_cycle += 1
+        # Per-token speed percentile (best-effort)
+        spd_pct = 50.0
+        if speed_tracker_ai is not None:
+            try:
+                spd = speed_tracker_ai().get_token_speed(token)
+                if spd:
+                    spd_pct = spd.get('speed_percentile', 50.0)
+            except Exception:
+                pass
+        # Regime at decision time
+        regime_val = 'NEUTRAL'
+        try:
+            regime_val, _ = get_regime(token)
+        except Exception:
+            pass
+        wandb.log({
+            'timestamp': datetime.utcnow().isoformat(),
+            'cycle': _wandb_cycle,
+            'regime': regime_val,
+            'hotset_size': _pending_before,
+            'top_token': token,
+            'direction': direction.upper(),
+            'top_score': confidence,
+            'decision': decision.upper(),
+            'is_hot_auto': is_hot,
+            'is_pattern': is_pattern,
+            'speed_percentile': spd_pct,
+            'n_signals_total': _pending_before,
+            'n_pattern_signals': _n_pattern_signals,
+            'reason': str(reason)[:200],
+        }, step=_wandb_cycle)
+        # Local JSON backup — always saved regardless of W&B sync
+        try:
+            import json, os
+            os.makedirs('/root/.hermes/wandb-local', exist_ok=True)
+            with open('/root/.hermes/wandb-local/decisions.jsonl', 'a') as f:
+                f.write(json.dumps({
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'cycle': _wandb_cycle,
+                    'regime': regime_val,
+                    'hotset_size': _pending_before,
+                    'top_token': token,
+                    'direction': direction.upper(),
+                    'top_score': confidence,
+                    'decision': decision.upper(),
+                    'is_hot_auto': is_hot,
+                    'is_pattern': is_pattern,
+                    'speed_percentile': spd_pct,
+                    'n_signals_total': _pending_before,
+                    'n_pattern_signals': _n_pattern_signals,
+                    'reason': str(reason)[:200],
+                }) + '\n')
+        except Exception:
+            pass
+
+    if _wandb_available:
+        try:
+            _wandb_run = wandb.init(
+                project='hermes-ai',
+                name=datetime.utcnow().strftime('%Y-%m-%d-%H%M%S'),
+                mode='offline',
+                config={
+                    'min_trades': PERF_CAL_MIN_TRADES,
+                    'perf_cal_min': PERF_CAL_MIN_TRADES,
+                    'perf_cal_max': PERF_CAL_MAX_WEIGHT,
+                    'daily_token_budget': _DAILY_TOKEN_BUDGET,
+                    'max_open': MAX_OPEN,
+                    'exempt_confidence': 85,
+                    'purge_threshold': 5,
+                },
+                settings=wandb.Settings(anonymous='allow'),
+            )
+            print(f"[wandb] Decision audit logging started: {_wandb_run.url if hasattr(_wandb_run, 'url') else 'run-id'}")
+        except Exception as e:
+            print(f"[wandb] Init failed: {e}")
+            _wandb_run = None
 
     # ── DE-ESCALATION PROTOCOL (2026-04-02) ─────────────────────────────────────
     # Hot set signals can get stuck in APPROVED but never executed (positions full,
@@ -1853,6 +2435,23 @@ if __name__ == '__main__':
     update_trade_prices()  # Update current_price for all open trades
     print(f"Market: Z-Score={market_z}, BTC=${prices.get('BTC','N/A')}")
 
+    # ── BATCH MODE: one Minimax call for ALL signals + open trade monitoring ──
+    # Only call if there are non-hot signals to review (hot signals auto-approve)
+    non_hot_signals = [s for s in pending
+                       if s.get('token', '').upper() not in _hot_rounds
+                       or _hot_rounds.get(s.get('token', '').upper(), {}).get('rounds', 0) < 1]
+    if non_hot_signals:
+        print(f"[batch] Sending {len(non_hot_signals)} signals + open trades to Minimax in ONE call...")
+        batch_decisions = ai_decide_batch(non_hot_signals, market_z, prices)
+        # Log open trade alerts if any
+        open_alerts = batch_decisions.get('_open_trades', [])
+        if open_alerts:
+            for alert in open_alerts:
+                print(f"  🚨 OPEN TRADE ALERT: {alert['token']} → {alert['alert']}: {alert['reason']}")
+                log_event('OPEN_TRADE_ALERT', alert, level='WARN')
+    else:
+        batch_decisions = {}
+
     processed_this_run = set()  # token+direction already reviewed this run
 
     for s in pending:
@@ -1883,12 +2482,18 @@ if __name__ == '__main__':
             print(f"   🚫 {t}: BLACKLISTED - skipping SHORT completely (0-20% WR historically)")
             log_signal(t, direction, entry, s.get('confidence', 0), f"SKIPPED-blacklist-{exchange}")
             mark_signal_processed(t, 'SKIPPED', decision_reason=f'blacklist-short-{exchange}')
+            _log_wandb('SKIPPED', t, direction, conf, False,
+                       s.get('signal_type', '').startswith('pattern_'),
+                       'blacklist-short')
             continue
     
         if direction.lower() == "long" and t.upper() in LONG_BLACKLIST:
             print(f"   🚫 {t}: BLACKLISTED - skipping LONG (poor performance)")
             log_signal(t, direction, entry, s.get("confidence", 0), f"SKIPPED-blacklist-{exchange}")
             mark_signal_processed(t, 'SKIPPED', decision_reason=f'blacklist-long')
+            _log_wandb('SKIPPED', t, direction, conf, False,
+                       s.get('signal_type', '').startswith('pattern_'),
+                       'blacklist-long')
             continue
 
         # FIX (2026-04-02): Block STABLE/STBL tokens. These are illiquid, error-prone
@@ -1896,8 +2501,11 @@ if __name__ == '__main__':
         # STABLE incident: confluence 99% signal, wrong direction, cascade massacre.
         if t.upper() in ('STABLE', 'STBL'):
             print(f"   🚫 {t}: BLOCKED — illiquid/non-standard token (2026-04-02 incident)")
-            log_signal(t, direction, entry, s.get("confidence", 0), "SKIPPED-stable-block")
+            log_signal(t, direction, entry, s.get('confidence', 0), "SKIPPED-stable-block")
             mark_signal_processed(t, 'SKIPPED', decision_reason='blocked-illiquid-token')
+            _log_wandb('SKIPPED', t, direction, conf, False,
+                       s.get('signal_type', '').startswith('pattern_'),
+                       'stable-block')
             continue
 
         # FIX (2026-04-05): Solana-only tokens (Raydium) are NOT tradeable on Hyperliquid.
@@ -1908,6 +2516,9 @@ if __name__ == '__main__':
             print(f"   🚫 {t}: BLOCKED — Solana-only token (not on Hyperliquid)")
             log_signal(t, direction, entry, s.get('confidence', 0), f"SKIPPED-solana-only-{exchange}")
             mark_signal_processed(t, 'SKIPPED', decision_reason=f'solana-only-{exchange}')
+            _log_wandb('SKIPPED', t, direction, conf, False,
+                       s.get('signal_type', '').startswith('pattern_'),
+                       'solana-only')
             continue
 
         # Check open PAPER slots only — live HL trades should not block paper trading.
@@ -1915,6 +2526,9 @@ if __name__ == '__main__':
         if get_open() >= MAX_OPEN:
             print(f"⏸️ {t}: max paper trades reached ({get_open()}/{MAX_OPEN})")
             log_signal(t, direction, entry, conf, f"SKIPPED-max-{exchange}")
+            _log_wandb('SKIPPED', t, direction, conf, False,
+                       s.get('signal_type', '').startswith('pattern_'),
+                       'max-open-slots')
             continue
         # ── Hot set: r1+ auto-approval ──────────────────────────────────────────
         hot = _hot_rounds.get(t.upper())
@@ -1936,6 +2550,9 @@ if __name__ == '__main__':
                 log_signal(t, direction, entry, conf, f"hot-gate-fail-{exchange}")
                 mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-quality-gate')
                 processed_this_run.add(key)
+                _log_wandb('HOT_SKIPPED', t, direction, avg_conf, True,
+                           (hot.get('source') or '').startswith('pattern_scanner'),
+                           f'hot-quality-gate-types{num_types}-conf{avg_conf_str}')
                 continue
 
             if is_token_open(t):
@@ -1943,6 +2560,9 @@ if __name__ == '__main__':
                 log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
                 mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-position-open')
                 processed_this_run.add(key)
+                _log_wandb('HOT_SKIPPED', t, direction, avg_conf, True,
+                           (hot.get('source') or '').startswith('pattern_scanner'),
+                           'hot-position-open')
                 continue
 
             # Blacklist double-check
@@ -1951,6 +2571,9 @@ if __name__ == '__main__':
                 log_signal(t, direction, entry, conf, f"SKIPPED-blacklist-{exchange}")
                 mark_signal_processed(t, 'SKIPPED', hot.get('signal_ids'), decision_reason='hot-set-blacklist')
                 processed_this_run.add(key)
+                _log_wandb('HOT_SKIPPED', t, direction, avg_conf, True,
+                           (hot.get('source') or '').startswith('pattern_scanner'),
+                           'hot-blacklist')
                 continue
 
             # Targeted update: only specific signal IDs
@@ -1966,6 +2589,9 @@ if __name__ == '__main__':
                       f"conf={final_conf}% (+{hot_bonus}% hot +{diversity_bonus}% diversity, "
                       f"types={num_types}, avg={avg_conf:.0f}%)")
                 log_signal(t, direction, entry, final_conf, f"hot-set-r{hot['rounds']}-{exchange}")
+                _log_wandb('HOT_APPROVED', t, direction, final_conf, True,
+                           t.upper().startswith('PATTERN_') or (hot.get('source') or '').startswith('pattern_'),
+                           f'hot-r{hot["rounds"]}-auto-approved')
             else:
                 print(f"   ❌🔥 HOT r{hot['rounds']} {t}: failed to record approval")
                 log_signal(t, direction, entry, conf, f"FAILED-hot-{exchange}")
@@ -2002,13 +2628,22 @@ if __name__ == '__main__':
         if z_tier:
             print(f"   📊 Z-Score Tier: {z_tier} (z={z:.2f})")
 
-        # All PENDING signals (65-94%) go to AI for review
-        print(f"\n🤔 AI reviewing: {t} {direction} @ ${entry} (signal confidence: {conf}%)")
-        macd_data = get_macd(t)
-        decision, ai_conf, reason = ai_decide(t, direction, entry, conf, prices, market_z, macd_data, pred_str, z_tier, z)
-    
-        print(f"   AI Decision: {decision.upper()} (conf: {ai_conf}%)")
-        print(f"   Reason: {reason[:100]}...")
+        # ── Use batch decision if available (single Minimax call for all non-hot signals) ──
+        batch_key = f"{t}:{direction.upper()}"
+        if batch_key in batch_decisions:
+            bd = batch_decisions[batch_key]
+            decision = bd['decision']
+            ai_conf = bd['confidence']
+            reason = bd.get('reason', 'batch-decision')
+            print(f"\n🤖 BATCH DECISION: {t} {direction} → {decision.upper()} (conf: {ai_conf}%)")
+            print(f"   Reason: {reason[:100]}...")
+        else:
+            # Fall back to individual call (hot signals, edge cases)
+            print(f"\n🤔 AI reviewing: {t} {direction} @ ${entry} (signal confidence: {conf}%)")
+            macd_data = get_macd(t)
+            decision, ai_conf, reason = ai_decide(t, direction, entry, conf, prices, market_z, macd_data, pred_str, z_tier, z)
+            print(f"   AI Decision: {decision.upper()} (conf: {ai_conf}%)")
+            print(f"   Reason: {reason[:100]}...")
     
         # Apply learned adjustments from past trades
         learned = get_learned_adjustments(t, direction)
@@ -2041,16 +2676,25 @@ if __name__ == '__main__':
                 print(f"   ⏸️ SKIPPED - No pump momentum (need >3% 24h + volume)")
                 log_signal(t, direction, entry, conf, f"SKIPPED-{exchange}")
                 mark_signal_processed(t, 'SKIPPED', decision_reason='no-pump-momentum')
+                _log_wandb('SKIPPED', t, direction, ai_conf, False,
+                           s.get('signal_type', '').startswith('pattern_'),
+                           'no-pump-momentum')
             elif is_token_open(t):
                 print(f"   ⏸️ SKIPPED - {t} already has open position")
                 log_signal(t, direction, entry, conf, f"SKIPPED-open-{exchange}")
                 mark_signal_processed(t, 'SKIPPED', decision_reason='position-already-open')
+                _log_wandb('SKIPPED', t, direction, ai_conf, False,
+                           s.get('signal_type', '').startswith('pattern_'),
+                           'position-already-open')
             else:
                 # Record approval
                 ok = mark_signal_processed(t, 'APPROVED')
                 if ok:
                     print(f"   ✅ APPROVED: {t} {decision.upper()} — decider-run will execute")
                     log_signal(t, decision, entry, ai_conf, exchange)
+                    _log_wandb('APPROVED', t, direction, ai_conf, False,
+                               s.get('signal_type', '').startswith('pattern_'),
+                               f'ai-reviewed-{reason[:80]}')
                 else:
                     print(f"   ❌ Failed to record approval")
                     log_signal(t, decision, entry, ai_conf, f"FAILED-{exchange}")
@@ -2059,6 +2703,9 @@ if __name__ == '__main__':
             print(f"   ⏸️ AI said WAIT")
             log_signal(t, direction, entry, ai_conf, f"WAIT-{exchange}")
             mark_signal_processed(t, 'WAIT', decision_reason=f'ai-wait-{decision}')
+            _log_wandb('WAIT', t, direction, ai_conf, False,
+                       s.get('signal_type', '').startswith('pattern_'),
+                       f'ai-wait-{reason[:80]}')
 
 
     # ── Pipeline heartbeat ─────────────────────────────────────────────────────────
@@ -2083,6 +2730,14 @@ if __name__ == '__main__':
 
     # Pipeline heartbeat
     _update_heartbeat_ai('ai_decider')
+
+    # W&B: close run
+    if _wandb_available and _wandb_run is not None:
+        try:
+            wandb.finish()
+            print(f"[wandb] Decision audit run finished ({_wandb_cycle} cycles logged)")
+        except Exception as e:
+            print(f"[wandb] finish error: {e}")
 
     # Release lock
     release_lock()

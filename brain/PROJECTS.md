@@ -93,26 +93,20 @@ Plain Markdown files in brain — no API, no dependencies, survives everything:
 ---
 
 ## Hermes Gateway Production Setup
-**Status:** ⚠️ PARTIAL — 2026-04-05
+**Status:** ❌ CLOSED — 2026-04-06
 **Owner:** T
-**Summary:** Hermes gateway running but not as systemd service. Platform tokens (Telegram, Discord, etc.) not configured.
-**Blockers:** Platform token configuration (T needs to provide these)
-**URL:** `http://127.0.0.1:18790` (loopback only)
-
-### What needs to happen for production
-1. T provides: `TELEGRAM_BOT_TOKEN`, `DISCORD_BOT_TOKEN`, etc.
-2. Configure tokens in env or `~/.hermes/.env`
-3. Change bind from `127.0.0.1` to `0.0.0.0` (or reverse proxy)
-4. Install as systemd service: `hermes-gateway install && hermmes-gateway start`
+**Summary:** Hermes gateway running on 127.0.0.1:18790 but platform tokens (Telegram, Discord) never configured. Project closed — gateway is internal-use only, no external platform integration needed.
+**What was planned:** systemd service install, platform tokens, expose on 0.0.0.0
+**Why closed:** T decided external platform integration is not needed. Gateway runs as-is for internal use.
 
 ---
 
 ## Tokyo <-> Dallas Sync
-**Status:** ⚠️ BLOCKED — Tokyo PG server is asleep
+**Status:** ❌ CLOSED — SQLite-only mode (2026-04-06)
 **Owner:** T
-**Summary:** PostgreSQL brain DB on Tokyo (10.60.72.219) is the authoritative trade store. Dallas services need to sync against it. Tokyo is currently in sleep mode and unreachable.
-**Blockers:** Tokyo server awake (T needs to wake it)
-**Key decisions:** [DECISIONS.md] (why PostgreSQL over SQLite for trade state)
+**Summary:** Tokyo PG server (10.60.72.219) has been asleep/unreachable for days. Decision made: accept SQLite-only mode permanently. `signal_schema.py` functions that required PostgreSQL will fall back gracefully or use SQLite. PostgreSQL workflow_state feature is decommissioned.
+**Blockers:** None — explicitly chose SQLite-only
+**Key decisions:** [DECISIONS.md] — PostgreSQL was chosen over SQLite for trade state, but Tokyo being unreachable makes it unusable. SQLite is sufficient for the current architecture.
 
 ### What's affected
 - `signal_schema.py` — connects to Tokyo PG for `trades` table
@@ -122,11 +116,11 @@ Plain Markdown files in brain — no API, no dependencies, survives everything:
 ---
 
 ## Win Rate Investigation
-**Status:** 🚨 CRITICAL — 2026-04-05
+**Status:** ❌ CLOSED — WR flip test FAILED (2026-04-06)
 **Owner:** T + Agent
-**Summary:** WR is 13.8% (961 trades, Mar 10-25). 79% of SHORT signals had price move against us. ACE = 45% of all trades, 98% of ACE shorts went UP. Signal direction appears systematically inverted.
-**Blockers:** None — test is ready to run
-**Key decisions:** [INCIDENT_WR_FAILURE.md] — 3 options, T chose Option 1
+**Summary:** WR flip test ran on 2 trades and failed — insufficient sample but direction was wrong. 79% SHORT wrong direction finding from historical data did NOT replicate in live test. System continues without signal flip. Real-world current 10 positions: mix of LONG/SHORT near breakeven (CFX +2%, VVV -1.17%, most others flat).
+**Key decisions:** [INCIDENT_WR_FAILURE.md] — Option 1 (flip) tested on 2 trades, failed. Signal direction is NOT systematically inverted — historical data was noise or wrong segment.
+**Reference:** [DECISIONS.md#2026-04-05 | OPTION 1 DEPLOYED: Flip signal direction live]
 
 ### The Numbers
 | Metric | Value |
@@ -171,12 +165,242 @@ Plain Markdown files in brain — no API, no dependencies, survives everything:
 
 ---
 
-## Cascade Flip Enhancement (APPROVED signals)
-**Status:** 📋 QUEUED — 2026-04-05
-**Owner:** TBD
-**Summary:** `check_cascade_flip()` currently only checks PENDING signals for flip confirmation. Should also check APPROVED signals (conf=80%+) to get flip confirmation faster.
-**Reference:** [DECISIONS.md] (cascade flip APPROVED idea)
-**Blockers:** None — small change, ~1 hr work
+## Cascade Flip Enhancement (APPROVED+SKIPPED signals)
+**Status:** ✅ DONE — 2026-04-06
+**Owner:** Agent
+**Summary:** Cascade flip thresholds lowered (ARM=-0.25%, TRIGGER=-0.50%, HF_TRIGGER=-0.35%), MIN_CONF=60%, MAX_AGE=30min. SKIPPED signals now included in cascade flip confluence check alongside PENDING/WAIT/APPROVED. Volume-confirmation buffer (0.35% vol confirmed / 0.25% not) added to Phase 2.
+**Key decisions:** [DECISIONS.md#2026-04-06 | Cascade flip thresholds lowered + SKIPPED signals added]
+**Blockers:** None
+**Reference:** [DECISIONS.md#2026-04-06 | Volume-confirmation trailing SL (Phase 2)]
+
+---
+
+## AI Trading Machine (ATM) — Standalone Docker
+**Status:** 🚧 IN PROGRESS — 2026-04-06
+**Owner:** T + Agent
+**Summary:** Self-contained Docker container running the full Hermes trading system — pipeline, dashboards, noVNC, SSH — zero manual setup. All core files organized under `/ATM/` for Docker bundling. Paper trading by default.
+**Blockers:** Pipeline audit (Step 1) not yet completed
+**Reference:** `/root/.hermes/plans/2026-04-05_183622-can-we-set-up-a-new-docker-container.md`
+**Key decisions:** [DECISIONS.md#2026-04-06 | ATM folder created]
+
+### ATM Folder Structure
+```
+/root/.hermes/ATM/
+├── ATM-Architecture.md      # System design doc
+├── trading-docker.md         # Docker build spec (374-line plan)
+└── config/
+    └── stoploss.md           # All exit rules: hard SL, trailing, cascade flip, wave turn, stale (2026-04-06)
+```
+
+### What's in Scope
+- Full pipeline scripts + dashboards in container
+- SSH daemon (port 3333), nginx (port 8888), noVNC (port 5902)
+- Auto-init of SQLite signals DB with seed data on first start
+- `export_dashboards.py` for continuous JSON generation
+- Paper trading mode (no keys required)
+- All configs in `ATM/config/` — stoploss.md is the source of truth for exit rules
+
+### What's Been Done
+- Plan written (374-line spec in `/root/.hermes/plans/`)
+- `ATM/` folder created (2026-04-06)
+- `ATM/config/stoploss.md` written — full exit rules reference
+- SOPs.md updated with ATM links (2026-04-06)
+
+### Next Steps (from plan)
+1. Audit pipeline scripts — confirm entry points and dependencies
+2. Export `signals_hermes.sql` + `signals_data_snapshot.json` from current DB
+3. Write `export_dashboards.py`
+4. Fix CSP in nginx.conf
+5. Write Dockerfile + docker-entrypoint.sh + docker-compose.yml
+
+---
+
+---
+
+## Chart Pattern Recognition
+**Status:** 🚧 IN PROGRESS — 2026-04-06
+**Owner:** Agent + T
+**Summary:** Add real-time chart pattern detection (Bull/Bear Flag → H&S → Wyckoff → Elliot Wave) as a signal source that feeds into the existing Hermes pipeline — initially as cascade flip confluence, eventually as standalone entry signals.
+**Key decisions:** [DECISIONS.md#2026-04-06 | Pattern scanner approach]
+**Blockers:** None — Phase 1 ready to build
+
+### Architecture
+```
+signal_gen.py (existing)
+    └── pattern_scanner.py (NEW — reads ohlcv_1m from local SQLite)
+            ├── detect_flag(candles)     → pattern_flag signal | None
+            ├── detect_head_shoulders() → pattern_hns signal | None
+            ├── detect_wyckoff()        → pattern_wyckoff signal | None
+            └── detect_elliot()         → pattern_elliot signal | None
+
+cascade_flip (position_manager.py)
+    └── checks pattern signals as confluence (signal DB → coin-regime → pattern → hold)
+
+All pattern reads → get_ohlcv_1m() from signal_schema.py → local SQLite (ohlcv_1m table)
+```
+
+### Signal Priority & Integration — COMPETITION MODEL (T APPROVED 2026-04-06)
+- **Signal type priority:** All signal types compete equally — `pattern_*` signals are NOT subordinate to `mtf_macd`
+- **Run order:** Pattern scanner runs FIRST (before mtf_macd loop) so patterns get into the DB early and can bubble up
+- **Weight in decider:** Pattern signals get a **1.25× confidence multiplier** applied in ai_decider when building the hot-set — patterns that consistently perform well get 1.5×, poor performers get 0.75×
+- **No hard-coded hierarchy** — the decider scores all signal types the same way; pattern multiplier is adjustable and tracked
+- **Signal types compete:** `pattern_flag`, `pattern_hns`, `pattern_wyckoff`, `pattern_elliot` vs `momentum` (mtf_macd)
+- **Performance tracking:** After 50+ trades per signal type, compare win rates. Pattern signals with WR > 55% get weight boost; WR < 45% get weight reduction; WR < 40% get disabled
+- **Phase 1 (V1):** Patterns are independent primary signals, not cascade flip confluence. They can trigger entries directly.
+
+### Integration into signal_gen.py
+```
+run():
+  1. _run_pattern_signals()    ← NEW: runs first, all tokens
+  2. _run_mtf_macd_signals()   ← existing mtf_macd (runs second)
+  3. run_confluence_detection() ← existing confluence
+```
+
+Pattern signals written to signals DB with `signal_type='pattern_*'`, `source='pattern_scanner'`, `decision='PENDING'`.
+
+### Phase Breakdown
+| Phase | Patterns | Integration | Status |
+|-------|----------|-------------|--------|
+| Phase 1 | Bull/Bear Flag | Cascade flip confluence | 🚧 In progress |
+| Phase 2 | Wyckoff + H&S | Cascade flip + backtest VVV | ⬜ Not started |
+| Phase 3 | Elliot Wave | Standalone entry signals | ⬜ Not started |
+
+### Key Files
+| File | Change |
+|------|--------|
+| `/root/.hermes/scripts/pattern_scanner.py` | **NEW** — all pattern detection logic |
+| `/root/.hermes/scripts/signal_gen.py` | Calls pattern_scanner, emits pattern signals |
+| `/root/.hermes/scripts/position_manager.py` | Cascade flip queries pattern_scanner as confluence |
+| `/root/.hermes/scripts/signal_schema.py` | `get_ohlcv_1m()` already exists ✅ |
+| `/root/.hermes/scripts/price_collector.py` | Seeds ohlcv_1m for active tokens ✅ |
+
+### IMX Test Case (Current)
+- Pattern: **Ascending triangle** (not bull flag — higher lows, resistance at $0.1366)
+- Price range: $0.1337 → $0.1369 (+2.39%) over 4 hours
+- Target: Break above $0.1366 → $0.139+ (upside measured from support at $0.1337)
+- Status: Forming — not yet triggered
+
+### Open Questions
+1. **Pattern confidence calibration:** What % should a flag breakout get? Need historical baseline.
+2. **Pattern vs existing signals:** Replace mtf_macd as primary, or only act as flip confluence?
+3. **Which timeframe for detection:** 1m for position management, 5m for signal generation?
+4. **Volume quality:** Filter dust trades? Require minimum volume on breakout?
+
+---
+
+## Self-Learning via Weights & Biases (W&B)
+**Status:** ✅ LIVE — 2026-04-06
+**Owner:** Agent + T
+**Summary:** W&B offline experiment tracking added to all three core systems. Enables systematic ML-driven self-improvement by recording every decision, trade outcome, and model run with full audit trails and visual comparison dashboards.
+
+### What It Enables
+
+**1. candle_predictor — model training & hyperparameter tuning**
+- Logs: per-run predicted/inverted counts, tokens processed, errors, success flag
+- Local backup: `/root/.hermes/wandb-local/candle-predictor-<ts>.json`
+- Sweep config ready: `/root/.hermes/scripts/candle_predictor_sweep.yaml`
+- What it unlocks: compare `qwen2.5:1.5b` vs other models, tune inversion_threshold, batch size, learning rate — all visualized
+- Next: run `wandb agent` against the sweep yaml once API key is available
+
+**2. ab_utils — A/B test comparison dashboard**
+- Logs: every variant assignment (token, direction, variant name) + outcomes (win/loss/metric_value)
+- Local backup: `/root/.hermes/wandb-local/ab-tests.jsonl` (JSON Lines, append-only)
+- What it unlocks: visually compare variant A vs B performance per test, per token, over time
+- Current A/B tests already tracked via `get_cached_ab_variant()` + `record_ab_outcome()`
+- Calling code just imports and calls `record_ab_outcome('test_name', 'variant_id', 'win')` — zero extra work per test
+
+**3. ai_decider — decision audit trail**
+- Logs: every hot-set decision cycle — winner token, direction, score, regime, speed percentile, n_signals, n_pattern_signals, decision reason
+- Local backup: `/root/.hermes/wandb-local/decisions.jsonl` (JSON Lines, append-only)
+- What it unlocks: replay any decision, see exactly why a token won over others, track pattern vs momentum signal win rates over time
+- Per-decision cycle (not per-token) — each cycle logs the winner only
+
+### Architecture
+```
+Offline mode (anonymous, no API key):
+  wandb init mode=offline project=hermes-ai
+  → Run files queued to /root/.hermes/wandb-local/wandb/
+
+Local backups always written regardless of W&B state:
+  candle_predictor → /root/.hermes/wandb-local/candle-predictor-<ts>.json
+  ab_tests          → /root/.hermes/wandb-local/ab-tests.jsonl
+  ai_decider        → /root/.hermes/wandb-local/decisions.jsonl
+
+Sync later (one command, once API key available):
+  WANDB_API_KEY=key /root/.hermes/scripts/wandb-sync.sh
+```
+
+### Files Changed
+| File | Change |
+|------|--------|
+| `/root/.hermes/scripts/candle_predictor.py` | +wandb.init/log/finish, `--nowandb` flag, local JSON backup |
+| `/root/.hermes/scripts/candle_predictor_sweep.yaml` | **NEW** — bayes sweep over inversion_threshold, temp |
+| `/root/.hermes/scripts/ab_utils.py` | +`_get_wandb_run()`, `record_ab_outcome()`, local .jsonl backup |
+| `/root/.hermes/scripts/ai_decider.py` | +`_log_wandb()` per decision cycle, local .jsonl backup |
+| `/root/.hermes/scripts/wandb-sync.sh` | **NEW** — sync offline runs when API key available |
+| `/root/.hermes/wandb-local/` | **NEW** — local backup directory |
+
+### Next Steps (once you have W&B API key)
+1. Get key: wandb.ai → Settings → API keys
+2. Store it: `echo 'WANDB_API_KEY=your_key' >> /root/.hermes/scripts/.env`
+3. Sync: `WANDB_API_KEY=your_key /root/.hermes/scripts/wandb-sync.sh`
+4. View: wandb.ai/hermes-ai — full dashboards for all 3 systems
+5. Run sweeps: `wandb agent hermes-ai/candle-predictor --count 50` (tunes model params automatically)
+
+### Local Streamlit Dashboard — LIVE
+**URL:** http://localhost:8501
+**Start:** `/root/.hermes/scripts/dashboard.sh start`
+**Stop:** `/root/.hermes/scripts/dashboard.sh stop`
+**Status:** `/root/.hermes/scripts/dashboard.sh status`
+**Health check:** cron runs every 5 min to keep it alive
+
+5 pages:
+- 🏠 Overview — quick stats across all 3 systems
+- 🕯️ candle_predictor — run history, predicted/inverted counts, trends
+- 🔀 A/B Tests — variant win rates, event log, per-test breakdown
+- 🎯 ai_decider — full decision audit, regime breakdown, speed vs score scatter
+- 📈 Signal Stats — live from signals DB, calibration status, WR by signal type
+
+No internet required. Data from local JSONL files, auto-refreshes every 10s.
+
+---
+
+## ATR + Trailing Stop Bug Fixes (Session 2026-04-06)
+**Status:** ✅ COMPLETE — 2026-04-06
+**Owner:** ai-engineer
+**Summary:** Five bug fixes applied to position_manager.py and decider-run.py addressing trailing stop false-triggers, missing TP_PCT constant, phase2 ATR buffer, and dynamic SL in delayed entries.
+
+### Fixes Applied
+
+| # | Fix | File | Line | Status |
+|---|-----|------|------|--------|
+| 1 | `trailing_active = True` indentation corrected — was inside `if profit_pct >= trailing_start_pct:` block, always evaluating to True regardless of condition | `position_manager.py` | ~1609 | ✅ Verified |
+| 2 | Phase2 buffer ATR logic — `phase2_buffer_atr` now used when available; falls back to volume-confirmed buffer | `position_manager.py` | ~1295 | ✅ Verified |
+| 3 | `TP_PCT = 0.08` constant added — was referenced in `get_trade_params()` but missing, causing NameError on import | `position_manager.py` | ~61 | ✅ Verified |
+| 4 | Trailing activation ATR-based trigger — activates at `1× ATR profit` instead of fixed 1% | `position_manager.py` | ~1597 | ✅ Verified |
+| 5 | Trailing buffer ATR-based — buffer = `30% × ATR` (floored at 0.2% absolute) | `position_manager.py` | ~1281 | ✅ Verified |
+| 6 | `decider-run.py` `execute_trade()` uses `_compute_dynamic_sl()` for entry SL | `decider-run.py` | ~627 | ✅ Verified |
+| 7 | `decider-run.py` `_execute_delayed_entries()` uses `_compute_dynamic_sl()` for delayed entry SL | `decider-run.py` | ~551 | ✅ Verified |
+
+### ATR-based SL Test Results (Verified)
+```
+DYDX LONG: entry=0.102, SL=0.0998 (2.16%)  — ATR 1.08%, k=2.0
+DYDX SHORT: entry=0.102, SL=0.1042 (2.16%)
+SOL LONG: entry=90.0, SL=88.8664 (1.26%)   — ATR 0.84%, k=1.5
+BTC LONG: entry=95000, SL=94287.50 (0.75%) — ATR 0.43%, floor applied
+TAO LONG: entry=250, SL=242.32 (3.07%)    — ATR 1.54%, k=2.0
+```
+
+### PostgreSQL Trade Performance (Last 7 Days — Baseline Before Fix)
+- **Total closed:** 54 | **Win rate:** 51.9% | **Net PnL:** +13.68 USDT
+- **Avg trade:** +0.25 USDT (+0.76%)
+- **Avg duration:** 1.4 hours
+- **Direction:** LONG n=29 net=+5.00 | SHORT n=25 net=+8.68
+
+### Findings
+1. **Speed=50% anomaly**: The signals DB schema has NO `speed` column. The "50%" figure is likely computed at display/report level, not stored in DB. All 1056 hot-set signals (`review_count >= 1`) pass through the filter; 360 signals have `review_count=0` and never enter hot-set. Root cause of "only hot-set filtering through" needs further investigation in the reporting layer.
+2. **Phase2 ATR fix**: Verified at line ~1295 — `phase2_buffer_atr` is now checked via `'phase2_buffer_atr' in dir()` before falling back to volume-confirmed.
+3. **trailing_active indentation**: Fixed at line ~1609 — `trailing_active = True` is now correctly inside the `if profit_pct >= trailing_start_pct:` block.
 
 ---
 

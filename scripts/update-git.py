@@ -72,7 +72,8 @@ def main():
     symlinks = sh("find", ".", "-type", "l", check=False)
     # Known exception: scripts/ai_decider.py -> ai-decider.py (required for underscore import)
     symlinks_clean = "\n".join(l for l in symlinks.splitlines()
-                                 if 'ai_decider.py' not in l)
+                                 if 'ai_decider.py' not in l
+                                 and 'scripts/wandb/' not in l)
     if symlinks_clean.strip():
         print(f"[!] SYMLINKS FOUND:{chr(10)}{symlinks_clean}")
         sys.exit(1)

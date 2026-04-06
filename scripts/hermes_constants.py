@@ -95,6 +95,8 @@ LONG_BLACKLIST = {
     'REZ',      # LONG net: -$3.96 (2 losses: trailing_exit -$3.84, guardian_missing -$0.12)
     'XMR',      # LONG net: -$3.64 (1 loss: conf-1s -$3.64)
     'ZETA',     # LONG net: -$5.29 (1 loss: trailing_exit -$5.29)
+    # 2026-04-06: ME systematic LONG losses — 10 trades net -$2.77 (guardian_missing closes)
+    'ME',
 }
 BROAD_MARKET_TOKENS={'SOL', 'BTC'}
 

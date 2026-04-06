@@ -1,0 +1,27 @@
+# W&B Sweep configuration for candle_predictor hyperparameter tuning
+# Usage: wandb sweep /root/.hermes/scripts/candle_predictor_sweep.yaml
+# Then: wandb agent <entity>/candle-predictor/<sweep_id>
+
+project: candle-predictor
+entity: null  # Set your W&B team/username here
+
+method: bayes
+metric:
+  name: run_success
+  goal: maximize
+parameters:
+  model:
+    value: qwen2.5:1.5b
+  ollama_url:
+    value: http://127.0.0.1:11434/api/generate
+  top_tokens_count:
+    value: 25
+  inversion_threshold:
+    min: 0.30
+    max: 0.50
+  candle_minutes:
+    value: 240
+  # Temperature for LLM (future sweep target)
+  llm_temperature:
+    min: 0.1
+    max: 0.7
