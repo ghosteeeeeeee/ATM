@@ -64,10 +64,19 @@ MAX_LEVERAGE = 5
 
 # ─── Trailing Stop-Loss Config ─────────────────────────────────────────────────
 # Default fallback values (used when trade has no per-trade trailing settings)
-TRAILING_START_PCT_DEFAULT  = 0.01   # engage at +1% profit
-TRAILING_BUFFER_PCT_DEFAULT = 0.005  # keep 0.5% buffer above entry when first activated
-TRAILING_TIGHTEN = True     # tighten buffer as profit grows
+TRAILING_START_PCT_DEFAULT   = 0.01   # engage at +1% profit
+TRAILING_BUFFER_PCT_DEFAULT  = 0.003  # keep 0.3% buffer above entry when first activated (tightened 2026-04-05)
+TRAILING_PHASE2_BUFFER_DEFAULT = 0.002 # Phase 2: 0.2% buffer (floor — tightened 2026-04-05)
+# Volume-confirmed tightening: when candle volume > 24h MA in trade direction
+# LONG → buy volume > MA  |  SHORT → sell volume > MA
+# Gives more room on high-momentum moves, tighter on low-volume
+TRAILING_VOL_CONF_BUFFER   = 0.0035  # 0.35% buffer when volume confirms direction
+TRAILING_VOL_NO_CONF_BUFFER = 0.0025  # 0.25% buffer when volume is weak/absent
+TRAILING_VOL_LOOKBACK      = 24      # candles for volume MA
+TRAILING_TIGHTEN = True      # tighten buffer as profit grows
 TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
+VOLUME_CACHE_FILE  = '/var/www/hermes/data/volume_cache.json'
+VOLUME_CACHE_TTL  = 60       # seconds — one fetch per pipeline minute
 
 # ── Cascade Flip Config ──────────────────────────────────────────────────────
 # When an open position is losing AND an opposite signal fires with strong conf,
@@ -182,7 +191,7 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
                    pnl_pct, pnl_usdt, stop_loss, target, exchange,
                    open_time, close_time, status, signal, confidence,
                    leverage, paper, sl_distance, sl_group,
-                   trailing_activation, trailing_distance
+                   trailing_activation, trailing_distance, trailing_phase2_dist
             FROM trades
             WHERE status = 'open'
               AND server = %s
@@ -978,6 +987,100 @@ def _save_trailing_data(data: Dict) -> None:
         print(f"[Position Manager] Error saving trailing data: {e}")
 
 
+# ─── Volume Confirmation Cache (HL candles via ccxt) ────────────────────────────
+# One fetch per 60s — shared across all trades in the same pipeline run.
+
+def _load_volume_cache() -> dict:
+    """Load cached volume data. Returns {token: {ts, vol_last, vol_ma, confirmed}}"""
+    try:
+        if os.path.exists(VOLUME_CACHE_FILE):
+            with open(VOLUME_CACHE_FILE) as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+
+def _save_volume_cache(data: dict) -> None:
+    """Save volume cache to disk atomically."""
+    try:
+        os.makedirs(os.path.dirname(VOLUME_CACHE_FILE), exist_ok=True)
+        tmp = VOLUME_CACHE_FILE + f".{os.getpid()}.tmp"
+        with open(tmp, "w") as f:
+            json.dump(data, f, default=str)
+        os.replace(tmp, VOLUME_CACHE_FILE)
+    except Exception as e:
+        print(f"[Position Manager] _save_volume_cache error: {e}")
+
+
+def _fetch_volume_data(token: str) -> dict:
+    """
+    Fetch last 24h of 1h candles for token via ccxt+Hyperliquid.
+    Returns {vol_last, vol_ma, confirmed} or empty dict on failure.
+    Hard timeout of 5s — failures are silent (volume confirmation = False).
+    """
+    try:
+        import ccxt
+        import time as _time
+    except Exception:
+        return {}
+
+    try:
+        ex = ccxt.hyperliquid()
+        ex.http_timeout = 5  # hard cap — don't block the pipeline
+        # HL uses /USDC suffix for perps
+        symbol = f"{token.upper()}/USDC:USDC"
+        candles = ex.fetch_ohlcv(symbol, "1h", limit=TRAILING_VOL_LOOKBACK)
+        if not candles or len(candles) < 2:
+            return {}
+        # candles: [ts, open, high, low, close, volume]
+        vols = [float(c[5]) for c in candles]
+        vol_last = vols[-1]
+        vol_ma = sum(vols[:-1]) / len(vols[:-1])  # MA excluding current candle
+        return {
+            "vol_last": vol_last,
+            "vol_ma": vol_ma,
+            "confirmed": vol_last > vol_ma,
+            "ratio": round(vol_last / vol_ma, 2) if vol_ma > 0 else 0,
+            "ts": _time.time(),
+        }
+    except Exception:
+        # Fail silent — volume confirmation defaults to False (tighter SL)
+        return {}
+
+
+def get_volume_confirmation(token: str, direction: str) -> bool:
+    """
+    Returns True if the most recent candle volume confirms the trade direction:
+      LONG  → vol_last > vol_ma  (buy-side volume above average)
+      SHORT → vol_last > vol_ma  (sell-side volume above average)
+
+    Volume data is fetched ONCE per 60s and cached in VOLUME_CACHE_FILE.
+    All subsequent calls within the same cycle return the cached result.
+    """
+    import time as _time
+    data = _load_volume_cache()
+    now = _time.time()
+
+    # Cache hit — still fresh
+    if data.get(token) and (now - data[token].get("ts", 0)) < VOLUME_CACHE_TTL:
+        return data[token].get("confirmed", False)
+
+    # Cache miss — fetch fresh
+    fresh = _fetch_volume_data(token)
+    if not fresh:
+        return False  # Fail closed: no data = no relaxed buffer
+
+    data[token] = fresh
+    _save_volume_cache(data)
+    return fresh.get("confirmed", False)
+
+
+def has_volume_confirmation(token: str, direction: str) -> bool:
+    """Alias for get_volume_confirmation — volume confirms directional move."""
+    return get_volume_confirmation(token, direction)
+
+
 def is_trailing_active(trade_id: int) -> bool:
     """Check if trailing stop is active for a trade.
 
@@ -1053,7 +1156,7 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
         trailing_buffer = CASCADE_FLIP_POST_TRAIL_PCT  # 0.5% buffer — tight
         phase2_dist     = None   # Disable phase2 tightening for post-flip
     # Phase 2: tighter trailing once profit doubles from activation threshold
-    phase2_dist      = trade.get('trailingPhase2DistancePct')
+    phase2_dist      = trade.get('trailing_phase2_dist')  # DB column: trailing_phase2_dist
     phase2_threshold = trailing_start * 2  # phase2 activates at 2x activation profit
 
     # If not yet activated and profit < threshold → skip activation check
@@ -1078,11 +1181,23 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
             trade_data = data.get(str(trade_id), {})
 
     # Use phase 2 buffer if activated, otherwise phase 1
-    active_buffer = float(phase2_dist) if trade_data.get("phase2_activated") and phase2_dist else trailing_buffer
+    # If phase2 activated but per-trade phase2_dist is None, use global default
+    if trade_data.get("phase2_activated") and phase2_dist:
+        active_buffer = float(phase2_dist)
+    elif trade_data.get("phase2_activated"):
+        # Phase 2 base: looser when volume confirms direction, tighter when it doesn't
+        token = str(trade.get("token", "")).upper()
+        vol_confirmed = has_volume_confirmation(token, direction)
+        if vol_confirmed:
+            active_buffer = TRAILING_VOL_CONF_BUFFER   # 0.35% — room for high-momentum
+        else:
+            active_buffer = TRAILING_VOL_NO_CONF_BUFFER  # 0.25% — tighten on weak volume
+    else:
+        active_buffer = trailing_buffer
 
     # Calculate buffer — tighter floor, faster tighten as profit grows.
     # SHORT pnl is positive when in profit (entry > current).
-    # Formula: 0.5% at 5% pnl → 0.3% at 15% → 0.2% floor at 25%+.
+    # Formula: buffer% at 5% pnl → floor at 25%+.
     # Floor = 0.2% (2x max daily move for most alts, won't stop you out on noise).
     # Tighten rate: every 10% pnl reduces buffer by 0.1%.
     if TRAILING_TIGHTEN:
@@ -1282,6 +1397,38 @@ def refresh_current_prices(server: str = SERVER_NAME):
     return positions
 
 
+def _warmup_volume_cache_pm(tokens: List[str]):
+    """
+    Pre-fetch HL volume data for a list of tokens — non-blocking.
+    Reads existing cache, fetches only stale/missing entries (one HL call per token).
+    Each fetch has a 5s timeout — failures are silent, cache stays fresh for existing entries.
+    This is called at the START of check_and_manage_positions so the cache is warm
+    by the time we evaluate trailing SLs in the loop below.
+    """
+    if not tokens:
+        return
+    import threading, time as _time
+
+    def _fetch_one(token: str):
+        data = _fetch_volume_data(token)
+        if data:
+            cache = _load_volume_cache()
+            cache[token.upper()] = data
+            _save_volume_cache(cache)
+
+    cache = _load_volume_cache()
+    now = _time.time()
+    stale = [t.upper() for t in tokens
+             if t.upper() not in cache or (now - cache.get(t.upper(), {}).get("ts", 0)) >= VOLUME_CACHE_TTL]
+    if not stale:
+        return
+
+    # Fire one thread per stale token — threads die on timeout, no blocking
+    for token in stale:
+        t = threading.Thread(target=_fetch_one, args=(token,), daemon=True)
+        t.start()
+
+
 def check_and_manage_positions() -> Tuple[int, int, int]:
     """
     Called every pipeline run.
@@ -1298,6 +1445,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     Returns: (open_count, closed_count, adjusted_count)
     """
     positions = refresh_current_prices()
+
+    # ── Volume cache warm-up ──────────────────────────────────────────────
+    # Pre-fetch volume data for all open positions before trailing SL evaluation.
+    # Lazy-warms the cache so subsequent has_volume_confirmation() calls are instant.
+    _warmup_volume_cache_pm([p.get("token") for p in positions])
 
     # SPEED FEATURE: update speed tracker once per pipeline run (<2s)
     if SPEED_TRACKER is not None:

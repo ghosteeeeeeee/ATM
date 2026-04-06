@@ -1092,6 +1092,69 @@ def _check_counter_trend_trap(token: str, direction: str) -> tuple:
     return False, ''
 
 
+# ─── Volume Cache Warm-Up ────────────────────────────────────────────────────────
+def _warmup_volume_cache():
+    """
+    Pre-fetch HL volume data for all tokens with open positions.
+    Runs in a background thread — does NOT block decider-run pipeline.
+    Writes to the shared volume_cache.json so position_manager reads it
+    warm on the same pipeline cycle.
+    """
+    import threading
+
+    def _background_warmup():
+        try:
+            from position_manager import (
+                _fetch_volume_data, _load_volume_cache, _save_volume_cache,
+                VOLUME_CACHE_FILE, VOLUME_CACHE_TTL
+            )
+            import time as _time
+        except Exception as e:
+            print(f"[Volume Warmup] import failed: {e}")
+            return
+
+        try:
+            conn = psycopg2.connect(**BRAIN_DB_DICT)
+            cur = conn.cursor()
+            cur.execute("SELECT DISTINCT token FROM trades WHERE status = 'open' AND server = 'Hermes'")
+            open_tokens = [r[0].upper() for r in cur.fetchall()]
+            conn.close()
+        except Exception as e:
+            print(f"[Volume Warmup] failed to get open tokens: {e}")
+            return
+
+        if not open_tokens:
+            return
+
+        cache = _load_volume_cache()
+        now = _time.time()
+        fresh_tokens = [t for t in open_tokens
+                        if cache.get(t) and (now - cache[t].get("ts", 0)) < VOLUME_CACHE_TTL]
+        tokens_to_fetch = [t for t in open_tokens if t not in fresh_tokens]
+        if not tokens_to_fetch:
+            return  # all already fresh
+
+        fetched = errors = 0
+        for token in tokens_to_fetch:
+            try:
+                data = _fetch_volume_data(token)
+                if data:
+                    cache[token] = data
+                    fetched += 1
+                else:
+                    errors += 1
+            except Exception:
+                errors += 1
+
+        if cache:
+            _save_volume_cache(cache)
+        print(f"[Volume Warmup] {fetched} fetched, {errors} errors ({len(open_tokens)} open tokens)")
+
+    t = threading.Thread(target=_background_warmup, daemon=True)
+    t.start()
+    # Don't join — let it run in background while pipeline proceeds
+
+
 # ─── Main Run ────────────────────────────────────────────────────
 
 def run(dry_run=False):
@@ -1099,6 +1162,11 @@ def run(dry_run=False):
     mode = "LIVE" if not paper else "PAPER"
     log(f'=== Decider Run ({mode}) ===')
     init_db()
+
+    # ── Warm-up volume cache ────────────────────────────────────────────────
+    # Volume data is now seeded lazily inside position_manager on first call —
+    # the cache file is shared across both scripts so it's already warm by the
+    # time position_manager checks it. No blocking import or threading needed.
 
     # ── Checkpoint recovery ───────────────────────────────────────────────
     try:
