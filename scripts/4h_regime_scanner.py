@@ -175,11 +175,40 @@ def get_tokens_to_scan():
             pass
     
     # Always include focus tokens (they are valid crypto symbols)
-    focus_tokens = ['SOL', 'BTC', 'ETH', 'WIF', 'PEPE', 'VIRTUAL', 'FARTCOIN', 'MELANIA', 'POPCAT', 'GOAT']
+    # Expanded 2026-04-06: all tokens that have ever generated signals need regime data
+    focus_tokens = [
+        'SOL', 'BTC', 'ETH', 'WIF', 'PEPE', 'VIRTUAL', 'FARTCOIN', 'MELANIA', 'POPCAT', 'GOAT',
+        'AXS', 'TRB', 'SKY', 'VVV', 'ZORA', 'SAGA', 'GMX', 'ALGO', 'IOTA', 'TRX',
+        'HYPE', 'WCT', 'BONK', 'FWOG', 'CHILL', 'MUMU', 'PNUT', 'AERO',
+        'AEVO', 'ALT', 'APT', 'ARB', 'ATOM', 'AVAX', 'BLUR', 'BNB', 'CRV', 'DOGE',
+        'FIL', 'FTM', 'GRT', 'ICP', 'INJ', 'LDO', 'LINK', 'LTC', 'MATIC', 'NEAR', 'OP',
+        'ORDI', 'RENDER', 'RUNE', 'SAND', 'SEI', 'SHIB', 'SUI', 'TIA', 'TON', 'UNI',
+        'XRP', 'NIL', 'MOVE', 'IMX', 'ASTER', 'SOPH', 'GALA', 'MEW', 'MON', 'BIGTIME',
+    ]
     for t in focus_tokens:
         tokens.add(t)
     
-    return list(tokens)[:30]  # Limit to 30 tokens
+    # Also pull directly from the live signals SQLite DB — don't miss tokens only in DB
+    for sig_db in ['/root/.hermes/data/signals_hermes_runtime.db',
+                   '/root/.hermes/data/signals.db',
+                   '/root/.hermes/data/signals_hermes.db']:
+        try:
+            import sqlite3
+            sc = sqlite3.connect(sig_db)
+            cu = sc.cursor()
+            cu.execute("SELECT DISTINCT token FROM signals WHERE token NOT LIKE '@%' LIMIT 100")
+            for row in cu.fetchall():
+                if row[0]:
+                    tokens.add(row[0])
+            sc.close()
+        except Exception:
+            pass
+    
+    # Priority: focus_tokens first (high-value tokens we always want to scan),
+    # then open-trade tokens, then signal tokens. No artificial cap.
+    focus_set = set(focus_tokens)
+    priority_tokens = list(focus_set) + [t for t in tokens if t not in focus_set]
+    return priority_tokens
 
 def scan_token(token):
     """Scan a single token and return regime data"""

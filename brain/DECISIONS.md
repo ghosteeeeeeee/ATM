@@ -395,4 +395,21 @@
 
 ---
 
+---
+
+## 2026-04-06 | ai_decide_batch regime hard block + guardian orphan fix
+
+**Decisions:**
+1. `ai_decide_batch()` now applies regime hard block inline after parsing Minimax decisions. Previously only `ai_decide()` had it — batch mode bypassed it entirely.
+2. `hl-sync-guardian.py` Step8 now skips paper trades (`paper=True`) in orphan detection. Paper trades being absent from HL is expected behavior — they are never on HL.
+3. NEUTRAL regime with conf > 60% should be treated as a WAIT, not auto-execute.
+
+**Evidence:** SKY was SHORT @ LONG_BIAS@95% regime → executed anyway (batch bypassed regime block). VVV SHORT was wrong direction — VVV not in regime_4h.json or momentum_cache. Guardian was closing paper trades as "stale orphans."
+
+**Full post-mortems:** `tradingnotes.md`
+
+**Owner:** Agent
+
+---
+
 *Format: `## YYYY-MM-DD | Short title` — append new decisions to the top, above this line.*

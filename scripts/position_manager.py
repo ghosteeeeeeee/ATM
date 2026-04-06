@@ -92,7 +92,7 @@ VOLUME_CACHE_TTL  = 60       # seconds — one fetch per pipeline minute
 # BUG-8 fix: Push trailing SL updates to Hyperliquid.
 # The position_manager computes trailing SL and writes it to brain DB, but the
 # actual HL stop-loss order was never updated when trailing tightened.
-# We now push updated SL orders to HL when trailing tightens.
+# cascade flip: close the losing position AND enter the opposite direction.
 CASCADE_FLIP_ARM_LOSS        = -0.25  # System ARMED at this loss % (speed check activates)
 CASCADE_FLIP_TRIGGER_LOSS   = -0.50  # FLIP fires at this loss % (if armed + speed increasing)
 CASCADE_FLIP_HF_TRIGGER_LOSS = -0.35  # Fast flip: high-momentum tokens (speed pctl > 80)
@@ -102,6 +102,13 @@ CASCADE_FLIP_MIN_TYPES       = 1     # Opposite signal must have at least this m
 CASCADE_FLIP_MAX             = 3      # Max flips per token (permanent lockout after)
 CASCADE_FLIP_POST_TRAIL_PCT  = 0.5    # Post-flip trailing SL window (tight — 0.5%)
 FLIP_COUNTS_FILE            = '/var/www/hermes/data/flip_counts.json'
+
+# ── MACD-Triggered Cascade Flip ───────────────────────────────────────────────
+# Tokens where MACD 1H crossing under signal (while LONG) or crossing over (while SHORT)
+# triggers an immediate cascade flip — regardless of PnL.
+# These are tokens where we entered at a local peak and MACD confirms reversal.
+# Added 2026-04-06 based on TRB/IMX/SOPH/SCR post-mortems.
+MACD_CASCADE_FLIP_TOKENS = {'TRB', 'IMX', 'SOPH', 'SCR'}
 
 # ─── Cascade Flip Helpers ─────────────────────────────────────────────────────
 
@@ -124,6 +131,65 @@ def _save_flip_counts(counts: dict):
             json.dump(counts, f, indent=2)
     except Exception as e:
         print(f"  [Flip Count] ⚠️ Failed to persist flip counts: {e}")
+
+
+def _get_macd_1h_state(token: str) -> Optional[str]:
+    """
+    Compute MACD(12,26,9) on 1h candles from Binance public API.
+    Returns:
+      'cross_under' — MACD line crossed under signal line (bearish, flip LONG → SHORT)
+      'cross_over'  — MACD line crossed over signal line (bullish, flip SHORT → LONG)
+      'none'         — no crossover on the last 1h candle
+      None           — error fetching/computing
+    """
+    try:
+        import requests
+        # Fetch 40 × 1h candles (enough for MACD(12,26,9) to stabilize)
+        url = f"https://api.binance.com/api/v3/klines?symbol={token}USDT&interval=1h&limit=40"
+        resp = requests.get(url, timeout=10)
+        if resp.status_code != 200:
+            return None
+        klines = resp.json()
+        if len(klines) < 35:
+            return None
+
+        closes = [float(k[4]) for k in klines]  # close prices
+
+        def ema(data, period):
+            k = 2 / (period + 1)
+            ema_val = data[0]
+            for price in data[1:]:
+                ema_val = price * k + ema_val * (1 - k)
+            return ema_val
+
+        ema_12 = ema(closes, 12)
+        ema_26 = ema(closes, 26)
+        macd_line = ema_12 - ema_26
+
+        # Need prior MACD for signal line (use last 9 closes before current)
+        macd_series = []
+        for i in range(26, len(closes)):
+            e12 = ema(closes[:i+1], 12)
+            e26 = ema(closes[:i+1], 26)
+            macd_series.append(e12 - e26)
+
+        if len(macd_series) < 10:
+            return None
+
+        signal_line = ema(macd_series[-9:], 9)
+        prev_macd = macd_series[-2]
+        prev_signal = ema(macd_series[-10:-1], 9) if len(macd_series) >= 10 else macd_series[-2]
+        curr_macd = macd_series[-1]
+
+        # Detect crossover
+        if prev_macd > prev_signal and curr_macd < signal_line:
+            return 'cross_under'
+        elif prev_macd < prev_signal and curr_macd > signal_line:
+            return 'cross_over'
+        return 'none'
+    except Exception as e:
+        print(f"  [MACD 1H] {token} error: {e}")
+        return None
 
 
 def _speed_increasing(token: str, speed_tracker) -> tuple:
@@ -1224,6 +1290,7 @@ def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional
     entry_price = float(trade.get("entry_price") or 0)
     current_price = float(trade.get("current_price") or 0)
     trade_id = trade.get("id")
+    token = str(trade.get("token", "")).upper()
 
     if entry_price <= 0 or current_price <= 0:
         return None
@@ -1619,6 +1686,117 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 close_paper_position(trade_id, reason)
                 closed_count += 1
                 print(f"  TRAILING EXIT {token} {direction} {live_pnl:+.2f}% (SL: {trailing_sl:.6f})")
+
+        # ── 2b. MACD-Rules Engine Cascade Flip (2026-04-06) ───────────────────
+        # Use macd_rules.py for proper entry/exit/flip signal detection.
+        # Replaces the simple cross_under/cross_over check with full state machine.
+        if token.upper() in MACD_CASCADE_FLIP_TOKENS and not trailing_active:
+            from macd_rules import get_macd_exit_signal, compute_macd_state, compute_mtf_macd_alignment
+
+            # ── MTF MACD Alignment ultra-confirmation (2026-04-06) ──────────
+            # If ALL 3 TFs (4H/1H/15m) flip direction, this is an extremely
+            # rare event — trigger cascade flip immediately with max confidence.
+            mtf_align = compute_mtf_macd_alignment(token)
+            mtf_all_flipped = False
+            if mtf_align is not None:
+                # all_tfs_bearish means all 3 TFs bearish → SHORT direction confirmed
+                # If we're LONG and all TFs bearish → immediate cascade flip
+                # all_tfs_bullish means all 3 TFs bullish → LONG direction confirmed
+                # If we're SHORT and all TFs bullish → immediate cascade flip
+                if mtf_align['all_tfs_bearish'] and direction == 'LONG':
+                    mtf_all_flipped = True
+                    print(f"  [MTF ALIGN] {token} 4H/1H/15m all bearish → immediate cascade flip")
+                elif mtf_align['all_tfs_bullish'] and direction == 'SHORT':
+                    mtf_all_flipped = True
+                    print(f"  [MTF ALIGN] {token} 4H/1H/15m all bullish → immediate cascade flip")
+
+                # Log TF states for monitoring
+                for tf_name, state in mtf_align['tf_states'].items():
+                    if state is not None:
+                        print(f"    [MTF ALIGN {tf_name}] regime={state.regime.name} "
+                              f"bull_score={state.bullish_score:+d} macd_above={state.macd_above_signal} "
+                              f"hist={state.histogram:+.6f}")
+
+            macd_result = get_macd_exit_signal(token, direction)
+
+            if macd_result['state'] is not None:
+                s = macd_result['state']
+                # Log MACD state for monitoring
+                print(f"  [MACD] {token} bull_score={s.bullish_score:+d} "
+                      f"regime={'BULL' if s.regime.value==1 else 'BEAR' if s.regime.value==-1 else 'NEUTRAL'} "
+                      f"xover={'FRESH' if abs(s.crossover_freshness.value)==2 else 'STALE'} "
+                      f"hist={s.histogram:+.6f} rate={s.histogram_rate:+.2f}")
+
+            if mtf_all_flipped:
+                # Ultra-confirmed cascade flip — all TFs flipped direction
+                flip_info = {
+                    'opposite_dir': 'SHORT' if direction == 'LONG' else 'LONG',
+                    'conf': 95.0,
+                    'source': 'mtf_macd_alignment',
+                    'reason': 'all_tfs_reversed'
+                }
+                cascade_flipped = cascade_flip(
+                    token, direction, trade_id,
+                    live_pnl, flip_info,
+                    entry=float(pos.get('entry_price') or 0)
+                )
+                if cascade_flipped:
+                    closed_count += 1
+                    continue
+
+            # ── Cascade Direction Flip (2026-04-06) ─────────────────────────────
+            # If cascade is ACTIVE and the cascade direction is OPPOSITE to our
+            # current position — flip immediately. Cascade is the LEAD indicator
+            # and means the market is already cascading in the other direction.
+            from macd_rules import cascade_entry_signal
+            cascade = cascade_entry_signal(token)
+            if cascade['cascade_active'] and cascade['cascade_direction'] and cascade['cascade_direction'] != direction:
+                print(f"  [CASCADE FLIP] {token} {direction} → {cascade['cascade_direction']} "
+                      f"(cascade active, lead={cascade['lead_tf']}, confirm={cascade['confirmation_count']}, "
+                      f"reason={cascade['entry_block_reason']})")
+                flip_info = {
+                    'opposite_dir': cascade['cascade_direction'],
+                    'conf': 95.0,
+                    'source': 'cascade_direction',
+                    'reason': f'cascade_{cascade["cascade_direction"].lower()}_confirmed'
+                }
+                cascade_flipped = cascade_flip(
+                    token, direction, trade_id,
+                    live_pnl, flip_info,
+                    entry=float(pos.get('entry_price') or 0)
+                )
+                if cascade_flipped:
+                    closed_count += 1
+                    continue
+
+            if macd_result['should_flip'] and macd_result['reasons']:
+                primary_reason = macd_result['reasons'][0]
+                print(f"  [MACD FLIP] {token} {direction} → flipping: {macd_result['reasons']}")
+                flip_info = {
+                    'opposite_dir': 'SHORT' if direction == 'LONG' else 'LONG',
+                    'conf': 85.0,
+                    'source': 'macd_rules_engine',
+                    'reason': primary_reason[:80]
+                }
+                cascade_flipped = cascade_flip(
+                    token, direction, trade_id,
+                    live_pnl, flip_info,
+                    entry=float(pos.get('entry_price') or 0)
+                )
+                if cascade_flipped:
+                    closed_count += 1
+                    continue
+            elif macd_result['should_exit'] and macd_result['reasons']:
+                # Exit without flip (market not set up for reverse)
+                for reason in macd_result['reasons']:
+                    if reason.startswith('FLIP:'):
+                        continue
+                    print(f"  [MACD EXIT] {token} {direction} → exiting: {reason}")
+                    close_paper_position(trade_id, reason)
+                    closed_count += 1
+                    break
+                if closed_count > original_closed:
+                    continue
 
         # ── 3. Cascade flip (speed-armed reversal — fires before cut_loser) ───
         # Only fires if trailing is NOT active (don't flip during trailing).

@@ -32,6 +32,15 @@ FLAG_BREAKOUT_CONFIRM_PCT = 0.2   # price must exceed pole high by this %
 
 SUPPORT_RESISTANCE_LOOKBACK = 20  # candles for swing high/low detection
 
+# ── Micro-Flag Constants (smaller-scale patterns) ───────────────────────────
+# For sideways/low-volatility markets where 3% poles never form on 1m candles
+MICRO_POLE_MIN_PCT = 0.3        # % move required (was 3.0%)
+MICRO_POLE_MAX_CANDLES = 15     # max candles for pole (was 8)
+MICRO_CONSOLIDATION_MAX_PCT = 0.15  # max % range during consolidation (was 1.5%)
+MICRO_CONSOLIDATION_MIN_CANDLES = 3
+MICRO_BREAKOUT_CONFIRM_PCT = 0.05   # price must exceed pole high by this %
+MICRO_COOLDOWN_HOURS = 6       # don't re-signal same token within 6h
+
 # ── Core Detection ──────────────────────────────────────────────────────────
 
 def detect_bull_flag(candles: list) -> dict | None:
@@ -165,6 +174,242 @@ def detect_bull_flag(candles: list) -> dict | None:
         'cons_resistance': round(cons_high, 6),
         'pole_high_px': round(pole_high, 6),
         'signal_type': 'pattern_flag',
+        'source': 'pattern_scanner',
+    }
+
+
+def detect_micro_bull_flag(candles: list) -> dict | None:
+    """
+    Detect micro bull flag pattern in 1m OHLCV candle list.
+    For use in low-volatility / sideways markets where standard 3% flags never form.
+
+    Micro flag requirements:
+    1. Flag pole: >= 0.3% up-move in <= 15 consecutive candles
+    2. Consolidation: 3-5 candles, range < 0.15%
+    3. Breakout: candle closes above pole high + volume confirmation
+    """
+    if len(candles) < MICRO_POLE_MAX_CANDLES + MICRO_CONSOLIDATION_MIN_CANDLES + 2:
+        return None
+
+    closes = [c['close'] for c in candles]
+    highs  = [c['high']  for c in candles]
+    lows   = [c['low']   for c in candles]
+    vols   = [c['volume'] for c in candles]
+
+    # ── Step 1: Find micro flag pole ────────────────────────────────────────
+    best_pole = None
+    best_pole_pct = 0
+
+    for start in range(len(closes) - MICRO_POLE_MAX_CANDLES):
+        for end in range(start + 2, min(start + MICRO_POLE_MAX_CANDLES + 1, len(closes))):
+            pct = (closes[end] - closes[start]) / closes[start] * 100
+            if pct >= MICRO_POLE_MIN_PCT and pct > best_pole_pct:
+                segment = closes[start:end+1]
+                max_drawdown = max((segment[i] - segment[j]) / segment[j] * 100
+                                   for i in range(len(segment)) for j in range(i+1, len(segment)))
+                if max_drawdown < pct * 0.3:
+                    best_pole = {'start': start, 'end': end, 'pct': pct,
+                                  'high': max(highs[start:end+1]),
+                                  'low':  min(lows[start:end+1]),
+                                  'open_px': closes[start],
+                                  'close_px': closes[end]}
+                    best_pole_pct = pct
+
+    if not best_pole:
+        return None
+
+    pole_start = best_pole['start']
+    pole_end   = best_pole['end']
+    pole_high  = best_pole['high']
+    pole_open  = best_pole['open_px']
+
+    # ── Step 2: Find consolidation after pole ───────────────────────────────
+    consolidation_start = pole_end + 1
+    consolidation_candles = []
+
+    for i in range(consolidation_start, len(closes)):
+        remaining = closes[i:]
+        if len(remaining) < MICRO_CONSOLIDATION_MIN_CANDLES:
+            break
+        for w in range(MICRO_CONSOLIDATION_MIN_CANDLES, min(6, len(remaining))):
+            window = remaining[:w]
+            c_range = (max(window) - min(window)) / min(window) * 100
+            if c_range <= MICRO_CONSOLIDATION_MAX_PCT:
+                consolidation_candles = candles[consolidation_start + i - consolidation_start:
+                                                consolidation_start + i - consolidation_start + w]
+                break
+        if consolidation_candles:
+            break
+
+    if not consolidation_candles:
+        return None
+
+    cons_high = max(c['high'] for c in consolidation_candles)
+    cons_low  = min(c['low']  for c in consolidation_candles)
+    cons_end_idx = candles.index(consolidation_candles[-1])
+
+    # ── Step 3: Detect breakout ──────────────────────────────────────────────
+    if cons_end_idx + 1 >= len(candles):
+        return None
+
+    breakout_candle = candles[cons_end_idx + 1]
+    breakout_close  = breakout_candle['close']
+    breakout_vol    = breakout_candle['volume']
+
+    cons_avg_vol = sum(c['volume'] for c in consolidation_candles) / len(consolidation_candles)
+
+    breakout_exceeds_pole = (breakout_close > pole_high * (1 + MICRO_BREAKOUT_CONFIRM_PCT / 100))
+    volume_confirmed = breakout_vol > cons_avg_vol * 0.5
+
+    if not breakout_exceeds_pole or not volume_confirmed:
+        return None
+
+    # ── Step 4: Calculate confidence ─────────────────────────────────────────
+    pole_score = min(best_pole_pct / 1.0, 1.0)   # 0.3% = 0.3, 0.6% = 0.6, 1.0% = 1.0
+    cons_range_pct = (cons_high - cons_low) / cons_low * 100
+    consolidation_score = 1.0 - (cons_range_pct / MICRO_CONSOLIDATION_MAX_PCT)
+    vol_ratio = breakout_vol / cons_avg_vol if cons_avg_vol > 0 else 0
+    volume_score = min(vol_ratio / 3, 1.0)
+
+    confidence = (pole_score * 0.4 + consolidation_score * 0.3 + volume_score * 0.3) * 100
+    confidence = round(min(confidence, 95), 1)
+
+    # ── Step 5: Pattern details ──────────────────────────────────────────────
+    breakout_px = pole_high * (1 + MICRO_BREAKOUT_CONFIRM_PCT / 100)
+    measured_move = (cons_low - pole_open) / pole_open * 100
+    target = breakout_close * (1 + best_pole_pct / 100)
+
+    return {
+        'pattern_type': 'micro_bull_flag',
+        'direction': 'LONG',
+        'confidence': confidence,
+        'pole_pct': round(best_pole_pct, 3),
+        'consolidation_candles': len(consolidation_candles),
+        'consolidation_range_pct': round(cons_range_pct, 4),
+        'breakout_px': round(breakout_px, 6),
+        'breakout_vol': round(breakout_vol, 2),
+        'volume_ratio': round(vol_ratio, 2),
+        'measured_move_pct': round(measured_move, 3),
+        'target_px': round(target, 6),
+        'cons_support': round(cons_low, 6),
+        'cons_resistance': round(cons_high, 6),
+        'pole_high_px': round(pole_high, 6),
+        'signal_type': 'pattern_micro_flag',
+        'source': 'pattern_scanner',
+    }
+
+
+def detect_micro_bear_flag(candles: list) -> dict | None:
+    """
+    Detect micro bear flag — mirror of micro bull flag for shorts.
+    Strong DOWN move, small UP consolidation, breakdown below pole low.
+    """
+    if len(candles) < MICRO_POLE_MAX_CANDLES + MICRO_CONSOLIDATION_MIN_CANDLES + 2:
+        return None
+
+    closes = [c['close'] for c in candles]
+    highs  = [c['high']  for c in candles]
+    lows   = [c['low']   for c in candles]
+    vols   = [c['volume'] for c in candles]
+
+    # ── Step 1: Find micro flag pole (downward) ─────────────────────────────
+    best_pole = None
+    best_pole_pct = 0
+
+    for start in range(len(closes) - MICRO_POLE_MAX_CANDLES):
+        for end in range(start + 2, min(start + MICRO_POLE_MAX_CANDLES + 1, len(closes))):
+            pct = (closes[start] - closes[end]) / closes[start] * 100  # negative for down
+            if pct >= MICRO_POLE_MIN_PCT and pct > best_pole_pct:
+                segment = closes[start:end+1]
+                max_recovery = max((segment[j] - segment[i]) / segment[i] * 100
+                                  for i in range(len(segment)) for j in range(i+1, len(segment)))
+                if max_recovery < pct * 0.3:
+                    best_pole = {'start': start, 'end': end, 'pct': pct,
+                                  'high': max(highs[start:end+1]),
+                                  'low':  min(lows[start:end+1]),
+                                  'open_px': closes[start],
+                                  'close_px': closes[end]}
+                    best_pole_pct = pct
+
+    if not best_pole:
+        return None
+
+    pole_end   = best_pole['end']
+    pole_low   = best_pole['low']
+    pole_open  = best_pole['open_px']
+
+    # ── Step 2: Find UP consolidation after pole ───────────────────────────
+    consolidation_start = pole_end + 1
+    consolidation_candles = []
+
+    for i in range(consolidation_start, len(closes)):
+        remaining = closes[i:]
+        if len(remaining) < MICRO_CONSOLIDATION_MIN_CANDLES:
+            break
+        for w in range(MICRO_CONSOLIDATION_MIN_CANDLES, min(6, len(remaining))):
+            window = remaining[:w]
+            c_range = (max(window) - min(window)) / min(window) * 100
+            if c_range <= MICRO_CONSOLIDATION_MAX_PCT:
+                consolidation_candles = candles[consolidation_start + i - consolidation_start:
+                                                consolidation_start + i - consolidation_start + w]
+                break
+        if consolidation_candles:
+            break
+
+    if not consolidation_candles:
+        return None
+
+    cons_high = max(c['high'] for c in consolidation_candles)
+    cons_low  = min(c['low']  for c in consolidation_candles)
+    cons_end_idx = candles.index(consolidation_candles[-1])
+
+    # ── Step 3: Detect breakdown ──────────────────────────────────────────────
+    if cons_end_idx + 1 >= len(candles):
+        return None
+
+    breakdown_candle = candles[cons_end_idx + 1]
+    breakdown_close = breakdown_candle['close']
+    breakdown_vol   = breakdown_candle['volume']
+
+    cons_avg_vol = sum(c['volume'] for c in consolidation_candles) / len(consolidation_candles)
+
+    breakdown_below_pole = (breakdown_close < pole_low * (1 - MICRO_BREAKOUT_CONFIRM_PCT / 100))
+    volume_confirmed = breakdown_vol > cons_avg_vol * 0.5
+
+    if not breakdown_below_pole or not volume_confirmed:
+        return None
+
+    # ── Step 4: Calculate confidence ────────────────────────────────────────
+    pole_score = min(best_pole_pct / 1.0, 1.0)
+    cons_range_pct = (cons_high - cons_low) / cons_low * 100
+    consolidation_score = 1.0 - (cons_range_pct / MICRO_CONSOLIDATION_MAX_PCT)
+    vol_ratio = breakdown_vol / cons_avg_vol if cons_avg_vol > 0 else 0
+    volume_score = min(vol_ratio / 3, 1.0)
+
+    confidence = (pole_score * 0.4 + consolidation_score * 0.3 + volume_score * 0.3) * 100
+    confidence = round(min(confidence, 95), 1)
+
+    # ── Step 5: Pattern details ─────────────────────────────────────────────
+    breakout_px = pole_low * (1 - MICRO_BREAKOUT_CONFIRM_PCT / 100)
+    measured_move = (pole_open - cons_high) / pole_open * 100
+    target = breakdown_close * (1 - best_pole_pct / 100)
+
+    return {
+        'pattern_type': 'micro_bear_flag',
+        'direction': 'SHORT',
+        'confidence': confidence,
+        'pole_pct': round(best_pole_pct, 3),
+        'consolidation_candles': len(consolidation_candles),
+        'consolidation_range_pct': round(cons_range_pct, 4),
+        'breakout_px': round(breakout_px, 6),
+        'breakout_vol': round(breakdown_vol, 2),
+        'volume_ratio': round(vol_ratio, 2),
+        'measured_move_pct': round(measured_move, 3),
+        'target_px': round(target, 6),
+        'cons_support': round(cons_low, 6),
+        'cons_resistance': round(cons_high, 6),
+        'pole_low_px': round(pole_low, 6),
+        'signal_type': 'pattern_micro_flag',
         'source': 'pattern_scanner',
     }
 
@@ -510,6 +755,18 @@ def scan_token(token: str, lookback_minutes: int = 240) -> list:
     if desc:
         desc['token'] = token.upper()
         patterns.append(desc)
+
+    # Micro bull flag (smaller-scale for low-volatility markets)
+    micro_bull = detect_micro_bull_flag(candles)
+    if micro_bull:
+        micro_bull['token'] = token.upper()
+        patterns.append(micro_bull)
+
+    # Micro bear flag
+    micro_bear = detect_micro_bear_flag(candles)
+    if micro_bear:
+        micro_bear['token'] = token.upper()
+        patterns.append(micro_bear)
 
     return patterns
 

@@ -136,6 +136,7 @@ SOURCE_WEIGHT_OVERRIDES = [
     ('pattern_hns',   'pattern_scanner', 1.25),
     ('pattern_wyckoff','pattern_scanner', 1.25),
     ('pattern_elliot', 'pattern_scanner', 1.25),
+    ('pattern_micro_flag', 'pattern_scanner', 1.0),   # micro flags get 1.0× — lower weight until proven
 ]
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -155,6 +156,7 @@ SIGNAL_TYPE_CATEGORY_MAP = {
     'pattern_hns':     'pattern_scanner',
     'pattern_wyckoff': 'pattern_scanner',
     'pattern_elliot':  'pattern_scanner',
+    'pattern_micro_flag': 'pattern_scanner',  # micro flags tracked separately for now
     # Momentum / MTF sources
     'mtf_macd':  'mtf_macd',
     'hmacd-,hzscore':              'hmacd-momentum',
@@ -1403,6 +1405,32 @@ def get_pending_signals():
                     if is_delisted(tkn):
                         print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted on Hyperliquid")
                         continue
+                    # REGIME SAFETY FILTER (2026-04-06): tokens must have regime data and not fight it
+                    # This prevents regime-blind tokens (AZTEC, VVV, etc.) and counter-regime trades
+                    # from ever entering the hot-set. Regime data loaded once per compaction pass.
+                    _regime_cache = {}
+                    try:
+                        with open('/var/www/html/regime_4h.json') as _rf:
+                            _rd = _json.load(_rf)
+                            _regime_cache = _rd.get('regimes', {})
+                    except Exception:
+                        pass  # If regime JSON is missing, skip filtering (don't crash)
+                    _tok_reg = _regime_cache.get(tkn.upper(), {})
+                    _tok_regime = _tok_reg.get('regime', 'NEUTRAL')
+                    _tok_rc = _tok_reg.get('confidence', 0)
+                    if not _tok_reg:
+                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — regime blindspot (not in regime_4h.json)")
+                        continue
+                    if _tok_regime == 'NEUTRAL':
+                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — NEUTRAL regime (should wait, not trade)")
+                        continue
+                    if _tok_rc < 50:
+                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — weak regime conf {_tok_rc:.0f}% (below 50%)")
+                        continue
+                    if (_tok_regime == 'LONG_BIAS' and direction.upper() == 'SHORT') or \
+                       (_tok_regime == 'SHORT_BIAS' and direction.upper() == 'LONG'):
+                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — counter-regime ({_tok_regime} but SHORT/LONG)")
+                        continue
                     spd = _speed_cache.get(tkn, {})
                     conf = float(r[3]) if r[3] else 0.0
                     momentum = spd.get('momentum_score', 50.0)
@@ -1889,6 +1917,15 @@ End with:
                     'confidence': confidence,
                     'reason': reason[:200]
                 }
+                # HARD BLOCK: regime must align with direction (same logic as ai_decide())
+                regime_val, regime_conf = regime_cache.get(token.upper(), ('NEUTRAL', 0))
+                d = decisions[f"{token}:{direction}"]
+                if d['decision'] != 'wait' and regime_val != 'NEUTRAL' and regime_conf > 50:
+                    if (regime_val == 'LONG_BIAS' and d['decision'] == 'short') or \
+                       (regime_val == 'SHORT_BIAS' and d['decision'] == 'long'):
+                        d['decision'] = 'wait'
+                        d['confidence'] = 0
+                        d['reason'] = f'REGIME_BLOCK: {regime_val}({regime_conf}%) opposes {d["decision"]}'
 
     decisions['_open_trades'] = open_trade_alerts
     return decisions

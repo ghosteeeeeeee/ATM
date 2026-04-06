@@ -130,14 +130,17 @@ def apply_token_override(token, direction):
     override_line = f"    '{token.upper()}': {{'direction': '{direction}', 'always_invert': True}},  # from candle_tuner"
 
     # Check if override already exists (uncommented)
-    already_added = re.search(r"'{TOKEN}':\s*\{'direction':\s*'{DIR}',\s*'always_invert':\s*True\}".format(TOKEN=token.upper(), DIR=direction), content)
+    already_added = re.search(
+        rf"'{re.escape(token.upper())}':\s*\{{'direction':\s*'{re.escape(direction)}',\s*'always_invert':\s*True\}}",
+        content
+    )
 
     if already_added:
         log(f"Override already exists for {token}/{direction}")
         return True
 
     # Replace commented-out example with actual override
-    comment_pattern = r"#\s*'{TOKEN}':\s*\{'direction':\s*'{DIR}',\s*'always_invert':\s*True\},\s*#.*".format(TOKEN=token.upper(), DIR=direction)
+    comment_pattern = rf"#\s*'{re.escape(token.upper())}':\s*\{{'direction':\s*'{re.escape(direction)}',\s*'always_invert':\s*True\}},\s*#.*"
     if re.search(comment_pattern, content):
         content = re.sub(comment_pattern, override_line, content, count=1)
     else:

@@ -111,6 +111,180 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 
 ---
 
+## True-MACD Cascade System (Core Strategy)
+**Status:** ✅ LIVE — 2026-04-06
+**Sub-project of:** Trading Pipeline | **Owner:** Agent
+
+---
+
+### What It Is
+
+True-MACD is a multi-timeframe MACD alignment and cascade detection system. It is one of Hermes's core strategy filters — preventing bad entries at local peaks and triggering cascade flips when smaller timeframes lead a reversal.
+
+**The core insight:** Smaller timeframes (15m) flip FIRST when a trend reverses. The larger timeframes (1h, 4h) follow. We were entering trades when the 4h looked great but the 15m had already turned — getting run over by the cascade before it reached the larger TFs.
+
+---
+
+### Files
+
+| File | Role |
+|------|------|
+| `/root/.hermes/scripts/macd_rules.py` | Pure MACD math engine — EMA(12/26/9), histogram, regime, crossover age, bullish_score |
+| `/root/.hermes/scripts/candle_db.py` | Local SQLite candle storage (1m/15m/1h/4h), cascade direction detection |
+| `/root/.hermes/scripts/signal_gen.py` | Entry guard: blocks signals when MACD rules say market not in valid regime |
+| `/root/.hermes/scripts/position_manager.py` | Cascade flip: exits/flips positions when MTF alignment flips |
+
+---
+
+### MACD Rules Engine (`macd_rules.py`)
+
+**MACD(12,26,9) computed on Binance 1h candles:**
+
+```
+MACD line    = EMA(12) - EMA(26)
+Signal line  = EMA(9) of MACD series
+Histogram    = MACD - Signal
+```
+
+**Per-token state captured:**
+- `regime`: BULL (macd_line > 0) | NEUTRAL | BEAR (macd_line < 0)
+- `crossover_freshness`: FRESH_BULL / STALE_BULL / NONE / STALE_BEAR / FRESH_BEAR
+- `crossover_age`: candles since last crossover
+- `histogram_rate`: momentum acceleration (expanding or contracting)
+- `bullish_score`: -3 to +3 composite (each indicator votes once, no double-counting)
+- `macd_above_signal`, `histogram_positive`: current bool state
+
+**Entry rules:**
+```
+LONG allowed when ALL of:
+  ✓ regime == BULL OR crossover == FRESH_BULL
+  ✓ macd_above_signal == True
+  ✓ histogram_positive == True
+  ✓ histogram_rate >= -0.15 (not fading fast)
+
+SHORT allowed when: mirror logic
+```
+
+**Exit/Flip rules:**
+```
+Exit LONG when:
+  • histogram crosses zero from positive (momentum broken)
+  • MACD fresh cross_under
+  • Regime flips to BEAR
+  • Histogram fading fast (rate < -0.20)
+
+Flip LONG→SHORT when:
+  • Exit signal fires AND (regime=BEAR OR FRESH_BEAR)
+  • histogram deeply negative + still falling
+  • MACD >20% below signal (divergence)
+```
+
+---
+
+### Cascade Direction Detection (`candle_db.py`)
+
+**Key insight:** 15m leads → 1h follows → 4h confirms. A true reversal cascades downward through timeframes.
+
+**TF_ORDER = ['15m', '1h', '4h']**
+
+Each TF scored bullish/bearish: `macd_above_signal AND histogram_positive` = BULL
+
+**Cascade LONG** when: 15m=BULL + at least one larger TF also BULL
+**Cascade SHORT** when: 15m=BEAR + at least one larger TF also BEAR
+
+**Entry blocked when:**
+- Lead TF (15m) flipped but larger TFs still opposite → "early entry danger"
+- 15m and 1h conflict → no clear direction
+- 4h already flipped away from direction → "missed the move"
+
+**`detect_cascade_direction(tf_states)` returns:**
+- `cascade_active`: bool — True if smaller TFs flipped and larger TFs still pending
+- `cascade_direction`: 'LONG' | 'SHORT' | None
+- `lead_tf`: which smallest TF flipped first
+- `confirmation_count`: how many larger TFs followed (0-2)
+- `reversal_score`: 0.0 → 1.0
+
+---
+
+### MTF MACD Alignment (`compute_mtf_macd_alignment()`)
+
+Fetches 4H + 1H + 15m candles from Binance, runs full MACD state machine on each TF.
+
+```
+Returns:
+  mtf_score: 0-3 (how many TFs agree)
+  mtf_direction: 'LONG' | 'SHORT' | 'NEUTRAL'
+  mtf_confidence: 0.0 to 1.0
+  all_tfs_bullish / all_tfs_bearish: bool
+  tf_states: {tf_name: MACDState}
+```
+
+**Confidence mapping:**
+- 3/3 TFs agree → confidence = 1.0 (ultra-confirmation)
+- 2/3 TFs agree → confidence = 0.75
+- 1/3 TFs agree → confidence = 0.25
+
+**signal_gen.py boost:** ALL 3 TFs agree → +10 confidence. 2/3 agree → +5 confidence.
+
+---
+
+### Cascade Entry Signal (`cascade_entry_signal()`)
+
+Chains `compute_mtf_macd_alignment()` → `detect_cascade_direction()` with cascade entry timing rules.
+
+**Returns:**
+```python
+{
+    cascade_long_allowed: bool,
+    cascade_short_allowed: bool,
+    cascade_direction: 'LONG' | 'SHORT' | None,
+    cascade_active: bool,
+    cascade_score: float,       # 0.0 to 1.0
+    lead_tf: str,               # '15m' | '1h' | None
+    confirmation_count: int,    # 0-2
+    entry_block_reason: str | None,
+    mtf_result: dict,           # raw MTF result for logging
+}
+```
+
+**signal_gen.py integration:**
+- Cascade ACTIVE + aligns with direction → +10 confidence boost
+- Cascade ACTIVE but OPPOSITE to direction → BLOCK entry
+
+**position_manager.py integration:**
+- Cascade ACTIVE + cascade direction ≠ current position → immediate flip, conf=95
+
+---
+
+### Current Live Readings (2026-04-06 ~18:00 UTC)
+
+```
+BTC:  cascade=LONG  | LONG_ALLOW=True  | 15m=BULL, 1h=BEAR, 4h=BULL
+ETH:  cascade=LONG  | LONG_ALLOW=True  | 15m=BEAR, 1h=BEAR, 4h=BULL
+TRB:  cascade=SHORT | LONG_ALLOW=False | block: "4h_already_flipped_away_missed_move"
+IMX:  cascade=SHORT | LONG_ALLOW=False | block: "4h_already_flipped_away_missed_move"
+```
+
+**Why TRB/IMX SHORT is blocked:** 15m and 1h are BEAR (cascade started), but 4h is still BULL — the larger TF hasn't confirmed. Entering SHORT here would be catching a falling knife that hasn't finished falling.
+
+---
+
+### What Was Wrong Before (TRB/IMX/SOPH/SCR Losses)
+
+We entered LONG at local peaks. The 15m had already flipped bearish (lead TF turned), but the 4h still looked bullish from its higher timeframe — giving us false confidence. By the time 4h confirmed the reversal, we were already stopped out.
+
+**The fix:** Entry requires 15m lead TF flipped AND at least one larger TF confirming. No entries before confirmation.
+
+---
+
+### Related Ideas (Queue)
+
+- [ ] **Cascade flip: also check APPROVED signals** — currently only PENDING signals trigger flip. ME had APPROVED LONG signals (conf=80%+) 1 min before close but flip didn't use them. Using APPROVED signals would give flip confirmation faster.
+- [ ] **ATR-adaptive SL/TP** — SL = 1.5× ATR(14) instead of fixed %
+- [ ] **ADX trend strength filter** — ADX < 20 = ranging, prefer mean-reversion
+
+---
+
 ## Active Ideas (Queue)
 
 ### Ideas for Future Builds

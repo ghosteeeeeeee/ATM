@@ -42,19 +42,28 @@ def run_check(name):
 
 # ─── Check 1: Pipeline systemd service ──────────────────────────────
 def check_pipeline_service():
+    """Check pipeline via timer (onshot services go inactive after run)."""
     try:
-        r = subprocess.run(['systemctl', 'is-active', 'hermes-pipeline.service'],
+        # For oneshot services triggered by timers, check the timer instead
+        r = subprocess.run(['systemctl', 'is-active', 'hermes-pipeline.timer'],
                          capture_output=True, text=True, timeout=10)
-        status = r.stdout.strip()
-        if status != 'active':
-            return False, f'hermes-pipeline.service is {status}', [f'pipeline service {status}']
-        return True, 'pipeline service active', []
+        timer_status = r.stdout.strip()
+        if timer_status != 'active':
+            return False, f'hermes-pipeline.timer is {timer_status}', [f'pipeline timer {timer_status}']
+
+        # Also verify service ran recently via journal (check last 2 entries to find Started/Deactivated)
+        r2 = subprocess.run(['journalctl', '-u', 'hermes-pipeline.service', '-n', '5', '--since', '15 minutes ago'],
+                           capture_output=True, text=True, timeout=10)
+        if 'Started hermes-pipeline.service' not in r2.stdout and 'Deactivated successfully' not in r2.stdout:
+            return False, 'pipeline timer active but no recent execution', ['no recent pipeline run']
+        return True, 'pipeline timer active + recent run OK', []
     except Exception as e:
         return False, f'cant check pipeline service: {e}', [str(e)]
 
 
 # ─── Check 2: HL Sync Guardian ──────────────────────────────────────
 def check_hl_sync():
+    """Check hl-sync service (long-running Type=simple service)."""
     try:
         r = subprocess.run(['systemctl', 'is-active', 'hermes-hl-sync-guardian.service'],
                          capture_output=True, text=True, timeout=10)
@@ -93,7 +102,7 @@ def check_pipeline_recent():
         output = r.stdout
         if not output.strip():
             return False, 'no pipeline runs in last 5 minutes', ['pipeline silent 5min']
-        if 'Started hermes-pipeline' in output or 'signal_gen' in output or 'Pipeline PAPER' in output:
+        if 'Started hermes-pipeline' in output or 'signal_gen' in output or 'Pipeline PAPER' in output or 'Deactivated successfully' in output:
             return True, 'pipeline ran recently', []
         return False, f'pipeline output unclear: {output[:100]}', ['pipeline unclear output']
     except Exception as e:

@@ -175,6 +175,74 @@ Plain Markdown files in brain — no API, no dependencies, survives everything:
 
 ---
 
+## True-MACD Cascade System (Core Strategy)
+**Status:** ✅ LIVE — 2026-04-06
+**Owner:** Agent
+**Sub-project of:** Trading Pipeline
+
+### Summary
+Multi-timeframe MACD alignment and cascade detection system. One of Hermes's **core strategy filters** — prevents bad entries at local peaks and triggers cascade flips when smaller timeframes lead a reversal.
+
+**Core insight:** 15m leads → 1h follows → 4h confirms. We were entering LONG when 4h looked great but 15m had already flipped bearish — getting run over by the cascade before it reached larger TFs.
+
+### Key Files
+| Component | File | Role |
+|-----------|------|------|
+| MACD rules engine | `/root/.hermes/scripts/macd_rules.py` | EMA(12/26/9), histogram, regime, bullish_score (-3 to +3) |
+| Cascade detection | `/root/.hermes/scripts/candle_db.py` | Local SQLite candles, `detect_cascade_direction()` |
+| Entry guard | `/root/.hermes/scripts/signal_gen.py` | Blocks signals when MACD rules say market not in valid regime |
+| Cascade flip | `/root/.hermes/scripts/position_manager.py` | Exits/flips when MTF alignment flips |
+
+### Sub-components
+| Function | Location | Returns |
+|----------|----------|---------|
+| `compute_macd_state()` | macd_rules.py | Full MACD state: regime, crossover age, histogram_rate, bullish_score |
+| `get_macd_entry_signal()` | macd_rules.py | `allowed: bool + reason` for LONG/SHORT entry |
+| `get_macd_exit_signal()` | macd_rules.py | `should_exit/should_flip + reasons` |
+| `compute_mtf_macd_alignment()` | macd_rules.py | MTF score 0-3, direction, confidence (0.0-1.0), per-TF states |
+| `cascade_entry_signal()` | macd_rules.py | Cascade LONG/SHORT allowed + block reason |
+| `detect_cascade_direction()` | candle_db.py | lead TF, confirmation count, reversal_score |
+
+### Cascade Entry Rules
+```
+LONG entry — ALL 3 conditions:
+  1. 15m macd_above_signal=True AND histogram_positive=True (lead TF flipped)
+  2. At least one of (1h, 4h) also BULL (confirmation received)
+  3. 4h regime is BULL (anchor hasn't diverged)
+
+SHORT entry: mirror logic
+
+Entry BLOCKED when:
+  - 15m flipped but larger TFs still opposite → "early entry danger"
+  - 15m/1h conflict → no clear direction
+  - 4h already flipped away → "missed the move"
+```
+
+### signal_gen.py Integration
+- Cascade ACTIVE + aligns with direction → **+10 confidence boost**
+- Cascade ACTIVE but OPPOSITE to direction → **BLOCK entry**
+
+### position_manager.py Integration
+- Cascade ACTIVE + cascade direction ≠ current position → **immediate flip, conf=95**
+
+### Live Readings (2026-04-06 ~18:00 UTC)
+```
+BTC: cascade=LONG  | LONG_ALLOW=True  | 15m=BULL, 1h=BEAR, 4h=BULL
+ETH: cascade=LONG  | LONG_ALLOW=True  | 15m=BEAR, 1h=BEAR, 4h=BULL
+TRB: cascade=SHORT | LONG_ALLOW=False | block: "4h_already_flipped_away_missed_move"
+IMX: cascade=SHORT | LONG_ALLOW=False | block: "4h_already_flipped_away_missed_move"
+```
+TRB/IMX SHORT blocked because 4h still BULL while 15m/1h already BEAR — larger TF hasn't confirmed yet.
+
+### What Was Wrong Before (TRB/IMX/SOPH/SCR Losses)
+We entered LONG at local peaks. 15m had already flipped bearish, but 4h still looked bullish — giving false confidence. By the time 4h confirmed, we were already stopped out.
+
+### Related
+- [DECISIONS.md#2026-04-06 | Cascade flip thresholds + SKIPPED signals]
+- [brain/trading.md##True-MACD Cascade System]
+
+---
+
 ## AI Trading Machine (ATM) — Standalone Docker
 **Status:** 🚧 IN PROGRESS — 2026-04-06
 **Owner:** T + Agent

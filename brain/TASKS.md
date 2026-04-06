@@ -273,6 +273,24 @@ Inspect `trailing_stops.json` for phase2 entries. Confirm `phase2_buffer_atr` va
 ### [ ] (P) Compare pre/post fix PnL (need baseline from before 2026-04-06) — owner: ai-engineer — 2026-04-09
 Query PostgreSQL for 30-day pre-fix baseline. Current post-fix baseline: 54 trades, 51.9% WR, +13.68 USDT net over 7 days. Need historical data from before 2026-04-06 to compute delta.
 
+### [ ] (P) Verify pattern_scanner detects any patterns at all — owner: ai-engineer — 2026-04-07
+Pattern scanner has NEVER produced a signal in production (0 pattern_scanner signals in DB). Root causes identified: (1) `_get_active_tokens()` only returns 5 tokens (DYDX, MORPHO, MOVE, TST, XRP) instead of the full hot-set, so only 5 tokens get 1m candles seeded; (2) bull flag requires ≥3% pole move which is very rare on 1m candles. Test: run `python3 pattern_scanner.py TOKEN 240` on 10 different tokens and verify patterns are found OR confirm thresholds are the bottleneck.
+
+### [ ] (P) Fix active_tokens so all hot-set tokens get 1m candles seeded — owner: ai-engineer — 2026-04-07
+`_get_active_tokens()` in price_collector.py returns only 5 tokens instead of the full active universe (~236 tokens). This means only 5 tokens ever get 1m OHLCV data in `ohlcv_1m`. Fix to return all tokens that have recent prices (i.e., the full hot-set / active universe). Without this, pattern_scanner can never run on most tokens.
+
+### [ ] (P) Add smaller-scale pattern detection (micro-flags: 0.3% pole, 0.15% range) — owner: ai-engineer — 2026-04-08
+Current bull flag params (≥3% pole, ≤1.5% consolidation range) are too strict for 1m candles in sideways/low-volatility markets. Add a parallel detection mode for micro-flags with relaxed params: FLAG_POLE_MIN_PCT=0.3, FLAG_CONSOLIDATION_MAX_PCT=0.15, FLAG_POLE_MAX_CANDLES=15. These should be separate pattern types (e.g., `pattern_micro_flag`) so they can be tracked independently from real flag patterns.
+
+### [ ] (P) Measure pattern backtest accuracy — owner: ai-engineer — 2026-04-08
+Backtest patterns vs baseline (minimal prompt) on historical data. backtest_patterns.py shows B_patterns=33.3% vs A_minimal=46.7% on 30 samples — patterns are currently WORSE. Need to run on larger sample (n=200+) and determine if pattern detection parameters need tuning or if the approach is fundamentally flawed for this market regime.
+
+### [ ] (P) Verify pattern signals can reach ai_decider hot-set scoring — owner: ai-engineer — 2026-04-08
+Even if pattern_scanner starts producing signals, confirm they flow through to ai_decider scoring. Check: (1) pattern signals written to signals DB with correct source='pattern_scanner', signal_type='pattern_*'; (2) ai_decider's hot-set builder includes pattern_scanner signals in ALL_CATS; (3) pattern signals with 1.25x multiplier appear in pipeline output. Run a full pipeline cycle and grep for pattern_flag in the output.
+
+### [ ] (P) Verify cron jobs survive sessions — owner: T — 2026-04-07
+Confirm: (1) Are cron jobs implemented via the agent's built-in cron system (mcp_cronjob action='create') or via system crond/systemd? (2) Do they persist across agent restarts/reboots? (3) Are there any cron jobs showing last_status='error' that need attention? Currently 5 of 8 cron jobs show 'error' status. Investigate and fix.
+
 ### [✅] (P) Investigate Speed=50% anomaly — why only hot-set filtering through? — owner: ai-engineer — 2026-04-09
 **RESOLVED 2026-04-06.** Root cause: hermes-trades-api.py line ~355 uses `e.get('speed_percentile') or e.get('momentum_score') or 50.0`. The 4 affected tokens (KSHIB, KFLOKI, KBONK, KLUNC) don't exist in SpeedTracker's price history (Solana tokens, no on-chain price data). SpeedTracker defaults to 50.0 for unknown tokens. **Fix:** Seed price history for K* tokens on next pipeline run. All hot-set tokens show 50% because SpeedTracker has no history for any of them — the hot-set is a filtered view that survived AI compaction rounds, not a SpeedTracker output.
 

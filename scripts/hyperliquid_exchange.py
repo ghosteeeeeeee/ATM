@@ -80,15 +80,31 @@ def _sz_decimals(token: str) -> int:
         return 4
 
 
+# Tokens known to be non-tradable on Hyperliquid (returns 500/not in universe).
+# These generate signals but can never be filled — hard block to prevent noise.
+_HL_BLOCKLIST = {
+    # K-tokens: meme coin forks. In HL universe but regime blindspots — pollute
+    # the signals queue and block legitimate tokens. Added 2026-04-06.
+    'KPEPE', 'KSHIB', 'KLUNC', 'KSHIBA', 'KLOKI', 'KNEIRO', 'KFLOKI', 'KBONK',
+    # Other confirmed non-tradable
+    'WCT', 'SAGA', 'GOAT', 'IOTA', 'ZORA', 'AZTEC',
+    'TRX', 'RESOLV', 'HEMI', 'GMX', 'ALGO', 'HYPER',
+    'SUPER',  # regime blindspot + HL blindspot
+}
+
 def is_delisted(token: str) -> bool:
     """Return True if token is delisted/halted on Hyperliquid (no new positions)."""
+    # Hard blocklist first — tokens that cause 500 errors or are otherwise untradeable
+    if token.upper() in _HL_BLOCKLIST:
+        return True
     try:
         for coin in _get_meta().get("universe", []):
             if coin.get("name", "").upper() == token.upper():
                 return bool(coin.get("isDelisted", False))
-        return False
+        # Token not found in HL universe — treat as delisted (non-tradeable)
+        return True
     except Exception:
-        return False
+        return True  # On error, assume delisted to be safe
 
 
 def is_tradeable(token: str) -> bool:

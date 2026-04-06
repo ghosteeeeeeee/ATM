@@ -1946,11 +1946,25 @@ def sync():
     _save_closed_set()  # BUG-4: persist cleared state
     log(f'── Sync cycle ──')
 
-    # Step 1: Get HL positions
-    try:
-        hl_pos = get_open_hype_positions_curl()
-    except Exception as e:
-        log(f'Failed to fetch HL positions: {e}', 'FAIL')
+    # Step 1: Get HL positions (retry on rate-limit → empty dict)
+    # If HL is rate-limited and returns {}, we risk closing real positions as orphans.
+    # Retry with backoff before accepting an empty position set.
+    hl_pos = {}
+    for attempt in range(4):
+        try:
+            hl_pos = get_open_hype_positions_curl()
+            if hl_pos:
+                break  # Got real positions
+            if attempt < 3:
+                wait = 5 * (2 ** attempt)
+                log(f'HL returned empty (rate-limited), retrying in {wait}s... ({attempt+1}/4)', 'WARN')
+                time.sleep(wait)
+        except Exception as e:
+            log(f'HL fetch error: {e}', 'WARN')
+            if attempt < 3:
+                time.sleep(5 * (2 ** attempt))
+    if not hl_pos:
+        log('HL still returning empty after 4 retries — skipping this cycle', 'WARN')
         return
 
     # Step 2: Get current prices from shared cache (written by price_collector)
@@ -2077,14 +2091,21 @@ def sync():
                 # NOT in safe_to_close = guardian_closed=TRUE → stale flag, try to close
                 # FIX (2026-04-02): paper=f trades are LIVE trades — never skip them.
                 # They MUST be closed when missing from HL, regardless of guardian_closed flag.
-                if t.get('paper') == False:
-                    # Live trade missing from HL — close it immediately
-                    pass  # fall through to close logic below
-                elif str(trade_id) in safe_to_close:
-                    log(f'  Step8 SKIP {tok} #{trade_id}: externally closed (guardian_closed=FALSE)', 'WARN')
+                # BUG-FIX (2026-04-06): Paper trades that are missing from HL are EXPECTED —
+                # paper trades are never supposed to be on HL. Only close as orphan when:
+                #   - guardian_closed=FALSE (never closed by guardian before) AND
+                #   - missing from HL AND
+                #   - NOT a paper trade (paper=False)
+                # Paper trades (paper=True) that exist in DB but not on HL are normal — skip them.
+                if t.get('paper') == True:
+                    # Paper trade not on HL — expected, do NOT close
                     continue
 
-                # guardian_closed=TRUE but trade is missing from HL — stale flag, close now
+                if str(trade_id) in safe_to_close:
+                    log(f'  Step8 SKIP {tok} #{trade_id}: live trade but guardian_closed=FALSE (externally closed)', 'WARN')
+                    continue
+
+                # guardian_closed=TRUE but trade is missing from HL — stale orphan, close now
                 log(f'  Step8 closing {tok} #{trade_id}: guardian_closed=TRUE but missing from HL — closing stale orphan', 'WARN')
 
                 try:

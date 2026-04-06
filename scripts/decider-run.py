@@ -18,7 +18,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from tokens import is_solana_only
-from hyperliquid_exchange import is_live_trading_enabled
+from hyperliquid_exchange import is_live_trading_enabled, is_delisted
 import hype_cache as hc
 
 # ── OPTION 1: Signal Direction Flip ──────────────────────────────────────
@@ -83,7 +83,7 @@ def _get_atr(token: str, period: int = 14, interval: str = '1h') -> float | None
         log(f'  [ATR] {token} fetch error: {e}')
         return None
 
-def _atr_multiplier(token: str, atr_pct: float) -> float:
+def _atr_multiplier(token: str, atr_pct: float, override_k: float = None) -> float:
     """
     Return k multiplier for ATR-based SL.
     Self-calibrating based on actual ATR% (volatility):
@@ -1433,15 +1433,40 @@ def run(dry_run=False):
 
         # ── Regime filter for approved signals (same as HOT-SET, 2026-04-05) ─
         # Approved signals bypass HOT-SET regime check — close that gap here.
+        # Full coverage: is_delisted + blindspot + NEUTRAL + weak_conf + counter-regime
         try:
+            # Case 0: Not tradeable on Hyperliquid (hard blocklist + HL universe check)
+            if is_delisted(token):
+                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: not tradeable on Hyperliquid')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
             regime, regime_conf = get_regime(token)
-            if regime != 'NEUTRAL' and regime_conf > 50:
-                if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
-                   (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                    log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: regime={regime} ({regime_conf}%) fights direction')
-                    mark_signal_executed(token, direction)
-                    skipped += 1
-                    continue
+            # Case 1: blindspot — token not in regime data
+            if regime is None or regime == 'NOT_IN_JSON':
+                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: regime blindspot (not in regime_4h.json)')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
+            # Case 2: NEUTRAL regime — should wait, not execute
+            if regime == 'NEUTRAL' and regime_conf > 60:
+                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: NEUTRAL regime ({regime_conf:.0f}%)')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
+            # Case 3: weak confidence — not enough regime conviction
+            if regime_conf < 50:
+                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: weak regime conf ({regime_conf:.0f}% < 50%)')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
+            # Case 4: counter-regime — fighting the trend
+            if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+               (regime == 'SHORT_BIAS' and direction == 'LONG'):
+                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: counter-regime ({regime} {regime_conf:.0f}%)')
+                mark_signal_executed(token, direction)
+                skipped += 1
+                continue
         except Exception as e:
             log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 

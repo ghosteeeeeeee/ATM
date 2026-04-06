@@ -1482,6 +1482,27 @@ def _run_mtf_macd_signals():
         price = data['price']
         if not is_reasonable_price(token, price):
             continue
+
+        # ── MACD Rules entry guard (2026-04-06) ──────────────────────────────
+        # Block LONG/SHORT entries when macd_rules says entry not allowed.
+        # Prevents entering at local peaks when MACD momentum is already turning.
+        from macd_rules import get_macd_entry_signal
+        macd_entry = get_macd_entry_signal(token, 'LONG')  # check LONG first
+        macd_entry_short = get_macd_entry_signal(token, 'SHORT')  # check SHORT
+
+        # Log MACD state for monitoring (verbose in debug mode)
+        if macd_entry['state'] is not None:
+            s = macd_entry['state']
+            print(f"  [macd_rules] {token} bull_score={s.bullish_score:+d} "
+                  f"regime={'BULL' if s.regime.value==1 else 'BEAR' if s.regime.value==-1 else 'NEUTRAL'} "
+                  f"long={'ALLOWED' if s.long_entry_allowed else 'BLOCKED'} "
+                  f"short={'ALLOWED' if s.short_entry_allowed else 'BLOCKED'}")
+
+        if not macd_entry['allowed'] and not macd_entry_short['allowed']:
+            # Both blocked — market not in a valid MACD regime for new entries
+            print(f"  [macd_rules] {token} entry blocked (both LONG/SHORT disallowed by MACD rules)")
+            continue
+
         mom = get_momentum_stats(token)
         if not mom:
             continue
@@ -1556,6 +1577,44 @@ def _run_mtf_macd_signals():
         # so they can compete with Hermes signals in the max(hermes_avg, mtf_avg) scoring
         # Raised from 1.15x to 1.35x — MACD crossovers are primary trend signals
         conf = min(95, base_conf * 1.35)  # 2tf=94, 3tf=99, 1tf=74
+
+        # ── MTF MACD Alignment Boost (2026-04-06) ───────────────────────────────
+        # Use the full macd_rules state machine across 4H/1H/15m for ultra-confirmation.
+        # ALL 3 TFs agree → +10 confidence (stacks on existing signals).
+        # 2/3 TFs agree and aligned with direction → +5.
+        # Log the alignment state for monitoring.
+        from macd_rules import compute_mtf_macd_alignment
+        mtf_align = compute_mtf_macd_alignment(token)
+        if mtf_align is not None:
+            align_score = mtf_align['mtf_score']
+            align_dir   = mtf_align['mtf_direction']
+            align_conf  = mtf_align['mtf_confidence']
+            print(f"  [MTF ALIGN] {token} score={align_score}/3 dir={align_dir} "
+                  f"conf={align_conf:.0%} bull={mtf_align['all_tfs_bullish']} bear={mtf_align['all_tfs_bearish']}")
+            if align_score >= 3:
+                conf += 10   # all 3 TFs agree → ultra-confirmation
+            elif align_score >= 2 and align_dir == direction:
+                conf += 5    # 2/3 agree and aligned → boost
+
+        # ── Cascade Entry Signal (2026-04-06) ───────────────────────────────────
+        # Cascade = smaller TFs leading the reversal. If cascade is ACTIVE and
+        # aligned with direction → STRONG confirmation (boost +10).
+        # If cascade is ACTIVE but OPPOSITE to direction → BLOCK this entry.
+        from macd_rules import cascade_entry_signal
+        cascade = cascade_entry_signal(token)
+        if cascade['cascade_active']:
+            print(f"  [CASCADE] {token} active={cascade['cascade_active']} "
+                  f"dir={cascade['cascade_direction']} score={cascade['cascade_score']:.2f} "
+                  f"lead={cascade['lead_tf']} confirm={cascade['confirmation_count']}")
+            if cascade['cascade_direction'] == direction:
+                # Cascade CONFIRMS the direction — strong boost
+                conf += 10
+                print(f"  [CASCADE] {token} {direction} cascade confirmed → confidence +10 → {conf}")
+            elif cascade['cascade_direction'] is not None:
+                # Cascade is ACTIVE but OPPOSITE direction → block entry
+                print(f"  [CASCADE] {token} {direction} BLOCKED — cascade active in opposite direction "
+                      f"({cascade['cascade_direction']}): {cascade['entry_block_reason']}")
+                continue
 
         # ── Write mtf_macd signal ────────────────────────────────
         # Source = 'hmacd-' — prefixed so add_signal() merge combines
