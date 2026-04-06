@@ -549,7 +549,8 @@ def decide_inversion(token, direction, momentum_state, conn):
         if overall_dir_acc is not None and overall_sample >= 20 and overall_dir_acc < threshold_pct:
             return 'DOWN', True, f"UP overall: acc={overall_dir_acc:.1f}% < {threshold_pct}% (n={overall_sample}), invert to DOWN"
         # Not enough data or accuracy is OK — keep UP
-        return 'UP', False, f"UP acc={overall_dir_acc:.1f}% >= {threshold_pct}% or n={overall_sample} < 20, keep UP"
+        acc_str = f"{overall_dir_acc:.1f}%" if overall_dir_acc is not None else "N/A"
+        return 'UP', False, f"UP acc={acc_str} >= {threshold_pct}% or n={overall_sample} < 20, keep UP"
 
     # ── RULE 2: INVERT DOWN if accuracy is below threshold ─────────────────────
     if direction == 'DOWN':
