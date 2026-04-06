@@ -1217,6 +1217,9 @@ def get_pending_signals():
                         'price_velocity_5m':   spd.get('price_velocity_5m', 0.0),
                         'momentum_score':   momentum,
                     })
+                # Cap at 20 tokens
+                if len(hotset) > 20:
+                    hotset = hotset[:20]
                 with open(hotset_file, 'w') as _f:
                     _json.dump({'hotset': hotset, 'timestamp': time.time()}, _f)
                 print(f"  [hot-set] wrote {len(hotset)} tokens to hotset.json")

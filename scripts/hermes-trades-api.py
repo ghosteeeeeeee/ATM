@@ -359,6 +359,9 @@ def _get_hotset_from_file():
                 'is_overextended': e.get('is_overextended', False),
             })
         print(f"[hotset] loaded {len(result)} tokens from hotset.json")
+        # Safety cap: hot-set should never exceed 20 tokens
+        if len(result) > 20:
+            result = result[:20]
         return result
     except FileNotFoundError:
         print("[hotset] hotset.json not found — using fallback DB query")

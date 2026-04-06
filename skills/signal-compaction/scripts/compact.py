@@ -341,6 +341,10 @@ def rebuild_hotset():
             "momentum_score": momentum,
         })
 
+    # Cap hot-set at 20 tokens (matches ai_decider.py and hermes-trades-api.py fallback)
+    if len(hotset) > 20:
+        hotset = hotset[:20]
+
     # Write atomically: temp file then rename
     tmp = HOTSET_FILE + f".tmp.{int(time.time())}"
     with open(tmp, "w") as f:
