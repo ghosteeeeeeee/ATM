@@ -93,17 +93,25 @@ def _atr_multiplier(token: str, atr_pct: float) -> float:
     """
     if atr_pct < 0.01:
         return 1.5
+    if override_k is not None:
+        return override_k          # A/B test overrides volatility-based k
     elif atr_pct > 0.03:
         return 2.5
+    elif atr_pct > 0.015:
+        return 1.5
     else:
         return 2.0
 
 def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
-                        sl_pct_fallback: float = 0.015) -> float:
+                        sl_pct_fallback: float = 0.015,
+                        override_k: float = None) -> float:
     """
     Compute dynamic SL using ATR(14).
     ATR-based SL replaces the fixed % SL. k multiplier is self-calibrating
     based on ATR% (volatility) — wider stops for volatile tokens.
+
+    override_k: if provided (from A/B test atr-sl-test), use it directly
+    instead of the volatility-based k table.
 
     Minimum ATR% floor: if ATR/price < 0.75%, the token is too stable for
     ATR-based SL (e.g. BTC at $95k has $409 ATR = 0.43% = too tight).
@@ -123,7 +131,7 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
             return entry_price * (1 + sl_pct_fallback)
 
     atr_pct = atr / entry_price
-    k = _atr_multiplier(token, atr_pct)
+    k = _atr_multiplier(token, atr_pct, override_k=override_k)
     atr_distance = k * atr
     atr_sl_pct = atr_distance / entry_price
 

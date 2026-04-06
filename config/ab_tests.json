@@ -3,12 +3,12 @@
   "tests": [
     {
       "name": "sl-distance-test",
-      "description": "Stop-loss distance optimization — test 1%, 2%, 3% SL distances",
+      "description": "Stop-loss distance optimization \u2014 test 1%, 2%, 3% SL distances",
       "variants": []
     },
     {
       "name": "entry-timing-test",
-      "description": "Entry timing — immediate vs retrace 2% vs retrace 5% pullback",
+      "description": "Entry timing \u2014 immediate vs retrace 2% vs retrace 5% pullback",
       "variants": [
         {
           "id": "IMMEDIATE",
@@ -29,7 +29,7 @@
     },
     {
       "name": "trailing-stop-test",
-      "description": "Trailing stop parameters — activation threshold and distance",
+      "description": "Trailing stop parameters \u2014 activation threshold and distance",
       "variants": [
         {
           "id": "TS-tight",
@@ -90,7 +90,7 @@
       "variants": [
         {
           "id": "SHORT-aggressive",
-          "label": "Aggressive SHORT — tighter SL",
+          "label": "Aggressive SHORT \u2014 tighter SL",
           "weight": 1,
           "enabled": true,
           "config": {
@@ -100,7 +100,7 @@
         },
         {
           "id": "SHORT-conservative",
-          "label": "Conservative SHORT — wider SL",
+          "label": "Conservative SHORT \u2014 wider SL",
           "weight": 1,
           "enabled": true,
           "config": {
@@ -112,7 +112,7 @@
     },
     {
       "name": "flip-trade-strategy",
-      "description": "Flip trade strategy after SL hit — test when to flip and with what parameters",
+      "description": "Flip trade strategy after SL hit \u2014 test when to flip and with what parameters",
       "variants": [
         {
           "id": "FLIP-NONE",
@@ -165,6 +165,60 @@
             "flipTrailingActivation": 0.5,
             "flipTrailingDistance": 0.5
           }
+        }
+      ]
+    },
+    {
+      "name": "atr-sl-test",
+      "description": "ATR-based stop-loss \u2014 test different ATR multipliers for dynamic SL",
+      "variants": [
+        {
+          "id": "ATR-tight",
+          "label": "Tight ATR: 1.5\u00d7 ATR stop-loss",
+          "weight": 33,
+          "enabled": true,
+          "config": {
+            "slAtrMultiplier": 1.5,
+            "description": "Tight ATR SL \u2014 1.5\u00d7 daily ATR from entry"
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null
+        },
+        {
+          "id": "ATR-medium",
+          "label": "Medium ATR: 2.0\u00d7 ATR stop-loss",
+          "weight": 34,
+          "enabled": true,
+          "config": {
+            "slAtrMultiplier": 2.0,
+            "description": "Medium ATR SL \u2014 2\u00d7 daily ATR from entry (baseline)"
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null
+        },
+        {
+          "id": "ATR-loose",
+          "label": "Loose ATR: 2.5\u00d7 ATR stop-loss",
+          "weight": 33,
+          "enabled": true,
+          "config": {
+            "slAtrMultiplier": 2.5,
+            "description": "Loose ATR SL \u2014 2.5\u00d7 daily ATR from entry"
+          },
+          "trades": 0,
+          "wins": 0,
+          "losses": 0,
+          "winRate": 0,
+          "totalPnlPct": 0,
+          "lastUpdated": null
         }
       ]
     }
