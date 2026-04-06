@@ -43,6 +43,7 @@ WATCH_LIST_FILE = '/root/.hermes/data/candle-watched-tokens.json'
 # Token-specific overrides discovered by candle_tuner.py (auto-updated hourly)
 # Format: {TOKEN: {'direction': X, 'threshold': Y}} — applies token-specific inversion
 TOKEN_ACC_OVERRIDES={
+    'APEX': {'direction': 'DOWN', 'always_invert': True},  # from candle_tuner
     # 'MATIC': {'direction': 'DOWN', 'always_invert': True},  # 0% accuracy on 58 predictions
     'MATIC': {'direction': 'DOWN', 'always_invert': True},
     'MKR': {'direction': 'DOWN', 'always_invert': True},
