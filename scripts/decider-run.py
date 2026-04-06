@@ -351,7 +351,7 @@ def get_ab_variant(test_name: str, direction: str) -> dict:
     Canonical A/B variant selection — delegates to ab_utils.get_ab_variant().
     This ensures Thompson sampling is used consistently everywhere.
     """
-    from ab_utils import get_ab_variant as _get
+    from hermes_ab_utils import get_ab_variant as _get
     return _get(test_name, direction)
 
 

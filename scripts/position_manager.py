@@ -695,7 +695,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
         for test_name, variant_id in test_map.items():
             if test_name and variant_id:
                 try:
-                    from ab_utils import record_ab_outcome
+                    from hermes_ab_utils import record_ab_outcome
                     record_ab_outcome(
                         test_name,
                         variant_id,

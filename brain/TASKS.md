@@ -273,8 +273,11 @@ Inspect `trailing_stops.json` for phase2 entries. Confirm `phase2_buffer_atr` va
 ### [ ] (P) Compare pre/post fix PnL (need baseline from before 2026-04-06) — owner: ai-engineer — 2026-04-09
 Query PostgreSQL for 30-day pre-fix baseline. Current post-fix baseline: 54 trades, 51.9% WR, +13.68 USDT net over 7 days. Need historical data from before 2026-04-06 to compute delta.
 
-### [ ] (P) Investigate Speed=50% anomaly — why only hot-set filtering through? — owner: ai-engineer — 2026-04-09
-Signals DB has NO `speed` column in schema. "Speed=50%" is a display-layer calculation. Hot-set (review_count>=1) has 1056 signals; review_count=0 has 360 signals. Need to find where Speed is calculated and why all displayed entries show 50%.
+### [✅] (P) Investigate Speed=50% anomaly — why only hot-set filtering through? — owner: ai-engineer — 2026-04-09
+**RESOLVED 2026-04-06.** Root cause: hermes-trades-api.py line ~355 uses `e.get('speed_percentile') or e.get('momentum_score') or 50.0`. The 4 affected tokens (KSHIB, KFLOKI, KBONK, KLUNC) don't exist in SpeedTracker's price history (Solana tokens, no on-chain price data). SpeedTracker defaults to 50.0 for unknown tokens. **Fix:** Seed price history for K* tokens on next pipeline run. All hot-set tokens show 50% because SpeedTracker has no history for any of them — the hot-set is a filtered view that survived AI compaction rounds, not a SpeedTracker output.
+
+### [ ] (P) Verify Speed=50% fix applied — seed price history for KSHIB/KFLOKI/KBONK/KLUNC — owner: ai-engineer — 2026-04-10
+CONFIRM that SpeedTracker's price history was seeded for KSHIB, KFLOKI, KBONK, KLUNC. Check speedtracker data or run a pipeline cycle and verify these tokens now have real speed_percentile values (not 50.0). If not seeded, the hot-set will continue showing 50% for these 4 tokens.
 
 ---
 

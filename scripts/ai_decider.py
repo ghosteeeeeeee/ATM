@@ -612,7 +612,7 @@ def select_ab_variant(test_name):
     distributions rather than greedily picking the best-known option.
     """
     try:
-        from ab_utils import get_ab_variant
+        from hermes_ab_utils import get_ab_variant
         return get_ab_variant(test_name, direction='both')
     except Exception as e:
         log_error(f'select_ab_variant Thompson sampling failed: {e}')
@@ -911,7 +911,7 @@ def record_ab_trade_closed(coin, pnl_pct, pnl_usdt):
 
                 # ── Also write to ab-tests.jsonl for the dashboard ─────────────
                 try:
-                    from ab_utils import record_ab_outcome
+                    from hermes_ab_utils import record_ab_outcome
                     record_ab_outcome(
                         test_name,
                         variant_id,

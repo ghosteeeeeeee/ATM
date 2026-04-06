@@ -126,26 +126,25 @@ def apply_token_override(token, direction):
     with open(CANDLE_PREDICTOR, 'r') as f:
         content = f.read()
 
+    import re
     override_line = f"    '{token.upper()}': {{'direction': '{direction}', 'always_invert': True}},  # from candle_tuner"
 
-    # Find the TOKEN_ACC_OVERRIDES dict and add this entry
-    if "TOKEN_ACC_OVERRIDES = {" in content:
-        # Find the closing brace of the dict and insert before it
-        import re
-        # Replace the commented-out example with actual entries
-        if "# 'MATIC': {'direction': 'DOWN', 'always_invert': True}," in content:
-            content = content.replace(
-                "# 'MATIC': {'direction': 'DOWN', 'always_invert': True},  # from candle_tuner",
-                override_line
-            )
-        else:
-            # Insert after the opening brace
-            pattern = r"(TOKEN_ACC_OVERRIDES = \{)(\n)*"
-            replacement = r"\1\n" + override_line + r"\n"
-            content = re.sub(pattern, replacement, content, count=1)
+    # Check if override already exists (uncommented)
+    already_added = re.search(r"'{TOKEN}':\s*\{'direction':\s*'{DIR}',\s*'always_invert':\s*True\}".format(TOKEN=token.upper(), DIR=direction), content)
+
+    if already_added:
+        log(f"Override already exists for {token}/{direction}")
+        return True
+
+    # Replace commented-out example with actual override
+    comment_pattern = r"#\s*'{TOKEN}':\s*\{'direction':\s*'{DIR}',\s*'always_invert':\s*True\},\s*#.*".format(TOKEN=token.upper(), DIR=direction)
+    if re.search(comment_pattern, content):
+        content = re.sub(comment_pattern, override_line, content, count=1)
     else:
-        log(f"Could not find TOKEN_ACC_OVERRIDES in candle_predictor.py", 'ERROR')
-        return False
+        # Insert after opening brace of TOKEN_ACC_OVERRIDES
+        insert_pattern = r"(TOKEN_ACC_OVERRIDES=\{\n)"
+        insert_replacement = r"\1" + override_line + "\n"
+        content = re.sub(insert_pattern, insert_replacement, content, count=1)
 
     with open(CANDLE_PREDICTOR, 'w') as f:
         f.write(content)

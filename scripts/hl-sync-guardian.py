@@ -55,7 +55,7 @@ except (IOError, OSError):
     sys.exit(1)
 sys.path.insert(0, '/root/.hermes/scripts')
 
-from ab_utils import get_cached_ab_variant
+from hermes_ab_utils import get_cached_ab_variant
 from hermes_constants import HOTSET_BLOCKLIST, SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,

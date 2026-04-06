@@ -42,8 +42,10 @@ WATCH_LIST_FILE = '/root/.hermes/data/candle-watched-tokens.json'
 
 # Token-specific overrides discovered by candle_tuner.py (auto-updated hourly)
 # Format: {TOKEN: {'direction': X, 'threshold': Y}} — applies token-specific inversion
-TOKEN_ACC_OVERRIDES = {
+TOKEN_ACC_OVERRIDES={
     # 'MATIC': {'direction': 'DOWN', 'always_invert': True},  # 0% accuracy on 58 predictions
+    'MATIC': {'direction': 'DOWN', 'always_invert': True},
+    'MKR': {'direction': 'DOWN', 'always_invert': True},
 }
 
 # Regime-specific DOWN accuracy (from 4188 predictions, 2026-04-05)
@@ -508,9 +510,10 @@ def decide_inversion(token, direction, momentum_state, conn):
     Decide whether to INVERT a prediction based on historical accuracy.
     Returns (final_direction, was_inverted, reason).
 
-    FIX (2026-04-05): Complete rewrite based on real prediction.db stats:
-    - UP is 60.5% accurate overall — NEVER invert UP (regardless of state)
-    - DOWN is 35% overall — invert when down_performance < threshold in state
+    FIX (2026-04-06): Use INVERSION_THRESHOLD properly, fix UP inversion logic.
+    - INVERSION_THRESHOLD (0.40): invert if direction accuracy < this threshold
+    - UP: invert only if token-specific UP accuracy is < 40% with 20+ predictions
+    - DOWN: invert if state-specific or overall DOWN accuracy < threshold
     - TOKEN_ACC_OVERRIDES: per-token discovered accuracy problems (from candle_tuner)
     - REGIME_DOWN_ACCURACY: data-backed state-specific DOWN accuracy
     """
@@ -529,34 +532,50 @@ def decide_inversion(token, direction, momentum_state, conn):
     state_acc = state_data.get(direction, {}).get('acc', None)
     overall_dir_acc = overall_data.get(direction, {}).get('acc', None)
     state_sample = state_data.get(direction, {}).get('n', 0)
+    overall_sample = overall_data.get(direction, {}).get('n', 0)
 
-    # ── RULE 1: NEVER INVERT UP ──────────────────────────────────────────────
+    # Use configurable INVERSION_THRESHOLD instead of hardcoded values
+    threshold_pct = int(INVERSION_THRESHOLD * 100)  # 0.40 -> 40
+
+    # ── RULE 1: INVERT UP only if historically terrible ──────────────────────
+    # "Never invert UP" was too aggressive — per-token UP can be 0%
+    # Only invert UP if we have enough data showing it's genuinely bad
     if direction == 'UP':
-        return 'UP', False, "UP predictions are 60.5% accurate — never invert"
+        # Check state-specific UP accuracy
+        if state_acc is not None and state_sample >= 20 and state_acc < threshold_pct:
+            return 'DOWN', True, f"UP in {momentum_state}: acc={state_acc:.1f}% < {threshold_pct}% (n={state_sample}), invert to DOWN"
+        # Check overall UP accuracy
+        if overall_dir_acc is not None and overall_sample >= 20 and overall_dir_acc < threshold_pct:
+            return 'DOWN', True, f"UP overall: acc={overall_dir_acc:.1f}% < {threshold_pct}% (n={overall_sample}), invert to DOWN"
+        # Not enough data or accuracy is OK — keep UP
+        return 'UP', False, f"UP acc={overall_dir_acc:.1f}% >= {threshold_pct}% or n={overall_sample} < 20, keep UP"
 
-    # ── RULE 2: INVERT DOWN only when statistically justified ─────────────────
+    # ── RULE 2: INVERT DOWN if accuracy is below threshold ─────────────────────
     if direction == 'DOWN':
         # Get regime-specific DOWN accuracy (data-backed)
         regime_acc = REGIME_DOWN_ACCURACY.get(momentum_state, 35.0)
-        threshold = 42  # default
 
         # Dynamic threshold: if state data exists, weight it
         if state_acc is not None and state_sample >= 10:
             # Blend regime baseline with state-specific data
-            # More samples = trust state data more
             blend = min(0.8, state_sample / 100)
             effective_acc = regime_acc * (1 - blend) + state_acc * blend
-            threshold = 42 - (effective_acc - regime_acc) / 2  # adjust threshold based on delta
-            threshold = max(30, min(50, threshold))  # clamp 30-50%
+            # Adjust threshold based on delta from regime baseline
+            threshold = threshold_pct - (effective_acc - regime_acc) / 2
+            threshold = max(25, min(55, threshold))  # clamp 25-55%
+        else:
+            threshold = threshold_pct
 
+        # Invert if state accuracy is below threshold
         if state_acc is not None and state_sample >= 10:
-            if state_acc < threshold and (overall_dir_acc is None or overall_dir_acc < 45):
+            if state_acc < threshold:
                 return 'UP', True, f"DOWN in {momentum_state}: acc={state_acc:.1f}% < {threshold:.0f}%, invert to UP"
             return 'DOWN', False, f"DOWN in {momentum_state}: acc={state_acc:.1f}% >= {threshold:.0f}%, keep DOWN"
-        elif overall_dir_acc is not None and overall_dir_acc < 42:
-            return 'UP', True, f"DOWN overall: acc={overall_dir_acc:.1f}% < 42% — invert to UP"
-        elif overall_dir_acc is not None and overall_dir_acc >= 42:
-            return 'DOWN', False, f"DOWN overall: acc={overall_dir_acc:.1f}% >= 42%, keep DOWN"
+        # Fall back to overall accuracy
+        elif overall_dir_acc is not None and overall_dir_acc < threshold_pct:
+            return 'UP', True, f"DOWN overall: acc={overall_dir_acc:.1f}% < {threshold_pct}% — invert to UP"
+        elif overall_dir_acc is not None:
+            return 'DOWN', False, f"DOWN overall: acc={overall_dir_acc:.1f}% >= {threshold_pct}%, keep DOWN"
 
     return direction, False, "insufficient data to decide inversion"
 
