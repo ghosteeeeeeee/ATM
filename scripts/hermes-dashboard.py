@@ -343,7 +343,7 @@ elif page == '🔀 A/B Tests':
 
     if ab.empty:
         st.info('No A/B test events yet — `record_ab_outcome()` needs to be called from trading code')
-        st.code('from ab_utils import record_ab_outcome\nrecord_ab_outcome("my_test", "variant_a", "win", metric_value=1.5)', language='python')
+        st.code('from hermes_ab_utils import record_ab_outcome\\nrecord_ab_outcome("my_test", "variant_a", "win", metric_value=1.5)', language='python')
     else:
         col1, col2, col3 = st.columns(3)
         with col1:
