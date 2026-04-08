@@ -419,6 +419,19 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                             tp_result = hl_place_tp(hype_token, direction, float(sl_row[1]), float(sz)) if sl_row[1] else {"success": True}
                             if sl_result.get("success"):
                                 print(f"[brain.py] ✅ SL placed on HL: {hype_token} {direction} SL=${sl_row[0]:.6f} TP=${sl_row[1]:.6f if sl_row[1] else 'N/A'}")
+                                # Record HL order IDs for TP/SL (needed for cancel/replace)
+                                hl_sl_oid = sl_result.get("order_id")
+                                hl_tp_oid = tp_result.get("order_id") if tp_result.get("success") else None
+                                if hl_sl_oid or hl_tp_oid:
+                                    conn_oid = get_db_connection()
+                                    cur_oid = conn_oid.cursor()
+                                    cur_oid.execute("""
+                                        UPDATE trades SET hl_sl_order_id = %s, hl_tp_order_id = %s
+                                        WHERE id = %s
+                                    """, (hl_sl_oid, hl_tp_oid, trade_id))
+                                    conn_oid.commit()
+                                    cur_oid.close(); conn_oid.close()
+                                    print(f"[brain.py] 📝 Recorded HL order IDs: sl={hl_sl_oid}, tp={hl_tp_oid}")
                             else:
                                 print(f"[brain.py] ⚠️ SL placement failed: {sl_result.get('error')} (non-fatal, paper still open)")
                 else:

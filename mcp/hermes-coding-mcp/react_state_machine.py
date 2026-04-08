@@ -49,7 +49,7 @@ class ToolCall:
 class ReActState:
     """
     ReAct state machine for agent orchestration.
-    
+
     Attributes:
         task: Current task description from user
         history: All tool calls made so far
@@ -71,6 +71,9 @@ class ReActState:
     max_retries: int = 3
     step_count: int = 0
     error_message: Optional[str] = None
+
+    # Maximum history size to prevent unbounded memory growth
+    MAX_HISTORY_SIZE: int = 1000
     
     def step(self, tool_result: Optional[dict] = None) -> tuple[ReActAction, Optional[dict]]:
         """
@@ -183,7 +186,7 @@ class ReActState:
         # A more sophisticated check would look at the specific task
         return False  # Conservative - let the orchestrator decide
     
-    def record_tool_call(self, tool_name: str, parameters: dict, 
+    def record_tool_call(self, tool_name: str, parameters: dict,
                          duration_ms: Optional[float] = None) -> None:
         """Record a tool call in history."""
         call = ToolCall(
@@ -192,6 +195,11 @@ class ReActState:
             duration_ms=duration_ms
         )
         self.history.append(call)
+
+        # Truncate history if it exceeds max size to prevent unbounded growth
+        if len(self.history) > self.MAX_HISTORY_SIZE:
+            # Keep the most recent entries
+            self.history = self.history[-self.MAX_HISTORY_SIZE:]
     
     def get_history_summary(self) -> dict:
         """Get a summary of all tool calls made."""

@@ -80,6 +80,39 @@ def _sz_decimals(token: str) -> int:
         return 4
 
 
+def _round_position_sz(szi_raw, token: str) -> float:
+    """
+    Parse position size from HL 'szi' field and round to token's szDecimals.
+    Uses Decimal to avoid float precision issues (e.g. 99.9 vs 100.0 for DYDX).
+
+    szi_raw: the raw szi value from HL (can be string, float, int, or None)
+    token:   token symbol to look up szDecimals
+    Returns: rounded absolute size as float
+    """
+    try:
+        decimals = _sz_decimals(token)
+        # Parse as Decimal to avoid float precision issues
+        if szi_raw is None:
+            sz = Decimal("0")
+        elif isinstance(szi_raw, (int, float)):
+            sz = Decimal(str(szi_raw))
+        else:
+            sz = Decimal(str(szi_raw))
+        # Round to token's szDecimals using ROUND_HALF_UP (standard rounding)
+        if decimals > 0:
+            quantizer = Decimal(f"0.{'0' * decimals}")
+            sz = sz.quantize(quantizer, rounding=ROUND_UP)
+        else:
+            sz = sz.to_integral_value(rounding=ROUND_UP)
+        return abs(float(sz))
+    except Exception:
+        # Fallback: parse as float directly
+        try:
+            return abs(float(szi_raw or 0))
+        except Exception:
+            return 0.0
+
+
 # Tokens known to be non-tradable on Hyperliquid (returns 500/not in universe).
 # These generate signals but can never be filled — hard block to prevent noise.
 _HL_BLOCKLIST = {
@@ -425,8 +458,13 @@ def get_open_hype_positions_curl():
         for p in aps:
             pos = p.get("position", {})
             coin = pos.get("coin", "")
-            sz = float(pos.get("szi", 0) or 0)
-            if sz == 0:
+            szi_raw = pos.get("szi")
+            try:
+                raw_sz = float(szi_raw or 0)
+            except Exception:
+                raw_sz = 0
+            sz = _round_position_sz(szi_raw, coin)
+            if sz == 0 and raw_sz == 0:
                 continue
             # BUG FIX (2026-04-02): extract leverage before dict literal
             # HL returns leverage as dict {'type': 'cross', 'value': 5}, extract numeric value
@@ -438,8 +476,8 @@ def get_open_hype_positions_curl():
             else:
                 lev = 1
             out[coin] = {
-                "size": abs(sz),
-                "direction": "LONG" if sz > 0 else "SHORT",
+                "size": sz,
+                "direction": "LONG" if raw_sz > 0 else "SHORT",
                 "entry_px": float(pos.get("entryPx", 0) or 0),
                 "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
                 "leverage": lev,
@@ -608,12 +646,17 @@ def get_open_hype_positions():
         for p in positions:
             pos = p.get("position", {})
             coin = pos.get("coin", "")
-            sz = float(pos.get("szi", 0) or 0)
-            if sz == 0:
+            szi_raw = pos.get("szi")
+            try:
+                raw_sz = float(szi_raw or 0)
+            except Exception:
+                raw_sz = 0
+            sz = _round_position_sz(szi_raw, coin)
+            if sz == 0 and raw_sz == 0:
                 continue
             out[coin] = {
-                "size": abs(sz),
-                "direction": "LONG" if sz > 0 else "SHORT",
+                "size": sz,
+                "direction": "LONG" if raw_sz > 0 else "SHORT",
                 "entry_px": float(pos.get("entryPx", 0) or 0),
                 "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
             }
@@ -947,13 +990,137 @@ def hype_coin(paper_token: str) -> str:
     return TOKEN_MAP.get(paper_token.upper(), paper_token.upper())
 
 
+# ─── Order builders ─────────────────────────────────────────────────────────────
+
+def build_order(coin: str, side: str, sz: float, limit_px: float,
+                order_type: str = "Limit", tif: str = "Gtc",
+                reduce_only: bool = False) -> dict:
+    """
+    Build a single OrderRequest dict for bulk / individual use.
+    Mirrors the signature of place_order() but returns a TypedDict dict.
+
+    Args:
+        coin:       HL coin name (e.g. 'HYPE')
+        side:       'BUY' or 'SELL'
+        sz:         size in coin units
+        limit_px:   limit price (0 for market)
+        order_type: 'Limit' or 'Market'
+        tif:        'Gtc', 'Alo', or 'Ioc'
+        reduce_only: True for TP/SL close-only orders
+    """
+    from hyperliquid.utils.signing import OrderRequest
+    if isinstance(order_type, dict):
+        # Already a trigger/Limit dict — use it directly
+        otype = order_type
+    elif order_type == "Market":
+        otype = {"trigger": {"triggerPx": 0, "isMarket": True, "tpsl": "tp"}}
+    else:
+        otype = {"limit": {"tif": tif}}
+    is_buy = side.upper() == "BUY"
+    order: dict = {
+        "coin": coin.upper(),
+        "is_buy": is_buy,
+        "sz": float(sz),
+        "limit_px": float(limit_px),
+        "order_type": otype,
+        "reduce_only": reduce_only,
+    }
+    return order
+
+
+def place_bulk_orders(orders: list, grouping: str = "na") -> dict:
+    """
+    Place multiple orders in a single POST /api/v1/batchOrders call.
+
+    Args:
+        orders:   list of OrderRequest dicts (from build_order, or raw dicts)
+        grouping: 'na' | 'normalTpsl' | 'positionTpsl'  (default 'na')
+
+    Returns:
+        {"success": bool, "result": raw_response_or_error}
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+
+    def _do():
+        return exchange.bulk_orders(orders, grouping=grouping)
+
+    try:
+        result = _exchange_retry(_do)
+        statuses = (
+            result.get("response", {})
+            .get("data", {})
+            .get("statuses", [])
+        )
+        errors = [s["error"] for s in statuses if "error" in s]
+        if errors:
+            return {"success": False, "errors": errors, "result": result}
+        return {"success": True, "result": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def cancel_bulk_orders(requests: list) -> dict:
+    """
+    Cancel multiple orders in a single POST /api/v1/batchCancels call.
+
+    Args:
+        requests: list of CancelRequest dicts, each {"coin": str, "oid": int}
+                  OR CancelByCloidRequest dicts {"coin": str, "cloid": Cloid}
+
+    Returns:
+        {"success": bool, "result": raw_response_or_error}
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+
+    def _do():
+        # Dispatch to the right bulk cancel variant based on key presence
+        if requests and "cloid" in requests[0]:
+            return exchange.bulk_cancel_by_cloid(requests)
+        return exchange.bulk_cancel(requests)
+
+    try:
+        result = _exchange_retry(_do)
+        statuses = (
+            result.get("response", {})
+            .get("data", {})
+            .get("statuses", [])
+        )
+        errors = [s["error"] for s in statuses if "error" in s]
+        if errors:
+            return {"success": False, "errors": errors, "result": result}
+        return {"success": True, "result": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 # ─── TP / SL Order Placement ───────────────────────────────────────────────────
 
 # HL tick sizes (minimum price increment for TP/SL orders)
 # BTC=1, ETH=0.1, SOL=0.01, STX=0.01, AVAX=0.001, TRX=0.01
 _HL_TICK_DECIMALS = {
-    "BTC": 0, "ETH": 1, "SOL": 2, "STX": 2, "AVAX": 3, "TRX": 2,
-    "MEGA": 6, "DOGE": 5, "XRP": 4, "ADA": 5, "DOT": 3, "LINK": 3,
+    # Verified from order book (2026-04-08)
+    # tick_size = 10 ** -N where N = decimals
+    "BTC": 1,   # $71k — tick 1, order book shows 71688.0 (1 decimal)
+    "ETH": 1,   # $2.2k — tick 0.1, order book shows 2250.2 (1 decimal)
+    "SOL": 3,   # $84 — tick 0.001, order book shows 84.659 (3 decimals)
+    "AVAX": 4,  # $9 — tick 0.0001, order book shows 9.3714 (4 decimals)
+    "XRP": 4,   # $1.38 — tick 0.0001, order book shows 1.3812 (4 decimals)
+    "ADA": 5,   # $0.26 — tick 0.00001, order book shows 0.25934 (5 decimals)
+    "LINK": 4,  # $9 — tick 0.0001, order book shows 9.2192 (4 decimals)
+    "DOT": 4,   # $1.3 — tick 0.0001, order book shows 1.3256 (4 decimals)
+    "DOGE": 6,  # $0.095 — tick 0.000001, order book shows 0.094826 (6 decimals)
+    "STX": 5,   # $0.23 — tick 0.00001, order book shows 0.22769 (5 decimals)
+    "TRX": 5,   # $0.32 — tick 0.00001, order book shows 0.31625 (5 decimals)
+    "MEGA": 5,  # $0.13 — tick 0.00001, order book shows 0.12991 (5 decimals)
+    # Missing tokens — inferred from order book (2026-04-08)
+    "SCR": 5,   # $0.044 — tick 0.00001, order book shows 0.04454 (5 decimals)
+    "SAND": 6,  # $0.08 — tick 0.000001, order book shows 0.079833 (6 decimals)
+    "ETHFI": 5, # $0.46 — tick 0.00001, order book shows 0.45978 (5 decimals)
+    "AXS": 4,   # $1.14 — tick 0.0001, order book shows 1.1406 (4 decimals)
+    "UMA": 5,   # $0.42 — tick 0.00001, order book shows 0.41898 (5 decimals)
+    "SKY": 6,   # $0.08 — tick 0.000001, order book shows 0.079896 (6 decimals)
 }
 
 
@@ -996,6 +1163,9 @@ def place_tp(coin: str, direction: str, tp_price: float, size: float) -> dict:
             if "error" in s:
                 return {"success": False, "error": s["error"], "coin": coin, "type": "TP",
                         "hint": "Check: price on correct side of current? price rounded to tick size?"}
+            if "ok" in s:
+                oid = s["ok"].get("oid") if isinstance(s["ok"], dict) else None
+                return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size, "order_id": oid}
         return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size}
     except Exception as e:
         return {"success": False, "error": str(e), "coin": coin, "type": "TP"}
@@ -1024,7 +1194,165 @@ def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
             if "error" in s:
                 return {"success": False, "error": s["error"], "coin": coin, "type": "SL",
                         "hint": "Check: price on correct side of current? price rounded to tick size?"}
+            if "ok" in s:
+                oid = s["ok"].get("oid") if isinstance(s["ok"], dict) else None
+                return {"success": True, "coin": coin, "type": "SL", "price": sl_rounded, "size": size, "order_id": oid}
         return {"success": True, "coin": coin, "type": "SL", "price": sl_rounded, "size": size}
+    except Exception as e:
+        return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
+
+
+def _find_open_trigger_order(coin: str, tpsl_type: str) -> tuple:
+    """
+    Find an open TP or SL order for a given coin.
+    
+    Args:
+        coin:      HL coin name (e.g. 'BTC')
+        tpsl_type: "tp" or "sl"
+    
+    Returns:
+        (oid: int, cloid: Cloid, sz: float, trigger_px: float) or (None, None, None, None) if not found.
+    """
+    exchange = get_exchange()
+    try:
+        resp = _hl_info({"type": "open_orders", "user": MAIN_ACCOUNT_ADDRESS})
+        orders = resp if isinstance(resp, list) else resp.get("orders", [])
+    except Exception:
+        return None, None, None, None
+
+    coin_upper = coin.upper()
+    for o in orders:
+        if o.get("coin", "").upper() != coin_upper:
+            continue
+        ot = o.get("orderType", {})
+        trig = ot.get("trigger", {}) if isinstance(ot, dict) else {}
+        if trig.get("tpsl", "").lower() != tpsl_type.lower():
+            continue
+        return (
+            o.get("oid"),
+            o.get("cloid"),
+            float(o.get("sz", 0)),
+            float(trig.get("triggerPx", 0)),
+        )
+    return None, None, None, None
+
+
+def cancel_tp(coin: str, direction: str = None) -> dict:
+    """
+    Cancel the open take-profit order for a given coin.
+    Returns {"success": True} on success, {"success": False, "error": ...} on failure.
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+    oid, cloid, _, _ = _find_open_trigger_order(coin, "tp")
+    if oid is None:
+        return {"success": False, "error": f"No open TP found for {coin}"}
+
+    try:
+        if cloid:
+            result = exchange.cancel_by_cloid(coin, cloid)
+        else:
+            result = exchange.cancel(coin, oid)
+        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+        for s in statuses:
+            if "error" in s:
+                return {"success": False, "error": s["error"]}
+        return {"success": True, "coin": coin, "type": "TP", "oid": oid}
+    except Exception as e:
+        return {"success": False, "error": str(e), "coin": coin, "type": "TP"}
+
+
+def cancel_sl(coin: str, direction: str = None) -> dict:
+    """
+    Cancel the open stop-loss order for a given coin.
+    Returns {"success": True} on success, {"success": False, "error": ...} on failure.
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+    oid, cloid, _, _ = _find_open_trigger_order(coin, "sl")
+    if oid is None:
+        return {"success": False, "error": f"No open SL found for {coin}"}
+
+    try:
+        if cloid:
+            result = exchange.cancel_by_cloid(coin, cloid)
+        else:
+            result = exchange.cancel(coin, oid)
+        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+        for s in statuses:
+            if "error" in s:
+                return {"success": False, "error": s["error"]}
+        return {"success": True, "coin": coin, "type": "SL", "oid": oid}
+    except Exception as e:
+        return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
+
+
+def replace_tp(coin: str, direction: str, new_price: float, size: float = None) -> dict:
+    """
+    Replace an existing TP order with a new price (and optionally new size).
+    If no existing TP is found, places a NEW TP order (handles entry-time failures).
+    Returns {"success": True} on success, {"success": False, "error": ...} on failure.
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+    oid, cloid, existing_sz, _ = _find_open_trigger_order(coin, "tp")
+    is_buy = direction.upper() == "SHORT"
+    sz = float(size) if size is not None else existing_sz
+    decimals = _HL_TICK_DECIMALS.get(coin, 6)
+    new_px = _hl_tick_round(new_price, decimals)
+    order_type = {
+        "trigger": {
+            "triggerPx": new_px,
+            "isMarket": True,
+            "tpsl": "tp",
+        }
+    }
+    # No existing TP found — place a NEW one instead of failing
+    if oid is None:
+        return place_tp(coin, direction, new_px, sz)
+    try:
+        result = exchange.modify_order(oid, coin, is_buy, sz, new_px, order_type, reduce_only=True, cloid=cloid)
+        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+        for s in statuses:
+            if "error" in s:
+                return {"success": False, "error": s["error"], "coin": coin, "type": "TP",
+                        "hint": "Check: new price on correct side of current price? price rounded to tick size?"}
+        return {"success": True, "coin": coin, "type": "TP", "price": new_px, "size": sz, "old_oid": oid}
+    except Exception as e:
+        return {"success": False, "error": str(e), "coin": coin, "type": "TP"}
+
+
+def replace_sl(coin: str, direction: str, new_price: float, size: float = None) -> dict:
+    """
+    Replace an existing SL order with a new price (and optionally new size).
+    If no existing SL is found, places a NEW SL order (handles entry-time failures).
+    Returns {"success": True} on success, {"success": False, "error": ...} on failure.
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+    oid, cloid, existing_sz, _ = _find_open_trigger_order(coin, "sl")
+    is_buy = direction.upper() == "SHORT"
+    sz = float(size) if size is not None else existing_sz
+    decimals = _HL_TICK_DECIMALS.get(coin, 6)
+    new_px = _hl_tick_round(new_price, decimals)
+    order_type = {
+        "trigger": {
+            "triggerPx": new_px,
+            "isMarket": True,
+            "tpsl": "sl",
+        }
+    }
+    # No existing SL found — place a NEW one instead of failing
+    if oid is None:
+        return place_sl(coin, direction, new_px, sz)
+    try:
+        result = exchange.modify_order(oid, coin, is_buy, sz, new_px, order_type, reduce_only=True, cloid=cloid)
+        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+        for s in statuses:
+            if "error" in s:
+                return {"success": False, "error": s["error"], "coin": coin, "type": "SL",
+                        "hint": "Check: new price on correct side of current price? price rounded to tick size?"}
+        return {"success": True, "coin": coin, "type": "SL", "price": new_px, "size": sz, "old_oid": oid}
     except Exception as e:
         return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
 

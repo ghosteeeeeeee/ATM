@@ -18,7 +18,7 @@ Reverses signal direction before every trade is executed in the Hermes pipeline.
 
 ### Check current status
 ```bash
-grep "_FLIP_SIGNALS" /root/.hermes/scripts/decider-run.py | head -1
+grep "_FLIP_SIGNALS" /root/.hermes/scripts/decider_run.py | head -1
 ```
 Or:
 ```python
@@ -29,17 +29,17 @@ import decider_run_module  # can't import directly due to side effects
 
 ### Enable flip
 ```bash
-sed -i 's/_FLIP_SIGNALS = False/_FLIP_SIGNALS = True/' /root/.hermes/scripts/decider-run.py
+sed -i 's/_FLIP_SIGNALS = False/_FLIP_SIGNALS = True/' /root/.hermes/scripts/decider_run.py
 # Verify:
-grep "_FLIP_SIGNALS" /root/.hermes/scripts/decider-run.py | head -1
+grep "_FLIP_SIGNALS" /root/.hermes/scripts/decider_run.py | head -1
 # Should show: _FLIP_SIGNALS = True
 ```
 
 ### Disable flip
 ```bash
-sed -i 's/_FLIP_SIGNALS = True/_FLIP_SIGNALS = False/' /root/.hermes/scripts/decider-run.py
+sed -i 's/_FLIP_SIGNALS = True/_FLIP_SIGNALS = False/' /root/.hermes/scripts/decider_run.py
 # Verify:
-grep "_FLIP_SIGNALS" /FLIP_SIGNALS" /root/.hermes/scripts/decider-run.py | head -1
+grep "_FLIP_SIGNALS" /FLIP_SIGNALS" /root/.hermes/scripts/decider_run.py | head -1
 # Should show: _FLIP_SIGNALS = False
 ```
 
@@ -61,7 +61,7 @@ Save as `/tmp/signal_flip.py` and run with `python3 /tmp/signal_flip.py [on|off|
 """Signal flip enable/disable script for Hermes trading pipeline."""
 import sys, re, argparse
 
-FILE = '/root/.hermes/scripts/decider-run.py'
+FILE = '/root/.hermes/scripts/decider_run.py'
 
 def get_status():
     with open(FILE) as f:
@@ -118,7 +118,7 @@ echo '{"live_trading": false}' > /var/www/hermes/data/hype_live_trading.json
 
 ## Implementation Details
 
-**File changed:** `/root/.hermes/scripts/decider-run.py`
+**File changed:** `/root/.hermes/scripts/decider_run.py`
 **Flag location:** Line 28 (`_FLIP_SIGNALS = True`)
 **Execution paths affected:**
 1. Main approved-signals loop → flips before `execute_trade()` call

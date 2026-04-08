@@ -58,32 +58,11 @@ MAX_POSITIONS = 10
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = -2.0   # cut if pnl_pct <= -2.0%
-TP_PCT        = 0.08          # 8% target (used in get_trade_params for reference)
+TP_PCT        = 0.08          # 8% fallback target (overridden by ATR-based TP in get_trade_params)
+ATR_UPDATE_THRESHOLD_PCT = 0.003  # only push SL/TP update to HL if delta > 0.3%
 SL_PCT = 0.03          # 3% stop loss (cut loser threshold — DEFAULT fallback)
 SL_PCT_MIN = 0.01      # minimum SL for any trade
 MAX_LEVERAGE = 5
-
-# ─── Trailing Stop-Loss Config ─────────────────────────────────────────────────
-# Default fallback values (used when trade has no per-trade trailing settings)
-TRAILING_START_PCT_DEFAULT   = 0.01   # engage at +1% profit (ATR-aware below)
-TRAILING_BUFFER_PCT_DEFAULT  = 0.003  # keep 0.3% buffer above entry when first activated
-TRAILING_PHASE2_BUFFER_DEFAULT = 0.002 # Phase 2: 0.2% buffer (floor — tightened 2026-04-05)
-# ── ATR-aware trailing parameters ───────────────────────────────────────────
-# These are multipliers on ATR.  Activate trailing when profit >= ATR_MULT_START × ATR.
-# Buffer = ATR_MULT_BUFFER × ATR (floored at TRAILING_BUFFER_MIN_ABS).
-TRAILING_ATR_MULT_START   = 1.0   # activate at 1× ATR profit
-TRAILING_ATR_MULT_BUFFER = 0.30  # buffer = 30% of ATR
-TRAILING_BUFFER_MIN_ABS  = 0.002 # 0.2% absolute floor (per 1% trailing)
-# Volume-confirmed tightening: when candle volume > 24h MA in trade direction
-# LONG → buy volume > MA  |  SHORT → sell volume > MA
-# Gives more room on high-momentum moves, tighter on low-volume
-TRAILING_VOL_CONF_BUFFER   = 0.0035  # 0.35% buffer when volume confirms direction
-TRAILING_VOL_NO_CONF_BUFFER = 0.0025  # 0.25% buffer when volume is weak/absent
-TRAILING_VOL_LOOKBACK      = 24      # candles for volume MA
-TRAILING_TIGHTEN = True      # tighten buffer as profit grows
-TRAILING_DATA_FILE = '/var/www/hermes/data/trailing_stops.json'
-VOLUME_CACHE_FILE  = '/var/www/hermes/data/volume_cache.json'
-VOLUME_CACHE_TTL  = 60       # seconds — one fetch per pipeline minute
 
 # ── Cascade Flip Config ──────────────────────────────────────────────────────
 # When an open position is losing AND an opposite signal fires with strong conf,
@@ -100,7 +79,9 @@ CASCADE_FLIP_MIN_CONF        = 60.0   # Opposite signal must have conf >= this %
 CASCADE_FLIP_MAX_AGE_M       = 30     # Opposite signal must be created within this many minutes (expanded from 15)
 CASCADE_FLIP_MIN_TYPES       = 1     # Opposite signal must have at least this many agreeing signal types
 CASCADE_FLIP_MAX             = 3      # Max flips per token (permanent lockout after)
-CASCADE_FLIP_POST_TRAIL_PCT  = 0.5    # Post-flip trailing SL window (tight — 0.5%)
+# NOTE: CASCADE_FLIP_POST_TRAIL_PCT removed 2026-04-08 — was only used by deprecated
+# trailing stop. Cascade-flip positions will get their own tighter SL management
+# when ATR-adaptive TP/SL is extended to cover post-flip scenarios.
 FLIP_COUNTS_FILE            = '/var/www/hermes/data/flip_counts.json'
 
 # ── MACD-Triggered Cascade Flip ───────────────────────────────────────────────
@@ -1075,6 +1056,286 @@ def _pm_atr_multiplier(atr_pct: float) -> float:
         return 2.0
 
 
+# ─── ATR-Adaptive TP/SL (batch — replaces deprecated trailing stop) ────────────
+
+def _atr_multiplier(atr_pct: float) -> float:
+    """Return k multiplier for ATR-based SL/TP. Self-calibrating by volatility."""
+    if atr_pct < 0.01:
+        return 1.5    # LOW_VOLATILITY
+    elif atr_pct > 0.03:
+        return 2.5    # HIGH_VOLATILITY
+    else:
+        return 2.0    # NORMAL_VOLATILITY
+
+
+def _force_fresh_atr(token: str, period: int = 14, interval: str = '1h') -> float | None:
+    """
+    Force-fetch ATR bypassing cache. Used for ATR-adaptive order updates.
+    Always fetches the current ATR value — no TTL check.
+    """
+    import time as _time
+    try:
+        from hyperliquid.info import Info
+        info = Info('https://api.hyperliquid.xyz', skip_ws=True)
+        now = _time.time()
+        end_t = int(now * 1000)
+        start_t = end_t - (60 * 60 * 1000 * (period + 5))
+        candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
+        if not candles or len(candles) < period + 1:
+            return None
+        trs = []
+        for i in range(1, min(period + 1, len(candles))):
+            high = float(candles[i]['h'])
+            low  = float(candles[i]['l'])
+            prev_close = float(candles[i - 1]['c'])
+            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+            trs.append(tr)
+        return sum(trs) / len(trs) if trs else None
+    except Exception:
+        return None
+
+
+def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
+    """
+    Collect all open positions (excluding cascade-flip) whose SL or TP has drifted
+    > ATR_UPDATE_THRESHOLD_PCT from current ATR.
+
+    Called once per cycle after the main position loop.
+    Returns list of update dicts:
+      {trade_id, token, direction, entry_price,
+       old_sl, new_sl, old_tp, new_tp,
+       needs_sl, needs_tp, atr, atr_pct, k}
+    """
+    if not open_positions:
+        return []
+
+    # Deduplicate tokens — one ATR fetch per unique token
+    tokens_seen: Dict[str, float | None] = {}
+    for pos in open_positions:
+        token = str(pos.get('token', '')).upper()
+        if token and token not in tokens_seen:
+            atr = _force_fresh_atr(token)
+            tokens_seen[token] = atr
+
+    updates = []
+    for pos in open_positions:
+        token = str(pos.get('token', '')).upper()
+        direction = str(pos.get('direction', '')).upper()
+        entry_price = float(pos.get('entry_price') or 0)
+        current_price = float(pos.get('current_price') or 0)
+        trade_id = pos.get('id')
+        current_sl = float(pos.get('stop_loss') or 0)
+        current_tp = float(pos.get('target') or 0)
+        source = str(pos.get('source') or '')
+
+        # Skip cascade-flip positions — they have their own tighter SL
+        if source.startswith('cascade-reverse-'):
+            continue
+
+        if not token or not trade_id:
+            continue
+
+        atr = tokens_seen.get(token)
+        if atr is None:
+            continue
+
+        # ATR as % of entry_price (standard normalization; SL/TP anchored to current_price below)
+        if entry_price <= 0:
+            continue
+        atr_pct = atr / entry_price
+        k = _atr_multiplier(atr_pct)
+        sl_pct = k * atr_pct
+        tp_pct = 2 * k * atr_pct
+
+        # Anchor SL/TP to current_price (live) not entry_price (stale).
+        # Fallback to entry_price if current_price unavailable (e.g. SKY with no mids).
+        ref_price = current_price if current_price > 0 else entry_price
+        if not ref_price > 0:
+            continue
+
+        if direction == "LONG":
+            new_sl = round(ref_price * (1 - sl_pct), 8)
+            new_tp = round(ref_price * (1 + tp_pct), 8)
+        elif direction == "SHORT":
+            new_sl = round(ref_price * (1 + sl_pct), 8)
+            new_tp = round(ref_price * (1 - tp_pct), 8)
+        else:
+            continue
+
+        # ── Trailing SL: only tighten, never loosen ─────────────────────────────
+        # SL only moves in the profit direction. Prevents getting stopped out by
+        # normal volatility when price temporarily pulls back.
+        # TP also only moves to improve (moves away from entry for LONG).
+        needs_sl = False
+        needs_tp = False
+        if direction == "LONG":
+            if current_sl > 0 and new_sl <= current_sl:
+                new_sl = current_sl          # don't loosen
+            else:
+                needs_sl = True
+            if current_tp > 0 and new_tp <= current_tp:
+                new_tp = current_tp          # don't improve unfavorably
+            else:
+                needs_tp = True
+        elif direction == "SHORT":
+            if current_sl > 0 and new_sl >= current_sl:
+                new_sl = current_sl          # don't loosen
+            else:
+                needs_sl = True
+            if current_tp > 0 and new_tp >= current_tp:
+                new_tp = current_tp          # don't improve unfavorably
+            else:
+                needs_tp = True
+
+        # Check deltas (only if trailing logic didn't already block the update)
+        if needs_sl:
+            sl_delta = abs(new_sl - current_sl) / current_sl if current_sl > 0 else 1.0
+            needs_sl = sl_delta > ATR_UPDATE_THRESHOLD_PCT
+        if needs_tp:
+            tp_delta = abs(new_tp - current_tp) / current_tp if current_tp > 0 else 1.0
+            needs_tp = tp_delta > ATR_UPDATE_THRESHOLD_PCT
+
+        if needs_sl or needs_tp:
+            updates.append({
+                'trade_id': trade_id,
+                'token': token,
+                'direction': direction,
+                'entry_price': entry_price,
+                'old_sl': current_sl,
+                'new_sl': new_sl,
+                'old_tp': current_tp,
+                'new_tp': new_tp,
+                'needs_sl': needs_sl,
+                'needs_tp': needs_tp,
+                'atr': atr,
+                'atr_pct': atr_pct,
+                'k': k,
+            })
+
+    return updates
+
+
+def _execute_atr_bulk_updates(updates: List[Dict]) -> dict:
+    """
+    Execute SL/TP updates for all affected positions in exactly 2 HL API calls:
+      1. cancel_bulk_orders  — cancel only the stale SL+TP orders for affected trades
+      2. place_bulk_orders  — place all new SL+TP orders
+
+    BUG-1 FIX: Track SL/TP OIDs per trade_id so only the right orders get cancelled.
+    Previously cancelled ALL reduceOnly orders for a token, which could affect
+    other positions of the same token that weren't being updated.
+
+    Position sizes fetched once from HL, reused across all updates.
+    """
+    if not updates:
+        return {'cancelled': 0, 'placed': 0, 'errors': []}
+
+    from hyperliquid_exchange import (
+        get_exchange, get_open_hype_positions,
+        _HL_TICK_DECIMALS, _hl_tick_round,
+        cancel_bulk_orders, place_bulk_orders, build_order,
+        MAIN_ACCOUNT_ADDRESS,
+    )
+
+    exchange = get_exchange()
+
+    # ── 1. Get position sizes from HL (one call, reused) ──────────────────────
+    positions = get_open_hype_positions()
+    if not positions:
+        return {'cancelled': 0, 'placed': 0, 'errors': ['no positions on HL']}
+
+    sz_map: Dict[str, float] = {}
+    for coin_name, p in positions.items():
+        sz_map[coin_name.upper()] = abs(float(p.get('size', 0) or 0))
+
+    # ── 2. Build set of trade_ids being updated ───────────────────────────────
+    updated_trade_ids = {u['trade_id'] for u in updates}
+
+    # ── 3. Find stale order IDs to cancel — SELECTIVE per trade_id ───────────
+    all_open = exchange.info.open_orders(MAIN_ACCOUNT_ADDRESS)
+    stale_order_reqs = []
+    for order in all_open:
+        coin = order.get('coin', '').upper()
+        oid = order.get('oid')
+        if not oid or not coin:
+            continue
+        # Check if this order belongs to any of the affected trades
+        # We check by matching token AND by checking the order's trigger price
+        # matches either the SL or TP of one of our updates
+        for u in updates:
+            if u['token'].upper() != coin:
+                continue
+            # For this update's token, check if this OID's trigger price matches
+            # the old SL or TP (indicating it belongs to this trade)
+            order_trigger = float(order.get('triggerPrice', 0) or 0)
+            if order.get('reduceOnly', False):
+                # Match by trigger price proximity to old SL or TP
+                if order_trigger > 0:
+                    if (abs(order_trigger - u['old_sl']) < 0.001 or
+                        abs(order_trigger - u['old_tp']) < 0.001):
+                        stale_order_reqs.append({'oid': oid, 'coin': coin})
+                        break
+
+    # ── 3. Cancel all stale orders (one bulk call) ─────────────────────────────
+    if stale_order_reqs:
+        cancel_bulk_orders(stale_order_reqs)
+
+    # ── 4. Build and place all new SL+TP orders (one bulk call) ───────────────
+    new_orders = []
+    for u in updates:
+        token = u['token']
+        direction = u['direction']
+        sz = sz_map.get(token.upper(), 0)
+        if sz <= 0:
+            continue
+
+        decimals = _HL_TICK_DECIMALS.get(token.upper(), 6)
+        is_short = direction == 'SHORT'
+
+        if u['needs_sl']:
+            sl_px = _hl_tick_round(u['new_sl'], decimals)
+            sl_type = {"trigger": {"triggerPx": sl_px, "isMarket": True, "tpsl": "sl"}}
+            buy_side = "SELL" if not is_short else "BUY"
+            new_orders.append(build_order(
+                token, buy_side, sz, sl_px, sl_type, reduce_only=True
+            ))
+
+        if u['needs_tp']:
+            tp_px = _hl_tick_round(u['new_tp'], decimals)
+            tp_type = {"trigger": {"triggerPx": tp_px, "isMarket": True, "tpsl": "tp"}}
+            buy_side = "SELL" if not is_short else "BUY"
+            new_orders.append(build_order(
+                token, buy_side, sz, tp_px, tp_type, reduce_only=True
+            ))
+
+    placed = 0
+    errors = []
+    if new_orders:
+        # HL batch endpoint has limits with large order counts.
+        # Chunk into sub-batches of MAX_BATCH_ORDERS to avoid rejections.
+        MAX_BATCH_ORDERS = 10  # 5 positions × 2 orders (SL+TP)
+        for i in range(0, len(new_orders), MAX_BATCH_ORDERS):
+            chunk = new_orders[i:i + MAX_BATCH_ORDERS]
+            result = place_bulk_orders(chunk)
+            if result.get('success') or result.get('status') == 'ok':
+                placed += len(chunk)
+            else:
+                # Collect ALL error fields: 'errors' (API-level) and 'error' (exception)
+                errs = result.get('errors', [])
+                if isinstance(errs, list):
+                    errors.extend([str(e) for e in errs])
+                # Also catch the 'error' key set by exception handler
+                single_err = result.get('error')
+                if single_err:
+                    errors.append(str(single_err))
+
+    return {
+        'cancelled': len(stale_order_reqs),
+        'placed': placed,
+        'errors': errors,
+    }
+
+
 def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVERAGE,
                      token: str = '', sl_pct_fallback: float = 0.015) -> Dict:
     """
@@ -1093,7 +1354,7 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
     direction = direction.upper()
     leverage = min(max_leverage, MAX_LEVERAGE)
 
-    token = token.upper().strip()
+    token = token.upper()
 
     # ── ATR-based SL ─────────────────────────────────────────────────────
     if token:
@@ -1109,12 +1370,22 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
     else:
         effective_sl_pct = sl_pct_fallback
 
+    # ── ATR-based TP (2:1 R:R — TP = 2 × SL distance) ───────────────────
+    tp_pct = TP_PCT  # fallback
+    if token:
+        atr = _pm_get_atr(token)
+        if atr is not None:
+            atr_pct_tp = atr / price
+            k_tp = _pm_atr_multiplier(atr_pct_tp)
+            tp_pct = 2 * k_tp * atr_pct_tp  # 2× SL distance → 2:1 R:R
+            tp_pct = max(tp_pct, TP_PCT)     # floor at 8%
+
     if direction == "LONG":
         stop_loss = round(price * (1 - effective_sl_pct), 8)
-        target = round(price * (1 + TP_PCT), 8)
+        target = round(price * (1 + tp_pct), 8)
     elif direction == "SHORT":
         stop_loss = round(price * (1 + effective_sl_pct), 8)
-        target = round(price * (1 - TP_PCT), 8)
+        target = round(price * (1 - tp_pct), 8)
     else:
         raise ValueError(f"Invalid direction: {direction}")
 
@@ -1125,30 +1396,13 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
     }
 
 
-# ─── Trailing Stop-Loss State ──────────────────────────────────────────────────
-def _load_trailing_data() -> Dict:
-    """Load trailing stop state from JSON file."""
-    try:
-        if os.path.exists(TRAILING_DATA_FILE):
-            with open(TRAILING_DATA_FILE, "r") as f:
-                return json.load(f)
-    except Exception as e:
-        print(f"[Position Manager] Error loading trailing data: {e}")
-    return {}
-
-
-def _save_trailing_data(data: Dict) -> None:
-    """Save trailing stop state to JSON file."""
-    try:
-        os.makedirs(os.path.dirname(TRAILING_DATA_FILE), exist_ok=True)
-        with open(TRAILING_DATA_FILE, "w") as f:
-            json.dump(data, f, indent=2, default=str)
-    except Exception as e:
-        print(f"[Position Manager] Error saving trailing data: {e}")
-
-
 # ─── Volume Confirmation Cache (HL candles via ccxt) ────────────────────────────
 # One fetch per 60s — shared across all trades in the same pipeline run.
+# NOTE: Volume confirmation is unused by the new ATR-adaptive TP/SL system but
+# _warmup_volume_cache_pm still calls _fetch_volume_data, so keep these functions.
+TRAILING_VOL_LOOKBACK = 24  # candles for volume MA (used by _fetch_volume_data)
+VOLUME_CACHE_FILE  = '/var/www/hermes/data/volume_cache.json'
+VOLUME_CACHE_TTL  = 60       # seconds — one fetch per pipeline minute
 
 def _load_volume_cache() -> dict:
     """Load cached volume data. Returns {token: {ts, vol_last, vol_ma, confirmed}}"""
@@ -1168,9 +1422,9 @@ def _save_volume_cache(data: dict) -> None:
         tmp = VOLUME_CACHE_FILE + f".{os.getpid()}.tmp"
         with open(tmp, "w") as f:
             json.dump(data, f, default=str)
-        os.replace(tmp, VOLUME_CACHE_FILE)
-    except Exception as e:
-        print(f"[Position Manager] _save_volume_cache error: {e}")
+        os.rename(tmp, VOLUME_CACHE_FILE)
+    except Exception:
+        pass
 
 
 def _fetch_volume_data(token: str) -> dict:
@@ -1207,278 +1461,6 @@ def _fetch_volume_data(token: str) -> dict:
     except Exception:
         # Fail silent — volume confirmation defaults to False (tighter SL)
         return {}
-
-
-def get_volume_confirmation(token: str, direction: str) -> bool:
-    """
-    Returns True if the most recent candle volume confirms the trade direction:
-      LONG  → vol_last > vol_ma  (buy-side volume above average)
-      SHORT → vol_last > vol_ma  (sell-side volume above average)
-
-    Volume data is fetched ONCE per 60s and cached in VOLUME_CACHE_FILE.
-    All subsequent calls within the same cycle return the cached result.
-    """
-    import time as _time
-    data = _load_volume_cache()
-    now = _time.time()
-
-    # Cache hit — still fresh
-    if data.get(token) and (now - data[token].get("ts", 0)) < VOLUME_CACHE_TTL:
-        return data[token].get("confirmed", False)
-
-    # Cache miss — fetch fresh
-    fresh = _fetch_volume_data(token)
-    if not fresh:
-        return False  # Fail closed: no data = no relaxed buffer
-
-    data[token] = fresh
-    _save_volume_cache(data)
-    return fresh.get("confirmed", False)
-
-
-def has_volume_confirmation(token: str, direction: str) -> bool:
-    """Alias for get_volume_confirmation — volume confirms directional move."""
-    return get_volume_confirmation(token, direction)
-
-
-def is_trailing_active(trade_id: int) -> bool:
-    """Check if trailing stop is active for a trade.
-
-    IMPORTANT: Also verify the trade exists and is open in DB.
-    Orphaned entries in trailing_stops.json (from deleted trades) must not
-    cause false positives that immediately close new trades with matching IDs.
-    """
-    # First verify the trade actually exists and is open in the DB
-    conn = get_db_connection()
-    if conn is None:
-        return False
-    try:
-        cur = get_cursor(conn)
-        cur.execute("SELECT id FROM trades WHERE id=%s AND status='open'", (trade_id,))
-        exists = cur.fetchone() is not None
-        cur.close()
-        conn.close()
-        if not exists:
-            # Trade doesn't exist (deleted/closed) — clean up orphaned entry
-            data = _load_trailing_data()
-            if str(trade_id) in data:
-                del data[str(trade_id)]
-                _save_trailing_data(data)
-            return False
-    except Exception:
-        if conn:
-            conn.close()
-        return False
-
-    # Trade is open — check trailing file
-    data = _load_trailing_data()
-    return str(trade_id) in data and data[str(trade_id)].get("active", False)
-
-
-def get_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> Optional[float]:
-    """
-    Compute the current trailing stop for a position.
-    Returns trailing SL value, or None if not yet engaged.
-
-    - Trailing SL engages at +1% profit (pnl_pct >= TRAILING_START_PCT)
-    - Tracks best price (highest for LONG, lowest for SHORT)
-    - Buffer tightens as profit grows (TRAILING_TIGHTEN=True)
-
-    Always returns a value when trailing is already active (live_pnl overrides trade dict).
-    """
-    direction = str(trade.get("direction", "")).upper()
-    entry_price = float(trade.get("entry_price") or 0)
-    current_price = float(trade.get("current_price") or 0)
-    trade_id = trade.get("id")
-    token = str(trade.get("token", "")).upper()
-
-    if entry_price <= 0 or current_price <= 0:
-        return None
-
-    # Compute pnl from live price (not stale DB value)
-    if live_pnl is not None:
-        pnl_pct = live_pnl
-    else:
-        pnl_pct = float(trade.get("pnl_pct") or 0)
-
-    # Load trailing data
-    data = _load_trailing_data()
-    trade_data = data.get(str(trade_id), {})
-    is_active = trade_data.get("active", False)
-
-    # Per-trade trailing settings (from A/B test), else defaults
-    trailing_start   = float(trade.get('trailing_activation') or TRAILING_START_PCT_DEFAULT)
-    trailing_buffer  = float(trade.get('trailing_distance') or TRAILING_BUFFER_PCT_DEFAULT)
-    # Post-flip override: cascade-flipped positions use tighter 0.5% trailing window
-    # instead of the default 1% activation / variable buffer.
-    source = str(trade.get('source') or '')
-    if source.startswith('cascade-reverse-'):
-        trailing_start  = CASCADE_FLIP_POST_TRAIL_PCT  # 0.5% activation
-        trailing_buffer = CASCADE_FLIP_POST_TRAIL_PCT  # 0.5% buffer — tight
-        phase2_dist     = None   # Disable phase2 tightening for post-flip
-    # Phase 2: tighter trailing once profit doubles from activation threshold
-    phase2_dist      = trade.get('trailing_phase2_dist')  # DB column: trailing_phase2_dist
-    phase2_threshold = trailing_start * 2  # phase2 activates at 2x activation profit
-
-    # If not yet activated and profit < threshold → skip activation check
-    # pnl_pct is already in percentage (e.g. 1.23 = 1.23%), trailing_start is a fraction (0.01 = 1%)
-    if not is_active and pnl_pct < trailing_start:
-        return None
-
-    # If trailing is not active yet → don't return a value
-    if not is_active:
-        return None
-
-    # Trailing is active → always compute current SL regardless of pnl_pct
-    # (pnl might dip but the trailing SL from the peak still protects)
-
-    # ── Phase 2: tighten buffer once profit doubles from activation ─────────────
-    # Check if phase 2 should activate (and persist to file so it sticks across calls)
-    if phase2_dist is not None and not trade_data.get("phase2_activated", False):
-        if pnl_pct >= phase2_threshold:
-            data[str(trade_id)]["phase2_activated"] = True
-            data[str(trade_id)]["phase2_at_pnl"] = pnl_pct
-            _save_trailing_data(data)
-            trade_data = data.get(str(trade_id), {})
-
-    # ATR-aware buffer: buffer = 30% of ATR (floored at absolute minimum).
-    # Falls back to per-trade / global defaults if ATR unavailable.
-    atr_for_buffer = _pm_get_atr(token) if token else None
-    if atr_for_buffer is not None:
-        atr_buffer_pct = TRAILING_ATR_MULT_BUFFER * atr_for_buffer / entry_price
-        # Absolute floor so low-price tokens don't get razor buffers
-        atr_buffer_pct = max(atr_buffer_pct, TRAILING_BUFFER_MIN_ABS)
-        if trailing_buffer == 0:
-            trailing_buffer = atr_buffer_pct
-        # Phase 2 also gets ATR treatment
-        if phase2_dist == 0 or phase2_dist is None:
-            phase2_buffer_atr = TRAILING_ATR_MULT_BUFFER * 0.7 * atr_for_buffer / entry_price
-            phase2_buffer_atr = max(phase2_buffer_atr, TRAILING_BUFFER_MIN_ABS * 0.7)
-    # If phase2 activated but per-trade phase2_dist is None, use global default
-    if trade_data.get("phase2_activated") and phase2_dist:
-        active_buffer = float(phase2_dist)
-    elif trade_data.get("phase2_activated"):
-        # Phase 2: use ATR-based buffer if available, else volume-confirmed
-        if 'phase2_buffer_atr' in dir() and atr_for_buffer is not None:
-            active_buffer = phase2_buffer_atr
-        else:
-            token=str(trade.get("token", "")).upper()
-            vol_confirmed = has_volume_confirmation(token, direction)
-            if vol_confirmed:
-                active_buffer = TRAILING_VOL_CONF_BUFFER   # 0.35% — room for high-momentum
-            else:
-                active_buffer = TRAILING_VOL_NO_CONF_BUFFER  # 0.25% — tighten on weak volume
-    else:
-        active_buffer = trailing_buffer
-
-    # Calculate buffer — tighter floor, faster tighten as profit grows.
-    # SHORT pnl is positive when in profit (entry > current).
-    # Formula: buffer% at 5% pnl → floor at 25%+.
-    # Floor = 0.2% (2x max daily move for most alts, won't stop you out on noise).
-    # Tighten rate: every 10% pnl reduces buffer by 0.1%.
-    if TRAILING_TIGHTEN:
-        tighten_per_10pnl = 0.001  # 0.1% tighter per 10% pnl gained
-        buffer_pct = max(0.002, active_buffer - (pnl_pct / 10) * tighten_per_10pnl)
-        buffer_pct = max(0.002, buffer_pct)  # 0.2% floor — won't stop on daily noise
-    else:
-        buffer_pct = active_buffer
-
-    # Track best price
-    # best_price from JSON is float; current_price from PostgreSQL may be Decimal
-    # (psycopg2 returns numeric/decimal columns as Python Decimal).
-    # Always coerce to float for comparison/arithmetic.
-    if direction == "LONG":
-        best_price = float(trade_data.get("best_price", current_price))
-        if float(current_price) > best_price:
-            best_price = current_price
-            data[str(trade_id)]["best_price"] = best_price
-            _save_trailing_data(data)
-        trailing_sl = best_price * (1 - buffer_pct)
-    elif direction == "SHORT":
-        best_price = float(trade_data.get("best_price", current_price))
-        if float(current_price) < best_price:
-            best_price = current_price
-            data[str(trade_id)]["best_price"] = best_price
-            _save_trailing_data(data)
-        trailing_sl = best_price * (1 + buffer_pct)
-    else:
-        return None
-    
-    return round(trailing_sl, 8)
-
-
-def check_trailing_stop(trade: Dict, live_pnl: Optional[float] = None) -> bool:
-    """
-    Check if trailing stop is hit for a position.
-    Returns True if trailing SL is hit (position should be closed).
-    """
-    trade_id = trade.get("id")
-    direction = str(trade.get("direction", "")).upper()
-    current_price = float(trade.get("current_price") or 0)
-    entry_price = float(trade.get("entry_price") or 0)
-
-    if entry_price <= 0 or current_price <= 0:
-        return False
-
-    # Get trailing stop value
-    trailing_sl = get_trailing_stop(trade, live_pnl=live_pnl)
-    if trailing_sl is None:
-        return False
-
-    # Check if trailing stop is hit
-    # LONG: trailing SL is a floor — hit when price drops below it
-    # SHORT: trailing SL is a ceiling — hit when price rises above it
-    if direction == "LONG":
-        hit = current_price < trailing_sl
-    elif direction == "SHORT":
-        hit = current_price > trailing_sl
-    else:
-        return False
-
-    # If hit, mark as inactive so close_position doesn't double-close
-    if hit:
-        try:
-            data = _load_trailing_data()
-            if str(trade_id) in data:
-                data[str(trade_id)]["active"] = False
-                _save_trailing_data(data)
-        except:
-            pass
-
-    return hit
-
-
-def activate_trailing_stop(trade_id: int, trade: Dict) -> None:
-    """Mark trailing stop as active for a trade, initializing best_price."""
-    data = _load_trailing_data()
-    if str(trade_id) not in data:
-        data[str(trade_id)] = {}
-
-    direction = str(trade.get("direction", "")).upper()
-    entry_price = float(trade.get("entry_price") or 0)
-    current_price = float(trade.get("current_price") or 0)
-
-    # Initialize best_price based on direction
-    # LONG:  best = current (entry is the low so far)
-    # SHORT: best = entry (entry is the high — we haven't seen the low yet)
-    # For SHORT, using current_price risks capturing a stale/old price from a
-    # previous pipeline run, causing the trailing SL to fire immediately.
-    if direction == "LONG":
-        best_price = current_price
-    else:
-        best_price = entry_price
-
-    data[str(trade_id)]["active"] = True
-    data[str(trade_id)]["token"] = trade.get("token")
-    data[str(trade_id)]["direction"] = direction
-    data[str(trade_id)]["entry_price"] = entry_price
-    data[str(trade_id)]["best_price"] = best_price
-    data[str(trade_id)]["activated_at_pnl"] = float(trade.get("pnl_pct") or 0)
-    data[str(trade_id)]["activated_at_price"] = current_price
-
-    _save_trailing_data(data)
-    print(f"  TRAILING STOP ACTIVATED: {trade.get('token')} {direction} "
-          f"(best={best_price}, pnl={trade.get('pnl_pct'):.2f}%)")
 
 
 # ─── Position Management ──────────────────────────────────────────────────────
@@ -1609,14 +1591,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     """
     Called every pipeline run.
 
-    Exit strategy (trailing SL is the primary exit, no fixed TP):
-    1. Cut losers: pnl <= -3% → immediate exit via static SL
-    2. At +1% profit: trailing SL activates, starts at breakeven + 0.5%
-    3. As profit grows: trailing SL tightens (buffer shrinks from 0.5% → 0.2%)
-       → Long:  trailing SL = best_price * (1 - buffer%)
-       → Short: trailing SL = best_price * (1 + buffer%)
-    4. Exit when price crosses the trailing SL (reverses from peak)
-       With 10x leverage, a 3-5% move = 30-50% gross profit
+    Exit strategy — ATR-adaptive TP/SL (replaces deprecated trailing stop):
+    1. Cut losers: pnl <= -3% → guardian handles
+    2. Cascade flips: speed-armed reversal for wrong-direction positions
+    3. Wave turn exits: z-score extremes with momentum shift
+    4. Stale exits: flat winners/losers after 30+ minutes
+    5. ATR-adaptive TP/SL: SL and TP recalculated each cycle from current ATR.
+       Batch-pushed to HL when drift > 0.3%. Cascade-flip positions skipped.
+    TP = 2× SL distance (2:1 R:R), self-calibrating via ATR volatility.
 
     Returns: (open_count, closed_count, adjusted_count)
     """
@@ -1652,45 +1634,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         else:
             live_pnl = pnl_pct
 
-        trailing_active = is_trailing_active(trade_id)
-
-        # ── 1. Trailing stop management ────────────────────────────
-        # ATR-aware activation: use ATR-based threshold unless A/B test overrides.
-        # SHORTs activate trailing only when in profit (pnl_pct positive = price moved down).
-        # Never activate on loss — cascade_flip handles reversals, cut_loser is the safety net.
-        token_for_atr = token if token else ''
-        atr_for_trailing = _pm_get_atr(token_for_atr) if token_for_atr else None
-        trailing_start_pct = float(pos.get('trailing_activation') or 0)  # A/B override?
-        if atr_for_trailing is not None and trailing_start_pct == 0:
-            # No A/B override — use ATR-based activation threshold
-            trailing_start_atr = atr_for_trailing * TRAILING_ATR_MULT_START  # 1× ATR profit
-            trailing_start_pct = trailing_start_atr  # in absolute % terms (pnl_pct already %)
-        elif trailing_start_pct == 0:
-            # No ATR available and no A/B override — use global default
-            trailing_start_pct = TRAILING_START_PCT_DEFAULT
-
-        profit_pct = pnl_pct if direction == 'SHORT' else pnl_pct
-        if profit_pct >= trailing_start_pct:
-            activate_trailing_stop(trade_id, pos)
-            adjusted_count += 1
-            trailing_active = True
-
-        # ── 2. Trailing SL exit (primary) ─────────────────────────
-        # Once trailing is active, it is the ONLY exit — cut_loser is DISABLED.
-        # This prevents the cut_loser from firing during a retrace from a big gain.
-        trailing_sl = None
-        if trailing_active:
-            trailing_sl = get_trailing_stop(pos, live_pnl=live_pnl)
-            if check_trailing_stop(pos, live_pnl=live_pnl):
-                reason = f"trailing_exit_{live_pnl:+.2f}%"
-                close_paper_position(trade_id, reason)
-                closed_count += 1
-                print(f"  TRAILING EXIT {token} {direction} {live_pnl:+.2f}% (SL: {trailing_sl:.6f})")
+        # ATR-adaptive TP/SL: replaces deprecated trailing stop.
+        # trailing_active is always False now (trailing stop removed).
+        trailing_active = False
 
         # ── 2b. MACD-Rules Engine Cascade Flip (2026-04-06) ───────────────────
         # Use macd_rules.py for proper entry/exit/flip signal detection.
         # Replaces the simple cross_under/cross_over check with full state machine.
-        if token.upper() in MACD_CASCADE_FLIP_TOKENS and not trailing_active:
+        if token.upper() in MACD_CASCADE_FLIP_TOKENS:
             from macd_rules import get_macd_exit_signal, compute_macd_state, compute_mtf_macd_alignment
 
             # ── MTF MACD Alignment ultra-confirmation (2026-04-06) ──────────
@@ -1733,12 +1684,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     'opposite_dir': 'SHORT' if direction == 'LONG' else 'LONG',
                     'conf': 95.0,
                     'source': 'mtf_macd_alignment',
-                    'reason': 'all_tfs_reversed'
+                    'reason': 'all_tfs_reversed',
+                    'sig_id': None,
                 }
                 cascade_flipped = cascade_flip(
                     token, direction, trade_id,
                     live_pnl, flip_info,
-                    entry=float(pos.get('entry_price') or 0)
+                    entry_price=float(pos.get('entry_price') or 0)
                 )
                 if cascade_flipped:
                     closed_count += 1
@@ -1758,12 +1710,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     'opposite_dir': cascade['cascade_direction'],
                     'conf': 95.0,
                     'source': 'cascade_direction',
-                    'reason': f'cascade_{cascade["cascade_direction"].lower()}_confirmed'
+                    'reason': f'cascade_{cascade["cascade_direction"].lower()}_confirmed',
+                    'sig_id': None,
                 }
                 cascade_flipped = cascade_flip(
                     token, direction, trade_id,
                     live_pnl, flip_info,
-                    entry=float(pos.get('entry_price') or 0)
+                    entry_price=float(pos.get('entry_price') or 0)
                 )
                 if cascade_flipped:
                     closed_count += 1
@@ -1776,12 +1729,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     'opposite_dir': 'SHORT' if direction == 'LONG' else 'LONG',
                     'conf': 85.0,
                     'source': 'macd_rules_engine',
-                    'reason': primary_reason[:80]
+                    'reason': primary_reason[:80],
+                    'sig_id': None,
                 }
                 cascade_flipped = cascade_flip(
                     token, direction, trade_id,
                     live_pnl, flip_info,
-                    entry=float(pos.get('entry_price') or 0)
+                    entry_price=float(pos.get('entry_price') or 0)
                 )
                 if cascade_flipped:
                     closed_count += 1
@@ -1811,7 +1765,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 cascade_flipped = cascade_flip(
                     token, direction, trade_id,
                     live_pnl, flip_info,
-                    entry=float(pos.get('entry_price') or 0)
+                    entry_price=float(pos.get('entry_price') or 0)
                 )
                 if cascade_flipped:
                     closed_count += 1
@@ -1877,74 +1831,29 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
                 continue  # Skip trailing SL update for closed position
 
-        # ── 7. Update trailing SL in DB and push to Hyperliquid ─────
-        if trailing_sl:
-            try:
-                conn_pm = get_db_connection()
-                if conn_pm:
-                    cur_pm = get_cursor(conn_pm)
-                    cur_pm.execute(
-                        "UPDATE trades SET stop_loss=%s WHERE id=%s",
-                        (round(trailing_sl, 8), trade_id)
-                    )
-                    conn_pm.commit()
-                    cur_pm.close()
-                    conn_pm.close()
-            except Exception:
-                pass
-            # BUG-8 fix: push updated trailing SL to Hyperliquid
-            # BUG-FIX B5: retry with exponential backoff on 429 rate-limit errors
-            def _retry_hl_call(fn, *args, max_attempts=3, **kwargs):
-                """Retry HL API call with exponential backoff on rate-limit errors."""
-                import time as _time
-                for attempt in range(max_attempts):
-                    try:
-                        return fn(*args, **kwargs), None
-                    except Exception as e:
-                        err_str = str(e).lower()
-                        if '429' in err_str or 'rate limit' in err_str or 'too many' in err_str:
-                            wait = 5 * (2 ** attempt)
-                            print(f"  [B5] Rate-limited on {fn.__name__}, retry {attempt+1}/{max_attempts} in {wait}s")
-                            _time.sleep(wait)
-                        else:
-                            return None, e  # Non-429 error, propagate
-                return None, Exception(f"{fn.__name__}: max retries exceeded")
-            try:
-                from hyperliquid_exchange import get_exchange, _hl_tick_round, _HL_TICK_DECIMALS
-                exchange = get_exchange()
-                decimals = _HL_TICK_DECIMALS.get(token, 6)
-                sl_rounded = _hl_tick_round(trailing_sl, decimals)
-                # Get position size from HL (with retry)
-                from hyperliquid_exchange import get_open_hype_positions
-                positions, err = _retry_hl_call(get_open_hype_positions)
-                if err or not positions:
-                    print(f"  [B5] Could not get positions for {token}: {err}")
-                else:
-                    size = 0.0
-                    for coin_name, p in positions.items():
-                        if coin_name.upper() == token.upper():
-                            size = float(p.get('szi', 0) or 0)
-                            break
-                    if size > 0:
-                        is_buy = direction.upper() == "SHORT"
-                        order_type = {
-                            "trigger": {
-                                "triggerPx": sl_rounded,
-                                "isMarket": True,
-                                "tpsl": "sl",
-                            }
-                        }
-                        order_result, order_err = _retry_hl_call(
-                            exchange.order, token, is_buy, abs(size), sl_rounded, order_type, reduce_only=True
-                        )
-                        if order_err:
-                            print(f"  [B5] Failed to push trailing SL to HL ({token}): {order_err}")
-                        else:
-                            print(f"  [BUG-8] Pushed trailing SL to HL: {token} {direction} SL=${sl_rounded:.6f}")
-            except Exception as e:
-                import traceback
-                print(f"  [BUG-8] Failed to push trailing SL to HL ({token}): {e}")
-                traceback.print_exc()
+        # ── 7. ATR-adaptive TP/SL bulk push ───────────────────────────────────
+        # After processing all positions, batch-update HL for any SL/TP that has
+        # drifted > ATR_UPDATE_THRESHOLD_PCT from current ATR (force-fresh ATR).
+        # Runs once per cycle, outside the per-position loop.
+        # Cascade-flip positions are skipped (they manage their own tighter SL/TP).
+
+    # ── End of per-position loop ─────────────────────────────────────────────
+
+    # ── ATR-adaptive TP/SL: batch collect + bulk push (one pass, 2 HL calls) ───
+    if positions:
+        updates = _collect_atr_updates(positions)
+        if updates:
+            result = _execute_atr_bulk_updates(updates)
+            for u in updates:
+                direction_u = u['direction']
+                sl_info = f"SL {u['old_sl']:.4f}→{u['new_sl']:.4f}" if u['needs_sl'] else "SL unchanged"
+                tp_info = f"TP {u['old_tp']:.4f}→{u['new_tp']:.4f}" if u['needs_tp'] else "TP unchanged"
+                print(f"  [ATR] {u['token']} {direction_u} {sl_info} | {tp_info} "
+                      f"(ATR={u['atr']:.4f} {u['atr_pct']*100:.2f}%, k={u['k']})")
+            if result['errors']:
+                for err in result['errors']:
+                    print(f"  [ATR ERR] {err}")
+            print(f"  [ATR] Bulk push: {result['cancelled']} cancelled, {result['placed']} placed")
 
     print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
 
@@ -2211,9 +2120,10 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
     # ── 2. Enter the opposite direction at current market price ───────────────
     # sig_id=None case: coin-regime-fallback — regime momentum IS the entry signal,
     # no DB signal to mark as executed. Proceed to entry with regime-based confidence.
-    from hyperliquid_exchange import place_order, get_price
+    from hyperliquid_exchange import place_order, get_prices
     try:
-        current_price = get_price(token)
+        price_map = get_prices([token])
+        current_price = price_map.get(token, 0) or 0
         if not current_price or current_price <= 0:
             current_price = flip_info.get('price') or 0
     except Exception:

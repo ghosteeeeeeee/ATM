@@ -161,13 +161,13 @@ Check status: `python3 -c "from ai_decider import get_calibration_summary; print
 
 > These are exploratory — not yet scheduled. See [PROJECTS.md#Signal Quality Improvement] for context.
 
-- [ ] **Volume displacement filter** — only trigger on breakout + displacement > 0.5%
-- [ ] **ATR-adaptive SL/TP** — SL = 1.5× ATR(14) instead of fixed %
-- [ ] **ADX trend strength filter** — ADX < 20 = ranging, prefer mean-reversion
-- [ ] **Scale-out TP system** — TP1/TP2/TP3 (1R/2R/3R) instead of single exit
-- [ ] **Wave quality metric** — HMA slope to distinguish clean swell from chaos
-- [ ] **Funding rate integration** — negative funding = tailwind for SHORTs
-- [ ] **Wave-of-interest filter** — top 50 tokens in regime direction + speed > 50
+- [ ] **Volume displacement filter**
+- [ ] **ATR-adaptive SL/TP**
+- [ ] **ADX trend strength filter**
+- [ ] **Scale-out TP system**
+- [ ] **Wave quality metric**
+- [ ] **Funding rate integration**
+- [ ] **Wave-of-interest filter**
 
 ---
 
@@ -242,29 +242,29 @@ Check status: `python3 -c "from ai_decider import get_calibration_summary; print
 
 ## Completed (this session)
 
-- [x] **Kanban board at `/projects`** (port 54321) — Flask API on :3461, nginx proxied, systemd service, 42 tasks seeded from TASKS.md
+- [✅] **Kanban board at `/projects`** (port 54321)
   - API: `/api/config/projects` (GET/POST), data at `/var/www/hermes/data/kanban.json`
   - HTML: `/var/www/hermes/projects.html` — drag-and-drop, inline edit, priority, project labels
-- [x] ATM folder created: `/root/.hermes/ATM/`
-- [x] `ATM/config/stoploss.md` written — full exit rules reference (7 exit types, all constants, cascade flip state machine, volume-tightening logic, runtime file paths)
-- [x] SOPs.md updated — ATM header + links to ATM-Architecture.md and ATM/config/stoploss.md
-- [x] PROJECTS.md: Trading-Docker → renamed AI Trading Machine (ATM), ATM folder structure documented
-- [x] DECISIONS.md: Added "ATM folder created" + "Cut-loser DISABLED" entries
-- [x] Run signal compaction — expired 903 stale WAIT signals, rebuilt hot-set 4→13 tokens
-- [x] Build checkpoint_utils.py — crash recovery snapshots
-- [x] Build event_log.py — structured audit trail
-- [x] Add token budget to ai_decider.py
-- [x] Instrument decider-run.py with checkpoints + log_event
-- [x] Instrument hl-sync-guardian.py with checkpoints + log_event
-- [x] Add workflow_state to signal_schema.py + DB migration
-- [x] Run integration test suite — 50/50 tests pass
-- [x] Remove OpenClaw (binary, npm, 54 systemd units)
-- [x] Start hermes-gateway on port 18790
-- [x] Restart hermes-git-release.timer (was dead since Apr 2)
-- [x] Audit all 47 OpenClaw skills vs Hermes tools
-- [x] Create DECISIONS.md — decision log
-- [x] Create PROJECTS.md — project tracker
-- [x] Create TASKS.md — task tracker (this file)
+- [✅] ATM folder created: `/root/.hermes/ATM/`
+- [✅] `ATM/config/stoploss.md` written
+- [✅] SOPs.md updated
+- [✅] PROJECTS.md: Trading-Docker → renamed AI Trading Machine (ATM), ATM folder structure documented
+- [✅] DECISIONS.md: Added "ATM folder created" + "Cut-loser DISABLED" entries
+- [✅] Run signal compaction
+- [✅] Build checkpoint_utils.py
+- [✅] Build event_log.py
+- [✅] Add token budget to ai_decider.py
+- [✅] Instrument decider-run.py with checkpoints + log_event
+- [✅] Instrument hl-sync-guardian.py with checkpoints + log_event
+- [✅] Add workflow_state to signal_schema.py + DB migration
+- [✅] Run integration test suite
+- [✅] Remove OpenClaw (binary, npm, 54 systemd units)
+- [✅] Start hermes-gateway on port 18790
+- [✅] Restart hermes-git-release.timer (was dead since Apr 2)
+- [✅] Audit all 47 OpenClaw skills vs Hermes tools
+- [✅] Create DECISIONS.md
+- [✅] Create PROJECTS.md
+- [✅] Create TASKS.md
 
 ---
 
@@ -332,14 +332,14 @@ CONFIRM that SpeedTracker's price history was seeded for KSHIB, KFLOKI, KBONK, K
 **Date:** 2026-04-08
 
 **All completed:**
-- [x] B8: Atomic write lock added to hermes-trades-api.py + update-trades-json.py
-- [x] B3: SL+TP placed on HL immediately after entry (brain.py add_trade)
-- [x] B2: SL+TP placed on HL after cascade flip (position_manager cascade_flip)
-- [x] B1: Trailing SL pushed to HL every cycle (already implemented, verified)
-- [x] B7: Guardian kill switch created (guardian_kill_switch.json + _is_token_killed check)
-- [x] B6: Standardized close reason vocabulary (UPPERCASE_STANDARD format)
-- [x] B5: 429 backoff retry in position_manager (_retry_hl_call helper)
-- [x] B4: cascade_sequences table + recording in cascade_flip()
+- [✅] B8: Atomic write lock added to hermes-trades-api.py + update-trades-json.py
+- [✅] B3: SL+TP placed on HL immediately after entry (brain.py add_trade)
+- [✅] B2: SL+TP placed on HL after cascade flip (position_manager cascade_flip)
+- [✅] B1: Trailing SL pushed to HL every cycle (already implemented, verified)
+- [✅] B7: Guardian kill switch created (guardian_kill_switch.json + _is_token_killed check)
+- [✅] B6: Standardized close reason vocabulary (UPPERCASE_STANDARD format)
+- [✅] B5: 429 backoff retry in position_manager (_retry_hl_call helper)
+- [✅] B4: cascade_sequences table + recording in cascade_flip()
 
 **Reference:** [brain/PROJECTS.md#SL/TP Protection System Fixes]
 

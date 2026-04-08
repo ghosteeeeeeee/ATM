@@ -128,12 +128,16 @@ class KnowledgeGraph:
             params.append(node_type)
         
         if path_prefix:
-            query += " AND path LIKE ?"
-            params.append(f"{path_prefix}%")
+            # Escape LIKE wildcards in path_prefix to prevent injection
+            escaped_prefix = path_prefix.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+            query += " AND path LIKE ? ESCAPE '\\'"
+            params.append(f"{escaped_prefix}%")
         
         if name_pattern:
-            query += " AND name LIKE ?"
-            params.append(f"%{name_pattern}%")
+            # Escape LIKE wildcards in name_pattern
+            escaped_pattern = name_pattern.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+            query += " AND name LIKE ? ESCAPE '\\'"
+            params.append(f"%{escaped_pattern}%")
         
         cursor = self.schema.conn.execute(query, params)
         rows = cursor.fetchall()

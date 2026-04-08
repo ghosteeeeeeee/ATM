@@ -116,11 +116,28 @@ Plain Markdown files in brain — no API, no dependencies, survives everything:
 ---
 
 ## Hot-Set Compaction Rewrite
-**Status:** ⬜ OPEN — 2026-04-08
+**Status:** 🚧 PARTIAL — 2026-04-08
 **Owner:** Agent
 **Summary:** Redesign the hot-set pipeline to match original intent: signals generated in last 10 mins → compacted by AI every 10 mins → top 20 survive → survivors get stronger across rounds → reverse signals penalize and evict. Signals NOT in top 20 are immediately purged (REJECTED column). No signal buildup.
 **Reference:** [.hermes/plans/2026-04-08_041613-hotset-depletion-fix.md]
 **Blockers:** None
+
+### Completed ✅
+- [X] Rewrite AI compaction prompt (Q_final variant) — fixes NO_SIGNALS bug, token `***` anonymization
+- [X] Add `***` token recovery logic in parsing — recovers anonymized tokens via direction+confidence match
+- [X] Fix `z_val:+.2f` None crash in batch decision prompt (ai_decider.py:1838)
+- [X] Add `max_tokens=4000` to ai_decider batch calls ✅ (already done)
+- [X] Fix `opened_at` → `open_time` in get_open_trade_details() (ai_decider.py:1749) — was crashing every 10 min
+- [X] Fix `needs_sl` undefined in position_manager.py — was crashing ATR update cycle
+- [X] Fix RSI/MACD confidence caps: RSI 50→70, MACD 50→80, conf-2s 70→80 (signal_gen.py)
+- [X] Confluence 2-source boost: 1.25x→1.3x (signal_gen.py)
+
+### Remaining ⬜
+- [ ] Change hot-set query window from 3h → 10 mins (`created_at > datetime('now', '-10 minutes')`)
+- [ ] Remove `review_count >= 1` requirement from hot-set query
+- [ ] Add PURGE step: non-top-20 signals → `decision='REJECTED', rejected_at=NOW()`
+- [ ] Add `rejected_at` and `rejection_reason` columns to signals table
+- [ ] Simplify state machine: GENERATED → PENDING → APPROVED (in hot-set) / REJECTED (purged) / EXECUTED (traded)
 
 ### Problem Statement
 Current broken flow: signals need `review_count>=1` + `created_at < 3 hours` to enter hot-set. But new signals never get reviewed fast enough (10-min AI review cycle), so the 3-hour window expires them before they can accumulate `review_count>=1`. Hot-set goes empty.

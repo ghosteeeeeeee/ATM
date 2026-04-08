@@ -6,7 +6,7 @@ Serves the projects.html kanban board at /projects and persists to kanban.json.
 Run: python3 /root/.hermes/scripts/kanban_api.py
 Daemon: supervised by systemd or run in background.
 """
-import os, sys, json, time
+import os, sys, json, time, subprocess
 from flask import Flask, request, jsonify, send_file, Response
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -100,6 +100,7 @@ def save_projects():
         'columns': columns
     }
     save_kanban(data)
+    subprocess.run([sys.executable, '/root/.hermes/scripts/sync_kanban_tasks.py', 'kanban→tasks'], timeout=30)
     return jsonify({'ok': True, 'saved': len(projects)})
 
 @app.route('/api/config/projects/<task_id>', methods=['DELETE'])

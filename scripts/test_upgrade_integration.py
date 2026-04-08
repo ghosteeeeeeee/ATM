@@ -461,26 +461,26 @@ def test_postgresql_columns():
 # ── Test 6: decider-run instrumentation check ──────────────────────────────────
 
 def test_decider_run_instrumentation():
-    section('decider-run.py instrumentation')
+    section('decider_run.py instrumentation')
     try:
         import ast
-        with open('/root/.hermes/scripts/decider-run.py') as f:
+        with open('/root/.hermes/scripts/decider_run.py') as f:
             source = f.read()
     except Exception as e:
-        fail('Read decider-run.py', e)
+        fail('Read decider_run.py', e)
         return
 
     # 6a. Checkpoint import
     if 'from checkpoint_utils import' in source:
-        pass_('checkpoint_utils imported in decider-run.py')
+        pass_('checkpoint_utils imported in decider_run.py')
     else:
-        fail('checkpoint_utils import NOT found in decider-run.py')
+        fail('checkpoint_utils import NOT found in decider_run.py')
 
     # 6b. log_event import
     if 'from event_log import' in source:
-        pass_('event_log imported in decider-run.py')
+        pass_('event_log imported in decider_run.py')
     else:
-        fail('event_log import NOT found in decider-run.py')
+        fail('event_log import NOT found in decider_run.py')
 
     # 6c. log_event calls present
     if 'log_event(EVENT_TRADE_ENTERED' in source:
@@ -609,7 +609,7 @@ def test_syntax():
         '/root/.hermes/scripts/checkpoint_utils.py',
         '/root/.hermes/scripts/event_log.py',
         '/root/.hermes/scripts/ai_decider.py',
-        '/root/.hermes/scripts/decider-run.py',
+        '/root/.hermes/scripts/decider_run.py',
         '/root/.hermes/scripts/hl-sync-guardian.py',
         '/root/.hermes/scripts/signal_schema.py',
     ]

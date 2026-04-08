@@ -1,15 +1,39 @@
 ---
 name: hermes-session-wrap
-description: Full session wrap for Hermes trading system — update-git, analyze-trades, fresh-run. Run after major coding sessions.
+description: Full session wrap for Hermes trading system — update-git, analyze-trades, fresh-run, CONTEXT.md refresh, kanban↔TASKS.md sync, DECISIONS.md auto-log. Run after major coding sessions.
 category: trading
-tags: [hermes, git, trading, reset, analysis]
+tags: [hermes, git, trading, reset, analysis, context, sync]
 author: T
 created: 2026-04-02
+updated: 2026-04-08
 ---
 
 # Hermes Session Wrap — Full Run + Package
 
-Run after any significant coding session: updates git, analyzes trades, fresh-resets the pipeline.
+Run after any significant coding session: updates git, analyzes trades, fresh-resets the pipeline, syncs kanban, and logs decisions.
+
+## Step 0 — CONTEXT.md Refresh (before anything else)
+
+```
+python3 /root/.hermes/scripts/context-compactor.py
+```
+
+This auto-patches Quick Status + Critical Flags in-place via flock lock.
+
+Then update the "This Session" section in `/root/.hermes/CONTEXT.md`:
+- What was accomplished this session
+- Any bugs fixed
+- Any decisions made
+- Any new tasks created
+- Update bottom timestamp
+
+## Step 0b — Kanban ↔ TASKS.md Sync
+
+```
+python3 /root/.hermes/scripts/sync_kanban_tasks.py both
+```
+
+Bidirectional sync. Uses flock locking. SKIPs on lock timeout (another writer active).
 
 ## Prerequisites
 - GitHub token: stored in `~/.netrc` (machine `api.github.com`)
@@ -275,6 +299,27 @@ git add -A && git status --short
 git commit -m "your message"
 python3 scripts/update-git.py
 ```
+
+## Step 5 — DECISIONS.md Auto-Log (session decisions)
+
+Before closing, auto-capture key decisions to `/root/.hermes/brain/DECISIONS.md`:
+
+```
+python3 /root/.hermes/scripts/hermes_write_with_lock.py decisions.md /root/.hermes/brain/DECISIONS.md << 'EOF'
+## SESSION {timestamp} | {1-line summary}
+
+**Decisions:**
+- [Decision 1]
+- [Decision 2]
+
+**Tasks Created:** N | **Tasks Completed:** N
+**Files Changed:** [list]
+**Bugs Fixed:** [list]
+**Next Session Focus:** [from Current Session Focus]
+EOF
+```
+
+If DECISIONS.md append fails (lock timeout), log the session decisions to `brain/ideas.md` under a temporary note instead.
 
 ## What NOT to Do
 - **DO NOT run the pipeline** as part of this skill — T decides when

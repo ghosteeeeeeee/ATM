@@ -1,0 +1,17 @@
+# Hermes Coding MCP Server Dependencies
+
+# MCP Framework - FastMCP implementation
+mcp >= 1.0.0
+
+# Pydantic for typed parameters (included with mcp but listed for clarity)
+pydantic >= 2.0.0
+
+# Systemd watchdog notification
+sdnotify >= 2.0.0
+
+# Note: Standard library modules used:
+# - asyncio: async subprocess execution
+# - json: structured output
+# - re: regex pattern matching for search_code
+# - pathlib: file path operations
+# - subprocess: command execution

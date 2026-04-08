@@ -1305,7 +1305,7 @@ def _run_rsi_signals_for_confluence():
                 continue  # broad market too bullish, skip LONG
             if z is None or z > LONG_1H_Z_MAX:
                 continue  # token not suppressed enough
-            conf = min(50, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
+            conf = min(70, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
             if conf < ENTRY_THRESHOLD and not (rsi < 15):
                 continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
@@ -1319,7 +1319,7 @@ def _run_rsi_signals_for_confluence():
                 continue
             if is_delisted(token.upper()):
                 continue
-            conf = min(50, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
+            conf = min(70, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
             if conf < SHORT_ENTRY_THRESHOLD and not (rsi > 85):
                 continue  # weak signal, not extreme → skip entirely
             add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
@@ -1768,7 +1768,7 @@ def _run_macd_signals_for_confluence():
         else:
             if token.upper() in SHORT_BLACKLIST:
                 continue
-        conf = min(50, 30 + abs(h) * 300)
+        conf = min(80, 30 + abs(h) * 300)
         has_partner = _has_confluence_partners(token, direction, exclude_type='macd_confluence')
         if conf < ENTRY_THRESHOLD and not (abs(h) > 0.05):
             continue
@@ -1916,8 +1916,8 @@ def run_confluence_detection(regime, long_mult, short_mult):
         if num_signals >= 3:
             boosted = min(90, base_avg * 1.5 * reversal_mult)
         else:
-            # conf-2s: only 2 agreeing signals. Cap at 70%.
-            boosted = min(70, base_avg * 1.25 * reversal_mult)
+            # conf-2s: only 2 agreeing signals. Cap at 80%.
+            boosted = min(80, base_avg * 1.3 * reversal_mult)
 
         if num_signals < 2:
             # Single-source — not confluence, skip. Let the individual signal type

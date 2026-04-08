@@ -50,13 +50,16 @@ class PipelineResult:
 class PipelineWorker:
     """
     Single pipeline worker that executes tasks through the ReAct loop.
-    
+
     Each worker has:
     - Its own ReAct state machine
     - Independent tool execution context
     - File modification tracking for conflict detection
     """
-    
+
+    # Maximum tool calls to keep in history
+    MAX_TOOL_CALLS = 1000
+
     def __init__(
         self,
         pipeline_id: int,
@@ -65,7 +68,7 @@ class PipelineWorker:
     ):
         """
         Initialize a pipeline worker.
-        
+
         Args:
             pipeline_id: Unique identifier for this pipeline
             task: Task description to execute
@@ -74,7 +77,7 @@ class PipelineWorker:
         self.pipeline_id = pipeline_id
         self.task = task
         self.tool_executor = tool_executor
-        
+
         self.tool_calls: List[ToolCall] = []
         self.file_modifications: List[str] = []
         self.errors: List[str] = []
@@ -166,7 +169,6 @@ class PipelineWorker:
         try:
             if self.tool_executor:
                 result = await self.tool_executor(
-                    self.pipeline_id,
                     self.current_tool,
                     {'task': self.task}
                 )
@@ -190,6 +192,11 @@ class PipelineWorker:
             self.errors.append(f"Tool {self.current_tool} failed: {e}")
         
         self.tool_calls.append(tool_call)
+
+        # Truncate history if it exceeds max size to prevent unbounded growth
+        if len(self.tool_calls) > self.MAX_TOOL_CALLS:
+            self.tool_calls = self.tool_calls[-self.MAX_TOOL_CALLS:]
+
         self.current_action = ReActAction.OBSERVE
     
     async def _simulate_tool_execution(self) -> Dict[str, Any]:

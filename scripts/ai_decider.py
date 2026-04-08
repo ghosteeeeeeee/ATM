@@ -1053,492 +1053,520 @@ def is_token_open(token):
         log_error(f'is_token_open: {e}')
         return False
 
-def get_pending_signals():
-    """Get PENDING signals from signals_hermes_runtime.db.
+# ─────────────────────────────────────────────────────────────────────────────
+# LLM-BASED HOT-SET COMPACTION (2026-04-08)
+# Replaces Python scoring algorithm with MiniMax-M2 ranking
+# ─────────────────────────────────────────────────────────────────────────────
 
-    FIX (2026-04-05): Extended window from 30min to 3 hours.
-    Signals with review_count>=1 are protected from expiry (handled by PURGE instead).
-    Compacts the DB to top 20 signals on each call — AI picks which to keep
-    based on freshness + confidence + agreement across indicators.
+def _do_compaction_llm():
+    """
+    Replace Python scoring with LLM-based ranking of top 20 signals.
+    
+    Every 10 mins:
+      1. QUERY: All PENDING/APPROVED signals from last 10 mins (no rc filter)
+      2. LLM RANK: Feed to MiniMax-M2 with max_tokens=4000
+      3. PARSE: Strip thinking block, extract top 20 TOKEN DIR CONF REASON lines
+      4. WRITE HOT-SET: hotset.json with survival_round (increment or 1)
+      5. UPDATE DB: APPROVED for top 20, REJECTED for others
+    """
+    import re as _re
+    
+    conn = sqlite3.connect(SIGNALS_DB)
+    c = conn.cursor()
+    
+    # STEP 1: Query signals from last 30 mins (wider window to catch signals
+    # generated in the 10-min steps, since signal_gen only fires 2x/hour)
+    # Include PENDING/APPROVED signals that haven't been executed yet.
+    c.execute("""
+        SELECT token, direction, signal_type, confidence, source, created_at,
+               compact_rounds, survival_score, z_score_tier, z_score
+        FROM signals
+        WHERE decision IN ('PENDING', 'APPROVED')
+          AND executed = 0
+          AND created_at > datetime('now', '-30 minutes')
+          AND token NOT LIKE '@%'
+        ORDER BY confidence DESC
+        LIMIT 100
+    """)
+    signals = c.fetchall()
+    
+    if not signals:
+        conn.close()
+        print("  [LLM-compaction] No signals in last 30 mins — skipping")
+        return
+    
+    print(f"  [LLM-compaction] Ranking {len(signals)} signals with MiniMax-M2...")
+    
+    # Load current hot-set for HOT SURVIVORS context
+    prev_hotset = {}
+    try:
+        with open('/var/www/hermes/data/hotset.json') as _hf:
+            _hdata = json.load(_hf)
+            for s in _hdata.get('hotset', []):
+                prev_hotset[f"{s['token']}:{s['direction']}"] = s
+    except Exception:
+        pass
+    
+    # Build HOT SURVIVORS context — include staleness info so LLM can penalize old entries
+    # Format: TOKEN(D/S,CONF%,AGE_h) where AGE_h is hours since last signal
+    if prev_hotset:
+        survivor_parts = []
+        for key, s in prev_hotset.items():
+            conf = s.get('confidence', 0)
+            age_h = (time.time() - s.get('timestamp', 0)) / 3600
+            survivor_parts.append(f"{s['token']}({s['direction'][0]},{conf:.0f}%,{age_h:.1f}h)")
+        hot_survivors_str = "HOT SURVIVORS (with age): " + " ".join(survivor_parts[:20])
+    else:
+        hot_survivors_str = "HOT SURVIVORS: (none — first run)"
+    
+    # Build SIGNALS list for prompt — include ALL signals (fresh + stale from prev hotset)
+    # The LLM will decide which survive based on fresh conviction + staleness penalty
+    signal_lines = []
+    for idx, row in enumerate(signals):
+        token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
+        # Format created time as HH:MM:SS and compute age in hours
+        try:
+            created_t = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
+            time_str = created_t.strftime('%H:%M:%S')
+            age_h = (datetime.now() - created_t).total_seconds() / 3600
+        except Exception:
+            time_str = created[-8:] if len(created) >= 8 else created
+            age_h = 0
+        signal_lines.append(f"[{idx}] {token} | {direction} | conf={conf:.0f}% | age={age_h:.1f}h | src={source}")
+    
+    # BLACKLIST string
+    BLACKLIST_STR = "SUI FET SPX ARK TON ONDO CRV RUNE AR NXPC DASH ARB TRUMP LDO NEAR APT CELO SEI ACE"
+    
+    # Dynamically read market regime to build adaptive RULES
+    _market_regime = "NEUTRAL"
+    try:
+        import os
+        _regime_path = '/var/www/html/regime_4h.json'
+        if os.path.exists(_regime_path):
+            with open(_regime_path) as _rf:
+                _rd = json.load(_rf)
+            _market_regime = _rd.get('aggregate', {}).get('overall', 'NEUTRAL')
+    except Exception:
+        pass
+    
+    if _market_regime == 'LONG_BIAS':
+        _bias_rules = "prefer LONG when close, penalize SHORT vs hot LONG -15%, no SHORT on"
+        _bias_note = "LONG_BIAS market"
+    elif _market_regime == 'SHORT_BIAS':
+        _bias_rules = "prefer SHORT when close, penalize LONG vs hot SHORT -15%, no LONG on"
+        _bias_note = "SHORT_BIAS market"
+    else:
+        _bias_rules = "prefer higher-confidence signal when close, no directional bias"
+        _bias_note = "NEUTRAL market"
+    
+    # Build prompt
+    prompt = f"""{hot_survivors_str}
+SIGNALS: {' '.join(signal_lines)}
+RULES: reject<70, penalize stale signals (>0.5h old) by -20% confidence, penalize tokens with no fresh signal in >1h, {_bias_rules}:{BLACKLIST_STR}, dedupe token+direction (keep highest).
+Market regime: {_bias_note} — bias rules in effect.
+OUT: TOKEN DIR CONF REASON (max 20 lines)
+IMPORTANT: Never use *** or any placeholder for token names. Always use the exact token symbol from the SIGNALS list above."""
+    
+    # STEP 2: Call MiniMax-M2 with max_tokens=4000 (CRITICAL: 4000 not 3000)
+    # MiniMax-M2 uses full max_tokens for BOTH reasoning + output.
+    # With max_tokens=3000, reasoning uses 2999 leaving 1 output token.
+    try:
+        _auth_path = '/root/.hermes/auth.json'
+        with open(_auth_path) as _f:
+            _auth = json.load(_f)
+        _creds = (_auth.get('credential_pool', {}) or {}).get('minimax', [])
+        if not _creds:
+            raise RuntimeError("no minimax credentials")
+        _minimax_token = _creds[0].get('access_token', '')
+        
+        if not _check_token_budget(4000):
+            print("[LLM-compaction] Token budget exceeded — skipping")
+            conn.close()
+            return
+        
+        from openai import OpenAI
+        _client = OpenAI(api_key=_minimax_token, base_url='https://api.minimax.io/v1')
+        _resp = _client.chat.completions.create(
+            model="MiniMax-M2",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=4000
+        )
+        raw = _resp.choices[0].message.content
+        
+        # Record token usage
+        try:
+            _usage = _resp.usage
+            _output_tokens = getattr(_usage, 'completion_tokens', 0) or len(raw.split()) * 1.3
+            _record_token_usage(int(2000 + _output_tokens))
+        except Exception:
+            _record_token_usage(4000)
+        
+        print(f"  [LLM-compaction] LLM response received ({len(raw)} chars)")
+        
+    except Exception as _e:
+        print(f"  [LLM-compaction] FAILED: {_e}")
+        conn.close()
+        return
+    
+    # STEP 3: Extract content from after the think block
+    # MiniMax-M2 output format: <think> [reasoning]  [actual output] 
+    # The <think> block ends with </think>. The actual output (if any) comes AFTER </think>.
+    # Use </think> as the delimiter — it reliably marks the end of the thinking block.
+    content = raw.strip() if raw else ""
+    marker = '</think>'
+    idx = content.rfind(marker)
+    if idx >= 0:
+        # Take content AFTER the </think> marker (the actual trading output)
+        content = content[idx + len(marker):].strip()
+    
+    # Debug: print first 500 chars of content
+    print(f"  [LLM-compaction] Content preview: {content[:500]}")
+    # DEBUG: write full content to temp file for inspection
+    with open('/tmp/llm_compaction_content.txt', 'w') as _dbg:
+        _dbg.write(f"RAW ({len(raw)} chars):\n{raw}\n\n---EXTRACTED ({len(content)} chars):\n{content}\n")
+    
+    if not content:
+        print(f"  [LLM-compaction] Empty LLM output — using fallback scorer")
+        parsed = []  # Will trigger the FALLBACK at "if not parsed:"
+    
+    # Build a set of valid tokens from our signals for strict parsing
+    valid_tokens = {row[0].upper() for row in signals}  # token column from signals
+    valid_confs = {row[3]: row[0].upper() for row in signals}  # conf -> token mapping
+    
+    # STEP 4: Parse OUT lines — format: TOKEN DIR CONF REASON
+    # Each line: "LAYER LONG 91 strong momentum alignment"
+    parsed = []
+    for line in content.split('\n'):
+        line = line.strip()
+        if not line:
+            continue
+        # Skip header/rule lines and think markers
+        if line.startswith(('HOT ', 'SIGNALS', 'RULES:', 'OUT:', '---', '<think>')):
+            continue
+        # Skip lines that are clearly not output lines (don't contain any LONG/SHORT)
+        if 'LONG' not in line and 'SHORT' not in line:
+            continue
+        
+        # Parse: TOKEN DIR CONF REASON
+        # Token can be alphanumeric, dir is LONG/SHORT, conf is number, rest is reason
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+        
+        # First part = token (uppercase alphanumeric)
+        token = parts[0].upper()
+        
+        # Second part = direction
+        direction = parts[1].upper()
+        if direction not in ('LONG', 'SHORT'):
+            # Try to find LONG/SHORT in parts
+            for d in ('LONG', 'SHORT'):
+                if d in parts:
+                    direction = d
+                    break
+            else:
+                continue
+        
+        # Find confidence: first numeric in parts after direction (strip % suffix)
+        conf = None
+        reason_parts = []
+        for i, p in enumerate(parts[2:], start=2):
+            # Strip trailing % if present
+            p_clean = p.rstrip('%')
+            try:
+                conf = float(p_clean)
+                reason_parts = parts[i+1:]
+                break
+            except ValueError:
+                reason_parts.append(p)
+        
+        if conf is None:
+            continue
+        
+        reason = ' '.join(reason_parts) if reason_parts else 'no reason'
+        
+        # Only include tokens that are in our actual signal list (not hallucinated)
+        # RECOVERY: If token is *** or not valid, try to recover by matching direction+confidence
+        if token == '***' or token not in valid_tokens:
+            recovered_token = None
+            for row in signals:
+                sig_token, sig_dir, _, sig_conf = row[0], row[1], row[2], row[3]
+                if sig_dir.upper() == direction.upper() and abs(sig_conf - conf) < 5:
+                    recovered_token = sig_token
+                    break
+            if recovered_token:
+                token = recovered_token
+                print(f"  [LLM-compaction] Recovered token *** -> {token} via direction+confidence match")
+            else:
+                # Couldn't recover - skip this line
+                continue
+        
+        parsed.append({
+            'token': token,
+            'direction': direction,
+            'confidence': conf,
+            'reason': reason,
+        })
+    
+    print(f"  [LLM-compaction] Parsed {len(parsed)} ranked signals")
+
+    if not parsed:
+        # FALLBACK: Use algorithm scoring when LLM produces no valid tokens
+        # REQUIREMENT: tokens must have real confidence >65% to survive without hot survivor boost
+        print(f"  [LLM-compaction] FALLBACK: Using algorithm scoring")
+        scored = []
+        for row in signals:
+            token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
+            cr = row[6]  # compact_rounds
+            if direction.upper() == 'SHORT' and token in SHORT_BLACKLIST:
+                continue
+            if direction.upper() == 'LONG' and token in LONG_BLACKLIST:
+                continue
+            if is_solana_only(token):
+                continue
+            if is_delisted(token):
+                continue
+            # Compute age of signal
+            try:
+                created_t = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
+                age_h = (datetime.now() - created_t).total_seconds() / 3600
+            except Exception:
+                age_h = 999
+            # Staleness penalty: -20% per hour of age (max -40%)
+            staleness_penalty = max(0, 1.0 - (age_h * 0.2))
+            # Hot survivor boost: only if compact_rounds > 0 AND age < 1h
+            if cr > 0 and age_h < 1.0:
+                survival_bonus = 1.0 + (cr * 0.15)
+            else:
+                survival_bonus = 1.0
+            # Regime bias (SHORT_BIAS): SHORT gets +15%, LONG gets -15%
+            regime_bonus = 1.15 if direction.upper() == 'SHORT' and _market_regime == 'SHORT_BIAS' else (
+                           0.85 if direction.upper() == 'LONG' and _market_regime == 'SHORT_BIAS' else 1.0)
+            score = conf * survival_bonus * staleness_penalty * regime_bonus
+            scored.append((token, direction, conf, score, age_h))
+        scored.sort(key=lambda x: x[3], reverse=True)
+        # Only keep tokens with score >= 65 (real conviction required)
+        top20_scored = [(s[0], s[1], s[2], s[3]) for s in scored if s[3] >= 65][:20]
+        parsed = [
+            {'token': s[0], 'direction': s[1], 'confidence': s[2], 'reason': f'fallback score={s[3]:.0f}'}
+            for s in top20_scored
+        ] if top20_scored else []
+        print(f"  [LLM-compaction] Fallback: {len(parsed)} signals above 65% threshold")
+    else:
+        print(f"  [LLM-compaction] Top parsed: {parsed[:5]}")
+    
+    # Deduplicate LLM output by token+direction before building top20
+    _seen_keys = set()
+    _parsed_deduped = []
+    for s in parsed:
+        key = f"{s['token']}:{s['direction']}"
+        if key not in _seen_keys:
+            _seen_keys.add(key)
+            _parsed_deduped.append(s)
+    parsed = _parsed_deduped
+    
+    # STEP 5: Get previous hot-set for survival_round tracking
+    prev_hotset = {}
+    try:
+        with open('/var/www/hermes/data/hotset.json') as _hf:
+            _hdata = json.load(_hf)
+            for s in _hdata.get('hotset', []):
+                prev_hotset[f"{s['token']}:{s['direction']}"] = s
+    except Exception:
+        pass
+    
+    # Build top-20 set and track survival_rounds
+    top20 = parsed[:20]
+    top20_keys = {f"{s['token']}:{s['direction']}" for s in top20}
+    
+    # Determine survival_round for each token
+    # For tokens that were in previous hotset: survival_round + 1
+    # For new tokens: survival_round = 1
+    hotset_entries = []
+    for s in top20:
+        key = f"{s['token']}:{s['direction']}"
+        prev = prev_hotset.get(key, {})
+        if prev:
+            new_sr = (prev.get('survival_round', 0)) + 1
+        else:
+            new_sr = 1
+        hotset_entries.append({
+            'token': s['token'],
+            'direction': s['direction'],
+            'confidence': s['confidence'],
+            'reason': s['reason'],
+            'survival_round': new_sr,
+        })
+    
+    # STEP 6: Update signal decisions in DB
+    # Top 20 → APPROVED, increment compact_rounds
+    # Others → REJECTED + rejected_at
+    
+    # Get all candidate signal IDs grouped by token+direction
+    c.execute("""
+        SELECT id, token, direction FROM signals
+        WHERE decision IN ('PENDING', 'APPROVED')
+          AND executed = 0
+          AND created_at > datetime('now', '-10 minutes')
+          AND token NOT LIKE '@%'
+    """)
+    all_sig_ids = c.fetchall()
+    
+    approved_ids = []
+    rejected_ids = []
+    
+    for sid, tok, d in all_sig_ids:
+        key = f"{tok.upper()}:{d.upper()}"
+        if key in top20_keys:
+            approved_ids.append(sid)
+        else:
+            rejected_ids.append(sid)
+    
+    # Update APPROVED
+    if approved_ids:
+        placeholders = ','.join(['?' for _ in approved_ids])
+        c.execute(f"""
+            UPDATE signals
+            SET decision = 'APPROVED',
+                compact_rounds = COALESCE(compact_rounds, 0) + 1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id IN ({placeholders})
+        """, approved_ids)
+        print(f"  [LLM-compaction] APPROVED {len(approved_ids)} signals")
+    
+    # Update REJECTED
+    if rejected_ids:
+        placeholders = ','.join(['?' for _ in rejected_ids])
+        c.execute(f"""
+            UPDATE signals
+            SET decision = 'REJECTED',
+                rejected_at = CURRENT_TIMESTAMP,
+                rejection_reason = 'llm_compaction_not_in_top20',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id IN ({placeholders})
+        """, rejected_ids)
+        print(f"  [LLM-compaction] REJECTED {len(rejected_ids)} signals")
+    
+    conn.commit()
+    conn.close()
+    
+    # STEP 7: Write hotset.json with survival_round
+    # Track compaction_cycle
+    _prev_cycle = 0
+    try:
+        if os.path.exists('/var/www/hermes/data/hotset.json'):
+            with open('/var/www/hermes/data/hotset.json') as _pf:
+                _prev_data = json.load(_pf)
+                _prev_cycle = _prev_data.get('compaction_cycle', 0)
+    except Exception:
+        pass
+    _compaction_cycle = _prev_cycle + 1
+    
+    # Enrich with speed data if available
+    _speed_cache = {}
+    try:
+        if speed_tracker_ai is not None:
+            _speed_cache = speed_tracker_ai().get_all_speeds()
+    except Exception:
+        pass
+    
+    # Deduplicate by token+direction before safety filters
+    _seen_keys = set()
+    _hotset_deduped = []
+    for entry in hotset_entries:
+        key = f"{entry['token']}:{entry['direction']}"
+        if key not in _seen_keys:
+            _seen_keys.add(key)
+            _hotset_deduped.append(entry)
+    hotset_entries = _hotset_deduped
+    
+    # Apply safety filters and write final hot-set
+    hotset_final = []
+    
+    for entry in hotset_entries:
+        tkn = entry['token']
+        direction = entry['direction']
+        
+        # Safety: blacklist filter
+        if direction.upper() == 'SHORT' and tkn in SHORT_BLACKLIST:
+            print(f"  🚫 [HOTSET-FILTER] {tkn}: SHORT blocked — SHORT_BLACKLIST")
+            continue
+        if direction.upper() == 'LONG' and tkn in LONG_BLACKLIST:
+            print(f"  🚫 [HOTSET-FILTER] {tkn}: LONG blocked — LONG_BLACKLIST")
+            continue
+        # Solana-only filter
+        if is_solana_only(tkn):
+            print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — Solana-only")
+            continue
+        # Delisted filter
+        if is_delisted(tkn):
+            print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted")
+            continue
+        
+        spd = _speed_cache.get(tkn, {})
+        # Get z_score and signal source from the original signal entry
+        sig_entry = next((s for s in signals if s[0] == tkn and s[1].upper() == direction.upper()), None)
+        z_val = sig_entry[9] if sig_entry else 0  # z_score column (index 9)
+        src_val = sig_entry[4] if sig_entry else ''  # source column (index 4)
+        hotset_final.append({
+            'token': tkn,
+            'direction': direction,
+            'confidence': entry['confidence'],
+            'reason': entry['reason'],
+            'source': src_val,
+            'z_score': z_val,
+            'compact_rounds': entry.get('compact_rounds', 1),
+            'survival_score': entry.get('survival_score', 0.0),
+            'survival_round': entry['survival_round'],
+            'wave_phase': spd.get('wave_phase', 'neutral'),
+            'is_overextended': spd.get('is_overextended', False),
+            'price_acceleration': spd.get('price_acceleration', 0.0),
+            'momentum_score': spd.get('momentum_score', 50.0),
+            'speed_percentile': spd.get('speed_percentile', 50.0),
+        })
+    
+    # Cap at 20
+    if len(hotset_final) > 20:
+        hotset_final = hotset_final[:20]
+    
+    with open('/var/www/hermes/data/hotset.json', 'w') as _f:
+        json.dump({
+            'hotset': hotset_final,
+            'compaction_cycle': _compaction_cycle,
+            'timestamp': time.time()
+        }, _f, indent=2)
+    
+    print(f"  [LLM-compaction] Wrote hotset.json with {len(hotset_final)} tokens (cycle={_compaction_cycle})")
+    
+    # Update pipeline heartbeat
+    try:
+        _hotset_ts_file = '/var/www/hermes/data/hotset_last_updated.json'
+        with open(_hotset_ts_file, 'w') as _f:
+            json.dump({'last_compaction_ts': time.time()}, _f)
+    except Exception:
+        pass
+
+
+# ── END LLM COMPACTION ─────────────────────────────────────────────────────────
+
+
+def get_pending_signals():
+    """
+    Get PENDING signals from signals_hermes_runtime.db.
+
+    FIX (2026-04-08): Uses LLM-based compaction instead of Python scoring.
+    Every 10 mins the LLM ranks signals and top 20 survive.
     """
     try:
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # Compaction window: 60 minutes (FIX 2026-04-05: extended from 30min)
-        # Signals older than 60 min that have never been reviewed (review_count=0)
-        # are expired — they arrived but ai_decider never got to them.
-        # IMPORTANT: signals with review_count>=1 are PROTECTED from expiry even if old.
-        # If ai_decider has seen a signal at least once, it has survival_score and
-        # the PURGE rule (compact_rounds >= 5) handles it instead.
-        c.execute("""
-            UPDATE signals
-            SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
-            WHERE decision = 'PENDING'
-              AND created_at < datetime('now', '-60 minutes')
-              AND review_count = 0
-        """)
-        expired = c.rowcount
-        conn.commit()
+        # Run LLM-based compaction (replaces Python scoring)
+        _do_compaction_llm()
 
-        # ── RULE 3: PURGE — expire signals surviving too many compaction rounds ──
-        # If a PENDING signal has survived 20+ compaction rounds, it's stuck.
-        # It keeps accumulating survival_score but never gets acted on (wrong direction,
-        # wrong regime, etc.). Force-expire it so new fresh signals can take its place.
-        PURGE_THRESHOLD = 5  # compaction rounds (lowered from 20 — max cr observed was 3 in 4 days; 20 = weeks to trigger)
-        c.execute("""
-            UPDATE signals
-            SET decision = 'EXPIRED', executed = 1,
-                deescalation_reason = 'purge-surviving-signal',
-                updated_at = CURRENT_TIMESTAMP
-            WHERE decision = 'PENDING'
-              AND compact_rounds >= ?
-        """, (PURGE_THRESHOLD,))
-        purged = c.rowcount
-        if purged > 0:
-            print(f"  [Compaction PURGE] {purged} PENDING signals expired (>={PURGE_THRESHOLD} compaction rounds survived)")
-
-        # ── STEP 0: HOT-SET REDESIGN PURGE (2026-04-08) ────────────────────────────
-        # Mark signals from PREVIOUS cycle that aren't in the new top 20 as REJECTED.
-        # This is the core of the 10-min hot-set cycle:
-        #   - Signals from last 10 mins are candidates for the new hot-set
-        #   - Signals from PREVIOUS cycle that didn't make the new top 20 → REJECTED
-        #   - Only top 20 survive per cycle → no signal accumulation
-        try:
-            # Read current hotset.json to get previous cycle's tokens
-            import json as _json
-            prev_hotset = []
-            try:
-                with open('/var/www/hermes/data/hotset.json') as _hf:
-                    _hdata = _json.load(_hf)
-                    prev_hotset = [f"{s['token']}:{s['direction']}" for s in _hdata.get('hotset', [])]
-            except Exception:
-                pass  # no previous hotset = first run, skip purge
-
-            if prev_hotset:
-                # Build set of new top-20 token+direction from current candidates
-                # (we'll build this after scoring in the normal flow)
-                # For purge: mark OLD signals (from previous cycle) as REJECTED
-                # if they're not in the hotset (meaning they didn't survive)
-                placeholders = ','.join(['?' for _ in prev_hotset])
-                c.execute(f"""
-                    UPDATE signals
-                    SET decision = 'REJECTED',
-                        rejected_at = CURRENT_TIMESTAMP,
-                        rejection_reason = 'not_in_top_20_compaction',
-                        updated_at = CURRENT_TIMESTAMP
-                    WHERE decision = 'PENDING'
-                      AND created_at < datetime('now', '-10 minutes')
-                      AND (token || ':' || direction) NOT IN (
-                          SELECT (token || ':' || direction) FROM signals
-                          WHERE created_at > datetime('now', '-10 minutes')
-                            AND decision = 'PENDING'
-                            AND executed = 0
-                      )
-                """)
-                _purged_prev = c.rowcount
-                if _purged_prev > 0:
-                    print(f"  [Compaction PURGE] {_purged_prev} previous-cycle signals REJECTED (not in new top 20)")
-        except Exception as _pe:
-            print(f"  [Compaction PURGE] warning: {_pe}")
-
-        # ── 2. AI-guided compaction: score and keep top 20 ─────────────────────
-        # Score = recency_boost + confidence + confluence_bonus + speed_score
-        # SPEED FEATURE: update tracker once per compaction run (<2s)
-        if speed_tracker_ai is not None:
-            speed_tracker_ai().update()
-
-        # FIX (2026-04-08): 10-min window for compaction — all signals in last 10 mins
-        # are scored regardless of review_count. New signals (rc=0) must enter hot-set.
-        c.execute("""
-            SELECT id, token, direction, signal_type, confidence, source, created_at
-            FROM signals
-            WHERE decision = 'PENDING'
-              AND executed = 0
-              AND created_at > datetime('now', '-10 minutes')
-        """)
-        candidates = c.fetchall()
-        # Always score all candidates — this increments compact_rounds for EVERY signal
-        # each cycle, building their survival history so the hot set populates even
-        # with <20 signals. With <=20 candidates, ALL survive (no compaction).
-        # With >20, top 20 survive and rest are compacted.
-        if candidates:
-            # Pre-load signal streaks for all candidates (batched, single DB connection)
-            _load_signal_streaks_batch(candidates)
-
-            # Score each signal: confluence > confidence > survival_meta > streak > recency
-            scored = []
-            now_ts = time.time()
-            now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            for row in candidates:
-                sid, coin, direction, stype, conf, source, created = row
-
-                # Fetch survival data from signal record
-                c.execute("SELECT compact_rounds, survival_score FROM signals WHERE id = ?", (sid,))
-                surv_row = c.fetchone()
-                compact_rounds = surv_row[0] if surv_row else 0
-                survival_meta = surv_row[1] if surv_row else 0.0
-
-                # Confluence: base score from agreeing signal types
-                agreeing = sum(1 for r in candidates
-                               if r[1] == coin and r[2] == direction and r[3] != stype)
-                base_confluence = 1.0 + min(agreeing, 2) * 0.5  # 1.0 to 2.0
-
-                # Signal-type quality multiplier for confluence signals
-                # conf-2s: weak (only 2 agreeing indicators, often noise)
-                # conf-3s+: strong (3+ indicators = genuine confluence)
-                # conf-4s+: very strong (rare, high conviction)
-                if stype == 'confluence' and source and source.startswith('conf-'):
-                    try:
-                        n = int(source.split('-')[1].rstrip('s'))  # e.g. 'conf-2s' -> 2
-                    except (ValueError, IndexError):
-                        n = 2
-                    if n == 2:
-                        base_confluence *= 0.4   # 0.4 to 0.8 — penalize weak 2-signal confluence
-                    elif n == 3:
-                        base_confluence *= 1.1   # 1.1 to 2.2 — reward strong 3-signal
-                    elif n >= 4:
-                        base_confluence *= 1.4   # 1.4 to 2.8 — very rare, very strong
-                confluence_score = base_confluence
-
-                # Source confidence weight from centralized config
-                source_weight = _get_source_weight(stype, source)
-
-                # Confidence (scaled by source weight)
-                conf_score = (conf / 100.0) * source_weight
-
-                # Recency
-                try:
-                    created_dt = datetime.strptime(created, '%Y-%m-%d %H:%M:%S')
-                    created_ts = created_dt.replace(tzinfo=timezone.utc).timestamp()
-                    age_min = (now_ts - created_ts) / 60.0
-                    recency_score = max(0.0, 1.0 + (0.3 * max(0, (5 - age_min) / 5)))
-                except (ValueError, TypeError):
-                    recency_score = 1.0
-
-                # Signal quality streak (hot boost, cold suppress)
-                streak = _get_signal_streak(coin, direction, stype)
-                streak_mult = streak.get('multiplier', 1.0)
-
-                # Survival inertia: log-based bonus — 20 rounds shouldn't = 10x the inertia of 2 rounds.
-                # OLD: survival_bonus = compact_rounds * 0.2 → 20 rounds = 4.0 bonus, 2 rounds = 0.4
-                # NEW: log1p(compact_rounds) * 0.5 → 20 rounds = 1.5, 2 rounds = 0.5 — much more stable.
-                # Plus a STAY bonus: if signal is already in hot-set (rc>=1) and stays competitive
-                # (score still in top half), add a "stay bonus" that compounds over rounds.
-                # This prevents a new burst of fresh signals from crowding out established ones.
-                stay_bonus = 0.0
-                if compact_rounds >= 1:
-                    # Stay bonus = 0.1 per round survived, capped at 1.0
-                    # Signal with r=20 and decent scores gets +1.0 on top of log bonus
-                    stay_bonus = min(1.0, compact_rounds * 0.05)
-                survival_bonus = min(1.5, math.log1p(compact_rounds) * 0.5 + stay_bonus)
-                survival_score_raw = 1.0 + survival_bonus
-
-                # SPEED FEATURE: speed percentile boosts survival in compaction
-                # Fast-moving tokens survive compaction longer — we want to be in movers.
-                # speed_score = speed_percentile / 100 * 0.10 (10% weight)
-                speed_score = 0.0
-                if speed_tracker_ai is not None:
-                    spd = speed_tracker_ai().get_token_speed(coin)
-                    if spd:
-                        speed_score = (spd.get('speed_percentile', 50.0) / 100.0) * 0.10
-
-                # REGIME FILTER in compaction: penalize signals fighting the current regime.
-                # ANIME LONG in SHORT regime (or vice versa) should not survive compaction.
-                # Regime score: 1.0 = neutral/no-regime, 0.5 = fighting regime, 1.5 = aligned.
-                # This is applied as a multiplier on the final score.
-                regime_score = 1.0
-                try:
-                    regime, regime_conf = get_regime(coin)
-                    if regime != 'NEUTRAL' and regime_conf >= 55:
-                        if (regime == 'SHORT_BIAS' and direction == 'LONG') or \
-                           (regime == 'LONG_BIAS' and direction == 'SHORT'):
-                            regime_score = 0.4  # strongly penalize counter-regime signals
-                        elif (regime == 'SHORT_BIAS' and direction == 'SHORT') or \
-                             (regime == 'LONG_BIAS' and direction == 'LONG'):
-                            regime_score = 1.2  # slight bonus for regime-aligned signals
-                except Exception:
-                    pass  # never block on regime lookup errors
-
-                # Score = (confluence(5%) + confidence(40%) + survival(20%) + streak(20%) + recency(15%) + speed(10%)) × regime_score
-                # FIX (2026-04-02): Confluence weight cut to 5% — conf-2s noise was dominating.
-                # SPEED: Added 10% weight for speed percentile — fast movers survive longer.
-                # REGIME: Added regime_score multiplier — counter-regime signals penalized 0.4x.
-                raw_score = (
-                    confluence_score   * 0.05 +
-                    conf_score         * 0.40 +
-                    survival_score_raw * 0.20 +
-                    streak_mult        * 0.20 +
-                    recency_score      * 0.15 +
-                    speed_score        * 0.10
-                )
-                final_score = raw_score * regime_score
-                scored.append({
-                    'score': final_score,
-                    'raw': raw_score,
-                    'regime_score': regime_score,
-                    'survival_bonus': survival_bonus,
-                    'streak_mult': streak_mult,
-                    'confluence_score': confluence_score,
-                    'conf_score': conf_score,
-                    'source_weight': source_weight,
-                    'recency_score': recency_score,
-                    'speed_score': speed_score,
-                    'compact_rounds': compact_rounds,
-                    'survival_meta': survival_meta,
-                    'sid': sid,
-                    'token': coin,
-                    'direction': direction,
-                    'stype': stype,
-                    'conf': conf,
-                    'source': source,
-                    'row': row,
-                })
-
-            # Sort and partition: top 20 survive, rest are compacted (only when >20)
-            scored.sort(key=lambda x: -x['score'])
-            keep_all = len(candidates) <= 20  # when few signals, ALL survive
-            compacted_count = 0
-            compact_round = int(time.time())
-            keep_sids = {s['sid'] for s in scored[:20]}  # O(1) set for membership test
-
-            # Update ALL signals: increment compact_rounds, update survival_score, record history
-            for s in scored:
-                new_survival = s['survival_meta'] + 0.5
-                c.execute("""
-                    UPDATE signals
-                    SET compact_rounds = compact_rounds + 1,
-                        survival_score = ?,
-                        last_compact_at = ?,
-                        review_count = COALESCE(review_count, 0) + 1
-                    WHERE id = ?
-                """, (round(new_survival, 3), now_str, s['sid']))
-
-                # Record survival history for ALL signals (survived=1)
-                c.execute("""
-                    INSERT INTO signal_history
-                        (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
-                    VALUES (?, ?, ?, ?, 1, ?, ?, ?)
-                """, (s['token'], s['direction'], s['stype'], compact_round,
-                      round(s['raw'], 3), round(s['score'], 3),
-                      f'survived_r{s["compact_rounds"]+1}_conf{s["conf"]:.0f}'))
-
-            # Only compact (expire bottom signals) when we have >20 candidates
-            # FIX (2026-04-02): Signals with confidence >= 85% are EXEMPT from compaction.
-            # These are strong signals that have survived multiple AI review passes
-            # and deserve a chance to reach APPROVED/execution. Compacting them
-            # at 286 signals (avg 94% conf) was destroying good opportunities.
-            EXEMPT_CONFIDENCE = 85
-            if not keep_all:
-                # Separate exempt signals from compactable ones
-                exempt_sids = {s['sid'] for s in scored if s['conf'] >= EXEMPT_CONFIDENCE}
-                compactable = [s for s in scored if s['sid'] not in exempt_sids]
-                # Keep top 20 compactable signals, compact the rest
-                keep_sids = {s['sid'] for s in compactable[:20]} | exempt_sids
-                expire_ids = [s['sid'] for s in compactable[20:]]
-                compacted_count = len(expire_ids)
-                if expire_ids:
-                    placeholders = ','.join(['?' for _ in expire_ids])
-                    for s in compactable[20:]:
-                        c.execute("""
-                            INSERT INTO signal_history
-                                (token, direction, signal_type, compact_round, survived, score_before, score_after, reason)
-                            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
-                        """, (s['token'], s['direction'], s['stype'], compact_round,
-                              round(s['raw'], 3), 0.0,
-                              f'compacted_r{s["compact_rounds"]}_losing_conf{s["conf"]:.0f}'))
-                    c.execute(f"""
-                        UPDATE signals
-                        SET decision = 'EXPIRED', executed = 1, updated_at = CURRENT_TIMESTAMP
-                        WHERE id IN ({placeholders})
-                    """, expire_ids)
-                    if exempt_sids:
-                        print(f"  [compaction] EXEMPT: {len(exempt_sids)} high-confidence signals protected from compaction (conf>={EXEMPT_CONFIDENCE}%)")
-
-            conn.commit()
-
-            # ── HOT-SET DISCIPLINE: mark compaction timestamp ────────────────────
-            # This signals to decider-run that ai_decider has run and the hot-set
-            # is valid for approval. Without this, decider-run blocks new approvals
-            # if ai_decider hasn't run in the last 11 minutes.
-            try:
-                import json as _json
-                _hotset_ts_file = '/var/www/hermes/data/hotset_last_updated.json'
-                with open(_hotset_ts_file, 'w') as _f:
-                    _json.dump({'last_compaction_ts': time.time()}, _f)
-            except Exception:
-                pass  # Never crash on heartbeat failures
-
-            # ── Write canonical hot-set to JSON (SOLE source of truth) ───────────
-            # This is the SOLE source of truth for what tokens are in the hot-set.
-            # decider-run reads this file — it tells us exactly which signals survived compaction.
-            # Only signals with rc>=1 (survived at least 1 ai_decider pass) are in the hot-set.
-            try:
-                import json as _json
-                hotset_file = '/var/www/hermes/data/hotset.json'
-                c_hot = conn.cursor()
-                # Deduplicate by token+direction, keeping the row with highest survival_score
-                # This prevents duplicate entries (e.g., BTC appearing twice with 94.5% and 90.0%)
-                # FIX (2026-05): Include PENDING signals with review_count>=1.
-                # BUG: The hot-set query required decision='APPROVED' but signals were
-                # never reaching APPROVED state (ai_decider marks them PENDING after review).
-                # Now includes PENDING/APPROVED/WAIT with review_count>=1 that have been
-                # reviewed by ai_decider at least once (survived compaction).
-                # GROUP BY token+direction to prevent same token+direction from appearing
-                # twice (e.g. mtf_zscore+mtf_macd both agreeing = confluence, shown as
-                # one row with max conf).
-                c_hot.execute("""
-                    SELECT token, direction,
-                           -- Best signal_type = the one with highest confidence
-                           (SELECT signal_type FROM signals s2
-                            WHERE s2.token=signals.token
-                              AND s2.direction=signals.direction
-                              AND s2.decision IN ('PENDING','APPROVED')
-                              AND s2.executed=0
-                              AND s2.created_at > datetime('now','-10 minutes')
-                              AND s2.token NOT LIKE '@%'
-                            ORDER BY s2.confidence DESC LIMIT 1) as signal_type,
-                           MAX(confidence) as confidence,
-                           MAX(compact_rounds) as compact_rounds,
-                           MAX(survival_score) as survival_score,
-                           MAX(z_score_tier) as z_score_tier,
-                           MAX(z_score) as z_score,
-                           MAX(review_count) as review_count,
-                           MAX(updated_at) as last_seen
-                    FROM signals
-                    WHERE decision IN ('PENDING','APPROVED')
-                      AND executed = 0
-                      AND created_at > datetime('now', '-10 minutes')
-                      AND token NOT LIKE '@%'
-                    GROUP BY token, direction
-                    HAVING MAX(confidence) >= 70
-                    ORDER BY MAX(survival_score) DESC, MAX(confidence) DESC
-                    LIMIT 50
-                """)
-                hot_rows = c_hot.fetchall()
-
-                # Enrich with current speed data (wave phase, acceleration, overextended)
-                _speed_cache = {}
-                if speed_tracker_ai is not None:
-                    try:
-                        _speed_cache = speed_tracker_ai().get_all_speeds()
-                    except Exception:
-                        pass
-
-                hotset = []
-                for r in hot_rows:
-                    tkn = r[0]
-                    direction = r[1]
-                    # SAFETY FILTER: skip @XXX numeric coin IDs (shouldn't reach here after
-                    # SQL filter, but defense-in-depth)
-                    if tkn.startswith('@'):
-                        continue
-                    # SAFETY FILTER: never write blacklisted or Solana-only tokens to hotset.json
-                    if direction.upper() == 'SHORT' and tkn in SHORT_BLACKLIST:
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: SHORT blocked — in SHORT_BLACKLIST")
-                        continue
-                    if direction.upper() == 'LONG' and tkn in LONG_BLACKLIST:
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: LONG blocked — in LONG_BLACKLIST")
-                        continue
-                    if is_solana_only(tkn):
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — Solana-only (not on Hyperliquid)")
-                        continue
-                    if is_delisted(tkn):
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted on Hyperliquid")
-                        continue
-                    # REGIME SAFETY FILTER (2026-04-06): tokens must have regime data and not fight it
-                    # This prevents regime-blind tokens (AZTEC, VVV, etc.) and counter-regime trades
-                    # from ever entering the hot-set. Regime data loaded once per compaction pass.
-                    _regime_cache = {}
-                    try:
-                        with open('/var/www/html/regime_4h.json') as _rf:
-                            _rd = _json.load(_rf)
-                            _regime_cache = _rd.get('regimes', {})
-                    except Exception:
-                        pass  # If regime JSON is missing, skip filtering (don't crash)
-                    _tok_reg = _regime_cache.get(tkn.upper(), {})
-                    _tok_regime = _tok_reg.get('regime', 'NEUTRAL')
-                    _tok_rc = _tok_reg.get('confidence', 0)
-                    if not _tok_reg:
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — regime blindspot (not in regime_4h.json)")
-                        continue
-                    if _tok_regime == 'NEUTRAL':
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — NEUTRAL regime (should wait, not trade)")
-                        continue
-                    if _tok_rc < 50:
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — weak regime conf {_tok_rc:.0f}% (below 50%)")
-                        continue
-                    if (_tok_regime == 'LONG_BIAS' and direction.upper() == 'SHORT') or \
-                       (_tok_regime == 'SHORT_BIAS' and direction.upper() == 'LONG'):
-                        print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — counter-regime ({_tok_regime} but SHORT/LONG)")
-                        continue
-                    spd = _speed_cache.get(tkn, {})
-                    conf = float(r[3]) if r[3] else 0.0
-                    momentum = spd.get('momentum_score', 50.0)
-                    speed_pctl = spd.get('speed_percentile', 50.0)
-                    # T's filters: skip if confidence < 70% OR momentum (speed) = 0%
-                    if conf < 70.0:
-                        print(f"  🚫 [HOTSET-FILTER] {tkn} {direction}: conf={conf:.0f}% — below 70% threshold")
-                        continue
-                    if momentum == 0.0:
-                        print(f"  🚫 [HOTSET-FILTER] {tkn} {direction}: momentum=0% — speed stalled")
-                        continue
-                    hotset.append({
-                        'token': tkn,
-                        'direction': r[1],
-                        'signal_type': r[2],
-                        'confidence': conf,
-                        'compact_rounds': r[4] or 0,
-                        'survival_round': (r[4] or 0) + 1,
-                        'survival_score': r[5] or 0,
-                        'z_score_tier': r[6],
-                        'z_score': r[7] if r[7] is not None else 0.0,
-                        'review_count': r[8] or 0,
-                        'last_seen': r[9] or '',   # MAX(updated_at) from hotset query
-                        # SPEED FEATURE (2026-04-03): wave-aware hot-set
-                        'wave_phase':       spd.get('wave_phase', 'neutral'),
-                        'is_overextended':  spd.get('is_overextended', False),
-                        'price_acceleration': spd.get('price_acceleration', 0.0),
-                        'price_velocity_5m':   spd.get('price_velocity_5m', 0.0),
-                        'momentum_score':   momentum,
-                        'speed_percentile': speed_pctl,
-                    })
-                # Cap at 20 tokens
-                if len(hotset) > 20:
-                    hotset = hotset[:20]
-
-                # Track compaction_cycle: increment from previous value (persisted in hotset.json)
-                _prev_cycle = 0
-                try:
-                    if os.path.exists(hotset_file):
-                        with open(hotset_file) as _prev_f:
-                            _prev_data = _json.load(_prev_f)
-                            _prev_cycle = _prev_data.get('compaction_cycle', 0)
-                except Exception:
-                    pass
-                _compaction_cycle = _prev_cycle + 1
-
-                with open(hotset_file, 'w') as _f:
-                    _json.dump({
-                        'hotset': hotset,
-                        'compaction_cycle': _compaction_cycle,
-                        'timestamp': time.time()
-                    }, _f)
-                print(f"  [hot-set] wrote {len(hotset)} tokens to hotset.json (cycle={_compaction_cycle})")
-            except Exception as _e:
-                print(f"  [hot-set] FAILED to write: {_e}")
-            finally:
-                c_hot.close()
-
-            # Log compaction activity
-            if compacted_count > 0 or expired > 0:
-                top = scored[0]
-                print(f'  [compaction] kept={"all" if keep_all else "20"} expired_auto={expired} compacted={compacted_count} '
-                      f'(top: {top["token"]}/{top["direction"]} r{top["compact_rounds"]+1}+, '
-                      f'survival={top["survival_bonus"]:.2f} streak={top["streak_mult"]:.2f}x, '
-                      f'speed={top["speed_score"]:.3f}, conf={top["conf_score"]:.0%})')
-
-        # ── 3. Fetch top 20 LIFO + confidence ────────────────────────────────
+        # After compaction, fetch signals for the main loop
+        # (The LLM already updated decisions to APPROVED/REJECTED)
         c.execute("""
             SELECT token, direction, signal_type, confidence, value, exchange, z_score_tier, z_score, compact_rounds, source
             FROM signals
@@ -1558,7 +1586,6 @@ def get_pending_signals():
         non_hot_signals = []
         for row in rows:
             coin, direction, stype, confidence, value, exchange, z_tier, z_score, compact_rounds, source = row
-            # BUG-12 fix: validate source against whitelist before using in A/B routing/logging
             safe_source = validate_source(source) if source else 'unknown'
             sig = {
                 "token": coin,
@@ -1570,14 +1597,13 @@ def get_pending_signals():
                 "z_score_tier": z_tier,
                 "z_score": z_score,
                 "compact_rounds": compact_rounds or 0,
-                "source": safe_source,  # BUG-12: validated source
+                "source": safe_source,
             }
             if coin.upper() in hot_tokens:
                 hot_signals.append(sig)
             else:
                 non_hot_signals.append(sig)
 
-        # Hot signals first, then the rest (hot = proven by AI across 2+ rounds)
         return hot_signals + non_hot_signals
     except Exception as e:
         import traceback; traceback.print_exc()
@@ -1732,7 +1758,7 @@ def get_open_trade_details():
                    status, pnl_pct, updated_at
             FROM trades
             WHERE status = 'open' AND server='Hermes'
-            ORDER BY opened_at DESC
+            ORDER BY open_time DESC
         """)
         rows = cur.fetchall()
         cur.close()
@@ -1821,7 +1847,7 @@ def ai_decide_batch(signals, market_z, prices):
 
             sig_lines.append(
                 f"[{i}] {token} | {direction} | conf={conf:.0f}% | entry=${entry:.4f} | "
-                f"regime={regime_val}({regime_conf}%) | z={z_tier}({z_val:+.2f}) | src={source}"
+                f"regime={regime_val}({(regime_conf or 0):.0f}%) | z={z_tier}({(z_val or 0):+.2f}) | src={source}"
             )
         signals_section = "\n".join(sig_lines)
 

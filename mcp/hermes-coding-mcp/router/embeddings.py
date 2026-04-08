@@ -100,28 +100,35 @@ class ToolEmbeddingCache:
         return cls._instance
     
     def __init__(self) -> None:
-        if self._initialized:
-            return
-        self._model: Optional[SentenceTransformer] = None
-        self._embeddings: dict[str, np.ndarray] = {}
-        self._initialized = True
+        # Thread-safe initialization - protect _initialized flag with lock
+        with self._lock:
+            if self._initialized:
+                return
+            self._model: Optional[SentenceTransformer] = None
+            self._embeddings: dict[str, np.ndarray] = {}
+            self._initialized = True
     
     @property
     def model(self) -> SentenceTransformer:
-        """Lazy-load the embedding model."""
+        """Lazy-load the embedding model (thread-safe)."""
         if self._model is None:
-            self._model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+            with self._lock:
+                # Double-check after acquiring lock
+                if self._model is None:
+                    self._model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
         return self._model
-    
+
     def embed(self, text: str) -> np.ndarray:
-        """Generate embedding for a single text."""
-        embedding = self.model.encode(text, convert_to_numpy=True)
-        return embedding
+        """Generate embedding for a single text (thread-safe)."""
+        # Access model property - it's thread-safe via double-checked locking
+        # sentence-transformers encode() is thread-safe for concurrent calls
+        return self.model.encode(text, convert_to_numpy=True)
     
     def embed_tools(self) -> dict[str, np.ndarray]:
         """
         Pre-compute and cache embeddings for all tools.
         Call this at startup to avoid latency on first routing decision.
+        Thread-safe: uses double-checked locking.
         
         Returns:
             Dict mapping tool name -> embedding vector
@@ -130,8 +137,11 @@ class ToolEmbeddingCache:
             if tool_desc.embedding is None:
                 # Combine description and usage patterns for richer embedding
                 combined_text = f"{tool_desc.description} {' '.join(tool_desc.usage_patterns)}"
-                tool_desc.embedding = self.embed(combined_text)
-                self._embeddings[tool_name] = tool_desc.embedding
+                with self._lock:
+                    # Double-check after acquiring lock
+                    if tool_desc.embedding is None:
+                        tool_desc.embedding = self.embed(combined_text)
+                        self._embeddings[tool_name] = tool_desc.embedding
         return self._embeddings
     
     def get_embedding(self, tool_name: str) -> np.ndarray:

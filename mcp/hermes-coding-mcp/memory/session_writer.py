@@ -235,22 +235,27 @@ class SessionWriter:
     ) -> Dict[str, Any]:
         """
         Finalize the session and write all pending data.
-        
+
         Args:
             tasks_completed: Number of tasks completed
             key_decisions: List of key decision summaries
-            
+
         Returns:
             Session summary
         """
-        with self.kg:
-            # End the session
-            self.kg.end_session(
-                session_id=self.session_id,
-                tasks_completed=tasks_completed,
-                key_decisions=key_decisions
-            )
-        
+        try:
+            with self.kg:
+                # End the session
+                self.kg.end_session(
+                    session_id=self.session_id,
+                    tasks_completed=tasks_completed,
+                    key_decisions=key_decisions
+                )
+        except Exception as e:
+            # Log but don't fail if end_session fails
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to end session {self.session_id}: {e}")
+
         summary = {
             "session_id": self.session_id,
             "repo_path": str(self.repo_path),
@@ -260,7 +265,7 @@ class SessionWriter:
             "patterns_stored": len(self.pending_patterns),
             "tasks_completed": tasks_completed
         }
-        
+
         return summary
     
     def _detect_language(self, file_path: str) -> Optional[str]:

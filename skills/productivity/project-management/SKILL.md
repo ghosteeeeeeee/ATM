@@ -36,6 +36,10 @@ grep -n "\- \[ \]\|\- \[P\]\|\- \[!\]" brain/TASKS.md
 2. Log new decisions in DECISIONS.md
 3. Move completed tasks to "Completed" section in TASKS.md
 4. Update TASKS.md with new tasks discovered during the session
+5. **After any TASKS.md write: run kanban sync**
+   ```
+   python3 /root/.hermes/scripts/sync_kanban_tasks.py tasks→kanban
+   ```
 
 ---
 

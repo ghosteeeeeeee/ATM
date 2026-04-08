@@ -1,10 +1,11 @@
 # CONTEXT.md — Hermes ATM
 ## Quick Status
 ```
-WIN RATE:  46% (7d) | PNL: -$23.50 (7d) | POSITIONS: 8 open (all SHORT, all real HL)
-BIAS: SHORT | LIVE TRADING: ON
+PIPELINE: RUNNING ✅ | HOTSET: 3 tokens (SCR/BTC/ETH SHORT) | LIVE TRADING: ON
+REGIME: SHORT_BIAS | POSITIONS: 9 open | UPTIME: +21.29% today
+Updated: 2026-04-08 18:13 UTC
 ```
-**8 real HL positions (all SHORT):** MORPHO, ZORA, TRX, UNI, ASTER, ZEC, SKY, TST
+**10 open positions (brain DB):** 2 SHORT (DYDX, SKY), 8 LONG (UMA, SCR, ICP, AVAX, AXS, ETHFI, SAND, XRP)
 
 ## Active
 - 8 open positions (real HL), all SHORT — Guardian actively mirroring
@@ -20,13 +21,12 @@ BIAS: SHORT | LIVE TRADING: ON
 - HL cache: FRESH ✅
 - 222 stale momentum_cache entries: CLEARED ✅
 
-## This Session (2026-04-05 ~05:40 UTC)
-- **Emergency resolved:** live trading was OFF, pipeline verified healthy, re-enabled
-- **Fix:** decider-run.py approved-signals loop now has regime check (was HOT-SET only)
-- **Fix:** 222 stale momentum_cache entries cleared
-- **Fix:** WASP cron installed (every 5min)
-- **Fresh-run:** 99 closed trades archived, 11662 signals purged, DB vacuum'd
-- **Git:** committed + pushed v3bcee80-20260405-0546
+## This Session (2026-04-08 ~07:20 UTC)
+- **Building:** CONTEXT.md Per-Call System — auto-refresh cron, SOUL.md Context Anchor, brain.md File Anchors
+- **Building:** hermes_write_with_lock.py — flock-based write lock to prevent concurrent write collisions
+- **Building:** sync_kanban_tasks.py — bidirectional TASKS.md ↔ kanban.json sync
+- **Building:** hermes-brain-sync.timer — daily 6am EST deep PM audit via project-manager-senior subagent
+- **Live trading:** ON — DO NOT change hype_live_trading.json
 
 ## Critical Bugs Fixed
 - AAVE/STX contrarian trades: regime filter now applies to APPROVED signals path
@@ -34,8 +34,6 @@ BIAS: SHORT | LIVE TRADING: ON
 
 ## Signal DBs
 - Hermes: /root/.hermes/data/signals_hermes_runtime.db (local SQLite)
-- OpenClaw: /root/.openclaw/workspace/data/signals.db (empty)
-- Tokyo PG: not reachable (sleep mode)
 
 ## HL Wallet
 - 0x324a9713603863FE3A678E83d7a81E20186126E7
@@ -48,4 +46,4 @@ BIAS: SHORT | LIVE TRADING: ON
 - hype_live_trading.json is the KILL SWITCH — must be false to prevent real orders
 
 ---
-*Updated: 2026-04-05 05:48 UTC*
+*Updated: 2026-04-08 07:30 UTC*

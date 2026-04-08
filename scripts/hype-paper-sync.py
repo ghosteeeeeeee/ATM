@@ -64,6 +64,10 @@ def sync_closes(hype_positions, paper_positions):
     This is the "safety net" — if paper says a trade is closed but HL still has it open,
     we close it on HL.
     """
+    if not paper_positions:
+        log("Paper positions empty — unknown state, skipping orphaned closes", "WARN")
+        return 0, len(hype_positions)
+
     paper_tokens = {p["token"] for p in paper_positions if p.get("exchange", "").lower() == "hyperliquid"}
     closed = 0
     skipped = 0

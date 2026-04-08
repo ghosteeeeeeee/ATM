@@ -166,6 +166,28 @@ The Agents Orchestrator owns the entire pipeline:
 - [x] Created brain/BETTER-CODER.md quick reference doc
 - [x] Cron job `hermes-pipeline` already configured for 30-min dispatch intervals
 
+### Self-Healing Audit (COMPLETED 2026-04-08)
+- [x] Code Reviewer: Full audit of all Python files
+- [x] Security Engineer: SAST scan for injection risks
+- [x] Devops Automator: Systemd service verification
+- [x] Reality Checker: Kill/restart tests passed
+
+## Bugs Found & Fixed
+
+| Bug | Severity | File | Fix |
+|-----|---------|------|-----|
+| Missing `import fcntl` | CRITICAL | run_better_coder.py:39 | Added import for file locking |
+| Stale lock files not cleaned | HIGH | run_better_coder.py:35-43 | Added stale lock detection + cleanup |
+
+## Self-Healing Verification Results
+
+| Test | Result |
+|------|--------|
+| Kill MCP server (SIGKILL) | Auto-restarted in ~5s ✅ |
+| Stale lock file cleanup | PID check + removal working ✅ |
+| Dispatcher exception handling | fcntl import fixed, runs to completion ✅ |
+| Service Restart=on-failure | Verified in systemd configs ✅ |
+
 ## Reference Links
 
 ## What Was Built

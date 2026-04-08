@@ -8,7 +8,7 @@ Usage:
 """
 import sys, re, argparse
 
-FILE = '/root/.hermes/scripts/decider-run.py'
+FILE = '/root/.hermes/scripts/decider_run.py'
 
 def get_status():
     with open(FILE) as f:

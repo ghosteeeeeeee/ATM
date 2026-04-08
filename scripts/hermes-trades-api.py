@@ -350,16 +350,16 @@ def _get_hotset_from_file():
                 'token':          tok,
                 'direction':      e.get('direction', 'SHORT'),
                 'type':           'hot set',
-                'sources':        e.get('signal_type', ''),
+                'sources':        e.get('source', ''),       # was: signal_type (wrong)
                 'confidence':     round(e.get('confidence', 0), 1),
                 'base_conf':      round(e.get('confidence', 0), 1),
-                'entry_count':    e.get('review_count', 1),
+                'entry_count':    e.get('compact_rounds', 1), # was: review_count (wrong)
                 'price':          live_price or e.get('price', 0),
                 'rsi':            rsi_val,
                 'macd':           macd_val,
-                'zscore':         e.get('z_score', 0),
-                'rounds':         e.get('compact_rounds', 0),
-                'survival':       e.get('survival_score', 0),
+                'zscore':         e.get('z_score', 0),       # was: z_score (key was never written)
+                'rounds':         e.get('survival_round', 0), # was: compact_rounds (wrong direction)
+                'survival':       e.get('survival_score', 0), # was: survival_score (key was never written)
                 'last_seen':      str(e.get('timestamp', ts)),
                 # SPEED FEATURE fields (from hotset.json)
                 'speed_pctl':     round(e.get('speed_percentile') or e.get('momentum_score') or 50.0, 1),

@@ -21,7 +21,7 @@ ai_decider.py               ──→ compact_signals() → hotset.json (top 20 
     │                              review_count increments on WAIT/SKIPPED
     │
     ▼
-decider-run.py              ──→ TWO PATHS (both enforce bans):
+decider_run.py              ──→ TWO PATHS (both enforce bans):
     │                              1. _run_hot_set() → hotset.json
     │                                 Hot-set execution filters:
     │                                 Wave alignment: bottoming+LONG, falling+SHORT get +15% boost
@@ -76,7 +76,7 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 | Price collection | Every 1 min | `price_collector.py` |
 | Regime scan | Every 1 min | `4h_regime_scanner.py` |
 | Signal generation | Every 1 min | `signal_gen.py` |
-| Hot-set execution | Every 1 min | `decider-run.py` |
+| Hot-set execution | Every 1 min | `decider_run.py` |
 | Position management | Every 1 min | `position_manager.py` |
 | Web dashboard | Every 1 min | `update-trades-json` |
 | AI decision + compaction | Every 10 min | `ai_decider.py` |

@@ -28,6 +28,10 @@ class PatternLibrary:
             └── decision-log.md
     """
     
+    # Module-level logger for observability
+    import logging
+    _logger = logging.getLogger(__name__)
+    
     PATTERN_EXTENSIONS = {
         "python": ".py",
         "javascript": ".js",
@@ -190,7 +194,8 @@ class PatternLibrary:
                     metadata = {k: v for k, v in data.items() if k != "code"}
                     results.append(metadata)
                     
-                except (json.JSONDecodeError, IOError):
+                except (json.JSONDecodeError, IOError) as e:
+                    self._logger.warning(f"Skipping unreadable pattern file {pattern_file}: {e}")
                     continue
         
         return sorted(results, key=lambda x: x.get("created_at", ""), reverse=True)

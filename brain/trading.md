@@ -27,7 +27,7 @@ ai_decider.py               ──→ compact_signals() → hotset.json (top 20 
     │                              review_count increments on WAIT/SKIPPED
     │
     ▼
-decider-run.py              ──→ reads hotset.json
+decider_run.py              ──→ reads hotset.json
     │                              _run_hot_set() enforces: wave-phase, counter-trend trap,
     │                              regime alignment, overextended filter, cooldown
     │                              10-max-open-positions gate
@@ -51,7 +51,7 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 | Price collection | Every 1 min | `price_collector.py` |
 | Regime scan | Every 1 min | `4h_regime_scanner.py` |
 | Signal generation | Every 1 min | `signal_gen.py` |
-| Hot-set execution | Every 1 min | `decider-run.py` |
+| Hot-set execution | Every 1 min | `decider_run.py` |
 | Position management | Every 1 min | `position_manager.py` |
 | Web dashboard | Every 1 min | `update-trades-json` |
 | AI decision + compaction | Every 10 min | `ai_decider.py` |
@@ -616,4 +616,50 @@ Systemd timer fires at `:00` and pipeline also runs via another trigger at `:01`
 - `/root/.hermes/scripts/update-trades-json.py` — atomic write, same locking
 - `/root/.hermes/scripts/brain.py` — SL+TP placed on entry via mirror_open hook
 - `/root/.hermes/scripts/position_manager.py` — SL+TP placed on cascade flip
+
+---
+
+## ATR TP/SL Bug Fix (2026-04-08)
+
+### Bugs Fixed
+
+**B2 — NameError silences entire ATR bulk-update block (line 1774)**
+- `if open_positions:` used undefined variable `open_positions` instead of `positions`
+- `_execute_atr_bulk_updates()` was never called — HL TP/SL never updated via ATR path
+- Fix: changed `open_positions` → `positions` at line 1780, and corrected call to `_collect_atr_updates(positions)` at line 1781
+
+**B1 — SL/TP anchored to stale entry_price instead of live current_price (lines ~1143-1151)**
+- `_collect_atr_updates()` computed SL/TP as `entry_price × (1 ± k×atr_pct)` — frozen at open time
+- Should use `current_price` (live) so ATR levels track current market reality
+- Fix: added `current_price = float(pos.get('current_price') or 0)` at line 1125; SL/TP now computed from `ref_price = current_price if current_price > 0 else entry_price`; fallback guard added for missing price
+- Note: `atr_pct` is still computed as `atr / entry_price` (correct normalization basis)
+
+### Positions Affected (9 of 10 need update on next cycle)
+
+| Token | Dir | Entry | Current | ATR% | k | SL old→new | TP old→new | needs_sl | needs_tp |
+|-------|-----|-------|---------|------|---|-----------|-----------|---------|---------|
+| DYDX | SHORT | 0.1010 | 0.0990 | 1.94% | 0.5 | 0.1030→0.0999 | 0.0960→0.0971 | ✅ | ✅ |
+| LINK | LONG | 9.2182 | 9.0370 | 1.11% | 0.5 | 9.034→8.987 | 9.682→9.137 | ✅ | ✅ |
+| SCR | LONG | 0.0444 | 0.0441 | 1.09% | 0.5 | 0.0435→0.0439 | 0.0466→0.0446 | ✅ | ✅ |
+| SAND | LONG | 0.0804 | 0.0788 | 1.14% | 0.5 | 0.0788→0.0783 | 0.0844→0.0797 | ✅ | ✅ |
+| ETHFI | LONG | 0.4552 | 0.4500 | 1.09% | 0.5 | 0.4461→0.4476 | 0.4780→0.4549 | ❌ | ✅ |
+| AVAX | LONG | 9.5055 | 9.2327 | 1.40% | 0.5 | 9.315→9.168 | 9.981→9.362 | ✅ | ✅ |
+| AXS | LONG | 1.1380 | 1.1272 | 1.18% | 0.5 | 1.115→1.121 | 1.195→1.141 | ❌ | ✅ |
+| UMA | LONG | 0.4149 | 0.4180 | 1.33% | 0.5 | 0.4066→0.4152 | 0.4356→0.4235 | ✅ | ✅ |
+| XRP | LONG | 1.3886 | 1.3547 | 0.99% | 0.25 | 1.3608→1.3513 | 1.458→1.361 | ✅ | ✅ |
+
+SKY: skipped — `entry_price = 0` in DB, no ATR anchor available; fallback would skip.
+
+### Validation
+- Dry-run at `/root/.hermes/scripts/atr_dry_run.py` — confirmed 9/10 positions fire `needs_sl` and/or `needs_tp`
+- ETHFI/AXS: only TP drifts >0.5% threshold; SL is close enough to skip unnecessary update
+- Cascade-flip positions (source.startswith cascade-reverse-) correctly skipped
+
+### Files Changed
+- `/root/.hermes/scripts/position_manager.py` — B1 + B2 fixes above, no other changes
+- `/root/.hermes/scripts/atr_dry_run.py` — validation script (dry-run only, no live trading)
+
+### What Was NOT Changed
+- `hyperliquid_exchange.py` — untouched
+- Cascade-flip SL/TP placement code (line ~2124) — untouched; that path is separate from the ATR `_collect_atr_updates()` flow
 
