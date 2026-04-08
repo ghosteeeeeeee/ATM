@@ -317,22 +317,20 @@ CONFIRM that SpeedTracker's price history was seeded for KSHIB, KFLOKI, KBONK, K
 
 ## 2026-04-08 Session Tasks
 
-### [P] SL/TP System Fixes — Phase 1 (done), Phase 2 (pending)
+### [P] SL/TP System Fixes — Phase 1 (done), Phase 2 (done), Phase 3 (done)
 **Project:** SL/TP Protection System Fixes
-**Status:** 🚧 4/8 done, 4 remaining
+**Status:** ✅ ALL 8 DONE — 2026-04-08
 **Date:** 2026-04-08
 
-**Completed 2026-04-08:**
+**All completed:**
 - [x] B8: Atomic write lock added to hermes-trades-api.py + update-trades-json.py
 - [x] B3: SL+TP placed on HL immediately after entry (brain.py add_trade)
 - [x] B2: SL+TP placed on HL after cascade flip (position_manager cascade_flip)
 - [x] B1: Trailing SL pushed to HL every cycle (already implemented, verified)
-
-**Pending:**
-- [ ] B4: Add cascade_sequences table to brain DB
-- [ ] B5: Add 429 backoff to position_manager
-- [ ] B6: Fix guardian reason column trackability
-- [ ] B7: Create guardian_kill_switch.json
+- [x] B7: Guardian kill switch created (guardian_kill_switch.json + _is_token_killed check)
+- [x] B6: Standardized close reason vocabulary (UPPERCASE_STANDARD format)
+- [x] B5: 429 backoff retry in position_manager (_retry_hl_call helper)
+- [x] B4: cascade_sequences table + recording in cascade_flip()
 
 **Reference:** [brain/PROJECTS.md#SL/TP Protection System Fixes]
 

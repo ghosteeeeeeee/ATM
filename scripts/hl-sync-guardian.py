@@ -159,6 +159,44 @@ def _clear_reconciled_token(token):
 
 # ── BUG-4/15: Persistent closed-trade dedup set ─────────────────────────────────
 _CLOSED_SET_FILE = os.path.join(DATA_DIR, 'guardian-closed-set.json')
+_KILL_SWITCH_FILE = os.path.join(DATA_DIR, 'guardian_kill_switch.json')
+
+# ── BUG-FIX B7: Manual close kill switch ─────────────────────────────────────
+# T can tell guardian "I manually closed this token" by adding it to this file.
+# Guardian will NOT close that token — it will treat it as an orphan HL close.
+def _load_kill_switch() -> set:
+    """Load set of tokens T has manually closed (guardian will skip these)."""
+    try:
+        with open(_KILL_SWITCH_FILE) as f:
+            data = json.load(f)
+            return set(data.get('closed', []))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+
+def _is_token_killed(token: str) -> bool:
+    """Check if token is in the manual kill switch (T closed it manually)."""
+    return token.upper() in _load_kill_switch()
+
+def _add_to_kill_switch(token: str):
+    """Add a token to the kill switch. Call this when T manually closes a token."""
+    try:
+        ks = _load_kill_switch()
+        ks.add(token.upper())
+        with open(_KILL_SWITCH_FILE, 'w') as f:
+            json.dump({'description': 'Guardian kill switch — tokens in closed list will NOT be closed by guardian', 'closed': sorted(ks)}, f, indent=2)
+        log(f'Kill switch: added {token.upper()}', 'INFO')
+    except Exception as e:
+        log(f'Kill switch write error: {e}', 'FAIL')
+
+def _remove_from_kill_switch(token: str):
+    """Remove a token from the kill switch (e.g., when re-entering the position)."""
+    try:
+        ks = _load_kill_switch()
+        ks.discard(token.upper())
+        with open(_KILL_SWITCH_FILE, 'w') as f:
+            json.dump({'description': 'Guardian kill switch', 'closed': sorted(ks)}, f, indent=2)
+    except Exception:
+        pass
 
 
 def _load_closed_set() -> set:
@@ -823,7 +861,7 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
 
                 # Mark guardian_closed so Step 8 won't re-process this trade
                 cur.execute("""
-                    UPDATE trades SET status='closed', close_reason='flipped',
+                    UPDATE trades SET status='closed', close_reason='CASCADE_FLIP',
                         exit_reason='flipped_hard_sl', flip_variant=%s,
                         guardian_closed=TRUE
                     WHERE id=%s
@@ -992,7 +1030,7 @@ def sync_pnl_from_hype(prices):
                                     cur_cut = conn_cut.cursor()
                                     cur_cut.execute(
                                         "UPDATE trades SET guardian_closed=TRUE, status='closed', "
-                                        "close_reason='cut_loser', exit_reason='cut_loser_pnl' "
+                                        "close_reason='CUT_LOSER', exit_reason='CUT_LOSER_PNL' "
                                         "WHERE id=%s AND status='open'",
                                         (trade_id,))
                                     conn_cut.commit()
@@ -1219,7 +1257,7 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     try:
         db_cur.execute("""
             UPDATE trades SET status='closed', guardian_closed=TRUE,
-                close_reason='stale_rotation', exit_reason='stale_velocity_low',
+                close_reason='STALE_ROTATION', exit_reason='STALE_ROTATION_VELOCITY_LOW',
                 pnl_pct=%s, current_price=%s
             WHERE id=%s AND status='open'
         """, (pnl_pct, prices.get(token, entry_px), trade_id))
@@ -1466,7 +1504,7 @@ def close_orphan_paper_trades(hl_pos, prices):
                             log(f'  ⚠️ Retry {retry+1} failed for {token}: {e}', 'WARN')
                     if not registered:
                         log(f'  ⚠️ {token} copied but no HL position after retries — closing paper', 'WARN')
-                        _close_paper_trade_db(trade_id, token, prices.get(token, entry), 'hl_position_missing')
+                        _close_paper_trade_db(trade_id, token, prices.get(token, entry), 'ORPHAN_PAPER')
                         closed_count += 1
                     # Remove from copied list
                     try:
@@ -1492,7 +1530,7 @@ def close_orphan_paper_trades(hl_pos, prices):
             if hype_count >= MAX_HYPE_POSITIONS:
                 # At max — close the paper trade
                 log(f'  At max positions ({MAX_HYPE_POSITIONS}), closing paper: {token}', 'WARN')
-                _close_paper_trade_db(trade_id, token, curr_price, 'max_positions')
+                _close_paper_trade_db(trade_id, token, curr_price, 'MAX_POSITIONS')
                 closed_count += 1
                 continue
 
@@ -1511,7 +1549,7 @@ def close_orphan_paper_trades(hl_pos, prices):
                 log(f'  {token}: NOT in hot-set — paper only, live mirror blocked', 'WARN')
             elif blocked:
                 log(f'  {token}: on HOTSET_BLOCKLIST ({direction}) — closing paper trade', 'WARN')
-                _close_paper_trade_db(trade_id, token, curr_price, 'hotset_blocked')
+                _close_paper_trade_db(trade_id, token, curr_price, 'HOTSET_BLOCKED')
             elif not DRY and is_live_trading_enabled():
                 try:
                     result = mirror_open(ht, direction, float(curr_price), leverage=lev_int)
@@ -1550,7 +1588,22 @@ def close_orphan_paper_trades(hl_pos, prices):
 
 def _close_paper_trade_db(trade_id, token, exit_price, reason):
     """Close a paper trade in the DB without touching HL. Idempotent — checks status='open'.
-    Calculates pnl_usdt and pnl_pct from entry_price stored in DB."""
+    Calculates pnl_usdt and pnl_pct from entry_price stored in DB.
+
+    BUG-FIX B7: Kill switch — if token is in kill switch, skip the close.
+    BUG-FIX B6: Standardized reason vocabulary:
+        ORPHAN_PAPER   = paper has no HL position
+        MAX_POSITIONS  = at max HL positions
+        HOTSET_BLOCKED = token on hot-set blocklist
+        CUT_LOSER      = cut loser triggered
+        STALE_ROTATION = stale rotation
+        CASCADE_FLIP   = cascade flip
+        MANUAL_CLOSE   = T manually closed via kill switch
+    """
+    # BUG-FIX B7: Kill switch check — skip if T manually closed this token
+    if _is_token_killed(token):
+        log(f'  Kill switch: skipping close for {token} ({reason})', 'INFO')
+        return
     if DRY:
         log(f'  [DRY] Would close paper trade #{trade_id} ({reason})', 'WARN')
         return
@@ -1909,9 +1962,9 @@ def _sweep_blocklist_trades(prices):
 
             # Determine direction-appropriate close reason
             reason = (
-                'hotset_blocked_short' if direction.upper() == 'SHORT' and ht in SHORT_BLACKLIST else
-                'hotset_blocked_long'  if direction.upper() == 'LONG'  and ht in LONG_BLACKLIST  else
-                'hotset_blocked'
+                'HOTSET_BLOCKED_SHORT' if direction.upper() == 'SHORT' and ht in SHORT_BLACKLIST else
+                'HOTSET_BLOCKED_LONG'  if direction.upper() == 'LONG'  and ht in LONG_BLACKLIST  else
+                'HOTSET_BLOCKED'
             )
             exit_price = prices.get(ht) or prices.get(token) or entry_px or 0
 
@@ -2123,7 +2176,7 @@ def sync():
                         cur_upd.close()
                         conn_upd.close()
 
-                    _close_paper_trade_db(trade_id, tok, exit_price, 'guardian_missing')
+                    _close_paper_trade_db(trade_id, tok, exit_price, 'MANUAL_CLOSE')
                 except Exception as e:
                     log(f'  DB close failed for {tok}: {e}', 'FAIL')
 

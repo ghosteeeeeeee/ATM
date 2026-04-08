@@ -486,10 +486,10 @@ TAO LONG: entry=250, SL=242.32 (3.07%)    — ATR 1.54%, k=2.0
 | B1 | Trailing SL never pushed to HL after activation | position_manager.py | ATR calculated but `place_sl()` only called on entry | ✅ FIXED (already had BUG-8 fix, verified) |
 | B2 | Cascade new position has no SL | position_manager.py | Post-flip position has no HL protection | ✅ FIXED (cascade_flip now calls place_sl+TP) |
 | B3 | No TP/SL placed on initial entry | brain.py | `place_order()` fires but SL/TP never sent to HL | ✅ FIXED (brain.py add_trade now calls place_sl+TP) |
-| B4 | Cascade PnL tracking absent | position_manager.py | Can't determine if flips succeeded → cooldown dead | 🔴 PENDING |
-| B5 | HL rate-limit skips cycles silently | hl-sync-guardian.py + position_manager | 429 causes silent skip, no cache, no retry | 🟡 PARTIAL (guardian has backoff, position_manager doesn't) |
-| B6 | Guardian reason = "guardian_missing" | hl-sync-guardian.py | No trackability, all closes logged as same value | 🔴 PENDING |
-| B7 | No manual close kill switch | hl-sync-guardian.py | T can't tell guardian "I closed this" | 🔴 PENDING |
+| B4 | Cascade PnL tracking absent | position_manager.py | Can't determine if flips succeeded → cooldown dead | ✅ FIXED (cascade_sequences table created, recording in cascade_flip) |
+| B5 | HL rate-limit skips cycles silently | hl-sync-guardian.py + position_manager | 429 causes silent skip, no cache, no retry | ✅ FIXED (position_manager B5 retry added, guardian already had backoff) |
+| B6 | Guardian reason = "guardian_missing" | hl-sync-guardian.py | No trackability, all closes logged as same value | ✅ FIXED (standardized reason vocabulary) |
+| B7 | No manual close kill switch | hl-sync-guardian.py | T can't tell guardian "I closed this" | ✅ FIXED (guardian_kill_switch.json + _is_token_killed check) |
 | B8 | Two scripts writing trades.json | hermes-trades-api.py + update-trades-json.py | Race condition risk | ✅ FIXED (atomic flock added to both scripts) |
 
 ### Fixes Applied 2026-04-08
@@ -507,7 +507,30 @@ TAO LONG: entry=250, SL=242.32 (3.07%)    — ATR 1.54%, k=2.0
 **B2 (Cascade SL+TP):**
 - `position_manager.py cascade_flip()`: after `place_order()` succeeds, reads back new trade's SL/TP from DB and calls `place_sl()` + `place_tp()` on HL
 
-### Remaining Work
+**B1:** Already implemented (BUG-8 fix in position_manager — verified in code at line ~1895-1920)
+
+**B7 (Kill Switch):**
+- Created `/var/www/hermes/data/guardian_kill_switch.json`
+- Added `_is_token_killed()`, `_add_to_kill_switch()`, `_remove_from_kill_switch()` to hl-sync-guardian.py
+- `_close_paper_trade_db()` now checks kill switch before closing any token
+- T can manually close a token on HL and add it to kill switch — guardian will NOT close the paper trade
+
+**B6 (Standardized Reasons):**
+- All `close_reason`/`exit_reason`/`guardian_reason` now use UPPERCASE_STANDARD vocabulary:
+  - `ORPHAN_PAPER`, `MAX_POSITIONS`, `HOTSET_BLOCKED`, `HOTSET_BLOCKED_SHORT`, `HOTSET_BLOCKED_LONG`
+  - `CUT_LOSER`, `STALE_ROTATION`, `CASCADE_FLIP`, `MANUAL_CLOSE`
+- Updated all SQL `UPDATE` statements and `_close_paper_trade_db()` call sites
+
+**B5 (429 Backoff):**
+- Added `_retry_hl_call()` helper inside trailing SL push section
+- Retries up to 3× with exponential backoff (5s, 10s, 20s) on 429/rate-limit errors
+- Both `get_open_hype_positions()` and `exchange.order()` now use retry logic
+
+**B4 (Cascade Sequences):**
+- Created `cascade_sequences` table in brain DB (sequence_id, parent_trade_id, trade_id, direction, entry_px, exit_px, pnl_usdt, pnl_pct, close_reason, created_at, closed_at)
+- Added `_record_cascade_sequence()` function to position_manager.py
+- `cascade_flip()` now records: (a) the close of the old trade with PnL, (b) the open of the new trade with new trade_id
+- All flips in same cascade share `sequence_id = parent_trade_id`
 - B4: Add `cascade_sequences` table to brain DB
 - B5: Add retry/backoff to position_manager for 429 responses
 - B6: Fix guardian reason column with specific close reasons

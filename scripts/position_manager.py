@@ -1893,30 +1893,54 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             except Exception:
                 pass
             # BUG-8 fix: push updated trailing SL to Hyperliquid
+            # BUG-FIX B5: retry with exponential backoff on 429 rate-limit errors
+            def _retry_hl_call(fn, *args, max_attempts=3, **kwargs):
+                """Retry HL API call with exponential backoff on rate-limit errors."""
+                import time as _time
+                for attempt in range(max_attempts):
+                    try:
+                        return fn(*args, **kwargs), None
+                    except Exception as e:
+                        err_str = str(e).lower()
+                        if '429' in err_str or 'rate limit' in err_str or 'too many' in err_str:
+                            wait = 5 * (2 ** attempt)
+                            print(f"  [B5] Rate-limited on {fn.__name__}, retry {attempt+1}/{max_attempts} in {wait}s")
+                            _time.sleep(wait)
+                        else:
+                            return None, e  # Non-429 error, propagate
+                return None, Exception(f"{fn.__name__}: max retries exceeded")
             try:
                 from hyperliquid_exchange import get_exchange, _hl_tick_round, _HL_TICK_DECIMALS
                 exchange = get_exchange()
                 decimals = _HL_TICK_DECIMALS.get(token, 6)
                 sl_rounded = _hl_tick_round(trailing_sl, decimals)
-                # Get position size from HL to set SL at correct size
+                # Get position size from HL (with retry)
                 from hyperliquid_exchange import get_open_hype_positions
-                positions = get_open_hype_positions() or {}
-                size = 0.0
-                for coin_name, p in positions.items():
-                    if coin_name.upper() == token.upper():
-                        size = float(p.get('szi', 0) or 0)
-                        break
-                if size > 0:
-                    is_buy = direction.upper() == "SHORT"
-                    order_type = {
-                        "trigger": {
-                            "triggerPx": sl_rounded,
-                            "isMarket": True,
-                            "tpsl": "sl",
+                positions, err = _retry_hl_call(get_open_hype_positions)
+                if err or not positions:
+                    print(f"  [B5] Could not get positions for {token}: {err}")
+                else:
+                    size = 0.0
+                    for coin_name, p in positions.items():
+                        if coin_name.upper() == token.upper():
+                            size = float(p.get('szi', 0) or 0)
+                            break
+                    if size > 0:
+                        is_buy = direction.upper() == "SHORT"
+                        order_type = {
+                            "trigger": {
+                                "triggerPx": sl_rounded,
+                                "isMarket": True,
+                                "tpsl": "sl",
+                            }
                         }
-                    }
-                    exchange.order(token, is_buy, abs(size), sl_rounded, order_type, reduce_only=True)
-                    print(f"  [BUG-8] Pushed trailing SL to HL: {token} {direction} SL=${sl_rounded:.6f}")
+                        order_result, order_err = _retry_hl_call(
+                            exchange.order, token, is_buy, abs(size), sl_rounded, order_type, reduce_only=True
+                        )
+                        if order_err:
+                            print(f"  [B5] Failed to push trailing SL to HL ({token}): {order_err}")
+                        else:
+                            print(f"  [BUG-8] Pushed trailing SL to HL: {token} {direction} SL=${sl_rounded:.6f}")
             except Exception as e:
                 import traceback
                 print(f"  [BUG-8] Failed to push trailing SL to HL ({token}): {e}")
@@ -2097,6 +2121,40 @@ def check_cascade_flip(token: str, position_direction: str,
         return None
 
 
+# ── BUG-FIX B4: Cascade sequence PnL tracking ─────────────────────────────────
+def _record_cascade_sequence(parent_trade_id: int, token: str, entry_px: float,
+                             current_px: float, pnl_usdt: float, pnl_pct: float,
+                             direction: str, child_trade_id: int = None):
+    """
+    Record a cascade flip in the cascade_sequences table.
+    sequence_id = parent_trade_id (all flips in same cascade share this ID).
+    When child_trade_id is None: record the close of the old position.
+    When child_trade_id is set: record the open of the new position.
+    """
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        if child_trade_id is None:
+            # Record the closing trade in the cascade
+            cur.execute("""
+                INSERT INTO cascade_sequences
+                (sequence_id, parent_trade_id, trade_id, direction, entry_price, exit_price, pnl_usdt, pnl_pct, close_reason, closed_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'CASCADE_FLIP', NOW())
+            """, (parent_trade_id, parent_trade_id, parent_trade_id, direction, entry_px, current_px, pnl_usdt, pnl_pct))
+        else:
+            # Record the new post-flip trade
+            cur.execute("""
+                INSERT INTO cascade_sequences
+                (sequence_id, parent_trade_id, trade_id, direction, entry_price, close_reason, created_at)
+                VALUES (%s, %s, %s, %s, %s, 'CASCADE_ENTRY', NOW())
+            """, (parent_trade_id, parent_trade_id, child_trade_id, direction, current_px))
+        conn.commit()
+        cur.close(); conn.close()
+        print(f"  [B4] Cascade sequence recorded: parent=#{parent_trade_id} child=#{child_trade_id} pnl={pnl_usdt:+.4f}")
+    except Exception as e:
+        print(f"  [B4] Failed to record cascade sequence: {e}")
+
+
 def cascade_flip(token: str, position_direction: str, trade_id: int,
                  live_pnl: float, flip_info: Dict,
                  entry_price: float) -> bool:
@@ -2119,11 +2177,36 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
     print(f"  [CASCADE FLIP] {token} {position_direction}→{opposite_dir} "
           f"(loss={live_pnl:+.2f}%, opp_conf={conf:.1f}%, src={source})")
 
+    # ── 0. BUG-FIX B4: Look up old trade data for cascade sequence recording ──
+    try:
+        conn_old = get_db_connection()
+        cur_old = conn_old.cursor()
+        cur_old.execute(
+            "SELECT amount_usdt FROM trades WHERE id=%s",
+            (trade_id,)
+        )
+        row_old = cur_old.fetchone()
+        cur_old.close(); conn_old.close()
+        old_amount = float(row_old[0]) if row_old else 50.0
+    except Exception:
+        old_amount = 50.0
+    close_pnl_usdt = round(live_pnl / 100 * old_amount, 4)
+
     # ── 1. Close the losing position ───────────────────────────────────────────
     close_ok = close_paper_position(trade_id, f"cascade_flip_{live_pnl:+.2f}%")
     if not close_ok:
         print(f"  [CASCADE FLIP] ❌ Failed to close {token} #{trade_id}")
         return False
+
+    # ── 1b. BUG-FIX B4: Record cascade close ──────────────────────────────────
+    _record_cascade_sequence(
+        parent_trade_id=trade_id, token=token,
+        entry_px=entry_price,
+        current_px=flip_info.get('price') or entry_price,
+        pnl_usdt=close_pnl_usdt, pnl_pct=live_pnl,
+        direction=position_direction,
+        child_trade_id=None  # signals this is the close record
+    )
 
     # ── 2. Enter the opposite direction at current market price ───────────────
     # sig_id=None case: coin-regime-fallback — regime momentum IS the entry signal,
@@ -2159,6 +2242,28 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
 
     if ok and ok.get('success'):
         print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
+        # ── BUG-FIX B4: Record cascade ENTRY ───────────────────────────────────
+        # Look up the new trade's ID (most recent open trade for this token)
+        try:
+            conn_seq = get_db_connection()
+            cur_seq = conn_seq.cursor()
+            cur_seq.execute(
+                "SELECT id FROM trades WHERE token=%s AND status='open' ORDER BY id DESC LIMIT 1",
+                (token,)
+            )
+            row_seq = cur_seq.fetchone()
+            cur_seq.close(); conn_seq.close()
+            new_trade_id = row_seq[0] if row_seq else None
+            if new_trade_id:
+                _record_cascade_sequence(
+                    parent_trade_id=trade_id, token=token,
+                    entry_px=current_price,
+                    current_px=0, pnl_usdt=0, pnl_pct=0,
+                    direction=opposite_dir,
+                    child_trade_id=new_trade_id
+                )
+        except Exception as e:
+            print(f"  [B4] Could not record cascade entry: {e}")
         # ── BUG-FIX (B2): Place SL + TP on HL for the new cascade position ─────
         # Without this, the new post-flip position has no HL protection
         sz = ok.get('size')
