@@ -140,6 +140,15 @@ Check status: `python3 -c "from ai_decider import get_calibration_summary; print
 
 ---
 
+### [!] Hot-Set Compaction Rewrite — redesign 10-min pipeline (Hot-Set Redesign)
+**Project:** Hot-Set Compaction Rewrite
+**Status:** ⬜ OPEN — 2026-04-08
+**Owner:** Agent
+**Summary:** Hot-set design is broken. Signals need `review_count>=1` + 3-hour window to enter hot-set, but new signals never get reviewed fast enough. Full redesign needed: 10-min compaction, top 20 survivors, reverse signal penalization, PURGE of non-top-20. Prompt testing completed — `L_survival_rounds` + `Q_final` are best prompt variants. Key finding: MiniMax needs `max_tokens=4000+` to fit both thinking and output.
+**Reference:** [.hermes/plans/2026-04-08_041613-hotset-depletion-fix.md]
+
+---
+
 ## Future Build Ideas (Backlog)
 
 ### [ ] Trading-Docker — Step 1: Audit pipeline scripts

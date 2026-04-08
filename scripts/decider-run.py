@@ -325,7 +325,11 @@ def _load_delayed():
     """Load pending delayed entries."""
     try:
         with open(DELAYED_FILE) as f:
-            return json.load(f)
+            data = json.load(f)
+            # Support both {"pending": [...]} and [...] formats
+            if isinstance(data, dict):
+                return data.get('pending', [])
+            return data if isinstance(data, list) else []
     except (FileNotFoundError, json.JSONDecodeError):
         return []
 
@@ -829,7 +833,7 @@ def _run_hot_set():
       pct-hermes + hmacd- = 0.6x → threshold 65/0.6 = 108% → effectively never
 
     Wave quality filter (SPEED FEATURE):
-    - Counter-trend trap: block stale tokens where regime disagrees with z-score direction
+    - Counter-trend trap: PENALIZE stale tokens where regime disagrees with z-score direction
     - Speed boost: tokens with speed_percentile >= 80 get 20% easier entry threshold
     - Back-to-back failure cooldown: 2+ same-direction failures → block for 1hr
     """
@@ -1022,61 +1026,67 @@ def _run_hot_set():
 
             # ── COUNTER-TREND TRAP FILTER ────────────────────────────────────
             # If the token's own z-score contradicts the direction AND we're in
-            # the corresponding regime, that's a trap. e.g. stale near bottom + SHORT.
-            trap_blocked, trap_reason = _check_counter_trend_trap(token, direction)
-            if trap_blocked:
-                log(f'  🧊 [HOT-SET] {token} {direction} BLOCKED: {trap_reason} '
-                    f'(counter-trend trap — stale flat token vs regime)')
-                _record_hotset_failure(token, direction, failures)
-                continue
+            # the corresponding regime → PENALIZE (not block). Strong signals survive.
+            trap_penalty, trap_reason = _check_counter_trend_trap(token, direction)
+            if trap_penalty > 0:
+                confidence -= trap_penalty
+                if confidence < 55:
+                    log(f'  🧊 [HOT-SET] {token} {direction} BLOCKED: {trap_reason} '
+                        f'(counter-trend trap penalty={trap_penalty}, conf below threshold)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+                log(f'  🧊 [HOT-SET] {token} {direction} penalized {trap_penalty}pts: {trap_reason} (conf now {confidence:.0f}%)')
 
-            # FIX (2026-04-03): Regime check for ALL signal types (not just confluence).
-            # ANIME LONG in SHORT regime was getting through via hmacd — same check applies.
-            # Regime-aligned signals get through; counter-regime signals are blocked.
+            # Regime check for ALL signal types. Counter-regime → PENALIZE (not block).
+            # Strong signals with high enough confidence get through after penalty.
+            # Regime-aligned signals get through untouched.
             try:
                 regime, regime_conf = get_regime(token)
                 if regime != 'NEUTRAL' and regime_conf > 50:
                     if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
                        (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                        log(f'  🧊 [HOT-SET] {token} {direction} blocked: regime={regime} ({regime_conf}%) fights direction')
-                        _record_hotset_failure(token, direction, failures)
-                        continue
+                        # PENALTY not block: scale penalty with regime confidence (max 30 pts)
+                        penalty = min(int(regime_conf * 0.4), 30)
+                        confidence -= penalty
+                        if confidence < 55:
+                            log(f'  🧊 [HOT-SET] {token} {direction} penalized {penalty}pts below threshold: regime={regime} ({regime_conf:.0f}%) fights direction')
+                            _record_hotset_failure(token, direction, failures)
+                            continue
+                        log(f'  🧊 [HOT-SET] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
             except Exception as e:
                 log(f'  ⚠️ [HOT-SET] {token} regime check error: {e}')
 
-            # ── TOKEN-LEVEL REGIME CHECK (SPEED FEATURE, 2026-04-03) ───────
-            # Each token has its own regime: rising / falling / neutral.
-            # Use z_score_tier from hotset.json (computed per token at signal time).
-            #
-            # SEMANTICS (fixed 2026-04-05):
-            #   z_direction = 'rising'  → z-score is rising = price mean-reverting UP = LOCAL BOTTOM
-            #   z_direction = 'falling' → z-score is falling = price mean-reverting DOWN = LOCAL TOP
-            # signal_gen.py was inverted (avg_z > 0 labeled 'rising'), now fixed.
-            _z_tier = (hot_sig.get('z_score_tier') or '').lower()
-            _z = hot_sig.get('z_score', 0.0)
-            if _z_tier and _z is not None:
-                # Local bottom (rising) + LONG → ideal entry
-                # Local top (falling) + SHORT → ideal entry
-                if _z_tier == 'rising' and direction == 'LONG':
-                    token_regime_ok = True
-                elif _z_tier == 'falling' and direction == 'SHORT':
-                    token_regime_ok = True
-                elif _z_tier == 'neutral':
-                    # Neutral zone — use market regime as tiebreaker
-                    token_regime_ok = True  # let market regime handle it
-                elif _z_tier == 'rising' and direction == 'SHORT':
-                    # Price at local bottom but SHORT direction — catch the bounce instead.
-                    # Only allow if momentum is low (bottoming phase allows SHORT entry).
-                    token_regime_ok = (_wave in ('bottoming', 'neutral'))
-                elif _z_tier == 'falling' and direction == 'LONG':
-                    # Price at local top but LONG direction — skip unless bottoming
-                    token_regime_ok = (_wave in ('bottoming',))
-                else:
-                    token_regime_ok = False
-                if not token_regime_ok:
-                    log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime=tier={_z_tier}(z={_z:+.2f}) fights direction')
-                    _record_hotset_failure(token, direction, failures)
-                    continue
+                # ── TOKEN-LEVEL REGIME CHECK (z_score_tier) ──────────────────
+                # z_direction = 'rising' = local bottom → LONG ideal, SHORT penalized
+                # z_direction = 'falling' = local top → SHORT ideal, LONG penalized
+                # Neutral zone → let market regime decide (no penalty here)
+                _z_tier = (hot_sig.get('z_score_tier') or '').lower()
+                _z = hot_sig.get('z_score', 0.0)
+                if _z_tier and _z is not None:
+                    if _z_tier == 'rising' and direction == 'LONG':
+                        pass  # ideal — no penalty
+                    elif _z_tier == 'falling' and direction == 'SHORT':
+                        pass  # ideal — no penalty
+                    elif _z_tier == 'neutral':
+                        pass  # neutral zone — let market regime handle it
+                    elif _z_tier == 'rising' and direction == 'SHORT':
+                        # Price at local bottom but SHORT direction — PENALIZE unless momentum is low
+                        if momentum_state not in ('bottoming', 'neutral'):
+                            confidence -= 20
+                            if confidence < 55:
+                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={momentum_state})')
+                                _record_hotset_failure(token, direction, failures)
+                                continue
+                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+SHORT+momentum={momentum_state} (conf now {confidence:.0f}%)')
+                    elif _z_tier == 'falling' and direction == 'LONG':
+                        # Price at local top but LONG direction — PENALIZE unless bottoming
+                        if momentum_state != 'bottoming':
+                            confidence -= 20
+                            if confidence < 55:
+                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={momentum_state})')
+                                _record_hotset_failure(token, direction, failures)
+                                continue
+                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+LONG+momentum={momentum_state} (conf now {confidence:.0f}%)')
 
             # Signal-type specific approval logic
             if sig_type == 'confluence':
@@ -1189,37 +1199,34 @@ def _get_token_zscore(token: str) -> float:
 def _check_counter_trend_trap(token: str, direction: str) -> tuple:
     """
     SPEED FEATURE: Counter-trend trap detection.
+    PENALTY not block: strong signals survive despite counter-trend setup.
 
-    Block signals when:
-    - is_stale == True AND z_score < 0 AND regime = SHORT_BIAS → SHORT entry blocked
-    - is_stale == True AND z_score > 0 AND regime = LONG_BIAS → LONG entry blocked
-
-    Rationale: stale flat token near the bottom of its range trying to go SHORT
-    = catching a falling knife. The regime says "short" but the price is already
-    at the bottom — the wave has no room to fall further.
-
-    Returns (blocked: bool, reason: str)
+    Returns (penalty: int, reason: str) — penalty=0 means no counter-trend penalty.
+    Only penalized if: is_stale=True AND z_score direction contradicts regime.
     """
     if speed_tracker_dr is None:
-        return False, ''
+        return 0, ''
 
     spd = speed_tracker_dr.get_token_speed(token)
     if not spd or not spd.get('is_stale'):
-        return False, ''
+        return 0, ''
 
     z_score = _get_token_zscore(token)
     regime, regime_conf = get_regime(token)
 
-    # High confidence regime check — low confidence regimes are uncertain
     if regime_conf < 60:
-        return False, ''
+        return 0, ''
 
+    # Counter-trend trap: stale token near bottom of range trying to go SHORT
+    # (z<0 = price near local bottom, but regime says SHORT = catching falling knife)
     if regime in ('SHORT_BIAS', 'SHORT') and z_score < 0:
-        return True, f'counter_trend_trap: stale+z<0+short_regime(z={z_score:+.2f})'
+        penalty = min(int(regime_conf * 0.4), 30)
+        return penalty, f'counter_trend_trap: stale+z<0+short_regime(z={z_score:+.2f})'
     if regime in ('LONG_BIAS', 'LONG') and z_score > 0:
-        return True, f'counter_trend_trap: stale+z>0+long_regime(z={z_score:+.2f})'
+        penalty = min(int(regime_conf * 0.4), 30)
+        return penalty, f'counter_trend_trap: stale+z>0+long_regime(z={z_score:+.2f})'
 
-    return False, ''
+    return 0, ''
 
 
 # ─── Volume Cache Warm-Up ────────────────────────────────────────────────────────
@@ -1460,13 +1467,17 @@ def run(dry_run=False):
                 mark_signal_executed(token, direction)
                 skipped += 1
                 continue
-            # Case 4: counter-regime — fighting the trend
+            # Case 4: counter-regime — fighting the trend → PENALIZE not block
             if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
                (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: counter-regime ({regime} {regime_conf:.0f}%)')
-                mark_signal_executed(token, direction)
-                skipped += 1
-                continue
+                penalty = min(int(regime_conf * 0.4), 30)
+                confidence -= penalty
+                if confidence < MIN_EXEC_CONFIDENCE:
+                    log(f'  🧊 [EXEC-BLOCK] {token} {direction} penalized {penalty}pts below exec threshold: counter-regime ({regime} {regime_conf:.0f}%)')
+                    mark_signal_executed(token, direction)
+                    skipped += 1
+                    continue
+                log(f'  🧊 [EXEC-BLOCK] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
         except Exception as e:
             log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 

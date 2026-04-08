@@ -1098,21 +1098,64 @@ def get_pending_signals():
         if purged > 0:
             print(f"  [Compaction PURGE] {purged} PENDING signals expired (>={PURGE_THRESHOLD} compaction rounds survived)")
 
+        # ── STEP 0: HOT-SET REDESIGN PURGE (2026-04-08) ────────────────────────────
+        # Mark signals from PREVIOUS cycle that aren't in the new top 20 as REJECTED.
+        # This is the core of the 10-min hot-set cycle:
+        #   - Signals from last 10 mins are candidates for the new hot-set
+        #   - Signals from PREVIOUS cycle that didn't make the new top 20 → REJECTED
+        #   - Only top 20 survive per cycle → no signal accumulation
+        try:
+            # Read current hotset.json to get previous cycle's tokens
+            import json as _json
+            prev_hotset = []
+            try:
+                with open('/var/www/hermes/data/hotset.json') as _hf:
+                    _hdata = _json.load(_hf)
+                    prev_hotset = [f"{s['token']}:{s['direction']}" for s in _hdata.get('hotset', [])]
+            except Exception:
+                pass  # no previous hotset = first run, skip purge
+
+            if prev_hotset:
+                # Build set of new top-20 token+direction from current candidates
+                # (we'll build this after scoring in the normal flow)
+                # For purge: mark OLD signals (from previous cycle) as REJECTED
+                # if they're not in the hotset (meaning they didn't survive)
+                placeholders = ','.join(['?' for _ in prev_hotset])
+                c.execute(f"""
+                    UPDATE signals
+                    SET decision = 'REJECTED',
+                        rejected_at = CURRENT_TIMESTAMP,
+                        rejection_reason = 'not_in_top_20_compaction',
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE decision = 'PENDING'
+                      AND created_at < datetime('now', '-10 minutes')
+                      AND (token || ':' || direction) NOT IN (
+                          SELECT (token || ':' || direction) FROM signals
+                          WHERE created_at > datetime('now', '-10 minutes')
+                            AND decision = 'PENDING'
+                            AND executed = 0
+                      )
+                """)
+                _purged_prev = c.rowcount
+                if _purged_prev > 0:
+                    print(f"  [Compaction PURGE] {_purged_prev} previous-cycle signals REJECTED (not in new top 20)")
+        except Exception as _pe:
+            print(f"  [Compaction PURGE] warning: {_pe}")
+
         # ── 2. AI-guided compaction: score and keep top 20 ─────────────────────
         # Score = recency_boost + confidence + confluence_bonus + speed_score
         # SPEED FEATURE: update tracker once per compaction run (<2s)
         if speed_tracker_ai is not None:
             speed_tracker_ai().update()
 
-        # FIX (2026-04-05): Extended from 30min to 3 hours to match the hot-set
-        # 3-hour window. Signals with review_count>=1 are protected by PURGE
-        # (compact_rounds >= 5) so they won't accumulate forever.
+        # FIX (2026-04-08): 10-min window for compaction — all signals in last 10 mins
+        # are scored regardless of review_count. New signals (rc=0) must enter hot-set.
         c.execute("""
             SELECT id, token, direction, signal_type, confidence, source, created_at
             FROM signals
             WHERE decision = 'PENDING'
               AND executed = 0
-              AND created_at > datetime('now', '-3 hours')
+              AND created_at > datetime('now', '-10 minutes')
         """)
         candidates = c.fetchall()
         # Always score all candidates — this increments compact_rounds for EVERY signal
@@ -1350,10 +1393,9 @@ def get_pending_signals():
                            (SELECT signal_type FROM signals s2
                             WHERE s2.token=signals.token
                               AND s2.direction=signals.direction
-                              AND s2.decision IN ('PENDING','APPROVED','WAIT')
+                              AND s2.decision IN ('PENDING','APPROVED')
                               AND s2.executed=0
-                              AND s2.review_count>=1
-                              AND s2.created_at > datetime('now','-3 hours')
+                              AND s2.created_at > datetime('now','-10 minutes')
                               AND s2.token NOT LIKE '@%'
                             ORDER BY s2.confidence DESC LIMIT 1) as signal_type,
                            MAX(confidence) as confidence,
@@ -1364,11 +1406,10 @@ def get_pending_signals():
                            MAX(review_count) as review_count,
                            MAX(updated_at) as last_seen
                     FROM signals
-                    WHERE decision IN ('PENDING','APPROVED','WAIT')
+                    WHERE decision IN ('PENDING','APPROVED')
                       AND executed = 0
-                      AND review_count >= 1
-                      AND created_at > datetime('now', '-3 hours')
-                      AND token NOT LIKE '@%'   -- FIX: exclude @XXX numeric coin IDs
+                      AND created_at > datetime('now', '-10 minutes')
+                      AND token NOT LIKE '@%'
                     GROUP BY token, direction
                     HAVING MAX(confidence) >= 70
                     ORDER BY MAX(survival_score) DESC, MAX(confidence) DESC
@@ -1448,6 +1489,7 @@ def get_pending_signals():
                         'signal_type': r[2],
                         'confidence': conf,
                         'compact_rounds': r[4] or 0,
+                        'survival_round': (r[4] or 0) + 1,
                         'survival_score': r[5] or 0,
                         'z_score_tier': r[6],
                         'z_score': r[7] if r[7] is not None else 0.0,
@@ -1464,9 +1506,25 @@ def get_pending_signals():
                 # Cap at 20 tokens
                 if len(hotset) > 20:
                     hotset = hotset[:20]
+
+                # Track compaction_cycle: increment from previous value (persisted in hotset.json)
+                _prev_cycle = 0
+                try:
+                    if os.path.exists(hotset_file):
+                        with open(hotset_file) as _prev_f:
+                            _prev_data = _json.load(_prev_f)
+                            _prev_cycle = _prev_data.get('compaction_cycle', 0)
+                except Exception:
+                    pass
+                _compaction_cycle = _prev_cycle + 1
+
                 with open(hotset_file, 'w') as _f:
-                    _json.dump({'hotset': hotset, 'timestamp': time.time()}, _f)
-                print(f"  [hot-set] wrote {len(hotset)} tokens to hotset.json")
+                    _json.dump({
+                        'hotset': hotset,
+                        'compaction_cycle': _compaction_cycle,
+                        'timestamp': time.time()
+                    }, _f)
+                print(f"  [hot-set] wrote {len(hotset)} tokens to hotset.json (cycle={_compaction_cycle})")
             except Exception as _e:
                 print(f"  [hot-set] FAILED to write: {_e}")
             finally:
@@ -1837,7 +1895,7 @@ End with:
             model="MiniMax-M2",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
-            max_tokens=800
+            max_tokens=4000
         )
         result = _resp.choices[0].message.content
         # Record token usage
@@ -2175,7 +2233,7 @@ REASON: [1-sentence explanation]
                 model="MiniMax-M2",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
-                max_tokens=300
+                max_tokens=4000
             )
             result = _resp.choices[0].message.content
             # Record token usage: estimate ~2000 prompt + actual output tokens

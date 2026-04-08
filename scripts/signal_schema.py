@@ -173,6 +173,14 @@ def init_db():
         rc.execute("ALTER TABLE signals ADD COLUMN review_count INTEGER DEFAULT 0")
     except Exception:
         pass  # column may already exist
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN rejected_at TEXT")
+    except Exception:
+        pass  # column may already exist
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN rejection_reason TEXT")
+    except Exception:
+        pass  # column may already exist
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')

@@ -115,6 +115,47 @@ Plain Markdown files in brain — no API, no dependencies, survives everything:
 
 ---
 
+## Hot-Set Compaction Rewrite
+**Status:** ⬜ OPEN — 2026-04-08
+**Owner:** Agent
+**Summary:** Redesign the hot-set pipeline to match original intent: signals generated in last 10 mins → compacted by AI every 10 mins → top 20 survive → survivors get stronger across rounds → reverse signals penalize and evict. Signals NOT in top 20 are immediately purged (REJECTED column). No signal buildup.
+**Reference:** [.hermes/plans/2026-04-08_041613-hotset-depletion-fix.md]
+**Blockers:** None
+
+### Problem Statement
+Current broken flow: signals need `review_count>=1` + `created_at < 3 hours` to enter hot-set. But new signals never get reviewed fast enough (10-min AI review cycle), so the 3-hour window expires them before they can accumulate `review_count>=1`. Hot-set goes empty.
+
+### Target Design
+```
+Every 10 mins:
+  1. PURGE: last cycle's non-top-20 → REJECTED (moved to rejected column)
+  2. NEW SIGNALS: ~250 signals generated (last 10 mins only)
+  3. AI COMPACTION: rank top 20, penalize reverse signals, identify survivors
+  4. WRITE HOT-SET: top 20 to hotset.json with survival_round count
+  5. DECIDER-RUN: trade highest confidence signal from hot-set only
+```
+
+### Key Decisions (pending)
+- [ ] Change hot-set query window from 3h → 10 mins (`created_at > datetime('now', '-10 minutes')`)
+- [ ] Remove `review_count >= 1` requirement from hot-set query
+- [ ] Add PURGE step: non-top-20 signals → `decision='REJECTED', rejected_at=NOW()`
+- [ ] Rewrite AI compaction prompt (best variants: `L_survival_rounds`, `Q_final` from prompt tests)
+- [ ] Add `max_tokens=4000` to all ai_decider batch calls (fixes MiniMax thinking budget issue)
+- [ ] Add `rejected_at` and `rejection_reason` columns to signals table
+- [ ] Simplify state machine: GENERATED → PENDING → APPROVED (in hot-set) / REJECTED (purged) / EXECUTED (traded)
+
+### Prompt Testing Results (2026-04-08)
+| Prompt | Tokens | Output Quality |
+|--------|--------|----------------|
+| `L_survival_rounds` | 1025-3370 | ✅ Best structured, includes survival rounds |
+| `Q_final` | 978-2970 | ✅ Clean minimal format, efficient |
+| `K_ultraminimal` | 970 | ✅ Simple, fast |
+| `A_current` (baseline) | 2088 | ❌ Broken — 2x tokens, wrong task |
+
+**Critical finding:** MiniMax-M2 with thinking uses full `max_tokens` for BOTH reasoning + output. Need `max_tokens=4000+` to get actual output. With `max_tokens=3000`, reasoning consumes 2999 tokens leaving 1 output token.
+
+---
+
 ## Win Rate Investigation
 **Status:** ❌ CLOSED — WR flip test FAILED (2026-04-06)
 **Owner:** T + Agent
