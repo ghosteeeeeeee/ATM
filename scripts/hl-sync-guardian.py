@@ -1991,6 +1991,266 @@ def _sweep_blocklist_trades(prices):
     return closed
 
 
+# ─── TP/SL Reconciliation ────────────────────────────────────────────────────
+
+# Per-token cooldown: prevents the guardian from hammering HL with TP/SL updates
+# Key = token.upper(), Value = Unix timestamp of last TP/SL reconcile
+_TPSL_RECONCILE_COOLDOWN = {}   # module-level, persists across sync cycles
+_TPSL_COOLDOWN_SEC = 30          # 30-second cooldown per token
+
+# In-memory state for TP/SL reconciles this cycle (per-token, not cross-token)
+_TPSL_MOVED_THIS_CYCLE = {}      # token.upper() -> {'tp': bool, 'sl': bool}
+
+
+def _is_tpsl_cooldown_active(token: str) -> bool:
+    """Return True if token is in 30s cooldown since last reconcile_tp_sl."""
+    tok = token.upper()
+    if tok not in _TPSL_RECONCILE_COOLDOWN:
+        return False
+    elapsed = time.time() - _TPSL_RECONCILE_COOLDOWN[tok]
+    return elapsed < _TPSL_COOLDOWN_SEC
+
+
+def _set_tpsl_cooldown(token: str):
+    """Mark token as having just been reconciled (start 30s cooldown)."""
+    _TPSL_RECONCILE_COOLDOWN[token.upper()] = time.time()
+
+
+def _should_move_sl(entry_px: float, direction: str, ideal_sl: float, current_sl: float) -> bool:
+    """
+    Decide if SL should be moved to ideal_sl from current_sl.
+    Only move in the FAVORABLE direction:
+      - LONG:  favorable = moving SL HIGHER (closer to entry = less risk, tighter stop)
+               BUT actually we want to protect profits → move SL UP (higher = better for LONG)
+               Wait: for LONG, SL price < entry. Moving SL UP means price goes up (toward entry).
+               Favorable for LONG = SL moves higher (further from entry, gives trade more room)
+               No wait: for profit protection, you move SL UP (to lock in more profit)
+               Actually: for LONG, favorable = SL moving higher (away from entry = lock in more profit
+               before being stopped out)
+      - SHORT: favorable = moving SL LOWER (closer to entry for SHORT)
+
+    Actually re-reading: "moves TP/SL only in favorable direction" means:
+    - Long: SL should only move UP (higher price, more protection/profit lock-in)
+           TP should only move UP (higher price, more profit)
+    - Short: SL should only move DOWN (lower price, more protection/profit lock-in)
+             TP should only move DOWN (lower price, more profit)
+
+    Wait, let me think again more carefully:
+    - For LONG: entry_px is the base. SL is below entry. TP is above entry.
+      - SL moving DOWN (lower) = worse (wider, further from entry) — NOT favorable
+      - SL moving UP (higher) = better (tighter stop, closer to entry) OR profit lock-in?
+      Actually: SL at $90 with entry at $100. SL moving to $95 = better (stops closer to entry).
+      So for LONG: favorable SL = moving UP (higher price, closer to entry or lock-in)
+      TP at $110 with entry $100. TP moving to $115 = better (more profit).
+      So for LONG: favorable TP = moving UP (higher price, more profit)
+
+    - For SHORT: entry_px is the base. SL is above entry. TP is below entry.
+      - SL moving UP (higher) = worse (wider, further from entry)
+      - SL moving DOWN (lower) = better (closer to entry or lock-in)
+      - TP moving DOWN (lower) = better (more profit)
+      - TP moving UP (higher) = worse (less profit)
+
+    So:
+      LONG:  favorable = SL moves UP (higher), TP moves UP (higher)
+      SHORT: favorable = SL moves DOWN (lower), TP moves DOWN (lower)
+    """
+    if current_sl is None or current_sl == 0:
+        return True  # No existing SL, always set
+
+    if direction.upper() == 'LONG':
+        # For LONG: favorable = SL moves UP (higher price = better protection)
+        return ideal_sl > current_sl
+    else:  # SHORT
+        # For SHORT: favorable = SL moves DOWN (lower price = better protection)
+        return ideal_sl < current_sl
+
+
+def _should_move_tp(entry_px: float, direction: str, ideal_tp: float, current_tp: float) -> bool:
+    """Same logic for TP."""
+    if current_tp is None or current_tp == 0:
+        return True
+
+    if direction.upper() == 'LONG':
+        # For LONG: favorable = TP moves UP (higher price = more profit)
+        return ideal_tp > current_tp
+    else:  # SHORT
+        # For SHORT: favorable = TP moves DOWN (lower price = more profit)
+        return ideal_tp < current_tp
+
+
+def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
+    """
+    Step 10 (2026-04-08): Reconcile TP/SL for open HL positions.
+
+    For each open HL position with a corresponding paper DB trade:
+      1. Skip if token is in 30s cooldown (per-token)
+      2. Compute ideal TP/SL using ATR-based logic (same as _compute_dynamic_sl)
+      3. Only update TP/SL on HL if the move is in the FAVORABLE direction:
+         - LONG:  SL moves UP, TP moves UP
+         - SHORT: SL moves DOWN, TP moves DOWN
+      4. After any successful TP/SL update, set per-token cooldown (30s)
+
+    Uses replace_tp() / replace_sl() from hyperliquid_exchange (modify existing order
+    if found, or place new if no existing order — handles entry-time failures gracefully).
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return 0
+
+    if DRY:
+        log('[DRY] reconcile_tp_sl: would reconcile TP/SL for open positions', 'WARN')
+        return 0
+
+    moved = 0
+
+    try:
+        # Build token -> db_trade lookup for quick access
+        db_by_token = {t['token'].upper(): t for t in db_trades if t.get('status') == 'open'}
+
+        for coin, pos_data in hl_pos.items():
+            entry_px = float(pos_data.get('entry_px', 0))
+            sz = float(pos_data.get('size', 0))
+            direction = pos_data.get('direction', 'LONG')
+
+            if entry_px == 0 or sz == 0:
+                continue
+
+            # Skip if in cooldown
+            if _is_tpsl_cooldown_active(coin):
+                log(f'  ⏳ {coin} TP/SL: in cooldown, skipping')
+                continue
+
+            # Check if we have a DB trade for this token
+            tok = coin.upper()
+            if tok not in db_by_token:
+                continue
+
+            db_trade = db_by_token[tok]
+            current_sl = db_trade.get('stop_loss') or 0
+            current_tp = db_trade.get('target') or 0
+
+            # ── Compute ideal TP/SL using same ATR-based logic as _compute_dynamic_sl ──
+            # Import the function from decider-run's scope (both use same constants)
+            from decider_run import _compute_dynamic_sl
+
+            # Use sl_pct_fallback=0.015 (1.5%) as baseline if ATR unavailable
+            sl_pct_fallback = 0.015
+            try:
+                ideal_sl = _compute_dynamic_sl(tok, direction.upper(), entry_px, sl_pct_fallback)
+            except Exception as e:
+                # Fallback to fixed % SL
+                if direction.upper() == 'LONG':
+                    ideal_sl = entry_px * (1 - sl_pct_fallback)
+                else:
+                    ideal_sl = entry_px * (1 + sl_pct_fallback)
+                log(f'  [WARN] {coin} ATR-based SL failed ({e}), using fixed {sl_pct_fallback*100:.1f}%')
+
+            # ── Compute ideal TP using ATR (same logic as _compute_dynamic_tp) ──
+            from decider_run import _compute_dynamic_tp
+            tp_pct_fallback = 0.05
+            try:
+                ideal_tp = _compute_dynamic_tp(tok, direction.upper(), entry_px, tp_pct_fallback)
+            except Exception as e:
+                # Fallback to fixed % TP
+                if direction.upper() == 'LONG':
+                    ideal_tp = entry_px * (1 + tp_pct_fallback)
+                else:
+                    ideal_tp = entry_px * (1 - tp_pct_fallback)
+                log(f'  [WARN] {coin} ATR-based TP failed ({e}), using fixed {tp_pct_fallback*100:.1f}%')
+
+            # ── Check if HL actually has TP/SL orders (not just the DB) ──────────
+            # BUG-FIX: Guardian writes SL/TP to DB when creating orphan trades,
+            # but never places them on HL. The favorable-move gate then prevents
+            # placing new orders because ideal_sl < current_sl (HL has nothing).
+            # Solution: if HL has no existing order, ALWAYS place one (initial placement).
+            from hyperliquid_exchange import _find_open_trigger_order
+            hl_has_sl = _find_open_trigger_order(tok, "sl")[0] is not None
+            hl_has_tp = _find_open_trigger_order(tok, "tp")[0] is not None
+
+            sl_changed = _should_move_sl(entry_px, direction, ideal_sl, current_sl)
+            tp_changed = _should_move_tp(entry_px, direction, ideal_tp, current_tp)
+
+            # Override favorable gate if HL is missing the order entirely
+            if not hl_has_sl:
+                sl_changed = True
+                log(f'  🆕 {coin} SL missing on HL — forcing initial placement (DB has {current_sl})')
+            if not hl_has_tp:
+                tp_changed = True
+                log(f'  🆕 {coin} TP missing on HL — forcing initial placement (DB has {current_tp})')
+
+            if not sl_changed and not tp_changed:
+                log(f'  ✅ {coin} TP/SL: no move needed')
+                continue
+
+            # ── Build order size from HL position size ──
+            # Size in hyperliquid is in coin units (sz from hl_pos)
+            order_size = abs(sz)
+
+            any_success = False
+
+            # ── Update SL — modify existing or place new if not found ──
+            if sl_changed:
+                try:
+                    result = replace_sl(tok, direction, ideal_sl, order_size)
+                    if result.get('success'):
+                        log(f'  📍 {coin} SL {"initial" if not hl_has_sl else "updated"}: '
+                            f'{current_sl:.6f} → {ideal_sl:.6f}', 'PASS')
+                        any_success = True
+                    else:
+                        log(f'  ❌ {coin} SL {"placement" if not hl_has_sl else "update"} failed: '
+                            f'{result.get("error", result)}', 'FAIL')
+                except Exception as e:
+                    log(f'  ❌ {coin} SL exception: {e}', 'FAIL')
+
+            # ── Update TP — modify existing or place new if not found ──
+            if tp_changed:
+                try:
+                    result = replace_tp(tok, direction, ideal_tp, order_size)
+                    if result.get('success'):
+                        log(f'  🎯 {coin} TP {"initial" if not hl_has_tp else "updated"}: '
+                            f'{current_tp:.6f} → {ideal_tp:.6f}', 'PASS')
+                        any_success = True
+                    else:
+                        log(f'  ❌ {coin} TP {"placement" if not hl_has_tp else "update"} failed: '
+                            f'{result.get("error", result)}', 'FAIL')
+                except Exception as e:
+                    log(f'  ❌ {coin} TP exception: {e}', 'FAIL')
+
+            # ── Update DB record if any update succeeded ──
+            if any_success:
+                # Update DB with new TP/SL values (persist the favorable move)
+                try:
+                    conn_upd = get_db_connection()
+                    if conn_upd:
+                        cur_upd = conn_upd.cursor()
+                        cur_upd.execute("""
+                            UPDATE trades SET stop_loss=%s, target=%s WHERE id=%s
+                        """, (ideal_sl, ideal_tp, db_trade.get('id')))
+                        conn_upd.commit()
+                        cur_upd.close()
+                        conn_upd.close()
+                        log(f'  💾 {coin} DB updated with new TP/SL')
+                except Exception as e:
+                    log(f'  [WARN] {coin} DB update failed: {e}', 'WARN')
+
+                _set_tpsl_cooldown(coin)
+                moved += 1
+
+                # Rate limit: 5s gap between tokens to avoid HL rate limiting
+                time.sleep(5)
+
+    except Exception as e:
+        log(f'reconcile_tp_sl error: {e}', 'FAIL')
+        import traceback; traceback.print_exc()
+    finally:
+        try:
+            conn.close()
+        except:
+            pass
+
+    return moved
+
+
 def sync():
     """Run one full sync cycle."""
     global _CLOSED_THIS_CYCLE, _CLOSED_HL_COINS
@@ -2189,6 +2449,12 @@ def sync():
         sweep_closed = _sweep_blocklist_trades(prices)
         if sweep_closed > 0:
             log(f'Step9 blocklist sweep: closed {sweep_closed} paper trades on HOTSET_BLOCKLIST')
+
+    # Step 10: Reconcile TP/SL — move only in favorable direction, per-token 30s cooldown
+    if db_trades:
+        tpsl_moved = reconcile_tp_sl(hl_pos, prices, db_trades)
+        if tpsl_moved > 0:
+            log(f'Step10 TP/SL reconcile: updated {tpsl_moved} token(s)')
 
     log(f'── Sync done ──')
 
