@@ -473,3 +473,45 @@ TAO LONG: entry=250, SL=242.32 (3.07%)    — ATR 1.54%, k=2.0
 ---
 
 *Format: `## Project Name | Status | Owner` — update status when it changes.*
+---
+
+## SL/TP Protection System Fixes
+**Status:** 🚧 PHASE 1 DONE — 2026-04-08
+**Owner:** Agent
+**Summary:** 8 bugs confirmed in stop-loss and trailing stop-loss system. 4 fixed (B1/B2/B3/B8), 4 remaining (B4/B5/B6/B7). Live trading active with `hype_live_trading.json = true`.
+
+### Bug Registry (as of 2026-04-08)
+| # | Bug | File | Impact | Status |
+|---|-----|------|--------|--------|
+| B1 | Trailing SL never pushed to HL after activation | position_manager.py | ATR calculated but `place_sl()` only called on entry | ✅ FIXED (already had BUG-8 fix, verified) |
+| B2 | Cascade new position has no SL | position_manager.py | Post-flip position has no HL protection | ✅ FIXED (cascade_flip now calls place_sl+TP) |
+| B3 | No TP/SL placed on initial entry | brain.py | `place_order()` fires but SL/TP never sent to HL | ✅ FIXED (brain.py add_trade now calls place_sl+TP) |
+| B4 | Cascade PnL tracking absent | position_manager.py | Can't determine if flips succeeded → cooldown dead | 🔴 PENDING |
+| B5 | HL rate-limit skips cycles silently | hl-sync-guardian.py + position_manager | 429 causes silent skip, no cache, no retry | 🟡 PARTIAL (guardian has backoff, position_manager doesn't) |
+| B6 | Guardian reason = "guardian_missing" | hl-sync-guardian.py | No trackability, all closes logged as same value | 🔴 PENDING |
+| B7 | No manual close kill switch | hl-sync-guardian.py | T can't tell guardian "I closed this" | 🔴 PENDING |
+| B8 | Two scripts writing trades.json | hermes-trades-api.py + update-trades-json.py | Race condition risk | ✅ FIXED (atomic flock added to both scripts) |
+
+### Fixes Applied 2026-04-08
+
+**B8 (Atomic Write Lock):**
+- Added `_atomic_write()` using `fcntl.flock()` to both `hermes-trades-api.py` and `update-trades-json.py`
+- `update-trades-json.py` KEPT as safety net (not removed — it has no `signal_schema` import overhead)
+- Both scripts write to same path with proper locking
+
+**B3 (Entry SL+TP):**
+- `brain.py add_trade()`: after `mirror_open()` succeeds, now calls `place_sl()` and `place_tp()` on HL immediately
+- SL/TP read back from trade record (stop_loss, target columns)
+- Non-fatal if SL placement fails — paper trade still tracked
+
+**B2 (Cascade SL+TP):**
+- `position_manager.py cascade_flip()`: after `place_order()` succeeds, reads back new trade's SL/TP from DB and calls `place_sl()` + `place_tp()` on HL
+
+### Remaining Work
+- B4: Add `cascade_sequences` table to brain DB
+- B5: Add retry/backoff to position_manager for 429 responses
+- B6: Fix guardian reason column with specific close reasons
+- B7: Create `guardian_kill_switch.json` with manual close protection
+
+**Reference:** [.hermes/plans/2026-04-08_010451-conversation-plan.md](./.hermes/plans/2026-04-08_010451-conversation-plan.md)
+

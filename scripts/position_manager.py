@@ -2159,6 +2159,32 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
 
     if ok and ok.get('success'):
         print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
+        # ── BUG-FIX (B2): Place SL + TP on HL for the new cascade position ─────
+        # Without this, the new post-flip position has no HL protection
+        sz = ok.get('size')
+        if sz:
+            # Read back the new trade's SL and TP from DB (cascade uses same SL/TP as original)
+            from brain import get_db_connection
+            conn_sl = get_db_connection()
+            cur_sl = conn_sl.cursor()
+            cur_sl.execute("""
+                SELECT stop_loss, target, trailing_activation, trailing_distance
+                FROM trades
+                WHERE token = %s AND status = 'open'
+                ORDER BY id DESC LIMIT 1
+            """, (token,))
+            sl_row = cur_sl.fetchone()
+            cur_sl.close(); conn_sl.close()
+            if sl_row and sl_row[0]:
+                from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp, hype_coin
+                hl_token = hype_coin(token)
+                sl_result = hl_place_sl(hl_token, opposite_dir, float(sl_row[0]), float(sz))
+                tp_result = hl_place_tp(hl_token, opposite_dir, float(sl_row[1]), float(sz)) if sl_row[1] else {"success": True}
+                if sl_result.get("success"):
+                    print(f"  [CASCADE FLIP] ✅ SL+TP placed on HL: {hl_token} {opposite_dir} SL={sl_row[0]:.6f} TP={sl_row[1]:.6f if sl_row[1] else 'N/A'}")
+                else:
+                    print(f"  [CASCADE FLIP] ⚠️ SL placement failed: {sl_result.get('error')} (non-fatal, paper open)")
+
         # ── 3. Persist flip count ─────────────────────────────────────────────
         flip_counts = _load_flip_counts()
         entry = flip_counts.get(token.upper(), {})

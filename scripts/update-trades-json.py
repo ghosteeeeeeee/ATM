@@ -1,12 +1,23 @@
 #!/usr/bin/python3
 """Standalone trades.json writer — no signal_schema (avoids init_db hangs on large DBs).
-Updates P&L on open trades using live prices from the static SQLite DB."""
-import sys, os, json, sqlite3, psycopg2
+Updates P&L on open trades using live prices from the static SQLite DB.
+Uses atomic write (flock) for safe concurrent access with hermes-trades-api.py."""
+import sys, os, json, sqlite3, psycopg2, fcntl
 from datetime import datetime, timezone
 
 BRAIN_DB  = 'host=/var/run/postgresql dbname=brain user=postgres password=Brain123'
 PRICE_DB  = '/root/.hermes/data/signals_hermes.db'
 OUT_TRADES = '/var/www/hermes/data/trades.json'
+
+
+def _atomic_write(data: dict, path: str):
+    """Write JSON atomically using flock — safe for concurrent writers."""
+    lock_path = path + '.lock'
+    with open(lock_path, 'w') as lf:
+        fcntl.flock(lf.fileno(), fcntl.LOCK_EX)
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=2)
+        fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
 
 def get_current_price(token):
     try:
@@ -89,8 +100,7 @@ result = {
     'open_count': len(open_t), 'closed_count': total_closed,
     'page_size': 50, 'open': out, 'closed': closed_out
 }
-with open(OUT_TRADES, 'w') as f:
-    json.dump(result, f, indent=2)
+_atomic_write(result, OUT_TRADES)
 
 print(f'Written {os.path.getsize(OUT_TRADES)} bytes | open={len(out)} closed={len(closed_out)}')
 for t in out:

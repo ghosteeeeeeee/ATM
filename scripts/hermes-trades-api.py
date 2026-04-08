@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Hermes trades + signals API — outputs JSON for the web dashboard."""
-import sys, json, os, sqlite3, time
+import sys, json, os, sqlite3, time, fcntl
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import init_db
 import psycopg2
@@ -17,6 +17,17 @@ BRAIN_DB   = "host=/var/run/postgresql dbname=brain user=postgres password=***"
 PRICE_DB   = '/root/.hermes/data/signals_hermes.db'
 _px_cache  = {}    # token -> [(ts, price), ...]
 _px_at     = 0     # last load timestamp
+_LOCK_FILE = '/var/www/hermes/data/.trades-lock'
+
+
+def _atomic_write(data: dict, path: str):
+    """Write JSON atomically using flock — safe for concurrent writers."""
+    lock_path = path + '.lock'
+    with open(lock_path, 'w') as lf:
+        fcntl.flock(lf.fileno(), fcntl.LOCK_EX)
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=2)
+        fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
 
 
 def _load_prices(token):
@@ -249,8 +260,7 @@ def write_trades():
             "close_reason": r[13] if r[13] else ""
         } for r in closed_t]
     }
-    with open(OUT_TRADES, 'w') as f:
-        json.dump(result, f, indent=2)
+    _atomic_write(result, OUT_TRADES)
 
 
 def _build_open_trades(open_t):
@@ -580,8 +590,7 @@ def write_signals():
         "signals": signals,
         "hot_set": hot_set,
     }
-    with open(OUT_SIGNALS, 'w') as f:
-        json.dump(result, f, indent=2)
+    _atomic_write(result, OUT_SIGNALS)
 
 
 def main():

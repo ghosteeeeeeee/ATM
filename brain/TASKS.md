@@ -313,3 +313,33 @@ CONFIRM that SpeedTracker's price history was seeded for KSHIB, KFLOKI, KBONK, K
 
 *Format: `- [STATUS] Task (Project) — owner` — update status when it changes.*
 *How to read: Most urgent at top. Completed tasks move to bottom section.*
+---
+
+## 2026-04-08 Session Tasks
+
+### [P] SL/TP System Fixes — Phase 1 (done), Phase 2 (pending)
+**Project:** SL/TP Protection System Fixes
+**Status:** 🚧 4/8 done, 4 remaining
+**Date:** 2026-04-08
+
+**Completed 2026-04-08:**
+- [x] B8: Atomic write lock added to hermes-trades-api.py + update-trades-json.py
+- [x] B3: SL+TP placed on HL immediately after entry (brain.py add_trade)
+- [x] B2: SL+TP placed on HL after cascade flip (position_manager cascade_flip)
+- [x] B1: Trailing SL pushed to HL every cycle (already implemented, verified)
+
+**Pending:**
+- [ ] B4: Add cascade_sequences table to brain DB
+- [ ] B5: Add 429 backoff to position_manager
+- [ ] B6: Fix guardian reason column trackability
+- [ ] B7: Create guardian_kill_switch.json
+
+**Reference:** [brain/PROJECTS.md#SL/TP Protection System Fixes]
+
+### [🚨] Guardian + Position Manager — confirm online and watching
+**Status:** ✅ DONE — Confirmed 2026-04-08
+- Guardian: 10/10 positions matched, running every 60s
+- Position Manager: 10 open, 6 trailing activations last cycle
+- XRP: LONG entry=1.3886, current=1.3690, pnl=-1.23%, SL=1.3608 (NOT stopped out)
+- EIGEN: closed at +0.42% (trailing exit -0.12%) — NOT a loss
+

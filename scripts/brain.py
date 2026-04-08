@@ -402,6 +402,25 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                     """, (hl_entry, hl_entry, trade_id))
                     conn3.commit()
                     cur3.close(); conn3.close()
+
+                    # BUG-FIX: Place SL + TP on HL immediately after entry
+                    # (B3: no SL/TP was placed on initial entry — fixed here)
+                    sz = result.get('size')
+                    if sz and is_live_trading_enabled():
+                        # Read SL and TP from the trade record
+                        conn_sl = get_db_connection()
+                        cur_sl = conn_sl.cursor()
+                        cur_sl.execute("SELECT stop_loss, target FROM trades WHERE id = %s", (trade_id,))
+                        sl_row = cur_sl.fetchone()
+                        cur_sl.close(); conn_sl.close()
+                        if sl_row and sl_row[0]:
+                            from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp
+                            sl_result = hl_place_sl(hype_token, direction, float(sl_row[0]), float(sz))
+                            tp_result = hl_place_tp(hype_token, direction, float(sl_row[1]), float(sz)) if sl_row[1] else {"success": True}
+                            if sl_result.get("success"):
+                                print(f"[brain.py] ✅ SL placed on HL: {hype_token} {direction} SL=${sl_row[0]:.6f} TP=${sl_row[1]:.6f if sl_row[1] else 'N/A'}")
+                            else:
+                                print(f"[brain.py] ⚠️ SL placement failed: {sl_result.get('error')} (non-fatal, paper still open)")
                 else:
                     print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
         else:

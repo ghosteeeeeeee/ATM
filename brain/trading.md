@@ -574,3 +574,46 @@ When asked `BTC: trend=UP, RSI=overbought` → said DOWN (safety bias against UP
 - [ ] candle_predictor.py stays on qwen2.5:1.5b (no changes to primary path)
 - [ ] Skill created: prompt-training (trading/prompt-training/SKILL.md)
 - [ ] backtest_minimax.py exists at /root/.hermes/scripts/backtest_minimax.py for future testing
+
+---
+
+## 2026-04-08 03:17 UTC — SL/TP System Audit + Fixes
+
+### System Status (CONFIRMED LIVE)
+- **Guardian:** ONLINE — 10/10 positions matched, running every 60s, last sync 03:22:05
+- **Position Manager:** ONLINE — 10 open, 6 trailing activations at 03:12:40
+- **hype_live_trading.json:** `true` (live trading active since 2026-04-05 05:45 UTC)
+- **HL cache:** Age 77s (1.2 min) — current, rate-limited at time of check
+
+### Open Positions (Live)
+| Token | Dir | Entry | Current | PnL% | SL | Status |
+|-------|-----|-------|---------|------|-------|--------|
+| SAND | LONG | 0.0804 | 0.0803 | +0.02% | 1.3608 | Watching |
+| SKY | SHORT | 0.0781 | 0.0775 | +0.73% | — | — |
+| ETHFI | LONG | 0.4552 | 0.4572 | +0.40% | — | — |
+| MORPHO | LONG | 1.7226 | 1.7160 | -0.39% | — | — |
+| AVAX | LONG | 9.5055 | 9.4437 | -0.59% | 9.3154 | Trailing pending |
+| ZK | SHORT | 0.0156 | 0.0156 | +0.09% | — | Trailing active |
+| AXS | LONG | 1.1380 | 1.1510 | +1.33% | — | Trailing active |
+| UMA | LONG | 0.4149 | 0.4179 | +0.53% | — | Trailing active |
+| XRP | LONG | 1.3886 | 1.3690 | -1.23% | 1.3608 | SL tight, not hit |
+| PENDLE | LONG | 1.0750 | 1.0790 | +0.83% | — | Trailing active |
+
+### 8 Bugs Confirmed (4 fixed 2026-04-08, 4 pending)
+See [PROJECTS.md#SL/TP Protection System Fixes] for full table.
+
+### Fixes Applied (2026-04-08)
+1. **B8:** Atomic flock write lock added to `hermes-trades-api.py` + `update-trades-json.py`
+2. **B3:** `brain.py add_trade()` — after `mirror_open()` success, calls `place_sl()` + `place_tp()` on HL
+3. **B2:** `position_manager.py cascade_flip()` — after `place_order()` success, reads back SL/TP from DB and calls `place_sl()` + `place_tp()` on HL
+4. **B1:** Already implemented (BUG-8 fix in position_manager — verified in code at line ~1895-1920)
+
+### Pipeline Double-Execution
+Systemd timer fires at `:00` and pipeline also runs via another trigger at `:01` — but lock prevents overlap. Pipeline runs twice per minute (step 6+7 both run twice per cycle due to double-firing). Lock prevents corruption.
+
+### Key Files Changed
+- `/root/.hermes/scripts/hermes-trades-api.py` — atomic write, imports fcntl
+- `/root/.hermes/scripts/update-trades-json.py` — atomic write, same locking
+- `/root/.hermes/scripts/brain.py` — SL+TP placed on entry via mirror_open hook
+- `/root/.hermes/scripts/position_manager.py` — SL+TP placed on cascade flip
+
