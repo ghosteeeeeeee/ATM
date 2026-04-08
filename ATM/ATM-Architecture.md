@@ -23,8 +23,12 @@ ai_decider.py               ──→ compact_signals() → hotset.json (top 20 
     ▼
 decider-run.py              ──→ TWO PATHS (both enforce bans):
     │                              1. _run_hot_set() → hotset.json
-    │                                 Enforces: wave-phase, counter-trend trap, regime alignment,
-    │                                 overextended filter, cooldown, 10-max-open-positions gate
+    │                                 Hot-set execution filters:
+    │                                 Wave alignment: bottoming+LONG, falling+SHORT get +15% boost
+    │                                 Counter-wave: 0.70–0.88× penalty
+    │                                 Overextended: BLOCKED (except bottoming+LONG, falling+SHORT)
+    │                                 Counter-trend trap: z-score vs direction → penalty
+    │                                 Regime alignment: tier disagrees → -20 pts
     │                                 HARD BANS: conf-1s (single-source), speed=0% (stale token)
     │                              2. get_approved_signals() → reads APPROVED from DB
     │                                 Enforces: counter-trend trap, regime alignment
