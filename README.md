@@ -4,7 +4,7 @@ Hyperliquid momentum-based algorithmic trading system. Monitors 544 tokens, gene
 
 ## System Overview
 
-Hermes is an event-driven trading system that continuously monitors cryptocurrency markets, identifies momentum-based trading opportunities using technical indicators (RSI, MACD, z-score velocity, percentile rank), and executes trades on Hyperliquid exchange. The system supports both paper trading (simulated) and live trading, with a kill switch for safe切换.
+Hermes is an event-driven trading system that continuously monitors cryptocurrency markets, identifies momentum-based trading opportunities using technical indicators (RSI, MACD, z-score velocity, percentile rank), and executes trades on Hyperliquid exchange. The system supports both paper trading (simulated) and live trading, with a kill switch for safety.
 
 ---
 
