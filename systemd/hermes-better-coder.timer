@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes Better Coder Dispatcher Timer — every 30 minutes
+Requires=hermes-better-coder.service
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=30min
+Unit=hermes-better-coder.service
+
+[Install]
+WantedBy=timers.target

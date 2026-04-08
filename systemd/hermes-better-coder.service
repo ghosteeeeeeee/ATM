@@ -1,0 +1,15 @@
+[Unit]
+Description=Hermes Better Coder Dispatcher — runs coding tasks from TASK.md every 30 min
+After=network.target
+Wants=hermes-better-coder.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/run_better_coder.py
+WorkingDirectory=/root/.hermes
+Restart=on-failure
+RestartSec=30s
+Environment="PYTHONPATH=/root/.hermes/mcp/hermes-coding-mcp"
+
+[Install]
+WantedBy=hermes-better-coder.timer

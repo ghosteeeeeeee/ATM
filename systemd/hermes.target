@@ -1,0 +1,7 @@
+[Unit]
+Description=Hermes Core Services — grouping target for all Hermes systemd units
+After=network-online.target
+Wants=hermes-coding-mcp.service hermes-pipeline.service hermes-metrics.service
+
+[Install]
+WantedBy=multi-user.target

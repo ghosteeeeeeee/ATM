@@ -1,0 +1,16 @@
+[Unit]
+Description=Hermes Coding MCP Server — Better Coder tool host
+After=network.target
+PartOf=hermes.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/run_mcp_server.py
+WorkingDirectory=/root/.hermes/mcp/hermes-coding-mcp
+Restart=on-failure
+RestartSec=5s
+Environment="PYTHONPATH=/root/.hermes/mcp/hermes-coding-mcp"
+Environment="SSE_PORT=8765"
+
+[Install]
+WantedBy=hermes.target
