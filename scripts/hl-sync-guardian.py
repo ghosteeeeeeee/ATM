@@ -22,6 +22,7 @@ Migrated from combined-trading.py:
 import sys, time, json, subprocess, argparse, os, re, fcntl
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
+from hermes_file_lock import FileLock
 
 # Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
 # Pruned 2026-04-02: removed WIF, BONK, PYTH, JTO, MNGO, APTOS, RAY (these ARE tradeable)
@@ -60,7 +61,8 @@ from hermes_constants import HOTSET_BLOCKLIST, SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin,
-    is_delisted, replace_sl, replace_tp,
+    is_delisted, replace_sl, replace_tp, place_tp_sl_batch, _hl_price_decimals,
+    cancel_all_open_orders,
 )
 
 import json  # for json.dumps in penalty recording
@@ -128,8 +130,9 @@ def _save_reconciled_state(state):
             cleaned[tok] = entry
         if pruned > 0:
             log(f'  [STALE-CLEANUP] removed {pruned} stale reconciled entries (>24h old)')
-        with open(_RECONCILED_STATE_FILE, 'w') as f:
-            json.dump(cleaned, f)
+        with FileLock('reconciled_state'):
+            with open(_RECONCILED_STATE_FILE, 'w') as f:
+                json.dump(cleaned, f)
     except Exception as e:
         log(f'  Warning: could not save reconciled state: {e}', 'WARN')
 
@@ -180,10 +183,11 @@ def _is_token_killed(token: str) -> bool:
 def _add_to_kill_switch(token: str):
     """Add a token to the kill switch. Call this when T manually closes a token."""
     try:
-        ks = _load_kill_switch()
-        ks.add(token.upper())
-        with open(_KILL_SWITCH_FILE, 'w') as f:
-            json.dump({'description': 'Guardian kill switch — tokens in closed list will NOT be closed by guardian', 'closed': sorted(ks)}, f, indent=2)
+        with FileLock('kill_switch'):
+            ks = _load_kill_switch()
+            ks.add(token.upper())
+            with open(_KILL_SWITCH_FILE, 'w') as f:
+                json.dump({'description': 'Guardian kill switch — tokens in closed list will NOT be closed by guardian', 'closed': sorted(ks)}, f, indent=2)
         log(f'Kill switch: added {token.upper()}', 'INFO')
     except Exception as e:
         log(f'Kill switch write error: {e}', 'FAIL')
@@ -212,8 +216,9 @@ def _load_closed_set() -> set:
 def _save_closed_set():
     """Persist closed-trade IDs to disk for crash-restart dedup."""
     try:
-        with open(_CLOSED_SET_FILE, 'w') as f:
-            json.dump(list(_CLOSED_THIS_CYCLE), f)
+        with FileLock('closed_trade_ids'):
+            with open(_CLOSED_SET_FILE, 'w') as f:
+                json.dump(list(_CLOSED_THIS_CYCLE), f)
     except Exception as e:
         log(f'  Warning: could not save closed set: {e}', 'WARN')
 
@@ -255,8 +260,9 @@ def get_copied_trades():
 
 def save_copied_trades(state):
     """Save copied trades state to JSON file."""
-    with open(COPIED_TRADES_FILE, 'w') as f:
-        json.dump(state, f)
+    with FileLock('copied_trades'):
+        with open(COPIED_TRADES_FILE, 'w') as f:
+            json.dump(state, f)
 
 
 # ─── DB Helpers ────────────────────────────────────────────────────────────────
@@ -2080,6 +2086,21 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
         # Mark coin as closed BEFORE closing to prevent race conditions
         _CLOSED_HL_COINS.add(tok)
 
+        # Phase-3 fix: add trade_id to dedup set and persist BEFORE calling HL.
+        # This prevents duplicate closes if this process crashes after HL call
+        # but before the DB update below.
+        if trade_id:
+            _CLOSED_THIS_CYCLE.add(str(trade_id))
+            _save_closed_set()
+
+        # File lock to prevent this exact close from racing with another guardian cycle
+        lock_path = f'/tmp/hermes-close-lock-{token}.lock'
+        lock_fd = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o644)
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX)  # blocking lock
+        finally:
+            os.close(lock_fd)
+
         # Fire market close on HL
         success = close_position_hl(coin, breach_reason)
         if not success:
@@ -2237,14 +2258,14 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
 
     For each open HL position with a corresponding paper DB trade:
       1. Skip if token is in 30s cooldown (per-token)
-      2. Compute ideal TP/SL using ATR-based logic (same as _compute_dynamic_sl)
-      3. Only update TP/SL on HL if the move is in the FAVORABLE direction:
-         - LONG:  SL moves UP, TP moves UP
-         - SHORT: SL moves DOWN, TP moves DOWN
-      4. After any successful TP/SL update, set per-token cooldown (30s)
+      2. Compute ideal TP/SL using ATR-based logic (ATR distance from current_price, not entry_price)
+         - Uses current_price from prices dict for ATR% calculation (Bug 3 fix)
+      3. Skip only if the new SL/TP is within 1 tick size of current (Bug 4 fix — no favorable-move gate)
+      4. Use atomic batch placement via normalTpsl grouping — one API call, no race window (Bug 2 fix)
+      5. After any successful TP/SL update, set per-token cooldown (30s)
 
-    Uses replace_tp() / replace_sl() from hyperliquid_exchange (modify existing order
-    if found, or place new if no existing order — handles entry-time failures gracefully).
+    Uses place_tp_sl_batch() from hyperliquid_exchange which atomically cancels old TP/SL
+    and places new ones in a single HL API call using normalTpsl grouping.
     """
     conn = get_db_connection()
     if conn is None:
@@ -2290,6 +2311,10 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
 
             log(f'  [DEBUG] {coin}: checking TP/SL (sz={sz} dir={direction} entry={entry_px})')
 
+            # ── BUG-FIX (Bug 3): Use current_price (from prices dict) for ATR calculation ──
+            # This replaces entry_price which was incorrectly used before.
+            current_price = prices.get(tok, entry_px)
+
             # ── Compute ideal TP/SL using same ATR-based logic as _compute_dynamic_sl ──
             # Import the function from decider-run's scope (both use same constants)
             from decider_run import _compute_dynamic_sl
@@ -2297,108 +2322,77 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
             # Use sl_pct_fallback=0.015 (1.5%) as baseline if ATR unavailable
             sl_pct_fallback = 0.015
             try:
-                ideal_sl = _compute_dynamic_sl(tok, direction.upper(), entry_px, sl_pct_fallback)
+                # BUG-FIX: pass current_price as 4th arg (was entry_px)
+                ideal_sl = _compute_dynamic_sl(tok, direction.upper(), entry_px, current_price, sl_pct_fallback)
             except Exception as e:
                 # Fallback to fixed % SL
                 if direction.upper() == 'LONG':
-                    ideal_sl = entry_px * (1 - sl_pct_fallback)
+                    ideal_sl = current_price * (1 - sl_pct_fallback)
                 else:
-                    ideal_sl = entry_px * (1 + sl_pct_fallback)
+                    ideal_sl = current_price * (1 + sl_pct_fallback)
                 log(f'  [WARN] {coin} ATR-based SL failed ({e}), using fixed {sl_pct_fallback*100:.1f}%')
 
             # ── Compute ideal TP using ATR (same logic as _compute_dynamic_tp) ──
             from decider_run import _compute_dynamic_tp
             tp_pct_fallback = 0.05
             try:
-                ideal_tp = _compute_dynamic_tp(tok, direction.upper(), entry_px, tp_pct_fallback)
+                # BUG-FIX: pass current_price as 4th arg (was entry_px)
+                ideal_tp = _compute_dynamic_tp(tok, direction.upper(), entry_px, current_price, tp_pct_fallback)
             except Exception as e:
                 # Fallback to fixed % TP
                 if direction.upper() == 'LONG':
-                    ideal_tp = entry_px * (1 + tp_pct_fallback)
+                    ideal_tp = current_price * (1 + tp_pct_fallback)
                 else:
-                    ideal_tp = entry_px * (1 - tp_pct_fallback)
+                    ideal_tp = current_price * (1 - tp_pct_fallback)
                 log(f'  [WARN] {coin} ATR-based TP failed ({e}), using fixed {tp_pct_fallback*100:.1f}%')
 
-            # ── Check if HL actually has TP/SL orders (not just the DB) ──────────
-            # BUG-FIX: Guardian writes SL/TP to DB when creating orphan trades,
-            # but never places them on HL. The favorable-move gate then prevents
-            # placing new orders because ideal_sl < current_sl (HL has nothing).
-            # Solution: if HL has no existing order, ALWAYS place one (initial placement).
-            from hyperliquid_exchange import _find_open_trigger_order
-            hl_has_sl = _find_open_trigger_order(tok, "sl")[0] is not None
-            hl_has_tp = _find_open_trigger_order(tok, "tp")[0] is not None
-
-            sl_changed = _should_move_sl(entry_px, direction, ideal_sl, current_sl)
-            tp_changed = _should_move_tp(entry_px, direction, ideal_tp, current_tp)
-
-            # Override favorable gate if HL is missing the order entirely
-            if not hl_has_sl:
-                sl_changed = True
-                log(f'  🆕 {coin} SL missing on HL — forcing initial placement (DB has {current_sl})')
-            if not hl_has_tp:
-                tp_changed = True
-                log(f'  🆕 {coin} TP missing on HL — forcing initial placement (DB has {current_tp})')
+            # ── BUG-FIX (Bug 4): Remove favorable-move gate — only skip if negligible change ──
+            # Only skip if the new SL/TP is within 1 tick size of the current one
+            tick_decimals = _hl_price_decimals(tok)
+            tick_size = 10 ** (-tick_decimals)
+            sl_changed = abs(ideal_sl - current_sl) > tick_size if current_sl > 0 else True
+            tp_changed = abs(ideal_tp - current_tp) > tick_size if current_tp > 0 else True
 
             if not sl_changed and not tp_changed:
-                log(f'  ✅ {coin} TP/SL: no move needed (ideal_sl={ideal_sl:.6f} current_sl={current_sl:.6f} hl_sl={hl_has_sl} | ideal_tp={ideal_tp:.6f} current_tp={current_tp:.6f} hl_tp={hl_has_tp})')
+                log(f'  ✅ {coin} TP/SL: no move needed (ideal_sl={ideal_sl:.6f} current_sl={current_sl:.6f} | ideal_tp={ideal_tp:.6f} current_tp={current_tp:.6f})')
                 continue
 
             # ── Build order size from HL position size ──
             # Size in hyperliquid is in coin units (sz from hl_pos)
             order_size = abs(sz)
 
-            any_success = False
-
-            # ── Update SL — modify existing or place new if not found ──
-            if sl_changed:
-                try:
-                    result = replace_sl(tok, direction, ideal_sl, order_size)
-                    if result.get('success'):
-                        log(f'  📍 {coin} SL {"initial" if not hl_has_sl else "updated"}: '
-                            f'{current_sl:.6f} → {ideal_sl:.6f}', 'PASS')
-                        any_success = True
-                    else:
-                        log(f'  ❌ {coin} SL {"placement" if not hl_has_sl else "update"} failed: '
-                            f'{result.get("error", result)}', 'FAIL')
-                except Exception as e:
-                    log(f'  ❌ {coin} SL exception: {e}', 'FAIL')
-
-            # ── Update TP — modify existing or place new if not found ──
-            if tp_changed:
-                try:
-                    result = replace_tp(tok, direction, ideal_tp, order_size)
-                    if result.get('success'):
-                        log(f'  🎯 {coin} TP {"initial" if not hl_has_tp else "updated"}: '
-                            f'{current_tp:.6f} → {ideal_tp:.6f}', 'PASS')
-                        any_success = True
-                    else:
-                        log(f'  ❌ {coin} TP {"placement" if not hl_has_tp else "update"} failed: '
-                            f'{result.get("error", result)}', 'FAIL')
-                except Exception as e:
-                    log(f'  ❌ {coin} TP exception: {e}', 'FAIL')
-
-            # ── Update DB record if any update succeeded ──
-            if any_success:
-                # Update DB with new TP/SL values (persist the favorable move)
-                try:
-                    conn_upd = get_db_connection()
-                    if conn_upd:
-                        cur_upd = conn_upd.cursor()
-                        cur_upd.execute("""
-                            UPDATE trades SET stop_loss=%s, target=%s WHERE id=%s
-                        """, (ideal_sl, ideal_tp, db_trade.get('id')))
-                        conn_upd.commit()
-                        cur_upd.close()
-                        conn_upd.close()
-                        log(f'  💾 {coin} DB updated with new TP/SL')
-                except Exception as e:
-                    log(f'  [WARN] {coin} DB update failed: {e}', 'WARN')
-
-                _set_tpsl_cooldown(coin)
-                moved += 1
-
-                # Rate limit: 5s gap between tokens to avoid HL rate limiting
-                time.sleep(5)
+            # ── BUG-FIX (Bug 2): Atomic cancel+place using normalTpsl grouping ──
+            # This replaces the old flow: clean_all_tpsl_orders → sleep(2) → replace_sl → sleep(5) → replace_tp
+            # The normalTpsl grouping atomically cancels old TP/SL and places new ones in ONE API call.
+            # First cancel ALL stale orders (trigger AND non-trigger) to clear orphaned entry limits:
+            cancel_result = cancel_all_open_orders(tok)
+            if cancel_result.get('cancelled'):
+                log(f'  🗑️ {tok} cancelled {len(cancel_result["cancelled"])} stale orders')
+            try:
+                result = place_tp_sl_batch(tok, direction, ideal_sl, ideal_tp, order_size)
+                if result.get('success'):
+                    log(f'  🔄 {coin} TP/SL batched: SL={ideal_sl:.6f} TP={ideal_tp:.6f}', 'PASS')
+                    moved += 1
+                    _set_tpsl_cooldown(tok)
+                    # Update DB with new TP/SL values
+                    try:
+                        conn_upd = get_db_connection()
+                        if conn_upd:
+                            cur_upd = conn_upd.cursor()
+                            cur_upd.execute("""
+                                UPDATE trades SET stop_loss=%s, target=%s WHERE id=%s
+                            """, (ideal_sl, ideal_tp, db_trade.get('id')))
+                            conn_upd.commit()
+                            cur_upd.close()
+                            conn_upd.close()
+                            log(f'  💾 {coin} DB updated with new TP/SL')
+                    except Exception as e:
+                        log(f'  ❌ {coin} DB update failed: {e}', 'FAIL')
+                else:
+                    errors = result.get('errors', [])
+                    log(f'  ❌ {coin} TP/SL batch failed: {errors or result.get("error", "unknown")}', 'FAIL')
+            except Exception as e:
+                log(f'  ❌ {coin} TP/SL batch exception: {e}', 'FAIL')
 
     except Exception as e:
         log(f'reconcile_tp_sl error: {e}', 'FAIL')

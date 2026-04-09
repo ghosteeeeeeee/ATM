@@ -2,8 +2,9 @@
 """
 AI Decider - Actually thinks and decides using all available info
 """
-import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback, math
+import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback, math, fcntl
 from datetime import datetime, timezone
+from hermes_file_lock import FileLock
 
 # W&B decision audit logging — audit trail of every hot-set decision
 try:
@@ -130,7 +131,7 @@ SOURCE_WEIGHTS = {
 SOURCE_WEIGHT_OVERRIDES = [
     ('mtf_macd',  'hmacd-',  1.0),   # hmacd- + mtf_macd = MACD crossover (was 1.2)
     # hzscore signals get suppressed — noisy, often fires against trend
-    ('mtf_zscore', 'hzscore', 0.5),
+    ('mtf_zscore', 'hzscore', 0.15),
     # All other hmacd-* sources (pct-hermes, etc.) fall through to default 0.6
     # Pattern signals: 1.25× multiplier — independent primary signals, need to
     # bubble up so T can observe their performance vs mtf_macd in hot-set
@@ -941,33 +942,35 @@ PENDING = "/root/.hermes/data/pending-signals.json"
 # signal_gen writes to runtime DB
 from signal_schema import RUNTIME_DB as SIGNALS_DB
 SIGNAL_LOG = "/var/www/hermes/logs/signals.log"
-LOCK_FILE = "/tmp/ai-decider.lock"
+LOCK_FILE = "/root/.hermes/locks/ai_decider.lock"
 
 MAX_OPEN = 10
 
-# Check for existing lock to prevent race conditions
 def acquire_lock():
-    if os.path.exists(LOCK_FILE):
-        # Check if process is still running
-        try:
-            with open(LOCK_FILE) as f:
-                pid = int(f.read().strip())
-            os.kill(pid, 0)  # Check if process exists
-            print(f"🔒 Lock file exists, PID {pid} still running. Exiting.")
-            return False
-        except (ValueError, ProcessLookupError, PermissionError):
-            # Stale lock, remove it
-            os.remove(LOCK_FILE)
-    # Create lock
-    with open(LOCK_FILE, 'w') as f:
-        f.write(str(os.getpid()))
-    return True
+    """Use fcntl.flock for atomic process-level lock. Replaces stale PID-file approach."""
+    global _lock_fd
+    try:
+        _lock_fd = os.open(LOCK_FILE, os.O_CREAT | os.O_RDWR, 0o644)
+        fcntl.flock(_lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        open(LOCK_FILE, 'w').write(str(os.getpid()))
+        return True
+    except (IOError, OSError):
+        print("🔒 ai_decider lock held by another process. Exiting.")
+        return False
 
 def release_lock():
+    global _lock_fd
     try:
-        os.remove(LOCK_FILE)
-    except Exception as e:
-        log_error(f'release_lock: {e}')
+        fcntl.flock(_lock_fd, fcntl.LOCK_UN)
+        os.close(_lock_fd)
+    except Exception:
+        pass
+    try:
+        os.unlink(LOCK_FILE)
+    except Exception:
+        pass
+
+_lock_fd = None
 
 # Acquire lock at startup
 if not acquire_lock():
@@ -1551,20 +1554,22 @@ OUT:
     if len(hotset_final) > 20:
         hotset_final = hotset_final[:20]
     
-    with open('/var/www/hermes/data/hotset.json', 'w') as _f:
-        json.dump({
-            'hotset': hotset_final,
-            'compaction_cycle': _compaction_cycle,
-            'timestamp': time.time()
-        }, _f, indent=2)
-    
+    with FileLock('hotset_json'):
+        with open('/var/www/hermes/data/hotset.json', 'w') as _f:
+            json.dump({
+                'hotset': hotset_final,
+                'compaction_cycle': _compaction_cycle,
+                'timestamp': time.time()
+            }, _f, indent=2)
+
     print(f"  [LLM-compaction] Wrote hotset.json with {len(hotset_final)} tokens (cycle={_compaction_cycle})")
-    
+
     # Update pipeline heartbeat
     try:
-        _hotset_ts_file = '/var/www/hermes/data/hotset_last_updated.json'
-        with open(_hotset_ts_file, 'w') as _f:
-            json.dump({'last_compaction_ts': time.time()}, _f)
+        with FileLock('hotset_last_updated'):
+            _hotset_ts_file = '/var/www/hermes/data/hotset_last_updated.json'
+            with open(_hotset_ts_file, 'w') as _f:
+                json.dump({'last_compaction_ts': time.time()}, _f)
     except Exception:
         pass
 

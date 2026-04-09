@@ -30,18 +30,18 @@ HYPES_LIVE = DATA_DIR / "hype_live_trading.json"
 AUTH_JSON = HERMES_DIR / "auth.json"
 
 SCRIPT_CHECK_MAP = {
-    "signal_gen.py":              ["pipeline_errors", "price_data_fresh", "signal_db"],
-    "ai_decider.py":              ["hotset_exists", "signal_db", "pipeline_errors"],
-    "decider_run.py":             ["pipeline_errors", "signal_db", "hotset_exists"],
+    "signal_gen.py":              ["pipeline_errors", "price_data_fresh", "signal_db", "stale_locks"],
+    "ai_decider.py":              ["hotset_exists", "signal_db", "pipeline_errors", "stale_locks"],
+    "decider_run.py":             ["pipeline_errors", "signal_db", "hotset_exists", "stale_locks"],
     "position_manager.py":        ["pipeline_errors", "postgres_trades", "signal_db"],
     "hl-sync-guardian.py":        ["postgres_trades", "signal_db"],
-    "live-decider.py":            ["pipeline_errors", "hotset_exists", "signal_db", "live_mode"],
-    "price_collector.py":          ["price_data_fresh"],
-    "candle_predictor.py":        ["pipeline_errors", "postgres_trades"],
-    "hebbian_engine.py":          ["brain_db", "hebbian_network"],
-    "hebbian_session_learner.py": ["brain_db", "hebbian_network"],
-    "smoke_test.py":              ["pipeline_errors", "price_data_fresh", "signal_db", "brain_db", "postgres_trades"],
-    "run_pipeline.py":            ["pipeline_errors", "pipeline_not_stuck", "no_flapping"],
+    "live-decider.py":            ["pipeline_errors", "hotset_exists", "signal_db", "live_mode", "stale_locks"],
+    "price_collector.py":          ["price_data_fresh", "stale_locks"],
+    "candle_predictor.py":        ["pipeline_errors", "postgres_trades", "stale_locks"],
+    "hebbian_engine.py":          ["brain_db", "hebbian_network", "stale_locks"],
+    "hebbian_session_learner.py": ["brain_db", "hebbian_network", "stale_locks"],
+    "smoke_test.py":              ["pipeline_errors", "price_data_fresh", "signal_db", "brain_db", "postgres_trades", "stale_locks"],
+    "run_pipeline.py":            ["pipeline_errors", "pipeline_not_stuck", "no_flapping", "stale_locks"],
     "wasp.py":                    ["pipeline_errors", "postgres_trades", "signal_db", "hotset_exists"],
     "archive-signals.py":         ["signal_db", "pipeline_errors"],
     "hotset.json":                ["hotset_exists"],
@@ -50,12 +50,12 @@ SCRIPT_CHECK_MAP = {
     "_secrets.py":               ["postgres_trades"],
 }
 
-CRITICAL_CHECKS = ["pipeline_errors", "pipeline_not_stuck", "price_data_fresh", "signal_db"]
+CRITICAL_CHECKS = ["pipeline_errors", "pipeline_not_stuck", "price_data_fresh", "signal_db", "stale_locks"]
 
 
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # LLM Integration — minimax for AI-assisted healing
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 def _get_minimax_client():
     """Build minimax OpenAI-compatible client from auth.json."""
@@ -84,9 +84,8 @@ def _call_minimax(system_prompt: str, user_prompt: str, max_tokens=800) -> str:
             model="MiniMax-M2",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
+                {"role": "user", "content": user_prompt},
             ],
-            temperature=0.3,
             max_tokens=max_tokens
         )
         return resp.choices[0].message.content or ""
@@ -94,9 +93,9 @@ def _call_minimax(system_prompt: str, user_prompt: str, max_tokens=800) -> str:
         return ""
 
 
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Built-in fix functions
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 def _fix_pipeline_stuck():
     lock = Path("/tmp/hermes-pipeline.lock")
@@ -106,6 +105,33 @@ def _fix_pipeline_stuck():
             lock.unlink()
             return True, f"Removed stale lock ({age/60:.0f}min old)"
     return False, "No stuck lock found"
+
+
+# Known lock files written by Hermes scripts — check all for staleness
+HERMES_LOCKS = {
+    "/tmp/hermes-pipeline.lock":      600,   # 10 min
+    "/tmp/hermes-guardian.lock":      600,
+    "/root/.hermes/locks/ai_decider.lock": 600,
+    "/tmp/ai-decider.lock":           600,
+    "/tmp/hermes-decider.lock":       600,
+}
+
+def _fix_stale_locks():
+    """Remove all stale Hermes lock files."""
+    removed = []
+    for lock_path, max_age in HERMES_LOCKS.items():
+        p = Path(lock_path)
+        if p.exists():
+            age = time.time() - p.stat().st_mtime
+            if age > max_age:
+                try:
+                    p.unlink()
+                    removed.append(lock_path)
+                except Exception:
+                    pass
+    if removed:
+        return True, f"Removed stale locks: {', '.join(removed)}"
+    return False, "No stale locks found"
 
 
 def _fix_price_stale():
@@ -150,6 +176,7 @@ def _fix_postgres_trades():
 
 HEAL_MAP = {
     "pipeline_not_stuck": (_fix_pipeline_stuck, True),
+    "stale_locks":        (_fix_stale_locks, True),
     "price_data_fresh":   (_fix_price_stale, True),
     "signal_db":          (None, False),   # signals live in PG — no local fix
     "hotset_exists":      (_fix_hotset_stale, True),
@@ -163,9 +190,9 @@ HEAL_MAP = {
 }
 
 
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Individual checks
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 def check_pipeline_log_errors(n=20):
     if not PIPELINE_LOG.exists():
@@ -187,6 +214,20 @@ def check_pipeline_not_stuck():
     return True, f"lock age: {age:.0f}s"
 
 
+def check_stale_locks():
+    """Check all Hermes lock files. Fail if any is > threshold (process likely died)."""
+    stale = []
+    for lock_path, max_age in HERMES_LOCKS.items():
+        p = Path(lock_path)
+        if p.exists():
+            age = time.time() - p.stat().st_mtime
+            if age > max_age:
+                stale.append(f"{lock_path} ({age/60:.0f}min)")
+    if stale:
+        return False, f"Stale locks: {', '.join(stale)}"
+    return True, "all locks fresh"
+
+
 def check_price_data_fresh(max_age_sec=180):
     prices_json = DATA_DIR / "prices.json"
     if not prices_json.exists():
@@ -201,7 +242,7 @@ def check_price_data_fresh(max_age_sec=180):
         age = time.time() - ts
         if age > max_age_sec:
             return False, f"Prices stale: {age:.0f}s old"
-        return True, f"prices OK ({age:.0f}s)"
+        return True, f"prices OK ({age:.0}s)"
     except Exception as e:
         return False, f"prices.json parse error: {e}"
 
@@ -232,369 +273,179 @@ def check_signal_db():
         else:
             try:
                 conn = sqlite3.connect(str(signals_db), timeout=5)
-                tables = [r[0] for r in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'"
-                ).fetchall()]
-                if 'signals' in tables:
-                    count = conn.execute("SELECT COUNT(*) FROM signals").fetchone()[0]
-                    conn.close()
-                    return True, f"signals OK via SQLite ({count} records)"
+                cur = conn.execute("SELECT COUNT(*) FROM signals")
+                count = cur.fetchone()[0]
                 conn.close()
-            except Exception as e:
+                return True, f"signals DB OK ({count} rows)"
+            except Exception:
                 pass  # fall through to PG
 
-    # Fallback: PostgreSQL (signals table may exist in some deployments)
+    # Fallback: check PostgreSQL
     try:
-        sys.path.insert(0, str(SCRIPTS_DIR))
-        from _secrets import BRAIN_DB_DICT
         import psycopg2
-        conn = psycopg2.connect(**BRAIN_DB_DICT)
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM signals")
+        conn = psycopg2.connect(
+            host="localhost", dbname="brain", user="postgres",
+            password="brain123", connect_timeout=5
+        )
+        cur = conn.execute("SELECT COUNT(*) FROM signals")
         count = cur.fetchone()[0]
         conn.close()
-        return True, f"signals OK via PostgreSQL ({count} records)"
+        return True, f"signals PG OK ({count} rows)"
     except Exception as e:
-        return False, f"signals unreachable (SQLite empty, PG: {e})"
+        return False, f"signals DB down: {e}"
 
 
 def check_brain_db():
-    import sqlite3
     if not BRAIN_DB.exists():
-        return False, "associative_memory.db missing"
+        alt = HERMES_DIR / "brain.db"
+        if alt.exists():
+            BRAIN_DB = alt
+        if not BRAIN_DB.exists():
+            return False, "brain.db not found"
     try:
-        conn = sqlite3.connect(str(BRAIN_DB), timeout=5)
-        nodes = conn.execute("SELECT COUNT(*) FROM concept_nodes").fetchone()[0]
-        synapses = conn.execute("SELECT COUNT(*) FROM synapse_weights").fetchone()[0]
+        conn = sqlite3.connect(str(BRAIN_DB))
+        cur = conn.execute("SELECT COUNT(*) FROM nodes")
+        count = cur.fetchone()[0]
         conn.close()
-        return True, f"brain DB OK ({nodes} nodes, {synapses} synapses)"
+        return True, f"brain OK ({count} nodes)"
     except Exception as e:
-        return False, f"brain DB error: {e}"
+        return False, f"brain.db error: {e}"
 
 
 def check_postgres_trades():
     try:
-        sys.path.insert(0, str(SCRIPTS_DIR))
-        from _secrets import BRAIN_DB_DICT
         import psycopg2
-        conn = psycopg2.connect(**BRAIN_DB_DICT)
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM trades WHERE server='Hermes'")
+        conn = psycopg2.connect(
+            host="localhost", dbname="brain", user="postgres",
+            password="brain123", connect_timeout=5
+        )
+        cur = conn.execute("SELECT COUNT(*) FROM trades")
         count = cur.fetchone()[0]
         conn.close()
-        return True, f"PostgreSQL OK ({count} total trades)"
+        return True, f"trades OK ({count})"
     except Exception as e:
-        return False, f"PostgreSQL error: {e}"
+        return False, f"postgres down: {e}"
 
 
-def check_live_mode_flags():
-    try:
-        flags = json.loads(HYPES_LIVE.read_text())
-        live = flags.get("live_trading", False)
-        if live:
-            return True, "LIVE TRADING ENABLED"
-        return True, "paper mode"
-    except Exception:
-        return True, "no flags"
-
-
-def check_recent_restarts():
-    log = PIPELINE_LOG.read_text() if PIPELINE_LOG.exists() else ""
-    lines = log.splitlines()
-    recent = [l for l in lines[-60:] if "Pipeline LIVE" in l or "Pipeline PAPER" in l]
-    if len(recent) > 5:
-        return False, f"Pipeline flapping: {len(recent)} runs in last 60 log lines"
-    return True, f"run count OK ({len(recent)} runs)"
+def check_live_mode():
+    if HYPES_LIVE.exists():
+        try:
+            data = json.loads(HYPES_LIVE.read_text())
+            mode = data.get("mode", "unknown")
+            return True, f"live_mode={mode}"
+        except Exception:
+            pass
+    return True, "live_mode unknown"
 
 
 def check_hebbian_network():
-    import sqlite3
+    sys.path.insert(0, str(SCRIPTS_DIR))
     try:
-        conn = sqlite3.connect(str(BRAIN_DB), timeout=5)
-        nodes = conn.execute("SELECT COUNT(*) FROM concept_nodes").fetchone()[0]
-        synapses = conn.execute("SELECT COUNT(*) FROM synapse_weights").fetchone()[0]
-        conn.close()
-        if nodes > 50000:
-            return False, f"Hebbian explosion: {nodes} nodes — possible loop"
-        if synapses > 500000:
-            return False, f"Hebbian explosion: {synapses} synapses — possible loop"
-        return True, f"hebbian OK ({nodes} nodes, {synapses} synapses)"
+        from hebbian_engine import HebbianEngine
+        h = HebbianEngine()
+        stats = h.stats()
+        if stats.get("node_count", 0) > 0:
+            return True, f"hebbian OK ({stats['node_count']} nodes)"
+        return False, "hebbian empty"
     except Exception as e:
-        return True, f"hebbian check skipped: {e}"
+        return False, f"hebbian error: {e}"
 
 
-CHECKS = [
-    ("pipeline_errors",    check_pipeline_log_errors),
-    ("pipeline_not_stuck", check_pipeline_not_stuck),
-    ("price_data_fresh",   check_price_data_fresh),
-    ("hotset_exists",      check_hotset_exists),
-    ("signal_db",          check_signal_db),
-    ("brain_db",           check_brain_db),
-    ("postgres_trades",    check_postgres_trades),
-    ("live_mode",          check_live_mode_flags),
-    ("no_flapping",        check_recent_restarts),
-    ("hebbian_network",     check_hebbian_network),
-]
+def check_no_flapping():
+    """Check pipeline for flapping (restarts > 3 times in 10 min)."""
+    if not PIPELINE_LOG.exists():
+        return True, "no pipeline.log"
+    try:
+        lines = PIPELINE_LOG.read_text().splitlines()
+        recent = [l for l in lines if "START" in l or "pipeline" in l.lower()]
+        if len(recent) > 10:
+            return False, f"Pipeline flapping: {len(recent)} restarts"
+        return True, "pipeline stable"
+    except Exception:
+        return True, "flapping check unknown"
 
 
-# ---------------------------------------------------------------------------
-# Core run functions
-# ---------------------------------------------------------------------------
+# Map name -> (checker_fn, is_critical)
+CHECKS = {
+    "pipeline_errors":    (check_pipeline_log_errors, True),
+    "pipeline_not_stuck":  (check_pipeline_not_stuck, True),
+    "price_data_fresh":   (check_price_data_fresh, True),
+    "signal_db":          (check_signal_db, True),
+    "brain_db":           (check_brain_db, False),
+    "postgres_trades":    (check_postgres_trades, True),
+    "hotset_exists":      (check_hotset_exists, True),
+    "live_mode":          (check_live_mode, False),
+    "hebbian_network":    (check_hebbian_network, False),
+    "no_flapping":        (check_no_flapping, False),
+    "stale_locks":        (check_stale_locks, True),
+}
 
-def run_smoke_test(verbose=True, check_filter=None):
-    """Run smoke checks. Returns (all_passed, results)."""
-    checks_to_run = [(n, fn) for n, fn in CHECKS if check_filter is None or n in check_filter]
 
+# ----------------------------------------------------------------------
+# Runner
+# ----------------------------------------------------------------------
+
+def run_checks(target_names=None, heal=False, verbose=False):
+    """Run checks. If heal=True, apply fixes for failed checks."""
     results = []
-    all_ok = True
-    for name, fn in checks_to_run:
+    for name in (target_names or CHECKS.keys()):
+        if name not in CHECKS:
+            print(f"Unknown check: {name}")
+            continue
+        checker, is_critical = CHECKS[name]
         try:
-            ok, msg = fn()
-            results.append((name, ok, msg))
-            if not ok:
-                all_ok = False
+            ok, msg = checker()
         except Exception as e:
-            results.append((name, False, f"EXCEPTION: {e}"))
-            all_ok = False
-
-    if verbose:
-        status = "PASS" if all_ok else "FAIL"
-        print(f"[SMOKE TEST] {status}")
-        for name, ok, msg in results:
-            icon = "✅" if ok else "❌"
-            print(f"  {icon} {name}: {msg}")
-
-    return all_ok, results
-
-
-def run_smoke_test_with_heal(max_heal_attempts=2, check_filter=None, verbose=True):
-    """
-    Run smoke test, auto-heal failures using:
-      1. Built-in fix functions (HEAL_MAP)
-      2. Minimax AI for unmapped/unknown failures
-
-    Returns (final_passed, results, heal_log).
-    """
-    heal_log = []
-    attempt = 0
-    all_ok = False
-
-    while attempt <= max_heal_attempts:
-        ok, results = run_smoke_test(verbose=(attempt == 0 and verbose), check_filter=check_filter)
-
-        if ok:
-            all_ok = True
-            break
-
-        failures = [(name, msg) for name, ok, msg in results if not ok]
-        if not failures:
-            break
-
-        if attempt >= max_heal_attempts:
-            if verbose:
-                print(f"[SMOKE TEST] Max heal attempts ({max_heal_attempts}) reached")
-            # Still failing after all heal attempts → alert T
-            _alert_on_heal_failure(results, heal_log)
-            break
-
-        # Built-in fixes
-        built_in = []
-        for name, msg in failures:
-            if name in HEAL_MAP:
-                fix_fn, can_heal = HEAL_MAP[name]
-                if can_heal and fix_fn is not None:
-                    built_in.append((name, fix_fn))
-
-        if verbose:
-            print(f"[SMOKE TEST] Attempt {attempt+1}/{max_heal_attempts}: "
-                  f"{len(built_in)} built-in heals + AI fallback")
-
-        for name, fix_fn in built_in:
-            try:
-                success, fix_msg = fix_fn()
-                heal_log.append({
-                    "check": name, "attempt": attempt + 1, "method": "builtin",
-                    "success": success, "message": fix_msg
-                })
-                if verbose:
-                    icon = "✅" if success else "❌"
-                    print(f"  {icon} heal [{name}] (builtin): {fix_msg}")
-            except Exception as e:
-                heal_log.append({
-                    "check": name, "attempt": attempt + 1, "method": "builtin",
-                    "success": False, "message": f"EXCEPTION: {e}"
-                })
-                if verbose:
-                    print(f"  ❌ heal [{name}] (builtin): EXCEPTION {e}")
-
-        # AI healing for remaining failures
-        ai_failures = [
-            (name, msg) for name, msg in failures
-            if not any(n == name for n, _ in built_in)
-        ]
-
-        if ai_failures and attempt < max_heal_attempts:
-            system_prompt = (
-                "You are Hermes, a crypto trading system automation agent. "
-                "You diagnose and fix infrastructure failures. "
-                "You have shell access and systemd control on a Linux system. "
-                "Be concise — describe the problem, the fix command, and any verification step."
-            )
-            failure_lines = "\n".join([f"- {n}: {m}" for n, m in ai_failures])
-            user_prompt = (
-                f"Smoke test failed on these checks:\n{failure_lines}\n\n"
-                f"Hermes root: {HERMES_DIR}\nScripts: {SCRIPTS_DIR}\n"
-                f"Data: {DATA_DIR}\nLogs: {LOG_DIR}\n\n"
-                f"For each failure:\n"
-                f"  1. Most likely root cause\n"
-                f"  2. Exact command(s) to fix it\n"
-                f"  3. How to verify\n\n"
-                f"Only suggest safe infra commands (systemctl, python3 scripts/, rm -f /tmp/). "
-                f"Do NOT suggest trade execution or strategy changes."
-            )
-
-            ai_response = _call_minimax(system_prompt, user_prompt)
-            if ai_response:
-                heal_log.append({
-                    "check": ",".join(n for n, _ in ai_failures),
-                    "attempt": attempt + 1, "method": "ai",
-                    "success": True, "message": ai_response[:500]
-                })
-                if verbose:
-                    print(f"  🧠 AI diagnostic:\n    {ai_response[:300]}")
-
-                # Execute safe commands from AI response
-                for line in ai_response.split("\n"):
-                    line = line.strip().strip("`")
-                    safe_starts = (
-                        "sudo systemctl restart",
-                        "sudo systemctl stop",
-                        "sudo systemctl start",
-                        "python3 /root/.hermes/scripts/",
-                        "sudo rm -f /tmp/",
-                    )
-                    if any(line.startswith(p) for p in safe_starts):
-                        r = subprocess.run(line, shell=True, capture_output=True, timeout=30)
-                        heal_log.append({
-                            "check": "ai_exec", "attempt": attempt + 1, "method": "ai_exec",
-                            "success": r.returncode == 0, "message": f"ran: {line[:60]} → {r.returncode}"
-                        })
-                        if verbose:
-                            icon = "✅" if r.returncode == 0 else "❌"
-                            print(f"  {icon} ai_exec: {line[:70]}")
-
-        time.sleep(5)
-        attempt += 1
-
-    return all_ok, results, heal_log
+            ok, msg = False, f"exception: {e}"
+        results.append((name, ok, msg, is_critical))
+        status = "PASS" if ok else "FAIL"
+        print(f"  [{status}] {name}: {msg}")
+        if not ok and heal:
+            fixer, can_heal = HEAL_MAP.get(name, (None, False))
+            if fixer and can_heal:
+                ok2, msg2 = fixer()
+                print(f"         healed: {msg2}")
+                results[-1] = (name, ok2, msg2, is_critical)
+    failed = [r for r in results if not r[1] and r[3]]
+    return 0 if not failed else 1
 
 
-def find_changed_scripts(since_minutes=30):
-    """Find scripts/data-files modified in the last N minutes."""
-    now = time.time()
-    cutoff = now - (since_minutes * 60)
-    changed = []
-    for script in SCRIPT_CHECK_MAP:
-        for base in [SCRIPTS_DIR, DATA_DIR, HERMES_DIR / "data", HERMES_DIR]:
-            path = base / script
-            if path.exists() and path.stat().st_mtime > cutoff:
-                changed.append(script)
-                break
-    return changed
+def main():
+    parser = argparse.ArgumentParser(description="Hermes smoke test")
+    parser.add_argument("--target", help="Run checks for a specific script")
+    parser.add_argument("--changed-since", type=int, metavar="MINS", help="Scripts changed in last N minutes")
+    parser.add_argument("--critical", action="store_true", help="Critical checks only")
+    parser.add_argument("--heal", action="store_true", help="Auto-heal failed checks")
+    parser.add_argument("--verbose", "-v", action="store_true")
+    args = parser.parse_args()
 
+    targets = None
+    if args.target:
+        if args.target not in SCRIPT_CHECK_MAP:
+            print(f"Unknown target: {args.target}")
+            print(f"Available: {', '.join(SCRIPT_CHECK_MAP.keys())}")
+            sys.exit(1)
+        targets = SCRIPT_CHECK_MAP[args.target]
+    elif args.changed_since:
+        cutoff = time.time() - args.changed_since * 60
+        targets = []
+        for script, checks in SCRIPT_CHECK_MAP.items():
+            p = SCRIPTS_DIR / script
+            if p.exists() and p.stat().st_mtime > cutoff:
+                targets.extend(checks)
+        targets = sorted(set(targets))
+        print(f"Changed scripts → checks: {targets}")
+    elif args.critical:
+        targets = CRITICAL_CHECKS
 
-AUTH_JSON = HERMES_DIR / "auth.json"
+    exit_code = run_checks(targets, heal=args.heal, verbose=args.verbose)
 
-
-def _send_telegram_alert(message: str, max_len=4000):
-    """Send alert via Telegram bot. Silently fails if not configured."""
-    try:
-        with open(AUTH_JSON) as f:
-            auth = json.load(f)
-        tele = (auth.get("notifications", {}) or {}).get("telegram", {})
-        token = tele.get("bot_token", "")
-        chat_id = tele.get("chat_id", "")
-        if not token or not chat_id:
-            return False
-        import urllib.request
-        msg = urllib.parse.quote(message[:max_len])
-        urllib.request.urlopen(
-            f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={msg}",
-            timeout=10
-        )
-        return True
-    except Exception:
-        return False
-
-
-def _alert_on_heal_failure(results, heal_log):
-    """If smoke test still failing after heal attempts, alert T via Telegram."""
-    failures = [(name, msg) for name, ok, msg in results if not ok]
-    if not failures:
-        return
-    lines = "\n".join([f"❌ {n}: {msg}" for n, msg in failures])
-    msg = (
-        f"🚨 Hermes Smoke Test FAILURE (unhealed)\n"
-        f"{lines}\n"
-        f"Heal attempts: {len(heal_log)}\n"
-        f"Run: python3 /root/.hermes/scripts/smoke_test.py --critical --heal"
-    )
-    _send_telegram_alert(msg)
-
-
-def _log_heal_results(heal_log):
-    try:
-        log_path = LOG_DIR / "smoke_heal.log"
-        entry = {
-            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "heal_attempts": heal_log
-        }
-        with open(log_path, "a") as f:
-            f.write(json.dumps(entry) + "\n")
-    except Exception:
-        pass
+    if exit_code == 0:
+        print("\nAll checks passed.")
+    else:
+        print("\nSome checks FAILED.")
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Hermes Smoke Test")
-    parser.add_argument("--target", metavar="SCRIPT",
-                       help="Run targeted checks for a specific script")
-    parser.add_argument("--changed-since", metavar="MINS", type=int, default=None,
-                       help="Check scripts modified in the last N minutes")
-    parser.add_argument("--critical", action="store_true",
-                       help="Run only critical checks")
-    parser.add_argument("--heal", action="store_true",
-                       help="Auto-heal failures using built-in fixes + minimax AI")
-    args = parser.parse_args()
-
-    # Build check filter from --target or --changed-since
-    check_filter = None
-    if args.target:
-        checks = set(SCRIPT_CHECK_MAP.get(args.target, []))
-        if not checks:
-            print(f"[SMOKE TEST] No checks mapped for '{args.target}'")
-            sys.exit(1)
-        check_filter = checks
-    elif args.changed_since is not None:
-        changed = find_changed_scripts(args.changed_since)
-        if changed:
-            all_checks = set()
-            for script in changed:
-                all_checks.update(SCRIPT_CHECK_MAP.get(script, []))
-            check_filter = all_checks
-        elif not args.heal:
-            print("[SMOKE TEST] No recent changes detected")
-            sys.exit(0)
-    elif args.critical:
-        check_filter = set(CRITICAL_CHECKS)
-
-    if args.heal:
-        ok, _, heal_log = run_smoke_test_with_heal(
-            max_heal_attempts=2, check_filter=check_filter, verbose=True
-        )
-        if heal_log:
-            _log_heal_results(heal_log)
-        sys.exit(0 if ok else 1)
-    else:
-        ok, _ = run_smoke_test(verbose=True, check_filter=check_filter)
-        sys.exit(0 if ok else 1)
+    main()

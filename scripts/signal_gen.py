@@ -27,6 +27,7 @@ from typing import Tuple, List, Optional
 import sys, sqlite3, time, os, json, statistics, math
 from functools import lru_cache
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from hermes_file_lock import FileLock
 _RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            os.pardir, 'data', 'signals_hermes_runtime.db')
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
@@ -257,9 +258,10 @@ def _update_heartbeat(stage: str):
                     data = json.load(f)
             except Exception:
                 pass
-        data[stage] = {"timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), "status": "ok"}
-        with open(_HEARTBEAT_FILE, 'w') as f:
-            json.dump(data, f, indent=2)
+        with FileLock('pipeline_heartbeat'):
+            data[stage] = {"timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), "status": "ok"}
+            with open(_HEARTBEAT_FILE, 'w') as f:
+                json.dump(data, f, indent=2)
     except Exception:
         pass  # Never crash on heartbeat failures
 

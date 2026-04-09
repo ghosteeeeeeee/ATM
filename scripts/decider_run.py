@@ -5,7 +5,7 @@ Respects hype_live_trading.json: paper=False (live by default).
 Reads APPROVED signals, checks position limits, computes SL/TP, places trades.
 Also processes delayed-entry signals from pending-delayed-entries.json.
 """
-import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2
+import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2, fcntl
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
@@ -18,6 +18,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from tokens import is_solana_only
+from hermes_file_lock import FileLock
 from hyperliquid_exchange import is_live_trading_enabled, is_delisted
 import hype_cache as hc
 
@@ -103,6 +104,7 @@ def _atr_multiplier(token: str, atr_pct: float, override_k: float = None) -> flo
         return 2.0
 
 def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
+                        current_price: float,
                         sl_pct_fallback: float = 0.015,
                         override_k: float = None) -> float:
     """
@@ -118,6 +120,9 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
     In that case, use max(ATR-based, 1.5% fixed) to ensure meaningful protection.
 
     Maximum: cap SL distance at 5% to avoid absurdly wide stops on any token.
+
+    BUG-FIX: ATR distance is now computed from current_price (not entry_price),
+    which is the correct volatility-based stop placement.
     """
     MIN_ATR_PCT = 0.015   # 1.5% — below this, fall back to fixed %
     MAX_SL_PCT  = 0.05     # 5% — never wider than this
@@ -130,39 +135,44 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
         else:
             return entry_price * (1 + sl_pct_fallback)
 
-    atr_pct = atr / entry_price
+    # BUG-FIX: use current_price for ATR% calculation (not entry_price)
+    atr_pct = atr / current_price
     k = _atr_multiplier(token, atr_pct, override_k=override_k)
     atr_distance = k * atr
-    atr_sl_pct = atr_distance / entry_price
 
     # Apply minimum ATR% floor — don't let low-vol tokens get razor SLs
-    effective_sl_pct = max(atr_sl_pct, MIN_ATR_PCT)
+    effective_sl_pct = max(atr_distance / current_price, MIN_ATR_PCT)
     # Apply maximum cap
     effective_sl_pct = min(effective_sl_pct, MAX_SL_PCT)
 
+    # BUG-FIX: SL distance is from current_price, not entry_price
     if direction == 'LONG':
-        sl = entry_price * (1 - effective_sl_pct)
+        sl = current_price * (1 - effective_sl_pct)
     else:
-        sl = entry_price * (1 + effective_sl_pct)
+        sl = current_price * (1 + effective_sl_pct)
 
-    log(f'  [ATR] {token} {direction}: price={entry_price}, ATR={atr:.6f} ({atr_pct*100:.2f}%), '
-        f'k={k}, raw={atr_sl_pct*100:.2f}%, effective={effective_sl_pct*100:.2f}%, SL={sl:.6f}')
+    log(f'  [ATR] {token} {direction}: entry={entry_price}, cur={current_price}, ATR={atr:.6f} ({atr_pct*100:.2f}%), '
+        f'k={k}, dist={atr_distance:.6f}, effective={effective_sl_pct*100:.2f}%, SL={sl:.6f}')
     return sl
 
 def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
+                        current_price: float,
                          tp_pct_fallback: float = 0.05,
                          override_k: float = None) -> float:
     """
     Compute dynamic TP using ATR(14) — parallel to _compute_dynamic_sl().
-    TP = entry_price ± (k_tp * ATR(14)) where k_tp is 3× the SL multiplier.
+    TP = current_price ± (k_tp * ATR(14)) where k_tp is 2.5× the SL multiplier.
     This gives a proper R:R ratio: at NORMAL vol, TP = 4× ATR ≈ 4× 2× ATR SL = 2:1 R:R.
 
-    k_tp multipliers (3× SL k):
-      LOW_VOLATILITY:    k_tp=4.5  (3× 1.5)
-      NORMAL_VOLATILITY: k_tp=6.0  (3× 2.0)
-      HIGH_VOLATILITY:   k_tp=7.5  (3× 2.5)
+    k_tp multipliers (2.5× SL k):
+      LOW_VOLATILITY:    k_tp=3.75  (2.5× 1.5)
+      NORMAL_VOLATILITY: k_tp=5.0   (2.5× 2.0)
+      HIGH_VOLATILITY:   k_tp=6.25  (2.5× 2.5)
     Minimum TP% floor: never tighter than tp_pct_fallback (default 5%).
     Maximum TP cap: never wider than 15% to avoid absurdly wide targets.
+
+    BUG-FIX: ATR distance is now computed from current_price (not entry_price),
+    which is the correct volatility-based TP placement.
     """
     MIN_TP_PCT = 0.03    # 3% — below this, fall back to fixed %
     MAX_TP_PCT = 0.15    # 15% — never tighter than this
@@ -175,7 +185,8 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
         else:
             return entry_price * (1 - tp_pct_fallback)
 
-    atr_pct = atr / entry_price
+    # BUG-FIX: use current_price for ATR% calculation (not entry_price)
+    atr_pct = atr / current_price
     atr_pct_val = atr_pct  # for clarity
 
     # k_tp = 2.5× the SL k multiplier (reduced from 3×)
@@ -191,20 +202,20 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
         k_tp = 4.5    # was 6.0
 
     atr_distance_tp = k_tp * atr
-    atr_tp_pct = atr_distance_tp / entry_price
 
     # Apply minimum TP% floor — don't let low-vol tokens get razor TPs
-    effective_tp_pct = max(atr_tp_pct, MIN_TP_PCT)
+    effective_tp_pct = max(atr_distance_tp / current_price, MIN_TP_PCT)
     # Apply maximum cap
     effective_tp_pct = min(effective_tp_pct, MAX_TP_PCT)
 
+    # BUG-FIX: TP distance is from current_price, not entry_price
     if direction == 'LONG':
-        tp = entry_price * (1 + effective_tp_pct)
+        tp = current_price * (1 + effective_tp_pct)
     else:
-        tp = entry_price * (1 - effective_tp_pct)
+        tp = current_price * (1 - effective_tp_pct)
 
-    log(f'  [ATR-TP] {token} {direction}: price={entry_price}, ATR={atr:.6f} ({atr_pct_val*100:.2f}%), '
-        f'k_tp={k_tp}, raw={atr_tp_pct*100:.2f}%, effective={effective_tp_pct*100:.2f}%, TP={tp:.6f}')
+    log(f'  [ATR-TP] {token} {direction}: entry={entry_price}, cur={current_price}, ATR={atr:.6f} ({atr_pct_val*100:.2f}%), '
+        f'k_tp={k_tp}, dist={atr_distance_tp:.6f}, effective={effective_tp_pct*100:.2f}%, TP={tp:.6f}')
     return tp
 
 # ── Checkpoint & Event-log instrumentation ───────────────────────────────
@@ -248,8 +259,9 @@ def _get_hotset_last_updated():
 def _set_hotset_last_updated():
     """Called by ai_decider after each compaction run."""
     try:
-        with open(_HOTSET_LAST_UPDATED_FILE, 'w') as f:
-            json.dump({'last_compaction_ts': time.time()}, f)
+        with FileLock('hotset_last_updated'):
+            with open(_HOTSET_LAST_UPDATED_FILE, 'w') as f:
+                json.dump({'last_compaction_ts': time.time()}, f)
     except Exception:
         pass
 
@@ -327,13 +339,14 @@ def _update_decider_heartbeat():
     import json
     hb_file = '/var/www/hermes/data/pipeline_heartbeat.json'
     try:
-        data = {}
-        if os.path.exists(hb_file):
-            with open(hb_file) as f:
-                data = json.load(f)
-        data['decider_run'] = {"timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), "status": "ok"}
-        with open(hb_file, 'w') as f:
-            json.dump(data, f, indent=2)
+        with FileLock('pipeline_heartbeat'):
+            data = {}
+            if os.path.exists(hb_file):
+                with open(hb_file) as f:
+                    data = json.load(f)
+            data['decider_run'] = {"timestamp": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), "status": "ok"}
+            with open(hb_file, 'w') as f:
+                json.dump(data, f, indent=2)
     except Exception:
         pass  # never crash on heartbeat failures
 
@@ -394,8 +407,9 @@ def _load_delayed():
 
 def _save_delayed(entries):
     """Save pending delayed entries."""
-    with open(DELAYED_FILE, 'w') as f:
-        json.dump(entries, f, indent=2)
+    with FileLock('delayed_entries'):
+        with open(DELAYED_FILE, 'w') as f:
+            json.dump(entries, f, indent=2)
 
 
 # ─── Thompson Sampling A/B Selection ───────────────────────────────────────────
@@ -623,8 +637,9 @@ def process_delayed_entries(paper=False):
             f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
 
         # Delayed entry uses the same ATR-based SL and TP as normal entry
-        sl = _compute_dynamic_sl(token, direction.upper(), cur_price, sl_pct_val)
-        tp = _compute_dynamic_tp(token, direction.upper(), cur_price)
+        # cur_price is both entry price (execution price) and current price
+        sl = _compute_dynamic_sl(token, direction.upper(), cur_price, cur_price, sl_pct_val)
+        tp = _compute_dynamic_tp(token, direction.upper(), cur_price, cur_price)
         cmd_side = 'buy' if direction.upper() == 'LONG' else 'sell'
 
         experiment = entry.get('experiment', 'control')
@@ -695,7 +710,8 @@ def execute_trade(token, direction, price, confidence, source,
     # ── Dynamic ATR-based SL ───────────────────────────────────────────────
     # Uses ATR(14) × k multiplier instead of fixed %. Falls back to sl_pct
     # if ATR is unavailable. Passes the MORE PROTECTIVE (tighter) of the two.
-    sl = _compute_dynamic_sl(token, direction, price, sl_pct_val)
+    # Uses price (signal price) as current_price proxy since trade executes immediately.
+    sl = _compute_dynamic_sl(token, direction, price, price, sl_pct_val)
 
     if direction == 'LONG':
         tp = price * (1 + tp_pct_val)
@@ -819,8 +835,9 @@ def _get_hotset_approval_rate() -> tuple:
 def _increment_hotset_approval_rate(count: int, window_start: float):
     """Save updated approval rate counter."""
     try:
-        with open(_HOTSET_APPROVAL_RATE_FILE, 'w') as f:
-            json.dump({'count': count, 'window_start': window_start}, f)
+        with FileLock('hotset_approval_rate'):
+            with open(_HOTSET_APPROVAL_RATE_FILE, 'w') as f:
+                json.dump({'count': count, 'window_start': window_start}, f)
     except Exception:
         pass
 
@@ -834,18 +851,22 @@ def _load_hotset_failures():
 
 def _save_hotset_failures(data):
     try:
-        with open(_HOTSET_FAILURE_FILE) as f:
-            existing = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        existing = {}
-    existing.update(data)
-    with open(_HOTSET_FAILURE_FILE, 'w') as f:
-        json.dump(existing, f)
+        with FileLock('hotset_failures'):
+            try:
+                with open(_HOTSET_FAILURE_FILE) as f:
+                    existing = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                existing = {}
+            existing.update(data)
+            with open(_HOTSET_FAILURE_FILE, 'w') as f:
+                json.dump(existing, f)
+    except Exception as e:
+        print(f"Save hotset failures error: {e}")
 
 def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
     """
     Returns (blocked: bool, reason: str) for back-to-back failure cooldown.
-    
+
     Rule: If 2+ same-direction trades failed recently, block that direction for 1hr.
     Only allow opposite-direction trades from hot-set during cooldown.
     """
@@ -1624,8 +1645,9 @@ def run(dry_run=False):
         ts_variant = ab.get('ts_variant', '')
 
         # ATR-based SL and TP (same formula used throughout)
-        sl = _compute_dynamic_sl(token, direction, price, sl_pct)
-        tp = _compute_dynamic_tp(token, direction, price)
+        # Uses price (signal price) as current_price proxy since trade executes immediately.
+        sl = _compute_dynamic_sl(token, direction, price, price, sl_pct)
+        tp = _compute_dynamic_tp(token, direction, price, price)
 
         # Recalculate speed_pctl for logging (sp was from _exec_score scope)
         sig_spd = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None

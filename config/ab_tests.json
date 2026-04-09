@@ -18,12 +18,12 @@
           "config": {
             "entryMode": "immediate"
           },
-          "trades": 54,
+          "trades": 63,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-09 17:03:09.526229"
+          "lastUpdated": "2026-04-09 22:42:46.380013"
         }
       ]
     },
@@ -40,12 +40,12 @@
             "trailingActivationPct": 0.5,
             "trailingDistancePct": 0.5
           },
-          "trades": 43,
+          "trades": 52,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-09 17:03:09.529344"
+          "lastUpdated": "2026-04-09 22:42:46.385056"
         },
         {
           "id": "TS-loose",

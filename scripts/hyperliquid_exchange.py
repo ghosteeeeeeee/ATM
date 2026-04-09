@@ -1304,6 +1304,66 @@ def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
         return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
 
 
+def place_tp_sl_batch(coin: str, direction: str, sl_price: float, tp_price: float, size: float) -> dict:
+    """
+    Place TP + SL for a coin in a SINGLE atomic API call using normalTpsl grouping.
+    This replaces existing TP/SL and places new ones atomically — no race window.
+
+    Args:
+        coin: token symbol
+        direction: 'LONG' or 'SHORT'
+        sl_price: stop loss price (will be rounded to tick size)
+        tp_price: take profit price (will be rounded to tick size)
+        size: order size in coin units
+
+    Returns: {"success": bool, "errors": [...]}
+    """
+    _exchange_rate_limit()
+    exchange = get_exchange()
+
+    coin_upper = coin.upper()
+    is_buy_sl = direction.upper() == "SHORT"  # SL triggers on opposite side
+    is_buy_tp = direction.upper() == "SHORT"  # TP triggers on opposite side
+
+    price_decimals = _hl_price_decimals(coin_upper)
+    sl_px = _hl_tick_round(sl_price, price_decimals)
+    tp_px = _hl_tick_round(tp_price, price_decimals)
+
+    sz = float(size)
+
+    # Build SL order using SDK's OrderRequest structure
+    sl_trigger = signing.TriggerOrderType(trigger={
+        "triggerPx": sl_px,
+        "isMarket": True,
+        "tpsl": "sl",
+    })
+    sl_order = signing.OrderRequest(
+        coin=coin_upper,
+        is_buy=is_buy_sl,
+        sz=sz,
+        limit_px=sl_px,
+        order_type=sl_trigger,
+        reduce_only=True,
+    )
+
+    # Build TP order using SDK's OrderRequest structure
+    tp_trigger = signing.TriggerOrderType(trigger={
+        "triggerPx": tp_px,
+        "isMarket": True,
+        "tpsl": "tp",
+    })
+    tp_order = signing.OrderRequest(
+        coin=coin_upper,
+        is_buy=is_buy_tp,
+        sz=sz,
+        limit_px=tp_px,
+        order_type=tp_trigger,
+        reduce_only=True,
+    )
+
+    return place_bulk_orders([sl_order, tp_order], grouping="normalTpsl")
+
+
 # ── Cached open_orders to avoid N+1 HL API calls per cycle ──────────────────
 # HL rate-limits /info endpoints aggressively. Step10 calls _find_open_trigger_order
 # for each token (9 tokens × 2 = 18 calls/cycle), each doing open_orders + N query_by_oid.
@@ -1491,6 +1551,123 @@ def cancel_sl(coin: str, direction: str = None) -> dict:
                 time.sleep(2 ** attempt); continue
             return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
     return {"success": False, "error": last_error, "coin": coin, "type": "SL"}
+
+
+def cancel_all_open_orders(coin: str) -> dict:
+    """
+    Cancel ALL open orders (trigger AND non-trigger) for a coin in ONE API call.
+
+    This is more aggressive than clean_all_tpsl_orders which only removes TP/SL trigger orders.
+    Use this to clean up stale entry orders, orphaned limit orders, etc.
+
+    Returns {'cancelled': [oids], 'errors': [...]}.
+    """
+    wallet = MAIN_ACCOUNT_ADDRESS
+    url = "https://api.hyperliquid.xyz/info"
+    payload = json.dumps({"type": "openOrders", "user": wallet}).encode()
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        orders = json.loads(resp.read())
+    if not isinstance(orders, list):
+        orders = orders.get("orders", [])
+
+    coin_upper = coin.upper()
+    to_cancel = []
+    for o in orders:
+        if o.get("coin", "").upper() != coin_upper:
+            continue
+        oid = o.get("oid")
+        if oid is None:
+            continue
+        cloid = o.get("cloid")
+        req = {"coin": coin_upper}
+        if cloid:
+            req["cloid"] = cloid
+        else:
+            req["oid"] = oid
+        to_cancel.append(req)
+
+    if not to_cancel:
+        return {"cancelled": [], "errors": []}
+
+    return cancel_bulk_orders(to_cancel)
+
+
+def clean_all_tpsl_orders(coin: str) -> dict:
+    """
+    Cancel ALL open TP and SL trigger orders for a coin.
+    Uses FRESH HL API call (bypasses 55s open_orders cache).
+    Uses cancel_bulk_orders for a SINGLE API call (no per-order rate limiting).
+    Returns {'cancelled': [oids], 'errors': [...]}.
+    """
+    # Fresh fetch, no cache
+    wallet = MAIN_ACCOUNT_ADDRESS
+    exchange = get_exchange()  # For query_order_by_oid inside loop
+    url = "https://api.hyperliquid.xyz/info"
+    payload = json.dumps({"type": "openOrders", "user": wallet}).encode()
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        orders = json.loads(resp.read())
+    if not isinstance(orders, list):
+        orders = orders.get("orders", [])
+
+    coin_upper = coin.upper()
+    to_cancel = []
+    for o in orders:
+        if o.get("coin", "").upper() != coin_upper:
+            continue
+        oid = o.get("oid")
+        if oid is None:
+            continue
+        # Fetch full order to check isTrigger
+        try:
+            full = exchange.info.query_order_by_oid(wallet, oid)
+            order_data = full.get("order", {}) if isinstance(full, dict) else {}
+            order_info = order_data.get("order", {}) if isinstance(order_data, dict) else {}
+            if not order_info.get("isTrigger", False):
+                continue
+            tpsl = order_info.get("triggerCondition", "").lower()
+            if "below" in tpsl or "above" in tpsl:
+                cloid = order_info.get("cloid")
+                # Build cancel request in format expected by cancel_bulk_orders:
+                # {"coin": str, "oid": int} or {"coin": str, "cloid": Cloid}
+                req = {"coin": coin_upper}
+                if cloid:
+                    req["cloid"] = cloid
+                else:
+                    req["oid"] = oid
+                to_cancel.append(req)
+        except Exception:
+            continue
+
+    if not to_cancel:
+        return {"cancelled": [], "errors": []}
+
+    # BUG-FIX: Use cancel_bulk_orders for ONE API call instead of N calls.
+    # cancel_bulk_orders handles both oid-based and cloid-based cancels internally.
+    result = cancel_bulk_orders(to_cancel)
+
+    if result.get("success"):
+        # All succeeded — return oids we tried to cancel
+        cancelled = [item.get("oid") for item in to_cancel if "oid" in item]
+        return {"cancelled": cancelled, "errors": []}
+    else:
+        # Extract error info
+        errors = result.get("errors", [])
+        error_msg = result.get("error", str(errors))
+        cancelled = []
+        # Try to determine which succeeded vs failed from statuses
+        statuses = (
+            result.get("result", {})
+            .get("response", {})
+            .get("data", {})
+            .get("statuses", [])
+        )
+        for item in to_cancel:
+            oid = item.get("oid")
+            if oid:
+                cancelled.append(oid)
+        return {"cancelled": cancelled, "errors": [error_msg] if errors else []}
 
 
 def replace_tp(coin: str, direction: str, new_price: float, size: float = None) -> dict:
