@@ -670,7 +670,9 @@ def check_hotset():
     # Freshness check
     meta = read_json(HOTSET_META, {})
     if meta:
-        age_m = (time.time() - meta.get("last_updated", 0)) / 60
+        # Handle both field names for compatibility
+        last_ts = meta.get("last_updated") or meta.get("last_compaction_ts", 0)
+        age_m = (time.time() - last_ts) / 60
         if age_m > 30:
             bug("WARNING", "hotset", f"Hotset metadata is {age_m:.0f}m old")
     else:

@@ -1,0 +1,7 @@
+[Unit]
+Description=Hebbian Memory Decay — daily at 4am UTC
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+[Install]
+WantedBy=timers.target

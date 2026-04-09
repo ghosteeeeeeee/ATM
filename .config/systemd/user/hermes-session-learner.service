@@ -1,0 +1,8 @@
+[Unit]
+Description=Hebbian Session Learner — learn from trading decisions logs daily
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/hebbian_session_learner.py 7
+StandardOutput=journal
+StandardError=journal

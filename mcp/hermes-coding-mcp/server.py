@@ -417,6 +417,102 @@ async def execute_command(
 
 
 # =============================================================================
+# Tool 5: hebbian_recall
+# =============================================================================
+
+import sys
+sys.path.insert(0, '/root/.hermes/scripts')
+
+
+@mcp.tool()
+async def hebbian_recall(
+    concept: str = Field(description="Concept to recall associated memories for"),
+    k: int = Field(default=5, ge=1, le=20, description="Max number of associations to return"),
+    min_weight: float = Field(default=0.5, ge=0.0, description="Minimum synapse weight threshold"),
+) -> str:
+    """
+    Hebbian associative recall — "neurons that fire together, wire together."
+
+    Given a concept, returns ranked associated concepts from Hermes's Hebbian
+    memory network. Concepts are ranked by connection weight (co-occurrence strength).
+
+    Different from semantic search — this returns what Hermes has *itself* learned
+    to associate through repeated experience, not what a vector model thinks is similar.
+    """
+    try:
+        from scripts.hebbian_engine import HebbianEngine
+        engine = HebbianEngine()
+        results = engine.recall(concept, k=k, min_weight=min_weight)
+        return json.dumps({
+            "isError": False,
+            "concept": concept,
+            "associations": [
+                {"concept": name, "label_type": ltype, "weight": weight, "co_occurrences": count}
+                for name, ltype, weight, count in results
+            ],
+            "count": len(results)
+        })
+    except Exception as e:
+        return json.dumps({
+            "isError": True,
+            "error": "unknown",
+            "message": str(e)
+        })
+
+
+@mcp.tool()
+async def hebbian_learn(
+    concept_a: str = Field(description="First concept in the pair"),
+    concept_b: str = Field(description="Second concept in the pair"),
+    label_type_a: Optional[str] = Field(default=None, description="Label type for concept A"),
+    label_type_b: Optional[str] = Field(default=None, description="Label type for concept B"),
+) -> str:
+    """
+    Record a Hebbian co-occurrence — two concepts fired together in the same context.
+
+    Use this to record that two concepts appeared together and should have their
+    connection strength increased.
+    """
+    try:
+        from scripts.hebbian_engine import HebbianEngine
+        engine = HebbianEngine()
+        weight = engine.learn_pair(concept_a, concept_b, label_type_a, label_type_b)
+        return json.dumps({
+            "isError": False,
+            "concept_a": concept_a,
+            "concept_b": concept_b,
+            "weight": weight
+        })
+    except Exception as e:
+        return json.dumps({
+            "isError": True,
+            "error": "unknown",
+            "message": str(e)
+        })
+
+
+@mcp.tool()
+async def hebbian_stats() -> str:
+    """
+    Get Hebbian memory network statistics — node count, synapse count, top edges.
+    """
+    try:
+        from scripts.hebbian_engine import HebbianEngine
+        engine = HebbianEngine()
+        stats = engine.get_stats()
+        return json.dumps({
+            "isError": False,
+            **stats
+        })
+    except Exception as e:
+        return json.dumps({
+            "isError": True,
+            "error": "unknown",
+            "message": str(e)
+        })
+
+
+# =============================================================================
 # Health Check Tool
 # =============================================================================
 
@@ -428,7 +524,7 @@ async def health_check() -> str:
     """
     return json.dumps({
         "status": "ok",
-        "tools": ["read_file", "write_file", "search_code", "execute_command", "health_check"]
+        "tools": ["read_file", "write_file", "search_code", "execute_command", "hebbian_recall", "hebbian_learn", "hebbian_stats", "health_check"]
     })
 
 

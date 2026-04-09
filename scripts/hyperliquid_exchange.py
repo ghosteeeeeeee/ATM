@@ -10,6 +10,7 @@ Rate limit strategy:
 
 from eth_account import Account
 from hyperliquid.exchange import Exchange
+import hyperliquid.utils.signing as signing
 import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error, subprocess
 from decimal import Decimal, ROUND_UP
 
@@ -1098,40 +1099,120 @@ def cancel_bulk_orders(requests: list) -> dict:
 # ─── TP / SL Order Placement ───────────────────────────────────────────────────
 
 # HL tick sizes (minimum price increment for TP/SL orders)
-# BTC=1, ETH=0.1, SOL=0.01, STX=0.01, AVAX=0.001, TRX=0.01
-_HL_TICK_DECIMALS = {
-    # Verified from order book (2026-04-08)
-    # tick_size = 10 ** -N where N = decimals
-    "BTC": 1,   # $71k — tick 1, order book shows 71688.0 (1 decimal)
-    "ETH": 1,   # $2.2k — tick 0.1, order book shows 2250.2 (1 decimal)
-    "SOL": 3,   # $84 — tick 0.001, order book shows 84.659 (3 decimals)
-    "AVAX": 4,  # $9 — tick 0.0001, order book shows 9.3714 (4 decimals)
-    "XRP": 4,   # $1.38 — tick 0.0001, order book shows 1.3812 (4 decimals)
-    "ADA": 5,   # $0.26 — tick 0.00001, order book shows 0.25934 (5 decimals)
-    "LINK": 4,  # $9 — tick 0.0001, order book shows 9.2192 (4 decimals)
-    "DOT": 4,   # $1.3 — tick 0.0001, order book shows 1.3256 (4 decimals)
-    "DOGE": 6,  # $0.095 — tick 0.000001, order book shows 0.094826 (6 decimals)
-    "STX": 5,   # $0.23 — tick 0.00001, order book shows 0.22769 (5 decimals)
-    "TRX": 5,   # $0.32 — tick 0.00001, order book shows 0.31625 (5 decimals)
-    "MEGA": 5,  # $0.13 — tick 0.00001, order book shows 0.12991 (5 decimals)
-    # Missing tokens — inferred from order book (2026-04-08)
-    "SCR": 5,   # $0.044 — tick 0.00001, order book shows 0.04454 (5 decimals)
-    "SAND": 6,  # $0.08 — tick 0.000001, order book shows 0.079833 (6 decimals)
-    "ETHFI": 5, # $0.46 — tick 0.00001, order book shows 0.45978 (5 decimals)
-    "AXS": 4,   # $1.14 — tick 0.0001, order book shows 1.1406 (4 decimals)
-    "UMA": 5,   # $0.42 — tick 0.00001, order book shows 0.41898 (5 decimals)
-    "SKY": 6,   # $0.08 — tick 0.000001, order book shows 0.079896 (6 decimals)
-}
+    # HL tick sizes (minimum price increment for TP/SL orders)
+    # COIN META IS NOW DYNAMIC — see _hl_tick_decimals() above.
+    # The old static _HL_TICK_DECIMALS table has been removed.
+    # Coin metadata (szDecimals) is fetched from HL /info endpoint and cached
+    # locally in /root/.hermes/data/hl_coin_meta.json for 24 hours.
+
+
+# ─── Coin Meta Cache (szDecimals per coin, refreshed daily) ─────────────────
+# szDecimals defines the HL tick size: tick = 10^-szDecimals
+# e.g. szDecimals=3 → tick=0.001, szDecimals=0 → tick=1.0
+# This replaces the old hardcoded _HL_TICK_DECIMALS table.
+# Cache is seeded from HL /info endpoint, refreshed when stale (>24h).
+_COIN_META_FILE = '/root/.hermes/data/hl_coin_meta.json'
+_COIN_META_TTL = 86400  # 24 hours
+
+def _load_coin_meta() -> dict:
+    """Load cached HL coin metadata from local file. Returns {coin: {szDecimals, tick}}."""
+    try:
+        if os.path.exists(_COIN_META_FILE):
+            with open(_COIN_META_FILE) as f:
+                data = json.load(f)
+            return data.get('coins', {})
+    except Exception:
+        pass
+    return {}
+
+def _save_coin_meta(coins: dict) -> None:
+    """Save coin metadata to local cache file."""
+    try:
+        os.makedirs(os.path.dirname(_COIN_META_FILE), exist_ok=True)
+        with open(_COIN_META_FILE, 'w') as f:
+            json.dump({'updated_at': time.time(), 'coins': coins}, f, indent=2)
+    except Exception:
+        pass
+
+def _fetch_and_cache_coin_meta() -> dict:
+    """Fetch full HL coin meta, cache locally, return coins dict."""
+    meta = _get_meta()
+    coins = {}
+    for coin in meta.get('universe', []):
+        name = coin.get('name', '')
+        sz = int(coin.get('szDecimals', 4))
+        coins[name] = {
+            'szDecimals': sz,
+            'tick': 10 ** (-sz) if sz >= 0 else 1.0
+        }
+    _save_coin_meta(coins)
+    return coins
+
+def _get_coin_meta_cached() -> dict:
+    """Get coin metadata, refreshing from HL if cache is stale (>24h)."""
+    now = time.time()
+    cached = _load_coin_meta()
+    if cached:
+        # Check if cache is fresh
+        try:
+            with open(_COIN_META_FILE) as f:
+                data = json.load(f)
+            age = now - data.get('updated_at', 0)
+            if age < _COIN_META_TTL:
+                return cached
+        except Exception:
+            pass
+    # Cache miss or stale — fetch fresh from HL
+    return _fetch_and_cache_coin_meta()
+
+def _hl_tick_decimals(token: str) -> int:
+    """Return tick decimals (= szDecimals) for a coin. Live from HL meta."""
+    meta = _get_coin_meta_cached()
+    token_upper = token.upper()
+    if token_upper in meta:
+        return meta[token_upper]['szDecimals']
+    # Fallback: fetch live from HL meta (shouldn't happen if cache is warm)
+    for coin in _get_meta().get('universe', []):
+        if coin.get('name', '').upper() == token_upper:
+            return int(coin.get('szDecimals', 4))
+    return 4  # safe fallback
+
+
+def _hl_price_decimals(token: str) -> int:
+    """Return the correct decimal precision for HL perpetual PRICE (not size).
+
+    For perpetuals: price_tick = 10^-(6 - szDecimals)
+    szDecimals=0 → price has 6 decimal places (tick=0.000001)
+    szDecimals=1 → price has 5 decimal places (tick=0.00001)
+    szDecimals=3 → price has 3 decimal places (tick=0.001)
+    szDecimals=6 → price has 0 decimal places (tick=1, integer)
+
+    Use this for rounding prices in place_tp, place_sl, replace_tp, replace_sl.
+    Use _hl_tick_decimals (szDecimals) only for rounding SIZE.
+    """
+    sd = _hl_tick_decimals(token)
+    return max(0, 6 - sd)
 
 
 def _hl_tick_round(px: float, decimals: int) -> float:
-    """Round price to HL tick size."""
+    """Round price to HL tick size. Returns a CLEAN FLOAT.
+
+    Key insight: HL's API requires prices EXACTLY on tick boundaries. The old
+    approach of float(Decimal(str(round(...))).normalize()) introduced tiny IEEE
+    754 errors (e.g. 1.437442 → 1.4374420000000001) which HL rejects as 'invalid
+    price'.
+
+    Fix: quantize with Decimal ROUND_HALF_UP then convert to float. This is exact
+    for most decimal prices because ROUND_HALF_UP produces a value whose binary
+    representation is exact for the given precision.
+
+    For coins with very precise requirements (CAKE ~$1.4, TRB ~$14), test before using.
+    """
     import decimal
-    rounded = round(px, decimals)
-    if decimals == 0:
-        rounded = int(rounded)
-    normalized = decimal.Decimal(str(rounded)).normalize()
-    return float(normalized)
+    quantize_str = "0." + "0" * decimals if decimals > 0 else "1"
+    d = decimal.Decimal(str(round(px, decimals)))
+    rounded = d.quantize(decimal.Decimal(quantize_str), rounding=decimal.ROUND_HALF_UP)
+    return float(rounded)  # Decimal → float is exact for these small decimal values
 
 
 def place_tp(coin: str, direction: str, tp_price: float, size: float) -> dict:
@@ -1146,29 +1227,51 @@ def place_tp(coin: str, direction: str, tp_price: float, size: float) -> dict:
     exchange = get_exchange()
     is_buy = direction.upper() == "SHORT"
 
-    decimals = _HL_TICK_DECIMALS.get(coin, 6)
-    tp_rounded = _hl_tick_round(tp_price, decimals)
+    # Use _hl_price_decimals (6 - szDecimals) for price rounding, NOT szDecimals directly
+    price_decimals = _hl_price_decimals(coin)
+    tp_rounded = _hl_tick_round(tp_price, price_decimals)
 
-    order_type = {
-        "trigger": {
-            "triggerPx": tp_rounded,
-            "isMarket": True,
-            "tpsl": "tp",
-        }
-    }
-    try:
-        result = exchange.order(coin, is_buy, float(size), tp_rounded, order_type, reduce_only=True)
-        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
-        for s in statuses:
-            if "error" in s:
-                return {"success": False, "error": s["error"], "coin": coin, "type": "TP",
-                        "hint": "Check: price on correct side of current? price rounded to tick size?"}
-            if "ok" in s:
-                oid = s["ok"].get("oid") if isinstance(s["ok"], dict) else None
-                return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size, "order_id": oid}
-        return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size}
-    except Exception as e:
-        return {"success": False, "error": str(e), "coin": coin, "type": "TP"}
+    order_type = signing.TriggerOrderType(trigger={
+        "triggerPx": tp_rounded,
+        "isMarket": True,
+        "tpsl": "tp",
+    })
+    # Retry with backoff on rate-limit errors (429)
+    import time
+    last_error = None
+    for attempt in range(3):
+        try:
+            result = exchange.order(coin, is_buy, float(size), tp_rounded, order_type, reduce_only=True)
+            # Guard: HL sometimes returns a string error instead of dict
+            if not isinstance(result, dict):
+                last_error = str(result)
+                if attempt < 2 and '429' in str(result):
+                    time.sleep(2 ** attempt)
+                    continue
+                return {"success": False, "error": last_error, "coin": coin, "type": "TP"}
+            statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+            for s in statuses:
+                if "error" in s:
+                    err = s["error"]
+                    last_error = err
+                    # Retry on rate limit
+                    if attempt < 2 and ('429' in str(err) or 'rate limit' in str(err).lower()):
+                        time.sleep(2 ** attempt)
+                        continue
+                    return {"success": False, "error": err, "coin": coin, "type": "TP",
+                            "hint": "Check: price on correct side of current? price rounded to tick size?"}
+                if "ok" in s:
+                    oid = s["ok"].get("oid") if isinstance(s["ok"], dict) else None
+                    return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size, "order_id": oid}
+            return {"success": True, "coin": coin, "type": "TP", "price": tp_rounded, "size": size}
+        except Exception as e:
+            last_error = str(e)
+            if attempt < 2 and ('429' in str(e) or 'rate limit' in str(e).lower()):
+                time.sleep(2 ** attempt)
+                continue
+            return {"success": False, "error": str(e), "coin": coin, "type": "TP"}
+
+    return {"success": False, "error": last_error, "coin": coin, "type": "TP"}
 
 
 def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
@@ -1177,16 +1280,15 @@ def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
     exchange = get_exchange()
     is_buy = direction.upper() == "SHORT"
 
-    decimals = _HL_TICK_DECIMALS.get(coin, 6)
-    sl_rounded = _hl_tick_round(sl_price, decimals)
+    # Use _hl_price_decimals (6 - szDecimals) for price rounding, NOT szDecimals directly
+    price_decimals = _hl_price_decimals(coin)
+    sl_rounded = _hl_tick_round(sl_price, price_decimals)
 
-    order_type = {
-        "trigger": {
-            "triggerPx": sl_rounded,
-            "isMarket": True,
-            "tpsl": "sl",
-        }
-    }
+    order_type = signing.TriggerOrderType(trigger={
+        "triggerPx": sl_rounded,
+        "isMarket": True,
+        "tpsl": "sl",
+    })
     try:
         result = exchange.order(coin, is_buy, float(size), sl_rounded, order_type, reduce_only=True)
         statuses = result.get("response", {}).get("data", {}).get("statuses", [])
@@ -1202,38 +1304,125 @@ def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
         return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
 
 
+# ── Cached open_orders to avoid N+1 HL API calls per cycle ──────────────────
+# HL rate-limits /info endpoints aggressively. Step10 calls _find_open_trigger_order
+# for each token (9 tokens × 2 = 18 calls/cycle), each doing open_orders + N query_by_oid.
+# Cache open_orders for 55s so all token lookups share ONE API call.
+_OPEN_ORDERS_CACHE: dict = {"orders": [], "expires_at": 0.0}
+_CACHE_TTL_SEC = 55.0
+
+
+def _get_cached_open_orders() -> list:
+    """Return cached open orders list, fetching from HL only if cache expired."""
+    import time
+    now = time.monotonic()
+    if now < _OPEN_ORDERS_CACHE["expires_at"]:
+        return _OPEN_ORDERS_CACHE["orders"]
+    exchange = get_exchange()
+    try:
+        resp = exchange.info.open_orders(MAIN_ACCOUNT_ADDRESS)
+        orders = resp if isinstance(resp, list) else resp.get("orders", [])
+        _OPEN_ORDERS_CACHE["orders"] = orders
+        _OPEN_ORDERS_CACHE["expires_at"] = now + _CACHE_TTL_SEC
+        return orders
+    except Exception:
+        # On failure, return cached if available, else empty
+        return _OPEN_ORDERS_CACHE.get("orders", [])
+
+
 def _find_open_trigger_order(coin: str, tpsl_type: str) -> tuple:
     """
     Find an open TP or SL order for a given coin.
-    
+
     Args:
-        coin:      HL coin name (e.g. 'BTC')
+        coin:      HL coin name (e.g. 'HYPE')
         tpsl_type: "tp" or "sl"
-    
+
     Returns:
         (oid: int, cloid: Cloid, sz: float, trigger_px: float) or (None, None, None, None) if not found.
     """
-    exchange = get_exchange()
-    try:
-        resp = _hl_info({"type": "open_orders", "user": MAIN_ACCOUNT_ADDRESS})
-        orders = resp if isinstance(resp, list) else resp.get("orders", [])
-    except Exception:
-        return None, None, None, None
+    global _exchange
+    _exchange = get_exchange()
+    # Use cached open_orders (1 API call per 55s for ALL token checks)
+    orders = _get_cached_open_orders()
 
     coin_upper = coin.upper()
+    tpsl_type_lower = tpsl_type.lower()
+
+    # Determine which orderType string to match based on tpsl_type
+    if tpsl_type_lower == "tp":
+        # Take Profit: orderType = "Take Profit Market" or triggerCondition contains "below"
+        tp_order_types = {"take profit market", "tp"}
+    else:
+        # Stop Loss: orderType = "Stop Market" or triggerCondition contains "above"
+        tp_order_types = {"stop market", "sl"}
+
     for o in orders:
         if o.get("coin", "").upper() != coin_upper:
             continue
-        ot = o.get("orderType", {})
-        trig = ot.get("trigger", {}) if isinstance(ot, dict) else {}
-        if trig.get("tpsl", "").lower() != tpsl_type.lower():
+
+        # Use query_order_by_oid for full order details (open_orders doesn't return isTrigger/orderType)
+        oid = o.get("oid")
+        if oid is None:
             continue
-        return (
-            o.get("oid"),
-            o.get("cloid"),
-            float(o.get("sz", 0)),
-            float(trig.get("triggerPx", 0)),
-        )
+
+        # Retry on rate-limit / transient errors (max 3 attempts with backoff)
+        full_order = None
+        for attempt in range(3):
+            try:
+                full_order = _exchange.info.query_order_by_oid(MAIN_ACCOUNT_ADDRESS, oid)
+                break
+            except Exception as e:
+                if attempt < 2:
+                    import time
+                    time.sleep(2 ** attempt)  # exponential backoff: 1s, 2s
+                    continue
+                else:
+                    # Log but don't crash — skip this order, don't silently lose it
+                    import logging
+                    logging.getLogger("hyperliquid").warning(
+                        f"query_order_by_oid({coin}, oid={oid}) failed after 3 attempts: {e}"
+                    )
+                    break
+
+        if full_order is None:
+            continue
+
+        order_data = full_order.get("order", {})
+        order_info = order_data.get("order", {}) if isinstance(order_data, dict) else {}
+
+        is_trigger = order_info.get("isTrigger", False)
+        if not is_trigger:
+            continue
+
+        order_type_str = order_info.get("orderType", "").lower()
+        trigger_condition = order_info.get("triggerCondition", "").lower()
+
+        # Match by orderType string
+        if order_type_str in tp_order_types:
+            return (
+                oid,
+                order_info.get("cloid"),
+                float(order_info.get("sz", 0)),
+                float(order_info.get("triggerPx", 0)),
+            )
+
+        # Fallback: match by triggerCondition keywords
+        if tpsl_type_lower == "tp" and "below" in trigger_condition:
+            return (
+                oid,
+                order_info.get("cloid"),
+                float(order_info.get("sz", 0)),
+                float(order_info.get("triggerPx", 0)),
+            )
+        if tpsl_type_lower == "sl" and "above" in trigger_condition:
+            return (
+                oid,
+                order_info.get("cloid"),
+                float(order_info.get("sz", 0)),
+                float(order_info.get("triggerPx", 0)),
+            )
+
     return None, None, None, None
 
 
@@ -1267,24 +1456,41 @@ def cancel_sl(coin: str, direction: str = None) -> dict:
     Cancel the open stop-loss order for a given coin.
     Returns {"success": True} on success, {"success": False, "error": ...} on failure.
     """
+    # cancel_sl: add type guard for string error responses
     _exchange_rate_limit()
     exchange = get_exchange()
     oid, cloid, _, _ = _find_open_trigger_order(coin, "sl")
     if oid is None:
         return {"success": False, "error": f"No open SL found for {coin}"}
 
-    try:
-        if cloid:
-            result = exchange.cancel_by_cloid(coin, cloid)
-        else:
-            result = exchange.cancel(coin, oid)
-        statuses = result.get("response", {}).get("data", {}).get("statuses", [])
-        for s in statuses:
-            if "error" in s:
-                return {"success": False, "error": s["error"]}
-        return {"success": True, "coin": coin, "type": "SL", "oid": oid}
-    except Exception as e:
-        return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
+    import time
+    last_error = None
+    for attempt in range(3):
+        try:
+            if cloid:
+                result = exchange.cancel_by_cloid(coin, cloid)
+            else:
+                result = exchange.cancel(coin, oid)
+            if not isinstance(result, dict):
+                last_error = str(result)
+                if attempt < 2 and '429' in str(result):
+                    time.sleep(2 ** attempt); continue
+                return {"success": False, "error": last_error}
+            statuses = result.get("response", {}).get("data", {}).get("statuses", [])
+            for s in statuses:
+                if "error" in s:
+                    err = s["error"]
+                    last_error = err
+                    if attempt < 2 and ('429' in str(err) or 'rate limit' in str(err).lower()):
+                        time.sleep(2 ** attempt); continue
+                    return {"success": False, "error": err}
+            return {"success": True, "coin": coin, "type": "SL", "oid": oid}
+        except Exception as e:
+            last_error = str(e)
+            if attempt < 2 and ('429' in str(e) or 'rate limit' in str(e).lower()):
+                time.sleep(2 ** attempt); continue
+            return {"success": False, "error": str(e), "coin": coin, "type": "SL"}
+    return {"success": False, "error": last_error, "coin": coin, "type": "SL"}
 
 
 def replace_tp(coin: str, direction: str, new_price: float, size: float = None) -> dict:
@@ -1298,15 +1504,13 @@ def replace_tp(coin: str, direction: str, new_price: float, size: float = None) 
     oid, cloid, existing_sz, _ = _find_open_trigger_order(coin, "tp")
     is_buy = direction.upper() == "SHORT"
     sz = float(size) if size is not None else existing_sz
-    decimals = _HL_TICK_DECIMALS.get(coin, 6)
-    new_px = _hl_tick_round(new_price, decimals)
-    order_type = {
-        "trigger": {
-            "triggerPx": new_px,
-            "isMarket": True,
-            "tpsl": "tp",
-        }
-    }
+    price_decimals = _hl_price_decimals(coin)
+    new_px = _hl_tick_round(new_price, price_decimals)
+    order_type = signing.TriggerOrderType(trigger={
+        "triggerPx": new_px,
+        "isMarket": True,
+        "tpsl": "tp",
+    })
     # No existing TP found — place a NEW one instead of failing
     if oid is None:
         return place_tp(coin, direction, new_px, sz)
@@ -1333,15 +1537,13 @@ def replace_sl(coin: str, direction: str, new_price: float, size: float = None) 
     oid, cloid, existing_sz, _ = _find_open_trigger_order(coin, "sl")
     is_buy = direction.upper() == "SHORT"
     sz = float(size) if size is not None else existing_sz
-    decimals = _HL_TICK_DECIMALS.get(coin, 6)
-    new_px = _hl_tick_round(new_price, decimals)
-    order_type = {
-        "trigger": {
-            "triggerPx": new_px,
-            "isMarket": True,
-            "tpsl": "sl",
-        }
-    }
+    price_decimals = _hl_price_decimals(coin)
+    new_px = _hl_tick_round(new_price, price_decimals)
+    order_type = signing.TriggerOrderType(trigger={
+        "triggerPx": new_px,
+        "isMarket": True,
+        "tpsl": "sl",
+    })
     # No existing SL found — place a NEW one instead of failing
     if oid is None:
         return place_sl(coin, direction, new_px, sz)

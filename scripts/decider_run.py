@@ -43,9 +43,9 @@ import time as _time
 _ATR_CACHE = {}   # {(token, timeframe): (atr_value, timestamp)}
 _ATR_TTL    = 300  # 5 minutes cache TTL
 
-def _get_atr(token: str, period: int = 14, interval: str = '1h') -> float | None:
+def _get_atr(token: str, period: int = 14, interval: str = '15m') -> float | None:
     """
-    Fetch ATR(period) for token from Hyperliquid 1h candles.
+    Fetch ATR(14) for token from Hyperliquid 15m candles.
     Returns ATR value in dollar terms (same unit as price), or None on failure.
     Cached per token for _ATR_TTL seconds.
     """
@@ -60,7 +60,7 @@ def _get_atr(token: str, period: int = 14, interval: str = '1h') -> float | None
         from hyperliquid.info import Info
         info = Info('https://api.hyperliquid.xyz', skip_ws=True)
         end_t = int(now * 1000)
-        start_t = end_t - (60 * 60 * 1000 * (period + 5))  # period+5 hours
+        start_t = end_t - (15 * 60 * 1000 * (period + 5))  # period+5 × 15min windows
         candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
         if not candles or len(candles) < period + 1:
             return None
@@ -92,7 +92,7 @@ def _atr_multiplier(token: str, atr_pct: float, override_k: float = None) -> flo
       atr_pct > 3%    → HIGH_VOLATILITY   → k=2.5
     """
     if atr_pct < 0.01:
-        return 1.5
+        return 2.5
     if override_k is not None:
         return override_k          # A/B test overrides volatility-based k
     elif atr_pct > 0.03:
@@ -119,7 +119,7 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
 
     Maximum: cap SL distance at 5% to avoid absurdly wide stops on any token.
     """
-    MIN_ATR_PCT = 0.0075   # 0.75% — below this, fall back to fixed %
+    MIN_ATR_PCT = 0.015   # 1.5% — below this, fall back to fixed %
     MAX_SL_PCT  = 0.05     # 5% — never wider than this
 
     atr = _get_atr(token)
@@ -178,17 +178,17 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
     atr_pct = atr / entry_price
     atr_pct_val = atr_pct  # for clarity
 
-    # k_tp = 3× the SL k multiplier (same volatility table)
+    # k_tp = 2.5× the SL k multiplier (reduced from 3×)
     if atr_pct_val < 0.01:
-        k_tp = 4.5   # LOW_VOLATILITY
+        k_tp = 6.25   # 2.5× the new SL k=2.5 for low-vol
     elif override_k is not None:
-        k_tp = override_k * 3.0
+        k_tp = override_k * 2.5   # was × 3.0
     elif atr_pct_val > 0.03:
-        k_tp = 7.5   # HIGH_VOLATILITY
+        k_tp = 6.0    # was 7.5
     elif atr_pct_val > 0.015:
-        k_tp = 4.5   # LOW_VOLATILITY
+        k_tp = 3.0    # was 4.5
     else:
-        k_tp = 6.0   # NORMAL_VOLATILITY
+        k_tp = 4.5    # was 6.0
 
     atr_distance_tp = k_tp * atr
     atr_tp_pct = atr_distance_tp / entry_price

@@ -45,5 +45,14 @@ Updated: 2026-04-08 18:13 UTC
 - 282 signals below 55% confidence in last hour (signal gen flooding)
 - hype_live_trading.json is the KILL SWITCH — must be false to prevent real orders
 
+## PENDLE/MET TP/SL Issue (Fixed 2026-04-08)
+- PENDLE/MET TP/SL on HL were failing: "Invalid TP/SL price" — missing from _HL_TICK_DECIMALS
+- Fix: Added PENDLE→4 decimals, MET→5 decimals to hyperliquid_exchange.py
+- PENDLE/MET still underwater (PENDLE entry=1.033, curr≈1.027; MET entry=0.1357, curr≈0.134)
+- Plan A: HL TP/SL (fix deployed in guardian, needs 1 cycle to apply)
+- Plan B: Internal breach detector added to guardian (Step 11) — fires market close if SL/TP breached
+- ETH has 6 stale limit orders (not trigger orders) — from old code path, not harmful but messy
+- Guardian restarted with new code (PID 2988175)
+
 ---
 *Updated: 2026-04-08 07:30 UTC*

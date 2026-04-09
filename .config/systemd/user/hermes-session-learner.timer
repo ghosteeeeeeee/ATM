@@ -1,0 +1,7 @@
+[Unit]
+Description=Hebbian Session Learner — daily at 6am UTC
+[Timer]
+OnCalendar=*-*-* 06:00:00
+Persistent=true
+[Install]
+WantedBy=timers.target

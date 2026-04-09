@@ -35,8 +35,8 @@ except Exception as e:
     speed_tracker_ai = lambda: None
 
 # Token budget enforcement
-_MAX_TOKENS_PER_RUN = 8000    # hard cap per ai_decider invocation
-_DAILY_TOKEN_BUDGET = 500000  # daily cap
+_MAX_TOKENS_PER_RUN=10000    # hard cap per ai_decider invocation
+_DAILY_TOKEN_BUDGET=1200000  # daily cap (1.2M — supports ai_decider + 2x compaction/day)
 _DAILY_TOKENS_USED = 0
 _DAILY_BUDGET_FILE = '/root/.hermes/data/ai_decider_daily_tokens.json'
 
@@ -129,6 +129,8 @@ SOURCE_WEIGHTS = {
 # Checked in order; first match wins. None = neutral 1.0.
 SOURCE_WEIGHT_OVERRIDES = [
     ('mtf_macd',  'hmacd-',  1.0),   # hmacd- + mtf_macd = MACD crossover (was 1.2)
+    # hzscore signals get suppressed — noisy, often fires against trend
+    ('mtf_zscore', 'hzscore', 0.5),
     # All other hmacd-* sources (pct-hermes, etc.) fall through to default 0.6
     # Pattern signals: 1.25× multiplier — independent primary signals, need to
     # bubble up so T can observe their performance vs mtf_macd in hot-set
@@ -306,7 +308,11 @@ def _get_source_weight(stype, source):
     else:
         # hmacd-* but not mtf_macd → penalize baseline
         if source.startswith('hmacd-'):
-            base_weight = SOURCE_WEIGHTS.get('hmacd-default', 0.6)
+            # Specific combo hmacd-,hzscore,pct-hermes is noisy — suppress hard
+            if 'pct-hermes' in source and 'hzscore' in source:
+                base_weight = 0.4   # combo with pct-hermes + hzscore = very noisy
+            else:
+                base_weight = SOURCE_WEIGHTS.get('hmacd-default', 0.6)
         else:
             base_weight = DEFAULT_SOURCE_WEIGHT
 
@@ -1159,13 +1165,18 @@ def _do_compaction_llm():
         _bias_rules = "prefer higher-confidence signal when close, no directional bias"
         _bias_note = "NEUTRAL market"
     
-    # Build prompt
-    prompt = f"""{hot_survivors_str}
+    # Build prompt — WINNING STRUCTURE: blank lines + QA framing + OUT: on its own line
+    # Testing proved: MiniMax needs explicit "Question:/Answer:" framing + blank lines to output structured data
+    prompt = f"""\
+{hot_survivors_str}
 SIGNALS: {' '.join(signal_lines)}
-RULES: reject<70, penalize stale signals (>0.5h old) by -20% confidence, penalize tokens with no fresh signal in >1h, {_bias_rules}:{BLACKLIST_STR}, dedupe token+direction (keep highest).
-Market regime: {_bias_note} — bias rules in effect.
-OUT: TOKEN DIR CONF REASON (max 20 lines)
-IMPORTANT: Never use *** or any placeholder for token names. Always use the exact token symbol from the SIGNALS list above."""
+RULES: reject conf<70, penalize stale signals (>0.5h old) by -20% confidence, penalize tokens with no fresh signal in >1h, no SHORT on blacklist: {BLACKLIST_STR}, dedupe
+
+Question: which tokens pass all filters?
+
+Answer (TOKEN DIR CONF, one per line):
+OUT:
+"""
     
     # STEP 2: Call MiniMax-M2 with max_tokens=4000 (CRITICAL: 4000 not 3000)
     # MiniMax-M2 uses full max_tokens for BOTH reasoning + output.
@@ -1217,8 +1228,18 @@ IMPORTANT: Never use *** or any placeholder for token names. Always use the exac
     marker = '</think>'
     idx = content.rfind(marker)
     if idx >= 0:
-        # Take content AFTER the </think> marker (the actual trading output)
+        # Take content AFTER the  marker (the actual trading output)
         content = content[idx + len(marker):].strip()
+    
+    # FALLBACK: if content is empty but raw contains OUT: lines,
+    # extract directly from raw (MiniMax sometimes puts OUT: inside think block)
+    if not content or 'OUT:' not in content:
+        _raw_upper = raw.upper()
+        _out_marker_pos = _raw_upper.rfind('OUT:')
+        if _out_marker_pos >= 0:
+            # Take everything from OUT: to end of raw
+            content = raw[_out_marker_pos:].strip()
+            print(f"  [LLM-compaction] OUT: found inside think block — using raw fallback ({len(content)} chars)")
     
     # Debug: print first 500 chars of content
     print(f"  [LLM-compaction] Content preview: {content[:500]}")

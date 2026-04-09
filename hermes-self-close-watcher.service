@@ -1,0 +1,14 @@
+[Unit]
+Description=Hermes Self-Close Watcher — final fallback for unprotectable coins
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes/scripts
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/self_close_watcher.py
+StandardOutput=append:/root/.hermes/logs/self_close_watcher.log
+StandardError=append:/root/.hermes/logs/self_close_watcher.err.log
+User=root
+
+[Install]
+WantedBy=multi-user.target

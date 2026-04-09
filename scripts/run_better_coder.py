@@ -9,6 +9,7 @@ import os
 import asyncio
 import re
 import fcntl
+import subprocess
 from datetime import datetime
 
 # Add the MCP server directory to path
@@ -249,6 +250,20 @@ def main():
     
     try:
         asyncio.run(run_better_coder())
+
+        # Post-run smoke test: check any scripts modified in the last 30 minutes
+        # Use --heal to attempt self-healing before reporting failure
+        smoke_script = "/root/.hermes/scripts/smoke_test.py"
+        smoke_result = subprocess.run(
+            [sys.executable, smoke_script, "--changed-since", "30", "--heal"],
+            capture_output=False,
+            timeout=120
+        )
+        if smoke_result.returncode != 0:
+            log(f'SMOKE TEST FAILED — infrastructure issues remain after auto-heal attempts')
+        else:
+            log(f'Smoke test PASSED — all changed-script checks OK (auto-healed if needed)')
+
     except Exception as e:
         log(f'Error running Better Coder: {e}')
     finally:

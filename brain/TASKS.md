@@ -74,6 +74,76 @@
 
 ---
 
+## Smoke Testing Infrastructure
+**Project:** Smoke Test — general infrastructure sanity checks
+
+### [P] Smoke Test Suite — DONE 2026-04-09
+- `scripts/smoke_test.py` — full suite of 10 infrastructure checks ✅
+- Checks: pipeline_errors, pipeline_not_stuck, price_data_fresh, hotset_exists, signal_db, brain_db, postgres_trades, live_mode, no_flapping, hebbian_network ✅
+- systemd `hermes-smoke-test.timer`: every 15 minutes ✅
+- hotset threshold: >10min stale = FAIL ✅
+
+### [P] Better Coder Integration — DONE 2026-04-09
+- Post-run hook in `scripts/run_better_coder.py` — runs `smoke_test.py --changed-since 30 --heal` after each dispatcher cycle ✅
+- Detects scripts modified in last 30min, runs targeted checks only ✅
+- Script→checks map: SCRIPT_CHECK_MAP in smoke_test.py (easily extensible) ✅
+
+### [P] Self-Healing with Minimax AI — DONE 2026-04-09
+- `smoke_test.py --heal` tries built-in fixes first, then calls minimax for unknown failures ✅
+- Minimax diagnoses failure, suggests safe infra command, auto-executes if whitelisted ✅
+- Whitelisted prefixes: `sudo systemctl restart/start/stop`, `python3 /root/.hermes/scripts/`, `sudo rm -f /tmp/` ✅
+- Max 2 heal attempts per cycle, 5s delay between attempts, results logged to `logs/smoke_heal.log` ✅
+- `signal_db` check: SQLite primary (0 bytes = empty), PG fallback — signals live in SQLite runtime DB ✅
+
+### [ ] Extend SCRIPT_CHECK_MAP
+Add entries as new scripts are created:
+```
+SCRIPT_CHECK_MAP = {
+    "new_script.py":  ["pipeline_errors", "postgres_trades"],
+    ...
+}
+```
+
+---
+
+## Hebbian Associative Memory (General Purpose)
+**Project:** Hebbian Associative Memory Network
+
+### [P] Core Hebbian Engine — DONE 2026-04-09
+- `scripts/hebbian_engine.py` — learn_pair, recall, decay_all, get_stats ✅
+- `brain/associative_memory.db` — SQLite schema (concept_nodes + synapse_weights) ✅
+- Unit tests: learn/recall cycle, bidirectional, weight accumulation, decay ✅
+
+### [P] MCP Tools + Skill — DONE 2026-04-09
+- Added `hebbian_recall`, `hebbian_learn`, `hebbian_stats` to `mcp/hermes-coding-mcp/server.py` ✅
+- Restarted hermes-coding-mcp systemd service ✅
+- Created `skills/associative-recall/SKILL.md` ✅
+- Updated `skills/brain-memory/SKILL.md` — added 3rd recall mode ✅
+
+### [ ] Initial seeding — seed from brain files
+**Status:** 🚧 IN PROGRESS
+- `scripts/hebbian_learner.py` created ✅
+- Core brain files seeded: 82 nodes, 915 synapses ✅ (via inline script)
+- Skill files seeding: skipped (hangs on glob)
+- Current DB: 82 nodes, 915 synapses
+
+### [ ] Integration hooks — learn from real usage
+**Status:** ✅ DONE 2026-04-09
+- Entity extractor: `scripts/hebbian_entity_extractor.py` — typed entities (token/skill/file/infra/project/concept) from any text ✅
+- Session co-occurrence learner: `scripts/hebbian_session_learner.py` — processes decisions logs + session dumps ✅
+- SOUL.md directive: Agent instructed to proactively recall concepts T mentions ✅
+- Skill: `skills/associative-recall/` — session start hook + CLI docs ✅
+- MCP tools: `hebbian_recall`, `hebbian_learn`, `hebbian_stats` in hermes-coding-mcp ✅
+- Brain-memory updated: associative recall as 3rd recall mode ✅
+
+### [ ] Daily decay cron — CREATED 2026-04-09
+**Status:** ✅ DONE 2026-04-09
+- Decay factor: 0.999/day (elephant's memory — ~3% loss/year) ✅
+- `hermes-hebbian-decay.timer` systemd: 4 AM UTC daily ✅
+- `hermes-session-learner.timer` systemd: 6 AM UTC daily ✅
+
+**Reference:** [.hermes/plans/2026-04-09_060840-how-would-we-create-a-neural-network-type.md](../.hermes/plans/2026-04-09_060840-how-would-we-create-a-neural-network-type.md)
+
 ---
 
 ## Chart Pattern Recognition (Phase 1 — Bull Flag)

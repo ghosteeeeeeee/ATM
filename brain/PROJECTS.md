@@ -596,3 +596,27 @@ TAO LONG: entry=250, SL=242.32 (3.07%)    — ATR 1.54%, k=2.0
 
 **Reference:** [.hermes/plans/2026-04-08_010451-conversation-plan.md](./.hermes/plans/2026-04-08_010451-conversation-plan.md)
 
+
+## Hebbian Associative Memory Network
+**Status:** 🚧 IN PROGRESS — 2026-04-09
+**Owner:** Agent
+**Summary:** Build a Hebbian "neural network" memory layer for Hermes — "neurons that fire together, wire together." When concepts co-occur across any domain (trading, projects, infrastructure, skills), their connection strength grows. Retrieval returns ranked associations based on Hermes's own experience.
+
+**Why:** Current memory is structural (brain/*.md files) and semantic (Tokyo Brain API). Neither links concepts by co-occurrence experience. Hebbian memory fills this gap.
+
+**Architecture:** SQLite-based `associative_memory.db` — concept_nodes + synapse_weights. Self-contained, no external deps.
+
+### Components
+| Component | File | Status |
+|-----------|------|--------|
+| Core engine | `scripts/hebbian_engine.py` | ✅ Done |
+| Initial seeding | `scripts/hebbian_learner.py` | ✅ Done — 82 nodes from brain files |
+| Retroactive seed | `scripts/hebbian_seed_sessions.py` | ✅ Done 2026-04-09 — 9,705 sessions → 1.04M pairs |
+| Integration hooks | SOUL.md + entity extractor + session learner | ✅ Done 2026-04-09 |
+| Daily crons | systemd timers (no cron) | ✅ Done 2026-04-09 |
+| MCP tool | ⚠️ Skipped | No MCP server found — superseded by direct CLI + cron |
+| Decay cron | TBD | 🚧 Pending |
+
+**Key decisions:** [.hermes/plans/2026-04-09_060840-how-would-we-create-a-neural-network-type.md](./.hermes/plans/2026-04-09_060840-how-would-we-create-a-neural-network-type.md)
+
+**Reference:** Donald Hebb, 1949 — "Neurons that fire together, wire together"

@@ -760,6 +760,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
 
 def close_paper_position(trade_id: int, reason: str) -> bool:
     """Close a paper position via direct SQL UPDATE."""
+    reason = reason[:20]  # DB column is VARCHAR(20) — truncate if needed
     conn = get_db_connection()
     if conn is None:
         return False
@@ -1006,10 +1007,11 @@ def enforce_max_positions(max_pos: int = MAX_POSITIONS) -> bool:
 # ATR-based SL for position_manager internal use.
 # Imports the same ATR engine from decider-run (shared module-level cache).
 
-def _pm_get_atr(token: str, period: int = 14, interval: str = '1h') -> float | None:
+def _pm_get_atr(token: str, period: int = 14, interval: str = '15m') -> float | None:
     """
     Fetch ATR(14) for token. Reuses _ATR_CACHE from decider-run if available
     via module-level cache. Falls back to direct HL API call.
+    Default interval: 15m (intraday feel vs 1h swing-trade).
     """
     import time as _time
     _ATR_TTL = 300
@@ -1017,7 +1019,7 @@ def _pm_get_atr(token: str, period: int = 14, interval: str = '1h') -> float | N
     # Try decider-run's cache first (shared process memory)
     try:
         from decider_run import _ATR_CACHE as _dr_cache
-        cache_key = (token.upper(), interval)
+        cache_key = (token.upper(), interval)  # interval is part of cache key
         if cache_key in _dr_cache:
             atr_val, ts = _dr_cache[cache_key]
             if _time.time() - ts < _ATR_TTL:
@@ -1031,7 +1033,8 @@ def _pm_get_atr(token: str, period: int = 14, interval: str = '1h') -> float | N
         info = Info('https://api.hyperliquid.xyz', skip_ws=True)
         now = _time.time()
         end_t = int(now * 1000)
-        start_t = end_t - (60 * 60 * 1000 * (period + 5))
+        # 15m candles: each interval = 15min = 15*60*1000 ms
+        start_t = end_t - (15 * 60 * 1000 * (period + 5))
         candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
         if not candles or len(candles) < period + 1:
             return None
@@ -1068,10 +1071,81 @@ def _atr_multiplier(atr_pct: float) -> float:
         return 2.0    # NORMAL_VOLATILITY
 
 
-def _force_fresh_atr(token: str, period: int = 14, interval: str = '1h') -> float | None:
+def _atr_sl_k_scaled(
+    token: str,
+    direction: str,
+    atr_pct: float,
+    speed_percentile: float = 50,
+    momentum_stats: dict = None,
+) -> float:
+    """
+    Scale k_SL by z-score exhaustion + velocity stall + speed.
+    Returns k multiplier to apply on top of base _atr_multiplier().
+    momentum_stats: from get_momentum_stats(token) — {percentile_long, percentile_short, velocity, phase}
+    """
+    from signal_gen import PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME
+
+    base_k = _atr_multiplier(atr_pct)
+
+    if momentum_stats is None:
+        return base_k  # can't assess — no change
+
+    phase_str = momentum_stats.get('phase', 'neutral')
+    velocity = momentum_stats.get('velocity', 0)
+
+    # Direction-aware percentile
+    if direction == 'LONG':
+        pct = momentum_stats.get('percentile_long', 50)
+    else:
+        pct = momentum_stats.get('percentile_short', 50)
+
+    # Phase tier map (string -> int for comparison)
+    PHASE_TIER = {
+        'neutral': 0,
+        'building': 1,
+        'accelerating': 2,
+        'exhaustion': 3,
+        'extreme': 4,
+    }
+    phase = PHASE_TIER.get(phase_str, 0)
+
+    # Velocity stall: negative velocity at accelerating+ phase = tired
+    stalling = (velocity < 0) and (phase >= 2)  # >= ACCELERATING
+
+    # Phase-based multiplier (tightened by 0.75× to get SL closer to price)
+    if phase < 2:
+        return base_k  # neutral/building — no change
+    elif phase == 2:
+        # ACCELERATING
+        if stalling:
+            mult = 1.125   # was 1.5
+        elif speed_percentile >= 70:
+            mult = 0.94    # was 1.25
+        else:
+            mult = 0.75    # was 1.0
+    elif phase == 3:
+        # EXHAUSTION
+        if stalling:
+            mult = 1.5     # was 2.0
+        elif speed_percentile >= 70:
+            mult = 1.5     # was 2.0
+        else:
+            mult = 1.125   # was 1.5
+    else:
+        # EXTREME
+        if stalling:
+            mult = 1.88    # was 2.5
+        else:
+            mult = 1.125   # was 1.5
+
+    return base_k * mult
+
+
+def _force_fresh_atr(token: str, period: int = 14, interval: str = '15m') -> float | None:
     """
     Force-fetch ATR bypassing cache. Used for ATR-adaptive order updates.
     Always fetches the current ATR value — no TTL check.
+    Default interval: 15m (intraday feel vs 1h swing-trade).
     """
     import time as _time
     try:
@@ -1079,7 +1153,8 @@ def _force_fresh_atr(token: str, period: int = 14, interval: str = '1h') -> floa
         info = Info('https://api.hyperliquid.xyz', skip_ws=True)
         now = _time.time()
         end_t = int(now * 1000)
-        start_t = end_t - (60 * 60 * 1000 * (period + 5))
+        # 15m candles: each interval = 15min = 15*60*1000 ms
+        start_t = end_t - (15 * 60 * 1000 * (period + 5))
         candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
         if not candles or len(candles) < period + 1:
             return None
@@ -1117,6 +1192,25 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             atr = _force_fresh_atr(token)
             tokens_seen[token] = atr
 
+    # Fetch momentum and speed for each unique token once (dedup like ATR)
+    momentum_by_token: Dict[str, Any] = {}
+    speed_by_token: Dict[str, float] = {}
+    for pos in open_positions:
+        token = str(pos.get('token', '')).upper()
+        if token and token not in momentum_by_token:
+            try:
+                from signal_gen import get_momentum_stats
+                ms = get_momentum_stats(token)
+                momentum_by_token[token] = ms
+            except Exception:
+                momentum_by_token[token] = None
+        if token and token not in speed_by_token:
+            try:
+                sd = SPEED_TRACKER.get_token_speed(token) if SPEED_TRACKER else None
+                speed_by_token[token] = sd.get('speed_percentile', 50) if sd else 50
+            except Exception:
+                speed_by_token[token] = 50
+
     updates = []
     for pos in open_positions:
         token = str(pos.get('token', '')).upper()
@@ -1143,9 +1237,11 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         if entry_price <= 0:
             continue
         atr_pct = atr / entry_price
-        k = _atr_multiplier(atr_pct)
+        momentum = momentum_by_token.get(token)
+        speed_pctl = speed_by_token.get(token, 50)
+        k = _atr_sl_k_scaled(token, direction, atr_pct, speed_pctl, momentum)
         sl_pct = k * atr_pct
-        tp_pct = 2 * k * atr_pct
+        tp_pct = 2.5 * _atr_multiplier(atr_pct) * atr_pct  # was 2×
 
         # Anchor SL/TP to current_price (live) not entry_price (stale).
         # Fallback to entry_price if current_price unavailable (e.g. SKY with no mids).
@@ -1377,7 +1473,7 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
         if atr is not None:
             atr_pct_tp = atr / price
             k_tp = _pm_atr_multiplier(atr_pct_tp)
-            tp_pct = 2 * k_tp * atr_pct_tp  # 2× SL distance → 2:1 R:R
+            tp_pct = 2.5 * k_tp * atr_pct_tp  # was 2×
             tp_pct = max(tp_pct, TP_PCT)     # floor at 8%
 
     if direction == "LONG":
@@ -1616,6 +1712,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     open_count = len(positions)
     closed_count = 0
     adjusted_count = 0
+    original_closed = closed_count  # FIX (2026-04-09): track baseline before exit logic
 
     for pos in positions:
         token = str(pos.get("token", "UNKNOWN"))

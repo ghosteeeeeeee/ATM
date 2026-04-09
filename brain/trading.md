@@ -663,3 +663,162 @@ SKY: skipped — `entry_price = 0` in DB, no ATR anchor available; fallback woul
 - `hyperliquid_exchange.py` — untouched
 - Cascade-flip SL/TP placement code (line ~2124) — untouched; that path is separate from the ATR `_collect_atr_updates()` flow
 
+
+## LLM Compaction Fix + Token Budget Raise (2026-04-08)
+
+### Problem
+- LLM compaction failing silently — MiniMax puts `OUT:` token inside the `<think>` think block
+- Current extraction: takes everything after ``, but OUT: is BEFORE that marker → empty content → fallback scoring
+- Also hitting 500k/day budget cap (was exhausting at ~576k/day)
+
+### Fix 1: Content Extraction Bug (ai_decider.py ~line 1220)
+Added fallback: if extracted content is empty OR has no OUT: marker, search raw for "OUT:" and extract from there.
+
+```python
+if not content or 'OUT:' not in content:
+    raw_upper = raw.upper()
+    out_pos = raw_upper.rfind('OUT:')
+    if out_pos >= 0:
+        content = raw[out_pos:].strip()
+        print(f"  [LLM-compaction] OUT: found inside think block — using raw fallback ({len(content)} chars)")
+```
+
+### Fix 2: Token Budget Raised
+- `_MAX_TOKENS_PER_RUN`: 8000 → 10000
+- `_DAILY_TOKEN_BUDGET`: 800000 → 1200000 (1.2M — supports ai_decider + 2x compaction/day)
+
+
+
+## TP/SL Batch Rewrite — 2026-04-09
+
+### Root Causes Found
+
+**Bug 1 — Wrong price precision in hyperliquid_exchange.py**
+`place_tp`/`place_sl`/`replace_tp`/`replace_sl` used `szDecimals` directly as price decimals.
+HL perpetual price tick = `10^-(6 - szDecimals)`:
+- szDecimals=0 → price has 6 decimals, NOT 0
+- szDecimals=1 → price has 5 decimals, NOT 1
+
+Fix: added `_hl_price_decimals(token)` = `max(0, 6 - szDecimals)`, patched all 4 functions.
+
+**Bug 2 — guardian reconcile_tp_sl never ran**  
+Guardian's Step 10 requires `hl_sl_order_id`/`hl_tp_order_id` in DB to exist.
+All 9 positions had NULLs → guardian skipped reconciliation entirely.
+
+**Bug 3 — Cancel not working → order accumulation**  
+`cancel_bulk_orders` needed `{"coin": str, "oid": int}` format. Batch script was
+passing `{"oid": int}` without coin. Fixed mid-session.
+
+### batch_tpsl_rewrite.py
+- systemd timer: hermes-atr-sl-updater.timer (every 1 min)
+- Log: /root/.hermes/logs/tpsl_rewrite.log
+- Architecture: cancel ALL existing exit orders for coin → compute ATR SL/TP → place fresh
+
+### Coin Status After Session
+
+| Coin | HL TP/SL | Notes |
+|------|----------|-------|
+| CFX | ✅ 1 TP + 1 SL | Working, batch running |
+| EIGEN | ⚠️ 4 orders | SDK bulk-cancel response parsing issue — cancels work but log shows 0 |
+| BTC | ✗ | "Invalid TP/SL price. asset=0" — needs investigation |
+| AAVE | ✗ | "Invalid TP/SL price. asset=28" — HL config issue |
+| MORPHO | ✗ | "Invalid TP/SL price. asset=173" — HL config issue |
+| ASTER | ✗ | "Invalid TP/SL price. asset=207" — HL config issue |
+| PAXG | ✗ | "Invalid TP/SL price. asset=187" — HL config issue |
+| SAND | ✗ | szDecimals=0 → integer prices only. Coin <$1 makes TP/SL meaningless |
+| AVNT | ✗ | szDecimals=0 → integer prices only. Coin <$1 makes TP/SL meaningless |
+
+### Known Issues to Resolve
+1. EIGEN accumulation: batch cancel returns empty statuses array → log shows 0 cancelled
+   but orders ARE being cancelled (EIGEN went from 22→4 orders). Still accumulating.
+   Fix: bypass SDK bulk cancel, use direct HL REST API for cancel.
+2. BTC/AAVE/MORPHO/ASTER/PAXG: "Invalid TP/SL price. asset=N" — these assets seem
+   to reject ALL TP/SL prices. May need fresh position re-entry on HL.
+3. SAND/AVNT: szDecimals=0 coins with <$1 price. Need position sizing increase
+   or delist from paper system.
+
+### Hotset Fix
+away_detector.py was reading from `/root/.hermes/data/hotset.json` (wrong).
+Canonical path: `/var/www/hermes/data/hotset.json`. Fixed. Hotset now shows 3 entries.
+
+## TP/SL Batch Rewrite — UPDATED 2026-04-09 09:25 UTC
+
+### Current HL Open Orders State
+- CFX: 2 orders (1 TP + 1 SL) ✓
+- EIGEN: 2 orders (1 TP + 1 SL) ✓  
+- TNSR: 2 orders (1 TP + 1 SL) ✓
+- AAVE: 1 stale plain-limit order (NOT TP/SL — from failed SDK tests)
+- BTC: 0 orders ✗
+
+### Bugs Fixed This Session
+
+1. **Hotset empty (FIXED)**: away_detector.py read wrong path.
+   `/root/.hermes/data/hotset.json` → canonical `/var/www/hermes/data/hotset.json`
+
+2. **Wrong price_decimals (FIXED)**: hyperliquid_exchange.py used szDecimals directly
+   for price rounding. Correct: `max(0, 6 - szDecimals)`. Patched place_tp,
+   place_sl, replace_tp, replace_sl.
+
+3. **Guardian DEBUG crash (FIXED)**: hl-sync-guardian.py reconcile_tp_sl referenced
+   `current_sl`/`current_tp` before assignment (log at line 2278 before line 2286).
+   Moved DEBUG log after the variable assignment.
+
+4. **Batch TP/SL reference price (FIXED)**: compute_sl_tp used entry_px for both ATR%
+   AND TP/SL target. Now uses current mid for the TP/SL target (so triggerPx
+   is within HL's acceptable range of current price).
+
+5. **Batch cancel format (FIXED)**: cancel_bulk_orders now correctly passes
+   {"coin": str, "oid": int} (was missing "coin" field).
+
+6. **Batch cancel response parsing (FIXED)**: parse SDK's nested "ok"/"error" statuses.
+
+### batch_tpsl_rewrite.py
+- systemd: hermes-atr-sl-updater.timer (every 1 min)
+- Log: /root/.hermes/logs/tpsl_rewrite.log
+- Flow: cancel all orders for coin → compute ATR SL/TP from current mid →
+  place fresh TP + SL → update DB order IDs
+
+### Assets That CAN Have TP/SL (working)
+CFX, EIGEN, TNSR — clean 1 TP + 1 SL each, batch running.
+
+### Assets That CANNOT Have TP/SL (blocked by HL)
+These consistently return "Invalid TP/SL price. asset=N" for ALL triggerPx values:
+
+| Coin  | Asset ID | Likely Issue |
+|-------|----------|--------------|
+| AAVE  | 28       | Isolated/leveraged position — TP/SL blocked by HL |
+| MORPHO| 173      | Same |
+| ASTER | 207      | Same |
+| PAXG  | 187      | Same |
+| BTC   | 0        | Intermittent — works at 73500-75500 range but fails at
+|       |          | 73300-73400. Probably a rate-limit artifact. BTC has 0 TP/SL.
+
+SAND, AVNT: skipped due to szDecimals=0 (coin < $1 → meaningless integer TP/SL).
+
+### BTC TP/SL Status
+BTC TP/SL WORKS — confirmed at 73500, 74000, 74500, 75000, 75500 (3-6% above mid).
+But batch consistently fails at 73300-73400. This is likely because HL is
+rate-limiting our test calls, NOT a genuine BTC TP/SL limitation.
+Batch runs once per minute — by the time the timer fires, rate limits may have reset.
+## LLM Compaction Fix + Token Budget Raise (2026-04-08)
+
+### Problem
+- LLM compaction failing silently — MiniMax puts `OUT:` token inside the `<think>` think block
+- Current extraction: takes everything after ``, but OUT: is BEFORE that marker → empty content → fallback scoring
+- Also hitting 500k/day budget cap (was exhausting at ~576k/day)
+
+### Fix 1: Content Extraction Bug (ai_decider.py ~line 1220)
+Added fallback: if extracted content is empty OR has no OUT: marker, search raw for "OUT:" and extract from there.
+
+```python
+if not content or 'OUT:' not in content:
+    raw_upper = raw.upper()
+    out_pos = raw_upper.rfind('OUT:')
+    if out_pos >= 0:
+        content = raw[out_pos:].strip()
+        print(f"  [LLM-compaction] OUT: found inside think block — using raw fallback ({len(content)} chars)")
+```
+
+### Fix 2: Token Budget Raised
+- `_MAX_TOKENS_PER_RUN`: 8000 → 10000
+- `_DAILY_TOKEN_BUDGET`: 800000 → 1200000 (1.2M — supports ai_decider + 2x compaction/day)

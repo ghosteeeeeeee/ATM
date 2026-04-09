@@ -201,19 +201,6 @@ def pick_task():
 
 def build_subagent_context(task):
     """Build context string for the subagent."""
-    # Read current state files for context
-    positions_info = "unknown"
-    hotset_info    = "unknown"
-
-    try:
-        with open('/root/.hermes/data/hotset.json') as f:
-            hs = json.load(f)
-            age = time.time() - hs.get('timestamp', 0)
-            tokens = hs.get('hotset', [])
-            hotset_info = f"{len(tokens)} tokens, age={age:.0f}s"
-    except Exception:
-        pass
-
     ctx = f"""
 SELF-INITIATIVE RUN — {LOG_STAMP()}
 
@@ -223,7 +210,6 @@ DO NOT fire any live trades. Work on research, analysis, and PM tasks only.
 === Current System State ===
 Pipeline: {'healthy' if is_pipeline_healthy() else 'STALE — investigate before starting'}
 Live trading: {'ENABLED' if is_live_trading_enabled() else 'DISABLED (paper only)'}
-Hot-set: {hotset_info}
 
 === Your Task ===
 Task: {task.get('name')}
@@ -244,7 +230,6 @@ Full: {task.get('raw')}
 - /root/.hermes/brain/TASKS.md
 - /root/.hermes/brain/DECISIONS.md
 - /root/.hermes/data/signals_hermes_runtime.db
-- /root/.hermes/data/hotset.json
 - /root/.hermes/logs/pipeline.log
 
 Report back: what you found, what you did, PM files changed, what T should review.

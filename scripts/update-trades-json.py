@@ -36,7 +36,8 @@ def get_current_price(token):
 conn = psycopg2.connect(BRAIN_DB)
 cur = conn.cursor()
 cur.execute("""
-    SELECT id, token, direction, entry_price, leverage, amount_usdt
+    SELECT id, token, direction, entry_price, leverage, amount_usdt,
+           stop_loss, target
     FROM trades WHERE status='open' LIMIT 100
 """)
 open_t = cur.fetchall()
@@ -60,6 +61,8 @@ out = []
 closed_out = []
 for r in open_t:
     tkn=r[1]; direction=r[2]; entry_px=float(r[3]); lev=float(r[4]); amt=float(r[5] or 0)
+    sl=float(r[6]) if r[6] is not None else 0.0
+    tp=float(r[7]) if r[7] is not None else 0.0
     cp = get_current_price(tkn) or entry_px
     if entry_px > 0:
         pnl_pct = round((entry_px-cp)/entry_px*100, 4) if direction=='SHORT' else round((cp-entry_px)/entry_px*100, 4)
@@ -69,7 +72,8 @@ for r in open_t:
     out.append({
         'token': tkn, 'direction': direction,
         'entry': entry_px, 'current': round(cp, 6),
-        'pnl_pct': round(pnl_pct, 2), 'pnl_usdt': round(pnl_usdt, 2)
+        'pnl_pct': round(pnl_pct, 2), 'pnl_usdt': round(pnl_usdt, 2),
+        'sl': round(sl, 6), 'tp': round(tp, 6)
     })
 
 # Build closed trades array

@@ -1,0 +1,8 @@
+[Unit]
+Description=Hebbian Memory Decay — fade old synapses at 0.999x/day
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/hebbian_engine.py decay
+StandardOutput=journal
+StandardError=journal

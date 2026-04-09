@@ -60,7 +60,7 @@ from hermes_constants import HOTSET_BLOCKLIST, SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin,
-    is_delisted
+    is_delisted, replace_sl, replace_tp,
 )
 
 import json  # for json.dumps in penalty recording
@@ -293,6 +293,7 @@ def get_db_open_trades():
                     'leverage': float(parts[4]) if parts[4] else 1,
                     'amount_usdt': float(parts[5]) if parts[5] else 50,
                     'paper': parts[6].lower() == 't' if len(parts) > 6 else True,
+                    'status': 'open',   # SQL already filters status='open'; added for reconcile_tp_sl filter
                 })
     return trades
 
@@ -2002,6 +2003,158 @@ _TPSL_COOLDOWN_SEC = 30          # 30-second cooldown per token
 _TPSL_MOVED_THIS_CYCLE = {}      # token.upper() -> {'tp': bool, 'sl': bool}
 
 
+def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list) -> int:
+    """
+    Step 11 (2026-04-08): Plan B breach detector — fires when HL TP/SL placement fails.
+
+    For each open HL position with a DB trade:
+      - Checks if current price has crossed the DB stop_loss (SL breach) OR target (TP breach)
+      - LONG: breached if curr < SL  OR curr > TP
+      - SHORT: breached if curr > SL OR curr < TP
+      - If breached → fires close_position_hl (market close on HL) + closes DB trade
+
+    Returns count of positions closed due to breach.
+
+    This is the fallback when HL trigger orders are rejected (PENDLE/MET) or as redundant
+    safety net even when HL TP/SL exists (guardian catches breaches in ~60s vs HL's instant trigger).
+    """
+    if DRY:
+        log('[DRY] _check_and_close_breached_trades: would check and close breached trades', 'WARN')
+        return 0
+
+    # Build token -> db_trade lookup
+    db_by_token = {t['token'].upper(): t for t in db_trades if t.get('status') == 'open'}
+
+    breach_closed = 0
+    conn = get_db_connection()
+    if conn is None:
+        return 0
+
+    for coin, pos_data in hl_pos.items():
+        tok = coin.upper()
+        if tok not in db_by_token:
+            continue
+
+        # Skip if already closed this cycle (dedup)
+        if tok in _CLOSED_HL_COINS:
+            continue
+
+        entry_px = float(pos_data.get('entry_px', 0))
+        direction = pos_data.get('direction', 'LONG')
+        sz = float(pos_data.get('size', 0))
+        if entry_px == 0 or sz == 0:
+            continue
+
+        db_trade = db_by_token[tok]
+        trade_id = db_trade.get('id')
+        sl = db_trade.get('stop_loss') or 0
+        tp = db_trade.get('target') or 0
+        curr = prices.get(coin, 0)
+        if curr == 0:
+            continue
+
+        # Determine breach
+        breached = False
+        breach_reason = None
+        if direction == 'LONG':
+            if sl > 0 and curr <= sl:
+                breached = True
+                breach_reason = 'breach_SL'
+            elif tp > 0 and curr >= tp:
+                breached = True
+                breach_reason = 'breach_TP'
+        else:  # SHORT
+            if sl > 0 and curr >= sl:
+                breached = True
+                breach_reason = 'breach_SL'
+            elif tp > 0 and curr <= tp:
+                breached = True
+                breach_reason = 'breach_TP'
+
+        if not breached:
+            continue
+
+        log(f'  🚨 {coin} BREACH DETECTED ({direction}): {breach_reason} — '
+            f'entry={entry_px}, curr={curr:.6f}, SL={sl:.6f}, TP={tp:.6f}', 'WARN')
+
+        # Mark coin as closed BEFORE closing to prevent race conditions
+        _CLOSED_HL_COINS.add(tok)
+
+        # Fire market close on HL
+        success = close_position_hl(coin, breach_reason)
+        if not success:
+            _CLOSED_HL_COINS.discard(tok)  # Remove on failure, allow retry next cycle
+            log(f'  ❌ {coin} breach close failed — will retry next cycle', 'FAIL')
+            continue
+
+        # Wait for HL fills to appear (close_position_hl returns immediately, fills take time)
+        time.sleep(6)
+
+        # Close DB paper trade using actual HL fill price
+        try:
+            from hyperliquid_exchange import get_trade_history
+            close_start_ms = int(time.time() * 1000) - 300000
+            hl_exit_px, realized_pnl = _poll_hl_fills_for_close(tok, close_start_ms)
+
+            amount_usdt = db_trade.get('amount_usdt', 50.0)
+            lev = db_trade.get('leverage', 1)
+
+            if realized_pnl is not None and realized_pnl != 0:
+                computed_pnl_pct = round(realized_pnl / amount_usdt * 100, 4)
+                computed_pnl_usdt = round(realized_pnl, 4)
+            elif hl_exit_px > 0:
+                if direction.upper() == 'SHORT':
+                    computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
+                else:
+                    computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
+                computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+            else:
+                # No fill data — close at current price as estimate
+                if direction.upper() == 'SHORT':
+                    computed_pnl_pct = round((entry_px - curr) / entry_px * 100, 4)
+                else:
+                    computed_pnl_pct = round((curr - entry_px) / entry_px * 100, 4)
+                computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                hl_exit_px = curr
+
+            if trade_id:
+                cur = conn.cursor()
+                cur.execute("""
+                    UPDATE trades SET
+                        status='closed',
+                        close_reason=%s,
+                        exit_reason=%s,
+                        guardian_closed=TRUE,
+                        hl_exit_price=%s,
+                        pnl_pct=%s,
+                        pnl_usdt=%s,
+                        realized_pnl=%s
+                    WHERE id=%s
+                """, (
+                    breach_reason,
+                    breach_reason,
+                    hl_exit_px,
+                    computed_pnl_pct,
+                    computed_pnl_usdt,
+                    computed_pnl_usdt if realized_pnl is not None else 0,
+                    trade_id
+                ))
+                conn.commit()
+                cur.close()
+                _CLOSED_THIS_CYCLE.add(str(trade_id))
+                log(f'  ✅ {coin} DB trade #{trade_id} closed — {breach_reason}, '
+                    f'exit={hl_exit_px:.6f}, pnl={computed_pnl_pct:.2f}%', 'PASS')
+        except Exception as e:
+            log(f'  ❌ {coin} DB trade close error: {e}', 'FAIL')
+            _CLOSED_HL_COINS.discard(tok)
+
+        breach_closed += 1
+        time.sleep(3)
+
+    conn.close()
+    return breach_closed
+
+
 def _is_tpsl_cooldown_active(token: str) -> bool:
     """Return True if token is in 30s cooldown since last reconcile_tp_sl."""
     tok = token.upper()
@@ -2095,6 +2248,7 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
     """
     conn = get_db_connection()
     if conn is None:
+        log('[DEBUG] reconcile_tp_sl: conn is None, returning 0')
         return 0
 
     if DRY:
@@ -2106,6 +2260,7 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
     try:
         # Build token -> db_trade lookup for quick access
         db_by_token = {t['token'].upper(): t for t in db_trades if t.get('status') == 'open'}
+        log(f'  [DEBUG] Step10: {len(db_by_token)} tokens in db_by_token: {list(db_by_token.keys())}')
 
         for coin, pos_data in hl_pos.items():
             entry_px = float(pos_data.get('entry_px', 0))
@@ -2120,6 +2275,10 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
                 log(f'  ⏳ {coin} TP/SL: in cooldown, skipping')
                 continue
 
+            # Skip SKIP_COINS — these cannot have HL TP/SL, use self-close watcher instead
+            if coin.upper() in {'AAVE', 'MORPHO', 'ASTER', 'PAXG', 'AVNT'}:
+                continue
+
             # Check if we have a DB trade for this token
             tok = coin.upper()
             if tok not in db_by_token:
@@ -2128,6 +2287,8 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
             db_trade = db_by_token[tok]
             current_sl = db_trade.get('stop_loss') or 0
             current_tp = db_trade.get('target') or 0
+
+            log(f'  [DEBUG] {coin}: checking TP/SL (sz={sz} dir={direction} entry={entry_px})')
 
             # ── Compute ideal TP/SL using same ATR-based logic as _compute_dynamic_sl ──
             # Import the function from decider-run's scope (both use same constants)
@@ -2179,7 +2340,7 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
                 log(f'  🆕 {coin} TP missing on HL — forcing initial placement (DB has {current_tp})')
 
             if not sl_changed and not tp_changed:
-                log(f'  ✅ {coin} TP/SL: no move needed')
+                log(f'  ✅ {coin} TP/SL: no move needed (ideal_sl={ideal_sl:.6f} current_sl={current_sl:.6f} hl_sl={hl_has_sl} | ideal_tp={ideal_tp:.6f} current_tp={current_tp:.6f} hl_tp={hl_has_tp})')
                 continue
 
             # ── Build order size from HL position size ──
@@ -2404,18 +2565,135 @@ def sync():
                 # NOT in safe_to_close = guardian_closed=TRUE → stale flag, try to close
                 # FIX (2026-04-02): paper=f trades are LIVE trades — never skip them.
                 # They MUST be closed when missing from HL, regardless of guardian_closed flag.
-                # BUG-FIX (2026-04-06): Paper trades that are missing from HL are EXPECTED —
-                # paper trades are never supposed to be on HL. Only close as orphan when:
-                #   - guardian_closed=FALSE (never closed by guardian before) AND
-                #   - missing from HL AND
-                #   - NOT a paper trade (paper=False)
-                # Paper trades (paper=True) that exist in DB but not on HL are normal — skip them.
+                # FIX (2026-04-09): Paper trades missing from HL are NOT expected —
+                # they mean HL closed the position (via TP/SL or otherwise) and the
+                # DB must be updated. Previously this block skipped paper trades,
+                # leaving phantom open positions in DB and breaking the pipeline.
+                #
+                # Logic:
+                #  - Paper=True, missing from HL → HL closed it → close DB with TP/SL reason
+                #  - Paper=False, guardian_closed=FALSE → externally closed → skip (don't re-close)
+                #  - Paper=False, guardian_closed=TRUE  → stale orphan → close as MANUAL_CLOSE
                 if t.get('paper') == True:
-                    # Paper trade not on HL — expected, do NOT close
+                    # Paper trade missing from HL = HL closed it via TP/SL. Close DB.
+                    try:
+                        # Get TP/SL from DB to determine close_reason
+                        conn_trade = get_db_connection()
+                        if conn_trade:
+                            cur_trade = conn_trade.cursor()
+                            cur_trade.execute(
+                                "SELECT stop_loss, target, direction FROM trades WHERE id=%s",
+                                (trade_id,))
+                            row_trade = cur_trade.fetchone()
+                            cur_trade.close()
+                            conn_trade.close()
+                            sl = float(row_trade[0]) if row_trade and row_trade[0] else 0
+                            tp = float(row_trade[1]) if row_trade and row_trade[1] else 0
+                            direction = row_trade[2] if row_trade else ''
+                        else:
+                            sl = tp = 0
+                            direction = t.get('direction', '')
+
+                        fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
+                        exit_price = _get_hl_exit_price(tok, fallback_price)
+
+                        # Determine close_reason: TP vs SL
+                        if tp > 0 and sl > 0:
+                            if direction.upper() == 'LONG':
+                                if exit_price >= tp:
+                                    close_reason = 'HL_TP_CLOSED'
+                                elif exit_price <= sl:
+                                    close_reason = 'HL_SL_CLOSED'
+                                else:
+                                    close_reason = 'HL_CLOSED'
+                            else:  # SHORT
+                                if exit_price <= tp:
+                                    close_reason = 'HL_TP_CLOSED'
+                                elif exit_price >= sl:
+                                    close_reason = 'HL_SL_CLOSED'
+                                else:
+                                    close_reason = 'HL_CLOSED'
+                        else:
+                            close_reason = 'HL_CLOSED'
+
+                        log(f'  Step8 closing paper {tok} #{trade_id}: exit={exit_price} reason={close_reason}', 'INFO')
+
+                        # Mark guardian_closed BEFORE closing to prevent double-close
+                        conn_upd = get_db_connection()
+                        if conn_upd:
+                            cur_upd = conn_upd.cursor()
+                            cur_upd.execute(
+                                "UPDATE trades SET guardian_closed=TRUE WHERE id=%s",
+                                (trade_id,))
+                            conn_upd.commit()
+                            cur_upd.close()
+                            conn_upd.close()
+
+                        _close_paper_trade_db(trade_id, tok, exit_price, close_reason)
+                    except Exception as e:
+                        log(f'  DB close failed for paper {tok}: {e}', 'FAIL')
                     continue
 
                 if str(trade_id) in safe_to_close:
-                    log(f'  Step8 SKIP {tok} #{trade_id}: live trade but guardian_closed=FALSE (externally closed)', 'WARN')
+                    # FIX (2026-04-09): Trade missing from HL with guardian_closed=FALSE.
+                    # Previously skipped as "externally closed". But this includes HL TP/SL closes
+                    # (NIL, AAVE, CFX, LAYER) where the user didn't manually close — HL did.
+                    # Determine close_reason from TP/SL in DB, then close with HL_CLOSED reason.
+                    try:
+                        conn_trade = get_db_connection()
+                        if conn_trade:
+                            cur_trade = conn_trade.cursor()
+                            cur_trade.execute(
+                                "SELECT stop_loss, target, direction FROM trades WHERE id=%s",
+                                (trade_id,))
+                            row_trade = cur_trade.fetchone()
+                            cur_trade.close()
+                            conn_trade.close()
+                            sl = float(row_trade[0]) if row_trade and row_trade[0] else 0
+                            tp = float(row_trade[1]) if row_trade and row_trade[1] else 0
+                            direction = row_trade[2] if row_trade else t.get('direction', '')
+                        else:
+                            sl = tp = 0
+                            direction = t.get('direction', '')
+
+                        fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
+                        exit_price = _get_hl_exit_price(tok, fallback_price)
+
+                        # Determine close_reason: TP vs SL
+                        if tp > 0 and sl > 0 and direction:
+                            if direction.upper() == 'LONG':
+                                if exit_price >= tp:
+                                    close_reason = 'HL_TP_CLOSED'
+                                elif exit_price <= sl:
+                                    close_reason = 'HL_SL_CLOSED'
+                                else:
+                                    close_reason = 'HL_CLOSED'
+                            else:  # SHORT
+                                if exit_price <= tp:
+                                    close_reason = 'HL_TP_CLOSED'
+                                elif exit_price >= sl:
+                                    close_reason = 'HL_SL_CLOSED'
+                                else:
+                                    close_reason = 'HL_CLOSED'
+                        else:
+                            close_reason = 'HL_CLOSED'
+
+                        log(f'  Step8 closing {tok} #{trade_id}: exit={exit_price} reason={close_reason}', 'INFO')
+
+                        # Mark guardian_closed BEFORE closing to prevent double-close
+                        conn_upd = get_db_connection()
+                        if conn_upd:
+                            cur_upd = conn_upd.cursor()
+                            cur_upd.execute(
+                                "UPDATE trades SET guardian_closed=TRUE WHERE id=%s",
+                                (trade_id,))
+                            conn_upd.commit()
+                            cur_upd.close()
+                            conn_upd.close()
+
+                        _close_paper_trade_db(trade_id, tok, exit_price, close_reason)
+                    except Exception as e:
+                        log(f'  DB close failed for {tok}: {e}', 'FAIL')
                     continue
 
                 # guardian_closed=TRUE but trade is missing from HL — stale orphan, close now
@@ -2452,9 +2730,19 @@ def sync():
 
     # Step 10: Reconcile TP/SL — move only in favorable direction, per-token 30s cooldown
     if db_trades:
+        log(f'[DEBUG] Step10 called with {len(db_trades)} db_trades, {len(hl_pos)} hl_pos')
         tpsl_moved = reconcile_tp_sl(hl_pos, prices, db_trades)
+        log(f'[DEBUG] Step10 result: tpsl_moved={tpsl_moved}')
         if tpsl_moved > 0:
             log(f'Step10 TP/SL reconcile: updated {tpsl_moved} token(s)')
+
+    # Step 11 (2026-04-08): Plan B — Internal breach detector
+    # Runs if HL TP/SL placement failed (PENDLE/MET still missing) or as redundant safety net.
+    # Checks if current price has crossed SL or TP for any open HL position.
+    # If breached → fires market close on HL (Plan A backup) + closes DB trade.
+    breach_closed = _check_and_close_breached_trades(hl_pos, prices, db_trades)
+    if breach_closed > 0:
+        log(f'Step11 breach detector: closed {breach_closed} position(s) — TP/SL backup')
 
     log(f'── Sync done ──')
 

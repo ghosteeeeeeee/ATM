@@ -106,3 +106,18 @@ See `trading.md` for the full pipeline. Key files:
 - `/var/www/hermes/data/signals.json` — web dashboard output (reads from hotset.json, enriched with live RSI)
 - `ai_decider.py` — compaction + scoring + AI decision gate
 - `hermes-trades-api.py` — writes signals.json for web UI (reads hotset.json as authoritative source)
+
+## Future Considerations
+
+**Hebbian Associative Memory — Trading vs General Purpose:**
+The network was seeded from 9,705 historical sessions (1.04M co-occurring pairs). Top trading edges:
+- `LONG_BIAS ↔ HOT_APPROVED` (2106x co-occurrences)
+- `TNSR ↔ SKIPPED` (428x)
+- `SHORT_BIAS ↔ XRP` (162x)
+
+These are trading-specific patterns baked into the network. If Hermes ever gets stuck in a trading loop or the network over-indexes on trading context, consider:
+- Adding label-type filtering to recall (e.g., `recall(concept, label_filter='project')` to scope to general-purpose associations)
+- Tracking "domain" separately from "concept" (e.g., a token+regime cluster vs a project+skill cluster)
+- Pruning trading-specific edges that overwhelm general-purpose memory
+
+Decay: 0.999/day (elephant's memory — very sticky). Systemd timers `hermes-hebbian-decay.timer` (4am) + `hermes-session-learner.timer` (6am).
