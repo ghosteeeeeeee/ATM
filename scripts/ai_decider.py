@@ -1537,7 +1537,7 @@ OUT:
             'reason': entry['reason'],
             'source': src_val,
             'z_score': z_val,
-            'compact_rounds': entry.get('compact_rounds', 1),
+            'compact_rounds': max(entry.get('compact_rounds', 0), 1),
             'survival_score': entry.get('survival_score', 0.0),
             'survival_round': entry['survival_round'],
             'wave_phase': spd.get('wave_phase', 'neutral'),

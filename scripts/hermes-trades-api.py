@@ -404,7 +404,7 @@ def _build_hotset_from_db():
             SELECT
                 s.token,
                 s.direction,
-                MAX(s.compact_rounds) as max_rounds,
+                MAX(s.review_count) as max_rounds,
                 MAX(s.survival_score) as max_survival,
                 MAX(s.confidence) as max_conf,
                 AVG(s.confidence) as avg_conf,
@@ -419,13 +419,13 @@ def _build_hotset_from_db():
                 sp.is_stale
             FROM signals s
             LEFT JOIN token_speeds sp ON UPPER(s.token) = UPPER(sp.token)
-            WHERE s.compact_rounds > 0
+            WHERE s.review_count >= 1
               AND s.executed = 0
-              AND s.review_count >= 1
-              AND s.created_at > datetime('now', '-3 hours')
+              AND s.decision IN ('PENDING', 'APPROVED', 'WAIT')
               AND s.confidence >= 70
               AND (sp.speed_percentile IS NULL OR sp.speed_percentile > 0)
             GROUP BY s.token, s.direction
+            HAVING COUNT(*) >= 1
             ORDER BY max_rounds DESC, max_survival DESC, avg_conf DESC
             LIMIT 20
         """)
