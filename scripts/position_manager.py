@@ -14,7 +14,9 @@ import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
 sys.path.insert(0, '/root/.hermes/scripts')
+from hermes_file_lock import FileLock
 from _secrets import BRAIN_DB_DICT
+
 
 import hype_cache as hc
 
@@ -64,6 +66,12 @@ SL_PCT = 0.03          # 3% stop loss (cut loser threshold — DEFAULT fallback)
 SL_PCT_MIN = 0.01      # minimum SL for any trade
 MAX_LEVERAGE = 5
 
+# ─── ATR Internal Close System ─────────────────────────────────────────────────
+# Kill switch: disables pushing SL/TP orders to Hyperliquid.
+# When False, _execute_atr_bulk_updates() is NOT called from the main loop.
+# Hermes self-closes on ATR hits internally and mirrors to HL via market order.
+ATR_HL_ORDERS_ENABLED = False
+
 # ── Cascade Flip Config ──────────────────────────────────────────────────────
 # When an open position is losing AND an opposite signal fires with strong conf,
 # cascade flip: close the losing position AND enter the opposite direction.
@@ -107,9 +115,10 @@ def _load_flip_counts() -> dict:
 def _save_flip_counts(counts: dict):
     """Persist flip counts to disk."""
     try:
-        os.makedirs(os.path.dirname(FLIP_COUNTS_FILE), exist_ok=True)
-        with open(FLIP_COUNTS_FILE, 'w') as f:
-            json.dump(counts, f, indent=2)
+        with FileLock('flip_counts'):
+            os.makedirs(os.path.dirname(FLIP_COUNTS_FILE), exist_ok=True)
+            with open(FLIP_COUNTS_FILE, 'w') as f:
+                json.dump(counts, f, indent=2)
     except Exception as e:
         print(f"  [Flip Count] ⚠️ Failed to persist flip counts: {e}")
 
@@ -346,6 +355,77 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
 
     # Priority 3: global hard stop
     return pnl_pct <= CUT_LOSER_PNL
+
+
+def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
+    """
+    Check every open position for ATR TP/SL hit.
+
+    Returns list of dicts with trade_id and hit reason:
+      LONG: current_price <= stop_loss  → SL hit
+      LONG: current_price >= target     → TP hit
+      SHORT: current_price >= stop_loss → SL hit
+      SHORT: current_price <= target    → TP hit
+
+    Handles edge cases: missing current_price, missing SL/TP in DB.
+    """
+    hits = []
+    for pos in open_positions:
+        token = str(pos.get('token', '')).upper()
+        trade_id = pos.get('id')
+        direction = str(pos.get('direction', '')).upper()
+        current_price = pos.get('current_price')
+        stop_loss = pos.get('stop_loss')
+        target = pos.get('target')
+
+        if not trade_id or not direction:
+            continue
+        if direction not in ('LONG', 'SHORT'):
+            continue
+
+        # Need a valid current_price to check
+        try:
+            cur = float(current_price)
+            if cur <= 0:
+                continue
+        except (TypeError, ValueError):
+            continue
+
+        # Need both SL and TP set in DB to check ATR hits
+        # 0.0 is not a valid SL/TP — treat it as unset
+        try:
+            sl = float(stop_loss) if stop_loss is not None else None
+            tp = float(target) if target is not None else None
+        except (TypeError, ValueError):
+            continue
+
+        if not sl or not tp:
+            continue
+
+        hit = None
+        if direction == 'LONG':
+            if cur <= sl:
+                hit = 'atr_sl_hit'
+            elif cur >= tp:
+                hit = 'atr_tp_hit'
+        elif direction == 'SHORT':
+            if cur >= sl:
+                hit = 'atr_sl_hit'
+            elif cur <= tp:
+                hit = 'atr_tp_hit'
+
+        if hit:
+            hits.append({
+                'trade_id': trade_id,
+                'token': token,
+                'direction': direction,
+                'hit_reason': hit,
+                'current_price': cur,
+                'stop_loss': sl,
+                'target': tp,
+            })
+
+    return hits
 
 
 def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[bool, str]:
@@ -879,6 +959,23 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         if HYPE_AVAILABLE and is_live_trading_enabled():
             hype_token = hype_coin(token)
             conn.commit()  # lock in DB close
+
+            # ── Best-effort HL order cleanup for ATR hits ─────────────────────
+            # If closing due to ATR SL/TP hit, cancel any stale HL trigger orders
+            # so they don't fire after the position is already closed.
+            # This is best-effort: failures don't block the mirror_close.
+            if reason in ('atr_sl_hit', 'atr_tp_hit'):
+                try:
+                    from hyperliquid_exchange import cancel_all_open_orders as _cancel_all
+                    cleanup = _cancel_all(hype_token)
+                    if cleanup.get('cancelled'):
+                        print(f"  [ATR CLEANUP] Cancelled {len(cleanup['cancelled'])} stale HL orders for {hype_token}")
+                    if cleanup.get('errors'):
+                        for e in cleanup['errors']:
+                            print(f"  [ATR CLEANUP] Warning: {e}")
+                except Exception as cleanup_err:
+                    print(f"  [ATR CLEANUP] Failed to cancel stale orders for {hype_token}: {cleanup_err}")
+
             try:
                 hl_exit_info = mirror_close(hype_token, direction)
                 print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
@@ -1071,6 +1168,12 @@ def _atr_multiplier(atr_pct: float) -> float:
         return 2.0    # NORMAL_VOLATILITY
 
 
+def _dr_atr(token: str, atr_pct: float) -> float:
+    """Proxy to decider_run._atr_multiplier — imported lazily to avoid circular."""
+    from decider_run import _atr_multiplier
+    return _atr_multiplier(token, atr_pct)
+
+
 def _atr_sl_k_scaled(
     token: str,
     direction: str,
@@ -1080,12 +1183,12 @@ def _atr_sl_k_scaled(
 ) -> float:
     """
     Scale k_SL by z-score exhaustion + velocity stall + speed.
-    Returns k multiplier to apply on top of base _atr_multiplier().
+    Returns k multiplier to apply on top of base _dr_atr().
     momentum_stats: from get_momentum_stats(token) — {percentile_long, percentile_short, velocity, phase}
     """
     from signal_gen import PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME
 
-    base_k = _atr_multiplier(atr_pct)
+    base_k = _dr_atr(token, atr_pct)
 
     if momentum_stats is None:
         return base_k  # can't assess — no change
@@ -1157,6 +1260,7 @@ def _force_fresh_atr(token: str, period: int = 14, interval: str = '15m') -> flo
         start_t = end_t - (15 * 60 * 1000 * (period + 5))
         candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
         if not candles or len(candles) < period + 1:
+            print(f"  [ATR] {token}: insufficient candle data ({len(candles) or 0} bars, need {period+1})")
             return None
         trs = []
         for i in range(1, min(period + 1, len(candles))):
@@ -1166,7 +1270,8 @@ def _force_fresh_atr(token: str, period: int = 14, interval: str = '15m') -> flo
             tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
             trs.append(tr)
         return sum(trs) / len(trs) if trs else None
-    except Exception:
+    except Exception as e:
+        print(f"  [ATR] {token}: HL API error fetching ATR — {e}")
         return None
 
 
@@ -1241,7 +1346,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         speed_pctl = speed_by_token.get(token, 50)
         k = _atr_sl_k_scaled(token, direction, atr_pct, speed_pctl, momentum)
         sl_pct = k * atr_pct
-        tp_pct = 2.5 * _atr_multiplier(atr_pct) * atr_pct  # was 2×
+        tp_pct = 2.5 * _dr_atr(token, atr_pct) * atr_pct  # was 2×
 
         # Anchor SL/TP to current_price (live) not entry_price (stale).
         # Fallback to entry_price if current_price unavailable (e.g. SKY with no mids).
@@ -1257,6 +1362,9 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             new_tp = round(ref_price * (1 - tp_pct), 8)
         else:
             continue
+
+        # Debug: log computed ATR levels for monitoring
+        print(f"  [ATR] {token}: k={k:.3f} ATR={atr:.4f} ({atr_pct*100:.2f}%) → SL={new_sl:.6f} TP={new_tp:.6f}")
 
         # ── Trailing SL: only tighten, never loosen ─────────────────────────────
         # SL only moves in the profit direction. Prevents getting stopped out by
@@ -1309,6 +1417,39 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             })
 
     return updates
+
+
+def _persist_atr_levels(updates: List[Dict]) -> None:
+    """
+    Write ATR-computed SL/TP levels to brain DB.
+    Called once per cycle after _collect_atr_updates() — BEFORE hit detection.
+    This wires the dynamic ATR levels into check_atr_tp_sl_hits() next cycle.
+    Only updates if delta > ATR_UPDATE_THRESHOLD_PCT (same as HL path).
+    """
+    if not updates:
+        return
+
+    conn = get_db_connection()
+    if conn is None:
+        return
+
+    try:
+        cur = get_cursor(conn)
+        for u in updates:
+            trade_id = u.get('trade_id')
+            new_sl = u.get('new_sl')
+            new_tp = u.get('new_tp')
+            if not trade_id or new_sl is None or new_tp is None:
+                continue
+            cur.execute(
+                "UPDATE trades SET stop_loss = %s, target = %s WHERE id = %s AND status = 'open'",
+                (round(new_sl, 8), round(new_tp, 8), trade_id)
+            )
+        conn.commit()
+    except Exception as e:
+        print(f"  [ATR] DB persist error: {e}")
+    finally:
+        conn.close()
 
 
 def _execute_atr_bulk_updates(updates: List[Dict]) -> dict:
@@ -1457,7 +1598,7 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
         atr = _pm_get_atr(token)
         if atr is not None:
             atr_pct = atr / price
-            k = _pm_atr_multiplier(atr_pct)
+            k = _dr_atr(token, atr_pct)
             atr_sl_pct = (k * atr) / price
             effective_sl_pct = max(atr_sl_pct, MIN_ATR_PCT)
             effective_sl_pct = min(effective_sl_pct, MAX_SL_PCT)
@@ -1472,7 +1613,7 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
         atr = _pm_get_atr(token)
         if atr is not None:
             atr_pct_tp = atr / price
-            k_tp = _pm_atr_multiplier(atr_pct_tp)
+            k_tp = _dr_atr(token, atr_pct_tp)
             tp_pct = 2.5 * k_tp * atr_pct_tp  # was 2×
             tp_pct = max(tp_pct, TP_PCT)     # floor at 8%
 
@@ -1687,14 +1828,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     """
     Called every pipeline run.
 
-    Exit strategy — ATR-adaptive TP/SL (replaces deprecated trailing stop):
-    1. Cut losers: pnl <= -3% → guardian handles
-    2. Cascade flips: speed-armed reversal for wrong-direction positions
-    3. Wave turn exits: z-score extremes with momentum shift
-    4. Stale exits: flat winners/losers after 30+ minutes
-    5. ATR-adaptive TP/SL: SL and TP recalculated each cycle from current ATR.
-       Batch-pushed to HL when drift > 0.3%. Cascade-flip positions skipped.
-    TP = 2× SL distance (2:1 R:R), self-calibrating via ATR volatility.
+    Exit priority (all exits self-close via close_paper_position):
+    1. ATR TP/SL hit      — price crossed dynamically-computed ATR SL/TP (DB-written each cycle)
+    2. MACD cascade flip  — MTF MACD alignment reversal (MACD_CASCADE_FLIP_TOKENS)
+    3. Cascade flip       — loss > -0.25% + speed increasing + opposite signal
+    4. Wave turn exit     — z-score extreme (>±1.5) + acceleration reversing
+    5. Stale winner/loser — flat >15min in profit OR flat >30min in loss
+
+    ATR SL/TP is recomputed each cycle via _collect_atr_updates() (z-score/speed-adaptive k)
+    and written to the brain DB via _persist_atr_levels() before hit detection runs.
+    HL order push (_execute_atr_bulk_updates) is controlled by ATR_HL_ORDERS_ENABLED kill switch.
 
     Returns: (open_count, closed_count, adjusted_count)
     """
@@ -1709,12 +1852,30 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     if SPEED_TRACKER is not None:
         SPEED_TRACKER.update()
 
+    # ── 0. Refresh ATR SL/TP levels in DB ─────────────────────────────────────
+    # Compute fresh ATR-based SL/TP for all positions and write to DB.
+    # check_atr_tp_sl_hits() will use these new levels in this cycle's hit checks.
+    # This wires the z-score/speed-adaptive k multiplier into self-close detection.
+    _atr_updates = _collect_atr_updates(positions)
+    if _atr_updates:
+        _persist_atr_levels(_atr_updates)  # NEW: write to DB (always runs)
+        if ATR_HL_ORDERS_ENABLED:
+            _execute_atr_bulk_updates(_atr_updates)  # HL path (kill switch controlled)
+        print(f"  [ATR] Updated {len(_atr_updates)} position SL/TP levels")
+
     open_count = len(positions)
     closed_count = 0
     adjusted_count = 0
     original_closed = closed_count  # FIX (2026-04-09): track baseline before exit logic
 
     for pos in positions:
+        # ── EXIT PRIORITY ORDER ─────────────────────────────────────────────────
+        # 1. ATR TP/SL hit        — price crossed DB SL/TP (dynamically updated above)
+        # 2. MACD cascade flip    — MTF MACD alignment reversal (MACD_CASCADE_FLIP_TOKENS)
+        # 3. Cascade flip        — loss > -0.25% + speed increasing + opposite signal
+        # 4. Wave turn exit      — z-score extreme (>±1.5) + acceleration reversing
+        # 5. Stale winner/loser  — flat >15min in profit OR flat >30min in loss
+        # ─────────────────────────────────────────────────────────────────────────────
         token = str(pos.get("token", "UNKNOWN"))
         direction = str(pos.get("direction", "UNKNOWN")).upper()
         pnl_pct = float(pos.get("pnl_pct") or 0)
@@ -1730,6 +1891,20 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 live_pnl = ((entry - cur) / entry) * 100
         else:
             live_pnl = pnl_pct
+
+        # ── 1. ATR TP/SL hit detection (internal close) ────────────────────────
+        # Check if current price has crossed the ATR-based SL or TP level.
+        # This runs BEFORE all other exit checks so ATR hits are processed first.
+        # close_paper_position() handles internal DB close + market mirror to HL.
+        # Best-effort attempt to cancel stale HL orders follows (non-blocking).
+        atr_hits = check_atr_tp_sl_hits([pos])
+        for hit in atr_hits:
+            print(f"  [ATR HIT] {token} {direction} {hit['hit_reason']}: "
+                  f"price={hit['current_price']:.6f} SL={hit['stop_loss']:.6f} TP={hit['target']:.6f}")
+            close_paper_position(hit['trade_id'], hit['hit_reason'])
+            closed_count += 1
+        if atr_hits:
+            continue  # Position closed — skip remaining checks
 
         # ATR-adaptive TP/SL: replaces deprecated trailing stop.
         # trailing_active is always False now (trailing stop removed).
@@ -1928,29 +2103,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
                 continue  # Skip trailing SL update for closed position
 
-        # ── 7. ATR-adaptive TP/SL bulk push ───────────────────────────────────
-        # After processing all positions, batch-update HL for any SL/TP that has
-        # drifted > ATR_UPDATE_THRESHOLD_PCT from current ATR (force-fresh ATR).
-        # Runs once per cycle, outside the per-position loop.
-        # Cascade-flip positions are skipped (they manage their own tighter SL/TP).
-
     # ── End of per-position loop ─────────────────────────────────────────────
-
-    # ── ATR-adaptive TP/SL: batch collect + bulk push (one pass, 2 HL calls) ───
-    if positions:
-        updates = _collect_atr_updates(positions)
-        if updates:
-            result = _execute_atr_bulk_updates(updates)
-            for u in updates:
-                direction_u = u['direction']
-                sl_info = f"SL {u['old_sl']:.4f}→{u['new_sl']:.4f}" if u['needs_sl'] else "SL unchanged"
-                tp_info = f"TP {u['old_tp']:.4f}→{u['new_tp']:.4f}" if u['needs_tp'] else "TP unchanged"
-                print(f"  [ATR] {u['token']} {direction_u} {sl_info} | {tp_info} "
-                      f"(ATR={u['atr']:.4f} {u['atr_pct']*100:.2f}%, k={u['k']})")
-            if result['errors']:
-                for err in result['errors']:
-                    print(f"  [ATR ERR] {err}")
-            print(f"  [ATR] Bulk push: {result['cancelled']} cancelled, {result['placed']} placed")
 
     print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
 
@@ -2364,9 +2517,10 @@ def _load_cooldowns() -> Dict:
 def _save_cooldowns(data: Dict) -> None:
     """Save cooldown data to JSON file."""
     try:
-        os.makedirs(os.path.dirname(LOSS_COOLDOWN_FILE), exist_ok=True)
-        with open(LOSS_COOLDOWN_FILE, "w") as f:
-            json.dump(data, f, indent=2, default=str)
+        with FileLock('loss_cooldowns'):
+            os.makedirs(os.path.dirname(LOSS_COOLDOWN_FILE), exist_ok=True)
+            with open(LOSS_COOLDOWN_FILE, "w") as f:
+                json.dump(data, f, indent=2, default=str)
     except Exception as e:
         print(f"[Position Manager] Error saving cooldowns: {e}")
 
@@ -2491,9 +2645,10 @@ def _load_wrong_side() -> Dict:
 def _save_wrong_side(data: Dict) -> None:
     """Save wrong-side learning data."""
     try:
-        os.makedirs(os.path.dirname(WRONG_SIDE_FILE), exist_ok=True)
-        with open(WRONG_SIDE_FILE, "w") as f:
-            json.dump(data, f, indent=2, default=str)
+        with FileLock('wrong_side_learning'):
+            os.makedirs(os.path.dirname(WRONG_SIDE_FILE), exist_ok=True)
+            with open(WRONG_SIDE_FILE, "w") as f:
+                json.dump(data, f, indent=2, default=str)
     except Exception:
         pass
 
@@ -2643,16 +2798,17 @@ def _is_win_cooldown_active(token: str, direction: str) -> bool:
 def _update_pm_heartbeat():
     """Update pipeline heartbeat for position_manager."""
     try:
-        data = {}
-        if os.path.exists(_PM_HEARTBEAT_FILE):
-            with open(_PM_HEARTBEAT_FILE) as f:
-                data = json.load(f)
-        data['position_manager'] = {
-            "timestamp": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-            "status": "ok"
-        }
-        with open(_PM_HEARTBEAT_FILE, 'w') as f:
-            json.dump(data, f, indent=2)
+        with FileLock('pipeline_heartbeat'):
+            data = {}
+            if os.path.exists(_PM_HEARTBEAT_FILE):
+                with open(_PM_HEARTBEAT_FILE) as f:
+                    data = json.load(f)
+            data['position_manager'] = {
+                "timestamp": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "status": "ok"
+            }
+            with open(_PM_HEARTBEAT_FILE, 'w') as f:
+                json.dump(data, f, indent=2)
     except Exception:
         pass  # never crash on heartbeat failures
 

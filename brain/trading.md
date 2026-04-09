@@ -36,6 +36,7 @@ decider_run.py              ──→ reads hotset.json
 hyperliquid_exchange.py     ──→ HL API (live or paper)
     │                              mirror_open for paper trades
 position_manager.py          ──→ trailing stops, stale winner/loser exits, cascade flips
+    │                              ATR TP/SL internal close system (2026-04-09)
     │                              ro-trailing-stop.service (Dallas, Python only)
     │
     ▼
@@ -58,6 +59,78 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 | Strategy optimization | Every 10 min | `strategy_optimizer.py` |
 | A/B optimization | Every 10 min | `ab_optimizer.py` |
 | A/B learner | Every 10 min | `ab_learner.py` |
+
+---
+
+## ATR TP/SL Internal Close System
+**Status:** ✅ LIVE — 2026-04-09
+**Sub-project of:** Position Management | **Owner:** Agent
+
+### What It Is
+
+Hermes self-closes positions when ATR-based SL or TP levels are hit — without relying on HL trigger orders. This was necessary because the HL SL/TP trigger order path (`_execute_atr_bulk_updates()`) was unreliable and could not place meaningful limit/market closes on Hyperliquid.
+
+### Architecture
+
+```
+Pipeline Cycle (every 1 min):
+  1. refresh_current_prices()       → fetch live prices from HL
+  2. check_atr_tp_sl_hits()          → scan all positions for ATR SL/TP hits
+     ├── LONG: price <= stop_loss   → atr_sl_hit
+     ├── LONG: price >= target      → atr_tp_hit
+     ├── SHORT: price >= stop_loss  → atr_sl_hit
+     └── SHORT: price <= target     → atr_tp_hit
+  3. close_paper_position()          → internal DB close + market mirror to HL
+     └── Best-effort: cancel_all_open_orders() to remove stale HL trigger orders
+  4. [Kill switch: _execute_atr_bulk_updates() to HL is DISABLED]
+  5. Other exits: cascade flip, wave turn, stale winner/loser
+```
+
+### Why Internal Close (Not HL Trigger Orders)
+
+- **Problem:** The system could not reliably place CLOSE orders on Hyperliquid. `mirror_close()` (market close) works, but limit close orders and the `_execute_atr_bulk_updates()` SL/TP update path had issues.
+- **Solution:** Hermes tracks its own ATR-based SL/TP levels in the brain DB and self-closes when crossed. HL mirror is a market order — best-effort.
+- **Risk tradeoff:** If Hermes crashes or the pipeline stops, positions won't auto-close on HL until the next run. `hl-sync-guardian.py` (60s cycle) reconciles any divergence.
+
+### Key Components
+
+| Component | Role |
+|-----------|------|
+| `ATR_HL_ORDERS_ENABLED` | Kill switch constant (`False`) — disables `_execute_atr_bulk_updates()` call path |
+| `check_atr_tp_sl_hits()` | Per-position hit detection using live price vs DB SL/TP levels |
+| `close_paper_position()` | Internal DB close + market mirror to HL + best-effort HL order cleanup |
+| `_force_fresh_atr()` | ATR fetch with error logging (HL API failures don't crash pipeline) |
+
+### ATR TP/SL Hit Logic
+
+```
+LONG:
+  price <= stop_loss → atr_sl_hit (exit with loss)
+  price >= target    → atr_tp_hit (exit with profit)
+
+SHORT:
+  price >= stop_loss → atr_sl_hit (exit with loss)
+  price <= target    → atr_tp_hit (exit with profit)
+```
+
+### HL Order Cleanup
+
+When closing via ATR hit, Hermes attempts to cancel any stale HL trigger orders for that token via `cancel_all_open_orders()`. This prevents orphaned HL SL/TP orders from firing after the position is already closed. Failures are best-effort and do not block the close.
+
+### Kill Switch
+
+```python
+ATR_HL_ORDERS_ENABLED = False  # in position_manager.py
+```
+
+Set to `True` to re-enable the `_execute_atr_bulk_updates()` path (push SL/TP to HL). Currently disabled because the HL trigger order path was unreliable for close execution.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `position_manager.py` | Kill switch, `check_atr_tp_sl_hits()`, wiring, HL cleanup, hardened `_force_fresh_atr()` |
+| `brain/trading.md` | This documentation |
 
 ---
 
