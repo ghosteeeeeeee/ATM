@@ -113,12 +113,12 @@ def compute_sl_tp(direction: str, entry_price: float, current_price: float = Non
     atr_pct = 0.02 if atr is None else float(atr) / entry_price
 
     if atr_pct < 0.01:
-        k = 2.5
-    elif atr_pct < 0.025:
-        k = 2.0
+        k = 1.5   # LOW_VOLATILITY
+    elif atr_pct > 0.03:
+        k = 2.5   # HIGH_VOLATILITY
     else:
-        k = 1.5
-    k_tp = 2.5 * k
+        k = 2.0   # NORMAL_VOLATILITY
+    k_tp = 3.0 * k   # TP = 3× SL k (4.5 / 6.0 / 7.5)
 
     MIN_SL_PCT, MAX_SL_PCT = 0.015, 0.05
     MIN_TP_PCT, MAX_TP_PCT = 0.03, 0.15
