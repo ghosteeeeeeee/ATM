@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-04-10 | Cascade Flip Kill Switch — Disabled
+
+**Decision:** Added `CASCADE_FLIP_ENABLED = False` kill switch to `position_manager.py`. All 4 cascade flip call sites now guarded by this flag.
+
+**Why disabled:** Cascade flip not working as intended — T flagged for revisit.
+
+**What was disabled (all cascade flip paths in `check_and_manage_positions()`):**
+1. MTF MACD all-TFs-flipped cascade flip (`if CASCADE_FLIP_ENABLED and mtf_all_flipped`)
+2. Cascade direction active flip (`CASCADE_FLIP_ENABLED and cascade['cascade_active']`)
+3. MACD rules engine flip signal (`CASCADE_FLIP_ENABLED and macd_result['should_flip']`)
+4. Speed-armed cascade flip (`CASCADE_FLIP_ENABLED and ... CASCADE_FLIP_ARM_LOSS`)
+
+**Kill switch location:** `position_manager.py` line ~74 (`CASCADE_FLIP_ENABLED = False`)
+
+**To re-enable:** Set `CASCADE_FLIP_ENABLED = True` in `position_manager.py`.
+
+**Owner:** T
+
+---
+
 ## 2026-04-05 | MiniMax API over ollama for ai_decider scoring
 
 **Decision:** Use MiniMax-M2 API (via `/v1/chat/completions`) as primary LLM for ai_decider signal scoring and compaction.

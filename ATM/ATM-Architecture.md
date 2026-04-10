@@ -48,6 +48,7 @@ hl-sync-guardian.py         ──→ background service (60s interval)
     │                              Reconciles HL positions ↔ paper DB
     │                              Marks guardian_missing / hl_position_missing closes
 position_manager.py         ──→ trailing stops, stale winner/loser exits, cascade flips
+    │                          KILL SWITCH: CASCADE_FLIP_ENABLED=False (2026-04-10)
     │                              BUG FIX (2026-04-05): close_paper_position() used stale
     │                              current_price for PnL calc — trailing_exit trigger price was
     │                              not used. Fixed: re-extract realized PnL% from reason string

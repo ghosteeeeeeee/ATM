@@ -72,6 +72,11 @@ MAX_LEVERAGE = 5
 # Hermes self-closes on ATR hits internally and mirrors to HL via market order.
 ATR_HL_ORDERS_ENABLED = False
 
+# ── Cascade Flip Kill Switch ─────────────────────────────────────────────────
+# Disables ALL cascade flip logic (both MACD-triggered and speed-armed).
+# Set to False to disable cascade flipping entirely.
+CASCADE_FLIP_ENABLED = False
+
 # ── Cascade Flip Config ──────────────────────────────────────────────────────
 # When an open position is losing AND an opposite signal fires with strong conf,
 # cascade flip: close the losing position AND enter the opposite direction.
@@ -1711,6 +1716,9 @@ def refresh_current_prices(server: str = SERVER_NAME):
     HL's unrealized_pnl = (entryPx - currentPx) / entryPx * positionValue * leverage
     This is the GROUND TRUTH — use it for all exit decisions.
 
+    FIX (2026-04-10): Also persist pnl_pct, pnl_usdt, current_price to DB.
+    Previously only updated in-memory dict, so direct DB queries returned stale values.
+
     DB↔HL reconciliation (orphans/ghosts) is handled exclusively by
     hl-sync-guardian.py (60s cycle). This function ONLY updates current_price
     and pnl_pct for positions already confirmed in the DB.
@@ -1741,6 +1749,10 @@ def refresh_current_prices(server: str = SERVER_NAME):
     # Warn if paper trading without HL access
     if not HYPE_AVAILABLE:
         print(f"  [Position Manager] WARNING: Paper trading WITHOUT Hyperliquid — prices may be stale")
+
+    # DB connection for persisting PnL (BUG FIX 2026-04-10)
+    db_conn = get_db_connection()
+    db_cur = db_conn.cursor() if db_conn else None
 
     updated = 0
     for pos in positions:
@@ -1786,6 +1798,29 @@ def refresh_current_prices(server: str = SERVER_NAME):
                 pos['current_price'] = cur_price
                 pos['pnl_usdt'] = pnl_usdt
                 updated += 1
+
+                # BUG FIX (2026-04-10): persist to DB so direct DB queries return correct PnL
+                if db_cur:
+                    try:
+                        db_cur.execute("""
+                            UPDATE trades
+                            SET pnl_pct = %s, pnl_usdt = %s, current_price = %s, updated_at = NOW()
+                            WHERE id = %s AND status = 'open'
+                        """, (pnl_pct, pnl_usdt, cur_price, trade_id))
+                    except Exception as e:
+                        print(f"  [Position Manager] Failed to persist PnL for trade {trade_id}: {e}")
+
+    # Commit and close DB connection
+    if db_conn:
+        try:
+            db_conn.commit()
+        except Exception as e:
+            print(f"  [Position Manager] DB commit failed: {e}")
+        finally:
+            if db_cur:
+                db_cur.close()
+            if db_conn:
+                db_conn.close()
 
     if updated:
         print(f"  [Position Manager] Updated {updated} position prices from HL")
@@ -1950,7 +1985,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                       f"xover={'FRESH' if abs(s.crossover_freshness.value)==2 else 'STALE'} "
                       f"hist={s.histogram:+.6f} rate={s.histogram_rate:+.2f}")
 
-            if mtf_all_flipped:
+            if CASCADE_FLIP_ENABLED and mtf_all_flipped:
                 # Ultra-confirmed cascade flip — all TFs flipped direction
                 flip_info = {
                     'opposite_dir': 'SHORT' if direction == 'LONG' else 'LONG',
@@ -1974,7 +2009,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             # and means the market is already cascading in the other direction.
             from macd_rules import cascade_entry_signal
             cascade = cascade_entry_signal(token)
-            if cascade['cascade_active'] and cascade['cascade_direction'] and cascade['cascade_direction'] != direction:
+            if CASCADE_FLIP_ENABLED and cascade['cascade_active'] and cascade['cascade_direction'] and cascade['cascade_direction'] != direction:
                 print(f"  [CASCADE FLIP] {token} {direction} → {cascade['cascade_direction']} "
                       f"(cascade active, lead={cascade['lead_tf']}, confirm={cascade['confirmation_count']}, "
                       f"reason={cascade['entry_block_reason']})")
@@ -1994,7 +2029,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     closed_count += 1
                     continue
 
-            if macd_result['should_flip'] and macd_result['reasons']:
+            if CASCADE_FLIP_ENABLED and macd_result['should_flip'] and macd_result['reasons']:
                 primary_reason = macd_result['reasons'][0]
                 print(f"  [MACD FLIP] {token} {direction} → flipping: {macd_result['reasons']}")
                 flip_info = {
@@ -2031,7 +2066,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         #   loss <= -0.25% → armed: speed check, log, wait for trigger
         #   loss <= -0.50% (pctl 50-80) OR -0.35% (pctl > 80) → FLIP
         cascade_flipped = False
-        if not trailing_active and live_pnl <= CASCADE_FLIP_ARM_LOSS:
+        if CASCADE_FLIP_ENABLED and not trailing_active and live_pnl <= CASCADE_FLIP_ARM_LOSS:
             flip_info = check_cascade_flip(token, direction, live_pnl, SPEED_TRACKER)
             if flip_info:
                 cascade_flipped = cascade_flip(

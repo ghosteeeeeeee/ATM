@@ -97,6 +97,27 @@ Pipeline Cycle (every 1 min):
 | Component | Role |
 |-----------|------|
 | `ATR_HL_ORDERS_ENABLED` | Kill switch constant (`False`) — disables `_execute_atr_bulk_updates()` call path |
+| `CASCADE_FLIP_ENABLED` | Kill switch constant (`False`) — disables ALL cascade flip logic (MACD-triggered + speed-armed) |
+
+---
+
+## Cascade Flip — DISABLED (2026-04-10)
+**Status:** 🔴 KILL SWITCHED OFF — will revisit
+**Sub-project of:** Position Management | **Owner:** T
+
+Cascade flip closes a losing position AND enters the opposite direction when:
+- Loss > -0.25% + speed increasing + opposite signal (speed-armed)
+- MACD MTF alignment reversal on `MACD_CASCADE_FLIP_TOKENS` (IMX, SOPH, SCR)
+- MACD rules engine flip signal
+
+**Kill switch:** `CASCADE_FLIP_ENABLED = False` in `position_manager.py` (line ~74).
+When disabled, all 4 cascade flip call sites are bypassed:
+1. MTF MACD all-TFs-flipped cascade flip
+2. Cascade direction active flip (macd_rules)
+3. MACD rules engine flip signal
+4. Speed-armed cascade flip
+
+**Why disabled:** Not working as intended — T flagged 2026-04-10 for revisit.
 | `check_atr_tp_sl_hits()` | Per-position hit detection using live price vs DB SL/TP levels |
 | `close_paper_position()` | Internal DB close + market mirror to HL + best-effort HL order cleanup |
 | `_force_fresh_atr()` | ATR fetch with error logging (HL API failures don't crash pipeline) |
@@ -895,3 +916,57 @@ if not content or 'OUT:' not in content:
 ### Fix 2: Token Budget Raised
 - `_MAX_TOKENS_PER_RUN`: 8000 → 10000
 - `_DAILY_TOKEN_BUDGET`: 800000 → 1200000 (1.2M — supports ai_decider + 2x compaction/day)
+
+---
+
+## Profit Monster — Medium-Profit Auto-Closer
+
+**Purpose**: Randomly close 1-2 open positions in the 2-5% profit range every 10-30 minutes. Locks in medium gains before momentum fades. Never touches losing positions.
+
+**Script**: `/root/.hermes/scripts/profit_monster.py`
+
+**Config**: `/root/.hermes/data/profit_monster_config.json`
+```json
+{
+  "enabled": true,
+  "ab_group": "B",          // "A" = 10-15min, "B" = 20-30min fire interval
+  "min_profit_pct": 1.0,
+  "max_profit_pct": 5.0,
+  "max_closes_per_wake": 2,
+  "skip_top_pct": 20,       // don't touch the top 20% most profitable
+  "dry_run": false
+}
+```
+
+**close_reason tracking**: All profit-monster closes set `close_reason = 'profit-monster'` in the trades DB. The `close_trade()` function in `brain.py` now accepts an explicit `--close-reason` param that overrides the notes field. Profit monster passes `--close-reason profit-monster` on every close.
+
+**A/B Test**:
+- Group A: fires every 10-15 min (more frequent small wins)
+- Group B: fires every 20-30 min (let positions run longer, bigger closes)
+- Toggle via `ab_group` in config.json — no redeploy needed
+
+**Profit range logic**: Computes live pnl from `entry_price` vs `current_price` (not the stored `pnl_pct` which is often 0). Filters LONG positions where `(current_price - entry_price) / entry_price * 100` is between 2-5%, and SHORT positions inversely.
+
+**Selection logic**: Gets all qualifying positions, skips the top 20% most profitable (let winners run), randomly picks 1-2 from the remainder.
+
+**Last-run timer**: Stored in `/root/.hermes/data/profit_monster_last_run.json`. The fire interval is random within the window (not fixed).
+
+**Log**: `/root/.hermes/logs/profit_monster.log`
+
+**Crontab**: `* * * * * cd /root/.hermes/scripts && python3 profit_monster.py`
+
+**Dry run**: `python3 profit_monster.py --dry-run`
+
+---
+
+## hzscore — combo only, never solo
+
+hzscore (mtf_zscore from get_tf_zscores) is **never allowed solo**. It only has weight when combined with another signal source.
+
+**Solo hzscore**: matched by `('mtf_zscore', 'hzscore', 0.15)` — very suppressed, 85% penalty vs default.
+
+**hzscore in combo with hmacd-** (e.g. `hmacd-,hzscore`): falls through to `hmacd-default` at 0.6 — stronger but still not primary.
+
+**hzscore + pct-hermes + hmacd-** (e.g. `hmacd-,hzscore,pct-hermes`): the noisiest combo → explicitly suppressed to 0.4.
+
+In practice this means: hzscore data only matters when it confirms a MACD crossover or pattern signal, not on its own.
