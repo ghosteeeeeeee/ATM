@@ -165,7 +165,7 @@ CONFLUENCE_RSI_HIGH  = 70   # RSI > this → SHORT (overbought = bearish confirm
                              # FIX: Was 65 — changed to 70 to restore symmetric RSI 30/70 split.
                              # RSI 35-65 was a dead zone where both LONG and SHORT could fire,
                              # causing the asymmetric bias. Now: RSI<35=LONG, RSI>70=SHORT.
-CONFLUENCE_MACD_HIST_THRESH = 0.000005  # MACD histogram magnitude to add individual signal
+# ── Confluence Detection ───────────────────────────────────────────────────────
 
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
@@ -1519,66 +1519,78 @@ def _run_mtf_macd_signals():
         phase     = mom.get('phase', 'quiet')
         z_dir     = mom.get('z_direction', 'neutral')
 
-        # ── MTF MACD check ────────────────────────────────────────
-        # Use histogram (MACD line - signal line) for direction, NOT raw MACD line.
-        # histogram > 0 = MACD above signal = bullish → LONG
-        # histogram < 0 = MACD below signal = bearish → SHORT
+        # ── MTF MACD check ──────────────────────────────────────────────────────────
+        # Signal logic:
+        # - 15m crossover is the TRIGGER (entry fires when 15m crosses)
+        # - 4H/1H confirm the REGIME (broad market direction)
+        # - Histogram (h > 0) is a weak fallback only when NO crossover exists at any TF
+        # - When a higher TF (4H/1H) HAS a crossover, it MUST agree with 15m direction
         xo_4h  = _macd_crossover(token, 60*4)
         xo_1h  = _macd_crossover(token, 60*1)
         xo_15m = _macd_crossover(token, 15)
 
-        # Collect valid (histogram, macd, signal, crossover_dir) tuples per TF
         valid = {}
         for tf, xo in [('4h', xo_4h), ('1h', xo_1h), ('15m', xo_15m)]:
             if xo is not None:
                 valid[tf] = xo
 
         if len(valid) >= 2:
-            # At least 2 TFs have MACD data → use crossover agreement across TFs.
-            # PRIMARY signal: crossover_dir (actual MACD line crossing signal line).
-            # Falls back to histogram sign if no crossover detected (crossover_dir == 0).
-            bullish_tfs = 0
-            for tf, (h, m, s, xo_dir) in valid.items():
-                if xo_dir == 1:       # bullish crossover confirmed
-                    bullish_tfs += 2  # crossover is strong signal — weight 2x
-                elif xo_dir == 0 and h > 0:  # no crossover, but MACD above signal
-                    bullish_tfs += 1
-            total_tfs   = len(valid)
-            direction   = 'LONG' if bullish_tfs >= total_tfs else 'SHORT'
-            strength    = bullish_tfs  # weighted count
-            timeframe_str = f'{min(bullish_tfs, total_tfs*2)}tf+'
-        elif len(valid) == 1:
-            # Single TF → use crossover_dir, fallback to histogram sign
-            tf, (h, m, s, xo_dir) = next(iter(valid.items()))
-            if xo_dir == 1:
-                direction = 'LONG'; strength = 2
-            elif xo_dir == -1:
-                direction = 'SHORT'; strength = 2
+            # Check 4H and 1H crossover direction — if they exist, they must agree with 15m
+            has_4h_xo = '4h' in valid
+            has_1h_xo = '1h' in valid
+            xo_4h_dir = valid.get('4h', (0,0,0,0))[3]
+            xo_1h_dir = valid.get('1h', (0,0,0,0))[3]
+            xo_15m_dir = valid.get('15m', (0,0,0,0))[3]
+
+            # Regime check: if 4H or 1H have a crossover, it must align with 15m direction
+            # A 15m bullish entry in a 4H/1H bearish regime = blocked
+            if has_4h_xo and xo_4h_dir == -1 and xo_15m_dir == 1:
+                continue  # 4H bearish, 15m bullish → counter-regime, block
+            if has_1h_xo and xo_1h_dir == -1 and xo_15m_dir == 1:
+                continue  # 1H bearish, 15m bullish → counter-regime, block
+            if has_4h_xo and xo_4h_dir == 1 and xo_15m_dir == -1:
+                continue  # 4H bullish, 15m bearish → counter-regime, block
+            if has_1h_xo and xo_1h_dir == 1 and xo_15m_dir == -1:
+                continue  # 1H bullish, 15m bearish → counter-regime, block
+
+            # Direction from 15m crossover trigger
+            if xo_15m_dir == 1:
+                direction = 'LONG'; strength = 3
+            elif xo_15m_dir == -1:
+                direction = 'SHORT'; strength = 3
             else:
-                if h == 0:
-                    continue  # no crossover, flat histogram — no momentum
-                direction = 'LONG' if h > 0 else 'SHORT'; strength = 1
-            timeframe_str = tf
+                # No 15m crossover — use histogram only as fallback (weak signal)
+                if len(valid) >= 3:
+                    bullish_tfs = sum(1 for tf, (h, m, s, xd) in valid.items() if h > 0)
+                    total_tfs = len(valid)
+                    direction = 'LONG' if bullish_tfs >= (total_tfs + 1) // 2 else 'SHORT'
+                    strength = bullish_tfs
+                else:
+                    continue  # no 15m crossover, not enough TFs for histogram fallback
+            timeframe_str = '15m_xo'
+
+        elif len(valid) == 1:
+            # Single TF only — not enough for mtf signal
+            continue
         else:
             continue  # no MACD data at all
 
-        # Blacklist + z-score filters
-        if direction == 'LONG':
-            if avg_z is None or avg_z > LONG_1H_Z_MAX:
-                continue
-        else:
-            # Don't SHORT extremely suppressed tokens — mean reversion targets
-            if avg_z is not None and avg_z < -0.5:
-                continue
-            if token.upper() in SHORT_BLACKLIST:
-                continue
+        # Z-score regime filter: elevated price (> +0.5 on 1H z-score) blocks both LONG and SHORT
+        # Elevated price = z > 0 = price above mean = bad for LONG entry
+        # Same elevated price is also bad for SHORT entry (shorts need suppressed price to work)
+        # The old comment "suppressed = mean reversion target = bad for SHORT" was WRONG —
+        # suppressed price (z < 0) is actually the SHORT setup, not the block.
+        if avg_z is not None and avg_z > LONG_1H_Z_MAX:
+            continue  # elevated price blocks any new entry (LONG or SHORT)
 
-        # Confidence based on TF agreement strength
-        base_conf = 40 + strength * 15  # 2tf=70, 3tf=85, 1tf=55
-        # Boost: MTF MACD crossovers are strong indicators — give them extra weight
-        # so they can compete with Hermes signals in the max(hermes_avg, mtf_avg) scoring
-        # Raised from 1.15x to 1.35x — MACD crossovers are primary trend signals
-        conf = min(95, base_conf * 1.35)  # 2tf=94, 3tf=99, 1tf=74
+        # SHORT_BLACKLIST still applies to SHORT entries
+        if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            continue
+
+        # Confidence: base for 15m crossover trigger (always strength=3)
+        base_conf = 40 + 3 * 15  # = 85
+        # Boost: MACD crossovers are primary trend signals
+        conf = min(95, base_conf * 1.35)  # = 95 (capped)
 
         # ── MTF MACD Alignment Boost (2026-04-06) ───────────────────────────────
         # Use the full macd_rules state machine across 4H/1H/15m for ultra-confirmation.
@@ -1720,8 +1732,9 @@ def _run_mtf_macd_signals():
             if local_dir and (regime_dir is None or local_dir == regime_dir):
                 z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
                 z_tf_str = f'{max(bullish_tfs, bearish_tfs)}z{len(valid_z)}'
+                avg_z = statistics.mean(valid_z)
                 add_signal(token, local_dir, 'mtf_zscore', 'hzscore',
-                           confidence=z_conf, value=round(statistics.mean(valid_z), 3),
+                           confidence=z_conf, value=round(avg_z, 3),
                            price=price, exchange='hyperliquid', timeframe=z_tf_str,
                            z_score=avg_z, z_score_tier=z_dir,
                            rsi_14=rsi_val)
@@ -1730,57 +1743,10 @@ def _run_mtf_macd_signals():
     return added
 
 
-# ── MACD signals for confluence (legacy — kept for signal_type compat) ───────
+# ── MACD signals for confluence (LEGACY — disabled 2026-04-10, use mtf_macd) ─
 def _run_macd_signals_for_confluence():
-    """Legacy MACD histogram signal — kept for confluence compatibility."""
-    from signal_schema import compute_macd, compute_zscore
-    prices_dict = get_all_latest_prices()
-    open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
-    # SHORT_BLACKLIST is imported from hermes_constants at module level
-    added = 0
-    for token, data in prices_dict.items():
-        # Skip @XXX numeric coin IDs — not real token symbols
-        if token.startswith('@'):
-            continue
-        if price_age_minutes(token) > 10:
-            continue
-        if not data.get('price') or data['price'] <= 0:
-            continue
-        if token.upper() in open_pos:
-            continue
-        if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
-            continue
-        if is_delisted(token.upper()):
-            continue
-        macd = compute_macd(token, lookback_minutes=60*24)
-        if not macd:
-            continue
-        h = macd['histogram']
-        z = compute_zscore(token)
-        z_tier = 'suppressed' if z is not None and z < -0.5 else ('normal' if z is not None and abs(z) <= 0.5 else 'elevated') if z is not None else None
-        price = data['price']
-        if not is_reasonable_price(token, price):
-            continue
-        if abs(h) < CONFLUENCE_MACD_HIST_THRESH:
-            continue
-        direction = 'LONG' if h > 0 else 'SHORT'
-        if direction == 'LONG':
-            if z is None or z > LONG_1H_Z_MAX:
-                continue
-        else:
-            if token.upper() in SHORT_BLACKLIST:
-                continue
-        conf = min(80, 30 + abs(h) * 300)
-        has_partner = _has_confluence_partners(token, direction, exclude_type='macd_confluence')
-        if conf < ENTRY_THRESHOLD and not (abs(h) > 0.05):
-            continue
-        add_signal(token, direction, 'macd_confluence', 'macd-confluence',
-                   confidence=conf, value=h, price=price,
-                   macd_value=macd.get('macd'), macd_signal=macd.get('signal'),
-                   macd_hist=h, exchange='hyperliquid',
-                   z_score=z, z_score_tier=z_tier)
-        added += 1
-    return added
+    """DISABLED — use _run_mtf_macd_signals() instead which provides true MTF MACD."""
+    return 0  # disabled
 
 
 # ── Confluence Detection ───────────────────────────────────────────────────────

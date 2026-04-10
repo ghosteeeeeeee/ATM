@@ -1102,6 +1102,7 @@ def _run_hot_set():
                 wave_tag = f'~ neutral@{_momentum:.0f}'
 
             effective_conf = float(sig_conf) * wave_mult
+            confidence = effective_conf  # BUG FIX (2026-04-10): was never initialized; penalties now apply to this
             reason_suffix = f'+{wave_tag}'
 
             # ── COUNTER-TREND TRAP FILTER ────────────────────────────────────
@@ -1151,22 +1152,22 @@ def _run_hot_set():
                         pass  # neutral zone — let market regime handle it
                     elif _z_tier == 'rising' and direction == 'SHORT':
                         # Price at local bottom but SHORT direction — PENALIZE unless momentum is low
-                        if momentum_state not in ('bottoming', 'neutral'):
+                        if _momentum not in ('bottoming', 'neutral'):
                             confidence -= 20
                             if confidence < 55:
-                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={momentum_state})')
+                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={_momentum})')
                                 _record_hotset_failure(token, direction, failures)
                                 continue
-                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+SHORT+momentum={momentum_state} (conf now {confidence:.0f}%)')
+                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+SHORT+momentum={_momentum} (conf now {confidence:.0f}%)')
                     elif _z_tier == 'falling' and direction == 'LONG':
                         # Price at local top but LONG direction — PENALIZE unless bottoming
-                        if momentum_state != 'bottoming':
+                        if _momentum != 'bottoming':
                             confidence -= 20
                             if confidence < 55:
-                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={momentum_state})')
+                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={_momentum})')
                                 _record_hotset_failure(token, direction, failures)
                                 continue
-                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+LONG+momentum={momentum_state} (conf now {confidence:.0f}%)')
+                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+LONG+momentum={_momentum} (conf now {confidence:.0f}%)')
 
             # Signal-type specific approval logic
             if sig_type == 'confluence':
@@ -1186,13 +1187,13 @@ def _run_hot_set():
                     log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
                     _record_hotset_failure(token, direction, failures)
                     continue
-                # Use effective_conf (speed-boosted) for threshold comparison
+                # Use penalized confidence for threshold comparison (BUG FIX 2026-04-10)
                 base_threshold = 65
                 if num_src >= 3:
-                    should_approve = effective_conf >= base_threshold
+                    should_approve = confidence >= base_threshold
                     reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
                 else:
-                    should_approve = effective_conf >= base_threshold
+                    should_approve = confidence >= base_threshold
                     reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
             elif sig_src and sig_src.startswith('hmacd-'):
                 # FIX (2026-04-05): speed=0% = stale token, hard ban
@@ -1205,17 +1206,19 @@ def _run_hot_set():
                 # Apply centralized source weight from ai-decider
                 sw = _get_source_weight(sig_type, sig_src)
                 threshold = min(99, 65.0 / sw)
-                should_approve = effective_conf >= threshold
+                should_approve = confidence >= threshold  # BUG FIX: was effective_conf (penalties now apply)
                 reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]{reason_suffix}'
             else:
                 # Any other signal type (mtf_macd, mtf_zscore, percentile_rank, etc.)
-                # must also pass speed=0% ban
+                # must also pass speed=0% ban; use base 65% threshold on penalized confidence
                 spd3 = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
                 sp3 = spd3.get('speed_percentile', 50.0) if spd3 else 50.0
                 if sp3 == 0:
                     log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
                     _record_hotset_failure(token, direction, failures)
                     continue
+                should_approve = confidence >= 65  # BUG FIX: was missing entirely (inherited prev branch value)
+                reason = f'hot-other @{sig_conf:.0f}%{reason_suffix}'
 
             if should_approve:
                 # Rate limit check: only 3 new approvals per minute

@@ -130,9 +130,11 @@ SOURCE_WEIGHTS = {
 # Checked in order; first match wins. None = neutral 1.0.
 SOURCE_WEIGHT_OVERRIDES = [
     ('mtf_macd',  'hmacd-',  1.0),   # hmacd- + mtf_macd = MACD crossover (was 1.2)
-    # hzscore signals get suppressed — noisy, often fires against trend
+    # hzscore: combo-only, never solo. pct-hermes is the ONLY allowed combo (suppressed 0.4).
+    # Any other hzscore combo (e.g. hmacd-,hzscore without pct-hermes) = 0.15.
     ('mtf_zscore', 'hzscore', 0.15),
-    # All other hmacd-* sources (pct-hermes, etc.) fall through to default 0.6
+    ('mtf_zscore', 'hmacd-,hzscore', 0.15),   # hzscore without pct-hermes = suppressed
+    ('mtf_zscore', 'hzscore,pct-hermes', 0.4),  # the only allowed hzscore combo
     # Pattern signals: 1.25× multiplier — independent primary signals, need to
     # bubble up so T can observe their performance vs mtf_macd in hot-set
     ('pattern_flag',   'pattern_scanner', 1.25),
@@ -312,6 +314,8 @@ def _get_source_weight(stype, source):
             # Specific combo hmacd-,hzscore,pct-hermes is noisy — suppress hard
             if 'pct-hermes' in source and 'hzscore' in source:
                 base_weight = 0.4   # combo with pct-hermes + hzscore = very noisy
+            elif source == 'hmacd-':
+                base_weight = 0.3   # solo hmacd- = not allowed, very weak
             else:
                 base_weight = SOURCE_WEIGHTS.get('hmacd-default', 0.6)
         else:

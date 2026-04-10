@@ -22,6 +22,7 @@ os.makedirs(ARCHIVE_DIR, exist_ok=True)
 ARCHIVABLE_DECISIONS = {'SKIPPED', 'EXPIRED', 'EXECUTED', 'COMPACTED', 'WAIT'}
 CUTOFF_HOURS_APPROVED = 6    # archive APPROVED signals older than this
 CUTOFF_HOURS_OTHERS   = 6    # archive SKIPPED/EXPIRED/EXECUTED/COMPACTED/WAIT older than this
+CUTOFF_HOURS_PENDING  = 1    # archive PENDING signals older than this (stale, not worth keeping)
 
 
 def get_stats(conn):
@@ -75,11 +76,9 @@ def run_archive(conn, dry_run=True):
     total_archived = 0
     total_deleted = 0
 
-    # ── Gather rows to archive ──────────────────────────────────────────────
-    # APPROVED > CUTOFF_HOURS_APPROVED
-    # SKIPPED/EXPIRED/EXECUTED/COMPACTED > CUTOFF_HOURS_OTHERS
-    placeholders = ','.join(['?'] * len(ARCHIVABLE_DECISIONS))
+    cols = [desc[0] for desc in conn.execute('SELECT * FROM signals LIMIT 0').description]
 
+    # ── Gather rows to archive ─────────────────────────────────────────────
     to_archive = []
 
     # APPROVED older than cutoff
@@ -88,15 +87,23 @@ def run_archive(conn, dry_run=True):
         WHERE decision = 'APPROVED'
           AND created_at < datetime('now', '-{CUTOFF_HOURS_APPROVED} hours')
     ''').fetchall()
-    cols = [desc[0] for desc in conn.execute('SELECT * FROM signals LIMIT 0').description]
     to_archive.extend([dict(zip(cols, r)) for r in rows])
 
-    # ARCHIVABLE decisions older than cutoff (includes WAIT)
+    # ARCHIVABLE decisions older than cutoff (SKIPPED/EXPIRED/EXECUTED/COMPACTED/WAIT)
+    placeholders = ','.join(['?'] * len(ARCHIVABLE_DECISIONS))
     rows = conn.execute(f'''
         SELECT * FROM signals
         WHERE decision IN ({placeholders})
           AND created_at < datetime('now', '-{CUTOFF_HOURS_OTHERS} hours')
     ''', tuple(ARCHIVABLE_DECISIONS)).fetchall()
+    to_archive.extend([dict(zip(cols, r)) for r in rows])
+
+    # PENDING older than 1 hour — stale, not worth keeping (they didn't make the cut)
+    rows = conn.execute(f'''
+        SELECT * FROM signals
+        WHERE decision = 'PENDING'
+          AND created_at < datetime('now', '-{CUTOFF_HOURS_PENDING} hours')
+    ''').fetchall()
     to_archive.extend([dict(zip(cols, r)) for r in rows])
 
     if not to_archive:
@@ -114,7 +121,18 @@ def run_archive(conn, dry_run=True):
     # ── Group by year/month and archive ─────────────────────────────────────
     by_ym = {}
     for r in to_archive:
-        dt = datetime.fromisoformat(r['created_at'].replace('Z', '+00:00'))
+        created_str = r.get('created_at', '')
+        # Handle Unix timestamp stored as string (e.g. '1775779899') or bad data
+        if created_str and created_str[0].isdigit() and len(created_str) >= 10:
+            try:
+                dt = datetime.fromtimestamp(int(created_str[:10]))
+            except Exception:
+                dt = datetime.now(timezone.utc)
+        else:
+            try:
+                dt = datetime.fromisoformat(created_str.replace('Z', '+00:00'))
+            except Exception:
+                dt = datetime.now(timezone.utc)
         ym = dt.strftime('%Y-%m')
         by_ym.setdefault(ym, []).append(r)
 

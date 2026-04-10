@@ -698,8 +698,11 @@ def reconcile_hype_to_paper(hl_pos, prices):
                         log(f'  ⚠️ Orphan {coin} created in DB (trade #{trade_id}) but HL close failed', 'WARN')
                         _CLOSED_HL_COINS.discard(coin.upper())  # Remove from closed set on failure
 
-                # If we created the paper trade, mark it as copied so we don't try to mirror it again
-                if trade_id and not DRY:
+                # If we created the paper trade AND HL close succeeded, mark it as copied.
+                # BUG-FIX: Only mark as copied if close_position_hl() returned True.
+                # If HL close failed, the orphan paper trade stays "open" in the DB (correct),
+                # and Step 10's orphan detection will handle it properly on the next cycle.
+                if trade_id and not DRY and close_result:
                     copied_state = get_copied_trades()
                     copied_state['copied'].append(str(trade_id))
                     save_copied_trades(copied_state)
@@ -2393,6 +2396,25 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
                     log(f'  ❌ {coin} TP/SL batch failed: {errors or result.get("error", "unknown")}', 'FAIL')
             except Exception as e:
                 log(f'  ❌ {coin} TP/SL batch exception: {e}', 'FAIL')
+
+            # ── DB persistence: ALWAYS write ATR-computed values to DB ────────────────
+            # The DB is the source of truth for the web dashboard. Even if HL API
+            # fails (e.g. 'Main order cannot be trigger order' or 'Invalid TP/SL price'),
+            # we must persist the correct ATR SL/TP so the dashboard shows accurate values.
+            # HL can be re-synced later; the DB must always reflect the ATR formula.
+            try:
+                conn_upd = get_db_connection()
+                if conn_upd:
+                    cur_upd = conn_upd.cursor()
+                    cur_upd.execute("""
+                        UPDATE trades SET stop_loss=%s, target=%s WHERE id=%s
+                    """, (ideal_sl, ideal_tp, db_trade.get('id')))
+                    conn_upd.commit()
+                    cur_upd.close()
+                    conn_upd.close()
+                    log(f'  💾 {coin} DB ATR TP/SL persisted: SL={ideal_sl:.6f} TP={ideal_tp:.6f}')
+            except Exception as db_e:
+                log(f'  ❌ {coin} DB ATR update failed: {db_e}', 'FAIL')
 
     except Exception as e:
         log(f'reconcile_tp_sl error: {e}', 'FAIL')

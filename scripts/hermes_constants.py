@@ -43,6 +43,8 @@ SHORT_BLACKLIST = {
     # 2026-04-04: systematic SHORT losses (net<=$-2.50, phantom trades excluded)
     'ENA',     # SHORT net: -$5.41 (1 loss: conf-1s -$5.41)
     'PENGU',   # SHORT net: -$4.36 (1 loss: conf-1s -$4.36)
+    # 2026-04-10: CFX — persistent losses on SHORT, phantom order issues on HL
+    'CFX',
 }
 LONG_BLACKLIST = {
     'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
@@ -75,6 +77,8 @@ LONG_BLACKLIST = {
     'ETC',   # LONG net: -$2.95 (3 trades: brain trailing_exit -$1.49, conf-2s +$0.03, conf-4s -$1.49)
     # 2026-04-02: manual additions
     'BIO', 'TAO', 'GAS',   # blocking both directions: no trade history, high-risk profiles
+    # 2026-04-10: CFX — persistent losses, phantom order issues on HL
+    'CFX',
     # 2026-04-02: HMSTR — phantom SHORT, manually closed, catastrophic history
     'HMSTR',
     # 2026-04-04: LONG blacklist additions (net<=$-2.50, phantom trades excluded)

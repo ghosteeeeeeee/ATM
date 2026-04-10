@@ -443,7 +443,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
 
     return trade_id
 
-def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None, notes: str = None):
+def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
+                 notes: str = None, close_reason: str = None):
     """Close an existing trade. Uses Hyperliquid as ground truth for PnL (Plan B).
 
     After closing, queries HL /my_trades for realized PnL and updates:
@@ -516,8 +517,8 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None, notes:
     final_exit = hl_exit_price or exit_price
 
     # ── Write to DB ────────────────────────────────────────────────────────────
-    # close_reason: use notes if provided, else default to 'manual_close'
-    close_reason_val = notes if notes else 'manual_close'
+    # close_reason: explicit param wins, else default to 'manual_close'
+    close_reason_val = close_reason if close_reason else 'manual_close'
     cur.execute("""
         UPDATE trades SET
             exit_price    = %s,
@@ -719,6 +720,7 @@ if __name__ == "__main__":
         close_parser.add_argument("exit_price", type=float, help="Exit price")
         close_parser.add_argument("--pnl", type=float, help="Manual PnL override")
         close_parser.add_argument("--notes", help="Exit notes")
+        close_parser.add_argument("--close-reason", help="Close reason tag (e.g. profit-monster)")
         
         list_parser = subparsers.add_parser("list", help="List trades")
         list_parser.add_argument("--status", choices=["open", "closed"], help="Filter by status")
@@ -756,7 +758,7 @@ if __name__ == "__main__":
             print(f"  Exchange: {args.exchange} | Server: {args.server} | Paper: {not args.real} | Signal: {args.signal or 'N/A'} | Lev: {args.leverage}x")
         
         elif args.subcommand == "close":
-            close_trade(args.id, args.exit_price, args.pnl, args.notes)
+            close_trade(args.id, args.exit_price, args.pnl, args.notes, args.close_reason)
             print(f"✓ Closed trade #{args.id} @ ${args.exit_price}")
         
         elif args.subcommand == "list":

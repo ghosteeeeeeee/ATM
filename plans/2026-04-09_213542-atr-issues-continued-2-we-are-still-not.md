@@ -1,109 +1,128 @@
-# ATR Issues Continued #2 — Plan
-**Date:** 2026-04-09 21:35 UTC
-**Status:** PLANNING ONLY — no execution
-
----
+# ATR Issues — Disable HL Close Orders, Beef Up Internal ATR Tracking
 
 ## Goal
 
-Disable the broken HL close-order functionality (which cannot place meaningful limit/market closes on HL) and harden the internal ATR TP/SL tracking system so that Hermes closes positions internally when ATR-based SL/TP triggers fire, without relying on HL orders.
+Disable the broken HL close-order placement (`_execute_atr_bulk_updates`) and make the internal ATR TP/SL hit detection + self-close pipeline bulletproof. The system already has all the pieces — this is hardening and bug fixing.
 
 ---
 
-## Current Context
+## Current State
 
-### What's broken
-The system cannot reliably place CLOSE orders on Hyperliquid in a meaningful way. `mirror_close()` works (market close) but limit close orders and the `_execute_atr_bulk_updates()` SL/TP update path have issues. The `close_position` → `mirror_close` path uses market orders only — no limit close.
+### What's Already Disabled (Good)
+- `ATR_HL_ORDERS_ENABLED = False` at line 73 of `position_manager.py`
+- `_execute_atr_bulk_updates()` exists but is never called — kill switch is off
 
-### What already works
-- **`_collect_atr_updates()`** in `position_manager.py` (lines 1182–1320): Computes ATR-based SL/TP for all open positions, deduplicates tokens, fetches fresh ATR per cycle, applies trailing-only-tighten logic
-- **`_execute_atr_bulk_updates()`** in `position_manager.py` (lines 1323–1441): Pushes updated SL/TP to HL via cancel + re-place (for existing position management)
-- **`should_cut_loser()`** in `position_manager.py` (lines 311–351): Checks live price vs SL price in DB
-- **`check_stale_position()`** in `position_manager.py` (lines 354–432): Speed-based stale detection
-- **`_pm_get_atr()`** / **`_force_fresh_atr()`** in `position_manager.py` (lines 1013–1179): ATR fetching from HL 15m candles
-- **`check_cascade_flip()`**: Cascade flip detection
-
-### What needs to be made bulletproof
-1. **ATR TP/SL hit detection** — every pipeline cycle, check if current price has crossed the DB SL or TP level for any open position
-2. **Internal close execution** — when ATR SL or TP is hit, call `close_paper_position()` to close internally (DB) + mirror to HL via `mirror_close()` (market)
-3. **Stop relying on HL SL/TP trigger orders** — the HL trigger orders are unreliable as the execution path; Hermes should self-close based on its own ATR levels and treat HL mirror as best-effort
-4. **Stale order cleanup** — cancel stale HL SL/TP orders for positions that were already closed internally
-
----
-
-## Proposed Approach
-
-### Phase 1: Audit and disable HL SL/TP order placement for closes
-
-**Files:** `position_manager.py`, `hyperliquid_exchange.py`
-
-- Find any code path that calls `_execute_atr_bulk_updates()` and deprecates/flags it as non-functional for close triggers
-- Add a kill-switch flag (e.g., `ATR_HL_ORDERS_ENABLED = False`) to disable pushing SL/TP orders to HL
-- The `cancel_bulk_orders` and `place_bulk_orders` paths remain usable for other purposes but the ATR close-order path is disabled
-
-### Phase 2: Implement internal ATR TP/SL hit detection
-
-**File:** `position_manager.py` — new function `check_atr_tp_sl_hits()`
-
-```python
-def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
-    """
-    Check every open position for ATR TP/SL hit.
-    Returns list of positions where:
-      - LONG: current_price <= stop_loss  → SL hit
-      - LONG: current_price >= target     → TP hit
-      - SHORT: current_price >= stop_loss → SL hit
-      - SHORT: current_price <= target    → TP hit
-    
-    Reads current_price from the position dict (refreshed by refresh_current_prices()).
-    """
+### The Working Internal Pipeline (Keep Intact)
+```
+check_and_manage_positions()  [line 1827]
+  ├── _collect_atr_updates()   [line 1278] — compute fresh ATR SL/TP per position
+  ├── _persist_atr_levels()   [line 1422] — write to brain DB
+  ├── check_atr_tp_sl_hits()  [line  360] — detect if price crossed DB levels
+  └── close_paper_position()   [line  841] — close DB + mirror_close() to HL
 ```
 
-Called in the main position loop before any other close logic.
+### The Broken Part
+`mirror_close()` (the market-close path in `close_paper_position`) is unreliable for the close-order use case — orders won't fill at meaningful prices, creating gap risk and poor fills.
 
-### Phase 3: Wire ATR hit detection into close pipeline
-
-**File:** `position_manager.py` — integrate `check_atr_tp_sl_hits()` into `check_and_manage_positions()`
-
-In the main per-position loop (around line 600–800 where `should_cut_loser` is called):
-1. First, check ATR TP/SL hits via `check_atr_tp_sl_hits()`
-2. If hit → call `close_paper_position()` with reason `atr_sl_hit` or `atr_tp_hit`
-3. Continue with existing stale/cut-loser checks as fallback
-
-### Phase 4: Harden the ATR computation pipeline
-
-1. **`_force_fresh_atr()`**: Ensure it handles:
-   - HL API rate limit errors gracefully (don't crash the pipeline)
-   - Tokens with no candle data (return None, skip the position)
-   - Add logging so failures are visible in pipeline output
-
-2. **`_collect_atr_updates()`**: 
-   - Ensure the 0.3% delta threshold (`ATR_UPDATE_THRESHOLD_PCT`) is correct
-   - Skip cascade-flip positions (already done — verify)
-   - Ensure trailing logic (only tighten, never loosen) is working
-
-3. **`refresh_current_prices()`**: Verify current prices are being refreshed every cycle for all open positions. This is the reference price for ATR hit detection.
-
-### Phase 5: Cleanup stale HL orders for closed positions
-
-When `close_paper_position()` is called for an ATR hit:
-1. After internal close, attempt to cancel any HL SL/TP orders for that token via `cancel_all_open_orders(token)` — best-effort, don't block if it fails
-2. This prevents orphaned HL trigger orders from firing after the position is already closed
+### What We Want Instead
+Internal ATR hit detection drives ALL exits. HL gets a market close via `mirror_close()` as a simple market order — no trigger orders.
 
 ---
 
 ## Step-by-Step Plan
 
-| Step | Action | Files | Notes |
-|------|--------|-------|-------|
-| 1 | Add kill switch `ATR_HL_ORDERS_ENABLED = False` | `position_manager.py` | Disables `_execute_atr_bulk_updates()` call path |
-| 2 | Add `check_atr_tp_sl_hits()` function | `position_manager.py` | Internal ATR TP/SL hit detection |
-| 3 | Wire `check_atr_tp_sl_hits()` into `check_and_manage_positions()` loop | `position_manager.py` | Before stale/cut-loser checks |
-| 4 | Add best-effort HL order cleanup after ATR hit close | `position_manager.py` | `cancel_all_open_orders()` in `close_paper_position()` |
-| 5 | Harden `_force_fresh_atr()` error handling | `position_manager.py` | Add try/except with logging |
-| 6 | Add `atr_sl_hit` / `atr_tp_hit` to `close_reasons` tracking | `position_manager.py` | New close reasons for analytics |
-| 7 | Update `trading.md` with new architecture | `brain/trading.md` | Document the ATR self-close system |
-| 8 | Test: dry-run `check_atr_tp_sl_hits()` on current positions | `position_manager.py` | Verify hit detection logic |
+### Step 1: Disable HL ATR Order Push Completely
+**File:** `/root/.hermes/scripts/position_manager.py`
+
+Two things are already done, but verify and document:
+
+1. Line 73: Confirm `ATR_HL_ORDERS_ENABLED = False`
+2. Lines 1862-1863: The `_execute_atr_bulk_updates()` call is guarded by the flag — no code change needed, just confirm
+3. Add a kill-switch comment explaining why it's disabled
+
+```python
+# KILL SWITCH: HL trigger-order placement for ATR SL/TP is DISABLED.
+# The internal ATR pipeline (_collect_atr_updates → _persist_atr_levels →
+# check_atr_tp_sl_hits → close_paper_position) handles ATR exits via market mirror.
+# _execute_atr_bulk_updates() is broken for close-order use cases.
+```
+
+### Step 2: Audit `_collect_atr_updates()` — ATR Threshold Bug
+**File:** `/root/.hermes/scripts/position_manager.py` (lines 1278–1419)
+
+**Bug:** Delta threshold check (line 1395-1400) only fires when `needs_sl/needs_tp` is True from the trailing logic. But the trailing logic can set `needs_sl=True` even when the delta is tiny (because it already passed the `new_sl > current_sl` check for LONG). The real threshold logic is correct but the logging at line 1367 shows what was *computed*, not whether it actually passed the threshold. 
+
+**Fix:** Make the debug print show `needs_sl/needs_tp` and whether it passed the delta threshold, so we can monitor this in production.
+
+### Step 3: Audit `check_atr_tp_sl_hits()` — The Core Hit Detector
+**File:** `/root/.hermes/scripts/position_manager.py` (lines 360–428)
+
+**Problem 1:** Requires **both** SL and TP to be set in DB to fire (`if not sl or not tp: continue` at line 402). If a position has only SL or only TP, it will never be closed on ATR hit.
+
+**Fix:** Make SL-only or TP-only positions still eligible for hit detection. Only require the relevant level:
+- For `atr_sl_hit`: require SL only
+- For `atr_tp_hit`: require TP only
+
+**Problem 2:** Uses `stop_loss` and `target` from the `pos` dict passed in — which comes from `refresh_current_prices()`. If the refresh doesn't have the DB-written ATR values (race condition or stale cache), hits won't detect.
+
+**Fix:** `check_atr_tp_sl_hits()` should read directly from the DB, not trust the `pos` dict's SL/TP. Add a direct DB lookup for each trade_id.
+
+### Step 4: Add Direct DB Read in `check_atr_tp_sl_hits()`
+**File:** `/root/.hermes/scripts/position_manager.py`
+
+Refactor `check_atr_tp_sl_hits()` to optionally accept a `db_conn` and read the current SL/TP directly from DB for each trade, bypassing any stale in-memory values:
+
+```python
+def check_atr_tp_sl_hits(open_positions: List[Dict], db_conn=None) -> List[Dict]:
+    # ... existing logic ...
+    # After fetching row from pos dict, overwrite sl/tp with live DB values
+    if db_conn:
+        cur.execute("SELECT stop_loss, target FROM trades WHERE id = %s AND status = 'open'",
+                    (trade_id,))
+        db_row = cur.fetchone()
+        if db_row:
+            sl = float(db_row['stop_loss']) if db_row['stop_loss'] else sl
+            tp = float(db_row['target']) if db_row['target'] else tp
+```
+
+### Step 5: Harden `close_paper_position()` ATR Cleanup
+**File:** `/root/.hermes/scripts/position_manager.py` (lines 967–977)
+
+The ATR cleanup calls `cancel_all_open_orders(hype_token)` which cancels ALL open orders for that token. This is overly broad — it could cancel SL/TP orders for OTHER open positions on the same token.
+
+**Fix:** Only cancel the specific stale orders for this trade_id. The `_execute_atr_bulk_updates()` logic that matches by trigger price proximity is correct — steal that logic for the cleanup path.
+
+```python
+# Cancel only the specific SL/TP orders for this position
+# Match by token + trigger price matching old SL/TP ± tolerance
+```
+
+### Step 6: Ensure `mirror_close()` Is the Only HL Interaction
+**File:** `/root/.hermes/scripts/position_manager.py`
+
+`close_paper_position()` already calls `mirror_close()` for HL market close (line 980). This is the correct behavior — a simple market order that will fill at market price. This should stay.
+
+Confirm that `mirror_close()` handles both LONG (sell to close) and SHORT (buy to close) correctly and verify the `hype_coin()` mapping is correct for all tokens in the current portfolio.
+
+### Step 7: Add Health Monitoring / Logging
+**Files:** `position_manager.py`, `trading.md`
+
+Add structured logging so we can detect if the pipeline is silently failing:
+
+```
+[ATR] IMX LONG: computed SL=0.1449 TP=0.1492 — passed threshold, written to DB
+[ATR] IMX LONG: hit detection — price=0.1435 <= SL=0.1449 → CLOSING
+[Position Manager] Closed trade 123 (atr_sl_hit)
+[ATR CLEANUP] Cancelled 1 stale order for IMX
+[Position Manager] HYPE mirror_close SUCCESS: IMX
+```
+
+All of these already exist at various points — confirm they're all firing correctly.
+
+### Step 8: End-to-End Test
+**Script:** `/root/.hermes/scripts/atr_dry_run.py`
+
+Run the dry-run to verify `_collect_atr_updates()` works for all open positions, then simulate hit detection by patching a price slightly below SL for one position and confirming the hit fires.
 
 ---
 
@@ -111,31 +130,30 @@ When `close_paper_position()` is called for an ATR hit:
 
 | File | Change |
 |------|--------|
-| `/root/.hermes/scripts/position_manager.py` | Core changes: kill switch, new `check_atr_tp_sl_hits()`, wiring, HL cleanup |
-| `/root/.hermes/brain/trading.md` | Document new ATR close architecture |
+| `/root/.hermes/scripts/position_manager.py` | Steps 1, 2, 3, 4, 5, 6, 7 |
+| `/root/.hermes/brain/trading.md` | Step 7 monitoring |
 
 ---
 
 ## Tests / Validation
 
-1. **Dry-run test**: Run `check_atr_tp_sl_hits()` against current open positions — should return empty list (no hits) or report any positions that are suspiciously close to SL/TP
-2. **Simulate a hit**: Manually set a position's `current_price` to trigger SL or TP and verify it would be returned by `check_atr_tp_sl_hits()`
-3. **Pipeline integration check**: Confirm `check_atr_tp_sl_hits()` is called every pipeline cycle in `check_and_manage_positions()`
-4. **No HL orders placed**: With kill switch off, `_execute_atr_bulk_updates()` should not be called from the main loop
+1. **Unit test:** Patch a position's `current_price` below its SL in the DB, call `check_atr_tp_sl_hits()`, verify it returns the hit
+2. **Unit test:** Patch a position with only SL (no TP), verify SL hit still fires  
+3. **Dry run:** Run `python3 atr_dry_run.py` — should output per-position ATR levels for all 10 open positions
+4. **Manual inspection:** Check the Streamlit dashboard (`/signals`) to confirm position SL/TP values match what's in the DB
 
 ---
 
-## Risks / Tradeoffs
+## Risks & Tradeoffs
 
-- **Risk**: If `current_price` in DB is stale, ATR hit detection may fire incorrectly or miss actual hits. Mitigation: `refresh_current_prices()` must run every cycle (it does — called in `check_and_manage_positions()`)
-- **Risk**: Closing via `mirror_close()` (market order) may not be the same as a limit close. Mitigation: market close is actually what we want for TP hits (we want out now). For SL hits, market close is acceptable as it's a worst-case protection.
-- **Tradeoff**: Disabling HL SL/TP orders means we lose the "free" HL-side SL/TP protection. If Hermes crashes or the pipeline stops, positions won't auto-close on HL until the next run. Mitigation: `hl-sync-guardian.py` still runs every 60s and can reconcile.
-- **Open Question**: Should we try to keep the `_execute_atr_bulk_updates()` path alive but only for TP/SL *updating* (not for close triggers)? If yes, keep the function but disable its close-order behavior and only use it for trail-tightening. The task says "disable that functionality" — confirm this means fully disable or just disable the close-order use.
+- **Risk:** Changing `check_atr_tp_sl_hits()` to read from DB directly could slow down the pipeline (one extra DB query per position per cycle). **Mitigation:** Read all at once with a `WHERE id IN (...)` query.
+- **Tradeoff:** The ATR cleanup (Step 5) currently cancels ALL orders for a token. Fixing it to cancel only the specific orders reduces blast radius but is more complex. **Mitigation:** Use the existing trigger-price-matching logic from `_execute_atr_bulk_updates()`.
+- **Open Question:** Does `mirror_close()` reliably fill on HL for both LONG and SHORT? Need to verify with T.
 
 ---
 
-## Open Questions
+## Open Questions for T
 
-1. **Confirm scope of "disable"**: Does "disable that functionality" mean fully remove the HL close-order code path, or just stop calling it for ATR hits? (Currently reading as fully disable.)
-2. **HL mirror as best-effort**: With internal ATR hit detection, `mirror_close()` to HL is still called — but it's a market close, not a limit. Is that acceptable for TP/SL hits?
-3. **Existing open HL SL/TP orders**: There may be existing SL/TP trigger orders on HL from previous runs. Should a cleanup run be done on startup to cancel all existing HL SL/TP orders for tokens with open positions?
+1. Is `mirror_close()` working reliably for both LONG and SHORT? The market close should fill at market — is it?
+2. Are there specific tokens where the ATR levels feel wrong (SL too tight or too loose)?
+3. Should we also disable `ATR_HL_ORDERS_ENABLED` entirely in the config, or just leave the `= False` default?

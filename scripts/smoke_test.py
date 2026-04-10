@@ -14,10 +14,13 @@ Usage:
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
+import sqlite3
 
 HERMES_DIR = Path("/root/.hermes")
 SCRIPTS_DIR = HERMES_DIR / "scripts"
@@ -48,6 +51,7 @@ SCRIPT_CHECK_MAP = {
     "prices.json":                ["price_data_fresh"],
     "hype_live_trading.json":     ["live_mode"],
     "_secrets.py":               ["postgres_trades"],
+    "profit_monster.py":          ["profit_monster_fires", "postgres_trades"],
 }
 
 CRITICAL_CHECKS = ["pipeline_errors", "pipeline_not_stuck", "price_data_fresh", "signal_db", "stale_locks"]
@@ -264,30 +268,30 @@ def check_hotset_exists():
 def check_signal_db():
     """Check signals via SQLite (primary) or PostgreSQL (fallback)."""
     import sqlite3
-    signals_db = SCRIPTS_DIR / "signals_hermes_runtime.db"
+    signals_db = Path("/root/.hermes/data/signals_hermes_runtime.db")
 
     # Primary: check SQLite file
     if signals_db.exists():
-        if signals_db.stat().st_size == 0:
-            pass  # fall through to PG check
-        else:
-            try:
-                conn = sqlite3.connect(str(signals_db), timeout=5)
-                cur = conn.execute("SELECT COUNT(*) FROM signals")
-                count = cur.fetchone()[0]
-                conn.close()
-                return True, f"signals DB OK ({count} rows)"
-            except Exception:
-                pass  # fall through to PG
+        try:
+            conn = sqlite3.connect(str(signals_db))
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM signals")
+            count = cur.fetchone()[0]
+            conn.close()
+            return True, f"signals SQLite OK ({count} rows)"
+        except Exception:
+            pass  # fall through to PG
 
-    # Fallback: check PostgreSQL
+    # Fallback: check PostgreSQL (Unix socket)
     try:
         import psycopg2
+        from _secrets import BRAIN_HOST, BRAIN_PASSWORD
         conn = psycopg2.connect(
-            host="localhost", dbname="brain", user="postgres",
-            password="brain123", connect_timeout=5
+            host=BRAIN_HOST, dbname="brain", user="postgres",
+            password=BRAIN_PASSWORD, connect_timeout=5
         )
-        cur = conn.execute("SELECT COUNT(*) FROM signals")
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM signals")
         count = cur.fetchone()[0]
         conn.close()
         return True, f"signals PG OK ({count} rows)"
@@ -296,15 +300,18 @@ def check_signal_db():
 
 
 def check_brain_db():
-    if not BRAIN_DB.exists():
+    # Local var to avoid UnboundLocalError
+    brain_db = BRAIN_DB
+    if not brain_db.exists():
         alt = HERMES_DIR / "brain.db"
         if alt.exists():
-            BRAIN_DB = alt
-        if not BRAIN_DB.exists():
+            brain_db = alt
+        if not brain_db.exists():
             return False, "brain.db not found"
     try:
-        conn = sqlite3.connect(str(BRAIN_DB))
-        cur = conn.execute("SELECT COUNT(*) FROM nodes")
+        conn = sqlite3.connect(str(brain_db))
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM concept_nodes")
         count = cur.fetchone()[0]
         conn.close()
         return True, f"brain OK ({count} nodes)"
@@ -315,11 +322,13 @@ def check_brain_db():
 def check_postgres_trades():
     try:
         import psycopg2
+        from _secrets import BRAIN_HOST, BRAIN_PASSWORD
         conn = psycopg2.connect(
-            host="localhost", dbname="brain", user="postgres",
-            password="brain123", connect_timeout=5
+            host=BRAIN_HOST, dbname="brain", user="postgres",
+            password=BRAIN_PASSWORD, connect_timeout=5
         )
-        cur = conn.execute("SELECT COUNT(*) FROM trades")
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM trades")
         count = cur.fetchone()[0]
         conn.close()
         return True, f"trades OK ({count})"
@@ -343,9 +352,10 @@ def check_hebbian_network():
     try:
         from hebbian_engine import HebbianEngine
         h = HebbianEngine()
-        stats = h.stats()
-        if stats.get("node_count", 0) > 0:
-            return True, f"hebbian OK ({stats['node_count']} nodes)"
+        stats = h.get_stats()
+        node_count = stats.get("nodes", stats.get("node_count", 0))
+        if node_count > 0:
+            return True, f"hebbian OK ({node_count} nodes)"
         return False, "hebbian empty"
     except Exception as e:
         return False, f"hebbian error: {e}"
@@ -365,19 +375,42 @@ def check_no_flapping():
         return True, "flapping check unknown"
 
 
+def check_profit_monster_fires():
+    """Verify profit-monster log was written to recently."""
+    log = Path("/root/.hermes/logs/profit_monster.log")
+    if not log.exists():
+        return False, "profit_monster.log not found"
+    try:
+        lines = log.read_text().splitlines()
+        if not lines:
+            return False, "profit_monster.log empty"
+        last_line = lines[-1]
+        m = re.search(r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]', last_line)
+        if not m:
+            return False, f"cannot parse log timestamp: {last_line[:50]}"
+        last_ts = datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S")
+        age_sec = (datetime.now() - last_ts).total_seconds()
+        if age_sec > 1800:  # 30 min
+            return False, f"profit-monster silent ({age_sec/60:.0f}min)"
+        return True, f"profit-monster alive ({age_sec:.0f}s ago)"
+    except Exception as e:
+        return False, f"profit-monster check error: {e}"
+
+
 # Map name -> (checker_fn, is_critical)
 CHECKS = {
-    "pipeline_errors":    (check_pipeline_log_errors, True),
-    "pipeline_not_stuck":  (check_pipeline_not_stuck, True),
-    "price_data_fresh":   (check_price_data_fresh, True),
-    "signal_db":          (check_signal_db, True),
-    "brain_db":           (check_brain_db, False),
-    "postgres_trades":    (check_postgres_trades, True),
-    "hotset_exists":      (check_hotset_exists, True),
-    "live_mode":          (check_live_mode, False),
-    "hebbian_network":    (check_hebbian_network, False),
-    "no_flapping":        (check_no_flapping, False),
-    "stale_locks":        (check_stale_locks, True),
+    "pipeline_errors":        (check_pipeline_log_errors, True),
+    "pipeline_not_stuck":     (check_pipeline_not_stuck, True),
+    "price_data_fresh":      (check_price_data_fresh, True),
+    "signal_db":             (check_signal_db, True),
+    "brain_db":              (check_brain_db, False),
+    "postgres_trades":       (check_postgres_trades, True),
+    "hotset_exists":         (check_hotset_exists, True),
+    "live_mode":             (check_live_mode, False),
+    "hebbian_network":       (check_hebbian_network, False),
+    "no_flapping":           (check_no_flapping, False),
+    "stale_locks":           (check_stale_locks, True),
+    "profit_monster_fires":  (check_profit_monster_fires, False),
 }
 
 
