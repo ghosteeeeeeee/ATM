@@ -231,7 +231,14 @@ def patch_context_file(quick_status, critical_flags, timestamp):
     try:
         with open(CONTEXT_FILE, 'w') as f:
             f.write(new_content3)
-        log(f"CONTEXT.md patched successfully")
+        # Save post-write hash so agents can verify at session start
+        import hashlib
+        with open(CONTEXT_FILE) as f:
+            file_hash = hashlib.md5(f.read().encode()).hexdigest()
+        hash_file = '/root/.hermes/data/CONTEXT_MD_HASH.txt'
+        with open(hash_file, 'w') as f:
+            f.write(file_hash)
+        log(f"CONTEXT.md patched successfully, hash={file_hash}")
         return True
     finally:
         release_lock(fd)

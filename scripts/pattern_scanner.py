@@ -14,6 +14,7 @@ Data flow:
 """
 
 import sys, os, time, json
+from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (
     get_ohlcv_1m,
@@ -689,7 +690,7 @@ def detect_descending_triangle(candles: list) -> dict | None:
 
 def write_pattern_signal(token: str, pattern: dict) -> bool:
     """Write a pattern signal to the signals DB."""
-    now = int(time.time())
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # ISO format — matches SQLite datetime() comparisons in expiry
     try:
         conn = _get_conn(RUNTIME_DB)
         c = conn.cursor()

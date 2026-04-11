@@ -2322,8 +2322,8 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
             # Import the function from decider-run's scope (both use same constants)
             from decider_run import _compute_dynamic_sl
 
-            # Use sl_pct_fallback=0.015 (1.5%) as baseline if ATR unavailable
-            sl_pct_fallback = 0.015
+            # Use sl_pct_fallback=0.010 (1.0%) as baseline if ATR unavailable
+            sl_pct_fallback = 0.010
             try:
                 # BUG-FIX: pass current_price as 4th arg (was entry_px)
                 ideal_sl = _compute_dynamic_sl(tok, direction.upper(), entry_px, current_price, sl_pct_fallback)
@@ -2337,7 +2337,7 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
 
             # ── Compute ideal TP using ATR (same logic as _compute_dynamic_tp) ──
             from decider_run import _compute_dynamic_tp
-            tp_pct_fallback = 0.05
+            tp_pct_fallback = 0.015
             try:
                 # BUG-FIX: pass current_price as 4th arg (was entry_px)
                 ideal_tp = _compute_dynamic_tp(tok, direction.upper(), entry_px, current_price, tp_pct_fallback)

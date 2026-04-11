@@ -118,22 +118,22 @@ from hyperliquid_exchange import is_delisted
 # ─── Source confidence weights ────────────────────────────────────────────────
 # Single config for all signal source multipliers applied to raw confidence.
 # > 1.0 = boost (trust more), < 1.0 = suppress (trust less).
-# mtf_macd with hmacd- source = MACD crossovers = clearest trend signals = 1.0 (neutral).
+# mtf_macd with hmacd- source = MACD crossovers = clearest trend signals = 1.5 (boosted).
 # Dialed back from 1.2 — was dominating compaction and pushing other signal types out.
 # Other hmacd-* sources = weaker/secondary = 0.6x (penalize, don't trust alone).
 # All others = 1.0 (neutral).
 SOURCE_WEIGHTS = {
-    'hmacd-mtf_macd': 1.0,   # MACD crossovers — neutral weight (was 1.2)
+    'hmacd-mtf_macd': 1.5,   # MACD crossovers — boosted to 1.5
     'hmacd-default': 0.6,   # Other hmacd-derived signals — penalize
 }
 # Master map: (signal_type, source_prefix) -> weight
 # Checked in order; first match wins. None = neutral 1.0.
 SOURCE_WEIGHT_OVERRIDES = [
-    ('mtf_macd',  'hmacd-',  1.0),   # hmacd- + mtf_macd = MACD crossover (was 1.2)
+    ('mtf_macd',  'hmacd-',  1.5),   # hmacd- + mtf_macd = MACD crossover (boosted to 1.5)
     # hzscore: combo-only, never solo. pct-hermes is the ONLY allowed combo (suppressed 0.4).
     # Any other hzscore combo (e.g. hmacd-,hzscore without pct-hermes) = 0.15.
     ('mtf_zscore', 'hzscore', 0.15),
-    ('mtf_zscore', 'hmacd-,hzscore', 0.15),   # hzscore without pct-hermes = suppressed
+    ('mtf_zscore', 'hmacd-,hzscore', 1.25),   # hzscore without pct-hermes = boosted
     ('mtf_zscore', 'hzscore,pct-hermes', 0.4),  # the only allowed hzscore combo
     # Pattern signals: 1.25× multiplier — independent primary signals, need to
     # bubble up so T can observe their performance vs mtf_macd in hot-set
@@ -142,6 +142,8 @@ SOURCE_WEIGHT_OVERRIDES = [
     ('pattern_wyckoff','pattern_scanner', 1.25),
     ('pattern_elliot', 'pattern_scanner', 1.25),
     ('pattern_micro_flag', 'pattern_scanner', 1.0),   # micro flags get 1.0× — lower weight until proven
+    # RSI confluence: oversold/overbought RSI confirming momentum — boosted to 1.5
+    ('rsi-confluence', 'rsi_confluence', 1.5),
 ]
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -185,6 +187,17 @@ SIGNAL_TYPE_CATEGORY_MAP = {
     # Reconciliation
     'hl_reconcile':   'hl_reconcile',
 }
+
+# ── Signal Type Whitelist ──────────────────────────────────────────────────────
+# When set to a list (e.g. ['mtf_macd']), ONLY these signal types pass through.
+# When None, all signal types pass through.
+# Use this to isolate individual signal sources during backtesting/vetting.
+#
+# Examples:
+#   SIGNAL_TYPE_WHITELIST = ['mtf_macd']          → only mtf_macd signals
+#   SIGNAL_TYPE_WHITELIST = ['mtf_zscore']        → only zscore signals
+#   SIGNAL_TYPE_WHITELIST = None                  → all signals (default)
+SIGNAL_TYPE_WHITELIST = None
 
 # Category-level WR thresholds → multiplier
 def _wr_to_multiplier(wr: float) -> float:
@@ -425,13 +438,11 @@ def _load_hot_rounds():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # FIX (2026-04-02): Also include tokens with rc>=1 EXPIRED signals.
-        # When positions are full, strong signals get SKIPPED→EXPIRED.
-        # rc=1 EXPIRED = reviewed once by AI, then expired (never reached rc=2).
-        # IMPORTANT: We only include EXPIRED with rc>=1, not rc=0 — rc=0 EXPIRED
-        # signals were NEVER reviewed by AI (just aged out of signal_gen), and
-        # including them floods the hot set with tokens that never passed AI review.
-        # review_count>=1 proves: "AI already looked at this token."
+        # FIX (2026-04-10): Drop 3-hour created_at filter for signals with review_count>=1.
+        # These signals have ALREADY been reviewed by AI and proven worthy of the hot-set.
+        # Only apply the 3-hour filter to signals with review_count=0 (never seen by AI).
+        # Bug: The 3-hour window expired 354 WAIT signals (10-27h old) that had review_count>=1,
+        # while 58 recent signals with review_count=0 couldn't enter because AI hadn't seen them yet.
         c.execute("""
             SELECT token, direction, MAX(review_count) as rounds,
                    GROUP_CONCAT(DISTINCT signal_type) as types, source
@@ -439,7 +450,10 @@ def _load_hot_rounds():
             WHERE (decision IN ('PENDING', 'APPROVED', 'WAIT')
                    OR (decision = 'EXPIRED' AND review_count >= 1))
               AND review_count >= 1
-              AND created_at > datetime('now', '-3 hours')
+              AND (
+                  created_at > datetime('now', '-3 hours')  -- new signals: must be <3h old
+                  OR review_count >= 1                      -- AI-reviewed signals: no age limit
+              )
               AND (token, direction) NOT IN (
                   SELECT token, direction FROM signals
                   WHERE decision = 'APPROVED' AND executed = 0
@@ -1086,11 +1100,19 @@ def _do_compaction_llm():
     
     conn = sqlite3.connect(SIGNALS_DB)
     c = conn.cursor()
-    
+
     # STEP 1: Query signals from last 30 mins (wider window to catch signals
     # generated in the 10-min steps, since signal_gen only fires 2x/hour)
     # Include PENDING/APPROVED signals that haven't been executed yet.
-    c.execute("""
+    # Whitelist filter: if SIGNAL_TYPE_WHITELIST is set, only pass those signal types.
+    _whitelist_sql = ""
+    _whitelist_params = []
+    if SIGNAL_TYPE_WHITELIST:
+        _placeholders = ','.join('?' * len(SIGNAL_TYPE_WHITELIST))
+        _whitelist_sql = f" AND signal_type IN ({_placeholders})"
+        _whitelist_params = list(SIGNAL_TYPE_WHITELIST)
+
+    c.execute(f"""
         SELECT token, direction, signal_type, confidence, source, created_at,
                compact_rounds, survival_score, z_score_tier, z_score
         FROM signals
@@ -1098,16 +1120,20 @@ def _do_compaction_llm():
           AND executed = 0
           AND created_at > datetime('now', '-30 minutes')
           AND token NOT LIKE '@%'
+          {_whitelist_sql}
         ORDER BY confidence DESC
         LIMIT 100
-    """)
+    """, _whitelist_params)
     signals = c.fetchall()
     
     if not signals:
         conn.close()
         print("  [LLM-compaction] No signals in last 30 mins — skipping")
         return
-    
+
+    # Debug: log signal types in the whitelist-filtered set
+    _signal_types_seen = set(row[2] for row in signals)
+    print(f"  [LLM-compaction] whitelist={SIGNAL_TYPE_WHITELIST}, signal_types={_signal_types_seen}, count={len(signals)}")
     print(f"  [LLM-compaction] Ranking {len(signals)} signals with MiniMax-M2...")
     
     # Load current hot-set for HOT SURVIVORS context

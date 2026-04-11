@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes Context Compactor — patch CONTEXT.md Quick Status
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/context-compactor.py
+WorkingDirectory=/root/.hermes/scripts
+StandardOutput=journal
+StandardError=journal

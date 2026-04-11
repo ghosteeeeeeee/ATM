@@ -432,4 +432,17 @@
 
 ---
 
+## 2026-04-10 | Cascade-flip kill switch confirmed + context-compactor migrated to systemd
+
+**Decisions:**
+1. CASCADE_FLIP_ENABLED=False in position_manager.py (line 78) — kill switch already active. Cascade-flip DISABLED pending revisit.
+2. context-compactor migrated: cron → hermes-context-compactor.timer (systemd). Removed from jobs.json.
+3. CONTEXT.md hash enforcement wired: context-compactor.py now writes post-write MD5 → /root/.hermes/data/CONTEXT_MD_HASH.txt. Memory stores current hash. Agent checks at SESSION START — mismatch triggers full re-read.
+
+**Context:** T noted agent was looping on old tasks (cascade-flip already fixed). CONTEXT.md was stale (Apr 8). Root cause: session-start anchor in SOUL.md was not enforced.
+
+**Owner:** Agent
+
+---
+
 *Format: `## YYYY-MM-DD | Short title` — append new decisions to the top, above this line.*

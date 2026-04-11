@@ -1153,24 +1153,25 @@ def _pm_get_atr(token: str, period: int = 14, interval: str = '15m') -> float | 
 
 
 def _pm_atr_multiplier(atr_pct: float) -> float:
+    """Canonical k multiplier — must match decider_run._atr_multiplier."""
     if atr_pct < 0.01:
-        return 1.5
+        return 1.0   # LOW_VOLATILITY: tight SL for stable tokens
     elif atr_pct > 0.03:
-        return 2.5
+        return 2.5   # HIGH_VOLATILITY: wide SL for volatile tokens
     else:
-        return 2.0
+        return 2.0   # NORMAL_VOLATILITY: balanced
 
 
 # ─── ATR-Adaptive TP/SL (batch — replaces deprecated trailing stop) ────────────
 
 def _atr_multiplier(atr_pct: float) -> float:
-    """Return k multiplier for ATR-based SL/TP. Self-calibrating by volatility."""
+    """Canonical k multiplier — must match decider_run._atr_multiplier."""
     if atr_pct < 0.01:
-        return 1.5    # LOW_VOLATILITY
+        return 1.0   # LOW_VOLATILITY: tight SL for stable tokens
     elif atr_pct > 0.03:
-        return 2.5    # HIGH_VOLATILITY
+        return 2.5   # HIGH_VOLATILITY: wide SL for volatile tokens
     else:
-        return 2.0    # NORMAL_VOLATILITY
+        return 2.0   # NORMAL_VOLATILITY: balanced
 
 
 def _dr_atr(token: str, atr_pct: float) -> float:
@@ -1589,7 +1590,7 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
     Falls back to sl_pct_fallback if ATR unavailable or token not provided.
     TP is fixed 8% target.
     """
-    MIN_ATR_PCT = 0.0075
+    MIN_ATR_PCT = 0.010
     MAX_SL_PCT  = 0.05
     STOP_LOSS_DEFAULT = 0.03   # 3% fallback SL if everything fails
 

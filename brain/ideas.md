@@ -72,3 +72,19 @@ _Last updated: 2026-04-06_
 **Stale Tasks:** None
 **Kanban Sync:** None
 
+
+### 2026-04-11 02:45 UTC
+**Per-token MACD params:** MTF-MACD backtest proves tokens prefer different signal periods:
+- SOL: sig=15 optimal (91.2% WR vs 83.9% with sig=12)
+- BTC: sig=12 optimal (70.0% WR vs 60.5% with sig=15, +9.5pp)
+- ADA: sig=12 optimal (91.3% vs 78.3%, +13pp)
+- APT: sig=12 optimal (77.8% vs 62.9%, +15pp)
+
+**Next sprint:** Expand backtest to ETH, AVAX, LTC with full param variants. Implement per-token MACD routing in signal_gen.py. Goal: 80%+ WR across all traded tokens.
+
+*Status: BACKLOG — needs MTF-MACD backtest expansion + ETH/AVAX/LTC analysis first*
+
+### 2026-04-11 05:00 UTC
+**Stale Tasks:** None
+**Kanban Sync:** None
+

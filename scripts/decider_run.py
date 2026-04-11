@@ -88,20 +88,18 @@ def _atr_multiplier(token: str, atr_pct: float, override_k: float = None) -> flo
     """
     Return k multiplier for ATR-based SL.
     Self-calibrating based on actual ATR% (volatility):
-      atr_pct < 1.0%  → LOW_VOLATILITY    → k=1.5
+      atr_pct < 1.0%  → LOW_VOLATILITY    → k=1.0 (tight SL for stable tokens)
       atr_pct 1-3%    → NORMAL_VOLATILITY → k=2.0
-      atr_pct > 3%    → HIGH_VOLATILITY   → k=2.5
+      atr_pct > 3%    → HIGH_VOLATILITY   → k=2.5 (wide SL for volatile tokens)
     """
-    if atr_pct < 0.01:
-        return 2.5
     if override_k is not None:
         return override_k          # A/B test overrides volatility-based k
+    if atr_pct < 0.01:
+        return 1.0   # LOW_VOLATILITY: tight SL
     elif atr_pct > 0.03:
-        return 2.5
-    elif atr_pct > 0.015:
-        return 1.5
+        return 2.5   # HIGH_VOLATILITY: wide SL
     else:
-        return 2.0
+        return 2.0   # NORMAL_VOLATILITY: balanced
 
 def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
                         current_price: float,
@@ -124,7 +122,7 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
     BUG-FIX: ATR distance is now computed from current_price (not entry_price),
     which is the correct volatility-based stop placement.
     """
-    MIN_ATR_PCT = 0.015   # 1.5% — below this, fall back to fixed %
+    MIN_ATR_PCT = 0.010   # 1.0% — below this, fall back to fixed %
     MAX_SL_PCT  = 0.05     # 5% — never wider than this
 
     atr = _get_atr(token)
@@ -161,11 +159,11 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
                          override_k: float = None) -> float:
     """
     Compute dynamic TP using ATR(14) — parallel to _compute_dynamic_sl().
-    TP = current_price ± (k_tp * ATR(14)) where k_tp is 2.5× the SL multiplier.
-    This gives a proper R:R ratio: at NORMAL vol, TP = 4× ATR ≈ 4× 2× ATR SL = 2:1 R:R.
+    TP = current_price ± (k_tp * ATR(14)) where k_tp = 2.5 × k_SL.
+    With new k table: <1%→k=1.0, 1-3%→k=2.0, >3%→k=2.5.
 
-    k_tp multipliers (2.5× SL k):
-      LOW_VOLATILITY:    k_tp=3.75  (2.5× 1.5)
+    k_tp multipliers (k_tp = 2.5 × k_SL):
+      LOW_VOLATILITY:    k_tp=2.5   (2.5× 1.0)
       NORMAL_VOLATILITY: k_tp=5.0   (2.5× 2.0)
       HIGH_VOLATILITY:   k_tp=6.25  (2.5× 2.5)
     Minimum TP% floor: never tighter than tp_pct_fallback (default 5%).
@@ -174,7 +172,7 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
     BUG-FIX: ATR distance is now computed from current_price (not entry_price),
     which is the correct volatility-based TP placement.
     """
-    MIN_TP_PCT = 0.03    # 3% — below this, fall back to fixed %
+    MIN_TP_PCT = 0.015    # 1.5% — below this, fall back to fixed %
     MAX_TP_PCT = 0.15    # 15% — never tighter than this
 
     atr = _get_atr(token)
@@ -189,17 +187,16 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
     atr_pct = atr / current_price
     atr_pct_val = atr_pct  # for clarity
 
-    # k_tp = 2.5× the SL k multiplier (reduced from 3×)
-    if atr_pct_val < 0.01:
-        k_tp = 6.25   # 2.5× the new SL k=2.5 for low-vol
-    elif override_k is not None:
-        k_tp = override_k * 2.5   # was × 3.0
+    # k_tp = 2.5× the SL k multiplier (k_tp = 2.5 × k_SL)
+    # With new k table: <1%→k=1.0, 1-3%→k=2.0, >3%→k=2.5
+    if override_k is not None:
+        k_tp = override_k * 2.5
+    elif atr_pct_val < 0.01:
+        k_tp = 2.5    # 2.5 × 1.0 (LOW_VOL)
     elif atr_pct_val > 0.03:
-        k_tp = 6.0    # was 7.5
-    elif atr_pct_val > 0.015:
-        k_tp = 3.0    # was 4.5
+        k_tp = 6.25   # 2.5 × 2.5 (HIGH_VOL)
     else:
-        k_tp = 4.5    # was 6.0
+        k_tp = 5.0    # 2.5 × 2.0 (NORMAL_VOL)
 
     atr_distance_tp = k_tp * atr
 

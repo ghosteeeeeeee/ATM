@@ -232,11 +232,11 @@ def check_and_close():
         # Get stored TP/SL
         record = stored.get(coin)
         if not record:
-            # No stored TP/SL — compute from defaults (2% ATR)
+            # No stored TP/SL — compute from defaults (2% ATR% → NORMAL_VOL → k=2.0)
             atr_pct = 0.02
-            k, k_tp = 2.0, 5.0
-            sl_pct = max(0.015, min(0.05, k * atr_pct))
-            tp_pct = max(0.03, min(0.15, k_tp * atr_pct))
+            k, k_tp = 2.0, 5.0   # k=2.0 for NORMAL_VOL, k_tp=2.5×k=5.0
+            sl_pct = max(0.010, min(0.05, k * atr_pct))
+            tp_pct = max(0.015, min(0.15, k_tp * atr_pct))
             if direction == 'LONG':
                 sl_price = current_px * (1 - sl_pct)
                 tp_price = current_px * (1 + tp_pct)

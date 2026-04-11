@@ -102,9 +102,9 @@ def compute_sl_tp(direction: str, entry_price: float, current_price: float = Non
     is within HL's acceptable range of the current market price.
 
     SL multiplier k:
-      atr_pct < 1%  → k = 2.5 (low volatility)
-      1-2.5%       → k = 2.0 (normal)
-      > 2.5%       → k = 1.5 (high volatility)
+      atr_pct < 1%  → k = 1.0 (low volatility — tight SL)
+      1-3%        → k = 2.0 (normal)
+      > 3%        → k = 2.5 (high volatility — wide SL)
     TP multiplier k_tp = 2.5 * k
     Min/max floors prevent razor-thin or absurdly wide stops.
     """
@@ -113,15 +113,15 @@ def compute_sl_tp(direction: str, entry_price: float, current_price: float = Non
     atr_pct = 0.02 if atr is None else float(atr) / entry_price
 
     if atr_pct < 0.01:
-        k = 1.5   # LOW_VOLATILITY
+        k = 1.0   # LOW_VOLATILITY: tight SL for stable tokens
     elif atr_pct > 0.03:
-        k = 2.5   # HIGH_VOLATILITY
+        k = 2.5   # HIGH_VOLATILITY: wide SL for volatile tokens
     else:
-        k = 2.0   # NORMAL_VOLATILITY
-    k_tp = 3.0 * k   # TP = 3× SL k (4.5 / 6.0 / 7.5)
+        k = 2.0   # NORMAL_VOLATILITY: balanced
+    k_tp = 2.5 * k   # TP = 2.5 × SL k (2.5 / 5.0 / 6.25)
 
-    MIN_SL_PCT, MAX_SL_PCT = 0.015, 0.05
-    MIN_TP_PCT, MAX_TP_PCT = 0.03, 0.15
+    MIN_SL_PCT, MAX_SL_PCT = 0.010, 0.05
+    MIN_TP_PCT, MAX_TP_PCT = 0.015, 0.15
 
     atr_val = float(atr) if atr else entry_price * 0.02
 

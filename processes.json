@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "session_id": "proc_2d0417618c9c",
+    "command": "cd /root/.hermes && python3 scripts/mtf_macd_tuner.py sweep 2>&1 | tee /root/.hermes/logs/mtf_sweep.log",
+    "pid": 4185701,
+    "pid_scope": "host",
+    "cwd": "/root",
+    "started_at": 1775887576.1605105,
+    "task_id": "9824430a-c816-4398-b602-38fd4714d917",
+    "session_key": "",
+    "watcher_platform": "",
+    "watcher_chat_id": "",
+    "watcher_thread_id": "",
+    "watcher_interval": 0,
+    "notify_on_complete": false
+  }
+]

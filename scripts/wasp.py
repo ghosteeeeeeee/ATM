@@ -679,12 +679,21 @@ def check_hotset():
         bug("INFO", "hotset", "No hotset metadata file")
 
     # Load hotset
-    data = read_json(HOTSET_FILE, {"hotset": []})
+    data = read_json(HOTSET_FILE, {"hotset": [], "timestamp": 0})
     hotset = data.get("hotset", [])
+    hotset_ts = data.get("timestamp", 0)
     print(f"   Hotset: {len(hotset)} tokens")
 
     if not hotset:
-        bug("INFO", "hotset", "Hotset is empty")
+        # CRITICAL if hotset has been empty for >2 minutes (pipeline silently skips execution)
+        if hotset_ts > 0:
+            age_s = time.time() - hotset_ts
+            if age_s > 120:
+                bug("CRITICAL", "hotset", f"Hotset EMPTY for {age_s/60:.1f}m — pipeline silently skipping all execution!")
+            else:
+                bug("WARNING", "hotset", f"Hotset empty ({age_s:.0f}s ago, <2m grace)")
+        else:
+            bug("CRITICAL", "hotset", "Hotset is EMPTY and has no timestamp — ai_decider may not be running!")
         return
 
     # Token count vs position limit

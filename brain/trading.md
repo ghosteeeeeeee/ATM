@@ -969,4 +969,64 @@ hzscore (mtf_zscore from get_tf_zscores) is **never allowed solo**. It only has 
 
 **hzscore + pct-hermes + hmacd-** (e.g. `hmacd-,hzscore,pct-hermes`): the noisiest combo → explicitly suppressed to 0.4.
 
-In practice this means: hzscore data only matters when it confirms a MACD crossover or pattern signal, not on its own.
+**In practice this means:** hzscore data only matters when it confirms a MACD crossover or pattern signal, not on its own.
+
+---
+
+## Signal DB Fix (2026-04-10)
+
+**Problem:** `created_at` column had mixed formats — ISO strings (all normal signals) vs Unix timestamps (pattern_scanner only). `expire_pending_signals()` SQL uses `datetime('now', '-N minutes')` which only works on ISO strings. 114 unix-format rows were silently exempt from expiry.
+
+**Fix applied:**
+1. Migrated 114 unix `created_at` rows → ISO format in runtime DB
+2. Patched `write_pattern_signal()` in `pattern_scanner.py` to use `datetime.now().strftime('%Y-%m-%d %H:%M:%S')` instead of `int(time.time())`
+3. Added `from datetime import datetime` import
+
+**All signals now use ISO format.** Expiry SQL works correctly on all rows.
+
+
+---
+## MTF-MACD Backtest Results (2026-04-11)
+
+### Best Configs Found (90d backtest, 3-of-3 TF agreement, 60m hold)
+- **SOL**: fast=12, slow=55, signal=15 → WR=73.7%, PF=2.58, PnL=+15.9%, 57 signals
+- **BTC**: fast=20, slow=65, signal=7 → WR=64.9%, PF=1.65, PnL=+4.5%, 37 signals
+- **ETH**: fast=16, slow=55, signal=9 → WR=66.7%, PF=0.41, PnL=-2.0%, 30 signals
+
+### Key Discoveries
+1. **2-of-3 TF agreement is garbage**: WR=38.5%, PnL=-20.7% vs 73.7% with 3-of-3. Keep strict.
+2. **Cascade reversal is broken**: Design flaw — reversal fires on first TF flip but score=1.0 only after second flip. Larger TFs confirm AFTER position closes. Needs N-candle delay fix.
+3. **60m hold is optimal**: 36/57 SOL trades ran to timeout (68.3% WR) vs 21/57 exit_signal (92.9% WR). Let winners run.
+4. **macd_rules.py MACD_PARAMS updated** (2026-04-11): fast=12, slow=55, signal=15, HOLD=60m.
+
+### Signal Isolation (ai_decider.py)
+- `SIGNAL_TYPE_WHITELIST = None` at line ~189. Set to `['mtf_macd']` to isolate MTF-MACD only.
+- Debug log prints signal_types on every compaction run.
+
+---
+## BUG FIXES
+
+### Hot-Set Empty Fix (2026-04-11)
+**Problem**: `_load_hot_rounds()` (line 453) required ALL signals to be `<3 hours old`, combined with `review_count >= 1`. This created a dead gap:
+- 354 WAIT signals with `review_count >= 1` were 10-27 hours old — expired by the 3-hour filter
+- 58 signals created in last 3 hours had `review_count = 0` — blocked by review_count filter
+- Result: 0 signals matched both criteria → hot-set was empty, 10th position slot couldn't fill
+
+**Fix**: Changed the `created_at > datetime('now', '-3 hours')` filter to apply ONLY to signals with `review_count = 0` (never seen by AI). Signals with `review_count >= 1` have no age restriction — they've already been reviewed and approved by AI.
+
+**Before**:
+```sql
+AND review_count >= 1
+AND created_at > datetime('now', '-3 hours')
+```
+
+**After**:
+```sql
+AND review_count >= 1
+AND (
+    created_at > datetime('now', '-3 hours')  -- new signals: must be <3h old
+    OR review_count >= 1                      -- AI-reviewed signals: no age limit
+)
+```
+
+**Result**: 33 hot signals now available (vs 0 before). WAIT signals with review_count>=1 (e.g., AAVE, LINK, GALA, PENDLE) can now enter the hot-set regardless of age.

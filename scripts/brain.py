@@ -513,8 +513,8 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
                              * amount_usdt * lev / float(entry_price or 1))
         hype_pnl_pct = (hype_pnl_usdt / amount_usdt * 100) if amount_usdt else 0
 
-    # Use HL exit price if available, else signal exit price
-    final_exit = hl_exit_price or exit_price
+    # Use HL exit price if available and > 0, else signal-provided exit price
+    final_exit = hl_exit_price if hl_exit_price and hl_exit_price > 0 else exit_price
 
     # ── Write to DB ────────────────────────────────────────────────────────────
     # close_reason: explicit param wins, else default to 'manual_close'
