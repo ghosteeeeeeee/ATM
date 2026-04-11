@@ -124,6 +124,7 @@ except Exception as e:
     print(f"[signal_gen] SpeedTracker unavailable: {e}")
     speed_tracker = None
 from hyperliquid_exchange import is_delisted
+from macd_rules import MACD_PARAMS  # tuned MACD params (2026-04-10 backtest)
 from position_manager import get_open_positions as _get_open_pos, get_opposite_direction_cooldown_hours
 
 # ── In-memory cache for z-scores (avoids repeated SQLite reads per token) ──────
@@ -317,13 +318,17 @@ def ema(prices, period):
     return val
 
 
-def macd(prices, fast=12, slow=26, signal=9):
+def macd(prices, fast=None, slow=None, signal=None):
     """
     MACD. Returns (macd_line, histogram) or (None, None).
-    - MACD line = 12-period EMA - 26-period EMA
-    - Signal line = 9-period EMA of MACD line
+    Uses tuned params from macd_rules (fast=12, slow=55, signal=15) by default.
+    - MACD line = fast EMA - slow EMA
+    - Signal line = signal-period EMA of MACD line
     - Histogram = MACD line - Signal line
     """
+    if fast is None: fast = MACD_PARAMS['fast']
+    if slow is None: slow = MACD_PARAMS['slow']
+    if signal is None: signal = MACD_PARAMS['signal']
     if len(prices) < slow + signal:
         return None, None
     ef = ema(prices, fast)
@@ -333,7 +338,7 @@ def macd(prices, fast=12, slow=26, signal=9):
 
     macd_line = ef - es  # absolute value
 
-    # Compute signal line (9-period EMA of MACD values)
+    # Compute signal line (signal-period EMA of MACD values)
     # Approximate by iterating backwards through prices
     macd_values = []
     for i in range(len(prices) - 1, -1, -1):
@@ -1401,7 +1406,11 @@ def _run_mtf_macd_signals():
         # for current (35 bars) but prev would get None (34 bars < 35), silently skipping
         # the crossover detection at exactly 35 bars.
         n_bars = len(closes_all[:-1])
-        if n_bars >= 35:
+        if n_bars >= 65 + MACD_PARAMS['signal']:
+            # Standard slow MACD — backtest-optimized (2026-04-10)
+            fast, slow, sig = MACD_PARAMS['fast'], MACD_PARAMS['slow'], MACD_PARAMS['signal']
+        elif n_bars >= 35:
+            # Fallback: MACD(12,26,9) for standard TFs with moderate data
             fast, slow, sig = 12, 26, 9
         elif n_bars >= 6:
             fast, slow, sig = 2, 4, 2   # fast MACD for sparse-data TFs (4H ~10 bars)
