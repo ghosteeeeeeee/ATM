@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes MTF-MACD Tuner — full sweep all tokens
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/mtf_macd_tuner.py sweep
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
