@@ -521,13 +521,157 @@ def _test_config_worker(args):
     return (token, (fast, slow, sig, ex, ho, sc, rg), res)
 
 
+def _test_config_worker_v2(args):
+    """Fast worker: pre-fetched candles + precomputed MACD series.
+    Each config gets O(1) histogram lookup instead of O(n^2) EMA recompute.
+    Returns (token, params, result).
+    """
+    (token, fast, slow, sig, ex, ho, sc, rg,
+     closes_15m, closes_1h, closes_4h, sorted_15m_ts,
+     pm_15m_base, pm_1h_base, pm_4h_base, warmup, window_days) = args
+
+    # Build PrecomputedMACD for this specific config (O(n) not O(n^2))
+    pm_15m = PrecomputedMACD(closes_15m, fast, slow, sig)
+    pm_1h  = PrecomputedMACD(closes_1h,  fast, slow, sig)
+    pm_4h  = PrecomputedMACD(closes_4h,  fast, slow, sig)
+
+    res = _fast_backtest(
+        token, fast, slow, sig, ex, ho, sc, bool(rg),
+        closes_15m, closes_1h, closes_4h, sorted_15m_ts,
+        pm_15m, pm_1h, pm_4h, warmup
+    )
+    return (token, (fast, slow, sig, ex, ho, sc, rg), res)
+
+
+def _fast_backtest(token, fast, slow, sig, exit_strategy,
+                   hold_minutes, score_threshold, regime_filter,
+                   closes_15m, closes_1h, closes_4h, sorted_15m_ts,
+                   pm_15m, pm_1h, pm_4h, warmup):
+    """Fast backtest using precomputed close arrays and PrecomputedMACD.
+    Same logic as test_mtf_macd_config but avoids repeated data fetching.
+    """
+    trades = []
+    n_15m = len(closes_15m)
+
+    for i in range(warmup, n_15m - 1):
+        ih_1h = min(i // 4, len(closes_1h) - 1)
+        ih_4h = min(i // 16, len(closes_4h) - 1)
+
+        h_prev = pm_15m.histogram(i - 1)
+        h_curr = pm_15m.histogram(i)
+        if h_prev is None or h_curr is None:
+            continue
+        if not (h_prev <= 0 < h_curr):
+            continue
+
+        if regime_filter:
+            h_1h = pm_1h.histogram(ih_1h)
+            h_4h = pm_4h.histogram(ih_4h)
+            if h_1h is None or h_4h is None:
+                continue
+            if h_1h <= 0 or h_4h <= 0:
+                continue
+
+        score_count = 0
+        h_15m = pm_15m.histogram(i)
+        h_1h  = pm_1h.histogram(ih_1h)
+        h_4h  = pm_4h.histogram(ih_4h)
+        if h_15m is not None and h_15m > 0:
+            score_count += 1
+        if h_1h is not None and h_1h > 0:
+            score_count += 1
+        if h_4h is not None and h_4h > 0:
+            score_count += 1
+        if score_count < score_threshold:
+            continue
+
+        entry_price = closes_15m[i]
+        entry_ts    = sorted_15m_ts[i]
+        hold_end_ts = entry_ts + hold_minutes * 60 * 1000
+
+        exit_price = None
+        exit_type  = None
+        for j in range(i + 1, n_15m):
+            if sorted_15m_ts[j] > hold_end_ts:
+                exit_price = closes_15m[j]
+                exit_type  = 'hold'
+                break
+
+            h_prev = pm_15m.histogram(j - 1)
+            h_curr = pm_15m.histogram(j)
+            flip = False
+            if h_prev is not None and h_curr is not None:
+                flip = (h_prev <= 0 < h_curr) or (h_prev >= 0 > h_curr)
+
+            if flip:
+                if exit_strategy == 'histogram_flip':
+                    exit_price = closes_15m[j]
+                    exit_type  = 'hist_flip'
+                    break
+                elif exit_strategy == 'any_flip':
+                    j_1h = j // 4
+                    j_4h = j // 16
+                    h15m_prev, h15m_curr = h_prev, h_curr
+                    h1h_prev  = pm_1h.histogram(j_1h - 1)
+                    h1h_curr  = pm_1h.histogram(j_1h)
+                    h4h_prev  = pm_4h.histogram(j_4h - 1)
+                    h4h_curr  = pm_4h.histogram(j_4h)
+                    any_flip = False
+                    for hpr, hcu in [(h15m_prev, h15m_curr), (h1h_prev, h1h_curr), (h4h_prev, h4h_curr)]:
+                        if hpr is not None and hcu is not None:
+                            if (hpr <= 0 < hcu) or (hpr >= 0 > hcu):
+                                any_flip = True
+                                break
+                    if any_flip:
+                        exit_price = closes_15m[j]
+                        exit_type  = 'any_flip'
+                        break
+
+        if exit_price is None:
+            continue
+
+        pnl_pct = (exit_price - entry_price) / entry_price * 100
+        trades.append({
+            'direction': 'LONG', 'entry': entry_price, 'exit': exit_price,
+            'pnl_pct': pnl_pct, 'exit_type': exit_type,
+        })
+
+    if not trades:
+        return None
+
+    wins       = [t for t in trades if t['pnl_pct'] > 0]
+    losses     = [t for t in trades if t['pnl_pct'] <= 0]
+    wr         = len(wins) / len(trades) * 100
+    gross_win  = sum(t['pnl_pct'] for t in wins)
+    gross_loss = abs(sum(t['pnl_pct'] for t in losses))
+    pf         = gross_win / gross_loss if gross_loss > 0 else float('inf') if gross_win > 0 else 0
+    total_pnl  = sum(t['pnl_pct'] for t in trades)
+
+    dd = 0; peak = -9999
+    for t in trades:
+        peak = max(peak, t['pnl_pct'])
+        dd   = min(dd, t['pnl_pct'] - peak)
+    max_dd = dd
+
+    return {
+        'signals':         len(trades),
+        'wins':            len(wins),
+        'losses':          len(losses),
+        'win_rate':        round(wr, 4),
+        'profit_factor':   round(pf, 4),
+        'total_pnl_pct':   round(total_pnl, 4),
+        'max_drawdown_pct': round(max_dd, 4),
+        'avg_pnl_pct':     round(total_pnl / len(trades), 4),
+    }
+
+
 def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=None):
     """Run full parameter sweep for tokens.
 
     Args:
         tokens: list of token symbols (default: monitored tokens)
         window_days: backtest window (default: WINDOW_DAYS)
-        parallel: if True, use multiprocessing for parallel config testing
+        parallel: if True, test all configs per token in parallel (data fetched once per token)
         workers: number of worker processes (default: cpu_count())
     """
     if tokens is None:
@@ -556,12 +700,46 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
         best_for_token = None
 
         if parallel and len(grid) > 1:
-            # Parallel mode: test all configs in parallel
-            worker_args = [(token, fast, slow, sig, ex, ho, sc, rg, window_days)
-                          for fast, slow, sig, ex, ho, sc, rg in grid]
+            # Pre-fetch data ONCE per token so all 544 configs share the same candles
+            symbol = token.upper() + 'USDT'
+            klines_1h = fetch_1h_klines(symbol, window_days)
+            klines_4h = fetch_4h_klines(symbol, window_days)
+
+            if len(klines_1h) < 100 or len(klines_4h) < 20:
+                print(f'  [WARN] {token}: insufficient data ({len(klines_1h)} 1h, {len(klines_4h)} 4h)')
+                conn.commit()
+                continue
+
+            # Build 15m candles from 1H aggregation
+            buckets_15m = build_15m_candles_from_1h(klines_1h)
+            sorted_15m_ts = sorted(buckets_15m.keys())
+            closes_15m = [buckets_15m[ts][3] for ts in sorted_15m_ts]
+            closes_1h = [float(k[4]) for k in klines_1h]
+            closes_4h = [float(k[4]) for k in klines_4h]
+
+            warmup = 65 + 28 + 5  # slow + signal + buffer
+            if len(closes_15m) < warmup + 1 or len(closes_1h) < warmup + 1 or len(closes_4h) < 10:
+                print(f'  [WARN] {token}: not enough candles after warmup')
+                conn.commit()
+                continue
+
+            print(f'  [DATA] {token}: {len(closes_15m)} 15m, {len(closes_1h)} 1h, {len(closes_4h)} 4h candles')
+
+            # Precompute MACD series so config testing is fast (O(1) histogram per config)
+            pm_15m = PrecomputedMACD(closes_15m, 12, 55, 15)
+            pm_1h  = PrecomputedMACD(closes_1h,  12, 55, 15)
+            pm_4h  = PrecomputedMACD(closes_4h,  12, 55, 15)
+
+            # Test all configs in parallel against the SAME pre-fetched data
+            worker_args = [
+                (token, fast, slow, sig, ex, ho, sc, rg,
+                 closes_15m, closes_1h, closes_4h, sorted_15m_ts,
+                 pm_15m, pm_1h, pm_4h, warmup, window_days)
+                for fast, slow, sig, ex, ho, sc, rg in grid
+            ]
 
             with Pool(processes=workers) as pool:
-                results = pool.map(_test_config_worker, worker_args)
+                results = pool.map(_test_config_worker_v2, worker_args)
 
             for idx, (_, params, res) in enumerate(results):
                 (fast, slow, sig, ex, ho, sc, rg) = params
