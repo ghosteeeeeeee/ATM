@@ -124,7 +124,7 @@ except Exception as e:
     print(f"[signal_gen] SpeedTracker unavailable: {e}")
     speed_tracker = None
 from hyperliquid_exchange import is_delisted
-from macd_rules import MACD_PARAMS  # tuned MACD params (2026-04-10 backtest)
+from macd_rules import MACD_PARAMS, get_macd_params  # tuned MACD params (2026-04-10 backtest)
 from position_manager import get_open_positions as _get_open_pos, get_opposite_direction_cooldown_hours
 
 # ── In-memory cache for z-scores (avoids repeated SQLite reads per token) ──────
@@ -321,11 +321,14 @@ def ema(prices, period):
 def macd(prices, fast=None, slow=None, signal=None):
     """
     MACD. Returns (macd_line, histogram) or (None, None).
-    Uses tuned params from macd_rules (fast=12, slow=55, signal=15) by default.
+    Uses tuned per-token params from macd_rules TOKEN_MACD_PARAMS (DB-loaded).
+    Falls back to DEFAULT (fast=12, slow=55, signal=15) for unknown tokens.
     - MACD line = fast EMA - slow EMA
     - Signal line = signal-period EMA of MACD line
     - Histogram = MACD line - Signal line
     """
+    # Per-token override via get_macd_params(token) — requires token kwarg
+    # Pass fast/slow/signal explicitly in caller when token is known
     if fast is None: fast = MACD_PARAMS['fast']
     if slow is None: slow = MACD_PARAMS['slow']
     if signal is None: signal = MACD_PARAMS['signal']
@@ -1360,9 +1363,10 @@ def _run_mtf_macd_signals():
     def _macd_crossover(token, minutes):
         """
         Compute MACD crossover for a token at given timeframe.
-        Aggregates raw minute-candles into the target timeframe, computes MACD(12/26/9)
-        on those TF candles, then detects whether a crossover occurred between the
-        previous bar and current bar.
+        Aggregates raw minute-candles into the target timeframe, computes MACD
+        on those TF candles using per-token tuned params from get_macd_params(),
+        then detects whether a crossover occurred between the previous bar and
+        current bar.
 
         Returns (histogram: float, macd_line: float, signal_line: float,
                  crossover_dir: int) or None.
@@ -1388,34 +1392,24 @@ def _run_mtf_macd_signals():
                 buckets[bucket_ts] = [close, close, close, close]  # open, high, low, close
             else:
                 buckets[bucket_ts][1] = max(buckets[bucket_ts][1], close)   # high
-                buckets[bucket_ts][2] = min(buckets[bucket_ts][2], close)  # low
+                buckets[bucket_ts][2] = min(buckets[bucket_ts][2], close)   # low
                 buckets[bucket_ts][3] = close                                # close
 
         sorted_ts = sorted(buckets.keys())
-        if len(sorted_ts) < 4:   # need at least a few TF bars
-            return None
+        if len(sorted_ts) < 4:
+            return None  # need at least a few TF bars
 
         closes_all = [buckets[ts][3] for ts in sorted_ts]
 
-        # Select MACD params based on how many TF bars we have.
-        # Standard MACD(12,26,9) needs 35 bars — use it when available (1H, 15m).
-        # 4H: DB caps at 2000 rows (~2 days) → ~10 4H bars. Use fast MACD(2,4,2).
-        # FIX B (2026-04-05): use closes_all[:-1] (prev bar count) to determine params.
-        # This ensures BOTH current and prev bars use the same compatible params —
-        # prev has 1 fewer bar, so using closes_all count could select standard MACD(12,26,9)
-        # for current (35 bars) but prev would get None (34 bars < 35), silently skipping
-        # the crossover detection at exactly 35 bars.
+        # Use per-token tuned MACD params from DB (get_macd_params).
+        # Bar-count safety check: ensure we have enough bars for (fast, slow, sig).
+        # FIX (2026-04-11): was selecting params by bar count (wrong — bypassed tuning).
+        # Now always uses tuned params; only returns None if not enough bars for them.
+        params = get_macd_params(token)
+        fast, slow, sig = params['fast'], params['slow'], params['signal']
         n_bars = len(closes_all[:-1])
-        if n_bars >= 65 + MACD_PARAMS['signal']:
-            # Standard slow MACD — backtest-optimized (2026-04-10)
-            fast, slow, sig = MACD_PARAMS['fast'], MACD_PARAMS['slow'], MACD_PARAMS['signal']
-        elif n_bars >= 35:
-            # Fallback: MACD(12,26,9) for standard TFs with moderate data
-            fast, slow, sig = 12, 26, 9
-        elif n_bars >= 6:
-            fast, slow, sig = 2, 4, 2   # fast MACD for sparse-data TFs (4H ~10 bars)
-        else:
-            return None  # not enough bars for any MACD
+        if n_bars < slow + sig:
+            return None  # not enough bars for this token's tuned MACD params
 
         def _macd_from_closes(closes_list, _fast=fast, _slow=slow, _sig=sig):
             """Compute MACD on closes with adaptive params."""
