@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes Self-Close Watcher — TP/SL fallback for unprotectable coins
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/self_close_watcher.py
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
