@@ -355,6 +355,54 @@ When fixing bugs:
 3. Fix the root cause (GREEN)
 4. The test proves the fix and prevents regression
 
+## Hermes Signal Gen: Recurring Failure Patterns
+
+When debugging signal generation (signal_gen.py returning 0 signals):
+
+### 1. Schema-vs-Code Mismatch in momentum_cache
+
+**Symptom:** RSI values always 85.0, velocity=0, z=0 across all tokens.
+
+**Root cause:** Code writes `rsi_14` to `add_signal()` but `momentum_cache` table was missing the column. The `_persist_momentum_state()` function never included `rsi_14` in its INSERT statement. After computing RSI from price history, the result was stored in-memory but never persisted.
+
+**Fix:**
+```sql
+ALTER TABLE momentum_cache ADD COLUMN rsi_14 REAL;
+```
+Then update `_persist_momentum_state()` to include `rsi_14` in INSERT/UPDATE and pass it from the call site.
+
+**Prevention:** When a function computes a value and another function reads it, verify the column exists in the DB schema. Schema mismatches are a common silent failure mode.
+
+### 2. avg_z vs z_1h Variable Confusion
+
+**Symptom:** Tokens with suppressed 1H z-scores (good for LONG) are blocked by `avg_z > 0.5` filter.
+
+**Root cause:** `avg_z` is the mean across all 6 timeframes (1m, 5m, 15m, 30m, 1h, 4h). A token with suppressed 1h/4h z but elevated 1m/5m z will have `avg_z > 0.5` and be blocked. Comment said "1H z-score" but code checked the average.
+
+**Fix:** Always use the specific TF variable, not the average across TFs. For 1H entry filter: `zscores.get('1h', (None, None))[0]` not `mom['avg_z']`.
+
+### 3. All Prices Flatline in price_history
+
+**Symptom:** RSI always 85.0 (or very high), all tokens show identical RSI.
+
+**Root cause:** `signals_hermes.db` price_history table has flatline data for many tokens — the same price repeated thousands of times. RSI returns 85.0 when `avg_loss == 0` (no pullbacks at all = price only goes up). All derived indicators (velocity, z-score) become 0.
+
+**Diagnosis:**
+```python
+# Check for flatlines
+rows = get_price_history(token, lookback_minutes=60480)
+unique = len(set(r[1] for r in rows))
+print(f'{token}: {len(rows)} rows, {unique} unique prices')
+```
+
+### 4. MACD Crossover Needs Actual Cross Event
+
+**Symptom:** `_run_mtf_macd_signals()` produces nothing despite valid momentum data.
+
+**Root cause:** MACD crossover requires `MACD_line` to actually cross `signal_line`. If MACD is all positive and stays all positive, no crossover fires. Histogram fallback (`h > 0`) requires ALL 3 TFs (4h, 1h, 15m) to have `hist > 0` for LONG.
+
+**Diagnosis:** Manually compute MACD values to check crossover direction.
+
 ## Real-World Impact
 
 From debugging sessions:

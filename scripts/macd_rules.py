@@ -198,11 +198,12 @@ def _long_entry_allowed(s: MACDState) -> bool:
 
     1. Regime is BULL (macd_line > 0)        — macro direction confirmed
     2. Crossover is FRESH (age <= 2 candles) — not stale, right timing
+       OR bull_score = +3 (maximum conviction: 3 indicators aligned, skip timing)
     3. bullish_score >= ENTRY_BULLISH_SCORE_MIN (2) — composite strength
     4. hist_rate > 0                         — momentum ACCELERATING, not just positive
 
     These filters together give 75-90% WR potential by eliminating:
-      - Late entries (stale crossover)
+      - Late entries (stale crossover — unless score=+3 overrides)
       - Weak setups (score < 2)
       - Fading momentum (hist_rate <= 0)
     """
@@ -210,16 +211,21 @@ def _long_entry_allowed(s: MACDState) -> bool:
     if s.regime != Regime.BULL:
         return False
 
-    # 2. Crossover must be FRESH — not STALE, not NONE
-    if s.crossover_freshness != CrossoverFreshness.FRESH_BULL:
-        return False
+    # 2. Crossover must be FRESH — OR max conviction (score=+3) overrides staleness
+    is_stale_bull = s.crossover_freshness in (CrossoverFreshness.STALE_BULL, CrossoverFreshness.NONE)
+    if is_stale_bull and s.bullish_score < 3:
+        return False  # Block stale entries unless max conviction
+
+    if s.crossover_freshness == CrossoverFreshness.FRESH_BEAR:
+        return False  # Opposite crossover active — don't fight it
 
     # 3. Strong composite score — eliminates weak/hybrid signals
     if s.bullish_score < ENTRY_BULLISH_SCORE_MIN:
         return False
 
-    # 4. Momentum must be accelerating (not just positive, actively growing)
-    if s.histogram_rate <= 0:
+    # 4. Momentum must be positive (not declining from peak)
+    # Relaxed from > 0 to >= 0: stable momentum (hist_rate=0) is still healthy in uptrend
+    if s.histogram_rate < 0:
         return False
 
     return True
@@ -228,9 +234,9 @@ def _long_entry_allowed(s: MACDState) -> bool:
 def _short_entry_allowed(s: MACDState) -> bool:
     """
     HIGH-WR SHORT entry — all conditions must be true:
-
     1. Regime is BEAR (macd_line < 0)       — macro direction confirmed
     2. Crossover is FRESH (age <= 2 candles) — right timing
+       OR bull_score = -3 (maximum conviction: 3 indicators aligned, skip timing)
     3. bullish_score <= ENTRY_BEARISH_SCORE_MIN (-2) — strong bearish composite
     4. hist_rate < 0                        — momentum decelerating/falling
     """
@@ -238,9 +244,13 @@ def _short_entry_allowed(s: MACDState) -> bool:
     if s.regime != Regime.BEAR:
         return False
 
-    # 2. Crossover must be FRESH
-    if s.crossover_freshness != CrossoverFreshness.FRESH_BEAR:
-        return False
+    # 2. Crossover must be FRESH — OR max conviction (score=-3) overrides staleness
+    is_stale_bear = s.crossover_freshness in (CrossoverFreshness.STALE_BEAR, CrossoverFreshness.NONE)
+    if is_stale_bear and s.bullish_score > -3:
+        return False  # Block stale entries unless max conviction
+
+    if s.crossover_freshness == CrossoverFreshness.FRESH_BULL:
+        return False  # Opposite crossover active — don't fight it
 
     # 3. Strong bearish composite score
     if s.bullish_score > ENTRY_BEARISH_SCORE_MIN:  # score is positive for bulls, negative for bears

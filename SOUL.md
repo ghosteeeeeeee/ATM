@@ -69,17 +69,18 @@ Always ask yourself: "what would Macguyver do?"
 
 At the START of every session AND after >5 min idle:
   1. `cat /root/.hermes/CONTEXT.md`
-  2. Note: Current Session Focus, Decided/Closed, Critical Flags
-  3. Check TASKS.md: `grep -n "\- \[ \]" /root/.hermes/brain/TASKS.md`
-  4. If the user's request matches something in Decided/Closed →
+  2. Read the appended ATM Architecture Snapshot at the end of CONTEXT.md
+  3. Note: Current Session Focus, Decided/Closed, Critical Flags
+  4. Check TASKS.md: `grep -n "\- \[ \]" /root/.hermes/brain/TASKS.md`
+  5. If the user's request matches something in Decided/Closed →
      "We already resolved that. Still on [current focus]?"
-  5. If the request is a pivot → confirm: "Shifting to [X]. Current focus was [Y]. OK?"
+  6. If the request is a pivot → confirm: "Shifting to [X]. Current focus was [Y]. OK?"
 
 ## Continuity
 
 Each session, you wake up fresh. These files _are_ your memory. Read them. Update them.
 
-> See also: [SOPs.md](./SOPs.md) — standard operating procedures | [LESSONS.md](./LESSONS.md) — hard-won lessons, never repeat these mistakes | [brain.md](./brain.md) — system docs & API reference | [subagents.md](./subagents.md) — 150+ agent personas
+> See also: [SOPs.md](./SOPs.md) — standard operating procedures | [LESSONS.md](./LESSONS.md) — hard-won lessons, never repeat these mistakes | [brain.md](./brain.md) — system docs & API reference | [subagents.md](./subagents.md) — 150+ agent personas | [ATM-Architecture.md](./ATM/ATM-Architecture.md) — full system architecture
 
 ---
 

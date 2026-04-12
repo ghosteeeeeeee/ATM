@@ -194,10 +194,12 @@ def get_signals_from_db(limit=100):
     try:
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
+        # Exclude blacklisted signal sources (rsi-confluence: 0% WR)
         c.execute("""
             SELECT token, direction, confidence, signal_type, source, price,
                    z_score, rsi_14, macd_hist, decision, created_at
             FROM signals
+            WHERE source != 'rsi-confluence'
             ORDER BY created_at DESC
             LIMIT ?
         """, (limit,))

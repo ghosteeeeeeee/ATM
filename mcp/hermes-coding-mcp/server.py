@@ -556,21 +556,49 @@ def _start_watchdog():
 # Server Entry Point
 # =============================================================================
 
+def _should_use_sse() -> bool:
+    """Determine transport mode.
+
+    SSE (HTTP) is used when:
+      - MCP_TRANSPORT=sse is explicitly set, OR
+      - SSE_PORT env var is set (systemd service convention), OR
+      - stdin is a TTY (interactive/manual testing)
+
+    Otherwise, stdio transport is used (hermes-agent subprocess mode).
+    """
+    if os.environ.get('MCP_TRANSPORT', '').lower() == 'sse':
+        return True
+    if os.environ.get('SSE_PORT'):
+        return True
+    # Interactive terminal = SSE for human testing; pipe/pty = stdio for agents
+    if sys.stdin.isatty():
+        return True
+    return False
+
+
 if __name__ == "__main__":
-    # Start watchdog thread for systemd
-    watchdog_thread = _start_watchdog()
+    use_sse = _should_use_sse()
 
-    # Signal systemd that service is ready (only if sdnotify is available)
-    if HAS_SDNOTIFY and _systemd_notifier:
+    if use_sse:
+        # SSE mode — systemd service or interactive terminal
+        watchdog_thread = _start_watchdog()
+
+        if HAS_SDNOTIFY and _systemd_notifier:
+            try:
+                _systemd_notifier.notify("READY=1")
+            except Exception:
+                pass
+
+        mcp.settings.port = int(os.environ.get('SSE_PORT', 8000))
+        mcp.settings.host = os.environ.get('SSE_HOST', '127.0.0.1')
+        sse_mount = os.environ.get('SSE_MOUNT_PATH', '/mcp')
+
         try:
-            _systemd_notifier.notify("READY=1")
-        except Exception:
-            pass
-
-    try:
-        mcp.run()
-    finally:
-        # Signal watchdog to stop
-        _watchdog_stop.set()
-        if watchdog_thread:
-            watchdog_thread.join(timeout=5)
+            mcp.run(transport='sse', mount_path=sse_mount)
+        finally:
+            _watchdog_stop.set()
+            if watchdog_thread:
+                watchdog_thread.join(timeout=5)
+    else:
+        # Stdio mode — hermes-agent subprocess
+        mcp.run(transport='stdio')

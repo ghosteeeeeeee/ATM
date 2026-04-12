@@ -342,36 +342,6 @@
 
 ---
 
-## Prior Decisions (Pre-2026-04-05)
-
-### SHORT trailing activation fix
-**When:** Pre-2026-04-04
-**What:** `abs(pnl_pct)` for SHORTs was wrong — renamed `adverse_pct → profit_pct` so trailing stop triggers correctly on profit for shorts
-**Owner:** Agent
-
-### Dual guardian reconciliation
-**When:** Pre-2026-04-04
-**What:** Both `hl-sync-guardian` AND `position_manager.refresh_current_prices` reconciled independently — consolidated to avoid double-firing
-**Owner:** Agent
-
-### SQL injection fix
-**When:** Pre-2026-04-04
-**What:** `record_closed_trade` in hl-sync-guardian.py had SQL injection vulnerability — fixed with parameterized queries
-**Owner:** Agent
-
-### Hot-set SQL placeholder fix
-**When:** 2026-04-04
-**What:** `***` SQL placeholder caused hot-set never to build — replaced with proper `?` placeholders across 3+ files
-**Owner:** Agent
-
-### Cascade flip: check APPROVED signals (deferred idea)
-**When:** 2026-04-05
-**What:** Idea to modify `check_cascade_flip()` to query `decision IN ('PENDING', 'APPROVED')` instead of just PENDING — would give flip confirmation faster
-**Status:** Deferred — not yet implemented (see TASKS.md)
-**Owner:** TBD
-
----
-
 ## 2026-04-06 | ATM folder created — trading system configs consolidated
 
 **Decision:** Create `/root/.hermes/ATM/` as the canonical home for all trading system files included in the standalone Docker. All primary trading scripts, configs, and architecture docs live here.

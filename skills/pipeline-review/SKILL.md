@@ -45,13 +45,59 @@ Full diagnostic of the Hermes signal → trade pipeline. Use whenever signals ap
 
 ## How to Run
 
+### IMPORTANT — Verify DB Paths First
+
+The signals DB path may have changed. Always verify before running:
+
+```bash
+# Check which DBs are active (most recently modified)
+ls -lat /root/.hermes/data/*.db | head -10
+
+# predictions.db is often the ACTIVE output (128K+ rows)
+# signals_hermes_runtime.db may be EMPTY (0 signals) — legacy/dead path
+sqlite3 /root/.hermes/data/predictions.db "SELECT COUNT(*) FROM predictions"
+```
+
 ### Step 1 — Collect Data
 
-Run all queries against both databases:
-
-**SQLite signals DB:**
+**Primary DB: predictions.db** (active pipeline output, ~128K rows)
 ```python
 import sqlite3
+sc = sqlite3.connect('/root/.hermes/data/predictions.db')
+q = sc.cursor()
+
+# Direction accuracy (most important check)
+q.execute("""
+    SELECT direction, COUNT(*) as n,
+           SUM(CASE WHEN correct=1 THEN 1 ELSE 0 END) as correct,
+           AVG(predicted_move_pct) as avg_pred,
+           AVG(actual_move_pct) as avg_actual
+    FROM predictions WHERE correct IS NOT NULL GROUP BY direction
+""")
+
+# Direction ratio
+q.execute("""
+    SELECT direction, COUNT(*) FROM predictions GROUP BY direction
+""")
+
+# Confidence tier accuracy
+q.execute("""
+    SELECT
+        CASE
+            WHEN confidence < 50 THEN '<50'
+            WHEN confidence >= 50 AND confidence < 60 THEN '50-60'
+            WHEN confidence >= 60 AND confidence < 70 THEN '60-70'
+            WHEN confidence >= 70 AND confidence < 80 THEN '70-80'
+            ELSE '80+'
+        END as tier,
+        COUNT(*) as n,
+        SUM(CASE WHEN correct=1 THEN 1 ELSE 0 END) as correct
+    FROM predictions WHERE correct IS NOT NULL GROUP BY tier
+""")
+```
+
+**Legacy signals DB** (may be empty — check first):
+```python
 sc = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
 q = sc.cursor()
 
@@ -170,7 +216,18 @@ Write the report to `/root/.hermes/pipeline_health_report_YYYY-MM-DD.txt`.
 
 ---
 
-## Key Findings from 2026-04-02 Run
+## Key Findings from 2026-04-12 Run
+
+| # | Severity | Finding |
+|---|----------|---------|
+| 1 | CRITICAL | signals_hermes_runtime.db EMPTY (0 signals) — ai_decider not writing there. predictions.db is the active DB (128K+ rows) |
+| 2 | CRITICAL | DOWN predictions at 27% WR (anti-correct) vs UP at 95.7%. Model is systematically wrong on shorts. Root cause: candle_predictor.py build_prediction_prompt() LLM maps elevated price → DOWN countertrend (wrong direction) |
+| 3 | CRITICAL | 8.6x LONG bias — 115K UP vs 13K DOWN predictions. Double the previous 4x HIGH threshold |
+| 4 | CRITICAL | Confidence tiers are INVERSE of accuracy: conf 50-60 = 89% WR, conf 80+ = 33% WR. Confidence cannot be used as approval gate |
+| 5 | HIGH | All 86 closed trades have signal="unknown" — no attribution, can't analyze WR by signal type |
+| 6 | OK | predictions.db generating ~4 predictions/sec across 84 tokens — generation healthy |
+
+## Key Findings from 2026-04-02 Run (Legacy)
 
 | # | Severity | Finding |
 |---|----------|---------|
@@ -186,7 +243,15 @@ Write the report to `/root/.hermes/pipeline_health_report_YYYY-MM-DD.txt`.
 
 ---
 
-## Recommended Immediate Actions
+## Recommended Immediate Actions (2026-04-12)
+
+1. **[CRITICAL]** FIX DOWN predictions in `candle_predictor.py` `build_prediction_prompt()` — LLM maps elevated price + momentum → DOWN countertrend, which is wrong. Options: (a) remove/revise z_cat feature, (b) invert all DOWN labels, (c) retrain
+2. **[CRITICAL]** Audit direction distribution in signal generators — 8.6x LONG bias has doubled since last review
+3. **[CRITICAL]** Remove confidence as auto-approval gate — confidence tiers 70+ are anti-correlated with accuracy
+4. **[HIGH]** Fix signal attribution in closed_trades_archive.json — all trades show signal="unknown"
+5. **[HIGH]** Verify why ai_decider writes to predictions.db but not signals_hermes_runtime.db — determine if this is intentional
+
+## Recommended Immediate Actions (Legacy)
 
 1. **[CRITICAL]** Increase signal TTL from ~3.8h to 8-12h in `signal_schema.py`
 2. **[CRITICAL]** Investigate APPROVED→EXECUTED bottleneck — check `decider-run.py` execution loop and `position_manager.py` approval processor

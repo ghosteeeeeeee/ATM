@@ -1,0 +1,192 @@
+================================================================================
+PIPELINE HEALTH REPORT — 2026-04-12 19:46 (Auto-Generated)
+================================================================================
+
+## EXECUTIVE SUMMARY
+
+Status: MULTIPLE CRITICAL ISSUES
+Primary DB: /root/.hermes/data/predictions.db (128,835 predictions)
+Trade DB:   /root/.hermes/data/closed_trades_archive.json (86 closed trades)
+Signals DB: /root/.hermes/data/signals_hermes_runtime.db — EMPTY (0 signals)
+
+⚠️  The Hermes signal pipeline is NOT generating signals to the signals DB.
+    The predictions DB (128K rows) is the active pipeline output.
+
+================================================================================
+## FINDINGS (Ranked by Severity)
+================================================================================
+
+### 🔴 CRITICAL #1: DOWN Predictions Catastrophically Wrong
+
+  DOWN accuracy: 27.2% (9,037 predictions verified)
+  UP accuracy:   95.7% (48,513 predictions verified)
+
+  The prediction model is REVERSED on DOWN predictions.
+  Every market regime shows DOWN at 20-35% accuracy.
+  This means the model is anti-correct on short signals.
+
+  DOWN predictions are not just unprofitable — they are reliably
+  predicting the OPPOSITE of what happens.
+
+  Impact: Any SHORT signal from the pipeline has a ~75% chance of
+  being backwards. This alone can explain negative PnL on shorts.
+
+  Breakdown by regime:
+    bearish DOWN: 20.4% WR  | bearish UP: 93.4% WR
+    bullish DOWN: 35.0% WR  | bullish UP: 92.3% WR
+    neutral DOWN: 25.7% WR  | neutral UP: 97.3% WR
+
+  → Root cause: Model trained on regime/momentum, but DOWN direction
+    fundamentally anti-correlated with actual price movement in dataset.
+
+
+### 🔴 CRITICAL #2: 8.6x Directional Bias in Predictions
+
+  UP predictions:   115,397 (89.6%)
+  DOWN predictions:  13,438 (10.4%)
+
+  Ratio: 8.6x more UP than DOWN predictions.
+  The pipeline is generating 8-9x more LONG signals than SHORT signals.
+  This is NOT market-conditioned — it's a structural bias.
+
+  Last run (2026-04-02) flagged 4x as the HIGH threshold.
+  We're now at 8.6x — more than double the previous record.
+
+
+### 🔴 CRITICAL #3: Confidence Scores Are Meaningless
+
+  Accuracy by confidence tier (verified predictions):
+    conf < 50:   30.2% WR  (n=43)
+    conf 50-60:  88.9% WR  (n=53,336)  ← almost all predictions
+    conf 60-70:  40.8% WR  (n=316)
+    conf 70-80:  35.3% WR  (n=1,565)
+    conf 80+:    32.7% WR  (n=2,290)
+
+  The confidence field is not predictive of accuracy.
+  The tier around 55 (the vast majority) has 89% WR,
+  but higher confidence (60+) drops to 35-41% WR.
+  This means: the signal generation is assigning ~55 conf universally
+  regardless of actual signal quality.
+
+  → Signals with high confidence (>60) are WORSE than low confidence.
+    The auto-approval threshold logic cannot use confidence as a gate.
+
+
+### 🟡 HIGH #4: Predicted Magnitude vs Actual — Large Disconnect
+
+  For UP predictions:
+    avg_predicted_move_pct:  -0.08% (slightly negative!)
+    avg_actual_move_pct:    +11.06% (strongly positive!)
+
+  The model predicts slight downside but price goes up 11%.
+  This means: the model gets direction right but magnitude/timing wrong.
+  Entry price targets derived from predicted_move_pct would be wrong.
+
+  For DOWN predictions:
+    avg_predicted_move_pct:  -0.63%
+    avg_actual_move_pct:     +2.40%
+
+  DOWN: predicts -0.6% but price goes UP 2.4% — direction AND magnitude wrong.
+
+
+### 🟡 HIGH #5: Trade Win Rate 39.5% — Below Breakeven for Leverage
+
+  Closed trades (86 total, all paper):
+    Wins: 34 (39.5%)  Losses: 52
+    Net PnL: +1.45 USDT (tiny, within noise)
+
+  LONG:  59 trades, 37% WR, net = -0.37 USDT
+  SHORT: 27 trades, 44% WR, net = +1.82 USDT
+
+  Observations:
+  - 39.5% WR is below the ~45-50% breakeven for 10x leverage trading
+    (fees eat into small edges at this leverage)
+  - SHORTs actually more profitable per trade (1.82 vs -0.37)
+  - But shorts are rare due to 8.6x LONG bias in generation
+  - All trades have confidence=0 (signal not being passed through)
+  - No signal attribution in closed trades (all "unknown")
+
+
+### 🟡 HIGH #6: signals_hermes_runtime.db Is Empty
+
+  signals_hermes_runtime.db: 0 rows in all tables
+  signals_hermes.db: NOT a signals DB (it's a price/OHLCV cache)
+
+  The ai_decider / signal_gen pipeline is NOT writing to signals DB.
+  Either:
+  a) Generation is writing to predictions.db only (not signals DB)
+  b) Generation is disabled/blocked
+  c) The signals DB path has changed
+
+  Pipeline cannot be reviewed using the standard signals DB queries.
+
+
+### 🟢 OK #7: Pipeline Generation Active
+
+  predictions.db: 128,835 predictions (latest: 2026-04-12 19:14)
+  ~4 predictions/second generation rate seems active.
+  84 unique tokens covered.
+
+
+### 🟢 OK #8: was_inverted Flag Doesn't Help Much
+
+  was_inverted=0, UP:   95.3% WR
+  was_inverted=1, UP:   96.0% WR  (slightly better)
+  was_inverted=0, DOWN: 27.0% WR
+  was_inverted=1, DOWN: 28.2% WR  (slightly better)
+
+  Inversion is not a reliable signal correction mechanism.
+  The problem is structural, not an inversion issue.
+
+================================================================================
+## RECOMMENDED ACTIONS (Priority Order)
+================================================================================
+
+1. [CRITICAL] FIX DOWN PREDICTIONS — Root cause analysis of why DOWN is
+   27% WR (anti-correct). The model appears to have learned the wrong
+   direction for DOWN in most regimes. Suspect:
+   - Training data labeling issue (DOWN signal = price went up?)
+   - Momentum/regime feature interaction inverts for shorts
+   - Feature importance: RSI extreme values may trigger shorts incorrectly
+   
+   Action: Audit the signal generation code for SHORT direction — check
+   RSI logic, MACD crossover logic, and regime interaction for shorts.
+
+2. [CRITICAL] BALANCE DIRECTION RATIO — 8.6x LONG bias needs investigation.
+   If market is actually 50/50, ratio should not exceed 2x.
+   The RSI_individual producing 144:1 LONG was flagged in the last review.
+   This has likely worsened.
+
+   Action: Audit all signal generators for one-sided logic.
+   Add direction distribution monitoring to signal_gen.
+
+3. [CRITICAL] RECALIBRATE CONFIDENCE — Confidence tiers above 60 are
+   less accurate than tier 50-60. The confidence field is not predictive.
+   
+   Action: Remove confidence as an auto-approval gate.
+   OR retrain the confidence model on actual price outcomes.
+
+4. [HIGH] FIX SIGNAL ATTRIBUTION — All 86 closed trades have signal="unknown".
+   This means the trading system is not receiving signal metadata.
+   Cannot do signal-level performance analysis.
+
+   Action: Ensure signal ID/type is passed through to trade execution.
+
+5. [HIGH] INVESTIGATE signals_hermes_runtime.db EMPTY — Determine if
+   this is intentional (predictions.db is the new signal store) or a bug.
+   
+   Action: Check signal_gen configuration for output DB path.
+
+6. [MEDIUM] CLOSED TRADE SIGNAL ATTRIBUTION — Add confidence field to
+   closed_trades_archive.json so WR can be analyzed by confidence tier.
+
+================================================================================
+## DATA SOURCES
+================================================================================
+
+predictions.db          — 128,835 rows, 84 tokens, active generation
+closed_trades_archive   — 86 closed paper trades
+signals_hermes_runtime  — EMPTY (0 signals) — legacy signals DB
+PostgreSQL trades       — 1 open trade, 0 closed
+
+================================================================================

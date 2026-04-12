@@ -57,7 +57,7 @@ except (IOError, OSError):
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from hermes_ab_utils import get_cached_ab_variant
-from hermes_constants import HOTSET_BLOCKLIST, SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, hype_coin,
@@ -1554,11 +1554,13 @@ def close_orphan_paper_trades(hl_pos, prices):
                 conn_s.close()
             except Exception:
                 in_hot = False  # Fail open on DB errors
-            blocked = ht.upper() in HOTSET_BLOCKLIST
+            blocked = (direction.upper() == 'SHORT' and ht.upper() in SHORT_BLACKLIST) or \
+                      (direction.upper() == 'LONG' and ht.upper() in LONG_BLACKLIST)
             if not in_hot:
                 log(f'  {token}: NOT in hot-set — paper only, live mirror blocked', 'WARN')
             elif blocked:
-                log(f'  {token}: on HOTSET_BLOCKLIST ({direction}) — closing paper trade', 'WARN')
+                bl = 'SHORT_BLACKLIST' if direction.upper() == 'SHORT' else 'LONG_BLACKLIST'
+                log(f'  {token}: on {bl} ({direction}) — closing paper trade', 'WARN')
                 _close_paper_trade_db(trade_id, token, curr_price, 'HOTSET_BLOCKED')
             elif not DRY and is_live_trading_enabled():
                 try:
@@ -1943,12 +1945,12 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
 
 def _sweep_blocklist_trades(prices):
     """
-    Step 9 (2026-04-05): Sweep all open paper trades and close any on HOTSET_BLOCKLIST.
+    Step 9 (2026-04-05): Sweep all open paper trades and close any on SHORT or LONG blacklist.
     This is the last line of defense against external systems writing blocklisted tokens.
     Only closes paper=true trades — live trades get real HL fill data.
     """
     if DRY:
-        log('[DRY] _sweep_blocklist_trades: would check all open paper trades against HOTSET_BLOCKLIST')
+        log('[DRY] _sweep_blocklist_trades: would check all open paper trades against SHORT/LONG blacklist')
         return 0
 
     conn = get_db_connection()
@@ -1967,15 +1969,13 @@ def _sweep_blocklist_trades(prices):
         """)
         for (trade_id, token, direction, entry_px, lev) in cur.fetchall():
             ht = token.upper()
-            if ht not in HOTSET_BLOCKLIST:
+            blocked_short = direction.upper() == 'SHORT' and ht in SHORT_BLACKLIST
+            blocked_long = direction.upper() == 'LONG' and ht in LONG_BLACKLIST
+            if not (blocked_short or blocked_long):
                 continue
 
             # Determine direction-appropriate close reason
-            reason = (
-                'HOTSET_BLOCKED_SHORT' if direction.upper() == 'SHORT' and ht in SHORT_BLACKLIST else
-                'HOTSET_BLOCKED_LONG'  if direction.upper() == 'LONG'  and ht in LONG_BLACKLIST  else
-                'HOTSET_BLOCKED'
-            )
+            reason = 'HOTSET_BLOCKED_SHORT' if blocked_short else 'HOTSET_BLOCKED_LONG'
             exit_price = prices.get(ht) or prices.get(token) or entry_px or 0
 
             trade_id_str = str(trade_id)
@@ -2734,15 +2734,15 @@ def sync():
                 except Exception as e:
                     log(f'  DB close failed for {tok}: {e}', 'FAIL')
 
-    # Step 9: SWEEP HOTSET_BLOCKLIST — close any paper trades on the blocklist.
+            # Step 9: SWEEP SHORT/LONG BLACKLIST — close any paper trades on the directional blacklist.
     # External systems (e.g. OpenClaw) can write directly to brain.trades, bypassing
     # signal_gen.py blacklist checks. This is the last line of defense: any paper trade
-    # on HOTSET_BLOCKLIST (SHORT_BLACKLIST ∪ LONG_BLACKLIST) gets closed regardless
+            # on SHORT_BLACKLIST or LONG_BLACKLIST gets closed regardless
     # of how it was created. Only closes paper=true trades — live trades use HL fills.
     if True:  # always run, even when live trading is OFF
         sweep_closed = _sweep_blocklist_trades(prices)
         if sweep_closed > 0:
-            log(f'Step9 blocklist sweep: closed {sweep_closed} paper trades on HOTSET_BLOCKLIST')
+            log(f'Step9 blocklist sweep: closed {sweep_closed} paper trades on SHORT/LONG blacklist')
 
     # Step 10: Reconcile TP/SL — move only in favorable direction, per-token 30s cooldown
     if db_trades:

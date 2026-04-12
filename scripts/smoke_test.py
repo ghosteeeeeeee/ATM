@@ -362,15 +362,45 @@ def check_hebbian_network():
 
 
 def check_no_flapping():
-    """Check pipeline for flapping (restarts > 3 times in 10 min)."""
+    """Check pipeline for flapping (restarts > 3 times in 10 min).
+    
+    FIX (2026-04-12): Was counting ALL "START"/"pipeline" lines in the entire log
+    (458K lines), triggering false positives. Fixed to count only actual pipeline
+    cycle completions in the last 60 minutes by checking for "Pipeline done"
+    patterns with timestamps.
+    """
     if not PIPELINE_LOG.exists():
         return True, "no pipeline.log"
     try:
+        import time
+        cutoff = time.time() - 3600  # last 60 min
         lines = PIPELINE_LOG.read_text().splitlines()
-        recent = [l for l in lines if "START" in l or "pipeline" in l.lower()]
-        if len(recent) > 10:
-            return False, f"Pipeline flapping: {len(recent)} restarts"
-        return True, "pipeline stable"
+        
+        # Count actual pipeline completions in last 60 min
+        completions = 0
+        for l in lines:
+            if "Pipeline done" in l:
+                # Extract timestamp: "[2026-04-12 15:32:13]"
+                try:
+                    ts_str = l.split(']')[0].replace('[', '')
+                    from datetime import datetime
+                    ts = datetime.strptime(ts_str, '%Y-%m-%d %H:%M:%S').timestamp()
+                    if ts >= cutoff:
+                        completions += 1
+                except (ValueError, IndexError):
+                    pass
+        
+        # Also count restarts: "Restarting pipeline" or service restarts
+        restarts = 0
+        for l in lines[-5000:]:  # last 5000 lines = last ~2 hours at normal rate
+            if "restart" in l.lower() and "service" in l.lower():
+                restarts += 1
+        
+        if completions > 30:
+            return False, f"Pipeline flapping: {completions} cycles in last 60min (>30 threshold)"
+        if restarts > 10:
+            return False, f"Pipeline flapping: {restarts} service restarts in last 5000 lines (>10 threshold)"
+        return True, f"pipeline stable ({completions} cycles, {restarts} restarts)"
     except Exception:
         return True, "flapping check unknown"
 

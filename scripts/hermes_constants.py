@@ -45,6 +45,8 @@ SHORT_BLACKLIST = {
     'PENGU',   # SHORT net: -$4.36 (1 loss: conf-1s -$4.36)
     # 2026-04-10: CFX — persistent losses on SHORT, phantom order issues on HL
     'CFX',
+    # 2026-04-11: SAND — blocklisted both directions
+    'SAND',
 }
 LONG_BLACKLIST = {
     'SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
@@ -103,10 +105,15 @@ LONG_BLACKLIST = {
     'PAXG',
     # 2026-04-06: ME systematic LONG losses — 10 trades net -$2.77 (guardian_missing closes)
     'ME',
+    # 2026-04-11: SAND — blocklisted both directions
+    'SAND',
 }
 BROAD_MARKET_TOKENS={'SOL', 'BTC'}
 
-# Combined blocklist: tokens blocked from hot-set for ANY direction
-# = SHORT_BLACKLIST ∪ LONG_BLACKLIST
-HOTSET_BLOCKLIST = SHORT_BLACKLIST | LONG_BLACKLIST
+# Signal source blocklist — block ENTIRE signal sources that are broken/baselined
+# Blocked sources will be filtered out at the signal_schema.py level before hotset
+SIGNAL_SOURCE_BLACKLIST = {
+    'rsi-confluence',  # 0% WR across 7+ trades — suppress entirely
+    'rsi_confluence',  # same source, underscore variant (signal_type field)
+}
 SERVER_NAME = 'Hermes'

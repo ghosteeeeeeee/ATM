@@ -6,40 +6,7 @@
 
 ---
 
-## Priority Tasks
-
-### [P] W&B self-learning tracking — all 3 systems (Self-Learning)
-**Owner:** Agent + T
-**Status:** ✅ DONE 2026-04-06 — Added to: candle_predictor, ab_utils, ai_decider. All run in offline mode, local JSONL backups written. Sweep config ready. T to provide W&B API key to enable cloud sync.
-
-### [🚨] CRITICAL: Cascade flip DONE — thresholds lowered, SKIPPED signals added
-**Project:** Cascade Flip Enhancement
-**Owner:** Agent
-**Status:** ✅ DONE 2026-04-06 — Thresholds lowered: ARM=-0.25%, TRIGGER=-0.50%, HF_TRIGGER=-0.35%. MIN_CONF=60%, MAX_AGE=30min. SKIPPED signals now in confluence check alongside PENDING/WAIT/APPROVED. Volume-confirmation buffer added (0.35% when vol confirms, 0.25% when not).
-**Reference:** [DECISIONS.md#2026-04-06 | Cascade flip thresholds lowered + SKIPPED signals added]
-
----
-
-### [!] WR flip test — outcome documented (Win Rate Investigation)
-**Project:** Win Rate Investigation
-**Status:** ❌ CLOSED — Flip test FAILED on 2 trades. Historical 79% SHORT-wrong finding did NOT replicate. System continues without signal flip.
-**Action:** No further action needed.
-
----
-
-### [!] Tokyo PG — accept SQLite-only mode permanently
-**Status:** ❌ CLOSED — SQLite-only mode. PostgreSQL workflow_state feature decommissioned.
-**Action:** No further action needed.
-
----
-
 ## Queued Tasks (Next Sprint)
-
-### [ ] Cascade flip: check APPROVED+SKIPPED signals (Signal Enhancement)
-**Project:** Cascade Flip Enhancement
-**Status:** ✅ DONE 2026-04-06 — Already included in thresholds-lowered fix. SKIPPED signals added to confluence check. APPROVED signals were already included.
-
----
 
 ### [ ] Session checkpoint/restore system (Session Persistence)
 **Project:** Session Checkpoint/Restore System
@@ -77,24 +44,6 @@
 ## Smoke Testing Infrastructure
 **Project:** Smoke Test — general infrastructure sanity checks
 
-### [P] Smoke Test Suite — DONE 2026-04-09
-- `scripts/smoke_test.py` — full suite of 10 infrastructure checks ✅
-- Checks: pipeline_errors, pipeline_not_stuck, price_data_fresh, hotset_exists, signal_db, brain_db, postgres_trades, live_mode, no_flapping, hebbian_network ✅
-- systemd `hermes-smoke-test.timer`: every 15 minutes ✅
-- hotset threshold: >10min stale = FAIL ✅
-
-### [P] Better Coder Integration — DONE 2026-04-09
-- Post-run hook in `scripts/run_better_coder.py` — runs `smoke_test.py --changed-since 30 --heal` after each dispatcher cycle ✅
-- Detects scripts modified in last 30min, runs targeted checks only ✅
-- Script→checks map: SCRIPT_CHECK_MAP in smoke_test.py (easily extensible) ✅
-
-### [P] Self-Healing with Minimax AI — DONE 2026-04-09
-- `smoke_test.py --heal` tries built-in fixes first, then calls minimax for unknown failures ✅
-- Minimax diagnoses failure, suggests safe infra command, auto-executes if whitelisted ✅
-- Whitelisted prefixes: `sudo systemctl restart/start/stop`, `python3 /root/.hermes/scripts/`, `sudo rm -f /tmp/` ✅
-- Max 2 heal attempts per cycle, 5s delay between attempts, results logged to `logs/smoke_heal.log` ✅
-- `signal_db` check: SQLite primary (0 bytes = empty), PG fallback — signals live in SQLite runtime DB ✅
-
 ### [ ] Extend SCRIPT_CHECK_MAP
 Add entries as new scripts are created:
 ```
@@ -109,17 +58,6 @@ SCRIPT_CHECK_MAP = {
 ## Hebbian Associative Memory (General Purpose)
 **Project:** Hebbian Associative Memory Network
 
-### [P] Core Hebbian Engine — DONE 2026-04-09
-- `scripts/hebbian_engine.py` — learn_pair, recall, decay_all, get_stats ✅
-- `brain/associative_memory.db` — SQLite schema (concept_nodes + synapse_weights) ✅
-- Unit tests: learn/recall cycle, bidirectional, weight accumulation, decay ✅
-
-### [P] MCP Tools + Skill — DONE 2026-04-09
-- Added `hebbian_recall`, `hebbian_learn`, `hebbian_stats` to `mcp/hermes-coding-mcp/server.py` ✅
-- Restarted hermes-coding-mcp systemd service ✅
-- Created `skills/associative-recall/SKILL.md` ✅
-- Updated `skills/brain-memory/SKILL.md` — added 3rd recall mode ✅
-
 ### [ ] Initial seeding — seed from brain files
 **Status:** 🚧 IN PROGRESS
 - `scripts/hebbian_learner.py` created ✅
@@ -127,79 +65,9 @@ SCRIPT_CHECK_MAP = {
 - Skill files seeding: skipped (hangs on glob)
 - Current DB: 82 nodes, 915 synapses
 
-### [ ] Integration hooks — learn from real usage
-**Status:** ✅ DONE 2026-04-09
-- Entity extractor: `scripts/hebbian_entity_extractor.py` — typed entities (token/skill/file/infra/project/concept) from any text ✅
-- Session co-occurrence learner: `scripts/hebbian_session_learner.py` — processes decisions logs + session dumps ✅
-- SOUL.md directive: Agent instructed to proactively recall concepts T mentions ✅
-- Skill: `skills/associative-recall/` — session start hook + CLI docs ✅
-- MCP tools: `hebbian_recall`, `hebbian_learn`, `hebbian_stats` in hermes-coding-mcp ✅
-- Brain-memory updated: associative recall as 3rd recall mode ✅
-
-### [ ] Daily decay cron — CREATED 2026-04-09
-**Status:** ✅ DONE 2026-04-09
-- Decay factor: 0.999/day (elephant's memory — ~3% loss/year) ✅
-- `hermes-hebbian-decay.timer` systemd: 4 AM UTC daily ✅
-- `hermes-session-learner.timer` systemd: 6 AM UTC daily ✅
-
-**Reference:** [.hermes/plans/2026-04-09_060840-how-would-we-create-a-neural-network-type.md](../.hermes/plans/2026-04-09_060840-how-would-we-create-a-neural-network-type.md)
-
 ---
 
 ## Chart Pattern Recognition (Phase 1 — Bull Flag)
-
-### [P] Build pattern_scanner.py — flag detection (Phase 1)
-**Project:** Chart Pattern Recognition
-**Owner:** Agent
-**Status:** ✅ DONE — 2026-04-06
-**What:** Created `/root/.hermes/scripts/pattern_scanner.py` with:
-- `detect_bull_flag()` — flag pole (>= 3% impulse in <= 8 candles) + consolidation (< 1.5% range) + breakout confirmation
-- `detect_bear_flag()` — mirror for shorts
-- `detect_ascending_triangle()` — higher lows + horizontal resistance breakout
-- `detect_descending_triangle()` — mirror for shorts
-- `write_pattern_signal()` — emits to signals DB with `source='pattern_scanner'`
-- Tested on synthetic data: bull flag detected at 68.2% ✅
-- IMX confirmed: no breakout yet (resistance $0.1364, last close $0.1360) ✅
-**Reference:** [PROJECTS.md#Chart Pattern Recognition]
-
-### [P] Integrate pattern_scanner into signal_gen.py (all tokens, run FIRST)
-**Project:** Chart Pattern Recognition
-**Owner:** Agent
-**Status:** ✅ DONE — 2026-04-06
-**What:** Added `_run_pattern_signals()` to `signal_gen.py`:
-- `import pattern_scanner` at top of signal_gen.py
-- `_run_pattern_signals(prices_dict)` — iterates ALL tokens, calls `scan_and_write()` per token
-- Called FIRST in `run()` before mtf_macd loop (line ~1941)
-- 0.46s for 50 tokens — fast, non-blocking
-- Pattern signals compete equally with momentum in the DB
-**Reference:** [PROJECTS.md#Chart Pattern Recognition]
-
-### [P] Add WR-based calibration for ALL signals (auto-multiplier)
-**Project:** Chart Pattern Recognition
-**Owner:** Agent
-**Status:** ✅ DONE — 2026-04-06
-**What:** Full calibration system added to `ai_decider.py`:
-- `get_signal_type_stats()` — queries `signal_outcomes`, computes WR per signal type
-- `get_calibration_summary()` — human-readable calibration report
-- `get_category_multipliers()` — aggregated category-level multipliers
-- `_wr_to_multiplier()` — WR→multiplier mapping
-- `SIGNAL_TYPE_CATEGORY_MAP` — maps composite signal types to categories
-- `_get_source_weight()` updated to apply WR-based calibration on top of baselines
-- `PERF_CAL_MIN_TRADES = 15` — min trades before calibration kicks in
-
-Calibration rules (ALL signals):
-  WR >= 55%  → 1.5×  |  WR 45-55%  → 1.25×  |  WR 40-45%  → 0.75×  |  WR < 40%  → 0.0× (disabled)
-
-**Current live calibration findings:**
-  decider:         22.8% WR / 101 trades → DISABLED (0.0×)
-  conf-2s:         33.3% WR / 39 trades → DISABLED (0.0×)
-  conf-3s:         24.0% WR / 25 trades → DISABLED (0.0×)
-  conf-1s:         45.5% WR / 110 trades → 1.25× (calibrated good)
-  hl_reconcile:    51.0% WR / 51 trades → 1.25×
-  pattern_scanner: no data yet → 1.0× baseline (1.25× override active)
-
-Check status: `python3 -c "from ai_decider import get_calibration_summary; print(get_calibration_summary())"`
-**Reference:** [PROJECTS.md#Chart Pattern Recognition]
 
 ### [ ] Test pattern_scanner on IMX ascending triangle
 **Project:** Chart Pattern Recognition
@@ -310,34 +178,6 @@ Check status: `python3 -c "from ai_decider import get_calibration_summary; print
 
 ---
 
-## Completed (this session)
-
-- [✅] **Kanban board at `/projects`** (port 54321)
-  - API: `/api/config/projects` (GET/POST), data at `/var/www/hermes/data/kanban.json`
-  - HTML: `/var/www/hermes/projects.html` — drag-and-drop, inline edit, priority, project labels
-- [✅] ATM folder created: `/root/.hermes/ATM/`
-- [✅] `ATM/config/stoploss.md` written
-- [✅] SOPs.md updated
-- [✅] PROJECTS.md: Trading-Docker → renamed AI Trading Machine (ATM), ATM folder structure documented
-- [✅] DECISIONS.md: Added "ATM folder created" + "Cut-loser DISABLED" entries
-- [✅] Run signal compaction
-- [✅] Build checkpoint_utils.py
-- [✅] Build event_log.py
-- [✅] Add token budget to ai_decider.py
-- [✅] Instrument decider-run.py with checkpoints + log_event
-- [✅] Instrument hl-sync-guardian.py with checkpoints + log_event
-- [✅] Add workflow_state to signal_schema.py + DB migration
-- [✅] Run integration test suite
-- [✅] Remove OpenClaw (binary, npm, 54 systemd units)
-- [✅] Start hermes-gateway on port 18790
-- [✅] Restart hermes-git-release.timer (was dead since Apr 2)
-- [✅] Audit all 47 OpenClaw skills vs Hermes tools
-- [✅] Create DECISIONS.md
-- [✅] Create PROJECTS.md
-- [✅] Create TASKS.md
-
----
-
 ## Post-Fix Verification (3-day monitoring)
 
 ### [ ] (P) Verify SL ATR adjustments improved win rate — owner: ai-engineer — 2026-04-09
@@ -392,31 +232,3 @@ CONFIRM that SpeedTracker's price history was seeded for KSHIB, KFLOKI, KBONK, K
 
 *Format: `- [STATUS] Task (Project) — owner` — update status when it changes.*
 *How to read: Most urgent at top. Completed tasks move to bottom section.*
----
-
-## 2026-04-08 Session Tasks
-
-### [P] SL/TP System Fixes — Phase 1 (done), Phase 2 (done), Phase 3 (done)
-**Project:** SL/TP Protection System Fixes
-**Status:** ✅ ALL 8 DONE — 2026-04-08
-**Date:** 2026-04-08
-
-**All completed:**
-- [✅] B8: Atomic write lock added to hermes-trades-api.py + update-trades-json.py
-- [✅] B3: SL+TP placed on HL immediately after entry (brain.py add_trade)
-- [✅] B2: SL+TP placed on HL after cascade flip (position_manager cascade_flip)
-- [✅] B1: Trailing SL pushed to HL every cycle (already implemented, verified)
-- [✅] B7: Guardian kill switch created (guardian_kill_switch.json + _is_token_killed check)
-- [✅] B6: Standardized close reason vocabulary (UPPERCASE_STANDARD format)
-- [✅] B5: 429 backoff retry in position_manager (_retry_hl_call helper)
-- [✅] B4: cascade_sequences table + recording in cascade_flip()
-
-**Reference:** [brain/PROJECTS.md#SL/TP Protection System Fixes]
-
-### [🚨] Guardian + Position Manager — confirm online and watching
-**Status:** ✅ DONE — Confirmed 2026-04-08
-- Guardian: 10/10 positions matched, running every 60s
-- Position Manager: 10 open, 6 trailing activations last cycle
-- XRP: LONG entry=1.3886, current=1.3690, pnl=-1.23%, SL=1.3608 (NOT stopped out)
-- EIGEN: closed at +0.42% (trailing exit -0.12%) — NOT a loss
-

@@ -181,6 +181,41 @@ def init_db():
         rc.execute("ALTER TABLE signals ADD COLUMN rejection_reason TEXT")
     except Exception:
         pass  # column may already exist
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS signal_types TEXT")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN signal_types TEXT")
+        except Exception:
+            pass  # column already exists
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS deescalation_reason TEXT")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN deescalation_reason TEXT")
+        except Exception:
+            pass
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS hot_cycle_count INTEGER DEFAULT 0")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN hot_cycle_count INTEGER DEFAULT 0")
+        except Exception:
+            pass
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS counter_detected INTEGER DEFAULT 0")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN counter_detected INTEGER DEFAULT 0")
+        except Exception:
+            pass
+    try:
+        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS last_hot_at TEXT")
+    except Exception:
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN last_hot_at TEXT")
+        except Exception:
+            pass
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
     rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
@@ -267,7 +302,13 @@ def init_db():
         if count == 0:
             print(f'Loading backfill seed from {seed_path} ...')
             with open(seed_path) as f:
-                sc.executescript(f.read())
+                try:
+                    sc.executescript(f.read())
+                except sqlite3.OperationalError as e:
+                    if 'already exists' in str(e):
+                        print(f'  Seed table already exists (concurrent init) — skipping')
+                    else:
+                        raise
             sc.commit()
             new_count = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
             print(f'Seed loaded: {new_count} rows')
@@ -305,12 +346,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     if confidence < MIN_CONFIDENCE_FLOOR:
         return None  # Silently skip low-confidence signals
 
-    # ── HOTSET_BLOCKLIST guard — block at source ───────────────────────────
+    # ── Directional blacklist guard — block at source ──────────────────────
     # Import lazily to avoid circular deps
     try:
-        from hermes_constants import HOTSET_BLOCKLIST
-        if token.upper() in HOTSET_BLOCKLIST:
-            return None  # Silently skip blocklisted tokens
+        from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST
+        if direction.upper() == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            return None  # Silently skip SHORT-blocklisted tokens
+        if direction.upper() == 'LONG' and token.upper() in LONG_BLACKLIST:
+            return None  # Silently skip LONG-blocklisted tokens
+        if signal_type in SIGNAL_SOURCE_BLACKLIST:
+            return None  # Silently skip blocklisted signal sources
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
     # ─────────────────────────────────────────────────────────────────────────
@@ -912,7 +957,6 @@ def mark_signal_processed(token, decision, signal_ids=None, decision_reason=None
     try:
         tok = token.upper()
         reason = decision_reason or f'processed-{decision.lower()}'
-        increment_rc = decision in ('SKIPPED', 'WAIT')
 
         if signal_ids:
             # Targeted update: only specific IDs
@@ -924,7 +968,18 @@ def mark_signal_processed(token, decision, signal_ids=None, decision_reason=None
                     SET decision=?, decision_reason=?, executed=0, updated_at=CURRENT_TIMESTAMP
                     WHERE id IN ({placeholders}) AND executed IN (0, 1)
                 ''', params)
-            elif increment_rc:
+            elif decision == 'WAIT':
+                # WAIT = processed by AI but not yet traded; keep executed=0 so it
+                # stays in the hot-set compaction pool and can be APPROVED later.
+                c.execute(f'''
+                    UPDATE signals
+                    SET decision=?, decision_reason=?, executed=0,
+                        review_count = COALESCE(review_count, 0) + 1,
+                        updated_at=CURRENT_TIMESTAMP
+                    WHERE id IN ({placeholders}) AND executed IN (0, 1)
+                ''', params)
+            elif decision == 'SKIPPED':
+                # SKIPPED = dead signal, not to be traded; executed=1 excludes it.
                 c.execute(f'''
                     UPDATE signals
                     SET decision=?, decision_reason=?, executed=1,
@@ -948,7 +1003,15 @@ def mark_signal_processed(token, decision, signal_ids=None, decision_reason=None
                     SET decision=?, executed=0, updated_at=CURRENT_TIMESTAMP
                     WHERE token=? AND executed IN (0, 1)
                 ''', params_approved)
-            elif increment_rc:
+            elif decision == 'WAIT':
+                c.execute('''
+                    UPDATE signals
+                    SET decision=?, decision_reason=?, executed=0,
+                        review_count = COALESCE(review_count, 0) + 1,
+                        updated_at=CURRENT_TIMESTAMP
+                    WHERE token=? AND executed IN (0, 1)
+                ''', params_other)
+            elif decision == 'SKIPPED':
                 c.execute('''
                     UPDATE signals
                     SET decision=?, decision_reason=?, executed=1,

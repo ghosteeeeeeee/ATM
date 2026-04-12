@@ -19,8 +19,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (
     get_ohlcv_1m,
     get_latest_price,
-    _get_conn,
-    RUNTIME_DB,
+    add_signal,  # Use add_signal so directional blacklist guards are applied
 )
 
 # ── Pattern Signal Constants ──────────────────────────────────────────────────
@@ -689,32 +688,27 @@ def detect_descending_triangle(candles: list) -> dict | None:
 # ── Write Pattern Signal to DB ───────────────────────────────────────────────
 
 def write_pattern_signal(token: str, pattern: dict) -> bool:
-    """Write a pattern signal to the signals DB."""
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # ISO format — matches SQLite datetime() comparisons in expiry
+    """Write a pattern signal to the signals DB via add_signal().
+    add_signal() applies directional blacklist guards — SHORT_BLACKLIST/LONG_BLACKLIST.
+    Returns True only if signal was actually written to DB."""
     try:
-        conn = _get_conn(RUNTIME_DB)
-        c = conn.cursor()
-        c.execute("""
-            INSERT INTO signals (
-                token, direction, signal_type, source, confidence,
-                price, exchange, timeframe, decision,
-                z_score, momentum_state, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            token.upper(),
-            pattern['direction'],
-            pattern['signal_type'],
-            pattern['source'],
-            pattern['confidence'],
-            pattern.get('breakout_px', 0),
-            'hyperliquid',
-            '1m',
-            'PENDING',
-            None, None, now
-        ))
-        conn.commit()
-        conn.close()
-        return True
+        result = add_signal(
+            token=token.upper(),
+            direction=pattern['direction'].upper(),
+            signal_type=pattern['signal_type'],
+            source=pattern['source'],
+            confidence=pattern['confidence'],
+            value=pattern.get('breakout_px', pattern.get('resistance_px', 0)),
+            price=pattern.get('breakout_px', pattern.get('resistance_px', 0)),
+        )
+        wrote_ok = result is not None
+        if wrote_ok:
+            print(f'[pattern_scanner] {token} {pattern["pattern_type"]} '
+                  f'{pattern["direction"]} conf={pattern["confidence"]}% '
+                  f'breakout=${pattern.get("breakout_px", pattern.get("resistance_px", 0)):.4f}')
+        else:
+            print(f'[pattern_scanner] {token} BLOCKED (blacklist)')
+        return wrote_ok
     except Exception as e:
         print(f'[pattern_scanner] write_pattern_signal error: {e}')
         return False
@@ -775,14 +769,14 @@ def scan_token(token: str, lookback_minutes: int = 240) -> list:
 def scan_and_write(token: str, lookback_minutes: int = 240) -> list:
     """
     Scan a token for patterns and write any detected signals to DB.
-    Returns list of patterns found.
+    Returns list of patterns written (not blocked by SHORT_BLACKLIST/LONG_BLACKLIST).
     """
     patterns = scan_token(token, lookback_minutes=lookback_minutes)
+    written = []
     for p in patterns:
-        write_pattern_signal(token, p)
-        print(f"[pattern_scanner] {token} {p['pattern_type']} {p['direction']} "
-              f"conf={p['confidence']}% breakout=${p.get('breakout_px', p.get('resistance_px', 0)):.4f}")
-    return patterns
+        if write_pattern_signal(token, p):
+            written.append(p)
+    return written
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────

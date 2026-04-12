@@ -79,6 +79,7 @@ PREFER_HYPERLIQUID_TOKENS = {
 # ============================================
 TOKEN_BLACKLIST = {
     'SKR',  # Worst performer
+    'SAND',  # Blocklisted 2026-04-11
 }
 
 # ============================================

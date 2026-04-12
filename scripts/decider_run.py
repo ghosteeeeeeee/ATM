@@ -760,7 +760,7 @@ def execute_trade(token, direction, price, confidence, source,
                 if 'trade #' in line.lower():
                     tid = line.lower().split('trade #')[1].split()[0]
                     if tid == 'none':
-                        return False, f'brain.py rejected: conf-1s or HOTSET_BLOCKLIST blocked (output: {result.stdout.strip()[:80]})'
+                        return False, f'brain.py rejected: conf-1s or blacklist blocked (output: {result.stdout.strip()[:80]})'
                     # Add traded coin to candle predictor watch list
                     try:
                         from candle_predictor import add_to_watch_list
@@ -1439,12 +1439,11 @@ def run(dry_run=False):
     # If approved is empty, we wait for the next ai_decider run to populate the hot-set.
     # This is the "no shortcuts" rule from surfing.md.
 
-    # ── Confidence floor: reject signals below 65% ──────────────────────────
-    # Raised from 70% on 2026-04-02. The _run_hot_set() approver runs every minute
-    # (not every 10min like ai-decider) and approves at 65%+ for hot confluence signals.
-    # 65% is the floor for any signal reaching execution — hot-set tokens that survived
-    # AI review at this level are pre-qualified. Individual RSI/MACD below 65% are blocked.
-    MIN_EXEC_CONFIDENCE = 65
+    # ── Confidence floor: reject signals below 50% ──────────────────────────
+    # Lowered from 65% on 2026-04-11 — signals were being generated at 59-65% conf
+    # but 100% blocked at execution gate, causing empty hotset and pipeline stall.
+    # 50% is still a meaningful quality floor for pre-qualified hot-set tokens.
+    MIN_EXEC_CONFIDENCE = 50
     approved = [s for s in approved if s.get('final_confidence', 0) >= MIN_EXEC_CONFIDENCE]
     if not approved:
         log(f'No signals above {MIN_EXEC_CONFIDENCE}% confidence — skipping execution')

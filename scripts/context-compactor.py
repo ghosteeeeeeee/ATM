@@ -11,7 +11,8 @@ Timeout: 30s wait, 5s polling, SKIPPED on timeout.
 import sys, os, re, time, subprocess, json
 sys.path.insert(0, '/root/.hermes/scripts')
 
-CONTEXT_FILE = '/root/.hermes/CONTEXT.md'
+CONTEXT_FILE         = '/root/.hermes/CONTEXT.md'
+ATM_ARCHITECTURE_FILE = '/root/.hermes/ATM/ATM-Architecture.md'
 LOCK_FILE    = '/root/.hermes/locks/context.md.lock'
 MAX_WAIT     = 30
 POLL_INT     = 5
@@ -223,6 +224,31 @@ def patch_context_file(quick_status, critical_flags, timestamp):
         log("Appended timestamp")
     else:
         log(f"Patched timestamp ({n_ts} replacement)")
+
+    # ── Append ATM Architecture Reference ─────────────────────────────────────
+    # Always keep a current snapshot of the architecture at the end of CONTEXT.md
+    try:
+        with open(ATM_ARCHITECTURE_FILE, 'r') as f:
+            arch_content = f.read().strip()
+        # Remove existing ATM Architecture section if present
+        arch_section_pattern = r'\n---\n# ATM ARCHITECTURE SNAPSHOT.*?(?=\n---\n|\Z)'
+        new_content3 = re.sub(arch_section_pattern, '', new_content3, flags=re.DOTALL)
+        # Find the last horizontal rule before EOF to insert after it
+        # If no HR found, append at end
+        if '\n---\n' in new_content3:
+            insert_pos = new_content3.rfind('\n---\n') + 5
+            new_content3 = new_content3[:insert_pos] + (
+                f"\n# ATM ARCHITECTURE SNAPSHOT (auto-generated, see: ATM-Architecture.md)\n"
+                f"{arch_content}\n"
+            )
+        else:
+            new_content3 = new_content3.rstrip() + (
+                f"\n---\n# ATM ARCHITECTURE SNAPSHOT (auto-generated, see: ATM-Architecture.md)\n"
+                f"{arch_content}\n"
+            )
+        log("Appended ATM Architecture snapshot to CONTEXT.md")
+    except Exception as e:
+        log(f"WARNING: could not append ATM Architecture: {e}")
 
     # Write back via lock
     fd = acquire_lock()

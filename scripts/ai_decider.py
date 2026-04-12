@@ -111,9 +111,10 @@ def _record_token_usage(tokens_used: int):
 
 AB_CONFIG_FILE = '/root/.hermes/data/ab-test-config.json'
 sys.path.insert(0, '/root/.hermes/scripts')
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
+from signal_schema import mark_signal_processed, validate_source  # BUG-12 fix: must be before first use (line 1645)
 
 # ─── Source confidence weights ────────────────────────────────────────────────
 # Single config for all signal source multipliers applied to raw confidence.
@@ -142,8 +143,8 @@ SOURCE_WEIGHT_OVERRIDES = [
     ('pattern_wyckoff','pattern_scanner', 1.25),
     ('pattern_elliot', 'pattern_scanner', 1.25),
     ('pattern_micro_flag', 'pattern_scanner', 1.0),   # micro flags get 1.0× — lower weight until proven
-    # RSI confluence: oversold/overbought RSI confirming momentum — boosted to 1.5
-    ('rsi-confluence', 'rsi_confluence', 1.5),
+    # RSI confluence: oversold/overbought RSI confirming momentum — suppressed to 0.5 (WR=0% across 7 trades — was 1.5)
+    ('rsi-confluence', 'rsi_confluence', 0.5),
 ]
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -1026,11 +1027,12 @@ def cleanup_stale_signals():
             
             # Fix inconsistent signals — only for non-PENDING decisions
             # PENDING signals stay untouched so ai-decider can review them
+            # WAIT signals must also stay with executed=0 so compaction can re-evaluate them
             cur.execute("""
                 UPDATE signals
                 SET executed = 1, updated_at = CURRENT_TIMESTAMP
                 WHERE decision IS NOT NULL AND executed = 0
-                  AND decision NOT IN ('PENDING', 'APPROVED')
+                  AND decision NOT IN ('PENDING', 'APPROVED', 'WAIT')
             """)
             conn_sqlite.commit()
             
@@ -1101,8 +1103,8 @@ def _do_compaction_llm():
     conn = sqlite3.connect(SIGNALS_DB)
     c = conn.cursor()
 
-    # STEP 1: Query signals from last 30 mins (wider window to catch signals
-    # generated in the 10-min steps, since signal_gen only fires 2x/hour)
+    # STEP 1: Query signals from last 90 mins (expanded window to prevent mass-rejection
+    # when LLM compaction runs but signal_gen hasn't fired in a while).
     # Include PENDING/APPROVED signals that haven't been executed yet.
     # Whitelist filter: if SIGNAL_TYPE_WHITELIST is set, only pass those signal types.
     _whitelist_sql = ""
@@ -1112,13 +1114,18 @@ def _do_compaction_llm():
         _whitelist_sql = f" AND signal_type IN ({_placeholders})"
         _whitelist_params = list(SIGNAL_TYPE_WHITELIST)
 
+    # LLM input: signals available for hot-set consideration.
+    # - PENDING + executed=0: new signals awaiting first AI review
+    # - WAIT + executed=0: AI-reviewed signals deferred for later (review_count >= 1
+    #   is guaranteed since mark_signal_processed increments it when WAIT is set)
+    # Signals with executed=1 (SKIPPED, REJECTED, or actually traded) are excluded.
     c.execute(f"""
         SELECT token, direction, signal_type, confidence, source, created_at,
                compact_rounds, survival_score, z_score_tier, z_score
         FROM signals
-        WHERE decision IN ('PENDING', 'APPROVED')
+        WHERE decision IN ('PENDING', 'WAIT')
           AND executed = 0
-          AND created_at > datetime('now', '-30 minutes')
+          AND created_at > datetime('now', '-90 minutes')
           AND token NOT LIKE '@%'
           {_whitelist_sql}
         ORDER BY confidence DESC
@@ -1173,8 +1180,8 @@ def _do_compaction_llm():
             age_h = 0
         signal_lines.append(f"[{idx}] {token} | {direction} | conf={conf:.0f}% | age={age_h:.1f}h | src={source}")
     
-    # BLACKLIST string
-    BLACKLIST_STR = "SUI FET SPX ARK TON ONDO CRV RUNE AR NXPC DASH ARB TRUMP LDO NEAR APT CELO SEI ACE"
+    # BLACKLIST string — use separate short/long blocklists for directional blocking
+    BLACKLIST_STR = ' '.join(sorted(SHORT_BLACKLIST | LONG_BLACKLIST))
     
     # Dynamically read market regime to build adaptive RULES
     _market_regime = "NEUTRAL"
@@ -1198,18 +1205,83 @@ def _do_compaction_llm():
         _bias_rules = "prefer higher-confidence signal when close, no directional bias"
         _bias_note = "NEUTRAL market"
     
-    # Build prompt — WINNING STRUCTURE: blank lines + QA framing + OUT: on its own line
-    # Testing proved: MiniMax needs explicit "Question:/Answer:" framing + blank lines to output structured data
-    prompt = f"""\
+    # Load prompt template from main-prompt.md
+    _prompt_path = '/root/.hermes/prompt/main-prompt.md'
+    try:
+        with open(_prompt_path) as _pf:
+            _prompt_template = _pf.read()
+    except Exception as _e:
+        print(f"  [LLM-compaction] WARNING: could not load {_prompt_path}: {_e} — using inline prompt")
+        _prompt_template = None
+
+    if _prompt_template:
+        # Build context sections from gathered data
+        _open_trades_str = "No open trades."
+        # (open trades context would go here if available)
+
+        # Build new signals section
+        _new_signals_str = '\n'.join(signal_lines) if signal_lines else 'No new signals this cycle.'
+
+        # Build hot survivors section (detailed format for the prompt template)
+        _survivor_detail_str = ""
+        if prev_hotset:
+            for key, s in prev_hotset.items():
+                conf = s.get('confidence', 0)
+                rounds = s.get('rounds', 0)
+                src = s.get('source', 'unknown')
+                z = s.get('z', 0)
+                wave = s.get('wave', 'unknown')
+                mom = s.get('momentum', 50)
+                spd = s.get('speed', 50)
+                overext = s.get('overextended', False)
+                age_h = (time.time() - s.get('timestamp', time.time())) / 3600
+                _survivor_detail_str += (
+                    f"{s['token']} | {s['direction']} | conf={conf:.0f}% | "
+                    f"rounds={rounds} | src={src} | z={z} | wave={wave} | "
+                    f"mom={mom:.0f} | spd={spd:.0f} | overext={overext} | "
+                    f"age={age_h:.1f}h\n"
+                )
+        else:
+            _survivor_detail_str = "No hot-set survivors — first run."
+
+        # Substitute into template
+        _substitutions = {
+            '{n}': str(len(signal_lines)),
+            '{market_z}': f"{broad_z_avg:+.2f}" if 'broad_z_avg' in dir() else '0.00',
+            '{fear_greed}': 'N/A',
+            '{regime}': _market_regime,
+            '{bias_note}': _bias_note,
+            '{n_open}': '0',
+            '{MAX_OPEN}': '10',
+            '{n_live}': '0',
+            '{MAX_LIVE}': '3',
+            '{list of tokens that survived LLM compaction in previous cycle}': _survivor_detail_str,
+            '{list of pending signals with full context}': _new_signals_str,
+            '{full list}': BLACKLIST_STR,
+            '{short blacklist}': ' '.join(sorted(SHORT_BLACKLIST)),
+            '{long blacklist}': ' '.join(sorted(LONG_BLACKLIST)),
+        }
+        prompt = _prompt_template
+        for _k, _v in _substitutions.items():
+            prompt = prompt.replace(_k, _v)
+        # Remove any leftover unfilled placeholders
+        import re as _re2
+        prompt = _re2.sub(r'\{[^}]+\}', '', prompt)
+    else:
+        # Fallback inline prompt
+        prompt = f"""\
 {hot_survivors_str}
 SIGNALS: {' '.join(signal_lines)}
-RULES: reject conf<70, penalize stale signals (>0.5h old) by -20% confidence, penalize tokens with no fresh signal in >1h, no SHORT on blacklist: {BLACKLIST_STR}, dedupe
+RULES: reject conf<50, penalize stale signals (>0.5h old) by -20% confidence, no SHORT on blacklist: {BLACKLIST_STR}
 
 Question: which tokens pass all filters?
 
 Answer (TOKEN DIR CONF, one per line):
 OUT:
 """
+
+    # Ensure regex is available for the parser (imported above if template was loaded)
+    import re as _re2  # available either way since we reach parser after prompt building
     
     # STEP 2: Call MiniMax-M2 with max_tokens=4000 (CRITICAL: 4000 not 3000)
     # MiniMax-M2 uses full max_tokens for BOTH reasoning + output.
@@ -1287,62 +1359,120 @@ OUT:
     # Build a set of valid tokens from our signals for strict parsing
     valid_tokens = {row[0].upper() for row in signals}  # token column from signals
     valid_confs = {row[3]: row[0].upper() for row in signals}  # conf -> token mapping
+
+    # Also build set from current hotset (LLM can re-rank existing survivors)
+    _hot_tokens_set = set()
+    try:
+        with open('/var/www/hermes/data/hotset.json') as _hf:
+            _hf_data = json.load(_hf)
+            for s in _hf_data.get('hotset', []):
+                _hot_tokens_set.add(s.get('token', '').upper())
+    except Exception:
+        pass
     
-    # STEP 4: Parse OUT lines — format: TOKEN DIR CONF REASON
-    # Each line: "LAYER LONG 91 strong momentum alignment"
+    # STEP 4: Parse HOT-SET output lines
+    # Format A (new, numbered): "1. TOKEN | DIRECTION | CONF=75% | ROUNDS=2 | WAVE=... | MOM=... | SPD=... | OVEREXT=... // reason"
+    # Format B (old, bare):     "TOKEN LONG 75 reason words"
+    # Both are supported for backward compat.
     parsed = []
     for line in content.split('\n'):
         line = line.strip()
         if not line:
             continue
         # Skip header/rule lines and think markers
-        if line.startswith(('HOT ', 'SIGNALS', 'RULES:', 'OUT:', '---', '<think>')):
+        if line.startswith(('HOT ', 'SIGNALS', 'RULES:', '---', '<think>')):
             continue
-        # Skip lines that are clearly not output lines (don't contain any LONG/SHORT)
-        if 'LONG' not in line and 'SHORT' not in line:
+        # Skip lines without LONG/SHORT
+        if 'LONG' not in line.upper() and 'SHORT' not in line.upper():
             continue
-        
-        # Parse: TOKEN DIR CONF REASON
-        # Token can be alphanumeric, dir is LONG/SHORT, conf is number, rest is reason
-        parts = line.split()
-        if len(parts) < 3:
-            continue
-        
-        # First part = token (uppercase alphanumeric)
-        token = parts[0].upper()
-        
-        # Second part = direction
-        direction = parts[1].upper()
-        if direction not in ('LONG', 'SHORT'):
-            # Try to find LONG/SHORT in parts
-            for d in ('LONG', 'SHORT'):
-                if d in parts:
-                    direction = d
-                    break
-            else:
+
+        # Strip leading number and dot if present (Format A: "1. TOKEN ...")
+        _line_clean = _re2.sub(r'^\d+\.\s*', '', line).strip()
+
+        # Split on '//' to separate structured fields from reason
+        if ' // ' in _line_clean:
+            _fields_part, _reason_raw = _line_clean.split(' // ', 1)
+            reason = _reason_raw.strip()
+        else:
+            _fields_part = _line_clean
+            reason = ''
+
+        # Parse structured fields from Format A: "TOKEN | DIRECTION | CONF=75% | ..."
+        _pipe_parts = [p.strip() for p in _fields_part.split(' | ')]
+        if len(_pipe_parts) >= 2:
+            # Format A: TOKEN | DIRECTION | CONF=... | ...
+            token = _pipe_parts[0].upper()
+            direction = _pipe_parts[1].upper()
+            # Extract CONF from field like "CONF=75%"
+            _conf_str = next((p for p in _pipe_parts if p.startswith('CONF=')), None)
+            conf = None
+            if _conf_str:
+                try:
+                    conf = float(_conf_str.split('=')[1].rstrip('%'))
+                except (ValueError, IndexError):
+                    conf = None
+            # ROUNDS, WAVE, MOM, SPD, OVEREXT — extract if present
+            _rounds = 0
+            _wave = 'unknown'
+            _mom = 50
+            _spd = 50
+            _overext = False
+            for p in _pipe_parts:
+                if p.startswith('ROUNDS='):
+                    try:
+                        _rounds = int(p.split('=')[1])
+                    except (ValueError, IndexError):
+                        pass
+                elif p.startswith('WAVE='):
+                    _wave = p.split('=')[1].strip()
+                elif p.startswith('MOM='):
+                    try:
+                        _mom = float(p.split('=')[1])
+                    except (ValueError, IndexError):
+                        pass
+                elif p.startswith('SPD='):
+                    try:
+                        _spd = float(p.split('=')[1])
+                    except (ValueError, IndexError):
+                        pass
+                elif p.startswith('OVEREXT='):
+                    _overext = p.split('=')[1].strip().lower() == 'true'
+        else:
+            # Format B (old bare format): "TOKEN LONG 75 reason words"
+            _parts = _line_clean.split()
+            if len(_parts) < 3:
                 continue
-        
-        # Find confidence: first numeric in parts after direction (strip % suffix)
-        conf = None
-        reason_parts = []
-        for i, p in enumerate(parts[2:], start=2):
-            # Strip trailing % if present
-            p_clean = p.rstrip('%')
-            try:
-                conf = float(p_clean)
-                reason_parts = parts[i+1:]
-                break
-            except ValueError:
-                reason_parts.append(p)
-        
+            token = _parts[0].upper()
+            direction = _parts[1].upper()
+            if direction not in ('LONG', 'SHORT'):
+                for d in ('LONG', 'SHORT'):
+                    if d in _parts:
+                        direction = d
+                        break
+                else:
+                    continue
+            # Find confidence: first numeric in parts after direction
+            conf = None
+            _reason_parts_b = []
+            for p in _parts[2:]:
+                p_clean = p.rstrip('%')
+                try:
+                    conf = float(p_clean)
+                except ValueError:
+                    _reason_parts_b.append(p)
+            reason = ' '.join(_reason_parts_b) if _reason_parts_b else 'no reason'
+            _rounds = 0
+            _wave = 'unknown'
+            _mom = 50
+            _spd = 50
+            _overext = False
+
         if conf is None:
             continue
-        
-        reason = ' '.join(reason_parts) if reason_parts else 'no reason'
-        
-        # Only include tokens that are in our actual signal list (not hallucinated)
-        # RECOVERY: If token is *** or not valid, try to recover by matching direction+confidence
-        if token == '***' or token not in valid_tokens:
+
+        # Hallucination guard — only include tokens in our actual signal list
+        if token == '***' or (token not in valid_tokens and token not in _hot_tokens_set):
+            # RECOVERY: match by direction + nearest confidence
             recovered_token = None
             for row in signals:
                 sig_token, sig_dir, _, sig_conf = row[0], row[1], row[2], row[3]
@@ -1351,16 +1481,20 @@ OUT:
                     break
             if recovered_token:
                 token = recovered_token
-                print(f"  [LLM-compaction] Recovered token *** -> {token} via direction+confidence match")
+                print(f"  [LLM-compaction] Recovered token -> {token} via direction+confidence match")
             else:
-                # Couldn't recover - skip this line
                 continue
-        
+
         parsed.append({
             'token': token,
             'direction': direction,
             'confidence': conf,
             'reason': reason,
+            'rounds': _rounds,
+            'wave': _wave,
+            'momentum': _mom,
+            'speed': _spd,
+            'overextended': _overext,
         })
     
     print(f"  [LLM-compaction] Parsed {len(parsed)} ranked signals")
@@ -1400,8 +1534,8 @@ OUT:
             score = conf * survival_bonus * staleness_penalty * regime_bonus
             scored.append((token, direction, conf, score, age_h))
         scored.sort(key=lambda x: x[3], reverse=True)
-        # Only keep tokens with score >= 65 (real conviction required)
-        top20_scored = [(s[0], s[1], s[2], s[3]) for s in scored if s[3] >= 65][:20]
+        # Only keep tokens with score >= 50 (real conviction required, lowered from 65)
+        top20_scored = [(s[0], s[1], s[2], s[3]) for s in scored if s[3] >= 50][:20]
         parsed = [
             {'token': s[0], 'direction': s[1], 'confidence': s[2], 'reason': f'fallback score={s[3]:.0f}'}
             for s in top20_scored
@@ -1451,19 +1585,33 @@ OUT:
             'confidence': s['confidence'],
             'reason': s['reason'],
             'survival_round': new_sr,
+            'rounds': s.get('rounds', new_sr),
+            'wave': s.get('wave', 'unknown'),
+            'momentum': s.get('momentum', 50),
+            'speed': s.get('speed', 50),
+            'overextended': s.get('overextended', False),
+            'source': s.get('source', 'llm-ranked'),
+            'timestamp': time.time(),
         })
     
     # STEP 6: Update signal decisions in DB
     # Top 20 → APPROVED, increment compact_rounds
     # Others → REJECTED + rejected_at
     
-    # Get all candidate signal IDs grouped by token+direction
+    # Get all candidate signal IDs for compaction decision.
+    # PENDING: new signals that haven't been reviewed yet
+    # WAIT: AI-reviewed signals deferred (executed=0 so they remain in the pool)
+    # Tokens already APPROVED+pending execution are excluded (already in hotset).
     c.execute("""
         SELECT id, token, direction FROM signals
-        WHERE decision IN ('PENDING', 'APPROVED')
+        WHERE decision IN ('PENDING', 'WAIT')
           AND executed = 0
           AND created_at > datetime('now', '-10 minutes')
           AND token NOT LIKE '@%'
+        AND (token, direction) NOT IN (
+            SELECT token, direction FROM signals
+            WHERE decision = 'APPROVED' AND executed = 0
+        )
     """)
     all_sig_ids = c.fetchall()
     
@@ -1537,7 +1685,69 @@ OUT:
     
     # Apply safety filters and write final hot-set
     hotset_final = []
-    
+
+    # No-signal deadlock fix: if LLM produced nothing, keep previous hot-set alive.
+    # This prevents the pipeline from going stale when no new signals are generated
+    # (signal_gen fires 2x/hour but compaction runs every 10 min).
+    # Apply source blacklist to preserved signals too — blacklisted sources must not
+    # survive even via preservation path.
+    # CRITICAL: Also preserve if ALL entries were filtered by safety checks (not just
+    # LLM producing zero output). If every entry fails safety, preserving the previous
+    # hotset is better than going empty and starving the pipeline.
+    _any_survived = any(
+        (True for entry in hotset_entries
+         if entry.get('token') and entry.get('direction')
+         and entry.get('token').upper() not in SHORT_BLACKLIST
+         and entry.get('token').upper() not in LONG_BLACKLIST
+         and not is_solana_only(entry.get('token', ''))
+         and not is_delisted(entry.get('token', ''))
+         and entry.get('source', '') not in SIGNAL_SOURCE_BLACKLIST)
+    ) if hotset_entries else False
+
+    if not hotset_entries or not _any_survived:
+        _preserving = not hotset_entries
+        print(f"  [LLM-compaction] No signals in pool ({'LLM output empty' if _preserving else 'all entries filtered'}) — preserving previous hotset")
+        prev_hotset_data = {}
+        try:
+            if os.path.exists('/var/www/hermes/data/hotset.json'):
+                with open('/var/www/hermes/data/hotset.json') as _pf:
+                    prev_hotset_data = json.load(_pf)
+            if prev_hotset_data.get('hotset'):
+                _prev_entries = prev_hotset_data['hotset']
+                # Filter preserved entries through all safety filters
+                _safe_prev = []
+                for _entry in _prev_entries:
+                    _tok = _entry.get('token', '')
+                    _dir = _entry.get('direction', '').upper()
+                    _src = _entry.get('source', '')
+                    if _dir == 'SHORT' and _tok in SHORT_BLACKLIST:
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: SHORT blocked — SHORT_BLACKLIST")
+                        continue
+                    if _dir == 'LONG' and _tok in LONG_BLACKLIST:
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: LONG blocked — LONG_BLACKLIST")
+                        continue
+                    if is_solana_only(_tok):
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — Solana-only")
+                        continue
+                    if is_delisted(_tok):
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — delisted")
+                        continue
+                    if _src in SIGNAL_SOURCE_BLACKLIST:
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — source '{_src}' blacklisted")
+                        continue
+                    # FIX (2026-04-12): Update timestamp on preservation so "Last Seen" is accurate
+                    _entry['timestamp'] = time.time()
+                    _safe_prev.append(_entry)
+                if _safe_prev:
+                    print(f"  [LLM-compaction] Preserving {len(_safe_prev)} tokens from previous hotset")
+                    hotset_final = _safe_prev
+                else:
+                    print("  [LLM-compaction] Previous hotset had no safe entries to preserve")
+            else:
+                print("  [LLM-compaction] No previous hotset to preserve")
+        except Exception as e:
+            print(f"  [LLM-compaction] Could not preserve previous hotset: {e}")
+
     for entry in hotset_entries:
         tkn = entry['token']
         direction = entry['direction']
@@ -1557,12 +1767,16 @@ OUT:
         if is_delisted(tkn):
             print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted")
             continue
-        
         spd = _speed_cache.get(tkn, {})
         # Get z_score and signal source from the original signal entry
         sig_entry = next((s for s in signals if s[0] == tkn and s[1].upper() == direction.upper()), None)
         z_val = sig_entry[9] if sig_entry else 0  # z_score column (index 9)
         src_val = sig_entry[4] if sig_entry else ''  # source column (index 4)
+
+        # Source blacklist filter (e.g. rsi-confluence has 0% win rate)
+        if src_val in SIGNAL_SOURCE_BLACKLIST:
+            print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src_val}' blacklisted")
+            continue
         hotset_final.append({
             'token': tkn,
             'direction': direction,
@@ -1578,6 +1792,7 @@ OUT:
             'price_acceleration': spd.get('price_acceleration', 0.0),
             'momentum_score': spd.get('momentum_score', 50.0),
             'speed_percentile': spd.get('speed_percentile', 50.0),
+            'timestamp': time.time(),  # FIX (2026-04-12): set fresh timestamp for each entry
         })
     
     # Cap at 20
@@ -1663,10 +1878,20 @@ def get_pending_signals():
         return hot_signals + non_hot_signals
     except Exception as e:
         import traceback; traceback.print_exc()
+        # Write full traceback to a dedicated error file so we can identify recurring issues
+        try:
+            import os as _os
+            _os.makedirs('/var/www/hermes/logs', exist_ok=True)
+            with open('/var/www/hermes/logs/ai_decider_error.log', 'a') as _ef:
+                import datetime as _dt
+                _ef.write(f"\n=== {_dt.datetime.now()} ===\n")
+                _ef.write(f"Function: get_pending_signals\n")
+                _ef.write(f"Error: {e}\n")
+                traceback.print_exc(file=_ef)
+        except Exception:
+            pass
         log_error(f"get_pending_signals DB read error: {e}")
         return []
-
-from signal_schema import mark_signal_processed, validate_source  # BUG-12: validate source against whitelist
 
 def get_regime(coin):
     """Get 4h regime from regime_4h.json (primary) or momentum_cache (fallback).
@@ -1932,8 +2157,7 @@ Fear & Greed: {fear_greed}
    If you want to REJECT: DECIDE: BTC LONG 0 Low confidence and counter-regime
 
 === HARD RULES ===
-- BLACKLISTED TOKENS for SHORT: SUI FET SPX ARK TON ONDO CRV RUNE AR NXPC DASH ARB TRUMP LDO NEAR APT CELO SEI ACE
-- DIRECTION BIAS: LONGS outperform SHORTS historically. When uncertain, favor LONG.
+- BLOCKED TOKENS (both directions blocked): use combined SHORT_BLACKLIST ∪ LONG_BLACKLIST — see hermes_constants
 - CONFIDENCE THRESHOLD: reject signals with raw confidence < 50% (always WAIT on low confidence)
 - EXECUTE thresholds: AI confidence ≥ 50% AND aligned with momentum → EXECUTE
 - Regime contradiction: if regime strongly opposes direction (conf>55%) → WAIT
@@ -2250,27 +2474,21 @@ MOMENTUM SIGNAL CONFIDENCE: {conf}% (this is the system's raw score — not gosp
 - DECISION: WAIT → reject, don't enter
 
 === HARD RULES ===
-1. TOKEN BLACKLIST (SHORT always blocked):
-   SUI, FET, SPX, ARK, TON, ONDO, CRV, RUNE, AR, NXPC, DASH, ARB, TRUMP, LDO, NEAR, APT, CELO, SEI, ACE
+1. TOKEN BLACKLIST (both directions blocked — any trade on these is instant WAIT):
+   SHORT: {' '.join(sorted(SHORT_BLACKLIST))}
+   LONG:  {' '.join(sorted(LONG_BLACKLIST))}
 
-2. DIRECTION BIAS — LONGS outperform SHORTS historically. When uncertain, favor LONG.
-
-3. EXECUTE vs WAIT thresholds:
+2. EXECUTE vs WAIT thresholds:
    - AI confidence ≥ 50% + aligned with momentum signal → EXECUTE
    - AI confidence < 50% → WAIT
    - AI contradicts signal direction → WAIT
-   - Shorting a blacklisted token → WAIT
+   - Any blacklisted token (either direction) → WAIT
 
 4. LEVERAGE: Default 10x unless token is high-volatility (>50% daily range) → 5x max
 
 5. MARKET REGIME:
    Regime: {regime} ({regime_conf}% confidence)
    Align with regime direction. Fight it only with very high confidence.
-
-=== TECHNICAL INDICATORS ===
-- MACD Signal: {macd} (confidence: {macd_conf}%)
-- RSI: oversold <35 or overbought >65 is significant
-- MA Crossover: 9/21 trend direction
 
 === MARKET CONTEXT ===
 - Market Z-Score Trend: {market_z}

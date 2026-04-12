@@ -362,7 +362,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         if is_live_trading_enabled():
             # HOT-SET GUARD: only mirror trades for tokens in the hot-set
             hype_token = hype_coin(token)
-            from hermes_constants import HOTSET_BLOCKLIST
+            from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
             try:
                 import sqlite3
                 conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
@@ -372,11 +372,13 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 conn_s.close()
             except Exception:
                 in_hot = False  # Fail open on DB errors
-            blocked = hype_token.upper() in HOTSET_BLOCKLIST
+            blocked = (direction.upper() == 'SHORT' and hype_token.upper() in SHORT_BLACKLIST) or \
+                      (direction.upper() == 'LONG' and hype_token.upper() in LONG_BLACKLIST)
             if blocked:
                 # FIX (2026-04-05): Don't close the paper trade. Keep it open for
                 # tracking/audit. Just skip the HL mirror — don't destroy the paper trail.
-                print(f"[brain.py] {hype_token}: on HOTSET_BLOCKLIST ({direction}) — paper trade #{trade_id} kept (no HL mirror)")
+                bl_list = 'SHORT_BLACKLIST' if direction.upper() == 'SHORT' else 'LONG_BLACKLIST'
+                print(f"[brain.py] {hype_token}: on {bl_list} ({direction}) — paper trade #{trade_id} kept (no HL mirror)")
                 # Return trade_id so brain DB has the paper record, but no HL position
             else:
                 # Read back leverage for this trade
