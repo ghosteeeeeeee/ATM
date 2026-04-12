@@ -8,13 +8,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 STATIC_DB = '/root/.hermes/data/signals_hermes.db'
-LIMIT = 24  # 24 x 1h = 24h of history
+LIMIT = 1000  # 1000 x 1h = ~41 days of history (needed for z-score calculation, requires 60+ rows)
 
 def hl_to_binance(token: str) -> str:
     """Map Hyperliquid token → Binance symbol."""
     return f"{token}USDT"
 
-def fetch_klines(token: str, lookback_hours: int = 24) -> list:
+def fetch_klines(token: str, lookback_hours: int = 1000) -> list:
     """Fetch 1h klines from Binance. Returns [(timestamp_sec, close_price)]."""
     symbol = hl_to_binance(token)
     url = 'https://api.binance.com/api/v3/klines'
@@ -45,7 +45,7 @@ def backfill_batch(tokens: list, workers: int = 30) -> dict:
     return results
 
 def main():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(STATIC_DB)
     c = conn.cursor()
 
     # Get all tokens from latest_prices

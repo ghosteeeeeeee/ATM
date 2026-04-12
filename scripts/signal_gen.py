@@ -67,7 +67,8 @@ def _has_confluence_partners(token: str, direction: str, exclude_type: str = Non
 # hot set logic lives in ai-decider.py (_load_hot_rounds at line 96).
 # signal_gen.py also had _process_signal defined but never imported/called.
 def _persist_momentum_state(token, momentum_state, state_confidence,
-                             pct_long, pct_short, avg_z, phase, z_direction):
+                             pct_long, pct_short, avg_z, phase, z_direction,
+                             rsi_14=None):
     """Save momentum state to DB for tracking state transitions over time."""
     try:
         conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
@@ -75,8 +76,8 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
         cur.execute("""
             INSERT INTO momentum_cache
               (token, phase, percentile_long, percentile_short, velocity, avg_z,
-               z_direction, momentum_state, state_confidence, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+               z_direction, momentum_state, state_confidence, updated_at, rsi_14)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(token) DO UPDATE SET
               momentum_state    = excluded.momentum_state,
               state_confidence  = excluded.state_confidence,
@@ -85,9 +86,10 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
               avg_z            = excluded.avg_z,
               phase            = excluded.phase,
               z_direction      = excluded.z_direction,
-              updated_at       = excluded.updated_at
+              updated_at       = excluded.updated_at,
+              rsi_14           = excluded.rsi_14
         """, (token, phase, pct_long, pct_short, 0.0, avg_z,
-              z_direction, momentum_state, state_confidence, int(time.time())))
+              z_direction, momentum_state, state_confidence, int(time.time()), rsi_14))
         conn.commit()
         conn.close()
     except Exception as e:
@@ -147,8 +149,8 @@ PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
 PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
-ENTRY_THRESHOLD      = 65    # min score to add signal (LONG)
-SHORT_ENTRY_THRESHOLD = 72   # min score for SHORT — raised to reduce excess SHORT signals
+ENTRY_THRESHOLD      = 50    # min score to add signal (LONG) — lowered from 65 for more signals
+SHORT_ENTRY_THRESHOLD = 60   # min score for SHORT — lowered from 72
                              # Historical: SHORT 26% WR vs LONG 46% WR (2026-04-01)
 AI_DECIDER_THRESHOLD  = 65    # ≥ this + < AUTO_APPROVE → pending → AI decider
 AUTO_APPROVE          = 95    # ≥ this → auto-approve (momentum uses PENDING only; this is a safety cap)
@@ -159,19 +161,22 @@ CONFLUENCE_BOOST_2     = 1.25 # 1.25x confidence boost for 2 signals
 CONFLUENCE_BOOST_3PLUS = 1.50 # 1.5x confidence boost for 3+ signals
 CONFLUENCE_AUTO_APPROVE = 75  # confluence signal ≥ this → auto-approve (no AI needed)
 
-# Individual signal thresholds for confluence-ready signal table population
-# These are LOWER than ENTRY_THRESHOLD so confluence can combine weak-but-aligned signals
-CONFLUENCE_RSI_LOW   = 35   # RSI < this → LONG (oversold = potential reversal LONG)
-CONFLUENCE_RSI_HIGH  = 70   # RSI > this → SHORT (overbought = bearish confirmation SHORT)
-                             # FIX: Was 65 — changed to 70 to restore symmetric RSI 30/70 split.
-                             # RSI 35-65 was a dead zone where both LONG and SHORT could fire,
-                             # causing the asymmetric bias. Now: RSI<35=LONG, RSI>70=SHORT.
+# RSI thresholds for _run_rsi_signals_for_confluence (eased 2026-04-12)
+CONFLUENCE_RSI_LOW   = 45   # RSI < this → LONG (was 35)
+CONFLUENCE_RSI_HIGH  = 60   # RSI > this → SHORT (was 70)
+
+# Individual signal thresholds for _run_mtf_macd_signals (eased 2026-04-12)
+RSI_INDIVIDUAL_LONG_THRESH  = 42   # RSI < this + MTF direction = LONG (was 40)
+RSI_INDIVIDUAL_SHORT_THRESH = 60   # RSI > this + MTF direction = SHORT (was 65)
+
+# Percentile rank signal threshold (eased 2026-04-12)
+PCT_RANK_THRESH = 72              # pct_long/pct_short >= this → historical extreme (was 85)
 # ── Confluence Detection ───────────────────────────────────────────────────────
 
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
 
 # Z-score lookback for percentile ranking (in price rows, ~1 row/min)
-ZSCORE_HISTORY    = 500   # compute percentile from last 500 bars
+ZSCORE_HISTORY    = 200   # compute percentile from last 200 bars (~3 days @ 1m)
 
 # ─── Scoring weights ────────────────────────────────────────────
 W_PERCENTILE      = 3.0   # percentile rank is primary signal
@@ -225,7 +230,7 @@ SHORT_30M_Z_MAX = +2.0    # BLOCK SHORT if 30m z > +2.0 (was +2.5)
 SHORT_AGREE_TFS = 2       # Require at least 2 of (1h, 4h, 30m) to be elevated
 
 # Broad market: if BTC+ETH+SOL avg 4h z > 0 → block SHORTs (ride the wave, not against it)
-BROAD_UPTEND_Z   = +0.0
+BROAD_UPTEND_Z   = +0.5  # block LONG only if BTC+ETH+SOL avg 4h z > +0.5 (significant uptrend, not mild bias)
 
 # ─── Per-Token Rate Limiting ─────────────────────────────────────────
 MIN_TRADE_INTERVAL_MINUTES = 10   # min minutes between trades on same token
@@ -678,7 +683,7 @@ def get_momentum_stats(token):
     }
 
     # Persist to DB
-    _persist_momentum_state(token, momentum_state, state_confidence, pct_long, pct_short, avg_z, phase, z_direction)
+    _persist_momentum_state(token, momentum_state, state_confidence, pct_long, pct_short, avg_z, phase, z_direction, rsi_14=rsi_14_val)
 
     return result
 
@@ -1318,10 +1323,11 @@ def _run_rsi_signals_for_confluence():
             conf = min(70, 30 + (CONFLUENCE_RSI_LOW - rsi) * 1.5)
             if conf < ENTRY_THRESHOLD and not (rsi < 15):
                 continue  # weak signal, not extreme → skip entirely
-            add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
+            sid = add_signal(token, 'LONG', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
-            added += 1
+            if sid:
+                added += 1
         elif rsi > CONFLUENCE_RSI_HIGH:
             # ── SHORT: RSI overbought (above HIGH threshold = overbought) ──
             # No z-score filter for SHORTs — elevated prices are valid short targets
@@ -1332,10 +1338,11 @@ def _run_rsi_signals_for_confluence():
             conf = min(70, 30 + (rsi - CONFLUENCE_RSI_HIGH) * 1.5)
             if conf < SHORT_ENTRY_THRESHOLD and not (rsi > 85):
                 continue  # weak signal, not extreme → skip entirely
-            add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
+            sid = add_signal(token, 'SHORT', 'rsi_confluence', 'rsi-confluence',
                        confidence=conf, value=rsi, price=price, exchange='hyperliquid',
                        z_score=z, z_score_tier=z_tier)
-            added += 1
+            if sid:
+                added += 1
     return added
 
 
@@ -1488,29 +1495,19 @@ def _run_mtf_macd_signals():
         if not is_reasonable_price(token, price):
             continue
 
-        # ── MACD Rules entry guard (2026-04-06) ──────────────────────────────
-        # Block LONG/SHORT entries when macd_rules says entry not allowed.
-        # Prevents entering at local peaks when MACD momentum is already turning.
-        from macd_rules import get_macd_entry_signal
-        macd_entry = get_macd_entry_signal(token, 'LONG')  # check LONG first
-        macd_entry_short = get_macd_entry_signal(token, 'SHORT')  # check SHORT
-
-        # Log MACD state for monitoring (verbose in debug mode)
-        if macd_entry['state'] is not None:
-            s = macd_entry['state']
-            print(f"  [macd_rules] {token} bull_score={s.bullish_score:+d} "
-                  f"regime={'BULL' if s.regime.value==1 else 'BEAR' if s.regime.value==-1 else 'NEUTRAL'} "
-                  f"long={'ALLOWED' if s.long_entry_allowed else 'BLOCKED'} "
-                  f"short={'ALLOWED' if s.short_entry_allowed else 'BLOCKED'}")
-
-        if not macd_entry['allowed'] and not macd_entry_short['allowed']:
-            # Both blocked — market not in a valid MACD regime for new entries
-            print(f"  [macd_rules] {token} entry blocked (both LONG/SHORT disallowed by MACD rules)")
-            continue
+        # NOTE: macd_rules entry guard REMOVED 2026-04-12.
+        # macd_rules was blocking ALL signal generation during BEAR regimes.
+        # Individual signals (RSI, percentile, velocity, zscore) can still fire
+        # and contribute to confluence — they are filtered by their own criteria.
+        # macd_rules regime still applies within the mtf_macd signal logic below
+        # (counter-regime crossover blocking via xo_4h_dir / xo_1h_dir checks).
 
         mom = get_momentum_stats(token)
         if not mom:
             continue
+        # TEMP DEBUG: print tokens that reach here
+        pct_short = mom.get('percentile_short', 50)
+        print(f'  DEBUG MOM: {token} rsi={mom.get("rsi_14")} pct_s={pct_short}', flush=True)
 
         rsi_val  = mom.get('rsi_14')
         macd_val = mom.get('macd_line')
@@ -1521,6 +1518,10 @@ def _run_mtf_macd_signals():
         avg_z     = mom.get('avg_z', 0)
         phase     = mom.get('phase', 'quiet')
         z_dir     = mom.get('z_direction', 'neutral')
+
+        # Get 1H z-score directly (not averaged across all TFs) for entry filtering
+        zscores = get_tf_zscores(token)
+        z_1h = zscores.get('1h', (None, None))[0] if zscores else None
 
         # ── MTF MACD check ──────────────────────────────────────────────────────────
         # Signal logic:
@@ -1578,16 +1579,17 @@ def _run_mtf_macd_signals():
         else:
             continue  # no MACD data at all
 
-        # Z-score regime filter: elevated price (> +0.5 on 1H z-score) blocks both LONG and SHORT
-        # Elevated price = z > 0 = price above mean = bad for LONG entry
-        # Same elevated price is also bad for SHORT entry (shorts need suppressed price to work)
+        # Z-score regime filter: use 1H z-score (not avg across all TFs) for entry filtering.
+        # Elevated 1H z (> +0.5) = price above mean on 1H = bad for LONG entry.
+        # Same elevated price is also bad for SHORT entry (shorts need suppressed price).
         # The old comment "suppressed = mean reversion target = bad for SHORT" was WRONG —
-        # suppressed price (z < 0) is actually the SHORT setup, not the block.
-        if avg_z is not None and avg_z > LONG_1H_Z_MAX:
-            continue  # elevated price blocks any new entry (LONG or SHORT)
+        # z_1h filter
+        if z_1h is not None and z_1h > LONG_1H_Z_MAX:
+            print(f'  DEBUG BLOCK-Z: {token} z_1h={z_1h} > 0.5')
+            continue  # elevated 1H price blocks any new entry (LONG or SHORT)
 
-        # SHORT_BLACKLIST still applies to SHORT entries
         if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            print(f'  DEBUG BLOCK-SHORT-BL: {token}')
             continue
 
         # Confidence: base for 15m crossover trigger (always strength=3)
@@ -1596,10 +1598,6 @@ def _run_mtf_macd_signals():
         conf = min(95, base_conf * 1.35)  # = 95 (capped)
 
         # ── MTF MACD Alignment Boost (2026-04-06) ───────────────────────────────
-        # Use the full macd_rules state machine across 4H/1H/15m for ultra-confirmation.
-        # ALL 3 TFs agree → +10 confidence (stacks on existing signals).
-        # 2/3 TFs agree and aligned with direction → +5.
-        # Log the alignment state for monitoring.
         from macd_rules import compute_mtf_macd_alignment
         mtf_align = compute_mtf_macd_alignment(token)
         if mtf_align is not None:
@@ -1609,14 +1607,11 @@ def _run_mtf_macd_signals():
             print(f"  [MTF ALIGN] {token} score={align_score}/3 dir={align_dir} "
                   f"conf={align_conf:.0%} bull={mtf_align['all_tfs_bullish']} bear={mtf_align['all_tfs_bearish']}")
             if align_score >= 3:
-                conf += 10   # all 3 TFs agree → ultra-confirmation
+                conf += 10
             elif align_score >= 2 and align_dir == direction:
-                conf += 5    # 2/3 agree and aligned → boost
+                conf += 5
 
         # ── Cascade Entry Signal (2026-04-06) ───────────────────────────────────
-        # Cascade = smaller TFs leading the reversal. If cascade is ACTIVE and
-        # aligned with direction → STRONG confirmation (boost +10).
-        # If cascade is ACTIVE but OPPOSITE to direction → BLOCK this entry.
         from macd_rules import cascade_entry_signal
         cascade = cascade_entry_signal(token)
         if cascade['cascade_active']:
@@ -1624,43 +1619,45 @@ def _run_mtf_macd_signals():
                   f"dir={cascade['cascade_direction']} score={cascade['cascade_score']:.2f} "
                   f"lead={cascade['lead_tf']} confirm={cascade['confirmation_count']}")
             if cascade['cascade_direction'] == direction:
-                # Cascade CONFIRMS the direction — strong boost
                 conf += 10
                 print(f"  [CASCADE] {token} {direction} cascade confirmed → confidence +10 → {conf}")
             elif cascade['cascade_direction'] is not None:
-                # Cascade is ACTIVE but OPPOSITE direction → block entry
                 print(f"  [CASCADE] {token} {direction} BLOCKED — cascade active in opposite direction "
                       f"({cascade['cascade_direction']}): {cascade['entry_block_reason']}")
                 continue
 
-        # ── Write mtf_macd signal ────────────────────────────────
-        # Source = 'hmacd-' — prefixed so add_signal() merge combines
-        # Hermes rows separately from OC 'mtf-macd' rows (different source string)
-        add_signal(token, direction, 'mtf_macd', 'hmacd-',
+        # ── Write mtf_macd signal ────────────────────────────────────────────
+        print(f'  DEBUG WRITE: {token} {direction} conf={conf} z_1h={z_1h}', flush=True)
+        sid = add_signal(token, direction, 'mtf_macd', 'hmacd-',
                    confidence=conf, value=strength, price=price,
                    exchange='hyperliquid', timeframe=timeframe_str,
                    macd_value=macd_val, macd_hist=macd_hist,
                    z_score=avg_z, z_score_tier=z_dir,
                    rsi_14=rsi_val)
+        if sid:
+            print(f'  DEBUG ADDED mtf_macd: {token} sid={sid}')
+            added += 1
 
         # ── Individual RSI signal (Hermes-only, distinct signal_type) ────
         if rsi_val is not None:
-            if rsi_val < 40:  # oversold → potential LONG
+            if rsi_val < RSI_INDIVIDUAL_LONG_THRESH:  # oversold → potential LONG (eased 2026-04-12)
                 if direction == 'LONG':  # only when aligned
-                    rsi_conf = min(60, 30 + (40 - rsi_val) * 1.5)
-                    add_signal(token, 'LONG', 'rsi_individual', 'rsi-hermes',
+                    rsi_conf = min(60, 30 + (RSI_INDIVIDUAL_LONG_THRESH - rsi_val) * 1.5)
+                    sid = add_signal(token, 'LONG', 'rsi_individual', 'rsi-hermes',
                                 confidence=rsi_conf, value=rsi_val, price=price,
                                 exchange='hyperliquid', timeframe='4h',
                                 rsi_14=rsi_val, z_score=avg_z, z_score_tier=z_dir)
-                    added += 1
-            elif rsi_val > 65:  # overbought → potential SHORT
+                    if sid:
+                        added += 1
+            elif rsi_val > RSI_INDIVIDUAL_SHORT_THRESH:  # overbought → potential SHORT (eased 2026-04-12)
                 if direction == 'SHORT':
-                    rsi_conf = min(60, 30 + (rsi_val - 65) * 1.5)
-                    add_signal(token, 'SHORT', 'rsi_individual', 'rsi-hermes',
+                    rsi_conf = min(60, 30 + (rsi_val - RSI_INDIVIDUAL_SHORT_THRESH) * 1.5)
+                    sid = add_signal(token, 'SHORT', 'rsi_individual', 'rsi-hermes',
                                 confidence=rsi_conf, value=rsi_val, price=price,
                                 exchange='hyperliquid', timeframe='4h',
                                 rsi_14=rsi_val, z_score=avg_z, z_score_tier=z_dir)
-                    added += 1
+                    if sid:
+                        added += 1
 
         # ── Percentile rank signal (Hermes-only) ──────────────────────────
         # Fires when price is at historical extreme (suppressed or elevated)
@@ -1668,24 +1665,24 @@ def _run_mtf_macd_signals():
         # pct_long = % of prices BELOW current price (high = elevated = SHORT opportunity)
         # pct_short = % of prices ABOVE current price (high = suppressed = LONG opportunity)
         pct_signal_dir = None
-        if pct_long >= 85:  # price elevated (85% of history is below current) → SHORT
+        if pct_long >= PCT_RANK_THRESH:  # price elevated (72%+ of history is below current) → SHORT
             pct_signal_dir = 'SHORT'
             pct_val = pct_long
-        elif pct_short >= 85:  # price suppressed (85% of history is above current) → LONG
+        elif pct_short >= PCT_RANK_THRESH:  # price suppressed (72%+ of history is above current) → LONG
             pct_signal_dir = 'LONG'
             pct_val = pct_short
         if pct_signal_dir:
             # Normalize percentile_rank to signal-strength equivalent.
-            # pct_val 85→60pts, pct_val 100→75pts. Reaches MIN_CONFIDENCE_FLOOR (50)
-            # at pct_val=85 so it now passes the confidence threshold. Cap at 75 so it
-            # contributes proportionally to other signals (z_score: 0-30, velocity: 0-65).
-            pct_conf = min(75, (pct_val - 70) * 4.0)
-            add_signal(token, pct_signal_dir, 'percentile_rank', 'pct-hermes',
+            # pct_val 72→55pts, pct_val 100→75pts. Floor at 72 to reach MIN_CONFIDENCE_FLOOR (50).
+            # Formula: (pct_val - 72) * 3.5 + 50. At pct_val=72: 50. At pct_val=85: ~95.
+            pct_conf = min(80, max(50, (pct_val - 72) * 3.5 + 50))
+            sid = add_signal(token, pct_signal_dir, 'percentile_rank', 'pct-hermes',
                         confidence=round(pct_conf, 1), value=pct_val, price=price,
                         exchange='hyperliquid', timeframe='4h',
                         z_score=avg_z, z_score_tier=z_dir,
                         rsi_14=rsi_val)
-            added += 1
+            if sid:
+                added += 1
 
         # ── Velocity signal (rising/falling z-score) ──────────────────────
         # Fires when z-score momentum is strong and aligned with direction
@@ -1697,14 +1694,16 @@ def _run_mtf_macd_signals():
             vel_signal_dir = 'LONG' if velocity > 0 else 'SHORT'
             if vel_signal_dir == direction:  # aligned
                 vel_conf = min(65, 35 + abs(velocity) * 500)
-                add_signal(token, vel_signal_dir, 'velocity', 'vel-hermes',
+                sid = add_signal(token, vel_signal_dir, 'velocity', 'vel-hermes',
                             confidence=vel_conf, value=round(velocity, 4), price=price,
                             exchange='hyperliquid', timeframe='1h',
                             z_score=avg_z, z_score_tier=z_dir,
                             rsi_14=rsi_val)
-                added += 1
+                if sid:
+                    added += 1
 
-        added += 1  # count mtf_macd
+        # mtf_macd: always counts (it's the primary signal even when other subs fire)
+        added += 1  # mtf_macd signal was written above (non-conditional entry point)
 
         # ── MTF Z-Score Agreement ────────────────────────────────
         # Fires when z-score agrees across multiple timeframes (4H/1H/15m)
@@ -1736,12 +1735,13 @@ def _run_mtf_macd_signals():
                 z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
                 z_tf_str = f'{max(bullish_tfs, bearish_tfs)}z{len(valid_z)}'
                 avg_z = statistics.mean(valid_z)
-                add_signal(token, local_dir, 'mtf_zscore', 'hzscore',
+                sid = add_signal(token, local_dir, 'mtf_zscore', 'hzscore',
                            confidence=z_conf, value=round(avg_z, 3),
                            price=price, exchange='hyperliquid', timeframe=z_tf_str,
                            z_score=avg_z, z_score_tier=z_dir,
                            rsi_14=rsi_val)
-                added += 1
+                if sid:
+                    added += 1
 
     return added
 
@@ -1952,7 +1952,7 @@ def _run_pattern_signals(prices_dict: dict) -> int:
 
         try:
             patterns = pattern_scanner.scan_and_write(token.upper(), lookback_minutes=240)
-            added += len(patterns)
+            added += len([p for p in patterns if p])  # count only successfully written signals
             if patterns is None:
                 skipped_no_candles += 1
         except Exception as e:
