@@ -572,6 +572,91 @@ def compute_macd_state(token: str, candles: list = None,
         return None
 
 
+# ── Cascade direction detection ──────────────────────────────────────────────
+
+def _detect_cascade(tf_states: dict) -> dict:
+    """
+    Detect cascade entry condition: smaller TF flips before larger TF confirms.
+
+    Returns dict:
+      cascade_direction: 'LONG' | 'SHORT' | None
+      cascade_active: bool
+      lead_tf: str ('15m' | '1h' | '4h' | None)
+      confirmation_count: int (how many larger TFs have now confirmed)
+      reversal_score: float
+    """
+    s_15m = tf_states.get('15m')
+    s_1h  = tf_states.get('1h')
+    s_4h  = tf_states.get('4h')
+
+    result = {
+        'cascade_direction': None,
+        'cascade_active': False,
+        'lead_tf': None,
+        'confirmation_count': 0,
+        'reversal_score': 0.0,
+    }
+
+    # Need at least 2 TFs to detect cascade
+    valid = [(k, v) for k, v in [('15m', s_15m), ('1h', s_1h), ('4h', s_4h)] if v is not None]
+    if len(valid) < 2:
+        return result
+
+    # Determine current bull/bear state per TF
+    def bull(s):
+        return s.macd_above_signal and s.histogram_positive
+    def bear(s):
+        return not s.macd_above_signal and not s.histogram_positive
+
+    # Cascade sequence detection (smallest TF → largest TF)
+    # If 15m flipped but 1h/4h haven't confirmed yet = cascade in progress
+    # If all TFs are aligned = cascade complete
+    tf_order = ['15m', '1h', '4h']
+    states_by_tf = {'15m': s_15m, '1h': s_1h, '4h': s_4h}
+
+    # Count TFs in each direction
+    bull_count = sum(1 for _, s in valid if bull(s))
+    bear_count = sum(1 for _, s in valid if bear(s))
+
+    if bull_count >= 2:
+        result['cascade_direction'] = 'LONG'
+    elif bear_count >= 2:
+        result['cascade_direction'] = 'SHORT'
+    else:
+        return result  # No clear direction
+
+    # Identify lead TF (smallest TF with the direction)
+    for tf in tf_order:
+        s = states_by_tf.get(tf)
+        if s is None:
+            continue
+        if result['cascade_direction'] == 'LONG' and bull(s):
+            result['lead_tf'] = tf
+            break
+        if result['cascade_direction'] == 'SHORT' and bear(s):
+            result['lead_tf'] = tf
+            break
+
+    # Count confirmations from larger TFs
+    lead_idx = tf_order.index(result['lead_tf']) if result['lead_tf'] else -1
+    for tf in tf_order[lead_idx + 1:]:
+        s = states_by_tf.get(tf)
+        if s is None:
+            continue
+        if result['cascade_direction'] == 'LONG' and bull(s):
+            result['confirmation_count'] += 1
+        elif result['cascade_direction'] == 'SHORT' and bear(s):
+            result['confirmation_count'] += 1
+
+    # Cascade is active if lead TF is smaller than largest confirmed TF
+    result['cascade_active'] = result['lead_tf'] is not None and result['confirmation_count'] < len(valid) - 1
+
+    # Reversal score: how many TFs have flipped in the direction
+    result['reversal_score'] = float(bull_count if result['cascade_direction'] == 'LONG' else bear_count) / len(valid)
+
+    return result
+
+
 # ── Cascade entry signal ─────────────────────────────────────────────────────
 
 def cascade_entry_signal(token: str) -> dict:
@@ -610,8 +695,6 @@ def cascade_entry_signal(token: str) -> dict:
         'mtf_result': dict,
       }
     """
-    from candle_db import detect_cascade_direction
-
     # Get per-TF MACD states
     mtf_result = compute_mtf_macd_alignment(token)
     if mtf_result is None:
@@ -628,7 +711,8 @@ def cascade_entry_signal(token: str) -> dict:
         }
 
     tf_states = mtf_result['tf_states']
-    cascade = detect_cascade_direction(tf_states)
+    # Cascade detection: find which (if any) smaller TF flipped before larger TFs
+    cascade = _detect_cascade(tf_states)
 
     s_15m = tf_states.get('15m')
     s_1h  = tf_states.get('1h')

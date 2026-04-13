@@ -205,8 +205,35 @@ def fetch_4h_klines(symbol, window_days=WINDOW_DAYS):
     all_batches.sort(key=lambda k: int(k[0]))
     return all_batches
 
+def fetch_15m_klines(symbol, window_days=WINDOW_DAYS):
+    """Fetch N days of 15m klines from Binance via backward pagination.
+    Returns list of [open_time, open, high, low, close, volume] (ascending, oldest→newest)."""
+    limit = 1000
+    now = int(time.time() * 1000)
+    target_start = now - window_days * 24 * 3600 * 1000
+    all_batches = []
+    current_end = now
+
+    for _ in range(12):  # 12 * 1000 * 15min = 7200h = 300 days max
+        url = f'{BINANCE_BASE}?symbol={symbol}&interval=15m&limit={limit}&endTime={current_end}'
+        batch = _cached_request(url)
+        if not batch:
+            break
+        all_batches.extend(batch)
+        oldest = int(batch[0][0])
+        if oldest <= target_start:
+            break
+        if len(batch) < limit:
+            break
+        current_end = oldest - 1
+
+    all_batches.sort(key=lambda k: int(k[0]))
+    return all_batches
+
+
 def build_15m_candles_from_1h(klines_1h):
-    """Aggregate 1H OHLC into 15m candles.
+    """DEPRECATED — only use for lookback warmup if 15m data is unavailable.
+    Aggregate 1H OHLC into 15m candles.
     klines_1h: list of [open_time, open, high, low, close, volume] (ascending).
     Returns: dict of {ts15m: [open, high, low, close]}."""
     buckets = {}
@@ -240,16 +267,16 @@ def test_mtf_macd_config(token, fast, slow, signal, exit_strategy,
     # ── Fetch all TF data ─────────────────────────────────────────────────────
     klines_1h = fetch_1h_klines(symbol, window_days)
     klines_4h = fetch_4h_klines(symbol, window_days)
+    klines_15m = fetch_15m_klines(symbol, window_days)
 
-    if len(klines_1h) < 100 or len(klines_4h) < 20:
+    if len(klines_1h) < 100 or len(klines_4h) < 20 or len(klines_15m) < 100:
         if verbose:
-            print(f'  [WARN] {token}: insufficient data ({len(klines_1h)} 1h, {len(klines_4h)} 4h)')
+            print(f'  [WARN] {token}: insufficient data ({len(klines_1h)} 1h, {len(klines_4h)} 4h, {len(klines_15m)} 15m)')
         return None
 
-    # Build 15m candles from 1H aggregation
-    buckets_15m = build_15m_candles_from_1h(klines_1h)
-    sorted_15m_ts = sorted(buckets_15m.keys())
-    closes_15m = [buckets_15m[ts][3] for ts in sorted_15m_ts]
+    # Build 15m candles from real Binance 15m klines
+    sorted_15m_ts = sorted(int(k[0]) for k in klines_15m)
+    closes_15m = [float(k[4]) for k in klines_15m]
 
     # 1H closes from raw klines
     closes_1h = [float(k[4]) for k in klines_1h]
@@ -591,8 +618,10 @@ def _fast_backtest(token, fast, slow, sig, exit_strategy,
 
         exit_price = None
         exit_type  = None
+        hold_expired = False
         for j in range(i + 1, n_15m):
             if sorted_15m_ts[j] > hold_end_ts:
+                # Hold expired — exit at close of that candle
                 exit_price = closes_15m[j]
                 exit_type  = 'hold'
                 break
@@ -627,8 +656,11 @@ def _fast_backtest(token, fast, slow, sig, exit_strategy,
                         exit_type  = 'any_flip'
                         break
 
+        # If hold_minutes exceeded available data without a flip signal,
+        # exit at last candle rather than silently dropping the trade
         if exit_price is None:
-            continue
+            exit_price = closes_15m[-1]
+            exit_type  = 'hold_expired'
 
         pnl_pct = (exit_price - entry_price) / entry_price * 100
         trades.append({
@@ -704,16 +736,16 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
             symbol = token.upper() + 'USDT'
             klines_1h = fetch_1h_klines(symbol, window_days)
             klines_4h = fetch_4h_klines(symbol, window_days)
+            klines_15m = fetch_15m_klines(symbol, window_days)
 
-            if len(klines_1h) < 100 or len(klines_4h) < 20:
-                print(f'  [WARN] {token}: insufficient data ({len(klines_1h)} 1h, {len(klines_4h)} 4h)')
+            if len(klines_1h) < 100 or len(klines_4h) < 20 or len(klines_15m) < 100:
+                print(f'  [WARN] {token}: insufficient data ({len(klines_1h)} 1h, {len(klines_4h)} 4h, {len(klines_15m)} 15m)')
                 conn.commit()
                 continue
 
-            # Build 15m candles from 1H aggregation
-            buckets_15m = build_15m_candles_from_1h(klines_1h)
-            sorted_15m_ts = sorted(buckets_15m.keys())
-            closes_15m = [buckets_15m[ts][3] for ts in sorted_15m_ts]
+            # Real 15m candles from Binance paginated fetch
+            sorted_15m_ts = sorted(int(k[0]) for k in klines_15m)
+            closes_15m = [float(k[4]) for k in klines_15m]
             closes_1h = [float(k[4]) for k in klines_1h]
             closes_4h = [float(k[4]) for k in klines_4h]
 
@@ -811,7 +843,10 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
                     break
 
         if best_for_token:
-            c.execute("""INSERT OR REPLACE INTO token_best_config
+            # Mark previous configs for this token as stale before inserting new best
+            c.execute("UPDATE token_best_config SET is_stale=1 WHERE token=? AND is_stale=0",
+                      (token,))
+            c.execute("""INSERT INTO token_best_config
                 (token, fast, slow, signal, exit_strategy, hold_minutes,
                  score_threshold, regime_filter, win_rate, profit_factor,
                  total_pnl_pct, signal_count, backtest_run_id, updated_at, is_stale)
