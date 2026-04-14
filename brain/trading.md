@@ -50,6 +50,75 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 **Status:** LIVE — 2026-04-09
 **Sub-project of:** Position Management | **Owner:** Agent
 
+### Dashboard Update Chain
+```
+Pipeline (every 1 min via run_pipeline.py)
+  → hermes-trades-api.py (reads PostgreSQL brain DB, writes /var/www/hermes/data/trades.json)
+    → nginx port 54321 (serves trades.json to trades.html)
+      → trades.html polls /data/trades.json every 30s
+
+Pipeline log: /root/.hermes/logs/pipeline.log
+Dashboard JSON: /var/www/hermes/data/trades.json
+JSON updated by: hermes-trades-api.py (standalone, NOT via systemd service)
+```
+**IF DASHBOARD STALE:** Check if pipeline is still running (`ps aux | grep run_pipeline`). Pipeline crashed/stopped = dashboard frozen. Restart via the pipeline timer or manually.
+
+### Guardian vs Dashboard Lag
+- Guardian (`hl-sync-guardian.py`): runs every ~7s, recalculates ATR continuously
+- Guardian → PostgreSQL DB: persists ATR SL/TP at end of each sync cycle
+- Pipeline → Dashboard JSON: reads PostgreSQL DB, writes trades.json every 1 min
+- Dashboard shows: PostgreSQL values, which lag guardian's in-memory ATR by ~0-60s
+- AVAX/BLUR confirmed: `replace_sl` successfully updated HL in <10s from guardian call
+
+### SKIP_COINS Bug (FIXED 2026-04-14)
+**Root cause:** `position_manager.py` reconcile_tp_sl() had a hardcoded skip list:
+```python
+if coin.upper() in {'AAVE', 'MORPHO', 'ASTER', 'PAXG', 'AVNT'}:
+    continue
+```
+Coins in this list NEVER got ATR-based SL recalculation — they only received the 2%-from-entry
+fallback SL from the earlier step, which is wrong.
+
+**Fix applied:** Removed all coins from SKIP_COINS in `hl-sync-guardian.py` line ~2490.
+The skip was in `hl-sync-guardian.py` reconcile_tp_sl(), NOT in position_manager.py.
+All 9 open positions now get ATR-based SL reconciliation.
+
+**Affected coins (previously skipped):** AAVE, MORPHO, ASTER, PAXG, AVNT
+
+### HL Rate Limit Issues
+- HL enforces a request budget (approx 74247 base + USDC volume bonus)
+- Guardian request count: ~80023 (over budget = rate limited)
+- Error messages: "Too many cumulative requests sent", "Invalid TP/SL price. asset=X"
+- The `asset=X` errors (BTC=0, XRP=25, PROVE=201, AVNT=208) are HL-side validation failures,
+  not code bugs — likely triggered by the rate-limit state corrupting the order routing
+- Successfully updated on HL so far: AVAX, BLUR (both PASS in logs)
+- Mitigation: `_tpsl_cooldown` = 30s per token prevents duplicate HL calls
+
+### Current ATR SL Values (2026-04-14, from guardian DB writes)
+| Token | Direction | ATR | SL Formula | Current |
+|-------|-----------|-----|------------|---------|
+| BTC | SHORT | ~135 | cur + ATR | ~75,127 |
+| ETH | LONG | ~6.1 | cur - ATR | ~2,365 |
+| AVAX | LONG | ~0.023 | cur - ATR | ~9.38 |
+| LINK | LONG | ~0.024 | cur - ATR | ~9.11 |
+| XRP | LONG | ~0.0029 | cur - ATR | ~1.347 |
+| DYDX | LONG | ~0.00037 | cur - ATR | ~0.096 |
+| BLUR | SHORT | ~0.00015 | cur + ATR | ~0.021 |
+| PROVE | SHORT | ~0.00067 | cur + ATR | ~0.229 |
+| AVNT | SHORT | ~0.00058 | cur + ATR | ~0.134 |
+
+### When to Check What
+| Question | Where to look |
+|----------|--------------|
+| Is the guardian running? | `ps aux \| grep hl-sync-guardian` |
+| Is the pipeline running? | `ps aux \| grep run_pipeline` |
+| Guardian ATR calc fresh? | `tail -20 /root/.hermes/logs/sync-guardian.log \| grep ATR` |
+| Dashboard JSON fresh? | `stat /var/www/hermes/data/trades.json \| grep Modify` |
+| Pipeline cycle? | `tail /root/.hermes/logs/pipeline.log` |
+| DB vs dashboard diff? | PostgreSQL `trades.stop_loss` vs `/var/www/hermes/data/trades.json` |
+
+---
+
 ### What It Is
 Hermes self-closes positions when ATR-based SL or TP levels are hit — without relying on HL trigger orders.
 
@@ -239,3 +308,38 @@ UPDATE signals SET executed = 1 WHERE decision NOT IN ('PENDING', 'APPROVED', 'W
 **Verification:**
 - After fix: signals reset to PENDING with `executed=0`, compaction approved all 11
 - Compaction now includes WAIT signals in re-evaluation cycle
+
+### Fix: Confidence Floor + Entry Threshold Raise (2026-04-13)
+**Severity:** HIGH — was causing confidence inversion in pipeline decisions
+**Files:** `ai_decider.py` (new), `signal_gen.py`
+
+**Symptom (from Pipeline Analyst):**
+- REJECTED signals avg: 79.8% confidence (135 signals)
+- EXECUTED signals avg: 70.1% confidence (22 signals)
+- Higher confidence signals systematically rejected; lower confidence executed
+
+**Root Cause:**
+1. ENTRY_THRESHOLD was 50 — too many weak signals flooding the hot-set pipeline, diluting LLM attention
+2. No floor in `_do_compaction_llm()` — the LLM received all signals including sub-60% noise, spending tokens evaluating garbage
+
+**Fix Applied:**
+
+1. **`ai_decider.py`** — Added confidence floor in `_do_compaction_llm()`:
+   ```python
+   CONFIDENCE_FLOOR = 60
+   signals = [s for s in signals if s[3] >= CONFIDENCE_FLOOR]
+   ```
+   Signals below 60% are silently dropped before reaching the LLM. Reduces token spend, focuses LLM on qualified candidates.
+
+2. **`signal_gen.py`** — Raised entry thresholds:
+   ```
+   ENTRY_THRESHOLD:       50 → 60  (LONG)
+   SHORT_ENTRY_THRESHOLD: 60 → 60  (SHORT — was 70, now unified at 60)
+   ```
+   Only signals with natural score ≥60 (LONG) or ≥70 (SHORT) are written to the DB at all.
+
+**Expected Effect:**
+- ~30-40% fewer signals written to DB (weaker ones filtered at source)
+- LLM only evaluates signals that are already mid-quality or higher
+- Higher average confidence in hot-set shortlist
+- Reduces the inversion: signals the LLM sees are pre-qualified
