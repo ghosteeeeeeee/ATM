@@ -16,7 +16,7 @@ Run this when you need a comprehensive audit of the Hermes codebase for:
 - Any structural problems that would prevent the zip from working standalone
 
 ## Subagent
-Uses the **Git Workflow Master** subagent persona from `/hermes/subagents/git-workflow-master.md`.
+Uses the **Git Workflow Master** subagent persona from `/root/.hermes/subagents/engineering/git-workflow-master.md`.
 This agent has deep Git expertise and applies it to audit the Hermes system.
 
 ## Steps

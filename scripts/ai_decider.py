@@ -41,6 +41,14 @@ _DAILY_TOKEN_BUDGET=1200000  # daily cap (1.2M — supports ai_decider + 2x comp
 _DAILY_TOKENS_USED = 0
 _DAILY_BUDGET_FILE = '/root/.hermes/data/ai_decider_daily_tokens.json'
 
+# ── Candle Predictor Killswitch ───────────────────────────────────────────
+# FIX (2026-04-13): candle_predictor has 38% accuracy (136K predictions) —
+# BELOW RANDOM (50%). Model is actively harmful. Kill its influence on
+# trading decisions until retrained. The get_prediction() call still runs
+# (it's just informational context in the prompt), but its output is marked
+# as IGNORED so it cannot affect any decision.
+_CANDLE_PREDICTOR_IGNORE = True   # True = ignore candle predictor output entirely
+
 # Event log integration
 try:
     from event_log import log_event
@@ -131,11 +139,15 @@ SOURCE_WEIGHTS = {
 # Checked in order; first match wins. None = neutral 1.0.
 SOURCE_WEIGHT_OVERRIDES = [
     ('mtf_macd',  'hmacd-',  1.5),   # hmacd- + mtf_macd = MACD crossover (boosted to 1.5)
-    # hzscore: combo-only, never solo. pct-hermes is the ONLY allowed combo (suppressed 0.4).
-    # Any other hzscore combo (e.g. hmacd-,hzscore without pct-hermes) = 0.15.
-    ('mtf_zscore', 'hzscore', 0.15),
-    ('mtf_zscore', 'hmacd-,hzscore', 1.25),   # hzscore without pct-hermes = boosted
-    ('mtf_zscore', 'hzscore,pct-hermes', 0.4),  # the only allowed hzscore combo
+    # hzscore: combo-only, never solo. pct-hermes is the ONLY allowed combo.
+    # hzscore,pct-hermes = 1.0 (restored from 0.4, direction bug now fixed).
+    # hzscore,pct-hermes,vel-hermes = 0.85.
+    # bare hzscore = 0.15 (blocked at hot-set entry anyway).
+    # NOTE: longer prefixes must come BEFORE shorter ones (first-match wins).
+    ('mtf_zscore', 'hzscore,pct-hermes', 1.0),        # specific first — restored from 0.4
+    ('mtf_zscore', 'hzscore,pct-hermes,vel-hermes', 0.85),  # then this
+    ('mtf_zscore', 'hmacd-,hzscore', 1.25),           # hzscore without pct-hermes = boosted
+    ('mtf_zscore', 'hzscore', 0.15),                   # bare hzscore last — too short to shadow
     # Pattern signals: 1.25× multiplier — independent primary signals, need to
     # bubble up so T can observe their performance vs mtf_macd in hot-set
     ('pattern_flag',   'pattern_scanner', 1.25),
@@ -323,17 +335,10 @@ def _get_source_weight(stype, source):
             base_weight = weight
             break
     else:
-        # hmacd-* but not mtf_macd → penalize baseline
-        if source.startswith('hmacd-'):
-            # Specific combo hmacd-,hzscore,pct-hermes is noisy — suppress hard
-            if 'pct-hermes' in source and 'hzscore' in source:
-                base_weight = 0.4   # combo with pct-hermes + hzscore = very noisy
-            elif source == 'hmacd-':
-                base_weight = 0.3   # solo hmacd- = not allowed, very weak
-            else:
-                base_weight = SOURCE_WEIGHTS.get('hmacd-default', 0.6)
-        else:
-            base_weight = DEFAULT_SOURCE_WEIGHT
+        # No SOURCE_WEIGHT_OVERRIDES match — use default (1.0).
+        # NOTE: All 'hmacd-*' variants are already caught by SOURCE_WEIGHT_OVERRIDES
+        # entries above, so the old inline hmacd-* handling here was dead code.
+        base_weight = DEFAULT_SOURCE_WEIGHT
 
     # Layer 2: WR-based calibration — override baseline if enough data
     # Uses category-level calibration to smooth across related signal types
@@ -439,21 +444,21 @@ def _load_hot_rounds():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # FIX (2026-04-10): Drop 3-hour created_at filter for signals with review_count>=1.
-        # These signals have ALREADY been reviewed by AI and proven worthy of the hot-set.
-        # Only apply the 3-hour filter to signals with review_count=0 (never seen by AI).
-        # Bug: The 3-hour window expired 354 WAIT signals (10-27h old) that had review_count>=1,
-        # while 58 recent signals with review_count=0 couldn't enter because AI hadn't seen them yet.
+        # FIX (2026-04-13): Pipeline increments hot_cycle_count, NOT review_count.
+        # review_count is only incremented by AI-decider on SKIPPED/WAIT signals.
+        # _load_hot_rounds must query hot_cycle_count to find pipeline-approved signals.
+        # Bug: review_count >= 1 returned 0 rows for ADA/DOGE/ONDO (executed, review_count=0,
+        # hot_cycle_count=1) → all LONGs excluded from hotset → 33 SHORTs only.
         c.execute("""
-            SELECT token, direction, MAX(review_count) as rounds,
+            SELECT token, direction, MAX(hot_cycle_count) as rounds,
                    GROUP_CONCAT(DISTINCT signal_type) as types, source
             FROM signals
             WHERE (decision IN ('PENDING', 'APPROVED', 'WAIT')
-                   OR (decision = 'EXPIRED' AND review_count >= 1))
-              AND review_count >= 1
+                   OR (decision = 'EXPIRED' AND hot_cycle_count >= 1))
+              AND hot_cycle_count >= 1
               AND (
                   created_at > datetime('now', '-3 hours')  -- new signals: must be <3h old
-                  OR review_count >= 1                      -- AI-reviewed signals: no age limit
+                  OR hot_cycle_count >= 1                   -- pipeline-approved signals: no age limit
               )
               AND (token, direction) NOT IN (
                   SELECT token, direction FROM signals
@@ -515,6 +520,19 @@ def _load_hot_rounds():
                 'num_types': num_types,
                 'source': source,
             }
+
+        # BUG FIX (2026-04-13): Filter bare hzscore — hzscore is combo-only, never solo.
+        # It must have pct-hermes alongside. Block:
+        #   - bare 'hzscore'
+        #   - compounds where hzscore is present but pct-hermes is NOT (e.g. hzscore,vel-hermes)
+        # Compounds hzscore,pct-hermes,... (pct-hermes present) are VALID and pass through.
+        # Defense-in-depth: _run_hot_set also checks, and preservation filter also checks.
+        bare_hz = [tok for tok, d in _hot_rounds.items()
+                   if 'hzscore' in d.get('source', '')
+                   and 'pct-hermes' not in d.get('source', '')]
+        for tok in bare_hz:
+            print(f"   🚫 [HOTSET-FILTER] {tok}: bare hzscore blocked (combo-only, needs pct-hermes)")
+            del _hot_rounds[tok]
 
         conn.close()
         # BUG-11 fix: reset failure count on successful load
@@ -1125,17 +1143,30 @@ def _do_compaction_llm():
         FROM signals
         WHERE decision IN ('PENDING', 'WAIT')
           AND executed = 0
-          AND created_at > datetime('now', '-90 minutes')
+          AND (
+              created_at > datetime('now', '-90 minutes')  -- new signals: must be <90m old
+              OR hot_cycle_count >= 1                       -- pipeline-approved signals: no age limit
+          )
           AND token NOT LIKE '@%'
           {_whitelist_sql}
         ORDER BY confidence DESC
         LIMIT 100
     """, _whitelist_params)
     signals = c.fetchall()
-    
+
+    # Confidence floor — only pass signals ≥60% to the LLM.
+    # This reduces token spend on weak signals and prevents the LLM from
+    # over-valuing mediocre signals at the expense of high-conviction ones.
+    CONFIDENCE_FLOOR = 60
+    before_count = len(signals)
+    signals = [s for s in signals if s[3] >= CONFIDENCE_FLOOR]
+    filtered_count = before_count - len(signals)
+    if filtered_count:
+        print(f"  [LLM-compaction] Filtered {filtered_count}/{before_count} signals below {CONFIDENCE_FLOOR}% confidence floor")
+
     if not signals:
         conn.close()
-        print("  [LLM-compaction] No signals in last 30 mins — skipping")
+        print("  [LLM-compaction] No signals above confidence floor — skipping")
         return
 
     # Debug: log signal types in the whitelist-filtered set
@@ -1301,7 +1332,7 @@ OUT:
             return
         
         from openai import OpenAI
-        _client = OpenAI(api_key=_minimax_token, base_url='https://api.minimax.io/v1')
+        _client = OpenAI(api_key=_minimax_token, base_url='https://api.minimax.io/v1', timeout=60)
         _resp = _client.chat.completions.create(
             model="MiniMax-M2",
             messages=[{"role": "user", "content": prompt}],
@@ -1734,6 +1765,12 @@ OUT:
                         continue
                     if _src in SIGNAL_SOURCE_BLACKLIST:
                         print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — source '{_src}' blacklisted")
+                        continue
+                    # BUG FIX (2026-04-13): Block bare hzscore as first component.
+                    # source='hzscore,pct-hermes' → first='hzscore' → block.
+                    # This catches compound sources where hzscore appears alone without pct-hermes.
+                    if _src and _src.split(',')[0] == 'hzscore':
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — bare hzscore (combo-only)")
                         continue
                     # FIX (2026-04-12): Update timestamp on preservation so "Last Seen" is accurate
                     _entry['timestamp'] = time.time()
@@ -2196,7 +2233,7 @@ End with:
             _result['_open_trades'] = []
             return _result
 
-        _client = _OpenAI(api_key=_token, base_url='https://api.minimax.io/v1')
+        _client = _OpenAI(api_key=_token, base_url='https://api.minimax.io/v1', timeout=60)
         _resp = _client.chat.completions.create(
             model="MiniMax-M2",
             messages=[{"role": "user", "content": prompt}],
@@ -2528,7 +2565,7 @@ REASON: [1-sentence explanation]
             return direction, abs(conf) * 30, "Budget exceeded"
 
         try:
-            _client = OpenAI(api_key=_minimax_token, base_url=_minimax_url)
+            _client = OpenAI(api_key=_minimax_token, base_url=_minimax_url, timeout=60)
             _resp = _client.chat.completions.create(
                 model="MiniMax-M2",
                 messages=[{"role": "user", "content": prompt}],
@@ -3002,9 +3039,11 @@ if __name__ == '__main__':
             continue
     
         # Get LLM candle prediction for this token
+        # KILLSWITCH (2026-04-13): candle predictor at 38% accuracy is worse than
+        # random. Mark pred_str as IGNORED so the LLM doesn't factor it into decisions.
         prediction = get_prediction(t)
         pred_str = ""
-        if prediction:
+        if prediction and not _CANDLE_PREDICTOR_IGNORE:
             token_info = f"- Token-Specific Accuracy: {prediction['token_accuracy']}% ({prediction['token_total']} predictions)"
             if prediction['token_total'] < 3:
                 token_info = f"- Token-Specific Accuracy: {prediction['token_accuracy']}% ({prediction['token_total']} predictions) - building history"
@@ -3015,6 +3054,11 @@ if __name__ == '__main__':
     {token_info}
     IMPORTANT: The candle predictor is unreliable (35% accuracy, 0% in last 24h).
     Treat its predictions as weak signal at best. Primary trust: momentum signal + MACD + RSI.
+    """
+        elif prediction and _CANDLE_PREDICTOR_IGNORE:
+            # Candle predictor is disabled — mark as ignored in prompt
+            pred_str = """
+    [CANDLE PREDICTOR: DISABLED — 38% accuracy (below random). Ignored for this decision.]
     """""
     
         # Get z-score tier from signal

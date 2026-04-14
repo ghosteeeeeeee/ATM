@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-04-14 | RSI Signal Disable — Remove RSI from Signal Generation
+
+**Decision:** Commented out RSI individual signal and RSI confluence SHORT path in `signal_gen.py`. RSI LONG confluence remains active (has z-score filter).
+
+**Why disabled:**
+- RSI individual fires LONG when RSI < 42, SHORT when RSI > 60 — completely independent of z-score (price position)
+- RSI confluence SHORT: "No z-score filter for SHORTs — elevated prices are valid short targets" — fires SHORT when RSI > 60 regardless of whether price is actually elevated
+- Backtest (794 trades): `hzscore,pct-hermes,vel-hermes` = 58.1% WR (+$16.58) vs `hzscore,pct-hermes,rsi-hermes` = 44.2% WR (-$4.77)
+- RSI individual SHORT: 0% WR across 6 trades, avg -0.21%
+- All RSI combinations perform worse than non-RSI equivalents in every case
+
+**What was disabled:**
+1. `_run_rsi_signals_for_confluence()` SHORT path (signal_gen.py ~lines 1334-1348)
+2. RSI individual signal block (signal_gen.py ~lines 1642-1673)
+
+**What remains active:**
+- RSI LONG confluence (lines 1320-1333) — has z-score filter `z > LONG_1H_Z_MAX`, suppressed prices only
+
+**What NOT to re-enable without:**
+- Z-score filter on RSI SHORT path (must confirm price is actually elevated with z_score > 0)
+- Minimum z-score threshold for RSI individual (don't fire RSI signals when z is near 0)
+
+**Backtest data:** `scripts/rsi_backtest.py` — run with `python3 scripts/rsi_backtest.py`
+
+**Files modified:** `/root/.hermes/scripts/signal_gen.py`
+
+**Owner:** Agent
+
+---
+
 ## 2026-04-10 | Cascade Flip Kill Switch — Disabled
 
 **Decision:** Added `CASCADE_FLIP_ENABLED = False` kill switch to `position_manager.py`. All 4 cascade flip call sites now guarded by this flag.

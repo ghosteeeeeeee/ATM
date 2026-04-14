@@ -34,6 +34,8 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 ```
 
 ### Pipeline Schedule
+`run_pipeline.py` — runs every 1 minute via `hermes-pipeline.timer`
+
 | Step | Frequency | Script |
 |------|-----------|--------|
 | Price collection | Every 1 min | `price_collector.py` |
@@ -41,8 +43,16 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 | Signal generation | Every 1 min | `signal_gen.py` |
 | Hot-set execution | Every 1 min | `decider_run.py` |
 | Position management | Every 1 min | `position_manager.py` |
-| Web dashboard | Every 1 min | `update-trades-json` |
-| AI decision + compaction | Every 10 min | `ai_decider.py` |
+| Web dashboard JSON | Every 1 min | `hermes-trades-api.py` |
+| AI decision + hot-set compaction | Every 10 min (on 10s) | `ai_decider.py` |
+| Strategy optimizer | Every 10 min (on 10s) | `strategy_optimizer.py` |
+| A/B optimizer | Every 10 min (on 10s) | `ab_optimizer.py` |
+| A/B learner | Every 10 min (on 10s) | `ab_learner.py` |
+
+Timer: `hermes-pipeline.timer` — every 1 minute on the clock (`:0/1:00`).
+10-min steps run on minutes 0, 10, 20, 30, 40, 50 (when `minute % 10 == 0`).
+
+Guardian: `hermes-hl-sync-guardian.timer` — every 2 minutes (separate from pipeline).
 
 ---
 
@@ -52,16 +62,50 @@ hermes-trades-api.py        ──→ writes signals.json for web dashboard
 
 ### Dashboard Update Chain
 ```
-Pipeline (every 1 min via run_pipeline.py)
+Pipeline (every 10 min via hermes-pipeline.timer)
   → hermes-trades-api.py (reads PostgreSQL brain DB, writes /var/www/hermes/data/trades.json)
-    → nginx port 54321 (serves trades.json to trades.html)
+    → nginx port 54321 (aliases /data/trades.json → /var/www/hermes/data/trades.json)
       → trades.html polls /data/trades.json every 30s
 
 Pipeline log: /root/.hermes/logs/pipeline.log
-Dashboard JSON: /var/www/hermes/data/trades.json
-JSON updated by: hermes-trades-api.py (standalone, NOT via systemd service)
+Dashboard JSON: /var/www/hermes/data/trades.json  ← REAL file (95KB, live)
+               /root/.hermes/data/trades.json     ← STALE file (26 bytes, empty, NOT used)
+               /root/.hermes/web/data/trades.json ← seed file (Apr 5, NOT used)
 ```
-**IF DASHBOARD STALE:** Check if pipeline is still running (`ps aux | grep run_pipeline`). Pipeline crashed/stopped = dashboard frozen. Restart via the pipeline timer or manually.
+
+**Two trades.json files — only one matters:**
+- `/var/www/hermes/data/trades.json` — the live file, served by nginx, updated every 10 min
+- `/root/.hermes/data/trades.json` — stale 26-byte empty file, nothing reads or writes it
+- `/root/.hermes/web/data/trades.json` — old seed file from Apr 5, nothing reads it
+- nginx root is `/var/www/hermes` (real directory, NOT a symlink to `/root/.hermes`)
+
+**IF DASHBOARD STALE:** Check if pipeline is still running (`ps aux | grep run_pipeline`).
+Pipeline crashed/stopped = dashboard frozen. Restart via the pipeline timer or manually.
+
+### Port 59999 — Unrelated HTTP Server
+python3 -m http.server 59999 runs from /tmp — serves nothing useful, completely unrelated
+to Hermes trading data or the web dashboard. Ignore it.
+
+### Guardian ↔ Web Dashboard Bridge
+The guardian does NOT write to trades.json directly. The bridge is hermes-trades-api.py:
+
+```
+hl-sync-guardian.py writes → PostgreSQL brain trades table (status, SL, TP, pnl)
+hermes-trades-api.py reads PostgreSQL → writes → /var/www/hermes/data/trades.json
+nginx port 54321 serves → trades.html reads
+```
+
+guardian: runs every 2 min via `hermes-hl-sync-guardian.timer`, writes to PostgreSQL only
+hermes-trades-api: runs every 10 min via `hermes-pipeline.timer`, reads PostgreSQL → writes JSON
+
+The dashboard shows PostgreSQL data (guardian's persistance layer), which lags the guardian's
+in-memory ATR calculations by up to 10 minutes between pipeline cycles.
+
+### Streamlit Dashboard (Port 8501)
+`hermes-dashboard.py` is a **separate ML/signal statistics dashboard** running under
+`/learning/` path. It shows signal win rates, calibration data, and pattern analysis
+from `signals_hermes_runtime.db`. It is NOT a real-time trades dashboard — it's for
+AI/ML analysis. Unrelated to the trades.html web dashboard.
 
 ### Guardian vs Dashboard Lag
 - Guardian (`hl-sync-guardian.py`): runs every ~7s, recalculates ATR continuously
@@ -183,7 +227,53 @@ Pipeline Cycle (every 1 min):
 
 ---
 
+## RSI Signal Disable (2026-04-14)
+**Status:** DISABLED — RSI signals removed from signal_gen.py pending z-score filter fix
+
+### Why RSI Was Disabled
+1. **RSI individual signal** (lines 1645-1673): fires LONG when RSI < 42, SHORT when RSI > 60, completely independent of z-score (price position). No directional confirmation from price momentum.
+2. **RSI confluence SHORT** (lines 1343-1356): fires SHORT when RSI > 60 with comment "No z-score filter for SHORTs — elevated prices are valid short targets." In a BTC pump, every alt looks "elevated" — the system was shorting everything.
+
+### Backtest Results (794 closed Hermes trades)
+```
+Signal                                  N     WR       Avg    Total
+hzscore,pct-hermes,vel-hermes (NO RSI)  167  58.1%  +0.099%  +$16.58
+hzscore,pct-hermes,rsi-hermes (RSI)      52  44.2%  -0.092%   -$4.77
+hzscore,rsi-hermes (RSI only)             7   0.0%  -0.228%   -$1.60
+
+HAS RSI (any):    62 trades  WR=38.7%  Avg=-0.105%  Total=-$6.50
+NO RSI (signal): 732 trades  WR=50.1%  Avg=+0.021%  Total=+$15.69
+```
+
+**Conclusion:** RSI degrades signal quality in every combo. Adding RSI to hzscore,pct-hermes drops win rate from 58.1% to 44.2%, drops avg from +0.099% to -0.092%. RSI individual SHORT has 0% win rate.
+
+### What Was Disabled
+- `_run_rsi_signals_for_confluence()` SHORT path (lines 1334-1348) — RSI confluence SHORT, no z-score filter
+- RSI individual signal block (lines 1642-1673) — fires independently without z-score confirmation
+
+### RSI LONG (confluence) Still Active
+- RSI LONG path (lines 1320-1333) — still ACTIVE, has z-score filter (`z > LONG_1H_Z_MAX`)
+- This is the `rsi_confluence` signal with `source='rsi-confluence'`
+
+### What NOT To Re-enable Without
+- Z-score filter on RSI SHORT path (must confirm price is actually elevated)
+- Minimum z-score threshold for RSI individual
+
+### Files Modified
+- `/root/.hermes/scripts/signal_gen.py` — commented out RSI individual + RSI confluence SHORT
+
+---
+
 ## Live Log (Recent)
+
+### 2026-04-14 — RSI Signals Disabled
+- RSI individual: DISABLED (0% WR on SHORT, degrades every combo)
+- RSI confluence SHORT: DISABLED (no z-score filter — fires SHORTs in bull markets)
+- RSI LONG confluence: STILL ACTIVE (has z-score filter `z > LONG_1H_Z_MAX`)
+- Backtest: `hzscore,pct-hermes,vel-hermes` (167 trades, 58.1% WR, +$16.58) vs with RSI (52 trades, 44.2% WR, -$4.77)
+- ATR SL hit analysis: 9 trades, 100% wrong direction — system was SHORT when it should've been LONG
+- BIO SHORT current: -4.4%, LINK LONG current: -1.6% — both wrong direction due to RSI
+- Pipeline: still running, hot-set now RSI-free
 
 ### 2026-04-12 — Session Start
 - Cascade-flip: DISABLED

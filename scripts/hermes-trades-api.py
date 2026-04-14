@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Hermes trades + signals API — outputs JSON for the web dashboard."""
-import sys, json, os, sqlite3, time, fcntl
+import sys, json, os, sqlite3, time, fcntl, logging
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import init_db
 import psycopg2
 from datetime import datetime, timezone
+
+# Configure logging for get_trades() exceptions
+logging.basicConfig(level=logging.WARNING,
+                    format='[%(asctime)s] %(levelname)s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+_log = logging.getLogger(__name__)
 try:
     from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
     from tokens import is_solana_only
@@ -183,7 +189,8 @@ def get_trades(status='open', limit=20, offset=0):
         rows = cur.fetchall()
         cur.close(); conn.close()
         return rows
-    except:
+    except Exception as e:
+        _log.warning(f"[get_trades] DB query failed: {e}")
         return []
 
 
@@ -525,12 +532,14 @@ def write_signals():
     hot_set = _get_hotset_from_file()
 
     # _get_hotset_from_file() returns:
-    #   - None  : file not found or read error
-    #   - []    : file is stale (>11 min) or empty
-    #   - [..]  : valid enriched hot-set
-    # In all cases, treat None or [] the same — return empty to dashboard.
+    #   - [..] : valid enriched hot-set from hotset.json (fresh, <20 min)
+    #   - []   : file is stale (>20 min) or empty
+    #   - None : file not found or read error
+    # When stale or missing, fall back to DB query so dashboard always shows hot-set.
     if not hot_set:
-        hot_set = []
+        hot_set = _build_hotset_from_db()
+        if not hot_set:
+            hot_set = []
 
     # Compute win rate from brain DB using pnl_pct (after fees)
     # Filter out corrupted trades: exit_price sanity check

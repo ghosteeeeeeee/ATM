@@ -63,6 +63,46 @@ python3 /root/.hermes/skills/signal-compaction/scripts/compact.py --rebuild-only
 - ai-decider seems stuck or hot-set is very small (< 5 tokens)
 - After a trading session ends and you want to reset signal state
 - Scheduled: every 4-6 hours during active trading to prevent backlog
+
+## Manual Workflow (For Debugging Blocked Pipelines)
+
+If `hermes-trades-api` isn't syncing signals after `ai_decider` runs, check for these issues:
+
+### Issue 1: decider_run Times Out and Blocks Pipeline Sync
+**Symptom:** `signals.json` shows old/empty signals even though `signal_gen` generated new PENDING signals.
+**Root cause:** `decider_run` is the slowest step (HL API calls per token). If it times out, `hermes-trades-api` never runs.
+**Fix in `run_pipeline.py`:** Move `hermes-trades-api` BEFORE `decider_run` in `STEPS_EVERY_MIN`:
+```python
+STEPS_EVERY_MIN = ['price_collector', '4h_regime_scanner', 'signal_gen',
+                   'hermes-trades-api',   # <-- sync signals FIRST
+                   'decider_run', 'position_manager', 'update-trades-json']
+```
+This ensures signals sync immediately after generation regardless of decider_run behavior.
+
+### Issue 2: Stale Lock on ai_decider
+**Symptom:** `ai_decider.py` prints "lock held by another process" when you try to run it.
+**Fix:**
+```bash
+# Find and kill stale process
+fuser /root/.hermes/locks/ai_decider.lock
+kill -9 <PID>
+```
+
+### Issue 3: Correct Manual Sequence (After Lock Fix)
+After killing stale locks, run steps in this order:
+```bash
+# 1. Generate fresh PENDING signals
+python3 /root/.hermes/scripts/signal_gen.py
+
+# 2. Compact into hot-set
+python3 /root/.hermes/scripts/ai_decider.py
+
+# 3. Sync to signals.json (also done automatically by pipeline next run)
+python3 /root/.hermes/scripts/hermes-trades-api.py
+```
+
+### Issue 4: purge_and_compact.py Doesn't Call ai_decider Correctly
+The `purge_and_compact.py` script calls `ai_decider.py` which exits early if lock is held. After purging, you must manually run `signal_gen` then `ai_decider` in sequence (above).
 - **"No signals in last 30 mins" logged AND hotset.json stale** → check DB row count first (`SELECT COUNT(*) FROM signals`)
 
 ## Hotset Staleness Deadlock (CRITICAL)

@@ -18,12 +18,12 @@
           "config": {
             "entryMode": "immediate"
           },
-          "trades": 75,
+          "trades": 203,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-12 17:02:25.797307"
+          "lastUpdated": "2026-04-14 17:43:22.163317"
         }
       ]
     },
@@ -40,12 +40,12 @@
             "trailingActivationPct": 0.5,
             "trailingDistancePct": 0.5
           },
-          "trades": 63,
+          "trades": 60,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-12 17:02:25.809746"
+          "lastUpdated": "2026-04-14 17:43:22.167636"
         },
         {
           "id": "TS-loose",
@@ -56,12 +56,12 @@
             "trailingActivationPct": 2.0,
             "trailingDistancePct": 1.0
           },
-          "trades": 11,
+          "trades": 141,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-12 17:02:20.629851"
+          "lastUpdated": "2026-04-14 17:43:07.727300"
         },
         {
           "id": "TSEVO-3",
@@ -75,12 +75,12 @@
             "evolved_from": "TS-loose",
             "spawned_at": "2026-04-05T04:08:30.510438"
           },
-          "trades": 1,
+          "trades": 2,
           "wins": 0,
           "losses": 0,
           "winRate": 0,
           "totalPnlPct": 0,
-          "lastUpdated": "2026-04-10 00:42:40.457340"
+          "lastUpdated": "2026-04-14 07:31:28.220405"
         }
       ]
     },

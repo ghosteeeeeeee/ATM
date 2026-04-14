@@ -21,6 +21,7 @@ from tokens import is_solana_only
 from hermes_file_lock import FileLock
 from hyperliquid_exchange import is_live_trading_enabled, is_delisted
 import hype_cache as hc
+import atr_cache
 
 # ── OPTION 1: Signal Direction Flip ──────────────────────────────────────
 # Signal direction flip — disabled 2026-04-05 (flip test concluded)
@@ -47,22 +48,44 @@ _ATR_TTL    = 300  # 5 minutes cache TTL
 def _get_atr(token: str, period: int = 14, interval: str = '15m') -> float | None:
     """
     Fetch ATR(14) for token from Hyperliquid 15m candles.
+    Note: ATR(14) with 15m candles = 14 × 15min = 3.5 hours of data — intentional
+    design for responsive volatility measurement without excessive lag.
     Returns ATR value in dollar terms (same unit as price), or None on failure.
-    Cached per token for _ATR_TTL seconds.
+
+    Cache hierarchy (fastest first):
+      1. atr_cache memory cache  — per-process, survives process restarts
+      2. atr_cache file cache   — cross-process, 300s TTL
+      3. HL API                 — only on persistent cache miss
     """
     cache_key = (token.upper(), interval)
-    now = _time.time()
-    if cache_key in _ATR_CACHE:
-        atr_val, ts = _ATR_CACHE[cache_key]
-        if now - ts < _ATR_TTL:
-            return atr_val
 
+    # 1. Try persistent cache (file + memory) first
+    cached_atr = atr_cache.get_atr(token.upper(), interval)
+    if cached_atr is not None:
+        _ATR_CACHE[cache_key] = (cached_atr, time.time())
+        return cached_atr
+
+    # 2. Cache miss — fetch from HL API
     try:
-        from hyperliquid.info import Info
-        info = Info('https://api.hyperliquid.xyz', skip_ws=True)
+        # Use _hl_info() which applies 10s rate-limit gap + capped backoff.
+        # This avoids hammering HL with multiple concurrent candleSnapshot calls.
+        # BUG-FIX: HL API expects {"type": "candleSnapshot", "req": {...}}
+        # NOT {"type": "candles_snapshot", ...} — the latter returns HTTP 422.
+        from hyperliquid_exchange import _hl_info
+        now = time.time()
         end_t = int(now * 1000)
         start_t = end_t - (15 * 60 * 1000 * (period + 5))  # period+5 × 15min windows
-        candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
+        payload = {
+            "type": "candleSnapshot",
+            "req": {
+                "coin": token.upper(),
+                "interval": interval,
+                "startTime": start_t,
+                "endTime": end_t,
+            }
+        }
+        result = _hl_info(payload)
+        candles = result if isinstance(result, list) else []
         if not candles or len(candles) < period + 1:
             return None
 
@@ -78,7 +101,12 @@ def _get_atr(token: str, period: int = 14, interval: str = '15m') -> float | Non
         if not trs:
             return None
         atr = sum(trs) / len(trs)
-        _ATR_CACHE[cache_key] = (atr, now)
+
+        # 3. Save to persistent cache (file + memory) for next process restart
+        atr_cache.save_atr(token.upper(), atr, interval)
+
+        # Update in-process memory cache
+        _ATR_CACHE[cache_key] = (atr, time.time())
         return atr
     except Exception as e:
         log(f'  [ATR] {token} fetch error: {e}')
@@ -127,11 +155,11 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
 
     atr = _get_atr(token)
     if atr is None:
-        # Fall back to fixed % SL
+        # Fall back to fixed % SL (use current_price for fair fallback)
         if direction == 'LONG':
-            return entry_price * (1 - sl_pct_fallback)
+            return current_price * (1 - sl_pct_fallback)
         else:
-            return entry_price * (1 + sl_pct_fallback)
+            return current_price * (1 + sl_pct_fallback)
 
     # BUG-FIX: use current_price for ATR% calculation (not entry_price)
     atr_pct = atr / current_price
@@ -177,11 +205,11 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
 
     atr = _get_atr(token)
     if atr is None:
-        # Fall back to fixed % TP
+        # Fall back to fixed % TP (use current_price for fair fallback)
         if direction == 'LONG':
-            return entry_price * (1 + tp_pct_fallback)
+            return current_price * (1 + tp_pct_fallback)
         else:
-            return entry_price * (1 - tp_pct_fallback)
+            return current_price * (1 - tp_pct_fallback)
 
     # BUG-FIX: use current_price for ATR% calculation (not entry_price)
     atr_pct = atr / current_price
@@ -1166,6 +1194,14 @@ def _run_hot_set():
                                 continue
                             log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+LONG+momentum={_momentum} (conf now {confidence:.0f}%)')
 
+            # ── SINGLE-SOURCE hzscore FILTER ────────────────────────────────────
+            # hzscore is combo-only, never solo. Must have pct-hermes (or vel-hermes)
+            # merged to pass. source='hzscore' = bare hzscore, no confluence → block.
+            if sig_src == 'hzscore':
+                log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: hzscore (combo-only, no confluence)')
+                _record_hotset_failure(token, direction, failures)
+                continue
+
             # Signal-type specific approval logic
             if sig_type == 'confluence':
                 try:
@@ -1560,10 +1596,9 @@ def run(dry_run=False):
         except Exception as e:
             log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 
-        # FIX (2026-04-05): conf-1s = single-source, too weak — hard ban on approved signals too.
-        # Only block conf-1s (true single-source confluence). Merged signals with 1 type
-        # (count=1) have legitimate sources like 'mtf_macd', 'hzscore' — don't block those.
-        # Block conf-1s, conf-2s etc. (not 'hzscore' or 'hmacd-').
+        # conf-1s = single-source, too weak — hard ban. conf-2s+ are real confluence.
+        # NOTE: hzscore and hmacd- also end in 's' but pass through because the
+        # inner check only blocks conf-1s variants. This is intentional.
         sig_src = sig.get('source', '') or ''
         if sig_src.startswith('conf-') or sig_src.endswith('s'):
             # It's a confluence source (conf-1s, conf-2s, fallback-conf-3s, etc.)

@@ -129,20 +129,36 @@ def calculate_r2(candles, slope):
     return max(0, r2)
 
 def determine_regime(slope_pct, r2):
-    """Determine regime based on slope and confidence"""
-    # Slope thresholds (% per 4h candle)
-    # 0.5% per candle = ~3% over 6 candles = strong momentum
+    """Determine regime based on slope and confidence.
     
-    if slope_pct > 0.3 and r2 > 0.5:
+    FIX (2026-04-13): Previous version had structural SHORT_BIAS bias because:
+    - slope_pct thresholds were asymmetric (0.3 for strong, nothing for weak positive)
+    - The elif slope_pct > 0: LONG_BIAS caught very small positive slopes
+    - The else: SHORT_BIAS caught all negative slopes not caught by strong threshold
+    - In broadly bearish crypto markets, this produced 95% SHORT_BIAS (106:6 ratio)
+    
+    New thresholds use symmetric boundaries:
+    - NEUTRAL band: |slope_pct| < 0.20 (widened from 0.15)
+    - LONG_BIAS: slope_pct >= 0.20 with r2 > 0.4 (raised r2 from 0.5, lowered slope)
+    - SHORT_BIAS: slope_pct <= -0.20 with r2 > 0.4 (symmetric with LONG)
+    - Strong momentum: |slope_pct| > 0.35 with r2 > 0.5 (slightly raised threshold)
+    """
+    # Strong momentum cases (high confidence)
+    if slope_pct > 0.35 and r2 > 0.5:
         return "LONG_BIAS", min(95, 50 + r2 * 45 + slope_pct * 20)
-    elif slope_pct < -0.3 and r2 > 0.5:
+    elif slope_pct < -0.35 and r2 > 0.5:
         return "SHORT_BIAS", min(95, 50 + r2 * 45 + abs(slope_pct) * 20)
-    elif abs(slope_pct) < 0.15:
-        return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/0.15) * 20)
-    elif slope_pct > 0:
+    # NEUTRAL: weak slope or low confidence
+    elif abs(slope_pct) < 0.20:
+        return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/0.20) * 20)
+    # Moderate cases — require better r2 for direction assignment
+    elif slope_pct > 0 and r2 > 0.4:
         return "LONG_BIAS", 45 + r2 * 20
-    else:
+    elif slope_pct < 0 and r2 > 0.4:
         return "SHORT_BIAS", 45 + r2 * 20
+    # Default to NEUTRAL when r2 is low (no clear trend)
+    else:
+        return "NEUTRAL", 40 + r2 * 15
 
 def get_tokens_to_scan():
     """Get tokens from open trades and recent signals"""

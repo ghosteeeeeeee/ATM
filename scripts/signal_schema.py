@@ -257,6 +257,45 @@ def init_db():
     """)
     rc.execute("CREATE INDEX IF NOT EXISTS idx_tokspd_updated ON token_speeds(updated_at)")
 
+    # ── decisions — audit trail for every trading decision ──────────────────────
+    rc.execute("""
+        CREATE TABLE IF NOT EXISTS decisions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT NOT NULL,
+            direction TEXT NOT NULL,
+            confidence REAL,
+            entry_price REAL,
+            exchange TEXT,
+            decision TEXT NOT NULL,
+            reason TEXT,
+            server TEXT DEFAULT 'Hermes',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # ── token_intel — per-token feature/intel snapshot ─────────────────────────
+    rc.execute("""
+        CREATE TABLE IF NOT EXISTS token_intel (
+            token TEXT PRIMARY KEY,
+            exchange TEXT,
+            max_leverage INTEGER,
+            base_position_size REAL,
+            open_positions INTEGER DEFAULT 0,
+            last_signal_at TEXT,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # ── cooldown_tracker — prevent over-trading same token+direction ──────────
+    rc.execute("""
+        CREATE TABLE IF NOT EXISTS cooldown_tracker (
+            token TEXT NOT NULL,
+            direction TEXT NOT NULL,
+            expires_at INTEGER NOT NULL,
+            PRIMARY KEY(token, direction)
+        )
+    """)
+
     rc.commit()
     rc.close()
     # ── Migrate legacy backfill data to static DB (once, persisted) ──
@@ -419,10 +458,18 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             else:
                 new_conf = max(existing_conf, confidence)
                 if num_srcs_gained > 0:
-                    new_conf = min(100, new_conf + min(num_srcs_gained, 2))
+                    bonus = min(num_srcs_gained, 2)
+                    # REDUCED merge bonus for percentile_rank — its base conf formula
+                    # already overstates strength (pct_val 72→50pts, caps at 80 individually,
+                    # then merge bonuses inflate further to 91-96). Halve the per-source bonus.
+                    if signal_type == 'percentile_rank':
+                        bonus = max(1, bonus // 2)
+                    new_conf = min(100, new_conf + bonus)
                 # Confluence bonus: +5% per new distinct signal_type
+                # REDUCED for percentile_rank signals (their base conf is inflated by design)
                 if num_types > 1:
-                    new_conf = min(100, new_conf + min(5 * num_types, 20))
+                    per_type_bonus = 5 if signal_type != 'percentile_rank' else 2
+                    new_conf = min(100, new_conf + min(per_type_bonus * num_types, 20))
 
             # Keep most recent indicator values (update to latest)
             c.execute('''
@@ -1316,6 +1363,212 @@ def update_signal_review_count(signal_id: int) -> None:
             (signal_id,)
         )
         conn.commit()
+    finally:
+        conn.close()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# decisions — audit trail for every trading decision (signal_gen + ai_decider)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def record_decision(token: str, direction: str, decision: str,
+                    confidence: float = None, entry_price: float = None,
+                    exchange: str = 'hyperliquid', reason: str = None,
+                    regime: str = None, signal_id: int = None) -> bool:
+    """
+    Write one row to the decisions audit trail.
+    Called after every signal_gen auto-approve and every ai_decider YES/NO/WAIT.
+    """
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        c.execute("""
+            INSERT INTO decisions
+                (token, direction, confidence, entry_price, exchange,
+                 decision, reason, server, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'Hermes', CURRENT_TIMESTAMP)
+        """, (
+            token.upper(), direction.upper(),
+            round(confidence, 1) if confidence is not None else None,
+            entry_price, exchange,
+            decision.upper(), reason,
+        ))
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        print(f"[signal_schema] record_decision error: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# token_intel — per-token feature snapshot at time of decision
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def update_token_intel(token: str,
+                       regime: str = None,
+                       z_score: float = None,
+                       trend_strength: float = None,
+                       prediction_confidence: float = None,
+                       exchange: str = 'hyperliquid',
+                       max_leverage: int = None,
+                       base_position_size: float = None,
+                       open_positions: int = None) -> bool:
+    """
+    UPSERT token intelligence/features at time of signal generation.
+    Records the market context (regime, z-score, trend) for later analysis.
+    """
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        c.execute("""
+            INSERT INTO token_intel
+                (token, exchange, max_leverage, base_position_size,
+                 open_positions, last_signal_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ON CONFLICT(token) DO UPDATE SET
+                exchange          = COALESCE(excluded.exchange,          token_intel.exchange),
+                max_leverage      = COALESCE(excluded.max_leverage,       token_intel.max_leverage),
+                base_position_size= COALESCE(excluded.base_position_size, token_intel.base_position_size),
+                open_positions    = COALESCE(excluded.open_positions,     token_intel.open_positions),
+                last_signal_at    = CURRENT_TIMESTAMP,
+                updated_at        = CURRENT_TIMESTAMP
+        """, (
+            token.upper(), exchange,
+            max_leverage, base_position_size, open_positions,
+        ))
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        print(f"[signal_schema] update_token_intel error: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+def get_token_intel(token: str) -> dict:
+    """Read token intelligence record."""
+    conn = _get_conn(_runtime(), row_factory=True)
+    c = conn.cursor()
+    try:
+        c.execute("SELECT * FROM token_intel WHERE token=?", (token.upper(),))
+        row = c.fetchone()
+        return dict(row) if row else {}
+    finally:
+        conn.close()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# cooldown_tracker — enforce minimum interval between trades on same token+dir
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def record_cooldown_start(token: str, direction: str, duration_minutes: int = 30) -> bool:
+    """
+    Write a cooldown entry when a trade CLOSES so the same direction
+    cannot re-enter for `duration_minutes`.
+    """
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        expires_at = int(time.time() * 1000) + (duration_minutes * 60 * 1000)
+        c.execute("""
+            INSERT OR REPLACE INTO cooldown_tracker
+                (token, direction, expires_at)
+            VALUES (?, ?, ?)
+        """, (token.upper(), direction.upper(), expires_at))
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        print(f"[signal_schema] record_cooldown_start error: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+def is_cooldown_active(token: str, direction: str) -> bool:
+    """
+    Return True if token+direction is in cooldown_tracker.
+    Called before opening a new trade.
+    """
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        now_ms = int(time.time() * 1000)
+        c.execute("""
+            SELECT expires_at FROM cooldown_tracker
+            WHERE token=? AND direction=? AND expires_at > ?
+        """, (token.upper(), direction.upper(), now_ms))
+        row = c.fetchone()
+        return row is not None
+    finally:
+        conn.close()
+
+
+def clear_cooldown_entry(token: str, direction: str) -> bool:
+    """Remove a cooldown entry (e.g., when manually clearing)."""
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        c.execute("""
+            DELETE FROM cooldown_tracker WHERE token=? AND direction=?
+        """, (token.upper(), direction.upper()))
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# signal_outcomes — win/loss tracking on trade close (enhanced)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def record_signal_outcome(token: str, direction: str,
+                          pnl_pct: float, pnl_usdt: float,
+                          signal_type: str = 'decider',
+                          confidence: float = None,
+                          is_win: bool = None) -> bool:
+    """
+    Write one row to signal_outcomes when a trade closes.
+    is_win is computed from pnl_usdt sign if not provided.
+    """
+    conn = _get_conn(_runtime())
+    c = conn.cursor()
+    try:
+        if is_win is None:
+            is_win = float(pnl_usdt or 0) > 0
+        # Dedup: skip if same token+dir+pnl recorded in last 5 min
+        c.execute("""
+            SELECT id FROM signal_outcomes
+            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+              AND created_at > datetime('now', '-5 minutes')
+        """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
+        if c.fetchone():
+            conn.close()
+            return False  # dedup hit
+        c.execute("""
+            INSERT INTO signal_outcomes
+                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            token.upper(), direction.upper(),
+            signal_type, 1 if is_win else 0,
+            round(float(pnl_pct or 0), 6),
+            round(float(pnl_usdt or 0), 4),
+            round(float(confidence or 0), 1),
+        ))
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        print(f"[signal_schema] record_signal_outcome error: {e}")
+        return False
     finally:
         conn.close()
 

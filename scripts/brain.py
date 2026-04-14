@@ -305,6 +305,13 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     if signal == 'conf-1s':
         print(f"✗ REJECTED: {token} {side_type} — conf-1s (single-source, min 2 required)")
         return None
+    # Signal source blacklist — block uncalibrated/noisy signal sources at the trade entry level
+    NOISE_SIGNALS = {
+        'pct-hermes', 'vel-hermes', 'rsi-hermes',
+    }
+    if signal in NOISE_SIGNALS:
+        print(f"✗ REJECTED: {token} {side_type} — noisy signal source '{signal}' blocklisted")
+        return None
     # Pre-check: dont consume ID if trade already exists
     conn_check = get_db_connection()
     cur_check = conn_check.cursor()

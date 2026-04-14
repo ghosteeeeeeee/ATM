@@ -16,6 +16,7 @@ from typing import List, Dict, Optional, Tuple
 sys.path.insert(0, '/root/.hermes/scripts')
 from hermes_file_lock import FileLock
 from _secrets import BRAIN_DB_DICT
+from signal_schema import record_signal_outcome
 
 
 import hype_cache as hc
@@ -1049,6 +1050,22 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # ── Always record outcome (A/B + signal_outcomes) — single call ─────────
         # _record_ab_close handles both: A/B data if present, signal_outcomes always
         _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=net_pnl)
+
+        # ── Signal outcomes via signal_schema (with real PnL) ────────────────────
+        # Use net_pnl (after fees) as the authoritative PnL for the outcomes table
+        actual_pnl_usdt = net_pnl if net_pnl is not None else pnl_usdt_val
+        actual_pnl_pct = (actual_pnl_usdt / amount_usdt * 100) if amount_usdt > 0 else pnl_pct
+        try:
+            record_signal_outcome(
+                token=token,
+                direction=direction,
+                pnl_pct=round(actual_pnl_pct, 4),
+                pnl_usdt=round(actual_pnl_usdt, 4),
+                signal_type=signal_type or 'decider',
+                confidence=confidence
+            )
+        except Exception as rso_err:
+            print(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")
 
         # ── Bridge signal_history → brain.trade_patterns ─────────────────────────
         # Persist hot-set survival data as permanent knowledge in brain DB.

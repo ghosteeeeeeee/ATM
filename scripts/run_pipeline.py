@@ -11,7 +11,7 @@ LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 LOCK    = '/tmp/hermes-pipeline.lock'
 
 # Which steps run every minute vs every N minutes
-STEPS_EVERY_MIN  = ['price_collector', '4h_regime_scanner', 'signal_gen', 'decider_run', 'position_manager', 'update-trades-json', 'hermes-trades-api']
+STEPS_EVERY_MIN  = ['price_collector', '4h_regime_scanner', 'signal_gen', 'hermes-trades-api', 'decider_run', 'position_manager']
 STEPS_EVERY_10M  = ['ai_decider', 'strategy_optimizer', 'ab_optimizer', 'ab_learner']
 
 
@@ -27,12 +27,28 @@ def log(msg):
         pass
 
 
+# Per-step timeouts (seconds)
+STEP_TIMEOUTS = {
+    'signal_gen': 180,
+    'decider_run': 360,
+    'ai_decider': 240,
+    'position_manager': 120,
+    'strategy_optimizer': 300,
+    'ab_optimizer': 300,
+    'ab_learner': 300,
+    'live_decider': 240,
+    'hermes-trades-api': 60,
+}
+DEFAULT_TIMEOUT = 300
+
+
 def run(name, args=None):
     script = f'{SCRIPTS}/{name}.py'
     cmd = [sys.executable, script] + (args or [])
+    timeout = STEP_TIMEOUTS.get(name, DEFAULT_TIMEOUT)
     log(f'Running {name}...')
     try:
-        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, timeout=300)
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, timeout=timeout)
         out = (r.stdout or b'').decode(errors='replace').strip()
         err = (r.stderr or b'').decode(errors='replace').strip()
 

@@ -243,13 +243,108 @@ Write the report to `/root/.hermes/pipeline_health_report_YYYY-MM-DD.txt`.
 
 ---
 
-## Recommended Immediate Actions (2026-04-12)
+## Key Findings from 2026-04-13 Run (Decider Timeout Investigation)
 
-1. **[CRITICAL]** FIX DOWN predictions in `candle_predictor.py` `build_prediction_prompt()` — LLM maps elevated price + momentum → DOWN countertrend, which is wrong. Options: (a) remove/revise z_cat feature, (b) invert all DOWN labels, (c) retrain
-2. **[CRITICAL]** Audit direction distribution in signal generators — 8.6x LONG bias has doubled since last review
-3. **[CRITICAL]** Remove confidence as auto-approval gate — confidence tiers 70+ are anti-correlated with accuracy
-4. **[HIGH]** Fix signal attribution in closed_trades_archive.json — all trades show signal="unknown"
-5. **[HIGH]** Verify why ai_decider writes to predictions.db but not signals_hermes_runtime.db — determine if this is intentional
+| # | Severity | Finding |
+|---|----------|---------|
+| 1 | CRITICAL | decider_run timing out at 240s step limit — LLM calls in `ai_decider.py` had NO timeout. OpenAI SDK defaults to infinite wait on network issues |
+| 2 | CRITICAL | HL `/info` rate-limit gap was 10s between calls — HL allows ~10 req/s, so 1s gap is safe and 10x faster. FileLock prevents concurrent access anyway |
+| 3 | HIGH | HL API `_http_post` retry backoff escalated to 64s per attempt (1→2→4→8→16→32→64s). Capped at 10s — 64s waits were blocking decider_run |
+| 4 | HIGH | Token counter at exactly 1,200,000 / 1,200,000 cap — all LLM calls blocked. Reset `ai_decider_daily_tokens.json` |
+| 5 | MEDIUM | Orphaned HL positions (AVAX LONG, MOVE LONG) detected by decider_run — exist on Hyperliquid but NOT in paper PostgreSQL. Runs in DRY mode, requires human decision |
+| 6 | MEDIUM | `hermes-trades-api.py` `get_trades()` returns 0 rows due to `WHERE server='Hermes'` filter — `server` column may be NULL. Always verify actual column values before filtering |
+
+## Pipeline Timer Verification
+
+**Critical: Timer files can lie.** The timer `.timer` file defines WHEN the service fires, but the service script itself may have internal gating that further limits frequency. Always check BOTH.
+
+```bash
+# Step 1: Check what the timer file claims
+systemctl cat hermes-pipeline.timer
+# Look for OnCalendar=*:0/10:00 (every 10 min) vs *:0/1:00 (every 1 min)
+
+# Step 2: Check the actual pipeline script for internal gating
+grep -n "minute % 10\|every_10\|STEPS_EVERY" /root/.hermes/scripts/run_pipeline.py
+# This shows which steps run every cycle vs every 10 cycles
+
+# Step 3: Verify actual recent executions
+journalctl -u hermes-pipeline.service --since "1 hour ago" | grep "Pipeline"
+# Or check pipeline log:
+tail -5 /root/.hermes/logs/pipeline.log
+
+# Step 4: Check pipeline log timestamp spacing
+# If timer is every 10min but script has internal gating every 10th run,
+# steps will appear to run every 10min even if timer fires every 1min
+```
+
+**Common misconfiguration pattern:**
+- Timer fires every 10 min (`*:0/10:00`)
+- T expects pipeline steps every 1 min
+- Fix: change timer to `*:0/1:00` — pipeline script has its own `minute % 10` gating for 10-min steps
+
+**Timer locations:**
+- `/etc/systemd/system/hermes-pipeline.timer` — pipeline steps (signal_gen, decider, etc.)
+- `/etc/systemd/system/hermes-hl-sync-guardian.timer` — ATR/SL/TP recalculation (every 2 min)
+- `/etc/systemd/system/hermes-hype-paper-sync.timer` — HL ↔ paper reconciliation (every 10 min)
+
+## HL API Rate Limit — Critical Learning
+
+```
+# WRONG (found in hyperliquid_exchange.py line ~369):
+time.sleep(10)  # between every /info call — was causing 150s+ decider_run
+
+# CORRECT:
+time.sleep(1)   # HL allows ~10 req/s, 1s gap is safe with FileLock
+
+# For /exchange endpoints: time.sleep(10) still applies (heavier operations)
+```
+
+## LLM Timeout Pattern — Always Required
+
+```python
+# All OpenAI() constructor calls in ai_decider.py need explicit timeout:
+_client = OpenAI(api_key=_token, base_url='...', timeout=60)  # 60s max
+
+# Without timeout=60, the SDK waits forever on network issues → decider_run timeout
+```
+
+## Orphaned HL Positions — Correct DRY RUN Behavior
+
+decider_run correctly detects positions on Hyperliquid not in paper DB:
+```
+[WARN] AVAX: on HL but NOT in paper → DRY LONG @ ?
+[WARN] MOVE: on HL but NOT in paper → DRY LONG @ ?
+Result: 2 confirmed in sync | 2 orphaned (need closing)
+DRY RUN — re-run with --apply to close orphaned positions
+```
+Always runs in DRY mode by default. Human must decide: import to paper DB or close with `--apply`.
+
+## PostgreSQL server Column Filter Gotcha
+
+```python
+# This query may return 0 rows even when positions exist:
+cur.execute("SELECT ... WHERE server='Hermes' AND status='open'")  # returns 0!
+
+# Check actual column values first:
+cur.execute("SELECT DISTINCT server FROM trades LIMIT 10")  # see what values exist
+
+# Safe pattern — use COALESCE or no filter:
+cur.execute("SELECT ... WHERE COALESCE(server, 'Hermes') = 'Hermes' AND status='open'")
+# OR just:
+cur.execute("SELECT ... WHERE status='open'")
+```
+
+---
+
+## Recommended Immediate Actions (2026-04-13)
+
+1. **[CRITICAL]** Verify `timeout=60` on all 3 OpenAI SDK calls in `ai_decider.py` (lines ~1331, ~2241, ~2565) — was missing, causing infinite hangs
+2. **[CRITICAL]** Confirm rate-limit gap in `hyperliquid_exchange.py` `_info_rate_limit()` is 1s (not 10s) — was causing decider_run to take 150s+ for 15 tokens
+3. **[CRITICAL]** Confirm retry backoff cap is 10s in `_http_post` — was reaching 64s (6 retries × ~10s each = 60s wasted)
+4. **[HIGH]** Monitor for orphaned HL positions — decider_run correctly detects them in DRY mode. Investigate root cause (pipeline outage? DB write failure?)
+5. **[HIGH]** Fix `hermes-trades-api.py` `get_trades()` `server='Hermes'` filter — returns 0 rows. Verify actual server column values
+6. **[MEDIUM]** Check `ab_learner` double-writing (two patterns.json writes seen in logs) — may be running twice per cycle
+7. **[MEDIUM]** After pipeline restart, verify `hotset.json` freshness — was falling back to DB query when LLM calls timed out
 
 ## Recommended Immediate Actions (Legacy)
 

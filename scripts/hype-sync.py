@@ -118,10 +118,34 @@ def get_hot_tokens(min_cycles: int = 1) -> set:
         return set()  # Fail open — don't block all syncing
 
 
+def get_recent_signal_tokens(within_minutes: int = 60) -> set:
+    """
+    Return tokens that have a signal record created within the last N minutes.
+    These are tokens that are actively signaling but may not yet have hot_cycle_count >= 1.
+    Used as a fallback to allow new positions through even if the hot-set hasn't been
+    updated yet (pipeline lag between signal creation and hot_cycle_count increment).
+    """
+    try:
+        conn = sqlite3.connect(SIGNALS_DB)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT DISTINCT token
+            FROM signals
+            WHERE created_at >= datetime('now', '-' || ? || ' minutes')
+        """, (within_minutes,))
+        tokens = {r[0] for r in cur.fetchall()}
+        conn.close()
+        return tokens
+    except Exception as e:
+        log(f"Failed to get recent signal tokens: {e}", "WARN")
+        return set()
+
+
 def sync_opens(brain_positions, hype_positions):
-    """Mirror brain positions missing from HL — HOT-SET ONLY."""
+    """Mirror brain positions missing from HL — HOT-SET ONLY, with recent-signal fallback."""
     hype_tokens = set(hype_positions.keys())
     hot_tokens  = get_hot_tokens(min_cycles=1)
+    recent_tokens = get_recent_signal_tokens(within_minutes=60)
     opened = skipped = delisted = not_hot = 0
 
     log(f"  Hot-set filter: {len(hot_tokens)} tokens eligible", "INFO")
@@ -131,9 +155,15 @@ def sync_opens(brain_positions, hype_positions):
 
         # ── HOT-SET GUARD ─────────────────────────────────────────────────
         if token not in hot_tokens:
-            log(f"  {token}: NOT in hot-set — skipping open", "INFO")
-            not_hot += 1
-            continue
+            # Fallback: allow if token has a recent signal (within 60 min)
+            # This handles pipeline lag where hot_cycle_count hasn't been
+            # incremented yet but a signal definitely exists
+            if token in recent_tokens:
+                log(f"  {token}: recent signal found (hcc=0) — allowing through", "WARN")
+            else:
+                log(f"  {token}: NOT in hot-set — skipping open", "INFO")
+                not_hot += 1
+                continue
 
         if is_delisted(token):
             log(f"  {token}: DELISTED on HL — cannot mirror", "WARN")

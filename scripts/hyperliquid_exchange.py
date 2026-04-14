@@ -345,18 +345,21 @@ _EXCHANGE_RATE_FILE = "/var/www/hermes/data/hype_exchange_rate.json"
 
 
 def _exchange_rate_limit():
-    """Block until 5s have passed since last exchange call."""
+    """Block until 10s have passed since last exchange call (HL rate limit: 10s between /exchange calls).
+    Uses FileLock to prevent concurrent processes from racing and all hitting HL at once."""
+    from hermes_file_lock import FileLock
     _os.makedirs(_os.path.dirname(_EXCHANGE_RATE_FILE), exist_ok=True)
-    try:
-        with open(_EXCHANGE_RATE_FILE) as f:
-            data = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        data = {"last_call": 0}
-    elapsed = time.time() - data.get("last_call", 0)
-    if elapsed < 5:
-        time.sleep(5 - elapsed)
-    with open(_EXCHANGE_RATE_FILE, "w") as f:
-        json.dump({"last_call": time.time()}, f)
+    with FileLock('exchange_rate'):
+        try:
+            with open(_EXCHANGE_RATE_FILE) as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {"last_call": 0}
+        elapsed = time.time() - data.get("last_call", 0)
+        if elapsed < 10:
+            time.sleep(10 - elapsed)
+        with open(_EXCHANGE_RATE_FILE, "w") as f:
+            json.dump({"last_call": time.time()}, f)
 
 
 # /info: separate rate limit pool — use curl directly with 1s gap
@@ -364,18 +367,22 @@ _INFO_RATE_FILE = "/var/www/hermes/data/hype_info_rate.json"
 
 
 def _info_rate_limit():
-    """Block until 1s has passed since last info API call (separate pool from /exchange)."""
+    """Block until 1s has passed since last /info API call (HL ~10 req/s, 1s gap is safe).
+    Uses FileLock to prevent concurrent processes from racing and all hitting HL at once.
+    """
+    from hermes_file_lock import FileLock
     _os.makedirs(_os.path.dirname(_INFO_RATE_FILE), exist_ok=True)
-    try:
-        with open(_INFO_RATE_FILE) as f:
-            data = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        data = {"last_call": 0}
-    elapsed = time.time() - data.get("last_call", 0)
-    if elapsed < 1:
-        time.sleep(1 - elapsed)
-    with open(_INFO_RATE_FILE, "w") as f:
-        json.dump({"last_call": time.time()}, f)
+    with FileLock('info_rate'):
+        try:
+            with open(_INFO_RATE_FILE) as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {"last_call": 0}
+        elapsed = time.time() - data.get("last_call", 0)
+        if elapsed < 1.0:
+            time.sleep(1.0 - elapsed)
+        with open(_INFO_RATE_FILE, "w") as f:
+            json.dump({"last_call": time.time()}, f)
 
 
 def _http_post(endpoint: str, payload: dict, timeout: int = 10) -> dict:
@@ -397,14 +404,14 @@ def _http_post(endpoint: str, payload: dict, timeout: int = 10) -> dict:
         except urllib.error.HTTPError as e:
             body = e.read().decode() if e.fp else ""
             if e.code == 429 or "rate limited" in body.lower() or body.strip() in ("rate limited", "null"):
-                wait = 4 ** attempt  # 1s, 4s, 16s, 64s...
+                wait = min(4 ** attempt, 10)  # cap at 10s instead of 64s
                 sys.stderr.write(f"[_http_post] 429 rate-limited, attempt {attempt+1}/8, waiting {wait}s...\n"); sys.stderr.flush()
                 time.sleep(wait)
                 continue
             raise Exception(f"HTTP {e.code}: {body}")
         except Exception as e:
             if "429" in str(e) or "rate limited" in str(e).lower():
-                wait = 4 ** attempt
+                wait = min(4 ** attempt, 10)  # cap at 10s instead of 64s
                 sys.stderr.write(f"[_http_post] rate-limited (try {attempt+1}/8), waiting {wait}s...\n"); sys.stderr.flush()
                 time.sleep(wait)
                 continue
@@ -540,7 +547,14 @@ def place_order(name, side, sz, price=None, order_type="Limit", tif="Gtc",
 
     try:
         result = _exchange_retry(_do)
-        # Check for error inside status
+        # Guard: if result is a string (raw error from SDK), handle gracefully
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}"}
+        # Guard: top-level error status from HL (e.g. rate limit exceeded)
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg}
+        # Check for error inside nested statuses
         statuses = (
             result.get("response", {})
             .get("data", {})
@@ -582,6 +596,11 @@ def close_position(name, slippage=0.02):
 
     try:
         result = _exchange_retry(_do)
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}"}
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg}
         statuses = (
             result.get("response", {})
             .get("data", {})
@@ -937,8 +956,10 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
                     "side": "BUY" if is_buy else "SELL",
                     "usdt": size_usdt}
         else:
-            print(f"[HYPE Mirror] FAILED open {direction} {token}: {result.get('error')}")
-            return {"success": False, "message": result.get("error", "Unknown error")}
+            # Handle case where result is a string (raw API error) instead of a dict
+            err_msg = result.get('error') if isinstance(result, dict) else str(result)
+            print(f"[HYPE Mirror] FAILED open {direction} {token}: {err_msg}")
+            return {"success": False, "message": err_msg or "Unknown error"}
     except Exception as e:
         print(f"[HYPE Mirror] FAILED open {direction} {token}: {e}")
         return {"success": False, "message": str(e)}
@@ -1048,6 +1069,11 @@ def place_bulk_orders(orders: list, grouping: str = "na") -> dict:
 
     try:
         result = _exchange_retry(_do)
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}"}
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg, "result": result}
         statuses = (
             result.get("response", {})
             .get("data", {})
@@ -1083,6 +1109,11 @@ def cancel_bulk_orders(requests: list) -> dict:
 
     try:
         result = _exchange_retry(_do)
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}"}
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg, "result": result}
         statuses = (
             result.get("response", {})
             .get("data", {})
@@ -1242,13 +1273,22 @@ def place_tp(coin: str, direction: str, tp_price: float, size: float) -> dict:
     for attempt in range(3):
         try:
             result = exchange.order(coin, is_buy, float(size), tp_rounded, order_type, reduce_only=True)
-            # Guard: HL sometimes returns a string error instead of dict
+            # Guard: HL sometimes returns a String error instead of dict
             if not isinstance(result, dict):
                 last_error = str(result)
                 if attempt < 2 and '429' in str(result):
                     time.sleep(2 ** attempt)
                     continue
                 return {"success": False, "error": last_error, "coin": coin, "type": "TP"}
+            # Guard: top-level error status (e.g. rate limit exceeded)
+            if result.get("status") == "err":
+                err_msg = result.get("response", "Unknown HL error")
+                last_error = err_msg
+                if attempt < 2 and '429' in str(err_msg):
+                    time.sleep(2 ** attempt)
+                    continue
+                return {"success": False, "error": err_msg, "coin": coin, "type": "TP",
+                        "hint": "Check: price on correct side of current? price rounded to tick size?"}
             statuses = result.get("response", {}).get("data", {}).get("statuses", [])
             for s in statuses:
                 if "error" in s:
@@ -1291,6 +1331,14 @@ def place_sl(coin: str, direction: str, sl_price: float, size: float) -> dict:
     })
     try:
         result = exchange.order(coin, is_buy, float(size), sl_rounded, order_type, reduce_only=True)
+        # Guard: HL sometimes returns a String error instead of dict
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}", "coin": coin, "type": "SL"}
+        # Guard: top-level error status (e.g. rate limit exceeded)
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg, "coin": coin, "type": "SL",
+                    "hint": "Check: price on correct side of current? price rounded to tick size?"}
         statuses = result.get("response", {}).get("data", {}).get("statuses", [])
         for s in statuses:
             if "error" in s:
@@ -1693,6 +1741,12 @@ def replace_tp(coin: str, direction: str, new_price: float, size: float = None) 
         return place_tp(coin, direction, new_px, sz)
     try:
         result = exchange.modify_order(oid, coin, is_buy, sz, new_px, order_type, reduce_only=True, cloid=cloid)
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}", "coin": coin, "type": "TP"}
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg, "coin": coin, "type": "TP",
+                    "hint": "Check: new price on correct side of current price? price rounded to tick size?"}
         statuses = result.get("response", {}).get("data", {}).get("statuses", [])
         for s in statuses:
             if "error" in s:
@@ -1726,6 +1780,12 @@ def replace_sl(coin: str, direction: str, new_price: float, size: float = None) 
         return place_sl(coin, direction, new_px, sz)
     try:
         result = exchange.modify_order(oid, coin, is_buy, sz, new_px, order_type, reduce_only=True, cloid=cloid)
+        if not isinstance(result, dict):
+            return {"success": False, "error": f"Non-dict response from exchange: {result}", "coin": coin, "type": "SL"}
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown HL error")
+            return {"success": False, "error": err_msg, "coin": coin, "type": "SL",
+                    "hint": "Check: new price on correct side of current price? price rounded to tick size?"}
         statuses = result.get("response", {}).get("data", {}).get("statuses", [])
         for s in statuses:
             if "error" in s:

@@ -115,5 +115,13 @@ BROAD_MARKET_TOKENS={'SOL', 'BTC'}
 SIGNAL_SOURCE_BLACKLIST = {
     'rsi-confluence',  # 0% WR across 7+ trades — suppress entirely
     'rsi_confluence',  # same source, underscore variant (signal_type field)
+    # 2026-04-13: Solo sources with no independent confirmation — block at trade entry.
+    # hzscore,pct-hermes,vel-hermes is BOOSTED (not blocked) — vel-hermes adds legit momentum.
+    # BUG FIX (2026-04-13): bare hzscore = combo-only, never solo. Block it here so it
+    # can't slip through the hot-set preservation filter (ai_decider.py line 1742).
+    'hzscore',
+    'pct-hermes',
+    'vel-hermes',
+    'rsi-hermes',
 }
 SERVER_NAME = 'Hermes'

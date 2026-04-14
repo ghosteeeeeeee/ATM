@@ -105,21 +105,40 @@ git diff
 git log -p --follow src/problematic_file.py | head -100
 ```
 
-### 4. Gather Evidence in Multi-Component Systems
+## Multi-Component Systems — Data Flow Investigation Pattern
 
-**WHEN system has multiple components (API → service → database, CI → build → deploy):**
+When investigating dashboards, APIs, or services that read from files:
 
-**BEFORE proposing fixes, add diagnostic instrumentation:**
+**Step 1: Identify the serving layer**
+- nginx config: `grep -r "alias\|proxy_pass" /etc/nginx/` to find which port serves which path
+- Check which process owns the listening port: `ss -tlnp | grep <port>`
 
-For EACH component boundary:
-- Log what data enters the component
-- Log what data exits the component
-- Verify environment/config propagation
-- Check state at each layer
+**Step 2: Find all copies of the data file**
+```bash
+find / -name "trades.json" 2>/dev/null   # find every copy
+stat <each>                              # compare timestamps/sizes
+```
+The file with recent modification is the live one. Empty/stale files may be unused.
 
-Run once to gather evidence showing WHERE it breaks.
-THEN analyze evidence to identify the failing component.
-THEN investigate that specific component.
+**Step 3: Confirm which file the consumer actually reads**
+- If nginx aliases `/data/trades.json` → `/var/www/hermes/data/trades.json`
+- But code reads `/root/.hermes/data/trades.json`
+- These are DIFFERENT files if `/var/www/hermes` is a real directory (not a symlink)
+
+**Step 4: Verify what writes to the live file**
+- Search scripts for the output path: `grep -rn "OUT_TRADES\|OUT_SIGNALS" scripts/`
+- Check systemd timers or cron for the update frequency
+
+**Real example from trades.html investigation:**
+- `/root/.hermes/data/trades.json` → 26 bytes, empty, nothing uses it
+- `/var/www/hermes/data/trades.json` → 95KB, live, nginx serves it
+- `/root/.hermes/web/data/trades.json` → 965 bytes, Apr 5 seed file, unused
+- nginx root is `/var/www/hermes` (real directory, NOT symlinked to `/root/.hermes`)
+
+### When to Use
+- Dashboard shows empty/stale data
+- File exists but nothing seems to write to it
+- Multiple copies of a config/data file exist
 
 ### 5. Trace Data Flow
 
@@ -402,6 +421,190 @@ print(f'{token}: {len(rows)} rows, {unique} unique prices')
 **Root cause:** MACD crossover requires `MACD_line` to actually cross `signal_line`. If MACD is all positive and stays all positive, no crossover fires. Histogram fallback (`h > 0`) requires ALL 3 TFs (4h, 1h, 15m) to have `hist > 0` for LONG.
 
 **Diagnosis:** Manually compute MACD values to check crossover direction.
+
+## 5. Noisy Signal Sources Blocked in Pipeline but NOT at Trade Entry
+
+**Symptom:** Trades appear in brain PostgreSQL DB with signal sources like `pct-hermes`, `hzscore,pct-hermes`, `vel-hermes` that should be blocklisted. These sources pass through the full pipeline: signal_gen → SQLite signals DB → ai_decider (weight-suppressed but not blocked) → hotset.json → decider_run → brain.py → brain trades DB.
+
+**Root cause:** Two-layer blocking gap:
+- `hermes_constants.SIGNAL_SOURCE_BLACKLIST` blocks at ai_decider hot-set compaction level (filters what enters hotset.json)
+- `brain.py add_trade()` had a `conf-1s` block but NO signal source blacklist
+
+**Fix:** Add sources to BOTH places:
+1. `hermes_constants.SIGNAL_SOURCE_BLACKLIST` — blocks at pipeline/approval level
+2. `brain.py add_trade()` — secondary safeguard at trade entry level (last line of defense)
+
+**Example:**
+```python
+# hermes_constants.py
+SIGNAL_SOURCE_BLACKLIST = {
+    'rsi-confluence', 'rsi_confluence',
+    'pct-hermes', 'hzscore,pct-hermes', 'hzscore,pct-hermes,vel-hermes', 'vel-hermes',
+}
+
+# brain.py add_trade()
+NOISE_SIGNALS = {
+    'pct-hermes', 'hzscore,pct-hermes', 'hzscore,pct-hermes,vel-hermes',
+    'vel-hermes', 'rsi-hermes',
+}
+if signal in NOISE_SIGNALS:
+    print(f"✗ REJECTED: {token} {side_type} — noisy signal source '{signal}' blocklisted")
+    return None
+```
+
+**Diagnosis:** Query brain DB for signals that shouldn't exist:
+```sql
+SELECT id, token, signal, confidence FROM trades
+WHERE signal IN ('pct-hermes','hzscore,pct-hermes','hzscore,pct-hermes,vel-hermes','vel-hermes')
+ORDER BY open_time DESC;
+```
+
+**Prevention:** When adding a new signal source weight suppression, always ask: should it also be added to SIGNAL_SOURCE_BLACKLIST (hard block) or just given low weight (soft suppression)? Noisy/uncalibrated sources should always be blacklisted at both levels.
+
+### 6. Import-from-Non-Existent-Module Bug
+
+**Symptom:** Runtime `ImportError` when a function runs (not at import time).
+
+**Root cause:** A function `foo()` imports `bar.baz()` at call time (inside the function body) — so it works during initial development when `foo()` is never called, but fails immediately in production when `foo()` executes.
+
+**Example:** `cascade_entry_signal()` called `from candle_db import detect_cascade_direction` — the import existed only inside the function body, `detect_cascade_direction` never existed, and the function was called in the production signal pipeline. No test ever exercised that code path.
+
+**Fix:** Implement the missing function inline, or create the missing module with the correct interface.
+
+**Prevention:** Test every code path, not just the happy path. When adding a function call inside another function (not at module level), mark it with a `TODO_TEST` comment and create a test that exercises that exact path.
+
+### 7. DB Mechanism Never Triggered (Silent No-Op)
+
+**Symptom:** A column with a state machine semantics (e.g., `is_stale`) is always stuck in one value, never transitions.
+
+**Root cause:** The INSERT path always sets the "active" state (e.g., `is_stale=0`). There's no UPDATE path that ever sets the "inactive" state (e.g., `is_stale=1`). The mechanism is a no-op by design oversight.
+
+**Example:** `token_best_config` table has `is_stale INTEGER NOT NULL DEFAULT 0`. The sweep code used `INSERT OR REPLACE` always inserting `is_stale=0`. No code anywhere ever set `is_stale=1`. All 124 tokens permanently stuck at active.
+
+**Diagnosis:**
+```sql
+SELECT is_stale, COUNT(*) FROM token_best_config GROUP BY is_stale;
+-- If all rows show is_stale=0 → mechanism is broken
+```
+
+**Fix:** Replace `INSERT OR REPLACE INTO table (..., is_stale) VALUES (..., 0)` with:
+```sql
+UPDATE table SET is_stale=1 WHERE token=? AND is_stale=0;
+INSERT INTO table (token, ..., is_stale) VALUES (?, ..., 0);
+```
+
+**Prevention:** When implementing a state machine in a DB table (active/stale/enabled flags), always write the transition logic BEFORE the insert logic. Add a DB-level CHECK constraint if possible.
+
+### 8. Synthetic Data Bug — Aggregation Logic Inverts High/Low
+
+**Symptom:** Backtest shows unusually high win rates (100%) and unrealistic performance metrics. Results don't match live trading.
+
+**Root cause:** A function aggregates raw data into a higher timeframe by taking `high = open` and `low = close` — inverting the actual meaning of high/low. Indicators (MACD, RSI) computed on these synthetic candles are fundamentally wrong.
+
+**Example:** `build_15m_candles_from_1h` bucketed 1H open/close prices into 15m buckets using `max(high, open)` for the high field — but the `high` being used was actually the 1H close price. The "15m MACD" was computed on garbage data.
+
+**Fix:** Fetch real Binance 15m klines via paginated API instead of aggregating 1H candles.
+
+**Diagnosis:** Check data source lineage — synthetic 15m from 1H gives ~2160 candles (90 days × 24h); real Binance 15m gives ~8640 (90 days × 96/day).
+
+**Prevention:** When aggregating data (e.g., 1H→15m, 1m→5m), verify that OHLC semantics are preserved correctly. Prefer fetching real data at the target timeframe rather than aggregating higher-frequency data.
+
+### 9. Exit Loop Silent Drop — Hold Expiry Beyond Data Range
+
+**Symptom:** Backtest trade counts are lower than expected, especially for long hold times. Some trades vanish entirely.
+
+**Root cause:** An exit loop iterates over available candles looking for a hold expiry timestamp. If `hold_end_ts > last_candle_timestamp`, the condition never fires, `exit_price` stays `None`, and the code silently calls `continue` — dropping the trade from results entirely.
+
+**Example:** With 90 days of 15m data, a 480-minute hold can only be tested on the first ~67% of entry points. The last 33% of potential entries silently produce no trade, skewing win rate and signal count.
+
+**Fix:** Always have a terminal exit condition:
+```python
+# Before (silent drop):
+if exit_price is None:
+    continue  # Trade lost!
+
+# After (graceful exit):
+if exit_price is None:
+    exit_price = closes_15m[-1]
+    exit_type = 'hold_expired'
+```
+
+**Prevention:** In backtest loops, always have a terminal exit condition. If `hold_minutes > 0` always produces a valid exit, even if it's just "expire at last candle". Never silently drop data points.
+
+### 10. Pipeline Writes Column X, Query Filters Column Y — Silent Empty Results
+
+**Symptom:** A filtered dataset (e.g., hot-set, warm-up candidates) returns zero rows despite the data clearly existing. Downstream effects are asymmetric — SHORTs appear but LONGs don't, or vice versa.
+
+**Root cause:** The pipeline increments one column (e.g., `hot_cycle_count`) while the query filters on a different column (e.g., `review_count`). These are two separate columns with different semantics:
+- `hot_cycle_count` — incremented by the pipeline in `signal_gen.py` when APPROVED signals don't execute within the cycle window
+- `review_count` — incremented by `ai_decider.py` only when signals are SKIPPED or WAIT
+
+Signals can have `hot_cycle_count=1` (pipeline-approved but unexecuted) while `review_count=0` (never SKIPPED/WAIT). The query returns nothing because `review_count >= 1` never matches.
+
+**Real example:** `_load_hot_rounds()` in `ai_decider.py` queried `review_count >= 1` at line 444. But the pipeline increments `hot_cycle_count` when signals are approved but not executed. ADA/DOGE/ONDO (LONG candidates) had `hot_cycle_count=1` but `review_count=0` → invisible to the query → `_hot_rounds` empty → flip-kill protection never ran → LLM had no LONG survivors → SHORTs dominated the hot-set.
+
+**Fix:** Use the correct column in the query — the one that the pipeline actually increments:
+```sql
+-- Wrong (what was used):
+WHERE hot_cycle_count >= 1  -- pipeline increments this
+-- Correct (what should have been used):
+WHERE hot_cycle_count >= 1  -- pipeline increments this
+```
+
+And verify with a diagnostic query that shows BOTH columns:
+```sql
+SELECT token, direction, hot_cycle_count, review_count, decision
+FROM signals
+WHERE hot_cycle_count >= 1
+ORDER BY hot_cycle_count DESC;
+```
+
+**Diagnosis:**
+```python
+# Check both counters side-by-side
+rows = query("""
+    SELECT token, direction, hot_cycle_count, review_count, decision
+    FROM signals
+    WHERE hot_cycle_count >= 1
+    GROUP BY token, direction
+""")
+for r in rows:
+    if r['review_count'] == 0:
+        print(f"MISMATCH: {r['token']} hot_cycle={r['hot_cycle_count']} review={r['review_count']}")
+```
+
+**Prevention:** When implementing a state-tracking column, document which component increments it. When writing a query that filters on a counter, verify the column name against the actual increment site. Use a comment in the query that references the source file and line number of the increment.
+
+### 11. HL API `{'status': 'err'}` Without Top-Level Guard — Silent Failure or Crash
+
+**Symptom:** SHORT trades not syncing to Hyperliquid. Trades stay paper-only. No error surfaced to logs, but HL shows no positions.
+
+**Root cause:** Hyperliquid API returns error responses as `{'status': 'err', 'response': 'error_message_string'}` — NOT as HTTP error codes. The code called `.get('response').get('data').get('statuses')` on this structure without first checking if `status == 'err'`. This caused:
+- `'str' object has no attribute 'get'` when HL returned a raw string error
+- `{'success': True, 'result': {'status': 'err', ...}}` when status was 'err' but code only checked the nested `statuses` array
+
+**Real example:** `mirror_open` for SHORT trades silently failed with rate-limit error `{'status': 'err', 'response': 'Too many cumulative requests sent (77037 > 73552)'}`. All 9 HL exchange functions in `hyperliquid_exchange.py` had this pattern.
+
+**Fix:** Always check for error status BEFORE calling nested `.get()` chains:
+```python
+# Before (crashes on error):
+result = req.json()
+statuses = result.get('response', {}).get('data', {}).get('statuses', [])
+for s in statuses:
+    if s.get('status') == 'err':
+        ...
+
+# After (safe):
+result = req.json()
+if not isinstance(result, dict):
+    return {"success": False, "error": f"Non-dict response: {result}"}
+if result.get("status") == "err":
+    err_msg = result.get("response", "")
+    return {"success": False, "error": err_msg}
+statuses = result.get('response', {}).get('data', {}).get('statuses', [])
+```
+
+**Prevention:** When wrapping external API responses, validate the top-level structure before accessing nested keys. Use `isinstance(result, dict)` first. If the API uses a `status: err` pattern, handle it at the outermost level before any chained `.get()` calls. Document the error response structure in the code comments.
 
 ## Real-World Impact
 

@@ -197,16 +197,22 @@ ATR_HL_ORDERS_ENABLED (position_manager.py)
 
 ---
 
-## Known Issues (2026-04-12)
-1. **Pipeline BROKEN** — ai_decider errors: "name 'ai_decider' is not defined" / "name 'HOTSET_BLOCKLIST' is not defined" — module scope bug in get_pending_signals
-2. **Zero signals** — signals_hermes_runtime.db has 0 PENDING/WAIT/APPROVED signals
-3. **Hotset STALE** — hotset.json empty (should have 20 signals), ~107 min since last update
-4. **smoke_test false positive** — `no_flapping` check is a false positive (458K-line event log always hits >10 threshold)
+## Known Issues (2026-04-13)
+1. ~~Pipeline BROKEN~~ — FIXED 2026-04-12
+2. ~~Zero signals~~ — FIXED 2026-04-12
+3. **SHORT trades not syncing to HL** — ROOT CAUSE FOUND 2026-04-13.
+   Hyperliquid API returns `{'status': 'err', 'response': 'error_string'}` for rate-limit
+   errors on `market_open`. All HL exchange functions (`place_order`, `close_position`,
+   `mirror_open`, `replace_tp`, `replace_sl`, `place_tp`, `place_sl`, `place_bulk_orders`,
+   `cancel_bulk_orders`) were calling `.get()` on the response without checking for the
+   top-level `status: 'err'` key first. Fix: added `isinstance(result, dict)` guard and
+   `result.get("status") == "err"` guard in all 9 functions in `hyperliquid_exchange.py`.
 
 **Plan:** `/root/.hermes/plans/2026-04-09_230328-...` — Profit Monster close-reason bug fix + pipeline repair
 
----
-
 ## Last Updated
+- 2026-04-13 05:15 UTC — Fixed HL API error handling in all exchange functions.
+  `{'status': 'err'}` responses now properly propagate as `success: False` instead of
+  being treated as `success: True` or crashing with `'str' object has no attribute 'get'`.
 - 2026-04-12 17:30 UTC — Complete rewrite. Added all timers, services, ML scripts, known issues.
 - 2026-04-08 — Corrected script paths, DB locations, row counts, paper/live dynamic flag

@@ -20,7 +20,7 @@ from signal_schema import (
     get_ohlcv_1m,
 )
 import hype_cache as hc
-from hyperliquid_exchange import is_delisted as _is_delisted
+from hyperliquid_exchange import is_delisted as _is_delisted, _info_rate_limit
 
 STATIC = STATIC_DB
 init_db()  # Ensure tables exist

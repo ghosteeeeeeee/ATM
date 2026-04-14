@@ -69,7 +69,7 @@ Always ask yourself: "what would Macguyver do?"
 
 At the START of every session AND after >5 min idle:
   1. `cat /root/.hermes/CONTEXT.md`
-  2. Read the appended ATM Architecture Snapshot at the end of CONTEXT.md
+  2. Read the appended ATM Architecture Snapshot at the end of CONTEXT.md - DO NOT BREAK ANYTHING when making changes!
   3. Note: Current Session Focus, Decided/Closed, Critical Flags
   4. Check TASKS.md: `grep -n "\- \[ \]" /root/.hermes/brain/TASKS.md`
   5. If the user's request matches something in Decided/Closed →

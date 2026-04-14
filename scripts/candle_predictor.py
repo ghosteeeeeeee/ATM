@@ -49,12 +49,16 @@ TOKEN_ACC_OVERRIDES={
     'MKR': {'direction': 'DOWN', 'always_invert': True},
 }
 
-# Regime-specific DOWN accuracy (from 4188 predictions, 2026-04-05)
-# Used to set dynamic inversion thresholds per state
+# Regime-specific DOWN accuracy (from 57,550 verified predictions, 2026-04-12)
+# CRITICAL: These are empirically measured — DOWN predictions are anti-correct
+# in ALL regimes. DOWN accuracy ranges 20-35% regardless of regime.
+# The prior "89% in bullish" was a false positive — model predicted DOWN when
+# price was already elevated, calling it a countertrend win. Actual outcome:
+# price continued UP 71% of the time after DOWN predictions.
 REGIME_DOWN_ACCURACY = {
-    'bullish':  89.0,  # DOWN is great in bullish
-    'bearish':  38.0,  # DOWN is weak in bearish
-    'neutral':  37.0,  # DOWN is weak in neutral
+    'bullish':  35.0,  # DOWN anti-correct: price goes UP most of the time
+    'bearish':  20.4,  # DOWN worst in bearish — model predicts reversal that fails
+    'neutral':  25.7,  # DOWN anti-correct in neutral too
 }
 
 

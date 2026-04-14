@@ -48,9 +48,11 @@ class FileLock:
         while True:
             try:
                 fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                # Write PID so operators can identify the holder
+                # Write PID so operators can identify the holder (use fd, not new open)
                 try:
-                    open(self.lockfile, 'w').write(str(os.getpid()))
+                    os.lseek(self.fd, 0, os.SEEK_SET)
+                    os.ftruncate(self.fd, 0)
+                    os.write(self.fd, str(os.getpid()).encode())
                 except Exception:
                     pass
                 return self
