@@ -781,6 +781,27 @@ def execute_trade(token, direction, price, confidence, source,
     if flipped:
         cmd += ['--flipped']
 
+    # ── Duplicate-entry guard ───────────────────────────────────────────────
+    # FIX (2026-04-14): If there's already an open trade for this token+direction
+    # (in DB or on HL), skip. Prevents the system from opening multiple positions
+    # on the same token and diluting capital across entries.
+    from psycopg2 import connect as pg_connect
+    try:
+        _dup_conn = pg_connect(host='/var/run/postgresql', database='brain', user='postgres')
+        _dup_cur = _dup_conn.cursor()
+        _dup_cur.execute(
+            "SELECT id, pnl_pct FROM trades WHERE server='Hermes' AND token=%s AND direction=%s AND status='open' LIMIT 1",
+            (token.upper(), direction.upper()))
+        _dup_row = _dup_cur.fetchone()
+        _dup_cur.close(); _dup_conn.close()
+        if _dup_row:
+            dup_id, dup_pnl = _dup_row
+            log(f'  ⛔ DUPLICATE ENTRY BLOCKED: {token} {direction} already open (#{dup_id}, pnl={float(dup_pnl or 0):.3f}%) — skipping')
+            return False, f'duplicate_entry_blocked token={token} direction={direction} existing_id={dup_id}'
+    except Exception as dup_err:
+        log(f'  [WARN] Duplicate-entry guard DB check failed for {token}: {dup_err}', 'WARN')
+        # Don't block on DB errors — proceed with the trade
+
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
