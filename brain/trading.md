@@ -266,6 +266,14 @@ NO RSI (signal): 732 trades  WR=50.1%  Avg=+0.021%  Total=+$15.69
 
 ## Live Log (Recent)
 
+### 2026-04-14 — HL Fill Cache + Rate-Limit Fix
+- HL fill retrieval was calling get_trade_history 2x per close (duplicate API calls)
+- Added `_get_fills_cached()`: in-memory cache (5-min TTL), max 3 API calls/60s cycle
+- One close now = 1 API call instead of 2 (was: _get_hl_exit_price + _close_paper_trade_db)
+- Polling delay: 3×5s (was 3×2s) — more time without more API calls
+- PHANTOM_CLOSE trades can be retried from cache without calling HL again
+- Data issues: 67 trades have exit_price=current_price (fallback), 5 PHANTOM_CLOSE with exit=0
+
 ### 2026-04-14 — RSI Signals Disabled
 - RSI individual: DISABLED (0% WR on SHORT, degrades every combo)
 - RSI confluence SHORT: DISABLED (no z-score filter — fires SHORTs in bull markets)

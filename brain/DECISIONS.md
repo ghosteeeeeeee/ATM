@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-04-14 | HL Fill Cache — Consolidate API Calls + Rate-Limit Guard
+
+**Decision:** Added `_get_fills_cached()` to consolidate all `get_trade_history` calls in `hl-sync-guardian.py`.
+
+**Why:**
+- Each close was making 2 separate `get_trade_history` API calls: `_get_hl_exit_price()` + `_close_paper_trade_db()`
+- HL fills take 5+ minutes to appear in `user_fills_by_time` — guardian was polling 3×2s = 6s total, not enough
+- 67 trades have `exit_price = current_price` (market fallback), 5 PHANTOM_CLOSE have `exit_price = 0`
+- PROVE has 12 closed trades (same token, same direction, different entry prices) — system re-entering without closing
+
+**What was added:**
+- `_get_fills_cached()`: in-memory cache with 5-min TTL, max 3 API calls per 60s guardian cycle
+- `_poll_hl_fills_for_close`: now uses `_get_fills_cached`, 3×5s polling
+- `_get_hl_exit_price`: now uses `_get_fills_cached`, 3×5s polling
+- `_close_paper_trade_db`: uses `_get_fills_cached` for HL PnL lookup (eliminates duplicate API call)
+
+**Key insight:** Cache key = (token, window_start_ms, window_end_ms). Same token within 5 min = cache hit = 0 API calls. PHANTOM_CLOSE retried in next cycle can find fills from cache.
+
+**Files modified:** `/root/.hermes/scripts/hl-sync-guardian.py`
+
+---
+
 ## 2026-04-14 | RSI Signal Disable — Remove RSI from Signal Generation
 
 **Decision:** Commented out RSI individual signal and RSI confluence SHORT path in `signal_gen.py`. RSI LONG confluence remains active (has z-score filter).
