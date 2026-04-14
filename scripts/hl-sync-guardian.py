@@ -566,18 +566,66 @@ def close_position_hl(coin: str, reason: str) -> bool:
         return False
 
 
+# ── In-memory fill cache — prevents duplicate get_trade_history calls ───────────
+# Key: (token, window_start_ms, window_end_ms) → list of fills
+# Keeps fills for 5 minutes to avoid re-fetching same window
+_FILL_CACHE = {}          # {(tok, w_start, w_end): {'fills': [...], 'fetched_at': timestamp}}
+_FILL_CACHE_TTL = 300      # Keep cached fills for 5 minutes
+_MAX_API_CALLS_PER_CYCLE = 3  # Conservative rate-limit guard
+
+def _get_fills_cached(token: str, window_start_ms: int, window_end_ms: int):
+    """
+    Fetch HL fills with in-memory caching and rate-limit protection.
+    Returns list of fill dicts (same as get_trade_history).
+    Uses cached fills if already fetched within last 5 min.
+    Limits to _MAX_API_CALLS_PER_CYCLE actual API calls per guardian cycle.
+    """
+    cache_key = (token.upper(), window_start_ms, window_end_ms)
+    now = time.time()
+
+    # Check cache first
+    if cache_key in _FILL_CACHE:
+        cached = _FILL_CACHE[cache_key]
+        if now - cached['fetched_at'] < _FILL_CACHE_TTL:
+            return cached['fills']  # Cache hit
+
+    # Check rate limit guard
+    cycle_key = f"_cycle_{int(now // 60)}"  # New cycle every 60s
+    if not hasattr(_get_fills_cached, '_call_count'):
+        _get_fills_cached._call_count = {}
+    count = _get_fills_cached._call_count.get(cycle_key, 0)
+
+    if count >= _MAX_API_CALLS_PER_CYCLE:
+        log(f'  [RATE-LIMIT] get_trade_history called {count}x this cycle — using fallback', 'WARN')
+        return []
+
+    # Fetch from HL
+    _get_fills_cached._call_count[cycle_key] = count + 1
+    try:
+        fills = get_trade_history(window_start_ms, window_end_ms)
+        _FILL_CACHE[cache_key] = {'fills': fills, 'fetched_at': now}
+        return fills
+    except Exception as e:
+        log(f'  [RATE-LIMIT] get_trade_history failed: {e}', 'WARN')
+        return []
+
+
 def _poll_hl_fills_for_close(token: str, close_start_ms: int):
     """
-    Poll get_trade_history() up to 3 times with 2s delay to get actual HL fill data
+    Poll get_trade_history() up to 3 times with 5s delay to get actual HL fill data
     for a recently-closed position.
     Returns (hl_exit_price, realized_pnl) or (0.0, None) if no fills found.
     Returns (wavg_exit, float) for breakeven or losing/winning trades.
+
+    FIX (2026-04-14): Now uses _get_fills_cached to consolidate API calls and
+    prevent duplicate get_trade_history calls within the same guardian cycle.
     """
     for attempt in range(3):
-        time.sleep(2)
-        fills = get_trade_history(close_start_ms, int(time.time() * 1000))
-        token_closes=[f for f in fills
-                        if f['coin'].upper() == token.upper() and f['side'] == 'B']
+        time.sleep(5)
+        window_end = int(time.time() * 1000)
+        fills = _get_fills_cached(token, close_start_ms, window_end)
+        token_closes = [f for f in fills
+                        if f['coin'].upper() == token.upper() and f.get('side') == 'B']
         if token_closes:
             total_sz = sum(f['sz'] for f in token_closes)
             wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
@@ -612,25 +660,26 @@ def _wait_for_position_closed(token: str, timeout: int = 15) -> bool:
 def _get_hl_exit_price(token: str, fallback: float = 0.0) -> float:
     """
     Attempt to get the actual HL fill price for a recently-closed position.
-    Polls trade history up to 3 times with 2s delay.
+    Polls trade history up to 3 times with 5s delay using _get_fills_cached.
     Returns the weighted-average close-fill price, or fallback if no fills found.
     Only considers side='B' (close) fills — not entry fills (side='A').
+
+    FIX (2026-04-14): Uses _get_fills_cached to avoid duplicate API calls.
+    If no fills found after 3 attempts (15s), falls back to provided fallback.
     """
     for attempt in range(3):
-        time.sleep(2)
-        try:
-            # BUG-16 fix: look back 300s (was 120s) for better fill coverage.
-            fills = get_trade_history(int(time.time() * 1000) - 300_000, int(time.time() * 1000))
-            # Only use close fills (side='B'), not entry fills (side='A')
-            token_closes = [f for f in fills
-                           if f['coin'].upper() == token.upper() and f.get('side') == 'B']
-            if token_closes:
-                total_sz = sum(f['sz'] for f in token_closes)
-                wavg = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
-                log(f'  HL exit price for {token}: {wavg:.4f} (from {len(token_closes)} close fills)')
-                return wavg
-        except Exception as e:
-            log(f'  HL fill poll attempt {attempt+1} failed for {token}: {e}', 'WARN')
+        time.sleep(5)
+        window_end = int(time.time() * 1000)
+        window_start = window_end - 300_000  # 5 min lookback
+        fills = _get_fills_cached(token, window_start, window_end)
+        # Only use close fills (side='B'), not entry fills (side='A')
+        token_closes = [f for f in fills
+                       if f['coin'].upper() == token.upper() and f.get('side') == 'B']
+        if token_closes:
+            total_sz = sum(f['sz'] for f in token_closes)
+            wavg = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
+            log(f'  HL exit price for {token}: {wavg:.4f} (from {len(token_closes)} close fills)')
+            return wavg
     log(f'  ⚠️ guardian_missing {token}: using estimated exit price (HL fill not available)', 'WARN')
     return fallback
 
@@ -1862,12 +1911,13 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         # ── Try HL ground truth first ───────────────────────────────────
         hype_pnl_usdt = None
         try:
-            from hyperliquid_exchange import get_trade_history
-            # BUG-16 fix: look back 300s to match the longer HL fill propagation delay.
-            close_start_ms = int(time.time() * 1000) - 300_000
-            fills = get_trade_history(close_start_ms, int(time.time() * 1000))
+            # FIX (2026-04-14): Use _get_fills_cached instead of direct get_trade_history
+            # to consolidate API calls and respect rate limits.
+            window_end = int(time.time() * 1000)
+            window_start = window_end - 300_000
+            fills = _get_fills_cached(token, window_start, window_end)
             token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
-            close_fills = [f for f in token_fills if f['side'] == 'B']
+            close_fills = [f for f in token_fills if f.get('side') == 'B']
             if close_fills:
                 hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
                 log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
