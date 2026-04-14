@@ -115,11 +115,26 @@ def main():
         extra = ['--live'] if is_live else []
         run(step, extra)
 
-    # Every 10 minutes
-    if every_10:
-        log('Running 10-min steps...')
-        for step in STEPS_EVERY_10M:
-            run(step)
+    # FIX (2026-04-14): Skip ai_decider if already running (process-level guard).
+    # Also removed the redundant 'every_10' inner loop since we already check it above.
+    import psutil
+    for step in STEPS_EVERY_10M:
+        if step == 'ai_decider':
+            skip = False
+            for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                try:
+                    cmdline = proc.info.get('cmdline') or []
+                    if any('ai_decider' in str(c) for c in cmdline):
+                        pid = proc.info['pid']
+                        if pid != os.getpid():
+                            log(f'Skipping ai_decider (PID {pid} already running)')
+                            skip = True
+                            break
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+            if skip:
+                continue
+        run(step)
 
     elapsed = _t.time() - start
     log(f'=== Pipeline done ({mode}) ===')

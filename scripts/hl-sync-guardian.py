@@ -2626,21 +2626,21 @@ def _place_or_replace_tp(coin: str, direction: str, new_tp_price: float, size: f
 
 def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
     """
-    Step 10 (2026-04-08): Reconcile ATR-based SL for open HL positions.
+    Step 10 (2026-04-08): ATR-based SL/TP for open HL positions. DISABLED (2026-04-14) —
+      HL TP/SL sync was eating rate limits. DB persistence retained (dashboard shows ATR values).
 
     For each open HL position with a corresponding paper DB trade:
       1. Skip if token is in 30s cooldown (per-token)
-      2. Compute ideal SL using ATR-based logic (ATR distance from current_price, not entry_price)
-         - Uses current_price from prices dict for ATR% calculation (Bug 3 fix)
-      3. Skip only if the new SL is within 1 tick size of current (Bug 4 fix — no favorable-move gate)
-      4. Send SL update to HL via replace_sl() — TP is left untouched
-      5. After any successful SL update, set per-token cooldown (30s)
+      2. Compute ideal SL/TP using ATR-based logic (ATR distance from current_price)
+      3. Skip only if the new SL is within 1 tick size of current
+      4. DISABLED: Send SL update to HL via replace_sl() — was eating rate limits
+      5. DISABLED: Send TP update to HL — was eating rate limits
       6. Always persist ATR SL/TP to DB (source of truth for the web dashboard)
 
     Returns:
-      moved (int): number of SL updates successfully sent to HL
-      failed (int): number of SL updates that failed
-      failed_coins (list): list of (coin, error_reason) tuples for each failure
+      moved (int): always 0 now (HL sync disabled)
+      failed (int): always 0 now (HL sync disabled)
+      failed_coins (list): always [] now (HL sync disabled)
     """
     conn = get_db_connection()
     if conn is None:
@@ -2766,44 +2766,16 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
             except Exception as _db_err:
                 log(f'  [WARN] {coin} ATR DB persist failed: {_db_err}')
 
-            # ── SL-only: use replace_sl to update SL on HL (TP stays as-is from HL) ──
-            try:
-                result = replace_sl(tok, direction.upper(), ideal_sl, order_size)
-                if isinstance(result, dict) and result.get('success'):
-                    log(f'  🔄 {coin} SL updated on HL: SL={ideal_sl:.6f}', 'PASS')
-                    moved += 1
-                    _set_tpsl_cooldown(tok)
-                else:
-                    error_msg = result.get('error', 'unknown') if isinstance(result, dict) else str(result)
-                    hint = result.get('hint', '') if isinstance(result, dict) else ''
-                    log(f'  ❌ {coin} SL replace failed: {error_msg}{f" | {hint}" if hint else ""}', 'FAIL')
-                    failed += 1
-                    failed_coins.append((coin, error_msg))
-            except Exception as e:
-                log(f'  ❌ {coin} SL replace exception: {e}', 'FAIL')
-                failed += 1
-                failed_coins.append((coin, str(e)))
-
-            # ── TP update: send TP to HL if it's missing or stale ─────────────────
-            # FIX (2026-04-14): reconcile_tp_sl only sent SL to HL, never TP.
-            # This caused positions like XRP (no TP on HL) to have no TP protection.
-            # Now check if TP needs to be placed, and place it if missing.
-            if ideal_tp > 0:
-                tp_result = _place_or_replace_tp(
-                    tok, direction.upper(), ideal_tp, order_size)
-                if isinstance(tp_result, dict) and tp_result.get('success'):
-                    log(f'  🎯 {coin} TP updated on HL: TP={ideal_tp:.6f}', 'PASS')
-                elif tp_result and not tp_result.get('success'):
-                    tp_err = tp_result.get('error', 'unknown')
-                    log(f'  ⚠️ {coin} TP update failed: {tp_err}', 'WARN')
-                else:
-                    log(f'  ⚠️ {coin} TP update returned unexpected result: {tp_result}', 'WARN')
+            # ── HL TP/SL sync: DISABLED (2026-04-14) ────────────────────────────────────
+            # ATR → HL TP/SL was eating rate limits and causing excessive API calls.
+            # HL TP/SL should be set once at entry and left alone (HL triggers on breach).
+            # DB persistence below is kept so the web dashboard still shows correct ATR values.
+            log(f'  ⏸️ {coin} ATR→HL sync DISABLED: SL={ideal_sl:.6f} TP={ideal_tp:.6f} (DB only)', 'WARN')
 
             # ── DB persistence: ALWAYS write ATR-computed values to DB ────────────────
-            # The DB is the source of truth for the web dashboard. Even if HL API
-            # fails (e.g. 'Main order cannot be trigger order' or 'Invalid TP/SL price'),
-            # we must persist the correct ATR SL/TP so the dashboard shows accurate values.
-            # HL can be re-synced later; the DB must always reflect the ATR formula.
+            # The DB is the source of truth for the web dashboard. HL TP/SL is
+            # disabled — DB is the only place ATR values are tracked now.
+            # HL triggers on breach using its own hardcoded TP/SL from entry.
             try:
                 conn_upd = get_db_connection()
                 if conn_upd:
