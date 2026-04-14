@@ -2569,6 +2569,31 @@ def _should_move_tp(entry_px: float, direction: str, ideal_tp: float, current_tp
         return ideal_tp < current_tp
 
 
+def _place_or_replace_tp(coin: str, direction: str, new_tp_price: float, size: float) -> dict:
+    """
+    Place a new TP order if none exists, or replace the existing TP order.
+    Returns {"success": True} on success, {"success": False, "error": ...} on failure.
+    """
+    from hyperliquid_exchange import (
+        place_tp, replace_tp, _find_open_trigger_order, _hl_price_decimals, _hl_tick_round
+    )
+    from hyperliquid_exchange import get_exchange
+    import hyperliquid_exchange as hl_ex
+    _exchange = hl_ex.get_exchange()
+
+    tp_oid, tp_cloid, existing_tp_sz, existing_tp_px = _find_open_trigger_order(coin, "tp")
+
+    price_decimals = _hl_price_decimals(coin)
+    tp_rounded = _hl_tick_round(new_tp_price, price_decimals)
+
+    if tp_oid is None:
+        # No existing TP — place a new one
+        return place_tp(coin, direction, tp_rounded, size)
+    else:
+        # Existing TP found — replace it
+        return replace_tp(coin, direction, tp_rounded, size)
+
+
 def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
     """
     Step 10 (2026-04-08): Reconcile ATR-based SL for open HL positions.
@@ -2729,6 +2754,21 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
                 failed += 1
                 failed_coins.append((coin, str(e)))
 
+            # ── TP update: send TP to HL if it's missing or stale ─────────────────
+            # FIX (2026-04-14): reconcile_tp_sl only sent SL to HL, never TP.
+            # This caused positions like XRP (no TP on HL) to have no TP protection.
+            # Now check if TP needs to be placed, and place it if missing.
+            if ideal_tp > 0:
+                tp_result = _place_or_replace_tp(
+                    tok, direction.upper(), ideal_tp, order_size)
+                if isinstance(tp_result, dict) and tp_result.get('success'):
+                    log(f'  🎯 {coin} TP updated on HL: TP={ideal_tp:.6f}', 'PASS')
+                elif tp_result and not tp_result.get('success'):
+                    tp_err = tp_result.get('error', 'unknown')
+                    log(f'  ⚠️ {coin} TP update failed: {tp_err}', 'WARN')
+                else:
+                    log(f'  ⚠️ {coin} TP update returned unexpected result: {tp_result}', 'WARN')
+
             # ── DB persistence: ALWAYS write ATR-computed values to DB ────────────────
             # The DB is the source of truth for the web dashboard. Even if HL API
             # fails (e.g. 'Main order cannot be trigger order' or 'Invalid TP/SL price'),
@@ -2757,7 +2797,93 @@ def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
         except:
             pass
 
+    # FIX (2026-04-14): After updating ATR SL/TP in DB, update trades.json immediately
+    # so the web dashboard shows the correct values without waiting for the next
+    # pipeline run (which runs every 60s). Guardian runs every 30s so this ensures
+    # the dashboard is never more than 30s stale on ATR values.
+    _update_trades_json_atr(db_by_token)
+
     return moved, failed, failed_coins
+
+
+def _update_trades_json_atr(db_by_token: dict):
+    """
+    Update SL/TP values in trades.json for the tokens that were just ATR-updated.
+    This is a lightweight targeted update — only touches the open trades array.
+    Reads current trades.json, updates matching tokens, writes back atomically.
+    """
+    import sqlite3
+    TRADES_JSON = '/var/www/hermes/data/trades.json'
+    PRICE_DB = '/root/.hermes/data/signals_hermes.db'
+
+    try:
+        with open(TRADES_JSON) as f:
+            data = json.load(f)
+    except Exception as e:
+        log(f'  [WARN] trades.json update skipped: {e}')
+        return
+
+    # Build token -> db_trade lookup for quick access
+    if not db_by_token:
+        return
+
+    try:
+        # Get current prices for all tokens
+        conn_p = sqlite3.connect(PRICE_DB, timeout=3)
+        cur_p = conn_p.cursor()
+        prices = {}
+        for tok in db_by_token.keys():
+            cur_p.execute(
+                'SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 1',
+                (tok,))
+            row = cur_p.fetchone()
+            prices[tok] = float(row[0]) if row else None
+        conn_p.close()
+    except Exception as e:
+        log(f'  [WARN] trades.json price fetch failed: {e}')
+        return
+
+    updated = 0
+    for tok, db_trade in db_by_token.items():
+        # Find matching open trade in trades.json
+        for jt in data.get('open', []):
+            if jt.get('token', '').upper() == tok:
+                entry_px = float(db_trade.get('entry_price') or 0)
+                direction = db_trade.get('direction', '')
+                current_px = prices.get(tok, entry_px) or entry_px
+                sl = float(db_trade.get('stop_loss') or 0)
+                tp = float(db_trade.get('target') or 0)
+
+                # Recalculate PnL from ATR values
+                if entry_px > 0 and current_px > 0:
+                    if direction.upper() == 'SHORT':
+                        pnl_pct = round((entry_px - current_px) / entry_px * 100, 2)
+                    else:
+                        pnl_pct = round((current_px - entry_px) / entry_px * 100, 2)
+                    amt = float(db_trade.get('amount_usdt') or 50)
+                    pnl_usdt = round(pnl_pct / 100 * amt, 2)
+                else:
+                    pnl_pct = 0
+                    pnl_usdt = 0
+
+                jt['sl'] = round(sl, 6)
+                jt['tp'] = round(tp, 6)
+                jt['current'] = round(current_px, 6)
+                jt['pnl_pct'] = pnl_pct
+                jt['pnl_usdt'] = pnl_usdt
+                updated += 1
+                break
+
+    try:
+        lock_path = TRADES_JSON + '.lock'
+        with open(lock_path, 'w') as lf:
+            fcntl.flock(lf.fileno(), fcntl.LOCK_EX)
+            with open(TRADES_JSON, 'w') as f:
+                json.dump(data, f, indent=2)
+            fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
+        log(f'  [WARN] trades.json ATR update: {updated} trades updated')
+    except Exception as e:
+        log(f'  [WARN] trades.json write failed: {e}')
 
 
 def sync():
