@@ -3017,6 +3017,14 @@ def sync():
     if missing:
         # Load missing tracking state
         missing_state = _load_missing_tracking()
+
+        # FIX (2026-04-14): Clear missing tracking at the START of each cycle.
+        # Previously, tokens stayed in missing_tracking forever (accumulates history
+        # across days). Step 5 kept signaling closes for already-closed trades,
+        # and new trades for the same token got caught in the 2-miss trap.
+        # Clearing and rebuilding each cycle preserves the 2-miss protection for
+        # actual current-state misses without stale historical data polluting decisions.
+        missing_state = {}
         now_ts = time.strftime('%Y-%m-%d %H:%M:%S')
 
         # Update tracking: increment cycle count for missing tokens, clear for present tokens
