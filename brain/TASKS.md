@@ -109,6 +109,29 @@ SCRIPT_CHECK_MAP = {
 
 ---
 
+## Today (2026-04-14) — Bug Hunt Session
+
+### [x] AVNT wrong SL ($0.139567 fallback instead of ATR-based $0.1345) — FIXED
+**Root cause:** `SKIP_COINS` in `hl-sync-guardian.py` excluded AVNT from ATR recalculation. Only got 2%-from-entry fallback.
+**Fix:** Removed all coins from SKIP_COINS. Re-enabled `replace_sl()` call to update SL on Hyperliquid (SL-only, TP untouched).
+**Status:** AVAX PASS confirmed (SL=9.380943 on HL). AVNT rate-limited on first try — retry in next cycle.
+
+### [x] Dashboard stale (pipeline crashed, 2.5h gap) — FIXED
+**Root cause:** Pipeline process died, no restart mechanism.
+**Fix:** Restarted pipeline. Dashboard now updating every 1 min.
+**Prevention:** Added "When to Check What" table to brain/trading.md.
+
+### [ ] BTC/XRP/PROVE "Invalid TP/SL price" errors — INVESTIGATING
+HL returning `asset=X` errors for some SHORT positions. Not rate-limit-related — likely HL validation failure.
+**Affected:** BTC (asset=0), XRP (asset=25), PROVE (asset=201), AVNT (asset=208)
+**Next:** Check `_find_open_trigger_order` — BTC SHORT may have no existing SL order, causing `asset=0` when trying to modify a non-existent order.
+
+### [ ] DYDX atr_sl_hit closed at -2.25% — CONFIRMED WORKING
+Guardian correctly closed DYDX when ATR SL hit. This is the internal close path working as designed.
+Not a bug — intended behavior.
+
+---
+
 ## Queued Tasks (Next Sprint)
 
 ### [ ] Runtime DB archival strategy — 195MB, signal_history has 697K rows
