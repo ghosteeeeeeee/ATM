@@ -445,10 +445,45 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                                 print(f"[brain.py] ⚠️ SL placement failed: {sl_result.get('error')} (non-fatal, paper still open)")
                 else:
                     print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
+                    # FIX (2026-04-14): If mirror_open failed for non-blacklist reasons
+                    # (rate limit, max positions, insufficient margin, etc.), the paper
+                    # trade should NOT remain in DB as a phantom. Delete it so the guardian
+                    # never sees a paper trade that never reached HL.
+                    try:
+                        conn_del = get_db_connection()
+                        cur_del = conn_del.cursor()
+                        cur_del.execute("DELETE FROM trades WHERE id = %s", (trade_id,))
+                        conn_del.commit()
+                        cur_del.close(); conn_del.close()
+                        print(f"[brain.py] 🗑️ Deleted phantom paper trade #{trade_id} ({hype_token}) — mirror_open failed: {result.get('message')}")
+                    except Exception as del_err:
+                        print(f"[brain.py] ⚠️ Failed to delete phantom trade #{trade_id}: {del_err}")
         else:
             print(f"[brain.py] Live trading OFF — paper trade {trade_id} not mirrored")
+            # FIX (2026-04-14): Live trading is off, mirror was never attempted.
+            # Don't leave phantom paper trades in DB — delete them.
+            try:
+                conn_del = get_db_connection()
+                cur_del = conn_del.cursor()
+                cur_del.execute("DELETE FROM trades WHERE id = %s", (trade_id,))
+                conn_del.commit()
+                cur_del.close(); conn_del.close()
+                print(f"[brain.py] 🗑️ Deleted phantom paper trade #{trade_id} ({hype_token}) — live trading is OFF")
+            except Exception as del_err:
+                print(f"[brain.py] ⚠️ Failed to delete phantom trade #{trade_id}: {del_err}")
     except Exception as e:
         print(f"[brain.py] HYPE mirror_open failed (non-fatal): {e}")
+        # FIX (2026-04-14): If an exception occurred after the trade was created,
+        # don't leave a phantom paper trade in DB — delete it.
+        try:
+            conn_del = get_db_connection()
+            cur_del = conn_del.cursor()
+            cur_del.execute("DELETE FROM trades WHERE id = %s", (trade_id,))
+            conn_del.commit()
+            cur_del.close(); conn_del.close()
+            print(f"[brain.py] 🗑️ Deleted phantom paper trade #{trade_id} ({hype_token}) — exception: {e}")
+        except Exception as del_err:
+            print(f"[brain.py] ⚠️ Failed to delete phantom trade #{trade_id}: {del_err}")
 
     return trade_id
 

@@ -306,6 +306,7 @@ def _retry_phantom_close_fills():
 
     Only processes up to 5 PHANTOM_CLOSE trades per cycle to avoid slow cycles.
     """
+    import psycopg2  # local import like other functions in this file
     try:
         conn = psycopg2.connect(**BRAIN_DB)
         cur = conn.cursor()
