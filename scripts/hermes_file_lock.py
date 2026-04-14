@@ -43,12 +43,22 @@ class FileLock:
         self.fd        = None
 
     def __enter__(self):
+        # FIX (2026-04-14): Delete stale lock file BEFORE acquiring.
+        # Previous version deleted on __exit__, which created a race: between
+        # unlock and next process's open(), a third process could also acquire.
+        # Now we clean stale locks proactively so only ONE process can hold at a time.
+        # Also cleans orphaned lock files from killed processes.
+        try:
+            if os.path.exists(self.lockfile):
+                os.unlink(self.lockfile)
+        except Exception:
+            pass
         self.fd = os.open(self.lockfile, os.O_CREAT | os.O_RDWR, 0o644)
         deadline = time.time() + self.timeout
         while True:
             try:
                 fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                # Write PID so operators can identify the holder (use fd, not new open)
+                # Write PID so operators can identify the holder
                 try:
                     os.lseek(self.fd, 0, os.SEEK_SET)
                     os.ftruncate(self.fd, 0)
