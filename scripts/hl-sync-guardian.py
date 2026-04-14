@@ -307,6 +307,7 @@ def _retry_phantom_close_fills():
     Only processes up to 5 PHANTOM_CLOSE trades per cycle to avoid slow cycles.
     """
     import psycopg2  # local import like other functions in this file
+    from _secrets import BRAIN_DB_DICT
     try:
         conn = psycopg2.connect(**BRAIN_DB)
         cur = conn.cursor()
@@ -1880,6 +1881,21 @@ def close_orphan_paper_trades(hl_pos, prices):
             if hype_count >= MAX_HYPE_POSITIONS:
                 log(f'  [LIVE-MISS] {token}: max positions — cannot mirror', 'WARN')
                 continue
+            if not is_live_trading_enabled():
+                # FIX (2026-04-14): Live trading is off. Don't leave phantom paper trades —
+                # delete them so they don't get closed as phantom HL_CLOSED later.
+                try:
+                    conn_del = get_db_connection()
+                    cur_del = conn_del.cursor()
+                    cur_del.execute(
+                        "DELETE FROM trades WHERE id=%s AND paper=false AND status='open'",
+                        (trade_id,))
+                    conn_del.commit()
+                    cur_del.close(); conn_del.close()
+                    log(f'  [LIVE-MISS] Deleted phantom paper trade #{trade_id} ({token}) — live trading is OFF', 'WARN')
+                except Exception as del_err:
+                    log(f'  [LIVE-MISS] Failed to delete phantom trade #{trade_id}: {del_err}', 'WARN')
+                continue
             curr_price = prices.get(token) if prices else None
             if not curr_price:
                 log(f'  [LIVE-MISS] {token}: no price — cannot mirror', 'WARN')
@@ -1892,7 +1908,21 @@ def close_orphan_paper_trades(hl_pos, prices):
                     hype_count += 1
                     log(f'  [LIVE-MISS] Mirrored {token} {direction} @ {curr_price} → {result}', 'PASS')
                 else:
-                    log(f'  [LIVE-MISS] Mirror failed for {token}: {result}', 'WARN')
+                    # FIX (2026-04-14): mirror_open failed — delete the phantom paper trade
+                    # so guardian doesn't later close it as HL_CLOSED.
+                    msg = result.get('message', str(result)) if result else 'unknown'
+                    log(f'  [LIVE-MISS] Mirror failed for {token}: {msg} — deleting phantom', 'WARN')
+                    try:
+                        conn_del = get_db_connection()
+                        cur_del = conn_del.cursor()
+                        cur_del.execute(
+                            "DELETE FROM trades WHERE id=%s AND paper=false AND status='open'",
+                            (trade_id,))
+                        conn_del.commit()
+                        cur_del.close(); conn_del.close()
+                        log(f'  [LIVE-MISS] Deleted phantom paper trade #{trade_id} ({token})', 'WARN')
+                    except Exception as del_err:
+                        log(f'  [LIVE-MISS] Failed to delete phantom trade #{trade_id}: {del_err}', 'WARN')
             except Exception as me:
                 log(f'  [LIVE-MISS] Mirror error for {token}: {me}', 'WARN')
 

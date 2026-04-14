@@ -1784,6 +1784,18 @@ def replace_sl(coin: str, direction: str, new_price: float, size: float = None) 
             return {"success": False, "error": f"Non-dict response from exchange: {result}", "coin": coin, "type": "SL"}
         if result.get("status") == "err":
             err_msg = result.get("response", "Unknown HL error")
+            # FIX (2026-04-14): "Invalid TP/SL price. asset=0" means the existing order
+            # is in a bad state on HL (possibly filled, cancelled, or stale OID).
+            # Try: delete the bad order, then place a fresh one.
+            if "Invalid TP/SL price" in str(err_msg) or "Invalid" in str(err_msg):
+                print(f"[WARN] replace_sl({coin}): HL rejected modify with '{err_msg}' — trying delete-and-recreate", file=sys.stderr)
+                try:
+                    cancel_result = exchange.cancel_order(coin, oid)
+                    print(f"[INFO] replace_sl({coin}): cancel result: {cancel_result}", file=sys.stderr)
+                    # Place fresh SL
+                    return place_sl(coin, direction, new_px, sz)
+                except Exception as cancel_err:
+                    return {"success": False, "error": f"modify failed ({err_msg}) then cancel also failed ({cancel_err})", "coin": coin, "type": "SL"}
             return {"success": False, "error": err_msg, "coin": coin, "type": "SL",
                     "hint": "Check: new price on correct side of current price? price rounded to tick size?"}
         statuses = result.get("response", {}).get("data", {}).get("statuses", [])
