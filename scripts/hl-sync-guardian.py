@@ -294,6 +294,82 @@ def _clear_pending_retry(tokens: list):
         with open(_PENDING_RETRY_FILE, 'w') as f:
             json.dump({'tokens': list(pending), 'saved_at': time.strftime('%Y-%m-%d %H:%M:%S')}, f)
 
+def _retry_phantom_close_fills():
+    """
+    FIX (2026-04-14): PHANTOM_CLOSE trades have exit_price=0 because HL fills
+    hadn't propagated when the guardian first closed them. On each guardian cycle,
+    try to find the real HL fill price and backfill the trade record.
+
+    Uses _get_fills_cached which has a 5-min TTL — if HL fills have propagated
+    by the next guardian cycle (up to 60s later), they will be in the cache
+    and this will update exit_price at zero API cost.
+
+    Only processes up to 5 PHANTOM_CLOSE trades per cycle to avoid slow cycles.
+    """
+    try:
+        conn = psycopg2.connect(**BRAIN_DB)
+        cur = conn.cursor()
+        # Find PHANTOM_CLOSE trades with exit_price=0 that haven't been retried
+        # recently (don't retry same trade every cycle — wait at least 60s between attempts)
+        cur.execute('''
+            SELECT id, token, direction, entry_price, pnl_pct,
+                   EXTRACT(EPOCH FROM (NOW() - close_time)) as age_seconds
+            FROM trades
+            WHERE server = 'Hermes'
+              AND status = 'closed'
+              AND close_reason = 'PHANTOM_CLOSE'
+              AND exit_price = 0
+            ORDER BY close_time ASC
+            LIMIT 5
+        ''')
+        phantom_trades = cur.fetchall()
+        if not phantom_trades:
+            return
+
+        log(f'PHANTOM_CLOSE backfill: found {len(phantom_trades)} trades to retry', 'INFO')
+        updated = 0
+        for trade_row in phantom_trades:
+            trade_id, token, direction, entry_price, pnl_pct, age_seconds = trade_row
+            if age_seconds < 60:
+                # Already retried recently, skip
+                continue
+
+            # Try to get HL fill price
+            window_end = int(time.time() * 1000)
+            window_start = window_end - 300_000  # 5 min lookback
+            fills = _get_fills_cached(token.upper(), window_start, window_end)
+            close_fills = [f for f in fills
+                         if f['coin'].upper() == token.upper() and f.get('side') == 'B']
+
+            if close_fills:
+                total_sz = sum(f['sz'] for f in close_fills)
+                wavg_exit = sum(f['px'] * f['sz'] for f in close_fills) / total_sz
+                # Recalculate pnl_pct from real HL data
+                entry_px = float(entry_price)
+                pnl_pct = ((wavg_exit - entry_px) / entry_px) * 100
+                # Round to 6 decimal places
+                pnl_pct = round(pnl_pct, 6)
+
+                cur.execute('''
+                    UPDATE trades
+                    SET exit_price = %s,
+                        pnl_pct = %s,
+                        close_reason = 'phantom_close_filled',
+                        close_time = NOW()
+                    WHERE id = %s
+                      AND exit_price = 0
+                ''', (wavg_exit, pnl_pct, trade_id))
+                conn.commit()
+                updated += 1
+                log(f'  {token} PHANTOM_CLOSE backfilled: exit={wavg_exit:.4f} pnl={pnl_pct:.3f}%', 'PASS')
+            else:
+                log(f'  {token} PHANTOM_CLOSE: no HL fill yet (age={age_seconds:.0f}s) — will retry next cycle', 'WARN')
+
+        log(f'PHANTOM_CLOSE backfill complete: {updated}/{len(phantom_trades)} updated', 'INFO')
+        conn.close()
+    except Exception as e:
+        log(f'PHANTOM_CLOSE backfill error: {e}', 'FAIL')
+
 
 # ── BUG-4/15: Persistent closed-trade dedup set ─────────────────────────────────
 _CLOSED_SET_FILE = os.path.join(DATA_DIR, 'guardian-closed-set.json')
@@ -2892,33 +2968,41 @@ def sync():
                             sl = float(row_trade[0]) if row_trade and row_trade[0] else 0
                             tp = float(row_trade[1]) if row_trade and row_trade[1] else 0
                             direction = row_trade[2] if row_trade else ''
+                            hl_entry_price = float(row_trade[3]) if row_trade and row_trade[3] else None
                         else:
                             sl = tp = 0
                             direction = t.get('direction', '')
+                            hl_entry_price = None
 
                         fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
                         exit_price = _get_hl_exit_price(tok, fallback_price)
 
-                        # Determine close_reason: TP vs SL
-                        if tp > 0 and sl > 0:
-                            if direction.upper() == 'LONG':
-                                if exit_price >= tp:
-                                    close_reason = 'HL_TP_CLOSED'
-                                elif exit_price <= sl:
-                                    close_reason = 'HL_SL_CLOSED'
-                                else:
-                                    close_reason = 'HL_CLOSED'
-                            else:  # SHORT
-                                if exit_price <= tp:
-                                    close_reason = 'HL_TP_CLOSED'
-                                elif exit_price >= sl:
-                                    close_reason = 'HL_SL_CLOSED'
-                                else:
-                                    close_reason = 'HL_CLOSED'
-                        else:
-                            close_reason = 'HL_CLOSED'
+                        # FIX (2026-04-14): Same logic as second Step 8 path.
+                        # Only close with HL_* reason if HL confirmed the position existed.
+                        has_hl_confirmation = bool(hl_entry_price)
 
-                        log(f'  Step8 closing paper {tok} #{trade_id}: exit={exit_price} reason={close_reason}', 'INFO')
+                        if not has_hl_confirmation:
+                            close_reason = 'PHANTOM_CLOSE'
+                        else:
+                            if tp > 0 and sl > 0:
+                                if direction.upper() == 'LONG':
+                                    if exit_price >= tp:
+                                        close_reason = 'HL_TP_CLOSED'
+                                    elif exit_price <= sl:
+                                        close_reason = 'HL_SL_CLOSED'
+                                    else:
+                                        close_reason = 'HL_CLOSED'
+                                else:  # SHORT
+                                    if exit_price <= tp:
+                                        close_reason = 'HL_TP_CLOSED'
+                                    elif exit_price >= sl:
+                                        close_reason = 'HL_SL_CLOSED'
+                                    else:
+                                        close_reason = 'HL_CLOSED'
+                            else:
+                                close_reason = 'HL_CLOSED'
+
+                        log(f'  Step8 closing {tok} #{trade_id}: exit={exit_price} reason={close_reason} hl_confirmed={has_hl_confirmation}', 'INFO')
 
                         # Mark guardian_closed BEFORE closing to prevent double-close
                         conn_upd = get_db_connection()
@@ -2955,7 +3039,7 @@ def sync():
                         if conn_trade:
                             cur_trade = conn_trade.cursor()
                             cur_trade.execute(
-                                "SELECT stop_loss, target, direction FROM trades WHERE id=%s",
+                                "SELECT stop_loss, target, direction, hl_entry_price FROM trades WHERE id=%s",
                                 (trade_id,))
                             row_trade = cur_trade.fetchone()
                             cur_trade.close()
@@ -2963,33 +3047,47 @@ def sync():
                             sl = float(row_trade[0]) if row_trade and row_trade[0] else 0
                             tp = float(row_trade[1]) if row_trade and row_trade[1] else 0
                             direction = row_trade[2] if row_trade else t.get('direction', '')
+                            hl_entry_price = float(row_trade[3]) if row_trade and row_trade[3] else None
                         else:
                             sl = tp = 0
                             direction = t.get('direction', '')
+                            hl_entry_price = None
 
                         fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
                         exit_price = _get_hl_exit_price(tok, fallback_price)
                         if not exit_price or exit_price <= 0:
                             raise ValueError(f"No valid exit price for {tok} trade #{trade_id}: fallback={fallback_price}")
 
-                        # Determine close_reason: TP vs SL
-                        if tp > 0 and sl > 0 and direction:
-                            if direction.upper() == 'LONG':
-                                if exit_price >= tp:
-                                    close_reason = 'HL_TP_CLOSED'
-                                elif exit_price <= sl:
-                                    close_reason = 'HL_SL_CLOSED'
-                                else:
-                                    close_reason = 'HL_CLOSED'
-                            else:  # SHORT
-                                if exit_price <= tp:
-                                    close_reason = 'HL_TP_CLOSED'
-                                elif exit_price >= sl:
-                                    close_reason = 'HL_SL_CLOSED'
-                                else:
-                                    close_reason = 'HL_CLOSED'
+                        # FIX (2026-04-14): Only close paper=False trades as HL_CLOSED if HL
+                        # actually confirmed the position (hl_entry_price IS NOT NULL).
+                        # If hl_entry_price IS NULL, the HL mirror likely failed (rate limit,
+                        # balance, blacklist, etc.) and this is a PHANTOM paper trade — close
+                        # it as PHANTOM_CLOSE instead of HL_CLOSED.
+                        has_hl_confirmation = bool(hl_entry_price)
+
+                        if not has_hl_confirmation:
+                            # PHANTOM: HL mirror never succeeded — close without HL fill
+                            close_reason = 'PHANTOM_CLOSE'
+                            log(f'  Step8 {tok} #{trade_id}: PHANTOM (no HL confirmation, never reached HL) — closing as phantom', 'WARN')
                         else:
-                            close_reason = 'HL_CLOSED'
+                            # HL confirmed — use TP/SL logic to determine close reason
+                            if tp > 0 and sl > 0 and direction:
+                                if direction.upper() == 'LONG':
+                                    if exit_price >= tp:
+                                        close_reason = 'HL_TP_CLOSED'
+                                    elif exit_price <= sl:
+                                        close_reason = 'HL_SL_CLOSED'
+                                    else:
+                                        close_reason = 'HL_CLOSED'
+                                else:  # SHORT
+                                    if exit_price <= tp:
+                                        close_reason = 'HL_TP_CLOSED'
+                                    elif exit_price >= sl:
+                                        close_reason = 'HL_SL_CLOSED'
+                                    else:
+                                        close_reason = 'HL_CLOSED'
+                            else:
+                                close_reason = 'HL_CLOSED'
 
                         log(f'  Step8 closing {tok} #{trade_id}: exit={exit_price} reason={close_reason}', 'INFO')
 
@@ -3140,6 +3238,14 @@ def main():
                     log(f'HL state refreshed after retry: {len(hl_pos_retry)} positions', 'INFO')
             except Exception:
                 pass
+
+        # ── PHANTOM_CLOSE exit-price backfill ──────────────────────────────────────
+        # FIX (2026-04-14): PHANTOM_CLOSE trades have exit_price=0 because HL fills
+        # hadn't propagated when the guardian first closed them. Now that we have
+        # _get_fills_cached with a 5-min cache, subsequent guardian cycles can find
+        # the real HL fill prices without making extra API calls.
+        # Only retry trades where: close_reason=PHANTOM_CLOSE AND exit_price=0.
+        _retry_phantom_close_fills()
 
         try:
             sync()
