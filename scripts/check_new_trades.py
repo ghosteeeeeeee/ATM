@@ -19,8 +19,9 @@ from datetime import datetime, timezone
 sys.path.insert(0, '/root/.hermes/scripts')
 import psycopg2
 
+from paths import *
 BRAIN_DB_DICT = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
-SIGNAL_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+SIGNAL_DB = RUNTIME_DB
 REGIME_JSON = '/var/www/html/regime_4h.json'
 
 def load_regimes():

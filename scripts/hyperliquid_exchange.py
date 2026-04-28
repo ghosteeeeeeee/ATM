@@ -14,6 +14,7 @@ import hyperliquid.utils.signing as signing
 import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error, subprocess
 from decimal import Decimal, ROUND_UP
 
+from paths import *
 # ─── Wallet Credentials ──────────────────────────────────────────────────────
 _SECRETS = pathlib.Path(__file__).parent.parent / ".secrets.local"
 if _SECRETS.exists():
@@ -217,7 +218,7 @@ HYPE_AVAILABLE = True
 
 # ─── Kill Switch ──────────────────────────────────────────────────────────────
 # Stored in a file so it survives restarts and can be set by cron/CLI.
-_KILL_FILE = "/var/www/hermes/data/hype_live_trading.json"
+_KILL_FILE = LIVESWITCH_FILE
 
 
 def _load_flags() -> dict:
@@ -483,10 +484,16 @@ def get_open_hype_positions_curl():
                 lev = float(lev_data)
             else:
                 lev = 1
+            raw_entry = pos.get("entryPx", 0) or 0
+            # FATAL ERROR FIX (2026-04-19): HL returns entryPx=null for some positions.
+            # float(None or 0) = 0.0 — overwriting real entry prices with 0 corrupts PnL.
+            # If entryPx is null/0, leave entry_px as None so caller can fall back to
+            # trade history or preserve existing DB value. Never write 0 as a sentinel.
+            entry_px = float(raw_entry) if raw_entry not in (None, 0, "0") else None
             out[coin] = {
                 "size": sz,
                 "direction": "LONG" if raw_sz > 0 else "SHORT",
-                "entry_px": float(pos.get("entryPx", 0) or 0),
+                "entry_px": entry_px,
                 "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
                 "leverage": lev,
             }
@@ -778,9 +785,19 @@ def get_realized_pnl(token: str, start_time_ms: int, end_time_ms: int = None) ->
         return {"realized_pnl": 0.0, "entry_price": 0.0, "exit_price": 0.0,
                 "total_size": 0.0, "fills": 0}
 
-    # HL uses: side="A" = open fill, side="B" = close fill (has realized PnL)
-    open_fills  = [f for f in token_fills if f["side"] == "A"]
-    close_fills = [f for f in token_fills if f["side"] == "B"]
+    # HL uses side + dir to indicate fill type:
+    #   LONG open:  side="B" dir="Open Long"
+    #   LONG close: side="A" dir="Close Long"
+    #   SHORT open: side="A" dir="Open Short"
+    #   SHORT close: side="B" dir="Close Short"
+    # Use "dir" field (contains "Open" or "Close") to identify fill direction.
+    def is_open_fill(f):
+        return "Open" in f.get("dir", "")
+    def is_close_fill(f):
+        return "Close" in f.get("dir", "")
+
+    open_fills  = [f for f in token_fills if is_open_fill(f)]
+    close_fills = [f for f in token_fills if is_close_fill(f)]
 
     def wavg_price(fills_list):
         if not fills_list:
@@ -809,11 +826,12 @@ def mirror_get_entry_fill(token: str, start_time_ms: int, window_ms: int = 30000
     end_ms = start_time_ms + window_ms
     fills = get_trade_history(start_time_ms, end_ms)
     token_upper = token.upper()
-    # side=A = opens a long or closes a short
-    # side=B = opens a short or closes a long
+    # Use "dir" field to identify OPEN fills only (not close fills).
+    # For LONG opens: side="B" dir="Open Long"
+    # For SHORT opens: side="A" dir="Open Short"
     entry_fills = [f for f in fills
                    if f["coin"].upper() == token_upper
-                   and f["side"] in ("A", "B")]
+                   and "Open" in f.get("dir", "")]
     if not entry_fills:
         return {"success": False}
     total_sz = sum(abs(f["sz"]) for f in entry_fills)
@@ -835,8 +853,11 @@ def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000
     """
     end_ms = start_time_ms + window_ms
     fills = get_trade_history(start_time_ms, end_ms)
+    # Use "dir" field (contains "Close") to identify exit fills, not just "side".
+    # For LONG closes: side="A" dir="Close Long"
+    # For SHORT closes: side="B" dir="Close Short"
     close_fills = [f for f in fills
-                   if f["coin"].upper() == token.upper() and f["side"] == "B"]
+                   if f["coin"].upper() == token.upper() and "Close" in f.get("dir", "")]
     if not close_fills:
         return {"success": False}
     total_sz = sum(f["sz"] for f in close_fills)
@@ -965,6 +986,148 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
         return {"success": False, "message": str(e)}
 
 
+def mirror_open_batch(token_infos: list, prices: dict = None) -> dict:
+    """
+    Open multiple HL positions in a batch — ONE /exchange API call for all orders.
+
+    Args:
+        token_infos: list of dicts, each {
+            'token': str,       # HL coin name e.g. 'HYPE'
+            'direction': str,   # 'LONG' or 'SHORT'
+            'entry_price': float,  # for size calc (can be stale if prices dict provided)
+            'leverage': int,    # HL leverage (default 3)
+        }
+        prices: optional {token: price} dict. If provided, skips per-token price fetch.
+                If None, fetches all tokens' prices in ONE /info call.
+
+    Returns: {
+        'success': bool,
+        'results': [{'token', 'success', 'entry_price', 'size', 'error'}],
+        'placed': int,
+        'errors': [str],
+    }
+    """
+    if not token_infos:
+        return {"success": True, "results": [], "placed": 0, "errors": []}
+
+    if not is_live_trading_enabled():
+        return {"success": False, "results": [], "errors": ["live trading disabled"]}
+
+    # ── 1. Fetch ALL prices in ONE /info call ─────────────────────────────────
+    if prices is None:
+        token_names = [t["token"] for t in token_infos]
+        try:
+            prices = get_prices_curl(token_names)
+        except Exception as e:
+            return {"success": False, "results": [], "errors": [f"price fetch failed: {e}"]}
+
+    # ── 2. Build order requests and handle leverage per token ─────────────────
+    size_usdt = _get_trade_size_usdt() + MIN_ORDER_BUFFER
+    order_reqs = []
+    leverage_calls = []  # (token, leverage) pairs for cross-margin setup
+    valid_infos = []    # token_infos entries that produced a valid order_reqs entry
+
+    for info in token_infos:
+        token = info["token"].upper()
+        direction = info["direction"].upper()
+        leverage = max(1, min(int(info.get("leverage", 3)), _coin_max_leverage(token), 10))
+        is_buy = direction == "LONG"
+
+        # Price: use provided price dict, or live fetch, or entry_price fallback
+        live_price = prices.get(token)
+        if not live_price or live_price <= 0:
+            live_price = info.get("entry_price", 0)
+        if not live_price or live_price <= 0:
+            continue  # skip — no price
+
+        # Size in coin units (same logic as mirror_open)
+        decimals = _sz_decimals(token)
+        raw_sz = size_usdt / live_price
+        if decimals > 0:
+            sz = float(Decimal(str(raw_sz)).quantize(
+                Decimal(f"0.{'0' * decimals}"), rounding=ROUND_UP))
+        else:
+            sz = math.ceil(raw_sz)
+        if sz <= 0:
+            continue
+
+        leverage_calls.append((token, leverage))
+        order_reqs.append(build_order(
+            token,
+            "BUY" if is_buy else "SELL",
+            sz,
+            0,  # market order px=0
+            "Market",   # plain Market order — NOT a trigger (which fires as TP/SL)
+            reduce_only=False,
+        ))
+        valid_infos.append((info, token, is_buy, sz))
+
+    if not order_reqs:
+        return {"success": False, "results": [], "errors": ["no valid orders to place"]}
+
+    # ── 3. Set leverage for each token (cross-margin), then place all orders ───
+    results = []
+    errors = []
+
+    def _do():
+        _exchange_rate_limit()   # HL requires 10s gap between /exchange calls
+        exchange = get_exchange()
+        # Set leverage for each token (cross-margin = is_cross=True)
+        for token, lev in leverage_calls:
+            exchange.update_leverage(lev, token, is_cross=True)
+        # Place ALL orders in ONE /exchange call
+        return exchange.bulk_orders(order_reqs, grouping="na")
+
+    try:
+        result = _exchange_retry(_do)
+        order_time_ms = int(time.time() * 1000)
+
+        if not isinstance(result, dict):
+            return {"success": False, "results": [], "errors": [f"non-dict response: {result}"]}
+
+        if result.get("status") == "err":
+            err_msg = result.get("response", "Unknown error")
+            return {"success": False, "results": [], "errors": [str(err_msg)]}
+
+        # Parse per-order results from the batch response
+        statuses = (
+            result.get("response", {})
+            .get("data", {})
+            .get("statuses", [])
+        )
+
+        for i, (info, token, is_buy, sz) in enumerate(valid_infos):
+            if i < len(statuses):
+                s = statuses[i]
+                if "error" in s:
+                    results.append({"token": token, "success": False, "error": s["error"]})
+                    errors.append(f"{token}: {s['error']}")
+                else:
+                    # Success — get entry fill price
+                    entry_info = mirror_get_entry_fill(
+                        token, order_time_ms - 2000, window_ms=15000)
+                    if entry_info.get("success"):
+                        fill_price = entry_info["entry_price"]
+                    else:
+                        fill_price = prices.get(token, info.get("entry_price", 0))
+                    results.append({
+                        "token": token,
+                        "success": True,
+                        "entry_price": fill_price,
+                        "size": sz,
+                        "side": "BUY" if is_buy else "SELL",
+                    })
+            else:
+                results.append({"token": token, "success": False, "error": "no response for order"})
+                errors.append(f"{token}: no response")
+
+        placed = sum(1 for r in results if r["success"])
+        return {"success": placed > 0, "results": results, "placed": placed, "errors": errors}
+
+    except Exception as e:
+        return {"success": False, "results": [], "errors": [str(e)]}
+
+
 def mirror_close(token: str, direction: str, exit_price: float = None) -> dict:
     """
     Close a real Hyperliquid position mirroring a paper close.
@@ -1035,7 +1198,8 @@ def build_order(coin: str, side: str, sz: float, limit_px: float,
         # Already a trigger/Limit dict — use it directly
         otype = order_type
     elif order_type == "Market":
-        otype = {"trigger": {"triggerPx": 0, "isMarket": True, "tpsl": "tp"}}
+        # Market = aggressive Limit IoC (same as SDK's market_open internals)
+        otype = {"limit": {"tif": "Ioc"}}
     else:
         otype = {"limit": {"tif": tif}}
     is_buy = side.upper() == "BUY"

@@ -5,7 +5,8 @@ Avoids repeated API calls, enables historical queries, and feeds MACD/timeframe 
 
 Tables:
   candles_1m   — 1-minute OHLCV (for aggregation into any higher TF)
-  candles_15m  — 15-minute aggregated candles
+  candles_5m   — 5-minute OHLCV (live feed from Binance)
+  candles_15m  — 15-minute OHLCV (live feed from Binance)
   candles_1h   — 1-hour candles
   candles_4h   — 4-hour candles
   tokens       — token metadata (last_update, active flag)
@@ -20,6 +21,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional
 
+from paths import *
 DB_PATH = '/root/.hermes/data/candles.db'
 
 # ── Schema ──────────────────────────────────────────────────────────────────
@@ -28,6 +30,17 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS candles_1m (
     token    TEXT NOT NULL,
     ts       INTEGER NOT NULL,   -- Unix timestamp (seconds)
+    open     REAL NOT NULL,
+    high     REAL NOT NULL,
+    low      REAL NOT NULL,
+    close    REAL NOT NULL,
+    volume   REAL NOT NULL,
+    PRIMARY KEY (token, ts)
+);
+
+CREATE TABLE IF NOT EXISTS candles_5m (
+    token    TEXT NOT NULL,
+    ts       INTEGER NOT NULL,
     open     REAL NOT NULL,
     high     REAL NOT NULL,
     low      REAL NOT NULL,
@@ -95,10 +108,10 @@ def init_db():
         conn.executescript(SCHEMA)
 
 def _tf_table(tf: str) -> str:
-    return {'1m': 'candles_1m', '15m': 'candles_15m', '1h': 'candles_1h', '4h': 'candles_4h'}[tf]
+    return {'1m': 'candles_1m', '5m': 'candles_5m', '15m': 'candles_15m', '1h': 'candles_1h', '4h': 'candles_4h'}[tf]
 
 def _tf_minutes(tf: str) -> int:
-    return {'1m': 1, '15m': 15, '1h': 60, '4h': 240}[tf]
+    return {'1m': 1, '5m': 5, '15m': 15, '1h': 60, '4h': 240}[tf]
 
 
 # ── Fetch from Binance + store ────────────────────────────────────────────────
@@ -108,7 +121,7 @@ def fetch_and_store(token: str, tf: str = '1m', limit: int = 500) -> int:
     Fetch `limit` candles from Binance for token/timeframe, store to local DB.
     Returns number of candles stored (0 = no new data or error).
     """
-    interval_map = {'1m': '1m', '15m': '15m', '1h': '1h', '4h': '4h'}
+    interval_map = {'1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h'}
     binance_tf = interval_map[tf]
     table = _tf_table(tf)
 
@@ -153,7 +166,7 @@ def fetch_and_store_all_tf(token: str, limits: dict = None) -> dict:
     Returns dict of {tf: rows_stored}.
     """
     if limits is None:
-        limits = {'1m': 500, '15m': 500, '1h': 500, '4h': 500}
+        limits = {'1m': 500, '5m': 500, '15m': 500, '1h': 500, '4h': 500}
     results = {}
     for tf, limit in limits.items():
         results[tf] = fetch_and_store(token, tf, limit)

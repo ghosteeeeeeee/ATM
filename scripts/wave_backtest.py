@@ -9,6 +9,7 @@ Usage:
   python3 wave_backtest.py                    # quick BTC 4H validation (30s)
   python3 wave_backtest.py --full-grid       # all 677K configs (hours)
   python3 wave_backtest.py --tokens BTC ETH SOL --timeframes 4h 1h
+from paths import *
 """
 import sqlite3, json, time, hashlib, argparse, sys, math
 from datetime import datetime

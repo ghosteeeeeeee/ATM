@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes ZScore Momentum Tuner — full sweep all tokens
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/zscore_momentum.py --sweep
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

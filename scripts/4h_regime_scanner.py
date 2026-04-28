@@ -1,69 +1,87 @@
 #!/usr/bin/env python3
 """
 4h Regime Scanner
-Fetches 4h candles for tokens and calculates price momentum slope
-Adds regime bias to signal weight calculation
+Reads 4h closed candles from local candles.db (primary), falls back to Binance.
+Uses is_closed=1 to exclude the current developing candle from slope calculation.
+Adds regime bias to signal weight calculation.
 """
 import requests
 import json
 import sys
 import time
+import sqlite3
 import psycopg2
 from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 
+from paths import *
 INFO_URL = "https://api.hyperliquid.xyz/info"
 OUTPUT_FILE = "/var/www/html/regime_4h.json"
 STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
+CANDLES_DB  = "/root/.hermes/data/candles.db"
 LOG_FILE = "/root/.hermes/logs/4h_regime.log"
 BRAIN_DB = BRAIN_DB_DICT
+CANDLE_TF = "4h"
+CANDLE_TABLE = "candles_4h"
+STALE_THRESHOLD_SECS = 600  # 10 min — if latest closed candle is older, use Binance
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
     with open(LOG_FILE, "a") as f:
         f.write(f"[{datetime.now().isoformat()}] {msg}\n")
 
-def fetch_candles(token, interval="4h", limit=6):
-    """Fetch 4h candles from Hyperliquid"""
+def fetch_candles_from_db(token, limit=6):
+    """Read closed 4h candles from candles.db. Returns list of dicts or None if stale/missing."""
     try:
-        # Hyperliquid uses 1h intervals, so we get more and filter
-        # Actually, let's use Binance for broader token support
-        # Try Hyperliquid first
-        payload = {
-            "type": "candleSnapshot",
-            "req": {
-                "coin": token,
-                "interval": interval,
-                "num": limit
-            }
-        }
-        r = requests.post(INFO_URL, json=payload, timeout=15)
-        if r.ok:
-            data = r.json()
-            if data and len(data) > 0:
-                # Convert to OHLCV format
-                candles = []
-                for c in data:  # Hyperliquid returns [time, open, high, low, close, volume]
-                    candles.append({
-                        'time': c[0],
-                        'open': float(c[1]),
-                        'high': float(c[2]),
-                        'low': float(c[3]),
-                        'close': float(c[4]),
-                        'volume': float(c[5])
-                    })
-                return candles
+        conn = sqlite3.connect(CANDLES_DB)
+        cur = conn.cursor()
+        cur.execute(f"""
+            SELECT ts, open, high, low, close, volume
+            FROM {CANDLE_TABLE}
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), limit))
+        rows = cur.fetchall()
+        conn.close()
+
+        if not rows:
+            return None
+
+        # Check if data is stale (latest closed candle too old)
+        latest_ts = rows[0][0]
+        age = time.time() - latest_ts
+        if age > STALE_THRESHOLD_SECS:
+            log(f"  {token}: candles.db stale ({age:.0f}s old) — falling back to Binance")
+            return None
+
+        # Reverse to chronological order for slope calculation
+        candles = []
+        for r in reversed(rows):
+            candles.append({
+                'time': r[0],
+                'open': float(r[1]),
+                'high': float(r[2]),
+                'low': float(r[3]),
+                'close': float(r[4]),
+                'volume': float(r[5])
+            })
+        return candles
     except Exception as e:
-        log(f"Hyperliquid error for {token}: {e}")
-    
-    # Fallback to Binance
+        log(f"  {token}: candles.db error ({e}) — falling back to Binance")
+        return None
+
+def fetch_candles_from_binance(token, limit=6):
+    """Fetch 4h candles from Binance as fallback. Always drops developing candle."""
     try:
         symbol = f"{token}USDT"
-        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=4h&limit={limit + 1}"
         r = requests.get(url, timeout=10)
         if r.ok:
             data = r.json()
+            # Drop the current developing candle (last entry) — not closed yet
+            data = data[:-1]
             candles = []
             for c in data:
                 candles.append({
@@ -76,94 +94,88 @@ def fetch_candles(token, interval="4h", limit=6):
                 })
             return candles
     except Exception as e:
-        log(f"Binance error for {token}: {e}")
-    
+        log(f"  {token}: Binance error: {e}")
     return None
+
+def fetch_candles(token, limit=6):
+    """
+    Fetch candles: candles.db primary (closed only), Binance fallback.
+    Always excludes the developing candle from slope calculation.
+    """
+    # Try local DB first
+    candles = fetch_candles_from_db(token, limit)
+    if candles:
+        return candles
+    # Fallback to Binance
+    return fetch_candles_from_binance(token, limit)
 
 def calculate_slope(candles):
     """Calculate linear regression slope of close prices"""
     if not candles or len(candles) < 3:
         return None, 0
-    
+
     closes = [c['close'] for c in candles]
     n = len(closes)
-    
-    # Simple linear regression
+
     x = list(range(n))
     x_mean = (n - 1) / 2
     y_mean = sum(closes) / n
-    
+
     numerator = sum((x[i] - x_mean) * (closes[i] - y_mean) for i in range(n))
     denominator = sum((x[i] - x_mean) ** 2 for i in range(n))
-    
+
     if denominator == 0:
         return 0, 0
-    
+
     slope = numerator / denominator
     slope_pct = (slope / y_mean) * 100  # Normalize as percentage per candle
-    
+
     return slope, slope_pct
 
 def calculate_r2(candles, slope):
     """Calculate R-squared for confidence"""
     if not candles or len(candles) < 3:
         return 0
-    
+
     closes = [c['close'] for c in candles]
     n = len(closes)
     y_mean = sum(closes) / n
-    
-    # Calculate predicted values
+
     x = list(range(n))
     x_mean = (n - 1) / 2
-    
+
     y_pred = [y_mean + slope * (x[i] - x_mean) for i in range(n)]
-    
+
     ss_res = sum((closes[i] - y_pred[i]) ** 2 for i in range(n))
     ss_tot = sum((closes[i] - y_mean) ** 2 for i in range(n))
-    
+
     if ss_tot == 0:
         return 0
-    
+
     r2 = 1 - (ss_res / ss_tot)
     return max(0, r2)
 
 def determine_regime(slope_pct, r2):
     """Determine regime based on slope and confidence.
-    
-    FIX (2026-04-13): Previous version had structural SHORT_BIAS bias because:
-    - slope_pct thresholds were asymmetric (0.3 for strong, nothing for weak positive)
-    - The elif slope_pct > 0: LONG_BIAS caught very small positive slopes
-    - The else: SHORT_BIAS caught all negative slopes not caught by strong threshold
-    - In broadly bearish crypto markets, this produced 95% SHORT_BIAS (106:6 ratio)
-    
-    New thresholds use symmetric boundaries:
-    - NEUTRAL band: |slope_pct| < 0.20 (widened from 0.15)
-    - LONG_BIAS: slope_pct >= 0.20 with r2 > 0.4 (raised r2 from 0.5, lowered slope)
-    - SHORT_BIAS: slope_pct <= -0.20 with r2 > 0.4 (symmetric with LONG)
-    - Strong momentum: |slope_pct| > 0.35 with r2 > 0.5 (slightly raised threshold)
+    Symmetric thresholds — asset-agnostic.
     """
-    # Strong momentum cases (high confidence)
     if slope_pct > 0.35 and r2 > 0.5:
         return "LONG_BIAS", min(95, 50 + r2 * 45 + slope_pct * 20)
     elif slope_pct < -0.35 and r2 > 0.5:
         return "SHORT_BIAS", min(95, 50 + r2 * 45 + abs(slope_pct) * 20)
-    # NEUTRAL: weak slope or low confidence
     elif abs(slope_pct) < 0.20:
         return "NEUTRAL", min(70, 50 + (1 - abs(slope_pct)/0.20) * 20)
-    # Moderate cases — require better r2 for direction assignment
     elif slope_pct > 0 and r2 > 0.4:
         return "LONG_BIAS", 45 + r2 * 20
     elif slope_pct < 0 and r2 > 0.4:
         return "SHORT_BIAS", 45 + r2 * 20
-    # Default to NEUTRAL when r2 is low (no clear trend)
     else:
         return "NEUTRAL", 40 + r2 * 15
 
 def get_tokens_to_scan():
-    """Get tokens from open trades and recent signals"""
+    """Get tokens from open trades, recent signals, and focus list"""
     tokens = set()
-    
+
     # Get from open trades
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
@@ -175,7 +187,7 @@ def get_tokens_to_scan():
         conn.close()
     except Exception as e:
         log(f"DB error: {e}")
-    
+
     # Get from signal files
     for fname in ["/var/www/html/signals.json", "/root/.hermes/data/signals.json"]:
         try:
@@ -189,9 +201,8 @@ def get_tokens_to_scan():
                             tokens.add(sig['symbol'].replace('USDT', ''))
         except:
             pass
-    
-    # Always include focus tokens (they are valid crypto symbols)
-    # Expanded 2026-04-06: all tokens that have ever generated signals need regime data
+
+    # Focus tokens
     focus_tokens = [
         'SOL', 'BTC', 'ETH', 'WIF', 'PEPE', 'VIRTUAL', 'FARTCOIN', 'MELANIA', 'POPCAT', 'GOAT',
         'AXS', 'TRB', 'SKY', 'VVV', 'ZORA', 'SAGA', 'GMX', 'ALGO', 'IOTA', 'TRX',
@@ -203,13 +214,12 @@ def get_tokens_to_scan():
     ]
     for t in focus_tokens:
         tokens.add(t)
-    
-    # Also pull directly from the live signals SQLite DB — don't miss tokens only in DB
-    for sig_db in ['/root/.hermes/data/signals_hermes_runtime.db',
+
+    # Also pull from live signals SQLite DB
+    for sig_db in [RUNTIME_DB,
                    '/root/.hermes/data/signals.db',
                    '/root/.hermes/data/signals_hermes.db']:
         try:
-            import sqlite3
             sc = sqlite3.connect(sig_db)
             cu = sc.cursor()
             cu.execute("SELECT DISTINCT token FROM signals WHERE token NOT LIKE '@%' LIMIT 100")
@@ -219,9 +229,7 @@ def get_tokens_to_scan():
             sc.close()
         except Exception:
             pass
-    
-    # Priority: focus_tokens first (high-value tokens we always want to scan),
-    # then open-trade tokens, then signal tokens. No artificial cap.
+
     focus_set = set(focus_tokens)
     priority_tokens = list(focus_set) + [t for t in tokens if t not in focus_set]
     return priority_tokens
@@ -231,18 +239,19 @@ def scan_token(token):
     candles = fetch_candles(token, limit=6)
     if not candles:
         return None
-    
+
     slope, slope_pct = calculate_slope(candles)
     if slope is None:
         return None
-    
+
     r2 = calculate_r2(candles, slope)
     regime, confidence = determine_regime(slope_pct, r2)
-    
+
+    # Use last closed candle for current_price (candles are already closed-only from DB)
     current_price = candles[-1]['close']
     start_price = candles[0]['open']
     total_change = ((current_price - start_price) / start_price) * 100
-    
+
     return {
         'token': token,
         'regime': regime,
@@ -258,19 +267,16 @@ def calculate_weight_adjustment(regime, side):
     """Calculate weight multiplier based on regime alignment"""
     if regime == "NEUTRAL":
         return 1.0
-    
     if regime == "LONG_BIAS":
         if side == "long":
-            return 1.2  # Bonus for aligned direction
+            return 1.2
         else:
-            return 0.8  # Penalty for fighting trend
-    
+            return 0.8
     if regime == "SHORT_BIAS":
         if side == "short":
             return 1.2
         else:
             return 0.8
-    
     return 1.0
 
 def write_to_brain_cache(results):
@@ -284,7 +290,6 @@ def write_to_brain_cache(results):
         for token, r in results.items():
             regime = r.get('regime', 'NEUTRAL')
             slope_pct = r.get('slope_pct', 0)
-            # Map regime to trend (simplified)
             trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
             cur.execute("""
                 INSERT INTO momentum_cache (token, slope_4h, regime_4h, trend, updated_at)
@@ -304,48 +309,44 @@ def write_to_brain_cache(results):
 
 def main():
     log("=== 4h Regime Scanner Started ===")
-    
+
     tokens = get_tokens_to_scan()
     log(f"Scanning {len(tokens)} tokens")
-    
+
     results = {}
     for token in tokens:
         result = scan_token(token)
         if result:
             results[token] = result
             log(f"  {token}: {result['regime']} ({result['confidence']}%) - slope: {result['slope_pct']}%")
-    
-    # Calculate aggregate bias
+
     long_count = sum(1 for r in results.values() if r['regime'] == "LONG_BIAS")
     short_count = sum(1 for r in results.values() if r['regime'] == "SHORT_BIAS")
     neutral_count = sum(1 for r in results.values() if r['regime'] == "NEUTRAL")
-    
+
     aggregate = {
         'long_bias': long_count,
         'short_bias': short_count,
         'neutral': neutral_count,
         'overall': 'LONG_BIAS' if long_count > short_count + 2 else 'SHORT_BIAS' if short_count > long_count + 2 else 'NEUTRAL'
     }
-    
+
     output = {
         'timestamp': datetime.now().isoformat(),
         'tokens_scanned': len(results),
         'aggregate': aggregate,
         'regimes': results
     }
-    
-    # Save to file
+
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
-    
-    # Write per-token regime to PostgreSQL brain momentum_cache
+
     write_to_brain_cache(results)
-    
-    # Also write aggregate regime to static DB (wasp.py checks this table)
+
+    # Write aggregate regime to static DB (wasp.py checks this table)
     try:
-        import sqlite3
         n = len(results) or 1
-        broad_z = (short_count - long_count) / n  # -1 to +1
+        broad_z = (long_count - short_count) / n  # -1 to +1 (FIXED: was short - long)
         if aggregate['overall'] == 'LONG_BIAS':
             long_mult, short_mult = 1.2, 0.8
         elif aggregate['overall'] == 'SHORT_BIAS':
@@ -361,7 +362,7 @@ def main():
         sc.close()
     except Exception as e:
         log(f"DB write error: {e}")
-    
+
     log(f"Overall market bias: {aggregate['overall']} ({long_count}L/{short_count}S/{neutral_count}N)")
     print(json.dumps(output, indent=2))
 

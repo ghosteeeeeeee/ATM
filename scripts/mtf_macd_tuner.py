@@ -10,14 +10,178 @@ Data strategy:
   - 4H klines: paginate Binance in 1000-candle batches (3 pages = 125 days)
   - All aggregation uses open_time as the grouping key (Binance ascending = oldest first)
 """
+from paths import *
 import sqlite3, requests, time, sys, functools
 from datetime import datetime
 from itertools import product
 from multiprocessing import Pool, cpu_count
 
 DB_PATH = '/root/.hermes/data/mtf_macd_tuner.db'
+LOCAL_DB_PATH = STATIC_DB
+CANDLES_DIR = '/root/.hermes/data/candles'
 WINDOW_DAYS = 90
 BINANCE_BASE = 'https://api.binance.com/api/v3/klines'
+STALE_THRESHOLD_SEC = 900  # 15 min — refresh if file older than this
+
+# ── Local candle reader: candles/*.json files (zero API cost, real Binance OHLCV) ──
+def fetch_candles_from_files(token):
+    """
+    Read cached Binance OHLCV candles from candles/*.json files.
+    Returns (closes_15m, closes_1h, closes_4h, sorted_ts_15m) or None if files missing.
+
+    File format: each candle is {O, H, L, C, V, T} (open, high, low, close, volume, open_time_ms)
+    15m files have ~500 candles (~5 days); 1h ~500 (~21 days); 4h ~500 (~83 days).
+    """
+    import json, os
+
+    symbol = token.upper()
+    path_15m = f'{CANDLES_DIR}/{symbol}_15m.json'
+    path_1h  = f'{CANDLES_DIR}/{symbol}_1h.json'
+    path_4h  = f'{CANDLES_DIR}/{symbol}_4h.json'
+
+    if not all(os.path.exists(p) for p in [path_15m, path_1h, path_4h]):
+        return None
+
+    try:
+        with open(path_15m) as f:
+            candles_15m = json.load(f)
+        with open(path_1h) as f:
+            candles_1h = json.load(f)
+        with open(path_4h) as f:
+            candles_4h = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
+
+    if not candles_15m or not candles_1h or not candles_4h:
+        return None
+
+    # Extract closes and sorted timestamps (open_time_ms ascending)
+    sorted_15m_ts = sorted(int(c['T']) for c in candles_15m)
+    closes_15m = []
+    ts_to_candle_15m = {int(c['T']): c for c in candles_15m}
+    for ts in sorted_15m_ts:
+        closes_15m.append(float(ts_to_candle_15m[ts]['C']))
+
+    closes_1h = [float(c['C']) for c in candles_1h]
+    closes_4h = [float(c['C']) for c in candles_4h]
+
+    return closes_15m, closes_1h, closes_4h, sorted_15m_ts
+
+
+def fetch_candles_from_files_with_refresh(token):
+    """
+    Primary local candle reader for the quick sweep.
+    Reads from candles/*.json files. No network calls — freshness is checked
+    on next full refresh run (separate timer or manual trigger).
+    Returns (closes_15m, closes_1h, closes_4h, sorted_ts_15m, refreshed).
+    refreshed is always False here (refreshes happen in run_full_sweep or a
+    dedicated daily refresh cron).
+    """
+    import json, os
+
+    symbol = token.upper()
+    path_15m = f'{CANDLES_DIR}/{symbol}_15m.json'
+    path_1h  = f'{CANDLES_DIR}/{symbol}_1h.json'
+    path_4h  = f'{CANDLES_DIR}/{symbol}_4h.json'
+
+    if not all(os.path.exists(p) for p in [path_15m, path_1h, path_4h]):
+        return None, False
+
+    try:
+        with open(path_15m) as f:
+            candles_15m = json.load(f)
+        with open(path_1h) as f:
+            candles_1h = json.load(f)
+        with open(path_4h) as f:
+            candles_4h = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None, False
+
+    if not candles_15m or not candles_1h or not candles_4h:
+        return None, False
+
+    # Extract closes and sorted timestamps (open_time_ms ascending)
+    sorted_15m_ts = sorted(int(c['T']) for c in candles_15m)
+    closes_15m = []
+    ts_to_candle_15m = {int(c['T']): c for c in candles_15m}
+    for ts in sorted_15m_ts:
+        closes_15m.append(float(ts_to_candle_15m[ts]['C']))
+
+    closes_1h = [float(c['C']) for c in candles_1h]
+    closes_4h = [float(c['C']) for c in candles_4h]
+
+    return (closes_15m, closes_1h, closes_4h, sorted_15m_ts), False
+
+
+def refresh_token_candles(token):
+    """
+    Force-refresh all 3 candle files for one token from Binance.
+    Called by a separate daily timer, not by the quick sweep.
+    Returns True if all 3 files were refreshed, False otherwise.
+    """
+    symbol = token.upper()
+    refreshed_any = False
+    for path, tf in [
+        (f'{CANDLES_DIR}/{symbol}_15m.json', '15m'),
+        (f'{CANDLES_DIR}/{symbol}_1h.json',  '1h'),
+        (f'{CANDLES_DIR}/{symbol}_4h.json',  '4h'),
+    ]:
+        klines = _fetch_klines_for_tf(symbol, tf, WINDOW_DAYS)
+        if klines:
+            _save_candles_to_file(path, klines)
+            refreshed_any = True
+    return refreshed_any
+
+
+def _fetch_klines_for_tf(symbol, interval, window_days=WINDOW_DAYS):
+    """Fetch klines for one timeframe. Returns list of {O,H,L,C,V,T} dicts."""
+    limit = 1000
+    now = int(time.time() * 1000)
+    target_start = now - window_days * 86400 * 1000
+    all_batches = []
+    current_end = now
+
+    # Adjust batch size for interval
+    if interval == '15m':
+        ms_per_candle = 15 * 60 * 1000
+        max_pages = 12
+    elif interval == '1h':
+        ms_per_candle = 3600 * 1000
+        max_pages = 4
+    else:  # '4h'
+        ms_per_candle = 4 * 3600 * 1000
+        max_pages = 4
+
+    for _ in range(max_pages):
+        current_start = current_end - limit * ms_per_candle
+        if current_start < target_start:
+            url = f'{BINANCE_BASE}?symbol={symbol}&interval={interval}&limit={limit}&startTime={target_start}&endTime={current_end}'
+        else:
+            url = f'{BINANCE_BASE}?symbol={symbol}&interval={interval}&limit={limit}&startTime={current_start}&endTime={current_end}'
+
+        batch = _cached_request(url)
+        if not batch:
+            break
+        all_batches.extend(batch)
+        oldest = int(batch[0][0])
+        if oldest <= target_start:
+            break
+        if len(batch) < limit:
+            break
+        current_end = oldest - 1
+
+    all_batches.sort(key=lambda k: int(k[0]))
+    return [{'O': float(k[1]), 'H': float(k[2]), 'L': float(k[3]),
+             'C': float(k[4]), 'V': float(k[5]), 'T': int(k[0])} for k in all_batches]
+
+
+def _save_candles_to_file(path, candles):
+    """Save candle list to JSON file atomically."""
+    import json, os, tempfile
+    with tempfile.NamedTemporaryFile(mode='w', dir=os.path.dirname(path), delete=False) as f:
+        json.dump(candles, f)
+        tmp = f.name
+    os.replace(tmp, path)
 
 # ── Request caching ───────────────────────────────────────────────────────────
 @functools.lru_cache(maxsize=4)
@@ -120,7 +284,7 @@ class PrecomputedMACD:
 
     def histogram(self, i):
         """Return histogram at closes index i, or None if not yet valid."""
-        if i < self.warmup:
+        if i < self.warmup or i >= len(self.sig_ema):
             return None
         return self.macd[i] - self.sig_ema[i]
 
@@ -573,14 +737,21 @@ def _test_config_worker_v2(args):
 def _fast_backtest(token, fast, slow, sig, exit_strategy,
                    hold_minutes, score_threshold, regime_filter,
                    closes_15m, closes_1h, closes_4h, sorted_15m_ts,
-                   pm_15m, pm_1h, pm_4h, warmup):
+                   pm_15m, pm_1h, pm_4h, warmup_override):
     """Fast backtest using precomputed close arrays and PrecomputedMACD.
     Same logic as test_mtf_macd_config but avoids repeated data fetching.
+
+    warmup_override: conservative floor for loop start. Actual loop uses
+    max(warmup_override, pm_15m.warmup) to avoid being too conservative with
+    short candle files (e.g. 5-day candles/*.json files).
     """
     trades = []
     n_15m = len(closes_15m)
 
-    for i in range(warmup, n_15m - 1):
+    # Use actual per-config warmup, not just the conservative floor
+    loop_start = max(warmup_override, pm_15m.warmup)
+
+    for i in range(loop_start, n_15m - 1):
         ih_1h = min(i // 4, len(closes_1h) - 1)
         ih_4h = min(i // 16, len(closes_4h) - 1)
 
@@ -591,12 +762,16 @@ def _fast_backtest(token, fast, slow, sig, exit_strategy,
         if not (h_prev <= 0 < h_curr):
             continue
 
+        # Regime filter: only require valid (non-None) h_1h/h_4h to be positive.
+        # If h_1h or h_4h is None (not yet warm due to short data), treat as
+        # "not yet positive" — skip rejecting, but don't count it in score either.
         if regime_filter:
             h_1h = pm_1h.histogram(ih_1h)
             h_4h = pm_4h.histogram(ih_4h)
-            if h_1h is None or h_4h is None:
+            # Reject only if we have valid data that says it's not bullish
+            if h_1h is not None and h_1h <= 0:
                 continue
-            if h_1h <= 0 or h_4h <= 0:
+            if h_4h is not None and h_4h <= 0:
                 continue
 
         score_count = 0
@@ -732,30 +907,45 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
         best_for_token = None
 
         if parallel and len(grid) > 1:
-            # Pre-fetch data ONCE per token so all 544 configs share the same candles
+            # ── Data source: LOCAL first (candles/*.json) → Binance fallback ──────
             symbol = token.upper() + 'USDT'
-            klines_1h = fetch_1h_klines(symbol, window_days)
-            klines_4h = fetch_4h_klines(symbol, window_days)
-            klines_15m = fetch_15m_klines(symbol, window_days)
 
-            if len(klines_1h) < 100 or len(klines_4h) < 20 or len(klines_15m) < 100:
-                print(f'  [WARN] {token}: insufficient data ({len(klines_1h)} 1h, {len(klines_4h)} 4h, {len(klines_15m)} 15m)')
-                conn.commit()
-                continue
+            candles_result, _ = fetch_candles_from_files_with_refresh(token.upper())
+            if candles_result is not None:
+                closes_15m, closes_1h, closes_4h, sorted_15m_ts = candles_result
+                print(f'  [LOCAL] {token}: {len(closes_15m)} 15m, {len(closes_1h)} 1h, {len(closes_4h)} 4h (candles/*.json)')
+            else:
+                # No local files — fetch from Binance
+                klines_15m = fetch_15m_klines(symbol, window_days)
+                klines_1h  = fetch_1h_klines(symbol, window_days)
+                klines_4h  = fetch_4h_klines(symbol, window_days)
 
-            # Real 15m candles from Binance paginated fetch
-            sorted_15m_ts = sorted(int(k[0]) for k in klines_15m)
-            closes_15m = [float(k[4]) for k in klines_15m]
-            closes_1h = [float(k[4]) for k in klines_1h]
-            closes_4h = [float(k[4]) for k in klines_4h]
+                if len(klines_1h) < 100 or len(klines_4h) < 20 or len(klines_15m) < 100:
+                    print(f'  [WARN] {token}: insufficient Binance data ({len(klines_1h)} 1h, {len(klines_4h)} 4h, {len(klines_15m)} 15m)')
+                    conn.commit()
+                    continue
+
+                sorted_15m_ts = sorted(int(k[0]) for k in klines_15m)
+                closes_15m = [float(k[4]) for k in klines_15m]
+                closes_1h  = [float(k[4]) for k in klines_1h]
+                closes_4h  = [float(k[4]) for k in klines_4h]
+                print(f'  [BINANCE] {token}: {len(closes_15m)} 15m, {len(closes_1h)} 1h, {len(closes_4h)} 4h')
+
+                # Save to local files for next time
+                for path, tf, klines in [
+                    (f'{CANDLES_DIR}/{token.upper()}_15m.json', '15m', klines_15m),
+                    (f'{CANDLES_DIR}/{token.upper()}_1h.json',  '1h',  klines_1h),
+                    (f'{CANDLES_DIR}/{token.upper()}_4h.json',  '4h',  klines_4h),
+                ]:
+                    formatted = [{'O': float(k[1]), 'H': float(k[2]), 'L': float(k[3]),
+                                  'C': float(k[4]), 'V': float(k[5]), 'T': int(k[0])} for k in klines]
+                    _save_candles_to_file(path, formatted)
 
             warmup = 65 + 28 + 5  # slow + signal + buffer
             if len(closes_15m) < warmup + 1 or len(closes_1h) < warmup + 1 or len(closes_4h) < 10:
                 print(f'  [WARN] {token}: not enough candles after warmup')
                 conn.commit()
                 continue
-
-            print(f'  [DATA] {token}: {len(closes_15m)} 15m, {len(closes_1h)} 1h, {len(closes_4h)} 4h candles')
 
             # Precompute MACD series so config testing is fast (O(1) histogram per config)
             pm_15m = PrecomputedMACD(closes_15m, 12, 55, 15)
@@ -844,9 +1034,7 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
 
         if best_for_token:
             # Mark previous configs for this token as stale before inserting new best
-            c.execute("UPDATE token_best_config SET is_stale=1 WHERE token=? AND is_stale=0",
-                      (token,))
-            c.execute("""INSERT INTO token_best_config
+            c.execute("""INSERT OR REPLACE INTO token_best_config
                 (token, fast, slow, signal, exit_strategy, hold_minutes,
                  score_threshold, regime_filter, win_rate, profit_factor,
                  total_pnl_pct, signal_count, backtest_run_id, updated_at, is_stale)
@@ -873,28 +1061,61 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
     print(f'\n[sweep] DONE. Run #{run_id}. Best configs for {len(tokens_best)}/{len(tokens)} tokens.')
     return run_id, tokens_best
 
-# ── Quick update ────────────────────────────────────────────────────────────────
+# ── Quick update (per-token, uses local data) ─────────────────────────────────────
 def quick_update(token, top_n=10):
-    """Re-test top-N prior configs for a token. Update best if new winner."""
+    """
+    Re-test top-N prior configs for a token using LOCAL data.
+    Falls back to Binance if local data unavailable.
+    Returns the best config dict or None.
+    """
     conn = get_conn()
     c = conn.cursor()
     c.execute("""SELECT fast, slow, signal, exit_strategy, hold_minutes,
                   score_threshold, regime_filter
-                  FROM backtest_results WHERE token=? AND signals >= 5
+                  FROM backtest_results WHERE token=? AND signals >= 2
                   ORDER BY win_rate DESC LIMIT ?""", (token.upper(), top_n))
     prior_configs = c.fetchall()
     conn.close()
 
     if not prior_configs:
-        print(f'[quick] No prior configs for {token} — running initial backtest')
-        register_token(token)
-        return run_full_sweep(tokens=[token])
+        return None
 
-    print(f'[quick] Re-testing {len(prior_configs)} prior configs for {token}')
+    # Fetch candles from local files (candles/*.json) — zero API cost
+    # Falls back to Binance only if files don't exist
+    candles_result, did_refresh = fetch_candles_from_files_with_refresh(token.upper())
+    if candles_result is not None:
+        closes_15m, closes_1h, closes_4h, sorted_15m_ts = candles_result
+        if did_refresh:
+            print(f'  [REFRESH] {token}: refreshed stale candle file during quick_update')
+    else:
+        # No local files — fetch from Binance as fallback
+        symbol = token.upper() + 'USDT'
+        klines_15m = fetch_15m_klines(symbol, WINDOW_DAYS)
+        klines_1h  = fetch_1h_klines(symbol, WINDOW_DAYS)
+        klines_4h  = fetch_4h_klines(symbol, WINDOW_DAYS)
+        if len(klines_15m) < 100 or len(klines_1h) < 20 or len(klines_4h) < 10:
+            return None
+        sorted_15m_ts = sorted(int(k[0]) for k in klines_15m)
+        closes_15m = [float(k[4]) for k in klines_15m]
+        closes_1h  = [float(k[4]) for k in klines_1h]
+        closes_4h  = [float(k[4]) for k in klines_4h]
+
+    warmup = 65 + 28 + 5
+    if len(closes_15m) < warmup + 1 or len(closes_1h) < warmup + 1 or len(closes_4h) < 10:
+        return None
+
     best = None
     for (fast, slow, sig, ex, ho, sc, rg) in prior_configs:
-        res = test_mtf_macd_config(token, fast, slow, sig, ex, ho, sc, bool(rg))
-        if res and res['signals'] >= 3:
+        pm_15m = PrecomputedMACD(closes_15m, fast, slow, sig)
+        pm_1h  = PrecomputedMACD(closes_1h,  fast, slow, sig)
+        pm_4h  = PrecomputedMACD(closes_4h,  fast, slow, sig)
+        res = _fast_backtest(
+            token, fast, slow, sig, ex, ho, sc, bool(rg),
+            closes_15m, closes_1h, closes_4h, sorted_15m_ts,
+            pm_15m, pm_1h, pm_4h, warmup
+        )
+        # Accept config if it has at least 2 signals on current (shorter) data
+        if res and res['signals'] >= 2:
             if best is None or res['win_rate'] > best['win_rate']:
                 best = {**res, 'fast': fast, 'slow': slow, 'signal': sig,
                        'exit_strategy': ex, 'hold_minutes': ho,
@@ -903,21 +1124,57 @@ def quick_update(token, top_n=10):
     if best:
         conn = get_conn()
         c = conn.cursor()
+        # Use INSERT OR REPLACE so existing (non-stale) rows are overwritten cleanly
         c.execute("""INSERT OR REPLACE INTO token_best_config
             (token, fast, slow, signal, exit_strategy, hold_minutes,
              score_threshold, regime_filter, win_rate, profit_factor,
-             total_pnl_pct, signal_count, updated_at, is_stale)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,0)""",
+             total_pnl_pct, signal_count, backtest_run_id, updated_at, is_stale)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,0)""",
             (token.upper(), best['fast'], best['slow'], best['signal'],
              best['exit_strategy'], best['hold_minutes'], best['score_threshold'],
-             best['regime_filter'], best['win_rate'], best['profit_factor'],
-             best['total_pnl_pct'], best['signals']))
+             int(best['regime_filter']), best['win_rate'], best['profit_factor'],
+             best['total_pnl_pct'], best['signals'], 0))
         conn.commit()
         conn.close()
-        print(f'[quick] {token} updated: WR={best["win_rate"]:.1f}% PF={best["profit_factor"]:.3f} '
-              f'({best["fast"]},{best["slow"]},{best["signal"]}) hold={best["hold_minutes"]}m n={best["signals"]}')
+        print(f'[quick] {token}: WR={best["win_rate"]:.1f}% PF={best["profit_factor"]:.3f} '
+              f'({best["fast"]},{best["slow"]},{best["signal"]}) '
+              f'hold={best["hold_minutes"]}m n={best["signals"]}')
+    else:
+        print(f'[quick] {token}: no prior configs with >= 1 signals on current data')
 
     return best
+
+# ── Quick sweep (all tokens, every minute) ────────────────────────────────────────
+def run_quick_sweep():
+    """
+    Fast refresh: for each token with candle files, re-test top 10 configs
+    using local data. Refreshes stale files automatically (1 API call per stale file).
+    Designed to run every minute — completes in <30s for 20 tokens.
+    """
+    init_db()
+    import os
+
+    # Only sweep tokens that have candle files (20 tokens)
+    candle_tokens = []
+    if os.path.isdir(CANDLES_DIR):
+        for fname in os.listdir(CANDLES_DIR):
+            if fname.endswith('_15m.json'):
+                token = fname.replace('_15m.json', '')
+                candle_tokens.append(token)
+    candle_tokens.sort()
+
+    updated = 0
+    skipped = 0
+
+    for token in candle_tokens:
+        best = quick_update(token, top_n=10)
+        if best is None:
+            skipped += 1
+            continue
+        updated += 1
+
+    print(f'\n[quick] Done. {updated} tokens updated, {skipped} skipped (no prior configs or insufficient data)')
+    return updated
 
 # ── Report ────────────────────────────────────────────────────────────────────────
 def print_report():
@@ -961,9 +1218,15 @@ def main():
 
     elif action == 'quick':
         if len(sys.argv) < 3:
-            print('Usage: mtf_macd_tuner.py quick <TOKEN>')
-            return
-        quick_update(sys.argv[2])
+            # No token specified: run quick sweep across all tokens (for timer)
+            run_quick_sweep()
+        else:
+            # Per-token quick update
+            best = quick_update(sys.argv[2])
+            if best:
+                print(f'[quick] {sys.argv[2]}: WR={best["win_rate"]:.1f}% PF={best["profit_factor"]:.3f} '
+                      f'({best["fast"]},{best["slow"]},{best["signal"]}) '
+                      f'hold={best["hold_minutes"]}m n={best["signals"]}')
 
     elif action == 'add':
         if len(sys.argv) < 3:
@@ -976,6 +1239,26 @@ def main():
 
     elif action == 'report':
         print_report()
+
+    elif action == 'refresh':
+        """Refresh candle files for tokens from Binance (daily, called by separate timer)."""
+        import os
+        tokens_to_refresh = sys.argv[2:] if len(sys.argv) > 2 else None
+        if not tokens_to_refresh:
+            # Refresh all tokens with candle files
+            if os.path.isdir(CANDLES_DIR):
+                tokens_to_refresh = sorted(set(
+                    f.replace('_15m.json', '') for f in os.listdir(CANDLES_DIR)
+                    if f.endswith('_15m.json')
+                ))
+        print(f'[refresh] Starting — {len(tokens_to_refresh)} tokens')
+        refreshed = 0
+        for token in tokens_to_refresh:
+            ok = refresh_token_candles(token)
+            if ok:
+                refreshed += 1
+                print(f'  [refresh] {token}: refreshed')
+        print(f'[refresh] Done — {refreshed}/{len(tokens_to_refresh)} tokens refreshed')
 
     elif action == 'test':
         print('[test] SOL quick backtest (known-good: 12,55,15 any_flip 120m score=2 reg=1)')

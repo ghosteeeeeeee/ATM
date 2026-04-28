@@ -32,6 +32,8 @@ _RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            os.pardir, 'data', 'signals_hermes_runtime.db')
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 import pattern_scanner  # Chart pattern detection — runs first, all active tokens
+# import ma300_candle_confirm_signals  # EMA300 + 2-conf signal — DISABLED 2026-04-22
+# zscore_momentum — moved to zscore_pump_hunter.py (standalone, owns its own timer)
 
 
 def _has_confluence_partners(token: str, direction: str, exclude_type: str = None) -> bool:
@@ -73,11 +75,16 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
     try:
         conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
         cur = conn.cursor()
+        # Read existing phase BEFORE overwriting (for transition detection)
+        cur.execute("SELECT phase FROM momentum_cache WHERE token = ?", (token,))
+        row = cur.fetchone()
+        old_phase = row[0] if row else None
+
         cur.execute("""
             INSERT INTO momentum_cache
               (token, phase, percentile_long, percentile_short, velocity, avg_z,
-               z_direction, momentum_state, state_confidence, updated_at, rsi_14)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+               z_direction, momentum_state, state_confidence, updated_at, rsi_14, prev_phase)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(token) DO UPDATE SET
               momentum_state    = excluded.momentum_state,
               state_confidence  = excluded.state_confidence,
@@ -85,12 +92,14 @@ def _persist_momentum_state(token, momentum_state, state_confidence,
               percentile_short  = excluded.percentile_short,
               velocity          = excluded.velocity,
               avg_z            = excluded.avg_z,
+              prev_phase       = excluded.prev_phase,
               phase            = excluded.phase,
               z_direction      = excluded.z_direction,
               updated_at       = excluded.updated_at,
               rsi_14           = excluded.rsi_14
         """, (token, phase, pct_long, pct_short, velocity, avg_z,
-              z_direction, momentum_state, state_confidence, int(time.time()), rsi_14))
+              z_direction, momentum_state, state_confidence, int(time.time()), rsi_14,
+              old_phase))
         conn.commit()
         conn.close()
     except Exception as e:
@@ -171,7 +180,12 @@ RSI_INDIVIDUAL_LONG_THRESH  = 42   # RSI < this + MTF direction = LONG (was 40)
 RSI_INDIVIDUAL_SHORT_THRESH = 60   # RSI > this + MTF direction = SHORT (was 65)
 
 # Percentile rank signal threshold (eased 2026-04-12)
-PCT_RANK_THRESH = 68              # pct_long/pct_short >= this → historical extreme (lowered from 72 — was too restrictive, blocking most signals)
+# Percentile rank signal threshold (STRENGTHENED 2026-04-19)
+# pct_long/pct_short >= this → historical extreme
+# RAISED from 68→72: backtest showed pct_long=68-71 was too loose — price
+# continued falling at those levels, not reversing. True reversal zone is
+# pct_long ≥ 72. Raising to 72 reduces signal count but improves hit rate.
+PCT_RANK_THRESH = 72
 # ── Confluence Detection ───────────────────────────────────────────────────────
 
 EXIT_THRESHOLD    = 55    # opposite signal ≥ this → consider closing
@@ -191,9 +205,8 @@ W_VOLUME          = 1.5   # volume rate-of-change confirmation
 # ─── Speed Feature thresholds ───────────────────────────────────────────
 # SPEED FEATURE: filter low-momentum tokens from signal generation.
 # Rationale: don't generate signals for flat/stale tokens, focus on movers.
-SPEED_MIN_THRESHOLD = 20   # tokens with speed_percentile < 20 rarely get signals
-SPEED_BOOST_THRESHOLD = 70  # tokens with speed_percentile >= 70 get 5% easier entry
-SPEED_BOOST_FACTOR = 0.95   # multiply entry threshold by this (lower = easier)
+# Sourced from hermes_constants.py — adjust SPEED_MIN_THRESHOLD, SPEED_BOOST_* there.
+from hermes_constants import SPEED_MIN_THRESHOLD, SPEED_BOOST_THRESHOLD, SPEED_BOOST_FACTOR
 
 # ─── Timeframe windows ──────────────────────────────────────────
 TF_WINDOWS = [
@@ -252,7 +265,7 @@ def log(msg):
     try:
         with open(LOG_FILE, 'a') as f:
             f.write(line + '\n')
-    except:
+    except Exception:
         pass
 
 
@@ -368,12 +381,16 @@ def macd(prices, fast=None, slow=None, signal=None):
         # Fallback: signal ≈ EMA(slow) approximation
         signal_val = es
     else:
-        # Compute 9-period EMA of MACD values
-        macd_rev = list(reversed(macd_values))
-        k = 2 / (signal + 1)
-        signal_val = sum(macd_rev[:signal]) / signal
-        for v in macd_rev[signal:]:
-            signal_val = v * k + signal_val * (1 - k)
+        # Compute signal-period EMA of MACD values
+        # Guard: signal must be > 0 (normally guaranteed by caller, but be safe)
+        if signal <= 0:
+            signal_val = es
+        else:
+            macd_rev = list(reversed(macd_values))
+            k = 2 / (signal + 1)
+            signal_val = sum(macd_rev[:signal]) / signal
+            for v in macd_rev[signal:]:
+                signal_val = v * k + signal_val * (1 - k)
 
     hist = macd_line - signal_val
     return round(macd_line, 6), round(hist, 6)
@@ -758,8 +775,8 @@ def check_long_trend_filter(token):
             broad_z_vals.append(zs['4h'][0])
     if broad_z_vals:
         broad_avg = statistics.mean(broad_z_vals)
-        if broad_avg > BROAD_UPTEND_Z:
-            return False, f'broad_market_z={broad_avg:+.2f}>+{BROAD_UPTEND_Z}'
+        if broad_avg >= BROAD_UPTEND_Z:
+            return False, f'broad_market_z={broad_avg:+.2f}>=+{BROAD_UPTEND_Z}'
 
     # ── Token-specific multi-TF check ──────────────────────────────
     zscores = get_tf_zscores(token)
@@ -794,8 +811,8 @@ def check_short_trend_filter(token):
             broad_z_vals.append(zs['4h'][0])
     if broad_z_vals:
         broad_avg = statistics.mean(broad_z_vals)
-        if broad_avg > BROAD_UPTEND_Z:
-            return False, f'broad_market_z={broad_avg:+.2f}>+{BROAD_UPTEND_Z} (rising market, no shorts)'
+        if broad_avg >= BROAD_UPTEND_Z:
+            return False, f'broad_market_z={broad_avg:+.2f}>=+{BROAD_UPTEND_Z} (rising market, no shorts)'
 
     # ── Token-specific multi-TF check ──────────────────────────────
     zscores = get_tf_zscores(token)
@@ -833,7 +850,7 @@ def recent_trade_exists(token, minutes=MIN_TRADE_INTERVAL_MINUTES):
                 ts = entry
             if ts > cutoff:
                 return True
-    except:
+    except Exception:
         pass
     return False
 
@@ -1324,7 +1341,7 @@ def _run_rsi_signals_for_confluence():
             continue
         if rsi < CONFLUENCE_RSI_LOW:
             # ── LONG: RSI oversold (below LOW threshold = deeply oversold) + z-score suppressed ──
-            if broad_avg > BROAD_UPTEND_Z:
+            if broad_avg >= BROAD_UPTEND_Z:
                 continue  # broad market too bullish, skip LONG
             if z is None or z > LONG_1H_Z_MAX:
                 continue  # token not suppressed enough
@@ -1695,8 +1712,8 @@ def _run_mtf_macd_signals():
 
         # ── Velocity signal (rising/falling z-score) ──────────────────────
         # Fires independently when z-score momentum is strong.
-        # Positive velocity = z-score rising = price reverting UP = GOOD for SHORT
-        # Negative velocity = z-score falling = price reverting DOWN = GOOD for LONG
+        # Positive velocity = z-score rising = price above mean = bearish = SHORT
+        # Negative velocity = z-score falling = price below mean = bullish = LONG
         # FIX (2026-04-13): Raised threshold from 0.03 to 0.05 — vel-hermes was
         # conflicting with hzscore+pct-hermes mean-reversion signals. A z-score
         # that crosses 0.05/bars is meaningful momentum, not noise. The weaker
@@ -1707,8 +1724,8 @@ def _run_mtf_macd_signals():
         vel_conf = min(65, 35 + vel_abs * 500)
         print(f'  DEBUG VEL: {token} vel={velocity:.4f} abs={vel_abs:.4f} thr=0.03 conf={vel_conf:.0f} pass_vel={vel_abs>=0.03} pass_conf={vel_conf>=50}', flush=True)
         if vel_abs >= 0.03 and vel_conf >= 50:
-            vel_signal_dir = 'LONG' if velocity > 0 else 'SHORT'
-            vel_dir_char = '+' if velocity > 0 else '-'
+            vel_signal_dir = 'SHORT' if velocity > 0 else 'LONG'
+            vel_dir_char = '-' if velocity > 0 else '+'
             sid = add_signal(token, vel_signal_dir, 'velocity', f'vel-hermes{vel_dir_char}',
                         confidence=vel_conf, value=round(velocity, 4), price=price,
                         exchange='hyperliquid', timeframe='1h',
@@ -1749,7 +1766,7 @@ def _run_mtf_macd_signals():
                 z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
                 z_tf_str = f'{max(bullish_tfs, bearish_tfs)}z{len(valid_z)}'
                 avg_z = statistics.mean(valid_z)
-                hz_dir_char = '+' if local_dir == 'LONG' else '-'
+                hz_dir_char = '-' if local_dir == 'LONG' else '+'
                 sid = add_signal(token, local_dir, 'mtf_zscore', f'hzscore{hz_dir_char}',
                            confidence=z_conf, value=round(avg_z, 3),
                            price=price, exchange='hyperliquid', timeframe=z_tf_str,
@@ -1762,6 +1779,101 @@ def _run_mtf_macd_signals():
 
 
 # ── MACD signals for confluence (LEGACY — disabled 2026-04-10, use mtf_macd) ─
+# ═══════════════════════════════════════════════════════════════════════════════
+# Phase Acceleration Signal — fires when momentum ENTERS accelerating phase
+# ═══════════════════════════════════════════════════════════════════════════════
+def _run_phase_accel_signals(prices_dict):
+    """
+    Detect when a token's momentum transitions INTO the 'accelerating' phase.
+
+    Fires when:
+      - Current phase == 'accelerating'
+      - Previous phase was NOT 'accelerating' (transition)
+
+    Signals cascade flip to prepare for potential reversal in the OPPOSITE
+    direction — if we're already wrong, we want to flip early, not wait for
+    a larger loss.
+
+    Writes 'phase_accel_long' (LONG) or 'phase_accel_short' (SHORT) signal_type.
+    Direction is based on momentum_state: bullish → LONG, bearish → SHORT.
+    """
+    added = 0
+
+    for token in list(prices_dict.keys()):
+        if token.startswith('@'):
+            continue
+        if price_age_minutes(token) > 10:
+            continue
+        data = prices_dict.get(token, {})
+        price = data.get('price')
+        if not is_reasonable_price(token, price):
+            continue
+
+        mom = get_momentum_stats(token)
+        if not mom:
+            continue
+
+        phase = mom.get('phase', '')
+        momentum_state = mom.get('momentum_state', 'neutral')
+
+        # Only fire on accelerating phase
+        if phase != 'accelerating':
+            continue
+
+        # Check if this is a NEW accelerating transition
+        prev_phase = _get_previous_phase(token)
+        if prev_phase == 'accelerating':
+            continue  # already accelerating, not a new transition
+
+        # Determine direction
+        if momentum_state == 'bullish':
+            direction = 'LONG'
+            direction = 'LONG'
+            sig_type = 'phase_accel_long'
+        elif momentum_state == 'bearish':
+            direction = 'SHORT'
+            sig_type = 'phase_accel_short'
+        else:
+            continue  # neutral, skip
+
+        # Confidence based on percentile (how strongly accelerating)
+        percentile = mom.get('percentile', 50)
+        confidence = min(99.0, percentile)
+
+        add_signal(
+            token=token,
+            direction=direction,
+            signal_type=sig_type,
+            source='phase-accel+' if direction == 'LONG' else 'phase-accel-',
+            confidence=confidence,
+            value=confidence,
+            price=price,
+            exchange='hyperliquid',
+            timeframe='accel',
+            z_score=mom.get('avg_z'),
+            z_score_tier=mom.get('z_direction'),
+        )
+        log(f'SIGNAL:  {token} {direction} phase_accel @{price:.6f} {confidence:.1f}% '
+            f'[vel={mom.get("velocity") or 0.0:+.2f} pct={percentile:.0f}]')
+        added += 1
+
+    return added
+
+
+def _get_previous_phase(token):
+    """Read the previous phase from momentum_cache (phase from last pipeline run)."""
+    try:
+        conn = sqlite3.connect(_RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("SELECT prev_phase FROM momentum_cache WHERE token = ?", (token.upper(),))
+        row = cur.fetchone()
+        conn.close()
+        return row[0] if row else None
+    except Exception:
+        return None
+
+
+# ─── Fast Momentum Signal ──────────────────────────────────────────────────────
 def _run_fast_momentum_signal():
     """
     FIX (2026-04-18): Implement fast-momentum signal generation.
@@ -1946,12 +2058,14 @@ def run_confluence_detection(regime, long_mult, short_mult):
     # Get confluence groups: tokens with ≥2 PENDING signal types in last 60 min.
     confluences = get_confluence_signals(hours=1, min_signals=CONFLUENCE_MIN_SIGNALS,
                                          signal_types=None)
+    if not isinstance(confluences, list):
+        confluences = []
 
     confluences_added = 0
     for c in confluences:
         token = c['token']
         direction = c['direction']
-        num_signals = c.get('num_types') or c.get('count')
+        num_signals = c.get('num_types')  # get_confluence_signals returns 'num_types' (SQL alias), never 'count'
         avg_conf = c['avg_conf']
 
         # Don't add confluence for tokens we already have a position on
@@ -2020,7 +2134,7 @@ def run_confluence_detection(regime, long_mult, short_mult):
         if os.path.exists('/var/www/hermes/data/hotset.json'):
             try:
                 with open('/var/www/hermes/data/hotset.json') as _f:
-                    _hs_data = _json.load(_f)
+                    _hs_data = json.load(_f)
                 _in_hs = any(
                     h.get('token', '').upper() == token.upper()
                     and h.get('direction', '').upper() == direction.upper()
@@ -2095,6 +2209,39 @@ def run_confluence_detection(regime, long_mult, short_mult):
 
 
 # ═══════════════════════════════════════════════════════════════
+# MACD 1m signals — DISABLED 2026-04-22
+# from macd_1m_signals import scan_macd_1m_signals, reset_cache as _reset_macd_1m_cache
+
+# ═══════════════════════════════════════════════════════════════
+# SUPPORT & RESISTANCE — disabled 2026-04-21
+# from rs_signals import scan_rs_signals
+
+# MA CROSS 5M — per-token tuned EMA crossover on 5m (aggregated from 1m), see scripts/ma_cross_5m.py
+from ma_cross_5m import scan_ma_cross_5m_signals
+
+# GAP300 — EMA(300) vs SMA(300) gap widening on 1m, see scripts/gap300_signals.py
+from gap300_signals import scan_gap300_signals
+
+# EMA9/SMA20 — EMA(9) vs SMA(20) rate-of-change gap on 1m, see scripts/ema9_sma20_signals.py
+from ema9_sma20_signals import scan_ema9_sma20_signals
+from ema20_50_signals import scan_ema20_50_signals
+
+# R² MEAN REVERSION 5M — DISABLED 2026-04-22 (signal source blacklisted)
+# from r2_rev_5m_signals import scan_r2_rev_5m_signals as scan_r2_signals
+
+# ZSCORE MOMENTUM — price z-score momentum, see scripts/zscore_momentum.py
+from zscore_momentum import _run_zscore_momentum_signals as scan_zscore_momentum
+
+# VOLUME 1M — volume spike on local 1m HL candles, see scripts/volume_1m_signals.py
+from volume_1m_signals import scan_volume_1m_signals
+
+# COUNTER-FLIP SIGNAL — cascade-flip detection logic writing to regular signal pipeline.
+# Fires when MTF alignment, cascade direction, or MACD rules engine detects a reversal
+# against an open position. Counter to original direction, flows through compaction normally.
+from counter_flip_signal import scan_counter_flip_signals
+
+
+# ═══════════════════════════════════════════════════════════════
 # PATTERN SCANNER — runs FIRST, independent primary signals
 
 def _run_pattern_signals(prices_dict: dict) -> int:
@@ -2134,11 +2281,61 @@ def _run_pattern_signals(prices_dict: dict) -> int:
     return added
 
 
-# ═══════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
+# MA300 + 2-CONF CANDLE SIGNAL — independent primary signal
+# ═══════════════════════════════════════════════════════════════════════
+
+def _run_ma300_candle_signals(prices_dict: dict) -> int:
+    """
+    Run EMA300 + 2-candle confirmation signal on active tokens.
+
+    Signal: candle[i] closes above EMA(300), next 2 candles open+close
+    above candle[i]'s body high (LONG) or below body low (SHORT).
+
+    Filter: candle[i] close must be >= 0.5% away from EMA300.
+
+    Tokens without local 1m candle data are skipped (reads from signal_schema ohlcv_1m).
+
+    Returns: number of signals written to DB.
+    """
+    added = 0
+    skipped_no_candles = 0
+
+    for token in prices_dict:
+        data = prices_dict.get(token, {})
+        if not data.get('price') or data['price'] <= 0:
+            continue
+        try:
+            n, _ = ma300_candle_confirm_signals.scan_ma300_candle_signals({token: data})
+            added += n
+        except Exception as e:
+            # Non-fatal — other signals still run
+            pass
+
+    if added > 0:
+        print(f'  MA300+2conf signals: {added} written to DB')
+    return added
+
+
+# ═══════════════════════════════════════════════════════════════════════
 
 def run():
     init_db()
-    expire_pending_signals(minutes=60)  # FIX (2026-04-02): was 15min — signals need time to accumulate
+
+    # ── Live Trading Guard ───────────────────────────────────────────
+    # FIX (2026-04-19): signal_gen wrote signals even when live_trading=OFF.
+    # This wasted compute and polluted the signals DB with paper-only noise.
+    # The run_pipeline.py reads hype_live_trading.json at startup only, so
+    # signal_gen needs its own guard here.
+    try:
+        from hyperliquid_exchange import is_live_trading_enabled
+        if not is_live_trading_enabled():
+            print('=== Signal Gen SKIPPED — live_trading=OFF ===')
+            return 0
+    except Exception:
+        pass
+
+    expire_pending_signals()  # safety net only (60-min PENDING / 5-min APPROVED hard caps)
                                          # review_count through multiple ai-decider passes. 15min was too
                                          # tight: ai-decider runs every ~1min, needs 3-5 cycles to build
                                          # confidence, but signals were being deleted before that.
@@ -2146,10 +2343,15 @@ def run():
                                          # genuinely stale entries within a few hours.
     _ZSCORE_CACHE.clear()
     _VOL_CACHE.clear()
+    # _reset_macd_1m_cache()  # re-load per-token params from DB each run  # DISABLED 2026-04-22
+    # zscore_momentum — moved to zscore_pump_hunter.py (standalone, owns its own timer)
     prices_dict = get_all_latest_prices()
 
     # ── PATTERN SIGNALS — run FIRST, independent primary signals ──────
     pattern_added = _run_pattern_signals(prices_dict)
+
+    # ── MA300 + 2-CONF SIGNALS — DISABLED 2026-04-22 ───────────
+    # ma300_added = _run_ma300_candle_signals(prices_dict)
 
     # SPEED FEATURE: update speed tracker once per run (<2s) — must be before the loop
     if speed_tracker is not None:
@@ -2160,7 +2362,13 @@ def run():
     log(f'REGIME: {regime.upper()} L:x{long_mult:.1f} S:x{short_mult:.1f} broad_z={broad_z_avg:+.2f} | {len(prices_dict)} tokens')
 
     from position_manager import get_open_positions as _get_open_pos, get_opposite_direction_cooldown_hours
-    open_pos = _get_open_pos()
+    # FIX (2026-04-22): _get_open_pos() returns a list of dicts. All other helper functions
+    # build a dict here (e.g., {p['token']: p['direction'] for p in _get_open_pos()}).
+    # Lines 2383/2478/2559/2560 use open_pos[token] as dict subscript, so we MUST
+    # build a dict here for consistency. Previously this caused:
+    #   - open_pos[token] → TypeError (bypassed by short-circuit: token not in [list] = True)
+    #   - token in open_pos → always False (membership on list of dicts) → exit signals never fired
+    open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     added    = 0
     blocked  = 0
     exits    = []
@@ -2392,18 +2600,98 @@ def run():
 
     print(f'=== Done: {added} signals | {blocked} blocked | {len(exits)} exit alerts ===')
 
+    # ── OpenClaw Signal Import ──────────────────────────────────
+    # Import OC signals from workspace snapshot files as regular signals.
+    # They go through add_signal() like all other generators — NOT auto-approved,
+    # NOT bypassing the pipeline. They participate in confluence like any other signal.
+    oc_added = 0
+    try:
+        from oc_signal_importer import run_oc_import
+        oc_added = run_oc_import()
+        if oc_added:
+            print(f'  OC signals: {oc_added} oc-mtf-macd emitted')
+    except Exception as e:
+        print(f'  OC signal import error: {e}')
+
     # ── Confluence Detection ────────────────────────────────────
     # FIXED: must run RSI and MACD individual signal generators FIRST,
     # THEN detect confluences. Previously the RSI/MACD functions were
     # defined but never called, so confluence detection always found 0.
     confluences_added = 0
+    # macd_1m_added = 0  # DISABLED 2026-04-22
     try:
         rsi_added   = _run_rsi_signals_for_confluence()
         macd_added  = _run_macd_signals_for_confluence()
         mtf_added   = _run_mtf_macd_signals()  # native MTF-MACD + sub-signal writers
         fm_added    = _run_fast_momentum_signal()  # FIX (2026-04-18): fast-momentum signals
-        if rsi_added or macd_added or fm_added:
-            print(f'  RSI/MACD/MTF signals: {rsi_added} RSI + {macd_added} MACD + {mtf_added} MTF-MACD + {fm_added} fast-momentum')
+        # Per-token MACD SHORT + LONG on 1m candles — DISABLED 2026-04-22
+        # macd_1m_added = scan_macd_1m_signals(prices_dict)
+        # Support & Resistance — disabled 2026-04-21
+        # rs_added = scan_rs_signals(prices_dict)
+        # if rs_added:
+        #     print(f'  R&S signals: {rs_added} support_resistance emitted')
+        # MA Cross 5M — per-token tuned EMA crossover on 5m (aggregated from 1m)
+        ma5m_added = scan_ma_cross_5m_signals(prices_dict)
+        if ma5m_added:
+            print(f'  MA Cross 5M signals: {ma5m_added} ma-5m emitted')
+        # GAP300 — EMA(300) vs SMA(300) gap widening on 1m
+        gap_added = scan_gap300_signals(prices_dict)
+        if gap_added:
+            print(f'  GAP300 signals: {gap_added} gap-300 emitted')
+        # ACCEL-300 — persistent gap above EMA(300) with growing gap — catches slow breakouts
+        from accel_300_signals import scan_accel_300_signals
+        accel_added = scan_accel_300_signals(prices_dict)
+        if accel_added:
+            print(f'  ACCEL-300 signals: {accel_added} accel-300 emitted')
+        # GAP300-5M — gap widening on 5m candles (EMA300 from 1m closes) — cleaner than 1m
+        from gap300_5m_signals import scan_gap300_5m_signals
+        gap5m_added = scan_gap300_5m_signals(prices_dict)
+        if gap5m_added:
+            print(f'  GAP300-5M signals: {gap5m_added} gap300-5m emitted')
+        # Trend Purity — sustained above/below EMA30, gives confluence to other signals
+        from trend_purity_signals import scan as scan_trend_purity
+        tp_added = scan_trend_purity(conf_min=60)
+        if tp_added:
+            print(f'  TREND-PURITY signals: {tp_added} trend_purity emitted')
+        # Exhaustion — counter-trend reversal after extended move (consecutive bars + EMA cross)
+        from exhaustion_signals import scan as scan_exhaustion
+        exh_added = scan_exhaustion(conf_min=70)
+        if exh_added:
+            print(f'  EXHAUSTION signals: {exh_added} exhaustion emitted')
+        # EMA9/SMA20 — EMA(9) vs SMA(20) rate-of-change gap on 1m
+        ema920_added = scan_ema9_sma20_signals(prices_dict)
+        if ema920_added:
+            print(f'  EMA9/SMA20 signals: {ema920_added} ema9-sma20 emitted')
+        # EMA20/EMA50 — trend-filtered pullback on 1m (ema20_50_signals.py)
+        ema2050_added = scan_ema20_50_signals(prices_dict)
+        if ema2050_added:
+            print(f'  EMA20/EMA50 signals: {ema2050_added} ema20-50 emitted')
+        # R² Mean Reversion 5M — DISABLED 2026-04-22 (signal source blacklisted)
+        # r2_added = scan_r2_signals(prices_dict)
+        # if r2_added:
+        #     print(f'  R² Rev 5M signals: {r2_added} r2_rev_5m emitted')
+        # Z-score momentum — price z-score momentum, see scripts/zscore_momentum.py
+        zs_added = scan_zscore_momentum(prices_dict)
+        if zs_added:
+            print(f'  Z-score momentum signals: {zs_added} zscore_momentum emitted')
+        # Volume 1m — volume spike on local 1m HL candles
+        vol_added = scan_volume_1m_signals(prices_dict)
+        if vol_added:
+            print(f'  Volume 1m signals: {vol_added} volume_1m emitted')
+        # Z-score pump hunter — moved to zscore_pump_hunter.py (standalone, owns its own timer)
+        # Phase acceleration: detect when momentum enters ACCELERATING phase (transition)
+        # — used by cascade flip as early warning that momentum is building
+        accel_added = _run_phase_accel_signals(prices_dict)
+        if accel_added:
+            print(f'  Phase accel signals: {accel_added} phase_accel emitted')
+        # if rsi_added or macd_added or fm_added or macd_1m_added:
+        #     print(f'  RSI/MACD/MTF signals: {rsi_added} RSI + {macd_added} MACD + {mtf_added} MTF-MACD + {fm_added} fast-momentum + {macd_1m_added} macd_1m')
+        # Counter-flip signal: cascade-flip detection logic writing to regular pipeline.
+        # Only fires when CASCADE_FLIP_ENABLED=True (gated inside the function).
+        cf_added = scan_counter_flip_signals(prices_dict)
+        if cf_added:
+            print(f'  Counter-flip: {cf_added} counter_flip signals written')
+
         confluences_added = run_confluence_detection(regime, long_mult, short_mult)
     except Exception as e:
         print(f'  Confluence detection error: {e}')

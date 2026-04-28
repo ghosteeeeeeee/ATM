@@ -61,3 +61,10 @@ config.yaml
 scripts/signals_hermes_runtime.db
 pastes/
 scripts/runtime
+
+# ─── W&B ──────────────────────────────────────────────────────────────────────
+wandb/
+scripts/wandb/offline-run-*/
+scripts/wandb/debug*.log
+scripts/wandb/latest-run
+wandb-local/

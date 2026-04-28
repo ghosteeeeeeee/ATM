@@ -1,109 +1,122 @@
 ---
 name: closed-trades-eval
-description: Audit closed trades for bogus zero-PnL entries (non_hoted_removed/orphan_sync/phantom_sync), delete them, then run blocklist-decision on all remaining loss tokens. Produces a cleaned trade history and updated blacklist.
+description: Audit closed trades for bogus zero-PnL entries, delete them, then run blocklist-decision on all remaining loss tokens. Produces a cleaned trade history and updated blacklist.
 ---
 
 # Closed Trades Eval Skill
 
-## When to Use
-Run during session wrap, weekly audit, or whenever the user asks to "clean up" or "evaluate" closed trades.
-
 ## Prerequisites
-- PostgreSQL brain DB: `host=/var/run/postgresql, dbname=brain, user=postgres, password=Brain123`
 - SQLite signals DB: `/root/.hermes/data/signals_hermes_runtime.db`
+- PostgreSQL brain DB: `host=/var/run/postgresql, dbname=brain, user=postgres, password=Brain123` (for blocklist lookups only)
 - Constants file: `/root/.hermes/scripts/hermes_constants.py`
+- The canonical `signal_outcomes` table is in SQLite — NOT in PostgreSQL brain DB
+- The `signal_outcomes` table does NOT have a `close_reason` column — do not look for one
+
+## Critical Bug: BRAIN_DB typo in hl-sync-guardian.py
+
+**ALWAYS check and fix first:** Line 312 of `hl-sync-guardian.py` has a typo that breaks phantom close retry:
+
+```python
+# WRONG (BRAIN_DB is not defined):
+conn = psycopg2.connect(**BRAIN_DB)
+
+# CORRECT:
+conn = psycopg2.connect(**BRAIN_DB_DICT)
+```
+
+This typo causes phantom close backfill to fail every cycle, creating new zero-PnL rows on each retry instead of updating the original trade. Fix it before auditing.
 
 ## Process
 
-### Phase 1: Audit Bogus Trades
+### Phase 1: Audit Zero-PnL Phantom Entries
 
-**Step 1a — Identify bogus zero-PnL trades**
+**Zero-PnL entries are NOT duplicates — they are phantom close retries.**
+
+The guardian's `_close_orphan_paper_trade_by_id` is called each cycle for phantom positions. If no HL fill is found (`hl_exit_px == 0.0`), the function returns early, but other code paths can still fire and create zero-PnL rows. Each guardian retry cycle adds another row.
+
+**Step 1a — Identify zero-PnL entries:**
 ```python
-cur.execute("""
-    SELECT id, token, direction, pnl_pct, pnl_usdt, close_reason, close_time
-    FROM trades
-    WHERE (pnl_pct IS NULL OR pnl_pct = 0)
-      AND close_reason IN ('non_hoted_removed', 'orphan_sync', 'phantom_sync')
-      AND status = 'closed'
-    ORDER BY close_time
+c.execute("""
+    SELECT id, token, direction, signal_type, pnl_pct, pnl_usdt, created_at
+    FROM signal_outcomes
+    WHERE pnl_pct = 0 AND pnl_usdt = 0
+    ORDER BY created_at
 """)
-bogus = cur.fetchall()
 ```
-Print count and list. These represent tokens that were never actually filled.
+Print count and list. These are phantom entries.
 
-**Step 1b — Delete bogus trades**
+**Step 1b — Delete zero-PnL entries:**
 ```python
-ids = [r[0] for r in bogus]
-if ids:
-    cur.execute(f"DELETE FROM trades WHERE id IN ({','.join('%s' for _ in ids)})", ids)
-    conn.commit()
-    print(f"Deleted {len(ids)} bogus trades")
+c.execute("DELETE FROM signal_outcomes WHERE pnl_pct = 0 AND pnl_usdt = 0")
+conn.commit()
 ```
-Also delete corresponding rows from `signal_outcomes` (SQLite) for these bogus entries:
+
+### Phase 2: Signal Type Performance Analysis
+
+After cleanup, run:
 ```python
-# In SQLite - match by token+direction+close_reason timing
-cur.execute("""
-    DELETE FROM signal_outcomes
-    WHERE token = ? AND pnl_pct = 0 AND pnl_usdt = 0
-""", (token,))
+c.execute("""
+    SELECT signal_type,
+           COUNT(*) as n,
+           SUM(is_win) as wins,
+           ROUND(100.0*SUM(is_win)/COUNT(*), 1) as wr,
+           ROUND(SUM(pnl_usdt), 4) as net_pnl
+    FROM signal_outcomes
+    GROUP BY signal_type
+    ORDER BY net_pnl ASC
+""")
 ```
 
-### Phase 2: Cross-Reference with signal_outcomes
+**Dangerous signals to flag:**
+- `hzscore,pct-hermes`: 20% WR or below over 5+ trades → candidate for SIGNAL_SOURCE_BLACKLIST
+- Any signal with negative net PnL over 10+ trades → investigate
 
-For each remaining token with losses, query `signal_outcomes` (SQLite) alongside brain DB trades to get the complete trade history:
+### Phase 3: Blacklist Candidates
+
 ```python
-sqlite_conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-# Get directional net from signal_outcomes
-cur.execute("""
-    SELECT direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence
-    FROM signal_outcomes WHERE token=? ORDER BY created_at
-""", (token,))
+c.execute("""
+    SELECT token, direction,
+           COUNT(*) as n,
+           SUM(is_win) as wins,
+           ROUND(SUM(pnl_usdt), 4) as net
+    FROM signal_outcomes
+    GROUP BY token, direction
+    HAVING SUM(pnl_usdt) <= -0.50
+    ORDER BY net ASC
+""")
 ```
 
-### Phase 3: Calculate Directional Net PnL
+Check each candidate against hermes_constants.py SHORT_BLACKLIST and LONG_BLACKLIST before adding.
 
-Group all trade data by token+direction:
-- Wins = trades where `is_win=True` or `pnl_pct > 0`
-- Losses = trades where `is_win=False` or `pnl_pct < 0`
-- Net = sum of all `pnl_usdt` values
+### Phase 4: Root Cause Analysis
 
-### Phase 4: Apply Blocklist Rules
+Calculate directional split:
+```python
+c.execute("""
+    SELECT direction, COUNT(*) as n, SUM(is_win) as wins, SUM(pnl_usdt) as net
+    FROM signal_outcomes GROUP BY direction
+""")
+```
 
-Rules from `hermes_constants.py`:
-- **SHORT_BLACKLIST**: `net_loss_on_direction <= -$2.50` OR `3+ consecutive losses`
-- **LONG_BLACKLIST**: `net_loss_on_direction <= -$2.50` OR `3+ consecutive losses`
-
-**Exclusions — DO NOT blacklist based on these:**
-- Any trade with `confidence=0` or `confidence=None` alongside `pnl_pct` < -50% — these are phantom/sync errors
-- Any trade with close_reason in `('phantom_sync', 'orphan_sync', 'non_hoted_removed')` — these are the bogus entries already deleted
-- Any trade where entry_price == exit_price (no actual fill)
+**Common loss patterns:**
+1. **Risk/reward imbalance**: avg loss > avg win despite good WR
+2. **Directional bias**: one direction dominates and loses
+3. **hl_reconcile noise**: many small losses from guardian reconciliation
 
 ### Phase 5: Update Constants
 
+Add to SHORT_BLACKLIST or LONG_BLACKLIST with format:
 ```python
-patch(hermes_constants.py,
-      old_string="    # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)\n    'AERO', 'CHILLGUY', 'LIT', 'DOT', 'ANIME',  # LONG losing streaks",
-      new_string="    # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)\n    'AERO', 'CHILLGUY', 'LIT', 'DOT', 'ANIME',  # LONG streaks\n    # YYYY-MM-DD: SHORT blacklist additions\n    'TOKEN',  # SHORT net: $X.XX (N losses: ...)\n    # YYYY-MM-DD: LONG blacklist additions\n    'TOKEN',  # LONG net: $X.XX (N losses: ...)")
+# YYYY-MM-DD: systematic SHORT losses (net loss, phantom trades excluded)
+'TOKEN',  # SHORT net: -$X.XX (N losses: sig1 $Y.YY, sig2 $Z.ZZ)
 ```
-Verify syntax: `python3 -m py_compile /root/.hermes/scripts/hermes_constants.py`
+
+Verify: `python3 -m py_compile /root/.hermes/scripts/hermes_constants.py`
 
 ### Phase 6: Report
 
-Print a final summary table:
-```
-=== CLOSED TRADES CLEANUP ===
-Deleted: N bogus trades (zero-PnL, no fill)
+Print summary with signal type performance, directional split, root cause, and blacklist changes.
 
-=== BLACKLIST UPDATES ===
-SHORT_BLACKLIST added:  TOKEN ($X.XX, N losses)
-LONG_BLACKLIST added:   TOKEN ($X.XX, N losses)
+## Key Insight: Why "Duplicates" Appear
 
-=== FINAL BLACKLIST (as of YYYY-MM-DD) ===
-SHORT_BLACKLIST: ...
-LONG_BLACKLIST: ...
-```
-
-## Output
-- Cleaned brain DB (no bogus entries)
-- Updated hermes_constants.py with new blacklist entries
-- Complete audit report
+Zero-PnL entries are **multiple INSERT attempts for the same phantom close** across guardian retry cycles — NOT duplicates from concurrent writes. The BRAIN_DB typo makes the backfill fail, so each retry creates a new row instead of updating the original trade. IMX/LONG had 6 entries because the guardian retried 6 times before the HL fill propagated.

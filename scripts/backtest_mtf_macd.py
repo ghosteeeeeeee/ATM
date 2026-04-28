@@ -21,6 +21,7 @@ import sys, json, time, statistics, requests
 from datetime import datetime
 from typing import Optional
 
+from paths import *
 # ── Default tokens ────────────────────────────────────────────────────────────
 DEFAULT_TOKENS = ['BTC', 'ETH']
 PARAMS = {

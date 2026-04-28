@@ -1,10 +1,10 @@
 [Unit]
-Description=Hermes MTF-MACD Tuner — full sweep all tokens
+Description=Hermes MTF-MACD Tuner — quick re-test top 10 configs (every 1min)
 After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /root/.hermes/scripts/mtf_macd_tuner.py sweep
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/mtf_macd_tuner.py quick
 WorkingDirectory=/root/.hermes
 StandardOutput=journal
 StandardError=journal

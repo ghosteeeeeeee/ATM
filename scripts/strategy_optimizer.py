@@ -9,6 +9,7 @@ from collections import defaultdict
 
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 BRAIN_DB = "host=/var/run/postgresql dbname=brain user=postgres password=postgres"
 DB_PATH = '/root/.openclaw/workspace/data/signals.db'
 

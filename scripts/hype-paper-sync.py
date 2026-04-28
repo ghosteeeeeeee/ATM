@@ -14,6 +14,8 @@ Usage:
 """
 import sys, json, time, argparse
 sys.path.insert(0, '/root/.hermes/scripts')
+from paths import *  # single source of truth for paths
+import hype_cache as hc
 from hyperliquid_exchange import (
     get_open_hype_positions_curl,
     is_live_trading_enabled,
@@ -21,7 +23,7 @@ from hyperliquid_exchange import (
 )
 
 
-PAPER_JSON = "/var/www/hermes/data/trades.json"
+PAPER_JSON = TRADES_JSON
 DRY = True
 
 
@@ -38,7 +40,7 @@ def get_paper_positions():
         positions = []
         for p in data.get("open", []):
             positions.append({
-                "token": p.get("token"),
+                "coin": p.get("coin"),
                 "direction": p.get("direction"),
                 "entry": p.get("entry"),
                 "exchange": p.get("exchange", ""),
@@ -50,7 +52,16 @@ def get_paper_positions():
 
 
 def get_hype_positions():
-    """Get live HL positions. Returns {} on failure."""
+    """Get live HL positions. Tries shared hype_cache first (fast), falls back
+    to direct API call only if cache is stale (>60s)."""
+    # Try shared cache first
+    try:
+        cached = hc.get_cached_positions()
+        if cached:
+            return cached
+    except Exception:
+        pass
+    # Fallback: direct API call
     try:
         return get_open_hype_positions_curl()
     except Exception as e:
@@ -68,7 +79,7 @@ def sync_closes(hype_positions, paper_positions):
         log("Paper positions empty — unknown state, skipping orphaned closes", "WARN")
         return 0, len(hype_positions)
 
-    paper_tokens = {p["token"] for p in paper_positions if p.get("exchange", "").lower() == "hyperliquid"}
+    paper_tokens = {p["coin"] for p in paper_positions if p.get("exchange", "").lower() == "hyperliquid"}
     closed = 0
     skipped = 0
 
@@ -106,6 +117,34 @@ def sync_closes(hype_positions, paper_positions):
     return closed, skipped
 
 
+def _remove_paper_position(token: str, reason: str) -> None:
+    """Remove a paper-only position from trades.json (no HL action needed)."""
+    try:
+        with open(PAPER_JSON) as f:
+            data = json.load(f)
+        original_len = len(data.get("open", []))
+
+        # Remove from open list
+        data["open"] = [p for p in data.get("open", []) if p.get("coin") != token]
+
+        # Add to closed list with reason
+        closed_entry = {
+            "coin": token,
+            "reason": reason,
+            "closed_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        if "closed" not in data:
+            data["closed"] = []
+        data["closed"].insert(0, closed_entry)
+
+        with open(PAPER_JSON, "w") as f:
+            json.dump(data, f, indent=2)
+
+        log(f"  {token}: removed from paper (was {original_len} → {len(data['open'])} open)", "PASS")
+    except Exception as e:
+        log(f"  {token}: failed to remove from paper — {e}", "FAIL")
+
+
 def main():
     global DRY
     parser = argparse.ArgumentParser(description="Sync HL with paper trades.json")
@@ -126,7 +165,7 @@ def main():
 
     log(f"Paper HL positions: {len(paper_hl)}", "INFO")
     for p in paper_hl:
-        log(f"  {p['token']} {p['direction']} entry={p['entry']}", "INFO")
+        log(f"  {p['coin']} {p['direction']} entry={p['entry']}", "INFO")
 
     if paper_other:
         log(f"Paper non-HL positions: {len(paper_other)} (not relevant for HL sync)", "INFO")
@@ -138,7 +177,22 @@ def main():
     log("--- Checking for orphaned HL positions (paper says closed, HL still open) ---", "INFO")
     closed, confirmed = sync_closes(hype_pos, paper_pos)
 
-    orphaned = closed
+    log("--- Checking for orphaned paper positions (paper open, HL closed) ---", "INFO")
+    paper_tokens = {p["coin"] for p in paper_hl}
+    hype_tokens  = set(hype_pos.keys())
+    paper_only   = paper_tokens - hype_tokens
+    if paper_only:
+        for token in sorted(paper_only):
+            pos = next((p for p in paper_hl if p["coin"] == token), None)
+            log(f"  {token}: in paper but NOT on HL → removing phantom entry", "WARN")
+            if not DRY:
+                _remove_paper_position(token, "ORPHAN_PAPER")
+        orphaned_paper = len(paper_only)
+    else:
+        orphaned_paper = 0
+        log(f"  None — all paper entries confirmed on HL ✓", "INFO")
+
+    orphaned = closed + orphaned_paper
     log(f"Result: {confirmed} confirmed in sync | {orphaned} orphaned (need closing)", "WARN" if orphaned else "PASS")
 
     if DRY:

@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
-AI Decider - Actually thinks and decides using all available info
+⚠️  DEPRECATED — ai_decider.py is LEGACY and should no longer be used.
+──────────────────────────────────────────────────────────────────────────────
+Active decision-making has moved to signal_compactor.py.
+hotset.json is now written by signal_compactor.py (deterministic, LLM-free).
+ai_decider.py is kept only for: get_regime(), signal streak tracking, AB params.
+All other logic (hot-set decisions, trade approval, compaction) is defunct.
+──────────────────────────────────────────────────────────────────────────────
 """
 import subprocess, json, time, sys, requests, sqlite3, psycopg2, os, random, shlex, traceback, math, fcntl
 from datetime import datetime, timezone
@@ -119,7 +125,7 @@ def _record_token_usage(tokens_used: int):
 
 AB_CONFIG_FILE = '/root/.hermes/data/ab-test-config.json'
 sys.path.insert(0, '/root/.hermes/scripts')
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, MAX_OPEN_POSITIONS
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from signal_schema import mark_signal_processed, validate_source  # BUG-12 fix: must be before first use (line 1645)
@@ -141,11 +147,9 @@ SOURCE_WEIGHT_OVERRIDES = [
     ('mtf_macd',  'hmacd-',  1.5),   # hmacd- + mtf_macd = MACD crossover (boosted to 1.5)
     # hzscore: combo-only, never solo. pct-hermes is the ONLY allowed combo.
     # hzscore,pct-hermes = 1.0 (restored from 0.4, direction bug now fixed).
-    # hzscore,pct-hermes,vel-hermes = 0.85.
     # bare hzscore = 0.15 (blocked at hot-set entry anyway).
     # NOTE: longer prefixes must come BEFORE shorter ones (first-match wins).
     ('mtf_zscore', 'hzscore,pct-hermes', 1.0),        # specific first — restored from 0.4
-    ('mtf_zscore', 'hzscore,pct-hermes,vel-hermes', 0.85),  # then this
     ('mtf_zscore', 'hmacd-,hzscore', 1.25),           # hzscore without pct-hermes = boosted
     ('mtf_zscore', 'hzscore', 0.15),                   # bare hzscore last — too short to shadow
     # Pattern signals: 1.25× multiplier — independent primary signals, need to
@@ -157,6 +161,9 @@ SOURCE_WEIGHT_OVERRIDES = [
     ('pattern_micro_flag', 'pattern_scanner', 1.0),   # micro flags get 1.0× — lower weight until proven
     # RSI confluence: oversold/overbought RSI confirming momentum — suppressed to 0.5 (WR=0% across 7 trades — was 1.5)
     ('rsi-confluence', 'rsi_confluence', 0.5),
+    # momentum: combined pct-hermes + acceleration (new signal, backtest shows strong)
+    # SHORT: 77% hit rate at 16h (15m TF). Set to 1.25 — same as pattern signals.
+    ('momentum', 'momentum', 1.25),
 ]
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -182,7 +189,6 @@ SIGNAL_TYPE_CATEGORY_MAP = {
     'hmacd-,hzscore':              'hmacd-momentum',
     'hmacd-,hzscore,pct-hermes':   'hmacd-momentum',
     'hmacd-,hzscore,pct-hermes,rsi-hermes': 'hmacd-momentum',
-    'hmacd-,hzscore,pct-hermes,vel-hermes': 'hmacd-momentum',
     # Confluence sources
     'conf-1s':  'confluence',
     'conf-2s':  'confluence',
@@ -524,8 +530,8 @@ def _load_hot_rounds():
         # BUG FIX (2026-04-13): Filter bare hzscore — hzscore is combo-only, never solo.
         # It must have pct-hermes alongside. Block:
         #   - bare 'hzscore'
-        #   - compounds where hzscore is present but pct-hermes is NOT (e.g. hzscore,vel-hermes)
         # Compounds hzscore,pct-hermes,... (pct-hermes present) are VALID and pass through.
+        # vel-hermes is also noise — all vel-hermes variants are in SIGNAL_SOURCE_BLACKLIST.
         # Defense-in-depth: _run_hot_set also checks, and preservation filter also checks.
         bare_hz = [tok for tok, d in _hot_rounds.items()
                    if 'hzscore' in d.get('source', '')
@@ -981,7 +987,7 @@ from signal_schema import RUNTIME_DB as SIGNALS_DB
 SIGNAL_LOG = "/var/www/hermes/logs/signals.log"
 LOCK_FILE = "/root/.hermes/locks/ai_decider.lock"
 
-MAX_OPEN = 10
+MAX_OPEN = MAX_OPEN_POSITIONS
 
 def acquire_lock():
     """Use fcntl.flock for atomic process-level lock. Replaces stale PID-file approach."""
@@ -1261,10 +1267,10 @@ def _do_compaction_llm():
                 rounds = s.get('rounds', 0)
                 src = s.get('source', 'unknown')
                 z = s.get('z', 0)
-                wave = s.get('wave', 'unknown')
-                mom = s.get('momentum', 50)
-                spd = s.get('speed', 50)
-                overext = s.get('overextended', False)
+                wave = s.get('wave_phase', 'unknown')
+                mom = s.get('momentum_score', s.get('momentum', 50))
+                spd = s.get('speed_percentile', s.get('speed', 50))
+                overext = s.get('is_overextended', s.get('overextended', False))
                 age_h = (time.time() - s.get('timestamp', time.time())) / 3600
                 _survivor_detail_str += (
                     f"{s['token']} | {s['direction']} | conf={conf:.0f}% | "
@@ -1283,7 +1289,7 @@ def _do_compaction_llm():
             '{regime}': _market_regime,
             '{bias_note}': _bias_note,
             '{n_open}': '0',
-            '{MAX_OPEN}': '10',
+            '{MAX_OPEN}': str(MAX_OPEN_POSITIONS),
             '{n_live}': '0',
             '{MAX_LIVE}': '3',
             '{list of tokens that survived LLM compaction in previous cycle}': _survivor_detail_str,
@@ -1327,11 +1333,11 @@ OUT:
         _minimax_token = _creds[0].get('access_token', '')
         
         if not _check_token_budget(4000):
-            print("[LLM-compaction] Token budget exceeded — skipping")
-            conn.close()
-            return
-        
-        from openai import OpenAI
+            print("[LLM-compaction] Token budget exceeded — skipping LLM call, falling through to preservation")
+            parsed = []
+            raw = ""
+        else:
+            from openai import OpenAI
         _client = OpenAI(api_key=_minimax_token, base_url='https://api.minimax.io/v1', timeout=60)
         _resp = _client.chat.completions.create(
             model="MiniMax-M2",
@@ -1766,6 +1772,9 @@ OUT:
                     if _src in SIGNAL_SOURCE_BLACKLIST:
                         print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — source '{_src}' blacklisted")
                         continue
+                    if ',' in _src and any(p.strip() in SIGNAL_SOURCE_BLACKLIST for p in _src.split(',')):
+                        print(f"  🚫 [HOTSET-FILTER] {_tok}: blocked — source component in '{_src}' blacklisted")
+                        continue
                     # BUG FIX (2026-04-13): Block bare hzscore as first component.
                     # source='hzscore,pct-hermes' → first='hzscore' → block.
                     # This catches compound sources where hzscore appears alone without pct-hermes.
@@ -1811,15 +1820,23 @@ OUT:
         src_val = sig_entry[4] if sig_entry else ''  # source column (index 4)
 
         # Source blacklist filter (e.g. rsi-confluence has 0% win rate)
+        # Check direct match AND comma-separated components (e.g. 'hwave,hzscore+')
         if src_val in SIGNAL_SOURCE_BLACKLIST:
             print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src_val}' blacklisted")
             continue
+        if ',' in src_val and any(p.strip() in SIGNAL_SOURCE_BLACKLIST for p in src_val.split(',')):
+            print(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source component in '{src_val}' blacklisted")
+            continue
+        # Count raw source entries: 'hzscore+,hwave-,hzscore+' -> 3 (same logic as signal_compactor Step 15)
+        _parts = [p.strip() for p in (src_val or '').split(',') if p.strip()]
+        _entries_count = len(_parts) if _parts else 1
         hotset_final.append({
             'token': tkn,
             'direction': direction,
             'confidence': entry['confidence'],
             'reason': entry['reason'],
             'source': src_val,
+            'entries_count': _entries_count,
             'z_score': z_val,
             'compact_rounds': max(entry.get('compact_rounds', 0), 1),
             'survival_score': entry.get('survival_score', 0.0),
@@ -1870,8 +1887,8 @@ def get_pending_signals():
         conn = sqlite3.connect(SIGNALS_DB)
         c = conn.cursor()
 
-        # Run LLM-based compaction (replaces Python scoring)
-        _do_compaction_llm()
+        # DEFUNCT 2026-04-16: LLM compaction replaced by signal_compactor.py (runs every 5 min via run_pipeline.py).
+        # _do_compaction_llm()  # commented out — left as documentation of old behavior
 
         # After compaction, fetch signals for the main loop
         # (The LLM already updated decisions to APPROVED/REJECTED)
@@ -2309,7 +2326,7 @@ End with:
                 token = parts[1]
                 direction = parts[2].upper()
                 try:
-                    confidence = int(min(100, max(0, float(parts[3]))))
+                    confidence = int(min(88, max(0, float(parts[3]))))
                 except (ValueError, IndexError):
                     confidence = 0
                 reason = parts[4] if len(parts) > 4 else ''
@@ -2407,7 +2424,7 @@ def get_macd(coin):
         cur_hist = float(hist[-1])
         bullish = cur_macd > cur_signal
         avg_price = float(np.mean(prices[-50:])) if len(prices) >= 50 else float(prices[-1])
-        conf = min(100, round(abs(cur_hist) / (abs(cur_macd) + 1e-10) * 100))
+        conf = min(88, round(abs(cur_hist) / (abs(cur_macd) + 1e-10) * 100))
         return {
             "signal": "bullish" if bullish else "bearish",
             "histogram": round(cur_hist, 6),
@@ -2625,7 +2642,7 @@ REASON: [1-sentence explanation]
                     import re
                     nums = re.findall(r'\d+\.?\d*', line)
                     if nums:
-                        confidence = min(100, max(0, float(nums[0])))  # Clamp to 0-100
+                        confidence = min(88, max(0, float(nums[0])))  # Clamp to 0-88
                         confidence = int(confidence)
                 except Exception as e:
                     log_error(f'ai_decide: confidence parse error: {e}')
@@ -2642,7 +2659,7 @@ REASON: [1-sentence explanation]
                          (regime == "SHORT_BIAS" and decision == "short"):
                         # Aligned with regime — small boost
                         regime_bonus = min(10, (regime_conf - 50) // 5)
-                        confidence = min(100, confidence + regime_bonus)
+                        confidence = min(88, confidence + regime_bonus)
         
         return decision, confidence, result[:500]
     except Exception as e:

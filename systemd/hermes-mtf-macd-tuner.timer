@@ -1,10 +1,10 @@
 [Unit]
-Description=Hermes MTF-MACD Tuner — full sweep every 24h
+Description=Hermes MTF-MACD Tuner — quick re-test every 1min, full sweep every 24h
 After=network.target
 
 [Timer]
 OnBootSec=5
-OnUnitActiveSec=24h
+OnUnitActiveSec=1m
 Persistent=true
 
 [Install]

@@ -10,6 +10,7 @@ Usage:
   python3 /root/.hermes/scripts/hermes-dashboard.py
 
 Runs on http://localhost:8501 by default.
+from paths import *
 """
 import streamlit as st
 import pandas as pd
@@ -23,7 +24,7 @@ LOCAL_DIR = Path('/root/.hermes/wandb-local')
 CANDLE_DIR = LOCAL_DIR  # candle runs are individual .json files
 AB_FILE = LOCAL_DIR / 'ab-tests.jsonl'
 DECISIONS_FILE = LOCAL_DIR / 'decisions.jsonl'
-SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+SIGNALS_DB = RUNTIME_DB
 
 st.set_page_config(
     page_title='Hermes Dashboard',

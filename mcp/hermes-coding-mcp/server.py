@@ -422,13 +422,13 @@ async def execute_command(
 
 import sys
 sys.path.insert(0, '/root/.hermes/scripts')
-
+from hebbian_engine import HebbianEngine
 
 @mcp.tool()
 async def hebbian_recall(
     concept: str = Field(description="Concept to recall associated memories for"),
     k: int = Field(default=5, ge=1, le=20, description="Max number of associations to return"),
-    min_weight: float = Field(default=0.5, ge=0.0, description="Minimum synapse weight threshold"),
+    min_weight: float = None,
 ) -> str:
     """
     Hebbian associative recall — "neurons that fire together, wire together."
@@ -440,9 +440,9 @@ async def hebbian_recall(
     to associate through repeated experience, not what a vector model thinks is similar.
     """
     try:
-        from scripts.hebbian_engine import HebbianEngine
         engine = HebbianEngine()
-        results = engine.recall(concept, k=k, min_weight=min_weight)
+        _min_weight = min_weight if min_weight is not None else 0.5
+        results = engine.recall(concept, k=k, min_weight=_min_weight)
         return json.dumps({
             "isError": False,
             "concept": concept,
@@ -464,8 +464,8 @@ async def hebbian_recall(
 async def hebbian_learn(
     concept_a: str = Field(description="First concept in the pair"),
     concept_b: str = Field(description="Second concept in the pair"),
-    label_type_a: Optional[str] = Field(default=None, description="Label type for concept A"),
-    label_type_b: Optional[str] = Field(default=None, description="Label type for concept B"),
+    label_type_a: Optional[str] = None,
+    label_type_b: Optional[str] = None,
 ) -> str:
     """
     Record a Hebbian co-occurrence — two concepts fired together in the same context.
@@ -474,7 +474,6 @@ async def hebbian_learn(
     connection strength increased.
     """
     try:
-        from scripts.hebbian_engine import HebbianEngine
         engine = HebbianEngine()
         weight = engine.learn_pair(concept_a, concept_b, label_type_a, label_type_b)
         return json.dumps({
@@ -497,7 +496,6 @@ async def hebbian_stats() -> str:
     Get Hebbian memory network statistics — node count, synapse count, top edges.
     """
     try:
-        from scripts.hebbian_engine import HebbianEngine
         engine = HebbianEngine()
         stats = engine.get_stats()
         return json.dumps({

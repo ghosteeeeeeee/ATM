@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes Candle File Trimmer — trim candle JSONs to MAX_CANDLES rows
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/trim_candle_files.py
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

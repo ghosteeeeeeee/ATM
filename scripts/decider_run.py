@@ -10,18 +10,22 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
                            update_signal_decision, validate_source)
-from ai_decider import get_regime, _get_source_weight
+from paths import *
+# NOTE: ai_decider.py is legacy (LLM-based compaction). The current pipeline uses:
+#   signal_compactor.py (runs every 1 min via hermes-signal-compactor.timer) → writes hotset.json
+#   decider_run.py (runs every 1 min via hermes-pipeline.timer) → reads hotset.json, executes trades
+# get_regime from ai_decider is unused — regime is pre-computed in hotset.json by signal_compactor
 from _secrets import BRAIN_DB_DICT
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
-                              get_trade_params, is_loss_cooldown_active, set_loss_cooldown,
-                              _is_win_cooldown_active, is_wrong_side_risky)
+                              get_trade_params, set_loss_cooldown,
+                              is_wrong_side_risky)
+from signal_schema import _is_loss_cooldown_active
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
 from hyperliquid_exchange import is_live_trading_enabled, is_delisted
 import hype_cache as hc
-import atr_cache
 
 # ── OPTION 1: Signal Direction Flip ──────────────────────────────────────
 # Signal direction flip — disabled 2026-04-05 (flip test concluded)
@@ -35,213 +39,13 @@ _FLIP_SIGNALS = False
 # This replaces fixed % SL which was too tight for volatile tokens (71.5%
 # of losses had <1% adverse move — SL fired on noise).
 #
-# k multipliers:
-#   LOW_VOLATILITY:    k=1.5  (SL ≈ 1.5× ATR, slightly wider than old 1.5% flat)
+# k multipliers (confirmed against hermes_constants.py ATR_K_LOW/NORMAL/HIGH_VOL):
+#   LOW_VOLATILITY:    k=1.0  (SL ≈ 1× ATR — tight for low-vol tokens)
 #   NORMAL_VOLATILITY: k=2.0  (SL ≈ 2× ATR — gives trade room to breathe)
 #   HIGH_VOLATILITY:   k=2.5  (SL ≈ 2.5× ATR — tokens like TAO, SOL need room)
 # Minimum SL guard: never tighter than sl_pct (A/B test value), use ATR if wider.
 import time as _time
 
-_ATR_CACHE = {}   # {(token, timeframe): (atr_value, timestamp)}
-_ATR_TTL    = 300  # 5 minutes cache TTL
-
-def _get_atr(token: str, period: int = 14, interval: str = '15m') -> float | None:
-    """
-    Fetch ATR(14) for token from Hyperliquid 15m candles.
-    Note: ATR(14) with 15m candles = 14 × 15min = 3.5 hours of data — intentional
-    design for responsive volatility measurement without excessive lag.
-    Returns ATR value in dollar terms (same unit as price), or None on failure.
-
-    Cache hierarchy (fastest first):
-      1. atr_cache memory cache  — per-process, survives process restarts
-      2. atr_cache file cache   — cross-process, 300s TTL
-      3. HL API                 — only on persistent cache miss
-    """
-    cache_key = (token.upper(), interval)
-
-    # 1. Try persistent cache (file + memory) first
-    cached_atr = atr_cache.get_atr(token.upper(), interval)
-    if cached_atr is not None:
-        _ATR_CACHE[cache_key] = (cached_atr, time.time())
-        return cached_atr
-
-    # 2. Cache miss — fetch from HL API
-    try:
-        # Use _hl_info() which applies 10s rate-limit gap + capped backoff.
-        # This avoids hammering HL with multiple concurrent candleSnapshot calls.
-        # BUG-FIX: HL API expects {"type": "candleSnapshot", "req": {...}}
-        # NOT {"type": "candles_snapshot", ...} — the latter returns HTTP 422.
-        from hyperliquid_exchange import _hl_info
-        now = time.time()
-        end_t = int(now * 1000)
-        start_t = end_t - (15 * 60 * 1000 * (period + 5))  # period+5 × 15min windows
-        payload = {
-            "type": "candleSnapshot",
-            "req": {
-                "coin": token.upper(),
-                "interval": interval,
-                "startTime": start_t,
-                "endTime": end_t,
-            }
-        }
-        result = _hl_info(payload)
-        candles = result if isinstance(result, list) else []
-        if not candles or len(candles) < period + 1:
-            return None
-
-        # Compute True Range for each complete candle pair
-        trs = []
-        for i in range(1, min(period + 1, len(candles))):
-            high = float(candles[i]['h'])
-            low  = float(candles[i]['l'])
-            prev_close = float(candles[i - 1]['c'])
-            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
-            trs.append(tr)
-
-        if not trs:
-            return None
-        atr = sum(trs) / len(trs)
-
-        # 3. Save to persistent cache (file + memory) for next process restart
-        atr_cache.save_atr(token.upper(), atr, interval)
-
-        # Update in-process memory cache
-        _ATR_CACHE[cache_key] = (atr, time.time())
-        return atr
-    except Exception as e:
-        log(f'  [ATR] {token} fetch error: {e}')
-        return None
-
-def _atr_multiplier(token: str, atr_pct: float, override_k: float = None) -> float:
-    """
-    Return k multiplier for ATR-based SL.
-    Self-calibrating based on actual ATR% (volatility):
-      atr_pct < 1.0%  → LOW_VOLATILITY    → k=1.0 (tight SL for stable tokens)
-      atr_pct 1-3%    → NORMAL_VOLATILITY → k=2.0
-      atr_pct > 3%    → HIGH_VOLATILITY   → k=2.5 (wide SL for volatile tokens)
-    """
-    if override_k is not None:
-        return override_k          # A/B test overrides volatility-based k
-    if atr_pct < 0.01:
-        return 1.0   # LOW_VOLATILITY: tight SL
-    elif atr_pct > 0.03:
-        return 2.5   # HIGH_VOLATILITY: wide SL
-    else:
-        return 2.0   # NORMAL_VOLATILITY: balanced
-
-def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
-                        current_price: float,
-                        sl_pct_fallback: float = 0.015,
-                        override_k: float = None) -> float:
-    """
-    Compute dynamic SL using ATR(14).
-    ATR-based SL replaces the fixed % SL. k multiplier is self-calibrating
-    based on ATR% (volatility) — wider stops for volatile tokens.
-
-    override_k: if provided (from A/B test atr-sl-test), use it directly
-    instead of the volatility-based k table.
-
-    Minimum ATR% floor: if ATR/price < 0.75%, the token is too stable for
-    ATR-based SL (e.g. BTC at $95k has $409 ATR = 0.43% = too tight).
-    In that case, use max(ATR-based, 1.5% fixed) to ensure meaningful protection.
-
-    Maximum: cap SL distance at 5% to avoid absurdly wide stops on any token.
-
-    BUG-FIX: ATR distance is now computed from current_price (not entry_price),
-    which is the correct volatility-based stop placement.
-    """
-    MIN_ATR_PCT = 0.010   # 1.0% — below this, fall back to fixed %
-    MAX_SL_PCT  = 0.05     # 5% — never wider than this
-
-    atr = _get_atr(token)
-    if atr is None:
-        # Fall back to fixed % SL (use current_price for fair fallback)
-        if direction == 'LONG':
-            return current_price * (1 - sl_pct_fallback)
-        else:
-            return current_price * (1 + sl_pct_fallback)
-
-    # BUG-FIX: use current_price for ATR% calculation (not entry_price)
-    atr_pct = atr / current_price
-    k = _atr_multiplier(token, atr_pct, override_k=override_k)
-    atr_distance = k * atr
-
-    # Apply minimum ATR% floor — don't let low-vol tokens get razor SLs
-    effective_sl_pct = max(atr_distance / current_price, MIN_ATR_PCT)
-    # Apply maximum cap
-    effective_sl_pct = min(effective_sl_pct, MAX_SL_PCT)
-
-    # BUG-FIX: SL distance is from current_price, not entry_price
-    if direction == 'LONG':
-        sl = current_price * (1 - effective_sl_pct)
-    else:
-        sl = current_price * (1 + effective_sl_pct)
-
-    log(f'  [ATR] {token} {direction}: entry={entry_price}, cur={current_price}, ATR={atr:.6f} ({atr_pct*100:.2f}%), '
-        f'k={k}, dist={atr_distance:.6f}, effective={effective_sl_pct*100:.2f}%, SL={sl:.6f}')
-    return sl
-
-def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
-                        current_price: float,
-                         tp_pct_fallback: float = 0.05,
-                         override_k: float = None) -> float:
-    """
-    Compute dynamic TP using ATR(14) — parallel to _compute_dynamic_sl().
-    TP = current_price ± (k_tp * ATR(14)) where k_tp = 2.5 × k_SL.
-    With new k table: <1%→k=1.0, 1-3%→k=2.0, >3%→k=2.5.
-
-    k_tp multipliers (k_tp = 2.5 × k_SL):
-      LOW_VOLATILITY:    k_tp=2.5   (2.5× 1.0)
-      NORMAL_VOLATILITY: k_tp=5.0   (2.5× 2.0)
-      HIGH_VOLATILITY:   k_tp=6.25  (2.5× 2.5)
-    Minimum TP% floor: never tighter than tp_pct_fallback (default 5%).
-    Maximum TP cap: never wider than 15% to avoid absurdly wide targets.
-
-    BUG-FIX: ATR distance is now computed from current_price (not entry_price),
-    which is the correct volatility-based TP placement.
-    """
-    MIN_TP_PCT = 0.015    # 1.5% — below this, fall back to fixed %
-    MAX_TP_PCT = 0.15    # 15% — never tighter than this
-
-    atr = _get_atr(token)
-    if atr is None:
-        # Fall back to fixed % TP (use current_price for fair fallback)
-        if direction == 'LONG':
-            return current_price * (1 + tp_pct_fallback)
-        else:
-            return current_price * (1 - tp_pct_fallback)
-
-    # BUG-FIX: use current_price for ATR% calculation (not entry_price)
-    atr_pct = atr / current_price
-    atr_pct_val = atr_pct  # for clarity
-
-    # k_tp = 2.5× the SL k multiplier (k_tp = 2.5 × k_SL)
-    # With new k table: <1%→k=1.0, 1-3%→k=2.0, >3%→k=2.5
-    if override_k is not None:
-        k_tp = override_k * 2.5
-    elif atr_pct_val < 0.01:
-        k_tp = 2.5    # 2.5 × 1.0 (LOW_VOL)
-    elif atr_pct_val > 0.03:
-        k_tp = 6.25   # 2.5 × 2.5 (HIGH_VOL)
-    else:
-        k_tp = 5.0    # 2.5 × 2.0 (NORMAL_VOL)
-
-    atr_distance_tp = k_tp * atr
-
-    # Apply minimum TP% floor — don't let low-vol tokens get razor TPs
-    effective_tp_pct = max(atr_distance_tp / current_price, MIN_TP_PCT)
-    # Apply maximum cap
-    effective_tp_pct = min(effective_tp_pct, MAX_TP_PCT)
-
-    # BUG-FIX: TP distance is from current_price, not entry_price
-    if direction == 'LONG':
-        tp = current_price * (1 + effective_tp_pct)
-    else:
-        tp = current_price * (1 - effective_tp_pct)
-
-    log(f'  [ATR-TP] {token} {direction}: entry={entry_price}, cur={current_price}, ATR={atr:.6f} ({atr_pct_val*100:.2f}%), '
-        f'k_tp={k_tp}, dist={atr_distance_tp:.6f}, effective={effective_tp_pct*100:.2f}%, TP={tp:.6f}')
-    return tp
 
 # ── Checkpoint & Event-log instrumentation ───────────────────────────────
 try:
@@ -256,7 +60,7 @@ except Exception:
     log_event = lambda *a, **k: None
 
 # Speed feature: speed-weighted hot set scoring
-SPEED_WEIGHT = 0.15  # 15% of total hot-set score comes from speed percentile
+from hermes_constants import SPEED_HOTSET_WEIGHT as SPEED_WEIGHT
 try:
     from speed_tracker import SpeedTracker
     speed_tracker_dr = SpeedTracker()
@@ -264,14 +68,14 @@ except Exception as e:
     print(f"[decider-run] SpeedTracker unavailable: {e}")
     speed_tracker_dr = None
 
-# Hot-set discipline: track when ai_decider last ran compaction
-# The hot-set is THE single gate for execution — it must come from ai_decider output.
-# decider-run runs every 1 min but ai_decider only runs every 10 min.
-# We gate new approvals on ai_decider having run recently.
-_HOTSET_LAST_UPDATED_FILE = '/var/www/hermes/data/hotset_last_updated.json'
+# Hot-set discipline: track when signal_compactor last ran compaction.
+# The hot-set is THE single gate for execution — it comes from signal_compactor output.
+# signal_compactor.py runs every 1 min (hermes-signal-compactor.timer) and writes hotset.json.
+# We track the last compaction timestamp to detect if the pipeline is stalled.
+_HOTSET_LAST_UPDATED_FILE = HOTSET_META_FILE
 
 def _get_hotset_last_updated():
-    """Return Unix timestamp of last ai_decider compaction, or 0 if never."""
+    """Return Unix timestamp of last signal_compactor compaction, or 0 if never."""
     try:
         if os.path.exists(_HOTSET_LAST_UPDATED_FILE):
             with open(_HOTSET_LAST_UPDATED_FILE) as f:
@@ -282,7 +86,7 @@ def _get_hotset_last_updated():
     return 0
 
 def _set_hotset_last_updated():
-    """Called by ai_decider after each compaction run."""
+    """Called by signal_compactor after each compaction run."""
     try:
         with FileLock('hotset_last_updated'):
             with open(_HOTSET_LAST_UPDATED_FILE, 'w') as f:
@@ -292,7 +96,7 @@ def _set_hotset_last_updated():
 
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
-MAX_POS         = 10
+MAX_POS         = MAX_OPEN_POSITIONS
 POSITION_SIZE_USD = 50.0   # $50 actual capital per trade
 LOG_FILE        = '/var/www/hermes/logs/signals.log'
 DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
@@ -329,7 +133,7 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
             SELECT COUNT(*) as total,
                    SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins
             FROM trades
-            WHERE token=? AND direction = %s
+            WHERE token=%s AND direction = %s
               AND status = 'closed'
               AND close_time >= NOW() - INTERVAL '7 days'
         """, (token.upper(), direction.upper()))
@@ -362,7 +166,7 @@ def log(msg):
 def _update_decider_heartbeat():
     """Update pipeline heartbeat for decider-run."""
     import json
-    hb_file = '/var/www/hermes/data/pipeline_heartbeat.json'
+    hb_file = PIPELINE_HB_FILE
     try:
         with FileLock('pipeline_heartbeat'):
             data = {}
@@ -661,10 +465,10 @@ def process_delayed_entries(paper=False):
         log(f'🎯 DELAYED ENTRY: {token} {direction} @ ${cur_price:.6f} '
             f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
 
-        # Delayed entry uses the same ATR-based SL and TP as normal entry
-        # cur_price is both entry price (execution price) and current price
-        sl = _compute_dynamic_sl(token, direction.upper(), cur_price, cur_price, sl_pct_val)
-        tp = _compute_dynamic_tp(token, direction.upper(), cur_price, cur_price)
+        # ATR SL/TP is set by position_manager on the first cycle (within 1 min of entry).
+        # Passing sl=0, tp=0 defers to position_manager._collect_atr_updates().
+        sl = 0
+        tp = 0
         cmd_side = 'buy' if direction.upper() == 'LONG' else 'sell'
 
         experiment = entry.get('experiment', 'control')
@@ -722,6 +526,12 @@ def execute_trade(token, direction, price, confidence, source,
     # Spike/pump trades: tight SL/TP, NO trailing. Enter fast, exit fast.
     is_pump = 'pump-' in (source or '')
 
+    # Default values for non-pump trades (avoid UnboundLocalError)
+    sl = 0.0
+    tp = 0.0
+    sl_pct_val = 0.0
+    tp_pct_val = 0.0
+
     if is_pump:
         sl_pct_val = PUMP_SL_PCT    # 1.5% SL
         tp_pct_val = PUMP_TP_PCT    # 2.5% TP
@@ -730,21 +540,26 @@ def execute_trade(token, direction, price, confidence, source,
         log(f'  [PUMP MODE] {token} {direction} — SL={PUMP_SL_PCT*100:.1f}% TP={PUMP_TP_PCT*100:.1f}% NO trailing')
     else:
         sl_pct_val = float(sl_pct)  # sl_pct is already a fraction (0.01 = 1%)
-        tp_pct_val = 0.05                 # 5% TP
 
-    # ── Dynamic ATR-based SL ───────────────────────────────────────────────
-    # Uses ATR(14) × k multiplier instead of fixed %. Falls back to sl_pct
-    # if ATR is unavailable. Passes the MORE PROTECTIVE (tighter) of the two.
-    # Uses price (signal price) as current_price proxy since trade executes immediately.
-    sl = _compute_dynamic_sl(token, direction, price, price, sl_pct_val)
-
-    if direction == 'LONG':
-        tp = price * (1 + tp_pct_val)
+    # ── ATR SL/TP ─────────────────────────────────────────────
+    # ATR-based SL/TP is handled by position_manager every 1 min.
+    # Decider_run passes sl=0, tp=0 to defer to position_manager._collect_atr_updates().
+    if is_pump:
+        # Pump mode: tight fixed SL/TP, NO trailing. Enter fast, exit fast.
+        if direction == 'LONG':
+            sl = round(price * (1 - PUMP_SL_PCT), 8)
+            tp = round(price * (1 + PUMP_TP_PCT), 8)
+        else:
+            sl = round(price * (1 + PUMP_SL_PCT), 8)
+            tp = round(price * (1 - PUMP_TP_PCT), 8)
     else:
-        tp = price * (1 - tp_pct_val)
+        # A/B TEST DISABLED (2026-04-17) — ATR handles SL/TP via position_manager.
+        # position_manager._collect_atr_updates() sets dynamic ATR-based SL/TP within 1 min.
+        sl_pct_val = 0.0  # defer to ATR
+        tp_pct_val = 0.0  # defer to ATR
 
-    # Sanity check: SL must provide real protection
-    if direction == 'LONG' and sl >= price:
+    # Sanity check: SL must provide real protection (only when sl > 0)
+    if sl > 0 and direction == 'LONG' and sl >= price:
         sl = price * 0.99
         log(f'  [WARN] SL sanity check triggered for LONG {token}, reset to 1%')
     elif direction == 'SHORT' and sl <= price:
@@ -810,12 +625,7 @@ def execute_trade(token, direction, price, confidence, source,
                     tid = line.lower().split('trade #')[1].split()[0]
                     if tid == 'none':
                         return False, f'brain.py rejected: conf-1s or blacklist blocked (output: {result.stdout.strip()[:80]})'
-                    # Add traded coin to candle predictor watch list
-                    try:
-                        from candle_predictor import add_to_watch_list
-                        add_to_watch_list(token)
-                    except Exception as e:
-                        log(f"[WARN] could not add {token} to candle watch list: {e}")
+
                     return True, f'trade #{tid}'
             return True, result.stdout.strip()[:80]
         else:
@@ -829,6 +639,10 @@ def close_position(token, reason):
     Does NOT overwrite entry_price — leaves it intact.
     exit_price and PnL will be filled in by hl-sync-guardian (via HL fill data)
     or by brain.py close_trade() if called from there.
+
+    FIX (2026-04-22): Record loss cooldown in BOTH stores so the same direction
+    cannot immediately re-enter. Counter-signals/manual closes should block
+    re-entry to prevent immediate whipsaw in the opposite direction.
     """
     try:
         import psycopg2
@@ -840,13 +654,29 @@ def close_position(token, reason):
             SET status='closed', close_time=NOW(),
                 close_reason=%s
             WHERE server=%s AND token=%s AND status='open'
-            RETURNING id, entry_price
+            RETURNING id, entry_price, direction
         """, (reason, SERVER, token))
         row = cur.fetchone()
         conn.commit()
         cur.close(); conn.close()
         if row:
-            log(f'CLOSED: {token} {reason} (trade #{row[0]}), entry={row[1]}')
+            trade_id, entry_price_val, trade_dir = row
+            log(f'CLOSED: {token} {reason} (trade #{trade_id}), entry={entry_price_val}')
+            # Record cooldown for the direction that was closed so the same direction
+            # cannot immediately re-enter — but only on LOSS (FIX 2026-04-23: was
+            # writing cooldown on EVERY close regardless of outcome, flooding PG with
+            # 200+ active cooldowns and blocking all signals from entering hot-set).
+            if trade_dir and 'loss' in reason.lower():
+                try:
+                    from position_manager import set_loss_cooldown
+                    set_loss_cooldown(token, trade_dir)
+                except Exception as cd_err:
+                    log(f'loss cooldown error: {cd_err}')
+                try:
+                    from signal_schema import set_cooldown
+                    set_cooldown(token.upper(), trade_dir.upper(), hours=1)
+                except Exception as pg_err:
+                    log(f'PostgreSQL cooldown error: {pg_err}', 'WARN')
             return True
         return False
     except Exception as e:
@@ -856,10 +686,10 @@ def close_position(token, reason):
 
 # ─── Hot-Set Auto-Approver (runs every minute in decider-run) ─────
 # Per-token failure tracking for back-to-back cooldown
-_HOTSET_FAILURE_FILE = '/var/www/hermes/data/hotset-failures.json'
+_HOTSET_FAILURE_FILE = HOTSET_FAILURES_FILE
 
 # Rate limit: max 3 new hot-set approvals per minute (NEW RULE)
-_HOTSET_APPROVAL_RATE_FILE = '/var/www/hermes/data/hotset-approval-rate.json'
+_HOTSET_APPROVAL_RATE_FILE = HOTSET_APPROVAL_FILE
 
 def _get_hotset_approval_rate() -> tuple:
     """Return (count, window_start_ts). Resets if window expired (>60s)."""
@@ -944,28 +774,22 @@ def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
 
 def _run_hot_set():
     """
-    HOT-SET DISCIPLINE (SPEED FEATURE) — SOLE SOURCE OF TRUTH:
-    The hot-set is THE single gate for execution. This function reads the
-    canonical hot-set from /var/www/hermes/data/hotset.json (written by ai_decider
-    after each compaction). Only signals in this JSON can be approved.
-
-    If hotset.json doesn't exist or is stale (>11 min old), we block new approvals
-    and only manage existing positions. This enforces the discipline that every
-    approved signal must have survived ai_decider's compaction.
-
-    Approves: conf-3s+ >= 65%, hmacd- (weight-based threshold), conf-2s >= 65%.
-    Hot-set thresholds use centralized _get_source_weight() from ai-decider:
-      mtf_macd + hmacd- = 1.2x → threshold 65/1.2 = 54% (boosted)
-      pct-hermes + hmacd- = 0.6x → threshold 65/0.6 = 108% → effectively never
-
-    Wave quality filter (SPEED FEATURE):
-    - Counter-trend trap: PENALIZE stale tokens where regime disagrees with z-score direction
-    - Speed boost: tokens with speed_percentile >= 80 get 20% easier entry threshold
-    - Back-to-back failure cooldown: 2+ same-direction failures → block for 1hr
+    READ-ONLY hot-set enforcer (defunct approval logic — signal_compactor.py is the sole
+    APPROVAL authority as of 2026-04-16).
+    
+    This function runs every 1 min via decider_run.main() but is now READ-ONLY.
+    It enforces hot-set eligibility (blacklist, cooldown, position, overextended checks)
+    against tokens in hotset.json, but NEVER writes APPROVED to the DB.
+    
+    decider_run.main() picks the best APPROVED signals for execution using
+    the survival_rounds + confidence ranking from signal_compactor's output.
+    
+    If hotset.json is stale (>20 min old), all tokens are blocked — decider_run
+    will not execute any trades until the next compaction cycle.
     """
     import sqlite3, os, time as _time, json as _json
 
-    SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+    SIGNALS_DB = RUNTIME_DB
     if not os.path.exists(SIGNALS_DB):
         return 0
 
@@ -975,17 +799,18 @@ def _run_hot_set():
     approved_count = 0
 
     # ── HOT-SET DISCIPLINE: Read canonical hot-set from JSON ─────────────────
-    # hotset.json is written by ai_decider after each compaction.
+    # hotset.json is written by signal_compactor.py after each compaction (every 1 min).
     # It is the SOLE source of truth for what tokens are in the hot-set.
-    hotset_file = '/var/www/hermes/data/hotset.json'
+    hotset_file = HOTSET_FILE
     if not os.path.exists(hotset_file):
-        log('  🧊 [HOT-SET] hotset.json missing — ai_decider has not run yet')
+        log('  🧊 [HOT-SET] hotset.json missing — signal_compactor may not have run yet')
         conn.close()
         return 0
 
     try:
-        with open(hotset_file) as f:
-            hotset_data = _json.load(f)
+        with FileLock('hotset_json'):
+            with open(hotset_file) as f:
+                hotset_data = _json.load(f)
     except Exception as e:
         log(f'  🧊 [HOT-SET] failed to read hotset.json: {e}')
         conn.close()
@@ -999,8 +824,11 @@ def _run_hot_set():
 
     hotset_ts = hotset_data.get('timestamp', 0)
     age = _time.time() - hotset_ts
-    if age > 660:  # 11 minutes
-        log(f'  🧊 [HOT-SET] hotset.json stale ({age:.0f}s) — blocking new approvals')
+    # signal_compactor runs every 1 min, so hotset should be <1 min old normally.
+    # 20 min threshold accounts for pipeline delays if signal_compactor is slow
+    # or temporarily paused. If hotset is older than 20 min, something is wrong.
+    if age > 1200:
+        log(f'  🧊 [HOT-SET] hotset.json stale ({age/60:.1f}m > 20m) — blocking new approvals')
         conn.close()
         return 0
 
@@ -1022,11 +850,20 @@ def _run_hot_set():
         if speed_tracker_dr is not None:
             speed_tracker_dr.update()
 
+        # ── HOT-SET ITERATION ORDER: survival rounds first ────────────────────────
+        # Tokens that survived more compaction cycles have proven themselves against
+        # market volatility. Approve them FIRST so rate limits don't block veterans.
+        # Secondary sort: confidence desc (proven quality)
+        hotset_sorted = sorted(hotset,
+            key=lambda s: (-s.get('survival_round', 0), -s.get('confidence', 0)))
+        _order = [f"{s['token']}(r{s.get('survival_round', 0)})" for s in hotset_sorted[:10]]
+        log(f'  🔥 [HOT-SET] iteration order: {_order}...')
+
         # Iterate over canonical hot-set from JSON (SOLE source of truth)
-        for hot_sig in hotset:
+        for hot_sig in hotset_sorted:
             token = hot_sig.get('token', '').upper()
             direction = hot_sig.get('direction', '').upper()
-            rounds = hot_sig.get('review_count', 0)
+            rounds = hot_sig.get('survival_round', 0)  # use survival_round for iteration priority
             z_score = hot_sig.get('z_score', 0.0) or 0.0
 
             if not token or not direction:
@@ -1040,8 +877,8 @@ def _run_hot_set():
                 log(f'  🚫 [HOT-SET] {token} LONG BLOCKED — in LONG_BLACKLIST')
                 continue
 
-            # FIX (2026-04-05): Defense-in-depth. is_solana_only tokens can't be traded
-            # on Hyperliquid. ai_decider.py also checks this, but decider-run is the final gate.
+            # Defense-in-depth. is_solana_only tokens can't be traded
+            # on Hyperliquid. decider-run is the final gate.
             if is_solana_only(token):
                 log(f'  🚫 [HOT-SET] {token} BLOCKED — Solana-only (not on Hyperliquid)')
                 continue
@@ -1095,6 +932,7 @@ def _run_hot_set():
             _overext = hot_sig.get('is_overextended', False)
             _momentum = hot_sig.get('momentum_score', 50.0)
             _vel = hot_sig.get('price_velocity_5m', 0.0)
+            _speed_pctl = hot_sig.get('speed_percentile', 50.0)
             if _wave == 'neutral' and speed_tracker_dr is not None:
                 spd = speed_tracker_dr.get_token_speed(token)
                 if spd:
@@ -1102,6 +940,12 @@ def _run_hot_set():
                     _overext = spd.get('is_overextended', False)
                     _momentum = spd.get('momentum_score', 50.0)
                     _vel = spd.get('price_velocity_5m', 0.0)
+                    _speed_pctl = spd.get('speed_percentile', 50.0)
+
+            # Regime from hotset.json (enriched by signal_compactor at compaction time).
+            # This avoids expensive get_regime() calls per token per cycle.
+            _regime = hot_sig.get('regime', 'NEUTRAL')
+            _regime_conf = hot_sig.get('regime_conf', 0)
 
             # BLOCK overextended tokens: velocity has moved too far from the 15m
             # baseline. Example: vel_5m > +3% means price ripped up too fast — reversal
@@ -1147,14 +991,24 @@ def _run_hot_set():
                 wave_mult = NEUTRAL_BOOST
                 wave_tag = f'~ neutral@{_momentum:.0f}'
 
-            effective_conf = float(sig_conf) * wave_mult
+            # SPEED FEATURE: add speed_percentile contribution to effective confidence.
+            # Formula: speed_factor = (speed_pctl - 50) / 100 → pctl 100 = +0.50, pctl 0 = -0.50
+            # Speed pts = speed_factor × SPEED_WEIGHT × sig_conf
+            # pctl 100: +0.50 × 0.15 × 80 = +6.0 pts boost
+            # pctl 0:   -0.50 × 0.15 × 80 = -6.0 pts penalty
+            # pctl 50:   0.0 × 0.15 × 80 = 0 pts (neutral)
+            speed_factor = (_speed_pctl - 50.0) / 100.0
+            speed_pts = speed_factor * SPEED_WEIGHT * float(sig_conf)
+            speed_tag = f' spd@{_speed_pctl:.0f}({speed_pts:+.1f})'
+
+            effective_conf = float(sig_conf) * wave_mult + speed_pts
             confidence = effective_conf  # BUG FIX (2026-04-10): was never initialized; penalties now apply to this
-            reason_suffix = f'+{wave_tag}'
+            reason_suffix = f'+{wave_tag}{speed_tag}'
 
             # ── COUNTER-TREND TRAP FILTER ────────────────────────────────────
             # If the token's own z-score contradicts the direction AND we're in
             # the corresponding regime → PENALIZE (not block). Strong signals survive.
-            trap_penalty, trap_reason = _check_counter_trend_trap(token, direction)
+            trap_penalty, trap_reason = _check_counter_trend_trap(token, direction, _regime, _regime_conf)
             if trap_penalty > 0:
                 confidence -= trap_penalty
                 if confidence < 55:
@@ -1164,56 +1018,74 @@ def _run_hot_set():
                     continue
                 log(f'  🧊 [HOT-SET] {token} {direction} penalized {trap_penalty}pts: {trap_reason} (conf now {confidence:.0f}%)')
 
-            # Regime check for ALL signal types. Counter-regime → PENALIZE (not block).
-            # Strong signals with high enough confidence get through after penalty.
-            # Regime-aligned signals get through untouched.
-            try:
-                regime, regime_conf = get_regime(token)
-                if regime != 'NEUTRAL' and regime_conf > 50:
-                    if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
-                       (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                        # PENALTY not block: scale penalty with regime confidence (max 30 pts)
-                        penalty = min(int(regime_conf * 0.4), 30)
-                        confidence -= penalty
-                        if confidence < 55:
-                            log(f'  🧊 [HOT-SET] {token} {direction} penalized {penalty}pts below threshold: regime={regime} ({regime_conf:.0f}%) fights direction')
-                            _record_hotset_failure(token, direction, failures)
-                            continue
-                        log(f'  🧊 [HOT-SET] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
-            except Exception as e:
-                log(f'  ⚠️ [HOT-SET] {token} regime check error: {e}')
+            # ── REGIME ESCALATION / DE-ESCALATION PROTOCOL ──────────────────────────
+            #
+            # Counter-regime signals are NEVER hard-blocked. They earn their place
+            # through survival. The gradient does all the work:
+            #
+            #   • Regime penalty = regime_conf × 0.4, capped at 30 pts
+            #   • Escalation: +survival_rounds × 2 pts of penalty forgiveness
+            #     (each compaction round survived = proven against regime headwinds)
+            #   • Effective_conf = base_conf - penalty + escalation_bonus
+            #
+            # GRADUAL FADE: As regime_conf rises, penalty grows proportionally.
+            # Counter-regime signals naturally sink in the execution order.
+            # GRACEFUL ENTRY: New counter-regime signals enter with their base conf
+            # minus penalty. If regime is weak (conf < 60), penalty is small (≤24pts).
+            # Regime check: counter-trend signals are allowed but de-escalated.
+            # Both directions can coexist when the regime is unclear.
+            #
+            # Regime from hotset.json (enriched by signal_compactor at compaction time).
+            # Per-coin regime was looked up once at compaction time — no per-token
+            # get_regime() calls needed here.
+            _regime = hot_sig.get('regime', 'NEUTRAL')
+            _regime_conf = hot_sig.get('regime_conf', 0)
+            _survival_rounds = hot_sig.get('survival_round', hot_sig.get('rounds', 1))
+            if _regime not in ('NEUTRAL', '') and _regime_conf > 50:
+                if (_regime in ('LONG_BIAS', 'LONG') and direction == 'SHORT') or \
+                   (_regime in ('SHORT_BIAS', 'SHORT') and direction == 'LONG'):
+                    # Base penalty: scales with regime strength, max 30 pts
+                    penalty = min(int(_regime_conf * 0.4), 30)
+                    # Escalation bonus: each survival round partially forgives penalty
+                    # A signal that's survived 3 rounds against a 95% regime has proven
+                    # it can hold — reward that with +6 pts back
+                    escalation = min(_survival_rounds * 2, 10)
+                    effective_penalty = max(penalty - escalation, 0)
+                    confidence -= effective_penalty
+                    if effective_penalty > 0:
+                        log(f'  🧊 [REGIME] {token} {direction}: {penalty}pt penalty → -{escalation}pt survival bonus = {effective_penalty}net (conf {hot_sig["confidence"]:.0f}%→{confidence:.0f}%, regime={_regime} {_regime_conf:.0f}%, rounds={_survival_rounds})')
 
-                # ── TOKEN-LEVEL REGIME CHECK (z_score_tier) ──────────────────
-                # z_direction = 'rising' = local bottom → LONG ideal, SHORT penalized
-                # z_direction = 'falling' = local top → SHORT ideal, LONG penalized
-                # Neutral zone → let market regime decide (no penalty here)
-                _z_tier = (hot_sig.get('z_score_tier') or '').lower()
-                _z = hot_sig.get('z_score', 0.0)
-                if _z_tier and _z is not None:
-                    if _z_tier == 'rising' and direction == 'LONG':
-                        pass  # ideal — no penalty
-                    elif _z_tier == 'falling' and direction == 'SHORT':
-                        pass  # ideal — no penalty
-                    elif _z_tier == 'neutral':
-                        pass  # neutral zone — let market regime handle it
-                    elif _z_tier == 'rising' and direction == 'SHORT':
-                        # Price at local bottom but SHORT direction — PENALIZE unless momentum is low
-                        if _momentum not in ('bottoming', 'neutral'):
-                            confidence -= 20
-                            if confidence < 55:
-                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={_momentum})')
-                                _record_hotset_failure(token, direction, failures)
-                                continue
-                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+SHORT+momentum={_momentum} (conf now {confidence:.0f}%)')
-                    elif _z_tier == 'falling' and direction == 'LONG':
-                        # Price at local top but LONG direction — PENALIZE unless bottoming
-                        if _momentum != 'bottoming':
-                            confidence -= 20
-                            if confidence < 55:
-                                log(f'  📍 [HOT-SET] {token} {direction} BLOCKED: token regime tier={_z_tier}(z={_z:+.2f}) fights direction (momentum={_momentum})')
-                                _record_hotset_failure(token, direction, failures)
-                                continue
-                            log(f'  📍 [HOT-SET] {token} {direction} penalized 20pts: tier={_z_tier}+LONG+momentum={_momentum} (conf now {confidence:.0f}%)')
+            # ── TOKEN-LEVEL REGIME CHECK (z_score_tier) ──────────────────
+            # z_direction = 'rising' = local bottom → LONG ideal, SHORT penalized
+            # z_direction = 'falling' = local top → SHORT ideal, LONG penalized
+            # Neutral zone → let market regime decide (no penalty here)
+            _z_tier = (hot_sig.get('z_score_tier') or '').lower()
+            _z = hot_sig.get('z_score', 0.0)
+            if _z_tier and _z is not None:
+                if _z_tier == 'rising' and direction == 'LONG':
+                    pass  # ideal — no penalty
+                elif _z_tier == 'falling' and direction == 'SHORT':
+                    pass  # ideal — no penalty
+                elif _z_tier == 'neutral':
+                    pass  # neutral zone — let market regime handle it
+                elif _z_tier == 'rising' and direction == 'SHORT':
+                    # Price at local bottom but SHORT direction — PENALIZE
+                    # Graceful de-escalation: penalty is applied, signal fades naturally
+                    if _momentum not in ('bottoming', 'neutral'):
+                        extra_penalty = 20
+                        escalation = min(_survival_rounds * 2, 10)
+                        effective_extra = max(extra_penalty - escalation, 0)
+                        confidence -= effective_extra
+                        log(f'  📍 [Z-SCORE] {token} {direction}: {extra_penalty}pt z-penalty → -{escalation}pt survival bonus = {effective_extra}net (conf now {confidence:.0f}%, tier={_z_tier}, momentum={_momentum})')
+                elif _z_tier == 'falling' and direction == 'LONG':
+                    # Price at local top but LONG direction — PENALIZE
+                    # Graceful de-escalation: penalty is applied, signal fades naturally
+                    if _momentum != 'bottoming':
+                        extra_penalty = 20
+                        escalation = min(_survival_rounds * 2, 10)
+                        effective_extra = max(extra_penalty - escalation, 0)
+                        confidence -= effective_extra
+                        log(f'  📍 [Z-SCORE] {token} {direction}: {extra_penalty}pt z-penalty → -{escalation}pt survival bonus = {effective_extra}net (conf now {confidence:.0f}%, tier={_z_tier}, momentum={_momentum})')
 
             # ── SINGLE-SOURCE hzscore FILTER ────────────────────────────────────
             # hzscore is combo-only, never solo. Must have pct-hermes (or vel-hermes)
@@ -1223,84 +1095,19 @@ def _run_hot_set():
                 _record_hotset_failure(token, direction, failures)
                 continue
 
-            # Signal-type specific approval logic
-            if sig_type == 'confluence':
-                try:
-                    num_src = int((sig_src or 'conf-1s').split('-')[1].rstrip('s'))
-                except (ValueError, IndexError):
-                    num_src = 1
-                # FIX (2026-04-05): conf-1s = single-source = too weak, hard ban
-                if num_src < 2:
-                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: conf-1s (single-source, min 2 required)')
-                    _record_hotset_failure(token, direction, failures)
-                    continue
-                # FIX (2026-04-05): speed=0% = stale token, hard ban
-                spd = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
-                sp = spd.get('speed_percentile', 50.0) if spd else 50.0
-                if sp == 0:
-                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
-                    _record_hotset_failure(token, direction, failures)
-                    continue
-                # Use penalized confidence for threshold comparison (BUG FIX 2026-04-10)
-                base_threshold = 65
-                if num_src >= 3:
-                    should_approve = confidence >= base_threshold
-                    reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
-                else:
-                    should_approve = confidence >= base_threshold
-                    reason = f'hot-conf-{num_src}s @{sig_conf:.0f}%{reason_suffix}'
-            elif sig_src and sig_src.startswith('hmacd-'):
-                # FIX (2026-04-05): speed=0% = stale token, hard ban
-                spd2 = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
-                sp2 = spd2.get('speed_percentile', 50.0) if spd2 else 50.0
-                if sp2 == 0:
-                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
-                    _record_hotset_failure(token, direction, failures)
-                    continue
-                # Apply centralized source weight from ai-decider
-                sw = _get_source_weight(sig_type, sig_src)
-                threshold = min(99, 65.0 / sw)
-                should_approve = confidence >= threshold  # BUG FIX: was effective_conf (penalties now apply)
-                reason = f'hot-hmacd @{sig_conf:.0f}%[{sw:.1f}x]{reason_suffix}'
-            else:
-                # Any other signal type (mtf_macd, mtf_zscore, percentile_rank, etc.)
-                # must also pass speed=0% ban; use base 65% threshold on penalized confidence
-                spd3 = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
-                sp3 = spd3.get('speed_percentile', 50.0) if spd3 else 50.0
-                if sp3 == 0:
-                    log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: speed=0% (stale token)')
-                    _record_hotset_failure(token, direction, failures)
-                    continue
-                should_approve = confidence >= 65  # BUG FIX: was missing entirely (inherited prev branch value)
-                reason = f'hot-other @{sig_conf:.0f}%{reason_suffix}'
-
-            if should_approve:
-                # Rate limit check: only 3 new approvals per minute
-                rate_count, rate_window = _get_hotset_approval_rate()
-                if rate_count >= 3:
-                    log(f'  🚫 [HOT-SET] Rate limit reached ({rate_count}/3) — {token} {direction} queued for next window')
-                    break  # stop approving more; next cycle will pick up
-                c.execute("""
-                    UPDATE signals SET decision='APPROVED', updated_at=?
-                    WHERE id=? AND executed=0
-                """, (now_str, sig_id))
-                conn.commit()
-                approved_count += 1
-                _increment_hotset_approval_rate(rate_count + 1, rate_window)
-                log(f'  🔥 [HOT-SET] {token} {direction} {reason} (survived r{rounds}) [{rate_count+1}/3]')
-                # ── Hotset checkpoint & event ─────────────────────────────
-                try:
-                    checkpoint_write('hotset_built', {'approved_count': approved_count + 1, 'hotset_size': len(hotset)})
-                    log_event(EVENT_HOTSET_UPDATED, {'approved_count': approved_count + 1, 'hotset_size': len(hotset)})
-                except Exception as e:
-                    pass  # never crash pipeline
+            # APPROVAL IS NOW THE SOLE RESPONSIBILITY OF signal_compactor.py (every 5 min).
+            # _run_hot_set() is READ-ONLY here — it enforces hot-set eligibility
+            # (blacklist, cooldown, position checks) but never writes APPROVED.
+            # decider_run.main() picks the best APPROVED signals for execution
+            # based on survival rounds + confidence, using the ranking step below.
     except Exception as e:
         import traceback; traceback.print_exc()
         log(f'HOT-SET error: {e}')
     finally:
         conn.close()
 
-    return approved_count
+    # READ-ONLY: never writes APPROVED — signal_compactor.py is sole approval authority.
+    return 0
 
 def _record_hotset_failure(token: str, direction: str, failures: dict):
     """Record a failed trade for back-to-back cooldown tracking."""
@@ -1333,13 +1140,18 @@ def _get_token_zscore(token: str) -> float:
     return 0.0
 
 
-def _check_counter_trend_trap(token: str, direction: str) -> tuple:
+def _check_counter_trend_trap(token: str, direction: str, regime: str = 'NEUTRAL', regime_conf: float = 0) -> tuple:
     """
     SPEED FEATURE: Counter-trend trap detection.
     PENALTY not block: strong signals survive despite counter-trend setup.
 
     Returns (penalty: int, reason: str) — penalty=0 means no counter-trend penalty.
     Only penalized if: is_stale=True AND z_score direction contradicts regime.
+
+    Args:
+        token, direction: trade parameters
+        regime: pre-computed per-coin regime from hotset.json (avoids get_regime() call)
+        regime_conf: pre-computed regime confidence from hotset.json
     """
     if speed_tracker_dr is None:
         return 0, ''
@@ -1349,7 +1161,6 @@ def _check_counter_trend_trap(token: str, direction: str) -> tuple:
         return 0, ''
 
     z_score = _get_token_zscore(token)
-    regime, regime_conf = get_regime(token)
 
     if regime_conf < 60:
         return 0, ''
@@ -1492,8 +1303,8 @@ def run(dry_run=False):
 
     # ── HOT-SET DISCIPLINE: NO BYPASS ─────────────────────────────────────
     # Every entry comes from the hot-set. The >=95% confluence fallback has been
-    # removed — signals that haven't survived ai_decider compaction do NOT execute.
-    # If approved is empty, we wait for the next ai_decider run to populate the hot-set.
+    # removed — signals that haven't survived signal_compactor compaction do NOT execute.
+    # If approved is empty, we wait for the next signal_compactor run to populate the hot-set.
     # This is the "no shortcuts" rule from surfing.md.
 
     # ── Confidence floor: reject signals below 50% ──────────────────────────
@@ -1501,32 +1312,77 @@ def run(dry_run=False):
     # but 100% blocked at execution gate, causing empty hotset and pipeline stall.
     # 50% is still a meaningful quality floor for pre-qualified hot-set tokens.
     MIN_EXEC_CONFIDENCE = 50
+    # Surfing gate: require signal to survive N hot-set cycles before executing.
+    # Cycle 1: signal appears in hot-set for the FIRST time as APPROVED → survival_rounds=1
+    # Cycle 2+: signal reappears as APPROVED → survival_rounds=2 → NOW eligible
+    # Setting to 1 = signal must have survived at least 1 hot-set cycle (the "prove it" gate).
+    # The original value of 2 was unachievable on first-pass signals.
+    MIN_SURVIVAL_ROUNDS = 1
     approved = [s for s in approved if s.get('final_confidence', 0) >= MIN_EXEC_CONFIDENCE]
     if not approved:
         log(f'No signals above {MIN_EXEC_CONFIDENCE}% confidence — skipping execution')
         return 0, 0
 
     # ── Multi-factor execution ranking ─────────────────────────────────────────
-    # Sort approved signals by execution score: higher = better trade candidate.
-    # Score = confidence × speed_mult × z_mult
-    #   speed_mult: 1.0 + (speed_pctl/100 × 0.15)  → fast movers get priority
-    #   z_mult:     1.0 + (|z_score|/10 × 0.10)     → further from mean = stronger signal
-    # This ensures we execute the BEST signal first when slots are limited.
+    # PRIMARY: survival rounds — signals that survived more hot-set compaction cycles
+    # have proven themselves against market volatility. Execute veterans first.
+    # Secondary: final_confidence (includes hot_bonus = min(20, hot_rounds * 5)
+    # Speed and z are NOT used here — they would incorrectly prioritize fresh high-speed
+    # signals over proven survivors.
     def _exec_score(sig):
         conf = sig.get('final_confidence', 0)
-        tok = sig.get('token', '').upper()
-        z = sig.get('z_score') or 0.0
-        spd = speed_tracker_dr.get_token_speed(tok) if speed_tracker_dr else None
-        sp = spd.get('speed_percentile', 50.0) if spd else 50.0
-        speed_mult = 1.0 + (sp / 100.0 * 0.15)
-        z_mult = 1.0 + (abs(z) / 10.0 * 0.10)
-        return conf * speed_mult * z_mult
+        rounds = sig.get('hot_rounds', 0)  # survival rounds from DB (0 if never hot-set)
+        # PRIMARY: survival rounds — most battle-tested signals execute first.
+        # Secondary: confidence — higher quality within same round-tier.
+        return (rounds, conf)  # rounds-first, confidence tiebreak
 
     scored = sorted(approved, key=_exec_score, reverse=True)
+
+    # Pre-build regime lookup from hotset.json for execution block.
+    # signal_compactor writes regime+regime_conf to hotset.json at compaction time.
+    _hotset_regime = {}
+    try:
+        import json as _json
+        _hf_path = HOTSET_FILE
+        with open(_hf_path) as _hf:
+            for _s in _json.load(_hf).get('hotset', []):
+                _hotset_regime[_s['token'].upper()] = (_s.get('regime', 'NEUTRAL'), _s.get('regime_conf', 0))
+    except Exception:
+        pass
+
+    # Load current hot-set for execution gate check
+    # NOTE: hot-set is reloaded on EACH iteration inside the loop, not once
+    # at the top. This prevents a race where signal_compactor runs mid-loop
+    # and writes a new hot-set that could allow previously-blocked tokens through.
+    _current_hotset = []
+    _hot_tokens = set()
+    _hotset_regime = {}
+    try:
+        with open(HOTSET_FILE) as _hf:
+            _hs_data = _json.load(_hf)
+            _current_hotset = _hs_data.get('hotset', [])
+            _hot_tokens = {_t['token'].upper() for _t in _current_hotset}
+            for _s in _current_hotset:
+                _hotset_regime[_s['token'].upper()] = (_s.get('regime', 'NEUTRAL'), _s.get('regime_conf', 0))
+    except Exception:
+        pass
+
     entered = 0
     skipped = 0
 
     for i, sig in enumerate(scored):
+        # Re-load hot-set on each iteration — prevents race with signal_compactor
+        # running mid-loop and updating hotset.json between signals
+        try:
+            with open(HOTSET_FILE) as _hf:
+                _hs_data = _json.load(_hf)
+                _current_hotset = _hs_data.get('hotset', [])
+                _hot_tokens = {_t['token'].upper() for _t in _current_hotset}
+                for _s in _current_hotset:
+                    _hotset_regime[_s['token'].upper()] = (_s.get('regime', 'NEUTRAL'), _s.get('regime_conf', 0))
+        except Exception:
+            pass
+
         # BUG-26: extract signal_id for atomic claim BEFORE any trade execution.
         # This prevents double-execution when multiple scripts run same minute.
         sig_id = sig.get('signal_id')
@@ -1548,29 +1404,56 @@ def run(dry_run=False):
             ratio = price / cached
             if ratio > 5:
                 log(f'SKIP: {token} SUSPICIOUS PRICE {price} vs cached {cached} (ratio {ratio:.2f}x) — skipping')
-                mark_signal_executed(token, direction)
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
+
         if price > 1_000_000 or price < 0.00001:
-            log(f'SKIP: {token} price {price} out of absolute bounds [$0.00001-$1_000_000]')
-            mark_signal_executed(token, direction)
+            log(f'SKIP: {token} price {price} out of absolute bounds [$0.00001-$1 000 000]')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
 
         # Check if already open
         if is_position_open(token):
             log(f'SKIP: {token} already open')
-            mark_signal_executed(token, direction)
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
+
+        # ── Surfing gate: skip if signal hasn't survived enough hot-set cycles ──
+        # hot_rounds comes from get_approved_signals() (signal_schema.py line 1012)
+        sig_survival_rounds = sig.get('hot_rounds', 0)
+        if sig_survival_rounds < MIN_SURVIVAL_ROUNDS:
+            log(f'SKIP SURF: {token} {direction} — survival_rounds={sig_survival_rounds} < {MIN_SURVIVAL_ROUNDS} (wave still building)')
+            skipped += 1
+            continue
+
+        # ── OC Signal Block (2026-04-23) ──────────────────────────────────────────
+        # oc_pending signals must survive signal_compactor hot-set compaction.
+        # They are NOT auto-approved here — they go through the same survival
+        # rounds check as all other signals. This prevents OC from bypassing
+        # the hot-set discipline by writing directly to the signal DB.
+        # Leave as PENDING so they continue competing in compaction cycles.
+        sig_type = sig.get('signal_type', '') or ''
+        if sig_type == 'oc_pending':
+            log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: oc_pending signal (must survive hot-set compaction)')
             skipped += 1
             continue
 
         # ── Counter-trend trap guard at execution time ───────────────────
         # Even if _run_hot_set() passed this signal, re-check at execution time.
         # Conditions may have changed (z-score moved, speed changed).
-        trap_blocked, trap_reason = _check_counter_trend_trap(token, direction)
+        # Use hotset.json lookup for pre-computed regime (avoids redundant get_regime() call).
+        _exec_regime, _exec_regime_conf = _hotset_regime.get(token, ('NEUTRAL', 0))
+        trap_blocked, trap_reason = _check_counter_trend_trap(token, direction, _exec_regime, _exec_regime_conf)
         if trap_blocked:
             log(f'  🧊 [EXEC-BLOCK] {token} {direction}: {trap_reason}')
-            mark_signal_executed(token, direction)
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
 
@@ -1581,39 +1464,46 @@ def run(dry_run=False):
             # Case 0: Not tradeable on Hyperliquid (hard blocklist + HL universe check)
             if is_delisted(token):
                 log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: not tradeable on Hyperliquid')
-                mark_signal_executed(token, direction)
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
-            regime, regime_conf = get_regime(token)
+            # Regime from hotset.json (pre-computed by signal_compactor — no ai_decider call)
+            # _hotset_regime is built at lines ~1316-1324 from hotset.json per token
+            regime, regime_conf = _hotset_regime.get(token, ('NEUTRAL', 0))
             # Case 1: blindspot — token not in regime data
             if regime is None or regime == 'NOT_IN_JSON':
                 log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: regime blindspot (not in regime_4h.json)')
-                mark_signal_executed(token, direction)
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
-            # Case 2: NEUTRAL regime — should wait, not execute
+            # Case 2: NEUTRAL regime — de-escalate gracefully, don't hard-block
+            # Signal stays in pipeline to compete when/if regime becomes directional
             if regime == 'NEUTRAL' and regime_conf > 60:
-                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: NEUTRAL regime ({regime_conf:.0f}%)')
-                mark_signal_executed(token, direction)
+                log(f'  📉 [DEESC] {token} {direction} de-escalated: NEUTRAL regime ({regime_conf:.0f}%)')
+                # Don't mark_executed — let it survive and be reconsidered
                 skipped += 1
                 continue
-            # Case 3: weak confidence — not enough regime conviction
-            if regime_conf < 50:
-                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: weak regime conf ({regime_conf:.0f}% < 50%)')
-                mark_signal_executed(token, direction)
-                skipped += 1
-                continue
-            # Case 4: counter-regime — fighting the trend → PENALIZE not block
+            # Case 3: REMOVED (2026-04-17) — weak regime confidence should NOT block
+            # execution of hot-set signals. If a signal survived signal_compactor compaction
+            # and entered the hot-set, it's already been vetted. The regime_conf is
+            # advisory — survival_score decay handles the fade. Blocking at execution
+            # time prevents hot-set signals from ever trading. Let them execute.
+            # Case 4: counter-regime — fighting the trend → PENALIZE lightly
+            # Reduced 2026-04-17: was regime_conf*0.4 (30pt max) — too aggressive, blocked all
+            # counter-regime signals during LONG_BIAS. New: regime_conf*0.15 (15pt max).
+            # At 80% regime conf: old=30pts, new=12pts. A 77% signal survives at 65%.
             if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
                (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                penalty = min(int(regime_conf * 0.4), 30)
+                penalty = min(int(regime_conf * 0.15), 15)
                 confidence -= penalty
                 if confidence < MIN_EXEC_CONFIDENCE:
-                    log(f'  🧊 [EXEC-BLOCK] {token} {direction} penalized {penalty}pts below exec threshold: counter-regime ({regime} {regime_conf:.0f}%)')
-                    mark_signal_executed(token, direction)
+                    # De-escalate: don't execute this cycle, but keep signal alive
+                    log(f'  📉 [DEESC] {token} {direction} counter-regime penalized {penalty}pts below exec threshold ({confidence:.0f}% < {MIN_EXEC_CONFIDENCE}%) — kept alive for organic de-escalation')
                     skipped += 1
                     continue
-                log(f'  🧊 [EXEC-BLOCK] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
+                log(f'  📉 [DEESC] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
         except Exception as e:
             log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 
@@ -1625,7 +1515,8 @@ def run(dry_run=False):
             # It's a confluence source (conf-1s, conf-2s, fallback-conf-3s, etc.)
             if sig_src == 'conf-1s' or sig_src.startswith('conf-1s'):
                 log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: {sig_src} (single-source, min 2 required)')
-                mark_signal_executed(token, direction)
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
 
@@ -1634,19 +1525,19 @@ def run(dry_run=False):
         sp_exec_val = sp_exec.get('speed_percentile', 50.0) if sp_exec else 50.0
         if sp_exec_val == 0:
             log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: speed=0% (stale token)')
-            mark_signal_executed(token, direction)
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
 
         # Check loss cooldown — block same direction after a loss
-        if is_loss_cooldown_active(token, direction):
+        # FIX (2026-04-23): Use _is_loss_cooldown_active from signal_schema (JSON-only)
+        # instead of position_manager.is_loss_cooldown_active (which also checks PostgreSQL
+        # signal_cooldowns). The PostgreSQL table has 188 rows including expired cooldowns
+        # that never get cleaned up, causing ALL hot-set signals to be blocked every cycle.
+        # signal_compactor.py already uses the JSON-only variant — decider_run must match.
+        if _is_loss_cooldown_active(token, direction):
             log(f'SKIP: {token} {direction} in loss cooldown')
-            skipped += 1
-            continue
-
-        # Check win cooldown — block same direction after a win (prevents re-entry loop)
-        if _is_win_cooldown_active(token, direction):
-            log(f'SKIP: {token} {direction} in win cooldown')
             skipped += 1
             continue
 
@@ -1699,10 +1590,10 @@ def run(dry_run=False):
         sl_variant = ab.get('sl_variant', '')
         ts_variant = ab.get('ts_variant', '')
 
-        # ATR-based SL and TP (same formula used throughout)
-        # Uses price (signal price) as current_price proxy since trade executes immediately.
-        sl = _compute_dynamic_sl(token, direction, price, price, sl_pct)
-        tp = _compute_dynamic_tp(token, direction, price, price)
+        # A/B TEST DISABLED (2026-04-17) — ATR-based SL/TP managed by position_manager.
+        # ATR populates within 1 min of entry via _collect_atr_updates().
+        sl = 0
+        tp = 0
 
         # Recalculate speed_pctl for logging (sp was from _exec_score scope)
         sig_spd = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
@@ -1714,7 +1605,7 @@ def run(dry_run=False):
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
-            mark_signal_executed(token, direction)
+            # Don't mark executed in dry-run — nothing is real
             entered += 1
             # Don't increment open_count in dry-run — no real position opened
             continue
@@ -1774,16 +1665,14 @@ def run(dry_run=False):
             # Revert executed=0 so the signal can be picked up on next run.
             if sig_id:
                 try:
-                    from signal_schema import _get_conn, _runtime
-                    conn = _get_conn(_runtime())
-                    conn.execute(
-                        "UPDATE signals SET executed=0, decision='APPROVED', updated_at=CURRENT_TIMESTAMP WHERE id=?",
-                        (sig_id,))
-                    conn.commit()
-                    conn.close()
-                    log(f'  → ROLLED BACK signal {sig_id} (trade failed: {msg[:60]})')
+                    from signal_schema import rollback_signal_executed
+                    rolled = rollback_signal_executed(token, direction, signal_id=sig_id)
+                    if rolled:
+                        log(f'  🔁 SIGNAL ROLLED BACK: {token} {direction} (sig#{sig_id}) — stays in hot-set for retry')
+                    else:
+                        log(f'  ⚠️ ROLLBACK FAILED: sig#{sig_id} already claimed by another process')
                 except Exception as rb_e:
-                    log(f'  → rollback warning for signal {sig_id}: {rb_e}')
+                    log(f'  ⚠️ ROLLBACK ERROR for sig#{sig_id}: {rb_e}')
             log(f'  → FAILED: {msg}')
             # ── Trade failed event ───────────────────────────────────────
             try:

@@ -24,6 +24,11 @@ Histogram momentum:
 from typing import Optional
 from dataclasses import dataclass, field
 from enum import IntEnum
+import os, sqlite3, time
+
+from hermes_constants import MACD_EXIT_PAUSED
+
+_PRICE_DB = '/root/.hermes/data/signals_hermes.db'
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -57,6 +62,7 @@ from enum import IntEnum
 
 # ── Per-Token MACD Params (loaded from tuner DB, fallback to defaults) ───────────
 # Wired to mtf_macd_tuner.db — updated hourly by hermes-mtf-macd-tuner.timer
+from paths import *
 # This is the single source of truth for MACD params in production.
 import sqlite3 as _sqlite3
 
@@ -272,6 +278,8 @@ def _exit_long_signals(s: MACDState) -> list:
       4. Histogram fading fast (rate < -0.2)
       5. Crossover STALE for > 8 candles in bull regime
     """
+    if MACD_EXIT_PAUSED:
+        return []
     signals = []
 
     # Signal 1: Histogram reversing through zero (was +, now going toward -)
@@ -303,6 +311,8 @@ def _exit_long_signals(s: MACDState) -> list:
 
 def _exit_short_signals(s: MACDState) -> list:
     """Mirror of exit_long_signals for shorts."""
+    if MACD_EXIT_PAUSED:
+        return []
     signals = []
 
     if s.histogram_positive and s.histogram_rate > 0:
@@ -486,7 +496,7 @@ def compute_macd_state(token: str, candles: list = None,
             cs_slice = macd_series[start_cs:] if start_cs >= 0 else macd_series[start_cs:]
 
             if len(ps_slice) < 3 or len(cs_slice) < 3:
-                break
+                continue  # not enough data for this offset, keep scanning earlier
 
             ps_val = ema(ps_slice, 9)
             cs_val = ema(cs_slice, 9)
@@ -526,23 +536,29 @@ def compute_macd_state(token: str, candles: list = None,
             hist_rate = 0.0
 
         # ── Bullish score (-3 to +3) ─────────────────────────────────────────
-        # Pure composite: each indicator votes once, no double-counting
-        # +3 = strongly bullish, 0 = neutral, -3 = strongly bearish
-        score = 0
-        if curr_macd > curr_signal:    score += 1   # MACD above signal
-        if curr_histogram > 0:        score += 1   # histogram positive
-        if regime == Regime.BULL:     score += 1   # above zero line
-        if freshness == CrossoverFreshness.FRESH_BULL: score += 1  # fresh cross_over is strongest signal
-        if hist_rate > 0.1:           score += 1   # momentum accelerating
+        # Pure composite: each indicator votes once, no double-counting.
+        # +3 = strongly bullish, 0 = neutral, -3 = strongly bearish.
+        # Structure: count bullish votes, count bearish votes, take difference.
+        bull = 0
+        bear = 0
 
-        if curr_macd < curr_signal:   score -= 1   # MACD below signal
-        if curr_histogram < 0:       score -= 1   # histogram negative
-        if regime == Regime.BEAR:    score -= 1   # below zero line
-        if freshness == CrossoverFreshness.FRESH_BEAR: score -= 1  # fresh cross_under
-        if hist_rate < -0.1:         score -= 1   # momentum fading
+        if curr_macd > curr_signal:                            bull += 1
+        else:                                                  bear += 1  # mutually exclusive
 
-        # Cap at +/-3
-        bullish_score = max(-3, min(3, score))
+        if curr_histogram > 0:                                 bull += 1
+        else:                                                  bear += 1  # mutually exclusive
+
+        if regime == Regime.BULL:                              bull += 1
+        elif regime == Regime.BEAR:                            bear += 1  # mutually exclusive
+
+        if freshness == CrossoverFreshness.FRESH_BULL:          bull += 1
+        elif freshness == CrossoverFreshness.FRESH_BEAR:        bear += 1  # mutually exclusive
+
+        if hist_rate > 0.1:                                    bull += 1
+        elif hist_rate < -0.1:                                 bear += 1  # mutually exclusive
+
+        # Net score: positive = bullish, negative = bearish
+        bullish_score = max(-3, min(3, bull - bear))
 
         # ── Build state object ────────────────────────────────────────────────
         state = MACDState(
@@ -852,31 +868,68 @@ def get_macd_exit_signal(token: str, position_dir: str) -> dict:
         }
 
 
-def _fetch_binance_candles(token: str, interval: str, limit: int = None) -> Optional[list]:
+def _fetch_binance_candles(token: str, interval: str, limit: int = None,
+                           fast: int = None, slow: int = None, sig: int = None) -> Optional[list]:
     """
-    Fetch klines from Binance API. interval: '4h', '1h', '15m', etc.
+    Fetch OHLCV candles for any interval via signal_schema (unified price source).
 
-    For slow MACD (65/15): need slow + signal + 20 = 100+ candles.
-    Default limit=None → uses MACD_PARAMS to determine sufficient count.
+    FIX (2026-04-23): 1m now reads from price_history (signals_hermes.db) directly.
+      price_history is updated every minute with live prices — the ONLY reliable source.
+      ohlcv_1m table is 7+ days stale — CANNOT be used.
+      - 1m: price_history via direct SQLite (signals_hermes.db)
+      - 4h/1h/15m: signal_schema.fetch_binance_candles() — direct Binance
+
+    interval: '4h', '1h', '15m', '1m'
+    limit: number of candles to return (oldest-first)
+    fast/slow/sig: per-token MACD params. If None, resolved from get_macd_params().
     """
-    import requests
-    # Determine sufficient candle count based on MACD_PARAMS (defined at module level)
+    # Resolve per-token params (from DB or defaults)
+    if fast is None or slow is None or sig is None:
+        p = get_macd_params(token)
+        fast  = fast  or p['fast']
+        slow  = slow  or p['slow']
+        sig   = sig   or p['signal']
+    warmup_per_token = 2 * slow + 2 * sig + 20
+    warmup_min = max(warmup_per_token, 150)
     if limit is None:
-        limit = max(150, MACD_PARAMS['slow'] + MACD_PARAMS['signal'] + 20)
-    try:
-        url = f"https://api.binance.com/api/v3/klines?symbol={token}USDT&interval={interval}&limit={limit}"
-        resp = requests.get(url, timeout=10)
-        if resp.status_code != 200:
+        limit = warmup_min
+    else:
+        limit = max(limit, warmup_min)
+
+    # 1m: read from price_history (live, updated every minute)
+    if interval == '1m':
+        try:
+            conn = sqlite3.connect(_PRICE_DB, timeout=10)
+            c = conn.cursor()
+            c.execute("""
+                SELECT timestamp, price FROM (
+                    SELECT timestamp, price
+                    FROM price_history
+                    WHERE token = ?
+                    ORDER BY timestamp DESC
+                    LIMIT ?
+                ) sub
+                ORDER BY timestamp ASC
+            """, (token.upper(), limit))
+            rows = c.fetchall()
+            conn.close()
+            if not rows:
+                return None
+            # Freshness guard — skip if most recent price is > 2 minutes old
+            if (time.time() - rows[-1][0]) > 120:
+                return None
+            # Synthesize ohlcv dict for compatibility
+            return [{'open_time': r[0], 'open': r[1], 'high': r[1],
+                     'low': r[1], 'close': r[1], 'volume': 0.0} for r in rows]
+        except Exception:
             return None
-        klines = resp.json()
-        min_required = MACD_PARAMS['slow'] + MACD_PARAMS['signal'] + 5
-        if len(klines) < min_required:
-            return None
-        return [{'open': float(k[1]), 'high': float(k[2]),
-                 'low': float(k[3]), 'close': float(k[4]), 'volume': float(k[5])}
-                for k in klines]
-    except Exception:
-        return None
+
+    # 4h/1h/15m: no local multi-TF tables — go direct to Binance via signal_schema
+    from signal_schema import fetch_binance_candles
+    candles = fetch_binance_candles(token, interval=interval, limit=limit)
+    if candles and len(candles) >= warmup_min - 5:
+        return candles
+    return None
 
 
 def compute_mtf_macd_alignment(token: str) -> Optional[dict]:

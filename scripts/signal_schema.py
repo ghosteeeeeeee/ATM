@@ -11,10 +11,7 @@ import psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 
-# ── Database paths ────────────────────────────────────────────────────────────
-HERMES_DATA = os.environ.get('HERMES_DATA_DIR', '/root/.hermes/data')
-STATIC_DB   = os.path.join(HERMES_DATA, 'signals_hermes.db')
-RUNTIME_DB  = os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')
+from paths import *
 
 # Legacy path (deprecated — kept for migration reference only)
 LEGACY_DB   = '/root/.openclaw/workspace/data/signals.db'  # noqa: F841
@@ -383,18 +380,57 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     # ── Minimum confidence floor ─────────────────────────────────────────────
     MIN_CONFIDENCE_FLOOR = 50
     if confidence < MIN_CONFIDENCE_FLOOR:
+        print(f'  DEBUG add_signal BLOCKED: {token} {direction} conf={confidence} < {MIN_CONFIDENCE_FLOOR} [confidence floor]', flush=True)
         return None  # Silently skip low-confidence signals
+
+    # ── Maximum confidence ceiling ───────────────────────────────────────────
+    # R&S is structural (not momentum), ma_cross/r2_trend are confirmatory.
+    # No signal type should exceed 88 — this prevents any single signal from
+    # drowning out others in the hot-set merge logic.
+    MAX_CONFIDENCE = 88
+    if confidence > MAX_CONFIDENCE:
+        confidence = MAX_CONFIDENCE
 
     # ── Directional blacklist guard — block at source ──────────────────────
     # Import lazily to avoid circular deps
     try:
         from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST
         if direction.upper() == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            print(f'  DEBUG add_signal BLOCKED: {token} {direction} SHORT_BLACKLIST', flush=True)
             return None  # Silently skip SHORT-blocklisted tokens
         if direction.upper() == 'LONG' and token.upper() in LONG_BLACKLIST:
             return None  # Silently skip LONG-blocklisted tokens
-        if signal_type in SIGNAL_SOURCE_BLACKLIST:
+        # Check source field (e.g. 'hzscore,pct-hermes+') not signal_type (e.g. 'percentile_rank')
+        # Use exact match to avoid substring blocking (e.g. 'vel-hermes' must NOT block 'vel-hermes+')
+        if source in SIGNAL_SOURCE_BLACKLIST:
+            print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BLACKLIST (exact)', flush=True)
             return None  # Silently skip blocklisted signal sources
+        # Also check individual components in comma-separated source lists
+        # (e.g. 'hzscore,pct-hermes+' contains blocklisted 'hzscore')
+        for component in source.split(','):
+            if component in SIGNAL_SOURCE_BLACKLIST:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" component="{component}" BLACKLIST', flush=True)
+                return None  # Silently skip blocklisted signal sources
+    except ImportError:
+        pass  # hermes_constants may not be available in all contexts
+
+    # ── Directional Volume Filter ─────────────────────────────────────────────
+    # Binance 1m klines → buy-vol vs sell-vol split → confidence adjustment.
+    # Contrarian (distribution trap): skip entirely. WEAK: reduce confidence.
+    # See: volume_filter.py and hermes_constants.py VOLUME_* thresholds.
+    try:
+        from hermes_constants import VOLUME_FILTER_ENABLED
+        if VOLUME_FILTER_ENABLED:
+            try:
+                from volume_filter import get_directional_vol
+                vol = get_directional_vol(token, direction)
+                delta = vol.get('delta', 0)
+                if delta == -15:  # CONTRARIAN — distribution trap, skip signal entirely
+                    return None  # Silent skip
+                if delta != 0:
+                    confidence = max(1, confidence + delta)
+            except Exception:
+                pass  # Volume check is advisory — never error out the signal
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
     # ─────────────────────────────────────────────────────────────────────────
@@ -404,29 +440,25 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         token = token.upper()
         direction = direction.upper()
 
-        # ── CONFLICT GUARD ─────────────────────────────────────────────────────
-        # Before writing any new signal, expire any OPPOSITE-direction signals
-        # for this token (both PENDING and APPROVED). This prevents a new signal
-        # from creating an opposite direction that survives alongside the existing one.
-        opp_dir = 'SHORT' if direction == 'LONG' else 'LONG'
-        c.execute('''
-            UPDATE signals
-            SET decision='EXPIRED', executed=1, updated_at=CURRENT_TIMESTAMP
-            WHERE token=? AND direction=? AND executed=0
-              AND decision IN ('PENDING', 'APPROVED')
-              AND created_at > datetime('now', '-3 hours')
-        ''', (token, opp_dir))
-        if c.rowcount > 0:
-            print(f'  🗑️ [CONFLICT-GUARD] expired {c.rowcount} {opp_dir} signals for {token} (new: {direction})')
+        # ── CONFLICT GUARD — REMOVED 2026-04-27 ───────────────────────────────────
+        # Removed: relying on signal_compactor's opp_penalty instead (-15% per
+        # opposing source, 5-min window). The conflict guard was causing counter_flip
+        # signals to expire each other and had a 3-hour window that was too long.
+        # Opposing signals now compete naturally in the hot-set scoring.
 
         # ── MERGE by token+direction (not token+direction+signal_type) ─────────
-        # Check for existing PENDING signal for same token+direction in last 30 min
+        # Check for existing PENDING signal for same token+direction in last 5 min.
+        # FIX (2026-04-26): Reduced from 30 min to 5 min. Signals that are not
+        # contemporaneous (>5 min apart) should not merge. A signal that expires
+        # after 5 min must not contribute its source tag to a new signal arriving
+        # 10+ min later. The compactor already expires PENDING signals at the 5-min
+        # mark — this brings add_signal() in sync with that lifecycle.
         c.execute('''
             SELECT id, source, signal_types, confidence,
                    z_score, z_score_tier, rsi_14, macd_value, macd_signal, macd_hist
             FROM signals
             WHERE token=? AND direction=? AND executed=0 AND decision='PENDING'
-              AND created_at > datetime('now', '-30 minutes')
+              AND created_at > datetime('now', '-5 minutes')
             LIMIT 1
         ''', (token, direction))
         existing = c.fetchone()
@@ -454,7 +486,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if confidence < existing_conf:
                 decay = (existing_conf - confidence) * 0.4
                 new_conf = max(existing_conf - decay + (num_srcs_gained * 1.0), min(existing_conf, confidence))
-                new_conf = max(1, min(99, new_conf))
+                new_conf = max(1, min(88, new_conf))
             else:
                 new_conf = max(existing_conf, confidence)
                 if num_srcs_gained > 0:
@@ -464,12 +496,19 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     # then merge bonuses inflate further to 91-96). Halve the per-source bonus.
                     if signal_type == 'percentile_rank':
                         bonus = max(1, bonus // 2)
-                    new_conf = min(100, new_conf + bonus)
+                    new_conf = min(88, new_conf + bonus)
                 # Confluence bonus: +5% per new distinct signal_type
                 # REDUCED for percentile_rank signals (their base conf is inflated by design)
                 if num_types > 1:
                     per_type_bonus = 5 if signal_type != 'percentile_rank' else 2
-                    new_conf = min(100, new_conf + min(per_type_bonus * num_types, 20))
+                    new_conf = min(88, new_conf + min(per_type_bonus * num_types, 20))
+
+            # FIX (2026-04-26): combo_key must be recomputed from merged sources.
+            # Without this, a merged signal keeps the old combo_key (e.g. "oc-mtf-rsi-")
+            # while its source field shows the merged set (e.g. "gap-300-,oc-mtf-rsi-").
+            # This breaks staleness, opposing penalty, and rounds continuity.
+            merged_combo_parts = sorted(all_srcs)
+            merged_combo_key = f"{token.upper()}:{direction.upper()}:{','.join(merged_combo_parts)}"
 
             # Keep most recent indicator values (update to latest)
             c.execute('''
@@ -477,11 +516,13 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     confidence=?, source=?, signal_types=?,
                     z_score=?, z_score_tier=?, rsi_14=?,
                     macd_value=?, macd_signal=?, macd_hist=?,
+                    combo_key=?,
                     updated_at=CURRENT_TIMESTAMP
                 WHERE id=?
             ''', (new_conf, merged_sources, merged_types,
                   z_score, z_score_tier, rsi_14,
                   macd_value, macd_signal, macd_hist,
+                  merged_combo_key,
                   sig_id))
             conn.commit()
             conn.close()
@@ -497,17 +538,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
               AND executed = 0
         """, (token, direction))
 
+        # Compute combo_key for identity matching across cycles.
+        # Sorted alphabetically so 'pct-hermes+,hzscore+' and 'hzscore+,pct-hermes+' → same identity.
+        source_parts = sorted(p.strip() for p in (source or '').split(',') if p.strip())
+        combo_key = f"{token.upper()}:{direction.upper()}:{','.join(source_parts)}"
+
         c.execute('''
             INSERT INTO signals
             (token, direction, signal_type, source, signal_types, confidence, value, price,
              exchange, timeframe, z_score, z_score_tier, momentum_state,
              rsi_14, macd_value, macd_signal, macd_hist, decision, executed, leverage,
-             hot_cycle_count, counter_detected)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0)
+             hot_cycle_count, counter_detected, combo_key)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0, ?)
         ''', (token, direction, signal_type, source, signal_type,
-              confidence, value, price, exchange, timeframe,
+              min(100, confidence), value, price, exchange, timeframe,  # FIX: cap at 100
               z_score, z_score_tier, momentum_state,
-              rsi_14, macd_value, macd_signal, macd_hist, leverage))
+              rsi_14, macd_value, macd_signal, macd_hist, leverage,
+              combo_key))
         conn.commit()
         sid = c.lastrowid
         conn.close()
@@ -540,50 +587,41 @@ def get_pending_signals(hours=24, limit=50):
 
 get_pending_signals_as_dict = get_pending_signals  # alias
 
-def expire_pending_signals(minutes=60):
-    """Expire stale PENDING and APPROVED signals. Called every signal_gen run
-    to prevent the queue from accumulating stale signals.
+def expire_pending_signals():
+    """EXPIRED signals safety-net — DEPRECATED for primary PENDING/APPROVED lifecycle.
 
-    PENDING: cleared if older than 60 minutes — new signals will regenerate if conditions persist.
+    Primary expiry is handled by signal_compactor deterministically:
+    - PENDING: marked EXPIRED when staleness reaches 0 (no firing for 5 min)
+    - APPROVED: marked EXPIRED when combo falls out of top-10 AND no recent PENDING
 
-    APPROVED: cleared if older than 30 minutes AND not executed.
-    This is critical: auto-approved signals (from confluence ≥90% or hot-set r1)
-    accumulate when positions are full. After 30 minutes without execution, they're
-    blocking hot-set signals from auto-approving for the same token. Stale APPROVED
-    entries need to be released so fresh signals can take their place.
+    This function is a SAFETY NET for edge cases (crash mid-cycle, missed compaction):
+    - Hard PENDING cap: 60 minutes max
+    - Hard APPROVED cap: 5 minutes max
 
-    FIX (2026-04-02): Added APPROVED expiry. Previously 476 APPROVED signals were
-    stuck in queue, blocking hot-set overrides for MINA/BIO/SUSHI/TURBO. Also changed
-    PENDING from 15min to 60min to allow review_count to accumulate for hot-set."""
+    Called by: nothing (dead function, safe to keep for manual cleanup).
+    """
     conn = _get_conn(_runtime())
     c = conn.cursor()
 
-    # Expire stale PENDING signals
-    # FIX (2026-04-03): NEVER expire signals that survived ai_decider compaction (rc>=1).
-    # Signals with review_count>=1 or compact_rounds>=1 are protected from time-based expiry.
-    # They survive via ai_decider's compaction discipline and are only expired when
-    # compact_rounds >= 20 (forced expire by ai_decider compaction logic).
+    # Safety net: expire PENDING signals older than 60 minutes
+    # (signal_compactor should have already handled these at 5 min)
     c.execute("""
         UPDATE signals
         SET decision = 'EXPIRED'
         WHERE decision = 'PENDING'
-          AND created_at < datetime('now', ?)
+          AND created_at < datetime('now', '-60 minutes')
           AND executed = 0
-          AND (review_count IS NULL OR review_count = 0)
-          AND (compact_rounds IS NULL OR compact_rounds = 0)
-    """, (f'-{minutes} minutes',))
+    """)
     pending_expired = c.rowcount
 
-    # Expire stale APPROVED signals (not executed, too old)
-    # These block hot-set signals from auto-approving for the same token.
-    # FIX (2026-04-02): Was updated_at — touched on every read, never expired.
-    # Now uses created_at so APPROVED signals clear 30 min after approval.
+    # Safety net: expire APPROVED signals older than 5 minutes
+    # (signal_compactor handles this when combo falls out of top-10)
     c.execute("""
         UPDATE signals
         SET decision = 'EXPIRED', executed = 1
         WHERE decision = 'APPROVED'
           AND executed = 0
-          AND created_at < datetime('now', '-30 minutes')
+          AND created_at < datetime('now', '-5 minutes')
     """)
     approved_expired = c.rowcount
 
@@ -591,114 +629,97 @@ def expire_pending_signals(minutes=60):
     c.close()
     total_expired = pending_expired + approved_expired
     if total_expired > 0:
-        print(f'  [Signal Expiry] Cleared {pending_expired} PENDING + {approved_expired} APPROVED ({minutes}min PENDING / 30min APPROVED)')
+        print(f'  [Signal Expiry] Safety-net cleared {pending_expired} PENDING + {approved_expired} APPROVED')
     return total_expired
 
 
 def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     """Return tokens where ≥min_signals PENDING signal types agree (Hermes-only).
-    Used by ai_decider / decider-run. Boosts confidence by 1.25x (2 signals)
-    or 1.5x (3+ signals).
+    Boosts confidence by 1.25x (2 signals) or 1.5x (3+ signals).
 
-    FIX (2026-04-05): After the add_signal merge-by-token+direction fix,
-    PENDING rows are now ONE per token+direction with all signal_types in the
-    signal_types column. This function detects that and uses the column directly.
-    Legacy rows (NULL signal_types) fall back to GROUP BY COUNT approach."""
+    FIX (2026-04-18): Rewrote from scratch. The old UNION ALL approach had
+    mismatched column counts (11 vs 9) causing OperationalError that silently
+    fell through to legacy fallback which also returned nothing.
+
+    Now: single query using signal_types column directly (pre-merged rows).
+    Legacy fallback only for truly old rows without signal_types populated."""
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
 
     st_list = list(signal_types) if signal_types else []
 
-    # New approach (2026-04-05+): signal_types column is pre-populated by add_signal.
-    # Count types by splitting the comma-separated signal_types column.
-    # SQLite: use xml_table trick or simple string manipulation.
-    # Safer: use a subquery that counts commas + 1.
-    new_query = f"""
+    # Single query: use signal_types column (comma-separated, populated by add_signal)
+    # Count types as number of commas + 1
+    # Filter: PENDING, has signal_types, within time window
+    base_where = """decision='PENDING'
+      AND signal_types IS NOT NULL AND signal_types != ''
+      AND created_at > datetime('now','-'||?||' hours')"""
+
+    if st_list:
+        st_filter = "AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
+        params = (hours,) + tuple(st_list)
+    else:
+        st_filter = ""
+        params = (hours,)
+
+    # FIX (2026-04-18): Query was missing GROUP BY — each token+direction was returning
+    # one row per signal instead of one aggregated row, so num_types was always 1.
+    # Now properly groups by token+direction and counts DISTINCT signal_types.
+    query = f"""
         SELECT
             token, direction,
             signal_types,
-            -- Count types in signal_types column: number of commas + 1
-            (LENGTH(signal_types) - LENGTH(REPLACE(signal_types, ',', '')) + 1) as num_types,
-            confidence as avg_conf,
-            confidence as max_conf,
-            signal_type as types,       -- legacy compat: single type
-            source as all_sources,
-            price,
-            z_score,
-            rsi_14,
-            1 as use_merged
+            COUNT(DISTINCT signal_type) as num_types,
+            AVG(confidence) as avg_conf,
+            MAX(confidence) as max_conf,
+            MAX(signal_type) as types,
+            MAX(source) as all_sources,
+            MAX(price) as price,
+            MAX(z_score) as z_score,
+            MAX(rsi_14) as rsi_14
         FROM signals
-        WHERE decision='PENDING'
-          AND signal_types IS NOT NULL AND signal_types != ''
-          AND created_at > datetime('now','-'||?||' hours')
-    """
-    # Legacy approach: GROUP BY for rows without signal_types
-    legacy_select = f"""
-        SELECT token, direction,
-               COUNT(DISTINCT signal_type) as num_types,
-               COUNT(*) as total_rows,
-               AVG(confidence) as avg_conf,
-               MAX(confidence) as max_conf,
-               GROUP_CONCAT(DISTINCT signal_type) as types,
-               GROUP_CONCAT(DISTINCT source) as all_sources,
-               MAX(price) as price,
-               MAX(z_score) as z_score,
-               MAX(rsi_14) as rsi_14,
-               0 as use_merged
-        FROM signals
-        WHERE decision='PENDING'
-          AND (signal_types IS NULL OR signal_types = '')
-          AND created_at > datetime('now','-'||?||' hours')
+        WHERE {base_where}
+        {st_filter}
         GROUP BY token, direction
     """
 
-    params = (hours,) + tuple(st_list) if st_list else (hours,)
-    legacy_params = params
-
-    if st_list:
-        st_placeholder = " AND signal_type IN (" + ",".join(["?" for _ in st_list]) + ")"
-        new_query += st_placeholder
-        legacy_select += st_placeholder
-        params = (hours,) + tuple(st_list)
-        legacy_params = params
-
-    new_query += f"\nUNION ALL\n{legacy_select}"
-
     try:
-        c.execute(new_query, params + legacy_params)
-        results_raw = c.fetchall()
-    except Exception as e:
-        # Fallback: legacy GROUP BY only
+        c.execute(query, params)
+        rows = c.fetchall()
+    except Exception:
         conn.close()
         return _get_confluence_signals_legacy(hours, min_signals, signal_types)
 
     results = []
-    for r in c.fetchall():
+    for r in rows:
         d = dict(r)
-        num_types = d.get('num_types', 1) or 1
+        num_types = int(d.get('num_types', 1) or 1)
+        if num_types < min_signals:
+            continue
         mult = 1.5 if num_types >= 3 else 1.25 if num_types == 2 else 1.0
         avg_conf = d.get('avg_conf', 0) or 0
         d['final_confidence'] = min(99, avg_conf * mult)
         d['num_agreeing'] = num_types
-        # Parse signal_types from column
+        # Parse signal_types column into list
         st_col = d.get('signal_types', '')
         if st_col:
             d['signal_types_list'] = [t.strip() for t in st_col.split(',') if t.strip()]
             d['signal_types'] = d['signal_types_list']
         else:
-            types_str = d.get('types', '')
-            d['signal_types'] = types_str.split(',') if types_str else []
-        # Legacy compat
-        all_srcs = d.get('all_sources', '')
+            d['signal_types'] = []
+        # Build hermes_sources sorted
+        all_srcs = d.get('all_sources', '') or ''
         if all_srcs:
             d['hermes_sources'] = sorted(all_srcs.split(','))
+        else:
+            d['hermes_sources'] = []
         top_source = all_srcs.split(',')[0] if all_srcs else ''
         d['source'] = validate_source(top_source) if top_source else 'unknown'
-        if num_types >= min_signals:
-            results.append(d)
+        results.append(d)
 
     conn.close()
-    return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+    ret = sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+    return ret if isinstance(ret, list) else []
 
 
 def _get_confluence_signals_legacy(hours=24, min_signals=2, signal_types=None):
@@ -749,7 +770,8 @@ def _get_confluence_signals_legacy(hours=24, min_signals=2, signal_types=None):
         d['source'] = validate_source(top_source) if top_source else 'unknown'
         results.append(d)
     conn.close()
-    return sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+    ret = sorted(results, key=lambda x: x['final_confidence'], reverse=True)
+    return ret if isinstance(ret, list) else []
 
 
 def add_confluence_signal(token, direction, confidence, num_signals, price, z_score=None, rsi_14=None, macd_hist=None):
@@ -798,6 +820,8 @@ ALLOWED_SIGNAL_SOURCES = frozenset({
     'hzscore,pct-hermes', 'hzscore,vel-hermes',
     'mtf_macd,hzscore', 'mtf_macd,pct-hermes',
     'rsi-confluence,hzscore', 'rsi-confluence,pct-hermes',
+    # Pattern scanner signals
+    'pattern_scanner',
     # Standard signal types used throughout the system
     'mtf_macd', 'mtf_zscore', 'mtf_rsi', 'mtf_momentum',
     'percentile_rank', 'velocity', 'rsi_local', 'macd_local',
@@ -811,29 +835,23 @@ ALLOWED_SIGNAL_SOURCES = frozenset({
 
 def validate_source(source: str) -> str:
     """
-    BUG-12 fix: Validate source against whitelist.
-    Returns the original source if valid, 'unknown' if not.
-    Prevents malformed signals from routing to unintended A/B variants.
-
-    FIX: Also handles merged indicator sources (comma-separated) like 'hmacd-,hzscore,pct-hermes'.
-    Validates each component against the whitelist or accepts hmacd-* prefix patterns.
+    Validate source against blacklist (SIGNAL_SOURCE_BLACKLIST).
+    Returns the original source if NOT in blacklist, 'unknown' if blocked.
+    No whitelist — only the blacklist blocks signals.
     """
+    from hermes_constants import SIGNAL_SOURCE_BLACKLIST
     if not source:
         return 'unknown'
-    if source in ALLOWED_SIGNAL_SOURCES:
-        return source
-    # Handle merged indicator sources (comma-separated list of indicators)
+    # Check direct match in blacklist
+    if source in SIGNAL_SOURCE_BLACKLIST:
+        return 'unknown'
+    # Handle merged/comma-separated sources: block if ANY component is blacklisted
     if ',' in source:
         components = [c.strip() for c in source.split(',') if c.strip()]
-        # All components must be valid individually
         for comp in components:
-            if comp not in ALLOWED_SIGNAL_SOURCES:
-                # Allow hmacd-* style prefixes as valid merged components
-                if not any(comp.startswith(prefix) for prefix in
-                           ['hmacd-', 'mtf_', 'counter-', 'pct-', 'vel-', 'rsi-', 'hzscore']):
-                    return 'unknown'
-        return source  # Valid merged source
-    return 'unknown'
+            if comp in SIGNAL_SOURCE_BLACKLIST:
+                return 'unknown'
+    return source  # Not blocked — valid
 
 
 def update_signal_decision(token, direction, decision, reason=None, signal_id=None):
@@ -854,29 +872,82 @@ def update_signal_decision(token, direction, decision, reason=None, signal_id=No
         c.execute('''
             UPDATE signals
             SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+                compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
                 updated_at=CURRENT_TIMESTAMP
             WHERE id=? AND executed=0
-        ''', (decision, decision, signal_id))
+        ''', (decision, decision, decision, signal_id))
     else:
         # Legacy: update all matching token+direction
         c.execute('''
             UPDATE signals
             SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+                compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
                 updated_at=CURRENT_TIMESTAMP
             WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
             AND executed=0
-        ''', (decision, decision, token.upper(), direction.upper()))
+        ''', (decision, decision, decision, token.upper(), direction.upper()))
     conn.commit()
     count = c.rowcount
     conn.close()
     return count
 
-def mark_signal_executed(token, direction, signal_id=None):
+def mark_signal_executed(token, direction, decision='EXECUTED', signal_id=None):
     """
-    BUG-26 fix: accepts optional signal_id for atomic claim.
-    When signal_id is provided, marks only that specific signal.
+    Mark a signal as processed (executed or skipped).
+
+    BUG-FIX: Added optional `decision` param so blocked signals can be marked
+    'SKIPPED' instead of 'EXECUTED'. 'EXECUTED' must mean "trade actually placed
+    on Hyperliquid" — not "signal was considered and blocked".
+
+    decision='EXECUTED': trade was actually placed (default)
+    decision='SKIPPED':  signal was blocked/dropped, no trade placed
     """
-    return update_signal_decision(token, direction, 'EXECUTED', signal_id=signal_id)
+    return update_signal_decision(token, direction, decision, signal_id=signal_id)
+
+
+def rollback_signal_executed(token, direction, signal_id=None) -> bool:
+    """
+    Restore executed=0 on a signal so it stays in APPROVED state and can be retried.
+
+    Uses the same atomic claim mechanism as mark_signal_executed — only rolls back
+    if signal_id matches and executed=1 (prevents race conditions with concurrent
+    pipeline runs).
+
+    Returns True if rollback succeeded, False if signal was already claimed by
+    another process or the DB call failed.
+    """
+    conn = _get_conn(_runtime())
+    if conn is None:
+        return False
+    try:
+        cur = conn.cursor()
+        if signal_id is not None:
+            # Atomic: only update if this exact signal_id is marked executed
+            cur.execute("""
+                UPDATE signals
+                SET executed = 0,
+                    decision = 'APPROVED',
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s AND executed = 1
+                RETURNING id
+            """, (signal_id,))
+        else:
+            # Fallback: match by token + direction (may affect multiple rows)
+            cur.execute("""
+                UPDATE signals
+                SET executed = 0,
+                    decision = 'APPROVED',
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE token = %s AND direction = %s AND executed = 1
+                RETURNING id
+            """, (token.upper(), direction.upper()))
+        row = cur.fetchone()
+        conn.commit()
+        cur.close(); conn.close()
+        return row is not None
+    except Exception:
+        return False
+
 
 def approve_signal(token, direction, leverage=None):
     conn = _get_conn(_runtime())
@@ -905,7 +976,7 @@ def get_approved_signals(hours=24):
     - Base: max confidence (not avg — avoids low-confidence noise dragging down strong signals)
     - Diversity bonus: +5% per distinct signal_type present (max +20%)
     - Only consider individual signals >= 25% confidence
-    - Hot-set bonus: signals with compact_rounds > 0 get +10% base (proven by market)
+    - Hot-set bonus: signals with survival_rounds > 0 get +10% base (proven by market)
     """
     conn = _get_conn(_runtime(), row_factory=True)
     c = conn.cursor()
@@ -914,20 +985,19 @@ def get_approved_signals(hours=24):
     c.execute('''
         SELECT id, token, direction,
                COUNT(*) as count,
-               AVG(confidence) as avg_conf,
-               MAX(confidence) as max_conf,
-               MIN(confidence) as min_conf,
+               MAX(COALESCE(effective_confidence, confidence)) as max_conf,
+               MIN(COALESCE(effective_confidence, confidence)) as min_conf,
                GROUP_CONCAT(DISTINCT signal_type) as types,
                MAX(source) as source,
                MAX(price) as price,
                MAX(leverage) as leverage,
                MAX(COALESCE(
-                   (SELECT compact_rounds FROM signals s2
+                   (SELECT survival_rounds FROM signals s2
                     WHERE s2.token=signals.token
                       AND s2.direction = signals.direction
                       AND s2.decision = 'APPROVED'
                       AND s2.executed = 0
-                    ORDER BY compact_rounds DESC LIMIT 1), 0
+                    ORDER BY survival_rounds DESC LIMIT 1), 0
                )) as hot_rounds,
                MAX(COALESCE(
                    (SELECT learned_sl_multiplier FROM signals s3
@@ -940,7 +1010,7 @@ def get_approved_signals(hours=24):
         FROM signals
         WHERE decision='APPROVED' AND executed=0
           AND created_at > datetime('now','-'||?||' hours')
-          AND confidence >= 25   -- filter noise
+          AND COALESCE(effective_confidence, confidence) >= 25   -- filter noise
         GROUP BY token, direction
         ORDER BY count DESC, max_conf DESC
     ''', (hours,))
@@ -958,16 +1028,15 @@ def get_approved_signals(hours=24):
         types = [t for t in types if t]
         num_types = len(types)
 
-        # Quality base: weight strongest signals more
-        # penalize if min_conf is very low compared to max
+        # Quality base: max effective confidence (penalized value if set)
+        # Penalize if min_conf is very low compared to max (mixed signal quality)
         min_c = d.get('min_conf', 0) or 0
         max_c = d.get('max_conf', 0) or 0
         range_ratio = (max_c - min_c) / max_c if max_c > 0 else 0
 
-        # Base score = weighted average favoring higher confs
-        # (simple avg penalized if range_ratio is high)
-        quality_penalty = range_ratio * 0.3  # up to 30% penalty for mixed quality
-        base = d.get('avg_conf', 0) * (1 - quality_penalty)
+        # Base score: use max effective confidence directly
+        # (penalty is already baked in by decider_run when writing effective_confidence)
+        base = max_c
 
         # Diversity bonus: distinct strong types add signal
         diversity_bonus = min(20, num_types * 5)
@@ -1277,78 +1346,215 @@ def price_age_minutes(token):
         return 999
 
 # ── Cooldowns ─────────────────────────────────────────────────────────────────
-COOLDOWN_FILE = '/root/.hermes/data/signal-cooldowns.json'
+# Note: LOSS_COOLDOWN_FILE is imported from paths.py (SINGLE SOURCE).
+# COOLDOWN_FILE (legacy) is also from paths.py for the fallback path.
+
+def _is_cooldown_key_active(key: str, data: dict) -> bool:
+    """Helper: check if a specific token:direction key is active.
+    
+    When checking loss_cooldowns.json (guardian loss cooldowns), entries with
+    reason='signal' (from signal generators) are ignored so they don't block
+    valid multi-source confluence signals from other generators.
+    """
+    entry = data.get(key)
+    if not entry:
+        return False
+    # Only block guardian/pipeline loss cooldowns (reason='loss' or 'guardian').
+    # Signal-generator cooldowns (reason='signal') are ignored so they don't block
+    # multi-source confluence signals from other generators.
+    reason = entry.get('reason') if isinstance(entry, dict) else None
+    if reason not in ('loss', 'guardian'):
+        return False
+    expiry = entry.get('expires') if isinstance(entry, dict) else entry
+    return bool(expiry and expiry > time.time())
+
+# FIX (2026-04-23): Expose only loss_cooldowns.json check for signal_compactor.
+# signal_compactor.py calls get_cooldown() to block tokens that had losing trades
+# (guardian writes to loss_cooldowns.json). But the old get_cooldown() also checked
+# PostgreSQL signal_cooldowns — where signal generators (gap300, ma_cross_5m, etc.)
+# write cooldowns for their individual signals. Those cooldowns should NOT block
+# multi-source confluence signals from OTHER generators.
+# By extracting just the loss-cooldown check, signal_compactor respects only the
+# authoritative loss-cooldown while letting signal-generator cooldowns not interfere.
+def _is_loss_cooldown_active(token: str, direction: str) -> bool:
+    """Check if token+direction is in loss_cooldowns.json (guardian loss cooldown only).
+    Returns True if the token is in exponential-backoff cooldown from a losing trade.
+    Only entries with reason='loss' (guardian losses) are checked — 'signal' entries
+    (from signal generators like gap300/ma_cross) are ignored, so they don't block
+    confluence signals from other generators.
+    Does NOT check PostgreSQL — use get_cooldown() for the full check."""
+    token_key = token.upper()
+    if direction:
+        key = f"{token_key}:{direction.upper()}"
+    else:
+        key = f"{token_key}"
+    try:
+        with open(LOSS_COOLDOWN_FILE) as f:
+            loss_data = json.load(f)
+    except Exception:
+        loss_data = {}
+    entry = loss_data.get(key)
+    if not entry:
+        return False
+    # Only block guardian/pipeline loss cooldowns (reason='loss' or 'guardian').
+    # Signal-generator cooldowns (reason='signal') are ignored so they don't block
+    # multi-source confluence signals from other generators.
+    reason = entry.get('reason') if isinstance(entry, dict) else None
+    if reason not in ('loss', 'guardian'):
+        return False
+    expiry = entry.get('expires') if isinstance(entry, dict) else entry
+    return bool(expiry and expiry > time.time())
 
 def get_cooldown(token, direction=None):
-    # Primary: PostgreSQL (durable). Fallback: JSON file.
-    key = token.upper()
+    # Guardian loss cooldowns are authoritative (streak-based exponential backoff).
+    # Check loss_cooldowns.json FIRST — this is the single source of truth for loss
+    # cooldowns written by guardian. Falls back to PostgreSQL/signal-cooldowns.json
+    # for any other cooldown sources.
+    token_key = token.upper()
     if direction:
-        key = "%s:%s" % (key, direction.upper())
+        check_keys = ["%s:%s" % (token_key, direction.upper())]
+    else:
+        # No direction provided — check BOTH LONG and SHORT (signal_gen calls this
+        # at token-level without direction; we must not miss per-direction cooldowns)
+        check_keys = ["%s:LONG" % token_key, "%s:SHORT" % token_key]
+
+    # Load loss_cooldowns.json once
     try:
-        conn = psycopg2.connect(**BRAIN_DB_DICT)
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT expires_at FROM signal_cooldowns WHERE token=%s AND expires_at > NOW()",
-            (key,))
-        row = cur.fetchone()
-        conn.close()
-        if row:
-            return True
+        with open(LOSS_COOLDOWN_FILE) as f:
+            loss_data = json.load(f)
     except Exception:
-        pass
-    # Fallback: JSON file
-    try:
-        with open(COOLDOWN_FILE) as f:
-            data = json.load(f)
-        if key in data and data[key] > time.time():
-            return data[key]
-    except:
-        pass
+        loss_data = {}
+
+    # FIX (2026-04-22): Purge expired entries from loss_cooldowns.json to prevent
+    # unbounded file growth. Expired entries that accumulate forever were bloating
+    # the file (36 stale entries found on 2026-04-22). We clean in-memory only;
+    # the next _save_cooldowns() from guardian will write the pruned state.
+    now = time.time()
+    cleaned = False
+    for k, v in list(loss_data.items()):
+        expiry = v.get('expires') if isinstance(v, dict) else v
+        if expiry and expiry <= now:
+            del loss_data[k]
+            cleaned = True
+    if cleaned:
+        try:
+            with open(LOSS_COOLDOWN_FILE, 'w') as f:
+                json.dump(loss_data, f, indent=2)
+        except Exception:
+            pass  # Best-effort — don't block on cleanup failure
+
+    for key in check_keys:
+        # Check loss_cooldowns.json (guardian's authoritative source)
+        if _is_cooldown_key_active(key, loss_data):
+            return True
+        # Fallback: PostgreSQL (general cooldowns)
+        try:
+            conn = psycopg2.connect(**BRAIN_DB_DICT)
+            cur = conn.cursor()
+            # FIX (2026-04-22): Add explicit direction filter. While set_cooldown stores
+            # direction both in the token key (TOKEN:DIRECTION) and as a separate column,
+            # the separate direction column should be checked too. When direction=None
+            # (signal_gen calls get_cooldown at token level), extract direction from key.
+            key_direction = direction
+            if key_direction is None and ':' in key:
+                key_direction = key.split(':', 1)[1]  # 'APE:SHORT' -> 'SHORT'
+            cur.execute(
+                "SELECT expires_at FROM signal_cooldowns WHERE token=%s AND direction=%s AND expires_at > NOW()",
+                (key, key_direction))
+            row = cur.fetchone()
+            # FIX (2026-04-22): Periodically purge expired rows to prevent table/index
+            # bloat (155 expired rows found on 2026-04-22). Purge on every 10th call
+            # to avoid DB overhead on every cooldown check.
+            import random as _random
+            if _random.random() < 0.1:  # ~10% of calls
+                try:
+                    cur_p = conn.cursor()
+                    cur_p.execute(
+                        "DELETE FROM signal_cooldowns WHERE expires_at < NOW() - INTERVAL '1 hour'")
+                    deleted = cur_p.rowcount
+                    conn.commit()
+                    cur_p.close()
+                    if deleted > 0:
+                        print(f"[signal_schema] Purged {deleted} expired cooldown rows from PostgreSQL")
+                except Exception:
+                    pass  # Best-effort cleanup
+            conn.close()
+            if row:
+                return True
+        except Exception:
+            pass
+        # Fallback: legacy JSON file
+        try:
+            with open(COOLDOWN_FILE) as f:
+                legacy_data = json.load(f)
+            if _is_cooldown_key_active(key, legacy_data):
+                return True
+        except Exception:
+            pass
     return None
 
 def set_cooldown(token, direction=None, hours=1):
-    # Primary: PostgreSQL (durable). Fallback: JSON file.
-    key = token.upper()
+    # Primary: loss_cooldowns.json (shared with guardian — consistent format).
+    # Fallback: PostgreSQL signal_cooldowns table.
+    token_key = token.upper()
+    key = token_key
     if direction:
-        key = "%s:%s" % (key, direction.upper())
-    expires = datetime.now() + timedelta(hours=hours)
+        key = "%s:%s" % (token_key, direction.upper())
+    expires_ts = time.time() + (hours * 3600)
+
+    # Primary: write to loss_cooldowns.json in dict format
+    try:
+        try:
+            with open(LOSS_COOLDOWN_FILE) as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {}
+
+        # Incremental: extend only if new expiry is later (don't shrink existing)
+        existing = data.get(key)
+        if existing is not None:
+            existing_expires = existing.get('expires') if isinstance(existing, dict) else existing
+            if existing_expires and existing_expires > expires_ts:
+                expires_ts = existing_expires
+
+        data[key] = {'expires': expires_ts, 'hours': hours, 'reason': 'signal'}
+        with open(LOSS_COOLDOWN_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+        return
+    except Exception as e:
+        print(f"[signal_schema] set_cooldown JSON failed: {e}")
+
+    # Fallback: PostgreSQL
+    expires_dt = datetime.now() + timedelta(hours=hours)
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO signal_cooldowns (token, expires_at, reason, direction) "
-            "VALUES (%s, %s, 'signal', %s) "
-            "ON CONFLICT (token, direction) DO UPDATE SET expires_at = %s",
-            (key, expires, direction, expires))
+        cur.execute("""
+            INSERT INTO signal_cooldowns (token, expires_at, reason, direction)
+            VALUES (%s, %s, 'signal', %s)
+            ON CONFLICT (token, direction) DO UPDATE
+            SET expires_at = GREATEST(signal_cooldowns.expires_at, %s)
+            """, (key, expires_dt, direction, expires_dt))
         conn.commit()
         conn.close()
-        return
     except Exception as e:
-        print(f"[signal_schema] set_cooldown PostgreSQL failed: {e} — falling back to JSON file")
-    # Fallback: JSON file
-    try:
-        try:
-            with open(COOLDOWN_FILE) as f:
-                data = json.load(f)
-        except:
-            data = {}
-        data[key] = time.time() + (hours * 3600)
-        with open(COOLDOWN_FILE, 'w') as f:
-            json.dump(data, f, indent=2)
-    except Exception as e:
-        print(f'[signal_schema] set_cooldown fallback (JSON) failed: {e} — cooldown may not persist')
+        print(f"[signal_schema] set_cooldown PostgreSQL failed: {e}")
 
 def clear_cooldown(token, direction=None):
+    key = token.upper()
+    if direction:
+        key = f"{key}:{direction.upper()}"
     try:
-        with open(COOLDOWN_FILE) as f:
-            data = json.load(f)
-        key = token.upper()
-        if direction:
-            key = f"{key}:{direction.upper()}"
+        try:
+            with open(LOSS_COOLDOWN_FILE) as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {}
         data.pop(key, None)
-        with open(COOLDOWN_FILE, 'w') as f:
-            json.dump(data, f)
-    except: pass
+        with open(LOSS_COOLDOWN_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print(f"[signal_schema] clear_cooldown failed: {e}")
 
 # ── Legacy DB_PATH alias (for any scripts still referencing it) ───────────────
 DB_PATH = RUNTIME_DB  # backwards compat alias
@@ -1426,18 +1632,22 @@ def update_token_intel(token: str,
         c.execute("""
             INSERT INTO token_intel
                 (token, exchange, max_leverage, base_position_size,
-                 open_positions, last_signal_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                 open_positions, regime, z_score,
+                 last_signal_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             ON CONFLICT(token) DO UPDATE SET
                 exchange          = COALESCE(excluded.exchange,          token_intel.exchange),
                 max_leverage      = COALESCE(excluded.max_leverage,       token_intel.max_leverage),
                 base_position_size= COALESCE(excluded.base_position_size, token_intel.base_position_size),
                 open_positions    = COALESCE(excluded.open_positions,     token_intel.open_positions),
+                regime            = COALESCE(excluded.regime,              token_intel.regime),
+                z_score           = COALESCE(excluded.z_score,             token_intel.z_score),
                 last_signal_at    = CURRENT_TIMESTAMP,
                 updated_at        = CURRENT_TIMESTAMP
         """, (
             token.upper(), exchange,
             max_leverage, base_position_size, open_positions,
+            regime, z_score,
         ))
         conn.commit()
         return True
@@ -1649,6 +1859,16 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
     Write latest prices from HL allMids into local SQLite.
     Seeds both latest_prices (current) and price_history (time series).
 
+    Gap-filling: when a 429 or other outage causes a missed collection cycle,
+    this function backfills the missing minutes by carrying forward the last
+    known price for each token. Backfills use INSERT OR IGNORE so they are
+    collision-safe — if a row already exists it is silently skipped.
+
+    Write-order: current price is written BEFORE backfill rows. This means
+    if a rate-limit or other error hits mid-batch, the current price is
+    already committed and only the backfill is lost. The next collection
+    cycle will catch remaining gaps.
+
     This is called by price_collector.py on every run.
     Any script that fetches allMids should call this afterward.
 
@@ -1657,17 +1877,29 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
         tokens:   {token_symbol: max_leverage} from HL meta universe
 
     Returns:
-        Number of rows inserted into price_history.
+        Number of rows inserted into price_history (excludes backfills).
     """
     if not allMids:
         return 0
     now = int(time.time())
     conn = _get_conn(STATIC_DB)
     c = conn.cursor()
+
+    # Batch-fetch last timestamp per token (one query instead of N)
+    syms = [s for s in allMids.keys() if not s.startswith('@')]
+    last_ts = {}
+    if syms:
+        placeholders = ','.join('?' * len(syms))
+        c.execute(
+            f'SELECT token, MAX(timestamp) FROM price_history WHERE token IN ({placeholders}) GROUP BY token',
+            syms
+        )
+        last_ts = {row[0]: row[1] for row in c.fetchall()}
+
     rows = 0
+    prev_price = {}  # {token: last_price} for backfill carry-forward
     for sym, price_str in allMids.items():
-        # SAFETY: reject @XXX numeric coin IDs — Hyperliquid allMids returns these for
-        # some coins instead of proper symbol names. They must never enter SQLite.
+        # SAFETY: reject @XXX numeric coin IDs
         if sym.startswith('@'):
             continue
         try:
@@ -1675,19 +1907,41 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
             if price <= 0:
                 continue
             lev = tokens.get(sym, 10) if tokens else 10
-            # latest_prices: upsert
+            sym_upper = sym.upper()
+
+            # latest_prices: upsert first (most important data)
             c.execute(
                 'INSERT OR REPLACE INTO latest_prices(token, price, updated_at, max_leverage) VALUES(?, ?, ?, ?)',
-                (sym.upper(), price, now, lev)
+                (sym_upper, price, now, lev)
             )
-            # price_history: insert (one row per tick for historical series)
+
+            # price_history: write CURRENT price before backfill
+            # (so current price survives even if backfill hits a 429)
             c.execute(
                 'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
-                (sym.upper(), price, now)
+                (sym_upper, price, now)
             )
             rows += 1
+
+            # Backfill any missing minutes since last collection
+            # Each missed minute gets the LAST KNOWN price (carry-forward),
+            # which is the price from the previous iteration for this symbol
+            prev_ts = last_ts.get(sym_upper)
+            if prev_ts is not None:
+                gap_seconds = now - prev_ts
+                if gap_seconds > 75:  # Missed at least one full cycle
+                    backfill_price = prev_price.get(sym_upper, price)
+                    for t in range(prev_ts + 60, now, 60):
+                        c.execute(
+                            'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
+                            (sym_upper, backfill_price, t)
+                        )
+
+            # Track previous price for next iteration's backfill
+            prev_price[sym_upper] = price
         except (ValueError, TypeError):
             continue
+
     conn.commit()
     conn.close()
     return rows
@@ -1822,7 +2076,7 @@ def get_price_history(token: str, lookback_minutes: int = 60*24) -> list:
         SELECT timestamp, price FROM price_history
         WHERE token=? AND timestamp>?
         ORDER BY timestamp ASC
-        LIMIT 2000
+        LIMIT 25000
     """, (token.upper(), cutoff))
     rows = c.fetchall()
     conn.close()

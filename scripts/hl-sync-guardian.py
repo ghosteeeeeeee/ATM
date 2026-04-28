@@ -25,9 +25,53 @@ from _secrets import BRAIN_DB_DICT
 from hermes_file_lock import FileLock
 
 # Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
-# Pruned 2026-04-02: removed WIF, BONK, PYTH, JTO, MNGO, APTOS, RAY (these ARE tradeable)
-HL_TOKEN_BLOCKLIST = frozenset({'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA',
+HL_TOKEN_BLOCKLIST=frozenset({'HILL', 'FIRE', 'FORTH', 'ALPINE', 'DOGET', 'XRP',
+    'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA',
     'LOOM', 'SRM', 'SAGE', 'SAMO', 'DUST', 'HNT', 'STABLE', 'STBL'})
+
+# ── Self-close (UNPROTECTABLE coins) ──────────────────────────────────────────
+# Coins where HL rejects TP/SL trigger orders. Guardian maintains tpsl_self_close
+# table and monitors breach locally, replacing self_close_watcher.py (2026-04-23).
+SELF_CLOSE_TABLE = "tpsl_self_close"
+UNPROTECTABLE_COINS = frozenset({'AAVE', 'MORPHO', 'ASTER', 'PAXG', 'BTC', 'AVNT', 'PENDLE', 'MET'})
+
+# ── Shared HL positions cache (avoids redundant /info calls within a cycle) ────
+_hl_positions_cache = {}        # {coin: position_data}
+_hl_positions_cache_time = 0
+_HL_POSITIONS_CACHE_TTL = 30    # seconds — valid for one guardian cycle
+
+def _get_cached_hl_positions():
+    """Return cached HL positions if fresh, else refetch.
+    
+    Tries shared hype_cache first (written by pipeline), falls back to direct
+    API call only if the cache is stale (>60s) or missing. This eliminates
+    duplicate /info API calls when both guardian and pipeline run on the same
+    60s schedule.
+    """
+    global _hl_positions_cache, _hl_positions_cache_time
+    if time.time() - _hl_positions_cache_time < _HL_POSITIONS_CACHE_TTL:
+        return _hl_positions_cache
+    
+    # ── Step 1: Try shared hype_cache (written by pipeline's position_manager) ──
+    # This avoids a redundant /info API call when pipeline ran recently.
+    try:
+        import hype_cache as hc
+        cached = hc.get_cached_positions()
+        if cached:
+            _hl_positions_cache = cached
+            _hl_positions_cache_time = time.time()
+            return _hl_positions_cache
+    except Exception:
+        pass  # Shared cache miss/stale — fall through to direct fetch
+    
+    # ── Step 2: Direct API fallback (only if cache is cold) ──
+    try:
+        fresh = get_open_hype_positions_curl()
+        _hl_positions_cache = {p.get('coin'): p for p in fresh}
+        _hl_positions_cache_time = time.time()
+    except Exception:
+        pass  # Return stale cache on error
+    return _hl_positions_cache
 
 def _is_token_tradeable(token: str) -> bool:
     """Check if token is on HL blocklist (non-tradeable phantom tokens).
@@ -138,16 +182,82 @@ def _acquire_lock_with_heartbeat():
 _lock_fd = _acquire_lock_with_heartbeat()
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 from hermes_ab_utils import get_cached_ab_variant
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT, ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL, ATR_K_NORMAL_VOL, ATR_PCT_FALLBACK, MAX_HYPE_POSITIONS
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
-    get_trade_history, is_live_trading_enabled, mirror_open, hype_coin,
-    is_delisted, replace_sl, replace_tp, place_tp_sl_batch, _hl_price_decimals,
-    cancel_all_open_orders,
+    get_trade_history, is_live_trading_enabled, mirror_open, mirror_open_batch,
+    hype_coin, is_delisted, replace_sl, replace_tp, place_tp_sl_batch,
+    _hl_price_decimals, cancel_all_open_orders,
 )
 
 import json  # for json.dumps in penalty recording
+
+# ── Loss cooldown ─────────────────────────────────────────────────────────────
+# Imported from paths.py (SINGLE SOURCE). Previous inline definitions were
+# duplicated across hl-sync-guardian.py, position_manager.py, and cascade_flip.py.
+from paths import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
+
+def _load_cooldowns() -> dict:
+    try:
+        with open(LOSS_COOLDOWN_FILE) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+def _save_cooldowns(data: dict) -> None:
+    try:
+        with open(LOSS_COOLDOWN_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        log(f'[_save_cooldowns] FAILED to write {LOSS_COOLDOWN_FILE}: {e}', 'FAIL')
+        raise  # Re-raise so caller knows the save failed
+
+def _is_loss_cooldown_active(token: str, direction: str) -> bool:
+    key = f"{token.upper()}:{direction.upper()}"
+    data = _load_cooldowns()
+    import time as _time
+    now = _time.time()
+    entry = data.get(key)
+    if not entry:
+        return False
+    expiry = entry.get('expires', 0) if isinstance(entry, dict) else entry
+    return expiry > now
+
+def _record_loss_cooldown(token: str, direction: str) -> None:
+    """
+    Record a loss cooldown for token+direction. Called when guardian closes a losing trade.
+
+    Guardian is purely protective — only writes if the pipeline did NOT already write a
+    cooldown entry. If an entry already exists (from pipeline with reason='loss'), skip.
+    Writes with reason='guardian' to distinguish from pipeline's reason='loss'.
+    """
+    if _is_loss_cooldown_active(token, direction):
+        return  # Already in cooldown (pipeline or prior guardian entry)
+    key = f"{token.upper()}:{direction.upper()}"
+    data = _load_cooldowns()
+    # Skip if pipeline already wrote a proper loss cooldown
+    existing = data.get(key, {})
+    if existing.get('reason') == 'loss':
+        log(f'  [Guardian] Pipeline already recorded loss cooldown for {key} — skipping', 'INFO')
+        return
+    entry = data.get(key)
+    if entry is None:
+        streak = 1
+    elif isinstance(entry, dict):
+        streak = entry.get('streak', 0) + 1
+    else:
+        streak = 1
+    hours = min(LOSS_COOLDOWN_BASE * (2 ** (streak - 1)), LOSS_COOLDOWN_MAX)
+    import time as _time
+    expiry = _time.time() + (hours * 3600)
+    data[key] = {'expires': expiry, 'streak': streak, 'hours': hours, 'reason': 'guardian'}
+    try:
+        _save_cooldowns(data)
+        log(f'  [Guardian] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h', 'WARN')
+    except Exception:
+        pass  # Error already logged and re-raised by _save_cooldowns
 
 # ── Instrumented checkpoint + event logging ──────────────────────────────────
 try:
@@ -309,7 +419,7 @@ def _retry_phantom_close_fills():
     import psycopg2  # local import like other functions in this file
     from _secrets import BRAIN_DB_DICT
     try:
-        conn = psycopg2.connect(**BRAIN_DB)
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         # Find PHANTOM_CLOSE trades with exit_price=0 that haven't been retried
         # recently (don't retry same trade every cycle — wait at least 60s between attempts)
@@ -317,13 +427,13 @@ def _retry_phantom_close_fills():
             SELECT id, token, direction, entry_price, pnl_pct,
                    EXTRACT(EPOCH FROM (NOW() - close_time)) as age_seconds
             FROM trades
-            WHERE server = 'Hermes'
+            WHERE server = %s
               AND status = 'closed'
               AND close_reason = 'PHANTOM_CLOSE'
               AND exit_price = 0
             ORDER BY close_time ASC
             LIMIT 5
-        ''')
+        ''', ('Hermes',))
         phantom_trades = cur.fetchall()
         if not phantom_trades:
             return
@@ -494,7 +604,7 @@ def get_db_open_trades():
     """Get open trades from paper DB where exchange = Hyperliquid. Includes 'id' for Step 8."""
     r = subprocess.run([
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
-        "SELECT id, token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid'"
+        "SELECT id, token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid' AND (signal IS NULL OR signal NOT IN ('pump_hunter'))"
     ], capture_output=True, text=True, timeout=10)
     if r.returncode != 0:
         log(f'get_db_open_trades FAILED: {r.stderr}', 'FAIL')
@@ -521,7 +631,7 @@ def get_all_open_trades():
     """Get ALL open trades (paper and real) from DB."""
     r = subprocess.run([
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
-        "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open'"
+        "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND (signal IS NULL OR signal NOT IN ('pump_hunter'))"
     ], capture_output=True, text=True, timeout=10)
     if r.returncode != 0:
         log(f'get_all_open_trades FAILED: {r.stderr}', 'FAIL')
@@ -567,16 +677,17 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
         # Atomic: INSERT only if no open trade exists for this token.
         # Eliminates race condition between SELECT-then-INSERT.
         cur.execute("""
-            INSERT INTO trades (token, direction, amount_usdt, entry_price,
+            INSERT INTO trades (token, direction, amount_usdt, entry_price, hl_entry_price,
                 exchange, paper, stop_loss, target, server, status, open_time,
-                pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance)
-            SELECT %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
-                   0, 0, %s, 0.03, 0.01, 0.01
+                pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance,
+                guardian_closed, is_guardian_close)
+            SELECT %s, %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
+                   0, 0, %s, 0.03, 0.01, 0.01, TRUE, TRUE
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
             )
             RETURNING id
-        """, (token, direction, amount_usdt, entry_price,
+        """, (token, direction, amount_usdt, entry_price, entry_price,
               stop_loss, target, leverage, token))
         row = cur.fetchone()
         if row is None:
@@ -675,6 +786,10 @@ def _get_fills_cached(token: str, window_start_ms: int, window_end_ms: int):
 
     if count >= _MAX_API_CALLS_PER_CYCLE:
         log(f'  [RATE-LIMIT] get_trade_history called {count}x this cycle — using fallback', 'WARN')
+        # BUG-FIX: If rate-limited, return stale cache if available instead of []
+        if cache_key in _FILL_CACHE:
+            cached = _FILL_CACHE[cache_key]
+            return cached['fills']
         return []
 
     # Fetch from HL
@@ -688,27 +803,38 @@ def _get_fills_cached(token: str, window_start_ms: int, window_end_ms: int):
         return []
 
 
+def _poll_close_fills_once(token: str):
+    """
+    Shared inner loop for polling HL close fills once (no sleep).
+    Returns (wavg_exit, realized_pnl) or (None, None) if no fills.
+    """
+    window_end = int(time.time() * 1000)
+    window_start = window_end - 300_000  # 5 min lookback
+    fills = _get_fills_cached(token, window_start, window_end)
+    token_closes = [f for f in fills
+                    if f['coin'].upper() == token.upper() and f.get('side') == 'B']
+    if token_closes:
+        total_sz = sum(f['sz'] for f in token_closes)
+        wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
+        realized_pnl = sum(f.get('closed_pnl', 0) or 0 for f in token_closes)
+        return wavg_exit, realized_pnl
+    return None, None
+
+
 def _poll_hl_fills_for_close(token: str, close_start_ms: int):
     """
     Poll get_trade_history() up to 3 times with 5s delay to get actual HL fill data
     for a recently-closed position.
     Returns (hl_exit_price, realized_pnl) or (0.0, None) if no fills found.
-    Returns (wavg_exit, float) for breakeven or losing/winning trades.
 
-    FIX (2026-04-14): Now uses _get_fills_cached to consolidate API calls and
-    prevent duplicate get_trade_history calls within the same guardian cycle.
+    FIX (2026-04-14): Now uses _get_fills_cached to consolidate API calls.
+    FIX (2026-04-17): Delegated to shared _poll_close_fills_once helper.
     """
     for attempt in range(3):
         time.sleep(5)
-        window_end = int(time.time() * 1000)
-        fills = _get_fills_cached(token, close_start_ms, window_end)
-        token_closes = [f for f in fills
-                        if f['coin'].upper() == token.upper() and f.get('side') == 'B']
-        if token_closes:
-            total_sz = sum(f['sz'] for f in token_closes)
-            wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
-            realized_pnl = sum(f['closed_pnl'] for f in token_closes)
-            return wavg_exit, realized_pnl
+        wavg, pnl = _poll_close_fills_once(token)
+        if wavg is not None:
+            return wavg, pnl
         log(f'  Fill poll attempt {attempt+1}/3 — no close fills yet for {token}', 'WARN')
     log(f'  No HL close fills found for {token} after 3 polls', 'FAIL')
     return 0.0, None  # None = no data found, distinguish from breakeven (0.0)
@@ -719,13 +845,16 @@ def _wait_for_position_closed(token: str, timeout: int = 15) -> bool:
     BUG-2 fix: Wait for a position to actually disappear from HL /info.
     Returns True if position is gone (closed/filled), False if still open.
     Polls every 2s for up to 'timeout' seconds.
+
+    FIX (2026-04-17): Uses _get_cached_hl_positions() first, then falls back
+    to fresh API call if cache is stale. Avoids redundant /info calls.
     """
     deadline = time.time() + timeout
     while time.time() < deadline:
         time.sleep(2)
         try:
-            positions = get_open_hype_positions_curl()
-            if token not in positions:
+            positions = _get_cached_hl_positions()
+            if token not in positions or float(positions.get(token, {}).get('size', 0)) == 0:
                 log(f'  [FILL CONFIRMED] {token} position closed on HL')
                 return True
             log(f'  [FILL WAIT] {token} still on HL, retrying...', 'WARN')
@@ -740,25 +869,38 @@ def _get_hl_exit_price(token: str, fallback: float = 0.0) -> float:
     Attempt to get the actual HL fill price for a recently-closed position.
     Polls trade history up to 3 times with 5s delay using _get_fills_cached.
     Returns the weighted-average close-fill price, or fallback if no fills found.
-    Only considers side='B' (close) fills — not entry fills (side='A').
 
     FIX (2026-04-14): Uses _get_fills_cached to avoid duplicate API calls.
+    FIX (2026-04-17): Uses shared _poll_close_fills_once helper.
     If no fills found after 3 attempts (15s), falls back to provided fallback.
+
+    FIX (2026-04-16): When no fills are found AND fallback is 0.0, return the
+    current market price from the price cache. This prevents guardian from
+    closing trades with exit_price=0 (which corrupts PnL calculations) when
+    HL fills are unavailable due to rate-limits or the fallback entry price
+    was never recorded in the paper trade.
     """
     for attempt in range(3):
         time.sleep(5)
-        window_end = int(time.time() * 1000)
-        window_start = window_end - 300_000  # 5 min lookback
-        fills = _get_fills_cached(token, window_start, window_end)
-        # Only use close fills (side='B'), not entry fills (side='A')
-        token_closes = [f for f in fills
-                       if f['coin'].upper() == token.upper() and f.get('side') == 'B']
-        if token_closes:
-            total_sz = sum(f['sz'] for f in token_closes)
-            wavg = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
-            log(f'  HL exit price for {token}: {wavg:.4f} (from {len(token_closes)} close fills)')
+        wavg, _ = _poll_close_fills_once(token)
+        if wavg is not None:
+            log(f'  HL exit price for {token}: {wavg:.4f}')
             return wavg
-    log(f'  ⚠️ guardian_missing {token}: using estimated exit price (HL fill not available)', 'WARN')
+    log(f'  ⚠️ guardian_missing {token}: no HL close fills found — using fallback', 'WARN')
+    # FIX (2026-04-16): If fallback is 0.0 or None, try to get current market price
+    if not fallback or fallback <= 0:
+        try:
+            import hype_cache as hc
+            mids = hc.get_allMids()
+            if token.upper() in mids:
+                curr = float(mids[token.upper()])
+                if curr > 0:
+                    log(f'  ⚠️ {token} using current market price {curr} as exit (fallback was 0.0)')
+                    return curr
+        except Exception:
+            pass
+        log(f'  ⚠️ {token} exit price unavailable: fallback={fallback}, HL fills not found, no market price — treating as 0', 'WARN')
+        return 0.0  # Last resort — guardian will handle 0.0 in caller
     return fallback
 
 
@@ -808,9 +950,9 @@ def reconcile_hype_to_paper(hl_pos, prices):
             direction = pos_data.get('direction', 'LONG')
             lev = float(pos_data.get('leverage', 1)) or 1
 
-            # Calculate SL/TP defaults
-            sl_pct = 0.02
-            tp_pct = 0.05
+            # Calculate SL/TP defaults — use acceleration-phase floors for tight stops
+            sl_pct = ATR_SL_MIN_ACCEL   # 0.20% floor
+            tp_pct = ATR_TP_MIN_ACCEL   # 0.50% floor
             if direction == 'SHORT':
                 # SHORT: SL above entry (price rises = bad), TP below entry (price falls = good)
                 sl_price = round(entry_px * (1 + sl_pct), 8)
@@ -837,7 +979,7 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 update_values = []
 
                 # Entry price
-                if paper_entry and abs(float(entry_px) - float(paper_entry)) / float(paper_entry) > 0.001:
+                if paper_entry is not None and paper_entry > 0 and abs(float(entry_px) - float(paper_entry)) / float(paper_entry) > 0.001:
                     needs_update = True
                     update_fields.append("entry_price = %s")
                     update_values.append(entry_px)
@@ -857,19 +999,8 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     update_values.append(int(lev))
                     log(f'  🔄 {coin} leverage: {paper_lev}x → {lev}x')
 
-                # Stop loss
-                if sl_price and (not paper_sl or abs(sl_price - float(paper_sl)) / float(paper_sl) > 0.001):
-                    needs_update = True
-                    update_fields.append("stop_loss = %s")
-                    update_values.append(sl_price)
-                    log(f'  🔄 {coin} SL: {paper_sl} → {sl_price}')
-
-                # Target
-                if tp_price and (not paper_tp or abs(tp_price - float(paper_tp)) / float(paper_tp) > 0.001):
-                    needs_update = True
-                    update_fields.append("target = %s")
-                    update_values.append(tp_price)
-                    log(f'  🔄 {coin} TP: {paper_tp} → {tp_price}')
+                # Stop loss — ATR SL is owned by position_manager. Never overwrite it here.
+                # Target — ATR TP is owned by position_manager. Never overwrite it here.
 
                 if needs_update:
                     update_values.append(trade_id)
@@ -893,11 +1024,17 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     try:
                         conn_upd = get_db_connection()
                         cur_upd = conn_upd.cursor()
+                        # NOTE: stop_loss and target are NOT updated here.
+                        # SL/TP is owned by position_manager's ATR trailing engine.
+                        # Writing fixed-% SL/TP here would overwrite the ATR-computed values.
                         cur_upd.execute("""
                             UPDATE trades SET entry_price=%s, direction=%s, leverage=%s,
-                                stop_loss=%s, target=%s
+                                highest_price=%s, lowest_price=%s
                             WHERE id=%s AND status='open'
-                        """, (entry_px, direction, int(lev), sl_price, tp_price, reconciled_id))
+                        """, (entry_px, direction, int(lev),
+                              entry_px if direction == 'LONG' else 0,   # highest_price: LONG starts at entry
+                              entry_px if direction == 'SHORT' else 0,  # lowest_price: SHORT starts at entry
+                              reconciled_id))
                         conn_upd.commit()
                         cur_upd.close()
                         conn_upd.close()
@@ -905,7 +1042,57 @@ def reconcile_hype_to_paper(hl_pos, prices):
                         log(f'  Update reconciled trade failed: {upd_err}', 'WARN')
                     continue  # Don't create new record, don't add to updated_tokens
 
-                log(f'  ⚠️ Orphan HL position: {coin} — creating paper trade before close', 'WARN')
+                # DUPLICATE GUARD: Also check PostgreSQL trades DB directly.
+                # signal_gen may have opened a paper trade within the same minute as this
+                # guardian cycle. reconciled_state only tracks guardian-opened trades.
+                # If a paper trade already exists for this coin, don't create a duplicate orphan.
+                # Skip pump_hunter records — they manage their own lifecycle.
+                try:
+                    conn_dup = get_db_connection()
+                    cur_dup = conn_dup.cursor()
+                    cur_dup.execute(
+                        "SELECT id, signal FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') LIMIT 1",
+                        (coin.upper(),))
+                    dup_row = cur_dup.fetchone()
+                    cur_dup.close()
+                    conn_dup.close()
+                    if dup_row:
+                        existing_id = dup_row[0]
+                        log(f'  ⚠️ {coin} orphan HL position but paper trade #{existing_id} already exists — closing both with existing ID', 'WARN')
+                        try:
+                            conn_upd2 = get_db_connection()
+                            cur_upd2 = conn_upd2.cursor()
+                            cur_upd2.execute("""
+                                UPDATE trades SET entry_price=%s, direction=%s, leverage=%s
+                                WHERE id=%s AND status='open'
+                            """, (entry_px, direction, int(lev), existing_id))
+                            conn_upd2.commit()
+                            cur_upd2.close()
+                            conn_upd2.close()
+                        except Exception as upd_err2:
+                            log(f'  Update existing trade failed: {upd_err2}', 'WARN')
+                        _mark_hl_reconciled(coin, existing_id, entry_px, direction)
+                        # FIX: Close the orphan HL position AND close the paper trade
+                        # BOTH using the existing_id — no new record created, no duplicates.
+                        # Close HL position first to eliminate real-money risk.
+                        if not DRY:
+                            _CLOSED_HL_COINS.add(coin.upper())
+                            close_ok = close_position_hl(coin, f"orphan_recovery_trade_{existing_id}")
+                            if close_ok:
+                                log(f'  Orphan {coin} HL position closed via market order (existing_id={existing_id})', 'PASS')
+                                time.sleep(6)
+                                _close_paper_trade_db(existing_id, coin, entry_px, 'ORPHAN_PAPER')
+                            else:
+                                _CLOSED_HL_COINS.discard(coin.upper())
+                                log(f'  ⚠️ Orphan {coin} market_close failed (existing_id={existing_id}) — will retry', 'WARN')
+                        continue
+                except Exception as dup_err:
+                    log(f'  Duplicate guard DB check failed for {coin}: {dup_err}', 'WARN')
+
+                # ORPHAN GUARD (2026-04-16): Guardian must NOT create paper trades for orphan
+                # HL positions — only decider-run can open new trades. Log and skip.
+                log(f'  ⛔ {coin} HL position has no DB record — guardian cannot create trades (skip)', 'WARN')
+                continue
 
                 # ── Orphan detected checkpoint ─────────────────────────────────────
                 try:
@@ -1010,15 +1197,13 @@ def reconcile_hype_to_paper(hl_pos, prices):
 
 def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
     """
-    Check if trade should be flipped based on A/B test config and PnL thresholds.
-    - Soft SL (1% loss): arm the flip (ready to trigger on next check)
-    - Hard SL (2% loss): execute the flip immediately (close + open opposite)
-    Uses flip-trade-strategy A/B test to determine behavior.
+    [DEFUNCT-2026-04-17] Flip logic removed from guardian.
+    Cascade-flip now lives in position_manager.py (CASCADE_FLIP_ENABLED).
+    Guardian is orphan/cascade recovery only — NOT a trading executor.
     """
-    if DRY:
-        return
+    return  # guardian does not trade
 
-    from hyperliquid_exchange import place_order, get_open_hype_positions_curl
+    from hyperliquid_exchange import place_order
 
     token = trade['token']
     direction = trade['direction']
@@ -1193,9 +1378,9 @@ def sync_pnl_from_hype(prices):
     try:
         cur = conn.cursor()
 
-        # Get HL positions with unrealized PnL
+        # Get HL positions with unrealized PnL — use cache when available
         try:
-            hl_pos = get_open_hype_positions_curl()
+            hl_pos = _get_cached_hl_positions()
         except Exception as e:
             log(f'  sync_pnl_from_hype: failed to fetch HL positions: {e}', 'FAIL')
             conn.close()
@@ -1250,38 +1435,23 @@ def sync_pnl_from_hype(prices):
                           prices.get(token, entry) if prices else entry,
                           trade_id))
 
-                    # Check flip trade triggers (A/B tested: soft SL arm / hard SL flip)
-                    _check_and_execute_flip(
-                        {'id': trade_id, 'token': token, 'direction': direction,
-                         'leverage': lev, 'amount_usdt': amount},
-                        pnl_pct, prices)
+                    # [DEFUNCT-2026-04-17] flip now handled by position_manager CASCADE_FLIP
+                    # _check_and_execute_flip({...})
 
                     # ── Stale Trade Rotation (2026-04-05) ────────────────────────────────
                     # If trade hasn't moved >1% in 15min AND a faster hot-set token exists
                     # → close stale trade, let ai_decider refill from hot-set.
-                    # Runs after flip check; skipped for trades already being cut (<-5%).
-                    # BUG-FIX: CUT_LOSER_THRESHOLD was referenced before definition (line 918
-                    # defined it after line 901's use → UnboundLocalError. Moved to module-level
-                    # constant. Also guard: skip if flip_armed (docstring contract).
+                    # Runs after pnl update; skipped for trades already being cut (<-5%).
+                    # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
                     if pnl_pct > CUT_LOSER_THRESHOLD:
-                        # Check flip_armed before rotating — don't override a pending flip
-                        cur.execute("SELECT flip_armed FROM trades WHERE id=%s", (trade_id,))
-                        flip_row = cur.fetchone()
-                        flip_armed = bool(flip_row[0]) if flip_row else False
-                        if flip_armed:
-                            log(f'  [STALE-ROTATION] {token} flip_armed — skipping rotation', 'INFO')
-                        else:
-                            try:
-                                _check_stale_rotation(
-                                    {'id': trade_id, 'token': token, 'direction': direction,
-                                     'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
-                                    pnl_pct, prices, conn, cur)
-                            except Exception as stale_err:
-                                log(f'  [STALE-ROTATION] {token} error: {stale_err}', 'WARN')
+                        _check_stale_rotation(
+                            {'id': trade_id, 'token': token, 'direction': direction,
+                             'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
+                            pnl_pct, prices, conn, cur)
 
                     updated += 1
                     # Cut-loser: emergency exit at -5% loss
-                    # This runs AFTER flip check, so flip has priority over hard cut
+                    # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
                     # ── Cut-loser: BUG-2/3/28 fix ────────────────────────────────────────
                     # IMPORTANT: close_position() sends order but does NOT wait for fill.
                     # BUG-2 old: marked DB closed BEFORE HL confirmed fill. Fix: wait first.
@@ -1305,10 +1475,20 @@ def sync_pnl_from_hype(prices):
                                 # Still on HL — retry close
                                 log(f'  [CUT-LOSER] Retry {attempt+2}/2: {token} still open on HL', 'WARN')
                             else:
-                                log(f'  [CUT-LOSER] Attempt {attempt+1}/2 failed: {close_result.get("error", "unknown")}', 'WARN')
+                                log(f'  [CUT-LOSER] Attempt {attempt+1}/2 failed: '
+                                    f'error={close_result.get("error","?")} message={close_result.get("message","?")}', 'WARN')
 
                         if not closed_ok:
-                            log(f'  [CUT-LOSER] FATAL: could not close {token} after 2 attempts — trade remains open!', 'FAIL')
+                            # BUG-FIX (2026-04-20): When HL close fails after 2 attempts,
+                            # force-close the paper trade to prevent it from becoming an orphan.
+                            log(f'  [CUT-LOSER] FATAL: could not close {token} on HL after 2 attempts '
+                                f'— force-closing paper trade', 'FAIL')
+                            try:
+                                _close_paper_trade_db(trade_id, token, curr_price_hl, 'CUT_LOSER_CLOSE_FAILED')
+                                log(f'  [CUT-LOSER] {token} paper trade force-closed '
+                                    f'at {curr_price_hl:.6f} ({pnl_pct:.2f}%) — HL position may be ghost', 'WARN')
+                            except Exception as db_err:
+                                log(f'  [CUT-LOSER] Paper force-close also failed for {token}: {db_err}', 'FAIL')
                         else:
                             # Only mark DB closed AFTER fill confirmed on HL
                             try:
@@ -1326,6 +1506,12 @@ def sync_pnl_from_hype(prices):
                                     log(f'  [CUT-LOSER] DB updated for {token} trade #{trade_id}', 'PASS')
                             except Exception as cut_err:
                                 log(f'  Cut-loser DB update error: {cut_err}', 'FAIL')
+                            # FIX (2026-04-25): Record loss cooldown after successful HL close.
+                            # The direct UPDATE above skips _close_paper_trade_db, which is where
+                            # _record_loss_cooldown is normally called. Without this, cut-loser
+                            # closes never populate loss_cooldowns.json, allowing immediate re-entry.
+                            if pnl_pct < 0:
+                                _record_loss_cooldown(token, direction)
                         continue  # Skip flip check — already closing
 
         conn.commit()
@@ -1338,10 +1524,148 @@ def sync_pnl_from_hype(prices):
     except Exception as e:
         try:
             conn.rollback()
-            conn.close()
-        except:
+        except Exception:
             pass
-        log(f'  sync_pnl_from_hype error: {e}', 'FAIL')
+        log(f'  sync_pnl_from_hype failed: {e}', 'FAIL')
+        return
+
+
+# ── Guardian hard-stop backup (emergency last line of defense) ─────────────────
+# Guardian watches ALL open trades. If price crosses the stored DB SL or TP,
+# it closes immediately — INDEPENDENT of position_manager's ATR engine.
+# This is purely price-based: no ATR, no momentum, no phase detection.
+# It reads the SL/TP that position_manager wrote to the DB (ATR-computed values).
+def _check_hard_stops(prices: dict):
+    """
+    Emergency backup: close any trade whose price has crossed its DB SL or TP.
+    This is the guardian's independent hard-stop check — completely separate from
+    position_manager's ATR logic. If ATR engine fails or HL orders don't execute,
+    this ensures we still exit at the stored levels.
+    Only fires when price has crossed the level by >0.1% (avoids edge-case touching).
+    """
+    from hyperliquid_exchange import close_position
+
+    conn = get_db_connection()
+    if conn is None:
+        return
+    try:
+        cur = conn.cursor()
+        # GUARDIAN HARD-STOP: Only fires for positions NOT managed by ATR.
+        # ATR-managed positions are handled exclusively by position_manager's
+        # check_atr_tp_sl_hits() in the pipeline. Guardian is the emergency backup
+        # for positions that somehow never got ATR levels (entry_price=0, etc).
+        cur.execute("""
+            SELECT id, token, direction, entry_price, stop_loss, target,
+                   leverage, amount_usdt, paper
+            FROM trades
+            WHERE status='open' AND exchange='Hyperliquid'
+            AND stop_loss IS NOT NULL AND stop_loss > 0
+            AND (atr_managed IS NULL OR atr_managed = FALSE)
+        """)
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        for trade_id, token, direction, entry_px, sl, tp, lev, amt, paper in rows:
+            token = token.upper()
+            cur_price = prices.get(token)
+            if cur_price is None:
+                continue
+
+            direction = direction.upper()
+            sl = float(sl)
+            tp = float(tp) if tp else 0
+            entry_px = float(entry_px)
+            hit_reason = None
+
+            if direction == 'SHORT':
+                # SHORT: SL is ABOVE entry. Price rising TO or ABOVE SL = loss.
+                # TP is BELOW entry. Price falling TO or BELOW TP = profit target.
+                if cur_price >= sl:
+                    hit_reason = 'hard_sl'
+                elif tp > 0 and cur_price <= tp:
+                    hit_reason = 'hard_tp'
+            elif direction == 'LONG':
+                # LONG: SL is BELOW entry. Price falling TO or BELOW SL = loss.
+                # TP is ABOVE entry. Price rising TO or ABOVE TP = profit target.
+                if cur_price <= sl:
+                    hit_reason = 'hard_sl'
+                elif tp > 0 and cur_price >= tp:
+                    hit_reason = 'hard_tp'
+
+            if hit_reason:
+                pnl_pct = 0
+                if entry_px > 0 and cur_price > 0:
+                    if direction == 'SHORT':
+                        pnl_pct = round((entry_px - cur_price) / entry_px * 100, 2)
+                    else:
+                        pnl_pct = round((cur_price - entry_px) / entry_px * 100, 2)
+
+                log(f'  [HARD-{hit_reason.upper()}] {token} trade#{trade_id} '
+                    f'{"LONG" if direction=="LONG" else "SHORT"} '
+                    f'entry={entry_px:.6f} cur={cur_price:.6f} '
+                    f'{"SL" if "sl" in hit_reason else "TP"}={sl:.6f} '
+                    f'PnL={pnl_pct:.2f}% — closing', 'WARN')
+
+                # Retry close up to 2 times on failure
+                closed_ok = False
+                for attempt in range(2):
+                    result = close_position(token)
+                    if result.get('success'):
+                        filled = _wait_for_position_closed(token, timeout=15)
+                        if filled:
+                            closed_ok = True
+                            break
+                        log(f'  [HARD-STOP] Retry {attempt+2}/2: {token} still open on HL', 'WARN')
+                    else:
+                        log(f'  [HARD-STOP] Attempt {attempt+1}/2 failed: '
+                            f'error={result.get("error","?")} message={result.get("message","?")}', 'WARN')
+                    time.sleep(3)
+
+                if closed_ok:
+                    # Close DB trade
+                    conn2 = get_db_connection()
+                    if conn2:
+                        cur2 = conn2.cursor()
+                        cur2.execute("""
+                            UPDATE trades SET status='closed', guardian_closed=TRUE,
+                                close_reason=%s, exit_reason=%s,
+                                exit_price=%s, pnl_pct=%s, close_time=NOW()
+                            WHERE id=%s AND status='open'
+                        """, (hit_reason, f'guardian_hard_{hit_reason}',
+                              cur_price, pnl_pct, trade_id))
+                        conn2.commit()
+                        cur2.close()
+                        conn2.close()
+                    log(f'  [HARD-{hit_reason.upper()}] {token} closed at {cur_price:.6f} '
+                        f'({pnl_pct:.2f}%)', 'PASS')
+                    # FIX (2026-04-25): Record loss cooldown after successful HL close.
+                    # The direct UPDATE above skips _close_paper_trade_db, which is where
+                    # _record_loss_cooldown is normally called. Without this, hard-stop
+                    # closes never populate loss_cooldowns.json, allowing immediate re-entry.
+                    if pnl_pct < 0:
+                        _record_loss_cooldown(token, direction)
+                else:
+                    # BUG-FIX (2026-04-20): When HL close fails after 2 attempts,
+                    # force-close the paper trade to prevent it from becoming an orphan.
+                    # HL may have a ghost position — paper side must be closed regardless.
+                    log(f'  [HARD-{hit_reason.upper()}] FATAL: could not close {token} '
+                        f'on HL after 2 attempts — force-closing paper trade', 'FAIL')
+                    try:
+                        _close_paper_trade_db(trade_id, token, cur_price, 'HARD_SL_CLOSE_FAILED')
+                        log(f'  [HARD-{hit_reason.upper()}] {token} paper trade force-closed '
+                            f'at {cur_price:.6f} ({pnl_pct:.2f}%) — HL position may be ghost', 'WARN')
+                    except Exception as db_err:
+                        log(f'  [HARD-{hit_reason.upper()}] Paper force-close also failed for '
+                            f'{token}: {db_err}', 'FAIL')
+
+    except Exception as e:
+        log(f'  [HARD-STOP] check failed: {e}', 'FAIL')
+        try:
+            conn.rollback()
+            conn.close()
+        except Exception:
+            pass
 
 
 # ─── Stale Trade Rotation (2026-04-05) ───────────────────────────────────────
@@ -1377,12 +1701,20 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         return
 
     import json as _json, time as _time, sqlite3 as _sqlite3
+    from signal_schema import _is_loss_cooldown_active
 
     token = trade['token']
     trade_id = trade['id']
     entry_px = float(trade.get('entry_price') or 0)
     direction = trade.get('direction', 'SHORT')
     direction_upper = direction.upper()
+
+    # BUG-FIX (2026-04-26): If this token+direction is in loss cooldown from a
+    # previous losing trade, do NOT rotate — that would be revenge trading.
+    # _is_loss_cooldown_active checks loss_cooldowns.json (guardian loss cooldowns
+    # only, not signal-generator cooldowns) and returns True if still active.
+    if _is_loss_cooldown_active(token, direction_upper):
+        return
 
     # 0.2% matches speed_tracker.py STALE_VELOCITY_5M — the noise floor for 5m velocity.
     # Using 1.0% here was 5x too loose and inconsistent with how is_stale is computed.
@@ -1391,7 +1723,7 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     RATE_LIMIT_SEC = 180      # 3 min cooldown between rotations
 
     # ── 1. Load speed data from runtime signals DB ──────────────────────────────
-    db_path = '/root/.hermes/data/signals_hermes_runtime.db'
+    db_path = RUNTIME_DB
     if not os.path.exists(db_path):
         return
 
@@ -1452,13 +1784,14 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         return  # Trade is moving fine
 
     # ── 3. Load hot-set and find a faster replacement ──────────────────────────
-    hotset_path = '/var/www/hermes/data/hotset.json'
+    hotset_path = HOTSET_FILE
     if not os.path.exists(hotset_path):
         return
 
     try:
-        with open(hotset_path) as f:
-            hs = _json.load(f)
+        with FileLock('hotset_json'):
+            with open(hotset_path) as f:
+                hs = _json.load(f)
         hotset = hs.get('hotset', [])
     except Exception as e:
         log(f'  [STALE-ROTATION] hotset.json load error: {e}', 'WARN')
@@ -1720,38 +2053,34 @@ def record_exit_features(trade_id: int, exit_price: float, exit_reason: str):
 def close_orphan_paper_trades(hl_pos, prices):
     """
     Handle paper trades that don't have corresponding HL position.
-    If room exists on HL → mirror the paper trade.
+    If room exists on HL → mirror the paper trade (batched, single API call).
     If at max positions → close the paper trade.
 
     Quality filter: only sync top 5 paper trades by confidence.
+
+    Rate-limit strategy:
+      - Collect ALL eligible trades first
+      - Call mirror_open_batch() ONCE for all of them
+        → single /info price fetch (shared), single /exchange leverage cycle,
+          single /exchange bulk orders call
+      - Falls back to per-trade mirror_open() only on batch failure
     """
     conn = get_db_connection()
     if conn is None:
-        return 0
+        return 0, 0
 
     try:
         cur = conn.cursor()
 
-        # Get top 5 paper trades by confidence (quality filter from combined-trading.py)
-        cur.execute("""
-            SELECT id, token, direction, entry_price, leverage, amount_usdt, confidence
-            FROM trades
-            WHERE status = 'open' AND paper = true AND exchange = 'Hyperliquid'
-            ORDER BY confidence DESC NULLS LAST, open_time ASC
-            LIMIT 5
-        """)
-        top_trades = {str(row[0]): row for row in cur.fetchall()}
-        log(f'  Quality filter: syncing top {len(top_trades)} paper trades to HL')
         conn.close()
 
         added_count = 0
         closed_count = 0
-        MAX_HYPE_POSITIONS = 5
 
-        # Count current HL positions
+        # Count current HL positions (zscore-pump is fully separate, never counted here)
         hype_count = len([p for p in hl_pos.values() if float(p.get('size', 0)) != 0])
 
-        # ── Paper=True path: mirror hot-set trades to HL ────────────────
+        # ── Paper=True path: mirror hot-set trades to HL (BATCHED) ────────────────
         conn2 = get_db_connection()
         cur2 = conn2.cursor()
         cur2.execute("""
@@ -1760,105 +2089,188 @@ def close_orphan_paper_trades(hl_pos, prices):
             WHERE status = 'open' AND paper = true AND exchange = 'Hyperliquid'
         """)
         all_paper_trades = cur2.fetchall()
+        conn2.close()
+
+        # Get copied trades state once
+        copied_state = get_copied_trades()
+        copied_ids = set(str(x) for x in copied_state.get('copied', []))
+
+        # Pass 1: handle already-copied trades (verify HL registration)
+        # ─────────────────────────────────────────────────────────────────────────
+        for row in all_paper_trades:
+            trade_id, token, direction, entry, lev, amount = row
+            trade_id_str = str(trade_id)
+
+            if trade_id_str not in copied_ids:
+                continue  # Not copied yet — handled in Pass 2
+
+            # Verify HL position still exists
+            if token in hl_pos and float(hl_pos[token].get('size', 0)) != 0:
+                log(f'  ✅ {token} verified on HL (copied trade #{trade_id})')
+                continue
+
+            # HL position not yet registered — wait before assuming missing.
+            # Race: paper trade created, HL order submitted, but HL hasn't confirmed yet.
+            # Retry up to 6 times with 5s delay = 30s total.
+            registered = False
+            for retry in range(6):
+                time.sleep(5)
+                try:
+                    hl_pos_retry = _get_cached_hl_positions()
+                    if token in hl_pos_retry and float(hl_pos_retry[token].get('size', 0)) != 0:
+                        log(f'  ✅ {token} verified on HL after {retry+1} retries')
+                        registered = True
+                        break
+                except Exception as e:
+                    log(f'  ⚠️ Retry {retry+1} failed for {token}: {e}', 'WARN')
+            if not registered:
+                log(f'  ⚠️ {token} copied but no HL position after retries — closing paper', 'WARN')
+                _close_paper_trade_db(trade_id, token, prices.get(token, entry), 'ORPHAN_PAPER')
+                closed_count += 1
+                try:
+                    copied_state['copied'].remove(trade_id_str)
+                    copied_state['closed'].append(trade_id_str)
+                    save_copied_trades(copied_state)
+                except:
+                    pass
+
+        # Pass 2: collect eligible NEW trades for batch mirroring
+        # ─────────────────────────────────────────────────────────────────────────
+        batch_eligible = []   # [(trade_id, token, direction, lev_int, curr_price)]
 
         for row in all_paper_trades:
             trade_id, token, direction, entry, lev, amount = row
             trade_id_str = str(trade_id)
 
-            # Get copied trades state
-            copied_state = get_copied_trades()
-            copied_ids = [str(x) for x in copied_state.get('copied', [])]
-
-            # Already copied to HL?
             if trade_id_str in copied_ids:
-                # Verify HL position still exists
-                if token in hl_pos and float(hl_pos[token].get('size', 0)) != 0:
-                    log(f'  ✅ {token} verified on HL (copied trade #{trade_id})')
-                else:
-                    # HL position not yet registered — wait before assuming missing.
-                    # Race: paper trade created, HL order submitted, but HL hasn't confirmed yet.
-                    # Retry up to 6 times with 5s delay = 30s total (was 3×5s=15s).
-                    registered = False
-                    for retry in range(6):
-                        time.sleep(5)
-                        try:
-                            hl_pos_retry = get_open_hype_positions_curl()
-                            if token in hl_pos_retry and float(hl_pos_retry[token].get('size', 0)) != 0:
-                                log(f'  ✅ {token} verified on HL after {retry+1} retries')
-                                registered = True
-                                break
-                        except Exception as e:
-                            log(f'  ⚠️ Retry {retry+1} failed for {token}: {e}', 'WARN')
-                    if not registered:
-                        log(f'  ⚠️ {token} copied but no HL position after retries — closing paper', 'WARN')
-                        _close_paper_trade_db(trade_id, token, prices.get(token, entry), 'ORPHAN_PAPER')
-                        closed_count += 1
-                    # Remove from copied list
-                    try:
-                        copied_state['copied'].remove(trade_id_str)
-                        copied_state['closed'].append(trade_id_str)
-                        save_copied_trades(copied_state)
-                    except:
-                        pass
-                continue
-
-            # Not copied yet — check if HL has this position
+                continue  # Already handled in Pass 1
             if token in hl_pos:
                 continue  # Position exists, will be reconciled
 
-            # No HL position — try to mirror
             curr_price = prices.get(token) if prices else None
             if not curr_price:
                 continue
 
             lev_int = int(lev) if lev else 10
-            amount_float = float(amount) if amount else 20
 
             if hype_count >= MAX_HYPE_POSITIONS:
-                # At max — close the paper trade
                 log(f'  At max positions ({MAX_HYPE_POSITIONS}), closing paper: {token}', 'WARN')
                 _close_paper_trade_db(trade_id, token, curr_price, 'MAX_POSITIONS')
                 closed_count += 1
                 continue
 
-            # Mirror paper trade to HL — HOT-SET ONLY (blacklist-aware)
+            # HOT-SET + blacklist checks (same logic as before)
             ht = hype_coin(token)
             try:
-                conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+                conn_s = sqlite3.connect(RUNTIME_DB)
                 cur_s = conn_s.cursor()
                 cur_s.execute("SELECT 1 FROM signals WHERE token=? AND hot_cycle_count>=1 LIMIT 1", (ht,))
                 in_hot = cur_s.fetchone() is not None
                 conn_s.close()
             except Exception:
-                in_hot = False  # Fail open on DB errors
+                in_hot = False
             blocked = (direction.upper() == 'SHORT' and ht.upper() in SHORT_BLACKLIST) or \
                       (direction.upper() == 'LONG' and ht.upper() in LONG_BLACKLIST)
             if not in_hot:
                 log(f'  {token}: NOT in hot-set — paper only, live mirror blocked', 'WARN')
-            elif blocked:
+                # BUG FIX (2026-04-26): Do NOT increment hype_count here.
+                # This trade never consumed an HL slot (it was closed before the batch
+                # reservation step). Incrementing hype_count would overcount open slots,
+                # causing legitimate trades to be rejected as "at max positions."
+                _close_paper_trade_db(trade_id, token, curr_price, 'NOT_HOTSET')
+                closed_count += 1
+                continue
+            if blocked:
                 bl = 'SHORT_BLACKLIST' if direction.upper() == 'SHORT' else 'LONG_BLACKLIST'
                 log(f'  {token}: on {bl} ({direction}) — closing paper trade', 'WARN')
+                # BUG FIX (2026-04-26): Do NOT increment hype_count here.
+                # Same reason as NOT_HOTSET: this trade never consumed an HL slot.
                 _close_paper_trade_db(trade_id, token, curr_price, 'HOTSET_BLOCKED')
-            elif not DRY and is_live_trading_enabled():
-                try:
-                    result = mirror_open(ht, direction, float(curr_price), leverage=lev_int)
-                    if result.get('success'):
-                        # Mark as copied
-                        copied_state['copied'].append(trade_id_str)
-                        save_copied_trades(copied_state)
-                        log(f'  Mirrored {token} to HL: {direction} @ {curr_price}', 'PASS')
-                        hype_count += 1
-                        added_count += 1
-                    else:
-                        log(f'  Mirror failed for {token}: {result.get("message")}', 'WARN')
-                except Exception as me:
-                    log(f'  Mirror error for {token}: {me}', 'WARN')
-            elif DRY:
-                log(f'  [DRY] Would mirror {token} {direction} @ {curr_price} x{lev_int}', 'WARN')
-                hype_count += 1
-                added_count += 1
+                closed_count += 1
+                continue
 
-        conn2.close()
+            # DRY mode — log only, do NOT increment hype_count (nothing was actually placed)
+            if DRY:
+                log(f'  [DRY] Would mirror {token} {direction} @ {curr_price} x{lev_int}', 'WARN')
+                added_count += 1  # report what would have been mirrored
+                continue
+
+            # Collect for batch
+            batch_eligible.append((trade_id_str, ht, direction, lev_int, curr_price))
+            hype_count += 1  # reserve HL slot — will be confirmed after batch executes
+
+        # ── Batch mirror all eligible trades in ONE API call ─────────────────────
+        if batch_eligible and is_live_trading_enabled():
+            batch_info = [
+                {"token": ht, "direction": dir_, "entry_price": px, "leverage": lev}
+                for (tid, ht, dir_, lev, px) in batch_eligible
+            ]
+            # mirror_open_batch uses local prices dict (avoid per-token /info fetch)
+            prices_for_batch = {ht: px for (_, ht, _, _, px) in batch_eligible}
+
+            log(f'  BATCH: mirroring {len(batch_info)} trades to HL in single API call...', 'INFO')
+            batch_result = mirror_open_batch(batch_info, prices=prices_for_batch)
+
+            if batch_result.get('success') and batch_result.get('placed', 0) > 0:
+                placed_tokens = []
+                for r in batch_result.get('results', []):
+                    if r.get('success'):
+                        placed_tokens.append(r['token'])
+                        # Mark signal as executed
+                        try:
+                            from signal_schema import mark_signal_executed
+                            mark_signal_executed(r['token'].upper(), r.get('side', '').upper())
+                        except Exception:
+                            pass
+                log(f'  BATCH mirrored: {placed_tokens}', 'PASS')
+                added_count += len(placed_tokens)
+                # NOTE: hype_count already incremented per batch_eligible entry above (slot reservation)
+                # Do NOT re-increment here — that would double-count
+
+                # Update copied_state + persist
+                for (trade_id_str, ht, direction, lev_int, curr_price) in batch_eligible:
+                    if ht in placed_tokens:
+                        copied_state['copied'].append(trade_id_str)
+                save_copied_trades(copied_state)
+            else:
+                # Batch failed — fall back to per-trade mirror_open
+                errors = batch_result.get('errors', [])
+                log(f'  BATCH failed ({errors}), falling back to per-trade mirroring...', 'WARN')
+                # Undo batch slot reservation — batch consumed no HL slots
+                hype_count -= len(batch_eligible)
+                for (trade_id_str, ht, direction, lev_int, curr_price) in batch_eligible:
+                    try:
+                        result = mirror_open(ht, direction, float(curr_price), leverage=lev_int)
+                        if result.get('success'):
+                            copied_state['copied'].append(trade_id_str)
+                            fill_price = result.get('entry_price')
+                            if fill_price and fill_price > 0:
+                                # Write HL fill price back to DB (same pattern as the original per-trade path)
+                                conn4 = get_db_connection()
+                                if conn4:
+                                    cur4 = conn4.cursor()
+                                    try:
+                                        cur4.execute("""
+                                            UPDATE trades SET entry_price = %s, hl_entry_price = %s
+                                            WHERE id = %s AND status = 'open'
+                                        """, (fill_price, fill_price, int(trade_id_str)))
+                                        conn4.commit()
+                                    except Exception:
+                                        pass
+                                    cur4.close()
+                                    conn4.close()
+                            try:
+                                from signal_schema import mark_signal_executed
+                                mark_signal_executed(ht.upper(), direction.upper())
+                            except Exception:
+                                pass
+                            hype_count += 1
+                            added_count += 1
+                        else:
+                            log(f'  Mirror failed for {ht}: {result.get("message")}', 'WARN')
+                    except Exception as me:
+                        log(f'  Mirror error for {ht}: {me}', 'WARN')
+                save_copied_trades(copied_state)
 
         # ── Paper=False path: place missing real trades on HL immediately ──
         # These trades were created with paper=False (live) but never reached HL.
@@ -1907,9 +2319,13 @@ def close_orphan_paper_trades(hl_pos, prices):
                 if result and result.get('success'):
                     hype_count += 1
                     log(f'  [LIVE-MISS] Mirrored {token} {direction} @ {curr_price} → {result}', 'PASS')
+                    try:
+                        from signal_schema import mark_signal_executed
+                        mark_signal_executed(ht.upper(), direction.upper())
+                        log(f'  [LIVE-MISS] Marked {ht} {direction} signal as executed in DB', 'PASS')
+                    except Exception as sig_err:
+                        log(f'  [LIVE-MISS] Failed to mark signal executed: {sig_err}', 'WARN')
                 else:
-                    # FIX (2026-04-14): mirror_open failed — delete the phantom paper trade
-                    # so guardian doesn't later close it as HL_CLOSED.
                     msg = result.get('message', str(result)) if result else 'unknown'
                     log(f'  [LIVE-MISS] Mirror failed for {token}: {msg} — deleting phantom', 'WARN')
                     try:
@@ -1929,7 +2345,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         if added_count > 0 or closed_count > 0:
             log(f'  Paper→HL mirror: {added_count} added, {closed_count} closed')
 
-        return added_count
+        return added_count, closed_count
 
     except Exception as e:
         try:
@@ -1938,7 +2354,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         except:
             pass
         log(f'  close_orphan_paper_trades error: {e}', 'FAIL')
-        return 0
+        return 0, 0
 
 
 def _close_paper_trade_db(trade_id, token, exit_price, reason):
@@ -1950,6 +2366,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         ORPHAN_PAPER   = paper has no HL position
         MAX_POSITIONS  = at max HL positions
         HOTSET_BLOCKED = token on hot-set blocklist
+        NOT_HOTSET     = token not in hot-set (not mirrored)
         CUT_LOSER      = cut loser triggered
         STALE_ROTATION = stale rotation
         CASCADE_FLIP   = cascade flip
@@ -2024,7 +2441,13 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             window_start = window_end - 300_000
             fills = _get_fills_cached(token, window_start, window_end)
             token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
-            close_fills = [f for f in token_fills if f.get('side') == 'B']
+            # BUG-FIX (2026-04-19): was filtering by side=='B' but HL fill data uses
+            # side + dir together: LONG close = side='A' dir='Close Long' (side!='B').
+            # SHORT close = side='B' dir='Close Short' (side=='B' happens to match).
+            # Using side=='B' alone misses all LONG closes — same root cause as the
+            # 2026-04-18 fix in hyperliquid_exchange.py (get_realized_pnl / mirror_get_exit_fill).
+            # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
+            close_fills = [f for f in token_fills if 'Close' in str(f.get('dir', ''))]
             if close_fills:
                 hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
                 log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
@@ -2061,7 +2484,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             UPDATE trades SET status = 'closed', exit_price = %s,
                 pnl_pct = %s, pnl_usdt = %s,
                 close_time = NOW(), close_reason = %s, exit_reason = %s,
-                is_guardian_close = TRUE, guardian_reason = %s,
+                is_guardian_close = TRUE, guardian_closed = TRUE, guardian_reason = %s,
                 hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s
             WHERE id = %s AND status = 'open'
         """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, reason, reason,
@@ -2075,6 +2498,9 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             conn.commit()
             log(f'  Closed paper trade #{trade_id} ({reason}): {token} @ {exit_price} '
                 f'pnl={final_pnl_pct:+.4f}% ({final_pnl_usdt:+.2f})', 'PASS')
+            # ── Loss cooldown: record if this was a losing trade ──────────────────
+            if final_pnl_usdt < 0:
+                _record_loss_cooldown(token, direction)
             # FIX (2026-04-01): Clear reconciled state so token can be re-reconciled on next open.
             _clear_reconciled_token(token)
         cur.close()
@@ -2161,7 +2587,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 pnl_pct=%s, pnl_usdt=%s,
                 close_time=NOW(), close_reason=%s, exit_reason=%s,
                 last_updated=NOW(), updated_at=NOW(),
-                is_guardian_close=TRUE, guardian_reason=%s,
+                is_guardian_close=TRUE, guardian_closed=TRUE, guardian_reason=%s,
                 hype_realized_pnl_usdt=%s, hype_realized_pnl_pct=%s
             WHERE id=%s AND status='open'
         """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
@@ -2176,12 +2602,12 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
             conn.commit()
             log(f'  Closed orphan trade #{trade_id}: {token} {direction} exit={hl_exit_px:.6f} '
                 f'pnl={computed_pnl_pct:+.4f}% {"WIN" if is_win else "LOSS"}', 'PASS')
+            # BUG-43 fix: _record_trade_outcome only on actual close (not dedup)
+            # _record_trade_outcome internally calls _record_loss_cooldown, so do it here
+            if not is_win:
+                _record_loss_cooldown(token, direction)
         cur.close()
         conn.close()
-
-        # ── Signal outcome recording + self-correction ────────────────────────
-        _record_trade_outcome(token, direction.upper(), computed_pnl_pct,
-                              computed_pnl_usdt, trade_id)
 
     except Exception as e:
         try:
@@ -2206,7 +2632,7 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
     # ── Record to signal_outcomes (SQLite) ─────────────────────────────────
     try:
         import sqlite3
-        conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+        conn_s = sqlite3.connect(RUNTIME_DB)
         cur_s = conn_s.cursor()
         # Dedup: check if we already recorded this exact outcome recently
         # (same token, direction, pnl — protects against the function being
@@ -2235,14 +2661,10 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
 
     # ── Self-correction on loss ───────────────────────────────────────────
     if not is_win:
-        opposite = 'LONG' if direction.upper() == 'SHORT' else 'SHORT'
-        try:
-            from signal_schema import set_cooldown
-            set_cooldown(token.upper(), opposite, minutes=60,
-                         reason=f'flip_after_loss_{direction.lower()}')
-            log(f'  FLIP: {token} {direction} lost -> {opposite} cooldown (60min)', 'INFO')
-        except Exception as cd_err:
-            log(f'  Flip cooldown error: {cd_err}', 'WARN')
+        # Block re-entry in the SAME direction that just lost (prevents revenge trading).
+        # CASCADE_FLIP handles the flip decision in position_manager — not here.
+        _record_loss_cooldown(token, direction)
+        log(f'  COOLDOWN: {token} {direction} blocked after loss', 'INFO')
 
         # Record penalty to trade_patterns via UPSERT (incrementing sample_count each time)
         try:
@@ -2352,13 +2774,101 @@ def _sweep_blocklist_trades(prices):
 _TPSL_RECONCILE_COOLDOWN = {}   # module-level, persists across sync cycles
 _TPSL_COOLDOWN_SEC = 30          # 30-second cooldown per token
 
-# In-memory state for TP/SL reconciles this cycle (per-token, not cross-token)
-_TPSL_MOVED_THIS_CYCLE = {}      # token.upper() -> {'tp': bool, 'sl': bool}
 
+# ── Self-close helpers (UNPROTECTABLE coins) ───────────────────────────────────
+
+def _ensure_self_close_table():
+    """Create tpsl_self_close table if it doesn't exist."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(f"""
+        CREATE TABLE IF NOT EXISTS {SELF_CLOSE_TABLE} (
+            id SERIAL PRIMARY KEY,
+            coin VARCHAR(16) NOT NULL,
+            direction VARCHAR(8) NOT NULL,
+            size REAL NOT NULL,
+            entry_px REAL NOT NULL,
+            sl_price REAL NOT NULL,
+            tp_price REAL NOT NULL,
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW(),
+            last_checked_at TIMESTAMP,
+            triggered_at TIMESTAMP,
+            close_result JSONB,
+            UNIQUE(coin)
+        )
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def _upsert_self_close(coin: str, direction: str, size: float,
+                        entry_px: float, sl_price: float, tp_price: float):
+    """Store or update SL/TP for an unprotectable coin."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(f"""
+            INSERT INTO {SELF_CLOSE_TABLE} (coin, direction, size, entry_px, sl_price, tp_price, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+            ON CONFLICT (coin) DO UPDATE SET
+                direction = EXCLUDED.direction,
+                size = EXCLUDED.size,
+                entry_px = EXCLUDED.entry_px,
+                sl_price = EXCLUDED.sl_price,
+                tp_price = EXCLUDED.tp_price,
+                updated_at = NOW(),
+                last_checked_at = NOW()
+        """, (coin.upper(), direction.upper(), abs(float(size)),
+              float(entry_px), float(sl_price), float(tp_price)))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        log(f'  [SELF-CLOSE] DB upsert failed for {coin}: {e}', 'WARN')
+
+
+def _get_all_self_close_records() -> list:
+    """Load all self-close TP/SL records from DB."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(f"SELECT coin, direction, size, entry_px, sl_price, tp_price FROM {SELF_CLOSE_TABLE}")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [{'coin': r[0], 'direction': r[1], 'size': r[2],
+                 'entry_px': r[3], 'sl_price': r[4], 'tp_price': r[5]} for r in rows]
+    except Exception as e:
+        log(f'  [SELF-CLOSE] Failed to load records: {e}', 'WARN')
+        return []
+
+
+def _mark_self_close_triggered(coin: str, result: dict):
+    """Record that self-close was triggered."""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(f"""
+            UPDATE {SELF_CLOSE_TABLE}
+            SET triggered_at = NOW(), close_result = %s, last_checked_at = NOW()
+            WHERE coin = %s
+        """, (json.dumps(result), coin.upper()))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        log(f'  [SELF-CLOSE] Failed to mark triggered for {coin}: {e}', 'WARN')
+
+
+# ── Breach detector (Step 11 — handles both normal + unprotectable coins) ───────
 
 def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list) -> int:
     """
     Step 11 (2026-04-08): Plan B breach detector — fires when HL TP/SL placement fails.
+    Also handles UNPROTECTABLE coins (AAVE/MORPHO/etc) that can't have HL TP/SL orders.
+    Merged from self_close_watcher.py (2026-04-23).
 
     For each open HL position with a DB trade:
       - Checks if current price has crossed the DB stop_loss (SL breach) OR target (TP breach)
@@ -2375,10 +2885,190 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
         log('[DRY] _check_and_close_breached_trades: would check and close breached trades', 'WARN')
         return 0
 
-    # Build token -> db_trade lookup
+    breach_closed = 0
+
+    # ── UNPROTECTABLE coins: check self-close table ─────────────────────────────
+    # These coins cannot have HL TP/SL orders placed. We maintain our own tpsl_self_close
+    # table and check price breaches locally (same logic as former self_close_watcher.py).
+    _ensure_self_close_table()
+
+    # Get open HL positions for unprotectable coins
+    unprot_hl_pos = {
+        coin.upper(): data for coin, data in hl_pos.items()
+        if coin.upper() in UNPROTECTABLE_COINS and float(data.get('size', 0)) != 0
+    }
+
+    if unprot_hl_pos:
+        self_close_records = {r['coin'].upper(): r for r in _get_all_self_close_records()}
+        for coin, pos_data in unprot_hl_pos.items():
+            if coin in _CLOSED_HL_COINS:
+                continue
+            sz = float(pos_data.get('size', 0))
+            entry_px = float(pos_data.get('entry_px', 0))
+            direction = pos_data.get('direction', 'LONG')
+            sz = abs(sz)
+            if entry_px == 0 or sz == 0:
+                continue
+            curr = prices.get(coin, 0)
+            if curr == 0:
+                continue
+
+            record = self_close_records.get(coin)
+            if record:
+                # Stale record check: if entry_px doesn't match current HL entry, the
+                # position was closed/reopened and we have a stale TP/SL from the old trade.
+                # Refresh with current values and skip this cycle.
+                stored_entry = float(record.get('entry_px') or 0)
+                if stored_entry > 0 and entry_px > 0:
+                    entry_delta = abs(stored_entry - entry_px) / entry_px
+                    if entry_delta > 0.001:  # >0.1% entry mismatch → stale record
+                        log(f'  [SELF-CLOSE] ⚠️ {coin} stale record (stored={stored_entry:.6f} vs current={entry_px:.6f}, Δ={entry_delta:.2%}) — refreshing', 'WARN')
+                        # BUG FIX (2026-04-28): old LONG TP/SL is stale/invalid for new direction.
+                        # Recalculate fresh SL/TP for the new entry and direction.
+                        from atr_cache import get_atr
+                        real_atr = get_atr(coin, interval='1h')
+                        if real_atr is not None and entry_px > 0:
+                            atr_pct = real_atr / entry_px
+                        else:
+                            atr_pct = ATR_PCT_FALLBACK  # 2% assumed
+                        k = ATR_K_NORMAL_VOL  # 1.25 for NORMAL_VOL tier
+                        k_tp = k * ATR_TP_K_MULT  # 1.25 × k
+                        sl_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, k * atr_pct))
+                        tp_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, k_tp * atr_pct))
+                        if direction == 'LONG':
+                            new_sl = entry_px * (1 - sl_pct)
+                            new_tp = entry_px * (1 + tp_pct)
+                        else:
+                            new_sl = entry_px * (1 + sl_pct)
+                            new_tp = entry_px * (1 - tp_pct)
+                        _upsert_self_close(coin, direction, sz, entry_px, new_sl, new_tp)
+                        continue
+                # Record is current — fall through to breach check below
+                sl_price = record['sl_price']
+                tp_price = record['tp_price']
+            else:
+                # No stored TP/SL — compute defaults (NORMAL_VOL, k=2.0)
+                from atr_cache import get_atr
+                # Use real ATR from cache if available; fall back to ATR_PCT_FALLBACK only.
+                real_atr = get_atr(coin, interval='1h')
+                if real_atr is not None and curr > 0:
+                    atr_pct = real_atr / curr
+                else:
+                    atr_pct = ATR_PCT_FALLBACK  # 2% assumed — only for first-seen coins
+                k = ATR_K_NORMAL_VOL  # 2.0 for NORMAL_VOL tier
+                k_tp = k * ATR_TP_K_MULT
+                sl_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, k * atr_pct))
+                tp_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, k_tp * atr_pct))
+                if direction == 'LONG':
+                    sl_price = curr * (1 - sl_pct)
+                    tp_price = curr * (1 + tp_pct)
+                else:
+                    sl_price = curr * (1 + sl_pct)
+                    tp_price = curr * (1 - tp_pct)
+                _upsert_self_close(coin, direction, sz, entry_px, sl_price, tp_price)
+                continue  # Store now, check next cycle
+
+            # Determine breach
+            triggered = False
+            trigger_reason = None
+            if direction == 'LONG':
+                if curr <= sl_price:
+                    triggered = True
+                    trigger_reason = f"SL triggered (px={curr} <= sl={sl_price})"
+                elif curr >= tp_price:
+                    triggered = True
+                    trigger_reason = f"TP triggered (px={curr} >= tp={tp_price})"
+            else:
+                if curr >= sl_price:
+                    triggered = True
+                    trigger_reason = f"SL triggered (px={curr} >= sl={sl_price})"
+                elif curr <= tp_price:
+                    triggered = True
+                    trigger_reason = f"TP triggered (px={curr} <= tp={tp_price})"
+
+            if not triggered:
+                continue
+
+            log(f'  [SELF-CLOSE] 🚨 {coin} BREACH ({direction}): {trigger_reason}', 'WARN')
+            _CLOSED_HL_COINS.add(coin)
+            success = close_position_hl(coin, trigger_reason)
+            result = {"ok": success, "coin": coin, "reason": trigger_reason}
+            _mark_self_close_triggered(coin, result)
+            if success:
+                log(f'  [SELF-CLOSE] ✅ {coin} market close OK', 'PASS')
+                # ── FIX (2026-04-26): Also close the corresponding trades table entry ──
+                # The self-close block only wrote to tpsl_self_close, not the trades table.
+                # Mirror the DB update logic from the normal breach handler (lines 3077-3103).
+                db_by_token_local = {t['token'].upper(): t for t in db_trades if t.get('status') == 'open'}
+                trade_record = db_by_token_local.get(coin.upper())
+                if trade_record and trade_record.get('id'):
+                    try:
+                        close_start_ms = int(time.time() * 1000) - 300000
+                        time.sleep(6)  # Wait for HL fills to appear before polling
+                        hl_exit_px, realized_pnl = _poll_hl_fills_for_close(coin, close_start_ms)
+                        entry_px_sc = float(trade_record.get('entry_price', 0))
+                        amount_usdt = trade_record.get('amount_usdt', 50.0)
+                        direction_sc = trade_record.get('direction', 'LONG')
+                        if realized_pnl is not None and realized_pnl != 0:
+                            computed_pnl_pct = round(realized_pnl / amount_usdt * 100, 4)
+                            computed_pnl_usdt = round(realized_pnl, 4)
+                        elif hl_exit_px > 0:
+                            if direction_sc.upper() == 'SHORT':
+                                computed_pnl_pct = round((entry_px_sc - hl_exit_px) / entry_px_sc * 100, 4)
+                            else:
+                                computed_pnl_pct = round((hl_exit_px - entry_px_sc) / entry_px_sc * 100, 4)
+                            computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                        else:
+                            # No fill data — use current price as proxy (best available estimate)
+                            if direction_sc.upper() == 'SHORT':
+                                computed_pnl_pct = round((entry_px_sc - curr) / entry_px_sc * 100, 4)
+                            else:
+                                computed_pnl_pct = round((curr - entry_px_sc) / entry_px_sc * 100, 4)
+                            computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                            hl_exit_px = curr
+                        conn_sc = get_db_connection()
+                        cur_sc = conn_sc.cursor()
+                        realized_pnl_value = realized_pnl if realized_pnl is not None else 0
+                        # BUG-35 fix: use correct schema columns (exit_price, hype_realized_pnl_usdt)
+                        cur_sc.execute("""
+                            UPDATE trades SET
+                                status='closed',
+                                close_time=NOW(),
+                                close_reason=%s,
+                                exit_reason=%s,
+                                guardian_closed=TRUE,
+                                exit_price=%s,
+                                pnl_pct=%s,
+                                pnl_usdt=%s,
+                                hype_realized_pnl_usdt=%s
+                            WHERE id=%s
+                        """, (
+                            trigger_reason.split('(')[0].strip(),  # e.g. "TP triggered"
+                            trigger_reason.split('(')[0].strip(),
+                            hl_exit_px,
+                            computed_pnl_pct,
+                            computed_pnl_usdt,
+                            realized_pnl_value,
+                            trade_record['id']
+                        ))
+                        conn_sc.commit()
+                        cur_sc.close()
+                        conn_sc.close()
+                        # BUG-34 fix: record loss cooldown so losing self-closes don't re-enter immediately
+                        if computed_pnl_usdt < 0:
+                            _record_loss_cooldown(coin, direction_sc)
+                        log(f'  [SELF-CLOSE] ✅ DB trade #{trade_record["id"]} closed — exit={hl_exit_px:.6f}, pnl={computed_pnl_pct:.2f}%', 'PASS')
+                    except Exception as sc_db_err:
+                        log(f'  [SELF-CLOSE] ❌ DB update failed for {coin}: {sc_db_err}', 'FAIL')
+                    finally:
+                        breach_closed += 1
+            else:
+                log(f'  [SELF-CLOSE] ❌ {coin} market close failed — will retry next cycle', 'FAIL')
+            time.sleep(3)
+
+    # ── Normal breach check (protected coins with DB trades) ─────────────────────
     db_by_token = {t['token'].upper(): t for t in db_trades if t.get('status') == 'open'}
 
-    breach_closed = 0
     conn = get_db_connection()
     if conn is None:
         return 0
@@ -2441,7 +3131,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             _save_closed_set()
 
         # File lock to prevent this exact close from racing with another guardian cycle
-        lock_path = f'/tmp/hermes-close-lock-{token}.lock'
+        lock_path = f'/tmp/hermes-close-lock-{tok}.lock'
         lock_fd = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o644)
         try:
             fcntl.flock(lock_fd, fcntl.LOCK_EX)  # blocking lock
@@ -2487,16 +3177,17 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
 
             if trade_id:
                 cur = conn.cursor()
+                # BUG-35 fix: use correct column names (exit_price, hype_realized_pnl_usdt)
                 cur.execute("""
                     UPDATE trades SET
                         status='closed',
                         close_reason=%s,
                         exit_reason=%s,
                         guardian_closed=TRUE,
-                        hl_exit_price=%s,
+                        exit_price=%s,
                         pnl_pct=%s,
                         pnl_usdt=%s,
-                        realized_pnl=%s
+                        hype_realized_pnl_usdt=%s
                     WHERE id=%s
                 """, (
                     breach_reason,
@@ -2509,6 +3200,9 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                 ))
                 conn.commit()
                 cur.close()
+                # BUG-34 fix: record loss cooldown so losing positions don't re-enter immediately
+                if computed_pnl_usdt < 0:
+                    _record_loss_cooldown(tok, direction)
                 _CLOSED_THIS_CYCLE.add(str(trade_id))
                 log(f'  ✅ {coin} DB trade #{trade_id} closed — {breach_reason}, '
                     f'exit={hl_exit_px:.6f}, pnl={computed_pnl_pct:.2f}%', 'PASS')
@@ -2626,186 +3320,24 @@ def _place_or_replace_tp(coin: str, direction: str, new_tp_price: float, size: f
 
 def reconcile_tp_sl(hl_pos: dict, prices: dict, db_trades: list):
     """
-    Step 10 (2026-04-08): ATR-based SL/TP for open HL positions. DISABLED (2026-04-14) —
-      HL TP/SL sync was eating rate limits. DB persistence retained (dashboard shows ATR values).
+    DEPRECATED (2026-04-15) — ATR SL/TP computation moved to position_manager._collect_atr_updates().
+    This function is fully disabled and returns (0, 0, []) immediately.
 
-    For each open HL position with a corresponding paper DB trade:
-      1. Skip if token is in 30s cooldown (per-token)
-      2. Compute ideal SL/TP using ATR-based logic (ATR distance from current_price)
-      3. Skip only if the new SL is within 1 tick size of current
-      4. DISABLED: Send SL update to HL via replace_sl() — was eating rate limits
-      5. DISABLED: Send TP update to HL — was eating rate limits
-      6. Always persist ATR SL/TP to DB (source of truth for the web dashboard)
+    Former behaviour:
+      1. Compute ideal SL/TP using ATR-based logic (ATR distance from current_price)
+      2. Persist to DB and optionally push to HL
+
+    Sole ATR engine now: position_manager._collect_atr_updates() + _persist_atr_levels()
+    called every pipeline cycle from check_and_manage_positions() in position_manager.
 
     Returns:
-      moved (int): always 0 now (HL sync disabled)
-      failed (int): always 0 now (HL sync disabled)
-      failed_coins (list): always [] now (HL sync disabled)
+      moved (int): always 0
+      failed (int): always 0
+      failed_coins (list): always []
     """
-    conn = get_db_connection()
-    if conn is None:
-        log('[DEBUG] reconcile_tp_sl: conn is None, returning 0')
-        return 0
+    log('[DEBUG] reconcile_tp_sl DISABLED — position_manager is sole ATR engine', 'WARN')
+    return 0, 0, []
 
-    if DRY:
-        log('[DRY] reconcile_tp_sl: would reconcile TP/SL for open positions', 'WARN')
-        return 0
-
-    moved = 0
-    failed = 0
-    failed_coins = []  # (coin, error_reason)
-
-    try:
-        # Build token -> db_trade lookup for quick access
-        db_by_token = {t['token'].upper(): t for t in db_trades if t.get('status') == 'open'}
-        log(f'  [DEBUG] Step10: {len(db_by_token)} tokens in db_by_token: {list(db_by_token.keys())}')
-
-        for coin, pos_data in hl_pos.items():
-            entry_px = float(pos_data.get('entry_px', 0))
-            sz = float(pos_data.get('size', 0))
-            direction = pos_data.get('direction', 'LONG')
-
-            if entry_px == 0 or sz == 0:
-                continue
-
-            # Skip if in cooldown
-            if _is_tpsl_cooldown_active(coin):
-                log(f'  ⏳ {coin} TP/SL: in cooldown, skipping')
-                continue
-
-            # Skip SKIP_COINS — no longer skipping any coins; all get ATR-based SL via place_tp_sl_batch
-            # (previously skipped: AAVE, MORPHO, ASTER, PAXG, AVNT — now all supported)
-            pass
-
-            # Check if we have a DB trade for this token
-            tok = coin.upper()
-            if tok not in db_by_token:
-                continue
-
-            db_trade = db_by_token[tok]
-            current_sl = db_trade.get('stop_loss') or 0
-            current_tp = db_trade.get('target') or 0
-
-            log(f'  [DEBUG] {coin}: checking TP/SL (sz={sz} dir={direction} entry={entry_px})')
-
-            # ── BUG-FIX (Bug 3): Use current_price (from prices dict) for ATR calculation ──
-            # This replaces entry_price which was incorrectly used before.
-            current_price = prices.get(tok, entry_px)
-
-            # ── Compute ideal TP/SL using same ATR-based logic as _compute_dynamic_sl ──
-            # Import the function from decider-run's scope (both use same constants)
-            from decider_run import _compute_dynamic_sl
-
-            # Use sl_pct_fallback=0.010 (1.0%) as baseline if ATR unavailable
-            sl_pct_fallback = 0.010
-            try:
-                # BUG-FIX: pass current_price as 4th arg (was entry_px)
-                ideal_sl = _compute_dynamic_sl(tok, direction.upper(), entry_px, current_price, sl_pct_fallback)
-            except Exception as e:
-                # Fallback to fixed % SL
-                if direction.upper() == 'LONG':
-                    ideal_sl = current_price * (1 - sl_pct_fallback)
-                else:
-                    ideal_sl = current_price * (1 + sl_pct_fallback)
-                log(f'  [WARN] {coin} ATR-based SL failed ({e}), using fixed {sl_pct_fallback*100:.1f}%')
-
-            # ── Trailing SL: enforce one-way movement ──
-            # SHORT: SL only moves UP (numerically higher) to lock in profit
-            # LONG:  SL only moves DOWN (numerically lower) to lock in profit
-            if current_sl > 0:
-                if direction.upper() == 'SHORT':
-                    ideal_sl = max(ideal_sl, current_sl)
-                else:  # LONG
-                    ideal_sl = min(ideal_sl, current_sl)
-
-            # ── Compute ideal TP using ATR (same logic as _compute_dynamic_tp) ──
-            from decider_run import _compute_dynamic_tp
-            tp_pct_fallback = 0.015
-            try:
-                # BUG-FIX: pass current_price as 4th arg (was entry_px)
-                ideal_tp = _compute_dynamic_tp(tok, direction.upper(), entry_px, current_price, tp_pct_fallback)
-            except Exception as e:
-                # Fallback to fixed % TP
-                if direction.upper() == 'LONG':
-                    ideal_tp = current_price * (1 + tp_pct_fallback)
-                else:
-                    ideal_tp = current_price * (1 - tp_pct_fallback)
-                log(f'  [WARN] {coin} ATR-based TP failed ({e}), using fixed {tp_pct_fallback*100:.1f}%')
-
-            # ── BUG-FIX (Bug 4): Remove favorable-move gate — only skip if negligible change ──
-            # Only skip if the new SL/TP is within 1 tick size of the current one
-            tick_decimals = _hl_price_decimals(tok)
-            tick_size = 10 ** (-tick_decimals)
-            sl_changed = abs(ideal_sl - current_sl) > tick_size if current_sl > 0 else True
-            tp_changed = abs(ideal_tp - current_tp) > tick_size if current_tp > 0 else True
-
-            if not sl_changed and not tp_changed:
-                log(f'  ✅ {coin} TP/SL: no move needed (ideal_sl={ideal_sl:.6f} current_sl={current_sl:.6f} | ideal_tp={ideal_tp:.6f} current_tp={current_tp:.6f})')
-                continue
-
-            # ── Build order size from HL position size ──
-            # Size in hyperliquid is in coin units (sz from hl_pos)
-            order_size = abs(sz)
-
-            # ── PERSIST ATR SL TO DB FIRST (before replace_sl) ──────────────────────────
-            # Step 3 (HL→DB reconcile) runs BEFORE Step 10 in every cycle and would
-            # overwrite our ATR value with HL's stale SL. By writing here BEFORE calling
-            # replace_sl, we ensure the DB already has the correct ATR value when Step 3
-            # would overwrite it. This guarantees the dashboard shows ATR SL even if
-            # HL rate-limits or rejects the replace_sl call.
-            try:
-                _conn = get_db_connection()
-                if _conn:
-                    _cur = _conn.cursor()
-                    _cur.execute("""
-                        UPDATE trades SET stop_loss=%s, target=%s WHERE id=%s
-                    """, (ideal_sl, ideal_tp, db_trade.get('id')))
-                    _conn.commit()
-                    _cur.close()
-                    _conn.close()
-            except Exception as _db_err:
-                log(f'  [WARN] {coin} ATR DB persist failed: {_db_err}')
-
-            # ── HL TP/SL sync: DISABLED (2026-04-14) ────────────────────────────────────
-            # ATR → HL TP/SL was eating rate limits and causing excessive API calls.
-            # HL TP/SL should be set once at entry and left alone (HL triggers on breach).
-            # DB persistence below is kept so the web dashboard still shows correct ATR values.
-            log(f'  ⏸️ {coin} ATR→HL sync DISABLED: SL={ideal_sl:.6f} TP={ideal_tp:.6f} (DB only)', 'WARN')
-
-            # ── DB persistence: ALWAYS write ATR-computed values to DB ────────────────
-            # The DB is the source of truth for the web dashboard. HL TP/SL is
-            # disabled — DB is the only place ATR values are tracked now.
-            # HL triggers on breach using its own hardcoded TP/SL from entry.
-            try:
-                conn_upd = get_db_connection()
-                if conn_upd:
-                    cur_upd = conn_upd.cursor()
-                    cur_upd.execute("""
-                        UPDATE trades SET stop_loss=%s, target=%s WHERE id=%s
-                    """, (ideal_sl, ideal_tp, db_trade.get('id')))
-                    conn_upd.commit()
-                    cur_upd.close()
-                    conn_upd.close()
-                    log(f'  💾 {coin} DB ATR TP/SL persisted: SL={ideal_sl:.6f} TP={ideal_tp:.6f}')
-            except Exception as db_e:
-                log(f'  ❌ {coin} DB ATR update failed: {db_e}', 'FAIL')
-
-    except Exception as e:
-        log(f'reconcile_tp_sl error: {e}', 'FAIL')
-        import traceback; traceback.print_exc()
-    finally:
-        try:
-            conn.close()
-        except:
-            pass
-
-    # FIX (2026-04-14): After updating ATR SL/TP in DB, update trades.json immediately
-    # so the web dashboard shows the correct values without waiting for the next
-    # pipeline run (which runs every 60s). Guardian runs every 30s so this ensures
-    # the dashboard is never more than 30s stale on ATR values.
-    _update_trades_json_atr(db_by_token)
-
-    return moved, failed, failed_coins
 
 
 def _update_trades_json_atr(db_by_token: dict):
@@ -2816,7 +3348,7 @@ def _update_trades_json_atr(db_by_token: dict):
     """
     import sqlite3
     TRADES_JSON = '/var/www/hermes/data/trades.json'
-    PRICE_DB = '/root/.hermes/data/signals_hermes.db'
+    PRICE_DB = STATIC_DB
 
     try:
         with open(TRADES_JSON) as f:
@@ -2849,7 +3381,7 @@ def _update_trades_json_atr(db_by_token: dict):
     for tok, db_trade in db_by_token.items():
         # Find matching open trade in trades.json
         for jt in data.get('open', []):
-            if jt.get('token', '').upper() == tok:
+            if jt.get('coin', '').upper() == tok:
                 entry_px = float(db_trade.get('entry_price') or 0)
                 direction = db_trade.get('direction', '')
                 current_px = prices.get(tok, entry_px) or entry_px
@@ -2890,10 +3422,21 @@ def _update_trades_json_atr(db_by_token: dict):
 
 def sync():
     """Run one full sync cycle."""
+
+    # FIX (2026-04-16): Load miss tracking ONCE at start. This state is used by
+    # Step 8 (not the early block below) — the early block is removed because it
+    # was double-incrementing: it incremented in-memory missing_state, but Step 8
+    # re-loaded from disk and incremented again, resetting cycles to 1 instead of 2.
+    try:
+        missing_state = _load_missing_tracking()
+    except Exception:
+        missing_state = {}
+
     global _CLOSED_THIS_CYCLE, _CLOSED_HL_COINS
     _CLOSED_THIS_CYCLE.clear()
     _CLOSED_HL_COINS.clear()
     _save_closed_set()  # BUG-4: persist cleared state
+
     log(f'── Sync cycle ──')
 
     # Step 1: Get HL positions (retry on rate-limit → empty dict)
@@ -2916,6 +3459,11 @@ def sync():
     if not hl_pos:
         log('HL still returning empty after 4 retries — skipping this cycle', 'WARN')
         return
+
+    # Populate module-level cache so all subsequent functions reuse this result
+    global _hl_positions_cache, _hl_positions_cache_time
+    _hl_positions_cache = hl_pos.copy()
+    _hl_positions_cache_time = time.time()
 
     # Step 2: Get current prices from shared cache (written by price_collector)
     prices = {}
@@ -2954,6 +3502,12 @@ def sync():
 
     # Step 5: Sync PnL from HL
     sync_pnl_from_hype(prices)
+
+    # Step 5b: Guardian hard-stop backup — independent price-based SL/TP check.
+    # Reads SL/TP from DB (written by position_manager's ATR engine).
+    # Closes any trade whose price has crossed its SL or TP.
+    # This is the guardian's emergency backup — completely separate from ATR engine.
+    _check_hard_stops(prices)
 
     # Step 6: Close orphan HL positions (paper trade was already created by reconcile_hype_to_paper)
     # IMPORTANT: close the existing orphan paper trade directly by ID using the actual
@@ -3002,7 +3556,8 @@ def sync():
     # Step 7: Close orphan paper trades (mirror paper→HL or close)
     if missing:
         log(f'Syncing {len(missing)} paper-only trade(s)...', 'WARN')
-        close_orphan_paper_trades(hl_pos, prices)
+        added, closed = close_orphan_paper_trades(hl_pos, prices)
+        log(f'Paper→HL: {added} mirrored, {closed} closed')
 
     # Step 8: Close remaining "missing" DB trades ONLY if they weren't externally closed.
     # Bug fix (2026-04-02): T manually closed STABLE. Without guardian_closed flag,
@@ -3017,14 +3572,6 @@ def sync():
     if missing:
         # Load missing tracking state
         missing_state = _load_missing_tracking()
-
-        # FIX (2026-04-14): Clear missing tracking at the START of each cycle.
-        # Previously, tokens stayed in missing_tracking forever (accumulates history
-        # across days). Step 5 kept signaling closes for already-closed trades,
-        # and new trades for the same token got caught in the 2-miss trap.
-        # Clearing and rebuilding each cycle preserves the 2-miss protection for
-        # actual current-state misses without stale historical data polluting decisions.
-        missing_state = {}
         now_ts = time.strftime('%Y-%m-%d %H:%M:%S')
 
         # Update tracking: increment cycle count for missing tokens, clear for present tokens
@@ -3091,13 +3638,14 @@ def sync():
                 if t.get('paper') == True:
                     # Paper=True trades are mirror-only. Missing from HL = HL closed it via TP/SL.
                     # Close DB immediately to keep paper trail in sync.
+                    # FIX (2026-04-16): Added hl_entry_price to SELECT so we can detect
+                    # PHANTOM_CLOSE when hl_entry_price IS NULL (HL mirror never confirmed).
                     try:
-                        # Get TP/SL from DB to determine close_reason
                         conn_trade = get_db_connection()
                         if conn_trade:
                             cur_trade = conn_trade.cursor()
                             cur_trade.execute(
-                                "SELECT stop_loss, target, direction FROM trades WHERE id=%s",
+                                "SELECT stop_loss, target, direction, hl_entry_price FROM trades WHERE id=%s",
                                 (trade_id,))
                             row_trade = cur_trade.fetchone()
                             cur_trade.close()
@@ -3114,8 +3662,14 @@ def sync():
                         fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
                         exit_price = _get_hl_exit_price(tok, fallback_price)
 
-                        # FIX (2026-04-14): Same logic as second Step 8 path.
-                        # Only close with HL_* reason if HL confirmed the position existed.
+                        # FIX (2026-04-16): Require 2+ consecutive misses before closing
+                        # paper=True trades (same as paper=False). This prevents 429
+                        # false positives from closing real HL positions prematurely.
+                        miss_cycles_paper = missing_state.get(tok.upper(), {}).get('cycles', 0)
+                        if miss_cycles_paper < 2:
+                            log(f'  Step8 SKIP {tok} #{trade_id}: paper=True missing only {miss_cycles_paper} cycle(s) — waiting for 2nd miss (possible 429)', 'WARN')
+                            continue
+
                         has_hl_confirmation = bool(hl_entry_price)
 
                         if not has_hl_confirmation:
@@ -3140,18 +3694,6 @@ def sync():
                                 close_reason = 'HL_CLOSED'
 
                         log(f'  Step8 closing {tok} #{trade_id}: exit={exit_price} reason={close_reason} hl_confirmed={has_hl_confirmation}', 'INFO')
-
-                        # Mark guardian_closed BEFORE closing to prevent double-close
-                        conn_upd = get_db_connection()
-                        if conn_upd:
-                            cur_upd = conn_upd.cursor()
-                            cur_upd.execute(
-                                "UPDATE trades SET guardian_closed=TRUE WHERE id=%s",
-                                (trade_id,))
-                            conn_upd.commit()
-                            cur_upd.close()
-                            conn_upd.close()
-
                         _close_paper_trade_db(trade_id, tok, exit_price, close_reason)
                     except Exception as e:
                         log(f'  DB close failed for paper {tok}: {e}', 'FAIL')
@@ -3227,25 +3769,37 @@ def sync():
                                 close_reason = 'HL_CLOSED'
 
                         log(f'  Step8 closing {tok} #{trade_id}: exit={exit_price} reason={close_reason}', 'INFO')
-
-                        # Mark guardian_closed BEFORE closing to prevent double-close
-                        conn_upd = get_db_connection()
-                        if conn_upd:
-                            cur_upd = conn_upd.cursor()
-                            cur_upd.execute(
-                                "UPDATE trades SET guardian_closed=TRUE WHERE id=%s",
-                                (trade_id,))
-                            conn_upd.commit()
-                            cur_upd.close()
-                            conn_upd.close()
-
                         _close_paper_trade_db(trade_id, tok, exit_price, close_reason)
                     except Exception as e:
                         log(f'  DB close failed for {tok}: {e}', 'FAIL')
                     continue
 
                 # guardian_closed=TRUE but trade is missing from HL — stale orphan, close now
-                log(f'  Step8 closing {tok} #{trade_id}: guardian_closed=TRUE but missing from HL — closing stale orphan', 'WARN')
+                # FIX (2026-04-16): Also check hl_entry_price to detect PHANTOM trades
+                # (paper=False trades where HL mirror never succeeded). Close these as
+                # PHANTOM_CLOSE rather than MANUAL_CLOSE so they're correctly labeled.
+                try:
+                    conn_trade2 = get_db_connection()
+                    if conn_trade2:
+                        cur_trade2 = conn_trade2.cursor()
+                        cur_trade2.execute(
+                            "SELECT hl_entry_price FROM trades WHERE id=%s",
+                            (trade_id,))
+                        row_trade2 = cur_trade2.fetchone()
+                        cur_trade2.close()
+                        conn_trade2.close()
+                        orphan_hl_entry = float(row_trade2[0]) if row_trade2 and row_trade2[0] else None
+                    else:
+                        orphan_hl_entry = None
+                except Exception:
+                    orphan_hl_entry = None
+
+                if not orphan_hl_entry:
+                    orphan_close_reason = 'PHANTOM_CLOSE'
+                    log(f'  Step8 {tok} #{trade_id}: PHANTOM (guardian_closed=TRUE but no HL confirmation) — closing as phantom', 'WARN')
+                else:
+                    orphan_close_reason = 'MANUAL_CLOSE'
+                    log(f'  Step8 closing {tok} #{trade_id}: guardian_closed=TRUE but missing from HL — closing stale orphan (HL confirmed)', 'WARN')
 
                 try:
                     fallback_price = prices.get(tok) or prices.get(t['token']) or t.get('entry_price') or 0
@@ -3253,18 +3807,7 @@ def sync():
                     if not exit_price or exit_price <= 0:
                         raise ValueError(f"No valid exit price for stale orphan {tok} trade #{trade_id}: fallback={fallback_price}")
 
-                    # Mark as guardian_closed BEFORE closing to prevent double-close
-                    conn_upd = get_db_connection()
-                    if conn_upd:
-                        cur_upd = conn_upd.cursor()
-                        cur_upd.execute(
-                            "UPDATE trades SET guardian_closed=TRUE WHERE id=%s",
-                            (trade_id,))
-                        conn_upd.commit()
-                        cur_upd.close()
-                        conn_upd.close()
-
-                    _close_paper_trade_db(trade_id, tok, exit_price, 'MANUAL_CLOSE')
+                    _close_paper_trade_db(trade_id, tok, exit_price, orphan_close_reason)
                 except Exception as e:
                     log(f'  DB close failed for {tok}: {e}', 'FAIL')
 
@@ -3278,16 +3821,13 @@ def sync():
         if sweep_closed > 0:
             log(f'Step9 blocklist sweep: closed {sweep_closed} paper trades on SHORT/LONG blacklist')
 
-    # Step 10: Reconcile ATR-based SL — move only in favorable direction, per-token 30s cooldown
+    # Step 10: ATR SL/TP — DISABLED (2026-04-15)
+    # ATR SL/TP computation is now handled EXCLUSIVELY by position_manager._collect_atr_updates()
+    # which runs every 1 min via the pipeline. position_manager writes to DB via _persist_atr_levels().
+    # Guardian reads from DB (no recomputation) — it only handles HL execution, not ATR math.
+    # See: https://github.com/.../issues/atr-sl-uniqueness
     if db_trades:
-        log(f'[DEBUG] Step10 called with {len(db_trades)} db_trades, {len(hl_pos)} hl_pos')
-        tpsl_moved, tpsl_failed, tpsl_failed_coins = reconcile_tp_sl(hl_pos, prices, db_trades)
-        log(f'[DEBUG] Step10 result: moved={tpsl_moved} failed={tpsl_failed}')
-        if tpsl_moved > 0:
-            log(f'Step10 SL reconcile: updated {tpsl_moved} token(s) on HL')
-        if tpsl_failed > 0:
-            failed_list = ', '.join([f'{c} ({e})' for c, e in tpsl_failed_coins])
-            log(f'Step10 SL reconcile FAILED ({tpsl_failed}): {failed_list}', 'FAIL')
+        log(f'[DEBUG] Step10 ATR reconcile DISABLED — position_manager is sole ATR engine')
 
     # Step 11 (2026-04-08): Plan B — Internal breach detector
     # Runs if HL TP/SL placement failed (PENDLE/MET still missing) or as redundant safety net.
@@ -3361,16 +3901,34 @@ def main():
                 result = close_position_hl(token, 'pending_retry')
                 if result:
                     time.sleep(6)
+                    # BUG-FIX (2026-04-26): Look up actual direction and leverage from DB
+                    # instead of hardcoding 'LONG' and 1. Using wrong direction on the close
+                    # call could cause incorrect PnL calculation and state tracking.
+                    try:
+                        conn_t = get_db_connection()
+                        cur_t = conn_t.cursor()
+                        cur_t.execute("SELECT direction, leverage FROM trades WHERE id=%s", (trade_id,))
+                        row_t = cur_t.fetchone()
+                        if row_t:
+                            retry_direction = row_t[0]
+                            retry_lev = row_t[1] if row_t[1] else 1
+                        else:
+                            retry_direction = 'LONG'
+                            retry_lev = 1
+                        conn_t.close()
+                    except Exception:
+                        retry_direction = 'LONG'
+                        retry_lev = 1
                     _close_orphan_paper_trade_by_id(
-                        trade_id, token, 'LONG', curr_price, 1, 'guardian_orphan_retry'
+                        trade_id, token, retry_direction, curr_price, retry_lev, 'guardian_orphan_retry'
                     )
                     _clear_pending_retry([token])
                     log(f'  {token}: pending retry succeeded', 'PASS')
                 else:
                     log(f'  {token}: pending retry still failing — will retry again next cycle', 'WARN')
-            # Refresh HL state after retries
+            # Refresh HL state after retries — use cache
             try:
-                hl_pos_retry = get_open_hype_positions_curl()
+                hl_pos_retry = _get_cached_hl_positions()
                 if hl_pos_retry:
                     log(f'HL state refreshed after retry: {len(hl_pos_retry)} positions', 'INFO')
             except Exception:

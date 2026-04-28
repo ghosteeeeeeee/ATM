@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes Candle File Trimmer — run every 12 hours
+After=network.target
+
+[Timer]
+OnBootSec=5
+OnUnitActiveSec=12h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -24,7 +24,7 @@ Be decisive. Rank only what deserves to rank. Reject what doesn't.
 === OPEN TRADES (Context Only — For Your Awareness) ===
 {n} open trades. Do NOT close or manage these — execution layer handles that.
 For each:
-  - TOKEN DIRECTION ENTRY=${entry} CURRENT=${current} PnL={±.}% SL=${sl}
+  - COIN DIRECTION ENTRY=${entry} CURRENT=${current} PnL={±.}% SL=${sl}
 ```
 
 These are provided so you understand what's already working and can factor it into your rankings. The execution layer manages these independently.
@@ -37,7 +37,7 @@ These are provided so you understand what's already working and can factor it in
 === HOT-SET SURVIVORS (re-rank or reject from prior cycles) ===
 {list of coins that survived LLM compaction in previous cycle}
 
-For each: TOKEN | DIRECTION | conf={.}% | rounds={n} | src={source} | z={z} | wave={wave_phase} | mom={momentum_score} | spd={speed_percentile} | overext={bool} | reason={reason}
+For each: COIN_SYM | DIRECTION | conf={.}% | rounds={n} | src={source} | z={z} | WAVE={wave_phase} | MOM={momentum_score} | SPD={speed_percentile} | OVEREXT={bool} | reason={reason}
 
 Rounds = how many cycles this signal has survived. More rounds = stronger signal.
 Watch for counter-pressure: if a LONG has SHORT signals forming, reduce its conf.
@@ -69,7 +69,7 @@ Open Slots: {n_open}/{MAX_OPEN} paper, {n_live}/{MAX_LIVE} live
 === NEW SIGNALS (first-time review) ===
 {list of pending signals with full context}
 
-For each: TOKEN | DIRECTION | conf={.}% | regime={regime} | z={z} | src={source} | entry=${.} | wave={wave_phase} | mom={momentum_score} | spd={speed_percentile} | overext={bool}
+For each: COIN_SYM | DIRECTION | conf={.}% | regime={regime} | z={z} | src={source} | entry=${.} | WAVE={wave_phase} | MOM={momentum_score} | SPD={speed_percentile} | OVEREXT={bool}
 ```
 
 **Your actions for new signals:**
@@ -79,18 +79,19 @@ For each: TOKEN | DIRECTION | conf={.}% | regime={regime} | z={z} | src={source}
 
 ---
 
-## Hard Rules (Pre-Filtered by Python — Stated for Your Awareness)
+## Hard Rules (Already Applied by Python — Stated for Context Only)
 
 ```
-=== HARD RULES ===
-• SHORT_BLACKLIST: {short blacklist} → REJECT SHORT
-• LONG_BLACKLIST: {long blacklist} → REJECT LONG
-• CONFIDENCE FLOOR: < 50% → SKIP
-• MIN SIGNAL QUALITY: < 2 distinct signal types → SKIP (need confluence) EXCEPT 'mtf_macd'
-• REGIME CONFLICT: strong regime opposes direction → SKIP
-• SOL/Raydium coins → REJECT ALL
-• Already-open position → SKIP (execution layer handles existing positions)
+=== HARD RULES (all pre-filtered by Python before signals reach you) ===
+• All blacklisted tokens (SHORT_BLACKLIST, LONG_BLACKLIST) → already removed
+• Solana-only coins → already removed
+• Delisted coins → already removed
+• Bare hzscore sources (no combo) → already removed
+• CONFIDENCE FLOOR < 60% → already removed
+• You do NOT need to filter anything — all signals passed to you are already valid.
 ```
+
+**Your only job: rank the signals by quality. Python has already done all filtering.**
 
 ---
 
@@ -100,20 +101,20 @@ After processing all sections, output the complete hot-set as numbered entries:
 
 ```
 === HOT-SET ===
-1. TOKEN | DIRECTION | CONF={.}% | ROUNDS={n} | WAVE={wave_phase} | MOM={momentum_score} | SPD={speed_percentile} | OVEREXT={bool} // {your reasoning}
-2. TOKEN | DIRECTION | CONF={.}% | ROUNDS={n} | WAVE={wave_phase} | MOM={momentum_score} | SPD={speed_percentile} | OVEREXT={bool} // {your reasoning}
+1. COIN_SYM | DIRECTION | CONF={.}% | ROUNDS={n} | WAVE={wave_phase} | MOM={momentum_score} | SPD={speed_percentile} | OVEREXT={bool} // {your reasoning}
+2. COIN_SYM | DIRECTION | CONF={.}% | ROUNDS={n} | WAVE={wave_phase} | MOM={momentum_score} | SPD={speed_percentile} | OVEREXT={bool} // {your reasoning}
 ... (numbered entries, highest priority first, max 20)
 ```
 
-`//` separates structured fields from free-text reasoning. Use `{coin} — {reason}` inside the `//` section.
+`//` separates structured fields from free-text reasoning. Use `{COIN_SYM} — {reason}` inside the `//` section.
 ```
 
 **Schema fields:**
-- `TOKEN` — coin symbol (e.g. HYPE)
+- `COIN_SYM` — coin symbol (e.g. HYPE)
 - `DIRECTION` — LONG or SHORT
 - `CONF` — your assessed confidence (0-100%), accounts for survival rounds, counter-pressure, regime alignment
 - `ROUNDS` — cycles survived (incremented from previous cycle if APPROVED)
-- `WAVE` — wave phase (emerging/building/peaking/declining/neutral)
+- `WAVE` — wave phase (accelerating/decelerating/bottoming/falling/neutral). accelerating=both vel+accel positive (rising momentum); decelerating=vel+accel opposite (momentum peaking); bottoming=vel neg+accel pos (reversal imminent); falling=both negative (down momentum); neutral=no clear phase. These are computed from 5-min velocity and acceleration.
 - `MOM` — momentum score (0-100)
 - `SPD` — speed percentile (0-100)
 - `OVEREXT` — is overextended (true/false)
@@ -138,9 +139,25 @@ SUMMARY: {n_hot_approved} approved, {n_hot_rejected} rejected, {n_hot_skipped} s
 
 ---
 
+## Signal Source Naming Convention
+
+```
+Source names encode BOTH the indicator type AND the direction:
+• hmacd+  = bullish MTF MACD crossover → good for LONG
+• hmacd-  = bearish MTF MACD crossover → good for SHORT
+• pct-hermes+ = price suppressed (low percentile) → good for LONG  (mean-reversion long)
+• pct-hermes- = price elevated (high percentile) → good for SHORT (mean-reversion short)
+• hzscore = z-score agreement across timeframes (direction from z_score_tier: rising=LONG, falling=SHORT)
+• vel-hermes = z-score momentum (rising z = good for SHORT, falling z = good for LONG)
+```
+
+When ranking signals, a mixed source string like `hmacd-,hzscore,pct-hermes+` indicates conflicting indicators — the LONG signal from `pct-hermes+` contradicts the SHORT from `hmacd-` and `hzscore`. This is a red flag for rejection or deep discount.
+
+---
+
 ## Implementation Notes
 
 - Hot-set written to `/var/www/hermes/data/hotset.json`
 - Compaction cycle runs every 10 min with the signal pipeline purge
 - If LLM fails: preserve previous hot-set (read from hotset.json), increment failure counter
-- `compact_rounds` increments each cycle if token survives; resets if rejected and re-approved
+- `compact_rounds` increments each cycle if coin survives; resets if rejected and re-approved

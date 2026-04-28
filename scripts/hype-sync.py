@@ -15,6 +15,7 @@ What it does:
 """
 import sys, argparse, time
 sys.path.insert(0, '/root/.hermes/scripts')
+from paths import *  # single source of truth for paths
 from hyperliquid_exchange import (
     mirror_open, mirror_close, is_live_trading_enabled,
     get_open_hype_positions_curl, is_delisted, get_tradeable_tokens,
@@ -26,7 +27,7 @@ from _secrets import BRAIN_DB_DICT
 DRY = True  # overridden by --dry / --apply
 
 DB = BRAIN_DB_DICT  # centralized credential management
-SIGNALS_DB = "/root/.hermes/data/signals_hermes_runtime.db"
+SIGNALS_DB = RUNTIME_DB
 
 
 def log(msg, tag="INFO"):

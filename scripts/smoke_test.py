@@ -14,6 +14,7 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -21,6 +22,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 import sqlite3
+from paths import *  # single source of truth for paths
 
 HERMES_DIR = Path("/root/.hermes")
 SCRIPTS_DIR = HERMES_DIR / "scripts"
@@ -52,6 +54,7 @@ SCRIPT_CHECK_MAP = {
     "hype_live_trading.json":     ["live_mode"],
     "_secrets.py":               ["postgres_trades"],
     "profit_monster.py":          ["profit_monster_fires", "postgres_trades"],
+    "pump_hunter.py":             ["pump_hunter_log", "pump_hunter_positions"],
 }
 
 CRITICAL_CHECKS = ["pipeline_errors", "pipeline_not_stuck", "price_data_fresh", "signal_db", "stale_locks"]
@@ -119,6 +122,30 @@ HERMES_LOCKS = {
     "/tmp/ai-decider.lock":           600,
     "/tmp/hermes-decider.lock":       600,
 }
+
+# Key trading systemd timers that should be running
+# Format: (timer_name, is_critical, description)
+TRADING_TIMERS = [
+    ("hermes-pipeline.timer",              True,  "Pipeline — 1 min cycle"),
+    ("hermes-hl-sync-guardian.timer",     True,  "Guardian — live trading reconciliation"),
+    ("hermes-price-collector.timer",       True,  "Price collection"),
+    ("hermes-self-close-watcher.timer",   True,  "ATR self-close monitoring"),
+    ("hermes-hype-paper-sync.timer",       True,  "HL ↔ paper position sync"),
+    ("hermes-away-detector.timer",         False, "T absence detection → self-init"),
+    ("hermes-context-compactor.timer",     False, "CONTEXT.md compaction (30 min)"),
+    ("hermes-brain-sync.timer",            False, "Brain memory sync (hourly)"),
+    ("hermes-git-release.timer",          False, "Auto git commit + release (daily)"),
+    ("hermes-wasp.timer",                  False, "System health & anomaly detection"),
+    ("hermes-smoke-test.timer",            False, "Scheduled smoke tests"),
+    ("hermes-pump-hunter.timer",           True,  "Pump hunter vol explosion executor"),
+]
+
+# ----------------------------------------------------------------------
+# Key trading systemd services (sibling to timer) that should be running
+# Format: (service_name, is_critical, description)
+TRADING_SERVICES = [
+    ("hermes-pump-hunter.service",         True,  "Pump hunter vol explosion executor"),
+]
 
 def _fix_stale_locks():
     """Remove all stale Hermes lock files."""
@@ -214,19 +241,68 @@ def check_pipeline_not_stuck():
         return True, "no lock"
     age = time.time() - lock.stat().st_mtime
     if age > 600:
-        return False, f"Pipeline stuck ({age/60:.0f}min old lock)"
+        # Only fail if no living process holds the lock
+        holders = _get_lock_holder_pid(str(lock))
+        if holders:
+            dead = [p for p in holders if not _pid_alive(p)]
+            if dead:
+                return False, f"Pipeline stuck ({age/60:.0f}min old lock, dead holders: {dead})"
+            return True, f"lock held by live PID(s): {holders}"
+        return False, f"Pipeline stuck ({age/60:.0f}min old lock, no holder)"
     return True, f"lock age: {age:.0f}s"
 
 
+def _pid_alive(pid: int) -> bool:
+    """Check if a process is alive."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def _get_lock_holder_pid(lock_path: str) -> list:
+    """Return list of PIDs holding a lock (via lsof)."""
+    try:
+        r = subprocess.run(
+            ['lsof', lock_path], capture_output=True, text=True, timeout=10
+        )
+        pids = []
+        for line in r.stdout.splitlines()[1:]:  # skip header
+            parts = line.split()
+            if parts:
+                try:
+                    pids.append(int(parts[1]))
+                except ValueError:
+                    pass
+        return pids
+    except Exception:
+        return []
+
+
 def check_stale_locks():
-    """Check all Hermes lock files. Fail if any is > threshold (process likely died)."""
+    """Check all Hermes lock files. Fail if > threshold AND holder process is dead."""
     stale = []
     for lock_path, max_age in HERMES_LOCKS.items():
         p = Path(lock_path)
         if p.exists():
             age = time.time() - p.stat().st_mtime
             if age > max_age:
-                stale.append(f"{lock_path} ({age/60:.0f}min)")
+                holders = _get_lock_holder_pid(lock_path)
+                # Lock is old — only report as stale if no living process holds it
+                if not holders:
+                    stale.append(f"{lock_path} ({age/60:.0f}min, no holder)")
+                else:
+                    # Verify each holder process is still alive
+                    dead = []
+                    for pid in holders:
+                        try:
+                            os.kill(pid, 0)  # signal 0 = existence check
+                        except OSError:
+                            dead.append(pid)
+                    if dead:
+                        stale.append(f"{lock_path} ({age/60:.0f}min, dead holders: {dead})")
+                    # else: lock is old but actively held — not stale
     if stale:
         return False, f"Stale locks: {', '.join(stale)}"
     return True, "all locks fresh"
@@ -268,7 +344,7 @@ def check_hotset_exists():
 def check_signal_db():
     """Check signals via SQLite (primary) or PostgreSQL (fallback)."""
     import sqlite3
-    signals_db = Path("/root/.hermes/data/signals_hermes_runtime.db")
+    signals_db = Path(RUNTIME_DB)
 
     # Primary: check SQLite file
     if signals_db.exists():
@@ -349,6 +425,7 @@ def check_live_mode():
 
 def check_hebbian_network():
     sys.path.insert(0, str(SCRIPTS_DIR))
+    # paths imported at module level
     try:
         from hebbian_engine import HebbianEngine
         h = HebbianEngine()
@@ -396,8 +473,10 @@ def check_no_flapping():
             if "restart" in l.lower() and "service" in l.lower():
                 restarts += 1
         
-        if completions > 30:
-            return False, f"Pipeline flapping: {completions} cycles in last 60min (>30 threshold)"
+        # 1-cycle-per-minute pipeline = 60/min max. Allow up to 55 to account for
+        # normal misses/restarts. Flagging only if it's running MORE than once/min.
+        if completions > 55:
+            return False, f"Pipeline flapping: {completions} cycles in last 60min (>55 threshold)"
         if restarts > 10:
             return False, f"Pipeline flapping: {restarts} service restarts in last 5000 lines (>10 threshold)"
         return True, f"pipeline stable ({completions} cycles, {restarts} restarts)"
@@ -427,6 +506,132 @@ def check_profit_monster_fires():
         return False, f"profit-monster check error: {e}"
 
 
+def check_trading_timers():
+    """Verify all key Hermes systemd timers are running (not expired)."""
+    try:
+        result = subprocess.run(
+            ["systemctl", "list-timers", "--all", "-n", "200"],
+            capture_output=True, text=True, timeout=20
+        )
+        if result.returncode != 0:
+            return False, f"systemctl list-timers failed: {result.stderr.strip()}"
+        output = result.stdout
+
+        failed = []
+        stale = []
+        for timer_name, is_critical, desc in TRADING_TIMERS:
+            # Check if this timer appears in the list
+            for line in output.splitlines():
+                if timer_name in line:
+                    # Parse the "X ago" and "in Y" columns to detect if it's waiting or elapsed
+                    # A timer with a timestamp in the past and no "X ago" or an "X ago" > 2x its interval
+                    # is considered stale if its next scheduled time is also past
+                    parts = line.split()
+                    if len(parts) >= 3:
+                        # The "in X" column tells us next run; "X ago" tells us last run
+                        # If there's no "in" time, timer may be inactive/masked
+                        # Check: is there a NEXT timestamp that is in the past?
+                        # Format: "NEXT_TIME  X ago  LAST_TIME  X ago ago  TIMER_NAME"
+                        try:
+                            # Try to find if timer has a future scheduled time
+                            # We check if it's masked (no NEXT time shown)
+                            pass
+                        except (ValueError, IndexError):
+                            pass
+                    break
+            else:
+                # Timer not found in output at all — could be masked or dead
+                stale.append(f"{timer_name} (not in list)")
+
+        # More reliable: check each timer individually with systemctl
+        failed = []
+        for timer_name, is_critical, desc in TRADING_TIMERS:
+            r = subprocess.run(
+                ["systemctl", "is-active", timer_name],
+                capture_output=True, text=True, timeout=5
+            )
+            state = r.stdout.strip()
+            if state != "active":
+                failed.append(f"{timer_name}={state}")
+
+        if failed:
+            msg = ", ".join(failed)
+            return False, f"inactive timers: {msg}"
+
+        # Also check services
+        svc_failed = []
+        for svc_name, is_critical, desc in TRADING_SERVICES:
+            r = subprocess.run(
+                ["systemctl", "is-active", svc_name],
+                capture_output=True, text=True, timeout=5
+            )
+            state = r.stdout.strip()
+            if state != "active":
+                svc_failed.append(f"{svc_name}={state}")
+
+        if svc_failed:
+            msg = ", ".join(svc_failed)
+            return False, f"inactive services: {msg}"
+
+        total = len(TRADING_TIMERS) + len(TRADING_SERVICES)
+        return True, f"all {total} timers/services active"
+    except subprocess.TimeoutExpired:
+        return False, "systemctl timed out"
+    except Exception as e:
+        return False, f"timer check error: {e}"
+
+
+# ----------------------------------------------------------------------
+# pump_hunter checks
+# ----------------------------------------------------------------------
+
+def check_pump_hunter_log(max_age_sec=600):
+    """Verify pump_hunter log was written to recently (10 min threshold)."""
+    log = Path("/root/.hermes/data/logs/pump_hunter.log")
+    if not log.exists():
+        return False, "pump_hunter.log not found"
+    try:
+        lines = log.read_text().splitlines()
+        if not lines:
+            return False, "pump_hunter.log empty"
+        last_line = lines[-1]
+        m = re.search(r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]', last_line)
+        if not m:
+            # Fallback: [HH:MM:SS] same-day format — prepend today's date
+            m2 = re.search(r'\[(\d{2}:\d{2}:\d{2})\]', last_line)
+            if not m2:
+                return False, f"cannot parse log timestamp: {last_line[:50]}"
+            last_ts = datetime.strptime(
+                f"{datetime.now().strftime('%Y-%m-%d')} {m2.group(1)}",
+                "%Y-%m-%d %H:%M:%S"
+            )
+        else:
+            last_ts = datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S")
+        age_sec = (datetime.now() - last_ts).total_seconds()
+        if age_sec > max_age_sec:
+            return False, f"pump_hunter silent ({age_sec/60:.0f}min > {max_age_sec/60:.0f}min)"
+        return True, f"pump_hunter alive ({age_sec:.0f}s ago)"
+    except Exception as e:
+        return False, f"pump_hunter log check error: {e}"
+
+
+def check_pump_hunter_positions():
+    """Verify pump_hunter positions file is accessible (not stale/corrupted)."""
+    positions_file = Path("/root/.hermes/data/pump_hunter_positions.json")
+    if not positions_file.exists():
+        return True, "no pump_hunter positions file (clean)"
+    try:
+        data = json.loads(positions_file.read_text())
+        if not isinstance(data, dict):
+            return False, f"pump_hunter_positions.json unexpected type: {type(data)}"
+        positions = data.get("positions", data.get("open", []))
+        if not positions:
+            return True, "pump_hunter positions file clean (0 open)"
+        return True, f"pump_hunter positions file OK ({len(positions)} open)"
+    except Exception as e:
+        return False, f"pump_hunter_positions.json error: {e}"
+
+
 # Map name -> (checker_fn, is_critical)
 CHECKS = {
     "pipeline_errors":        (check_pipeline_log_errors, True),
@@ -441,6 +646,9 @@ CHECKS = {
     "no_flapping":           (check_no_flapping, False),
     "stale_locks":           (check_stale_locks, True),
     "profit_monster_fires":  (check_profit_monster_fires, False),
+    "pump_hunter_log":       (check_pump_hunter_log, True),
+    "pump_hunter_positions":  (check_pump_hunter_positions, True),
+    "trading_timers":        (check_trading_timers, True),
 }
 
 

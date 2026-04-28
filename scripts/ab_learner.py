@@ -9,6 +9,7 @@ Run this after trades close to:
 
 The pipeline: trade_patterns → get_learned_adjustments() → bias toward winning configs
 """
+from paths import *
 import json, os, sys, psycopg2
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -348,6 +349,18 @@ def write_trade_patterns(patterns, sl_learnings, regimes, direction_stats):
 
 def run():
     """Full learning cycle."""
+    # Check if A/B testing is globally enabled
+    import json as _json
+    _cfg_path = '/root/.hermes/config/ab_tests.json'
+    try:
+        with open(_cfg_path) as _f:
+            _cfg = _json.load(_f)
+        if not _cfg.get('enabled', True):
+            log('A/B testing is globally DISABLED — skipping learning cycle.')
+            return
+    except Exception:
+        pass
+
     log('Starting learning cycle...')
 
     sl_learnings = compute_sl_learnings()

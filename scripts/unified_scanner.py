@@ -7,10 +7,12 @@ import sys, subprocess, requests, json, os
 sys.path.insert(0, '/root/.openclaw/workspace/scripts')
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import add_signal, get_confluence_signals, get_pending_signals as schema_get_pending
+from paths import *
 from hype_cache import get_meta
 from tokens import SOLANA_ONLY_TOKENS, HYPERLIQUID_TOKENS, HYPERLIQUID_EXCLUDE, PREFER_HYPERLIQUID_TOKENS, is_solana_only, is_hyperliquid, get_token_chain, can_short
 from _secrets import BRAIN_DB_DICT
 import psycopg2
+from hermes_constants import MAX_HYPE_POSITIONS, MAX_SOL_POSITIONS, MAX_TOTAL_POSITIONS
 
 LOG_FILE = '/root/.hermes/logs/unified-scanner.log'
 
@@ -74,7 +76,7 @@ def get_cached_prices():
 
     # Fallback to local cache
     try:
-        with open('/root/.hermes/data/prices.json') as f:
+        with open(PRICES_FILE) as f:
             return json.load(f)
     except:
         return {}

@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes MACD 1M Tuner — per-token params on 1m candles
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/macd_1m_tuner.py sweep
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -13,6 +13,7 @@ Usage:
 """
 import sys, json, time, argparse
 sys.path.insert(0, '/root/.hermes/scripts')
+from paths import *  # single source of truth for paths
 from hyperliquid_exchange import (
     get_open_hype_positions_curl,
     is_live_trading_enabled,
@@ -20,7 +21,7 @@ from hyperliquid_exchange import (
 )
 
 
-PAPER_JSON = "/var/www/hermes/data/trades.json"
+PAPER_JSON = TRADES_JSON
 DRY = True
 SAFE_MODE = True  # never open new positions, only close orphans
 MAX_SLIPPAGE = 0.005  # 0.5%
@@ -166,11 +167,11 @@ def main():
     hl_positions = get_hl_positions()
     hl_orders = get_hl_open_orders()
 
-    paper_tokens = {p['token'] for p in paper_trades}
+    paper_tokens = {p['coin'] for p in paper_trades}
 
     log(f"\\nPaper HL trades: {len(paper_trades)}", "INFO")
     for p in paper_trades:
-        log(f"  {p['token']:<12} {p['direction']:<7} entry={p['entry']} amount=${p.get('amount_usdt','?')}", "INFO")
+        log(f"  {p['coin']:<12} {p['direction']:<7} entry={p['entry']} amount=${p.get('amount_usdt','?')}", "INFO")
 
     log(f"\\nHL positions: {len(hl_positions)}", "INFO")
     for token, p in sorted(hl_positions.items()):
@@ -180,7 +181,7 @@ def main():
     log("\\n── Phase 1: Missing HL positions (paper → HL) ──", "INFO")
     opens_needed = []
     for p in paper_trades:
-        token = p['token']
+        token = p['coin']
         direction = p['direction']
         entry = p['entry']
         amount = p.get('amount_usdt', 50.0)
@@ -202,7 +203,7 @@ def main():
                 log(f"  {token}: paper ↔ HL in sync ✓", "PASS")
 
     for p in opens_needed:
-        result = open_position_on_hl(p['token'], p['direction'], p.get('amount_usdt', 50.0), p['entry'])
+        result = open_position_on_hl(p['coin'], p['direction'], p.get('amount_usdt', 50.0), p['entry'])
         time.sleep(3)
 
     # ── Phase 2: Close paper orphans (HL → paper) ─────────────────────────────
@@ -224,7 +225,7 @@ def main():
     try:
         with open(PAPER_JSON) as f:
             data = json.load(f)
-        recently_closed = {t['token'] for t in data.get('closed', [])[-10:]}
+        recently_closed = {t['coin'] for t in data.get('closed', [])[-10:]}
     except:
         recently_closed = set()
 

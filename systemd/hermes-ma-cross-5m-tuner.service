@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes MA Cross 5M Tuner — per-token EMA params on 5m candles
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/ma_cross_5m.py --sweep
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal

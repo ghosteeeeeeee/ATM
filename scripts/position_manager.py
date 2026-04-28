@@ -15,6 +15,22 @@ from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
 sys.path.insert(0, '/root/.hermes/scripts')
 from hermes_file_lock import FileLock
+from hermes_constants import (
+    MAX_OPEN_POSITIONS,
+    ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT,
+    ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL,
+    ATR_SL_MIN_INIT, ATR_SL_MAX_INIT, SL_PCT_FALLBACK, TP_PCT_FALLBACK, STOP_LOSS_DEFAULT,
+    ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
+    ATR_PCT_LOW_THRESH, ATR_PCT_HIGH_THRESH,
+    PHASE_TIER_NEUTRAL, PHASE_TIER_BUILDING, PHASE_TIER_ACCELERATING,
+    PHASE_TIER_EXHAUSTION, PHASE_TIER_EXTREME,
+    K_PHASE_ACCEL_STALL, K_PHASE_ACCEL_FAST, K_PHASE_ACCEL_SLOW,
+    K_PHASE_EXH_STALL, K_PHASE_EXH_FAST, K_PHASE_EXH_SLOW,
+    K_PHASE_EXT_STALL, K_PHASE_EXT_FAST,
+    WRONG_SIDE_AVG_PCT_THRESH,
+    CASCADE_FLIP_ENABLED,
+)
+from paths import *
 from _secrets import BRAIN_DB_DICT
 from signal_schema import record_signal_outcome
 
@@ -30,14 +46,13 @@ except Exception as e:
     SPEED_TRACKER = None
 
 # Speed feature: stale winner/loser exit logic
-# Tokens that are in profit but flat for 15+ min should be closed (book profits).
-# Tokens that are in loss but flat for 30+ min should be cut (dead positions).
-STALE_WINNER_TIMEOUT_MINUTES = 15  # close winners who've been stale for 15+ min
-STALE_LOSER_TIMEOUT_MINUTES = 30  # close losers who've been stale for 30+ min
-STALE_WINNER_MIN_PROFIT = 1.0    # % profit required to be a "winner"
-STALE_LOSER_MAX_LOSS = -1.0      # % loss (more negative) required to be a "loser"
-# Speed threshold: velocity < 0.2% over 5 min = stale
-STALE_VELOCITY_THRESHOLD = 0.2   # % change — below this = flat/stale
+# Tokens that are in profit but flat for 30+ min should be closed (book profits).
+# Tokens that are in loss but flat for 15+ min should be cut (dead positions).
+# Sourced from hermes_constants.py — adjust STALE_*, SPEED_HOTSET_WEIGHT there.
+from hermes_constants import (
+    STALE_WINNER_TIMEOUT_MINUTES, STALE_LOSER_TIMEOUT_MINUTES,
+    STALE_WINNER_MIN_PROFIT, STALE_LOSER_MAX_LOSS, STALE_VELOCITY_THRESHOLD,
+)
 
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
 try:
@@ -56,13 +71,13 @@ DB_CONFIG = BRAIN_DB_DICT
 SERVER_NAME = "Hermes"
 
 # Pipeline heartbeat file
-_PM_HEARTBEAT_FILE = '/var/www/hermes/data/pipeline_heartbeat.json'
-MAX_POSITIONS = 10
+_PM_HEARTBEAT_FILE = PIPELINE_HB_FILE
+MAX_POSITIONS = MAX_OPEN_POSITIONS
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = -2.0   # cut if pnl_pct <= -2.0%
 TP_PCT        = 0.08          # 8% fallback target (overridden by ATR-based TP in get_trade_params)
-ATR_UPDATE_THRESHOLD_PCT = 0.003  # only push SL/TP update to HL if delta > 0.3%
+ATR_UPDATE_THRESHOLD_PCT = 0.0015  # only push SL/TP update to HL if delta > 0.15%
 SL_PCT = 0.03          # 3% stop loss (cut loser threshold — DEFAULT fallback)
 SL_PCT_MIN = 0.01      # minimum SL for any trade
 MAX_LEVERAGE = 5
@@ -74,10 +89,6 @@ MAX_LEVERAGE = 5
 ATR_HL_ORDERS_ENABLED = False
 
 # ── Cascade Flip Kill Switch ─────────────────────────────────────────────────
-# Disables ALL cascade flip logic (both MACD-triggered and speed-armed).
-# Set to False to disable cascade flipping entirely.
-CASCADE_FLIP_ENABLED = False
-
 # ── Cascade Flip Config ──────────────────────────────────────────────────────
 # When an open position is losing AND an opposite signal fires with strong conf,
 # cascade flip: close the losing position AND enter the opposite direction.
@@ -86,9 +97,9 @@ CASCADE_FLIP_ENABLED = False
 # The position_manager computes trailing SL and writes it to brain DB, but the
 # actual HL stop-loss order was never updated when trailing tightened.
 # cascade flip: close the losing position AND enter the opposite direction.
-CASCADE_FLIP_ARM_LOSS        = -0.25  # System ARMED at this loss % (speed check activates)
-CASCADE_FLIP_TRIGGER_LOSS   = -0.50  # FLIP fires at this loss % (if armed + speed increasing)
-CASCADE_FLIP_HF_TRIGGER_LOSS = -0.35  # Fast flip: high-momentum tokens (speed pctl > 80)
+CASCADE_FLIP_ARM_LOSS        = -0.10  # System ARMED at this loss % (speed check activates)
+CASCADE_FLIP_TRIGGER_LOSS   = -0.15  # FLIP fires at this loss % (if armed + speed increasing)
+CASCADE_FLIP_HF_TRIGGER_LOSS = -0.15  # Fast flip: high-momentum tokens (speed pctl > 80)
 CASCADE_FLIP_MIN_CONF        = 60.0   # Opposite signal must have conf >= this % (lowered from 70)
 CASCADE_FLIP_MAX_AGE_M       = 30     # Opposite signal must be created within this many minutes (expanded from 15)
 CASCADE_FLIP_MIN_TYPES       = 1     # Opposite signal must have at least this many agreeing signal types
@@ -96,7 +107,6 @@ CASCADE_FLIP_MAX             = 3      # Max flips per token (permanent lockout a
 # NOTE: CASCADE_FLIP_POST_TRAIL_PCT removed 2026-04-08 — was only used by deprecated
 # trailing stop. Cascade-flip positions will get their own tighter SL management
 # when ATR-adaptive TP/SL is extended to cover post-flip scenarios.
-FLIP_COUNTS_FILE            = '/var/www/hermes/data/flip_counts.json'
 
 # ── MACD-Triggered Cascade Flip ───────────────────────────────────────────────
 # Tokens where MACD 1H crossing under signal (while LONG) or crossing over (while SHORT)
@@ -105,28 +115,9 @@ FLIP_COUNTS_FILE            = '/var/www/hermes/data/flip_counts.json'
 # Added 2026-04-06 based on TRB/IMX/SOPH/SCR post-mortems.
 MACD_CASCADE_FLIP_TOKENS = {'TRB', 'IMX', 'SOPH', 'SCR'}
 
-# ─── Cascade Flip Helpers ─────────────────────────────────────────────────────
-
-def _load_flip_counts() -> dict:
-    """Load persisted flip counts. Returns {TOKEN: {flips, last_flip_dir, last_flip_time}}"""
-    try:
-        if os.path.exists(FLIP_COUNTS_FILE):
-            with open(FLIP_COUNTS_FILE) as f:
-                return json.load(f)
-    except Exception:
-        pass
-    return {}
-
-
-def _save_flip_counts(counts: dict):
-    """Persist flip counts to disk."""
-    try:
-        with FileLock('flip_counts'):
-            os.makedirs(os.path.dirname(FLIP_COUNTS_FILE), exist_ok=True)
-            with open(FLIP_COUNTS_FILE, 'w') as f:
-                json.dump(counts, f, indent=2)
-    except Exception as e:
-        print(f"  [Flip Count] ⚠️ Failed to persist flip counts: {e}")
+# cascade_flip lives in its own module (cascade_flip.py) for isolated testing.
+# Also import _load_flip_counts (used by check_cascade_flip in this file).
+from cascade_flip import cascade_flip, _load_flip_counts
 
 
 def _get_macd_1h_state(token: str) -> Optional[str]:
@@ -221,12 +212,11 @@ def _get_trigger_threshold(token: str, speed_tracker) -> float:
 
 
 # ─── Loss Cooldown Config ─────────────────────────────────────────────────────
-# After a losing trade, block the SAME direction for N hours
-# This prevents the loss spiral: trade → cut → immediately re-enter → cut again
-# INCREMENTAL: consecutive losses double the cooldown (2h → 4h → 8h), wins reset streak
-LOSS_COOLDOWN_FILE     = '/var/www/hermes/data/loss_cooldowns.json'
-LOSS_COOLDOWN_BASE     = 2.0   # hours for 1st consecutive loss
-LOSS_COOLDOWN_MAX       = 8.0   # cap at 8 hours after 3+ consecutive losses
+# Imported from paths.py (SINGLE SOURCE). Do not redefine inline — import instead.
+# This prevents the bug where hl-sync-guardian.py and position_manager.py had
+# different values for the same constants, causing get_cooldown to disagree with
+# _record_loss_cooldown.
+from paths import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
 LOSS_STREAK_RESET_WIN   = True   # reset streak to 0 after a win (good trend continuation)
 WIN_COOLDOWN_MINUTES    = 5     # block same direction for 5 min after a win
 
@@ -260,10 +250,12 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
                    pnl_pct, pnl_usdt, stop_loss, target, exchange,
                    open_time, close_time, status, signal, confidence,
                    leverage, paper, sl_distance, sl_group,
-                   trailing_activation, trailing_distance, trailing_phase2_dist
+                   trailing_activation, trailing_distance, trailing_phase2_dist,
+                   highest_price, lowest_price
             FROM trades
             WHERE status = 'open'
               AND server = %s
+              AND (signal IS NULL OR signal NOT IN ('pump_hunter', 'zscore_pump'))
             ORDER BY open_time DESC
         """, (server,))
         rows = cur.fetchall()
@@ -276,7 +268,7 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
 
 
 def get_position_count(server: str = SERVER_NAME) -> int:
-    """Count open positions for the given server."""
+    """Count open positions for the given server (excludes pump_hunter and zscore_pump signals)."""
     conn = get_db_connection()
     if conn is None:
         return 0
@@ -285,7 +277,9 @@ def get_position_count(server: str = SERVER_NAME) -> int:
         cur = get_cursor(conn)
         cur.execute("""
             SELECT COUNT(*) as cnt FROM trades
-            WHERE status = 'open' AND server = %s
+            WHERE status = 'open'
+              AND server = %s
+              AND (signal IS NULL OR signal NOT IN ('pump_hunter', 'zscore_pump'))
         """, (server,))
         row = cur.fetchone()
         return int(row["cnt"]) if row else 0
@@ -297,7 +291,7 @@ def get_position_count(server: str = SERVER_NAME) -> int:
 
 
 def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
-    """Check if token already has an open position for the given server."""
+    """Check if token already has an open position (excludes pump_hunter and zscore_pump signals)."""
     conn = get_db_connection()
     if conn is None:
         return False
@@ -309,6 +303,7 @@ def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
             WHERE status = 'open'
               AND server = %s
               AND LOWER(token) = LOWER(%s)
+              AND (signal IS NULL OR signal NOT IN ('pump_hunter', 'zscore_pump'))
         """, (server, token))
         row = cur.fetchone()
         return int(row["cnt"]) > 0 if row else False
@@ -488,7 +483,7 @@ def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[b
                     stale_minutes = int((time.time() - last_dt.timestamp()) / 60)
                 except Exception:
                     stale_minutes = 0
-            if stale_minutes >= 30:  # Give winners more time — 30 min stall
+            if stale_minutes >= STALE_WINNER_TIMEOUT_MINUTES:  # Give winners more time
                 reason = f"stalled_winner_pnl{live_pnl:+.1f}%_spd{speed_pctl:.0f}_vel{vel_5m:+.3f}%_{stale_minutes}m"
                 return True, reason
 
@@ -499,7 +494,7 @@ def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[b
 
 # ─── Signal Quality Tracking ──────────────────────────────────────────────────
 
-SIGNAL_DB = '/root/.hermes/data/signals_hermes_runtime.db'
+SIGNAL_DB = RUNTIME_DB
 
 def _ensure_signal_outcomes_table():
     """Create signal_outcomes table if it doesn't exist."""
@@ -622,7 +617,7 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
         return
 
     # Read signals from signal_history for this trade_id
-    sig_db = '/root/.hermes/data/signals_hermes_runtime.db'
+    sig_db = RUNTIME_DB
     try:
         conn_sig = _sqlite3.connect(sig_db, timeout=5)
         c_sig = conn_sig.cursor()
@@ -685,11 +680,17 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
 
 
 def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt: float,
-                            signal_type: str = None, confidence: float = None):
-    """Record outcome for a signal type so we can track win/loss streaks."""
+                            signal_type: str = None, confidence: float = None,
+                            net_pnl: float = None):
+    """Record outcome for a signal type so we can track win/loss streaks.
+    
+    win/loss is determined by net_pnl if provided (after fees), otherwise gross pnl_usdt.
+    """
     _ensure_signal_outcomes_table()
     import sqlite3
-    is_win = 1 if float(pnl_usdt or 0) > 0 else 0
+    # BUG-42 fix: use net_pnl (after fees) for win/loss classification if available
+    record_pnl = net_pnl if net_pnl is not None else pnl_usdt
+    is_win = 1 if float(record_pnl or 0) > 0 else 0
     try:
         conn = sqlite3.connect(SIGNAL_DB)
         c = conn.cursor()
@@ -717,6 +718,13 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
               f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
     except Exception as e:
         print(f"[Position Manager] _record_signal_outcome error: {e}")
+
+    # FIX (2026-04-22): Also write loss cooldowns to PostgreSQL so signal_gen's
+    # get_cooldown() can find them. get_cooldown() checks JSON FIRST (streak-based)
+    # then falls back to PostgreSQL (flat 1h). Writing to both ensures coverage
+    # even if JSON is empty/expired or the JSON-only path is bypassed.
+    if is_win == 0:  # loss
+        set_loss_cooldown(token, direction)
 
 
 # ─── A/B Results Recording ─────────────────────────────────────────────────────
@@ -841,7 +849,8 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     # ── Signal Outcomes recording — ALWAYS (independent of A/B data) ─────────
     # This feeds the self-learning streak system so even pre-A/B trades contribute
     _record_signal_outcome(token, direction, pnl_pct, pnl_usdt,
-                          signal_type=signal_type, confidence=confidence)
+                          signal_type=signal_type, confidence=confidence,
+                          net_pnl=net_pnl)
 
 
 def close_paper_position(trade_id: int, reason: str) -> bool:
@@ -858,7 +867,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # Fetch trade details before closing
         cur.execute("""
             SELECT token, direction, entry_price, current_price,
-                   pnl_pct, experiment, sl_distance, amount_usdt
+                   pnl_pct, experiment, sl_distance, amount_usdt, signal
             FROM trades WHERE id = %s
         """, (trade_id,))
         row = cur.fetchone()
@@ -872,6 +881,17 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         amount_usdt = float(row['amount_usdt'] or 50)
         experiment = row['experiment']
         sl_dist = row['sl_distance']
+        signal_type = row['signal']  # fallback for record_signal_outcome
+
+        # BUG-FIX (2026-04-19): 'confidence' was never fetched in this function scope
+        # causing "name 'confidence' is not defined" errors in record_signal_outcome.
+        # Fix: fetch confidence from the trades table alongside signal_type.
+        try:
+            cur.execute("SELECT confidence FROM trades WHERE id = %s", (trade_id,))
+            conf_row = cur.fetchone()
+            confidence = float(conf_row['confidence'] or 0) if conf_row and conf_row['confidence'] else None
+        except Exception:
+            confidence = None
 
         # ── Fee calculation ──────────────────────────────────────────
         # Hyperliquid charges 0.045% per side on NOTIONAL value
@@ -915,19 +935,18 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 # pnl_pct_from_reason is the realized pnl% at time of exit
                 pnl_usdt_val = amount_usdt * (abs(pnl_pct_from_reason) / 100) * (1 if pnl_pct_from_reason >= 0 else -1)
                 pnl_pct = pnl_pct_from_reason  # also correct the stored pnl_pct
+                # BUG-49 fix: net_pnl must be kept in sync after reason override
+                net_pnl = pnl_usdt_val - fee_total
         is_loss = pnl_usdt_val < 0
         if is_loss:
             set_loss_cooldown(token, direction)
             # Post-mortem: if we lost on a direction, was the market moving against us first?
             _analyze_loss_direction(token, direction, entry_price, current_price)
 
-        # ── Trigger win cooldown ──────────────────────────────────
-        # Also: clear loss streak since WIN confirms this was the right direction
+        # ── Trigger win: clear loss streak since WIN confirms this was the right direction ──
         is_win = pnl_usdt_val > 0
-        if is_win:
-            _set_win_cooldown(token, direction)
-            if LOSS_STREAK_RESET_WIN:
-                clear_loss_streak(token, direction)
+        if is_win and LOSS_STREAK_RESET_WIN:
+            clear_loss_streak(token, direction)
 
         cur.execute("""
             UPDATE trades
@@ -1073,7 +1092,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # and kept it alive — good signal. Record the pattern.
         try:
             import sqlite3 as _sqlite3
-            conn_s = _sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db', timeout=5)
+            conn_s = _sqlite3.connect(RUNTIME_DB, timeout=5)
             c_s = conn_s.cursor()
             c_s.execute("""
                 SELECT MAX(compact_round) FROM signal_history
@@ -1135,14 +1154,17 @@ def _pm_get_atr(token: str, period: int = 14, interval: str = '15m') -> float | 
     import time as _time
     _ATR_TTL = 300
 
-    # Try decider-run's cache first (shared process memory)
+    # Try local atr_cache.json (shared file, no decider_run dependency)
     try:
-        from decider_run import _ATR_CACHE as _dr_cache
-        cache_key = (token.upper(), interval)  # interval is part of cache key
-        if cache_key in _dr_cache:
-            atr_val, ts = _dr_cache[cache_key]
-            if _time.time() - ts < _ATR_TTL:
-                return atr_val
+        cache_file = ATR_CACHE_FILE
+        if _os.path.exists(cache_file):
+            with open(cache_file) as f:
+                data = _json.load(f)
+            entry = data.get(token.upper(), {})
+            atr_val = entry.get('atr')
+            ts = entry.get('ts', 0)
+            if atr_val is not None and (_time.time() - ts) < _ATR_TTL:
+                return float(atr_val)
     except Exception:
         pass
 
@@ -1169,32 +1191,21 @@ def _pm_get_atr(token: str, period: int = 14, interval: str = '15m') -> float | 
         return None
 
 
-def _pm_atr_multiplier(atr_pct: float) -> float:
-    """Canonical k multiplier — must match decider_run._atr_multiplier."""
-    if atr_pct < 0.01:
-        return 1.0   # LOW_VOLATILITY: tight SL for stable tokens
-    elif atr_pct > 0.03:
-        return 2.5   # HIGH_VOLATILITY: wide SL for volatile tokens
-    else:
-        return 2.0   # NORMAL_VOLATILITY: balanced
-
-
-# ─── ATR-Adaptive TP/SL (batch — replaces deprecated trailing stop) ────────────
+# ─── ATR-Adaptive TP/SL ────────────────────────────────────────────────────
 
 def _atr_multiplier(atr_pct: float) -> float:
     """Canonical k multiplier — must match decider_run._atr_multiplier."""
-    if atr_pct < 0.01:
-        return 1.0   # LOW_VOLATILITY: tight SL for stable tokens
-    elif atr_pct > 0.03:
-        return 2.5   # HIGH_VOLATILITY: wide SL for volatile tokens
+    if atr_pct < ATR_PCT_LOW_THRESH:
+        return ATR_K_LOW_VOL    # LOW_VOLATILITY: tight SL for stable tokens
+    elif atr_pct > ATR_PCT_HIGH_THRESH:
+        return ATR_K_HIGH_VOL   # HIGH_VOLATILITY: wide SL for volatile tokens
     else:
-        return 2.0   # NORMAL_VOLATILITY: balanced
+        return ATR_K_NORMAL_VOL  # NORMAL_VOLATILITY: balanced
 
 
 def _dr_atr(token: str, atr_pct: float) -> float:
-    """Proxy to decider_run._atr_multiplier — imported lazily to avoid circular."""
-    from decider_run import _atr_multiplier
-    return _atr_multiplier(token, atr_pct)
+    """Local proxy — uses _atr_multiplier from this module (no decider_run dependency)."""
+    return _atr_multiplier(atr_pct)
 
 
 def _atr_sl_k_scaled(
@@ -1209,7 +1220,7 @@ def _atr_sl_k_scaled(
     Returns k multiplier to apply on top of base _dr_atr().
     momentum_stats: from get_momentum_stats(token) — {percentile_long, percentile_short, velocity, phase}
     """
-    from signal_gen import PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME
+    from signal_gen import PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME, detect_phase
 
     base_k = _dr_atr(token, atr_pct)
 
@@ -1219,83 +1230,235 @@ def _atr_sl_k_scaled(
     phase_str = momentum_stats.get('phase', 'neutral')
     velocity = momentum_stats.get('velocity', 0)
 
-    # Direction-aware percentile
+    # Direction-aware percentile — use LONG/SHORT specific pct for phase classification
     if direction == 'LONG':
         pct = momentum_stats.get('percentile_long', 50)
     else:
         pct = momentum_stats.get('percentile_short', 50)
 
+    # FIX (2026-04-28): phase was computed from OVERALL percentile in get_momentum_stats
+    # (percentile=1.1 → 'quiet'), ignoring direction-specific conviction (percentile_long=95.5).
+    # Re-compute phase using DIRECTION-SPECIFIC percentile so LONG conviction drives tight k.
+    phase = detect_phase(pct, velocity)
+
     # Phase tier map (string -> int for comparison)
     PHASE_TIER = {
-        'neutral': 0,
-        'building': 1,
-        'accelerating': 2,
-        'exhaustion': 3,
-        'extreme': 4,
+        'neutral':     PHASE_TIER_NEUTRAL,
+        'building':    PHASE_TIER_BUILDING,
+        'accelerating':PHASE_TIER_ACCELERATING,
+        'exhaustion':  PHASE_TIER_EXHAUSTION,
+        'extreme':     PHASE_TIER_EXTREME,
     }
-    phase = PHASE_TIER.get(phase_str, 0)
+    phase_tier = PHASE_TIER.get(phase, PHASE_TIER_NEUTRAL)
 
     # Velocity stall: negative velocity at accelerating+ phase = tired
-    stalling = (velocity < 0) and (phase >= 2)  # >= ACCELERATING
+    stalling = (velocity < 0) and (phase_tier >= PHASE_TIER_ACCELERATING)
 
-    # Phase-based multiplier (tightened by 0.75× to get SL closer to price)
-    if phase < 2:
+    # Phase-based multiplier — TIGHT: first candle against us, we're out
+    if phase_tier < PHASE_TIER_ACCELERATING:
         return base_k  # neutral/building — no change
-    elif phase == 2:
-        # ACCELERATING
+    elif phase_tier == PHASE_TIER_ACCELERATING:
+        # ACCELERATING: first candle against us, OUT. mult < 1.0 = tighter SL.
+        # ATR% is the only stop we need — floor is the hard floor.
         if stalling:
-            mult = 1.125   # was 1.5
+            mult = K_PHASE_ACCEL_STALL  # stalling + accelerating = momentum fading, snap out
         elif speed_percentile >= 70:
-            mult = 0.94    # was 1.25
+            mult = K_PHASE_ACCEL_FAST   # fast momentum but first reversal = out
         else:
-            mult = 0.75    # was 1.0
-    elif phase == 3:
-        # EXHAUSTION
+            mult = K_PHASE_ACCEL_SLOW   # low speed = no room needed, stay tight
+    elif phase_tier == PHASE_TIER_EXHAUSTION:
+        # EXHAUSTION: still tight — 1.25-1.5× only
         if stalling:
-            mult = 1.5     # was 2.0
+            mult = K_PHASE_EXH_STALL    # stalling exhaustion = snap out faster
         elif speed_percentile >= 70:
-            mult = 1.5     # was 2.0
+            mult = K_PHASE_EXH_FAST     # fast momentum
         else:
-            mult = 1.125   # was 1.5
+            mult = K_PHASE_EXH_SLOW     # slow momentum
     else:
-        # EXTREME
+        # EXTREME: 1.5× max
         if stalling:
-            mult = 1.88    # was 2.5
+            mult = K_PHASE_EXT_STALL   # stalling extreme
         else:
-            mult = 1.125   # was 1.5
+            mult = K_PHASE_EXT_FAST     # fast extreme
 
     return base_k * mult
 
 
 def _force_fresh_atr(token: str, period: int = 14, interval: str = '15m') -> float | None:
     """
-    Force-fetch ATR bypassing cache. Used for ATR-adaptive order updates.
-    Always fetches the current ATR value — no TTL check.
+    Get ATR for a token. Reads from local atr_cache.json FIRST (no rate limits).
+    If cache is stale (>300s), fetches from HL API.
+    If HL fails (rate-limited) AND no cache exists, falls back to Binance public API.
+    Saved ATR values are in dollar terms (converted from Binance quote currency).
+    This makes position_manager the authoritative ATR writer (every 1 min via pipeline).
     Default interval: 15m (intraday feel vs 1h swing-trade).
     """
     import time as _time
+    import json as _json
+    import os as _os
+    import requests as _requests
+
+    cache_file = ATR_CACHE_FILE
+    cache_key = token.upper()
+    _STALE_MAX = 3600  # accept cache up to 1h old as fallback during rate limiting
+
+    # 1. Try persistent cache first
+    stale_cached_atr = None
+    try:
+        if _os.path.exists(cache_file):
+            with open(cache_file) as f:
+                data = _json.load(f)
+            entry = data.get(cache_key, {})
+            atr_val = entry.get('atr')
+            ts = entry.get('ts', 0)
+            age = _time.time() - ts
+            if atr_val is not None and age < 300:
+                return float(atr_val)  # fresh cache — return immediately
+            elif atr_val is not None and age < _STALE_MAX:
+                stale_cached_atr = float(atr_val)  # save for fallback below
+    except Exception:
+        pass
+
+    # 2. Cache miss or stale — fetch from HL API
+    atr = None
     try:
         from hyperliquid.info import Info
         info = Info('https://api.hyperliquid.xyz', skip_ws=True)
         now = _time.time()
         end_t = int(now * 1000)
-        # 15m candles: each interval = 15min = 15*60*1000 ms
         start_t = end_t - (15 * 60 * 1000 * (period + 5))
         candles = info.candles_snapshot(token.upper(), interval, start_t, end_t)
-        if not candles or len(candles) < period + 1:
-            print(f"  [ATR] {token}: insufficient candle data ({len(candles) or 0} bars, need {period+1})")
-            return None
-        trs = []
-        for i in range(1, min(period + 1, len(candles))):
-            high = float(candles[i]['h'])
-            low  = float(candles[i]['l'])
-            prev_close = float(candles[i - 1]['c'])
-            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
-            trs.append(tr)
-        return sum(trs) / len(trs) if trs else None
-    except Exception as e:
-        print(f"  [ATR] {token}: HL API error fetching ATR — {e}")
-        return None
+        if candles and len(candles) >= period + 1:
+            trs = []
+            for i in range(1, min(period + 1, len(candles))):
+                high = float(candles[i]['h'])
+                low  = float(candles[i]['l'])
+                prev_close = float(candles[i - 1]['c'])
+                tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+                trs.append(tr)
+            atr = sum(trs) / len(trs) if trs else None
+    except Exception:
+        pass  # HL failed
+
+    # 3. No ATR from HL AND no stale cache — try Binance public API
+    if atr is None and stale_cached_atr is None:
+        try:
+            # Binance klines: interval mapping
+            binance_interval = '15m'  # maps directly to Binance
+            url = (f"https://api.binance.com/api/v3/klines"
+                   f"?symbol={token.upper()}USDT&interval={binance_interval}&limit={period + 1}")
+            resp = _requests.get(url, timeout=10)
+            if resp.status_code == 200:
+                klines = resp.json()
+                if klines and len(klines) >= period + 1:
+                    trs = []
+                    for i in range(1, min(period + 1, len(klines))):
+                        high = float(klines[i][2])   # high price
+                        low  = float(klines[i][3])   # low price
+                        prev_close = float(klines[i - 1][4])  # previous close
+                        tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+                        trs.append(tr)
+                    atr = sum(trs) / len(trs) if trs else None
+                    if atr is not None:
+                        print(f"  [ATR] {token}: Binance ATR={atr:.4f} ({atr/float(klines[-1][4])*100:.2f}%)")
+        except Exception:
+            pass  # Binance also failed
+
+    # 4. Save to atr_cache.json
+    if atr is not None:
+        try:
+            file_data = {}
+            if _os.path.exists(cache_file):
+                with open(cache_file) as f:
+                    file_data = _json.load(f)
+            file_data[cache_key] = {'atr': atr, 'ts': _time.time()}
+            _os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+            with open(cache_file, 'w') as f:
+                _json.dump(file_data, f)
+        except Exception:
+            pass
+
+    # 5. Return fresh ATR if available, otherwise fall back to stale cache
+    if atr is not None:
+        return atr
+    if stale_cached_atr is not None:
+        try:
+            if _os.path.exists(cache_file):
+                with open(cache_file) as f:
+                    data = _json.load(f)
+                ts = data.get(cache_key, {}).get('ts', 0)
+                age = _time.time() - ts
+                print(f"  [ATR] {token}: using stale cache (age={age:.0f}s)")
+        except Exception:
+            pass
+        return stale_cached_atr
+
+    return None
+
+def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
+                        current_price: float,
+                        sl_pct_fallback: float = SL_PCT_FALLBACK) -> float:
+    """
+    Compute dynamic trailing SL using ATR(14). Same formula used by decider_run and guardian.
+    ATR-based SL replaces fixed % SL. Falls back to sl_pct_fallback if ATR unavailable.
+
+    Trailing behavior:
+      LONG  → SL starts at entry - k·ATR, trails DOWN as price rises (locks in profit)
+      SHORT → SL starts at entry + k·ATR, trails DOWN as price falls (locks in profit)
+
+    SL is always on the profitable side of current price.
+    """
+    atr = _force_fresh_atr(token)
+    if atr is None:
+        if direction == 'LONG':
+            return current_price * (1 - sl_pct_fallback)
+        else:
+            return current_price * (1 + sl_pct_fallback)
+
+    atr_pct = atr / current_price
+    k = _atr_multiplier(atr_pct)
+    atr_distance = k * atr
+
+    effective_sl_pct = max(atr_distance / current_price, ATR_SL_MIN)
+    effective_sl_pct = min(effective_sl_pct, ATR_SL_MAX)
+
+    if direction == 'LONG':
+        # SL = entry - k·ATR, never above current price (catches drops)
+        sl = entry_price * (1 - effective_sl_pct)
+        return min(sl, current_price * (1 - ATR_SL_MIN))
+    else:
+        # SHORT: SL trails ABOVE current price as it falls (locks in profit)
+        # SL = current_price + ATR_SL_MIN buffer — tight trailing for acceleration phase
+        # The buffer is relative to current price, so as price falls, SL falls too
+        return current_price * (1 + ATR_SL_MIN)
+
+
+def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
+                        current_price: float,
+                        tp_pct_fallback: float = TP_PCT_FALLBACK) -> float:
+    """
+    Compute dynamic TP using ATR(14). Same formula used by decider_run and guardian.
+    TP = current_price ± (k_tp * ATR(14)) where k_tp = k * ATR_TP_K_MULT (1.25).
+    """
+    atr = _force_fresh_atr(token)
+    if atr is None:
+        if direction == 'LONG':
+            return current_price * (1 + tp_pct_fallback)
+        else:
+            return current_price * (1 - tp_pct_fallback)
+
+    atr_pct = atr / current_price
+    k = _atr_multiplier(atr_pct)
+    k_tp = k * ATR_TP_K_MULT  # TP tighter — book profit, don't let it ride
+    atr_distance_tp = k_tp * atr
+
+    effective_tp_pct = max(atr_distance_tp / current_price, ATR_TP_MIN)
+    effective_tp_pct = min(effective_tp_pct, ATR_TP_MAX)
+
+    if direction == 'LONG':
+        return current_price * (1 + effective_tp_pct)
+    else:
+        return current_price * (1 - effective_tp_pct)
 
 
 def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
@@ -1339,6 +1502,29 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             except Exception:
                 speed_by_token[token] = 50
 
+    # P2 FIX (2026-04-19): Re-read peak prices from DB to ensure _collect_atr_updates
+    # always has fresh values. The in-memory pos dict might not have been refreshed
+    # with the latest persisted values from the previous cycle's
+    # refresh_current_prices() call.
+    _peak_cache: Dict[int, tuple] = {}
+    try:
+        _conn_peak = get_db_connection()
+        if _conn_peak:
+            _cur_peak = _conn_peak.cursor()
+            _trade_ids = [p.get('id') for p in open_positions if p.get('id')]
+            if _trade_ids:
+                _placeholders = ','.join(['%s'] * len(_trade_ids))
+                _cur_peak.execute(
+                    f"SELECT id, highest_price, lowest_price FROM trades WHERE id IN ({_placeholders}) AND status = 'open'",
+                    _trade_ids
+                )
+                for _row in _cur_peak.fetchall():
+                    _peak_cache[int(_row[0])] = (_row[1], _row[2])
+            _cur_peak.close()
+            _conn_peak.close()
+    except Exception:
+        pass
+
     updates = []
     for pos in open_positions:
         token = str(pos.get('token', '')).upper()
@@ -1350,9 +1536,22 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         current_tp = float(pos.get('target') or 0)
         source = str(pos.get('source') or '')
 
-        # Skip cascade-flip positions — they have their own tighter SL
-        if source.startswith('cascade-reverse-'):
-            continue
+        # P2 FIX: use DB-cached peak prices to ensure trailing SL is accurate
+        if trade_id and trade_id in _peak_cache:
+            _db_high, _db_low = _peak_cache[trade_id]
+            pos['highest_price'] = float(_db_high) if _db_high else 0
+            pos['lowest_price'] = float(_db_low) if _db_low else 0
+
+        # ── Post-flip eviction check: if token was recently flipped, use k=1.0
+        # (tightest possible — the flip entry was at a known bad moment, cut fast)
+        flip_k_override = None
+        try:
+            from cascade_flip_helpers import is_token_evicted
+            if is_token_evicted(token):
+                flip_k_override = 1.0
+                print(f"  [ATR] {token}: post-flip eviction active — forcing k=1.0")
+        except Exception:
+            pass
 
         if not token or not trade_id:
             continue
@@ -1361,79 +1560,223 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         if atr is None:
             continue
 
-        # ATR as % of entry_price (standard normalization; SL/TP anchored to current_price below)
-        if entry_price <= 0:
-            continue
-        atr_pct = atr / entry_price
+        # ── Resolve effective entry price ─────────────────────────────────────────
+        # If entry_price is 0/None (stale DB entry), use current_price from the
+        # already-refreshed position dict (refresh_current_prices fetches live HL data
+        # and also patches entry_price in-memory when DB entry was 0).
+        _entry = entry_price
+        if not _entry or float(_entry) <= 0:
+            if current_price and float(current_price) > 0:
+                _entry = float(current_price)
+                print(f"  [ATR] {token}: used current_price {_entry:.6f} as entry (DB entry was 0/None)")
+            else:
+                continue
+
+        # ── Compute ATR-based SL/TP ───────────────────────────────────────────────
+        # atr_pct is calculated from effective entry (not current price)
+        atr_pct = atr / _entry
         momentum = momentum_by_token.get(token)
         speed_pctl = speed_by_token.get(token, 50)
         k = _atr_sl_k_scaled(token, direction, atr_pct, speed_pctl, momentum)
+        if flip_k_override is not None:
+            k = flip_k_override
         sl_pct = k * atr_pct
-        tp_pct = 2.5 * _dr_atr(token, atr_pct) * atr_pct  # was 2×
+        tp_pct = k * ATR_TP_K_MULT * atr_pct  # canonical: momentum-scaled k × 1.25 × atr_pct
 
-        # Anchor SL/TP to current_price (live) not entry_price (stale).
-        # Fallback to entry_price if current_price unavailable (e.g. SKY with no mids).
-        ref_price = current_price if current_price > 0 else entry_price
-        if not ref_price > 0:
+        # BUG FIX: clamp sl_pct to ATR_SL_MAX_INIT on initial SL set (when current_sl is 0/None).
+        # Un-clamped sl_pct bypasses hermes_constants SL caps (ATR_SL_MAX=2.0%) entirely.
+        # Phase-tier k multipliers (0.05-0.25) provide tightening; this clamp is the hard ceiling.
+        if not current_sl or float(current_sl) <= 0:
+            sl_pct = min(sl_pct, ATR_SL_MAX_INIT)
+
+        # ── Trailing SL anchor: use peak price instead of current price ────────────
+        # For SHORT: lowest_price seen since entry (SL trails DOWN from the short's best price)
+        # For LONG:  highest_price seen since entry (SL trails UP from the long's best price)
+        # This implements proper trailing — SL only moves in profit direction.
+        _peak_high = float(pos.get('highest_price') or 0) or 0
+        _peak_low  = float(pos.get('lowest_price')  or 0) or 0
+        if direction == "SHORT":
+            # SHORT wins when price falls — use the lowest price seen as profit anchor
+            ref_price = _peak_low if _peak_low > 0 else (current_price if (current_price and float(current_price) > 0) else _entry)
+        elif direction == "LONG":
+            # LONG wins when price rises — use the highest price seen as profit anchor
+            ref_price = _peak_high if _peak_high > 0 else (current_price if (current_price and float(current_price) > 0) else _entry)
+        else:
+            ref_price = current_price if (current_price and float(current_price) > 0) else _entry
+        if not ref_price or float(ref_price) <= 0:
             continue
 
+        # ── New-trade gate: give fresh PROFITABLE positions breathing room ───────────
+        # If peak price == entry price AND position is in profit, the trade just opened
+        # with no real candle formed yet. Applying phase-acceleration multipliers
+        # (k=0.05–0.25) squeezes the SL to near-zero. Use base_k + INIT floor instead.
+        #
+        # IMPORTANT: If the trade is ALREADY underwater, let the phase multiplier tighten.
+        # is_new_trade=True without profit check caused SL to be set below entry
+        # (worst-case: base_k=1.250, MIN_SL=0.50% floor → SL = entry-0.50% < entry).
+        _entry_f = float(_entry)
+        _pnl_pct = float(pos.get('pnl_pct', 0) or 0)
+        _in_profit = _pnl_pct > 0
+        is_new_trade = False
+        if _in_profit:
+            if direction == "LONG" and _peak_high > 0 and abs(_peak_high - _entry_f) / _entry_f < 0.001:
+                is_new_trade = True
+            elif direction == "SHORT" and _peak_low > 0 and abs(_peak_low - _entry_f) / _entry_f < 0.001:
+                is_new_trade = True
+
+        if is_new_trade:
+            k = _dr_atr(token, atr_pct)  # use base k — no acceleration squeeze
+            sl_pct = k * atr_pct
+            MIN_SL_PCT_TRAILING = ATR_SL_MIN_INIT  # 0.50% floor for new trades
+            MIN_TP_PCT_TRAILING = ATR_TP_MIN        # 0.75% floor for new trades
+        else:
+            # Established trade: acceleration-phase logic applies
+            MIN_SL_PCT_TRAILING = ATR_SL_MIN_ACCEL  # 0.20% floor — first candle against us, out
+            MIN_TP_PCT_TRAILING = ATR_TP_MIN_ACCEL  # 0.50% floor — book profit fast
+
+        # Enforce minimum SL/TP percentages to prevent razor-thin stops on low-vol tokens.
+        effective_sl_pct = max(sl_pct, MIN_SL_PCT_TRAILING)
+        effective_tp_pct = max(tp_pct, MIN_TP_PCT_TRAILING)
+
         if direction == "LONG":
-            new_sl = round(ref_price * (1 - sl_pct), 8)
-            new_tp = round(ref_price * (1 + tp_pct), 8)
+            new_sl = round(ref_price * (1 - effective_sl_pct), 8)
+            new_tp = round(ref_price * (1 + effective_tp_pct), 8)
         elif direction == "SHORT":
-            new_sl = round(ref_price * (1 + sl_pct), 8)
-            new_tp = round(ref_price * (1 - tp_pct), 8)
+            # SHORT: SL = ref_price + ATR buffer (trailing from lowest trough)
+            # _peak_low = lowest price seen (best price for SHORT = max profit)
+            # As price falls to new lows, _peak_low drops → SL drops (tightens from below)
+            # As price bounces, _peak_low stays fixed → SL stays fixed (doesn't chase)
+            # Uses effective_sl_pct (ATR-scaled) not raw MIN_SL_PCT_TRAILING constant
+            new_sl = round(ref_price * (1 + effective_sl_pct), 8)
+            new_tp = round(ref_price * (1 - effective_tp_pct), 8)
         else:
             continue
 
-        # Debug: log computed ATR levels for monitoring
-        print(f"  [ATR] {token}: k={k:.3f} ATR={atr:.4f} ({atr_pct*100:.2f}%) → SL={new_sl:.6f} TP={new_tp:.6f}")
+        # INIT-to-ACCEL migration: save the ORIGINAL new_sl (INIT-floor wide value) BEFORE
+        # the tighten gate below modifies new_sl in place with current_sl.
+        # This is the value we want to write to DB when migrating stale accel-floor SLs.
+        _atr_computed_new_sl = new_sl  # always use this for migration writes
 
-        # ── Trailing SL: only tighten, never loosen ─────────────────────────────
-        # SL only moves in the profit direction. Prevents getting stopped out by
-        # normal volatility when price temporarily pulls back.
-        # TP also only moves to improve (moves away from entry for LONG).
+        # Debug: log computed ATR levels for monitoring
+        print(f"  [ATR] {token}: k={k:.3f} ATR={atr:.4f} ({atr_pct*100:.2f}%) → SL={new_sl:.6f} TP={new_tp:.6f} [ref={ref_price:.6f}]")
+
+        # ── Trailing TP: only tighten, never loosen ─────────────────────────────
+        #
+        # GOLDEN RULE: TP can only move in the PROFIT direction.
+        #
+        # LONG:  TP only increases  (higher = further from entry = more profit locked)
+        # SHORT: TP only decreases  (lower = further from entry = more profit locked)
+        #
+        # Implementation: compute new TP from current price, then ONLY apply it
+        # if it's better than the current TP. This handles SHORT TP loosening correctly:
+        # price drops to 0.36 → TP=0.349 (locked). Price bounces to 0.38 → TP would be
+        # 0.368, but that's LOOSER than 0.349 so we keep 0.349. Position stays on.
+        #
         needs_sl = False
         needs_tp = False
         if direction == "LONG":
-            if current_sl > 0 and new_sl <= current_sl:
-                new_sl = current_sl          # don't loosen
+            # new_sl = ref_price * (1 - effective_sl_pct) — already computed above
+            # SL tightens as price rises: higher SL = closer to current price = more locked in.
+            # Only tighten: accept if new_sl > current_sl (higher = tighter).
+            if current_sl > 0:
+                if new_sl > current_sl:
+                    needs_sl = True      # ATR tightens — accept
+                else:
+                    new_sl = current_sl  # would loosen — keep current
+                    needs_sl = False
             else:
                 needs_sl = True
-            if current_tp > 0 and new_tp <= current_tp:
-                new_tp = current_tp          # don't improve unfavorably
-            else:
-                needs_tp = True
-        elif direction == "SHORT":
-            if current_sl > 0 and new_sl >= current_sl:
-                new_sl = current_sl          # don't loosen
-            else:
-                needs_sl = True
-            if current_tp > 0 and new_tp >= current_tp:
-                new_tp = current_tp          # don't improve unfavorably
+
+            # TP: compute from current price, only raise if it would improve (higher)
+            # TP = price × (1 + tp_pct)  — as price rises, TP rises (numerically higher)
+            if current_tp > 0:
+                tp_at_ref = round(ref_price * (1 + tp_pct), 8)
+                # For LONG: higher TP = more profit locked. If ATR would raise TP (tighten), update.
+                # Only block if ATR would lower the TP (loosen).
+                if tp_at_ref < current_tp:
+                    new_tp = current_tp    # ATR would loosen — keep current
+                    needs_tp = False
+                else:
+                    new_tp = tp_at_ref      # ATR tightens (higher) — update
+                    needs_tp = True
             else:
                 needs_tp = True
 
-        # Check deltas (only if trailing logic didn't already block the update)
+        elif direction == "SHORT":
+            # SL trailing: new_sl = ref_price * (1 + effective_sl_pct)
+            # ref_price = _peak_low (lowest seen) — SHORT's profit anchor.
+            # As price falls to new lows: ref_price drops → SL drops (tightens from below).
+            # As price bounces: ref_price stays fixed → SL stays fixed (no chase).
+            # Only accept if new_sl < current_sl (tightening). Block if >= (loosening).
+            if current_sl > 0:
+                if new_sl >= current_sl:
+                    new_sl = current_sl    # would loosen — block it
+                    needs_sl = False
+                else:
+                    needs_sl = True        # new_sl < current_sl — tighten, accept
+            else:
+                needs_sl = True
+
+            # TP: ONLY decrease — never loosen a SHORT TP.
+            # Compute TP from current price, but only accept if it's LOWER (better).
+            # Price drops to 0.36:  TP=0.36×0.968=0.3488 (tightened from entry)
+            # Price bounces to 0.38: TP=0.38×0.968=0.3680 — but 0.3680 > 0.3488
+            #                         → TP would LOOSEN → KEEP 0.3488 instead.
+            if current_tp > 0:
+                tp_at_ref = round(ref_price * (1 - effective_tp_pct), 8)
+                if tp_at_ref >= current_tp:
+                    new_tp = current_tp    # would loosen (not lower) — KEEP locked TP
+                    needs_tp = False
+                else:
+                    new_tp = tp_at_ref     # would tighten (lower) — update
+                    needs_tp = True
+            else:
+                # First time setting TP — compute from current (entry) price
+                # Use effective_tp_pct (floor-enforced) not raw tp_pct
+                new_tp = round(ref_price * (1 - effective_tp_pct), 8)
+                needs_tp = True
+
+        # ── Force-write conditions (bypass delta gate for stale/missing values) ──────
+        # If current SL/TP is 0 or None, this is a stale/missing entry — always write.
+        sl_stale = not current_sl or float(current_sl) <= 0
+        tp_stale = not current_tp or float(current_tp) <= 0
+
+        # INIT-to-ACCEL migration: detect stale accel-floor SLs on new trades
+        # BEFORE the tighten gate below modifies new_sl in place with current_sl.
+        INIT_TO_ACCEL_MIGRATION = False
+        if is_new_trade and not sl_stale and current_sl and float(current_sl) > 0:
+            old_sl_pct = abs(float(current_sl) - float(entry_price)) / float(entry_price)
+            if old_sl_pct < ATR_SL_MIN_INIT * 0.95:  # old was < 0.475% (stale accel floor)
+                INIT_TO_ACCEL_MIGRATION = True
+
+        # ── Check deltas (only gates HL push, NOT DB persistence) ──────────────────
         if needs_sl:
             sl_delta = abs(new_sl - current_sl) / current_sl if current_sl > 0 else 1.0
-            needs_sl = sl_delta > ATR_UPDATE_THRESHOLD_PCT
+            hl_needs_sl = sl_delta > ATR_UPDATE_THRESHOLD_PCT or sl_stale
+        else:
+            hl_needs_sl = False
+
         if needs_tp:
             tp_delta = abs(new_tp - current_tp) / current_tp if current_tp > 0 else 1.0
-            needs_tp = tp_delta > ATR_UPDATE_THRESHOLD_PCT
+            hl_needs_tp = tp_delta > ATR_UPDATE_THRESHOLD_PCT or tp_stale
+        else:
+            hl_needs_tp = False
 
-        if needs_sl or needs_tp:
+        # Always append for DB persistence — delta gate only affects HL push
+        # INIT_TO_ACCEL_MIGRATION bypasses tighten gate to correct stale accel-floor SLs
+        if needs_sl or needs_tp or sl_stale or tp_stale or INIT_TO_ACCEL_MIGRATION:
             updates.append({
                 'trade_id': trade_id,
                 'token': token,
                 'direction': direction,
                 'entry_price': entry_price,
                 'old_sl': current_sl,
-                'new_sl': new_sl,
+                'new_sl': _atr_computed_new_sl,  # always use ATR-computed (INIT floor) for migrations
                 'old_tp': current_tp,
                 'new_tp': new_tp,
-                'needs_sl': needs_sl,
-                'needs_tp': needs_tp,
+                # HL push is gated by delta + stale check; DB persist always happens
+                'needs_sl': hl_needs_sl,
+                'needs_tp': hl_needs_tp,
                 'atr': atr,
                 'atr_pct': atr_pct,
                 'k': k,
@@ -1447,7 +1790,10 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
     Write ATR-computed SL/TP levels to brain DB.
     Called once per cycle after _collect_atr_updates() — BEFORE hit detection.
     This wires the dynamic ATR levels into check_atr_tp_sl_hits() next cycle.
-    Only updates if delta > ATR_UPDATE_THRESHOLD_PCT (same as HL path).
+
+    NOTE: unlike _execute_atr_bulk_updates (HL path), this ALWAYS writes to DB
+    regardless of ATR_UPDATE_THRESHOLD_PCT. The delta gate only controls whether
+    we push orders to Hyperliquid, not whether we update our own self-close levels.
     """
     if not updates:
         return
@@ -1465,7 +1811,7 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
             if not trade_id or new_sl is None or new_tp is None:
                 continue
             cur.execute(
-                "UPDATE trades SET stop_loss = %s, target = %s WHERE id = %s AND status = 'open'",
+                "UPDATE trades SET stop_loss = %s, target = %s, atr_managed = TRUE WHERE id = %s AND status = 'open'",
                 (round(new_sl, 8), round(new_tp, 8), trade_id)
             )
         conn.commit()
@@ -1499,8 +1845,16 @@ def _execute_atr_bulk_updates(updates: List[Dict]) -> dict:
 
     exchange = get_exchange()
 
-    # ── 1. Get position sizes from HL (one call, reused) ──────────────────────
-    positions = get_open_hype_positions()
+    # ── 1. Get position sizes — read from shared cache if available ─────────────
+    # The cache is populated by check_and_manage_positions() before this is called.
+    # Falls back to direct API call only if cache is cold.
+    try:
+        import hype_cache as hc
+        positions = hc.get_cached_positions()
+    except Exception:
+        positions = {}
+    if not positions:
+        positions = get_open_hype_positions()
     if not positions:
         return {'cancelled': 0, 'placed': 0, 'errors': ['no positions on HL']}
 
@@ -1597,20 +1951,17 @@ def _execute_atr_bulk_updates(updates: List[Dict]) -> dict:
 
 
 def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVERAGE,
-                     token: str = '', sl_pct_fallback: float = 0.015) -> Dict:
+                     token: str = '', sl_pct_fallback: float = SL_PCT_FALLBACK) -> Dict:
     """
     Compute SL and TP for a new trade.
-    SL is ATR(14)-based:
-      ATR < 1%  → k=1.5 (LOW_VOL)
-      ATR 1-3%  → k=2.0 (NORMAL)
-      ATR > 3%  → k=2.5 (HIGH_VOL)
+    SL is ATR(14)-based via _dr_atr() → _atr_multiplier():
+      atr_pct < ATR_PCT_LOW_THRESH (1%)  → k=ATR_K_LOW_VOL (1.0)
+      atr_pct <= ATR_PCT_HIGH_THRESH (3%) → k=ATR_K_NORMAL_VOL (1.25)
+      atr_pct > ATR_PCT_HIGH_THRESH (3%)  → k=ATR_K_HIGH_VOL (1.5)
+    Clamped by ATR_SL_MIN_INIT / ATR_SL_MAX_INIT floors and caps.
     Falls back to sl_pct_fallback if ATR unavailable or token not provided.
-    TP is fixed 8% target.
+    TP = k * ATR_TP_K_MULT (1.25) * atr_pct, floored at TP_PCT_FALLBACK (8%).
     """
-    MIN_ATR_PCT = 0.010
-    MAX_SL_PCT  = 0.05
-    STOP_LOSS_DEFAULT = 0.03   # 3% fallback SL if everything fails
-
     direction = direction.upper()
     leverage = min(max_leverage, MAX_LEVERAGE)
 
@@ -1623,22 +1974,22 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
             atr_pct = atr / price
             k = _dr_atr(token, atr_pct)
             atr_sl_pct = (k * atr) / price
-            effective_sl_pct = max(atr_sl_pct, MIN_ATR_PCT)
-            effective_sl_pct = min(effective_sl_pct, MAX_SL_PCT)
+            effective_sl_pct = max(atr_sl_pct, ATR_SL_MIN_INIT)
+            effective_sl_pct = min(effective_sl_pct, ATR_SL_MAX_INIT)
         else:
             effective_sl_pct = sl_pct_fallback
     else:
         effective_sl_pct = sl_pct_fallback
 
     # ── ATR-based TP (2:1 R:R — TP = 2 × SL distance) ───────────────────
-    tp_pct = TP_PCT  # fallback
+    tp_pct = TP_PCT_FALLBACK  # fallback
     if token:
         atr = _pm_get_atr(token)
         if atr is not None:
             atr_pct_tp = atr / price
-            k_tp = _dr_atr(token, atr_pct_tp)
-            tp_pct = 2.5 * k_tp * atr_pct_tp  # was 2×
-            tp_pct = max(tp_pct, TP_PCT)     # floor at 8%
+            k_tp = _dr_atr(token, atr_pct_tp) * ATR_TP_K_MULT
+            tp_pct = k_tp * atr_pct_tp  # canonical: k × 1.25 × atr_pct
+            tp_pct = max(tp_pct, TP_PCT_FALLBACK)     # floor at 8%
 
     if direction == "LONG":
         stop_loss = round(price * (1 - effective_sl_pct), 8)
@@ -1748,14 +2099,48 @@ def refresh_current_prices(server: str = SERVER_NAME):
         return []
 
     # Get HL's authoritative position data (includes unrealized_pnl)
+    # Try shared hype_cache first (written by this same pipeline run), then fall
+    # back to direct API call. This avoids a duplicate /info call when the cache
+    # has already been populated by fetch_and_cache_positions() above.
     try:
-        hl_positions = get_open_hype_positions()
-    except Exception as e:
-        print(f"  [Position Manager] Failed to fetch HL positions: {e}")
-        return positions
+        import hype_cache as hc
+        hl_positions = hc.get_cached_positions()
+    except Exception:
+        hl_positions = {}
+    
+    if not hl_positions:
+        try:
+            hl_positions = get_open_hype_positions()
+        except Exception as e:
+            print(f"  [Position Manager] HL positions API failed: {e}")
+            hl_positions = {}
+    
+    # Legacy fallback: read hl_cache.json directly (before our new get_cached_positions)
+    if not hl_positions:
+        try:
+            import json as _json
+            _cache = '/var/www/hermes/data/hl_cache.json'
+            if os.path.exists(_cache):
+                with open(_cache) as _f:
+                    _cached = _json.load(_f)
+                _cached_pos = {_p['coin']: _p for _p in _cached.get('positions', [])}
+                hl_positions = {}
+                for _tok, _pdata in _cached_pos.items():
+                    hl_positions[_tok] = {
+                        'entry_px': float(_pdata.get('entryPrice', 0) or 0),
+                        'unrealized_pnl': float(_pdata.get('unrealizedPnl', 0) or 0),
+                        'size': float(_pdata.get('size', 0) or 0),
+                        'leverage': float(_pdata.get('leverage', 1) or 1),
+                        'direction': _pdata.get('side', '').upper(),
+                    }
+                if hl_positions:
+                    print(f"  [Position Manager] Using legacy hl_cache.json fallback ({len(hl_positions)} positions)")
+        except Exception:
+            pass
 
     if not hl_positions:
-        return []
+        print(f"  [Position Manager] No HL position data available (rate limited + no cache)")
+        return positions
 
     # Fetch live mids for current_price (more accurate than deriving from unrealized_pnl)
     try:
@@ -1776,22 +2161,100 @@ def refresh_current_prices(server: str = SERVER_NAME):
     for pos in positions:
             token = str(pos.get('token') or '').upper()
             trade_id = pos.get('id')
+            if not trade_id:
+                continue
+            direction = str(pos.get('direction') or '').upper()
             entry = float(pos.get('entry_price') or 0)
             leverage = float(pos.get('leverage') or 1)
-            if not entry or not trade_id:
-                continue
+
+            # Get current price from HL mids (most up-to-date)
+            cur_price_str = mids.get(token, '0')
+            try:
+                cur_price = round(float(cur_price_str), 6)
+            except:
+                cur_price = 0
+
+            # Fallback for entry=0: use mid price as proxy
+            if not entry and cur_price > 0:
+                entry = cur_price
+                pos['entry_price'] = cur_price
+                if db_cur:
+                    try:
+                        db_cur.execute("""
+                            UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
+                        """, (cur_price, trade_id))
+                    except Exception:
+                        pass
 
             # Get HL authoritative data for this token
             hl_data = hl_positions.get(token)
-            if not hl_data:
+            if hl_data:
+                # Use HL unrealized_pnl as ground truth for PnL
+                hl_entry = float(hl_data.get('entry_px', 0))
+                hl_unrealized = float(hl_data.get('unrealized_pnl', 0))
+                hl_size = float(hl_data.get('size', 0))
+
+                # If entry is 0 but HL has it, backfill from HL
+                if entry <= 0 and hl_entry > 0:
+                    entry = hl_entry
+                    pos['entry_price'] = hl_entry
+                    if db_cur:
+                        try:
+                            db_cur.execute("""
+                                UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
+                            """, (hl_entry, trade_id))
+                        except Exception:
+                            pass
+
+                # Use mid price as current_price (most accurate real-time value)
+                if cur_price > 0:
+                    pos['current_price'] = cur_price
+
+                if entry > 0 and cur_price > 0 and direction:
+                    # Use hl_entry for PnL computation, NOT the DB entry_price.
+                    # DB entry may be stale/wrong (e.g. stale signal price vs actual HL fill).
+                    # HL's unrealized_pnl is already computed against hl_entry, so using
+                    # hl_entry here ensures PnL is consistent with what HL reports.
+                    # If hl_entry is 0 (edge case), fall back to DB entry.
+                    _ep = hl_entry if hl_entry > 0 else entry
+                    pnl_pct = round(((cur_price - _ep) / _ep * 100) if direction == 'LONG'
+                                    else ((_ep - cur_price) / _ep * 100), 4)
+                    pos['pnl_pct'] = pnl_pct
+                    pos['pnl_usdt'] = hl_unrealized if hl_unrealized else 0
+                    pos['entry_price'] = _ep  # fix in-memory entry to match HL
+                    updated += 1
+                    if db_cur:
+                        try:
+                            db_cur.execute("""
+                                UPDATE trades
+                                SET current_price = %s, pnl_pct = %s, pnl_usdt = %s,
+                                    entry_price = %s, updated_at = NOW()
+                                WHERE id = %s AND status = 'open'
+                            """, (cur_price, pnl_pct, pos['pnl_usdt'], _ep, trade_id))
+                        except Exception:
+                            pass
+            else:
+                # No HL position data — skip PnL update (only mids price available)
+                if cur_price > 0:
+                    pos['current_price'] = cur_price
                 continue
 
-            hl_entry = float(hl_data.get('entry_px', 0))
-            hl_unrealized = float(hl_data.get('unrealized_pnl', 0))
-            hl_size = float(hl_data.get('size', 0))
-
+            # ── HL position data available — use authoritative PnL + peak tracking ──
             if hl_size <= 0 or hl_entry <= 0:
                 continue
+
+            # FIX (2026-04-17): If entry_price in DB is 0 but HL has a valid entry_px,
+            # update entry_price too — so _collect_atr_updates can compute ATR levels.
+            if entry <= 0 and hl_entry > 0:
+                entry = hl_entry
+                pos['entry_price'] = hl_entry  # patch in-memory so _collect_atr_updates sees it
+                if db_cur:
+                    try:
+                        db_cur.execute("""
+                            UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
+                        """, (hl_entry, trade_id))
+                    except Exception as e:
+                        print(f"  [Position Manager] Failed to fix entry_price for trade {trade_id}: {e}")
 
             # pnl_pct from HL's unrealized_pnl (ground truth)
             # unrealized_pnl = (entryPx - currentPx) / entryPx * positionValue
@@ -1801,30 +2264,59 @@ def refresh_current_prices(server: str = SERVER_NAME):
             pnl_pct = round(pnl_pct, 4)
 
             # current_price from mids (most accurate for DB)
-            cur_price_str = mids.get(token, '0')
-            try:
-                cur_price = round(float(cur_price_str), 6)
-            except:
-                cur_price = 0
+            if cur_price <= 0:
+                cur_price_str = mids.get(token, '0')
+                try:
+                    cur_price = round(float(cur_price_str), 6)
+                except:
+                    cur_price = 0
 
             # pnl_usdt = unrealized_pnl directly (already in USDT)
             pnl_usdt = round(hl_unrealized, 2)
 
             if cur_price > 0:
+                # ── Peak price tracking for trailing SL ────────────────────────
+                # SHORT: track highest_price (peak pump), SL trails DOWN from highest
+                # LONG:  track lowest_price (bottom trough), SL trails UP from lowest
+                existing_high = float(pos.get('highest_price') or 0) or 0
+                existing_low  = float(pos.get('lowest_price')  or 0) or 0
+
+                # FIX (2026-04-25): Initialize peak to entry_price when trade just opened
+                # and no real peak has formed yet. This prevents ATR trailing from using
+                # current_price as a moving reference instead of a true peak anchor.
+                if existing_high <= 0 and direction == "SHORT":
+                    existing_high = entry  # SHORT: start tracking from entry
+                if existing_low <= 0 and direction == "LONG":
+                    existing_low = entry   # LONG: start tracking from entry
+
+                if direction == "SHORT":
+                    new_high = max(existing_high, cur_price)
+                    new_low  = min(existing_low, cur_price)   # track new lows for SHORT
+                elif direction == "LONG":
+                    new_high = max(existing_high, cur_price)  # track peak for LONG trailing
+                    new_low  = min(existing_low, cur_price)
+                else:
+                    new_high = existing_high
+                    new_low  = existing_low
+
                 # Update in-memory so subsequent checks use fresh values
                 pos['pnl_pct'] = pnl_pct
                 pos['current_price'] = cur_price
                 pos['pnl_usdt'] = pnl_usdt
+                pos['highest_price'] = new_high
+                pos['lowest_price']  = new_low
                 updated += 1
 
                 # BUG FIX (2026-04-10): persist to DB so direct DB queries return correct PnL
+                # Also persist peak prices for trailing SL (BUG FIX 2026-04-19)
                 if db_cur:
                     try:
                         db_cur.execute("""
                             UPDATE trades
-                            SET pnl_pct = %s, pnl_usdt = %s, current_price = %s, updated_at = NOW()
+                            SET pnl_pct = %s, pnl_usdt = %s, current_price = %s,
+                                highest_price = %s, lowest_price = %s, updated_at = NOW()
                             WHERE id = %s AND status = 'open'
-                        """, (pnl_pct, pnl_usdt, cur_price, trade_id))
+                        """, (pnl_pct, pnl_usdt, cur_price, new_high, new_low, trade_id))
                     except Exception as e:
                         print(f"  [Position Manager] Failed to persist PnL for trade {trade_id}: {e}")
 
@@ -1894,6 +2386,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
     Returns: (open_count, closed_count, adjusted_count)
     """
+    # ── Pre-fetch HL positions into shared cache for guardian and downstream ──────
+    # Both refresh_current_prices() and _execute_atr_bulk_updates() call
+    # get_open_hype_positions() directly. Writing to the shared cache here means
+    # they can both read from it instead of making 2 separate /info API calls.
+    try:
+        import hype_cache as hc
+        hc.fetch_and_cache_positions()
+    except Exception:
+        pass  # Never fail the pipeline over a cache write
+
     positions = refresh_current_prices()
 
     # ── Volume cache warm-up ──────────────────────────────────────────────
@@ -1912,6 +2414,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     _atr_updates = _collect_atr_updates(positions)
     if _atr_updates:
         _persist_atr_levels(_atr_updates)  # NEW: write to DB (always runs)
+        # BUG FIX: also update in-memory positions so check_atr_tp_sl_hits() sees fresh values
+        # (check_atr_tp_sl_hits reads from the in-memory dict, not the DB)
+        updates_by_id = {u['trade_id']: u for u in _atr_updates}
+        for pos in positions:
+            tid = pos.get('id')
+            if tid in updates_by_id:
+                u = updates_by_id[tid]
+                pos['stop_loss'] = u['new_sl']
+                pos['target'] = u['new_tp']
         if ATR_HL_ORDERS_ENABLED:
             _execute_atr_bulk_updates(_atr_updates)  # HL path (kill switch controlled)
         print(f"  [ATR] Updated {len(_atr_updates)} position SL/TP levels")
@@ -1923,11 +2434,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
     for pos in positions:
         # ── EXIT PRIORITY ORDER ─────────────────────────────────────────────────
-        # 1. ATR TP/SL hit        — price crossed DB SL/TP (dynamically updated above)
-        # 2. MACD cascade flip    — MTF MACD alignment reversal (MACD_CASCADE_FLIP_TOKENS)
-        # 3. Cascade flip        — loss > -0.25% + speed increasing + opposite signal
-        # 4. Wave turn exit      — z-score extreme (>±1.5) + acceleration reversing
-        # 5. Stale winner/loser  — flat >15min in profit OR flat >30min in loss
+        # 1. Wave turn exit      — z-score extreme (>±1.5) + acceleration reversing
+        #                          (HIGHEST CONVICTION — fires before ATR if in profit)
+        # 2. ATR TP/SL hit       — price crossed DB SL/TP (dynamically updated above)
+        # 3. MACD cascade flip   — MTF MACD alignment reversal (MACD_CASCADE_FLIP_TOKENS)
+        # 4. Cascade flip        — loss > -0.25% + speed increasing + opposite signal
         # ─────────────────────────────────────────────────────────────────────────────
         token = str(pos.get("token", "UNKNOWN"))
         direction = str(pos.get("direction", "UNKNOWN")).upper()
@@ -1946,10 +2457,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             live_pnl = pnl_pct
 
         # ── 1. ATR TP/SL hit detection (internal close) ────────────────────────
-        # Check if current price has crossed the ATR-based SL or TP level.
-        # This runs BEFORE all other exit checks so ATR hits are processed first.
+        # ATR TP/SL is the primary exit — run FIRST so standard exits always fire
+        # before speculative wave_turn counter-trend exits.
         # close_paper_position() handles internal DB close + market mirror to HL.
-        # Best-effort attempt to cancel stale HL orders follows (non-blocking).
         atr_hits = check_atr_tp_sl_hits([pos])
         for hit in atr_hits:
             print(f"  [ATR HIT] {token} {direction} {hit['hit_reason']}: "
@@ -1959,11 +2469,66 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         if atr_hits:
             continue  # Position closed — skip remaining checks
 
-        # ATR-adaptive TP/SL: replaces deprecated trailing stop.
-        # trailing_active is always False now (trailing stop removed).
-        trailing_active = False
+        # ── 2. WAVE TURN EXIT (SPEED FEATURE) ─────────────────────────────────
+        # Wave turn detection: z-score extreme AND acceleration flipping direction.
+        # Fires AFTER ATR — wave turns are counter-trend exits that should only
+        # fire on positions that survived standard TP/SL.
+        #
+        # TOP FORMING:  z_score > +1.5 AND acceleration < 0 → close LONGs
+        # BOTTOM FORMING: z_score < -1.5 AND acceleration > 0 → close SHORTs
+        wave_turn_fired = False
+        trailing_active = False  # always False (trailing stop is computed via ATR SL, not a separate mechanism)
+        if SPEED_TRACKER is not None:
+            spd = SPEED_TRACKER.get_token_speed(token)
+            if spd:
+                z_score = spd.get('price_velocity_5m', 0)
+                accel = spd.get('price_acceleration', 0)
+                wave_turn = False
+                if direction == 'LONG' and z_score > 1.5 and accel is not None and accel < 0:
+                    wave_turn = True
+                    reason = f"wave_turn_top_z{z_score:+.2f}_acc{accel:+.4f}"
+                elif direction == 'SHORT' and z_score < -1.5 and accel is not None and accel > 0:
+                    wave_turn = True
+                    reason = f"wave_turn_bottom_z{z_score:+.2f}_acc{accel:+.4f}"
 
-        # ── 2b. MACD-Rules Engine Cascade Flip (2026-04-06) ───────────────────
+                if wave_turn:
+                    trailing_active = False  # always False (trailing stop removed)
+                    # Don't exit if trailing is active AND position is underwater
+                    if trailing_active and live_pnl <= 0:
+                        print(f"  🌊 WAVE TURN {token} {direction} {live_pnl:+.2f}% — trailing active, skipping (still underwater)")
+                    else:
+                        close_paper_position(trade_id, f"wave_turn_{reason}")
+                        closed_count += 1
+                        wave_turn_fired = True
+                        print(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
+
+                        # ── 2b. Counter-signal injection ──────────────────────────
+                        opposite_dir = 'SHORT' if direction == 'LONG' else 'LONG'
+                        counter_source = 'wave_turn,momentum'
+                        counter_conf = min(85, max(60, abs(accel) * 500 + 60))
+                        counter_sig_type = 'wave_turn'
+                        try:
+                            from signal_schema import add_signal as _add_sig
+                            new_sid = _add_sig(
+                                token=token,
+                                direction=opposite_dir,
+                                signal_type=counter_sig_type,
+                                source=counter_source,
+                                confidence=counter_conf,
+                                value=str(abs(accel)),
+                                price=0,
+                                exchange='hyperliquid',
+                                timeframe='5m',
+                                z_score=z_score,
+                                z_score_tier='wave_turn_exit',
+                            )
+                            print(f"  🌊 WAVE TURN counter injected: {token} {opposite_dir} conf={counter_conf:.0f}% sig_id={new_sid}")
+                        except Exception as inj_err:
+                            print(f"  🌊 WAVE TURN counter injection failed for {token}: {inj_err}")
+
+                        continue  # Position closed — skip remaining checks
+
+        # ── 3. MACD-Rules Engine Cascade Flip (2026-04-06) ───────────────────
         # Use macd_rules.py for proper entry/exit/flip signal detection.
         # Replaces the simple cross_under/cross_over check with full state machine.
         if token.upper() in MACD_CASCADE_FLIP_TOKENS:
@@ -2096,42 +2661,6 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     closed_count += 1
                     continue  # Position was flipped — skip remaining checks
 
-        # ── 4. WAVE TURN EXIT (SPEED FEATURE) ─────────────────────────────────
-        # Wave turn detection: z-score extreme AND acceleration flipping direction.
-        # These exits fire BEFORE stale loser checks — wave turns are higher conviction.
-        #
-        # TOP FORMING:  z_score > +1.5 AND acceleration < 0 → close LONGs
-        # BOTTOM FORMING: z_score < -1.5 AND acceleration > 0 → close SHORTs
-        #
-        # Rationale from surfing.md:
-        # - Z-score far from mean = price has moved to an extreme
-        # - Acceleration opposite to position direction = momentum shifting
-        # - This is the "wave cresting" signal — close longs before the drop
-        #
-        # Only fires when trailing is NOT active (don't interfere with trailing exits).
-        if not trailing_active:
-            if SPEED_TRACKER is not None:
-                spd = SPEED_TRACKER.get_token_speed(token)
-                if spd:
-                    z_score = spd.get('price_velocity_5m', 0)  # Use velocity_5m as z-proxy
-                    accel = spd.get('price_acceleration', 0)
-                    # Wave turn: extreme z-score (using velocity as proxy) + acceleration flipping
-                    # For LONGs: z>1.5 (price elevated) + accel<0 (momentum turning down)
-                    # For SHORTs: z<-1.5 (price depressed) + accel>0 (momentum turning up)
-                    wave_turn = False
-                    if direction == 'LONG' and z_score > 1.5 and accel is not None and accel < 0:
-                        wave_turn = True
-                        reason = f"wave_turn_top_z{z_score:+.2f}_acc{accel:+.4f}"
-                    elif direction == 'SHORT' and z_score < -1.5 and accel is not None and accel > 0:
-                        wave_turn = True
-                        reason = f"wave_turn_bottom_z{z_score:+.2f}_acc{accel:+.4f}"
-
-                    if wave_turn:
-                        close_paper_position(trade_id, f"wave_turn_{reason}")
-                        closed_count += 1
-                        print(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
-                        continue  # Position closed — skip remaining checks
-
         # ── 5. Cut loser (DISABLED — guardian handles all emergency exits) ──
         # Cut_loser was causing races: position_manager uses fresh prices and cuts tight
         # (sl_distance from A/B test can be 0.5%), before guardian's flip can fire.
@@ -2221,321 +2750,39 @@ def check_cascade_flip(token: str, position_direction: str,
               f"speed_pctl={percentile:.1f}, trigger={trigger_pct:.2f}%)")
         return None
 
-    # ── 5. Flip warranted ──────────────────────────────────────────────────────
+    # ── 5. Flip warranted — NO SIGNAL REQUIRED ─────────────────────────────────
+    # T: don't wait for opposing signal. Momentum + loss is enough to flip.
+    # Use coin-regime momentum as the signal source always.
     opposite_dir = 'SHORT' if position_direction == 'LONG' else 'LONG'
 
-    db_path = '/root/.hermes/data/signals_hermes_runtime.db'
-    if not os.path.exists(db_path):
-        return None
-
-    try:
-        conn = sqlite3.connect(db_path, timeout=5)
-        c = conn.cursor()
-        # Confluence check: count distinct signal types agreeing on opposite direction
-        # SKIPPED is included — the pipeline generated an opposite-direction signal but
-        # couldn't enter (max positions, cooldown, etc.). That's valid confluence.
-        c.execute("""
-            SELECT COUNT(DISTINCT signal_type)
-            FROM signals
-            WHERE UPPER(token) = ?
-              AND direction = ?
-              AND decision IN ('PENDING', 'WAIT', 'APPROVED', 'SKIPPED')
-              AND confidence >= ?
-              AND created_at >= datetime('now', ?)
-        """, (token.upper(), opposite_dir, CASCADE_FLIP_MIN_CONF,
-              f'-{CASCADE_FLIP_MAX_AGE_M} minutes'))
-        agreeing_types = c.fetchone()[0]
-        if agreeing_types < CASCADE_FLIP_MIN_TYPES:
-            conn.close()
-            # ── 5b. No-confluence fallback: use coin-specific momentum as entry signal ─
-            # If cascade flip triggers but there's no opposite signal in the DB,
-            # use the token's own momentum/velocity as a coin-specific regime check.
-            # This is the fallback for when the entire signal pipeline is wrong-dir
-            # (like VVV SHORT — every signal was SHORT, nothing to flip into).
-            #
-            # Entry conditions (regime acts as the signal source for the opposite trade):
-            #   LONG + price_velocity_5m < -1.0  → momentum turning down → flip to SHORT
-            #   SHORT + price_velocity_5m > +1.0  → momentum turning up   → flip to LONG
-            # Acceleration is directional confirmation (speed must be increasing).
-            if speed_tracker is not None:
-                try:
-                    spd = speed_tracker.get_token_speed(token)
-                    vel = spd.get('price_velocity_5m', 0) or 0
-                    accel = spd.get('price_acceleration', 0) or 0
-                    regime_conf = min(100.0, max(0.0, abs(vel) * 30))  # vel 1.0→30%, 2.0→60%
-                    if position_direction == 'LONG' and vel < -1.0:
-                        print(f"  [CASCADE FLIP] {token} no opposite signal confluence "
-                              f"(need {CASCADE_FLIP_MIN_TYPES}, got {agreeing_types}), "
-                              f"using coin-regime as entry signal: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
-                        return {
-                            'opposite_dir': opposite_dir,
-                            'conf': regime_conf,
-                            'source': 'coin-regime-fallback',
-                            'sig_id': None,   # No DB signal — regime IS the signal
-                            'price': 0,
-                            'created_at': None,
-                            'signal_type': 'coin-regime',
-                        }
-                    elif position_direction == 'SHORT' and vel > +1.0:
-                        print(f"  [CASCADE FLIP] {token} no opposite signal confluence "
-                              f"(need {CASCADE_FLIP_MIN_TYPES}, got {agreeing_types}), "
-                              f"using coin-regime as entry signal: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
-                        return {
-                            'opposite_dir': opposite_dir,
-                            'conf': regime_conf,
-                            'source': 'coin-regime-fallback',
-                            'sig_id': None,
-                            'price': 0,
-                            'created_at': None,
-                            'signal_type': 'coin-regime',
-                        }
-                except Exception:
-                    pass
-            print(f"  [CASCADE FLIP] {token} flip triggered but no opposite confluence "
-                  f"(need {CASCADE_FLIP_MIN_TYPES}, got {agreeing_types})")
+    if speed_tracker is not None:
+        try:
+            spd = speed_tracker.get_token_speed(token)
+            vel = spd.get('price_velocity_5m', 0) or 0
+            accel = spd.get('price_acceleration', 0) or 0
+            regime_conf = min(100.0, max(0.0, abs(vel) * 30))  # vel 1.0→30%, 2.0→60%
+            if regime_conf >= 20.0:  # Require some minimum momentum to flip
+                print(f"  [CASCADE FLIP] {token} flipping on momentum: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
+                return {
+                    'opposite_dir': opposite_dir,
+                    'conf': regime_conf,
+                    'source': 'coin-regime',
+                    'sig_id': None,
+                    'price': 0,
+                    'created_at': None,
+                    'signal_type': 'coin-regime',
+                }
+            else:
+                print(f"  [CASCADE FLIP] {token} not flipping: vel={vel:+.2f} conf={regime_conf:.0f}% < 20%")
+                return None
+        except Exception as e:
+            print(f"  [CASCADE FLIP] {token} speed lookup error: {e}")
             return None
-
-        c.execute("""
-            SELECT id, signal_type, source, confidence, price, created_at
-            FROM signals
-            WHERE UPPER(token) = ?
-              AND direction = ?
-              AND decision IN ('PENDING', 'WAIT', 'APPROVED', 'SKIPPED')
-              AND confidence >= ?
-              AND created_at >= datetime('now', ?)
-            ORDER BY confidence DESC, created_at DESC
-            LIMIT 1
-        """, (token.upper(), opposite_dir, CASCADE_FLIP_MIN_CONF,
-              f'-{CASCADE_FLIP_MAX_AGE_M} minutes'))
-        row = c.fetchone()
-        conn.close()
-
-        if not row:
-            return None
-
-        sig_id, sig_type, source, conf, price, created_at = row
-
-        print(f"  [CASCADE FLIP] ✅ {token} FLIP TRIGGERED "
-              f"(loss={live_pnl:+.2f}%, pctl={percentile:.1f}%, "
-              f"opp_conf={conf:.1f}%, src={source})")
-
-        return {
-            'opposite_dir': opposite_dir,
-            'conf': conf,
-            'source': source,
-            'sig_id': sig_id,
-            'price': price,
-            'created_at': created_at,
-            'signal_type': sig_type,
-        }
-    except Exception as e:
-        print(f"  [Cascade Flip] DB error checking {token}: {e}")
-        return None
+    return None
 
 
 # ── BUG-FIX B4: Cascade sequence PnL tracking ─────────────────────────────────
-def _record_cascade_sequence(parent_trade_id: int, token: str, entry_px: float,
-                             current_px: float, pnl_usdt: float, pnl_pct: float,
-                             direction: str, child_trade_id: int = None):
-    """
-    Record a cascade flip in the cascade_sequences table.
-    sequence_id = parent_trade_id (all flips in same cascade share this ID).
-    When child_trade_id is None: record the close of the old position.
-    When child_trade_id is set: record the open of the new position.
-    """
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        if child_trade_id is None:
-            # Record the closing trade in the cascade
-            cur.execute("""
-                INSERT INTO cascade_sequences
-                (sequence_id, parent_trade_id, trade_id, direction, entry_price, exit_price, pnl_usdt, pnl_pct, close_reason, closed_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'CASCADE_FLIP', NOW())
-            """, (parent_trade_id, parent_trade_id, parent_trade_id, direction, entry_px, current_px, pnl_usdt, pnl_pct))
-        else:
-            # Record the new post-flip trade
-            cur.execute("""
-                INSERT INTO cascade_sequences
-                (sequence_id, parent_trade_id, trade_id, direction, entry_price, close_reason, created_at)
-                VALUES (%s, %s, %s, %s, %s, 'CASCADE_ENTRY', NOW())
-            """, (parent_trade_id, parent_trade_id, child_trade_id, direction, current_px))
-        conn.commit()
-        cur.close(); conn.close()
-        print(f"  [B4] Cascade sequence recorded: parent=#{parent_trade_id} child=#{child_trade_id} pnl={pnl_usdt:+.4f}")
-    except Exception as e:
-        print(f"  [B4] Failed to record cascade sequence: {e}")
-
-
-def cascade_flip(token: str, position_direction: str, trade_id: int,
-                 live_pnl: float, flip_info: Dict,
-                 entry_price: float) -> bool:
-    """
-    Execute a cascade flip: close losing position, enter opposite direction.
-    Uses HL reduce-only market order (close) then market order (open).
-    Source string 'cascade-reverse-{src}' is used so post-flip trailing
-    can detect flipped positions and use the tighter 0.5% window.
-
-    Returns True if close succeeded (entry result doesn't block the return).
-    """
-    opposite_dir = flip_info['opposite_dir']
-    conf = flip_info['conf']
-    source = flip_info['source']
-    sig_id = flip_info['sig_id']
-    # Use cascade-reverse- prefix so should_use_trailing_stop() can detect
-    # this is a post-flip position and apply the tighter 0.5% trailing window.
-    source_tag = f"cascade-reverse-{source}"
-
-    print(f"  [CASCADE FLIP] {token} {position_direction}→{opposite_dir} "
-          f"(loss={live_pnl:+.2f}%, opp_conf={conf:.1f}%, src={source})")
-
-    # ── 0. BUG-FIX B4: Look up old trade data for cascade sequence recording ──
-    try:
-        conn_old = get_db_connection()
-        cur_old = conn_old.cursor()
-        cur_old.execute(
-            "SELECT amount_usdt FROM trades WHERE id=%s",
-            (trade_id,)
-        )
-        row_old = cur_old.fetchone()
-        cur_old.close(); conn_old.close()
-        old_amount = float(row_old[0]) if row_old else 50.0
-    except Exception:
-        old_amount = 50.0
-    close_pnl_usdt = round(live_pnl / 100 * old_amount, 4)
-
-    # ── 1. Close the losing position ───────────────────────────────────────────
-    close_ok = close_paper_position(trade_id, f"cascade_flip_{live_pnl:+.2f}%")
-    if not close_ok:
-        print(f"  [CASCADE FLIP] ❌ Failed to close {token} #{trade_id}")
-        return False
-
-    # ── 1b. BUG-FIX B4: Record cascade close ──────────────────────────────────
-    _record_cascade_sequence(
-        parent_trade_id=trade_id, token=token,
-        entry_px=entry_price,
-        current_px=flip_info.get('price') or entry_price,
-        pnl_usdt=close_pnl_usdt, pnl_pct=live_pnl,
-        direction=position_direction,
-        child_trade_id=None  # signals this is the close record
-    )
-
-    # ── 2. Enter the opposite direction at current market price ───────────────
-    # sig_id=None case: coin-regime-fallback — regime momentum IS the entry signal,
-    # no DB signal to mark as executed. Proceed to entry with regime-based confidence.
-    from hyperliquid_exchange import place_order, get_prices
-    try:
-        price_map = get_prices([token])
-        current_price = price_map.get(token, 0) or 0
-        if not current_price or current_price <= 0:
-            current_price = flip_info.get('price') or 0
-    except Exception:
-        current_price = flip_info.get('price') or 0
-    if not current_price or current_price <= 0:
-        print(f"  [CASCADE FLIP] ❌ Could not get price for {token}")
-        return True  # Position closed; new entry failed but not fatal
-
-    # Get position size to maintain roughly same notional exposure
-    # (use entry_price from the closed position as reference)
-    if entry_price > 0 and current_price > 0:
-        # Approximate: same dollar amount, different direction
-        # close_position already closed the full size, so we re-enter with
-        # the same size in the opposite direction.
-        sz = None  # let place_order use its default sizing
-    else:
-        sz = None
-
-    ok = place_order(
-        name=token,
-        side='BUY' if opposite_dir == 'LONG' else 'SELL',
-        sz=sz,
-        price=current_price,
-        order_type='Market',
-    )
-
-    if ok and ok.get('success'):
-        print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
-        # ── BUG-FIX B4: Record cascade ENTRY ───────────────────────────────────
-        # Look up the new trade's ID (most recent open trade for this token)
-        try:
-            conn_seq = get_db_connection()
-            cur_seq = conn_seq.cursor()
-            cur_seq.execute(
-                "SELECT id FROM trades WHERE token=%s AND status='open' ORDER BY id DESC LIMIT 1",
-                (token,)
-            )
-            row_seq = cur_seq.fetchone()
-            cur_seq.close(); conn_seq.close()
-            new_trade_id = row_seq[0] if row_seq else None
-            if new_trade_id:
-                _record_cascade_sequence(
-                    parent_trade_id=trade_id, token=token,
-                    entry_px=current_price,
-                    current_px=0, pnl_usdt=0, pnl_pct=0,
-                    direction=opposite_dir,
-                    child_trade_id=new_trade_id
-                )
-        except Exception as e:
-            print(f"  [B4] Could not record cascade entry: {e}")
-        # ── BUG-FIX (B2): Place SL + TP on HL for the new cascade position ─────
-        # Without this, the new post-flip position has no HL protection
-        sz = ok.get('size')
-        if sz:
-            # Read back the new trade's SL and TP from DB (cascade uses same SL/TP as original)
-            from brain import get_db_connection
-            conn_sl = get_db_connection()
-            cur_sl = conn_sl.cursor()
-            cur_sl.execute("""
-                SELECT stop_loss, target, trailing_activation, trailing_distance
-                FROM trades
-                WHERE token = %s AND status = 'open'
-                ORDER BY id DESC LIMIT 1
-            """, (token,))
-            sl_row = cur_sl.fetchone()
-            cur_sl.close(); conn_sl.close()
-            if sl_row and sl_row[0]:
-                from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp, hype_coin
-                hl_token = hype_coin(token)
-                sl_result = hl_place_sl(hl_token, opposite_dir, float(sl_row[0]), float(sz))
-                tp_result = hl_place_tp(hl_token, opposite_dir, float(sl_row[1]), float(sz)) if sl_row[1] else {"success": True}
-                if sl_result.get("success"):
-                    print(f"  [CASCADE FLIP] ✅ SL+TP placed on HL: {hl_token} {opposite_dir} SL={sl_row[0]:.6f} TP={sl_row[1]:.6f if sl_row[1] else 'N/A'}")
-                else:
-                    print(f"  [CASCADE FLIP] ⚠️ SL placement failed: {sl_result.get('error')} (non-fatal, paper open)")
-
-        # ── 3. Persist flip count ─────────────────────────────────────────────
-        flip_counts = _load_flip_counts()
-        entry = flip_counts.get(token.upper(), {})
-        flip_counts[token.upper()] = {
-            'flips': entry.get('flips', 0) + 1,
-            'last_flip_dir': opposite_dir,
-            'last_flip_time': datetime.now().isoformat(),
-        }
-        _save_flip_counts(flip_counts)
-        print(f"  [CASCADE FLIP] {token} flip count: "
-              f"{flip_counts[token.upper()]['flips']}/{CASCADE_FLIP_MAX}")
-        # ── 4. Mark triggering signal as executed ─────────────────────────────
-        # Skip for coin-regime-fallback (sig_id=None) — no DB signal to update.
-        if sig_id is not None:
-            try:
-                conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-                c = conn.cursor()
-                c.execute(
-                    "UPDATE signals SET decision='EXECUTED', trade_id=? WHERE id=?",
-                    (trade_id, sig_id)
-                )
-                conn.commit()
-                conn.close()
-            except Exception:
-                pass
-    else:
-        err = ok.get('error', 'unknown') if ok else 'no response'
-        print(f"  [CASCADE FLIP] ⚠️ {token} {opposite_dir} entry failed: {err} "
-              f"(position closed, will retry next cycle)")
-
-    return True
-
-
+# ─── Loss Cooldown
 # ─── Loss Cooldown (Incremental) ──────────────────────────────────────────────
 # Entries store: {key: {"expires": unix_ts, "streak": 3}}
 # Each consecutive loss: streak++, hours doubles (2h → 4h → 8h cap)
@@ -2589,10 +2836,43 @@ def _clean_expired(data: Dict) -> Dict:
 
 
 def is_loss_cooldown_active(token: str, direction: str) -> bool:
-    """Return True if token+direction is in loss cooldown."""
+    """Return True if token+direction is in loss cooldown.
+
+    FIX (2026-04-22): Check BOTH stores.
+    - Primary: loss_cooldowns.json (guardian's streak-based cooldowns).
+    - Fallback: PostgreSQL signal_cooldowns (1h flat, written by HL live-close path
+      via _record_trade_outcome). Without this check, HL live closes (HL_SL_CLOSED,
+      HL_CLOSED, etc.) were invisible to this function, allowing immediate re-entry.
+
+    PostgreSQL stores tokens as 'TOKEN:DIRECTION' (e.g. 'BTC:LONG').
+    """
     key = f"{token.upper()}:{direction.upper()}"
+
+    # Primary: loss_cooldowns.json (guardian's streak-based cooldowns)
     data = _clean_expired(_load_cooldowns())
-    return key in data
+    if key in data:
+        return True
+
+    # Fallback: PostgreSQL signal_cooldowns (written by _record_trade_outcome on
+    # HL live closes — HL_SL_CLOSED, HL_CLOSED, etc. never write to JSON)
+    try:
+        import psycopg2
+        from _secrets import BRAIN_DB_DICT
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        # PostgreSQL stores token='BTC:LONG', direction='LONG' — check both match
+        cur.execute(
+            "SELECT 1 FROM signal_cooldowns WHERE token=%s AND direction=%s AND expires_at > NOW()",
+            (key, direction.upper()))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        if result:
+            return True
+    except Exception:
+        pass
+
+    return False
 
 
 def get_opposite_direction_cooldown_hours(token: str, direction: str) -> float:
@@ -2638,7 +2918,7 @@ def set_loss_cooldown(token: str, direction: str, hours: float = None) -> None:
 
     now = datetime.now(timezone.utc).timestamp()
     expiry = now + (hours * 3600)
-    data[key] = {"expires": expiry, "streak": streak, "hours": hours}
+    data[key] = {"expires": expiry, "streak": streak, "hours": hours, "reason": "loss"}
     _save_cooldowns(data)
     print(f"[Position Manager] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h")
 
@@ -2727,7 +3007,7 @@ def _analyze_loss_direction(token: str, direction: str, entry_price: float, exit
 
     try:
         # Get price history for the last ~4 hours to find the counter-move
-        conn = _sqlite3.connect('/root/.hermes/data/signals_hermes.db')
+        conn = _sqlite3.connect(STATIC_DB)
         cur = conn.cursor()
         cur.execute("""
             SELECT timestamp, price FROM price_history
@@ -2817,7 +3097,7 @@ def is_wrong_side_risky(token: str, direction: str, confidence: float = 70) -> T
     avg_pct = entry.get("avg_counter_pct", 0)
     avg_min = entry.get("avg_minutes", 0)
 
-    if count >= 3 and avg_pct >= 1.5:
+    if count >= 3 and avg_pct >= WRONG_SIDE_AVG_PCT_THRESH:
         reason = f"wrong-side x{count} avg+{avg_pct:.1f}%/{avg_min:.0f}min"
         return True, reason
 

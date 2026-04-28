@@ -10,6 +10,8 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import sys
 import os
+import paths  # noqa: F401 — single source of truth for paths
+import subprocess
 
 # Database connection — use centralized secrets, fail fast if missing
 try:
@@ -280,7 +282,7 @@ def get_thoughts_by_tag(tag: str) -> list:
         conn.close()
 
 def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float,
-               exchange: str = "Hyperliquid", strategy: str = None, paper: bool = True,
+               exchange: str = "Hyperliquid", strategy: str = None, paper: bool = False,
                stop_loss: float = None, target: float = None, server: str = "Hermes",
                signal: str = None, confidence: float = None, address: str = None,
                sl_group: str = "control", sl_distance: float = None,
@@ -288,11 +290,20 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                trailing_phase2_dist: float = None,
                leverage: int = 1, experiment: str = None,
                flipped_from_trade: bool = False):
-    """Add a new trade to the trades table"""
-    # FIX (2026-04-05): Block conf-1s at the trades DB level — confluence means
-    # ≥2 signals agreeing. num_signals=1 is not confluence, it's a single source.
-    # This catches cases where the signal DB source passed the conf-1s block but
-    # the strategy field (Hermes-conf-1s) slipped through to the trades DB.
+    """
+    Add a new trade. HL-first: open on Hyperliquid FIRST, write to local DB only
+    if HL confirms. Eliminates phantom trades (DB writes deleted when HL fails,
+    leaving consumed signals with no corresponding position).
+    """
+    import sys, os, random
+
+    # ── Normalize direction ──────────────────────────────────────────────
+    side_type = side_type.lower() if side_type else 'long'
+    direction = 'LONG' if side_type == 'long' else 'SHORT'
+
+    # ── Step 1: Pre-flight checks ───────────────────────────────────────
+
+    # Block conf-1s at the trade entry level
     if strategy and strategy.startswith('Hermes-conf-'):
         try:
             num = int(strategy.split('-')[-1].rstrip('s'))
@@ -305,195 +316,124 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     if signal == 'conf-1s':
         print(f"✗ REJECTED: {token} {side_type} — conf-1s (single-source, min 2 required)")
         return None
-    # Signal source blacklist — block uncalibrated/noisy signal sources at the trade entry level
-    NOISE_SIGNALS = {
-        'pct-hermes', 'vel-hermes', 'rsi-hermes',
-    }
+
+    # Block noisy signal sources
+    NOISE_SIGNALS = {'pct-hermes', 'vel-hermes', 'rsi-hermes'}
     if signal in NOISE_SIGNALS:
         print(f"✗ REJECTED: {token} {side_type} — noisy signal source '{signal}' blocklisted")
         return None
-    # Pre-check: dont consume ID if trade already exists
+
+    # ── Step 2: HL-first — open on Hyperliquid before any DB write ─────
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    # paths already imported at module level (line 13)
+    from hyperliquid_exchange import (mirror_open, hype_coin,
+                                       is_live_trading_enabled, is_delisted)
+
+    if not is_live_trading_enabled():
+        print(f"[brain.py] Live trading OFF — rejecting {token} {direction}")
+        return None
+
+    if is_delisted(token):
+        print(f"[brain.py] {token} is delisted on Hyperliquid — rejecting")
+        return None
+
+    hype_token = hype_coin(token)
+
+    # Blacklist check
+    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+    blocked = (direction == 'SHORT' and hype_token in SHORT_BLACKLIST) or \
+              (direction == 'LONG'  and hype_token in LONG_BLACKLIST)
+    if blocked:
+        bl = 'SHORT_BLACKLIST' if direction == 'SHORT' else 'LONG_BLACKLIST'
+        print(f"[brain.py] {hype_token}: blocked by {bl} — rejecting")
+        return None
+
+    # Duplicate open check (local DB constraint)
     conn_check = get_db_connection()
     cur_check = conn_check.cursor()
-    cur_check.execute("SELECT id FROM trades WHERE token = %s AND server = %s AND status = 'open'", (token, server))
+    cur_check.execute(
+        "SELECT id FROM trades WHERE token=%s AND server=%s AND status='open'",
+        (token, server))
     if cur_check.fetchone():
-        cur_check.close()
-        conn_check.close()
-        return None  # Skip if already open - prevents ID consumption
-    cur_check.close()
-    conn_check.close()
+        print(f"[brain.py] {token} already open on {server} — rejecting duplicate")
+        return None
+    cur_check.close(); conn_check.close()
 
-    side_type = side_type.lower() if side_type else 'long'
-    direction = 'LONG' if side_type == 'long' else 'SHORT'
-    
-    # A/B Test: Assign SL parameters if not provided
-    import random
+    # A/B params (needed for HL order sizing)
     if sl_distance is None:
         groups = {"control": 0.03, "test_a": 0.015, "test_b": 0.01}
         sl_group = random.choice(list(groups.keys()))
         sl_distance = groups[sl_group]
     if trailing_activation is None:
-        trailing_activation = 0.01  # default: activate at +1%
+        trailing_activation = 0.01
     if trailing_distance is None:
-        trailing_distance = 0.01   # default: 1% trailing distance
-    
+        trailing_distance = 0.01
+
+    leverage = max(1, min(int(leverage), 5))  # cap at 5x
+
+    # ── Step 3: mirror_open on HL ──────────────────────────────────────
+    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage)
+    if not result.get("success"):
+        print(f"[brain.py] mirror_open FAILED for {hype_token}: {result.get('message')}")
+        return None   # ← NO DB write, signal stays alive for retry
+
+    # ── Step 4: HL confirmed — write to local DB ───────────────────────
+    hl_entry = result.get("hl_entry_price") or result.get("entry_price")
+    sz = result.get("size")
+
     conn = get_db_connection()
     cur = conn.cursor()
-    
     cur.execute("""
         INSERT INTO trades (token, direction, amount_usdt, entry_price,
-                          exchange, strategy, paper, stop_loss, target, server, status, open_time,
-                          signal, confidence, token_address, pnl_usdt, pnl_pct,
-                          sl_distance, trailing_activation, trailing_distance,
-                          trailing_phase2_dist, leverage, experiment,
-                          flipped_from_trade, flip_variant)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                  exchange, strategy, paper, stop_loss, target, server, status, open_time,
+                  signal, confidence, token_address, pnl_usdt, pnl_pct,
+                  sl_distance, trailing_activation, trailing_distance,
+                  trailing_phase2_dist, leverage, experiment,
+                  flipped_from_trade, flip_variant,
+                  hl_entry_price,
+                  highest_price, lowest_price)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id
-    """, (token, direction, amount_usdt, entry_price,
-          exchange, strategy, paper, stop_loss, target, server, 'open',
+    """, (token, direction, amount_usdt, hl_entry,
+          exchange, strategy, False, stop_loss, target, server, 'open',
           signal, confidence, address, 0, 0,
           sl_distance, trailing_activation, trailing_distance,
           trailing_phase2_dist, leverage, experiment,
-          int(flipped_from_trade) if flipped_from_trade else 0, 'signal-flip'))
+          int(flipped_from_trade) if flipped_from_trade else 0, 'signal-flip',
+          hl_entry,
+          hl_entry if direction == 'LONG' else 0,   # highest_price: LONG starts at entry
+          hl_entry if direction == 'SHORT' else 0)) # lowest_price: SHORT starts at entry
     trade_id = cur.fetchone()[0]
     conn.commit()
-    cur.close()
-    conn.close()
+    cur.close(); conn.close()
 
-    # ── Mirror to Hyperliquid (real trade) ───────────────────────
-    # Respects kill switch: mirror_open checks is_live_trading_enabled() internally.
-    try:
-        import sys, os
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from hyperliquid_exchange import mirror_open, hype_coin, is_live_trading_enabled
-        if is_live_trading_enabled():
-            # HOT-SET GUARD: only mirror trades for tokens in the hot-set
-            hype_token = hype_coin(token)
-            from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
-            try:
-                import sqlite3
-                conn_s = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-                cur_s = conn_s.cursor()
-                cur_s.execute("SELECT 1 FROM signals WHERE token=? AND hot_cycle_count>=1 LIMIT 1", (hype_token,))
-                in_hot = cur_s.fetchone() is not None
-                conn_s.close()
-            except Exception:
-                in_hot = False  # Fail open on DB errors
-            blocked = (direction.upper() == 'SHORT' and hype_token.upper() in SHORT_BLACKLIST) or \
-                      (direction.upper() == 'LONG' and hype_token.upper() in LONG_BLACKLIST)
-            if blocked:
-                # FIX (2026-04-05): Don't close the paper trade. Keep it open for
-                # tracking/audit. Just skip the HL mirror — don't destroy the paper trail.
-                bl_list = 'SHORT_BLACKLIST' if direction.upper() == 'SHORT' else 'LONG_BLACKLIST'
-                print(f"[brain.py] {hype_token}: on {bl_list} ({direction}) — paper trade #{trade_id} kept (no HL mirror)")
-                # Return trade_id so brain DB has the paper record, but no HL position
-            else:
-                # Read back leverage for this trade
-                conn2 = get_db_connection()
-                cur2 = conn2.cursor()
-                cur2.execute("SELECT leverage FROM trades WHERE id = %s", (trade_id,))
-                row = cur2.fetchone()
-                lev = int(row[0]) if row else 1
-                cur2.close(); conn2.close()
+    # ── Step 5: Place SL + TP on HL ─────────────────────────────────────
+    if sz and stop_loss:
+        from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp
+        sl_result = hl_place_sl(hype_token, direction, float(stop_loss), float(sz))
+        tp_result = hl_place_tp(hype_token, direction, float(target), float(sz)) \
+                    if target else {"success": True}
+        if sl_result.get("success"):
+            conn_oid = get_db_connection()
+            cur_oid = conn_oid.cursor()
+            cur_oid.execute("""
+                UPDATE trades SET hl_sl_order_id=%s, hl_tp_order_id=%s WHERE id=%s
+            """, (sl_result.get("order_id"),
+                  tp_result.get("order_id") if tp_result.get("success") else None,
+                  trade_id))
+            conn_oid.commit(); cur_oid.close(); conn_oid.close()
 
-                result = mirror_open(hype_token, direction, float(entry_price), leverage=lev)
-                if result.get("success"):
-                    # Plan A: record actual HL fill price as ground truth entry
-                    hl_entry = result.get("hl_entry_price") or result.get("entry_price")
-                    print(f"[brain.py] HYPE ✅ mirror_open SUCCESS: {direction} {result.get('size')} {hype_token} @ ${result.get('entry_price')} "
-                          f"(HL_fill=${hl_entry:.6f}) leverage={lev}x (trade #{trade_id})")
-                    # Update trade with ground-truth HL entry price
-                    conn3 = get_db_connection()
-                    cur3 = conn3.cursor()
-                    cur3.execute("""
-                        UPDATE trades SET entry_price = %s, hl_entry_price = %s
-                        WHERE id = %s
-                    """, (hl_entry, hl_entry, trade_id))
-                    conn3.commit()
-                    cur3.close(); conn3.close()
-
-                    # BUG-FIX: Place SL + TP on HL immediately after entry
-                    # (B3: no SL/TP was placed on initial entry — fixed here)
-                    sz = result.get('size')
-                    if sz and is_live_trading_enabled():
-                        # Read SL and TP from the trade record
-                        conn_sl = get_db_connection()
-                        cur_sl = conn_sl.cursor()
-                        cur_sl.execute("SELECT stop_loss, target FROM trades WHERE id = %s", (trade_id,))
-                        sl_row = cur_sl.fetchone()
-                        cur_sl.close(); conn_sl.close()
-                        if sl_row and sl_row[0]:
-                            from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp
-                            sl_result = hl_place_sl(hype_token, direction, float(sl_row[0]), float(sz))
-                            tp_result = hl_place_tp(hype_token, direction, float(sl_row[1]), float(sz)) if sl_row[1] else {"success": True}
-                            if sl_result.get("success"):
-                                print(f"[brain.py] ✅ SL placed on HL: {hype_token} {direction} SL=${sl_row[0]:.6f} TP=${sl_row[1]:.6f if sl_row[1] else 'N/A'}")
-                                # Record HL order IDs for TP/SL (needed for cancel/replace)
-                                hl_sl_oid = sl_result.get("order_id")
-                                hl_tp_oid = tp_result.get("order_id") if tp_result.get("success") else None
-                                if hl_sl_oid or hl_tp_oid:
-                                    conn_oid = get_db_connection()
-                                    cur_oid = conn_oid.cursor()
-                                    cur_oid.execute("""
-                                        UPDATE trades SET hl_sl_order_id = %s, hl_tp_order_id = %s
-                                        WHERE id = %s
-                                    """, (hl_sl_oid, hl_tp_oid, trade_id))
-                                    conn_oid.commit()
-                                    cur_oid.close(); conn_oid.close()
-                                    print(f"[brain.py] 📝 Recorded HL order IDs: sl={hl_sl_oid}, tp={hl_tp_oid}")
-                            else:
-                                print(f"[brain.py] ⚠️ SL placement failed: {sl_result.get('error')} (non-fatal, paper still open)")
-                else:
-                    print(f"[brain.py] HYPE mirror_open blocked/failed: {result.get('message')}")
-                    # FIX (2026-04-14): If mirror_open failed for non-blacklist reasons
-                    # (rate limit, max positions, insufficient margin, etc.), the paper
-                    # trade should NOT remain in DB as a phantom. Delete it so the guardian
-                    # never sees a paper trade that never reached HL.
-                    try:
-                        conn_del = get_db_connection()
-                        cur_del = conn_del.cursor()
-                        cur_del.execute("DELETE FROM trades WHERE id = %s", (trade_id,))
-                        conn_del.commit()
-                        cur_del.close(); conn_del.close()
-                        print(f"[brain.py] 🗑️ Deleted phantom paper trade #{trade_id} ({hype_token}) — mirror_open failed: {result.get('message')}")
-                    except Exception as del_err:
-                        print(f"[brain.py] ⚠️ Failed to delete phantom trade #{trade_id}: {del_err}")
-        else:
-            print(f"[brain.py] Live trading OFF — paper trade {trade_id} not mirrored")
-            # FIX (2026-04-14): Live trading is off, mirror was never attempted.
-            # Don't leave phantom paper trades in DB — delete them.
-            try:
-                conn_del = get_db_connection()
-                cur_del = conn_del.cursor()
-                cur_del.execute("DELETE FROM trades WHERE id = %s", (trade_id,))
-                conn_del.commit()
-                cur_del.close(); conn_del.close()
-                print(f"[brain.py] 🗑️ Deleted phantom paper trade #{trade_id} ({hype_token}) — live trading is OFF")
-            except Exception as del_err:
-                print(f"[brain.py] ⚠️ Failed to delete phantom trade #{trade_id}: {del_err}")
-    except Exception as e:
-        print(f"[brain.py] HYPE mirror_open failed (non-fatal): {e}")
-        # FIX (2026-04-14): If an exception occurred after the trade was created,
-        # don't leave a phantom paper trade in DB — delete it.
-        try:
-            conn_del = get_db_connection()
-            cur_del = conn_del.cursor()
-            cur_del.execute("DELETE FROM trades WHERE id = %s", (trade_id,))
-            conn_del.commit()
-            cur_del.close(); conn_del.close()
-            print(f"[brain.py] 🗑️ Deleted phantom paper trade #{trade_id} ({hype_token}) — exception: {e}")
-        except Exception as del_err:
-            print(f"[brain.py] ⚠️ Failed to delete phantom trade #{trade_id}: {del_err}")
-
+    print(f"[brain.py] ✅ {hype_token} {direction} trade #{trade_id} confirmed on HL @ ${hl_entry:.6f}")
     return trade_id
 
 def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
-                 notes: str = None, close_reason: str = None):
-    """Close an existing trade. Uses Hyperliquid as ground truth for PnL (Plan B).
+                 notes: str = None, close_reason: str = None, skip_hl: bool = False):
+    """Close an existing trade. Computes PnL from signal prices (no extra HL API calls).
 
-    After closing, queries HL /my_trades for realized PnL and updates:
-        hype_pnl_usdt, hype_pnl_pct, exit_price (HL ground truth)
-    Falls back to signal-based PnL calculation if HL query fails.
+    Args:
+        skip_hl: If True, skip HL /info lookup and use signal-based PnL directly.
+                 Saves 1 HL API call per close. Use for automated closes (profit-monster,
+                 guardian, etc.) where signal exit price is sufficient.
     """
     conn = get_db_connection()
     cur = conn.cursor()
@@ -510,42 +450,43 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
     lev = float(stored_lev or 1)
     amount_usdt = float(amount_usdt or 50)
 
-    # ── Plan B: Get HL realized PnL (ground truth) ─────────────────────────────
+    # ── Get HL realized PnL (ground truth) — skip if skip_hl ───────────────────
     hype_pnl_usdt = None
     hype_pnl_pct  = None
     hl_exit_price = None
 
-    try:
-        import sys, os
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from hyperliquid_exchange import get_realized_pnl, mirror_close
-        from datetime import datetime
+    if not skip_hl:
+        try:
+            import sys, os
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from hyperliquid_exchange import get_realized_pnl
+            from datetime import datetime
 
-        # Convert open_time to ms timestamp
-        if open_time:
-            if isinstance(open_time, str):
-                dt = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
+            # Convert open_time to ms timestamp
+            if open_time:
+                if isinstance(open_time, str):
+                    dt = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
+                else:
+                    dt = open_time
+                start_ms = int(dt.timestamp() * 1000)
             else:
-                dt = open_time
-            start_ms = int(dt.timestamp() * 1000)
-        else:
-            # Fallback: last 24 hours
-            start_ms = int((datetime.now().timestamp() - 86400) * 1000)
+                # Fallback: last 24 hours
+                start_ms = int((datetime.now().timestamp() - 86400) * 1000)
 
-        # Query HL for realized PnL for this token
-        hl_data = get_realized_pnl(token.upper(), start_ms)
+            # Query HL for realized PnL for this token
+            hl_data = get_realized_pnl(token.upper(), start_ms)
 
-        if hl_data and hl_data.get("realized_pnl") is not None:
-            hype_pnl_usdt = hl_data["realized_pnl"]
-            hype_pnl_pct  = (hype_pnl_usdt / amount_usdt * 100) if amount_usdt else 0
-            hl_exit_price = hl_data.get("exit_price") or exit_price
-            print(f"[close_trade] HL ground truth — {token} pnl={hype_pnl_usdt:+.4f} ({hype_pnl_pct:+.2f}%) "
-                  f"exit={hl_exit_price:.6f}")
-        else:
-            print(f"[close_trade] HL no fill data for {token}, using signal calc")
+            if hl_data and hl_data.get("realized_pnl") is not None:
+                hype_pnl_usdt = hl_data["realized_pnl"]
+                hype_pnl_pct  = (hype_pnl_usdt / amount_usdt * 100) if amount_usdt else 0
+                hl_exit_price = hl_data.get("exit_price") or exit_price
+                print(f"[close_trade] HL ground truth — {token} pnl={hype_pnl_usdt:+.4f} ({hype_pnl_pct:+.2f}%) "
+                      f"exit={hl_exit_price:.6f}")
+            else:
+                print(f"[close_trade] HL no fill data for {token}, using signal calc")
 
-    except Exception as e:
-        print(f"[close_trade] HL sync failed (non-fatal): {e}")
+        except Exception as e:
+            print(f"[close_trade] HL sync failed (non-fatal): {e}")
 
     # ── Fallback: signal-based PnL ─────────────────────────────────────────────
     if hype_pnl_usdt is None:
@@ -563,6 +504,10 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
     # ── Write to DB ────────────────────────────────────────────────────────────
     # close_reason: explicit param wins, else default to 'manual_close'
     close_reason_val = close_reason if close_reason else 'manual_close'
+    # BUG-FIX (2026-04-19): exit_reason was not being set in close_trade().
+    # profit_monster and any other caller using brain.py close_trade() would get
+    # NULL exit_reason in the trades table, making exit attribution impossible.
+    # Fix: write exit_reason = close_reason_val so both columns are always set.
     cur.execute("""
         UPDATE trades SET
             exit_price    = %s,
@@ -573,9 +518,10 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
             status        = 'closed',
             close_time    = NOW(),
             close_reason  = %s,
+            exit_reason   = %s,
             notes         = COALESCE(%s, '')
         WHERE id = %s
-    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, notes, trade_id))
+    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, notes, trade_id))
 
     conn.commit()
     cur.close()
@@ -765,6 +711,8 @@ if __name__ == "__main__":
         close_parser.add_argument("--pnl", type=float, help="Manual PnL override")
         close_parser.add_argument("--notes", help="Exit notes")
         close_parser.add_argument("--close-reason", help="Close reason tag (e.g. profit-monster)")
+        close_parser.add_argument("--skip-hl", action="store_true",
+                                  help="Skip HL /info lookup — use signal-based PnL (saves 1 API call)")
         
         list_parser = subparsers.add_parser("list", help="List trades")
         list_parser.add_argument("--status", choices=["open", "closed"], help="Filter by status")
@@ -802,7 +750,8 @@ if __name__ == "__main__":
             print(f"  Exchange: {args.exchange} | Server: {args.server} | Paper: {not args.real} | Signal: {args.signal or 'N/A'} | Lev: {args.leverage}x")
         
         elif args.subcommand == "close":
-            close_trade(args.id, args.exit_price, args.pnl, args.notes, args.close_reason)
+            close_trade(args.id, args.exit_price, args.pnl, args.notes, args.close_reason,
+                        skip_hl=args.skip_hl)
             print(f"✓ Closed trade #{args.id} @ ${args.exit_price}")
         
         elif args.subcommand == "list":

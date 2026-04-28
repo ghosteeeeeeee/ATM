@@ -1,5 +1,17 @@
 # ATM Architecture — Hermes Trading System
-**Last updated:** 2026-04-12 17:30 UTC
+**Last updated:** 2026-04-16 04:25 UTC
+
+---
+
+## Path Management — Single Source of Truth
+**`/root/.hermes/scripts/paths.py`** — ALL file/DB paths defined here. Import with `from paths import *`.
+Two base directories:
+- `HERMES_DATA` = `/root/.hermes/data` — local runtime data (gitignored)
+- `WWW_DATA` = `/var/www/hermes/data` — served by nginx, dashboard accessible
+
+Key exports: `RUNTIME_DB`, `STATIC_DB`, `HOTSET_FILE`, `LIVESWITCH_FILE`, `TRADES_JSON`,
+`HL_CACHE_FILE`, `PIPELINE_HB_FILE`, `ATR_CACHE_FILE`, `DELAYED_FILE`, `TRAILING_STOPS_FILE`,
+`KANBAN_FILE`, `AB_CONFIG_FILE`, `SPEED_HOTSET_THRESHOLD`, `SPEED_HOTSET_BONUS`
 
 ---
 
@@ -99,6 +111,8 @@ update-trades-json.py       ──→ /var/www/hermes/data/trades.json (position
 ---
 
 ## Data Stores
+**Path source:** All paths via `from paths import *` — see `paths.py` for the canonical definition.
+Locations: `HERMES_DATA=/root/.hermes/data` | `WWW_DATA=/var/www/hermes/data`
 
 | File | Contents |
 |------|----------|

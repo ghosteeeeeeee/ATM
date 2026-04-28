@@ -16,6 +16,7 @@ Two responsibilities:
    - Spawn new variant hypotheses to test fresh market conditions
    - Write updated config back to ab-test-config.json
 """
+from paths import *
 import json, time, os, sys, random, argparse
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
@@ -515,6 +516,9 @@ def run_evolution() -> Dict[str, Any]:
 
     for test in cfg.get('tests', []):
         test_name = test['name']
+        if not test.get('enabled', True):
+            log(f'\nTest: {test_name} — DISABLED, skipping')
+            continue
         test_results = results.get(test_name, [])
 
         total_trades = sum(r['trades'] for r in test_results)

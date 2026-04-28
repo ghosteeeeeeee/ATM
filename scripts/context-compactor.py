@@ -11,6 +11,7 @@ Timeout: 30s wait, 5s polling, SKIPPED on timeout.
 import sys, os, re, time, subprocess, json
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 CONTEXT_FILE         = '/root/.hermes/CONTEXT.md'
 ATM_ARCHITECTURE_FILE = '/root/.hermes/ATM/ATM-Architecture.md'
 LOCK_FILE    = '/root/.hermes/locks/context.md.lock'
@@ -54,7 +55,7 @@ def get_wasp_status():
 def get_live_trading_status():
     """Check hype_live_trading.json."""
     try:
-        with open('/var/www/hermes/data/hype_live_trading.json') as f:
+        with open(LIVESWITCH_FILE) as f:
             d = json.load(f)
         state = d.get('live_trading_enabled', d.get('enabled', 'UNKNOWN'))
         return f"LIVE TRADING: {'ON ✅' if state else 'OFF ⚠️'}"
@@ -78,7 +79,7 @@ def get_position_summary():
     except Exception as e:
         # Fallback to trades.json
         try:
-            with open('/var/www/hermes/data/trades.json') as f:
+            with open(TRADES_JSON) as f:
                 trades = json.load(f)
             open_trades = [t for t in trades if t.get('status') == 'open']
             return f"POSITIONS: {len(open_trades)} open (trades.json)"
@@ -89,7 +90,7 @@ def get_position_summary():
 def get_regime():
     """Get current regime from regime scanner or hotset."""
     try:
-        with open('/var/www/hermes/data/hotset.json') as f:
+        with open(HOTSET_FILE) as f:
             hs = json.load(f)
         regime = hs.get('regime', 'UNKNOWN')
         return f"REGIME: {regime}"
@@ -117,7 +118,7 @@ def get_critical_flags_block():
     flags = []
     # Check live trading
     try:
-        with open('/var/www/hermes/data/hype_live_trading.json') as f:
+        with open(LIVESWITCH_FILE) as f:
             d = json.load(f)
         if not d.get('live_trading_enabled', d.get('enabled', True)):
             flags.append("- ⚠️ LIVE TRADING IS OFF — KILL SWITCH ACTIVE")
@@ -225,30 +226,54 @@ def patch_context_file(quick_status, critical_flags, timestamp):
     else:
         log(f"Patched timestamp ({n_ts} replacement)")
 
-    # ── Append ATM Architecture Reference ─────────────────────────────────────
-    # Always keep a current snapshot of the architecture at the end of CONTEXT.md
+    # ── ATM Architecture Snapshot: REPLACE in-place, don't append ─────────────────
+    # CONTEXT.md already references ATM-Architecture.md at the top.
+    # The static content ends at ## ATM_SNAP (line 35), the snapshot is everything after.
+    # On every run: find the static/snapshot boundary, remove old snapshot, insert fresh.
     try:
         with open(ATM_ARCHITECTURE_FILE, 'r') as f:
             arch_content = f.read().strip()
-        # Remove existing ATM Architecture section if present
-        arch_section_pattern = r'\n---\n# ATM ARCHITECTURE SNAPSHOT.*?(?=\n---\n|\Z)'
-        new_content3 = re.sub(arch_section_pattern, '', new_content3, flags=re.DOTALL)
-        # Find the last horizontal rule before EOF to insert after it
-        # If no HR found, append at end
-        if '\n---\n' in new_content3:
-            insert_pos = new_content3.rfind('\n---\n') + 5
-            new_content3 = new_content3[:insert_pos] + (
-                f"\n# ATM ARCHITECTURE SNAPSHOT (auto-generated, see: ATM-Architecture.md)\n"
-                f"{arch_content}\n"
-            )
+
+        # Anchor: ## ATM_SNAP (section header). Using a ## header as anchor lets us
+        # match the entire snapshot block with \n## ATM_SNAP\n.*?(?=\n## |\Z) reliably,
+        # since no ## can appear inside the architecture content legitimately.
+        SNAP_ANCHOR = '## ATM_SNAP'
+        SNAP_HEADER = '# ATM ARCHITECTURE SNAPSHOT (auto-generated, see: ATM-Architecture.md)'
+
+        # ── 1. Find the LAST ## ATM_SNAP in the file (the one we appended last run) ──
+        # Using last occurrence is critical: the snapshot content itself contains
+        # the same section headers as static content (## Data Flow, ## Pipeline, etc.),
+        # so a forward search would hit the static copy's header and fail to clean up.
+        all_snap_matches = list(re.finditer(r'\n## ATM_SNAP\n', new_content3))
+        if all_snap_matches:
+            # Use the LAST occurrence as our boundary — that's the one we appended
+            snap_match = all_snap_matches[-1]
+            static_prefix = new_content3[:snap_match.start()]
+            log(f"Found {len(all_snap_matches)} ATM_SNAP anchor(s), using the last one at pos {snap_match.start()}")
         else:
-            new_content3 = new_content3.rstrip() + (
-                f"\n---\n# ATM ARCHITECTURE SNAPSHOT (auto-generated, see: ATM-Architecture.md)\n"
-                f"{arch_content}\n"
-            )
-        log("Appended ATM Architecture snapshot to CONTEXT.md")
+            # No anchor yet — find last HR as boundary
+            last_hr = new_content3.rfind('\n---\n')
+            static_prefix = new_content3[:last_hr] if last_hr >= 0 else new_content3
+            log("No ## ATM_SNAP anchor found, using last HR boundary")
+
+        # ── 2. Remove old snapshot block ──────────────────────────────────────────
+        # Remove EVERYTHING from the LAST ## ATM_SNAP to end of file
+        # (the snapshot we appended last run, which may have duplicated content)
+        old_snap_start = all_snap_matches[-1].start() if all_snap_matches else -1
+        if old_snap_start >= 0:
+            # Verify this ## ATM_SNAP is followed by our header marker
+            remainder = new_content3[old_snap_start:]
+            SNAP_HEADER = '# ATM ARCHITECTURE SNAPSHOT (auto-generated'
+            if SNAP_HEADER in remainder:
+                # Truncate at this anchor — remove the old snapshot entirely
+                new_content3 = new_content3[:old_snap_start]
+                log("Removed old ATM Architecture snapshot (confirmed by header)")
+
+        # ── 3. Insert fresh snapshot after static prefix ──────────────────────────
+        new_content3 = static_prefix + '\n## ATM_SNAP\n' + SNAP_HEADER + '\n' + arch_content + '\n'
+        log("Inserted ATM Architecture snapshot")
     except Exception as e:
-        log(f"WARNING: could not append ATM Architecture: {e}")
+        log(f"WARNING: could not manage ATM Architecture: {e}")
 
     # Write back via lock
     fd = acquire_lock()
