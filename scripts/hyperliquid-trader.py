@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Hyperliquid Auto-Trading Bot v4 - SL/TP Monitoring
+from paths import *
 """
 import requests
 import json

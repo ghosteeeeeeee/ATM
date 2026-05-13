@@ -9,6 +9,7 @@ Usage:
     python3 archive-signals.py --apply   # actually archive + delete + vacuum
     python3 archive-signals.py --stats   # just show current table stats
 """
+from paths import *
 import sqlite3, os, json, gzip, time
 from datetime import datetime, timezone
 from pathlib import Path

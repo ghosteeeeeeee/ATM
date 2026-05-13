@@ -1,3 +1,4 @@
+# Migrated from ../ema20_50_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
 """
 ema20_50_signals.py — Trend-Filtered EMA Pullback Signal on 1m prices.
@@ -442,6 +443,13 @@ def scan_ema20_50_signals(prices_dict: dict) -> int:
         if sig is None:
             continue
 
+        # ── Per-direction kill-switch ─────────────────────────────────────────
+        from hermes_constants import EMA20_50_PLUS_ENABLED, EMA20_50_MINUS_ENABLED
+        if sig['direction'] == 'LONG' and not EMA20_50_PLUS_ENABLED:
+            continue
+        if sig['direction'] == 'SHORT' and not EMA20_50_MINUS_ENABLED:
+            continue
+
         try:
             sid = add_signal(
                 token=token.upper(),
@@ -472,6 +480,18 @@ def scan_ema20_50_signals(prices_dict: dict) -> int:
 # ═══════════════════════════════════════════════════════════════════════════════
 # CLI test
 # ═══════════════════════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# signals_runner entry point
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def run(prices_dict=None):
+    """Entry point for signals_runner. Returns count of signals emitted."""
+    if prices_dict is None:
+        from signal_schema import get_all_latest_prices
+        prices_dict = get_all_latest_prices()
+    return scan_ema20_50_signals(prices_dict)
+
 
 if __name__ == '__main__':
     import sys

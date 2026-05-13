@@ -3,6 +3,7 @@
 Live Trading Decider - Wrapper for decider_run.py
 Executes trades on real Hyperliquid using the unified execution pipeline.
 """
+from paths import *
 import sys
 import subprocess
 import os

@@ -249,6 +249,13 @@ def scan_ma300_candle_signals(prices_dict: dict) -> tuple[int, list[dict]]:
         if direction.upper() == 'LONG' and token.upper() in LONG_BLACKLIST:
             continue
 
+        # ── Per-direction kill-switch ─────────────────────────────────────────
+        from hermes_constants import MA300_CANDLE_PLUS_ENABLED, MA300_CANDLE_MINUS_ENABLED
+        if direction.upper() == 'LONG' and not MA300_CANDLE_PLUS_ENABLED:
+            continue
+        if direction.upper() == 'SHORT' and not MA300_CANDLE_MINUS_ENABLED:
+            continue
+
         sid = add_signal(
             token=token,
             direction=direction,

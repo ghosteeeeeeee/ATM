@@ -60,23 +60,19 @@ def get_latest_prices_from_candles() -> dict:
 
 
 def get_open_positions() -> dict:
-    """Return token -> direction dict for currently open HL positions."""
-    positions = {}
+    """Return token -> direction dict for currently open HL positions.
+    
+    Uses position_manager.get_open_positions() which queries the brain DB (PostgreSQL).
+    Falls back to an empty dict if the DB is unavailable.
+    """
     try:
-        conn = sqlite3.connect(_RUNTIME_DB, timeout=10)
-        conn.row_factory = sqlite3.Row
-        c = conn.cursor()
-        c.execute("""
-            SELECT token, direction
-            FROM positions
-            WHERE status = 'open'
-        """)
-        for row in c.fetchall():
-            positions[row['token'].upper()] = row['direction']
-        conn.close()
+        from position_manager import get_open_positions as _pm_get_open
+        positions = _pm_get_open()
+        return {p.get('token', '').upper(): p.get('direction', '').upper()
+                for p in positions if p.get('token')}
     except Exception as e:
-        print(f"[run_rs] positions table error: {e}")
-    return positions
+        print(f"[run_rs] get_open_positions error: {e}")
+        return {}
 
 
 # ── Blacklists ────────────────────────────────────────────────────────────────
@@ -141,15 +137,13 @@ def main():
 
     n, signaled_tokens = scan_rs_signals(filtered)
 
-    # 7. Write cooldowns via signal_schema (uses milliseconds internally)
-    # Only for tokens that actually got a signal, and only for the direction that fired
+    # 7. Write cooldowns via signal_schema (per-direction, same direction only)
+    # Only for tokens+directions that actually fired — not both directions
     if signaled_tokens:
-        for token in signaled_tokens:
-            # cooldown is per-token per-direction; R&S fires in one direction only
-            # we record both directions since R&S can trigger in either on next scan
-            for direction in ('LONG', 'SHORT'):
-                record_cooldown_start(token.upper(), direction, RS_COOLDOWN_HOURS * 60)
-        print(f"[run_rs] Cooldowns written: {len(signaled_tokens)} tokens × {RS_COOLDOWN_HOURS}h ({len(signaled_tokens)*2} entries)")
+        from signal_schema import set_cooldown
+        for token, direction in signaled_tokens:
+            set_cooldown(token, direction, hours=RS_COOLDOWN_HOURS)
+        print(f"[run_rs] Cooldowns written: {len(signaled_tokens)} entries (token+direction specific)")
 
     print(f"[run_rs] Done. {n} signals emitted.")
 

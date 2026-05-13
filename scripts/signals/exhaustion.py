@@ -1,3 +1,4 @@
+# Migrated from ../exhaustion_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
 """
 exhaustion_signals.py — Trend exhaustion counter-trend signal.
@@ -206,6 +207,9 @@ def detect_exhaustion(token: str, direction: str = None):
 
 
 def scan(conf_min: int = 70, token: str = None):
+    from hermes_constants import EXHAUSTION_ENABLED
+    if not EXHAUSTION_ENABLED:
+        return 0
     """
     Scan all tokens (or single token) and emit exhaustion signals.
 
@@ -227,6 +231,12 @@ def scan(conf_min: int = 70, token: str = None):
     emitted = 0
     for tok in tokens:
         for direction in ['LONG', 'SHORT']:
+            # ── Per-direction kill-switch ─────────────────────────────────────────
+            from hermes_constants import EXHAUSTION_PLUS_ENABLED, EXHAUSTION_MINUS_ENABLED
+            if direction == 'LONG' and not EXHAUSTION_PLUS_ENABLED:
+                continue
+            if direction == 'SHORT' and not EXHAUSTION_MINUS_ENABLED:
+                continue
             sig = detect_exhaustion(tok, direction)
             if not sig:
                 continue
@@ -239,6 +249,13 @@ def scan(conf_min: int = 70, token: str = None):
             print(f"  {tok:8s} {sig['direction']:5s} conf={sig['confidence']} gap={sig['gap_pct']:+.3f}%{extra}")
 
     return emitted
+
+
+def run(prices_dict=None):
+    """Entry point for signals_runner. Returns count of signals emitted."""
+    from signals.exhaustion import scan as exh_scan
+    result = exh_scan(conf_min=70)
+    return result if isinstance(result, int) else len(result) if result else 0
 
 
 def main():

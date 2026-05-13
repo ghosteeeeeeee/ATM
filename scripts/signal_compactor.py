@@ -23,13 +23,54 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON
 
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
 _open_pos_cache = {}  # token_upper -> True/False, refreshed each run
+_dir_wr_cache = {}    # (token, direction) -> (wr, count, timestamp)
+_DIR_WR_CACHE_TTL = 300  # 5 min cache
+
+
+def _get_token_wr(token: str, direction: str) -> tuple:
+    """Return (win_rate_pct, trade_count) for a token+direction in last 7 days.
+    Caches for 5 min to avoid hammering PostgreSQL on every compaction cycle."""
+    import time
+    key = (token.upper(), direction.upper())
+    now = time.time()
+    if key in _dir_wr_cache:
+        cached_wr, cached_count, cached_at = _dir_wr_cache[key]
+        if now - cached_at < _DIR_WR_CACHE_TTL:
+            return cached_wr, cached_count
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
+                                 user='postgres', connect_timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins
+            FROM trades
+            WHERE token=%s AND direction=%s
+              AND status='closed'
+              AND close_time >= NOW() - INTERVAL '7 days'
+        """, (token.upper(), direction.upper()))
+        row = cur.fetchone()
+        cur.close(); conn.close()
+        total = row[0] or 0
+        wins = row[1] or 0
+        if total == 0:
+            wr = 50.0  # neutral — no history
+        elif total < 3:
+            wr = 50.0  # need 3 trades to judge
+        else:
+            wr = round((wins / total) * 100, 1)
+        _dir_wr_cache[key] = (wr, total, now)
+        return wr, total
+    except Exception:
+        return 50.0, 0  # neutral on error
 
 
 def _get_open_tokens() -> set:
@@ -69,51 +110,46 @@ def log(msg, level='INFO'):
 # a second source arrives for the same token+direction. The GROUP BY merges
 # multiple sources per token+direction into a single row.
 
-def get_regime_15m(coin):
-    """Get 15m regime from regime_15m.json (primary) or momentum_cache fallback.
-    Returns (regime_str, confidence_int).
+def get_regime_1m(coin):
+    """Get 1m regime from linear regression of last 50 1m candles.
+    Returns (regime_str, confidence_int 0-100).
+    Slope > 0 = LONG_BIAS, slope < 0 = SHORT_BIAS, else NEUTRAL.
+    R² determines confidence: higher R² = more certain trend.
     """
-    # Primary: read from JSON file written by regime scanner
-    REGIME_15M_FILE = '/var/www/hermes/data/regime_15m.json'
+    import statistics
     try:
-        with open(REGIME_15M_FILE) as f:
-            data = json.load(f)
-        if coin.upper() in data.get('regimes', {}):
-            reg = data['regimes'][coin.upper()]
-            return reg.get('regime', 'NEUTRAL'), reg.get('confidence', 0)
-    except Exception:
-        pass
-
-    # Fallback: query momentum_cache in PostgreSQL brain DB directly
-    try:
-        import psycopg2
-        from _secrets import BRAIN_DB_DICT
-        conn = psycopg2.connect(**BRAIN_DB_DICT)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT regime_15m, updated_at FROM momentum_cache
-            WHERE token = %s
-            ORDER BY updated_at DESC LIMIT 1
-        """, (coin.upper(),))
-        row = cur.fetchone()
-        cur.close()
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        rows = conn.execute(
+            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 50",
+            (coin.upper(),)
+        ).fetchall()
         conn.close()
-        if row and row[0]:
-            regime = row[0]
-            updated_at = row[1]
-            if updated_at:
-                now = datetime.now(timezone.utc)
-                if updated_at.tzinfo is None:
-                    updated_at = updated_at.replace(tzinfo=timezone.utc)
-                age_seconds = (now - updated_at).total_seconds()
-                confidence = 75 if age_seconds < 900 else 40  # fresh if < 15min
-            else:
-                confidence = 50
-            return regime, confidence
+        if len(rows) < 20:
+            return 'NEUTRAL', 0
+        closes = [r[0] for r in reversed(rows)]
+        n = len(closes)
+        mean_x = (n - 1) / 2.0
+        mean_y = statistics.mean(closes)
+        cov = sum((i - mean_x) * (closes[i] - mean_y) for i in range(n))
+        var_x = sum((i - mean_x) ** 2 for i in range(n))
+        if var_x == 0:
+            return 'NEUTRAL', 0
+        slope = cov / var_x
+        ss_tot = sum((y - mean_y) ** 2 for y in closes)
+        ss_res = sum(
+            (closes[i] - (mean_y + slope * (i - mean_x))) ** 2 for i in range(n)
+        )
+        r2 = max(0.0, 1.0 - (ss_res / ss_tot)) if ss_tot > 0 else 0.0
+        confidence = int(round(r2 * 100))
+        if slope > 0:
+            return 'LONG_BIAS', confidence
+        elif slope < 0:
+            return 'SHORT_BIAS', confidence
+        else:
+            return 'NEUTRAL', confidence
     except Exception:
-        pass
+        return 'NEUTRAL', 0
 
-    return 'NEUTRAL', 0
 
 # ── Signal source weights ────────────────────────────────────────────────────────
 # Source-specific multipliers applied during scoring.
@@ -124,6 +160,10 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('mtf_macd',  'hmacd-'):       1.5,   # MACD crossovers — strongest trend signal
     ('macd_short_1m', 'macd-accel-'): 2.00, # per-token tuned 1m MACD SHORT, ~65% WR avg
     ('macd_long_1m',  'macd-accel-'): 1.50, # per-token tuned 1m MACD LONG, ~52% WR avg
+    # macd_accel — fixed-params MACD(8,50,12) crossover + acceleration (hold=10)
+    # Backtest (3000 bars, 40 tokens): SHORT avg=+0.041%, LONG avg=-0.128%
+    ('macd_accel_short', 'macd-accel-'):  1.0,  # SHORT: modest edge, moderate weight
+    ('macd_accel_long',  'macd-accel+'):  0.8,  # LONG: negative avg, suppress
     ('momentum',  'momentum+'):    1.25,  # combined pct-hermes + accel LONG (77% hit rate)
     ('momentum',  'momentum-'):    1.25,  # combined pct-hermes + accel SHORT (77% hit rate)
     ('mtf_zscore','hzscore,pct-hermes,momentum'): 1.1,  # triple combo — slightly boosted
@@ -149,8 +189,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('support_resistance', 'rs-'):       0.7,
     ('rsi-confluence', 'rsi_confluence'):    0.5,   # WR=0% — suppress
     # gap300: EMA(300) vs SMA(300) gap widening on 1m — positive avg PnL in backtest
-    ('ema_sma_gap_300_long',  'gap-300+'):   1.0,  # gap widens bullish — strong momentum
-    ('ema_sma_gap_300_short', 'gap-300-'):  1.0,  # gap widens bearish — strong momentum
+    # FLIPPED 2026-04-28: gap-300+ now fires SHORT, gap-300- now fires LONG
+    ('ema_sma_gap_300_long',  'gap-300-'):   1.0,  # gap widens bullish — strong momentum
+    ('ema_sma_gap_300_short', 'gap-300+'):  1.0,  # gap widens bearish — strong momentum
     # phase_accel: wave phase acceleration signals
     ('phase_accel_long',  'phase-accel+'):  1.3,
     ('phase_accel_short', 'phase-accel-'):  1.3,
@@ -168,6 +209,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # ma_cross_5m: per-token tuned EMA(10)×EMA(200) crossover on 5m
     ('ma_cross_5m_long',  'ma-cross-5m+'):  1.0,
     ('ma_cross_5m_short', 'ma-cross-5m-'):  1.0,
+    # tl_break: diagonal trendline breakout on 5m — standalone directional signal
+    ('tl_break_long',  'tl_break_long'):   1.25,  # diagonal downtrend + upside break
+    ('tl_break_short', 'tl_break_short'):  1.25,  # diagonal uptrend + downside break
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -189,7 +233,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     score = confidence
             × survival_bonus   (1 + cr*0.15, only if cr>0 AND age_m<5)
             × staleness_mult  max(0, 1.0 - age_m*0.2)  → 0 at 5min
-            × reg_mult        (+15% aligned / -30% counter-regime)
+            × reg_mult        (+50% aligned / -50% counter-regime / -50% NEUTRAL or no-data)
             × source_mult     (from _get_source_weight)
             × speed_mult      (+15% if speed_percentile >= 80)
     """
@@ -206,15 +250,20 @@ def _score_signal(token, direction, conf, source, signal_type,
     # At age=1min → mult=0.8 (20% penalty still alive)
     staleness_mult = max(0.0, 1.0 - (age_m * 0.2))
 
-    # Regime multiplier: +15% aligned, -30% counter-regime
+    # Regime multiplier: +50% aligned, -50% counter-regime, -50% neutral
+    # No regime data at all → 0.5x floor
     reg_mult = 1.0
-    if regime != 'NEUTRAL' and regime_conf > 0:
+    if regime_conf > 0:
         if (regime == 'LONG_BIAS' and direction == 'LONG') or \
            (regime == 'SHORT_BIAS' and direction == 'SHORT'):
-            reg_mult = 1.15
+            reg_mult = 1.50
         elif (regime == 'LONG_BIAS' and direction == 'SHORT') or \
              (regime == 'SHORT_BIAS' and direction == 'LONG'):
-            reg_mult = 0.70
+            reg_mult = 0.50
+        elif regime == 'NEUTRAL':
+            reg_mult = 0.50
+    else:
+        reg_mult = 0.50
 
     # Source weight multiplier
     source_mult = _get_source_weight(signal_type, source)
@@ -265,7 +314,12 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
             opp_source_count += len(opp_parts)
 
         if opp_source_count > 0:
-            penalty = max(0.70, 1.0 - (opp_source_count * 0.15))  # -15% per opposing source, floor 70%
+            # FIX (2026-05-05): -30% per opposing source, floor 65%.
+            # Previous: floor 40% — death spiral with staleness decay kills signals in 2 cycles.
+            # With floor=65%: opp_parts=5 → max(0.65, -0.50) = 0.65 → base = 57.2 (conf=88).
+            # At staleness=0.6 → score=34. Survives 2+ cycles to build survival rounds.
+            # With opp_parts=1-2 (typical for good signals): 70-73% multiplier — meaningful but not fatal.
+            penalty = max(0.65, 1.0 - (opp_source_count * 0.30))
             log(f"  ⚠️  [OPP-PENALTY] {token} {direction}: {opp_source_count} opposing sources ({opp_direction}) → {penalty:.0%}")
             return penalty
         return 1.0
@@ -329,6 +383,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 MAX(z_score)      AS z_score,
                 MAX(compact_rounds) AS compact_rounds,
                 MAX(hot_cycle_count) AS hot_cycle_count,
+                MAX(signal_metadata) AS signal_metadata,
                 combo_key
             FROM signals
             WHERE decision = 'PENDING'
@@ -343,7 +398,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             LIMIT 150
         """)
         rows = c.fetchall()
-        log(f"Query: {len(rows)} token+direction pairs in 10-min window (conf>=60, not executed)")
+        log(f"Query: {len(rows)} combo_keys in 5-min window (conf>=60, not executed)")
 
         # ── Step 2: Pre-filter ─────────────────────────────────────────────────
         signals = []
@@ -366,28 +421,129 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
             # ── DIRECTIONAL CONFLICT DETECTION (2026-04-18) ──────────────────────
             # Parse directional suffix from each source component.
-            # '+' = LONG, '-' = SHORT. If both polarities present in the same
-            # merged source, the signals are fighting each other — skip entirely.
-            # e.g. 'pct-hermes-,hzscore+' → CONFLICT (SHORT vs LONG)
-            #      'hzscore+,pct-hermes+,vel-hermes+' → CLEAN (all LONG)
-            long_srcs  = [p for p in source_parts if p.endswith('+')]
-            short_srcs = [p for p in source_parts if p.endswith('-')]
+            # ONLY count sources that are genuinely directional (pct-hermes, vel-hermes,
+            # macd-accel, ma-cross, etc.). hzscore, oc-mtf-macd, oc-mtf-rsi, gap-300,
+            # phase-accel, fast-momentum, zscore-momentum are z-score or momentum
+            # normalizations — their +/- is NOT a direction vote, it's a regime tag.
+            # If both polarities of a GENUINELY DIRECTIONAL source are present,
+            # the signals are fighting each other — skip entirely.
+            # e.g. 'pct-hermes-,hzscore+,vel-hermes+' → CLEAN (hzscore is not directional)
+            #      'pct-hermes+,pct-hermes-' → CONFLICT (same source, opposite dirs)
+            #      'macd-accel+,macd-accel-' → CONFLICT
+            NON_DIRECTIONAL_PREFIXES = (
+                'hzscore', 'oc-mtf-macd', 'oc-mtf-rsi', 'gap-300',
+                'phase-accel', 'fast-momentum', 'zscore-momentum',
+            )
+            directional_parts = [
+                p for p in source_parts
+                if not any(p.startswith(prefix) for prefix in NON_DIRECTIONAL_PREFIXES)
+            ]
+            long_srcs  = [p for p in directional_parts if p.endswith('+')]
+            short_srcs = [p for p in directional_parts if p.endswith('-')]
             if long_srcs and short_srcs:
                 log(f"  ⚔️  [CONFLICT] {token} {direction}: LONG={{{','.join(long_srcs)}}} vs SHORT={{{','.join(short_srcs)}}}, skipping")
                 continue
 
-            # ── CONFLUENCE GATE: single-source signals must stay PENDING ───────────
-            # A signal needs 2+ sources firing together before it can hit hot-set.
-            # Single-source signals (e.g. 'oc-zscore-v9-', 'zscore-short') wait for
-            # a second source to confirm before being eligible for approval.
-            # EXCEPTION: breakout is single-source but bypasses the confluence gate
-            # since it writes directly to DB and hot-set (not via the normal pipeline).
-            if len(source_parts) < 2 and source != 'breakout':
-                log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction}: single-source {{{source}}} — waiting for 2nd source")
+            # ── CO-SIGNAL GATE (FIX 2026-05-06) ─────────────────────────────────────
+            # Audit: 742 trades, deduplicated by token-direction-week.
+            #
+            # LONG rules:
+            #   accel-300+ + ma-cross-5m+  → 16.7% WR  → BLOCK
+            #   accel-300+ + pct-hermes+    → 35.7% WR  → BLOCK  (catches knives)
+            #   accel-300+ + trend_purity+  → 62.5% WR  → PASS (no further restriction)
+            #   accel-300+ + hzscore-       → 36.7% WR  → PASS (no better combo available)
+            #
+            # SHORT rules:
+            #   hzscore+ + vel-hermes- WITHOUT pct-hermes- → 20% WR, −0.064% → BLOCK (poison)
+            #   hzscore+ + vel-hermes- WITH pct-hermes-     → 46.2% WR, +0.382% → PASS
+            #   hzscore+ + vel-hermes- + ma-cross-5m-       → 50% WR (2 trades) → but too sparse
+            #
+            # General SHORT poison (any direction):
+            #   ma-cross-5m+ → poison for LONG, don't add to LONG combos
+            #
+            # Implementation: check poison patterns first (block), then check
+            # required-co-signal patterns (require).
+            has_accel_plus  = 'accel-300+'  in source_parts
+            has_accel_minus = 'accel-300-' in source_parts
+            has_hz_pos     = 'hzscore+'     in source_parts
+            has_vel_neg    = 'vel-hermes-'  in source_parts
+            has_pct_neg    = 'pct-hermes-'  in source_parts
+            has_ma5m_pos   = 'ma-cross-5m+' in source_parts
+            has_trend_pos  = 'trend_purity+' in source_parts
+
+            # ── LONG poison blocks ──────────────────────────────────────────────
+            if direction.upper() == 'LONG':
+                if has_accel_plus and has_ma5m_pos:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: accel-300+ + ma-cross-5m+ blocked (16.7% WR)")
+                    continue
+                # accel-300+ + pct-hermes+ = 35.7% WR — catches knives
+                # But accel-300+ + pct-hermes+ + trend_purity+ = 62.5% WR (trend_purity+ overrides)
+                # Only block if pct-hermes+ is present WITHOUT trend_purity+
+                if has_accel_plus and 'pct-hermes+' in source_parts and not has_trend_pos:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: accel-300+ + pct-hermes+ blocked (35.7% WR, catches knives)")
+                    continue
+
+            # ── SHORT poison + required co-signal logic ──────────────────────────
+            if direction.upper() == 'SHORT':
+                # POISON: hzscore+ + vel-hermes- without pct-hermes- = 20% WR
+                if has_hz_pos and has_vel_neg and not has_pct_neg:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: hzscore++vel-hermes- without pct-hermes- blocked (20% WR, poison)")
+                    continue
+                # accel-300- barely fires; no special gate needed
+                if has_accel_minus and has_ma5m_pos:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: accel-300- + ma-cross-5m+ blocked (low WR)")
+                    continue
+
+            # ── CONFLUENCE: collapse same-type multi-level sources (e.g. rs-s386,rs-s406) ─
+            # Different bars_since values for the SAME signal type are NOT real confluence.
+            # They represent the same signal re-firing at different times — fake diversity.
+            # Normalize each part to its signal-type prefix, then count unique types.
+            def _signal_type_key(part: str) -> str:
+                # Strip numeric suffixes that represent bars_since / level / bar counts.
+                # These are the SAME signal at different timestamps — not distinct sources.
+                # Pattern: source tag followed only by digits (no trailing letters).
+                # rs-s386    → rs-s     (support/resistance level)
+                # rs-r1774   → rs-r     (resistance level)
+                # hhh-short4 → hhh-short (hh_hl breakout pullback)
+                # hhh-long5  → hhh-long  (hh_hl breakout breakout)
+                # ma-death14 → ma-death  (ma_cross death cross)
+                # ma-golden5 → ma-golden (ma_cross golden cross)
+                # pct-hermes+ → pct-hermes+ (keep directional suffix)
+                # macd-accel+ → macd-accel+  (keep directional suffix)
+                #
+                # Regex: prefix([a-z0-9_-]+) + optional_direction([+-]) + number(\d+)
+                # Stripping the number gives the canonical signal type.
+                m = re.match(r'^([a-z][a-z0-9_-]*)([+-]?)(\d+)$', part)
+                if m:
+                    prefix, suffix, _ = m.groups()
+                    return prefix + suffix  # e.g. 'hhh-short' or 'ma-death'
+                return part
+
+            unique_signal_types = len(set(_signal_type_key(p) for p in source_parts))
+            source_count = len(source_parts)
+
+            # ══ CONFLUENCE REQUIRED ══ — 2026-05-08
+            # Rule: 2+ unique signal types required. No exceptions, no good-standalone bypass.
+            # Single-source signals stay PENDING until a co-signal arrives.
+            # If no co-signal within 5 min → staleness=0 → EXPIRED.
+            # This is the ONLY valid path into the hot-set.
+            pass_gate = False
+            gate_msg = ''
+            if unique_signal_types >= 2:
+                pass_gate = True
+                gate_msg = f'{unique_signal_types} unique types'
+            else:
+                gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
+
+            # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
+            log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
+
+            if not pass_gate:
+                log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction}: {gate_msg}")
                 continue
 
             signals.append(row)
-            log(f"  ✅ [CONFLUENCE-GATE-PASS] {token} {direction}: {{{source}}} (conf={conf})")
+            log(f"  ✅ [CONFLUENCE-GATE-PASS] {token} {direction}: {{{source}}} ({gate_msg})")
 
         log(f"Pre-filter: {len(signals)} signals passed safety filters")
         if verbose and signals:
@@ -399,6 +555,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # NOTE: Do NOT return here — Step 12 merge logic must still run to preserve prev_hotset
 
         # ── Step 3: Load speed data ────────────────────────────────────────────
+        # speed_tracker.py writes to token_speeds DB every ~1 min.
+        # signal_compactor reads from there (DB fallback below) — speed_cache.json
+        # is optional and deprecated; no warning if missing.
         speed_cache = {}
         if os.path.exists(SPEED_CACHE_FILE):
             try:
@@ -406,9 +565,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     speed_cache = json.load(f)
                 log(f"Speed cache: {len(speed_cache)} tokens")
             except Exception as e:
-                log(f"Speed cache load failed: {e} — using defaults", 'WARN')
-        else:
-            log(f"Speed cache not found at {SPEED_CACHE_FILE} — using defaults", 'WARN')
+                log(f"Speed cache load failed: {e} — using DB fallback", 'WARN')
 
         # Fallback: load from token_speeds DB table for any missing tokens
         try:
@@ -469,8 +626,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             except Exception:
                 age_m = 999
 
-            regime, regime_conf = get_regime_15m(token)
+            regime, regime_conf = get_regime_1m(token)
             speed_data = speed_cache.get(token.upper(), {})
+            source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+            # ── accel-300 required (2026-05-12) ──────────────────────────────────────
+            has_accel = any(p.startswith('accel-300') for p in source_parts)
+            if not has_accel:
+                if verbose:
+                    log(f"  SKIP {token} {direction}: no accel-300 signal")
+                continue
+            # ── Trend purity bonus: major confidence boost when present ──────────
+            has_trend_purity = ('trend_purity+' in source_parts or 'trend_purity-' in source_parts)
+            tp_bonus_mult = 1.50 if has_trend_purity else 1.0
             base_score = _score_signal(
                 token=token,
                 direction=direction.upper(),
@@ -523,9 +690,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'regime_conf': regime_conf,
                 'speed_data': speed_data,
                 'combo_key': combo_key,
+                'tp_bonus_mult': tp_bonus_mult,   # 1.5 if trend_purity present, else 1.0
             })
 
         # ── Step 7: Rank and select top 10 ──────────────────────────────────────
+        # Apply trend_purity bonus multiplier to score for ranking purposes.
+        for s in scored:
+            s['score'] = s['score'] * s.get('tp_bonus_mult', 1.0)
         scored.sort(key=lambda x: x['score'], reverse=True)
         top_signals = scored[:10]
 
@@ -595,17 +766,20 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             else:
                 rounds = 1  # New combo
 
-            # Staleness: max(0, 1 - age_m * 0.2) where age_m is from combo's own created_at
-            # age_m was computed from this row's created_at (grouped by combo_key)
-            staleness = max(0.0, 1.0 - (s['age_m'] * 0.2))
-
-            # entry_origin_ts: carry forward from previous hot-set if found,
-            # otherwise set to now (new combo first entering)
+            # Staleness: max(0, 1 - age_min * 0.2) where age_min is from entry_origin_ts.
+            # For new combos entering hot-set: entry_origin_ts = now → staleness = 1.0 (fresh).
+            # For preserved combos re-entering: entry_origin_ts carries forward from when
+            # the combo first entered hot-set — preserving continuous staleness timeline.
+            # This means a combo that survived 3 cycles has staleness computed from its
+            # original entry, not from when it most recently fired. Age from DB created_at
+            # is only used for score weighting in _score_signal (age_m parameter).
             if prev_entry:
                 prev_origin_ts = prev_entry.get('entry_origin_ts')
                 entry_origin_ts = prev_origin_ts if prev_origin_ts else time.time()
             else:
                 entry_origin_ts = time.time()
+            age_from_entry = (time.time() - entry_origin_ts) / 60.0
+            staleness = max(0.0, 1.0 - (age_from_entry * 0.2))
 
             hotset_entries.append({
                 'token': token,
@@ -630,7 +804,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'momentum_score': spd.get('momentum_score', 50.0),
                 'speed_percentile': spd.get('speed_percentile', 50.0),
                 'score': s['score'],
+                'tp_bonus_mult': s.get('tp_bonus_mult', 1.0),  # 1.5 if trend_purity present
                 'entry_origin_ts': entry_origin_ts,  # carried forward if combo existed, else now
+                # JSONB catch-all: all signal indicator values at entry time (future-proof)
+                'signal_metadata': row[11] if len(row) > 11 else None,
             })
 
         # ── Step 10: Build reason strings ───────────────────────────────────────
@@ -669,13 +846,50 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if is_delisted(tkn):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted")
                 continue
-            # Check if ANY comma-separated component of src is blacklisted
-            # e.g. 'hmacd++,hzscore-' should block on 'hmacd++' even though
-            # the whole string isn't in the blacklist
-            source_parts = [p.strip() for p in src.split(',')]
-            if any(p in SIGNAL_SOURCE_BLACKLIST for p in source_parts):
-                log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source component in '{src}' is blacklisted")
+            # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
+            # Uses validate_source() for correct handling:
+            # 1. Exact match: whole source in blacklist → block
+            # 2. 3+ signals: if blacklist combo is subset → ALLOW
+            # 3. vel-hermes+ blocked via sentinel suffix-agnostic match
+            from signal_schema import validate_source
+            src = src.strip() if src else ''
+            if validate_source(src) == 'unknown':
+                log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src}' in blacklist")
                 continue
+            source_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
+            # accel-300 required for all entries (2026-05-12)
+            # accel-300 is the primary directional trigger. Every LONG needs accel-300+,
+            # every SHORT needs accel-300- as the primary directional confirmation.
+            has_accel = any(p.startswith('accel-300') for p in source_parts)
+            if not has_accel:
+                log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — requires accel-300+ or accel-300- (has: {src})")
+                continue
+            # ── Trend purity bonus: major confidence boost when present ─────────────
+            # trend_purity is no longer a hard requirement — it's a scoring bonus.
+            # Signals with trend_purity+ (LONG) or trend_purity- (SHORT) get +50% source weight.
+            # This rewards trend-confirmed entries without blocking trend-agnostic ones.
+            has_trend_purity = ('trend_purity+' in source_parts or 'trend_purity-' in source_parts)
+            tp_bonus_mult = 1.50 if has_trend_purity else 1.0
+            # ── OC Signal Block (2026-04-29) ─────────────────────────────────────────
+            # oc_pending/oc_rsi signals are generated by OpenClaw's external system
+            # and should NOT drive Hermes trades on their own.
+            # HOWEVER: they CAN contribute to confluence (the 2+ source requirement).
+            # If this combo has at least one real (non-OC) source, let it through —
+            # the OC contribution is valid confluence even if the final direction
+            # is ultimately driven by real indicators (pct-hermes, macd-accel, etc.).
+            # Only block if the combo is PURELY OC-driven (no real source overlap).
+            sig_type = entry.get('signal_type', '')
+            if sig_type in ('oc_pending', 'oc_rsi'):
+                # Check if any source component is a real (non-OC) signal
+                oc_only = True
+                for p in source_parts:
+                    if not p.startswith('oc_'):
+                        oc_only = False
+                        break
+                if oc_only:
+                    log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — OC-only combo (no real source confluence)")
+                    continue
+                # Else: has real confluence — let it through
             # Skip tokens that already have an open position — prevents ghost
             # APPROVED signals that block all future real trades for this token
             if tkn.lower() in open_tokens:
@@ -693,6 +907,29 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     continue
             except Exception:
                 pass  # non-fatal — helper may not be available in all environments
+            # ── Per-coin WR filter (2026-05-11) ─────────────────────────────────
+            # Block tokens with <50% WR and ≥3 trades — prevents signal_compactor
+            # from building hot-set entries for tokens that decider_run would
+            # block anyway. Stops the feedback loop of selecting losers.
+            wr, wr_count = _get_token_wr(tkn, direction)
+            if wr < 50 and wr_count >= 3:
+                log(f"  🚫 [HOTSET-FILTER] {tkn}: {direction} blocked — WR={wr:.0f}% ({wr_count} trades)")
+                continue
+            # CRITICAL DEBUG: log every entry entering hotset_final — catch single-source bypass
+            src_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
+            # ── FINAL CONFLUENCE GUARD (2026-05-12) ─────────────────────────────────
+            # This is the last line of defense: even if a single-source entry somehow
+            # passed _filter_safe_prev_hotset (preservation path) or the DB query path,
+            # it is HARD-BLOCKED here before entering hotset_final.
+            # BUG FIX: MERL/ME/BRETT executed single-source (accel-300+) at 16:49 on May 12.
+            # The confluence gate at Step 2 (line 537) and _filter_safe_prev_hotset both
+            # have the correct logic, but a race condition or DB state edge case allowed
+            # single-source entries to slip through into hotset_final. This guard
+            # catches that edge case permanently.
+            if len(src_parts) < 2:
+                log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (this should never happen — investigate confluence gate or preservation path)")
+                continue
+            log(f"  ➡️  [HOTSET-FINAL-ADD] {tkn}:{direction} src='{src}' parts={src_parts} parts_count={len(src_parts)} conf={entry.get('confidence')} score={entry.get('score',0):.2f}")
             hotset_final.append(entry)
 
         # ── Step 12: Preserve previous hotset entries that didn't make it from DB ──
@@ -709,13 +946,30 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # add it; if DB entry exists, keep the one with higher score
             for pe in preserved:
                 key = f"{pe['token']}:{pe['direction']}"
-                # Look up 15m regime for preserved entries (DB entries already have it from scored dict)
-                regime, regime_conf = get_regime_15m(pe['token'])
-                pe['regime'] = regime
-                pe['regime_conf'] = regime_conf
                 existing = db_by_key.get(key)
+                # ── FINAL CONFLUENCE GUARD for preserved entries (2026-05-12) ─────────
+                # Preserved entries passed _filter_safe_prev_hotset which has a confluence
+                # check. But when they merge with DB entries (existing), the merged entry
+                # could theoretically become single-source if the DB entry has a conflicting
+                # single source. This guard ensures the merged entry still has 2+ sources.
+                pe_src = pe.get('source', '')
+                pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
+                if len(pe_parts) < 2:
+                    log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
+                    continue
                 if existing is None:
+                    # CRITICAL DEBUG: preserved entry enters hotset (no DB entry competition)
+                    log(f"  🔄 [PRESERVE-ADD] {pe['token']}:{pe['direction']} src='{pe_src}' parts={pe_parts} parts_count={len(pe_parts)} score={pe.get('score',0):.2f} (preserved, no DB entry)")
                     db_by_key[key] = pe  # no DB entry — take preserved
+                elif existing.get('score', 0) <= 0 and pe.get('score', 0) <= 0:
+                    # FIX (2026-05-05): Both expired (score=0). Keep the one with lower age_m
+                    # (newer entry has better chance of being genuinely expired vs. a stale
+                    # entry from a prior compaction run that missed expiry). If pe is newer
+                    # (lower age_m), replace. If existing is newer, keep it.
+                    existing_age = existing.get('age_m', 999)
+                    pe_age = pe.get('age_m', 999)
+                    if pe_age < existing_age:
+                        db_by_key[key] = pe
                 elif existing.get('score', 0) < pe.get('score', 0):
                     db_by_key[key] = pe  # preserved has higher score — use it
                 # else: keep DB entry (higher score)
@@ -738,13 +992,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             conn = sqlite3.connect(RUNTIME_DB, timeout=30)
             c = conn.cursor()
 
+            # ── Step 12b: Proactively expire signals with newly-blacklisted sources ─
+            # FIX (2026-05-05): When hermes_constants.SIGNAL_SOURCE_BLACKLIST is updated,
+            # existing PENDING/APPROVED signals from before the blacklist change are never
+            # purged — validate_source() only fires on NEW writes. This catches any stale
+            # entries that survived from before the blacklist update and expire them.
+            from signal_schema import validate_source
+            cur = c.execute("SELECT id, source FROM signals WHERE decision IN ('PENDING','APPROVED') AND executed=0")
+            expired_ids = []
+            for row_id, src in cur.fetchall():
+                if validate_source(src or '') == 'unknown':
+                    c.execute("""
+                        UPDATE signals
+                        SET decision='EXPIRED', expired_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP
+                        WHERE id=? AND decision IN ('PENDING','APPROVED') AND executed=0
+                    """, (row_id,))
+                    expired_ids.append(row_id)
+            if expired_ids:
+                log(f"EXPIRED {len(expired_ids)} signals whose sources were blacklisted since entry (enforcement gap fix)")
+
             top10_keys = {f"{e['token']}:{e['direction']}" for e in hotset_final}
             top10_combos = {e.get('combo_key') for e in hotset_final if e.get('combo_key')}
 
             # ── Process PENDING/WAIT candidates ───────────────────────────────────
             c.execute("""
                 SELECT id, token, direction, COALESCE(compact_rounds, 0) AS cr,
-                       combo_key, created_at
+                       combo_key, created_at, source
                 FROM signals
                 WHERE decision IN ('PENDING', 'WAIT')
                   AND executed = 0
@@ -761,10 +1034,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             expired_ids = []      # PENDING→EXPIRED (staleness=0)
             still_pending_ids = [] # PENDING stays PENDING (not yet expired)
 
-            for sid, tok, d, cr, ck, sig_created_at in all_sig_rows:
+            for sid, tok, d, cr, ck, sig_created_at, source in all_sig_rows:
                 key = f"{tok.upper()}:{d.upper()}"
                 if key in top10_keys:
-                    # Combo entered top-10 → APPROVED
+                    # ── CONFLUENCE CHECK (2026-05-12) ─────────────────────────────────
+                    # A PENDING row entering top-10 must have 2+ unique signal sources.
+                    # The DB pre-filter already gates new signals, but this loop processes
+                    # ALL PENDING rows in the 60-min window — including single-source rows
+                    # from add_signal() merges that lost a source. Skip any combo with
+                    # only 1 source, regardless of its score or top-10 standing.
+                    src_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+                    if len(src_parts) < 2:
+                        log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
+                        continue
+                    # Combo entered top-10 → APPROVED immediately.
+                    # No age gate — if it's in top-10 it's signal-worthy.
+                    # If it stops firing, staleness=0 will expire it within 5 min.
                     prev_combo = prev_hotset_by_combo.get(ck) if ck else None
                     if prev_combo:
                         new_sr = prev_combo.get('rounds', 0) + 1
@@ -790,11 +1075,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # just entered the merge window and should stay PENDING.
                     created_ts = time.mktime(time.strptime(sig_created_at, '%Y-%m-%d %H:%M:%S'))
                     age_m = (time.time() - created_ts) / 60.0
+                    # Staleness = 5 min. Signals must find confluence (enter top-10) within
+                    # 5 min or they expire. Same timer as hot-set expiry — stale signals
+                    # no longer useful.
                     if age_m < 5.0:
-                        # Signal is fresh (<5 min) but not in top-10 → stay PENDING
                         still_pending_ids.append(sid)
                     else:
-                        # age_m >= 5: no firing for 5 min → EXPIRED (new model)
+                        # age_m >= 5: no new firing for 5 min → EXPIRED
                         c.execute("""
                             UPDATE signals
                             SET decision = 'EXPIRED',
@@ -828,14 +1115,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     log(f"Refreshed {refreshed} APPROVED signals still in hot-set")
 
             # APPROVED signals that left top-10 and are stale: EXPIRED
-            # FIX (2026-04-26): An APPROVED combo_key that's temporarily absent from
-            # PENDING (no signals this cycle) should NOT be expired immediately.
-            # Only expire if there are no PENDING signals for this combo AND the most
-            # recent PENDING signal for this combo is older than 5 minutes. This matches
-            # the staleness=0 boundary from the compactor's perspective.
-            # FIX (2026-04-27): Also exclude signals approved THIS cycle (approved_ids).
-            # They were just moved PENDING→APPROVED, so they're not in the PENDING subquery
-            # yet. Without this exclusion they'd be expired immediately after approval.
+            # FIX (2026-05-12): Two bugs caused APPROVED signals to hang indefinitely:
+            # 1. combo_key IS NULL signals were never expired (gate required combo_key IS NOT NULL)
+            # 2. hot_cycle_count >= 2 gate meant hcc=0 or hcc=1 signals survived an extra cycle
+            # NEW BEHAVIOR: Any APPROVED signal not refreshed in top-10 within 5 min expires.
+            # This matches the 5-min staleness boundary used for PENDING signals.
             if approved_ids:
                 c.execute(f"""
                     UPDATE signals
@@ -844,15 +1128,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         updated_at = CURRENT_TIMESTAMP
                     WHERE decision = 'APPROVED'
                       AND executed = 0
-                      AND hot_cycle_count >= 2
-                      AND combo_key IS NOT NULL
                       AND id NOT IN ({','.join(['?' for _ in approved_ids])})
-                      AND combo_key NOT IN (
-                          SELECT combo_key FROM signals
-                          WHERE decision = 'PENDING'
-                            AND executed = 0
-                            AND combo_key IS NOT NULL
-                            AND created_at > datetime('now', '-5 minutes')
+                      AND (
+                          -- Has combo_key but it's not in current hot-set
+                          (combo_key IS NOT NULL AND combo_key NOT IN (
+                              SELECT combo_key FROM signals
+                              WHERE decision = 'PENDING'
+                                AND executed = 0
+                                AND combo_key IS NOT NULL
+                                AND created_at > datetime('now', '-5 minutes')
+                          ))
+                          -- No combo_key (null signals never expire — FIX: now they do)
+                          OR (combo_key IS NULL)
                       )
                 """, approved_ids)
             else:
@@ -863,14 +1150,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         updated_at = CURRENT_TIMESTAMP
                     WHERE decision = 'APPROVED'
                       AND executed = 0
-                      AND hot_cycle_count >= 2
-                      AND combo_key IS NOT NULL
-                      AND combo_key NOT IN (
-                          SELECT combo_key FROM signals
-                          WHERE decision = 'PENDING'
-                            AND executed = 0
-                            AND combo_key IS NOT NULL
-                            AND created_at > datetime('now', '-5 minutes')
+                      AND (
+                          (combo_key IS NOT NULL AND combo_key NOT IN (
+                              SELECT combo_key FROM signals
+                              WHERE decision = 'PENDING'
+                                AND executed = 0
+                              AND combo_key IS NOT NULL
+                              AND created_at > datetime('now', '-5 minutes')
+                          ))
+                          OR (combo_key IS NULL)
                       )
                 """)
             left_and_stale = c.rowcount
@@ -898,6 +1186,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Count raw source entries (comma-separated, e.g. 'hwave+,hzscore-,hzscore+' → 3)
             parts = [p.strip() for p in (src or '').split(',') if p.strip()]
             entries_count = len(parts) if parts else 1
+
+            # CRITICAL SAFETY GATE: last-resort block of single-source entries
+            # If a single-source entry somehow got past the confluence gate above,
+            # this is the final catch before it reaches decider_run.
+            if entries_count < 2:
+                log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — single-source src='{src}' parts_count={entries_count} (LAST RESORT BLOCK)")
+                continue
+
+            log(f"  💾 [HOTSET-WRITE] {e['token']}:{e.get('direction')} src='{src}' parts={parts} entries_count={entries_count} score={e.get('score',0):.2f}")
+
             hotset_output.append({
                 'token': e['token'],
                 'direction': e['direction'],
@@ -911,6 +1209,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'staleness': e.get('staleness', 1.0),   # NEW: staleness (1.0=fresh, 0.0=dead)
                 'compact_rounds': e.get('compact_rounds', 0),  # PENDING failure count
                 'final_score': e.get('score', 0.0),
+                'tp_bonus_mult': e.get('tp_bonus_mult', 1.0),   # 1.5 if trend_purity present
                 'survival_score': e.get('survival_score', 0.0),  # backward compat
                 'survival_round': e.get('survival_round', 1),    # backward compat (= rounds)
                 'entry_origin_ts': e.get('entry_origin_ts', e.get('timestamp', time.time())),  # staleness tracking
@@ -1027,6 +1326,11 @@ def _filter_safe_prev_hotset(prev_hotset):
     for entry in prev_hotset.values():
         tok = entry.get('token', '')
         direction = entry.get('direction', '').upper()
+        src = entry.get('source', '')
+
+        # CRITICAL DEBUG: log ALL preserved entries and their filter outcomes
+        sp_debug = [p.strip() for p in (src or '').split(',') if p.strip()]
+        debug_msg = f"  🔍 [PRESERVE-CHECK] {tok}:{direction} src='{src}' parts={sp_debug} count={len(sp_debug)}"
 
         # Cooldown check: skip tokens in loss cooldown (guardian loss cooldown only)
         # Do NOT use get_cooldown() here — it checks ALL PostgreSQL cooldowns,
@@ -1043,17 +1347,37 @@ def _filter_safe_prev_hotset(prev_hotset):
             continue
         if is_delisted(tok):
             continue
-        source_parts = [p.strip() for p in src.split(',')]
-        if any(p in SIGNAL_SOURCE_BLACKLIST for p in source_parts):
+        # Skip tokens with open positions — don't preserve entries for tokens already traded
+        live_open = _get_open_tokens()
+        if tok.lower() in live_open:
             continue
+        src_str = src.strip() if src else ''
+        # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
+        from signal_schema import validate_source
+        if validate_source(src_str) == 'unknown':
+            continue
+        sp = [p.strip() for p in src_str.split(',') if p.strip()]
+        # ── accel-300 required for all entries (2026-05-12) ──────────────────────
+        # Every LONG needs accel-300+, every SHORT needs accel-300-.
+        has_accel = any(p.startswith('accel-300') for p in sp)
+        if not has_accel:
+            continue  # skip without accel-300
+        # ── Trend purity: bonus multiplier (not hard requirement) ─────────────
+        # Signals with trend_purity get +50% final score.
+        has_trend_purity = ('trend_purity+' in sp or 'trend_purity-' in sp)
+        tp_bonus = 1.50 if has_trend_purity else 1.0
+        entry['tp_bonus_mult'] = tp_bonus
         # breakout is single-source but exempt from confluence requirement
         # (it writes to DB directly and bypasses the normal pipeline)
+        source_parts = [p.strip() for p in src_str.split(',') if p.strip()]
         if src == 'breakout':
             pass  # exempt, allow through
         elif len(source_parts) < 2:
             continue  # requires 2+ sources for confluence
-        if src and src.split(',')[0] == 'hzscore' and ',' not in src:
-            continue
+        # NOTE: The old hzscore-only filter (first-source='hzscore' + no comma) was
+        # removed — it was redundant with the confluence gate above. If a preserved
+        # entry has 2+ sources it passed the gate legitimately. If it has 1 source
+        # it's already filtered by the < 2 check above.
         # Back-fill final_confidence for entries from older compaction runs
         if 'final_confidence' not in entry:
             entry['final_confidence'] = entry.get('confidence', 50)
@@ -1072,15 +1396,24 @@ def _filter_safe_prev_hotset(prev_hotset):
         entry['timestamp'] = current_ts
         age_min = (current_ts - entry_origin_ts) / 60.0
         entry['staleness'] = max(0.0, 1.0 - age_min * 0.2)
-        # Expire entries with staleness <= 0.01 (5+ minutes old from entry_origin_ts)
+# Expire entries with staleness <= 0.01 (5+ minutes old from entry_origin_ts)
         if entry['staleness'] <= 0.01:
+            continue
+        # ── Per-coin WR filter (2026-05-11) ─────────────────────────────────
+        # Same WR check as run_compaction hotset_final loop — apply to
+        # preserved entries too, so blocked tokens don't sneak back in.
+        wr, wr_count = _get_token_wr(tok, direction)
+        if wr < 50 and wr_count >= 3:
             continue
         # NOTE: rounds and compact_rounds are NOT decremented here.
         # Rounds only increment when the combo fires again in a new cycle.
         # compact_rounds is irrelevant for hot-set exit — staleness is the only timer.
         filtered.append(entry)
+        log(f"  ✅ [PRESERVE-PASS] {tok}:{direction} src='{src}' parts={sp_debug} count={len(sp_debug)} passed all filters -> preserved")
     if filtered:
         log(f"Preserving {len(filtered)} tokens from previous hotset")
+    else:
+        log(f"  ℹ️  [PRESERVE-EMPTY] 0 tokens preserved from previous hotset")
     return filtered
 
 
@@ -1095,7 +1428,15 @@ def _preserve_previous_hotset(dry=False):
                     # Back-fill final_confidence for entries from older compaction runs
                     if 'final_confidence' not in s:
                         s['final_confidence'] = s.get('confidence', 50)
-                        print(f"DEBUG: Patched {s['token']} final_confidence={s['final_confidence']}")
+                    # Recompute staleness from entry_origin_ts so stale values from disk
+                    # don't persist across compaction cycles. Without this, staleness read
+                    # from file is carried forward until _filter_safe_prev_hotset corrects
+                    # it in-memory — but the corrected value never persists to file until
+                    # the next compaction write.
+                    origin = s.get('entry_origin_ts')
+                    if origin:
+                        age_m = (time.time() - origin) / 60.0
+                        s['staleness'] = max(0.0, 1.0 - age_m * 0.2)
                     prev_hotset[f"{s['token']}:{s['direction']}"] = s
         except Exception as e:
             pass
@@ -1117,7 +1458,12 @@ def _preserve_previous_hotset(dry=False):
         parts = [p.strip() for p in (src or '').split(',') if p.strip()]
         entries_count = len(parts) if parts else 1
         entry = dict(e, timestamp=time.time())
-        entry['entries_count'] = e.get('entries_count', entries_count)
+        # FIX (2026-05-12): Always recalculate entries_count from the current source string.
+        # Previously used e.get('entries_count', entries_count) which preserved a stale
+        # entries_count from a previous cycle when source had more components.
+        # This caused single-source signals to slip through the confluence filter
+        # (len(source_parts) < 2) because their stale entries_count claimed 2 sources.
+        entry['entries_count'] = entries_count
         hotset_output.append(entry)
 
     if not dry:

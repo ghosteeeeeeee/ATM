@@ -14,6 +14,7 @@ FIXED v2 (2026-04-02):
   - Added momentum_state accuracy bias to prompt
   - Added HL bid-ask spread from orderbook
   - Proper candle-aggregated close prices for all technical indicators
+from paths import *
 """
 import sqlite3, json, time, os, sys, subprocess, statistics, argparse
 from collections import defaultdict

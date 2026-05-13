@@ -197,7 +197,7 @@ import json  # for json.dumps in penalty recording
 # ── Loss cooldown ─────────────────────────────────────────────────────────────
 # Imported from paths.py (SINGLE SOURCE). Previous inline definitions were
 # duplicated across hl-sync-guardian.py, position_manager.py, and cascade_flip.py.
-from paths import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
+from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
 
 def _load_cooldowns() -> dict:
     try:
@@ -350,6 +350,59 @@ def _clear_reconciled_token(token):
     if token.upper() in state:
         del state[token.upper()]
         _save_reconciled_state(state)
+
+# ── Guardian Closing Markers (race-condition fix) ─────────────────────────────
+# When guardian initiates a close for a token (orphan recovery or HL→paper close),
+# it writes a marker here BEFORE calling market_close. This allows signal_compactor/
+# decider_run to skip executing new trades for that token while the close is in-flight.
+#
+# Key race: guardian sees HL position with no DB record → closes it. But a concurrent
+# signal_compactor cycle has already approved a new signal for the same token and
+# decider_run is about to execute it. The marker tells decider_run "this token is being
+# closed by guardian — skip execution".
+#
+# File format: {tokens: {"ZK": {"started": "2026-05-04 21:34:12", "trade_id": 123}}}
+_GUARDIAN_CLOSING_FILE = os.path.join(DATA_DIR, 'guardian-closing-markers.json')
+
+def _save_closing_marker(token: str, trade_id=None):
+    """Mark a token as being closed by guardian (before market_close is called)."""
+    try:
+        markers = _load_closing_markers()
+        markers[token.upper()] = {
+            'started': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'trade_id': trade_id,
+            'pid': os.getpid()
+        }
+        with FileLock('guardian_closing'):
+            with open(_GUARDIAN_CLOSING_FILE, 'w') as f:
+                json.dump({'tokens': markers, 'saved_at': time.strftime('%Y-%m-%d %H:%M:%S')}, f, indent=2)
+    except Exception as e:
+        log(f'  [_save_closing_marker] FAILED for {token}: {e}', 'WARN')
+
+def _clear_closing_marker(token: str):
+    """Clear the closing marker after guardian close completes (success or exhausted)."""
+    try:
+        markers = _load_closing_markers()
+        if token.upper() in markers:
+            del markers[token.upper()]
+            with FileLock('guardian_closing'):
+                with open(_GUARDIAN_CLOSING_FILE, 'w') as f:
+                    json.dump({'tokens': markers, 'saved_at': time.strftime('%Y-%m-%d %H:%M:%S')}, f, indent=2)
+    except Exception as e:
+        log(f'  [_clear_closing_marker] FAILED for {token}: {e}', 'WARN')
+
+def _load_closing_markers() -> dict:
+    """Load the current closing markers dict."""
+    try:
+        with open(_GUARDIAN_CLOSING_FILE) as f:
+            data = json.load(f)
+        return data.get('tokens', {})
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def _is_closing_marker_active(token: str) -> bool:
+    """Check if guardian is currently closing this token."""
+    return token.upper() in _load_closing_markers()
 
 # ── Pending orphan close retry state ─────────────────────────────────────────
 # When market_close fails (rate-limited), we record the token here so the next
@@ -717,13 +770,17 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
 
 def close_position_hl(coin: str, reason: str) -> bool:
     """Close a position on HL. Returns True on success."""
+    log(f'  → close_position_hl({coin}, reason={reason}) — initiating HL market close')
     if DRY:
-        log(f'  [DRY] Would close {coin} ({reason})', 'WARN')
+        log(f'  [DRY] Would close {coin} ({reason})')
         return True
 
     try:
+        log(f'  → get_exchange() for {coin}')
         exchange = get_exchange()
+        log(f'  → exchange.market_close(coin={coin}, slippage={CLOSE_SLIPPAGE})')
         result = exchange.market_close(coin=coin, slippage=CLOSE_SLIPPAGE)
+        log(f'  ← market_close returned: {type(result).__name__} = {str(result)[:300]}')
 
         # Defensive: handle None, non-dict, or unexpected result structures
         if result is None:
@@ -1091,7 +1148,8 @@ def reconcile_hype_to_paper(hl_pos, prices):
 
                 # ORPHAN GUARD (2026-04-16): Guardian must NOT create paper trades for orphan
                 # HL positions — only decider-run can open new trades. Log and skip.
-                log(f'  ⛔ {coin} HL position has no DB record — guardian cannot create trades (skip)', 'WARN')
+                log(f'  ⛔ ORPHAN DETECTED: {coin} HL position has no DB record — guardian CANNOT create trades (skipping). Position LEFT OPEN on HL!', 'FAIL')
+                log(f'  ⛔ ORPHAN DETECTED: {coin} — this means brain.py INSERT failed and HL position was left dangling!', 'FAIL')
                 continue
 
                 # ── Orphan detected checkpoint ─────────────────────────────────────
@@ -2525,7 +2583,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
     """
     if DRY:
         log(f'  [DRY] Would _close_orphan_paper_trade_by_id #{trade_id} ({reason})', 'WARN')
-        return
+        return True  # DRY mode: treat as success (no marker to leak)
 
     from hyperliquid_exchange import get_trade_history
     import time as _time
@@ -2537,7 +2595,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
 
     if hl_exit_px == 0.0:
         log(f'  No HL fill for {token} trade #{trade_id}, will retry next cycle', 'WARN')
-        return
+        return False  # FAILED: marker must stay so decider_run keeps blocking
 
     # Look up amount_usdt and leverage from DB (don't use hardcoded 20.0)
     conn_lookup = get_db_connection()
@@ -2579,7 +2637,9 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
 
     conn = get_db_connection()
     if conn is None:
-        return
+        return False  # FAILED: DB unavailable, keep marker
+
+    close_success = False
     try:
         cur = conn.cursor()
         cur.execute("""
@@ -2598,14 +2658,14 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         if cur.rowcount == 0:
             log(f'  Dedup: orphan trade #{trade_id} ({token}) already closed, skipping', 'WARN')
             conn.rollback()
+            close_success = True  # Already closed is OK — not a failure
         else:
             conn.commit()
             log(f'  Closed orphan trade #{trade_id}: {token} {direction} exit={hl_exit_px:.6f} '
                 f'pnl={computed_pnl_pct:+.4f}% {"WIN" if is_win else "LOSS"}', 'PASS')
-            # BUG-43 fix: _record_trade_outcome only on actual close (not dedup)
-            # _record_trade_outcome internally calls _record_loss_cooldown, so do it here
             if not is_win:
                 _record_loss_cooldown(token, direction)
+            close_success = True
         cur.close()
         conn.close()
 
@@ -2616,10 +2676,13 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         except:
             pass
         log(f'  _close_orphan_paper_trade_by_id error: {e}', 'FAIL')
+        return False  # FAILED: exception, keep marker
+
     # FIX (2026-04-01): Clear reconciled state when position is closed on HL.
     # This allows the token to be re-reconciled if a new position opens.
     # BUG-15 fix: move inside try block so it's actually called (was after return).
     _clear_reconciled_token(token)
+    return close_success  # True = close recorded, marker can be cleared
 
 
 def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
@@ -2974,17 +3037,17 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             if direction == 'LONG':
                 if curr <= sl_price:
                     triggered = True
-                    trigger_reason = f"SL triggered (px={curr} <= sl={sl_price})"
+                    trigger_reason = f"guardian_sl (px={curr} <= sl={sl_price})"
                 elif curr >= tp_price:
                     triggered = True
-                    trigger_reason = f"TP triggered (px={curr} >= tp={tp_price})"
+                    trigger_reason = f"guardian_tp (px={curr} >= tp={tp_price})"
             else:
                 if curr >= sl_price:
                     triggered = True
-                    trigger_reason = f"SL triggered (px={curr} >= sl={sl_price})"
+                    trigger_reason = f"guardian_sl (px={curr} >= sl={sl_price})"
                 elif curr <= tp_price:
                     triggered = True
-                    trigger_reason = f"TP triggered (px={curr} <= tp={tp_price})"
+                    trigger_reason = f"guardian_tp (px={curr} <= tp={tp_price})"
 
             if not triggered:
                 continue
@@ -3043,7 +3106,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                                 hype_realized_pnl_usdt=%s
                             WHERE id=%s
                         """, (
-                            trigger_reason.split('(')[0].strip(),  # e.g. "TP triggered"
+                            trigger_reason.split('(')[0].strip(),  # e.g. "guardian_sl" or "guardian_tp"
                             trigger_reason.split('(')[0].strip(),
                             hl_exit_px,
                             computed_pnl_pct,
@@ -3102,17 +3165,17 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
         if direction == 'LONG':
             if sl > 0 and curr <= sl:
                 breached = True
-                breach_reason = 'breach_SL'
+                breach_reason = 'guardian_sl'
             elif tp > 0 and curr >= tp:
                 breached = True
-                breach_reason = 'breach_TP'
+                breach_reason = 'guardian_tp'
         else:  # SHORT
             if sl > 0 and curr >= sl:
                 breached = True
-                breach_reason = 'breach_SL'
+                breach_reason = 'guardian_sl'
             elif tp > 0 and curr <= tp:
                 breached = True
-                breach_reason = 'breach_TP'
+                breach_reason = 'guardian_tp'
 
         if not breached:
             continue
@@ -3437,6 +3500,20 @@ def sync():
     _CLOSED_HL_COINS.clear()
     _save_closed_set()  # BUG-4: persist cleared state
 
+    # RACE-CONDITION FIX: Stale marker cleanup.
+    # If a closing marker exists for a token that is NO LONGER in hl_pos (HL position
+    # was successfully closed), clear the marker — the close is done.
+    # If the token IS still in hl_pos, keep the marker active (guardian is mid-close
+    # or the close failed — either way decider_run should stay blocked).
+    try:
+        stale_markers = _load_closing_markers()
+        for tok in list(stale_markers.keys()):
+            if tok not in hl_pos:
+                log(f'  [STALE-MARKER] {tok} no longer in HL — clearing closing marker')
+                _clear_closing_marker(tok)
+    except Exception:
+        pass
+
     log(f'── Sync cycle ──')
 
     # Step 1: Get HL positions (retry on rate-limit → empty dict)
@@ -3523,6 +3600,11 @@ def sync():
             direction = p.get('direction', 'LONG')
             lev = float(p.get('leverage', 1)) or 1
 
+            # RACE-CONDITION FIX: Write closing marker BEFORE market_close.
+            # This tells signal_compactor/decider_run "guardian is closing this token —
+            # skip any new executions for it" to prevent the dual-execution race.
+            _save_closing_marker(coin)
+
             success = close_position_hl(coin, 'guardian_orphan')
             if success:
                 time.sleep(6)  # Wait for fills to appear
@@ -3545,12 +3627,66 @@ def sync():
                         else:
                             _CLOSED_THIS_CYCLE.add(orphan_id)
                             _save_closed_set()  # BUG-4: persist orphan close
-                            _close_orphan_paper_trade_by_id(
+                            close_ok = _close_orphan_paper_trade_by_id(
                                 orphan_id, coin, direction, entry_px, lev,
                                 'guardian_orphan'
                             )
+                            # Only clear the closing marker if the DB was actually updated.
+                            # If _close_orphan_paper_trade_by_id returned False (no HL fill yet
+                            # or DB error), the marker stays active so decider_run keeps
+                            # blocking the token. It will be cleared on the next guardian
+                            # cycle when the position is gone from HL.
+                            if close_ok:
+                                _clear_closing_marker(coin)
+                            else:
+                                log(f'  Orphan close incomplete for {coin} — keeping closing marker active', 'WARN')
+                    else:
+                        # No DB record found — brain.py INSERT failed silently (PostgreSQL
+                        # connection contention at max positions). Guardian must create a
+                        # minimal guardian_orphan record so Step 6 close is traceable.
+                        # ORPHAN GUARD (2026-04-16) prevented the initial INSERT, so we
+                        # create it here on the orphan-close path using HL trade_id.
+                        try:
+                            import time as _t
+                            cur_orphan.execute("""
+                                INSERT INTO trades (
+                                    token, direction, entry_price, hl_entry_price,
+                                    amount_usdt, leverage, status, exchange,
+                                    signal_reason, open_time, paper,
+                                    trade_id, is_guardian_close, guardian_reason
+                                ) VALUES (
+                                    %s, %s, %s, %s,
+                                    50.0, %s, 'open', 'Hyperliquid',
+                                    'guardian_orphan_insert', NOW() - INTERVAL '1 second', FALSE,
+                                    %s, TRUE, 'guardian_orphan'
+                                ) RETURNING id
+                            """, (
+                                coin.upper(), direction, entry_px, entry_px,
+                                int(lev),
+                                int(lev * 1000000)  # trade_id from HL leverage encoding
+                            ))
+                            orphan_id = cur_orphan.fetchone()[0]
+                            conn_orphan.commit()
+                            log(f'  Created guardian_orphan trade #{orphan_id} for {coin} (entry_px={entry_px})', 'WARN')
+                            _CLOSED_THIS_CYCLE.add(orphan_id)
+                            _save_closed_set()
+                            close_ok = _close_orphan_paper_trade_by_id(
+                                orphan_id, coin, direction, entry_px, lev,
+                                'guardian_orphan'
+                            )
+                            if close_ok:
+                                _clear_closing_marker(coin)
+                            else:
+                                log(f'  Orphan close incomplete for {coin} — keeping closing marker active', 'WARN')
+                        except Exception as e:
+                            log(f'  Failed to create guardian_orphan record for {coin}: {e}', 'FAIL')
+                            _t.sleep(3)
                     cur_orphan.close()
                     conn_orphan.close()
+            else:
+                # market_close failed — keep the marker set so decider_run stays blocked.
+                # Guardian will retry on next cycle; if HL position is gone, marker clears.
+                log(f'  guardian_orphan close failed for {coin} — keeping closing marker active', 'WARN')
             time.sleep(3)
 
     # Step 7: Close orphan paper trades (mirror paper→HL or close)

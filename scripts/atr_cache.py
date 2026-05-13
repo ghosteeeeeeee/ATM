@@ -9,7 +9,11 @@ TTL: 300 seconds (stale ATR is better than no ATR)
 import json, time, os
 from hermes_file_lock import FileLock
 
-_CACHE_FILE = "/root/.hermes/data/atr_cache.json"
+_HERMES_DATA = os.environ.get(
+    'HERMES_DATA_DIR',
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+)
+_CACHE_FILE = os.path.join(_HERMES_DATA, 'atr_cache.json')
 _CACHE_TTL  = 300  # 5 minutes — same as decider_run._ATR_TTL
 
 # In-memory cache mirrors decider_run._ATR_CACHE for speed within a process.

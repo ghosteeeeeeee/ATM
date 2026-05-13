@@ -5,6 +5,7 @@ import sys, json, time
 sys.path.insert(0, '/root/.hermes/scripts')
 sys.path.insert(1, '/root/.openclaw/workspace/scripts')
 from signal_schema import add_signal, get_confluence_signals as schema_get_confluence, set_cooldown
+from paths import *
 import sqlite3
 
 DB_PATH = '/root/.openclaw/workspace/data/signals.db'

@@ -1,3 +1,4 @@
+# Migrated from ../gap300_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
 """
 gap300_signals.py — EMA(300) vs SMA(300) Gap Widening Signal on 1m prices.
@@ -417,6 +418,9 @@ def scan_gap300_state(token: str, prices: list, price: float,
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def scan_gap300_signals(prices_dict: dict) -> int:
+    from hermes_constants import GAP_300_ENABLED
+    if not GAP_300_ENABLED:
+        return 0
     """
     Scan tokens for EMA(300)/SMA(300) gap widening signals.
 
@@ -468,6 +472,13 @@ def scan_gap300_signals(prices_dict: dict) -> int:
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
+        # ── Per-direction kill-switches ─────────────────────────────────────────
+        from hermes_constants import GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED
+        if direction == 'LONG' and not GAP_300_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not GAP_300_MINUS_ENABLED:
+            continue
+
         try:
             sid = add_signal(
                 token=token.upper(),
@@ -503,3 +514,15 @@ def detect_gap_cross(token: str, prices: list, price: float):
     Kept for backwards compatibility with any callers that import this directly.
     """
     return None   # Legacy detection is replaced by the state machine.
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# signals_runner entry point
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def run(prices_dict=None):
+    """Entry point for signals_runner. Returns count of signals emitted."""
+    if prices_dict is None:
+        from signal_schema import get_all_latest_prices
+        prices_dict = get_all_latest_prices()
+    return scan_gap300_signals(prices_dict)

@@ -7,6 +7,7 @@ RUNTIME DB (/root/.hermes/data/signals_hermes_runtime.db) — signals, decisions
 import sys
 import sqlite3, time, json, os
 from datetime import datetime, timedelta
+from functools import lru_cache
 import psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
@@ -411,6 +412,178 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if component in SIGNAL_SOURCE_BLACKLIST:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" component="{component}" BLACKLIST', flush=True)
                 return None  # Silently skip blocklisted signal sources
+    except ImportError:
+        pass  # hermes_constants may not be available in all contexts
+
+    # ── Layer 2: Signal Kill-Switch Guard (per-source * _ENABLED flags) ────
+    # This is the second line of defense after the blacklist. It enforces the
+    # *_ENABLED / *_PLUS_ENABLED / *_MINUS_ENABLED flags in hermes_constants.py.
+    # This layer allows per-direction control (e.g. pct-hermes+ ON, pct-hermes- OFF).
+    try:
+        from hermes_constants import (
+            PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
+            VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
+            HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
+            HMACD_ENABLED, HMACD_PLUS_ENABLED, HMACD_MINUS_ENABLED,
+            MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED,
+            PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
+            FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
+            RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
+            ACCEL_300_PLUS_ENABLED, ACCEL_300_MINUS_ENABLED,
+            COUNTER_FLIP_PLUS_ENABLED, COUNTER_FLIP_MINUS_ENABLED,
+            HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
+            RS_PLUS_ENABLED, RS_MINUS_ENABLED,
+            TL_BREAK_PLUS_ENABLED, TL_BREAK_MINUS_ENABLED,
+            MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
+            MA_CROSS_5M_ENABLED, MA_CROSS_5M_PLUS_ENABLED, MA_CROSS_5M_MINUS_ENABLED,
+            HH_HL_ENABLED, GUPPY_ENABLED, MACD_ACCEL_ENABLED,
+            TREND_PURITY_ENABLED, EMA9_SMA20_ENABLED,
+            R2_REV_ENABLED, R2_TREND_ENABLED,
+            VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
+            ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
+        )
+        from hermes_constants import SIGNAL_SOURCE_BLACKLIST as _BL
+        # Fast path: if source is blocklisted, blacklist layer already caught it
+        # Check per-source kill switches
+        _src = source or ''
+        _components = _src.split(',')
+        for _comp in _components:
+            # pct-hermes
+            if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PCT_HERMES_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'pct-hermes-' and not PCT_HERMES_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PCT_HERMES_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'pct-hermes' and not PCT_HERMES_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PCT_HERMES_ENABLED=False', flush=True)
+                return None
+            # vel-hermes
+            if _comp == 'vel-hermes+' and not VEL_HERMES_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VEL_HERMES_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'vel-hermes-' and not VEL_HERMES_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VEL_HERMES_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'vel-hermes' and not VEL_HERMES_ENABLED:
+                return None
+            # hzscore
+            if _comp == 'hzscore+' and not HZSCORE_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HZSCORE_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'hzscore-' and not HZSCORE_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HZSCORE_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'hzscore' and not HZSCORE_ENABLED:
+                return None
+            # hmacd
+            if _comp == 'hmacd+' and not HMACD_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HMACD_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'hmacd-' and not HMACD_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HMACD_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'hmacd' and not HMACD_ENABLED:
+                return None
+            # mtf-momentum
+            if _comp == 'mtf-momentum+' and not MTF_MOMENTUM_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MTF_MOMENTUM_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'mtf-momentum-' and not MTF_MOMENTUM_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MTF_MOMENTUM_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'mtf-momentum' and not MTF_MOMENTUM_ENABLED:
+                return None
+            # phase-accel
+            if _comp == 'phase-accel+' and not PHASE_ACCEL_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PHASE_ACCEL_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'phase-accel-' and not PHASE_ACCEL_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PHASE_ACCEL_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'phase-accel' and not PHASE_ACCEL_ENABLED:
+                return None
+            # fast-momentum
+            if _comp == 'fast-momentum+' and not FAST_MOMENTUM_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" FAST_MOMENTUM_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'fast-momentum-' and not FAST_MOMENTUM_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" FAST_MOMENTUM_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'fast-momentum' and not FAST_MOMENTUM_ENABLED:
+                return None
+            # momentum — BUG FIX 2026-05-06: had NO Layer 2 kill-switch.
+            # Registry scripts removed Layer 1 guards; add_signal() was the only gate.
+            if _comp == 'momentum+' and not MOMENTUM_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOMENTUM_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'momentum-' and not MOMENTUM_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOMENTUM_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'momentum' and not MOMENTUM_ENABLED:
+                return None
+            # gap-300
+            if _comp in ('gap-300+', 'gap300-5m+') and not GAP_300_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GAP_300_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp in ('gap-300-', 'gap300-5m-') and not GAP_300_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" GAP_300_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp in ('gap-300', 'gap-300+', 'gap-300-') and not GAP_300_ENABLED:
+                return None
+            # ma_cross
+            if _comp == 'ma_cross+' and not MA_CROSS_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_CROSS_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'ma_cross-' and not MA_CROSS_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_CROSS_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'ma_cross' and not MA_CROSS_ENABLED:
+                return None
+            # ma_cross_5m
+            if _comp == 'ma_cross_5m+' and not MA_CROSS_5M_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_CROSS_5M_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'ma_cross_5m-' and not MA_CROSS_5M_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_CROSS_5M_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'ma_cross_5m' and not MA_CROSS_5M_ENABLED:
+                return None
+            # r2_rev
+            if _comp == 'r2_rev+' and not R2_REV_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_REV_ENABLED=False', flush=True)
+                return None
+            if _comp == 'r2_rev-' and not R2_REV_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_REV_ENABLED=False', flush=True)
+                return None
+            if _comp == 'r2_rev' and not R2_REV_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_REV_ENABLED=False', flush=True)
+                return None
+            # oc-mtf-macd — OpenClaw signals
+            if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_MTF_MACD_ENABLED=False', flush=True)
+                return None
+            if _comp == 'oc-mtf-macd-' and not OC_MTF_MACD_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_MTF_MACD_ENABLED=False', flush=True)
+                return None
+            # oc-rsi
+            if _comp == 'oc-rsi+' and not OC_RSI_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_RSI_ENABLED=False', flush=True)
+                return None
+            if _comp == 'oc-rsi-' and not OC_RSI_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_RSI_ENABLED=False', flush=True)
+                return None
+            # oc-mtf-rsi
+            if _comp == 'oc-mtf-rsi+' and not OC_MTF_RSI_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_MTF_RSI_ENABLED=False', flush=True)
+                return None
+            if _comp == 'oc-mtf-rsi-' and not OC_MTF_RSI_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_MTF_RSI_ENABLED=False', flush=True)
+                return None
+            # oc-pending-*
+            if _comp.startswith('oc-pending-') and not OC_PENDING_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_PENDING_ENABLED=False', flush=True)
+                return None
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -838,19 +1011,64 @@ def validate_source(source: str) -> str:
     Validate source against blacklist (SIGNAL_SOURCE_BLACKLIST).
     Returns the original source if NOT in blacklist, 'unknown' if blocked.
     No whitelist — only the blacklist blocks signals.
+
+    Blocking rules:
+    - Exact match: 'hzscore+,pct-hermes-' blocks 'hzscore+,pct-hermes-' (2-signal exact)
+    - Subset match: 'hzscore+,pct-hermes-,rs-r600' is NOT blocked by 'hzscore+,pct-hermes-'
+      because the combo entry only blocks the exact 2-signal source, not 3-signal extensions.
+    - Sentinel suffix-agnostic: 'vel-hermes+' is blocked if 'vel-hermes' is in blacklist
+      (vel-hermes has no directional variants — the bare base is the blacklist entry).
+      But 'pct-hermes+' is NOT blocked by 'pct-hermes' because pct-hermes+ is a valid
+      directional variant (only pct-hermes- is blacklisted).
     """
     from hermes_constants import SIGNAL_SOURCE_BLACKLIST
     if not source:
         return 'unknown'
-    # Check direct match in blacklist
+
+    # ── Exact match (handles combo entries like 'hzscore+,pct-hermes-') ──
     if source in SIGNAL_SOURCE_BLACKLIST:
         return 'unknown'
-    # Handle merged/comma-separated sources: block if ANY component is blacklisted
-    if ',' in source:
-        components = [c.strip() for c in source.split(',') if c.strip()]
-        for comp in components:
-            if comp in SIGNAL_SOURCE_BLACKLIST:
+
+    # ── Sentinel bases: suffix-agnostic, blocked as bare only (no directional variants).
+    # e.g. 'vel-hermes+' → base 'vel-hermes' → blocked (vel-hermes is blacklisted, vel-hermes+/- don't exist)
+    SENTINEL_BASES = {'vel-hermes'}
+
+    # ── Single-signal source (no comma) ──
+    if ',' not in source:
+        base = source.rstrip('+-')
+        if base in SENTINEL_BASES and base in SIGNAL_SOURCE_BLACKLIST:
+            return 'unknown'
+        # Exact-match directional variants of pct-hermes (2026-05-05: pct-hermes+
+        # and pct-hermes- are structural inversions in bear markets — block both)
+        if source in SIGNAL_SOURCE_BLACKLIST:
+            return 'unknown'
+        return source  # Not blocked
+
+    # ── Multi-signal source ──
+    components = [c.strip() for c in source.split(',') if c.strip()]
+    n = len(components)
+
+    # For 3+ signal sources: allow if a 2-signal blacklist combo is a proper subset.
+    # e.g. blacklist='hzscore+,pct-hermes-', source='hzscore+,pct-hermes-,rs-r600'
+    # → blacklist combo IS a subset of source → this is a 3-signal extension → ALLOW.
+    if n >= 3:
+        for bl_entry in SIGNAL_SOURCE_BLACKLIST:
+            if ',' not in bl_entry:
+                continue
+            bl_comps = set(bl_entry.split(','))
+            if bl_comps.issubset(set(components)):
+                return source  # 3+ signal extension of a blocked combo → ALLOW
+
+    # Component-level check: block if ANY component is in the blacklist.
+    # Exact match always blocks. Suffix-agnostic only for sentinel bases.
+    for comp in components:
+        base = comp.rstrip('+-')
+        for bl_entry in SIGNAL_SOURCE_BLACKLIST:
+            if bl_entry == comp:
                 return 'unknown'
+            elif base == bl_entry and base in SENTINEL_BASES:
+                return 'unknown'
+
     return source  # Not blocked — valid
 
 
@@ -1199,6 +1417,7 @@ def get_latest_price(token):
     conn.close()
     return row[0] if row else None
 
+@lru_cache(maxsize=4)
 def get_all_latest_prices():
     conn = _get_conn(_static())
     c = conn.cursor()
@@ -2083,6 +2302,7 @@ def get_price_history(token: str, lookback_minutes: int = 60*24) -> list:
     return rows
 
 
+@lru_cache(maxsize=4)
 def get_all_latest_prices() -> dict:
     """
     Read all current prices from local SQLite latest_prices table.

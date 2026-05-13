@@ -1,3 +1,4 @@
+# Migrated from ../accel_300_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
 """
 accel_300_signals.py -- Persistent Gap Above EMA(300) Acceleration Signal.
@@ -50,23 +51,26 @@ Run:
 import sys, os, sqlite3, time, datetime
 from typing import Optional, List
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, price_age_minutes
-from hermes_constants import (
-    MIN_GAP_PCT_LONG, MIN_GAP_PCT_SHORT,
-    ACCEL_300_PERIOD, ACCEL_300_LOOKBACK,
-    ACCEL_300_PERSISTENCE_BARS, ACCEL_300_MIN_GAP_GROWTH,
-)
+from signal_schema import add_signal, get_cooldown, price_age_minutes
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 _RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 _PRICE_DB   = '/root/.hermes/data/signals_hermes.db'   # price_history -- live 1m prices
 
 # ── Signal constants ──────────────────────────────────────────────────────────
-PERIOD             = ACCEL_300_PERIOD       # EMA(ACCEL_300_PERIOD) on 1m prices
-LOOKBACK           = ACCEL_300_LOOKBACK     # bars ago when price was on the other side
-PERSISTENCE_BARS   = ACCEL_300_PERSISTENCE_BARS  # must be persistently above/below EMA
-MIN_GAP_GROWTH_PCT = ACCEL_300_MIN_GAP_GROWTH    # gap must grow by at least this %
-COOLDOWN_BARS      = 10       # dedup: only fire once per N bars per token+direction
+# 2026-05-11: Reverted to tighter params — accel-300+ was firing too loosely,
+# causing market-wide bursts of LONG entries in sideways conditions.
+# MIN_GAP_PCT: 0.15 → 0.20 (require stronger breakout above EMA)
+# MIN_GAP_GROWTH_PCT: 0.03 → 0.05 (require meaningful acceleration)
+# COOLDOWN_BARS: 12 → 10 (shorter dedup since quality filter is tighter)
+# TIMING: bars_since_cross >= 1 required (no firing at exact cross moment)
+# PERSISTENCE_BARS stays at 2.
+PERIOD             = 300      # EMA(300) on 1m prices
+LOOKBACK           = 30       # bars ago when price was on the other side of EMA300
+PERSISTENCE_BARS   = 2        # must be persistently above/below EMA for this many bars
+MIN_GAP_PCT            = 0.20    # minimum gap above EMA300 to fire (%) — was 0.15
+MIN_GAP_GROWTH_PCT     = 0.05    # gap must grow by at least this % vs PERSISTENCE_BARS ago — was 0.03
+COOLDOWN_BARS          = 10      # dedup: only fire once per N bars per token+direction — was 12
 LOOKBACK_1M        = 700      # 1m prices to fetch (warmup + detection window)
 DRY_RUN            = '--dry' in sys.argv
 
@@ -215,9 +219,9 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
 
         direction = 'LONG' if current_above else 'SHORT'
 
-        # ── Condition 2: Gap >= direction-specific minimum ─────────────────────────
-        min_gap = MIN_GAP_PCT_LONG if direction == 'LONG' else MIN_GAP_PCT_SHORT
-        if gap_now < min_gap:
+        # ── Condition 2: |gap| >= MIN_GAP_PCT ─────────────────────────────────
+        # Both directions need a meaningful gap — SHORT needs gap <= -MIN_GAP_PCT
+        if abs(gap_now) < MIN_GAP_PCT:
             continue
 
         # ── Condition 3: Persistently above/below for PERSISTENCE_BARS bars ─────
@@ -247,44 +251,54 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         if avg_gap_growth <= MIN_GAP_GROWTH_PCT:
             continue  # Gap is not growing over the window -- stale signal
 
-        # ── Condition 4b: MARGINAL ACCELERATION (the real fix) ─────────────────
+        # ── Condition 4b: MARGINAL ACCELERATION + TIMING ─────────────────────────
         # gap_now vs 1 bar ago must show INCREASING momentum, not just steady growth.
         # This catches early acceleration (good) vs late-stage extension (peak).
-        # Without this: a linearly growing gap fires correctly but at the WRONG time
-        # because PERSISTENCE_BARS of confirmation means price has already run too far.
-        gap_1_idx = i - 1
-        gap_2_idx = i - 2
-        if gap_1_idx < 0 or gap_pcts[gap_1_idx] is None:
-            continue
-        if gap_2_idx < 0 or gap_pcts[gap_2_idx] is None:
-            continue
-
-        delta_last  = gap_pcts[i]      - gap_pcts[gap_1_idx]   # most recent increment
-        delta_prev  = gap_pcts[gap_1_idx] - gap_pcts[gap_2_idx]  # previous increment
-
-        # For LONG: delta_last must exceed delta_prev (positive acceleration)
-        # For SHORT: delta_last must be more negative than delta_prev (negative acceleration)
-        if direction == 'LONG' and delta_last <= delta_prev:
-            continue  # Momentum not increasing at the margin -- catching a peak
-        if direction == 'SHORT' and delta_last >= delta_prev:
-            continue  # Momentum not increasing at the margin -- catching a bottom
-
-        # ── Cooldown: bars since last signal (checked by caller via recent_trade_exists) ──
-        # We compute how many bars ago the breakout cross happened
+        #
+        # TIMING FIX (2026-05-10): Fire EARLY when bars_since_cross <= 3 (near breakout).
+        # Only enforce strict marginal acceleration when bars_since_cross > 3.
+        # This solves the "firing too late at the peak" problem — entries close to
+        # the EMA cross (bars=0,1,2) are the most profitable because the move just started.
+        # Entries that have been above EMA for 10+ bars without our signal are stale.
+        # ── Find cross bar first ─────────────────────────────────────────────────
         cross_bar = None
         for j in range(i - LOOKBACK, i + 1):
             if j < 0 or gap_pcts[j] is None:
                 continue
             if direction == 'LONG' and closes[j] > ema300[j]:
                 if j > 0 and closes[j-1] <= ema300[j-1]:
-                    cross_bar = j  # found the cross
+                    cross_bar = j
                     break
             if direction == 'SHORT' and closes[j] < ema300[j]:
                 if j > 0 and closes[j-1] >= ema300[j-1]:
                     cross_bar = j
                     break
 
-        bars_since_cross = i - cross_bar if cross_bar is not None else 0
+        bars_since_cross = i - cross_bar if cross_bar is not None else 999
+
+        # Must have confirmed the cross (at least 1 bar has closed since the cross)
+        if bars_since_cross < 1:
+            continue
+
+        # Too stale — price has been running without us for too long
+        if bars_since_cross > 10:
+            continue
+
+        # For bars 0-3: fire on gap_growth alone (near the breakout, momentum is fresh)
+        # For bars 4-10: require marginal acceleration check too
+        if bars_since_cross > 3:
+            gap_1_idx = i - 1
+            gap_2_idx = i - 2
+            if gap_1_idx < 0 or gap_pcts[gap_1_idx] is None:
+                continue
+            if gap_2_idx < 0 or gap_pcts[gap_2_idx] is None:
+                continue
+            delta_last  = gap_pcts[i]      - gap_pcts[gap_1_idx]
+            delta_prev  = gap_pcts[gap_1_idx] - gap_pcts[gap_2_idx]
+            if direction == 'LONG' and delta_last <= delta_prev:
+                continue
+            if direction == 'SHORT' and delta_last >= delta_prev:
+                continue
 
         return {
             'direction': direction,
@@ -303,6 +317,9 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def scan_accel_300_signals(prices_dict: dict) -> int:
+    from hermes_constants import ACCEL_300_ENABLED, ACCEL_300_TOKEN_ALLOWLIST
+    if not ACCEL_300_ENABLED:
+        return 0
     """
     Scan tokens for accel_300 signals.
 
@@ -315,7 +332,7 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
     Returns:
         Number of signals written to DB.
     """
-    from signal_schema import add_signal, price_age_minutes
+    from signal_schema import add_signal, get_cooldown, price_age_minutes
     from position_manager import get_open_positions as _get_open_pos
     from signal_gen import (
         recent_trade_exists, is_delisted, SHORT_BLACKLIST,
@@ -339,6 +356,9 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             continue
         if token.upper() in SHORT_BLACKLIST:
             continue
+        # ── Token allowlist: only fire on tokens with >=50% historical WR ─────────
+        if ACCEL_300_TOKEN_ALLOWLIST and token.upper() not in ACCEL_300_TOKEN_ALLOWLIST:
+            continue
         if price_age_minutes(token) > 10:
             continue
 
@@ -350,23 +370,25 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
         if sig is None:
             continue
 
-        # direction now known -- apply direction-specific cooldown AFTER detecting signal
-        from signal_schema import get_cooldown
-        cd = get_cooldown(token) or {}
-        if cd.get(f"{token.upper()}:{sig['direction']}"):
+        direction = sig['direction']
+        if get_cooldown(token, direction=direction):
             continue
 
-        direction = sig['direction']
+        # ── Per-direction kill-switch ─────────────────────────────────────────
+        from hermes_constants import ACCEL_300_PLUS_ENABLED, ACCEL_300_MINUS_ENABLED
+        if direction == 'LONG' and not ACCEL_300_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not ACCEL_300_MINUS_ENABLED:
+            continue
+
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
         # Confidence: base on gap strength + gap growth
-        # MIN_GAP_PCT_SHORT=0.10 (SHORT), MIN_GAP_PCT_LONG=0.25 (LONG)
-        # Larger gap → up to 80
+        # MIN_GAP_PCT=0.10 → base 65, larger gap → up to 70 (cap lowered 2026-05-12 to reduce LONG bias)
         # Bonus for strong gap growth (requires growth > 0.05% to earn bonus)
-        min_gap = MIN_GAP_PCT_LONG if direction == 'LONG' else MIN_GAP_PCT_SHORT
         gap_bonus = max(0, sig['gap_growth'] - 0.05) * 200  # max ~20 for 0.15%+ growth
-        confidence = int(min(80, 65 + max(0, (sig['gap_pct'] - min_gap) * 80) + gap_bonus))
+        confidence = int(min(70, 65 + max(0, (sig['gap_pct'] - MIN_GAP_PCT) * 80) + gap_bonus))
         confidence = max(60, confidence)
 
         if DRY_RUN:
@@ -403,7 +425,7 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CLI test
+# CLI entry point — used by signals_runner via getattr(mod, 'run')
 # ═══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
@@ -423,13 +445,7 @@ if __name__ == '__main__':
     tokens = [r[0] for r in c.fetchall()]
     conn.close()
 
-    # Test on a few tokens
-    test_tokens = {k: {'price': None} for k in tokens
-                   if k in ('BTC', 'ETH', 'SOL', 'AVAX', 'LINK', 'ARB', 'XMR', 'SNX')}
-    if not test_tokens:
-        test_tokens = {k: {'price': None} for k in tokens[:10]}
-
-    # Fetch latest prices
+    # Build prices dict for the scanner
     prices = {}
     conn = sqlite3.connect(_PRICE_DB, timeout=10)
     c = conn.cursor()
@@ -442,8 +458,7 @@ if __name__ == '__main__':
         )
     """, (int(time.time()) - 600,))
     for row in c.fetchall():
-        if row[0] in test_tokens:
-            prices[row[0]] = {'price': row[1]}
+        prices[row[0]] = {'price': row[1]}
     conn.close()
 
     mode = "DRY" if DRY_RUN else "LIVE"
@@ -451,3 +466,20 @@ if __name__ == '__main__':
     init_db()
     n = scan_accel_300_signals(prices)
     print(f"[accel-300] Done. {n} signals emitted.")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# signals_runner entry point — called by signals/__init__.py via getattr(mod, 'run')
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def run(prices_dict=None):
+    """Entry point for signals_runner.
+
+    signals_runner calls this as: fn(prices)
+    where prices = get_all_latest_prices() = {token: {'price': float}}
+
+    The scanner handles all guards internally (allowlist, cooldown, blacklist, etc.)
+    """
+    if prices_dict is None:
+        from signal_schema import get_all_latest_prices
+        prices_dict = get_all_latest_prices()
+    return scan_accel_300_signals(prices_dict)

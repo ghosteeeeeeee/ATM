@@ -22,6 +22,7 @@ import os
 # Add scripts/ to path so we can import position_manager
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from paths import *
 # Paper/live flag — must be set before position_manager imports hype_cache
 PAPER_MODE = True  # default
 

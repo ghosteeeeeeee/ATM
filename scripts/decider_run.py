@@ -21,7 +21,7 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               is_wrong_side_risky)
 from signal_schema import _is_loss_cooldown_active
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS, HOTSET_ENABLED
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
 from hyperliquid_exchange import is_live_trading_enabled, is_delisted
@@ -68,6 +68,46 @@ except Exception as e:
     print(f"[decider-run] SpeedTracker unavailable: {e}")
     speed_tracker_dr = None
 
+# ── 1m Linear Regression Regime ─────────────────────────────────────────────
+# Computed fresh per token from last 100 1m candles on each decider_run cycle.
+# Replaces the stale regime_5m.json regime (updated every 5 min by regime scanner).
+import statistics as _stat_lib
+
+def _get_regime_1m(coin: str) -> tuple:
+    """1m linear regression regime. Returns (regime_str, confidence_int 0-100)."""
+    try:
+        import sqlite3
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        rows = conn.execute(
+            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 100",
+            (coin.upper(),)
+        ).fetchall()
+        conn.close()
+        if len(rows) < 30:
+            return 'NEUTRAL', 0
+        closes = [r[0] for r in reversed(rows)]
+        n = len(closes)
+        mean_x = (n - 1) / 2.0
+        mean_y = _stat_lib.mean(closes)
+        cov = sum((i - mean_x) * (closes[i] - mean_y) for i in range(n))
+        var_x = sum((i - mean_x) ** 2 for i in range(n))
+        if var_x == 0:
+            return 'NEUTRAL', 0
+        slope = cov / var_x
+        ss_tot = sum((y - mean_y) ** 2 for y in closes)
+        ss_res = sum(
+            (closes[i] - (mean_y + slope * (i - mean_x))) ** 2 for i in range(n)
+        )
+        r2 = max(0.0, 1.0 - (ss_res / ss_tot)) if ss_tot > 0 else 0.0
+        confidence = int(round(r2 * 100))
+        if slope > 0:
+            return 'LONG_BIAS', confidence
+        elif slope < 0:
+            return 'SHORT_BIAS', confidence
+        return 'NEUTRAL', confidence
+    except Exception:
+        return 'NEUTRAL', 0
+
 # Hot-set discipline: track when signal_compactor last ran compaction.
 # The hot-set is THE single gate for execution — it comes from signal_compactor output.
 # signal_compactor.py runs every 1 min (hermes-signal-compactor.timer) and writes hotset.json.
@@ -109,6 +149,24 @@ _RATE_LIMIT_TTL    = 300  # seconds
 
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 os.makedirs(os.path.dirname(DELAYED_FILE), exist_ok=True)
+
+# ─── Guardian Closing Marker Check ─────────────────────────────────────────────
+# When guardian closes an orphan position, it writes a marker to this file BEFORE
+# calling market_close. decider_run checks it before executing any trade for a
+# token that guardian is actively closing. This prevents the race:
+#   guardian closes orphan → signal_compactor approves new signal → dual execution.
+_GUARDIAN_CLOSING_FILE = os.path.join(HERMES_DATA, 'guardian-closing-markers.json')
+
+def _is_guardian_closing(token: str) -> bool:
+    """Return True if guardian is currently closing this token (closing marker active)."""
+    try:
+        if os.path.exists(_GUARDIAN_CLOSING_FILE):
+            with open(_GUARDIAN_CLOSING_FILE) as f:
+                data = json.load(f)
+            return token.upper() in data.get('tokens', {})
+    except Exception:
+        pass
+    return False
 
 # ─── Direction Awareness ─────────────────────────────────────────────────────
 # If a direction has < 50% win rate in recent history, pause it.
@@ -518,7 +576,14 @@ def execute_trade(token, direction, price, confidence, source,
                   trailing_activation=0.01, trailing_distance=0.01,
                   trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
-                  live_trading=False, flipped=False):
+                  live_trading=False, flipped=False,
+                  # ── Signal indicator fields (from hotset at entry) ──
+                  signal_z_score=None, signal_rsi_14=None,
+                  signal_macd_hist=None, signal_momentum_state=None,
+                  signal_z_score_tier=None, signal_decision=None,
+                  test_sl_variant=None, test_timing_variant=None,
+                  test_trailing_variant=None,
+                  signal_metadata=None):  # JSON dict of all signal values for future-proof capture
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
@@ -595,6 +660,28 @@ def execute_trade(token, direction, price, confidence, source,
         cmd += ['--experiment', exp_json]
     if flipped:
         cmd += ['--flipped']
+    # ── Signal indicator fields (from hotset at entry) ──
+    if signal_z_score is not None:
+        cmd += ['--signal-z-score', str(signal_z_score)]
+    if signal_rsi_14 is not None:
+        cmd += ['--signal-rsi-14', str(signal_rsi_14)]
+    if signal_macd_hist is not None:
+        cmd += ['--signal-macd-hist', str(signal_macd_hist)]
+    if signal_momentum_state is not None:
+        cmd += ['--signal-momentum-state', str(signal_momentum_state)]
+    if signal_z_score_tier is not None:
+        cmd += ['--signal-z-score-tier', str(signal_z_score_tier)]
+    if signal_decision is not None:
+        cmd += ['--signal-decision', str(signal_decision)]
+    if test_sl_variant is not None:
+        cmd += ['--test-sl-variant', str(test_sl_variant)]
+    if test_timing_variant is not None:
+        cmd += ['--test-timing-variant', str(test_timing_variant)]
+    if test_trailing_variant is not None:
+        cmd += ['--test-trailing-variant', str(test_trailing_variant)]
+    if signal_metadata is not None:
+        import json as _json
+        cmd += ['--signal-metadata-json', _json.dumps(signal_metadata)]
 
     # ── Duplicate-entry guard ───────────────────────────────────────────────
     # FIX (2026-04-14): If there's already an open trade for this token+direction
@@ -611,14 +698,18 @@ def execute_trade(token, direction, price, confidence, source,
         _dup_cur.close(); _dup_conn.close()
         if _dup_row:
             dup_id, dup_pnl = _dup_row
-            log(f'  ⛔ DUPLICATE ENTRY BLOCKED: {token} {direction} already open (#{dup_id}, pnl={float(dup_pnl or 0):.3f}%) — skipping')
+            log(f'  ⛔ DUPLICATE ENTRY BLOCKED in PostgreSQL: {token} {direction} already open (#{dup_id}, pnl={float(dup_pnl or 0):.3f}%) — skipping')
             return False, f'duplicate_entry_blocked token={token} direction={direction} existing_id={dup_id}'
+        else:
+            log(f'  ✔ PostgreSQL duplicate check passed: no open trade for {token} {direction}')
     except Exception as dup_err:
-        log(f'  [WARN] Duplicate-entry guard DB check failed for {token}: {dup_err}', 'WARN')
+        log(f'  [WARN] Duplicate-entry guard DB check failed for {token}: {dup_err}')
         # Don't block on DB errors — proceed with the trade
 
     try:
+        log(f'  [brain.py] EXEC: {" ".join(cmd[:8])}... [{paper_flag}]')
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        log(f'  [brain.py] RC={result.returncode} stdout={result.stdout[:200] if result.stdout else "(empty)"}')
         if result.returncode == 0:
             for line in result.stdout.split('\n'):
                 if 'trade #' in line.lower():
@@ -629,6 +720,7 @@ def execute_trade(token, direction, price, confidence, source,
                     return True, f'trade #{tid}'
             return True, result.stdout.strip()[:80]
         else:
+            log(f'  [brain.py] ❌ FAILED: stderr={result.stderr.strip()[:200] if result.stderr else "(empty)"}')
             return False, result.stderr.strip()[:80]
     except Exception as e:
         return False, str(e)[:80]
@@ -662,21 +754,33 @@ def close_position(token, reason):
         if row:
             trade_id, entry_price_val, trade_dir = row
             log(f'CLOSED: {token} {reason} (trade #{trade_id}), entry={entry_price_val}')
-            # Record cooldown for the direction that was closed so the same direction
-            # cannot immediately re-enter — but only on LOSS (FIX 2026-04-23: was
-            # writing cooldown on EVERY close regardless of outcome, flooding PG with
-            # 200+ active cooldowns and blocking all signals from entering hot-set).
-            if trade_dir and 'loss' in reason.lower():
+            # ── Loss cooldown: record if this was a losing trade ─────────────
+            # FIX (2026-04-28): Was checking 'loss' in reason string — but MANUALLY
+            # closed trades don't have 'loss' in the reason. Fetch actual pnl_usdt
+            # from the trade record to determine if it was a loss.
+            if trade_dir:
                 try:
-                    from position_manager import set_loss_cooldown
-                    set_loss_cooldown(token, trade_dir)
-                except Exception as cd_err:
-                    log(f'loss cooldown error: {cd_err}')
-                try:
-                    from signal_schema import set_cooldown
-                    set_cooldown(token.upper(), trade_dir.upper(), hours=1)
-                except Exception as pg_err:
-                    log(f'PostgreSQL cooldown error: {pg_err}', 'WARN')
+                    conn2 = psycopg2.connect(**BRAIN_DB_DICT)
+                    cur2 = conn2.cursor()
+                    cur2.execute(
+                        "SELECT pnl_usdt FROM trades WHERE id=%s AND status='closed'",
+                        (trade_id,))
+                    row2 = cur2.fetchone()
+                    pnl = float(row2[0]) if row2 and row2[0] is not None else None
+                    cur2.close(); conn2.close()
+                    if pnl is not None and pnl < 0:
+                        try:
+                            from position_manager import set_loss_cooldown
+                            set_loss_cooldown(token, trade_dir)
+                        except Exception as cd_err:
+                            log(f'loss cooldown error: {cd_err}')
+                        try:
+                            from signal_schema import set_cooldown
+                            set_cooldown(token.upper(), trade_dir.upper(), hours=1)
+                        except Exception as pg_err:
+                            log(f'PostgreSQL cooldown error: {pg_err}')
+                except Exception as e:
+                    log(f'cooldown check error for {token}: {e}')
             return True
         return False
     except Exception as e:
@@ -1054,6 +1158,20 @@ def _run_hot_set():
                     confidence -= effective_penalty
                     if effective_penalty > 0:
                         log(f'  🧊 [REGIME] {token} {direction}: {penalty}pt penalty → -{escalation}pt survival bonus = {effective_penalty}net (conf {hot_sig["confidence"]:.0f}%→{confidence:.0f}%, regime={_regime} {_regime_conf:.0f}%, rounds={_survival_rounds})')
+            # ── NEUTRAL MARKET PENALTY ─────────────────────────────────────────────
+            # No regime conviction = no market edge. Apply a mild flat penalty
+            # to ensure only the strongest signals (high base conf + good wave/speed)
+            # survive. Milder than counter-regime penalty (max 30pt) since the
+            # compactor already applied 0.5x reg_mult at scoring stage.
+            elif _regime == 'NEUTRAL':
+                neutral_penalty = 10  # flat 10 pts — enough to filter weak entries
+                # Survival round forgiveness: each round proves the signal holds in
+                # directionless market, reduce penalty by 2 pts (cap at 6)
+                neutral_escalation = min(_survival_rounds * 2, 6)
+                effective_neutral = max(neutral_penalty - neutral_escalation, 0)
+                confidence -= effective_neutral
+                if effective_neutral > 0:
+                    log(f'  🌐 [NEUTRAL] {token} {direction}: -{neutral_penalty}pt → -{neutral_escalation}pt survival = {effective_neutral}net (conf {hot_sig["confidence"]:.0f}%→{confidence:.0f}%)')
 
             # ── TOKEN-LEVEL REGIME CHECK (z_score_tier) ──────────────────
             # z_direction = 'rising' = local bottom → LONG ideal, SHORT penalized
@@ -1290,7 +1408,7 @@ def run(dry_run=False):
                 return 0, 0
     except Exception as e:
         import traceback; traceback.print_exc()
-        log(f'Rate limit check failed (DB error): {e} — proceeding without rate limit', 'WARN')
+        log(f'Rate limit check failed (DB error): {e} — proceeding without rate limit')
 
     # Get approved signals
     # Clean up stale approvals before fetching (expire anything >1h old)
@@ -1312,6 +1430,24 @@ def run(dry_run=False):
     # but 100% blocked at execution gate, causing empty hotset and pipeline stall.
     # 50% is still a meaningful quality floor for pre-qualified hot-set tokens.
     MIN_EXEC_CONFIDENCE = 50
+
+    # ── HOTSET_ENABLED bypass ──────────────────────────────────────────────
+    # When HOTSET_ENABLED=False, skip the hot-set gate entirely.
+    # Any PENDING signal passing blacklist/cooldown/regime checks can execute
+    # immediately — no survival_rounds or hot-set compaction required.
+    if not HOTSET_ENABLED:
+        # Pull best PENDING signal per token+direction (skip APPROVED/hot-set gate)
+        pending = get_pending_signals(hours=24)
+        pending = [s for s in pending if s.get('confidence', 0) >= MIN_EXEC_CONFIDENCE]
+        # Normalize pending signals to match approved signal schema (final_confidence)
+        for s in pending:
+            s['final_confidence'] = s.get('confidence', 0)
+            s['source'] = s.get('source', 'bypass')
+        # Score by confidence (no survival round filter)
+        pending_sorted = sorted(pending, key=lambda s: s.get('final_confidence', 0), reverse=True)
+        log(f'[HOTSET-BYPASS] {len(pending_sorted)} pending signals eligible (no hot-set gate)')
+        # Reuse the same approved processing loop by substituting pending as approved
+        approved = pending_sorted
     # Surfing gate: require signal to survive N hot-set cycles before executing.
     # Cycle 1: signal appears in hot-set for the FIRST time as APPROVED → survival_rounds=1
     # Cycle 2+: signal reappears as APPROVED → survival_rounds=2 → NOW eligible
@@ -1335,6 +1471,11 @@ def run(dry_run=False):
         # PRIMARY: survival rounds — most battle-tested signals execute first.
         # Secondary: confidence — higher quality within same round-tier.
         return (rounds, conf)  # rounds-first, confidence tiebreak
+
+    # Override scoring for bypass mode: pure confidence sort (no hot-set rounds bias)
+    if not HOTSET_ENABLED:
+        def _exec_score(sig):
+            return sig.get('final_confidence', 0)
 
     scored = sorted(approved, key=_exec_score, reverse=True)
 
@@ -1383,12 +1524,107 @@ def run(dry_run=False):
         except Exception:
             pass
 
-        # BUG-26: extract signal_id for atomic claim BEFORE any trade execution.
-        # This prevents double-execution when multiple scripts run same minute.
+        # ── DEBUG: Log every signal disposition ─────────────────────────────────
         sig_id = sig.get('signal_id')
         token = sig.get('token', '').upper()
         direction = sig['direction']
-        confidence = sig['final_confidence']
+        confidence = sig.get('final_confidence')
+        source = sig.get('source', '')
+        in_hotset = token in _hot_tokens
+        log(f"[DECIDER-LOOP] #{i+1} {token} {direction} conf={confidence} hotset={'YES' if in_hotset else 'NO'} src={source[:60]}")
+        # HOT-SET DISCIPLINE: execution REQUIRES token to be in hotset.json.
+        # signal_compactor is the sole approval authority — signals not in hotset
+        # have not passed compaction and must NOT execute.
+        if not in_hotset:
+            log(f'  🚫 [EXEC-BLOCK] {token} {direction} NOT in hot-set — bypass attempt blocked')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
+
+        # BUG-26: extract signal_id for atomic claim BEFORE any trade execution.
+        # This prevents double-execution when multiple scripts run same minute.
+        sig_id = sig.get('signal_id')
+
+        # ── Layer 3: Kill-Switch Execution Gate ────────────────────────────────
+        # This is the FINAL gate before execution — even if a signal survived
+        # add_signal() (Layer 2), it gets stopped here if its *_ENABLED flag is False.
+        try:
+            from hermes_constants import (
+                PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
+                VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
+                HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
+                HMACD_ENABLED, HMACD_PLUS_ENABLED, HMACD_MINUS_ENABLED,
+                MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED,
+                PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
+                FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
+                RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
+                MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
+                MA_CROSS_5M_ENABLED, MA_CROSS_5M_PLUS_ENABLED, MA_CROSS_5M_MINUS_ENABLED,
+                HH_HL_ENABLED, GUPPY_ENABLED, MACD_ACCEL_ENABLED,
+                TREND_PURITY_ENABLED, EMA9_SMA20_ENABLED,
+                R2_REV_ENABLED, R2_TREND_ENABLED,
+                VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
+                ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
+            )
+            _components = source.split(',')
+            for _comp in _components:
+                if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: PCT_HERMES_PLUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'pct-hermes-' and not PCT_HERMES_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: PCT_HERMES_MINUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'pct-hermes' and not PCT_HERMES_ENABLED:
+                    log(f'  SKIP {token} {direction}: PCT_HERMES_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'vel-hermes+' and not VEL_HERMES_PLUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: VEL_HERMES_PLUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'vel-hermes-' and not VEL_HERMES_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: VEL_HERMES_MINUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'hzscore+' and not HZSCORE_PLUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: HZSCORE_PLUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'hzscore-' and not HZSCORE_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: HZSCORE_MINUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'hmacd+' and not HMACD_PLUS_ENABLED:
+                    skipped += 1; continue
+                if _comp == 'hmacd-' and not HMACD_MINUS_ENABLED:
+                    skipped += 1; continue
+                if _comp in ('gap-300+', 'gap300-5m+') and not GAP_300_PLUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: GAP_300_PLUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp in ('gap-300-', 'gap300-5m-') and not GAP_300_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: GAP_300_MINUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'ma_cross+' and not MA_CROSS_PLUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: MA_CROSS_PLUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'ma_cross-' and not MA_CROSS_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: MA_CROSS_MINUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'ma_cross_5m+' and not MA_CROSS_5M_PLUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: MA_CROSS_5M_PLUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'ma_cross_5m-' and not MA_CROSS_5M_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: MA_CROSS_5M_MINUS_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'r2_rev' and not R2_REV_ENABLED:
+                    log(f'  SKIP {token} {direction}: R2_REV_ENABLED=False')
+                    skipped += 1; continue
+                if _comp == 'fast-momentum-' and not FAST_MOMENTUM_MINUS_ENABLED:
+                    log(f'  SKIP {token} {direction}: FAST_MOMENTUM_MINUS_ENABLED=False')
+                    skipped += 1; continue
+        except ImportError:
+            pass  # hermes_constants not available — skip gate
+
+        # Check skip flag before proceeding (set by Layer 3 gate above)
+        # The continue above sets a 'continue' but we need to check after the try/except
+        # Re-check: if the loop hit a continue, we need to break to next signal
+        # Actually the 'continue' above already skips to next iteration of the for loop
         price = sig.get('price') or get_current_price(token)
 
         if not price:
@@ -1424,13 +1660,27 @@ def run(dry_run=False):
             skipped += 1
             continue
 
-        # ── Surfing gate: skip if signal hasn't survived enough hot-set cycles ──
-        # hot_rounds comes from get_approved_signals() (signal_schema.py line 1012)
-        sig_survival_rounds = sig.get('hot_rounds', 0)
-        if sig_survival_rounds < MIN_SURVIVAL_ROUNDS:
-            log(f'SKIP SURF: {token} {direction} — survival_rounds={sig_survival_rounds} < {MIN_SURVIVAL_ROUNDS} (wave still building)')
+        # ── Guardian closing race-condition gate ───────────────────────────────
+        # Guardian writes a marker before closing an orphan position. The marker
+        # stays active while HL fills propagate (up to ~15s). decider_run checks
+        # it here to avoid executing a new signal while guardian is closing the
+        # same token — which would result in dual positions on HL.
+        if _is_guardian_closing(token):
+            log(f'SKIP: {token} — guardian closing in progress (race guard)')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
+
+        # ── Surfing gate: skip if signal hasn't survived enough hot-set cycles ──
+        # hot_rounds comes from get_approved_signals() (signal_schema.py line 1012)
+        # HOTSET_ENABLED=False bypasses this gate entirely
+        if HOTSET_ENABLED:
+            sig_survival_rounds = sig.get('hot_rounds', 0)
+            if sig_survival_rounds < MIN_SURVIVAL_ROUNDS:
+                log(f'SKIP SURF: {token} {direction} — survival_rounds={sig_survival_rounds} < {MIN_SURVIVAL_ROUNDS} (wave still building)')
+                skipped += 1
+                continue
 
         # ── OC Signal Block (2026-04-23) ──────────────────────────────────────────
         # oc_pending signals must survive signal_compactor hot-set compaction.
@@ -1438,74 +1688,59 @@ def run(dry_run=False):
         # rounds check as all other signals. This prevents OC from bypassing
         # the hot-set discipline by writing directly to the signal DB.
         # Leave as PENDING so they continue competing in compaction cycles.
+        # HOTSET_ENABLED=False bypasses OC block — any signal can execute
         sig_type = sig.get('signal_type', '') or ''
-        if sig_type == 'oc_pending':
+        if HOTSET_ENABLED and sig_type == 'oc_pending':
             log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: oc_pending signal (must survive hot-set compaction)')
             skipped += 1
             continue
 
-        # ── Counter-trend trap guard at execution time ───────────────────
-        # Even if _run_hot_set() passed this signal, re-check at execution time.
-        # Conditions may have changed (z-score moved, speed changed).
-        # Use hotset.json lookup for pre-computed regime (avoids redundant get_regime() call).
-        _exec_regime, _exec_regime_conf = _hotset_regime.get(token, ('NEUTRAL', 0))
-        trap_blocked, trap_reason = _check_counter_trend_trap(token, direction, _exec_regime, _exec_regime_conf)
-        if trap_blocked:
-            log(f'  🧊 [EXEC-BLOCK] {token} {direction}: {trap_reason}')
-            if sig_id:
-                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-            skipped += 1
-            continue
+        # ── Counter-trend trap guard — DISABLED 2026-05-11 ─────────────────
+        # 1m LR regime is too noisy for execution gating (100-candle window too volatile).
+        # Was causing false SHORT_BIAS → blocking LONG signals incorrectly.
+        # _exec_regime, _exec_regime_conf = _get_regime_1m(token)
+        # trap_blocked, trap_reason = _check_counter_trend_trap(token, direction, _exec_regime, _exec_regime_conf)
+        # if trap_blocked:
+        #     log(f'  🧊 [EXEC-BLOCK] {token} {direction}: {trap_reason}')
+        #     if sig_id:
+        #         mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+        #     skipped += 1
+        #     continue
 
-        # ── Regime filter for approved signals (same as HOT-SET, 2026-04-05) ─
-        # Approved signals bypass HOT-SET regime check — close that gap here.
-        # Full coverage: is_delisted + blindspot + NEUTRAL + weak_conf + counter-regime
-        try:
-            # Case 0: Not tradeable on Hyperliquid (hard blocklist + HL universe check)
-            if is_delisted(token):
-                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: not tradeable on Hyperliquid')
-                if sig_id:
-                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                skipped += 1
-                continue
-            # Regime from hotset.json (pre-computed by signal_compactor — no ai_decider call)
-            # _hotset_regime is built at lines ~1316-1324 from hotset.json per token
-            regime, regime_conf = _hotset_regime.get(token, ('NEUTRAL', 0))
-            # Case 1: blindspot — token not in regime data
-            if regime is None or regime == 'NOT_IN_JSON':
-                log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: regime blindspot (not in regime_4h.json)')
-                if sig_id:
-                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                skipped += 1
-                continue
-            # Case 2: NEUTRAL regime — de-escalate gracefully, don't hard-block
-            # Signal stays in pipeline to compete when/if regime becomes directional
-            if regime == 'NEUTRAL' and regime_conf > 60:
-                log(f'  📉 [DEESC] {token} {direction} de-escalated: NEUTRAL regime ({regime_conf:.0f}%)')
-                # Don't mark_executed — let it survive and be reconsidered
-                skipped += 1
-                continue
-            # Case 3: REMOVED (2026-04-17) — weak regime confidence should NOT block
-            # execution of hot-set signals. If a signal survived signal_compactor compaction
-            # and entered the hot-set, it's already been vetted. The regime_conf is
-            # advisory — survival_score decay handles the fade. Blocking at execution
-            # time prevents hot-set signals from ever trading. Let them execute.
-            # Case 4: counter-regime — fighting the trend → PENALIZE lightly
-            # Reduced 2026-04-17: was regime_conf*0.4 (30pt max) — too aggressive, blocked all
-            # counter-regime signals during LONG_BIAS. New: regime_conf*0.15 (15pt max).
-            # At 80% regime conf: old=30pts, new=12pts. A 77% signal survives at 65%.
-            if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
-               (regime == 'SHORT_BIAS' and direction == 'LONG'):
-                penalty = min(int(regime_conf * 0.15), 15)
-                confidence -= penalty
-                if confidence < MIN_EXEC_CONFIDENCE:
-                    # De-escalate: don't execute this cycle, but keep signal alive
-                    log(f'  📉 [DEESC] {token} {direction} counter-regime penalized {penalty}pts below exec threshold ({confidence:.0f}% < {MIN_EXEC_CONFIDENCE}%) — kept alive for organic de-escalation')
-                    skipped += 1
-                    continue
-                log(f'  📉 [DEESC] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
-        except Exception as e:
-            log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
+        # ── Regime filter for approved signals — DISABLED 2026-05-11 ───────────
+        # 1m LR (100 candles) is too noisy — produces false SHORT_BIAS during neutral
+        # markets, blocks valid LONG signals. Regime check was adding confusion on top
+        # of the WR gate. Hot-set signals are already vetted by signal_compactor.
+        # Disabling entirely to let WR gate do its job cleanly.
+        # try:
+        #     if is_delisted(token):
+        #         log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: not tradeable on Hyperliquid')
+        #         if sig_id:
+        #             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+        #         skipped += 1
+        #         continue
+        #     regime, regime_conf = _get_regime_1m(token)
+        #     if regime is None or regime == 'NOT_IN_JSON':
+        #         log(f'  🧊 [EXEC-BLOCK] {token} {direction} blocked: regime blindspot')
+        #         if sig_id:
+        #             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+        #         skipped += 1
+        #         continue
+        #     if regime == 'NEUTRAL' and regime_conf > 60:
+        #         log(f'  📉 [DEESC] {token} {direction} de-escalated: NEUTRAL regime ({regime_conf:.0f}%)')
+        #         skipped += 1
+        #         continue
+        #     if (regime == 'LONG_BIAS' and direction == 'SHORT') or \
+        #        (regime == 'SHORT_BIAS' and direction == 'LONG'):
+        #         penalty = min(int(regime_conf * 0.15), 15)
+        #         confidence -= penalty
+        #         if confidence < MIN_EXEC_CONFIDENCE:
+        #             log(f'  📉 [DEESC] {token} {direction} counter-regime penalized {penalty}pts below exec threshold ({confidence:.0f}% < {MIN_EXEC_CONFIDENCE}%)')
+        #             skipped += 1
+        #             continue
+        #         log(f'  📉 [DEESC] {token} {direction} penalized {penalty}pts for counter-regime (conf now {confidence:.0f}%)')
+        # except Exception as e:
+        #     log(f'  ⚠️ [EXEC-BLOCK] {token} regime check error: {e}')
 
         # conf-1s = single-source, too weak — hard ban. conf-2s+ are real confluence.
         # NOTE: hzscore and hmacd- also end in 's' but pass through because the
@@ -1617,10 +1852,12 @@ def run(dry_run=False):
         # BUG-26 fix: claim signal atomically BEFORE brain.py call.
         # This prevents double-execution when multiple scripts run same minute.
         # Use signal_id if available, else fall back to legacy token+direction match.
+        log(f'  → mark_signal_executed(token={token}, direction={direction}, signal_id={sig_id}) — atomic claim')
         claimed = mark_signal_executed(token, direction, signal_id=sig_id)
+        log(f'  ← mark_signal_executed returned: {claimed} (0=failed/already-claimed, 1=success)')
         if sig_id is not None and claimed == 0:
             # Signal already claimed by another process — skip this one
-            log(f'SKIP: {token} {direction} — signal {sig_id} already claimed (executed by another runner)')
+            log(f'SKIP: {token} {direction} — signal {sig_id} already claimed (executed by another runner) [executed=1 in DB]')
             skipped += 1
             continue
 
@@ -1644,7 +1881,24 @@ def run(dry_run=False):
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
-            live_trading=not paper, flipped=bool(flipped_direction))
+            live_trading=not paper, flipped=bool(flipped_direction),
+            # Signal indicator fields captured from hotset at entry time
+            signal_z_score=sig.get('z_score'),
+            signal_rsi_14=sig.get('rsi_14'),
+            signal_macd_hist=sig.get('macd_hist'),
+            signal_momentum_state=sig.get('momentum_state'),
+            signal_z_score_tier=sig.get('z_score_tier'),
+            signal_decision=sig.get('decision'),
+            # A/B test variant tags
+            test_sl_variant=ab.get('sl_variant'),
+            test_timing_variant=ab.get('entry_variant'),
+            test_trailing_variant=ab.get('ts_variant'),
+            # JSONB catch-all: all signal indicator values at entry time
+            # sig.get() returns a JSON string from hotset.json — deserialize to dict
+            # before passing to execute_trade() which will re-serialize via json.dumps()
+            signal_metadata=(json.loads(sig.get('signal_metadata'))
+                             if sig.get('signal_metadata') else None),
+        )
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')

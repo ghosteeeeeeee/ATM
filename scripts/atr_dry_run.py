@@ -7,19 +7,11 @@ import sys
 import os
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 from position_manager import (
     get_open_positions, _force_fresh_atr, _atr_multiplier,
     ATR_UPDATE_THRESHOLD_PCT, refresh_current_prices
 )
-
-ATR_UPDATE_THRESHOLD_PCT = 0.005  # 0.5%
-
-def _atr_multiplier(atr_pct):
-    if atr_pct >= 0.10:   return 2.0
-    elif atr_pct >= 0.05: return 1.5
-    elif atr_pct >= 0.02: return 1.0
-    elif atr_pct >= 0.01: return 0.5
-    else:                 return 0.25
 
 def main():
     positions = refresh_current_prices()

@@ -1,3 +1,4 @@
+# Migrated from ../trend_purity_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
 """
 trend_purity_signals.py — Standalone trend purity signal.
@@ -167,6 +168,9 @@ def detect_trend_purity(token: str, direction: str = None):
 
 
 def scan(conf_min: int = 60, token: str = None):
+    from hermes_constants import TREND_PURITY_ENABLED
+    if not TREND_PURITY_ENABLED:
+        return 0
     """
     Scan all tokens (or single token) and emit trend_purity signals.
 
@@ -188,6 +192,12 @@ def scan(conf_min: int = 60, token: str = None):
     emitted = 0
     for tok in tokens:
         for direction in ['LONG', 'SHORT']:
+            # ── Per-direction kill-switch ─────────────────────────────────────────
+            from hermes_constants import TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED
+            if direction == 'LONG' and not TREND_PURITY_PLUS_ENABLED:
+                continue
+            if direction == 'SHORT' and not TREND_PURITY_MINUS_ENABLED:
+                continue
             sig = detect_trend_purity(tok, direction)
             if not sig:
                 continue
@@ -202,12 +212,21 @@ def scan(conf_min: int = 60, token: str = None):
     return emitted
 
 
-def main():
-    global DRY_RUN
+def run(prices_dict=None):
+    """Entry point for signals_runner. Returns count of signals emitted."""
+    result = scan(conf_min=60)
+    if result is None:
+        return 0
+    return result if isinstance(result, int) else len(result)
+
+
+# ── CLI entry point ───────────────────────────────────────────────────────────
+if __name__ == '__main__':
+    import argparse, sys
     parser = argparse.ArgumentParser(description='trend_purity signals')
-    parser.add_argument('--dry', action='store_true', help='dry run — do not write to DB')
-    parser.add_argument('--token', type=str, default=None, help='scan single token')
-    parser.add_argument('--conf-min', type=int, default=60, help='minimum confidence to emit')
+    parser.add_argument('--dry', action='store_true', help='dry run')
+    parser.add_argument('--token', type=str, default=None)
+    parser.add_argument('--conf-min', type=int, default=60)
     args = parser.parse_args()
     DRY_RUN = args.dry
 
@@ -221,7 +240,3 @@ def main():
     else:
         emitted = scan(conf_min=args.conf_min)
         print(f"\nTotal trend_purity signals emitted: {emitted}")
-
-
-if __name__ == '__main__':
-    main()

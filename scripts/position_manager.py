@@ -21,6 +21,7 @@ from hermes_constants import (
     ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL,
     ATR_SL_MIN_INIT, ATR_SL_MAX_INIT, SL_PCT_FALLBACK, TP_PCT_FALLBACK, STOP_LOSS_DEFAULT,
     ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
+    ATR_K_INITIAL,
     ATR_PCT_LOW_THRESH, ATR_PCT_HIGH_THRESH,
     PHASE_TIER_NEUTRAL, PHASE_TIER_BUILDING, PHASE_TIER_ACCELERATING,
     PHASE_TIER_EXHAUSTION, PHASE_TIER_EXTREME,
@@ -51,7 +52,7 @@ except Exception as e:
 # Sourced from hermes_constants.py — adjust STALE_*, SPEED_HOTSET_WEIGHT there.
 from hermes_constants import (
     STALE_WINNER_TIMEOUT_MINUTES, STALE_LOSER_TIMEOUT_MINUTES,
-    STALE_WINNER_MIN_PROFIT, STALE_LOSER_MAX_LOSS, STALE_VELOCITY_THRESHOLD,
+    STALE_WINNER_MIN_PROFIT, STALE_LOSER_MAX_LOSS, VEL_STALE_THRESHOLD_PCT,
 )
 
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
@@ -216,7 +217,7 @@ def _get_trigger_threshold(token: str, speed_tracker) -> float:
 # This prevents the bug where hl-sync-guardian.py and position_manager.py had
 # different values for the same constants, causing get_cooldown to disagree with
 # _record_loss_cooldown.
-from paths import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
+from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
 LOSS_STREAK_RESET_WIN   = True   # reset streak to 0 after a win (good trend continuation)
 WIN_COOLDOWN_MINUTES    = 5     # block same direction for 5 min after a win
 
@@ -457,7 +458,7 @@ def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[b
     # ── Speed stall check ───────────────────────────────────────────────────
     # Speed in bottom third (<33) + velocity near zero = stalled
     SPEED_STALL_THRESHOLD = 33  # bottom third of percentile range
-    is_stalled = speed_pctl < SPEED_STALL_THRESHOLD and abs(vel_5m) < STALE_VELOCITY_THRESHOLD
+    is_stalled = speed_pctl < SPEED_STALL_THRESHOLD and abs(vel_5m) < VEL_STALE_THRESHOLD_PCT
 
     # ── Stale loser: pnl < -1% AND stalled for 15+ min ──────────────────────
     if live_pnl <= STALE_LOSER_MAX_LOSS:
@@ -1635,8 +1636,10 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             MIN_TP_PCT_TRAILING = ATR_TP_MIN_ACCEL  # 0.50% floor — book profit fast
 
         # Enforce minimum SL/TP percentages to prevent razor-thin stops on low-vol tokens.
-        effective_sl_pct = max(sl_pct, MIN_SL_PCT_TRAILING)
-        effective_tp_pct = max(tp_pct, MIN_TP_PCT_TRAILING)
+        # Cap is enforced here too — _collect_atr_updates was missing the upper bound
+        # that get_trade_params and _compute_dynamic_sl both apply.
+        effective_sl_pct = min(max(sl_pct, MIN_SL_PCT_TRAILING), ATR_SL_MAX)
+        effective_tp_pct = min(max(tp_pct, MIN_TP_PCT_TRAILING), ATR_TP_MAX)
 
         if direction == "LONG":
             new_sl = round(ref_price * (1 - effective_sl_pct), 8)
@@ -1972,7 +1975,7 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
         atr = _pm_get_atr(token)
         if atr is not None:
             atr_pct = atr / price
-            k = _dr_atr(token, atr_pct)
+            k = ATR_K_INITIAL  # separate k for initial SL — wider than trailing k
             atr_sl_pct = (k * atr) / price
             effective_sl_pct = max(atr_sl_pct, ATR_SL_MIN_INIT)
             effective_sl_pct = min(effective_sl_pct, ATR_SL_MAX_INIT)

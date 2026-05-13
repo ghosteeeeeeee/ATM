@@ -15,6 +15,7 @@ import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error, 
 from decimal import Decimal, ROUND_UP
 
 from paths import *
+from hermes_constants import LIVE_TRADING_ENABLED
 # ─── Wallet Credentials ──────────────────────────────────────────────────────
 _SECRETS = pathlib.Path(__file__).parent.parent / ".secrets.local"
 if _SECRETS.exists():
@@ -236,8 +237,7 @@ def _save_flags(flags: dict):
 
 
 def is_live_trading_enabled() -> bool:
-    """Check if live trading mirroring is enabled."""
-    return _load_flags().get("live_trading", False)
+    return LIVE_TRADING_ENABLED
 
 
 def enable_live_trading() -> dict:

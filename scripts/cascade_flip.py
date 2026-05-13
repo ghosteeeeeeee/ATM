@@ -26,7 +26,7 @@ _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 
-from paths import RUNTIME_DB, FLIP_COUNTS_FILE, LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
+from hermes_constants import RUNTIME_DB, FLIP_COUNTS_FILE, LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
 from hermes_file_lock import FileLock
 
 
@@ -176,6 +176,16 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
             conn.close()
             return False
         conn.commit()
+        # ── Loss cooldown: record if this was a losing trade ──────────────────
+        # BUG-FIX (2026-04-28): cascade flip closes losing positions but was NOT
+        # recording loss cooldowns, allowing immediate re-entry. Also fixed here:
+        # if _set_loss_cooldown throws, do NOT rollback — the close is already committed.
+        if pnl_usdt_val < 0:
+            try:
+                _set_loss_cooldown(token, direction)
+                print(f"  [CASCADE FLIP] LOSS COOLDOWN recorded for {token} {direction}")
+            except Exception as cd_err:
+                print(f"  [CASCADE FLIP] ⚠️ Cooldown write failed (close is committed): {cd_err}")
         conn.close()
         return True
     except Exception as e:
