@@ -24,9 +24,10 @@ import sys as _sys
 _sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import _get_meta, get_tradeable_tokens
 
+from paths import *
 HL_INFO_URL = "https://api.hyperliquid.xyz/info"
 BINANCE_VOL_URL = "https://api.binance.com/api/v3/ticker/24hr"
-CACHE_FILE = "/root/.hermes/data/top150_tokens.json"
+CACHE_FILE = TOP150_FILE
 CACHE_TTL = 3600  # 1 hour
 
 

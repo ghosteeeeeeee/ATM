@@ -11,6 +11,7 @@ Usage:
 
 Lock files: /root/.hermes/locks/<lockname>.lock
 Timeout: 30s wait, 5s polling, SKIPPED (exit 0) on timeout.
+from paths import *
 """
 import sys, os, fcntl, time
 

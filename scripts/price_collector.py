@@ -20,6 +20,10 @@ from signal_schema import (
 )
 import hype_cache as hc
 from hyperliquid_exchange import is_delisted as _is_delisted, _info_rate_limit
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+
+# Combined blacklist — tokens that should never be stored (not tradeable or systematically losing)
+SKIP_TOKENS = SHORT_BLACKLIST | LONG_BLACKLIST
 
 STATIC = STATIC_DB
 init_db()  # Ensure tables exist
@@ -142,7 +146,10 @@ def _seed_universe_candles(universe: list):
 
     all_tokens = sorted(set(
         u['name'] for u in universe
-        if u.get('name') and not u['name'].startswith('@') and len(u['name']) <= 10
+        if u.get('name')
+        and not u['name'].startswith('@')
+        and len(u['name']) <= 10
+        and not u.get('isDelisted', False)  # FIX: don't seed candles for delisted HL tokens
     ))
 
     saved_tokens, cursor, last_run = _get_candle_progress()
@@ -258,11 +265,16 @@ def save_prices(tokens, prices, universe=None):
         for tok in tokens:
             if _is_delisted(tok):
                 delisted.add(tok)
-    tokens_clean={k: v for k, v in tokens.items() if k not in delisted}
+    tokens_clean={k: v for k, v in tokens.items() if k not in delisted and k not in SKIP_TOKENS}
     # FIX: Only store prices for tokens that exist in tokens_clean (i.e., universe tokens).
     # Hyperliquid's allMids returns ~542 entries: 230 named coins + 306 @XXX numeric IDs.
     # @XXX entries are invalid coin identifiers — never store them in SQLite.
-    prices_clean={k: v for k, v in prices.items() if k not in delisted and k in tokens_clean}
+    prices_clean={k: v for k, v in prices.items() if k not in delisted and k not in SKIP_TOKENS and k in tokens_clean}
+
+    # Count skipped for logging
+    skipped = len(prices) - len(prices_clean)
+    if skipped > 0:
+        print(f'  [price_collector] Skipped {skipped} blacklisted tokens (not storing to DB)')
 
     # Write all prices to local SQLite via upsert_prices_from_allMids
     inserted = upsert_prices_from_allMids(prices_clean, tokens_clean)
@@ -397,6 +409,10 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
     # The fill queries all windows from last_closed_boundary + tf onward,
     # then INSERT OR REPLACE marks them is_closed=1.
     # Tokens with no prior candles have last_closed_boundary = -tf_seconds (start from epoch).
+    # Skip blacklisted tokens — reduces ~79 tokens × 5 queries × 4 TFs per run
+    skip = SHORT_BLACKLIST | LONG_BLACKLIST
+    last_closed_dict = {k: v for k, v in last_closed_dict.items() if k not in skip}
+
     filled = 0
     for token, token_last_closed in last_closed_dict.items():
         # Skip tokens with no last_closed_boundary
@@ -486,6 +502,9 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
         WHERE a.bar_count >= 2
     """).fetchall()
 
+    # Filter out blacklisted tokens for developing candle phase too
+    dev_rows = [row for row in dev_rows if row[0] not in skip]
+
     # Write developing candle for the open window if >= 2 bars available.
     # Only write if this window is not already closed in candles.db.
     # INSERT OR REPLACE would overwrite is_closed=1 with is_closed=0 otherwise.
@@ -525,13 +544,15 @@ def main():
     print(f'Collected {inserted} prices at {time.strftime("%H:%M:%S")}')
 
     # Aggregate candles from price_history (signals_hermes.db) into candles.db
+    # THEN update prices.json so the timestamp reflects post-aggregation freshness
     ph_conn = sqlite3.connect(STATIC_DB, timeout=30)
     ph_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn = sqlite3.connect(CANDLES_DB, timeout=60)
     candle_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn.execute("PRAGMA synchronous=NORMAL")
 
-    for tf_sec, table in [(300, 'candles_5m'), (900, 'candles_15m'), (3600, 'candles_1h'), (14400, 'candles_4h')]:
+    for tf_sec, table in [(300, 'candles_5m'), (900, 'candles_15m'), (3600, 'candles_1h'),]:  # (14400, 'candles_4h')  # disabled — not used by any active signal
+        # (14400, 'candles_4h'),  # disabled — not used by any active signal
         try:
             last = _aggregate_tf(ph_conn, candle_conn, tf_sec, table)
             dt = time.strftime('%H:%M:%S', time.localtime(last)) if last else 'N/A'
@@ -542,9 +563,9 @@ def main():
     ph_conn.close()
     candle_conn.close()
 
-    # Seed multi-TF candles for universe tokens (2 tokens per run, 3 TFs each)
-    # This populates candles.db so macd_rules has local data with zero API calls
-    _seed_universe_candles(universe)
+    # candles now updated — timestamp already reflects post-aggregation freshness
+    # save_prices() removed — was redundant second write, doubled DB time
+    # _seed_universe_candles disabled — Binance API calls caused 100s+ blocking, conflicts with aggregation lock
 
 if __name__ == '__main__':
     main()

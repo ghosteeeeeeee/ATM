@@ -28,6 +28,7 @@ from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Optional, List, Dict, Any
 
+from paths import *
 warnings.filterwarnings('ignore')
 
 ARCHIVE_DIR = Path('/root/.hermes/data/candles')

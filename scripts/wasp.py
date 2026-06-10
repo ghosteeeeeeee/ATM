@@ -12,13 +12,14 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(__file__))
 
+from paths import *
 # ── Config ──────────────────────────────────────────────────────────────────
 STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
 RUNTIME_DB  = "/root/.hermes/data/signals_hermes_runtime.db"
 BRAIN_DSN   = "host=/var/run/postgresql dbname=brain user=postgres"
-PRICES_JSON = "/root/.hermes/data/prices.json"
-HL_CACHE    = "/var/www/hermes/data/hl_cache.json"
-LIVESWITCH  = "/var/www/hermes/data/hype_live_trading.json"
+PRICES_JSON = PRICES_FILE
+HL_CACHE    = HL_CACHE_FILE
+LIVESWITCH  = LIVESWITCH_FILE
 PIPELINE_LOG = "/root/.hermes/logs/pipeline.log"
 ERRORS_LOG  = "/root/.hermes/logs/errors.log"
 TRADES_API  = "/var/www/hermes/data/trades.json"
@@ -584,7 +585,7 @@ def check_web_api():
         api_tokens = set()
         try:
             api = read_json(TRADES_API, {})
-            api_tokens = {t["token"] for t in api.get("open", [])}
+            api_tokens = {t["coin"] for t in api.get("open", [])}
         except: pass
         missing = open_tokens - api_tokens
         if missing:
@@ -664,7 +665,7 @@ def check_db_integrity():
 # ═══════════════════════════════════════════════════════════════════════════
 def check_hotset():
     HOTSET_FILE = "/var/www/hermes/data/hotset.json"
-    HOTSET_META = "/var/www/hermes/data/hotset_last_updated.json"
+    HOTSET_META = HOTSET_META_FILE
     TRADES_JSON = "/var/www/hermes/data/trades.json"
 
     # Freshness check
@@ -743,7 +744,7 @@ def check_hotset():
 # ═══════════════════════════════════════════════════════════════════════════
 def check_paper_hl_sync():
     TRADES_JSON = "/var/www/hermes/data/trades.json"
-    LIVESWITCH  = "/var/www/hermes/data/hype_live_trading.json"
+    LIVESWITCH  = LIVESWITCH_FILE
 
     switch = read_json(LIVESWITCH, {})
     if not switch.get("live_trading"):
@@ -752,7 +753,7 @@ def check_paper_hl_sync():
 
     # Load paper open positions
     paper = read_json(TRADES_JSON, {"open": []}).get("open", [])
-    paper_tokens = {p.get("token") for p in paper if p.get("token")}
+    paper_tokens = {p.get("coin") for p in paper if p.get("coin")}
     print(f"   Paper open: {len(paper_tokens)} tokens")
 
     if not paper_tokens:
@@ -793,7 +794,7 @@ def check_paper_hl_sync():
             ", ".join(sorted(phantom)[:10]))
 
     # Sync staleness: check pipeline_heartbeat.json
-    hb = read_json("/var/www/hermes/data/pipeline_heartbeat.json", {})
+    hb = read_json(PIPELINE_HB_FILE, {})
     if hb:
         hb_age = (time.time() - hb.get("timestamp", 0)) / 60
         if hb_age > 15:

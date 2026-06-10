@@ -16,6 +16,7 @@ from datetime import datetime
 
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 LOG = '/root/.hermes/logs/trading-checklist.log'
 os.makedirs(os.path.dirname(LOG), exist_ok=True)
 
@@ -151,7 +152,7 @@ def check_signals_db():
     issues = []
     try:
         import sqlite3
-        db = '/root/.hermes/data/signals_hermes_runtime.db'
+        db = RUNTIME_DB
         conn = sqlite3.connect(db)
         c = conn.cursor()
 
@@ -213,7 +214,7 @@ def check_live_trading():
     try:
         import json
         # Check the live trading file
-        fpath = '/var/www/hermes/data/hype_live_trading.json'
+        fpath = LIVESWITCH_FILE
         with open(fpath) as f:
             data = json.load(f)
 
@@ -242,7 +243,7 @@ def check_momentum_cache():
     issues = []
     try:
         import sqlite3
-        db = '/root/.hermes/data/signals_hermes_runtime.db'
+        db = RUNTIME_DB
         conn = sqlite3.connect(db)
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*), MAX(updated_at) FROM momentum_cache")
@@ -272,7 +273,7 @@ def check_trailing_stops():
     issues = []
     try:
         import json
-        fpath = '/var/www/hermes/data/trailing_stops.json'
+        fpath = TRAILING_STOPS_FILE
         with open(fpath) as f:
             data = json.load(f)
 

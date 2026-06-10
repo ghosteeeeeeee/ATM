@@ -17,6 +17,7 @@ import psycopg2
 import sys
 from collections import defaultdict
 
+from paths import *
 BRAIN_DB = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
 
 def get_trades():

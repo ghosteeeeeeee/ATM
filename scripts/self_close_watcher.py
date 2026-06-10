@@ -17,7 +17,14 @@ from datetime import datetime
 
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 import hype_cache as hc
+from atr_cache import get_atr
+from tpsl_utils import compute_atr_sl_price, compute_atr_tp_price
+from hermes_constants import (
+    ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT,
+    ATR_K_NORMAL_VOL, ATR_PCT_FALLBACK,
+)
 from hyperliquid_exchange import (
     get_exchange, _exchange_rate_limit, get_open_hype_positions_curl,
     MAIN_ACCOUNT_ADDRESS, cancel_bulk_orders
@@ -162,8 +169,16 @@ def guarded_close_position(coin: str, direction: str, size: float,
             log.info(f"  Self-close {coin} {direction} sz={size} at ~{price} ({reason})")
 
             result = exchange.order(coin, is_buy, size, price, None, reduce_only=True)
-            statuses = result.get("response", {}).get("data", {}).get("statuses", [])
-            error = statuses[0].get("error") if statuses else None
+            response = result.get("response")
+            data = response.get("data", {}) if isinstance(response, dict) else {}
+            statuses = data.get("statuses", []) if isinstance(data, dict) else []
+            error = None
+            if statuses and isinstance(statuses, list) and len(statuses) > 0:
+                first = statuses[0]
+                if isinstance(first, dict):
+                    error = first.get("error")
+            elif isinstance(response, dict):
+                error = response.get("error")
 
             if error:
                 log.error(f"  Self-close {coin} failed: {error}")
@@ -173,7 +188,7 @@ def guarded_close_position(coin: str, direction: str, size: float,
                     continue
                 return {"ok": False, "error": error, "coin": coin, "attempt": attempt}
 
-            oid = statuses[0].get("ok", {}).get("oid") if statuses else None
+            oid = statuses[0].get("ok", {}).get("oid") if (isinstance(statuses, list) and len(statuses) > 0) else None
             log.info(f"  Self-close {coin} OK — oid={oid}")
             return {"ok": True, "coin": coin, "size": size, "close_price": price,
                     "direction": direction, "oid": oid, "reason": reason}
@@ -232,17 +247,11 @@ def check_and_close():
         # Get stored TP/SL
         record = stored.get(coin)
         if not record:
-            # No stored TP/SL — compute from defaults (2% ATR% → NORMAL_VOL → k=2.0)
-            atr_pct = 0.02
-            k, k_tp = 2.0, 5.0   # k=2.0 for NORMAL_VOL, k_tp=2.5×k=5.0
-            sl_pct = max(0.010, min(0.05, k * atr_pct))
-            tp_pct = max(0.015, min(0.15, k_tp * atr_pct))
-            if direction == 'LONG':
-                sl_price = current_px * (1 - sl_pct)
-                tp_price = current_px * (1 + tp_pct)
-            else:
-                sl_price = current_px * (1 + sl_pct)
-                tp_price = current_px * (1 - tp_pct)
+            # No stored TP/SL — compute from ATR using canonical tpsl_utils.
+            # compute_atr_sl_price / compute_atr_tp_price handle ATR cache,
+            # ATR_PCT_FALLBACK, and all MIN/MAX clamping internally.
+            sl_price = compute_atr_sl_price(coin, direction, entry_px, current_px)
+            tp_price = compute_atr_tp_price(coin, direction, entry_px, current_px)
             # Store for future runs
             upsert_self_close(coin, direction, sz, entry_px, sl_price, tp_price)
             log.info(f"  {coin}: no prior record, computed SL={sl_price:.6f} TP={tp_price:.6f}")
@@ -319,13 +328,15 @@ def sync_from_batch():
 
 
 if __name__ == "__main__":
+    # DEPRECATED (2026-04-23): Self-close logic has been merged into hl-sync-guardian.py.
+    # The hermes-self-close-watcher.timer is stopped and masked.
+    # This file is kept for reference only — do not run manually.
+    log.warning("self_close_watcher.py is DEPRECATED — breach logic is now in hl-sync-guardian.py")
+    log.warning("Stopping hermes-self-close-watcher.timer: systemctl stop hermes-self-close-watcher.timer")
     parser = argparse.ArgumentParser()
     parser.add_argument('--dry-run', action='store_true')
     args = parser.parse_args()
-    DRY = args.dry_run
-
-    if DRY:
-        log.info("DRY RUN — no orders will be placed")
-
-    sync_from_batch()
-    check_and_close()
+    if args.dry_run:
+        log.info("Would run check_and_close() but this module is deprecated")
+    # Exit immediately — guardian handles everything now
+    sys.exit(0)

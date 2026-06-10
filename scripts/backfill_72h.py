@@ -3,6 +3,7 @@
 Backfill 72h of 1h candles from Binance into price_history.
 Public API — no auth, no rate limits for klines.
 72h at 1h = 72 candles per token = 1 API call (Binance returns up to 1000).
+from paths import *
 """
 import sqlite3, requests
 from concurrent.futures import ThreadPoolExecutor, as_completed

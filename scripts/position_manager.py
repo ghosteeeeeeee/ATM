@@ -17,9 +17,10 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from hermes_file_lock import FileLock
 from hermes_constants import (
     MAX_OPEN_POSITIONS,
+    DEFAULT_TRADE_SIZE_USDT,
     ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT,
     ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL,
-    ATR_SL_MIN_INIT, ATR_SL_MAX_INIT, SL_PCT_FALLBACK, TP_PCT_FALLBACK, STOP_LOSS_DEFAULT,
+    ATR_SL_MIN_INIT, ATR_SL_MAX_INIT, SL_PCT_FALLBACK, TP_PCT_FALLBACK, STOP_LOSS_DEFAULT, SL_PCT_MIN,
     ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
     ATR_K_INITIAL,
     ATR_PCT_LOW_THRESH, ATR_PCT_HIGH_THRESH,
@@ -28,12 +29,16 @@ from hermes_constants import (
     K_PHASE_ACCEL_STALL, K_PHASE_ACCEL_FAST, K_PHASE_ACCEL_SLOW,
     K_PHASE_EXH_STALL, K_PHASE_EXH_FAST, K_PHASE_EXH_SLOW,
     K_PHASE_EXT_STALL, K_PHASE_EXT_FAST,
+    PHASE_ACCEL_FAST_THRESH,
     WRONG_SIDE_AVG_PCT_THRESH,
     CASCADE_FLIP_ENABLED,
+    ATR_UPDATE_THRESHOLD,
 )
 from paths import *
 from _secrets import BRAIN_DB_DICT
+from tpsl_utils import compute_atr_sl_tp
 from signal_schema import record_signal_outcome
+from pnl_utils import compute_live_pnl, compute_hl_pnl_pct, compute_pnl_usdt, compute_close_pnl, Direction
 
 
 import hype_cache as hc
@@ -77,10 +82,7 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = -2.0   # cut if pnl_pct <= -2.0%
-TP_PCT        = 0.08          # 8% fallback target (overridden by ATR-based TP in get_trade_params)
-ATR_UPDATE_THRESHOLD_PCT = 0.0015  # only push SL/TP update to HL if delta > 0.15%
-SL_PCT = 0.03          # 3% stop loss (cut loser threshold — DEFAULT fallback)
-SL_PCT_MIN = 0.01      # minimum SL for any trade
+ATR_UPDATE_THRESHOLD_PCT = ATR_UPDATE_THRESHOLD  # only push SL/TP update to HL if delta > 0.15%
 MAX_LEVERAGE = 5
 
 # ─── ATR Internal Close System ─────────────────────────────────────────────────
@@ -256,7 +258,7 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
             FROM trades
             WHERE status = 'open'
               AND server = %s
-              AND (signal IS NULL OR signal NOT IN ('pump_hunter', 'zscore_pump'))
+              AND (signal IS NULL OR signal NOT IN ('pump_hunter'))
             ORDER BY open_time DESC
         """, (server,))
         rows = cur.fetchall()
@@ -269,7 +271,7 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
 
 
 def get_position_count(server: str = SERVER_NAME) -> int:
-    """Count open positions for the given server (excludes pump_hunter and zscore_pump signals)."""
+    """Count open positions for the given server (excludes pump_hunter signal only)."""
     conn = get_db_connection()
     if conn is None:
         return 0
@@ -280,7 +282,7 @@ def get_position_count(server: str = SERVER_NAME) -> int:
             SELECT COUNT(*) as cnt FROM trades
             WHERE status = 'open'
               AND server = %s
-              AND (signal IS NULL OR signal NOT IN ('pump_hunter', 'zscore_pump'))
+              AND (signal IS NULL OR signal NOT IN ('pump_hunter'))
         """, (server,))
         row = cur.fetchone()
         return int(row["cnt"]) if row else 0
@@ -292,7 +294,7 @@ def get_position_count(server: str = SERVER_NAME) -> int:
 
 
 def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
-    """Check if token already has an open position (excludes pump_hunter and zscore_pump signals)."""
+    """Check if token already has an open position (excludes pump_hunter signal only)."""
     conn = get_db_connection()
     if conn is None:
         return False
@@ -304,7 +306,7 @@ def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
             WHERE status = 'open'
               AND server = %s
               AND LOWER(token) = LOWER(%s)
-              AND (signal IS NULL OR signal NOT IN ('pump_hunter', 'zscore_pump'))
+              AND (signal IS NULL OR signal NOT IN ('pump_hunter'))
         """, (server, token))
         row = cur.fetchone()
         return int(row["cnt"]) > 0 if row else False
@@ -359,6 +361,20 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
     return pnl_pct <= CUT_LOSER_PNL
 
 
+# Guardian closing marker path (same as hl-sync-guardian.py)
+_GUARDIAN_CLOSING_FILE = '/root/.hermes/data/guardian-closing-markers.json'
+
+def _is_closing_marker_active(token: str) -> bool:
+    """Check if guardian is currently closing this token — skip ATR check if so."""
+    try:
+        with FileLock('guardian_closing'):
+            with open(_GUARDIAN_CLOSING_FILE) as f:
+                data = json.load(f)
+        return token.upper() in data.get('tokens', {})
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
+
 def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
     """
     Check every open position for ATR TP/SL hit.
@@ -370,6 +386,7 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
       SHORT: current_price <= target    → TP hit
 
     Handles edge cases: missing current_price, missing SL/TP in DB.
+    Skips tokens that guardian is actively closing (race-condition guard).
     """
     hits = []
     for pos in open_positions:
@@ -383,6 +400,11 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
         if not trade_id or not direction:
             continue
         if direction not in ('LONG', 'SHORT'):
+            continue
+
+        # GUARDIAN CLOSING GUARD: if guardian is mid-close on this token,
+        # skip ATR check — guardian owns the close, don't dual-close
+        if _is_closing_marker_active(token):
             continue
 
         # Need a valid current_price to check
@@ -868,7 +890,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # Fetch trade details before closing
         cur.execute("""
             SELECT token, direction, entry_price, current_price,
-                   pnl_pct, experiment, sl_distance, amount_usdt, signal
+                   pnl_pct, experiment, sl_distance, amount_usdt, signal,
+                   hl_notional_usdt
             FROM trades WHERE id = %s
         """, (trade_id,))
         row = cur.fetchone()
@@ -879,7 +902,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         direction = row['direction']
         entry_price = float(row['entry_price'] or 0)
         current_price = float(row['current_price'] or entry_price)
-        amount_usdt = float(row['amount_usdt'] or 50)
+        # Bug-fix (2026-05-20): `or` treated 0.0 as falsy → phantom $50 fee base.
+        # Use explicit None check so 0.0 is kept as real data.
+        amount_usdt = float(row['amount_usdt']) if row['amount_usdt'] is not None else DEFAULT_TRADE_SIZE_USDT
+        # calc_notional: use actual HL notional if recorded, else fall back to amount_usdt.
+        # Bug-fix (2026-05-20): `if row['hl_notional_usdt']` treated 0.0 as falsy — 
+        # an HL trade with $0 notional (theoretical) or NULL both need the fallback.
+        calc_notional = float(row['hl_notional_usdt']) if row['hl_notional_usdt'] is not None else amount_usdt
         experiment = row['experiment']
         sl_dist = row['sl_distance']
         signal_type = row['signal']  # fallback for record_signal_outcome
@@ -899,7 +928,10 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         TAKER_FEE = 0.00045
         leverage = float(row.get('leverage') or 10)
         entry_fee_paid = float(row.get('entry_fee') or 0)
-        notional = amount_usdt * leverage
+        # BUG-FIX (2026-05-18): Fees must be calculated from actual HL notional
+        # (calc_notional ≈ $7), not signal-level amount_usdt (≈ $50).
+        # Using amount_usdt inflates fees by ~7x and understates net PnL.
+        notional = calc_notional * leverage
 
         # If entry_fee was never recorded, calculate it now
         if entry_fee_paid == 0 and notional > 0:
@@ -910,14 +942,14 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
 
         # Calculate pnl_usdt at close (direction-aware)
         # pnl_pct = raw % price change (e.g., 10 = 10% move)
-        # pnl_usdt = amount_usdt * |pnl_pct|/100 (proportional to actual capital, NO leverage)
-        # NOTE: leverage is already embedded in the % change when using notional PnL from HL,
-        # but here pnl_pct is raw market return so we don't double-apply leverage.
+        # pnl_usdt = calc_notional * |pnl_pct|/100 (proportional to actual HL capital)
+        # Use actual HL notional (calc_notional) when available for accurate PnL math.
+        # calc_notional = hl_notional_usdt when set (≈$7 from HL), else amount_usdt (≈$50 legacy).
         if direction == 'LONG':
             pnl_pct = ((current_price - entry_price) / entry_price * 100) if entry_price > 0 else 0
         else:
             pnl_pct = ((entry_price - current_price) / entry_price * 100) if entry_price > 0 else 0
-        pnl_usdt = amount_usdt * (abs(pnl_pct) / 100) * (1 if pnl_pct >= 0 else -1)
+        pnl_usdt = calc_notional * (abs(pnl_pct) / 100) * (1 if pnl_pct >= 0 else -1)
         pnl_usdt_val = float(pnl_usdt or 0)
 
         # Net PnL after fees
@@ -934,15 +966,51 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             if m:
                 pnl_pct_from_reason = float(m.group(1))
                 # pnl_pct_from_reason is the realized pnl% at time of exit
-                pnl_usdt_val = amount_usdt * (abs(pnl_pct_from_reason) / 100) * (1 if pnl_pct_from_reason >= 0 else -1)
+                pnl_usdt_val = calc_notional * (abs(pnl_pct_from_reason) / 100) * (1 if pnl_pct_from_reason >= 0 else -1)
                 pnl_pct = pnl_pct_from_reason  # also correct the stored pnl_pct
                 # BUG-49 fix: net_pnl must be kept in sync after reason override
                 net_pnl = pnl_usdt_val - fee_total
+            else:
+                # FIX (2026-05-17): reason has no PnL% pattern (e.g. "atr_sl_hit").
+                # Fall back to hype_realized_pnl_usdt if available — this captures
+                # the actual HL fill price which doesn't revert like current_price does.
+                # hype_realized_pnl_usdt is set by the guardian after HL fills confirm,
+                # so it reflects true realized loss/profit.
+                try:
+                    cur.execute("SELECT hype_realized_pnl_usdt FROM trades WHERE id=%s", (trade_id,))
+                    hr_row = cur.fetchone()
+                    if hr_row and hr_row['hype_realized_pnl_usdt'] is not None:
+                        hype_val = float(hr_row['hype_realized_pnl_usdt'])
+                        if hype_val != 0:
+                            pnl_usdt_val = round(hype_val, 4)
+                            # Compute pnl_pct from the corrected pnl_usdt
+                            if calc_notional > 0:
+                                pnl_pct = round(pnl_usdt_val / calc_notional * 100, 4)
+                            net_pnl = pnl_usdt_val - fee_total
+                except Exception:
+                    pass  # Keep pnl_usdt_val=0 if fallback also fails
         is_loss = pnl_usdt_val < 0
+        print(f"[Position Manager] close_paper_position trade_id={trade_id} reason='{reason}' "
+              f"pnl_usdt_val={pnl_usdt_val} is_loss={is_loss}")
         if is_loss:
+            print(f"[Position Manager] >>> LOSS DETECTED — calling set_loss_cooldown({token}, {direction})")
             set_loss_cooldown(token, direction)
+            print(f"[Position Manager] >>> set_loss_cooldown returned — verify in loss_cooldowns.json")
             # Post-mortem: if we lost on a direction, was the market moving against us first?
             _analyze_loss_direction(token, direction, entry_price, current_price)
+        else:
+            # SENTINEL: Check if hype_realized_pnl_usdt has a hidden loss that we missed
+            try:
+                cur.execute("SELECT hype_realized_pnl_usdt FROM trades WHERE id=%s", (trade_id,))
+                hr_row = cur.fetchone()
+                if hr_row and hr_row['hype_realized_pnl_usdt'] is not None:
+                    hype_val = float(hr_row['hype_realized_pnl_usdt'])
+                    if hype_val < 0:
+                        print(f"[Position Manager] ⚠️  ALERT: is_loss=False but hype_realized_pnl_usdt={hype_val} < 0 — cooldown may be missed!")
+                        print(f"[Position Manager] ⚠️  This means the loss was confirmed by HL but not recorded in cooldown! Calling set_loss_cooldown as fallback.")
+                        set_loss_cooldown(token, direction)
+            except Exception:
+                pass
 
         # ── Trigger win: clear loss streak since WIN confirms this was the right direction ──
         is_win = pnl_usdt_val > 0
@@ -974,6 +1042,22 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             return
         # DB UPDATE done — do NOT commit yet. Commit only after HL confirms, or rollback if HL fails.
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
+
+        # ── AUDIT: Log trade close ───────────────────────────────────────────
+        try:
+            from audit_logger import trade_close
+            trade_close(trade_id=int(trade_id),
+                        token=token.upper(), direction=direction,
+                        entry_price=float(entry_price),
+                        exit_price=float(current_price),
+                        pnl_usdt=float(pnl_usdt_val),
+                        pnl_pct=float(pnl_pct),
+                        close_reason=reason,
+                        hype_realized_pnl_usdt=None,
+                        is_loss=bool(is_loss),
+                        source='position_manager')
+        except Exception as _a:
+            pass
 
         # ── Mirror to Hyperliquid (real trade) ───────────────────────
         # Commit DB FIRST, then close on HL. This prevents the worst-case scenario
@@ -1033,11 +1117,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                     hl_ep = hl_exit_info.get('hl_exit_price')
                     # Use stored amount_usdt for pct calculation
                     cur2.execute(
-                        "SELECT amount_usdt FROM trades WHERE id=%s",
+                        "SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id=%s",
                         (trade_id,))
                     row = cur2.fetchone()
-                    amt = float(row[0] or 50) if row else 50
-                    hype_pct = round(hl_rp / amt * 100, 4)
+                    # Bug-fix (2026-05-20): same 0.0-falsy issue — use explicit None check.
+                    amt = float(row[0]) if row and row[0] is not None else DEFAULT_TRADE_SIZE_USDT
+                    calc_notional = float(row[1]) if row and row[1] is not None else amt
+                    hype_pct = round(hl_rp / calc_notional * 100, 4) if calc_notional else 0
                     cur2.execute("""
                         UPDATE trades SET
                             hype_realized_pnl_usdt = %s,
@@ -1074,7 +1160,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # ── Signal outcomes via signal_schema (with real PnL) ────────────────────
         # Use net_pnl (after fees) as the authoritative PnL for the outcomes table
         actual_pnl_usdt = net_pnl if net_pnl is not None else pnl_usdt_val
-        actual_pnl_pct = (actual_pnl_usdt / amount_usdt * 100) if amount_usdt > 0 else pnl_pct
+        # Use calc_notional for % calculation — reflects actual HL capital deployed
+        actual_pnl_pct = (actual_pnl_usdt / calc_notional * 100) if calc_notional > 0 else pnl_pct
         try:
             record_signal_outcome(
                 token=token,
@@ -1263,7 +1350,7 @@ def _atr_sl_k_scaled(
         # ATR% is the only stop we need — floor is the hard floor.
         if stalling:
             mult = K_PHASE_ACCEL_STALL  # stalling + accelerating = momentum fading, snap out
-        elif speed_percentile >= 70:
+        elif speed_percentile >= PHASE_ACCEL_FAST_THRESH:
             mult = K_PHASE_ACCEL_FAST   # fast momentum but first reversal = out
         else:
             mult = K_PHASE_ACCEL_SLOW   # low speed = no room needed, stay tight
@@ -1271,7 +1358,7 @@ def _atr_sl_k_scaled(
         # EXHAUSTION: still tight — 1.25-1.5× only
         if stalling:
             mult = K_PHASE_EXH_STALL    # stalling exhaustion = snap out faster
-        elif speed_percentile >= 70:
+        elif speed_percentile >= PHASE_ACCEL_FAST_THRESH:
             mult = K_PHASE_EXH_FAST     # fast momentum
         else:
             mult = K_PHASE_EXH_SLOW     # slow momentum
@@ -1426,12 +1513,20 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
     if direction == 'LONG':
         # SL = entry - k·ATR, never above current price (catches drops)
         sl = entry_price * (1 - effective_sl_pct)
-        return min(sl, current_price * (1 - ATR_SL_MIN))
+        result = min(sl, current_price * (1 - ATR_SL_MIN))
+        print(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
+        return result
     else:
         # SHORT: SL trails ABOVE current price as it falls (locks in profit)
         # SL = current_price + ATR_SL_MIN buffer — tight trailing for acceleration phase
         # The buffer is relative to current price, so as price falls, SL falls too
-        return current_price * (1 + ATR_SL_MIN)
+        result = current_price * (1 + ATR_SL_MIN)
+        print(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
+        # BUG CHECK
+        _in_profit = (current_price < entry_price) if (entry_price > 0 and current_price > 0) else False
+        if entry_price > 0 and current_price > 0:
+            print(f"  [_dynSL]   SHORT BUG-CHECK: SL-entry={((result-entry_price)/entry_price)*100:.2f}% SL-current={((result-current_price)/current_price)*100:.2f}% in_profit={_in_profit}")
+        return result
 
 
 def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
@@ -1457,15 +1552,22 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
     effective_tp_pct = min(effective_tp_pct, ATR_TP_MAX)
 
     if direction == 'LONG':
-        return current_price * (1 + effective_tp_pct)
+        result = current_price * (1 + effective_tp_pct)
+        print(f"  [_dynTP] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} k_tp={k_tp:.3f} eff_tp={effective_tp_pct*100:.3f}% → TP={result:.6f}")
+        return result
     else:
-        return current_price * (1 - effective_tp_pct)
+        result = current_price * (1 - effective_tp_pct)
+        print(f"  [_dynTP] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} k_tp={k_tp:.3f} eff_tp={effective_tp_pct*100:.3f}% → TP={result:.6f}")
+        # BUG CHECK: SHORT TP should be BELOW entry (profit target)
+        if entry_price > 0 and current_price > 0:
+            print(f"  [_dynTP]   SHORT BUG-CHECK: TP-entry={((result-entry_price)/entry_price)*100:.2f}% (should be negative for SHORT in profit)")
+        return result
 
 
 def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
     """
-    Collect all open positions (excluding cascade-flip) whose SL or TP has drifted
-    > ATR_UPDATE_THRESHOLD_PCT from current ATR.
+    Collect all open positions whose SL/TP has drifted from current ATR.
+    Delegated to tpsl_utils.compute_atr_sl_tp() for all SL/TP computation.
 
     Called once per cycle after the main position loop.
     Returns list of update dicts:
@@ -1535,16 +1637,18 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         trade_id = pos.get('id')
         current_sl = float(pos.get('stop_loss') or 0)
         current_tp = float(pos.get('target') or 0)
-        source = str(pos.get('source') or '')
+        pnl_pct = float(pos.get('pnl_pct', 0) or 0)
 
-        # P2 FIX: use DB-cached peak prices to ensure trailing SL is accurate
+        # Use DB-cached peak prices for accurate trailing
         if trade_id and trade_id in _peak_cache:
             _db_high, _db_low = _peak_cache[trade_id]
             pos['highest_price'] = float(_db_high) if _db_high else 0
             pos['lowest_price'] = float(_db_low) if _db_low else 0
 
-        # ── Post-flip eviction check: if token was recently flipped, use k=1.0
-        # (tightest possible — the flip entry was at a known bad moment, cut fast)
+        _peak_high = float(pos.get('highest_price') or 0) or 0
+        _peak_low  = float(pos.get('lowest_price')  or 0) or 0
+
+        # ── Post-flip eviction check ────────────────────────────────────────────
         flip_k_override = None
         try:
             from cascade_flip_helpers import is_token_evicted
@@ -1561,10 +1665,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         if atr is None:
             continue
 
-        # ── Resolve effective entry price ─────────────────────────────────────────
-        # If entry_price is 0/None (stale DB entry), use current_price from the
-        # already-refreshed position dict (refresh_current_prices fetches live HL data
-        # and also patches entry_price in-memory when DB entry was 0).
+        # ── Resolve effective entry price ──────────────────────────────────────
         _entry = entry_price
         if not _entry or float(_entry) <= 0:
             if current_price and float(current_price) > 0:
@@ -1573,186 +1674,42 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             else:
                 continue
 
-        # ── Compute ATR-based SL/TP ───────────────────────────────────────────────
-        # atr_pct is calculated from effective entry (not current price)
-        atr_pct = atr / _entry
-        momentum = momentum_by_token.get(token)
-        speed_pctl = speed_by_token.get(token, 50)
-        k = _atr_sl_k_scaled(token, direction, atr_pct, speed_pctl, momentum)
-        if flip_k_override is not None:
-            k = flip_k_override
-        sl_pct = k * atr_pct
-        tp_pct = k * ATR_TP_K_MULT * atr_pct  # canonical: momentum-scaled k × 1.25 × atr_pct
+        # ── Delegate SL/TP computation to tpsl_utils ───────────────────────────
+        # tpsl_utils.compute_atr_sl_tp handles:
+        #   - k scaling (phase + speed + momentum)
+        #   - new-trade INIT floor vs established ACCEL floor
+        #   - anchor price (highest/lowest/current/entry)
+        #   - trailing SL gate (only tighten, never loosen)
+        #   - trailing TP gate (only tighten, never loosen)
+        #   - INIT-to-ACCEL migration detection
+        result = compute_atr_sl_tp(
+            token=token,
+            direction=direction,
+            entry_price=_entry,
+            current_price=current_price,
+            highest_price=_peak_high,
+            lowest_price=_peak_low,
+            pnl_pct=pnl_pct,
+            current_sl=current_sl,
+            current_tp=current_tp,
+            momentum_stats=momentum_by_token.get(token),
+            speed_percentile=speed_by_token.get(token, 50),
+            flip_k_override=flip_k_override,
+        )
 
-        # BUG FIX: clamp sl_pct to ATR_SL_MAX_INIT on initial SL set (when current_sl is 0/None).
-        # Un-clamped sl_pct bypasses hermes_constants SL caps (ATR_SL_MAX=2.0%) entirely.
-        # Phase-tier k multipliers (0.05-0.25) provide tightening; this clamp is the hard ceiling.
-        if not current_sl or float(current_sl) <= 0:
-            sl_pct = min(sl_pct, ATR_SL_MAX_INIT)
+        new_sl = result['new_sl']
+        new_tp = result['new_tp']
+        needs_sl = result['needs_sl']
+        needs_tp = result['needs_tp']
 
-        # ── Trailing SL anchor: use peak price instead of current price ────────────
-        # For SHORT: lowest_price seen since entry (SL trails DOWN from the short's best price)
-        # For LONG:  highest_price seen since entry (SL trails UP from the long's best price)
-        # This implements proper trailing — SL only moves in profit direction.
-        _peak_high = float(pos.get('highest_price') or 0) or 0
-        _peak_low  = float(pos.get('lowest_price')  or 0) or 0
-        if direction == "SHORT":
-            # SHORT wins when price falls — use the lowest price seen as profit anchor
-            ref_price = _peak_low if _peak_low > 0 else (current_price if (current_price and float(current_price) > 0) else _entry)
-        elif direction == "LONG":
-            # LONG wins when price rises — use the highest price seen as profit anchor
-            ref_price = _peak_high if _peak_high > 0 else (current_price if (current_price and float(current_price) > 0) else _entry)
-        else:
-            ref_price = current_price if (current_price and float(current_price) > 0) else _entry
-        if not ref_price or float(ref_price) <= 0:
-            continue
-
-        # ── New-trade gate: give fresh PROFITABLE positions breathing room ───────────
-        # If peak price == entry price AND position is in profit, the trade just opened
-        # with no real candle formed yet. Applying phase-acceleration multipliers
-        # (k=0.05–0.25) squeezes the SL to near-zero. Use base_k + INIT floor instead.
-        #
-        # IMPORTANT: If the trade is ALREADY underwater, let the phase multiplier tighten.
-        # is_new_trade=True without profit check caused SL to be set below entry
-        # (worst-case: base_k=1.250, MIN_SL=0.50% floor → SL = entry-0.50% < entry).
-        _entry_f = float(_entry)
-        _pnl_pct = float(pos.get('pnl_pct', 0) or 0)
-        _in_profit = _pnl_pct > 0
-        is_new_trade = False
-        if _in_profit:
-            if direction == "LONG" and _peak_high > 0 and abs(_peak_high - _entry_f) / _entry_f < 0.001:
-                is_new_trade = True
-            elif direction == "SHORT" and _peak_low > 0 and abs(_peak_low - _entry_f) / _entry_f < 0.001:
-                is_new_trade = True
-
-        if is_new_trade:
-            k = _dr_atr(token, atr_pct)  # use base k — no acceleration squeeze
-            sl_pct = k * atr_pct
-            MIN_SL_PCT_TRAILING = ATR_SL_MIN_INIT  # 0.50% floor for new trades
-            MIN_TP_PCT_TRAILING = ATR_TP_MIN        # 0.75% floor for new trades
-        else:
-            # Established trade: acceleration-phase logic applies
-            MIN_SL_PCT_TRAILING = ATR_SL_MIN_ACCEL  # 0.20% floor — first candle against us, out
-            MIN_TP_PCT_TRAILING = ATR_TP_MIN_ACCEL  # 0.50% floor — book profit fast
-
-        # Enforce minimum SL/TP percentages to prevent razor-thin stops on low-vol tokens.
-        # Cap is enforced here too — _collect_atr_updates was missing the upper bound
-        # that get_trade_params and _compute_dynamic_sl both apply.
-        effective_sl_pct = min(max(sl_pct, MIN_SL_PCT_TRAILING), ATR_SL_MAX)
-        effective_tp_pct = min(max(tp_pct, MIN_TP_PCT_TRAILING), ATR_TP_MAX)
-
-        if direction == "LONG":
-            new_sl = round(ref_price * (1 - effective_sl_pct), 8)
-            new_tp = round(ref_price * (1 + effective_tp_pct), 8)
-        elif direction == "SHORT":
-            # SHORT: SL = ref_price + ATR buffer (trailing from lowest trough)
-            # _peak_low = lowest price seen (best price for SHORT = max profit)
-            # As price falls to new lows, _peak_low drops → SL drops (tightens from below)
-            # As price bounces, _peak_low stays fixed → SL stays fixed (doesn't chase)
-            # Uses effective_sl_pct (ATR-scaled) not raw MIN_SL_PCT_TRAILING constant
-            new_sl = round(ref_price * (1 + effective_sl_pct), 8)
-            new_tp = round(ref_price * (1 - effective_tp_pct), 8)
-        else:
-            continue
-
-        # INIT-to-ACCEL migration: save the ORIGINAL new_sl (INIT-floor wide value) BEFORE
-        # the tighten gate below modifies new_sl in place with current_sl.
-        # This is the value we want to write to DB when migrating stale accel-floor SLs.
-        _atr_computed_new_sl = new_sl  # always use this for migration writes
-
-        # Debug: log computed ATR levels for monitoring
-        print(f"  [ATR] {token}: k={k:.3f} ATR={atr:.4f} ({atr_pct*100:.2f}%) → SL={new_sl:.6f} TP={new_tp:.6f} [ref={ref_price:.6f}]")
-
-        # ── Trailing TP: only tighten, never loosen ─────────────────────────────
-        #
-        # GOLDEN RULE: TP can only move in the PROFIT direction.
-        #
-        # LONG:  TP only increases  (higher = further from entry = more profit locked)
-        # SHORT: TP only decreases  (lower = further from entry = more profit locked)
-        #
-        # Implementation: compute new TP from current price, then ONLY apply it
-        # if it's better than the current TP. This handles SHORT TP loosening correctly:
-        # price drops to 0.36 → TP=0.349 (locked). Price bounces to 0.38 → TP would be
-        # 0.368, but that's LOOSER than 0.349 so we keep 0.349. Position stays on.
-        #
-        needs_sl = False
-        needs_tp = False
-        if direction == "LONG":
-            # new_sl = ref_price * (1 - effective_sl_pct) — already computed above
-            # SL tightens as price rises: higher SL = closer to current price = more locked in.
-            # Only tighten: accept if new_sl > current_sl (higher = tighter).
-            if current_sl > 0:
-                if new_sl > current_sl:
-                    needs_sl = True      # ATR tightens — accept
-                else:
-                    new_sl = current_sl  # would loosen — keep current
-                    needs_sl = False
-            else:
-                needs_sl = True
-
-            # TP: compute from current price, only raise if it would improve (higher)
-            # TP = price × (1 + tp_pct)  — as price rises, TP rises (numerically higher)
-            if current_tp > 0:
-                tp_at_ref = round(ref_price * (1 + tp_pct), 8)
-                # For LONG: higher TP = more profit locked. If ATR would raise TP (tighten), update.
-                # Only block if ATR would lower the TP (loosen).
-                if tp_at_ref < current_tp:
-                    new_tp = current_tp    # ATR would loosen — keep current
-                    needs_tp = False
-                else:
-                    new_tp = tp_at_ref      # ATR tightens (higher) — update
-                    needs_tp = True
-            else:
-                needs_tp = True
-
-        elif direction == "SHORT":
-            # SL trailing: new_sl = ref_price * (1 + effective_sl_pct)
-            # ref_price = _peak_low (lowest seen) — SHORT's profit anchor.
-            # As price falls to new lows: ref_price drops → SL drops (tightens from below).
-            # As price bounces: ref_price stays fixed → SL stays fixed (no chase).
-            # Only accept if new_sl < current_sl (tightening). Block if >= (loosening).
-            if current_sl > 0:
-                if new_sl >= current_sl:
-                    new_sl = current_sl    # would loosen — block it
-                    needs_sl = False
-                else:
-                    needs_sl = True        # new_sl < current_sl — tighten, accept
-            else:
-                needs_sl = True
-
-            # TP: ONLY decrease — never loosen a SHORT TP.
-            # Compute TP from current price, but only accept if it's LOWER (better).
-            # Price drops to 0.36:  TP=0.36×0.968=0.3488 (tightened from entry)
-            # Price bounces to 0.38: TP=0.38×0.968=0.3680 — but 0.3680 > 0.3488
-            #                         → TP would LOOSEN → KEEP 0.3488 instead.
-            if current_tp > 0:
-                tp_at_ref = round(ref_price * (1 - effective_tp_pct), 8)
-                if tp_at_ref >= current_tp:
-                    new_tp = current_tp    # would loosen (not lower) — KEEP locked TP
-                    needs_tp = False
-                else:
-                    new_tp = tp_at_ref     # would tighten (lower) — update
-                    needs_tp = True
-            else:
-                # First time setting TP — compute from current (entry) price
-                # Use effective_tp_pct (floor-enforced) not raw tp_pct
-                new_tp = round(ref_price * (1 - effective_tp_pct), 8)
-                needs_tp = True
-
-        # ── Force-write conditions (bypass delta gate for stale/missing values) ──────
-        # If current SL/TP is 0 or None, this is a stale/missing entry — always write.
+        # ── Force-write conditions (bypass delta gate for stale/missing values) ──
         sl_stale = not current_sl or float(current_sl) <= 0
         tp_stale = not current_tp or float(current_tp) <= 0
 
-        # INIT-to-ACCEL migration: detect stale accel-floor SLs on new trades
-        # BEFORE the tighten gate below modifies new_sl in place with current_sl.
-        INIT_TO_ACCEL_MIGRATION = False
-        if is_new_trade and not sl_stale and current_sl and float(current_sl) > 0:
-            old_sl_pct = abs(float(current_sl) - float(entry_price)) / float(entry_price)
-            if old_sl_pct < ATR_SL_MIN_INIT * 0.95:  # old was < 0.475% (stale accel floor)
-                INIT_TO_ACCEL_MIGRATION = True
+        # INIT-to-ACCEL migration: correct stale accel-floor SLs on new trades
+        is_init_to_accel = result.get('is_init_to_accel_migration', False)
 
-        # ── Check deltas (only gates HL push, NOT DB persistence) ──────────────────
+        # ── Delta check (only gates HL push, NOT DB persistence) ────────────────
         if needs_sl:
             sl_delta = abs(new_sl - current_sl) / current_sl if current_sl > 0 else 1.0
             hl_needs_sl = sl_delta > ATR_UPDATE_THRESHOLD_PCT or sl_stale
@@ -1765,24 +1722,24 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         else:
             hl_needs_tp = False
 
-        # Always append for DB persistence — delta gate only affects HL push
-        # INIT_TO_ACCEL_MIGRATION bypasses tighten gate to correct stale accel-floor SLs
-        if needs_sl or needs_tp or sl_stale or tp_stale or INIT_TO_ACCEL_MIGRATION:
+        # ── Persist to DB (delta gate only affects HL push) ─────────────────────
+        # Also force-write if TPSL flagged the current_sl as wrong-sided
+        is_force = result.get('_force_write', False)
+        if needs_sl or needs_tp or sl_stale or tp_stale or is_init_to_accel or is_force:
             updates.append({
                 'trade_id': trade_id,
                 'token': token,
                 'direction': direction,
                 'entry_price': entry_price,
                 'old_sl': current_sl,
-                'new_sl': _atr_computed_new_sl,  # always use ATR-computed (INIT floor) for migrations
+                'new_sl': result['_atr_computed_new_sl'] if is_init_to_accel else new_sl,
                 'old_tp': current_tp,
                 'new_tp': new_tp,
-                # HL push is gated by delta + stale check; DB persist always happens
-                'needs_sl': hl_needs_sl,
-                'needs_tp': hl_needs_tp,
+                'needs_sl': hl_needs_sl or is_force,  # force HL push too if wrong-sided
+                'needs_tp': hl_needs_tp or is_force,
                 'atr': atr,
-                'atr_pct': atr_pct,
-                'k': k,
+                'atr_pct': atr / _entry if _entry > 0 else 0.0,
+                'k': result.get('k', 1.0),
             })
 
     return updates
@@ -1817,6 +1774,12 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
                 "UPDATE trades SET stop_loss = %s, target = %s, atr_managed = TRUE WHERE id = %s AND status = 'open'",
                 (round(new_sl, 8), round(new_tp, 8), trade_id)
             )
+            # DEBUG: log every DB write with context
+            print(f"  [PERSIST] trade_id={trade_id} token={u.get('token')} dir={u.get('direction')} "
+                  f"SL_write={new_sl:.6f} TP_write={new_tp:.6f} "
+                  f"atr={u.get('atr')} atr_pct={u.get('atr_pct',0)*100:.2f}% k={u.get('k')} "
+                  f"old_sl={u.get('old_sl')} old_tp={u.get('old_tp')} "
+                  f"entry={u.get('entry_price')}")
         conn.commit()
     except Exception as e:
         print(f"  [ATR] DB persist error: {e}")
@@ -1826,16 +1789,10 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
 
 def _execute_atr_bulk_updates(updates: List[Dict]) -> dict:
     """
-    Execute SL/TP updates for all affected positions in exactly 2 HL API calls:
-      1. cancel_bulk_orders  — cancel only the stale SL+TP orders for affected trades
-      2. place_bulk_orders  — place all new SL+TP orders
-
-    BUG-1 FIX: Track SL/TP OIDs per trade_id so only the right orders get cancelled.
-    Previously cancelled ALL reduceOnly orders for a token, which could affect
-    other positions of the same token that weren't being updated.
-
-    Position sizes fetched once from HL, reused across all updates.
+    DISABLED 2026-05-15 — TP/SL is managed LOCALLY by guardian via DB read.
+    No HL trigger orders are placed. position_manager writes to DB only.
     """
+    return {'cancelled': 0, 'placed': 0, 'errors': ['disabled — guardian manages TP/SL via DB']}
     if not updates:
         return {'cancelled': 0, 'placed': 0, 'errors': []}
 
@@ -2220,8 +2177,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
                     # hl_entry here ensures PnL is consistent with what HL reports.
                     # If hl_entry is 0 (edge case), fall back to DB entry.
                     _ep = hl_entry if hl_entry > 0 else entry
-                    pnl_pct = round(((cur_price - _ep) / _ep * 100) if direction == 'LONG'
-                                    else ((_ep - cur_price) / _ep * 100), 4)
+                    pnl_pct = compute_live_pnl(_ep, cur_price, direction)   # pnl_utils
                     pos['pnl_pct'] = pnl_pct
                     pos['pnl_usdt'] = hl_unrealized if hl_unrealized else 0
                     pos['entry_price'] = _ep  # fix in-memory entry to match HL
@@ -2263,8 +2219,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
             # unrealized_pnl = (entryPx - currentPx) / entryPx * positionValue
             # where positionValue = entryPx * size (leverage already baked into size)
             position_value = hl_entry * hl_size
-            pnl_pct = (hl_unrealized / position_value) * 100 if position_value > 0 else 0
-            pnl_pct = round(pnl_pct, 4)
+            pnl_pct = compute_hl_pnl_pct(hl_unrealized, position_value)   # pnl_utils
 
             # current_price from mids (most accurate for DB)
             if cur_price <= 0:
@@ -2428,6 +2383,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 pos['target'] = u['new_tp']
         if ATR_HL_ORDERS_ENABLED:
             _execute_atr_bulk_updates(_atr_updates)  # HL path (kill switch controlled)
+        else:
+            print(f"  [ATR] HL orders DISABLED — SL/TP managed locally by guardian via DB")
         print(f"  [ATR] Updated {len(_atr_updates)} position SL/TP levels")
 
     open_count = len(positions)
@@ -2452,10 +2409,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         entry = float(pos.get("entry_price") or 0)
         cur = float(pos.get("current_price") or 0)
         if entry > 0 and cur > 0:
-            if direction == "LONG":
-                live_pnl = ((cur - entry) / entry) * 100
-            else:
-                live_pnl = ((entry - cur) / entry) * 100
+            live_pnl = compute_live_pnl(entry, cur, direction)   # pnl_utils
         else:
             live_pnl = pnl_pct
 
@@ -2924,6 +2878,16 @@ def set_loss_cooldown(token: str, direction: str, hours: float = None) -> None:
     data[key] = {"expires": expiry, "streak": streak, "hours": hours, "reason": "loss"}
     _save_cooldowns(data)
     print(f"[Position Manager] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h")
+    # DEBUG: immediately verify the write succeeded
+    verify = _load_cooldowns().get(key)
+    print(f"[Position Manager] DEBUG: loss_cooldowns.json verify after write = {verify}")
+    # ── AUDIT: Log loss cooldown ───────────────────────────────────────
+    try:
+        from audit_logger import loss_cooldown_set
+        loss_cooldown_set(token=token.upper(), direction=direction.upper(),
+                          streak=streak, hours=hours, reason='loss')
+    except Exception:
+        pass
 
 
 def clear_loss_streak(token: str, direction: str) -> None:

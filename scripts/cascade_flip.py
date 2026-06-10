@@ -26,8 +26,9 @@ _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 
-from hermes_constants import RUNTIME_DB, FLIP_COUNTS_FILE, LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
+from hermes_constants import RUNTIME_DB, FLIP_COUNTS_FILE, LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, CASCADE_FLIP_ENABLED, DEFAULT_TRADE_SIZE_USDT
 from hermes_file_lock import FileLock
+from pnl_utils import compute_close_pnl
 
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -137,7 +138,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
         direction = row['direction']
         entry_price = float(row['entry_price'] or 0)
         current_price = float(row['current_price'] or entry_price)
-        amount_usdt = float(row['amount_usdt'] or 50)
+        amount_usdt = float(row['amount_usdt'] or DEFAULT_TRADE_SIZE_USDT)
         leverage = float(row['leverage'] or 10)
         signal_type = row['signal']
         confidence = row['confidence']
@@ -146,12 +147,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
         entry_fee = notional * TAKER_FEE
         exit_fee = notional * TAKER_FEE
         fee_total = entry_fee + exit_fee
-        if direction == 'LONG':
-            pnl_pct = ((current_price - entry_price) / entry_price * 100) if entry_price > 0 else 0
-        else:
-            pnl_pct = ((entry_price - current_price) / entry_price * 100) if entry_price > 0 else 0
-        pnl_usdt_val = amount_usdt * (abs(pnl_pct) / 100) * (1 if pnl_pct >= 0 else -1)
-        net_pnl = pnl_usdt_val - fee_total
+        pnl_pct, pnl_usdt_val, net_pnl = compute_close_pnl(entry_price, current_price, direction, amount_usdt)
         cur.execute("""
             UPDATE trades
             SET status = 'closed',
@@ -272,12 +268,12 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
             )
             row_old = cur_old.fetchone()
             cur_old.close(); conn_old.close()
-            old_amount = float(row_old['amount_usdt']) if row_old else 50.0
+            old_amount = float(row_old['amount_usdt']) if row_old else DEFAULT_TRADE_SIZE_USDT
         else:
-            old_amount = 50.0
+            old_amount = DEFAULT_TRADE_SIZE_USDT
     except Exception:
-        old_amount = 50.0
-    close_pnl_usdt = round(live_pnl / 100 * old_amount, 4)
+        old_amount = DEFAULT_TRADE_SIZE_USDT
+    close_pnl_usdt = compute_pnl_usdt(live_pnl, old_amount)   # pnl_utils
 
     # ── 1. Close the losing position ────────────────────────────────────────
     close_ok = _close_paper_position(trade_id, f"cascade_flip_{live_pnl:+.2f}%")
@@ -406,19 +402,18 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         except Exception as e:
             print(f"  [CASCADE FLIP] ⚠️ Post-flip DB INSERT skipped: {e}")
 
-        # ── 2d. Place SL + TP on HL ──────────────────────────────────────────
-        if sl_val > 0:
-            try:
-                from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp, hype_coin
-                hl_token = hype_coin(token)
-                sl_result = hl_place_sl(hl_token, opposite_dir, sl_val, float(trade_sz))
-                tp_result = hl_place_tp(hl_token, opposite_dir, tp_val, float(trade_sz)) if tp_val > 0 else {"success": True}
-                if sl_result.get("success"):
-                    print(f"  [CASCADE FLIP] ✅ SL+TP placed on HL: {hl_token} {opposite_dir} SL={sl_val:.6f} TP={tp_val:.6f if tp_val > 0 else 'N/A'}")
-                else:
-                    print(f"  [CASCADE FLIP] ⚠️ SL placement failed: {sl_result.get('error')}")
-            except Exception as e:
-                print(f"  [CASCADE FLIP] ⚠️ HL SL/TP order skipped: {e}")
+        # ── 2d. Place SL + TP on HL ── DISABLED 2026-05-17 ─────────────────
+        # TP/SL is managed LOCALLY via DB — no HL trigger orders placed.
+        # CASCADE_FLIP_ENABLED=False guards this function entry,
+        # but belt-and-suspenders: also comment out the actual calls.
+        if CASCADE_FLIP_ENABLED and sl_val > 0:
+            pass  # DISABLED — TP/SL via DB, not HL
+            # try:
+            #     from hyperliquid_exchange import place_sl as hl_place_sl, place_tp as hl_place_tp, hype_coin
+            #     hl_token = hype_coin(token)
+            #     sl_result = hl_place_sl(hl_token, opposite_dir, sl_val, float(trade_sz))
+            #     tp_result = hl_place_tp(hl_token, opposite_dir, tp_val, float(trade_sz)) if tp_val > 0 else {"success": True}
+            #     ...
 
         # ── 3. Persist flip count + hot-set eviction ─────────────────────────
         flip_counts = _load_flip_counts()

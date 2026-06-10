@@ -430,6 +430,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
             RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
             ACCEL_300_PLUS_ENABLED, ACCEL_300_MINUS_ENABLED,
+            EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
             COUNTER_FLIP_PLUS_ENABLED, COUNTER_FLIP_MINUS_ENABLED,
             HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
             RS_PLUS_ENABLED, RS_MINUS_ENABLED,
@@ -584,6 +585,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if _comp.startswith('oc-pending-') and not OC_PENDING_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" OC_PENDING_ENABLED=False', flush=True)
                 return None
+            # ema-angle
+            if _comp == 'ema-angle+' and not EMA_ANGLE_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" EMA_ANGLE_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'ema-angle-' and not EMA_ANGLE_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" EMA_ANGLE_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'ema-angle' and not EMA_ANGLE_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" EMA_ANGLE_ENABLED=False', flush=True)
+                return None
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -683,12 +694,20 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             merged_combo_parts = sorted(all_srcs)
             merged_combo_key = f"{token.upper()}:{direction.upper()}:{','.join(merged_combo_parts)}"
 
-            # Keep most recent indicator values (update to latest)
+            # FIX (2026-05-21): Only overwrite indicator fields when the new signal
+            # actually provides a VALID value. COALESCE(?, z_score) preserves the
+            # existing indicator value when the new signal doesn't carry that field
+            # (e.g., R&S doesn't pass z_score — without COALESCE it would wipe the
+            # valid z_score that a prior zscore-pump signal had written).
             c.execute('''
                 UPDATE signals SET
                     confidence=?, source=?, signal_types=?,
-                    z_score=?, z_score_tier=?, rsi_14=?,
-                    macd_value=?, macd_signal=?, macd_hist=?,
+                    z_score=COALESCE(?, z_score),
+                    z_score_tier=COALESCE(?, z_score_tier),
+                    rsi_14=COALESCE(?, rsi_14),
+                    macd_value=COALESCE(?, macd_value),
+                    macd_signal=COALESCE(?, macd_signal),
+                    macd_hist=COALESCE(?, macd_hist),
                     combo_key=?,
                     updated_at=CURRENT_TIMESTAMP
                 WHERE id=?

@@ -22,6 +22,7 @@ from hermes_constants import (
     PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
     FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
     ACCEL_300_ENABLED,
+    EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
     RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
     MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
     MA_CROSS_5M_ENABLED, MA_CROSS_5M_PLUS_ENABLED, MA_CROSS_5M_MINUS_ENABLED,
@@ -45,6 +46,8 @@ from hermes_constants import (
     EMA20_50_PLUS_ENABLED, EMA20_50_MINUS_ENABLED,
     MACD_1M_PLUS_ENABLED, MACD_1M_MINUS_ENABLED,
     TL_BREAK_ENABLED,
+    ZSCORE_PUMP_NEW_ENABLED, ZSCORE_PUMP_PLUS_ENABLED, ZSCORE_PUMP_MINUS_ENABLED,
+    MTP_ZSCORE_ENABLED, MTP_ZSCORE_PLUS_ENABLED, MTP_ZSCORE_MINUS_ENABLED,
 )
 
 
@@ -61,6 +64,11 @@ try:
     from signals.vel_hermes import run as _vel_hermes_run
 except Exception:
     _vel_hermes_run = None
+
+try:
+    from signals.zscore_rising import run as _zscore_rising_run
+except Exception:
+    _zscore_rising_run = None
 
 try:
     from signals.hzscore import run as _hzscore_run
@@ -101,6 +109,11 @@ try:
     from signals.accel_300 import scan_accel_300_signals as _accel_300_run
 except Exception:
     _accel_300_run = None
+
+try:
+    from signals.ema_angle import scan_ema_angle_signals as _ema_angle_run
+except Exception:
+    _ema_angle_run = None
 
 try:
     from signals.rs import scan_rs_signals as _rs_run
@@ -187,6 +200,16 @@ try:
 except Exception:
     _tl_break_run = None
 
+try:
+    from signals.zscore_pump import scan_zscore_pump_signals as _zscore_pump_run
+except Exception:
+    _zscore_pump_run = None
+
+try:
+    from signals.mtp_zscore import scan_mtp_zscore_signals as _mtp_zscore_run
+except Exception:
+    _mtp_zscore_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -204,6 +227,7 @@ except Exception:
 SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pct_hermes',          'enabled': 'PCT_HERMES_ENABLED',         'run': _pct_hermes_run},
     {'name': 'vel_hermes',           'enabled': 'VEL_HERMES_ENABLED',         'run': _vel_hermes_run},
+    {'name': 'zscore_rising',        'enabled': 'ZSCORE_RISING_ENABLED',      'run': _zscore_rising_run},
     {'name': 'hzscore',              'enabled': 'HZSCORE_ENABLED',            'run': _hzscore_run},
     {'name': 'hmacd',                'enabled': 'HMACD_ENABLED',              'run': _hmacd_run},
     {'name': 'hmacd_mtf',             'enabled': 'HMACD_ENABLED',              'run': _mtf_macd_run},
@@ -213,6 +237,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'fast_momentum',        'enabled': 'FAST_MOMENTUM_ENABLED',      'run': _fast_momentum_run},
     # These use their *_ENABLED boolean directly
     {'name': 'accel_300',            'enabled': ACCEL_300_ENABLED,           'run': _accel_300_run},
+    {'name': 'ema_angle',            'enabled': EMA_ANGLE_ENABLED,            'run': _ema_angle_run},
     {'name': 'rs',                   'enabled': RS_ENABLED,                   'run': _rs_run},
     {'name': 'gap_300',              'enabled': GAP_300_ENABLED,             'run': _gap_300_run},
     {'name': 'ma_cross',             'enabled': MA_CROSS_ENABLED,            'run': _ma_cross_run},
@@ -230,6 +255,8 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'exhaustion',           'enabled': EXHAUSTION_ENABLED,          'run': _exhaustion_run},
     {'name': 'counter_flip',         'enabled': COUNTER_FLIP_ENABLED,      'run': _counter_flip_run},
     {'name': 'tl_break',             'enabled': TL_BREAK_ENABLED,          'run': _tl_break_run},
+    {'name': 'zscore_pump',         'enabled': ZSCORE_PUMP_NEW_ENABLED,       'run': _zscore_pump_run},
+    {'name': 'mtp_zscore',          'enabled': MTP_ZSCORE_ENABLED,             'run': _mtp_zscore_run},
 ]
 
 
@@ -282,12 +309,13 @@ def _run_signal(args):
     we submit cache-warming signals FIRST and let them fill the cache before the
     remaining signals start pulling from it.
     """
-    sig_name, module_name = args
+    sig_name, fn_name = args
     try:
         import sys
         sys.path.insert(0, '/root/.hermes/scripts')
-        mod = __import__(f'signals.{module_name}', fromlist=['run'])
-        fn = getattr(mod, 'run', None)
+        # Use the signal name itself as module name
+        mod = __import__(f'signals.{sig_name}', fromlist=[fn_name])
+        fn = getattr(mod, fn_name, None)
         if fn is None:
             return sig_name, None
         if fn.__code__.co_argcount == 0:
@@ -320,21 +348,23 @@ def run_all_signals(signal_list=None):
 
     # Build (name, module_name) work items
     name_to_module = {
-        'pct_hermes': 'pct_hermes', 'vel_hermes': 'vel_hermes',
-        'hzscore': 'hzscore', 'hmacd': 'hmacd',
-        'phase_accel': 'phase_accel', 'fast_momentum': 'fast_momentum',
-        'accel_300': 'accel_300', 'rs': 'rs',
-        'ma_cross': 'ma_cross', 'ma_cross_5m': 'ma_cross_5m',
-        'hh_hl': 'hh_hl', 'guppy': 'guppy',
-        'macd_accel': 'macd_accel', 'trend_purity': 'trend_purity',
-        'ema9_sma20': 'ema9_sma20', 'r2_trend': 'r2_trend',
-        'volume_hl': 'volume_hl', 'ma300_candle_confirm': 'ma300_candle_confirm',
-        'atr_compression': 'atr_compression',
-        'exhaustion': 'exhaustion', 'counter_flip': 'counter_flip',
-        'tl_break': 'tl_break',
+        'pct_hermes': 'run', 'vel_hermes': 'run',
+        'hzscore': 'run', 'hmacd': 'run',
+        'phase_accel': 'run', 'fast_momentum': 'run',
+        'accel_300': 'scan_accel_300_signals', 'ema_angle': 'scan_ema_angle_signals',
+        'rs': 'scan_rs_signals',
+        'ma_cross': 'scan_ma_cross_signals', 'ma_cross_5m': 'scan_ma_cross_5m_signals',
+        'hh_hl': 'scan_hh_hl_signals', 'guppy': 'scan_all_tokens',
+        'macd_accel': 'scan_macd_accel_signals', 'trend_purity': 'scan',
+        'ema9_sma20': 'scan_ema9_sma20_signals', 'r2_rev': 'run', 'r2_trend': 'run',
+        'volume_hl': 'run', 'ma300_candle_confirm': 'run',
+        'atr_compression': 'run',
+        'exhaustion': 'run', 'counter_flip': 'run',
+        'tl_break': 'run', 'zscore_pump': 'scan_zscore_pump_signals',
+        'mtp_zscore': 'scan_mtp_zscore_signals',
     }
     work = [
-        (signal['name'], name_to_module.get(signal['name'], signal['name']))
+        (signal['name'], signal['run'].__name__)
         for signal in signals_to_run
         if signal.get('run') is not None
     ]

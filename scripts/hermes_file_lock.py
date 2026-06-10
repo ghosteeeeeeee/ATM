@@ -18,6 +18,7 @@ Lockfiles live in /root/.hermes/locks/ — PID written for operator visibility.
 
 import os, fcntl, time
 
+from paths import *
 LOCK_DIR = "/root/.hermes/locks"
 os.makedirs(LOCK_DIR, exist_ok=True)
 

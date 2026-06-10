@@ -34,6 +34,7 @@ from decimal import Decimal, ROUND_UP
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import CANDLES_DB, HERMES_DATA
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from hermes_constants import PUMP_HUNTER_ENABLED
 from hyperliquid_exchange import (
     mirror_open, mirror_close, is_live_trading_enabled,
     get_open_hype_positions_curl, is_delisted, _round_position_sz, _sz_decimals,
@@ -667,29 +668,31 @@ def execute_pump_trade(token: str, signal: dict) -> dict:
     save_positions(data)
     log(f"TRACKED {token} pump position: entry={fill_price:.6f} target={signal['revert_target']:.6f} stop={signal['stop_price']:.6f}", "TRACK")
 
-    # Place TP and SL
-    tp_result = place_tp(
-        coin=token,
-        direction='LONG',
-        tp_price=signal['revert_target'],
-        size=actual_size,
-    )
-    sl_result = place_sl(
-        coin=token,
-        direction='LONG',
-        sl_price=signal['stop_price'],
-        size=actual_size,
-    )
-
-    if tp_result.get('success'):
-        log(f"  TP placed: {signal['revert_target']:.6f}", "TP")
-    else:
-        log(f"  TP FAILED: {tp_result.get('error')}", "FAIL")
-
-    if sl_result.get('success'):
-        log(f"  SL placed: {signal['stop_price']:.6f}", "SL")
-    else:
-        log(f"  SL FAILED: {sl_result.get('error')}", "FAIL")
+    # Place TP and SL ── DISABLED 2026-05-17 ──────────────────────────
+    # PUMP_HUNTER_ENABLED=False blocks scan_and_fire(), but this function
+    # can be called directly. Belt-and-suspenders: disable the actual calls.
+    if PUMP_HUNTER_ENABLED:
+        pass  # DISABLED — TP/SL managed locally via DB, not HL
+        # tp_result = place_tp(
+        #     coin=token,
+        #     direction='LONG',
+        #     tp_price=signal['revert_target'],
+        #     size=actual_size,
+        # )
+        # sl_result = place_sl(
+        #     coin=token,
+        #     direction='LONG',
+        #     sl_price=signal['stop_price'],
+        #     size=actual_size,
+        # )
+        # if tp_result.get('success'):
+        #     log(f"  TP placed: {signal['revert_target']:.6f}", "TP")
+        # else:
+        #     log(f"  TP FAILED: {tp_result.get('error')}", "FAIL")
+        # if sl_result.get('success'):
+        #     log(f"  SL placed: {signal['stop_price']:.6f}", "SL")
+        # else:
+        #     log(f"  SL FAILED: {sl_result.get('error')}", "FAIL")
 
     return {
         'success': True,
@@ -839,6 +842,11 @@ def get_tradeable_tokens() -> list:
 
 def scan_and_fire():
     """Scan all tokens for vol explosions and fire trades."""
+    from hermes_constants import PUMP_HUNTER_ENABLED
+    if not PUMP_HUNTER_ENABLED:
+        log("PUMP_HUNTER_ENABLED=False — block pump_hunter from firing", "OFF")
+        return
+
     tokens = get_tradeable_tokens()
     log(f"Scanning {len(tokens)} tokens for vol explosions...", "SCAN")
 

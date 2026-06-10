@@ -3,6 +3,7 @@
 Candle Predictor Auto-Tuner — runs hourly as a cron job.
 Analyzes prediction.db accuracy, identifies problems, implements fixes.
 Logs everything to /root/.hermes/logs/candle-tuner.log
+from paths import *
 """
 import sqlite3, time, os, sys, statistics
 from datetime import datetime

@@ -5,6 +5,7 @@ Aggregates all trades per (test_name, variant_id), computes net PnL after fees,
 then does a single upsert per variant.
 
 Usage: python3 /tmp/rebuild_ab_results.py
+from paths import *
 """
 import psycopg2, json, sys
 from decimal import Decimal

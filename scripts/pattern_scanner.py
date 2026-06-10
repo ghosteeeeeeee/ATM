@@ -2,25 +2,68 @@
 """
 pattern_scanner.py — Real-time chart pattern detection for Hermes.
 
-Reads 1m OHLCV candles from local SQLite (signal_schema → ohlcv_1m table).
-Writes pattern signals to signals DB (signal_type = 'pattern_flag', etc.)
-Used as cascade flip confluence only (Phase 1) — not primary entry signals.
+FIX (2026-04-23): Reads from price_history (signals_hermes.db) directly.
+  price_history is updated every minute with live prices — the ONLY reliable source.
+  ohlcv_1m table is 7+ days stale — CANNOT be used.
 
 Data flow:
-  get_ohlcv_1m(token)          ← local SQLite (seeded by price_collector via Binance)
-  detect_bull_flag(candles)     ← core detection logic
-  detect_bear_flag(candles)     ← mirror for shorts
-  write_pattern_signal(...)     ← emits to signals DB
+  price_history (signals_hermes.db) ← live 1m prices (updated every minute)
+  detect_bull_flag(candles)          ← core detection logic
+  detect_bear_flag(candles)           ← mirror for shorts
+  write_pattern_signal(...)           ← emits to signals DB
 """
 
-import sys, os, time, json
+import sys, os, time, json, sqlite3
 from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (
-    get_ohlcv_1m,
     get_latest_price,
     add_signal,  # Use add_signal so directional blacklist guards are applied
 )
+
+_PRICE_DB = '/root/.hermes/data/signals_hermes.db'
+
+def _get_candles_1m(token: str, lookback_minutes: int = 120) -> list:
+    """Fetch 1m close prices from price_history (signals_hermes.db), oldest first.
+
+    price_history is updated every minute with live prices — the ONLY reliable source.
+    timestamps are in SECONDS (Unix time).
+
+    Returns oldest-first list of {open_time, open, high, low, close, volume} dicts.
+    Freshness guard: returns [] if most recent price is > 2 minutes old.
+    """
+    try:
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT timestamp, price FROM (
+                SELECT timestamp, price
+                FROM price_history
+                WHERE token = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            ) sub
+            ORDER BY timestamp ASC
+        """, (token.upper(), lookback_minutes))
+        rows = c.fetchall()
+        conn.close()
+
+        if not rows:
+            return []
+
+        # Freshness guard — skip if most recent price is stale
+        most_recent_ts = rows[-1][0]  # seconds
+        if (time.time() - most_recent_ts) > 120:
+            return []
+
+        # Synthesize ohlcv dicts for pattern compatibility
+        return [
+            {'open_time': r[0], 'open': r[1], 'high': r[1],
+             'low': r[1], 'close': r[1], 'volume': 0.0}
+            for r in rows
+        ]
+    except Exception:
+        return []
 
 # ── Pattern Signal Constants ──────────────────────────────────────────────────
 
@@ -721,7 +764,7 @@ def scan_token(token: str, lookback_minutes: int = 240) -> list:
     Run all pattern detectors on a token's candle data.
     Returns list of detected patterns (may be empty).
     """
-    candles = get_ohlcv_1m(token, lookback_minutes=lookback_minutes)
+    candles = _get_candles_1m(token, lookback_minutes=lookback_minutes)
     if not candles or len(candles) < 20:
         return []
 

@@ -57,21 +57,30 @@ from signal_schema import add_signal, get_cooldown, price_age_minutes
 _RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 _PRICE_DB   = '/root/.hermes/data/signals_hermes.db'   # price_history -- live 1m prices
 
-# ── Signal constants ──────────────────────────────────────────────────────────
-# 2026-05-11: Reverted to tighter params — accel-300+ was firing too loosely,
-# causing market-wide bursts of LONG entries in sideways conditions.
-# MIN_GAP_PCT: 0.15 → 0.20 (require stronger breakout above EMA)
-# MIN_GAP_GROWTH_PCT: 0.03 → 0.05 (require meaningful acceleration)
-# COOLDOWN_BARS: 12 → 10 (shorter dedup since quality filter is tighter)
-# TIMING: bars_since_cross >= 1 required (no firing at exact cross moment)
-# PERSISTENCE_BARS stays at 2.
-PERIOD             = 300      # EMA(300) on 1m prices
-LOOKBACK           = 30       # bars ago when price was on the other side of EMA300
-PERSISTENCE_BARS   = 2        # must be persistently above/below EMA for this many bars
-MIN_GAP_PCT            = 0.20    # minimum gap above EMA300 to fire (%) — was 0.15
-MIN_GAP_GROWTH_PCT     = 0.05    # gap must grow by at least this % vs PERSISTENCE_BARS ago — was 0.03
-COOLDOWN_BARS          = 10      # dedup: only fire once per N bars per token+direction — was 12
-LOOKBACK_1M        = 700      # 1m prices to fetch (warmup + detection window)
+# ── Signal constants (from hermes_constants) ──────────────────────────────────
+from hermes_constants import (
+    ACCEL_300_PERIOD, ACCEL_300_LOOKBACK, ACCEL_300_PERSISTENCE_BARS,
+    ACCEL_300_MIN_GAP_PCT, ACCEL_300_MIN_GAP_GROWTH, ACCEL_300_COOLDOWN_BARS,
+    ACCEL_300_LOOKBACK_1M,
+    ACCEL_300_MIN_GAP_PCT_LONG, ACCEL_300_MIN_GAP_PCT_SHORT,
+    ACCEL_300_MIN_GAP_GROWTH_SHORT,
+    ACCEL_300_STALE_BARS, ACCEL_300_STALE_BARS_SHORT,
+    ACCEL_300_MARGINAL_ACCEL_BARS, ACCEL_300_BARS_UNKNOWN,
+    ACCEL_300_BAR_GAP_THRESH_SEC,
+)
+# Alias local names for readability in detection logic
+PERIOD          = ACCEL_300_PERIOD
+LOOKBACK        = ACCEL_300_LOOKBACK
+PERSISTENCE_BARS = ACCEL_300_PERSISTENCE_BARS
+MIN_GAP_PCT     = ACCEL_300_MIN_GAP_PCT
+MIN_GAP_GROWTH_PCT = ACCEL_300_MIN_GAP_GROWTH
+COOLDOWN_BARS   = ACCEL_300_COOLDOWN_BARS
+LOOKBACK_1M     = ACCEL_300_LOOKBACK_1M
+STALE_BARS      = ACCEL_300_STALE_BARS
+STALE_BARS_SHORT = ACCEL_300_STALE_BARS_SHORT
+MARGINAL_ACCEL_BARS = ACCEL_300_MARGINAL_ACCEL_BARS
+BARS_UNKNOWN     = ACCEL_300_BARS_UNKNOWN
+BAR_GAP_THRESH_SEC = ACCEL_300_BAR_GAP_THRESH_SEC
 DRY_RUN            = '--dry' in sys.argv
 
 SIGNAL_TYPE_LONG   = 'accel_300_long'
@@ -141,7 +150,7 @@ def _get_1m_prices(token: str, lookback: int = LOOKBACK_1M) -> list:
             mean_gap = sum(bar_gaps) / len(bar_gaps)
             variance = sum((g - mean_gap) ** 2 for g in bar_gaps) / len(bar_gaps)
             std_gap = variance ** 0.5
-            threshold = max(150, mean_gap + 3.0 * std_gap)
+            threshold = max(BAR_GAP_THRESH_SEC, mean_gap + 3.0 * std_gap)
             for i in range(1, len(rows)):
                 if rows[i][0] - rows[i-1][0] > threshold:
                     print(f"  [accel-300] {token}: data gap, skipping")
@@ -171,6 +180,27 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
 
     Returns dict with direction, gap_pct, gap_growth, bars_since_cross, or None.
     """
+    from hermes_constants import (
+        # Detection params (from top of file — originally hardcoded here)
+        ACCEL_300_PERIOD, ACCEL_300_LOOKBACK, ACCEL_300_PERSISTENCE_BARS,
+        ACCEL_300_MIN_GAP_PCT, ACCEL_300_MIN_GAP_GROWTH,
+        # P0 gate constants
+        ACCEL_300_STALE_BARS, ACCEL_300_STALE_LOOKBACK,
+        ACCEL_300_MIN_GAP_EXPANSION,
+        ACCEL_300_REGIME_SLOPE_PCT, ACCEL_300_SLOPE_WINDOW,
+        ACCEL_300_STALE_GAP_DECAY_THRESHOLD,
+        ACCEL_300_CHOP_CROSS_GAP_PCT, ACCEL_300_CHOP_EMA_ANGLE_PCT,
+        ACCEL_300_CHOP_AVG_GAP_PCT, ACCEL_300_CHOP_LOOKBACK,
+        ACCEL_300_CROSS_LOOKBACK,
+        ACCEL_300_MARGINAL_ACCEL_BARS, ACCEL_300_BARS_UNKNOWN,
+        ACCEL_300_BAR_GAP_THRESH_SEC,
+    )
+    # Alias short names for detection logic readability
+    PERIOD           = ACCEL_300_PERIOD
+    LOOKBACK         = ACCEL_300_LOOKBACK
+    PERSISTENCE_BARS = ACCEL_300_PERSISTENCE_BARS
+    MIN_GAP_PCT      = ACCEL_300_MIN_GAP_PCT
+    MIN_GAP_GROWTH_PCT = ACCEL_300_MIN_GAP_GROWTH
     n = len(prices)
     if n < PERIOD + LOOKBACK + PERSISTENCE_BARS + 5:
         return None
@@ -219,9 +249,11 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
 
         direction = 'LONG' if current_above else 'SHORT'
 
-        # ── Condition 2: |gap| >= MIN_GAP_PCT ─────────────────────────────────
-        # Both directions need a meaningful gap — SHORT needs gap <= -MIN_GAP_PCT
-        if abs(gap_now) < MIN_GAP_PCT:
+        # ── Condition 2: |gap| >= direction-specific MIN_GAP_PCT ───────────────
+        # Per-direction thresholds: SHORT tighter (0.25) than LONG (0.20)
+        # accel-300- has 40% WR vs 55% for accel-300+ — SHORT needs stronger confirmation
+        min_gap_dir = ACCEL_300_MIN_GAP_PCT_SHORT if direction == 'SHORT' else ACCEL_300_MIN_GAP_PCT_LONG
+        if abs(gap_now) < min_gap_dir:
             continue
 
         # ── Condition 3: Persistently above/below for PERSISTENCE_BARS bars ─────
@@ -248,7 +280,10 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         gap_then = gap_pcts[gap_then_idx]
         avg_gap_growth = gap_now - gap_then
 
-        if avg_gap_growth <= MIN_GAP_GROWTH_PCT:
+        # Per-direction gap growth: SHORT stricter (0.07) than LONG (0.05)
+        # SHORT side gets more false breakouts that reverse — needs stronger growth
+        min_gap_growth_dir = ACCEL_300_MIN_GAP_GROWTH_SHORT if direction == 'SHORT' else MIN_GAP_GROWTH_PCT
+        if avg_gap_growth <= min_gap_growth_dir:
             continue  # Gap is not growing over the window -- stale signal
 
         # ── Condition 4b: MARGINAL ACCELERATION + TIMING ─────────────────────────
@@ -260,33 +295,68 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         # This solves the "firing too late at the peak" problem — entries close to
         # the EMA cross (bars=0,1,2) are the most profitable because the move just started.
         # Entries that have been above EMA for 10+ bars without our signal are stale.
-        # ── Find cross bar first ─────────────────────────────────────────────────
+        # ── Find cross bar — two-pass search ───────────────────────────────────────
+        # Pass 1: primary window (ACCEL_300_CROSS_LOOKBACK bars before signal bar)
+        # Pass 2: full fallback to index 0 (catches crosses far in the past)
         cross_bar = None
-        for j in range(i - LOOKBACK, i + 1):
-            if j < 0 or gap_pcts[j] is None:
+        for j in range(i - ACCEL_300_CROSS_LOOKBACK, i + 1):
+            if j < 0 or gap_pcts[j] is None or ema300[j] is None:
                 continue
             if direction == 'LONG' and closes[j] > ema300[j]:
-                if j > 0 and closes[j-1] <= ema300[j-1]:
+                if j > 0 and ema300[j-1] is not None and closes[j-1] <= ema300[j-1]:
                     cross_bar = j
                     break
             if direction == 'SHORT' and closes[j] < ema300[j]:
-                if j > 0 and closes[j-1] >= ema300[j-1]:
+                if j > 0 and ema300[j-1] is not None and closes[j-1] >= ema300[j-1]:
                     cross_bar = j
                     break
+        # Pass 2: full fallback — search from signal bar back to earliest bar
+        if cross_bar is None:
+            for j in range(i - 1, -1, -1):
+                if j < 0 or gap_pcts[j] is None or ema300[j] is None:
+                    continue
+                if direction == 'LONG' and closes[j] > ema300[j]:
+                    if j > 0 and ema300[j-1] is not None and closes[j-1] <= ema300[j-1]:
+                        cross_bar = j
+                        break
+                if direction == 'SHORT' and closes[j] < ema300[j]:
+                    if j > 0 and ema300[j-1] is not None and closes[j-1] >= ema300[j-1]:
+                        cross_bar = j
+                        break
 
-        bars_since_cross = i - cross_bar if cross_bar is not None else 999
+        bars_since_cross = i - cross_bar if cross_bar is not None else BARS_UNKNOWN
+
+        # ── Gap expansion gate — price must be farther from EMA than at cross ───────
+        # Prevents signals where price barely crossed EMA and is already fading back
+        if cross_bar is not None and gap_pcts[cross_bar] is not None:
+            gap_at_cross = gap_pcts[cross_bar]
+            if direction == 'LONG' and gap_now < gap_at_cross - ACCEL_300_MIN_GAP_EXPANSION:
+                continue  # gap contracting back toward EMA — stale
+            if direction == 'SHORT' and gap_now > gap_at_cross + ACCEL_300_MIN_GAP_EXPANSION:
+                continue  # gap contracting (less negative) back toward EMA — stale
 
         # Must have confirmed the cross (at least 1 bar has closed since the cross)
         if bars_since_cross < 1:
             continue
 
         # Too stale — price has been running without us for too long
-        if bars_since_cross > 10:
+        # Per-direction stale bars: SHORT stricter (55) than LONG (60)
+        max_stale = STALE_BARS_SHORT if direction == 'SHORT' else STALE_BARS
+        if bars_since_cross >= max_stale:
             continue
 
-        # For bars 0-3: fire on gap_growth alone (near the breakout, momentum is fresh)
-        # For bars 4-10: require marginal acceleration check too
-        if bars_since_cross > 3:
+        # ── STALE GATE (FIX 2026-06-08): bars_since_cross is measured from
+        # detection bar i, not from the latest bar. A signal can fire at i=344
+        # (13:37) with bars_since_cross=1 (cross was at i-1), passing the stale
+        # gate, but from the latest bar (18:02) the cross is 354 bars old.
+        # Add absolute stale gate: detection bar must be within N bars of latest.
+        bars_from_latest = len(closes) - 1 - i
+        if bars_from_latest > ACCEL_300_STALE_LOOKBACK:
+            continue
+
+        # For bars 0-MARGINAL_ACCEL_BARS: fire on gap_growth alone (near the breakout, momentum is fresh)
+        # For bars MARGINAL_ACCEL_BARS+: require marginal acceleration check too
+        if bars_since_cross > MARGINAL_ACCEL_BARS:
             gap_1_idx = i - 1
             gap_2_idx = i - 2
             if gap_1_idx < 0 or gap_pcts[gap_1_idx] is None:
@@ -299,6 +369,60 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
                 continue
             if direction == 'SHORT' and delta_last >= delta_prev:
                 continue
+
+        # ── Regime slope check ─────────────────────────────────────────────────────
+        # Market must be trending in the signal's direction (prevents trading chop)
+        if len(closes) >= i + ACCEL_300_SLOPE_WINDOW:
+            slope_chunk = closes[i:i + ACCEL_300_SLOPE_WINDOW]
+            n_s = len(slope_chunk)
+            # Simple linear regression: slope = sum((x-x̄)(y-ȳ)) / sum((x-x̄)²)
+            x_mean = (n_s - 1) / 2.0
+            y_mean = sum(slope_chunk) / n_s
+            num = sum((j - x_mean) * (slope_chunk[j] - y_mean) for j in range(n_s))
+            den = sum((j - x_mean) ** 2 for j in range(n_s))
+            if den > 0:
+                slope = num / den
+                pct_slope = slope / y_mean * 100.0 if y_mean != 0 else 0.0
+                if direction == 'LONG' and pct_slope <= ACCEL_300_REGIME_SLOPE_PCT:
+                    continue  # market flat or falling — don't LONG
+                if direction == 'SHORT' and pct_slope >= -ACCEL_300_REGIME_SLOPE_PCT:
+                    continue  # market flat or rising — don't SHORT
+
+        # ── Stale gap decay check ──────────────────────────────────────────────────
+        # Newest bar's gap must be >= threshold fraction of signal bar's gap
+        # (blocks stale pullback signals where gap collapsed after the signal fired)
+        newest_idx = len(closes) - 2
+        if newest_idx > i and gap_pcts[newest_idx] is not None:
+            signal_gap = abs(gap_now)
+            newest_gap = abs(gap_pcts[newest_idx])
+            if signal_gap > 0 and newest_gap < signal_gap * ACCEL_300_STALE_GAP_DECAY_THRESHOLD:
+                continue  # gap decayed — stale pullback, block
+
+        # ── Chop filter — reject choppy / ranging markets ─────────────────────────
+        # Applied at the cross bar to ensure the signal crossed through a meaningful move
+        if cross_bar is not None and cross_bar >= ACCEL_300_CHOP_LOOKBACK:
+            #1. Gap at cross bar must be meaningful
+            cross_gap = gap_pcts[cross_bar]
+            if cross_gap is None:
+                continue
+            if direction == 'LONG' and cross_gap < ACCEL_300_CHOP_CROSS_GAP_PCT:
+                continue
+            if direction == 'SHORT' and cross_gap > -ACCEL_300_CHOP_CROSS_GAP_PCT:
+                continue
+
+            # 2. EMA angle at cross bar
+            if ema300[cross_bar] is not None and ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK] is not None:
+                dy = ema300[cross_bar] - ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK]
+                angle_pct = (dy / ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK]) * 100.0 if ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK] != 0 else 0.0
+                if abs(angle_pct) < ACCEL_300_CHOP_EMA_ANGLE_PCT:
+                    continue
+
+            # 3. Average gap magnitude over the bars leading up to cross bar
+            gap_slice = [abs(g) for g in gap_pcts[cross_bar - ACCEL_300_CHOP_LOOKBACK:cross_bar] if g is not None]
+            if gap_slice:
+                avg_gap = sum(gap_slice) / len(gap_slice)
+                if avg_gap < ACCEL_300_CHOP_AVG_GAP_PCT:
+                    continue
 
         return {
             'direction': direction,

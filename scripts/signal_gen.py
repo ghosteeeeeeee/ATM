@@ -30,7 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hermes_file_lock import FileLock
 _RUNTIME_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            os.pardir, 'data', 'signals_hermes_runtime.db')
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED, VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED, HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED, HMACD_ENABLED, HMACD_PLUS_ENABLED, HMACD_MINUS_ENABLED, MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED, PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED, FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED, MOMENTUM_ENABLED, MOMENTUM_PLUS_ENABLED, MOMENTUM_MINUS_ENABLED
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED, VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED, HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED, HMACD_ENABLED, HMACD_PLUS_ENABLED, HMACD_MINUS_ENABLED, MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED, PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED, FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED, MOMENTUM_ENABLED, MOMENTUM_PLUS_ENABLED, MOMENTUM_MINUS_ENABLED, PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME
 import pattern_scanner  # Chart pattern detection — runs first, all active tokens
 # import ma300_candle_confirm_signals  # EMA300 + 2-conf signal — DISABLED 2026-04-22
 # zscore_momentum — moved to zscore_pump_hunter.py (standalone, owns its own timer)
@@ -150,13 +150,6 @@ _STOP_VOL_PREFETCH = None
 
 LOG_FILE = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-
-# ─── Momentum phase thresholds ─────────────────────────────────
-# Based on z-score percentile rank (how unusual for this token)
-PHASE_BUILDING    = 60    # percentile ≥60 → momentum starting
-PHASE_ACCELERATING= 75    # percentile ≥75 → strong momentum
-PHASE_EXHAUSTION  = 88    # percentile ≥88 → late phase, watch for exit
-PHASE_EXTREME     = 95    # percentile ≥95 → exhaustion/mean-reversion territory
 
 # Entry score thresholds
 ENTRY_THRESHOLD      = 55    # min score to add signal (LONG) — Z_FLOOR+trend filter handle quality
@@ -2677,7 +2670,7 @@ def run():
         if gap_added:
             print(f'  GAP300 signals: {gap_added} gap-300 emitted')
         # ACCEL-300 — persistent gap above EMA(300) with growing gap — catches slow breakouts
-        from accel_300_signals import scan_accel_300_signals
+        from signals.accel_300 import scan_accel_300_signals
         accel_added = scan_accel_300_signals(prices_dict)
         if accel_added:
             print(f'  ACCEL-300 signals: {accel_added} accel-300 emitted')

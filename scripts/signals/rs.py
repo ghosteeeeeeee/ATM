@@ -29,32 +29,28 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal
-
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-RS_LOOKBACK_CANDLES   = 4700  # max available in price_history (~3+ days of 1m)
-RS_LEVEL_LOOKBACK     = 20    # swing high/low detection window (candles)
-RS_ATR_PERIOD         = 14    # ATR lookback period
-RS_CLUSTER_ATR        = 0.50  # cluster levels within 0.50 * ATR of each other
-RS_PROXIMITY_K        = 0.70 # fire if price is within 0.70 * ATR of a level (tightened from 1.00)
-RS_MIN_TOUCHES        = 3     # minimum historical touches to be a valid level (lowered from 8)
-RS_COOLDOWN_HOURS     = 4     # cooldown between RS signals per token+direction
-RS_SIGNAL_TYPE        = 'support_resistance'
-RS_SOURCE_PREFIX      = 'rs'
-RS_MIN_CONFIDENCE     = 50    # global floor (matches signal_schema minimum)
-RS_MAX_CONFIDENCE     = 88    # cap — R&S is structural, not momentum
-
-# Recency tuning: touches in last N candles count as "recent"
-# Low-touch fresh levels (1-20 touches) have 44% WR and +0.80% avg
-# vs ancient levels (100+ touches) with 40% WR and +0.03% avg
-RS_RECENCY_WINDOW     = 200   # lookback for recency-weighted touch count
-RS_RECENCY_BOOST_K    = 3.0   # multiplier: each recent touch counts as K ancient touches
-
-# Bounce confirmation: what counts as a "bounce" off a level?
-# A bounce means price got close to the level and recovered.
-# We check the last RS_LEVEL_LOOKBACK candles for this behavior.
-_BOUNCE_LOOKBACK      = 6     # candles to check for bounce confirmation
-_BOUNCE_THRESH_ATR     = 1.00  # touch: price came within 1.00 * ATR(14) of the level
+from hermes_constants import (
+    RS_LOOKBACK_CANDLES,
+    RS_LEVEL_LOOKBACK,
+    RS_ATR_PERIOD,
+    RS_CLUSTER_ATR,
+    RS_PROXIMITY_K,
+    RS_MIN_TOUCHES,
+    RS_COOLDOWN_HOURS,
+    RS_SIGNAL_TYPE,
+    RS_SOURCE_PREFIX,
+    RS_MIN_CONFIDENCE,
+    RS_MAX_CONFIDENCE,
+    RS_RECENCY_WINDOW,
+    RS_RECENCY_BOOST_K,
+    RS_BOUNCE_LOOKBACK,
+    RS_BOUNCE_THRESH_ATR,
+    RS_DECIDER_MIN_TOUCHES,
+    RS_TOUCH_HARD_CAP,
+    RS_BROKEN_SHORT_ENABLED,
+    RS_BROKEN_RESISTANCE_LONG_ENABLED,
+    RS_ATR_DIST_FALLBACK,
+)
 
 # Regime lookup for RS directionality
 _REGIME_FILE = '/var/www/hermes/data/regime_5m.json'
@@ -150,7 +146,7 @@ def _find_swing_highs_lows(candles: list, window: int = RS_LEVEL_LOOKBACK):
 
 def _cluster_levels(levels: list, cluster_atr_pct: float) -> list:
     """Cluster price levels that are within cluster_atr_pct of each other.
-    Each cluster is replaced by its average price weighted by touch count.
+    Each cluster is replaced by its average price (simple mean, not touch-count weighted).
 
     Args:
         levels: list of (price, touch_count) tuples
@@ -195,7 +191,7 @@ def _price_near_level(price: float, level: float, atr_pct: float, k: float = RS_
 
 def _bounce_confirmation(candles: list, level: float, direction: str,
                           atr_value: float = None,
-                          lookback: int = _BOUNCE_LOOKBACK) -> bool:
+                          lookback: int = RS_BOUNCE_LOOKBACK) -> bool:
     """Check if price recently bounced from the level.
 
     For LONG (near support): find at least one candle whose close was near the
@@ -217,7 +213,7 @@ def _bounce_confirmation(candles: list, level: float, direction: str,
         # Fallback: use fixed 0.15% threshold
         thresh = level * 0.0015
     else:
-        thresh = atr_value * _BOUNCE_THRESH_ATR
+        thresh = atr_value * RS_BOUNCE_THRESH_ATR
 
     if direction == 'LONG':
         # Support bounce: close touched level, then either:
@@ -260,32 +256,61 @@ def _bounce_confirmation(candles: list, level: float, direction: str,
 # (DEPRECATED 2026-05-06 — removed ATR band filter, levels in this range are valid)
 
 
-def _level_recently_broken(candles: list, level: float, lookback: int = 20) -> bool:
-    """Return True if price crossed *through* the level in the last `lookback` candles.
+def _level_recently_broken(candles: list, level: float, lookback: Optional[int] = None,
+                            direction: str = 'support') -> bool:
+    """Return True if the level was *definitively* broken in the given direction.
 
-    price_history is close-only (open=high=low=close for every candle), so we detect
-    a level crossing by checking if two successive candle closes are on opposite
-    sides of the level:
-      - Resistance broken: prev_close < level < curr_close  (price crossed above)
-      - Support broken:    prev_close > level > curr_close  (price crossed below)
+    For 'support': price must have closed below the level and STAYED below
+    (the candle AFTER the break must also be below the level).
 
-    A candle closing ON the level (prev_close < level < curr_close with curr_close
-    equal to level) cannot occur with close-only data, so this is a pure close-crossing
-    check between consecutive candles.
+    For 'resistance': price must have closed above the level and STAYED above
+    (the candle AFTER the break must also be above the level).
+
+    price_history is close-only (open=high=low=close for every candle), so we
+    detect a level crossing by checking if two successive candle closes are
+    on opposite sides of the level.
+
+    A broken level must have TWO confirming candles on the far side — the
+    initial cross and at least one follow-through candle. This prevents a
+    bounce (cross then immediate reversal) from being mistaken for a break.
+
+    Args:
+        direction: 'support' checks if support was broken downward.
+                   'resistance' checks if resistance was broken upward.
     """
-    if len(candles) < lookback:
+    from hermes_constants import RS_LEVEL_BROKEN_LOOKBACK
+    if lookback is None:
+        lookback = RS_LEVEL_BROKEN_LOOKBACK
+    if len(candles) < 2:
         return False
 
-    recent = candles[-lookback:]
-    for i in range(1, len(recent)):
-        prev_close = recent[i - 1]['close']
-        curr_close = recent[i]['close']
-        # Resistance broken: price closed above from below
-        if prev_close < level < curr_close:
-            return True
-        # Support broken: price closed below from above
-        if prev_close > level > curr_close:
-            return True
+    recent = candles[-min(lookback, len(candles)):]
+
+    if direction == 'support':
+        # Support broken: prev_close > level > curr_close AND
+        # the candle BEFORE the break was above support (genuine crossing, not already-broken state)
+        for i in range(1, len(recent)):
+            prev_close = recent[i - 1]['close']
+            curr_close = recent[i]['close']
+            # Must be a clean cross below
+            if prev_close > level > curr_close:
+                # Check this candle closed BELOW and STAYED below
+                if i + 1 < len(recent) and recent[i + 1]['close'] < level:
+                    return True
+                # Single candle below is a bounce — not a confirmed break
+    else:
+        # Resistance broken: prev_close < level < curr_close AND
+        # the candle AFTER the cross confirms price stayed above
+        for i in range(1, len(recent)):
+            prev_close = recent[i - 1]['close']
+            curr_close = recent[i]['close']
+            # Must be a clean cross above
+            if prev_close < level < curr_close:
+                # Check follow-through candle closed above
+                if i + 1 < len(recent) and recent[i + 1]['close'] > level:
+                    return True
+                # Single candle above is a rejection bounce — not a confirmed break
+
     return False
 
 
@@ -299,7 +324,7 @@ def _build_level_touches(candles_or_highs_lows, level: float = None,
 
     Uses ATR-based threshold so touch counting is volatility-normalized:
     - price_history is close-only (open=high=low=close for every candle)
-    - a "touch" = any candle's close within _BOUNCE_THRESH_ATR * ATR(14) of the level
+    - a "touch" = any candle's close within RS_BOUNCE_THRESH_ATR * ATR(14) of the level
     - this avoids the 0.15% fixed threshold over-counting on volatile tokens
 
     Args:
@@ -313,7 +338,7 @@ def _build_level_touches(candles_or_highs_lows, level: float = None,
         n = len(highs)
         if atr_value is not None and atr_value > 0:
             # ATR-normalized threshold — adapts to volatility
-            threshold = atr_value * _BOUNCE_THRESH_ATR
+            threshold = atr_value * RS_BOUNCE_THRESH_ATR
         else:
             # Fallback: ~0.15% of price (old hardcoded behavior)
             threshold = abs(level) * 0.0015
@@ -334,7 +359,7 @@ def _build_level_touches(candles_or_highs_lows, level: float = None,
     # Legacy path: list of dict candles
     candles = candles_or_highs_lows
     if atr_value is not None and atr_value > 0:
-        threshold = atr_value * _BOUNCE_THRESH_ATR
+        threshold = atr_value * RS_BOUNCE_THRESH_ATR
     else:
         threshold = abs(level) * 0.0015
     count = 0
@@ -441,8 +466,18 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
     recency_by_level = {l: rs for l, tc, rs in raw_resistance}
     recency_by_level.update({l: rs for l, tc, rs in raw_support})
 
-    if not r_levels and not s_levels:
-        return None
+    # Map clustered levels back to nearest raw level recency (clustered prices are
+    # averages that won't exactly match raw level keys in recency_by_level)
+    def _get_clustered_recency(clustered_level, raw_levels_list):
+        """Find the raw level closest to clustered_level and return its recency."""
+        best = None
+        best_dist = float('inf')
+        for raw_l, raw_tc, raw_rs in raw_levels_list:
+            d = abs(raw_l - clustered_level)
+            if d < best_dist:
+                best_dist = d
+                best = raw_rs
+        return best if best is not None else 0
 
     # Find the nearest valid level for each direction
     # For best level: use recency_score (fresh levels prioritized over ancient ones)
@@ -458,7 +493,7 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
         if touch_count < RS_MIN_TOUCHES:
             continue
         dist_pct = abs(price - level) / price * 100.0
-        recency = recency_by_level.get(level, 0)
+        recency = _get_clustered_recency(level, raw_support)
         if _price_near_level(price, level, atr_pct) and dist_pct < best_support_dist:
             best_support_dist = dist_pct
             best_support_recency = recency
@@ -468,7 +503,7 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
         if touch_count < RS_MIN_TOUCHES:
             continue
         dist_pct = abs(price - level) / price * 100.0
-        recency = recency_by_level.get(level, 0)
+        recency = _get_clustered_recency(level, raw_resistance)
         if _price_near_level(price, level, atr_pct) and dist_pct < best_resist_dist:
             best_resist_dist = dist_pct
             best_resist_recency = recency
@@ -506,67 +541,139 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
     # Check LONG: price near support level + bounce
     if nearest_support is not None:
         level, touch_count = nearest_support
-        recency = best_support_recency
-        bounces = _bounce_confirmation(candles, level, 'LONG', atr_value=atr)
-        broken  = _level_recently_broken(candles, level)
-        atr_dist = best_support_dist / atr_pct if atr_pct > 0 else 999
-
-        # Gate: reject recently-broken levels (level invalidation)
-        if broken:
+        # Hard cap: levels touched too many times are exhausted/trampled — block entirely
+        if RS_TOUCH_HARD_CAP and touch_count > RS_TOUCH_HARD_CAP:
             nearest_support = None
         else:
-            confidence = _compute_confidence(atr_pct, best_support_dist, touch_count, bounces, recency)
-            # Counter-regime penalty: 20% haircut for SHORT_BIAS + LONG
-            if regime == 'SHORT_BIAS' and regime_conf > 50:
-                confidence = confidence * 0.80
-            # NEUTRAL penalty: 15% haircut
-            elif regime == 'NEUTRAL' and regime_conf > 55:
-                confidence = confidence * 0.85
-            source = f'{RS_SOURCE_PREFIX}-s{touch_count}'
-            signal = {
-                'direction':  'LONG',
-                'confidence': confidence,
-                'level':      level,
-                'source':     source,
-                'value':      float(confidence),
-                'atr_dist':   atr_dist,
-                'touches':    touch_count,
-                'recency_score': recency,
-                'bounce':     bounces,
-            }
+            recency = best_support_recency
+            bounces = _bounce_confirmation(candles, level, 'LONG', atr_value=atr)
+            broken  = _level_recently_broken(candles, level, direction='support')
+            atr_dist = best_support_dist / atr_pct if atr_pct > 0 else RS_ATR_DIST_FALLBACK
+
+            # Gate: reject recently-broken levels (level invalidation).
+            # If a "broken" support has since recovered above the level, it's no longer
+            # acting as broken resistance — treat it as a bounce LONG instead.
+            if broken and price > level:
+                broken  = False   # reclassify: level is now supporting again
+                bounces = True    # and it's actively bouncing
+                # Falls through to normal support → LONG path below
+
+            if broken:
+                # Support was breached — fire SHORT in the direction of the break.
+                # RS_BROKEN_SHORT_ENABLED = False: disable this path — broken support SHORT
+                # is a counter-trend trap (29% WR in sample), price often continues up.
+                # Better path: broken support → LONG on recovery instead (caught above).
+                if not RS_BROKEN_SHORT_ENABLED:
+                    nearest_support = None
+                else:
+                    confidence = _compute_confidence(atr_pct, best_support_dist, touch_count, bounces=bounces, recency_score=recency)
+                    if regime == 'LONG_BIAS' and regime_conf > 50:
+                        confidence = confidence * 0.80
+                    elif regime == 'NEUTRAL' and regime_conf > 55:
+                        confidence = confidence * 0.85
+                    source = f'{RS_SOURCE_PREFIX}-s-broken'
+                    signal = {
+                        'direction':  'SHORT',
+                        'confidence': confidence,
+                        'level':      level,
+                        'source':     source,
+                        'value':      float(confidence),
+                        'atr_dist':   atr_dist,
+                        'touches':    touch_count,
+                        'recency_score': recency,
+                        'bounce':     False,
+                    }
+            else:
+                # Normal support bounce — price near support, bouncing upward.
+                confidence = _compute_confidence(atr_pct, best_support_dist, touch_count, bounces, recency)
+                # Counter-regime penalty: 20% haircut for SHORT_BIAS + LONG
+                if regime == 'SHORT_BIAS' and regime_conf > 50:
+                    confidence = confidence * 0.80
+                # NEUTRAL penalty: 15% haircut
+                elif regime == 'NEUTRAL' and regime_conf > 55:
+                    confidence = confidence * 0.85
+                source = f'{RS_SOURCE_PREFIX}-s{touch_count}'
+                signal = {
+                    'direction':  'LONG',
+                    'confidence': confidence,
+                    'level':      level,
+                    'source':     source,
+                    'value':      float(confidence),
+                    'atr_dist':   atr_dist,
+                    'touches':    touch_count,
+                    'recency_score': recency,
+                    'bounce':     bounces,
+                }
 
     # Check SHORT: price near resistance level + rejection
     if nearest_resistance is not None:
         level, touch_count = nearest_resistance
-        recency = best_resist_recency
-        bounces = _bounce_confirmation(candles, level, 'SHORT', atr_value=atr)
-        broken  = _level_recently_broken(candles, level)
-        atr_dist = best_resist_dist / atr_pct if atr_pct > 0 else 999
-
-        # Gate: reject recently-broken levels (level invalidation)
-        if broken:
+        # Hard cap: levels touched too many times are exhausted/trampled — block entirely
+        if RS_TOUCH_HARD_CAP and touch_count > RS_TOUCH_HARD_CAP:
             nearest_resistance = None
         else:
-            confidence = _compute_confidence(atr_pct, best_resist_dist, touch_count, bounces, recency)
-            # Counter-regime penalty: 20% haircut for LONG_BIAS + SHORT
-            if regime == 'LONG_BIAS' and regime_conf > 50:
-                confidence = confidence * 0.80
-            # NEUTRAL penalty: 15% haircut
-            elif regime == 'NEUTRAL' and regime_conf > 55:
-                confidence = confidence * 0.85
-            source = f'{RS_SOURCE_PREFIX}-r{touch_count}'
-            cand_signal = {
-                'direction':  'SHORT',
-                'confidence': confidence,
-                'level':      level,
-                'source':     source,
-                'value':      float(confidence),
-                'atr_dist':   atr_dist,
-                'touches':    touch_count,
-                'bounce':     bounces,
-            }
-            # Use SHORT if it has higher confidence; otherwise keep LONG
-            if signal is None or cand_signal['confidence'] > signal['confidence']:
+            recency = best_resist_recency
+            bounces = _bounce_confirmation(candles, level, 'SHORT', atr_value=atr)
+            broken  = _level_recently_broken(candles, level, direction='resistance')
+            atr_dist = best_resist_dist / atr_pct if atr_pct > 0 else RS_ATR_DIST_FALLBACK
+
+            # Gate: reject recently-broken levels (level invalidation).
+            # If a "broken" resistance has since fallen back below the level, it's no
+            # longer acting as broken support — treat it as a resistance SHORT instead.
+            if broken and price < level:
+                broken = False   # reclassify: level is now resistance again
+                # Falls through to normal resistance → SHORT path below
+
+            if broken:
+                # Resistance was breached — fire LONG in the direction of the break.
+                # RS_BROKEN_RESISTANCE_LONG_ENABLED = False: disable this path — broken
+                # resistance LONG is a counter-trend trap (BLUR/BRETT loss pattern). Price
+                # broke through resistance, expecting bounce, but momentum is bearish and
+                # price typically continues down.
+                if not RS_BROKEN_RESISTANCE_LONG_ENABLED:
+                    nearest_resistance = None
+                    cand_signal = None
+                else:
+                    confidence = _compute_confidence(atr_pct, best_resist_dist, touch_count, bounces=bounces, recency_score=recency)
+                    if regime == 'SHORT_BIAS' and regime_conf > 50:
+                        confidence = confidence * 0.80
+                    elif regime == 'NEUTRAL' and regime_conf > 55:
+                        confidence = confidence * 0.85
+                    source = f'{RS_SOURCE_PREFIX}-r-broken'
+                    cand_signal = {
+                        'direction':  'LONG',
+                        'confidence': confidence,
+                        'level':      level,
+                        'source':     source,
+                        'value':      float(confidence),
+                        'atr_dist':   atr_dist,
+                        'touches':    touch_count,
+                        'recency_score': recency,
+                        'bounce':     False,
+                    }
+            else:
+                # Normal resistance rejection — price near resistance, bouncing downward.
+                confidence = _compute_confidence(atr_pct, best_resist_dist, touch_count, bounces, recency)
+                # Counter-regime penalty: 20% haircut for LONG_BIAS + SHORT
+                if regime == 'LONG_BIAS' and regime_conf > 50:
+                    confidence = confidence * 0.80
+                # NEUTRAL penalty: 15% haircut
+                elif regime == 'NEUTRAL' and regime_conf > 55:
+                    confidence = confidence * 0.85
+                source = f'{RS_SOURCE_PREFIX}-r{touch_count}'
+                cand_signal = {
+                    'direction':  'SHORT',
+                    'confidence': confidence,
+                    'level':      level,
+                    'source':     source,
+                    'value':      float(confidence),
+                    'atr_dist':   atr_dist,
+                    'touches':    touch_count,
+                    'recency_score': recency,
+                    'bounce':     bounces,
+                }
+            # Only update signal if cand_signal was actually created (not blocked by killswitch)
+            if cand_signal is not None and (signal is None or cand_signal['confidence'] > signal['confidence']):
                 signal = cand_signal
 
     return signal
@@ -623,14 +730,15 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
 # ── Main scanner ────────────────────────────────────────────────────────────────
 
 def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
-    from hermes_constants import RS_ENABLED
+    from hermes_constants import RS_ENABLED, LONG_BLACKLIST, SHORT_BLACKLIST
     if not RS_ENABLED:
         return 0
     """Scan pre-filtered tokens for support/resistance signals and write to DB.
 
-    All guards (blacklists, open positions, cooldowns, price age) must be
-    applied by the caller before passing prices_dict here. This function
-    focuses purely on R&S level detection and DB writing.
+    Guards applied here (no caller assumptions):
+    - RS_ENABLED kill-switch
+    - LONG_BLACKLIST / SHORT_BLACKLIST from hermes_constants
+    - RS_PLUS_ENABLED / RS_MINUS_ENABLED per-direction kill-switches
 
     Args:
         prices_dict: token -> {'price': float, ...}  (pre-filtered by caller)
@@ -664,12 +772,20 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
         if sig['direction'] == 'SHORT' and not RS_MINUS_ENABLED:
             continue
 
+        # ── Blacklist guard ──────────────────────────────────────────────────
+        token_upper = token.upper()
+        if sig['direction'] == 'LONG' and token_upper in LONG_BLACKLIST:
+            continue
+        if sig['direction'] == 'SHORT' and token_upper in SHORT_BLACKLIST:
+            continue
+
         sid = add_signal(
             token=token.upper(),
             direction=sig['direction'],
             signal_type=RS_SIGNAL_TYPE,
             source=sig['source'],
             confidence=sig['confidence'],
+            price=price,
         )
         if sid:
             added += 1

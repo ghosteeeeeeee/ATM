@@ -19,10 +19,11 @@ Migrated from combined-trading.py:
   - record_entry_features() / record_exit_features() — feature logging
   - close_orphan_paper_trades() — paper→HL mirroring
 """
-import sys, time, json, subprocess, argparse, os, re, fcntl
+import sys, time, json, subprocess, argparse, os, re, fcntl, math
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 from hermes_file_lock import FileLock
+from pnl_utils import compute_close_pnl, compute_live_pnl
 
 # Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
 HL_TOKEN_BLOCKLIST=frozenset({'HILL', 'FIRE', 'FORTH', 'ALPINE', 'DOGET', 'XRP',
@@ -394,8 +395,9 @@ def _clear_closing_marker(token: str):
 def _load_closing_markers() -> dict:
     """Load the current closing markers dict."""
     try:
-        with open(_GUARDIAN_CLOSING_FILE) as f:
-            data = json.load(f)
+        with FileLock('guardian_closing'):
+            with open(_GUARDIAN_CLOSING_FILE) as f:
+                data = json.load(f)
         return data.get('tokens', {})
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
@@ -503,15 +505,23 @@ def _retry_phantom_close_fills():
             window_end = int(time.time() * 1000)
             window_start = window_end - 300_000  # 5 min lookback
             fills = _get_fills_cached(token.upper(), window_start, window_end)
+            # BUG-FIX (2026-06-10): same root cause as line 2523 fix.
+            # side=='B' only matches SHORT closes — misses ALL LONG closes.
+            # Fix: filter on dir field containing 'Close'.
             close_fills = [f for f in fills
-                         if f['coin'].upper() == token.upper() and f.get('side') == 'B']
+                         if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
 
             if close_fills:
                 total_sz = sum(f['sz'] for f in close_fills)
                 wavg_exit = sum(f['px'] * f['sz'] for f in close_fills) / total_sz
                 # Recalculate pnl_pct from real HL data
                 entry_px = float(entry_price)
-                pnl_pct = ((wavg_exit - entry_px) / entry_px) * 100
+                # BUG-FIX (2026-06-10): PnL formula must be direction-aware.
+                # LONG: profit when exit > entry. SHORT: profit when exit < entry.
+                if direction == 'SHORT':
+                    pnl_pct = ((entry_px - wavg_exit) / entry_px) * 100
+                else:
+                    pnl_pct = ((wavg_exit - entry_px) / entry_px) * 100
                 # Round to 6 decimal places
                 pnl_pct = round(pnl_pct, 6)
 
@@ -709,7 +719,8 @@ def get_all_open_trades():
 
 def add_orphan_trade(token: str, direction: str, entry_price: float,
                       amount_usdt: float, leverage: int,
-                      stop_loss: float = None, target: float = None) -> int:
+                      stop_loss: float = None, target: float = None,
+                      signal_z_score: float = None) -> int:
     """
     Create a paper trade in the brain DB (equivalent to brain.py add_trade).
     Returns the new trade_id, or None if creation failed.
@@ -733,15 +744,17 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
             INSERT INTO trades (token, direction, amount_usdt, entry_price, hl_entry_price,
                 exchange, paper, stop_loss, target, server, status, open_time,
                 pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance,
-                guardian_closed, is_guardian_close)
+                guardian_closed, is_guardian_close,
+                signal_z_score)
             SELECT %s, %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
-                   0, 0, %s, 0.03, 0.01, 0.01, TRUE, TRUE
+                   0, 0, %s, 0.03, 0.01, 0.01, TRUE, TRUE,
+                   %s
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
             )
             RETURNING id
         """, (token, direction, amount_usdt, entry_price, entry_price,
-              stop_loss, target, leverage, token))
+              stop_loss, target, leverage, signal_z_score, token))
         row = cur.fetchone()
         if row is None:
             # No row returned = INSERT was skipped (open trade already exists)
@@ -868,8 +881,12 @@ def _poll_close_fills_once(token: str):
     window_end = int(time.time() * 1000)
     window_start = window_end - 300_000  # 5 min lookback
     fills = _get_fills_cached(token, window_start, window_end)
+    # BUG-FIX (2026-06-10): side=='B' only matches SHORT closes (dir="Close Short").
+    # It MISSES all LONG closes (dir="Close Long" has side='A').
+    # Same root cause as the 2026-04-19 fix in _close_paper_trade_db (line 2523).
+    # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
     token_closes = [f for f in fills
-                    if f['coin'].upper() == token.upper() and f.get('side') == 'B']
+                    if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
     if token_closes:
         total_sz = sum(f['sz'] for f in token_closes)
         wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
@@ -1212,9 +1229,16 @@ def reconcile_hype_to_paper(hl_pos, prices):
                         log(f'  Orphan {coin} marked as copied (trade #{trade_id})', 'WARN')
                         # Immediately poll for fills and close the DB orphan trade
                         time.sleep(6)
+                        # Compute actual HL notional: sz (coin units) × entry_px.
+                        # pos_data was populated at line 1189: pos_data = hl_pos.get(coin, {})
+                        # Uses the same sz/entry_px that was used to create the paper trade.
+                        _sz = float(pos_data.get('size', 0)) if 'pos_data' in dir() else 0
+                        _ep = float(pos_data.get('entry_px', 0)) if 'pos_data' in dir() else entry_px
+                        _hl_notional = abs(_sz * _ep) if _sz > 0 and _ep > 0 else None
                         _close_orphan_paper_trade_by_id(
                             trade_id, coin, direction, entry_px, lev,
-                            'guardian_orphan'
+                            'guardian_orphan',
+                            amount_usdt_override=_hl_notional
                         )
                     else:
                         log(f'  ⚠️ Orphan {coin} market_close failed (trade #{trade_id}) — will retry next cycle', 'WARN')
@@ -1462,62 +1486,64 @@ def sync_pnl_from_hype(prices):
                 pos_data = hl_pos[token]
                 unrealized_pnl = float(pos_data.get('unrealizedPnl', 0))
                 entry_price_hl = float(pos_data.get('entryPrice', entry) or entry)
-                curr_price_hl = float(pos_data.get('currentPrice', prices.get(token, entry)) or prices.get(token, entry) or entry)
+                # Safe float extraction for currentPrice — HL can return NaN, null, or
+                # non-numeric strings which crash float() before the old guard runs.
+                _raw_cp = pos_data.get('currentPrice')
+                try:
+                    curr_price_hl = float(_raw_cp)
+                    if math.isnan(curr_price_hl) or curr_price_hl <= 0:
+                        curr_price_hl = float(prices.get(token, entry) or entry)
+                except (TypeError, ValueError):
+                    curr_price_hl = float(prices.get(token, entry) or entry)
 
-                if unrealized_pnl != 0:
-                    # BUG-29 fix: use unrealized_pnl for display fields, but do NOT store
-                    # it in hype_pnl_usdt (that's reserved for REALIZED PnL from HL fills).
-                    # Storing unrealized in hype_pnl_usdt caused massive PnL overstatements
-                    # (e.g. unrealized +$50 became $50 realized even on paper losses).
-                    pnl_usdt = round(unrealized_pnl, 4)  # unrealized PnL from HL /account summary
-                    # BUG-6 fix: use UNLEVERAGED pnl_pct (entry-based, not margin-based).
-                    # OLD: leveraged pnl_pct = (unrealized_pnl / margin) * 100 — inconsistent
-                    #   across leverage levels and with _close_paper_trade_db formula.
-                    # NEW: unleveraged pnl_pct = (exit - entry) / entry * 100, same as
-                    #   _close_paper_trade_db. This is the "raw" market return, not
-                    #   amplified by leverage. Comparable across all leverage levels.
-                    if entry_price_hl and entry_price_hl > 0 and curr_price_hl and curr_price_hl > 0:
-                        if direction and direction.upper() == 'SHORT':
-                            pnl_pct = round((entry_price_hl - curr_price_hl) / entry_price_hl * 100, 4)
-                        else:
-                            pnl_pct = round((curr_price_hl - entry_price_hl) / entry_price_hl * 100, 4)
-                    else:
-                        # Fallback to HL unrealized pnl_pct (leveraged but better than nothing)
-                        pnl_pct = round(unrealized_pnl / float(amount or 50) * 100, 4)
+                # FIX (2026-05-20): Always update prices and pnl_pct, even when
+                # unrealized_pnl == 0 (breakeven positions). The old guard skipped
+                # the entire update when pnl was zero, leaving current_price stale.
+                # We use unrealized_pnl for pnl_usdt (HL's authoritative USDT value)
+                # and compute_live_pnl for pnl_pct (unleveraged, entry-based %).
+                pnl_usdt = round(unrealized_pnl, 4)  # HL unrealized PnL in USDT
+                # Defensive: ensure prices are float before arithmetic
+                entry_price_hl = float(entry_price_hl)
+                curr_price_hl = float(curr_price_hl)
+                if entry_price_hl > 0 and curr_price_hl > 0:
+                    pnl_pct = compute_live_pnl(entry_price_hl, curr_price_hl, direction)  # pnl_utils
+                else:
+                    # Fallback: leveraged but better than nothing
+                    pnl_pct = round(unrealized_pnl / float(amount or 50) * 100, 4)
 
-                    cur.execute("""
-                        UPDATE trades SET pnl_usdt = %s, pnl_pct = %s,
-                            current_price = %s
-                        WHERE id = %s
-                    """, (pnl_usdt, pnl_pct,
-                          prices.get(token, entry) if prices else entry,
-                          trade_id))
+                cur.execute("""
+                    UPDATE trades SET pnl_usdt = %s, pnl_pct = %s,
+                        current_price = %s
+                    WHERE id = %s
+                """, (pnl_usdt, pnl_pct,
+                      prices.get(token, entry) if prices else entry,
+                      trade_id))
 
-                    # [DEFUNCT-2026-04-17] flip now handled by position_manager CASCADE_FLIP
-                    # _check_and_execute_flip({...})
+                # [DEFUNCT-2026-04-17] flip now handled by position_manager CASCADE_FLIP
+                # _check_and_execute_flip({...})
 
-                    # ── Stale Trade Rotation (2026-04-05) ────────────────────────────────
-                    # If trade hasn't moved >1% in 15min AND a faster hot-set token exists
-                    # → close stale trade, let ai_decider refill from hot-set.
-                    # Runs after pnl update; skipped for trades already being cut (<-5%).
-                    # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
-                    if pnl_pct > CUT_LOSER_THRESHOLD:
-                        _check_stale_rotation(
-                            {'id': trade_id, 'token': token, 'direction': direction,
-                             'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
-                            pnl_pct, prices, conn, cur)
+                # ── Stale Trade Rotation (2026-04-05) ────────────────────────────────
+                # If trade hasn't moved >1% in 15min AND a faster hot-set token exists
+                # → close stale trade, let ai_decider refill from hot-set.
+                # Runs after pnl update; skipped for trades already being cut (<-5%).
+                # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
+                if pnl_pct > CUT_LOSER_THRESHOLD:
+                    _check_stale_rotation(
+                        {'id': trade_id, 'token': token, 'direction': direction,
+                         'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
+                        pnl_pct, prices, conn, cur)
 
-                    updated += 1
-                    # Cut-loser: emergency exit at -5% loss
-                    # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
-                    # ── Cut-loser: BUG-2/3/28 fix ────────────────────────────────────────
-                    # IMPORTANT: close_position() sends order but does NOT wait for fill.
-                    # BUG-2 old: marked DB closed BEFORE HL confirmed fill. Fix: wait first.
-                    # BUG-3: flip order placed without verifying close succeeded. Fix: verify.
-                    # BUG-28: no retry on failure. Fix: retry once, then alert.
-                    # NOTE: CUT_LOSER_THRESHOLD moved to module scope (line 74) — was causing
-                    # UnboundLocalError when used at line 904 before local def at line 931.
-                    if pnl_pct <= CUT_LOSER_THRESHOLD:
+                updated += 1
+                # Cut-loser: emergency exit at -5% loss
+                # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
+                # ── Cut-loser: BUG-2/3/28 fix ────────────────────────────────────────
+                # IMPORTANT: close_position() sends order but does NOT wait for fill.
+                # BUG-2 old: marked DB closed BEFORE HL confirmed fill. Fix: wait first.
+                # BUG-3: flip order placed without verifying close succeeded. Fix: verify.
+                # BUG-28: no retry on failure. Fix: retry once, then alert.
+                # NOTE: CUT_LOSER_THRESHOLD moved to module scope (line 74) — was causing
+                # UnboundLocalError when used at line 904 before local def at line 931.
+                if pnl_pct <= CUT_LOSER_THRESHOLD:
                         log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
                         from hyperliquid_exchange import close_position
 
@@ -2482,6 +2508,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         # Reject the HL fill and fall back to current market price.
         # NOTE: prices not available in Step8 scope — removed inline check.
         # exit_price already validated by _get_hl_exit_price() caller.
+        # Calculate PnL using centralized pnl_utils
         if not entry_price or not exit_price or exit_price <= 0:
             log(f'  Skipping trade #{trade_id} ({token}): missing entry/exit price', 'WARN')
             cur.close(); conn.close()
@@ -2512,12 +2539,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         except Exception as hl_err:
             log(f'  {token} HL PnL fetch failed (using calc): {hl_err}', 'WARN')
 
-        # Calculate PnL
-        if direction and direction.upper() == 'SHORT':
-            pnl_pct = round((float(entry_price) - exit_price) / float(entry_price) * 100, 4)
-        else:
-            pnl_pct = round((exit_price - float(entry_price)) / float(entry_price) * 100, 4)
-        pnl_usdt = round(pnl_pct / 100 * amount_usdt, 4)
+        # Centralized PnL calculation via pnl_utils
+        pnl_pct, pnl_usdt, _ = compute_close_pnl(float(entry_price), exit_price, direction, amount_usdt)
 
         # Use HL ground truth if available
         if hype_pnl_usdt is not None and hype_pnl_usdt != 0:
@@ -2572,14 +2595,15 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         log(f'  _close_paper_trade_db error: {e}', 'FAIL')
 
 
-def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, reason):
+def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, reason, amount_usdt_override=None):
     """
     Close a specific orphan paper trade by ID using actual HL fill data.
     Looks up the HL exit price + realized PnL, then updates the trade and
     records signal_outcomes + self-correction (flip+penalty on loss).
 
-    This replaces the old approach of calling record_closed_trade() which
-    INSERTS a new row (creating duplicates) instead of updating the existing orphan.
+    amount_usdt_override: optional float — if provided, use this instead of
+    DB lookup. Allows guardian to pass actual HL notional (sz × entry_px)
+    computed at orphan-close time before DB INSERT creates the record.
     """
     if DRY:
         log(f'  [DRY] Would _close_orphan_paper_trade_by_id #{trade_id} ({reason})', 'WARN')
@@ -2598,10 +2622,17 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         return False  # FAILED: marker must stay so decider_run keeps blocking
 
     # Look up amount_usdt and leverage from DB (don't use hardcoded 20.0)
+    # amount_usdt_override: HL notional passed from guardian at orphan-close time
+    # (computed as abs(sz × entry_px) from the actual HL position data).
+    # This replaces the DB lookup with the true HL notional, fixing PnL inflation.
     conn_lookup = get_db_connection()
     amount_usdt = 50.0
     lev = 1
-    if conn_lookup:
+    if amount_usdt_override is not None:
+        amount_usdt = float(amount_usdt_override)
+        log(f'  [_close_orphan_paper_trade_by_id] PnL TIER-2: using HL_notional_override=${amount_usdt:.2f} '
+            f'(trade_id={trade_id}, reason={reason})', 'INFO')
+    elif conn_lookup:
         try:
             cl = conn_lookup.cursor()
             cl.execute("SELECT amount_usdt, leverage FROM trades WHERE id=%s", (trade_id,))
@@ -3505,14 +3536,12 @@ def sync():
     # was successfully closed), clear the marker — the close is done.
     # If the token IS still in hl_pos, keep the marker active (guardian is mid-close
     # or the close failed — either way decider_run should stay blocked).
-    try:
-        stale_markers = _load_closing_markers()
-        for tok in list(stale_markers.keys()):
-            if tok not in hl_pos:
-                log(f'  [STALE-MARKER] {tok} no longer in HL — clearing closing marker')
-                _clear_closing_marker(tok)
-    except Exception:
-        pass
+    #
+    # BUG-FIX (2026-05-20): Must run AFTER hl_pos is fetched (not before), otherwise
+    # when HL is rate-limited and returns empty {}, ALL markers are incorrectly cleared
+    # as "stale" before the orphan close ever runs. This caused the closing marker bug
+    # where ada/mon/strk/tia markers kept reappearing every cycle.
+    # Move to after Step 1 (HL fetch) — see line 3561.
 
     log(f'── Sync cycle ──')
 
@@ -3550,6 +3579,18 @@ def sync():
         prices = {k: float(v) for k, v in mids.items()}
     except Exception as e:
         log(f'Failed to fetch prices: {e}', 'WARN')
+
+    # Stale marker cleanup — AFTER hl_pos is populated (not before).
+    # When HL was rate-limited and returned {}, all markers were incorrectly cleared
+    # as "stale" before the orphan close could run, causing the closing marker bug.
+    try:
+        stale_markers = _load_closing_markers()
+        for tok in list(stale_markers.keys()):
+            if tok not in hl_pos:
+                log(f'  [STALE-MARKER] {tok} no longer in HL — clearing closing marker')
+                _clear_closing_marker(tok)
+    except Exception:
+        pass
 
     # Step 3: Get paper DB open trades
     try:
@@ -3627,9 +3668,19 @@ def sync():
                         else:
                             _CLOSED_THIS_CYCLE.add(orphan_id)
                             _save_closed_set()  # BUG-4: persist orphan close
+                            # Compute actual HL notional from sz × entry_px (from hl_pos).
+                            # This replaces the $50 fallback for accurate PnL calculation.
+                            sz = float(p.get('size', 0))
+                            entry_px_raw = float(p.get('entry_px', 0))
+                            hl_notional_override = abs(sz * entry_px_raw) if sz > 0 and entry_px_raw > 0 else None
+                            if hl_notional_override:
+                                log(f'  Orphan {coin}: sz={sz}, entry_px={entry_px_raw:.6f}, HL_notional=${hl_notional_override:.2f}', 'INFO')
+                            else:
+                                log(f'  Orphan {coin}: sz={sz}, entry_px={entry_px_raw} — using DB/50 fallback for notional', 'WARN')
                             close_ok = _close_orphan_paper_trade_by_id(
                                 orphan_id, coin, direction, entry_px, lev,
-                                'guardian_orphan'
+                                'guardian_orphan',
+                                amount_usdt_override=hl_notional_override
                             )
                             # Only clear the closing marker if the DB was actually updated.
                             # If _close_orphan_paper_trade_by_id returned False (no HL fill yet
@@ -3648,31 +3699,41 @@ def sync():
                         # create it here on the orphan-close path using HL trade_id.
                         try:
                             import time as _t
+                            # Compute actual HL notional from sz × entry_px BEFORE the INSERT
+                            # uses it. p was populated at line 3607: p = hl_pos.get(coin, {})
+                            sz = float(p.get('size', 0))
+                            entry_px_raw = float(p.get('entry_px', 0))
+                            hl_notional = abs(sz * entry_px_raw) if sz > 0 and entry_px_raw > 0 else 50.0
                             cur_orphan.execute("""
                                 INSERT INTO trades (
                                     token, direction, entry_price, hl_entry_price,
                                     amount_usdt, leverage, status, exchange,
                                     signal_reason, open_time, paper,
-                                    trade_id, is_guardian_close, guardian_reason
+                                    trade_id, is_guardian_close, guardian_reason,
+                                    hl_notional_usdt
                                 ) VALUES (
                                     %s, %s, %s, %s,
-                                    50.0, %s, 'open', 'Hyperliquid',
+                                    %s, %s, 'open', 'Hyperliquid',
                                     'guardian_orphan_insert', NOW() - INTERVAL '1 second', FALSE,
-                                    %s, TRUE, 'guardian_orphan'
+                                    %s, TRUE, 'guardian_orphan',
+                                    %s
                                 ) RETURNING id
                             """, (
                                 coin.upper(), direction, entry_px, entry_px,
-                                int(lev),
-                                int(lev * 1000000)  # trade_id from HL leverage encoding
+                                hl_notional, int(lev),
+                                int(lev * 1000000),  # trade_id from HL leverage encoding
+                                hl_notional  # hl_notional_usdt — actual HL notional
                             ))
                             orphan_id = cur_orphan.fetchone()[0]
                             conn_orphan.commit()
-                            log(f'  Created guardian_orphan trade #{orphan_id} for {coin} (entry_px={entry_px})', 'WARN')
+                            log(f'  Created guardian_orphan trade #{orphan_id} for {coin} '
+                                f'(entry_px={entry_px}, hl_notional=${hl_notional:.2f}, sz={sz})', 'WARN')
                             _CLOSED_THIS_CYCLE.add(orphan_id)
                             _save_closed_set()
                             close_ok = _close_orphan_paper_trade_by_id(
                                 orphan_id, coin, direction, entry_px, lev,
-                                'guardian_orphan'
+                                'guardian_orphan',
+                                amount_usdt_override=hl_notional
                             )
                             if close_ok:
                                 _clear_closing_marker(coin)
@@ -4056,7 +4117,9 @@ def main():
                         retry_direction = 'LONG'
                         retry_lev = 1
                     _close_orphan_paper_trade_by_id(
-                        trade_id, token, retry_direction, curr_price, retry_lev, 'guardian_orphan_retry'
+                        trade_id, token, retry_direction, curr_price, retry_lev,
+                        'guardian_orphan_retry',
+                        amount_usdt_override=None  # pending retry: no HL notional available, uses DB lookup
                     )
                     _clear_pending_retry([token])
                     log(f'  {token}: pending retry succeeded', 'PASS')

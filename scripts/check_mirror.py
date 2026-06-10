@@ -2,6 +2,7 @@
 import sys
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 with open('/root/.hermes/logs/pipeline.log') as f:
     lines = f.readlines()
 

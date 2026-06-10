@@ -6,62 +6,30 @@ Tracks how fast each token is moving and identifies:
 - Stale tokens (flat for 15+ min, exit or skip)
 - Acceleration vs deceleration (momentum of momentum)
 
-Uses local hype_cache.get_allMids() for current prices.
-Maintains in-memory rolling history (60 points = 60 min).
-Runs every ~1 min as part of the pipeline — must complete in <2s.
+Uses LOCAL price cache (signals_hermes.db latest_prices + candles_5m).
+No external API calls — fast, consistent with signal_gen token universe.
+Runs every ~1 min as part of the pipeline.
 """
 
 import json
 import os
 import sqlite3
 import time
-from collections import defaultdict
 from datetime import datetime, timezone
 
-import hype_cache as hc
-
+from paths import *
 # ── Paths ────────────────────────────────────────────────────────────────────
 HERMES_DATA = "/root/.hermes/data"
 SPEED_CACHE = os.path.join(HERMES_DATA, "speed_cache.json")
 
-# ── Thresholds (documented rationale) ───────────────────────────────────────
-# speed_percentile < 20  → token is near-universe minimum velocity, skip signals
-# speed_percentile >= 70 → fast mover, 5% easier entry threshold
-# speed_percentile >= 80 → hot set speed bonus (+15% score boost)
-# stale_5m_velocity     → 0.2% = "essentially flat" over 5 min (noise threshold)
-# stale_15m             → 15 min of flatness = stale winner, book profits
-# stale_30m             → 30 min of flatness = stale loser, cut loss
-
-SPEED_MIN_THRESHOLD = 20      # tokens below this rarely get signals
-SPEED_ENTRY_BOOST = 70         # percentile at which entry gets 5% easier
-SPEED_HOTSET_THRESHOLD = 80    # percentile at which hot set gets speed bonus
-STALE_VELOCITY_5M = 0.2        # % change — below this = "flat" for 5m
-STALE_WINNER_MINUTES = 15      # stale winner: 15+ min flat while in profit
-STALE_LOSER_MINUTES = 30        # stale loser: 30+ min flat while in loss
-SPEED_WEIGHT = 0.15            # 15% of hot set score
-SPEED_HOTSET_BONUS = 0.15      # +15% score boost for speed_percentile >= 80
-SPEED_COMPACTION_WEIGHT = 0.10 # 10% of compaction score
-
-# ── History config ───────────────────────────────────────────────────────────
-HISTORY_POINTS = 60   # 60 min of 1-min history
-HISTORY_FILE = os.path.join(HERMES_DATA, "speed_history.json")
-
-
-def _load_history() -> dict:
-    """Load rolling price history from disk (persists across pipeline runs)."""
-    if os.path.exists(HISTORY_FILE):
-        try:
-            with open(HISTORY_FILE) as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            pass
-    return {}
-
-
-def _save_history(history: dict) -> None:
-    """Persist rolling history to disk."""
-    with open(HISTORY_FILE, "w") as f:
-        json.dump(history, f)
+# ── Thresholds ─────────────────────────────────────────────────────────────────
+# Sourced from hermes_constants.py — adjust there to propagate to all consumers.
+from hermes_constants import (
+    SPEED_MIN_THRESHOLD, SPEED_BOOST_THRESHOLD, SPEED_BOOST_FACTOR,
+    SPEED_HOTSET_THRESHOLD, SPEED_HOTSET_BONUS,
+    VEL_5M_WINDOW, VEL_15M_WINDOW, VEL_STALE_THRESHOLD_PCT, OVEREXTENDED_THRESHOLD,
+    STALE_WINNER_TIMEOUT_MINUTES, STALE_LOSER_TIMEOUT_MINUTES,
+)
 
 
 def _now_ts() -> str:
@@ -84,60 +52,90 @@ class SpeedTracker:
 
     def __init__(self):
         self._speeds: dict = {}        # token → speed dict (in-memory, current run)
-        self._history: dict = _load_history()   # token → list of {price, ts}
         self._percentiles: list = []    # sorted list of all velocities (for percentile rank)
         self._updated_at: str = _now_ts()
+
+    # ── Price fetchers ─────────────────────────────────────────────────────────
+
+    def _get_current_prices_from_db(self) -> dict:
+        """Fetch latest prices from local signals_hermes.db (consistent w/ signal_gen)."""
+        prices = {}
+        if not os.path.exists(STATIC_DB):
+            return prices
+        try:
+            conn = sqlite3.connect(STATIC_DB, timeout=5)
+            cur = conn.cursor()
+            cur.execute("SELECT token, price FROM latest_prices")
+            for token, price in cur.fetchall():
+                prices[token] = price
+            conn.close()
+        except Exception as e:
+            print(f"[SpeedTracker] Failed to read latest_prices: {e}")
+        return prices
+
+    def _get_candle_history(self, token: str, num_candles: int = 20) -> list:
+        """
+        Fetch last N 5m candle closes for a token from candles.db.
+        Returns list of {price, ts} newest-first (matches old hist format).
+        """
+        if not os.path.exists(CANDLES_DB):
+            return []
+        try:
+            conn = sqlite3.connect(CANDLES_DB, timeout=5)
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT ts, close FROM candles_5m
+                WHERE token = ?
+                ORDER BY ts DESC
+                LIMIT ?
+            """, [token, num_candles])
+            rows = cur.fetchall()
+            conn.close()
+            # Convert to old hist format: {price, ts}, newest-first
+            return [{"price": close, "ts": ts} for ts, close in rows]
+        except Exception as e:
+            return []
 
     # ── Public API ────────────────────────────────────────────────────────────
 
     def update(self) -> dict:
         """
-        Fetch current prices, update history, compute all speed metrics.
-        Call once per pipeline run. Returns dict of token → speed data.
+        Fetch current prices + recent 5m candle history from local DB,
+        compute all speed metrics. Call once per pipeline run.
         """
         t0 = time.time()
 
-        # Fetch current prices from local cache (sub-second)
-        try:
-            mids = hc.get_allMids()
-        except Exception as e:
-            print(f"[SpeedTracker] Failed to fetch mids: {e}")
-            mids = {}
+        # ── Step 1: Get current prices from local DB ───────────────────────────
+        mids = self._get_current_prices_from_db()
+        if not mids:
+            print("[SpeedTracker] No prices found in local DB — check pipeline order")
+            return {}
+
+        # ── Step 2: Fetch candle history from candles.db for each token ────────
+        # Build token → hist dict (newest-first, same format as old rolling history)
+        history = {}
+        for token in mids:
+            hist = self._get_candle_history(token, num_candles=20)
+            if hist:
+                history[token] = hist
 
         now = time.time()
         now_ts = _now_ts()
 
-        # Push current prices into rolling history
-        for token, price_str in mids.items():
-            try:
-                price = float(price_str)
-            except (ValueError, TypeError):
-                continue
-            if price <= 0:
-                continue
-
-            if token not in self._history:
-                self._history[token] = []
-            self._history[token].append({"price": price, "ts": now})
-            # Keep only last HISTORY_POINTS
-            if len(self._history[token]) > HISTORY_POINTS:
-                self._history[token] = self._history[token][-HISTORY_POINTS:]
-
-        # Compute speed for each token that has enough history
+        # ── Step 3: Compute speed for each token ───────────────────────────────
         self._speeds = {}
         all_velocities_5m = []
 
-        for token, hist in self._history.items():
-            if len(hist) < 2:   # need at least 2 points to compute any velocity
+        for token, hist in history.items():
+            if len(hist) < 2:
                 continue
 
             speed = self._compute_speed(token, hist, now)
             self._speeds[token] = speed
-            # Only rank tokens with valid 5m velocity
             if speed["price_velocity_5m"] is not None:
                 all_velocities_5m.append(abs(speed["price_velocity_5m"]))
 
-        # Compute percentile rank for each token
+        # ── Step 4: Compute percentile rank ────────────────────────────────────
         if all_velocities_5m:
             all_velocities_5m.sort()
             n = len(all_velocities_5m)
@@ -146,82 +144,65 @@ class SpeedTracker:
                     speed["speed_percentile"] = 50
                     continue
                 v = abs(speed["price_velocity_5m"])
-                # percentile: what % of tokens have lower or equal velocity
                 rank = next((i for i, x in enumerate(all_velocities_5m) if x >= v), n - 1)
                 speed["speed_percentile"] = round(rank / (n - 1) * 100, 1) if n > 1 else 50
 
-                # is_stale: flat for 15+ min (velocity near zero)
+                # ── is_stale: flat on BOTH 5m and 15m windows ─────────────
+                vel_5m  = speed["price_velocity_5m"]
+                vel_15m = speed["price_velocity_15m"]
                 speed["is_stale"] = (
-                    abs(speed["price_velocity_5m"]) < STALE_VELOCITY_5M
-                    and speed["price_velocity_15m"] is not None
-                    and abs(speed["price_velocity_15m"]) < STALE_VELOCITY_5M
+                    vel_5m is not None
+                    and abs(vel_5m) < VEL_STALE_THRESHOLD_PCT
+                    and vel_15m is not None
+                    and abs(vel_15m) < VEL_STALE_THRESHOLD_PCT
                 )
 
-                # Wave phase: classify the acceleration regime
-                # accelerating  = vel and accel both positive → rising momentum
-                # decelerating = vel positive, accel negative → slowing down
-                # bottoming    = vel negative, accel positive → reversal potential
-                # falling      = vel and accel both negative → continuing down
-                vel = speed["price_velocity_5m"]
-                accel = speed["price_acceleration"]
-                # BUG FIX (2026-04-05): None guards added — _compute_speed() returns None
-                # for vel/accel when there's insufficient history, causing TypeError on comparison
-                if vel is not None and accel is not None:
-                    if vel > 0 and accel > 0:
-                        wave_phase = "accelerating"
-                    elif vel > 0 and accel < 0:
-                        wave_phase = "decelerating"
-                    elif vel < 0 and accel > 0:
-                        wave_phase = "bottoming"
-                    elif vel < 0 and accel < 0:
-                        wave_phase = "falling"
-                    else:
-                        wave_phase = "neutral"
-                else:
-                    wave_phase = "neutral"
-                speed["wave_phase"] = wave_phase
-
-                # is_overextended: velocity has moved too far from 15m baseline
-                # → wave is overcooked, reversal likely
-                # SHORT overextended: vel_5m < -3%  (ripped up too fast, reversal down coming)
-                # LONG overextended:  vel_5m > +3%  (dumped too hard, bounce coming)
-                # is_stale tokens are never overextended (they've already flatlined)
-                OVEREXTENDED_THRESHOLD = 3.0
+                # ── is_overextended ──────────────────────────────────────────
                 speed["is_overextended"] = (
                     not speed["is_stale"]
-                    and abs(vel) > OVEREXTENDED_THRESHOLD
+                    and vel_5m is not None
+                    and abs(vel_5m) > OVEREXTENDED_THRESHOLD
                 )
 
-                # momentum_score: composite of current velocity + acceleration
-                # Tokens in "bottoming" phase with positive accel are best LONG entries
-                # Tokens in "decelerating" phase (high vel, neg accel) are best SHORT exits
-                # Range: ~0 to ~100, where 50 = average momentum
-                vel_component = min(abs(vel) / 3.0, 1.0) * 60  # 0-60 from velocity magnitude
-                accel_component = accel * 5 if accel else 0  # signed: positive accel = +score
-                speed["momentum_score"] = round(
-                    speed.get("speed_percentile", 50) * 0.4  # 40% base percentile
-                    + vel_component * 0.4                    # 40% current velocity
-                    + min(max(accel_component, -20), 20) * 0.2,  # 20% acceleration
-                    1
-                )
+        # ── Step 5: Wave phase classification ─────────────────────────────────
+        for token, speed in self._speeds.items():
+            vel  = speed["price_velocity_5m"]
+            accel = speed["price_acceleration"]
+            if vel is not None and accel is not None:
+                if vel > 0 and accel > 0:
+                    wave = "accelerating"
+                elif vel > 0 and accel < 0:
+                    wave = "decelerating"
+                elif vel < 0 and accel > 0:
+                    wave = "bottoming"
+                elif vel < 0 and accel < 0:
+                    wave = "falling"
+                else:
+                    wave = "neutral"
+            else:
+                wave = "neutral"
+            speed["wave_phase"] = wave
 
-                # last_move_at: when was last significant move (>0.3% in 1 min)
-                # Only same-direction moves reset the stale timer
-                speed["last_move_at"], speed["last_move_dir"] = self._last_move_time(token, hist, now)
-        else:
-            for token in self._speeds:
-                self._speeds[token]["speed_percentile"] = 50
-                self._speeds[token]["is_stale"] = False
+            # ── momentum_score ──────────────────────────────────────────────
+            vel_comp = min(abs(vel or 0) / 3.0, 1.0) * 60
+            accel_comp = (accel or 0) * 5
+            speed["momentum_score"] = round(
+                speed.get("speed_percentile", 50) * 0.4
+                + vel_comp * 0.4
+                + min(max(accel_comp, -20), 20) * 0.2,
+                1
+            )
 
-        # Persist history for next run
-        _save_history(self._history)
+            # ── last_move_at: when was last significant move (>0.3% in 1 min)
+            # Only same-direction moves reset the stale timer
+            speed["last_move_at"], speed["last_move_dir"] = self._last_move_time(token, hist, now)
 
-        # Persist to DB (for cross-script access)
+        # ── Step 6: Persist to DB ──────────────────────────────────────────────
         self._persist_to_db()
 
         self._updated_at = now_ts
         elapsed = time.time() - t0
-        print(f"[SpeedTracker] Updated {len(self._speeds)} tokens in {elapsed:.3f}s")
+        print(f"[SpeedTracker] Updated {len(self._speeds)} tokens in {elapsed:.3f}s (local DB)")
         return self._speeds
 
     def get_all_speeds(self) -> dict:
@@ -274,35 +255,44 @@ class SpeedTracker:
             interval = ts0 - ts1
             if interval > 0:
                 avg_interval = interval
-        # For hourly data (avg_interval ~= 3600), we map:
-        #   5m velocity  → use index 1  (1 hour ago, ~5% of a 24h token's movement)
-        #   15m velocity → use index 3  (3 hours ago)
+
+        # For hourly data (avg_interval ~= 3600):
+        #   5m  window → 1 candle
+        #   15m window → 3 candles
         # For 1-min data (avg_interval ≈ 60):
-        #   5m velocity  → use index 5  (5 min ago)
-        #   15m velocity → use index 15 (15 min ago)
+        #   5m  window → VEL_5M_WINDOW  (default 5)
+        #   15m window → VEL_15M_WINDOW (default 15)
         if avg_interval >= 1800:  # hourly or higher interval
-            idx_5m, idx_15m = 1, 3
+            win_5m, win_15m = 1, 3
         else:  # 1-min data
-            idx_5m, idx_15m = 5, 15
+            win_5m  = VEL_5M_WINDOW   # 5
+            win_15m = VEL_15M_WINDOW  # 15
 
-        p0 = _price_at_idx(0)
-        p5 = _price_at_idx(idx_5m)
-        p15 = _price_at_idx(idx_15m)
+        # ── Windowed average velocity ─────────────────────────────────────
+        # Replaces single-point (p0 - p5)/p5 which is noise-sensitive to one ref candle.
+        # Now: mean of last N candle returns — smooth, noise-immune.
+        def _avg_vel(window: int) -> float | None:
+            """Mean % change per candle over the last `window` candles."""
+            if len(hist) < window + 1:
+                return None
+            total = 0.0
+            for i in range(1, window + 1):
+                p_cur  = hist[-i]["price"]
+                p_prev = hist[-(i + 1)]["price"]
+                if p_prev <= 0:
+                    return None
+                total += (p_cur - p_prev) / p_prev * 100
+            return round(total / window, 4)
 
-        vel_5m = None
-        vel_15m = None
+        vel_5m  = _avg_vel(win_5m)
+        vel_15m = _avg_vel(win_15m)
+
+        # ── Acceleration: rate of change of velocity ─────────────────────
+        # accel = (avg_vel_5m - avg_vel_15m) / time_span
+        # Positive → velocity increasing (momentum building)
+        # Negative → velocity decreasing (momentum fading)
+        span = win_15m - win_5m
         accel = None
-
-        if p0 and p5 and p5 > 0:
-            vel_5m = round((p0 - p5) / p5 * 100, 4)
-
-        if p0 and p15 and p15 > 0:
-            vel_15m = round((p0 - p15) / p15 * 100, 4)
-
-        # ── Acceleration: change in velocity ───────────────────────────────
-        # For hourly data: accel = (vel_5m - vel_15m) / 3 (per-hour, 3hr span)
-        # For 1-min data:  accel = (vel_5m - vel_15m) / 15 (per-min, 15min span)
-        span = idx_15m - idx_5m  # time span between velocity measurements
         if vel_5m is not None and vel_15m is not None and span > 0:
             accel = round((vel_5m - vel_15m) / span, 4)
 
@@ -351,7 +341,7 @@ class SpeedTracker:
 
     def _persist_to_db(self) -> None:
         """Persist current speeds to SQLite (called once per update cycle)."""
-        db_path = "/root/.hermes/data/signals_hermes_runtime.db"
+        db_path = RUNTIME_DB
         if not os.path.exists(db_path):
             return
         try:

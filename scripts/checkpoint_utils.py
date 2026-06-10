@@ -2,6 +2,7 @@
 checkpoint_utils.py — Hermes pipeline checkpoint system
 Implements Claude Code primitive: Session persistence that survives crashes.
 Snapshot pipeline state before each major step.
+from paths import *
 """
 import json
 import os

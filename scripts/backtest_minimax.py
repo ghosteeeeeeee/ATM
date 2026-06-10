@@ -3,6 +3,7 @@
 
 import json, requests, sqlite3, time, re, sys
 
+from paths import *
 API_KEY = None
 with open('/root/.hermes/auth.json') as f:
     auth = json.load(f)
@@ -56,7 +57,7 @@ def load_candles(n=30):
     return candles
 
 def load_price_history(tokens):
-    conn = sqlite3.connect('/root/.hermes/data/signals_hermes.db', timeout=10)
+    conn = sqlite3.connect(STATIC_DB, timeout=10)
     cur = conn.cursor()
     data = {}
     for token in tokens:

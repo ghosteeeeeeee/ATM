@@ -321,7 +321,11 @@ def _exit_short_signals(s: MACDState) -> list:
     if s.crossover_freshness == CrossoverFreshness.FRESH_BULL:
         signals.append('macd_cross_over')
 
-    if s.regime == Regime.BULL:
+    # DISABLED (2026-05-11): regime_bull_flip fires too often on short timeframe,
+    # causing premature exits when MACD just ticks positive momentarily.
+    # Killswitch: REGIME_BULL_FLIP_ENABLED in hermes_constants.py
+    from hermes_constants import REGIME_BULL_FLIP_ENABLED
+    if REGIME_BULL_FLIP_ENABLED and s.regime == Regime.BULL:
         signals.append('regime_bull_flip')
 
     if s.histogram_rate > 0.10:

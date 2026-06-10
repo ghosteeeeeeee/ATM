@@ -1,13 +1,16 @@
 #!/usr/bin/python3
 """Standalone trades.json writer — no signal_schema (avoids init_db hangs on large DBs).
 Updates P&L on open trades using live prices from the static SQLite DB.
-Uses atomic write (flock) for safe concurrent access with hermes-trades-api.py."""
+
+Uses atomic write (flock) for safe concurrent access with hermes-trades-api.py.
+"""
+from paths import *
 import sys, os, json, sqlite3, psycopg2, fcntl
 from datetime import datetime, timezone
 
 BRAIN_DB  = 'host=/var/run/postgresql dbname=brain user=postgres password=Brain123'
-PRICE_DB  = '/root/.hermes/data/signals_hermes.db'
-OUT_TRADES = '/var/www/hermes/data/trades.json'
+PRICE_DB  = STATIC_DB
+OUT_TRADES = TRADES_JSON
 
 
 def _atomic_write(data: dict, path: str):
@@ -42,15 +45,14 @@ cur.execute("""
 """)
 open_t = cur.fetchall()
 cur.execute("""
-    SELECT COUNT(*) FROM trades
-    WHERE (server='Hermes' OR server IS NULL) AND status='closed'
+    SELECT COUNT(*) FROM trades WHERE status='closed'
 """)
 total_closed = cur.fetchone()[0]
 cur.execute("""
     SELECT id, token, direction, entry_price, exit_price, pnl_usdt, pnl_pct,
            leverage, amount_usdt, close_reason, close_time, signal
     FROM trades
-    WHERE (server='Hermes' OR server IS NULL) AND status='closed'
+    WHERE status='closed'
     ORDER BY close_time DESC
     LIMIT 200
 """)
@@ -70,7 +72,7 @@ for r in open_t:
     else:
         pnl_pct = 0.0; pnl_usdt = 0.0
     out.append({
-        'token': tkn, 'direction': direction,
+        'coin': tkn, 'direction': direction,
         'entry': entry_px, 'current': round(cp, 6),
         'pnl_pct': round(pnl_pct, 2), 'pnl_usdt': round(pnl_usdt, 2),
         'sl': round(sl, 6), 'tp': round(tp, 6)
@@ -86,7 +88,7 @@ for r in closed_t:
         ct_str = ''
     closed_out.append({
         'id': int(tid) if tid else 0,
-        'token': str(token) if token else '',
+        'coin': str(token) if token else '',
         'direction': str(direction) if direction else '',
         'entry': float(entry_px) if entry_px else 0.0,
         'exit': float(exit_px) if exit_px else 0.0,
@@ -108,4 +110,4 @@ _atomic_write(result, OUT_TRADES)
 
 print(f'Written {os.path.getsize(OUT_TRADES)} bytes | open={len(out)} closed={len(closed_out)}')
 for t in out:
-    print(f"  {t['token']:<6} {t['direction']:<5} ep={t['entry']:.4f} cp={t['current']:.4f} pnl%={t['pnl_pct']:>8.2f}% pnl$={t['pnl_usdt']:>8.2f}")
+    print(f"  {t['coin']:<6} {t['direction']:<5} ep={t['entry']:.4f} cp={t['current']:.4f} pnl%={t['pnl_pct']:>8.2f}% pnl$={t['pnl_usdt']:>8.2f}")

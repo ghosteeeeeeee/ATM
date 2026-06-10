@@ -20,13 +20,14 @@ import json
 import time
 from datetime import datetime, timedelta
 
+from paths import *
 # ─── Config ───────────────────────────────────────────────────────────────────
 LOG_FILE   = '/root/.hermes/logs/study_winning_combos.log'
 HIST_FILE   = '/root/.hermes/logs/study_history.log'
 HL_TRADE_DB = '/root/.hermes/data/hl_paper_trades.db'
 PG_CREDS = dict(host='/var/run/postgresql', dbname='brain',
                 user='postgres', password='postgres')
-RT_DB     = '/root/.hermes/data/signals_hermes_runtime.db'
+RT_DB     = RUNTIME_DB
 STUDY_HRS = 24   # look back window
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────

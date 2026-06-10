@@ -21,7 +21,12 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               is_wrong_side_risky)
 from signal_schema import _is_loss_cooldown_active
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS, HOTSET_ENABLED
+from hermes_constants import (
+    SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS, HOTSET_ENABLED,
+    RS_DECIDER_MIN_TOUCHES, RS_DECIDER_ZBONUS_TOUCHES, RS_DECIDER_ZBONUS_ZSCORE,
+    RS_DECIDER_CONF_PENALTY, RS_DECIDER_CONF_FLOOR,
+    RS_TOUCH_HARD_CAP,
+)
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
 from hyperliquid_exchange import is_live_trading_enabled, is_delisted
@@ -134,10 +139,12 @@ def _set_hotset_last_updated():
     except Exception:
         pass
 
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT
+
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
 MAX_POS         = MAX_OPEN_POSITIONS
-POSITION_SIZE_USD = 50.0   # $50 actual capital per trade
+POSITION_SIZE_USD = DEFAULT_TRADE_SIZE_USDT   # FIX (2026-05-19): was hardcoded 50.0 — now from hermes_constants
 LOG_FILE        = '/var/www/hermes/logs/signals.log'
 DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
 AB_CONFIG_FILE  = '/root/.hermes/data/ab-test-config.json'
@@ -716,9 +723,16 @@ def execute_trade(token, direction, price, confidence, source,
                     tid = line.lower().split('trade #')[1].split()[0]
                     if tid == 'none':
                         return False, f'brain.py rejected: conf-1s or blacklist blocked (output: {result.stdout.strip()[:80]})'
-
+                    # FIX (2026-05-19): Only mark signal EXECUTED after brain.py actually
+                    # confirmed the DB INSERT succeeded. brain.py prints "✅ trade #N"
+                    # to stdout on success. If brain.py exits with RC=0 but no 'trade #'
+                    # in stdout (e.g. INSERT failed silently), treat as failure — do NOT
+                    # mark signal EXECUTED, let decider_run retry next cycle.
                     return True, f'trade #{tid}'
-            return True, result.stdout.strip()[:80]
+            # RC=0 but no 'trade #' found in stdout — DB INSERT may have failed silently.
+            # Do NOT mark signal EXECUTED — return failure so decider_run retries.
+            log(f'  [brain.py] ⚠️ RC=0 but no trade ID in stdout — treating as failure. stdout={result.stdout[:100]}')
+            return False, f'brain.py RC=0 but no trade ID in stdout'
         else:
             log(f'  [brain.py] ❌ FAILED: stderr={result.stderr.strip()[:200] if result.stderr else "(empty)"}')
             return False, result.stderr.strip()[:80]
@@ -1020,6 +1034,49 @@ def _run_hot_set():
             sig_id, sig_type, sig_src, sig_conf = best
             should_approve, reason = False, ''
             reason_suffix = ''
+
+            # ── ZSCORE-PUMP INTEGRITY GATE ─────────────────────────────────────
+            # If zscore-pump appears in sig_src but z_score is effectively 0 or None,
+            # the zscore-pump signal was either rejected or got wiped by a merge bug.
+            # Treat this as RS-only — apply a confidence penalty. If it drops below
+            # the approval threshold, block the trade.
+            # (This is the second line of defense; signal_schema.py COALESCE fix is first.)
+            if 'zscore-pump' in sig_src and abs(z_score) < 0.1:
+                conf_penalty = 12
+                sig_conf -= conf_penalty
+                log(f'  📭 [ZSCORE-GATE] {token} {direction}: zscore-pump in source '
+                    f'but z={z_score:.3f} → penalty {conf_penalty}pt (conf {sig_conf+conf_penalty:.0f}%→{sig_conf:.0f}%)')
+                if sig_conf < 55:
+                    log(f'  🚫 [ZSCORE-GATE] {token} {direction} BLOCKED: zscore-pump '
+                        f'failed/invalid (effective conf={sig_conf:.0f}% < 55)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+
+            # ── RS TOUCH COUNT GATE (FIX 3, 2026-05-21) ─────────────────────────
+            # Parse touch count from sig_src (format: rs-s<N> or rs-r<N>)
+            # Low-touch levels (weak support) correlate with losing trades.
+            # Apply penalty or block accordingly.
+            import re
+            touch_match = re.search(r'rs-[sr](\d+)', sig_src or '')
+            if touch_match:
+                rs_touches = int(touch_match.group(1))
+                # Hard cap: levels touched too many times are exhausted/trampled — block at decider
+                if RS_TOUCH_HARD_CAP and rs_touches > RS_TOUCH_HARD_CAP:
+                    log(f'  🚫 [TOUCH-CAP] {token} {direction}: rs_touches={rs_touches} > {RS_TOUCH_HARD_CAP} '
+                        f'→ blocked (level is exhausted/trampled)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+                # Z-score bonus: strong momentum (|z| > threshold) compensates for weaker level
+                min_touches = RS_DECIDER_ZBONUS_TOUCHES if abs(z_score) >= RS_DECIDER_ZBONUS_ZSCORE else RS_DECIDER_MIN_TOUCHES
+                if rs_touches < min_touches:
+                    sig_conf -= RS_DECIDER_CONF_PENALTY
+                    log(f'  📉 [TOUCH-GATE] {token} {direction}: rs_touches={rs_touches} < {min_touches} '
+                        f'→ -{RS_DECIDER_CONF_PENALTY}pt penalty (conf {sig_conf+RS_DECIDER_CONF_PENALTY:.0f}%→{sig_conf:.0f}%)')
+                    if sig_conf < RS_DECIDER_CONF_FLOOR:
+                        log(f'  🚫 [TOUCH-GATE] {token} {direction} BLOCKED: weak level '
+                            f'(touches={rs_touches}, effective conf={sig_conf:.0f}% < {RS_DECIDER_CONF_FLOOR})')
+                        _record_hotset_failure(token, direction, failures)
+                        continue
 
             # ── WAVE-AWARENESS FILTER (SPEED FEATURE, 2026-04-03) ─────────────
             # Entry philosophy:
@@ -1510,6 +1567,7 @@ def run(dry_run=False):
 
     entered = 0
     skipped = 0
+    _processed_tokens_this_run = set()
 
     for i, sig in enumerate(scored):
         # Re-load hot-set on each iteration — prevents race with signal_compactor
@@ -1541,6 +1599,18 @@ def run(dry_run=False):
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
+
+        # BUG-FIX (2026-05-15): Skip if this token was already processed in this pipeline run.
+        # Hot-set can have duplicate token+direction entries via signal_compactor.
+        # PostgreSQL duplicate check reads pre-run state — two approved signals for the same
+        # token in the same run would both pass. This set tracks tokens processed in THIS run.
+        if token in _processed_tokens_this_run:
+            log(f'  [SKIP] {token} {direction} — already processed in this pipeline run')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
+        _processed_tokens_this_run.add(token)
 
         # BUG-26: extract signal_id for atomic claim BEFORE any trade execution.
         # This prevents double-execution when multiple scripts run same minute.
@@ -1861,7 +1931,22 @@ def run(dry_run=False):
             skipped += 1
             continue
 
-        # ── OPTION 1: Flip signal direction before trading ───────────────
+        elif sig_id is None:
+            # Legacy hot-set format (no signal_id): fallback claim via token+direction.
+            # Two cases:
+            #   claimed=1: this process won the fallback race, proceed to brain.py
+            #   claimed=0: another process already claimed via a valid sig_id — skip
+            # BUG-FIX (2026-05-20): Without this check, sig_id=None + claimed=0 proceeds
+            # to brain.py anyway, opening an HL position with no valid signal claim.
+            # This creates phantom orphans — HL position opened, DB INSERT fails (already
+            # claimed by another process), HL rollback succeeds but signal is stuck.
+            if claimed == 0:
+                log(f'SKIP: {token} {direction} — sig_id=None but claimed=0, another process with valid sig_id already owns this token+direction slot')
+                skipped += 1
+                continue
+            log(f'  ⚠️ sig_id=None for {token} {direction} — legacy hot-set format, proceeding via token+direction fallback claim')
+        
+        # ── OPTION 1: Flip signal direction before trading ────────────────
         # See INCIDENT_WR_FAILURE.md — test if signals are direction-inverted
         flipped_direction = None
         if _FLIP_SIGNALS:
@@ -1927,6 +2012,20 @@ def run(dry_run=False):
                         log(f'  ⚠️ ROLLBACK FAILED: sig#{sig_id} already claimed by another process')
                 except Exception as rb_e:
                     log(f'  ⚠️ ROLLBACK ERROR for sig#{sig_id}: {rb_e}')
+            else:
+                # [FIX-BUG1] sig_id=None (legacy hot-set without signal_id):
+                # Try token+direction fallback rollback so signal isn't stuck permanently.
+                # Log CRITICAL since this is a gap that could orphan HL positions.
+                log(f'  ⚠️ sig_id=None for {token} {direction} — attempting token+direction fallback rollback', 'WARN')
+                try:
+                    from signal_schema import rollback_signal_executed
+                    rolled = rollback_signal_executed(token, direction, signal_id=None)
+                    if rolled:
+                        log(f'  🔁 SIGNAL ROLLED BACK (token+direction fallback): {token} {direction} — stays in hot-set for retry')
+                    else:
+                        log(f'  ⚠️ FALLBACK ROLLBACK FAILED: {token} {direction} — signal may be stuck, manual check needed', 'FAIL')
+                except Exception as rb_e:
+                    log(f'  ⚠️ FALLBACK ROLLBACK ERROR for {token} {direction}: {rb_e}', 'FAIL')
             log(f'  → FAILED: {msg}')
             # ── Trade failed event ───────────────────────────────────────
             try:

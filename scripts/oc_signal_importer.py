@@ -275,6 +275,9 @@ def _load_json(path):
 
 def import_mtf_macd_signals(indicators: dict) -> int:
     """Import multi-timeframe MACD signals — computed locally from fresh candles.db."""
+    from hermes_constants import OC_MTF_MACD_ENABLED
+    if not OC_MTF_MACD_ENABLED:
+        return 0
     count = 0
     for token, data in indicators.items():
         mt_bull, mt_bear, tf_states = _mtf_bull_bear(token)
@@ -318,6 +321,9 @@ def import_mtf_macd_signals(indicators: dict) -> int:
 
 def import_rsi_signals(indicators: dict) -> int:
     """Import multi-TF RSI signals — computed locally from candles.db (15m/1h/4h)."""
+    from hermes_constants import OC_RSI_ENABLED
+    if not OC_RSI_ENABLED:
+        return 0
     count = 0
     for token in list(indicators.keys()):
         oversold_count, overbought_count, tf_states = _mtf_rsi(token)
@@ -366,6 +372,9 @@ def import_rsi_signals(indicators: dict) -> int:
 
 def import_pending_signals(pending_data: dict) -> int:
     """Import pre-approved pending signals from OC pipeline."""
+    from hermes_constants import OC_PENDING_ENABLED, OC_MTF_RSI_ENABLED
+    if not OC_PENDING_ENABLED:
+        return 0
     signals = pending_data.get('pending_signals', [])
     count = 0
     for sig in signals:
@@ -378,6 +387,10 @@ def import_pending_signals(pending_data: dict) -> int:
         confidence = sig.get('confidence', 60)
         price      = sig.get('entry')
         oc_source = sig.get('source', 'unknown')
+
+        # oc-mtf-rsi: guard with OC_MTF_RSI_ENABLED
+        if oc_source.startswith('mtf-rsi') and not OC_MTF_RSI_ENABLED:
+            continue
 
         # Skip scanner-v9 — it's OC echoing Hermes's own signals back.
         # signal_gen.py generates native confluence; scanner-v9 is redundant.
@@ -439,6 +452,11 @@ def run_oc_import() -> int:
     All signals go through add_signal() — they are NOT auto-approved, they participate
     in confluence exactly like any other signal generator.
     """
+    # Master kill-switch: if all OC flags are False, skip entirely
+    from hermes_constants import OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_PENDING_ENABLED, OC_MTF_RSI_ENABLED
+    if not any([OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_PENDING_ENABLED, OC_MTF_RSI_ENABLED]):
+        print("[OC signal importer] All OC signals disabled via hermes_constants")
+        return 0
     print(f"[OC signal importer] Starting at {time.strftime('%Y-%m-%d %H:%M:%S')}")
 
     indicators = _load_json(OC_INDICATORS_FILE)

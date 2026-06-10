@@ -2,6 +2,7 @@
 event_log.py — Hermes structured event logging system
 Implements Claude Code primitive: System event logging separate from conversation logs.
 Provides a structured, queryable audit trail for the trading pipeline.
+from paths import *
 """
 import json
 import os

@@ -8,7 +8,9 @@ Usage: python3 scripts/backfill_hl_pnl.py
 import sys, os, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from paths import *
 from hyperliquid_exchange import get_trade_history
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT
 from datetime import datetime, timedelta
 
 import psycopg2
@@ -46,8 +48,11 @@ def get_hl_close_fill(token: str, start_time_ms: int, end_time_ms: int = None) -
     if end_time_ms is None:
         end_time_ms = int(time.time() * 1000)
     fills = get_trade_history(start_time_ms, end_time_ms)
+    # BUG-FIX (2026-06-10): side=='B' only matches SHORT closes (dir="Close Short").
+    # LONG closes have side='A' dir="Close Long" — would be missed by side=='B'.
+    # Fix: filter on dir field containing 'Close'.
     close_fills = [f for f in fills
-                   if f['coin'].upper() == token.upper() and f['side'] == 'B']
+                   if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
     if not close_fills:
         return None
     # Most recent close fill
@@ -95,7 +100,7 @@ def backfill():
         if t['pnl_pct'] and float(t['pnl_pct']) != 0:
             amount_usdt = abs(brain_pnl / (float(t['pnl_pct']) / 100))
         else:
-            amount_usdt = 50.0
+            amount_usdt = DEFAULT_TRADE_SIZE_USDT
 
         # Convert open_time to ms
         if open_time:
@@ -113,8 +118,9 @@ def backfill():
         hl = None
         for attempt in range(4):
             fills = get_trade_history(start_ms, end_ms)
+            # BUG-FIX (2026-06-10): same root cause as above fix.
             close_fills = [f for f in fills
-                           if f['coin'].upper() == token.upper() and f['side'] == 'B']
+                           if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
             if close_fills:
                 hl = max(close_fills, key=lambda x: x['time_ms'])
                 break

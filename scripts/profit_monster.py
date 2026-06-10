@@ -4,23 +4,15 @@ Profit Monster — closes medium-profit positions (2-5%) at random intervals.
 Loves profit. A/B testable fire intervals (10-15min vs 20-30min).
 Never touches losing positions.
 """
+from paths import *
+from hermes_constants import PROFIT_MIN_PCT, PROFIT_MAX_PCT, MAX_CLOSE_PER_WAKE, SKIP_TOP_PCT, FIRE_WINDOWS
 import sys, os, json, time, random, argparse
 from pathlib import Path
 
 # ── Constants ────────────────────────────────────────────────────────────────
-PROFIT_MIN_PCT    = 2.0
-PROFIT_MAX_PCT    = 5.0
-MAX_CLOSE_PER_WAKE = 2
-SKIP_TOP_PCT      = 20        # don't touch the top 20% most profitable
 LOG_FILE          = Path("/root/.hermes/logs/profit_monster.log")
-CONFIG_FILE       = Path("/root/.hermes/data/profit_monster_config.json")
+CONFIG_FILE       = Path(PROFIT_MONSTER_CONFIG)
 BRAIN_CMD         = "/root/.hermes/scripts/brain.py"
-
-# A/B fire windows (minutes)
-FIRE_WINDOWS = {
-    "A": (10, 15),   # 10-15 min
-    "B": (20, 30),   # 20-30 min
-}
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 def log(msg, level="INFO"):
@@ -85,13 +77,11 @@ def get_profitable_positions(min_pct=PROFIT_MIN_PCT, max_pct=PROFIT_MAX_PCT):
 
 def filter_profitable_positions(positions, min_pct=PROFIT_MIN_PCT, max_pct=PROFIT_MAX_PCT):
     """Compute live pnl_pct from entry_price vs current_price and filter to range."""
+    from pnl_utils import compute_live_pnl   # local import to avoid circular dependency at module load
     filtered = []
     for pos in positions:
         if pos["entry_price"] > 0 and pos["current_price"] > 0:
-            if pos["direction"].upper() == "LONG":
-                live_pnl = (pos["current_price"] - pos["entry_price"]) / pos["entry_price"] * 100
-            else:
-                live_pnl = (pos["entry_price"] - pos["current_price"]) / pos["entry_price"] * 100
+            live_pnl = compute_live_pnl(pos["entry_price"], pos["current_price"], pos["direction"])
             pos["live_pnl_pct"] = live_pnl
             if min_pct <= live_pnl <= max_pct:
                 filtered.append(pos)
@@ -103,7 +93,7 @@ def select_positions(positions, max_close=MAX_CLOSE_PER_WAKE, skip_top_pct=SKIP_
         return []
 
     # Skip top profitable (let winners run)
-    skip_count = max(1, int(len(positions) * skip_top_pct / 100))
+    skip_count = max(0, int(len(positions) * skip_top_pct / 100))
     candidates = positions[skip_count:]
     if not candidates:
         return []
@@ -112,16 +102,35 @@ def select_positions(positions, max_close=MAX_CLOSE_PER_WAKE, skip_top_pct=SKIP_
     count = random.randint(1, min(max_close, len(candidates)))
     return random.sample(candidates, count)
 
-# ── Close a position via brain.py ─────────────────────────────────────────────
+# ── Close a position via brain.py + HL mirror ─────────────────────────────────
 def close_position(trade_id: int, token: str, direction: str, pnl_pct: float, current_price: float, dry_run: bool):
     if dry_run:
         log(f"[DRY RUN] Would close id={trade_id} {token} {direction} @ {pnl_pct:.2f}% profit", "WARN")
         return True
 
+    # Step 1: Close the HL position FIRST (prevents guardian from creating duplicate orphan trade)
+    # Only attempt in live mode; in paper mode skip HL (no real position exists)
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from hyperliquid_exchange import is_live_trading_enabled, close_position
+        if is_live_trading_enabled():
+            # Paper trade was mirroring to HL — close the real HL position first
+            result = close_position(token.upper())
+            if result.get("success"):
+                log(f"  HL close OK: {token} (realized_pnl={result.get('hl_realized_pnl', 'N/A')})", "PASS")
+            else:
+                log(f"  HL close failed for {token}: {result.get('error', 'unknown')} — will still close DB", "WARN")
+        else:
+            log(f"  HL close skipped for {token} (paper mode — no real HL position)", "INFO")
+    except Exception as e:
+        log(f"  HL close error for {token}: {e} — will still close DB", "WARN")
+
+    # Step 2: Update the paper DB (brain.py handles this)
     exit_price = f"{current_price:.8f}"
     cmd = [sys.executable, BRAIN_CMD, "trade", "close", str(trade_id), exit_price,
            "--notes", f"profit-monster({pnl_pct:.2f}%)",
-           "--close-reason", "profit-monster"]
+           "--close-reason", "profit-monster",
+           "--skip-hl"]
     try:
         import subprocess
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
@@ -137,7 +146,7 @@ def close_position(trade_id: int, token: str, direction: str, pnl_pct: float, cu
 
 # ── Load / save last run timestamp ────────────────────────────────────────────
 def get_last_run_ts():
-    ts_file = Path("/root/.hermes/data/profit_monster_last_run.json")
+    ts_file = Path(PROFIT_MONSTER_LAST)
     try:
         with open(ts_file) as f:
             return json.load(f).get("ts", 0.0)
@@ -145,7 +154,7 @@ def get_last_run_ts():
         return 0.0
 
 def save_last_run_ts():
-    ts_file = Path("/root/.hermes/data/profit_monster_last_run.json")
+    ts_file = Path(PROFIT_MONSTER_LAST)
     with open(ts_file, "w") as f:
         json.dump({"ts": time.time()}, f)
 
@@ -164,20 +173,18 @@ def run(dry_run=False):
         log(f"Group {ab_group} — not time to fire yet (elapsed={time.time()-last_ts:.0f}s)")
         return
 
-    log(f"Firing — group {ab_group}, profit range [{cfg.get('min_profit_pct',PROFIT_MIN_PCT)}-{cfg.get('max_profit_pct',PROFIT_MAX_PCT)}%]")
+    log(f"Firing — group {ab_group}, profit range [{PROFIT_MIN_PCT}-{PROFIT_MAX_PCT}%]")
 
     positions = get_profitable_positions()
     log(f"Found {len(positions)} open positions (computing live pnl...)")
 
-    min_pct = cfg.get("min_profit_pct", PROFIT_MIN_PCT)
-    max_pct = cfg.get("max_profit_pct", PROFIT_MAX_PCT)
-    in_range = filter_profitable_positions(positions, min_pct, max_pct)
-    log(f"  {len(in_range)} positions in profit range [{min_pct}-{max_pct}%]")
+    in_range = filter_profitable_positions(positions, PROFIT_MIN_PCT, PROFIT_MAX_PCT)
+    log(f"  {len(in_range)} positions in profit range [{PROFIT_MIN_PCT}-{PROFIT_MAX_PCT}%]")
 
     to_close = select_positions(
         in_range,
-        max_close=cfg.get("max_closes_per_wake", MAX_CLOSE_PER_WAKE),
-        skip_top_pct=cfg.get("skip_top_pct", SKIP_TOP_PCT)
+        max_close=MAX_CLOSE_PER_WAKE,
+        skip_top_pct=SKIP_TOP_PCT
     )
 
     if not to_close:

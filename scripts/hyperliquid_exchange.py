@@ -237,6 +237,14 @@ def _save_flags(flags: dict):
 
 
 def is_live_trading_enabled() -> bool:
+    """
+    Final kill-switch for live trading on Hyperliquid.
+
+    Controlled by hermes_constants.LIVE_TRADING_ENABLED only.
+    hype_live_trading.json is NOT consulted — it was a redundant intermediate
+    control that caused ghost trades (brain.py rejected while decider_run thought
+    it succeeded). The single source of truth is the constant in hermes_constants.py.
+    """
     return LIVE_TRADING_ENABLED
 
 
@@ -458,49 +466,64 @@ def get_account_value_curl():
 
 def get_open_hype_positions_curl():
     """Get open positions from Hyperliquid using SDK user_state (uses MAIN_ACCOUNT_ADDRESS).
-    SDK's user_state() is more reliable than raw curl for this account."""
+    SDK's user_state() is more reliable than raw curl for this account.
+    
+    FALLBACK (2026-05-30): Exchange.__init__ crashes with IndexError on HL API schema change.
+    Uses direct REST /info endpoint with clearinghouseState to bypass broken SDK path.
+    """
     try:
         _exchange = get_exchange()
         state = _exchange.info.user_state(MAIN_ACCOUNT_ADDRESS)
-        aps = state.get("assetPositions", [])
-        out = {}
-        for p in aps:
-            pos = p.get("position", {})
-            coin = pos.get("coin", "")
-            szi_raw = pos.get("szi")
-            try:
-                raw_sz = float(szi_raw or 0)
-            except Exception:
-                raw_sz = 0
-            sz = _round_position_sz(szi_raw, coin)
-            if sz == 0 and raw_sz == 0:
-                continue
-            # BUG FIX (2026-04-02): extract leverage before dict literal
-            # HL returns leverage as dict {'type': 'cross', 'value': 5}, extract numeric value
-            lev_data = pos.get("leverage", {})
-            if isinstance(lev_data, dict):
-                lev = float(lev_data.get("value", 1)) or 1
-            elif isinstance(lev_data, (int, float)):
-                lev = float(lev_data)
-            else:
-                lev = 1
-            raw_entry = pos.get("entryPx", 0) or 0
-            # FATAL ERROR FIX (2026-04-19): HL returns entryPx=null for some positions.
-            # float(None or 0) = 0.0 — overwriting real entry prices with 0 corrupts PnL.
-            # If entryPx is null/0, leave entry_px as None so caller can fall back to
-            # trade history or preserve existing DB value. Never write 0 as a sentinel.
-            entry_px = float(raw_entry) if raw_entry not in (None, 0, "0") else None
-            out[coin] = {
-                "size": sz,
-                "direction": "LONG" if raw_sz > 0 else "SHORT",
-                "entry_px": entry_px,
-                "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
-                "leverage": lev,
-            }
-        return out
-    except Exception as e:
-        print(f"[HYPE] get_open_hype_positions_curl error: {e}")
-        return {}
+    except Exception as _e:
+        # Fallback: direct REST call bypassing broken Exchange SDK path
+        # HL SDK Exchange() crashes at Info.__init__ due to API schema change
+        # Use requests directly with the same clearinghouseState endpoint
+        import requests as _req
+        _resp = _req.post(
+            'https://api.hyperliquid.xyz/info',
+            json={'type': 'clearinghouseState', 'user': MAIN_ACCOUNT_ADDRESS},
+            timeout=10
+        )
+        if _resp.status_code != 200:
+            raise RuntimeError(f"HL API error: {_resp.status_code} {_resp.text[:100]}")
+        state = _resp.json()
+    
+    aps = state.get("assetPositions", [])
+    out = {}
+    for p in aps:
+        pos = p.get("position", {})
+        coin = pos.get("coin", "")
+        szi_raw = pos.get("szi")
+        try:
+            raw_sz = float(szi_raw or 0)
+        except Exception:
+            raw_sz = 0
+        sz = _round_position_sz(szi_raw, coin)
+        if sz == 0 and raw_sz == 0:
+            continue
+        # BUG FIX (2026-04-02): extract leverage before dict literal
+        # HL returns leverage as dict {'type': 'cross', 'value': 5}, extract numeric value
+        lev_data = pos.get("leverage", {})
+        if isinstance(lev_data, dict):
+            lev = float(lev_data.get("value", 1)) or 1
+        elif isinstance(lev_data, (int, float)):
+            lev = float(lev_data)
+        else:
+            lev = 1
+        raw_entry = pos.get("entryPx", 0) or 0
+        # FATAL ERROR FIX (2026-04-19): HL returns entryPx=null for some positions.
+        # float(None or 0) = 0.0 — overwriting real entry prices with 0 corrupts PnL.
+        # If entryPx is null/0, leave entry_px as None so caller can fall back to
+        # trade history or preserve existing DB value. Never write 0 as a sentinel.
+        entry_px = float(raw_entry) if raw_entry not in (None, 0, "0") else None
+        out[coin] = {
+            "size": sz,
+            "direction": "LONG" if raw_sz > 0 else "SHORT",
+            "entry_px": entry_px,
+            "unrealized_pnl": float(pos.get("unrealizedPnl", 0) or 0),
+            "leverage": lev,
+        }
+    return out
 
 
 # ─── /exchange endpoint (trading, uses SDK) ──────────────────────────────────
@@ -533,6 +556,65 @@ def place_order(name, side, sz, price=None, order_type="Limit", tif="Gtc",
     exchange = get_exchange()
 
     def _do():
+        try:
+            exchange = get_exchange()
+        except Exception as _e:
+            # SDK Exchange() init crashed (HL API schema change breaking Info.__init__).
+            # Use direct REST fallback for trading — build the order action manually and
+            # POST to /exchange directly with the wallet signature.
+            import requests as _req
+            from eth_account import Account
+            import json as _json
+
+            wallet = get_wallet()
+            coin = name.upper()
+            is_buy = (side == "BUY")
+            sz_str = f"{sz}"
+            limit_px = price or 0
+
+            # Build order action for Hyperliquid /exchange
+            order_action = {
+                "type": "order",
+                "coin": coin,
+                "side": "Buy" if is_buy else "Sell",
+                "sz": sz_str,
+                "limitPx": str(limit_px),
+                "orderType": {"limit": {"tif": tif}} if order_type == "Limit" else {"market": {}},
+                "reduceOnly": reduce_only,
+            }
+
+            # Get nonce from HL
+            nonce_resp = _req.post('https://api.hyperliquid.xyz/info',
+                                   json={'type': 'nonce'},
+                                   timeout=10)
+            nonce = int(nonce_resp.json()['nonce'])
+
+            # Sign the action
+            from hyperliquid.utils.signing import sign_l1_action
+            signature = sign_l1_action(wallet, order_action, nonce)
+
+            # POST to /exchange
+            payload = {
+                "action": order_action,
+                "nonce": nonce,
+                "signature": signature,
+                "vaultAddress": None,
+            }
+            resp = _req.post('https://api.hyperliquid.xyz/exchange',
+                             json=payload, timeout=10)
+            if resp.status_code == 200:
+                result = resp.json()
+                if result.get('status') == 'err':
+                    return {"success": False, "error": result.get('response', 'HL error')}
+                # Check statuses
+                statuses = result.get('response', {}).get('data', {}).get('statuses', [])
+                for s in statuses:
+                    if 'error' in s:
+                        return {"success": False, "error": s['error']}
+                return {"success": True, "result": result}
+            else:
+                return {"success": False, "error": f"HTTP {resp.status_code}: {resp.text[:100]}"}
+
         if order_type == "Market":
             return exchange.market_open(
                 name=name,
@@ -970,11 +1052,14 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
 
             return {"success": True, "message": f"Opened {direction} {sz} {token}",
                     "size": sz,
-                    "entry_price": fill_price,       # actual HL fill price for PnL
-                    "hl_entry_price": fill_price,     # alias
+                    "total_sz": entry_info.get("total_sz"),   # actual coin units from HL fills
+                    "entry_price": fill_price,                 # actual HL fill price for PnL
+                    "hl_entry_price": fill_price,              # alias
+                    "notional_usdt": entry_info.get("total_sz", sz) * fill_price,  # actual HL fill notional
                     "mid_price": live_price,
                     "slippage_pct": abs(fill_price - live_price) / live_price if live_price else 0,
                     "side": "BUY" if is_buy else "SELL",
+                    "hl_realized_pnl": entry_info.get("realized_pnl", 0),
                     "usdt": size_usdt}
         else:
             # Handle case where result is a string (raw API error) instead of a dict
@@ -1114,7 +1199,10 @@ def mirror_open_batch(token_infos: list, prices: dict = None) -> dict:
                         "token": token,
                         "success": True,
                         "entry_price": fill_price,
+                        "hl_entry_price": fill_price,
                         "size": sz,
+                        "total_sz": entry_info.get("total_sz"),
+                        "notional_usdt": entry_info.get("total_sz", sz) * fill_price,
                         "side": "BUY" if is_buy else "SELL",
                     })
             else:

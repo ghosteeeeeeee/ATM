@@ -9,6 +9,7 @@ from datetime import datetime
 
 sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import close_position, get_open_hype_positions_curl, get_trade_history
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT
 
 PAPER_JSON = "/var/www/hermes/data/trades.json"
 BRAIN_DB   = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
@@ -58,7 +59,7 @@ def close_brain(coin, exit_price):
     try:
         cur = conn.cursor()
         cur.execute("""
-            SELECT id, direction, entry_price, amount_usdt
+            SELECT id, direction, entry_price, amount_usdt, hl_notional_usdt
             FROM trades
             WHERE token = %s AND status = 'open' AND exchange = 'Hyperliquid'
             ORDER BY id DESC LIMIT 1
@@ -67,20 +68,20 @@ def close_brain(coin, exit_price):
         if not row:
             log(f"Brain: no open trade for {coin}", "WARN")
             return
-        trade_id, direction, entry_price, amount_usdt_raw = row
-        amount = float(amount_usdt_raw or 50.0)
+        trade_id, direction, entry_price, amount_usdt_raw, hl_notional_raw = row
+        calc_notional = float(hl_notional_raw) if hl_notional_raw else float(amount_usdt_raw or DEFAULT_TRADE_SIZE_USDT)
         pnl_pct = 0.0
         if entry_price and float(entry_price) != 0 and exit_price:
-            pnl_pct = round((exit_price - float(entry_price)) / float(entry_price) * 100, 4)
+            if direction == 'LONG':
+                pnl_pct = round((exit_price - float(entry_price)) / float(entry_price) * 100, 4)
+            else:
+                pnl_pct = round((float(entry_price) - exit_price) / float(entry_price) * 100, 4)
         # BUG-FIX (2026-04-19): pnl_usdt was hardcoded to 0 — manual_close trades
         # showed exit prices that differed from entry but pnl=0.00 was recorded.
         # Fix: compute pnl_usdt from entry/exit/amount and direction-aware formula.
         pnl_usdt_calc = 0.0
         if entry_price and float(entry_price) != 0 and exit_price:
-            if direction == 'LONG':
-                pnl_usdt_calc = round((exit_price - float(entry_price)) / float(entry_price) * amount, 4)
-            else:
-                pnl_usdt_calc = round((float(entry_price) - exit_price) / float(entry_price) * amount, 4)
+            pnl_usdt_calc = round(pnl_pct / 100 * calc_notional, 4)
         cur.execute("""
             UPDATE trades SET
                 status='closed', close_time=NOW(), exit_price=%s,

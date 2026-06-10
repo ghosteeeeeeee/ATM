@@ -9,6 +9,7 @@ Two variants:
 import json, requests, sqlite3, time, sys
 import statistics
 
+from paths import *
 OLLAMA = 'http://127.0.0.1:11434/api/generate'
 MODEL = 'qwen2.5:1.5b'
 
@@ -171,7 +172,7 @@ def build_pattern_prompt(trend, rsi_cat, patterns, prev3):
 # ── Load test data ────────────────────────────────────────────────────────────
 
 DB_PRED = '/root/.hermes/data/predictions.db'
-DB_PRICE = '/root/.hermes/data/signals_hermes.db'
+DB_PRICE = STATIC_DB
 
 conn = sqlite3.connect(DB_PRED, timeout=10)
 cur = conn.cursor()

@@ -473,10 +473,10 @@ def check_no_flapping():
             if "restart" in l.lower() and "service" in l.lower():
                 restarts += 1
         
-        # 1-cycle-per-minute pipeline = 60/min max. Allow up to 55 to account for
-        # normal misses/restarts. Flagging only if it's running MORE than once/min.
-        if completions > 55:
-            return False, f"Pipeline flapping: {completions} cycles in last 60min (>55 threshold)"
+        # 1-cycle-per-minute pipeline = 60/min normal. Allow up to 65 to avoid
+        # false positives on clean runs. Flag if it's running MORE than ~1/min.
+        if completions > 65:
+            return False, f"Pipeline flapping: {completions} cycles in last 60min (>65 threshold)"
         if restarts > 10:
             return False, f"Pipeline flapping: {restarts} service restarts in last 5000 lines (>10 threshold)"
         return True, f"pipeline stable ({completions} cycles, {restarts} restarts)"

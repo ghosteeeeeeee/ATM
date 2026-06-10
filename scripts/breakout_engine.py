@@ -33,6 +33,7 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from hyperliquid_exchange import is_delisted
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 HERMES_DATA  = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, 'data')
@@ -336,6 +337,10 @@ def detect_breakout_for_token(token: str, dry: bool = False) -> Optional[dict]:
     Run full compression → breakout detection for one token across timeframes.
     Returns breakout signal dict or None.
     """
+    # Skip delisted tokens — can't trade them on Hyperliquid
+    if is_delisted(token):
+        return None
+
     result = None
 
     for tf in TIMEFRAMES:

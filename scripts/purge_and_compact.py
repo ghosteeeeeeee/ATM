@@ -8,9 +8,10 @@ purge_and_compact.py — Full signal pipeline reset + hot-set compaction.
 import sys, os, time, json, subprocess
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 from signal_schema import _get_conn, _runtime
 
-PAPER_JSON   = '/var/www/hermes/data/trades.json'
+PAPER_JSON   = TRADES_JSON
 HOTSET_FILE  = '/var/www/hermes/data/hotset.json'
 
 def log(msg, tag="INFO"):

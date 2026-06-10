@@ -14,7 +14,9 @@ import time
 import psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 from hyperliquid_exchange import get_trade_history, get_exchange
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT
 
 DB_KWARGS = {
     'host': 'localhost',
@@ -66,8 +68,11 @@ def fetch_hl_prices(token: str, start_ms: int, end_ms: int):
         print(f"  WARNING: No fills found for {token} between {start_ms} and {end_ms}")
         return None
 
-    open_fills  = [f for f in fills if f['side'] == 'A']
-    close_fills = [f for f in fills if f['side'] == 'B']
+    # BUG-FIX (2026-06-10): side=='B' only matches SHORT closes (dir="Close Short").
+    # LONG closes have side='A' dir="Close Long" — would be missed by side=='B'.
+    # Fix: filter on dir field containing 'Close'.
+    open_fills  = [f for f in fills if 'Open' in str(f.get('dir', ''))]
+    close_fills = [f for f in fills if 'Close' in str(f.get('dir', ''))]
 
     entry_price  = wavg_price(open_fills)
     exit_price   = wavg_price(close_fills)
@@ -139,10 +144,11 @@ def main():
             calc_entry_px = entry_px if entry_px > 0 else float(entry_price)
 
             # Compute hype_pnl_pct from actual exit price and entry price
-            # Use amount_usdt from DB if available; default to 50
-            cur.execute("SELECT amount_usdt FROM trades WHERE id = %s", (trade_id,))
+            # Use calc_notional (actual HL notional) if available; default to amount_usdt
+            cur.execute("SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id = %s", (trade_id,))
             amt_row = cur.fetchone()
-            amount  = float(amt_row[0]) if amt_row and amt_row[0] else 50.0
+            amount  = float(amt_row[0]) if amt_row and amt_row[0] else DEFAULT_TRADE_SIZE_USDT
+            calc_notional = float(amt_row[1]) if amt_row and amt_row[1] else amount
 
             if calc_entry_px > 0 and exit_px > 0:
                 if direction == 'SHORT':
@@ -152,11 +158,11 @@ def main():
             else:
                 hype_pnl_pct_raw = 0.0
 
-            # Use actual realized_pnl from HL if available, otherwise compute
+            # Use actual realized_pnl from HL if available, otherwise compute using actual HL notional
             if real_pnl != 0 and abs(real_pnl) > 0.0001:
                 hype_pnl_usdt_val = real_pnl
             else:
-                hype_pnl_usdt_val = round(amount * hype_pnl_pct_raw / 100, 4)
+                hype_pnl_usdt_val = round(calc_notional * hype_pnl_pct_raw / 100, 4)
 
             print(f"  AFTER:  hl_entry={entry_px:.8f}, hl_exit={exit_px:.8f}, "
                   f"hype_pnl_usdt={hype_pnl_usdt_val:.6f}, hype_pnl_pct={hype_pnl_pct_raw:.4f}")

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+from paths import *
 """Backtest candle predictor prompts against historical BTC 4h candles."""
 import sqlite3, statistics, requests, time, re, sys, random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-PRICES_DB = '/root/.hermes/data/signals_hermes.db'
+PRICES_DB = STATIC_DB
 OLLAMA_URL = 'http://127.0.0.1:11434/api/generate'
 MODEL = 'qwen2.5:1.5b'
 candle_minutes = 240

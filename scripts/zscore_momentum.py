@@ -169,6 +169,96 @@ def get_all_token_prices(lookback_bars: int = 200) -> dict:
         return {}
 
 
+def is_price_data_fresh() -> bool:
+    """Check if price_history has sufficient bars to run a meaningful sweep.
+    
+    Freshness for sweep means: can we get 60+ bars of history for most tokens?
+    Not: are the most recent bars from the last 2 minutes.
+    
+    The price_history table gets ~1 bar/min/token updated live. But we need
+    60+ historical bars to backtest — and that data IS available going back
+    days/weeks. The 2-min window has only 1-2 bars per token (that's normal).
+    
+    So we check: can the full-history fetch give us 60+ bars for 80%+ of tokens?
+    If yes → data is sufficient for sweep.
+    If no → data is too thin, skip sweep, keep existing params.
+    """
+    try:
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        cur = conn.cursor()
+        result = {}
+        cur.execute("SELECT DISTINCT token FROM price_history")
+        tokens = [r[0] for r in cur.fetchall()]
+        conn.close()
+        
+        passed = 0
+        for token in tokens:
+            try:
+                conn2 = sqlite3.connect(_PRICE_DB, timeout=3)
+                c2 = conn2.cursor()
+                c2.execute("""
+                    SELECT price FROM (
+                        SELECT price, timestamp FROM price_history
+                        WHERE token = ?
+                        ORDER BY timestamp DESC
+                        LIMIT 240
+                    ) sub
+                    ORDER BY timestamp ASC
+                """, (token,))
+                prices = [r[0] for r in c2.fetchall()]
+                conn2.close()
+                if len(prices) >= 60:
+                    passed += 1
+            except Exception:
+                continue
+        
+        if not tokens:
+            return False
+        # Require at least 80% of tokens to have sufficient bars
+        fresh_enough = passed >= len(tokens) * 0.8
+        print(f"[zscore_momentum] Freshness check: {passed}/{len(tokens)} tokens have >= 60 bars (need 80%: {len(tokens) * 0.8:.0f}) → {'PASS' if fresh_enough else 'FAIL'}")
+        return fresh_enough
+    except Exception as e:
+        print(f"[zscore_momentum] is_price_data_fresh error: {e}")
+        return False
+
+
+def get_all_token_prices_full(lookback_bars: int = 240) -> dict:
+    """Fetch full price history for all tokens — no time cutoff.
+    Used by sweep when data is fresh. Gets lookback_bars per token.
+    """
+    try:
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        cur = conn.cursor()
+        result = {}
+        cur.execute("SELECT DISTINCT token FROM price_history")
+        tokens = [r[0] for r in cur.fetchall()]
+        conn.close()
+        for token in tokens:
+            try:
+                conn2 = sqlite3.connect(_PRICE_DB, timeout=5)
+                c2 = conn2.cursor()
+                c2.execute("""
+                    SELECT price FROM (
+                        SELECT price, timestamp FROM price_history
+                        WHERE token = ?
+                        ORDER BY timestamp DESC
+                        LIMIT ?
+                    ) sub
+                    ORDER BY timestamp ASC
+                """, (token, lookback_bars))
+                prices = [r[0] for r in c2.fetchall()]
+                conn2.close()
+                if prices:
+                    result[token] = prices
+            except Exception:
+                continue
+        return result
+    except Exception as e:
+        print(f"[zscore_momentum] get_all_token_prices_full error: {e}")
+        return {}
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # DB: tuner — store/load per-token best config
 # ─────────────────────────────────────────────────────────────────────────────
@@ -343,9 +433,18 @@ def _backtest_params(token: str, closes: list, lookback: int, threshold: float) 
     }
 
 
-def run_sweep(token: str = None, lookbacks = None, thresholds = None) -> dict:
+def run_sweep(token: str = None, lookbacks = None, thresholds = None,
+              lookback_period: int = 240) -> dict:
     """
     Run full param sweep. If token is None, sweep all tokens in price_history.
+    
+    Freshness gate: only runs if sufficient historical data exists (>=60 bars
+    for 80%+ of tokens). Otherwise skips sweep and keeps existing params.
+    
+    Args:
+        lookback_period: number of 1m bars to fetch for backtesting sweep.
+            Default 240 = last 4 hours of 1m candles.
+            Override via CLI: --lookback-period 240
     
     Returns dict of best params per token: {TOKEN: {lookback, threshold, win_rate, ...}}
     """
@@ -359,16 +458,40 @@ def run_sweep(token: str = None, lookbacks = None, thresholds = None) -> dict:
     
     init_tuner_db()
     
-    # Load all price data
-    all_prices = get_all_token_prices(lookback_bars=MAX_LOOKBACK * 4)
+    # ── Load blacklists from hermes_constants ─────────────────────────────────────
+    try:
+        from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+        _blacklist = SHORT_BLACKLIST | LONG_BLACKLIST
+    except Exception:
+        _blacklist = set()
+    
+    # ── Freshness gate ──────────────────────────────────────────────────────────
+    # Load full history and check we have enough data per token to backtest.
+    # If not, skip sweep entirely — keep existing params (do nothing).
+    # ─────────────────────────────────────────────────────────────────────────────
+    print(f"[zscore_momentum] Loading price history for sweep (period={lookback_period} bars)...")
+    all_prices = get_all_token_prices_full(lookback_bars=lookback_period)
     if not all_prices:
         print("[zscore_momentum] No price data found in price_history")
+        return {}
+    
+    sufficient = sum(1 for p in all_prices.values() if len(p) >= 60)
+    total = len(all_prices)
+    print(f"[zscore_momentum] {sufficient}/{total} tokens have >= 60 bars (need 80%: {total * 0.8:.0f})")
+    if sufficient < total * 0.8:
+        print("[zscore_momentum] Insufficient data for sweep. Keeping existing params.")
         return {}
     
     targets = {token.upper(): all_prices[token]} if token else all_prices
     
     results = {}
+    skipped_blacklist = 0
     for tok, closes in targets.items():
+        # Skip blacklisted tokens
+        if tok.upper() in _blacklist:
+            skipped_blacklist += 1
+            continue
+        
         if len(closes) < MAX_LOOKBACK + 10:
             continue
         
@@ -399,6 +522,7 @@ def run_sweep(token: str = None, lookbacks = None, thresholds = None) -> dict:
                   f"WR={best['win_rate']:.1f}%, avg_pnl={best['avg_pnl_pct']:.2f}%, "
                   f"n={best['signal_count']}")
     
+    print(f"[zscore_momentum] Sweep complete. Tuned {len(results)} tokens, skipped {skipped_blacklist} blacklisted.")
     return results
 
 
@@ -637,12 +761,14 @@ if __name__ == '__main__':
     parser.add_argument('--run-signals', action='store_true', help='Run signal generation')
     parser.add_argument('--lookback', type=int, default=DEFAULT_LOOKBACK, help='Lookback window (bars)')
     parser.add_argument('--threshold', type=float, default=DEFAULT_THRESHOLD, help='Z-score threshold')
+    parser.add_argument('--lookback-period', type=int, default=240,
+                        help='Number of 1m bars to fetch for sweep backtesting (default: 240 = 4 hours)')
     args = parser.parse_args()
     
     if args.sweep:
         print(f"[zscore_momentum] Starting sweep... (lookbacks {MIN_LOOKBACK}-{MAX_LOOKBACK}, "
-              f"thresholds {MIN_THRESHOLD}-{MAX_THRESHOLD})")
-        results = run_sweep(token=args.token)
+              f"thresholds {MIN_THRESHOLD}-{MAX_THRESHOLD}, period={args.lookback_period} bars)")
+        results = run_sweep(token=args.token, lookback_period=args.lookback_period)
         print(f"[zscore_momentum] Sweep complete. Tuned {len(results)} tokens.")
     
     if args.run_signals:

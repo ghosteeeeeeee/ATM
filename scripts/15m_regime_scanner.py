@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-15m Regime Scanner
-Reads 15m closed candles from local candles.db (primary), falls back to Binance.
+5m Regime Scanner
+Reads 5m closed candles from local candles.db (primary), falls back to Binance.
 Uses is_closed=1 to exclude the current developing candle from slope calculation.
-Adds regime bias to signal weight calculation (faster response than 4h).
+Adds regime bias to signal weight calculation (faster response than 15m).
 """
 import requests
 import json
@@ -17,13 +17,13 @@ from _secrets import BRAIN_DB_DICT
 
 from paths import *
 INFO_URL = "https://api.hyperliquid.xyz/info"
-OUTPUT_FILE = "/var/www/hermes/data/regime_15m.json"
+OUTPUT_FILE = "/var/www/hermes/data/regime_5m.json"
 STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
 CANDLES_DB  = "/root/.hermes/data/candles.db"
 LOG_FILE = "/root/.hermes/logs/15m_regime.log"
 BRAIN_DB = BRAIN_DB_DICT
-CANDLE_TF = "15m"
-CANDLE_TABLE = "candles_15m"
+CANDLE_TF = "5m"
+CANDLE_TABLE = "candles_5m"
 STALE_THRESHOLD_SECS = 300  # 5 min — if latest closed candle is older, use Binance
 
 def log(msg):
@@ -76,7 +76,7 @@ def fetch_candles_from_binance(token, limit=16):
     """Fetch 15m candles from Binance as fallback. Always drops developing candle."""
     try:
         symbol = f"{token}USDT"
-        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=15m&limit={limit + 1}"
+        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=5m&limit={limit + 1}"
         r = requests.get(url, timeout=10)
         if r.ok:
             data = r.json()
@@ -275,18 +275,18 @@ def write_to_brain_cache(results):
             slope_pct = r.get('slope_pct', 0)
             trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
             cur.execute("""
-                INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at)
+                INSERT INTO momentum_cache (token, slope_5m, regime_5m, trend, updated_at)
                 VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (token) DO UPDATE SET
-                    slope_15m = EXCLUDED.slope_15m,
-                    regime_15m = EXCLUDED.regime_15m,
+                    slope_5m = EXCLUDED.slope_5m,
+                    regime_5m = EXCLUDED.regime_5m,
                     trend = EXCLUDED.trend,
                     updated_at = EXCLUDED.updated_at
             """, (token, slope_pct, regime, trend, now))
         conn.commit()
         cur.close()
         conn.close()
-        log(f"Brain momentum_cache: wrote {len(results)} tokens (15m)")
+        log(f"Brain momentum_cache: wrote {len(results)} tokens (5m)")
     except Exception as e:
         log(f"Brain momentum_cache write error: {e}")
 

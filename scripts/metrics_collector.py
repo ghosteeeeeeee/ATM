@@ -3,6 +3,7 @@
 import sys, os, json, time, subprocess
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 METRICS_FILE = "/var/www/hermes/data/metrics.json"
 os.makedirs("/var/www/hermes/data", exist_ok=True)
 

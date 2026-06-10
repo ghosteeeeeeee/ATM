@@ -2,6 +2,7 @@
 """
 Backfill 1h candles from Binance public API into price_history.
 Maps Hyperliquid token names to Binance USDT pairs.
+from paths import *
 """
 import sqlite3, requests, time
 from concurrent.futures import ThreadPoolExecutor, as_completed

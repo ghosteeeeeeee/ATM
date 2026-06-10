@@ -22,12 +22,13 @@ Format in trading.log:
     [TIMESTAMP] [BREAD] step_name | enter | {extra}
     [TIMESTAMP] [BREAD] step_name | ok  | {extra}
     [TIMESTAMP] [BREAD] step_name | ERROR | {extra="error message"}
+from paths import *
 """
 import time, json, os, traceback
 from datetime import datetime
 
 LOG_FILE = '/var/www/hermes/logs/trading.log'
-BREADCRUMB_FILE = '/var/www/hermes/data/breadcrumbs.json'
+BREADCRUMB_FILE = BREADCRUMBS_FILE
 ENABLED = True  # Set to False to disable without removing code
 
 def BREADCRUMB(step: str, status: str, extra: dict = None):

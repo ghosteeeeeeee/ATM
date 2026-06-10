@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON
@@ -74,19 +74,52 @@ def _get_token_wr(token: str, direction: str) -> tuple:
 
 
 def _get_open_tokens() -> set:
-    """Query PostgreSQL for tokens with open positions (Hermes server)."""
+    """Query PostgreSQL for tokens with open positions (Hermes server).
+    
+    DEFENSE-IN-DEPTH (2026-05-17): Also check guardian-closing-markers.json
+    to exclude tokens the guardian is actively closing. Without this, a token
+    the guardian is about to close can still get a new signal during the same
+    pipeline run because PostgreSQL hasn't been updated yet (HL position closed
+    but DB record not updated → _get_open_tokens returns nothing → signal passes).
+    """
     try:
         import psycopg2
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
-                                 user='postgres', connect_timeout=5)
+                                user='postgres', connect_timeout=5)
         cur = conn.cursor()
         cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes'")
         tokens = {row[0] for row in cur.fetchall()}
         cur.close(); conn.close()
-        return tokens
     except Exception as e:
         log(f"[WARN] Could not query open positions from PostgreSQL: {e}", 'WARN')
-        return set()
+        tokens = set()
+    
+    # DEFENSE-IN-DEPTH: Also check guardian closing markers
+    # A token in closing markers means guardian has an active HL close in progress.
+    # Even if PostgreSQL hasn't been updated yet (orphan case), we must block
+    # signal execution to prevent the exact ATOM scenario: first trade silently
+    # failed to get a DB record → guardian closing marker active → signal fires
+    # anyway because _get_open_tokens only checks PostgreSQL.
+    guardian_closing = set()
+    closing_file = '/root/.hermes/data/guardian-closing-markers.json'
+    try:
+        if os.path.exists(closing_file):
+            with open(closing_file) as f:
+                data = json.load(f)
+            if not isinstance(data, dict):
+                log(f"[WARN] Guardian closing markers file is corrupt (type={type(data).__name__}) — skipping", 'WARN')
+                guardian_closing = set()
+            else:
+                guardian_closing = {k.lower() for k in data.get('tokens', {})}
+            if guardian_closing:
+                log(f"[OPEN-POS-FILTER] Guardian closing markers active: {sorted(guardian_closing)}")
+    except Exception as e:
+        log(f"[WARN] Could not read guardian closing markers: {e}", 'WARN')
+    
+    if guardian_closing:
+        tokens = tokens | guardian_closing  # union — treat guardian-closing as open
+    
+    return tokens
 
 # ── Speed cache path (written by speed_tracker.py every ~1 min) ───────────────
 SPEED_CACHE_FILE = os.path.join(HERMES_DATA, "speed_cache.json")
@@ -185,6 +218,10 @@ SIGNAL_SOURCE_WEIGHTS = {
     # Weight 1.5: strong standalone signal, want it near top of hot-set
     ('zscore_momentum', 'zscore-momentum+'):     1.5, # upward momentum confirmed by z-score
     ('zscore_momentum', 'zscore-momentum-'):     1.5, # downward momentum confirmed by z-score
+    # mtp_zscore: multi-timeperiod z-score — ALL 3/3 periods must agree on direction
+    # Weight 1.25: strong standalone signal (3-confluence), conservative start
+    ('mtp_zscore_long',   'mtp-zscore+'):  1.25,  # 3-period upward momentum
+    ('mtp_zscore_short',  'mtp-zscore-'):  1.25,  # 3-period downward momentum
     # support_resistance: reduce weight — underperforming in backtest
     ('support_resistance', 'rs-'):       0.7,
     ('rsi-confluence', 'rsi_confluence'):    0.5,   # WR=0% — suppress
@@ -499,25 +536,34 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # They represent the same signal re-firing at different times — fake diversity.
             # Normalize each part to its signal-type prefix, then count unique types.
             def _signal_type_key(part: str) -> str:
-                # Strip numeric suffixes that represent bars_since / level / bar counts.
+                # Strip ALL trailing digits that represent bars_since / level / bar counts.
                 # These are the SAME signal at different timestamps — not distinct sources.
-                # Pattern: source tag followed only by digits (no trailing letters).
-                # rs-s386    → rs-s     (support/resistance level)
-                # rs-r1774   → rs-r     (resistance level)
+                # Pattern: source tag + optional directional suffix + digits.
+                # rs-s386 → rs-s (support level 386 at different times)
+                # rs-r1774 → rs-r (resistance level 1774 at different times)
+                # rs-s4 → rs-s (single-digit level)
                 # hhh-short4 → hhh-short (hh_hl breakout pullback)
-                # hhh-long5  → hhh-long  (hh_hl breakout breakout)
-                # ma-death14 → ma-death  (ma_cross death cross)
+                # hhh-long5 → hhh-long (hh_hl breakout breakout)
+                # ma-death14 → ma-death (ma_cross death cross)
                 # ma-golden5 → ma-golden (ma_cross golden cross)
-                # pct-hermes+ → pct-hermes+ (keep directional suffix)
-                # macd-accel+ → macd-accel+  (keep directional suffix)
+                # pct-hermes+ → pct-hermes+ (keep directional suffix — no trailing digits)
+                # macd-accel+ → macd-accel+ (keep directional suffix — no trailing digits)
                 #
-                # Regex: prefix([a-z0-9_-]+) + optional_direction([+-]) + number(\d+)
-                # Stripping the number gives the canonical signal type.
-                m = re.match(r'^([a-z][a-z0-9_-]*)([+-]?)(\d+)$', part)
-                if m:
-                    prefix, suffix, _ = m.groups()
-                    return prefix + suffix  # e.g. 'hhh-short' or 'ma-death'
-                return part
+                # BUG FIX (2026-05-15): Previous regex only stripped ONE digit:
+                #   r'^([a-z][a-z0-9_-]*)([+-]?)(\d+)$' → returns prefix+suffix+first_digit
+                #   rs-s48 → 'rs-s4' (WRONG — keeps one digit)
+                #   rs-s82 → 'rs-s8' (WRONG — keeps one digit)
+                #   These were counted as different types → double-RS signals passed confluence.
+                # FIX: Strip ALL trailing digits using re.sub(r'\d+$', '', part).
+                # ALSO strip '-broken' suffix — rs-s-broken and rs-r are the SAME signal type
+                # as rs-s, not distinct types. The -broken modifier describes the path, not
+                # the signal family (support/resistance).
+                part = re.sub(r'-broken$', '', part)
+                # Collapse rs-s and rs-r to 'rs' — different directions of the same signal
+                # family should not count as separate types for confluence purposes.
+                # rs-s86, rs-r1774, rs-s-broken → all collapse to 'rs'
+                part = re.sub(r'^rs-[sr]', 'rs', part)
+                return re.sub(r'\d+$', '', part) or part
 
             unique_signal_types = len(set(_signal_type_key(p) for p in source_parts))
             source_count = len(source_parts)
@@ -533,7 +579,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 pass_gate = True
                 gate_msg = f'{unique_signal_types} unique types'
             else:
-                gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
+                # ── Accel-300 Standalone Bypass ───────────────────────────────────
+                # Strong standalone accel-300 (no RS co-signal needed) — fire on
+                # high-confidence accel-300 alone when the momentum is very strong.
+                if (ACCEL_300_STANDALONE_BYPASS_ENABLED
+                        and unique_signal_types == 1
+                        and source.startswith('accel-300')
+                        and conf >= ACCEL_300_STANDALONE_BYPASS_CONFIDENCE):
+                    pass_gate = True
+                    gate_msg = f'standalone accel-300 conf={conf:.0f}% >= {ACCEL_300_STANDALONE_BYPASS_CONFIDENCE}%'
+                else:
+                    gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
 
             # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
@@ -629,11 +685,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             regime, regime_conf = get_regime_1m(token)
             speed_data = speed_cache.get(token.upper(), {})
             source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
-            # ── accel-300 required (2026-05-12) ──────────────────────────────────────
-            has_accel = any(p.startswith('accel-300') for p in source_parts)
-            if not has_accel:
+            # ── rs required (replaces accel-300, 2026-05-15) ──────────────────────────
+            has_rs = any(p.startswith('rs') for p in source_parts)
+            if not has_rs:
                 if verbose:
-                    log(f"  SKIP {token} {direction}: no accel-300 signal")
+                    log(f"  SKIP {token} {direction}: no rs signal")
                 continue
             # ── Trend purity bonus: major confidence boost when present ──────────
             has_trend_purity = ('trend_purity+' in source_parts or 'trend_purity-' in source_parts)
@@ -857,12 +913,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src}' in blacklist")
                 continue
             source_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
-            # accel-300 required for all entries (2026-05-12)
-            # accel-300 is the primary directional trigger. Every LONG needs accel-300+,
-            # every SHORT needs accel-300- as the primary directional confirmation.
-            has_accel = any(p.startswith('accel-300') for p in source_parts)
-            if not has_accel:
-                log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — requires accel-300+ or accel-300- (has: {src})")
+            # rs required for all entries (replaces accel-300, 2026-05-15)
+            # rs is the primary directional trigger. Every LONG needs rs-s#,
+            # every SHORT needs rs-r# as the primary directional confirmation.
+            has_rs = any(p.startswith('rs') for p in source_parts)
+            if not has_rs:
+                log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — requires rs-s# or rs-r# (has: {src})")
                 continue
             # ── Trend purity bonus: major confidence boost when present ─────────────
             # trend_purity is no longer a hard requirement — it's a scoring bonus.
@@ -957,10 +1013,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if len(pe_parts) < 2:
                     log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
                     continue
+                # Track whether preserved entry won the merge (for APPROVED upsert below)
+                _preserved_won = False
                 if existing is None:
                     # CRITICAL DEBUG: preserved entry enters hotset (no DB entry competition)
                     log(f"  🔄 [PRESERVE-ADD] {pe['token']}:{pe['direction']} src='{pe_src}' parts={pe_parts} parts_count={len(pe_parts)} score={pe.get('score',0):.2f} (preserved, no DB entry)")
                     db_by_key[key] = pe  # no DB entry — take preserved
+                    _preserved_won = True
                 elif existing.get('score', 0) <= 0 and pe.get('score', 0) <= 0:
                     # FIX (2026-05-05): Both expired (score=0). Keep the one with lower age_m
                     # (newer entry has better chance of being genuinely expired vs. a stale
@@ -970,9 +1029,67 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pe_age = pe.get('age_m', 999)
                     if pe_age < existing_age:
                         db_by_key[key] = pe
+                        _preserved_won = True
                 elif existing.get('score', 0) < pe.get('score', 0):
                     db_by_key[key] = pe  # preserved has higher score — use it
+                    _preserved_won = True
                 # else: keep DB entry (higher score)
+
+                # ── APPROVED-DB upsert when preserved entry won the merge (2026-05-21) ──
+                # FIX: Preserved entries bypass the PENDING→APPROVED gate because they have
+                # no DB row (or the DB row lost the merge). Without an APPROVED row in the DB,
+                # decider_run's get_approved_signals() returns [] and no trades fire — even
+                # though the token is legitimately in hotset.json. This ensures decider_run
+                # can find and execute the preserved entry.
+                if _preserved_won and not dry:
+                    try:
+                        _pe_ck = pe.get('combo_key') or f"{pe['token']}:{pe['direction']}:{pe_src}"
+                        _conn = sqlite3.connect(RUNTIME_DB, timeout=30)
+                        _cur = _conn.cursor()
+                        _cur.execute("""
+                            SELECT id, survival_rounds FROM signals
+                            WHERE token=? AND direction=? AND decision='APPROVED' AND executed=0
+                            LIMIT 1
+                        """, (pe['token'], pe.get('direction','')))
+                        _row = _cur.fetchone()
+                        if _row:
+                            _prev_sr = _row[1] or 0
+                            _new_sr = max(_prev_sr, int(pe.get('rounds', 1)))
+                            _cur.execute("""
+                                UPDATE signals
+                                SET survival_rounds=MAX(COALESCE(survival_rounds,0), ?),
+                                    hot_cycle_count=COALESCE(hot_cycle_count,0)+1,
+                                    updated_at=CURRENT_TIMESTAMP,
+                                    source=?,
+                                    combo_key=?
+                                WHERE id=?
+                            """, (_new_sr, pe_src, _pe_ck, _row[0]))
+                        else:
+                            _cur.execute("""
+                                INSERT INTO signals (
+                                    token, direction, signal_type, source, confidence,
+                                    decision, executed, z_score, survival_rounds,
+                                    hot_cycle_count, combo_key, price, created_at,
+                                    updated_at
+                                ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?,
+                                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                            """, (
+                                pe['token'], pe.get('direction',''),
+                                pe.get('signal_type','hot-set'),
+                                pe_src,
+                                pe.get('confidence', 50.0) or 50.0,
+                                pe.get('z_score', 0) or 0,
+                                int(pe.get('rounds', 1)),
+                                _pe_ck,
+                                pe.get('price') or 0,
+                            ))
+                        _conn.commit()
+                        _conn.close()
+                        log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
+                    except Exception as _e:
+                        import traceback
+                        log(f"  ⚠️  [PRESERVE-APPROVED-FAIL] {pe['token']}: {_e}")
+                        log(f"     Stack: {traceback.format_exc()[:200]}")
             hotset_final = list(db_by_key.values())
             # Re-sort by score descending
             hotset_final.sort(key=lambda x: x.get('score', 0), reverse=True)
@@ -1295,10 +1412,95 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
 
 def _purge_executed_signals(hours=1, dry=False):
-    """Delete executed signals older than `hours` from the runtime DB."""
+    """Delete executed signals older than `hours` from the runtime DB.
+
+    FIX (2026-05-19): Before deleting, cross-check PostgreSQL to ensure the
+    signal actually has a corresponding trade. If a signal was marked EXECUTED
+    but the brain.py DB INSERT failed (phantom execution), the signal must be
+    restored to PENDING so decider_run retries it next cycle.
+
+    Without this check, a failed DB INSERT + orphaned HL position causes:
+      1. Signal marked EXECUTED in SQLite
+      2. Compactor purges the EXECUTED signal
+      3. HL position still open (no DB record)
+      4. Guardian detects orphan, closes at loss
+      5. New signal for same token can't execute (old EXECUTED still blocking)
+    """
+    # First: get all EXECUTED signals older than cutoff
     conn = sqlite3.connect(RUNTIME_DB, timeout=30)
     c = conn.cursor()
     cutoff = datetime.now().replace(microsecond=0).isoformat()
+    c.execute("""
+        SELECT id, token, direction FROM signals
+        WHERE decision = 'EXECUTED'
+          AND updated_at < datetime('now', '-' || ? || ' hours')
+    """, (hours,))
+    old_executed = c.fetchall()
+    if not old_executed:
+        conn.close()
+        if dry:
+            log(f"[DRY] Would check 0 executed signals older than {hours}h — nothing to do")
+        else:
+            log(f"Purged 0 executed signals older than {hours}h (none found)")
+        return
+
+    if dry:
+        log(f"[DRY] Would check {len(old_executed)} executed signals older than {hours}h:")
+        for sid, tok, d in old_executed:
+            log(f"  [DRY]   id={sid} {tok} {d}")
+        conn.close()
+        return
+
+    # Cross-check each old EXECUTED signal against PostgreSQL
+    try:
+        import psycopg2
+        pg_conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres')
+        pg_cur = pg_conn.cursor()
+    except Exception as pg_err:
+        log(f"[WARN] Could not connect to PostgreSQL to verify signals: {pg_err}")
+        log(f"  Falling back to blind purge — signal-to-trade linkage check SKIPPED")
+        deleted = _do_purge(conn, c, cutoff, hours)
+        conn.close()
+        return
+
+    restored = 0
+    for sid, tok, d in old_executed:
+        # Check if there's ANY trade for this token (open or closed).
+        # If a trade exists, the signal was legitimately executed (DB INSERT succeeded).
+        # Only restore to PENDING if no trade record exists at all (phantom execution).
+        pg_cur.execute("""
+            SELECT id, status FROM trades
+            WHERE token=%s AND direction=%s AND server='Hermes'
+            ORDER BY id DESC
+            LIMIT 1
+        """, (tok.upper(), d.upper()))
+        row = pg_cur.fetchone()
+        if not row:
+            # No trade found for this specific token+direction — phantom execution.
+            # Restore to PENDING so decider_run can retry cleanly.
+            # Note: guardian_orphan trades use 'guardian_orphan_insert' signal, not
+            # the original signal source, so they won't match the signal's token+direction
+            # in a way that masks phantom executions.
+            c.execute("""
+                UPDATE signals
+                SET decision='PENDING', executed=0, updated_at=CURRENT_TIMESTAMP
+                WHERE id=?
+            """, (sid,))
+            restored += 1
+            log(f"  [PURGE-VERIFY] Restored signal id={sid} ({tok} {d}) to PENDING — no recent trade found")
+
+    pg_cur.close()
+    pg_conn.close()
+
+    deleted = _do_purge(conn, c, cutoff, hours)
+    conn.close()
+
+    log(f"Purged {deleted} executed signals older than {hours}h"
+        + (f", restored {restored} phantom signals to PENDING" if restored else ""))
+
+
+def _do_purge(conn, c, cutoff, hours):
+    """Execute the actual DELETE for _purge_executed_signals. Returns rowcount."""
     c.execute("""
         DELETE FROM signals
         WHERE decision = 'EXECUTED'
@@ -1306,11 +1508,8 @@ def _purge_executed_signals(hours=1, dry=False):
     """, (hours,))
     deleted = c.rowcount
     conn.commit()
-    conn.close()
-    if dry:
-        log(f"[DRY] Would purge {deleted} executed signals older than {hours}h")
-    else:
-        log(f"Purged {deleted} executed signals older than {hours}h")
+    log(f"Purged {deleted} executed signals older than {hours}h")
+    return deleted
 
 
 def _filter_safe_prev_hotset(prev_hotset):
@@ -1357,11 +1556,12 @@ def _filter_safe_prev_hotset(prev_hotset):
         if validate_source(src_str) == 'unknown':
             continue
         sp = [p.strip() for p in src_str.split(',') if p.strip()]
-        # ── accel-300 required for all entries (2026-05-12) ──────────────────────
-        # Every LONG needs accel-300+, every SHORT needs accel-300-.
-        has_accel = any(p.startswith('accel-300') for p in sp)
-        if not has_accel:
-            continue  # skip without accel-300
+        # ── rs required for all entries (2026-05-15) ──────────────────────────────
+        # Every hotset entry (LONG or SHORT) must have at least one rs signal.
+        has_rs = any(p.startswith('rs') for p in sp)
+        if not has_rs:
+            log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — no rs signal (src='{src}')")
+            continue
         # ── Trend purity: bonus multiplier (not hard requirement) ─────────────
         # Signals with trend_purity get +50% final score.
         has_trend_purity = ('trend_purity+' in sp or 'trend_purity-' in sp)
@@ -1369,11 +1569,11 @@ def _filter_safe_prev_hotset(prev_hotset):
         entry['tp_bonus_mult'] = tp_bonus
         # breakout is single-source but exempt from confluence requirement
         # (it writes to DB directly and bypasses the normal pipeline)
-        source_parts = [p.strip() for p in src_str.split(',') if p.strip()]
         if src == 'breakout':
             pass  # exempt, allow through
-        elif len(source_parts) < 2:
-            continue  # requires 2+ sources for confluence
+        elif len(sp) < 2:
+            log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")
+            continue
         # NOTE: The old hzscore-only filter (first-source='hzscore' + no comma) was
         # removed — it was redundant with the confluence gate above. If a preserved
         # entry has 2+ sources it passed the gate legitimately. If it has 1 source

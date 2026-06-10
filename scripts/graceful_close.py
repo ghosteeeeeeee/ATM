@@ -12,6 +12,7 @@ import psycopg2
 sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import get_exchange, get_open_hype_positions_curl
 
+from paths import *
 BRAIN_DB_DICT = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
 
 # (token, trade_id, direction, reason, has_hl_position, hl_entry_price)
