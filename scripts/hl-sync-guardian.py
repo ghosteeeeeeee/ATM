@@ -516,7 +516,7 @@ def _retry_phantom_close_fills():
             # side=='B' only matches SHORT closes — misses ALL LONG closes.
             # Fix: filter on dir field containing 'Close'.
             close_fills = [f for f in fills
-                         if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
+                         if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir') or '')]
 
             if close_fills:
                 total_sz = sum(f['sz'] for f in close_fills)
@@ -890,7 +890,7 @@ def _poll_open_fill_once(token: str):
     window_start = window_end - 300_000  # 5 min lookback
     fills = _get_fills_cached(token, window_start, window_end)
     token_opens = [f for f in fills
-                   if f['coin'].upper() == token.upper() and 'Open' in str(f.get('dir', ''))]
+                   if f['coin'].upper() == token.upper() and 'Open' in str(f.get('dir') or '')]
     if token_opens:
         total_sz = sum(f['sz'] for f in token_opens)
         wavg_open = sum(f['px'] * f['sz'] for f in token_opens) / total_sz
@@ -911,7 +911,7 @@ def _poll_close_fills_once(token: str):
     # Same root cause as the 2026-04-19 fix in _close_paper_trade_db (line 2523).
     # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
     token_closes = [f for f in fills
-                    if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
+                    if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir') or '')]
     if token_closes:
         total_sz = sum(f['sz'] for f in token_closes)
         wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
@@ -1174,13 +1174,14 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     conn_dup = get_db_connection()
                     cur_dup = conn_dup.cursor()
                     cur_dup.execute(
-                        "SELECT id, signal FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') LIMIT 1",
+                        "SELECT id, signal, direction FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') LIMIT 1",
                         (coin.upper(),))
                     dup_row = cur_dup.fetchone()
                     cur_dup.close()
                     conn_dup.close()
                     if dup_row:
                         existing_id = dup_row[0]
+                        existing_direction = dup_row[2]  # matched trade's direction, not HL coin's direction
                         # Fetch actual HL open fill price for accurate entry update
                         hl_open_fill, fill_sz = _poll_open_fill_once(coin)
                         if hl_open_fill and hl_open_fill > 0:
@@ -1196,13 +1197,13 @@ def reconcile_hype_to_paper(hl_pos, prices):
                             cur_upd2.execute("""
                                 UPDATE trades SET entry_price=%s, hl_entry_price=%s, direction=%s, leverage=%s
                                 WHERE id=%s AND status='open'
-                            """, (dup_entry, dup_entry, direction, int(lev), existing_id))
+                            """, (dup_entry, dup_entry, existing_direction, int(lev), existing_id))
                             conn_upd2.commit()
                             cur_upd2.close()
                             conn_upd2.close()
                         except Exception as upd_err2:
-                            log(f'  Update existing trade failed: {upd_err2}', 'WARN')
-                        _mark_hl_reconciled(coin, existing_id, dup_entry, direction)
+                            log(f'Update existing trade failed: {upd_err2}', 'WARN')
+                        _mark_hl_reconciled(coin, existing_id, dup_entry, existing_direction)
                         # FIX: Close the orphan HL position AND close the paper trade
                         # BOTH using the existing_id — no new record created, no duplicates.
                         # Close HL position first to eliminate real-money risk.
@@ -2596,7 +2597,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             # Using side=='B' alone misses all LONG closes — same root cause as the
             # 2026-04-18 fix in hyperliquid_exchange.py (get_realized_pnl / mirror_get_exit_fill).
             # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
-            close_fills = [f for f in token_fills if 'Close' in str(f.get('dir', ''))]
+            close_fills = [f for f in token_fills if 'Close' in str(f.get('dir') or '')]
             if close_fills:
                 hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
                 log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
@@ -3097,22 +3098,6 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                     if direction_changed:
                         log(f'  [SELF-CLOSE] ⚠️ {coin} direction changed ({stored_direction}→{direction}) — invalidating stale record')
                         _upsert_self_close(coin, direction, sz, entry_px, record['sl_price'], record['tp_price'])
-                        continue
-                        if real_atr is not None and entry_px > 0:
-                            atr_pct = real_atr / entry_px
-                        else:
-                            atr_pct = ATR_PCT_FALLBACK  # 2% assumed
-                        k = ATR_K_NORMAL_VOL  # 1.25 for NORMAL_VOL tier
-                        k_tp = k * ATR_TP_K_MULT  # 1.25 × k
-                        sl_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, k * atr_pct))
-                        tp_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, k_tp * atr_pct))
-                        if direction == 'LONG':
-                            new_sl = entry_px * (1 - sl_pct)
-                            new_tp = entry_px * (1 + tp_pct)
-                        else:
-                            new_sl = entry_px * (1 + sl_pct)
-                            new_tp = entry_px * (1 - tp_pct)
-                        _upsert_self_close(coin, direction, sz, entry_px, new_sl, new_tp)
                         continue
                 # Record is current — fall through to breach check below
                 sl_price = record['sl_price']
@@ -4195,15 +4180,16 @@ def main():
                         retry_direction = 'LONG'
                         retry_lev = 1
                     # Fetch actual HL exit fill price
-                    hl_exit = _poll_hl_fills_for_close(token, int(time.time() * 1000) - 300000)
+                    close_start_ms = int(time.time() * 1000) - 300000
+                    hl_exit_px, realized_pnl = _poll_hl_fills_for_close(token, close_start_ms)
                     _close_orphan_paper_trade_by_id(
-                        trade_id, token, retry_direction, hl_exit, retry_lev,
+                        trade_id, token, retry_direction, hl_exit_px, retry_lev,
                         'guardian_orphan_retry',
                         amount_usdt_override=None
                     )
                     _CLOSED_HL_COINS.add(token.upper())  # prevent Step 11 double-close
                     _clear_pending_retry([token])
-                    log(f'  {token}: pending retry succeeded (HL exit={hl_exit:.6f})', 'PASS')
+                    log(f'  {token}: pending retry succeeded (HL exit={hl_exit_px:.6f})', 'PASS')
                 else:
                     log(f'  {token}: pending retry still failing — will retry again next cycle', 'WARN')
             # Refresh HL state after retries — use cache
