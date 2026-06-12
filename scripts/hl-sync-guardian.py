@@ -1471,14 +1471,23 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                     variant_id, trade_id
                 ))
 
-                # Mark guardian_closed so Step 8 won't re-process this trade
-                cur.execute("""
-                    UPDATE trades SET status='closed', close_reason='CASCADE_FLIP',
-                        exit_reason='flipped_hard_sl', flip_variant=%s,
-                        guardian_closed=TRUE
-                    WHERE id=%s
-                """, (variant_id, trade_id))
-
+                # BUG-G5 fix: use _close_paper_trade_db for proper PnL calculation and
+                # loss cooldown recording. The old direct UPDATE missed loss cooldown
+                # (same token could re-enter immediately) and left pnl_usdt/pnl_pct NULL.
+                # flip_variant is set separately since _close_paper_trade_db doesn't handle it.
+                flip_exit_px = prices.get(token, entry_px)
+                _close_paper_trade_db(trade_id, token, flip_exit_px, 'CASCADE_FLIP')
+                # Set flip_variant on the now-closed trade record
+                conn = get_db_connection()
+                if conn:
+                    try:
+                        cu = conn.cursor()
+                        cu.execute("UPDATE trades SET flip_variant=%s WHERE id=%s", (variant_id, trade_id))
+                        conn.commit()
+                        cu.close()
+                        conn.close()
+                    except Exception:
+                        pass
                 log(f'  [FLIP] Done: opened trade #{trade_id} opposite direction', 'INFO')
             else:
                 log(f'  [FLIP] FAILED: {open_result.get("error")}', 'FAIL')
