@@ -492,7 +492,6 @@ def _retry_phantom_close_fills():
             WHERE server = %s
               AND status = 'closed'
               AND close_reason = 'PHANTOM_CLOSE'
-              AND exit_price = 0
             ORDER BY close_time ASC
             LIMIT 5
         ''', ('Hermes',))
@@ -539,7 +538,6 @@ def _retry_phantom_close_fills():
                         close_reason = 'phantom_close_filled',
                         close_time = NOW()
                     WHERE id = %s
-                      AND exit_price = 0
                 ''', (wavg_exit, pnl_pct, trade_id))
                 conn.commit()
                 updated += 1
@@ -1994,8 +1992,8 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
 
     # ── 4. Rate-limit: don't rotate same token more than once per 3 min ─────────
     rate_file = '/root/.hermes/data/stale-rotation-rate.json'
+    rate_data = {}
     try:
-        rate_data = {}
         if os.path.exists(rate_file):
             with open(rate_file) as f:
                 rate_data = _json.load(f)
@@ -2005,10 +2003,16 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     except:
         pass
 
-    # ── 5. Execute the rotation ────────────────────────────────────────────────
-    log(f'  [STALE-ROTATION] {token} {direction} stale (vel={signed_vel:.2f}%, sp={sp:.0f}) → '
-        f'closing for {best["token"]} {best["direction"]} (sp={best["speed_percentile"]:.0f}%, vel={best["velocity_5m"]:.2f}%)',
-        'WARN')
+    # Update rate limit BEFORE closing so it persists even if HL close fails.
+    # Guard with try in case rate_file is unwritable.
+    def _update_rate():
+        try:
+            rate_data[token] = _time.time()
+            with open(rate_file, 'w') as f:
+                _json.dump(rate_data, f)
+        except:
+            pass
+    _update_rate()
 
     from hyperliquid_exchange import close_position
 
@@ -2022,26 +2026,17 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         log(f'  [STALE-ROTATION] {token} NOT closed after 15s — aborting rotation', 'FAIL')
         return
 
-    # Mark trade as closed in DB
-    try:
-        db_cur.execute("""
-            UPDATE trades SET status='closed', guardian_closed=TRUE,
-                close_reason='STALE_ROTATION', exit_reason='STALE_ROTATION_VELOCITY_LOW',
-                pnl_pct=%s, current_price=%s
-            WHERE id=%s AND status='open'
-        """, (pnl_pct, prices.get(token, entry_px), trade_id))
-        db_conn.commit()
+    # BUG-G1/G2/G3 fix: use _close_paper_trade_db for proper PnL calculation,
+    # loss cooldown recording, and _clear_reconciled_token. The old direct UPDATE
+    # (a) used stale pnl_pct instead of computing from actual close price,
+    # (b) never recorded loss cooldown allowing immediate re-entry,
+    # (c) never cleared reconciled state blocking re-reconciliation.
+    exit_px_rot = prices.get(token, entry_px)
+    close_ok = _close_paper_trade_db(trade_id, token, exit_px_rot, 'STALE_ROTATION')
+    if close_ok:
         log(f'  [STALE-ROTATION] {token} trade #{trade_id} closed (stale)', 'PASS')
-    except Exception as db_err:
-        log(f'  [STALE-ROTATION] DB update error: {db_err}', 'FAIL')
-
-    # Update rate limit
-    try:
-        rate_data[token] = _time.time()
-        with open(rate_file, 'w') as f:
-            _json.dump(rate_data, f)
-    except:
-        pass
+    else:
+        log(f'  [STALE-ROTATION] DB close failed for trade #{trade_id} — will retry', 'FAIL')
 
     log(f'  [STALE-ROTATION] Replaced {token} → {best["token"]} ({best["direction"]}) '
         f'conf={best["confidence"]:.0f}% sp={best["speed_percentile"]:.0f}%', 'INFO')
