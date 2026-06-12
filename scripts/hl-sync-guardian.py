@@ -516,7 +516,7 @@ def _retry_phantom_close_fills():
             # side=='B' only matches SHORT closes — misses ALL LONG closes.
             # Fix: filter on dir field containing 'Close'.
             close_fills = [f for f in fills
-                         if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir') or '')]
+                         if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
 
             if close_fills:
                 total_sz = sum(f['sz'] for f in close_fills)
@@ -890,7 +890,7 @@ def _poll_open_fill_once(token: str):
     window_start = window_end - 300_000  # 5 min lookback
     fills = _get_fills_cached(token, window_start, window_end)
     token_opens = [f for f in fills
-                   if f['coin'].upper() == token.upper() and 'Open' in str(f.get('dir') or '')]
+                   if f['coin'].upper() == token.upper() and 'Open' in str(f.get('dir', ''))]
     if token_opens:
         total_sz = sum(f['sz'] for f in token_opens)
         wavg_open = sum(f['px'] * f['sz'] for f in token_opens) / total_sz
@@ -911,7 +911,7 @@ def _poll_close_fills_once(token: str):
     # Same root cause as the 2026-04-19 fix in _close_paper_trade_db (line 2523).
     # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
     token_closes = [f for f in fills
-                    if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir') or '')]
+                    if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
     if token_closes:
         total_sz = sum(f['sz'] for f in token_closes)
         wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
@@ -2597,7 +2597,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             # Using side=='B' alone misses all LONG closes — same root cause as the
             # 2026-04-18 fix in hyperliquid_exchange.py (get_realized_pnl / mirror_get_exit_fill).
             # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
-            close_fills = [f for f in token_fills if 'Close' in str(f.get('dir') or '')]
+            close_fills = [f for f in token_fills if 'Close' in str(f.get('dir', ''))]
             if close_fills:
                 hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
                 log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
@@ -2766,6 +2766,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 f'pnl={computed_pnl_pct:+.4f}% {"WIN" if is_win else "LOSS"}', 'PASS')
             if not is_win:
                 _record_loss_cooldown(token, direction)
+            _clear_reconciled_token(token)  # must be inside success path before return
             close_success = True
         cur.close()
         conn.close()
@@ -2779,11 +2780,9 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
         log(f'  _close_orphan_paper_trade_by_id error: {e}', 'FAIL')
         return False  # FAILED: exception, keep marker
 
-    # FIX (2026-04-01): Clear reconciled state when position is closed on HL.
-    # This allows the token to be re-reconciled if a new position opens.
-    # BUG-15 fix: move inside try block so it's actually called (was after return).
-    _clear_reconciled_token(token)
-    return close_success  # True = close recorded, marker can be cleared
+    # NOTE: _clear_reconciled_token is called INSIDE the try block above
+    # (after successful conn.commit) to ensure it's actually executed.
+    return close_success  # True=success (close recorded, marker can be cleared)
 
 
 def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
@@ -3208,14 +3207,17 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                             trade_record['id']
                         ))
                         conn_sc.commit()
-                        cur_sc.close()
-                        conn_sc.close()
-                        # BUG-34 fix: record loss cooldown so losing self-closes don't re-enter immediately
+                        # Record loss cooldown BEFORE closing conn (before any failure path)
                         if computed_pnl_usdt < 0:
                             _record_loss_cooldown(coin, direction_sc)
+                        _clear_reconciled_token(coin)
+                        cur_sc.close()
+                        conn_sc.close()
                         log(f'  [SELF-CLOSE] ✅ DB trade #{trade_record["id"]} closed — exit={hl_exit_px:.6f}, pnl={computed_pnl_pct:.2f}%', 'PASS')
                     except Exception as sc_db_err:
                         log(f'  [SELF-CLOSE] ❌ DB update failed for {coin}: {sc_db_err}', 'FAIL')
+                        if computed_pnl_usdt < 0:
+                            _record_loss_cooldown(coin, direction_sc)
                     finally:
                         breach_closed += 1
             else:
@@ -3332,40 +3334,49 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                 hl_exit_px = curr
 
             if trade_id:
-                # FIX: call _record_loss_cooldown BEFORE the try block so it's recorded
-                # even if the UPDATE fails.
+                # Record loss cooldown BEFORE the try block (so it's recorded even if UPDATE fails)
                 if computed_pnl_usdt < 0:
                     _record_loss_cooldown(tok, direction)
+                _clear_reconciled_token(tok)
                 cur = conn.cursor()
                 try:
                     cur.execute("""
                         UPDATE trades SET
                             status='closed',
+                            close_time=NOW(),
                             close_reason=%s,
                             exit_reason=%s,
                             guardian_closed=TRUE,
+                            guardian_reason=%s,
                             exit_price=%s,
                             pnl_pct=%s,
                             pnl_usdt=%s,
-                            hype_realized_pnl_usdt=%s
+                            hype_realized_pnl_usdt=%s,
+                            hype_realized_pnl_pct=%s,
+                            updated_at=NOW(),
+                            last_updated=NOW()
                         WHERE id=%s
                     """, (
+                        breach_reason,
                         breach_reason,
                         breach_reason,
                         hl_exit_px,
                         computed_pnl_pct,
                         computed_pnl_usdt,
                         computed_pnl_usdt if realized_pnl is not None else 0,
+                        computed_pnl_pct if realized_pnl is not None else None,
                         trade_id
                     ))
                     conn.commit()
                     cur.close()
                     _CLOSED_THIS_CYCLE.add(str(trade_id))
+                    breach_closed += 1
                     log(f'  ✅ {coin} DB trade #{trade_id} closed — {breach_reason}, '
                         f'exit={hl_exit_px:.6f}, pnl={computed_pnl_pct:.2f}%', 'PASS')
                 except Exception as e:
                     log(f'  ❌ {coin} DB trade close error: {e}', 'FAIL')
-                    _CLOSED_HL_COINS.discard(tok)
+                    # guardian_closed was already set above before try — trade IS closed
+                    # Only increment breach_closed here so it's counted regardless of outcome
         except Exception as e:
             log(f'  ❌ {coin} breach trade error: {e}', 'FAIL')
             try:
@@ -3373,7 +3384,6 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             except Exception:
                 pass
 
-        breach_closed += 1
         time.sleep(3)
 
     conn.close()
