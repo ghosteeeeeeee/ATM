@@ -208,9 +208,13 @@ def _cluster_levels(levels: list, cluster_atr_pct: float) -> list:
     current_cluster = [sorted_levels[0]]
     for level in sorted_levels[1:]:
         price, count = level
-        cluster_price = sum(p for p, _ in current_cluster) / len(current_cluster)
-        # If within cluster threshold of the cluster center, add to cluster
-        if abs(price - cluster_price) / cluster_price * 100.0 <= cluster_atr_pct:
+        # Compare against the ANCHOR level (first level in cluster), not the running
+        # average. Using a running average causes cluster creep: [(100),(105),(106)]
+        # with 5% threshold clusters all 3 (avg=103.67, 106 is 3.4% from avg)
+        # when 106 should form its own cluster (6% from anchor 100).
+        anchor_price = current_cluster[0][0]
+        # If within cluster threshold of the anchor level, add to cluster
+        if abs(price - anchor_price) / anchor_price * 100.0 <= cluster_atr_pct:
             current_cluster.append(level)
         else:
             clusters.append(current_cluster)
