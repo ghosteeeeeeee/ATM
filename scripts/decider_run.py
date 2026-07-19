@@ -26,6 +26,7 @@ from hermes_constants import (
     RS_DECIDER_MIN_TOUCHES, RS_DECIDER_ZBONUS_TOUCHES, RS_DECIDER_ZBONUS_ZSCORE,
     RS_DECIDER_CONF_PENALTY, RS_DECIDER_CONF_FLOOR,
     RS_TOUCH_HARD_CAP,
+    TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -168,8 +169,9 @@ def _is_guardian_closing(token: str) -> bool:
     """Return True if guardian is currently closing this token (closing marker active)."""
     try:
         if os.path.exists(_GUARDIAN_CLOSING_FILE):
-            with open(_GUARDIAN_CLOSING_FILE) as f:
-                data = json.load(f)
+            with FileLock('guardian_closing'):
+                with open(_GUARDIAN_CLOSING_FILE) as f:
+                    data = json.load(f)
             return token.upper() in data.get('tokens', {})
     except Exception:
         pass
@@ -357,7 +359,7 @@ def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
     except Exception:
         exploit_vid = None
 
-    if random.random() < EPSILON and exploit_vid:
+    if random.random() >= EPSILON and exploit_vid:
         # Exploitation — use best variant
         for v in test.get('variants', []):
             if v.get('id') == exploit_vid:
@@ -580,7 +582,7 @@ def process_delayed_entries(paper=False):
 
 def execute_trade(token, direction, price, confidence, source,
                   leverage=10, paper=False, sl_pct=0.02,
-                  trailing_activation=0.01, trailing_distance=0.01,
+                  trailing_activation=TRAILING_ACTIVATION_PCT, trailing_distance=TRAILING_DISTANCE_PCT,
                   trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
                   live_trading=False, flipped=False,
@@ -821,7 +823,8 @@ def _get_hotset_approval_rate() -> tuple:
         window_start = data.get('window_start', 0)
         now = time.time()
         if now - window_start > 60:
-            return 0, now  # new window
+            _increment_hotset_approval_rate(0, now)  # reset to disk
+            return 0, now
         return count, window_start
     except Exception:
         return 0, time.time()
@@ -863,6 +866,7 @@ def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
 
     Rule: If 2+ same-direction trades failed recently, block that direction for 1hr.
     Only allow opposite-direction trades from hot-set during cooldown.
+    Resets failure count after cooldown expires so tokens aren't permanently blocked.
     """
     import time
     token = token.upper()
@@ -881,6 +885,13 @@ def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
     if dir_count >= 2 and (now - dir_last) < COOLDOWN_SECS:
         remaining = int(COOLDOWN_SECS - (now - dir_last))
         return True, f'{direction} in cooldown ({remaining}s left, {dir_count} failures)'
+    
+    # Reset failure count after cooldown expires
+    if dir_count >= 2 and (now - dir_last) >= COOLDOWN_SECS:
+        dir_failures['count'] = 0
+        dir_failures['last'] = 0
+        failures[token][direction] = dir_failures
+        _save_hotset_failures(failures)
     
     # Check if opposite direction has failures (to allow opposite signals through)
     opp_count = opp_failures.get('count', 0)
@@ -1637,64 +1648,63 @@ def run(dry_run=False):
                 VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
                 ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
             )
+            _skip_signal = False
             _components = source.split(',')
             for _comp in _components:
                 if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
                     log(f'  SKIP {token} {direction}: PCT_HERMES_PLUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'pct-hermes-' and not PCT_HERMES_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: PCT_HERMES_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'pct-hermes' and not PCT_HERMES_ENABLED:
                     log(f'  SKIP {token} {direction}: PCT_HERMES_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'vel-hermes+' and not VEL_HERMES_PLUS_ENABLED:
                     log(f'  SKIP {token} {direction}: VEL_HERMES_PLUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'vel-hermes-' and not VEL_HERMES_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: VEL_HERMES_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'hzscore+' and not HZSCORE_PLUS_ENABLED:
                     log(f'  SKIP {token} {direction}: HZSCORE_PLUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'hzscore-' and not HZSCORE_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: HZSCORE_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'hmacd+' and not HMACD_PLUS_ENABLED:
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'hmacd-' and not HMACD_MINUS_ENABLED:
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp in ('gap-300+', 'gap300-5m+') and not GAP_300_PLUS_ENABLED:
                     log(f'  SKIP {token} {direction}: GAP_300_PLUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp in ('gap-300-', 'gap300-5m-') and not GAP_300_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: GAP_300_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'ma_cross+' and not MA_CROSS_PLUS_ENABLED:
                     log(f'  SKIP {token} {direction}: MA_CROSS_PLUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'ma_cross-' and not MA_CROSS_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: MA_CROSS_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'ma_cross_5m+' and not MA_CROSS_5M_PLUS_ENABLED:
                     log(f'  SKIP {token} {direction}: MA_CROSS_5M_PLUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'ma_cross_5m-' and not MA_CROSS_5M_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: MA_CROSS_5M_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'r2_rev' and not R2_REV_ENABLED:
                     log(f'  SKIP {token} {direction}: R2_REV_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
                 if _comp == 'fast-momentum-' and not FAST_MOMENTUM_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: FAST_MOMENTUM_MINUS_ENABLED=False')
-                    skipped += 1; continue
+                    skipped += 1; _skip_signal = True; break
         except ImportError:
             pass  # hermes_constants not available — skip gate
 
-        # Check skip flag before proceeding (set by Layer 3 gate above)
-        # The continue above sets a 'continue' but we need to check after the try/except
-        # Re-check: if the loop hit a continue, we need to break to next signal
-        # Actually the 'continue' above already skips to next iteration of the for loop
+        if _skip_signal:
+            continue
         price = sig.get('price') or get_current_price(token)
 
         if not price:

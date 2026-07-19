@@ -125,7 +125,7 @@ def _record_token_usage(tokens_used: int):
 
 AB_CONFIG_FILE = '/root/.hermes/data/ab-test-config.json'
 sys.path.insert(0, '/root/.hermes/scripts')
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, MAX_OPEN_POSITIONS
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, MAX_OPEN_POSITIONS, TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from signal_schema import mark_signal_processed, validate_source  # BUG-12 fix: must be before first use (line 1645)
@@ -722,8 +722,8 @@ def get_ab_params(coin, direction='long'):
     ts_test = get_cached_ab_variant(coin, direction, 'trailing-stop-test')
     if ts_test:
         cfg = ts_test.get("config", {})
-        result['trailing_activation'] = cfg.get("trailingActivationPct", 0.01)
-        result['trailing_distance'] = cfg.get("trailingDistancePct", 0.01)
+        result['trailing_activation'] = cfg.get("trailingActivationPct", TRAILING_ACTIVATION_PCT)
+        result['trailing_distance'] = cfg.get("trailingDistancePct", TRAILING_DISTANCE_PCT)
         result['variant_id'] = ts_test.get('id', '')
         result['test_name'] = 'trailing-stop-test'
         print(f"  [AB] Trailing: activate at +{result['trailing_activation']*100:g}%, "

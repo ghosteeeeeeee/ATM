@@ -18,7 +18,7 @@ from datetime import datetime
 
 # ── Loss cooldown helpers ─────────────────────────────────────────────────────
 from hermes_file_lock import FileLock
-from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT
+from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT
 from pnl_utils import compute_close_pnl
 
 def _load_cooldowns() -> dict:
@@ -115,12 +115,12 @@ def call_ollama(prompt: str) -> dict:
         response = resp.json()
         raw_resp = response.get("response", "{}")
 
-        # ── Validate response contains required fields ──────────────────────────
-        if "DECISION:" not in raw_resp or "CONFIDENCE:" not in raw_resp:
-            print(f"[brain.py] Ollama response validation failed — missing DECISION/CONFIDENCE")
-            return {}  # safe default
-
-        return json.loads(raw_resp)
+        # Validate response is valid JSON (prompt asks for JSON with people/topics/sentiment/etc)
+        result = json.loads(raw_resp)
+        if not isinstance(result, dict):
+            print(f"[brain.py] Ollama response is not a dict: {type(result)}")
+            return {}
+        return result
     except Exception as e:
         print(f"[brain.py] Ollama call failed: {e}")
         return {}  # safe default
@@ -475,9 +475,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         sl_group = random.choice(list(groups.keys()))
         sl_distance = groups[sl_group]
     if trailing_activation is None:
-        trailing_activation = 0.01
+        trailing_activation = TRAILING_ACTIVATION_PCT
     if trailing_distance is None:
-        trailing_distance = 0.01
+        trailing_distance = TRAILING_DISTANCE_PCT
 
     leverage = max(1, min(int(leverage), 5))  # cap at 5x
 
