@@ -499,6 +499,19 @@ def compute_atr_sl_tp(
         else:
             result['needs_sl'] = True  # first time set
 
+    # ── BREAKEVEN GUARD ────────────────────────────────────────────────────────
+    # For established trades (not new), SL must never drop below entry price.
+    # This ensures profit is locked in once price moves favorably.
+    # Without this, ATR_SL_MIN_ACCEL anchored to peak allows SL to sit below
+    # entry even at +0.75% peak — giving back all profit on reversal.
+    if not is_new_trade:
+        if direction == 'LONG' and new_sl < entry_f:
+            new_sl = entry_f
+            result['needs_sl'] = True
+        elif direction == 'SHORT' and new_sl > entry_f:
+            new_sl = entry_f
+            result['needs_sl'] = True
+
     # ── Trailing TP gate (only tighten, never loosen) ──────────────────────────
     # LONG:  TP only increases (numerically higher = further from entry).
     # SHORT: TP only decreases (numerically lower = further from entry).
