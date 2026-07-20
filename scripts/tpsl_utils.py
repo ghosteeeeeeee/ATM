@@ -465,6 +465,9 @@ def compute_atr_sl_tp(
                 # This means the position is already wrong-sided — force write so TP/SL is set right.
                 result['needs_sl'] = True
                 result['_force_write'] = True
+            elif result.get('_force_write'):
+                # Guard already snapped new_sl to a safe value — allow it through
+                result['needs_sl'] = True
             else:
                 new_sl = current_sl  # would loosen (or equal) — block
                 result['needs_sl'] = False
@@ -487,6 +490,9 @@ def compute_atr_sl_tp(
                     # new_sl would loosen or equal — block even if wrong-side
                     new_sl = current_sl
                     result['needs_sl'] = False
+            elif result.get('_force_write'):
+                # Guard already snapped new_sl to a safe value — allow it through
+                result['needs_sl'] = True
             else:
                 new_sl = current_sl  # would loosen (or equal) — block
                 result['needs_sl'] = False
