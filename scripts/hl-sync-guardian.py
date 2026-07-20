@@ -68,7 +68,7 @@ def _get_cached_hl_positions():
     # ── Step 2: Direct API fallback (only if cache is cold) ──
     try:
         fresh = get_open_hype_positions_curl()
-        _hl_positions_cache = {p.get('coin'): p for p in fresh}
+        _hl_positions_cache = fresh  # already {coin: position_data} dict
         _hl_positions_cache_time = time.time()
     except Exception:
         pass  # Return stale cache on error
@@ -208,9 +208,11 @@ def _load_cooldowns() -> dict:
         return {}
 
 def _save_cooldowns(data: dict) -> None:
+    from hermes_file_lock import FileLock
     try:
-        with open(LOSS_COOLDOWN_FILE, 'w') as f:
-            json.dump(data, f, indent=2)
+        with FileLock('loss_cooldown'):
+            with open(LOSS_COOLDOWN_FILE, 'w') as f:
+                json.dump(data, f, indent=2)
     except Exception as e:
         log(f'[_save_cooldowns] FAILED to write {LOSS_COOLDOWN_FILE}: {e}', 'FAIL')
         raise  # Re-raise so caller knows the save failed
@@ -257,8 +259,8 @@ def _record_loss_cooldown(token: str, direction: str) -> None:
     try:
         _save_cooldowns(data)
         log(f'  [Guardian] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h', 'WARN')
-    except Exception:
-        pass  # Error already logged and re-raised by _save_cooldowns
+    except Exception as e:
+        log(f'  [Guardian] LOSS COOLDOWN FAILED for {token} {direction}: {e}', 'FAIL')
 
 # ── Instrumented checkpoint + event logging ──────────────────────────────────
 try:
@@ -811,14 +813,23 @@ def close_position_hl(coin: str, reason: str) -> bool:
         # Try expected path: response.data.statuses
         response_data = result.get('response')
         if isinstance(response_data, dict):
+            # Check for HL API errors before checking statuses
+            if 'error' in response_data:
+                log(f'  ❌ {coin}: HL API error: {response_data["error"]}', 'FAIL')
+                return False
+            if response_data.get('status') == 'err':
+                err_msg = response_data.get('response', str(response_data))
+                log(f'  ❌ {coin}: market_close failed: {err_msg}', 'FAIL')
+                return False
             statuses = response_data.get('data', {}).get('statuses', [])
         else:
             # Unexpected: log it as a warning but treat as success (HL filled it)
             log(f'  ⚠️ {coin}: unexpected result structure: {str(result)[:200]}', 'WARN')
             return True
 
-        if statuses is None:
-            statuses = []
+        if not statuses:
+            log(f'  ❌ {coin}: market_close returned empty statuses — HL rejected the order', 'FAIL')
+            return False
         for s in statuses:
             if isinstance(s, dict) and 'error' in s:
                 log(f'  ❌ {coin}: {s["error"]}', 'FAIL')
@@ -890,8 +901,8 @@ def _poll_open_fill_once(token: str):
     token_opens = [f for f in fills
                    if f['coin'].upper() == token.upper() and 'Open' in str(f.get('dir', ''))]
     if token_opens:
-        total_sz = sum(f['sz'] for f in token_opens)
-        wavg_open = sum(f['px'] * f['sz'] for f in token_opens) / total_sz
+        total_sz = sum(float(f['sz']) for f in token_opens)
+        wavg_open = sum(float(f['px']) * float(f['sz']) for f in token_opens) / total_sz
         return wavg_open, total_sz
     return None, None
 
@@ -911,9 +922,9 @@ def _poll_close_fills_once(token: str):
     token_closes = [f for f in fills
                     if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
     if token_closes:
-        total_sz = sum(f['sz'] for f in token_closes)
-        wavg_exit = sum(f['px'] * f['sz'] for f in token_closes) / total_sz
-        realized_pnl = sum(f.get('closed_pnl', 0) or 0 for f in token_closes)
+        total_sz = sum(float(f['sz']) for f in token_closes)
+        wavg_exit = sum(float(f['px']) * float(f['sz']) for f in token_closes) / total_sz
+        realized_pnl = sum(float(f.get('closed_pnl', 0) or 0) for f in token_closes)
         return wavg_exit, realized_pnl
     return None, None
 
@@ -1124,6 +1135,13 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     updated += 1
                     updated_tokens.append(coin)
             else:
+                # GUARDIAN CLOSING GUARD: if a closing marker exists for this token,
+                # the guardian is mid-close or just confirmed a close. Do NOT create
+                # a new orphan paper trade — it would be a duplicate of the closing one.
+                if _is_closing_marker_active(coin):
+                    log(f'  Skipping orphan-create for {coin}: guardian closing marker active (incoming close in progress)', 'INFO')
+                    continue
+
                 # KEY FIX: Orphan HL position — check if already reconciled first.
                 # FIX (2026-04-01): Previously guardian would create a new record each cycle
                 # because _CLOSED_THIS_CYCLE cleared between cycles while copied_state persisted.
@@ -1551,13 +1569,29 @@ def sync_pnl_from_hype(prices):
             trade_id, token, amount, lev, entry, direction = row
             if token in hl_pos:
                 pos_data = hl_pos[token]
-                unrealized_pnl = float(pos_data.get('unrealizedPnl', 0))
-                entry_price_hl = float(pos_data.get('entryPrice', entry) or entry)
-                # Safe float extraction for currentPrice — HL can return NaN, null, or
-                # non-numeric strings which crash float() before the old guard runs.
+                # FIX (2026-06-13): Defensive float extraction for unrealizedPnl.
+                # HL can return numeric strings, NaN, or malformed values that crash
+                # float() or cause "float - str" arithmetic errors downstream.
+                _raw_upnl = pos_data.get('unrealizedPnl', 0)
+                try:
+                    unrealized_pnl = float(_raw_upnl) if _raw_upnl is not None else 0.0
+                    if math.isnan(unrealized_pnl):
+                        unrealized_pnl = 0.0
+                except (TypeError, ValueError):
+                    unrealized_pnl = 0.0
+                # Safe float extraction for currentPrice AND entryPrice.
+                # HL can return NaN, null, or non-numeric strings which crash float().
+                # Guard both values before any arithmetic.
+                _raw_ep = pos_data.get('entryPrice')
+                try:
+                    entry_price_hl = float(_raw_ep) if _raw_ep is not None else float(entry)
+                    if math.isnan(entry_price_hl) or entry_price_hl <= 0:
+                        entry_price_hl = float(entry)
+                except (TypeError, ValueError):
+                    entry_price_hl = float(entry)
                 _raw_cp = pos_data.get('currentPrice')
                 try:
-                    curr_price_hl = float(_raw_cp)
+                    curr_price_hl = float(_raw_cp) if _raw_cp is not None else float(prices.get(token, entry) or entry)
                     if math.isnan(curr_price_hl) or curr_price_hl <= 0:
                         curr_price_hl = float(prices.get(token, entry) or entry)
                 except (TypeError, ValueError):
@@ -1572,10 +1606,14 @@ def sync_pnl_from_hype(prices):
                 # Defensive: ensure prices are float before arithmetic
                 entry_price_hl = float(entry_price_hl)
                 curr_price_hl = float(curr_price_hl)
-                if entry_price_hl > 0 and curr_price_hl > 0:
-                    pnl_pct = compute_live_pnl(entry_price_hl, curr_price_hl, direction)  # pnl_utils
-                else:
-                    # Fallback: leveraged but better than nothing
+                try:
+                    if entry_price_hl > 0 and curr_price_hl > 0:
+                        pnl_pct = compute_live_pnl(entry_price_hl, curr_price_hl, direction)  # pnl_utils
+                    else:
+                        pnl_pct = 0.0
+                except Exception:
+                    pnl_pct = 0.0
+                if entry_price_hl <= 0 or curr_price_hl <= 0:
                     pnl_pct = round(unrealized_pnl / float(amount or 50) * 100, 4)
 
                 cur.execute("""
@@ -1673,11 +1711,14 @@ def sync_pnl_from_hype(prices):
             log(f'  Synced PnL from HL for {updated} positions')
 
     except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
         try:
             conn.rollback()
         except Exception:
             pass
         log(f'  sync_pnl_from_hype failed: {e}', 'FAIL')
+        log(f'  Traceback: {tb}', 'FAIL')
         return
 
 
@@ -1912,7 +1953,10 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     # ── 1b. Check data freshness ───────────────────────────────────────────────
     # BUG-FIX: updated_at was loaded but never used — could act on stale data
     if speed_data.get('updated_at'):
-        age_sec = _time.time() - speed_data['updated_at']
+        try:
+            age_sec = _time.time() - float(speed_data['updated_at'])
+        except (TypeError, ValueError):
+            age_sec = 0
         if age_sec > STALE_AGE_SEC:
             log(f'  [STALE-ROTATION] {token} speed data is {age_sec:.0f}s old — skipping', 'WARN')
             return
@@ -3081,78 +3125,60 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                 continue
 
             record = self_close_records.get(coin)
-            if record:
-                # Stale record check: if entry_px doesn't match current HL entry, the
-                # position was closed/reopened and we have a stale TP/SL from the old trade.
-                # Refresh with current values and skip this cycle.
-                stored_entry = float(record.get('entry_px') or 0)
-                stored_direction = record.get('direction', '')
-                if stored_entry > 0 and entry_px > 0:
-                    entry_delta = abs(stored_entry - entry_px) / entry_px
-                    direction_changed = (
-                        stored_direction and
-                        stored_direction.upper() != direction.upper()
-                    )
-                    # Stale record: use the existing sl/tp from the record (already loaded at line 3062)
-                    if entry_delta > 0.001:
-                        log(f'  [SELF-CLOSE] ⚠️ {coin} stale record (entry drifted {entry_delta*100:.2f}%) — refreshing')
-                        _upsert_self_close(coin, direction, sz, entry_px, record['sl_price'], record['tp_price'])
-                        continue
-                    if direction_changed:
-                        log(f'  [SELF-CLOSE] ⚠️ {coin} direction changed ({stored_direction}→{direction}) — invalidating stale record')
-                        _upsert_self_close(coin, direction, sz, entry_px, record['sl_price'], record['tp_price'])
-                        continue
-                # Record is current — fall through to breach check below
-                sl_price = record['sl_price']
-                tp_price = record['tp_price']
-            else:
-                # No stored TP/SL — compute defaults (NORMAL_VOL, k=2.0)
-                from atr_cache import get_atr
-                # Use real ATR from cache if available; fall back to ATR_PCT_FALLBACK only.
-                real_atr = get_atr(coin, interval='1h')
-                if real_atr is not None and curr > 0:
-                    atr_pct = real_atr / curr
-                else:
-                    atr_pct = ATR_PCT_FALLBACK  # 2% assumed — only for first-seen coins
-                k = ATR_K_NORMAL_VOL  # 2.0 for NORMAL_VOL tier
-                k_tp = k * ATR_TP_K_MULT
-                sl_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, k * atr_pct))
-                tp_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, k_tp * atr_pct))
-                if direction == 'LONG':
-                    sl_price = curr * (1 - sl_pct)
-                    tp_price = curr * (1 + tp_pct)
-                else:
-                    sl_price = curr * (1 + sl_pct)
-                    tp_price = curr * (1 - tp_pct)
-                _upsert_self_close(coin, direction, sz, entry_px, sl_price, tp_price)
-                continue  # Store now, check next cycle
 
-            # Determine breach
-            triggered = False
-            trigger_reason = None
+            # ── Refresh TP/SL FIRST, then breach check ─────────────────────────────
+            # FIX (2026-07-20): Previously the breach check ran BEFORE the refresh,
+            # using stale sl_price from DB (e.g. AAVE sl=97.99 from Apr-28 when AAVE
+            # was ~$98, causing false guardian_sl when new trade opened at $90).
+            # Now: compute fresh SL/TP based on current price, upsert to DB, THEN
+            # check breach against the fresh values.
+            from atr_cache import get_atr
+            real_atr = get_atr(coin, interval='1h')
+            if real_atr is not None and curr > 0:
+                atr_pct = real_atr / curr
+            else:
+                atr_pct = ATR_PCT_FALLBACK
+            k = ATR_K_NORMAL_VOL
+            k_tp = k * ATR_TP_K_MULT
+            sl_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, k * atr_pct))
+            tp_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, k_tp * atr_pct))
             if direction == 'LONG':
-                if curr <= sl_price:
-                    triggered = True
-                    trigger_reason = f"guardian_sl (px={curr} <= sl={sl_price})"
-                elif curr >= tp_price:
-                    triggered = True
-                    trigger_reason = f"guardian_tp (px={curr} >= tp={tp_price})"
+                fresh_sl = curr * (1 - sl_pct)
+                fresh_tp = curr * (1 + tp_pct)
             else:
-                if curr >= sl_price:
-                    triggered = True
-                    trigger_reason = f"guardian_sl (px={curr} >= sl={sl_price})"
-                elif curr <= tp_price:
-                    triggered = True
-                    trigger_reason = f"guardian_tp (px={curr} <= tp={tp_price})"
+                fresh_sl = curr * (1 + sl_pct)
+                fresh_tp = curr * (1 - tp_pct)
+            _upsert_self_close(coin, direction, sz, entry_px, fresh_sl, fresh_tp)
 
-            if not triggered:
+            # ── Breach check (uses FRESH values) ───────────────────────────────────
+            breach_triggered = False
+            breach_reason_str = None
+            if direction == 'LONG':
+                if fresh_sl > 0 and curr <= fresh_sl:
+                    breach_triggered = True
+                    breach_reason_str = f"guardian_sl (px={curr} <= sl={fresh_sl})"
+                elif fresh_tp > 0 and curr >= fresh_tp:
+                    breach_triggered = True
+                    breach_reason_str = f"guardian_tp (px={curr} >= tp={fresh_tp})"
+            elif direction == 'SHORT':
+                if fresh_sl > 0 and curr >= fresh_sl:
+                    breach_triggered = True
+                    breach_reason_str = f"guardian_sl (px={curr} >= sl={fresh_sl})"
+                elif fresh_tp > 0 and curr <= fresh_tp:
+                    breach_triggered = True
+                    breach_reason_str = f"guardian_tp (px={curr} <= tp={fresh_tp})"
+
+            # ── Fire breach if triggered ──────────────────────────────────────────
+            if breach_triggered and breach_reason_str:
+                log(f'  [SELF-CLOSE] 🚨 {coin} BREACH ({direction}): {breach_reason_str}', 'WARN')
+                _CLOSED_HL_COINS.add(coin.upper())
+                success = close_position_hl(coin, breach_reason_str)
+                result = {"ok": success, "coin": coin, "reason": breach_reason_str}
+                _mark_self_close_triggered(coin, result)
+            else:
+                # No breach — log fresh SL/TP for this cycle and continue
+                log(f'  [SELF-CLOSE] {coin} SL={fresh_sl:.6f} TP={fresh_tp:.6f} (no breach, px={curr})', 'INFO')
                 continue
-
-            log(f'  [SELF-CLOSE] 🚨 {coin} BREACH ({direction}): {trigger_reason}', 'WARN')
-            _CLOSED_HL_COINS.add(coin.upper())
-            success = close_position_hl(coin, trigger_reason)
-            result = {"ok": success, "coin": coin, "reason": trigger_reason}
-            _mark_self_close_triggered(coin, result)
             if success:
                 log(f'  [SELF-CLOSE] ✅ {coin} market close OK', 'PASS')
                 # ── FIX (2026-04-26): Also close the corresponding trades table entry ──
@@ -3202,8 +3228,8 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                                 hype_realized_pnl_usdt=%s
                             WHERE id=%s
                         """, (
-                            trigger_reason.split('(')[0].strip(),  # e.g. "guardian_sl" or "guardian_tp"
-                            trigger_reason.split('(')[0].strip(),
+                            breach_reason_str.split('(')[0].strip(),  # e.g. "guardian_sl" or "guardian_tp"
+                            breach_reason_str.split('(')[0].strip(),
                             hl_exit_px,
                             computed_pnl_pct,
                             computed_pnl_usdt,
@@ -3668,21 +3694,33 @@ def sync():
     # Stale marker cleanup — AFTER hl_pos is populated (not before).
     # When HL was rate-limited and returned {}, all markers were incorrectly cleared
     # as "stale" before the orphan close ever ran, causing the closing marker bug.
+    # Stale marker cleanup — AFTER hl_pos is populated.
+    # Only clear markers for tokens that the guardian has CONFIRMED closed.
+    # Tokens with active closing markers that are still on HL must stay blocked
+    # (guardian is mid-close or the close failed — either way decider_run stays blocked).
+    # Tokens NOT in hl_pos but WITHOUT an active marker: their close was already
+    # confirmed in a prior cycle, so the marker should have been cleared already.
+    # Don't auto-clear these either — let orphan-recovery handle them if needed.
     try:
         stale_markers = _load_closing_markers()
         for tok in list(stale_markers.keys()):
-            if tok not in hl_pos:
-                log(f'  [STALE-MARKER] {tok} no longer in HL — clearing closing marker')
+            if tok not in hl_pos and tok.upper() in _CLOSED_HL_COINS:
+                # Guardian confirmed this close — fill must have arrived.
+                # Safe to clear the marker.
+                log(f'  [STALE-MARKER] {tok} confirmed closed (fill received) — clearing closing marker')
                 _clear_closing_marker(tok)
                 # FIX (2026-06-12): If tok was pending retry but HL position is gone,
-                # clear the pending retry too — the close already happened (fills were
-                # found in a prior cycle and the DB trade was closed). No need to
-                # attempt close_position_hl on a non-existent position.
+                # clear the pending retry too — the close already happened.
                 pending = _load_pending_retry()
                 if tok.upper() in pending:
                     log(f'  [STALE-MARKER] {tok} also in pending retry — clearing pending retry', 'WARN')
-                    _CLOSED_HL_COINS.add(tok.upper())  # prevent Step 11 double-close
                     _clear_pending_retry([tok])
+            elif tok not in hl_pos and tok.upper() not in _CLOSED_HL_COINS:
+                # Token not on HL but guardian never confirmed the close.
+                # This means the close order was never placed or failed silently.
+                # DO NOT clear the marker — keep decider_run blocked.
+                # Orphan-recovery will handle creating a new paper trade for this HL position.
+                log(f'  [STALE-MARKER] {tok} not on HL but no confirmed close — keeping marker (orphan-recovery will handle)', 'WARN')
     except Exception:
         pass
 
@@ -3742,7 +3780,14 @@ def sync():
 
             success = close_position_hl(coin, 'guardian_orphan')
             if success:
-                time.sleep(6)  # Wait for fills to appear
+                # FIX: Wait up to 30s for HL fill confirmation before closing DB.
+                # Previously used time.sleep(6) which was never enough — fills can take
+                # 30-60s to appear on HL, causing duplicate orphan trades each cycle.
+                filled = _wait_for_position_closed(coin.upper(), timeout=30)
+                if not filled:
+                    log(f'  Orphan {coin}: fill not confirmed after 30s — keeping marker, will retry next cycle', 'WARN')
+                    # Keep the closing marker active so decider_run stays blocked
+                    continue
 
                 # Find the orphan paper trade that reconcile_hype_to_paper created
                 # and close it directly with the actual HL exit price.
