@@ -426,17 +426,24 @@ def compute_atr_sl_tp(
     # for the wrong-side case.
     if current_price and current_price > 0 and new_sl and new_sl > 0:
         if direction == 'LONG' and new_sl >= current_price:
-            snapped = round(current_price * (1 - max(ATR_SL_MIN_INIT, 0.003)), 8)
-            print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
-                  f">= current {current_price:.6f}; snapping to {snapped:.6f}")
-            new_sl = snapped
-            result['_force_write'] = True
+            # Only snap if SL is below entry — that's truly wrong-side.
+            # If SL is above entry, it's a profitable trailing stop — let it through.
+            if new_sl < entry_f:
+                snapped = round(current_price * (1 - max(ATR_SL_MIN_INIT, 0.003)), 8)
+                print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
+                      f">= current {current_price:.6f} but below entry {entry_f:.6f}; snapping to {snapped:.6f}")
+                new_sl = snapped
+                result['_force_write'] = True
+            else:
+                # SL above entry = profitable trailing stop — keep it, don't snap
+                pass
         elif direction == 'SHORT' and new_sl <= current_price:
-            snapped = round(current_price * (1 + max(ATR_SL_MIN_INIT, 0.003)), 8)
-            print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
-                  f"<= current {current_price:.6f}; snapping to {snapped:.6f}")
-            new_sl = snapped
-            result['_force_write'] = True
+            if new_sl > entry_f:
+                snapped = round(current_price * (1 + max(ATR_SL_MIN_INIT, 0.003)), 8)
+                print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
+                      f"<= current {current_price:.6f} but above entry {entry_f:.6f}; snapping to {snapped:.6f}")
+                new_sl = snapped
+                result['_force_write'] = True
 
     # ── Trailing SL gate ────────────────────────────────────────────────────────
     # LONG:  SL must trail UP as price rises — only tighten if new_sl > current_sl.
