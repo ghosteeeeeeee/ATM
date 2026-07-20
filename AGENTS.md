@@ -182,6 +182,8 @@ python3 scripts/signal_compactor.py --verbose
 
 **Constraints:** `ATR_SL_MIN_ACCEL < ATR_SL_MIN_INIT < ATR_SL_MAX` and `ATR_TP_MIN_ACCEL < ATR_TP_MIN`
 
+**Breakeven Guard:** For established trades, SL never drops below entry price. Ensures profit is locked once price moves favorably.
+
 ## MCP Server
 
 Coding MCP server at `/root/.hermes/mcp/hermes-coding-mcp/server.py` provides Hebbian tools (hebbian_recall, hebbian_learn, hebbian_stats). Configured in `config.yaml` under `mcp_servers`.
