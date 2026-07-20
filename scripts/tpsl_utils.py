@@ -252,6 +252,7 @@ def compute_atr_sl_tp(
     momentum_stats: Optional[dict] = None,
     speed_percentile: float = 50.0,
     flip_k_override: Optional[float] = None,
+    trade_open_time: Optional[str] = None,
 ) -> dict:
     """
     Compute trailing ATR SL and TP for a position.
@@ -297,6 +298,37 @@ def compute_atr_sl_tp(
     # Once the initial SL has been written (current_sl > 0) and the trade is in
     # profit, the canonical peak-anchored trailing behavior takes over.
     is_initial_write = (not current_sl or float(current_sl) <= 0)
+
+    # ── BRAND-NEW TRADE GUARD (FIX 2026-07-20) ──────────────────────────────────
+    # If the pipeline lock is released immediately (run_pipeline.py:176), two
+    # position_manager runs can overlap. The first sets SL correctly anchored to
+    # entry_price. The second sees current_sl > 0 (is_initial_write=False) and
+    # re-anchors to lowest_price/highest_price — which for SHORT trades with
+    # hl_fill < entry produces a SL below entry, triggering instantly.
+    # Fix: if the trade was opened within the last 2 minutes, still treat as
+    # initial write regardless of current_sl value, and treat as new trade
+    # (INIT floor + breakeven guard bypass).
+    _brand_new = False
+    if trade_open_time:
+        try:
+            from datetime import datetime, timezone
+            _now = datetime.now(timezone.utc)
+            if isinstance(trade_open_time, str):
+                _open = datetime.fromisoformat(trade_open_time.replace('Z', '+00:00'))
+            else:
+                _open = trade_open_time
+            if _open.tzinfo is None:
+                _open = _open.replace(tzinfo=timezone.utc)
+            _age_s = (_now - _open).total_seconds()
+            if _age_s < 120:
+                _brand_new = True
+                if not is_initial_write:
+                    is_initial_write = True
+                    print(f"  [TPSL] {token}: BRAND-NEW TRADE GUARD — trade opened {_age_s:.0f}s ago, "
+                          f"forcing is_initial_write=True (prevents wrong-anchor overwrite)")
+        except Exception:
+            pass
+
     if direction == 'LONG':
         if is_initial_write and entry_price > 0:
             ref_price = float(entry_price)
@@ -374,6 +406,11 @@ def compute_atr_sl_tp(
     elif direction == 'SHORT' and lowest_price > 0:
         if abs(lowest_price - entry_f) / entry_f < 0.001:
             is_new_trade = True
+
+    # ── BRAND-NEW TRADE: also force is_new_trade ────────────────────────────────
+    # Use the _brand_new flag computed in the guard above (avoids duplicate parsing).
+    if not is_new_trade and _brand_new:
+        is_new_trade = True
 
     # ── Determine MIN floor for this trade state ────────────────────────────────
     if is_new_trade:

@@ -1517,15 +1517,10 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
         print(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
     else:
-        # SHORT: SL trails ABOVE current price as it falls (locks in profit)
-        # SL = current_price + ATR_SL_MIN buffer — tight trailing for acceleration phase
-        # The buffer is relative to current price, so as price falls, SL falls too
-        result = current_price * (1 + ATR_SL_MIN)
+        # SHORT: SL = entry + k·ATR, never below current price (catches rallies)
+        sl = entry_price * (1 + effective_sl_pct)
+        result = max(sl, current_price * (1 + ATR_SL_MIN))
         print(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
-        # BUG CHECK
-        _in_profit = (current_price < entry_price) if (entry_price > 0 and current_price > 0) else False
-        if entry_price > 0 and current_price > 0:
-            print(f"  [_dynSL]   SHORT BUG-CHECK: SL-entry={((result-entry_price)/entry_price)*100:.2f}% SL-current={((result-current_price)/current_price)*100:.2f}% in_profit={_in_profit}")
         return result
 
 
@@ -1579,7 +1574,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         return []
 
     # Deduplicate tokens — one ATR fetch per unique token
-    tokens_seen: Dict[str, float | None] = {}
+    tokens_seen: Dict[str, Optional[float]] = {}
     for pos in open_positions:
         token = str(pos.get('token', '')).upper()
         if token and token not in tokens_seen:
@@ -1695,6 +1690,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             momentum_stats=momentum_by_token.get(token),
             speed_percentile=speed_by_token.get(token, 50),
             flip_k_override=flip_k_override,
+            trade_open_time=pos.get('open_time'),
         )
 
         new_sl = result['new_sl']
