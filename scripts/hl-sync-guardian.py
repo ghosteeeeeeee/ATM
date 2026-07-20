@@ -3110,7 +3110,6 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
     }
 
     if unprot_hl_pos:
-        self_close_records = {r['coin'].upper(): r for r in _get_all_self_close_records()}
         for coin, pos_data in unprot_hl_pos.items():
             if coin in _CLOSED_HL_COINS:
                 continue
@@ -3123,8 +3122,6 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             curr = prices.get(coin, 0)
             if curr == 0:
                 continue
-
-            record = self_close_records.get(coin)
 
             # ── Refresh TP/SL FIRST, then breach check ─────────────────────────────
             # FIX (2026-07-20): Previously the breach check ran BEFORE the refresh,
