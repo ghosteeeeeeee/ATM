@@ -69,8 +69,8 @@ def _atr_tier(atr_pct: float) -> float:
     if atr_pct < ATR_PCT_LOW_THRESH:
         return ATR_K_LOW_VOL    # <1%: tight SL
     elif atr_pct > ATR_PCT_HIGH_THRESH:
-        return ATR_K_HIGH_VOL   # >3%: wide SL
-    return ATR_K_NORMAL_VOL     # 1-3%: balanced
+        return ATR_K_HIGH_VOL   # >1.5%: wide SL
+    return ATR_K_NORMAL_VOL     # 0.5-1.5%: balanced
 
 
 def _phase_from_pct(pct: float, velocity: float) -> str:
@@ -333,7 +333,14 @@ def compute_atr_sl_tp(
         if is_initial_write and entry_price > 0:
             ref_price = float(entry_price)
         elif highest_price > 0:
-            ref_price = float(highest_price)
+            # For LONG: trail from highest_price (best price seen).
+            # But ONLY if highest_price > entry (trade is in profit).
+            # If highest_price <= entry (trade in loss), use entry_price
+            # to prevent SL from trailing against the trade.
+            if float(highest_price) > float(entry_price):
+                ref_price = float(highest_price)
+            else:
+                ref_price = float(entry_price)
         elif current_price and current_price > 0:
             ref_price = float(current_price)
         else:
@@ -342,7 +349,14 @@ def compute_atr_sl_tp(
         if is_initial_write and entry_price > 0:
             ref_price = float(entry_price)
         elif lowest_price > 0:
-            ref_price = float(lowest_price)
+            # For SHORT: trail from lowest_price (best price seen).
+            # But ONLY if lowest_price < entry (trade is in profit).
+            # If lowest_price >= entry (trade in loss), use entry_price
+            # to prevent SL from trailing against the trade.
+            if float(lowest_price) < float(entry_price):
+                ref_price = float(lowest_price)
+            else:
+                ref_price = float(entry_price)
         elif current_price and current_price > 0:
             ref_price = float(current_price)
         else:
@@ -401,10 +415,10 @@ def compute_atr_sl_tp(
     is_new_trade = False
 
     if direction == 'LONG' and highest_price > 0:
-        if abs(highest_price - entry_f) / entry_f < 0.001:
+        if abs(highest_price - entry_f) / entry_f < 0.001 and _brand_new:
             is_new_trade = True
     elif direction == 'SHORT' and lowest_price > 0:
-        if abs(lowest_price - entry_f) / entry_f < 0.001:
+        if abs(lowest_price - entry_f) / entry_f < 0.001 and _brand_new:
             is_new_trade = True
 
     # ── BRAND-NEW TRADE: also force is_new_trade ────────────────────────────────
@@ -418,11 +432,11 @@ def compute_atr_sl_tp(
             k = _atr_tier(atr_pct)  # reset to base k — no acceleration squeeze
         # else: preserve flip_k_override (set above, don't overwrite)
         sl_pct = k * atr_pct
-        MIN_SL_PCT = ATR_SL_MIN_INIT   # 0.6% — wider for new trades (breathing room)
+        MIN_SL_PCT = ATR_SL_MIN_INIT   # 1.0% — wider for new trades (breathing room)
         MIN_TP_PCT = ATR_TP_MIN         # 1.5% — wider for new trades
     else:
-        MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.5% — tighter for established trades (phase logic bites)
-        MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.2% — tighter for established trades
+        MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.15% — tighter for established trades (phase logic bites)
+        MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades
 
     # ── Clamp effective percentages ─────────────────────────────────────────────
     # Initial SL set (current_sl is 0/None): also cap at ATR_SL_MAX_INIT
@@ -458,29 +472,91 @@ def compute_atr_sl_tp(
     # ── WRONG-SIDE SAFETY NET (FIX 2026-07-19) ──────────────────────────────────
     # Last-line guard: if any other code path or future regression produces a
     # new_sl that is on the wrong side of current_price, snap it to a safe
-    # distance instead of writing a guaranteed-stop-out. The 0.30% safety
-    # buffer is the same floor as ATR_SL_MIN_INIT so we don't paper-thin the SL
-    # for the wrong-side case.
+    # distance instead of writing a guaranteed-stop-out.
+    # FIX (2026-07-24): When price is deep in loss, don't let the guard create
+    # SL that's 3%+ below entry. Use tighter of entry-based and current-price-based.
+    # If price is already far below entry, the ATR-based SL (which ran before this
+    # guard) is usually correct — only snap if the ATR SL itself was wrong.
     if current_price and current_price > 0 and new_sl and new_sl > 0:
         if direction == 'LONG' and new_sl >= current_price:
             # Only snap if SL is below entry — that's truly wrong-side.
-            # If SL is above entry, it's a profitable trailing stop — let it through.
             if new_sl < entry_f:
-                snapped = round(current_price * (1 - max(ATR_SL_MIN_INIT, 0.003)), 8)
-                print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
-                      f">= current {current_price:.6f} but below entry {entry_f:.6f}; snapping to {snapped:.6f}")
+                # How far is current price from entry?
+                loss_from_entry = (entry_f - current_price) / entry_f
+                _snap_dist = max(0.002, k * atr_pct) if k and atr_pct else 0.002
+                if loss_from_entry > 0.015:
+                    # Deep loss: use entry-based SL, not current-price chase.
+                    snapped = round(entry_f * (1 - max(ATR_SL_MIN_INIT, _snap_dist)), 8)
+                    if snapped >= current_price:
+                        snapped = round(current_price * (1 - _snap_dist * 2), 8)
+                    print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — deep loss "
+                          f"({loss_from_entry*100:.1f}% from entry), proposed SL {new_sl:.6f} "
+                          f">= current {current_price:.6f}; entry-anchored → {snapped:.6f}")
+                else:
+                    # Price close to entry — snap to ATR_SL_MIN_INIT below entry
+                    snapped = round(entry_f * (1 - max(ATR_SL_MIN_INIT, 0.003)), 8)
+                    # Ensure below current price
+                    if snapped >= current_price:
+                        snapped = round(current_price * (1 - _snap_dist), 8)
+                    print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
+                          f">= current {current_price:.6f} but below entry {entry_f:.6f}; snapping to {snapped:.6f}")
                 new_sl = snapped
-                result['_force_write'] = True
+                if current_sl > 0 and snapped <= current_sl:
+                    result['_force_write'] = False
+                else:
+                    result['_force_write'] = True
             else:
-                # SL above entry = profitable trailing stop — keep it, don't snap
-                pass
+                # new_sl >= current_price AND new_sl >= entry_f
+                # Still wrong-side for LONG — snap below current with ATR buffer
+                _snap_dist = max(0.002, k * atr_pct) if k and atr_pct else 0.002
+                snapped = round(current_price * (1 - _snap_dist), 8)
+                print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — SL {new_sl:.6f} "
+                      f">= current {current_price:.6f} and >= entry; snapping to {_snap_dist*100:.2f}% below current → {snapped:.6f}")
+                new_sl = snapped
+                if current_sl > 0 and snapped <= current_sl:
+                    result['_force_write'] = False
+                else:
+                    result['_force_write'] = True
         elif direction == 'SHORT' and new_sl <= current_price:
             if new_sl > entry_f:
-                snapped = round(current_price * (1 + max(ATR_SL_MIN_INIT, 0.003)), 8)
-                print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
-                      f"<= current {current_price:.6f} but above entry {entry_f:.6f}; snapping to {snapped:.6f}")
+                loss_from_entry = (current_price - entry_f) / entry_f
+                _snap_dist = max(0.002, k * atr_pct) if k and atr_pct else 0.002
+                if loss_from_entry > 0.015:
+                    # Deep loss: use entry-based SL, not current-price chase.
+                    # Anchoring to entry prevents "SL perpetually 0.3% above current" pattern.
+                    snapped = round(entry_f * (1 + max(ATR_SL_MIN_INIT, _snap_dist)), 8)
+                    if snapped <= current_price:
+                        # If entry-based SL is still below current, use wider buffer
+                        snapped = round(current_price * (1 + _snap_dist * 2), 8)
+                    print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — deep loss "
+                          f"({loss_from_entry*100:.1f}% from entry), proposed SL {new_sl:.6f} "
+                          f"<= current {current_price:.6f}; entry-anchored → {snapped:.6f}")
+                else:
+                    snapped = round(entry_f * (1 + max(ATR_SL_MIN_INIT, 0.003)), 8)
+                    if snapped <= current_price:
+                        snapped = round(current_price * (1 + _snap_dist), 8)
+                    print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
+                          f"<= current {current_price:.6f} but above entry {entry_f:.6f}; snapping to {snapped:.6f}")
                 new_sl = snapped
-                result['_force_write'] = True
+                # Only force write if snapped SL is actually tighter than current SL.
+                # If snapped >= current_sl, the guard is loosening — let trailing gate decide.
+                if current_sl > 0 and snapped >= current_sl:
+                    result['_force_write'] = False  # trailing gate will block
+                else:
+                    result['_force_write'] = True
+            else:
+                # new_sl <= entry_f — SL below entry AND below current price.
+                # Would trigger immediate stop-out for SHORT. Snap to safe distance above current.
+                _snap_dist = max(0.002, k * atr_pct) if k and atr_pct else 0.002
+                snapped = round(current_price * (1 + _snap_dist), 8)
+                print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — SL below entry "
+                      f"({new_sl:.6f} <= entry {entry_f:.6f}) and below current "
+                      f"({current_price:.6f}); snapping to {_snap_dist*100:.2f}% above current → {snapped:.6f}")
+                new_sl = snapped
+                if current_sl > 0 and snapped >= current_sl:
+                    result['_force_write'] = False
+                else:
+                    result['_force_write'] = True
 
     # ── Trailing SL gate ────────────────────────────────────────────────────────
     # LONG:  SL must trail UP as price rises — only tighten if new_sl > current_sl.
@@ -505,10 +581,19 @@ def compute_atr_sl_tp(
                 # new_sl RAISES = tighten upward — correct, allow
                 result['needs_sl'] = True
             elif current_on_wrong_side:
-                # current_sl is ABOVE current (in loss zone) but new_sl doesn't raise it enough.
-                # This means the position is already wrong-sided — force write so TP/SL is set right.
-                result['needs_sl'] = True
-                result['_force_write'] = True
+                # current_sl is ABOVE current_price (wrong side for LONG).
+                # The old SL should have already triggered a stop-out via guardian.
+                # If new_sl would loosen (lower than current_sl), KEEP the old SL
+                # so the guardian can still close the trade. Only force write if
+                # new_sl actually tightens (raises).
+                if new_sl > current_sl:
+                    # new_sl tightens even though wrong-side — allow correction
+                    result['needs_sl'] = True
+                    result['_force_write'] = True
+                else:
+                    # new_sl would loosen — keep old SL so guardian closes
+                    new_sl = current_sl
+                    result['needs_sl'] = False
             elif result.get('_force_write'):
                 # Guard already snapped new_sl to a safe value — allow it through
                 result['needs_sl'] = True
@@ -525,13 +610,16 @@ def compute_atr_sl_tp(
                 # new_sl LOWERS = tighten downward — correct, allow
                 result['needs_sl'] = True
             elif current_on_wrong_side:
-                # current_sl is ABOVE current (in loss zone for SHORT).
-                # Only force write if new_sl actually tightens — don't propagate loosening.
+                # current_sl is BELOW current_price (wrong side for SHORT).
+                # If new_sl would loosen (higher than current_sl), KEEP the old SL
+                # so the guardian can still close the trade. Only force write if
+                # new_sl actually tightens (lowers).
                 if new_sl < current_sl:
+                    # new_sl tightens even though wrong-side — allow correction
                     result['needs_sl'] = True
                     result['_force_write'] = True
                 else:
-                    # new_sl would loosen or equal — block even if wrong-side
+                    # new_sl would loosen — keep old SL so guardian closes
                     new_sl = current_sl
                     result['needs_sl'] = False
             elif result.get('_force_write'):
@@ -543,25 +631,20 @@ def compute_atr_sl_tp(
         else:
             result['needs_sl'] = True  # first time set
 
-    # ── BREAKEVEN GUARD ────────────────────────────────────────────────────────
-    # For established trades (not new), SL must never drop below entry price.
-    # This ensures profit is locked in once price moves favorably.
-    # Without this, ATR_SL_MIN_ACCEL anchored to peak allows SL to sit below
-    # entry even at +0.75% peak — giving back all profit on reversal.
-    if not is_new_trade:
-        if direction == 'LONG' and new_sl < entry_f:
-            new_sl = entry_f
-            result['needs_sl'] = True
-        elif direction == 'SHORT' and new_sl > entry_f:
-            new_sl = entry_f
-            result['needs_sl'] = True
+    # ── BREAKEVEN GUARD (REMOVED 2026-07-26) ──────────────────────────────────
+    # Previously snapped SL to entry when trade was in profit (pnl_pct >= 0).
+    # Removed because: (1) ATR SL with 0.15% floor already trails tightly,
+    # (2) guard killed short-lived mean-reversion trades (inv-accel-300) by
+    # snapping SL to entry on first tick of profit before signal could develop.
+    # ATR_SL_MIN_ACCEL anchored to peak naturally keeps SL near entry for
+    # low-vol tokens — explicit guard is redundant and harmful.
 
     # ── Trailing TP gate (only tighten, never loosen) ──────────────────────────
     # LONG:  TP only increases (numerically higher = further from entry).
     # SHORT: TP only decreases (numerically lower = further from entry).
     if direction == 'LONG':
         if current_tp > 0:
-            tp_at_ref = round(ref_price * (1 + tp_pct), 8)  # raw, no floor (tighten check)
+            tp_at_ref = round(ref_price * (1 + eff_tp_pct), 8)  # floored (matches SHORT)
             if tp_at_ref < current_tp:
                 new_tp = current_tp  # would loosen — block
                 result['needs_tp'] = False

@@ -40,44 +40,51 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-# Lookback window (~10h = 120 candles at 5m to capture full diagonal pattern)
-TL_LOOKBACK           = 120   # candles — wider window to capture full diagonal
-TL_LOOKBACK_MIN       = 80    # minimum required
+# Lookback window (~6h = 72 candles at 5m)
+TL_LOOKBACK           = 72    # candles
+TL_LOOKBACK_MIN       = 50    # minimum required
 
-# Diagonal zone: first 70% of lookback (84 candles = ~7h)
-# Breakout zone: last 30% of lookback (36 candles = ~3h)
-TL_DIAGONAL_CUTOFF    = 0.70
-TL_BREAKOUT_ZONE      = 0.30
+# Trendline fitting zone: first 75% of lookback (54 candles = ~4.5h)
+# Breakout confirmation zone: last 25% of lookback (18 candles = ~1.5h)
+TL_FIT_CUTOFF         = 0.75
+TL_BREAKOUT_CANDLES   = 15    # breakout must confirm within 15 candles (75 min)
 
-# Diagonal detection: anchor at START (closes[0]), measure slope to end of zone
-# The diagonal slope magnitude must be large enough to form a visible diagonal
-TL_SLOPE_MAG_MIN      = 0.0000005   # barely above zero — filter only flat/ranging
+# Trendline detection: linear regression on closes in fit zone
+# R² must be high enough to confirm a real trendline (not noise)
+TL_R2_MIN             = 0.40  # minimum R² for trendline validity (5m crypto is noisy)
+TL_SLOPE_PCT_MIN      = 0.0002 # minimum slope as % of price per candle (~0.1%/hr)
 
-# Bounce detection: price must be close to diagonal (within this ATR multiple)
-# A bounce = price touched diagonal and next candle confirms the touch
-TL_BOUNCE_ATR_K       = 2.0   # within 2.0 * ATR(14) of diagonal
-TL_MIN_BOUNCES        = 2     # minimum 2 bounce touches in diagonal zone
+# Bounce detection: price must touch the trendline (wick or close within threshold)
+# A bounce = candle touches trendline AND next candle closes AWAY from it (rejection)
+TL_BOUNCE_ATR_K       = 0.5   # within 0.5 * ATR(14) of trendline (tight)
+TL_MIN_BOUNCES        = 3     # minimum 3 touches in fit zone
+TL_MAX_BOUNCE_RATIO   = 0.20  # bounces cannot exceed 20% of fit candles (filters noise)
+TL_REJECTION_ATR_K    = 0.25  # rejection must move 0.25+ ATR away from line
 
-# Breakout confirmation: price must be beyond diagonal by this much
-TL_BREAKOUT_ATR_K     = 0.35  # 0.35 * ATR(14) beyond diagonal level
-TL_FOLLOWTHROUGH_K    = 0.20  # 20%+ of breakout candles must stay beyond diagonal
+# Breakout confirmation: price must close beyond trendline + threshold
+TL_BREAKOUT_ATR_K     = 0.4   # 0.4 * ATR(14) beyond trendline
+TL_FOLLOWTHROUGH_MIN  = 4     # minimum candles closing beyond line in breakout zone
 
 # ATR settings
 TL_ATR_PERIOD         = 14
 
 # Confidence scoring
-TL_BASE_CONFIDENCE    = 64
-TL_BOUNCE_BONUS_MAX   = 12   # per extra bounce beyond 2
-TL_SLOPE_BONUS_MAX    = 8    # steeper diagonal = more valid
-TL_FOLLOWTHROUGH_BONUS = 10
-TL_BREAKOUT_BONUS_MAX = 8
-TL_MAX_CONFIDENCE     = 88
+TL_BASE_CONFIDENCE    = 60
+TL_BOUNCE_BONUS       = 3    # per extra bounce beyond min
+TL_R2_BONUS_MAX       = 10   # higher R² = stronger trendline
+TL_REJECTION_BONUS    = 5    # strong rejection = valid bounce
+TL_FOLLOWTHROUGH_BONUS = 5
+TL_BREAKOUT_BONUS_MAX = 5
+TL_MAX_CONFIDENCE     = 85
 
 # Cooldown: don't fire again within this many hours
 TL_COOLDOWN_HOURS     = 3
 
 TL_SIGNAL_TYPE        = 'tl_break'
 _PRICE_DB             = '/root/.hermes/data/candles.db'
+
+# Per-token cooldown cache (loaded from DB on first call)
+_TL_COOLDOWN_CACHE = {}  # {token: last_fire_timestamp}
 
 # ── Candle Fetching ───────────────────────────────────────────────────────────
 
@@ -146,23 +153,6 @@ def _atr(candles: list, period: int = TL_ATR_PERIOD) -> Optional[float]:
     return atr
 
 
-def _linear_regression(closes: List[float]) -> Tuple[float, float]:
-    """Compute slope and intercept of linear regression on closes."""
-    n = len(closes)
-    if n < 2:
-        return 0.0, (sum(closes) / n) if closes else 0.0
-    sum_x = sum(range(n))
-    sum_y = sum(closes)
-    sum_xy = sum(i * c for i, c in enumerate(closes))
-    sum_x2 = sum(i * i for i in range(n))
-    denom = n * sum_x2 - sum_x * sum_x
-    if abs(denom) < 1e-10:
-        return 0.0, sum_y / n
-    slope = (n * sum_xy - sum_x * sum_y) / denom
-    intercept = (sum_y - slope * sum_x) / n
-    return slope, intercept
-
-
 def _trendline_price(slope: float, intercept: float, index: int) -> float:
     """Get the trendline price at candle index `index`."""
     return slope * index + intercept
@@ -170,155 +160,154 @@ def _trendline_price(slope: float, intercept: float, index: int) -> float:
 
 # ── Core Detection ─────────────────────────────────────────────────────────────
 
-def _detect_diagonal(closes: List[float], diag_end: int) -> Optional[Dict]:
-    """Detect diagonal trendline from closes[0] to closes[diag_end-1].
+def _linear_regression_with_r2(closes: List[float]) -> Tuple[float, float, float]:
+    """Linear regression on closes. Returns (slope, intercept, R²)."""
+    n = len(closes)
+    if n < 2:
+        return 0.0, (sum(closes) / n) if closes else 0.0, 0.0
+    sum_x = sum(range(n))
+    sum_y = sum(closes)
+    sum_xy = sum(i * c for i, c in enumerate(closes))
+    sum_x2 = sum(i * i for i in range(n))
+    denom = n * sum_x2 - sum_x * sum_x
+    if abs(denom) < 1e-10:
+        return 0.0, sum_y / n, 0.0
+    slope = (n * sum_xy - sum_x * sum_y) / denom
+    intercept = (sum_y - slope * sum_x) / n
+    # R² calculation
+    mean_y = sum_y / n
+    ss_tot = sum((y - mean_y) ** 2 for y in closes)
+    ss_res = sum((closes[i] - (intercept + slope * i)) ** 2 for i in range(n))
+    r2 = max(0.0, 1.0 - ss_res / ss_tot) if ss_tot > 0 else 0.0
+    return slope, intercept, r2
 
-    Anchor at START (closes[0]). Direction from slope of start→end.
-    Returns dict with slope, intercept, direction, n_touches or None.
+
+def _detect_trendline(closes: List[float], fit_end: int) -> Optional[Dict]:
+    """Detect trendline using linear regression on closes[0:fit_end].
+
+    Returns dict with slope, intercept, R², direction or None.
+    Direction: descending line (slope<0) → LONG breakout, ascending → SHORT breakout.
     """
-    if diag_end < 20:
+    if fit_end < 20:
         return None
 
-    start_price = closes[0]
-    end_price = closes[diag_end - 1]
+    fit_closes = closes[:fit_end]
+    slope, intercept, r2 = _linear_regression_with_r2(fit_closes)
 
-    # Diagonal slope: start to end of zone
-    diag_slope = (end_price - start_price) / (diag_end - 1)
-
-    # Slope magnitude check — filter flat/ranging
-    if abs(diag_slope) < TL_SLOPE_MAG_MIN:
+    if r2 < TL_R2_MIN:
         return None
 
-    # Direction: down-slope → LONG breakout, up-slope → SHORT breakout
-    if diag_slope < 0:
-        direction = 'LONG'
-    else:
-        direction = 'SHORT'
+    # Slope as % of average price per candle
+    avg_price = sum(fit_closes) / len(fit_closes)
+    if avg_price <= 0:
+        return None
+    slope_pct = abs(slope) / avg_price
+    if slope_pct < TL_SLOPE_PCT_MIN:
+        return None
 
-    # ATR for normalization
-    # We pass candles directly; caller computes ATR first
+    # Direction: descending trendline → LONG breakout, ascending → SHORT
+    direction = 'LONG' if slope < 0 else 'SHORT'
 
     return {
-        'slope': diag_slope,
-        'start_price': start_price,
+        'slope': slope,
+        'intercept': intercept,
+        'r2': r2,
         'direction': direction,
-        'diag_end': diag_end,
+        'avg_price': avg_price,
     }
 
 
-def _count_touches(closes: List[float], diag_slope: float, start_price: float,
-                    diag_end: int, atr: float, direction: str) -> Tuple[int, List[int]]:
-    """Count how many candles in the diagonal zone bounced off the diagonal line.
+def _count_bounces_with_rejection(closes: List[float], slope: float, intercept: float,
+                                   fit_end: int, atr: float, direction: str) -> Tuple[int, float]:
+    """Count bounces off the trendline with rejection validation.
 
-    A bounce: price was close to diagonal (within TL_BOUNCE_ATR_K * ATR),
-    AND the next candle moves AWAY from the diagonal in the breakout direction.
+    A valid bounce:
+      1. Candle is on the correct side of trendline (approaching from below for LONG,
+         from above for SHORT) within TL_BOUNCE_ATR_K * ATR
+      2. Next candle closes AWAY from trendline (rejection) by TL_REJECTION_ATR_K * ATR
 
-    For LONG (diagonal slopes down → expect upside break):
-      Bounce = candle touched diagonal from below, next candle went above diagonal
-    For SHORT (diagonal slopes up → expect downside break):
-      Bounce = candle touched diagonal from above, next candle went below diagonal
-
-    Returns: (touch_count, list_of_bounce_indices)
+    Returns (bounce_count, avg_rejection_strength).
     """
-    bounce_indices = []
-    thresh = atr * TL_BOUNCE_ATR_K
-    diag_end_idx = min(diag_end, len(closes) - 2)  # need i+1
+    bounce_thresh = atr * TL_BOUNCE_ATR_K
+    rejection_thresh = atr * TL_REJECTION_ATR_K
+    bounce_count = 0
+    rejection_strengths = []
 
-    for i in range(1, diag_end_idx):
-        tl_i = start_price + diag_slope * i
-        price = closes[i]
-        diff = abs(price - tl_i)
+    for i in range(fit_end - 1):
+        tl_price = slope * i + intercept
+        candle = closes[i]
+        next_candle = closes[i + 1]
 
-        if diff > thresh:
+        # Check approach direction: candle must be approaching from the correct side
+        if direction == 'LONG':
+            # Descending resistance: price approaches from BELOW the line
+            if candle > tl_price + bounce_thresh:
+                continue  # candle is above line — not a valid approach
+        else:  # SHORT
+            # Ascending support: price approaches from ABOVE the line
+            if candle < tl_price - bounce_thresh:
+                continue  # candle is below line — not a valid approach
+
+        # Check if candle is near trendline
+        dist = abs(candle - tl_price)
+        if dist > bounce_thresh:
             continue
 
-        next_tl = start_price + diag_slope * (i + 1)
-        next_price = closes[i + 1]
+        # Check rejection: next candle must close away from line
+        next_tl = slope * (i + 1) + intercept
+        next_dist = next_candle - next_tl
 
         if direction == 'LONG':
-            # Bounce = price was below diagonal, next candle breaks above
-            if price < tl_i and next_price > next_tl:
-                bounce_indices.append(i)
+            # Descending resistance: rejection DOWNWARD (back below line)
+            if next_dist < -rejection_thresh:
+                bounce_count += 1
+                rejection_strengths.append(abs(next_dist))
         else:  # SHORT
-            # Bounce = price was above diagonal, next candle breaks below
-            if price > tl_i and next_price < next_tl:
-                bounce_indices.append(i)
+            # Ascending support: rejection UPWARD (back above line)
+            if next_dist > rejection_thresh:
+                bounce_count += 1
+                rejection_strengths.append(abs(next_dist))
 
-    return len(bounce_indices), bounce_indices
+    avg_rejection = sum(rejection_strengths) / len(rejection_strengths) if rejection_strengths else 0.0
+    return bounce_count, avg_rejection
 
 
-def _cluster_bounces_simple(bounce_indices: List[int], closes: List[float],
-                             diag_slope: float, start_price: float,
-                             atr: float) -> Optional[float]:
-    """Cluster bounces by price level. If 2+ bounces are within 3*ATR, valid zone.
+def _detect_breakout(closes: List[float], slope: float, intercept: float,
+                     fit_end: int, atr: float, direction: str) -> Tuple[bool, float, int]:
+    """Detect breakout in the candles after fit_end.
 
-    For any pair of bounces with gap <= 3*ATR, compute their midpoint as zone.
-    Use the pair with smallest gap as primary zone (most coherent level).
+    Breakout: candle closes beyond trendline + threshold, followed by
+    follow-through candles staying beyond the line.
+
+    Returns (breakout_detected, breakout_strength_atr, follow_through_count).
     """
-    if len(bounce_indices) < 2:
-        return None
-    zone_half = atr * 3.0
-    bp = sorted([start_price + diag_slope * idx for idx in bounce_indices])
-
-    # Find all pairs with gap <= zone_half, pick the tightest one
-    best_zone = None
-    best_gap = float('inf')
-    for i in range(len(bp)):
-        for j in range(i + 1, len(bp)):
-            gap = bp[j] - bp[i]
-            if gap <= zone_half and gap < best_gap:
-                best_gap = gap
-                best_zone = (bp[i] + bp[j]) / 2.0
-
-    return best_zone
-
-
-def _detect_breakout(closes: List[float], diag_slope: float, start_price: float,
-                     diag_end: int, breakout_end: int,
-                     atr: float, direction: str) -> Tuple[bool, float, float]:
-    """Detect if price has broken out of the diagonal in the breakout zone.
-
-    Breakout zone: candles from diag_end to end of window.
-
-    For LONG (diagonal slopes down): price must be ABOVE diagonal + threshold
-    For SHORT (diagonal slopes up): price must be BELOW diagonal - threshold
-
-    Returns: (breakout_detected, breakout_pct_atr, follow_through_score)
-    """
-    if breakout_end <= diag_end:
-        return False, 0.0, 0.0
-
-    breakout_candles = closes[diag_end:breakout_end]
-    if len(breakout_candles) < 2:
-        return False, 0.0, 0.0
+    breakout_start = fit_end
+    breakout_end = min(fit_end + TL_BREAKOUT_CANDLES, len(closes))
+    if breakout_end <= breakout_start + 2:
+        return False, 0.0, 0
 
     breakout_thresh = atr * TL_BREAKOUT_ATR_K
-
-    if direction == 'LONG':
-        # Diagonal level at start of breakout zone
-        diag_level = start_price + diag_slope * diag_end
-        # Check if most recent candle is above diagonal + threshold
-        if breakout_candles[-1] <= diag_level + breakout_thresh:
-            return False, 0.0, 0.0
-        breakout_pct = (breakout_candles[-1] - diag_level) / atr
-    else:  # SHORT
-        diag_level = start_price + diag_slope * diag_end
-        if breakout_candles[-1] >= diag_level - breakout_thresh:
-            return False, 0.0, 0.0
-        breakout_pct = (diag_level - breakout_candles[-1]) / atr
-
-    # Follow-through: count candles in breakout zone that stayed beyond diagonal
     follow_count = 0
-    for i, price in enumerate(breakout_candles[:-1]):  # exclude last (entry)
-        diag_at_i = start_price + diag_slope * (diag_end + i)
-        if direction == 'LONG' and price > diag_at_i:
-            follow_count += 1
-        elif direction == 'SHORT' and price < diag_at_i:
-            follow_count += 1
+    breakout_strength = 0.0
 
-    ft_score = min(1.0, follow_count / max(1, len(breakout_candles) - 1))
+    for i in range(breakout_start, breakout_end):
+        tl_price = slope * i + intercept
+        price = closes[i]
 
-    return True, breakout_pct, ft_score
+        if direction == 'LONG':
+            if price > tl_price + breakout_thresh:
+                follow_count += 1
+                breakout_strength = max(breakout_strength, (price - tl_price) / atr)
+        else:  # SHORT
+            if price < tl_price - breakout_thresh:
+                follow_count += 1
+                breakout_strength = max(breakout_strength, (tl_price - price) / atr)
+
+    # Need: (1) at least one candle beyond threshold, (2) enough follow-through
+    has_breakout = follow_count >= 1
+    has_follow_through = follow_count >= TL_FOLLOWTHROUGH_MIN
+
+    return has_breakout and has_follow_through, breakout_strength, follow_count
 
 
 # ── Main Signal Detection ──────────────────────────────────────────────────────
@@ -326,11 +315,8 @@ def _detect_breakout(closes: List[float], diag_slope: float, start_price: float,
 def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     """Detect diagonal trendline breakout on a single token's candles.
 
-    Anchor-at-start approach:
-      - Trendline anchored at closes[0] (start of diagonal zone)
-      - Diagonal slope = (closes[diag_end-1] - closes[0]) / (diag_end - 1)
-      - Direction: down-slope → LONG, up-slope → SHORT
-      - Breakout: price must be beyond diagonal in last 30% of window
+    Uses linear regression to fit a trendline, validates bounces with rejection,
+    then confirms breakout with follow-through.
 
     Returns signal dict if triggered, else None.
     """
@@ -338,77 +324,76 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         return None
 
     closes = [c['close'] for c in candles]
-
     atr = _atr(candles, TL_ATR_PERIOD)
     if atr is None:
         return None
 
     n = len(closes)
-    diag_end = int(n * TL_DIAGONAL_CUTOFF)    # 84 for n=120
-    breakout_end = n                          # 120
+    fit_end = int(n * TL_FIT_CUTOFF)
 
-    # ── Phase 1: Diagonal detection ─────────────────────────────────────────
-    diag = _detect_diagonal(closes, diag_end)
-    if diag is None:
+    # ── Phase 1: Trendline detection via linear regression ─────────────────
+    tl = _detect_trendline(closes, fit_end)
+    if tl is None:
         return None
 
-    diag_slope = diag['slope']
-    start_price = diag['start_price']
-    direction = diag['direction']
+    slope = tl['slope']
+    intercept = tl['intercept']
+    r2 = tl['r2']
+    direction = tl['direction']
 
-    # ── Phase 2: Bounce validation — 2+ bounces in diagonal zone ───────────
-    n_touches, bounce_indices = _count_touches(
-        closes, diag_slope, start_price, diag_end, atr, direction)
-    if n_touches < TL_MIN_BOUNCES:
+    # Minimum trendline duration: at least 30 candles of consistent trend
+    if fit_end < 30:
         return None
 
-    # Zone validation: bounces must form a coherent resistance/support level
-    # within 3*ATR of each other (diagonal bounces at different times)
-    zone_price = _cluster_bounces_simple(bounce_indices, closes, diag_slope, start_price, atr)
-    if zone_price is None:
+    # ── Phase 2: Bounce validation with rejection ──────────────────────────
+    n_bounces, avg_rejection = _count_bounces_with_rejection(
+        closes, slope, intercept, fit_end, atr, direction)
+    if n_bounces < TL_MIN_BOUNCES:
+        return None
+    # Filter: too many bounces = noise, not trendline touches
+    if n_bounces / fit_end > TL_MAX_BOUNCE_RATIO:
         return None
 
-    # ── Phase 3: Breakout confirmation in last 30% ───────────────────────────
-    breakout, breakout_pct_atr, follow_through = _detect_breakout(
-        closes, diag_slope, start_price, diag_end, breakout_end, atr, direction)
-
+    # ── Phase 3: Breakout confirmation ─────────────────────────────────────
+    breakout, breakout_strength, follow_count = _detect_breakout(
+        closes, slope, intercept, fit_end, atr, direction)
     if not breakout:
         return None
 
     # ── Phase 4: Confidence scoring ─────────────────────────────────────────
-    base_conf = TL_BASE_CONFIDENCE
+    conf = TL_BASE_CONFIDENCE
 
-    # Bounce bonus: more touches = stronger zone
-    bounce_bonus = min(TL_BOUNCE_BONUS_MAX,
-                       (n_touches - TL_MIN_BOUNCES) * 5)
+    # Bounce bonus
+    conf += min(12, (n_bounces - TL_MIN_BOUNCES) * TL_BOUNCE_BONUS)
 
-    # Slope magnitude bonus
-    slope_ratio = min(1.0, (abs(diag_slope) - TL_SLOPE_MAG_MIN) / (TL_SLOPE_MAG_MIN * 5))
-    slope_bonus = slope_ratio * TL_SLOPE_BONUS_MAX
+    # R² bonus — stronger trendline = more reliable
+    r2_bonus = min(TL_R2_BONUS_MAX, int((r2 - TL_R2_MIN) * 20))
+    conf += r2_bonus
+
+    # Rejection bonus
+    if avg_rejection > atr * 0.5:
+        conf += TL_REJECTION_BONUS
 
     # Follow-through bonus
-    ft_bonus = follow_through * TL_FOLLOWTHROUGH_BONUS
+    conf += min(TL_FOLLOWTHROUGH_BONUS, follow_count)
 
     # Breakout strength bonus
-    breakout_bonus = min(TL_BREAKOUT_BONUS_MAX, breakout_pct_atr * 3)
+    conf += min(TL_BREAKOUT_BONUS_MAX, int(breakout_strength * 2))
 
-    confidence = int(min(TL_MAX_CONFIDENCE,
-                         base_conf + bounce_bonus + slope_bonus + ft_bonus + breakout_bonus))
+    conf = min(TL_MAX_CONFIDENCE, conf)
 
     # ── Build signal ─────────────────────────────────────────────────────────
     signal_type = f'tl_break_{direction.lower()}'
     source = f'tl_break_{direction.lower()}'
 
-    # Compute diagonal level at breakout start for metadata
-    diag_level_at_breakout = start_price + diag_slope * diag_end
-
     value = str({
-        'slope': round(diag_slope, 8),
-        'diag_start': round(start_price, 6),
-        'diag_level_breakout': round(diag_level_at_breakout, 6),
-        'n_touches': n_touches,
-        'breakout_pct_atr': round(breakout_pct_atr, 2),
-        'follow_through': round(follow_through, 2),
+        'slope': round(slope, 8),
+        'intercept': round(intercept, 6),
+        'r2': round(r2, 3),
+        'n_bounces': n_bounces,
+        'avg_rejection_atr': round(avg_rejection / atr, 2) if atr > 0 else 0,
+        'breakout_strength_atr': round(breakout_strength, 2),
+        'follow_count': follow_count,
         'atr': round(atr, 6),
     })
 
@@ -417,16 +402,15 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         'direction': direction,
         'signal_type': signal_type,
         'source': source,
-        'confidence': confidence,
+        'confidence': conf,
         'value': value,
         'price': price,
-        '_slope': diag_slope,
-        '_start_price': start_price,
-        '_n_touches': n_touches,
-        '_breakout_pct_atr': breakout_pct_atr,
-        '_follow_through': follow_through,
+        '_slope': slope,
+        '_r2': r2,
+        '_n_bounces': n_bounces,
+        '_breakout_strength': breakout_strength,
+        '_follow_count': follow_count,
         '_atr': atr,
-        '_diag_level_breakout': diag_level_at_breakout,
     }
 
 
@@ -445,10 +429,40 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
 
     added = 0
     signaled_tokens = []
+    now = time.time()
+
+    # Load cooldowns from DB on first call (prevents re-fire on restart)
+    if not _TL_COOLDOWN_CACHE:
+        try:
+            import sqlite3 as _sqlite3
+            from paths import RUNTIME_DB as _RUNTIME_DB
+            _conn = _sqlite3.connect(_RUNTIME_DB, timeout=5)
+            _cur = _conn.cursor()
+            _cur.execute("""
+                SELECT token, MAX(created_at) FROM signals
+                WHERE signal_type = 'tl_break'
+                GROUP BY token
+            """)
+            for _tok, _ts in _cur.fetchall():
+                try:
+                    import datetime as _dt
+                    _ts_str = str(_ts)
+                    _dt_obj = _dt.datetime.strptime(_ts_str, '%Y-%m-%d %H:%M:%S')
+                    _TL_COOLDOWN_CACHE[_tok] = _dt_obj.timestamp()
+                except Exception:
+                    pass
+            _conn.close()
+        except Exception:
+            pass
 
     for token, data in prices_dict.items():
         price = data.get('price')
         if not price or price <= 0:
+            continue
+
+        # ── Cooldown check ──────────────────────────────────────────────────
+        last_fire = _TL_COOLDOWN_CACHE.get(token.upper(), 0)
+        if now - last_fire < TL_COOLDOWN_HOURS * 3600:
             continue
 
         candles = _get_candles_5m(token, lookback_candles=TL_LOOKBACK)
@@ -483,10 +497,11 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
         if sid:
             added += 1
             signaled_tokens.append(token)
+            _TL_COOLDOWN_CACHE[token.upper()] = now
             print(f"[tl_break] {sig['direction']} {sig['token']} "
-                  f"conf={sig['confidence']} slope={sig['_slope']:.7f} "
-                  f"touches={sig['_n_touches']} breakout={sig['_breakout_pct_atr']:.2f}ATR "
-                  f"ft={sig['_follow_through']:.2f}")
+                  f"conf={sig['confidence']} r2={sig['_r2']:.3f} "
+                  f"bounces={sig['_n_bounces']} breakout={sig['_breakout_strength']:.2f}ATR "
+                  f"ft={sig['_follow_count']}")
 
     return added, signaled_tokens
 

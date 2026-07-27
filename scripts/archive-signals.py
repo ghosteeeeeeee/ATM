@@ -21,9 +21,9 @@ os.makedirs(ARCHIVE_DIR, exist_ok=True)
 # WAIT is included because stale WAIT signals block hot-set auto-approvals
 # (WASP flagged: "5 WAIT signals never re-reviewed" — same root cause)
 ARCHIVABLE_DECISIONS = {'SKIPPED', 'EXPIRED', 'EXECUTED', 'COMPACTED', 'WAIT'}
-CUTOFF_HOURS_APPROVED = 6    # archive APPROVED signals older than this
-CUTOFF_HOURS_OTHERS   = 6    # archive SKIPPED/EXPIRED/EXECUTED/COMPACTED/WAIT older than this
-CUTOFF_HOURS_PENDING  = 1    # archive PENDING signals older than this (stale, not worth keeping)
+CUTOFF_HOURS_APPROVED = 720   # archive APPROVED signals older than 30 days (was 6h — too aggressive for analysis)
+CUTOFF_HOURS_OTHERS   = 720   # archive SKIPPED/EXPIRED/EXECUTED/COMPACTED/WAIT older than 30 days
+CUTOFF_HOURS_PENDING  = 24    # archive PENDING signals older than 24 hours (stale, not worth keeping)
 
 
 def get_stats(conn):

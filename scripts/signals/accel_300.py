@@ -1,96 +1,48 @@
-# Migrated from ../accel_300_signals.py — see signals/__init__.py registry
 #!/usr/bin/env python3
+# Migrated from ../accel_300_signals.py — see signals/__init__.py registry
+"""Latest-bar EMA300 acceleration signal.
+
+Data source
+-----------
+`signals_hermes.db.price_history` supplies the live 1-minute points. Candle DB
+rows are intentionally not used because they can lag the live price collector.
+
+Signal contract
+---------------
+LONG fires only when the newest price-history point is above its newest EMA300,
+the positive EMA gap has persisted and widened, and the newest upward gap
+velocity is stronger than the prior velocity.
+
+SHORT is the exact mirror: newest price below newest EMA300, persistent/widening
+negative gap, and newest downward gap velocity more negative than before.
+
+Historical points may calculate EMA, persistence, velocity, and cross age, but
+an old qualifying point can never be returned as a current signal. This avoids
+stale LONG/SHORT emissions after live price action has reversed.
+
+Pipeline
+--------
+price_history (1m) -> EMA300/current acceleration -> signal_schema.add_signal()
+-> signals_hermes_runtime.db -> signal_compactor -> hotset.json -> guardian.
 """
-accel_300_signals.py — Persistent Gap Above EMA(300) Acceleration Signal.
 
-SIGNAL TYPE: momentum confirmation (secondary — fires after gap_300 cross is confirmed)
-LOG_FILE: /var/www/hermes/logs/signals.log
-
-== WHAT IT DETECTS ==
-Fires when price breaks above EMA(300) and then PROVES the move is real by sustaining
-and WIDENING that gap over time. Where gap_300 fires on the initial cross, accel_300
-waits for confirmation that momentum is persisting and accelerating.
-
-== ALL CONDITIONS (must be true simultaneously) ==
- 1. FRESH CROSS:     price was on the OTHER SIDE of EMA300 within last 30 bars (LONG)
- or 500 bars (SHORT — handles "sustained bleeds" where cross is old)
- 2. MINIMUM GAP:     price >= 0.20% above (LONG) or 0.25% below (SHORT) the EMA
- 3. PERSISTENCE:     price has stayed above/below EMA for PERSISTENCE_BARS consecutive bars
- 4. GROWING GAP:      current gap_pct > gap_pct PERSISTENCE_BARS bars ago (momentum accelerating)
- 5. MARGINAL ACCEL:   for signals 3+ bars after cross: last bar's gap growth > prior bar's growth
- 6. GAP EXPANSION:    current gap must be wider than at the actual cross point (not already fading)
- 7. STALE GATE:       signal must fire within tight window of latest bar and ~60 bars of cross
- 8. REGIME SLOPE:     market must be trending in signal's direction (filters ranging markets)
- 9. STALE GAP DECAY:  latest bar's gap must still be meaningful fraction of signal bar's gap
-10. CHOP FILTER:      at cross point: EMA angle + average gap leading up to cross must show
- a real directional move (not noise/ranging)
-
-== INTENT ==
-Catch "slow breakouts" that gap_300 misses — the gap_300 fires on the cross moment,
-accel_300 fires on the CONFIRMATION that momentum is persisting. The growing gap
-means the move isn't fading, it's accelerating. The SHORT side has tighter thresholds
-(0.25% min gap, 0.07% growth) because it historically generated more false breakouts.
-
-== ARCHITECTURE ==
-  price_history (1m closes, fresh every minute) → EMA(300) → gap analysis
-  → signal_schema.add_signal() → signals_hermes_runtime.db
-  → signal_compactor → hotset.json → guardian → HL
-
-== SIGNAL TYPES ==
-  - accel_300_long  : persistent above-EMA300 with growing gap — momentum accelerating long
-  - accel_300_short : persistent below-EMA300 with growing gap — momentum accelerating short
-
-== RUN ==
- python3 accel_300_signals.py           # live scan
-    python3 accel_300_signals.py --dry     # dry run (log only)
-"""
-import os
+import sys, os, sqlite3, time
+from typing import Optional
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from signal_schema import add_signal, get_cooldown, price_age_minutes
 
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(SIGNAL_LOG), exist_ok=True)
 
-def _log(msg):
-    """Write to both stdout and signals.log."""
-    import sys
+
+def _log(msg: str) -> None:
+    """Write signal events to stdout and the shared signal log."""
     print(msg)
     try:
-        with open(SIGNAL_LOG, 'a') as f:
-            f.write(msg + '\n')
-    except Exception:
-        pass
-
-"""
-Concept: price breaks above EMA300 (was below within last N bars), then
-stays above for PERSISTENCE_BARS consecutive bars while the gap vs EMA300
-is GROWING. The growing gap = accelerating momentum -- the move isn't fading.
-
-This catches "slow breakouts" that gap_300 misses -- gap_300 fires on the
-cross moment, accel_300 fires on the confirmation that momentum is persisting.
-
-Signal logic:
-  - LONG:  price was below EMA300 within last LOOKBACK bars,
-            now above EMA300 for PERSISTENCE_BARS consecutive bars,
-            and current gap_pct > gap_pct PERSISTENCE_BARS bars ago (gap is growing)
-  - SHORT: mirror for downside
-
-Architecture:
-  price_history (1m closes, fresh every minute) → EMA(300) → gap analysis
-  → signal_schema.add_signal() → signals_hermes_runtime.db
-  → signal_compactor → hotset.json → guardian → HL
-
-Signal types:
-  - accel_300_long  : persistent above-EMA300 with growing gap -- momentum accelerating long
-  - accel_300_short : persistent below-EMA300 with growing gap -- momentum accelerating short
-
-Run:
-    python3 accel_300_signals.py           # live scan
-    python3 accel_300_signals.py --dry     # dry run (log only)
-"""
-
-import sys, os, sqlite3, time, datetime
-from typing import Optional, List
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, get_cooldown, price_age_minutes
+        with open(SIGNAL_LOG, 'a') as log_file:
+            log_file.write(msg + '\n')
+    except OSError as exc:
+        print(f"[accel-300] log write failed: {exc}")
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 _RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
@@ -209,431 +161,278 @@ def _get_1m_prices(token: str, lookback: int = LOOKBACK_1M) -> list:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def detect_accel_300(token: str, prices: list) -> Optional[dict]:
-    """
-    Detect persistent gap above EMA(300) with growing gap.
+    """Detect acceleration at the newest 1-minute price_history point.
 
-    Fire when ALL of these are true:
-      1. Price was BELOW EMA300 at some point within last LOOKBACK bars
-      2. Price is NOW above EMA300 with gap >= MIN_GAP_PCT
-      3. Price has been above EMA300 for PERSISTENCE_BARS consecutive bars
-      4. Current gap_pct > gap_pct PERSISTENCE_BARS bars ago (gap is GROWING)
-      5. Not in cooldown window (tracked by caller via recent_trade_exists)
+    LONG requires all current conditions to agree:
+      - latest price is above its latest EMA300
+      - the positive gap is large enough and persisted across recent bars
+      - the gap is widening upward now
+      - the latest upward gap velocity is stronger than the prior velocity
 
-    Returns dict with direction, gap_pct, gap_growth, bars_since_cross, or None.
+    SHORT is the exact mirror below EMA300: a sufficiently negative, persistent
+    gap whose latest downward velocity is more negative than the prior velocity.
+
+    Historical bars are used only to calculate EMA, persistence, and velocity.
+    They are never returned as a current signal. This prevents an old
+    qualifying bar from being resurrected after price action has reversed.
     """
     from hermes_constants import (
-        # Detection params (from top of file — originally hardcoded here)
-        ACCEL_300_PERIOD, ACCEL_300_LOOKBACK, ACCEL_300_PERSISTENCE_BARS,
-        ACCEL_300_MIN_GAP_PCT, ACCEL_300_MIN_GAP_GROWTH,
-        # P0 gate constants
-        ACCEL_300_STALE_BARS, ACCEL_300_STALE_LOOKBACK,
-        ACCEL_300_MIN_GAP_EXPANSION,
-        ACCEL_300_REGIME_SLOPE_PCT, ACCEL_300_SLOPE_WINDOW,
-        ACCEL_300_STALE_GAP_DECAY_THRESHOLD,
-        ACCEL_300_CHOP_CROSS_GAP_PCT, ACCEL_300_CHOP_EMA_ANGLE_PCT,
-        ACCEL_300_CHOP_AVG_GAP_PCT, ACCEL_300_CHOP_LOOKBACK,
-        ACCEL_300_CROSS_LOOKBACK,
-        ACCEL_300_MARGINAL_ACCEL_BARS, ACCEL_300_BARS_UNKNOWN,
-        ACCEL_300_BAR_GAP_THRESH_SEC,
+        ACCEL_300_PERIOD,
+        ACCEL_300_PERSISTENCE_BARS,
+        ACCEL_300_MIN_GAP_PCT_LONG,
+        ACCEL_300_MIN_GAP_PCT_SHORT,
+        ACCEL_300_MIN_GAP_GROWTH,
+        ACCEL_300_MIN_GAP_GROWTH_SHORT,
+        ACCEL_300_REGIME_SLOPE_PCT,
+        ACCEL_300_SLOPE_WINDOW,
+        ACCEL_300_BARS_UNKNOWN,
     )
-    # Alias short names for detection logic readability
-    PERIOD           = ACCEL_300_PERIOD
-    LOOKBACK         = ACCEL_300_LOOKBACK
-    PERSISTENCE_BARS = ACCEL_300_PERSISTENCE_BARS
-    MIN_GAP_PCT      = ACCEL_300_MIN_GAP_PCT
-    MIN_GAP_GROWTH_PCT = ACCEL_300_MIN_GAP_GROWTH
-    n = len(prices)
-    if n < PERIOD + LOOKBACK + PERSISTENCE_BARS + 5:
+
+    period = ACCEL_300_PERIOD
+    persistence_bars = ACCEL_300_PERSISTENCE_BARS
+    minimum_rows = period + max(persistence_bars, 3)
+    if len(prices) < minimum_rows:
         return None
 
-    closes = [p['price'] for p in prices]
-    ema300 = _ema_series(closes, PERIOD)
+    closes = [float(point['price']) for point in prices]
+    ema300 = _ema_series(closes, period)
+    gap_pcts = [
+        None if ema is None or ema == 0 else (price - ema) / ema * 100.0
+        for price, ema in zip(closes, ema300)
+    ]
 
-    # Build gap_pct series
-    gap_pcts = []
-    for i in range(len(closes)):
-        if ema300[i] is None or ema300[i] == 0:
-            gap_pcts.append(None)
-        else:
-            gap_pcts.append((closes[i] - ema300[i]) / ema300[i] * 100.0)
-
-    # Walk through and detect — SCAN BACKWARD to find the most recent qualifying bar.
-    # Previously scanned forward and returned the FIRST match (oldest qualifying signal),
-    # causing stale signals from hours ago to fire with that stale bar's price timestamp.
-    # Now: find ALL qualifying bars scanning forward, track the most recent one.
-    # Return the most recent (last) qualifying bar found.
-    signal_bar = None
-
-    for i in range(PERIOD + LOOKBACK, len(closes) - 1):
-        price = closes[i]
-        ema_val = ema300[i]
-        if ema_val is None:
-            continue
-
-        gap_now = gap_pcts[i]
-        if gap_now is None:
-            continue
-
-        # ── Direction ────────────────────────────────────────────────────────────
-        current_above = price > ema_val
-        current_below = price < ema_val
-
-        # Direction determined by current position vs EMA
-        direction = 'LONG' if current_above else 'SHORT'
-
-        # SUSTAINED BLEED FIX: always initialize implied_cross_bar so it's in scope
-        implied_cross_bar = None
-        cross_bar = None  # initialized early so C1 can reference it
-
-        # ── Condition 1: Was on the other side within direction-specific LOOKBACK? ─
-        # Use ACCEL_300_LOOKBACK_SHORT (500) for SHORT — handles sustained bleeds
-        # where the cross is far in the past. For LONG use ACCEL_300_LOOKBACK (30).
-        lookback_dir = ACCEL_300_LOOKBACK_SHORT if direction == 'SHORT' else ACCEL_300_LOOKBACK
-        was_above_recently = False
-        was_below_recently = False
-        was_ever_above_in_window = False
-        for j in range(i - lookback_dir, i):
-            if j >= 0 and gap_pcts[j] is not None:
-                if closes[j] > ema300[j]:
-                    was_above_recently = True
-                    was_ever_above_in_window = True
-                else:
-                    was_below_recently = True
-
-        # SUSTAINED RISE FIX (LONG): price was never below EMA in window AND no cross
-        # found in fallback. ME pattern: price crossed above EMA 80 bars ago and has
-        # been above ever since. We have a real cross_bar, so allow the signal.
-        # Block only if: never below in window AND no cross found in fallback.
-        # (cross_bar found by fallback = real cross = allow signal)
-        if cross_bar is not None:
-            pass  # real cross found in fallback search — allow signal
-        elif current_above and not was_below_recently:
-            # No cross found and price never pulled back to EMA — block
-            continue  # Never went below -- not a fresh breakout
-        if current_below and not was_above_recently:
-            # SUSTAINED BLEED FIX: if was_ever_above_in_window is False (price was
-            # NEVER above EMA in the entire lookback window), this is a pre-existing
-            # downtrend. Treat it as a valid cross — the original cross happened before
-            # our dataset started. Use implied_cross_bar = i - lookback_dir (first bar
-            # in the window) to allow the signal through.
-            if not was_ever_above_in_window:
-                # Mark that we have an implied cross (stored in a local var via closure
-                # — handled below in cross_bar search). Set a sentinel so the cross_bar
-                # finder knows to use the window start as the implied cross point.
-                implied_cross_bar = max(i - lookback_dir, 0)
-            else:
-                implied_cross_bar = None
-                continue  # Never went above -- not a fresh breakdown
-
-        # ── Condition 2: |gap| >= direction-specific MIN_GAP_PCT ───────────────
-        # Per-direction thresholds: SHORT tighter (0.25) than LONG (0.20)
-        # accel-300- has 40% WR vs 55% for accel-300+ — SHORT needs stronger confirmation
-        min_gap_dir = ACCEL_300_MIN_GAP_PCT_SHORT if direction == 'SHORT' else ACCEL_300_MIN_GAP_PCT_LONG
-        if abs(gap_now) < min_gap_dir:
-            continue
-
-        # ── Condition 3: Persistently above/below for PERSISTENCE_BARS bars ─────
-        persistent = True
-        for j in range(i - PERSISTENCE_BARS + 1, i + 1):
-            if j < 0 or gap_pcts[j] is None:
-                persistent = False
-                break
-            if direction == 'LONG' and closes[j] <= ema300[j]:
-                persistent = False
-                break
-            if direction == 'SHORT' and closes[j] >= ema300[j]:
-                persistent = False
-                break
-
-        if not persistent:
-            continue
-
-        # ── Condition 4a: Average gap growth over PERSISTENCE_BARS window ─────────
-        # For sustained moves (bars_since_cross > MARGINAL_ACCEL_BARS), measure
-        # growth from the cross bar instead of 2 bars back. 2-bar growth is too
-        # short for sustained trends — ME has 1.06% growth from cross but -0.15%
-        # over 2 bars, failing the gate incorrectly.
-        gap_then_idx = i - PERSISTENCE_BARS
-        if gap_then_idx < 0 or gap_pcts[gap_then_idx] is None:
-            continue
-
-        gap_then = gap_pcts[gap_then_idx]
-
-        # SUSTAINED MOVE FIX: if bars_since_cross > MARGINAL_ACCEL_BARS (3+ bars
-        # since cross), use growth from cross bar instead of 2-bar lookback.
-        # Cross-bar growth captures the full move; 2-bar captures only the latest pullback.
-        bars_since_cross_for_growth = i - cross_bar if cross_bar is not None else 999
-        if bars_since_cross_for_growth > ACCEL_300_MARGINAL_ACCEL_BARS and cross_bar is not None and gap_pcts[cross_bar] is not None:
-            avg_gap_growth = gap_now - gap_pcts[cross_bar]  # growth from cross
-        else:
-            avg_gap_growth = gap_now - gap_then  # original 2-bar growth
-
-        # Per-direction gap growth: SHORT stricter (0.07) than LONG (0.05)
-        # SHORT side gets more false breakouts that reverse — needs stronger growth
-        min_gap_growth_dir = ACCEL_300_MIN_GAP_GROWTH_SHORT if direction == 'SHORT' else MIN_GAP_GROWTH_PCT
-        # SHORT gap is negative (price below EMA). Widening gap = gap becoming more
-        # negative = avg_gap_growth is a larger negative number. We need growth > threshold
-        # for LONG (positive gap), but growth < -threshold for SHORT (negative gap).
-        # Sign-flipped comparison: avg_gap_growth must be MORE NEGATIVE than -threshold.
-        if direction == 'SHORT':
-            if avg_gap_growth >= -min_gap_growth_dir:
-                continue  # Gap is not growing (not widening) over the window — stale SHORT
-        else:
-            if avg_gap_growth <= min_gap_growth_dir:
-                continue  # Gap is not growing over the window — stale signal
-
-        # ── Condition 4b: MARGINAL ACCELERATION + TIMING ─────────────────────────
-        # gap_now vs 1 bar ago must show INCREASING momentum, not just steady growth.
-        # This catches early acceleration (good) vs late-stage extension (peak).
-        #
-        # TIMING FIX (2026-05-10): Fire EARLY when bars_since_cross <= 3 (near breakout).
-        # Only enforce strict marginal acceleration when bars_since_cross > 3.
-        # This solves the "firing too late at the peak" problem — entries close to
-        # the EMA cross (bars=0,1,2) are the most profitable because the move just started.
-        # Entries that have been above EMA for 10+ bars without our signal are stale.
-        # ── Find cross bar — two-pass search ───────────────────────────────────────
-        # Pass 1: primary window (ACCEL_300_CROSS_LOOKBACK bars before signal bar)
-        # Pass 2: full fallback to index 0 (catches crosses far in the past)
-        cross_bar = None
-        for j in range(i - ACCEL_300_CROSS_LOOKBACK, i + 1):
-            if j < 0 or gap_pcts[j] is None or ema300[j] is None:
-                continue
-            if direction == 'LONG' and closes[j] > ema300[j]:
-                if j > 0 and ema300[j-1] is not None and closes[j-1] <= ema300[j-1]:
-                    cross_bar = j
-                    break
-            if direction == 'SHORT' and closes[j] < ema300[j]:
-                if j > 0 and ema300[j-1] is not None and closes[j-1] >= ema300[j-1]:
-                    cross_bar = j
-                    break
-        # Pass 2: full fallback — search from signal bar back to earliest bar
-        # Handles crosses far in the past (e.g., sustained bleeds).
-        # At the EMA warmup boundary (j=299, j-1=298), ema300[j-1] is None.
-        # Use a relaxed check: require ema300[j] valid, but allow ema300[j-1] to
-        # be None when j is at the warmup boundary (j == PERIOD - 1).
-        if cross_bar is None:
-            for j in range(i - 1, -1, -1):
-                if j < 0 or gap_pcts[j] is None or ema300[j] is None:
-                    continue
-                # Check ema300[j-1] — relaxed for warmup boundary (j == PERIOD - 1)
-                prev_ema_valid = (j - 1 >= 0 and ema300[j-1] is not None) or j == PERIOD - 1
-                if not prev_ema_valid:
-                    continue
-                if direction == 'LONG' and closes[j] > ema300[j]:
-                    # True for warmup boundary (j == PERIOD-1) where ema300[j-1] is None
-                    if j == PERIOD - 1:
-                        prev_cond = True
-                    else:
-                        prev_cond = closes[j-1] <= ema300[j-1]
-                    if prev_cond:
-                        cross_bar = j
-                        break
-                if direction == 'SHORT' and closes[j] < ema300[j]:
-                    if j == PERIOD - 1:
-                        prev_cond = True
-                    else:
-                        prev_cond = closes[j-1] >= ema300[j-1]
-                    if prev_cond:
-                        cross_bar = j
-                        break
-
-        bars_since_cross = i - cross_bar if cross_bar is not None else BARS_UNKNOWN
-
-        # ── CROSS-BACK CHECK ─────────────────────────────────────────────────────
-        # After finding cross_bar, verify that price hasn't crossed BACK through EMA
-        # since the initial cross. If price crossed back and stayed on the opposite side
-        # for 2+ bars, the cross is stale and the signal should be blocked.
-        #
-        # ME pattern: cross at j=299 (warmup boundary), price then stayed ABOVE EMA
-        # for 60+ bars — the "cross" is from a completely different trend regime.
-        # The persistence check only looks at 2 bars and misses cross-backs 30+ bars ago.
-        if cross_bar is not None and cross_bar < i:
-            cross_back_valid = True
-            # Walk backward from i-1 to cross_bar+1 checking for cross-back
-            for j in range(i - 1, cross_bar, -1):
-                if j < 0 or j >= len(closes) or ema300[j] is None or gap_pcts[j] is None:
-                    break
-                if direction == 'SHORT':
-                    # For SHORT signal: cross-back = price went ABOVE EMA
-                    # Check if bar j is the first bar where price crossed above
-                    if closes[j] > ema300[j] and j + 1 < len(closes) and closes[j + 1] <= ema300[j + 1]:
-                        # Found cross-back. Verify price stayed above for 2+ bars
-                        bars_above = 0
-                        for k in range(j, min(i, len(closes) - 1)):
-                            if k >= 0 and closes[k] > ema300[k]:
-                                bars_above += 1
-                            else:
-                                break
-                        if bars_above >= 2:
-                            cross_back_valid = False
-                            break
-                elif direction == 'LONG':
-                    # For LONG signal: cross-back = price went BELOW EMA
-                    if closes[j] < ema300[j] and j + 1 < len(closes) and closes[j + 1] >= ema300[j + 1]:
-                        bars_below = 0
-                        for k in range(j, min(i, len(closes) - 1)):
-                            if k >= 0 and closes[k] < ema300[k]:
-                                bars_below += 1
-                            else:
-                                break
-                        if bars_below >= 2:
-                            cross_back_valid = False
-                            break
-            if not cross_back_valid:
-                continue  # cross is stale — price crossed back through EMA
-
-        # SUSTAINED BLEED FIX: if cross_bar is None after full fallback search,
-        # use the implied_cross_bar (first bar of our lookback window) as the cross.
-        # This handles sustained bleeds where the original cross is before our data.
-        is_sustained_bleed = False
-        if cross_bar is None and 'implied_cross_bar' in dir() and implied_cross_bar is not None:
-            cross_bar = implied_cross_bar
-            bars_since_cross = i - cross_bar
-            is_sustained_bleed = True
-
-        # SUSTAINED BLEED / RISE LATE ENTRY GUARD:
-        # For signals where the cross is old (bars_since_cross > MARGINAL_ACCEL_BARS),
-        # if the gap has already expanded significantly from the cross bar's gap, the
-        # signal is a late entry chasing a move that already ran. Block it.
-        # AXS pattern: cross at -0.075%, gap now -0.924% (0.849% expansion) → late entry
-        if bars_since_cross > ACCEL_300_MARGINAL_ACCEL_BARS and cross_bar is not None and gap_pcts[cross_bar] is not None:
-            gap_at_cross_val = gap_pcts[cross_bar]
-            gap_expansion = abs(gap_now) - abs(gap_at_cross_val)
-            max_expansion = ACCEL_300_MIN_GAP_PCT_SHORT * 3  # 0.25% * 3 = 0.75%
-            if gap_expansion > max_expansion:
-                continue  # late entry — move already ran too far from cross
-
-        # ── Gap expansion gate — price must be farther from EMA than at cross ───────
-
-        # ── Gap expansion gate — price must be farther from EMA than at cross ───────
-        # Prevents signals where price barely crossed EMA and is already fading back
-        if cross_bar is not None and gap_pcts[cross_bar] is not None:
-            gap_at_cross = gap_pcts[cross_bar]
-            if direction == 'LONG' and gap_now < gap_at_cross - ACCEL_300_MIN_GAP_EXPANSION:
-                continue  # gap contracting back toward EMA — stale
-            if direction == 'SHORT' and gap_now > gap_at_cross + ACCEL_300_MIN_GAP_EXPANSION:
-                continue  # gap contracting (less negative) back toward EMA — stale
-
-        # Must have confirmed the cross (at least 1 bar has closed since the cross)
-        if bars_since_cross < 1:
-            continue
-
-        # Too stale — price has been running without us for too long
-        # Per-direction stale bars: SHORT stricter (55) than LONG (60)
-        # SUSTAINED BLEED FIX: skip this check for implied_cross_bar (bars_since_cross
-        # is meaningless — the cross happened before our data window)
-        max_stale = STALE_BARS_SHORT if direction == 'SHORT' else STALE_BARS
-        if not is_sustained_bleed and bars_since_cross >= max_stale:
-            continue
-
-        # ── STALE GATE (FIX 2026-06-08): bars_since_cross is measured from
-        # detection bar i, not from the latest bar. A signal can fire at i=344
-        # (13:37) with bars_since_cross=1 (cross was at i-1), passing the stale
-        # gate, but from the latest bar (18:02) the cross is 354 bars old.
-        # Add absolute stale gate: detection bar must be within N bars of latest.
-        bars_from_latest = len(closes) - 1 - i
-        if bars_from_latest > ACCEL_300_STALE_LOOKBACK:
-            continue
-
-        # For bars 0-MARGINAL_ACCEL_BARS: fire on gap_growth alone (near the breakout, momentum is fresh)
-        # For bars MARGINAL_ACCEL_BARS+: require marginal acceleration check too
-        if bars_since_cross > MARGINAL_ACCEL_BARS:
-            gap_1_idx = i - 1
-            gap_2_idx = i - 2
-            if gap_1_idx < 0 or gap_pcts[gap_1_idx] is None:
-                continue
-            if gap_2_idx < 0 or gap_pcts[gap_2_idx] is None:
-                continue
-            delta_last  = gap_pcts[i]      - gap_pcts[gap_1_idx]
-            delta_prev  = gap_pcts[gap_1_idx] - gap_pcts[gap_2_idx]
-            if direction == 'LONG' and delta_last <= delta_prev:
-                continue
-            if direction == 'SHORT' and delta_last >= delta_prev:
-                continue
-
-        # ── Regime slope check ─────────────────────────────────────────────────────
-        # Market must be trending in the signal's direction (prevents trading chop)
-        if len(closes) >= i + ACCEL_300_SLOPE_WINDOW:
-            slope_chunk = closes[i:i + ACCEL_300_SLOPE_WINDOW]
-            n_s = len(slope_chunk)
-            # Simple linear regression: slope = sum((x-x̄)(y-ȳ)) / sum((x-x̄)²)
-            x_mean = (n_s - 1) / 2.0
-            y_mean = sum(slope_chunk) / n_s
-            num = sum((j - x_mean) * (slope_chunk[j] - y_mean) for j in range(n_s))
-            den = sum((j - x_mean) ** 2 for j in range(n_s))
-            if den > 0:
-                slope = num / den
-                pct_slope = slope / y_mean * 100.0 if y_mean != 0 else 0.0
-                if direction == 'LONG' and pct_slope <= ACCEL_300_REGIME_SLOPE_PCT:
-                    continue  # market flat or falling — don't LONG
-                if direction == 'SHORT' and pct_slope >= -ACCEL_300_REGIME_SLOPE_PCT:
-                    continue  # market flat or rising — don't SHORT
-
-        # ── Stale gap decay check ──────────────────────────────────────────────────
-        # Newest bar's gap must be >= threshold fraction of signal bar's gap
-        # (blocks stale pullback signals where gap collapsed after the signal fired)
-        newest_idx = len(closes) - 2
-        if newest_idx > i and gap_pcts[newest_idx] is not None:
-            signal_gap = abs(gap_now)
-            newest_gap = abs(gap_pcts[newest_idx])
-            if signal_gap > 0 and newest_gap < signal_gap * ACCEL_300_STALE_GAP_DECAY_THRESHOLD:
-                continue  # gap decayed — stale pullback, block
-
-        # ── Chop filter — reject choppy / ranging markets ─────────────────────────
-        # Applied at the cross bar to ensure the signal crossed through a meaningful move
-        if cross_bar is not None and cross_bar >= ACCEL_300_CHOP_LOOKBACK:
-            #1. Gap at cross bar must be meaningful
-            cross_gap = gap_pcts[cross_bar]
-            if cross_gap is None:
-                continue
-            if direction == 'LONG' and cross_gap < ACCEL_300_CHOP_CROSS_GAP_PCT:
-                continue
-            if direction == 'SHORT' and cross_gap > -ACCEL_300_CHOP_CROSS_GAP_PCT:
-                continue
-
-            # 2. EMA angle at cross bar
-            if ema300[cross_bar] is not None and ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK] is not None:
-                dy = ema300[cross_bar] - ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK]
-                angle_pct = (dy / ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK]) * 100.0 if ema300[cross_bar - ACCEL_300_CHOP_LOOKBACK] != 0 else 0.0
-                if abs(angle_pct) < ACCEL_300_CHOP_EMA_ANGLE_PCT:
-                    continue
-
-            # 3. Average gap magnitude over the bars leading up to cross bar
-            gap_slice = [abs(g) for g in gap_pcts[cross_bar - ACCEL_300_CHOP_LOOKBACK:cross_bar] if g is not None]
-            if gap_slice:
-                avg_gap = sum(gap_slice) / len(gap_slice)
-                if avg_gap < ACCEL_300_CHOP_AVG_GAP_PCT:
-                    continue
-
-        # Found a qualifying bar — save its state and break to return the MOST RECENT.
-        # Scanning forward keeps the last (most recent) match. All loop variables
-        # at this point are the signal bar's values.
-        signal_bar = {
-            'direction': direction,
-            'gap_pct': round(gap_now, 4),
-            'gap_growth': round(avg_gap_growth, 4),
-            'gap_then': round(gap_then, 4),
-            'bars_since_cross': bars_since_cross,
-            'price': price,
-        }
-        break
-
-    if signal_bar is None:
+    latest_idx = len(closes) - 1
+    latest_ema = ema300[latest_idx]
+    gap_now = gap_pcts[latest_idx]
+    if latest_ema is None or gap_now is None or closes[latest_idx] == latest_ema:
         return None
 
-    return signal_bar
+    direction = 'LONG' if closes[latest_idx] > latest_ema else 'SHORT'
+    min_gap = (
+        ACCEL_300_MIN_GAP_PCT_LONG
+        if direction == 'LONG'
+        else ACCEL_300_MIN_GAP_PCT_SHORT
+    )
+    if abs(gap_now) < min_gap:
+        return None
+
+    # Price must remain on the current side of EMA throughout the persistence
+    # window. A one-point cross/touch is not enough to establish momentum.
+    persistence_start = latest_idx - persistence_bars + 1
+    if persistence_start < 0:
+        return None
+    for idx in range(persistence_start, latest_idx + 1):
+        ema = ema300[idx]
+        if ema is None:
+            return None
+        if direction == 'LONG' and closes[idx] <= ema:
+            return None
+        if direction == 'SHORT' and closes[idx] >= ema:
+            return None
+
+    growth_start_idx = latest_idx - persistence_bars
+    if growth_start_idx < 0 or gap_pcts[growth_start_idx] is None:
+        return None
+    gap_then = gap_pcts[growth_start_idx]
+    gap_growth = gap_now - gap_then
+    min_growth = (
+        ACCEL_300_MIN_GAP_GROWTH
+        if direction == 'LONG'
+        else ACCEL_300_MIN_GAP_GROWTH_SHORT
+    )
+    if direction == 'LONG' and gap_growth <= min_growth:
+        return None
+    if direction == 'SHORT' and gap_growth >= -min_growth:
+        return None
+
+    # Price velocity must also strengthen literally. EMA-gap acceleration alone
+    # can look stronger merely because EMA300 moved, even when raw price speed
+    # was flat or weakening.
+    # Use 5-bar window: price collector stores same price for 2-3 consecutive bars,
+    # making 1-bar velocity zero. 5-bar window captures real price movement.
+    price_velocity = closes[latest_idx] - closes[latest_idx - 5]
+    prior_price_velocity = closes[latest_idx - 5] - closes[latest_idx - 10]
+    price_acceleration = price_velocity - prior_price_velocity
+    # Floating-point subtraction can turn equal velocities into tiny signed
+    # noise (for example -1e-14). Scale tolerance to the local price level.
+    price_epsilon = max(abs(closes[latest_idx]) * 1e-12, 1e-12)
+    # Relaxed: only require price velocity in the right direction.
+    # Allow slight deceleration (price_acceleration can be slightly negative).
+    # This catches decelerating trends like PEOPLE where price is rising but slowing.
+    if direction == 'LONG':
+        if price_velocity <= price_epsilon:
+            return None
+    else:
+        if price_velocity >= -price_epsilon:
+            return None
+
+    # Velocity = current bar's change in EMA gap. Acceleration = change in
+    # velocity. Requiring both signs prevents a still-widening but decelerating
+    # move from being mislabeled as acceleration.
+    gap_prev = gap_pcts[latest_idx - 1]
+    gap_prev2 = gap_pcts[latest_idx - 2]
+    if gap_prev is None or gap_prev2 is None:
+        return None
+    gap_velocity = gap_now - gap_prev
+    prior_gap_velocity = gap_prev - gap_prev2
+    gap_acceleration = gap_velocity - prior_gap_velocity
+    if direction == 'LONG':
+        if gap_velocity <= 0 or gap_acceleration <= 0:
+            return None
+    else:
+        if gap_velocity >= 0 or gap_acceleration >= 0:
+            return None
+
+    # Use a trailing slope window. The legacy detector used bars after an old
+    # candidate bar; a latest-bar detector cannot look into the future.
+    slope_window = min(ACCEL_300_SLOPE_WINDOW, len(closes))
+    if slope_window >= 2:
+        slope_chunk = closes[-slope_window:]
+        x_mean = (slope_window - 1) / 2.0
+        y_mean = sum(slope_chunk) / slope_window
+        denominator = sum((idx - x_mean) ** 2 for idx in range(slope_window))
+        if denominator > 0 and y_mean != 0:
+            numerator = sum(
+                (idx - x_mean) * (slope_chunk[idx] - y_mean)
+                for idx in range(slope_window)
+            )
+            pct_slope = (numerator / denominator) / y_mean * 100.0
+            if direction == 'LONG' and pct_slope <= ACCEL_300_REGIME_SLOPE_PCT:
+                return None
+            if direction == 'SHORT' and pct_slope >= -ACCEL_300_REGIME_SLOPE_PCT:
+                return None
+
+    # Diagnostic only: report distance from the most recent same-direction EMA
+    # cross, but do not require a fresh cross. Sustained acceleration remains a
+    # valid signal as long as the current conditions above are true.
+    cross_bar = None
+    for idx in range(latest_idx, period - 1, -1):
+        previous_idx = idx - 1
+        if previous_idx < 0 or ema300[idx] is None or ema300[previous_idx] is None:
+            continue
+        if direction == 'LONG':
+            crossed = closes[idx] > ema300[idx] and closes[previous_idx] <= ema300[previous_idx]
+        else:
+            crossed = closes[idx] < ema300[idx] and closes[previous_idx] >= ema300[previous_idx]
+        if crossed:
+            cross_bar = idx
+            break
+
+    bars_since_cross = (
+        latest_idx - cross_bar if cross_bar is not None else ACCEL_300_BARS_UNKNOWN
+    )
+
+    # Stale bars gate: reject signals where the EMA cross is too old.
+    # A fresh cross means the signal is entering early in the move.
+    stale_limit = STALE_BARS if direction == 'LONG' else STALE_BARS_SHORT
+    if bars_since_cross != ACCEL_300_BARS_UNKNOWN and bars_since_cross > stale_limit:
+        return None
+
+    return {
+        'direction': direction,
+        'gap_pct': round(gap_now, 4),
+        'gap_growth': round(gap_growth, 4),
+        'price_velocity': price_velocity,
+        'price_acceleration': price_acceleration,
+        'gap_velocity': round(gap_velocity, 4),
+        'gap_acceleration': round(gap_acceleration, 4),
+        'gap_then': round(gap_then, 4),
+        'bars_since_cross': bars_since_cross,
+        'price': closes[latest_idx],
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Ultra-Fast Breakout Detection
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect_breakout(token: str, prices: list, volumes: list = None) -> Optional[dict]:
+    """Detect high-velocity breakout BEFORE persistence confirms the trend.
+
+    Fires when price makes a fast move (>1.0% in 5 bars) with strong gap from
+    EMA60. Uses 200 EMA as trend filter. Requires volume confirmation.
+
+    Returns signal dict or None.
+    """
+    from hermes_constants import (
+        ACCEL_300_BREAKOUT_VELOCITY,
+        ACCEL_300_BREAKOUT_GAP_MIN,
+        ACCEL_300_BREAKOUT_TREND_EMA,
+        ACCEL_300_BREAKOUT_VOL_MULT,
+    )
+
+    if len(prices) < 210:  # need 200 EMA warmup + 5 bar velocity
+        return None
+
+    closes = [float(p['price']) for p in prices]
+
+    # Compute EMAs
+    ema60 = _ema_series(closes, 60)
+    ema200 = _ema_series(closes, 200)
+
+    latest_idx = len(closes) - 1
+    if ema60[latest_idx] is None or ema200[latest_idx] is None:
+        return None
+
+    gap_now = (closes[latest_idx] - ema60[latest_idx]) / ema60[latest_idx] * 100.0
+    direction = 'LONG' if closes[latest_idx] > ema60[latest_idx] else 'SHORT'
+
+    # Gap must be strong enough
+    if abs(gap_now) < ACCEL_300_BREAKOUT_GAP_MIN:
+        return None
+
+    # Trend filter: LONG only above 200 EMA, SHORT only below
+    if direction == 'LONG' and closes[latest_idx] < ema200[latest_idx]:
+        return None
+    if direction == 'SHORT' and closes[latest_idx] > ema200[latest_idx]:
+        return None
+
+    # 5-bar velocity check
+    if latest_idx < 5:
+        return None
+    move_5 = (closes[latest_idx] - closes[latest_idx - 5]) / closes[latest_idx - 5] * 100.0
+    if direction == 'LONG' and move_5 < ACCEL_300_BREAKOUT_VELOCITY:
+        return None
+    if direction == 'SHORT' and move_5 > -ACCEL_300_BREAKOUT_VELOCITY:
+        return None
+
+    # Fresh gap: price must have been on the same side for last 3 bars
+    for j in range(latest_idx - 2, latest_idx + 1):
+        if ema60[j] is None:
+            return None
+        if direction == 'LONG' and closes[j] <= ema60[j]:
+            return None
+        if direction == 'SHORT' and closes[j] >= ema60[j]:
+            return None
+
+    # Price must be moving in the right direction
+    price_velocity = closes[latest_idx] - closes[latest_idx - 5]
+    if direction == 'LONG' and price_velocity <= 0:
+        return None
+    if direction == 'SHORT' and price_velocity >= 0:
+        return None
+
+    # Volume filter (if volumes provided)
+    if volumes and len(volumes) >= 20:
+        vol_avg = sum(volumes[-20:]) / 20.0
+        if vol_avg > 0 and volumes[-1] < vol_avg * ACCEL_300_BREAKOUT_VOL_MULT:
+            return None
+
+    return {
+        'direction': direction,
+        'gap_pct': round(gap_now, 4),
+        'move_5bar': round(move_5, 4),
+        'price_velocity': price_velocity,
+        'price': closes[latest_idx],
+        'type': 'breakout',
+    }
+
+
 # Scanner
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def scan_accel_300_signals(prices_dict: dict) -> int:
-    from hermes_constants import ACCEL_300_ENABLED, ACCEL_300_TOKEN_ALLOWLIST
-    if not ACCEL_300_ENABLED:
-        return 0
-    """
-    Scan tokens for accel_300 signals.
+    """Scan tokens for accel_300 signals.
 
     All guards (blacklists, open positions, cooldowns, price age) must be
     applied by the caller before passing prices_dict here.
@@ -644,6 +443,9 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
     Returns:
         Number of signals written to DB.
     """
+    from hermes_constants import ACCEL_300_ENABLED, ACCEL_300_TOKEN_ALLOWLIST
+    if not ACCEL_300_ENABLED:
+        return 0
     from signal_schema import add_signal, get_cooldown, price_age_minutes
     from position_manager import get_open_positions as _get_open_pos
     from signal_gen import (
@@ -666,8 +468,8 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             continue
         if is_delisted(token.upper()):
             continue
-        if token.upper() in SHORT_BLACKLIST:
-            continue
+        # Direction-aware SHORT blacklist is enforced after detection. Applying
+        # it here would also suppress valid LONG signals for the same token.
         # ── Token allowlist: only fire on tokens with >=50% historical WR ─────────
         if ACCEL_300_TOKEN_ALLOWLIST and token.upper() not in ACCEL_300_TOKEN_ALLOWLIST:
             continue
@@ -675,10 +477,21 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             continue
 
         prices = _get_1m_prices(token, lookback=LOOKBACK_1M)
-        if not prices or len(prices) < PERIOD + LOOKBACK + PERSISTENCE_BARS + 5:
+        minimum_rows = PERIOD + max(PERSISTENCE_BARS, 3)
+        if not prices or len(prices) < minimum_rows:
             continue
 
+        # ── Try persistence-based accel_300 first ────────────────────────────
         sig = detect_accel_300(token, prices)
+
+        # ── Try ultra-fast breakout if persistence failed ─────────────────────
+        from hermes_constants import ACCEL_300_BREAKOUT_ENABLED
+        breakout_sig = None
+        if sig is None and ACCEL_300_BREAKOUT_ENABLED:
+            breakout_sig = detect_breakout(token, prices)
+            if breakout_sig is not None:
+                sig = breakout_sig
+
         if sig is None:
             continue
 
@@ -701,32 +514,52 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             continue
 
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
-        source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
-        # Confidence: base on gap strength + gap growth
-        # MIN_GAP_PCT=0.10 → base 65, larger gap → up to 70 (cap lowered 2026-05-12 to reduce LONG bias)
-        # Bonus for strong gap growth (requires growth > 0.05% to earn bonus)
-        # FIX: use abs(gap_pct) so SHORT signals also earn the gap-strength bonus
-        gap_bonus = max(0, sig['gap_growth'] - 0.05) * 200  # max ~20 for 0.15%+ growth
-        gap_for_conf = abs(sig['gap_pct'])  # use absolute gap so SHORT earns bonus too
-        confidence = int(min(70, 65 + max(0, (gap_for_conf - MIN_GAP_PCT) * 80) + gap_bonus))
-        confidence = max(60, confidence)
+        # ── Source and confidence: breakout vs persistence ────────────────────
+        is_breakout = breakout_sig is not None and sig.get('type') == 'breakout'
+        if is_breakout:
+            source = 'accel-300-breakout'
+            confidence = ACCEL_300_BREAKOUT_CONFIDENCE
+        else:
+            source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+            # Confidence: base on gap strength + absolute gap growth. SHORT growth
+            # is negative by design, so abs() keeps the strength bonus symmetric.
+            # Use direction-specific gap threshold to match detection logic.
+            gap_bonus = max(0, abs(sig['gap_growth']) - 0.05) * 200
+            gap_for_conf = abs(sig['gap_pct'])  # use absolute gap so SHORT earns bonus too
+            min_gap_for_conf = ACCEL_300_MIN_GAP_PCT_LONG if direction == 'LONG' else ACCEL_300_MIN_GAP_PCT_SHORT
+            confidence = int(min(70, 65 + max(0, (gap_for_conf - min_gap_for_conf) * 80) + gap_bonus))
+            confidence = max(60, confidence)
+
+        # `_get_1m_prices` enforces freshness and returns the real latest
+        # price_history point used by detection. Do not persist the separate
+        # prices_dict snapshot, which can be from a different collector tick.
+        signal_price = float(sig['price'])
 
         if DRY_RUN:
-            _log(f"  [DRY] {direction:5s}-accel-300 {token:8s} conf={confidence:.0f}% "
-                  f"gap={sig['gap_pct']:.3f}% growth={sig['gap_growth']:.3f}% "
-                  f"bars_since_cross={sig['bars_since_cross']} [{source}]")
+            if is_breakout:
+                _log(f"  [DRY] {direction:5s}-accel-300-breakout {token:8s} conf={confidence:.0f}% "
+                      f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
+                      f"move_5bar={sig['move_5bar']:.3f}% [{source}]")
+            else:
+                _log(f"  [DRY] {direction:5s}-accel-300 {token:8s} conf={confidence:.0f}% "
+                      f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
+                      f"growth={sig['gap_growth']:.3f}% price_accel={sig['price_acceleration']:.8g} "
+                      f"gap_velocity={sig['gap_velocity']:.3f}% "
+                      f"accel={sig['gap_acceleration']:.3f}% "
+                      f"bars_since_cross={sig['bars_since_cross']} [{source}]")
             continue
 
         try:
+            value = float(sig.get('move_5bar', sig.get('gap_growth', 0)))
             sid = add_signal(
                 token=token.upper(),
                 direction=direction,
                 signal_type=sig_type,
                 source=source,
                 confidence=confidence,
-                value=float(sig['gap_growth']),
-                price=price,
+                value=value,
+                price=signal_price,
                 exchange='hyperliquid',
                 timeframe='1m',
                 z_score=None,
@@ -734,11 +567,21 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             )
             if sid:
                 added += 1
-                # Set cooldown: don't re-fire for COOLDOWN_BARS bars (~10 minutes)
-                set_cooldown(token, direction, hours=COOLDOWN_BARS / 60.0)
-                _log(f"  {direction:5s}-accel-300 {token:8s} conf={confidence:.0f}% "
-                      f"gap={sig['gap_pct']:.3f}% growth={sig['gap_growth']:.3f}% "
-                      f"bars_since_cross={sig['bars_since_cross']} [{source}]")
+                # Breakout uses longer cooldown (1h) to avoid clustered false signals
+                if is_breakout:
+                    from hermes_constants import ACCEL_300_BREAKOUT_COOLDOWN
+                    set_cooldown(token, direction, hours=ACCEL_300_BREAKOUT_COOLDOWN / 12.0)
+                    _log(f"  {direction:5s}-accel-300-breakout {token:8s} conf={confidence:.0f}% "
+                          f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
+                          f"move_5bar={sig['move_5bar']:.3f}% [{source}]")
+                else:
+                    set_cooldown(token, direction, hours=COOLDOWN_BARS / 60.0)
+                    _log(f"  {direction:5s}-accel-300 {token:8s} conf={confidence:.0f}% "
+                          f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
+                          f"growth={sig['gap_growth']:.3f}% price_accel={sig['price_acceleration']:.8g} "
+                          f"gap_velocity={sig['gap_velocity']:.3f}% "
+                          f"accel={sig['gap_acceleration']:.3f}% "
+                          f"bars_since_cross={sig['bars_since_cross']} [{source}]")
         except Exception as e:
             print(f"[accel-300] add_signal error for {token}: {e}")
 

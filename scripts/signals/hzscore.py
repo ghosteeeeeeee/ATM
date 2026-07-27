@@ -11,10 +11,11 @@ hz_dir_char: '-' for LONG, '+' for SHORT.
 
 Checks HZSCORE_PLUS_ENABLED for SHORT, HZSCORE_MINUS_ENABLED for LONG.
 
-FIX (2026-05-07): Added MIN_Z_VALUE = 0.6.
+FIX (2026-05-07): Added MIN_Z_VALUE = 0.4.
   - Historical data: winners had avg_z ~2.0, losers ~0.72. Marginal z-scores
     in chop zone produce 35% WR vs 47%+ WR at extreme readings.
-  - Only fire when |avg_z| >= 0.6 — excludes marginal readings in the noise zone.
+  - Only fire when |avg_z| >= 0.4 — excludes marginal readings in the noise zone.
+  - Was 0.6, too tight — blocked 50% of signals.
 """
 
 # ── Signal Quality Threshold ───────────────────────────────────────────────────

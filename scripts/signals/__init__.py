@@ -21,7 +21,7 @@ from hermes_constants import (
     MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED,
     PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
     FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
-    ACCEL_300_ENABLED,
+    ACCEL_300_ENABLED, INVERSE_ACCEL_300_ENABLED,
     EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
     RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
     MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
@@ -46,6 +46,7 @@ from hermes_constants import (
     EMA20_50_PLUS_ENABLED, EMA20_50_MINUS_ENABLED,
     MACD_1M_PLUS_ENABLED, MACD_1M_MINUS_ENABLED,
     TL_BREAK_ENABLED,
+    SQUEEZE_CROSS_ENABLED, SQUEEZE_CROSS_PLUS_ENABLED, SQUEEZE_CROSS_MINUS_ENABLED,
     ZSCORE_PUMP_NEW_ENABLED, ZSCORE_PUMP_PLUS_ENABLED, ZSCORE_PUMP_MINUS_ENABLED,
     MTP_ZSCORE_ENABLED, MTP_ZSCORE_PLUS_ENABLED, MTP_ZSCORE_MINUS_ENABLED,
 )
@@ -109,6 +110,11 @@ try:
     from signals.accel_300 import scan_accel_300_signals as _accel_300_run
 except Exception:
     _accel_300_run = None
+
+try:
+    from signals.inverse_accel_300 import scan_inverse_accel_300_signals as _inverse_accel_300_run
+except Exception:
+    _inverse_accel_300_run = None
 
 try:
     from signals.ema_angle import scan_ema_angle_signals as _ema_angle_run
@@ -201,6 +207,11 @@ except Exception:
     _tl_break_run = None
 
 try:
+    from signals.squeeze_cross import run as _squeeze_cross_run
+except Exception:
+    _squeeze_cross_run = None
+
+try:
     from signals.zscore_pump import scan_zscore_pump_signals as _zscore_pump_run
 except Exception:
     _zscore_pump_run = None
@@ -237,6 +248,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'fast_momentum',        'enabled': 'FAST_MOMENTUM_ENABLED',      'run': _fast_momentum_run},
     # These use their *_ENABLED boolean directly
     {'name': 'accel_300',            'enabled': ACCEL_300_ENABLED,           'run': _accel_300_run},
+    {'name': 'inverse_accel_300',    'enabled': INVERSE_ACCEL_300_ENABLED,   'run': _inverse_accel_300_run},
     {'name': 'ema_angle',            'enabled': EMA_ANGLE_ENABLED,            'run': _ema_angle_run},
     {'name': 'rs',                   'enabled': RS_ENABLED,                   'run': _rs_run},
     {'name': 'gap_300',              'enabled': GAP_300_ENABLED,             'run': _gap_300_run},
@@ -255,6 +267,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'exhaustion',           'enabled': EXHAUSTION_ENABLED,          'run': _exhaustion_run},
     {'name': 'counter_flip',         'enabled': COUNTER_FLIP_ENABLED,      'run': _counter_flip_run},
     {'name': 'tl_break',             'enabled': TL_BREAK_ENABLED,          'run': _tl_break_run},
+    {'name': 'squeeze_cross',        'enabled': SQUEEZE_CROSS_ENABLED,     'run': _squeeze_cross_run},
     {'name': 'zscore_pump',         'enabled': ZSCORE_PUMP_NEW_ENABLED,       'run': _zscore_pump_run},
     {'name': 'mtp_zscore',          'enabled': MTP_ZSCORE_ENABLED,             'run': _mtp_zscore_run},
 ]
@@ -351,7 +364,8 @@ def run_all_signals(signal_list=None):
         'pct_hermes': 'run', 'vel_hermes': 'run',
         'hzscore': 'run', 'hmacd': 'run',
         'phase_accel': 'run', 'fast_momentum': 'run',
-        'accel_300': 'scan_accel_300_signals', 'ema_angle': 'scan_ema_angle_signals',
+        'accel_300': 'scan_accel_300_signals', 'inverse_accel_300': 'scan_inverse_accel_300_signals',
+        'ema_angle': 'scan_ema_angle_signals',
         'rs': 'scan_rs_signals',
         'ma_cross': 'scan_ma_cross_signals', 'ma_cross_5m': 'scan_ma_cross_5m_signals',
         'hh_hl': 'scan_hh_hl_signals', 'guppy': 'scan_all_tokens',
@@ -360,7 +374,8 @@ def run_all_signals(signal_list=None):
         'volume_hl': 'run', 'ma300_candle_confirm': 'run',
         'atr_compression': 'run',
         'exhaustion': 'run', 'counter_flip': 'run',
-        'tl_break': 'run', 'zscore_pump': 'scan_zscore_pump_signals',
+        'tl_break': 'run', 'squeeze_cross': 'run',
+        'zscore_pump': 'scan_zscore_pump_signals',
         'mtp_zscore': 'scan_mtp_zscore_signals',
     }
     work = [

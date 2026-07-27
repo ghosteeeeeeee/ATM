@@ -3,6 +3,7 @@
 run_pipeline.py — Hermes Trading Pipeline
 Runs every 1 minute via cron. A/B optimizer every 10 minutes.
 """
+from paths import *
 import sys, subprocess, time, os, argparse, os, fcntl, json
 from _secrets import BRAIN_DB_DICT
 
@@ -11,8 +12,32 @@ LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 LOCK    = '/tmp/hermes-pipeline.lock'
 
 # Which steps run every minute vs every N minutes
-STEPS_EVERY_MIN  = ['price_collector', '4h_regime_scanner', 'signal_gen', 'hermes-trades-api', 'decider_run', 'position_manager']
-STEPS_EVERY_10M  = ['ai_decider', 'strategy_optimizer', 'ab_optimizer', 'ab_learner']
+#
+# ai_decider: DEFUNCT (removed 2026-04-16)
+#   - Was: LLM-based hot-set compactor running every 10 min via ai-decider.timer
+#   - Problem: update_open_positions_skipped() marked every open-position token
+#     SKIPPED every 10 min → 50+ duplicate SKIPPED entries, corrupted signal lifecycle
+#   - Replaced by: signal_compactor.py (in STEPS_EVERY_MIN) — deterministic, LLM-free
+#   - ai-decider.timer + ai-decider.service: STOPPED and DISABLED
+#   - brain.py still has ai_decider import for backward compat only
+
+# 4h_regime_scanner: runs via 4h-regime-scanner.timer (OnUnitActiveSec=4h)
+# 15m_regime_scanner: runs via hermes-15m-regime-scanner.timer (OnCalendar=*:0/15:00)
+# Both were incorrectly in STEPS_EVERY_MIN — removed 2026-04-25 (were firing every minute,
+# burning Binance API calls and producing duplicate stale results).
+# Both scanners now read from local candles.db (primary) with Binance fallback.
+# signal_gen removed 2026-05-06 — inline signals migrated to signals_runner (scripts/signals/).
+# All master *_ENABLED flags in hermes_constants.py are False; signal_gen was doing
+# expensive computation (get_all_latest_prices, compute_regime, get_momentum_stats)
+# for zero signal output. signals_runner is now the canonical path.
+STEPS_EVERY_MIN  = ['signal_compactor', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
+# price_collector: removed 2026-04-25
+#   - Was firing BOTH via run_pipeline.py AND via hermes-price-collector.timer
+#   - Lock caused ~0.3% skip rate from collision
+#   - Now runs exclusively via hermes-price-collector.timer (standalone, every 1 min)
+#   - Pipeline no longer blocked by ~26s aggregation; other steps get faster execution
+STEPS_EVERY_5M   = ['signals_runner_slow']  # slow signals: momentum, mtf_momentum (>60s per run)
+STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer', 'ab_learner']
 
 
 def log(msg):
@@ -30,8 +55,11 @@ def log(msg):
 # Per-step timeouts (seconds)
 STEP_TIMEOUTS = {
     'signal_gen': 180,
+    'signals_runner': 300,
+    'signals_runner_slow': 240,
+    'breakout_engine': 60,
     'decider_run': 360,
-    'ai_decider': 240,
+    'signal_compactor': 60,   # deterministic — must be fast (<2s typical)
     'position_manager': 120,
     'strategy_optimizer': 300,
     'ab_optimizer': 300,
@@ -43,6 +71,10 @@ DEFAULT_TIMEOUT = 300
 
 
 def run(name, args=None):
+    # Slow signals runner uses --slow flag
+    if name == 'signals_runner_slow':
+        name = 'signals_runner'
+        args = ['--slow']
     script = f'{SCRIPTS}/{name}.py'
     cmd = [sys.executable, script] + (args or [])
     timeout = STEP_TIMEOUTS.get(name, DEFAULT_TIMEOUT)
@@ -57,7 +89,10 @@ def run(name, args=None):
         if out:
             lines = out.split('\n')
             # For noisy steps (price_collector etc.) only log errors
-            if name in ('position_manager', 'decider_run', 'signal_gen', 'ai_decider', 'live-decider'):
+            if name in ('position_manager', 'decider_run', 'live-decider'):
+                # ai_decider: DEFUNCT — removed 2026-04-16.
+                # Replaced by signal_compactor.py (STEPS_EVERY_5M) which is deterministic
+                # and LLM-free. signal_compactor runs every minute in STEPS_EVERY_MIN.
                 log_lines = [l.strip() for l in lines if l.strip()]
                 if log_lines:
                     for l in log_lines[-8:]:
@@ -81,12 +116,39 @@ def run(name, args=None):
         return False
 
 
+def run_bg(name, args=None):
+    """Run a step in the background so the pipeline is not blocked.
+    Used for slow steps (>30s) like signals_runner.
+    stdout/stderr go to the pipeline log directly.
+    """
+    if name == 'signals_runner_slow':
+        name = 'signals_runner'
+        args = ['--slow']
+    script = f'{SCRIPTS}/{name}.py'
+    cmd = [sys.executable, script] + (args or [])
+    log(f'Running {name} [BACKGROUND]...')
+    try:
+        # Open log file for this step's output
+        log_file = LOG
+        with open(log_file, 'a') as lf:
+            proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.DEVNULL,
+                stdout=lf,
+                stderr=subprocess.STDOUT,
+                start_new_session=True
+            )
+        log(f'  {name} forked as PID {proc.pid}')
+    except Exception as e:
+        log(f'ERROR {name}: failed to fork: {e}')
+
+
 def main():
     args = sys.argv[1:]
     is_live = '--live' in args
     # Also check hype_live_trading.json for live mode
     try:
-        with open('/var/www/hermes/data/hype_live_trading.json') as f:
+        with open(LIVESWITCH_FILE) as f:
             flags = json.load(f)
             if flags.get('live_trading'):
                 is_live = True
@@ -95,6 +157,7 @@ def main():
     mode = 'LIVE' if is_live else 'PAPER'
 
     minute = int(time.strftime('%M'))
+    every_5  = (minute % 5 == 0)
     every_10 = (minute % 10 == 0)
 
     # Prevent overlapping pipeline runs (systemd can fire twice)
@@ -105,36 +168,47 @@ def main():
         log(f'=== Pipeline skipped (already running) ===')
         sys.exit(0)
 
-    log(f'=== Pipeline {mode} ({"1m+10m" if every_10 else "1m"}) ===')
+    # Explicitly close lock fd — otherwise the lock persists until this process
+    # exits. Since signals_runner is forked (run_bg with start_new_session=True),
+    # the fd is duplicated into the child. Closing it here releases the lock
+    # immediately so subsequent pipeline runs are not blocked.
+    try:
+        os.close(lock_fd)
+    except OSError:
+        pass
+
+    log(f'=== Pipeline {mode} ({"1m+5m+10m" if every_5 else ("1m+10m" if every_10 else "1m")}) ===')
+
+    # Increment pipeline cycle counter (used for cascade-flip eviction tracking)
+    try:
+        sys.path.insert(0, SCRIPTS)
+        from cascade_flip_helpers import increment_pipeline_cycle
+        new_cycle = increment_pipeline_cycle()
+        log(f'  [Cycle] #{new_cycle}')
+    except Exception as e:
+        log(f'  [Cycle] ⚠️ Could not increment cycle: {e}')
 
     import time as _t
     start = _t.time()
     # Every minute
     for step in STEPS_EVERY_MIN:
-        # Pass --live to step scripts only when in live mode
-        extra = ['--live'] if is_live else []
-        run(step, extra)
+        # NOTE: --live is NOT passed to step scripts.
+        # All scripts check LIVESWITCH_FILE (hype_live_trading.json) for live mode.
+        # Some scripts (breakout_engine, price_collector, etc.) do not accept --live.
+        if step == 'signals_runner':
+            run_bg(step)  # signals_runner takes ~60s — run in background
+        else:
+            run(step)
 
-    # FIX (2026-04-14): Skip ai_decider if already running (process-level guard).
-    # Also removed the redundant 'every_10' inner loop since we already check it above.
-    import psutil
-    for step in STEPS_EVERY_10M:
-        if step == 'ai_decider':
-            skip = False
-            for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-                try:
-                    cmdline = proc.info.get('cmdline') or []
-                    if any('ai_decider' in str(c) for c in cmdline):
-                        pid = proc.info['pid']
-                        if pid != os.getpid():
-                            log(f'Skipping ai_decider (PID {pid} already running)')
-                            skip = True
-                            break
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    pass
-            if skip:
-                continue
-        run(step)
+    # Every 5 minutes: slow signals (momentum, mtf_momentum)
+    if every_5:
+        for step in STEPS_EVERY_5M:
+            run(step)
+
+    # Every 10 minutes: strategy_optimizer, ab_optimizer, ab_learner
+    if every_10:
+        for step in STEPS_EVERY_10M:
+            run(step)
 
     elapsed = _t.time() - start
     log(f'=== Pipeline done ({mode}) ===')

@@ -280,7 +280,7 @@ DRY = False  # Default is LIVE. Use --dry flag (not --apply) for dry-run mode.
 INTERVAL = 60  # seconds between checks
 # BUG-FIX: CUT_LOSER_THRESHOLD was used on line ~901 before being defined at ~918 inside
 # the same function → UnboundLocalError at runtime. Now defined at module scope.
-CUT_LOSER_THRESHOLD = -5.0
+CUT_LOSER_THRESHOLD = -3.0
 MAX_CONSECUTIVE_FAILURES = 5
 # BUG-5: Configurable slippage for guardian market closes (was hardcoded 0.01).
 # 0.005 = 0.5% — conservative for liquid markets, safe for illiquid tokens.
@@ -1266,13 +1266,32 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     log(f'  HL open fill for {coin}: ${hl_open_fill:.6f} (sz={fill_sz})', 'INFO')
                     hl_entry = hl_open_fill
                 else:
-                    # Fallback: use realized_pnl entry price, then entry_px from hl_pos
+                    # FIX (2026-07-27): get_realized_pnl() averages ALL open fills for a token
+                    # (mixing LONG and SHORT), causing wrong entry when multiple positions exist.
+                    # E.g., a large LONG open (149 sz @ 0.0324) drowns a small SHORT open (0.6 sz @ 0.03176).
+                    # Instead, match the specific open fill by direction using fill dir field.
                     start_ms = int(time.time() * 1000) - 86400000  # look back 24h
-                    realized = get_realized_pnl(coin, start_ms)
-                    hl_entry = realized.get('entry_price', entry_px)
-                    if hl_entry == 0:
+                    end_ms = int(time.time() * 1000)
+                    try:
+                        all_fills = _get_fills_cached(coin, start_ms, end_ms)
+                        token_fills = [f for f in all_fills if f['coin'].upper() == coin.upper()]
+                        # Find the open fill matching the detected direction
+                        dir_key = 'Open Long' if direction == 'LONG' else 'Open Short'
+                        matching_opens = [f for f in token_fills if dir_key in str(f.get('dir', ''))]
+                        if matching_opens:
+                            total_sz = sum(float(f['sz']) for f in matching_opens)
+                            hl_entry = sum(float(f['px']) * float(f['sz']) for f in matching_opens) / total_sz
+                            log(f'  HL direction-matched open fill for {coin} ({dir_key}): ${hl_entry:.6f} (sz={total_sz:.2f})', 'INFO')
+                        else:
+                            # No matching direction fill — fall back to any open fill
+                            realized = get_realized_pnl(coin, start_ms)
+                            hl_entry = realized.get('entry_price', entry_px)
+                            if hl_entry == 0:
+                                hl_entry = entry_px
+                            log(f'  ⚠️ {coin} no direction-matched open fill — using fallback ${hl_entry:.6f}', 'WARN')
+                    except Exception as fill_err:
                         hl_entry = entry_px
-                    log(f'  ⚠️ {coin} no HL open fill found — using fallback ${hl_entry:.6f}', 'WARN')
+                        log(f'  ⚠️ {coin} fill lookup failed ({fill_err}) — using entry_px ${hl_entry:.6f}', 'WARN')
 
                 # Create paper trade
                 # FIX (2026-04-05): entry_price and amount_usdt were SWAPPED in the call.
@@ -1742,23 +1761,23 @@ def _check_hard_stops(prices: dict):
         return
     try:
         cur = conn.cursor()
-        # GUARDIAN HARD-STOP: Only fires for positions NOT managed by ATR.
-        # ATR-managed positions are handled exclusively by position_manager's
-        # check_atr_tp_sl_hits() in the pipeline. Guardian is the emergency backup
-        # for positions that somehow never got ATR levels (entry_price=0, etc).
+        # GUARDIAN HARD-STOP: Fires for ALL positions with SL set.
+        # ATR-managed positions are also covered — catches cases where ATR engine
+        # produces an unfillable SL (e.g., wrong-side guard chasing price).
+        # Safety margin: only fires when price is >0.5% beyond SL to avoid
+        # race conditions with position_manager's own SL checks.
         cur.execute("""
             SELECT id, token, direction, entry_price, stop_loss, target,
-                   leverage, amount_usdt, paper
+                   leverage, amount_usdt, paper, atr_managed
             FROM trades
             WHERE status='open' AND exchange='Hyperliquid'
             AND stop_loss IS NOT NULL AND stop_loss > 0
-            AND (atr_managed IS NULL OR atr_managed = FALSE)
         """)
         rows = cur.fetchall()
         cur.close()
         conn.close()
 
-        for trade_id, token, direction, entry_px, sl, tp, lev, amt, paper in rows:
+        for trade_id, token, direction, entry_px, sl, tp, lev, amt, paper, atr_managed in rows:
             token = token.upper()
             cur_price = prices.get(token)
             if cur_price is None:
@@ -1773,16 +1792,20 @@ def _check_hard_stops(prices: dict):
             if direction == 'SHORT':
                 # SHORT: SL is ABOVE entry. Price rising TO or ABOVE SL = loss.
                 # TP is BELOW entry. Price falling TO or BELOW TP = profit target.
-                if cur_price >= sl:
+                # Safety margin: for ATR-managed positions, require >0.5% beyond SL
+                # to avoid race conditions with position_manager.
+                _margin = 0.005 if (atr_managed) else 0.0
+                if cur_price >= sl * (1 + _margin):
                     hit_reason = 'hard_sl'
-                elif tp > 0 and cur_price <= tp:
+                elif tp > 0 and cur_price <= tp * (1 - _margin):
                     hit_reason = 'hard_tp'
             elif direction == 'LONG':
                 # LONG: SL is BELOW entry. Price falling TO or BELOW SL = loss.
                 # TP is ABOVE entry. Price rising TO or ABOVE TP = profit target.
-                if cur_price <= sl:
+                _margin = 0.005 if (atr_managed) else 0.0
+                if cur_price <= sl * (1 - _margin):
                     hit_reason = 'hard_sl'
-                elif tp > 0 and cur_price >= tp:
+                elif tp > 0 and cur_price >= tp * (1 + _margin):
                     hit_reason = 'hard_tp'
 
             if hit_reason:
@@ -1792,6 +1815,42 @@ def _check_hard_stops(prices: dict):
                         pnl_pct = round((entry_px - cur_price) / entry_px * 100, 2)
                     else:
                         pnl_pct = round((cur_price - entry_px) / entry_px * 100, 2)
+
+                # RACE CONDITION GUARD: Check if position is still on HL before closing.
+                # Position_manager may have already closed it (e.g., ATR SL hit).
+                # If HL shows no position, skip — position_manager handled it.
+                from hyperliquid_exchange import get_open_hype_positions
+                hl_pos = get_open_hype_positions()
+                # SAFETY: get_open_hype_positions() returns {} on API error.
+                # If hl_pos is empty AND we have a trade, that's an API error —
+                # don't skip, proceed with close. Only skip when hl_pos is
+                # non-empty AND token is missing (position_manager closed it).
+                if hl_pos and token.upper() not in hl_pos:
+                    log(f'  [HARD-{hit_reason.upper()}] {token} trade#{trade_id} — '
+                        f'NOT on HL (position_manager already closed) — skipping', 'INFO')
+                    # Mark as closed in DB to prevent re-check
+                    try:
+                        conn_skip = get_db_connection()
+                        if conn_skip:
+                            cur_skip = conn_skip.cursor()
+                            cur_skip.execute("""
+                                UPDATE trades SET status='closed', guardian_closed=TRUE,
+                                    close_reason=%s, exit_reason=%s,
+                                    exit_price=%s, pnl_pct=%s, close_time=NOW()
+                                WHERE id=%s AND status='open'
+                            """, (f'position_manager_{hit_reason}', f'pm_{hit_reason}',
+                                  cur_price, pnl_pct, trade_id))
+                            conn_skip.commit()
+                            cur_skip.close()
+                            conn_skip.close()
+                    except Exception as e:
+                        log(f'  [HARD-{hit_reason.upper()}] DB update failed for '
+                            f'trade#{trade_id}: {e}', 'FAIL')
+                    _CLOSED_HL_COINS.add(token.upper())
+                    continue
+                elif not hl_pos:
+                    log(f'  [HARD-{hit_reason.upper()}] {token} — HL API returned empty '
+                        f'(possible error), proceeding with close', 'WARN')
 
                 log(f'  [HARD-{hit_reason.upper()}] {token} trade#{trade_id} '
                     f'{"LONG" if direction=="LONG" else "SHORT"} '

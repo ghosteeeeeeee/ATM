@@ -11,29 +11,27 @@ WWW_GIT = Path("/var/www/git")
 GITHUB_REPO = "ghosteeeeeeee/ATM"
 
 def _get_token():
-    t = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
-    if t:
-        return t
+    """Get token from _secrets first (primary), then ~/.netrc fallback."""
+    # Try _secrets first
     try:
         sys.path.insert(0, str(Path(__file__).parent))
-        from _secrets import GITHUB_TOKEN
-        if GITHUB_TOKEN and GITHUB_TOKEN not in ("", "***"):
-            return GITHUB_TOKEN
+        from _secrets import GITHUB_TOKEN as _t
+        if _t and _t not in ("", "***") and _t.startswith("ghp_"):
+            return _t
     except Exception:
         pass
+    # Fall back to ~/.netrc
     try:
         netrc = Path.home() / ".netrc"
         if netrc.exists():
             for line in netrc.read_text().splitlines():
                 if "api.github.com" in line:
-                    parts = line.split()
-                    if "login" in parts:
-                        idx = parts.index("login")
-                        if idx + 1 < len(parts):
-                            return parts[idx + 1]
+                    for part in line.split():
+                        if part.startswith("ghp_"):
+                            return part
     except Exception:
         pass
-    sys.exit("ERROR: No GITHUB_TOKEN found in env, _secrets, or ~/.netrc")
+    sys.exit("ERROR: No GITHUB_TOKEN found in _secrets or ~/.netrc")
 
 GH = _get_token()
 
@@ -109,8 +107,12 @@ def main():
     # 6. Push to GitHub (both remotes)
     if not no_push:
         print("Pushing to GitHub...")
-        # Use force-withLease instead of --force for safer push
-        sh("git", "push", "github", "main", check=False)
+        push_url = f"https://user:{GH}@github.com/{GITHUB_REPO}.git"
+        r = subprocess.run(["git", "-C", str(HERMES), "push", push_url, "main", "--force"],
+                           capture_output=True, text=True)
+        if r.returncode:
+            print(f"  Push failed: {r.stderr.strip()}")
+            sys.exit(1)
         print("  Pushed to github/main")
     print("Creating GitHub release...")
     release_data = {
@@ -129,16 +131,17 @@ def main():
     with open(full_zip, "rb") as f:
         zip_data = f.read()
 
-    # Upload zip to GitHub release assets
+    # 8. Upload zip to GitHub release (may fail if repo has immutable releases)
     import urllib.request, urllib.error
-    upload_url_clean = f"{upload_url}{zip_basename}"
+    github_dl = None
     req = urllib.request.Request(
-        upload_url_clean,
+        f"{upload_url}{zip_basename}",
         data=zip_data,
         headers={
             "Authorization": f"token {GH}",
             "Content-Type": "application/zip",
             "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
         },
         method="POST",
     )
@@ -147,12 +150,16 @@ def main():
             asset = json.loads(resp.read())
         github_dl = asset["browser_download_url"]
         print(f"  GitHub: {github_dl}")
+        print("Publishing release...")
+        github_api("PATCH", f"releases/{release_id}", data={"draft": False})
     except urllib.error.HTTPError as e:
         body = e.read().decode()
-        # Fall back: release was created, zip is at local path — GitHub release URL works
-        github_dl = f"https://github.com/{GITHUB_REPO}/releases/tag/{tag_name}"
-        print(f"  GitHub upload failed ({e.code}) — release created but asset not attached")
-        print(f"  GitHub: {github_dl}")
+        if "immutable" in body:
+            print(f"  GitHub: release is immutable — using local endpoint only")
+            github_dl = f"https://github.com/{GITHUB_REPO}/releases/tag/v{ts}"
+        else:
+            print(f"  GitHub upload failed ({e.code}): {body[:200]}")
+            github_dl = f"https://github.com/{GITHUB_REPO}/releases/tag/v{ts}"
 
     WWW_GIT.mkdir(parents=True, exist_ok=True)
     local_dest = WWW_GIT / zip_basename

@@ -27,7 +27,7 @@ SPEED_CACHE = os.path.join(HERMES_DATA, "speed_cache.json")
 from hermes_constants import (
     SPEED_MIN_THRESHOLD, SPEED_BOOST_THRESHOLD, SPEED_BOOST_FACTOR,
     SPEED_HOTSET_THRESHOLD, SPEED_HOTSET_BONUS,
-    VEL_5M_WINDOW, VEL_15M_WINDOW, VEL_STALE_THRESHOLD_PCT, OVEREXTENDED_THRESHOLD,
+    VEL_5M_WINDOW, VEL_15M_WINDOW, VEL_30M_WINDOW, VEL_STALE_THRESHOLD_PCT, OVEREXTENDED_THRESHOLD,
     STALE_WINNER_TIMEOUT_MINUTES, STALE_LOSER_TIMEOUT_MINUTES,
 )
 
@@ -259,14 +259,17 @@ class SpeedTracker:
         # For hourly data (avg_interval ~= 3600):
         #   5m  window → 1 candle
         #   15m window → 3 candles
+        #   30m window → 6 candles
         # For 1-min data (avg_interval ≈ 60):
-        #   5m  window → VEL_5M_WINDOW  (default 5)
-        #   15m window → VEL_15M_WINDOW (default 15)
+        #   5m  window → VEL_5M_WINDOW  (5)
+        #   15m window → VEL_15M_WINDOW (15)
+        #   30m window → VEL_30M_WINDOW (30)
         if avg_interval >= 1800:  # hourly or higher interval
-            win_5m, win_15m = 1, 3
+            win_5m, win_15m, win_30m = 1, 3, 6
         else:  # 1-min data
             win_5m  = VEL_5M_WINDOW   # 5
             win_15m = VEL_15M_WINDOW  # 15
+            win_30m = VEL_30M_WINDOW  # 30
 
         # ── Windowed average velocity ─────────────────────────────────────
         # Replaces single-point (p0 - p5)/p5 which is noise-sensitive to one ref candle.
@@ -286,6 +289,7 @@ class SpeedTracker:
 
         vel_5m  = _avg_vel(win_5m)
         vel_15m = _avg_vel(win_15m)
+        vel_30m = _avg_vel(win_30m)
 
         # ── Acceleration: rate of change of velocity ─────────────────────
         # accel = (avg_vel_5m - avg_vel_15m) / time_span
@@ -296,10 +300,19 @@ class SpeedTracker:
         if vel_5m is not None and vel_15m is not None and span > 0:
             accel = round((vel_5m - vel_15m) / span, 4)
 
+        # ── 30m price change (total move, not per-candle) ────────────────
+        # Used by decider_run.py to detect momentum exhaustion.
+        # If price moved >0.5% in 30m, entering now = catching the top.
+        price_change_30m = None
+        if vel_30m is not None:
+            price_change_30m = round(vel_30m * win_30m, 4)
+
         return {
             "price_velocity_5m": vel_5m,
             "price_velocity_15m": vel_15m,
+            "price_velocity_30m": vel_30m,
             "price_acceleration": accel,
+            "price_change_30m": price_change_30m,
             "momentum_score": 50,
             "is_stale": False,
             "last_move_at": None,
@@ -353,8 +366,8 @@ class SpeedTracker:
                     INSERT INTO token_speeds
                         (token, price_velocity_5m, price_velocity_15m, price_acceleration,
                          speed_percentile, is_stale, wave_phase, is_overextended,
-                         momentum_score, last_move_at, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         momentum_score, price_change_30m, last_move_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(token) DO UPDATE SET
                         price_velocity_5m = excluded.price_velocity_5m,
                         price_velocity_15m = excluded.price_velocity_15m,
@@ -364,6 +377,7 @@ class SpeedTracker:
                         wave_phase = excluded.wave_phase,
                         is_overextended = excluded.is_overextended,
                         momentum_score = excluded.momentum_score,
+                        price_change_30m = excluded.price_change_30m,
                         last_move_at = excluded.last_move_at,
                         updated_at = excluded.updated_at
                 """, (
@@ -376,6 +390,7 @@ class SpeedTracker:
                     s.get("wave_phase", "neutral"),
                     1 if s.get("is_overextended") else 0,
                     s.get("momentum_score", 50),
+                    s.get("price_change_30m") or 0,
                     s.get("last_move_at"),
                     now,
                 ))

@@ -316,6 +316,9 @@ def scan_zscore_pump_signals(prices_dict: dict) -> int:
     Returns:
         Number of signals written to DB.
     """
+    global DRY_RUN
+    DRY_RUN = '--dry' in sys.argv
+
     if not ZSCORE_PUMP_NEW_ENABLED:
         return 0
 

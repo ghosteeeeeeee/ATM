@@ -21,11 +21,11 @@ _SECRETS = pathlib.Path(__file__).parent.parent / ".secrets.local"
 if _SECRETS.exists():
     for line in _SECRETS.read_text().splitlines():
         k, _, v = line.strip().partition("=")
-        if k and v and k not in ("SIGNING_WALLET_ADDRESS", "MAIN_ACCOUNT_ADDRESS"):
+        if k and v and k not in ("MAIN_ACCOUNT_ADDRESS",):
             globals()[k] = v.strip('"')
 
 _SIGNING_KEY            = globals().get("SIGNING_KEY", "")
-SIGNING_WALLET_ADDRESS  = "0x5AB4AC1b62A255284b54230b980AbA66d882D80A"  # funding/signing wallet
+SIGNING_WALLET_ADDRESS  = globals().get("SIGNING_WALLET_ADDRESS", "")  # loaded from .secrets.local above
 
 # MAIN_ACCOUNT_ADDRESS = trading account (separate from signing wallet)
 # .secrets.local has it but it's filtered above, so hardcode here

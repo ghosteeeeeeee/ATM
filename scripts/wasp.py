@@ -49,12 +49,12 @@ def psql(sql: str) -> list:
         bug("ERROR", "brain-db", f"PSQL query failed: {e}", sql[:80])
         return []
 
-def sqlite(db: str, sql: str) -> list:
+def sqlite(db: str, sql: str, params=()) -> list:
     try:
         conn = sqlite3.connect(db)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        cur.execute(sql)
+        cur.execute(sql, params)
         rows = cur.fetchall()
         conn.close()
         return [dict(r) for r in rows]
@@ -85,8 +85,11 @@ def check_prices():
         prices = data.get("prices", {})
         tokens = data.get("tokens", {})
         count = len(prices)
-        if count < 200:
-            bug("ERROR", "prices", f"Only {count} tokens in prices.json (expected ~229)")
+        # Tradeable core universe on HL is now ~83 (Apr 2026+) — Hyperliquid pruned
+        # delisted coins + price_collector filters out @XXX numeric IDs and SKIP_TOKENS.
+        # 50 is a generous floor: any less means the collector broke, not that the universe shrunk.
+        if count < 50:
+            bug("ERROR", "prices", f"Only {count} tokens in prices.json (expected ~83)")
             bug("WARNING", "prices", f"prices.json has top-level keys: {list(data.keys())}")
         # check for stale entries (price = 0 or null)
         stale = [k for k, v in prices.items() if not v or v == 0]
@@ -96,8 +99,11 @@ def check_prices():
     # HL cache freshness
     cache = read_json(HL_CACHE, {})
     cache_age = time.time() - cache.get("_ts", 0)
-    if cache_age > 90:
-        bug("ERROR", "hl-cache", f"HL cache is {cache_age:.0f}s old (expected <90s)")
+    # price_collector currently takes ~105-175s because candle aggregation is
+    # part of the same oneshot. A 90s cache floor false-flags healthy in-flight
+    # runs; 240s still catches a genuinely stalled collector.
+    if cache_age > 240:
+        bug("ERROR", "hl-cache", f"HL cache is {cache_age:.0f}s old (expected <240s)")
     else:
         if not cache.get("allMids"):
             bug("CRITICAL", "hl-cache", "Cache has no allMids data")
@@ -199,23 +205,22 @@ def check_signals():
             bug("INFO", "signals", f"Decision skew: {pct:.0f}% PENDING (normal if AI review is slow)")
 
 # ═══════════════════════════════════════════════════════════════════════════
-# 3. AI DECIDER
+# 3. SIGNAL COMPACTOR
 # ═══════════════════════════════════════════════════════════════════════════
-def check_ai_decider():
-    # Check if signals are getting reviewed in last 2h
-    reviewed = sqlite(RUNTIME_DB,
-        "SELECT COUNT(*) as cnt FROM signals WHERE decision IN ('APPROVED','WAIT') "
-        "AND updated_at > datetime('now', '-2 hours')")
-    if reviewed and reviewed[0]["cnt"] == 0:
-        bug("WARNING", "ai-decider", "No signals reviewed by AI in last 2h — Ollama may be down")
+def check_signal_compactor():
+    """Verify the current deterministic signal decision path is processing data.
 
-    # Check for WAIT signals that have been stuck > 30 min (should be re-reviewed)
-    stuck_wait = sqlite(RUNTIME_DB,
-        "SELECT token, direction, confidence, updated_at FROM signals "
-        "WHERE decision='WAIT' AND updated_at < datetime('now', '-30 minutes') LIMIT 5")
-    if stuck_wait:
-        bug("INFO", "signals", f"{len(stuck_wait)} WAIT signals never re-reviewed",
-            ", ".join(f"{r['token']}({r['direction']})" for r in stuck_wait))
+    ai_decider.py is obsolete; signal_compactor.py now owns the hot-set. Its
+    lifecycle uses PENDING/EXPIRED/EXECUTED rather than APPROVED/WAIT, so the
+    old check permanently false-flagged a healthy system as an Ollama failure.
+    """
+    processed = sqlite(RUNTIME_DB,
+        "SELECT COUNT(*) as cnt FROM signals "
+        "WHERE decision IN ('EXPIRED','EXECUTED') "
+        "AND updated_at > datetime('now', '-2 hours')")
+    if processed and processed[0]["cnt"] == 0:
+        bug("WARNING", "signal-compactor",
+            "No signals processed in last 2h — compactor may not be running")
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 3b. OLLAMA HEALTH
@@ -241,8 +246,17 @@ def check_ollama():
             bug("ERROR", "ollama", "No models loaded")
             return
         model_names = [m.get("name","?") for m in models]
-        # Primary model is the first one usually
-        primary = model_names[0] if model_names else "?"
+        # Prefer generative model — /api/generate returns 400 on embedding-only models
+        # (e.g. nomic-embed-text). Skip embed families and pick a chat/generate model.
+        def _is_gen(m):
+            n = m.get("name","").lower()
+            fam = (m.get("details",{}).get("family","") or "").lower()
+            return "embed" not in n and "embed" not in fam and "bert" not in fam
+        gen_models = [m["name"] for m in models if _is_gen(m)]
+        primary = gen_models[0] if gen_models else model_names[0]
+        if not gen_models:
+            bug("WARNING", "ollama", f"No generative models installed (only: {', '.join(model_names)})")
+            return
         print(f"   Ollama models: {', '.join(model_names)}")
     except Exception as e:
         bug("ERROR", "ollama", f"Failed to parse model list: {e}")
@@ -259,7 +273,7 @@ def check_ollama():
         }, timeout=15)
         elapsed = time.time() - start
         if rp.status_code != 200:
-            bug("ERROR", "ollama", f"Generate request returned {rp.status_code}")
+            bug("ERROR", "ollama", f"Generate request returned {rp.status_code} (model={primary})")
         elif elapsed > 10:
             bug("WARNING", "ollama", f"Slow response: {elapsed:.1f}s (model={primary})")
         else:
@@ -419,17 +433,23 @@ def check_trailing_stops():
         bug("ERROR", "trailing-stop", "Trailing activation set but distance is 0/NULL",
             str(bad_dist[:3]))
 
-    # Check momentum_cache freshness (proxy for whether trailing stop state is being updated)
-    # Note: updated_at stores Unix timestamps (int-as-text), not ISO datetime strings,
-    # so we compare numerically using strftime '%s' to convert ISO 'now' to unix epoch
-    stale_trail = sqlite(RUNTIME_DB, """
-        SELECT token, updated_at
-        FROM momentum_cache
-        WHERE updated_at < strftime('%s', 'now', '-2 hours') * 1
-        LIMIT 5
-    """)
-    if stale_trail:
-        bug("WARNING", "trailing-stop", f"{len(stale_trail)} stale momentum_cache entries > 2h old")
+    # momentum_cache retains dormant-token history. Only stale state for currently
+    # open positions matters to trailing-stop safety; old rows are not failures.
+    open_tokens = [r[0] for r in psql(
+        "SELECT token FROM trades WHERE status='open' AND server='Hermes'")]
+    if open_tokens:
+        placeholders = ",".join("?" for _ in open_tokens)
+        stale_trail = sqlite(RUNTIME_DB, f"""
+            SELECT token, updated_at
+            FROM momentum_cache
+            WHERE token IN ({placeholders})
+              AND updated_at < strftime('%s', 'now', '-2 hours') * 1
+            LIMIT 5
+        """, open_tokens)
+        if stale_trail:
+            bug("WARNING", "trailing-stop",
+                f"{len(stale_trail)} open-position momentum_cache entries > 2h old",
+                ", ".join(r["token"] for r in stale_trail))
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 7. A/B TESTING / LEARNING
@@ -544,14 +564,16 @@ def check_pipeline():
                     bug("WARNING", "errors-log", f"{len(err_lines)} errors in last hour")
             except: pass
 
-    # Check cron health
+    # Check timer health (T uses systemd timers, not crontab — per SOPS)
     try:
-        result = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=5)
-        lines = result.stdout.splitlines()
-        wasp_crons = [l for l in lines if "wasp" in l.lower()]
-        if not wasp_crons:
-            bug("WARNING", "cron", "WASP cron job not installed")
-    except: pass
+        result = subprocess.run(
+            ["systemctl", "is-enabled", "hermes-wasp.timer"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode != 0 or result.stdout.strip() != "enabled":
+            bug("WARNING", "cron", f"WASP systemd timer not enabled (systemctl: {result.stdout.strip() or result.stderr.strip()})")
+    except Exception as e:
+        bug("WARNING", "cron", f"WASP timer check failed: {e}")
 
     # Check disk space
     try:
@@ -650,8 +672,11 @@ def check_db_integrity():
             age_h = (time.time() - datetime.fromisoformat(intel[0]["last"]).timestamp()) / 3600
         except:
             age_h = 999
+        # 2026-07-13: token_intel is a legacy one-row table and no active script
+        # writes it. Keep visibility without false-flagging the live pipeline.
         if age_h > 24:
-            bug("WARNING", "token-intel", f"token_intel stale: {intel[0]['cnt']} entries, {age_h:.1f}h old")
+            bug("INFO", "token-intel",
+                f"Legacy token_intel stale: {intel[0]['cnt']} entries, {age_h:.1f}h old")
 
     # Check for duplicate momentum_cache entries
     dup_mom = sqlite(RUNTIME_DB,
@@ -774,8 +799,18 @@ def check_paper_hl_sync():
 
     # Try to get actual HL position sizes
     try:
-        hl_positions = get_open_hype_positions_curl()
-        hl_tokens = {p.get("token") for p in hl_positions if p.get("token")}
+        hl_positions: object = get_open_hype_positions_curl()
+        # Current helper contract is {token: {size, direction, ...}}. Retain
+        # list support for older deployments, where rows used token/coin keys.
+        if isinstance(hl_positions, dict):
+            hl_tokens = {str(token).upper() for token, pos in hl_positions.items()
+                         if token and isinstance(pos, dict)}
+        elif isinstance(hl_positions, list):
+            hl_tokens = {str(p.get("token") or p.get("coin")).upper()
+                         for p in hl_positions if isinstance(p, dict)
+                         and (p.get("token") or p.get("coin"))}
+        else:
+            raise TypeError(f"unexpected position payload: {type(hl_positions).__name__}")
         print(f"   HL positions: {len(hl_tokens)} tokens")
     except Exception as e:
         bug("WARNING", "paper-hl-sync", f"Cannot fetch HL positions: {e}")
@@ -793,14 +828,28 @@ def check_paper_hl_sync():
         bug("INFO", "paper-hl-sync", f"{len(phantom)} HL-only tokens (not in paper)",
             ", ".join(sorted(phantom)[:10]))
 
-    # Sync staleness: check pipeline_heartbeat.json
+    # Sync staleness: use the newest component timestamp in pipeline_heartbeat.json.
+    # The heartbeat file is a component map, not a flat {"timestamp": ...} object.
     hb = read_json(PIPELINE_HB_FILE, {})
     if hb:
-        hb_age = (time.time() - hb.get("timestamp", 0)) / 60
-        if hb_age > 15:
-            bug("WARNING", "paper-hl-sync", f"Pipeline heartbeat is {hb_age:.0f}m old (sync may be stale)")
+        heartbeat_times = []
+        for component, state in hb.items():
+            if not isinstance(state, dict) or not state.get("timestamp"):
+                continue
+            try:
+                stamp = str(state["timestamp"]).replace("Z", "+00:00")
+                heartbeat_times.append(datetime.fromisoformat(stamp).timestamp())
+            except (TypeError, ValueError):
+                bug("INFO", "paper-hl-sync",
+                    f"Invalid pipeline heartbeat timestamp for {component}: {state.get('timestamp')}")
+        if heartbeat_times:
+            hb_age = (time.time() - max(heartbeat_times)) / 60
+            if hb_age > 15:
+                bug("WARNING", "paper-hl-sync", f"Pipeline heartbeat is {hb_age:.0f}m old (sync may be stale)")
+            else:
+                print(f"   Pipeline heartbeat: {hb_age:.1f}m ago")
         else:
-            print(f"   Pipeline heartbeat: {hb_age:.1f}m ago")
+            bug("WARNING", "paper-hl-sync", "Pipeline heartbeat has no valid component timestamps")
 
 # ═══════════════════════════════════════════════════════════════════════════
 # MAIN
@@ -811,7 +860,7 @@ def main():
 
     check_prices()
     check_signals()
-    check_ai_decider()
+    check_signal_compactor()
     check_ollama()
     check_positions()
     check_mirror()

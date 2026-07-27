@@ -13,12 +13,13 @@ logging.basicConfig(level=logging.WARNING,
                     datefmt='%Y-%m-%d %H:%M:%S')
 _log = logging.getLogger(__name__)
 try:
-    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, DEFAULT_TRADE_SIZE_USDT
     from tokens import is_solana_only
-except Exception:
-    SHORT_BLACKLIST = set()
-    LONG_BLACKLIST = set()
-    is_solana_only = lambda t: False
+except Exception as e:
+    # [FIX-BUG4] Don't silently redefine constants — fail visibly so the missing
+    # import is caught rather than running with wrong DEFAULT_TRADE_SIZE_USDT value.
+    print(f"[hermes-trades-api] FAILED to import hermes_constants: {e}")
+    raise
 
 BRAIN_DB   = "host=/var/run/postgresql dbname=brain user=postgres password=***"
 PRICE_DB   = STATIC_DB
@@ -294,7 +295,7 @@ def write_trades():
             "status": r[12], "signal": r[14],
             "confidence": float(r[15]) if r[15] else 0,
             "leverage": float(r[16]) if r[16] else 1,
-            "amount_usdt": float(r[17]) if r[17] else 50.0,
+            "amount_usdt": float(r[17]) if r[17] else DEFAULT_TRADE_SIZE_USDT,
             "close_reason": r[13] if r[13] else ""
         } for r in closed_t]
     }
@@ -309,7 +310,7 @@ def _build_open_trades(open_t):
         direction = r[2]
         entry_px  = float(r[3]) if r[3] else 0
         lev       = float(r[16]) if r[16] else 1
-        amt       = float(r[17]) if r[17] else 50.0
+        amt       = float(r[17]) if r[17] else DEFAULT_TRADE_SIZE_USDT
 
         # FIX (2026-04-15): Use PostgreSQL current_price (r[4]) which is updated
         # every minute by position_manager.refresh_current_prices() with live HL mids.

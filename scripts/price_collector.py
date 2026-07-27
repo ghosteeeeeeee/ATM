@@ -462,21 +462,23 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
                 filled += 1
 
     # Write developing candle for the open window if >= 2 bars available
+    prev_window = current_window - tf_seconds
     dev_rows = ph_cur.execute(f"""
         WITH windowed AS (
             SELECT
                 token,
-                ((timestamp / {tf_seconds}) * {tf_seconds}) AS window_ts,
+                :current_window AS window_ts,
                 price, timestamp,
                 ROW_NUMBER() OVER (
-                    PARTITION BY token, ((timestamp / {tf_seconds}) * {tf_seconds})
+                    PARTITION BY token
                     ORDER BY timestamp
                 ) AS rn,
                 COUNT(*) OVER (
-                    PARTITION BY token, ((timestamp / {tf_seconds}) * {tf_seconds})
+                    PARTITION BY token
                 ) AS cnt
-            FROM price_history
-            WHERE ((timestamp / {tf_seconds}) * {tf_seconds}) = {current_window}
+        FROM price_history
+            WHERE timestamp > :prev_window
+              AND timestamp <= :current_window
         ),
         agg AS (
             SELECT token,
@@ -495,12 +497,12 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
         )
         SELECT
             a.token,
-            (SELECT price FROM windowed WHERE token=a.token AND window_ts={current_window} AND rn=1 LIMIT 1) AS open_price,
+            (SELECT price FROM windowed WHERE token=a.token AND window_ts=:current_window AND rn=1 LIMIT 1) AS open_price,
             a.high, a.low, f.close_price, a.bar_count
         FROM agg a
         JOIN first_last f ON a.token = f.token
         WHERE a.bar_count >= 2
-    """).fetchall()
+    """, {'current_window': current_window, 'prev_window': prev_window}).fetchall()
 
     # Filter out blacklisted tokens for developing candle phase too
     dev_rows = [row for row in dev_rows if row[0] not in skip]
@@ -520,6 +522,14 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
                 (token, ts, open, high, low, close, volume, is_closed)
             VALUES (?, ?, ?, ?, ?, ?, 0, 0)
         """, (token, current_window, open_px, high, low, close_px))
+
+    # Prune old closed candles to prevent table bloat (keep 72h)
+    if table == 'candles_5m':
+        candle_cur.execute(f"""
+            DELETE FROM {table} WHERE is_closed = 1 AND ts < ?
+        """, (last_closed - 259200,))
+        if candle_cur.rowcount > 0:
+            print(f'  [{table}] Pruned {candle_cur.rowcount} old closed candles')
 
     candle_conn.commit()
     return last_closed

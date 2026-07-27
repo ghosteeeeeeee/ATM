@@ -1127,9 +1127,10 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                     cur2.execute("""
                         UPDATE trades SET
                             hype_realized_pnl_usdt = %s,
-                            hype_realized_pnl_pct = %s
+                            hype_realized_pnl_pct = %s,
+                            exit_price = COALESCE(%s, exit_price)
                         WHERE id=%s
-                    """, (round(hl_rp, 4), hype_pct, trade_id))
+                    """, (round(hl_rp, 4), hype_pct, hl_ep, trade_id))
                     conn2.commit()
                     cur2.close()
                     conn2.close()
@@ -2637,6 +2638,39 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 closed_count += 1
                 print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
                 continue  # Skip trailing SL update for closed position
+
+        # ── 7. HARD MAX-LOSS EXIT ──────────────────────────────────────────────
+        # Safety net: if trade is losing >= HARD_MAX_LOSS_PCT, close immediately.
+        # No stall/speed/SL checks — this is a hard stop to prevent deep bleeding.
+        # Covers the gap between stale loser (-0.6%) and guardian cut_loser (-5%).
+        HARD_MAX_LOSS_PCT = -2.0
+        if live_pnl <= HARD_MAX_LOSS_PCT:
+            close_paper_position(trade_id, f"hard_max_loss_{live_pnl:+.2f}%")
+            closed_count += 1
+            print(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}%]")
+            continue
+
+        # ── 8. TIME-BASED EXIT (slow bleed) ────────────────────────────────────
+        # If trade has been open > 2h AND is in loss, close it.
+        # Catches the "slow bleed" pattern where price oscillates just below SL.
+        TIME_EXIT_HOURS = 2
+        if live_pnl < 0:
+            _ot = pos.get('open_time')
+            if _ot:
+                try:
+                    from datetime import datetime as _dt
+                    if isinstance(_ot, str):
+                        _ot_dt = _dt.fromisoformat(_ot.replace('Z', '+00:00'))
+                    else:
+                        _ot_dt = _ot
+                    _age_h = (_dt.now() - _ot_dt).total_seconds() / 3600
+                    if _age_h >= TIME_EXIT_HOURS:
+                        close_paper_position(trade_id, f"time_exit_{_age_h:.1f}h_{live_pnl:+.2f}%")
+                        closed_count += 1
+                        print(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")
+                        continue
+                except Exception:
+                    pass
 
     # ── End of per-position loop ─────────────────────────────────────────────
 

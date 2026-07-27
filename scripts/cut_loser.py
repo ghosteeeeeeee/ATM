@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """
-Profit Monster — closes medium-profit positions (2-5%) at random intervals.
-Loves profit. A/B testable fire intervals (10-15min vs 20-30min).
-Never touches losing positions.
+Cut Loser — closes medium-loss positions (-0.5% to -3%) at random intervals.
+Never touches profitable positions. A/B testable fire intervals (5-10min vs 10-18min).
 """
 from paths import *
-from hermes_constants import PROFIT_MIN_PCT, PROFIT_MAX_PCT, MAX_CLOSE_PER_WAKE, SKIP_TOP_PCT, FIRE_WINDOWS
+from hermes_constants import (
+    CUT_LOSER_ENABLED, LOSS_MIN_PCT, LOSS_MAX_PCT,
+    CUT_LOSER_MAX_CLOSE, SKIP_BOTTOM_PCT, CUT_LOSER_FIRE_WINDOWS
+)
 import sys, os, json, time, random, argparse
 from pathlib import Path
 
-# ── Constants ────────────────────────────────────────────────────────────────
-LOG_FILE          = Path("/root/.hermes/logs/profit_monster.log")
-CONFIG_FILE       = Path(PROFIT_MONSTER_CONFIG)
-BRAIN_CMD         = "/root/.hermes/scripts/brain.py"
+# ── Constants ─────────────────────────────────────────────────────────────────
+LOG_FILE   = Path("/root/.hermes/logs/cut_loser.log")
+CONFIG_FILE = Path(CUT_LOSER_CONFIG)
+BRAIN_CMD   = "/root/.hermes/scripts/brain.py"
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 def log(msg, level="INFO"):
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
-    line = f"[{ts}] [{level}] [profit-monster] {msg}"
+    line = f"[{ts}] [{level}] [cut-loser] {msg}"
     print(line)
     try:
         LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -26,7 +28,7 @@ def log(msg, level="INFO"):
     except Exception:
         pass
 
-# ── Config ───────────────────────────────────────────────────────────────────
+# ── Config ─────────────────────────────────────────────────────────────────────
 def load_config():
     try:
         with open(CONFIG_FILE) as f:
@@ -34,20 +36,19 @@ def load_config():
     except Exception:
         return {"enabled": True, "ab_group": "B", "dry_run": False}
 
-# ── Fire decision (random timer) ──────────────────────────────────────────────
+# ── Fire decision (random timer) ───────────────────────────────────────────────
 def should_fire(ab_group: str, last_run_ts: float) -> bool:
     """Return True if enough minutes have passed since last_run_ts."""
-    window = FIRE_WINDOWS.get(ab_group, FIRE_WINDOWS["B"])
+    window = CUT_LOSER_FIRE_WINDOWS.get(ab_group, CUT_LOSER_FIRE_WINDOWS["B"])
     min_wait, max_wait = window
-    # Add jitter: random within the window
     jitter = random.uniform(0, 1)
     fire_interval_sec = (min_wait + (max_wait - min_wait) * jitter) * 60
     elapsed = time.time() - last_run_ts
     return elapsed >= fire_interval_sec
 
-# ── Query open positions in profit range ─────────────────────────────────────
-def get_profitable_positions(min_pct=PROFIT_MIN_PCT, max_pct=PROFIT_MAX_PCT):
-    """Return list of dicts for open positions with pnl_pct in [min_pct, max_pct]."""
+# ── Query open positions ────────────────────────────────────────────────────────
+def get_losing_positions():
+    """Return list of dicts for open positions with pnl_pct < 0."""
     try:
         import psycopg2
         from _secrets import BRAIN_PASSWORD, BRAIN_HOST
@@ -61,7 +62,7 @@ def get_profitable_positions(min_pct=PROFIT_MIN_PCT, max_pct=PROFIT_MAX_PCT):
               AND status = 'open'
               AND entry_price > 0
               AND current_price > 0
-            ORDER BY pnl_pct DESC
+            ORDER BY pnl_pct ASC
         """)
         rows = cur.fetchall()
         conn.close()
@@ -74,48 +75,53 @@ def get_profitable_positions(min_pct=PROFIT_MIN_PCT, max_pct=PROFIT_MAX_PCT):
         log(f"DB query error: {e}", "ERROR")
         return []
 
-
-def filter_profitable_positions(positions, min_pct=PROFIT_MIN_PCT, max_pct=PROFIT_MAX_PCT):
-    """Compute live pnl_pct from entry_price vs current_price and filter to range."""
-    from pnl_utils import compute_live_pnl   # local import to avoid circular dependency at module load
+def filter_losing_positions(positions, min_pct=LOSS_MIN_PCT, max_pct=LOSS_MAX_PCT):
+    """Compute live pnl_pct from entry_price vs current_price and filter to loss range."""
     filtered = []
     for pos in positions:
         if pos["entry_price"] > 0 and pos["current_price"] > 0:
-            live_pnl = compute_live_pnl(pos["entry_price"], pos["current_price"], pos["direction"])
+            if pos["direction"].upper() == "LONG":
+                live_pnl = (pos["current_price"] - pos["entry_price"]) / pos["entry_price"] * 100
+            else:
+                live_pnl = (pos["entry_price"] - pos["current_price"]) / pos["entry_price"] * 100
             pos["live_pnl_pct"] = live_pnl
-            if min_pct <= live_pnl <= max_pct:
+            # live_pnl is negative for losses; LOSS_MIN_PCT=-3.0 (catastrophic floor),
+            # LOSS_MAX_PCT=-0.5 (threshold). Cut positions where:
+            #   live_pnl <= -0.5  (loss worse than -0.5%) AND
+            #   live_pnl >= -3.0  (not worse than -3%, not catastrophic)
+            # Note: min_pct=-3.0 > max_pct=-0.5 on the number line (less negative).
+            # Use explicit operators to avoid Python chained-comparison pitfall:
+            #   a <= b <= c  ==  (a <= b) and (b <= c)  — fails here because -0.35 <= -0.5 is False.
+            if (live_pnl <= max_pct) and (live_pnl >= min_pct):
                 filtered.append(pos)
     return filtered
 
-# ── Select positions to close (skip top SKIP_TOP_PCT, pick 1-2 at random) ───────
-def select_positions(positions, max_close=MAX_CLOSE_PER_WAKE, skip_top_pct=SKIP_TOP_PCT):
+# ── Select positions to close (skip bottom SKIP_BOTTOM_PCT worst losers) ───────
+def select_positions(positions, max_close=CUT_LOSER_MAX_CLOSE, skip_bottom_pct=SKIP_BOTTOM_PCT):
     if not positions:
         return []
 
-    # Skip top profitable (let winners run)
-    skip_count = max(0, int(len(positions) * skip_top_pct / 100))
+    # Skip bottom losers (let them recover or get stopped out by ATR)
+    skip_count = max(0, int(len(positions) * skip_bottom_pct / 100))
     candidates = positions[skip_count:]
     if not candidates:
         return []
 
-    # Randomly pick 1-2
     count = random.randint(1, min(max_close, len(candidates)))
     return random.sample(candidates, count)
 
-# ── Close a position via brain.py + HL mirror ─────────────────────────────────
+# ── Close a position via brain.py + HL mirror ──────────────────────────────────
 def close_position(trade_id: int, token: str, direction: str, pnl_pct: float, current_price: float, dry_run: bool):
     if dry_run:
-        log(f"[DRY RUN] Would close id={trade_id} {token} {direction} @ {pnl_pct:.2f}% profit", "WARN")
+        log(f"[DRY RUN] Would close id={trade_id} {token} {direction} @ {pnl_pct:.2f}% loss", "WARN")
         return True
 
     # Step 1: Close the HL position FIRST (prevents guardian from creating duplicate orphan trade)
-    # Only attempt in live mode; in paper mode skip HL (no real position exists)
     hl_fill_price = None
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from hyperliquid_exchange import is_live_trading_enabled, close_position
         if is_live_trading_enabled():
-            # Paper trade was mirroring to HL — close the real HL position first
             result = close_position(token.upper())
             if result.get("success"):
                 log(f"  HL close OK: {token} (realized_pnl={result.get('hl_realized_pnl', 'N/A')})", "PASS")
@@ -142,14 +148,14 @@ def close_position(trade_id: int, token: str, direction: str, pnl_pct: float, cu
     # Use HL fill price if available, otherwise fall back to current market price
     exit_price = f"{hl_fill_price:.8f}" if hl_fill_price else f"{current_price:.8f}"
     cmd = [sys.executable, BRAIN_CMD, "trade", "close", str(trade_id), exit_price,
-           "--notes", f"profit-monster({pnl_pct:.2f}%)",
-           "--close-reason", "profit-monster",
+           "--notes", f"cut-loser({pnl_pct:.2f}%)",
+           "--close-reason", "cut-loser",
            "--skip-hl"]
     try:
         import subprocess
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
-            log(f"Closed id={trade_id} {token} {direction} — {pnl_pct:.2f}% profit", "INFO")
+            log(f"Closed id={trade_id} {token} {direction} — {pnl_pct:.2f}% loss", "INFO")
             return True
         else:
             log(f"Close failed for id={trade_id} {token}: {result.stderr.strip()[:120]}", "ERROR")
@@ -158,9 +164,9 @@ def close_position(trade_id: int, token: str, direction: str, pnl_pct: float, cu
         log(f"Close error for id={trade_id} {token}: {e}", "ERROR")
         return False
 
-# ── Load / save last run timestamp ────────────────────────────────────────────
+# ── Load / save last run timestamp ─────────────────────────────────────────────
 def get_last_run_ts():
-    ts_file = Path(PROFIT_MONSTER_LAST)
+    ts_file = Path(CUT_LOSER_LAST)
     try:
         with open(ts_file) as f:
             return json.load(f).get("ts", 0.0)
@@ -168,12 +174,16 @@ def get_last_run_ts():
         return 0.0
 
 def save_last_run_ts():
-    ts_file = Path(PROFIT_MONSTER_LAST)
+    ts_file = Path(CUT_LOSER_LAST)
     with open(ts_file, "w") as f:
         json.dump({"ts": time.time()}, f)
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# ── Main ───────────────────────────────────────────────────────────────────────
 def run(dry_run=False):
+    if not CUT_LOSER_ENABLED:
+        log("disabled via CUT_LOSER_ENABLED — exiting")
+        return
+
     cfg = load_config()
 
     if not cfg.get("enabled", True):
@@ -187,22 +197,24 @@ def run(dry_run=False):
         log(f"Group {ab_group} — not time to fire yet (elapsed={time.time()-last_ts:.0f}s)")
         return
 
-    log(f"Firing — group {ab_group}, profit range [{PROFIT_MIN_PCT}-{PROFIT_MAX_PCT}%]")
+    log(f"Firing — group {ab_group}, loss range [{cfg.get('loss_min_pct', LOSS_MIN_PCT)} to {cfg.get('loss_max_pct', LOSS_MAX_PCT)}%]")
 
-    positions = get_profitable_positions()
+    positions = get_losing_positions()
     log(f"Found {len(positions)} open positions (computing live pnl...)")
 
-    in_range = filter_profitable_positions(positions, PROFIT_MIN_PCT, PROFIT_MAX_PCT)
-    log(f"  {len(in_range)} positions in profit range [{PROFIT_MIN_PCT}-{PROFIT_MAX_PCT}%]")
+    min_pct = cfg.get("loss_min_pct", LOSS_MIN_PCT)
+    max_pct = cfg.get("loss_max_pct", LOSS_MAX_PCT)
+    in_range = filter_losing_positions(positions, min_pct, max_pct)
+    log(f"  {len(in_range)} positions in loss range [{min_pct} to {max_pct}%]")
 
     to_close = select_positions(
         in_range,
-        max_close=MAX_CLOSE_PER_WAKE,
-        skip_top_pct=SKIP_TOP_PCT
+        max_close=cfg.get("max_closes_per_wake", CUT_LOSER_MAX_CLOSE),
+        skip_bottom_pct=cfg.get("skip_bottom_pct", SKIP_BOTTOM_PCT)
     )
 
     if not to_close:
-        log("No positions selected for close — letting winners run")
+        log("No positions selected for close — letting them recover")
         save_last_run_ts()
         return
 
@@ -214,9 +226,9 @@ def run(dry_run=False):
 
     save_last_run_ts()
 
-# ── CLI ───────────────────────────────────────────────────────────────────────
+# ── CLI ─────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Profit Monster")
+    parser = argparse.ArgumentParser(description="Cut Loser")
     parser.add_argument("--dry-run", action="store_true", help="Preview closes without executing")
     args = parser.parse_args()
 

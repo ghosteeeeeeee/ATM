@@ -9,6 +9,7 @@ ARCHITECTURE:
   signals_hermes_runtime.db  — runtime data, LOCAL ONLY (.gitignored)
     └── signals, decisions, token_intel, cooldown_tracker, momentum_cache
 """
+from paths import *
 import os
 
 # Base directory for all data
@@ -21,4 +22,4 @@ HERMES_STATIC_DB = os.path.join(HERMES_DATA_DIR, 'signals_hermes.db')
 HERMES_RUNTIME_DB = os.path.join(HERMES_DATA_DIR, 'signals_hermes_runtime.db')
 
 # Legacy path (for migration only — scripts should update)
-LEGACY_SIGNALS_DB = '/root/.hermes/data/openclaw_signals.db'
+SIGNALS_DB = '/root/.hermes/data/signals_hermes_runtime.db'

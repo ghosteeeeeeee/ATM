@@ -27,6 +27,8 @@ from hermes_constants import (
     RS_DECIDER_CONF_PENALTY, RS_DECIDER_CONF_FLOOR,
     RS_TOUCH_HARD_CAP,
     TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT,
+    CONFLUENCE_REQUIRED,
+    MOMENTUM_EXHAUSTION_THRESHOLD,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -627,10 +629,18 @@ def execute_trade(token, direction, price, confidence, source,
             sl = round(price * (1 + PUMP_SL_PCT), 8)
             tp = round(price * (1 - PUMP_TP_PCT), 8)
     else:
-        # A/B TEST DISABLED (2026-04-17) — ATR handles SL/TP via position_manager.
-        # position_manager._collect_atr_updates() sets dynamic ATR-based SL/TP within 1 min.
-        sl_pct_val = 0.0  # defer to ATR
-        tp_pct_val = 0.0  # defer to ATR
+        # Set initial SL/TP at trade open to eliminate the 60s zero-SL window.
+        # position_manager will refine these on the next cycle with full ATR computation.
+        from hermes_constants import ATR_SL_MIN_INIT, ATR_TP_MIN
+        if direction == 'LONG':
+            sl = round(price * (1 - ATR_SL_MIN_INIT), 8)
+            tp = round(price * (1 + ATR_TP_MIN), 8)
+        else:
+            sl = round(price * (1 + ATR_SL_MIN_INIT), 8)
+            tp = round(price * (1 - ATR_TP_MIN), 8)
+        sl_pct_val = ATR_SL_MIN_INIT
+        tp_pct_val = ATR_TP_MIN
+        log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%)')
 
     # Sanity check: SL must provide real protection (only when sl > 0)
     if sl > 0 and direction == 'LONG' and sl >= price:
@@ -1128,6 +1138,24 @@ def _run_hot_set():
                     f'(vel={_vel:+.2f}%, phase={_wave})')
                 _record_hotset_failure(token, direction, failures)
                 continue
+
+            # ── MOMENTUM EXHAUSTION FILTER ────────────────────────────────────────
+            # If price has already moved >0.5% in 30m, don't enter — catching the top.
+            # This catches cases where overextended (3% threshold) doesn't trigger
+            # but price has still run too far. Example: SKR +0.8% in 1hr → bad entry.
+            # Exception: bottoming + LONG or falling + SHORT (the move IS the signal).
+            _chg_30m = hot_sig.get('price_change_30m', 0.0) or 0.0
+            if abs(_chg_30m) > MOMENTUM_EXHAUSTION_THRESHOLD:
+                if direction == 'LONG' and _chg_30m > 0:
+                    log(f'  ⚡ [HOT-SET] {token} {direction} BLOCKED: momentum exhausted '
+                        f'(30m move={_chg_30m:+.2f}% > +{MOMENTUM_EXHAUSTION_THRESHOLD}%)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+                elif direction == 'SHORT' and _chg_30m < 0:
+                    log(f'  ⚡ [HOT-SET] {token} {direction} BLOCKED: momentum exhausted '
+                        f'(30m move={_chg_30m:+.2f}% < -{MOMENTUM_EXHAUSTION_THRESHOLD}%)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
 
             # Compute direction-wave alignment multiplier (affects threshold)
             # > 1.0 = easier entry, < 1.0 = harder entry
@@ -1826,7 +1854,7 @@ def run(dry_run=False):
         # NOTE: hzscore and hmacd- also end in 's' but pass through because the
         # inner check only blocks conf-1s variants. This is intentional.
         sig_src = sig.get('source', '') or ''
-        if sig_src.startswith('conf-') or sig_src.endswith('s'):
+        if CONFLUENCE_REQUIRED and (sig_src.startswith('conf-') or sig_src.endswith('s')):
             # It's a confluence source (conf-1s, conf-2s, fallback-conf-3s, etc.)
             if sig_src == 'conf-1s' or sig_src.startswith('conf-1s'):
                 log(f'  🚫 [EXEC-BLOCK] {token} {direction} blocked: {sig_src} (single-source, min 2 required)')
@@ -1834,6 +1862,9 @@ def run(dry_run=False):
                     mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
                 continue
+        elif not CONFLUENCE_REQUIRED and (sig_src.startswith('conf-') or sig_src.endswith('s')):
+            if sig_src == 'conf-1s' or sig_src.startswith('conf-1s'):
+                log(f'  ➡️  [EXEC-ALLOW] {token} {direction} single-source allowed (CONFLUENCE_REQUIRED=False): {sig_src}')
 
         # FIX (2026-04-05): speed=0% = stale token — hard ban
         sp_exec = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None

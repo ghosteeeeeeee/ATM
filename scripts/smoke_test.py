@@ -141,10 +141,15 @@ TRADING_TIMERS = [
 ]
 
 # ----------------------------------------------------------------------
-# Key trading systemd services (sibling to timer) that should be running
-# Format: (service_name, is_critical, description)
+# Key trading systemd services (sibling to timer) that should be running.
+# NOTE (2026-07-13): Only include services that should be PERSISTENTLY active.
+# Type=oneshot services (like hermes-pump-hunter.service) exit cleanly after
+# each tick — the TIMER is what should be active, not the service. Including
+# them here triggers false "inactive" alarms. The pump-hunter timer is still
+# checked in TRADING_TIMERS above.
+# ----------------------------------------------------------------------
 TRADING_SERVICES = [
-    ("hermes-pump-hunter.service",         True,  "Pump hunter vol explosion executor"),
+    # ("hermes-pump-hunter.service",  True,  "Pump hunter vol explosion executor"),  # Type=oneshot — checked via timer
 ]
 
 def _fix_stale_locks():
@@ -225,31 +230,84 @@ HEAL_MAP = {
 # Individual checks
 # ----------------------------------------------------------------------
 
-def check_pipeline_log_errors(n=20):
+def check_pipeline_log_errors(n=200):
+    """Tail the last N lines of pipeline.log via subprocess (avoids loading 1+ GB files).
+
+    Note (2026-07-13): was reading entire file with read_text().splitlines() which
+    takes >60s on the 1.3 GB pipeline.log. Now uses `tail -n N` which streams the
+    tail regardless of file size.
+    """
     if not PIPELINE_LOG.exists():
         return True, "pipeline.log not found"
-    lines = PIPELINE_LOG.read_text().splitlines()
-    errors = [l for l in lines[-n:] if "ERROR" in l or "CRITICAL" in l]
-    if errors:
-        return False, f"Pipeline errors: {errors[-1]}"
-    return True, "no errors"
+    try:
+        r = subprocess.run(
+            ["tail", "-n", str(n), str(PIPELINE_LOG)],
+            capture_output=True, text=True, timeout=10
+        )
+        if r.returncode != 0:
+            return False, f"tail failed: {r.stderr.strip()}"
+        lines = r.stdout.splitlines()
+        errors = [l for l in lines if "ERROR" in l or "CRITICAL" in l]
+        if errors:
+            return False, f"Pipeline errors: {errors[-1][:200]}"
+        return True, "no errors"
+    except subprocess.TimeoutExpired:
+        return False, "tail timed out (>10s on pipeline.log)"
+    except Exception as e:
+        return False, f"pipeline log check error: {e}"
 
 
 def check_pipeline_not_stuck():
+    """Check if the pipeline lock indicates a stuck pipeline.
+
+    NOTE (2026-07-13): hermes-pipeline is driven by hermes-pipeline.timer
+    (Type=oneshot) — each tick spawns a fresh python process that exits cleanly.
+    The lock file written by the previous run is ORPHANED DEBRIS if the timer is
+    still firing fresh "Pipeline done" lines. Only treat as stuck if BOTH:
+      (a) lock is old, AND
+      (b) the pipeline.log shows no recent "Pipeline done" lines (timer dead)
+    """
     lock = Path("/tmp/hermes-pipeline.lock")
     if not lock.exists():
         return True, "no lock"
     age = time.time() - lock.stat().st_mtime
-    if age > 600:
-        # Only fail if no living process holds the lock
-        holders = _get_lock_holder_pid(str(lock))
-        if holders:
-            dead = [p for p in holders if not _pid_alive(p)]
-            if dead:
-                return False, f"Pipeline stuck ({age/60:.0f}min old lock, dead holders: {dead})"
-            return True, f"lock held by live PID(s): {holders}"
-        return False, f"Pipeline stuck ({age/60:.0f}min old lock, no holder)"
-    return True, f"lock age: {age:.0f}s"
+    if age <= 600:
+        return True, f"lock age: {age:.0f}s"
+
+    # Old lock — check if pipeline is actually still firing
+    # Accept either "Pipeline done" (end of cycle) or "Pipeline LIVE" (start of cycle).
+    if PIPELINE_LOG.exists():
+        try:
+            r = subprocess.run(
+                # 1000 lines covers ~15min — comfortably above the 5min cutoff.
+                ["tail", "-n", "1000", str(PIPELINE_LOG)],
+                capture_output=True, text=True, timeout=5
+            )
+            if r.returncode == 0:
+                from datetime import datetime
+                cutoff = time.time() - 300  # 5 min
+                for line in r.stdout.splitlines():
+                    if "Pipeline done" not in line and "Pipeline LIVE" not in line:
+                        continue
+                    try:
+                        ts_str = line.split(']')[0].replace('[', '')
+                        ts = datetime.strptime(ts_str, '%Y-%m-%d %H:%M:%S').timestamp()
+                        if ts >= cutoff:
+                            # Pipeline is alive — orphan lock from a prior crashed run
+                            return True, f"lock is orphan debris ({age/60:.0f}min old, but pipeline active at {datetime.fromtimestamp(ts).strftime('%H:%M:%S')})"
+                    except (ValueError, IndexError):
+                        pass
+        except subprocess.TimeoutExpired:
+            pass
+
+    # Lock is old AND no recent pipeline activity — truly stuck
+    holders = _get_lock_holder_pid(str(lock))
+    if holders:
+        dead = [p for p in holders if not _pid_alive(p)]
+        if dead:
+            return False, f"Pipeline stuck ({age/60:.0f}min old lock, dead holders: {dead})"
+        return True, f"lock held by live PID(s): {holders}"
+    return False, f"Pipeline stuck ({age/60:.0f}min old lock, no holder, no recent pipeline activity)"
 
 
 def _pid_alive(pid: int) -> bool:
@@ -281,50 +339,119 @@ def _get_lock_holder_pid(lock_path: str) -> list:
 
 
 def check_stale_locks():
-    """Check all Hermes lock files. Fail if > threshold AND holder process is dead."""
+    """Check all Hermes lock files. Fail if > threshold AND holder process is dead.
+
+    FIX (2026-07-13): /tmp/hermes-pipeline.lock can be orphaned debris because
+    hermes-pipeline is Type=oneshot (spawned fresh each tick by the timer).
+    If pipeline.log shows recent "Pipeline done" lines, treat an old pipeline.lock
+    as orphan debris rather than a real stale lock.
+    """
+    # Is the pipeline actually alive? Used to distinguish orphan lock from real stuck.
+    # Accept either "Pipeline done" (end of cycle) or "Pipeline LIVE" (start of cycle).
+    pipeline_alive = False
+    if PIPELINE_LOG.exists():
+        try:
+            r = subprocess.run(
+                # Pipeline runs every 1min and each cycle logs ~50-100 lines.
+                # 1000 lines covers ~15min reliably — well above the 5min cutoff.
+                ["tail", "-n", "1000", str(PIPELINE_LOG)],
+                capture_output=True, text=True, timeout=5
+            )
+            if r.returncode == 0:
+                from datetime import datetime
+                cutoff = time.time() - 300  # 5 min
+                for line in r.stdout.splitlines():
+                    # "=== Pipeline done (LIVE) ===" — end of cycle
+                    # "=== Pipeline LIVE (1m) ===" — start of cycle
+                    if "Pipeline done" not in line and "Pipeline LIVE" not in line:
+                        continue
+                    try:
+                        ts_str = line.split(']')[0].replace('[', '')
+                        ts = datetime.strptime(ts_str, '%Y-%m-%d %H:%M:%S').timestamp()
+                        if ts >= cutoff:
+                            pipeline_alive = True
+                            break
+                    except (ValueError, IndexError):
+                        pass
+        except subprocess.TimeoutExpired:
+            pass
+
     stale = []
     for lock_path, max_age in HERMES_LOCKS.items():
         p = Path(lock_path)
-        if p.exists():
-            age = time.time() - p.stat().st_mtime
-            if age > max_age:
-                holders = _get_lock_holder_pid(lock_path)
-                # Lock is old — only report as stale if no living process holds it
-                if not holders:
-                    stale.append(f"{lock_path} ({age/60:.0f}min, no holder)")
-                else:
-                    # Verify each holder process is still alive
-                    dead = []
-                    for pid in holders:
-                        try:
-                            os.kill(pid, 0)  # signal 0 = existence check
-                        except OSError:
-                            dead.append(pid)
-                    if dead:
-                        stale.append(f"{lock_path} ({age/60:.0f}min, dead holders: {dead})")
-                    # else: lock is old but actively held — not stale
+        if not p.exists():
+            continue
+        age = time.time() - p.stat().st_mtime
+        if age <= max_age:
+            continue
+
+        # Special case: pipeline lock is known orphan debris if pipeline is alive
+        if lock_path == "/tmp/hermes-pipeline.lock" and pipeline_alive:
+            continue
+
+        holders = _get_lock_holder_pid(lock_path)
+        if not holders:
+            stale.append(f"{lock_path} ({age/60:.0f}min, no holder)")
+        else:
+            dead = []
+            for pid in holders:
+                try:
+                    os.kill(pid, 0)  # signal 0 = existence check
+                except OSError:
+                    dead.append(pid)
+            if dead:
+                stale.append(f"{lock_path} ({age/60:.0f}min, dead holders: {dead})")
+            # else: lock is old but actively held — not stale
     if stale:
         return False, f"Stale locks: {', '.join(stale)}"
     return True, "all locks fresh"
 
 
 def check_price_data_fresh(max_age_sec=180):
-    prices_json = DATA_DIR / "prices.json"
-    if not prices_json.exists():
-        alt = HERMES_DIR / "data" / "prices.json"
-        if alt.exists():
-            prices_json = alt
-        else:
-            return False, "prices.json not found — price_collector may be down"
-    try:
-        data = json.loads(prices_json.read_text())
-        ts = data.get("timestamp", data.get("updated", 0))
-        age = time.time() - ts
-        if age > max_age_sec:
-            return False, f"Prices stale: {age:.0f}s old"
-        return True, f"prices OK ({age:.0}s)"
-    except Exception as e:
-        return False, f"prices.json parse error: {e}"
+    """Check price data freshness.
+
+    FIX (2026-07-13): The legacy prices.json file is no longer written by the
+    pipeline. Real price data lives in:
+      - /var/www/hermes/data/hl_cache.json         (price_collector cache)
+      - /root/.hermes/data/candles.db              (candle DB mtime)
+      - /root/.hermes/data/signals_hermes.db       (signals/price DB mtime)
+
+    Pass if ANY of these has been updated within the freshness window.
+    """
+    candidates = [
+        # (path, kind) — kind just for the message string
+        (DATA_DIR / "prices.json",         "prices.json"),
+        (HERMES_DIR / "data" / "prices.json", "prices.json"),
+        (DATA_DIR / "hl_cache.json",       "hl_cache.json"),
+        (HERMES_DIR / "data" / "candles.db",      "candles.db"),
+        (HERMES_DIR / "data" / "signals_hermes.db", "signals_hermes.db"),
+    ]
+
+    # Try timestamp-bearing files first (prices.json, hl_cache.json)
+    for path, kind in candidates[:3]:
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text())
+            ts = data.get("timestamp", data.get("updated", 0))
+            if not ts:
+                continue
+            age = time.time() - ts
+            if age > max_age_sec:
+                return False, f"{kind} stale: {age:.0f}s old (threshold {max_age_sec}s)"
+            return True, f"{kind} OK ({age:.0}s)"
+        except Exception as e:
+            return False, f"{kind} parse error: {e}"
+
+    # Fall back to DB mtime — at least we know the writer is alive
+    for path, kind in candidates[3:]:
+        if path.exists():
+            age = time.time() - path.stat().st_mtime
+            if age > max_age_sec:
+                return False, f"{kind} stale: {age:.0f}s old (no timestamp-bearing file found either)"
+            return True, f"{kind} OK by mtime ({age:.0}s)"
+
+    return False, "no price data source found — price_collector may be down"
 
 
 def check_hotset_exists():
@@ -440,46 +567,59 @@ def check_hebbian_network():
 
 def check_no_flapping():
     """Check pipeline for flapping (restarts > 3 times in 10 min).
-    
+
     FIX (2026-04-12): Was counting ALL "START"/"pipeline" lines in the entire log
     (458K lines), triggering false positives. Fixed to count only actual pipeline
     cycle completions in the last 60 minutes by checking for "Pipeline done"
     patterns with timestamps.
+
+    FIX (2026-07-13): Switched to `tail -n` via subprocess — pipeline.log is 1.3 GB,
+    `read_text().splitlines()` takes >60s. Also tightened restarts counter to use a
+    time window (last 60 min) instead of fixed last-5000-lines.
     """
     if not PIPELINE_LOG.exists():
         return True, "no pipeline.log"
     try:
-        import time
+        # Tail last ~5000 lines (covers last ~80min at normal pipeline cadence).
+        # 5000 lines via `tail` is instant regardless of file size.
+        r = subprocess.run(
+            ["tail", "-n", "5000", str(PIPELINE_LOG)],
+            capture_output=True, text=True, timeout=10
+        )
+        if r.returncode != 0:
+            return True, "flapping check skipped (tail failed)"
+        lines = r.stdout.splitlines()
+
+        # Count actual pipeline completions in the tail window
+        from datetime import datetime
         cutoff = time.time() - 3600  # last 60 min
-        lines = PIPELINE_LOG.read_text().splitlines()
-        
-        # Count actual pipeline completions in last 60 min
         completions = 0
         for l in lines:
             if "Pipeline done" in l:
-                # Extract timestamp: "[2026-04-12 15:32:13]"
                 try:
                     ts_str = l.split(']')[0].replace('[', '')
-                    from datetime import datetime
                     ts = datetime.strptime(ts_str, '%Y-%m-%d %H:%M:%S').timestamp()
                     if ts >= cutoff:
                         completions += 1
                 except (ValueError, IndexError):
                     pass
-        
-        # Also count restarts: "Restarting pipeline" or service restarts
-        restarts = 0
-        for l in lines[-5000:]:  # last 5000 lines = last ~2 hours at normal rate
-            if "restart" in l.lower() and "service" in l.lower():
-                restarts += 1
-        
-        # 1-cycle-per-minute pipeline = 60/min normal. Allow up to 65 to avoid
-        # false positives on clean runs. Flag if it's running MORE than ~1/min.
-        if completions > 65:
-            return False, f"Pipeline flapping: {completions} cycles in last 60min (>65 threshold)"
-        if restarts > 10:
-            return False, f"Pipeline flapping: {restarts} service restarts in last 5000 lines (>10 threshold)"
+
+        # Count restarts in tail window (last ~80min) — threshold scaled to window.
+        # 1-cycle/min pipeline = ~80 cycles in 80min. Allow up to 5 actual restarts.
+        restarts = sum(
+            1 for l in lines
+            if "restart" in l.lower() and "service" in l.lower()
+        )
+
+        # 1-cycle-per-minute pipeline = 60/min normal. Tail of 5000 lines covers
+        # ~80min at 1/min. Allow up to 80 completions (small margin for catch-up).
+        if completions > 80:
+            return False, f"Pipeline flapping: {completions} cycles in last ~80min (>80 threshold)"
+        if restarts > 5:
+            return False, f"Pipeline flapping: {restarts} service restarts in tail (>5 threshold)"
         return True, f"pipeline stable ({completions} cycles, {restarts} restarts)"
+    except subprocess.TimeoutExpired:
+        return True, "flapping check skipped (tail timeout)"
     except Exception:
         return True, "flapping check unknown"
 

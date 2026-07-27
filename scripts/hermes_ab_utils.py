@@ -2,6 +2,7 @@
 Shared A/B testing utilities — canonical Thompson sampling implementation.
 Both ai-decider.py and decider-run.py use this for A/B variant selection.
 """
+from paths import *
 import random, sys, json, os
 from typing import Optional
 

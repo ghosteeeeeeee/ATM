@@ -34,14 +34,10 @@ from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hyperliquid_exchange import is_delisted
+from paths import HERMES_DATA, WWW_DATA, CANDLES_DB, RUNTIME_DB, HOTSET_FILE as HOTSET_PATH
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-HERMES_DATA  = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, 'data')
-CANDLES_DB   = os.path.join(HERMES_DATA, 'candles.db')
-RUNTIME_DB   = os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')
 OC_PENDING   = '/var/www/hermes/data/oc_pending_signals.json'  # OC writes here too
-HOTSET_PATH  = '/var/www/hermes/data/hotset.json'  # direct hot-set injection
-WWW_DATA     = '/var/www/hermes/data'
 LOG_FILE     = '/var/www/hermes/logs/breakout_engine.log'
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -527,13 +523,12 @@ def write_to_hotset(signals: List[dict], dry: bool = False):
             }
             existing_by_key[key] = entry
 
-        # Keep only top 10, sorted by score descending
+        # Don't evict existing signals — just add breakout signals.
+        # signal_compactor's next compaction cycle will handle ranking/eviction.
         all_entries = list(existing_by_key.values())
-        all_entries.sort(key=lambda x: x.get('score', 0), reverse=True)
-        top10 = all_entries[:10]
 
         output = {
-            'hotset': top10,
+            'hotset': all_entries,
             'compaction_cycle': 9999,  # signal_compactor reads this; high value = preserve
             'timestamp': time.time(),
         }
@@ -542,7 +537,7 @@ def write_to_hotset(signals: List[dict], dry: bool = False):
             with open(HOTSET_PATH, 'w') as f:
                 json.dump(output, f, indent=2)
             log(f"Wrote {len(signals)} breakout signals to hotset.json "
-                f"(total entries: {len(top10)})")
+                f"(total entries: {len(all_entries)})")
         else:
             log(f"[DRY] Would write {len(signals)} breakout signals to hotset.json")
 

@@ -22,6 +22,7 @@ Usage:
 import json, os, time
 from filelock import FileLock
 
+from paths import *
 _BREADCRUMB_FILE = '/root/.hermes/brain/pipeline_steps.json'
 _GLOBAL_LOCK = 'pipeline_breadcrumbs'
 

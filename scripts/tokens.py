@@ -88,17 +88,25 @@ TOKEN_BLACKLIST = {
 
 def is_solana_only(token: str) -> bool:
     """Check if token is Solana-only (Raydium, LONG only).
-    FIX (2026-04-05):
-    1. Check Hyperliquid first — if it's on HL, it's not Solana-only.
-       This fixes cross-chain tokens (SUSHI, XMR, ZEN, DYDX, WLD, PEPE, SHIB, etc.)
-       being incorrectly blocked.
-    2. Unknown tokens (not in either list) default to NOT Solana-only —
-       let Hyperliquid's own availability check handle that.
+    FIX (2026-07-26): Check live HL meta API instead of stale hardcoded list.
+    HL now has 939+ tokens — hardcoded lists can't keep up.
+    Falls back to hardcoded list if API unavailable.
     """
-    token=token.upper()
-    # If it's on Hyperliquid (or excluded from it), it's not Solana-only
-    if token in HYPERLIQUID_TOKENS or token in HYPERLIQUID_EXCLUDE:
+    token = token.upper()
+    # If it's in HL exclude list, it's not tradeable there (but not Solana-only either)
+    if token in HYPERLIQUID_EXCLUDE:
         return False
+    # Check live HL meta — if token exists on HL, it's NOT Solana-only
+    try:
+        import hype_cache as hc
+        meta = hc.get_meta()
+        hl_names = {u.get('name', '').upper() for u in meta.get('universe', [])}
+        if token in hl_names:
+            return False
+    except Exception:
+        # API unavailable — fall back to hardcoded list
+        if token in HYPERLIQUID_TOKENS:
+            return False
     if token in SOLANA_ONLY_TOKENS:
         return True
     # Unknown tokens — don't auto-block. They might be on Hyperliquid.

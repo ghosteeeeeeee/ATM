@@ -22,13 +22,14 @@ import fcntl
 import subprocess
 from datetime import datetime, timezone
 
+from paths import *
 # ── Config ──────────────────────────────────────────────────────────────────
 AWAY_FILE       = '/root/.hermes/data/last_user_message_at.json'
 DEBOUNCE_FILE   = '/root/.hermes/data/self_init_last_run.json'
 TASKS_FILE      = '/root/.hermes/brain/TASKS.md'
 PROJECTS_FILE   = '/root/.hermes/brain/PROJECTS.md'
 LOG_FILE        = '/root/.hermes/logs/away_detector.log'
-PIPELINE_HB     = '/root/.hermes/data/pipeline_heartbeat.json'
+PIPELINE_HB     = PIPELINE_HB_FILE
 HL_STATUS_FILE  = '/root/.hermes/data/hype_live_trading.json'
 DEBOUNCE_HOURS  = 2   # Don't re-spawn if we ran < 2h ago
 AWAY_THRESHOLD  = 20  # minutes
@@ -107,11 +108,14 @@ def is_pipeline_healthy():
 
 
 def is_live_trading_enabled():
-    """Return True if hype_live_trading.json has live_trading=true."""
-    if not os.path.exists(HL_STATUS_FILE):
-        return True  # assume live if file missing
-    data = load_json(HL_STATUS_FILE)
-    return data.get('live_trading', False)
+    """Return True if live trading is enabled.
+
+    FIX (2026-05-20): Was reading hype_live_trading.json directly, causing
+    split-brain with hyperliquid_exchange.is_live_trading_enabled() (which uses
+    hermes_constants.LIVE_TRADING_ENABLED). Now delegates to the canonical source.
+    """
+    from hyperliquid_exchange import is_live_trading_enabled as _hle
+    return _hle()
 
 
 def get_debounce_ts():

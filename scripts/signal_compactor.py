@@ -104,8 +104,9 @@ def _get_open_tokens() -> set:
     closing_file = '/root/.hermes/data/guardian-closing-markers.json'
     try:
         if os.path.exists(closing_file):
-            with open(closing_file) as f:
-                data = json.load(f)
+            with FileLock('guardian_closing'):
+                with open(closing_file) as f:
+                    data = json.load(f)
             if not isinstance(data, dict):
                 log(f"[WARN] Guardian closing markers file is corrupt (type={type(data).__name__}) — skipping", 'WARN')
                 guardian_closing = set()
@@ -222,8 +223,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # Weight 1.25: strong standalone signal (3-confluence), conservative start
     ('mtp_zscore_long',   'mtp-zscore+'):  1.25,  # 3-period upward momentum
     ('mtp_zscore_short',  'mtp-zscore-'):  1.25,  # 3-period downward momentum
-    # support_resistance: reduce weight — underperforming in backtest
-    ('support_resistance', 'rs-'):       0.7,
+    # support_resistance: RS at 25.0% WR, -0.227% avg PnL (2026-07-21 2-4h analysis)
+    # Broken path (33% WR) disabled via RS_BROKEN_SHORT_ENABLED=False
+    ('support_resistance', 'rs-'):       0.4,
     ('rsi-confluence', 'rsi_confluence'):    0.5,   # WR=0% — suppress
     # gap300: EMA(300) vs SMA(300) gap widening on 1m — positive avg PnL in backtest
     # FLIPPED 2026-04-28: gap-300+ now fires SHORT, gap-300- now fires LONG
@@ -249,6 +251,12 @@ SIGNAL_SOURCE_WEIGHTS = {
     # tl_break: diagonal trendline breakout on 5m — standalone directional signal
     ('tl_break_long',  'tl_break_long'):   1.25,  # diagonal downtrend + upside break
     ('tl_break_short', 'tl_break_short'):  1.25,  # diagonal uptrend + downside break
+    # accel_300: accel-300 overall 35.9% WR, -0.340% avg PnL (2026-07-21 2-4h analysis)
+    ('accel_300_long',  'accel-300+'):  0.3,   # LONG: 24.4% WR — heavy suppression
+    ('accel_300_short', 'accel-300-'):  1.0,   # SHORT: 57.1% WR — no suppression
+    # inv_accel_300: suppress so accel_300 SHORT wins when both fire for same token
+    ('inverse_accel_300_long',  'inv-accel-300+'):  0.7,  # LONG: lower priority than accel-300 SHORT
+    ('inverse_accel_300_short', 'inv-accel-300-'):  1.0,  # SHORT: no suppression
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -423,7 +431,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 MAX(signal_metadata) AS signal_metadata,
                 combo_key
             FROM signals
-            WHERE decision = 'PENDING'
+            WHERE decision IN ('PENDING', 'APPROVED')
               AND executed = 0
               AND created_at > datetime('now', '-5 minutes')
               AND confidence >= 60
@@ -569,13 +577,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             source_count = len(source_parts)
 
             # ══ CONFLUENCE REQUIRED ══ — 2026-05-08
-            # Rule: 2+ unique signal types required. No exceptions, no good-standalone bypass.
+            # Rule: 2+ unique signal types required (when CONFLUENCE_REQUIRED=True).
+            # When CONFLUENCE_REQUIRED=False: single-source signals pass through.
             # Single-source signals stay PENDING until a co-signal arrives.
             # If no co-signal within 5 min → staleness=0 → EXPIRED.
-            # This is the ONLY valid path into the hot-set.
             pass_gate = False
             gate_msg = ''
-            if unique_signal_types >= 2:
+            if not CONFLUENCE_REQUIRED:
+                # CONFLUENCE_REQUIRED=False: allow single-source signals
+                pass_gate = True
+                gate_msg = f'single-source allowed (CONFLUENCE_REQUIRED=False)'
+            elif unique_signal_types >= 2:
                 pass_gate = True
                 gate_msg = f'{unique_signal_types} unique types'
             else:
@@ -627,9 +639,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         try:
             _conn = sqlite3.connect(RUNTIME_DB)
             _cur = _conn.cursor()
-            _cur.execute("SELECT token, speed_percentile, momentum_score, wave_phase, is_overextended, price_acceleration FROM token_speeds")
+            _cur.execute("SELECT token, speed_percentile, momentum_score, wave_phase, is_overextended, price_acceleration, price_change_30m FROM token_speeds")
             for _row in _cur.fetchall():
-                _tok, _sp, _mom, _wave, _over, _accel = _row
+                _tok, _sp, _mom, _wave, _over, _accel, _chg30 = _row
                 if _tok.upper() not in speed_cache:
                     speed_cache[_tok.upper()] = {
                         'speed_percentile': _sp or 50.0,
@@ -637,6 +649,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         'wave_phase': _wave or 'neutral',
                         'is_overextended': bool(_over),
                         'price_acceleration': _accel or 0.0,
+                        'price_change_30m': _chg30 or 0.0,
                     }
             _conn.close()
         except Exception as e:
@@ -686,8 +699,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             speed_data = speed_cache.get(token.upper(), {})
             source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
             # ── rs required (replaces accel-300, 2026-05-15) ──────────────────────────
+            # Accel-300 and inverse-accel-300 standalone bypass: skip RS gate
+            is_accel300_standalone = source.startswith('accel-300') or source.startswith('inv-accel-300')
             has_rs = any(p.startswith('rs') for p in source_parts)
-            if not has_rs:
+            if not has_rs and not is_accel300_standalone:
                 if verbose:
                     log(f"  SKIP {token} {direction}: no rs signal")
                 continue
@@ -831,7 +846,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # is only used for score weighting in _score_signal (age_m parameter).
             if prev_entry:
                 prev_origin_ts = prev_entry.get('entry_origin_ts')
-                entry_origin_ts = prev_origin_ts if prev_origin_ts else time.time()
+                if isinstance(prev_origin_ts, (int, float)) and prev_origin_ts > 0:
+                    entry_origin_ts = prev_origin_ts
+                else:
+                    entry_origin_ts = time.time()
             else:
                 entry_origin_ts = time.time()
             age_from_entry = (time.time() - entry_origin_ts) / 60.0
@@ -857,6 +875,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'wave_phase': spd.get('wave_phase', 'neutral'),
                 'is_overextended': spd.get('is_overextended', False),
                 'price_acceleration': spd.get('price_acceleration', 0.0),
+                'price_change_30m': spd.get('price_change_30m', 0.0),
                 'momentum_score': spd.get('momentum_score', 50.0),
                 'speed_percentile': spd.get('speed_percentile', 50.0),
                 'score': s['score'],
@@ -913,13 +932,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src}' in blacklist")
                 continue
             source_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
-            # rs required for all entries (replaces accel-300, 2026-05-15)
+            # rs required for all entries when CONFLUENCE_REQUIRED=True (replaces accel-300, 2026-05-15)
             # rs is the primary directional trigger. Every LONG needs rs-s#,
             # every SHORT needs rs-r# as the primary directional confirmation.
-            has_rs = any(p.startswith('rs') for p in source_parts)
-            if not has_rs:
-                log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — requires rs-s# or rs-r# (has: {src})")
-                continue
+            # When CONFLUENCE_REQUIRED=False: skip RS requirement (single-source signals allowed).
+            if CONFLUENCE_REQUIRED:
+                has_rs = any(p.startswith('rs') for p in source_parts)
+                if not has_rs:
+                    log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — requires rs-s# or rs-r# (has: {src})")
+                    continue
             # ── Trend purity bonus: major confidence boost when present ─────────────
             # trend_purity is no longer a hard requirement — it's a scoring bonus.
             # Signals with trend_purity+ (LONG) or trend_purity- (SHORT) get +50% source weight.
@@ -982,9 +1003,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # have the correct logic, but a race condition or DB state edge case allowed
             # single-source entries to slip through into hotset_final. This guard
             # catches that edge case permanently.
-            if len(src_parts) < 2:
+            if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (this should never happen — investigate confluence gate or preservation path)")
                 continue
+            elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
+                log(f"  ➡️  [HOTSET-FINAL-ALLOW] {tkn}:{direction} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{src}'")
             log(f"  ➡️  [HOTSET-FINAL-ADD] {tkn}:{direction} src='{src}' parts={src_parts} parts_count={len(src_parts)} conf={entry.get('confidence')} score={entry.get('score',0):.2f}")
             hotset_final.append(entry)
 
@@ -1010,9 +1033,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # single source. This guard ensures the merged entry still has 2+ sources.
                 pe_src = pe.get('source', '')
                 pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
-                if len(pe_parts) < 2:
+                if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
                     log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
                     continue
+                elif not CONFLUENCE_REQUIRED and len(pe_parts) < 2:
+                    log(f"  ➡️  [PRESERVE-MERGE-ALLOW] {pe['token']}:{pe['direction']} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{pe_src}'")
                 # Track whether preserved entry won the merge (for APPROVED upsert below)
                 _preserved_won = False
                 if existing is None:
@@ -1161,9 +1186,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # from add_signal() merges that lost a source. Skip any combo with
                     # only 1 source, regardless of its score or top-10 standing.
                     src_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
-                    if len(src_parts) < 2:
+                    if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
                         continue
+                    elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
+                        log(f"  ➡️  [PENDING-APPROVE-ALLOW] {tok}:{d} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{source}'")
                     # Combo entered top-10 → APPROVED immediately.
                     # No age gate — if it's in top-10 it's signal-worthy.
                     # If it stops firing, staleness=0 will expire it within 5 min.
@@ -1307,9 +1334,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # CRITICAL SAFETY GATE: last-resort block of single-source entries
             # If a single-source entry somehow got past the confluence gate above,
             # this is the final catch before it reaches decider_run.
-            if entries_count < 2:
+            if CONFLUENCE_REQUIRED and entries_count < 2:
                 log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — single-source src='{src}' parts_count={entries_count} (LAST RESORT BLOCK)")
                 continue
+            elif not CONFLUENCE_REQUIRED and entries_count < 2:
+                log(f"  🛡️ [SAFETY-FILTER-ALLOW] {e['token']}:{e.get('direction')} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{src}'")
 
             log(f"  💾 [HOTSET-WRITE] {e['token']}:{e.get('direction')} src='{src}' parts={parts} entries_count={entries_count} score={e.get('score',0):.2f}")
 
