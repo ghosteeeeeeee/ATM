@@ -52,7 +52,7 @@ TL_BREAKOUT_CANDLES   = 15    # breakout must confirm within 15 candles (75 min)
 # Trendline detection: linear regression on closes in fit zone
 # R² must be high enough to confirm a real trendline (not noise)
 TL_R2_MIN             = 0.40  # minimum R² for trendline validity (5m crypto is noisy)
-TL_SLOPE_PCT_MIN      = 0.0002 # minimum slope as % of price per candle (~0.1%/hr)
+TL_SLOPE_PCT_MIN      = 0.0003 # minimum slope as % of price per candle (~0.1%/hr, rejects shallow drift)
 
 # Bounce detection: price must touch the trendline (wick or close within threshold)
 # A bounce = candle touches trendline AND next candle closes AWAY from it (rejection)
@@ -62,7 +62,7 @@ TL_MAX_BOUNCE_RATIO   = 0.20  # bounces cannot exceed 20% of fit candles (filter
 TL_REJECTION_ATR_K    = 0.25  # rejection must move 0.25+ ATR away from line
 
 # Breakout confirmation: price must close beyond trendline + threshold
-TL_BREAKOUT_ATR_K     = 0.4   # 0.4 * ATR(14) beyond trendline
+TL_BREAKOUT_ATR_K     = 0.8   # 0.8 * ATR(14) beyond trendline (was 0.4 — too weak, caught gentle drift)
 TL_FOLLOWTHROUGH_MIN  = 4     # minimum candles closing beyond line in breakout zone
 
 # ATR settings
