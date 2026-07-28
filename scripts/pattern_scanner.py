@@ -79,7 +79,7 @@ FLAG_POLE_MIN_PCT = 3.0       # % move required to count as flag pole
 FLAG_POLE_MAX_CANDLES = 8     # max candles for pole formation
 FLAG_CONSOLIDATION_MAX_PCT = 1.5  # max % range during flag consolidation
 FLAG_CONSOLIDATION_MIN_CANDLES = 3  # min candles in flag
-FLAG_BREAKOUT_CONFIRM_PCT = 0.2   # price must exceed pole high by this %
+FLAG_CONSOLIDATION_MAX_SLOPE = 0.0  # max consolidation slope (% per candle) — 0 = flat/down only
 
 SUPPORT_RESISTANCE_LOOKBACK = 20  # candles for swing high/low detection
 
@@ -88,12 +88,12 @@ MICRO_POLE_MIN_PCT = 0.3        # % move required (was 3.0%)
 MICRO_POLE_MAX_CANDLES = 15     # max candles for pole (was 8)
 MICRO_CONSOLIDATION_MAX_PCT = 0.15  # max % range during consolidation (was 1.5%)
 MICRO_CONSOLIDATION_MIN_CANDLES = 3
-MICRO_BREAKOUT_CONFIRM_PCT = 0.05   # price must exceed pole high by this %
+MICRO_CONSOLIDATION_MAX_SLOPE = 0.0  # max consolidation slope
 MICRO_COOLDOWN_HOURS = 6       # don't re-signal same token within 6h
 
-# ── ATR-based confirmation (replaces volume) ───────────────────────────────
-# HL doesn't provide volume — use ATR expansion + price velocity as breakout confirmation
+# ── Breakout confirmation (replaces old volume + single-candle check) ────────
 BREAKOUT_ATR_K_MIN = 0.5       # breakout candle must move >= 0.5 * ATR
+BREAKOUT_FOLLOWTHROUGH_MIN = 3 # need 3+ candles closing beyond pole level
 VELOCITY_MIN_PCT = 0.1         # breakout must have >= 0.1% velocity in last 5 bars
 
 # Cooldown cache
@@ -104,14 +104,13 @@ _COOLDOWN_CACHE = {}  # {token_pattern: last_fire_ts}
 def detect_bull_flag(candles: list) -> dict | None:
     """
     Detect bull flag pattern in 1m price list.
-    Returns signal dict or None if no pattern found.
 
     Bull flag requirements:
-    1. Flag pole: >= 3% up-move in <= 8 consecutive candles
-    2. Consolidation: 3-5 candles, range < 1.5%
-    3. Breakout: candle closes above pole high + ATR confirmation
+    1. Flag pole: >= 3% up-move in <= 8 candles, clean impulse (<30% drawdown from peak)
+    2. Consolidation: 3-5 candles, range < 1.5%, flat or downward slope
+    3. Breakout: 3+ candles closing above pole high, with ATR or velocity confirmation
     """
-    if len(candles) < FLAG_POLE_MAX_CANDLES + FLAG_CONSOLIDATION_MIN_CANDLES + 2:
+    if len(candles) < FLAG_POLE_MAX_CANDLES + FLAG_CONSOLIDATION_MIN_CANDLES + 3:
         return None
 
     closes = [c['close'] for c in candles]
@@ -125,13 +124,14 @@ def detect_bull_flag(candles: list) -> dict | None:
         for end in range(start + 2, min(start + FLAG_POLE_MAX_CANDLES + 1, len(closes))):
             pct = (closes[end] - closes[start]) / closes[start] * 100
             if pct >= FLAG_POLE_MIN_PCT and pct > best_pole_pct:
+                # Clean impulse: max drawdown from PEAK within pole < 30% of pole
                 segment = closes[start:end+1]
-                max_drawdown = max((segment[i] - segment[j]) / segment[j] * 100
-                                   for i in range(len(segment)) for j in range(i+1, len(segment)))
-                if max_drawdown < pct * 0.3:
+                peak = max(segment)
+                max_drawdown_from_peak = max((peak - s) / peak * 100 for s in segment)
+                if max_drawdown_from_peak < pct * 0.3:
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': max(closes[start:end+1]),
-                                  'low':  min(closes[start:end+1]),
+                                  'high': peak,
+                                  'low':  min(segment),
                                   'open_px': closes[start],
                                   'close_px': closes[end]}
                     best_pole_pct = pct
@@ -141,11 +141,10 @@ def detect_bull_flag(candles: list) -> dict | None:
 
     pole_end   = best_pole['end']
     pole_high  = best_pole['high']
-    pole_open  = best_pole['open_px']
 
     # ── Step 2: Find consolidation (flag) after pole ──────────────────────
     consolidation_start = pole_end + 1
-    consolidation_candles = []
+    consolidation_closes = []
 
     for i in range(consolidation_start, len(closes)):
         remaining = closes[i:]
@@ -157,42 +156,58 @@ def detect_bull_flag(candles: list) -> dict | None:
             c_range = (max(window) - min(window)) / min(window) * 100
 
             if c_range <= FLAG_CONSOLIDATION_MAX_PCT:
-                consolidation_candles = closes[consolidation_start + i - consolidation_start:
-                                                consolidation_start + i - consolidation_start + w]
+                # Check slope: consolidation should be flat or downward (bull flag)
+                if w >= 2:
+                    cons_slope = (window[-1] - window[0]) / window[0] * 100 / (w - 1)
+                    if cons_slope > FLAG_CONSOLIDATION_MAX_SLOPE:
+                        continue  # upward slope = not a bull flag
+                consolidation_closes = list(window)
                 break
-        if consolidation_candles:
+        if consolidation_closes:
             break
 
-    if not consolidation_candles:
+    if not consolidation_closes:
         return None
 
-    cons_high = max(consolidation_candles)
-    cons_low  = min(consolidation_candles)
-    cons_end_idx = consolidation_start + len(consolidation_candles) - 1
+    cons_high = max(consolidation_closes)
+    cons_low  = min(consolidation_closes)
+    cons_end_idx = consolidation_start + len(consolidation_closes) - 1
 
-    # ── Step 3: Detect breakout ───────────────────────────────────────────
-    if cons_end_idx + 1 >= len(closes):
+    # ── Step 3: Detect breakout with follow-through ────────────────────────
+    # Need 3+ candles closing above pole high
+    follow_count = 0
+    breakout_strength = 0.0
+    for i in range(cons_end_idx + 1, min(cons_end_idx + 1 + FLAG_POLE_MAX_CANDLES, len(closes))):
+        if closes[i] > pole_high:
+            follow_count += 1
+            breakout_strength = max(breakout_strength, (closes[i] - pole_high) / atr if atr > 0 else 0)
+
+    if follow_count < BREAKOUT_FOLLOWTHROUGH_MIN:
         return None
 
+    # ATR or velocity confirmation on breakout zone
     breakout_close = closes[cons_end_idx + 1]
     breakout_pct = (breakout_close - pole_high) / pole_high * 100
-
-    # Breakout confirmation: price exceeds pole high + ATR/velocity check
-    breakout_price_ok = breakout_close > pole_high * (1 + FLAG_BREAKOUT_CONFIRM_PCT / 100)
     breakout_atr_ok = atr > 0 and breakout_pct >= (atr / pole_high * 100) * BREAKOUT_ATR_K_MIN
-    velocity = _price_velocity(closes, window=5)
-    breakout_velocity_ok = velocity >= VELOCITY_MIN_PCT
 
-    if not breakout_price_ok or not (breakout_atr_ok or breakout_velocity_ok):
+    # Local velocity: last 5 candles of breakout zone (not global)
+    breakout_zone = closes[cons_end_idx + 1:cons_end_idx + 6]
+    if len(breakout_zone) >= 5:
+        local_velocity = (breakout_zone[-1] - breakout_zone[0]) / breakout_zone[0] * 100
+    else:
+        local_velocity = _price_velocity(closes, window=5)
+    breakout_velocity_ok = local_velocity >= VELOCITY_MIN_PCT
+
+    if not (breakout_atr_ok or breakout_velocity_ok):
         return None
 
     # ── Step 4: Calculate confidence ──────────────────────────────────────
     pole_score = min(best_pole_pct / 10, 1.0)
     cons_range_pct = (cons_high - cons_low) / cons_low * 100
     consolidation_score = 1.0 - (cons_range_pct / FLAG_CONSOLIDATION_MAX_PCT)
-    velocity_score = min(abs(velocity) / 0.5, 1.0)
+    follow_score = min(follow_count / 5, 1.0)
 
-    confidence = (pole_score * 0.4 + consolidation_score * 0.3 + velocity_score * 0.3) * 100
+    confidence = (pole_score * 0.3 + consolidation_score * 0.3 + follow_score * 0.4) * 100
     confidence = round(min(confidence, 95), 1)
 
     target = breakout_close * (1 + best_pole_pct / 100)
@@ -202,10 +217,11 @@ def detect_bull_flag(candles: list) -> dict | None:
         'direction': 'LONG',
         'confidence': confidence,
         'pole_pct': round(best_pole_pct, 2),
-        'consolidation_candles': len(consolidation_candles),
+        'consolidation_candles': len(consolidation_closes),
         'consolidation_range_pct': round(cons_range_pct, 3),
         'breakout_px': round(breakout_close, 6),
-        'velocity': round(velocity, 3),
+        'follow_count': follow_count,
+        'breakout_strength_atr': round(breakout_strength, 2),
         'target_px': round(target, 6),
         'cons_support': round(cons_low, 6),
         'cons_resistance': round(cons_high, 6),
@@ -215,8 +231,8 @@ def detect_bull_flag(candles: list) -> dict | None:
 
 
 def detect_micro_bull_flag(candles: list) -> dict | None:
-    """Detect micro bull flag — 0.3%+ pole for low-vol markets. No volume checks."""
-    if len(candles) < MICRO_POLE_MAX_CANDLES + MICRO_CONSOLIDATION_MIN_CANDLES + 2:
+    """Detect micro bull flag — 0.3%+ pole for low-vol markets. Follow-through required."""
+    if len(candles) < MICRO_POLE_MAX_CANDLES + MICRO_CONSOLIDATION_MIN_CANDLES + 3:
         return None
 
     closes = [c['close'] for c in candles]
@@ -230,14 +246,12 @@ def detect_micro_bull_flag(candles: list) -> dict | None:
             pct = (closes[end] - closes[start]) / closes[start] * 100
             if pct >= MICRO_POLE_MIN_PCT and pct > best_pole_pct:
                 segment = closes[start:end+1]
-                max_drawdown = max((segment[i] - segment[j]) / segment[j] * 100
-                                   for i in range(len(segment)) for j in range(i+1, len(segment)))
-                if max_drawdown < pct * 0.3:
+                peak = max(segment)
+                max_drawdown_from_peak = max((peak - s) / peak * 100 for s in segment)
+                if max_drawdown_from_peak < pct * 0.3:
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': max(closes[start:end+1]),
-                                  'low':  min(closes[start:end+1]),
-                                  'open_px': closes[start],
-                                  'close_px': closes[end]}
+                                  'high': peak, 'low': min(segment),
+                                  'open_px': closes[start], 'close_px': closes[end]}
                     best_pole_pct = pct
 
     if not best_pole:
@@ -257,8 +271,11 @@ def detect_micro_bull_flag(candles: list) -> dict | None:
             window = remaining[:w]
             c_range = (max(window) - min(window)) / min(window) * 100
             if c_range <= MICRO_CONSOLIDATION_MAX_PCT:
-                consolidation_closes = closes[consolidation_start + i - consolidation_start:
-                                               consolidation_start + i - consolidation_start + w]
+                if w >= 2:
+                    cons_slope = (window[-1] - window[0]) / window[0] * 100 / (w - 1)
+                    if cons_slope > MICRO_CONSOLIDATION_MAX_SLOPE:
+                        continue
+                consolidation_closes = list(window)
                 break
         if consolidation_closes:
             break
@@ -270,25 +287,24 @@ def detect_micro_bull_flag(candles: list) -> dict | None:
     cons_low  = min(consolidation_closes)
     cons_end_idx = consolidation_start + len(consolidation_closes) - 1
 
-    if cons_end_idx + 1 >= len(closes):
+    # Follow-through: 3+ candles above pole high
+    follow_count = 0
+    for i in range(cons_end_idx + 1, min(cons_end_idx + 1 + MICRO_POLE_MAX_CANDLES, len(closes))):
+        if closes[i] > pole_high:
+            follow_count += 1
+
+    if follow_count < BREAKOUT_FOLLOWTHROUGH_MIN:
         return None
 
     breakout_close = closes[cons_end_idx + 1]
-    breakout_pct = (breakout_close - pole_high) / pole_high * 100
-
-    breakout_price_ok = breakout_close > pole_high * (1 + MICRO_BREAKOUT_CONFIRM_PCT / 100)
-    velocity = _price_velocity(closes, window=5)
-    breakout_velocity_ok = velocity >= VELOCITY_MIN_PCT
-
-    if not breakout_price_ok or not breakout_velocity_ok:
-        return None
+    local_velocity = _price_velocity(closes[cons_end_idx + 1:cons_end_idx + 6], window=min(5, max(2, len(closes) - cons_end_idx - 1))) if len(closes) > cons_end_idx + 1 else 0
 
     pole_score = min(best_pole_pct / 1.0, 1.0)
     cons_range_pct = (cons_high - cons_low) / cons_low * 100
     consolidation_score = 1.0 - (cons_range_pct / MICRO_CONSOLIDATION_MAX_PCT)
-    velocity_score = min(abs(velocity) / 0.3, 1.0)
+    follow_score = min(follow_count / 5, 1.0)
 
-    confidence = (pole_score * 0.4 + consolidation_score * 0.3 + velocity_score * 0.3) * 100
+    confidence = (pole_score * 0.3 + consolidation_score * 0.3 + follow_score * 0.4) * 100
     confidence = round(min(confidence, 95), 1)
 
     target = breakout_close * (1 + best_pole_pct / 100)
@@ -301,7 +317,7 @@ def detect_micro_bull_flag(candles: list) -> dict | None:
         'consolidation_candles': len(consolidation_closes),
         'consolidation_range_pct': round(cons_range_pct, 4),
         'breakout_px': round(breakout_close, 6),
-        'velocity': round(velocity, 3),
+        'follow_count': follow_count,
         'target_px': round(target, 6),
         'cons_support': round(cons_low, 6),
         'cons_resistance': round(cons_high, 6),
@@ -312,7 +328,7 @@ def detect_micro_bull_flag(candles: list) -> dict | None:
 
 def detect_micro_bear_flag(candles: list) -> dict | None:
     """Detect micro bear flag — mirror of micro bull flag for shorts."""
-    if len(candles) < MICRO_POLE_MAX_CANDLES + MICRO_CONSOLIDATION_MIN_CANDLES + 2:
+    if len(candles) < MICRO_POLE_MAX_CANDLES + MICRO_CONSOLIDATION_MIN_CANDLES + 3:
         return None
 
     closes = [c['close'] for c in candles]
@@ -326,14 +342,12 @@ def detect_micro_bear_flag(candles: list) -> dict | None:
             pct = (closes[start] - closes[end]) / closes[start] * 100
             if pct >= MICRO_POLE_MIN_PCT and pct > best_pole_pct:
                 segment = closes[start:end+1]
-                max_recovery = max((segment[j] - segment[i]) / segment[i] * 100
-                                  for i in range(len(segment)) for j in range(i+1, len(segment)))
-                if max_recovery < pct * 0.3:
+                trough = min(segment)
+                max_recovery_from_trough = max((s - trough) / trough * 100 for s in segment)
+                if max_recovery_from_trough < pct * 0.3:
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': max(closes[start:end+1]),
-                                  'low':  min(closes[start:end+1]),
-                                  'open_px': closes[start],
-                                  'close_px': closes[end]}
+                                  'high': max(segment), 'low': trough,
+                                  'open_px': closes[start], 'close_px': closes[end]}
                     best_pole_pct = pct
 
     if not best_pole:
@@ -353,8 +367,11 @@ def detect_micro_bear_flag(candles: list) -> dict | None:
             window = remaining[:w]
             c_range = (max(window) - min(window)) / min(window) * 100
             if c_range <= MICRO_CONSOLIDATION_MAX_PCT:
-                consolidation_closes = closes[consolidation_start + i - consolidation_start:
-                                               consolidation_start + i - consolidation_start + w]
+                if w >= 2:
+                    cons_slope = (window[-1] - window[0]) / window[0] * 100 / (w - 1)
+                    if cons_slope < -MICRO_CONSOLIDATION_MAX_SLOPE:
+                        continue
+                consolidation_closes = list(window)
                 break
         if consolidation_closes:
             break
@@ -366,25 +383,24 @@ def detect_micro_bear_flag(candles: list) -> dict | None:
     cons_low  = min(consolidation_closes)
     cons_end_idx = consolidation_start + len(consolidation_closes) - 1
 
-    if cons_end_idx + 1 >= len(closes):
+    # Follow-through: 3+ candles below pole low
+    follow_count = 0
+    for i in range(cons_end_idx + 1, min(cons_end_idx + 1 + MICRO_POLE_MAX_CANDLES, len(closes))):
+        if closes[i] < pole_low:
+            follow_count += 1
+
+    if follow_count < BREAKOUT_FOLLOWTHROUGH_MIN:
         return None
 
     breakdown_close = closes[cons_end_idx + 1]
-    breakdown_pct = (pole_low - breakdown_close) / pole_low * 100
-
-    breakdown_price_ok = breakdown_close < pole_low * (1 - MICRO_BREAKOUT_CONFIRM_PCT / 100)
-    velocity = _price_velocity(closes, window=5)
-    breakdown_velocity_ok = velocity <= -VELOCITY_MIN_PCT
-
-    if not breakdown_price_ok or not breakdown_velocity_ok:
-        return None
+    local_velocity = _price_velocity(closes[cons_end_idx + 1:cons_end_idx + 6], window=min(5, max(2, len(closes) - cons_end_idx - 1))) if len(closes) > cons_end_idx + 1 else 0
 
     pole_score = min(best_pole_pct / 1.0, 1.0)
     cons_range_pct = (cons_high - cons_low) / cons_low * 100
     consolidation_score = 1.0 - (cons_range_pct / MICRO_CONSOLIDATION_MAX_PCT)
-    velocity_score = min(abs(velocity) / 0.3, 1.0)
+    follow_score = min(follow_count / 5, 1.0)
 
-    confidence = (pole_score * 0.4 + consolidation_score * 0.3 + velocity_score * 0.3) * 100
+    confidence = (pole_score * 0.3 + consolidation_score * 0.3 + follow_score * 0.4) * 100
     confidence = round(min(confidence, 95), 1)
 
     target = breakdown_close * (1 - best_pole_pct / 100)
@@ -397,7 +413,7 @@ def detect_micro_bear_flag(candles: list) -> dict | None:
         'consolidation_candles': len(consolidation_closes),
         'consolidation_range_pct': round(cons_range_pct, 4),
         'breakdown_px': round(breakdown_close, 6),
-        'velocity': round(velocity, 3),
+        'follow_count': follow_count,
         'target_px': round(target, 6),
         'cons_support': round(cons_low, 6),
         'cons_resistance': round(cons_high, 6),
@@ -407,8 +423,8 @@ def detect_micro_bear_flag(candles: list) -> dict | None:
 
 
 def detect_bear_flag(candles: list) -> dict | None:
-    """Detect bear flag — strong DOWN move, small UP consolidation, breakdown below pole low."""
-    if len(candles) < FLAG_POLE_MAX_CANDLES + FLAG_CONSOLIDATION_MIN_CANDLES + 2:
+    """Detect bear flag — strong DOWN move, flat/up consolidation, breakdown with follow-through."""
+    if len(candles) < FLAG_POLE_MAX_CANDLES + FLAG_CONSOLIDATION_MIN_CANDLES + 3:
         return None
 
     closes = [c['close'] for c in candles]
@@ -422,12 +438,12 @@ def detect_bear_flag(candles: list) -> dict | None:
             pct = (closes[start] - closes[end]) / closes[start] * 100
             if pct >= FLAG_POLE_MIN_PCT and pct > best_pole_pct:
                 segment = closes[start:end+1]
-                max_recovery = max((segment[j] - segment[i]) / segment[i] * 100
-                                  for i in range(len(segment)) for j in range(i+1, len(segment)))
-                if max_recovery < pct * 0.3:
+                trough = min(segment)
+                max_recovery_from_trough = max((s - trough) / trough * 100 for s in segment)
+                if max_recovery_from_trough < pct * 0.3:
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': max(closes[start:end+1]),
-                                  'low':  min(closes[start:end+1]),
+                                  'high': max(segment),
+                                  'low':  trough,
                                   'open_px': closes[start],
                                   'close_px': closes[end]}
                     best_pole_pct = pct
@@ -449,8 +465,12 @@ def detect_bear_flag(candles: list) -> dict | None:
             window = remaining[:w]
             c_range = (max(window) - min(window)) / min(window) * 100
             if c_range <= FLAG_CONSOLIDATION_MAX_PCT:
-                consolidation_closes = closes[consolidation_start + i - consolidation_start:
-                                               consolidation_start + i - consolidation_start + w]
+                # Check slope: consolidation should be flat or upward (bear flag)
+                if w >= 2:
+                    cons_slope = (window[-1] - window[0]) / window[0] * 100 / (w - 1)
+                    if cons_slope < -FLAG_CONSOLIDATION_MAX_SLOPE:
+                        continue  # downward slope = not a bear flag
+                consolidation_closes = list(window)
                 break
         if consolidation_closes:
             break
@@ -462,26 +482,37 @@ def detect_bear_flag(candles: list) -> dict | None:
     cons_low  = min(consolidation_closes)
     cons_end_idx = consolidation_start + len(consolidation_closes) - 1
 
-    if cons_end_idx + 1 >= len(closes):
+    # Need 3+ candles closing below pole low
+    follow_count = 0
+    breakout_strength = 0.0
+    for i in range(cons_end_idx + 1, min(cons_end_idx + 1 + FLAG_POLE_MAX_CANDLES, len(closes))):
+        if closes[i] < pole_low:
+            follow_count += 1
+            breakout_strength = max(breakout_strength, (pole_low - closes[i]) / atr if atr > 0 else 0)
+
+    if follow_count < BREAKOUT_FOLLOWTHROUGH_MIN:
         return None
 
     breakdown_close = closes[cons_end_idx + 1]
     breakdown_pct = (pole_low - breakdown_close) / pole_low * 100
-
-    breakdown_price_ok = breakdown_close < pole_low * (1 - FLAG_BREAKOUT_CONFIRM_PCT / 100)
     breakdown_atr_ok = atr > 0 and breakdown_pct >= (atr / pole_low * 100) * BREAKOUT_ATR_K_MIN
-    velocity = _price_velocity(closes, window=5)
-    breakdown_velocity_ok = velocity <= -VELOCITY_MIN_PCT
 
-    if not breakdown_price_ok or not (breakdown_atr_ok or breakdown_velocity_ok):
+    breakout_zone = closes[cons_end_idx + 1:cons_end_idx + 6]
+    if len(breakout_zone) >= 5:
+        local_velocity = (breakout_zone[0] - breakout_zone[-1]) / breakout_zone[-1] * 100
+    else:
+        local_velocity = _price_velocity(closes, window=5)
+    breakdown_velocity_ok = local_velocity >= VELOCITY_MIN_PCT
+
+    if not (breakdown_atr_ok or breakdown_velocity_ok):
         return None
 
     pole_score = min(best_pole_pct / 10, 1.0)
     cons_range_pct = (cons_high - cons_low) / cons_low * 100
     consolidation_score = 1.0 - (cons_range_pct / FLAG_CONSOLIDATION_MAX_PCT)
-    velocity_score = min(abs(velocity) / 0.5, 1.0)
+    follow_score = min(follow_count / 5, 1.0)
 
-    confidence = (pole_score * 0.4 + consolidation_score * 0.3 + velocity_score * 0.3) * 100
+    confidence = (pole_score * 0.3 + consolidation_score * 0.3 + follow_score * 0.4) * 100
     confidence = round(min(confidence, 95), 1)
 
     target = breakdown_close * (1 - best_pole_pct / 100)
@@ -494,7 +525,8 @@ def detect_bear_flag(candles: list) -> dict | None:
         'consolidation_candles': len(consolidation_closes),
         'consolidation_range_pct': round(cons_range_pct, 3),
         'breakdown_px': round(breakdown_close, 6),
-        'velocity': round(velocity, 3),
+        'follow_count': follow_count,
+        'breakout_strength_atr': round(breakout_strength, 2),
         'target_px': round(target, 6),
         'cons_support': round(cons_low, 6),
         'cons_resistance': round(cons_high, 6),
