@@ -37,6 +37,10 @@ from hermes_constants import (
     CONTEXT_GATE_Z_RANGING, CONTEXT_GATE_RANGING_SPEED,
     CONTEXT_GATE_SPEED_CONFIRM, CONTEXT_GATE_CACHE_TTL,
     CONTEXT_GATE_LLM_TIMEOUT, CONTEXT_GATE_FAIL_OPEN,
+    SIMILAR_SETUP_LOOKUP_ENABLED, SIMILAR_SETUP_MIN_SAMPLE,
+    SIMILAR_SETUP_HARD_BLOCK_WR, SIMILAR_SETUP_HARD_BLOCK_MIN_N,
+    SIMILAR_SETUP_PENALTY_40, SIMILAR_SETUP_PENALTY_30,
+    SIMILAR_SETUP_RSI_BAND, SIMILAR_SETUP_CACHE_TTL,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -780,9 +784,46 @@ Reply only GO or SKIP:"""
             return ('GO', None)  # fail-open: don't block good setups
         return ('SKIP', 'LLM failed, fail-closed')
 
+_setup_lookup_cache = {}  # f"{token}:{source}:{direction}:{tier}" → (n, wr, ts)
+
+def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
+    """Query PostgreSQL for past trades with same signal+direction+similar conditions.
+    Returns (n, win_rate, avg_pnl) or None. Fail-open on error."""
+    if not SIMILAR_SETUP_LOOKUP_ENABLED:
+        return None
+    cache_key = f"{token}:{source}:{direction}:{z_tier or ''}"
+    now = time.time()
+    cached = _setup_lookup_cache.get(cache_key)
+    if cached and now - cached[2] < SIMILAR_SETUP_CACHE_TTL:
+        return (cached[0], cached[1])
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*) AS n,
+                   AVG(CASE WHEN pnl_pct > 0 THEN 1.0 ELSE 0.0 END) AS wr,
+                   AVG(pnl_pct) AS avg_pnl
+            FROM trades
+            WHERE close_time IS NOT NULL
+                AND signal = %s AND direction = %s
+                AND signal_z_score_tier = %s
+                AND (%s IS NULL OR signal_rsi_14 IS NULL OR signal_rsi_14 BETWEEN %s AND %s)
+        """, (source, direction, z_tier, rsi,
+              (rsi or 0) - SIMILAR_SETUP_RSI_BAND, (rsi or 100) + SIMILAR_SETUP_RSI_BAND))
+        row = c.fetchone()
+        conn.close()
+        n, wr, avg_pnl = row[0], row[1], row[2]
+        if n and n >= SIMILAR_SETUP_MIN_SAMPLE:
+            result = (int(n), float(wr), float(avg_pnl or 0))
+            _setup_lookup_cache[cache_key] = (result[0], result[1], now)
+            return result
+    except Exception:
+        pass
+    return None
+
 def context_gate(token, direction, source, sig):
     """
-    Main entry point. Runs rule-based first, LLM only if ambiguous.
+    Main entry point. Rule-based gate → similar setup lookup → LLM.
     Returns ('GO', None) or ('SKIP', reason).
     """
     if not CONTEXT_GATE_ENABLED:
@@ -790,12 +831,28 @@ def context_gate(token, direction, source, sig):
 
     verdict, ctx = rule_based_context_gate(token, direction, source, sig)
 
+    if verdict == 'SKIP':
+        return ('SKIP', ctx)
     if verdict == 'GO':
         return ('GO', None)
-    elif verdict == 'SKIP':
-        return ('SKIP', ctx)
 
-    # AMBIGUOUS → call LLM
+    # AMBIGUOUS → similar setup lookup (historical recall)
+    rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
+    z_tier = sig.get('z_score_tier') if isinstance(sig, dict) else None
+    if ctx and isinstance(ctx, dict):
+        rsi = rsi or ctx.get('z_score_tier')  # fallback
+    setup = similar_setup_lookup(token, source, direction, rsi, z_tier)
+    if setup:
+        n, wr, _ = setup
+        wr_pct = wr * 100
+        log(f'  [SETUP-RECALL] {token} {source} {direction}: n={n} WR={wr_pct:.0f}%')
+        if n >= SIMILAR_SETUP_HARD_BLOCK_MIN_N and wr_pct < SIMILAR_SETUP_HARD_BLOCK_WR:
+            return ('SKIP', f'similar setup: n={n} WR={wr_pct:.0f}% < {SIMILAR_SETUP_HARD_BLOCK_WR}% (hard block)')
+        if wr_pct < 40 and n >= SIMILAR_SETUP_MIN_SAMPLE:
+            penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 30 else SIMILAR_SETUP_PENALTY_40
+            log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
+
+    # Still ambiguous → LLM
     return llm_context_gate(token, direction, source, sig, ctx)
 
 

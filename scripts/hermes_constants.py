@@ -454,6 +454,18 @@ CONTEXT_GATE_CACHE_TTL = 300         # seconds to cache LLM decision for same to
 CONTEXT_GATE_LLM_TIMEOUT = 8         # seconds before LLM call times out
 CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block good setups)
 
+# ── Similar Setup Lookup (Historical Trade Recall) ───────────────────────────
+# Queries PostgreSQL for past trades with same signal+direction+market conditions.
+# WR < hard_block → SKIP, WR 30-49% → confidence penalty (advisory).
+SIMILAR_SETUP_LOOKUP_ENABLED = True
+SIMILAR_SETUP_MIN_SAMPLE = 3          # need >= 3 similar trades to act
+SIMILAR_SETUP_HARD_BLOCK_WR = 30      # <30% WR with >=5 similar → hard SKIP
+SIMILAR_SETUP_HARD_BLOCK_MIN_N = 5    # minimum n for hard block
+SIMILAR_SETUP_PENALTY_40 = 10         # WR 40-49% → -10 confidence
+SIMILAR_SETUP_PENALTY_30 = 15         # WR 30-39% → -15 confidence
+SIMILAR_SETUP_RSI_BAND = 15           # RSI ± this for "similar"
+SIMILAR_SETUP_CACHE_TTL = 300         # 5 min cache per token+source+direction+tier
+
 # ── Wrong-side stall detection ────────────────────────────────────────────────
 WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 
