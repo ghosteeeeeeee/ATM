@@ -11,11 +11,9 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import close_position, get_open_hype_positions_curl, get_trade_history
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT
 
+from hermes_log import log
 PAPER_JSON = "/var/www/hermes/data/trades.json"
 BRAIN_DB   = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
-
-def log(msg, tag="INFO"):
-    print(f"[{time.strftime('%H:%M:%S')}] [{tag}] {msg}")
 
 def get_exit_price(coin):
     """Get the most recent fill price for a coin from HL trade history.

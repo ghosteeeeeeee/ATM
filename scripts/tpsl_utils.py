@@ -27,7 +27,9 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from typing import Optional
 
 from atr_cache import get_atr
+from paths import RUNTIME_DB
 from hermes_constants import (
+
     # SL floor/cap
     ATR_SL_MIN, ATR_SL_MAX,
     # Initial entry SL (new trades only)
@@ -101,7 +103,7 @@ def _get_current_phase(token: str) -> Optional[str]:
     """
     import sqlite3
     try:
-        conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db', timeout=5)
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         c = conn.cursor()
         c.execute("""
             SELECT speed_percentile, price_velocity_5m

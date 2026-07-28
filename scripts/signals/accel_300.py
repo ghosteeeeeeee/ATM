@@ -45,8 +45,9 @@ def _log(msg: str) -> None:
         print(f"[accel-300] log write failed: {exc}")
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
-_PRICE_DB   = '/root/.hermes/data/signals_hermes.db'   # price_history -- live 1m prices
+from paths import RUNTIME_DB, STATIC_DB, CANDLES_DB
+_RUNTIME_DB = RUNTIME_DB
+_PRICE_DB = STATIC_DB   # price_history -- live 1m prices
 
 # ── Signal constants (from hermes_constants) ──────────────────────────────────
 from hermes_constants import (

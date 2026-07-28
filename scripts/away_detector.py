@@ -36,15 +36,8 @@ AWAY_THRESHOLD  = 20  # minutes
 # ────────────────────────────────────────────────────────────────────────────
 
 from datetime import datetime, timezone
+from hermes_log import log
 LOG_STAMP = lambda: datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-
-
-def log(msg):
-    stamp = LOG_STAMP()
-    line  = f"[{stamp}] {msg}"
-    print(line)
-    with open(LOG_FILE, 'a') as f:
-        f.write(line + '\n')
 
 
 def load_json(path, default=None):

@@ -8,6 +8,7 @@ from signal_schema import add_signal, get_confluence_signals as schema_get_confl
 from paths import *
 import sqlite3
 
+from hermes_log import log
 DB_PATH = '/root/.openclaw/workspace/data/signals.db'
 LOG_FILE = '/root/.hermes/logs/signal-importer.log'
 
@@ -233,25 +234,3 @@ def get_confluence_signals(hours=24):
 # ============================================
 # Logging
 # ============================================
-def log(msg):
-    """Log to file"""
-    print(msg)
-    try:
-        import os
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(f"{msg}\n")
-    except:
-        pass
-
-# ============================================
-# Main
-# ============================================
-if __name__ == '__main__':
-    # Test confluence calculation
-    log("=== Signal Importer: Loading confluence ===")
-    confluence = get_confluence_signals(hours=24)
-    for c in confluence:
-        log(f"{c['token']} {c['direction']}: {c['count']} signals, {c['final_confidence']:.1f}% confidence")
-        log(f"  Signals: {c.get('signal_types', [])}")
-    log(f"=== Done: {len(confluence)} confluence signals ===")

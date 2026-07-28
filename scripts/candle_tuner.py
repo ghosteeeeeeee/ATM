@@ -8,22 +8,12 @@ from paths import *
 import sqlite3, time, os, sys, statistics
 from datetime import datetime
 
+from hermes_log import log
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 HERMES_DIR = os.path.dirname(SCRIPT_DIR)
 PREDICTIONS_DB = os.path.join(HERMES_DIR, 'data', 'predictions.db')
 LOG_FILE = '/root/.hermes/logs/candle-tuner.log'
 CANDLE_PREDICTOR = os.path.join(SCRIPT_DIR, 'candle_predictor.py')
-
-def log(msg, level='INFO'):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f"[{ts}] [{level}] {msg}"
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except:
-        pass
 
 def get_db():
     return sqlite3.connect(PREDICTIONS_DB, timeout=10)

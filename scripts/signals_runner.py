@@ -14,21 +14,10 @@ import os
 import time
 import argparse
 
+from hermes_log import log
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs')
 LOG_FILE = os.path.join(LOG_DIR, 'pipeline.log')
-
-
-def log(msg):
-    ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] {msg}'
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
 
 
 def main():

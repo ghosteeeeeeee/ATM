@@ -7,6 +7,7 @@ from paths import *
 import sys, subprocess, time, os, argparse, os, fcntl, json
 from _secrets import BRAIN_DB_DICT
 
+from hermes_log import log
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 LOG     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'pipeline.log')
 LOCK    = '/tmp/hermes-pipeline.lock'
@@ -38,36 +39,6 @@ STEPS_EVERY_MIN  = ['signal_compactor', 'breakout_engine', 'signals_runner', 'de
 #   - Pipeline no longer blocked by ~26s aggregation; other steps get faster execution
 STEPS_EVERY_5M   = ['signals_runner_slow']  # slow signals: momentum, mtf_momentum (>60s per run)
 STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer', 'ab_learner']
-
-
-def log(msg):
-    ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] {msg}'
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG), exist_ok=True)
-        with open(LOG, 'a') as f:
-            f.write(line + '\n')
-    except:
-        pass
-
-
-# Per-step timeouts (seconds)
-STEP_TIMEOUTS = {
-    'signal_gen': 180,
-    'signals_runner': 300,
-    'signals_runner_slow': 240,
-    'breakout_engine': 60,
-    'decider_run': 360,
-    'signal_compactor': 60,   # deterministic — must be fast (<2s typical)
-    'position_manager': 120,
-    'strategy_optimizer': 300,
-    'ab_optimizer': 300,
-    'ab_learner': 300,
-    'live_decider': 240,
-    'hermes-trades-api': 60,
-}
-DEFAULT_TIMEOUT = 300
 
 
 def run(name, args=None):

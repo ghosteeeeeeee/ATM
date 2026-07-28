@@ -29,8 +29,9 @@ from hermes_constants import (
     LONG_BLACKLIST,
 )
 from signal_schema import add_signal
+from paths import RUNTIME_DB, STATIC_DB, CANDLES_DB
 
-_DB_PATH = "/root/.hermes/data/signals_hermes.db"
+_DB_PATH = STATIC_DB
 
 # In-memory cooldown tracker: (token, direction) -> last_fired_bar
 _last_signal: dict[tuple[str, str], int] = {}

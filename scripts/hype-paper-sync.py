@@ -16,6 +16,7 @@ import sys, json, time, argparse
 sys.path.insert(0, '/root/.hermes/scripts')
 from paths import *  # single source of truth for paths
 import hype_cache as hc
+from hermes_log import log
 from hyperliquid_exchange import (
     get_open_hype_positions_curl,
     is_live_trading_enabled,
@@ -25,11 +26,6 @@ from hyperliquid_exchange import (
 
 PAPER_JSON = TRADES_JSON
 DRY = True
-
-
-def log(msg, tag="INFO"):
-    ts = time.strftime("%H:%M:%S")
-    print(f"[{ts}] [{tag}] {msg}")
 
 
 def get_paper_positions():

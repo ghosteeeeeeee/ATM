@@ -14,18 +14,9 @@ import subprocess
 import traceback
 import psycopg2
 
+from hermes_log import log
 LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'trading.log')
 BRAIN_DB = "host=/var/run/postgresql dbname=brain user=postgres password=postgres"
-
-def log(msg, level='INFO'):
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_line = f'[{timestamp}] [{level}] [hyperliquid-trader] {msg}'
-    print(log_line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(log_line + '\n')
-    except: pass  # Don't crash on log failures
 
 def log_error(msg, exc=None):
     error_msg = f'{msg}'

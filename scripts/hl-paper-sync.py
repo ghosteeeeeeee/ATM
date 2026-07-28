@@ -19,17 +19,14 @@ from hyperliquid_exchange import (
     is_live_trading_enabled,
     get_exchange,
 )
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT
 
+from hermes_log import log
 
 PAPER_JSON = TRADES_JSON
 DRY = True
 SAFE_MODE = True  # never open new positions, only close orphans
 MAX_SLIPPAGE = 0.005  # 0.5%
-
-
-def log(msg, tag="INFO"):
-    ts = time.strftime("%H:%M:%S")
-    print(f"[{ts}] [{tag}] {msg}")
 
 
 def get_paper_trades():
@@ -184,7 +181,7 @@ def main():
         token = p['coin']
         direction = p['direction']
         entry = p['entry']
-        amount = p.get('amount_usdt', 50.0)
+        amount = p.get('amount_usdt', DEFAULT_TRADE_SIZE_USDT)
 
         if token not in hl_positions:
             # Check if there are open orders for this coin (might be TP/SL only)
@@ -203,7 +200,7 @@ def main():
                 log(f"  {token}: paper ↔ HL in sync ✓", "PASS")
 
     for p in opens_needed:
-        result = open_position_on_hl(p['coin'], p['direction'], p.get('amount_usdt', 50.0), p['entry'])
+        result = open_position_on_hl(p['coin'], p['direction'], p.get('amount_usdt', DEFAULT_TRADE_SIZE_USDT), p['entry'])
         time.sleep(3)
 
     # ── Phase 2: Close paper orphans (HL → paper) ─────────────────────────────

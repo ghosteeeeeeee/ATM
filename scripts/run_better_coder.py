@@ -15,23 +15,13 @@ from datetime import datetime
 # Add the MCP server directory to path
 sys.path.insert(0, '/root/.hermes/mcp/hermes-coding-mcp')
 
+from paths import *
 from dispatcher.dispatcher import ParallelDispatcher
 
+from hermes_log import log
 TASKS_FILE = '/root/.hermes/brain/TASKS.md'
 LOG_FILE = '/root/.hermes/logs/better-coder.log'
 LOCK = '/tmp/hermes-better-coder.lock'
-
-
-def log(msg):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] {msg}'
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
 
 
 def acquire_lock():

@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 # DO NOT UPDATE ANY VALUES IN THIS FILE BEFORE ASKING T!!!
+# ── DISABLED SIGNALS (64 total) ───────────────────────────────────────────────
+# pct_hermes, vel_hermes, hzscore, hmacd, mtf_momentum, momentum, phase_accel,
+# fast_momentum, ema_angle, rs, gap_300, ma_cross, ma_cross_5m, hh_hl, guppy,
+# macd_accel, trend_purity, ema9_sma20, r2_rev, r2_trend, exhaustion,
+# counter_flip, squeeze_cross, zscore_pump, mtp_zscore, ema20_50+, volume_hl+,
+# ma300_candle+, ma_cross_5m+/-, gap_300+/-, ema9_sma20+/-, exhaust+/-, guppy+/-,
+# ma_cross+/-, r2_rev+/-, r2_trend+/-, trend_purity+/-, ema20_50-/-, fast_mom-,
+# momentum+/-, mtf_momentum+/-, oc_*, pump_hunter
+# All set to False. See each section below for individual flags.
 
 import os
 

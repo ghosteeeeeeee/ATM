@@ -21,6 +21,7 @@ import time
 from datetime import datetime, timedelta
 
 from paths import *
+from hermes_log import log
 # ─── Config ───────────────────────────────────────────────────────────────────
 LOG_FILE   = '/root/.hermes/logs/study_winning_combos.log'
 HIST_FILE   = '/root/.hermes/logs/study_history.log'
@@ -31,13 +32,6 @@ RT_DB     = RUNTIME_DB
 STUDY_HRS = 24   # look back window
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
-
-def log(msg, fp=None):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] {msg}'
-    print(line)
-    if fp:
-        fp.write(line + '\n')
 
 def pnl_emoji(pnl):
     if pnl is None:

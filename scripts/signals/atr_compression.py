@@ -22,10 +22,11 @@ from typing import Optional, List, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, price_age_minutes
+from paths import RUNTIME_DB, STATIC_DB, CANDLES_DB
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_RUNTIME_DB  = '/root/.hermes/data/signals_hermes_runtime.db'
-_CANDLES_DB  = '/root/.hermes/data/candles.db'
+_RUNTIME_DB = RUNTIME_DB
+_CANDLES_DB = CANDLES_DB
 
 # ── Signal constants ───────────────────────────────────────────────────────────
 ATR_PCT_THRESH  = 0.8    # max ATR14/close % to qualify as compressed (ATR alone)

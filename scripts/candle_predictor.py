@@ -20,6 +20,7 @@ import sqlite3, json, time, os, sys, subprocess, statistics, argparse
 from collections import defaultdict
 import wandb
 
+from hermes_log import log
 # ── Paths ─────────────────────────────────────────────────────────────────────
 SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
 HERMES_DIR   = os.path.dirname(SCRIPT_DIR)
@@ -61,16 +62,6 @@ REGIME_DOWN_ACCURACY = {
     'bearish':  20.4,  # DOWN worst in bearish — model predicts reversal that fails
     'neutral':  25.7,  # DOWN anti-correct in neutral too
 }
-
-
-def log(msg, level='INFO'):
-    ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    print(f"[{ts}] [{level}] {msg}")
-    try:
-        with open(LOG_FILE, 'a') as f:
-            f.write(f"[{ts}] [{level}] {msg}\n")
-    except:
-        pass
 
 
 def acquire_lock():

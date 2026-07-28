@@ -24,15 +24,11 @@ from hyperliquid_exchange import (
 import psycopg2, sqlite3
 from _secrets import BRAIN_DB_DICT
 
+from hermes_log import log
 DRY = True  # overridden by --dry / --apply
 
 DB = BRAIN_DB_DICT  # centralized credential management
 SIGNALS_DB = RUNTIME_DB
-
-
-def log(msg, tag="INFO"):
-    ts = time.strftime("%H:%M:%S")
-    print(f"[{ts}] [{tag}] {msg}")
 
 
 def get_brain_positions():

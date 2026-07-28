@@ -93,7 +93,7 @@ def _get_regime_1m(coin: str) -> tuple:
     """1m linear regression regime. Returns (regime_str, confidence_int 0-100)."""
     try:
         import sqlite3
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
         rows = conn.execute(
             "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 100",
             (coin.upper(),)
@@ -152,6 +152,7 @@ def _set_hotset_last_updated():
 
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT
 
+from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
 MAX_POS         = MAX_OPEN_POSITIONS
@@ -228,17 +229,6 @@ def _get_direction_wr(token: str, direction: str) -> tuple:
 # ─── Per-token Leverage Cache ──────────────────────────────────────────────────
 _LEVERAGE_CACHE = {}          # {token: {'leverage': int, 'cached_at': float}}
 _LEVERAGE_CACHE_TTL = 3600   # 1 hour
-
-def log(msg):
-    ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    line = f'{ts} {msg}'
-    print(line)
-    try:
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except:
-        pass
-
 
 def _update_decider_heartbeat():
     """Update pipeline heartbeat for decider-run."""

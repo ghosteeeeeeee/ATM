@@ -11,12 +11,9 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from paths import *
 from signal_schema import _get_conn, _runtime
 
+from hermes_log import log
 PAPER_JSON   = TRADES_JSON
 HOTSET_FILE  = '/var/www/hermes/data/hotset.json'
-
-def log(msg, tag="INFO"):
-    ts = time.strftime("%H:%M:%S")
-    print(f"[{ts}] [{tag}] {msg}")
 
 def count_signals():
     conn = _get_conn(_runtime())

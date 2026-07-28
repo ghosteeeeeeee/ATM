@@ -28,6 +28,7 @@ from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON
 
+from hermes_log import log
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
 _open_pos_cache = {}  # token_upper -> True/False, refreshed each run
 _dir_wr_cache = {}    # (token, direction) -> (wr, count, timestamp)
@@ -128,22 +129,6 @@ SPEED_CACHE_FILE = os.path.join(HERMES_DATA, "speed_cache.json")
 # ── Logging ───────────────────────────────────────────────────────────────────
 LOG_FILE = '/var/www/hermes/logs/trading.log'
 # ── Logging ───────────────────────────────────────────────────────────────────
-def log(msg, level='INFO'):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] [{level}] [signal-compactor] {msg}'
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
-
-# ── Confluence enforcement ───────────────────────────────────────────────────
-# Single-source signals are blocked from compaction. They stay PENDING until
-# a second source arrives for the same token+direction. The GROUP BY merges
-# multiple sources per token+direction into a single row.
-
 def get_regime_1m(coin):
     """Get 1m regime from linear regression of last 50 1m candles.
     Returns (regime_str, confidence_int 0-100).
@@ -152,7 +137,7 @@ def get_regime_1m(coin):
     """
     import statistics
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
         rows = conn.execute(
             "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 50",
             (coin.upper(),)

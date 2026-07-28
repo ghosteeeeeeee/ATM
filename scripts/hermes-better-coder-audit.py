@@ -4,17 +4,8 @@ import sys
 import subprocess
 from datetime import datetime
 
+from hermes_log import log
 LOG = '/root/.hermes/logs/audit.log'
-
-def log(msg):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] {msg}'
-    print(line)
-    try:
-        with open(LOG, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
 
 def run():
     log('=== Weekly Audit Starting ===')

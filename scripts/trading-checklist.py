@@ -17,19 +17,9 @@ from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from paths import *
+from hermes_log import log
 LOG = '/root/.hermes/logs/trading-checklist.log'
 os.makedirs(os.path.dirname(LOG), exist_ok=True)
-
-def log(msg, level='INFO'):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] [{level}] {msg}'
-    print(line)
-    try:
-        with open(LOG, 'a') as f:
-            f.write(line + '\n')
-    except:
-        pass
-
 
 def run_check(name):
     """Run a named check and return (ok: bool, msg: str, issues: list)"""

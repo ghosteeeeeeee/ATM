@@ -12,6 +12,7 @@ import sys, os, re, time, subprocess, json
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from paths import *
+from hermes_log import log
 CONTEXT_FILE         = '/root/.hermes/CONTEXT.md'
 ATM_ARCHITECTURE_FILE = '/root/.hermes/ATM/ATM-Architecture.md'
 LOCK_FILE    = '/root/.hermes/locks/context.md.lock'
@@ -19,9 +20,6 @@ MAX_WAIT     = 30
 POLL_INT     = 5
 
 # ── helpers ──────────────────────────────────────────────────────────────────
-
-def log(msg):
-    print(f"[context-compactor] {msg}", file=sys.stderr)
 
 def get_pipeline_status():
     """Check if hermes-pipeline is running via cron jobs.json."""

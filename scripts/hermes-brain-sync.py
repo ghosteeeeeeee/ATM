@@ -2,10 +2,12 @@
 """
 hermes-brain-sync.py — Daily brain audit for Hermes trading agent.
 READ ONLY — only appends to brain/ideas.md under ## Brain-Sync Audit Log
+from paths import *
 """
 import sys, os, time, fcntl, re
 from datetime import datetime
 
+from hermes_log import log
 LOCK_FILE = '/root/.hermes/locks/brain-sync.lock'
 TASKS_FILE = '/root/.hermes/brain/TASKS.md'
 PROJECTS_FILE = '/root/.hermes/brain/PROJECTS.md'
@@ -13,9 +15,6 @@ DECISIONS_FILE = '/root/.hermes/brain/DECISIONS.md'
 CONTEXT_FILE = '/root/.hermes/CONTEXT.md'
 IDEAS_FILE = '/root/.hermes/brain/ideas.md'
 KANBAN_FILE = '/var/www/hermes/data/kanban.json'
-
-def log(msg):
-    print(f"[hermes-brain-sync] {msg}", file=sys.stderr)
 
 def acquire_lock():
     os.makedirs('/root/.hermes/locks', exist_ok=True)

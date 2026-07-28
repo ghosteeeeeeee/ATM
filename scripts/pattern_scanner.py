@@ -17,8 +17,9 @@ import sys, os, time, json, sqlite3
 from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import add_signal
+from paths import STATIC_DB
 
-_PRICE_DB = '/root/.hermes/data/signals_hermes.db'
+_PRICE_DB = STATIC_DB
 
 def _get_candles_1m(token: str, lookback_minutes: int = 120) -> list:
     """Fetch 1m close prices from price_history, oldest first."""

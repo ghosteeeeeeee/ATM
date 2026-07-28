@@ -19,9 +19,10 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal
 from hermes_constants import CANDLES_STALENESS_SEC
+from paths import RUNTIME_DB, STATIC_DB, CANDLES_DB
 
-_PRICE_DB = '/root/.hermes/data/signals_hermes.db'
-_CANDLES_DB = '/root/.hermes/data/candles.db'
+_PRICE_DB = STATIC_DB
+_CANDLES_DB = CANDLES_DB
 
 # ── Config ────────────────────────────────────────────────────────────────────
 SCAN_SECS    = 60         # match pipeline cadence

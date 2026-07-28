@@ -9,24 +9,13 @@ from hermes_constants import PROFIT_MIN_PCT, PROFIT_MAX_PCT, MAX_CLOSE_PER_WAKE,
 import sys, os, json, time, random, argparse
 from pathlib import Path
 
+from hermes_log import log
 # ── Constants ────────────────────────────────────────────────────────────────
 LOG_FILE          = Path("/root/.hermes/logs/profit_monster.log")
 CONFIG_FILE       = Path(PROFIT_MONSTER_CONFIG)
 BRAIN_CMD         = "/root/.hermes/scripts/brain.py"
 
 # ── Logging ───────────────────────────────────────────────────────────────────
-def log(msg, level="INFO"):
-    ts = time.strftime("%Y-%m-%d %H:%M:%S")
-    line = f"[{ts}] [{level}] [profit-monster] {msg}"
-    print(line)
-    try:
-        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(LOG_FILE, "a") as f:
-            f.write(line + "\n")
-    except Exception:
-        pass
-
-# ── Config ───────────────────────────────────────────────────────────────────
 def load_config():
     try:
         with open(CONFIG_FILE) as f:

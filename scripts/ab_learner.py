@@ -14,16 +14,13 @@ import json, os, sys, psycopg2
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+from hermes_log import log
 BRAIN_DB = {
     'host': '/var/run/postgresql', 'dbname': 'brain',
     'user': 'postgres', 'password': 'postgres'
 }
 TRADE_PATTERNS_FILE = '/var/www/hermes/data/trade_patterns.json'
 os.makedirs(os.path.dirname(TRADE_PATTERNS_FILE), exist_ok=True)
-
-
-def log(msg):
-    print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} [ab_learner] {msg}')
 
 
 def _db_conn():

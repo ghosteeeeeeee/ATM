@@ -39,12 +39,16 @@ def _log(msg: str) -> None:
 
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
-_PRICE_DB   = '/root/.hermes/data/signals_hermes.db'
+_RUNTIME_DB = RUNTIME_DB
+_PRICE_DB = STATIC_DB
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+from paths import RUNTIME_DB, STATIC_DB, CANDLES_DB
+_RUNTIME_DB = RUNTIME_DB
+_PRICE_DB = STATIC_DB   # price_history -- live 1m prices
 
 # ── Signal constants ──────────────────────────────────────────────────────────
 from hermes_constants import (
-    ACCEL_300_PERIOD,
     INVERSE_ACCEL_300_MIN_GAP_PCT_LONG,
     INVERSE_ACCEL_300_MIN_GAP_PCT_SHORT,
     INVERSE_ACCEL_300_REVERSION_BARS,

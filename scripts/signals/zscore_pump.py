@@ -34,7 +34,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from signal_schema import add_signal, get_cooldown, price_age_minutes
 from signal_gen import MIN_TRADE_INTERVAL_MINUTES
+from paths import RUNTIME_DB, STATIC_DB
 from hermes_constants import (
+
     ZSCORE_PUMP_NEW_ENABLED,
     ZSCORE_PUMP_PLUS_ENABLED,
     ZSCORE_PUMP_MINUS_ENABLED,
@@ -51,8 +53,8 @@ from hermes_constants import (
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
-_PRICE_DB   = '/root/.hermes/data/signals_hermes.db'   # price_history — live 1m prices
+_RUNTIME_DB = RUNTIME_DB
+_PRICE_DB   = STATIC_DB   # price_history — live 1m prices
 _TUNER_DB   = '/root/.hermes/data/zscore_momentum_tuner.db'
 
 # ── Logging ───────────────────────────────────────────────────────────────────

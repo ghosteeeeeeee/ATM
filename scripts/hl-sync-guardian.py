@@ -200,6 +200,7 @@ import json  # for json.dumps in penalty recording
 # duplicated across hl-sync-guardian.py, position_manager.py, and cascade_flip.py.
 from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
 
+from hermes_log import log
 def _load_cooldowns() -> dict:
     try:
         with open(LOSS_COOLDOWN_FILE) as f:
@@ -624,15 +625,6 @@ _CLOSED_HL_COINS=set()  # tokens where HL position was closed this cycle
 # Ensure data dir exists
 os.makedirs(DATA_DIR, exist_ok=True)
 
-
-def log(msg, level='INFO'):
-    # Logs to stdout only — systemd service redirects stdout to sync-guardian.log
-    # via StandardOutput=append:. Direct file writes removed to prevent doubling.
-    ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    print(f'[{ts}] [{level}] {msg}', flush=True)  # flush=True for immediate write via systemd
-
-
-# ─── Copied Trades State (migrated from combined-trading.py) ──────────────────
 
 def get_copied_trades():
     """

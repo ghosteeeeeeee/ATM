@@ -21,6 +21,7 @@ import json, time, os, sys, random, argparse
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 
+from hermes_log import log
 # ─── DB ────────────────────────────────────────────────────────────────────────
 BRAIN_DB = {
     'host': '/var/run/postgresql', 'dbname': 'brain',
@@ -44,17 +45,6 @@ WIN_RATE_KILL       = 0.05  # retire if WR below 5% (much stricter — 13% WR is
 PNL_KILL            = -15.0 # retire if PnL% below -15% (primary kill signal)
 EPSILON             = 0.15  # 15% exploration — shift toward exploiting winners now
 MIN_TRADES_RANDOM   = 10    # need minimum sample before competing for exploit slot
-
-
-def log(msg: str, level: str = 'INFO'):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'{ts} [{level}] {msg}'
-    print(line)
-    try:
-        with open(EVOLUTION_LOG, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
 
 
 def _db_conn():

@@ -201,6 +201,7 @@ W_VOLUME          = 1.5   # volume rate-of-change confirmation
 # Sourced from hermes_constants.py — adjust SPEED_MIN_THRESHOLD, SPEED_BOOST_* there.
 from hermes_constants import SPEED_MIN_THRESHOLD, SPEED_BOOST_THRESHOLD, SPEED_BOOST_FACTOR, SPEED_ABS_MIN_THRESHOLD
 
+from hermes_log import log
 # ─── Timeframe windows ──────────────────────────────────────────
 TF_WINDOWS = [
     ('1m',  20),   # 20 minutes
@@ -250,20 +251,6 @@ MIN_TRADE_INTERVAL_MINUTES = 10   # min minutes between trades on same token
 # ═══════════════════════════════════════════════════════════════
 # Logging
 # ═══════════════════════════════════════════════════════════════
-
-def log(msg):
-    ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    line = f'{ts} {msg}'
-    print(line)
-    try:
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
-
-
-_HEARTBEAT_FILE = '/var/www/hermes/data/pipeline_heartbeat.json'
-
 
 def _update_heartbeat(stage: str):
     """Update the pipeline heartbeat file for a given stage."""

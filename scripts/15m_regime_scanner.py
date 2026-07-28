@@ -16,20 +16,14 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 
 from paths import *
+from hermes_log import log
 INFO_URL = "https://api.hyperliquid.xyz/info"
 OUTPUT_FILE = "/var/www/hermes/data/regime_5m.json"
-STATIC_DB   = "/root/.hermes/data/signals_hermes.db"
-CANDLES_DB  = "/root/.hermes/data/candles.db"
 LOG_FILE = "/root/.hermes/logs/15m_regime.log"
 BRAIN_DB = BRAIN_DB_DICT
 CANDLE_TF = "5m"
 CANDLE_TABLE = "candles_5m"
 STALE_THRESHOLD_SECS = 300  # 5 min — if latest closed candle is older, use Binance
-
-def log(msg):
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
-    with open(LOG_FILE, "a") as f:
-        f.write(f"[{datetime.now().isoformat()}] {msg}\n")
 
 def fetch_candles_from_db(token, limit=16):
     """Read closed 15m candles from candles.db. Returns list of dicts or None if stale/missing."""

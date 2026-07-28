@@ -44,6 +44,7 @@ if _parent not in sys.path:
 
 from signal_schema import add_signal, get_cooldown, price_age_minutes
 from signal_gen import MIN_TRADE_INTERVAL_MINUTES
+from paths import RUNTIME_DB, STATIC_DB
 from hermes_constants import (
     MTP_ZSCORE_ENABLED,
     MTP_ZSCORE_PLUS_ENABLED,
@@ -61,8 +62,8 @@ from hermes_constants import (
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
-_PRICE_DB   = '/root/.hermes/data/signals_hermes.db'   # price_history — live 1m prices
+_RUNTIME_DB = RUNTIME_DB
+_PRICE_DB   = STATIC_DB   # price_history — live 1m prices
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'

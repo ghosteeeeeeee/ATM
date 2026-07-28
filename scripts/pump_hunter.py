@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import CANDLES_DB, HERMES_DATA
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hermes_constants import PUMP_HUNTER_ENABLED
+from hermes_log import log
 from hyperliquid_exchange import (
     mirror_open, mirror_close, is_live_trading_enabled,
     get_open_hype_positions_curl, is_delisted, _round_position_sz, _sz_decimals,
@@ -85,20 +86,6 @@ TRACK_FILE = '/var/www/hermes/data/pump-hunter.json'
 # Logging
 LOG_FILE = os.path.join(HERMES_DATA, 'logs', 'pump_hunter.log')
 
-
-def log(msg, tag="INFO"):
-    ts = datetime.now().strftime("%H:%M:%S")
-    line = f"[{ts}] [{tag}] {msg}"
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + "\n")
-    except:
-        pass
-
-
-# ── Candle Data ────────────────────────────────────────────────────────────────
 
 def get_1m_candles(token: str, lookback: int = 30) -> list:
     """Fetch last N 1m candles for token from candles.db.

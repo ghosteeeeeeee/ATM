@@ -27,8 +27,9 @@ from enum import IntEnum
 import os, sqlite3, time
 
 from hermes_constants import MACD_EXIT_PAUSED
+from paths import STATIC_DB
 
-_PRICE_DB = '/root/.hermes/data/signals_hermes.db'
+_PRICE_DB = STATIC_DB
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

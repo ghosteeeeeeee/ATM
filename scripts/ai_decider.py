@@ -24,6 +24,7 @@ import pandas as pd
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 
+from hermes_log import log
 # Speed feature: speed percentile boosts compaction survival
 # Lazy-load to avoid 10s+ import penalty in decider-run.py (which only imports
 # get_regime, not the pipeline functions). SpeedTracker.update() is called
@@ -62,16 +63,6 @@ except Exception:
     log_event = lambda *a, **k: None
 
 LOG_FILE = '/var/www/hermes/logs/trading.log'
-
-def log(msg, level='INFO'):
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_line = f'[{timestamp}] [{level}] [ai-decider] {msg}'
-    print(log_line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(log_line + '\n')
-    except: pass  # Don't crash on log failures
 
 def log_error(msg, exc=None):
     error_msg = f'{msg}'

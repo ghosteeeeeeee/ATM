@@ -14,6 +14,7 @@ from _secrets import BRAIN_DB_DICT
 import psycopg2
 from hermes_constants import MAX_HYPE_POSITIONS, MAX_SOL_POSITIONS, MAX_TOTAL_POSITIONS
 
+from hermes_log import log
 LOG_FILE = '/root/.hermes/logs/unified-scanner.log'
 
 # ============================================
@@ -52,17 +53,6 @@ HYPERLIQUID_MAX_LEVERAGE = {}
 
 # ============================================
 # Logging
-# ============================================
-def log(msg):
-    print(msg)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(f"{msg}\n")
-    except: pass
-
-# ============================================
-# Price & Indicator Fetching
 # ============================================
 def get_cached_prices():
     """Fetch all prices from shared hype_cache (written by price_collector)."""

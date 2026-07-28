@@ -24,13 +24,12 @@ Lock files: /root/.hermes/locks/tasks.md.lock and /root/.hermes/locks/kanban.loc
 import sys, os, re, json, time, subprocess
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
+from hermes_log import log
 TASKS_FILE  = '/root/.hermes/brain/TASKS.md'
 KANBAN_FILE = '/var/www/hermes/data/kanban.json'
 LOCK_WRITER = '/root/.hermes/scripts/hermes_write_with_lock.py'
 MAX_WAIT    = 30
-
-def log(msg):
-    print(f"[sync_kanban_tasks] {msg}", file=sys.stderr)
 
 def write_with_lock(lockname, target, content):
     """Use hermes_write_with_lock.py to atomically write a file."""

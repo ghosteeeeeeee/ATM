@@ -36,6 +36,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hyperliquid_exchange import is_delisted
 from paths import HERMES_DATA, WWW_DATA, CANDLES_DB, RUNTIME_DB, HOTSET_FILE as HOTSET_PATH
 
+from hermes_log import log
 # ── Paths ────────────────────────────────────────────────────────────────────
 OC_PENDING   = '/var/www/hermes/data/oc_pending_signals.json'  # OC writes here too
 LOG_FILE     = '/var/www/hermes/logs/breakout_engine.log'
@@ -65,19 +66,6 @@ MIN_COMPRESSION_VOL_AVG = 30.0  # skip tokens with near-zero avg volume (illiqui
 TIMEFRAMES = ['5m', '1m']
 
 # ── Logging ──────────────────────────────────────────────────────────────────
-def log(msg, level='INFO'):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] [{level}] [breakout] {msg}'
-    print(line)
-    try:
-        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
-
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
 def get_candles(token: str, timeframe: str, bars: int = 100) -> List[dict]:
     """Fetch recent candles for token+timeframe from candles.db."""
     table = f'candles_{timeframe}'

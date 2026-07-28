@@ -1,21 +1,13 @@
 #!/usr/bin/env python3
+from paths import *
 """Daily disk space health check for Better Coder system."""
 import shutil
 import subprocess
 from datetime import datetime
 
+from hermes_log import log
 LOG = '/root/.hermes/logs/health-check.log'
 MIN_FREE_MB = 500
-
-def log(msg):
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{ts}] {msg}'
-    print(line)
-    try:
-        with open(LOG, 'a') as f:
-            f.write(line + '\n')
-    except Exception:
-        pass
 
 def run():
     log('=== Daily Health Check ===')
