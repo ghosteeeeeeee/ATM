@@ -358,6 +358,79 @@ def init_db():
     _init_done = True
 
 # ── Signals (runtime DB) ──────────────────────────────────────────────────────
+
+def _enrich_indicators(token):
+    """Compute standard indicators from price_history and token_speeds.
+    Returns dict with z_score, z_score_tier, rsi_14, macd_*, momentum_state, bb_position,
+    speed_percentile, wave_phase, price_acceleration, momentum_score. Fail-open: returns {}."""
+    try:
+        rows = get_price_history(token, lookback_minutes=60)
+        prices = [r[1] for r in rows]
+        if len(prices) < 26:
+            return {}
+        last = prices[-1]
+        result = {}
+        # z-score (20-bar)
+        w = prices[-20:]
+        mean = sum(w) / len(w)
+        var = sum((p - mean) ** 2 for p in w) / len(w)
+        std = var ** 0.5
+        if std > 0:
+            z = (last - mean) / std
+            result['z_score'] = round(z, 4)
+            result['z_score_tier'] = ('extreme_high' if z > 2 else 'high' if z > 1 else
+                                      'extreme_low' if z < -2 else 'low' if z < -1 else 'neutral')
+            result['bb_position'] = round((last - (mean - 2 * std)) / (4 * std), 4)
+        # RSI(14)
+        if len(prices) >= 15:
+            changes = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+            gains = [c for c in changes[-14:] if c > 0]
+            losses = [-c for c in changes[-14:] if c < 0]
+            avg_g = sum(gains) / 14 if gains else 0
+            avg_l = sum(losses) / 14 if losses else 0
+            result['rsi_14'] = 100.0 if avg_l == 0 else round(100 - 100 / (1 + avg_g / avg_l), 2)
+        # MACD(12,26,9)
+        def _ema(vals, period):
+            k = 2 / (period + 1)
+            e = sum(vals[:period]) / period
+            for v in vals[period:]:
+                e = v * k + e * (1 - k)
+            return e
+        if len(prices) >= 35:
+            macd_line = _ema(prices[-35:], 12) - _ema(prices[-35:], 26)
+            macd_vals = []
+            for i in range(26, len(prices) + 1):
+                chunk = prices[max(0, i - 35):i]
+                if len(chunk) >= 26:
+                    macd_vals.append(_ema(chunk, 12) - _ema(chunk, 26))
+            if len(macd_vals) >= 9:
+                sig = _ema(macd_vals, 9)
+                result['macd_value'] = round(macd_line, 8)
+                result['macd_signal'] = round(sig, 8)
+                result['macd_hist'] = round(macd_line - sig, 8)
+        # momentum_state (5-bar velocity)
+        if len(prices) >= 6 and prices[-6]:
+            vel = (prices[-1] - prices[-6]) / prices[-6] * 100
+            result['momentum_state'] = 'rising' if vel > 0.1 else 'falling' if vel < -0.1 else 'flat'
+        # From token_speeds (current market state)
+        try:
+            with sqlite3.connect(RUNTIME_DB, timeout=3) as sconn:
+                srow = sconn.execute(
+                    'SELECT speed_percentile, wave_phase, price_acceleration, '
+                    'momentum_score, is_stale FROM token_speeds WHERE token = ?', (token.upper(),)
+                ).fetchone()
+            if srow:
+                result['speed_percentile'] = srow[0]
+                result['wave_phase'] = srow[1]
+                result['price_acceleration'] = srow[2]
+                result['momentum_score'] = srow[3]
+                result['is_stale'] = bool(srow[4])
+        except Exception:
+            pass
+        return result
+    except Exception:
+        return {}
+
 def add_signal(token, direction, signal_type, source, confidence, value=None, price=None,
                exchange='hyperliquid', timeframe='1h', z_score=None, z_score_tier=None,
                momentum_state=None, rsi_14=None, macd_value=None, macd_signal=None,
@@ -624,6 +697,24 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         token = token.upper()
         direction = direction.upper()
 
+        # ── Auto-enrichment: fill missing indicators from price_history + token_speeds ──
+        enriched = {}
+        if z_score is None or rsi_14 is None or macd_hist is None or momentum_state is None:
+            enriched = _enrich_indicators(token)
+            if z_score is None: z_score = enriched.get('z_score')
+            if z_score_tier is None: z_score_tier = enriched.get('z_score_tier')
+            if rsi_14 is None: rsi_14 = enriched.get('rsi_14')
+            if macd_value is None: macd_value = enriched.get('macd_value')
+            if macd_signal is None: macd_signal = enriched.get('macd_signal')
+            if macd_hist is None: macd_hist = enriched.get('macd_hist')
+            if momentum_state is None: momentum_state = enriched.get('momentum_state')
+
+        # signal_metadata JSONB: full market state at signal time
+        metadata = kwargs.get('signal_metadata') or {}
+        if enriched:
+            metadata.update({k: v for k, v in enriched.items() if v is not None})
+            metadata['price_at_signal'] = price
+
         # ── CONFLICT GUARD — REMOVED 2026-04-27 ───────────────────────────────────
         # Removed: relying on signal_compactor's opp_penalty instead (-15% per
         # opposing source, 5-min window). The conflict guard was causing counter_flip
@@ -708,13 +799,17 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     macd_value=COALESCE(?, macd_value),
                     macd_signal=COALESCE(?, macd_signal),
                     macd_hist=COALESCE(?, macd_hist),
+                    momentum_state=COALESCE(?, momentum_state),
                     combo_key=?,
+                    signal_metadata=?,
                     updated_at=CURRENT_TIMESTAMP
                 WHERE id=?
             ''', (new_conf, merged_sources, merged_types,
                   z_score, z_score_tier, rsi_14,
                   macd_value, macd_signal, macd_hist,
+                  momentum_state,
                   merged_combo_key,
+                  json.dumps(metadata, default=str) if metadata else '{}',
                   sig_id))
             conn.commit()
             conn.close()
@@ -740,13 +835,14 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             (token, direction, signal_type, source, signal_types, confidence, value, price,
              exchange, timeframe, z_score, z_score_tier, momentum_state,
              rsi_14, macd_value, macd_signal, macd_hist, decision, executed, leverage,
-             hot_cycle_count, counter_detected, combo_key)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0, ?)
+             hot_cycle_count, counter_detected, combo_key, signal_metadata)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0, ?, ?)
         ''', (token, direction, signal_type, source, signal_type,
               min(100, confidence), value, price, exchange, timeframe,  # FIX: cap at 100
               z_score, z_score_tier, momentum_state,
               rsi_14, macd_value, macd_signal, macd_hist, leverage,
-              combo_key))
+              combo_key,
+              json.dumps(metadata, default=str) if metadata else '{}'))
         conn.commit()
         sid = c.lastrowid
         conn.close()

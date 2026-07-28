@@ -415,6 +415,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 MAX(created_at)   AS created_at,
                 MAX(z_score_tier) AS z_score_tier,
                 MAX(z_score)      AS z_score,
+                MAX(rsi_14)        AS rsi_14,
+                MAX(macd_hist)     AS macd_hist,
+                MAX(macd_value)   AS macd_value,
+                MAX(macd_signal)  AS macd_signal,
+                MAX(momentum_state) AS momentum_state,
                 MAX(compact_rounds) AS compact_rounds,
                 MAX(hot_cycle_count) AS hot_cycle_count,
                 MAX(signal_metadata) AS signal_metadata,
@@ -674,8 +679,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         scored = []
         for row in signals:
             token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
-            cr = row[8] or 0  # compact_rounds column (index 8)
-            combo_key = row[10] if len(row) > 10 else None  # combo_key (index 10)
+            cr = row[13] or 0  # compact_rounds column (index 13)
+            combo_key = row[16] if len(row) > 16 else None  # combo_key (index 16)
 
             # Compute age of signal in minutes
             try:
@@ -815,7 +820,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         for s in unique_top_signals:
             row = s['row']
             token, direction, stype, conf, source = row[0], row[1], row[2], row[3], row[4]
-            cr = row[8] or 0  # compact_rounds (PENDING failure count — not used for rounds)
+            cr = row[13] or 0  # compact_rounds (PENDING failure count — not used for rounds)
             combo_key = s.get('combo_key')  # from scored dict
             spd = s['speed_data']
 
@@ -873,7 +878,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'tp_bonus_mult': s.get('tp_bonus_mult', 1.0),  # 1.5 if trend_purity present
                 'entry_origin_ts': entry_origin_ts,  # carried forward if combo existed, else now
                 # JSONB catch-all: all signal indicator values at entry time (future-proof)
-                'signal_metadata': row[11] if len(row) > 11 else None,
+                'signal_metadata': row[15] if len(row) > 15 else None,
+                'rsi_14': row[8] if len(row) > 8 else None,
+                'macd_hist': row[9] if len(row) > 9 else None,
+                'momentum_state': row[12] if len(row) > 12 else None,
             })
 
         # ── Step 10: Build reason strings ───────────────────────────────────────
