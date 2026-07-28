@@ -435,7 +435,7 @@ def compute_atr_sl_tp(
         MIN_SL_PCT = ATR_SL_MIN_INIT   # 1.0% — wider for new trades (breathing room)
         MIN_TP_PCT = ATR_TP_MIN         # 1.5% — wider for new trades
     else:
-        MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.15% — tighter for established trades (phase logic bites)
+        MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.5% — established trade floor (phase scaling bites)
         MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades
 
     # ── Clamp effective percentages ─────────────────────────────────────────────

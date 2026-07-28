@@ -320,7 +320,7 @@ ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R)
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
-ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — ATR drives the SL, floor is safety net only
+ATR_SL_MIN_ACCEL   = 0.005   # 0.5% floor — prevent tiny SL from normal pullbacks (was 0.15%, too tight)
 ATR_TP_MIN_ACCEL   = 0.010   # 1.0% floor
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)

@@ -1064,7 +1064,7 @@ def reconcile_hype_to_paper(hl_pos, prices):
             lev = float(pos_data.get('leverage', 1)) or 1
 
             # Calculate SL/TP defaults — use acceleration-phase floors for tight stops
-            sl_pct = ATR_SL_MIN_ACCEL   # 0.20% floor
+            sl_pct = ATR_SL_MIN_ACCEL   # 0.50% floor
             tp_pct = ATR_TP_MIN_ACCEL   # 0.50% floor
             if direction == 'SHORT':
                 # SHORT: SL above entry (price rises = bad), TP below entry (price falls = good)
