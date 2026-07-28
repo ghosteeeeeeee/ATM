@@ -894,6 +894,23 @@ def scan_and_write(token: str, lookback_minutes: int = 240) -> list:
     return written
 
 
+# ── Signals Registry Interface ────────────────────────────────────────────────
+
+def run(prices_dict: dict) -> tuple[int, list]:
+    """Entry point for signals/__init__.py registry. Scans all tokens for patterns."""
+    added = 0
+    signaled_tokens = []
+    for token, data in prices_dict.items():
+        price = data.get('price')
+        if not price or price <= 0:
+            continue
+        written = scan_and_write(token, lookback_minutes=240)
+        if written:
+            added += len(written)
+            signaled_tokens.append(token)
+    return added, signaled_tokens
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':

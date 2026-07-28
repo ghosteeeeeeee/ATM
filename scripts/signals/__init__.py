@@ -212,6 +212,11 @@ except Exception:
     _squeeze_cross_run = None
 
 try:
+    from pattern_scanner import run as _pattern_scanner_run
+except Exception:
+    _pattern_scanner_run = None
+
+try:
     from signals.zscore_pump import scan_zscore_pump_signals as _zscore_pump_run
 except Exception:
     _zscore_pump_run = None
@@ -268,6 +273,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'counter_flip',         'enabled': COUNTER_FLIP_ENABLED,      'run': _counter_flip_run},
     {'name': 'tl_break',             'enabled': TL_BREAK_ENABLED,          'run': _tl_break_run},
     {'name': 'squeeze_cross',        'enabled': SQUEEZE_CROSS_ENABLED,     'run': _squeeze_cross_run},
+    {'name': 'pattern_scanner',     'enabled': True, 'run': _pattern_scanner_run},  # toggled internally via PATTERN_*_ENABLED
     {'name': 'zscore_pump',         'enabled': ZSCORE_PUMP_NEW_ENABLED,       'run': _zscore_pump_run},
     {'name': 'mtp_zscore',          'enabled': MTP_ZSCORE_ENABLED,             'run': _mtp_zscore_run},
 ]
