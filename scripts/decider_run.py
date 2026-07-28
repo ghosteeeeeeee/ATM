@@ -29,6 +29,8 @@ from hermes_constants import (
     TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT,
     CONFLUENCE_REQUIRED,
     MOMENTUM_EXHAUSTION_THRESHOLD,
+    SIGNAL_INVERSION_ENABLED, SIGNAL_INVERSION_MAP,
+    DEAD_HOURS_ENABLED, DEAD_HOURS_START, DEAD_HOURS_END,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -483,12 +485,29 @@ def process_delayed_entries(paper=False):
     still_pending = []
 
     for entry in pending:
-        token = entry['token'];
+        token = entry['token']
         direction  = entry['direction']
-        # ── OPTION 1: Flip delayed entries too ─────────────────────────────
-        if _FLIP_SIGNALS:
+        source = entry.get('source', '')
+        # ── Targeted Inversion for delayed entries ────────────────────────
+        if SIGNAL_INVERSION_ENABLED:
+            for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
+                if should_invert and source and source.startswith(prefix):
+                    direction = 'SHORT' if direction == 'LONG' else 'LONG'
+                    entry['direction'] = direction
+                    break
+        elif _FLIP_SIGNALS:
             direction = 'SHORT' if direction == 'LONG' else 'LONG'
-            entry['direction'] = direction  # persist flipped direction
+            entry['direction'] = direction
+
+        # ── Dead-Hours Filter for delayed entries ────────────────────────
+        if DEAD_HOURS_ENABLED:
+            import datetime as _dt
+            _utc_hour = _dt.datetime.utcnow().hour
+            if DEAD_HOURS_START <= _utc_hour < DEAD_HOURS_END:
+                log(f'⏰ DELAYED DEAD-HOURS: {token} {direction} blocked: {_utc_hour:02d}:XX UTC')
+                still_pending.append(entry)  # retry after dead hours end
+                continue
+
         sig_price = entry['signal_price']   # price when signal fired
         pullback   = entry.get('pullback_pct', 0.01)
         max_wait   = entry.get('max_wait_minutes', 30)
@@ -1866,6 +1885,20 @@ def run(dry_run=False):
             if sig_src == 'conf-1s' or sig_src.startswith('conf-1s'):
                 log(f'  ➡️  [EXEC-ALLOW] {token} {direction} single-source allowed (CONFLUENCE_REQUIRED=False): {sig_src}')
 
+        # ── Dead-Hours Entry Filter ─────────────────────────────────────
+        # Block ALL entries during 03:00-08:00 UTC (whitewater, no wave).
+        # Surfing principle: "You can't force a wave — you read it, position yourself."
+        # Data: trades during 03-08 UTC have ~15% WR vs 34% outside.
+        if DEAD_HOURS_ENABLED:
+            import datetime as _dt
+            _utc_hour = _dt.datetime.utcnow().hour
+            if DEAD_HOURS_START <= _utc_hour < DEAD_HOURS_END:
+                log(f'  🚫 [DEAD-HOURS] {token} {direction} blocked: {_utc_hour:02d}:XX UTC (dead hours {DEAD_HOURS_START:02d}-{DEAD_HOURS_END:02d})')
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                skipped += 1
+                continue
+
         # FIX (2026-04-05): speed=0% = stale token — hard ban
         sp_exec = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
         sp_exec_val = sp_exec.get('speed_percentile', 50.0) if sp_exec else 50.0
@@ -1987,12 +2020,20 @@ def run(dry_run=False):
                 continue
             log(f'  ⚠️ sig_id=None for {token} {direction} — legacy hot-set format, proceeding via token+direction fallback claim')
         
-        # ── OPTION 1: Flip signal direction before trading ────────────────
-        # See INCIDENT_WR_FAILURE.md — test if signals are direction-inverted
+        # ── Targeted Signal Inversion ─────────────────────────────────────
+        # Invert direction for specific signals that are statistically proven losers.
+        # Replaces the old _FLIP_SIGNALS global flip (tested 2026-07-28, gave 13.8% WR — worse).
         flipped_direction = None
-        if _FLIP_SIGNALS:
+        if SIGNAL_INVERSION_ENABLED:
+            for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
+                if should_invert and source and source.startswith(prefix):
+                    flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
+                    log(f'  [INVERT] {token} {source}: {direction} → {flipped_direction} (WR<35% signal)')
+                    direction = flipped_direction
+                    break
+        elif _FLIP_SIGNALS:
             flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
-            log(f'  [FLIP] {token} {direction} → {flipped_direction} (WR incident fix)')
+            log(f'  [FLIP] {token} {direction} → {flipped_direction} (legacy)')
             direction = flipped_direction
 
         # ── Trade pending checkpoint ───────────────────────────────────

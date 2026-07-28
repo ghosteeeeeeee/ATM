@@ -187,3 +187,39 @@ python3 scripts/signal_compactor.py --verbose
 ## MCP Server
 
 Coding MCP server at `/root/.hermes/mcp/hermes-coding-mcp/server.py` provides Hebbian tools (hebbian_recall, hebbian_learn, hebbian_stats). Configured in `config.yaml` under `mcp_servers`.
+
+## Surfing Principles (from brain/surfing.md)
+
+Trading is like surfing. You can't force a wave — you read it, position yourself, and let it carry you. Full philosophy in `/root/.hermes/brain/surfing.md`.
+
+### Entry Rules
+1. **No entries during dead hours**: 03:00-08:00 UTC = whitewater. Block all entries. (`DEAD_HOURS_START=3, DEAD_HOURS_END=8` in hermes_constants.py)
+2. **Wave quality minimum**: Speed percentile must be >= 30 to enter. Below 30 = no wave.
+3. **Phase alignment**: accel_300 only during building/accelerating phases. inv_accel_300 only during exhaustion/extreme. (`PHASE_ENTRY_FILTER_ENABLED` in hermes_constants.py)
+4. **Range position**: Don't LONG at range top (>80%), don't SHORT at range bottom (<20%). (price position filter in accel_300, inverse_accel_300)
+5. **Counter-trend trap**: If z-score contradicts signal direction AND speed is low → block.
+6. **Ranging market filter**: If |z-score| < 0.5 AND speed < 30th percentile → no entries.
+7. **Coin history gate**: If coin has <50% WR with >=3 trades → block further entries.
+
+### Exit Rules
+8. **Stale winner**: If pnl >= +0.5% and trade age > 30 min → tighten trailing aggressively.
+9. **Wave turning**: If z-score > +1.5 AND acceleration < 0 → close longs.
+10. **Bottom forming**: If z-score < -1.5 AND acceleration > 0 → close shorts.
+
+### Position Sizing
+11. **Fast movers, smaller size**: Speed percentile >= 80 → use 3x leverage (not 5x).
+12. **Slow movers, standard size**: Speed percentile < 50 → standard position.
+
+### The Four Quadrants (Z-Score × Speed)
+| Z-Score | Speed | Action |
+|---------|-------|--------|
+| Near 0 | Low | Sit out — whitewater, no wave |
+| Negative + HIGH + positive accel | Paddle for LONG — wave building |
+| Positive + HIGH + negative accel | Take SHORT — wave cresting |
+| Near 0 + HIGH + positive accel | Confirm with confluence before entering |
+
+### Key Lesson from NIL Case Study
+> "Before executing any signal, check is_stale. If is_stale AND z_score contradicts signal direction → counter-trend trap, block it."
+
+### Key Lesson from 0G Case Study
+> "Z-score in a ranging market is a mean-reversion signal, not a trend signal. Don't use z-score as an entry trigger in ranging conditions."

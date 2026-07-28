@@ -824,3 +824,33 @@ CONFLUENCE_REQUIRED = False
 # accel-300 is very strong. Strong accel-300 alone should sometimes fire.
 ACCEL_300_STANDALONE_BYPASS_ENABLED = False  # TEMPORARILY DISABLED — was firing too many weak pure-accel signals (40% WR)
 ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when disabled)
+
+# ── Dead-Hours Entry Filter ───────────────────────────────────────────────────
+# Block all new entries during 03:00-08:00 UTC (whitewater, no wave).
+# Surfing principle: "You can't force a wave — you read it, position yourself."
+# Data: trades during 03-08 UTC have ~15% WR vs 34% outside.
+DEAD_HOURS_ENABLED = True
+DEAD_HOURS_START = 3   # 03:00 UTC
+DEAD_HOURS_END = 8     # 08:00 UTC
+
+# ── Targeted Signal Inversion ──────────────────────────────────────────────────
+# Invert direction for specific signals that are statistically proven losers.
+# Replaces the old _FLIP_SIGNALS global flip (tested 2026-07-28, gave 13.8% WR — worse).
+#
+# Data basis: 200 closed trades analyzed 2026-07-28.
+# inv-accel-300+ LONG:  77 trades, 29% WR, -3.59% total → flip LONG→SHORT
+# accel-300+ LONG:       9 trades, 22% WR, -1.53% total → flip LONG→SHORT
+#
+# WHY NOT INVERT inv-accel-300- SHORT (23% WR, -6.17%)?
+# Inverting SHORT→LONG means catching a falling knife (price below EMA300 and falling).
+# Only invert after monitoring confirms the inverted direction works.
+SIGNAL_INVERSION_ENABLED = True
+SIGNAL_INVERSION_MAP = {
+    'inv-accel-300+': True,    # 77 trades, 29% WR → flip LONG→SHORT
+    'accel-300+':     True,    # 9 trades, 22% WR → flip LONG→SHORT
+    # KEEP these (do NOT invert):
+    # 'accel-300-':  — 16 trades, 62% WR — best signal
+    # 'sqx+'        — already disabled via SQUEEZE_CROSS_ENABLED=False
+    # 'sqx-'        — 10 trades, 40% WR — borderline, don't invert yet
+    # 'inv-accel-300-' — 66 trades, 23% WR — worst signal, but invert→LONG is catching falling knife
+}
