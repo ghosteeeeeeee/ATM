@@ -310,26 +310,27 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Used by position_manager.py and self_close_watcher.py for ATR-based SL/TP
 #
 # Trailing SL / TP — _collect_atr_updates / tpsl_utils.compute_atr_sl_tp
-# TUNED 2026-07-28: wider SL (survive mean-reversion noise), faster TP (book profits)
-# Analysis: 9/17 losses had MFE>0.3% — SL was too tight, price eventually moved in our favor
-ATR_SL_MIN             = 0.012   # 1.2% floor — survive mean-reversion noise
+# TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
+# Analysis: SL width barely matters when trailing+breakeven is active.
+# Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
+ATR_SL_MIN             = 0.008   # 0.8% floor — trailing handles protection
 ATR_SL_MAX             = 0.020   # 2.0% cap — survive P90 MAE
-ATR_TP_MIN             = 0.005   # 0.5% floor — capture quick wins (72% of trades reach +0.15%)
+ATR_TP_MIN             = 0.012   # 1.2% floor — good R:R
 ATR_TP_MAX             = 0.015   # 1.5% cap — realistic targets
-ATR_TP_K_MULT          = 0.5    # TP = 0.5x SL (favor quick exits over symmetric R:R)
+ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
-ATR_SL_MIN_ACCEL   = 0.007   # 0.7% floor — survive normal pullbacks (was 0.5%, too tight)
-ATR_TP_MIN_ACCEL   = 0.0035  # 0.35% floor — book profits faster (was 1.0%)
+ATR_SL_MIN_ACCEL   = 0.005   # 0.5% floor — survive normal pullbacks
+ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.012  # 1.2% — wider for new trades (was 0.8%, too tight for noise)
-ATR_SL_MAX_INIT    = 0.015  # 1.5% — new trade SL cap (was 1.2%)
-SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (was 0.8%)
-TP_PCT_FALLBACK    = 0.005  # 0.5% fallback target (was 1.5%)
-STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (was 0.8%)
+ATR_SL_MIN_INIT    = 0.008  # 0.8% — matching ATR_SL_MIN
+ATR_SL_MAX_INIT    = 0.012  # 1.2% — new trade SL cap
+SL_PCT_FALLBACK    = 0.008  # 0.8% if ATR unavailable
+TP_PCT_FALLBACK    = 0.015  # 1.5% fallback target
+STOP_LOSS_DEFAULT  = 0.008  # 0.8% hard fallback
 SL_PCT_MIN        = 0.005  # 0.5% minimum SL for any trade (hard floor)
 
 # ── Trailing Activation — brain.py / decider_run.py

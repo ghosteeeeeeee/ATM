@@ -160,6 +160,8 @@ def _live_trailing_sl(trade_id, direction, entry_price, current_price, trail_act
     """
     Compute the live trailing SL for an open position using trailing_stops.json.
     Returns None if not yet activated.
+    FIX 2026-07-28: Use PEAK PnL (not current) for activation check.
+    Once peak reaches activation threshold, trailing stays active even if price pulls back.
     """
     import json
     try:
@@ -177,27 +179,34 @@ def _live_trailing_sl(trade_id, direction, entry_price, current_price, trail_act
     if entry <= 0 or current <= 0:
         return None
 
-    if direction == 'LONG':
-        pnl_pct = (current - entry) / entry * 100
-    elif direction == 'SHORT':
-        pnl_pct = (entry - current) / entry * 100
-    else:
-        return None
-
-    if pnl_pct < trail_act_pct:
-        return None  # trailing not yet active
-
-    # Get best_price from trailing_stops.json
+    # Get best_price from trailing_stops.json (peak price since entry)
     ts = data.get(str(trade_id), {})
     if not ts.get('active'):
         return None
 
     best_price = float(ts.get('best_price', current))
 
+    # Use PEAK PnL for activation (not current) — once activated, stays active
     if direction == 'LONG':
-        return round(best_price * (1 - trail_dist_pct), 8)
+        peak_pnl_pct = (best_price - entry) / entry * 100
+    elif direction == 'SHORT':
+        peak_pnl_pct = (entry - best_price) / entry * 100
     else:
-        return round(best_price * (1 + trail_dist_pct), 8)
+        return None
+
+    if peak_pnl_pct < trail_act_pct:
+        return None  # trailing not yet activated (peak hasn't reached threshold)
+
+    # Trailing SL: from best_price (peak), offset by trail_dist
+    # With breakeven floor: SL never goes below entry for LONG (above for SHORT)
+    if direction == 'LONG':
+        trail_sl = best_price * (1 - trail_dist_pct)
+        trail_sl = max(trail_sl, entry)  # breakeven floor
+        return round(trail_sl, 8)
+    else:
+        trail_sl = best_price * (1 + trail_dist_pct)
+        trail_sl = min(trail_sl, entry)  # breakeven floor
+        return round(trail_sl, 8)
 
 
 def get_trades(status='open', limit=20, offset=0):
