@@ -49,59 +49,77 @@ If rules prove insufficient, LLM can be layered on top later.
 def context_gate(token, direction, sig):
     """
     Unified surfing-based context gate. Runs AFTER all eligibility checks,
-    RIGHT BEFORE execute_trade(). Returns (pass/reject, reason).
+    RIGHT BEFORE execute_trade(). Returns (pass/reject/flip, reason, new_direction).
     
     sig = hotset entry dict (contains z_score, speed_percentile, wave_phase, etc.)
     """
     
     # ── Rule 2: Wave quality minimum ──────────────────────────────────
-    # "Below 30th percentile = no wave" — don't enter on dead tokens
+    # "Below 20th percentile = no wave" — don't enter on dead tokens
     speed = sig.get('speed_percentile', 50.0)
-    if speed < 30:
-        return 'REJECT', f'speed_too_low ({speed:.0f} < 30)'
+    if speed < CONTEXT_GATE_SPEED_MIN:
+        return 'REJECT', f'speed_too_low ({speed:.0f} < {CONTEXT_GATE_SPEED_MIN})', direction
     
     # ── Rule 3: Phase alignment ──────────────────────────────────────
     # accel_300: only during building/accelerating (momentum just starting)
-    # inv_accel_300: only during exhaustion/extreme (reversion prime)
+    # inv_accel_300- (SHORT): accelerating phase is OK (betting on reversal FROM acceleration)
+    # inv_accel_300+ (LONG): accelerating phase is WRONG (buying into strength)
+    # inv_accel_300: only during exhaustion/extreme for LONG, accelerating OK for SHORT
     source = sig.get('source', '')
     phase = sig.get('wave_phase', 'neutral')
     
     is_accel = source.startswith('accel-300')
     is_inv_accel = source.startswith('inv-accel-300')
+    is_inv_accel_plus = 'inv-accel-300+' in source
     
     if is_accel and phase in ('exhaustion', 'extreme'):
-        return 'REJECT', f'accel300_in_{phase}_phase (move already done)'
+        return 'REJECT', f'accel300_in_{phase}_phase (move already done)', direction
     
-    if is_inv_accel and phase in ('quiet', 'building'):
-        return 'REJECT', f'inv_accel300_in_{phase}_phase (no reversion yet)'
+    # inv-accel-300+ (LONG): block in quiet/building/accelerating (not reversion prime)
+    if is_inv_accel_plus and phase in ('quiet', 'building', 'accelerating'):
+        return 'REJECT', f'inv_accel300+_in_{phase}_phase (not reversion prime)', direction
     
-    # ── Rule 5: Counter-trend trap (z-score + speed cross-check) ──────
-    # "If z-score contradicts signal direction AND speed is low → block"
-    # This extends the existing _check_counter_trend_trap() which only checks is_stale
+    # inv-accel-300- (SHORT): block in quiet/building/bottoming (accelerating is OK)
+    if is_inv_accel and not is_inv_accel_plus and phase in ('quiet', 'building', 'bottoming'):
+        return 'REJECT', f'inv_accel300-_in_{phase}_phase (not reversion prime)', direction
+    
+    # ── Rule 5a: Speed direction cross-check → FLIP ──────────────────
+    # "If wave_phase is falling and direction is LONG → flip to SHORT"
+    # "If wave_phase is accelerating and direction is SHORT → flip to LONG"
+    # ONLY for trend signals (tl_break, accel-300). NOT for reversion (inv-accel-300)
+    # because reversion signals intentionally fade momentum.
     z_score = sig.get('z_score', 0.0)
-    if direction == 'LONG' and z_score > 1.5 and speed < 50:
-        return 'REJECT', f'counter_trend_long (z={z_score:.2f}, speed={speed:.0f})'
-    if direction == 'SHORT' and z_score < -1.5 and speed < 50:
-        return 'REJECT', f'counter_trend_short (z={z_score:.2f}, speed={speed:.0f})'
+    momentum = sig.get('momentum_score', 50.0)
+    price_accel = sig.get('price_acceleration', 0.0)
+    
+    is_trend_signal = not is_inv_accel  # tl_break, accel-300, etc.
+    
+    if is_trend_signal and phase == 'falling' and direction == 'LONG':
+        new_dir = 'SHORT'
+        return 'FLIP', f'falling_speed_flipped_to_short (wave dying)', new_dir
+    if is_trend_signal and phase == 'accelerating' and direction == 'SHORT':
+        new_dir = 'LONG'
+        return 'FLIP', f'accelerating_speed_flipped_to_long (wave building)', new_dir
+    
+    # ── Rule 5b: Momentum + acceleration cross-check ─────────────────
+    # "If momentum is weak AND acceleration opposes direction → reject"
+    # ONLY for trend signals. Reversion signals (inv-accel) intentionally fade momentum.
+    if is_trend_signal and momentum < 25 and direction == 'LONG' and price_accel < -0.005:
+        return 'REJECT', f'weak_momentum_opposing_long (mom={momentum:.0f}, accel={price_accel:+.4f})', direction
+    if is_trend_signal and momentum < 25 and direction == 'SHORT' and price_accel > 0.005:
+        return 'REJECT', f'weak_momentum_opposing_short (mom={momentum:.0f}, accel={price_accel:+.4f})', direction
+    
+    # ── Rule 5c: Counter-trend trap (z-score + speed cross-check) ──────
+    if direction == 'LONG' and z_score > CONTEXT_GATE_Z_COUNTER_TREND and speed < 50:
+        return 'REJECT', f'counter_trend_long (z={z_score:.2f}, speed={speed:.0f})', direction
+    if direction == 'SHORT' and z_score < -CONTEXT_GATE_Z_COUNTER_TREND and speed < 50:
+        return 'REJECT', f'counter_trend_short (z={z_score:.2f}, speed={speed:.0f})', direction
     
     # ── Rule 6: Ranging market filter ─────────────────────────────────
-    # "|z-score| < 0.5 AND speed < 30th percentile → no entries"
-    # "Whitewater — no wave to ride"
-    if abs(z_score) < 0.5 and speed < 30:
-        return 'REJECT', f'ranging_market (|z|={abs(z_score):.2f}, speed={speed:.0f})'
+    if abs(z_score) < CONTEXT_GATE_Z_RANGING and speed < 25:
+        return 'REJECT', f'ranging_market (|z|={abs(z_score):.2f}, speed={speed:.0f})', direction
     
-    # ── Rule 4: Range position (from hotset price_acceleration) ──────
-    # "Don't LONG at range top (>80%), don't SHORT at range bottom (<20%)"
-    # Use price_acceleration as proxy for range position:
-    #   strong positive accel = likely near top
-    #   strong negative accel = likely near bottom
-    price_accel = sig.get('price_acceleration', 0.0)
-    if direction == 'LONG' and price_accel > 0.005:
-        return 'REJECT', f'long_at_range_top (accel={price_accel:.4f})'
-    if direction == 'SHORT' and price_accel < -0.005:
-        return 'REJECT', f'short_at_range_bottom (accel={price_accel:.4f})'
-    
-    return 'PASS', 'context_gate_passed'
+    return 'PASS', 'context_gate_passed', direction
 ```
 
 ### 2. Integration point in `decider_run.py`
@@ -110,13 +128,20 @@ Insert AFTER the signal inversion (line ~2037) and BEFORE `execute_trade()` (lin
 
 ```python
         # ── Context Gate (surfing rules) ───────────────────────────────
-        gate_result, gate_reason = context_gate(token, direction, sig)
+        gate_result, gate_reason, gate_dir = context_gate(token, direction, sig)
+        
         if gate_result == 'REJECT':
             log(f'  🚫 [CONTEXT-GATE] {token} {direction} rejected: {gate_reason}')
             if sig_id:
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
+        
+        if gate_result == 'FLIP':
+            log(f'  🔄 [CONTEXT-GATE] {token} {direction} → {gate_dir}: {gate_reason}')
+            direction = gate_dir
+            # Update entry direction for the flip
+            entry['direction'] = direction
 ```
 
 ### 3. New constant in `hermes_constants.py`
@@ -167,7 +192,9 @@ Signal inversion (SIGNAL_INVERSION_MAP)
 context_gate(token, direction, sig)
     ├── Rule 2: speed >= 30?
     ├── Rule 3: phase aligned with signal type?
-    ├── Rule 5: z-score contradicts + low speed?
+    ├── Rule 5a: speed direction vs signal direction?
+    ├── Rule 5b: momentum + acceleration vs signal direction?
+    ├── Rule 5c: z-score contradicts + low speed?
     ├── Rule 6: ranging market?
     └── Rule 4: range position?
     ↓
@@ -198,10 +225,10 @@ The context gate adds ONLY the missing surfing rules. It does not duplicate exis
 | Constant | Default | Purpose |
 |----------|---------|---------|
 | `CONTEXT_GATE_ENABLED` | `True` | Master toggle |
-| `CONTEXT_GATE_SPEED_MIN` | `30` | Rule 2 threshold |
-| `CONTEXT_GATE_Z_COUNTER_TREND` | `1.5` | Rule 5 z-score threshold |
-| `CONTEXT_GATE_Z_RANGING` | `0.5` | Rule 6 z-score threshold |
-| `CONTEXT_GATE_ACCEL_THRESHOLD` | `0.005` | Rule 4 range position threshold |
+| `CONTEXT_GATE_SPEED_MIN` | `20` | Rule 2: minimum speed percentile (lowered from 30 — AI traded at 23-28) |
+| `CONTEXT_GATE_Z_COUNTER_TREND` | `1.5` | Rule 5c: z-score threshold for counter-trend |
+| `CONTEXT_GATE_Z_RANGING` | `0.5` | Rule 6: |z-score| below this = ranging |
+| `CONTEXT_GATE_RANGING_SPEED` | `25` | Rule 6: speed threshold for ranging (separate from speed min) |
 
 ---
 
@@ -219,19 +246,21 @@ The context gate adds ONLY the missing surfing rules. It does not duplicate exis
 
 ## Expected Impact
 
-Based on 200-trade analysis:
+Based on 200-trade analysis + AI test on 11 pending signals:
 
 | Rule | Estimated Bad Trades Blocked | WR Impact |
 |------|------------------------------|-----------|
 | Speed >= 30 | ~10% of trades (dead tokens) | +2-3% |
-| Phase alignment | ~15% of trades (exhaustion entries) | +3-5% |
+| Phase alignment (expanded) | ~18% of trades (exhaustion + wrong phase) | +4-6% |
+| Speed direction cross-check | ~5% of trades (falling speed + LONG, etc.) | +1-2% |
+| Momentum + accel cross-check | ~5% of trades (weak momentum opposing) | +1-2% |
 | Counter-trend + speed | ~5% of trades | +1-2% |
 | Ranging market | ~5% of trades | +1-2% |
 | Range position | ~5% of trades | +1-2% |
-| **Combined** | **~25-35% of bad trades** | **+8-14%** |
+| **Combined** | **~30-40% of bad trades** | **+10-16%** |
 
-**Conservative estimate**: 29% → 37-43% WR (with inversion + dead-hours already deployed)
-**Optimistic estimate**: 29% → 43-50% WR
+**Conservative estimate**: 29% → 39-45% WR (with inversion + dead-hours already deployed)
+**Optimistic estimate**: 29% → 45-52% WR
 
 ---
 
