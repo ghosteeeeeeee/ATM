@@ -699,13 +699,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             speed_data = speed_cache.get(token.upper(), {})
             source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
             # ── rs required (replaces accel-300, 2026-05-15) ──────────────────────────
-            # Accel-300 and inverse-accel-300 standalone bypass: skip RS gate
-            is_accel300_standalone = source.startswith('accel-300') or source.startswith('inv-accel-300')
-            has_rs = any(p.startswith('rs') for p in source_parts)
-            if not has_rs and not is_accel300_standalone:
-                if verbose:
-                    log(f"  SKIP {token} {direction}: no rs signal")
-                continue
+            # When CONFLUENCE_REQUIRED=False: skip RS requirement entirely
+            if CONFLUENCE_REQUIRED:
+                # Accel-300 and inverse-accel-300 standalone bypass: skip RS gate
+                is_accel300_standalone = source.startswith('accel-300') or source.startswith('inv-accel-300')
+                has_rs = any(p.startswith('rs') for p in source_parts)
+                if not has_rs and not is_accel300_standalone:
+                    if verbose:
+                        log(f"  SKIP {token} {direction}: no rs signal")
+                    continue
             # ── Trend purity bonus: major confidence boost when present ──────────
             has_trend_purity = ('trend_purity+' in source_parts or 'trend_purity-' in source_parts)
             tp_bonus_mult = 1.50 if has_trend_purity else 1.0
@@ -1586,11 +1588,12 @@ def _filter_safe_prev_hotset(prev_hotset):
             continue
         sp = [p.strip() for p in src_str.split(',') if p.strip()]
         # ── rs required for all entries (2026-05-15) ──────────────────────────────
-        # Every hotset entry (LONG or SHORT) must have at least one rs signal.
-        has_rs = any(p.startswith('rs') for p in sp)
-        if not has_rs:
-            log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — no rs signal (src='{src}')")
-            continue
+        # When CONFLUENCE_REQUIRED=False: skip RS requirement entirely
+        if CONFLUENCE_REQUIRED:
+            has_rs = any(p.startswith('rs') for p in sp)
+            if not has_rs:
+                log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — no rs signal (src='{src}')")
+                continue
         # ── Trend purity: bonus multiplier (not hard requirement) ─────────────
         # Signals with trend_purity get +50% final score.
         has_trend_purity = ('trend_purity+' in sp or 'trend_purity-' in sp)
