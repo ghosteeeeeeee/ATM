@@ -617,17 +617,30 @@ def process_delayed_entries(paper=False):
 # Two-layer gate: rule-based (free, instant) → LLM (quota, 5-10 calls/hr).
 # Only fires after ALL other filters pass — last gate before execute_trade.
 
-_ctx_gate_cache = {}  # key: f"{token}:{source}" → {'verdict': str, 'ts': float}
+_CTX_CACHE_FILE = '/dev/shm/hermes-ctx-gate-cache.json'
+
+def _ctx_load_cache():
+    """Load persistent LLM cache from tmpfs (shared across pipeline runs)."""
+    try:
+        with open(_CTX_CACHE_FILE, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def _ctx_save_cache(cache):
+    """Save persistent LLM cache to tmpfs."""
+    try:
+        with open(_CTX_CACHE_FILE, 'w') as f:
+            json.dump(cache, f)
+    except Exception:
+        pass
 
 def _get_recent_prices(token, n=20):
-    """Get last N close prices from price_history. Returns list of floats or empty."""
+    """Get last N close prices from get_price_history. Returns list of floats or empty."""
     try:
-        with sqlite3.connect(PRICE_DB) as conn:
-            rows = conn.execute(
-                'SELECT close FROM price_history WHERE token = ? ORDER BY ts DESC LIMIT ?',
-                (token, n)
-            ).fetchall()
-            return [r[0] for r in reversed(rows)] if rows else []
+        from signal_schema import get_price_history
+        rows = get_price_history(token, lookback_minutes=n)
+        return [r[1] for r in rows[-n:]] if rows else []
     except Exception:
         return []
 
@@ -644,21 +657,17 @@ def _ctx_gate_get_speed(token):
         return None
 
 def _ctx_gate_get_zscore(token):
-    """Get z_score from latest signal_outcome or token_speeds. Returns float or None."""
+    """Compute z-score from price_history. Returns float or None."""
     try:
-        with sqlite3.connect(RUNTIME_DB) as conn:
-            row = conn.execute(
-                'SELECT z_score FROM signal_outcomes WHERE token = ? ORDER BY created_at DESC LIMIT 1',
-                (token,)
-            ).fetchone()
-            if row and row[0] is not None:
-                return float(row[0])
-            # fallback: compute from price_history
-            from zscore import compute_z_score
-            prices = _get_recent_prices(token, 20)
-            if prices and len(prices) >= 10:
-                return compute_z_score(prices)
+        prices = _get_recent_prices(token, 20)
+        if not prices or len(prices) < 10:
             return None
+        mean = sum(prices) / len(prices)
+        variance = sum((p - mean) ** 2 for p in prices) / len(prices)
+        std = variance ** 0.5
+        if std == 0:
+            return None
+        return (prices[-1] - mean) / std
     except Exception:
         return None
 
@@ -672,7 +681,7 @@ def _ctx_gate_get_phase(token):
 
 def rule_based_context_gate(token, direction, source, sig):
     """
-    Free, instant gate. Returns ('GO', None) or ('SKIP', reason).
+    Free, instant gate. Returns ('GO', None), ('SKIP', reason), or ('AMBIGUOUS', ctx_dict).
     Handles ~80% of cases. Only clear GO or clear NO-GO.
     """
     if not CONTEXT_GATE_ENABLED:
@@ -726,12 +735,13 @@ def llm_context_gate(token, direction, source, sig, rule_result):
     if not CONTEXT_GATE_LLM_ENABLED:
         return ('GO', None)  # LLM disabled → allow
 
-    cache_key = f"{token}:{source}"
+    cache_key = f"{token}:{source}:{direction}"
     now = time.time()
 
-    # Check cache
-    if cache_key in _ctx_gate_cache:
-        cached = _ctx_gate_cache[cache_key]
+    # Check persistent cache (shared across pipeline runs)
+    cache = _ctx_load_cache()
+    if cache_key in cache:
+        cached = cache[cache_key]
         if now - cached['ts'] < CONTEXT_GATE_CACHE_TTL:
             return (cached['verdict'], None)
 
@@ -764,8 +774,9 @@ Reply only GO or SKIP:"""
         response = (result.stdout or '').strip().upper()
         verdict = 'GO' if 'GO' in response and 'SKIP' not in response else 'SKIP'
 
-        # Cache it
-        _ctx_gate_cache[cache_key] = {'verdict': verdict, 'ts': now}
+        # Cache it (persistent across pipeline runs)
+        cache[cache_key] = {'verdict': verdict, 'ts': now}
+        _ctx_save_cache(cache)
         return (verdict, None)
 
     except Exception as e:
