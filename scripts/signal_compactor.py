@@ -251,9 +251,10 @@ SIGNAL_SOURCE_WEIGHTS = {
     # ma_cross_5m: per-token tuned EMA(10)×EMA(200) crossover on 5m
     ('ma_cross_5m_long',  'ma-cross-5m+'):  1.0,
     ('ma_cross_5m_short', 'ma-cross-5m-'):  1.0,
-    # tl_break: diagonal trendline breakout on 5m — standalone directional signal
-    ('tl_break_long',  'tl_break_long'):   1.25,  # diagonal downtrend + upside break
-    ('tl_break_short', 'tl_break_short'):  1.25,  # diagonal uptrend + downside break
+    # tl_break: diagonal trendline breakout on 5m — standalone has low WR but good R:R
+    # TUNED 2026-07-28: suppress standalone (25% WR) but keep combo with inv-accel-300
+    ('tl_break_long',  'tl_break_long'):   0.3,   # standalone: suppressed (25% WR, +0.54% total)
+    ('tl_break_short', 'tl_break_short'):  0.3,   # standalone: suppressed (21% WR, -0.28% total)
     # accel_300: accel-300 overall 35.9% WR, -0.340% avg PnL (2026-07-21 2-4h analysis)
     ('accel_300_long',  'accel-300+'):  0.3,   # LONG: 24.4% WR — heavy suppression
     ('accel_300_short', 'accel-300-'):  1.0,   # SHORT: 57.1% WR — no suppression
