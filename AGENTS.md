@@ -209,6 +209,27 @@ python3 scripts/signal_compactor.py --verbose
 
 **Breakeven Guard:** For established trades, SL never drops below entry price. Ensures profit is locked once price moves favorably.
 
+## Context Gate (AI Decision Making)
+
+Two-layer gate before trade execution — last gate after all other filters (dead-hours, phase, position). Only fires when signal is about to execute.
+
+**Flow:** Signal → Dead-hours → Phase → Position → Other filters → **Rule-based gate** → **LLM gate** → Execute
+
+**Rule-based gate (free, instant):**
+- Speed < 20% → SKIP (no wave)
+- |z| > 1.5 + speed < 50 + counter-trend → SKIP (counter-trend trap)
+- |z| < 0.5 + speed < 25% → SKIP (ranging market)
+- Speed > 70% + z confirms direction → GO (no LLM needed)
+- Wrong phase for signal type → SKIP
+
+**LLM gate (5-10 calls/hr):**
+- Only called for ambiguous cases (rule-based can't decide)
+- Uses `opencode run` with MiniMax-M2.7 model
+- 300s cache per token+signal to avoid duplicate calls
+- Fail-open: if LLM fails, allows trade (don't block good setups)
+
+**Constants:** `CONTEXT_GATE_ENABLED`, `CONTEXT_GATE_LLM_ENABLED`, `CONTEXT_GATE_SPEED_MIN=20`, `CONTEXT_GATE_Z_COUNTER_TREND=1.5`, `CONTEXT_GATE_Z_RANGING=0.5`, `CONTEXT_GATE_RANGING_SPEED=25`, `CONTEXT_GATE_SPEED_CONFIRM=70`, `CONTEXT_GATE_CACHE_TTL=300`, `CONTEXT_GATE_LLM_TIMEOUT=8`, `CONTEXT_GATE_FAIL_OPEN=True`
+
 ## MCP Server
 
 Coding MCP server at `/root/.hermes/mcp/hermes-coding-mcp/server.py` provides Hebbian tools (hebbian_recall, hebbian_learn, hebbian_stats). Configured in `config.yaml` under `mcp_servers`.
@@ -261,8 +282,8 @@ Current: 29% WR (200 trades), 1.68x R:R, profit factor 0.58
 | Targeted signal inversion | ✅ DONE | inv-accel-300+ and accel-300+ LONG→SHORT |
 | Dead hours filter | ✅ DONE | Blocks 03:00-08:00 UTC (16% WR vs 35% active) |
 | Price position filter | ✅ DONE | Blocks LONG at range top, SHORT at range bottom |
-| Context gate | ⚠️ SPEC DONE | 7 rules, AI-tested, ready to implement |
-| Phase-aware entry | ⚠️ SPEC DONE | Uses DB wave_phase labels, not implemented |
+| Context gate | ✅ DONE | Rule-based + LLM fallback, 5-10 calls/hr |
+| Phase-aware entry | ✅ DONE | Uses DB wave_phase labels, blocks wrong phases |
 
 **Key findings from data:**
 - Dead hours (03-08 UTC): 16.2% WR across 68 trades — **single biggest filter**

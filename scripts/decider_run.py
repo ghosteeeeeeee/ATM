@@ -32,6 +32,11 @@ from hermes_constants import (
     SIGNAL_INVERSION_ENABLED, SIGNAL_INVERSION_MAP,
     DEAD_HOURS_ENABLED, DEAD_HOURS_START, DEAD_HOURS_END,
     DEAD_HOURS_SIGNALS, DEAD_HOURS_DEFAULT,
+    CONTEXT_GATE_ENABLED, CONTEXT_GATE_LLM_ENABLED,
+    CONTEXT_GATE_SPEED_MIN, CONTEXT_GATE_Z_COUNTER_TREND,
+    CONTEXT_GATE_Z_RANGING, CONTEXT_GATE_RANGING_SPEED,
+    CONTEXT_GATE_SPEED_CONFIRM, CONTEXT_GATE_CACHE_TTL,
+    CONTEXT_GATE_LLM_TIMEOUT, CONTEXT_GATE_FAIL_OPEN,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -606,6 +611,186 @@ def process_delayed_entries(paper=False):
     if expired > 0 or executed > 0:
         log(f'  Delayed entries: {executed} executed | {expired} expired | {len(still_pending)} still waiting')
     return executed, expired
+
+
+# ─── Context Gate (Rule-Based + LLM) ─────────────────────────────
+# Two-layer gate: rule-based (free, instant) → LLM (quota, 5-10 calls/hr).
+# Only fires after ALL other filters pass — last gate before execute_trade.
+
+_ctx_gate_cache = {}  # key: f"{token}:{source}" → {'verdict': str, 'ts': float}
+
+def _get_recent_prices(token, n=20):
+    """Get last N close prices from price_history. Returns list of floats or empty."""
+    try:
+        with sqlite3.connect(PRICE_DB) as conn:
+            rows = conn.execute(
+                'SELECT close FROM price_history WHERE token = ? ORDER BY ts DESC LIMIT ?',
+                (token, n)
+            ).fetchall()
+            return [r[0] for r in reversed(rows)] if rows else []
+    except Exception:
+        return []
+
+def _ctx_gate_get_speed(token):
+    """Get speed percentile from token_speeds DB. Returns 0-100 or None."""
+    try:
+        with sqlite3.connect(RUNTIME_DB) as conn:
+            row = conn.execute(
+                'SELECT speed_percentile FROM token_speeds WHERE token = ?',
+                (token,)
+            ).fetchone()
+            return row[0] if row else None
+    except Exception:
+        return None
+
+def _ctx_gate_get_zscore(token):
+    """Get z_score from latest signal_outcome or token_speeds. Returns float or None."""
+    try:
+        with sqlite3.connect(RUNTIME_DB) as conn:
+            row = conn.execute(
+                'SELECT z_score FROM signal_outcomes WHERE token = ? ORDER BY created_at DESC LIMIT 1',
+                (token,)
+            ).fetchone()
+            if row and row[0] is not None:
+                return float(row[0])
+            # fallback: compute from price_history
+            from zscore import compute_z_score
+            prices = _get_recent_prices(token, 20)
+            if prices and len(prices) >= 10:
+                return compute_z_score(prices)
+            return None
+    except Exception:
+        return None
+
+def _ctx_gate_get_phase(token):
+    """Get current market phase from token_speeds. Returns phase string or None."""
+    try:
+        from tpsl_utils import _get_current_phase
+        return _get_current_phase(token)
+    except Exception:
+        return None
+
+def rule_based_context_gate(token, direction, source, sig):
+    """
+    Free, instant gate. Returns ('GO', None) or ('SKIP', reason).
+    Handles ~80% of cases. Only clear GO or clear NO-GO.
+    """
+    if not CONTEXT_GATE_ENABLED:
+        return ('GO', None)
+
+    speed = _ctx_gate_get_speed(token)
+    z_score = _ctx_gate_get_zscore(token)
+    phase = _ctx_gate_get_phase(token)
+
+    # 1. Speed too low = no wave (surfing: whitewater)
+    if speed is not None and speed < CONTEXT_GATE_SPEED_MIN:
+        return ('SKIP', f'speed {speed:.0f}% < {CONTEXT_GATE_SPEED_MIN}% (no wave)')
+
+    # 2. Clear setup: z + speed both strong → GO (no LLM needed)
+    if speed is not None and speed >= CONTEXT_GATE_SPEED_CONFIRM:
+        if z_score is not None:
+            # Strong momentum in right direction
+            if (direction == 'LONG' and z_score > 1.0) or \
+               (direction == 'SHORT' and z_score < -1.0):
+                return ('GO', None)
+
+    # 3. Counter-trend trap: z contradicts direction + low speed
+    if z_score is not None and speed is not None:
+        if abs(z_score) > CONTEXT_GATE_Z_COUNTER_TREND and speed < 50:
+            if (direction == 'LONG' and z_score < -CONTEXT_GATE_Z_COUNTER_TREND) or \
+               (direction == 'SHORT' and z_score > CONTEXT_GATE_Z_COUNTER_TREND):
+                return ('SKIP', f'counter-trend trap: z={z_score:.2f}, speed={speed:.0f}%')
+
+    # 4. Ranging market + low speed = no clear wave
+    if z_score is not None and speed is not None:
+        if abs(z_score) < CONTEXT_GATE_Z_RANGING and speed < CONTEXT_GATE_RANGING_SPEED:
+            return ('SKIP', f'ranging market: |z|={abs(z_score):.2f} < {CONTEXT_GATE_Z_RANGING}, speed={speed:.0f}%')
+
+    # 5. Wrong phase for signal type
+    if phase and source:
+        if 'accel-300' in source and 'inverse' not in source:
+            if phase in ('exhaustion', 'extreme'):
+                return ('SKIP', f'wrong phase: {phase} for accel-300 (wave cresting)')
+        if 'inverse' in source or 'inv-accel' in source:
+            if phase in ('quiet', 'building'):
+                return ('SKIP', f'wrong phase: {phase} for inv-accel (no reversal)')
+
+    # Ambiguous — needs LLM
+    return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase})
+
+def llm_context_gate(token, direction, source, sig, rule_result):
+    """
+    LLM fallback for ambiguous cases. Returns ('GO', None) or ('SKIP', reason).
+    Caches results for CONTEXT_GATE_CACHE_TTL seconds.
+    """
+    if not CONTEXT_GATE_LLM_ENABLED:
+        return ('GO', None)  # LLM disabled → allow
+
+    cache_key = f"{token}:{source}"
+    now = time.time()
+
+    # Check cache
+    if cache_key in _ctx_gate_cache:
+        cached = _ctx_gate_cache[cache_key]
+        if now - cached['ts'] < CONTEXT_GATE_CACHE_TTL:
+            return (cached['verdict'], None)
+
+    # Build minimal prompt (keep tokens low)
+    ctx = rule_result if isinstance(rule_result, dict) else {}
+    prompt = f"""You are a crypto trading gate. Evaluate this signal and reply GO or SKIP (one word).
+
+Token: {token}
+Direction: {direction}
+Signal: {source}
+Speed: {ctx.get('speed', 'N/A')}%
+Z-Score: {ctx.get('z_score', 'N/A')}
+Phase: {ctx.get('phase', 'N/A')}
+
+Rules:
+- GO if: strong momentum (speed>60, z confirms direction), or clear reversal setup (inv-accel at extreme phase)
+- SKIP if: counter-trend with low speed, ranging market, wrong phase for signal type
+- SKIP if: dead hours (03:00-08:00 UTC)
+- Default: GO (don't block good setups)
+
+Reply only GO or SKIP:"""
+
+    try:
+        # Call MiniMax via opencode run (always uses expanded price data)
+        import subprocess as _sp
+        result = _sp.run(
+            ['opencode', 'run', '-p', prompt, '-m', 'minimax/MiniMax-M2.7', '--no-stream'],
+            capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
+        )
+        response = (result.stdout or '').strip().upper()
+        verdict = 'GO' if 'GO' in response and 'SKIP' not in response else 'SKIP'
+
+        # Cache it
+        _ctx_gate_cache[cache_key] = {'verdict': verdict, 'ts': now}
+        return (verdict, None)
+
+    except Exception as e:
+        log(f'  ⚠️ [CTX-GATE] LLM failed for {token}: {e}')
+        if CONTEXT_GATE_FAIL_OPEN:
+            return ('GO', None)  # fail-open: don't block good setups
+        return ('SKIP', 'LLM failed, fail-closed')
+
+def context_gate(token, direction, source, sig):
+    """
+    Main entry point. Runs rule-based first, LLM only if ambiguous.
+    Returns ('GO', None) or ('SKIP', reason).
+    """
+    if not CONTEXT_GATE_ENABLED:
+        return ('GO', None)
+
+    verdict, ctx = rule_based_context_gate(token, direction, source, sig)
+
+    if verdict == 'GO':
+        return ('GO', None)
+    elif verdict == 'SKIP':
+        return ('SKIP', ctx)
+
+    # AMBIGUOUS → call LLM
+    return llm_context_gate(token, direction, source, sig, ctx)
 
 
 # ─── Trade Execution ──────────────────────────────────────────────
@@ -1998,6 +2183,17 @@ def run(dry_run=False):
             f'SL=${sl:.4f} TP=${tp:.4f} [{source}] '
             f'[SL={sl_pct:.1f}% trail={trailing_activation*100:.1f}%/{trailing_distance*100:.1f}%]'
             f'[spd={sp_now:.0f}%]')
+
+        # ── Context Gate (last gate before execution) ────────────
+        # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).
+        ctx_verdict, ctx_reason = context_gate(token, direction, source, sig)
+        if ctx_verdict == 'SKIP':
+            log(f'  🚫 [CTX-GATE] {token} {direction} blocked: {ctx_reason}')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
+        log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')

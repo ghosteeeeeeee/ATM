@@ -431,6 +431,20 @@ ACCEL_300_ALLOWED_PHASES = {'quiet', 'building', 'accelerating'}
 INVERSE_ACCEL_300_ALLOWED_PHASES = {'exhaustion', 'extreme'}
 INVERSE_ACCEL_300_CAUTION_PHASES = {'accelerating'}  # allow but may penalize later
 
+# ── Context Gate ───────────────────────────────────────────────────────────────
+# Two-layer gate before trade execution: rule-based (free) → LLM-based (quota).
+# Only fires when signal has passed ALL other filters (dead-hours, phase, position).
+CONTEXT_GATE_ENABLED = True          # master switch
+CONTEXT_GATE_LLM_ENABLED = True      # LLM fallback (rule-based always runs first)
+CONTEXT_GATE_SPEED_MIN = 20          # below this → SKIP (no wave)
+CONTEXT_GATE_Z_COUNTER_TREND = 1.5   # z-score contradicting signal + low speed → SKIP
+CONTEXT_GATE_Z_RANGING = 0.5         # |z| below this = ranging
+CONTEXT_GATE_RANGING_SPEED = 25      # ranging + low speed → SKIP
+CONTEXT_GATE_SPEED_CONFIRM = 70      # z + speed both strong → GO (no LLM needed)
+CONTEXT_GATE_CACHE_TTL = 300         # seconds to cache LLM decision for same token+signal
+CONTEXT_GATE_LLM_TIMEOUT = 8         # seconds before LLM call times out
+CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block good setups)
+
 # ── Wrong-side stall detection ────────────────────────────────────────────────
 WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 

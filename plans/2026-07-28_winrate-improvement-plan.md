@@ -279,17 +279,16 @@ Surfing.md has 5 open questions that map directly to our problems. The core surf
 3. ✅ **AGENTS.md surfing rules** (Proposal 4) — commit `705dcf7`
 4. ✅ **Price position filter** — commit `f42b4e5`
 
-### Phase 2 (NEXT — Spec Complete)
-5. 🔲 **Context gate** (Proposal 2 + Proposal 3 merged) — spec: `plans/2026-07-28_context-gate-spec.md`
-   - Speed >= 30th percentile (surfing rule #2)
+### Phase 2 (DONE — 2026-07-28)
+5. ✅ **Context gate** (Proposal 2 + Proposal 3 merged) — rule-based + LLM fallback
+   - Speed >= 20th percentile (surfing rule #2)
    - Phase alignment (surfing rule #3)
    - Counter-trend trap + speed cross-check (surfing rule #5)
    - Ranging market filter (surfing rule #6)
-   - Range position (surfing rule #4)
+   - LLM fallback for ambiguous cases (5-10 calls/hr)
 
 ### Phase 3 (Future — Low Priority)
-6. 🔲 **LLM-based AI decision** (Proposal 2, Phase 2) — only if rules prove insufficient
-7. 🔲 **Funding rate integration** (surfing.md open question)
+6. 🔲 **Funding rate integration** (surfing.md open question)
 
 ---
 
@@ -300,12 +299,11 @@ Surfing.md has 5 open questions that map directly to our problems. The core surf
 | Targeted inversion | ✅ DONE | +5-10% | HIGH |
 | Dead-hours filter | ✅ DONE | +3-5% | HIGH |
 | Price position filter | ✅ DONE | +2-3% | HIGH |
-| Context gate (merged: phase + counter-trend + ranging + speed) | 🔲 SPEC READY | +8-14% | MEDIUM-HIGH |
+| Context gate (merged: phase + counter-trend + ranging + speed + LLM) | ✅ DONE | +8-14% | MEDIUM-HIGH |
 | Coin history gate | ✅ DONE (existing) | +2-3% | HIGH |
-| **Combined (with all deployed)** | | **+20-35%** | **MEDIUM-HIGH** |
+| **Combined (all deployed)** | | **+20-35%** | **MEDIUM-HIGH** |
 
-**Current state (inversion + dead-hours deployed):** 29% → estimated 35-42% WR
-**After context gate:** estimated 43-50% WR
+**Current state (all deployed):** 29% → estimated 43-50% WR
 **Optimistic:** 55%+ WR
 
 At 50% WR with 1.68x R:R, the system would be significantly profitable.
