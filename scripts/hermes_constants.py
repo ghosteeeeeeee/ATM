@@ -646,7 +646,7 @@ TL_BREAK_MINUS_ENABLED        = True    # tl_break- SHORT
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
 # squeeze_cross.py — EMA(5)×EMA(180) cross + ATR squeeze + widening gap
 # Backtested: 71% WR, +2.36% avg PnL on 3-day 1m data
-SQUEEZE_CROSS_ENABLED       = True
+SQUEEZE_CROSS_ENABLED       = False  # DISABLED 2026-07-28: 0% WR on LONG, 40% on SHORT — no edge
 SQUEEZE_CROSS_PLUS_ENABLED  = True    # squeeze_cross+ LONG
 SQUEEZE_CROSS_MINUS_ENABLED = True    # squeeze_cross- SHORT
 # EMA periods
