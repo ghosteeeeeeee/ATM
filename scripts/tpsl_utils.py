@@ -91,6 +91,35 @@ def _phase_from_pct(pct: float, velocity: float) -> str:
     return 'quiet'
 
 
+def _get_current_phase(token: str) -> Optional[str]:
+    """Get current market phase for token from token_speeds cache.
+    
+    Reads speed_percentile and price_velocity_5m from token_speeds table,
+    then calls _phase_from_pct() to get phase string.
+    
+    Returns None if data not available (fail-open for signal filters).
+    """
+    import sqlite3
+    try:
+        conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db', timeout=5)
+        c = conn.cursor()
+        c.execute("""
+            SELECT speed_percentile, price_velocity_5m
+            FROM token_speeds
+            WHERE token = ?
+            ORDER BY updated_at DESC LIMIT 1
+        """, (token.upper(),))
+        row = c.fetchone()
+        conn.close()
+        if not row:
+            return None
+        pct = float(row[0] or 50)
+        velocity = float(row[1] or 0)
+        return _phase_from_pct(pct, velocity)
+    except Exception:
+        return None
+
+
 def _atr_sl_k_scaled(
     token: str,
     direction: str,

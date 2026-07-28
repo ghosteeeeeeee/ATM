@@ -413,6 +413,24 @@ PHASE_NEUTRAL       = 50   # percentile ≥50 → neutral (no strong direction)
 PHASE_VEL_STALL_THRESH = 0.0  # velocity ≤ 0 = stalling (negative velocity at accel+ phase)
 PHASE_ACCEL_FAST_THRESH = 70  # speed_percentile ≥70 → fast momentum branch in _atr_sl_k_scaled
 
+# ── Phase Entry Filter ────────────────────────────────────────────────────────
+# Blocks signal entries during inappropriate market phases.
+# Based on surfing.md: "Don't chase exhausted waves, don't enter whitewater."
+# Data: 2572 PostgreSQL trades analyzed 2026-07-28
+#
+# accel_300 (momentum): block during exhaustion/extreme (move already done)
+# inv_accel_300 (reversion): block during quiet/building (move not exhausted yet)
+PHASE_ENTRY_FILTER_ENABLED = True   # Master toggle
+
+# accel_300: which phases are ALLOWED (momentum entry)
+# Block: exhaustion, extreme
+ACCEL_300_ALLOWED_PHASES = {'quiet', 'building', 'accelerating'}
+
+# inv_accel_300: which phases are ALLOWED (mean reversion entry)
+# Block: quiet, building
+INVERSE_ACCEL_300_ALLOWED_PHASES = {'exhaustion', 'extreme'}
+INVERSE_ACCEL_300_CAUTION_PHASES = {'accelerating'}  # allow but may penalize later
+
 # ── Wrong-side stall detection ────────────────────────────────────────────────
 WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 

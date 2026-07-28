@@ -186,6 +186,8 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         ACCEL_300_REGIME_SLOPE_PCT,
         ACCEL_300_SLOPE_WINDOW,
         ACCEL_300_BARS_UNKNOWN,
+        PHASE_ENTRY_FILTER_ENABLED,
+        ACCEL_300_ALLOWED_PHASES,
     )
 
     period = ACCEL_300_PERIOD
@@ -345,6 +347,16 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
             if direction == 'SHORT' and position_pct < 0.20:
                 # SHORT at bottom 20% of range — high bounce risk
                 return None
+
+    # ── Phase entry filter (FIX 2026-07-28) ────────────────────────────────────
+    # Don't enter during exhaustion/extreme phases — the move is over.
+    # Data: accel_300 has 50% WR during dead hours (good), but exhaustion entries
+    # chase after the move is done → price reverses → SL hit.
+    if PHASE_ENTRY_FILTER_ENABLED:
+        from tpsl_utils import _get_current_phase
+        phase = _get_current_phase(token)
+        if phase and phase not in ACCEL_300_ALLOWED_PHASES:
+            return None
 
     return {
         'direction': direction,

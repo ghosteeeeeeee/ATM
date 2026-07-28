@@ -304,6 +304,17 @@ def detect_inverse_accel_300(token: str, prices: list) -> Optional[dict]:
             if direction == 'SHORT' and position_pct < 0.20:
                 return None  # SHORT at bottom 20% of range — high bounce risk
 
+    # ── Phase entry filter (FIX 2026-07-28) ────────────────────────────────────
+    # Mean reversion only works during exhaustion/extreme phases.
+    # During quiet/building, the move hasn't exhausted yet — too early to catch turn.
+    # Data: inv-accel-300 has 17% WR during dead hours vs 37% active (phase-related).
+    from hermes_constants import PHASE_ENTRY_FILTER_ENABLED, INVERSE_ACCEL_300_ALLOWED_PHASES
+    if PHASE_ENTRY_FILTER_ENABLED:
+        from tpsl_utils import _get_current_phase
+        phase = _get_current_phase(token)
+        if phase and phase not in INVERSE_ACCEL_300_ALLOWED_PHASES:
+            return None
+
     return {
         'direction': direction,
         'gap_pct': round(gap_now, 4),
