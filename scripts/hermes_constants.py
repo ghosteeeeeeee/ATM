@@ -576,6 +576,7 @@ PATTERN_FLAG_ENABLED       = True   # bull/bear flag patterns (3%+ pole)
 PATTERN_MICRO_FLAG_ENABLED = True   # micro bull/bear flag (0.3%+ pole, low-vol markets)
 PATTERN_TRIANGLE_ENABLED   = True   # ascending/descending triangle
 PATTERN_WOLF_ENABLED       = True   # wolf wave 5-point reversal pattern
+PATTERN_CHANNEL_ENABLED    = True   # channel-based flags (linear regression, ATR-normalized)
 MA_CROSS_ENABLED         = False   # ma_cross (short only historically)
 MA_CROSS_PLUS_ENABLED     = False  # ma_cross+ — catastrophic losses
 MA_CROSS_MINUS_ENABLED    = True

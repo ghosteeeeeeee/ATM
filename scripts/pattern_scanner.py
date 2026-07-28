@@ -124,14 +124,14 @@ def detect_bull_flag(candles: list) -> dict | None:
         for end in range(start + 2, min(start + FLAG_POLE_MAX_CANDLES + 1, len(closes))):
             pct = (closes[end] - closes[start]) / closes[start] * 100
             if pct >= FLAG_POLE_MIN_PCT and pct > best_pole_pct:
-                # Clean impulse: max drawdown from PEAK within pole < 30% of pole
-                segment = closes[start:end+1]
-                peak = max(segment)
-                max_drawdown_from_peak = max((peak - s) / peak * 100 for s in segment)
-                if max_drawdown_from_peak < pct * 0.3:
+                # Clean impulse: max drawdown from PEAK within pole body (excluding peak) < 30% of pole
+                body = closes[start:end]  # exclude the end point (peak)
+                peak = closes[end]
+                max_drawdown = max((peak - s) / peak * 100 for s in body) if body else 0
+                if max_drawdown < pct * 0.3:
                     best_pole = {'start': start, 'end': end, 'pct': pct,
                                   'high': peak,
-                                  'low':  min(segment),
+                                  'low':  min(closes[start:end+1]),
                                   'open_px': closes[start],
                                   'close_px': closes[end]}
                     best_pole_pct = pct
@@ -245,12 +245,12 @@ def detect_micro_bull_flag(candles: list) -> dict | None:
         for end in range(start + 2, min(start + MICRO_POLE_MAX_CANDLES + 1, len(closes))):
             pct = (closes[end] - closes[start]) / closes[start] * 100
             if pct >= MICRO_POLE_MIN_PCT and pct > best_pole_pct:
-                segment = closes[start:end+1]
-                peak = max(segment)
-                max_drawdown_from_peak = max((peak - s) / peak * 100 for s in segment)
-                if max_drawdown_from_peak < pct * 0.3:
+                body = closes[start:end]  # exclude the end point (peak)
+                peak = max(body) if body else closes[start]
+                max_drawdown = max((peak - s) / peak * 100 for s in body) if body else 0
+                if max_drawdown < max(pct * 0.5, 0.15):
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': peak, 'low': min(segment),
+                                  'high': closes[end], 'low': min(closes[start:end+1]),
                                   'open_px': closes[start], 'close_px': closes[end]}
                     best_pole_pct = pct
 
@@ -341,12 +341,12 @@ def detect_micro_bear_flag(candles: list) -> dict | None:
         for end in range(start + 2, min(start + MICRO_POLE_MAX_CANDLES + 1, len(closes))):
             pct = (closes[start] - closes[end]) / closes[start] * 100
             if pct >= MICRO_POLE_MIN_PCT and pct > best_pole_pct:
-                segment = closes[start:end+1]
-                trough = min(segment)
-                max_recovery_from_trough = max((s - trough) / trough * 100 for s in segment)
-                if max_recovery_from_trough < pct * 0.3:
+                body = closes[start+1:end+1]  # exclude the start point (peak)
+                trough = min(body)
+                max_recovery = max((s - trough) / trough * 100 for s in body)
+                if max_recovery < max(pct * 0.5, 0.15):
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': max(segment), 'low': trough,
+                                  'high': max(closes[start:end+1]), 'low': trough,
                                   'open_px': closes[start], 'close_px': closes[end]}
                     best_pole_pct = pct
 
@@ -437,12 +437,12 @@ def detect_bear_flag(candles: list) -> dict | None:
         for end in range(start + 2, min(start + FLAG_POLE_MAX_CANDLES + 1, len(closes))):
             pct = (closes[start] - closes[end]) / closes[start] * 100
             if pct >= FLAG_POLE_MIN_PCT and pct > best_pole_pct:
-                segment = closes[start:end+1]
-                trough = min(segment)
-                max_recovery_from_trough = max((s - trough) / trough * 100 for s in segment)
-                if max_recovery_from_trough < pct * 0.3:
+                body = closes[start+1:end+1]  # exclude the start point (peak)
+                trough = min(body) if body else closes[end]
+                max_recovery = max((s - trough) / trough * 100 for s in body) if body else 0
+                if max_recovery < pct * 0.3:
                     best_pole = {'start': start, 'end': end, 'pct': pct,
-                                  'high': max(segment),
+                                  'high': max(closes[start:end+1]),
                                   'low':  trough,
                                   'open_px': closes[start],
                                   'close_px': closes[end]}
@@ -851,6 +851,331 @@ def write_pattern_signal(token: str, pattern: dict) -> bool:
         return False
 
 
+# ── Linear Regression Helpers ────────────────────────────────────────────────
+
+def _linear_regression(closes: list):
+    """Linear regression. Returns (slope, intercept, r2)."""
+    n = len(closes)
+    if n < 2:
+        return 0.0, sum(closes) / n if closes else 0.0, 0.0
+    sum_x = sum(range(n))
+    sum_y = sum(closes)
+    sum_xy = sum(i * c for i, c in enumerate(closes))
+    sum_x2 = sum(i * i for i in range(n))
+    denom = n * sum_x2 - sum_x * sum_x
+    if abs(denom) < 1e-10:
+        return 0.0, sum_y / n, 0.0
+    slope = (n * sum_xy - sum_x * sum_y) / denom
+    intercept = (sum_y - slope * sum_x) / n
+    mean_y = sum_y / n
+    ss_tot = sum((y - mean_y) ** 2 for y in closes)
+    ss_res = sum((closes[i] - (intercept + slope * i)) ** 2 for i in range(n))
+    r2 = max(0.0, 1.0 - ss_res / ss_tot) if ss_tot > 0 else 0.0
+    return slope, intercept, r2
+
+
+def _atr_from_closes(closes: list, period: int = 14) -> float:
+    """ATR from close prices only (no OHLCV)."""
+    if len(closes) < period + 1:
+        return 0.0
+    changes = [abs(closes[i] - closes[i-1]) for i in range(1, len(closes))]
+    if not changes:
+        return 0.0
+    atr = sum(changes[:period]) / period
+    for c in changes[period:]:
+        atr = (atr * (period - 1) + c) / period
+    return atr
+
+
+def _ema(closes: list, period: int) -> list:
+    """Compute EMA series. Returns list with None for indices < period-1."""
+    if len(closes) < period:
+        return [None] * len(closes)
+    k = 2 / (period + 1)
+    result = [None] * (period - 1)
+    ema_val = sum(closes[:period]) / period
+    result.append(ema_val)
+    for price in closes[period:]:
+        ema_val = price * k + ema_val * (1 - k)
+        result.append(ema_val)
+    return result
+
+
+# ── Channel Flag Detection (improved) ─────────────────────────────────────
+
+# Channel flag constants
+CH_FLAG_LOOKBACK       = 200    # 1m candles for channel detection
+CH_FLAG_POLE_MIN_ATR   = 1.5   # pole must be >= 1.5 * ATR
+CH_FLAG_POLE_MAX_BARS  = 30    # max bars for pole formation
+CH_FLAG_CONS_MIN_BARS  = 5     # min consolidation bars
+CH_FLAG_CONS_MAX_BARS  = 60    # max consolidation bars
+CH_FLAG_R2_MIN         = 0.3   # minimum R² for channel boundaries
+CH_FLAG_SQUEEZE_RATIO  = 0.85  # ATR must decline to 85% of pole ATR
+CH_FLAG_BREAKOUT_ATR_K = 0.3   # breakout must be 0.3*ATR beyond channel
+CH_FLAG_SURVIVAL_BARS  = 5     # post-breakout survival bars
+CH_FLAG_COOLDOWN_HOURS = 4
+
+
+def detect_channel_flag(closes: list, token: str = '') -> dict | None:
+    """Detect channel-based flag with linear regression boundaries.
+
+    Improvements over basic flag:
+    1. Uses linear regression to fit channel boundaries (upper/lower)
+    2. ATR-normalized thresholds (works across tokens/timeframes)
+    3. Validates decreasing volatility (squeeze) during consolidation
+    4. Breakout confirmation with survival zone
+    5. Bounce count on channel boundary (like tl_break)
+
+    Args:
+        closes: list of float prices, oldest first
+        token: token symbol for logging
+
+    Returns:
+        Signal dict or None.
+    """
+    if len(closes) < CH_FLAG_LOOKBACK:
+        return None
+
+    atr = _atr_from_closes(closes, 14)
+    if atr <= 0:
+        return None
+
+    # ── Phase 1: Find the best pole (impulse move) ──────────────────────
+    # Scan for the strongest directional move in the first 70% of the window
+    search_end = int(len(closes) * 0.70)
+    best_pole = None
+    best_pole_score = 0
+
+    for start in range(max(0, search_end - CH_FLAG_POLE_MAX_BARS * 3), search_end - 5):
+        for end in range(start + 3, min(start + CH_FLAG_POLE_MAX_BARS + 1, search_end)):
+            # Bull flag: upward pole
+            up_pct = (closes[end] - closes[start]) / closes[start] * 100
+            up_atr = (closes[end] - closes[start]) / atr if atr > 0 else 0
+
+            if up_atr >= CH_FLAG_POLE_MIN_ATR:
+                # Check pole cleanliness: drawdown from peak (exclude start)
+                body = closes[start+1:end]
+                if body:
+                    peak = max(closes[start:end+1])
+                    max_dd = max((peak - s) / atr for s in body) if atr > 0 else 0
+                    if max_dd < up_atr * 0.4:  # clean impulse
+                        score = up_atr * (1.0 - max_dd / max(up_atr, 0.01))
+                        if score > best_pole_score:
+                            best_pole = {'start': start, 'end': end, 'direction': 'LONG',
+                                         'pct': up_pct, 'atr_moves': up_atr,
+                                         'high': closes[end], 'low': closes[start]}
+                            best_pole_score = score
+
+            # Bear flag: downward pole
+            down_pct = (closes[start] - closes[end]) / closes[start] * 100
+            down_atr = (closes[start] - closes[end]) / atr if atr > 0 else 0
+
+            if down_atr >= CH_FLAG_POLE_MIN_ATR:
+                body = closes[start+1:end]
+                if body:
+                    trough = min(closes[start:end+1])
+                    max_recovery = max((s - trough) / atr for s in body) if atr > 0 else 0
+                    if max_recovery < down_atr * 0.4:
+                        score = down_atr * (1.0 - max_recovery / max(down_atr, 0.01))
+                        if score > best_pole_score:
+                            best_pole = {'start': start, 'end': end, 'direction': 'SHORT',
+                                         'pct': down_pct, 'atr_moves': down_atr,
+                                         'high': closes[start], 'low': closes[end]}
+                            best_pole_score = score
+
+    if not best_pole:
+        return None
+
+    pole_end = best_pole['end']
+    pole_direction = best_pole['direction']
+
+    # ── Phase 2: Fit channel to consolidation zone ──────────────────────
+    cons_start = pole_end + 1
+    cons_end_min = cons_start + CH_FLAG_CONS_MIN_BARS
+    cons_end_max = min(cons_start + CH_FLAG_CONS_MAX_BARS, len(closes))
+
+    if cons_end_max < cons_end_min:
+        return None
+
+    # Find the best consolidation window (highest R² for channel fit)
+    best_channel = None
+    best_channel_score = 0
+
+    for ce in range(cons_end_min, cons_end_max):
+        cons_closes = closes[cons_start:ce]
+        if len(cons_closes) < CH_FLAG_CONS_MIN_BARS:
+            continue
+
+        # Linear regression on consolidation
+        slope, intercept, r2 = _linear_regression(cons_closes)
+
+        if r2 < CH_FLAG_R2_MIN:
+            continue
+
+        # Check channel width: all points within 1.5 * ATR of regression line
+        max_dev = 0
+        for j, px in enumerate(cons_closes):
+            line_px = slope * j + intercept
+            dev = abs(px - line_px) / atr if atr > 0 else 0
+            max_dev = max(max_dev, dev)
+
+        if max_dev > 1.5:
+            continue
+
+        # Check slope: should be counter-trend (flat or opposing pole)
+        avg_price = sum(cons_closes) / len(cons_closes)
+        slope_pct_per_bar = abs(slope) / avg_price if avg_price > 0 else 0
+
+        if pole_direction == 'LONG':
+            # Bull flag: consolidation should slope down or flat
+            if slope > slope_pct_per_bar * avg_price * 0.5:
+                continue
+        else:
+            # Bear flag: consolidation should slope up or flat
+            if slope < -slope_pct_per_bar * avg_price * 0.5:
+                continue
+
+        # Check for decreasing volatility (squeeze)
+        pole_atr = _atr_from_closes(closes[max(0, pole_end - 20):pole_end + 1], 14)
+        cons_atr = _atr_from_closes(cons_closes, 14)
+        squeeze_ok = cons_atr < pole_atr * CH_FLAG_SQUEEZE_RATIO if pole_atr > 0 else True
+
+        # Score: higher R² + tighter channel + squeeze = better
+        score = r2 * 0.4 + (1.0 - max_dev / 1.5) * 0.3 + (0.3 if squeeze_ok else 0) * 0.3
+
+        if score > best_channel_score:
+            best_channel = {
+                'start': cons_start, 'end': ce,
+                'slope': slope, 'intercept': intercept, 'r2': r2,
+                'max_dev': max_dev, 'squeeze_ok': squeeze_ok,
+                'cons_atr': cons_atr, 'pole_atr': pole_atr,
+            }
+            best_channel_score = score
+
+    if not best_channel:
+        return None
+
+    cons_end = best_channel['end']
+
+    # ── Phase 3: Bounce validation on channel boundary ─────────────────
+    channel_closes = closes[best_channel['start']:cons_end]
+    bounce_count = 0
+
+    for j in range(1, len(channel_closes) - 1):
+        line_px = best_channel['slope'] * j + best_channel['intercept']
+        dist = abs(channel_closes[j] - line_px) / atr if atr > 0 else 0
+
+        if dist < 0.5:  # within 0.5 ATR of channel midline
+            # Check rejection: next candle moves away
+            next_line = best_channel['slope'] * (j + 1) + best_channel['intercept']
+            next_dist = abs(channel_closes[j + 1] - next_line) / atr if atr > 0 else 0
+            if next_dist > dist + 0.2:  # moved away = rejection
+                bounce_count += 1
+
+    if bounce_count < 2:
+        return None
+
+    # ── Phase 4: Breakout confirmation ──────────────────────────────────
+    breakout_start = cons_end
+    breakout_end = min(cons_end + 15, len(closes))
+
+    if breakout_end <= breakout_start + 2:
+        return None
+
+    breakout_thresh = atr * CH_FLAG_BREAKOUT_ATR_K
+    follow_count = 0
+    breakout_strength = 0.0
+
+    # Extrapolate channel line to breakout zone
+    for i in range(breakout_start, breakout_end):
+        j = i - best_channel['start']  # index relative to channel start
+        channel_line = best_channel['slope'] * j + best_channel['intercept']
+        price = closes[i]
+
+        if pole_direction == 'LONG':
+            if price > channel_line + breakout_thresh:
+                follow_count += 1
+                breakout_strength = max(breakout_strength, (price - channel_line) / atr)
+        else:
+            if price < channel_line - breakout_thresh:
+                follow_count += 1
+                breakout_strength = max(breakout_strength, (channel_line - price) / atr)
+
+    if follow_count < 3:
+        return None
+
+    # ── Phase 5: Survival zone (fakeout guard) ──────────────────────────
+    survival_start = breakout_end
+    survival_end = min(survival_start + CH_FLAG_SURVIVAL_BARS, len(closes))
+
+    fakeouts = 0
+    for i in range(survival_start, survival_end):
+        j = i - best_channel['start']
+        channel_line = best_channel['slope'] * j + best_channel['intercept']
+        price = closes[i]
+        buffer = atr * 0.15
+
+        if pole_direction == 'LONG':
+            if price < channel_line - buffer:
+                fakeouts += 1
+        else:
+            if price > channel_line + buffer:
+                fakeouts += 1
+
+    if fakeouts > 0:
+        return None  # fakeout detected
+
+    # ── Confidence scoring ──────────────────────────────────────────────
+    conf = 55
+
+    # Pole strength
+    conf += min(15, int(best_pole['atr_moves'] - CH_FLAG_POLE_MIN_ATR) * 3)
+
+    # Channel quality (R²)
+    conf += min(10, int((best_channel['r2'] - CH_FLAG_R2_MIN) * 20))
+
+    # Squeeze bonus
+    if best_channel['squeeze_ok']:
+        conf += 5
+
+    # Bounce count
+    conf += min(5, bounce_count - 2)
+
+    # Breakout strength
+    conf += min(5, int(breakout_strength * 3))
+
+    # Follow-through
+    conf += min(5, follow_count - 3)
+
+    conf = min(conf, 90)
+
+    # ── Build signal ────────────────────────────────────────────────────
+    last_cons_price = closes[cons_end - 1] if cons_end > 0 else closes[-1]
+    target = best_pole['high'] if pole_direction == 'LONG' else best_pole['low']
+    measured_move = abs(target - last_cons_price) / atr if atr > 0 else 1.0
+
+    signal_type = f'pattern_channel_{pole_direction.lower()}'
+
+    return {
+        'pattern_type': f'channel_{pole_direction.lower()}',
+        'direction': pole_direction,
+        'confidence': conf,
+        'pole_pct': round(best_pole['pct'], 2),
+        'pole_atr_moves': round(best_pole['atr_moves'], 2),
+        'channel_r2': round(best_channel['r2'], 3),
+        'channel_max_dev_atr': round(best_channel['max_dev'], 2),
+        'squeeze_ok': best_channel['squeeze_ok'],
+        'bounce_count': bounce_count,
+        'follow_count': follow_count,
+        'breakout_strength_atr': round(breakout_strength, 2),
+        'consolidation_bars': cons_end - cons_start,
+        'target_px': round(target, 6),
+        'measured_move_atr': round(measured_move, 2),
+        'signal_type': signal_type,
+        'source': 'pattern_scanner',
+    }
+
+
 # ── Scan Token ───────────────────────────────────────────────────────────────
 
 def scan_token(token: str, lookback_minutes: int = 240) -> list:
@@ -858,6 +1183,7 @@ def scan_token(token: str, lookback_minutes: int = 240) -> list:
     from hermes_constants import (
         PATTERN_FLAG_ENABLED, PATTERN_TRIANGLE_ENABLED,
         PATTERN_WOLF_ENABLED, PATTERN_MICRO_FLAG_ENABLED,
+        PATTERN_CHANNEL_ENABLED,
     )
 
     candles = _get_candles_1m(token, lookback_minutes=lookback_minutes)
@@ -909,6 +1235,12 @@ def scan_token(token: str, lookback_minutes: int = 240) -> list:
         wolf = detect_wolf_wave(closes, atr)
         if wolf:
             _add(wolf)
+
+    # Channel-based flags (improved detection)
+    if PATTERN_CHANNEL_ENABLED:
+        channel = detect_channel_flag(closes, token)
+        if channel:
+            _add(channel)
 
     return patterns
 

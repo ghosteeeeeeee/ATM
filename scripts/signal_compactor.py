@@ -210,6 +210,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('pattern_elliot',  'pattern_scanner'): 1.25,
     ('pattern_micro_flag', 'pattern_scanner'): 1.0,
     ('pattern_wolf',   'pattern_scanner'): 1.25,
+    ('pattern_channel_long', 'pattern_scanner'): 1.2,
+    ('pattern_channel_short', 'pattern_scanner'): 1.2,
     # velocity: pure acceleration signal (no pct-hermes filter) — weaker alone, 45-55% hit rate
     ('velocity',   'vel-hermes+'):  0.8,   # acceleration-only SHORT — suppress
     ('velocity',   'vel-hermes-'):   0.8,   # acceleration-only LONG — suppress
