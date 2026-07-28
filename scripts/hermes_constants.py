@@ -879,7 +879,7 @@ DEAD_HOURS_DEFAULT = False  # False = only block listed signals, True = block AL
 # WHY NOT INVERT inv-accel-300- SHORT (23% WR, -6.17%)?
 # Inverting SHORT→LONG means catching a falling knife (price below EMA300 and falling).
 # Only invert after monitoring confirms the inverted direction works.
-SIGNAL_INVERSION_ENABLED = True
+SIGNAL_INVERSION_ENABLED = False  # Disabled 2026-07-28 — phase-aware entry should handle this
 SIGNAL_INVERSION_MAP = {
     'inv-accel-300+': True,    # 77 trades, 29% WR → flip LONG→SHORT
     'accel-300+':     True,    # 9 trades, 22% WR → flip LONG→SHORT
