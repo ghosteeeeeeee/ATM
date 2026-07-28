@@ -53,6 +53,7 @@ Never hardcode paths. Use `HERMES_DATA` or `WWW_DATA` from paths.
 | signals_hermes.db | `HERMES_DATA/` | price_history (~2.7M rows) |
 | candles.db | `HERMES_DATA/` | candle_cache (5m, 15m, 1h, 4h) |
 | brain.db | `/root/.hermes/` | Hebbian associative memory |
+| trades_analysis.db | `/root/.hermes/archive/` | trades (931 closed) |
 
 Query examples:
 ```bash
@@ -170,9 +171,24 @@ python3 scripts/signal_compactor.py --verbose
 - `scripts/hl-sync-guardian.py` — the guardian
 - `scripts/tpsl_utils.py` — ATR-based SL/TP computation (trailing logic)
 - `/var/www/hermes/data/hotset.json` — current hot set
-- `/var/www/hermes/data/trades.json` — open trades
-- `/root/.hermes/archive/trades_analysis.db` — archived closed trades
+- `/var/www/hermes/data/trades.json` — current closed trades (200, full metadata)
+- `/root/.hermes/archive/trades_analysis.db` — archived closed trades (931, SQLite)
+- `/root/.hermes/archive/trades/` — historical trade JSONs (5563+ trades, multiple files)
 - `scripts/signals/__init__.py` — signal registry
+
+## Trade Data Sources (for analysis/backtesting)
+
+| Source | Path | Records | Timestamps | Notes |
+|--------|------|---------|------------|-------|
+| Current trades | `/var/www/hermes/data/trades.json` | 200 | ✅ opened, closed | **Primary** — full metadata |
+| Archive DB | `/root/.hermes/archive/trades_analysis.db` | 931 | ✅ open_time, close_time | SQLite with technical indicators |
+| Archive JSONs | `/root/.hermes/archive/trades/` | 5563+ | ⚠️ partial | Multiple files, dedup required |
+| Signal outcomes | `signals_hermes_runtime.db` → `signal_outcomes` | 8132 | ✅ created_at | All signals (not just executed) |
+| Price history | `signals_hermes.db` → `price_history` | ~2.7M | ✅ Unix epoch | Close prices only |
+| Candle cache | `candles.db` → `candle_cache` | varies | ✅ | 5m, 15m, 1h, 4h OHLCV |
+| Speed/phase | `signals_hermes_runtime.db` → `token_speeds` | 549 | ✅ updated_at | Real-time market state |
+
+**Key insight:** `signal_outcomes` (8132) includes ALL signals generated, not just executed trades. Use `trades.json` (200) for actual trade performance. See `skills/trading/trade-data-sources/SKILL.md` for full documentation and query patterns.
 
 ## TPSL Parameters (hermes_constants.py)
 
@@ -232,3 +248,27 @@ Trading is like surfing. You can't force a wave — you read it, position yourse
 
 ### Key Lesson from 0G Case Study
 > "Z-score in a ranging market is a mean-reversion signal, not a trend signal. Don't use z-score as an entry trigger in ranging conditions."
+
+### Key Lesson from NIL Case Study
+> "Before executing any signal, check is_stale. If is_stale AND z_score contradicts signal direction → counter-trend trap, block it."
+
+## Winrate Improvement Plan
+
+Current: 29% WR (200 trades), 1.68x R:R, profit factor 0.58
+
+| Phase | Status | Impact |
+|-------|--------|--------|
+| Targeted signal inversion | ✅ DONE | inv-accel-300+ and accel-300+ LONG→SHORT |
+| Dead hours filter | ✅ DONE | Blocks 03:00-08:00 UTC (16% WR vs 35% active) |
+| Price position filter | ✅ DONE | Blocks LONG at range top, SHORT at range bottom |
+| Context gate | ⚠️ SPEC DONE | 7 rules, AI-tested, ready to implement |
+| Phase-aware entry | ⚠️ SPEC DONE | Uses DB wave_phase labels, not implemented |
+
+**Key findings from data:**
+- Dead hours (03-08 UTC): 16.2% WR across 68 trades — **single biggest filter**
+- inv-accel-300- SHORT: 24% WR overall, but 31% WR during active hours
+- accel-300- SHORT: 60% WR — best signal, don't touch
+
+**Specs:** `plans/2026-07-28_context-gate-spec.md`, `plans/2026-07-28_phase-aware-entry-spec.md`
+
+**Surfing philosophy:** `brain/surfing.md` (268 lines — wave quality, 4 quadrants, case studies)
