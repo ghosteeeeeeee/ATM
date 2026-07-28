@@ -635,14 +635,19 @@ def _get_recent_prices(token, n=20):
         return []
 
 def _ctx_gate_get_speed(token):
-    """Get speed percentile from token_speeds DB. Returns 0-100 or None."""
+    """Get speed percentile from token_speeds DB. Returns 0-100 or None.
+    Returns 0 if token is stale (flat markets = no wave)."""
     try:
         with sqlite3.connect(RUNTIME_DB) as conn:
             row = conn.execute(
-                'SELECT speed_percentile FROM token_speeds WHERE token = ?',
+                'SELECT speed_percentile, is_stale, updated_at FROM token_speeds WHERE token = ?',
                 (token,)
             ).fetchone()
-            return row[0] if row else None
+            if not row:
+                return None
+            if row[1]:  # is_stale
+                return 0
+            return row[0]
     except Exception:
         return None
 
