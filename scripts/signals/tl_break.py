@@ -40,14 +40,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-# Lookback window (~6h = 72 candles at 5m)
-TL_LOOKBACK           = 72    # candles
-TL_LOOKBACK_MIN       = 50    # minimum required
+# Lookback window (~8h = 96 candles at 5m)
+TL_LOOKBACK           = 96    # candles
+TL_LOOKBACK_MIN       = 70    # minimum required (need fit + breakout + survival)
 
-# Trendline fitting zone: first 75% of lookback (54 candles = ~4.5h)
-# Breakout confirmation zone: last 25% of lookback (18 candles = ~1.5h)
-TL_FIT_CUTOFF         = 0.75
+# 3-phase window:
+#   Phase 1 — Trendline fitting zone: first 50% of lookback (48 candles = ~4h)
+#   Phase 2 — Breakout confirmation zone: next 15 candles (~1.25h)
+#   Phase 3 — Post-breakout survival zone: next 15 candles (~1.25h)
+# The survival zone filters fakeouts: price must stay above trendline after breakout.
+TL_FIT_CUTOFF         = 0.50
 TL_BREAKOUT_CANDLES   = 15    # breakout must confirm within 15 candles (75 min)
+TL_SURVIVAL_CANDLES   = 15    # post-breakout: price must survive above line for 15 candles
 
 # Trendline detection: linear regression on closes in fit zone
 # R² must be high enough to confirm a real trendline (not noise)
@@ -310,6 +314,43 @@ def _detect_breakout(closes: List[float], slope: float, intercept: float,
     return has_breakout and has_follow_through, breakout_strength, follow_count
 
 
+# ── Fakeout Guard ─────────────────────────────────────────────────────────────
+
+def _detect_fakeout(closes: List[float], slope: float, intercept: float,
+                    survival_start: int, survival_end: int, atr: float,
+                    direction: str) -> Tuple[bool, int]:
+    """Check if price survived above/below trendline in post-breakout zone.
+
+    A fakeout = price broke out but then fell back below the trendline.
+    For LONG: all survival candles must close above trendline (with small buffer).
+    For SHORT: all survival candles must close below trendline (with small buffer).
+
+    Returns (is_fakeout, candles_below_line).
+    """
+    if survival_end <= survival_start:
+        return False, 0  # no survival zone to check
+
+    buffer = atr * 0.2  # small buffer — allow wicks to touch line
+    candles_below = 0
+
+    for i in range(survival_start, survival_end):
+        tl_price = slope * i + intercept
+        price = closes[i]
+
+        if direction == 'LONG':
+            # Fakeout: price fell back below trendline
+            if price < tl_price - buffer:
+                candles_below += 1
+        else:  # SHORT
+            # Fakeout: price rose back above trendline
+            if price > tl_price + buffer:
+                candles_below += 1
+
+    # Any candle closing significantly below/above line = fakeout
+    is_fakeout = candles_below >= 1
+    return is_fakeout, candles_below
+
+
 # ── Main Signal Detection ──────────────────────────────────────────────────────
 
 def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
@@ -359,6 +400,14 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         closes, slope, intercept, fit_end, atr, direction)
     if not breakout:
         return None
+
+    # ── Phase 3b: Fakeout guard — post-breakout survival ────────────────────
+    survival_start = fit_end + TL_BREAKOUT_CANDLES
+    survival_end = min(survival_start + TL_SURVIVAL_CANDLES, n)
+    is_fakeout, candles_below = _detect_fakeout(
+        closes, slope, intercept, survival_start, survival_end, atr, direction)
+    if is_fakeout:
+        return None  # price fell back below trendline — fakeout
 
     # ── Phase 4: Confidence scoring ─────────────────────────────────────────
     conf = TL_BASE_CONFIDENCE
