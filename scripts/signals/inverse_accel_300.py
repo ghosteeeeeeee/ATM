@@ -288,6 +288,22 @@ def detect_inverse_accel_300(token: str, prices: list) -> Optional[dict]:
     if direction == 'LONG' and gap_velocity <= 0:
         return None
 
+    # ── Price position filter (FIX 2026-07-28) ──────────────────────────────────
+    # Don't enter if price is already at the extreme of the 20-bar range.
+    # Prevents buying tops (LONG at range high) and shorting bottoms (SHORT at range low).
+    # This is wider than the 10-bar stabilization check above.
+    range_lookback = min(20, len(closes))
+    if range_lookback >= 5:
+        range_high = max(closes[-range_lookback:])
+        range_low = min(closes[-range_lookback:])
+        range_size = range_high - range_low
+        if range_size > 0:
+            position_pct = (closes[-1] - range_low) / range_size  # 0=bottom, 1=top
+            if direction == 'LONG' and position_pct > 0.80:
+                return None  # LONG at top 20% of range — high reversal risk
+            if direction == 'SHORT' and position_pct < 0.20:
+                return None  # SHORT at bottom 20% of range — high bounce risk
+
     return {
         'direction': direction,
         'gap_pct': round(gap_now, 4),
