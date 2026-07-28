@@ -826,12 +826,29 @@ ACCEL_300_STANDALONE_BYPASS_ENABLED = False  # TEMPORARILY DISABLED — was firi
 ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when disabled)
 
 # ── Dead-Hours Entry Filter ───────────────────────────────────────────────────
-# Block all new entries during 03:00-08:00 UTC (whitewater, no wave).
+# Block entries during low-liquidity hours (whitewater, no wave).
 # Surfing principle: "You can't force a wave — you read it, position yourself."
-# Data: trades during 03-08 UTC have ~15% WR vs 34% outside.
+#
+# Data basis (2572 PostgreSQL trades, 2026-07-28):
+# - inv-accel-300-: Dead=17.2% WR vs Active=37.8% WR → block during dead hours
+# - inv-accel-300+: Dead=18.8% WR vs Active=31.0% WR → block during dead hours
+# - accel-300+:     Dead=16.7% WR vs Active=33.3% WR → block during dead hours
+# - accel-300-:     Dead=50.5% WR vs Active=47.8% WR → DO NOT block (performs better)
+#
+# Config:
+#   DEAD_HOURS_ENABLED = master toggle (False = no filtering at all)
+#   DEAD_HOURS_START/END = hour range in UTC
+#   DEAD_HOURS_SIGNALS = list of signal prefixes to block during dead hours
+#   DEAD_HOURS_DEFAULT = True = block ALL signals not in list, False = only block listed signals
 DEAD_HOURS_ENABLED = True
 DEAD_HOURS_START = 3   # 03:00 UTC
 DEAD_HOURS_END = 8     # 08:00 UTC
+DEAD_HOURS_SIGNALS = [
+    'inv-accel-300-',   # 17.2% WR dead vs 37.8% active
+    'inv-accel-300+',   # 18.8% WR dead vs 31.0% active
+    'accel-300+',       # 16.7% WR dead vs 33.3% active
+]
+DEAD_HOURS_DEFAULT = False  # False = only block signals in list, False = allow all others
 
 # ── Targeted Signal Inversion ──────────────────────────────────────────────────
 # Invert direction for specific signals that are statistically proven losers.

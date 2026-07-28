@@ -31,6 +31,7 @@ from hermes_constants import (
     MOMENTUM_EXHAUSTION_THRESHOLD,
     SIGNAL_INVERSION_ENABLED, SIGNAL_INVERSION_MAP,
     DEAD_HOURS_ENABLED, DEAD_HOURS_START, DEAD_HOURS_END,
+    DEAD_HOURS_SIGNALS, DEAD_HOURS_DEFAULT,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -504,9 +505,17 @@ def process_delayed_entries(paper=False):
             import datetime as _dt
             _utc_hour = _dt.datetime.utcnow().hour
             if DEAD_HOURS_START <= _utc_hour < DEAD_HOURS_END:
-                log(f'⏰ DELAYED DEAD-HOURS: {token} {direction} blocked: {_utc_hour:02d}:XX UTC')
-                still_pending.append(entry)  # retry after dead hours end
-                continue
+                # Check if this signal is in the dead-hours block list
+                _signal = entry.get('signal', '')
+                _should_block = DEAD_HOURS_DEFAULT  # default behavior
+                for prefix in DEAD_HOURS_SIGNALS:
+                    if _signal.startswith(prefix):
+                        _should_block = True
+                        break
+                if _should_block:
+                    log(f'⏰ DELAYED DEAD-HOURS: {token} {direction} blocked: {_utc_hour:02d}:XX UTC (signal={_signal})')
+                    still_pending.append(entry)  # retry after dead hours end
+                    continue
 
         sig_price = entry['signal_price']   # price when signal fired
         pullback   = entry.get('pullback_pct', 0.01)
@@ -1886,18 +1895,26 @@ def run(dry_run=False):
                 log(f'  ➡️  [EXEC-ALLOW] {token} {direction} single-source allowed (CONFLUENCE_REQUIRED=False): {sig_src}')
 
         # ── Dead-Hours Entry Filter ─────────────────────────────────────
-        # Block ALL entries during 03:00-08:00 UTC (whitewater, no wave).
+        # Block entries during low-liquidity hours (whitewater, no wave).
         # Surfing principle: "You can't force a wave — you read it, position yourself."
-        # Data: trades during 03-08 UTC have ~15% WR vs 34% outside.
+        # Data: inv-accel signals have ~17% WR during dead hours vs ~35% active.
+        # accel-300- performs fine during dead hours (50% WR) — not blocked.
         if DEAD_HOURS_ENABLED:
             import datetime as _dt
             _utc_hour = _dt.datetime.utcnow().hour
             if DEAD_HOURS_START <= _utc_hour < DEAD_HOURS_END:
-                log(f'  🚫 [DEAD-HOURS] {token} {direction} blocked: {_utc_hour:02d}:XX UTC (dead hours {DEAD_HOURS_START:02d}-{DEAD_HOURS_END:02d})')
-                if sig_id:
-                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                skipped += 1
-                continue
+                # Check if this signal is in the dead-hours block list
+                _should_block = DEAD_HOURS_DEFAULT  # default behavior
+                for prefix in DEAD_HOURS_SIGNALS:
+                    if source.startswith(prefix):
+                        _should_block = True
+                        break
+                if _should_block:
+                    log(f'  🚫 [DEAD-HOURS] {token} {direction} blocked: {_utc_hour:02d}:XX UTC (signal={source}, dead hours {DEAD_HOURS_START:02d}-{DEAD_HOURS_END:02d})')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
 
         # FIX (2026-04-05): speed=0% = stale token — hard ban
         sp_exec = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None
