@@ -848,7 +848,7 @@ DEAD_HOURS_SIGNALS = [
     'inv-accel-300+',   # 18.8% WR dead vs 31.0% active
     'accel-300+',       # 16.7% WR dead vs 33.3% active
 ]
-DEAD_HOURS_DEFAULT = False  # False = only block signals in list, False = allow all others
+DEAD_HOURS_DEFAULT = False  # False = only block listed signals, True = block ALL signals
 
 # ── Targeted Signal Inversion ──────────────────────────────────────────────────
 # Invert direction for specific signals that are statistically proven losers.
