@@ -387,7 +387,7 @@ if __name__ == '__main__':
     # Build a minimal prices_dict from price_history for standalone run
     prices = {}
     try:
-        conn = sqlite3.connect('/root/.hermes/data/signals_hermes.db', timeout=10)
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT token, price, timestamp FROM price_history ph1
