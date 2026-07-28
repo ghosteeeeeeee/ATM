@@ -252,8 +252,9 @@ def detect_inverse_accel_300(token: str, prices: list) -> Optional[dict]:
 
     # FIX (2026-07-27): Stabilization + local extreme check.
     # Don't catch falling knives (LONG) or short into rallies (SHORT).
-    # For LONG: require price near recent LOW (turning point, not mid-fall).
-    # For SHORT: require price near recent HIGH (turning point, not mid-rally).
+    # For LONG: price must be near recent LOW (turning point, not mid-fall).
+    # For SHORT: price must be near recent HIGH (turning point, not mid-rally).
+    # NOTE: Falling knife protection is handled by staleness guard in scanner (0.5% slippage).
     stab_window = min(10, latest_idx)
     if stab_window >= 3:
         recent_prices = closes[latest_idx - stab_window + 1 : latest_idx + 1]
@@ -358,6 +359,14 @@ def scan_inverse_accel_300_signals(prices_dict: dict) -> int:
         # 1h trend filter — skip if price moved strongly against reversion direction
         if _check_1h_trend(token, direction, price):
             continue
+
+        # Staleness guard — if price has moved >0.5% from detection, skip
+        # Prevents stale signals where price dropped before entry (falling knife)
+        sig_price = sig['price']
+        if sig_price > 0:
+            slippage_pct = abs(price - sig_price) / sig_price * 100.0
+            if slippage_pct > 0.5:
+                continue
 
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
