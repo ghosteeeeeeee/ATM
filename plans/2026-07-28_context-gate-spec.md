@@ -61,10 +61,12 @@ def context_gate(token, direction, sig):
         return 'REJECT', f'speed_too_low ({speed:.0f} < {CONTEXT_GATE_SPEED_MIN})', direction
     
     # ── Rule 3: Phase alignment ──────────────────────────────────────
-    # accel_300: only during building/accelerating (momentum just starting)
-    # inv_accel_300- (SHORT): accelerating phase is OK (betting on reversal FROM acceleration)
-    # inv_accel_300+ (LONG): accelerating phase is WRONG (buying into strength)
-    # inv_accel_300: only during exhaustion/extreme for LONG, accelerating OK for SHORT
+    # Database wave_phase values: falling, decelerating, bottoming, accelerating, neutral
+    # (NOT the threshold-based phases from tpsl_utils.py)
+    #
+    # accel_300: only during accelerating (momentum building)
+    # inv_accel_300- (SHORT): decelerating/falling (price fading from peak)
+    # inv_accel_300+ (LONG): bottoming (price near trough)
     source = sig.get('source', '')
     phase = sig.get('wave_phase', 'neutral')
     
@@ -72,15 +74,15 @@ def context_gate(token, direction, sig):
     is_inv_accel = source.startswith('inv-accel-300')
     is_inv_accel_plus = 'inv-accel-300+' in source
     
-    if is_accel and phase in ('exhaustion', 'extreme'):
+    if is_accel and phase in ('decelerating', 'falling'):
         return 'REJECT', f'accel300_in_{phase}_phase (move already done)', direction
     
-    # inv-accel-300+ (LONG): block in quiet/building/accelerating (not reversion prime)
-    if is_inv_accel_plus and phase in ('quiet', 'building', 'accelerating'):
+    # inv-accel-300+ (LONG): block in accelerating/falling/decelerating (not bottoming)
+    if is_inv_accel_plus and phase in ('accelerating', 'falling', 'decelerating'):
         return 'REJECT', f'inv_accel300+_in_{phase}_phase (not reversion prime)', direction
     
-    # inv-accel-300- (SHORT): block in quiet/building/bottoming (accelerating is OK)
-    if is_inv_accel and not is_inv_accel_plus and phase in ('quiet', 'building', 'bottoming'):
+    # inv-accel-300- (SHORT): block in bottoming/accelerating (need decelerating/falling)
+    if is_inv_accel and not is_inv_accel_plus and phase in ('bottoming', 'accelerating'):
         return 'REJECT', f'inv_accel300-_in_{phase}_phase (not reversion prime)', direction
     
     # ── Rule 5a: Speed direction cross-check → FLIP ──────────────────
@@ -162,7 +164,7 @@ CONTEXT_GATE_ACCEL_THRESHOLD = 0.005 # Rule 4: price_accel threshold for range p
 
 Every rejection logs:
 ```
-🚫 [CONTEXT-GATE] BTC LONG rejected: accel300_in_exhaustion_phase (move already done)
+🚫 [CONTEXT-GATE] BTC LONG rejected: accel300_in_falling_phase (move already done)
 ```
 
 Every pass is silent (no log spam).
@@ -277,7 +279,7 @@ Based on 200-trade analysis + AI test on 11 pending signals:
 
 1. **Range position threshold (Rule 4)**: Using `price_acceleration` as proxy is imprecise. Should we compute actual range position from candle data? (Adds DB query but more accurate.)
 
-2. **Phase thresholds for inv_accel_300**: Should we allow inv_accel_300 during `accelerating` phase too, or only `exhaustion`/`extreme`? The surfing principle says "reversion prime" at exhaustion, but accelerating might be too early.
+2. **Phase thresholds for inv_accel_300**: RESOLVED — using database `wave_phase` labels (falling, decelerating, bottoming, accelerating, neutral), not threshold-based phases. inv-accel-300- SHORT needs decelerating/falling. inv-accel-300+ LONG needs bottoming.
 
 3. **Speed threshold tuning**: Is 30th percentile the right floor? Data shows ~15% WR below 30, but some tokens at 20-30 still win.
 
