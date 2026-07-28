@@ -125,6 +125,15 @@ When T mentions a concept, recall what you've learned to associate with it. This
 
 See `LESSONS.md` for hard-won bug patterns and parsing traps.
 
+## Git Operations
+
+**NEVER use `git push` directly.** Always use the canonical push script:
+```bash
+python3 /root/.hermes/skills/productivity/update-git/references/push_gh.py
+```
+
+This reads `GITHUB_TOKEN` from `.secrets.local`, cleans stale tokens from `.git/config`, and pushes via embedded URL (no credential prompts). See `skills/productivity/update-git/SKILL.md` for full workflow (staging, secrets audit, releases).
+
 ## Systemd Timers (installed from `/root/.hermes/systemd/`)
 
 Key timers:
