@@ -1,7 +1,7 @@
 # Plan: Win Rate Improvement — From 29% to 50%+
 
 **Date:** 2026-07-28
-**Status:** DRAFT — awaiting T's review
+**Status:** Phase 1 DONE, Phase 2 spec ready
 **Context:** 200 closed trades analyzed. 29% WR, 1.68x R:R. Break-even needs ~37% WR. System is bleeding.
 
 ---
@@ -273,37 +273,40 @@ Surfing.md has 5 open questions that map directly to our problems. The core surf
 
 ## Implementation Order
 
-### Phase 1 (Immediate — This Session)
-1. **Targeted inversion gate** (Proposal 1) — 30 min
-2. **Phase-aware entry** (Proposal 3) — 1 hour
-3. **Dead-hours filter** (Proposal 4) — 30 min
-4. **AGENTS.md surfing rules** (Proposal 4) — 30 min
+### Phase 1 (DONE — 2026-07-28)
+1. ✅ **Targeted inversion gate** (Proposal 1) — commit `705dcf7`
+2. ✅ **Dead-hours filter** (Proposal 4) — commit `705dcf7`
+3. ✅ **AGENTS.md surfing rules** (Proposal 4) — commit `705dcf7`
+4. ✅ **Price position filter** — commit `f42b4e5`
 
-### Phase 2 (Next Session)
-5. **Rule-based context check** (Proposal 2, Phase 1) — 2 hours
-6. **Regime strength axis** (Proposal 4) — 1 hour
-7. **Coin history gate** (Proposal 4) — 30 min
+### Phase 2 (NEXT — Spec Complete)
+5. 🔲 **Context gate** (Proposal 2 + Proposal 3 merged) — spec: `plans/2026-07-28_context-gate-spec.md`
+   - Speed >= 30th percentile (surfing rule #2)
+   - Phase alignment (surfing rule #3)
+   - Counter-trend trap + speed cross-check (surfing rule #5)
+   - Ranging market filter (surfing rule #6)
+   - Range position (surfing rule #4)
 
-### Phase 3 (Future)
-8. **LLM-based AI decision** (Proposal 2, Phase 2) — 4+ hours
-9. **Wave quality filter** (surfing.md open question) — 2 hours
-10. **Funding rate integration** (surfing.md open question) — 2 hours
+### Phase 3 (Future — Low Priority)
+6. 🔲 **LLM-based AI decision** (Proposal 2, Phase 2) — only if rules prove insufficient
+7. 🔲 **Funding rate integration** (surfing.md open question)
 
 ---
 
 ## Expected Combined Impact
 
-| Proposal | WR Improvement | Confidence |
-|----------|---------------|------------|
-| Targeted inversion | +5-10% | HIGH |
-| Phase-aware entry | +5-10% | HIGH |
-| Dead-hours filter | +3-5% | HIGH |
-| Rule-based context | +5-10% | MEDIUM |
-| Coin history gate | +2-3% | HIGH |
-| **Combined** | **+20-35%** | **MEDIUM-HIGH** |
+| Proposal | Status | WR Improvement | Confidence |
+|----------|--------|---------------|------------|
+| Targeted inversion | ✅ DONE | +5-10% | HIGH |
+| Dead-hours filter | ✅ DONE | +3-5% | HIGH |
+| Price position filter | ✅ DONE | +2-3% | HIGH |
+| Context gate (merged: phase + counter-trend + ranging + speed) | 🔲 SPEC READY | +8-14% | MEDIUM-HIGH |
+| Coin history gate | ✅ DONE (existing) | +2-3% | HIGH |
+| **Combined (with all deployed)** | | **+20-35%** | **MEDIUM-HIGH** |
 
-**Conservative estimate**: 29% → 45-50% WR
-**Optimistic estimate**: 29% → 55-60% WR
+**Current state (inversion + dead-hours deployed):** 29% → estimated 35-42% WR
+**After context gate:** estimated 43-50% WR
+**Optimistic:** 55%+ WR
 
 At 50% WR with 1.68x R:R, the system would be significantly profitable.
 
