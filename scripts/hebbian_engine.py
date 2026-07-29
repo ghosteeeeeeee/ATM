@@ -251,6 +251,34 @@ class HebbianEngine:
                     weakened += 1
         return {'strengthened': strengthened, 'weakened': weakened}
 
+    def wr_estimate(self, token: str, signal: str, k: int = 30):
+        """Estimate historical win rate for a (token, signal) pair from Hebbian memory.
+
+        Weight dynamics:
+        - New synapse starts at 1.0 (1st trade win) or 0.5 (1st trade loss)
+        - WIN → +1, LOSS → -1 (floor 0.5)
+        - After N trades with W wins: weight = max(0.5, 1 + 2W - N)
+
+        Calibrated WR:
+        - weight > 1.0: WR = (weight + N - 1) / (2N)
+        - weight == 0.5: WR < 0.5 (cannot distinguish 0% from 49%)
+
+        Returns (estimated_wr, count, weight) or None if pair not found.
+        """
+        results = self.recall(token, k=k)
+        match = next((r for r in results if r[0] == signal), None)
+        if not match:
+            return None
+        _concept, _label, weight, count = match
+        if count == 0:
+            return None
+        if weight > 1.0:
+            wr = (weight + count - 1) / (2 * count)
+        else:
+            # At floor — can't determine exact WR; conservative 50%
+            wr = 0.5
+        return (min(max(wr, 0.0), 1.0), int(count), float(weight))
+
     def recall(
         self,
         concept: str,

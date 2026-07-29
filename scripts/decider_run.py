@@ -43,6 +43,9 @@ from hermes_constants import (
     SIMILAR_SETUP_PENALTY_40, SIMILAR_SETUP_PENALTY_30,
     SIMILAR_SETUP_RSI_BAND, SIMILAR_SETUP_CACHE_TTL,
     LLM_CONFIDENCE_PENALTY,
+    HEBBIAN_BOOST_WR, HEBBIAN_BOOST_AMOUNT, HEBBIAN_BOOST_MIN_N,
+    HEBBIAN_PENALTY_WR, HEBBIAN_PENALTY_AMOUNT, HEBBIAN_PENALTY_MIN_N,
+    HEBBIAN_CACHE_TTL,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -834,6 +837,28 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
         pass
     return None
 
+_hebbian_cache = {}  # cache_key → (wr, n, weight, expiry)
+
+def hebbian_trade_boost(token, signal):
+    """Estimate historical win rate from Hebbian memory for (token, signal) pair.
+    Returns (wr, n, weight) or None. Fail-open. 10min cache."""
+    from hebbian_engine import HebbianEngine
+    cache_key = f"{token}:{signal}"
+    now = time.time()
+    cached = _hebbian_cache.get(cache_key)
+    if cached and now - cached[3] < HEBBIAN_CACHE_TTL:
+        return (cached[0], cached[1], cached[2])
+    try:
+        result = HebbianEngine().wr_estimate(token, signal)
+    except Exception:
+        return None
+    if result is None:
+        _hebbian_cache[cache_key] = (None, None, None, now)
+        return None
+    wr, n, weight = result
+    _hebbian_cache[cache_key] = (wr, n, weight, now)
+    return (wr, n, weight)
+
 def context_gate(token, direction, source, sig):
     """
     Main entry point. Rule-based gate → similar setup lookup → LLM.
@@ -865,6 +890,19 @@ def context_gate(token, direction, source, sig):
             penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 40 else SIMILAR_SETUP_PENALTY_40
             log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
             return ('WARN', f'similar setup: n={setup.n} WR={wr_pct:.0f}% → -{penalty} confidence', penalty)
+
+    # Hebbian WR estimate (brain.db token ↔ signal weight)
+    heb = hebbian_trade_boost(token, source)
+    if heb:
+        wr_est, n, weight = heb
+        wr_pct = wr_est * 100
+        log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})')
+        if n >= HEBBIAN_BOOST_MIN_N and wr_est >= HEBBIAN_BOOST_WR:
+            log(f'  [HEBBIAN] boost: +{HEBBIAN_BOOST_AMOUNT} confidence (high WR history)')
+            return ('WARN', f'hebbian boost: est WR={wr_pct:.0f}% (n={n})', -HEBBIAN_BOOST_AMOUNT)
+        if n >= HEBBIAN_PENALTY_MIN_N and wr_est <= HEBBIAN_PENALTY_WR:
+            log(f'  [HEBBIAN] penalty: -{HEBBIAN_PENALTY_AMOUNT} confidence (low WR history)')
+            return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
 
     # Still ambiguous → LLM (soft advisory, not hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx)

@@ -471,6 +471,17 @@ SIMILAR_SETUP_CACHE_TTL = 300         # 5 min cache per token+source+direction+t
 # LLM gate = soft advisory (WARN = confidence penalty, not block)
 LLM_CONFIDENCE_PENALTY = 15           # penalty applied when LLM returns WARN
 
+# ── Hebbian WR Estimate ──────────────────────────────────────────────────────
+# Uses brain.db (token ↔ signal) Hebbian weight to estimate historical WR.
+# Soft advisory: adjusts confidence, never blocks. Pass on low data.
+HEBBIAN_BOOST_WR = 0.60               # est WR >= 60% with n>=3 → +5 confidence
+HEBBIAN_BOOST_AMOUNT = 5              # confidence bonus when boost triggers
+HEBBIAN_BOOST_MIN_N = 3               # minimum co-occurrences to trust boost
+HEBBIAN_PENALTY_WR = 0.30             # est WR <= 30% with n>=5 → -10 confidence
+HEBBIAN_PENALTY_AMOUNT = 10           # confidence penalty when penalty triggers
+HEBBIAN_PENALTY_MIN_N = 5             # minimum co-occurrences to trust penalty
+HEBBIAN_CACHE_TTL = 600               # 10 min — Hebbian changes only on close
+
 # ── Wrong-side stall detection ────────────────────────────────────────────────
 WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 
