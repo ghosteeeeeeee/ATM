@@ -466,6 +466,11 @@ SIMILAR_SETUP_PENALTY_30 = 15         # WR 30-39% → -15 confidence
 SIMILAR_SETUP_RSI_BAND = 15           # RSI ± this for "similar"
 SIMILAR_SETUP_CACHE_TTL = 300         # 5 min cache per token+source+direction+tier
 
+# ── Hard vs Soft Guardrails ──────────────────────────────────────────────────
+# Rule-based gate = hard block (SKIP = real skip, trade blocked)
+# LLM gate = soft advisory (WARN = confidence penalty, not block)
+LLM_CONFIDENCE_PENALTY = 15           # penalty applied when LLM returns WARN
+
 # ── Wrong-side stall detection ────────────────────────────────────────────────
 WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 

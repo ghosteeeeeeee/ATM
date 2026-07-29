@@ -41,6 +41,7 @@ from hermes_constants import (
     SIMILAR_SETUP_HARD_BLOCK_WR, SIMILAR_SETUP_HARD_BLOCK_MIN_N,
     SIMILAR_SETUP_PENALTY_40, SIMILAR_SETUP_PENALTY_30,
     SIMILAR_SETUP_RSI_BAND, SIMILAR_SETUP_CACHE_TTL,
+    LLM_CONFIDENCE_PENALTY,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -728,7 +729,9 @@ def rule_based_context_gate(token, direction, source, sig):
 
 def llm_context_gate(token, direction, source, sig, rule_result):
     """
-    LLM fallback for ambiguous cases. Returns ('GO', None) or ('SKIP', reason).
+    LLM fallback for ambiguous cases. Returns ('GO', None) or ('WARN', reason).
+    WARN = soft advisory (confidence penalty), NOT a hard block.
+    Rule-based gate is the only hard blocker.
     Caches results for CONTEXT_GATE_CACHE_TTL seconds.
     """
     if not CONTEXT_GATE_LLM_ENABLED:
@@ -746,7 +749,8 @@ def llm_context_gate(token, direction, source, sig, rule_result):
 
     # Build minimal prompt (keep tokens low)
     ctx = rule_result if isinstance(rule_result, dict) else {}
-    prompt = f"""You are a crypto trading gate. Evaluate this signal and reply GO or SKIP (one word).
+    prompt = f"""You are a crypto trading gate. Evaluate this signal and reply GO or WARN (one word).
+WARN = caution (reduced confidence), not a hard block.
 
 Token: {token}
 Direction: {direction}
@@ -757,11 +761,11 @@ Phase: {ctx.get('phase', 'N/A')}
 
 Rules:
 - GO if: strong momentum (speed>60, z confirms direction), or clear reversal setup (inv-accel at extreme phase)
-- SKIP if: counter-trend with low speed, ranging market, wrong phase for signal type
-- SKIP if: dead hours (03:00-08:00 UTC)
+- WARN if: counter-trend with low speed, ranging market, wrong phase for signal type
+- WARN if: dead hours (03:00-08:00 UTC)
 - Default: GO (don't block good setups)
 
-Reply only GO or SKIP:"""
+Reply only GO or WARN:"""
 
     try:
         # Call MiniMax via opencode run (always uses expanded price data)
@@ -771,7 +775,7 @@ Reply only GO or SKIP:"""
             capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
         )
         response = (result.stdout or '').strip().upper()
-        verdict = 'GO' if 'GO' in response and 'SKIP' not in response else 'SKIP'
+        verdict = 'GO' if 'GO' in response and 'WARN' not in response else 'WARN'
 
         # Cache it (persistent across pipeline runs)
         cache[cache_key] = {'verdict': verdict, 'ts': now}
@@ -824,7 +828,9 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
 def context_gate(token, direction, source, sig):
     """
     Main entry point. Rule-based gate → similar setup lookup → LLM.
-    Returns ('GO', None) or ('SKIP', reason).
+    Returns ('GO', None), ('SKIP', reason), or ('WARN', reason).
+    - SKIP = hard block (rule-based gate or similar setup <30% WR)
+    - WARN = soft advisory (LLM or similar setup 30-49% WR → confidence penalty)
     """
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None)
@@ -851,9 +857,14 @@ def context_gate(token, direction, source, sig):
         if wr_pct < 40 and n >= SIMILAR_SETUP_MIN_SAMPLE:
             penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 30 else SIMILAR_SETUP_PENALTY_40
             log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
+            return ('WARN', f'similar setup: n={n} WR={wr_pct:.0f}% → -{penalty} confidence')
 
-    # Still ambiguous → LLM
-    return llm_context_gate(token, direction, source, sig, ctx)
+    # Still ambiguous → LLM (soft advisory, not hard block)
+    verdict, reason = llm_context_gate(token, direction, source, sig, ctx)
+    if verdict == 'WARN':
+        log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
+        return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty')
+    return (verdict, reason)
 
 
 # ─── Trade Execution ──────────────────────────────────────────────
@@ -2249,6 +2260,7 @@ def run(dry_run=False):
 
         # ── Context Gate (last gate before execution) ────────────
         # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).
+        # Rule-based = hard block (SKIP). LLM/similar setup = soft advisory (WARN → confidence penalty).
         ctx_verdict, ctx_reason = context_gate(token, direction, source, sig)
         if ctx_verdict == 'SKIP':
             log(f'  🚫 [CTX-GATE] {token} {direction} blocked: {ctx_reason}')
@@ -2256,7 +2268,12 @@ def run(dry_run=False):
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
-        log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
+        if ctx_verdict == 'WARN':
+            penalty = LLM_CONFIDENCE_PENALTY
+            confidence = max(confidence - penalty, 0)
+            log(f'  ⚠️ [CTX-GATE] {token} {direction} WARN: {ctx_reason} (conf → {confidence:.0f}%)')
+        else:
+            log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
 
         if dry_run:
             log(f'  → [DRY-RUN] Would enter {token} {direction}')
