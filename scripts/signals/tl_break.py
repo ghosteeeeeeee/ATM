@@ -406,6 +406,7 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     # ── Phase 2b: Z-score filter — block counter-trend traps ─────────────────
     # All recent losing LONGs had z < -1.5 (strong downtrend).
     # Don't fire LONG in strong downtrend, SHORT in strong uptrend.
+    # Also block overbought LONGs and oversold SHORTs (counter-trend trap).
     import statistics as _stat
     recent_closes = closes[-20:] if len(closes) >= 20 else closes
     if len(recent_closes) >= 10:
@@ -414,8 +415,12 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         _z = (recent_closes[-1] - _mean) / _stdev if _stdev > 0 else 0
         if direction == 'LONG' and _z < -1.5:
             return None  # strong downtrend — don't catch falling knife
+        if direction == 'LONG' and _z > 0.5:
+            return None  # overbought — don't buy the top
         if direction == 'SHORT' and _z > 1.5:
             return None  # strong uptrend — don't fade momentum
+        if direction == 'SHORT' and _z < -0.5:
+            return None  # oversold — don't sell the bottom
 
     # ── Phase 3: Breakout confirmation ─────────────────────────────────────
     breakout, breakout_strength, follow_count = _detect_breakout(
