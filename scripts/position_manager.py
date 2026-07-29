@@ -1047,7 +1047,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         if cur.rowcount == 0:
             print(f"[Position Manager] Dedup: trade {trade_id} already closed, skipping")
             conn.rollback()
-            return
+            return False
         # DB UPDATE done — do NOT commit yet. Commit only after HL confirms, or rollback if HL fails.
         print(f"[Position Manager] Closed trade {trade_id} ({reason})")
 

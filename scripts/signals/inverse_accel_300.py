@@ -135,8 +135,8 @@ def _check_1h_trend(token: str, direction: str, current_price: float) -> bool:
     """Check if 1h trend conflicts with reversion direction.
     
     Returns True if trade should be BLOCKED (trend too strong against us).
-    For LONG reversion: block if price rose >TREND_FILTER_PCT in last hour (strong uptrend)
-    For SHORT reversion: block if price fell >TREND_FILTER_PCT in last hour (strong downtrend)
+    For LONG reversion: block if price fell >TREND_FILTER_PCT in last hour (strong downtrend = catching falling knife)
+    For SHORT reversion: block if price rose >TREND_FILTER_PCT in last hour (strong uptrend = fading momentum)
     """
     try:
         import time
@@ -160,12 +160,12 @@ def _check_1h_trend(token: str, direction: str, current_price: float) -> bool:
         
         move_pct = abs(current_price - price_1h_ago) / price_1h_ago * 100
         
-        if direction == 'LONG' and current_price > price_1h_ago:
-            # Price rose in last hour — strong uptrend, reversion LONG is counter-trend
+        if direction == 'LONG' and current_price < price_1h_ago:
+            # Price fell in last hour — strong downtrend, reversion LONG is catching falling knife
             if move_pct > INVERSE_ACCEL_300_TREND_FILTER_PCT:
                 return True
-        elif direction == 'SHORT' and current_price < price_1h_ago:
-            # Price fell in last hour — strong downtrend, reversion SHORT is counter-trend
+        elif direction == 'SHORT' and current_price > price_1h_ago:
+            # Price rose in last hour — strong uptrend, reversion SHORT is fading momentum
             if move_pct > INVERSE_ACCEL_300_TREND_FILTER_PCT:
                 return True
         

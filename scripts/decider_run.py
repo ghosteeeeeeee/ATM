@@ -2470,6 +2470,22 @@ def run(dry_run=False):
             f'[SL={sl_pct:.1f}% trail={trailing_activation*100:.1f}%/{trailing_distance*100:.1f}%]'
             f'[spd={sp_now:.0f}%]')
 
+        # ── Targeted Signal Inversion (BEFORE context gate) ──────────────────
+        # Invert direction for specific signals that are statistically proven losers.
+        # Must run BEFORE context gate so FLIP decisions are based on correct direction.
+        flipped_direction = None
+        if SIGNAL_INVERSION_ENABLED:
+            for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
+                if should_invert and source and source.startswith(prefix):
+                    flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
+                    log(f'  [INVERT] {token} {source}: {direction} → {flipped_direction} (WR<35% signal)')
+                    direction = flipped_direction
+                    break
+        elif _FLIP_SIGNALS:
+            flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
+            log(f'  [FLIP] {token} {direction} → {flipped_direction} (legacy)')
+            direction = flipped_direction
+
         # ── Context Gate (last gate before execution) ────────────
         # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).
         # Rule-based = hard block (SKIP) or FLIP (direction change). LLM/similar setup = soft advisory (WARN → confidence penalty).
@@ -2529,22 +2545,6 @@ def run(dry_run=False):
                 continue
             log(f'  ⚠️ sig_id=None for {token} {direction} — legacy hot-set format, proceeding via token+direction fallback claim')
         
-        # ── Targeted Signal Inversion ─────────────────────────────────────
-        # Invert direction for specific signals that are statistically proven losers.
-        # Replaces the old _FLIP_SIGNALS global flip (tested 2026-07-28, gave 13.8% WR — worse).
-        flipped_direction = None
-        if SIGNAL_INVERSION_ENABLED:
-            for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
-                if should_invert and source and source.startswith(prefix):
-                    flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
-                    log(f'  [INVERT] {token} {source}: {direction} → {flipped_direction} (WR<35% signal)')
-                    direction = flipped_direction
-                    break
-        elif _FLIP_SIGNALS:
-            flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
-            log(f'  [FLIP] {token} {direction} → {flipped_direction} (legacy)')
-            direction = flipped_direction
-
         # ── Trade pending checkpoint ───────────────────────────────────
         try:
             checkpoint_write('trade_pending', {'token': token, 'direction': direction, 'original_direction': flipped_direction})
