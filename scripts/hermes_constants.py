@@ -454,6 +454,13 @@ CONTEXT_GATE_CACHE_TTL = 300         # seconds to cache LLM decision for same to
 CONTEXT_GATE_LLM_TIMEOUT = 8         # seconds before LLM call times out
 CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block good setups)
 
+# ── Per-Token WR Filter ──────────────────────────────────────────────────────
+# Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
+# Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).
+# Lower = more permissive (more trades, but more losers).
+TOKEN_WR_THRESHOLD = 30               # min WR% to allow (was 50, lowered 2026-07-29)
+TOKEN_WR_MIN_SAMPLE = 3               # min trades before filter applies
+
 # ── Similar Setup Lookup (Historical Trade Recall) ───────────────────────────
 # Queries PostgreSQL for past trades with same signal+direction+market conditions.
 # WR < hard_block → SKIP, WR 30-49% → confidence penalty (advisory).

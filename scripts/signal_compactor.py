@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON
@@ -988,7 +988,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # from building hot-set entries for tokens that decider_run would
             # block anyway. Stops the feedback loop of selecting losers.
             wr, wr_count = _get_token_wr(tkn, direction)
-            if wr < 50 and wr_count >= 3:
+            if wr < TOKEN_WR_THRESHOLD and wr_count >= TOKEN_WR_MIN_SAMPLE:
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: {direction} blocked — WR={wr:.0f}% ({wr_count} trades)")
                 continue
             # CRITICAL DEBUG: log every entry entering hotset_final — catch single-source bypass
@@ -1632,7 +1632,7 @@ def _filter_safe_prev_hotset(prev_hotset):
         # Same WR check as run_compaction hotset_final loop — apply to
         # preserved entries too, so blocked tokens don't sneak back in.
         wr, wr_count = _get_token_wr(tok, direction)
-        if wr < 50 and wr_count >= 3:
+        if wr < TOKEN_WR_THRESHOLD and wr_count >= TOKEN_WR_MIN_SAMPLE:
             continue
         # NOTE: rounds and compact_rounds are NOT decremented here.
         # Rounds only increment when the combo fires again in a new cycle.

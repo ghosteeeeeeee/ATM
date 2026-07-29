@@ -43,6 +43,7 @@ from hermes_constants import (
     SIMILAR_SETUP_PENALTY_40, SIMILAR_SETUP_PENALTY_30,
     SIMILAR_SETUP_RSI_BAND, SIMILAR_SETUP_CACHE_TTL,
     LLM_CONFIDENCE_PENALTY,
+    TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE,
     HEBBIAN_BOOST_WR, HEBBIAN_BOOST_AMOUNT, HEBBIAN_BOOST_MIN_N,
     HEBBIAN_PENALTY_WR, HEBBIAN_PENALTY_AMOUNT, HEBBIAN_PENALTY_MIN_N,
     HEBBIAN_CACHE_TTL,
@@ -2257,9 +2258,9 @@ def run(dry_run=False):
             confidence = adjusted_conf
 
         # ── Direction Awareness ───────────────────────────────────
-        # Skip LONG/SHORT if it has < 50% win rate in recent history (min 3 trades)
+        # Skip LONG/SHORT if it has < TOKEN_WR_THRESHOLD% win rate in recent history (min TOKEN_WR_MIN_SAMPLE trades)
         wr, wr_count = _get_direction_wr(token, direction)
-        if wr < 50 and wr_count >= 3:
+        if wr < TOKEN_WR_THRESHOLD and wr_count >= TOKEN_WR_MIN_SAMPLE:
             log(f'SKIP: {token} {direction} WR={wr:.0f}% ({wr_count} trades) — direction paused')
             skipped += 1
             continue
