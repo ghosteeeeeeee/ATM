@@ -798,28 +798,30 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
     cache_key = f"{token}:{source}:{direction}:{z_tier or ''}"
     now = time.time()
     cached = _setup_lookup_cache.get(cache_key)
-    if cached and now - cached[2] < SIMILAR_SETUP_CACHE_TTL:
-        return (cached[0], cached[1])
+    if cached and now - cached[3] < SIMILAR_SETUP_CACHE_TTL:
+        return (cached[0], cached[1], cached[2])
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
-        c = conn.cursor()
-        c.execute("""
-            SELECT COUNT(*) AS n,
-                   AVG(CASE WHEN pnl_pct > 0 THEN 1.0 ELSE 0.0 END) AS wr,
-                   AVG(pnl_pct) AS avg_pnl
-            FROM trades
-            WHERE close_time IS NOT NULL
-                AND signal = %s AND direction = %s
-                AND signal_z_score_tier = %s
-                AND (%s IS NULL OR signal_rsi_14 IS NULL OR signal_rsi_14 BETWEEN %s AND %s)
-        """, (source, direction, z_tier, rsi,
-              (rsi or 0) - SIMILAR_SETUP_RSI_BAND, (rsi or 100) + SIMILAR_SETUP_RSI_BAND))
-        row = c.fetchone()
-        conn.close()
-        n, wr, avg_pnl = row[0], row[1], row[2]
+        try:
+            c = conn.cursor()
+            c.execute("""
+                SELECT COUNT(*) AS n,
+                       AVG(CASE WHEN pnl_pct > 0 THEN 1.0 ELSE 0.0 END) AS wr,
+                       AVG(pnl_pct) AS avg_pnl
+                FROM trades
+                WHERE close_time IS NOT NULL
+                    AND signal = %s AND direction = %s
+                    AND signal_z_score_tier = %s
+                    AND (%s IS NULL OR signal_rsi_14 IS NULL OR signal_rsi_14 BETWEEN %s AND %s)
+            """, (source, direction, z_tier, rsi,
+                  (rsi or 0) - SIMILAR_SETUP_RSI_BAND, (rsi or 100) + SIMILAR_SETUP_RSI_BAND))
+            row = c.fetchone()
+            n, wr, avg_pnl = row[0], row[1], row[2]
+        finally:
+            conn.close()
         if n and n >= SIMILAR_SETUP_MIN_SAMPLE:
             result = (int(n), float(wr), float(avg_pnl or 0))
-            _setup_lookup_cache[cache_key] = (result[0], result[1], now)
+            _setup_lookup_cache[cache_key] = (result[0], result[1], result[2], now)
             return result
     except Exception:
         pass
@@ -828,43 +830,42 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
 def context_gate(token, direction, source, sig):
     """
     Main entry point. Rule-based gate → similar setup lookup → LLM.
-    Returns ('GO', None), ('SKIP', reason), or ('WARN', reason).
-    - SKIP = hard block (rule-based gate or similar setup <30% WR)
-    - WARN = soft advisory (LLM or similar setup 30-49% WR → confidence penalty)
+    Returns (verdict, reason, penalty):
+      - ('GO', None, 0): pass through
+      - ('SKIP', reason, 0): hard block (no penalty, trade blocked)
+      - ('WARN', reason, penalty_pts): soft advisory, trade executes with reduced confidence
     """
     if not CONTEXT_GATE_ENABLED:
-        return ('GO', None)
+        return ('GO', None, 0)
 
     verdict, ctx = rule_based_context_gate(token, direction, source, sig)
 
     if verdict == 'SKIP':
-        return ('SKIP', ctx)
+        return ('SKIP', ctx, 0)
     if verdict == 'GO':
-        return ('GO', None)
+        return ('GO', None, 0)
 
     # AMBIGUOUS → similar setup lookup (historical recall)
     rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
     z_tier = sig.get('z_score_tier') if isinstance(sig, dict) else None
-    if ctx and isinstance(ctx, dict):
-        rsi = rsi or ctx.get('z_score_tier')  # fallback
     setup = similar_setup_lookup(token, source, direction, rsi, z_tier)
     if setup:
         n, wr, _ = setup
         wr_pct = wr * 100
         log(f'  [SETUP-RECALL] {token} {source} {direction}: n={n} WR={wr_pct:.0f}%')
         if n >= SIMILAR_SETUP_HARD_BLOCK_MIN_N and wr_pct < SIMILAR_SETUP_HARD_BLOCK_WR:
-            return ('SKIP', f'similar setup: n={n} WR={wr_pct:.0f}% < {SIMILAR_SETUP_HARD_BLOCK_WR}% (hard block)')
-        if wr_pct < 40 and n >= SIMILAR_SETUP_MIN_SAMPLE:
-            penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 30 else SIMILAR_SETUP_PENALTY_40
+            return ('SKIP', f'similar setup: n={n} WR={wr_pct:.0f}% < {SIMILAR_SETUP_HARD_BLOCK_WR}% (hard block)', 0)
+        if wr_pct < 50 and n >= SIMILAR_SETUP_MIN_SAMPLE:
+            penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 40 else SIMILAR_SETUP_PENALTY_40
             log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
-            return ('WARN', f'similar setup: n={n} WR={wr_pct:.0f}% → -{penalty} confidence')
+            return ('WARN', f'similar setup: n={n} WR={wr_pct:.0f}% → -{penalty} confidence', penalty)
 
     # Still ambiguous → LLM (soft advisory, not hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx)
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
-        return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty')
-    return (verdict, reason)
+        return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty', LLM_CONFIDENCE_PENALTY)
+    return (verdict, reason, 0)
 
 
 # ─── Trade Execution ──────────────────────────────────────────────
@@ -2261,16 +2262,15 @@ def run(dry_run=False):
         # ── Context Gate (last gate before execution) ────────────
         # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).
         # Rule-based = hard block (SKIP). LLM/similar setup = soft advisory (WARN → confidence penalty).
-        ctx_verdict, ctx_reason = context_gate(token, direction, source, sig)
+        ctx_verdict, ctx_reason, ctx_penalty = context_gate(token, direction, source, sig)
         if ctx_verdict == 'SKIP':
             log(f'  🚫 [CTX-GATE] {token} {direction} blocked: {ctx_reason}')
             if sig_id:
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
-        if ctx_verdict == 'WARN':
-            penalty = LLM_CONFIDENCE_PENALTY
-            confidence = max(confidence - penalty, 0)
+        if ctx_verdict == 'WARN' and ctx_penalty:
+            confidence = max(confidence - ctx_penalty, 0)
             log(f'  ⚠️ [CTX-GATE] {token} {direction} WARN: {ctx_reason} (conf → {confidence:.0f}%)')
         else:
             log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
