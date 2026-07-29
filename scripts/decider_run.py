@@ -732,10 +732,30 @@ def rule_based_context_gate(token, direction, source, sig):
         return ('SKIP', f'speed {speed:.0f}% < {CONTEXT_GATE_SPEED_MIN}% (no wave)')
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
+    # But only if candle data is fresh (< 5 min old)
     if speed is not None and speed >= CONTEXT_GATE_SPEED_CONFIRM:
         if z_score is not None:
             if (direction == 'LONG' and z_score > 1.0) or \
                (direction == 'SHORT' and z_score < -1.0):
+                # Check if candle data is fresh
+                try:
+                    import sqlite3 as _sqlite3
+                    from paths import CANDLES_DB
+                    _conn = _sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur = _conn.cursor()
+                    _cur.execute("SELECT MAX(ts) FROM candle_cache WHERE token=?", (token,))
+                    _row = _cur.fetchone()
+                    _conn.close()
+                    if _row and _row[0]:
+                        import time as _time
+                        _age = _time.time() - _row[0]
+                        if _age > 300:  # >5 min stale
+                            return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
+                                                   'momentum': momentum, 'acceleration': accel,
+                                                   'wave_phase': wave_phase, 'market': market,
+                                                   'stale_candle': True})
+                except Exception:
+                    pass  # if we can't check, proceed with GO
                 return ('GO', None)
 
     # 3. Counter-trend trap: z contradicts direction + low speed
