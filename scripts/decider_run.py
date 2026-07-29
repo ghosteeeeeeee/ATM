@@ -738,40 +738,46 @@ def rule_based_context_gate(token, direction, source, sig):
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     # But only if price history is fresh (< 5 min old)
-    # Also check for FLIP conditions: if z contradicts direction, don't give GO
+    # GO conditions: speed >= 70% AND z strongly confirms direction:
+    #   LONG + z < -1.0 (price below average = good entry for buying)
+    #   SHORT + z > 1.0 (price above average = good entry for selling)
+    # FLIP territory (NEVER GO): LONG + z > 0.5, SHORT + z < -0.5
     if speed is not None and speed >= CONTEXT_GATE_SPEED_CONFIRM:
         if z_score is not None:
-            # Check stronger z-confirm first (z > 1.0 = full confirmation)
-            # For trend signals, z > 0.5 is FLIP territory, not GO territory
-            if (direction == 'LONG' and z_score > 1.0) or \
-               (direction == 'SHORT' and z_score < -1.0):
-                # z strongly confirms direction — give GO
-                try:
-                    import sqlite3 as _sqlite3
-                    from paths import HERMES_DATA
-                    _conn = _sqlite3.connect(f'{HERMES_DATA}/signals_hermes.db', timeout=5)
-                    _cur = _conn.cursor()
-                    _cur.execute("SELECT MAX(timestamp) FROM price_history WHERE token=?", (token,))
-                    _row = _cur.fetchone()
-                    _conn.close()
-                    if _row and _row[0]:
-                        import time as _time
-                        _age = _time.time() - _row[0]
-                        if _age > 300:  # >5 min stale
-                            return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
-                                                   'momentum': momentum, 'acceleration': accel,
-                                                   'wave_phase': wave_phase, 'market': market,
-                                                   'stale_price': True})
-                except Exception:
-                    pass  # if we can't check, proceed with GO
-                return ('GO', None)
-            elif is_trend_signal:
-                # For trend signals: if z contradicts direction, don't give GO — let FLIP check handle it
-                if (direction == 'LONG' and z_score > 0.5) or \
-                   (direction == 'SHORT' and z_score < -0.5):
-                    pass  # z in FLIP territory, fall through to FLIP check
-                # else: z < 0.5 for LONG or z > -0.5 for SHORT — neutral z, no strong signal
-                # Fall through to LLM gate for these ambiguous cases
+            # Check if z is in FLIP territory — if so, don't give GO
+            in_flip_territory = (
+                (direction == 'LONG' and z_score > 0.5) or
+                (direction == 'SHORT' and z_score < -0.5)
+            )
+            if not in_flip_territory:
+                # Check if z confirms direction (strong setup)
+                z_confirms = (
+                    (direction == 'LONG' and z_score < -1.0) or
+                    (direction == 'SHORT' and z_score > 1.0)
+                )
+                if z_confirms:
+                    # Strong setup — give GO
+                    try:
+                        import sqlite3 as _sqlite3
+                        from paths import HERMES_DATA
+                        _conn = _sqlite3.connect(f'{HERMES_DATA}/signals_hermes.db', timeout=5)
+                        _cur = _conn.cursor()
+                        _cur.execute("SELECT MAX(timestamp) FROM price_history WHERE token=?", (token,))
+                        _row = _cur.fetchone()
+                        _conn.close()
+                        if _row and _row[0]:
+                            import time as _time
+                            _age = _time.time() - _row[0]
+                            if _age > 300:  # >5 min stale
+                                return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
+                                                       'momentum': momentum, 'acceleration': accel,
+                                                       'wave_phase': wave_phase, 'market': market,
+                                                       'stale_price': True})
+                    except Exception:
+                        pass  # if we can't check, proceed with GO
+                    return ('GO', None)
+                # z doesn't confirm (e.g., LONG with z between -0.5 and 0.5)
+                # Fall through to LLM gate for ambiguous cases
 
     # 3. Counter-trend trap: z contradicts direction + low speed
     if z_score is not None and speed is not None:
