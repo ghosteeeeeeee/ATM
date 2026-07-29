@@ -727,13 +727,14 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # Get trade metadata
     cur.execute("""SELECT entry_price, amount_usdt, direction, leverage,
                           token, open_time, hl_notional_usdt,
-                          signal, signal_z_score_tier, signal_momentum_state
+                          signal, signal_z_score_tier, signal_momentum_state,
+                          signal_decision
                    FROM trades WHERE id = %s""", (trade_id,))
     row = cur.fetchone()
     if not row:
         return False
 
-    entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt, signal, signal_z_score_tier, signal_momentum_state = row
+    entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt, signal, signal_z_score_tier, signal_momentum_state, signal_decision = row
     lev = float(stored_lev or 1)
     # Bug-fix (2026-05-20): `or` treated 0.0 as falsy. Use explicit None check.
     amount_usdt = float(amount_usdt) if amount_usdt is not None else DEFAULT_TRADE_SIZE_USDT
