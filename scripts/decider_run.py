@@ -788,6 +788,15 @@ def rule_based_context_gate(token, direction, source, sig):
     if is_trend_signal and wave_phase == 'accelerating' and direction == 'SHORT':
         return ('FLIP', {'new_dir': 'LONG', 'reason': f'accelerating phase + SHORT → flip to LONG (wave building)'})
 
+    # 6b. FLIP: z-score contradicts signal direction → flip (trend signals only)
+    # If z > 0.5 for LONG (overbought) → flip to SHORT
+    # If z < -0.5 for SHORT (oversold) → flip to LONG
+    if is_trend_signal and z_score is not None:
+        if direction == 'LONG' and z_score > 0.5:
+            return ('FLIP', {'new_dir': 'SHORT', 'reason': f'z={z_score:.2f} > 0.5 (overbought) + LONG → flip to SHORT'})
+        if direction == 'SHORT' and z_score < -0.5:
+            return ('FLIP', {'new_dir': 'LONG', 'reason': f'z={z_score:.2f} < -0.5 (oversold) + SHORT → flip to LONG'})
+
     # 7. Momentum + acceleration cross-check (trend signals only)
     if is_trend_signal and momentum < 25:
         if direction == 'LONG' and accel < -0.005:
@@ -972,6 +981,8 @@ def hebbian_trade_boost(token, signal):
     now = time.time()
     cached = _hebbian_cache.get(cache_key)
     if cached and now - cached[4] < HEBBIAN_CACHE_TTL:
+        if cached[0] is None:
+            return None  # cached as no-data
         return (cached[0], cached[1], cached[2], cached[3])
     try:
         engine = HebbianEngine()

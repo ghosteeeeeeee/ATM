@@ -566,7 +566,7 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
             price=sig['price'],
             exchange='hyperliquid',
             timeframe='5m',
-            z_score=None,
+            z_score=sig.get('_z'),
             z_score_tier=None,
         )
 
