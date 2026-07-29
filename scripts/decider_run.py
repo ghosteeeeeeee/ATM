@@ -6,6 +6,7 @@ Reads APPROVED signals, checks position limits, computes SL/TP, places trades.
 Also processes delayed-entry signals from pending-delayed-entries.json.
 """
 import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2, fcntl
+from typing import NamedTuple
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
@@ -788,18 +789,24 @@ Reply only GO or WARN:"""
             return ('GO', None)  # fail-open: don't block good setups
         return ('SKIP', 'LLM failed, fail-closed')
 
-_setup_lookup_cache = {}  # f"{token}:{source}:{direction}:{tier}" → (n, wr, ts)
+class SetupStats(NamedTuple):
+    """Historical stats for similar setups. Field names prevent tuple-shape bugs."""
+    n: int
+    win_rate: float       # 0.0-1.0
+    avg_pnl: float        # signed pct
+
+_setup_lookup_cache = {}  # cache_key → SetupStats, expiry_ts
 
 def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
     """Query PostgreSQL for past trades with same signal+direction+similar conditions.
-    Returns (n, win_rate, avg_pnl) or None. Fail-open on error."""
+    Returns SetupStats(n, win_rate, avg_pnl) or None. Fail-open on error."""
     if not SIMILAR_SETUP_LOOKUP_ENABLED:
         return None
     cache_key = f"{token}:{source}:{direction}:{z_tier or ''}"
     now = time.time()
     cached = _setup_lookup_cache.get(cache_key)
-    if cached and now - cached[3] < SIMILAR_SETUP_CACHE_TTL:
-        return (cached[0], cached[1], cached[2])
+    if cached and now - cached[1] < SIMILAR_SETUP_CACHE_TTL:
+        return cached[0]
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         try:
@@ -820,9 +827,9 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
         finally:
             conn.close()
         if n and n >= SIMILAR_SETUP_MIN_SAMPLE:
-            result = (int(n), float(wr), float(avg_pnl or 0))
-            _setup_lookup_cache[cache_key] = (result[0], result[1], result[2], now)
-            return result
+            stats = SetupStats(n=int(n), win_rate=float(wr), avg_pnl=float(avg_pnl or 0))
+            _setup_lookup_cache[cache_key] = (stats, now)
+            return stats
     except Exception:
         pass
     return None
@@ -850,15 +857,14 @@ def context_gate(token, direction, source, sig):
     z_tier = sig.get('z_score_tier') if isinstance(sig, dict) else None
     setup = similar_setup_lookup(token, source, direction, rsi, z_tier)
     if setup:
-        n, wr, _ = setup
-        wr_pct = wr * 100
-        log(f'  [SETUP-RECALL] {token} {source} {direction}: n={n} WR={wr_pct:.0f}%')
-        if n >= SIMILAR_SETUP_HARD_BLOCK_MIN_N and wr_pct < SIMILAR_SETUP_HARD_BLOCK_WR:
-            return ('SKIP', f'similar setup: n={n} WR={wr_pct:.0f}% < {SIMILAR_SETUP_HARD_BLOCK_WR}% (hard block)', 0)
-        if wr_pct < 50 and n >= SIMILAR_SETUP_MIN_SAMPLE:
+        wr_pct = setup.win_rate * 100
+        log(f'  [SETUP-RECALL] {token} {source} {direction}: n={setup.n} WR={wr_pct:.0f}%')
+        if setup.n >= SIMILAR_SETUP_HARD_BLOCK_MIN_N and wr_pct < SIMILAR_SETUP_HARD_BLOCK_WR:
+            return ('SKIP', f'similar setup: n={setup.n} WR={wr_pct:.0f}% < {SIMILAR_SETUP_HARD_BLOCK_WR}% (hard block)', 0)
+        if wr_pct < 50 and setup.n >= SIMILAR_SETUP_MIN_SAMPLE:
             penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 40 else SIMILAR_SETUP_PENALTY_40
             log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
-            return ('WARN', f'similar setup: n={n} WR={wr_pct:.0f}% → -{penalty} confidence', penalty)
+            return ('WARN', f'similar setup: n={setup.n} WR={wr_pct:.0f}% → -{penalty} confidence', penalty)
 
     # Still ambiguous → LLM (soft advisory, not hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx)

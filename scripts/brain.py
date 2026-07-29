@@ -713,14 +713,15 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
 
     # Get trade metadata
     cur.execute("""SELECT entry_price, amount_usdt, direction, leverage,
-                          token, open_time, hl_notional_usdt
+                          token, open_time, hl_notional_usdt,
+                          signal, signal_z_score_tier, signal_momentum_state
                    FROM trades WHERE id = %s""", (trade_id,))
     row = cur.fetchone()
     if not row:
         cur.close(); conn.close()
         return False
 
-    entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt = row
+    entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt, signal, signal_z_score_tier, signal_momentum_state = row
     lev = float(stored_lev or 1)
     # Bug-fix (2026-05-20): `or` treated 0.0 as falsy. Use explicit None check.
     amount_usdt = float(amount_usdt) if amount_usdt is not None else DEFAULT_TRADE_SIZE_USDT
@@ -833,6 +834,20 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
     # via hype-sync.py or profit-monster closes.
     if hype_pnl_usdt is not None and hype_pnl_usdt < 0:
         _record_loss_cooldown(token, direction)
+
+    # ── Hebbian write-back: learn from outcome ────────────────────────
+    # Won → strengthen all concept pairs (token↔signal↔direction↔tier↔momentum).
+    # Lost → weaken pairs. Fail-open: errors never block trade close.
+    if hype_pnl_pct is not None and signal:
+        try:
+            from hebbian_engine import HebbianEngine
+            HebbianEngine().learn_trade_outcome(
+                token=token, signal=signal, direction=direction,
+                pnl_pct=hype_pnl_pct, z_score_tier=signal_z_score_tier,
+                momentum_state=signal_momentum_state,
+            )
+        except Exception:
+            pass  # fail-open
 
     cur.close()
     conn.close()

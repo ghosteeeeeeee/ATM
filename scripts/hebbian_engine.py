@@ -13,6 +13,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Optional
 
+from paths import *
 DB_PATH = "/root/.hermes/brain/associative_memory.db"
 
 # Weight dynamics
@@ -53,10 +54,33 @@ class HebbianEngine:
                     UNIQUE(concept_a_id, concept_b_id)
                 )
             """)
+            # Fix 4 (2026-06-24): session_summaries table for topic/file/coin-based
+            # recall. Distinct from co-occurrence graph: stores per-session metadata
+            # (summary text, discussion type, files/coins touched) so recall can
+            # answer "what did we do on signal_compactor?" directly instead of
+            # inferring from co-occurrences.
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS session_summaries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT UNIQUE NOT NULL,
+                    started_at TEXT,
+                    summary TEXT,
+                    discussion_type TEXT,
+                    subjects TEXT,                -- JSON array of {type, name}
+                    files_touched TEXT,           -- JSON array of file paths
+                    coins_discussed TEXT,         -- JSON array of coin tickers
+                    full_text_path TEXT,
+                    turn_count INTEGER,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
             # Indexes for fast lookup
             conn.execute("CREATE INDEX IF NOT EXISTS idx_synapse_a ON synapse_weights(concept_a_id)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_synapse_b ON synapse_weights(concept_b_id)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_node_name ON concept_nodes(name)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_ss_files ON session_summaries(files_touched)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_ss_coins ON session_summaries(coins_discussed)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_ss_type ON session_summaries(discussion_type)")
             conn.commit()
 
     def _get_or_create_node(self, name: str, label_type: str = "concept") -> int:
@@ -148,6 +172,85 @@ class HebbianEngine:
 
         return results
 
+    def weaken_pair(
+        self,
+        concept_a: str,
+        concept_b: str,
+        label_type_a: Optional[str] = None,
+        label_type_b: Optional[str] = None
+    ) -> float:
+        """
+        Decrement synapse weight between two concepts (loss learning).
+        Creates the synapse at floor weight if missing (single failure ≠ strong link).
+        Returns the new weight.
+        """
+        a_id = self._get_or_create_node(concept_a, label_type_a or "concept")
+        b_id = self._get_or_create_node(concept_b, label_type_b or "concept")
+
+        if a_id == b_id:
+            return 0.0
+
+        a_norm, b_norm = self._normalize_pair(a_id, b_id)
+
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute(
+                "SELECT weight FROM synapse_weights WHERE concept_a_id = ? AND concept_b_id = ?",
+                (a_norm, b_norm)
+            )
+            row = cur.fetchone()
+
+            if row:
+                new_weight = max(WEIGHT_FLOOR, row[0] - WEIGHT_INCREMENT)
+                conn.execute("""
+                    UPDATE synapse_weights
+                    SET weight = ?, last_updated = CURRENT_TIMESTAMP
+                    WHERE concept_a_id = ? AND concept_b_id = ?
+                """, (new_weight, a_norm, b_norm))
+            else:
+                # First failure: start at floor weight (no learning yet, but track existence)
+                new_weight = WEIGHT_FLOOR
+                conn.execute("""
+                    INSERT INTO synapse_weights (concept_a_id, concept_b_id, weight, co_occurrences)
+                    VALUES (?, ?, ?, 0)
+                """, (a_norm, b_norm, new_weight))
+
+            conn.commit()
+            return new_weight
+
+    def learn_trade_outcome(
+        self,
+        token: str,
+        signal: str,
+        direction: str,
+        pnl_pct: float,
+        z_score_tier: str = None,
+        momentum_state: str = None,
+    ) -> dict:
+        """
+        Hebbian write-back from a closed trade.
+        Won (pnl_pct > 0) → strengthen all concept pairs.
+        Lost (pnl_pct <= 0) → weaken all concept pairs.
+
+        Concepts: token, signal, direction, z_score_tier, momentum_state.
+        Returns {'strengthened': n, 'weakened': m} for logging.
+        """
+        concepts = [token, signal, direction, z_score_tier, momentum_state]
+        concepts = [c for c in concepts if c]
+        if len(concepts) < 2:
+            return {'strengthened': 0, 'weakened': 0}
+
+        won = pnl_pct is not None and pnl_pct > 0
+        strengthened = weakened = 0
+        for i in range(len(concepts)):
+            for j in range(i + 1, len(concepts)):
+                if won:
+                    self.learn_pair(concepts[i], concepts[j])
+                    strengthened += 1
+                else:
+                    self.weaken_pair(concepts[i], concepts[j])
+                    weakened += 1
+        return {'strengthened': strengthened, 'weakened': weakened}
+
     def recall(
         self,
         concept: str,
@@ -193,6 +296,73 @@ class HebbianEngine:
                     results.append((node_row[0], node_row[1], weight, count))
 
             return results
+
+    def add_session_summary(self, session_id, summary, discussion_type,
+                        subjects, files, coins, turn_count,
+                        full_text_path="", started_at="") -> int:
+        """Add or update a session summary row. Returns row id.
+
+        Fix 4 (2026-06-24): session-level recall — pairs of files/coins/subjects
+        stored as JSON arrays. INSERT OR REPLACE makes re-runs idempotent via
+        the UNIQUE session_id constraint.
+        """
+        import json
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute("""
+                INSERT OR REPLACE INTO session_summaries
+                  (session_id, started_at, summary, discussion_type, subjects,
+                   files_touched, coins_discussed, full_text_path, turn_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (session_id, started_at, summary, discussion_type,
+                  json.dumps(subjects), json.dumps(files), json.dumps(coins),
+                  full_text_path, turn_count))
+            conn.commit()
+            return int(cur.lastrowid or 0)
+
+    def recall_sessions_for_file(self, filepath: str, k: int = 5) -> list:
+        """Find sessions that touched this file.
+
+        Strips .py suffix and matches against both `foo` and `foo.py` in the
+        JSON-serialized files_touched array. Parameterized LIKE — safe from
+        injection (the f-string just builds the pattern value, not SQL).
+        """
+        base = filepath.removesuffix('.py')
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT session_id, started_at, summary, discussion_type,
+                       files_touched, coins_discussed
+                FROM session_summaries
+                WHERE files_touched LIKE ? OR files_touched LIKE ?
+                ORDER BY started_at DESC LIMIT ?
+            """, (f'%"{base}"%', f'%"{base}.py"%', k)).fetchall()
+            return [dict(r) for r in rows]
+
+    def recall_sessions_for_coin(self, coin: str, k: int = 5) -> list:
+        """Find sessions that discussed this coin ticker."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT session_id, started_at, summary, discussion_type,
+                       files_touched, coins_discussed
+                FROM session_summaries
+                WHERE coins_discussed LIKE ?
+                ORDER BY started_at DESC LIMIT ?
+            """, (f'%"{coin}"%', k)).fetchall()
+            return [dict(r) for r in rows]
+
+    def recall_sessions_for_topic(self, topic: str, k: int = 5) -> list:
+        """Find sessions by discussion_type or summary text match."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT session_id, started_at, summary, discussion_type,
+                       files_touched, coins_discussed
+                FROM session_summaries
+                WHERE discussion_type = ? OR summary LIKE ?
+                ORDER BY started_at DESC LIMIT ?
+            """, (topic, f'%{topic}%', k)).fetchall()
+            return [dict(r) for r in rows]
 
     def decay_all(self, decay_factor: float = DECAY_FACTOR, min_age_days: int = 7) -> int:
         """
@@ -245,6 +415,10 @@ class HebbianEngine:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("DELETE FROM synapse_weights")
             conn.execute("DELETE FROM concept_nodes")
+            conn.execute("DELETE FROM session_summaries")
+            # Reset autoincrement counters so id starts at 1 after reseed.
+            # Without this, old ids linger in sqlite_sequence.
+            conn.execute("DELETE FROM sqlite_sequence")
             conn.commit()
 
 
