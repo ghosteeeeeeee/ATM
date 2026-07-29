@@ -459,7 +459,7 @@ CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block go
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).
 # Lower = more permissive (more trades, but more losers).
 TOKEN_WR_THRESHOLD = 30               # min WR% to allow (was 50, lowered 2026-07-29)
-TOKEN_WR_MIN_SAMPLE = 3               # min trades before filter applies
+TOKEN_WR_MIN_SAMPLE = 5               # min trades before filter applies (was 3, raised 2026-07-29)
 
 # ── Similar Setup Lookup (Historical Trade Recall) ───────────────────────────
 # Queries PostgreSQL for past trades with same signal+direction+market conditions.
