@@ -684,10 +684,35 @@ def _ctx_gate_get_phase(token):
     except Exception:
         return None
 
+def _ctx_gate_get_momentum(token):
+    """Get momentum_score and price_acceleration from speed tracker. Returns dict or None."""
+    try:
+        from speed_tracker import SpeedTracker
+        st = SpeedTracker()
+        spd = st.get_token_speed(token)
+        if not spd:
+            return None
+        return {
+            'momentum': spd.get('momentum_score', 50),
+            'acceleration': spd.get('price_acceleration', 0),
+            'wave_phase': spd.get('wave_phase', 'neutral'),
+        }
+    except Exception:
+        return None
+
+def _ctx_gate_get_market_context():
+    """Get BTC and ETH z-scores for market context. Returns dict."""
+    btc_z = _ctx_gate_get_zscore('BTC')
+    eth_z = _ctx_gate_get_zscore('ETH')
+    return {'btc_z': btc_z, 'eth_z': eth_z}
+
 def rule_based_context_gate(token, direction, source, sig):
     """
-    Free, instant gate. Returns ('GO', None), ('SKIP', reason), or ('AMBIGUOUS', ctx_dict).
-    Handles ~80% of cases. Only clear GO or clear NO-GO.
+    Free, instant gate. Returns (verdict, data):
+      - ('GO', None)
+      - ('SKIP', reason)
+      - ('FLIP', {'new_dir': 'SHORT'|'LONG', 'reason': str})
+      - ('AMBIGUOUS', ctx_dict with speed, z_score, phase, momentum, accel, market)
     """
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None)
@@ -695,6 +720,12 @@ def rule_based_context_gate(token, direction, source, sig):
     speed = _ctx_gate_get_speed(token)
     z_score = _ctx_gate_get_zscore(token)
     phase = _ctx_gate_get_phase(token)
+    mom_data = _ctx_gate_get_momentum(token)
+    market = _ctx_gate_get_market_context()
+
+    momentum = mom_data.get('momentum', 50) if mom_data else 50
+    accel = mom_data.get('acceleration', 0) if mom_data else 0
+    wave_phase = mom_data.get('wave_phase', 'neutral') if mom_data else 'neutral'
 
     # 1. Speed too low = no wave (surfing: whitewater)
     if speed is not None and speed < CONTEXT_GATE_SPEED_MIN:
@@ -703,7 +734,6 @@ def rule_based_context_gate(token, direction, source, sig):
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     if speed is not None and speed >= CONTEXT_GATE_SPEED_CONFIRM:
         if z_score is not None:
-            # Strong momentum in right direction
             if (direction == 'LONG' and z_score > 1.0) or \
                (direction == 'SHORT' and z_score < -1.0):
                 return ('GO', None)
@@ -729,8 +759,29 @@ def rule_based_context_gate(token, direction, source, sig):
             if phase in ('quiet', 'building'):
                 return ('SKIP', f'wrong phase: {phase} for inv-accel (no reversal)')
 
+    # 6. FLIP: phase contradicts signal direction → flip (trend signals only)
+    is_inv_accel = 'inv-accel' in (source or '')
+    is_trend_signal = not is_inv_accel  # tl_break, accel-300, etc.
+
+    if is_trend_signal and wave_phase == 'falling' and direction == 'LONG':
+        return ('FLIP', {'new_dir': 'SHORT', 'reason': f'falling phase + LONG → flip to SHORT (wave dying)'})
+    if is_trend_signal and wave_phase == 'accelerating' and direction == 'SHORT':
+        return ('FLIP', {'new_dir': 'LONG', 'reason': f'accelerating phase + SHORT → flip to LONG (wave building)'})
+
+    # 7. Momentum + acceleration cross-check (trend signals only)
+    if is_trend_signal and momentum < 25:
+        if direction == 'LONG' and accel < -0.005:
+            return ('SKIP', f'weak momentum opposing LONG (mom={momentum:.0f}, accel={accel:+.4f})')
+        if direction == 'SHORT' and accel > 0.005:
+            return ('SKIP', f'weak momentum opposing SHORT (mom={momentum:.0f}, accel={accel:+.4f})')
+
     # Ambiguous — needs LLM
-    return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase})
+    ctx = {
+        'speed': speed, 'z_score': z_score, 'phase': phase,
+        'momentum': momentum, 'acceleration': accel, 'wave_phase': wave_phase,
+        'market': market,
+    }
+    return ('AMBIGUOUS', ctx)
 
 def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb=None):
     """
@@ -752,8 +803,10 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
         if now - cached['ts'] < CONTEXT_GATE_CACHE_TTL:
             return (cached['verdict'], None)
 
-    # Build prompt with Hebbian recall data
+    # Build prompt with Hebbian recall data + market context
     ctx = rule_result if isinstance(rule_result, dict) else {}
+    market = ctx.get('market', {})
+
     heb_section = ""
     if setup:
         heb_section += f"\nSimilar setup history: {setup.n} trades, WR={setup.win_rate*100:.0f}%, avg PnL={setup.avg_pnl:+.2f}%"
@@ -766,12 +819,21 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
     prompt = f"""You are a crypto trading gate. Evaluate this signal and reply GO or WARN (one word).
 WARN = caution (reduced confidence), not a hard block.
 
+=== TRADE CANDIDATE ===
 Token: {token}
 Direction: {direction}
 Signal: {source}
+
+=== MARKET STATE ===
 Speed: {ctx.get('speed', 'N/A')}%
 Z-Score: {ctx.get('z_score', 'N/A')}
-Phase: {ctx.get('phase', 'N/A')}
+Phase: {ctx.get('wave_phase', ctx.get('phase', 'N/A'))}
+Momentum: {ctx.get('momentum', 'N/A')}
+Acceleration: {ctx.get('acceleration', 'N/A')}
+
+=== MARKET CONTEXT ===
+BTC Z-Score: {market.get('btc_z', 'N/A')}
+ETH Z-Score: {market.get('eth_z', 'N/A')}
 {heb_section}
 
 Rules:
@@ -779,6 +841,7 @@ Rules:
 - WARN if: counter-trend with low speed, ranging market, wrong phase for signal type
 - WARN if: dead hours (03:00-08:00 UTC)
 - WARN if: historical WR < 40% with 5+ trades
+- WARN if: momentum < 25 and acceleration opposes direction
 - Default: GO (don't block good setups)
 
 Reply only GO or WARN:"""
@@ -875,9 +938,10 @@ def hebbian_trade_boost(token, signal):
 def context_gate(token, direction, source, sig):
     """
     Main entry point. Rule-based gate → similar setup lookup → LLM.
-    Returns (verdict, reason, penalty):
+    Returns (verdict, reason_or_data, penalty):
       - ('GO', None, 0): pass through
       - ('SKIP', reason, 0): hard block (no penalty, trade blocked)
+      - ('FLIP', {'new_dir': str, 'reason': str}, 0): flip direction
       - ('WARN', reason, penalty_pts): soft advisory, trade executes with reduced confidence
     """
     if not CONTEXT_GATE_ENABLED:
@@ -889,6 +953,8 @@ def context_gate(token, direction, source, sig):
         return ('SKIP', ctx, 0)
     if verdict == 'GO':
         return ('GO', None, 0)
+    if verdict == 'FLIP':
+        return ('FLIP', ctx, 0)  # ctx = {'new_dir': ..., 'reason': ...}
 
     # AMBIGUOUS → similar setup lookup (historical recall)
     rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
@@ -2318,7 +2384,7 @@ def run(dry_run=False):
 
         # ── Context Gate (last gate before execution) ────────────
         # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).
-        # Rule-based = hard block (SKIP). LLM/similar setup = soft advisory (WARN → confidence penalty).
+        # Rule-based = hard block (SKIP) or FLIP (direction change). LLM/similar setup = soft advisory (WARN → confidence penalty).
         ctx_verdict, ctx_reason, ctx_penalty = context_gate(token, direction, source, sig)
         if ctx_verdict == 'SKIP':
             log(f'  🚫 [CTX-GATE] {token} {direction} blocked: {ctx_reason}')
@@ -2326,7 +2392,12 @@ def run(dry_run=False):
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1
             continue
-        if ctx_verdict == 'WARN' and ctx_penalty:
+        if ctx_verdict == 'FLIP':
+            new_dir = ctx_reason.get('new_dir', direction)
+            flip_reason = ctx_reason.get('reason', 'phase flip')
+            log(f'  🔄 [CTX-GATE] {token} {direction} → {new_dir}: {flip_reason}')
+            direction = new_dir
+        elif ctx_verdict == 'WARN' and ctx_penalty:
             confidence = max(confidence - ctx_penalty, 0)
             log(f'  ⚠️ [CTX-GATE] {token} {direction} WARN: {ctx_reason} (conf → {confidence:.0f}%)')
         else:
