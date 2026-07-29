@@ -718,7 +718,8 @@ def rule_based_context_gate(token, direction, source, sig):
         return ('GO', None)
 
     speed = _ctx_gate_get_speed(token)
-    z_score = _ctx_gate_get_zscore(token)
+    # Use signal z-score if available (from tl_break signal), otherwise compute from current prices
+    z_score = sig.get('z_score') if isinstance(sig, dict) and sig.get('z_score') is not None else _ctx_gate_get_zscore(token)
     phase = _ctx_gate_get_phase(token)
     mom_data = _ctx_gate_get_momentum(token)
     market = _ctx_gate_get_market_context()
