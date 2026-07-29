@@ -331,7 +331,9 @@ ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles pr
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
-ATR_SL_MIN_ACCEL   = 0.005   # 0.5% floor — survive normal pullbacks
+ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
+# Was 0.5% — too wide, prevented trailing from locking in profits
+# Lower than TRAILING_DISTANCE_PCT (0.20%) so trailing takes over
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)

@@ -36,6 +36,8 @@ from hermes_constants import (
     ATR_SL_MIN_INIT, ATR_SL_MAX_INIT,
     # Acceleration-phase SL (established trades)
     ATR_SL_MIN_ACCEL,
+    # Trailing stop
+    TRAILING_DISTANCE_PCT,
     # TP floor/cap
     ATR_TP_MIN, ATR_TP_MAX,
     # Acceleration-phase TP (established trades)
@@ -480,6 +482,11 @@ def compute_atr_sl_tp(
 
     eff_sl_pct = min(max(sl_pct, MIN_SL_PCT), ATR_SL_MAX)
     eff_tp_pct = min(max(tp_pct, MIN_TP_PCT), ATR_TP_MAX)
+
+    # For established trades: cap SL at TRAILING_DISTANCE_PCT so trailing can lock profits
+    # Without this, the ATR-based floor (0.15-0.50%) overrides the trailing distance (0.20%)
+    if not is_new_trade:
+        eff_sl_pct = min(eff_sl_pct, TRAILING_DISTANCE_PCT)
 
     # ── Compute raw SL/TP from anchor price ───────────────────────────────────────
     if direction == 'LONG':
