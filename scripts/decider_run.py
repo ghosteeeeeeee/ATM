@@ -882,7 +882,7 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
 
     prompt = f"""You are a crypto trading gate. Evaluate this signal and reply ONE of: GO, WARN, NAY, or FLIP.
 
-GO = allow trade as-is
+GO = allow trade as-is (high confidence, z confirms direction)
 WARN = caution (reduced confidence, trade still executes)
 NAY = block this trade (hard reject — do not enter)
 FLIP = reverse direction (e.g., LONG→SHORT or SHORT→LONG)
@@ -904,12 +904,30 @@ BTC Z-Score: {market.get('btc_z', 'N/A')}
 ETH Z-Score: {market.get('eth_z', 'N/A')}
 {heb_section}
 
-RULES:
-- GO: strong momentum (speed>60, z confirms direction), clear reversal setup
-- WARN: counter-trend with low speed, ranging market, wrong phase for signal type
-- NAY: setup is actively harmful — will lose money (e.g., extremely overbought LONG, dead hours, historical WR < 30% with 10+ trades)
-- FLIP: z-score strongly contradicts signal direction (|z|>2.0 AND speed>50) — the OPPOSITE direction is better
-- Default: GO (don't block good setups)
+CRITERIA (be decisive!):
+
+GO (strong confidence):
+- Speed > 70% AND z confirms direction (LONG: z < -0.5, SHORT: z > 0.5)
+- Clear trend signal with strong momentum
+
+WARN (cautious):
+- Speed 20-70% (moderate momentum)
+- Z-score is neutral (-0.5 to 0.5)
+- Hebbian WR 30-50% with limited data
+
+NAY (hard block):
+- Dead hours (03:00-08:00 UTC) for non-inv-accel signals
+- Historical WR < 30% with 5+ trades for this setup
+- Z-score extreme AND speed low: |z| > 1.5 AND speed < 30
+- LONG with z > 1.5 AND speed < 40 (overbought + no momentum)
+- SHORT with z < -1.5 AND speed < 40 (oversold + no momentum)
+
+FLIP (reverse direction):
+- LONG with z > 0.7 (overbought → flip to SHORT)
+- SHORT with z < -0.7 (oversold → flip to LONG)
+- Momentum < 25 with acceleration opposing direction
+
+DEFAULT: If uncertain, reply NAY (better to miss a trade than lose money).
 
 Reply only GO, WARN, NAY, or FLIP:"""
 
