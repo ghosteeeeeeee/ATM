@@ -709,7 +709,7 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
 
 def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt: float,
                             signal_type: str = None, confidence: float = None,
-                            net_pnl: float = None):
+                            net_pnl: float = None, trade_id: int = None):
     """Record outcome for a signal type so we can track win/loss streaks.
     
     win/loss is determined by net_pnl if provided (after fees), otherwise gross pnl_usdt.
@@ -735,11 +735,12 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
                 return
             c.execute("""
                 INSERT INTO signal_outcomes
-                    (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (token.upper(), direction.upper(),
                   signal_type or 'decider', is_win,
-                  float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0)))
+                  float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0),
+                  trade_id))
             conn.commit()
             print(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
                   f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
@@ -759,7 +760,7 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
 # ─── A/B Results Recording ─────────────────────────────────────────────────────
 
 def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=None,
-                     signal_type=None, confidence=None):
+                     signal_type=None, confidence=None, trade_id=None):
     """Record trade close to ab_results table + signal_outcomes table.
 
     experiment can be:
@@ -879,7 +880,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     # This feeds the self-learning streak system so even pre-A/B trades contribute
     _record_signal_outcome(token, direction, pnl_pct, pnl_usdt,
                           signal_type=signal_type, confidence=confidence,
-                          net_pnl=net_pnl)
+                          net_pnl=net_pnl, trade_id=trade_id)
 
 
 def close_paper_position(trade_id: int, reason: str) -> bool:
@@ -1142,10 +1143,10 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                             WHERE id=%s
                         """, (round(hl_rp, 4), hype_pct, hl_ep, trade_id))
                         conn2.commit()
-                        cur2.close()
                         print(f"[Position Manager] Backfilled HL realized_pnl={hl_rp:+.4f} "
                               f"({hype_pct:+.4f}%) for trade {trade_id}")
                     finally:
+                        cur2.close()
                         conn2.close()
             except Exception as e:
                 print(f"[Position Manager] HL backfill failed (non-fatal): {e}")
@@ -1167,7 +1168,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 exp_str = str(experiment)
         # ── Always record outcome (A/B + signal_outcomes) — single call ─────────
         # _record_ab_close handles both: A/B data if present, signal_outcomes always
-        _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=net_pnl)
+        _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, net_pnl=net_pnl, trade_id=trade_id)
 
         # ── Signal outcomes via signal_schema (with real PnL) ────────────────────
         # Use net_pnl (after fees) as the authoritative PnL for the outcomes table
@@ -2442,7 +2443,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # TOP FORMING:  z_score > +1.5 AND acceleration < 0 → close LONGs
         # BOTTOM FORMING: z_score < -1.5 AND acceleration > 0 → close SHORTs
         wave_turn_fired = False
-        trailing_active = False  # always False (trailing stop is computed via ATR SL, not a separate mechanism)
+        # Bug-B fix: removed trailing_active (always False, trailing is via ATR SL)
         if SPEED_TRACKER is not None:
             spd = SPEED_TRACKER.get_token_speed(token)
             if spd:
@@ -2457,41 +2458,37 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     reason = f"wave_turn_bottom_z{z_score:+.2f}_acc{accel:+.4f}"
 
                 if wave_turn:
-                    trailing_active = False  # always False (trailing stop removed)
-                    # Don't exit if trailing is active AND position is underwater
-                    if trailing_active and live_pnl <= 0:
-                        print(f"  🌊 WAVE TURN {token} {direction} {live_pnl:+.2f}% — trailing active, skipping (still underwater)")
-                    else:
-                        close_paper_position(trade_id, f"wave_turn_{reason}")
-                        closed_count += 1
-                        wave_turn_fired = True
-                        print(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
+                    # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
+                    close_paper_position(trade_id, f"wave_turn_{reason}")
+                    closed_count += 1
+                    wave_turn_fired = True
+                    print(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
 
-                        # ── 2b. Counter-signal injection ──────────────────────────
-                        opposite_dir = 'SHORT' if direction == 'LONG' else 'LONG'
-                        counter_source = 'wave_turn,momentum'
-                        counter_conf = min(85, max(60, abs(accel) * 500 + 60))
-                        counter_sig_type = 'wave_turn'
-                        try:
-                            from signal_schema import add_signal as _add_sig
-                            new_sid = _add_sig(
-                                token=token,
-                                direction=opposite_dir,
-                                signal_type=counter_sig_type,
-                                source=counter_source,
-                                confidence=counter_conf,
-                                value=str(abs(accel)),
-                                price=cur,  # Bug-C fix: was 0, decider_run rejects price=0
-                                exchange='hyperliquid',
-                                timeframe='5m',
-                                z_score=z_score,
-                                z_score_tier='wave_turn_exit',
-                            )
-                            print(f"  🌊 WAVE TURN counter injected: {token} {opposite_dir} conf={counter_conf:.0f}% sig_id={new_sid}")
-                        except Exception as inj_err:
-                            print(f"  🌊 WAVE TURN counter injection failed for {token}: {inj_err}")
+                    # ── 2b. Counter-signal injection ──────────────────────────
+                    opposite_dir = 'SHORT' if direction == 'LONG' else 'LONG'
+                    counter_source = 'wave_turn,momentum'
+                    counter_conf = min(85, max(60, abs(accel) * 500 + 60))
+                    counter_sig_type = 'wave_turn'
+                    try:
+                        from signal_schema import add_signal as _add_sig
+                        new_sid = _add_sig(
+                            token=token,
+                            direction=opposite_dir,
+                            signal_type=counter_sig_type,
+                            source=counter_source,
+                            confidence=counter_conf,
+                            value=str(abs(accel)),
+                            price=cur,  # Bug-C fix: was 0, decider_run rejects price=0
+                            exchange='hyperliquid',
+                            timeframe='5m',
+                            z_score=z_score,
+                            z_score_tier='wave_turn_exit',
+                        )
+                        print(f"  🌊 WAVE TURN counter injected: {token} {opposite_dir} conf={counter_conf:.0f}% sig_id={new_sid}")
+                    except Exception as inj_err:
+                        print(f"  🌊 WAVE TURN counter injection failed for {token}: {inj_err}")
 
-                        continue  # Position closed — skip remaining checks
+                    continue  # Position closed — skip remaining checks
 
         # ── 3. MACD-Rules Engine Cascade Flip (2026-04-06) ───────────────────
         # Use macd_rules.py for proper entry/exit/flip signal detection.
@@ -2614,7 +2611,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         #   loss <= -0.25% → armed: speed check, log, wait for trigger
         #   loss <= -0.50% (pctl 50-80) OR -0.35% (pctl > 80) → FLIP
         cascade_flipped = False
-        if CASCADE_FLIP_ENABLED and not trailing_active and live_pnl <= CASCADE_FLIP_ARM_LOSS:
+        # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
+        if CASCADE_FLIP_ENABLED and live_pnl <= CASCADE_FLIP_ARM_LOSS:
             flip_info = check_cascade_flip(token, direction, live_pnl, SPEED_TRACKER)
             if flip_info:
                 cascade_flipped = cascade_flip(
@@ -2641,14 +2639,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # SPEED FEATURE: closes positions that are in profit but flat (stale winner)
         # or in loss but flat for 30+ min (stale loser).
         # Fires alongside trailing SL — doesn't replace it. Compliments cascade_flip.
-        # Only fires when trailing is NOT active (don't interfere with trailing exits).
-        if not trailing_active:
-            stale_close, stale_reason = check_stale_position(token, live_pnl, direction)
-            if stale_close:
-                close_paper_position(trade_id, f"stale_exit_{stale_reason}")
-                closed_count += 1
-                print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
-                continue  # Skip trailing SL update for closed position
+        # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
+        stale_close, stale_reason = check_stale_position(token, live_pnl, direction)
+        if stale_close:
+            close_paper_position(trade_id, f"stale_exit_{stale_reason}")
+            closed_count += 1
+            print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
+            continue  # Skip trailing SL update for closed position
 
         # ── 6b. SOFT PEAK-EXIT TRIGGER (1hr tight trail) ────────────────────────
         # After 1 hour open, if trade is flat/negative (hasn't gone in our direction),

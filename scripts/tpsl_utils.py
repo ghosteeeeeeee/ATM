@@ -713,10 +713,11 @@ def compute_atr_sl_tp(
         state = 'ESTABLISHED'
 
     # ── Debug distances ─────────────────────────────────────────────────────────
+    # Bug-12 fix: compute sl_entry_dist for both directions
     if direction == 'SHORT':
         sl_entry_dist = ((new_sl - entry_f) / entry_f) * 100 if entry_f > 0 else 0.0
-    else:
-        sl_entry_dist = 0.0
+    else:  # LONG
+        sl_entry_dist = ((entry_f - new_sl) / entry_f) * 100 if entry_f > 0 else 0.0
 
     # ── Debug print ─────────────────────────────────────────────────────────────
     print(f"  [TPSL] {token} {direction}: k={k:.3f} ATR={atr or 0:.4f} ({atr_pct*100:.2f}%) "

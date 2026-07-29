@@ -1141,17 +1141,20 @@ def execute_trade(token, direction, price, confidence, source,
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         log(f'  [brain.py] RC={result.returncode} stdout={result.stdout[:200] if result.stdout else "(empty)"}')
         if result.returncode == 0:
-            for line in result.stdout.split('\n'):
-                if 'trade #' in line.lower():
-                    tid = line.lower().split('trade #')[1].split()[0]
-                    if tid == 'none':
-                        return False, f'brain.py rejected: conf-1s or blacklist blocked (output: {result.stdout.strip()[:80]})'
-                    # FIX (2026-05-19): Only mark signal EXECUTED after brain.py actually
-                    # confirmed the DB INSERT succeeded. brain.py prints "✅ trade #N"
-                    # to stdout on success. If brain.py exits with RC=0 but no 'trade #'
-                    # in stdout (e.g. INSERT failed silently), treat as failure — do NOT
-                    # mark signal EXECUTED, let decider_run retry next cycle.
-                    return True, f'trade #{tid}'
+            import re
+            # Bug-14 fix: use regex instead of fragile substring split.
+            # brain.py outputs "✅ trade #123" on success, "trade #None" on rejection.
+            trade_match = re.search(r'trade\s*#\s*(\S+)', result.stdout, re.IGNORECASE)
+            if trade_match:
+                tid = trade_match.group(1)
+                if tid == 'none':
+                    return False, f'brain.py rejected: conf-1s or blacklist blocked (output: {result.stdout.strip()[:80]})'
+                # FIX (2026-05-19): Only mark signal EXECUTED after brain.py actually
+                # confirmed the DB INSERT succeeded. brain.py prints "✅ trade #N"
+                # to stdout on success. If brain.py exits with RC=0 but no 'trade #'
+                # in stdout (e.g. INSERT failed silently), treat as failure — do NOT
+                # mark signal EXECUTED, let decider_run retry next cycle.
+                return True, f'trade #{tid}'
             # RC=0 but no 'trade #' found in stdout — DB INSERT may have failed silently.
             # Do NOT mark signal EXECUTED — return failure so decider_run retries.
             log(f'  [brain.py] ⚠️ RC=0 but no trade ID in stdout — treating as failure. stdout={result.stdout[:100]}')

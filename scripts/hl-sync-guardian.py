@@ -2644,9 +2644,9 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         return
     try:
         cur = conn.cursor()
-        # Look up entry price, direction, amount, and leverage for PnL calc
+        # Look up entry price, direction, amount, leverage, and paper flag for PnL calc
         cur.execute(
-            "SELECT entry_price, direction, amount_usdt, leverage FROM trades WHERE id=%s AND status='open'",
+            "SELECT entry_price, direction, amount_usdt, leverage, paper FROM trades WHERE id=%s AND status='open'",
             (trade_id,))
         row = cur.fetchone()
         if not row:
@@ -2654,7 +2654,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             cur.close(); conn.close()
             return
 
-        entry_price, direction, amount_usdt, leverage = row
+        entry_price, direction, amount_usdt, leverage, is_paper = row
 
         # FIX (2026-04-05): Sanity-check entry_price against current market price.
         # If entry_price is <10% or >10x current market, the entry was corrupted (e.g.
@@ -2688,26 +2688,28 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         leverage = float(leverage or 1)
 
         # ── Try HL ground truth first ───────────────────────────────────
+        # Bug-O fix: skip HL fill fetch for paper-only trades (no HL position)
         hype_pnl_usdt = None
-        try:
-            # FIX (2026-04-14): Use _get_fills_cached instead of direct get_trade_history
-            # to consolidate API calls and respect rate limits.
-            window_end = int(time.time() * 1000)
-            window_start = window_end - 300_000
-            fills = _get_fills_cached(token, window_start, window_end)
-            token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
-            # BUG-FIX (2026-04-19): was filtering by side=='B' but HL fill data uses
-            # side + dir together: LONG close = side='A' dir='Close Long' (side!='B').
-            # SHORT close = side='B' dir='Close Short' (side=='B' happens to match).
-            # Using side=='B' alone misses all LONG closes — same root cause as the
-            # 2026-04-18 fix in hyperliquid_exchange.py (get_realized_pnl / mirror_get_exit_fill).
-            # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
-            close_fills = [f for f in token_fills if 'Close' in str(f.get('dir', ''))]
-            if close_fills:
-                hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
-                log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
-        except Exception as hl_err:
-            log(f'  {token} HL PnL fetch failed (using calc): {hl_err}', 'WARN')
+        if not is_paper:
+            try:
+                # FIX (2026-04-14): Use _get_fills_cached instead of direct get_trade_history
+                # to consolidate API calls and respect rate limits.
+                window_end = int(time.time() * 1000)
+                window_start = window_end - 300_000
+                fills = _get_fills_cached(token, window_start, window_end)
+                token_fills = [f for f in fills if f['coin'].upper() == token.upper()]
+                # BUG-FIX (2026-04-19): was filtering by side=='B' but HL fill data uses
+                # side + dir together: LONG close = side='A' dir='Close Long' (side!='B').
+                # SHORT close = side='B' dir='Close Short' (side=='B' happens to match).
+                # Using side=='B' alone misses all LONG closes — same root cause as the
+                # 2026-04-18 fix in hyperliquid_exchange.py (get_realized_pnl / mirror_get_exit_fill).
+                # Fix: filter on dir field containing 'Close' to catch both LONG and SHORT closes.
+                close_fills = [f for f in token_fills if 'Close' in str(f.get('dir', ''))]
+                if close_fills:
+                    hype_pnl_usdt = round(sum(f.get('closed_pnl', 0) or 0 for f in close_fills), 6)
+                    log(f'  {token} HL realized_pnl: {hype_pnl_usdt:+.4f}')
+            except Exception as hl_err:
+                log(f'  {token} HL PnL fetch failed (using calc): {hl_err}', 'WARN')
 
         # Centralized PnL calculation via pnl_utils
         pnl_pct, pnl_usdt, _ = compute_close_pnl(float(entry_price), exit_price, direction, amount_usdt)
