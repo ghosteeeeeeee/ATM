@@ -923,6 +923,7 @@ DEAD_HOURS_SIGNALS = [
     'inv-accel-300-',   # 17.2% WR dead vs 37.8% active
     'inv-accel-300+',   # 18.8% WR dead vs 31.0% active
     'accel-300+',       # 16.7% WR dead vs 33.3% active
+    'tl_break',         # all LONGs during dead hours lost (03-04 UTC data)
 ]
 DEAD_HOURS_DEFAULT = False  # False = only block listed signals, True = block ALL signals
 

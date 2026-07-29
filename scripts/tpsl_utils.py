@@ -608,59 +608,58 @@ def compute_atr_sl_tp(
     if direction == 'LONG':
         if current_sl > 0:
             current_on_wrong_side = (current_sl > current_price) if current_price > 0 else False
+            # FIX: current_sl above entry = wrong side for LONG. Force update to correct it.
+            current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
             if new_sl > current_sl:
                 # new_sl RAISES = tighten upward — correct, allow
                 result['needs_sl'] = True
+            elif current_above_entry:
+                # current_sl is above entry (wrong side for LONG).
+                # new_sl corrects it — force update (this is a correction, not loosening).
+                result['needs_sl'] = True
+                result['_force_write'] = True
             elif current_on_wrong_side:
-                # current_sl is ABOVE current_price (wrong side for LONG).
-                # The old SL should have already triggered a stop-out via guardian.
-                # If new_sl would loosen (lower than current_sl), KEEP the old SL
-                # so the guardian can still close the trade. Only force write if
-                # new_sl actually tightens (raises).
                 if new_sl > current_sl:
-                    # new_sl tightens even though wrong-side — allow correction
                     result['needs_sl'] = True
                     result['_force_write'] = True
                 else:
-                    # new_sl would loosen — keep old SL so guardian closes
                     new_sl = current_sl
                     result['needs_sl'] = False
             elif result.get('_force_write'):
-                # Guard already snapped new_sl to a safe value — allow it through
                 result['needs_sl'] = True
             else:
-                new_sl = current_sl  # would loosen (or equal) — block
+                new_sl = current_sl
                 result['needs_sl'] = False
         else:
-            result['needs_sl'] = True  # first time set
+            result['needs_sl'] = True
 
     elif direction == 'SHORT':
         if current_sl > 0:
             current_on_wrong_side = (current_sl > current_price) if current_price > 0 else False
+            # FIX: current_sl below entry = wrong side for SHORT. Force update to correct it.
+            current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
             if new_sl < current_sl:
                 # new_sl LOWERS = tighten downward — correct, allow
                 result['needs_sl'] = True
+            elif current_below_entry:
+                # current_sl is below entry (wrong side for SHORT).
+                # new_sl corrects it — force update (this is a correction, not loosening).
+                result['needs_sl'] = True
+                result['_force_write'] = True
             elif current_on_wrong_side:
-                # current_sl is BELOW current_price (wrong side for SHORT).
-                # If new_sl would loosen (higher than current_sl), KEEP the old SL
-                # so the guardian can still close the trade. Only force write if
-                # new_sl actually tightens (lowers).
                 if new_sl < current_sl:
-                    # new_sl tightens even though wrong-side — allow correction
                     result['needs_sl'] = True
                     result['_force_write'] = True
                 else:
-                    # new_sl would loosen — keep old SL so guardian closes
                     new_sl = current_sl
                     result['needs_sl'] = False
             elif result.get('_force_write'):
-                # Guard already snapped new_sl to a safe value — allow it through
                 result['needs_sl'] = True
             else:
-                new_sl = current_sl  # would loosen (or equal) — block
+                new_sl = current_sl
                 result['needs_sl'] = False
         else:
-            result['needs_sl'] = True  # first time set
+            result['needs_sl'] = True
 
     # ── BREAKEVEN GUARD (REMOVED 2026-07-26) ──────────────────────────────────
     # Previously snapped SL to entry when trade was in profit (pnl_pct >= 0).
