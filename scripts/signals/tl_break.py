@@ -68,6 +68,13 @@ TL_REJECTION_ATR_K    = 0.25  # rejection must move 0.25+ ATR away from line
 # Breakout confirmation: price must close beyond trendline + threshold
 TL_BREAKOUT_ATR_K     = 0.8   # 0.8 * ATR(14) beyond trendline (was 0.4 — too weak, caught gentle drift)
 TL_FOLLOWTHROUGH_MIN  = 4     # minimum candles closing beyond line in breakout zone
+TL_CONSECUTIVE_MIN    = 3     # minimum consecutive candles closing beyond line (stronger signal)
+
+# ATR expansion: big moves start with volatility increase
+TL_ATR_EXPANSION_MIN  = 1.2   # breakout ATR must be >= 1.2x fit ATR (20% expansion)
+
+# Breakout speed: fast breakouts succeed more
+TL_BREAKOUT_SPEED_MIN = 0.3   # minimum breakout speed in ATR units per candle
 
 # ATR settings
 TL_ATR_PERIOD         = 14
@@ -428,6 +435,52 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     if not breakout:
         return None
 
+    # ── Phase 3a: ATR expansion check — big moves start with volatility increase ──
+    # Compare ATR in breakout zone to ATR in fit zone
+    # Not a hard filter — just a confidence bonus
+    breakout_start = fit_end
+    breakout_end = min(fit_end + TL_BREAKOUT_CANDLES, n)
+    fit_closes_for_atr = closes[:fit_end]
+    breakout_closes_for_atr = closes[breakout_start:breakout_end]
+    fit_atr = _atr([{'high': c, 'low': c, 'close': c} for c in fit_closes_for_atr], TL_ATR_PERIOD)
+    breakout_atr = _atr([{'high': c, 'low': c, 'close': c} for c in breakout_closes_for_atr], TL_ATR_PERIOD)
+    if fit_atr and breakout_atr and fit_atr > 0:
+        atr_expansion = breakout_atr / fit_atr
+    else:
+        atr_expansion = 1.0  # can't compute — neutral
+
+    # ── Phase 3c: Consecutive candle check — stronger signal ──────────────
+    # Count consecutive candles closing beyond the trendline
+    # Not a hard filter — just a confidence bonus
+    consecutive = 0
+    max_consecutive = 0
+    for i in range(breakout_start, breakout_end):
+        tl_price = slope * i + intercept
+        price = closes[i]
+        if direction == 'LONG' and price > tl_price + (atr * TL_BREAKOUT_ATR_K * 0.5):
+            consecutive += 1
+            max_consecutive = max(max_consecutive, consecutive)
+        elif direction == 'SHORT' and price < tl_price - (atr * TL_BREAKOUT_ATR_K * 0.5):
+            consecutive += 1
+            max_consecutive = max(max_consecutive, consecutive)
+        else:
+            consecutive = 0  # reset on non-consecutive candle
+    # No hard filter — just use for confidence bonus
+
+    # ── Phase 3d: Breakout speed check — fast breakouts succeed more ─────
+    # Measure how far price moved beyond trendline in the breakout zone
+    # Not a hard filter — just a confidence bonus
+    breakout_move = 0.0
+    for i in range(breakout_start, min(breakout_start + 5, breakout_end)):
+        tl_price = slope * i + intercept
+        price = closes[i]
+        if direction == 'LONG':
+            breakout_move = max(breakout_move, (price - tl_price) / atr)
+        else:
+            breakout_move = max(breakout_move, (tl_price - price) / atr)
+    breakout_speed = breakout_move / 5  # ATR units per candle
+    # No hard filter — just use for confidence bonus
+
     # ── Phase 3b: Fakeout guard — post-breakout survival ────────────────────
     survival_start = fit_end + TL_BREAKOUT_CANDLES
     survival_end = min(survival_start + TL_SURVIVAL_CANDLES, n)
@@ -455,6 +508,23 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
 
     # Breakout strength bonus
     conf += min(TL_BREAKOUT_BONUS_MAX, int(breakout_strength * 2))
+
+    # ATR expansion bonus — big moves start with volatility increase
+    if atr_expansion > 1.5:
+        conf += 8  # strong expansion
+    elif atr_expansion > 1.2:
+        conf += 5  # moderate expansion
+    elif atr_expansion > 1.0:
+        conf += 2  # slight expansion
+
+    # Consecutive candle bonus — stronger signal
+    conf += min(5, max_consecutive - TL_CONSECUTIVE_MIN)
+
+    # Breakout speed bonus — fast breakouts succeed more
+    if breakout_speed > 0.5:
+        conf += 5  # fast breakout
+    elif breakout_speed > 0.3:
+        conf += 2  # moderate breakout
 
     conf = min(TL_MAX_CONFIDENCE, conf)
 
