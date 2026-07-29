@@ -549,9 +549,13 @@ def _retry_phantom_close_fills():
                 log(f'  {token} PHANTOM_CLOSE: no HL fill yet (age={age_seconds:.0f}s) — will retry next cycle', 'WARN')
 
         log(f'PHANTOM_CLOSE backfill complete: {updated}/{len(phantom_trades)} updated', 'INFO')
-        conn.close()
     except Exception as e:
         log(f'PHANTOM_CLOSE backfill error: {e}', 'FAIL')
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 # ── BUG-4/15: Persistent closed-trade dedup set ─────────────────────────────────
@@ -1872,17 +1876,19 @@ def _check_hard_stops(prices: dict):
                     # Close DB trade
                     conn2 = get_db_connection()
                     if conn2:
-                        cur2 = conn2.cursor()
-                        cur2.execute("""
-                            UPDATE trades SET status='closed', guardian_closed=TRUE,
-                                close_reason=%s, exit_reason=%s,
-                                exit_price=%s, pnl_pct=%s, close_time=NOW()
-                            WHERE id=%s AND status='open'
-                        """, (hit_reason, f'guardian_hard_{hit_reason}',
-                              cur_price, pnl_pct, trade_id))
-                        conn2.commit()
-                        cur2.close()
-                        conn2.close()
+                        try:
+                            cur2 = conn2.cursor()
+                            cur2.execute("""
+                                UPDATE trades SET status='closed', guardian_closed=TRUE,
+                                    close_reason=%s, exit_reason=%s,
+                                    exit_price=%s, pnl_pct=%s, close_time=NOW()
+                                WHERE id=%s AND status='open'
+                            """, (hit_reason, f'guardian_hard_{hit_reason}',
+                                  cur_price, pnl_pct, trade_id))
+                            conn2.commit()
+                            cur2.close()
+                        finally:
+                            conn2.close()
                     log(f'  [HARD-{hit_reason.upper()}] {token} closed at {cur_price:.6f} '
                         f'({pnl_pct:.2f}%)', 'PASS')
                     # FIX (2026-04-25): Record loss cooldown after successful HL close.
@@ -2062,9 +2068,11 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         hd = h.get('direction', 'SHORT').upper()
         if ht == token.upper():
             continue  # same token
-        # BUG-FIX: skip if this token already has an open position in the SAME direction
-        if token.upper() in open_by_dir and hd in open_by_dir[token.upper()]:
-            continue  # already has open position in this direction
+        # Bug-D fix: check if the HOT-SET CANDIDATE (ht) already has an open position
+        # in this direction. Was checking token.upper() which is the current trade's token
+        # — always false since we already filtered ht != token.upper().
+        if ht in open_by_dir and hd in open_by_dir[ht]:
+            continue  # hot-set candidate already has open position in this direction
         if hd != direction_upper:
             continue  # BUG-FIX: opposite direction — don't replace SHORT with LONG or vice versa
         # Get speed for this hot-set token
@@ -2095,7 +2103,7 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     best = candidates[0]
 
     # ── 4. Rate-limit: don't rotate same token more than once per 3 min ─────────
-    rate_file = '/root/.hermes/data/stale-rotation-rate.json'
+    rate_file = STALE_ROTATION_RATE_FILE
     rate_data = {}
     try:
         if os.path.exists(rate_file):
@@ -2318,8 +2326,6 @@ def close_orphan_paper_trades(hl_pos, prices):
         return 0, 0
 
     try:
-        cur = conn.cursor()
-
         conn.close()
 
         added_count = 0
@@ -2896,14 +2902,14 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         import sqlite3
         conn_s = sqlite3.connect(RUNTIME_DB)
         cur_s = conn_s.cursor()
-        # Dedup: check if we already recorded this exact outcome recently
-        # (same token, direction, pnl — protects against the function being
-        # called twice for the same trade close in the same sync cycle)
+        # Bug-16 fix: include trade_id in dedup — same trade may be called twice
+        # with slightly different pnl_pct rounding. Without trade_id, both insert.
         cur_s.execute("""
             SELECT id FROM signal_outcomes
             WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+            AND trade_id = ?
             AND created_at > datetime('now', '-5 minutes')
-        """, (token.upper(), direction.upper(), pnl_pct))
+        """, (token.upper(), direction.upper(), pnl_pct, trade_id))
         if cur_s.fetchone():
             log(f'  Signal outcome dedup: {token} {direction} already recorded recently, skipping', 'WARN')
             conn_s.close()
@@ -3290,13 +3296,21 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                             _record_loss_cooldown(coin, direction_sc)
                         _clear_reconciled_token(coin)
                         cur_sc.close()
-                        conn_sc.close()
                         log(f'  [SELF-CLOSE] ✅ DB trade #{trade_record["id"]} closed — exit={hl_exit_px:.6f}, pnl={computed_pnl_pct:.2f}%', 'PASS')
                     except Exception as sc_db_err:
                         log(f'  [SELF-CLOSE] ❌ DB update failed for {coin}: {sc_db_err}', 'FAIL')
                         if computed_pnl_usdt < 0:
                             _record_loss_cooldown(coin, direction_sc)
                     finally:
+                        # Bug-I fix: ensure connection is closed even on exception
+                        try:
+                            cur_sc.close()
+                        except Exception:
+                            pass
+                        try:
+                            conn_sc.close()
+                        except Exception:
+                            pass
                         breach_closed += 1
             else:
                 log(f'  [SELF-CLOSE] ❌ {coin} market close failed — will retry next cycle', 'FAIL')
@@ -3366,19 +3380,19 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             _CLOSED_THIS_CYCLE.add(str(trade_id))
             _save_closed_set()
 
-        # File lock to prevent this exact close from racing with another guardian cycle
+        # File lock to prevent this exact close from racing with another guardian cycle.
+        # Bug-E fix: hold the lock through the entire close, release AFTER critical section.
         lock_path = f'/tmp/hermes-close-lock-{tok}.lock'
         lock_fd = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o644)
-        try:
-            fcntl.flock(lock_fd, fcntl.LOCK_EX)  # blocking lock
-        finally:
-            os.close(lock_fd)
+        fcntl.flock(lock_fd, fcntl.LOCK_EX)  # blocking lock
 
         # Fire market close on HL
         success = close_position_hl(coin, breach_reason)
         if not success:
             _CLOSED_HL_COINS.discard(tok)  # Remove on failure, allow retry next cycle
             log(f'  ❌ {coin} breach close failed — will retry next cycle', 'FAIL')
+            # Bug-fix: removed os.close(lock_fd) here — the `finally` block handles
+            # lock release for ALL paths including this continue.
             continue
 
         # Wait for HL fills to appear (close_position_hl returns immediately, fills take time)
@@ -3461,6 +3475,8 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                 conn.rollback()
             except Exception:
                 pass
+        finally:
+            os.close(lock_fd)  # release lock after critical section completes
 
         time.sleep(3)
 

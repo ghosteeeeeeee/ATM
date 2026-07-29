@@ -102,7 +102,7 @@ def _get_open_tokens() -> set:
     # failed to get a DB record → guardian closing marker active → signal fires
     # anyway because _get_open_tokens only checks PostgreSQL.
     guardian_closing = set()
-    closing_file = '/root/.hermes/data/guardian-closing-markers.json'
+    closing_file = os.path.join(HERMES_DATA, 'guardian-closing-markers.json')
     try:
         if os.path.exists(closing_file):
             with FileLock('guardian_closing'):
@@ -1018,106 +1018,114 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         # per token:direction, keeping the higher-scoring entry.
         preserved = _filter_safe_prev_hotset(prev_hotset)
         if preserved:
-            # Build keyed dict of DB entries for merge
-            db_by_key = {f"{e['token']}:{e['direction']}": e for e in hotset_final}
-            # For each preserved entry: if no DB entry exists for that token:direction,
-            # add it; if DB entry exists, keep the one with higher score
-            for pe in preserved:
-                key = f"{pe['token']}:{pe['direction']}"
-                existing = db_by_key.get(key)
-                # ── FINAL CONFLUENCE GUARD for preserved entries (2026-05-12) ─────────
-                # Preserved entries passed _filter_safe_prev_hotset which has a confluence
-                # check. But when they merge with DB entries (existing), the merged entry
-                # could theoretically become single-source if the DB entry has a conflicting
-                # single source. This guard ensures the merged entry still has 2+ sources.
-                pe_src = pe.get('source', '')
-                pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
-                if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
-                    log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
-                    continue
-                elif not CONFLUENCE_REQUIRED and len(pe_parts) < 2:
-                    log(f"  ➡️  [PRESERVE-MERGE-ALLOW] {pe['token']}:{pe['direction']} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{pe_src}'")
-                # Track whether preserved entry won the merge (for APPROVED upsert below)
-                _preserved_won = False
-                if existing is None:
-                    # CRITICAL DEBUG: preserved entry enters hotset (no DB entry competition)
-                    log(f"  🔄 [PRESERVE-ADD] {pe['token']}:{pe['direction']} src='{pe_src}' parts={pe_parts} parts_count={len(pe_parts)} score={pe.get('score',0):.2f} (preserved, no DB entry)")
-                    db_by_key[key] = pe  # no DB entry — take preserved
-                    _preserved_won = True
-                elif existing.get('score', 0) <= 0 and pe.get('score', 0) <= 0:
-                    # FIX (2026-05-05): Both expired (score=0). Keep the one with lower age_m
-                    # (newer entry has better chance of being genuinely expired vs. a stale
-                    # entry from a prior compaction run that missed expiry). If pe is newer
-                    # (lower age_m), replace. If existing is newer, keep it.
-                    existing_age = existing.get('age_m', 999)
-                    pe_age = pe.get('age_m', 999)
-                    if pe_age < existing_age:
-                        db_by_key[key] = pe
-                        _preserved_won = True
-                elif existing.get('score', 0) < pe.get('score', 0):
-                    db_by_key[key] = pe  # preserved has higher score — use it
-                    _preserved_won = True
-                # else: keep DB entry (higher score)
+            # Bug-10 fix: open one connection, reuse for all preserved entries.
+            # Subagent review: commit AFTER the loop (atomic), reuse one cursor.
+            _upsert_conn = sqlite3.connect(RUNTIME_DB, timeout=30)
+            try:
+                _cur = _upsert_conn.cursor()
+                try:
+                    # Build keyed dict of DB entries for merge
+                    db_by_key = {f"{e['token']}:{e['direction']}": e for e in hotset_final}
+                    # For each preserved entry: if no DB entry exists for that token:direction,
+                    # add it; if DB entry exists, keep the one with higher score
+                    for pe in preserved:
+                        key = f"{pe['token']}:{pe['direction']}"
+                        existing = db_by_key.get(key)
+                        # ── FINAL CONFLUENCE GUARD for preserved entries (2026-05-12) ─────────
+                        # Preserved entries passed _filter_safe_prev_hotset which has a confluence
+                        # check. But when they merge with DB entries (existing), the merged entry
+                        # could theoretically become single-source if the DB entry has a conflicting
+                        # single source. This guard ensures the merged entry still has 2+ sources.
+                        pe_src = pe.get('source', '')
+                        pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
+                        if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
+                            log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
+                            continue
+                        elif not CONFLUENCE_REQUIRED and len(pe_parts) < 2:
+                            log(f"  ➡️  [PRESERVE-MERGE-ALLOW] {pe['token']}:{pe['direction']} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{pe_src}'")
+                        # Track whether preserved entry won the merge (for APPROVED upsert below)
+                        _preserved_won = False
+                        if existing is None:
+                            # CRITICAL DEBUG: preserved entry enters hotset (no DB entry competition)
+                            log(f"  🔄 [PRESERVE-ADD] {pe['token']}:{pe['direction']} src='{pe_src}' parts={pe_parts} parts_count={len(pe_parts)} score={pe.get('score',0):.2f} (preserved, no DB entry)")
+                            db_by_key[key] = pe  # no DB entry — take preserved
+                            _preserved_won = True
+                        elif existing.get('score', 0) <= 0 and pe.get('score', 0) <= 0:
+                            # FIX (2026-05-05): Both expired (score=0). Keep the one with lower age_m
+                            # (newer entry has better chance of being genuinely expired vs. a stale
+                            # entry from a prior compaction run that missed expiry). If pe is newer
+                            # (lower age_m), replace. If existing is newer, keep it.
+                            existing_age = existing.get('age_m', 999)
+                            pe_age = pe.get('age_m', 999)
+                            if pe_age < existing_age:
+                                db_by_key[key] = pe
+                                _preserved_won = True
+                        elif existing.get('score', 0) < pe.get('score', 0):
+                            db_by_key[key] = pe  # preserved has higher score — use it
+                            _preserved_won = True
+                        # else: keep DB entry (higher score)
 
-                # ── APPROVED-DB upsert when preserved entry won the merge (2026-05-21) ──
-                # FIX: Preserved entries bypass the PENDING→APPROVED gate because they have
-                # no DB row (or the DB row lost the merge). Without an APPROVED row in the DB,
-                # decider_run's get_approved_signals() returns [] and no trades fire — even
-                # though the token is legitimately in hotset.json. This ensures decider_run
-                # can find and execute the preserved entry.
-                if _preserved_won and not dry:
-                    try:
-                        _pe_ck = pe.get('combo_key') or f"{pe['token']}:{pe['direction']}:{pe_src}"
-                        _conn = sqlite3.connect(RUNTIME_DB, timeout=30)
-                        _cur = _conn.cursor()
-                        _cur.execute("""
-                            SELECT id, survival_rounds FROM signals
-                            WHERE token=? AND direction=? AND decision='APPROVED' AND executed=0
-                            LIMIT 1
-                        """, (pe['token'], pe.get('direction','')))
-                        _row = _cur.fetchone()
-                        if _row:
-                            _prev_sr = _row[1] or 0
-                            _new_sr = max(_prev_sr, int(pe.get('rounds', 1)))
-                            _cur.execute("""
-                                UPDATE signals
-                                SET survival_rounds=MAX(COALESCE(survival_rounds,0), ?),
-                                    hot_cycle_count=COALESCE(hot_cycle_count,0)+1,
-                                    updated_at=CURRENT_TIMESTAMP,
-                                    source=?,
-                                    combo_key=?
-                                WHERE id=?
-                            """, (_new_sr, pe_src, _pe_ck, _row[0]))
-                        else:
-                            _cur.execute("""
-                                INSERT INTO signals (
-                                    token, direction, signal_type, source, confidence,
-                                    decision, executed, z_score, survival_rounds,
-                                    hot_cycle_count, combo_key, price, created_at,
-                                    updated_at
-                                ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?,
-                                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                            """, (
-                                pe['token'], pe.get('direction',''),
-                                pe.get('signal_type','hot-set'),
-                                pe_src,
-                                pe.get('confidence', 50.0) or 50.0,
-                                pe.get('z_score', 0) or 0,
-                                int(pe.get('rounds', 1)),
-                                _pe_ck,
-                                pe.get('price') or 0,
-                            ))
-                        _conn.commit()
-                        _conn.close()
-                        log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
-                    except Exception as _e:
-                        import traceback
-                        log(f"  ⚠️  [PRESERVE-APPROVED-FAIL] {pe['token']}: {_e}")
-                        log(f"     Stack: {traceback.format_exc()[:200]}")
-            hotset_final = list(db_by_key.values())
-            # Re-sort by score descending
-            hotset_final.sort(key=lambda x: x.get('score', 0), reverse=True)
-            log(f"Merged {len(preserved)} preserved entries with {len(db_by_key)} DB entries")
+                        # ── APPROVED-DB upsert when preserved entry won the merge (2026-05-21) ──
+                        # FIX: Preserved entries bypass the PENDING→APPROVED gate because they have
+                        # no DB row (or the DB row lost the merge). Without an APPROVED row in the DB,
+                        # decider_run's get_approved_signals() returns [] and no trades fire — even
+                        # though the token is legitimately in hotset.json. This ensures decider_run
+                        # can find and execute the preserved entry.
+                        if _preserved_won and not dry:
+                            try:
+                                _pe_ck = pe.get('combo_key') or f"{pe['token']}:{pe['direction']}:{pe_src}"
+                                _cur.execute("""
+                                    SELECT id, survival_rounds FROM signals
+                                    WHERE token=? AND direction=? AND decision='APPROVED' AND executed=0
+                                    LIMIT 1
+                                """, (pe['token'], pe.get('direction','')))
+                                _row = _cur.fetchone()
+                                if _row:
+                                    _prev_sr = _row[1] or 0
+                                    _new_sr = max(_prev_sr, int(pe.get('rounds', 1)))
+                                    _cur.execute("""
+                                        UPDATE signals
+                                        SET survival_rounds=MAX(COALESCE(survival_rounds,0), ?),
+                                            hot_cycle_count=COALESCE(hot_cycle_count,0)+1,
+                                            updated_at=CURRENT_TIMESTAMP,
+                                            source=?,
+                                            combo_key=?
+                                        WHERE id=?
+                                    """, (_new_sr, pe_src, _pe_ck, _row[0]))
+                                else:
+                                    _cur.execute("""
+                                        INSERT INTO signals (
+                                            token, direction, signal_type, source, confidence,
+                                            decision, executed, z_score, survival_rounds,
+                                            hot_cycle_count, combo_key, price, created_at,
+                                            updated_at
+                                        ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?,
+                                            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                                    """, (
+                                        pe['token'], pe.get('direction',''),
+                                        pe.get('signal_type','hot-set'),
+                                        pe_src,
+                                        pe.get('confidence', 50.0) or 50.0,
+                                        pe.get('z_score', 0) or 0,
+                                        int(pe.get('rounds', 1)),
+                                        _pe_ck,
+                                        pe.get('price') or 0,
+                                    ))
+                                log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
+                            except Exception as _e:
+                                import traceback
+                                log(f"  ⚠️  [PRESERVE-APPROVED-FAIL] {pe['token']}: {_e}")
+                                log(f"     Stack: {traceback.format_exc()[:200]}")
+                    # Single atomic commit after all preserved entries processed
+                    _upsert_conn.commit()
+                finally:
+                    _cur.close()
+                hotset_final = list(db_by_key.values())
+                # Re-sort by score descending
+                hotset_final.sort(key=lambda x: x.get('score', 0), reverse=True)
+                log(f"Merged {len(preserved)} preserved entries with {len(db_by_key)} DB entries")
+            finally:
+                _upsert_conn.close()
 
         # Cap at 10
         hotset_final = hotset_final[:10]
@@ -1457,7 +1465,6 @@ def _purge_executed_signals(hours=1, dry=False):
     # First: get all EXECUTED signals older than cutoff
     conn = sqlite3.connect(RUNTIME_DB, timeout=30)
     c = conn.cursor()
-    cutoff = datetime.now().replace(microsecond=0).isoformat()
     c.execute("""
         SELECT id, token, direction FROM signals
         WHERE decision = 'EXECUTED'
@@ -1487,7 +1494,7 @@ def _purge_executed_signals(hours=1, dry=False):
     except Exception as pg_err:
         log(f"[WARN] Could not connect to PostgreSQL to verify signals: {pg_err}")
         log(f"  Falling back to blind purge — signal-to-trade linkage check SKIPPED")
-        deleted = _do_purge(conn, c, cutoff, hours)
+        deleted = _do_purge(conn, c, hours)
         conn.close()
         return
 
@@ -1520,14 +1527,14 @@ def _purge_executed_signals(hours=1, dry=False):
     pg_cur.close()
     pg_conn.close()
 
-    deleted = _do_purge(conn, c, cutoff, hours)
+    deleted = _do_purge(conn, c, hours)
     conn.close()
 
     log(f"Purged {deleted} executed signals older than {hours}h"
         + (f", restored {restored} phantom signals to PENDING" if restored else ""))
 
 
-def _do_purge(conn, c, cutoff, hours):
+def _do_purge(conn, c, hours):
     """Execute the actual DELETE for _purge_executed_signals. Returns rowcount."""
     c.execute("""
         DELETE FROM signals

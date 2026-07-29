@@ -479,7 +479,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     if trailing_distance is None:
         trailing_distance = TRAILING_DISTANCE_PCT
 
-    leverage = max(1, min(int(leverage), 5))  # cap at 5x
+    leverage = max(1, int(leverage))  # caller (decider_run.py:2415) already caps at 5x
 
     # ── Step 3: mirror_open on HL ──────────────────────────────────────
     print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage})")
@@ -707,10 +707,23 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
         skip_hl: If True, skip HL /info lookup and use signal-based PnL directly.
                  Saves 1 HL API call per close. Use for automated closes (profit-monster,
                  guardian, etc.) where signal exit price is sufficient.
-    """
-    conn = get_db_connection()
-    cur = conn.cursor()
 
+    Bug-G fix: wrap entire body in try/finally to prevent connection leak on any error.
+    """
+    # Bug-G fix: use try/finally wrapper for connection safety
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        try:
+            _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur)
+        finally:
+            cur.close()
+    finally:
+        conn.close()
+
+
+def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur):
+    """Implementation of close_trade. Assumes conn/cur are managed by caller."""
     # Get trade metadata
     cur.execute("""SELECT entry_price, amount_usdt, direction, leverage,
                           token, open_time, hl_notional_usdt,
@@ -718,7 +731,6 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
                    FROM trades WHERE id = %s""", (trade_id,))
     row = cur.fetchone()
     if not row:
-        cur.close(); conn.close()
         return False
 
     entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt, signal, signal_z_score_tier, signal_momentum_state = row
@@ -849,8 +861,6 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
         except Exception:
             pass  # fail-open
 
-    cur.close()
-    conn.close()
     return True
 
 def list_trades(status: str = None, limit: int = 20):

@@ -1909,7 +1909,10 @@ def run(dry_run=False):
         conn_rate.close()
         if row and row[0]:
             import datetime
-            gap = (datetime.datetime.now() - row[0].replace(tzinfo=None)).total_seconds()
+            # DB column is timestamp without time zone (naive). Localize as UTC
+            # so subtraction with timezone-aware now() works correctly.
+            ts = row[0].replace(tzinfo=datetime.timezone.utc) if row[0].tzinfo is None else row[0]
+            gap = (datetime.datetime.now(datetime.timezone.utc) - ts).total_seconds()
             if gap < 15:
                 log(f'SKIP: Rate limit — last entry {gap:.0f}s ago (min 15s gap)')
                 return 0, 0

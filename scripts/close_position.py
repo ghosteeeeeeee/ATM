@@ -12,7 +12,7 @@ from hyperliquid_exchange import close_position, get_open_hype_positions_curl, g
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT
 
 from hermes_log import log
-PAPER_JSON = "/var/www/hermes/data/trades.json"
+from paths import TRADES_JSON as PAPER_JSON
 BRAIN_DB   = {'host': '/var/run/postgresql', 'database': 'brain', 'user': 'postgres'}
 
 def get_exit_price(coin):

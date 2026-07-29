@@ -30,7 +30,6 @@ TASKS_FILE      = '/root/.hermes/brain/TASKS.md'
 PROJECTS_FILE   = '/root/.hermes/brain/PROJECTS.md'
 LOG_FILE        = '/root/.hermes/logs/away_detector.log'
 PIPELINE_HB     = PIPELINE_HB_FILE
-HL_STATUS_FILE  = '/root/.hermes/data/hype_live_trading.json'
 DEBOUNCE_HOURS  = 2   # Don't re-spawn if we ran < 2h ago
 AWAY_THRESHOLD  = 20  # minutes
 # ────────────────────────────────────────────────────────────────────────────

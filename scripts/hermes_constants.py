@@ -341,6 +341,7 @@ SL_PCT_FALLBACK    = 0.008  # 0.8% if ATR unavailable
 TP_PCT_FALLBACK    = 0.015  # 1.5% fallback target
 STOP_LOSS_DEFAULT  = 0.008  # 0.8% hard fallback
 SL_PCT_MIN        = 0.005  # 0.5% minimum SL for any trade (hard floor)
+CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
 # When price reaches +TRAILING_ACTIVATION_PCT above entry, SL trails to breakeven.
@@ -532,7 +533,7 @@ HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
 # ── Profit Monster ─────────────────────────────────────────────────────────────
 # profit_monster.py — closes medium-profit positions (2-5%) at random intervals.
 # Never touches losing positions.
-PROFIT_MIN_PCT    = 2.0    # 0.5% floor — take profit at 0.5% and above
+PROFIT_MIN_PCT    = 1.0    # 0.5% floor — take profit at 0.5% and above
 PROFIT_MAX_PCT    = 5.0    # 2.0% ceiling — don't hold for big moves
 MAX_CLOSE_PER_WAKE = 3
 SKIP_TOP_PCT      = 0     # don't touch the top 20% most profitable

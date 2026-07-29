@@ -369,6 +369,14 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     if atr is None:
         return None
 
+    # ── Speed check: need some momentum to trade ───────────────────────────
+    # Speed = rate of change over last 5 candles vs previous 5
+    if len(closes) >= 10:
+        recent_move = closes[-1] - closes[-5]
+        speed = abs(recent_move) / (atr + 1e-10)  # move in ATR units
+        if speed < 0.3:
+            return None  # no wave — sitting in whitewater
+
     n = len(closes)
     fit_end = int(n * TL_FIT_CUTOFF)
 
@@ -394,6 +402,20 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     # Filter: too many bounces = noise, not trendline touches
     if n_bounces / fit_end > TL_MAX_BOUNCE_RATIO:
         return None
+
+    # ── Phase 2b: Z-score filter — block counter-trend traps ─────────────────
+    # All recent losing LONGs had z < -1.5 (strong downtrend).
+    # Don't fire LONG in strong downtrend, SHORT in strong uptrend.
+    import statistics as _stat
+    recent_closes = closes[-20:] if len(closes) >= 20 else closes
+    if len(recent_closes) >= 10:
+        _mean = _stat.mean(recent_closes)
+        _stdev = _stat.stdev(recent_closes) if len(recent_closes) > 1 else 1
+        _z = (recent_closes[-1] - _mean) / _stdev if _stdev > 0 else 0
+        if direction == 'LONG' and _z < -1.5:
+            return None  # strong downtrend — don't catch falling knife
+        if direction == 'SHORT' and _z > 1.5:
+            return None  # strong uptrend — don't fade momentum
 
     # ── Phase 3: Breakout confirmation ─────────────────────────────────────
     breakout, breakout_strength, follow_count = _detect_breakout(

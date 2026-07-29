@@ -297,7 +297,7 @@ def check_cooldowns():
     expired = 0
     try:
         import json
-        fpath = '/root/.hermes/data/signal-cooldowns.json'
+        fpath = COOLDOWN_FILE
         if os.path.exists(fpath):
             with open(fpath) as f:
                 data = json.load(f)

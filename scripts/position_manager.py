@@ -58,6 +58,7 @@ except Exception as e:
 from hermes_constants import (
     STALE_WINNER_TIMEOUT_MINUTES, STALE_LOSER_TIMEOUT_MINUTES,
     STALE_WINNER_MIN_PROFIT, STALE_LOSER_MAX_LOSS, VEL_STALE_THRESHOLD_PCT,
+    CUT_LOSER_PNL as CUT_LOSER_PNL_HERMES,
 )
 
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
@@ -81,7 +82,7 @@ _PM_HEARTBEAT_FILE = PIPELINE_HB_FILE
 MAX_POSITIONS = MAX_OPEN_POSITIONS
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
-CUT_LOSER_PNL = -2.0   # cut if pnl_pct <= -2.0%
+CUT_LOSER_PNL = CUT_LOSER_PNL_HERMES  # from hermes_constants.py (was hardcoded -2.0)
 ATR_UPDATE_THRESHOLD_PCT = ATR_UPDATE_THRESHOLD  # only push SL/TP update to HL if delta > 0.15%
 MAX_LEVERAGE = 5
 
@@ -215,13 +216,9 @@ def _get_trigger_threshold(token: str, speed_tracker) -> float:
 
 
 # ─── Loss Cooldown Config ─────────────────────────────────────────────────────
-# Imported from paths.py (SINGLE SOURCE). Do not redefine inline — import instead.
-# This prevents the bug where hl-sync-guardian.py and position_manager.py had
-# different values for the same constants, causing get_cooldown to disagree with
-# _record_loss_cooldown.
-from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX
+# Imported from hermes_constants (SINGLE SOURCE). Do not redefine inline.
+from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, WIN_COOLDOWN_MINUTES
 LOSS_STREAK_RESET_WIN   = True   # reset streak to 0 after a win (good trend continuation)
-WIN_COOLDOWN_MINUTES    = 5     # block same direction for 5 min after a win
 
 # ─── DB Helpers ────────────────────────────────────────────────────────────────
 def get_db_connection():
@@ -362,7 +359,7 @@ def should_cut_loser(pnl_pct: float, trade: Dict = None) -> bool:
 
 
 # Guardian closing marker path (same as hl-sync-guardian.py)
-_GUARDIAN_CLOSING_FILE = '/root/.hermes/data/guardian-closing-markers.json'
+_GUARDIAN_CLOSING_FILE = os.path.join(HERMES_DATA, 'guardian-closing-markers.json')
 
 def _is_closing_marker_active(token: str) -> bool:
     """Check if guardian is currently closing this token — skip ATR check if so."""
@@ -520,7 +517,7 @@ def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[b
 SIGNAL_DB = RUNTIME_DB
 
 def _ensure_signal_outcomes_table():
-    """Create signal_outcomes table if it doesn't exist."""
+    """Create signal_outcomes table if it doesn't exist. Add trade_id column if missing."""
     import sqlite3
     try:
         conn = sqlite3.connect(SIGNAL_DB)
@@ -535,10 +532,16 @@ def _ensure_signal_outcomes_table():
                 pnl_pct REAL NOT NULL,
                 pnl_usdt REAL NOT NULL,
                 confidence REAL,
+                trade_id INTEGER,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 closed_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        # Add trade_id column if missing from existing table
+        try:
+            c.execute("SELECT trade_id FROM signal_outcomes LIMIT 1")
+        except Exception:
+            c.execute("ALTER TABLE signal_outcomes ADD COLUMN trade_id INTEGER")
         c.execute("""
             CREATE INDEX IF NOT EXISTS idx_sigout_token ON signal_outcomes(token, direction)
         """)
@@ -663,41 +666,43 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
     # Write to brain.trade_patterns
     try:
         conn_brain = psycopg2.connect(**BRAIN_DB_DICT)
-        cur_brain = conn_brain.cursor()
+        try:
+            cur_brain = conn_brain.cursor()
 
-        for row in rows:
-            sig_type, cround, survived, score_b, score_a, reason = row
-            # Pattern name: direction + token + signal_type + outcome
-            pattern_name = f"survival_{direction.lower()}_{token.lower()}_{sig_type}_{'win' if is_win else 'loss'}"
-            is_positive = 1 if is_win else 0
+            for row in rows:
+                sig_type, cround, survived, score_b, score_a, reason = row
+                # Pattern name: direction + token + signal_type + outcome
+                pattern_name = f"survival_{direction.lower()}_{token.lower()}_{sig_type}_{'win' if is_win else 'loss'}"
+                is_positive = 1 if is_win else 0
 
-            cur_brain.execute("""
-                INSERT INTO trade_patterns
-                    (pattern_name, token, side, is_positive, confidence,
-                     adjustment, sample_count, reason, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, 1, %s, NOW())
-                ON CONFLICT (pattern_name, token) DO UPDATE SET
-                    sample_count = trade_patterns.sample_count + 1,
-                    is_positive = CASE
-                        WHEN trade_patterns.is_positive = 1 THEN 1
-                        WHEN trade_patterns.is_positive = 0 AND %s = 1 THEN 1
-                        ELSE trade_patterns.is_positive END,
-                    confidence = (trade_patterns.confidence * trade_patterns.sample_count + %s)
-                                / (trade_patterns.sample_count + 1),
-                    updated_at = NOW()
-            """, (
-                pattern_name, token.upper(), direction.upper(), is_positive,
-                0.7 if is_win else 0.4,
-                json.dumps({'compact_rounds': cround, 'score_before': score_b,
-                            'score_after': score_a, 'survival_reason': reason}),
-                is_positive,
-                0.7 if is_win else 0.4,
-            ))
+                cur_brain.execute("""
+                    INSERT INTO trade_patterns
+                        (pattern_name, token, side, is_positive, confidence,
+                         adjustment, sample_count, reason, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, 1, %s, NOW())
+                    ON CONFLICT (pattern_name, token) DO UPDATE SET
+                        sample_count = trade_patterns.sample_count + 1,
+                        is_positive = CASE
+                            WHEN trade_patterns.is_positive = 1 THEN 1
+                            WHEN trade_patterns.is_positive = 0 AND %s = 1 THEN 1
+                            ELSE trade_patterns.is_positive END,
+                        confidence = (trade_patterns.confidence * trade_patterns.sample_count + %s)
+                                    / (trade_patterns.sample_count + 1),
+                        updated_at = NOW()
+                """, (
+                    pattern_name, token.upper(), direction.upper(), is_positive,
+                    0.7 if is_win else 0.4,
+                    json.dumps({'compact_rounds': cround, 'score_before': score_b,
+                                'score_after': score_a, 'survival_reason': reason}),
+                    is_positive,
+                    0.7 if is_win else 0.4,
+                ))
 
-        conn_brain.commit()
-        cur_brain.close()
-        conn_brain.close()
-        print(f"[Position Manager] _bridge: wrote {len(rows)} patterns for {token} {direction} ({'WIN' if is_win else 'LOSS'})")
+            conn_brain.commit()
+            cur_brain.close()
+            print(f"[Position Manager] _bridge: wrote {len(rows)} patterns for {token} {direction} ({'WIN' if is_win else 'LOSS'})")
+        finally:
+            conn_brain.close()
     except Exception as e:
         print(f"[Position Manager] _bridge: failed to write to trade_patterns: {e}")
 
@@ -716,29 +721,30 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
     is_win = 1 if float(record_pnl or 0) > 0 else 0
     try:
         conn = sqlite3.connect(SIGNAL_DB)
-        c = conn.cursor()
-        # Dedup: skip if we already recorded this exact outcome in the last 5 min
-        c.execute("""
-            SELECT id FROM signal_outcomes
-            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
-            AND created_at > datetime('now', '-5 minutes')
-        """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
-        if c.fetchone():
-            print(f"[Signal Quality] Dedup: {signal_type or 'decider'} {direction} {token} "
-                  f"already recorded recently, skipping")
+        try:
+            c = conn.cursor()
+            # Dedup: skip if we already recorded this exact outcome in the last 5 min
+            c.execute("""
+                SELECT id FROM signal_outcomes
+                WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+                AND created_at > datetime('now', '-5 minutes')
+            """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
+            if c.fetchone():
+                print(f"[Signal Quality] Dedup: {signal_type or 'decider'} {direction} {token} "
+                      f"already recorded recently, skipping")
+                return
+            c.execute("""
+                INSERT INTO signal_outcomes
+                    (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (token.upper(), direction.upper(),
+                  signal_type or 'decider', is_win,
+                  float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0)))
+            conn.commit()
+            print(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
+                  f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
+        finally:
             conn.close()
-            return
-        c.execute("""
-            INSERT INTO signal_outcomes
-                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (token.upper(), direction.upper(),
-              signal_type or 'decider', is_win,
-              float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0)))
-        conn.commit()
-        conn.close()
-        print(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
-              f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
     except Exception as e:
         print(f"[Position Manager] _record_signal_outcome error: {e}")
 
@@ -960,9 +966,10 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # (e.g. "trailing_exit_-0.55%"), use that to determine loss/win.
         # close_paper_position() uses current_price which may have reverted to entry
         # by the time the exit is processed, losing the realized PnL info.
-        if pnl_usdt_val == 0 and reason:
+        # Bug-20 fix: use tolerance instead of strict == 0 (float comparison).
+        if abs(pnl_usdt_val) < 0.01 and reason:
             import re
-            m = re.search(r'([+-]\d+\.\d+)%', reason)
+            m = re.search(r'([+-]?\d+(?:\.\d+)?)%', reason)
             if m:
                 pnl_pct_from_reason = float(m.group(1))
                 # pnl_pct_from_reason is the realized pnl% at time of exit
@@ -1106,36 +1113,40 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             conn.commit()
 
         # ── Backfill HL ground truth after close ───────────────────
-        # mirror_close returns {hl_exit_price, hl_realized_pnl} — backfill these
-        # into hype_realized_pnl_* columns so we have ground-truth PnL going forward.
-        if hl_exit_info and hl_exit_info.get('hl_realized_pnl') is not None:
+        # mirror_close returns {success, hl_exit_price, hl_realized_pnl} — backfill
+        # these into hype_realized_pnl_* columns for ground-truth PnL.
+        # Bug-3 fix: check success key explicitly, not dict truthiness (empty dict is falsy).
+        # Bug-F fix: wrap in try/finally to prevent connection leak on partial failure.
+        if hl_exit_info and hl_exit_info.get('success') and hl_exit_info.get('hl_realized_pnl') is not None:
             try:
                 conn2 = get_db_connection()
                 if conn2:
-                    cur2 = conn2.cursor()
-                    hl_rp = hl_exit_info.get('hl_realized_pnl', 0)
-                    hl_ep = hl_exit_info.get('hl_exit_price')
-                    # Use stored amount_usdt for pct calculation
-                    cur2.execute(
-                        "SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id=%s",
-                        (trade_id,))
-                    row = cur2.fetchone()
-                    # Bug-fix (2026-05-20): same 0.0-falsy issue — use explicit None check.
-                    amt = float(row[0]) if row and row[0] is not None else DEFAULT_TRADE_SIZE_USDT
-                    calc_notional = float(row[1]) if row and row[1] is not None else amt
-                    hype_pct = round(hl_rp / calc_notional * 100, 4) if calc_notional else 0
-                    cur2.execute("""
-                        UPDATE trades SET
-                            hype_realized_pnl_usdt = %s,
-                            hype_realized_pnl_pct = %s,
-                            exit_price = COALESCE(%s, exit_price)
-                        WHERE id=%s
-                    """, (round(hl_rp, 4), hype_pct, hl_ep, trade_id))
-                    conn2.commit()
-                    cur2.close()
-                    conn2.close()
-                    print(f"[Position Manager] Backfilled HL realized_pnl={hl_rp:+.4f} "
-                          f"({hype_pct:+.4f}%) for trade {trade_id}")
+                    try:
+                        cur2 = conn2.cursor()
+                        hl_rp = hl_exit_info.get('hl_realized_pnl', 0)
+                        hl_ep = hl_exit_info.get('hl_exit_price')
+                        # Use stored amount_usdt for pct calculation
+                        cur2.execute(
+                            "SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id=%s",
+                            (trade_id,))
+                        row = cur2.fetchone()
+                        # Bug-fix (2026-05-20): same 0.0-falsy issue — use explicit None check.
+                        amt = float(row[0]) if row and row[0] is not None else DEFAULT_TRADE_SIZE_USDT
+                        calc_notional = float(row[1]) if row and row[1] is not None else amt
+                        hype_pct = round(hl_rp / calc_notional * 100, 4) if calc_notional else 0
+                        cur2.execute("""
+                            UPDATE trades SET
+                                hype_realized_pnl_usdt = %s,
+                                hype_realized_pnl_pct = %s,
+                                exit_price = COALESCE(%s, exit_price)
+                            WHERE id=%s
+                        """, (round(hl_rp, 4), hype_pct, hl_ep, trade_id))
+                        conn2.commit()
+                        cur2.close()
+                        print(f"[Position Manager] Backfilled HL realized_pnl={hl_rp:+.4f} "
+                              f"({hype_pct:+.4f}%) for trade {trade_id}")
+                    finally:
+                        conn2.close()
             except Exception as e:
                 print(f"[Position Manager] HL backfill failed (non-fatal): {e}")
 
@@ -2470,7 +2481,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 source=counter_source,
                                 confidence=counter_conf,
                                 value=str(abs(accel)),
-                                price=0,
+                                price=cur,  # Bug-C fix: was 0, decider_run rejects price=0
                                 exchange='hyperliquid',
                                 timeframe='5m',
                                 z_score=z_score,
@@ -2639,38 +2650,126 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
                 continue  # Skip trailing SL update for closed position
 
+        # ── 6b. SOFT PEAK-EXIT TRIGGER (1hr tight trail) ────────────────────────
+        # After 1 hour open, if trade is flat/negative (hasn't gone in our direction),
+        # set a tight trailing SL 0.3% from current price. The trailing engine then
+        # tightens this as price moves favorably. Captures whatever profit is available.
+        SOFT_TRIGGER_HOURS = 1.0
+        SOFT_TRAIL_PCT = 0.003  # 0.3% trailing distance
+        _ot = pos.get('open_time')
+        if _ot and live_pnl <= 0:
+            try:
+                if isinstance(_ot, str):
+                    _ot_dt = datetime.fromisoformat(_ot.replace('Z', '+00:00'))
+                else:
+                    _ot_dt = _ot
+                if _ot_dt.tzinfo is None:
+                    _ot_dt = _ot_dt.replace(tzinfo=timezone.utc)
+                _age_h = (datetime.now(timezone.utc) - _ot_dt).total_seconds() / 3600
+                if _age_h >= SOFT_TRIGGER_HOURS:
+                    cur_sl = float(pos.get('stop_loss') or 0)
+                    cur_price = float(pos.get('current_price') or 0)
+                    if cur_sl > 0 and cur_price > 0:
+                        need_update = False
+                        if direction == 'LONG':
+                            # Tight trail: SL just below current price
+                            soft_sl = round(cur_price * (1 - SOFT_TRAIL_PCT), 8)
+                            # Only raise SL (trailing gate semantics) — never lower
+                            if soft_sl > cur_sl:
+                                new_sl = soft_sl
+                                need_update = True
+                        elif direction == 'SHORT':
+                            # Tight trail: SL just above current price
+                            soft_sl = round(cur_price * (1 + SOFT_TRAIL_PCT), 8)
+                            # Only lower SL (trailing gate semantics) — never raise
+                            if soft_sl < cur_sl:
+                                new_sl = soft_sl
+                                need_update = True
+                        if need_update:
+                            pos['stop_loss'] = new_sl
+                            # Persist to DB so ATR engine sees the floor
+                            _conn_st = get_db_connection()
+                            if _conn_st:
+                                _cur_st = None
+                                try:
+                                    _cur_st = get_cursor(_conn_st)
+                                    _cur_st.execute("""
+                                        UPDATE trades SET stop_loss = %s, updated_at = NOW()
+                                        WHERE id = %s AND status = 'open'
+                                    """, (new_sl, trade_id))
+                                    _conn_st.commit()
+                                except Exception as e:
+                                    print(f"  SOFT TRIGGER DB write failed for {token}: {e}")
+                                finally:
+                                    if _cur_st:
+                                        _cur_st.close()
+                                    _conn_st.close()
+                            print(f"  SOFT TRIGGER {token} {direction} SL set to {new_sl:.6f} "
+                                  f"(was {cur_sl:.6f}, 0.3% trail from {cur_price:.6f}, "
+                                  f"age={_age_h:.1f}h, pnl={live_pnl:+.2f}%)")
+            except Exception as e:
+                print(f"  SOFT TRIGGER error for {token}: {e}")
+
         # ── 7. HARD MAX-LOSS EXIT ──────────────────────────────────────────────
         # Safety net: if trade is losing >= HARD_MAX_LOSS_PCT, close immediately.
         # No stall/speed/SL checks — this is a hard stop to prevent deep bleeding.
         # Covers the gap between stale loser (-0.6%) and guardian cut_loser (-5%).
-        HARD_MAX_LOSS_PCT = -2.0
+        HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES
         if live_pnl <= HARD_MAX_LOSS_PCT:
             close_paper_position(trade_id, f"hard_max_loss_{live_pnl:+.2f}%")
             closed_count += 1
             print(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}%]")
             continue
 
-        # ── 8. TIME-BASED EXIT (slow bleed) ────────────────────────────────────
-        # If trade has been open > 2h AND is in loss, close it.
-        # Catches the "slow bleed" pattern where price oscillates just below SL.
-        TIME_EXIT_HOURS = 2
-        if live_pnl < 0:
-            _ot = pos.get('open_time')
-            if _ot:
-                try:
-                    from datetime import datetime as _dt
-                    if isinstance(_ot, str):
-                        _ot_dt = _dt.fromisoformat(_ot.replace('Z', '+00:00'))
-                    else:
-                        _ot_dt = _ot
-                    _age_h = (_dt.now() - _ot_dt).total_seconds() / 3600
-                    if _age_h >= TIME_EXIT_HOURS:
-                        close_paper_position(trade_id, f"time_exit_{_age_h:.1f}h_{live_pnl:+.2f}%")
-                        closed_count += 1
-                        print(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")
-                        continue
-                except Exception:
-                    pass
+        # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
+        # Catches two patterns:
+        #   a) Slow bleed: open > 2h AND in loss → close
+        #   b) Gave-it-all-back: was in profit (peak > +0.3%) but now losing, open > 1h → close
+        #    Prevents watching a winning trade turn into a loser.
+        _ot = pos.get('open_time')
+        if _ot:
+            try:
+                if isinstance(_ot, str):
+                    _ot_dt = datetime.fromisoformat(_ot.replace('Z', '+00:00'))
+                else:
+                    _ot_dt = _ot
+                if _ot_dt.tzinfo is None:
+                    _ot_dt = _ot_dt.replace(tzinfo=timezone.utc)
+                _age_h = (datetime.now(timezone.utc) - _ot_dt).total_seconds() / 3600
+
+                # (a) Slow bleed: 2h+ in loss
+                if live_pnl < 0 and _age_h >= 2.0:
+                    close_paper_position(trade_id, f"time_exit_{_age_h:.1f}h_{live_pnl:+.2f}%")
+                    closed_count += 1
+                    print(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")
+                    continue
+
+                # (b) Gave-it-all-back: was in profit but now losing, 1h+ open
+                if live_pnl < 0 and _age_h >= 1.0:
+                    peak_high = float(pos.get('highest_price') or 0)
+                    peak_low = float(pos.get('lowest_price') or 0)
+                    entry_f = float(pos.get('entry_price') or 0)
+                    if entry_f > 0:
+                        if direction == 'LONG' and peak_high > 0:
+                            peak_pnl_pct = (peak_high - entry_f) / entry_f * 100
+                            if peak_pnl_pct >= 0.3:
+                                close_paper_position(trade_id,
+                                    f"peak_exit_{_age_h:.1f}h_peak{peak_pnl_pct:+.2f}%_now{live_pnl:+.2f}%")
+                                closed_count += 1
+                                print(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
+                                      f"[was +{peak_pnl_pct:.2f}%, now {live_pnl:+.2f}%, {_age_h:.1f}h]")
+                                continue
+                        elif direction == 'SHORT' and peak_low > 0:
+                            peak_pnl_pct = (entry_f - peak_low) / entry_f * 100
+                            if peak_pnl_pct >= 0.3:
+                                close_paper_position(trade_id,
+                                    f"peak_exit_{_age_h:.1f}h_peak{peak_pnl_pct:+.2f}%_now{live_pnl:+.2f}%")
+                                closed_count += 1
+                                print(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
+                                      f"[was +{peak_pnl_pct:.2f}%, now {live_pnl:+.2f}%, {_age_h:.1f}h]")
+                                continue
+            except Exception as e:
+                print(f"  TIME EXIT error for {token}: {e}")
 
     # ── End of per-position loop ─────────────────────────────────────────────
 

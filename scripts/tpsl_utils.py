@@ -619,7 +619,11 @@ def compute_atr_sl_tp(
                 result['needs_sl'] = True
                 result['_force_write'] = True
             elif current_on_wrong_side:
-                if new_sl > current_sl:
+                # Bug-11 fix: current_sl is above current_price (wrong side for LONG).
+                # Allow if new_sl is on the correct side (below current_price).
+                # Old code checked `if new_sl > current_sl` which was dead (line 613
+                # already caught tighten). Block only if new_sl would make things worse.
+                if new_sl < current_price:
                     result['needs_sl'] = True
                     result['_force_write'] = True
                 else:
@@ -647,7 +651,9 @@ def compute_atr_sl_tp(
                 result['needs_sl'] = True
                 result['_force_write'] = True
             elif current_on_wrong_side:
-                if new_sl < current_sl:
+                # Bug-11 fix: current_sl is below current_price (wrong side for SHORT).
+                # Allow if new_sl is on the correct side (above current_price).
+                if new_sl > current_price:
                     result['needs_sl'] = True
                     result['_force_write'] = True
                 else:

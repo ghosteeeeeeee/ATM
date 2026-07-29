@@ -123,6 +123,7 @@ When T mentions a concept, recall what you've learned to associate with it. This
 - **Column names** — `pnl_usdt` and `amount_usdt` (NOT `pnl_usd` or `size`)
 - **SQL placeholders** — use `?` or named params, never `***` (was a silent bug source)
 - **Token vs coin** — the standard is `coin` in the codebase, but some files still use `token`
+- **Mandatory subagent code review** — after any major change (new feature, bug fix, refactor), call a subagent to audit the diff. The subagent must specifically look for bugs, scoping issues, edge cases, connection leaks, and future failure modes. Never skip this.
 
 See `LESSONS.md` for hard-won bug patterns and parsing traps.
 
