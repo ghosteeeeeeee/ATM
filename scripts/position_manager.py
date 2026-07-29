@@ -2734,8 +2734,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     _ot_dt = _ot_dt.replace(tzinfo=timezone.utc)
                 _age_h = (datetime.now(timezone.utc) - _ot_dt).total_seconds() / 3600
 
-                # (a) Slow bleed: 2h+ in loss
-                if live_pnl < 0 and _age_h >= 2.0:
+                # (a) Quick exit: 30 min in loss → move to next setup
+                if live_pnl < 0 and _age_h >= 0.5:  # 30 min
                     close_paper_position(trade_id, f"time_exit_{_age_h:.1f}h_{live_pnl:+.2f}%")
                     closed_count += 1
                     print(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")

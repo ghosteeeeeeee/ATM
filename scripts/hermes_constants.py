@@ -225,7 +225,7 @@ SIGNAL_SOURCE_BLACKLIST = {
     # 'pct-hermes',   # bare — combo-only, no standalone value; blocked via *_ENABLED
 }
 SERVER_NAME = 'Hermes'
-MAX_OPEN_POSITIONS = 3   # max open paper positions across all enforcement points
+MAX_OPEN_POSITIONS = 6   # max open paper positions — diversified portfolio (was 3)
 
 # ── Scanner Position Limits ─────────────────────────────────────────────────────
 # Unified limits for scanner slot allocation (unified_scanner.py)
@@ -322,7 +322,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.008   # 0.8% floor — trailing handles protection
+ATR_SL_MIN             = 0.005   # 0.5% floor — cut losers fast
 ATR_SL_MAX             = 0.020   # 2.0% cap — survive P90 MAE
 ATR_TP_MIN             = 0.012   # 1.2% floor — good R:R
 ATR_TP_MAX             = 0.015   # 1.5% cap — realistic targets
@@ -337,7 +337,7 @@ ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.008  # 0.8% — matching ATR_SL_MIN
+ATR_SL_MIN_INIT    = 0.005  # 0.5% — matching ATR_SL_MIN
 ATR_SL_MAX_INIT    = 0.012  # 1.2% — new trade SL cap
 SL_PCT_FALLBACK    = 0.008  # 0.8% if ATR unavailable
 TP_PCT_FALLBACK    = 0.015  # 1.5% fallback target
