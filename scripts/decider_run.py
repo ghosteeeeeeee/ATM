@@ -785,9 +785,12 @@ def rule_based_context_gate(token, direction, source, sig):
 
 def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb=None):
     """
-    LLM fallback for ambiguous cases. Returns ('GO', None) or ('WARN', reason).
-    WARN = soft advisory (confidence penalty), NOT a hard block.
-    Rule-based gate is the only hard blocker.
+    LLM fallback for ambiguous cases. Returns (verdict, reason):
+      - ('GO', None): allow trade as-is
+      - ('WARN', reason): confidence penalty (soft advisory, trade still executes)
+      - ('NAY', reason): hard block (trade rejected)
+      - ('FLIP', reason): reverse direction (e.g., LONG→SHORT)
+    Rule-based gate is the primary hard blocker.
     Caches results for CONTEXT_GATE_CACHE_TTL seconds.
     """
     if not CONTEXT_GATE_LLM_ENABLED:
