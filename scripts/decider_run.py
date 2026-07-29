@@ -728,6 +728,10 @@ def rule_based_context_gate(token, direction, source, sig):
     accel = mom_data.get('acceleration', 0) if mom_data else 0
     wave_phase = mom_data.get('wave_phase', 'neutral') if mom_data else 'neutral'
 
+    # Determine if this is a trend signal (not inv-accel)
+    is_inv_accel = 'inv-accel' in (source or '')
+    is_trend_signal = not is_inv_accel  # tl_break, accel-300, etc.
+
     # 1. Speed too low = no wave (surfing: whitewater)
     if speed is not None and speed < CONTEXT_GATE_SPEED_MIN:
         return ('SKIP', f'speed {speed:.0f}% < {CONTEXT_GATE_SPEED_MIN}% (no wave)')
@@ -787,9 +791,6 @@ def rule_based_context_gate(token, direction, source, sig):
                 return ('SKIP', f'wrong phase: {phase} for inv-accel (no reversal)')
 
     # 6. FLIP: phase contradicts signal direction → flip (trend signals only)
-    is_inv_accel = 'inv-accel' in (source or '')
-    is_trend_signal = not is_inv_accel  # tl_break, accel-300, etc.
-
     if is_trend_signal and wave_phase == 'falling' and direction == 'LONG':
         return ('FLIP', {'new_dir': 'SHORT', 'reason': f'falling phase + LONG → flip to SHORT (wave dying)'})
     if is_trend_signal and wave_phase == 'accelerating' and direction == 'SHORT':
