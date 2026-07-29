@@ -816,8 +816,12 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
     if not heb_section:
         heb_section = "\nNo historical data available for this setup."
 
-    prompt = f"""You are a crypto trading gate. Evaluate this signal and reply GO or WARN (one word).
-WARN = caution (reduced confidence), not a hard block.
+    prompt = f"""You are a crypto trading gate. Evaluate this signal and reply ONE of: GO, WARN, NAY, or FLIP.
+
+GO = allow trade as-is
+WARN = caution (reduced confidence, trade still executes)
+NAY = block this trade (hard reject — do not enter)
+FLIP = reverse direction (e.g., LONG→SHORT or SHORT→LONG)
 
 === TRADE CANDIDATE ===
 Token: {token}
@@ -836,15 +840,14 @@ BTC Z-Score: {market.get('btc_z', 'N/A')}
 ETH Z-Score: {market.get('eth_z', 'N/A')}
 {heb_section}
 
-Rules:
-- GO if: strong momentum (speed>60, z confirms direction), or clear reversal setup (inv-accel at extreme phase)
-- WARN if: counter-trend with low speed, ranging market, wrong phase for signal type
-- WARN if: dead hours (03:00-08:00 UTC)
-- WARN if: historical WR < 40% with 5+ trades
-- WARN if: momentum < 25 and acceleration opposes direction
+RULES:
+- GO: strong momentum (speed>60, z confirms direction), clear reversal setup
+- WARN: counter-trend with low speed, ranging market, wrong phase for signal type
+- NAY: setup is actively harmful — will lose money (e.g., extremely overbought LONG, dead hours, historical WR < 30% with 10+ trades)
+- FLIP: z-score strongly contradicts signal direction (|z|>2.0 AND speed>50) — the OPPOSITE direction is better
 - Default: GO (don't block good setups)
 
-Reply only GO or WARN:"""
+Reply only GO, WARN, NAY, or FLIP:"""
 
     try:
         import subprocess as _sp
@@ -855,7 +858,15 @@ Reply only GO or WARN:"""
             capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
         )
         response = (result.stdout or '').strip().upper()
-        verdict = 'GO' if 'GO' in response and 'WARN' not in response else 'WARN'
+        # Parse verdict: GO, WARN, NAY, or FLIP
+        if 'FLIP' in response:
+            verdict = 'FLIP'
+        elif 'NAY' in response:
+            verdict = 'NAY'
+        elif 'GO' in response and 'WARN' not in response:
+            verdict = 'GO'
+        else:
+            verdict = 'WARN'  # default to WARN for ambiguous responses
 
         # Cache it (persistent across pipeline runs)
         cache[cache_key] = {'verdict': verdict, 'ts': now}
@@ -983,11 +994,18 @@ def context_gate(token, direction, source, sig):
             log(f'  [HEBBIAN] penalty: -{HEBBIAN_PENALTY_AMOUNT} confidence (low WR history)')
             return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
 
-    # Still ambiguous → LLM (soft advisory, not hard block)
+    # Still ambiguous → LLM (soft advisory or hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
         return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty', LLM_CONFIDENCE_PENALTY)
+    if verdict == 'NAY':
+        log(f'  [CTX-GATE] {token}: LLM NAY → hard block')
+        return ('SKIP', f'LLM rejected: {reason or "setup is actively harmful"}', 0)
+    if verdict == 'FLIP':
+        new_dir = 'SHORT' if direction == 'LONG' else 'LONG'
+        log(f'  [CTX-GATE] {token}: LLM FLIP → {direction} → {new_dir}')
+        return ('FLIP', {'new_dir': new_dir, 'reason': f'LLM flipped {direction} → {new_dir}'}, 0)
     return (verdict, reason, 0)
 
 
