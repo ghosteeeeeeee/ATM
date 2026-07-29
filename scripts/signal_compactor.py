@@ -1498,34 +1498,35 @@ def _purge_executed_signals(hours=1, dry=False):
         conn.close()
         return
 
-    restored = 0
-    for sid, tok, d in old_executed:
-        # Check if there's ANY trade for this token (open or closed).
-        # If a trade exists, the signal was legitimately executed (DB INSERT succeeded).
-        # Only restore to PENDING if no trade record exists at all (phantom execution).
-        pg_cur.execute("""
-            SELECT id, status FROM trades
-            WHERE token=%s AND direction=%s AND server='Hermes'
-            ORDER BY id DESC
-            LIMIT 1
-        """, (tok.upper(), d.upper()))
-        row = pg_cur.fetchone()
-        if not row:
-            # No trade found for this specific token+direction — phantom execution.
-            # Restore to PENDING so decider_run can retry cleanly.
-            # Note: guardian_orphan trades use 'guardian_orphan_insert' signal, not
-            # the original signal source, so they won't match the signal's token+direction
-            # in a way that masks phantom executions.
-            c.execute("""
-                UPDATE signals
-                SET decision='PENDING', executed=0, updated_at=CURRENT_TIMESTAMP
-                WHERE id=?
-            """, (sid,))
-            restored += 1
-            log(f"  [PURGE-VERIFY] Restored signal id={sid} ({tok} {d}) to PENDING — no recent trade found")
-
-    pg_cur.close()
-    pg_conn.close()
+    try:
+        restored = 0
+        for sid, tok, d in old_executed:
+            # Check if there's ANY trade for this token (open or closed).
+            # If a trade exists, the signal was legitimately executed (DB INSERT succeeded).
+            # Only restore to PENDING if no trade record exists at all (phantom execution).
+            pg_cur.execute("""
+                SELECT id, status FROM trades
+                WHERE token=%s AND direction=%s AND server='Hermes'
+                ORDER BY id DESC
+                LIMIT 1
+            """, (tok.upper(), d.upper()))
+            row = pg_cur.fetchone()
+            if not row:
+                # No trade found for this specific token+direction — phantom execution.
+                # Restore to PENDING so decider_run can retry cleanly.
+                # Note: guardian_orphan trades use 'guardian_orphan_insert' signal, not
+                # the original signal source, so they won't match the signal's token+direction
+                # in a way that masks phantom executions.
+                c.execute("""
+                    UPDATE signals
+                    SET decision='PENDING', executed=0, updated_at=CURRENT_TIMESTAMP
+                    WHERE id=?
+                """, (sid,))
+                restored += 1
+                log(f"  [PURGE-VERIFY] Restored signal id={sid} ({tok} {d}) to PENDING — no recent trade found")
+    finally:
+        pg_cur.close()
+        pg_conn.close()
 
     deleted = _do_purge(conn, c, hours)
     conn.close()
