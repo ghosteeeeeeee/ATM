@@ -851,7 +851,7 @@ Reply only GO or WARN:"""
         import shutil as _sh
         _oc = _sh.which('opencode') or '/root/.opencode/bin/opencode'
         result = _sp.run(
-            [_oc, 'run', prompt, '-m', 'opencode/mimo-v2.5-free'],
+            [_oc, 'run', prompt, '-m', CONTEXT_GATE_LLM_MODEL],
             capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
         )
         response = (result.stdout or '').strip().upper()
