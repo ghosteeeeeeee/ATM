@@ -850,13 +850,31 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # ── Hebbian write-back: learn from outcome ────────────────────────
     # Won → strengthen all concept pairs (token↔signal↔direction↔tier↔momentum).
     # Lost → weaken pairs. Fail-open: errors never block trade close.
+    # Enrich indicators at close time for full Hebbian learning.
+    # Also save LLM decision (GO/WARN/NAY/FLIP) for learning.
     if hype_pnl_pct is not None and signal:
         try:
             from hebbian_engine import HebbianEngine
+            from signal_schema import _enrich_indicators
+            # Enrich indicators from current market state
+            enriched = _enrich_indicators(token)
+            # Use enriched data if trade record fields are NULL
+            z_tier = signal_z_score_tier or enriched.get('z_score_tier')
+            momentum = signal_momentum_state or enriched.get('momentum_state')
+            rsi = enriched.get('rsi_14')
+            z_score = enriched.get('z_score')
+            speed = enriched.get('speed_percentile')
+            phase = enriched.get('wave_phase')
+            accel = enriched.get('price_acceleration')
+            # LLM decision from signal_decision field
+            llm_decision = signal_decision  # GO, WARN, NAY, FLIP
             HebbianEngine().learn_trade_outcome(
                 token=token, signal=signal, direction=direction,
-                pnl_pct=hype_pnl_pct, z_score_tier=signal_z_score_tier,
-                momentum_state=signal_momentum_state,
+                pnl_pct=hype_pnl_pct, z_score_tier=z_tier,
+                momentum_state=momentum,
+                rsi=rsi, z_score=z_score, speed=speed,
+                phase=phase, acceleration=accel,
+                llm_decision=llm_decision,
             )
         except Exception:
             pass  # fail-open

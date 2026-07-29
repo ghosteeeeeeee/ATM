@@ -225,16 +225,48 @@ class HebbianEngine:
         pnl_pct: float,
         z_score_tier: str = None,
         momentum_state: str = None,
+        rsi: float = None,
+        z_score: float = None,
+        speed: float = None,
+        phase: str = None,
+        acceleration: float = None,
+        llm_decision: str = None,
     ) -> dict:
         """
         Hebbian write-back from a closed trade.
         Won (pnl_pct > 0) → strengthen all concept pairs.
         Lost (pnl_pct <= 0) → weaken all concept pairs.
 
-        Concepts: token, signal, direction, z_score_tier, momentum_state.
+        Concepts: token, signal, direction, z_score_tier, momentum_state,
+                  rsi_tier, z_score_tier_value, speed_tier, phase, accel_tier,
+                  llm_decision (GO/WARN/NAY/FLIP).
         Returns {'strengthened': n, 'weakened': m} for logging.
         """
-        concepts = [token, signal, direction, z_score_tier, momentum_state]
+        # Convert continuous values to tiers for Hebbian learning
+        rsi_tier = None
+        if rsi is not None:
+            rsi_tier = 'rsi_overbought' if rsi > 70 else 'rsi_oversold' if rsi < 30 else 'rsi_neutral'
+
+        z_tier_value = None
+        if z_score is not None:
+            z_tier_value = 'z_extreme_high' if z_score > 2 else 'z_high' if z_score > 1 else \
+                           'z_extreme_low' if z_score < -2 else 'z_low' if z_score < -1 else 'z_neutral'
+
+        speed_tier = None
+        if speed is not None:
+            speed_tier = 'speed_high' if speed > 70 else 'speed_low' if speed < 30 else 'speed_mid'
+
+        accel_tier = None
+        if acceleration is not None:
+            accel_tier = 'accel_positive' if acceleration > 0.001 else 'accel_negative' if acceleration < -0.001 else 'accel_flat'
+
+        # LLM decision concept
+        llm_concept = None
+        if llm_decision:
+            llm_concept = f'llm_{llm_decision.lower()}'  # llm_go, llm_warn, llm_nay, llm_flip
+
+        concepts = [token, signal, direction, z_score_tier, momentum_state,
+                    rsi_tier, z_tier_value, speed_tier, phase, accel_tier, llm_concept]
         concepts = [c for c in concepts if c]
         if len(concepts) < 2:
             return {'strengthened': 0, 'weakened': 0}
