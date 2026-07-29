@@ -487,6 +487,7 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         '_breakout_strength': breakout_strength,
         '_follow_count': follow_count,
         '_atr': atr,
+        '_z': _z if '_z' in dir() else None,
     }
 
 
