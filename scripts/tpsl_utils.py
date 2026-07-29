@@ -605,37 +605,24 @@ def compute_atr_sl_tp(
     #   - New: LONG: tighten = new_sl RAISES (higher number) = further from current price
     #          SHORT: tighten = new_sl LOWERS (lower number) = further from current price
     #
-    # Also: when get_trade_params pre-writes a fallback SL (current_sl != 0) but TPSL
-    # computes a CORRECT tightening, the stale-baseline current_sl would block the update.
-    # The WRONG_SIDE check prevents this: if current_sl is on the wrong side of current_price
-    # (for SHORT: current_sl < current, for LONG: current_sl > current), force the update.
+    # ── TRAILING GATE: SL NEVER LOOSENS ──────────────────────────────────────
+    # Core rule: SL only tightens, never loosens.
+    # LONG: SL only goes UP (new_sl > current_sl)
+    # SHORT: SL only goes DOWN (new_sl < current_sl)
+    # Exception: wrong-side correction (current_sl on wrong side of entry)
     if direction == 'LONG':
         if current_sl > 0:
-            current_on_wrong_side = (current_sl > current_price) if current_price > 0 else False
-            # FIX: current_sl above entry = wrong side for LONG. Force update to correct it.
             current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
             if new_sl > current_sl:
                 # new_sl RAISES = tighten upward — correct, allow
                 result['needs_sl'] = True
             elif current_above_entry:
                 # current_sl is above entry (wrong side for LONG).
-                # new_sl corrects it — force update (this is a correction, not loosening).
+                # Force update to correct it — this is a correction, not loosening.
                 result['needs_sl'] = True
                 result['_force_write'] = True
-            elif current_on_wrong_side:
-                # Bug-11 fix: current_sl is above current_price (wrong side for LONG).
-                # Allow if new_sl is on the correct side (below current_price).
-                # Old code checked `if new_sl > current_sl` which was dead (line 613
-                # already caught tighten). Block only if new_sl would make things worse.
-                if new_sl < current_price:
-                    result['needs_sl'] = True
-                    result['_force_write'] = True
-                else:
-                    new_sl = current_sl
-                    result['needs_sl'] = False
-            elif result.get('_force_write'):
-                result['needs_sl'] = True
             else:
+                # new_sl would loosen — block it
                 new_sl = current_sl
                 result['needs_sl'] = False
         else:
@@ -643,29 +630,17 @@ def compute_atr_sl_tp(
 
     elif direction == 'SHORT':
         if current_sl > 0:
-            current_on_wrong_side = (current_sl > current_price) if current_price > 0 else False
-            # FIX: current_sl below entry = wrong side for SHORT. Force update to correct it.
             current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
             if new_sl < current_sl:
                 # new_sl LOWERS = tighten downward — correct, allow
                 result['needs_sl'] = True
             elif current_below_entry:
                 # current_sl is below entry (wrong side for SHORT).
-                # new_sl corrects it — force update (this is a correction, not loosening).
+                # Force update to correct it — this is a correction, not loosening.
                 result['needs_sl'] = True
                 result['_force_write'] = True
-            elif current_on_wrong_side:
-                # Bug-11 fix: current_sl is below current_price (wrong side for SHORT).
-                # Allow if new_sl is on the correct side (above current_price).
-                if new_sl > current_price:
-                    result['needs_sl'] = True
-                    result['_force_write'] = True
-                else:
-                    new_sl = current_sl
-                    result['needs_sl'] = False
-            elif result.get('_force_write'):
-                result['needs_sl'] = True
             else:
+                # new_sl would loosen — block it
                 new_sl = current_sl
                 result['needs_sl'] = False
         else:
