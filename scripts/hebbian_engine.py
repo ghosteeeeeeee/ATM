@@ -283,7 +283,7 @@ class HebbianEngine:
                     weakened += 1
         return {'strengthened': strengthened, 'weakened': weakened}
 
-    def wr_estimate(self, token: str, signal: str, k: int = 30):
+    def wr_estimate(self, token: str, signal: str, k: int = 50):
         """Estimate historical win rate for a (token, signal) pair from Hebbian memory.
 
         Weight dynamics:

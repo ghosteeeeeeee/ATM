@@ -834,8 +834,22 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
     if setup:
         heb_section += f"\nSimilar setup history: {setup.n} trades, WR={setup.win_rate*100:.0f}%, avg PnL={setup.avg_pnl:+.2f}%"
     if heb:
-        wr_est, n, weight = heb
-        heb_section += f"\nHebbian estimate: WR={wr_est*100:.0f}% (n={n}, weight={weight:.2f})"
+        wr_est, n, weight, concepts = heb
+        wr_pct = wr_est * 100
+        heb_section += f"\nHebbian estimate: WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})"
+        # Add concept context for LLM
+        if concepts:
+            # Group concepts by type for readability
+            concept_groups = {}
+            for concept, label, cw, cn in concepts:
+                if concept not in concept_groups:
+                    concept_groups[concept] = {'weight': cw, 'count': cn}
+            # Show top concepts by weight
+            top_concepts = sorted(concept_groups.items(), key=lambda x: x[1]['weight'], reverse=True)[:8]
+            if top_concepts:
+                heb_section += "\nHistorical patterns:"
+                for concept, data in top_concepts:
+                    heb_section += f"\n  - {concept}: weight={data['weight']:.1f}, trades={data['count']}"
     if not heb_section:
         heb_section = "\nNo historical data available for this setup."
 
@@ -947,27 +961,35 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
         pass
     return None
 
-_hebbian_cache = {}  # cache_key → (wr, n, weight, expiry)
+_hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, expiry)
 
 def hebbian_trade_boost(token, signal):
     """Estimate historical win rate from Hebbian memory for (token, signal) pair.
-    Returns (wr, n, weight) or None. Fail-open. 10min cache."""
+    Returns (wr, n, weight, concepts) or None. Fail-open. 10min cache.
+    concepts = list of (concept_name, label, weight, count) for LLM context."""
     from hebbian_engine import HebbianEngine
     cache_key = f"{token}:{signal}"
     now = time.time()
     cached = _hebbian_cache.get(cache_key)
-    if cached and now - cached[3] < HEBBIAN_CACHE_TTL:
-        return (cached[0], cached[1], cached[2])
+    if cached and now - cached[4] < HEBBIAN_CACHE_TTL:
+        return (cached[0], cached[1], cached[2], cached[3])
     try:
-        result = HebbianEngine().wr_estimate(token, signal)
+        engine = HebbianEngine()
+        result = engine.wr_estimate(token, signal)
+        # Get full recall data for LLM context
+        recall = engine.recall(token, k=20)
+        # Filter to relevant concepts (exclude regime/decision nodes)
+        concepts = [(c, l, w, n) for c, l, w, n in recall
+                    if l == 'concept' and c not in ('SHORT_BIAS', 'LONG_BIAS', 'NEUTRAL',
+                                                     'APPROVED', 'HOT_APPROVED', 'WAIT', 'SKIPPED')]
     except Exception:
         return None
     if result is None:
-        _hebbian_cache[cache_key] = (None, None, None, now)
+        _hebbian_cache[cache_key] = (None, None, None, [], now)
         return None
     wr, n, weight = result
-    _hebbian_cache[cache_key] = (wr, n, weight, now)
-    return (wr, n, weight)
+    _hebbian_cache[cache_key] = (wr, n, weight, concepts, now)
+    return (wr, n, weight, concepts)
 
 def context_gate(token, direction, source, sig):
     """
@@ -1007,7 +1029,7 @@ def context_gate(token, direction, source, sig):
     # Hebbian WR estimate (brain.db token ↔ signal weight)
     heb = hebbian_trade_boost(token, source)
     if heb:
-        wr_est, n, weight = heb
+        wr_est, n, weight, concepts = heb
         wr_pct = wr_est * 100
         log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})')
         if n >= HEBBIAN_BOOST_MIN_N and wr_est >= HEBBIAN_BOOST_WR:
