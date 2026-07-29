@@ -734,30 +734,36 @@ def rule_based_context_gate(token, direction, source, sig):
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     # But only if price history is fresh (< 5 min old)
+    # Also check for FLIP conditions: if z contradicts direction, don't give GO
     if speed is not None and speed >= CONTEXT_GATE_SPEED_CONFIRM:
         if z_score is not None:
-            if (direction == 'LONG' and z_score > 1.0) or \
-               (direction == 'SHORT' and z_score < -1.0):
-                # Check if price history is fresh
-                try:
-                    import sqlite3 as _sqlite3
-                    from paths import HERMES_DATA
-                    _conn = _sqlite3.connect(f'{HERMES_DATA}/signals_hermes.db', timeout=5)
-                    _cur = _conn.cursor()
-                    _cur.execute("SELECT MAX(timestamp) FROM price_history WHERE token=?", (token,))
-                    _row = _cur.fetchone()
-                    _conn.close()
-                    if _row and _row[0]:
-                        import time as _time
-                        _age = _time.time() - _row[0]
-                        if _age > 300:  # >5 min stale
-                            return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
-                                                   'momentum': momentum, 'acceleration': accel,
-                                                   'wave_phase': wave_phase, 'market': market,
-                                                   'stale_price': True})
-                except Exception:
-                    pass  # if we can't check, proceed with GO
-                return ('GO', None)
+            # Check for FLIP conditions first (z contradicts direction)
+            if is_trend_signal:
+                if (direction == 'LONG' and z_score > 0.5) or \
+                   (direction == 'SHORT' and z_score < -0.5):
+                    pass  # Don't give GO — let FLIP check below handle it
+                elif (direction == 'LONG' and z_score > 1.0) or \
+                     (direction == 'SHORT' and z_score < -1.0):
+                    # z confirms direction — give GO
+                    try:
+                        import sqlite3 as _sqlite3
+                        from paths import HERMES_DATA
+                        _conn = _sqlite3.connect(f'{HERMES_DATA}/signals_hermes.db', timeout=5)
+                        _cur = _conn.cursor()
+                        _cur.execute("SELECT MAX(timestamp) FROM price_history WHERE token=?", (token,))
+                        _row = _cur.fetchone()
+                        _conn.close()
+                        if _row and _row[0]:
+                            import time as _time
+                            _age = _time.time() - _row[0]
+                            if _age > 300:  # >5 min stale
+                                return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
+                                                       'momentum': momentum, 'acceleration': accel,
+                                                       'wave_phase': wave_phase, 'market': market,
+                                                       'stale_price': True})
+                    except Exception:
+                        pass  # if we can't check, proceed with GO
+                    return ('GO', None)
 
     # 3. Counter-trend trap: z contradicts direction + low speed
     if z_score is not None and speed is not None:
