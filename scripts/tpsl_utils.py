@@ -366,10 +366,12 @@ def compute_atr_sl_tp(
         elif highest_price > 0:
             # For LONG: trail from highest_price (best price seen).
             # But ONLY if highest_price > entry (trade is in profit).
-            # If highest_price <= entry (trade in loss), use entry_price
-            # to prevent SL from trailing against the trade.
+            # If highest_price <= entry (trade in loss), use current_price
+            # to allow SL to tighten as price drops (protect against further loss).
             if float(highest_price) > float(entry_price):
                 ref_price = float(highest_price)
+            elif current_price and current_price > 0:
+                ref_price = float(current_price)
             else:
                 ref_price = float(entry_price)
         elif current_price and current_price > 0:
@@ -382,10 +384,12 @@ def compute_atr_sl_tp(
         elif lowest_price > 0:
             # For SHORT: trail from lowest_price (best price seen).
             # But ONLY if lowest_price < entry (trade is in profit).
-            # If lowest_price >= entry (trade in loss), use entry_price
-            # to prevent SL from trailing against the trade.
+            # If lowest_price >= entry (trade in loss), use current_price
+            # to allow SL to tighten as price rises (protect against further loss).
             if float(lowest_price) < float(entry_price):
                 ref_price = float(lowest_price)
+            elif current_price and current_price > 0:
+                ref_price = float(current_price)
             else:
                 ref_price = float(entry_price)
         elif current_price and current_price > 0:
