@@ -40,6 +40,23 @@ STEPS_EVERY_MIN  = ['signal_compactor', 'breakout_engine', 'signals_runner', 'de
 STEPS_EVERY_5M   = ['signals_runner_slow']  # slow signals: momentum, mtf_momentum (>60s per run)
 STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer', 'ab_learner']
 
+# Per-step timeouts (seconds)
+STEP_TIMEOUTS = {
+    'signal_gen': 180,
+    'signals_runner': 300,
+    'signals_runner_slow': 240,
+    'breakout_engine': 60,
+    'decider_run': 360,
+    'signal_compactor': 60,   # deterministic — must be fast (<2s typical)
+    'position_manager': 120,
+    'strategy_optimizer': 300,
+    'ab_optimizer': 300,
+    'ab_learner': 300,
+    'live_decider': 240,
+    'hermes-trades-api': 60,
+}
+DEFAULT_TIMEOUT = 300
+
 
 def run(name, args=None):
     # Slow signals runner uses --slow flag

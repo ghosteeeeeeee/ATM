@@ -774,8 +774,10 @@ Reply only GO or WARN:"""
     try:
         # Call MiniMax via opencode run (always uses expanded price data)
         import subprocess as _sp
+        import shutil as _sh
+        _oc = _sh.which('opencode') or '/root/.opencode/bin/opencode'
         result = _sp.run(
-            ['opencode', 'run', '-p', prompt, '-m', 'minimax/MiniMax-M2.7', '--no-stream'],
+            [_oc, 'run', '-p', prompt, '-m', 'minimax/MiniMax-M2.7', '--no-stream'],
             capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
         )
         response = (result.stdout or '').strip().upper()
