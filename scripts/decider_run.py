@@ -732,7 +732,7 @@ def rule_based_context_gate(token, direction, source, sig):
     # Ambiguous — needs LLM
     return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase})
 
-def llm_context_gate(token, direction, source, sig, rule_result):
+def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb=None):
     """
     LLM fallback for ambiguous cases. Returns ('GO', None) or ('WARN', reason).
     WARN = soft advisory (confidence penalty), NOT a hard block.
@@ -752,8 +752,17 @@ def llm_context_gate(token, direction, source, sig, rule_result):
         if now - cached['ts'] < CONTEXT_GATE_CACHE_TTL:
             return (cached['verdict'], None)
 
-    # Build minimal prompt (keep tokens low)
+    # Build prompt with Hebbian recall data
     ctx = rule_result if isinstance(rule_result, dict) else {}
+    heb_section = ""
+    if setup:
+        heb_section += f"\nSimilar setup history: {setup.n} trades, WR={setup.win_rate*100:.0f}%, avg PnL={setup.avg_pnl:+.2f}%"
+    if heb:
+        wr_est, n, weight = heb
+        heb_section += f"\nHebbian estimate: WR={wr_est*100:.0f}% (n={n}, weight={weight:.2f})"
+    if not heb_section:
+        heb_section = "\nNo historical data available for this setup."
+
     prompt = f"""You are a crypto trading gate. Evaluate this signal and reply GO or WARN (one word).
 WARN = caution (reduced confidence), not a hard block.
 
@@ -763,22 +772,23 @@ Signal: {source}
 Speed: {ctx.get('speed', 'N/A')}%
 Z-Score: {ctx.get('z_score', 'N/A')}
 Phase: {ctx.get('phase', 'N/A')}
+{heb_section}
 
 Rules:
 - GO if: strong momentum (speed>60, z confirms direction), or clear reversal setup (inv-accel at extreme phase)
 - WARN if: counter-trend with low speed, ranging market, wrong phase for signal type
 - WARN if: dead hours (03:00-08:00 UTC)
+- WARN if: historical WR < 40% with 5+ trades
 - Default: GO (don't block good setups)
 
 Reply only GO or WARN:"""
 
     try:
-        # Call MiniMax via opencode run (always uses expanded price data)
         import subprocess as _sp
         import shutil as _sh
         _oc = _sh.which('opencode') or '/root/.opencode/bin/opencode'
         result = _sp.run(
-            [_oc, 'run', '-p', prompt, '-m', 'minimax/MiniMax-M2.7', '--no-stream'],
+            [_oc, 'run', prompt, '-m', 'opencode/mimo-v2.5-free'],
             capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
         )
         response = (result.stdout or '').strip().upper()
@@ -908,7 +918,7 @@ def context_gate(token, direction, source, sig):
             return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
 
     # Still ambiguous → LLM (soft advisory, not hard block)
-    verdict, reason = llm_context_gate(token, direction, source, sig, ctx)
+    verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
         return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty', LLM_CONFIDENCE_PENALTY)

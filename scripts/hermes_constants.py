@@ -451,7 +451,7 @@ CONTEXT_GATE_Z_RANGING = 0.5         # |z| below this = ranging
 CONTEXT_GATE_RANGING_SPEED = 25      # ranging + low speed → SKIP
 CONTEXT_GATE_SPEED_CONFIRM = 70      # z + speed both strong → GO (no LLM needed)
 CONTEXT_GATE_CACHE_TTL = 300         # seconds to cache LLM decision for same token+signal
-CONTEXT_GATE_LLM_TIMEOUT = 8         # seconds before LLM call times out
+CONTEXT_GATE_LLM_TIMEOUT = 35        # seconds before LLM call times out
 CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block good setups)
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
