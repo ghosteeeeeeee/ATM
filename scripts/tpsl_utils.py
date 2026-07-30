@@ -513,7 +513,7 @@ def compute_atr_sl_tp(
     #   1. From entry: SL >= entry - 0.5% (new trade protection)
     #   2. From peak: SL >= peak - TRAILING_DISTANCE_PCT (trailing floor)
     #   3. From current: SL >= current - 0.5% (breathing room for pullbacks)
-    MIN_FROM_CURRENT = 0.010  # 1.0% minimum gap from current price (breathing room)
+    MIN_FROM_CURRENT = 0.004  # 0.4% gap from current price (0.3-0.5% range)
     _force_min_distance = False
     if entry_f > 0:
         if direction == 'LONG' and highest_price > 0:
@@ -729,7 +729,7 @@ def compute_atr_sl_tp(
 
     # ── POST-GATE MINIMUM SL DISTANCE (FIX 2026-07-30) ──────────────────────────
     # Safety net: same three checks as pre-gate guard.
-    MIN_FROM_CURRENT = 0.010
+    MIN_FROM_CURRENT = 0.004
     if entry_f > 0:
         if direction == 'LONG' and highest_price > 0:
             moved_pct = (highest_price - entry_f) / entry_f
