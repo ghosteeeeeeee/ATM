@@ -509,41 +509,53 @@ def compute_atr_sl_tp(
         return result
 
     # ── MINIMUM SL DISTANCE (FIX 2026-07-30) ──────────────────────────────────────
-    # Prevent trailing gate from compressing SL to near-zero distance.
-    # Two modes depending on trade state:
-    #
-    # NEW TRADE (highest≈entry): enforce minimum from entry (0.5%).
-    #   Prevents the 0.02% SL disaster from earlier sessions.
-    #
-    # IN PROFIT (highest moved up): enforce minimum from HIGHEST PRICE (0.4%).
-    #   This is the KEY fix — SL trails the peak, not stuck at entry.
-    #   Without this, the entry-based floor overrides trailing and SL never locks profit.
+    # Three independent checks, each can raise the SL:
+    #   1. From entry: SL >= entry - 0.5% (new trade protection)
+    #   2. From peak: SL >= peak - TRAILING_DISTANCE_PCT (trailing floor)
+    #   3. From current: SL >= current - 0.5% (breathing room for pullbacks)
+    MIN_FROM_CURRENT = 0.010  # 1.0% minimum gap from current price (breathing room)
     _force_min_distance = False
     if entry_f > 0:
         if direction == 'LONG' and highest_price > 0:
             moved_pct = (highest_price - entry_f) / entry_f
-            if moved_pct > 0.003:  # price moved 0.3%+ — trail from peak
-                min_sl = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                if new_sl < min_sl:
-                    new_sl = min_sl
+            # Check 1: from peak (trailing floor)
+            if moved_pct > 0.003:
+                trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                if new_sl < trail_floor:
+                    new_sl = trail_floor
                     _force_min_distance = True
-            else:  # new trade — enforce from entry
-                min_sl = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
-                if new_sl > min_sl:
-                    new_sl = min_sl
+            # Check 2: from entry (new trade floor)
+            else:
+                entry_floor = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl > entry_floor:
+                    new_sl = entry_floor
                     _force_min_distance = True
+            # Check 3: from current price (breathing room) — ALWAYS apply
+            # LONG: SL must be at least MIN_FROM_CURRENT BELOW current price
+            current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
+            if new_sl > current_floor:
+                new_sl = current_floor
+                _force_min_distance = True
         elif direction == 'SHORT' and lowest_price > 0:
             moved_pct = (entry_f - lowest_price) / entry_f
-            if moved_pct > 0.003:  # price moved 0.3%+ — trail from nadir
-                min_sl = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                if new_sl > min_sl:
-                    new_sl = min_sl
+            # Check 1: from nadir (trailing floor)
+            if moved_pct > 0.003:
+                trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                if new_sl > trail_ceil:
+                    new_sl = trail_ceil
                     _force_min_distance = True
-            else:  # new trade — enforce from entry
-                min_sl = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
-                if new_sl < min_sl:
-                    new_sl = min_sl
+            # Check 2: from entry (new trade floor)
+            else:
+                entry_ceil = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl < entry_ceil:
+                    new_sl = entry_ceil
                     _force_min_distance = True
+            # Check 3: from current price (breathing room) — ALWAYS apply
+            # SHORT: SL must be at least MIN_FROM_CURRENT ABOVE current price
+            current_ceil = round(current_price * (1 + MIN_FROM_CURRENT), 8)
+            if new_sl < current_ceil:
+                new_sl = current_ceil
+                _force_min_distance = True
 
     # ── INIT-to-ACCEL migration ──────────────────────────────────────────────────
     # Detect stale accel-floor SLs on new trades (INIT floor was too tight on entry).
@@ -716,33 +728,41 @@ def compute_atr_sl_tp(
             result['needs_sl'] = True
 
     # ── POST-GATE MINIMUM SL DISTANCE (FIX 2026-07-30) ──────────────────────────
-    # Safety net: enforce minimum distance after trailing gate runs.
-    # Same logic as pre-gate guard — entry-based for new trades, peak-based for profit.
+    # Safety net: same three checks as pre-gate guard.
+    MIN_FROM_CURRENT = 0.010
     if entry_f > 0:
         if direction == 'LONG' and highest_price > 0:
             moved_pct = (highest_price - entry_f) / entry_f
             if moved_pct > 0.003:
-                min_sl = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                if new_sl < min_sl:
-                    new_sl = min_sl
+                trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                if new_sl < trail_floor:
+                    new_sl = trail_floor
                     result['needs_sl'] = True
             else:
-                min_sl = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
-                if new_sl > min_sl:
-                    new_sl = min_sl
+                entry_floor = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl > entry_floor:
+                    new_sl = entry_floor
                     result['needs_sl'] = True
+            current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
+            if new_sl > current_floor:
+                new_sl = current_floor
+                result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
             moved_pct = (entry_f - lowest_price) / entry_f
             if moved_pct > 0.003:
-                min_sl = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                if new_sl > min_sl:
-                    new_sl = min_sl
+                trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                if new_sl > trail_ceil:
+                    new_sl = trail_ceil
                     result['needs_sl'] = True
             else:
-                min_sl = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
-                if new_sl < min_sl:
-                    new_sl = min_sl
+                entry_ceil = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl < entry_ceil:
+                    new_sl = entry_ceil
                     result['needs_sl'] = True
+            current_ceil = round(current_price * (1 + MIN_FROM_CURRENT), 8)
+            if new_sl < current_ceil:
+                new_sl = current_ceil
+                result['needs_sl'] = True
 
     # ── BREAKEVEN GUARD (REMOVED 2026-07-26) ──────────────────────────────────
     # Previously snapped SL to entry when trade was in profit (pnl_pct >= 0).

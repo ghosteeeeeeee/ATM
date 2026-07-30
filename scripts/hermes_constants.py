@@ -350,7 +350,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 # TUNED 2026-07-28: activate earlier (0.25%), tighter trail (0.20%)
 # Analysis: most trades peak at 0.3-0.6% MFE then pull back — need to lock in sooner
 TRAILING_ACTIVATION_PCT = 0.0025  # 0.25% — activate quickly (was 0.50%)
-TRAILING_DISTANCE_PCT   = 0.006   # 0.60% — trail 0.6% behind peak (was 0.40%, too tight)
+TRAILING_DISTANCE_PCT   = 0.015   # 1.50% — trail 1.5% behind peak (ATR-based was too tight)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
