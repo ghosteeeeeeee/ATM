@@ -428,8 +428,12 @@ def compute_atr_sl_tp(
     # ── ATR% from effective entry ───────────────────────────────────────────────
     if atr is None or atr <= 0:
         # No ATR — use fallback percentages
+        # Use TRAILING_DISTANCE_PCT as the floor (not ATR_SL_MIN_ACCEL)
+        # This ensures SL is at least TRAILING_DISTANCE_PCT from entry
         atr_pct = 0.0
         k = _atr_tier(ATR_PCT_FALLBACK)
+        # Override MIN_SL_PCT to use trailing distance when ATR is unavailable
+        MIN_SL_PCT = TRAILING_DISTANCE_PCT
     else:
         atr_pct = atr / entry_price
         k = _atr_sl_k_scaled(token, direction, atr_pct, speed_percentile, momentum_stats)
@@ -469,10 +473,14 @@ def compute_atr_sl_tp(
             k = _atr_tier(atr_pct)  # reset to base k — no acceleration squeeze
         # else: preserve flip_k_override (set above, don't overwrite)
         sl_pct = k * atr_pct
-        MIN_SL_PCT = ATR_SL_MIN_INIT   # 1.0% — wider for new trades (breathing room)
+        if atr is not None and atr > 0:
+            MIN_SL_PCT = ATR_SL_MIN_INIT   # 1.0% — wider for new trades (breathing room)
+        # else: MIN_SL_PCT already set to TRAILING_DISTANCE_PCT above
         MIN_TP_PCT = ATR_TP_MIN         # 1.5% — wider for new trades
     else:
-        MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.5% — established trade floor (phase scaling bites)
+        if atr is not None and atr > 0:
+            MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.5% — established trade floor (phase scaling bites)
+        # else: MIN_SL_PCT already set to TRAILING_DISTANCE_PCT above
         MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades
 
     # ── Clamp effective percentages ─────────────────────────────────────────────
@@ -646,6 +654,18 @@ def compute_atr_sl_tp(
                 # Force update to correct it — this is a correction, not loosening.
                 result['needs_sl'] = True
                 result['_force_write'] = True
+            elif new_sl > current_sl:
+                # Bug-fix: new_sl is higher than current_sl
+                # For SHORT, higher SL = more protection (SL above entry is correct)
+                # Allow if new_sl is at TRAILING_DISTANCE_PCT from entry (correct trailing)
+                sl_distance = abs(new_sl - entry_f) / entry_f if entry_f > 0 else 0
+                if abs(sl_distance - TRAILING_DISTANCE_PCT) < 0.001:  # within 0.1% of trailing distance
+                    result['needs_sl'] = True
+                    result['_force_write'] = True
+                else:
+                    # new_sl would loosen — block it
+                    new_sl = current_sl
+                    result['needs_sl'] = False
             else:
                 # new_sl would loosen — block it
                 new_sl = current_sl
