@@ -162,6 +162,7 @@ def _atr_sl_k_scaled(
     EXTREME phase: mult = 0.05-0.10 → tightest.
     """
     base_k = _atr_tier(atr_pct)
+    return base_k  # Phase scaling disabled — was compressing SL too aggressively
 
     if momentum_stats is None:
         return base_k
@@ -543,10 +544,7 @@ def compute_atr_sl_tp(
                 new_sl = max(new_sl, trail_floor)
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
-                # MIN DISTANCE: only tighten (never loosen)
-                _min_from_price = round(current_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                if new_sl < _min_from_price:
-                    new_sl = _min_from_price
+                # DO NOT floor at entry — trail_floor already keeps SL above entry
             else:
                 # In loss: entry floor is absolute, but never loosen
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
@@ -555,14 +553,13 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
+                # In profit: trail from nadir, enforce one-way
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 new_sl = min(new_sl, trail_ceil)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
-                # MIN DISTANCE: only tighten (never loosen — one-way handles that)
-                _min_from_price = round(current_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                if new_sl > _min_from_price:
-                    new_sl = _min_from_price
+                # DO NOT cap at entry — trail_ceil already keeps SL below entry
+                # Capping at entry sets SL to 0% from entry, any bounce triggers it
             else:
                 # In loss: entry ceiling is absolute, but never loosen
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
@@ -747,9 +744,6 @@ def compute_atr_sl_tp(
                 new_sl = max(new_sl, trail_floor)
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
-                _min_from_price = round(current_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                if new_sl < _min_from_price:
-                    new_sl = _min_from_price
             else:
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
@@ -763,9 +757,6 @@ def compute_atr_sl_tp(
                 new_sl = min(new_sl, trail_ceil)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
-                _min_from_price = round(current_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                if new_sl > _min_from_price:
-                    new_sl = _min_from_price
             else:
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
