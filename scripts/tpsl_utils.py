@@ -543,13 +543,11 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                # In profit: SL trails at 0.4% from current price, above entry
-                trail_from_price = round(current_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_from_price
-                # Ensure SL is above entry — floor at 100.1% of entry (0.1% buffer)
-                new_sl = max(new_sl, round(entry_f * 1.001, 8))
+                # In profit: SL trails from peak at 0.4%, stays above entry
+                trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                new_sl = trail_floor
                 if current_sl > 0:
-                    new_sl = max(new_sl, current_sl)  # one-way: never go down
+                    new_sl = max(new_sl, current_sl)
             else:
                 # In loss: entry floor is absolute — SL must stay at least 0.5% from entry
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
@@ -558,13 +556,13 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: SL trails at 0.4% from current price, below entry
-                trail_from_price = round(current_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_from_price
-                # Ensure SL is below entry — cap at 99.9% of entry (0.1% buffer)
-                new_sl = min(new_sl, round(entry_f * 0.999, 8))
+                # In profit: SL trails from nadir at 0.4%
+                # When nadir is close to entry, SL may be above entry (barely in profit)
+                # As trade moves deeper, SL naturally moves below entry (locking in profit)
+                trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                new_sl = trail_ceil
                 if current_sl > 0:
-                    new_sl = min(new_sl, current_sl)  # one-way: never go up
+                    new_sl = min(new_sl, current_sl)
             else:
                 # In loss: entry ceiling is absolute floor — SL must stay at least 0.5% from entry
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
@@ -746,9 +744,8 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                trail_from_price = round(current_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_from_price
-                new_sl = max(new_sl, round(entry_f * 1.001, 8))  # floor at 0.1% above entry
+                trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                new_sl = trail_floor
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             else:
@@ -760,9 +757,8 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                trail_from_price = round(current_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_from_price
-                new_sl = min(new_sl, round(entry_f * 0.999, 8))  # cap at 0.1% below entry
+                trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                new_sl = trail_ceil
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:
