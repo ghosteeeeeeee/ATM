@@ -534,11 +534,18 @@ def compute_atr_sl_tp(
                 new_sl = entry_floor
                 _force_min_distance = True
             # Check 3: from current price — ONLY when in profit (trailing)
+            # When in loss, entry floor (check 2) is the absolute floor.
             in_profit = current_price > entry_f
             if in_profit:
                 current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
                 if new_sl > current_floor:
                     new_sl = current_floor
+                    _force_min_distance = True
+            # When in loss: enforce entry floor as ABSOLUTE (nothing overrides it)
+            else:
+                entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
+                if new_sl > entry_floor:
+                    new_sl = entry_floor
                     _force_min_distance = True
         elif direction == 'SHORT' and lowest_price > 0:
             moved_pct = (entry_f - lowest_price) / entry_f
@@ -762,10 +769,16 @@ def compute_atr_sl_tp(
                 if new_sl > entry_floor:
                     new_sl = entry_floor
                     result['needs_sl'] = True
-            current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
-            if in_profit and new_sl > current_floor:
-                new_sl = current_floor
-                result['needs_sl'] = True
+            if in_profit:
+                current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
+                if new_sl > current_floor:
+                    new_sl = current_floor
+                    result['needs_sl'] = True
+            else:
+                entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
+                if new_sl > entry_floor:
+                    new_sl = entry_floor
+                    result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
             moved_pct = (entry_f - lowest_price) / entry_f
             if moved_pct > 0.003:
