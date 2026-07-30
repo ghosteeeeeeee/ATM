@@ -1050,6 +1050,20 @@ def context_gate(token, direction, source, sig):
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None, 0)
 
+    # ── Stale signal price check ───────────────────────────────────────────
+    # If signal price differs from current price by >0.5%, the signal is stale.
+    # Don't flip or trade on stale data — skip.
+    try:
+        _sig_price = float(sig.get('price', 0)) if isinstance(sig, dict) else 0
+        _cur_price = get_current_price(token) or 0
+        if _sig_price > 0 and _cur_price > 0:
+            _drift = abs(_sig_price - _cur_price) / _cur_price
+            if _drift > 0.005:
+                log(f'  [CTX-GATE] {token}: SKIP — signal price {_sig_price:.6f} drifts {_drift*100:.2f}% from current {_cur_price:.6f}')
+                return ('SKIP', f'stale signal price: drift {_drift*100:.2f}%', 0)
+    except Exception:
+        pass
+
     verdict, ctx = rule_based_context_gate(token, direction, source, sig)
 
     if verdict == 'SKIP':
@@ -1151,17 +1165,18 @@ def execute_trade(token, direction, price, confidence, source,
             tp = round(price * (1 - PUMP_TP_PCT), 8)
     else:
         # Set initial SL/TP at trade open to eliminate the 60s zero-SL window.
-        # position_manager will refine these on the next cycle with full ATR computation.
+        # Use CURRENT market price (not signal price) — signal may be stale.
         from hermes_constants import ATR_SL_MIN_INIT, ATR_TP_MIN
+        _live_price = get_current_price(token) or price
         if direction == 'LONG':
-            sl = round(price * (1 - ATR_SL_MIN_INIT), 8)
-            tp = round(price * (1 + ATR_TP_MIN), 8)
+            sl = round(_live_price * (1 - ATR_SL_MIN_INIT), 8)
+            tp = round(_live_price * (1 + ATR_TP_MIN), 8)
         else:
-            sl = round(price * (1 + ATR_SL_MIN_INIT), 8)
-            tp = round(price * (1 - ATR_TP_MIN), 8)
+            sl = round(_live_price * (1 + ATR_SL_MIN_INIT), 8)
+            tp = round(_live_price * (1 - ATR_TP_MIN), 8)
         sl_pct_val = ATR_SL_MIN_INIT
         tp_pct_val = ATR_TP_MIN
-        log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%)')
+        log(f'  [INIT-SL] {token} {direction} — SL={sl:.6f} ({ATR_SL_MIN_INIT*100:.1f}%) TP={tp:.6f} ({ATR_TP_MIN*100:.1f}%) live_price={_live_price:.6f}')
 
     # Sanity check: SL must provide real protection (only when sl > 0)
     if sl > 0 and direction == 'LONG' and sl >= price:
@@ -2611,7 +2626,8 @@ def run(dry_run=False):
             # the INIT-SL may be on the wrong side. Correct it using actual fill.
             try:
                 from hermes_constants import ATR_SL_MIN_INIT
-                _pg = pg_connect(host='/var/run/postgresql', database='brain', user='postgres')
+                from psycopg2 import connect as _pg_fix
+                _pg = _pg_fix(host='/var/run/postgresql', database='brain', user='postgres')
                 _cur = _pg.cursor()
                 _cur.execute(
                     "SELECT id, entry_price, hl_entry_price, stop_loss, direction FROM trades "
