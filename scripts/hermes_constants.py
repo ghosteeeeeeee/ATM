@@ -350,7 +350,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 # TUNED 2026-07-28: activate earlier (0.25%), tighter trail (0.20%)
 # Analysis: most trades peak at 0.3-0.6% MFE then pull back — need to lock in sooner
 TRAILING_ACTIVATION_PCT = 0.0025  # 0.25% — activate quickly (was 0.50%)
-TRAILING_DISTANCE_PCT   = 0.004   # 0.40% — give trades room to develop (was 0.20%)
+TRAILING_DISTANCE_PCT   = 0.006   # 0.60% — trail 0.6% behind peak (was 0.40%, too tight)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
@@ -536,7 +536,7 @@ HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
 # ── Profit Monster ─────────────────────────────────────────────────────────────
 # profit_monster.py — closes medium-profit positions (2-5%) at random intervals.
 # Never touches losing positions.
-PROFIT_MIN_PCT    = 1.0    # 0.5% floor — take profit at 0.5% and above
+PROFIT_MIN_PCT    = 1.5    # 0.5% floor — take profit at 0.5% and above
 PROFIT_MAX_PCT    = 5.0    # 2.0% ceiling — don't hold for big moves
 MAX_CLOSE_PER_WAKE = 3
 SKIP_TOP_PCT      = 0     # don't touch the top 20% most profitable
