@@ -762,7 +762,7 @@ def compute_atr_sl_tp(
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:
-                new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             if new_sl != result.get('new_sl', new_sl):
