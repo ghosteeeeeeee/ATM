@@ -2606,6 +2606,38 @@ def run(dry_run=False):
 
         if success:
             log(f'  → ENTERED: {token} {direction} ({msg})')
+            # ── POST-TRADE SL CORRECTION ────────────────────────────────────────
+            # If fill price differs from signal price (slippage, context gate flip),
+            # the INIT-SL may be on the wrong side. Correct it using actual fill.
+            try:
+                from hermes_constants import ATR_SL_MIN_INIT
+                _pg = pg_connect(host='/var/run/postgresql', database='brain', user='postgres')
+                _cur = _pg.cursor()
+                _cur.execute(
+                    "SELECT id, entry_price, hl_entry_price, stop_loss, direction FROM trades "
+                    "WHERE token=%s AND direction=%s AND status='open' ORDER BY id DESC LIMIT 1",
+                    (token.upper(), direction.upper()))
+                _row = _cur.fetchone()
+                if _row:
+                    _tid, _entry, _hl_entry, _sl, _dir = _row
+                    _actual = float(_hl_entry or _entry)
+                    _sl_val = float(_sl or 0)
+                    if _actual > 0 and _sl_val > 0:
+                        if _dir == 'LONG' and _sl_val >= _actual:
+                            # SL above entry for LONG — wrong side, fix it
+                            _new_sl = round(_actual * (1 - ATR_SL_MIN_INIT), 8)
+                            _cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s", (_new_sl, _tid))
+                            _pg.commit()
+                            log(f'  [SL-FIX] {token} LONG: SL was {_sl_val:.6f} (above entry {_actual:.6f}), fixed to {_new_sl:.6f}')
+                        elif _dir == 'SHORT' and _sl_val <= _actual:
+                            # SL below entry for SHORT — wrong side, fix it
+                            _new_sl = round(_actual * (1 + ATR_SL_MIN_INIT), 8)
+                            _cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s", (_new_sl, _tid))
+                            _pg.commit()
+                            log(f'  [SL-FIX] {token} SHORT: SL was {_sl_val:.6f} (below entry {_actual:.6f}), fixed to {_new_sl:.6f}')
+                _cur.close(); _pg.close()
+            except Exception as sl_fix_err:
+                log(f'  [SL-FIX] Post-trade SL correction failed for {token}: {sl_fix_err}')
             # BUG-26 fix: mark_signal_executed was already called atomically above (before brain.py).
             # Record in ab_results — all three experiments
             _record_ab_trade_opened(token, direction, experiment, ab.get('sl_variant', ''), 'sl-distance-test')
