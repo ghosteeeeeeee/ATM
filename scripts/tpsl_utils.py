@@ -530,18 +530,20 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: trail from nadir, then enforce one-way, then entry ceiling
+                # In profit: trail from nadir, then enforce one-way
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 new_sl = min(new_sl, trail_ceil)             # trail from nadir
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)         # one-way: never go up
-                entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
-                new_sl = min(new_sl, entry_ceil)  # entry ceiling is absolute cap
             else:
                 # In loss: entry ceiling is absolute, but never loosen from previous SL
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)  # one-way: never go up
+            # ABSOLUTE FLOOR: SL must stay at least 0.5% from entry
+            # Applied AFTER trailing — trail can only tighten FROM this floor
+            entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
+            new_sl = max(new_sl, entry_ceil)
 
     # ── INIT-to-ACCEL migration ──────────────────────────────────────────────────
     # Detect stale accel-floor SLs on new trades (INIT floor was too tight on entry).
@@ -735,7 +737,7 @@ def compute_atr_sl_tp(
                 new_sl = min(new_sl, trail_ceil)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
-                new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # entry_ceil FLOOR
             else:
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
