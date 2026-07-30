@@ -526,8 +526,10 @@ def compute_atr_sl_tp(
                     new_sl = max(new_sl, current_sl)         # one-way: never go down
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))  # entry floor
             else:
-                # In loss: entry floor is absolute
+                # In loss: entry floor is absolute, but never loosen from previous SL
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                if current_sl > 0:
+                    new_sl = max(new_sl, current_sl)  # one-way: never go down
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
@@ -538,8 +540,10 @@ def compute_atr_sl_tp(
                     new_sl = min(new_sl, current_sl)         # one-way: never go up
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # entry ceiling
             else:
-                # In loss: entry ceiling is absolute
+                # In loss: entry ceiling is absolute, but never loosen from previous SL
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                if current_sl > 0:
+                    new_sl = min(new_sl, current_sl)  # one-way: never go up
 
     # ── INIT-to-ACCEL migration ──────────────────────────────────────────────────
     # Detect stale accel-floor SLs on new trades (INIT floor was too tight on entry).
@@ -740,6 +744,8 @@ def compute_atr_sl_tp(
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
             else:
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                if current_sl > 0:
+                    new_sl = max(new_sl, current_sl)
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
@@ -752,6 +758,8 @@ def compute_atr_sl_tp(
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
             else:
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                if current_sl > 0:
+                    new_sl = min(new_sl, current_sl)
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
 
