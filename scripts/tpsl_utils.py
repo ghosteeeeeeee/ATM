@@ -509,12 +509,9 @@ def compute_atr_sl_tp(
         return result
 
     # ── MINIMUM SL DISTANCE (FIX 2026-07-30) ──────────────────────────────────────
-    # Three independent checks, each can raise the SL:
-    #   1. From entry: SL >= entry - 0.5% (new trade protection)
-    #   2. From peak: SL >= peak - TRAILING_DISTANCE_PCT (trailing floor)
-    #   3. From current: SL >= current - 0.5% (breathing room for pullbacks)
-    MIN_FROM_CURRENT = 0.004  # 0.4% gap from current price (0.3-0.5% range)
-    _force_min_distance = False
+    # Two-mode guard:
+    #   IN PROFIT: trail from peak at TRAILING_DISTANCE_PCT, enforce one-way, entry floor
+    #   IN LOSS: entry floor/ceiling is absolute
     if entry_f > 0:
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
@@ -663,27 +660,9 @@ def compute_atr_sl_tp(
 
     # ── Trailing SL gate ────────────────────────────────────────────────────────
     # LONG:  SL must trail UP as price rises — only tighten if new_sl > current_sl.
-    #        new_sl BELOW current price = in loss territory = WRONG SIDE.
     # SHORT: SL must trail DOWN as price falls — only tighten if new_sl < current_sl.
-    #        new_sl ABOVE current price = in loss territory = WRONG SIDE.
-    #
-    # BUG FIX (2026-05-18): The gate logic was INVERTED for LONG.
-    #   - Old (WRONG): `new_sl > current_sl` = tighten → blocked
-    #   - Old (WRONG): `new_sl < current_sl` = tighten → allowed (but blocked valid tightening!)
-    #   - New: LONG: tighten = new_sl RAISES (higher number) = further from current price
-    #          SHORT: tighten = new_sl LOWERS (lower number) = further from current price
-    #
-    # ── TRAILING GATE: SL NEVER LOOSENS ──────────────────────────────────────
-    # Core rule: SL only tightens, never loosens.
-    # LONG: SL only goes UP (new_sl > current_sl)
-    # SHORT: SL only goes DOWN (new_sl < current_sl)
     # Exception: wrong-side correction (current_sl on wrong side of entry)
-    # Exception: _force_min_distance (minimum distance guard snapped SL)
-    if _force_min_distance:
-        # Minimum distance guard snapped SL — force write regardless of gate logic
-        result['needs_sl'] = True
-        result['_force_write'] = True
-    elif direction == 'LONG':
+    if direction == 'LONG':
         if current_sl > 0:
             current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
             if new_sl > current_sl:
@@ -712,7 +691,7 @@ def compute_atr_sl_tp(
                 # Force update to correct it — this is a correction, not loosening.
                 result['needs_sl'] = True
                 result['_force_write'] = True
-            elif new_sl > current_sl and not _force_min_distance:
+            elif new_sl > current_sl:
                 # Bug-fix: new_sl is higher than current_sl
                 # For SHORT, higher SL = more protection (SL above entry is correct)
                 # Allow if new_sl is at TRAILING_DISTANCE_PCT from entry (correct trailing)

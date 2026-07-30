@@ -3196,7 +3196,11 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                 atr_pct = ATR_PCT_FALLBACK
             k = ATR_K_NORMAL_VOL
             k_tp = k * ATR_TP_K_MULT
-            sl_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, k * atr_pct))
+            # Guardian SL: 1.0-2.0% from current (wider than position_manager's 0.4%)
+            # This is the last-resort safety net — should NOT trigger on normal pullbacks
+            _GUARDIAN_SL_MIN = 0.010  # 1.0% minimum
+            _GUARDIAN_SL_MAX = 0.020  # 2.0% maximum
+            sl_pct = max(_GUARDIAN_SL_MIN, min(_GUARDIAN_SL_MAX, k * atr_pct))
             tp_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, k_tp * atr_pct))
             if direction == 'LONG':
                 fresh_sl = curr * (1 - sl_pct)
