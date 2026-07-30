@@ -524,14 +524,18 @@ def compute_atr_sl_tp(
                 if new_sl < trail_floor:
                     new_sl = trail_floor
                     _force_min_distance = True
+                # SL must never go below previous SL (one-way only)
+                if current_sl > 0 and new_sl < current_sl:
+                    new_sl = current_sl
+                    _force_min_distance = True
             # Check 2: from entry (new trade floor)
             else:
                 entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)  # 0.5% from entry
                 if new_sl > entry_floor:
                     new_sl = entry_floor
                     _force_min_distance = True
-            # Check 3: from current price (breathing room) — ALWAYS apply
-            # LONG: SL must be at least MIN_FROM_CURRENT BELOW current price
+            # Check 3: from current price (breathing room) — only tighten direction
+            # LONG: push SL UP if too close to current price
             current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
             if new_sl > current_floor:
                 new_sl = current_floor
@@ -544,18 +548,18 @@ def compute_atr_sl_tp(
                 if new_sl > trail_ceil:
                     new_sl = trail_ceil
                     _force_min_distance = True
+                # SL must never go above previous SL (one-way only)
+                if current_sl > 0 and new_sl > current_sl:
+                    new_sl = current_sl
+                    _force_min_distance = True
             # Check 2: from entry (new trade floor)
             else:
                 entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)  # 0.5% from entry
                 if new_sl < entry_ceil:
                     new_sl = entry_ceil
                     _force_min_distance = True
-            # Check 3: from current price (breathing room) — ALWAYS apply
-            # SHORT: SL must be at least MIN_FROM_CURRENT ABOVE current price
-            current_ceil = round(current_price * (1 + MIN_FROM_CURRENT), 8)
-            if new_sl < current_ceil:
-                new_sl = current_ceil
-                _force_min_distance = True
+            # NOTE: MIN_FROM_CURRENT not applied for SHORT — trailing from nadir
+            # handles it. MIN_FROM_CURRENT causes wrong-direction pushes on bounces.
 
     # ── INIT-to-ACCEL migration ──────────────────────────────────────────────────
     # Detect stale accel-floor SLs on new trades (INIT floor was too tight on entry).
@@ -759,10 +763,6 @@ def compute_atr_sl_tp(
                 if new_sl < entry_ceil:
                     new_sl = entry_ceil
                     result['needs_sl'] = True
-            current_ceil = round(current_price * (1 + MIN_FROM_CURRENT), 8)
-            if new_sl < current_ceil:
-                new_sl = current_ceil
-                result['needs_sl'] = True
 
     # ── BREAKEVEN GUARD (REMOVED 2026-07-26) ──────────────────────────────────
     # Previously snapped SL to entry when trade was in profit (pnl_pct >= 0).
