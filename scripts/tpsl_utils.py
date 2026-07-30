@@ -528,19 +528,11 @@ def compute_atr_sl_tp(
                 if current_sl > 0 and new_sl < current_sl:
                     new_sl = current_sl
                     _force_min_distance = True
-            # Check 2: from entry (new trade floor)
-            # When in loss: use current_price - buffer instead of entry - 0.5%.
-            # Entry-based floor would be above current price → wrong-side guard
-            # snaps it too far down. Current-price-based keeps SL tight.
-            else:
-                in_profit = current_price > entry_f
-                if in_profit:
-                    entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
-                else:
-                    entry_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
-                if new_sl > entry_floor:
-                    new_sl = entry_floor
-                    _force_min_distance = True
+            # Check 2: ABSOLUTE FLOOR — SL never drops below entry - 0.5%
+            entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
+            if new_sl > entry_floor:
+                new_sl = entry_floor
+                _force_min_distance = True
             # Check 3: from current price — ONLY when in profit (trailing)
             in_profit = current_price > entry_f
             if in_profit:
@@ -560,12 +552,11 @@ def compute_atr_sl_tp(
                 if current_sl > 0 and new_sl > current_sl:
                     new_sl = current_sl
                     _force_min_distance = True
-            # Check 2: from entry (new trade floor)
-            else:
-                entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)  # 0.5% from entry
-                if new_sl < entry_ceil:
-                    new_sl = entry_ceil
-                    _force_min_distance = True
+            # Check 2: ABSOLUTE CEILING — SL never rises above entry + 0.5%
+            entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
+            if new_sl < entry_ceil:
+                new_sl = entry_ceil
+                _force_min_distance = True
             # NOTE: MIN_FROM_CURRENT not applied for SHORT — trailing from nadir
             # handles it. MIN_FROM_CURRENT causes wrong-direction pushes on bounces.
 
@@ -612,7 +603,11 @@ def compute_atr_sl_tp(
                     print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
                           f">= current {current_price:.6f} but below entry {entry_f:.6f}; snapping to {snapped:.6f}")
                 new_sl = snapped
-                if current_sl > 0 and snapped <= current_sl:
+                # ABSOLUTE FLOOR: SL never drops below entry - 0.5% for LONG
+                _abs_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
+                if new_sl < _abs_floor:
+                    new_sl = _abs_floor
+                if current_sl > 0 and new_sl <= current_sl:
                     result['_force_write'] = False
                 else:
                     result['_force_write'] = True
@@ -624,7 +619,11 @@ def compute_atr_sl_tp(
                 print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — SL {new_sl:.6f} "
                       f">= current {current_price:.6f} and >= entry; snapping to {_snap_dist*100:.2f}% below current → {snapped:.6f}")
                 new_sl = snapped
-                if current_sl > 0 and snapped <= current_sl:
+                # ABSOLUTE FLOOR: SL never drops below entry - 0.5% for LONG
+                _abs_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
+                if new_sl < _abs_floor:
+                    new_sl = _abs_floor
+                if current_sl > 0 and new_sl <= current_sl:
                     result['_force_write'] = False
                 else:
                     result['_force_write'] = True
@@ -649,6 +648,10 @@ def compute_atr_sl_tp(
                     print(f"  [TPSL] {token} {direction}: WRONG-SIDE GUARD — proposed SL {new_sl:.6f} "
                           f"<= current {current_price:.6f} but above entry {entry_f:.6f}; snapping to {snapped:.6f}")
                 new_sl = snapped
+                # ABSOLUTE CEILING: SL never rises above entry + 0.5% for SHORT
+                _abs_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
+                if new_sl > _abs_ceil:
+                    new_sl = _abs_ceil
                 # Only force write if snapped SL is actually tighter than current SL.
                 # If snapped >= current_sl, the guard is loosening — let trailing gate decide.
                 if current_sl > 0 and snapped >= current_sl:
@@ -664,6 +667,10 @@ def compute_atr_sl_tp(
                       f"({new_sl:.6f} <= entry {entry_f:.6f}) and below current "
                       f"({current_price:.6f}); snapping to {_snap_dist*100:.2f}% above current → {snapped:.6f}")
                 new_sl = snapped
+                # ABSOLUTE CEILING: SL never rises above entry + 0.5% for SHORT
+                _abs_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
+                if new_sl > _abs_ceil:
+                    new_sl = _abs_ceil
                 if current_sl > 0 and snapped >= current_sl:
                     result['_force_write'] = False
                 else:
@@ -756,7 +763,7 @@ def compute_atr_sl_tp(
                     new_sl = entry_floor
                     result['needs_sl'] = True
             current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
-            if new_sl > current_floor:
+            if in_profit and new_sl > current_floor:
                 new_sl = current_floor
                 result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
