@@ -333,7 +333,7 @@ ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
 ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
 # Was 0.5% — too wide, prevented trailing from locking in profits
-# Lower than TRAILING_DISTANCE_PCT (0.20%) so trailing takes over
+# Lower than TRAILING_DISTANCE_PCT (0.40%) so trailing takes over
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
@@ -350,7 +350,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 # TUNED 2026-07-28: activate earlier (0.25%), tighter trail (0.20%)
 # Analysis: most trades peak at 0.3-0.6% MFE then pull back — need to lock in sooner
 TRAILING_ACTIVATION_PCT = 0.0025  # 0.25% — activate quickly (was 0.50%)
-TRAILING_DISTANCE_PCT   = 0.002   # 0.20% — tighter trail (was 0.40%)
+TRAILING_DISTANCE_PCT   = 0.004   # 0.40% — give trades room to develop (was 0.20%)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
