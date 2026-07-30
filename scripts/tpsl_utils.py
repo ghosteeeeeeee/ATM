@@ -526,7 +526,7 @@ def compute_atr_sl_tp(
                     _force_min_distance = True
             # Check 2: from entry (new trade floor)
             else:
-                entry_floor = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)  # 0.5% from entry
                 if new_sl > entry_floor:
                     new_sl = entry_floor
                     _force_min_distance = True
@@ -546,7 +546,7 @@ def compute_atr_sl_tp(
                     _force_min_distance = True
             # Check 2: from entry (new trade floor)
             else:
-                entry_ceil = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)  # 0.5% from entry
                 if new_sl < entry_ceil:
                     new_sl = entry_ceil
                     _force_min_distance = True
@@ -739,7 +739,7 @@ def compute_atr_sl_tp(
                     new_sl = trail_floor
                     result['needs_sl'] = True
             else:
-                entry_floor = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
                 if new_sl > entry_floor:
                     new_sl = entry_floor
                     result['needs_sl'] = True
@@ -755,7 +755,7 @@ def compute_atr_sl_tp(
                     new_sl = trail_ceil
                     result['needs_sl'] = True
             else:
-                entry_ceil = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
                 if new_sl < entry_ceil:
                     new_sl = entry_ceil
                     result['needs_sl'] = True
