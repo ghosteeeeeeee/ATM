@@ -508,33 +508,42 @@ def compute_atr_sl_tp(
     else:
         return result
 
-    # ── MINIMUM SL DISTANCE FROM ENTRY (FIX 2026-07-30) ──────────────────────────
-    # Prevent trailing gate from compressing SL to near-zero distance from entry.
-    # Without this, k×ATR% anchored to lowest/highest_price ratchets SL tighter
-    # every cycle until it's 0.02-0.05% from entry — any noise triggers stop-out.
-    # Root cause of 10/16 losses in Jul 29-30 batch (MFE exceeded SL distance).
+    # ── MINIMUM SL DISTANCE (FIX 2026-07-30) ──────────────────────────────────────
+    # Prevent trailing gate from compressing SL to near-zero distance.
+    # Two modes depending on trade state:
     #
-    # Once anchor moves past min distance, trailing gate handles SL naturally.
-    # This guard only clamps when anchor is still near entry (initial cycles).
-    _min_entry_dist = max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)  # 0.5% floor
-    _force_min_distance = False  # flag: guard snapped SL, trailing gate must allow
+    # NEW TRADE (highest≈entry): enforce minimum from entry (0.5%).
+    #   Prevents the 0.02% SL disaster from earlier sessions.
+    #
+    # IN PROFIT (highest moved up): enforce minimum from HIGHEST PRICE (0.4%).
+    #   This is the KEY fix — SL trails the peak, not stuck at entry.
+    #   Without this, the entry-based floor overrides trailing and SL never locks profit.
+    _force_min_distance = False
     if entry_f > 0:
-        if direction == 'LONG':
-            min_sl = round(entry_f * (1 - _min_entry_dist), 8)
-            # Only clamp if anchor hasn't moved past min distance yet
-            anchor_moved = highest_price > 0 and highest_price >= entry_f * (1 + _min_entry_dist)
-            if not anchor_moved and new_sl > min_sl:
-                new_sl = min_sl
-                eff_sl_pct = _min_entry_dist
-                _force_min_distance = True
-        elif direction == 'SHORT':
-            min_sl = round(entry_f * (1 + _min_entry_dist), 8)
-            # Only clamp if anchor hasn't moved past min distance yet
-            anchor_moved = lowest_price > 0 and lowest_price <= entry_f * (1 - _min_entry_dist)
-            if not anchor_moved and new_sl < min_sl:
-                new_sl = min_sl
-                eff_sl_pct = _min_entry_dist
-                _force_min_distance = True
+        if direction == 'LONG' and highest_price > 0:
+            moved_pct = (highest_price - entry_f) / entry_f
+            if moved_pct > 0.003:  # price moved 0.3%+ — trail from peak
+                min_sl = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                if new_sl < min_sl:
+                    new_sl = min_sl
+                    _force_min_distance = True
+            else:  # new trade — enforce from entry
+                min_sl = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl > min_sl:
+                    new_sl = min_sl
+                    _force_min_distance = True
+        elif direction == 'SHORT' and lowest_price > 0:
+            moved_pct = (entry_f - lowest_price) / entry_f
+            if moved_pct > 0.003:  # price moved 0.3%+ — trail from nadir
+                min_sl = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                if new_sl > min_sl:
+                    new_sl = min_sl
+                    _force_min_distance = True
+            else:  # new trade — enforce from entry
+                min_sl = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl < min_sl:
+                    new_sl = min_sl
+                    _force_min_distance = True
 
     # ── INIT-to-ACCEL migration ──────────────────────────────────────────────────
     # Detect stale accel-floor SLs on new trades (INIT floor was too tight on entry).
@@ -707,21 +716,33 @@ def compute_atr_sl_tp(
             result['needs_sl'] = True
 
     # ── POST-GATE MINIMUM SL DISTANCE (FIX 2026-07-30) ──────────────────────────
-    # Second line of defense: even if trailing gate allowed tightening, enforce
-    # minimum distance from entry. Prevents multi-cycle ratcheting where each
-    # cycle compresses SL by 0.01% until it's at 0.02% from entry.
+    # Safety net: enforce minimum distance after trailing gate runs.
+    # Same logic as pre-gate guard — entry-based for new trades, peak-based for profit.
     if entry_f > 0:
-        _min_entry_dist = max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)
-        if direction == 'LONG':
-            min_sl = round(entry_f * (1 - _min_entry_dist), 8)
-            if new_sl > min_sl:
-                new_sl = min_sl
-                result['needs_sl'] = True
-        elif direction == 'SHORT':
-            min_sl = round(entry_f * (1 + _min_entry_dist), 8)
-            if new_sl < min_sl:
-                new_sl = min_sl
-                result['needs_sl'] = True
+        if direction == 'LONG' and highest_price > 0:
+            moved_pct = (highest_price - entry_f) / entry_f
+            if moved_pct > 0.003:
+                min_sl = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                if new_sl < min_sl:
+                    new_sl = min_sl
+                    result['needs_sl'] = True
+            else:
+                min_sl = round(entry_f * (1 - max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl > min_sl:
+                    new_sl = min_sl
+                    result['needs_sl'] = True
+        elif direction == 'SHORT' and lowest_price > 0:
+            moved_pct = (entry_f - lowest_price) / entry_f
+            if moved_pct > 0.003:
+                min_sl = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                if new_sl > min_sl:
+                    new_sl = min_sl
+                    result['needs_sl'] = True
+            else:
+                min_sl = round(entry_f * (1 + max(ATR_SL_MIN, TRAILING_DISTANCE_PCT)), 8)
+                if new_sl < min_sl:
+                    new_sl = min_sl
+                    result['needs_sl'] = True
 
     # ── BREAKEVEN GUARD (REMOVED 2026-07-26) ──────────────────────────────────
     # Previously snapped SL to entry when trade was in profit (pnl_pct >= 0).
