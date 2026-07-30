@@ -543,9 +543,11 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                # In profit: SL trails from peak at 0.4%, stays above entry
+                # In profit: SL trails from peak at 0.4%, minimum 0.5% from entry
                 trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_floor
+                # Ensure SL is at least 0.5% from entry (initial SL level)
+                min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
+                new_sl = max(trail_floor, min_from_entry)
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             else:
@@ -556,11 +558,11 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: SL trails from nadir at 0.4%
-                # When nadir is close to entry, SL may be above entry (barely in profit)
-                # As trade moves deeper, SL naturally moves below entry (locking in profit)
+                # In profit: SL trails from nadir at 0.4%, minimum 0.5% from entry
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_ceil
+                # Ensure SL is at least 0.5% from entry (initial SL level)
+                min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
+                new_sl = min(trail_ceil, min_from_entry)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:
@@ -745,7 +747,8 @@ def compute_atr_sl_tp(
             in_profit = current_price > entry_f
             if in_profit:
                 trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_floor
+                min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
+                new_sl = max(trail_floor, min_from_entry)
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             else:
@@ -758,7 +761,8 @@ def compute_atr_sl_tp(
             in_profit = current_price < entry_f
             if in_profit:
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                new_sl = trail_ceil
+                min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
+                new_sl = min(trail_ceil, min_from_entry)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:
