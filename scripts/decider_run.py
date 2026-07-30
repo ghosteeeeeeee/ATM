@@ -1050,20 +1050,6 @@ def context_gate(token, direction, source, sig):
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None, 0)
 
-    # ── Stale signal price check ───────────────────────────────────────────
-    # If signal price differs from current price by >0.5%, the signal is stale.
-    # Don't flip or trade on stale data — skip.
-    try:
-        _sig_price = float(sig.get('price', 0)) if isinstance(sig, dict) else 0
-        _cur_price = get_current_price(token) or 0
-        if _sig_price > 0 and _cur_price > 0:
-            _drift = abs(_sig_price - _cur_price) / _cur_price
-            if _drift > 0.005:
-                log(f'  [CTX-GATE] {token}: SKIP — signal price {_sig_price:.6f} drifts {_drift*100:.2f}% from current {_cur_price:.6f}')
-                return ('SKIP', f'stale signal price: drift {_drift*100:.2f}%', 0)
-    except Exception:
-        pass
-
     verdict, ctx = rule_based_context_gate(token, direction, source, sig)
 
     if verdict == 'SKIP':
@@ -1168,6 +1154,7 @@ def execute_trade(token, direction, price, confidence, source,
         # Use CURRENT market price (not signal price) — signal may be stale.
         from hermes_constants import ATR_SL_MIN_INIT, ATR_TP_MIN
         _live_price = get_current_price(token) or price
+        price = _live_price  # use live price for entry, not stale signal price
         if direction == 'LONG':
             sl = round(_live_price * (1 - ATR_SL_MIN_INIT), 8)
             tp = round(_live_price * (1 + ATR_TP_MIN), 8)
