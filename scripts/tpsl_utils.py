@@ -8,6 +8,28 @@ them via this module.
 
 Single source of truth. No duplicated logic, no inline ATR math elsewhere.
 
+═══════════════════════════════════════════════════════════════════════
+CRITICAL SL RULES (DO NOT CHANGE WITHOUT T'S APPROVAL):
+═══════════════════════════════════════════════════════════════════════
+
+1. TRAILING: Once in profit, SL trails TRAILING_DISTANCE_PCT (0.4%) from
+   the peak/nadir. SL must NEVER go against the trade direction.
+   LONG: SL only goes UP. SHORT: SL only goes DOWN.
+
+2. ENTRY FLOOR: At trade entry, SL is set at entry ± ATR_SL_MIN (0.5%).
+   This is the INITIAL SL only. Once price moves into profit, trailing
+   takes over completely.
+
+3. MIN DISTANCE: In profit, SL is always TRAILING_DISTANCE_PCT from the
+   current peak/nadir — NOT from entry. This ensures SL locks in profit
+   as price moves favorably.
+
+4. ONE-WAY ENFORCEMENT: After any SL update, verify SL never loosens:
+   LONG: new_sl >= current_sl (only goes up)
+   SHORT: new_sl <= current_sl (only goes down)
+
+═══════════════════════════════════════════════════════════════════════
+
 Canonical trailing behaviour:
   LONG  → SL anchored to highest_price (peak). Tightens as price rises.
           TP anchored to highest_price. Tightens as TP rises.
@@ -516,34 +538,36 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                # In profit: trail from peak, then enforce one-way, then entry floor
+                # In profit: trail from peak, enforce one-way
                 trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                new_sl = max(new_sl, trail_floor)           # trail from peak
+                new_sl = max(new_sl, trail_floor)
                 if current_sl > 0:
-                    new_sl = max(new_sl, current_sl)         # one-way: never go down
-                new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))  # entry floor
+                    new_sl = max(new_sl, current_sl)
+                # MIN DISTANCE: only tighten (never loosen)
+                _min_from_price = round(current_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                if new_sl < _min_from_price:
+                    new_sl = _min_from_price
             else:
-                # In loss: entry floor is absolute, but never loosen from previous SL
+                # In loss: entry floor is absolute, but never loosen
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)  # one-way: never go down
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: trail from nadir, then enforce one-way
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                new_sl = min(new_sl, trail_ceil)             # trail from nadir
+                new_sl = min(new_sl, trail_ceil)
                 if current_sl > 0:
-                    new_sl = min(new_sl, current_sl)         # one-way: never go up
+                    new_sl = min(new_sl, current_sl)
+                # MIN DISTANCE: only tighten (never loosen — one-way handles that)
+                _min_from_price = round(current_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                if new_sl > _min_from_price:
+                    new_sl = _min_from_price
             else:
-                # In loss: entry ceiling is absolute, but never loosen from previous SL
+                # In loss: entry ceiling is absolute, but never loosen
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)  # one-way: never go up
-            # ABSOLUTE FLOOR: SL must stay at least 0.5% from entry
-            # Applied AFTER trailing — trail can only tighten FROM this floor
-            entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
-            new_sl = max(new_sl, entry_ceil)
 
     # ── INIT-to-ACCEL migration ──────────────────────────────────────────────────
     # Detect stale accel-floor SLs on new trades (INIT floor was too tight on entry).
@@ -723,7 +747,9 @@ def compute_atr_sl_tp(
                 new_sl = max(new_sl, trail_floor)
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
-                new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                _min_from_price = round(current_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                if new_sl < _min_from_price:
+                    new_sl = _min_from_price
             else:
                 new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
@@ -737,7 +763,9 @@ def compute_atr_sl_tp(
                 new_sl = min(new_sl, trail_ceil)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
-                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # entry_ceil FLOOR
+                _min_from_price = round(current_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                if new_sl > _min_from_price:
+                    new_sl = _min_from_price
             else:
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
