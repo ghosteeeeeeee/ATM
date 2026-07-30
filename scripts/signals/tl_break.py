@@ -438,15 +438,19 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         return None
 
     # ── Phase 3b: Breakout candle body check — decisive breakout ─────────────
-    # The first candle that breaks the trendline must have a strong body (> 0.5 ATR)
-    # Filters weak breakouts that just barely close beyond the line
+    # The first candle that breaks the trendline must have a body > 0.3 ATR
+    # Filters weak breakouts that barely close beyond the line
     breakout_body_ok = False
     for i in range(fit_end, min(fit_end + TL_BREAKOUT_CANDLES, n)):
         tl_price = slope * i + intercept
         candle = candles[i]
         body = abs(candle['close'] - candle['open'])
         if direction == 'LONG' and candle['close'] > tl_price + (atr * TL_BREAKOUT_ATR_K * 0.5):
-            if body > atr * 0.5:
+            if body > atr * 0.3:
+                breakout_body_ok = True
+                break
+        elif direction == 'SHORT' and candle['close'] < tl_price - (atr * TL_BREAKOUT_ATR_K * 0.5):
+            if body > atr * 0.3:
                 breakout_body_ok = True
                 break
         elif direction == 'SHORT' and candle['close'] < tl_price - (atr * TL_BREAKOUT_ATR_K * 0.5):
