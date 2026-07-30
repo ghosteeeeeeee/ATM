@@ -529,17 +529,25 @@ def compute_atr_sl_tp(
                     new_sl = current_sl
                     _force_min_distance = True
             # Check 2: from entry (new trade floor)
+            # When in loss: use current_price - buffer instead of entry - 0.5%.
+            # Entry-based floor would be above current price → wrong-side guard
+            # snaps it too far down. Current-price-based keeps SL tight.
             else:
-                entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)  # 0.5% from entry
+                in_profit = current_price > entry_f
+                if in_profit:
+                    entry_floor = round(entry_f * (1 - ATR_SL_MIN), 8)
+                else:
+                    entry_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
                 if new_sl > entry_floor:
                     new_sl = entry_floor
                     _force_min_distance = True
-            # Check 3: from current price (breathing room) — only tighten direction
-            # LONG: push SL UP if too close to current price
-            current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
-            if new_sl > current_floor:
-                new_sl = current_floor
-                _force_min_distance = True
+            # Check 3: from current price — ONLY when in profit (trailing)
+            in_profit = current_price > entry_f
+            if in_profit:
+                current_floor = round(current_price * (1 - MIN_FROM_CURRENT), 8)
+                if new_sl > current_floor:
+                    new_sl = current_floor
+                    _force_min_distance = True
         elif direction == 'SHORT' and lowest_price > 0:
             moved_pct = (entry_f - lowest_price) / entry_f
             # Check 1: from nadir (trailing floor)
