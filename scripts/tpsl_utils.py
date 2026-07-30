@@ -535,7 +535,8 @@ def compute_atr_sl_tp(
                 new_sl = min(new_sl, trail_ceil)             # trail from nadir
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)         # one-way: never go up
-                new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # entry ceiling
+                entry_ceil = round(entry_f * (1 + ATR_SL_MIN), 8)
+                new_sl = min(new_sl, entry_ceil)  # entry ceiling is absolute cap
             else:
                 # In loss: entry ceiling is absolute, but never loosen from previous SL
                 new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
