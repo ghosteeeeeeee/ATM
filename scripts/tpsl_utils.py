@@ -501,9 +501,13 @@ def compute_atr_sl_tp(
         # else: MIN_SL_PCT already set to TRAILING_DISTANCE_PCT above
         MIN_TP_PCT = ATR_TP_MIN         # 1.5% — wider for new trades
     else:
-        if atr is not None and atr > 0:
-            MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.5% — established trade floor (phase scaling bites)
-        # else: MIN_SL_PCT already set to TRAILING_DISTANCE_PCT above
+        # In loss: always use 0.5% floor (initial SL). Only use tighter floor when in profit.
+        in_loss = (direction == 'LONG' and current_price < entry_f) or \
+                  (direction == 'SHORT' and current_price > entry_f)
+        if in_loss:
+            MIN_SL_PCT = ATR_SL_MIN   # 0.5% — initial SL, even for established trades
+        elif atr is not None and atr > 0:
+            MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.15% — established trade floor in profit
         MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades
 
     # ── Clamp effective percentages ─────────────────────────────────────────────
@@ -546,8 +550,8 @@ def compute_atr_sl_tp(
                     new_sl = max(new_sl, current_sl)
                 # DO NOT floor at entry — trail_floor already keeps SL above entry
             else:
-                # In loss: entry floor is absolute, but never loosen
-                new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                # In loss: entry floor is absolute — SL must stay at least 0.5% from entry
+                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)  # one-way: never go down
         elif direction == 'SHORT' and lowest_price > 0:
@@ -561,8 +565,8 @@ def compute_atr_sl_tp(
                 # DO NOT cap at entry — trail_ceil already keeps SL below entry
                 # Capping at entry sets SL to 0% from entry, any bounce triggers it
             else:
-                # In loss: entry ceiling is absolute, but never loosen
-                new_sl = min(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                # In loss: entry ceiling is absolute floor — SL must stay at least 0.5% from entry
+                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)  # one-way: never go up
 
@@ -745,7 +749,7 @@ def compute_atr_sl_tp(
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             else:
-                new_sl = max(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             if new_sl != result.get('new_sl', new_sl):
