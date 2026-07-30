@@ -38,6 +38,8 @@ from typing import Optional, Tuple, List, Dict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from hyperliquid_exchange import _HL_BLOCKLIST
+
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 # Lookback window (~8h = 96 candles at 5m)
@@ -605,6 +607,10 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
     for token, data in prices_dict.items():
         price = data.get('price')
         if not price or price <= 0:
+            continue
+
+        # ── Blocklist check — skip tokens that can't be filled on HL ──────────
+        if token.upper() in _HL_BLOCKLIST:
             continue
 
         # ── Cooldown check ──────────────────────────────────────────────────
