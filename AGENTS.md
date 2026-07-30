@@ -195,16 +195,30 @@ python3 scripts/signal_compactor.py --verbose
 
 | Parameter | Value | Purpose |
 |-----------|-------|---------|
-| `ATR_SL_MIN` | 0.7% | Base SL floor (standalone helpers) |
-| `ATR_SL_MAX` | 0.8% | Absolute SL cap |
-| `ATR_SL_MIN_INIT` | 0.6% | New trade SL floor (breathing room) |
-| `ATR_SL_MAX_INIT` | 1.5% | New trade SL cap |
-| `ATR_SL_MIN_ACCEL` | 0.5% | Established trade SL floor (phase scaling bites) |
+| `ATR_SL_MIN` | 0.5% | Base SL floor (standalone helpers) |
+| `ATR_SL_MAX` | 2.0% | Absolute SL cap |
+| `ATR_SL_MIN_INIT` | 0.5% | New trade SL floor (breathing room) |
+| `ATR_SL_MAX_INIT` | 1.2% | New trade SL cap |
+| `ATR_SL_MIN_ACCEL` | 0.15% | Established trade SL floor (phase scaling bites) |
 | `ATR_TP_MIN` | 1.0% | Base TP floor |
 | `ATR_TP_MAX` | 5.0% | Absolute TP cap |
 | `ATR_TP_MIN_ACCEL` | 0.8% | Established trade TP floor |
 | `TRAILING_ACTIVATION_PCT` | 0.5% | Start trailing when price reaches +0.5% |
-| `TRAILING_DISTANCE_PCT` | 0.5% | SL sits 0.5% below peak |
+| `TRAILING_DISTANCE_PCT` | 0.4% | SL trails 0.4% behind peak/nadir |
+
+### CRITICAL SL TRAILING RULES (DO NOT CHANGE WITHOUT T'S APPROVAL):
+
+1. **TRAILING:** Once in profit, SL trails `TRAILING_DISTANCE_PCT` (0.4%) from the current peak/nadir. SL must NEVER go against the trade direction.
+   - LONG: SL only goes UP (never down)
+   - SHORT: SL only goes DOWN (never up)
+
+2. **ENTRY FLOOR:** At trade entry, SL is set at entry ± `ATR_SL_MIN` (0.5%). This is INITIAL SL only. Once price moves into profit, trailing takes over completely.
+
+3. **MIN DISTANCE:** In profit, SL is always 0.4% from the current peak/nadir — NOT from entry. This ensures SL locks in profit as price moves favorably.
+
+4. **ONE-WAY ENFORCEMENT:** After any SL update, verify SL never loosens:
+   - LONG: `new_sl >= current_sl` (only goes up)
+   - SHORT: `new_sl <= current_sl` (only goes down)
 
 **Constraints:** `ATR_SL_MIN_ACCEL < ATR_SL_MIN_INIT < ATR_SL_MAX` and `ATR_TP_MIN_ACCEL < ATR_TP_MIN`
 
