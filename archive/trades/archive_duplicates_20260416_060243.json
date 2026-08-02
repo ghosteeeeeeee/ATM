@@ -1,0 +1,30 @@
+{
+  "archived_at": "2026-04-16T06:02:43.401956",
+  "reason": "duplicate closed trades cleanup - guardian_orphan with hl_entry_price=0 (phantom trades)",
+  "trades_to_delete": [
+    {
+      "id": 5852,
+      "token": "AAVE",
+      "signal": "",
+      "close_reason": "ORPHAN_PAPER",
+      "pnl_pct": -0.2396,
+      "hl_entry_price": 0
+    },
+    {
+      "id": 6047,
+      "token": "IMX",
+      "signal": "",
+      "close_reason": "guardian_orphan",
+      "pnl_pct": 0.0,
+      "hl_entry_price": 0
+    },
+    {
+      "id": 6064,
+      "token": "PEOPLE",
+      "signal": "",
+      "close_reason": "guardian_orphan",
+      "pnl_pct": 1.5567,
+      "hl_entry_price": 0
+    }
+  ]
+}

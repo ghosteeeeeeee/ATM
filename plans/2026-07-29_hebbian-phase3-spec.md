@@ -1,7 +1,7 @@
 # Spec: Hebbian Phase 3 — Beyond WR Estimate
 
 **Date:** 2026-07-29
-**Status:** SPEC — awaiting review
+**Status:** Phase 3a SHIPPED, Phase 3b-d pending
 **Inspiration:** Brain.db now has 1007 nodes / 5706 synapses of trade-outcome data. Time to extract more value from it.
 
 ---

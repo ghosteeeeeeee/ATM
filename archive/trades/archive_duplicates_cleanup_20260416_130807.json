@@ -1,0 +1,41 @@
+{
+  "deleted_trades": [
+    {
+      "id": 6031,
+      "token": "DOGE",
+      "reason": "duplicate"
+    },
+    {
+      "id": 6035,
+      "token": "DOGE",
+      "reason": "duplicate"
+    },
+    {
+      "id": 5949,
+      "token": "DYM",
+      "reason": "duplicate"
+    },
+    {
+      "id": 5185,
+      "token": "XRP",
+      "reason": "duplicate"
+    },
+    {
+      "id": 5723,
+      "token": "OP",
+      "reason": "duplicate"
+    },
+    {
+      "id": 5448,
+      "token": "MORPHO",
+      "reason": "duplicate"
+    },
+    {
+      "id": 5845,
+      "token": "MORPHO",
+      "reason": "duplicate"
+    }
+  ],
+  "kept_trades": [],
+  "timestamp": "2026-04-16T13:08:05.658119"
+}

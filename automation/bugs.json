@@ -1,0 +1,19 @@
+{
+  "bugs": [],
+  "schema": {
+    "id": "BUG-XXX",
+    "title": "one-line description",
+    "severity": "CRITICAL|HIGH|MEDIUM|LOW",
+    "status": "OPEN|IN_PROGRESS|FIXED|WONTFIX|REOPENED",
+    "files": ["affected files"],
+    "symptom": "what was observed",
+    "root_cause": "what was actually wrong",
+    "fix": "what was changed",
+    "verified_by": "how it was confirmed",
+    "date_found": "YYYY-MM-DD",
+    "date_fixed": "YYYY-MM-DD or null",
+    "found_by": "agent|manual|monitoring",
+    "git_commit": "commit hash or null",
+    "related_bugs": ["BUG-XXX if related"]
+  }
+}

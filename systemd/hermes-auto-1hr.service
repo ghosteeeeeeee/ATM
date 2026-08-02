@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes Auto 1hr — analyze recent trades via opencode
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/.hermes/automation/run_auto_1hr.sh
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env

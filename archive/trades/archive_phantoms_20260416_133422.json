@@ -1,0 +1,56 @@
+{
+  "deleted": [
+    {
+      "id": 6073,
+      "token": "TRB",
+      "reason": "guardian_orphan, entry=exit, pnl=0, duplicates 5767"
+    },
+    {
+      "id": 6086,
+      "token": "TRB",
+      "reason": "guardian_orphan, entry=exit, pnl=0, duplicates 6072"
+    },
+    {
+      "id": 6074,
+      "token": "HBAR",
+      "reason": "ORPHAN_PAPER, entry=exit, pnl=0, duplicates 6041"
+    },
+    {
+      "id": 6080,
+      "token": "LINK",
+      "reason": "ORPHAN_PAPER, entry=exit, pnl=0, duplicates 5698"
+    },
+    {
+      "id": 6066,
+      "token": "LTC",
+      "reason": "HOTSET_BLOCKED, entry=exit, pnl=0, duplicates 5956"
+    },
+    {
+      "id": 6089,
+      "token": "SOL",
+      "reason": "ORPHAN_PAPER, entry=exit, pnl=0, duplicates 5942"
+    },
+    {
+      "id": 5956,
+      "token": "LTC",
+      "reason": "profit-monster, entry=exit, pnl=0, likely closed same day as 5945"
+    },
+    {
+      "id": 5754,
+      "token": "HBAR",
+      "reason": "profit-monster, entry=exit, pnl=0, likely stale close same entry"
+    },
+    {
+      "id": 5698,
+      "token": "LINK",
+      "reason": "profit-monster, entry=exit, pnl=0, likely stale close same entry"
+    },
+    {
+      "id": 5942,
+      "token": "SOL",
+      "reason": "profit-monster, entry=exit, pnl=0, likely stale close same entry"
+    }
+  ],
+  "kept": [],
+  "errors": []
+}

@@ -13,6 +13,11 @@ pairing/
 auth.lock
 .hermes_history
 
+# ─── SQLite runtime ────────────────────────────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+
 # ─── Generated / cached ──────────────────────────────────────────────────────
 __pycache__/
 *.pyc
@@ -25,6 +30,16 @@ scripts/trade_patterns.json
 migration/
 *.zip
 *.tar.gz
+
+# ─── Backup / temp / lock files ─────────────────────────────────────────────
+*.bak
+*.bak-*
+*.save
+*.save.*
+*.tmp
+*.lock
+*.corrupt
+*.pyc
 
 # ─── Environment secrets ──────────────────────────────────────────────────────
 .env
@@ -68,3 +83,44 @@ scripts/wandb/offline-run-*/
 scripts/wandb/debug*.log
 scripts/wandb/latest-run
 wandb-local/
+
+# ─── Runtime dirs (never commit) ─────────────────────────────────────────────
+memories/
+lsp/
+spawn-trees/
+state-snapshots/
+vids/
+
+# ─── Test scratch files ──────────────────────────────────────────────────────
+scripts/test_*.py
+scripts/tests/
+
+# ─── API caches ──────────────────────────────────────────────────────────────
+provider_models_cache.json
+ollama_cloud_models_cache.json
+
+# ─── Cron runtime ────────────────────────────────────────────────────────────
+cron/.jobs.lock
+cron/.jobs_*.tmp
+cron/ticker_heartbeat
+cron/ticker_last_success
+
+# ─── Debug scratch ───────────────────────────────────────────────────────────
+pipeline_bug_report_*.txt
+pipeline_health_report_*.txt
+auth.json.corrupt
+.npm_lock_hash_*
+
+# ─── Skills internal state (bundled skills, not our code) ────────────────────
+skills/.archive/
+skills/.curator_backups/
+skills/.curator_state
+skills/.hub/
+skills/.usage.json
+skills/.usage.json.lock
+
+# ─── Duplicate plans dir ─────────────────────────────────────────────────────
+.hermes/plans/
+
+# ─── Runtime caches ──────────────────────────────────────────────────────────
+cache/delegation/
