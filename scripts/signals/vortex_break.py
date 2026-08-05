@@ -338,6 +338,25 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
         else:
             _z = 0
         
+        # Regime filter — block signals that contradict regime
+        regime_penalty = 0
+        try:
+            import json as _json
+            regime_file = '/var/www/hermes/data/regime_5m.json'
+            if os.path.exists(regime_file):
+                with open(regime_file) as _f:
+                    _regime_data = _json.load(_f)
+                _token_regime = _regime_data.get('regimes', {}).get(token.upper(), {})
+                _token_reg = _token_regime.get('regime', 'NEUTRAL')
+                if _token_reg == 'LONG_BIAS' and direction == 'SHORT':
+                    continue
+                if _token_reg == 'SHORT_BIAS' and direction == 'LONG':
+                    continue
+                if _token_reg == 'NEUTRAL':
+                    pass  # No penalty for neutral regime — only block contradictions
+        except Exception:
+            pass
+        
         # All phases passed — calculate confidence
         conf = CONF_BASE
         if adx_val >= 30: conf += CONF_ADX_BONUS_MAX
@@ -352,6 +371,10 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
             conf += CONF_EMA_BONUS
         elif direction == 'SHORT' and crossover_price < ema_slow:
             conf += CONF_EMA_BONUS
+        
+        # Apply regime penalty
+        if regime_penalty:
+            conf = max(50, conf - regime_penalty)
         
         conf = min(CONF_MAX, conf)
         
@@ -381,119 +404,6 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
         }
     
     return None
-
-    # ── Phase 2: ADX trend confirmation ───────────────────────────────────
-    adx_val = _adx(candles, ADX_PERIOD)
-    if adx_val is None:
-        return None
-    if adx_val < ADX_MIN:
-        return None  # no trend — choppy market
-
-    # ── Phase 3: EMA alignment ────────────────────────────────────────────
-    ema_fast = _ema(closes, EMA_FAST)
-    ema_slow = _ema(closes, EMA_SLOW)
-
-    # Use price at crossover candle (index -2) for EMA check, not current price
-    # This prevents late detection when price moves after crossover
-    crossover_price = closes[-2] if len(closes) >= 2 else price
-
-    if direction == 'LONG' and crossover_price < ema_fast:
-        return None  # price below fast EMA at crossover — not bullish
-    if direction == 'SHORT' and crossover_price > ema_fast:
-        return None  # price above fast EMA at crossover — not bearish
-
-    # ── Phase 4: Z-score filter — block extreme counter-trend ──────────────
-    import statistics as _stat
-    recent_closes = closes[-20:] if len(closes) >= 20 else closes
-    if len(recent_closes) >= 10:
-        _mean = _stat.mean(recent_closes)
-        _stdev = _stat.stdev(recent_closes) if len(recent_closes) > 1 else 1
-        _z = (recent_closes[-1] - _mean) / _stdev if _stdev > 0 else 0
-        if direction == 'LONG' and _z < -2.0:
-            return None  # strong downtrend — don't catch falling knife
-        if direction == 'SHORT' and _z > 2.0:
-            return None  # strong uptrend — don't fade momentum
-    else:
-        _z = 0
-
-    # ── Phase 5: Regime filter ─────────────────────────────────────────────
-    regime_penalty = 0
-    try:
-        import json as _json
-        regime_file = '/var/www/hermes/data/regime_5m.json'
-        if os.path.exists(regime_file):
-            with open(regime_file) as _f:
-                _regime_data = _json.load(_f)
-            _token_regime = _regime_data.get('regimes', {}).get(token.upper(), {})
-            _token_reg = _token_regime.get('regime', 'NEUTRAL')
-            if _token_reg == 'LONG_BIAS' and direction == 'SHORT':
-                return None
-            if _token_reg == 'SHORT_BIAS' and direction == 'LONG':
-                return None
-            if _token_reg == 'NEUTRAL':
-                regime_penalty = 10
-    except Exception:
-        pass
-
-    # ── Confidence scoring ─────────────────────────────────────────────────
-    conf = CONF_BASE
-
-    # ADX bonus: stronger trend = higher confidence
-    if adx_val >= 30:
-        conf += CONF_ADX_BONUS_MAX
-    elif adx_val >= 25:
-        conf += int(CONF_ADX_BONUS_MAX * 0.7)
-    elif adx_val >= 20:
-        conf += int(CONF_ADX_BONUS_MAX * 0.4)
-
-    # VI spread bonus: wider spread = stronger signal
-    vi_strength = min(1.0, vi_spread / 0.5)  # normalize: 0.5 = max spread
-    conf += int(CONF_VI_STRENGTH_MAX * vi_strength)
-
-    # EMA alignment bonus
-    if direction == 'LONG' and price > ema_slow:
-        conf += CONF_EMA_BONUS
-    elif direction == 'SHORT' and price < ema_slow:
-        conf += CONF_EMA_BONUS
-
-    # Apply regime penalty
-    if regime_penalty:
-        conf = max(50, conf - regime_penalty)
-
-    conf = min(CONF_MAX, conf)
-
-    # Paper observation gate — only exceptional setups fire
-    if conf < VORTEX_BREAK_MIN_CONFIDENCE:
-        return None
-
-    # ── Build signal ───────────────────────────────────────────────────────
-    signal_type = f'vortex_break_{direction.lower()}'
-    source = f'vortex_break_{direction.lower()}'
-
-    value = str({
-        'vi_plus': round(cur_vi_plus, 4),
-        'vi_minus': round(cur_vi_minus, 4),
-        'vi_spread': round(vi_spread, 4),
-        'adx': round(adx_val, 2),
-        'ema_fast': round(ema_fast, 6),
-        'ema_slow': round(ema_slow, 6),
-    })
-
-    return {
-        'token': token.upper(),
-        'direction': direction,
-        'signal_type': signal_type,
-        'source': source,
-        'confidence': conf,
-        'value': value,
-        'price': price,
-        '_z': _z,
-        '_adx': adx_val,
-        '_vi_spread': vi_spread,
-    }
-
-
-# ── Scanner ───────────────────────────────────────────────────────────────────
 
 def scan_vortex_break_signals(prices_dict: dict) -> tuple:
     """Scan pre-filtered tokens for vortex_break signals.
