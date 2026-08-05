@@ -259,6 +259,9 @@ SIGNAL_SOURCE_BLACKLIST = {
     # 2026-08-03: BLOCK pattern_scanner — 0% WR (0/6), -$0.55 in 24h. No flag mapping
     # in decay detector, blocking at source level is the only kill mechanism.
     'pattern_scanner',
+    # 2026-08-05: BLOCK bb_bounce — 0% WR, 3 regressions via signal_rotator.
+    # Permanently dead. BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS + source blacklist.
+    'bb_bounce',
 }
 SERVER_NAME = 'Hermes'
 MAX_OPEN_POSITIONS = 4   # max open paper positions — diversified portfolio (was 3)
@@ -1145,7 +1148,7 @@ DECISION_LOG_CACHE_TTL = 300
 VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 VORTEX_BREAK_PLUS_ENABLED = True    # vortex_break+ LONG
 VORTEX_BREAK_MINUS_ENABLED = True   # vortex_break- SHORT
-VORTEX_BREAK_MIN_CONFIDENCE = 95    # paper observation — only exceptional setups fire
+VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for paper testing
 
 # ── Return Exhaustion Signal (NEW 2026-08-05) ────────────────────────────────
 # return_exhaustion.py — percentile exhaustion + momentum divergence
@@ -1154,4 +1157,4 @@ VORTEX_BREAK_MIN_CONFIDENCE = 95    # paper observation — only exceptional set
 RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
-RETURN_EXHAUSTION_MIN_CONFIDENCE = 95    # paper observation — only exceptional setups fire
+RETURN_EXHAUSTION_MIN_CONFIDENCE = 80  # CEO 2026-08-05 — lowered from 95 for paper testing

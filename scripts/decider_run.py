@@ -2162,6 +2162,7 @@ def run(dry_run=False):
                 R2_REV_ENABLED, R2_TREND_ENABLED,
                 VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
                 ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
+                BB_BOUNCE_ENABLED,
             )
             _skip_signal = False
             _components = source.split(',')
@@ -2214,6 +2215,9 @@ def run(dry_run=False):
                     skipped += 1; _skip_signal = True; break
                 if _comp == 'fast-momentum-' and not FAST_MOMENTUM_MINUS_ENABLED:
                     log(f'  SKIP {token} {direction}: FAST_MOMENTUM_MINUS_ENABLED=False')
+                    skipped += 1; _skip_signal = True; break
+                if _comp == 'bb_bounce' and not BB_BOUNCE_ENABLED:
+                    log(f'  SKIP {token} {direction}: BB_BOUNCE_ENABLED=False')
                     skipped += 1; _skip_signal = True; break
         except ImportError:
             pass  # hermes_constants not available — skip gate
