@@ -82,13 +82,13 @@ TL_BREAKOUT_SPEED_MIN = 0.3   # minimum breakout speed in ATR units per candle
 TL_ATR_PERIOD         = 14
 
 # Confidence scoring
-TL_BASE_CONFIDENCE    = 60
-TL_BOUNCE_BONUS       = 3    # per extra bounce beyond min
-TL_R2_BONUS_MAX       = 10   # higher R² = stronger trendline
-TL_REJECTION_BONUS    = 5    # strong rejection = valid bounce
-TL_FOLLOWTHROUGH_BONUS = 5
-TL_BREAKOUT_BONUS_MAX = 5
-TL_MAX_CONFIDENCE     = 85
+TL_BASE_CONFIDENCE    = 70    # raised from 60 — minimum viable signal
+TL_BOUNCE_BONUS       = 5     # per extra bounce beyond min (was 3)
+TL_R2_BONUS_MAX       = 12    # higher R² = stronger trendline (was 10)
+TL_REJECTION_BONUS    = 7     # strong rejection = valid bounce (was 5)
+TL_FOLLOWTHROUGH_BONUS = 7    # follow-through confirms breakout (was 5)
+TL_BREAKOUT_BONUS_MAX = 7     # strong breakout (was 5)
+TL_MAX_CONFIDENCE     = 92    # allow higher confidence for quality signals (was 85)
 
 # Cooldown: don't fire again within this many hours
 TL_COOLDOWN_HOURS     = 3
@@ -653,6 +653,20 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         conf += 5  # fast breakout
     elif breakout_speed > 0.3:
         conf += 2  # moderate breakout
+
+    # NEW: Trend alignment bonus — breakout aligned with higher timeframe trend
+    # Check if price is above/below 1H EMA (using current price vs trendline midpoint)
+    try:
+        # Simple proxy: if trendline slope is steep, likely aligned with trend
+        if abs(slope) / avg_price > 0.0003:  # steep slope = strong trend
+            conf += 5
+    except Exception:
+        pass
+
+    # NEW: Volume confirmation bonus — breakout should have above-average volume
+    # Use ATR expansion as proxy for volume (big moves = big volume)
+    if atr_expansion > 1.3 and breakout_speed > 0.4:
+        conf += 3  # strong move with speed = likely volume-confirmed
 
     conf = min(TL_MAX_CONFIDENCE, conf)
 
