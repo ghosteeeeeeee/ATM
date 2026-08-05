@@ -27,7 +27,7 @@
 - (none currently)
 
 ## FOLLOW-UP (checked by CEO on next run)
-- [ ] Verify decider is actually killed (check signal_outcomes for 'unknown' instead of 'decider')
+- [x] Verify decider is actually killed (check signal_outcomes for 'unknown' instead of 'decider') — DONE 2026-08-05
 - [ ] Verify return_exhaustion is generating signals after threshold fix
 - [ ] Verify vortex_break is generating signals after window expansion
 - [ ] Implement bb_bounce SL override (1.0% cap) — root cause: asymmetric R:R
@@ -35,7 +35,7 @@
 
 ## CEO DECISIONS (2026-08-05 22:30)
 - [x] 2026-08-05 22:30 — KEEP LIVE TRADING PAUSED — new signals untested, legacy dead signals still firing
-- [ ] 2026-08-05 22:30 — URGENT: DELEGATE to bug_hunter: Kill decider permanently (NEVER_REENABLE_FLAGS)
+- [x] 2026-08-05 22:30 — URGENT: DELEGATE to bug_hunter: Kill decider permanently (NEVER_REENABLE_FLAGS) — COMPLETED
 - [ ] 2026-08-05 22:30 — DELEGATE to signal_analyst: Debug vortex_break + return_exhaustion (0 signals)
 - [ ] 2026-08-05 22:30 — DELEGATE to self_learner: Investigate bb_bounce negative PnL (-$0.33, 42% WR)
 - [ ] 2026-08-05 22:30 — DELEGATE to self_learner: Monitor tl_break_long sustained performance

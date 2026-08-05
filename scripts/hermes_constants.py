@@ -666,6 +666,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_VELOCITY_MINUS_ENABLED', # permanently dead
     'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
     'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
+    'DECIDER',                    # CEO 2026-08-05 — 11.1% WR, -$0.18 (24h), permanently dead
     # BB_BOUNCE re-enabled 2026-08-05 by T — WR=50% after data corruption fix
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -1169,3 +1170,16 @@ RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper 
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
 RETURN_EXHAUSTION_MIN_CONFIDENCE = 70  # 2026-08-05 — lowered from 80 (TNSR p=3.4 conf=74, ARB p=98.1 conf=77 both blocked)
+
+# ── HL Copy Trading ───────────────────────────────────────────────────────────
+# hl_copy_trader.py — Track top Hyperliquid traders and copy their trades
+# All HL trades are on-chain and public via API.
+HL_COPY_TRADING_ENABLED = False     # Master kill-switch — disabled until tested
+HL_COPY_WALLETS = []                # Manual wallet list (populated by leaderboard scan)
+HL_COPY_MAX_POSITION_PCT = 0.10    # Max 10% of account per copy trade
+HL_COPY_MAX_DRAWDOWN = 0.15        # Stop copying at 15% drawdown
+HL_COPY_MIN_SCORE = 70             # Minimum trader score to copy
+HL_COPY_POLL_INTERVAL = 30         # Seconds between fill polls
+HL_COPY_MAX_DAILY_TRADES = 50      # Daily trade limit
+HL_COPY_REPORT_PATH = "/var/www/hermes/data/hl_copy_report.md"
+HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"

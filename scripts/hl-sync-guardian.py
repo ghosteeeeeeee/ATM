@@ -2989,7 +2989,7 @@ def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
         cur_s.execute("""
             INSERT INTO signal_outcomes (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (token.upper(), direction.upper(), 'decider',
+        """, (token.upper(), direction.upper(), 'unknown',
               1 if is_win else 0, pnl_pct, pnl_usdt, None, trade_id))
         conn_s.commit()
         conn_s.close()
