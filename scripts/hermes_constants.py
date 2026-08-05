@@ -114,6 +114,8 @@ SHORT_BLACKLIST = {
     'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
     # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
     'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
+    # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
+    'GALA', 'STRK',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -153,6 +155,8 @@ LONG_BLACKLIST = {
     'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
     # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
     'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
+    # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
+    'GALA', 'STRK',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 
@@ -810,7 +814,7 @@ EMA20_50_PLUS_ENABLED         = False    # ema20_50+ LONG
 EMA20_50_MINUS_ENABLED        = False    # ema20_50- SHORT
 MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
-ACCEL_300_PLUS_ENABLED        = True  # AUTO-ROTATED 2026-08-05  # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
+ACCEL_300_PLUS_ENABLED        = False  # AUTO-ROTATED 2026-08-05 # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-04 21:05 — 15% WR, -$1.26 in 7d. No SHORT edge.
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
@@ -822,7 +826,7 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_PLUS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_MINUS_ENABLED              = False  # disabled while testing inverse_accel_300
-TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
+TL_BREAK_PLUS_ENABLED         = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
@@ -993,8 +997,8 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_PLUS_ENABLED = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_MINUS_ENABLED = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_PLUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_MINUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
 ZSCORE_RISING_VEL_BARS     = 5      # lookback for z-velocity (cur_z - z_N_bars_ago)
@@ -1138,14 +1142,16 @@ DECISION_LOG_CACHE_TTL = 300
 # vortex_break.py — Vortex Indicator + ADX trend confirmation
 # Uses true range (high-low) directional movement, not price closes.
 # Catches trend inception via VI crossover + ADX strength filter.
-VORTEX_BREAK_ENABLED = False   # master kill-switch — disabled by default
+VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 VORTEX_BREAK_PLUS_ENABLED = True    # vortex_break+ LONG
 VORTEX_BREAK_MINUS_ENABLED = True   # vortex_break- SHORT
+VORTEX_BREAK_MIN_CONFIDENCE = 95    # paper observation — only exceptional setups fire
 
 # ── Return Exhaustion Signal (NEW 2026-08-05) ────────────────────────────────
 # return_exhaustion.py — percentile exhaustion + momentum divergence
 # Catches turning points when short-term returns are at statistical extremes
 # AND fast/slow momentum diverge (fast turning while slow hasn't caught up).
-RETURN_EXHAUSTION_ENABLED = False   # master kill-switch — disabled by default
+RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
+RETURN_EXHAUSTION_MIN_CONFIDENCE = 95    # paper observation — only exceptional setups fire

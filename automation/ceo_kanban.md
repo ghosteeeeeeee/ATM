@@ -117,5 +117,6 @@
 - [x] 2026-08-05 23:45 — VERIFIED: decider signals from deprecated ai_decider.py, not new regression
 - [x] 2026-08-05 23:45 — KEEP LIVE TRADING PAUSED — new signals need paper testing
 - [x] 2026-08-05 23:45 — BLOCKED: vortex_break + return_exhaustion gated by master kill-switches, cannot paper trade
-- [ ] 2026-08-05 23:45 — DELEGATE to self_learner: Enable vortex_break + return_exhaustion with HIGH confidence threshold (95+) for paper observation
-- [ ] 2026-08-05 23:45 — tl_break_long: 100% WR (14 trades) — monitor for sustained performance
+- [x] 2026-08-05 23:50 — ENABLED: vortex_break + return_exhaustion with conf≥95 for paper observation
+- [ ] 2026-08-05 23:50 — Monitor vortex_break + return_exhaustion signals over next 48h
+- [ ] 2026-08-05 23:50 — tl_break_long: 100% WR (14 trades) — monitor for sustained performance

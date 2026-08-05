@@ -34,6 +34,7 @@ from typing import Optional, Dict, List, Tuple
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from hyperliquid_exchange import _HL_BLOCKLIST
+from hermes_constants import VORTEX_BREAK_MIN_CONFIDENCE
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -57,7 +58,7 @@ CONF_BASE = 65
 CONF_ADX_BONUS_MAX = 15   # ADX > 25 → +15
 CONF_VI_STRENGTH_MAX = 10 # VI spread strength bonus
 CONF_EMA_BONUS = 5        # EMA alignment bonus
-CONF_MAX = 90
+CONF_MAX = 95
 
 # EMA periods for alignment
 EMA_FAST = 20
@@ -384,6 +385,10 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
         conf = max(50, conf - regime_penalty)
 
     conf = min(CONF_MAX, conf)
+
+    # Paper observation gate — only exceptional setups fire
+    if conf < VORTEX_BREAK_MIN_CONFIDENCE:
+        return None
 
     # ── Build signal ───────────────────────────────────────────────────────
     signal_type = f'vortex_break_{direction.lower()}'

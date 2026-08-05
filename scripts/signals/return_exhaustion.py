@@ -38,6 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hermes_constants import (
     SHORT_BLACKLIST,
     LONG_BLACKLIST,
+    RETURN_EXHAUSTION_MIN_CONFIDENCE,
 )
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -74,7 +75,7 @@ CONF_BASE = 60
 CONF_PCT_EXTREME_MAX = 15   # more extreme percentile = higher conf
 CONF_DIVERGENCE_BONUS = 10  # strong divergence bonus
 CONF_RSI_BONUS = 5          # RSI confirmation bonus
-CONF_MAX = 88
+CONF_MAX = 95
 
 SIGNAL_TYPE = 'return_exhaustion'
 
@@ -328,6 +329,10 @@ def detect_return_exhaustion(token: str, prices: list) -> Optional[Dict]:
         conf = max(50, conf - regime_penalty)
 
     conf = min(CONF_MAX, conf)
+
+    # Paper observation gate — only exceptional setups fire
+    if conf < RETURN_EXHAUSTION_MIN_CONFIDENCE:
+        return None
 
     # ── Build signal ───────────────────────────────────────────────────────
     signal_type = f'return_exhaustion_{direction.lower()}'
