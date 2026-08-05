@@ -21,7 +21,7 @@ from hermes_constants import CANDLES_STALENESS_SEC
 _PRICE_DB = '/root/.hermes/data/signals_hermes.db'
 _CANDLES_DB = '/root/.hermes/data/candles.db'
 
-VOL_MULT   = 5.0
+VOL_MULT   = 2.0   # lowered from 5.0 — too strict, not enough signals
 MIN_VOL    = 10_000      # USD
 MAX_CONF   = 88
 MIN_CONF   = 60

@@ -1,41 +1,71 @@
 {
-  "timestamp": "2026-08-04 23:25:02",
-  "total_checks": 15,
+  "timestamp": "2026-08-05 15:25:04",
+  "total_checks": 20,
   "passed": 10,
-  "critical_count": 4,
+  "critical_count": 9,
   "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
-      "msg": "98 files: study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py, wave_backtest.py",
+      "msg": "102 files: study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py, wave_backtest.py",
       "file": "study_winning_combos.py.py",
       "fix": "Move conn.close() to a finally block or use context manager"
     },
     {
       "name": "sql_injection",
-      "msg": "32 files with f-string SQL",
+      "msg": "34 files with f-string SQL",
       "file": "wave_backtest.py:452",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
     {
       "name": "cursor_leaks",
-      "msg": "113 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "114 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
       "file": "study_winning_combos.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
     {
       "name": "defunct_imports",
       "msg": "ai_decider.py imported in 1 files",
-      "file": "bug_hunter.py:242",
+      "file": "bug_hunter.py:244",
       "fix": "Remove ai_decider imports \u2014 module is defunct, replaced by signal_compactor.py"
+    },
+    {
+      "name": "bare_except",
+      "msg": "80 bare except clauses in 26 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "file": "",
+      "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
+    },
+    {
+      "name": "connection_leaks",
+      "msg": "110 files with sqlite3.connect but no finally block: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "file": "",
+      "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
+    },
+    {
+      "name": "non_atomic_json",
+      "msg": "64 files write JSON without atomic pattern: cascade_flip.py, hyperliquid_exchange.py, brain.py, ab_optimizer.py, sync_kanban_tasks.py",
+      "file": "",
+      "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
+    },
+    {
+      "name": "hardcoded_passwords",
+      "msg": "5 files with hardcoded passwords: study_winning_combos.py, context-compactor.py, hermes_ab_utils.py, rebuild_ab_results.py, trading-checklist.py",
+      "file": "",
+      "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
+    },
+    {
+      "name": "dead_imports",
+      "msg": "16 imports of defunct modules: volume_hl_signals.py\u2192signal_gen, ma_cross_5m.py\u2192signal_gen, check_filter_chain.py\u2192signal_gen",
+      "file": "",
+      "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
   "warnings": [
     {
-      "name": "win_rate",
-      "msg": "0.0% (0/16)",
+      "name": "trade_frequency",
+      "msg": "127 trades in 6h (21.2/hr)",
       "file": "",
-      "fix": "Kill 0% WR signals, enable profitable ones, or activate dynamic inverter"
+      "fix": ""
     }
   ]
 }

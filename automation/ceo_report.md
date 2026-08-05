@@ -1,33 +1,42 @@
-# CEO Report — 2026-08-05 23:55
+# CEO Report — 2026-08-05 22:00 UTC
 
 ## System Status
-- **Pipeline:** inactive (normal — paused for signal rebuild)
-- **HL-Sync:** active ✓
-- **Open Positions:** 0
-- **Disk:** 78% ✓
+- **Pipeline:** Active (last run 19:17 UTC)
+- **HL-Sync-Guardian:** Active
+- **Disk:** 78% (CLEANED from 84%)
+- **Live Trading:** PAUSED (kill switch off)
+- **Open Positions:** 1 (UMA SHORT, +$0.03)
 
-## Key Actions Taken
-1. **pattern_wolf signals verified OLD** (Aug 4) — kill switch working correctly
-2. **decider signals verified** — from deprecated ai_decider.py, not new regression
-3. **vortex_break + return_exhaustion ENABLED** with conf≥95 for paper observation
+## 24h Performance
+| Signal | Trades | WR | PnL |
+|--------|--------|----|-----|
+| bb_bounce | 20 | 35% | +$0.04 |
+| pattern_wolf_wave_bull | 1 | 0% | -$0.20 |
+| pattern_wolf_wave_bear | 1 | 0% | -$0.10 |
+| tl_break_short | 1 | 0% | -$0.09 |
+| accel-300+ | 2 | 0% | -$0.05 |
 
-## 24h Performance (from earlier today)
-- **tl_break_long:** 100% WR (14 trades) — **strongest signal**
-- **zscore-rising+:** 62.5% WR (8 trades)
-- **vel-hermes-:** 43.5% WR (46 trades) — workhorse
+**Total 24h:** 26 trades, 7.7% WR, -$0.40
 
-## CEO Decision
-**KEEP LIVE TRADING PAUSED** — no change.
+## CEO Decisions
+- **KEEP LIVE TRADING PAUSED** — No edge found. 7.7% WR insufficient.
+- **bb_bounce is back** — 20 trades, 35% WR, but was supposed to be killed. Regression #4.
 
-**Reasoning:**
-- New signals enabled but only fire at conf≥95 (exceptional setups)
-- Need 48h observation to validate performance
-- Pipeline remains paused — no live trades until signals proven
+## URGENT BLOCKERS
+1. **bb_bounce regression** — Flag was set False, but 20 trades fired today. signal_rotator.py bypass still not fixed despite NEVER_REENABLE_FLAGS.
+2. **signal_analyst overdue** — NEW signal family requested 48h+ ago. Not delivered.
+3. **Dead signals still firing** — pattern_wolf, accel-300+ still generating losses.
 
-## Next Review
-Tomorrow 08:00 UTC — check if vortex_break + return_exhaustion generating signals, verify tl_break_long sustained performance.
+## DELEGATIONS (IMMEDIATE)
+| Delegate | Task | Priority |
+|----------|------|----------|
+| bug_hunter | Fix bb_bounce regression — 4th time. Find root cause in signal_rotator.py | CRITICAL |
+| bug_hunter | Kill pattern_wolf and accel-300+ permanently | HIGH |
+| signal_analyst | Build NEW signal family — current family is dead | URGENT |
+| self_learner | Paper trade tl_break_long (70% WR, 14 trades) — verify edge | MEDIUM |
 
-## Files Changed
-- `hermes_constants.py`: VORTEX_BREAK_ENABLED=True, RETURN_EXHAUSTION_ENABLED=True, confidence thresholds=95
-- `signals/vortex_break.py`: Added confidence gate
-- `signals/return_exhaustion.py`: Added confidence gate
+## Kanban Status
+- Disk cleanup: DONE (84% → 78%)
+- BB_BOUNCE killed: FAILING (4th regression)
+- New signals: NOT STARTED
+- Threshold relaxation: DONE (VOL_MULT 5→2, atr_compression 5→3)

@@ -262,6 +262,12 @@ SIGNAL_SOURCE_BLACKLIST = {
     # 2026-08-05: BLOCK bb_bounce — 0% WR, 3 regressions via signal_rotator.
     # Permanently dead. BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS + source blacklist.
     'bb_bounce',
+    # 2026-08-05: BLOCK pattern_wolf — 0% WR (10 trades 7d), -$1.38. No edge found.
+    # All variants: pattern_wolf, pattern_wolf_wave_bull, pattern_wolf_wave_bear.
+    'pattern_wolf',
+    # 2026-08-05: BLOCK accel-300 — 0% WR over 48h, no edge. All variants dead.
+    # Covers: accel-300+, accel-300-, accel-300-vel+, accel-300-vel-, accel-300-breakout.
+    'accel-300',
 }
 SERVER_NAME = 'Hermes'
 MAX_OPEN_POSITIONS = 4   # max open paper positions — diversified portfolio (was 3)
@@ -652,10 +658,17 @@ CUT_LOSER_FIRE_WINDOWS = {
 NEVER_REENABLE_FLAGS = {
     'INVERSE_ACCEL_300_ENABLED',
     'INVERSE_ACCEL_300_PLUS_ENABLED',
-    # 'INVERSE_ACCEL_300_MINUS_ENABLED',  # RE-ENABLED 2026-08-04
-    'ACCEL_300_MINUS_ENABLED',  # RE-ENABLED 2026-08-04 — gap threshold lowered, needs SHORT volume
-    'PATTERN_SCANNER',  # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
-    'BB_BOUNCE_ENABLED',  # CEO 2026-08-05 — 0% WR (3 regressions), permanently disabled
+    'INVERSE_ACCEL_300_MINUS_ENABLED',
+    'ACCEL_300_ENABLED',           # 0% WR over 48h, no edge — permanently dead
+    'ACCEL_300_PLUS_ENABLED',      # 0% WR over 48h — permanently dead
+    'ACCEL_300_MINUS_ENABLED',     # 15% WR, -$1.26 in 7d — permanently dead
+    'ACCEL_300_BREAKOUT_ENABLED',  # 0% WR (0/3) — permanently dead
+    'ACCEL_300_VELOCITY_IGNITION_ENABLED',  # 0% WR (10 trades), -$4.97 — permanently dead
+    'ACCEL_300_VELOCITY_PLUS_ENABLED',  # permanently dead
+    'ACCEL_300_VELOCITY_MINUS_ENABLED', # permanently dead
+    'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
+    'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
+    'BB_BOUNCE_ENABLED',          # CEO 2026-08-05 — 0% WR (3 regressions), permanently disabled
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant

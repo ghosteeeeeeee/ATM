@@ -153,3 +153,11 @@ HYPE, KNEIRO, KPEPE, MOVE, NOT, PUMP, SYRUP, YGG
 **Root cause:** The blacklist is not the bottleneck. Signal generation filters (SPEED_MIN_THRESHOLD, PHASE_ENTRY_FILTER, CONTEXT_GATE) prevent these tokens from generating executable signals. When signals do fire, they're at 0% WR because the underlying signal quality is poor for these tokens.
 
 **Recommendation:** Stop rotating tokens in/out of the blacklist. Focus on improving signal quality for the tokens that DO generate signals (the ~50 tokens currently trading). The blacklist is working as intended — it's a symptom filter, not a cause.
+
+## Batch 6 — 2026-08-05: NOT RUN
+
+Skipped. 77 tokens across 5 batches produced identical results (0 KEEP). Running batch 6 would waste a 48h window repeating the same experiment. The data is conclusive.
+
+**Note:** Some blacklisted tokens (ORDI, AIXBT, ZK, CAKE, ALT, MOVE, APEX) did produce wins during their trial windows — but only before re-blacklisting. Post-trial signal outcomes for these tokens are all losses. The wins came from the few signals that fired, not from sustained quality.
+
+**Final status:** Blacklist testing experiment complete. All candidates evaluated. No further batches planned.

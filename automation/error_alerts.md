@@ -59,3 +59,9 @@
 
 ## Error Alerts — 2026-08-05 05:07 UTC
 - **REPEATED** (15x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner [TOK]: N done, N errors`
+
+## Error Alerts — 2026-08-05 15:08 UTC
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: TS   TOK position_manager: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-05 19:08 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   Signal return_exhaustion: TOK → TOK: name 'time' is not defined`

@@ -26,7 +26,7 @@ _CANDLES_DB = CANDLES_DB
 
 # ── Config ────────────────────────────────────────────────────────────────────
 SCAN_SECS    = 60         # match pipeline cadence
-VOL_MULT     = 5.0        # fire when current_vol >= sma_vol * VOL_MULT
+VOL_MULT     = 2.0        # fire when current_vol >= sma_vol * VOL_MULT (lowered from 5.0 — too strict, not enough signals)
 MIN_VOL      = 10_000    # minimum current volume (USD quote) to qualify
 MIN_CONF     = 60        # add_signal floor — must be >= 60 to pass compactor query
 MAX_CONF     = 88        # add_signal ceiling (per schema)

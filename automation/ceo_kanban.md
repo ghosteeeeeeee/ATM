@@ -93,6 +93,12 @@
 - [x] 2026-08-05 22:30 — BB_BOUNCE PERMANENTLY KILLED: Root cause was signal_rotator.py re-enabling without NEVER_REENABLE_FLAGS check. Fixed.
 - [ ] 2026-08-05 22:30 — LIVE TRADING: KEEP PAUSED — signals improving but not enough edge yet. tl_break_long (93% WR) is promising.
 
+## CEO DECISIONS (2026-08-05 22:00 — FINAL)
+- [x] 2026-08-05 22:00 — BB_BOUNCE ROOT CAUSE FOUND: decider_run.py Layer 3 was missing BB_BOUNCE_ENABLED check. Old DB signals survived compaction. Fixed at all 3 layers.
+- [x] 2026-08-05 22:00 — DEAD SIGNALS KILLED: pattern_wolf + accel-300 family added to NEVER_REENABLE_FLAGS + SIGNAL_SOURCE_BLACKLIST. Triple kill applied.
+- [ ] 2026-08-05 22:00 — LIVE TRADING: KEEP PAUSED — 7.7% WR today, no edge.
+- [ ] 2026-08-05 22:00 — URGENT: signal_analyst must build NEW signal family — overdue 48h+.
+
 ## CEO DECISIONS (2026-08-05 16:50)
 - [x] 2026-08-05 16:50 — NEW SIGNAL FAMILY DEPLOYED: vortex_break + return_exhaustion created. Both disabled by default, need testing.
 - [x] 2026-08-05 16:50 — THRESHOLDS RELAXED: VOL_MULT 5→2, atr_compression 5→3 bars. Signals will fire more often.
@@ -112,6 +118,12 @@
 - [ ] 2026-08-05 23:35 — DELEGATE to self_learner: Paper trade vortex_break and return_exhaustion for 48h
 - [ ] 2026-08-05 23:35 — System health: pipeline active, hl-sync active, disk 78%, 0 positions
 
+## CEO DECISIONS (2026-08-05 19:00)
+- [x] 2026-08-05 19:00 — KEEP LIVE TRADING PAUSED — no edge sufficient for live capital
+- [x] 2026-08-05 19:00 — LOWERED CONFIDENCE: vortex_break 95→80, return_exhaustion 95→80 — paper testing needs actual signals
+- [ ] 2026-08-05 19:00 — DELEGATE to self_learner: Monitor vortex_break + return_exhaustion 48h after threshold change
+- [ ] 2026-08-05 19:00 — DELEGATE to signal_analyst: Verify tl_break_long 100% WR isn't overfitting (41.5% on 7d)
+
 ## CEO DECISIONS (2026-08-05 23:45)
 - [x] 2026-08-05 23:45 — VERIFIED: pattern_wolf signals are OLD (Aug 4), kill switch working correctly
 - [x] 2026-08-05 23:45 — VERIFIED: decider signals from deprecated ai_decider.py, not new regression
@@ -120,3 +132,12 @@
 - [x] 2026-08-05 23:50 — ENABLED: vortex_break + return_exhaustion with conf≥95 for paper observation
 - [ ] 2026-08-05 23:50 — Monitor vortex_break + return_exhaustion signals over next 48h
 - [ ] 2026-08-05 23:50 — tl_break_long: 100% WR (14 trades) — monitor for sustained performance
+
+## CEO DECISIONS (2026-08-05 18:18)
+- [x] 2026-08-05 18:18 — KEEP LIVE TRADING PAUSED — zero actual trades in 24h, all expired
+- [ ] 2026-08-05 18:18 — URGENT: BUG — signal_outcomes.db is 0 bytes, trade P&L not tracking
+- [ ] 2026-08-05 18:18 — URGENT: BUG — pattern_wolf still generating (404 signals/24h) despite kill switch
+- [ ] 2026-08-05 18:18 — URGENT: BUG — Signals expiring before execution ("compaction_stale_5min")
+- [ ] 2026-08-05 18:18 — DELEGATE to bug_hunter: Fix signal_outcomes.db + pattern_wolf bypass + signal expiry
+- [ ] 2026-08-05 18:18 — DELEGATE to signal_analyst: NEW signal family — overdue 48h+
+- [ ] 2026-08-05 18:18 — DELEGATE to self_learner: Paper trade vortex_break + return_exhaustion

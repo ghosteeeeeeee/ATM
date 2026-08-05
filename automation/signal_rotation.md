@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-05 05:48 UTC
+# Signal Rotation — 2026-08-05 17:53 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,17 +6,21 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | accel-300+ | 57% | 0.282 | 0.282 | ❌ | ENABLE |
-| 2 | accel-300-vel- | 33% | 0.058 | 0.058 | ❌ |  |
-| 3 | zscore-rising+ | 0% | -0.000 | -0.000 | ❌ |  |
-| 4 | vel-hermes- | 0% | -0.000 | -0.000 | ❌ |  |
-| 5 | zscore-rising- | 0% | -0.000 | -0.000 | ❌ |  |
+| 1 | tl_break_long | 41% | 0.359 | 0.359 | ✅ | DISABLE |
+| 2 | accel-300+ | 40% | 0.068 | 0.068 | ✅ | DISABLE |
+| 3 | accel-300-vel- | 33% | 0.058 | 0.058 | ❌ |  |
+| 4 | zscore-rising+ | 41% | 0.028 | 0.043 | ❌ |  |
+| 5 | vel-hermes- | 38% | -0.007 | -0.007 | ❌ |  |
 | 6 | accel-300-vel+ | 27% | -0.031 | -0.031 | ❌ |  |
-| 7 | inv-accel-300- | 17% | -0.040 | -0.040 | ❌ |  |
+| 7 | accel-300- | 40% | -0.031 | -0.031 | ❌ |  |
 | 8 | accel-300-velocity-igniti | 40% | -0.042 | -0.042 | ❌ |  |
-| 9 | accel-300- | 33% | -0.146 | -0.146 | ❌ |  |
-| 10 | tl_break_short | 38% | -0.241 | -0.241 | ❌ |  |
-| 11 | tl_break_long | 28% | -0.336 | -0.336 | ❌ |  |
+| 9 | decider | 11% | -0.055 | -0.055 | ❓ |  |
+| 10 | tl_break_short | 42% | -0.086 | -0.086 | ✅ |  |
+| 11 | inv-accel-300- | 43% | -0.100 | -0.100 | ❌ |  |
+| 12 | pattern_wolf_wave_bear | 20% | -0.147 | -0.147 | ❓ |  |
+| 13 | zscore-rising- | 46% | -0.137 | -0.205 | ❌ |  |
+| 14 | bb_bounce | 47% | -0.352 | -0.352 | ❌ |  |
 
 ## Changes Applied
-- **ENABLE**: ACCEL_300_PLUS_ENABLED (WR=57%, edge=0.282, regime-aligned)
+- **DISABLE**: TL_BREAK_PLUS_ENABLED (WR=41%, edge=0.359, bleeding capital)
+- **DISABLE**: ACCEL_300_PLUS_ENABLED (WR=40%, edge=0.068, bleeding capital)

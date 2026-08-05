@@ -30,7 +30,7 @@ _CANDLES_DB = CANDLES_DB
 
 # ── Signal constants ───────────────────────────────────────────────────────────
 ATR_PCT_THRESH  = 0.8    # max ATR14/close % to qualify as compressed (ATR alone)
-MIN_BARS        = 5      # minimum consecutive compressed bars
+MIN_BARS        = 3      # minimum consecutive compressed bars (lowered from 5 — too strict, not enough signals)
 VOL_RATIO       = 2.0    # breakout bar volume must exceed comp avg by this
 BREAK_PCT       = 0.4    # close must break this % above compression high
 COOLDOWN_BARS   = 8      # bars between fires (avoid re-entry)
