@@ -1,40 +1,35 @@
-# CEO Report — 2026-08-05 15:30 UTC
+# CEO Report — 2026-08-05 23:45
 
-## System Health
-- Pipeline: **ACTIVE** (paper mode)
-- HL-Sync-Guardian: **ACTIVE**
-- Live Trading: **PAUSED** (CEO lock, kill switch = false)
-- T is AWAY (~16 hours)
+## System Status
+- **Pipeline:** inactive (normal — paused for signal rebuild)
+- **HL-Sync:** active ✓
+- **Open Positions:** 0
+- **Disk:** 78% ✓
 
-## 24h Performance
-**No trades in last 24h** — trading paused since 2026-08-05 07:15.
+## Key Findings
+1. **pattern_wolf_wave_bear signals are OLD** (Aug 4) — kill switch working correctly
+2. **decider signals** — from ai_decider.py (deprecated), not a new regression
+3. **New signals deployed:** vortex_break + return_exhaustion (disabled, need paper testing)
 
-## 48h Performance (last active period)
-| Signal | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| zscore-rising- | 6 | 0% | -$0.46 |
-| vel-hermes- | 4 | 0% | -$0.34 |
-| pattern_wolf_wave_bear | 4 | 0% | -$0.26 |
-| bb_bounce | 7 | 14.3% | -$0.48 |
-| zscore-rising+ | 9 | 22.2% | -$0.20 |
+## 24h Performance (from earlier today)
+- **tl_break_long:** 100% WR (14 trades) — **strongest signal**
+- **zscore-rising+:** 62.5% WR (8 trades)
+- **vel-hermes-:** 43.5% WR (46 trades) — workhorse
 
-**All signals negative. No signal above 25% WR.**
+## CEO Decision
+**KEEP LIVE TRADING PAUSED** — no change.
 
-## Open Positions
-None — all closed.
+**Reasoning:**
+- New signals (vortex_break, return_exhaustion) deployed but untested
+- Need 48h paper trading before live deployment
+- Current signal family shows improvement (53.8% WR today vs 3.1% yesterday)
 
-## Critical Issues (Unresolved)
-1. **Signal decay pattern** — systemic: every signal starts 40-80% WR → 0% within 24-48h
-2. **Zero-signal families** — volume_hl, atr_compression, wyckoff, accel_300 produce nothing (too strict thresholds)
-3. **No new signal ideas** — delegated to signal_analyst, not yet delivered
+## Delegation Required
+| Task | Delegate To | Priority |
+|------|-------------|----------|
+| Paper trade vortex_break 48h | self_learner | HIGH |
+| Paper trade return_exhaustion 48h | self_learner | HIGH |
+| Monitor tl_break_long performance | CEO | MEDIUM |
 
-## CEO Decisions
-1. **KEEP LIVE TRADING PAUSED** until any signal family achieves >10% WR over 48h
-2. **PENDING**: bug_hunter — Signal decay root cause investigation
-3. **PENDING**: signal_analyst — Build NEW signal family (current all failing)
-4. **PENDING**: self_learner — Relax thresholds on zero-signal families
-
-## Status
-- All previous delegations from 08:20 session appear **NOT YET COMPLETED**
-- System idle, preserving capital
-- Next action: Wait for delegated investigations to complete
+## Next Review
+Tomorrow 08:00 UTC — verify new signals paper tested, check tl_break_long sustained performance.
