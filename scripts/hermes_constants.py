@@ -821,8 +821,8 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_PLUS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_MINUS_ENABLED              = False  # disabled while testing inverse_accel_300
-TL_BREAK_PLUS_ENABLED         = False   # CEO KILLED 2026-08-04 21:05 — 13% WR, -$9.60 in 7d. No edge.
-TL_BREAK_MINUS_ENABLED        = False # CEO 2026-08-04 — re-enabled. Monitor for decay.
+TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
+TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
 # squeeze_cross.py — EMA(5)×EMA(180) cross + ATR squeeze + widening gap
