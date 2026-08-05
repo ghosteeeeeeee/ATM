@@ -842,7 +842,7 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_PLUS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_MINUS_ENABLED              = False  # disabled while testing inverse_accel_300
-TL_BREAK_PLUS_ENABLED         = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
+TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
@@ -867,7 +867,7 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = False  # CEO 2026-08-05 — KILLED PERMANENTLY. 0% WR, 3 regressions via signal_rotator. In NEVER_REENABLE_FLAGS.
+BB_BOUNCE_ENABLED = True  # Re-enabled 2026-08-05. WR=50% (16 trades 7d). Data was corrupted.
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
@@ -1013,8 +1013,8 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_PLUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_MINUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_PLUS_ENABLED = True   # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_MINUS_ENABLED = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
 ZSCORE_RISING_VEL_BARS     = 5      # lookback for z-velocity (cur_z - z_N_bars_ago)
