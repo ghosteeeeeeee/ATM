@@ -33,11 +33,12 @@
 ### Core Scripts
 | Script | Purpose |
 |--------|---------|
-| `scripts/ai_decider.py` | AI decision gate — scoring, compaction, hot-set builder |
+| `scripts/signal_compactor.py` | Deterministic decision gate — scoring, compaction, hot-set builder |
 | `scripts/decider_run.py` | Pipeline orchestrator — runs every minute |
 | `scripts/hl-sync-guardian.py` | Position mirror — keeps HL in sync with paper |
 | `scripts/position_manager.py` | SL/TP management, cascade flip |
-| `scripts/signal_gen.py` | Signal generation — momentum + pattern scanner |
+| `scripts/signal_runner.py` | Main signal runner — launches standalone scripts in `scripts/signals/` |
+| `scripts/wasp.py` | Health/anomaly monitor; runs every 30 minutes via systemd |
 | `scripts/hermes-trades-api.py` | Trades JSON API for web dashboard |
 | `scripts/kanban_api.py` | Kanban board API server (port 3461) |
 | `scripts/hermes_write_with_lock.py` | Flock-based file writer (prevents write collisions) |
@@ -67,6 +68,7 @@
 | Timer | Schedule | Purpose |
 |-------|----------|---------|
 | `hermes-pipeline.timer` | Every minute | Main trading pipeline |
+| `hermes-wasp.timer` | Every 30 minutes | WASP health/anomaly monitor |
 | `hermes-git-release.timer` | Daily | Git commit + release package |
 | `hermes-brain-sync.timer` | Daily 05:00 UTC (6am EST) | Deep PM audit |
 

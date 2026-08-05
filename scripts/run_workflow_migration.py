@@ -3,6 +3,7 @@
 import sys
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 import psycopg2
 from _secrets import BRAIN_DB_DICT
 

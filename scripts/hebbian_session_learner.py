@@ -5,12 +5,17 @@ Hebbian Session Co-occurrence Learner
 Scans Hermes's session/conversation data and learns entity co-occurrences.
 Run manually or via cron. Processes:
 - Recent session dumps (request_dump_*.json)
-- ai_decider decisions log (wandb-local/decisions.jsonl)
 - event log (data/event-log.jsonl)
 
 Usage:
   python3 scripts/hebbian_session_learner.py [days_back]
   python3 scripts/hebbian_session_learner.py --dry-run  # just show what would be learned
+
+Fix 2 (2026-06-24): removed learn_from_decisions_log() and its call site.
+The decisions log was creating the most polluted edges (SKIPPED<->NEUTRAL
+1066 fires) by linking regime to token to decision in ways that don't
+reflect actual knowledge. Sessions are the right source — what T actually
+discussed, not what the system decided.
 """
 
 import json
@@ -23,6 +28,7 @@ from collections import defaultdict
 
 sys.path.insert(0, '/root/.hermes/scripts')
 from hebbian_engine import HebbianEngine
+from paths import *
 from hebbian_entity_extractor import extract_entities
 
 HERMES_DIR = Path("/root/.hermes")
@@ -76,50 +82,12 @@ def learn_from_text(engine: HebbianEngine, text: str, source: str, label_types: 
     return len(entities)
 
 
-def learn_from_decisions_log(engine: HebbianEngine, days_back: int = 3) -> int:
-    """Learn from ai_decider decisions log — token + regime + direction + decision."""
-    log_path = WANDB_DIR / "decisions.jsonl"
-    if not log_path.exists():
-        return 0
-
-    cutoff = datetime.now() - timedelta(days=days_back)
-    count = 0
-
-    with open(log_path) as f:
-        for line in f:
-            try:
-                d = json.loads(line)
-                ts = datetime.fromisoformat(d.get("timestamp", "1970"))
-                if ts < cutoff:
-                    continue
-
-                token = d.get("top_token", "")
-                regime = d.get("regime", "")
-                direction = d.get("decision", "")  # actually direction field
-                decision = d.get("decision", "")
-                reason = d.get("reason", "")
-
-                pairs = []
-                if token:
-                    pairs.append(("token", token))
-                if regime and regime in REGIMES:
-                    pairs.append(("regime", regime))
-                if direction and direction in DIRECTIONS:
-                    pairs.append(("direction", direction))
-                if decision and decision in DECISIONS:
-                    pairs.append(("decision", decision))
-
-                for i in range(len(pairs)):
-                    for j in range(i + 1, len(pairs)):
-                        lt_a, a = pairs[i]
-                        lt_b, b = pairs[j]
-                        engine.learn_pair(a, b, lt_a, lt_b)
-                        count += 1
-
-            except Exception:
-                continue
-
-    return count
+# Fix 2 (2026-06-24): learn_from_decisions_log() DELETED.
+# Original function lived between this comment and learn_from_event_log, and
+# created the most polluted edges (SKIPPED<->NEUTRAL 1066 fires) by linking
+# regime to token to decision. The function and its call site in main() are
+# both removed. If anything tries to import or call this name, it will fail
+# loudly (NameError) — which is the desired signal: this code path is gone.
 
 
 def learn_from_event_log(engine: HebbianEngine, days_back: int = 3) -> int:
@@ -206,13 +174,7 @@ def main():
     print(f"  Processed {n} session turns")
     total_pairs += n
 
-    # 2. Decisions log
-    print("[Decisions Log]")
-    n = learn_from_decisions_log(engine, days_back)
-    print(f"  Learned {n} trading decision pairs")
-    total_pairs += n
-
-    # 3. Event log
+    # 2. Event log (decisions log removed in Fix 2 — was pollution source)
     print("[Event Log]")
     n = learn_from_event_log(engine, days_back)
     print(f"  Learned {n} event pairs")

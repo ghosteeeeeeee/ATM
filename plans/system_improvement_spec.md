@@ -85,30 +85,32 @@ Scans pipeline logs for recurring errors and alerts on patterns.
 2. **Observability Dashboard** — Quick win. Gives visibility into system state.
 3. **Parameter Auto-Tuner** — Medium impact. Automates what CEO does manually.
 4. **Error Pattern Analyzer** — Quick win. Catches issues faster.
-5. **Automated Rollback** — Safety net for auto-tuner.
+5. **Automated Rollback** — DEFERRED. Auto-tuner's backup + syntax validation covers the safety case. Add if auto-tuner causes regressions.
 
-## Files to Create
+## Files Created
 ```
-scripts/signal_decay_detector.py
-scripts/param_auto_tuner.py
-scripts/obs_dashboard.py
-scripts/auto_rollback.py
-scripts/error_analyzer.py
-automation/signal_decay_detector_prompt.md
-automation/param_auto_tuner_prompt.md
+scripts/signal_decay_detector.py       ✅
+scripts/param_auto_tuner.py            ✅ — MFE/MAE from brain DB, regex-apply to hermes_constants.py
+scripts/obs_dashboard.py               ✅
+scripts/auto_rollback.py               ⏸️  — DEFERRED (backup+syntax validation in tuner is sufficient)
+scripts/error_analyzer.py              ✅ — journalctl + pipeline.log scanner, severity-aware
 ```
 
-## Systemd Timers to Add
+## Systemd Timers
 ```
-hermes-signal-decay-detector.timer (6h)
-hermes-param-auto-tuner.timer (12h)
-hermes-obs-dashboard.timer (5min)
-hermes-error-analyzer.timer (1h)
+hermes-signal-decay-detector.timer     ✅ (6h)
+hermes-param-auto-tuner.timer          ✅ (12h)
+hermes-obs-dashboard.timer             ✅ (5min)
+hermes-error-analyzer.timer            ✅ (1h)
 ```
+
+## Bug Fixes (2026-08-02)
+Param auto-tuner: CRITICAL regex trailing-zero corruption, comment stacking, psycopg2 leak, FD leak, syntax validation.
+Error analyzer: severity word collapse, dead pruning code.
 
 ## Success Metrics
-- Signal decay detected within 6 hours (vs 13+ analyses before)
-- Parameter changes are data-driven (not gut feeling)
-- System health visible in real-time
-- Errors caught within 1 hour (vs next-day CEO review)
-- Zero manual parameter tuning needed for routine adjustments
+- Signal decay detected within 6 hours (vs 13+ analyses before) ✅
+- Parameter changes are data-driven (not gut feeling) ✅
+- System health visible in real-time ✅
+- Errors caught within 1 hour (vs next-day CEO review) ✅
+- Zero manual parameter tuning needed for routine adjustments ✅

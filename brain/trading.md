@@ -441,3 +441,47 @@ UPDATE signals SET executed = 1 WHERE decision NOT IN ('PENDING', 'APPROVED', 'W
 - LLM only evaluates signals that are already mid-quality or higher
 - Higher average confidence in hot-set shortlist
 - Reduces the inversion: signals the LLM sees are pre-qualified
+# Monitoring
+
+- WASP: `/root/.hermes/scripts/wasp.py`, triggered every 30 minutes by `hermes-wasp.timer`.
+- `hermes-wasp.service` is `Type=oneshot` with `RemainAfterExit=no`; it must be inactive between runs so `OnUnitActiveSec=1800` can retrigger it.
+- Current decision health is measured through `signal_compactor.py` (`EXPIRED`/`EXECUTED` states), not obsolete `ai_decider.py` APPROVED/WAIT states.
+- Paper↔HL sync must treat `get_open_hype_positions_curl()` as `{token: position_data}` and parse the newest component timestamp in `pipeline_heartbeat.json`.
+- HL cache alert threshold is 240s because the current price-collector cycle takes roughly 105–175s; lower thresholds produce expected in-flight false positives.
+
+### accel_300 latest-bar rewrite (2026-07-19)
+**Status:** CODE-READY — uncommitted on working tree (`M scripts/signals/accel_300.py`, `?? scripts/tests/test_accel_300.py`).
+
+`detect_accel_300()` now evaluates only the newest 1-minute `price_history` point (no candle DB). LONG fires when the latest price is above its latest EMA300, the positive gap has persisted for the configured window, and both raw price velocity/acceleration AND EMA-gap velocity/acceleration are strengthening. SHORT is the exact mirror. The legacy "backward-scan + break on first" pattern could resurrect a qualifying bar from minutes or hours ago, which was the source of 27/121 (22%) wrong-direction accel-300 trades over the trailing 7 days. The new contract physically cannot emit an old bar.
+
+Verified by 7 regression tests in `scripts/tests/test_accel_300.py`, 100k random 19-point price walks (0 contract violations), live replay of 41 historical accel-300 trades (40/41 correctly blocked, 1/41 correctly re-emitted with matching direction and positive price acceleration), live scan of 83 fresh tokens (0 wrong-side), and `smoke_test.py` 15/15 PASS. `hermes_constants.py` was NOT modified; the now-unused `ACCEL_300_STALE_LOOKBACK` and `ACCEL_300_STALE_GAP_DECAY_THRESHOLD` constants can be cleaned up in a T-approved follow-up. The signal runner imports the module at scan time, so a restart of `hermes-pipeline.timer` is required to make the new logic live.
+
+### Abandoned-trade class — 10-second stopouts (root cause found 2026-07-19)
+
+**Population:** 26 sub-60s closed trades in the trailing 14 days; **25/26 are `atr_managed=True`**. Total PnL of this class is only **−$0.35** but the failure mode is consistent and ongoing.
+
+```
+exit_reason      n
+atr_sl_hit      19
+guardian_sl      4
+guardian_tp      2
+guardian_orphan  1
+```
+
+Of the 26:
+- **11 (42%) had wrong-side SL**: LONG with `stop_loss > entry_price`, or SHORT with `stop_loss < entry_price`. Examples: MORPHO #12522 LONG entry=1.9977, SL=2.0160 (SL 0.92% above entry), 30s dur; GRAM #12394 LONG entry=1.785, SL=1.990 (SL 11.5% above entry), 1s dur.
+- **10 (38%) had very tight SL** (`|sl_pct| < 0.10%`): essentially the same as current price, so any 1-tick adverse move (spread/fees) stops them out in 2-3s.
+
+**Root cause (verified):** `tpsl_utils.compute_atr_sl_tp()` (line 290 onward) anchors the **initial** SL to `highest_price` (LONG) or `lowest_price` (SHORT) instead of `entry_price`. For a new trade, `highest_price` IS the entry — until the first tick. If price spikes up briefly and then reverses, `highest_price` becomes the spike peak, so the new SL = `peak * (1 - k*atr_pct)` ends up ABOVE the current price. The next tick fires the SL hit. Concrete trace from `sync-guardian.log` for MORPHO SHORT opened 2026-07-13 12:42:09 with entry=1.9813, then SL numbers 1.999066 → 1.997755 → 1.997352 → 1.999368 → 2.003954 → 2.005466 → 2.008742 → 2.011414 → 2.017361 — each iteration using the new `lowest_price` (or `highest_price` for LONG) as the anchor, so the SL moves TOWARDS the price, not away from it. Once price crosses the anchor, the SL ends up on the wrong side.
+
+**Proposed fix candidates (NOT applied — T approval needed for live-trading-adjacent code):**
+1. **Anchor initial SL to `entry_price`, not peak**: in `compute_atr_sl_tp`, while `is_new_trade` and not `in_profit`, set `ref_price = entry_price`. Only switch to `highest_price`/`lowest_price` once `pnl_pct > 0`.
+2. **Hard floor on SL distance from current price**: in `position_manager.check_atr_tp_sl_hits`, reject any SL that is within `MIN_SL_PCT` of `current_price` (would block the "tight" class).
+3. **Wrong-side sanity check before writing SL**: in `_persist_atr_levels`, validate `direction == 'LONG' → sl < current_price` and `direction == 'SHORT' → sl > current_price` before UPDATE. If wrong, snap to `current * (1 ± MAX_GUARD_PCT)`.
+4. **Freeze the SL for the first N seconds after open**: a 60-120s "stabilization window" during which the position_manager only writes the initial SL once and ignores further ATR updates until the trade has moved enough to be in profit. Prevents the SL anchor from drifting on a 1-tick move.
+
+**Analysis scripts (re-runnable):**
+- `scripts/analysis/find_abandoned_trades.py --days 14` — top-level characterization
+- `scripts/analysis/abandoned_trade_root_cause.py --days 14` — full wrong-side / tight SL dump
+- `scripts/analysis/trace_trade.py <trade_id>` — single-trade deep dive
+

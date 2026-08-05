@@ -59,7 +59,7 @@ from hermes_constants import (
     ACCEL_300_MIN_GAP_GROWTH_SHORT,
     ACCEL_300_STALE_BARS, ACCEL_300_STALE_BARS_SHORT,
     ACCEL_300_MARGINAL_ACCEL_BARS, ACCEL_300_BARS_UNKNOWN,
-    ACCEL_300_BAR_GAP_THRESH_SEC,
+    ACCEL_300_BAR_GAP_THRESH_SEC, ACCEL_300_BREAKOUT_CONFIDENCE,
 )
 # Alias local names for readability in detection logic
 PERIOD          = ACCEL_300_PERIOD
@@ -256,22 +256,13 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
     price_velocity = closes[latest_idx] - closes[latest_idx - 5]
     prior_price_velocity = closes[latest_idx - 5] - closes[latest_idx - 10]
     price_acceleration = price_velocity - prior_price_velocity
-    # Floating-point subtraction can turn equal velocities into tiny signed
-    # noise (for example -1e-14). Scale tolerance to the local price level.
-    price_epsilon = max(abs(closes[latest_idx]) * 1e-12, 1e-12)
-    # Relaxed: only require price velocity in the right direction.
-    # Allow slight deceleration (price_acceleration can be slightly negative).
-    # This catches decelerating trends like PEOPLE where price is rising but slowing.
-    if direction == 'LONG':
-        if price_velocity <= price_epsilon:
-            return None
-    else:
-        if price_velocity >= -price_epsilon:
-            return None
+    # Price velocity check removed — gap velocity is sufficient evidence of momentum.
+    # Price collector stores same price for consecutive bars, making velocity zero
+    # even when gap is widening. Gap velocity captures the actual signal.
 
     # Velocity = current bar's change in EMA gap. Acceleration = change in
-    # velocity. Requiring both signs prevents a still-widening but decelerating
-    # move from being mislabeled as acceleration.
+    # velocity. Relaxed: allow slightly negative velocity (gap narrowing slightly
+    # is normal in ranging markets — the gap still exists and is valid).
     gap_prev = gap_pcts[latest_idx - 1]
     gap_prev2 = gap_pcts[latest_idx - 2]
     if gap_prev is None or gap_prev2 is None:
@@ -279,11 +270,12 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
     gap_velocity = gap_now - gap_prev
     prior_gap_velocity = gap_prev - gap_prev2
     gap_acceleration = gap_velocity - prior_gap_velocity
+    # Allow velocity down to -0.01 (slight narrowing) — gap still valid
     if direction == 'LONG':
-        if gap_velocity <= 0 or gap_acceleration <= 0:
+        if gap_velocity < -0.01:
             return None
     else:
-        if gap_velocity >= 0 or gap_acceleration >= 0:
+        if gap_velocity > 0.01:
             return None
 
     # Use a trailing slope window. The legacy detector used bars after an old
@@ -325,11 +317,8 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         latest_idx - cross_bar if cross_bar is not None else ACCEL_300_BARS_UNKNOWN
     )
 
-    # Stale bars gate: reject signals where the EMA cross is too old.
-    # A fresh cross means the signal is entering early in the move.
-    stale_limit = STALE_BARS if direction == 'LONG' else STALE_BARS_SHORT
-    if bars_since_cross != ACCEL_300_BARS_UNKNOWN and bars_since_cross > stale_limit:
-        return None
+    # Stale bars check removed — gap/persistence/growth filters already ensure validity.
+    # Cross freshness is not required for acceleration signals.
 
     # ── Price position filter (FIX 2026-07-28) ──────────────────────────────────
     # Don't enter if price is already at the extreme of the recent range.
@@ -459,6 +448,145 @@ def detect_breakout(token: str, prices: list, volumes: list = None) -> Optional[
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Velocity Ignition Detection (FIX 2026-07-31)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect_velocity_ignition(token: str, prices: list) -> Optional[dict]:
+    """Detect the FIRST strong momentum bar after EMA300 cross.
+
+    Catches moves like MOVE 2026-07-31 where price dropped 0.39% in 1 minute.
+    The standard accel_300 signal waits 18 bars of persistence — this fires on
+    the first velocity spike, entering 15-20 minutes earlier.
+
+    Fires when ALL of these are true:
+      1. Price is on one side of EMA300 (LONG above, SHORT below)
+      2. The cross happened recently (within STALE_BARS)
+      3. Price velocity in the last bar is > VELOCITY_IGNITION_THRESHOLD x average
+      4. Gap is growing (gap_now > gap_then over 3 bars)
+      5. Price is moving in the signal direction (not just EMA moving)
+
+    Returns signal dict or None.
+    """
+    from hermes_constants import (
+        ACCEL_300_PERIOD,
+        ACCEL_300_VELOCITY_IGNITION_ENABLED,
+        ACCEL_300_VELOCITY_IGNITION_THRESHOLD,
+        ACCEL_300_VELOCITY_IGNITION_MIN_GAP,
+        ACCEL_300_VELOCITY_IGNITION_MIN_GAP_GROWTH,
+        ACCEL_300_VELOCITY_IGNITION_MAX_CROSS_AGE,
+    )
+
+    if not ACCEL_300_VELOCITY_IGNITION_ENABLED:
+        return None
+
+    period = ACCEL_300_PERIOD
+    if len(prices) < period + 10:
+        return None
+
+    closes = [float(p['price']) for p in prices]
+    ema300 = _ema_series(closes, period)
+
+    latest_idx = len(closes) - 1
+    if ema300[latest_idx] is None:
+        return None
+
+    # Direction: price above or below EMA300
+    gap_now = (closes[latest_idx] - ema300[latest_idx]) / ema300[latest_idx] * 100.0
+    direction = 'LONG' if closes[latest_idx] > ema300[latest_idx] else 'SHORT'
+
+    # Minimum gap requirement
+    if abs(gap_now) < ACCEL_300_VELOCITY_IGNITION_MIN_GAP:
+        return None
+
+    # Z-score cap: don't fire if move is too extended (FIX 2026-07-31)
+    # During losing streak, accel-300-vel+ fired at z=2.0-3.0 (top-chasing)
+    # A velocity spike when z > 1.5 is chasing, not catching
+    if len(closes) >= 20:
+        mean_20 = sum(closes[-20:]) / 20
+        std_20 = (sum((p - mean_20) ** 2 for p in closes[-20:]) / 20) ** 0.5
+        if std_20 > 0:
+            z_now = (closes[-1] - mean_20) / std_20
+            if abs(z_now) > 1.5:
+                return None  # move too extended — don't chase
+
+    # Find most recent cross (price crossing EMA300)
+    cross_bar = None
+    for idx in range(latest_idx, period - 1, -1):
+        prev_idx = idx - 1
+        if prev_idx < 0 or ema300[idx] is None or ema300[prev_idx] is None:
+            continue
+        if direction == 'LONG':
+            crossed = closes[idx] > ema300[idx] and closes[prev_idx] <= ema300[prev_idx]
+        else:
+            crossed = closes[idx] < ema300[idx] and closes[prev_idx] >= ema300[prev_idx]
+        if crossed:
+            cross_bar = idx
+            break
+
+    if cross_bar is None:
+        return None
+
+    bars_since_cross = latest_idx - cross_bar
+    if bars_since_cross > ACCEL_300_VELOCITY_IGNITION_MAX_CROSS_AGE:
+        return None  # cross too old — not ignition, it's a mature move
+
+    # Velocity check: last bar's move must be > threshold x average
+    if latest_idx < 10:
+        return None
+
+    # Average absolute bar-to-bar change over last 10 bars
+    bar_changes = [abs(closes[i] - closes[i-1]) for i in range(latest_idx - 9, latest_idx + 1)]
+    avg_change = sum(bar_changes) / len(bar_changes)
+    if avg_change == 0:
+        return None
+
+    last_bar_change = closes[latest_idx] - closes[latest_idx - 1]
+    # Guard against zero price (practically impossible with real exchange data)
+    if closes[latest_idx - 1] == 0:
+        return None
+    last_bar_pct = abs(last_bar_change) / closes[latest_idx - 1] * 100.0
+    avg_change_pct = avg_change / closes[latest_idx - 1] * 100.0
+
+    if last_bar_pct < avg_change_pct * ACCEL_300_VELOCITY_IGNITION_THRESHOLD:
+        return None  # not a velocity spike
+
+    # Price must be moving in the signal direction
+    if direction == 'LONG' and last_bar_change <= 0:
+        return None
+    if direction == 'SHORT' and last_bar_change >= 0:
+        return None
+
+    # Gap growth check: gap must be widening over recent bars
+    if latest_idx < 3:
+        return None
+    gap_ref = None
+    for idx in range(latest_idx - 3, latest_idx - 10, -1):
+        if idx >= 0 and ema300[idx] is not None and ema300[idx] != 0:
+            gap_ref = (closes[idx] - ema300[idx]) / ema300[idx] * 100.0
+            break
+    if gap_ref is None:
+        return None
+
+    gap_growth = gap_now - gap_ref
+    if direction == 'LONG' and gap_growth < ACCEL_300_VELOCITY_IGNITION_MIN_GAP_GROWTH:
+        return None
+    if direction == 'SHORT' and gap_growth > -ACCEL_300_VELOCITY_IGNITION_MIN_GAP_GROWTH:
+        return None
+
+    return {
+        'direction': direction,
+        'gap_pct': round(gap_now, 4),
+        'gap_growth': round(gap_growth, 4),
+        'bars_since_cross': bars_since_cross,
+        'velocity_pct': round(last_bar_pct, 4),
+        'avg_velocity_pct': round(avg_change_pct, 4),
+        'velocity_ratio': round(last_bar_pct / avg_change_pct, 2) if avg_change_pct > 0 else 0,
+        'price': closes[latest_idx],
+        'type': 'velocity_ignition',
+    }
+
+
 # Scanner
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -523,6 +651,15 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             if breakout_sig is not None:
                 sig = breakout_sig
 
+        # ── Try velocity ignition if both failed (FIX 2026-07-31) ─────────────
+        # Catches the first strong bar after EMA300 cross — enters 15-20 min
+        # earlier than persistence mode. Key for moves like MOVE 2026-07-31.
+        vi_sig = None
+        if sig is None:
+            vi_sig = detect_velocity_ignition(token, prices)
+            if vi_sig is not None:
+                sig = vi_sig
+
         if sig is None:
             continue
 
@@ -537,6 +674,21 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
         if direction == 'SHORT' and not ACCEL_300_MINUS_ENABLED:
             continue
 
+        # ── Z-score direction filter (FIX 2026-07-31) ────────────────────────
+        # Block LONG when z < -0.5 (price below average = chasing downtrend)
+        # Block SHORT when z > 0.5 (price above average = chasing uptrend)
+        # During losing streaks, signals fired in wrong direction 26% of the time
+        if len(prices) >= 20:
+            closes_for_z = [float(p['price']) for p in prices[-20:]]
+            mean_z = sum(closes_for_z) / 20
+            std_z = (sum((p - mean_z) ** 2 for p in closes_for_z) / 20) ** 0.5
+            if std_z > 0:
+                z_now = (closes_for_z[-1] - mean_z) / std_z
+                if direction == 'LONG' and z_now < -0.5:
+                    continue  # don't buy when price is below average
+                if direction == 'SHORT' and z_now > 0.5:
+                    continue  # don't sell when price is above average
+
         # ── Blacklist guard — direction-aware ─────────────────────────────────
         # SHORT_BLACKLIST only blocks SHORT signals; LONG signals for the same token
         # are valid (the blacklist is about shorting specific tokens, not going LONG).
@@ -546,11 +698,25 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
 
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
 
-        # ── Source and confidence: breakout vs persistence ────────────────────
+        # ── Source and confidence: breakout vs velocity ignition vs persistence ──
         is_breakout = breakout_sig is not None and sig.get('type') == 'breakout'
+        is_vi = vi_sig is not None and sig.get('type') == 'velocity_ignition'
+
         if is_breakout:
             source = 'accel-300-breakout'
             confidence = ACCEL_300_BREAKOUT_CONFIDENCE
+        elif is_vi:
+            # ponytail: explicit vel kill switches — safety net at source-assignment level
+            from hermes_constants import ACCEL_300_VELOCITY_PLUS_ENABLED, ACCEL_300_VELOCITY_MINUS_ENABLED
+            if direction == 'LONG' and not ACCEL_300_VELOCITY_PLUS_ENABLED:
+                continue
+            if direction == 'SHORT' and not ACCEL_300_VELOCITY_MINUS_ENABLED:
+                continue
+            source = 'accel-300-vel+' if direction == 'LONG' else 'accel-300-vel-'
+            # Confidence based on velocity ratio (how much faster than average)
+            velocity_ratio = sig.get('velocity_ratio', 1.0)
+            confidence = int(min(75, 60 + (velocity_ratio - 1.0) * 15))
+            confidence = max(60, confidence)
         else:
             source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
             # Confidence: base on gap strength + absolute gap growth. SHORT growth
@@ -572,6 +738,12 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
                 _log(f"  [DRY] {direction:5s}-accel-300-breakout {token:8s} conf={confidence:.0f}% "
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                       f"move_5bar={sig['move_5bar']:.3f}% [{source}]")
+            elif is_vi:
+                _log(f"  [DRY] {source} {token:8s} conf={confidence:.0f}% "
+                      f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
+                      f"velocity={sig['velocity_pct']:.3f}% (avg={sig['avg_velocity_pct']:.3f}%, "
+                      f"ratio={sig['velocity_ratio']:.1f}x) "
+                      f"bars_since_cross={sig['bars_since_cross']}")
             else:
                 _log(f"  [DRY] {direction:5s}-accel-300 {token:8s} conf={confidence:.0f}% "
                       f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
@@ -605,6 +777,14 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
                     _log(f"  {direction:5s}-accel-300-breakout {token:8s} conf={confidence:.0f}% "
                           f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                           f"move_5bar={sig['move_5bar']:.3f}% [{source}]")
+                elif is_vi:
+                    # Velocity ignition: medium cooldown (20 min) — fast but not too frequent
+                    set_cooldown(token, direction, hours=20/60.0)
+                    _log(f"  {source} {token:8s} conf={confidence:.0f}% "
+                          f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
+                          f"velocity={sig['velocity_pct']:.3f}% (avg={sig['avg_velocity_pct']:.3f}%, "
+                          f"ratio={sig['velocity_ratio']:.1f}x) "
+                          f"bars_since_cross={sig['bars_since_cross']}")
                 else:
                     set_cooldown(token, direction, hours=COOLDOWN_BARS / 60.0)
                     _log(f"  {direction:5s}-accel-300 {token:8s} conf={confidence:.0f}% "

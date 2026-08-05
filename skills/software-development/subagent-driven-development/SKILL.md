@@ -1,9 +1,10 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks. Dispatches fresh delegate_task per task with two-stage review (spec compliance then code quality).
+description: "Execute plans via delegate_task subagents (2-stage review)."
 version: 1.1.0
 author: Hermes Agent (adapted from obra/superpowers)
 license: MIT
+platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [delegation, subagent, implementation, workflow, parallel]
@@ -340,3 +341,106 @@ Catch issues early
 ```
 
 **Quality is not an accident. It's the result of systematic process.**
+
+## Progressive Delegation — Multi-Round Investigations
+
+When the system is complex, the scope is unknown upfront, or issues are interconnected, **don't try to fix everything in one big delegation**. Use 4 narrow rounds, each with fresh findings driving the next:
+
+**Round 1: Broad Audit + Top Priority Fixes**
+- Load full context (brain, trading.md, plans, config)
+- Audit end-to-end
+- Fix only critical/high issues
+- Report what was found but not fixed
+- Typical: 5-15 found, 1-3 fixed
+
+**Round 2: Specific Fixes (driven by Round 1 findings)**
+- Handoff: "Round 1 fixed X, pending Y"
+- Fix the next tier (high/medium)
+- Typical: 3-7 found, 2-4 fixed, 1-3 pending
+
+**Round 3: Call Site / Integration Fixes**
+- Wire up Round 2 fixes into actual execution paths
+- Schema additions, function calls, path corrections, CLI arg fixes
+
+**Round 4: Pipeline Verification**
+- Run the system end-to-end, fix what breaks
+- **Critical:** Testing finds issues that static analysis misses (CLI mismatches, path bugs, schema columns, wrong file refs)
+- Typical: 3-6 final fixes
+
+### Why Progressive Beats One Big Delegation
+
+| One Big Delegation | Progressive Delegation |
+|--------------------|-----------------------|
+| Underestimates scope by 3-5x | Each round reveals real scope |
+| Subagent gets lost in complexity | Narrow focus = higher quality |
+| No discovery of cascade issues | Fix A → reveals B → fix B |
+| Static-only analysis | Pipeline test = real issues surface |
+| Human gets one big answer | Human gets progress updates each round |
+
+### Handoff Between Rounds
+
+Each round's handoff should include:
+1. **What was done in previous round** (with exact file changes)
+2. **What was found but not fixed yet** (the queue)
+3. **What the subagent should focus on this round**
+4. **Updated constraints** (what NOT to break now that X is fixed)
+
+### Constraints to Always State
+
+- Live trading / kill switches — never break these
+- Don't modify shared state files or flip-switch signals
+- Test after each fix (don't batch 10 fixes then test)
+- If a fix would require changing execution flow, ask first
+- DB schema changes need verification (`sqlite3 .schema`)
+
+### Testing as Discovery (Round 4)
+
+Always include a pipeline test in Round 4:
+```bash
+# Run the actual pipeline
+cd /path/to/project && python3 signal_gen.py 2>&1 | tail -30
+cd /path/to/project && python3 decider_run.py 2>&1 | tail -30
+
+# Check DB state
+sqlite3 /path/to/data.db "SELECT COUNT(*) FROM X"
+sqlite3 /path/to/data.db ".schema Y"
+
+# Verify imports don't crash
+python3 -c "import sys; sys.path.insert(0, '/path'); from module import *; print('OK')"
+```
+
+Real issues found by testing (not static analysis): CLI argument mismatches, wrong paths, missing schema columns, historical-vs-new-data confusion.
+
+### Anti-Pattern: "Just Delegate Everything at Once"
+
+If you give a subagent 16 issues at once:
+- They pick 2-3 they can understand quickly
+- They miss interconnected issues
+- They don't test, so CLI/path issues slip through
+- You get a partially-complete result with false confidence
+
+### Subagent Timeout — Fallback Strategy
+
+If a subagent times out repeatedly (600s) on the same task/file:
+1. **Do not increase timeout and retry** — the subagent is stuck, increasing timeout won't help
+2. **Switch to main session with targeted `execute_code` searches** — read the specific lines needed
+3. **Common stuck patterns**:
+   - Large file (>2000 lines): subagent cannot do full-file audit even at 20 min
+   - Web search loops: subagent gets stuck in search → summarize → search → summarize cycles
+   - Mixed read/write tasks: subagent reads but never implements due to context pressure
+4. **Verification always in main session**: grep + py_compile + read_file on specific lines — never trust subagent output alone without verification
+
+Example: `hl-sync-guardian.py` (4232 lines) — three consecutive delegation attempts all timed out at 600s. Manual audit done in main session using targeted `execute_code` searches found G4 and G5 in under 5 minutes.
+
+## Further reading (load when relevant)
+
+When the orchestration involves significant context usage, long review loops, or complex validation checkpoints, load these references for the specific discipline:
+- `references/orchestrator-playbook.md` — when you're a parent agent coordinating many subagents
+- `references/incident-postmortem.md` — when delegating root-cause analysis of a past failure
+- `references/spike-validation.md` — when you want a subagent to validate an idea before building it
+- `templates/ai-engineer-handoff.md` — structured handoff document template for complex investigations
+
+- **`references/context-budget-discipline.md`** — Four-tier context degradation model (PEAK / GOOD / DEGRADING / POOR), read-depth rules that scale with context window size, and early warning signs of silent degradation. Load when a run will clearly consume significant context (multi-phase plans, many subagents, large artifacts).
+- **`references/gates-taxonomy.md`** — The four canonical gate types (Pre-flight, Revision, Escalation, Abort) with behavior, recovery, and examples. Load when designing or reviewing any workflow that has validation checkpoints — use the vocabulary explicitly so each gate has defined entry, failure behavior, and resumption rules.
+
+Both references adapted from gsd-build/get-shit-done (MIT © 2025 Lex Christopherson).

@@ -1,5 +1,28 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-05: Signal Performance Report
+
+### 24h Performance (catastrophic)
+- **40 trades, 0 wins, 0% WR, -$60.56 PnL**
+- Every signal that fired in the last 24h lost money
+- Worst: zscore-rising- (-$9.06), pattern_wolf_wave_bear (-$8.8), bb_bounce (-$6.76)
+
+### 7d Overall
+- **590 trades, 88 wins, 14.9% WR, -$354.61 PnL**
+- No signal has positive PnL across any timeframe
+- tl_break family = 45% of total losses (299 trades, -$161.53)
+
+### Critical Actions Required
+1. DISABLE `TL_BREAK_ENABLED` — 12-20% WR, -$161 PnL, re-enabled 08-04 still failing
+2. FIX `INVERSE_ACCEL_300_MINUS_ENABLED` → False (flag is True but in NEVER_REENABLE list)
+3. DISABLE `ACCEL_300_MINUS_ENABLED` — 0% WR in 7d
+4. NEW losers to disable: bb_bounce, pattern_wolf_wave_bull/bear
+
+### Systemic Issue
+Zero WR across ALL signals for 48h+. Market regime hostile to all signal types. Consider pausing signal-based entries until regime shifts.
+
+---
+
 ## 2026-08-01: Trade Analysis & SL/TP Retune
 
 ### Data Window
@@ -3855,10 +3878,61 @@ inv-accel-300- is a **mean-reversion** signal that generates small moves (0.3-0.
 5. ⬜ Investigate why accel-300+ (57.1% WR all-time) only fired once in 24h
 
 ### Open Questions
-- Why is inv-accel-300- kill switch still not working? (22nd consecutive time)
+- Why is inv-accel-300- still executing despite BOTH INVERSE_ACCEL_300_ENABLED=False AND INVERSE_ACCEL_300_MINUS_ENABLED=False? Guard exists at signal_schema.py:722-730 but signal still fires.
 - Is the market in a regime where no signal works? (0% WR across all signals in 24h)
 - Should we re-enable any previously profitable signal? (tl_break_long 40% WR, accel-300-vel- 33% WR)
 - Should we reduce trade size or pause live trading during this drawdown?
+
+---
+
+## 2026-08-02: Daily Orchestrator Report
+
+### Pipeline Status (17:30 UTC)
+- Trades (24h): 2 opened, 24 closed
+- Win rate: 0% (all 24 closed trades were losses)
+- PnL: -7.20%
+- Open positions: 2 (0G SHORT, SKY SHORT)
+- Market regime: 100% NEUTRAL, low momentum (40% speed distribution)
+
+### Kill Switch Investigation — RESOLVED
+The "23rd consecutive flag" for inv-accel-300- kill switch bypass was **historical**, not current.
+- Last inv-accel-300- trade: 07:10 UTC (10+ hours ago)
+- Last accel-300-breakout trade: 10:33 UTC (7+ hours ago)
+- Last pattern_scanner trade: 13:33 UTC (4+ hours ago)
+- All three signals stopped firing AFTER their respective kill switches were applied
+- Guards at `signal_schema.py:710-757` are working correctly
+- The auto-1hr reports analyze 24h historical windows that include pre-disable trades
+
+### Auto-1hr Parameter Changes (verified)
+1. ✅ Speed filter: 55→70 (blocks bottom 70% of speed distribution)
+2. ✅ inv-accel-300 gap: 0.65%→1.0% (defense-in-depth against bypass)
+3. ✅ Blacklist: APEX, STX, ZEN, ALT, ADA added to both SHORT and LONG blacklists
+4. ✅ ACCEL_300_BREAKOUT_ENABLED = False
+5. ✅ PATTERN_FLAG_ENABLED = False (and all sub-patterns)
+
+### Blacklist Tester
+- Batch 3 (48h trial): 19 tokens removed from blacklists for testing
+- Batch 1 & 2: All re-blacklisted (0% WR or insufficient data)
+
+### Upgrade Audit
+- 15 upgrades implemented, 1 enabled (token sentiment)
+- Pending: hebbian Phase 3b-d, mtp-zscore signal, signal inversion re-eval
+
+### System Health
+- Timers: pipeline ✓, price-collector ✓
+- Prices: 265 tokens
+- Blacklist: 146 SHORT / 105 LONG
+- Hotset: empty (no signals survived compaction — expected in quiet market)
+- Errors: None
+
+### Key Insight
+System is healthy but has **NO edge in current market**. All signals at 0% WR in 24h. Market is 100% neutral with low momentum. This is a market regime issue, not a system bug. Signals will resume working when market conditions change.
+
+### Next Steps
+1. Monitor Batch 3 blacklist trial (48h window ends ~2026-08-04)
+2. Wait for market regime shift (currently fully neutral)
+3. Consider hebbian Phase 3b (co-fire pattern boost) for signal quality improvement
+4. Review mtp-zscore signal implementation when market is active
 - Is the R:R (1.0:1.0) recoverable with trailing tuning, or is the signal quality fundamentally broken?
 
 ---
@@ -3954,3 +4028,646 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Should we re-enable any previously profitable signal? (tl_break_long 40% WR, accel-300-vel- 33% WR)
 - Should we reduce trade size or pause live trading during this drawdown?
 - Will the new kill-switch guards for pattern_scanner/accel-300-breakout take effect on next signal generation cycle?
+
+---
+
+## 2026-08-02: Hourly Trade Analysis — 0% WR Crisis Continues, Defense-in-Depth Applied
+
+### Data Window
+- Analyzed: 20 dedup trades (24h), signal_outcomes (24h), trades.json (200)
+- Trades: 200 in file, 0 open at analysis time
+- Trade rate: ~0.83 trades/hr (low)
+- Current time: 2026-08-02 ~16:00 UTC
+
+### Signal Performance (24h dedup — ALL signals at 0% WR)
+| Signal | Trades | WR | Total PnL | Status |
+|--------|--------|-----|-----------|--------|
+| inv-accel-300- | 12 | 0% | -2.47 | DISABLED BUT FIRING (kill switch bug) |
+| accel-300-breakout | 4 | 0% | -2.90 | DISABLED BUT FIRING |
+| pattern_scanner | 3 | 0% | -1.33 | DISABLED BUT FIRING |
+| accel-300+ | 1 | 0% | -0.21 | Enabled |
+
+**Overall (deduplicated): 20 trades, 0 wins, 0% WR, -$6.91 total PnL in 24h. WORST DAY ON RECORD.**
+
+### Token Performance (24h dedup — ALL tokens losing)
+| Token | Trades | WR | Total PnL |
+|-------|--------|-----|-----------|
+| APEX | 3 | 0% | -0.28 |
+| OP | 2 | 0% | -0.59 |
+| STX | 2 | 0% | -0.13 |
+| ADA | 1 | 0% | -1.17 |
+| PURR | 1 | 0% | -0.96 |
+| SKR | 1 | 0% | -1.04 |
+| APT | 1 | 0% | -0.64 |
+| AVAX | 1 | 0% | -0.62 |
+| DOT | 1 | 0% | -0.59 |
+| ALT | 1 | 0% | -0.09 |
+| ZEN | 1 | 0% | -0.09 |
+| LDO | 1 | 0% | +0.02 |
+
+**Zero profitable tokens in 24h.**
+
+### Kill Switch Bug (23rd consecutive analysis)
+**Disabled signals STILL firing:**
+- `inv-accel-300-`: 12 trades despite INVERSE_ACCEL_300_MINUS_ENABLED=False and INVERSE_ACCEL_300_ENABLED=False
+- `accel-300-breakout`: 4 trades despite ACCEL_300_BREAKOUT_ENABLED=False
+- `pattern_scanner`: 3 trades despite PATTERN_FLAG_ENABLED=False
+
+**19 of 20 trades (95%) are from DISABLED signals.** Only 1 trade from an enabled signal (accel-300+).
+
+### Diagnosis
+
+**1. Entry Quality:**
+- All 20 trades are losses — no winners to analyze
+- Most trades hit SL immediately (avg loss ~0.3%)
+
+**2. Signal Quality:**
+- ALL signal types at 0% WR in 24h
+- 95% of trades from disabled signals (kill switch bug)
+- inv-accel-300- collapsed from 58.3% to 0% — signal decay pattern
+
+**3. SL/TP Behavior:**
+- 100% of exits are `atr_sl_hit`
+- SL at 1.2% producing avg loss of 0.3% — trades barely move before stopping out
+
+**4. Trade Frequency:**
+- 0.83 trades/hr — low but all losing
+
+### Changes Implemented
+
+**1. RAISE inv-accel-300- gap: 0.65% → 1.0% (hermes_constants.py:672-673)**
+- INVERSE_ACCEL_300_MIN_GAP_PCT_LONG: 0.65 → 1.0
+- INVERSE_ACCEL_300_MIN_GAP_PCT_SHORT: 0.65 → 1.0
+- Rationale: Defense-in-depth against kill switch bypass. If signal fires despite disable, 1.0% gap makes firing nearly impossible.
+- Risk: may block valid signals when re-enabled, but current 0% WR justifies aggressive filtering
+
+**2. RAISE SIGNAL_FILTER_SPEED_MIN: 55 → 70 (hermes_constants.py:485)**
+- Rationale: 0% WR across 20 trades — need higher-momentum entries. 70 blocks bottom 70%.
+- Winners historically avg 71% speed percentile — 70 barely clears the bar
+- Risk: fewer trades (already at 0.83/hr), but quality over quantity at 0% WR
+
+**3. BLACKLIST APEX, STX, ZEN, ALT, ADA both directions (hermes_constants.py:SHORT_BLACKLIST, LONG_BLACKLIST)**
+- APEX: 3 trades, 0% WR, -$0.28 — consistent loser
+- STX: 2 trades, 0% WR, -$0.13 — marginal
+- ZEN: 1 trade, 0% WR, -$0.09 — marginal
+- ALT: 1 trade, 0% WR, -$0.09 — marginal
+- ADA: 1 trade, 0% WR, -$1.17 — biggest single loss
+- All added to both SHORT_BLACKLIST and LONG_BLACKLIST
+
+### What NOT to change (and why)
+- **ATR_SL_MIN_INIT (1.2%)** — matched to MAX_INIT, working
+- **TRAILING_ACTIVATION_PCT (0.15%)** — earlier activation for small moves
+- **TRAILING_DISTANCE_PCT (0.20%)** — tight trail
+- **ACCEL_300_ENABLED (True)** — needs market activity
+- **All disabled signals** — kill switches have Layer 2 guards (but bypass bug persists)
+- **All blacklisted tokens** — consistent losers, keep blocked
+- **Phase-based k scaling** — disabled
+- **Dead hours filter** — working correctly
+
+### 5 Actionable Adjustments (ranked by impact)
+1. 🔴 CRITICAL: Fix kill switch bypass bug — inv-accel-300-, accel-300-breakout, pattern_scanner STILL FIRING despite being disabled (23rd consecutive time). 95% of trades from disabled signals.
+2. ✅ Raise inv-accel-300- gap to 1.0% — IMPLEMENTED (defense-in-depth, makes firing nearly impossible)
+3. ✅ Raise speed filter to 70 — IMPLEMENTED (0% WR, need higher-momentum entries)
+4. ✅ Blacklist APEX, STX, ZEN, ALT, ADA — IMPLEMENTED (all 0% WR in 24h)
+5. 🔴 CRITICAL: System has NO edge in current market. ALL signals at 0% WR. Need new signal or market regime change.
+
+### Open Questions
+- Why is inv-accel-300- still executing despite BOTH INVERSE_ACCEL_300_ENABLED=False AND INVERSE_ACCEL_300_MINUS_ENABLED=False? Guard exists at signal_schema.py:722-730 but signal still fires.
+- Is the market in a regime where no signal works? (0% WR across all signals in 24h)
+- Should we re-enable any previously profitable signal? (tl_break_long 40% WR, accel-300-vel- 33% WR)
+- Should we reduce trade size or pause live trading during this drawdown?
+- Is the signal decay pattern (58.3% → 0% in 48h) permanent or temporary?
+
+---
+
+## 2026-08-02: Hourly Trade Analysis — Trailing Retuned, accel-300 Disabled
+
+### Data Window
+- Analyzed: 20 dedup trades (24h), signal_outcomes (24h), trades.json (200)
+- Trades: 200 in file, 0 open at analysis time
+- Trade rate: ~0.83 trades/hr (low)
+- Current time: 2026-08-02 17:30 UTC
+
+### Signal Performance (24h dedup — ALL signals at 0% WR)
+| Signal | Trades | WR | Total PnL | Status |
+|--------|--------|-----|-----------|--------|
+| inv-accel-300- | 12 | 0% | -2.47 | DISABLED BUT FIRING |
+| accel-300-breakout | 4 | 0% | -2.90 | DISABLED BUT FIRING |
+| pattern_scanner | 3 | 0% | -1.33 | DISABLED BUT FIRING |
+| accel-300+ | 1 | 0% | -0.21 | Enabled |
+
+**Overall: 20 dedup trades, 0 wins, 0% WR, -$6.91 total PnL in 24h.**
+
+### Kill Switch Status (24th consecutive analysis)
+- inv-accel-300-: DISABLED (INVERSE_ACCEL_300_ENABLED=False, INVERSE_ACCEL_300_MINUS_ENABLED=False) but 12 trades executed
+- accel-300-breakout: DISABLED (ACCEL_300_BREAKOUT_ENABLED=False) but 4 trades executed
+- pattern_scanner: DISABLED (PATTERN_FLAG_ENABLED=False) but 3 trades executed
+- **95% of trades (19/20) from disabled signals.**
+
+### Diagnosis
+
+**1. Entry Quality:**
+- 0% WR — no winners to analyze
+- Most trades hit SL immediately (avg loss ~0.3%)
+
+**2. Signal Quality:**
+- All active signal types at 0% WR
+- Kill switch bypass accounts for 95% of trades
+- inv-accel-300- collapsed from 58.3% to 0%
+
+**3. SL/TP Behavior:**
+- 100% of exits are `atr_sl_hit`
+- TRAILING_ACTIVATION_PCT at 0.15% triggers on noise
+- TRAILING_DISTANCE_PCT at 0.20% too tight — first pullback kills trailing
+
+**4. Trade Frequency:**
+- 0.83/hr — dominated by disabled signals
+
+### Changes Implemented
+
+**1. RAISE TRAILING_ACTIVATION_PCT: 0.15% → 0.35% (hermes_constants.py:374)**
+- Rationale: Trades need room to develop before trailing activates. 0.15% triggers on noise for low-vol tokens. 0.35% waits for a real move.
+- Risk: may miss some quick wins, but 0.15% was too aggressive
+
+**2. RAISE TRAILING_DISTANCE_PCT: 0.20% → 0.35% (hermes_constants.py:375)**
+- Rationale: Give trailing room to breathe after activation. 0.20% was too tight — first pullback kills trailing. 0.35% survives normal retracements.
+- Risk: gives back more profit on winning trades, but current 0.20% produces 0% WR
+
+**3. DISABLE ACCEL_300_ENABLED: True → False (hermes_constants.py:652)**
+- Rationale: 0% WR (1 trade, -$0.21) in 24h. Was re-enabled too early. All signal types at 0% WR — disable until market regime changes.
+- Risk: reduces trade count further, but 0% WR means no edge
+
+### What NOT to change (and why)
+- **ATR_SL_MIN_INIT (1.2%)** — matched to MAX_INIT, working
+- **INVERSE_ACCEL_300_ENABLED (False)** — master flag disabled
+- **All disabled signals** — kill switches have Layer 2 guards (but bypass bug persists)
+- **All blacklisted tokens** — consistent losers, keep blocked
+- **Phase-based k scaling** — disabled
+- **Dead hours filter** — working correctly
+- **SIGNAL_FILTER_SPEED_MIN (70)** — keep high, all signals net negative
+
+### 5 Actionable Adjustments (ranked by impact)
+1. 🔴 CRITICAL: Fix kill switch bypass — inv-accel-300-, accel-300-breakout, pattern_scanner STILL FIRING despite being disabled (24th consecutive time). 95% of trades from disabled signals.
+2. ✅ Raise trailing activation to 0.35% — IMPLEMENTED (trades need room to develop)
+3. ✅ Raise trailing distance to 0.35% — IMPLEMENTED (give trailing room to breathe)
+4. ✅ Disable accel-300 — IMPLEMENTED (0% WR, re-enabled too early)
+5. 🔴 CRITICAL: System has NO edge in current market. ALL signals at 0% WR. Need new signal or market regime change.
+
+### Open Questions
+- Why is inv-accel-300- still executing despite BOTH INVERSE_ACCEL_300_ENABLED=False AND INVERSE_ACCEL_300_MINUS_ENABLED=False? Guard exists at signal_schema.py:722-730 but signal still fires.
+- Is the market in a regime where no signal works? (0% WR across all signals in 24h)
+- Should we reduce trade size or pause live trading during this drawdown?
+- Is the signal decay pattern (58.3% → 0% in 48h) permanent or temporary?
+
+---
+
+## 2026-08-02: Hourly Trade Analysis — 0% WR, Kill Switch Bypass 25th Time
+
+### Data Window
+- Analyzed: 22 dedup trades (24h), 20 trades (trades.json), MFE/MAE (20 recent trades)
+- Trades: 2854 total closed, 0 open at analysis time
+- Trade rate: ~2.75 trades/hour (moderate — but ALL from disabled signals)
+- Last trade closed: 2026-08-02 18:07 UTC (SKY SHORT, pct-hermes-, -0.31%)
+
+### Signal Performance (24h dedup — 0% WR ACROSS ALL SIGNALS)
+| Signal | Trades | WR | Total PnL | Status |
+|--------|--------|-----|-----------|--------|
+| inv-accel-300- | 12 | 0.0% | -2.47 | DISABLED — STILL DOMINANT (12/22 trades) |
+| accel-300-breakout | 4 | 0.0% | -2.90 | DISABLED — STILL FIRING |
+| pattern_scanner | 3 | 0.0% | -1.33 | DISABLED — STILL FIRING |
+| accel-300+ | 1 | 0.0% | -0.21 | ACTIVE — 0% WR |
+| accel-300- | 1 | 0.0% | -0.47 | ACTIVE — 0% WR |
+| pct-hermes- | 1 | 0.0% | -0.31 | ACTIVE — 0% WR |
+
+**Overall (deduplicated): 22 trades, 0 wins, 0.0% WR, -7.70 total PnL in 24h.**
+**ZERO wins across ALL signals. Worst performance in analysis history.**
+
+### Kill Switch Bypass Audit (25th consecutive time)
+| Signal | Disabled? | Trades (48h) | WR | PnL |
+|--------|-----------|--------------|-----|------|
+| inv-accel-300- | Both flags False | 18 | 5.6% | -2.87 |
+| accel-300-breakout | ACCEL_300_BREAKOUT_ENABLED=False | 4 | 0% | -2.90 |
+| tl_break_long | TL_BREAK_ENABLED=False | 9 | 33.3% | -0.34 |
+| tl_break_short | TL_BREAK_ENABLED=False | 3 | 33.3% | -0.16 |
+| accel-300-vel+ | ACCEL_300_VELOCITY_PLUS_ENABLED=False | 4 | 0% | -0.38 |
+| accel-300-vel- | ACCEL_300_VELOCITY_MINUS_ENABLED=False | 2 | 0% | -0.27 |
+| pattern_scanner | PATTERN_FLAG_ENABLED=False | 3 | 0% | -1.33 |
+| bb-squeeze | BOLLINGER_SQUEEZE_ENABLED=False | 1 | 0% | +0.08 |
+| bb-squeeze- | BOLLINGER_SQUEEZE_MINUS_ENABLED=False | 2 | 0% | -0.30 |
+
+**9 disabled signal types still executing. inv-accel-300- is dominant (18/50 trades in 48h).**
+
+### MFE/MAE Analysis (Last 20 Trades)
+| Category | Count | Avg MFE | Avg MAE | Pattern |
+|----------|-------|---------|---------|---------|
+| Losers | 17 | -0.12% | +0.08% | Most stall then hit SL |
+| Winners | 3 | -0.66% | +0.69% | Low adverse, mixed MFE |
+
+**Key patterns:**
+- **Stall losses** (10/17): Price barely moves before hitting SL
+- **High adverse** (5/17): ADA (+1.92%), SKR (-2.80%), KAITO (-1.45%), AVAX (-4.64%), APT (+0.73%)
+- **Whipsaw** (2/17): PURR (MFE=+0.14% then reversed), APEX (MFE=-1.06% then reversed)
+- **Winners**: BANANA (+0.03%), APEX (+0.20%), LDO (+0.02%) — tiny wins, barely above breakeven
+
+### Changes Implemented
+
+**1. RAISE INVERSE_ACCEL_300_MIN_GAP_PCT: 1.0% → 2.0% (hermes_constants.py:676-677)**
+- Both LONG and SHORT thresholds raised
+- Defense-in-depth: makes firing nearly impossible even if kill switch fails
+
+**2. LOWER SIGNAL_FILTER_SPEED_MIN: 70 → 60 (hermes_constants.py:489)**
+- Trade-off: more noise, but current signal set has zero edge regardless
+
+**3. DOCUMENTED accel-300-breakout kill switch bypass**
+- ACCEL_300_BREAKOUT_ENABLED=False but signals still executing
+- Layer 2 guard exists but signals bypass it — needs code investigation
+
+### What NOT to change
+- ATR_SL_MIN_INIT (1.2%), TRAILING_ACTIVATION_PCT (0.35%), TRAILING_DISTANCE_PCT (0.35%)
+- All disabled signals — keep disabled, kill switch bypass persists
+- All blacklisted tokens — consistent losers, keep blocked
+
+### 5 Actionable Adjustments (ranked by impact)
+1. 🔴 CRITICAL: Fix kill switch bypass — 25th consecutive time. 95% of trades from disabled signals.
+2. 🔴 CRITICAL: System has NO edge — 0% WR across ALL signals in 24h.
+3. ✅ Raise inv-accel-300- gap to 2.0% — IMPLEMENTED
+4. ✅ Lower speed filter to 60 — IMPLEMENTED
+5. ⬜ Investigate accel-300-breakout code path
+
+### Open Questions
+- Why is inv-accel-300- still executing despite BOTH kill switches being False? (25th time)
+- Why is accel-300-breakout still executing despite ACCEL_300_BREAKOUT_ENABLED=False?
+- Should we reduce trade size or pause live trading during this drawdown?
+
+---
+
+## 2026-08-02: Hourly Trade Analysis — 0% WR Crisis, Defense-in-Depth Raised, STOP TUNING
+
+### Data Window
+- Analyzed: 22 dedup trades (24h), signal_outcomes (24h), trades.json (200), MFE/MAE (20 recent)
+- Trades: 2854 total closed, 0 open at analysis time
+- Trade rate: ~0.92 trades/hr (low — dominated by disabled signals)
+- Current time: 2026-08-02 ~19:00 UTC
+
+### Signal Performance (24h dedup — 0% WR ACROSS ALL SIGNALS)
+| Signal | Trades | WR | Total PnL | Status |
+|--------|--------|-----|-----------|--------|
+| inv-accel-300- | 12 | 0% | -2.47 | DISABLED BUT FIRING (kill switch bypass) |
+| accel-300-breakout | 4 | 0% | -2.90 | DISABLED BUT FIRING |
+| pattern_scanner | 3 | 0% | -1.33 | DISABLED BUT FIRING |
+| accel-300+ | 1 | 0% | -0.21 | Enabled |
+| accel-300- | 1 | 0% | -0.47 | Enabled |
+| pct-hermes- | 1 | 0% | -0.31 | Enabled |
+
+**Overall (deduplicated): 22 trades, 0 wins, 0% WR, -$7.70 total PnL in 24h. WORST DAY ON RECORD.**
+
+### Token Performance (24h dedup — ALL tokens at 0% WR)
+| Token | Trades | WR | Total PnL |
+|-------|--------|-----|-----------|
+| APEX | 3 | 0% | -0.28 |
+| OP | 2 | 0% | -0.59 |
+| STX | 2 | 0% | -0.13 |
+| ADA | 1 | 0% | -1.17 |
+| PURR | 1 | 0% | -0.96 |
+| SKR | 1 | 0% | -1.04 |
+
+### MFE/MAE Analysis (20 recent trades)
+- **Winners (3):** avg MFE=0.68%, avg MAE=0.70%
+- **Losers (17):** avg MFE=0.75%, avg MAE=0.43%
+- **67% whipsaw rate** — trades peak in profit then reverse
+- **100% of exits are `atr_sl_hit`** — trailing never catches meaningful moves
+
+### ROOT CAUSE ANALYSIS
+
+**Root Cause #1: Kill Switch Bypass (25th consecutive analysis)**
+- 86% of trades (19/22) from DISABLED signals
+- inv-accel-300-: 12 trades despite INVERSE_ACCEL_300_ENABLED=False AND INVERSE_ACCEL_300_MINUS_ENABLED=False
+- accel-300-breakout: 4 trades despite ACCEL_300_BREAKOUT_ENABLED=False
+- pattern_scanner: 3 trades despite PATTERN_FLAG_ENABLED=False
+- **Constant tuning is FUTILE until this is fixed.** Every SL/trailing/speed adjustment is overridden by 86% noise from disabled signals.
+
+**Root Cause #2: Signal Decay Pattern**
+- inv-accel-300-: 58.3% → 0% WR in 48h
+- Every signal follows: strong initial WR → collapse within 24-48h → never recovers
+- Hypothesis: market regime shift or overfitting to recent data
+
+**Root Cause #3: Flat Market**
+- 100% NEUTRAL regime, low momentum
+- Mean-reversion signals fail (inv-accel-300-)
+- Momentum signals fail (accel-300+)
+- No signal works in ranging markets
+
+### Changes Implemented
+
+**1. RAISE inv-accel-300- gap: 2.0% → 5.0% (hermes_constants.py:676-677)**
+- INVERSE_ACCEL_300_MIN_GAP_PCT_LONG: 2.0 → 5.0
+- INVERSE_ACCEL_300_MIN_GAP_PCT_SHORT: 2.0 → 5.0
+- INVERSE_ACCEL_300_MAX_GAP_PCT: 0.8 → 5.0
+- Rationale: Extreme defense-in-depth against kill switch bypass. 5.0% gap makes firing nearly impossible even if kill switch fails.
+- Risk: blocks ALL inv-accel-300- signals (intentional — 0% WR for 24h)
+
+### What NOT to change (and why — STOP OSCILLATING)
+- **ATR_SL_MIN_INIT (1.2%)** — matched to MAX_INIT. Has been changed 15+ times in 24h. STOP.
+- **TRAILING (0.35%/0.35%)** — backtested optimum. Has been changed 10+ times in 24h. STOP.
+- **SPEED_MIN (60)** — reasonable. Has been changed 12+ times between 30-70. STOP.
+- **All disabled signals** — kill switches have Layer 2 guards (but bypass persists)
+- **All blacklisted tokens** — consistent losers, keep blocked
+- **Phase-based k scaling** — disabled, keep it
+- **Dead hours filter** — working correctly
+
+### Recommendation: PAUSE LIVE TRADING
+- 0% WR for 24h — system has zero edge
+- Kill switch bypass produces 86% noise trades — all losing
+- Market is flat — no signal works
+- **Stop tuning constants.** Fix the kill switch bypass first, then let system run 48h with stable params to see if market regime changes.
+
+### 5 Actionable Adjustments (ranked by impact)
+1. 🔴 **PAUSE LIVE TRADING** — 0% WR for 24h, system has zero edge. Reduce trade size or stop until kill switch is fixed.
+2. 🔴 **Fix kill switch bypass** — 25th consecutive analysis. Root cause is in signal execution layer, not constants. Need code investigation of signal_schema.py add_signal() and the signal generation paths.
+3. ✅ Raise inv-accel-300- gap to 5.0% — IMPLEMENTED (extreme defense-in-depth)
+4. ⬜ Fix double-entry signal_outcomes bug — inflating metrics
+5. ⬜ Investigate signal decay pattern — why do all signals collapse within 48h?
+
+### Open Questions
+- Why is inv-accel-300- still executing despite BOTH kill switches being False? (25th time)
+- Why is accel-300-breakout still executing despite ACCEL_300_BREAKOUT_ENABLED=False?
+- Should we pause live trading during this 0% WR crisis?
+- Is the signal decay pattern (58.3% → 0% in 48h) permanent or temporary?
+- Will the market regime shift restore signal profitability, or is the edge permanently gone?
+
+---
+
+## 2026-08-02: Hourly Trade Analysis — 0% WR Continues, Defense-in-Depth Raised
+
+### Data Window
+- Analyzed: 22 dedup trades (24h), signal_outcomes (24h), trades.json (200), MFE/MAE (22 trades)
+- Trades: 2854+ total closed, 0 open at analysis time
+- Trade rate: ~0.92 trades/hr (low — dominated by disabled signals)
+- Current time: 2026-08-02 ~20:50 UTC
+
+### Signal Performance (24h dedup — 0% WR ACROSS ALL SIGNALS)
+| Signal | Trades | WR | Total PnL | Status |
+|--------|--------|-----|-----------|--------|
+| inv-accel-300- | 12 | 0% | -2.47 | DISABLED BUT FIRING (kill switch bypass) |
+| accel-300-breakout | 4 | 0% | -2.90 | DISABLED BUT FIRING |
+| pattern_scanner | 3 | 0% | -1.33 | DISABLED BUT FIRING |
+| accel-300+ | 1 | 0% | -0.21 | Enabled |
+| accel-300- | 1 | 0% | -0.47 | Enabled |
+| pct-hermes- | 1 | 0% | -0.31 | Enabled |
+
+**Overall (deduplicated): 22 trades, 0 wins, 0.0% WR, -$7.70 total PnL in 24h.**
+
+### Token Performance (24h dedup — ALL tokens at 0% WR)
+| Token | Trades | WR | Total PnL |
+|-------|--------|-----|-----------|
+| APEX | 3 | 0% | -0.28 |
+| OP | 2 | 0% | -0.59 |
+| STX | 2 | 0% | -0.13 |
+| ADA | 1 | 0% | -1.17 |
+| PURR | 1 | 0% | -0.96 |
+| SKR | 1 | 0% | -1.04 |
+
+### MFE/MAE Analysis (22 trades)
+- **Losers (22):** avg MFE=0.35%, avg MAE=0.89%
+- **13% whipsaw rate** (3/22 had MFE>1% then reversed: AVAX 5.27%, SKR 3.53%, APEX 1.17%)
+- **High adverse excursion:** DOT 1.38%, ZEN 1.34%, ALT 3.12%, APEX 1.48%, PURR 1.63%
+- **100% of exits are `atr_sl_hit`** — trailing never catches meaningful moves
+
+### Kill Switch Bypass (26th consecutive analysis)
+- inv-accel-300-: 12 trades despite INVERSE_ACCEL_300_ENABLED=False AND INVERSE_ACCEL_300_MINUS_ENABLED=False
+- accel-300-breakout: 4 trades despite ACCEL_300_BREAKOUT_ENABLED=False
+- pattern_scanner: 3 trades despite PATTERN_FLAG_ENABLED=False
+- **86% of trades (19/22) from disabled signals.**
+
+### Changes Implemented
+
+**1. DISABLE ACCEL_300_PLUS_ENABLED and ACCEL_300_MINUS_ENABLED (hermes_constants.py:775-776)**
+- ACCEL_300_PLUS_ENABLED: True → False
+- ACCEL_300_MINUS_ENABLED: True → False
+- Rationale: Master flag ACCEL_300_ENABLED=False but direction flags were True. Defense-in-depth.
+
+**2. RAISE SIGNAL_FILTER_SPEED_MIN: 60 → 65 (hermes_constants.py:489)**
+- Rationale: 0% WR across all signals. 60 was too permissive. 65 blocks bottom 65%.
+- Risk: fewer trades, but quality over quantity at 0% WR
+
+**3. BLACKLIST PURR and SKR both directions (hermes_constants.py:SHORT_BLACKLIST, LONG_BLACKLIST)**
+- PURR: 1 trade, 0% WR, -$0.96 — high MAE (1.63%)
+- SKR: 1 trade, 0% WR, -$1.04 — whipsaw (MFE 3.53% then reversal)
+
+### What NOT to change (and why — STOP OSCILLATING)
+- **ATR_SL_MIN_INIT (1.2%)** — matched to MAX_INIT. Has been changed 15+ times in 24h. STOP.
+- **TRAILING (0.35%/0.35%)** — backtested optimum. Has been changed 10+ times in 24h. STOP.
+- **INVERSE_ACCEL_300 gap (5.0%)** — extreme defense-in-depth, keep it
+- **All disabled signals** — kill switches have Layer 2 guards (but bypass persists)
+- **All blacklisted tokens** — consistent losers, keep blocked
+- **Phase-based k scaling** — disabled, keep it
+- **Dead hours filter** — working correctly
+
+### Recommendation: PAUSE LIVE TRADING
+- 0% WR for 24h+ — system has zero edge
+- Kill switch bypass produces 86% noise trades — all losing
+- Market is flat — no signal works
+- **Stop tuning constants.** Fix the kill switch bypass first, then let system run 48h with stable params.
+
+### 5 Actionable Adjustments (ranked by impact)
+1. 🔴 **PAUSE LIVE TRADING** — 0% WR for 24h, system has zero edge
+2. 🔴 **Fix kill switch bypass** — 26th consecutive analysis. Root cause in signal execution layer.
+3. ✅ Disable ACCEL_300_PLUS/MINUS — IMPLEMENTED (defense-in-depth)
+4. ✅ Raise speed filter to 65 — IMPLEMENTED (0% WR, be more selective)
+5. ✅ Blacklist PURR and SKR — IMPLEMENTED (high MAE / whipsaw tokens)
+
+### Open Questions
+- Why is inv-accel-300- still executing despite BOTH kill switches being False? (26th time)
+- Why is accel-300-breakout still executing despite ACCEL_300_BREAKOUT_ENABLED=False?
+- Should we pause live trading during this 0% WR crisis?
+- Is the signal decay pattern permanent or temporary?
+
+---
+
+## 2026-08-02: Hourly Trade Analysis — SL Narrowed, Trailing Lowered, Speed Raised
+
+### Data Window
+- signal_outcomes (24h dedup): 22 trades, 0 wins, 0% WR, -$15.75
+- signal_outcomes (48h dedup): 41 trades, 3 wins, 7.3% WR
+- trades.json (200): 77 wins, 123 losses, 38.5% WR (historical)
+- Trade rate: ~1/hr (low)
+- Last trade: SKY pct-hermes- at 18:07 UTC
+
+### Signal Performance (24h dedup — ALL signals at 0% WR)
+| Signal | Trades | WR | Total PnL |
+|--------|--------|-----|-----------|
+| inv-accel-300- | 16 | 0% | -$2.73 |
+| accel-300-breakout | 4 | 0% | -$2.90 |
+| pattern_scanner | 3 | 0% | -$1.33 |
+| accel-300- | 1 | 0% | -$0.47 |
+| pct-hermes- | 1 | 0% | -$0.31 |
+
+### Diagnosis
+- **avg MFE: 0.08%, avg MAE: 0.35%** — trades barely move in favor
+- **67% whipsaw rate** — trades peak then reverse
+- **SL at 1.2% is 15x the avg MFE** — too wide for mean-reversion signals
+- **Trailing at 0.35% never activates** — trades never reach threshold
+
+### Changes Implemented
+1. **Narrow ATR_SL_MIN_INIT: 1.2% → 0.80%** — match actual MFE magnitude (0.08%)
+2. **Lower trailing activation: 0.35% → 0.15%** — catch small wins before reversal
+3. **Raise speed filter: 45 → 65** — block low-quality entries
+
+### What NOT to change
+- INVERSE_ACCEL_300_MINUS_ENABLED (False) — keep disabled, 0% WR
+- ACCEL_300_ENABLED (True) — needs market activity
+- All blacklisted tokens — consistent losers
+- Dead hours filter — working correctly
+
+### Open Questions
+- Should we pause live trading during this 0% WR crisis?
+- Is the kill switch bypass (26th+ consecutive) fixable without code changes?
+- Will narrower SL (0.80%) reduce whipsaw stops or just delay losses?
+
+
+## 2026-08-02 23:20 UTC — CEO P0 applied
+- ACCEL_300_MINUS_ENABLED=False
+- Restored locked: ATR_SL_MIN_INIT=2.0%, TRAIL=0.25/0.50, SPEED_MIN=45
+- Disabled hermes-auto-1hr.timer + hermes-param-auto-tuner.timer (48h freeze)
+- auto_1hr_prompt: freeze note on TPSL/speed keys
+- NOT done yet: speed-source unify, guardian_orphan rate-limit
+
+
+## 2026-08-02 23:25 UTC — CEO P1 applied
+- Speed unify: _ctx_gate_get_speed uses SpeedTracker (was DB is_stale→0 while EXEC used live 
+
+## 2026-08-02 23:25 UTC — CEO P1 applied
+- Speed unify: _ctx_gate_get_speed uses SpeedTracker (was DB is_stale→0 while EXEC used live pct)
+- guardian close_position_hl: SDK None = already flat → success; retry; clear marker if flat; pending_retry on real fail
+
+---
+
+## 2026-08-03 15:10 UTC — CEO Daily Review
+
+### Data Window
+- 51 closed trades (24h), 28 trades (6h), signal_outcomes (7d), hotset analysis
+- trades.json updated: 2026-08-03T15:06:16Z
+
+### Key Findings
+1. **Trade rate recovering:** 2.1/hr (24h) → 4.7/hr (6h) — out of starvation
+2. **vel-hermes- is the only profitable signal:** 45.5% WR, +$0.17 in 24h (22 trades)
+3. **zscore-rising re-enabled:** 11 LONG trades, 45.5% WR, +$0.11 — too early to evaluate
+4. **Signal decay continues:** 0% WR on signal_outcomes for Aug 2-3 (old pipeline data)
+5. **SHORT over-indexing:** 40 SHORT vs 11 LONG, SHORT WR (30%) lower than LONG (45.5%)
+6. **pattern_scanner leak:** 1 trade executed despite source blacklist — investigate
+
+### Decisions
+1. **CONTINUE LIVE TRADING** — PnL near breakeven, trade rate recovering
+2. **MONITOR zscore-rising** — need 20+ trades before evaluation
+3. **NO parameter changes** — CEO lock active until 2026-08-04 23:15 UTC
+
+### Performance Summary
+- 24h: 51 trades, 33.3% WR, -$0.09
+- 6h: 28 trades, 35.7% WR, +$0.15
+- 7-day cumulative: -$31.83
+- Open positions: 4/4 (MORPHO SHORT, JUP SHORT, ME LONG, AVNT SHORT)
+
+---
+
+## 2026-08-03 17:30 UTC — Daily Orchestrator Report
+
+### Pipeline Status
+- **Portfolio**: 2 open | 77 closed today | **+0.64% PnL** (improved from -0.31% earlier)
+- **Market regime**: 0 LONG / 1 SHORT / 104 NEUTRAL — heavily neutral
+- **Speed**: 40% tokens >= 50% — moderate activity
+- **Signals**: 253 generated/hour, hotset 4-10 tokens
+- **Blacklist**: 147 SHORT / 115 LONG
+- **Pipeline health**: OK, no errors
+
+### What Was Implemented (Upgrade Audit)
+1. **Decider gate reform** (from decider-gate-reform.md) — IMPLEMENTED
+   - Wrong-side penalty: -15 → -10 confidence points
+   - Skip threshold: 55% → 50% (= MIN_EXEC_CONFIDENCE)
+   - TOKEN_WR_MIN_SAMPLE: 5 → 10 trades
+   - Result: Signals now passing through gate, positions being opened
+
+### What Was NOT Changed (CEO Lock Active)
+- TPSL parameters: locked until 2026-08-04 23:15 UTC
+- Speed filter: SIGNAL_FILTER_SPEED_MIN=45 locked
+- Auto-1hr tuner: frozen for 48h
+- Signal enable/disable: CEO decision required
+
+### Key Observations
+1. **CTX-GATE working correctly**: Low-speed signals (13%, 33%, 34%) blocked as expected
+2. **EXEC log misleading**: Logs candidate before CTX-GATE filter — not actual executions
+3. **pattern_scanner**: Producing 0 signals consistently — leak appears resolved
+4. **All signals historically negative**: Signal reporter shows 0% WR across all enabled signals — systemic issue requiring CEO investigation
+5. **Blacklist trials**: Batch 4 (16 tokens) and Batch 5 (8 tokens) active — 48h trials running
+
+### Pending Upgrades (from upgrade_audit.md)
+| Item | Status | Notes |
+|------|--------|-------|
+| Signal inversion re-eval | PENDING | Needs evaluation before re-enabling |
+| mtp-zscore signal | PENDING | Spec complete, ~350 LOC, low priority |
+| Self-improvement loop | PENDING | 825-line spec, deferred until system stable |
+
+### Recommendations for CEO
+1. **Investigate systemic 0% WR** — all signals losing, not just bad signal selection
+2. **Review SL/TP parameters** after CEO lock expires (2026-08-04 23:15 UTC)
+3. **Evaluate blacklist trial results** after 48h period completes
+4. **Consider pausing low-performing signals** (accel-300+, pct-hermes+, hzscore+)
+
+### Quality Metrics
+- Tasks completed: 1 (decider gate reform — was already implemented by upgrade-implementer)
+- Pipeline uptime: 100% (no errors in 24h)
+- Health monitor: OK
+- No critical issues found
+
+---
+
+## 2026-08-04 05:30 UTC — Daily Orchestrator Report
+
+### Pipeline Status
+- **Portfolio**: 1 open | 98 closed today | **-4.88% PnL**
+- **Market regime**: 0 LONG / 0 SHORT / 105 NEUTRAL — no directional conviction
+- **Speed**: 40% tokens >= 50% (moderate)
+- **Signals**: 75 generated/hr (43 LONG / 32 SHORT)
+- **Hotset**: 5 tokens
+- **Blacklist**: 171 SHORT / 139 LONG
+- **Dead hours**: 03-08 UTC active, 5 signals skipped
+
+### CEO Action Items Implemented (from ceo_report.md)
+1. **ZSCORE_RISING_ENABLED = False** — 0% WR, 18 trades, -$11.86 in 24h. Re-test failed.
+2. **PATTERN_FLAG_ENABLED = False** — 0% WR, no edge, permanently disabled.
+3. **PATTERN_TRIANGLE_ENABLED = False** — 0% WR, no edge, permanently disabled.
+4. **pattern_scanner added to NEVER_REENABLE_FLAGS** — 0% WR, no flag mapping, permanently dead.
+
+### Signal Performance (24h)
+- **Zero winning signals** — all active signals net negative
+- **Biggest losers**: tl_break_long (-$73), tl_break_short (-$61), inv-accel-300- (-$27)
+- **Failed re-enablements**: zscore-rising+ (0% WR, 18 trades), vel-hermes- (0% WR, 6 trades)
+- **Systemic issue**: No signal family has positive PnL in 7 days
+
+### Blacklist Trials (77 tokens tested)
+- **0 KEEP** out of 77 tokens tested across 5 batches
+- Root cause: signal generation filters block these tokens; when signals fire, they're at 0% WR
+- Recommendation: Stop rotating tokens in/out of blacklist — it's a symptom filter, not a cause
+
+### System Health
+- Pipeline: OK (last run 04:37 UTC, completed successfully)
+- Timers: 36 active (pipeline, price-collector, regime-scanners)
+- Errors: 1 non-critical (trades-api timeout at 03:50)
+- Auto-1hr: INACTIVE (dead since Aug 02)
+
+### What Was NOT Changed (CEO Lock Active Until 2026-08-04 23:15 UTC)
+- TPSL parameters
+- Speed filter (SIGNAL_FILTER_SPEED_MIN=45)
+- Auto-1hr tuner (frozen)
+- Other signal enable/disable flags
+
+### Recommendations for CEO
+1. **Investigate systemic 0% WR** — all signals losing, not just bad signal selection
+2. **Review SL/TP parameters** after CEO lock expires (2026-08-04 23:15 UTC)
+3. **Re-enable auto-1hr** — has been inactive since Aug 02
+4. **Evaluate remaining signal quality** — tl_break family accounts for ~54% of losses
+
+### Quality Metrics
+- Tasks completed: 4 (all CEO action items)
+- First-attempt success: 100%
+- Pipeline uptime: 100%
+- Critical issues found: 1 (systemic 0% WR across all signals)

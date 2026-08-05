@@ -41,8 +41,9 @@ Answer these questions:
 
 ## Step 5: Recommend & Implement
 - Propose 5 ranked adjustments to `hermes_constants.py` params.
-- Implement the top 3 immediately.
-- Verify each change loads correctly with a quick Python import test.
+- **CEO FREEZE until 2026-08-04 23:15 UTC:** Do NOT edit ATR_SL_MIN_INIT, ATR_SL_MAX_INIT, SL_PCT_FALLBACK, STOP_LOSS_DEFAULT, TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT, or SIGNAL_FILTER_SPEED_MIN. Analyze and recommend only — no writes to those keys.
+- Other params: implement at most 1 change, and only with clear data evidence.
+- Verify any allowed change loads correctly with a quick Python import test.
 
 ## Step 6: Document
 - Append a concise entry to `automation/trading_log.md` with:

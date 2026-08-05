@@ -1,10 +1,14 @@
 """
-zscore_rising — standalone momentum onset detector.
-Fires when z-score CROSSES threshold AND is actively rising (acceleration confirmed).
-Eliminates noise from persistently elevated z-scores that plague plain z-score threshold signals.
+zscore_rising — momentum onset detector (fishing for z-score reversals).
 
-Logic: prev_z < TH <= cur_z (crossing up) + z_velocity > 0 (rising)
-       prev_z > -TH >= cur_z (crossing down) + z_velocity < 0 (falling)
+Like a fish-finder detecting where fish congregate:
+- Z-score crossing = sonar ping (something is changing)
+- Velocity = echo strength (how fast is it changing?)
+- Speed percentile = is the fish moving?
+- RSI = water temperature (too hot/cold to trade?)
+- Volume = oxygen (is there real participation?)
+
+Fires when z-score CROSSES threshold AND ALL oxygen indicators align.
 """
 
 import json
@@ -33,8 +37,13 @@ from paths import RUNTIME_DB, STATIC_DB, CANDLES_DB
 
 _DB_PATH = STATIC_DB
 
-# In-memory cooldown tracker: (token, direction) -> last_fired_bar
 _last_signal: dict[tuple[str, str], int] = {}
+
+# ── Fishing parameters ────────────────────────────────────────────────────────
+ZSPEED_MIN = 50       # speed percentile — fish must be moving
+ZRSI_MIN = 30         # RSI floor — don't fish in frozen water
+ZRSI_MAX = 70         # RSI ceiling — don't fish in boiling water
+ZMIN_Z = 2.5          # minimum abs(z) at crossing — stronger echo required
 
 
 def compute_zscore(values: list[float], LB: int) -> Optional[float]:
@@ -52,14 +61,54 @@ def compute_zscore(values: list[float], LB: int) -> Optional[float]:
     return (cur - mean) / std
 
 
+def _get_rsi(prices: list[float], period: int = 14) -> Optional[float]:
+    """Compute RSI from price list. Returns 0-100 or None."""
+    if len(prices) < period + 1:
+        return None
+    gains = []
+    losses = []
+    for i in range(1, len(prices)):
+        delta = prices[i] - prices[i - 1]
+        gains.append(max(delta, 0))
+        losses.append(max(-delta, 0))
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return 100.0 - (100.0 / (1.0 + rs))
+
+
+def _get_speed(token: str) -> float:
+    """Get speed percentile for token. Returns 0-100."""
+    try:
+        from speed_tracker import get_token_speed
+        spd = get_token_speed(token)
+        return spd.get('speed_percentile', 50) if spd else 50.0
+    except Exception:
+        return 50.0
+
+
 def scan_zscore_rising_signals(prices_dict: dict[str, list[float]]) -> list[dict]:
     """
-    Scan all tokens for z-score crossing + rising momentum onset.
-    Per-bar iteration: for each bar i (starting at LB), compute z-score of
-    window ending at i vs window ending at i-1, detect crossing, confirm rising.
+    Scan tokens for z-score crossing + oxygen confirmation.
+    Only fires when ALL indicators align (fish-finder approach).
     """
     if not ZSCORE_RISING_ENABLED:
         return []
+
+    # ── Regime filter — z-score crossings are noise in ranging markets ────
+    try:
+        import os, json as _json
+        regime_file = '/var/www/hermes/data/regime_5m.json'
+        if os.path.exists(regime_file):
+            with open(regime_file) as _f:
+                _regime_data = _json.load(_f)
+            _overall = _regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
+            if _overall == 'NEUTRAL':
+                return []
+    except Exception:
+        pass  # if regime data unavailable, don't block
 
     signals = []
     LB = ZSCORE_RISING_LOOKBACK
@@ -77,31 +126,47 @@ def scan_zscore_rising_signals(prices_dict: dict[str, list[float]]) -> list[dict
         last_long_bar = -COOLDOWN
         last_short_bar = -COOLDOWN
 
-        # Iterate per-bar: i is the current bar index (0-based, oldest-first)
+        latest_bar = len(closes) - 1
         for i in range(LB, len(closes)):
-            # z_curr: z-score of window [0..i] (bars ending at i)
+            if i != latest_bar:
+                continue
+
             z_curr = compute_zscore(closes[: i + 1], LB)
             if z_curr is None:
                 continue
 
-            # z_prev: z-score of window [0..i-1] (bars ending at i-1)
             z_prev = compute_zscore(closes[:i], LB) if i >= LB else None
             if z_prev is None:
                 continue
 
-            # z_past: z-score of window [0..i-VEL_BARS] (bars ending i-VEL_BARS ago)
             z_past_win = closes[: i + 1 - VEL_BARS]
             z_past = compute_zscore(z_past_win, LB) if len(z_past_win) >= LB else None
             z_vel = (z_curr - z_past) if z_past is not None else 0.0
 
-            # === LONG: z crosses above +TH threshold AND rising ===
+            # ── Oxygen checks (must ALL align) ──────────────────────────────
+            speed = _get_speed(token)
+            rsi = _get_rsi(closes)
+
+            # Speed filter: fish must be moving
+            if speed < ZSPEED_MIN:
+                continue
+
+            # RSI filter: don't fish in frozen/boiling water
+            if rsi is not None and (rsi < ZRSI_MIN or rsi > ZRSI_MAX):
+                continue
+
+            # Z-score magnitude: stronger echo required
+            if abs(z_curr) < ZMIN_Z:
+                continue
+
+            # === LONG: z crosses above +TH AND rising + oxygen confirmed ===
             if ZSCORE_RISING_PLUS_ENABLED:
                 if z_prev < TH <= z_curr and z_vel > 0:
                     if token in LONG_BLACKLIST:
                         continue
                     if i - last_long_bar <= COOLDOWN:
                         continue
-                    confidence = min(CONF_MIN + abs(z_curr) * CONF_SCALE, CONF_MAX)
+                    confidence = min(CONF_MIN + abs(z_curr) * CONF_SCALE + speed * 0.1, CONF_MAX)
                     signals.append({
                         "token": token,
                         "direction": "long",
@@ -115,14 +180,14 @@ def scan_zscore_rising_signals(prices_dict: dict[str, list[float]]) -> list[dict
                     })
                     last_long_bar = i
 
-            # === SHORT: z crosses below -TH threshold AND falling ===
+            # === SHORT: z crosses below -TH AND falling + oxygen confirmed ===
             if ZSCORE_RISING_MINUS_ENABLED:
                 if z_prev > -TH >= z_curr and z_vel < 0:
                     if token in SHORT_BLACKLIST:
                         continue
                     if i - last_short_bar <= COOLDOWN:
                         continue
-                    confidence = min(CONF_MIN + abs(z_curr) * CONF_SCALE, CONF_MAX)
+                    confidence = min(CONF_MIN + abs(z_curr) * CONF_SCALE + speed * 0.1, CONF_MAX)
                     signals.append({
                         "token": token,
                         "direction": "short",
@@ -143,32 +208,26 @@ def run(prices_dict: dict[str, list[float]] = None) -> int:
     """
     Hermes signal entry point.
     Returns: number of signals emitted.
-    Prices dict: {token: [close_prices]} — oldest-first (ASC).
-    DB query returns DESC (newest-first); run() reverses each token's list.
+    Fetches price history per-token from get_price_history().
     """
     if not ZSCORE_RISING_ENABLED:
         return 0
 
-    if prices_dict is None:
-        prices_dict = {}
-        conn = sqlite3.connect(_DB_PATH)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT token, price FROM price_history
-            WHERE price IS NOT NULL AND price > 0
-            ORDER BY token, timestamp DESC
-        """)
-        rows = cur.fetchall()
-        conn.close()
+    from signal_schema import get_all_latest_prices, get_price_history, price_age_minutes
 
-        from collections import defaultdict
-        token_prices: dict[str, list[float]] = defaultdict(list)
-        for token, price in rows:
-            token_prices[token].append(price)
-
-        # DB returns newest-first (DESC), scan expects oldest-first (ASC)
-        for token, prices in token_prices.items():
-            prices_dict[token] = list(reversed(prices[:ZSCORE_RISING_MAX_BARS]))
+    # Build {token: [prices]} from per-token price_history queries
+    all_prices = get_all_latest_prices()
+    prices_dict = {}
+    for token, data in all_prices.items():
+        if token.startswith('@'):
+            continue
+        if not data.get('price') or data['price'] <= 0:
+            continue
+        if price_age_minutes(token) > 10:
+            continue
+        rows = get_price_history(token, lookback_minutes=ZSCORE_RISING_MAX_BARS)
+        if rows and len(rows) >= ZSCORE_RISING_LOOKBACK + ZSCORE_RISING_VEL_BARS + 2:
+            prices_dict[token] = [r[1] for r in reversed(rows)]  # oldest-first
 
     sigs = scan_zscore_rising_signals(prices_dict)
     for sig in sigs:

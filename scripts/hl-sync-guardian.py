@@ -185,7 +185,7 @@ sys.path.insert(0, '/root/.hermes/scripts')
 
 from paths import *
 from hermes_ab_utils import get_cached_ab_variant
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT, ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL, ATR_K_NORMAL_VOL, ATR_PCT_FALLBACK, MAX_HYPE_POSITIONS
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT, ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL, ATR_K_NORMAL_VOL, ATR_PCT_FALLBACK, MAX_HYPE_POSITIONS, STALE_ROTATION_ENABLED
 from hyperliquid_exchange import (
     get_open_hype_positions_curl, get_exchange, get_realized_pnl,
     get_trade_history, is_live_trading_enabled, mirror_open, mirror_open_batch,
@@ -784,56 +784,77 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
 
 # ─── HL Closing ────────────────────────────────────────────────────────────────
 
+def _hl_has_position(coin: str) -> bool:
+    """True if coin still has an open HL position (fresh user_state)."""
+    try:
+        from hyperliquid_exchange import get_exchange, MAIN_ACCOUNT_ADDRESS
+        ex = get_exchange()
+        addr = getattr(ex, 'account_address', None) or MAIN_ACCOUNT_ADDRESS
+        state = ex.info.user_state(addr)
+        for p in state.get('assetPositions', []) or []:
+            item = p.get('position') or {}
+            if item.get('coin') == coin and abs(float(item.get('szi') or 0)) > 0:
+                return True
+        return False
+    except Exception as e:
+        log(f'  ⚠️ {coin}: position check failed: {e}', 'WARN')
+        return True  # fail-closed: assume still open so we retry
+
+
 def close_position_hl(coin: str, reason: str) -> bool:
-    """Close a position on HL. Returns True on success."""
+    """Close a position on HL. Returns True on success.
+    SDK market_close returns None when coin not in positions (already flat) —
+    that is SUCCESS, not rate-limit. Retry once on real failures."""
     log(f'  → close_position_hl({coin}, reason={reason}) — initiating HL market close')
     if DRY:
         log(f'  [DRY] Would close {coin} ({reason})')
         return True
 
-    try:
-        log(f'  → get_exchange() for {coin}')
-        exchange = get_exchange()
-        log(f'  → exchange.market_close(coin={coin}, slippage={CLOSE_SLIPPAGE})')
-        result = exchange.market_close(coin=coin, slippage=CLOSE_SLIPPAGE)
-        log(f'  ← market_close returned: {type(result).__name__} = {str(result)[:300]}')
-
-        # Defensive: handle None, non-dict, or unexpected result structures
+    def _parse_result(result) -> str:
+        """Return 'ok' | 'gone' | 'fail'."""
         if result is None:
-            log(f'  ❌ {coin}: market_close returned None (rate-limited?)', 'FAIL')
-            return False
+            # SDK returns None when no matching open position — already closed
+            return 'gone' if not _hl_has_position(coin) else 'fail'
         if not isinstance(result, dict):
-            log(f'  ❌ {coin}: market_close returned {type(result).__name__}: {str(result)[:100]}', 'FAIL')
-            return False
-
-        # Try expected path: response.data.statuses
+            return 'fail'
         response_data = result.get('response')
         if isinstance(response_data, dict):
-            # Check for HL API errors before checking statuses
-            if 'error' in response_data:
-                log(f'  ❌ {coin}: HL API error: {response_data["error"]}', 'FAIL')
-                return False
-            if response_data.get('status') == 'err':
-                err_msg = response_data.get('response', str(response_data))
-                log(f'  ❌ {coin}: market_close failed: {err_msg}', 'FAIL')
-                return False
+            if 'error' in response_data or response_data.get('status') == 'err':
+                return 'fail'
             statuses = response_data.get('data', {}).get('statuses', [])
-        else:
-            # Unexpected: log it as a warning but treat as success (HL filled it)
-            log(f'  ⚠️ {coin}: unexpected result structure: {str(result)[:200]}', 'WARN')
-            return True
+            if not statuses:
+                return 'gone' if not _hl_has_position(coin) else 'fail'
+            for s in statuses:
+                if isinstance(s, dict) and 'error' in s:
+                    return 'fail'
+            return 'ok'
+        # Unexpected structure — check if flat
+        return 'ok' if not _hl_has_position(coin) else 'ok'
 
-        if not statuses:
-            log(f'  ❌ {coin}: market_close returned empty statuses — HL rejected the order', 'FAIL')
-            return False
-        for s in statuses:
-            if isinstance(s, dict) and 'error' in s:
-                log(f'  ❌ {coin}: {s["error"]}', 'FAIL')
-                return False
-        log(f'  ✅ {coin} closed ({reason})', 'PASS')
-        return True
+    try:
+        exchange = get_exchange()
+        for attempt in range(2):
+            if attempt:
+                time.sleep(5 + attempt * 5)
+                log(f'  → retry market_close {coin} attempt={attempt+1}', 'WARN')
+            log(f'  → exchange.market_close(coin={coin}, slippage={CLOSE_SLIPPAGE})')
+            result = exchange.market_close(coin=coin, slippage=CLOSE_SLIPPAGE)
+            log(f'  ← market_close returned: {type(result).__name__} = {str(result)[:300]}')
+            status = _parse_result(result)
+            if status in ('ok', 'gone'):
+                log(f'  ✅ {coin} closed ({reason}) [{status}]', 'PASS')
+                return True
+            log(f'  ❌ {coin}: market_close not confirmed (attempt {attempt+1})', 'FAIL')
+        # Final: if already flat, treat as success so markers clear
+        if not _hl_has_position(coin):
+            log(f'  ✅ {coin} already flat on HL after failed close — treating success', 'PASS')
+            return True
+        return False
     except Exception as e:
         log(f'  ❌ {coin}: EXCEPTION {e}', 'FAIL')
+        if not _hl_has_position(coin):
+            log(f'  ✅ {coin} already flat after exception — treating success', 'PASS')
+            return True
         return False
 
 
@@ -950,18 +971,18 @@ def _poll_hl_fills_for_close(token: str, close_start_ms: int):
 
 def _wait_for_position_closed(token: str, timeout: int = 15) -> bool:
     """
-    BUG-2 fix: Wait for a position to actually disappear from HL /info.
+    Wait for a position to actually disappear from HL.
     Returns True if position is gone (closed/filled), False if still open.
     Polls every 2s for up to 'timeout' seconds.
-
-    FIX (2026-04-17): Uses _get_cached_hl_positions() first, then falls back
-    to fresh API call if cache is stale. Avoids redundant /info calls.
+    Force-fetches from HL each iteration (bypasses cache) — cached data
+    is stale right after a close (HL API takes 1-5s to reflect fills).
     """
     deadline = time.time() + timeout
     while time.time() < deadline:
         time.sleep(2)
         try:
-            positions = _get_cached_hl_positions()
+            # Force fresh fetch — bypass the 30s cache
+            positions = get_open_hype_positions_curl()
             if token not in positions or float(positions.get(token, {}).get('size', 0)) == 0:
                 log(f'  [FILL CONFIRMED] {token} position closed on HL')
                 return True
@@ -1647,7 +1668,9 @@ def sync_pnl_from_hype(prices):
                 # → close stale trade, let ai_decider refill from hot-set.
                 # Runs after pnl update; skipped for trades already being cut (<-5%).
                 # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
-                if pnl_pct > CUT_LOSER_THRESHOLD:
+                if pnl_pct > CUT_LOSER_THRESHOLD and pnl_pct < 0.5 and STALE_ROTATION_ENABLED:
+                    # Only rotate trades that are flat or slightly negative (-3% to +0.5%)
+                    # Don't rotate trades in profit — let profit_monster handle those
                     _check_stale_rotation(
                         {'id': trade_id, 'token': token, 'direction': direction,
                          'leverage': lev, 'amount_usdt': amount, 'entry_price': entry},
@@ -2061,6 +2084,8 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     open_by_dir = {}
     for r in db_cur.fetchall():
         open_by_dir.setdefault(r[0].upper(), set()).add(r[1].upper())
+    # Release read snapshot immediately — prevents deadlock with profit_monster/position_manager
+    db_conn.rollback()
 
     candidates = []
     for h in hotset:
@@ -2144,7 +2169,12 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     # (b) never recorded loss cooldown allowing immediate re-entry,
     # (c) never cleared reconciled state blocking re-reconciliation.
     exit_px_rot = prices.get(token, entry_px)
-    close_ok = _close_paper_trade_db(trade_id, token, exit_px_rot, 'STALE_ROTATION')
+    # Enrich close reason with velocity and replacement details
+    repl_token = best.get('token', '?')
+    repl_sp = best.get('speed_percentile', 0)
+    vel_pct = signed_vel * 100
+    close_detail = f'STALE_ROT({vel_pct:+.1f}%,{repl_sp:.0f}%)'[:20]
+    close_ok = _close_paper_trade_db(trade_id, token, exit_px_rot, close_detail)
     if close_ok:
         log(f'  [STALE-ROTATION] {token} trade #{trade_id} closed (stale)', 'PASS')
     else:
@@ -2544,6 +2574,45 @@ def close_orphan_paper_trades(hl_pos, prices):
             trade_id_str = str(trade_id)
             if token in hl_pos and float(hl_pos[token].get('size', 0)) != 0:
                 continue  # On HL — reconciled by Step 3
+            # FIX: Check if this token was recently closed on HL (profit_monster, guardian, TP/SL).
+            # Without this, LIVE-MISS re-opens positions that were just intentionally closed,
+            # overwriting the original entry price and losing the profit record.
+            try:
+                close_start_ms = int(time.time() * 1000) - 1800000  # last 30 min
+                hl_exit_px, _ = _poll_hl_fills_for_close(token, close_start_ms)
+                if hl_exit_px > 0:
+                    log(f'  [LIVE-MISS] {token}: recently closed on HL (exit={hl_exit_px}) — NOT re-opening', 'WARN')
+                    # Detect WHO closed on HL by checking recent fills
+                    close_reason = 'hl_recently_closed'
+                    try:
+                        from hyperliquid_exchange import get_exchange, MAIN_ACCOUNT_ADDRESS
+                        ex = get_exchange()
+                        addr = getattr(ex, 'account_address', None) or MAIN_ACCOUNT_ADDRESS
+                        close_fills = ex.info.user_fills_by_time(addr, close_start_ms, int(time.time() * 1000))
+                        for cf in close_fills:
+                            if cf.get('coin', '').upper() == token.upper() and 'Close' in str(cf.get('dir', '')):
+                                close_reason = 'profit_monster'
+                                break
+                    except Exception:
+                        pass
+                    # Close this stale DB trade
+                    try:
+                        conn_close = get_db_connection()
+                        cur_close = conn_close.cursor()
+                        cur_close.execute("""
+                            UPDATE trades SET status='closed', exit_price=%s,
+                                close_time=NOW(), close_reason=%s,
+                                exit_reason=%s, guardian_closed=TRUE
+                            WHERE id=%s AND status='open'
+                        """, (hl_exit_px, close_reason, close_reason, trade_id))
+                        conn_close.commit()
+                        cur_close.close(); conn_close.close()
+                        log(f'  [LIVE-MISS] Closed stale trade #{trade_id} {token}', 'PASS')
+                    except Exception as close_err:
+                        log(f'  [LIVE-MISS] Failed to close stale trade #{trade_id}: {close_err}', 'FAIL')
+                    continue
+            except Exception as fill_err:
+                log(f'  [LIVE-MISS] Fill check failed for {token}: {fill_err} — proceeding with mirror', 'WARN')
             if hype_count >= MAX_HYPE_POSITIONS:
                 log(f'  [LIVE-MISS] {token}: max positions — cannot mirror', 'WARN')
                 continue
@@ -2733,6 +2802,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             final_pnl_pct = 0.0
             exit_price = entry_price  # close at entry = no loss/no win
 
+        # Commit IMMEDIATELY to release row lock — prevents deadlocks with position_manager
         cur.execute("""
             UPDATE trades SET status = 'closed', exit_price = %s,
                 pnl_pct = %s, pnl_usdt = %s,
@@ -2743,12 +2813,11 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, reason, reason,
               hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
               trade_id))
-        # Verify the UPDATE actually hit a row — if 0, trade was already closed
         if cur.rowcount == 0:
             log(f'  Dedup: trade #{trade_id} ({token}) already closed, skipping', 'WARN')
             conn.rollback()
         else:
-            conn.commit()
+            conn.commit()  # release row lock immediately
             log(f'  Closed paper trade #{trade_id} ({reason}): {token} @ {exit_price} '
                 f'pnl={final_pnl_pct:+.4f}% ({final_pnl_usdt:+.2f})', 'PASS')
             # ── Loss cooldown: record if this was a losing trade ──────────────────
@@ -3232,6 +3301,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             if breach_triggered and breach_reason_str:
                 log(f'  [SELF-CLOSE] 🚨 {coin} BREACH ({direction}): {breach_reason_str}', 'WARN')
                 _CLOSED_HL_COINS.add(coin.upper())
+                _save_closing_marker(coin)  # prevent profit_monster from racing
                 success = close_position_hl(coin, breach_reason_str)
                 result = {"ok": success, "coin": coin, "reason": breach_reason_str}
                 _mark_self_close_triggered(coin, result)
@@ -3393,6 +3463,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
         fcntl.flock(lock_fd, fcntl.LOCK_EX)  # blocking lock
 
         # Fire market close on HL
+        _save_closing_marker(tok)  # prevent profit_monster from racing
         success = close_position_hl(coin, breach_reason)
         if not success:
             _CLOSED_HL_COINS.discard(tok)  # Remove on failure, allow retry next cycle
@@ -3724,28 +3795,25 @@ def sync():
 
     log(f'── Sync cycle ──')
 
-    # Step 1: Get HL positions (retry on rate-limit → empty dict)
-    # If HL is rate-limited and returns {}, we risk closing real positions as orphans.
-    # Retry with backoff before accepting an empty position set.
+    # Step 1: Get HL positions (retry on error, but accept empty as valid)
+    # Rate-limiting raises exceptions or returns garbage — retry those.
+    # An empty dict from a successful call means 0 positions — valid state, skip retries.
     hl_pos = {}
     for attempt in range(4):
         try:
             hl_pos = get_open_hype_positions_curl()
-            if hl_pos:
-                break  # Got real positions
-            if attempt < 3:
-                wait = 5 * (2 ** attempt)
-                log(f'HL returned empty (rate-limited), retrying in {wait}s... ({attempt+1}/4)', 'WARN')
-                time.sleep(wait)
+            # Got a response (even empty) — 0 positions is valid, don't retry
+            break
         except Exception as e:
             log(f'HL fetch error: {e}', 'WARN')
             if attempt < 3:
-                time.sleep(5 * (2 ** attempt))
-    if not hl_pos:
-        log('HL still returning empty after 4 retries — skipping this cycle', 'WARN')
-        # Clear _CLOSED_HL_COINS since stale tokens from prior cycle could cause double-closes
-        _CLOSED_HL_COINS.clear()
-        return
+                wait = 5 * (2 ** attempt)
+                log(f'Retrying in {wait}s... ({attempt+1}/4)', 'WARN')
+                time.sleep(wait)
+            else:
+                log('HL still erroring after 4 retries — skipping this cycle', 'WARN')
+                _CLOSED_HL_COINS.clear()
+                return
 
     # Populate module-level cache so all subsequent functions reuse this result
     global _hl_positions_cache, _hl_positions_cache_time
@@ -3772,25 +3840,38 @@ def sync():
     # confirmed in a prior cycle, so the marker should have been cleared already.
     # Don't auto-clear these either — let orphan-recovery handle them if needed.
     try:
-        stale_markers = _load_closing_markers()
-        for tok in list(stale_markers.keys()):
-            if tok not in hl_pos and tok.upper() in _CLOSED_HL_COINS:
-                # Guardian confirmed this close — fill must have arrived.
-                # Safe to clear the marker.
+        # _load_closing_markers() returns {TOK: {started, ...}} already unwrapped
+        marker_map = _load_closing_markers()
+        _MARKER_MAX_AGE_S = 30 * 60  # 30 min — forever-block is worse than brief race
+        now_ts = time.time()
+        for tok in list(marker_map.keys()):
+            tok_u = tok.upper()
+            meta = marker_map.get(tok) or {}
+            started = meta.get('started') if isinstance(meta, dict) else None
+            age_s = None
+            if started:
+                try:
+                    age_s = now_ts - time.mktime(time.strptime(started, '%Y-%m-%d %H:%M:%S'))
+                except Exception:
+                    age_s = None
+            if tok_u not in hl_pos and tok_u in _CLOSED_HL_COINS:
                 log(f'  [STALE-MARKER] {tok} confirmed closed (fill received) — clearing closing marker')
                 _clear_closing_marker(tok)
-                # FIX (2026-06-12): If tok was pending retry but HL position is gone,
-                # clear the pending retry too — the close already happened.
                 pending = _load_pending_retry()
-                if tok.upper() in pending:
+                if tok_u in pending:
                     log(f'  [STALE-MARKER] {tok} also in pending retry — clearing pending retry', 'WARN')
                     _clear_pending_retry([tok])
-            elif tok not in hl_pos and tok.upper() not in _CLOSED_HL_COINS:
-                # Token not on HL but guardian never confirmed the close.
-                # This means the close order was never placed or failed silently.
-                # DO NOT clear the marker — keep decider_run blocked.
-                # Orphan-recovery will handle creating a new paper trade for this HL position.
-                log(f'  [STALE-MARKER] {tok} not on HL but no confirmed close — keeping marker (orphan-recovery will handle)', 'WARN')
+            elif tok_u not in hl_pos and (age_s is None or age_s > _MARKER_MAX_AGE_S):
+                # Not on HL and marker old/unknown — clear so decider isn't blocked forever
+                # (JUP marker from 2026-07-29 was still active weeks later)
+                log(f'  [STALE-MARKER] {tok} not on HL, age={age_s}s — clearing stuck marker', 'WARN')
+                _clear_closing_marker(tok)
+                try:
+                    _clear_pending_retry([tok_u])
+                except Exception:
+                    pass
+            elif tok_u not in hl_pos:
+                log(f'  [STALE-MARKER] {tok} not on HL age={age_s:.0f}s — keeping briefly', 'WARN')
     except Exception:
         pass
 
@@ -3906,12 +3987,21 @@ def sync():
                     cur_orphan.close()
                     conn_orphan.close()
             else:
-                # market_close failed — keep the marker set so decider_run stays blocked.
-                # IMPORTANT: Do NOT add to pending_retry here. Step 6 handles all orphan HL closes.
-                # The _save_pending_retry was only for reconcile_hype_to_paper's internal orphan path.
-                # Add to _CLOSED_HL_COINS so Step 11 skips this token.
-                _CLOSED_HL_COINS.add(coin.upper())
-                log(f'  guardian_orphan close failed for {coin} — keeping closing marker active', 'WARN')
+                # market_close failed — if already flat, clear marker; else keep + retry next cycle.
+                if not _hl_has_position(coin):
+                    log(f'  guardian_orphan {coin}: HL already flat — clearing marker', 'PASS')
+                    _clear_closing_marker(coin)
+                    _CLOSED_HL_COINS.add(coin.upper())
+                    _clear_pending_retry([coin.upper()])
+                else:
+                    _CLOSED_HL_COINS.add(coin.upper())
+                    try:
+                        pending = _load_pending_retry()
+                        pending.add(coin.upper())
+                        _save_pending_retry(list(pending))
+                    except Exception as e:
+                        log(f'  Could not save pending retry for {coin}: {e}', 'WARN')
+                    log(f'  guardian_orphan close failed for {coin} — keeping closing marker, pending retry', 'WARN')
             time.sleep(3)
 
     # Step 7: Close orphan paper trades (mirror paper→HL or close)
@@ -4033,26 +4123,49 @@ def sync():
 
                         has_hl_confirmation = bool(hl_entry_price)
 
+                        # Check if trade already has a close reason set by profit_monster/stale_rotation
+                        # If so, don't overwrite — the actual reason is already recorded
+                        try:
+                            conn_chk = get_db_connection()
+                            cur_chk = conn_chk.cursor()
+                            cur_chk.execute("SELECT close_reason FROM trades WHERE id=%s", (trade_id,))
+                            existing = cur_chk.fetchone()
+                            cur_chk.close(); conn_chk.close()
+                            if existing and existing[0]:
+                                log(f'  Step8 {tok} #{trade_id}: already closed by {existing[0]} — skipping', 'INFO')
+                                continue
+                        except Exception:
+                            pass
+
                         if not has_hl_confirmation:
                             close_reason = 'PHANTOM_CLOSE'
                         else:
-                            if tp > 0 and sl > 0:
-                                if direction.upper() == 'LONG':
-                                    if exit_price >= tp:
-                                        close_reason = 'HL_TP_CLOSED'
-                                    elif exit_price <= sl:
-                                        close_reason = 'HL_SL_CLOSED'
-                                    else:
-                                        close_reason = 'HL_CLOSED'
-                                else:  # SHORT
-                                    if exit_price <= tp:
-                                        close_reason = 'HL_TP_CLOSED'
-                                    elif exit_price >= sl:
-                                        close_reason = 'HL_SL_CLOSED'
-                                    else:
-                                        close_reason = 'HL_CLOSED'
-                            else:
-                                close_reason = 'HL_CLOSED'
+                            # Check HL fills to determine actual close reason
+                            close_reason = 'HL_CLOSED'
+                            try:
+                                from hyperliquid_exchange import get_exchange, MAIN_ACCOUNT_ADDRESS
+                                ex = get_exchange()
+                                addr = getattr(ex, 'account_address', None) or MAIN_ACCOUNT_ADDRESS
+                                close_fills = ex.info.user_fills_by_time(addr, int(time.time() * 1000) - 1800000, int(time.time() * 1000))
+                                for cf in close_fills:
+                                    if cf.get('coin', '').upper() == tok.upper() and 'Close' in str(cf.get('dir', '')):
+                                        # Found close fill — determine reason
+                                        if tp > 0 and sl > 0:
+                                            if direction.upper() == 'LONG' and exit_price >= tp:
+                                                close_reason = 'HL_TP_CLOSED'
+                                            elif direction.upper() == 'LONG' and exit_price <= sl:
+                                                close_reason = 'HL_SL_CLOSED'
+                                            elif direction.upper() == 'SHORT' and exit_price <= tp:
+                                                close_reason = 'HL_TP_CLOSED'
+                                            elif direction.upper() == 'SHORT' and exit_price >= sl:
+                                                close_reason = 'HL_SL_CLOSED'
+                                            else:
+                                                close_reason = 'HL_CLOSED'
+                                        else:
+                                            close_reason = 'HL_CLOSED'
+                                        break
+                            except Exception:
+                                pass
 
                         log(f'  Step8 closing {tok} #{trade_id}: exit={exit_price} reason={close_reason} hl_confirmed={has_hl_confirmation}', 'INFO')
                         _close_paper_trade_db(trade_id, tok, exit_price, close_reason)

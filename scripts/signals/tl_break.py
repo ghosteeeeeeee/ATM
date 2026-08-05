@@ -57,19 +57,19 @@ TL_SURVIVAL_CANDLES   = 15    # post-breakout: price must survive above line for
 
 # Trendline detection: linear regression on closes in fit zone
 # R² must be high enough to confirm a real trendline (not noise)
-TL_R2_MIN             = 0.40  # minimum R² for trendline validity (5m crypto is noisy)
-TL_SLOPE_PCT_MIN      = 0.0003 # minimum slope as % of price per candle (~0.1%/hr, rejects shallow drift)
+TL_R2_MIN             = 0.35  # minimum R² for trendline validity (relaxed from 0.40 — allows noisier trendlines)
+TL_SLOPE_PCT_MIN      = 0.0001 # minimum slope as % of price per candle (~0.03%/hr, rejects flat markets)
 
 # Bounce detection: price must touch the trendline (wick or close within threshold)
 # A bounce = candle touches trendline AND next candle closes AWAY from it (rejection)
 TL_BOUNCE_ATR_K       = 0.5   # within 0.5 * ATR(14) of trendline (tight)
-TL_MIN_BOUNCES        = 4     # minimum 4 touches in fit zone (stronger trendline)
-TL_MAX_BOUNCE_RATIO   = 0.20  # bounces cannot exceed 20% of fit candles (filters noise)
+TL_MIN_BOUNCES        = 2     # minimum 2 touches in fit zone (relaxed from 3 — more fish)
+TL_MAX_BOUNCE_RATIO   = 0.25  # bounces cannot exceed 25% of fit candles (relaxed from 0.20)
 TL_REJECTION_ATR_K    = 0.25  # rejection must move 0.25+ ATR away from line
 
 # Breakout confirmation: price must close beyond trendline + threshold
 TL_BREAKOUT_ATR_K     = 0.8   # 0.8 * ATR(14) beyond trendline (was 0.4 — too weak, caught gentle drift)
-TL_FOLLOWTHROUGH_MIN  = 4     # minimum candles closing beyond line in breakout zone
+TL_FOLLOWTHROUGH_MIN  = 3     # minimum candles closing beyond line in breakout zone (relaxed from 4)
 TL_CONSECUTIVE_MIN    = 3     # minimum consecutive candles closing beyond line (stronger signal)
 
 # ATR expansion: big moves start with volatility increase
@@ -356,7 +356,8 @@ def _detect_fakeout(closes: List[float], slope: float, intercept: float,
                 candles_below += 1
 
     # Any candle closing significantly below/above line = fakeout
-    is_fakeout = candles_below >= 1
+    # Relaxed: allow 1 candle (was 0) — wicks can touch line without invalidating
+    is_fakeout = candles_below >= 2
     return is_fakeout, candles_below
 
 
@@ -413,23 +414,125 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         return None
 
     # ── Phase 2b: Z-score filter — block counter-trend traps ─────────────────
-    # All recent losing LONGs had z < -1.5 (strong downtrend).
-    # Don't fire LONG in strong downtrend, SHORT in strong uptrend.
-    # Also block overbought LONGs and oversold SHORTs (counter-trend trap).
+    # Only block extreme reversals: strong downtrend for LONG, strong uptrend for SHORT
+    # Relaxed from 4 conditions to 2 — allow more market conditions
     import statistics as _stat
     recent_closes = closes[-20:] if len(closes) >= 20 else closes
     if len(recent_closes) >= 10:
         _mean = _stat.mean(recent_closes)
         _stdev = _stat.stdev(recent_closes) if len(recent_closes) > 1 else 1
         _z = (recent_closes[-1] - _mean) / _stdev if _stdev > 0 else 0
-        if direction == 'LONG' and _z < -1.5:
+        if direction == 'LONG' and _z < -2.0:
             return None  # strong downtrend — don't catch falling knife
-        if direction == 'LONG' and _z > 0.5:
-            return None  # overbought — don't buy the top
-        if direction == 'SHORT' and _z > 1.5:
+        if direction == 'SHORT' and _z > 2.0:
             return None  # strong uptrend — don't fade momentum
-        if direction == 'SHORT' and _z < -0.5:
-            return None  # oversold — don't sell the bottom
+
+    # ── Phase 2c: Regime filter — use per-token regime, not overall ──────────
+    # Trendline slope already gives direction (descending=LONG, ascending=SHORT).
+    # Per-token regime confirms or penalizes — doesn't block in NEUTRAL.
+    regime_penalty = 0
+    try:
+        import json as _json
+        regime_file = '/var/www/hermes/data/regime_5m.json'
+        if os.path.exists(regime_file):
+            with open(regime_file) as _f:
+                _regime_data = _json.load(_f)
+            _token_regime = _regime_data.get('regimes', {}).get(token.upper(), {})
+            _token_reg = _token_regime.get('regime', 'NEUTRAL')
+            # Counter-regime: don't fade a trending token
+            if _token_reg == 'LONG_BIAS' and direction == 'SHORT':
+                return None
+            if _token_reg == 'SHORT_BIAS' and direction == 'LONG':
+                return None
+            # NEUTRAL: fire but apply confidence haircut (trendline stands on its own)
+            if _token_reg == 'NEUTRAL':
+                regime_penalty = 15
+    except Exception:
+        pass  # if regime data unavailable, no penalty
+
+    # ── Oxygen checks (fishing for real breakouts) ─────────────────────────
+    # Speed percentile: is the fish moving?
+    try:
+        from speed_tracker import get_token_speed
+        spd = get_token_speed(token)
+        speed_pct = spd.get('speed_percentile', 50) if spd else 50
+        if speed_pct < 40:
+            return None  # too slow — no wave
+    except Exception:
+        speed_pct = 50
+
+    # RSI: water temperature — don't fish in frozen/boiling water
+    if len(closes) >= 15:
+        gains = []
+        losses = []
+        for j in range(1, min(15, len(closes))):
+            delta = closes[-j] - closes[-j-1]
+            gains.append(max(delta, 0))
+            losses.append(max(-delta, 0))
+        avg_gain = sum(gains) / len(gains) if gains else 0
+        avg_loss = sum(losses) / len(losses) if losses else 0.001
+        rs = avg_gain / avg_loss if avg_loss > 0 else 100
+        rsi = 100 - (100 / (1 + rs))
+        if direction == 'LONG' and rsi > 75:
+            return None  # overbought — don't buy
+        if direction == 'SHORT' and rsi < 25:
+            return None  # oversold — don't sell
+
+    # ── 5m trend alignment + strength (ADX + EMA) ─────────────────────────
+    # No trend = trendline break is just noise. Need:
+    #   1. ADX >= 25 (trending, not ranging)
+    #   2. EMA20 vs EMA50 alignment matches breakout direction
+    if len(closes) >= 50 and len(candles) >= 30:
+        # EMA helper
+        def _ema(data, period):
+            k = 2 / (period + 1)
+            val = data[0]
+            for v in data[1:]:
+                val = v * k + val * (1 - k)
+            return val
+
+        ema20 = _ema(closes, 20)
+        ema50 = _ema(closes, 50)
+
+        # Direction alignment
+        if direction == 'LONG' and ema20 < ema50:
+            return None  # 5m bearish — don't go long
+        if direction == 'SHORT' and ema20 > ema50:
+            return None  # 5m bullish — don't go short
+
+        # ADX computation (Wilder's smoothing, 14-period)
+        highs = [c.get('high', c['close']) for c in candles]
+        lows = [c.get('low', c['close']) for c in candles]
+        adx_period = 14
+
+        tr_list, plus_dm, minus_dm = [], [], []
+        for i in range(1, len(closes)):
+            tr = max(highs[i] - lows[i],
+                     abs(highs[i] - closes[i-1]),
+                     abs(lows[i] - closes[i-1]))
+            tr_list.append(tr)
+            up = highs[i] - highs[i-1]
+            down = lows[i-1] - lows[i]
+            plus_dm.append(up if up > down and up > 0 else 0)
+            minus_dm.append(down if down > up and down > 0 else 0)
+
+        if len(tr_list) >= adx_period * 2:
+            atr_s = sum(tr_list[:adx_period]) / adx_period
+            pdm_s = sum(plus_dm[:adx_period]) / adx_period
+            mdm_s = sum(minus_dm[:adx_period]) / adx_period
+            dx_list = []
+            for i in range(adx_period, len(tr_list)):
+                atr_s = (atr_s * (adx_period - 1) + tr_list[i]) / adx_period
+                pdm_s = (pdm_s * (adx_period - 1) + plus_dm[i]) / adx_period
+                mdm_s = (mdm_s * (adx_period - 1) + minus_dm[i]) / adx_period
+                pdi = 100 * pdm_s / (atr_s + 1e-10)
+                mdi = 100 * mdm_s / (atr_s + 1e-10)
+                dx = abs(pdi - mdi) / (pdi + mdi + 1e-10) * 100
+                dx_list.append(dx)
+            # ADX = smoothed DX
+            adx_val = sum(dx_list[-adx_period:]) / min(adx_period, len(dx_list))
+            if adx_val < 15:
+                return None  # no trend — choppy market, trendline break is noise
 
     # ── Phase 3: Breakout confirmation ─────────────────────────────────────
     breakout, breakout_strength, follow_count = _detect_breakout(
@@ -553,6 +656,10 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
 
     conf = min(TL_MAX_CONFIDENCE, conf)
 
+    # Apply regime penalty (set in Phase 2c)
+    if regime_penalty:
+        conf = max(50, conf - regime_penalty)
+
     # ── Build signal ─────────────────────────────────────────────────────────
     signal_type = f'tl_break_{direction.lower()}'
     source = f'tl_break_{direction.lower()}'
@@ -655,6 +762,17 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
             continue
         if sig['direction'] == 'SHORT' and not TL_BREAK_MINUS_ENABLED:
             continue
+
+        # ── Z-score direction filter (FIX 2026-07-31) ────────────────────────
+        # Block LONG when z < -0.5 (price below average = chasing downtrend)
+        # Block SHORT when z > 0.5 (price above average = chasing uptrend)
+        # During 08:00-09:30 losing streak, 26% of LONG signals had z < -0.5
+        z = sig.get('_z')
+        if z is not None:
+            if sig['direction'] == 'LONG' and z < -0.5:
+                continue  # don't buy when price is below average
+            if sig['direction'] == 'SHORT' and z > 0.5:
+                continue  # don't sell when price is above average
 
         sid = add_signal(
             token=sig['token'],

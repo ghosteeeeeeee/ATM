@@ -5,17 +5,17 @@ Respects hype_live_trading.json: paper=False (live by default).
 Reads APPROVED signals, checks position limits, computes SL/TP, places trades.
 Also processes delayed-entry signals from pending-delayed-entries.json.
 """
-import sys, subprocess, sqlite3, time, os, json, requests, random, psycopg2, fcntl
+import sys, subprocess, sqlite3, time, os, json, random, psycopg2, fcntl
 from typing import NamedTuple
 sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
                            update_signal_decision, validate_source)
 from paths import *
-# NOTE: ai_decider.py is legacy (LLM-based compaction). The current pipeline uses:
+# NOTE: legacy LLM-based compaction removed. Current pipeline uses:
 #   signal_compactor.py (runs every 1 min via hermes-signal-compactor.timer) → writes hotset.json
 #   decider_run.py (runs every 1 min via hermes-pipeline.timer) → reads hotset.json, executes trades
-# get_regime from ai_decider is unused — regime is pre-computed in hotset.json by signal_compactor
+# get_regime is pre-computed in hotset.json by signal_compactor
 from _secrets import BRAIN_DB_DICT
 from position_manager import (get_position_count, is_position_open, enforce_max_positions,
                               get_trade_params, set_loss_cooldown,
@@ -31,6 +31,8 @@ from hermes_constants import (
     CONFLUENCE_REQUIRED,
     MOMENTUM_EXHAUSTION_THRESHOLD,
     SIGNAL_INVERSION_ENABLED, SIGNAL_INVERSION_MAP,
+    DYNAMIC_INVERSION_ENABLED, INVERT_WR_THRESHOLD, INVERT_MIN_TRADES,
+    INVERT_LOOKBACK_HOURS, INVERT_CACHE_TTL, INVERT_SIGNALS,
     DEAD_HOURS_ENABLED, DEAD_HOURS_START, DEAD_HOURS_END,
     DEAD_HOURS_SIGNALS, DEAD_HOURS_DEFAULT,
      CONTEXT_GATE_ENABLED, CONTEXT_GATE_LLM_ENABLED, CONTEXT_GATE_LLM_MODEL,
@@ -38,15 +40,22 @@ from hermes_constants import (
      CONTEXT_GATE_Z_RANGING, CONTEXT_GATE_RANGING_SPEED,
      CONTEXT_GATE_SPEED_CONFIRM, CONTEXT_GATE_CACHE_TTL,
      CONTEXT_GATE_LLM_TIMEOUT, CONTEXT_GATE_FAIL_OPEN,
+    SIGNAL_FILTER_ENABLED, SIGNAL_FILTER_SPEED_MIN, SIGNAL_FILTER_MOMENTUM_MIN,
+    SIGNAL_FILTER_RSI_MIN, SIGNAL_FILTER_RSI_MAX,
+    SIGNAL_FILTER_Z_MIN, SIGNAL_FILTER_Z_MAX,
     SIMILAR_SETUP_LOOKUP_ENABLED, SIMILAR_SETUP_MIN_SAMPLE,
     SIMILAR_SETUP_HARD_BLOCK_WR, SIMILAR_SETUP_HARD_BLOCK_MIN_N,
     SIMILAR_SETUP_PENALTY_40, SIMILAR_SETUP_PENALTY_30,
     SIMILAR_SETUP_RSI_BAND, SIMILAR_SETUP_CACHE_TTL,
     LLM_CONFIDENCE_PENALTY,
-    TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE,
+     TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE,
+     WRONG_SIDE_PENALTY, WRONG_SIDE_SKIP_THRESHOLD,
     HEBBIAN_BOOST_WR, HEBBIAN_BOOST_AMOUNT, HEBBIAN_BOOST_MIN_N,
     HEBBIAN_PENALTY_WR, HEBBIAN_PENALTY_AMOUNT, HEBBIAN_PENALTY_MIN_N,
     HEBBIAN_CACHE_TTL,
+    TOKEN_SENTIMENT_ENABLED, TOKEN_SENTIMENT_K,
+    TOKEN_SENTIMENT_SKIP_THRESHOLD, TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD,
+    TOKEN_SENTIMENT_BOOST_THRESHOLD, TOKEN_SENTIMENT_BOOST_AMOUNT,
 )
 from tokens import is_solana_only
 from hermes_file_lock import FileLock
@@ -59,6 +68,88 @@ import hype_cache as hc
 # KILL SWITCH: set to True to re-enable flip. Effect takes place on next pipeline run (~1 min).
 _FLIP_SIGNALS = False
 
+# ── Dynamic Signal Inversion (WR-based auto-invert) ────────────────────
+# ponytail: single cache dict, per-process. TTL prevents DB hammering.
+_dynamic_invert_cache = {}  # {signal_type: should_invert}
+_dynamic_invert_ts = 0
+
+def _should_dynamic_invert(source):
+    """Check if a signal source should be dynamically inverted based on24h WR.
+
+    Returns True if the signal's WR is below INVERT_WR_THRESHOLD with enough trades.
+    Caches results for INVERT_CACHE_TTL seconds.
+    """
+    import time as _time
+    global _dynamic_invert_cache, _dynamic_invert_ts
+
+    if not DYNAMIC_INVERSION_ENABLED or not source:
+        return False
+
+    now = _time.time()
+    if now - _dynamic_invert_ts > INVERT_CACHE_TTL:
+        _dynamic_invert_cache = {}
+        _dynamic_invert_ts = now
+
+    if source in _dynamic_invert_cache:
+        return _dynamic_invert_cache[source]
+
+    # Query signal_outcomes for24h WR of this signal_type
+    try:
+        import sqlite3 as _sqlite3
+        from paths import RUNTIME_DB
+        conn = _sqlite3.connect(RUNTIME_DB, timeout=5)
+        try:
+            # LIKE handles both standalone ('zscore-rising+') and compound
+            # ('zscore-rising+,tl_break_long') signal_type values
+            row = conn.execute("""
+                SELECT COUNT(*) as trades,
+                       ROUND(CAST(SUM(is_win) AS FLOAT)/COUNT(*)*100, 1) as wr
+                FROM signal_outcomes
+                WHERE signal_type LIKE '%' || ? || '%'
+                  AND created_at > datetime('now', '-' || ? || ' hours')
+                  AND trade_id IS NOT NULL
+            """, (source, INVERT_LOOKBACK_HOURS)).fetchone()
+        finally:
+            conn.close()
+
+        if row and row[0] >= INVERT_MIN_TRADES and row[1] is not None and row[1] < INVERT_WR_THRESHOLD:
+            _dynamic_invert_cache[source] = True
+            return True
+    except Exception:
+        pass  # fail open — don't block trades on DB errors
+
+    _dynamic_invert_cache[source] = False
+    return False
+
+
+def _apply_inversion(direction, source, token=''):
+    """Apply static + dynamic signal inversion. Returns (new_direction, was_flipped)."""
+    # 1) Static map (explicit overrides)
+    if SIGNAL_INVERSION_ENABLED:
+        for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
+            if should_invert and source and source.startswith(prefix):
+                flipped = 'SHORT' if direction == 'LONG' else 'LONG'
+                log(f'  [INVERT] {token} {source}: {direction} → {flipped} (static map)')
+                return flipped, True
+
+    # 2) Dynamic WR-based auto-invert
+    if DYNAMIC_INVERSION_ENABLED and source:
+        # Check each monitored signal type as a prefix match
+        for sig_type in INVERT_SIGNALS:
+            if source.startswith(sig_type) and _should_dynamic_invert(sig_type):
+                flipped = 'SHORT' if direction == 'LONG' else 'LONG'
+                log(f'  [INVERT] {token} {source}: {direction} → {flipped} (dynamic WR<{INVERT_WR_THRESHOLD}%)')
+                return flipped, True
+
+    # 3) Legacy global flip
+    if _FLIP_SIGNALS:
+        flipped = 'SHORT' if direction == 'LONG' else 'LONG'
+        log(f'  [FLIP] {token} {direction} → {flipped} (legacy)')
+        return flipped, True
+
+    return direction, False
+
+
 # ── ATR-based Dynamic Stop Loss ─────────────────────────────────────────
 # ATR(14) from Hyperliquid 1h candles — cached per token for 5 min.
 # SL = entry_price ± (k * ATR(14)) where k varies by volatility regime.
@@ -70,7 +161,6 @@ _FLIP_SIGNALS = False
 #   NORMAL_VOLATILITY: k=2.0  (SL ≈ 2× ATR — gives trade room to breathe)
 #   HIGH_VOLATILITY:   k=2.5  (SL ≈ 2.5× ATR — tokens like TAO, SOL need room)
 # Minimum SL guard: never tighter than sl_pct (A/B test value), use ATR if wider.
-import time as _time
 
 
 # ── Checkpoint & Event-log instrumentation ───────────────────────────────
@@ -94,46 +184,6 @@ except Exception as e:
     print(f"[decider-run] SpeedTracker unavailable: {e}")
     speed_tracker_dr = None
 
-# ── 1m Linear Regression Regime ─────────────────────────────────────────────
-# Computed fresh per token from last 100 1m candles on each decider_run cycle.
-# Replaces the stale regime_5m.json regime (updated every 5 min by regime scanner).
-import statistics as _stat_lib
-
-def _get_regime_1m(coin: str) -> tuple:
-    """1m linear regression regime. Returns (regime_str, confidence_int 0-100)."""
-    try:
-        import sqlite3
-        conn = sqlite3.connect(CANDLES_DB, timeout=10)
-        rows = conn.execute(
-            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 100",
-            (coin.upper(),)
-        ).fetchall()
-        conn.close()
-        if len(rows) < 30:
-            return 'NEUTRAL', 0
-        closes = [r[0] for r in reversed(rows)]
-        n = len(closes)
-        mean_x = (n - 1) / 2.0
-        mean_y = _stat_lib.mean(closes)
-        cov = sum((i - mean_x) * (closes[i] - mean_y) for i in range(n))
-        var_x = sum((i - mean_x) ** 2 for i in range(n))
-        if var_x == 0:
-            return 'NEUTRAL', 0
-        slope = cov / var_x
-        ss_tot = sum((y - mean_y) ** 2 for y in closes)
-        ss_res = sum(
-            (closes[i] - (mean_y + slope * (i - mean_x))) ** 2 for i in range(n)
-        )
-        r2 = max(0.0, 1.0 - (ss_res / ss_tot)) if ss_tot > 0 else 0.0
-        confidence = int(round(r2 * 100))
-        if slope > 0:
-            return 'LONG_BIAS', confidence
-        elif slope < 0:
-            return 'SHORT_BIAS', confidence
-        return 'NEUTRAL', confidence
-    except Exception:
-        return 'NEUTRAL', 0
-
 # Hot-set discipline: track when signal_compactor last ran compaction.
 # The hot-set is THE single gate for execution — it comes from signal_compactor output.
 # signal_compactor.py runs every 1 min (hermes-signal-compactor.timer) and writes hotset.json.
@@ -151,14 +201,6 @@ def _get_hotset_last_updated():
         pass
     return 0
 
-def _set_hotset_last_updated():
-    """Called by signal_compactor after each compaction run."""
-    try:
-        with FileLock('hotset_last_updated'):
-            with open(_HOTSET_LAST_UPDATED_FILE, 'w') as f:
-                json.dump({'last_compaction_ts': time.time()}, f)
-    except Exception:
-        pass
 
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT
 
@@ -206,7 +248,6 @@ _DIR_WR_TTL    = 3600    # 1 hour
 
 def _get_direction_wr(token: str, direction: str) -> tuple:
     """Return (win_rate_pct, trade_count) for a token+direction in last 7 days."""
-    import time
     key = (token.upper(), direction.upper())
     now = time.time()
     if key in _DIR_WR_CACHE:
@@ -270,7 +311,6 @@ def get_max_leverage(token: str) -> int:
     Cached for 1 hour to avoid rate limiting.
     Returns 1-50, capped at MAX_LEVERAGE (10).
     """
-    import time
     token_upper = token.upper()
     now = time.time()
 
@@ -320,14 +360,6 @@ def _save_delayed(entries):
 
 # ─── Thompson Sampling A/B Selection ───────────────────────────────────────────
 
-def _load_ab_config():
-    try:
-        with open(AB_CONFIG_FILE) as f:
-            return json.load(f)
-    except Exception:
-        return {'enabled': False, 'tests': []}
-
-
 def get_ab_variant(test_name: str, direction: str) -> dict:
     """
     Canonical A/B variant selection — delegates to ab_utils.get_ab_variant().
@@ -335,64 +367,6 @@ def get_ab_variant(test_name: str, direction: str) -> dict:
     """
     from hermes_ab_utils import get_ab_variant as _get
     return _get(test_name, direction)
-
-
-def _get_ab_variant_for_test(test_name: str, direction: str) -> dict:
-    """
-    Pick variant for a test using epsilon-greedy.
-    Exploitation: best win_rate from ab_results.
-    Exploration: weighted random from config.
-    """
-    cfg = _load_ab_config()
-    if not cfg.get('enabled', False):
-        return {}
-
-    test = next((t for t in cfg.get('tests', []) if t['name'] == test_name), None)
-    if not test:
-        return {}
-
-    # Try exploitation — read from ab_results
-    try:
-        import psycopg2
-        conn = psycopg2.connect(**BRAIN_DB_DICT)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT variant_id, win_rate_pct
-            FROM ab_results
-            WHERE test_name=%s AND trades >= 5
-            ORDER BY win_rate_pct DESC
-            LIMIT 1
-        """, (test_name,))
-        row = cur.fetchone()
-        cur.close(); conn.close()
-        exploit_vid = row[0] if row else None
-    except Exception:
-        exploit_vid = None
-
-    if random.random() >= EPSILON and exploit_vid:
-        # Exploitation — use best variant
-        for v in test.get('variants', []):
-            if v.get('id') == exploit_vid:
-                log(f'  [AB] EXPLOIT: {test_name} → {v["id"]} (win_rate={row[1]:.0f}%)')
-                return v
-
-    # Exploration — weighted random
-    variants = [v for v in test.get('variants', []) if v.get('enabled', True)]
-    if not variants:
-        return {}
-    total = sum(v.get('weight', 1) for v in variants)
-    if total <= 0:
-        # All weights are zero — fallback to first variant to avoid random.uniform(0,0)
-        chosen = variants[0]
-        log(f'  [AB] EXPLORE: {test_name} → {chosen["id"]} (all weights 0, fallback to first)')
-        return chosen
-    r = random.uniform(0, total)
-    for v in variants:
-        r -= v.get('weight', 1)
-        if r <= 0:
-            log(f'  [AB] EXPLORE: {test_name} → {v["id"]} (random)')
-            return v
-    return variants[0]
 
 
 
@@ -494,16 +468,9 @@ def process_delayed_entries(paper=False):
         token = entry['token']
         direction  = entry['direction']
         source = entry.get('source', '')
-        # ── Targeted Inversion for delayed entries ────────────────────────
-        if SIGNAL_INVERSION_ENABLED:
-            for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
-                if should_invert and source and source.startswith(prefix):
-                    direction = 'SHORT' if direction == 'LONG' else 'LONG'
-                    entry['direction'] = direction
-                    break
-        elif _FLIP_SIGNALS:
-            direction = 'SHORT' if direction == 'LONG' else 'LONG'
-            entry['direction'] = direction
+        # ── Signal Inversion (static + dynamic) for delayed entries ───────
+        direction, _ = _apply_inversion(direction, source, token)
+        entry['direction'] = direction
 
         # ── Dead-Hours Filter for delayed entries ────────────────────────
         if DEAD_HOURS_ENABLED:
@@ -515,7 +482,7 @@ def process_delayed_entries(paper=False):
                 _should_block = DEAD_HOURS_DEFAULT  # default behavior
                 for prefix in DEAD_HOURS_SIGNALS:
                     if _signal.startswith(prefix):
-                        _should_block = True
+                        _should_block = False  # allowlisted — don't block
                         break
                 if _should_block:
                     log(f'⏰ DELAYED DEAD-HOURS: {token} {direction} blocked: {_utc_hour:02d}:XX UTC (signal={_signal})')
@@ -645,19 +612,24 @@ def _get_recent_prices(token, n=20):
         return []
 
 def _ctx_gate_get_speed(token):
-    """Get speed percentile from token_speeds DB. Returns 0-100 or None.
-    Returns 0 if token is stale (flat markets = no wave)."""
+    """Get speed percentile — same source as EXEC path (SpeedTracker).
+    CEO 2026-08-02: was reading token_speeds DB and mapping is_stale→0 while
+    EXEC used SpeedTracker live percentile → 27% vs 0% mismatch / false SKIP."""
     try:
+        if speed_tracker_dr is not None:
+            spd = speed_tracker_dr.get_token_speed(token)
+            if spd is None:
+                return None
+            # Missing token returns default 50 — treat as unknown, not real speed
+            if not speed_tracker_dr.get_all_speeds().get(token.upper()):
+                return None
+            return spd.get('speed_percentile')
         with sqlite3.connect(RUNTIME_DB) as conn:
             row = conn.execute(
-                'SELECT speed_percentile, is_stale, updated_at FROM token_speeds WHERE token = ?',
-                (token,)
+                'SELECT speed_percentile FROM token_speeds WHERE upper(token) = ?',
+                (token.upper(),)
             ).fetchone()
-            if not row:
-                return None
-            if row[1]:  # is_stale
-                return 0
-            return row[0]
+            return row[0] if row else None
     except Exception:
         return None
 
@@ -711,8 +683,8 @@ def rule_based_context_gate(token, direction, source, sig):
     Free, instant gate. Returns (verdict, data):
       - ('GO', None)
       - ('SKIP', reason)
-      - ('FLIP', {'new_dir': 'SHORT'|'LONG', 'reason': str})
       - ('AMBIGUOUS', ctx_dict with speed, z_score, phase, momentum, accel, market)
+    Note: FLIP was disabled 2026-08-01 — was inverting 31% of trades to wrong direction.
     """
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None)
@@ -720,34 +692,77 @@ def rule_based_context_gate(token, direction, source, sig):
     speed = _ctx_gate_get_speed(token)
     # Use signal z-score if available (from tl_break signal), otherwise compute from current prices
     z_score = sig.get('z_score') if isinstance(sig, dict) and sig.get('z_score') is not None else _ctx_gate_get_zscore(token)
-    phase = _ctx_gate_get_phase(token)
-    mom_data = _ctx_gate_get_momentum(token)
+    # FIX 2026-07-31: Use signal's phase/momentum when available, not speed_tracker
+    # Signal metadata has the correct values at signal generation time.
+    # Speed_tracker may have different values at execution time, causing wrong flips.
+    if isinstance(sig, dict) and sig.get('signal_metadata'):
+        try:
+            meta = json.loads(sig['signal_metadata']) if isinstance(sig['signal_metadata'], str) else sig['signal_metadata']
+            phase = meta.get('wave_phase') or _ctx_gate_get_phase(token)
+            mom_data = {
+                'momentum': meta.get('momentum_score', 50),
+                'acceleration': meta.get('price_acceleration', 0),
+                'wave_phase': meta.get('wave_phase', 'neutral'),
+            }
+        except Exception:
+            phase = _ctx_gate_get_phase(token)
+            mom_data = _ctx_gate_get_momentum(token)
+    else:
+        phase = _ctx_gate_get_phase(token)
+        mom_data = _ctx_gate_get_momentum(token)
     market = _ctx_gate_get_market_context()
 
     momentum = mom_data.get('momentum', 50) if mom_data else 50
-    accel = mom_data.get('acceleration', 0) if mom_data else 0
+    accel = (mom_data.get('acceleration') or 0) if mom_data else 0
     wave_phase = mom_data.get('wave_phase', 'neutral') if mom_data else 'neutral'
 
     # Determine if this is a trend signal (not inv-accel)
     is_inv_accel = 'inv-accel' in (source or '')
     is_trend_signal = not is_inv_accel  # tl_break, accel-300, etc.
 
-    # 1. Speed too low = no wave (surfing: whitewater)
+    # 1. Speed too low = no wave (surfing: whitewater) — AMBIGUOUS, not SKIP
     if speed is not None and speed < CONTEXT_GATE_SPEED_MIN:
-        return ('SKIP', f'speed {speed:.0f}% < {CONTEXT_GATE_SPEED_MIN}% (no wave)')
+        return ('AMBIGUOUS', f'speed {speed:.0f}% < {CONTEXT_GATE_SPEED_MIN}% (no wave)', 20)
+
+    # 1b. Global signal filters (FIX 2026-07-31) — apply to ALL signals
+    # Based on winning trade analysis: speed>50%, momentum>25, RSI 30-70, z neutral
+    if SIGNAL_FILTER_ENABLED:
+        # Speed filter: penalize when momentum is weak
+        if speed is not None and speed < SIGNAL_FILTER_SPEED_MIN:
+            return ('AMBIGUOUS', f'speed {speed:.0f}% < {SIGNAL_FILTER_SPEED_MIN}% (weak momentum)', 15)
+
+        # Momentum filter: penalize when trend is weak
+        if momentum < SIGNAL_FILTER_MOMENTUM_MIN:
+            return ('AMBIGUOUS', f'momentum {momentum:.0f} < {SIGNAL_FILTER_MOMENTUM_MIN} (weak trend)', 15)
+
+        # RSI filter: penalize overbought/oversold entries
+        rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
+        if rsi is not None:
+            if direction == 'LONG' and rsi > SIGNAL_FILTER_RSI_MAX:
+                return ('AMBIGUOUS', f'RSI {rsi:.1f} > {SIGNAL_FILTER_RSI_MAX} (overbought)', 10)
+            if direction == 'SHORT' and rsi < SIGNAL_FILTER_RSI_MIN:
+                return ('AMBIGUOUS', f'RSI {rsi:.1f} < {SIGNAL_FILTER_RSI_MIN} (oversold)', 10)
+
+        # Z-score filter: penalize chasing entries (only when speed is low)
+        # KEY INSIGHT: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
+        if z_score is not None:
+            if direction == 'LONG' and z_score < SIGNAL_FILTER_Z_MIN and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
+                return ('AMBIGUOUS', f'z={z_score:.2f} < {SIGNAL_FILTER_Z_MIN} + speed={speed:.0f}% (chasing downtrend)', 15)
+            if direction == 'SHORT' and z_score > SIGNAL_FILTER_Z_MAX and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
+                return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={speed:.0f}% (chasing uptrend)', 15)
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     # But only if price history is fresh (< 5 min old)
     # GO conditions: speed >= 70% AND z strongly confirms direction:
     #   LONG + z < -1.0 (price below average = good entry for buying)
     #   SHORT + z > 1.0 (price above average = good entry for selling)
-    # FLIP territory (NEVER GO): LONG + z > 0.5, SHORT + z < -0.5
+    # FLIP territory (NEVER GO): LONG + z > 1.0, SHORT + z < -1.0 (was 0.5 — too aggressive, normal market noise)
     if speed is not None and speed >= CONTEXT_GATE_SPEED_CONFIRM:
         if z_score is not None:
             # Check if z is in FLIP territory — if so, don't give GO
             in_flip_territory = (
-                (direction == 'LONG' and z_score > 0.5) or
-                (direction == 'SHORT' and z_score < -0.5)
+                (direction == 'LONG' and z_score > 1.0) or
+                (direction == 'SHORT' and z_score < -1.0)
             )
             if not in_flip_territory:
                 # Check if z confirms direction (strong setup)
@@ -767,7 +782,7 @@ def rule_based_context_gate(token, direction, source, sig):
                         _conn.close()
                         if _row and _row[0]:
                             import time as _time
-                            _age = _time.time() - _row[0]
+                            _age = time.time() - _row[0]
                             if _age > 300:  # >5 min stale
                                 return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
                                                        'momentum': momentum, 'acceleration': accel,
@@ -800,20 +815,11 @@ def rule_based_context_gate(token, direction, source, sig):
             if phase in ('quiet', 'building'):
                 return ('SKIP', f'wrong phase: {phase} for inv-accel (no reversal)')
 
-    # 6. FLIP: phase contradicts signal direction → flip (trend signals only)
-    if is_trend_signal and wave_phase == 'falling' and direction == 'LONG':
-        return ('FLIP', {'new_dir': 'SHORT', 'reason': f'falling phase + LONG → flip to SHORT (wave dying)'})
-    if is_trend_signal and wave_phase == 'accelerating' and direction == 'SHORT':
-        return ('FLIP', {'new_dir': 'LONG', 'reason': f'accelerating phase + SHORT → flip to LONG (wave building)'})
-
-    # 6b. FLIP: z-score contradicts signal direction → flip (trend signals only)
-    # If z > 0.5 for LONG (overbought) → flip to SHORT
-    # If z < -0.5 for SHORT (oversold) → flip to LONG
-    if is_trend_signal and z_score is not None:
-        if direction == 'LONG' and z_score > 0.5:
-            return ('FLIP', {'new_dir': 'SHORT', 'reason': f'z={z_score:.2f} > 0.5 (overbought) + LONG → flip to SHORT'})
-        if direction == 'SHORT' and z_score < -0.5:
-            return ('FLIP', {'new_dir': 'LONG', 'reason': f'z={z_score:.2f} < -0.5 (oversold) + SHORT → flip to LONG'})
+    # 6. FLIP: DISABLED 2026-08-01 — was flipping 31% of tl_break signals to wrong direction
+    # Phase/z-score flips are net negative: signal generator already accounts for these.
+    # tl_break_long (4.5% WR) and tl_break_short (5.6% WR) are already terrible;
+    # flipping them to the opposite direction makes them worse (0% WR on flipped trades).
+    # If re-enabling, gate on HIGH confidence signals only (conf >= 90) to limit damage.
 
     # 7. Momentum + acceleration cross-check (trend signals only)
     if is_trend_signal and momentum < 25:
@@ -940,10 +946,8 @@ Reply only GO, WARN, NAY, or FLIP:"""
             capture_output=True, text=True, timeout=CONTEXT_GATE_LLM_TIMEOUT
         )
         response = (result.stdout or '').strip().upper()
-        # Parse verdict: GO, WARN, NAY, or FLIP
-        if 'FLIP' in response:
-            verdict = 'FLIP'
-        elif 'NAY' in response:
+        # Parse verdict: GO, WARN, NAY (FLIP disabled 2026-08-01 — was inverting 31% of trades)
+        if 'NAY' in response:
             verdict = 'NAY'
         elif 'GO' in response and 'WARN' not in response:
             verdict = 'GO'
@@ -1073,6 +1077,24 @@ def context_gate(token, direction, source, sig):
             log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
             return ('WARN', f'similar setup: n={setup.n} WR={wr_pct:.0f}% → -{penalty} confidence', penalty)
 
+    # Token sentiment (Hebbian Phase 3a — chronic loser filter) — AMBIGUOUS, not SKIP
+    if TOKEN_SENTIMENT_ENABLED:
+        try:
+            from hebbian_engine import HebbianEngine
+            _eng = HebbianEngine()
+            sentiment = _eng.token_sentiment(token, k=TOKEN_SENTIMENT_K)
+            if sentiment != 0.0:
+                log(f'  [TOKEN-SENTIMENT] {token}: sentiment={sentiment:.2f}')
+                if sentiment <= TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD:
+                    return ('AMBIGUOUS', f'token sentiment {sentiment:.2f} <= {TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD} (chronic loser)', 25)
+                if sentiment <= TOKEN_SENTIMENT_SKIP_THRESHOLD:
+                    return ('AMBIGUOUS', f'token sentiment {sentiment:.2f} <= {TOKEN_SENTIMENT_SKIP_THRESHOLD} (negative history)', 15)
+                if sentiment >= TOKEN_SENTIMENT_BOOST_THRESHOLD:
+                    log(f'  [TOKEN-SENTIMENT] boost: +{TOKEN_SENTIMENT_BOOST_AMOUNT} confidence (positive sentiment)')
+                    return ('WARN', f'token sentiment {sentiment:.2f} >= {TOKEN_SENTIMENT_BOOST_THRESHOLD}', -TOKEN_SENTIMENT_BOOST_AMOUNT)
+        except Exception as e:
+            log(f'  [TOKEN-SENTIMENT] {token}: error {e} (fail-open)')
+
     # Hebbian WR estimate (brain.db token ↔ signal weight)
     heb = hebbian_trade_boost(token, source)
     if heb:
@@ -1092,12 +1114,12 @@ def context_gate(token, direction, source, sig):
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
         return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty', LLM_CONFIDENCE_PENALTY)
     if verdict == 'NAY':
-        log(f'  [CTX-GATE] {token}: LLM NAY → hard block')
-        return ('SKIP', f'LLM rejected: {reason or "setup is actively harmful"}', 0)
+        log(f'  [CTX-GATE] {token}: LLM NAY → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
+        return ('WARN', f'LLM rejected: {reason or "setup is actively harmful"}', LLM_CONFIDENCE_PENALTY)
+    # FLIP disabled 2026-08-01 — LLM FLIP was inverting 31% of trades to wrong direction
     if verdict == 'FLIP':
-        new_dir = 'SHORT' if direction == 'LONG' else 'LONG'
-        log(f'  [CTX-GATE] {token}: LLM FLIP → {direction} → {new_dir}')
-        return ('FLIP', {'new_dir': new_dir, 'reason': f'LLM flipped {direction} → {new_dir}'}, 0)
+        log(f'  [CTX-GATE] {token}: LLM FLIP ignored (disabled) → treating as WARN')
+        return ('WARN', f'LLM FLIP disabled: {reason or "setup uncertain"}', LLM_CONFIDENCE_PENALTY)
     return (verdict, reason, 0)
 
 
@@ -1278,68 +1300,6 @@ def execute_trade(token, direction, price, confidence, source,
         return False, str(e)[:80]
 
 
-def close_position(token, reason):
-    """Close an open position directly via brain.py.
-    Does NOT overwrite entry_price — leaves it intact.
-    exit_price and PnL will be filled in by hl-sync-guardian (via HL fill data)
-    or by brain.py close_trade() if called from there.
-
-    FIX (2026-04-22): Record loss cooldown in BOTH stores so the same direction
-    cannot immediately re-enter. Counter-signals/manual closes should block
-    re-entry to prevent immediate whipsaw in the opposite direction.
-    """
-    try:
-        import psycopg2
-        conn = psycopg2.connect(**BRAIN_DB_DICT)
-        cur = conn.cursor()
-        # Read entry_price so we don't accidentally null it
-        cur.execute("""
-            UPDATE trades
-            SET status='closed', close_time=NOW(),
-                close_reason=%s
-            WHERE server=%s AND token=%s AND status='open'
-            RETURNING id, entry_price, direction
-        """, (reason, SERVER, token))
-        row = cur.fetchone()
-        conn.commit()
-        cur.close(); conn.close()
-        if row:
-            trade_id, entry_price_val, trade_dir = row
-            log(f'CLOSED: {token} {reason} (trade #{trade_id}), entry={entry_price_val}')
-            # ── Loss cooldown: record if this was a losing trade ─────────────
-            # FIX (2026-04-28): Was checking 'loss' in reason string — but MANUALLY
-            # closed trades don't have 'loss' in the reason. Fetch actual pnl_usdt
-            # from the trade record to determine if it was a loss.
-            if trade_dir:
-                try:
-                    conn2 = psycopg2.connect(**BRAIN_DB_DICT)
-                    cur2 = conn2.cursor()
-                    cur2.execute(
-                        "SELECT pnl_usdt FROM trades WHERE id=%s AND status='closed'",
-                        (trade_id,))
-                    row2 = cur2.fetchone()
-                    pnl = float(row2[0]) if row2 and row2[0] is not None else None
-                    cur2.close(); conn2.close()
-                    if pnl is not None and pnl < 0:
-                        try:
-                            from position_manager import set_loss_cooldown
-                            set_loss_cooldown(token, trade_dir)
-                        except Exception as cd_err:
-                            log(f'loss cooldown error: {cd_err}')
-                        try:
-                            from signal_schema import set_cooldown
-                            set_cooldown(token.upper(), trade_dir.upper(), hours=1)
-                        except Exception as pg_err:
-                            log(f'PostgreSQL cooldown error: {pg_err}')
-                except Exception as e:
-                    log(f'cooldown check error for {token}: {e}')
-            return True
-        return False
-    except Exception as e:
-        log(f'CLOSE ERROR: {token} — {e}')
-        return False
-
-
 # ─── Hot-Set Auto-Approver (runs every minute in decider-run) ─────
 # Per-token failure tracking for back-to-back cooldown
 _HOTSET_FAILURE_FILE = HOTSET_FAILURES_FILE
@@ -1404,7 +1364,6 @@ def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
     Only allow opposite-direction trades from hot-set during cooldown.
     Resets failure count after cooldown expires so tokens aren't permanently blocked.
     """
-    import time
     token = token.upper()
     now = time.time()
     # Cooldown: 1 hour = 3600 seconds
@@ -1460,7 +1419,7 @@ def _run_hot_set():
 
     conn = sqlite3.connect(SIGNALS_DB)
     c = conn.cursor()
-    now_str = _time.strftime('%Y-%m-%d %H:%M:%S')
+    now_str = time.strftime('%Y-%m-%d %H:%M:%S')
     approved_count = 0
 
     # ── HOT-SET DISCIPLINE: Read canonical hot-set from JSON ─────────────────
@@ -1488,7 +1447,7 @@ def _run_hot_set():
         return 0
 
     hotset_ts = hotset_data.get('timestamp', 0)
-    age = _time.time() - hotset_ts
+    age = time.time() - hotset_ts
     # signal_compactor runs every 1 min, so hotset should be <1 min old normally.
     # 20 min threshold accounts for pipeline delays if signal_compactor is slow
     # or temporarily paused. If hotset is older than 20 min, something is wrong.
@@ -1851,7 +1810,6 @@ def _run_hot_set():
 
 def _record_hotset_failure(token: str, direction: str, failures: dict):
     """Record a failed trade for back-to-back cooldown tracking."""
-    import time
     now = time.time()
     if token not in failures:
         failures[token] = {'LONG': {'count': 0, 'last': 0}, 'SHORT': {'count': 0, 'last': 0}}
@@ -1952,7 +1910,7 @@ def _warmup_volume_cache():
             return
 
         cache = _load_volume_cache()
-        now = _time.time()
+        now = time.time()
         fresh_tokens = [t for t in open_tokens
                         if cache.get(t) and (now - cache[t].get("ts", 0)) < VOLUME_CACHE_TTL]
         tokens_to_fetch = [t for t in open_tokens if t not in fresh_tokens]
@@ -2408,7 +2366,7 @@ def run(dry_run=False):
                 _should_block = DEAD_HOURS_DEFAULT  # default behavior
                 for prefix in DEAD_HOURS_SIGNALS:
                     if source.startswith(prefix):
-                        _should_block = True
+                        _should_block = False  # allowlisted signal — don't block
                         break
                 if _should_block:
                     log(f'  🚫 [DEAD-HOURS] {token} {direction} blocked: {_utc_hour:02d}:XX UTC (signal={source}, dead hours {DEAD_HOURS_START:02d}-{DEAD_HOURS_END:02d})')
@@ -2439,12 +2397,13 @@ def run(dry_run=False):
             continue
 
         # ── Wrong-Side Learning ───────────────────────────────────
-        # If this token+direction has a history of wrong-side entries (>3x avg counter-move >1.5%),
-        # penalize confidence by 15 pts. If below threshold after penalty, skip.
+        # Softened 2026-08-03: penalty -15→-10, skip threshold 55→50.
+        # Was blocking too many hot-set candidates. MIN_EXEC_CONFIDENCE=50
+        # handles the final cutoff; this gate just adds a softer penalty.
         is_risky, risk_reason = is_wrong_side_risky(token, direction, confidence)
         if is_risky:
-            adjusted_conf = confidence - 15
-            if adjusted_conf < 55:  # below new threshold
+            adjusted_conf = confidence - WRONG_SIDE_PENALTY
+            if adjusted_conf < WRONG_SIDE_SKIP_THRESHOLD:
                 log(f'SKIP: {token} {direction} {risk_reason} (conf {confidence:.0f}% -> {adjusted_conf:.0f}%)')
                 skipped += 1
                 continue
@@ -2500,21 +2459,30 @@ def run(dry_run=False):
             f'[SL={sl_pct:.1f}% trail={trailing_activation*100:.1f}%/{trailing_distance*100:.1f}%]'
             f'[spd={sp_now:.0f}%]')
 
-        # ── Targeted Signal Inversion (BEFORE context gate) ──────────────────
-        # Invert direction for specific signals that are statistically proven losers.
-        # Must run BEFORE context gate so FLIP decisions are based on correct direction.
-        flipped_direction = None
-        if SIGNAL_INVERSION_ENABLED:
-            for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
-                if should_invert and source and source.startswith(prefix):
-                    flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
-                    log(f'  [INVERT] {token} {source}: {direction} → {flipped_direction} (WR<35% signal)')
-                    direction = flipped_direction
-                    break
-        elif _FLIP_SIGNALS:
-            flipped_direction = 'SHORT' if direction == 'LONG' else 'LONG'
-            log(f'  [FLIP] {token} {direction} → {flipped_direction} (legacy)')
-            direction = flipped_direction
+        # ── Signal Inversion (static + dynamic, BEFORE context gate) ─────
+        direction, _flipped = _apply_inversion(direction, source, token)
+        flipped_direction = direction if _flipped else None
+
+        # ── Z-Score Freshness Check (CRITICAL: prevent stale signal execution) ──
+        # If z-score direction has flipped since signal generation, skip the trade.
+        # This prevents SHORT signals firing when z is rising, and vice versa.
+        if sig and isinstance(sig, dict) and sig.get('z_score') is not None:
+            sig_z = sig.get('z_score', 0)
+            cur_z = _ctx_gate_get_zscore(token)
+            if cur_z is not None:
+                # Direction flip: signal said SHORT (z<0) but now z>0, or vice versa
+                if direction == 'SHORT' and cur_z > 0.5 and sig_z < 0:
+                    log(f'  🚫 [Z-FLIP] {token} SHORT blocked: z flipped from {sig_z:+.2f} to {cur_z:+.2f}')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
+                if direction == 'LONG' and cur_z < -0.5 and sig_z > 0:
+                    log(f'  🚫 [Z-FLIP] {token} LONG blocked: z flipped from {sig_z:+.2f} to {cur_z:+.2f}')
+                    if sig_id:
+                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    skipped += 1
+                    continue
 
         # ── Context Gate (last gate before execution) ────────────
         # Rule-based handles ~80% (free). LLM only for ambiguous (5-10 calls/hr).

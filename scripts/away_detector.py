@@ -2,7 +2,7 @@
 """
 away_detector.py — Self-Initiative Mode for Hermes
 
-Runs every 5 minutes via cron.
+Runs every 15 minutes via systemd timer.
 If T has been away > 20 minutes AND there are unblocked agent-owned tasks:
 → Spawn a subagent to work on the highest-priority task.
 → Log everything to /root/.hermes/logs/away_detector.log.
@@ -26,15 +26,12 @@ from paths import *
 # ── Config ──────────────────────────────────────────────────────────────────
 AWAY_FILE       = '/root/.hermes/data/last_user_message_at.json'
 DEBOUNCE_FILE   = '/root/.hermes/data/self_init_last_run.json'
-TASKS_FILE      = '/root/.hermes/brain/TASKS.md'
-PROJECTS_FILE   = '/root/.hermes/brain/PROJECTS.md'
 LOG_FILE        = '/root/.hermes/logs/away_detector.log'
 PIPELINE_HB     = PIPELINE_HB_FILE
-DEBOUNCE_HOURS  = 2   # Don't re-spawn if we ran < 2h ago
-AWAY_THRESHOLD  = 20  # minutes
+DEBOUNCE_HOURS  = 0.25  # 15 min between CEO calls
+AWAY_THRESHOLD  = 20    # minutes
 # ────────────────────────────────────────────────────────────────────────────
 
-from datetime import datetime, timezone
 from hermes_log import log
 LOG_STAMP = lambda: datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
 
@@ -119,163 +116,35 @@ def set_debounce_ts():
     save_json(DEBOUNCE_FILE, {'last_run_ts': time.time()})
 
 
-def parse_task_priority(tasks_md):
-    """
-    Parse TASKS.md and return highest-priority unblocked agent-owned task.
-    Returns (task_line, task_content) or (None, None).
-    """
-    # Find the ## Priority Tasks section
-    lines = tasks_md.split('\n')
-    in_priority = False
-    candidates = []
+def call_ceo():
+    """Call CEO via systemd service with away-mode prompt."""
+    log(f"  Calling CEO (away mode)...")
 
-    for i, line in enumerate(lines):
-        if line.strip() == '## Priority Tasks':
-            in_priority = True
-            continue
-        if line.startswith('## ') and in_priority:
-            break  # hit next section
-        if in_priority and line.startswith('### [ ]'):
-            # Unchecked queued task
-            content_lines = [line]
-            j = i + 1
-            while j < len(lines) and lines[j].startswith('**'):
-                content_lines.append(lines[j])
-                j += 1
-            full = '\n'.join(content_lines)
+    # Write away prompt to a temp file for the CEO to read
+    away_prompt = '/root/.hermes/automation/ceo_away_prompt.md'
+    if not os.path.exists(away_prompt):
+        log(f"  CEO away prompt not found: {away_prompt}")
+        return
 
-            # Check if Agent-owned
-            owner = 'Agent'
-            for cl in content_lines:
-                if cl.startswith('**Owner:**'):
-                    owner = cl.split('**Owner:**')[1].strip().split(' ')[0]
-                if 'Blocked' in cl or 'blocked' in cl:
-                    owner = 'T'  # blocked on T
-
-            is_agent = owner == 'Agent'
-            is_tbd   = 'TBD' in full
-
-            # Check if already in_progress elsewhere
-            already_active = '(IN PROGRESS)' in full or '🚧' in full
-
-            if (is_agent or is_tbd) and not already_active:
-                # Extract task name
-                name = line.replace('### [ ]', '').strip()
-                candidates.append((name, full))
-
-    return candidates
-
-
-def pick_task():
-    """Read TASKS.md, return best task for self-init run."""
+    # Trigger CEO service — it runs run_ceo.sh which calls opencode
+    # The CEO service starts opencode as foreground, so the server is available
     try:
-        with open(TASKS_FILE) as f:
-            content = f.read()
-    except FileNotFoundError:
-        log(f"  TASKS.md not found at {TASKS_FILE}")
-        return None
-
-    candidates = parse_task_priority(content)
-    if not candidates:
-        log("  No unblocked agent-owned tasks found in TASKS.md")
-        return None
-
-    # Pick first (highest priority) candidate
-    name, full = candidates[0]
-    log(f"  Selected task: {name}")
-
-    # Extract reference for context
-    ref = ''
-    for line in full.split('\n'):
-        if line.startswith('**Reference:**'):
-            ref = line.replace('**Reference:**', '').strip()
-        if line.startswith('**What:**'):
-            ref += ' | ' + line.replace('**What:**', '').strip()
-
-    return {'name': name, 'detail': ref, 'raw': full[:500]}
-
-
-def build_subagent_context(task):
-    """Build context string for the subagent."""
-    ctx = f"""
-SELF-INITIATIVE RUN — {LOG_STAMP()}
-
-You are running autonomously because T has been away > 20 minutes.
-DO NOT fire any live trades. Work on research, analysis, and PM tasks only.
-
-=== Current System State ===
-Pipeline: {'healthy' if is_pipeline_healthy() else 'STALE — investigate before starting'}
-Live trading: {'ENABLED' if is_live_trading_enabled() else 'DISABLED (paper only)'}
-
-=== Your Task ===
-Task: {task.get('name')}
-Detail: {task.get('detail')}
-Full: {task.get('raw')}
-
-=== Constraints ===
-- Do NOT execute any trades (paper or live)
-- Do NOT change live trading flags (hype_live_trading.json, _FLIP_SIGNALS, etc.)
-- Do NOT modify max positions or leverage
-- If system appears jeopardized → stop immediately, log what happened
-- Update trading.md with findings (append under ## SELF-INIT RUN header)
-- Update DECISIONS.md / PROJECTS.md / TASKS.md as needed
-
-=== Files to reference ===
-- /root/.hermes/brain/trading.md
-- /root/.hermes/brain/PROJECTS.md
-- /root/.hermes/brain/TASKS.md
-- /root/.hermes/brain/DECISIONS.md
-- /root/.hermes/data/signals_hermes_runtime.db
-- /root/.hermes/logs/pipeline.log
-
-Report back: what you found, what you did, PM files changed, what T should review.
-"""
-    return ctx
-
-
-def spawn_subagent(task):
-    """Spawn a background subagent to work on the task."""
-    ctx = build_subagent_context(task)
-
-    log(f"  Spawning subagent for: {task.get('name')}")
-    log(f"  Context: {task.get('detail', '')[:100]}")
-
-    cmd = [
-        'python3', '-c',
-        f"""
-import subprocess, json, sys
-result = subprocess.run(
-    ['{sys.executable}', '-m', 'hermes_tools', 'delegate_task',
-     '--goal', {json.dumps(f"Self-init task: {task.get('name')}")},
-     '--context', {json.dumps(ctx)},
-     '--toolsets', 'terminal,file'],
-    capture_output=True, text=True, timeout=300
-)
-print(result.stdout[-2000:] if result.stdout else 'no stdout')
-print(result.stderr[-500:] if result.stderr else 'no stderr', file=sys.stderr)
-"""
-    ]
-
-    # Write to a background job script so we don't block
-    bg_script = f'/root/.hermes/logs/self_init_{int(time.time())}.sh'
-    with open(bg_script, 'w') as f:
-        f.write('#!/bin/bash\n')
-        f.write(f'echo "SELF-INIT START {LOG_STAMP()}" >> /root/.hermes/logs/away_detector.log\n')
-        f.write(f'echo "Task: {task.get("name")}" >> /root/.hermes/logs/away_detector.log\n')
-        f.write(f'exit 0\n')
-
-    os.chmod(bg_script, 0o755)
-
-    # Use nohup + redirect — fire and forget
-    with open(f'/root/.hermes/logs/self_init_{int(time.time())}.out', 'w') as out:
-        subprocess.Popen(
-            ['nohup', 'python3', '-c', cmd[2]],
-            stdout=out, stderr=subprocess.STDOUT,
-            cwd='/root/.hermes'
+        # Use systemctl start (non-blocking for oneshot services)
+        result = subprocess.run(
+            ['systemctl', 'start', 'hermes-ceo.service'],
+            capture_output=True, text=True, timeout=5
         )
-
-    set_debounce_ts()
-    log(f"  Subagent spawned (pid tracked via bg script)")
+        if result.returncode == 0:
+            set_debounce_ts()
+            log(f"  CEO service triggered successfully")
+        else:
+            log(f"  CEO service trigger failed: {result.stderr}")
+    except subprocess.TimeoutExpired:
+        # Service started but hasn't finished yet — that's OK for oneshot
+        set_debounce_ts()
+        log(f"  CEO service started (running in background)")
+    except Exception as e:
+        log(f"  CEO service trigger error: {e}")
 
 
 LOCK_FILE = '/root/.hermes/logs/away_detector.lock'
@@ -316,29 +185,22 @@ def main():
 
     log("T is AWAY — checking pipeline health")
     if not is_pipeline_healthy():
-        log("Pipeline unhealthy — skipping self-init to avoid disruption")
+        log("Pipeline unhealthy — skipping CEO call to avoid disruption")
         return
 
-    # Check debounce
+    # Check debounce (15 min between CEO calls)
     last_run = get_debounce_ts()
     if last_run > 0 and (time.time() - last_run) < (DEBOUNCE_HOURS * 3600):
-        elapsed = (time.time() - last_run) / 3600
-        log(f"Debounce active — last ran {elapsed:.1f}h ago (threshold={DEBOUNCE_HOURS}h)")
-        return
-
-    # Pick task
-    task = pick_task()
-    if task is None:
-        log("No suitable task found")
+        elapsed = (time.time() - last_run) / 60
+        log(f"Debounce active — last CEO call {elapsed:.0f}min ago (min interval={DEBOUNCE_HOURS*60:.0f}min)")
         return
 
     # Execute or dry-run
     if '--execute' in sys.argv:
-        spawn_subagent(task)
+        call_ceo()
     else:
-        log(f"[DRY RUN] Would spawn subagent for: {task.get('name')}")
-        log(f"  Detail: {task.get('detail', '')[:120]}")
-        log("  Pass --execute to actually spawn")
+        log(f"[DRY RUN] Would call CEO (away mode)")
+        log(f"  Pass --execute to actually call")
 
 
 if __name__ == '__main__':

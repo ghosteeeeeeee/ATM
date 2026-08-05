@@ -357,6 +357,28 @@ class HebbianEngine:
 
             return results
 
+    def token_sentiment(self, token: str, k: int = 20) -> float:
+        """Returns (-1.0 to +1.0) sentiment from recall(token).
+
+        Positive = token has mostly HOT_APPROVED / APPROVED / direction biases.
+        Negative = token has mostly SKIPPED / WAIT / NEUTRAL decisions.
+        Zero = novel token or no decision labels found.
+        """
+        recall = self.recall(token, k=k)
+        if not recall:
+            return 0.0  # novel token, neutral
+        positive_labels = {'HOT_APPROVED', 'APPROVED', 'SHORT_BIAS', 'LONG_BIAS'}
+        negative_labels = {'SKIPPED', 'WAIT', 'NEUTRAL'}
+        pos_w = neg_w = 0.0
+        for concept, label, weight, count in recall:
+            if label == 'decision':
+                if concept in positive_labels:
+                    pos_w += weight
+                elif concept in negative_labels:
+                    neg_w += weight
+        total = pos_w + neg_w
+        return (pos_w - neg_w) / total if total > 0 else 0.0
+
     def add_session_summary(self, session_id, summary, discussion_type,
                         subjects, files, coins, turn_count,
                         full_text_path="", started_at="") -> int:

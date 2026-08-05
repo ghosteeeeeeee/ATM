@@ -70,16 +70,9 @@ from hermes_constants import (
     ATR_PCT_LOW_THRESH, ATR_PCT_HIGH_THRESH,
     # k tier values
     ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
-    # Phase tiers
-    PHASE_TIER_NEUTRAL, PHASE_TIER_BUILDING,
-    PHASE_TIER_ACCELERATING, PHASE_TIER_EXHAUSTION, PHASE_TIER_EXTREME,
-    # Phase-to-k multipliers
-    K_PHASE_ACCEL_STALL, K_PHASE_ACCEL_FAST, K_PHASE_ACCEL_SLOW,
-    K_PHASE_EXH_STALL, K_PHASE_EXH_FAST, K_PHASE_EXH_SLOW,
-    K_PHASE_EXT_STALL, K_PHASE_EXT_FAST,
     # Phase percentile thresholds (consistent with signal_gen.detect_phase)
     PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME,
-    PHASE_NEUTRAL, PHASE_VEL_STALL_THRESH, PHASE_ACCEL_FAST_THRESH,
+    PHASE_VEL_STALL_THRESH,
     # Fallback
     ATR_PCT_FALLBACK,
 )
@@ -163,54 +156,6 @@ def _atr_sl_k_scaled(
     """
     base_k = _atr_tier(atr_pct)
     return base_k  # Phase scaling disabled — was compressing SL too aggressively
-
-    if momentum_stats is None:
-        return base_k
-
-    if direction == 'LONG':
-        pct = momentum_stats.get('percentile_long', 50)
-    else:
-        pct = momentum_stats.get('percentile_short', 50)
-
-    velocity = momentum_stats.get('velocity', 0)
-    phase_str = _phase_from_pct(pct, velocity)
-
-    phase_tier_map = {
-        'neutral':      PHASE_TIER_NEUTRAL,
-        'building':     PHASE_TIER_BUILDING,
-        'accelerating': PHASE_TIER_ACCELERATING,
-        'exhaustion':   PHASE_TIER_EXHAUSTION,
-        'extreme':      PHASE_TIER_EXTREME,
-    }
-    phase_tier = phase_tier_map.get(phase_str, PHASE_TIER_NEUTRAL)
-
-    # Velocity stall: negative velocity at accel+ phase = momentum fading
-    stalling = (velocity < 0) and (phase_tier >= PHASE_TIER_ACCELERATING)
-
-    # Phase multiplier
-    if phase_tier < PHASE_TIER_ACCELERATING:
-        return base_k  # neutral/building — no acceleration
-    elif phase_tier == PHASE_TIER_ACCELERATING:
-        if stalling:
-            mult = K_PHASE_ACCEL_STALL
-        elif speed_percentile >= PHASE_ACCEL_FAST_THRESH:
-            mult = K_PHASE_ACCEL_FAST
-        else:
-            mult = K_PHASE_ACCEL_SLOW
-    elif phase_tier == PHASE_TIER_EXHAUSTION:
-        if stalling:
-            mult = K_PHASE_EXH_STALL
-        elif speed_percentile >= PHASE_ACCEL_FAST_THRESH:
-            mult = K_PHASE_EXH_FAST
-        else:
-            mult = K_PHASE_EXH_SLOW
-    else:  # EXTREME
-        if stalling:
-            mult = K_PHASE_EXT_STALL
-        else:
-            mult = K_PHASE_EXT_FAST
-
-    return base_k * mult
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -520,8 +465,9 @@ def compute_atr_sl_tp(
 
     # For established trades: cap SL at TRAILING_DISTANCE_PCT so trailing can lock profits
     # Without this, the ATR-based floor (0.15-0.50%) overrides the trailing distance (0.20%)
+    # FIX: Ensure ATR_SL_MIN floor is never violated — floor must always win
     if not is_new_trade:
-        eff_sl_pct = min(eff_sl_pct, TRAILING_DISTANCE_PCT)
+        eff_sl_pct = max(min(eff_sl_pct, TRAILING_DISTANCE_PCT), ATR_SL_MIN)
 
     # ── Compute raw SL/TP from anchor price ───────────────────────────────────────
     if direction == 'LONG':
@@ -558,11 +504,12 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: SL trails from nadir at 0.4%, minimum 0.5% from entry
+                # In profit: SL trails from nadir at 0.50%, minimum 0.80% from entry
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                # Ensure SL is at least 0.5% from entry (initial SL level)
+                # Ensure SL is at least 0.80% from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                new_sl = min(trail_ceil, min_from_entry)
+                # FIX: floor must always win — use max() not min() (matches LONG logic)
+                new_sl = max(trail_ceil, min_from_entry)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:
@@ -762,7 +709,8 @@ def compute_atr_sl_tp(
             if in_profit:
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                new_sl = min(trail_ceil, min_from_entry)
+                # FIX: floor must always win — use max() not min() (matches LONG logic)
+                new_sl = max(trail_ceil, min_from_entry)
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:

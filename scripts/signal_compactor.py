@@ -266,15 +266,15 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     score = confidence
             × survival_bonus   (1 + cr*0.15, only if cr>0 AND age_m<5)
-            × staleness_mult  max(0, 1.0 - age_m*0.2)  → 0 at 5min
+            × staleness_mult  max(0, 1.0 - age_m*0.1)  → 0 at 10min (CEO: was 5min, too aggressive)
             × reg_mult        (+50% aligned / -50% counter-regime / -50% NEUTRAL or no-data)
             × source_mult     (from _get_source_weight)
             × speed_mult      (+15% if speed_percentile >= 80)
     """
     score = float(conf)
 
-    # Survival bonus: only if survived previous cycles AND signal is still alive (age < 5min)
-    if compact_rounds > 0 and age_m < 5.0:
+    # Survival bonus: only if survived previous cycles AND signal is still alive (age < 10min)
+    if compact_rounds > 0 and age_m < 10.0:
         survival_bonus = 1.0 + (compact_rounds * 0.15)
     else:
         survival_bonus = 1.0
@@ -282,7 +282,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Staleness penalty: -20% per minute, no floor
     # At age=5min → mult=0.0 (signal is dead)
     # At age=1min → mult=0.8 (20% penalty still alive)
-    staleness_mult = max(0.0, 1.0 - (age_m * 0.2))
+    staleness_mult = max(0.0, 1.0 - (age_m * 0.1))  # CEO: 10min decay (was 5min) — give signals time to execute
 
     # Regime multiplier: +50% aligned, -50% counter-regime, -50% neutral
     # No regime data at all → 0.5x floor
@@ -1608,6 +1608,8 @@ def _filter_safe_prev_hotset(prev_hotset):
         # (it writes to DB directly and bypasses the normal pipeline)
         if src == 'breakout':
             pass  # exempt, allow through
+        elif not CONFLUENCE_REQUIRED and len(sp) >= 1:
+            pass  # ponytail: CONFLUENCE_REQUIRED=False → single-source allowed through preserve
         elif len(sp) < 2:
             log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")
             continue

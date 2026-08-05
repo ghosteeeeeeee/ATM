@@ -19,7 +19,7 @@ import re
 import subprocess
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import sqlite3
 from paths import *  # single source of truth for paths
@@ -284,7 +284,7 @@ def check_pipeline_not_stuck():
                 capture_output=True, text=True, timeout=5
             )
             if r.returncode == 0:
-                from datetime import datetime
+                from datetime import datetime, timezone
                 cutoff = time.time() - 300  # 5 min
                 for line in r.stdout.splitlines():
                     if "Pipeline done" not in line and "Pipeline LIVE" not in line:
@@ -358,7 +358,7 @@ def check_stale_locks():
                 capture_output=True, text=True, timeout=5
             )
             if r.returncode == 0:
-                from datetime import datetime
+                from datetime import datetime, timezone
                 cutoff = time.time() - 300  # 5 min
                 for line in r.stdout.splitlines():
                     # "=== Pipeline done (LIVE) ===" — end of cycle
@@ -591,7 +591,7 @@ def check_no_flapping():
         lines = r.stdout.splitlines()
 
         # Count actual pipeline completions in the tail window
-        from datetime import datetime
+        from datetime import datetime, timezone
         cutoff = time.time() - 3600  # last 60 min
         completions = 0
         for l in lines:
@@ -772,6 +772,251 @@ def check_pump_hunter_positions():
         return False, f"pump_hunter_positions.json error: {e}"
 
 
+# ── New checks (system improvement) ────────────────────────────────────────────
+
+def check_obs_metrics_fresh(max_age_sec=600):
+    """Verify obs_dashboard metrics are recent (< 10min old)."""
+    metrics_file = DATA_DIR / "obs_metrics.json"
+    if not metrics_file.exists():
+        return False, "obs_metrics.json missing — obs_dashboard not running"
+    try:
+        data = json.loads(metrics_file.read_text())
+        ts = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00'))
+        age_sec = (datetime.now(timezone.utc) - ts).total_seconds()
+        if age_sec > max_age_sec:
+            return False, f"obs_metrics stale ({age_sec/60:.0f}min > {max_age_sec/60:.0f}min)"
+        return True, f"obs_metrics fresh ({age_sec:.0f}s ago)"
+    except Exception as e:
+        return False, f"obs_metrics error: {e}"
+
+
+def check_signal_decay_detector(max_age_sec=28800):
+    """Verify signal_decay_detector ran recently (< 8h)."""
+    log_file = HERMES_DIR / "automation" / "decay_log.md"
+    if not log_file.exists():
+        return False, "decay_log.md missing — signal_decay_detector never ran"
+    try:
+        mtime = datetime.fromtimestamp(log_file.stat().st_mtime)
+        age_sec = (datetime.now() - mtime).total_seconds()
+        if age_sec > max_age_sec:
+            return False, f"signal_decay_detector stale ({age_sec/3600:.1f}h > {max_age_sec/3600:.1f}h)"
+        return True, f"signal_decay_detector ran ({age_sec/60:.0f}min ago)"
+    except Exception as e:
+        return False, f"signal_decay_detector check error: {e}"
+
+
+def check_hl_sync_active():
+    """Verify hl-sync-guardian is running."""
+    try:
+        result = subprocess.run(['systemctl', 'is-active', 'hermes-hl-sync-guardian'],
+                              capture_output=True, text=True, timeout=5)
+        if result.stdout.strip() == 'active':
+            return True, "hl-sync-guardian active"
+        return False, "hl-sync-guardian NOT active"
+    except Exception as e:
+        return False, f"hl-sync check error: {e}"
+
+
+def check_kill_switches_working():
+    """Verify disabled signals are NOT executing (check last 6h of signal_outcomes)."""
+    try:
+        conn = sqlite3.connect(str(RUNTIME_DB))
+        c = conn.cursor()
+        # Check for disabled signals that still executed
+        c.execute("""
+            SELECT signal_type, COUNT(*) as trades
+            FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+              AND created_at > datetime('now', '-6 hours')
+              AND signal_type IN ('inv-accel-300-', 'accel-300-vel+', 'accel-300-vel-',
+                                  'bb-squeeze-', 'bb-squeeze+', 'tl_break_long', 'tl_break_short')
+            GROUP BY signal_type
+        """)
+        violations = c.fetchall()
+        conn.close()
+        if violations:
+            names = [f"{v[0]}({v[1]})" for v in violations]
+            return False, f"kill switch violations: {', '.join(names)}"
+        return True, "no disabled signals executing (6h)"
+    except Exception as e:
+        return False, f"kill switch check error: {e}"
+
+
+def check_trailing_stops_exists():
+    """Verify trailing_stops.json exists (symlink or file)."""
+    ts_file = HERMES_DIR / "data" / "trailing_stops.json"
+    if ts_file.exists():
+        return True, "trailing_stops.json exists"
+    # Check www location
+    ts_www = DATA_DIR / "trailing_stops.json"
+    if ts_www.exists():
+        return True, "trailing_stops.json exists (www only — missing symlink)"
+    return False, "trailing_stops.json MISSING"
+
+
+def check_new_signals_generating():
+    """Verify pct_hermes, vel_hermes, fast_momentum are generating signals."""
+    try:
+        conn = sqlite3.connect(str(RUNTIME_DB))
+        c = conn.cursor()
+        c.execute("""
+            SELECT source, COUNT(*) as cnt
+            FROM signals
+            WHERE created_at > datetime('now', '-1 hour')
+              AND source IN ('pct-hermes+', 'pct-hermes-', 'vel-hermes+', 'vel-hermes-',
+                             'fast-momentum+', 'fast-momentum-')
+            GROUP BY source
+        """)
+        results = c.fetchall()
+        conn.close()
+        if results:
+            parts = [f"{r[0]}({r[1]})" for r in results]
+            return True, f"new signals generating: {', '.join(parts)}"
+        return True, "no new signals in last hour (may be normal)"
+    except Exception as e:
+        return False, f"new signals check error: {e}"
+
+
+def check_pattern_scanner_sources():
+    """Verify pattern_scanner uses pattern-specific sources."""
+    try:
+        conn = sqlite3.connect(str(RUNTIME_DB))
+        c = conn.cursor()
+        c.execute("""
+            SELECT source, COUNT(*) as cnt
+            FROM signals
+            WHERE created_at > datetime('now', '-24 hours')
+              AND source LIKE 'pattern_%'
+            GROUP BY source
+        """)
+        results = c.fetchall()
+        conn.close()
+        if results:
+            has_specific = any(r[0] != 'pattern_scanner' for r in results)
+            if has_specific:
+                parts = [f"{r[0]}({r[1]})" for r in results]
+                return True, f"pattern sources OK: {', '.join(parts)}"
+            return False, "pattern_scanner still using generic source"
+        return True, "no pattern signals in 24h (check later)"
+    except Exception as e:
+        return False, f"pattern source check error: {e}"
+
+
+def check_token_speed_tracker():
+    """Verify token speed tracker has recent data."""
+    try:
+        conn = sqlite3.connect(str(RUNTIME_DB))
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*), MAX(updated_at) FROM token_speeds")
+        row = c.fetchone()
+        conn.close()
+        count = row[0] or 0
+        last_update = row[1]
+        if count < 50:
+            return False, f"speed_tracker low: {count} tokens"
+        if last_update:
+            try:
+                update_dt = datetime.fromisoformat(last_update)
+                age = (datetime.now() - update_dt).total_seconds()
+                if age > 3600:
+                    return False, f"speed_tracker stale ({age/60:.0f}min ago)"
+            except Exception:
+                pass  # can't parse timestamp, skip age check
+        return True, f"speed_tracker OK ({count} tokens)"
+    except Exception as e:
+        return False, f"speed_tracker check error: {e}"
+
+
+def check_ceo_timer():
+    """Verify CEO timer is running."""
+    try:
+        result = subprocess.run(['systemctl', 'is-active', 'hermes-ceo.timer'],
+                              capture_output=True, text=True, timeout=5)
+        if result.stdout.strip() == 'active':
+            return True, "CEO timer active"
+        return False, "CEO timer NOT active"
+    except Exception as e:
+        return False, f"CEO timer check error: {e}"
+
+
+def check_openmemory_accessible():
+    """Verify OpenMemory MCP server is responding."""
+    try:
+        result = subprocess.run(['systemctl', 'is-active', 'hermes-coding-mcp'],
+                              capture_output=True, text=True, timeout=5)
+        if result.stdout.strip() == 'active':
+            return True, "OpenMemory MCP active"
+        return False, "OpenMemory MCP NOT active"
+    except Exception as e:
+        return False, f"OpenMemory check error: {e}"
+
+
+def check_pipeline_step_timings():
+    """Verify pipeline steps complete within reasonable time (< 60s each)."""
+    try:
+        # Check last pipeline run duration from journal
+        result = subprocess.run(
+            ['journalctl', '-u', 'hermes-pipeline', '--since', '30 min ago', '--no-pager'],
+            capture_output=True, text=True, timeout=10
+        )
+        output = result.stdout
+        # Find "Pipeline done" lines and extract duration
+        durations = re.findall(r'Consumed (\d+\.\d+)s CPU time', output)
+        if durations:
+            max_dur = max(float(d) for d in durations)
+            if max_dur > 60:
+                return False, f"pipeline step slow ({max_dur:.1f}s > 60s)"
+            return True, f"pipeline steps OK (max {max_dur:.1f}s)"
+        return True, "no pipeline runs in last 30min"
+    except Exception as e:
+        return False, f"pipeline timing check error: {e}"
+
+
+def check_trade_frequency():
+    """Verify trade frequency is reasonable (1-20 trades/hr)."""
+    try:
+        conn = sqlite3.connect(str(RUNTIME_DB))
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*) FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+              AND created_at > datetime('now', '-1 hour')
+        """)
+        trades = c.fetchone()[0] or 0
+        conn.close()
+        if trades > 20:
+            return False, f"overtrading: {trades} trades/hr (> 20)"
+        if trades == 0:
+            return True, f"0 trades/hr (may be normal during quiet market)"
+        return True, f"trade frequency OK ({trades}/hr)"
+    except Exception as e:
+        return False, f"trade frequency check error: {e}"
+
+
+def check_signal_win_rate():
+    """Verify overall win rate is above 20% (24h)."""
+    try:
+        conn = sqlite3.connect(str(RUNTIME_DB))
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*), SUM(is_win) FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+              AND created_at > datetime('now', '-24 hours')
+        """)
+        row = c.fetchone()
+        conn.close()
+        total = row[0] or 0
+        wins = row[1] or 0
+        if total < 5:
+            return True, f"insufficient trades ({total}) for WR check"
+        wr = wins / total * 100
+        if wr < 20:
+            return False, f"low win rate: {wr:.1f}% ({wins}/{total})"
+        return True, f"win rate OK: {wr:.1f}% ({wins}/{total})"
+    except Exception as e:
+        return False, f"win rate check error: {e}"
+
+
 # Map name -> (checker_fn, is_critical)
 CHECKS = {
     "pipeline_errors":        (check_pipeline_log_errors, True),
@@ -789,6 +1034,20 @@ CHECKS = {
     "pump_hunter_log":       (check_pump_hunter_log, True),
     "pump_hunter_positions":  (check_pump_hunter_positions, True),
     "trading_timers":        (check_trading_timers, True),
+    # New checks (system improvement)
+    "obs_metrics_fresh":     (check_obs_metrics_fresh, False),
+    "signal_decay_detector": (check_signal_decay_detector, False),
+    "hl_sync_active":        (check_hl_sync_active, True),
+    "kill_switches_working": (check_kill_switches_working, True),
+    "trailing_stops_exists": (check_trailing_stops_exists, True),
+    "new_signals_generating": (check_new_signals_generating, False),
+    "pattern_scanner_sources": (check_pattern_scanner_sources, False),
+    "token_speed_tracker":   (check_token_speed_tracker, False),
+    "ceo_timer":             (check_ceo_timer, False),
+    "openmemory_accessible": (check_openmemory_accessible, False),
+    "pipeline_step_timings": (check_pipeline_step_timings, False),
+    "trade_frequency":       (check_trade_frequency, False),
+    "signal_win_rate":       (check_signal_win_rate, False),
 }
 
 

@@ -259,6 +259,9 @@ class PrecomputedMACD:
 
         # First valid index for EMA (slow-1)
         first = slow - 1
+        if first >= n:
+            # Not enough data for this timeframe — fill with zeros
+            return
         # Seed: EMA of closes[:slow] with respective periods
         self.ema_fast[first] = ema(closes[:slow], fast)
         self.ema_slow[first] = ema(closes[:slow], slow)

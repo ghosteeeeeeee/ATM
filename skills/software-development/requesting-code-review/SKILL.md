@@ -1,16 +1,14 @@
 ---
 name: requesting-code-review
-description: >
-  Pre-commit verification pipeline — static security scan, baseline-aware
-  quality gates, independent reviewer subagent, and auto-fix loop. Use after
-  code changes and before committing, pushing, or opening a PR.
+description: "Pre-commit review: security scan, quality gates, auto-fix."
 version: 2.0.0
 author: Hermes Agent (adapted from obra/superpowers + MorAlekss)
 license: MIT
+platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [code-review, security, verification, quality, pre-commit, auto-fix]
-    related_skills: [subagent-driven-development, writing-plans, test-driven-development, github-code-review]
+    related_skills: [subagent-driven-development, plan, test-driven-development, github-code-review]
 ---
 
 # Pre-Commit Code Verification
@@ -268,7 +266,7 @@ The two-stage review (spec compliance + code quality) uses this pipeline.
 **test-driven-development:** This pipeline verifies TDD discipline was followed —
 tests exist, tests pass, no regressions.
 
-**writing-plans:** Validates implementation matches the plan requirements.
+**plan:** Validates implementation matches the plan requirements.
 
 ## Pitfalls
 
@@ -280,3 +278,119 @@ tests exist, tests pass, no regressions.
 - **No test framework found** — skip regression check, reviewer verdict still runs
 - **Lint tools not installed** — skip that check silently, don't fail
 - **Auto-fix introduces new issues** — counts as a new failure, cycle continues
+
+---
+
+# Appendix — Code Review Checklist
+
+This is the static checklist the reviewer subagent (and you, in inline review) should walk through. Apply it to every diff or audit. Use it for both **PR/diff review** (narrative format) and **full-file audits** (severity-ranked table).
+
+## Review Checklist
+
+### 1. Security First
+- [ ] No hardcoded secrets, API keys, or credentials
+- [ ] Input validation on all user-provided data
+- [ ] SQL queries use parameterized statements (no string concatenation)
+- [ ] File operations validate paths (no path traversal)
+- [ ] Authentication/authorization checks present where needed
+
+### 2. Error Handling
+- [ ] All external calls (API, DB, file) have try/catch
+- [ ] Errors are logged with context (but no sensitive data)
+- [ ] User-facing errors are helpful but don't leak internals
+- [ ] Resources are cleaned up in finally blocks or context managers
+
+### 3. Code Quality
+- [ ] Functions do one thing and are reasonably sized (<50 lines ideal)
+- [ ] Variable names are descriptive (no single letters except loops)
+- [ ] No commented-out code left behind
+- [ ] Complex logic has explanatory comments
+- [ ] No duplicate code (DRY principle)
+
+### 4. Testing Considerations
+- [ ] Edge cases handled (empty inputs, nulls, boundaries)
+- [ ] Happy path and error paths both work
+- [ ] New code has corresponding tests (if test suite exists)
+
+## Response Format
+
+### For Pull Request / Change Reviews (narrative)
+
+```
+## Summary
+[1-2 sentence overall assessment]
+
+## Critical Issues (Must Fix)
+- Issue 1: [description + location + suggested fix]
+- Issue 2: ...
+
+## Suggestions (Nice to Have)
+- Suggestion 1: [description]
+
+## Questions
+- [Any clarifying questions about intent]
+```
+
+### For Code Audits (full-file or system-level, severity table)
+
+```
+## Audit: <filename>
+
+| # | Severity | Location | Description |
+|---|----------|----------|-------------|
+| 1 | P0 | line ~N | [what + fix] |
+| 2 | P1 | line ~N | [what + fix] |
+
+### Detail
+[P0 issues explained]
+
+### Recommendations
+[Lower-severity findings, techniques, observations]
+```
+
+**Severity levels:**
+- **P0** — actively causing wrong behavior, security flaw, or data corruption risk
+- **P1** — defined but never enforced (dead code path), significant design flaw
+- **P2** — inconsistent state, silently swallowed exceptions, confusing API usage
+- **INFO** — positive findings, well-handled edge cases
+
+## Common Patterns to Flag
+
+### Python — SQL injection
+
+```python
+# Bad
+cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+# Good
+cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+```
+
+### JavaScript — XSS
+
+```javascript
+// Bad
+element.innerHTML = userInput;
+// Good
+element.textContent = userInput;
+```
+
+## Pitfalls — Code That Looks Correct But Isn't
+
+### Dead blacklist imports (P0)
+If a constant is imported but **never used** in the file's execution paths, it is dead code that creates a false sense of enforcement. Example: `SIGNAL_SOURCE_BLACKLIST` was defined and imported but no enforcement call existed — the protection *looks* present but is *never actually applied*.
+
+### Custom log() functions with wrong arity
+Many scripts define a local `log()` wrapper that only takes `msg: str`. If callers pass a second `level` argument like `log(msg, 'WARN')`, Python's `except` silently swallows it and the severity tag disappears. Always verify `log()` signature matches call sites.
+
+### Silently swallowed exceptions with bare `pass`
+`except Exception: pass` in non-trivial code paths hides failures permanently. In production scripts (trading pipelines, data pipelines), use `except Exception: log(f"error: {e}")` or at minimum a comment explaining why ignoring the error is safe.
+
+### Conflicting confidence thresholds
+If a script has multiple threshold constants (e.g. `MIN_EXEC_CONFIDENCE = 50` and `RS_DECIDER_CONF_FLOOR = 55`), the effective gate is the **higher** one. The lower value becomes a false floor that never actually blocks anything. Document which one is authoritative.
+
+## Tone Guidelines
+
+- Be constructive, not critical
+- Explain *why* something is an issue, not just *what*
+- Offer solutions, not just problems
+- Acknowledge good patterns you see

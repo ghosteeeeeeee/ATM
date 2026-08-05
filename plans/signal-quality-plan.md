@@ -1,81 +1,76 @@
-# Signal Quality Improvement Plan — 2026-05-10
+# Signal Quality vs Quantity Plan — 2026-08-04
 
-## Context from May 9 closed trade analysis (43 trades)
+## Problem Statement
 
-### Core findings:
-- **accel-300+ is the only profitable signal**: all 8 big winners (>1%) are accel-300+. RS alone produces nothing. pct-hermes- SHORTs: 0% WR, -0.29% avg.
-- **Entry timing is the main problem**: 78% of losses hit SL on the first counter-candle within 0.1-3 minutes. Move already exhausted when signal fires.
-- **Confidence scoring is backwards**: conf 70-79 = 100% WR, +3.13% avg. conf 90-99 = 28.6% WR, +0.26% avg.
-- **All SHORTs lose**: 4 shorts, 0 wins. System is fundamentally long-biased.
-- **RS high-touch levels are dead money**: 100+ touches = 40% WR but +0.03% avg. Level respected but no reactive bounce.
-- **TP never hit**: 0 trades closed at ATR TP. profit-monster closes trades manually at +0.5-2%.
+System generates 18,000+ signals/week but only executes 4. Total PnL: -$4.08. High-volume signals are low quality (lose money). Low-volume signals are high quality (can't scale).
 
----
+## Current State
 
-## Changes to Implement
+| Signal | Generated | Executed | Exec Rate | PnL | WR |
+|--------|-----------|----------|-----------|-----|-----|
+| zscore_rising_long | 4,729 | 0 | 0.0% | -$0.20 | 0% |
+| zscore_rising_short | 4,555 | 0 | 0.0% | -$0.46 | 0% |
+| tl_break_long | 1,347 | 0 | 0.0% | -$0.92 | 25% |
+| tl_break_short | 998 | 0 | 0.0% | -$0.46 | 34% |
+| velocity | 1,224 | 0 | 0.0% | -$0.53 | 0% |
+| pattern_wolf | 381 | 0 | 0.0% | -$0.26 | 0% |
+| accel_300 | 502 | 1 | 0.2% | -$0.19 | 33% |
+| bb_bounce | 111 | 3 | 2.7% | +$0.01 | 0% |
 
-### 1. Turn OFF tl_break signal
-- **File**: `/root/.hermes/scripts/hermes_constants.py`
-- **Change**: `TL_BREAK_ENABLED = True` → `TL_BREAK_ENABLED = False`
-- **Reason**: tl_break needs fine-tuning. All SHORT signals (including tl_break_short) are losing. The current tl_break params are uncalibrated and producing bad SHORT entries (e.g., GRIFFAIN SHORT: -0.30%, XRP SHORT still open).
-- **Risk**: None — this just removes one uncalibrated signal source.
+## Root Cause
 
-### 2. Wire regime scanner into accel-300+ as a filter gate
+1. **Quantity without quality** — zscore_rising/tl_break generate thousands but 0 execute
+2. **Quality signals have low volume** — accel_300/bb_bounce fire rarely
+3. **The mismatch** — high-volume = lose money, low-volume = can't scale
 
-**Problem**: accel-300+ fires in ALL regimes — trending, neutral, and chop. The 15m_regime_scanner.py already computes per-token regime (LONG_BIAS / SHORT_BIAS / NEUTRAL) every cycle and writes to `/var/www/hermes/data/regime_5m.json` and PostgreSQL `momentum_cache`. But signal_compactor.py never reads it.
+## Fix Strategy (Default: Fix, Don't Disable)
 
-**Change**: Add a regime read step in `signal_compactor.py` that filters accel-300+ signals:
-- accel-300+ LONG: only pass if token's regime is `LONG_BIAS` (not NEUTRAL, not SHORT_BIAS)
-- accel-300+ SHORT: only pass if token's regime is `SHORT_BIAS` (not NEUTRAL, not LONG_BIAS)
+### Priority 1: Fix High-Volume Losers
 
-**Implementation location**: `signal_compactor.py` — check regime_5m.json before allowing accel-300+ entry to pass the confluence gate.
+| Signal | Problem | Fix |
+|--------|---------|-----|
+| zscore_rising | 0% exec, -$0.66 PnL | Add trend filter + RSI confirmation |
+| tl_break | 0% exec, -$1.38 PnL | Already has ADX+EMA — check why 0 execute |
+| velocity | 0% exec, -$0.53 PnL | Add momentum confirmation |
+| pattern_wolf | 0% exec, -$0.26 PnL | Add trend alignment filter |
 
-**Fallback**: If regime_5m.json is missing/stale, apply NO filter (don't block on missing data).
+### Priority 2: Scale Quality Signals
 
-**Expected impact**: Filter out accel-300+ breakouts that happen in chop/neutral markets — the main source of the "first counter-candle hits SL" losses.
+| Signal | Problem | Fix |
+|--------|---------|-----|
+| accel_300 | 50% WR but 0.2% exec | Already relaxed — monitor |
+| bb_bounce | Quality filters working | Already improved — monitor |
+| pattern_scanner | Low volume | Keep as-is |
 
-### 3. Use trend_purity as a built-in co-signal filter (not competing signal)
+### Priority 3: New Signal Development
 
-**Problem**: trend_purity fires as a standalone signal competing for hot-set space. It has conf=60-80 and is a co-signal that confirms "clean trend." But it's not being used as a prerequisite gate.
+| Approach | Rationale |
+|----------|-----------|
+| Trend-aligned mean reversion | bb_bounce model — quality over quantity |
+| Volume confirmation | Add volume check to all signals |
+| Multi-timeframe alignment | 1H trend + 5m entry |
 
-**Insight**: trend_purity's `purity` metric = fraction of last 15 bars above EMA30. This is a better trend quality filter than the linear-slope regime scanner because it measures actual trend cleanliness, not just direction.
+## Implementation Checklist
 
-**Change**: In signal_compactor.py, before passing accel-300+ to the hot-set:
-- Check if trend_purity+ is present for LONG (purity >= 0.45 = confirmed clean uptrend)
-- Check if trend_purity- is present for SHORT (confirmed clean downtrend)
-- If trend_purity is NOT present, DEMOTE accel-300+ confidence significantly (e.g., -20 confidence) instead of blocking entirely — we don't want to block on missing co-signal, just reduce confidence
+- [ ] zscore_rising: Add trend filter (1H EMA20/50)
+- [ ] tl_break: Debug why 0 execute despite ADX+EMA filters
+- [ ] velocity: Add momentum confirmation
+- [ ] pattern_wolf: Add trend alignment filter
+- [ ] All signals: Add RSI confirmation (LONG < 40, SHORT > 60)
+- [ ] Monitor accel_300/bb_bounce for decay
+- [ ] Track execution rate improvement
 
-**Alternative (simpler)**: Raise the MIN_GAP_PCT for accel-300+ when trend_purity+ is absent, requiring a stronger gap to compensate for uncertain trend quality.
+## Success Metrics
 
-**Expected impact**: trend_purity+ fires at conf=60-80 when price is cleanly above EMA30. accel-300+ breaking out of a clean trend is a much better setup than accel-300+ breaking out of chop.
+| Metric | Current | Target |
+|--------|---------|--------|
+| Execution rate | 0.02% | >1% |
+| PnL | -$4.08 | >$0 |
+| WR | 26.9% | >40% |
+| Trades/day | 4 | >10 |
 
----
+## Notes
 
-## What NOT to change (yet)
-
-1. **RS touch count filter**: Already addressed in prior session with RS_PROXIMITY_K=0.70, RS_MIN_TOUCHES=3, RS_RECENCY_WINDOW=200, RS_RECENCY_BOOST_K=3.0. Need live trading data to verify behavior before further changes.
-
-2. **Confidence scoring over-boost**: pct-hermes+ and trend_purity+ boost mediocre entries to conf=99. Don't touch this yet — first implement regime filter and see if bad entries are naturally filtered out.
-
-3. **ATR SL/TP params**: 0 trades hit ATR TP. Don't tighten TP further without seeing regime-filtered results.
-
-4. **Leverage**: 5x has better avg PnL than 3x (+0.62% vs +0.04%), even with lower WR. Don't change.
-
----
-
-## Files to Modify
-
-| File | Change |
-|------|--------|
-| `hermes_constants.py:395` | `TL_BREAK_ENABLED = False` |
-| `signal_compactor.py` | Read regime_5m.json, filter accel-300+ by regime direction |
-| `signal_compactor.py` | Check trend_purity presence, demote conf if absent |
-
----
-
-## Testing Plan
-
-1. **AST check** on all modified files
-2. **Dry run**: Run signal_compactor.py in dry-run mode, verify regime filter doesn't block all signals
-3. **Verify** LAYER trade (opened at 04:58, already +17.5%): check if LAYER's regime was LONG_BIAS at open time (retroactively check regime_5m.json timestamp)
-4. **Monitor**: Track over next 24h — do regime-filtered accel-300+ entries have better WR than unfiltered?
+- **Fix is default** — improve signals before disabling
+- **Quality over quantity** — 10 good signals > 1000 noise signals
+- **Monitor decay** — any signal can lose edge within 48h

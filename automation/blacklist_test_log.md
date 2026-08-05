@@ -54,9 +54,102 @@ COMP, CRV, DYDX, IMX, SAND, NEAR, DOT, ICP, ATOM, INJ, FIL, ETC, ARB, OP, LDO, A
 
 **Batch 2 Summary:** 0 KEEP, 20 RE-BLACKLIST. Pattern matches Batch 1: most tokens generate zero executable signals. Only 5/20 had any trades, all at 0% WR. Root cause: signal generation filters (speed, phase, context gate) block these tokens before they can trade — the blacklist is not the bottleneck.
 
-## Batch 3 — Started 2026-08-02 (48h trial)
+## Batch 3 — Started 2026-08-02 (48h trial, evaluated 2026-08-03)
 
 Removed from both SHORT_BLACKLIST and LONG_BLACKLIST for 48h trial:
 2Z, ADA, AI16Z, BADGER, BANANA, BIGTIME, BLZ, CASHCAT, CFX, CHIP, DOOD, ENA, FOGO, FTT, FXS, GMT, GRAM, GRASS, HPOS
 
 **Note:** BOME kept in blacklist (sketchy volume — structural, not performance).
+
+### Batch 3 Results
+
+| Token | Trial Start | Trial End | Trades | WR | PnL | Verdict |
+|-------|-------------|-----------|--------|-----|-----|---------|
+| 2Z | 2026-08-02 | 2026-08-03 | 2 | 0% | -$0.11 | RE-BLACKLIST (INSUFFICIENT) |
+| ADA | 2026-08-02 | 2026-08-03 | 2 | 0% | -$0.33 | RE-BLACKLIST (INSUFFICIENT) |
+| BIGTIME | 2026-08-02 | 2026-08-03 | 2 | 0% | -$0.27 | RE-BLACKLIST (INSUFFICIENT) |
+| CHIP | 2026-08-02 | 2026-08-03 | 2 | 0% | -$0.29 | RE-BLACKLIST (INSUFFICIENT) |
+| AI16Z | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| BADGER | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| BANANA | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| BLZ | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| CASHCAT | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| CFX | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| DOOD | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| ENA | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| FOGO | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| FTT | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| FXS | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| GMT | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| GRAM | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| GRASS | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| HPOS | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+| ONDO | 2026-08-02 | 2026-08-03 | 0 | — | — | RE-BLACKLIST (no execution) |
+
+**Batch 3 Summary:** 0 KEEP, 20 RE-BLACKLIST. 4 tokens had trades (all 0% WR, 2 trades each — INSUFFICIENT). 16 tokens generated zero executable signals. Pattern confirmed across all 3 batches: signal generation filters block these tokens before they can trade. The blacklist is not the bottleneck.
+
+## Batch 4 — Started 2026-08-03 (48h trial)
+
+Removed from both SHORT_BLACKLIST and LONG_BLACKLIST for 48h trial:
+ALT, APEX, IO, MERL, MON, NEO, POL, PURR, SKR, STX, SUSHI, USUAL, XPL, ZEN, ZORA, ZRO
+
+**Selection criteria:** Untested tokens with ≥5 historical trades (to ensure measurable signal generation). Prioritized tokens in both blacklists.
+
+**Note:** ONDO re-blacklisted (Batch 3, no execution). ZORA swapped in as replacement.
+
+## Batch 5 — Started 2026-08-03 (48h trial)
+
+Removed from both SHORT_BLACKLIST and LONG_BLACKLIST for 48h trial:
+HYPE, KNEIRO, KPEPE, MOVE, NOT, PUMP, SYRUP, YGG
+
+**Selection criteria:** Final remaining untested tokens (8 total). Includes tokens with 0 historical trades (need testing) and MOVE (116 trades, 6.9% WR — worst performer, testing if bug fixes improve).
+
+**Note:** This is the last batch. All 69 blacklist candidates have now been tested or are in active trials.
+
+### Batch 4 Results (evaluated 2026-08-04)
+
+| Token | Trial Start | Trial End | Trades | WR | PnL | Verdict |
+|-------|-------------|-----------|--------|-----|-----|---------|
+| ALT | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| APEX | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.17 | RE-BLACKLIST (INSUFFICIENT) |
+| IO | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| MERL | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.20 | RE-BLACKLIST (INSUFFICIENT) |
+| MON | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.28 | RE-BLACKLIST (INSUFFICIENT) |
+| NEO | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| POL | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| PURR | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| SKR | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| STX | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| SUSHI | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.14 | RE-BLACKLIST (INSUFFICIENT) |
+| USUAL | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.17 | RE-BLACKLIST (INSUFFICIENT) |
+| XPL | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.25 | RE-BLACKLIST (INSUFFICIENT) |
+| ZEN | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.07 | RE-BLACKLIST (INSUFFICIENT) |
+| ZORA | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| ZRO | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+
+**Batch 4 Summary:** 0 KEEP, 16 RE-BLACKLIST. 7/16 had trades (all 0% WR, 2 trades each — INSUFFICIENT). 9/16 had zero executable signals. Same pattern as Batches 1-3.
+
+### Batch 5 Results (evaluated 2026-08-04)
+
+| Token | Trial Start | Trial End | Trades | WR | PnL | Verdict |
+|-------|-------------|-----------|--------|-----|-----|---------|
+| HYPE | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| KNEIRO | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| KPEPE | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| MOVE | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| NOT | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+| PUMP | 2026-08-03 | 2026-08-04 | 4 | 0% | -$0.54 | RE-BLACKLIST (0% WR) |
+| SYRUP | 2026-08-03 | 2026-08-04 | 2 | 0% | -$0.29 | RE-BLACKLIST (INSUFFICIENT) |
+| YGG | 2026-08-03 | 2026-08-04 | 0 | — | — | RE-BLACKLIST (no execution) |
+
+**Batch 5 Summary:** 0 KEEP, 8 RE-BLACKLIST. 2/8 had trades (both 0% WR). 6/8 had zero executable signals. Pattern confirmed across all 5 batches.
+
+## Overall Conclusion (Batches 1-5)
+
+**77 tokens tested, 0 KEEP.** Every batch produces the same result:
+- Tokens with trades: all at 0% WR,2 trades each (INSUFFICIENT sample)
+- Tokens without trades: signal generation filters (speed, phase, context gate) block them entirely
+
+**Root cause:** The blacklist is not the bottleneck. Signal generation filters (SPEED_MIN_THRESHOLD, PHASE_ENTRY_FILTER, CONTEXT_GATE) prevent these tokens from generating executable signals. When signals do fire, they're at 0% WR because the underlying signal quality is poor for these tokens.
+
+**Recommendation:** Stop rotating tokens in/out of the blacklist. Focus on improving signal quality for the tokens that DO generate signals (the ~50 tokens currently trading). The blacklist is working as intended — it's a symptom filter, not a cause.

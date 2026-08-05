@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
 Hebbian Retroactive Seeder — seeds the associative memory network
-from historical Hermes sessions and decisions logs.
+from historical Hermes session dumps.
 
 Usage:
   python3 scripts/hebbian_seed_sessions.py [batch_size]
 
 batch_size: number of sessions per batch (default 50)
              run in chunks to avoid memory issues
+
+Fix 2 (2026-06-24): removed seed_decisions_log() — it created pollution
+by learning from wandb-local/decisions.jsonl (regime<->token<->decision
+explosion). The decisions log is a process artifact, not knowledge worth
+memorizing. Sessions are the right source.
 """
 
 import json
@@ -19,6 +24,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
+from paths import *
 HERMES_DIR = Path("/root/.hermes")
 SESSIONS_DIR = HERMES_DIR / "sessions"
 DB_PATH = HERMES_DIR / "brain" / "associative_memory.db"
@@ -271,61 +277,11 @@ def seed_sessions(batch_size: int = 50):
     print(f"Entities extracted: {total_entities}")
     print(f"Pairs learned: {total_pairs}")
 
-def seed_decisions_log():
-    """Seed from trading decisions log."""
-    decisions_path = HERMES_DIR / "wandb-local" / "decisions.jsonl"
-    if not decisions_path.exists():
-        print("No decisions.jsonl found")
-        return 0
-
-    conn = get_connection()
-    count = 0
-
-    with open(decisions_path) as f:
-        for line in f:
-            try:
-                d = json.loads(line)
-                token = d.get("top_token", "")
-                regime = d.get("regime", "")
-                direction = d.get("direction", "")
-                decision = d.get("decision", "")
-                reason = d.get("reason", "")
-
-                # Build entity list
-                parts = []
-                if token:
-                    parts.append((token, "token"))
-                if regime:
-                    parts.append((regime, "concept"))
-                if direction:
-                    parts.append((direction, "concept"))
-                if decision:
-                    parts.append((decision, "concept"))
-
-                # Add entities from reason text
-                if reason:
-                    parts.extend(extract_entities(reason[:500]))
-
-                # Deduplicate
-                seen = {}
-                for name, lt in parts:
-                    if name not in seen:
-                        seen[name] = lt
-
-                concepts = list(seen.keys())
-                ltypes = [seen[c] for c in concepts]
-
-                for i in range(len(concepts)):
-                    for j in range(i + 1, len(concepts)):
-                        learn_pair(conn, concepts[i], ltypes[i], concepts[j], ltypes[j])
-                        count += 1
-
-            except Exception:
-                continue
-
-    conn.commit()
-    conn.close()
-    return count
+# Fix 2 (2026-06-24): seed_decisions_log() deleted. It pulled regime/token/decision
+# triples from wandb-local/decisions.jsonl and created the most polluted edges in
+# the graph (SKIPPED<->NEUTRAL 1066 fires). The decisions log is process output,
+# not knowledge — it doesn't tell us anything that co-occurrence across docs/sessions
+# wouldn't already surface. Removing both the function and its call site in main().
 
 if __name__ == "__main__":
     batch_size = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 100
@@ -337,11 +293,6 @@ if __name__ == "__main__":
     # Seed from sessions
     print("[Sessions]")
     seed_sessions(batch_size)
-
-    # Seed from decisions log
-    print("\n[Decisions Log]")
-    n = seed_decisions_log()
-    print(f"Learned {n} pairs from decisions log")
 
     # Final stats
     conn = get_connection()

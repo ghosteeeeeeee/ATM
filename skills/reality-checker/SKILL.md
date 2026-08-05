@@ -242,6 +242,92 @@ To certify anything as READY (not NEEDS WORK), require ALL of:
 - Be specific: "conf-1s signal with 99% confidence — single source cannot support this"
 - Stay grounded: "This needs ≥10 samples before any performance claim is credible"
 
+## Session Patterns — Lessons That Repeatedly Prove True
+
+These are hard-won findings from tracing actual code vs. claimed fixes:
+
+### Pattern 1: "Fix is non-functional" — always run dry-mode first
+When a fix claims to address a bug in signal_compactor.py, run `python3 scripts/signal_compactor.py --dry` BEFORE reading the fix code. The dry run output reveals secondary bugs (like "Cannot operate on a closed database") that make claimed fixes silently non-functional. A fix that throws an exception is not a working fix.
+
+### Pattern 2: DB connection lifecycle bugs in signal_compactor.py
+The critical section (FileLock) opens a connection at line ~247, does DB work, and closes it at line ~296. Step 5 (APPROVED cr cache) runs AFTER the close at lines ~396-417. When verifying fixes, check whether the connection is still open at the point where the fix runs. "Cannot operate on a closed database" = fix never executed. Always move `conn.close()` to AFTER all queries that need the connection.
+
+### Pattern 3: Loss cooldown gaps are almost NEVER in _save_cooldowns
+When loss_cooldowns.json is empty but trades show losses, the bug is almost never in `_save_cooldowns()` itself (which is usually a simple JSON write). The bugs are in CALLER code — specifically:
+- **Success vs. failure paths**: When HL close succeeds, code often does a direct `UPDATE trades` without calling `_close_paper_trade_db` — bypassing `_record_loss_cooldown` entirely. When HL close FAILS, code calls `_close_paper_trade_db` which DOES record the cooldown.
+- **Guardian's three close mechanisms**:
+  1. `_close_paper_trade_db()` → correctly calls `_record_loss_cooldown` ✅
+  2. Direct `UPDATE trades` (success path) → often misses `_record_loss_cooldown` ❌
+  3. Force-close via `_close_paper_trade_db` (failure path) → correctly calls `_record_loss_cooldown` ✅
+- Always check BOTH branches (success and failure) of close logic for cooldown recording.
+
+### Pattern 4: "Claimed root cause" is often the symptom, not the mechanism
+For Issue #3, the claimed root cause was "silent pass in _save_cooldowns". The actual root causes were:
+- Cut-loser success path (line ~1477): direct UPDATE without cooldown recording
+- Hard-stop success path (line ~1604): direct UPDATE without cooldown recording
+When investigating, always trace the full code path — especially the "happy path" that usually works correctly — rather than assuming the reported location is the actual bug.
+### Pattern 5: External signal data must be verified against local DB before use
+
+When another agent or external source presents a signal table (especially with timestamps, z-scores, prices, and decisions), treat it as UNVERIFIED until cross-checked against local sources. The fabrication failure mode looks like:
+- 19 signals listed, only 3-5 exist in local signals.json
+- Signal timestamps in the future relative to actual DB content
+- "Short at z=3.9" — z-score direction contradicts signal direction (z=+3.9 means price 3.9 std devs ABOVE mean, cannot support SHORT)
+- Missing signals (rs-r90, rs-r96 etc.) that have no DB record at all
+- Audit log showing a different outcome than the presented table (e.g., "EXPIRED" in table but "EXECUTED" in audit log)
+- Trade counts that don't match actual DB counts when queried directly
+
+**Verification workflow** (always run before trusting external signal tables):
+```bash
+# 1. Check signals.json for the token
+python3 -c "
+import json
+with open('/var/www/hermes/data/signals.json') as f:
+    data = json.load(f)
+signals = data.get('signals', [])
+fet = [s for s in signals if s.get('token') == 'FET']
+for s in sorted(fet, key=lambda x: x.get('time','')):
+    print(f\"  {s.get('time')}  {s.get('direction')}  {s.get('source')}  z={s.get('zscore')}  price={s.get('price')}  decision={s.get('decision')}\")
+"
+
+# 2. PostgreSQL — definitive trade count + PnL by signal (run this FIRST before reading any external table)
+cd /root/.hermes/scripts && python3 -c "
+from _secrets import BRAIN_DB_DICT
+import psycopg2
+conn = psycopg2.connect(**BRAIN_DB_DICT)
+cur = conn.cursor()
+cur.execute(\"\"\"
+    SELECT signal, direction, COUNT(*) as n,
+           SUM(hype_realized_pnl_usdt) as pnl,
+           SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) as wins
+    FROM trades
+    WHERE open_time > NOW() - INTERVAL '96 hours'
+    GROUP BY signal, direction
+    ORDER BY n DESC LIMIT 30
+\"\"\")
+rows = cur.fetchall()
+total = sum(r[2] for r in rows)
+total_pnl = sum(r[3] or 0 for r in rows)
+print(f'Total 96h trades: {total}, Total PnL: {total_pnl:.2f}')
+for r in rows[:20]:
+    print(r)
+conn.close()
+"
+
+# 3. Check hotset.json (the actual live hotset)
+python3 -c "
+import json
+with open('/var/www/hermes/data/hotset.json') as f:
+    data = json.load(f)
+hot = data.get('hotset', [])
+fet = [s for s in hot if 'FET' in str(s.get('symbol',''))]
+print(f'FET in hotset: {len(fet)}')
+"
+```
+
+**Ground truth hierarchy**: PostgreSQL trades table (direct query) > signals.json (signals array) > audit.log (trade events) > hotset.json (current hot-set) > external agent tables (unverified). When they disagree, local data wins.
+
+**Critical**: The PostgreSQL query returns actual rows even for NULL pnl values — an external table showing "64 trades, 0 wins" that returns only "34 trades, 17 wins" when you run the query yourself means the external table is fabricated or stale. Always run the query before reading the table.
+
 ## Success Metrics
 
 You're doing your job when:
@@ -250,3 +336,4 @@ You're doing your job when:
 - Guardian failures are caught before they compound ✅
 - No fantasy "proven strategies" reach the production hot set ✅
 - Trades that shouldn't fire get blocked by blacklist checks ✅
+- Code fixes are verified functional (not just syntactically correct) ✅

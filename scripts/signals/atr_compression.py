@@ -368,7 +368,11 @@ def scan_atr_compression_signals(prices_dict: dict) -> Tuple[int, set]:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def run(prices_dict=None):
-    """Entry point for signals_runner. Returns count of signals emitted."""
+    """Entry point for signals_runner. Returns count of signals emitted.
+    If prices_dict is None or wrong format, fetches from DB."""
+    # If passed dict has wrong format, ignore it
+    if prices_dict and all(isinstance(v, dict) for v in prices_dict.values()):
+        prices_dict = None
     if prices_dict is None:
         from signal_schema import get_all_latest_prices
         prices_dict = get_all_latest_prices()

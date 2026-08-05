@@ -269,11 +269,11 @@ def write_to_brain_cache(results):
             slope_pct = r.get('slope_pct', 0)
             trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
             cur.execute("""
-                INSERT INTO momentum_cache (token, slope_5m, regime_5m, trend, updated_at)
+                INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at)
                 VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (token) DO UPDATE SET
-                    slope_5m = EXCLUDED.slope_5m,
-                    regime_5m = EXCLUDED.regime_5m,
+                    slope_15m = EXCLUDED.slope_15m,
+                    regime_15m = EXCLUDED.regime_15m,
                     trend = EXCLUDED.trend,
                     updated_at = EXCLUDED.updated_at
             """, (token, slope_pct, regime, trend, now))

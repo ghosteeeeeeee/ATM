@@ -5,6 +5,7 @@ Serves the projects.html kanban board at /projects and persists to kanban.json.
 
 Run: python3 /root/.hermes/scripts/kanban_api.py
 Daemon: supervised by systemd or run in background.
+from paths import *
 """
 import os, sys, json, time, subprocess
 from flask import Flask, request, jsonify, send_file, Response

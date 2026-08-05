@@ -1,0 +1,15 @@
+{
+  "changes": [
+    {
+      "timestamp": "2026-08-05T00:46:03.401917+00:00",
+      "signal_type": "tl_break",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.1,
+      "new_value": 0.105,
+      "reason": "WR=30.0%, decay=False",
+      "wr_before": 0.3
+    }
+  ],
+  "daily_count": 1,
+  "last_reset": 1785890666.654959
+}

@@ -13,7 +13,7 @@ with 1.3x source weight in signal_compactor.
 Signal type: fast_momentum
 Sources:     fast-momentum+, fast-momentum-
 """
-import os, sys, statistics
+import os, sys, statistics, json, time
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
@@ -197,8 +197,6 @@ def run():
     Returns:
         int: number of fast-momentum signals written to DB.
     """
-    import json, time
-
     # NOTE: FAST_MOMENTUM_ENABLED guard is in signal_gen.py (inline version).
     # Per-direction FAST_MOMENTUM_PLUS/MINUS_ENABLED checks remain active.
     # This registry version is called by signals_runner.py — Layer 2 add_signal()
@@ -247,8 +245,8 @@ def run():
         if speed_tracker is not None:
             spd = speed_tracker.get_token_speed(token)
         speed_pctl = spd.get('speed_percentile', 50.0) if spd else 50.0
-        if speed_pctl < 70:
-            continue  # not a top mover — skip
+        if speed_pctl < 40:
+            continue  # not a top mover — skip (lowered from 70 → 50 → 40)
 
         # ── Acceleration: short-term z change vs medium-term ──────────────────
         z_accel = z_5m - z_30m
@@ -279,11 +277,14 @@ def run():
         direction = 'LONG' if is_bullish else 'SHORT'
         source    = 'fast-momentum+' if is_bullish else 'fast-momentum-'
 
-        # ── Additional filter: 5m z should be more extreme than 60m z ─────────
-        if is_bullish and not (z_5m < z_60m - 0.1):
-            continue  # not a true upside acceleration
-        if is_bearish and not (z_5m > z_60m + 0.1):
-            continue  # not a true downside acceleration
+        # ── Additional filter: 5m z should show acceleration vs 60m ─────────
+        # For LONG: z_5m should be rising faster than z_60m (momentum building)
+        # For SHORT: z_5m should be falling faster than z_60m (momentum building)
+        # FIX: removed overly restrictive z_5m < z_60m check — was blocking valid momentum
+        if is_bullish and z_5m < z_60m - 0.5:
+            continue  # only skip if 5m is FAR below 60m (not just a pullback)
+        if is_bearish and z_5m > z_60m + 0.5:
+            continue  # only skip if 5m is FAR above 60m (not just a bounce)
 
         # ── RSI / MACD confirmation ────────────────────────────────────────────
         mom     = get_momentum_stats(token)
@@ -297,8 +298,8 @@ def run():
                 continue  # MACD bearish — skip LONG
 
         if direction == 'SHORT':
-            if rsi_val is not None and rsi_val < 45:
-                continue  # oversold — skip SHORT
+            if rsi_val is not None and rsi_val < 30:
+                continue  # oversold — skip SHORT (lowered from 45 — was too restrictive)
             if macd_hist is not None and macd_hist > 0:
                 continue  # MACD bullish — skip SHORT
 

@@ -77,6 +77,8 @@ def disable_signal(signal_type):
         'pct-hermes-': 'PCT_HERMES_MINUS_ENABLED',
         'fast-momentum+': 'FAST_MOMENTUM_PLUS_ENABLED',
         'fast-momentum-': 'FAST_MOMENTUM_MINUS_ENABLED',
+        'zscore-rising+': 'ZSCORE_RISING_ENABLED',
+        'zscore-rising-': 'ZSCORE_RISING_ENABLED',
     }
 
     flag = flag_map.get(signal_type)

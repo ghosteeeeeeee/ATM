@@ -1,8 +1,9 @@
 import time, sqlite3, json, openai
 
+from paths import *
 time.sleep(10)
 
-conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
+conn = sqlite3.connect(RUNTIME_DB)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
 c.execute("""
@@ -23,7 +24,7 @@ conn.close()
 lines = [f"[{i}] {r['token']} | {r['direction']} | conf={r['confidence']:.0f}% | age={r['created_at'][-8:]}" for i, r in enumerate(deduped)]
 signals_text = "\n".join(lines)
 
-with open('/var/www/hermes/data/hotset.json') as f:
+with open(HOTSET_FILE) as f:
     hs = json.load(f)
 hot_tokens = [f"{s['token']}({s['direction'][0]},{s['confidence']:.0f}%)" for s in hs['hotset']]
 hotset_str = ", ".join(hot_tokens)

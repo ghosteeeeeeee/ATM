@@ -1,5 +1,6 @@
 import re
 
+from paths import *
 with open('/tmp/CONTEXT.md.original') as f:
     content = f.read()
 

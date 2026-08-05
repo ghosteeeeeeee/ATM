@@ -14,9 +14,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── Configuration ───────────────────────────────────────────────────────────────
-PCT_HERMES_ENABLED    = True   # master kill-switch for this signal type
-PCT_HERMES_PLUS_ENABLED  = True   # fire pct-hermes+ (LONG) signals
-PCT_HERMES_MINUS_ENABLED = True   # fire pct-hermes- (SHORT) signals
+# NOTE: Do NOT shadow hermes_constants here — import from hermes_constants instead.
+# Local True/False would override the actual kill-switch values.
+from hermes_constants import (
+    PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
+    SHORT_BLACKLIST as _SHORT_BL, LONG_BLACKLIST as _LONG_BL,
+)
 PCT_RANK_THRESH        = 95    # raised from 88 on 2026-05-07 — pct-hermes fires on top/bottom 5% only
                                  # pct=88 fires too early (conf=70) — price hasn't accelerated yet, catches knives
                                  # pct=95+ fires when momentum is already accelerating — price has room to continue
@@ -35,16 +38,21 @@ except Exception:
     def is_live_trading_enabled():
         return True
 
-try:
-    from hermes_constants import SHORT_BLACKLIST
-except Exception:
-    SHORT_BLACKLIST = set()
+SHORT_BLACKLIST = _SHORT_BL
+LONG_BLACKLIST = _LONG_BL
 
 try:
     from position_manager import get_open_positions as _get_open_pos
 except Exception:
     def _get_open_pos():
         return []
+
+try:
+    from signal_gen import recent_trade_exists, MIN_TRADE_INTERVAL_MINUTES
+except Exception:
+    MIN_TRADE_INTERVAL_MINUTES = 10
+    def recent_trade_exists(token, interval):
+        return False
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -91,7 +99,9 @@ def run() -> int:
             continue
         if get_cooldown(token):
             continue
-        if token.upper() in SHORT_BLACKLIST:
+        if token.upper() in SHORT_BLACKLIST or token.upper() in LONG_BLACKLIST:
+            continue
+        if recent_trade_exists(token, MIN_TRADE_INTERVAL_MINUTES):
             continue
 
         price = data['price']
@@ -144,7 +154,7 @@ def run() -> int:
             value       = pct_val,
             price       = price,
             exchange    = 'hyperliquid',
-            timeframe   = '4h',
+            timeframe   = '1m',
             z_score     = avg_z,
             z_score_tier = z_dir,
         )

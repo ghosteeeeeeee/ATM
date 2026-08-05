@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-08-04 23:25:02",
+  "total_checks": 15,
+  "passed": 10,
+  "critical_count": 4,
+  "warning_count": 1,
+  "criticals": [
+    {
+      "name": "sqlite_leaks",
+      "msg": "98 files: study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py, wave_backtest.py",
+      "file": "study_winning_combos.py.py",
+      "fix": "Move conn.close() to a finally block or use context manager"
+    },
+    {
+      "name": "sql_injection",
+      "msg": "32 files with f-string SQL",
+      "file": "wave_backtest.py:452",
+      "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
+    },
+    {
+      "name": "cursor_leaks",
+      "msg": "113 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "file": "study_winning_combos.py.py",
+      "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
+    },
+    {
+      "name": "defunct_imports",
+      "msg": "ai_decider.py imported in 1 files",
+      "file": "bug_hunter.py:242",
+      "fix": "Remove ai_decider imports \u2014 module is defunct, replaced by signal_compactor.py"
+    }
+  ],
+  "warnings": [
+    {
+      "name": "win_rate",
+      "msg": "0.0% (0/16)",
+      "file": "",
+      "fix": "Kill 0% WR signals, enable profitable ones, or activate dynamic inverter"
+    }
+  ]
+}

@@ -830,11 +830,13 @@ def write_pattern_signal(token: str, pattern: dict) -> bool:
     add_signal() applies directional blacklist guards — SHORT_BLACKLIST/LONG_BLACKLIST.
     Returns True only if signal was actually written to DB."""
     try:
+        # Include pattern type in source for tracking which patterns work
+        pattern_source = f"pattern_{pattern['pattern_type']}"
         result = add_signal(
             token=token.upper(),
             direction=pattern['direction'].upper(),
             signal_type=pattern['signal_type'],
-            source=pattern['source'],
+            source=pattern_source,
             confidence=pattern['confidence'],
             value=pattern.get('breakout_px', pattern.get('nose_line_px', pattern.get('resistance_px', 0))),
             price=pattern.get('breakout_px', pattern.get('nose_line_px', pattern.get('resistance_px', 0))),

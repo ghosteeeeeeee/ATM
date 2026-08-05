@@ -4,10 +4,11 @@ description: "Author in-repo SKILL.md: frontmatter, validator, structure."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
+platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [skills, authoring, hermes-agent, conventions, skill-md]
-    related_skills: [writing-plans, requesting-code-review]
+    related_skills: [plan, requesting-code-review]
 ---
 
 # Authoring Hermes-Agent Skills (in-repo)
@@ -134,6 +135,28 @@ Pick the closest existing category. Don't invent new top-level categories casual
 - **Major rewrite:** `write_file` the whole SKILL.md. `skill_manage(action='edit')` also works but requires supplying the full new content.
 - **Adding supporting files:** `write_file` to `skills/<category>/<name>/references/<file>.md`, `templates/<file>`, or `scripts/<file>`. `skill_manage(action='write_file')` also works and enforces the references/templates/scripts/assets subdir allowlist.
 - **Always commit** the edit — in-repo skills are source, not runtime state.
+
+## Thin Wrapper Pattern (Subagent Personas)
+
+Some skills exist only to point to a subagent persona file (e.g., `ai-engineer`, `senior-dev`). For these, **keep SKILL.md minimal** — one source of truth, nothing else:
+
+```markdown
+---
+name: my-persona
+description: Delegates to the subagent persona at .hermes/subagents/specialized/my-persona.md
+---
+
+# My Persona
+
+All persona definition and methodology is sourced exclusively from:
+**`.hermes/subagents/specialized/my-persona.md`**
+```
+
+**Why minimal:** Two files describing the same thing drift. The subagent file is the source of truth; SKILL.md is the discovery hook. The full skill content lives in `subagents/`, not in the skill.
+
+**When to use this pattern:** You have a pre-existing persona/role definition in `subagents/` and want to make it discoverable via skill search. The skill does not add workflow, it adds a trigger for matching.
+
+**When NOT to use:** You're authoring a new workflow that happens to mention a persona. Put the workflow in SKILL.md; reference the persona inline.
 
 ## Common Pitfalls
 

@@ -5,6 +5,7 @@ Create Hermes dual-database architecture:
   signals_hermes_runtime.db — runtime data, local only
 
 Also migrates backfill data from legacy DB.
+from paths import *
 """
 import sqlite3, os
 

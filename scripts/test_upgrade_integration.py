@@ -15,6 +15,7 @@ from datetime import datetime
 
 sys.path.insert(0, '/root/.hermes/scripts')
 
+from paths import *
 # ── Test Results ────────────────────────────────────────────────────────────────
 
 TESTS_PASSED = 0
@@ -334,11 +335,10 @@ def test_signal_schema_workflow():
 def test_ai_decider_token_budget():
     section('ai_decider token budget')
     try:
-        from ai_decider import (
-            _check_token_budget, _record_token_usage,
-            _MAX_TOKENS_PER_RUN, _DAILY_TOKEN_BUDGET,
-            _DAILY_BUDGET_FILE
-        )
+        # ai_decider is DEFUNCT — replaced by signal_compactor.py
+        # Skip this test
+        skip('ai_decider is defunct — replaced by signal_compactor.py')
+        return
     except Exception as e:
         fail('Import ai_decider token budget functions', e)
         return

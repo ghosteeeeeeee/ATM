@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from paths import *
 """Fix Unicode ellipsis corruption in OpenClaw indicator_calculator.py"""
 import sys
 
