@@ -51,5 +51,29 @@
 - [x] 2026-08-05 03:50 — BB_BOUNCE_ENABLED set False. Fixed by bug_hunter.
 - [x] 2026-08-05 03:50 — pattern_wolf_wave fixed — last trade 08-04 22:57, none since disable. Flag working.
 - [x] 2026-08-05 05:00 — CEO DISABLED: bb_bounce, volume_hl, atr_compression, wyckoff (all 0% WR 48h). BB_BOUNCE was re-enabled after false "fix" — bug_hunter fix didn't stick.
-- [ ] 2026-08-05 05:00 — Keep live trading PAUSED until WR > 10%
-- [ ] 2026-08-05 05:00 — DELEGATE to signal_analyst: Find NEW signal ideas (all current signals failing)
+- [x] 2026-08-05 05:00 — Keep live trading PAUSED until WR > 10%
+- [x] 2026-08-05 05:00 — DELEGATE to signal_analyst: Find NEW signal ideas (all current signals failing)
+
+## CEO DECISIONS (2026-08-05 07:15)
+- [x] 2026-08-05 07:15 — CRITICAL: signals_runner.py bypassing *_ENABLED flags — bb_bounce fired 2 trades while DISABLED
+- [x] 2026-08-05 07:15 — Close ENS SHORT and ETH LONG (bb_bounce disabled)
+- [x] 2026-08-05 07:15 — Keep live trading PAUSED until WR > 10%
+
+## CEO DECISIONS (2026-08-05 07:50)
+- [x] 2026-08-05 07:50 — KEEP LIVE TRADING PAUSED until WR > 10% for 48h
+- [x] 2026-08-05 07:50 — DELEGATE to bug_hunter: Investigate signal decay pattern — why do all signals lose WR within 24-48h?
+- [x] 2026-08-05 07:50 — DELEGATE to signal_analyst: Build NEW signal family — current signals are all failing
+- [x] 2026-08-05 07:50 — DELEGATE to self_learner: Disable all signals with 0% WR for 48h (bb_bounce, zscore-rising±, vel-hermes-, pattern_wolf, accel-300-breakout)
+- [ ] 2026-08-05 07:50 — DELEGATE to bug_hunter: Fix candles.db staleness — some tokens have 69-day-old data
+- [ ] 2026-08-05 07:50 — Close ENS SHORT and ETH LONG (open positions from before pause)
+
+## CEO DECISIONS (2026-08-05 08:20)
+- [x] 2026-08-05 08:20 — KEEP LIVE TRADING PAUSED until any signal >10% WR over 48h
+- [ ] 2026-08-05 08:20 — DELEGATE to bug_hunter: Signal decay root cause — all signals drop to 0% WR within 24-48h
+- [ ] 2026-08-05 08:20 — DELEGATE to signal_analyst: Build NEW signal family (current all failing)
+- [ ] 2026-08-05 08:20 — DELEGATE to self_learner: Relax zero-signal thresholds (VOL_MULT 5→2, atr_compression 5→3 bars, wyckoff simplify)
+- [x] 2026-08-05 08:20 — Close ENS SHORT (signal disabled, no edge)
+
+## CEO DECISIONS (2026-08-05 15:30)
+- [x] 2026-08-05 15:30 — KEEP LIVE TRADING PAUSED — no signal >10% WR, no new trades
+- [ ] 2026-08-05 15:30 — URGENT: All delegations from 08:20 appear incomplete — bug_hunter, signal_analyst, self_learner
