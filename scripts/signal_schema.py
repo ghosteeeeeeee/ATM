@@ -909,6 +909,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # bb_bounce (mean reversion for ranging markets)
+            if _comp == 'bb_bounce':
+                try:
+                    from hermes_constants import BB_BOUNCE_ENABLED
+                    if not BB_BOUNCE_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BB_BOUNCE_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2329,7 +2338,8 @@ def record_signal_outcome(token: str, direction: str,
     c = conn.cursor()
     try:
         if is_win is None:
-            is_win = float(pnl_usdt or 0) > 0
+            # Use pnl_pct (the value being stored) for consistency
+            is_win = float(pnl_pct or 0) > 0
         # Dedup: skip if same token+dir+pnl+trade_id recorded in last 5 min
         # NULL trade_id: match only if both are NULL (SQL NULL = NULL is falsy)
         if trade_id is not None:

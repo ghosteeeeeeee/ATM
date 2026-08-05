@@ -813,7 +813,7 @@ ACCEL_300_PLUS_ENABLED        = True  # AUTO-ROTATED 2026-08-05  # self_learner 
 ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-04 21:05 — 15% WR, -$1.26 in 7d. No SHORT edge.
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
-INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$2.34 in 7d. In NEVER_REENABLE.
+INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
 COUNTER_FLIP_PLUS_ENABLED     = True    # counter_flip+ LONG
 COUNTER_FLIP_MINUS_ENABLED    = True    # counter_flip- SHORT
 HMACD_MTF_PLUS_ENABLED        = True    # hmacd_mtf+ LONG
@@ -846,7 +846,7 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = False  # CEO 2026-08-05 — 0% WR (48h), re-enabled after false "fix". DISABLED.
+BB_BOUNCE_ENABLED = True  # Re-enabled 2026-08-05. Backtest: 48% WR, PF 1.15. LOOSE_V1 params.
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
