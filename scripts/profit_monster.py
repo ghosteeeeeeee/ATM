@@ -183,7 +183,19 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
             try:
                 from signal_schema import record_signal_outcome
                 actual_pnl_pct = float(pnl_pct or 0)
-                actual_pnl_usdt = float(pnl_pct or 0) / 100 * float(amount or 11) * float(leverage or 5)
+                # Fetch hl_notional_usdt from PostgreSQL for accurate PnL calculation
+                try:
+                    import psycopg2
+                    from _secrets import BRAIN_DB_DICT
+                    _conn = psycopg2.connect(**BRAIN_DB_DICT)
+                    _cur = _conn.cursor()
+                    _cur.execute("SELECT hl_notional_usdt FROM trades WHERE id=%s", (trade_id,))
+                    _row = _cur.fetchone()
+                    _conn.close()
+                    notional = float(_row[0]) if _row and _row[0] else 11.0
+                except Exception:
+                    notional = 11.0
+                actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
                 record_signal_outcome(
                     token=token,
                     direction=direction,
