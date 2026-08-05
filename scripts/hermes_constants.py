@@ -767,7 +767,7 @@ MA_CROSS_MINUS_ENABLED    = True
 MA_CROSS_5M_ENABLED       = False
 MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blacklist
 MA_CROSS_5M_MINUS_ENABLED = False
-TL_BREAK_ENABLED         = False   # CEO KILLED 2026-08-04 21:05 — 13%/21% WR, -$18.58 in 7d. Biggest loser. 327 trades, no edge.
+TL_BREAK_ENABLED         = True   # Re-enabled 2026-08-05. WR=41% (83 trades 7d), +$0.76. Best performer.
 ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
@@ -846,7 +846,7 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = True  # Re-enabled 2026-08-05. WR=40% (6/15), LOOSE_V1 params.
+BB_BOUNCE_ENABLED = False  # CEO KILLED PERMANENTLY 2026-08-05 22:00 — 3rd bypass regression. No re-enable without CEO approval.
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
@@ -991,7 +991,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Fires when z-score CROSSES above threshold AND is rising (velocity > 0).
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
-ZSCORE_RISING_ENABLED     = False  # CEO 2026-08-04 — KILLED. 0% WR (31 trades 7d), -$2.83. Dynamic inversion didn't help.
+ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_PLUS_ENABLED = False # CEO 2026-08-04 — re-enabled with dynamic inversion active
 ZSCORE_RISING_MINUS_ENABLED = False # CEO 2026-08-04 — re-enabled with dynamic inversion (SHORT→LONG auto-invert when WR<30%)
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
