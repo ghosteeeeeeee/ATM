@@ -1,4 +1,4 @@
-# CEO Report — 2026-08-05 23:45
+# CEO Report — 2026-08-05 23:50
 
 ## System Status
 - **Pipeline:** inactive (normal — paused for signal rebuild)
@@ -9,7 +9,7 @@
 ## Key Findings
 1. **pattern_wolf_wave_bear signals are OLD** (Aug 4) — kill switch working correctly
 2. **decider signals** — from ai_decider.py (deprecated), not a new regression
-3. **New signals deployed:** vortex_break + return_exhaustion (disabled, need paper testing)
+3. **vortex_break + return_exhaustion BLOCKED** — master kill-switches preventing signals
 
 ## 24h Performance (from earlier today)
 - **tl_break_long:** 100% WR (14 trades) — **strongest signal**
@@ -20,16 +20,16 @@
 **KEEP LIVE TRADING PAUSED** — no change.
 
 **Reasoning:**
-- New signals (vortex_break, return_exhaustion) deployed but untested
-- Need 48h paper trading before live deployment
-- Current signal family shows improvement (53.8% WR today vs 3.1% yesterday)
+- New signals (vortex_break, return_exhaustion) blocked by master kill-switches
+- Cannot paper trade without enabling signals
+- Need to enable with HIGH confidence threshold (95+) to observe best setups only
 
 ## Delegation Required
 | Task | Delegate To | Priority |
 |------|-------------|----------|
-| Paper trade vortex_break 48h | self_learner | HIGH |
-| Paper trade return_exhaustion 48h | self_learner | HIGH |
+| Enable vortex_break with conf≥95 | self_learner | HIGH |
+| Enable return_exhaustion with conf≥95 | self_learner | HIGH |
 | Monitor tl_break_long performance | CEO | MEDIUM |
 
 ## Next Review
-Tomorrow 08:00 UTC — verify new signals paper tested, check tl_break_long sustained performance.
+Tomorrow 08:00 UTC — verify new signals enabled with high threshold, check tl_break_long sustained performance.
