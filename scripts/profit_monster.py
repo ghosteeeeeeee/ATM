@@ -195,16 +195,16 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                         _row = _cur.fetchone()
                         if _row:
                             notional = float(_row[0]) if _row[0] else 11.0
-                            _signal_type = _row[1] or 'decider'
+                            _signal_type = _row[1] or 'unknown'
                             _confidence = float(_row[2]) if _row[2] else 80
                         else:
-                            _signal_type = 'decider'
+                            _signal_type = 'unknown'
                             _confidence = 80
                     finally:
                         try: _conn.close()
                         except: pass
                 except Exception:
-                    _signal_type = 'decider'
+                    _signal_type = 'unknown'
                     _confidence = 80
                 actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
                 record_signal_outcome(

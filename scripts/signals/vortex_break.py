@@ -289,8 +289,8 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
 
     vi_plus, vi_minus = vi_result
 
-    # Look for crossover in last 3 candles and check if it passes all phases
-    for i in range(-3, 0):
+    # Look for crossover in last 5 candles and check if it passes all phases
+    for i in range(-5, 0):
         if vi_plus[i] is None or vi_minus[i] is None:
             continue
         if vi_plus[i-1] is None or vi_minus[i-1] is None:

@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-05 17:53 UTC
+# Signal Rotation — 2026-08-05 21:48 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -7,9 +7,9 @@
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
 | 1 | tl_break_long | 41% | 0.359 | 0.359 | ✅ | DISABLE |
-| 2 | accel-300+ | 40% | 0.068 | 0.068 | ✅ | DISABLE |
+| 2 | accel-300+ | 40% | 0.068 | 0.068 | ❌ |  |
 | 3 | accel-300-vel- | 33% | 0.058 | 0.058 | ❌ |  |
-| 4 | zscore-rising+ | 41% | 0.028 | 0.043 | ❌ |  |
+| 4 | zscore-rising+ | 41% | 0.028 | 0.043 | ✅ | DISABLE |
 | 5 | vel-hermes- | 38% | -0.007 | -0.007 | ❌ |  |
 | 6 | accel-300-vel+ | 27% | -0.031 | -0.031 | ❌ |  |
 | 7 | accel-300- | 40% | -0.031 | -0.031 | ❌ |  |
@@ -18,9 +18,9 @@
 | 10 | tl_break_short | 42% | -0.086 | -0.086 | ✅ |  |
 | 11 | inv-accel-300- | 43% | -0.100 | -0.100 | ❌ |  |
 | 12 | pattern_wolf_wave_bear | 20% | -0.147 | -0.147 | ❓ |  |
-| 13 | zscore-rising- | 46% | -0.137 | -0.205 | ❌ |  |
-| 14 | bb_bounce | 47% | -0.352 | -0.352 | ❌ |  |
+| 13 | zscore-rising- | 46% | -0.137 | -0.205 | ✅ |  |
+| 14 | bb_bounce | 47% | -0.352 | -0.352 | ✅ |  |
 
 ## Changes Applied
 - **DISABLE**: TL_BREAK_PLUS_ENABLED (WR=41%, edge=0.359, bleeding capital)
-- **DISABLE**: ACCEL_300_PLUS_ENABLED (WR=40%, edge=0.068, bleeding capital)
+- **DISABLE**: ZSCORE_RISING_PLUS_ENABLED (WR=41%, edge=0.028, bleeding capital)

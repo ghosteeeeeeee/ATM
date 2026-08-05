@@ -2325,7 +2325,7 @@ def clear_cooldown_entry(token: str, direction: str) -> bool:
 
 def record_signal_outcome(token: str, direction: str,
                           pnl_pct: float, pnl_usdt: float,
-                          signal_type: str = 'decider',
+                          signal_type: str = 'unknown',
                           confidence: float = None,
                           is_win: bool = None,
                           trade_id: int = None) -> bool:

@@ -297,7 +297,7 @@ def detect_return_exhaustion(token: str, prices: list) -> Optional[Dict]:
             if _token_reg == 'SHORT_BIAS' and direction == 'LONG':
                 return None
             if _token_reg == 'NEUTRAL':
-                regime_penalty = 10
+                pass  # No penalty for neutral regime — only block contradictions
     except Exception:
         pass
 

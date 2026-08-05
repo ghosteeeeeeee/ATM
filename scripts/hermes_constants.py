@@ -259,9 +259,7 @@ SIGNAL_SOURCE_BLACKLIST = {
     # 2026-08-03: BLOCK pattern_scanner — 0% WR (0/6), -$0.55 in 24h. No flag mapping
     # in decay detector, blocking at source level is the only kill mechanism.
     'pattern_scanner',
-    # 2026-08-05: BLOCK bb_bounce — 0% WR, 3 regressions via signal_rotator.
-    # Permanently dead. BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS + source blacklist.
-    'bb_bounce',
+    # bb_bounce re-enabled 2026-08-05 by T — WR=50% after data corruption fix
     # 2026-08-05: BLOCK pattern_wolf — 0% WR (10 trades 7d), -$1.38. No edge found.
     # All variants: pattern_wolf, pattern_wolf_wave_bull, pattern_wolf_wave_bear.
     'pattern_wolf',
@@ -668,7 +666,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_VELOCITY_MINUS_ENABLED', # permanently dead
     'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
     'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
-    'BB_BOUNCE_ENABLED',          # CEO 2026-08-05 — 0% WR (3 regressions), permanently disabled
+    # BB_BOUNCE re-enabled 2026-08-05 by T — WR=50% after data corruption fix
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -830,7 +828,7 @@ EMA20_50_PLUS_ENABLED         = False    # ema20_50+ LONG
 EMA20_50_MINUS_ENABLED        = False    # ema20_50- SHORT
 MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
-ACCEL_300_PLUS_ENABLED        = False  # AUTO-ROTATED 2026-08-05 # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
+ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-04 21:05 — 15% WR, -$1.26 in 7d. No SHORT edge.
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
@@ -842,7 +840,7 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_PLUS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_MINUS_ENABLED              = False  # disabled while testing inverse_accel_300
-TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
+TL_BREAK_PLUS_ENABLED         = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
@@ -1013,7 +1011,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_PLUS_ENABLED = True   # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_MINUS_ENABLED = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
@@ -1170,4 +1168,4 @@ VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for pap
 RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
-RETURN_EXHAUSTION_MIN_CONFIDENCE = 80  # CEO 2026-08-05 — lowered from 95 for paper testing
+RETURN_EXHAUSTION_MIN_CONFIDENCE = 70  # 2026-08-05 — lowered from 80 (TNSR p=3.4 conf=74, ARB p=98.1 conf=77 both blocked)

@@ -732,7 +732,7 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
                 AND created_at > datetime('now', '-5 minutes')
             """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
             if c.fetchone():
-                log(f"[Signal Quality] Dedup: {signal_type or 'decider'} {direction} {token} "
+                log(f"[Signal Quality] Dedup: {signal_type or 'unknown'} {direction} {token} "
                       f"already recorded recently, skipping")
                 return
             c.execute("""
@@ -740,11 +740,11 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
                     (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (token.upper(), direction.upper(),
-                  signal_type or 'decider', is_win,
+                  signal_type or 'unknown', is_win,
                   float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0),
                   trade_id))
             conn.commit()
-            log(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
+            log(f"[Signal Quality] {signal_type or 'unknown'} {direction} {token}: "
                   f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
         finally:
             conn.close()
@@ -1183,7 +1183,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 direction=direction,
                 pnl_pct=round(actual_pnl_pct, 4),
                 pnl_usdt=round(actual_pnl_usdt, 4),
-                signal_type=signal_type or 'decider',
+                signal_type=signal_type or 'unknown',
                 confidence=confidence,
                 trade_id=trade_id
             )

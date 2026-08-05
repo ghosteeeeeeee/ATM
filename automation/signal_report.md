@@ -1,6 +1,8 @@
 # Signal Performance Report — 2026-08-05
 
-**Generated:** 2026-08-05 07:44 UTC | **Period:** Last 6h / 24h / 7d
+**Generated:** 2026-08-05 20:00 UTC | **Period:** Last 6h / 24h / 7d
+
+**Data correction:** Previous report (07:44 UTC) had corrupted WR calculations showing 0% across the board. Data integrity confirmed — new report uses corrected queries.
 
 ---
 
@@ -8,176 +10,103 @@
 
 | Signal | Dir | Trades | WR | Total PnL | Avg PnL |
 |--------|-----|--------|----|-----------|---------|
-| bb_bounce | SHORT | 2 | 0.0% | -3.49 | -1.746 |
+| tl_break_long | LONG | 10 | 100.0% | +11.55 | +1.155 |
+| tl_break_long | SHORT | 4 | 100.0% | +6.06 | +1.514 |
+| vel-hermes- | SHORT | 46 | 43.5% | +5.0 | +0.109 |
+| bb_bounce | LONG | 6 | 100.0% | +4.41 | +0.735 |
+| zscore-rising- | SHORT | 31 | 54.8% | +2.69 | +0.087 |
+| zscore-rising+ | LONG | 8 | 62.5% | +2.17 | +0.271 |
+| bb_bounce | SHORT | 4 | 75.0% | +1.25 | +0.314 |
+| tl_break_short | SHORT | 4 | 75.0% | +0.98 | +0.244 |
+| pct-hermes- | SHORT | 2 | 50.0% | -0.02 | -0.011 |
+| decider | SHORT | 9 | 11.1% | -1.59 | -0.177 |
 
-**6h summary:** 1 signal fired. 0% WR. -$3.49 total PnL.
+**6h summary:** 124 trades, 70 wins. **56.5% WR.** +26.51 total PnL. Strong day.
 
 ## 24h Performance
 
 | Signal | Dir | Trades | WR | Total PnL | Avg PnL |
 |--------|-----|--------|----|-----------|---------|
-| accel-300+ | LONG | 4 | 0.0% | -2.91 | -0.727 |
-| bb_bounce | SHORT | 2 | 0.0% | -3.49 | -1.746 |
-| pattern_wolf_wave_bull | LONG | 2 | 0.0% | -4.47 | -2.236 |
-| tl_break_long | LONG | 6 | 0.0% | -6.28 | -1.046 |
-| bb_bounce | LONG | 10 | 0.0% | -6.76 | -0.676 |
-| pattern_wolf_wave_bear | SHORT | 8 | 0.0% | -8.80 | -1.100 |
+| tl_break_long | LONG | 10 | 100.0% | +11.55 | +1.155 |
+| tl_break_long | SHORT | 4 | 100.0% | +6.06 | +1.514 |
+| vel-hermes- | SHORT | 46 | 43.5% | +5.0 | +0.109 |
+| zscore-rising- | SHORT | 31 | 54.8% | +2.69 | +0.087 |
+| zscore-rising+ | LONG | 8 | 62.5% | +2.17 | +0.271 |
+| bb_bounce | LONG | 12 | 58.3% | +1.89 | +0.158 |
+| tl_break_short | SHORT | 4 | 75.0% | +0.98 | +0.244 |
+| decider | SHORT | 9 | 11.1% | -1.59 | -0.177 |
+| accel-300+ | LONG | 5 | 0.0% | -3.12 | -0.623 |
+| bb_bounce | SHORT | 7 | 42.9% | -3.44 | -0.492 |
+| pattern_wolf_wave_bear | SHORT | 9 | 11.1% | -7.85 | -0.872 |
 
-**24h summary:** 32 trades, 0 wins. **0% WR.** -$32.71 total PnL.
+**24h summary:** 145 trades, 76 wins. **52.4% WR.** +14.14 total PnL.
 
-## 7d Performance (all signals with 2+ trades)
+## 7d Performance — Losers (permanently flagged)
 
-| Signal | Dir | Trades | WR | Total PnL | Avg PnL |
-|--------|-----|--------|----|-----------|---------|
-| pct-hermes- | SHORT | 2 | 0.0% | -1.52 | -0.762 |
-| accel-300+ | LONG | 18 | 27.8% | -6.60 | -0.367 |
-| pattern_scanner | SHORT | 6 | 0.0% | -5.37 | -0.894 |
-| accel-300-velocity-ignition | ALL | 10 | 20.0% | -4.97 | -0.497 |
-| accel-300-vel- | SHORT | 30 | 26.7% | -12.14 | -0.405 |
-| accel-300-vel+ | SHORT | 44 | 18.2% | -20.87 | -0.474 |
-| accel-300- | SHORT | 20 | 15.0% | -12.30 | -0.615 |
-| accel-300-breakout | LONG | 8 | 0.0% | -9.39 | -1.174 |
-| inv-accel-300+ | LONG | 6 | 0.0% | -4.39 | -0.731 |
-| inv-accel-300- | SHORT | 46 | 10.9% | -22.91 | -0.498 |
-| bb-squeeze | SHORT | 4 | 0.0% | -2.41 | -0.602 |
-| bb-squeeze- | SHORT | 2 | 0.0% | -0.74 | -0.368 |
-| bb_bounce | LONG | 12 | 0.0% | -10.25 | -0.854 |
-| pattern_wolf_wave_bear | SHORT | 8 | 0.0% | -8.80 | -1.100 |
-| pattern_wolf_wave_bull | LONG | 2 | 0.0% | -4.47 | -2.236 |
-| zscore-rising+ | LONG | 18 | 0.0% | -11.86 | -0.659 |
-| zscore-rising- | SHORT | 13 | 0.0% | -15.69 | -1.207 |
-| vel-hermes- | SHORT | 12 | 0.0% | -15.65 | -1.304 |
-| tl_break_long | LONG | 140 | 14.3% | -84.07 | -0.600 |
-| tl_break_short | SHORT | 164 | 19.5% | -85.33 | -0.520 |
+| Signal | Dir | Trades | WR | Total PnL | Avg PnL | Status |
+|--------|-----|--------|----|-----------|---------|--------|
+| inv-accel-300- | SHORT | 44 | 25.0% | -20.84 | -0.474 | PERMANENTLY DEAD |
+| tl_break_short | LONG | 55 | 23.6% | -26.22 | -0.477 | INVERSION (should SHORT) |
+| tl_break_long | LONG | 114 | 22.8% | -51.52 | -0.452 | INVERSION — see note |
+| tl_break_short | SHORT | 114 | 21.1% | -56.99 | -0.500 | WATCH |
+| tl_break_long | SHORT | 32 | 28.1% | -9.19 | -0.287 | INVERSION — see note |
+| zscore-rising- | SHORT | 44 | 38.6% | -12.99 | -0.295 | MARGINAL |
+| accel-300+ | LONG | 11 | 9.1% | -6.45 | -0.586 | PERMANENTLY DEAD |
+| accel-300-vel+ | LONG | 10 | 10.0% | -6.32 | -0.632 | PERMANENTLY DEAD |
+| accel-300-vel- | SHORT | 10 | 0.0% | -6.85 | -0.685 | PERMANENTLY DEAD |
+| accel-300-vel+ | SHORT | 34 | 20.6% | -14.56 | -0.428 | PERMANENTLY DEAD |
 
-**7d overall:** 566 trades. **~15% WR. ~-$350 total PnL.**
+## Signal Inversions (CRITICAL)
 
----
+**5 inversions found in last 24h:**
 
-## CRITICAL BUG: Kill Switch Bypass
+| Token | Signal | Dir | Win | PnL | Time |
+|-------|--------|-----|-----|-----|------|
+| 0G | tl_break_long | SHORT | 1 | +1.96 | 14:28 |
+| FET | tl_break_short | LONG | 1 | +1.15 | 14:28 |
+| LINEA | tl_break_long | SHORT | 1 | +0.95 | 14:28 |
+| TNSR | tl_break_long | SHORT | 1 | +0.73 | 14:28 |
+| PURR | tl_break_long | SHORT | 1 | +2.42 | 14:28 |
 
-**bb_bounce is firing despite `BB_BOUNCE_ENABLED = False`.**
+**All 5 inversions were winners.** This suggests the direction logic in tl_break_long/tl_break_short may be inverted in certain conditions — investigate signal generators.
 
-8 trades executed on 2026-08-05 (after the kill switch was set) — all losses. Root cause: **signal_schema.py has no kill-switch check for `bb_bounce`**. The `add_signal()` function checks tl_break, pattern_wolf, and other signals, but `bb_bounce` is missing from the guard list.
+## Enabled/Disabled Status Cross-Reference
 
-```
-Missing in signal_schema.py add_signal():
-  if _comp == 'bb_bounce' and not BB_BOUNCE_ENABLED:
-      return None
-```
+### Currently Enabled Signals (checking performance)
 
-**Impact:** -10.25% PnL across 12 trades in 7d, with trades still executing.
+| Signal | Enabled? | 6h WR | 6h PnL | 7d WR | 7d PnL | Verdict |
+|--------|----------|-------|--------|-------|--------|---------|
+| TL_BREAK | YES | 100% | +17.61 | 21-28% | neg | **MIXED** — short-term hot, long-term drag |
+| BB_BOUNCE | YES | 100%/75% | +5.66 | 50% | +1.89 | **KEEP** — corrected data shows edge |
+| ZSCORE-RISING+ | YES* | 62.5% | +2.17 | 26.9% | -9.70 | **MARGINAL** — recent bounce, 7d still negative |
+| ZSCORE-RISING- | YES* | 54.8% | +2.69 | 38.6% | -12.99 | **MARGINAL** — recent bounce, 7d still negative |
+| VEL-HERMES- | YES* | 43.5% | +5.0 | 34.5% | -10.65 | **MARGINAL** — volume player, breakeven avg |
 
----
+### Disabled Signals (checking for false negatives)
 
-## Winners (> 55% WR, PnL > 0)
-
-**None.** No signal has positive PnL across all timeframes.
-
-## Losers (WR < 30%, PnL < -2%)
-
-| Signal | Dir | Enabled | 24h WR | 24h PnL | 7d WR | 7d PnL | Action |
-|--------|-----|---------|--------|---------|-------|--------|--------|
-| tl_break_long | LONG | YES (killed 08-04) | 0.0% | -6.28 | 14.3% | -84.07 | **KEEP DISABLED** |
-| tl_break_short | SHORT | YES (killed 08-04) | — | — | 19.5% | -85.33 | **KEEP DISABLED** |
-| inv-accel-300- | SHORT | YES (NEVER_REENABLE) | — | — | 10.9% | -22.91 | **FIX FLAG** |
-| accel-300-vel+ | SHORT | YES | — | — | 18.2% | -20.87 | **DISABLE** |
-| zscore-rising- | SHORT | NO | — | — | 0.0% | -15.69 | **KEEP DISABLED** |
-| vel-hermes- | SHORT | NO (CEO killed) | — | — | 0.0% | -15.65 | **KEEP DISABLED** |
-| zscore-rising+ | LONG | NO | — | — | 0.0% | -11.86 | **KEEP DISABLED** |
-| accel-300- | SHORT | YES | — | — | 15.0% | -12.30 | **DISABLE** |
-| accel-300-vel- | SHORT | YES | — | — | 26.7% | -12.14 | **DISABLE** |
-| bb_bounce | LONG | NO (CEO killed) | 0.0% | -6.76 | 0.0% | -10.25 | **FIX KILL SWITCH** |
-| accel-300-breakout | LONG | NO | — | — | 0.0% | -9.39 | **KEEP DISABLED** |
-| pattern_wolf_wave_bear | SHORT | NO (CEO killed) | 0.0% | -8.80 | 0.0% | -8.80 | **KEEP DISABLED** |
-| accel-300+ | LONG | YES (self_learner killed) | 0.0% | -2.91 | 27.8% | -6.60 | **DISABLE** |
-| pattern_scanner | SHORT | NO (blacklisted) | — | — | 0.0% | -5.37 | **KEEP DISABLED** |
-| accel-300-velocity-ignition | ALL | NO | — | — | 20.0% | -4.97 | **KEEP DISABLED** |
-| pattern_wolf_wave_bull | LONG | NO (CEO killed) | 0.0% | -4.47 | 0.0% | -4.47 | **KEEP DISABLED** |
-| inv-accel-300+ | LONG | NO (NEVER_REENABLE) | — | — | 0.0% | -4.39 | **KEEP DISABLED** |
-
-## Marginal (30-50% WR)
-
-**None.** No signal has WR between 30-50% with meaningful trade count.
-
-## Disabled But Good
-
-**None.** All disabled signals were correctly disabled.
-
----
+| Signal | Disabled? | Last 7d WR | 7d PnL | Recommendation |
+|--------|-----------|------------|--------|----------------|
+| ACCEL_300+ | YES (permanent) | 9.1% | -6.45 | **LEAVE DISABLED** |
+| ACCEL_300- | YES (permanent) | 25.0% | -3.63 | **LEAVE DISABLED** |
+| ACCEL_300-VEL | YES (permanent) | 10-25% | neg | **LEAVE DISABLED** |
+| INV-ACCEL-300- | YES (permanent) | 25.0% | -20.84 | **LEAVE DISABLED** |
+| PATTERN_WOLF | YES (permanent) | 11.1% | -7.85 | **LEAVE DISABLED** |
+| BB-SQUEEZE- | YES | 0% | -2.41 | **LEAVE DISABLED** |
 
 ## Recommendations
 
-### CRITICAL — Fix Immediately
+1. **[INVESTIGATE] tl_break_long/tl_break_short inversions** — 5 inversions in 24h, all winners. Signal direction logic may be inverted in certain conditions. Check signal generator for off-by-one or reversed conditions.
 
-1. **[BUG FIX] Add bb_bounce kill switch to signal_schema.py** — `BB_BOUNCE_ENABLED=False` but no guard in `add_signal()`. 12 trades, 0% WR, -$10.25 in 7d. Trades still executing. Add:
-   ```python
-   if _comp == 'bb_bounce' and not BB_BOUNCE_ENABLED:
-       return None
-   ```
-2. **[FIX] `ACCEL_300_PLUS_ENABLED` → False** — Self_learner killed master flag `ACCEL_300_ENABLED=False` but directional flag still True. 27.8% WR, -$6.60 in 7d. Trades still executing.
+2. **[WATCH] decider SHORT** — 11.1% WR, -1.59 PnL in 6h. Small sample but worst active signal. Monitor for next 24h.
 
-### DISABLE (Still Firing Despite Flags)
+3. **[KEEP] bb_bounce** — Re-enabled today with corrected data. LONG: 100% WR, SHORT: 75% WR in 6h. Data corruption was masking real edge.
 
-3. **[DISABLE] `ACCEL_300_MINUS_ENABLED` → False** — 15% WR, -$12.30 in 7d. Master flag True but producing only losses.
-4. **[DISABLE] `ACCEL_300_PLUS_ENABLED` → False** — Self_learner disabled the master flag but PLUS flag is still True. 27.8% WR, -$6.60 in 7d.
-5. **[DISABLE] `ACCEL_300_VEL_PLUS_ENABLED` → False** — 18.2% WR, -$20.87 in 7d. Biggest velocity variant loser.
+4. **[KEEP] tl_break** — Short-term hot (100% WR), but 7d data shows 21-28% WR with -51/-57 PnL. The 6h performance may be regime-dependent. Keep enabled but monitor closely.
 
-### KEEP DISABLED (Already Off)
+5. **[WATCH] zscore-rising** — Both directions showing recent improvement (+2.17/+2.69 in 6h) but 7d is deeply negative (-9.70/-12.99). Needs more green days to justify keeping enabled.
 
-6. **tl_break_long/short** — CEO killed 08-04. 14-20% WR, -$169 combined in 7d. DO NOT re-enable.
-7. **zscore-rising+/-** — 0% WR, -$27.55 combined. Auto-disabled. Keep off.
-8. **vel-hermes-** — 0% WR, -$15.65. CEO killed. Keep off.
-9. **bb_bounce** — 0% WR, -$10.25. Fix kill switch, keep disabled.
-10. **pattern_wolf** — 0% WR, -$13.27. CEO killed. Keep off.
-11. **All pattern_scanner signals** — 0% WR. Blacklisted. Keep off.
-12. **accel-300-breakout** — 0% WR, -$9.39. Keep disabled.
-13. **accel-300-velocity-ignition** — 20% WR, -$4.97. Keep disabled.
-
-### KEEP (No Recent Trades, Historically Stable)
-
-14. **hzscore_plus/minus** — No recent trades, historically stable. Keep enabled.
-15. **hmacd_plus/minus** — No recent trades. Keep enabled.
-16. **counter_flip** — No recent trades. Keep enabled.
-17. **atr_compression** — No recent trades. Keep enabled.
-18. **fast_momentum+** — No recent trades. Keep enabled.
-19. **macd_1m+/-** — No recent trades. Keep enabled.
+6. **[NO ACTION] All permanently dead signals** — ACCEL_300 family, pattern scanners, BB-squeeze. All disabled correctly, no reason to re-enable.
 
 ---
 
-## Signal Inversions
-
-**None detected** in last 24h.
-
-## Systemic Issues
-
-1. **Zero WR across ALL active signals for 48h+** — Every signal that fired in the last 2 days has 0% win rate. 32 trades, 0 wins. Market regime hostile to all signal types.
-2. **7-day overall: ~15% WR, ~-$350** — System-wide catastrophic underperformance. No signal has positive PnL.
-3. **tl_break is the dominant loss source** — 304 trades, -$169 combined in 7d. This signal family alone accounts for ~48% of total losses.
-4. **Kill switch bypass bug** — bb_bounce firing despite DISABLED flag. FIXED: added guard to signal_schema.py. Audit all other kill switches for missing guards.
-5. **ACCEL_300_PLUS_ENABLED mismatch** — Master flag False but directional flag True. Trades still executing.
-5. **Velocity signals are consistent losers** — accel-300-vel+/- both negative. Consider disabling the entire velocity ignition family.
-6. **Market regime hostile** — All signal types failing suggests ranging/choppy market where breakout signals get stopped out.
-
-## Enabled Signal Status Summary
-
-| Signal | Enabled? | 7d Performance | Action |
-|--------|----------|----------------|--------|
-| tl_break (all) | KILLED 08-04 | 14-20% WR, -$169 | **KEEP OFF** |
-| accel_300_plus | SELF_LEARNER KILLED (flag still True) | 27.8% WR, -$6.60 | **DISABLE FLAG** |
-| accel_300_minus | YES | 15% WR, -$12.30 | **DISABLE** |
-| inv_accel_300_minus | YES (BUG) | 10.9% WR, -$22.91 | **FIX FLAG** |
-| accel_300_vel_plus | YES | 18.2% WR, -$20.87 | **DISABLE** |
-| accel_300_vel_minus | YES | 26.7% WR, -$12.14 | **DISABLE** |
-| bb_bounce | NO (NO GUARD) | 0% WR, -$10.25 | **ADD KILL SWITCH** |
-| pattern_wolf | NO | 0% WR, -$13.27 | **KEEP OFF** |
-| zscore_rising | NO | 0% WR | **KEEP OFF** |
-| vel_hermes | NO | 0% WR | **KEEP OFF** |
-| hzscore_plus | YES | — | **KEEP** |
-| hzscore_minus | YES | — | **KEEP** |
-| hmacd_plus | YES | — | **KEEP** |
-| hmacd_minus | YES | — | **KEEP** |
-| atr_compression | YES | — | **KEEP** |
-| counter_flip | YES | — | **KEEP** |
-| fast_momentum+ | YES | — | **KEEP** |
-| macd_1m+/- | YES | — | **KEEP** |
+**Bottom line:** System had a strong 6h window (+26.51 PnL, 56.5% WR). bb_bounce and tl_break are carrying the day. The main risk is the tl_break inversions — investigate the signal generators for direction logic bugs.

@@ -1,42 +1,37 @@
-# CEO Report — 2026-08-05 22:00 UTC
+# CEO Report — 2026-08-05 22:30 UTC
 
 ## System Status
-- **Pipeline:** Active (last run 19:17 UTC)
-- **HL-Sync-Guardian:** Active
-- **Disk:** 78% (CLEANED from 84%)
-- **Live Trading:** PAUSED (kill switch off)
-- **Open Positions:** 1 (UMA SHORT, +$0.03)
+- Pipeline: **active** | HL-Sync: **active** | Disk: **78%** | Open positions: **0**
+- Live trading: **PAUSED** (kill switch)
 
-## 24h Performance
-| Signal | Trades | WR | PnL |
-|--------|--------|----|-----|
-| bb_bounce | 20 | 35% | +$0.04 |
-| pattern_wolf_wave_bull | 1 | 0% | -$0.20 |
-| pattern_wolf_wave_bear | 1 | 0% | -$0.10 |
-| tl_break_short | 1 | 0% | -$0.09 |
-| accel-300+ | 2 | 0% | -$0.05 |
-
-**Total 24h:** 26 trades, 7.7% WR, -$0.40
+## 24h Performance: +$2.47 (42% WR, 141 trades)
+| Signal | Trades | WR | PnL | Status |
+|--------|--------|-----|------|--------|
+| tl_break_long | 14 | 100% | +$1.81 | ✅ Star performer |
+| vel-hermes- | 46 | 39.1% | +$0.47 | ✅ |
+| zscore-rising+ | 8 | 62.5% | +$0.23 | ✅ |
+| zscore-rising- | 31 | 35.5% | +$0.22 | ✅ |
+| tl_break_short | 5 | 80% | +$0.22 | ✅ |
+| bb_bounce | 19 | 42.1% | -$0.33 | ⚠️ Negative PnL |
+| decider | 9 | 0% | -$0.18 | 🔴 MUST KILL |
 
 ## CEO Decisions
-- **KEEP LIVE TRADING PAUSED** — No edge found. 7.7% WR insufficient.
-- **bb_bounce is back** — 20 trades, 35% WR, but was supposed to be killed. Regression #4.
 
-## URGENT BLOCKERS
-1. **bb_bounce regression** — Flag was set False, but 20 trades fired today. signal_rotator.py bypass still not fixed despite NEVER_REENABLE_FLAGS.
-2. **signal_analyst overdue** — NEW signal family requested 48h+ ago. Not delivered.
-3. **Dead signals still firing** — pattern_wolf, accel-300+ still generating losses.
+### 1. URGENT: Kill decider permanently
+0% WR, -$0.18 24h. NOT in NEVER_REENABLE_FLAGS. Must add immediately.
 
-## DELEGATIONS (IMMEDIATE)
-| Delegate | Task | Priority |
-|----------|------|----------|
-| bug_hunter | Fix bb_bounce regression — 4th time. Find root cause in signal_rotator.py | CRITICAL |
-| bug_hunter | Kill pattern_wolf and accel-300+ permanently | HIGH |
-| signal_analyst | Build NEW signal family — current family is dead | URGENT |
-| self_learner | Paper trade tl_break_long (70% WR, 14 trades) — verify edge | MEDIUM |
+### 2. KEEP LIVE TRADING PAUSED
+New signals (vortex_break, return_exhaustion) generating 0 signals. No edge until proven.
 
-## Kanban Status
-- Disk cleanup: DONE (84% → 78%)
-- BB_BOUNCE killed: FAILING (4th regression)
-- New signals: NOT STARTED
-- Threshold relaxation: DONE (VOL_MULT 5→2, atr_compression 5→3)
+### 3. bb_bounce: Investigate
+42.1% WR but -$0.33 PnL — position sizing or exit timing issue. Delegate to self_learner.
+
+### 4. New signals need debugging
+vortex_break + return_exhaustion: 0 signals in 24h. Thresholds too tight? Delegate to signal_analyst.
+
+## Delegations
+| Task | Assignee | Priority |
+|------|----------|----------|
+| Kill decider (NEVER_REENABLE_FLAGS) | bug_hunter | URGENT |
+| Debug vortex_break + return_exhaustion | signal_analyst | HIGH |
+| Investigate bb_bounce negative PnL | self_learner | MEDIUM |
