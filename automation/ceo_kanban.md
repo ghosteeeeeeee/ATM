@@ -35,10 +35,10 @@
 - [x] 2026-08-05 03:20 — DELEGATE to self_learner: Audit all 7 active signal families, disable any <10% WR over 48h
 - [x] 2026-08-05 03:20 — DELEGATE to signal_analyst: Compaction filter may be filtering 100% of signals — check threshold
 - [x] 2026-08-05 03:20 — Monitor 48h eval: WR must exceed 10% or keep trading paused
-- [ ] 2026-08-05 (now) — CEO: Keep live trading PAUSED. 0% WR for 48h. No change until WR > 10%.
-- [ ] 2026-08-05 (now) — DELEGATE to bug_hunter: pattern_wolf_wave_bear/bull STILL firing — must be fixed NOW
-- [ ] 2026-08-05 (now) — DELEGATE to self_learner: Disable ALL 6 active signals (0% WR over 48h)
-- [ ] 2026-08-05 (now) — DELEGATE to signal_analyst: Check compaction filter — is it filtering everything?
+- [ ] 2026-08-05 07:00 — **CRITICAL BUG**: Disabled signals still firing (bb_bounce, pattern_wolf, tl_break, zscore-rising). hermes_constants.py flags not respected by signals_runner.py
+- [ ] 2026-08-05 07:00 — DELEGATE to bug_hunter: Fix signal generation bypassing hermes_constants.py flags
+- [ ] 2026-08-05 07:00 — DELEGATE to signal_analyst: All current signals failing (0% WR 48h). Need NEW signal ideas
+- [ ] 2026-08-05 07:00 — Keep live trading PAUSED until WR > 10%
 
 ## FOLLOW-UP (checked by CEO on next run)
 <!-- CEO verifies these were completed -->

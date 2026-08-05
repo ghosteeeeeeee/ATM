@@ -712,7 +712,7 @@ ACCEL_300_BLOCK_COSIGS = {'ma-cross-5m+', 'pct-hermes+'}  # 16.7% / 35.7% WR
 # require stronger reversion confirmation. 0% WR on gap>=0.15% → cap at 0.8%.
 INVERSE_ACCEL_300_MIN_GAP_PCT_LONG = 1.5    # min gap below EMA300 to fire LONG (was 2.0 — low-vol market needs lower threshold)
 INVERSE_ACCEL_300_MIN_GAP_PCT_SHORT = 1.5   # min gap above EMA300 to fire SHORT (was 2.0 — same rationale)
-# NOTE: inv-accel-300- is DISABLED (INVERSE_ACCEL_300_MINUS_ENABLED=False  # AUTO-ROTATED 2026-08-04 ) but still executing
+# NOTE: inv-accel-300- is DISABLED (INVERSE_ACCEL_300_MINUS_ENABLED=False ) but still executing
 # due to kill switch bypass bug (25th consecutive analysis). Gap raised to 5.0%
 # as defense-in-depth — if signal fires despite kill switch, at least filter marginal entries.
 INVERSE_ACCEL_300_REVERSION_BARS = 2          # min bars of gap narrowing (was 3 — reduce starvation, let signal fire sooner)
@@ -809,7 +809,7 @@ EMA20_50_PLUS_ENABLED         = False    # ema20_50+ LONG
 EMA20_50_MINUS_ENABLED        = False    # ema20_50- SHORT
 MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
-ACCEL_300_PLUS_ENABLED        = False  # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
+ACCEL_300_PLUS_ENABLED        = True  # AUTO-ROTATED 2026-08-05  # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-04 21:05 — 15% WR, -$1.26 in 7d. No SHORT edge.
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
@@ -993,7 +993,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = False  # CEO 2026-08-04 — KILLED. 0% WR (31 trades 7d), -$2.83. Dynamic inversion didn't help.
 ZSCORE_RISING_PLUS_ENABLED = False # CEO 2026-08-04 — re-enabled with dynamic inversion active
-ZSCORE_RISING_MINUS_ENABLED = False  # AUTO-ROTATED 2026-08-04  # CEO 2026-08-04 — re-enabled with dynamic inversion (SHORT→LONG auto-invert when WR<30%)
+ZSCORE_RISING_MINUS_ENABLED = False # CEO 2026-08-04 — re-enabled with dynamic inversion (SHORT→LONG auto-invert when WR<30%)
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
 ZSCORE_RISING_VEL_BARS     = 5      # lookback for z-velocity (cur_z - z_N_bars_ago)
