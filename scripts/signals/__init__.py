@@ -52,6 +52,9 @@ from hermes_constants import (
     BOLLINGER_SQUEEZE_ENABLED,
     BB_BOUNCE_ENABLED,
     WYCKOFF_ENABLED,
+    # NEW signals — vortex_break, return_exhaustion
+    VORTEX_BREAK_ENABLED, VORTEX_BREAK_PLUS_ENABLED, VORTEX_BREAK_MINUS_ENABLED,
+    RETURN_EXHAUSTION_ENABLED, RETURN_EXHAUSTION_PLUS_ENABLED, RETURN_EXHAUSTION_MINUS_ENABLED,
 )
 
 
@@ -246,6 +249,16 @@ try:
 except Exception:
     _wyckoff_run = None
 
+try:
+    from signals.vortex_break import run as _vortex_break_run
+except Exception:
+    _vortex_break_run = None
+
+try:
+    from signals.return_exhaustion import scan_return_exhaustion_signals as _return_exhaustion_run
+except Exception:
+    _return_exhaustion_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -299,6 +312,8 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'bollinger_squeeze',   'enabled': BOLLINGER_SQUEEZE_ENABLED,      'run': _bollinger_squeeze_run},
     {'name': 'bb_bounce',           'enabled': BB_BOUNCE_ENABLED, 'run': _bb_bounce_run},  # CEO 2026-08-05: 0% WR, no edge
     {'name': 'wyckoff',             'enabled': WYCKOFF_ENABLED,               'run': _wyckoff_run},
+    {'name': 'vortex_break',        'enabled': VORTEX_BREAK_ENABLED,          'run': _vortex_break_run},
+    {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},
 ]
 
 
@@ -406,10 +421,12 @@ def run_all_signals(signal_list=None):
         'volume_hl': 'run', 'ma300_candle_confirm': 'run',
         'atr_compression': 'run',
         'exhaustion': 'run', 'counter_flip': 'run',
-        'tl_break': 'run', 'squeeze_cross': 'run',
+        'tl_break': 'run',         'squeeze_cross': 'run',
         'zscore_pump': 'scan_zscore_pump_signals',
         'mtp_zscore': 'scan_mtp_zscore_signals',
         'bollinger_squeeze': 'scan_bollinger_squeeze',
+        'vortex_break': 'run',
+        'return_exhaustion': 'scan_return_exhaustion_signals',
     }
     work = [
         (signal['name'], signal['run'].__name__)

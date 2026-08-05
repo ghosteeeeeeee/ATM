@@ -1133,3 +1133,19 @@ DECISION_LOG_ENABLED = True
 DECISION_LOG_PATH = '/root/.hermes/data/decisions.json'
 DECISION_LOG_MAX_ENTRIES = 1000
 DECISION_LOG_CACHE_TTL = 300
+
+# ── Vortex Break Signal (NEW 2026-08-05) ──────────────────────────────────────
+# vortex_break.py — Vortex Indicator + ADX trend confirmation
+# Uses true range (high-low) directional movement, not price closes.
+# Catches trend inception via VI crossover + ADX strength filter.
+VORTEX_BREAK_ENABLED = False   # master kill-switch — disabled by default
+VORTEX_BREAK_PLUS_ENABLED = True    # vortex_break+ LONG
+VORTEX_BREAK_MINUS_ENABLED = True   # vortex_break- SHORT
+
+# ── Return Exhaustion Signal (NEW 2026-08-05) ────────────────────────────────
+# return_exhaustion.py — percentile exhaustion + momentum divergence
+# Catches turning points when short-term returns are at statistical extremes
+# AND fast/slow momentum diverge (fast turning while slow hasn't caught up).
+RETURN_EXHAUSTION_ENABLED = False   # master kill-switch — disabled by default
+RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
+RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
