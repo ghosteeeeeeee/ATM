@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple
 sys.path.insert(0, '/root/.hermes/scripts')
 from hermes_file_lock import FileLock
+from hermes_log import log
 from hermes_constants import (
     MAX_OPEN_POSITIONS,
     DEFAULT_TRADE_SIZE_USDT,
@@ -33,6 +34,7 @@ from hermes_constants import (
     WRONG_SIDE_AVG_PCT_THRESH,
     CASCADE_FLIP_ENABLED,
     ATR_UPDATE_THRESHOLD,
+    TIME_EXIT_ENABLED, PEAK_EXIT_ENABLED,
 )
 from paths import *
 from _secrets import BRAIN_DB_DICT
@@ -48,7 +50,7 @@ try:
     from speed_tracker import SpeedTracker, get_token_speed
     SPEED_TRACKER = SpeedTracker()
 except Exception as e:
-    print(f"[Position Manager] SpeedTracker unavailable: {e}")
+    log(f"[Position Manager] SpeedTracker unavailable: {e}")
     SPEED_TRACKER = None
 
 # Speed feature: stale winner/loser exit logic
@@ -71,7 +73,7 @@ try:
     HYPE_AVAILABLE = True
 except Exception as e:
     HYPE_AVAILABLE = False
-    print(f"[Position Manager] Hyperliquid mirroring unavailable: {e}")
+    log(f"[Position Manager] Hyperliquid mirroring unavailable: {e}")
 
 # ─── DB Config ────────────────────────────────────────────────────────────────
 DB_CONFIG = BRAIN_DB_DICT
@@ -101,9 +103,9 @@ ATR_HL_ORDERS_ENABLED = False
 # The position_manager computes trailing SL and writes it to brain DB, but the
 # actual HL stop-loss order was never updated when trailing tightened.
 # cascade flip: close the losing position AND enter the opposite direction.
-CASCADE_FLIP_ARM_LOSS        = -0.10  # System ARMED at this loss % (speed check activates)
-CASCADE_FLIP_TRIGGER_LOSS   = -0.15  # FLIP fires at this loss % (if armed + speed increasing)
-CASCADE_FLIP_HF_TRIGGER_LOSS = -0.15  # Fast flip: high-momentum tokens (speed pctl > 80)
+CASCADE_FLIP_ARM_LOSS        = -0.05  # System ARMED at this loss % (was -0.10 — by then trade is deeply underwater)
+CASCADE_FLIP_TRIGGER_LOSS   = -0.08  # FLIP fires at this loss % (was -0.15 — too late to recover)
+CASCADE_FLIP_HF_TRIGGER_LOSS = -0.06  # Fast flip for high-momentum tokens (was -0.15 — too late)
 CASCADE_FLIP_MIN_CONF        = 60.0   # Opposite signal must have conf >= this % (lowered from 70)
 CASCADE_FLIP_MAX_AGE_M       = 30     # Opposite signal must be created within this many minutes (expanded from 15)
 CASCADE_FLIP_MIN_TYPES       = 1     # Opposite signal must have at least this many agreeing signal types
@@ -179,7 +181,7 @@ def _get_macd_1h_state(token: str) -> Optional[str]:
             return 'cross_over'
         return 'none'
     except Exception as e:
-        print(f"  [MACD 1H] {token} error: {e}")
+        log(f"  [MACD 1H] {token} error: {e}")
         return None
 
 
@@ -227,7 +229,7 @@ def get_db_connection():
         conn = psycopg2.connect(**DB_CONFIG)
         return conn
     except Exception as e:
-        print(f"[Position Manager] DB connection error: {e}")
+        log(f"[Position Manager] DB connection error: {e}")
         return None
 
 
@@ -261,7 +263,7 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
         rows = cur.fetchall()
         return [dict(r) for r in rows]
     except Exception as e:
-        print(f"[Position Manager] get_open_positions error: {e}")
+        log(f"[Position Manager] get_open_positions error: {e}")
         return []
     finally:
         conn.close()
@@ -284,7 +286,7 @@ def get_position_count(server: str = SERVER_NAME) -> int:
         row = cur.fetchone()
         return int(row["cnt"]) if row else 0
     except Exception as e:
-        print(f"[Position Manager] get_position_count error: {e}")
+        log(f"[Position Manager] get_position_count error: {e}")
         return 0
     finally:
         conn.close()
@@ -308,7 +310,7 @@ def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
         row = cur.fetchone()
         return int(row["cnt"]) > 0 if row else False
     except Exception as e:
-        print(f"[Position Manager] is_position_open error: {e}")
+        log(f"[Position Manager] is_position_open error: {e}")
         return False
     finally:
         conn.close()
@@ -551,7 +553,7 @@ def _ensure_signal_outcomes_table():
         conn.commit()
         conn.close()
     except Exception as e:
-        print(f"[Position Manager] signal_outcomes table error: {e}")
+        log(f"[Position Manager] signal_outcomes table error: {e}")
 
 
 def get_signal_streak(token: str, direction: str, signal_type: str = None) -> Dict:
@@ -618,7 +620,7 @@ def get_signal_streak(token: str, direction: str, signal_type: str = None) -> Di
             'last_was_win': rows[0][0] if rows else None
         }
     except Exception as e:
-        print(f"[Position Manager] get_signal_streak error: {e}")
+        log(f"[Position Manager] get_signal_streak error: {e}")
         return {'streak': 0, 'multiplier': 1.0, 'win_rate_20': 0.5, 'n': 0}
 
 
@@ -657,7 +659,7 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
         rows = c_sig.fetchall()
         conn_sig.close()
     except Exception as e:
-        print(f"[Position Manager] _bridge: failed to read signal_history: {e}")
+        log(f"[Position Manager] _bridge: failed to read signal_history: {e}")
         return
 
     if not rows:
@@ -700,11 +702,11 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
 
             conn_brain.commit()
             cur_brain.close()
-            print(f"[Position Manager] _bridge: wrote {len(rows)} patterns for {token} {direction} ({'WIN' if is_win else 'LOSS'})")
+            log(f"[Position Manager] _bridge: wrote {len(rows)} patterns for {token} {direction} ({'WIN' if is_win else 'LOSS'})")
         finally:
             conn_brain.close()
     except Exception as e:
-        print(f"[Position Manager] _bridge: failed to write to trade_patterns: {e}")
+        log(f"[Position Manager] _bridge: failed to write to trade_patterns: {e}")
 
 
 def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt: float,
@@ -730,7 +732,7 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
                 AND created_at > datetime('now', '-5 minutes')
             """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
             if c.fetchone():
-                print(f"[Signal Quality] Dedup: {signal_type or 'decider'} {direction} {token} "
+                log(f"[Signal Quality] Dedup: {signal_type or 'decider'} {direction} {token} "
                       f"already recorded recently, skipping")
                 return
             c.execute("""
@@ -742,12 +744,12 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
                   float(pnl_pct or 0), float(pnl_usdt or 0), float(confidence or 0),
                   trade_id))
             conn.commit()
-            print(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
+            log(f"[Signal Quality] {signal_type or 'decider'} {direction} {token}: "
                   f"{'WIN' if is_win else 'LOSS'} (conf={confidence}, pnl={pnl_pct:+.2f}%)")
         finally:
             conn.close()
     except Exception as e:
-        print(f"[Position Manager] _record_signal_outcome error: {e}")
+        log(f"[Position Manager] _record_signal_outcome error: {e}")
 
     # FIX (2026-04-22): Also write loss cooldowns to PostgreSQL so signal_gen's
     # get_cooldown() can find them. get_cooldown() checks JSON FIRST (streak-based)
@@ -794,7 +796,7 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
             cur_fetch.close()
             conn_fetch.close()
         except Exception as fetch_err:
-            print(f"[Position Manager] signal fetch fallback error: {fetch_err}")
+            log(f"[Position Manager] signal fetch fallback error: {fetch_err}")
 
 
     # Use net_pnl for win/loss and recording (or raw pnl_usdt if fees not available)
@@ -852,15 +854,15 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                           1 if is_win else 0, 0 if is_win else 1,
                           float(pnl_pct or 0), float(record_pnl or 0),
                           1 if is_win else 0))
-                    print(f"[Position Manager] AB UPSERT OK: test={test_name} variant={variant_id} is_win={is_win}")
+                    log(f"[Position Manager] AB UPSERT OK: test={test_name} variant={variant_id} is_win={is_win}")
                 except Exception as ue:
                     import traceback; traceback.print_exc()
-                    print(f"[Position Manager] AB UPSERT FAIL: test={test_name} variant={variant_id} — {ue}")
+                    log(f"[Position Manager] AB UPSERT FAIL: test={test_name} variant={variant_id} — {ue}")
             conn.commit()
             cur.close(); conn.close()
         except Exception as e:
             import traceback; traceback.print_exc()
-            print(f"[Position Manager] ab_results close error: {e}")
+            log(f"[Position Manager] ab_results close error: {e}")
 
         # ── Also write to ab-tests.jsonl for the dashboard ─────────────────────
         for test_name, variant_id in test_map.items():
@@ -874,13 +876,10 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
                         metric_value=float(pnl_pct or 0)
                     )
                 except Exception as ab_e:
-                    print(f"[Position Manager] ab_utils.record_ab_outcome error: {ab_e}")
+                    log(f"[Position Manager] ab_utils.record_ab_outcome error: {ab_e}")
 
-    # ── Signal Outcomes recording — ALWAYS (independent of A/B data) ─────────
-    # This feeds the self-learning streak system so even pre-A/B trades contribute
-    _record_signal_outcome(token, direction, pnl_pct, pnl_usdt,
-                          signal_type=signal_type, confidence=confidence,
-                          net_pnl=net_pnl, trade_id=trade_id)
+    # Signal outcomes recording moved to line ~1184 (record_signal_outcome from signal_schema)
+    # Loss cooldown handled there too — avoid double-recording to signal_outcomes
 
 
 def close_paper_position(trade_id: int, reason: str) -> bool:
@@ -998,12 +997,12 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 except Exception:
                     pass  # Keep pnl_usdt_val=0 if fallback also fails
         is_loss = pnl_usdt_val < 0
-        print(f"[Position Manager] close_paper_position trade_id={trade_id} reason='{reason}' "
+        log(f"[Position Manager] close_paper_position trade_id={trade_id} reason='{reason}' "
               f"pnl_usdt_val={pnl_usdt_val} is_loss={is_loss}")
         if is_loss:
-            print(f"[Position Manager] >>> LOSS DETECTED — calling set_loss_cooldown({token}, {direction})")
+            log(f"[Position Manager] >>> LOSS DETECTED — calling set_loss_cooldown({token}, {direction})")
             set_loss_cooldown(token, direction)
-            print(f"[Position Manager] >>> set_loss_cooldown returned — verify in loss_cooldowns.json")
+            log(f"[Position Manager] >>> set_loss_cooldown returned — verify in loss_cooldowns.json")
             # Post-mortem: if we lost on a direction, was the market moving against us first?
             _analyze_loss_direction(token, direction, entry_price, current_price)
         else:
@@ -1014,8 +1013,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 if hr_row and hr_row['hype_realized_pnl_usdt'] is not None:
                     hype_val = float(hr_row['hype_realized_pnl_usdt'])
                     if hype_val < 0:
-                        print(f"[Position Manager] ⚠️  ALERT: is_loss=False but hype_realized_pnl_usdt={hype_val} < 0 — cooldown may be missed!")
-                        print(f"[Position Manager] ⚠️  This means the loss was confirmed by HL but not recorded in cooldown! Calling set_loss_cooldown as fallback.")
+                        log(f"[Position Manager] ⚠️  ALERT: is_loss=False but hype_realized_pnl_usdt={hype_val} < 0 — cooldown may be missed!")
+                        log(f"[Position Manager] ⚠️  This means the loss was confirmed by HL but not recorded in cooldown! Calling set_loss_cooldown as fallback.")
                         set_loss_cooldown(token, direction)
             except Exception:
                 pass
@@ -1045,11 +1044,14 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
               None, None,  # hype_realized_pnl_* will be backfilled after HL confirms
               trade_id))
         if cur.rowcount == 0:
-            print(f"[Position Manager] Dedup: trade {trade_id} already closed, skipping")
+            log(f"[Position Manager] Dedup: trade {trade_id} already closed, skipping")
             conn.rollback()
             return False
-        # DB UPDATE done — do NOT commit yet. Commit only after HL confirms, or rollback if HL fails.
-        print(f"[Position Manager] Closed trade {trade_id} ({reason})")
+        # DB UPDATE done — commit immediately to release row lock.
+        # Guardian may need to update the same row; long transactions cause deadlocks.
+        # If HL close fails, guardian sync will catch it next cycle.
+        conn.commit()
+        log(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
         # ── AUDIT: Log trade close ───────────────────────────────────────────
         try:
@@ -1076,7 +1078,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         hl_exit_info = None
         if HYPE_AVAILABLE and is_live_trading_enabled():
             hype_token = hype_coin(token)
-            conn.commit()  # lock in DB close
+            # DB already committed above — row lock released
 
             # ── Best-effort HL order cleanup for ATR hits ─────────────────────
             # If closing due to ATR SL/TP hit, cancel any stale HL trigger orders
@@ -1087,27 +1089,27 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                     from hyperliquid_exchange import cancel_all_open_orders as _cancel_all
                     cleanup = _cancel_all(hype_token)
                     if cleanup.get('cancelled'):
-                        print(f"  [ATR CLEANUP] Cancelled {len(cleanup['cancelled'])} stale HL orders for {hype_token}")
+                        log(f"  [ATR CLEANUP] Cancelled {len(cleanup['cancelled'])} stale HL orders for {hype_token}")
                     if cleanup.get('errors'):
                         for e in cleanup['errors']:
-                            print(f"  [ATR CLEANUP] Warning: {e}")
+                            log(f"  [ATR CLEANUP] Warning: {e}")
                 except Exception as cleanup_err:
-                    print(f"  [ATR CLEANUP] Failed to cancel stale orders for {hype_token}: {cleanup_err}")
+                    log(f"  [ATR CLEANUP] Failed to cancel stale orders for {hype_token}: {cleanup_err}")
 
             try:
                 hl_exit_info = mirror_close(hype_token, direction)
-                print(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
+                log(f"[Position Manager] HYPE mirror_close SUCCESS: {hype_token}")
             except RuntimeError as me:
-                print(f"[Position Manager] HYPE mirror_close FAILED (DB committed, HL still open): {me}")
-                print(f"[Position Manager] hype-sync will reconcile on next run")
+                log(f"[Position Manager] HYPE mirror_close FAILED (DB committed, HL still open): {me}")
+                log(f"[Position Manager] hype-sync will reconcile on next run")
                 hl_exit_info = None
             except Exception as me:
-                print(f"[Position Manager] HYPE mirror_close ERROR (DB committed, HL still open): {me}")
-                print(f"[Position Manager] hype-sync will reconcile on next run")
+                log(f"[Position Manager] HYPE mirror_close ERROR (DB committed, HL still open): {me}")
+                log(f"[Position Manager] hype-sync will reconcile on next run")
                 hl_exit_info = None
         elif HYPE_AVAILABLE:
             # Live trading OFF → paper only
-            print(f"[Position Manager] Live trading OFF — paper close only (no HL)")
+            log(f"[Position Manager] Live trading OFF — paper close only (no HL)")
             conn.commit()
         else:
             # No HYPE available at all
@@ -1143,13 +1145,13 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                             WHERE id=%s
                         """, (round(hl_rp, 4), hype_pct, hl_ep, trade_id))
                         conn2.commit()
-                        print(f"[Position Manager] Backfilled HL realized_pnl={hl_rp:+.4f} "
+                        log(f"[Position Manager] Backfilled HL realized_pnl={hl_rp:+.4f} "
                               f"({hype_pct:+.4f}%) for trade {trade_id}")
                     finally:
                         cur2.close()
                         conn2.close()
             except Exception as e:
-                print(f"[Position Manager] HL backfill failed (non-fatal): {e}")
+                log(f"[Position Manager] HL backfill failed (non-fatal): {e}")
 
         # Record to ab_results on close — wrap with verbose logging so failures are never silent
         ab_errors = []
@@ -1182,10 +1184,19 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 pnl_pct=round(actual_pnl_pct, 4),
                 pnl_usdt=round(actual_pnl_usdt, 4),
                 signal_type=signal_type or 'decider',
-                confidence=confidence
+                confidence=confidence,
+                trade_id=trade_id
             )
         except Exception as rso_err:
-            print(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")
+            log(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")
+
+        # Loss cooldown — block re-entry after loss (prevents revenge trading)
+        is_win = 1 if float(actual_pnl_usdt or 0) > 0 else 0
+        if is_win == 0:
+            try:
+                set_loss_cooldown(token, direction)
+            except Exception as lc_err:
+                log(f"[Position Manager] set_loss_cooldown error (non-fatal): {lc_err}")
 
         # ── Bridge signal_history → brain.trade_patterns ─────────────────────────
         # Persist hot-set survival data as permanent knowledge in brain DB.
@@ -1209,7 +1220,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         return True
     except Exception as e:
         conn.rollback()
-        print(f"[Position Manager] close_position error: {e}")
+        log(f"[Position Manager] close_position error: {e}")
         return False
     finally:
         conn.close()
@@ -1230,7 +1241,7 @@ def adjust_stop_loss(trade_id: int, new_sl: float) -> bool:
         return True
     except Exception as e:
         conn.rollback()
-        print(f"[Position Manager] adjust_stop_loss error: {e}")
+        log(f"[Position Manager] adjust_stop_loss error: {e}")
         return False
     finally:
         conn.close()
@@ -1461,7 +1472,7 @@ def _force_fresh_atr(token: str, period: int = 14, interval: str = '15m') -> flo
                         trs.append(tr)
                     atr = sum(trs) / len(trs) if trs else None
                     if atr is not None:
-                        print(f"  [ATR] {token}: Binance ATR={atr:.4f} ({atr/float(klines[-1][4])*100:.2f}%)")
+                        log(f"  [ATR] {token}: Binance ATR={atr:.4f} ({atr/float(klines[-1][4])*100:.2f}%)")
         except Exception:
             pass  # Binance also failed
 
@@ -1489,7 +1500,7 @@ def _force_fresh_atr(token: str, period: int = 14, interval: str = '15m') -> flo
                     data = _json.load(f)
                 ts = data.get(cache_key, {}).get('ts', 0)
                 age = _time.time() - ts
-                print(f"  [ATR] {token}: using stale cache (age={age:.0f}s)")
+                log(f"  [ATR] {token}: using stale cache (age={age:.0f}s)")
         except Exception:
             pass
         return stale_cached_atr
@@ -1527,13 +1538,13 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
         # SL = entry - k·ATR, never above current price (catches drops)
         sl = entry_price * (1 - effective_sl_pct)
         result = min(sl, current_price * (1 - ATR_SL_MIN))
-        print(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
+        log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
     else:
         # SHORT: SL = entry + k·ATR, never below current price (catches rallies)
         sl = entry_price * (1 + effective_sl_pct)
         result = max(sl, current_price * (1 + ATR_SL_MIN))
-        print(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
+        log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
 
 
@@ -1561,14 +1572,14 @@ def _compute_dynamic_tp(token: str, direction: str, entry_price: float,
 
     if direction == 'LONG':
         result = current_price * (1 + effective_tp_pct)
-        print(f"  [_dynTP] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} k_tp={k_tp:.3f} eff_tp={effective_tp_pct*100:.3f}% → TP={result:.6f}")
+        log(f"  [_dynTP] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} k_tp={k_tp:.3f} eff_tp={effective_tp_pct*100:.3f}% → TP={result:.6f}")
         return result
     else:
         result = current_price * (1 - effective_tp_pct)
-        print(f"  [_dynTP] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} k_tp={k_tp:.3f} eff_tp={effective_tp_pct*100:.3f}% → TP={result:.6f}")
+        log(f"  [_dynTP] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} k_tp={k_tp:.3f} eff_tp={effective_tp_pct*100:.3f}% → TP={result:.6f}")
         # BUG CHECK: SHORT TP should be BELOW entry (profit target)
         if entry_price > 0 and current_price > 0:
-            print(f"  [_dynTP]   SHORT BUG-CHECK: TP-entry={((result-entry_price)/entry_price)*100:.2f}% (should be negative for SHORT in profit)")
+            log(f"  [_dynTP]   SHORT BUG-CHECK: TP-entry={((result-entry_price)/entry_price)*100:.2f}% (should be negative for SHORT in profit)")
         return result
 
 
@@ -1662,7 +1673,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             from cascade_flip_helpers import is_token_evicted
             if is_token_evicted(token):
                 flip_k_override = 1.0
-                print(f"  [ATR] {token}: post-flip eviction active — forcing k=1.0")
+                log(f"  [ATR] {token}: post-flip eviction active — forcing k=1.0")
         except Exception:
             pass
 
@@ -1678,7 +1689,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         if not _entry or float(_entry) <= 0:
             if current_price and float(current_price) > 0:
                 _entry = float(current_price)
-                print(f"  [ATR] {token}: used current_price {_entry:.6f} as entry (DB entry was 0/None)")
+                log(f"  [ATR] {token}: used current_price {_entry:.6f} as entry (DB entry was 0/None)")
             else:
                 continue
 
@@ -1784,14 +1795,14 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
                 (round(new_sl, 8), round(new_tp, 8), trade_id)
             )
             # DEBUG: log every DB write with context
-            print(f"  [PERSIST] trade_id={trade_id} token={u.get('token')} dir={u.get('direction')} "
+            log(f"  [PERSIST] trade_id={trade_id} token={u.get('token')} dir={u.get('direction')} "
                   f"SL_write={new_sl:.6f} TP_write={new_tp:.6f} "
                   f"atr={u.get('atr')} atr_pct={u.get('atr_pct',0)*100:.2f}% k={u.get('k')} "
                   f"old_sl={u.get('old_sl')} old_tp={u.get('old_tp')} "
                   f"entry={u.get('entry_price')}")
         conn.commit()
     except Exception as e:
-        print(f"  [ATR] DB persist error: {e}")
+        log(f"  [ATR] DB persist error: {e}")
     finally:
         conn.close()
 
@@ -2081,7 +2092,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
         try:
             hl_positions = get_open_hype_positions()
         except Exception as e:
-            print(f"  [Position Manager] HL positions API failed: {e}")
+            log(f"  [Position Manager] HL positions API failed: {e}")
             hl_positions = {}
     
     # Legacy fallback: read hl_cache.json directly (before our new get_cached_positions)
@@ -2103,24 +2114,24 @@ def refresh_current_prices(server: str = SERVER_NAME):
                         'direction': _pdata.get('side', '').upper(),
                     }
                 if hl_positions:
-                    print(f"  [Position Manager] Using legacy hl_cache.json fallback ({len(hl_positions)} positions)")
+                    log(f"  [Position Manager] Using legacy hl_cache.json fallback ({len(hl_positions)} positions)")
         except Exception:
             pass
 
     if not hl_positions:
-        print(f"  [Position Manager] No HL position data available (rate limited + no cache)")
+        log(f"  [Position Manager] No HL position data available (rate limited + no cache)")
         return positions
 
     # Fetch live mids for current_price (more accurate than deriving from unrealized_pnl)
     try:
         mids = hc.get_allMids()
     except Exception as e:
-        print(f"  [Position Manager] Failed to fetch mids: {e}")
+        log(f"  [Position Manager] Failed to fetch mids: {e}")
         mids = {}
 
     # Warn if paper trading without HL access
     if not HYPE_AVAILABLE:
-        print(f"  [Position Manager] WARNING: Paper trading WITHOUT Hyperliquid — prices may be stale")
+        log(f"  [Position Manager] WARNING: Paper trading WITHOUT Hyperliquid — prices may be stale")
 
     # DB connection for persisting PnL (BUG FIX 2026-04-10)
     db_conn = get_db_connection()
@@ -2140,7 +2151,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
             cur_price_str = mids.get(token, '0')
             try:
                 cur_price = round(float(cur_price_str), 6)
-            except:
+            except (TypeError, ValueError):
                 cur_price = 0
 
             # Fallback for entry=0: use mid price as proxy
@@ -2222,7 +2233,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
                             UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
                         """, (hl_entry, trade_id))
                     except Exception as e:
-                        print(f"  [Position Manager] Failed to fix entry_price for trade {trade_id}: {e}")
+                        log(f"  [Position Manager] Failed to fix entry_price for trade {trade_id}: {e}")
 
             # pnl_pct from HL's unrealized_pnl (ground truth)
             # unrealized_pnl = (entryPx - currentPx) / entryPx * positionValue
@@ -2235,7 +2246,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
                 cur_price_str = mids.get(token, '0')
                 try:
                     cur_price = round(float(cur_price_str), 6)
-                except:
+                except (TypeError, ValueError):
                     cur_price = 0
 
             # pnl_usdt = unrealized_pnl directly (already in USDT)
@@ -2284,15 +2295,16 @@ def refresh_current_prices(server: str = SERVER_NAME):
                                 highest_price = %s, lowest_price = %s, updated_at = NOW()
                             WHERE id = %s AND status = 'open'
                         """, (pnl_pct, pnl_usdt, cur_price, new_high, new_low, trade_id))
+                        db_conn.commit()  # release row lock immediately per-position
                     except Exception as e:
-                        print(f"  [Position Manager] Failed to persist PnL for trade {trade_id}: {e}")
+                        log(f"  [Position Manager] Failed to persist PnL for trade {trade_id}: {e}")
 
     # Commit and close DB connection
     if db_conn:
         try:
             db_conn.commit()
         except Exception as e:
-            print(f"  [Position Manager] DB commit failed: {e}")
+            log(f"  [Position Manager] DB commit failed: {e}")
         finally:
             if db_cur:
                 db_cur.close()
@@ -2300,7 +2312,7 @@ def refresh_current_prices(server: str = SERVER_NAME):
                 db_conn.close()
 
     if updated:
-        print(f"  [Position Manager] Updated {updated} position prices from HL")
+        log(f"  [Position Manager] Updated {updated} position prices from HL")
     return positions
 
 
@@ -2393,8 +2405,8 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         if ATR_HL_ORDERS_ENABLED:
             _execute_atr_bulk_updates(_atr_updates)  # HL path (kill switch controlled)
         else:
-            print(f"  [ATR] HL orders DISABLED — SL/TP managed locally by guardian via DB")
-        print(f"  [ATR] Updated {len(_atr_updates)} position SL/TP levels")
+            log(f"  [ATR] HL orders DISABLED — SL/TP managed locally by guardian via DB")
+        log(f"  [ATR] Updated {len(_atr_updates)} position SL/TP levels")
 
     open_count = len(positions)
     closed_count = 0
@@ -2428,7 +2440,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # close_paper_position() handles internal DB close + market mirror to HL.
         atr_hits = check_atr_tp_sl_hits([pos])
         for hit in atr_hits:
-            print(f"  [ATR HIT] {token} {direction} {hit['hit_reason']}: "
+            log(f"  [ATR HIT] {token} {direction} {hit['hit_reason']}: "
                   f"price={hit['current_price']:.6f} SL={hit['stop_loss']:.6f} TP={hit['target']:.6f}")
             close_paper_position(hit['trade_id'], hit['hit_reason'])
             closed_count += 1
@@ -2462,7 +2474,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     close_paper_position(trade_id, f"wave_turn_{reason}")
                     closed_count += 1
                     wave_turn_fired = True
-                    print(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
+                    log(f"  🌊 WAVE TURN EXIT {token} {direction} {live_pnl:+.2f}% [{reason}]")
 
                     # ── 2b. Counter-signal injection ──────────────────────────
                     opposite_dir = 'SHORT' if direction == 'LONG' else 'LONG'
@@ -2484,9 +2496,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                             z_score=z_score,
                             z_score_tier='wave_turn_exit',
                         )
-                        print(f"  🌊 WAVE TURN counter injected: {token} {opposite_dir} conf={counter_conf:.0f}% sig_id={new_sid}")
+                        log(f"  🌊 WAVE TURN counter injected: {token} {opposite_dir} conf={counter_conf:.0f}% sig_id={new_sid}")
                     except Exception as inj_err:
-                        print(f"  🌊 WAVE TURN counter injection failed for {token}: {inj_err}")
+                        log(f"  🌊 WAVE TURN counter injection failed for {token}: {inj_err}")
 
                     continue  # Position closed — skip remaining checks
 
@@ -2508,15 +2520,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 # If we're SHORT and all TFs bullish → immediate cascade flip
                 if mtf_align['all_tfs_bearish'] and direction == 'LONG':
                     mtf_all_flipped = True
-                    print(f"  [MTF ALIGN] {token} 4H/1H/15m all bearish → immediate cascade flip")
+                    log(f"  [MTF ALIGN] {token} 4H/1H/15m all bearish → immediate cascade flip")
                 elif mtf_align['all_tfs_bullish'] and direction == 'SHORT':
                     mtf_all_flipped = True
-                    print(f"  [MTF ALIGN] {token} 4H/1H/15m all bullish → immediate cascade flip")
+                    log(f"  [MTF ALIGN] {token} 4H/1H/15m all bullish → immediate cascade flip")
 
                 # Log TF states for monitoring
                 for tf_name, state in mtf_align['tf_states'].items():
                     if state is not None:
-                        print(f"    [MTF ALIGN {tf_name}] regime={state.regime.name} "
+                        log(f"    [MTF ALIGN {tf_name}] regime={state.regime.name} "
                               f"bull_score={state.bullish_score:+d} macd_above={state.macd_above_signal} "
                               f"hist={state.histogram:+.6f}")
 
@@ -2525,7 +2537,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             if macd_result['state'] is not None:
                 s = macd_result['state']
                 # Log MACD state for monitoring
-                print(f"  [MACD] {token} bull_score={s.bullish_score:+d} "
+                log(f"  [MACD] {token} bull_score={s.bullish_score:+d} "
                       f"regime={'BULL' if s.regime.value==1 else 'BEAR' if s.regime.value==-1 else 'NEUTRAL'} "
                       f"xover={'FRESH' if abs(s.crossover_freshness.value)==2 else 'STALE'} "
                       f"hist={s.histogram:+.6f} rate={s.histogram_rate:+.2f}")
@@ -2555,7 +2567,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             from macd_rules import cascade_entry_signal
             cascade = cascade_entry_signal(token)
             if CASCADE_FLIP_ENABLED and cascade['cascade_active'] and cascade['cascade_direction'] and cascade['cascade_direction'] != direction:
-                print(f"  [CASCADE FLIP] {token} {direction} → {cascade['cascade_direction']} "
+                log(f"  [CASCADE FLIP] {token} {direction} → {cascade['cascade_direction']} "
                       f"(cascade active, lead={cascade['lead_tf']}, confirm={cascade['confirmation_count']}, "
                       f"reason={cascade['entry_block_reason']})")
                 flip_info = {
@@ -2576,7 +2588,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
             if CASCADE_FLIP_ENABLED and macd_result['should_flip'] and macd_result['reasons']:
                 primary_reason = macd_result['reasons'][0]
-                print(f"  [MACD FLIP] {token} {direction} → flipping: {macd_result['reasons']}")
+                log(f"  [MACD FLIP] {token} {direction} → flipping: {macd_result['reasons']}")
                 flip_info = {
                     'opposite_dir': 'SHORT' if direction == 'LONG' else 'LONG',
                     'conf': 85.0,
@@ -2597,7 +2609,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 for reason in macd_result['reasons']:
                     if reason.startswith('FLIP:'):
                         continue
-                    print(f"  [MACD EXIT] {token} {direction} → exiting: {reason}")
+                    log(f"  [MACD EXIT] {token} {direction} → exiting: {reason}")
                     close_paper_position(trade_id, reason)
                     closed_count += 1
                     break
@@ -2633,7 +2645,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         #     reason = f"cut_loser_{live_pnl:+.2f}%"
         #     close_paper_position(trade_id, reason)
         #     closed_count += 1
-        #     print(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
+        #     log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 
         # ── 6. SPEED: Stale winner/loser exit ─────────────────────────────────
         # SPEED FEATURE: closes positions that are in profit but flat (stale winner)
@@ -2644,14 +2656,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         if stale_close:
             close_paper_position(trade_id, f"stale_exit_{stale_reason}")
             closed_count += 1
-            print(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
+            log(f"  STALE EXIT {token} {direction} {live_pnl:+.2f}% [{stale_reason}]")
             continue  # Skip trailing SL update for closed position
 
         # ── 6b. SOFT PEAK-EXIT TRIGGER (1hr tight trail) ────────────────────────
         # After 1 hour open, if trade is flat/negative (hasn't gone in our direction),
         # set a tight trailing SL 0.3% from current price. The trailing engine then
         # tightens this as price moves favorably. Captures whatever profit is available.
-        SOFT_TRIGGER_HOURS = 1.0
+        SOFT_TRIGGER_HOURS = 2.0  # was 1.0 — 1h kills trades that haven't developed yet
         SOFT_TRAIL_PCT = 0.003  # 0.3% trailing distance
         _ot = pos.get('open_time')
         if _ot and live_pnl <= 0:
@@ -2696,16 +2708,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                     """, (new_sl, trade_id))
                                     _conn_st.commit()
                                 except Exception as e:
-                                    print(f"  SOFT TRIGGER DB write failed for {token}: {e}")
+                                    log(f"  SOFT TRIGGER DB write failed for {token}: {e}")
                                 finally:
                                     if _cur_st:
                                         _cur_st.close()
                                     _conn_st.close()
-                            print(f"  SOFT TRIGGER {token} {direction} SL set to {new_sl:.6f} "
+                            log(f"  SOFT TRIGGER {token} {direction} SL set to {new_sl:.6f} "
                                   f"(was {cur_sl:.6f}, 0.3% trail from {cur_price:.6f}, "
                                   f"age={_age_h:.1f}h, pnl={live_pnl:+.2f}%)")
             except Exception as e:
-                print(f"  SOFT TRIGGER error for {token}: {e}")
+                log(f"  SOFT TRIGGER error for {token}: {e}")
 
         # ── 7. HARD MAX-LOSS EXIT ──────────────────────────────────────────────
         # Safety net: if trade is losing >= HARD_MAX_LOSS_PCT, close immediately.
@@ -2715,7 +2727,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         if live_pnl <= HARD_MAX_LOSS_PCT:
             close_paper_position(trade_id, f"hard_max_loss_{live_pnl:+.2f}%")
             closed_count += 1
-            print(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}%]")
+            log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}%]")
             continue
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
@@ -2735,14 +2747,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 _age_h = (datetime.now(timezone.utc) - _ot_dt).total_seconds() / 3600
 
                 # (a) Time exit: 2h in loss → move to next setup
-                if live_pnl < 0 and _age_h >= 2.0:  # 2 hours
+                if TIME_EXIT_ENABLED and live_pnl < 0 and _age_h >= 2.0:  # 2 hours
                     close_paper_position(trade_id, f"time_exit_{_age_h:.1f}h_{live_pnl:+.2f}%")
                     closed_count += 1
-                    print(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")
+                    log(f"  TIME EXIT {token} {direction} {live_pnl:+.2f}% [{_age_h:.1f}h open]")
                     continue
 
                 # (b) Gave-it-all-back: was in profit but now losing, 1h+ open
-                if live_pnl < 0 and _age_h >= 1.0:
+                if PEAK_EXIT_ENABLED and live_pnl < 0 and _age_h >= 1.0:
                     peak_high = float(pos.get('highest_price') or 0)
                     peak_low = float(pos.get('lowest_price') or 0)
                     entry_f = float(pos.get('entry_price') or 0)
@@ -2753,7 +2765,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 close_paper_position(trade_id,
                                     f"peak_exit_{_age_h:.1f}h_peak{peak_pnl_pct:+.2f}%_now{live_pnl:+.2f}%")
                                 closed_count += 1
-                                print(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
+                                log(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
                                       f"[was +{peak_pnl_pct:.2f}%, now {live_pnl:+.2f}%, {_age_h:.1f}h]")
                                 continue
                         elif direction == 'SHORT' and peak_low > 0:
@@ -2762,15 +2774,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 close_paper_position(trade_id,
                                     f"peak_exit_{_age_h:.1f}h_peak{peak_pnl_pct:+.2f}%_now{live_pnl:+.2f}%")
                                 closed_count += 1
-                                print(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
+                                log(f"  PEAK EXIT {token} {direction} {live_pnl:+.2f}% "
                                       f"[was +{peak_pnl_pct:.2f}%, now {live_pnl:+.2f}%, {_age_h:.1f}h]")
                                 continue
             except Exception as e:
-                print(f"  TIME EXIT error for {token}: {e}")
+                log(f"  TIME EXIT error for {token}: {e}")
 
     # ── End of per-position loop ─────────────────────────────────────────────
 
-    print(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
+    log(f"Position Manager: {open_count} open | {closed_count} closed | {adjusted_count} adjusted")
 
     # ── Pipeline heartbeat ─────────────────────────────────────────────────────
     _update_pm_heartbeat()
@@ -2813,7 +2825,7 @@ def check_cascade_flip(token: str, position_direction: str,
     flip_counts = _load_flip_counts()
     current_flips = flip_counts.get(token.upper(), {}).get('flips', 0)
     if current_flips >= CASCADE_FLIP_MAX:
-        print(f"  [CASCADE FLIP] {token} at max flips ({CASCADE_FLIP_MAX}) — skipped")
+        log(f"  [CASCADE FLIP] {token} at max flips ({CASCADE_FLIP_MAX}) — skipped")
         return None
 
     # ── 3. Speed check ─────────────────────────────────────────────────────────
@@ -2822,14 +2834,14 @@ def check_cascade_flip(token: str, position_direction: str,
 
     if not speed_ok:
         # Armed but speed not increasing — log and wait
-        print(f"  [CASCADE ARMED] {token} armed (loss={live_pnl:+.2f}%, "
+        log(f"  [CASCADE ARMED] {token} armed (loss={live_pnl:+.2f}%, "
               f"speed_pctl={percentile:.1f}, waiting for trigger <={trigger_pct:.2f}%)")
         return None
 
     # ── 4. Trigger check ───────────────────────────────────────────────────────
     if live_pnl > trigger_pct:
         # Armed, speed increasing, but haven't hit trigger yet
-        print(f"  [CASCADE ARMED] {token} armed (loss={live_pnl:+.2f}%, "
+        log(f"  [CASCADE ARMED] {token} armed (loss={live_pnl:+.2f}%, "
               f"speed_pctl={percentile:.1f}, trigger={trigger_pct:.2f}%)")
         return None
 
@@ -2845,7 +2857,7 @@ def check_cascade_flip(token: str, position_direction: str,
             accel = spd.get('price_acceleration', 0) or 0
             regime_conf = min(100.0, max(0.0, abs(vel) * 30))  # vel 1.0→30%, 2.0→60%
             if regime_conf >= 20.0:  # Require some minimum momentum to flip
-                print(f"  [CASCADE FLIP] {token} flipping on momentum: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
+                log(f"  [CASCADE FLIP] {token} flipping on momentum: vel={vel:+.2f} accel={accel:+.4f} conf={regime_conf:.0f}%")
                 return {
                     'opposite_dir': opposite_dir,
                     'conf': regime_conf,
@@ -2856,10 +2868,10 @@ def check_cascade_flip(token: str, position_direction: str,
                     'signal_type': 'coin-regime',
                 }
             else:
-                print(f"  [CASCADE FLIP] {token} not flipping: vel={vel:+.2f} conf={regime_conf:.0f}% < 20%")
+                log(f"  [CASCADE FLIP] {token} not flipping: vel={vel:+.2f} conf={regime_conf:.0f}% < 20%")
                 return None
         except Exception as e:
-            print(f"  [CASCADE FLIP] {token} speed lookup error: {e}")
+            log(f"  [CASCADE FLIP] {token} speed lookup error: {e}")
             return None
     return None
 
@@ -2890,10 +2902,10 @@ def _load_cooldowns() -> Dict:
                     migrated = True
             if migrated:
                 _save_cooldowns(raw)
-                print(f"[Position Manager] Migrated {migrated} old cooldown entries to new format")
+                log(f"[Position Manager] Migrated {migrated} old cooldown entries to new format")
             return raw
     except Exception as e:
-        print(f"[Position Manager] Error loading cooldowns: {e}")
+        log(f"[Position Manager] Error loading cooldowns: {e}")
     return {}
 
 
@@ -2905,7 +2917,7 @@ def _save_cooldowns(data: Dict) -> None:
             with open(LOSS_COOLDOWN_FILE, "w") as f:
                 json.dump(data, f, indent=2, default=str)
     except Exception as e:
-        print(f"[Position Manager] Error saving cooldowns: {e}")
+        log(f"[Position Manager] Error saving cooldowns: {e}")
 
 
 def _clean_expired(data: Dict) -> Dict:
@@ -3003,10 +3015,10 @@ def set_loss_cooldown(token: str, direction: str, hours: float = None) -> None:
     expiry = now + (hours * 3600)
     data[key] = {"expires": expiry, "streak": streak, "hours": hours, "reason": "loss"}
     _save_cooldowns(data)
-    print(f"[Position Manager] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h")
+    log(f"[Position Manager] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h")
     # DEBUG: immediately verify the write succeeded
     verify = _load_cooldowns().get(key)
-    print(f"[Position Manager] DEBUG: loss_cooldowns.json verify after write = {verify}")
+    log(f"[Position Manager] DEBUG: loss_cooldowns.json verify after write = {verify}")
     # ── AUDIT: Log loss cooldown ───────────────────────────────────────
     try:
         from audit_logger import loss_cooldown_set
@@ -3023,7 +3035,7 @@ def clear_loss_streak(token: str, direction: str) -> None:
     if key in data:
         del data[key]
         _save_cooldowns(data)
-        print(f"[Position Manager] LOSS STREAK CLEARED: {token} {direction}")
+        log(f"[Position Manager] LOSS STREAK CLEARED: {token} {direction}")
 
 
 def get_loss_streak(token: str, direction: str) -> int:
@@ -3144,7 +3156,7 @@ def _analyze_loss_direction(token: str, direction: str, entry_price: float, exit
 
         # Only record if counter-move > 0.5% (small noise doesn't count)
         if counter_move < 0.5:
-            print(f"[Loss Analysis] {token} {direction}: no counter-move ({counter_move:.2f}%)")
+            log(f"[Loss Analysis] {token} {direction}: no counter-move ({counter_move:.2f}%)")
             return
 
         # Check how long until the counter-move peak (in minutes)
@@ -3164,11 +3176,11 @@ def _analyze_loss_direction(token: str, direction: str, entry_price: float, exit
         entry["avg_minutes"] = round(entry["total_minutes"] / entry["count"], 1)
 
         _save_wrong_side(data)
-        print(f"[Loss Analysis] WRONG SIDE: {token} {direction} counter-move=+{counter_move:.2f}% "
+        log(f"[Loss Analysis] WRONG SIDE: {token} {direction} counter-move=+{counter_move:.2f}% "
               f"(took {counter_minutes:.0f}min) | avg now={entry['avg_counter_pct']:.2f}% | n={entry['count']}")
 
     except Exception as e:
-        print(f"[Loss Analysis] Error analyzing {token} {direction}: {e}")
+        log(f"[Loss Analysis] Error analyzing {token} {direction}: {e}")
 
 
 def is_wrong_side_risky(token: str, direction: str, confidence: float = 70) -> Tuple[bool, str]:
@@ -3210,7 +3222,7 @@ def _set_win_cooldown(token: str, direction: str, minutes: float = WIN_COOLDOWN_
     data = _load_cooldowns()
     data[key] = {"expires": expiry, "streak": 0}
     _save_cooldowns(data)
-    print(f"[Position Manager] WIN COOLDOWN: {token} {direction} blocked for {minutes:.0f}min")
+    log(f"[Position Manager] WIN COOLDOWN: {token} {direction} blocked for {minutes:.0f}min")
 
 
 def _is_win_cooldown_active(token: str, direction: str) -> bool:
@@ -3243,17 +3255,17 @@ def _update_pm_heartbeat():
 def main():
     """Test run — print current position state and run management check."""
     try:
-        print(f"[Position Manager] Starting check at {datetime.now()}")
-        print(f"[Position Manager] Connecting to DB: {DB_CONFIG.get('host')}/{DB_CONFIG.get('database','?')}")
+        log(f"[Position Manager] Starting check at {datetime.now()}")
+        log(f"[Position Manager] Connecting to DB: {DB_CONFIG.get('host')}/{DB_CONFIG.get('database','?')}")
 
         # refresh_current_prices() is called inside check_and_manage_positions()
         # Run management check (it calls refresh_current_prices internally)
         print()
         open_n, closed_n, adjusted_n = check_and_manage_positions()
-        print(f"\n[Position Manager] Done. Open: {open_n} | Closed: {closed_n} | Adjusted: {adjusted_n}")
+        log(f"\n[Position Manager] Done. Open: {open_n} | Closed: {closed_n} | Adjusted: {adjusted_n}")
     except Exception as e:
         import traceback
-        print(f"[Position Manager] FATAL in main(): {e}")
+        log(f"[Position Manager] FATAL in main(): {e}")
         traceback.print_exc()
         raise
 
@@ -3263,6 +3275,6 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         import traceback
-        print(f"[Position Manager] FATAL: {e}")
+        log(f"[Position Manager] FATAL: {e}")
         traceback.print_exc()
         exit(1)

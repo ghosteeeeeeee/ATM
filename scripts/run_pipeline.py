@@ -31,7 +31,7 @@ LOCK    = '/tmp/hermes-pipeline.lock'
 # All master *_ENABLED flags in hermes_constants.py are False; signal_gen was doing
 # expensive computation (get_all_latest_prices, compute_regime, get_momentum_stats)
 # for zero signal output. signals_runner is now the canonical path.
-STEPS_EVERY_MIN  = ['signal_compactor', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
+STEPS_EVERY_MIN  = ['signal_compactor', 'signal_analyst', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
 # price_collector: removed 2026-04-25
 #   - Was firing BOTH via run_pipeline.py AND via hermes-price-collector.timer
 #   - Lock caused ~0.3% skip rate from collision
@@ -48,6 +48,7 @@ STEP_TIMEOUTS = {
     'breakout_engine': 60,
     'decider_run': 360,
     'signal_compactor': 60,   # deterministic — must be fast (<2s typical)
+    'signal_analyst': 30,     # score hotset signals, must be fast
     'position_manager': 120,
     'strategy_optimizer': 300,
     'ab_optimizer': 300,
@@ -184,7 +185,7 @@ def main():
         # All scripts check LIVESWITCH_FILE (hype_live_trading.json) for live mode.
         # Some scripts (breakout_engine, price_collector, etc.) do not accept --live.
         if step == 'signals_runner':
-            run_bg(step)  # signals_runner takes ~60s — run in background
+            run(step)  # signals_runner ~3s — run synchronously so decider_run sees fresh signals
         else:
             run(step)
 
@@ -200,6 +201,15 @@ def main():
 
     elapsed = _t.time() - start
     log(f'=== Pipeline done ({mode}) ===')
+
+    # Write heartbeat for watchdog monitoring
+    try:
+        heartbeat_file = os.path.join(HERMES_DATA, 'pipeline_heartbeat.json')
+        os.makedirs(os.path.dirname(heartbeat_file), exist_ok=True)
+        with open(heartbeat_file, 'w') as f:
+            json.dump({'timestamp': time.time(), 'mode': mode, 'elapsed': round(elapsed, 1)}, f)
+    except Exception:
+        pass
 
     # Quick summary
     try:

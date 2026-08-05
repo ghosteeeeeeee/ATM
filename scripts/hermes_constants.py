@@ -34,20 +34,19 @@ LIVE_TRADING_ENABLED = True
 
 SHORT_BLACKLIST = {
     # High-volatility / inverse-beta tokens (shorting meme coins = lottery)
-    'MET','DASH','GRIFFAIN','BRETT','XLM','SNX','NIL','DYDX','IP','TRB','ETHFI','OP','EIGEN','COMP','NEAR','S','VVV','DOT','ICP','IMX','ATOM','SUI','LAYER','INJ','FIL','BERA','ETC','DYM','MAVIA','MEME','INIT','SOPH','XAI','ZEC','GAS','BLAST','MELANIA','BTC','ZETA','SPX','DOGE','ARK','CRV','RUNE','AR',
-    'TST','NXPC','ARB','TRUMP','LDO','APT','CELO','SEI',
+    'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','SOPH','XAI','ZEC','GAS','BLAST','MELANIA','BTC','ZETA','SPX','DOGE','ARK','RUNE','AR',
+    'TST','NXPC','TRUMP','CELO',
     'ACE','YZY','ZEREBRO','WLFI','HBAR','MEGA',
     # Historical 0% SHORT win rate (2026-04-01 analysis):
     'SOL','MEW',        # avg SHORT pnl: deeply negative, bull market leader
-    'XPL','ZRO','NEO','GMT','FTT','HYPE',
-    'YGG','IO','USUAL','FOGO',
+    # HYPE, YGG removed for Batch 5 trial 2026-08-03
     # 0% SHORT win rate — add fresh
-    'POL','DOOD','SYRUP',
+    # SYRUP removed for Batch 5 trial 2026-08-03
     # Additional high-beta / recent pumps (shorting pumps = catching knives)
     'POPCAT',  # meme pump history
     'VIRTUAL', 'MELANIA', 'FARTCOIN',  # meme coins
     # 2026-04-01: tokens with negative avg SHORT returns
-    'RENDER', 'WLD', 'PORT3',
+    'RENDER', 'PORT3',
     # 2026-04-01: sketchy volume and price action
     'BOME',
     # 2026-04-01: persistent losses on both sides
@@ -64,15 +63,13 @@ SHORT_BLACKLIST = {
     # 2026-04-02: persistent losing SHORT directions (loss cooldown streak)
     'MINA',   # SHORT: streak=2, 4h cooldown, persistent losses
     # 2026-04-02: phantom positions — guardian_missing loop (all +0.00%)
-    'RLB', 'RNDR', 'SHIA', 'AI16Z', 'BADGER', 'BLZ', 'FXS',
-    'HPOS', 'MATIC', 'UNIBOT', 'MKR', 'MYRO',
+    # AI16Z, BADGER, BLZ, FXS, HPOS removed for Batch 3 trial 2026-08-02
+    'RLB', 'RNDR', 'SHIA',
+    'MATIC', 'UNIBOT', 'MKR', 'MYRO',
     # 2026-04-04: systematic SHORT losses (net<=$-2.50, phantom trades excluded)
-    'ENA',     # SHORT net: -$5.41 (1 loss: conf-1s -$5.41)
+    # ENA removed for Batch 3 trial 2026-08-02
     'PENGU',   # SHORT net: -$4.36 (1 loss: conf-1s -$4.36)
-    # 2026-04-10: CFX — persistent losses on SHORT, phantom order issues on HL
-    'CFX',
-    # 2026-04-11: SAND — blocklisted both directions
-    'SAND',
+    # 2026-04-10: CFX removed for Batch 3 trial 2026-08-02
     # 2026-04-19: STABLE — block both directions. Stablecoin pairs have no directional
     # thesis and generate phantom trades via guardian_missing closes.
     'STABLE',
@@ -81,8 +78,6 @@ SHORT_BLACKLIST = {
     'PAXG',
     # 2026-04-22: APE — block both directions
     'APE',
-    # 2026-04-22: CRV — block both directions
-    'CRV',
     # 2026-04-22: PENDLE, POLYX — block both directions
     'PENDLE', 'POLYX',
     # 2026-04-22: BIO — block both directions
@@ -92,38 +87,72 @@ SHORT_BLACKLIST = {
     # instant HARD_SL_CLOSE failures. Blocking both directions until root cause fixed.)
     'REZ', 'HMSTR', 'BNB',
     # 2026-07-21: 48h/72h signal quality analysis — worst performing tokens
-    # ONDO: 0% WR (0/7), avg -1.382% — total loss
-    # CASHCAT: 50% WR (1/2), avg -4.366% — massive loss
-    # LTC: 36% WR (4/11), avg -0.457% — consistent loser
-    # SKY: 0% WR (0/1), avg -2.455% — total loss
-    # 2Z: 9% WR (1/11), avg -0.422% — massive loser in 2-4h window
-    # MERL: 20% WR (1/5), avg -0.905% — consistent loser
-    # GRAM: 0% WR (0/2), avg -1.468% — consistent loser
-    # ADA: 0% WR (0/1), avg -1.999% — consistent loser
-    # NOT: 0% WR (0/1), avg -1.592% — consistent loser
-    'KNEIRO', 'SUSHI', 'BANANA', 'KPEPE', 'GRASS', 'MON',
-    'BIGTIME', 'PUMP', 'CHIP', 'ZORA',
-    'ONDO', 'CASHCAT', 'LTC', 'SKY', '2Z',
-    'MERL', 'GRAM', 'ADA', 'NOT',
+    # BANANA, GRASS removed for Batch 3 trial 2026-08-02
+    # KNEIRO, KPEPE, PUMP, NOT removed for Batch 5 trial 2026-08-03
+    # 2026-08-02: Batch 1 trial RE-BLACKLISTED (48h trial: 0% WR, minimal execution)
+    # BABY, STBL: re-blacklisted 2026-08-01 (pre-trial data)
+    # MOVE removed for Batch 5 trial 2026-08-03
+    # UNI, LINEA, TIA, TURBO, BLUR, FET: re-blacklisted 2026-08-02 (pre-trial data)
+    # ORDI, PEOPLE, AIXBT, ZK, CAKE: re-blacklisted 2026-08-02 (no execution during trial)
+    'BABY', 'STBL',
+    'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
+    'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
+    # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
+    # OP: 4 trades, 0% WR — RE-BLACKLIST
+    # All others: 0-2 trades — INSUFFICIENT (signals don't fire for these tokens)
+    'COMP', 'CRV', 'DYDX', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
+    'SEI', 'MET', 'DASH', 'WLD',
+    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
+    'ADA',
+    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
+    '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
+    'GRASS', 'HPOS', 'ONDO',
+    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
+    'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
+    'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
+    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
+    'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
-    'MET','DASH','GRIFFAIN','BRETT','XLM','SNX','NIL','DYDX','IP','TRB','ETHFI','OP','EIGEN','COMP','NEAR','S','VVV','DOT','ICP','IMX','ATOM','SUI','LAYER','INJ','FIL','BERA','ETC','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','DOGE','MEW',
-    'TST','SEI', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
+    'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','DOGE','MEW',
+    'TST', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
     # 2026-04-24: REZ, HMSTR, BNB — block both directions
     'REZ', 'HMSTR', 'BNB',
     # 2026-07-21: 48h/72h signal quality analysis — worst performing tokens
-    'KNEIRO', 'SUSHI', 'BANANA', 'KPEPE', 'GRASS', 'MON',
-    'BIGTIME', 'PUMP', 'CHIP', 'ZORA',
-    'ONDO', 'CASHCAT', 'LTC', 'SKY', '2Z',
-    'MERL', 'GRAM', 'ADA', 'NOT',
-    # Solana chain tokens — indexed on HL but NOT tradeable
+    # BANANA, GRASS removed for Batch 3 trial 2026-08-02
+    # KNEIRO, KPEPE, PUMP, NOT removed for Batch 5 trial 2026-08-03
+    # 2026-08-02: Batch 1 trial RE-BLACKLISTED (48h trial: 0% WR, minimal execution)
+    # BABY, STBL: re-blacklisted 2026-08-01 (pre-trial data)
+    # MOVE removed for Batch 5 trial 2026-08-03
+    # UNI, LINEA, TIA, TURBO, BLUR, FET: re-blacklisted 2026-08-02 (pre-trial data)
+    # ORDI, PEOPLE, AIXBT, ZK, CAKE: re-blacklisted 2026-08-02 (no execution during trial)
+    'BABY', 'STBL',
+    'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
+    'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
+    # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
+    'COMP', 'CRV', 'DYDX', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
+    'SEI', 'MET', 'DASH', 'WLD',
     'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
     'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
     # 2026-04-02: phantom orders via openclaw systemd timers
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
     # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)
-    'AERO', 'CHILLGUY', 'LIT', 'DOT', 'ANIME',  # LONG streaks
+    'AERO', 'CHILLGUY', 'LIT', 'ANIME',  # LONG streaks
+    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
+    'ADA',
+    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
+    '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
+    'GRASS', 'HPOS', 'ONDO',
+    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
+    'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
+    'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
+    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
+    'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 
@@ -223,6 +252,9 @@ SIGNAL_SOURCE_BLACKLIST = {
     # pct-hermes+ unblocked above, pct-hermes- remains blocked via line below.
     # 'pct-hermes-',
     # 'pct-hermes',   # bare — combo-only, no standalone value; blocked via *_ENABLED
+    # 2026-08-03: BLOCK pattern_scanner — 0% WR (0/6), -$0.55 in 24h. No flag mapping
+    # in decay detector, blocking at source level is the only kill mechanism.
+    'pattern_scanner',
 }
 SERVER_NAME = 'Hermes'
 MAX_OPEN_POSITIONS = 4   # max open paper positions — diversified portfolio (was 3)
@@ -238,7 +270,7 @@ MAX_TOTAL_POSITIONS = 10  # max total open positions across all tokens
 # Centralized speed/momentum thresholds — used by signal_gen.py, decider_run.py,
 # position_manager.py, and speed_tracker.py.
 # SPEED FEATURE: filters slow/stale tokens from signal generation and hot-set.
-SPEED_MIN_THRESHOLD   = 50    # pctl < 20 → token blocked from signal generation
+SPEED_MIN_THRESHOLD   = 30    # pctl < 30 → token blocked from signal generation (lowered from 35 — critical starvation at 0.33/hr, need accel-300+ entries)
 SPEED_BOOST_THRESHOLD = 70    # pctl >= 70 → entry threshold lowered 5% (easier entry)
 SPEED_BOOST_FACTOR   = 0.95  # multiply entry threshold by this (lower = easier)
 SPEED_HOTSET_WEIGHT  = 0.25  # 25% weight for speed in hot-set effective_conf calculation
@@ -322,10 +354,10 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.005   # 0.5% floor — cut losers fast
-ATR_SL_MAX             = 0.020   # 2.0% cap — survive P90 MAE
-ATR_TP_MIN             = 0.012   # 1.2% floor — good R:R
-ATR_TP_MAX             = 0.015   # 1.5% cap — realistic targets
+ATR_SL_MIN             = 0.008   # 0.8% floor — survive normal crypto retracements (was 0.5% — low-vol tokens with ATR<1% get k=0.5, producing SL=0.03% which triggers on noise; 0.8% gives breathing room)
+ATR_SL_MAX             = 0.021  # AUTO-TUNED 2026-08-020   # 2.0% cap — survive P90 MAE
+ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
+ATR_TP_MAX             = 0.015   # 1.50% cap — match wider SL for R:R (was 1.00% — too tight with 1.0% SL)
 ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
@@ -337,20 +369,19 @@ ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.005  # 0.5% — matching ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.012  # 1.2% — new trade SL cap
-SL_PCT_FALLBACK    = 0.008  # 0.8% if ATR unavailable
-TP_PCT_FALLBACK    = 0.015  # 1.5% fallback target
-STOP_LOSS_DEFAULT  = 0.008  # 0.8% hard fallback
+# CEO 2026-08-05: lowered from 2.0% — trades exit at -1.0% avg, 2.0% floor never reached
+ATR_SL_MIN_INIT    = 0.010  # 1.0% — matches actual exit behavior (was 2.0%, never reached)
+ATR_SL_MAX_INIT    = 0.025  # 2.5% — initial SL cap
+SL_PCT_FALLBACK    = 0.010  # 1.0% if ATR unavailable (matched to ATR_SL_MIN_INIT)
+TP_PCT_FALLBACK    = 0.020  # 2.0% fallback target (2:1 R:R with 1.0% SL)
+STOP_LOSS_DEFAULT  = 0.010  # 1.0% hard fallback (matched to ATR_SL_MIN_INIT)
 SL_PCT_MIN        = 0.005  # 0.5% minimum SL for any trade (hard floor)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
-# When price reaches +TRAILING_ACTIVATION_PCT above entry, SL trails to breakeven.
-# TUNED 2026-07-28: activate earlier (0.25%), tighter trail (0.20%)
-# Analysis: most trades peak at 0.3-0.6% MFE then pull back — need to lock in sooner
-TRAILING_ACTIVATION_PCT = 0.0025  # 0.25% — activate quickly (was 0.50%)
-TRAILING_DISTANCE_PCT   = 0.004   # 0.40% — trail 0.4% behind peak
+# CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
+TRAILING_ACTIVATION_PCT = 0.0035  # 0.35% — trailing needs room to breathe
+TRAILING_DISTANCE_PCT   = 0.0080  # 0.80% — wider distance avoids noise stop-outs
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
@@ -432,7 +463,7 @@ PHASE_ACCEL_FAST_THRESH = 70  # speed_percentile ≥70 → fast momentum branch 
 #
 # accel_300 (momentum): block during exhaustion/extreme (move already done)
 # inv_accel_300 (reversion): block during quiet/building (move not exhausted yet)
-PHASE_ENTRY_FILTER_ENABLED = True   # Master toggle
+PHASE_ENTRY_FILTER_ENABLED = False  # DISABLED 2026-08-04 — phase data often unknown, blocking valid signals
 
 # accel_300: which phases are ALLOWED (momentum entry)
 # Block: exhaustion, extreme
@@ -440,8 +471,8 @@ ACCEL_300_ALLOWED_PHASES = {'quiet', 'building', 'accelerating'}
 
 # inv_accel_300: which phases are ALLOWED (mean reversion entry)
 # Block: quiet, building
-INVERSE_ACCEL_300_ALLOWED_PHASES = {'exhaustion', 'extreme'}
-INVERSE_ACCEL_300_CAUTION_PHASES = {'accelerating'}  # allow but may penalize later
+INVERSE_ACCEL_300_ALLOWED_PHASES = {'decelerating', 'bottoming', 'falling', 'accelerating'}  # FIX: match speed_tracker phases (was 'exhaustion','extreme' — never matched)
+INVERSE_ACCEL_300_CAUTION_PHASES = set()  # all phases allowed
 
 # ── Context Gate ───────────────────────────────────────────────────────────────
 # Two-layer gate before trade execution: rule-based (free) → LLM-based (quota).
@@ -458,12 +489,32 @@ CONTEXT_GATE_CACHE_TTL = 300         # seconds to cache LLM decision for same to
 CONTEXT_GATE_LLM_TIMEOUT = 35        # seconds before LLM call times out
 CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block good setups)
 
+# ── Global Signal Filters (FIX 2026-07-31) ────────────────────────────────────
+# Applied to ALL signals at context gate. Based on winning trade analysis:
+# Winners: speed>50%, momentum>25, RSI 30-70, z-score neutral
+# BUT: Best trades had EXTREME z when speed confirmed direction
+# Key insight: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
+SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
+SIGNAL_FILTER_SPEED_MIN = 45  # CEO LOCK 2026-08-02 23:15 UTC — freeze 48h (was 65 thrash)
+SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
+SIGNAL_FILTER_RSI_MIN = 20           # block SHORT when RSI < this (oversold) - was 30, lowered to allow bounces
+SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) - was 70, raised to allow reversals
+SIGNAL_FILTER_Z_MIN = -1.5           # block LONG when z < this AND speed < 50% (chasing)
+SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50% (chasing)
+
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).
 # Lower = more permissive (more trades, but more losers).
-TOKEN_WR_THRESHOLD = 30               # min WR% to allow (was 50, lowered 2026-07-29)
-TOKEN_WR_MIN_SAMPLE = 5               # min trades before filter applies (was 3, raised 2026-07-29)
+TOKEN_WR_THRESHOLD = 30               # min WR% to allow (LOWERED from 40 — reduce trade starvation, 2026-08-02)
+TOKEN_WR_MIN_SAMPLE = 10              # min trades before filter applies (was 5, raised 2026-08-03 — 5 trades is statistically meaningless)
+
+# ── Wrong-Side Learning Gate ─────────────────────────────────────────────────
+# Penalty and skip threshold for tokens with wrong-side entry history.
+# Softened 2026-08-03: was -15 penalty / 55 skip threshold — too aggressive,
+# blocking ~80% of hot-set candidates. Now -10 / 50 (matches MIN_EXEC_CONFIDENCE).
+WRONG_SIDE_PENALTY = 10               # confidence penalty when wrong-side detected
+WRONG_SIDE_SKIP_THRESHOLD = 50        # skip if adjusted conf below this (= MIN_EXEC_CONFIDENCE)
 
 # ── Similar Setup Lookup (Historical Trade Recall) ───────────────────────────
 # Queries PostgreSQL for past trades with same signal+direction+market conditions.
@@ -492,6 +543,14 @@ HEBBIAN_PENALTY_WR = 0.30             # est WR <= 30% with n>=5 → -10 confiden
 HEBBIAN_PENALTY_AMOUNT = 10           # confidence penalty when penalty triggers
 HEBBIAN_PENALTY_MIN_N = 5             # minimum co-occurrences to trust penalty
 HEBBIAN_CACHE_TTL = 600               # 10 min — Hebbian changes only on close
+
+# ── Phase 3a: Token Sentiment ────────────────────────────────────────────────
+TOKEN_SENTIMENT_ENABLED = True         # enabled 2026-08-02 — 10.2% of historical trades on chronic loser tokens (BSV, STBL, etc.)
+TOKEN_SENTIMENT_K = 20                 # top-K recall concepts to evaluate
+TOKEN_SENTIMENT_SKIP_THRESHOLD = -0.7  # sentiment <= this → SKIP (chronic loser)
+TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD = -0.85  # sentiment <= this → hard skip (very strong negative)
+TOKEN_SENTIMENT_BOOST_THRESHOLD = 0.7  # sentiment >= this → +3 confidence boost
+TOKEN_SENTIMENT_BOOST_AMOUNT = 3       # confidence boost on positive sentiment
 
 # ── Wrong-side stall detection ────────────────────────────────────────────────
 WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
@@ -536,14 +595,30 @@ HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
 # ── Profit Monster ─────────────────────────────────────────────────────────────
 # profit_monster.py — closes medium-profit positions (2-5%) at random intervals.
 # Never touches losing positions.
-PROFIT_MIN_PCT    = 2.5    # 0.5% floor — take profit at 0.5% and above
-PROFIT_MAX_PCT    = 5.0    # 2.0% ceiling — don't hold for big moves
-MAX_CLOSE_PER_WAKE = 3
-SKIP_TOP_PCT      = 0     # don't touch the top 20% most profitable
-FIRE_WINDOWS = {
-    "A": (1, 3),     # 5-8 min — take profit faster
-    "B": (8, 12),    # 8-12 min — slightly slower but still frequent
-}
+# ── Profit Monster — Two-Tier Take-Profit ──────────────────────────────────────
+# Tier 1: Quick scalp — lower profit, fires frequently
+PM_TIER1_MIN_PCT    = 0.6    # min profit % to close
+PM_TIER1_MAX_PCT    = 2.0    # max profit % to close
+PM_TIER1_MAX_CLOSE  = 2      # max positions to close per wake
+PM_TIER1_SKIP_TOP_PCT = 20    # don't touch top X% most profitable (0 = disabled)
+PM_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}   # minutes between fires
+
+# Tier 2: Runner — higher profit, fires less frequently
+PM_TIER2_MIN_PCT    = 2.0    # min profit % to close
+PM_TIER2_MAX_PCT    = 5.0    # max profit % to close
+PM_TIER2_MAX_CLOSE  = 1      # max positions to close per wake
+PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
+PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
+
+PM_DRY_RUN          = False  # global kill switch
+STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
+
+# ── Time / Peak Exit Kill Switches ──────────────────────────────────────────────
+# position_manager.py — controls time-based and peak-reversal exits.
+# Both had 0% WR across 7 trades (2026-08-01 analysis). Disabling to let
+# ATR SL/TP and trailing handle exits instead.
+TIME_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/4), closing positions at small losses
+PEAK_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/3), locking in losses on reversals
 
 # ── Cut Loser ─────────────────────────────────────────────────────────────────
 # cut_loser.py — closes medium-loss positions (-0.5% to -3%) at random intervals.
@@ -562,12 +637,24 @@ CUT_LOSER_FIRE_WINDOWS = {
 # Master kill switches for each signal family. True = signal can fire.
 # False = signal is blocked at BOTH add_signal() (Layer 2) AND decider_run (Layer 3).
 # Individual +/- variants controlled by *_PLUS_ENABLED / *_MINUS_ENABLED flags below.
+#
+# NEVER_REENABLE_FLAGS: signal_rotator.py checks this set and SKIPS re-enabling
+# any flag listed here. Use for signals that have been permanently disabled by
+# manual decision (CEO/developer) — prevents the rotator's auto-enable logic
+# from overriding a deliberate kill-switch decision.
+NEVER_REENABLE_FLAGS = {
+    'INVERSE_ACCEL_300_ENABLED',
+    'INVERSE_ACCEL_300_PLUS_ENABLED',
+    # 'INVERSE_ACCEL_300_MINUS_ENABLED',  # RE-ENABLED 2026-08-04
+    'ACCEL_300_MINUS_ENABLED',  # RE-ENABLED 2026-08-04 — gap threshold lowered, needs SHORT volume
+    'PATTERN_SCANNER',  # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
+}
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
 PCT_HERMES_MINUS_ENABLED = True   # pct-hermes- — 46.2% WR in hzscore+,pct-hermes-,vel-hermes- combo (best SHORT)
-VEL_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
+VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 7d), -$1.61. No edge.
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
-VEL_HERMES_MINUS_ENABLED = True   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
+VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HZSCORE_PLUS_ENABLED     = True   # hzscore+ — 31.3% WR, +13.92% PnL
 HZSCORE_MINUS_ENABLED    = True   # hzscore- — 0% WR, -$1.14 (mixed, keep enabled for now)
@@ -590,21 +677,21 @@ MIN_GAP_PCT_SHORT        = 0.15  # minimum gap below EMA300 to fire SHORT (was 0
 ACCEL_300_PERIOD          = 300  # EMA(300) on 1m prices
 ACCEL_300_LOOKBACK        = 30   # bars ago when price was on the other side of EMA300 — for LONG (was 100 → tightened 2026-06-08)
 ACCEL_300_LOOKBACK_SHORT  = 500  # much longer lookback for SHORT — handles sustained bleeds where cross is far in the past (was 30)
-ACCEL_300_PERSISTENCE_BARS = 18   # min bars gap must persist (was 15 — stronger confirmation)
-ACCEL_300_MIN_GAP_GROWTH = -0.10  # allow slight gap narrowing — catches decelerating trends (was 0.05)
+ACCEL_300_PERSISTENCE_BARS = 7    # min bars gap must persist (was 10 — catch moves earlier in weak trends)
+ACCEL_300_MIN_GAP_GROWTH = -0.05  # allow gap narrowing up to 0.05% (was 0.005 — too strict for ranging market)
 ACCEL_300_MIN_GAP_EXPANSION = 0.01 # price must be this much farther from EMA than at cross bar (gap expansion gate — both directions)
 ACCEL_300_MIN_GAP_PCT     = 0.20 # minimum gap above/below EMA300 to fire — was hardcoded in accel_300.py (was 0.15 → tightened 2026-05-11)
-ACCEL_300_MIN_GAP_PCT_LONG = 0.50   # min EMA gap % for LONG (was 0.45 — stronger trend)
-ACCEL_300_MIN_GAP_PCT_SHORT = 0.50   # min EMA gap % for SHORT (was 0.90 — catch downtrends earlier)
+ACCEL_300_MIN_GAP_PCT_LONG = 0.35   # min EMA gap % for LONG (was 0.50 — too tight for current low-vol market)
+ACCEL_300_MIN_GAP_PCT_SHORT = 0.35  # min EMA gap % for SHORT (was 0.50 — symmetric)
 ACCEL_300_MIN_GAP_GROWTH_SHORT = -0.10  # allow slight gap narrowing for SHORT (was 0.06)
 ACCEL_300_COOLDOWN_BARS   = 10   # dedup: only fire once per N bars per token+direction (was 12 → tightened 2026-05-11)
 ACCEL_300_LOOKBACK_1M     = 700  # 1m prices to fetch per token (warmup + detection window)
-ACCEL_300_ENABLED        = True  # Re-enabled 2026-07-27 — breakout mode added (83% WR backtest)
+ACCEL_300_ENABLED        = False  # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
-ACCEL_300_REGIME_SLOPE_PCT = 0.001   # min price slope % — allow weak trends (was 0.005)
+ACCEL_300_REGIME_SLOPE_PCT = 0.0005  # min price slope % — allow very weak trends (was 0.001)
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
-ACCEL_300_STALE_BARS = 25   # max bars since EMA cross for LONG (was 30 — fresher signals)
-ACCEL_300_STALE_BARS_SHORT = 25   # max bars since EMA cross for SHORT (was 30 — fresher signals)
+ACCEL_300_STALE_BARS = 15   # max bars since EMA cross for LONG (was 25 — fresher signals, catch moves earlier)
+ACCEL_300_STALE_BARS_SHORT = 15   # max bars since EMA cross for SHORT (was 25 — fresher signals)
 ACCEL_300_STALE_LOOKBACK   = 400  # detection bar must be within N bars of latest bar — older = stale, skip
 ACCEL_300_MARGINAL_ACCEL_BARS = 3   # bars_since_cross threshold — only enforce marginal acceleration check above this (fire early on breakout)
 ACCEL_300_BARS_UNKNOWN      = 999  # sentinel value when cross_bar is unknown (not found)
@@ -623,13 +710,16 @@ ACCEL_300_BLOCK_COSIGS = {'ma-cross-5m+', 'pct-hermes+'}  # 16.7% / 35.7% WR
 # LONG when price far below EMA300 and rising.
 # TUNED 2026-07-27: enter earlier (smaller gap), block overextended (max_gap),
 # require stronger reversion confirmation. 0% WR on gap>=0.15% → cap at 0.8%.
-INVERSE_ACCEL_300_MIN_GAP_PCT_LONG = 0.30   # min gap below EMA300 to fire LONG (was 0.50 — too late)
-INVERSE_ACCEL_300_MIN_GAP_PCT_SHORT = 0.30  # min gap above EMA300 to fire SHORT (was 0.50 — too late)
-INVERSE_ACCEL_300_REVERSION_BARS = 3          # min bars of gap narrowing (was 2 — too little confirmation)
-INVERSE_ACCEL_300_REVERSION_THRESHOLD = 0.08 # min gap narrowing % to confirm reversion (was 0.06 — too much noise)
+INVERSE_ACCEL_300_MIN_GAP_PCT_LONG = 1.5    # min gap below EMA300 to fire LONG (was 2.0 — low-vol market needs lower threshold)
+INVERSE_ACCEL_300_MIN_GAP_PCT_SHORT = 1.5   # min gap above EMA300 to fire SHORT (was 2.0 — same rationale)
+# NOTE: inv-accel-300- is DISABLED (INVERSE_ACCEL_300_MINUS_ENABLED=False  # AUTO-ROTATED 2026-08-04 ) but still executing
+# due to kill switch bypass bug (25th consecutive analysis). Gap raised to 5.0%
+# as defense-in-depth — if signal fires despite kill switch, at least filter marginal entries.
+INVERSE_ACCEL_300_REVERSION_BARS = 2          # min bars of gap narrowing (was 3 — reduce starvation, let signal fire sooner)
+INVERSE_ACCEL_300_REVERSION_THRESHOLD = 0.05 # min gap narrowing % to confirm reversion (was 0.08 — lower threshold for more entries)
 INVERSE_ACCEL_300_COOLDOWN_BARS = 15         # cooldown between signals per token+direction
 INVERSE_ACCEL_300_LOOKBACK_1M = 700          # 1m prices to fetch per token
-INVERSE_ACCEL_300_MAX_GAP_PCT = 0.8          # don't fire if gap is too extreme (was 1.5 — 0% WR above 0.15%)
+INVERSE_ACCEL_300_MAX_GAP_PCT = 5.0          # don't fire if gap is too extreme (RAISED to 5.0 — match MIN_GAP defense-in-depth)
 # 1h trend filter: skip if price moved >0.5% against reversion direction in last hour
 INVERSE_ACCEL_300_TREND_FILTER_PCT = 0.30    # max 1h move against reversion direction (was 0.50 — too lenient)
 # ── Accel-300 Chop Filter (signals/accel_300.py) ─────────────────────────────────
@@ -642,7 +732,7 @@ ACCEL_300_CHOP_LOOKBACK        = 50   # bars used for EMA angle and avg-gap chop
 # ── Accel-300 Ultra-Fast Breakout (signals/accel_300.py) ──────────────────────
 # Fires on high-velocity breakouts BEFORE persistence confirms the trend.
 # Backtested: 78% WR, +1.60% avg PnL on STX (11 signals in 3 days).
-ACCEL_300_BREAKOUT_ENABLED     = True   # enable ultra-fast breakout detection
+ACCEL_300_BREAKOUT_ENABLED     = False  # DISABLED 2026-08-02 — 0% WR (0/3 in 24h), -$1.93 total. All trades hit SL immediately.
 ACCEL_300_BREAKOUT_VELOCITY    = 1.0    # min price move % in 5 bars (1.0% = fast breakout)
 ACCEL_300_BREAKOUT_GAP_MIN     = 0.5    # min gap % from EMA60 (was 1.0 — too restrictive)
 ACCEL_300_BREAKOUT_TREND_EMA   = 200    # LONG only above this EMA, SHORT only below
@@ -650,24 +740,35 @@ ACCEL_300_BREAKOUT_VOL_MULT    = 1.5    # volume must be > N * 20-bar average
 ACCEL_300_BREAKOUT_COOLDOWN    = 8      # bars between signals per token (40min = 8 * 5m)
 ACCEL_300_BREAKOUT_CONFIDENCE  = 70     # base confidence for breakout signals
 
+# ── Velocity Ignition (FIX 2026-07-31) ────────────────────────────────────────
+# Catches the FIRST strong momentum bar after EMA300 cross — enters 15-20 min
+# earlier than persistence mode. Key for moves like MOVE 2026-07-31.
+ACCEL_300_VELOCITY_IGNITION_ENABLED   = False  # DISABLED 2026-08-01 — 0% WR (10 trades), -$4.97 total. Fires on first bar spike that reverses.
+ACCEL_300_VELOCITY_PLUS_ENABLED      = False # RE-ENABLED 2026-08-04 — signal diversity
+ACCEL_300_VELOCITY_MINUS_ENABLED     = False # RE-ENABLED 2026-08-04 — signal diversity
+ACCEL_300_VELOCITY_IGNITION_THRESHOLD = 1.5    # last bar must be > N x average bar change
+ACCEL_300_VELOCITY_IGNITION_MIN_GAP   = 0.30   # min gap % from EMA300 (lower than persistence 0.50)
+ACCEL_300_VELOCITY_IGNITION_MIN_GAP_GROWTH = 0.02  # gap must grow over 3 bars (positive = widening)
+ACCEL_300_VELOCITY_IGNITION_MAX_CROSS_AGE  = 15    # cross must be within N bars (fresh move)
+
 GAP_300_ENABLED          = False  # gap-300+ — 14.3% WR, -$1.52, worst active loser
 GAP_300_PLUS_ENABLED      = False
 GAP_300_MINUS_ENABLED     = False
 
 # ── Pattern Scanner Toggles (pattern_scanner.py) ─────────────────────────────
-PATTERN_FLAG_ENABLED       = True   # bull/bear flag patterns (3%+ pole)
-PATTERN_MICRO_FLAG_ENABLED = True   # micro bull/bear flag (0.3%+ pole, low-vol markets)
-PATTERN_TRIANGLE_ENABLED   = True   # ascending/descending triangle
-PATTERN_WOLF_ENABLED       = True   # wolf wave 5-point reversal pattern
-PATTERN_CHANNEL_ENABLED    = True   # channel-based flags (linear regression, ATR-normalized)
+PATTERN_FLAG_ENABLED       = False  # CEO 2026-08-04 — 0% WR, no edge, permanently disabled
+PATTERN_MICRO_FLAG_ENABLED = False   # DISABLED 2026-08-02 — matches master flag
+PATTERN_TRIANGLE_ENABLED   = False  # CEO 2026-08-04 — 0% WR, no edge, permanently disabled
+PATTERN_WOLF_ENABLED       = False  # CEO 2026-08-05 — 0% WR (10 trades 7d), -$1.38. No edge found.
+PATTERN_CHANNEL_ENABLED    = False   # DISABLED 2026-08-02 — matches master flag
 MA_CROSS_ENABLED         = False   # ma_cross (short only historically)
 MA_CROSS_PLUS_ENABLED     = False  # ma_cross+ — catastrophic losses
 MA_CROSS_MINUS_ENABLED    = True
 MA_CROSS_5M_ENABLED       = False
 MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blacklist
 MA_CROSS_5M_MINUS_ENABLED = False
-TL_BREAK_ENABLED         = True    # diagonal trendline breakout — rewritten 2026-07-26
-ATR_COMPRESSION_ENABLED  = True
+TL_BREAK_ENABLED         = False   # CEO KILLED 2026-08-04 21:05 — 13%/21% WR, -$18.58 in 7d. Biggest loser. 327 trades, no edge.
+ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
 # For each signal: _PLUS_ENABLED controls LONG, _MINUS_ENABLED controls SHORT.
@@ -701,18 +802,18 @@ R2_TREND_MINUS_ENABLED       = False    # r2_trend- SHORT
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT
-VOLUME_HL_ENABLED        = True
+VOLUME_HL_ENABLED        = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 VOLUME_HL_PLUS_ENABLED        = False    # volume_hl+ LONG
 VOLUME_HL_MINUS_ENABLED       = True    # volume_hl- SHORT
 EMA20_50_PLUS_ENABLED         = False    # ema20_50+ LONG
 EMA20_50_MINUS_ENABLED        = False    # ema20_50- SHORT
 MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
-ACCEL_300_PLUS_ENABLED        = True   # Re-enabled 2026-07-27 — breakout mode added
-ACCEL_300_MINUS_ENABLED       = True   # Re-enabled 2026-07-27 — breakout mode added
-INVERSE_ACCEL_300_ENABLED     = True    # inverse_accel_300 — mean reversion signal
-INVERSE_ACCEL_300_PLUS_ENABLED  = True  # inverse_accel_300+ LONG (buy dip)
-INVERSE_ACCEL_300_MINUS_ENABLED = True  # inverse_accel_300- SHORT (sell rip)
+ACCEL_300_PLUS_ENABLED        = False  # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
+ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-04 21:05 — 15% WR, -$1.26 in 7d. No SHORT edge.
+INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
+INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
+INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$2.34 in 7d. In NEVER_REENABLE.
 COUNTER_FLIP_PLUS_ENABLED     = True    # counter_flip+ LONG
 COUNTER_FLIP_MINUS_ENABLED    = True    # counter_flip- SHORT
 HMACD_MTF_PLUS_ENABLED        = True    # hmacd_mtf+ LONG
@@ -720,15 +821,33 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_PLUS_ENABLED               = False  # disabled while testing inverse_accel_300
 RS_MINUS_ENABLED              = False  # disabled while testing inverse_accel_300
-TL_BREAK_PLUS_ENABLED         = True    # tl_break+ LONG
-TL_BREAK_MINUS_ENABLED        = True    # tl_break- SHORT
+TL_BREAK_PLUS_ENABLED         = False   # CEO KILLED 2026-08-04 21:05 — 13% WR, -$9.60 in 7d. No edge.
+TL_BREAK_MINUS_ENABLED        = False # CEO 2026-08-04 — re-enabled. Monitor for decay.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
 # squeeze_cross.py — EMA(5)×EMA(180) cross + ATR squeeze + widening gap
 # Backtested: 71% WR, +2.36% avg PnL on 3-day 1m data
 SQUEEZE_CROSS_ENABLED       = False  # DISABLED 2026-07-28: 0% WR on LONG, 40% on SHORT — no edge
-SQUEEZE_CROSS_PLUS_ENABLED  = True    # squeeze_cross+ LONG
-SQUEEZE_CROSS_MINUS_ENABLED = True    # squeeze_cross- SHORT
+SQUEEZE_CROSS_PLUS_ENABLED  = False    # squeeze_cross+ LONG — DISABLED 2026-08-02: matches master flag
+SQUEEZE_CROSS_MINUS_ENABLED = False    # squeeze_cross- SHORT — DISABLED 2026-08-02: matches master flag
+
+# ── Bollinger Squeeze Signal ─────────────────────────────────────────────────
+# bollinger_squeeze.py — BB squeeze + breakout from price_history ticks
+BOLLINGER_SQUEEZE_ENABLED = False  # DISABLED 2026-08-01 — 0% WR (4 trades), -$2.41. Dominant signal but all losers.
+BOLLINGER_SQUEEZE_PLUS_ENABLED  = False    # bb-squeeze+ LONG — DISABLED 2026-08-02: matches master flag
+BOLLINGER_SQUEEZE_MINUS_ENABLED = False    # bb-squeeze- SHORT — DISABLED 2026-08-02: matches master flag
+BOLLINGER_SQUEEZE_PERIOD       = 20       # SMA window for Bollinger Bands
+BOLLINGER_SQUEEZE_MULT         = 2.0      # stddev multiplier
+BOLLINGER_SQUEEZE_THRESH       = 0.04     # bandwidth < 4% = squeeze
+BOLLINGER_SQUEEZE_MIN_BARS     = 6        # min bars in squeeze before breakout valid
+BOLLINGER_SQUEEZE_BREAK_PCT    = 0.15     # price must cross band by this % for confirmation
+BOLLINGER_SQUEEZE_CANDLE_SEC   = 300      # candle period in seconds (300 = 5m)
+BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze formation
+BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
+
+# bb_bounce.py — mean reversion for ranging markets
+BB_BOUNCE_ENABLED = False  # CEO 2026-08-05 — 0% WR (48h), re-enabled after false "fix". DISABLED.
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period
@@ -748,6 +867,11 @@ SQUEEZE_CROSS_CONF_WIDEN    = 5       # bonus for strong widening
 SQUEEZE_CROSS_CONF_MAX      = 90      # confidence cap
 
 COUNTER_FLIP_ENABLED     = False   # controlled by counter_flip_signal.py independently
+
+# ── Wyckoff Accumulation/Distribution Signal ────────────────────────────────
+# wyckoff.py — detects Wyckoff accumulation springs (LONG) and distribution
+# upthrusts (SHORT) using volume and price structure analysis on 5m candles.
+WYCKOFF_ENABLED = False   # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 
 # ── EMA300 Angle Signal ────────────────────────────────────────────────────────
 # ema_angle.py — detects when EMA300 starts lifting from flat (LONG setup)
@@ -867,9 +991,9 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Fires when z-score CROSSES above threshold AND is rising (velocity > 0).
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
-ZSCORE_RISING_ENABLED     = True   # master kill-switch
-ZSCORE_RISING_PLUS_ENABLED = True   # LONG (z crossing above TH, rising)
-ZSCORE_RISING_MINUS_ENABLED = True  # SHORT (z crossing below -TH, falling)
+ZSCORE_RISING_ENABLED     = False  # CEO 2026-08-04 — KILLED. 0% WR (31 trades 7d), -$2.83. Dynamic inversion didn't help.
+ZSCORE_RISING_PLUS_ENABLED = False # CEO 2026-08-04 — re-enabled with dynamic inversion active
+ZSCORE_RISING_MINUS_ENABLED = False  # AUTO-ROTATED 2026-08-04  # CEO 2026-08-04 — re-enabled with dynamic inversion (SHORT→LONG auto-invert when WR<30%)
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
 ZSCORE_RISING_VEL_BARS     = 5      # lookback for z-velocity (cur_z - z_N_bars_ago)
@@ -924,12 +1048,13 @@ DEAD_HOURS_ENABLED = True
 DEAD_HOURS_START = 3   # 03:00 UTC
 DEAD_HOURS_END = 8     # 08:00 UTC
 DEAD_HOURS_SIGNALS = [
-    'inv-accel-300-',   # 17.2% WR dead vs 37.8% active
-    'inv-accel-300+',   # 18.8% WR dead vs 31.0% active
-    'accel-300+',       # 16.7% WR dead vs 33.3% active
-    'tl_break_long',    # all LONGs during dead hours lost (03-04 UTC data)
+    # ALLOWLIST — only these signals fire during dead hours (DEFAULT=True blocks everything else)
+    'accel-300-',       # 50% WR during dead hours
+    'zscore-rising',    # 239 signals/hr — primary signal source
+    'vel-hermes',       # active signal with wins
+    'bb_bounce',        # backtested 48% WR, re-enabled 2026-08-05
 ]
-DEAD_HOURS_DEFAULT = False  # False = only block listed signals, True = block ALL signals
+DEAD_HOURS_DEFAULT = True  # True = block ALL signals not in allowlist (was False — only blocked 4 signals, dead hours WR=16%)
 
 # ── Targeted Signal Inversion ──────────────────────────────────────────────────
 # Invert direction for specific signals that are statistically proven losers.
@@ -952,3 +1077,58 @@ SIGNAL_INVERSION_MAP = {
     # 'sqx-'        — 10 trades, 40% WR — borderline, don't invert yet
     # 'inv-accel-300-' — 66 trades, 23% WR — worst signal, but invert→LONG is catching falling knife
 }
+
+# ── Dynamic Signal Inversion (WR-based auto-invert) ────────────────────────────
+# Automatically inverts signals whose 24h win-rate drops below threshold.
+# Complementary to SIGNAL_INVERSION_MAP (static overrides).
+# Queries signal_outcomes DB at trade time — no extra scripts needed.
+DYNAMIC_INVERSION_ENABLED = True        # master toggle for auto-inversion
+INVERT_WR_THRESHOLD = 30                # auto-invert when WR < this %
+INVERT_MIN_TRADES = 5                   # need at least this many trades before inverting
+INVERT_LOOKBACK_HOURS = 24              # performance window (hours)
+INVERT_CACHE_TTL = 300                  # cache WR lookups for 5 min (seconds)
+# Signals to monitor for auto-inversion (signal_type values from signal_outcomes).
+# If a signal's WR drops below threshold, its direction is flipped at execution.
+INVERT_SIGNALS = [
+    'zscore-rising+',       # currently 0% WR — will auto-invert LONG→SHORT
+    'zscore-rising-',       # currently 0% WR — will auto-invert SHORT→LONG
+    'tl_break_long',        # ADX+EMA filtered — auto-invert when WR<30%
+    'tl_break_short',       # ADX+EMA filtered — auto-invert when WR<30%
+    # Add more signal types here as needed:
+    # 'velocity+',
+    # 'velocity-',
+]
+
+# ── Trend Alignment Filter ─────────────────────────────────────────────────
+# Block signals that don't align with 1H EMA trend direction.
+# Backtest: 275 trades → 74 trades, PnL -$4.05 → +$3.28
+TREND_FILTER_ENABLED = True
+TREND_FILTER_TIMEFRAME = '1h'
+TREND_FILTER_EMA_FAST = 20
+TREND_FILTER_EMA_SLOW = 50
+TREND_FILTER_NEUTRAL_PCT = 0.105 # EMA spread % for neutral zone (allow both)
+TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
+
+# ── Macro Deployment Gate ─────────────────────────────────────────────────
+# Check market conditions before trading. Adjust position sizing.
+MACRO_GATE_ENABLED = True
+MACRO_HIGH_VOL_THRESHOLD = 0.05  # 5% ATR = high volatility → STOP
+MACRO_LOW_WR_THRESHOLD = 30      # WR < 30% → REDUCE
+MACRO_REDUCE_SIZE_MULT = 0.5     # 50% sizing when REDUCE
+
+# ── Self-Learning System ─────────────────────────────────────────────────
+# Auto-detect signal decay and adjust parameters (scientific method)
+SELF_LEARNER_ENABLED = True
+SELF_LEARNER_MIN_TRADES = 10    # Need at least 10 trades to judge
+SELF_LEARNER_WR_THRESHOLD = 0.30  # Below this = tighten filters
+SELF_LEARNER_WR_TARGET = 0.40     # Target win rate
+SELF_LEARNER_PARAM_STEP = 0.05    # 5% per iteration
+SELF_LEARNER_MAX_ADJUSTMENTS = 3  # Max changes per day
+SELF_LEARNER_MIN_BETWEEN = 15    # Min trades between changes
+
+# ── Persistent Decision Log ──────────────────────────────────────────────
+# Log every trade decision with reasoning, learn from outcomes
+DECISION_LOG_ENABLED = True
+DECISION_LOG_PATH = '/root/.hermes/data/decisions.json'
+DECISION_LOG_MAX_ENTRIES = 1000
+DECISION_LOG_CACHE_TTL = 300

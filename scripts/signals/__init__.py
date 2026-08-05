@@ -49,6 +49,9 @@ from hermes_constants import (
     SQUEEZE_CROSS_ENABLED, SQUEEZE_CROSS_PLUS_ENABLED, SQUEEZE_CROSS_MINUS_ENABLED,
     ZSCORE_PUMP_NEW_ENABLED, ZSCORE_PUMP_PLUS_ENABLED, ZSCORE_PUMP_MINUS_ENABLED,
     MTP_ZSCORE_ENABLED, MTP_ZSCORE_PLUS_ENABLED, MTP_ZSCORE_MINUS_ENABLED,
+    BOLLINGER_SQUEEZE_ENABLED,
+    BB_BOUNCE_ENABLED,
+    WYCKOFF_ENABLED,
 )
 
 
@@ -212,6 +215,8 @@ except Exception:
     _squeeze_cross_run = None
 
 try:
+    import sys as _sys
+    _sys.path.insert(0, '/root/.hermes/scripts')  # pattern_scanner.py is in scripts/, not signals/
     from pattern_scanner import run as _pattern_scanner_run
 except Exception:
     _pattern_scanner_run = None
@@ -225,6 +230,21 @@ try:
     from signals.mtp_zscore import scan_mtp_zscore_signals as _mtp_zscore_run
 except Exception:
     _mtp_zscore_run = None
+
+try:
+    from signals.bollinger_squeeze import scan_bollinger_squeeze as _bollinger_squeeze_run
+except Exception:
+    _bollinger_squeeze_run = None
+
+try:
+    from signals.bb_bounce import run as _bb_bounce_run
+except Exception:
+    _bb_bounce_run = None
+
+try:
+    from signals.wyckoff import run as _wyckoff_run
+except Exception:
+    _wyckoff_run = None
 
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
@@ -276,6 +296,9 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pattern_scanner',     'enabled': True, 'run': _pattern_scanner_run},  # toggled internally via PATTERN_*_ENABLED
     {'name': 'zscore_pump',         'enabled': ZSCORE_PUMP_NEW_ENABLED,       'run': _zscore_pump_run},
     {'name': 'mtp_zscore',          'enabled': MTP_ZSCORE_ENABLED,             'run': _mtp_zscore_run},
+    {'name': 'bollinger_squeeze',   'enabled': BOLLINGER_SQUEEZE_ENABLED,      'run': _bollinger_squeeze_run},
+    {'name': 'bb_bounce',           'enabled': BB_BOUNCE_ENABLED, 'run': _bb_bounce_run},  # CEO 2026-08-05: 0% WR, no edge
+    {'name': 'wyckoff',             'enabled': WYCKOFF_ENABLED,               'run': _wyckoff_run},
 ]
 
 
@@ -332,8 +355,11 @@ def _run_signal(args):
     try:
         import sys
         sys.path.insert(0, '/root/.hermes/scripts')
-        # Use the signal name itself as module name
-        mod = __import__(f'signals.{sig_name}', fromlist=[fn_name])
+        # Try direct import first (pattern_scanner.py is in scripts/, not signals/)
+        try:
+            mod = __import__(sig_name, fromlist=[fn_name])
+        except ImportError:
+            mod = __import__(f'signals.{sig_name}', fromlist=[fn_name])
         fn = getattr(mod, fn_name, None)
         if fn is None:
             return sig_name, None
@@ -383,6 +409,7 @@ def run_all_signals(signal_list=None):
         'tl_break': 'run', 'squeeze_cross': 'run',
         'zscore_pump': 'scan_zscore_pump_signals',
         'mtp_zscore': 'scan_mtp_zscore_signals',
+        'bollinger_squeeze': 'scan_bollinger_squeeze',
     }
     work = [
         (signal['name'], signal['run'].__name__)

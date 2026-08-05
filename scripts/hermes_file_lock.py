@@ -7,7 +7,16 @@ Usage:
     from hermes_file_lock import FileLock
 
     with FileLock('hotset_json'):
-        json.dump(data, open(HOTSET_PATH, 'w'))
+        # Atomic write: write to temp file, then os.replace()
+        import tempfile
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(HOTSET_PATH))
+        try:
+            with os.fdopen(tmp_fd, 'w') as tmp_f:
+                json.dump(data, tmp_f)
+            os.replace(tmp_path, HOTSET_PATH)
+        except Exception:
+            os.unlink(tmp_path)
+            raise
 
     with FileLock('ai_decider'):
         patch(...)
@@ -97,3 +106,49 @@ class FileLock:
             return open(self.lockfile).read().strip()
         except Exception:
             return "unknown"
+
+
+# ── Atomic JSON Write ─────────────────────────────────────────────────────────
+
+def atomic_write_json(data, path):
+    """Write JSON data atomically using temp file + os.replace.
+    
+    Prevents corruption from crashes mid-write. The old file is only
+    replaced after the new file is fully written and synced.
+    
+    Usage:
+        from hermes_file_lock import atomic_write_json
+        atomic_write_json({'key': 'value'}, '/path/to/file.json')
+    """
+    import json
+    import tempfile
+    
+    dir_name = os.path.dirname(path)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    
+    # Write to temp file in same directory (same filesystem for atomic replace)
+    fd, tmp_path = tempfile.mkstemp(dir=dir_name or '.', suffix='.tmp')
+    try:
+        with os.fdopen(fd, 'w') as f:
+            json.dump(data, f, indent=2, default=str)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, path)
+    except Exception:
+        # Clean up temp file on failure
+        try:
+            os.unlink(tmp_path)
+        except Exception:
+            pass
+        raise
+
+
+def load_json(path, default=None):
+    """Load JSON file safely, returning default on any error."""
+    import json
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except Exception:
+        return default

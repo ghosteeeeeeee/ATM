@@ -23,6 +23,41 @@ def _get_conn(path, row_factory=False):
         conn.row_factory = sqlite3.Row
     return conn
 
+
+from contextlib import contextmanager
+
+@contextmanager
+def _db_cursor(path, row_factory=False):
+    """Context manager for database connections with guaranteed cleanup.
+    
+    Usage:
+        with _db_cursor(RUNTIME_DB) as (conn, cur):
+            cur.execute("SELECT ...")
+            rows = cur.fetchall()
+        # conn and cur are automatically closed, even on exception
+    
+    With row_factory:
+        with _db_cursor(RUNTIME_DB, row_factory=True) as (conn, cur):
+            cur.execute("SELECT ...")
+            row = cur.fetchone()
+            print(row['column_name'])
+    """
+    conn = sqlite3.connect(path, timeout=30)
+    if row_factory:
+        conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    try:
+        yield conn, cur
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        try:
+            conn.close()
+        except Exception:
+            pass
+
 def _static():
     if os.path.exists(STATIC_DB):
         return STATIC_DB
@@ -457,6 +492,94 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         print(f'  DEBUG add_signal BLOCKED: {token} {direction} conf={confidence} < {MIN_CONFIDENCE_FLOOR} [confidence floor]', flush=True)
         return None  # Silently skip low-confidence signals
 
+    # ── Monte Carlo gate — block signal types with proven negative expectation ──
+    try:
+        from monte_carlo_gate import monte_carlo_gate
+        mc_allow, mc_stats = monte_carlo_gate(signal_type, direction)
+        if not mc_allow:
+            print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
+                  f'MC p_profit={mc_stats["p_profit"]:.2f} n={mc_stats["sample_size"]} [monte_carlo]', flush=True)
+            return None
+    except Exception:
+        pass  # fail open — don't block on MC errors
+
+    # ── Trend alignment filter — block counter-trend signals ────────────────
+    # Backtest: 275 trades → 74, PnL -$4.05 → +$3.28
+    try:
+        from hermes_constants import (
+            TREND_FILTER_ENABLED, TREND_FILTER_TIMEFRAME,
+            TREND_FILTER_EMA_FAST, TREND_FILTER_EMA_SLOW,
+            TREND_FILTER_NEUTRAL_PCT, TREND_FILTER_CACHE_TTL
+        )
+        if TREND_FILTER_ENABLED:
+            _trend_cache_key = f"{token.upper()}:{TREND_FILTER_TIMEFRAME}"
+            _trend_cache = getattr(add_signal, '_trend_cache', {})
+            _trend_ts = getattr(add_signal, '_trend_ts', {})
+
+            now_ts = time.time()
+            if _trend_cache_key in _trend_cache and now_ts - _trend_ts.get(_trend_cache_key, 0) < TREND_FILTER_CACHE_TTL:
+                trend_dir = _trend_cache[_trend_cache_key]
+            else:
+                # Fetch 1H candles and compute EMAs
+                trend_dir = None
+                try:
+                    import sqlite3 as _sqlite3
+                    from paths import CANDLES_DB
+                    _conn = _sqlite3.connect(CANDLES_DB, timeout=5)
+                    try:
+                        _cur = _conn.cursor()
+                        _cur.execute(f"""
+                            SELECT close FROM candles_{TREND_FILTER_TIMEFRAME}
+                            WHERE token = ?
+                            ORDER BY ts DESC
+                            LIMIT ?
+                        """, (token.upper(), TREND_FILTER_EMA_SLOW + 10))
+                        _rows = _cur.fetchall()
+                    finally:
+                        _conn.close()
+
+                    if _rows and len(_rows) >= TREND_FILTER_EMA_SLOW:
+                        _closes = [r[0] for r in reversed(_rows)]
+                        # Compute EMAs
+                        def _ema(data, period):
+                            k = 2 / (period + 1)
+                            val = data[0]
+                            for v in data[1:]:
+                                val = v * k + val * (1 - k)
+                            return val
+
+                        ema_fast = _ema(_closes, TREND_FILTER_EMA_FAST)
+                        ema_slow = _ema(_closes, TREND_FILTER_EMA_SLOW)
+
+                        if ema_slow > 0:
+                            spread_pct = abs(ema_fast - ema_slow) / ema_slow * 100
+                            if spread_pct < TREND_FILTER_NEUTRAL_PCT:
+                                trend_dir = 'NEUTRAL'
+                            elif ema_fast > ema_slow:
+                                trend_dir = 'BULLISH'
+                            else:
+                                trend_dir = 'BEARISH'
+                except Exception:
+                    pass  # fail open
+
+                # Cache result
+                add_signal._trend_cache = _trend_cache
+                add_signal._trend_ts = _trend_ts
+                _trend_cache[_trend_cache_key] = trend_dir
+                _trend_ts[_trend_cache_key] = now_ts
+
+            # Block counter-trend signals
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT':
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
+                      f'trend={trend_dir} [trend_filter]', flush=True)
+                return None
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG':
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
+                      f'trend={trend_dir} [trend_filter]', flush=True)
+                return None
+    except ImportError:
+        pass  # hermes_constants not available
+
     # ── Maximum confidence ceiling ───────────────────────────────────────────
     # R&S is structural (not momentum), ma_cross/r2_trend are confirmatory.
     # No signal type should exceed 88 — this prevents any single signal from
@@ -503,11 +626,13 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
             RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
             ACCEL_300_PLUS_ENABLED, ACCEL_300_MINUS_ENABLED,
+            ACCEL_300_VELOCITY_PLUS_ENABLED, ACCEL_300_VELOCITY_MINUS_ENABLED,
             EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
             COUNTER_FLIP_PLUS_ENABLED, COUNTER_FLIP_MINUS_ENABLED,
             HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
             RS_PLUS_ENABLED, RS_MINUS_ENABLED,
-            TL_BREAK_PLUS_ENABLED, TL_BREAK_MINUS_ENABLED,
+            TL_BREAK_ENABLED, TL_BREAK_PLUS_ENABLED, TL_BREAK_MINUS_ENABLED,
+            BOLLINGER_SQUEEZE_ENABLED, BOLLINGER_SQUEEZE_PLUS_ENABLED, BOLLINGER_SQUEEZE_MINUS_ENABLED,
             MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
             MA_CROSS_5M_ENABLED, MA_CROSS_5M_PLUS_ENABLED, MA_CROSS_5M_MINUS_ENABLED,
             HH_HL_ENABLED, GUPPY_ENABLED, MACD_ACCEL_ENABLED,
@@ -668,6 +793,122 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             if _comp == 'ema-angle' and not EMA_ANGLE_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" EMA_ANGLE_ENABLED=False', flush=True)
                 return None
+            # accel-300+ (momentum LONG)
+            if _comp == 'accel-300+' and not ACCEL_300_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_PLUS_ENABLED=False', flush=True)
+                return None
+            # accel-300- (momentum SHORT)
+            if _comp == 'accel-300-' and not ACCEL_300_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_MINUS_ENABLED=False', flush=True)
+                return None
+            # accel-300-vel+ (velocity ignition LONG variant)
+            if _comp == 'accel-300-vel+' and not ACCEL_300_VELOCITY_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_VELOCITY_PLUS_ENABLED=False', flush=True)
+                return None
+            # accel-300-vel- (velocity ignition SHORT variant)
+            if _comp == 'accel-300-vel-' and not ACCEL_300_VELOCITY_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_VELOCITY_MINUS_ENABLED=False', flush=True)
+                return None
+            # tl_break+ (trendline breakout LONG)
+            if _comp == 'tl_break+' and not TL_BREAK_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TL_BREAK_PLUS_ENABLED=False', flush=True)
+                return None
+            # tl_break- (trendline breakout SHORT)
+            if _comp == 'tl_break-' and not TL_BREAK_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TL_BREAK_MINUS_ENABLED=False', flush=True)
+                return None
+            # bb-squeeze+ (bollinger squeeze LONG)
+            if _comp == 'bb-squeeze+' and not BOLLINGER_SQUEEZE_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BOLLINGER_SQUEEZE_PLUS_ENABLED=False', flush=True)
+                return None
+            # bb-squeeze- (bollinger squeeze SHORT)
+            if _comp == 'bb-squeeze-' and not BOLLINGER_SQUEEZE_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BOLLINGER_SQUEEZE_MINUS_ENABLED=False', flush=True)
+                return None
+            # bb-squeeze (bare — check master)
+            if _comp == 'bb-squeeze' and not BOLLINGER_SQUEEZE_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BOLLINGER_SQUEEZE_ENABLED=False', flush=True)
+                return None
+            # tl_break (bare — check master)
+            if _comp == 'tl_break' and not TL_BREAK_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TL_BREAK_ENABLED=False', flush=True)
+                return None
+            # tl_break_long / tl_break_short (source names from tl_break.py)
+            if _comp in ('tl_break_long', 'tl_break_short') and not TL_BREAK_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TL_BREAK_ENABLED=False', flush=True)
+                return None
+            # inv-accel-300+ (mean reversion LONG)
+            if _comp == 'inv-accel-300+':
+                try:
+                    from hermes_constants import INVERSE_ACCEL_300_PLUS_ENABLED
+                    if not INVERSE_ACCEL_300_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" INVERSE_ACCEL_300_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # inv-accel-300- (mean reversion SHORT)
+            if _comp == 'inv-accel-300-':
+                try:
+                    from hermes_constants import INVERSE_ACCEL_300_MINUS_ENABLED
+                    if not INVERSE_ACCEL_300_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" INVERSE_ACCEL_300_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # inv-accel-300 (bare — check master)
+            if _comp == 'inv-accel-300':
+                try:
+                    from hermes_constants import INVERSE_ACCEL_300_ENABLED
+                    if not INVERSE_ACCEL_300_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" INVERSE_ACCEL_300_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # accel-300-breakout (ultra-fast breakout)
+            if _comp == 'accel-300-breakout':
+                try:
+                    from hermes_constants import ACCEL_300_BREAKOUT_ENABLED
+                    if not ACCEL_300_BREAKOUT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_BREAKOUT_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # pattern_scanner (bare — check master)
+            if _comp == 'pattern_scanner':
+                try:
+                    from hermes_constants import PATTERN_FLAG_ENABLED
+                    if not PATTERN_FLAG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PATTERN_FLAG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # pattern_micro_bull_flag / pattern_micro_bear_flag
+            if _comp in ('pattern_micro_bull_flag', 'pattern_micro_bear_flag'):
+                try:
+                    from hermes_constants import PATTERN_MICRO_FLAG_ENABLED
+                    if not PATTERN_MICRO_FLAG_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PATTERN_MICRO_FLAG_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # pattern_wolf_wave_bear / pattern_wolf_wave_bull
+            if _comp in ('pattern_wolf_wave_bear', 'pattern_wolf_wave_bull'):
+                try:
+                    from hermes_constants import PATTERN_WOLF_ENABLED
+                    if not PATTERN_WOLF_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PATTERN_WOLF_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # pattern_channel_long / pattern_channel_short
+            if _comp in ('pattern_channel_long', 'pattern_channel_short'):
+                try:
+                    from hermes_constants import PATTERN_CHANNEL_ENABLED
+                    if not PATTERN_CHANNEL_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PATTERN_CHANNEL_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2077,37 +2318,58 @@ def record_signal_outcome(token: str, direction: str,
                           pnl_pct: float, pnl_usdt: float,
                           signal_type: str = 'decider',
                           confidence: float = None,
-                          is_win: bool = None) -> bool:
+                          is_win: bool = None,
+                          trade_id: int = None) -> bool:
     """
     Write one row to signal_outcomes when a trade closes.
     is_win is computed from pnl_usdt sign if not provided.
+    trade_id prevents double-recording when both guardian and position_manager fire.
     """
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
         if is_win is None:
             is_win = float(pnl_usdt or 0) > 0
-        # Dedup: skip if same token+dir+pnl recorded in last 5 min
-        c.execute("""
-            SELECT id FROM signal_outcomes
-            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
-              AND created_at > datetime('now', '-5 minutes')
-        """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
+        # Dedup: skip if same token+dir+pnl+trade_id recorded in last 5 min
+        # NULL trade_id: match only if both are NULL (SQL NULL = NULL is falsy)
+        if trade_id is not None:
+            c.execute("""
+                SELECT id FROM signal_outcomes
+                WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+                  AND trade_id = ?
+                  AND created_at > datetime('now', '-5 minutes')
+            """, (token.upper(), direction.upper(), float(pnl_pct or 0), trade_id))
+        else:
+            c.execute("""
+                SELECT id FROM signal_outcomes
+                WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
+                  AND trade_id IS NULL
+                  AND created_at > datetime('now', '-5 minutes')
+            """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
         if c.fetchone():
             conn.close()
             return False  # dedup hit
         c.execute("""
             INSERT INTO signal_outcomes
-                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             token.upper(), direction.upper(),
             signal_type, 1 if is_win else 0,
             round(float(pnl_pct or 0), 6),
             round(float(pnl_usdt or 0), 4),
             round(float(confidence or 0), 1),
+            trade_id,
         ))
         conn.commit()
+        
+        # Log to persistent decision log
+        try:
+            from decision_log import update_trade_outcome, update_stats
+            update_stats()
+        except Exception:
+            pass  # Don't block on logging errors
+        
         return True
     except Exception as e:
         conn.rollback()
