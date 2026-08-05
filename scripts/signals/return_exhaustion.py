@@ -30,6 +30,7 @@ Run: scan_return_exhaustion_signals(prices_dict) — compatible with signals/__i
 import math
 import os
 import sys
+import time
 import sqlite3
 from typing import Optional, Dict, List
 
