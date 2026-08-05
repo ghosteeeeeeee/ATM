@@ -8,19 +8,22 @@ Usage:
     python3 scripts/blacklist_tester.py start      # remove tokens from blacklist for trial
     python3 scripts/blacklist_tester.py status     # show current trial status
     python3 scripts/blacklist_tester.py remaining  # show untested tokens
+    python3 scripts/blacklist_tester.py cleanup    # auto-cleanup: only perma-block repeat offenders
 
-Rules:
+Rules (lenient - first chance given):
     - WR >= 40% AND PnL > -2%  → KEEP (remove permanently)
-    - WR < 30% OR PnL < -5%    → RE-BLACKLIST
-    - WR 30-40%                 → EXTEND 24h
+    - WR < 20% OR PnL < -5%    → RE-BLACKLIST (but track failures)
+    - WR 20-40%                 → EXTEND 24h
     - < 3 trades                → INSUFFICIENT (extend or drop)
+    - PERMA-BLOCK: 3+ failures → permanent blacklist (never test again)
 """
-import sys, os, sqlite3, re
+import sys, os, sqlite3, re, json
 from datetime import datetime, timedelta
 
 HERMES_DATA = os.environ.get('HERMES_DATA_DIR', os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data'))
 RUNTIME_DB = os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')
 TEST_LOG = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'automation', 'blacklist_test_log.md')
+TRIAL_HISTORY = os.path.join(HERMES_DATA, 'blacklist_trial_history.json')
 
 # Tokens to NEVER test — structural issues, not performance
 SKIP_TOKENS = {
@@ -43,7 +46,23 @@ SKIP_TOKENS = {
 
 BATCH_SIZE = 20
 TRIAL_HOURS = 48
+MAX_FAILURES = 3  # Perma-block after 3 failures
 
+
+def load_trial_history() -> dict:
+    """Load trial history (how many times each token has failed)."""
+    try:
+        with open(TRIAL_HISTORY) as f:
+            return json.load(f)
+    except:
+        return {}
+
+def save_trial_history(history: dict):
+    """Save trial history."""
+    tmp_path = TRIAL_HISTORY + '.tmp'
+    with open(tmp_path, 'w') as f:
+        json.dump(history, f, indent=2)
+    os.replace(tmp_path, TRIAL_HISTORY)
 
 def load_blacklists():
     """Parse SHORT_BLACKLIST and LONG_BLACKLIST from hermes_constants.py."""
@@ -95,17 +114,30 @@ def get_trial_outcomes(token, trial_start):
     return trades, wins or 0, net_pnl or 0.0
 
 
-def evaluate_verdict(trades, wins, net_pnl):
-    """Apply verdict logic. Returns (verdict, reason)."""
+def evaluate_verdict(trades, wins, net_pnl, failure_count=0):
+    """Apply lenient verdict logic. Returns (verdict, reason)."""
     if trades < 3:
         return 'INSUFFICIENT', f'{trades} trades'
+    
     wr = 100.0 * wins / trades
+    
+    # Good performance → KEEP
     if wr >= 40 and net_pnl > -2.0:
         return 'KEEP', f'{wr:.0f}% WR, ${net_pnl:.2f}'
-    if wr < 30 or net_pnl < -5.0:
+    
+    # Very bad performance → RE-BLACKLIST
+    if wr < 20 or net_pnl < -5.0:
+        if failure_count >= MAX_FAILURES:
+            return 'PERMA-BLOCK', f'{wr:.0f}% WR, ${net_pnl:.2f}, {failure_count} failures'
         return 'RE-BLACKLIST', f'{wr:.0f}% WR, ${net_pnl:.2f}'
-    if 30 <= wr < 40:
+    
+    # Borderline → EXTEND
+    if 20 <= wr < 40:
         return 'EXTEND', f'{wr:.0f}% WR, ${net_pnl:.2f}'
+    
+    # Default: re-blacklist
+    if failure_count >= MAX_FAILURES:
+        return 'PERMA-BLOCK', f'{wr:.0f}% WR, ${net_pnl:.2f}, {failure_count} failures'
     return 'RE-BLACKLIST', f'{wr:.0f}% WR, ${net_pnl:.2f}'
 
 
@@ -120,7 +152,6 @@ def parse_test_log():
     current_batch = None
 
     for line in content.splitlines():
-        # Detect batch header: "## Batch N — Started YYYY-MM-DD"
         m = re.match(r'## Batch (\d+).*Started (\d{4}-\d{2}-\d{2})', line)
         if m:
             current_batch = {
@@ -134,7 +165,6 @@ def parse_test_log():
         if current_batch is None:
             continue
 
-        # Parse table rows: | TOKEN | START | END | TRADES | WR | PNL | VERDICT |
         if line.startswith('|') and not line.startswith('| Token') and not line.startswith('|---'):
             cols = [c.strip() for c in line.split('|')[1:-1]]
             if len(cols) >= 7 and cols[0] and cols[0] != 'Token':
@@ -143,12 +173,9 @@ def parse_test_log():
                 start = cols[1].strip() if cols[1] else ''
                 current_batch['tokens'][token] = {'start': start, 'verdict': verdict}
 
-        # Parse comma-separated token lists (Batch 2+ format before table)
         if line.strip().startswith('Removed from both'):
-            # Next line(s) until blank or **Note contain tokens
             continue
         if current_batch and not line.startswith('#') and not line.startswith('**') and not line.startswith('|') and not line.startswith('-') and not line.startswith('Removed') and line.strip():
-            # Check if this is a token list line (comma-separated uppercase)
             tokens_raw = [t.strip() for t in line.split(',') if t.strip()]
             if tokens_raw and all(t.replace(' ', '').isupper() or t == '' for t in tokens_raw):
                 for token in tokens_raw:
@@ -160,19 +187,14 @@ def parse_test_log():
 
 
 def get_tested_tokens():
-    """Return set of tokens that actually completed a trial (had trades, not just listed)."""
+    """Return set of tokens that actually completed a trial."""
     batches = parse_test_log()
     tested = set()
     for b in batches:
         for token, info in b['tokens'].items():
-            # Only count as tested if:
-            # 1. Has a trial start date, AND
-            # 2. Verdict is NOT "pre-trial" (was re-blacklisted before trial ran), AND
-            # 3. Has actual verdict data from the table (not just from comma list)
             v = info['verdict'].lower()
             if info['start'] and 'pre-trial' not in v and info['verdict'] not in ('RE-BLACKLIST', 'PENDING'):
                 tested.add(token)
-            # Also count if verdict explicitly says RE-BLACKLIST with trade data
             elif 'wr' in v or 'execution' in v or 'insufficient' in v:
                 tested.add(token)
     return tested
@@ -181,11 +203,15 @@ def get_tested_tokens():
 def pick_next_batch(short_blacklist, long_blacklist):
     """Pick tokens to test next."""
     candidates = (short_blacklist | long_blacklist) - SKIP_TOKENS
-    # Clean non-token entries
     candidates = {t for t in candidates if t.isalpha() and t.isupper() and len(t) <= 6}
 
     tested = get_tested_tokens()
     candidates -= tested
+
+    # Remove perma-blocked tokens
+    history = load_trial_history()
+    perma_blocked = {t for t, h in history.items() if h.get('failures', 0) >= MAX_FAILURES}
+    candidates -= perma_blocked
 
     # Prioritize: both dirs > short-only > long-only
     both = candidates & short_blacklist & long_blacklist
@@ -202,7 +228,6 @@ def pick_next_batch(short_blacklist, long_blacklist):
                 break
             cur.execute("SELECT COUNT(*) FROM signal_outcomes WHERE token = ?", (token,))
             total = cur.fetchone()[0]
-            # Include tokens with 0 trades — they need testing too
             batch.append((token, total))
         if len(batch) >= BATCH_SIZE:
             break
@@ -214,6 +239,7 @@ def pick_next_batch(short_blacklist, long_blacklist):
 def cmd_evaluate():
     """Evaluate all completed trials and produce verdicts."""
     batches = parse_test_log()
+    history = load_trial_history()
     now = datetime.utcnow()
 
     for batch in batches:
@@ -224,8 +250,7 @@ def cmd_evaluate():
             continue
 
         trial_end = start_dt + timedelta(hours=TRIAL_HOURS)
-        # Check if any tokens still need evaluation
-        pending = {t: i for t, i in batch['tokens'].items() if not i['verdict'].startswith(('KEEP', 'RE-BLACKLIST'))}
+        pending = {t: i for t, i in batch['tokens'].items() if not i['verdict'].startswith(('KEEP', 'RE-BLACKLIST', 'PERMA-BLOCK'))}
 
         if pending and now < trial_end:
             print(f"Batch {batch['num']}: STILL ACTIVE (ends {trial_end.strftime('%Y-%m-%d %H:%M')})")
@@ -236,27 +261,38 @@ def cmd_evaluate():
             print()
             continue
 
-        # Trial completed — evaluate pending tokens
         print(f"Batch {batch['num']} — COMPLETED (started {trial_start}):")
         verdicts = []
         for token, info in sorted(batch['tokens'].items()):
-            if info['verdict'].startswith(('KEEP', 'RE-BLACKLIST')):
-                continue  # already decided — skip
+            if info['verdict'].startswith(('KEEP', 'RE-BLACKLIST', 'PERMA-BLOCK')):
+                continue
             trades, wins, net_pnl = get_trial_outcomes(token, trial_start)
-            verdict, reason = evaluate_verdict(trades, wins, net_pnl)
+            failure_count = history.get(token, {}).get('failures', 0)
+            verdict, reason = evaluate_verdict(trades, wins, net_pnl, failure_count)
             verdicts.append((token, trades, wins, net_pnl, verdict, reason))
-            status = 'KEEP' if verdict == 'KEEP' else ('RE-BLACKLIST' if verdict == 'RE-BLACKLIST' else verdict)
+            
+            # Update history
+            if token not in history:
+                history[token] = {'failures': 0, 'trials': 0}
+            history[token]['trials'] = history[token].get('trials', 0) + 1
+            if verdict in ('RE-BLACKLIST', 'PERMA-BLOCK'):
+                history[token]['failures'] = history[token].get('failures', 0) + 1
+            
+            status = verdict
             print(f"  {token:8s} | {trades:3d} trades | {wins:2d} wins | ${net_pnl:+7.2f} | {status:14s} | {reason}")
 
         if verdicts:
             keeps = sum(1 for v in verdicts if v[4] == 'KEEP')
             rebl = sum(1 for v in verdicts if v[4] == 'RE-BLACKLIST')
+            perm = sum(1 for v in verdicts if v[4] == 'PERMA-BLOCK')
             ext = sum(1 for v in verdicts if v[4] == 'EXTEND')
             insuf = sum(1 for v in verdicts if v[4] == 'INSUFFICIENT')
-            print(f"  Summary: {keeps} KEEP, {rebl} RE-BLACKLIST, {ext} EXTEND, {insuf} INSUFFICIENT")
+            print(f"  Summary: {keeps} KEEP, {rebl} RE-BLACKLIST, {perm} PERMA-BLOCK, {ext} EXTEND, {insuf} INSUFFICIENT")
         else:
             print("  All tokens already decided.")
         print()
+    
+    save_trial_history(history)
 
 
 def cmd_pick():
@@ -289,9 +325,15 @@ def cmd_remaining():
     candidates = (short_bl | long_bl) - SKIP_TOKENS
     candidates = {t for t in candidates if t.isalpha() and t.isupper() and len(t) <= 6}
     tested = get_tested_tokens()
-    remaining = sorted(candidates - tested)
+    
+    # Remove perma-blocked
+    history = load_trial_history()
+    perma_blocked = {t for t, h in history.items() if h.get('failures', 0) >= MAX_FAILURES}
+    
+    remaining = sorted(candidates - tested - perma_blocked)
 
     print(f"Untested tokens remaining: {len(remaining)}")
+    print(f"Perma-blocked: {len(perma_blocked)}")
     for t in remaining:
         in_s = 'S' if t in short_bl else ' '
         in_l = 'L' if t in long_bl else ' '
@@ -302,8 +344,10 @@ def cmd_remaining():
 def cmd_status():
     """Show current trial status for all batches."""
     short_bl, long_bl = load_blacklists()
+    history = load_trial_history()
     print(f"SHORT_BLACKLIST: {len(short_bl)} tokens")
     print(f"LONG_BLACKLIST: {len(long_bl)} tokens")
+    print(f"Perma-blocked: {sum(1 for h in history.values() if h.get('failures', 0) >= MAX_FAILURES)}")
 
     batches = parse_test_log()
     now = datetime.utcnow()
@@ -321,7 +365,9 @@ def cmd_status():
         for token, info in sorted(batch['tokens'].items()):
             trades, wins, net_pnl = get_trial_outcomes(token, trial_start)
             wr = 100.0 * wins / trades if trades > 0 else 0
-            print(f"  {token:8s} | {trades:3d} trades | {wr:5.1f}% WR | ${net_pnl:+7.2f} | {info['verdict']}")
+            failures = history.get(token, {}).get('failures', 0)
+            fail_str = f" [{failures} fails]" if failures > 0 else ""
+            print(f"  {token:8s} | {trades:3d} trades | {wr:5.1f}% WR | ${net_pnl:+7.2f} | {info['verdict']}{fail_str}")
 
 
 if __name__ == '__main__':

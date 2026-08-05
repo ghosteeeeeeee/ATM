@@ -1,46 +1,42 @@
-# CEO Report — 2026-08-05 23:00
+# CEO Report — 2026-08-05 23:20 UTC
 
-## HL Copy Trading MVP — ACKNOWLEDGED
+## System Status
+- **pipeline.timer**: active ✓
+- **hl-sync-guardian**: active ✓
+- **Live trading**: PAUSED (PAPER mode)
 
-The HL Copy Trading system is live and tracking 18 Hyperliquid traders.
+## 24h Performance (140 trades)
+| Signal | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| tl_break_long | 14 | 100% | +$1.81 |
+| vel-hermes- | 46 | 43.5% | +$0.47 |
+| zscore-rising+ | 8 | 62.5% | +$0.23 |
+| tl_break_short | 5 | 80% | +$0.22 |
+| zscore-rising- | 31 | 54.8% | +$0.22 |
+| bb_bounce | 19 | 47.4% | -$0.52 |
+| decider | 9 | 11.1% | -$0.18 |
 
-### Architecture:
-- **Database**: hl_copy_db.py (SQLite)
-- **Leaderboard**: hl_leaderboard.py (scans/ranks traders)
-- **Fill Monitor**: hl_fill_monitor.py (30s polling)
-- **Orchestrator**: hl_copy_trader.py (daemon/reporting)
-- **TUI**: hl_copy_tui.py (terminal UI)
+## Open Positions (4)
+ASTER (LONG, +0.00%), JUP (SHORT, +0.51%), ENS (SHORT, -0.04%), PNUT (SHORT, +0.41%)
 
-### Current Status:
-- **Mode**: PASSIVE (HL_COPY_TRADING_ENABLED = False)
-- **Traders tracked**: 18
-- **Fills monitored**: 19,631
-- **Top performer**: 0x4e23288c (Score: 95, PnL: +$9,305, WR: 100%)
+## CEO DECISIONS
+1. **KEEP LIVE TRADING PAUSED** — decider still firing despite NEVER_REENABLE_FLAGS entry
+2. **DELEGATE to bug_hunter**: Find why decider trades keep appearing (9 trades, 10% WR)
+3. **bb_bounce SL override**: Implement 1.0% cap — current R:R is asymmetric (losses 1.73× bigger)
+4. **tl_break_long**: Best performer — monitor for decay (100% WR, +$1.81)
 
-### Safety Controls:
-- Max position: 10% per trade
-- Max drawdown: 15%
-- Min trader score: 70
-- Kill switch: HL_COPY_TRADING_ENABLED (default: False)
+## FOLLOW-UP (from previous session)
+- [ ] Verify return_exhaustion generating signals after threshold fix
+- [ ] Verify vortex_break generating signals after window expansion
+- [ ] Implement bb_bounce SL override (1.0% cap)
+- [ ] Monitor tl_break_long sustained performance
 
-### Next Steps (CEO DECISIONS):
-1. **PAPER TRADING PHASE**: Enable HL_COPY_TRADING_ENABLED, monitor for 48h
-2. **Dashboard**: Build HTML dashboard for web monitoring
-3. **Execution**: Implement actual copy execution logic
-4. **Risk validation**: Verify drawdown limits work in live conditions
+## CEO DECISIONS
+- [x] 2026-08-05 — DELEGATE to bug_hunter: Investigate AXS trade PnL discrepancy (RESOLVED)
 
-### System Status:
-- **All timers active**: pipeline, hl-sync, rotator, watchdog
-- **Mode**: PAPER trading (4/4 positions open)
-- **T is AWAY** (1807 min since last message)
+## BUG FIXES APPLIED (position_manager.py)
+1. **ATR stop loss floor** — now uses ATR_SL_MIN_INIT (1.0%) instead of ATR_SL_MIN (0.8%)
+2. **Signal outcome exit price** — uses actual HL exit price, not stale current_price
+3. **Break-even trades** — `is not None` check instead of `!= 0` (no more misclassified zero PnL)
 
-### 24h Performance:
-- **Total**: 142 trades, +$2.40 PnL
-- **Best signal**: tl_break_long (100% WR, +$1.81)
-- **Worst signal**: bb_bounce (-$0.33, 50% WR — SL override pending)
-
-## CEO DECISIONS (2026-08-05 23:00)
-- [ ] HL COPY TRADING MVP: Approved for paper trading phase
-- [ ] Monitor for 48h before enabling execution
-- [ ] Build HTML dashboard (PRIORITY: MEDIUM)
-- [ ] Verify bb_bounce SL override implemented
+Bug hunter verified all fixes. Root cause: HL exit price wasn't flowing through to signal_outcomes PnL calculation.

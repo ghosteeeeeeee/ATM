@@ -1120,6 +1120,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # these into hype_realized_pnl_* columns for ground-truth PnL.
         # Bug-3 fix: check success key explicitly, not dict truthiness (empty dict is falsy).
         # Bug-F fix: wrap in try/finally to prevent connection leak on partial failure.
+        hl_exit_price_used = None  # Track HL exit price for signal_outcomes
         if hl_exit_info and hl_exit_info.get('success') and hl_exit_info.get('hl_realized_pnl') is not None:
             try:
                 conn2 = get_db_connection()
@@ -1128,6 +1129,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                         cur2 = conn2.cursor()
                         hl_rp = hl_exit_info.get('hl_realized_pnl', 0)
                         hl_ep = hl_exit_info.get('hl_exit_price')
+                        hl_exit_price_used = hl_ep  # Save for signal_outcomes
                         # Use stored amount_usdt for pct calculation
                         cur2.execute(
                             "SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id=%s",
@@ -1174,9 +1176,24 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
 
         # ── Signal outcomes via signal_schema (with real PnL) ────────────────────
         # Use net_pnl (after fees) as the authoritative PnL for the outcomes table
-        actual_pnl_usdt = net_pnl if net_pnl is not None else pnl_usdt_val
-        # Use calc_notional for % calculation — reflects actual HL capital deployed
-        actual_pnl_pct = (actual_pnl_usdt / calc_notional * 100) if calc_notional > 0 else pnl_pct
+        # If HL exit price is available, use it for accurate PnL calculation
+        if hl_exit_price_used and hl_exit_price_used > 0 and entry_price > 0:
+            # Calculate PnL using actual HL exit price
+            if direction == 'LONG':
+                hl_pnl_pct = ((hl_exit_price_used - entry_price) / entry_price * 100)
+            else:
+                hl_pnl_pct = ((entry_price - hl_exit_price_used) / entry_price * 100)
+            hl_pnl_usdt = calc_notional * (abs(hl_pnl_pct) / 100) * (1 if hl_pnl_pct >= 0 else -1)
+            # Use HL PnL if available, otherwise fall back to calculated PnL
+            actual_pnl_usdt = hl_pnl_usdt if hl_pnl_usdt is not None else (net_pnl if net_pnl is not None else pnl_usdt_val)
+            actual_pnl_pct = hl_pnl_pct if hl_pnl_pct is not None else ((actual_pnl_usdt / calc_notional * 100) if calc_notional > 0 else pnl_pct)
+            log(f"[Position Manager] Using HL exit price ${hl_exit_price_used:.4f} for signal_outcomes "
+                  f"(HL PnL: {hl_pnl_pct:+.4f}%, ${hl_pnl_usdt:+.4f})")
+        else:
+            actual_pnl_usdt = net_pnl if net_pnl is not None else pnl_usdt_val
+            # Use calc_notional for % calculation — reflects actual HL capital deployed
+            actual_pnl_pct = (actual_pnl_usdt / calc_notional * 100) if calc_notional > 0 else pnl_pct
+        
         try:
             record_signal_outcome(
                 token=token,
@@ -1531,19 +1548,22 @@ def _compute_dynamic_sl(token: str, direction: str, entry_price: float,
     k = _atr_multiplier(atr_pct)
     atr_distance = k * atr
 
+    # ATR_SL_MIN (0.8%) used for trailing, ATR_SL_MIN_INIT (1.0%) used as final floor
     effective_sl_pct = max(atr_distance / current_price, ATR_SL_MIN)
     effective_sl_pct = min(effective_sl_pct, ATR_SL_MAX)
 
     if direction == 'LONG':
         # SL = entry - k·ATR, never above current price (catches drops)
         sl = entry_price * (1 - effective_sl_pct)
-        result = min(sl, current_price * (1 - ATR_SL_MIN))
+        # Use ATR_SL_MIN_INIT as floor to prevent premature stops
+        result = min(sl, current_price * (1 - ATR_SL_MIN_INIT))
         log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
     else:
         # SHORT: SL = entry + k·ATR, never below current price (catches rallies)
         sl = entry_price * (1 + effective_sl_pct)
-        result = max(sl, current_price * (1 + ATR_SL_MIN))
+        # Use ATR_SL_MIN_INIT as floor to prevent premature stops
+        result = max(sl, current_price * (1 + ATR_SL_MIN_INIT))
         log(f"  [_dynSL] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} ATR={atr:.4f} atr_pct={atr_pct*100:.2f}% k={k:.3f} eff_sl={effective_sl_pct*100:.3f}% → SL={result:.6f}")
         return result
 
