@@ -184,25 +184,36 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 from signal_schema import record_signal_outcome
                 actual_pnl_pct = float(pnl_pct or 0)
                 # Fetch hl_notional_usdt from PostgreSQL for accurate PnL calculation
+                notional = 11.0
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
                     _conn = psycopg2.connect(**BRAIN_DB_DICT)
-                    _cur = _conn.cursor()
-                    _cur.execute("SELECT hl_notional_usdt FROM trades WHERE id=%s", (trade_id,))
-                    _row = _cur.fetchone()
-                    _conn.close()
-                    notional = float(_row[0]) if _row and _row[0] else 11.0
+                    try:
+                        _cur = _conn.cursor()
+                        _cur.execute("SELECT hl_notional_usdt, signal, confidence FROM trades WHERE id=%s", (trade_id,))
+                        _row = _cur.fetchone()
+                        if _row:
+                            notional = float(_row[0]) if _row[0] else 11.0
+                            _signal_type = _row[1] or 'decider'
+                            _confidence = float(_row[2]) if _row[2] else 80
+                        else:
+                            _signal_type = 'decider'
+                            _confidence = 80
+                    finally:
+                        try: _conn.close()
+                        except: pass
                 except Exception:
-                    notional = 11.0
+                    _signal_type = 'decider'
+                    _confidence = 80
                 actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
                 record_signal_outcome(
                     token=token,
                     direction=direction,
                     pnl_pct=round(actual_pnl_pct, 4),
                     pnl_usdt=round(actual_pnl_usdt, 4),
-                    signal_type=signal_type or 'decider',
-                    confidence=confidence or 80,
+                    signal_type=_signal_type,
+                    confidence=_confidence,
                     trade_id=trade_id
                 )
             except Exception as sig_err:
