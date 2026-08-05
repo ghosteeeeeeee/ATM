@@ -69,6 +69,39 @@ python3 /root/.hermes/skills/productivity/update-git/references/push_gh.py
 
 This reads `GITHUB_TOKEN` from `.secrets.local`, cleans stale tokens from `.git/config`, and pushes via embedded URL (no credential prompts). See `skills/productivity/update-git/SKILL.md` for full workflow.
 
+### Daily Commits
+
+All trading system changes are committed automatically every 24 hours via `hermes-daily-commit.timer` (runs 07:15 UTC). The script:
+- Stages all modified/new files
+- Commits with categorized message
+- Pushes via canonical push script
+
+### Immediate Commits (Primary Workflow)
+
+**After every task that modifies files, commit immediately.** Don't batch changes — commit after each logical unit of work.
+
+```
+# After completing any task:
+git add -A
+git commit -m "Category: brief description"
+python3 /root/.hermes/skills/productivity/update-git/references/push_gh.py
+```
+
+**When to commit:**
+- After memory updates (OpenMemory store)
+- After bug fixes
+- After new scripts/features
+- After config changes
+- After plan/spec creation
+- After skill creation
+
+**Commit message format:**
+- Start with category (scripts, signals, skills, plans, memory, etc.)
+- Include date
+- List key changes (max 5 files shown)
+
+The daily timer catches anything missed, but **immediate commits are the default.**
+
 ## OpenMemory (MCP)
 
 Explicit memory system — no background collection. Query before tasks, store after discoveries.
