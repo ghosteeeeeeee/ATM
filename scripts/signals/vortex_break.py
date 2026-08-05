@@ -289,26 +289,98 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
 
     vi_plus, vi_minus = vi_result
 
-    # Check latest values
-    cur_vi_plus = vi_plus[-1] if vi_plus[-1] is not None else None
-    cur_vi_minus = vi_minus[-1] if vi_minus[-1] is not None else None
-    prev_vi_plus = vi_plus[-2] if len(vi_plus) > 1 and vi_plus[-2] is not None else None
-    prev_vi_minus = vi_minus[-2] if len(vi_minus) > 1 and vi_minus[-2] is not None else None
-
-    if cur_vi_plus is None or cur_vi_minus is None or prev_vi_plus is None or prev_vi_minus is None:
-        return None
-
-    # VI spread: how strong is the directional movement?
-    vi_spread = abs(cur_vi_plus - cur_vi_minus)
-
-    # Crossover detection: VI+ crosses above VI- → LONG, VI- crosses above VI+ → SHORT
-    long_cross = prev_vi_plus <= prev_vi_minus and cur_vi_plus > cur_vi_minus
-    short_cross = prev_vi_minus <= prev_vi_plus and cur_vi_minus > cur_vi_plus
-
-    if not long_cross and not short_cross:
-        return None
-
-    direction = 'LONG' if long_cross else 'SHORT'
+    # Look for crossover in last 3 candles and check if it passes all phases
+    for i in range(-3, 0):
+        if vi_plus[i] is None or vi_minus[i] is None:
+            continue
+        if vi_plus[i-1] is None or vi_minus[i-1] is None:
+            continue
+        
+        long_cross = vi_plus[i-1] <= vi_minus[i-1] and vi_plus[i] > vi_minus[i]
+        short_cross = vi_minus[i-1] <= vi_plus[i-1] and vi_minus[i] > vi_plus[i]
+        
+        if not long_cross and not short_cross:
+            continue
+        
+        direction = 'LONG' if long_cross else 'SHORT'
+        
+        # Use values at crossover point
+        cur_vi_plus = vi_plus[i]
+        cur_vi_minus = vi_minus[i]
+        vi_spread = abs(cur_vi_plus - cur_vi_minus)
+        
+        # Price at crossover candle
+        crossover_price = closes[len(closes)+i]
+        
+        # Check ADX at crossover
+        adx_val = _adx(candles[:len(candles)+i+1], ADX_PERIOD)
+        if adx_val is None or adx_val < ADX_MIN:
+            continue
+        
+        # Check EMA at crossover
+        ema_fast = _ema(closes[:len(closes)+i+1], EMA_FAST)
+        if direction == 'LONG' and crossover_price < ema_fast:
+            continue
+        if direction == 'SHORT' and crossover_price > ema_fast:
+            continue
+        
+        # Check Z-score at crossover
+        recent_closes = closes[max(0, len(closes)+i-20):len(closes)+i]
+        if len(recent_closes) >= 10:
+            import statistics as _stat
+            _mean = _stat.mean(recent_closes)
+            _stdev = _stat.stdev(recent_closes) if len(recent_closes) > 1 else 1
+            _z = (crossover_price - _mean) / _stdev if _stdev > 0 else 0
+            if direction == 'LONG' and _z < -2.0:
+                continue
+            if direction == 'SHORT' and _z > 2.0:
+                continue
+        else:
+            _z = 0
+        
+        # All phases passed — calculate confidence
+        conf = CONF_BASE
+        if adx_val >= 30: conf += CONF_ADX_BONUS_MAX
+        elif adx_val >= 25: conf += int(CONF_ADX_BONUS_MAX * 0.7)
+        elif adx_val >= 20: conf += int(CONF_ADX_BONUS_MAX * 0.4)
+        
+        vi_strength = min(1.0, vi_spread / 0.5)
+        conf += int(CONF_VI_STRENGTH_MAX * vi_strength)
+        
+        ema_slow = _ema(closes[:len(closes)+i+1], EMA_SLOW)
+        if direction == 'LONG' and crossover_price > ema_slow:
+            conf += CONF_EMA_BONUS
+        elif direction == 'SHORT' and crossover_price < ema_slow:
+            conf += CONF_EMA_BONUS
+        
+        conf = min(CONF_MAX, conf)
+        
+        if conf < VORTEX_BREAK_MIN_CONFIDENCE:
+            continue
+        
+        # Build signal
+        signal_type = f'vortex_break_{direction.lower()}'
+        source = f'vortex_break_{direction.lower()}'
+        
+        return {
+            'token': token.upper(),
+            'direction': direction,
+            'signal_type': signal_type,
+            'source': source,
+            'confidence': conf,
+            'value': str({
+                'vi_plus': round(cur_vi_plus, 4),
+                'vi_minus': round(cur_vi_minus, 4),
+                'adx': round(adx_val, 1),
+                'ema_fast': round(ema_fast, 4),
+            }),
+            'price': price,
+            '_adx': adx_val,
+            '_vi_spread': vi_spread,
+            '_z': _z,
+        }
+    
+    return None
 
     # ── Phase 2: ADX trend confirmation ───────────────────────────────────
     adx_val = _adx(candles, ADX_PERIOD)
@@ -321,10 +393,14 @@ def detect_vortex_break(token: str, candles: list, price: float) -> Optional[Dic
     ema_fast = _ema(closes, EMA_FAST)
     ema_slow = _ema(closes, EMA_SLOW)
 
-    if direction == 'LONG' and price < ema_fast:
-        return None  # price below fast EMA — not bullish
-    if direction == 'SHORT' and price > ema_fast:
-        return None  # price above fast EMA — not bearish
+    # Use price at crossover candle (index -2) for EMA check, not current price
+    # This prevents late detection when price moves after crossover
+    crossover_price = closes[-2] if len(closes) >= 2 else price
+
+    if direction == 'LONG' and crossover_price < ema_fast:
+        return None  # price below fast EMA at crossover — not bullish
+    if direction == 'SHORT' and crossover_price > ema_fast:
+        return None  # price above fast EMA at crossover — not bearish
 
     # ── Phase 4: Z-score filter — block extreme counter-trend ──────────────
     import statistics as _stat

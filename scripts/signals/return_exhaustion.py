@@ -50,7 +50,7 @@ RETURN_MID = 30         # 30-minute return (medium-term context)
 RETURN_LONG = 60        # 60-minute return (trend direction)
 
 # Percentile lookback window (how many historical returns to rank against)
-PERCENTILE_LOOKBACK = 200
+PERCENTILE_LOOKBACK = 20  # reduced from 200 — need enough data for percentile ranking
 
 # Percentile thresholds for exhaustion
 PCT_EXHAUST_LOW = 10    # below p10 = extreme negative → LONG exhaustion
