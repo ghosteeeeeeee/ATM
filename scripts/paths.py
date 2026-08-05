@@ -43,6 +43,8 @@ __all__ = [
     'HERMES_LOG_DIR', 'WWW_LOG_DIR',
     # www paths
     'REGIME_4H_FILE',
+    # HL Copy Trading
+    'HL_COPY_DB', 'HL_COPY_REPORT', 'HL_COPY_TRADERS',
 ]
 
 # ── Base directories ──────────────────────────────────────────────────────────
@@ -116,3 +118,8 @@ TOKEN_INTEL_WWW = '/var/www/html/token_intel.json'  # served by nginx
 # ── Log paths ─────────────────────────────────────────────────────────────────
 HERMES_LOG_DIR  = os.path.join(os.path.dirname(HERMES_DATA), 'logs')
 WWW_LOG_DIR     = '/var/www/hermes/logs'
+
+# ── HL Copy Trading paths ─────────────────────────────────────────────────────
+HL_COPY_DB      = os.path.join(HERMES_DATA, 'hl_copy.db')
+HL_COPY_REPORT  = os.path.join(WWW_DATA, 'hl_copy_report.md')
+HL_COPY_TRADERS = os.path.join(WWW_DATA, 'hl_copy_traders.json')

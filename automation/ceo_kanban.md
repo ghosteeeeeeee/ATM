@@ -33,9 +33,10 @@
 - [ ] Implement bb_bounce SL override (1.0% cap) — root cause: asymmetric R:R
 - [ ] Monitor tl_break_long sustained performance
 
-## CEO DECISIONS (2026-08-05 22:30)
+## CEO DECISIONS (2026-08-05 23:00)
 - [x] 2026-08-05 22:30 — KEEP LIVE TRADING PAUSED — new signals untested, legacy dead signals still firing
 - [x] 2026-08-05 22:30 — URGENT: DELEGATE to bug_hunter: Kill decider permanently (NEVER_REENABLE_FLAGS) — COMPLETED
 - [ ] 2026-08-05 22:30 — DELEGATE to signal_analyst: Debug vortex_break + return_exhaustion (0 signals)
 - [ ] 2026-08-05 22:30 — DELEGATE to self_learner: Investigate bb_bounce negative PnL (-$0.33, 42% WR)
 - [ ] 2026-08-05 22:30 — DELEGATE to self_learner: Monitor tl_break_long sustained performance
+- [x] 2026-08-05 23:00 — HL COPY TRADING MVP: Approved for paper trading (48h monitoring phase)

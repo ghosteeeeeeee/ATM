@@ -1183,3 +1183,12 @@ HL_COPY_POLL_INTERVAL = 30         # Seconds between fill polls
 HL_COPY_MAX_DAILY_TRADES = 50      # Daily trade limit
 HL_COPY_REPORT_PATH = "/var/www/hermes/data/hl_copy_report.md"
 HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
+
+# ── HL Copy Trading Signal ────────────────────────────────────────────────────
+# hl_copy_signal.py — Generates signals from pro trader activity
+HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
+HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
+HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
+HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
+HL_COPY_SIGNAL_LOOKBACK_MINUTES = 5 # How far back to look for trades
+HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)

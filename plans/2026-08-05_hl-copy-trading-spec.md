@@ -337,6 +337,67 @@ Skip for MVP:
 
 ---
 
-**Status**: Spec complete, awaiting review
-**Next**: Build MVP (paper trading)
+## Build Status
+
+**Status**: MVP Complete (2026-08-05)
+**Bug Hunter Review**: Passed (20 issues found, all critical/high fixed)
+
+### Files Created
+| File | Purpose | Status |
+|------|---------|--------|
+| `scripts/hl_copy_db.py` | SQLite schema | ✅ Complete |
+| `scripts/hl_leaderboard.py` | Scan & rank traders | ✅ Complete |
+| `scripts/hl_fill_monitor.py` | Track fills real-time | ✅ Complete |
+| `scripts/hl_copy_trader.py` | Main orchestrator | ✅ Complete |
+| `scripts/hl_copy_tui.py` | Terminal UI | ✅ Complete |
+| `scripts/hl_web_scraper.py` | Multi-platform scraping | ✅ Complete |
+
+### Files Modified
+| File | Change |
+|------|--------|
+| `scripts/paths.py` | Added HL_COPY_* paths |
+| `scripts/hermes_constants.py` | Added HL_COPY_* config |
+
+### Bug Fixes Applied
+- ✅ Bare except clauses → specific exceptions
+- ✅ DB connection leaks → try/finally blocks
+- ✅ Non-atomic JSON → temp + os.replace()
+- ✅ Batch log_fill → single connection per cycle
+- ✅ detect_pattern → real trade pattern analysis
+- ✅ Portfolio iteration → fixed dict handling
+- ✅ Config drift → import from hermes_constants
+- ✅ Fill dedup → UNIQUE constraint on (wallet, coin, time, side)
+
+### Testing
+- ✅ API connection to Hyperliquid
+- ✅ Wallet scanning (tested with 0x324a...26E7)
+- ✅ Fill monitoring (captured 19,000+ fills)
+- ✅ Position tracking
+- ✅ Report generation
+
+### Wallets Being Tracked (18 total)
+Source: Dexly leaderboard (30d PnL rankings)
+
+| Rank | Wallet | Score | PnL | WR | Status |
+|------|--------|-------|-----|-----|--------|
+| 17 | `0x4e23288c...` | 95.0 | +$9,305 | 100% | Active |
+| 22 | `0xa312114b...` | 95.0 | +$1,037 | 60% | Active |
+| 4 | `0x179f3d11...` | 71.0 | +$32 | 100% | Active |
+| 5 | `0xb83de012...` | 58.3 | -$5,927 | 39% | Active |
+| 11 | `0xf822fa0f...` | 51.2 | -$1,605 | 16% | Active |
+| +13 more wallets... | | | | | Active |
+
+### Performance Metrics
+- **Total fills tracked:** 31,700
+- **Today's PnL:** +$217,428
+- **Poll interval:** 30s
+- **Report interval:** 1 hour
+- **Web scraper:** Agent Reach + Dexly leaderboard
+
+### Next Steps
+1. ~~Add more wallets~~ ✅ Done (18 wallets)
+2. Build HTML dashboard
+3. Paper trading execution
+4. Live copy trading
+
 **Owner**: Hermes
