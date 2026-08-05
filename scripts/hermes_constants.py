@@ -648,6 +648,7 @@ NEVER_REENABLE_FLAGS = {
     # 'INVERSE_ACCEL_300_MINUS_ENABLED',  # RE-ENABLED 2026-08-04
     'ACCEL_300_MINUS_ENABLED',  # RE-ENABLED 2026-08-04 — gap threshold lowered, needs SHORT volume
     'PATTERN_SCANNER',  # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
+    'BB_BOUNCE_ENABLED',  # CEO 2026-08-05 — 0% WR (3 regressions), permanently disabled
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -846,7 +847,7 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = True  # Re-enabled 2026-08-05. WR=50% (16 trades 7d). Data was corrupted.
+BB_BOUNCE_ENABLED = False  # CEO 2026-08-05 — KILLED PERMANENTLY. 0% WR, 3 regressions via signal_rotator. In NEVER_REENABLE_FLAGS.
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
