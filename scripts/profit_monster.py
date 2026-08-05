@@ -179,6 +179,22 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
             log(f"  [{tier}] Closed id={trade_id} {token} {direction} — {pnl_pct:.2f}% profit", "INFO")
+            # Record to signal_outcomes for WR tracking
+            try:
+                from signal_schema import record_signal_outcome
+                actual_pnl_pct = float(pnl_pct or 0)
+                actual_pnl_usdt = float(pnl_pct or 0) / 100 * float(amount or 11) * float(leverage or 5)
+                record_signal_outcome(
+                    token=token,
+                    direction=direction,
+                    pnl_pct=round(actual_pnl_pct, 4),
+                    pnl_usdt=round(actual_pnl_usdt, 4),
+                    signal_type=signal_type or 'decider',
+                    confidence=confidence or 80,
+                    trade_id=trade_id
+                )
+            except Exception as sig_err:
+                log(f"  [{tier}] Signal outcome record error: {sig_err}", "WARN")
             return True
         else:
             log(f"  [{tier}] Close failed id={trade_id} {token}: {result.stderr.strip()[:120]}", "ERROR")
