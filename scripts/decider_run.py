@@ -1289,6 +1289,20 @@ def execute_trade(token, direction, price, confidence, source,
                 # to stdout on success. If brain.py exits with RC=0 but no 'trade #'
                 # in stdout (e.g. INSERT failed silently), treat as failure — do NOT
                 # mark signal EXECUTED, let decider_run retry next cycle.
+                # MARKER: Write token to recently-opened file so guardian skips orphan creation
+                try:
+                    _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
+                    import json as _j
+                    _marker = {}
+                    if os.path.exists(_marker_path):
+                        _marker = json.loads(open(_marker_path).read())
+                    _marker[token.upper()] = time.time()
+                    # Prune entries older than 60s
+                    _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+                    with open(_marker_path, 'w') as _f:
+                        json.dump(_marker, _f)
+                except Exception:
+                    pass  # non-fatal
                 return True, f'trade #{tid}'
             # RC=0 but no 'trade #' found in stdout — DB INSERT may have failed silently.
             # Do NOT mark signal EXECUTED — return failure so decider_run retries.

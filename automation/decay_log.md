@@ -179,3 +179,14 @@
 [2026-08-06 15:49 UTC]   🟢 bb_bounce,hzscore+: 3 trades, 100.0% WR, PnL=1.27
 [2026-08-06 15:49 UTC]   🟢 ma100-cross,vortex_break_long: 4 trades, 100.0% WR, PnL=1.72
 [2026-08-06 15:49 UTC] Done. Disabled 0 signals.
+[2026-08-06 21:49 UTC] === Signal Decay Detector ===
+[2026-08-06 21:49 UTC]   🟡 ma100-cross,return_exhaustion-: 5 trades, 20.0% WR, PnL=-3.33
+[2026-08-06 21:49 UTC]   🟢 bb_bounce: 4 trades, 25.0% WR, PnL=-2.9
+[2026-08-06 21:49 UTC]   🟢 return_exhaustion-: 4 trades, 50.0% WR, PnL=-0.91
+[2026-08-06 21:49 UTC]   🟢 hzscore-,return_exhaustion-: 9 trades, 55.6% WR, PnL=-1.41
+[2026-08-06 21:49 UTC]   🟢 ma100-cross,return_exhaustion_long: 5 trades, 60.0% WR, PnL=0.74
+[2026-08-06 21:49 UTC]   🟢 hzscore+,return_exhaustion_long: 8 trades, 62.5% WR, PnL=1.53
+[2026-08-06 21:49 UTC]   🟢 return_exhaustion-,vortex_break_short: 3 trades, 66.7% WR, PnL=-0.11
+[2026-08-06 21:49 UTC]   🟢 ma100-cross,vortex_break_long: 5 trades, 80.0% WR, PnL=0.82
+[2026-08-06 21:49 UTC]   🟢 bb_bounce,hzscore+: 3 trades, 100.0% WR, PnL=1.27
+[2026-08-06 21:49 UTC] Done. Disabled 0 signals.

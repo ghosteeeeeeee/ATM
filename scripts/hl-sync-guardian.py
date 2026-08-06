@@ -1289,6 +1289,21 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 except Exception:
                     pass  # non-fatal: proceed if check fails
 
+                # FIX (2026-08-06): Race condition guard — if signal pipeline just opened
+                # a trade for this token (marker file), skip orphan creation. The DB
+                # record may not have committed yet when guardian queries.
+                try:
+                    _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
+                    if os.path.exists(_marker_path):
+                        _marker = json.loads(open(_marker_path).read())
+                        if coin.upper() in _marker:
+                            _age = time.time() - _marker[coin.upper()]
+                            if _age < 60:
+                                log(f'  ⏩ {coin} recently opened by signal ({_age:.0f}s ago) — skipping orphan', 'WARN')
+                                continue
+                except Exception:
+                    pass  # non-fatal
+
                 # Calculate approximate position USD value
                 # Size is in contracts, price in USD per token
                 curr_price = prices.get(coin) if prices else entry_px
