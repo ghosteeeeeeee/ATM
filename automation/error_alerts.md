@@ -74,3 +74,6 @@
 
 ## Error Alerts — 2026-08-06 02:08 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Unknown TOK`
+
+## Error Alerts — 2026-08-06 04:08 UTC
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`

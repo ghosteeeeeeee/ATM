@@ -2,10 +2,10 @@
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
-- [ ] Implement bb_bounce SL override (1.0% cap) — R:R 1.73:1 unfavorable
-- [ ] Monitor tl_break_long sustained performance (100% WR, +$1.81)
-- [ ] Verify return_exhaustion generating signals after threshold fix
-- [ ] Verify vortex_break generating signals after window expansion
+- [ ] URGENT: bb_bounce root cause — STILL FIRING 18 trades/24h despite disable (delegated to bug_hunter 04:20)
+- [ ] Monitor ma_100_cross live performance (W LONG is first trade)
+- [ ] Monitor vortex_break sustained performance
+- [ ] Monitor hzscore+ confluence (100% WR, 5 trades today)
 
 ## IN PROGRESS
 - [x] LIVE TRADING RE-ENABLED — 2026-08-06 02:15 UTC, trailing tightened
@@ -70,6 +70,9 @@
 - [ ] 2026-08-06 03:18 — CONTINUE monitoring vortex_break + return_exhaustion (48h trial window)
 - [ ] 2026-08-06 03:18 — CONTINUE monitoring hzscore + rs confluence
 
+## CEO DECISIONS (2026-08-06 03:45)
+- [x] 2026-08-06 03:45 — HOT-SET FLIPPING FIXED: PENDING signal expiry 5min→10min. 37 signals expired as stale_5min in 30min. Signals now have 10min window to find co-signals for confluence.
+
 ## CEO DECISIONS (2026-08-06 03:30)
 - [ ] 2026-08-06 03:30 — FIRST CONFLUENCE TRADE: LTC LONG $44.94 (bb_bounce+hzscore+) 5x. Trade #13266. Monitor for signal quality.
 - [ ] 2026-08-06 03:30 — TRACK 3 hzscore+ open positions: LTC, BCH, MORPHO
@@ -77,6 +80,25 @@
 ## CEO DECISIONS (2026-08-06 02:50)
 - [x] 2026-08-06 02:50 — VERIFIED bb_bounce properly disabled. Only 1 legacy trade (race condition). NOT in registered signals.
 - [x] 2026-08-06 02:50 — SYSTEM HEALTH OK. +$2.23/24h net profitable. All dead signals confirmed disabled.
+
+## CEO DECISIONS (2026-08-06 04:20)
+- [ ] 2026-08-06 04:20 — URGENT DELEGATE to bug_hunter: bb_bounce STILL firing 18 trades/24h despite BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS. 08-05 investigation said "stale batch" but it's still happening. Find real root cause.
+- [ ] 2026-08-06 04:20 — MONITOR ma_100_cross: W LONG is first live trade (opened 03:36). Track for 48h.
+- [ ] 2026-08-06 04:20 — MONITOR hzscore+ confluence: 100% WR (5/5 trades today), small PnL per trade but consistent.
+- [x] 2026-08-06 04:20 — SYSTEM STATUS: 33 closed trades, 60.6% WR, +$0.49/24h. Net profitable. 3 open positions.
+
+## CEO DECISIONS (2026-08-06 05:00)
+- [x] 2026-08-06 05:00 — PROFIT MONSTER FIXED: IndentationError at line 185 resolved. Crash loop stopped. MORPHO should close on next cycle. Bug hunter verified 5/5 PASS.
+- [x] 2026-08-06 05:00 — BB_BOUNCE ROOT CAUSE FOUND: Line 876 had BB_BOUNCE_ENABLED=True (someone re-enabled). Set False + added to NEVER_REENABLE_FLAGS. Was never in NEVER_REENABLE_FLAGS — rotator could re-enable it.
+- [ ] 2026-08-06 05:00 — URGENT DELEGATE to bug_hunter: decider (9 trades) and vel-hermes- (46 trades) still firing despite being in NEVER_REENABLE_FLAGS / disabled. Investigate signal registration bypass.
+- [x] 2026-08-06 05:00 — SYSTEM STATUS: 42 trades, -$0.17/24h (breakeven). tl_break_long = +$1.81 (100% WR). No open positions.
+
+## CEO DECISIONS (2026-08-06 04:00)
+- [ ] 2026-08-06 04:00 — URGENT DELEGATE to bug_hunter: bb_bounce (18 trades/24h), decider (9 trades/24h), vel-hermes- (46 trades/24h) still firing despite NEVER_REENABLE_FLAGS. Find root cause in signal registration/rotator.
+- [ ] 2026-08-06 04:00 — MONITOR tl_break_long: 100% WR, 14 trades, +$1.81/24h. Protected. Continue.
+- [ ] 2026-08-06 04:00 — MONITOR vortex_break + return_exhaustion: 48h trial ongoing.
+- [x] 2026-08-06 04:00 — INVESTIGATE hl_notional_usdt drift (pending from earlier session).
+- [x] 2026-08-06 04:00 — DEAD SIGNAL INVESTIGATION (RESOLVED): bug_hunter confirmed stale batch data, not live leak. All trades from `2026-08-05 14:28:25` batch. NEVER_REENABLE_FLAGS works for rotator. Recommended: hardcoded block in signal_schema.py.
 
 ## CEO DECISIONS (2026-08-06 02:15)
 - [x] 2026-08-06 02:15 — RE-ENABLED LIVE TRADING: kill switch set true. 138 trades, 52.9% WR, +$2.23/24h. Net profitable.
