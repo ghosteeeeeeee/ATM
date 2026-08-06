@@ -675,7 +675,7 @@ PCT_HERMES_MINUS_ENABLED = True   # pct-hermes- — 46.2% WR in hzscore+,pct-her
 VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 7d), -$1.61. No edge.
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
-HZSCORE_ENABLED          = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
+HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
 HZSCORE_PLUS_ENABLED     = True   # hzscore+ — 31.3% WR, +13.92% PnL
 HZSCORE_MINUS_ENABLED    = True   # hzscore- — 0% WR, -$1.14 (mixed, keep enabled for now)
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -841,7 +841,7 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES lowered to 30, RS_PROXIMITY_K raised to 4.0
 RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
 RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
-TL_BREAK_PLUS_ENABLED         = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
+TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer. Need LONG for confluence.
 TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
