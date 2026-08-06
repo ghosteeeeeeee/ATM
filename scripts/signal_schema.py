@@ -486,6 +486,12 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     The AI decider requires ≥50% confidence to execute. Individual signals below this
     threshold generate noise without ever reaching execution — they just create WAIT
     records. This floor prevents signal spam from low-quality indicators."""
+    # ── Dead signal blocklist — defense-in-depth against NEVER_REENABLE bypass ──
+    _DEAD_SIGNALS = {'bb_bounce', 'decider', 'pattern_scanner'}
+    if signal_type in _DEAD_SIGNALS:
+        print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" [DEAD_SIGNAL]', flush=True)
+        return None
+
     # ── Minimum confidence floor ─────────────────────────────────────────────
     MIN_CONFIDENCE_FLOOR = 50
     if confidence < MIN_CONFIDENCE_FLOOR:
