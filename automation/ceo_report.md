@@ -1,42 +1,46 @@
-# CEO Report — 2026-08-05 23:20 UTC
+# CEO Report — 2026-08-06 01:00 UTC
 
 ## System Status
-- **pipeline.timer**: active ✓
-- **hl-sync-guardian**: active ✓
-- **Live trading**: PAUSED (PAPER mode)
+- **Pipeline**: ACTIVE (timers running)
+- **Live Trading**: PAUSED (kill switch OFF since Aug 5)
+- **Open Positions**: 0
 
-## 24h Performance (140 trades)
-| Signal | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| tl_break_long | 14 | 100% | +$1.81 |
-| vel-hermes- | 46 | 43.5% | +$0.47 |
-| zscore-rising+ | 8 | 62.5% | +$0.23 |
-| tl_break_short | 5 | 80% | +$0.22 |
-| zscore-rising- | 31 | 54.8% | +$0.22 |
-| bb_bounce | 19 | 47.4% | -$0.52 |
-| decider | 9 | 11.1% | -$0.18 |
+## 24h Performance
+| Metric | Value |
+|--------|-------|
+| Total Trades | 140 |
+| Win Rate | 44.3% |
+| Total PnL | +$2.18 |
 
-## Open Positions (4)
-ASTER (LONG, +0.00%), JUP (SHORT, +0.51%), ENS (SHORT, -0.04%), PNUT (SHORT, +0.41%)
+**Top Performers:**
+- `tl_break_long`: 14 trades, 100% WR, +$1.81 (MVP)
+- `vel-hermes-`: 46 trades, 39.1% WR, +$0.47
 
-## CEO DECISIONS
-1. **KEEP LIVE TRADING PAUSED** — decider still firing despite NEVER_REENABLE_FLAGS entry
-2. **DELEGATE to bug_hunter**: Find why decider trades keep appearing (9 trades, 10% WR)
-3. **bb_bounce SL override**: Implement 1.0% cap — current R:R is asymmetric (losses 1.73× bigger)
-4. **tl_break_long**: Best performer — monitor for decay (100% WR, +$1.81)
+**Biggest Losers:**
+- `bb_bounce`: 19 trades, 36.8% WR, -$0.62 (DISABLE PENDING)
+- `decider`: 9 trades, 0% WR, -$0.18 (historical, killed)
 
-## FOLLOW-UP (from previous session)
+## CEO Decisions
+1. **DISABLE bb_bounce** — 19 trades, 36.8% WR, -$0.62. Biggest loser. Asymmetric R:R (losses 1.73x wins). Delegate to self_learner.
+2. **KEEP LIVE TRADING PAUSED** — 24h PnL barely positive (+$0.016/trade). Need bb_bounce fixed + new signals validated before re-enabling.
+3. **MONITOR tl_break_long** — 100% WR but sample size (14 trades) small. Watch for decay pattern.
+
+## Follow-Up Items (from kanban)
 - [ ] Verify return_exhaustion generating signals after threshold fix
 - [ ] Verify vortex_break generating signals after window expansion
-- [ ] Implement bb_bounce SL override (1.0% cap)
-- [ ] Monitor tl_break_long sustained performance
+- [ ] Implement bb_bounce SL override (1.0% cap) — or just disable
 
-## CEO DECISIONS
-- [x] 2026-08-05 — DELEGATE to bug_hunter: Investigate AXS trade PnL discrepancy (RESOLVED)
+## Risk Assessment
+- **Signal decay pattern**: All signals show strong initial WR → rapid deterioration within 24-48h
+- **Systemic issue**: 7-day data shows no signal family with positive PnL
+- **HL Copy Trading**: Paper trading MVP approved, monitoring phase active
 
-## BUG FIXES APPLIED (position_manager.py)
-1. **ATR stop loss floor** — now uses ATR_SL_MIN_INIT (1.0%) instead of ATR_SL_MIN (0.8%)
-2. **Signal outcome exit price** — uses actual HL exit price, not stale current_price
-3. **Break-even trades** — `is not None` check instead of `!= 0` (no more misclassified zero PnL)
+## RS Signal Re-Enabled (2026-08-06)
+- **Status**: RS, RS+, RS- all active
+- **Root Cause**: MIN_TOUCHES=120 blocked 91% of tokens; zbonus was inverted
+- **Fix**: MIN_TOUCHES=30, PROXIMITY_K=4.0, zbonus=20
+- **First live signal**: ASTER $0.6047 — confluence with bb_bounce (support bounce at 0.6045, 36 touches)
+- **Audit**: bug_hunter verified 6/6 checks passed
 
-Bug hunter verified all fixes. Root cause: HL exit price wasn't flowing through to signal_outcomes PnL calculation.
+## Recommendation
+Fix bb_bounce (disable or SL cap), then evaluate re-enabling live trading with reduced position sizes. RS confluence ready for ASTER. The +$2.18/24h is noise — need consistent edge before risking real capital.
