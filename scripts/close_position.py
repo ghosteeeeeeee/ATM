@@ -57,7 +57,7 @@ def close_brain(coin, exit_price):
     try:
         cur = conn.cursor()
         cur.execute("""
-            SELECT id, direction, entry_price, amount_usdt, hl_notional_usdt, leverage
+            SELECT id, direction, entry_price, amount_usdt
             FROM trades
             WHERE token = %s AND status = 'open' AND exchange = 'Hyperliquid'
             ORDER BY id DESC LIMIT 1
@@ -66,9 +66,8 @@ def close_brain(coin, exit_price):
         if not row:
             log(f"Brain: no open trade for {coin}", "WARN")
             return
-        trade_id, direction, entry_price, amount_usdt_raw, hl_notional_raw, leverage_raw = row
-        calc_notional = float(hl_notional_raw) if hl_notional_raw else float(amount_usdt_raw or DEFAULT_TRADE_SIZE_USDT)
-        calc_leverage = float(leverage_raw) if leverage_raw else 1.0
+        trade_id, direction, entry_price, amount_usdt_raw = row
+        calc_notional = float(amount_usdt_raw) if amount_usdt_raw else DEFAULT_TRADE_SIZE_USDT
         pnl_pct = 0.0
         if entry_price and float(entry_price) != 0 and exit_price:
             if direction == 'LONG':
