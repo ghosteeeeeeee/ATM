@@ -208,8 +208,8 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 except Exception:
                     _signal_type = 'unknown'
                     _confidence = 80
-                # PnL = pnl% × (margin × leverage)
-                actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional * _leverage
+                # PnL = pnl% × margin (not leveraged notional — matches dashboard convention)
+                actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
                 record_signal_outcome(
                     token=token,
                     direction=direction,

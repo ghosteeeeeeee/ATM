@@ -80,7 +80,7 @@ def close_brain(coin, exit_price):
         # Fix: compute pnl_usdt from entry/exit/amount and direction-aware formula.
         pnl_usdt_calc = 0.0
         if entry_price and float(entry_price) != 0 and exit_price:
-            pnl_usdt_calc = round(pnl_pct / 100 * calc_notional * calc_leverage, 4)
+            pnl_usdt_calc = round(pnl_pct / 100 * calc_notional, 4)
         cur.execute("""
             UPDATE trades SET
                 status='closed', close_time=NOW(), exit_price=%s,
