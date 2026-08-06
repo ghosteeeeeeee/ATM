@@ -1273,19 +1273,19 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 # closed in the last 60s, skip orphan creation. The close may not have
                 # propagated from HL yet, so guardian sees a stale position.
                 try:
-                    _conn_rc = psycopg2.connect(**BRAIN_DB)
-                    _cur_rc = _conn_rc.cursor()
-                    _cur_rc.execute("""
-                        SELECT close_time FROM trades
-                        WHERE token = %s AND status = 'closed'
-                        AND close_time > NOW() - INTERVAL '60 seconds'
-                        LIMIT 1
-                    """, (coin,))
-                    if _cur_rc.fetchone():
-                        log(f'  ⏳ {coin} recently closed (<60s) — skipping orphan creation', 'INFO')
-                        _conn_rc.close()
-                        continue
-                    _conn_rc.close()
+                    import psycopg2
+                    from _secrets import BRAIN_DB_DICT as _rc_db
+                    with psycopg2.connect(**_rc_db) as _conn_rc:
+                        with _conn_rc.cursor() as _cur_rc:
+                            _cur_rc.execute("""
+                                SELECT 1 FROM trades
+                                WHERE token = %s AND status = 'closed'
+                                AND close_time > NOW() - INTERVAL '60 seconds'
+                                LIMIT 1
+                            """, (coin,))
+                            if _cur_rc.fetchone():
+                                log(f'  ⏳ {coin} recently closed (<60s) — skipping orphan creation', 'INFO')
+                                continue
                 except Exception:
                     pass  # non-fatal: proceed if check fails
 
