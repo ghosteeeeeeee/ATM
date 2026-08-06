@@ -55,6 +55,7 @@ from hermes_constants import (
     # NEW signals — vortex_break, return_exhaustion
     VORTEX_BREAK_ENABLED, VORTEX_BREAK_PLUS_ENABLED, VORTEX_BREAK_MINUS_ENABLED,
     RETURN_EXHAUSTION_ENABLED, RETURN_EXHAUSTION_PLUS_ENABLED, RETURN_EXHAUSTION_MINUS_ENABLED,
+    MA_100_CROSS_ENABLED, MA_100_CROSS_PLUS_ENABLED, MA_100_CROSS_MINUS_ENABLED,
 )
 
 
@@ -121,6 +122,11 @@ try:
     from signals.inverse_accel_300 import scan_inverse_accel_300_signals as _inverse_accel_300_run
 except Exception:
     _inverse_accel_300_run = None
+
+try:
+    from signals.ma_100_cross import run as _ma_100_cross_run
+except Exception:
+    _ma_100_cross_run = None
 
 try:
     from signals.ema_angle import scan_ema_angle_signals as _ema_angle_run
@@ -314,6 +320,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'wyckoff',             'enabled': WYCKOFF_ENABLED,               'run': _wyckoff_run},
     {'name': 'vortex_break',        'enabled': VORTEX_BREAK_ENABLED,          'run': _vortex_break_run},
     {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},
+    {'name': 'ma_100_cross',        'enabled': MA_100_CROSS_ENABLED,         'run': _ma_100_cross_run},
 ]
 
 

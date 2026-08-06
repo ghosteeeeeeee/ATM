@@ -391,8 +391,8 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
-TRAILING_ACTIVATION_PCT = 0.0035  # 0.35% — trailing needs room to breathe
-TRAILING_DISTANCE_PCT   = 0.0080  # 0.80% — wider distance avoids noise stop-outs
+TRAILING_ACTIVATION_PCT = 0.0030  # 0.30% — CEO tightened to lock profits faster (was 0.35%)
+TRAILING_DISTANCE_PCT   = 0.0070  # 0.70% — CEO tightened (was 0.80%)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
@@ -1170,6 +1170,14 @@ RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper 
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
 RETURN_EXHAUSTION_MIN_CONFIDENCE = 70  # 2026-08-05 — lowered from 80 (TNSR p=3.4 conf=74, ARB p=98.1 conf=77 both blocked)
+
+# ── 100MA Cross Signal ─────────────────────────────────────────────────────
+# ma_100_cross.py — Trend reversal at 100-period moving average
+# Backtested 14d: SHORT 51.4% WR +0.022%, LONG 46.7% WR +0.010%
+# Best on high-ATR tokens (ATR% >= 0.04%)
+MA_100_CROSS_ENABLED = True           # master kill-switch
+MA_100_CROSS_PLUS_ENABLED = True      # LONG (price crosses above MA)
+MA_100_CROSS_MINUS_ENABLED = True     # SHORT (price crosses below MA)
 
 # ── HL Copy Trading ───────────────────────────────────────────────────────────
 # hl_copy_trader.py — Track top Hyperliquid traders and copy their trades
