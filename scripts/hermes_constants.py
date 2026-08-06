@@ -1054,7 +1054,7 @@ HOTSET_ENABLED = True
 # ── Confluence Gate ───────────────────────────────────────────────────────────
 # When True (default): single-source signals are blocked from hot-set (require 2+ sources).
 # When False: single-source signals are allowed to pass through.
-CONFLUENCE_REQUIRED = False  # CEO 2026-08-06: paralysis — 14 signals blocked, hotset empty. Re-enable when signals co-fire naturally.
+CONFLUENCE_REQUIRED = True   # DO NOT DISABLE — paralysis was caused by 5min expiry (now 10min) and dead hours (now fixed)
 
 # ── Accel-300 Standalone Bypass ──────────────────────────────────────────────
 # When a single-source accel-300 has very high confidence, bypass confluence gate.
