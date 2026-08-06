@@ -862,6 +862,7 @@ CEO_PROTECTED_FLAGS = {
     'CONFLUENCE_REQUIRED': ('Core quality gate — CEO toggled this during paralysis, causing regression', '2026-08-06'),
     'LIVE_TRADING_ENABLED': ('Runtime kill switch — only T can change', '2026-08-06'),
     'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
+    'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
@@ -1042,7 +1043,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_PLUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_MINUS_ENABLED = False  # AUTO-ROTATED 2026-08-06  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_MINUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
 ZSCORE_RISING_VEL_BARS     = 5      # lookback for z-velocity (cur_z - z_N_bars_ago)
