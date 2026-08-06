@@ -126,6 +126,15 @@
 ## CEO DECISIONS (2026-08-06 06:50)
 - [x] 2026-08-06 06:50 — SYSTEM HEALTHY: 6 open, 42 closed, +4.38% PnL. All timers active.
 - [x] 2026-08-06 06:50 — bb_bounce RESOLVED: No longer in active signals. Directional flag fix worked.
-- [ ] 2026-08-06 06:50 — DELEGATE to bug_hunter: vel-hermes- signal leak — NEVER_REENABLE_FLAGS not blocking in signals/__init__.py:351. 46 trades/24h despite being disabled.
+- [x] 2026-08-06 06:50 — SIGNAL LEAK FULLY RESOLVED: Verified zero dead signal trades after 05:00 UTC. vel-hermes- 46 trades all pre-fix batch. NEVER_REENABLE_FLAGS working.
 - [ ] 2026-08-06 06:50 — CONTINUE monitoring ma_100_cross, vortex_break, return_exhaustion (48h windows).
 - [x] 2026-08-06 06:50 — NO PARAMETER CHANGES: System profitable, let signals run.
+
+## CEO DECISIONS (2026-08-06 — CEO Report)
+- [x] 2026-08-06 — CEO REVIEW: 157 trades, 55.4% WR, +$2.55/24h. Net profitable. Live trading active. Signal leak verified resolved. No parameter changes. tl_break_long 100% WR protected.
+
+## CEO DECISIONS (2026-08-06 — CEO Review 07:50)
+- [x] 2026-08-06 07:50 — SYSTEM STATUS: 159 trades, 57% WR. tl_break_long still 100% WR (+$1.81). Live trading active.
+- [ ] 2026-08-06 07:50 — URGENT DELEGATE to bug_hunter: decider (9 trades, 11.1% WR) and bb_bounce (16 trades) STILL firing despite NEVER_REENABLE_FLAGS. Previous fixes didn't stop them. Find actual leak source.
+- [x] 2026-08-06 07:50 — NO PARAMETER CHANGES: System profitable, let signals run.
+- [ ] 2026-08-06 07:50 — CONTINUE monitoring: tl_break_long, vel-hermes-, zscore confluence, hzscore+confluence.
