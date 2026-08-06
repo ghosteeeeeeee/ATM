@@ -22,7 +22,7 @@ FIX (2026-05-07): Added MIN_Z_VALUE = 0.4.
 # FIX (2026-05-07): Added to filter out marginal z-score readings.
 # Winners avg_z ~2.0, losers avg_z ~0.72. Only fire at genuine extremes.
 # FIX (2026-08-06): Raised from 0.4 to 0.8 — 12 signals had |z|<0.5, marginal noise.
-MIN_Z_VALUE = 0.8   # |avg_z| must exceed this (was 0.4 — too many marginal readings)
+MIN_Z_VALUE = 1.0   # |avg_z| must exceed this (backtested: 1.0 = 64.3% WR, 0.8 = 58.3%, 0 = 51.2%)
 COOLDOWN_HOURS = 0.083  # 5 minutes per-token+direction cooldown (was 2h — too aggressive)
 REQUIRE_3TF = False  # if True, require 3/3 TF agreement (was always 2/3 minimum)
 import statistics, sys, os
