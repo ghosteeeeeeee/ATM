@@ -844,6 +844,14 @@ RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance re
 TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer. Need LONG for confluence.
 TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer.
 
+# ── Rotator Protection ──────────────────────────────────────────────────────
+# Signals in this list are NEVER auto-rotated by signal_rotator.py
+# Used for signals we explicitly upgraded/tuned — old cumulative data is stale
+ROTATOR_PROTECTED_FLAGS = [
+    'TL_BREAK_PLUS_ENABLED',    # upgraded 2026-08-06 — old WR stale
+    'TL_BREAK_MINUS_ENABLED',   # upgraded 2026-08-06 — old WR stale
+]
+
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
 # squeeze_cross.py — EMA(5)×EMA(180) cross + ATR squeeze + widening gap
 # Backtested: 71% WR, +2.36% avg PnL on 3-day 1m data

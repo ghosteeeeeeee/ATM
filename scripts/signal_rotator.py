@@ -207,6 +207,11 @@ def select_signals(audit_signals, regime, registry):
 
         # Disable candidate: currently enabled but underperforming
         elif is_enabled is True and wr < MIN_WR_TO_DISABLE and edge < 0 and trades >= MIN_TRADES:
+            # Check rotator-protected flags (recently upgraded signals)
+            from hermes_constants import ROTATOR_PROTECTED_FLAGS
+            if flag in ROTATOR_PROTECTED_FLAGS:
+                log(f"  SKIP disable {flag}: in ROTATOR_PROTECTED_FLAGS (recently upgraded)")
+                continue
             changes.append({
                 'flag': flag,
                 'action': 'disable',
