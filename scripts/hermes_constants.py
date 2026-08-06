@@ -666,9 +666,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_VELOCITY_MINUS_ENABLED', # permanently dead
     'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
     'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
-    'BB_BOUNCE_ENABLED',          # CEO 2026-08-06 — 47.1% WR, -$0.34, asymmetric R:R, permanently dead
-    'BB_BOUNCE_PLUS_ENABLED',     # killed with master — directional flags must stay False
-    'BB_BOUNCE_MINUS_ENABLED',    # killed with master
+
     'VEL_HERMES_ENABLED',         # CEO 2026-08-04 — 0% WR (12 trades 7d), permanently dead
     'VEL_HERMES_PLUS_ENABLED',    # 31% WR, negative PnL, permanently dead
     'VEL_HERMES_MINUS_ENABLED',   # 45% WR but avg PnL marginal — manually killed, rotator must not re-enable
@@ -895,9 +893,9 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = False  # CEO 2026-08-06 05:00: URGENT KILL — 47.1% WR, -$0.34/24h, asymmetric R:R
-BB_BOUNCE_PLUS_ENABLED = False   # bb_bounce+ LONG — KILLED with master flag
-BB_BOUNCE_MINUS_ENABLED = False  # bb_bounce- SHORT — KILLED with master flag
+BB_BOUNCE_ENABLED = True    # re-enabled 2026-08-06 — confluence signal, testing with hzscore
+BB_BOUNCE_PLUS_ENABLED = True    # bb_bounce+ LONG
+BB_BOUNCE_MINUS_ENABLED = True   # bb_bounce- SHORT
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
