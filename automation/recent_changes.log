@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-06 04:00] bb_bounce RE-ENABLED (CEO killed it at 04:49)
+  WHY: CEO killed it claiming 47.1% WR, but it's needed for confluence testing.
+  BY: Human session (T)
+  DO NOT DISABLE. BB_BOUNCE is a confluence signal (pairs with hzscore, return_exhaustion).
+
 [2026-08-06 03:50] CONFLUENCE_REQUIRED = True (was False)
   WHY: CEO toggled it during paralysis. Root causes were 5min expiry + dead hours, both fixed.
   BY: Human session (T)
