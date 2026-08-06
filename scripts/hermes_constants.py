@@ -611,7 +611,7 @@ HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
 PM_TIER1_MIN_PCT    = 0.4    # min profit % to close
 PM_TIER1_MAX_PCT    = 2.0    # max profit % to close
 PM_TIER1_MAX_CLOSE  = 2      # max positions to close per wake
-PM_TIER1_SKIP_TOP_PCT = 25    # don't touch top X% most profitable (0 = disabled)
+PM_TIER1_SKIP_TOP_PCT = 0    # don't touch top X% most profitable (0 = disabled)
 PM_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}   # minutes between fires
 
 # Tier 2: Runner — higher profit, fires less frequently
@@ -1073,7 +1073,7 @@ ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when
 #   DEAD_HOURS_START/END = hour range in UTC
 #   DEAD_HOURS_SIGNALS = list of signal prefixes to block during dead hours
 #   DEAD_HOURS_DEFAULT = True = block ALL signals not in list, False = only block listed signals
-DEAD_HOURS_ENABLED = True
+DEAD_HOURS_ENABLED = False  # disabled 2026-08-06 — blocking confluence signals (LTC hzscore+return_exhaustion)
 DEAD_HOURS_START = 3   # 03:00 UTC
 DEAD_HOURS_END = 8     # 08:00 UTC
 DEAD_HOURS_SIGNALS = [
