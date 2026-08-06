@@ -163,9 +163,10 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
     except Exception as e:
         log(f"  [{tier}] HL close error for {token}: {e}", "WARN")
 
-    # Re-check HL before DB write
-    if not is_position_on_hl(token):
-        log(f"  [{tier}] {token} gone from HL during close — skipping DB write", "WARN")
+    # Re-check HL before DB write — only if close wasn't confirmed
+    # After successful close, position SHOULD be gone from HL (that's the goal)
+    if hl_fill_price is None and not is_position_on_hl(token):
+        log(f"  [{tier}] {token} gone from HL during close (no fill price) — skipping DB write", "WARN")
         return False
 
     # Update DB
