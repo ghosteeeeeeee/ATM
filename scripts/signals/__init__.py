@@ -316,7 +316,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'zscore_pump',         'enabled': ZSCORE_PUMP_NEW_ENABLED,       'run': _zscore_pump_run},
     {'name': 'mtp_zscore',          'enabled': MTP_ZSCORE_ENABLED,             'run': _mtp_zscore_run},
     {'name': 'bollinger_squeeze',   'enabled': BOLLINGER_SQUEEZE_ENABLED,      'run': _bollinger_squeeze_run},
-    # {'name': 'bb_bounce',         'enabled': BB_BOUNCE_ENABLED, 'run': _bb_bounce_run},  # CEO 2026-08-05: 0% WR, DEAD — removed from registry
+    {'name': 'bb_bounce',         'enabled': BB_BOUNCE_ENABLED, 'run': _bb_bounce_run},
     {'name': 'wyckoff',             'enabled': WYCKOFF_ENABLED,               'run': _wyckoff_run},
     {'name': 'vortex_break',        'enabled': VORTEX_BREAK_ENABLED,          'run': _vortex_break_run},
     {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},
