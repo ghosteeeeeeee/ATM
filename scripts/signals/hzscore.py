@@ -21,7 +21,10 @@ FIX (2026-05-07): Added MIN_Z_VALUE = 0.4.
 # ── Signal Quality Threshold ───────────────────────────────────────────────────
 # FIX (2026-05-07): Added to filter out marginal z-score readings.
 # Winners avg_z ~2.0, losers avg_z ~0.72. Only fire at genuine extremes.
-MIN_Z_VALUE = 0.4   # |avg_z| must exceed this for hzscore to fire (was 0.6, too tight — blocked 50% of signals)
+# FIX (2026-08-06): Raised from 0.4 to 0.8 — 12 signals had |z|<0.5, marginal noise.
+MIN_Z_VALUE = 0.8   # |avg_z| must exceed this (was 0.4 — too many marginal readings)
+COOLDOWN_HOURS = 2   # per-token+direction cooldown (was 0 — caused 6 duplicate signals/day)
+REQUIRE_3TF = False  # if True, require 3/3 TF agreement (was always 2/3 minimum)
 import statistics, sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -58,6 +61,25 @@ def run() -> int:
 
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
+
+    # ── Per-token cooldown check ───────────────────────────────────────────
+    # Query last hzscore signal time for each token+direction
+    last_signal_times = {}
+    try:
+        from signal_schema import _get_conn, _runtime
+        conn_cd = _get_conn(_runtime())
+        cur_cd = conn_cd.cursor()
+        cur_cd.execute("""
+            SELECT token, direction, MAX(created_at) as last_ts
+            FROM signals
+            WHERE signal_type = 'mtf_zscore'
+            GROUP BY token, direction
+        """)
+        for row in cur_cd.fetchall():
+            last_signal_times[(row[0], row[1])] = row[2]
+        conn_cd.close()
+    except Exception:
+        pass  # non-fatal: skip cooldown if DB query fails
 
     added = 0
 
@@ -97,6 +119,10 @@ def run() -> int:
         if len(valid_z) < 2:
             continue
 
+        # Optional: require 3/3 TF agreement (stronger confirmation)
+        if REQUIRE_3TF and len(valid_z) < 3:
+            continue
+
         bullish_tfs = sum(1 for v in valid_z if v > 0)
         bearish_tfs = len(valid_z) - bullish_tfs
 
@@ -130,6 +156,20 @@ def run() -> int:
         # |avg_z| < 0.6 is the chop zone — winners had avg_z ~2.0, losers ~0.72.
         if abs(avg_z) < MIN_Z_VALUE:
             continue
+
+        # ── Per-token cooldown (2h default) ─────────────────────────────────
+        # Prevents duplicate signals on same token+direction within cooldown window
+        if COOLDOWN_HOURS > 0:
+            import datetime
+            last_ts_str = last_signal_times.get((token, local_dir))
+            if last_ts_str:
+                try:
+                    last_ts = datetime.datetime.strptime(last_ts_str, '%Y-%m-%d %H:%M:%S')
+                    now = datetime.datetime.utcnow()
+                    if (now - last_ts).total_seconds() < COOLDOWN_HOURS * 3600:
+                        continue
+                except Exception:
+                    pass  # non-fatal: proceed if parse fails
 
         # ── Build and emit signal ───────────────────────────────────────
         z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
