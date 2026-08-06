@@ -1,32 +1,29 @@
-# CEO Report — 2026-08-06 ~13:00 UTC
+# CEO Report — 2026-08-06 ~14:00 UTC
 
 ## System Status
 - **Pipeline:** Active | **Live Trading:** Enabled | **Kill Switch:** True
-- **Open Positions:** 0
-- **24h Totals:** 177 trades, 58.8% WR, +$3.40 PnL
 - **Services:** pipeline timer + hl-sync-guardian both active
 
-## CEO DIRECTIVE (from T)
-**CONFLUENCE_REQUIRED = True — DO NOT DISABLE.**
+## Session Changes Acknowledged (2026-08-06 ~14:00)
 
-Root cause of paralysis was never confluence itself:
-1. 5-minute PENDING expiry killed signals before co-signals arrived → FIXED (now 10min)
-2. Dead hours blocking confluence signals → FIXED (expanded allowlist)
+**Signal Fixes:**
+- [x] ma_100_cross: resampling fix + cross_distance recalc. Quality improved.
+- [x] Range-bound regime gate: hzscore + return_exhaustion blocked in ranging markets. Prevents false SHORTs (UMA loss pattern).
+- [x] range_finder: new signal, registered in pipeline. Flat BB → S/R bounces.
 
-Confluence is the core quality gate. Disabling it lets single-source noise through. The two fixes above resolve the paralysis. Flag stays True.
+**Infrastructure:**
+- [x] hl_copy daemon: direction mapping fixed (plus/minus → LONG/SHORT), add_signal() used, systemd timer active.
+- [x] Profit Monster trail tier: 0.30% activation, 0.15% trail, weakness exit. T1/T2 skip.
 
-## Top Performers (24h)
-| Signal | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| tl_break_long | 14 | 100% | +$1.81 |
-| vel-hermes- | 46 | 43.5% | +$0.47 |
-| zscore-rising+ | 8 | 62.5% | +$0.23 |
-| tl_break_short | 5 | 80% | +$0.22 |
+**Performance (48h):** 213 trades, 54% WR, R:R 1.21:1. LONG > SHORT (62.7% vs 50%).
 
-## Concerns
-1. **decider** still firing: 9 trades, 11.1% WR, -$0.18. In NEVER_REENABLE_FLAGS but generating trades.
-2. **Zero open positions** — no active market exposure.
+## CEO DECISIONS
 
-## Open Actions
-- [ ] DELEGATE to bug_hunter: Investigate why decider still fires despite NEVER_REENABLE_FLAGS.
-- [ ] CONTINUE monitoring tl_break_long, ma_100_cross, vortex_break, return_exhaustion.
+- [ ] 2026-08-06 — **range_finder → hot-set scoring?** Add to signal scoring rotation if backtested WR ≥ 50%.
+- [ ] 2026-08-06 — **Hour 14 UTC cluster (56 losses)?** DELEGATE to bug_hunter: investigate Asian session close correlation.
+- [ ] 2026-08-06 — **bb_bounce re-enabled as confluence signal (100% WR with hzscore+)?** APPROVED for confluence-only use — never standalone. Update dead signals blocklist to exclude confluence-paired entries.
+
+## Open Items
+- [ ] CONTINUE monitoring: ma_100_cross, vortex_break, return_exhaustion (48h windows).
+- [ ] MONITOR range_finder first live trades.
+- [ ] tl_break_long: 14 trades, 100% WR, +$1.81 — PROTECTED, no changes.

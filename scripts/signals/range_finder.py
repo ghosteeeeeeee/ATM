@@ -21,6 +21,7 @@ UNLIKE bb_bounce:
 
 import sys
 import os
+import time
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +41,10 @@ TOUCH_WINDOW = 50            # Lookback for counting touches
 PROXIMITY_PCT = 0.50         # Price must be within 0.50% of band to trigger
 BOUNCE_MIN_PCT = 0.05        # Minimum bounce away from band (0.05%)
 COOLDOWN_CANDLES = 6         # 30 min cooldown on 5m candles
+
+
+# ── State ───────────────────────────────────────────────────────────────
+_cooldown = {}  # token -> timestamp of last signal
 
 
 def _log(msg):
@@ -140,12 +145,15 @@ def detect_range_signal(closes):
     dist_lower = abs(current - lower) / lower * 100 if lower > 0 else 999
     dist_upper = abs(current - upper) / upper * 100 if upper > 0 else 999
 
-    # LONG: near lower band + RSI oversold + bouncing up
+    # LONG: near lower band + RSI oversold + 2-candle bounce confirmation
     if dist_lower <= PROXIMITY_PCT and current > prev:
         if rsi > RSI_OVERSOLD:
             return None
         if current <= lower:
             return None  # still below band, no bounce yet
+        # 2-candle confirmation: both of last 2 candles must be above band
+        if len(arr) >= 3 and arr[-2] <= lower:
+            return None  # previous candle was still below band — not a real bounce
         bounce_pct = (current - lower) / lower * 100 if lower > 0 else 0
         if bounce_pct < BOUNCE_MIN_PCT:
             return None
@@ -167,12 +175,15 @@ def detect_range_signal(closes):
             'bounce_pct': round(bounce_pct, 3),
         }
 
-    # SHORT: near upper band + RSI overbought + bouncing down
+    # SHORT: near upper band + RSI overbought + 2-candle rejection
     if dist_upper <= PROXIMITY_PCT and current < prev:
         if rsi < RSI_OVERBOUGHT:
             return None
         if current >= upper:
-            return None  # still above band, no bounce yet
+            return None  # still above band, no rejection yet
+        # 2-candle confirmation: both of last 2 candles must be below band
+        if len(arr) >= 3 and arr[-2] >= upper:
+            return None  # previous candle was still above band — not a real rejection
         bounce_pct = (upper - current) / upper * 100 if upper > 0 else 0
         if bounce_pct < BOUNCE_MIN_PCT:
             return None
@@ -247,10 +258,16 @@ def scan_range_signals(prices_dict: dict) -> tuple:
 
     added = 0
     signaled_tokens = []
+    now = time.time()
 
     for token, data in prices_dict.items():
         price = data.get('price')
         if not price or price <= 0:
+            continue
+
+        # Cooldown: don't re-fire for COOLDOWN_CANDLES * 5 minutes per token
+        key = token.upper()
+        if key in _cooldown and (now - _cooldown[key]) < COOLDOWN_CANDLES * 5 * 60:
             continue
 
         closes = _get_candles_5m(token, lookback=2500)
@@ -286,6 +303,7 @@ def scan_range_signals(prices_dict: dict) -> tuple:
         if sid:
             added += 1
             signaled_tokens.append(token_upper)
+            _cooldown[key] = now
             _log(f'{sig["direction"]:5s} {token:8s} conf={sig["confidence"]:3.0f}% '
                  f'range={sig["range_width"]:.2f}% touches={sig["touch_count"]} '
                  f'rsi={sig["rsi"]:.1f} bounce={sig["bounce_pct"]:.3f}%')

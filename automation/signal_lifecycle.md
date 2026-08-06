@@ -1,31 +1,36 @@
-# Signal Lifecycle — 2026-08-05 17:53 UTC
+# Signal Lifecycle — 2026-08-06 17:54 UTC
 
 ## Pipeline
 - Audit: ✅
 - Rotation: ✅
 
 ## Signal States
-- 🔵 experimental: 13
-- 🔴 deprecated: 1
+- 🟢 active: 2
+- 🔵 experimental: 12
+- 🔴 deprecated: 2
 
 ## State Transitions
-- No transitions
+- **decider**: experimental → deprecated (Deprecated: WR=10% (10 trades))
+- **tl_break_long**: experimental → active (Promoted: WR=56% (45 trades))
+- **tl_break_short**: experimental → active (Promoted: WR=50% (30 trades))
 
 ## All Signals
 
 | Signal | State | WR | Edge | Updated |
 |--------|-------|-----|------|--------|
-| accel-300+ | 🔵 experimental | 40% | 0.068 | 2026-08-05 |
-| accel-300- | 🔵 experimental | 40% | -0.031 | 2026-08-05 |
-| accel-300-vel+ | 🔵 experimental | 27% | -0.031 | 2026-08-05 |
-| accel-300-vel- | 🔵 experimental | 33% | 0.058 | 2026-08-05 |
-| accel-300-velocity-igniti | 🔵 experimental | 40% | -0.042 | 2026-08-05 |
-| bb_bounce | 🔵 experimental | 47% | -0.352 | 2026-08-05 |
-| decider | 🔵 experimental | 11% | -0.055 | 2026-08-05 |
-| inv-accel-300- | 🔴 deprecated | 43% | -0.100 | 2026-08-05 |
-| pattern_wolf_wave_bear | 🔵 experimental | 20% | -0.147 | 2026-08-05 |
-| tl_break_long | 🔵 experimental | 41% | 0.359 | 2026-08-05 |
-| tl_break_short | 🔵 experimental | 42% | -0.086 | 2026-08-05 |
-| vel-hermes- | 🔵 experimental | 38% | -0.007 | 2026-08-05 |
-| zscore-rising+ | 🔵 experimental | 41% | 0.028 | 2026-08-05 |
-| zscore-rising- | 🔵 experimental | 46% | -0.137 | 2026-08-05 |
+| accel-300+ | 🔵 experimental | 29% | -0.046 | 2026-08-06 |
+| accel-300- | 🔵 experimental | 29% | -0.093 | 2026-08-06 |
+| accel-300-vel+ | 🔵 experimental | 27% | -0.031 | 2026-08-06 |
+| accel-300-vel- | 🔵 experimental | 33% | 0.058 | 2026-08-06 |
+| accel-300-velocity-igniti | 🔵 experimental | 40% | -0.042 | 2026-08-06 |
+| bb_bounce | 🔵 experimental | 48% | -0.444 | 2026-08-06 |
+| decider | 🔴 deprecated | 10% | -0.062 | 2026-08-06 |
+| hzscore+,return_exhaustio | 🔵 experimental | 80% | 0.480 | 2026-08-06 |
+| hzscore-,return_exhaustio | 🔵 experimental | 62% | -0.139 | 2026-08-06 |
+| inv-accel-300- | 🔴 deprecated | 42% | -0.243 | 2026-08-06 |
+| pattern_wolf_wave_bear | 🔵 experimental | 20% | -0.147 | 2026-08-06 |
+| tl_break_long | 🟢 active | 56% | 1.303 | 2026-08-06 |
+| tl_break_short | 🟢 active | 50% | 0.197 | 2026-08-06 |
+| vel-hermes- | 🔵 experimental | 38% | -0.007 | 2026-08-06 |
+| zscore-rising+ | 🔵 experimental | 41% | 0.028 | 2026-08-06 |
+| zscore-rising- | 🔵 experimental | 46% | -0.137 | 2026-08-06 |

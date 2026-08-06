@@ -76,12 +76,12 @@ def generate_hl_signal(trade: dict, trader_score: float) -> dict:
     )
     
     # Determine direction
-    direction = 'plus' if trade['side'] == 'B' else 'minus'
+    direction = 'LONG' if trade['side'] == 'B' else 'SHORT'
     
     # Create signal
     signal = {
         'coin': trade['coin'],
-        'signal_type': f'hl_copy_{direction}',
+        'signal_type': f'hl_copy_{"plus" if direction == "LONG" else "minus"}',
         'direction': direction,
         'confidence': confidence,
         'price': trade['px'],
@@ -127,33 +127,20 @@ def get_recent_pro_trades(minutes: int = None) -> list:
         conn.close()
 
 def write_signal_to_pipeline(signal: dict):
-    """Write signal to the signals database for pipeline processing."""
-    from paths import RUNTIME_DB
-    import sqlite3
+    """Write signal to the signals database via add_signal() for pipeline processing."""
+    from signal_schema import add_signal
     
-    conn = sqlite3.connect(RUNTIME_DB)
-    try:
-        # Map to correct schema
-        now = datetime.now().isoformat()
-        
-        conn.execute("""
-            INSERT INTO signals 
-            (token, signal_type, direction, confidence, price, source, 
-             created_at, signal_metadata)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            signal['coin'],  # token = coin
-            signal['signal_type'],
-            signal['direction'],
-            signal['confidence'],
-            signal['price'],
-            signal['source'],
-            now,
-            json.dumps(signal['meta'])
-        ))
-        conn.commit()
-    finally:
-        conn.close()
+    add_signal(
+        token=signal['coin'],
+        direction=signal['direction'],
+        signal_type=signal['signal_type'],
+        source=signal['source'],
+        confidence=signal['confidence'],
+        value=signal.get('trade_size'),
+        price=signal['price'],
+        exchange='hyperliquid',
+        timeframe='1h',
+    )
 
 def run_hl_copy_signal():
     """Main function: detect pro trades and generate pipeline signals."""

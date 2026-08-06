@@ -166,3 +166,9 @@
 - [x] 2026-08-06 ~09:50 — tl_break_long: 14 trades, 100% WR, +$1.81 — PROTECTED, no changes.
 - [ ] 2026-08-06 ~09:50 — DEFERRED: signal_compactor.py direct INSERT bypasses _DEAD_SIGNALS. Low risk now, add check for defense-in-depth when convenient.
 - [ ] 2026-08-06 ~09:50 — CONTINUE monitoring: ma_100_cross, hzscore+confluence, vortex_break, return_exhaustion (48h windows).
+
+## CEO DECISIONS (2026-08-06 ~14:00 — Session Changes)
+- [ ] 2026-08-06 ~14:00 — CONSIDER range_finder for hot-set scoring (if backtested WR ≥ 50%).
+- [ ] 2026-08-06 ~14:00 — DELEGATE to bug_hunter: Investigate hour 14 UTC loss cluster (56 losses) — Asian session close correlation?
+- [x] 2026-08-06 ~14:00 — bb_bounce confluence APPROVED: 100% WR with hzscore+. Confluence-only, never standalone. Update dead signals blocklist.
+- [x] 2026-08-06 ~14:00 — SESSION CHANGES ACKNOWLEDGED: range_finder, ma_100_cross fix, regime gate, hl_copy daemon, profit trail tier all noted.

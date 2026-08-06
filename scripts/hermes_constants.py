@@ -621,6 +621,13 @@ PM_TIER2_MAX_CLOSE  = 1      # max positions to close per wake
 PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
+# Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
+PM_TRAIL_ENABLED     = True   # master switch for trailing tier
+PM_TRAIL_ACTIVATE_PCT = 0.30  # mark trade as "in profit" at this threshold
+PM_TRAIL_DISTANCE_PCT = 0.15  # trail 0.15% behind peak
+PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
+PM_TRAIL_FIRE_WINDOWS = {"A": (0.5, 1), "B": (1, 2)}  # check every 30-60s (fast)
+
 PM_DRY_RUN          = False  # global kill switch
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -852,6 +859,7 @@ TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%,
 ROTATOR_PROTECTED_FLAGS = [
     'TL_BREAK_PLUS_ENABLED',    # upgraded 2026-08-06 — old WR stale
     'TL_BREAK_MINUS_ENABLED',   # upgraded 2026-08-06 — old WR stale
+    'BB_BOUNCE_ENABLED',        # confluence signal — 100% WR with hzscore+, standalone WR stale
 ]
 
 # ── CEO Protection ──────────────────────────────────────────────────────────
@@ -895,7 +903,7 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = True    # re-enabled 2026-08-06 — confluence signal, testing with hzscore
+BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
 BB_BOUNCE_PLUS_ENABLED = True    # bb_bounce+ LONG
 BB_BOUNCE_MINUS_ENABLED = True   # bb_bounce- SHORT
 

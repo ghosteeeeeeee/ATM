@@ -12,9 +12,11 @@ from paths import *
 from hermes_constants import (
     PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT, PM_TIER1_FIRE_WINDOWS,
     PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT, PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT, PM_TIER2_FIRE_WINDOWS,
+    PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
     PM_DRY_RUN,
 )
 import sys, os, json, time, random, argparse
+from datetime import datetime
 from pathlib import Path
 
 from hermes_log import log
@@ -86,12 +88,16 @@ def filter_by_pnl(positions, min_pct, max_pct):
     return filtered
 
 
-def select_positions(positions, max_close, skip_top_pct):
-    """Select positions to close: skip top profitable, pick random subset."""
+def select_positions(positions, max_close, skip_top_pct, trail_state=None):
+    """Select positions to close: skip top profitable + trailed, pick random subset."""
     if not positions:
         return []
     skip_count = max(0, int(len(positions) * skip_top_pct / 100))
     candidates = positions[skip_count:]
+    # Skip trades being trailed (trail tier handles those)
+    if trail_state:
+        trailed_ids = set(trail_state.keys())
+        candidates = [p for p in candidates if str(p["id"]) not in trailed_ids]
     if not candidates:
         return []
     count = random.randint(1, min(max_close, len(candidates)))
@@ -232,7 +238,7 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
 
 
 # ── Tier Runner ──────────────────────────────────────────────────────────────
-def run_tier(tier_name, min_pct, max_pct, max_close, skip_top_pct, fire_windows, positions, dry_run):
+def run_tier(tier_name, min_pct, max_pct, max_close, skip_top_pct, fire_windows, positions, dry_run, trail_state=None):
     """Run one tier: check fire timing, filter positions, close picks."""
     ts_file = Path(f"/root/.hermes/data/profit_monster_{tier_name}.json")
     try:
@@ -253,7 +259,7 @@ def run_tier(tier_name, min_pct, max_pct, max_close, skip_top_pct, fire_windows,
         ts_file.write_text(json.dumps({"ts": time.time()}))
         return 0
 
-    picks = select_positions(in_range, max_close, skip_top_pct)
+    picks = select_positions(in_range, max_close, skip_top_pct, trail_state)
     if not picks:
         log(f"  [{tier_name}] No positions selected — letting winners run")
         ts_file.write_text(json.dumps({"ts": time.time()}))
@@ -268,6 +274,108 @@ def run_tier(tier_name, min_pct, max_pct, max_close, skip_top_pct, fire_windows,
         if ok:
             closed += 1
 
+    ts_file.write_text(json.dumps({"ts": time.time()}))
+    return closed
+
+
+# ── Trailing Profit Tier ─────────────────────────────────────────────────────
+_TRAIL_STATE_FILE = Path("/root/.hermes/data/profit_monster_trail_state.json")
+
+def _load_trail_state():
+    """Load trailing state: {trade_id: {peak_pnl, activated_at, token}}"""
+    try:
+        return json.loads(_TRAIL_STATE_FILE.read_text())
+    except Exception:
+        return {}
+
+def _save_trail_state(state):
+    _TRAIL_STATE_FILE.write_text(json.dumps(state, indent=2))
+
+def run_trail(positions, dry_run):
+    """Trailing profit tier: mark trades in profit, trail peak, exit on weakness.
+
+    Logic:
+    1. When trade hits PM_TRAIL_ACTIVATE_PCT → mark as trailing, record peak
+    2. On each check: if current_pnl < peak - PM_TRAIL_DISTANCE_PCT → exit
+    3. If trade drops below activation threshold → clear state (didn't hold)
+    """
+    if not PM_TRAIL_ENABLED:
+        return 0
+
+    ab_group = load_config().get("ab_group", "A")
+    window = PM_TRAIL_FIRE_WINDOWS.get(ab_group, (0.5, 1))
+    # Use same fire timing as Tier 1 (fastest)
+    ts_file = Path("/root/.hermes/data/profit_monster_trail.json")
+    try:
+        last_ts = json.loads(ts_file.read_text()).get("ts", 0.0)
+    except Exception:
+        last_ts = 0.0
+
+    min_wait, max_wait = window
+    jitter = random.uniform(0, 1)
+    fire_interval = (min_wait + (max_wait - min_wait) * jitter) * 60
+    if time.time() - last_ts < fire_interval:
+        return 0
+
+    state = _load_trail_state()
+    closed = 0
+
+    for pos in positions:
+        tid = str(pos["id"])
+        pnl = pos.get("live_pnl_pct", pos["pnl_pct"])
+        now = time.time()
+
+        if tid in state:
+            # ── Already trailing ──────────────────────────────────────────
+            trail = state[tid]
+
+            # If trade went back below activation, clear (didn't hold)
+            if pnl < PM_TRAIL_ACTIVATE_PCT * 0.5:
+                log(f"  [TRAIL] {pos['token']} dropped to {pnl:.2f}% — clearing trail state")
+                del state[tid]
+                continue
+
+            # Update peak
+            if pnl > trail["peak_pnl"]:
+                trail["peak_pnl"] = pnl
+                trail["peak_time"] = now
+
+            # Check minimum hold time
+            if now - trail["activated_at"] < PM_TRAIL_MIN_HOLD * 60:
+                continue
+
+            # Exit if current price dropped trail distance from peak
+            trail_floor = trail["peak_pnl"] - PM_TRAIL_DISTANCE_PCT
+            if pnl <= trail_floor:
+                log(f"  [TRAIL] {pos['token']} trailing exit: peak={trail['peak_pnl']:.2f}% "
+                    f"current={pnl:.2f}% floor={trail_floor:.2f}%")
+                ok = close_position(pos["id"], pos["token"], pos["direction"],
+                                    pnl, pos["current_price"], dry_run, "trail")
+                if ok:
+                    closed += 1
+                del state[tid]
+
+        else:
+            # ── New candidate: just entered profit zone ───────────────────
+            if pnl >= PM_TRAIL_ACTIVATE_PCT:
+                # Check minimum hold time since trade opened
+                try:
+                    opened = datetime.fromisoformat(pos["opened_at"])
+                    hold_min = (datetime.now() - opened).total_seconds() / 60
+                except Exception:
+                    hold_min = 999
+
+                if hold_min >= PM_TRAIL_MIN_HOLD:
+                    state[tid] = {
+                        "peak_pnl": pnl,
+                        "activated_at": now,
+                        "peak_time": now,
+                        "token": pos["token"],
+                    }
+                    log(f"  [TRAIL] {pos['token']} activated: pnl={pnl:.2f}% "
+                        f"peak={pnl:.2f}% trail_floor={pnl - PM_TRAIL_DISTANCE_PCT:.2f}%")
+
+    _save_trail_state(state)
     ts_file.write_text(json.dumps({"ts": time.time()}))
     return closed
 
@@ -290,17 +398,23 @@ def run(dry_run=False):
     if not positions:
         return
 
+    # Tier T: Trailing profit (runs first — catches early profit and trails)
+    trail_closed = run_trail(positions, effective_dry_run)
+
+    # Load trail state for T1/T2 to skip trailed trades
+    trail_state = _load_trail_state() if PM_TRAIL_ENABLED else {}
+
     # Tier 1: Quick scalp
     t1_closed = run_tier("tier1", PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT,
                          PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT,
-                         PM_TIER1_FIRE_WINDOWS, positions, effective_dry_run)
+                         PM_TIER1_FIRE_WINDOWS, positions, effective_dry_run, trail_state)
 
     # Tier 2: Runner (re-check positions after tier 1 closes)
     if t1_closed > 0:
         positions = get_all_open_positions()
     t2_closed = run_tier("tier2", PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT,
                          PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT,
-                         PM_TIER2_FIRE_WINDOWS, positions, effective_dry_run)
+                         PM_TIER2_FIRE_WINDOWS, positions, effective_dry_run, trail_state)
 
     total = t1_closed + t2_closed
     if total > 0:
