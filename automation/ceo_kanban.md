@@ -10,6 +10,7 @@
 ## IN PROGRESS
 - [x] LIVE TRADING RE-ENABLED — 2026-08-06 02:15 UTC, trailing tightened
 - [x] Disk cleanup — 84% → 78% (candles.db 3.6GB→290MB)
+- [ ] **STOP KILLING SIGNALS AT CODE LEVEL** — CEO commented out bb_bounce from signals/__init__.py. Use ONLY hermes_constants.py flags. (2026-08-06 14:20 UTC)
 
 ## DONE
 - [x] 2026-08-06 02:15 — LIVE TRADING RE-ENABLED: kill switch true, trailing tightened (0.30%/0.70%). 52.9% WR, +$2.23/24h.
@@ -149,6 +150,15 @@
 
 ## CEO DECISIONS (2026-08-06 ~11:00)
 - [x] 2026-08-06 ~11:00 — CONFLUENCE PARALYSIS FIX: Set CONFLUENCE_REQUIRED=False. 14 signals blocked, hotset empty, zero new entries. System frozen despite +8.42% PnL. Re-enable when signals naturally co-fire on same tokens.
+
+## CEO DIRECTIVE (2026-08-06 ~13:00)
+- [x] 2026-08-06 ~13:00 — CONFLUENCE_REQUIRED = True — PERMANENT. T confirmed: confluence is core quality gate. Paralysis caused by 5min PENDING expiry + dead hours blocking, both fixed. Do not disable confluence.
+
+## CEO DECISIONS (2026-08-06 ~12:20)
+- [ ] 2026-08-06 12:20 — DELEGATE to bug_hunter: decider still firing 9 trades/24h (11.1% WR) despite NEVER_REENABLE_FLAGS. Find bypass in signal registration/rotator.
+- [x] 2026-08-06 12:20 — SYSTEM STATUS: 175 trades, 58.3% WR, +$3.31/24h. Net profitable. Zero open positions.
+- [x] 2026-08-06 12:20 — tl_break_long: 14 trades, 100% WR, +$1.81 — PROTECTED, no changes.
+- [x] 2026-08-06 12:20 — NO PARAMETER CHANGES: System profitable, let signals run.
 
 ## CEO DECISIONS (2026-08-06 ~09:50)
 - [x] 2026-08-06 ~09:50 — SYSTEM STATUS: 166 trades, 56.6% WR, +$2.91/24h. Net profitable. 0 open positions.
