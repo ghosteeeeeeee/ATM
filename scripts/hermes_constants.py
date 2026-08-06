@@ -856,6 +856,23 @@ ROTATOR_PROTECTED_FLAGS = [
     'TL_BREAK_MINUS_ENABLED',   # upgraded 2026-08-06 — old WR stale
 ]
 
+# ── CEO Protection ──────────────────────────────────────────────────────────
+# Flags the CEO automation CANNOT toggle. Prevents regression when CEO
+# independently investigates same issues as human session.
+# Format: flag_name -> (reason, date_added)
+CEO_PROTECTED_FLAGS = {
+    'CONFLUENCE_REQUIRED': ('Core quality gate — CEO toggled this during paralysis, causing regression', '2026-08-06'),
+    'LIVE_TRADING_ENABLED': ('Runtime kill switch — only T can change', '2026-08-06'),
+    'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
+}
+
+# ── Session Lock ────────────────────────────────────────────────────────────
+# When this file exists with content "active", CEO skips parameter changes.
+# Human session creates it at start, removes at end.
+# CEO checks this before modifying hermes_constants.py
+SESSION_LOCK_FILE = '/tmp/hermes-session-active.lock'
+SESSION_LOCK_TTL = 3600  # lock expires after 1 hour (safety net)
+
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
 # squeeze_cross.py — EMA(5)×EMA(180) cross + ATR squeeze + widening gap
 # Backtested: 71% WR, +2.36% avg PnL on 3-day 1m data

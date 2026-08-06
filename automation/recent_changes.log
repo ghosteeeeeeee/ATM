@@ -1,0 +1,45 @@
+# Recent Changes — READ THIS BEFORE MAKING DECISIONS
+# Updated by human sessions and automated processes
+# Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
+
+[2026-08-06 03:50] CONFLUENCE_REQUIRED = True (was False)
+  WHY: CEO toggled it during paralysis. Root causes were 5min expiry + dead hours, both fixed.
+  BY: Human session (T)
+  DO NOT CHANGE THIS FLAG.
+
+[2026-08-06 03:45] PENDING signal expiry 5min -> 10min
+  WHY: 37 signals expired as stale_5min in 30min. Signals need time to find co-signals.
+  BY: Human session (T)
+  DO NOT REVERT.
+
+[2026-08-06 03:30] Dead hours allowlist expanded
+  WHY: Added hzscore, return_exhaustion, bb_bounce, ma100-cross, vortex_break
+  BY: Human session (T) + CEO
+  DO NOT REMOVE from allowlist.
+
+[2026-08-06 03:15] profit_monster PnL fix
+  WHY: pnl_usdt was 0 because hl_notional_usdt was stale. Now uses amount_usdt.
+  BY: Human session (T)
+  FIXED: indentation error + DB write skip bug.
+
+[2026-08-06 03:00] Hot-set flipping fixed
+  WHY: Compactor was rebuilding hot-set from scratch each cycle, signals getting expired.
+  BY: Human session (T)
+  ROOT CAUSE: 5min expiry + dead hours. Both fixed.
+
+[2026-08-06 02:00] tl_break protected from auto-rotation
+  WHY: signal_rotator killed upgraded tl_break based on stale cumulative WR.
+  BY: Human session (T)
+  DO NOT CHANGE ROTATOR_PROTECTED_FLAGS.
+
+[2026-08-06 02:00] hzscore MIN_Z_VALUE 0.4 -> 1.0
+  WHY: Backtested: 1.0 gives 64.3% WR (highest of all configs).
+  BY: Human session (T)
+
+[2026-08-06 01:00] ma_100_cross signal deployed
+  WHY: New signal, 51-56% WR backtested, 2-candle confirmation.
+  BY: Human session (T)
+
+[2026-08-06 00:00] RS re-enabled with new params
+  WHY: MIN_TOUCHES 120->30, PROXIMITY_K 3->4. ASTER support bounce now fires.
+  BY: Human session (T)
