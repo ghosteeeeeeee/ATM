@@ -185,18 +185,20 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 actual_pnl_pct = float(pnl_pct or 0)
                 # Fetch hl_notional_usdt from PostgreSQL for accurate PnL calculation
                 notional = 11.0
+                _leverage = 1.0
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
                     _conn = psycopg2.connect(**BRAIN_DB_DICT)
                     try:
                         _cur = _conn.cursor()
-                        _cur.execute("SELECT hl_notional_usdt, signal, confidence FROM trades WHERE id=%s", (trade_id,))
+                        _cur.execute("SELECT hl_notional_usdt, leverage, signal, confidence FROM trades WHERE id=%s", (trade_id,))
                         _row = _cur.fetchone()
                         if _row:
                             notional = float(_row[0]) if _row[0] else 11.0
-                            _signal_type = _row[1] or 'unknown'
-                            _confidence = float(_row[2]) if _row[2] else 80
+                            _leverage = float(_row[1]) if _row[1] else 1.0
+                            _signal_type = _row[2] or 'unknown'
+                            _confidence = float(_row[3]) if _row[3] else 80
                         else:
                             _signal_type = 'unknown'
                             _confidence = 80
@@ -206,7 +208,8 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 except Exception:
                     _signal_type = 'unknown'
                     _confidence = 80
-                actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
+                # PnL = pnl% × (margin × leverage)
+                actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional * _leverage
                 record_signal_outcome(
                     token=token,
                     direction=direction,
