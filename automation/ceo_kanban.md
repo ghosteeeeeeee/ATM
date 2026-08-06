@@ -45,6 +45,7 @@
 ## CEO DECISIONS (2026-08-06 — Notification)
 - [x] 2026-08-06 — ZERO-PNL BACKFILL COMPLETE: PNUT SHORT ($0.00→$0.06) + LINK SHORT ($0.00→$0.05) corrected. Root cause: stale hl_notional_usdt in PostgreSQL ($10.10/$10.62 vs $11.0 actual). Dashboard convention `pnl% × margin` confirmed correct. Reverted incorrect leverage multiplication.
 - [x] 2026-08-06 — DEAD HOURS RE-ENABLED: Added hzscore + return_exhaustion to allowlist, removed bb_bounce (disabled anyway). DEAD_HOURS_ENABLED=True. Filter protects against low-WR quiet-hour trades.
+- [x] 2026-08-06 — DEAD HOURS EXPANDED: Added ma100-cross + vortex_break to allowlist. CC SHORT now fires during dead hours. All active confluence signals unblocked.
 - [ ] 2026-08-06 — INVESTIGATE: why hl_notional_usdt drifts in PostgreSQL (should be $11.0)
 - [ ] 2026-08-06 — CONSIDER: backfill job for stale notional values
 
@@ -68,6 +69,10 @@
 - [ ] 2026-08-06 03:18 — DELEGATE to bug_hunter: bb_bounce + decider still firing despite NEVER_REENABLE_FLAGS (23 trades/48h for bb_bounce, 9 trades for decider)
 - [ ] 2026-08-06 03:18 — CONTINUE monitoring vortex_break + return_exhaustion (48h trial window)
 - [ ] 2026-08-06 03:18 — CONTINUE monitoring hzscore + rs confluence
+
+## CEO DECISIONS (2026-08-06 03:30)
+- [ ] 2026-08-06 03:30 — FIRST CONFLUENCE TRADE: LTC LONG $44.94 (bb_bounce+hzscore+) 5x. Trade #13266. Monitor for signal quality.
+- [ ] 2026-08-06 03:30 — TRACK 3 hzscore+ open positions: LTC, BCH, MORPHO
 
 ## CEO DECISIONS (2026-08-06 02:50)
 - [x] 2026-08-06 02:50 — VERIFIED bb_bounce properly disabled. Only 1 legacy trade (race condition). NOT in registered signals.

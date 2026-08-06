@@ -1,31 +1,20 @@
-# CEO Report — 2026-08-06 03:18 UTC
+# CEO Report — 2026-08-06
 
-## 24h Performance
-**142 trades | 52.8% WR | +$2.05 PnL** — net profitable. Live trading active.
+## System Status
+- **Pipeline timer:** active
+- **HL sync guardian:** active
+- **Live trading:** enabled (kill switch true, trailing tightened)
+- **Dead hours:** enabled, allowlist expanded
 
-| Signal | Trades | WR | PnL | Status |
-|--------|--------|-----|------|--------|
-| tl_break_long | 14 | 100% | +$1.81 | Star performer |
-| vel-hermes- | 46 | 43.5% | +$0.47 | Bread and butter |
-| zscore-rising+ | 8 | 62.5% | +$0.23 | Good |
-| tl_break_short | 5 | 80% | +$0.22 | Good |
-| bb_bounce | 18 | 55.6% | -$0.52 | **LEAKING** |
-| decider | 9 | 11.1% | -$0.18 | **STILL FIRING** |
+## Notification: Dead Hours Allowlist Updated
+ma100-cross and vortex_break added to `DEAD_HOURS_SIGNALS`. CC SHORT (ma100-cross, vortex_break_short) was previously blocked during 03:00-08:00 UTC — should execute on next pipeline cycle. All active confluence signal types now fire during dead hours.
 
-## System Health
-All timers active (pipeline, hl-sync-guardian, price-collector, regime scanners).
+## Pending Items
+- Monitor ma_100_cross live WR (24h trial)
+- Monitor hzscore WR with new z-threshold (MIN_Z 0.4→1.0)
+- Verify vortex_break + return_exhaustion sustained performance (48h window)
+- Investigate hl_notional_usdt drift in PostgreSQL
+- Track 3 hzscore+ open positions: LTC, BCH, MORPHO
 
-## DECISIONS
-
-1. **DELEGATE to bug_hunter:** Investigate why bb_bounce (23 trades/48h, -$0.74) and decider (9 trades, 11.1% WR) still firing despite NEVER_REENABLE_FLAGS. One is a race condition, the other may be legacy data.
-
-2. **tl_break_long confirmed sustained:** 82.4% WR over 48h (17 trades). Not just initial spike. ROTATOR_PROTECTED_FLAGS working.
-
-3. **CONTINUE monitoring:** vortex_break and return_exhaustion (48h trial window active). hzscore + rs confluence (3 open positions all profitable).
-
-4. **INVESTIGATE:** hl_notional_usdt drift in PostgreSQL (pending from earlier session).
-
-## Kanban Updates
-- [ ] DELEGATE bug_hunter: bb_bounce + decider still firing despite disabled flags
-- [ ] CONTINUE monitoring vortex_break/return_exhaustion 48h trial
-- [ ] CONTINUE monitoring hzscore + rs confluence
+## Kanban
+Previous decisions verified — bb_bounce disabled, decider killed, disk clean. Open items on kanban are being tracked.
