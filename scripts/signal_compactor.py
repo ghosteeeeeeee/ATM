@@ -381,19 +381,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         conn = sqlite3.connect(RUNTIME_DB, timeout=30)
         c = conn.cursor()
 
-        # ── FIX (2026-04-25): Expire PENDING signals older than 5 minutes ──────────
-        # Signals older than 5 mins that haven't achieved confluence must not fish for
-        # late-arriving second sources. This prevents 30+ min stale signals from
-        # ghosting into hot-set via a random source overlap.
+        # ── FIX (2026-04-25): Expire PENDING signals older than 10 minutes ─────────
+        # Signals older than 10 mins that haven't achieved confluence must not fish for
+        # late-arriving second sources. Increased from 5min to match staleness decay.
         c.execute("""
             UPDATE signals
             SET decision = 'EXPIRED',
                 executed = 1,
-                decision_reason = 'compaction_stale_5min',
+                decision_reason = 'compaction_stale_10min',
                 updated_at = CURRENT_TIMESTAMP
             WHERE decision = 'PENDING'
               AND executed = 0
-              AND created_at < datetime('now', '-5 minutes')
+              AND created_at < datetime('now', '-10 minutes')
         """)
         expired_count = c.rowcount
         if expired_count > 0:
