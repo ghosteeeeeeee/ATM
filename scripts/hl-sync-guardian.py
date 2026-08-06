@@ -1269,6 +1269,26 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     log(f'  🚫 {coin} on blocklist or not tradeable — skipping orphan creation', 'WARN')
                     continue
 
+                # FIX (2026-08-06): Race condition guard — if a trade for this token was
+                # closed in the last 60s, skip orphan creation. The close may not have
+                # propagated from HL yet, so guardian sees a stale position.
+                try:
+                    _conn_rc = psycopg2.connect(**BRAIN_DB)
+                    _cur_rc = _conn_rc.cursor()
+                    _cur_rc.execute("""
+                        SELECT close_time FROM trades
+                        WHERE token = %s AND status = 'closed'
+                        AND close_time > NOW() - INTERVAL '60 seconds'
+                        LIMIT 1
+                    """, (coin,))
+                    if _cur_rc.fetchone():
+                        log(f'  ⏳ {coin} recently closed (<60s) — skipping orphan creation', 'INFO')
+                        _conn_rc.close()
+                        continue
+                    _conn_rc.close()
+                except Exception:
+                    pass  # non-fatal: proceed if check fails
+
                 # Calculate approximate position USD value
                 # Size is in contracts, price in USD per token
                 curr_price = prices.get(coin) if prices else entry_px
