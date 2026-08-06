@@ -42,5 +42,11 @@
 - **First live signal**: ASTER $0.6047 — confluence with bb_bounce (support bounce at 0.6045, 36 touches)
 - **Audit**: bug_hunter verified 6/6 checks passed
 
+## Signal Confluence Update (2026-08-06)
+- **tl_break LONG** enabled (was SHORT only). 41% WR, 83 trades/7d — best performer.
+- **HZSCORE** enabled. First test: 9 signals on 3-timeframe z-score agreement (4H/1H/15m).
+- **Confluence gate relaxed**: removed hard RS requirement. Any 2+ unique signal types now pass (e.g. bb_bounce+tl_break, hzscore+vortex_break).
+- Commits: 5461ab0 (gate fix), 9105083 (tl_break LONG + hzscore).
+
 ## Recommendation
 Fix bb_bounce (disable or SL cap), then evaluate re-enabling live trading with reduced position sizes. RS confluence ready for ASTER. The +$2.18/24h is noise — need consistent edge before risking real capital.
