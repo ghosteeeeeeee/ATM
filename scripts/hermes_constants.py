@@ -842,7 +842,7 @@ RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES low
 RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
 RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
 TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer. Need LONG for confluence.
-TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
+TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer.
 
 # ── Squeeze Cross Signal ──────────────────────────────────────────────────────
 # squeeze_cross.py — EMA(5)×EMA(180) cross + ATR squeeze + widening gap
@@ -1012,7 +1012,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_PLUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_MINUS_ENABLED = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
