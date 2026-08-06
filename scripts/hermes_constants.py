@@ -863,6 +863,7 @@ CEO_PROTECTED_FLAGS = {
     'LIVE_TRADING_ENABLED': ('Runtime kill switch — only T can change', '2026-08-06'),
     'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
     'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
+    'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
