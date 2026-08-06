@@ -667,7 +667,6 @@ NEVER_REENABLE_FLAGS = {
     'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
     'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
     'DECIDER',                    # CEO 2026-08-05 — 11.1% WR, -$0.18 (24h), permanently dead
-    'BB_BOUNCE_ENABLED',          # CEO 2026-08-06 — 36.8% WR, -$0.62 (24h), asymmetric R:R, permanently dead
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -874,7 +873,7 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = False  # CEO 2026-08-06: DISABLED. 19 trades, 36.8% WR, -$0.62. Asymmetric R:R (losses 1.73x wins).
+BB_BOUNCE_ENABLED = True   # re-enabled 2026-08-06 — 55.6% WR last 24h, confluence signal
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
