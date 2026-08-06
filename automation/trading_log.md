@@ -1,5 +1,34 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-06: Daily Orchestrator Report
+
+### Pipeline Status
+- 6 open | 75 closed today | +3.18% PnL
+- Hotset empty — market overwhelmingly NEUTRAL (103/105 tokens)
+- Pipeline healthy, no errors
+
+### Changes Implemented
+1. **FIXED: tl_break inversion bug** — Removed `tl_break_long`/`tl_break_short` from `INVERT_SIGNALS` in `hermes_constants.py:1151-1159`. Root cause: dynamic WR-based auto-inversion was flipping good signals to wrong direction (31.6% of trades inverted). Current tl_break performance is 100% WR — no inversion needed.
+2. **RE-ENABLED: zscore-rising+** — Set `ZSCORE_RISING_PLUS_ENABLED = True` in `hermes_constants.py:1051`. Signal reporter showed 62.5% WR, +$2.17. Not in `_NEVER_REENABLE` set.
+3. **SKIPPED: vel-hermes- re-enable** — CEO explicitly blocked in `_NEVER_REENABLE` set. Signal reporter recommendation conflicts with CEO decision.
+4. **SKIPPED: decider SHORT disable** — Already in `_DEAD_SIGNALS` blocklist, no action needed.
+
+### Blacklist Testing Complete
+- 77 tokens tested across 5 batches, 0 KEEP
+- Blacklist is working as intended — signal generation filters (speed, phase, context gate) block these tokens before they can trade
+- No further batches planned
+
+### Critical Issues
+- Market overwhelmingly NEUTRAL — no new entries expected until regime shifts
+- All 77 blacklist candidates confirmed as signal-quality-poor, not blacklist-bottleneck
+
+### Next Steps
+1. Monitor tl_break performance post-fix (should see 0 inversions going forward)
+2. Monitor zscore-rising+ performance after re-enable
+3. Wait for regime shift to generate new hotset entries
+
+---
+
 ## 2026-08-05: Signal Performance Report
 
 ### 24h Performance (catastrophic)

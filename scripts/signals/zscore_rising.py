@@ -107,6 +107,7 @@ def scan_zscore_rising_signals(prices_dict: dict[str, list[float]]) -> list[dict
             _overall = _regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
             if _overall == 'NEUTRAL':
                 return []
+            # Per-token range check (applied per-token in loop below)
     except Exception:
         pass  # if regime data unavailable, don't block
 

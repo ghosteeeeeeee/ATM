@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-06 09:49 UTC
+# Signal Rotation — 2026-08-06 13:49 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -19,6 +19,7 @@
 | 11 | inv-accel-300- | 43% | -0.100 | -0.100 | ❌ |  |
 | 12 | pattern_wolf_wave_bear | 20% | -0.147 | -0.147 | ❓ |  |
 | 13 | zscore-rising- | 46% | -0.137 | -0.205 | ❌ |  |
-| 14 | bb_bounce | 47% | -0.352 | -0.352 | ❌ |  |
+| 14 | bb_bounce | 47% | -0.352 | -0.352 | ✅ | DISABLE |
 
-## No changes applied
+## Changes Applied
+- **DISABLE**: BB_BOUNCE_ENABLED (WR=47%, edge=-0.352, bleeding capital)

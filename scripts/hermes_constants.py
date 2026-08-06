@@ -899,6 +899,11 @@ BB_BOUNCE_ENABLED = True    # re-enabled 2026-08-06 — confluence signal, testi
 BB_BOUNCE_PLUS_ENABLED = True    # bb_bounce+ LONG
 BB_BOUNCE_MINUS_ENABLED = True   # bb_bounce- SHORT
 
+# range_finder.py — range-bound mean reversion (flat BB, multi-touch)
+RANGE_FINDER_ENABLED = True
+RANGE_FINDER_PLUS_ENABLED = True     # range_finder+ LONG (buy support)
+RANGE_FINDER_MINUS_ENABLED = True    # range_finder- SHORT (sell resistance)
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period
@@ -1043,7 +1048,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_PLUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_PLUS_ENABLED = True  # Re-enabled 2026-08-06 — 62.5% WR, +$2.17 (signal reporter)
 ZSCORE_RISING_MINUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
@@ -1146,8 +1151,8 @@ INVERT_CACHE_TTL = 300                  # cache WR lookups for 5 min (seconds)
 INVERT_SIGNALS = [
     'zscore-rising+',       # currently 0% WR — will auto-invert LONG→SHORT
     'zscore-rising-',       # currently 0% WR — will auto-invert SHORT→LONG
-    'tl_break_long',        # ADX+EMA filtered — auto-invert when WR<30%
-    'tl_break_short',       # ADX+EMA filtered — auto-invert when WR<30%
+    # tl_break_long/short removed 2026-08-06 — 100% WR, dynamic inversion was
+    # flipping good signals to wrong direction (31.6% of trades inverted)
     # Add more signal types here as needed:
     # 'velocity+',
     # 'velocity-',

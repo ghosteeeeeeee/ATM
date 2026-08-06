@@ -240,6 +240,9 @@ def scan_token(token):
     r2 = calculate_r2(candles, slope)
     regime, confidence = determine_regime(slope_pct, r2)
 
+    # Range-bound detection: low slope + low R² = choppy/ranging market
+    is_ranging = abs(slope_pct) < 0.20 and r2 < 0.30
+
     # Use last closed candle for current_price (candles are already closed-only from DB)
     current_price = candles[-1]['close']
     start_price = candles[0]['open']
@@ -251,6 +254,7 @@ def scan_token(token):
         'confidence': round(confidence, 1),
         'slope_pct': round(slope_pct, 3),
         'r2': round(r2, 3),
+        'is_ranging': is_ranging,
         'current_price': current_price,
         'change_16_candles': round(total_change, 2),
         'candles': len(candles)

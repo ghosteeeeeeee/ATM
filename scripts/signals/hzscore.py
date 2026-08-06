@@ -100,6 +100,20 @@ def run() -> int:
         if is_delisted(token.upper()):
             continue
 
+        # ── Range-bound gate: skip in choppy markets ──────────────────────
+        # Trend-fading signals (like hzscore) should not fire in ranges.
+        try:
+            import json as _json
+            regime_file = '/var/www/hermes/data/regime_5m.json'
+            if os.path.exists(regime_file):
+                with open(regime_file) as _f:
+                    _regime_data = _json.load(_f)
+                _token_regime = _regime_data.get('regimes', {}).get(token.upper(), {})
+                if _token_regime.get('is_ranging', False):
+                    continue
+        except Exception:
+            pass
+
         price = data['price']
 
         # ── Get momentum stats for regime direction ───────────────────────

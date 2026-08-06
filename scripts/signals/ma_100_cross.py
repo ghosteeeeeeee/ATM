@@ -12,8 +12,8 @@ BACKTEST RESULTS (14 days, 115 tokens, 5m candles, MA(20)):
 LOGIC:
   1. Compute MA(20) on 5m candles (= 100 minutes, same as MA(100) on 1m)
   2. Detect cross: previous candle on one side, current on the other
-  3. Confirm cross: close must be >= 0.3 * ATR beyond MA
-  4. 2-candle confirmation: next candle must also close beyond MA
+  3. Confirm cross: close must be >= 0.3 * ATR beyond MA (in trade direction)
+  4. 2-candle confirmation: candle before cross must be on pre-cross side
   5. Filter: only fire on tokens with ATR% >= 0.04%
 """
 
@@ -30,12 +30,15 @@ CROSS_CONFIRM_ATR = 0.3     # cross confirmed if close is 0.3 * ATR beyond MA
 MIN_ATR_PCT = 0.04           # minimum ATR% to fire (filters low-vol tokens)
 COOLDOWN_CANDLES = 6         # 30 min cooldown on 5m candles
 ATR_PERIOD = 14              # ATR period for volatility normalization
-REQUIRE_2_CANDLE = True      # require next candle to also close beyond MA
+REQUIRE_2_CANDLE = True      # require candle before cross to confirm pre-cross side
 
 
 def _resample_5m(closes_1m: np.ndarray) -> np.ndarray:
-    """Resample 1m closes to 5m (every 5th candle)."""
-    return closes_1m[::5]
+    """Resample 1m closes to 5m — close of each 5-bar window (last element)."""
+    n = len(closes_1m)
+    # Take the close at minute 5, 10, 15, ... (index 4, 9, 14, ...)
+    indices = np.arange(4, n, 5)
+    return closes_1m[indices]
 
 
 def _compute_ma(closes: np.ndarray, period: int) -> np.ndarray:
@@ -110,14 +113,18 @@ def detect_ma_100_signal(token: str, candles: list, price: float) -> dict:
     if prev_above == curr_above:
         return None  # no cross
 
-    cross_distance = abs(current_price - current_ma)
+    # Signed cross distance: positive = price is beyond MA in trade direction
+    if curr_above:
+        cross_distance = current_price - current_ma    # LONG: price above MA
+    else:
+        cross_distance = current_ma - current_price    # SHORT: price below MA
+
     if cross_distance < current_atr * CROSS_CONFIRM_ATR:
         return None  # cross too weak
 
-    # 2-candle confirmation: check if candle BEFORE the cross also confirms
-    # The cross happened between candle i-1 and i.
-    # We need candle i-2 to have been on the SAME side as i-1 (the pre-cross side)
-    # to confirm it was a genuine cross, not noise.
+    # 2-candle confirmation: candle BEFORE the cross must have been on the
+    # same side as i-1 (pre-cross side). This confirms i-2 and i-1 were
+    # both on the pre-cross side, making the cross to i's side genuine.
     if REQUIRE_2_CANDLE and i >= 2:
         prev_prev_price = closes_5m[i - 2]
         prev_prev_ma = ma[i - 2]

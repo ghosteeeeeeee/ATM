@@ -292,6 +292,10 @@ def detect_return_exhaustion(token: str, prices: list) -> Optional[Dict]:
                 _regime_data = _json.load(_f)
             _token_regime = _regime_data.get('regimes', {}).get(token.upper(), {})
             _token_reg = _token_regime.get('regime', 'NEUTRAL')
+            _is_ranging = _token_regime.get('is_ranging', False)
+            # Block trend-fading signals in range-bound markets
+            if _is_ranging:
+                return None
             if _token_reg == 'LONG_BIAS' and direction == 'SHORT':
                 return None
             if _token_reg == 'SHORT_BIAS' and direction == 'LONG':
