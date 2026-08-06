@@ -746,10 +746,11 @@ def rule_based_context_gate(token, direction, source, sig):
         # Z-score filter: penalize chasing entries (only when speed is low)
         # KEY INSIGHT: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
         if z_score is not None:
+            _spd_str = f'{speed:.0f}' if speed is not None else '?'
             if direction == 'LONG' and z_score < SIGNAL_FILTER_Z_MIN and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
-                return ('AMBIGUOUS', f'z={z_score:.2f} < {SIGNAL_FILTER_Z_MIN} + speed={speed:.0f}% (chasing downtrend)', 15)
+                return ('AMBIGUOUS', f'z={z_score:.2f} < {SIGNAL_FILTER_Z_MIN} + speed={_spd_str}% (chasing downtrend)', 15)
             if direction == 'SHORT' and z_score > SIGNAL_FILTER_Z_MAX and (speed is None or speed < SIGNAL_FILTER_SPEED_MIN):
-                return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={speed:.0f}% (chasing uptrend)', 15)
+                return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={_spd_str}% (chasing uptrend)', 15)
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     # But only if price history is fresh (< 5 min old)
@@ -787,7 +788,7 @@ def rule_based_context_gate(token, direction, source, sig):
                                 return ('AMBIGUOUS', {'speed': speed, 'z_score': z_score, 'phase': phase,
                                                        'momentum': momentum, 'acceleration': accel,
                                                        'wave_phase': wave_phase, 'market': market,
-                                                       'stale_price': True})
+                                                       'stale_price': True}, 0)
                     except Exception:
                         pass  # if we can't check, proceed with GO
                     return ('GO', None, 0)
@@ -799,12 +800,12 @@ def rule_based_context_gate(token, direction, source, sig):
         if abs(z_score) > CONTEXT_GATE_Z_COUNTER_TREND and speed < 50:
             if (direction == 'LONG' and z_score < -CONTEXT_GATE_Z_COUNTER_TREND) or \
                (direction == 'SHORT' and z_score > CONTEXT_GATE_Z_COUNTER_TREND):
-                return ('SKIP', f'counter-trend trap: z={z_score:.2f}, speed={speed:.0f}%')
+                return ('SKIP', f'counter-trend trap: z={z_score:.2f}, speed={speed:.0f}%', 0)
 
     # 4. Ranging market + low speed = no clear wave
     if z_score is not None and speed is not None:
         if abs(z_score) < CONTEXT_GATE_Z_RANGING and speed < CONTEXT_GATE_RANGING_SPEED:
-            return ('SKIP', f'ranging market: |z|={abs(z_score):.2f} < {CONTEXT_GATE_Z_RANGING}, speed={speed:.0f}%')
+            return ('SKIP', f'ranging market: |z|={abs(z_score):.2f} < {CONTEXT_GATE_Z_RANGING}, speed={speed:.0f}%', 0)
 
     # 5. Wrong phase for signal type
     if phase and source:
