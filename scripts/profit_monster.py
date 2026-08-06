@@ -182,7 +182,7 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
             # Record to signal_outcomes for WR tracking
             try:
                 from signal_schema import record_signal_outcome
-                 actual_pnl_pct = float(pnl_pct or 0)
+                actual_pnl_pct = float(pnl_pct or 0)
                 # Fetch amount_usdt (margin) for PnL calc — NOT hl_notional_usdt
                 # (hl_notional_usdt is actual fill notional which varies; amount_usdt
                 #  is the margin we risk per trade, matching dashboard convention)
