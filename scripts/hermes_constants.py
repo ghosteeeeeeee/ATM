@@ -338,7 +338,7 @@ RS_MIN_TOUCHES       = 30       # minimum touches for valid level (was 120 — o
 RS_DECIDER_MIN_TOUCHES = 30    # minimum touches for decider to approve (synced with RS_MIN_TOUCHES)
 RS_TOUCH_HARD_CAP       = 200  # block signals when touch_count >= 200 — (was 120 which was blocking the best-performing SHORT bucket at 151-200 tc: 66.7% WR avg +2.0% PnL; 201-300 zone is the natural ceiling at 17.4% WR)
 RS_LEVEL_BROKEN_LOOKBACK = 200  # candles to check for level-invalidation (was hardcoded 20) — ~8hrs on 1m; catches support/resistance flips
-RS_DECIDER_ZBONUS_TOUCHES = 50  # relaxed threshold (50 vs 100) when |z_score| > 2.5 — strong momentum offsets weak level
+RS_DECIDER_ZBONUS_TOUCHES = 20  # relaxed threshold (20 vs 30) when |z_score| > 2.5 — strong momentum offsets weak level
 RS_DECIDER_ZBONUS_ZSCORE = 2.5  # z-score threshold for relaxed touch requirement
 RS_DECIDER_CONF_PENALTY = 15   # confidence point deduction when touches below threshold
 RS_DECIDER_CONF_FLOOR  = 60   # effective confidence below this → trade is blocked (was 55)
@@ -838,9 +838,9 @@ COUNTER_FLIP_PLUS_ENABLED     = True    # counter_flip+ LONG
 COUNTER_FLIP_MINUS_ENABLED    = True    # counter_flip- SHORT
 HMACD_MTF_PLUS_ENABLED        = True    # hmacd_mtf+ LONG
 HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
-RS_ENABLED               = False  # disabled while testing inverse_accel_300
-RS_PLUS_ENABLED               = False  # disabled while testing inverse_accel_300
-RS_MINUS_ENABLED              = False  # disabled while testing inverse_accel_300
+RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES lowered to 30, RS_PROXIMITY_K raised to 4.0
+RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
+RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
 TL_BREAK_PLUS_ENABLED         = False  # AUTO-ROTATED 2026-08-05   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-05. TL_BREAK_WR=41%, best performer.
 
