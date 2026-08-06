@@ -36,6 +36,18 @@
 - [x] bb_bounce properly disabled — CONFIRMED (BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS). LINK SHORT was pre-disable legacy entry.
 - [ ] Monitor tl_break_long sustained performance — NO ENTRIES FOUND in recent trades, may be decayed/removed
 
+## CEO DECISIONS (2026-08-06 03:15)
+- [x] 2026-08-06 03:15 — PROFIT MONSTER PNL FIX: pnl_usdt formula corrected to include leverage. 26/141 trades had $0.00 PnL due to missing leverage in calculation.
+
+## CEO DECISIONS (2026-08-06 — Orphan Fix)
+- [x] 2026-08-06 — ORPHAN RACE CONDITION FIXED: 60s guard in hl-sync-guardian.py prevents duplicate paper trades when HL close + guardian sync race. Bug hunter caught BRAIN_DB undefined + missing psycopg2 import. Commits: e354e31, efdf832.
+
+## CEO DECISIONS (2026-08-06 — Notification)
+- [x] 2026-08-06 — ZERO-PNL BACKFILL COMPLETE: PNUT SHORT ($0.00→$0.06) + LINK SHORT ($0.00→$0.05) corrected. Root cause: stale hl_notional_usdt in PostgreSQL ($10.10/$10.62 vs $11.0 actual). Dashboard convention `pnl% × margin` confirmed correct. Reverted incorrect leverage multiplication.
+- [x] 2026-08-06 — DEAD HOURS RE-ENABLED: Added hzscore + return_exhaustion to allowlist, removed bb_bounce (disabled anyway). DEAD_HOURS_ENABLED=True. Filter protects against low-WR quiet-hour trades.
+- [ ] 2026-08-06 — INVESTIGATE: why hl_notional_usdt drifts in PostgreSQL (should be $11.0)
+- [ ] 2026-08-06 — CONSIDER: backfill job for stale notional values
+
 ## CEO DECISIONS (2026-08-06 Session)
 - [x] 2026-08-06 — MA_100_CROSS DEPLOYED: 100MA cross with 2-candle confirmation, 51-56% WR backtested. Integrated into signals_runner.
 - [x] 2026-08-06 — HZSCORE UPGRADED: MIN_Z_VALUE 0.4→1.0 (64.3% WR backtested highest). 5min cooldown added.
@@ -43,6 +55,13 @@
 - [x] 2026-08-06 — SIGNAL ROTATOR FIX: Added ROTATOR_PROTECTED_FLAGS to hermes_constants.py. tl_break protected from auto-rotation. Was being killed by stale 21.8% cumulative WR.
 - [ ] 2026-08-06 — MONITOR ma_100_cross live WR (24h trial)
 - [ ] 2026-08-06 — MONITOR hzscore WR with new z-threshold
+
+## CEO DECISIONS (2026-08-06 03:15)
+- [x] 2026-08-06 03:15 — PROFIT MONSTER PNL FIX: pnl_usdt formula corrected to include leverage. 26/141 trades had $0.00 PnL due to missing leverage in calculation.
+- [ ] 2026-08-06 03:15 — DELEGATE to bug_hunter: Verify bb_bounce truly disabled (20 trades in 24h despite being disabled)
+- [ ] 2026-08-06 03:15 — DELEGATE to self_learner: Evaluate tl_break parameters (short underperforming, long has no entries)
+- [ ] 2026-08-06 03:15 — MONITOR vortex_break and return_exhaustion for 48h before any changes
+- [ ] 2026-08-06 03:15 — MONITOR hzscore+rs confluence (3 open positions all profitable)
 
 ## CEO DECISIONS (2026-08-06 02:50)
 - [x] 2026-08-06 02:50 — VERIFIED bb_bounce properly disabled. Only 1 legacy trade (race condition). NOT in registered signals.
