@@ -926,15 +926,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src}' in blacklist")
                 continue
             source_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
-            # rs required for all entries when CONFLUENCE_REQUIRED=True (replaces accel-300, 2026-05-15)
-            # rs is the primary directional trigger. Every LONG needs rs-s#,
-            # every SHORT needs rs-r# as the primary directional confirmation.
-            # When CONFLUENCE_REQUIRED=False: skip RS requirement (single-source signals allowed).
-            if CONFLUENCE_REQUIRED:
-                has_rs = any(p.startswith('rs') for p in source_parts)
-                if not has_rs:
-                    log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — requires rs-s# or rs-r# (has: {src})")
-                    continue
+            # ── CONFLUENCE CHECK ──────────────────────────────────────────────────
+            # Previously required RS as a hard gate here (line 929-937).
+            # Removed 2026-08-06 — confluence gate at line 573-608 already requires
+            # 2+ unique signal types. No per-type hard requirements.
             # ── Trend purity bonus: major confidence boost when present ─────────────
             # trend_purity is no longer a hard requirement — it's a scoring bonus.
             # Signals with trend_purity+ (LONG) or trend_purity- (SHORT) get +50% source weight.
