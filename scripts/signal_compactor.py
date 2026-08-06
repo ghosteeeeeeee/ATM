@@ -692,16 +692,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             regime, regime_conf = get_regime_1m(token)
             speed_data = speed_cache.get(token.upper(), {})
             source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
-            # ── rs required (replaces accel-300, 2026-05-15) ──────────────────────────
-            # When CONFLUENCE_REQUIRED=False: skip RS requirement entirely
-            if CONFLUENCE_REQUIRED:
-                # Accel-300 and inverse-accel-300 standalone bypass: skip RS gate
-                is_accel300_standalone = source.startswith('accel-300') or source.startswith('inv-accel-300')
-                has_rs = any(p.startswith('rs') for p in source_parts)
-                if not has_rs and not is_accel300_standalone:
-                    if verbose:
-                        log(f"  SKIP {token} {direction}: no rs signal")
-                    continue
+            # ── Confluence gate (2+ unique signal types) ──────────────────────────
+            # Handled at line 573-608 (pre-filter). No per-signal-type hard requirements here.
+            # Previously had a hard RS requirement — removed 2026-08-06 because:
+            # 1. The confluence gate already requires 2+ unique types
+            # 2. Requiring RS specifically blocked valid combos (e.g. bb_bounce+tl_break)
             # ── Trend purity bonus: major confidence boost when present ──────────
             has_trend_purity = ('trend_purity+' in source_parts or 'trend_purity-' in source_parts)
             tp_bonus_mult = 1.50 if has_trend_purity else 1.0
