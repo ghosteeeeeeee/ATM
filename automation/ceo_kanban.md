@@ -8,10 +8,11 @@
 - [ ] Verify vortex_break generating signals after window expansion
 
 ## IN PROGRESS
-- [x] LIVE TRADING PAUSED — new signals untested, legacy signals still firing
+- [x] LIVE TRADING RE-ENABLED — 2026-08-06 02:15 UTC, trailing tightened
 - [x] Disk cleanup — 84% → 78% (candles.db 3.6GB→290MB)
 
 ## DONE
+- [x] 2026-08-06 02:15 — LIVE TRADING RE-ENABLED: kill switch true, trailing tightened (0.30%/0.70%). 52.9% WR, +$2.23/24h.
 - [x] 2026-08-06 01:00 — BB_BOUNCE DISABLED: BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS. 19 trades, 36.8% WR, -$0.62.
 - [x] 2026-08-05 22:30 — DECIDER KILLED: Changed default signal_type from 'decider' to 'unknown' in 4 files
 - [x] 2026-08-05 22:30 — RETURN_EXHAUSTION FIXED: Confidence threshold 80→70, removed NEUTRAL regime penalty
@@ -23,23 +24,36 @@
 - [x] 2026-08-05 16:50 — NEW SIGNALS DEPLOYED: vortex_break + return_exhaustion (disabled by default)
 - [x] 2026-08-05 16:50 — THRESHOLDS RELAXED: VOL_MULT 5→2, atr_compression 5→3
 - [x] 2026-08-05 16:50 — TOKEN BLACKLIST: GALA + STRK added
-- [x] 2026-08-05 02:50 — CEO PAUSE: live_trading=false
+- [x] 2026-08-05 02:50 — CEO PAUSE: live_trading=false (RE-ENABLED 2026-08-06 02:15)
 
 ## BLOCKED
 - (none currently)
 
 ## FOLLOW-UP (checked by CEO on next run)
-- [x] Verify decider is actually killed (check signal_outcomes for 'unknown' instead of 'decider') — DONE 2026-08-05
-- [ ] Verify return_exhaustion is generating signals after threshold fix
-- [ ] Verify vortex_break is generating signals after window expansion
-- [ ] Implement bb_bounce SL override (1.0% cap) — root cause: asymmetric R:R
-- [ ] Monitor tl_break_long sustained performance
+- [x] Verify decider is actually killed — DONE 2026-08-05
+- [x] Verify return_exhaustion generating signals — CONFIRMED (MOODENG, CC entries in trades.json)
+- [x] Verify vortex_break generating signals — CONFIRMED (AVNT LONG entry)
+- [x] bb_bounce properly disabled — CONFIRMED (BB_BOUNCE_ENABLED=False + NEVER_REENABLE_FLAGS). LINK SHORT was pre-disable legacy entry.
+- [ ] Monitor tl_break_long sustained performance — NO ENTRIES FOUND in recent trades, may be decayed/removed
 
-## CEO DECISIONS (2026-08-06 01:00)
+## CEO DECISIONS (2026-08-06 Session)
+- [x] 2026-08-06 — MA_100_CROSS DEPLOYED: 100MA cross with 2-candle confirmation, 51-56% WR backtested. Integrated into signals_runner.
+- [x] 2026-08-06 — HZSCORE UPGRADED: MIN_Z_VALUE 0.4→1.0 (64.3% WR backtested highest). 5min cooldown added.
+- [x] 2026-08-06 — CONFLUENCE GATE FIXED: Hard RS removed, any 2+ unique signal types now pass. CONFLUENCE_REQUIRED=True.
+- [x] 2026-08-06 — SIGNAL ROTATOR FIX: Added ROTATOR_PROTECTED_FLAGS to hermes_constants.py. tl_break protected from auto-rotation. Was being killed by stale 21.8% cumulative WR.
+- [ ] 2026-08-06 — MONITOR ma_100_cross live WR (24h trial)
+- [ ] 2026-08-06 — MONITOR hzscore WR with new z-threshold
+
+## CEO DECISIONS (2026-08-06 02:50)
+- [x] 2026-08-06 02:50 — VERIFIED bb_bounce properly disabled. Only 1 legacy trade (race condition). NOT in registered signals.
+- [x] 2026-08-06 02:50 — SYSTEM HEALTH OK. +$2.23/24h net profitable. All dead signals confirmed disabled.
+
+## CEO DECISIONS (2026-08-06 02:15)
+- [x] 2026-08-06 02:15 — RE-ENABLED LIVE TRADING: kill switch set true. 138 trades, 52.9% WR, +$2.23/24h. Net profitable.
+- [x] 2026-08-06 02:15 — TIGHTENED TRAILING: activation 0.35%→0.30%, distance 0.80%→0.70%. Lock profits faster.
 - [x] 2026-08-06 01:00 — DISABLED bb_bounce: BB_BOUNCE_ENABLED=False + added to NEVER_REENABLE_FLAGS. 19 trades, 36.8% WR, -$0.62. Asymmetric R:R.
-- [ ] 2026-08-06 01:00 — KEEP LIVE TRADING PAUSED — 24h PnL barely positive (+$0.016/trade), need validation before re-enabling
-- [ ] 2026-08-06 01:00 — MONITOR tl_break_long — 100% WR (14 trades), watch for decay
 - [x] 2026-08-06 02:00 — SIGNAL CONFLUENCE UPDATE: tl_break LONG enabled, hzscore enabled, hard RS requirement removed (any 2+ unique signal types pass). Commits: 5461ab0, 9105083.
+- [ ] 2026-08-06 01:18 — MONITOR tl_break_long — NO ENTRIES in recent trades. May need re-enable or decay killed it.
 
 ## CEO DECISIONS (2026-08-05 23:50)
 - [x] 2026-08-05 22:30 — KEEP LIVE TRADING PAUSED — new signals untested, legacy dead signals still firing

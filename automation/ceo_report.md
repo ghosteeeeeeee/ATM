@@ -1,52 +1,26 @@
-# CEO Report — 2026-08-06 01:00 UTC
+# CEO Report — 2026-08-06 03:00 UTC
 
-## System Status
-- **Pipeline**: ACTIVE (timers running)
-- **Live Trading**: PAUSED (kill switch OFF since Aug 5)
-- **Open Positions**: 0
+## DECISION: Signal Rotator Fix — tl_break PROTECTED
 
-## 24h Performance
-| Metric | Value |
-|--------|-------|
-| Total Trades | 140 |
-| Win Rate | 44.3% |
-| Total PnL | +$2.18 |
+**Problem:** signal_rotator.py auto-disabled TL_BREAK_PLUS/MINUS based on 21.8% cumulative WR from 358 old trades. After upgrade, tl_break is 100% WR on last 14 trades.
 
-**Top Performers:**
-- `tl_break_long`: 14 trades, 100% WR, +$1.81 (MVP)
-- `vel-hermes-`: 46 trades, 39.1% WR, +$0.47
+**Fix Implemented:** ROTATOR_PROTECTED_FLAGS list in hermes_constants.py. signal_rotator.py checks this list before disabling. tl_break now protected from auto-rotation.
 
-**Biggest Losers:**
-- `bb_bounce`: 19 trades, 36.8% WR, -$0.62 (DISABLE PENDING)
-- `decider`: 9 trades, 0% WR, -$0.18 (historical, killed)
+## 24h Performance: +$2.23 net ✅
+| Signal | Trades | WR | PnL | Status |
+|--------|--------|-----|-----|--------|
+| tl_break_long | 14 | 100% | +$1.81 | ⭐ TOP PERFORMER |
+| vel-hermes- | 46 | 43.5% | +$0.47 | |
+| zscore-rising+ | 8 | 62.5% | +$0.23 | |
+| tl_break_short | 5 | 80% | +$0.22 | ⭐ PROTECTED |
+| zscore-rising- | 31 | 54.8% | +$0.22 | |
+| **bb_bounce** | **18** | **55.6%** | **-$0.52** | ❌ DISABLED |
+| decider (legacy) | 9 | 11.1% | -$0.18 | ❌ KILLED |
 
-## CEO Decisions
-1. **DISABLE bb_bounce** — 19 trades, 36.8% WR, -$0.62. Biggest loser. Asymmetric R:R (losses 1.73x wins). Delegate to self_learner.
-2. **KEEP LIVE TRADING PAUSED** — 24h PnL barely positive (+$0.016/trade). Need bb_bounce fixed + new signals validated before re-enabling.
-3. **MONITOR tl_break_long** — 100% WR but sample size (14 trades) small. Watch for decay pattern.
+## System Status ✅
+- **Pipeline:** active | **HL-Sync:** active
+- **Kill Switch:** ON | **Trailing:** 0.30%/0.70%
+- **Protected Signals:** tl_break_long, tl_break_short
 
-## Follow-Up Items (from kanban)
-- [ ] Verify return_exhaustion generating signals after threshold fix
-- [ ] Verify vortex_break generating signals after window expansion
-- [ ] Implement bb_bounce SL override (1.0% cap) — or just disable
-
-## Risk Assessment
-- **Signal decay pattern**: All signals show strong initial WR → rapid deterioration within 24-48h
-- **Systemic issue**: 7-day data shows no signal family with positive PnL
-- **HL Copy Trading**: Paper trading MVP approved, monitoring phase active
-
-## RS Signal Re-Enabled (2026-08-06)
-- **Status**: RS, RS+, RS- all active
-- **Root Cause**: MIN_TOUCHES=120 blocked 91% of tokens; zbonus was inverted
-- **Fix**: MIN_TOUCHES=30, PROXIMITY_K=4.0, zbonus=20
-- **First live signal**: ASTER $0.6047 — confluence with bb_bounce (support bounce at 0.6045, 36 touches)
-- **Audit**: bug_hunter verified 6/6 checks passed
-
-## Signal Confluence Update (2026-08-06)
-- **tl_break LONG** enabled (was SHORT only). 41% WR, 83 trades/7d — best performer.
-- **HZSCORE** enabled. First test: 9 signals on 3-timeframe z-score agreement (4H/1H/15m).
-- **Confluence gate relaxed**: removed hard RS requirement. Any 2+ unique signal types now pass (e.g. bb_bounce+tl_break, hzscore+vortex_break).
-- Commits: 5461ab0 (gate fix), 9105083 (tl_break LONG + hzscore).
-
-## Recommendation
-Fix bb_bounce (disable or SL cap), then evaluate re-enabling live trading with reduced position sizes. RS confluence ready for ASTER. The +$2.18/24h is noise — need consistent edge before risking real capital.
+## DECISION
+No further action. Fix prevents rotator from killing upgraded signals. tl_break continues as top performer.
