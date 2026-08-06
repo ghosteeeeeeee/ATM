@@ -181,6 +181,12 @@ def select_signals(audit_signals, regime, registry):
     except ImportError:
         NEVER_REENABLE_FLAGS = set()
 
+    # Load rotator-protected flags — never auto-disable these (recently upgraded)
+    try:
+        from hermes_constants import ROTATOR_PROTECTED_FLAGS
+    except ImportError:
+        ROTATOR_PROTECTED_FLAGS = []
+
     for sig in scored:
         flag = sig['flag']
         wr = sig['wr']
@@ -206,9 +212,8 @@ def select_signals(audit_signals, regime, registry):
             })
 
         # Disable candidate: currently enabled but underperforming
-        elif is_enabled is True and wr < MIN_WR_TO_DISABLE and edge < 0 and trades >= MIN_TRADES:
+        elif is_enabled is True and wr < MIN_WR_TO_DISABLE and sig.get('edge_score', 0) < 0 and trades >= MIN_TRADES:
             # Check rotator-protected flags (recently upgraded signals)
-            from hermes_constants import ROTATOR_PROTECTED_FLAGS
             if flag in ROTATOR_PROTECTED_FLAGS:
                 log(f"  SKIP disable {flag}: in ROTATOR_PROTECTED_FLAGS (recently upgraded)")
                 continue
