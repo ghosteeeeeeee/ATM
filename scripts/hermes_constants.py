@@ -1084,6 +1084,8 @@ DEAD_HOURS_SIGNALS = [
     'hzscore',          # added 2026-08-06 — confluence signal, 100% WR (1 trade) during dead hours
     'return_exhaustion', # added 2026-08-06 — was blocked, caused LTC hot-set stall
     'bb_bounce',        # re-added 2026-08-06 — testing confluence with hzscore+return_exhaustion
+    'ma100-cross',      # added 2026-08-06 — CC SHORT blocked by dead hours
+    'vortex_break',     # added 2026-08-06 — CC SHORT blocked by dead hours
 ]
 DEAD_HOURS_DEFAULT = True  # True = block ALL signals not in allowlist (was False — only blocked 4 signals, dead hours WR=16%)
 
