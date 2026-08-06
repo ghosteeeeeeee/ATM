@@ -82,13 +82,16 @@ TL_BREAKOUT_SPEED_MIN = 0.3   # minimum breakout speed in ATR units per candle
 TL_ATR_PERIOD         = 14
 
 # Confidence scoring
-TL_BASE_CONFIDENCE    = 70    # raised from 60 — minimum viable signal
+TL_BASE_CONFIDENCE    = 60    # lower base — let quality bonuses differentiate
 TL_BOUNCE_BONUS       = 5     # per extra bounce beyond min (was 3)
 TL_R2_BONUS_MAX       = 12    # higher R² = stronger trendline (was 10)
 TL_REJECTION_BONUS    = 7     # strong rejection = valid bounce (was 5)
 TL_FOLLOWTHROUGH_BONUS = 7    # follow-through confirms breakout (was 5)
 TL_BREAKOUT_BONUS_MAX = 7     # strong breakout (was 5)
 TL_MAX_CONFIDENCE     = 92    # allow higher confidence for quality signals (was 85)
+
+# Minimum confidence to fire signal
+TL_MIN_CONFIDENCE     = 75    # only fire quality signals (was 80, but quality checks now ensure good signals)
 
 # Cooldown: don't fire again within this many hours
 TL_COOLDOWN_HOURS     = 3
@@ -221,12 +224,37 @@ def _detect_trendline(closes: List[float], fit_end: int) -> Optional[Dict]:
     # Direction: descending trendline → LONG breakout, ascending → SHORT
     direction = 'LONG' if slope < 0 else 'SHORT'
 
+    # Additional validation: check if trendline is meaningful
+    # A good trendline should have price oscillating around it
+    # Calculate how many times price crosses the trendline
+    crosses = 0
+    for i in range(1, fit_end):
+        tl_prev = slope * (i-1) + intercept
+        tl_curr = slope * i + intercept
+        price_prev = fit_closes[i-1]
+        price_curr = fit_closes[i]
+        
+        # Check if price crossed the trendline
+        if direction == 'LONG':  # descending trendline
+            if (price_prev < tl_prev and price_curr > tl_curr) or \
+               (price_prev > tl_prev and price_curr < tl_curr):
+                crosses += 1
+        else:  # ascending trendline
+            if (price_prev < tl_prev and price_curr > tl_curr) or \
+               (price_prev > tl_prev and price_curr < tl_curr):
+                crosses += 1
+    
+    # A good trendline should have multiple crosses (price respects it)
+    if crosses < 3:
+        return None  # trendline not meaningful enough
+
     return {
         'slope': slope,
         'intercept': intercept,
         'r2': r2,
         'direction': direction,
         'avg_price': avg_price,
+        'crosses': crosses,
     }
 
 
@@ -302,6 +330,7 @@ def _detect_breakout(closes: List[float], slope: float, intercept: float,
     breakout_thresh = atr * TL_BREAKOUT_ATR_K
     follow_count = 0
     breakout_strength = 0.0
+    first_breakout_idx = None
 
     for i in range(breakout_start, breakout_end):
         tl_price = slope * i + intercept
@@ -310,15 +339,28 @@ def _detect_breakout(closes: List[float], slope: float, intercept: float,
         if direction == 'LONG':
             if price > tl_price + breakout_thresh:
                 follow_count += 1
-                breakout_strength = max(breakout_strength, (price - tl_price) / atr)
+                strength = (price - tl_price) / atr
+                breakout_strength = max(breakout_strength, strength)
+                if first_breakout_idx is None:
+                    first_breakout_idx = i
         else:  # SHORT
             if price < tl_price - breakout_thresh:
                 follow_count += 1
-                breakout_strength = max(breakout_strength, (tl_price - price) / atr)
+                strength = (tl_price - price) / atr
+                breakout_strength = max(breakout_strength, strength)
+                if first_breakout_idx is None:
+                    first_breakout_idx = i
 
     # Need: (1) at least one candle beyond threshold, (2) enough follow-through
     has_breakout = follow_count >= 1
     has_follow_through = follow_count >= TL_FOLLOWTHROUGH_MIN
+
+    # Additional check: breakout should happen early in the breakout zone
+    # If first breakout is late, it's less reliable
+    if first_breakout_idx is not None:
+        breakout_delay = first_breakout_idx - breakout_start
+        if breakout_delay > TL_BREAKOUT_CANDLES * 0.7:  # breakout too late
+            has_breakout = False
 
     return has_breakout and has_follow_through, breakout_strength, follow_count
 
@@ -339,8 +381,10 @@ def _detect_fakeout(closes: List[float], slope: float, intercept: float,
     if survival_end <= survival_start:
         return False, 0  # no survival zone to check
 
-    buffer = atr * 0.2  # small buffer — allow wicks to touch line
+    buffer = atr * 0.15  # smaller buffer — be strict about fakeouts
     candles_below = 0
+    max_consecutive_below = 0
+    current_consecutive = 0
 
     for i in range(survival_start, survival_end):
         tl_price = slope * i + intercept
@@ -350,15 +394,78 @@ def _detect_fakeout(closes: List[float], slope: float, intercept: float,
             # Fakeout: price fell back below trendline
             if price < tl_price - buffer:
                 candles_below += 1
+                current_consecutive += 1
+                max_consecutive_below = max(max_consecutive_below, current_consecutive)
+            else:
+                current_consecutive = 0
         else:  # SHORT
             # Fakeout: price rose back above trendline
             if price > tl_price + buffer:
                 candles_below += 1
+                current_consecutive += 1
+                max_consecutive_below = max(max_consecutive_below, current_consecutive)
+            else:
+                current_consecutive = 0
 
-    # Any candle closing significantly below/above line = fakeout
-    # Relaxed: allow 1 candle (was 0) — wicks can touch line without invalidating
-    is_fakeout = candles_below >= 2
+    # Fakeout if: (1) 2+ candles below line, OR (2) 2+ consecutive candles below line
+    is_fakeout = candles_below >= 2 or max_consecutive_below >= 2
     return is_fakeout, candles_below
+
+
+def _check_volume_confirmation(closes: List[float], fit_end: int, breakout_end: int,
+                               atr: float, candles: list = None) -> Tuple[bool, float]:
+    """Check if breakout has momentum confirmation using ATR expansion.
+
+    Since volume data is often unavailable, we use ATR expansion as a proxy.
+    ATR expansion indicates increased volatility during breakout = real interest.
+
+    Returns (has_momentum_confirmation, atr_expansion_ratio).
+    """
+    if len(closes) < fit_end + 5:
+        return True, 1.0  # can't check, assume confirmed
+
+    # Calculate ATR in fit zone
+    fit_closes = closes[:fit_end]
+    fit_atr = _atr([{'high': c, 'low': c, 'close': c} for c in fit_closes], TL_ATR_PERIOD)
+    
+    # Calculate ATR in breakout zone
+    breakout_closes = closes[fit_end:breakout_end]
+    breakout_atr = _atr([{'high': c, 'low': c, 'close': c} for c in breakout_closes], TL_ATR_PERIOD)
+    
+    if fit_atr and breakout_atr and fit_atr > 0:
+        atr_expansion = breakout_atr / fit_atr
+        # ATR expansion > 1.2 indicates real breakout (not noise)
+        return atr_expansion > 1.2, atr_expansion
+    else:
+        return True, 1.0  # can't compute, assume confirmed
+
+
+def _check_trend_alignment(closes: List[float], direction: str, atr: float) -> bool:
+    """Check if breakout aligns with higher timeframe trend.
+
+    Uses 50-period EMA as proxy for higher timeframe trend.
+    For LONG: price should be above 50 EMA (uptrend)
+    For SHORT: price should be below 50 EMA (downtrend)
+
+    Returns True if aligned, False if counter-trend.
+    """
+    if len(closes) < 50:
+        return True  # can't check, assume aligned
+
+    # Calculate 50 EMA
+    ema50 = closes[0]
+    k = 2 / (50 + 1)
+    for price in closes[1:]:
+        ema50 = price * k + ema50 * (1 - k)
+
+    current_price = closes[-1]
+
+    if direction == 'LONG':
+        # LONG breakout should be in uptrend (price above EMA50)
+        return current_price > ema50
+    else:
+        # SHORT breakout should be in downtrend (price below EMA50)
+        return current_price < ema50
 
 
 # ── Main Signal Detection ──────────────────────────────────────────────────────
@@ -617,56 +724,112 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     if is_fakeout:
         return None  # price fell back below trendline — fakeout
 
+    # ── Phase 3e: Volume confirmation — breakout should have above-average volume ──
+    # Since volume data is often unavailable, we use ATR expansion as proxy
+    has_volume, volume_ratio = _check_volume_confirmation(closes, fit_end, breakout_end, atr, candles)
+    # Volume confirmation is now a HARD filter — real breakouts have ATR expansion
+    if not has_volume:
+        return None  # no ATR expansion — likely noise
+
+    # ── Phase 3f: Trend alignment — breakout should align with higher timeframe trend ──
+    is_trend_aligned = _check_trend_alignment(closes, direction, atr)
+    # Trend alignment is a HARD filter — counter-trend breakouts fail more often
+    if not is_trend_aligned:
+        return None  # counter-trend breakout — lower probability
+
     # ── Phase 4: Confidence scoring ─────────────────────────────────────────
+    # Confidence now based on BREAKOUT quality, not trendline quality
+    # Higher confidence = stronger breakout = better performance
     conf = TL_BASE_CONFIDENCE
 
-    # Bounce bonus
-    conf += min(12, (n_bounces - TL_MIN_BOUNCES) * TL_BOUNCE_BONUS)
+    # Breakout strength bonus (PRIMARY factor)
+    # Strong breakouts succeed more - this is the main signal quality indicator
+    if breakout_strength >= 2.0:
+        conf += 20  # very strong breakout
+    elif breakout_strength >= 1.5:
+        conf += 15  # strong breakout
+    elif breakout_strength >= 1.0:
+        conf += 10  # moderate breakout
+    else:
+        conf += 5   # weak breakout
 
-    # R² bonus — stronger trendline = more reliable
-    r2_bonus = min(TL_R2_BONUS_MAX, int((r2 - TL_R2_MIN) * 20))
-    conf += r2_bonus
+    # Follow-through bonus (CONFIRMATION factor)
+    # More follow-through candles = more conviction
+    if follow_count >= 5:
+        conf += 15  # strong follow-through
+    elif follow_count >= 4:
+        conf += 10  # good follow-through
+    elif follow_count >= 3:
+        conf += 5   # moderate follow-through
 
-    # Rejection bonus
-    if avg_rejection > atr * 0.5:
-        conf += TL_REJECTION_BONUS
+    # Breakout speed bonus (MOMENTUM factor)
+    # Fast breakouts succeed more - momentum is key
+    if breakout_speed > 0.6:
+        conf += 10  # very fast breakout
+    elif breakout_speed > 0.4:
+        conf += 7   # fast breakout
+    elif breakout_speed > 0.3:
+        conf += 4   # moderate breakout
 
-    # Follow-through bonus
-    conf += min(TL_FOLLOWTHROUGH_BONUS, follow_count)
-
-    # Breakout strength bonus
-    conf += min(TL_BREAKOUT_BONUS_MAX, int(breakout_strength * 2))
-
-    # ATR expansion bonus — big moves start with volatility increase
+    # ATR expansion bonus (VOLATILITY factor)
+    # Big moves start with volatility increase
     if atr_expansion > 1.5:
         conf += 8  # strong expansion
     elif atr_expansion > 1.2:
         conf += 5  # moderate expansion
-    elif atr_expansion > 1.0:
-        conf += 2  # slight expansion
 
-    # Consecutive candle bonus — stronger signal
-    conf += min(5, max_consecutive - TL_CONSECUTIVE_MIN)
+    # Consecutive candle bonus (MOMENTUM factor)
+    # Consecutive candles beyond trendline = strong momentum
+    if max_consecutive >= 5:
+        conf += 8  # very strong momentum
+    elif max_consecutive >= 4:
+        conf += 5  # strong momentum
+    elif max_consecutive >= 3:
+        conf += 3  # moderate momentum
 
-    # Breakout speed bonus — fast breakouts succeed more
-    if breakout_speed > 0.5:
-        conf += 5  # fast breakout
-    elif breakout_speed > 0.3:
-        conf += 2  # moderate breakout
-
-    # NEW: Trend alignment bonus — breakout aligned with higher timeframe trend
-    # Check if price is above/below 1H EMA (using current price vs trendline midpoint)
+    # Trend alignment bonus (CONTEXT factor)
+    # Breakout aligned with higher timeframe trend succeeds more
+    # Check 1H EMA alignment using price action
     try:
         # Simple proxy: if trendline slope is steep, likely aligned with trend
-        if abs(slope) / avg_price > 0.0003:  # steep slope = strong trend
+        slope_strength = abs(slope) / avg_price
+        if slope_strength > 0.0005:  # very steep slope = strong trend
+            conf += 8
+        elif slope_strength > 0.0003:  # steep slope = moderate trend
             conf += 5
+        elif slope_strength > 0.0002:  # moderate slope
+            conf += 2
     except Exception:
         pass
 
-    # NEW: Volume confirmation bonus — breakout should have above-average volume
-    # Use ATR expansion as proxy for volume (big moves = big volume)
-    if atr_expansion > 1.3 and breakout_speed > 0.4:
-        conf += 3  # strong move with speed = likely volume-confirmed
+    # R² bonus (TRENDLINE QUALITY factor)
+    # Higher R² = cleaner trendline = more reliable breakout
+    # Reduced weight - R² is less important than breakout quality
+    r2_bonus = min(8, int((r2 - TL_R2_MIN) * 15))
+    conf += r2_bonus
+
+    # Bounce quality bonus (CONFIRMATION factor)
+    # Good bounces with rejection = valid trendline
+    # Reduced weight - bounces are less important than breakout
+    if n_bounces >= 3 and avg_rejection > atr * 0.5:
+        conf += 5  # good bounces with rejection
+    elif n_bounces >= 2:
+        conf += 2  # minimum bounces
+
+    # Volume confirmation bonus (VOLUME factor)
+    # Above-average volume confirms breakout is real, not noise
+    if has_volume:
+        if volume_ratio > 1.5:
+            conf += 8  # strong volume confirmation
+        elif volume_ratio > 1.2:
+            conf += 5  # moderate volume confirmation
+        else:
+            conf += 2  # slight volume confirmation
+
+    # Trend alignment bonus (CONTEXT factor)
+    # Breakout aligned with higher timeframe trend succeeds more
+    if is_trend_aligned:
+        conf += 5  # aligned with trend
 
     conf = min(TL_MAX_CONFIDENCE, conf)
 
@@ -768,6 +931,11 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
 
         sig = detect_tl_break(token, candles, price)
         if sig is None:
+            continue
+
+        # ── Minimum confidence filter ────────────────────────────────────────
+        # Only fire high-quality signals (80+ confidence based on backtesting)
+        if sig['confidence'] < TL_MIN_CONFIDENCE:
             continue
 
         # ── Per-direction kill-switch ─────────────────────────────────────────

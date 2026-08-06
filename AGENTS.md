@@ -142,3 +142,15 @@ If you skip this, the next session starts blind.
 | Context gate | `openmemory_openmemory_query(query="context gate ai decision hermes")` |
 | Surfing philosophy | `openmemory_openmemory_query(query="surfing principles trading philosophy hermes")` |
 | Winrate plan | `openmemory_openmemory_query(query="winrate improvement filter results hermes")` |
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+Rules:
+- Only run graphify when explicitly asked or when the question clearly benefits from relationship/mapping context (e.g. "how does X connect to Y", "what calls Z", "what would break if I change X"). Do NOT auto-query for simple code lookup, file reading, or factual questions grep can answer.
+- When graphify-out/graph.json exists and graphify is relevant: use `graphify query "<question>"` for relationships, `graphify path "<A>" "<B>"` for shortest path, `graphify explain "<concept>"` for node context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- Do not run graphify in a loop — one query per question is enough. If the graph doesn't answer it, fall back to grep/read.

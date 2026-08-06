@@ -1,55 +1,51 @@
-# CEO Action Plan — 2026-08-02 23:15 UTC
+# CEO Action Plan — 2026-08-06 02:15 UTC
 
-## Status: EDGE WEAK · INFRA OK · PARAM DRIFT
+## Status: LIVE · PROFITABLE · TIGHTENED
 
-Starvation blockers from earlier today are **closed**. Current problem is weak WR + constant thrash + speed-gate inconsistency.
-
-## Done (do not reopen)
-- ACCEL_300 re-enabled + NEVER_REENABLE on inv-accel family
-- Dead-hours, preserve filter, signals_runner sync
-- Kill-switch layers for disabled signals
-- ACCEL_300_BREAKOUT disabled
-- Pipeline + hl-sync-guardian active
+## Done (this session)
+- [x] RE-ENABLE live trading — kill switch set true (was paused since 2026-08-05 02:50)
+- [x] TIGHTEN trailing — activation 0.35%→0.30%, distance 0.80%→0.70%
+- [x] UPDATE ceo_report.md with 24h performance snapshot
 
 ## Now (only)
 
 | P | Action | Detail |
 |---|--------|--------|
-| P0 | DISABLE ACCEL_300_MINUS | ✅ DONE 23:20 UTC |
-| P0 | FREEZE params 48h | ✅ DONE — auto-1hr + param-auto-tuner timers disabled; prompt frozen |
-| P0 | Resolve lock conflict | ✅ RESTORED locked set (2.0% / 0.25·0.50 / 45) |
-| P1 | Unify speed metric | ✅ DONE — CTX-GATE uses SpeedTracker same as EXEC |
-| P1 | Fix guardian_orphan closes | ✅ DONE — None=already-flat success; retry; clear marker if flat |
-| P2 | Watch vel-hermes- | n≥30 before any scale |
-| P2 | Disk 81% | cleanup noncritical logs/archives |
+| P0 | MONITOR trailing impact | 0.30% activation may trigger too early on volatile tokens — watch for premature exits |
+| P1 | WATCH tl_break_long decay | 100% WR (14 trades) historically decays to 0% within 24-48h |
+| P1 | VERIFY return_exhaustion signals | Threshold lowered 80→70, should be firing now |
+| P2 | VERIFY vortex_break signals | Window expanded 3→5, should be firing now |
 
-## Locked parameters (reaffirm — DO NOT REVERT without data + CEO)
+## Locked Parameters
 
-Until explicit re-lock of the auto-1hr set:
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| ATR_SL_MIN_INIT | 1.0% | Matches exit behavior |
+| TRAILING_ACTIVATION | 0.30% | CEO tightened 2026-08-06 |
+| TRAILING_DISTANCE | 0.70% | CEO tightened 2026-08-06 |
+| STOP_LOSS_DEFAULT | 1.0% | Hard fallback |
+| MAX_OPEN_POSITIONS | 6 | Diversified |
 
-| Parameter | Locked |
-|-----------|--------|
-| ATR_SL_MIN_INIT | 2.0% |
-| TRAILING_ACTIVATION_PCT | 0.25% |
-| TRAILING_DISTANCE_PCT | 0.50% |
-| SIGNAL_FILTER_SPEED_MIN | 45 |
+## Signal Stance
 
-If live narrower SL/trail stays, CEO must re-lock after MFE/MAE proof — not silent tuner overwrite.
-
-## Signal stance
-
-| Signal | Stance |
-|--------|--------|
-| inv-accel-* | PERMANENT OFF |
-| accel-300-breakout | OFF |
-| accel-300- | DISABLE (P0) |
-| accel-300+ | ON, watch decay |
-| vel-hermes- | ON, trial |
-| pattern_scanner | ON, poor 24h — no expand |
-| pct-hermes- | flag-gated as live |
+| Signal | Stance | Evidence |
+|--------|--------|----------|
+| tl_break_long | ON, WATCH | 100% WR — decay imminent |
+| zscore-rising± | ON | 55-63% WR, profitable |
+| vel-hermes- | ON | 43.5% WR, +$0.47 |
+| hzscore± | ON | Mixed but enabled |
+| bb_bounce | DEAD | Asymmetric R:R, never re-enable |
+| decider | DEAD | 11% WR, never re-enable |
+| accel-300 family | DEAD | 0% WR, never re-enable |
+| pattern_wolf | DEAD | 0% WR, never re-enable |
 
 ## Do not
-- Pause live trading
-- Re-enable inv-accel
-- Chase 0% WR with more constant churn
-- Treat 04:00–12:00 starvation writeups as current blockers
+- Pause live trading (boss directive: "Pausing is not an option")
+- Re-enable dead signals
+- Widen trailing without data evidence
+- Chase losses with parameter thrash
+
+## Follow-up (CEO next run)
+- [ ] Check trailing stop-out frequency (too many premature exits?)
+- [ ] Verify return_exhaustion and vortex_break generating signals
+- [ ] tl_break_long WR decay check

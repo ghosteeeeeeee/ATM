@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-05 15:25:04",
+  "timestamp": "2026-08-05 23:25:05",
   "total_checks": 20,
-  "passed": 10,
+  "passed": 11,
   "critical_count": 9,
-  "warning_count": 1,
+  "warning_count": 0,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "114 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "113 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
       "file": "study_winning_combos.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -31,7 +31,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "80 bare except clauses in 26 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "msg": "82 bare except clauses in 28 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
@@ -43,7 +43,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "64 files write JSON without atomic pattern: cascade_flip.py, hyperliquid_exchange.py, brain.py, ab_optimizer.py, sync_kanban_tasks.py",
+      "msg": "70 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, hyperliquid_exchange.py, brain.py, ab_optimizer.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },
@@ -60,12 +60,5 @@
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
-  "warnings": [
-    {
-      "name": "trade_frequency",
-      "msg": "127 trades in 6h (21.2/hr)",
-      "file": "",
-      "fix": ""
-    }
-  ]
+  "warnings": []
 }

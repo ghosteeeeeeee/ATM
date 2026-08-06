@@ -68,3 +68,9 @@
 
 ## Error Alerts — 2026-08-05 20:08 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   Signal vortex_break: TOK → TOK: cannot access local variable '_stat' where it is not associated with a value`
+
+## Error Alerts — 2026-08-05 23:08 UTC
+- **REPEATED** (32x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-06 02:08 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Unknown TOK`

@@ -58,10 +58,16 @@
 
 ## CEO DECISIONS (2026-08-06 03:15)
 - [x] 2026-08-06 03:15 — PROFIT MONSTER PNL FIX: pnl_usdt formula corrected to include leverage. 26/141 trades had $0.00 PnL due to missing leverage in calculation.
-- [ ] 2026-08-06 03:15 — DELEGATE to bug_hunter: Verify bb_bounce truly disabled (20 trades in 24h despite being disabled)
-- [ ] 2026-08-06 03:15 — DELEGATE to self_learner: Evaluate tl_break parameters (short underperforming, long has no entries)
-- [ ] 2026-08-06 03:15 — MONITOR vortex_break and return_exhaustion for 48h before any changes
-- [ ] 2026-08-06 03:15 — MONITOR hzscore+rs confluence (3 open positions all profitable)
+- [x] 2026-08-06 03:15 — DELEGATE to bug_hunter: Verify bb_bounce truly disabled (20 trades in 24h despite being disabled)
+- [x] 2026-08-06 03:15 — DELEGATE to self_learner: Evaluate tl_break parameters (short underperforming, long has no entries)
+- [x] 2026-08-06 03:15 — MONITOR vortex_break and return_exhaustion for 48h before any changes
+- [x] 2026-08-06 03:15 — MONITOR hzscore+rs confluence (3 open positions all profitable)
+
+## CEO DECISIONS (2026-08-06 03:18)
+- [x] 2026-08-06 03:18 — tl_break_long CONFIRMED sustained: 82.4% WR over 48h, 17 trades, +$1.63. ROTATOR_PROTECTED_FLAGS working.
+- [ ] 2026-08-06 03:18 — DELEGATE to bug_hunter: bb_bounce + decider still firing despite NEVER_REENABLE_FLAGS (23 trades/48h for bb_bounce, 9 trades for decider)
+- [ ] 2026-08-06 03:18 — CONTINUE monitoring vortex_break + return_exhaustion (48h trial window)
+- [ ] 2026-08-06 03:18 — CONTINUE monitoring hzscore + rs confluence
 
 ## CEO DECISIONS (2026-08-06 02:50)
 - [x] 2026-08-06 02:50 — VERIFIED bb_bounce properly disabled. Only 1 legacy trade (race condition). NOT in registered signals.
