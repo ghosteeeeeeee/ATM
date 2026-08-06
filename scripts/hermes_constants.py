@@ -874,6 +874,8 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True   # re-enabled 2026-08-06 — 55.6% WR last 24h, confluence signal
+BB_BOUNCE_PLUS_ENABLED = True    # bb_bounce+ LONG
+BB_BOUNCE_MINUS_ENABLED = True   # bb_bounce- SHORT
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period

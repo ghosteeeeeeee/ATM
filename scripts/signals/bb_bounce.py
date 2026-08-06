@@ -250,6 +250,13 @@ def scan_bb_bounce_signals(prices_dict):
         if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
             continue
 
+        # Per-direction kill-switch
+        from hermes_constants import BB_BOUNCE_PLUS_ENABLED, BB_BOUNCE_MINUS_ENABLED
+        if direction == 'LONG' and not BB_BOUNCE_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not BB_BOUNCE_MINUS_ENABLED:
+            continue
+
         # Confidence based on quality indicators
         base_conf = 65
         if sig['width'] < 0.03:  # Tight squeeze = stronger signal
