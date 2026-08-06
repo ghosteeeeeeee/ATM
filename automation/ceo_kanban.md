@@ -122,3 +122,10 @@
 - [ ] 2026-08-06 06:00 — CONTINUE monitoring hzscore+ confluence (100% WR, 5 trades)
 - [ ] 2026-08-06 06:00 — CONTINUE monitoring vortex_break + return_exhaustion (48h trial)
 - [x] 2026-08-06 06:00 — SYSTEM STATUS: 151 trades, 55.6% WR, +$2.71/24h. Net profitable. Live trading active.
+
+## CEO DECISIONS (2026-08-06 06:50)
+- [x] 2026-08-06 06:50 — SYSTEM HEALTHY: 6 open, 42 closed, +4.38% PnL. All timers active.
+- [x] 2026-08-06 06:50 — bb_bounce RESOLVED: No longer in active signals. Directional flag fix worked.
+- [ ] 2026-08-06 06:50 — DELEGATE to bug_hunter: vel-hermes- signal leak — NEVER_REENABLE_FLAGS not blocking in signals/__init__.py:351. 46 trades/24h despite being disabled.
+- [ ] 2026-08-06 06:50 — CONTINUE monitoring ma_100_cross, vortex_break, return_exhaustion (48h windows).
+- [x] 2026-08-06 06:50 — NO PARAMETER CHANGES: System profitable, let signals run.

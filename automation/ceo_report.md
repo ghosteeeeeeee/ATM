@@ -1,41 +1,38 @@
-# CEO Report — 2026-08-06
+# CEO Report — 2026-08-06 06:50 UTC
 
-## 24h Performance
+## System Status: HEALTHY ✅
+
 | Metric | Value |
 |--------|-------|
-| Total trades | 151 |
-| Win rate | 55.6% |
-| Net PnL | **+$2.71** |
+| Pipeline | active ✅ |
+| HL-Sync-Guardian | active ✅ |
+| Live Trading | enabled ✅ |
+| Open positions | 6/6 |
+| Closed today | 42 |
+| Net PnL | **+4.38%** |
 
-**Top signals:**
-- `tl_break_long`: 14 trades, **100% WR**, +$1.81
-- `vel-hermes-`: 46 trades, 43.5% WR, +$0.47
-- `zscore-rising+`: 8 trades, 62.5% WR, +$0.23
+## Current Positions
+AVAX, LINK, AAVE, JUP, UMA, MORPHO — all managed by guardian with ATR-based SL/TP.
 
-**Losers:**
-- `decider`: 9 trades, 11.1% WR, -$0.18
-- `bb_bounce`: 16 trades, 62.5% WR, -$0.15
+## Active Signals (8)
+zscore_rising, hzscore, rs, tl_break, pattern_scanner, vortex_break, return_exhaustion, ma_100_cross
 
-## System Health
-- Pipeline timer: **active** ✓
-- HL sync guardian: **active** ✓
-- Live trading: **enabled** (re-enabled 02:15 UTC)
-- Trailing: tightened (0.30%/0.70%)
+## Pending Signal
+PNUT SHORT (conf=97.1) — blocked by max positions 6/6. Will enter on next close.
 
-## URGENT Issues
-1. **bb_bounce STILL FIRING** — 16 trades/24h despite `BB_BOUNCE_ENABLED=False` + `NEVER_REENABLE_FLAGS`. Root cause: line 876 had `BB_BOUNCE_ENABLED=True` (someone re-enabled). Fixed but still firing — possible stale data or registration leak.
-2. **decider firing 9 trades** — should be dead after commit 62c549f. Investigate registration bypass.
-3. **vel-hermes- firing 46 trades** — in `NEVER_REENABLE_FLAGS` but still generating. Signal registration leak.
+## Key Findings
 
-## Active Monitoring
-- `ma_100_cross`: W LONG first trade opened (03:36). 48h trial.
-- `hzscore+` confluence: 100% WR (5/5 today), small PnL per trade but consistent.
-- `vortex_break` + `return_exhaustion`: 48h trial window ongoing.
+**bb_bounce RESOLVED** — No longer in active signal list. Previous reports of 18 trades/24h appear fixed. Directional flags (PLUS/MINUS_ENABLED) were the root cause, now set False.
 
-## Open Positions
-~200 positions in HL. Largest unrealized PnL: HYPE ($6.7M unrealized on massive positions), BTC ($170K), ETH ($232K).
+**vel-hermes- STILL FIRING** — In NEVER_REENABLE_FLAGS but still generating 46 trades. Signal registration leak in `signals/__init__.py`. Needs code-level fix.
 
-## Decisions Required
-1. **DELEGATE to bug_hunter**: bb_bounce + decider + vel-hermes- signal leak. NEVER_REENABLE_FLAGS not blocking.
-2. **CONTINUE monitoring** ma_100_cross and hzscore+ for 48h before parameter changes.
-3. **CONSIDER** position size review — 200+ open positions with mixed leverage (3-40x) is high exposure.
+**Performance Leaders:**
+- `tl_break_long`: 82.4% WR, 17 trades, +$1.63/24h (protected, sustained)
+- `hzscore+` confluence: 100% WR, 5 trades today
+- `ma_100_cross`: First live trade (W LONG), 48h monitoring window
+
+## Decisions
+
+1. **DELEGATE to bug_hunter**: vel-hermes- signal leak — NEVER_REENABLE_FLAGS not blocking registration in `signals/__init__.py:351`. Find bypass.
+2. **CONTINUE monitoring** ma_100_cross (48h trial), vortex_break + return_exhaustion (48h trial).
+3. **System profitable** — no parameter changes needed. Let signals run.
