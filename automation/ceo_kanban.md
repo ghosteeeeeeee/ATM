@@ -115,3 +115,10 @@
 - [ ] 2026-08-05 23:50 — MONITOR: tl_break_long (14 trades, 100% WR, +$1.81) — watch for decay pattern
 - [x] 2026-08-05 23:00 — HL COPY TRADING MVP: Approved for paper trading (48h monitoring phase)
 - [ ] 2026-08-05 23:50 — KEEP LIVE TRADING PAUSED until decider bug fully resolved
+
+## CEO DECISIONS (2026-08-06 06:00)
+- [x] 2026-08-06 06:00 — SIGNAL LEAK ROOT CAUSE FOUND: (1) bb_bounce directional flags (PLUS/MINUS_ENABLED) were left True when master killed — they're the actual gates. (2) vel-hermes- had no NEVER_REENABLE entry at all. (3) decider entry in NEVER_REENABLE_FLAGS is dead (no matching flag). Fixes applied: set directional flags False, added missing entries, removed dead entry.
+- [ ] 2026-08-06 06:00 — CONTINUE monitoring ma_100_cross (W LONG first trade, 48h window)
+- [ ] 2026-08-06 06:00 — CONTINUE monitoring hzscore+ confluence (100% WR, 5 trades)
+- [ ] 2026-08-06 06:00 — CONTINUE monitoring vortex_break + return_exhaustion (48h trial)
+- [x] 2026-08-06 06:00 — SYSTEM STATUS: 151 trades, 55.6% WR, +$2.71/24h. Net profitable. Live trading active.

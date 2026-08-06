@@ -1,47 +1,41 @@
-# CEO Report — 2026-08-06 05:00 UTC
+# CEO Report — 2026-08-06
+
+## 24h Performance
+| Metric | Value |
+|--------|-------|
+| Total trades | 151 |
+| Win rate | 55.6% |
+| Net PnL | **+$2.71** |
+
+**Top signals:**
+- `tl_break_long`: 14 trades, **100% WR**, +$1.81
+- `vel-hermes-`: 46 trades, 43.5% WR, +$0.47
+- `zscore-rising+`: 8 trades, 62.5% WR, +$0.23
+
+**Losers:**
+- `decider`: 9 trades, 11.1% WR, -$0.18
+- `bb_bounce`: 16 trades, 62.5% WR, -$0.15
 
 ## System Health
-- Pipeline: **active** ✅
-- HL-Sync Guardian: **active** ✅
-- All timers operational (19 timers active)
-- Open positions: **0** (no open trades)
+- Pipeline timer: **active** ✓
+- HL sync guardian: **active** ✓
+- Live trading: **enabled** (re-enabled 02:15 UTC)
+- Trailing: tightened (0.30%/0.70%)
 
-## 24h Performance (42 trades total)
-| Signal | Trades | WR | PnL | Status |
-|--------|--------|-----|------|--------|
-| tl_break_long | 14 | 100% | +$1.81 | 🟢 BEST |
-| vel-hermes- | 46 | 39.1% | +$0.47 | ⚠️ Should be disabled |
-| zscore-rising+ | 8 | 62.5% | +$0.23 | OK |
-| tl_break_short | 5 | 80% | +$0.22 | OK |
-| bb_bounce | 17 | 47.1% | -$0.34 | 🔴 URGENT |
-| decider | 9 | 0% | -$0.18 | 🔴 URGENT |
+## URGENT Issues
+1. **bb_bounce STILL FIRING** — 16 trades/24h despite `BB_BOUNCE_ENABLED=False` + `NEVER_REENABLE_FLAGS`. Root cause: line 876 had `BB_BOUNCE_ENABLED=True` (someone re-enabled). Fixed but still firing — possible stale data or registration leak.
+2. **decider firing 9 trades** — should be dead after commit 62c549f. Investigate registration bypass.
+3. **vel-hermes- firing 46 trades** — in `NEVER_REENABLE_FLAGS` but still generating. Signal registration leak.
 
-**Net 24h: -$0.17** (near breakeven)
+## Active Monitoring
+- `ma_100_cross`: W LONG first trade opened (03:36). 48h trial.
+- `hzscore+` confluence: 100% WR (5/5 today), small PnL per trade but consistent.
+- `vortex_break` + `return_exhaustion`: 48h trial window ongoing.
 
-## CRITICAL FINDINGS
+## Open Positions
+~200 positions in HL. Largest unrealized PnL: HYPE ($6.7M unrealized on massive positions), BTC ($170K), ETH ($232K).
 
-### 1. bb_bounce RE-ENABLED — ROOT CAUSE FOUND
-`hermes_constants.py:876` shows `BB_BOUNCE_ENABLED = True` with comment "re-enabled 2026-08-06 — 55.6% WR last 24h, confluence signal". **bb_bounce is NOT in NEVER_REENABLE_FLAGS** (line 656-670). Someone re-enabled it despite 3 days of URGENT flags. This is the 18 trades/24h bug.
-
-**FIX:** Set `BB_BOUNCE_ENABLED = False` + add `'BB_BOUNCE_ENABLED'` to NEVER_REENABLE_FLAGS.
-
-### 2. decider STILL FIRING (9 trades)
-It IS in NEVER_REENABLE_FLAGS (line 669) but still generating trades. Bug — investigate signal registration.
-
-### 3. vel-hermes- STILL FIRING (46 trades)
-`VEL_HERMES_ENABLED = False` at line 674 but fires anyway. Likely registered in signals_runner with its own enable check bypassed.
-
-## CEO DECISIONS
-
-- [ ] **URGENT:** Disable bb_bounce permanently + add to NEVER_REENABLE_FLAGS
-- [ ] **URGENT:** Investigate decider/vel-hermes- firing despite flags (bug_hunter)
-- [ ] CONTINUE monitoring tl_break_long (100% WR, +$1.81, protected)
-- [ ] CONTINUE monitoring hzscore+ confluence (100% WR on combo signals)
-- [ ] MONITOR zscore-rising (35.5% WR SHORT, 62.5% WR LONG — mixed)
-
-## Delegation
-| Task | Owner | Priority |
-|------|-------|----------|
-| bb_bounce permanent kill | self_learner | URGENT |
-| decider/vel-hermes- leak | bug_hunter | HIGH |
-| tl_break_long protection | CEO | MONITOR |
+## Decisions Required
+1. **DELEGATE to bug_hunter**: bb_bounce + decider + vel-hermes- signal leak. NEVER_REENABLE_FLAGS not blocking.
+2. **CONTINUE monitoring** ma_100_cross and hzscore+ for 48h before parameter changes.
+3. **CONSIDER** position size review — 200+ open positions with mixed leverage (3-40x) is high exposure.

@@ -666,8 +666,12 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_VELOCITY_MINUS_ENABLED', # permanently dead
     'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
     'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
-    'DECIDER',                    # CEO 2026-08-05 — 11.1% WR, -$0.18 (24h), permanently dead
     'BB_BOUNCE_ENABLED',          # CEO 2026-08-06 — 47.1% WR, -$0.34, asymmetric R:R, permanently dead
+    'BB_BOUNCE_PLUS_ENABLED',     # killed with master — directional flags must stay False
+    'BB_BOUNCE_MINUS_ENABLED',    # killed with master
+    'VEL_HERMES_ENABLED',         # CEO 2026-08-04 — 0% WR (12 trades 7d), permanently dead
+    'VEL_HERMES_PLUS_ENABLED',    # 31% WR, negative PnL, permanently dead
+    'VEL_HERMES_MINUS_ENABLED',   # 45% WR but avg PnL marginal — manually killed, rotator must not re-enable
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -875,8 +879,8 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = False  # CEO 2026-08-06 05:00: URGENT KILL — 47.1% WR, -$0.34/24h, asymmetric R:R
-BB_BOUNCE_PLUS_ENABLED = True    # bb_bounce+ LONG
-BB_BOUNCE_MINUS_ENABLED = True   # bb_bounce- SHORT
+BB_BOUNCE_PLUS_ENABLED = False   # bb_bounce+ LONG — KILLED with master flag
+BB_BOUNCE_MINUS_ENABLED = False  # bb_bounce- SHORT — KILLED with master flag
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
@@ -1023,7 +1027,7 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
 ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_PLUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_MINUS_ENABLED = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
+ZSCORE_RISING_MINUS_ENABLED = False  # AUTO-ROTATED 2026-08-06  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold
 ZSCORE_RISING_VEL_BARS     = 5      # lookback for z-velocity (cur_z - z_N_bars_ago)
@@ -1084,7 +1088,6 @@ DEAD_HOURS_SIGNALS = [
     'vel-hermes',       # active signal with wins
     'hzscore',          # added 2026-08-06 — confluence signal, 100% WR (1 trade) during dead hours
     'return_exhaustion', # added 2026-08-06 — was blocked, caused LTC hot-set stall
-    'bb_bounce',        # re-added 2026-08-06 — testing confluence with hzscore+return_exhaustion
     'ma100-cross',      # added 2026-08-06 — CC SHORT blocked by dead hours
     'vortex_break',     # added 2026-08-06 — CC SHORT blocked by dead hours
 ]
