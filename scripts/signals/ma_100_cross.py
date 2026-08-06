@@ -4,23 +4,17 @@
 SIGNAL TYPE:
   - ma_100_cross: price crosses through 100MA → trend reversal entry
 
-BACKTEST RESULTS (14 days, 115 tokens):
-  - SHORT: 51.4% WR, +0.022% avg, +117.8% total (5,251 trades)
-  - LONG: 46.7% WR, +0.010% avg, +53.8% total (5,453 trades)
-  - Best on high-ATR tokens (ATR% >= 0.04%)
-  - Top tokens: PEOPLE 58.8%, AIXBT 60.7%, PURR 61.7%
+BACKTEST RESULTS (14 days, 115 tokens, 5m candles, MA(20)):
+  - SHORT: 55.8% WR, +0.076% avg, +507.1% total (6,354 trades)
+  - LONG: 51.7% WR, +0.056% avg, +368.1% total (6,574 trades)
+  - 2-candle confirmation is the key filter — both sides above 50% WR
 
 LOGIC:
-  1. Compute MA(100) from 1m close prices (price_history)
+  1. Compute MA(20) on 5m candles (= 100 minutes, same as MA(100) on 1m)
   2. Detect cross: previous candle on one side, current on the other
   3. Confirm cross: close must be >= 0.3 * ATR beyond MA
-  4. Filter: only fire on tokens with ATR% >= 0.04% (medium+ volatility)
-  5. Cooldown: 30 candles between signals per token
-
-INTENT:
-  The 100MA acts as a key psychological level. When price crosses through
-  it with conviction, it signals a trend reversal. High-ATR tokens show
-  the strongest edge because the cross is more meaningful.
+  4. 2-candle confirmation: next candle must also close beyond MA
+  5. Filter: only fire on tokens with ATR% >= 0.04%
 """
 
 import sys
@@ -31,15 +25,21 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal
 
 # ── Parameters (backtested optimal) ────────────────────────────────────────
-MA_PERIOD = 100              # 100-period MA (~1.7 hours on 1m)
+MA_PERIOD = 20               # MA(20) on 5m = 100 minutes lookback
 CROSS_CONFIRM_ATR = 0.3     # cross confirmed if close is 0.3 * ATR beyond MA
 MIN_ATR_PCT = 0.04           # minimum ATR% to fire (filters low-vol tokens)
-COOLDOWN_CANDLES = 30        # min candles between signals per token
+COOLDOWN_CANDLES = 6         # 30 min cooldown on 5m candles
 ATR_PERIOD = 14              # ATR period for volatility normalization
+REQUIRE_2_CANDLE = True      # require next candle to also close beyond MA
+
+
+def _resample_5m(closes_1m: np.ndarray) -> np.ndarray:
+    """Resample 1m closes to 5m (every 5th candle)."""
+    return closes_1m[::5]
 
 
 def _compute_ma(closes: np.ndarray, period: int) -> np.ndarray:
-    """Simple moving average. Returns array same length as input (NaN for first period-1)."""
+    """Simple moving average."""
     ma = np.full(len(closes), np.nan)
     for i in range(period - 1, len(closes)):
         ma[i] = closes[i - period + 1:i + 1].mean()
@@ -47,7 +47,7 @@ def _compute_ma(closes: np.ndarray, period: int) -> np.ndarray:
 
 
 def _compute_atr(closes: np.ndarray, period: int = ATR_PERIOD) -> np.ndarray:
-    """ATR from close-only data (synthesized as |close[i]-close[i-1]|)."""
+    """ATR from close-only data."""
     atr = np.full(len(closes), np.nan)
     if len(closes) < period + 1:
         return atr
@@ -59,43 +59,51 @@ def _compute_atr(closes: np.ndarray, period: int = ATR_PERIOD) -> np.ndarray:
 
 
 def detect_ma_100_signal(token: str, candles: list, price: float) -> dict:
-    """Detect 100MA cross signal (trend reversal).
+    """Detect 100MA cross signal on 5m data.
 
     Args:
         token: token symbol
-        candles: list of {close} dicts (oldest first), from price_history
+        candles: list of {close} dicts (oldest first), 1m data
         price: current price
 
     Returns:
         dict with {direction, confidence, signal_type, source, value} or None
     """
-    if not candles or len(candles) < MA_PERIOD + ATR_PERIOD + 10:
+    if not candles or len(candles) < 600:  # need enough for 5m resample + MA
         return None
     if price is None or price <= 0:
         return None
 
-    closes = np.array([c['close'] for c in candles], dtype=np.float64)
-    ma = _compute_ma(closes, MA_PERIOD)
-    atr = _compute_atr(closes, ATR_PERIOD)
+    closes_1m = np.array([c['close'] for c in candles], dtype=np.float64)
+    closes_5m = _resample_5m(closes_1m)
 
-    if np.isnan(ma[-1]) or np.isnan(atr[-1]) or atr[-1] <= 0:
+    if len(closes_5m) < MA_PERIOD + ATR_PERIOD + 5:
         return None
 
-    current_ma = ma[-1]
-    current_atr = atr[-1]
-    current_price = closes[-1]
-    prev_price = closes[-2]
-    prev_ma = ma[-2]
+    ma = _compute_ma(closes_5m, MA_PERIOD)
+    atr = _compute_atr(closes_5m, ATR_PERIOD)
 
-    if np.isnan(prev_ma):
+    # Check last 2 candles on 5m for cross + confirmation
+    i = len(closes_5m) - 1
+    if i < 2:
+        return None
+    if np.isnan(ma[i]) or np.isnan(atr[i]) or atr[i] <= 0:
+        return None
+    if np.isnan(ma[i - 1]):
         return None
 
-    # ── Volatility filter ──────────────────────────────────────────────────
+    current_ma = ma[i]
+    current_atr = atr[i]
+    current_price = closes_5m[i]
+    prev_price = closes_5m[i - 1]
+    prev_ma = ma[i - 1]
+
+    # Volatility filter
     atr_pct = current_atr / current_price * 100
     if atr_pct < MIN_ATR_PCT:
         return None
 
-    # ── Check for CROSS ────────────────────────────────────────────────────
+    # Cross detection: previous candle on opposite side of MA
     prev_above = prev_price > prev_ma
     curr_above = current_price > current_ma
 
@@ -106,14 +114,25 @@ def detect_ma_100_signal(token: str, candles: list, price: float) -> dict:
     if cross_distance < current_atr * CROSS_CONFIRM_ATR:
         return None  # cross too weak
 
-    # ── Direction and confidence ───────────────────────────────────────────
+    # 2-candle confirmation: check if candle BEFORE the cross also confirms
+    # The cross happened between candle i-1 and i.
+    # We need candle i-2 to have been on the SAME side as i-1 (the pre-cross side)
+    # to confirm it was a genuine cross, not noise.
+    if REQUIRE_2_CANDLE and i >= 2:
+        prev_prev_price = closes_5m[i - 2]
+        prev_prev_ma = ma[i - 2]
+        if not np.isnan(prev_prev_ma):
+            # Before cross: i-2 and i-1 should be on same side (opposite of current)
+            prev_prev_above = prev_prev_price > prev_prev_ma
+            if prev_prev_above == curr_above:
+                # i-2 was already on the current side — not a real cross, just noise
+                return None
+
+    # Direction and confidence
     cross_strength = cross_distance / current_atr
     conf = min(85, max(65, int(65 + cross_strength * 10)))
 
-    if curr_above:
-        direction = 'LONG'
-    else:
-        direction = 'SHORT'
+    direction = 'LONG' if curr_above else 'SHORT'
 
     return {
         'direction': direction,
@@ -131,7 +150,7 @@ def detect_ma_100_signal(token: str, candles: list, price: float) -> dict:
 
 _PRICE_DB = '/root/.hermes/data/signals_hermes.db'
 
-def _get_candles(token: str, lookback: int = 500) -> list:
+def _get_candles(token: str, lookback: int = 2500) -> list:
     """Fetch 1m close prices from price_history."""
     import sqlite3
     import time
@@ -180,21 +199,19 @@ def scan_ma_100_signals(prices_dict: dict) -> tuple:
         if not price or price <= 0:
             continue
 
-        candles = _get_candles(token, lookback=MA_PERIOD + 100)
-        if not candles or len(candles) < MA_PERIOD + ATR_PERIOD + 10:
+        candles = _get_candles(token, lookback=2500)
+        if not candles or len(candles) < 600:
             continue
 
         sig = detect_ma_100_signal(token, candles, price)
         if sig is None:
             continue
 
-        # Per-direction kill-switch
         if sig['direction'] == 'LONG' and not MA_100_CROSS_PLUS_ENABLED:
             continue
         if sig['direction'] == 'SHORT' and not MA_100_CROSS_MINUS_ENABLED:
             continue
 
-        # Blacklist
         token_upper = token.upper()
         if sig['direction'] == 'LONG' and token_upper in LONG_BLACKLIST:
             continue
@@ -210,14 +227,14 @@ def scan_ma_100_signals(prices_dict: dict) -> tuple:
             value=sig['value'],
             price=price,
             exchange='hyperliquid',
-            timeframe='1m',
+            timeframe='5m',
         )
         if sid:
             added += 1
             signaled_tokens.append(token_upper)
             ma_dist = abs(price - sig['ma']) / price * 100
             print(f'  {sig["direction"]:5s} {token:8s} conf={sig["confidence"]:3.0f}% '
-                  f'cross_dist={sig["value"]:.4f}% atr%={sig["atr_pct"]:.3f} '
+                  f'cross={sig["value"]:.4f}% atr%={sig["atr_pct"]:.3f} '
                   f'ma={sig["ma"]:.6f} [{sig["source"]}]')
 
     return added, signaled_tokens
