@@ -268,7 +268,7 @@ SIGNAL_SOURCE_BLACKLIST = {
     'accel-300',
 }
 SERVER_NAME = 'Hermes'
-MAX_OPEN_POSITIONS = 4   # max open paper positions — diversified portfolio (was 3)
+MAX_OPEN_POSITIONS = 6   # max open paper positions — diversified portfolio (was 3)
 
 # ── Scanner Position Limits ─────────────────────────────────────────────────────
 # Unified limits for scanner slot allocation (unified_scanner.py)
@@ -333,9 +333,9 @@ RS_LOOKBACK_CANDLES  = 4700   # candles to analyze (~3+ days of 1m)
 RS_LEVEL_LOOKBACK    = 300     # swing high/low detection window
 RS_ATR_PERIOD         = 30     # ATR lookback for proximity normalization
 RS_CLUSTER_ATR       = 1.0   # cluster levels within 1.0 * ATR of each other
-RS_PROXIMITY_K       = 3.0    # fire if price within 3.0 * ATR of a level (was 0.70 — impossibly tight for low-vol tokens where ATR%=0.04%, 0.70×0.04%=0.029% max distance; 3.0 allows 0.12% which is achievable)
-RS_MIN_TOUCHES       = 120      # minimum touches for valid level (was 100 — stronger levels)
-RS_DECIDER_MIN_TOUCHES = 120   # minimum touches for decider to approve (was 100)
+RS_PROXIMITY_K       = 4.0    # fire if price within 4.0 * ATR of a level (was 3.0 — ASTER setup needed K=3.47; 4.0 gives breathing room for low-vol tokens)
+RS_MIN_TOUCHES       = 30       # minimum touches for valid level (was 120 — only 4 tokens passed; 30 lets 85% qualify including ASTER)
+RS_DECIDER_MIN_TOUCHES = 30    # minimum touches for decider to approve (synced with RS_MIN_TOUCHES)
 RS_TOUCH_HARD_CAP       = 200  # block signals when touch_count >= 200 — (was 120 which was blocking the best-performing SHORT bucket at 151-200 tc: 66.7% WR avg +2.0% PnL; 201-300 zone is the natural ceiling at 17.4% WR)
 RS_LEVEL_BROKEN_LOOKBACK = 200  # candles to check for level-invalidation (was hardcoded 20) — ~8hrs on 1m; catches support/resistance flips
 RS_DECIDER_ZBONUS_TOUCHES = 50  # relaxed threshold (50 vs 100) when |z_score| > 2.5 — strong momentum offsets weak level
@@ -608,10 +608,10 @@ HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
 # Never touches losing positions.
 # ── Profit Monster — Two-Tier Take-Profit ──────────────────────────────────────
 # Tier 1: Quick scalp — lower profit, fires frequently
-PM_TIER1_MIN_PCT    = 0.6    # min profit % to close
+PM_TIER1_MIN_PCT    = 0.4    # min profit % to close
 PM_TIER1_MAX_PCT    = 2.0    # max profit % to close
 PM_TIER1_MAX_CLOSE  = 2      # max positions to close per wake
-PM_TIER1_SKIP_TOP_PCT = 20    # don't touch top X% most profitable (0 = disabled)
+PM_TIER1_SKIP_TOP_PCT = 25    # don't touch top X% most profitable (0 = disabled)
 PM_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}   # minutes between fires
 
 # Tier 2: Runner — higher profit, fires less frequently
