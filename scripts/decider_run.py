@@ -1054,7 +1054,7 @@ def context_gate(token, direction, source, sig):
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None, 0)
 
-    verdict, ctx = rule_based_context_gate(token, direction, source, sig)
+    verdict, ctx, _ = rule_based_context_gate(token, direction, source, sig)
 
     if verdict == 'SKIP':
         return ('SKIP', ctx, 0)
