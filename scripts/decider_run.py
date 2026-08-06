@@ -687,7 +687,7 @@ def rule_based_context_gate(token, direction, source, sig):
     Note: FLIP was disabled 2026-08-01 — was inverting 31% of trades to wrong direction.
     """
     if not CONTEXT_GATE_ENABLED:
-        return ('GO', None)
+        return ('GO', None, 0)
 
     speed = _ctx_gate_get_speed(token)
     # Use signal z-score if available (from tl_break signal), otherwise compute from current prices
@@ -790,7 +790,7 @@ def rule_based_context_gate(token, direction, source, sig):
                                                        'stale_price': True})
                     except Exception:
                         pass  # if we can't check, proceed with GO
-                    return ('GO', None)
+                    return ('GO', None, 0)
                 # z doesn't confirm (e.g., LONG with z between -0.5 and 0.5)
                 # Fall through to LLM gate for ambiguous cases
 
@@ -810,10 +810,10 @@ def rule_based_context_gate(token, direction, source, sig):
     if phase and source:
         if 'accel-300' in source and 'inverse' not in source:
             if phase in ('exhaustion', 'extreme'):
-                return ('SKIP', f'wrong phase: {phase} for accel-300 (wave cresting)')
+                return ('SKIP', f'wrong phase: {phase} for accel-300 (wave cresting)', 0)
         if 'inverse' in source or 'inv-accel' in source:
             if phase in ('quiet', 'building'):
-                return ('SKIP', f'wrong phase: {phase} for inv-accel (no reversal)')
+                return ('SKIP', f'wrong phase: {phase} for inv-accel (no reversal)', 0)
 
     # 6. FLIP: DISABLED 2026-08-01 — was flipping 31% of tl_break signals to wrong direction
     # Phase/z-score flips are net negative: signal generator already accounts for these.
@@ -824,9 +824,9 @@ def rule_based_context_gate(token, direction, source, sig):
     # 7. Momentum + acceleration cross-check (trend signals only)
     if is_trend_signal and momentum < 25:
         if direction == 'LONG' and accel < -0.005:
-            return ('SKIP', f'weak momentum opposing LONG (mom={momentum:.0f}, accel={accel:+.4f})')
+            return ('SKIP', f'weak momentum opposing LONG (mom={momentum:.0f}, accel={accel:+.4f})', 0)
         if direction == 'SHORT' and accel > 0.005:
-            return ('SKIP', f'weak momentum opposing SHORT (mom={momentum:.0f}, accel={accel:+.4f})')
+            return ('SKIP', f'weak momentum opposing SHORT (mom={momentum:.0f}, accel={accel:+.4f})', 0)
 
     # Ambiguous — needs LLM
     ctx = {
@@ -834,7 +834,7 @@ def rule_based_context_gate(token, direction, source, sig):
         'momentum': momentum, 'acceleration': accel, 'wave_phase': wave_phase,
         'market': market,
     }
-    return ('AMBIGUOUS', ctx)
+    return ('AMBIGUOUS', ctx, 0)
 
 def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb=None):
     """
