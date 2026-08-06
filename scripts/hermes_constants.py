@@ -1093,7 +1093,7 @@ ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when
 #   DEAD_HOURS_START/END = hour range in UTC
 #   DEAD_HOURS_SIGNALS = list of signal prefixes to block during dead hours
 #   DEAD_HOURS_DEFAULT = True = block ALL signals not in list, False = only block listed signals
-DEAD_HOURS_ENABLED = True   # re-enabled 2026-08-06 — expanded allowlist (hzscore, return_exhaustion added)
+DEAD_HOURS_ENABLED = False  # disabled 2026-08-06 — yesterday showed dead hours can be productive
 DEAD_HOURS_START = 3   # 03:00 UTC
 DEAD_HOURS_END = 8     # 08:00 UTC
 DEAD_HOURS_SIGNALS = [
