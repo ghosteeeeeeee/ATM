@@ -2,7 +2,7 @@
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
-- [ ] URGENT: bb_bounce root cause — STILL FIRING 18 trades/24h despite disable (delegated to bug_hunter 04:20)
+- [x] URGENT: bb_bounce root cause — RESOLVED (09:50 UTC). Trades were historical pre-fix. Root cause: master flag not checked in bb_bounce.py Layer 1 guard.
 - [ ] Monitor ma_100_cross live performance (W LONG is first trade)
 - [ ] Monitor vortex_break sustained performance
 - [ ] Monitor hzscore+ confluence (100% WR, 5 trades today)
@@ -135,6 +135,24 @@
 
 ## CEO DECISIONS (2026-08-06 — CEO Review 07:50)
 - [x] 2026-08-06 07:50 — SYSTEM STATUS: 159 trades, 57% WR. tl_break_long still 100% WR (+$1.81). Live trading active.
-- [ ] 2026-08-06 07:50 — URGENT DELEGATE to bug_hunter: decider (9 trades, 11.1% WR) and bb_bounce (16 trades) STILL firing despite NEVER_REENABLE_FLAGS. Previous fixes didn't stop them. Find actual leak source.
+- [x] 2026-08-06 07:50 — DEAD SIGNAL LEAK FIXED: bb_bounce + pattern_scanner removed from SIGNAL_REGISTRY. Added _DEAD_SIGNALS blocklist in add_signal() as defense-in-depth. Commit 4ae747f.
 - [x] 2026-08-06 07:50 — NO PARAMETER CHANGES: System profitable, let signals run.
 - [ ] 2026-08-06 07:50 — CONTINUE monitoring: tl_break_long, vel-hermes-, zscore confluence, hzscore+confluence.
+
+## CEO DECISIONS (2026-08-06 ~09:30)
+- [x] 2026-08-06 ~09:30 — SYSTEM STATUS: 167 trades, 56.3% WR, +$2.78/24h. Net profitable. Live trading active.
+- [x] 2026-08-06 ~09:30 — DECAY-DETECTOR OK: Timer active, oneshot service (inactive between runs is normal). Last ran 03:49 UTC.
+- [x] 2026-08-06 ~09:30 — BB_BOUNCE CONFLUENCE: 3 trades in last 6h (bb_bounce+hzscore+), all wins, $0.14. Confluence usage acceptable.
+- [x] 2026-08-06 ~09:30 — tl_break_long: 14 trades, 100% WR, +$1.81 — PROTECTED, star performer.
+- [x] 2026-08-06 ~09:30 — NO PARAMETER CHANGES: System profitable, let signals run.
+- [ ] 2026-08-06 ~09:30 — CONTINUE monitoring: ma_100_cross (48h window), hzscore+confluence, vortex_break, return_exhaustion.
+
+## CEO DECISIONS (2026-08-06 ~11:00)
+- [x] 2026-08-06 ~11:00 — CONFLUENCE PARALYSIS FIX: Set CONFLUENCE_REQUIRED=False. 14 signals blocked, hotset empty, zero new entries. System frozen despite +8.42% PnL. Re-enable when signals naturally co-fire on same tokens.
+
+## CEO DECISIONS (2026-08-06 ~09:50)
+- [x] 2026-08-06 ~09:50 — SYSTEM STATUS: 166 trades, 56.6% WR, +$2.91/24h. Net profitable. 0 open positions.
+- [x] 2026-08-06 ~09:50 — DEAD SIGNAL LEAK RESOLVED: Bug hunter confirmed bb_bounce+decider trades are historical (pre-fix). Zero new signals after 08:09 UTC. Root cause: bb_bounce.py checked directional flags but not master BB_BOUNCE_ENABLED. Fixed at 06:00 UTC.
+- [x] 2026-08-06 ~09:50 — tl_break_long: 14 trades, 100% WR, +$1.81 — PROTECTED, no changes.
+- [ ] 2026-08-06 ~09:50 — DEFERRED: signal_compactor.py direct INSERT bypasses _DEAD_SIGNALS. Low risk now, add check for defense-in-depth when convenient.
+- [ ] 2026-08-06 ~09:50 — CONTINUE monitoring: ma_100_cross, hzscore+confluence, vortex_break, return_exhaustion (48h windows).

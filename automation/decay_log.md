@@ -154,3 +154,17 @@
 [2026-08-06 03:49 UTC]   🟢 tl_break_short: 5 trades, 80.0% WR, PnL=2.12
 [2026-08-06 03:49 UTC]   🟢 tl_break_long: 14 trades, 100.0% WR, PnL=17.61
 [2026-08-06 03:49 UTC] Done. Disabled 0 signals.
+[2026-08-06 09:49 UTC] === Signal Decay Detector ===
+[2026-08-06 09:49 UTC]   SKIP: No flag mapping for decider
+[2026-08-06 09:49 UTC]   🔴 decider: 9 trades, 11.1% WR, PnL=-1.59
+[2026-08-06 09:49 UTC]   🟢 vel-hermes-: 46 trades, 43.5% WR, PnL=5.0
+[2026-08-06 09:49 UTC]   🟢 zscore-rising-: 31 trades, 54.8% WR, PnL=2.69
+[2026-08-06 09:49 UTC]   🟢 zscore-rising+: 8 trades, 62.5% WR, PnL=2.17
+[2026-08-06 09:49 UTC]   🟢 bb_bounce: 15 trades, 66.7% WR, PnL=1.37
+[2026-08-06 09:49 UTC]   🟢 return_exhaustion-,vortex_break_short: 3 trades, 66.7% WR, PnL=-0.11
+[2026-08-06 09:49 UTC]   🟢 hzscore-,return_exhaustion-: 4 trades, 75.0% WR, PnL=0.39
+[2026-08-06 09:49 UTC]   🟢 tl_break_short: 5 trades, 80.0% WR, PnL=2.12
+[2026-08-06 09:49 UTC]   🟢 bb_bounce,hzscore+: 3 trades, 100.0% WR, PnL=1.27
+[2026-08-06 09:49 UTC]   🟢 ma100-cross,vortex_break_long: 3 trades, 100.0% WR, PnL=1.28
+[2026-08-06 09:49 UTC]   🟢 tl_break_long: 14 trades, 100.0% WR, PnL=17.61
+[2026-08-06 09:49 UTC] Done. Disabled 0 signals.

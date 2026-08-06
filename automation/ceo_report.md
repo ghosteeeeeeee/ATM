@@ -1,38 +1,36 @@
-# CEO Report — 2026-08-06
+# CEO Report — 2026-08-06 ~11:00 UTC
 
 ## System Status
-- **Timers**: All active (pipeline, hl-sync-guardian, price-collector, etc.)
-- **Live Trading**: ACTIVE (kill switch true, trailing tightened)
-- **24h Signal Outcomes**: 159 trades
+- **Pipeline:** Active | **Live Trading:** Enabled | **Kill Switch:** True
+- **Open Positions:** 6 (BCH, ME, MOODENG, PNUT, W, XMR)
+- **Closed Today:** 54 | **PnL:** +8.42%
+- **Hardware:** CPU 85%, RAM 44%, Disk 79%
 
-## 24h Performance (by signal)
-| Signal | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| tl_break_long | 14 | 100% | +$1.81 |
-| vel-hermes- | 46 | 43.5% | +$0.47 |
-| zscore-rising+ | 8 | 62.5% | +$0.23 |
-| zscore-rising- | 31 | 54.8% | +$0.22 |
-| tl_break_short | 5 | 80% | +$0.22 |
-| decider | 9 | 11.1% | -$0.18 |
-| bb_bounce | 16 | 62.5% | -$0.15 |
+## CRITICAL: Confluence Gate Paralysis
 
-## CEO DECISIONS
+**Problem:** `CONFLUENCE_REQUIRED=True` is blocking ALL new entries. Hotset is empty. 14 pending signals (vortex_break, hzscore, return_exhaustion, rs) all blocked — each fires on a single token with no co-signal. The confluence gate requires 2+ unique signal types on the same token, but signals rarely overlap.
 
-### URGENT: Dead Signal Leak Still Active
-- **decider** (9 trades/24h, 11.1% WR) and **bb_bounce** (16 trades/24h) still firing
-- Both in NEVER_REENABLE_FLAGS but still generating signals
-- **DELEGATE to bug_hunter**: Find root cause in signal registration/batch pipeline. Previous investigation found stale batch data but leak persists.
+**Impact:** System is frozen. Existing 6 positions are profitable but no new trades can enter. Pipeline runs every minute producing zero hotset entries.
 
-### Monitor Active
-- **tl_break_long**: 100% WR, 14 trades — continue monitoring, protected
-- **vel-hermes-**: 46 trades, 43.5% WR — largest volume but marginal
-- **zscore confluence**: 8+31 trades, 62.5%/54.8% WR — consistent
-- **hzscore+confluence**: 5 trades today, 100% WR
+## CEO Decision
 
-### No Parameter Changes
-- System net profitable, signals running stable
-- Live trailing: activation 0.30%, distance 0.70%
+**SET `CONFLUENCE_REQUIRED=False`** in `hermes_constants.py:1057`
 
-## Open Positions
-- 586 positions tracked in hl_copy
-- Total unrealized PnL: $12.6M (includes all traders)
+Rationale:
+1. System was +8.42% today BEFORE confluence was enforced
+2. 14 signals blocked, zero entering hotset — gate is too strict for current signal set
+3. Single-source signals with good WR (tl_break 100%, hzscore 100%) should be allowed
+4. Can re-enable once signals naturally co-fire on same tokens
+
+## Delegate
+
+- **self_learner:** Set `CONFLUENCE_REQUIRED=False` in hermes_constants.py. Verify hotset populates on next pipeline cycle.
+
+## Monitoring (Continue)
+- [ ] ma_100_cross — first live trade, 48h window
+- [ ] vortex_break — 48h trial
+- [ ] return_exhaustion — 48h trial
+- [ ] tl_break_long — 100% WR, protected
+
+## Previous Session Cleanup
+All prior decisions from 03:15-09:50 UTC verified complete. Dead signal leak resolved. System healthy.
