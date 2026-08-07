@@ -22,11 +22,37 @@ signal script → add_signal() → signals table (PENDING)
 
 ---
 
+## Step 0: Verify data source exists
+
+Before writing code, confirm your data is available:
+
+```bash
+cd /root/.hermes/scripts && python3 -c "
+import sqlite3
+from paths import HERMES_DATA
+import os
+db = os.path.join(HERMES_DATA, 'candles.db')
+conn = sqlite3.connect(db)
+for t in ['candles_1m', 'candles_5m', 'candles_15m', 'candles_1h', 'candles_4h']:
+    try:
+        count = conn.execute(f'SELECT COUNT(DISTINCT token) FROM {t}').fetchone()[0]
+        print(f'{t}: {count} tokens')
+    except: print(f'{t}: NOT FOUND')
+conn.close()
+"
+```
+
+If using `latest_prices` from `signals_hermes.db`:
+```python
+from signal_schema import get_all_latest_prices
+prices = get_all_latest_prices()  # dict of token -> {'price': float}
+```
+
+---
+
 ## Step 1: Create signal script
 
 **File**: `/root/.hermes/scripts/signals/<signal_name>.py`
-
-Use `vortex_break.py` or `return_exhaustion.py` as template.
 
 ```python
 #!/usr/bin/env python3
@@ -34,9 +60,9 @@ Use `vortex_break.py` or `return_exhaustion.py` as template.
 import sys, os, sqlite3, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, get_cooldown, price_age_minutes
+from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
+from paths import HERMES_DATA
 
-# ── Constants (from hermes_constants.py) ──────────────────────────────────
 from hermes_constants import (
     YOUR_SIGNAL_ENABLED,
     YOUR_SIGNAL_PLUS_ENABLED,
@@ -49,8 +75,28 @@ SIGNAL_TYPE_SHORT = 'your_signal_short'
 SOURCE_LONG       = 'your-signal+'
 SOURCE_SHORT      = 'your-signal-'
 
-# ── Detection ─────────────────────────────────────────────────────────────
-def detect(token, prices, ...):
+_CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')  # if using candles
+
+def _get_closes(token, table, limit):
+    """DB fetch with proper connection cleanup."""
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute(f\"\"\"
+            SELECT close FROM (
+                SELECT close FROM {table}
+                WHERE token = ? ORDER BY ts DESC LIMIT ?
+            ) sub ORDER BY ts ASC
+        \"\"\", (token.upper(), limit))
+        return [r[0] for r in c.fetchall()]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+def detect(token, ...):
     """Return {direction, confidence, value, price} or None."""
     ...
     return {
@@ -60,21 +106,14 @@ def detect(token, prices, ...):
         'price': price,
     }
 
-# ── Scanner ───────────────────────────────────────────────────────────────
-def scan_signals(prices_dict: dict) -> int:
+def scan_signals() -> int:
     added = 0
-    for token, data in prices_dict.items():
-        price = data.get('price')
-        if not price or price <= 0:
-            continue
-
+    for token in all_tokens:
         # Guards
         if price_age_minutes(token) > 10:
             continue
-        if get_cooldown(token, direction=direction):
-            continue
 
-        sig = detect(token, prices, ...)
+        sig = detect(token, ...)
         if not sig:
             continue
 
@@ -92,6 +131,10 @@ def scan_signals(prices_dict: dict) -> int:
         if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
             continue
 
+        # Cooldown
+        if get_cooldown(token, direction=direction):
+            continue
+
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
@@ -102,23 +145,23 @@ def scan_signals(prices_dict: dict) -> int:
             source=source,
             confidence=sig['confidence'],
             value=sig.get('value'),
-            price=price,
+            price=sig['price'],
             exchange='hyperliquid',
             timeframe='5m',
             z_score=sig.get('z_score'),
         )
         if sid:
             added += 1
-            from signal_schema import set_cooldown
             set_cooldown(token, direction, hours=3)
     return added
 
-def run(prices_dict=None):
-    """Entry point for signals_runner."""
-    if prices_dict is None:
-        from signal_schema import get_all_latest_prices
-        prices_dict = get_all_latest_prices()
-    return scan_signals(prices_dict)
+def run():
+    """Entry point for signals_runner.
+    Use run() with no params if signal reads from DB directly (not prices_dict).
+    Using run(prices_dict=None) causes signals_runner to call get_all_latest_prices()
+    even when your signal doesn't need it — wasteful DB query every cycle.
+    """
+    return scan_signals()
 ```
 
 ### Source string convention
@@ -187,7 +230,7 @@ except Exception:
 
 ### 3D. If signal scans all tokens (>60s), add to slow set (~line 338)
 
-If your signal iterates over all ~191 tokens (like momentum, mtf_momentum, ma_100_cross), it's a slow signal. Add it:
+If your signal iterates over all ~191 tokens, it's a slow signal. Add it:
 
 ```python
 _SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'your_signal'}
@@ -246,19 +289,6 @@ if _comp == 'your-signal-':
 1. If your source is bare (no `+`/`-`), the `+`/`-` Layer 2 checks are dead code. Use `direction` param or add direction suffix to source.
 2. Asymmetric sources (different format per direction) — list BOTH variants in `_comp in (...)`.
 
-### ALLOWED_SIGNAL_SOURCES
-
-**File**: `/root/.hermes/scripts/signal_schema.py` (~line 1610)
-
-New source strings must be in the `ALLOWED_SIGNAL_SOURCES` frozenset or they route to `'unknown'`. Add your source(s):
-
-```python
-ALLOWED_SIGNAL_SOURCES = frozenset({
-    ...,
-    'your-signal+', 'your-signal-',   # or 'your-signal' if bare
-})
-```
-
 ---
 
 ## Step 5: Source weight in signal_compactor.py (recommended)
@@ -277,30 +307,106 @@ In `SIGNAL_SOURCE_WEIGHTS` (~line 177-253):
 ## Step 6: Verification
 
 ```bash
-# 1. Syntax check
+# 1. Syntax check all changed files
 python3 -c "import py_compile; py_compile.compile('scripts/signals/your_signal.py', doraise=True)"
+python3 -c "import py_compile; py_compile.compile('scripts/hermes_constants.py', doraise=True)"
+python3 -c "import py_compile; py_compile.compile('scripts/signals/__init__.py', doraise=True)"
+python3 -c "import py_compile; py_compile.compile('scripts/signal_schema.py', doraise=True)"
 
 # 2. Dry run (--dry logs decisions but still writes to DB — not a true dry run)
 cd /root/.hermes/scripts && python3 signals/your_signal.py --dry
 
 # 3. Check logs
 tail -100 /root/.hermes/logs/pipeline.log | grep your_signal
+```
 
-# 4. Test kill-switch: set flag to False, verify Layer 2 blocks
-# In hermes_constants.py: YOUR_SIGNAL_ENABLED = False
-# Run add_signal with your source → should see "DEBUG add_signal BLOCKED"
+---
 
-# 5. Check hotset
-cat /var/www/hermes/data/hotset.json | python3 -m json.tool | grep your_signal
+## Step 7: Call bug_hunter to verify
 
-# 6. Monitor WR (after first trades)
+**Run BEFORE committing the main signal.** Fix any bugs found, then re-verify.
+
+```bash
+cd /root/.hermes
 python3 -c "
-import sqlite3
-conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
-rows = conn.execute('SELECT signal_type, COUNT(*), SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) FROM signal_outcomes WHERE signal_type LIKE \"%your_signal%\" GROUP BY signal_type').fetchall()
-for r in rows: print(f'{r[0]}: {r[1]} trades, {r[2]}/{r[1]} WR')
-conn.close()
+import sys
+sys.argv = ['bug_hunter', 'scripts/signals/your_signal.py', 'scripts/signal_schema.py', 'scripts/hermes_constants.py', 'scripts/signals/__init__.py']
+exec(open('automation/bug_hunter_prompt.md').read())
 "
+```
+
+The bug_hunter checks:
+- Source string matches between script and Layer 2 enforcement
+- Import safety (try/except ImportError on all new checks)
+- Flag naming consistency
+- Control flow bugs (return None vs continue in loops)
+- Missing blacklist checks
+- Dead code paths
+- DB connection leaks (cursor closed in finally block)
+- Edge cases (ret == 0, empty data, None values)
+
+**Do not skip this step.** Every signal addition has caught issues on the first bug_hunter pass.
+
+After fixing bugs, re-run bug_hunter to confirm fixes are clean.
+
+---
+
+## Step 8: Commit the signal
+
+```bash
+cd /root/.hermes
+git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py scripts/signal_compactor.py
+git commit -m "signals: add your_signal — <brief description>
+
+- New signal script: signals/your_signal.py
+- hermes_constants: YOUR_SIGNAL_ENABLED/PLUS/MINUS flags
+- signals/__init__.py: registry entry
+- signal_schema.py: Layer 2 enforcement"
+```
+
+---
+
+## Step 9: Update CEO
+
+```bash
+cd /root/.hermes
+python3 -c "
+import json, datetime
+report = {
+    'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'event': 'new_signal_added',
+    'signal_name': 'your_signal',
+    'details': {
+        'master_flag': 'YOUR_SIGNAL_ENABLED',
+        'plus_flag': 'YOUR_SIGNAL_PLUS_ENABLED',
+        'minus_flag': 'YOUR_SIGNAL_MINUS_ENABLED',
+        'files_changed': [
+            'scripts/signals/your_signal.py',
+            'scripts/hermes_constants.py',
+            'scripts/signals/__init__.py',
+            'scripts/signal_schema.py',
+            'scripts/signal_compactor.py',
+        ],
+    }
+}
+print(json.dumps(report, indent=2))
+"
+```
+
+---
+
+## Step 10: Store to memory
+
+```python
+openmemory_openmemory_store(
+    content="Added new signal: your_signal. Description: <what it does>. "
+            "Files: scripts/signals/your_signal.py, hermes_constants.py, "
+            "signals/__init__.py, signal_schema.py, signal_compactor.py. "
+            "Flags: YOUR_SIGNAL_ENABLED, _PLUS_ENABLED, _MINUS_ENABLED. "
+            "Source: your-signal+/-.",
+    tags=["signals", "new-signal", "your_signal"],
+    type="contextual"
+)
 ```
 
 ---
@@ -353,91 +459,19 @@ This prevents `signal_rotator.py` from auto-re-enabling it.
 
 7. **SQL placeholders** — use `?` or named params, never `***`.
 
----
+8. **DB connection leak** — always close connections in `finally` block. Pattern:
+   ```python
+   conn = None
+   try:
+       conn = sqlite3.connect(db, timeout=10)
+       # ... work ...
+   except Exception:
+       return []
+   finally:
+       if conn:
+           conn.close()
+   ```
 
-## Step 7: Call bug_hunter to verify
+9. **run(prices_dict=None) when signal doesn't use prices** — if your signal reads from candles.db or other DB directly, use `def run():` instead. Using `run(prices_dict=None)` causes signals_runner to call `get_all_latest_prices()` wastefully every cycle.
 
-Always run the bug_hunter as the final step. No exceptions.
-
-```bash
-cd /root/.hermes
-python3 -c "
-import sys
-sys.argv = ['bug_hunter', 'scripts/signals/your_signal.py', 'scripts/signal_schema.py', 'scripts/hermes_constants.py', 'scripts/signals/__init__.py']
-exec(open('automation/bug_hunter_prompt.md').read())
-"
-```
-
-The bug_hunter checks:
-- Source string matches between script and Layer 2 enforcement
-- Import safety (try/except ImportError on all new checks)
-- Flag naming consistency
-- Control flow bugs (return None vs continue in loops)
-- Missing blacklist checks
-- Dead code paths
-
-**Do not skip this step.** Every signal addition has caught issues on the first bug_hunter pass.
-
----
-
-## Step 8: Update CEO
-
-Notify the CEO automation about the new signal.
-
-```bash
-cd /root/.hermes
-python3 -c "
-import json, datetime
-report = {
-    'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-    'event': 'new_signal_added',
-    'signal_name': 'your_signal',
-    'details': {
-        'master_flag': 'YOUR_SIGNAL_ENABLED',
-        'plus_flag': 'YOUR_SIGNAL_PLUS_ENABLED',
-        'minus_flag': 'YOUR_SIGNAL_MINUS_ENABLED',
-        'files_changed': [
-            'scripts/signals/your_signal.py',
-            'scripts/hermes_constants.py',
-            'scripts/signals/__init__.py',
-            'scripts/signal_schema.py',
-        ],
-    }
-}
-print(json.dumps(report, indent=2))
-"
-```
-
----
-
-## Step 9: Store to memory
-
-Save a summary to OpenMemory for cross-session continuity.
-
-```python
-openmemory_openmemory_store(
-    content="Added new signal: your_signal. Description: <what it does>. "
-            "Files: scripts/signals/your_signal.py, hermes_constants.py, "
-            "signals/__init__.py, signal_schema.py. "
-            "Flags: YOUR_SIGNAL_ENABLED, _PLUS_ENABLED, _MINUS_ENABLED. "
-            "Source: your-signal+/-.",
-    tags=["signals", "new-signal", "your_signal"],
-    type="contextual"
-)
-```
-
----
-
-## Step 10: Commit to git
-
-```bash
-cd /root/.hermes
-git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py
-git commit -m "signals: add your_signal — <brief description>
-
-- New signal script: signals/your_signal.py
-- hermes_constants: YOUR_SIGNAL_ENABLED/PLUS/MINUS flags
-- signals/__init__.py: registry entry
-- signal_schema.py: Layer 2 enforcement"
-python3 /root/.hermes/skills/productivity/update-git/references/push_gh.py
-```
+10. **Zero return edge case** — if `ret_1h == 0` (flat), the token has no momentum. Skip it or return None from direction decision. Don't arbitrarily pick LONG or SHORT.
