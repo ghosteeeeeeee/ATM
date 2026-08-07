@@ -34,6 +34,13 @@ from hermes_constants import (
     MOMENTUM_LEADERBOARD_MOVE_MIN,
     MOMENTUM_LEADERBOARD_COOLDOWN_MIN,
     MOMENTUM_LEADERBOARD_RET_WINDOWS,
+    MOMENTUM_LEADERBOARD_OVEREXTENDED_PCT,
+    MOMENTUM_LEADERBOARD_FAST_VEL,
+    MOMENTUM_LEADERBOARD_ELITE_VEL,
+    MOMENTUM_LEADERBOARD_CONF_PENALTY_PCT,
+    MOMENTUM_LEADERBOARD_CONF_BASE,
+    MOMENTUM_LEADERBOARD_CONF_FLOOR,
+    MOMENTUM_LEADERBOARD_CONF_CAP,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -196,8 +203,21 @@ def detect_leaderboard_signals() -> list:
         if move_score < MOMENTUM_LEADERBOARD_MOVE_MIN:
             continue
 
-        # Overextended filter — too risky to enter
-        if ret_5m is not None and abs(ret_5m) > 3.0:
+        # Overextended — fire opposing (fade) signal
+        if ret_5m is not None and abs(ret_5m) > MOMENTUM_LEADERBOARD_OVEREXTENDED_PCT:
+            # 5m moved hard against 1h trend → fade it
+            direction = 'SHORT' if ret_1h > 0 else 'LONG'
+            confidence = MOMENTUM_LEADERBOARD_CONF_BASE + 5  # slight boost for strong fade
+            candidates.append({
+                'token': token,
+                'direction': direction,
+                'confidence': min(MOMENTUM_LEADERBOARD_CONF_CAP, confidence),
+                'move_score': move_score,
+                'ret_1h': ret_1h,
+                'ret_15m': ret_15m,
+                'ret_5m': ret_5m,
+                'overextended': True,
+            })
             continue
 
         # Direction decision
@@ -216,6 +236,7 @@ def detect_leaderboard_signals() -> list:
             'ret_1h': ret_1h,
             'ret_15m': ret_15m,
             'ret_5m': ret_5m,
+            'overextended': False,
         })
 
     # Rank by move_score, take top N
@@ -237,7 +258,7 @@ def _decide_direction(ret_1h, ret_5m, ret_15m, vel_5m) -> str | None:
         # No 5m data — direction from 1h sign only
         return 'LONG' if ret_1h > 0 else 'SHORT'
 
-    fast = vel_5m is not None and abs(vel_5m) > 0.3  # 0.3% per candle = fast
+    fast = vel_5m is not None and abs(vel_5m) > MOMENTUM_LEADERBOARD_FAST_VEL
 
     if ret_1h > 0:
         if ret_5m > 0:
@@ -257,7 +278,7 @@ def _decide_direction(ret_1h, ret_5m, ret_15m, vel_5m) -> str | None:
 
 def _compute_confidence(ret_1h, ret_5m, ret_15m, direction, vel_5m) -> int:
     """Confidence scaling based on confluence and speed."""
-    conf = 75
+    conf = MOMENTUM_LEADERBOARD_CONF_BASE
 
     # Confluence: 15m and 1h agree on sign
     if ret_15m is not None:
@@ -265,14 +286,14 @@ def _compute_confidence(ret_1h, ret_5m, ret_15m, direction, vel_5m) -> int:
             conf += 5
 
     # Elite velocity
-    if vel_5m is not None and abs(vel_5m) > 0.5:
+    if vel_5m is not None and abs(vel_5m) > MOMENTUM_LEADERBOARD_ELITE_VEL:
         conf += 5
 
     # Overextension penalty
-    if ret_5m is not None and abs(ret_5m) > 2.0:
+    if ret_5m is not None and abs(ret_5m) > MOMENTUM_LEADERBOARD_CONF_PENALTY_PCT:
         conf -= 10
 
-    return max(50, min(88, conf))
+    return max(MOMENTUM_LEADERBOARD_CONF_FLOOR, min(MOMENTUM_LEADERBOARD_CONF_CAP, conf))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -188,9 +188,13 @@ Add in the signal kill-switches section (~line 674+):
 YOUR_SIGNAL_ENABLED = True              # master kill-switch
 YOUR_SIGNAL_PLUS_ENABLED = True         # LONG direction
 YOUR_SIGNAL_MINUS_ENABLED = True        # SHORT direction
-YOUR_SIGNAL_COOLDOWN_HOURS = 3          # optional
-YOUR_SIGNAL_MIN_CONFIDENCE = 70         # optional
-# ... signal-specific params (thresholds, periods, etc.)
+YOUR_SIGNAL_COOLDOWN_HOURS = 3          # per token+direction cooldown
+YOUR_SIGNAL_PARAM_A = 3.0               # threshold for X
+YOUR_SIGNAL_PARAM_B = 0.3               # threshold for Y
+YOUR_SIGNAL_CONF_BASE = 75              # base confidence
+YOUR_SIGNAL_CONF_FLOOR = 50             # min confidence
+YOUR_SIGNAL_CONF_CAP = 88               # max confidence (system ceiling)
+# ... all other signal-specific params
 ```
 
 ### Naming convention
@@ -199,7 +203,20 @@ YOUR_SIGNAL_MIN_CONFIDENCE = 70         # optional
 SIGNAL_NAME_ENABLED          # master
 SIGNAL_NAME_PLUS_ENABLED     # LONG
 SIGNAL_NAME_MINUS_ENABLED    # SHORT
+SIGNAL_NAME_<PARAM>          # all tweakable values
 ```
+
+### Rule: NO hardcoded magic numbers in the signal script
+
+Every threshold, period, weight, and confidence value MUST live in hermes_constants.py. This allows runtime tuning without code changes. If you find yourself writing a number directly in the signal script, move it to constants.
+
+What belongs in hermes_constants:
+- Thresholds (entry filters, overextension, velocity)
+- Periods / lookback windows
+- Confidence (base, floor, cap, bonus/penalty amounts)
+- Cooldown durations
+- Weight factors
+- Any value you might want to tune after observing live performance
 
 ---
 
@@ -475,3 +492,5 @@ This prevents `signal_rotator.py` from auto-re-enabling it.
 9. **run(prices_dict=None) when signal doesn't use prices** — if your signal reads from candles.db or other DB directly, use `def run():` instead. Using `run(prices_dict=None)` causes signals_runner to call `get_all_latest_prices()` wastefully every cycle.
 
 10. **Zero return edge case** — if `ret_1h == 0` (flat), the token has no momentum. Skip it or return None from direction decision. Don't arbitrarily pick LONG or SHORT.
+
+11. **Hardcoded magic numbers** — every threshold, period, weight, and confidence value MUST live in hermes_constants.py. If you write a number directly in the signal script (`> 3.0`, `< 0.5`, `conf = 75`), move it to a constant. This allows runtime tuning without code changes or redeploys.
