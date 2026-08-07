@@ -1277,7 +1277,7 @@ HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 
 # ── Momentum Leaderboard Signal ─────────────────────────────────────────────
 # momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
-MOMENTUM_LEADERBOARD_ENABLED = False           # master switch — off until tested
+MOMENTUM_LEADERBOARD_ENABLED = True            # master switch — enabled for paper testing
 MOMENTUM_LEADERBOARD_PLUS_ENABLED = True       # LONG direction
 MOMENTUM_LEADERBOARD_MINUS_ENABLED = True      # SHORT direction
 MOMENTUM_LEADERBOARD_TOP_N = 10               # top movers to evaluate
