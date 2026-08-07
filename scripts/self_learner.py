@@ -340,6 +340,7 @@ def run():
 
 def _get_combo_stats():
     """Query signal_outcomes for combo performance (7d window, 3+ trades)."""
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         cur = conn.cursor()
@@ -356,11 +357,13 @@ def _get_combo_stats():
             ORDER BY total_pnl DESC
         """, (f'-{COMBO_WINDOW_DAYS}', COMBO_MIN_TRADES))
         rows = cur.fetchall()
-        conn.close()
         return [(r[0], r[1], r[2], r[3], r[4]) for r in rows]
     except Exception as e:
         _log(f"Error querying combo stats: {e}")
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _calc_combo_weight(wr, avg_pnl, n_trades):
@@ -412,18 +415,33 @@ def _save_combo_weights(weights):
 
 def _is_signal_disabled(signal_type):
     """Check if a signal type is disabled via hermes_constants flags."""
+    import re
     try:
         with open(HERMES_CONSTANTS) as f:
             content = f.read()
-        # Check SIGNAL_BLOCKED set
-        if f"'{signal_type}'" in content.split('SIGNAL_BLOCKED')[1].split(']')[0] if 'SIGNAL_BLOCKED' in content else False:
-            return True
-        # Check *_ENABLED flags (crude but works for most)
-        import re
-        flag_name = signal_type.upper().replace('-', '_') + '_ENABLED'
-        match = re.search(rf'{flag_name}\s*=\s*(True|False)', content)
-        if match:
-            return match.group(1) == 'False'
+        disabled_bases = set()
+        disabled_variants = set()
+        for match in re.finditer(r'^(\w+)_ENABLED\s*=\s*False', content, re.MULTILINE):
+            flag_name = match.group(1)
+            if flag_name.endswith(('_PLUS', '_MINUS')):
+                disabled_variants.add(flag_name)
+            else:
+                disabled_bases.add(flag_name)
+        # Normalize: convert trailing +/- FIRST, then hyphens to underscores
+        norm = signal_type.upper()
+        norm = re.sub(r'\+$', '_PLUS', norm)
+        norm = re.sub(r'-$', '_MINUS', norm)
+        norm = norm.replace('-', '_')
+        # Strip _LONG/_SHORT direction suffix for base matching
+        norm_base = re.sub(r'_(LONG|SHORT)$', '', norm)
+        # Check disabled bases
+        for db in disabled_bases:
+            if norm_base == db or norm_base.startswith(db + '_'):
+                return True
+        # Check disabled variants
+        for dv in disabled_variants:
+            if norm == dv or norm.startswith(dv):
+                return True
     except Exception:
         pass
     return False
@@ -460,6 +478,11 @@ def analyze_combo_weights():
             new_weights[signal_type] = old_w  # keep existing
         else:
             _log(f"  {signal_type}: {n}T WR={wr:.0%} avg_pnl=${avg_pnl:+.4f} — no change")
+    
+    # Preserve old weights for signals that dropped below trade threshold
+    for st, w in old_weights.items():
+        if st not in new_weights:
+            new_weights[st] = w
     
     if changes > 0:
         _save_combo_weights(new_weights)
