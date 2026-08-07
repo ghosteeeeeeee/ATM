@@ -80,3 +80,19 @@ Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tig
 **Impact:** Eliminates phantom atr_sl_hit trades. SHORT trailing now functional.
 
 **Files:** `scripts/tpsl_utils.py` (commits c701d92, 23bbf1e)
+
+---
+
+## 2026-08-07 — momentum_leaderboard Signal Fix
+
+**Issue:** Signal was completely dead — zero signals ever emitted.
+
+**Root cause:** Two bugs:
+1. `_get_closes` query had `ORDER BY ts ASC` on outer subquery referencing non-existent column → SQLite error silently caught → empty closes for all tokens
+2. 1h staleness threshold was 15min but 1h candles update hourly → every token filtered
+
+**Fix:** Removed broken subquery wrapping, use `reversed()` for oldest-first order. Changed staleness to 90min.
+
+**Result:** 5 candidates detected, 3 pass all filters (ACE SHORT, CC SHORT, AVNT LONG).
+
+**Action:** Monitor next 24h — signal should start appearing in hotset.
