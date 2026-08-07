@@ -122,6 +122,10 @@ SHORT_BLACKLIST = {
     'KAITO',
     # 2026-08-07: HIP-3 asset, hl_copy SHORT signal — user requested block
     '@107',
+    # 2026-08-07: Consistent losers — 48h + all-time net negative
+    'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
+    'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
+    'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -171,6 +175,10 @@ LONG_BLACKLIST = {
     'KAITO',
     # 2026-08-07: HIP-3 asset, hl_copy signal — user requested block
     '@107',
+    # 2026-08-07: Consistent losers — 48h + all-time net negative
+    'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
+    'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
+    'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 

@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-07 13:49 UTC
+# Signal Rotation — 2026-08-07 17:54 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,20 +6,20 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | tl_break_long | 56% | 1.303 | 1.303 | ❌ |  |
-| 2 | hzscore+,return_exhaustio | 80% | 0.480 | 0.480 | ✅ |  |
-| 3 | tl_break_short | 50% | 0.197 | 0.197 | ❌ |  |
-| 4 | accel-300-vel- | 33% | 0.058 | 0.058 | ❌ |  |
-| 5 | zscore-rising+ | 41% | 0.028 | 0.043 | ❌ |  |
-| 6 | vel-hermes- | 38% | -0.007 | -0.007 | ❌ |  |
-| 7 | accel-300-vel+ | 27% | -0.031 | -0.031 | ❌ |  |
-| 8 | accel-300-velocity-igniti | 40% | -0.042 | -0.042 | ❌ |  |
-| 9 | accel-300+ | 29% | -0.046 | -0.046 | ❌ |  |
-| 10 | decider | 10% | -0.062 | -0.062 | ❓ |  |
-| 11 | accel-300- | 29% | -0.093 | -0.093 | ❌ |  |
-| 12 | hzscore-,return_exhaustio | 62% | -0.139 | -0.139 | ❌ |  |
+| 1 | tl_break_long | 67% | 1.911 | 1.911 | ❌ |  |
+| 2 | bb_bounce,hzscore+ | 100% | 0.912 | 0.912 | ✅ |  |
+| 3 | ma100-cross,return_exhaus | 67% | 0.307 | 0.307 | ❓ |  |
+| 4 | tl_break_short | 60% | 0.255 | 0.255 | ❌ |  |
+| 5 | hzscore+,return_exhaustio | 58% | 0.245 | 0.245 | ✅ |  |
+| 6 | ma100-cross,range_finder | 67% | 0.230 | 0.230 | ❓ |  |
+| 7 | ma100-cross,vortex_break_ | 71% | 0.186 | 0.186 | ❓ |  |
+| 8 | zscore-rising+ | 41% | 0.028 | 0.043 | ❌ |  |
+| 9 | bb_bounce,range_finder | 43% | -0.000 | -0.000 | ✅ |  |
+| 10 | vel-hermes- | 38% | -0.007 | -0.007 | ❌ |  |
+| 11 | decider | 10% | -0.062 | -0.062 | ❓ |  |
+| 12 | accel-300+ | 20% | -0.072 | -0.072 | ❌ |  |
 | 13 | pattern_wolf_wave_bear | 20% | -0.147 | -0.147 | ❓ |  |
 | 14 | zscore-rising- | 46% | -0.137 | -0.205 | ❌ |  |
-| 15 | inv-accel-300- | 42% | -0.243 | -0.243 | ❌ |  |
+| 15 | bb_bounce,ma100-cross | 43% | -0.216 | -0.216 | ✅ |  |
 
 ## No changes applied

@@ -245,7 +245,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('accel_300_short', 'accel-300-'):  1.0,   # SHORT: 57.1% WR — no suppression
     # inv_accel_300: suppress so accel_300 SHORT wins when both fire for same token
     ('inverse_accel_300_long',  'inv-accel-300+'):  0.7,  # LONG: lower priority than accel-300 SHORT
-    ('inverse_accel_300_short', 'inv-accel-300-'):  1.0,  # SHORT: no suppression
+    ('inverse_accel_300_short', 'inv-accel-300-'):  0.6,  # SHORT: 31% WR, -$0.27 (7d) — suppressed
     # hh_hl_choch: Change of Character — structure flip signals (HH_HL↔LH_LL)
     # Higher weight than breakout/pullback — CHoCH is a stronger reversal signal
     ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
@@ -253,6 +253,20 @@ SIGNAL_SOURCE_WEIGHTS = {
     # momentum_leaderboard — top movers
     ('mover_long',  'mover+'):  1.0,
     ('mover_short', 'mover-'):  1.0,
+    # ── Combo boosts (7d data: 2026-08-07) ──────────────────────────────────
+    # LONG combos that win: hzscore+ and return_exhaustion_long agree
+    ('mtf_zscore',  'hzscore+,return_exhaustion_long'):  1.2,  # 12T 58% WR +$0.13
+    ('bb_bounce',   'bb_bounce,hzscore+'):               1.3,  # 5T 100% WR +$0.20
+    ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.15, # 6T 67% WR +$0.12
+    ('vortex_break','ma100-cross,vortex_break_long'):     1.1,  # 8T 62% WR +$0.08
+    ('range_finder','ma100-cross,range_finder'):          1.05, # 7T 57% WR +$0.07
+    # ── Combo suppressions (7d data: 2026-08-07) ────────────────────────────
+    # SHORT combos that bleed: hzscore- and return_exhaustion- agree on losers
+    ('mtf_zscore',  'hzscore-,return_exhaustion-'):      0.6,  # 10T 50% WR -$0.18
+    ('return_exhaustion','return_exhaustion-'):           0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
+    ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28
+    # zscore-rising- is the biggest volume loser (38T, 32% WR)
+    ('zscore_momentum','zscore-rising-'):                 0.5,  # 38T 32% WR -$0.22
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -511,10 +525,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             has_accel_plus  = 'accel-300+'  in source_parts
             has_accel_minus = 'accel-300-' in source_parts
             has_hz_pos     = 'hzscore+'     in source_parts
+            has_hz_neg     = 'hzscore-'     in source_parts
             has_vel_neg    = 'vel-hermes-'  in source_parts
             has_pct_neg    = 'pct-hermes-'  in source_parts
             has_ma5m_pos   = 'ma-cross-5m+' in source_parts
             has_trend_pos  = 'trend_purity+' in source_parts
+            has_ma100      = 'ma100-cross'  in source_parts
+            has_bb_bounce  = 'bb_bounce'    in source_parts
+            has_re_neg     = 'return_exhaustion-' in source_parts
 
             # ── LONG poison blocks ──────────────────────────────────────────────
             if direction.upper() == 'LONG':
@@ -527,6 +545,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if has_accel_plus and 'pct-hermes+' in source_parts and not has_trend_pos:
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: accel-300+ + pct-hermes+ blocked (35.7% WR, catches knives)")
                     continue
+                # POISON: bb_bounce + ma100-cross = 43% WR (7T, -$0.10) — both directions lose
+                if has_bb_bounce and has_ma100:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce+ma100-cross blocked (43% WR, -$0.10)")
+                    continue
 
             # ── SHORT poison + required co-signal logic ──────────────────────────
             if direction.upper() == 'SHORT':
@@ -535,8 +557,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: hzscore++vel-hermes- without pct-hermes- blocked (20% WR, poison)")
                     continue
                 # POISON: ma100-cross + return_exhaustion- = 29% WR (7 trades, -$0.30)
-                if 'ma100-cross' in source_parts and 'return_exhaustion-' in source_parts:
+                if has_ma100 and has_re_neg:
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: ma100-cross+return_exhaustion- blocked (29% WR, -$0.30)")
+                    continue
+                # POISON: hzscore- + return_exhaustion- = 50% WR (10T, -$0.18)
+                if has_hz_neg and has_re_neg:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: hzscore-+return_exhaustion- blocked (50% WR, -$0.18)")
+                    continue
+                # BLANKET: return_exhaustion- standalone = 60% WR but -$0.12 (small wins, big losses)
+                if has_re_neg and len(source_parts) == 1:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: return_exhaustion- standalone blocked (60% WR, -$0.12)")
                     continue
                 # accel-300- barely fires; no special gate needed
                 if has_accel_minus and has_ma5m_pos:
