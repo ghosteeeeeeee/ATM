@@ -377,3 +377,67 @@ The bug_hunter checks:
 - Dead code paths
 
 **Do not skip this step.** Every signal addition has caught issues on the first bug_hunter pass.
+
+---
+
+## Step 8: Update CEO
+
+Notify the CEO automation about the new signal.
+
+```bash
+cd /root/.hermes
+python3 -c "
+import json, datetime
+report = {
+    'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'event': 'new_signal_added',
+    'signal_name': 'your_signal',
+    'details': {
+        'master_flag': 'YOUR_SIGNAL_ENABLED',
+        'plus_flag': 'YOUR_SIGNAL_PLUS_ENABLED',
+        'minus_flag': 'YOUR_SIGNAL_MINUS_ENABLED',
+        'files_changed': [
+            'scripts/signals/your_signal.py',
+            'scripts/hermes_constants.py',
+            'scripts/signals/__init__.py',
+            'scripts/signal_schema.py',
+        ],
+    }
+}
+print(json.dumps(report, indent=2))
+"
+```
+
+---
+
+## Step 9: Store to memory
+
+Save a summary to OpenMemory for cross-session continuity.
+
+```python
+openmemory_openmemory_store(
+    content="Added new signal: your_signal. Description: <what it does>. "
+            "Files: scripts/signals/your_signal.py, hermes_constants.py, "
+            "signals/__init__.py, signal_schema.py. "
+            "Flags: YOUR_SIGNAL_ENABLED, _PLUS_ENABLED, _MINUS_ENABLED. "
+            "Source: your-signal+/-.",
+    tags=["signals", "new-signal", "your_signal"],
+    type="contextual"
+)
+```
+
+---
+
+## Step 10: Commit to git
+
+```bash
+cd /root/.hermes
+git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py
+git commit -m "signals: add your_signal — <brief description>
+
+- New signal script: signals/your_signal.py
+- hermes_constants: YOUR_SIGNAL_ENABLED/PLUS/MINUS flags
+- signals/__init__.py: registry entry
+- signal_schema.py: Layer 2 enforcement"
+python3 /root/.hermes/skills/productivity/update-git/references/push_gh.py
+```
