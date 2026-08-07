@@ -337,6 +337,17 @@ cd /root/.hermes/scripts && python3 signals/your_signal.py --dry
 tail -100 /root/.hermes/logs/pipeline.log | grep your_signal
 ```
 
+### Pre-flight checklist (verify before bug_hunter)
+
+| Check | How | Fail = |
+|-------|-----|--------|
+| **DB connections safe** | Every `sqlite3.connect()` has matching `conn.close()` in `finally` block or uses `with` | Connection leak → "database locked" under load |
+| **No hardcoded numbers** | Grep script for raw numbers: `grep -n '[=<>] *[0-9]' signals/your_signal.py` | Can't tune without code changes |
+| **Blacklist in script** | Script checks `LONG_BLACKLIST`/`SHORT_BLACKLIST` before `add_signal()` | Blacklisted token gets signal |
+| **Cooldown set** | Uses `set_cooldown()` or `get_cooldown()` | Spam signals on same token |
+| **Not in _DEAD_SIGNALS** | `grep -n '_DEAD_SIGNALS\|DEAD_SOURCES' signal_schema.py` | Signal silently killed by add_signal() |
+| **Source format consistent** | Uses `+`/`-` suffix consistently, not mixed bare+directional | Layer 2 checks may be dead code |
+
 ---
 
 ## Step 7: Call bug_hunter to verify
