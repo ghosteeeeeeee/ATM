@@ -693,10 +693,17 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_VELOCITY_MINUS_ENABLED', # permanently dead
     'PATTERN_WOLF_ENABLED',       # 0% WR (10 trades 7d), -$1.38 — permanently dead
     'PATTERN_SCANNER',            # CEO 2026-08-04 — 0% WR, no flag mapping, permanently dead
-
     'VEL_HERMES_ENABLED',         # CEO 2026-08-04 — 0% WR (12 trades 7d), permanently dead
     'VEL_HERMES_PLUS_ENABLED',    # 31% WR, negative PnL, permanently dead
     'VEL_HERMES_MINUS_ENABLED',   # 45% WR but avg PnL marginal — manually killed, rotator must not re-enable
+    'TL_BREAK_ENABLED',           # CEO 2026-08-07 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
+    'TL_BREAK_PLUS_ENABLED',      # CEO 2026-08-07 — master TL_BREAK killed
+    'TL_BREAK_MINUS_ENABLED',     # CEO 2026-08-07 — master TL_BREAK killed
+    'ZSCORE_RISING_ENABLED',      # CEO 2026-08-07 — 38.6% WR (44 trades 7d), -$1.37. No edge.
+    'ZSCORE_RISING_PLUS_ENABLED', # CEO 2026-08-07 — master ZSCORE_RISING killed
+    'ZSCORE_RISING_MINUS_ENABLED',# CEO 2026-08-07 — master ZSCORE_RISING killed
+    'HZSCORE_MINUS_ENABLED',      # CEO 2026-08-07 — 15.8% WR, -$53.50 (76 trades 7d). hemorrhaging.
+    'PCT_HERMES_PLUS_ENABLED',    # CEO 2026-08-07 — historical 100% WR, but combo signals bleeding (-$33.83 standalone)
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -706,7 +713,7 @@ VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
 HZSCORE_PLUS_ENABLED     = True   # hzscore+ — 31.3% WR, +13.92% PnL
-HZSCORE_MINUS_ENABLED    = True   # hzscore- — 0% WR, -$1.14 (mixed, keep enabled for now)
+HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-07 — 15.8% WR, -$53.50 (76 trades 7d). hemorrhaging.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
 HMACD_MINUS_ENABLED      = True   # hmacd_bare- and hmacd_mtf- SHORT — kill-switch for SHORT direction
@@ -816,7 +823,7 @@ MA_CROSS_MINUS_ENABLED    = True
 MA_CROSS_5M_ENABLED       = False
 MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blacklist
 MA_CROSS_5M_MINUS_ENABLED = False
-TL_BREAK_ENABLED         = True   # Re-enabled 2026-08-05. WR=41% (83 trades 7d), +$0.76. Best performer.
+TL_BREAK_ENABLED         = False  # CEO KILLED 2026-08-07 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
 ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
@@ -873,15 +880,13 @@ HMACD_MTF_MINUS_ENABLED       = True    # hmacd_mtf- SHORT
 RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES lowered to 30, RS_PROXIMITY_K raised to 4.0
 RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
 RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
-TL_BREAK_PLUS_ENABLED         = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer. Need LONG for confluence.
-TL_BREAK_MINUS_ENABLED        = True   # Re-enabled 2026-08-06. TL_BREAK_WR=41%, best performer.
+TL_BREAK_PLUS_ENABLED         = False  # CEO KILLED 2026-08-07 — master TL_BREAK killed
+TL_BREAK_MINUS_ENABLED        = False  # CEO KILLED 2026-08-07 — master TL_BREAK killed
 
 # ── Rotator Protection ──────────────────────────────────────────────────────
 # Signals in this list are NEVER auto-rotated by signal_rotator.py
 # Used for signals we explicitly upgraded/tuned — old cumulative data is stale
 ROTATOR_PROTECTED_FLAGS = [
-    'TL_BREAK_PLUS_ENABLED',    # upgraded 2026-08-06 — old WR stale
-    'TL_BREAK_MINUS_ENABLED',   # upgraded 2026-08-06 — old WR stale
     'BB_BOUNCE_ENABLED',        # confluence signal — 100% WR with hzscore+, standalone WR stale
 ]
 
@@ -1080,8 +1085,8 @@ MTP_ZSCORE_COOLDOWN_BARS   = 20     # was 5 — prevent signal spam
 # Fires when z-score CROSSES above threshold AND is rising (velocity > 0).
 # Designed to catch pump starts while avoiding noise from persistently elevated z.
 # Logic: prev_z < TH <= cur_z AND (cur_z - prev_z) > 0 → rising momentum onset
-ZSCORE_RISING_ENABLED     = True  # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
-ZSCORE_RISING_PLUS_ENABLED = True  # Re-enabled 2026-08-06 — 62.5% WR, +$2.17 (signal reporter)
+ZSCORE_RISING_ENABLED     = False  # CEO KILLED 2026-08-07 — 38.6% WR (44 trades 7d), -$1.37. No edge.
+ZSCORE_RISING_PLUS_ENABLED = False  # CEO KILLED 2026-08-07 — master ZSCORE_RISING killed
 ZSCORE_RISING_MINUS_ENABLED = False # Re-enabled 2026-08-05. WR=41% (17 trades 7d), +$0.03.
 ZSCORE_RISING_LOOKBACK     = 20     # bars for z-score computation
 ZSCORE_RISING_THRESHOLD    = 2.5    # z must cross this threshold

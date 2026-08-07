@@ -1,5 +1,50 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-07: Daily Orchestrator Report
+
+### Pipeline Status
+- **Portfolio**: 6 open | 79 closed today | **-4.70% PnL**
+- **Market regime**: 0 LONG / 0 SHORT / 104 NEUTRAL — no directional conviction
+- **Speed**: 42% tokens >= 50% (moderate)
+- **Hotset**: 1 token
+- **Blacklist**: 169 SHORT / 143 LONG
+- **Dead hours**: active (03-08 UTC)
+
+### CEO Report Analysis (Re-verification)
+Data source: `signals_hermes_runtime.db` → `signal_outcomes`, last 7 days.
+Criteria: 20+ trades AND negative total PnL.
+
+### Signal Kills Implemented
+
+| Signal | Trades (7d) | WR | PnL | Action |
+|--------|-------------|-----|-----|--------|
+| TL_BREAK (all) | 66 long + 39 short | 33.3% / 30.8% | -$1.33 / -$1.43 | **DISABLED + NEVER_REENABLE** |
+| ZSCORE_RISING (all) | 44 + 26 | 38.6% / 26.9% | -$1.37 / -$1.01 | **DISABLED + NEVER_REENABLE** |
+| HZSCORE_MINUS | 76 | 15.8% | -$53.50 | **DISABLED + NEVER_REENABLE** |
+| PCT_HERMES_PLUS | 64 | 14.1% | -$33.83 | **NEVER_REENABLE** (already False) |
+
+### What Was Already Dead (verified)
+- accel-300-vel+ → already in NEVER_REENABLE_FLAGS
+- inv-accel-300- → already in NEVER_REENABLE_FLAGS
+- vel-hermes- → already in NEVER_REENABLE_FLAGS
+
+### Remaining Active Signals (winners)
+- bb_bounce,hzscore+ LONG — 100% WR (3T), +1.27
+- ma100-cross,return_exhaustion_long — 66.7% WR (6T), +1.13
+- ma100-cross,vortex_break_long — 80% WR (5T), +0.82
+- hzscore+,return_exhaustion_long — 54.5% WR (11T), +0.88
+- vortex_break_short — 100% WR (2T), +0.89
+
+### Recommendations for CEO
+1. **Investigate phantom trade bug** — debug instrumentation deployed, awaiting production data
+2. **Monitor remaining active signals** — 5 winning combos, all LONG-dominant
+3. **Blacklist experiment complete** — 77 tokens tested, 0 KEEP. Stop rotating.
+
+### Files Changed
+- `scripts/hermes_constants.py`: Disabled 4 signals, added 7 to NEVER_REENABLE_FLAGS, removed 2 from ROTATOR_PROTECTED_FLAGS
+
+---
+
 ## 2026-08-06: Daily Orchestrator Report
 
 ### Pipeline Status
