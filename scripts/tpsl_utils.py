@@ -262,20 +262,6 @@ def compute_atr_sl_tp(
       LONG  → anchored to highest_price (peak). new_sl > current_sl → tighten.
       SHORT → anchored to lowest_price  (nadir). new_sl < current_sl → tighten.
 
-    # ── PHANTOM TRADE DEBUG (2026-08-07) ────────────────────────────────────────
-    # Comprehensive input trace for debugging tight-SL phantom trades.
-    # Fires for ALL tokens — this is a systemic bug, not token-specific.
-    _phantom_dbg = True  # Set False to disable after bug is found
-    if _phantom_dbg:
-        _sl_dist_pct = abs(current_sl - entry_price) / entry_price * 100 if current_sl > 0 and entry_price > 0 else 0
-        _too_tight = _sl_dist_pct < 0.15 and current_sl > 0  # SL < 0.15% from entry = suspicious
-        if _too_tight or token in ('LINK', 'OG', 'AAVE', 'ETH', 'BTC'):
-            print(f"  [TPSL-IN] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} "
-                  f"high={highest_price:.6f} low={lowest_price:.6f} pnl={pnl_pct:.4f} "
-                  f"sl={current_sl:.6f} tp={current_tp:.6f} sl_dist={_sl_dist_pct:.3f}% "
-                  f"{'⚠️ TIGHT' if _too_tight else ''} "
-                  f"k_override={flip_k_override} speed={speed_percentile:.1f} open_time={trade_open_time}")
-
     TP trailing (canonical — only tighten, never loosen):
       LONG  → anchored to highest_price. new_tp > current_tp → tighten.
       SHORT → anchored to lowest_price.  new_tp < current_tp → tighten.
@@ -301,6 +287,20 @@ def compute_atr_sl_tp(
     Caller (position_manager) writes new_sl/new_tp to DB via _persist_atr_levels.
     Caller applies the needs_sl/needs_tp flags to determine if write is needed.
     """
+    # ── PHANTOM TRADE DEBUG (2026-08-07) ────────────────────────────────────────
+    # Comprehensive input trace for debugging tight-SL phantom trades.
+    # Fires for ALL tokens — this is a systemic bug, not token-specific.
+    _phantom_dbg = True  # Set False to disable after bug is found
+    if _phantom_dbg:
+        _sl_dist_pct = abs(current_sl - entry_price) / entry_price * 100 if current_sl > 0 and entry_price > 0 else 0
+        _too_tight = _sl_dist_pct < 0.15 and current_sl > 0  # SL < 0.15% from entry = suspicious
+        if _too_tight or token in ('LINK', 'OG', 'AAVE', 'ETH', 'BTC'):
+            print(f"  [TPSL-IN] {token} {direction}: entry={entry_price:.6f} current={current_price:.6f} "
+                  f"high={highest_price:.6f} low={lowest_price:.6f} pnl={pnl_pct:.4f} "
+                  f"sl={current_sl:.6f} tp={current_tp:.6f} sl_dist={_sl_dist_pct:.3f}% "
+                  f"{'⚠️ TIGHT' if _too_tight else ''} "
+                  f"k_override={flip_k_override} speed={speed_percentile:.1f} open_time={trade_open_time}")
+
     # ── Resolve anchor price (peak/low for trailing) ───────────────────────────
     # FIX 2026-07-19: anchor the INITIAL SL to entry_price, not to highest/lowest.
     # Legacy code used highest_price/lowest_price as the anchor for the very first
@@ -364,9 +364,8 @@ def compute_atr_sl_tp(
             ref_price = float(entry_price)
     if _phantom_dbg and (token in ('LINK', 'OG', 'AAVE') or (current_sl > 0 and entry_price > 0 and abs(current_sl - entry_price) / entry_price < 0.0015)):
         print(f"  [TPSL-ANCHOR] {token} {direction}: ref_price={ref_price:.6f} "
-              f"is_initial_write={is_initial_write} _brand_new={_brand_new} "
-              f"is_new_trade={is_new_trade}")
-    elif direction == 'SHORT':
+              f"is_initial_write={is_initial_write} _brand_new={_brand_new}")
+    if direction == 'SHORT':
         if is_initial_write and entry_price > 0:
             ref_price = float(entry_price)
         elif lowest_price > 0:
