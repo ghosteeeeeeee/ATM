@@ -282,7 +282,7 @@ def scan_bb_bounce_signals(prices_dict):
             token=token,
             direction=direction,
             signal_type='bb_bounce',
-            source='bb_bounce',
+            source=f'bb_bounce{"+" if direction == "LONG" else "-"}',
             confidence=min(base_conf, 88),
             value=sig['middle'],
             price=price,

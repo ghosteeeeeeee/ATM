@@ -145,7 +145,7 @@ def detect_ma_100_signal(token: str, candles: list, price: float) -> dict:
         'direction': direction,
         'confidence': conf,
         'signal_type': 'ma_100_cross',
-        'source': 'ma100-cross',
+        'source': f'ma100-cross{"+" if direction == "LONG" else "-"}',
         'value': float(round(cross_distance / current_price * 100, 4)),
         'ma': current_ma,
         'atr': current_atr,

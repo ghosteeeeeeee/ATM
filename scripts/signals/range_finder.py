@@ -293,7 +293,7 @@ def scan_range_signals(prices_dict: dict) -> tuple:
             token=token_upper,
             direction=sig['direction'],
             signal_type='range_finder',
-            source='range_finder',
+            source=f'range_finder{"+" if sig["direction"] == "LONG" else "-"}',
             confidence=sig['confidence'],
             value=sig['range_width'],
             price=price,
