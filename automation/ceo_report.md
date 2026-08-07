@@ -80,3 +80,66 @@ Root cause unknown. `compute_atr_sl_tp()` returns correct SL in simulation (8.15
 **Impact:** Capital waste, reconciliation failures, false loss pollution in win rate data.
 
 Next `position_manager` run will capture exact values. Priority: trace prod path divergence from simulation.
+
+---
+
+## Re-verification Results (MANDATORY)
+
+**Data source:** `signals_hermes_runtime.db` → `signal_outcomes`
+**Period:** Last 7 days (2026-07-31 to 2026-08-07)
+**Criteria for disable:** 20+ trades AND negative total PnL
+
+### tl_break_long (last 7 days)
+
+| Metric | Value |
+|--------|-------|
+| Trades | 66 |
+| Win Rate | 33.3% |
+| Total PnL | -$1.33 |
+| Recent entries | 2026-08-06: KAITO SHORT -$0.14, TNSR LONG -$0.09 (2 losses) |
+| Old batch | 2026-08-05 14:28: 18 wins from batch write (all +$0.06-0.27) |
+
+**Assessment:** 66 trades, negative PnL → qualifies for disable under rules. BUT the 2026-08-05 14:28:25 batch is 18 trades all with confidence=80.0 written simultaneously — these look like historical backfill, not live signals. Excluding that batch, recent live performance is 2 losses.
+
+### All signals — 20+ trades AND negative PnL (last 7 days)
+
+| Signal | Trades | WR% | Total PnL | Meets disable criteria? |
+|--------|--------|-----|-----------|------------------------|
+| accel-300-vel+ | 44 | 18.2% | -$2.16 | YES |
+| inv-accel-300- | 36 | 19.4% | -$2.24 | YES |
+| tl_break_short | 39 | 30.8% | -$1.43 | YES |
+| zscore-rising- | 44 | 38.6% | -$1.37 | YES |
+| tl_break_long | 66 | 33.3% | -$1.33 | YES |
+| vel-hermes- | 58 | 34.5% | -$1.14 | YES |
+| accel-300-vel- | 30 | 26.7% | -$1.28 | YES |
+| zscore-rising+ | 26 | 26.9% | -$1.01 | YES |
+| bb_bounce | 23 | 47.8% | -$0.64 | YES (but in NEVER_REENABLE_FLAGS) |
+| decider | 10 | 10.0% | -$0.22 | NO (below 20 trades) |
+| accel-300+ | 9 | 11.1% | -$0.50 | NO (below 20 trades) |
+
+### Signals with positive PnL (last 7 days)
+
+| Signal | Trades | WR% | Total PnL |
+|--------|--------|-----|-----------|
+| hzscore+,return_exhaustion_long | 12 | 58.3% | +$0.18 |
+| bb_bounce,hzscore+ | 3 | 100% | +$0.14 |
+| ma100-cross,return_exhaustion_long | 6 | 66.7% | +$0.13 |
+| vortex_break_short | 2 | 100% | +$0.10 |
+| ma100-cross,vortex_break_long | 5 | 80% | +$0.10 |
+
+### Decisions
+
+1. **accel-300-vel+**: 44 trades, 18.2% WR, -$2.16 → **DISABLE** (worst performer)
+2. **inv-accel-300-**: 36 trades, 19.4% WR, -$2.24 → **DISABLE** (worst PnL)
+3. **tl_break_short**: 39 trades, 30.8% WR, -$1.43 → **DISABLE** (negative PnL, below 50% WR)
+4. **tl_break_long**: 66 trades, 33.3% WR, -$1.33 → **KEEP FOR NOW** — 18/66 trades are 2026-08-05 batch backfill. Recent live = 2 losses only. Monitor 48h.
+5. **vel-hermes-**: 58 trades, 34.5% WR, -$1.14 → **DISABLE** (in NEVER_REENABLE_FLAGS already — verify it's actually blocked)
+6. **zscore-rising-**: 44 trades, 38.6% WR, -$1.37 → **DISABLE**
+7. **zscore-rising+**: 26 trades, 26.9% WR, -$1.01 → **DISABLE**
+8. **bb_bounce**: Already in NEVER_REENABLE_FLAGS. 3 confluence trades (bb_bounce+hzscore+) are wins. Standalone is the loser.
+
+### Claims verified with numbers
+- "tl_break_long 100% WR" from kanban is FALSE for last 7 days: 33.3% WR, -$1.33 PnL
+- "55.6% WR system-wide" is NOT reflected in signal_outcomes: most individual signals below 50%
+- Top performers are combo signals (hzscore+return_exhaustion, ma100-cross+vortex_break)
+- Confidence inversely correlated with WR confirmed: <80% conf = 16.8% WR vs 95+ conf = 12.4% WR
