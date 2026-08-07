@@ -830,7 +830,7 @@ GUPPY_MINUS_ENABLED            = False   # guppy- SHORT
 HH_HL_ENABLED            = False   # HH/HL breakout + pullback structure
 HH_HL_PLUS_ENABLED            = True    # hh_hl+ LONG (breakout/pullback)
 HH_HL_MINUS_ENABLED           = True    # hh_hl- SHORT (breakout/pullback)
-HH_HL_CHOCH_ENABLED           = False   # CHoCH reversal signals (separate from breakout/pullback)
+HH_HL_CHOCH_ENABLED           = True    # CHoCH reversal signals (separate from breakout/pullback)
 HH_HL_CHOCH_PLUS_ENABLED      = True    # choch+ bullish flip (LH_LL→HH_HL)
 HH_HL_CHOCH_MINUS_ENABLED     = True    # choch- bearish flip (HH_HL→LH_LL)
 MA300_CANDLE_ENABLED     = False
@@ -1233,7 +1233,7 @@ VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for pap
 RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = True   # return_exhaustion- SHORT (extreme positive)
-RETURN_EXHAUSTION_MIN_CONFIDENCE = 70  # 2026-08-05 — lowered from 80 (TNSR p=3.4 conf=74, ARB p=98.1 conf=77 both blocked)
+RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data: <90 conf = 37.5% WR, 90+ = 72% WR
 
 # ── 100MA Cross Signal ─────────────────────────────────────────────────────
 # ma_100_cross.py — Trend reversal at 100-period moving average
