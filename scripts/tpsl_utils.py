@@ -535,10 +535,11 @@ def compute_atr_sl_tp(
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                new_sl = max(trail_ceil, min_from_entry)
-                # FIX: SL must never be below entry for SHORT — when lowest_price spikes
-                # far below entry, trail_ceil can go below entry, causing instant stop-out.
-                if new_sl <= entry_f:
+                # For SHORT, tighter SL = lower (closer to price). Use min, not max.
+                new_sl = min(trail_ceil, min_from_entry)
+                # FIX: SL must never be below current_price for SHORT — when lowest_price
+                # spikes far below entry, trail_ceil can go below current, causing instant stop-out.
+                if new_sl < current_price:
                     new_sl = min_from_entry
                 # NOTE: No one-way gate here — the trailing gate handles one-way + correction.
             else:
@@ -744,9 +745,10 @@ def compute_atr_sl_tp(
             if in_profit:
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                new_sl = max(trail_ceil, min_from_entry)
-                # FIX: SL must never be below entry for SHORT (same as pre-gate)
-                if new_sl <= entry_f:
+                # For SHORT, tighter SL = lower. Use min, not max.
+                new_sl = min(trail_ceil, min_from_entry)
+                # FIX: SL must never be below current_price for SHORT (same as pre-gate)
+                if new_sl < current_price:
                     new_sl = min_from_entry
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
