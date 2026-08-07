@@ -80,16 +80,16 @@ def _get_closes(token: str, table: str, limit: int) -> list:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
         c.execute(f"""
-            SELECT close FROM (
-                SELECT close FROM {table}
-                WHERE token = ?
-                ORDER BY ts DESC
-                LIMIT ?
-            ) sub
-            ORDER BY ts ASC
+            SELECT close FROM {table}
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT ?
         """, (token.upper(), limit))
         rows = c.fetchall()
-        return [r[0] for r in rows] if rows else []
+        if not rows:
+            return []
+        # Reverse to get oldest-first (matching original intent)
+        return [r[0] for r in reversed(rows)]
     except Exception:
         return []
     finally:
@@ -178,9 +178,10 @@ def detect_leaderboard_signals() -> list:
         if not closes_1h or len(closes_1h) < lb_1h + 1:
             continue
 
-        # Staleness check — skip if latest 1h candle is > 15 min old
+        # Staleness check — skip if latest 1h candle is > 90 min old
+        # (1h candles naturally update hourly; 15min threshold was too strict)
         latest_ts = _get_candle_ts(token, 'candles_1h')
-        if latest_ts and (time.time() - latest_ts) > 900:
+        if latest_ts and (time.time() - latest_ts) > 5400:
             continue
 
         # Compute returns
