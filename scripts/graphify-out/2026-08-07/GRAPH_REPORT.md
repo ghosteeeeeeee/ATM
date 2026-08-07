@@ -1,36 +1,36 @@
-# Graph Report - scripts  (2026-08-07)
+# Graph Report - scripts  (2026-08-06)
 
 ## Corpus Check
-- 282 files · ~462,431 words
+- 278 files · ~454,300 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4455 nodes · 8782 edges · 247 communities (241 shown, 6 thin omitted)
+- 4395 nodes · 8650 edges · 256 communities (228 shown, 28 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 99 edges (avg confidence: 0.57)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `159c43c6`
+- Built from commit: `0ab91381`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- sync
-- signal_gen.py
-- phase_accel.py
+- hl-sync-guardian.py
+- add_signal
+- get_momentum_stats
 - hyperliquid_exchange.py
 - signal_schema.py
 - decider_run.py
 - __init__.py
 - self_close_watcher.py
-- main_loop
+- candle_predictor.py
 - atr_compression.py
 - log
 - mtf_macd_tuner.py
 - hh_hl.py
 - smoke_test.py
 - pump_hunter.py
-- get_db
+- hl_fill_monitor.py
 - wyckoff.py
 - signal_analyst.py
 - guppy.py
@@ -38,13 +38,13 @@
 - brain.py
 - paths.py
 - HebbianEngine
-- mark_signal_executed
+- _get_conn
 - position_manager.py
 - guppy_signals.py
 - zscore_momentum.py
 - run_guppy_signals.py
 - backtest_mtf_macd.py
-- cut_loser.py
+- close_position
 - mtf_macd_backtest.py
 - signal_compactor.py
 - rs.py
@@ -57,20 +57,20 @@
 - breakout_engine.py
 - signals/ma_cross_5m.py
 - ma_cross_5m.py
-- inverse_accel_300.py
+- get_cooldown
 - hermes-trades-api.py
 - oc_signal_importer.py
 - ab_optimizer.py
 - signal_quality_tracker.py
 - run
 - blacklist_tester.py
-- mirror_open
+- price_collector.py
 - rs_signals.py
 - signal_researcher.py
 - wasp.py
-- macd_accel_signals.py
+- backtest_hwave_bonus_thresholds.py
 - init_db
-- ema20_50_signals.py
+- backtest_ema20_50
 - hl_leaderboard.py
 - tl_break.py
 - sync_open_trades.py
@@ -79,7 +79,7 @@
 - checkpoint_utils.py
 - hl_wallet_discovery.py
 - strategy_optimizer.py
-- ema20_50.py
+- audit_logger.py
 - backtest_hh_hl.py
 - context-compactor.py
 - scrape_all_sources
@@ -87,37 +87,37 @@
 - signal_importer.py
 - 15m_regime_scanner.py
 - log_error
-- gap300_signals.py
+- backtest_gap300.py
 - bug_hunter.py
 - candle_db.py
-- gap_300.py
+- scan_gap300_state
 - backtest_breakout.py
 - backtest_tl_break.py
-- ema9_sma20_signals.py
-- compute_mtf_macd_alignment
+- detect_ema9_sma20_cross
+- counter_flip.py
 - profit_monster.py
 - signal_lifecycle.py
-- get_trade_history
+- get_realized_pnl
 - candle_tuner.py
 - log_event
 - hh_hl_signals.py
-- run_ma_cross_signals.py
+- record_cooldown_start
 - ab_learner.py
 - vortex_break.py
 - top150.py
 - signal_auditor.py
 - signal_quality_autotuner.py
 - signal_rotator.py
-- get_db_connection
+- fast_momentum.py
 - away_detector.py
-- momentum_leaderboard.py
+- cascade_flip_helpers.py
 - error_analyzer.py
 - hebbian_learner.py
 - Plan: Fix the Penalty System That Inverts Signal Quality
-- compute_macd_state
+- macd_rules.py
 - kanban_api.py
 - evaluate_macd_rules
-- ema9_sma20.py
+- detect_ema9_sma20_cross
 - ema_angle.py
 - sync_kanban_tasks.py
 - trading-checklist.py
@@ -125,11 +125,11 @@
 - param_auto_tuner.py
 - pipeline_watchdog.py
 - is_solana_only
-- refresh_current_prices
+- bollinger_squeeze.py
 - run_backtest
 - backtest_rs_tiers.py
 - rule_based_context_gate
-- ai_decide_batch
+- mtf_macd.py
 - macd_accel.py
 - atr_compression_signals.py
 - hermes-dashboard.py
@@ -149,35 +149,35 @@
 - fetch_binance_candles.py
 - hebbian_seed_sessions.py
 - hermes-brain-sync.py
-- main
+- hl_copy_tui.py
 - ma_cross.py
-- add_signal
+- r2_rev.py
 - backtest_bb_bounce_v2.py
 - backtest_ma300_candle_confirm.py
-- _secrets.py
-- macd_rules.py
+- run_pipeline.py
+- compute_mtf_macd_alignment
 - error_breadcrumbs.py
 - hyperliquid-trader.py
-- get_token_data_for_prediction
+- r2_rev_5m_signals.py
 - study_winning_combos.py
 - get_ab_params
 - archive-trades.py
 - backtest_candle.py
 - binance_volume_collector.py
 - daily_git_commit.py
-- price_collector.py
+- _seed_universe_candles
 - fetch_hl_volume.py
 - scan_for_signals
 - zscore_pump.py
 - backtest_combined_momentum_mean_reversion.py
 - backtest_zscore_pump_full.py
-- hl_signal_notifier.py
+- get_db
 - exhaustion.py
-- backfill_trade_indicators.py
+- _secrets.py
 - backtest_mtp_zscore.py
 - backtest_threshold
 - process_delayed_entries
-- FileLock
+- .learn_pair
 - rebuild_ab_results.py
 - rsi_backtest.py
 - signal_decay_detector.py
@@ -188,25 +188,25 @@
 - backfill_prices.py
 - backtest_minimax.py
 - backtest_momentum_cross
-- context_gate
+- graceful_close.py
 - grid_backtest.py
-- hype-sync.py
+- _close_trade_impl
 - monte_carlo_gate
-- is_position_open
+- gap300_5m_signals.py
 - volume_alert.py
 - get_directional_vol
 - evaluate_trade_1m
-- backtest_ma100_cross.py
+- detect_ma_100_signal
 - abandoned_trade_root_cause.py
 - simulate_accel_300_signal.py
 - backfill_candle_files.py
 - check_new_trades.py
 - dashboard.sh
 - hermes_ab_utils.py
-- hl-sync-guardian.py
+- _acquire_lock_with_heartbeat
 - backtest
 - Ollama Model Benchmarks
-- macd_1m.py
+- get_trade_history
 - backtest_mtp_zscore_full.py
 - trim_candle_files.py
 - update-git.py
@@ -218,53 +218,60 @@
 - get_ab_variant
 - scan
 - trend_purity_signals.py
-- range_finder.py
-- close_position
+- volume_hl_signals.py
+- main
 - _call_minimax
 - backtest
 - backtest_fast
 - sweep_r2_5m.py
 - start-litellm.sh
-- ma_100_bounce.py
+- detect_ma_100_signal
 - audit_dependencies.py
-- _hl_info
-- run_better_coder.py
-- r2_trend.py
-- run_rs_signals.py
-- _clear_reconciled_token
-- mtp_zscore.py
+- get_embedding
+- store_thought
+- .recall
+- detect_macd_accel
+- archive-signals.py
+- _aggregate_5m.py
 - get_fast_group_direction
 - _fetch_trades_sync
-- squeeze_cross.py
-- get_category_multipliers
-- candle_predictor.py
-- pnl_utils.py
-- record_cooldown_start
-- _add_to_kill_switch
-- _dr_atr
-- add_to_watch_list
-- _warmup_volume_cache
-- session_lock.py
-- decide_inversion
-- detect_ma_fast_cross
-- is_sol_token
-- get_max_leverage
+- run_checks
+- check_ceo_timer
+- check_hl_sync_active
+- check_kill_switches_working
+- check_new_signals_generating
+- check_no_flapping
+- check_obs_metrics_fresh
+- check_openmemory_accessible
+- check_pattern_scanner_sources
+- check_pipeline_log_errors
+- check_pipeline_step_timings
+- check_price_data_fresh
+- check_profit_monster_fires
+- check_pump_hunter_log
+- check_pump_hunter_positions
+- check_signal_db
+- check_signal_decay_detector
+- check_signal_win_rate
+- check_token_speed_tracker
+- check_trade_frequency
+- check_trading_timers
+- check_trailing_stops_exists
+- _fix_stale_locks
 
 ## God Nodes (most connected - your core abstractions)
-1. `log()` - 267 edges
-2. `add_signal()` - 160 edges
-3. `get_all_latest_prices()` - 97 edges
-4. `price_age_minutes()` - 79 edges
-5. `get_open_positions()` - 65 edges
-6. `init_db()` - 61 edges
-7. `FileLock` - 60 edges
+1. `log()` - 266 edges
+2. `add_signal()` - 154 edges
+3. `get_all_latest_prices()` - 95 edges
+4. `price_age_minutes()` - 77 edges
+5. `get_open_positions()` - 63 edges
+6. `FileLock` - 60 edges
+7. `init_db()` - 59 edges
 8. `recent_trade_exists()` - 47 edges
 9. `run()` - 47 edges
 10. `is_delisted()` - 44 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `get_realized_pnl()` --calls--> `wavg_price()`  [INFERRED]
-  hyperliquid_exchange.py → backfill_orphan_hl_prices.py
 - `_wait_for_hl_close()` --indirect_call--> `_wait_for_position_closed()`  [INFERRED]
   cascade_flip.py → hl-sync-guardian.py
 - `cascade_flip()` --indirect_call--> `_clear_reconciled_token()`  [INFERRED]
@@ -273,75 +280,73 @@
   decider_run.py → hebbian_engine.py
 - `SetupStats` --uses--> `FileLock`  [INFERRED]
   decider_run.py → hermes_file_lock.py
+- `SetupStats` --uses--> `SpeedTracker`  [INFERRED]
+  decider_run.py → speed_tracker.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (247 total, 6 thin omitted)
+## Communities (256 total, 28 thin omitted)
 
-### Community 0 - "sync"
-Cohesion: 0.08
-Nodes (34): add_orphan_trade(), close_orphan_paper_trades(), _close_paper_trade_db(), close_position_hl(), get_copied_trades(), get_db_open_trades(), _get_fills_cached(), _hl_has_position() (+26 more)
-
-### Community 1 - "signal_gen.py"
+### Community 0 - "hl-sync-guardian.py"
 Cohesion: 0.03
-Nodes (144): detect_accel_300(), _ema_series(), _get_1m_prices(), _log(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Write to both stdout and signals.log., Detect persistent gap above EMA(300) with growing gap. Fire when ALL of these…, Scan tokens for accel_300 signals. All guards (blacklists, open positions,… (+136 more)
+Nodes (134): FileLock, Exclusive flock context manager with retry. Args: lockname: Base name for…, add_orphan_trade(), _add_to_kill_switch(), _check_and_close_breached_trades(), _check_and_execute_flip(), _check_hard_stops(), _check_stale_rotation() (+126 more)
 
-### Community 2 - "phase_accel.py"
-Cohesion: 0.22
-Nodes (12): _detect_phase(), _get_direction(), _is_downward_transition(), _is_upward_transition(), Returns True if this is an upward (bullish) phase transition. Valid upward…, Returns True if this is a downward (bearish) phase transition. Catches…, Scan tokens for phase-acceleration signals. Tracks prev_phase in-memory per…, Seed _PHASE_TRACKER from momentum_cache on first run. Uses phase from DB as… (+4 more)
+### Community 1 - "add_signal"
+Cohesion: 0.03
+Nodes (148): detect_accel_300(), _ema_series(), _get_1m_prices(), _log(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Write to both stdout and signals.log., Detect persistent gap above EMA(300) with growing gap. Fire when ALL of these…, Scan tokens for accel_300 signals. All guards (blacklists, open positions,… (+140 more)
+
+### Community 2 - "get_momentum_stats"
+Cohesion: 0.06
+Nodes (50): get_opposite_direction_cooldown_hours(), Return hours remaining on the OPPOSITE direction's cooldown. Used by scanner to…, compute_regime(), compute_score(), compute_zscore_percentile(), detect_spike(), ema(), get_momentum_stats() (+42 more)
 
 ### Community 3 - "hyperliquid_exchange.py"
-Cohesion: 0.06
-Nodes (59): close_hl(), fix_and_close_db(), Market close on Hyperliquid. Returns True on success., Fix entry_price if needed, mark closed in DB. Returns trade info., ts(), _place_or_replace_tp(), Place a new TP order if none exists, or replace the existing TP order. Returns…, cancel_bulk_orders() (+51 more)
+Cohesion: 0.03
+Nodes (114): _place_or_replace_tp(), Place a new TP order if none exists, or replace the existing TP order. Returns…, close_brain_trade(), get_brain_positions(), get_brain_trade_by_token(), get_hot_tokens(), get_hype_positions(), get_recent_signal_tokens() (+106 more)
 
 ### Community 4 - "signal_schema.py"
 Cohesion: 0.03
-Nodes (119): _ema(), Compute EMA(period) from a list of prices (oldest first). Returns the most…, _ema(), Compute EMA(period) from a list of prices (oldest first). Returns the most…, cleanup_stale_approved(), clear_cooldown_entry(), compute_all_indicators(), compute_macd() (+111 more)
+Nodes (99): compute_all_indicators(), compute_macd(), compute_rsi(), compute_zscore(), _db_cursor(), _enrich_indicators(), get_all_latest_prices(), get_latest_price() (+91 more)
 
 ### Community 5 - "decider_run.py"
-Cohesion: 0.11
-Nodes (26): _check_counter_trend_trap(), _check_hotset_cooldown(), _get_hotset_approval_rate(), _get_hotset_last_updated(), _get_token_zscore(), _increment_hotset_approval_rate(), _load_hotset_failures(), Return (count, window_start_ts). Resets if window expired (>60s). (+18 more)
+Cohesion: 0.06
+Nodes (41): _check_counter_trend_trap(), _check_hotset_cooldown(), context_gate(), _ctx_load_cache(), _ctx_save_cache(), _get_hotset_approval_rate(), _get_hotset_last_updated(), _get_token_zscore() (+33 more)
 
 ### Community 6 - "__init__.py"
-Cohesion: 0.05
-Nodes (53): # NOTE: momentum+/momentum- had NO Layer 2 kill-switch in signal_schema.py…, # NOTE: 'vel-hermes' bare sentinel removed — vel-hermes+/vel-hermes- now…, # NOTE: hzscore+,hzscore- merge artifacts are now IMPOSSIBLE because, # NOTE: do NOT use this for PnL calculations — use, # NOTE: signals/rs.py had hardcoded values that diverged from this file., # NOTE: price_history is close-only (open=high=low=close per row), so swing, # NOTE: Lines 373-384 removed 2026-05-06 — were duplicate with inconsistent…, # NOTE: inv-accel-300- is DISABLED (INVERSE_ACCEL_300_MINUS_ENABLED=False ) but… (+45 more)
+Cohesion: 0.06
+Nodes (41): # NOTE: 'vel-hermes' bare sentinel removed — vel-hermes+/vel-hermes- now…, # NOTE: hzscore+,hzscore- merge artifacts are now IMPOSSIBLE because, # NOTE: do NOT use this for PnL calculations — use, # NOTE: signals/rs.py had hardcoded values that diverged from this file., # NOTE: price_history is close-only (open=high=low=close per row), so swing, # NOTE: Lines 373-384 removed 2026-05-06 — were duplicate with inconsistent…, # NOTE: inv-accel-300- is DISABLED (INVERSE_ACCEL_300_MINUS_ENABLED=False ) but…, # NOTE: momentum+/momentum- had NO Layer 2 kill-switch in signal_schema.py… (+33 more)
 
 ### Community 7 - "self_close_watcher.py"
-Cohesion: 0.08
-Nodes (41): get_allMids(), Return allMids dict — PRIMARY SOURCE is hl_cache.json (written by…, check_and_close(), db_connect(), ensure_table(), get_all_self_close(), guarded_close_position(), mark_triggered() (+33 more)
+Cohesion: 0.06
+Nodes (52): cache_age(), cache_fresh(), get_atr(), ATR cache — persistent file + in-memory ATR cache with 300s TTL. Survives…, Return seconds since cache was written, or 999 if no cache., True if cache exists and is within TTL., Read ATR cache from disk. Returns {token: {atr, ts}} or empty dict., Write ATR cache to disk atomically under file lock. (+44 more)
 
-### Community 8 - "main_loop"
-Cohesion: 0.11
-Nodes (18): build_prediction_prompt(), init_predictions_db(), main_loop(), minimax_check(), parse_prediction(), query_llm(), Second-opinion check via Minimax API. Returns {'agree': bool,…, Build Ollama prompt — pure text categories, no numeric values. Research… (+10 more)
+### Community 8 - "candle_predictor.py"
+Cohesion: 0.05
+Nodes (60): acquire_lock(), add_to_watch_list(), build_ohlcv(), build_prediction_prompt(), compute_macd_ohlc(), compute_mtf_macd(), compute_rsi_ohlc(), decide_inversion() (+52 more)
 
 ### Community 9 - "atr_compression.py"
 Cohesion: 0.21
 Nodes (13): _compute_atr(), detect_atr_compression_signal(), _get_candles_5m(), _get_last_state(), Read current compression state from runtime DB cache table., Persist compression state to runtime DB., State-machine ATR compression + breakout detector on 5m candles. States:…, Entry point for signals_runner. Returns count of signals emitted. If… (+5 more)
 
 ### Community 10 - "log"
-Cohesion: 0.08
-Nodes (43): close_brain(), close_paper(), get_exit_price(), main(), Get the most recent fill price for a coin from HL trade history. NOTE:…, Remove coin from paper open, append to closed with reason=manual_close., Close the open brain trade for coin with reason=manual_close., Record loss cooldown based on PnL. Wins do NOT trigger cooldown. (+35 more)
+Cohesion: 0.04
+Nodes (73): _get_signal_streak(), Get cached signal streak, refreshed every 5 minutes (per-key TTL)., Record outcome when a trade closes. Updates both the JSON file (legacy) and the…, record_ab_trade_closed(), close_brain(), close_paper(), get_exit_price(), main() (+65 more)
 
 ### Community 11 - "mtf_macd_tuner.py"
 Cohesion: 0.07
 Nodes (54): build_15m_candles_from_1h(), _cached_request(), compute_macd(), ema(), _fast_backtest(), fetch_15m_klines(), fetch_1h_klines(), fetch_4h_klines() (+46 more)
 
 ### Community 12 - "hh_hl.py"
-Cohesion: 0.14
-Nodes (23): _classify_structure(), _compute_atr(), _detect_breakout(), _detect_choch(), _detect_pullback(), _find_swing_highs_lows(), _get_candles_from_ohlcv_1m(), _get_candles_from_price_history() (+15 more)
-
-### Community 13 - "smoke_test.py"
-Cohesion: 0.04
-Nodes (48): check_ceo_timer(), check_hebbian_network(), check_hl_sync_active(), check_kill_switches_working(), check_new_signals_generating(), check_no_flapping(), check_obs_metrics_fresh(), check_openmemory_accessible() (+40 more)
+Cohesion: 0.17
+Nodes (18): _classify_structure(), _compute_atr(), _detect_breakout(), _detect_pullback(), _find_swing_highs_lows(), _get_candles_from_ohlcv_1m(), _get_candles_from_price_history(), Classify current swing structure at the most recent candle. Args: highs: sorted… (+10 more)
 
 ### Community 14 - "pump_hunter.py"
 Cohesion: 0.07
-Nodes (53): mirror_close(), Close a real Hyperliquid position mirroring a paper close. BLOCKED if live…, add_pump_position(), _cancel_brain_record(), check_pump_exits(), close_all(), _close_brain_record(), _create_brain_record() (+45 more)
+Nodes (51): add_pump_position(), _cancel_brain_record(), check_pump_exits(), close_all(), _close_brain_record(), _create_brain_record(), detect_vol_explosion(), execute_pump_trade() (+43 more)
 
-### Community 15 - "get_db"
-Cohesion: 0.08
-Nodes (46): get_db(), init_db(), Get database connection with WAL mode., Create all tables if they don't exist., Main function: detect pro trades and generate pipeline signals., run_hl_copy_signal(), generate_report(), main() (+38 more)
+### Community 15 - "hl_fill_monitor.py"
+Cohesion: 0.14
+Nodes (20): detect_new_trades(), get_active_traders(), get_fills_since(), get_trader_positions(), _hl_info(), load_last_fills(), log_fills_batch(), monitor_once() (+12 more)
 
 ### Community 16 - "wyckoff.py"
 Cohesion: 0.07
@@ -360,32 +365,32 @@ Cohesion: 0.09
 Nodes (40): load_prices(), Load 1m close prices for a token, oldest first. Last N days only., Run backtest across all tokens and flag types., run_backtest(), _atr_1m(), _atr_from_closes(), detect_ascending_triangle(), detect_bear_flag() (+32 more)
 
 ### Community 20 - "brain.py"
-Cohesion: 0.06
-Nodes (54): atr_check(), atr_sl_hit(), atr_tp_hit(), _base(), guardian_cycle(), log_event(), loss_cooldown_set(), _now() (+46 more)
+Cohesion: 0.15
+Nodes (20): trade_open_attempt(), trade_open_failed(), trade_open_success(), add_tag(), add_trade(), get_db_connection(), get_related_thoughts(), get_stats() (+12 more)
 
 ### Community 21 - "paths.py"
-Cohesion: 0.05
-Nodes (22): migrate_is_closed(), Add is_closed=1 to all existing candles_1m rows that lack the column., migrate_is_closed(), Add is_closed=1 to all existing candles_5m rows that lack the column., archive_month(), Write rows to a gzipped JSONL file for the given year/month., run_archive(), backfill_tf() (+14 more)
+Cohesion: 0.07
+Nodes (17): migrate_is_closed(), Add is_closed=1 to all existing candles_1m rows that lack the column., backfill_tf(), main(), Backfill all historical closed windows for one timeframe. Chunks the backfill…, Database configuration for Hermes trading system. Single source of truth for…, main(), Run live trading via decider_run.py with --live flag (+9 more)
 
 ### Community 22 - "HebbianEngine"
-Cohesion: 0.07
-Nodes (20): main(), HebbianEngine, main(), Ensure consistent ordering for symmetric storage., Record that concept_a and concept_b fired together. Increments synapse weight.…, Learn all pairs from a set of concepts that fired together. Creates C(n,2)…, Decrement synapse weight between two concepts (loss learning). Creates the…, Hebbian write-back from a closed trade. Won (pnl_pct > 0) → strengthen all… (+12 more)
+Cohesion: 0.14
+Nodes (8): main(), HebbianEngine, Create schema if not exists., Add or update a session summary row. Returns row id. Fix 4 (2026-06-24):…, Find sessions that touched this file. Strips .py suffix and matches against…, Find sessions that discussed this coin ticker., Find sessions by discussion_type or summary text match., Dangerous: wipe all data.
 
-### Community 23 - "mark_signal_executed"
-Cohesion: 0.50
-Nodes (4): mark_signal_executed(), BUG-26 fix: Added optional signal_id parameter for atomic claim. When signal_id…, Mark a signal as processed (executed or skipped). BUG-FIX: Added optional…, update_signal_decision()
+### Community 23 - "_get_conn"
+Cohesion: 0.09
+Nodes (36): clear_hotset(), count_signals(), main(), purge_signals(), run_ai_decider(), cleanup_stale_approved(), clear_cooldown_entry(), get_approved_signals() (+28 more)
 
 ### Community 24 - "position_manager.py"
-Cohesion: 0.04
-Nodes (83): Log an A/B test outcome to W&B (offline) for visual comparison. Also appends a…, record_ab_outcome(), cancel_all_open_orders(), Cancel ALL open orders (trigger AND non-trigger) for a coin in ONE API call.…, compute_live_pnl(), Compute live (unrealized) pnl_pct from entry and current price. Direction-…, adjust_stop_loss(), _analyze_loss_direction() (+75 more)
+Cohesion: 0.03
+Nodes (123): main(), READ-ONLY hot-set enforcer (defunct approval logic — signal_compactor.py is the…, _run_hot_set(), Direction, force_atr_update(), Log an A/B test outcome to W&B (offline) for visual comparison. Also appends a…, record_ab_outcome(), get_open_hype_positions() (+115 more)
 
 ### Community 25 - "guppy_signals.py"
 Cohesion: 0.10
 Nodes (33): _compute_confidence(), compute_ema(), _compute_ema_mid_history(), compute_group_emas(), detect_cross(), detect_cross_with_setup(), detect_expansion(), detect_guppy_exit() (+25 more)
 
 ### Community 26 - "zscore_momentum.py"
-Cohesion: 0.07
-Nodes (33): _backtest_params(), clear_cache(), compute_zscore(), _fast_zscore(), _get_1m_atr(), get_all_token_prices(), get_all_token_prices_full(), _get_latest_prices() (+25 more)
+Cohesion: 0.08
+Nodes (37): _backtest_params(), clear_cache(), compute_zscore(), _fast_zscore(), _get_1m_atr(), get_all_token_prices(), get_all_token_prices_full(), _get_latest_prices() (+29 more)
 
 ### Community 27 - "run_guppy_signals.py"
 Cohesion: 0.10
@@ -395,33 +400,33 @@ Nodes (33): add_position(), check_exits(), close_all_positions(), _close_brain_r
 Cohesion: 0.09
 Nodes (24): backtest_token(), evaluate_entry_at(), evaluate_exit_at(), fetch_binance_backward(), fetch_token_candles(), IncrementalMACD, load_local_candles(), MultiTimeFrameMACD (+16 more)
 
-### Community 29 - "cut_loser.py"
-Cohesion: 0.26
-Nodes (12): close_position(), filter_losing_positions(), get_last_run_ts(), get_losing_positions(), load_config(), Return True if enough minutes have passed since last_run_ts., Return list of dicts for open positions with pnl_pct < 0., Compute live pnl_pct from entry_price vs current_price and filter to loss range. (+4 more)
+### Community 29 - "close_position"
+Cohesion: 0.14
+Nodes (21): close_position(), filter_losing_positions(), get_last_run_ts(), get_losing_positions(), load_config(), Return True if enough minutes have passed since last_run_ts., Return list of dicts for open positions with pnl_pct < 0., Compute live pnl_pct from entry_price vs current_price and filter to loss range. (+13 more)
 
 ### Community 30 - "mtf_macd_backtest.py"
 Cohesion: 0.11
 Nodes (32): analyze(), build_filter_grid(), check_exit(), check_exit_4h_regime(), check_exit_any_flip(), check_exit_both_4h1h(), check_exit_histogram_flip(), compute_macd_state() (+24 more)
 
 ### Community 31 - "signal_compactor.py"
-Cohesion: 0.10
-Nodes (29): _do_purge(), _enrich_and_write_signals(), _filter_safe_prev_hotset(), _get_open_tokens(), _get_opposing_penalty(), get_regime_1m(), _get_source_weight(), _get_token_wr() (+21 more)
+Cohesion: 0.12
+Nodes (21): _do_purge(), _enrich_and_write_signals(), _get_opposing_penalty(), get_regime_1m(), _get_source_weight(), _get_token_wr(), _purge_executed_signals(), Get 1m regime from linear regression of last 50 1m candles. Returns… (+13 more)
 
 ### Community 32 - "rs.py"
-Cohesion: 0.06
-Nodes (49): detect_accel_300(), detect_breakout(), detect_velocity_ignition(), _ema_series(), _get_1m_prices(), _log(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Detect acceleration at the newest 1-minute price_history point. LONG requires… (+41 more)
+Cohesion: 0.09
+Nodes (33): _atr(), _atr_pct(), _bounce_confirmation(), _build_level_touches(), _cluster_levels(), _compute_confidence(), detect_rs_signal(), _find_swing_highs_lows() (+25 more)
 
 ### Community 33 - "unified_scanner.py"
-Cohesion: 0.11
-Nodes (28): get_pending_signals(), Get PENDING signals, sorted LIFO + confidence. NOTE: This function is used by…, add_all_signals(), get_cached_indicators(), get_cached_prices(), get_fear(), get_gateio_rsi(), get_gateio_signals() (+20 more)
+Cohesion: 0.09
+Nodes (34): get_meta(), Return meta dict — PRIMARY SOURCE is hl_cache.json (written by…, add_all_signals(), get_cached_indicators(), get_cached_prices(), get_fear(), get_gateio_rsi(), get_gateio_signals() (+26 more)
 
 ### Community 34 - "SpeedTracker"
 Cohesion: 0.09
-Nodes (19): _get_speed_tracker(), get_all_speeds(), get_fastest_tokens(), get_tracker(), _now_ts(), speed_tracker.py — Token speed, velocity, acceleration, and momentum…, Fetch current prices + recent 5m candle history from local DB, compute all…, Returns full dict of token → speed data (from last update). (+11 more)
+Nodes (18): _get_speed_tracker(), get_all_speeds(), get_fastest_tokens(), get_tracker(), _now_ts(), speed_tracker.py — Token speed, velocity, acceleration, and momentum…, Fetch current prices + recent 5m candle history from local DB, compute all…, Returns full dict of token → speed data (from last update). (+10 more)
 
 ### Community 35 - "cascade_flip.py"
-Cohesion: 0.07
-Nodes (46): cascade_flip(), _close_paper_position(), _get_db_connection(), clear_expired_evictions(), get_eviction_deadline(), get_flip_k_multiplier(), get_pipeline_cycle(), insert_post_flip_trade() (+38 more)
+Cohesion: 0.15
+Nodes (20): cascade_flip(), _close_paper_position(), _get_db_connection(), insert_post_flip_trade(), Synchronously insert a DB entry for a position opened via cascade flip. Sets…, _load_flip_counts(), Get a SQLite connection to the runtime DB., Close paper trade in DB. Returns True on success. (+12 more)
 
 ### Community 36 - "self_learner.py"
 Cohesion: 0.12
@@ -433,7 +438,7 @@ Nodes (27): check_entry(), check_exit(), check_guard_block(), compute_atr(), com
 
 ### Community 38 - "ai_decider.py"
 Cohesion: 0.05
-Nodes (34): acquire_lock(), clear_ab_cache(), _ema(), execute_trade(), get_hype_all_mids_batched(), get_hype_meta_batched(), get_local_prices(), get_macd() (+26 more)
+Nodes (39): acquire_lock(), clear_ab_cache(), _ema(), execute_trade(), get_calibration_summary(), get_category_multipliers(), get_hype_all_mids_batched(), get_hype_meta_batched() (+31 more)
 
 ### Community 39 - "breakout_engine.py"
 Cohesion: 0.11
@@ -447,9 +452,9 @@ Nodes (26): _aggregate_5m_from_1m(), _backtest_pair(), detect_cross(), _ema(), _
 Cohesion: 0.12
 Nodes (23): _aggregate_5m_from_1m(), _backtest_pair(), detect_cross(), _ema(), _ema_series(), get_5m_candles(), init_tuner_db(), load_params() (+15 more)
 
-### Community 42 - "inverse_accel_300.py"
-Cohesion: 0.17
-Nodes (16): _check_1h_trend(), detect_inverse_accel_300(), _ema_series(), _get_1m_prices(), _log(), Check if 1h trend conflicts with reversion direction. Returns True if trade…, Detect mean reversion opportunity at the newest price point. SHORT: price far…, # NOTE: Falling knife protection is handled by staleness guard in scanner (0.5%… (+8 more)
+### Community 42 - "get_cooldown"
+Cohesion: 0.07
+Nodes (44): get_cooldown(), _is_cooldown_key_active(), Helper: check if a specific token:direction key is active. When checking…, detect_accel_300(), detect_breakout(), detect_velocity_ignition(), _ema_series(), _get_1m_prices() (+36 more)
 
 ### Community 43 - "hermes-trades-api.py"
 Cohesion: 0.14
@@ -468,20 +473,20 @@ Cohesion: 0.17
 Nodes (24): evaluate_expired(), generate_report(), _get_current_price(), _get_entry_price(), _get_recent_signals(), _load_results(), _load_tracked(), main() (+16 more)
 
 ### Community 47 - "run"
-Cohesion: 0.10
-Nodes (21): execute_trade(), get_current_price(), _get_direction_wr(), get_max_leverage(), _is_guardian_closing(), Execute a trade via brain.py. Returns (success, trade_id_or_msg)., Return True if guardian is currently closing this token (closing marker active)., Return (win_rate_pct, trade_count) for a token+direction in last 7 days. (+13 more)
+Cohesion: 0.09
+Nodes (25): detect_incomplete_run(), On startup, check for a pipeline run that was interrupted mid-trade. Returns…, execute_trade(), get_current_price(), _get_direction_wr(), get_max_leverage(), _is_guardian_closing(), Execute a trade via brain.py. Returns (success, trade_id_or_msg). (+17 more)
 
 ### Community 48 - "blacklist_tester.py"
 Cohesion: 0.14
 Nodes (23): cmd_evaluate(), cmd_pick(), cmd_remaining(), cmd_status(), evaluate_verdict(), get_tested_tokens(), get_trial_outcomes(), load_blacklists() (+15 more)
 
-### Community 49 - "mirror_open"
-Cohesion: 0.08
-Nodes (30): _asset_id(), build_order(), _coin_max_leverage(), _fetch_and_cache_coin_meta(), _get_coin_meta_cached(), _get_meta(), get_prices_curl(), _hl_tick_decimals() (+22 more)
+### Community 49 - "price_collector.py"
+Cohesion: 0.23
+Nodes (11): _aggregate_tf(), fetch_all_prices(), _get_active_tokens(), main(), Fetch full token universe + allMids from Hyperliquid. Writes shared HL cache…, Save to SQLite + JSON cache. Returns rows inserted. Filters out delisted tokens…, Gather tokens that need candle data: hot-set + open positions., Aggregate price_history (signals_hermes.db) into a candles table (candles.db).… (+3 more)
 
 ### Community 50 - "rs_signals.py"
-Cohesion: 0.12
-Nodes (24): _atr(), _atr_pct(), _bounce_confirmation(), _build_level_touches(), _cluster_levels(), _compute_confidence(), detect_rs_signal(), _find_swing_highs_lows() (+16 more)
+Cohesion: 0.08
+Nodes (34): _atr(), _atr_pct(), _bounce_confirmation(), _build_level_touches(), _cluster_levels(), _compute_confidence(), detect_rs_signal(), _find_swing_highs_lows() (+26 more)
 
 ### Community 51 - "signal_researcher.py"
 Cohesion: 0.13
@@ -491,17 +496,17 @@ Nodes (23): backtest_signals(), detect_bollinger_squeeze(), detect_consecutive_c
 Cohesion: 0.28
 Nodes (23): bug(), check_ab_testing(), check_cooldowns(), check_db_integrity(), check_hotset(), check_mirror(), check_ollama(), check_paper_hl_sync() (+15 more)
 
-### Community 53 - "macd_accel_signals.py"
-Cohesion: 0.10
-Nodes (27): closest_candle_before(), compute_z_at(), get_token_tf_data(), hwave_test(), Returns (direction, avg_z_signed, avg_z_abs, avg_vel) or None. Regime filter…, run_backtest(), stats(), vel_sig_gen() (+19 more)
+### Community 53 - "backtest_hwave_bonus_thresholds.py"
+Cohesion: 0.18
+Nodes (15): closest_candle_before(), compute_z_at(), get_token_tf_data(), hwave_test(), Returns (direction, avg_z_signed, avg_z_abs, avg_vel) or None. Regime filter…, run_backtest(), stats(), vel_sig_gen() (+7 more)
 
 ### Community 54 - "init_db"
-Cohesion: 0.16
-Nodes (18): init_db(), Initialize both static and runtime DBs with proper schemas., _get_open_pos(), _get_open_pos_dict(), is_live_trading_enabled(), # NOTE: Do NOT shadow hermes_constants here — import from hermes_constants…, Return {token: direction} for all open positions., Scan all tokens and emit pct-hermes signals for price extremes. Returns: Number… (+10 more)
+Cohesion: 0.12
+Nodes (22): init_db(), _mark_migration_done(), Check if legacy migration has already run (idempotent — safe to call on every…, Persist that legacy migration has completed., Initialize both static and runtime DBs with proper schemas., _was_migration_done(), _get_open_pos(), _get_open_pos_dict() (+14 more)
 
-### Community 55 - "ema20_50_signals.py"
-Cohesion: 0.14
-Nodes (20): backtest_ema20_50(), batch_backtest(), detect_ema20_50_pullback(), _detect_one_direction(), _ema_series(), _get_1m_prices(), _is_bearish_reversal(), _is_bullish_reversal() (+12 more)
+### Community 55 - "backtest_ema20_50"
+Cohesion: 0.15
+Nodes (14): backtest_ema20_50(), batch_backtest(), _detect_one_direction(), _is_bearish_reversal(), _is_bullish_reversal(), _print_backtest(), Bullish 3-bar close reversal at index idx. Prior bar shows pullback (lower…, Bearish 3-bar close reversal at index idx. Prior bar shows pullback (higher… (+6 more)
 
 ### Community 56 - "hl_leaderboard.py"
 Cohesion: 0.13
@@ -521,11 +526,11 @@ Nodes (21): calculate_r2(), calculate_slope(), calculate_weight_adjustment(), de
 
 ### Community 60 - "hype_cache.py"
 Cohesion: 0.16
-Nodes (17): cache_age(), cache_fresh(), fetch_and_cache(), fetch_and_cache_positions(), get_cached_positions(), get_meta(), Shared Hyperliquid /info cache — single fetch per 60s, shared across all…, Return meta dict — PRIMARY SOURCE is hl_cache.json (written by… (+9 more)
+Nodes (17): cache_age(), cache_fresh(), fetch_and_cache(), fetch_and_cache_positions(), get_allMids(), get_cached_positions(), Shared Hyperliquid /info cache — single fetch per 60s, shared across all…, Return open positions from cache if fresh (< _POS_CACHE_TTL old). Returns… (+9 more)
 
 ### Community 61 - "checkpoint_utils.py"
-Cohesion: 0.11
-Nodes (23): checkpoint_decider_cycle(), checkpoint_guardian_cycle(), checkpoint_list(), checkpoint_orphan_detected(), checkpoint_read_last(), checkpoint_trade_pending(), checkpoint_write(), clear_workflow_state() (+15 more)
+Cohesion: 0.12
+Nodes (21): checkpoint_decider_cycle(), checkpoint_guardian_cycle(), checkpoint_list(), checkpoint_orphan_detected(), checkpoint_read_last(), checkpoint_trade_pending(), checkpoint_write(), clear_workflow_state() (+13 more)
 
 ### Community 62 - "hl_wallet_discovery.py"
 Cohesion: 0.13
@@ -535,9 +540,9 @@ Nodes (21): discover_from_social_media(), discover_from_trading_competitions(), 
 Cohesion: 0.14
 Nodes (21): apply_recommendations(), evaluate_results(), get_active_params(), get_closed_trades(), get_open_trade_ids(), get_pg_conn(), init_tables(), Record that a trade opened with specific param values. (+13 more)
 
-### Community 64 - "ema20_50.py"
-Cohesion: 0.12
-Nodes (24): backtest_ema20_50(), batch_backtest(), detect_ema20_50_pullback(), _detect_one_direction(), _ema_series(), _get_1m_prices(), _is_bearish_reversal(), _is_bullish_reversal() (+16 more)
+### Community 64 - "audit_logger.py"
+Cohesion: 0.21
+Nodes (15): atr_check(), atr_sl_hit(), atr_tp_hit(), _base(), guardian_cycle(), log_event(), loss_cooldown_set(), _now() (+7 more)
 
 ### Community 65 - "backtest_hh_hl.py"
 Cohesion: 0.18
@@ -552,24 +557,24 @@ Cohesion: 0.17
 Nodes (20): Scrape Twitter/X for known HL traders., Scrape GitHub for HL-related repos with wallet addresses., Run a shell command and return output., Scrape all sources for top HL traders., Scrape Dexly leaderboard for top traders., Scrape HyperStats leaderboard for top traders., Scrape Beacon leaderboard for top traders., Scrape SkynetX leaderboard for top traders. (+12 more)
 
 ### Community 68 - "ma300_candle_confirm_signals.py"
-Cohesion: 0.20
-Nodes (12): detect_ma300_candle(), _ema(), _ema_series(), _get_candles_1m(), Detect EMA300 + 2-candle confirmation signal. Args: token: token symbol (e.g.…, Scan all tokens in prices_dict for EMA300 + 2-conf signals. Args: prices_dict:…, Compute EMA(period) from a list of prices (oldest first). Returns the most…, Compute EMA series — returns EMA value at each index (oldest first). Returns a… (+4 more)
+Cohesion: 0.14
+Nodes (18): detect_ma300_candle(), _ema(), _ema_series(), _get_candles_1m(), Detect EMA300 + 2-candle confirmation signal. Args: token: token symbol (e.g.…, Scan all tokens in prices_dict for EMA300 + 2-conf signals. Args: prices_dict:…, Compute EMA(period) from a list of prices (oldest first). Returns the most…, Compute EMA series — returns EMA value at each index (oldest first). Returns a… (+10 more)
 
 ### Community 69 - "signal_importer.py"
 Cohesion: 0.12
-Nodes (22): calculate_confluence(), get_confluence_signals(), get_momentum_state(), get_zscore_tier(), import_fear_signal(), import_rsi_signal(), import_zscore_signal(), _load_momentum() (+14 more)
+Nodes (20): calculate_confluence(), get_confluence_signals(), get_momentum_state(), get_zscore_tier(), import_fear_signal(), import_rsi_signal(), import_zscore_signal(), _load_momentum() (+12 more)
 
 ### Community 70 - "15m_regime_scanner.py"
 Cohesion: 0.15
 Nodes (19): calculate_r2(), calculate_slope(), determine_regime(), fetch_candles(), fetch_candles_from_binance(), fetch_candles_from_db(), get_tokens_to_scan(), main() (+11 more)
 
 ### Community 71 - "log_error"
-Cohesion: 0.09
-Nodes (22): cleanup_stale_signals(), get_learned_adjustments(), get_market_zscore(), get_open(), get_pending_signals(), get_prediction(), get_prices(), is_real_pump() (+14 more)
+Cohesion: 0.06
+Nodes (37): ai_decide(), ai_decide_batch(), _check_token_budget(), cleanup_stale_signals(), _do_compaction_llm(), get_fear(), get_learned_adjustments(), get_market_zscore() (+29 more)
 
-### Community 72 - "gap300_signals.py"
-Cohesion: 0.13
-Nodes (23): compute_series(), get_all_prices(), main(), Group fires into pulses., Run state machine backtest on full price series. Returns events list., run_backtest(), summarize_pulses(), detect_gap_cross() (+15 more)
+### Community 72 - "backtest_gap300.py"
+Cohesion: 0.14
+Nodes (19): compute_series(), get_all_prices(), main(), Group fires into pulses., Run state machine backtest on full price series. Returns events list., run_backtest(), summarize_pulses(), _ema_series() (+11 more)
 
 ### Community 73 - "bug_hunter.py"
 Cohesion: 0.16
@@ -579,9 +584,9 @@ Nodes (13): grep_file(), Return list of (line_num, line) matching pattern., get_
 Cohesion: 0.16
 Nodes (19): aggregate_1m_to_tf(), detect_cascade_direction(), fetch_and_store(), fetch_and_store_all_tf(), get_candles(), get_conn(), get_last_ts(), get_latest_price() (+11 more)
 
-### Community 75 - "gap_300.py"
-Cohesion: 0.15
-Nodes (19): detect_gap_cross(), _ema_series(), _get_1m_prices(), _init_state_table(), _load_state(), Load state for a token. Returns default (no signal) if none found., Save state for a token to DB., Fetch 1m close prices from price_history (signals_hermes.db), oldest first.… (+11 more)
+### Community 75 - "scan_gap300_state"
+Cohesion: 0.18
+Nodes (12): _ema_series(), _init_state_table(), _load_state(), Load state for a token. Returns default (no signal) if none found., Save state for a token to DB., State machine scanner for gap-300 signals. Loads existing state for token,…, Return EMA series (oldest first), None for indices < period-1., Return SMA series (oldest first), None for indices < period-1. (+4 more)
 
 ### Community 76 - "backtest_breakout.py"
 Cohesion: 0.15
@@ -591,25 +596,25 @@ Nodes (16): backtest_token(), compute_atr(), compute_levels(), detect_breakout()
 Cohesion: 0.16
 Nodes (18): _atr_raw(), compute_atr(), compute_macd(), compute_rsi(), detect_tl_break_baseline(), detect_tl_break_improved(), _linear_regression(), load_candles_5m() (+10 more)
 
-### Community 78 - "ema9_sma20_signals.py"
-Cohesion: 0.18
-Nodes (18): backtest_ema9_sma20(), _compute_gap_series(), _compute_slope_series(), detect_ema9_sma20_cross(), _ema_series(), _ema_slope_series(), _get_1m_prices(), Compute slope over the last `slope_period` bars for each valid value. slope[i]… (+10 more)
+### Community 78 - "detect_ema9_sma20_cross"
+Cohesion: 0.17
+Nodes (16): backtest_ema9_sma20(), _compute_gap_series(), _compute_slope_series(), detect_ema9_sma20_cross(), _ema_series(), _ema_slope_series(), Compute slope over the last `slope_period` bars for each valid value. slope[i]…, Return (EMA series, slope of EMA series) — both oldest first. (+8 more)
 
-### Community 79 - "compute_mtf_macd_alignment"
-Cohesion: 0.15
-Nodes (18): cascade_entry_signal(), compute_mtf_macd_alignment(), _detect_cascade(), Detect cascade entry condition: smaller TF flips before larger TF confirms.…, Detect cascade entry timing and generate entry/exit signals. Key insight:…, Compute multi-timeframe MACD alignment using the FULL macd_rules state machine.…, _check_cascade_direction_flip(), _check_macd_rules_flip() (+10 more)
+### Community 79 - "counter_flip.py"
+Cohesion: 0.19
+Nodes (14): get_macd_exit_signal(), Check if a position should be exited based on MACD rules. Returns dict with:…, _check_cascade_direction_flip(), _check_macd_rules_flip(), _check_mtf_alignment_flip(), _get_open_positions(), Cascade direction flip: cascade_entry_signal() says cascade is ACTIVE and its…, MACD rules engine flip: macd histogram has turned against our position. Returns… (+6 more)
 
 ### Community 80 - "profit_monster.py"
-Cohesion: 0.13
-Nodes (25): close_position(), filter_by_pnl(), get_all_open_positions(), is_position_on_hl(), is_token_being_closed_by_guardian(), load_config(), _load_trail_state(), Check if token still has an open position on HL. (+17 more)
+Cohesion: 0.15
+Nodes (20): close_position(), filter_by_pnl(), get_all_open_positions(), is_position_on_hl(), is_token_being_closed_by_guardian(), load_config(), Check if token still has an open position on HL., Check if guardian closing markers include this token. (+12 more)
 
 ### Community 81 - "signal_lifecycle.py"
 Cohesion: 0.17
 Nodes (18): check_state_transition(), get_signal_history(), load_audit(), load_lifecycle(), log(), main(), Load latest audit data., Get historical performance for a signal type. (+10 more)
 
-### Community 82 - "get_trade_history"
-Cohesion: 0.14
-Nodes (18): backfill(), get_closed_trades_without_hl_pnl(), get_hl_close_fill(), Get the most recent HL close fill (side=B) for a token after start_time_ms.…, update_trade(), fetch_hl_prices(), main(), ms() (+10 more)
+### Community 82 - "get_realized_pnl"
+Cohesion: 0.27
+Nodes (9): fetch_hl_prices(), main(), ms(), Convert datetime string or object to Unix milliseconds., Compute size-weighted average price from a list of fill dicts., Fetch fills for token between start_ms and end_ms. Returns dict with…, wavg_price(), get_realized_pnl() (+1 more)
 
 ### Community 83 - "candle_tuner.py"
 Cohesion: 0.18
@@ -623,9 +628,9 @@ Nodes (17): event_summary(), log_api_call(), log_budget_exceeded(), log_checkpoi
 Cohesion: 0.18
 Nodes (17): _classify_structure(), _compute_atr(), _detect_breakout(), _detect_pullback(), _find_swing_highs_lows(), _get_candles_from_ohlcv_1m(), _get_candles_from_price_history(), Classify current swing structure at the most recent candle. Args: highs: sorted… (+9 more)
 
-### Community 86 - "run_ma_cross_signals.py"
-Cohesion: 0.17
-Nodes (14): detect_ma_cross(), _ema_series(), _get_candles_1m(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Scan pre-filtered tokens for MA cross signals and write to DB. All guards…, Compute EMA series — returns EMA value at each index (oldest first). Returns a…, Detect 10/200 EMA crossover on 1m candles. Args: token: token symbol (e.g.…, scan_ma_cross_signals() (+6 more)
+### Community 86 - "record_cooldown_start"
+Cohesion: 0.15
+Nodes (18): detect_ma_cross(), _ema(), _ema_series(), _get_candles_1m(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Scan pre-filtered tokens for MA cross signals and write to DB. All guards…, Compute EMA(period) from a list of prices (oldest first). Returns the most…, Compute EMA series — returns EMA value at each index (oldest first). Returns a… (+10 more)
 
 ### Community 87 - "ab_learner.py"
 Cohesion: 0.22
@@ -651,17 +656,17 @@ Nodes (16): _apply_changes(), _build_prompt(), _call_opencode(), _get_compactor_
 Cohesion: 0.21
 Nodes (16): apply_changes(), get_current_regime(), get_registry_status(), load_audit(), log(), main(), map_signal_to_flag(), Select which signals to enable/disable based on regime and performance. (+8 more)
 
-### Community 93 - "get_db_connection"
-Cohesion: 0.13
-Nodes (20): _check_and_close_breached_trades(), _check_and_execute_flip(), _ensure_self_close_table(), _get_all_self_close_records(), get_db_connection(), get_token_intel(), _mark_self_close_triggered(), [DEFUNCT-2026-04-17] Flip logic removed from guardian. Cascade-flip now lives… (+12 more)
+### Community 93 - "fast_momentum.py"
+Cohesion: 0.15
+Nodes (18): expire_pending_signals(), EXPIRED signals safety-net — DEPRECATED for primary PENDING/APPROVED lifecycle.…, compute_zscore_velocity(), _ema(), _fast_zscore(), get_momentum_stats(), is_reasonable_price(), _log() (+10 more)
 
 ### Community 94 - "away_detector.py"
 Cohesion: 0.21
 Nodes (15): acquire_lock(), call_ceo(), get_debounce_ts(), is_live_trading_enabled(), is_pipeline_healthy(), is_t_away(), load_json(), main() (+7 more)
 
-### Community 95 - "momentum_leaderboard.py"
-Cohesion: 0.15
-Nodes (19): _compute_confidence(), _compute_return(), _compute_velocity(), _decide_direction(), detect_leaderboard_signals(), _get_candle_ts(), _get_closes(), _log() (+11 more)
+### Community 95 - "cascade_flip_helpers.py"
+Cohesion: 0.18
+Nodes (17): clear_expired_evictions(), get_eviction_deadline(), get_flip_k_multiplier(), get_pipeline_cycle(), is_token_evicted(), load_flip_counts(), mark_token_flipped(), cascade_flip_helpers.py ======================= Shared helpers for cascade-flip… (+9 more)
 
 ### Community 96 - "error_analyzer.py"
 Cohesion: 0.19
@@ -675,9 +680,9 @@ Nodes (14): extract_and_learn(), infer_label(), _load_coin_universe(), Infer lab
 Cohesion: 0.12
 Nodes (15): BUG 1 & 2 Fix: Rebuild the Penalty Chain in `_run_hot_set()`, BUG 3 Fix: Write PnL to DB in `refresh_current_prices()`, Current Behavior, Current Broken Code Flow (lines 1104–1208), Files to Change, Fix, Location, Open Questions for T (+7 more)
 
-### Community 99 - "compute_macd_state"
-Cohesion: 0.17
-Nodes (12): compute_macd_state(), ema(), _fetch_binance_candles(), get_macd_bullish_score(), get_macd_entry_signal(), get_macd_params(), Return MACD params for token, falling back to DEFAULT., Compute EMA of a price list. (+4 more)
+### Community 99 - "macd_rules.py"
+Cohesion: 0.13
+Nodes (19): IntEnum, compute_macd_state(), CrossoverFreshness, _detect_cascade(), ema(), _fetch_binance_candles(), get_macd_bullish_score(), get_macd_entry_signal() (+11 more)
 
 ### Community 100 - "kanban_api.py"
 Cohesion: 0.20
@@ -687,9 +692,9 @@ Nodes (15): delete_project(), get_projects(), health(), load_kanban(), Load kanb
 Cohesion: 0.19
 Nodes (15): evaluate_macd_rules(), _exit_long_signals(), _exit_short_signals(), _flip_long_signals(), _flip_short_signals(), _long_entry_allowed(), MACDState, Given a computed MACDState, evaluate all entry/exit/flip rules. Returns the… (+7 more)
 
-### Community 102 - "ema9_sma20.py"
-Cohesion: 0.16
-Nodes (21): backtest_ema9_sma20(), _compute_gap_series(), _compute_slope_series(), detect_ema9_sma20_cross(), _ema_series(), _ema_slope_series(), _get_1m_prices(), Compute slope over the last `slope_period` bars for each valid value. slope[i]… (+13 more)
+### Community 102 - "detect_ema9_sma20_cross"
+Cohesion: 0.17
+Nodes (16): backtest_ema9_sma20(), _compute_gap_series(), _compute_slope_series(), detect_ema9_sma20_cross(), _ema_series(), _ema_slope_series(), Compute slope over the last `slope_period` bars for each valid value. slope[i]…, Return (EMA series, slope of EMA series) — both oldest first. (+8 more)
 
 ### Community 103 - "ema_angle.py"
 Cohesion: 0.21
@@ -716,12 +721,12 @@ Cohesion: 0.21
 Nodes (14): add_alert(), check_pipeline_errors(), check_pipeline_lock(), check_signal_production(), check_trade_execution(), log(), main(), Check if trades are being executed. (+6 more)
 
 ### Community 109 - "is_solana_only"
-Cohesion: 0.18
-Nodes (10): can_short(), get_all_tradeable_tokens(), get_token_chain(), is_hyperliquid(), is_solana_only(), Check if token is available on Hyperliquid., Determine the best chain for a token. Returns 'HYPERLIQUID', 'SOLANA', or…, Check if shorting is allowed for this token. (+2 more)
+Cohesion: 0.15
+Nodes (12): _load_hot_rounds(), Load hot signals based on review_count (ai-decider survival passes). A hot…, can_short(), get_all_tradeable_tokens(), get_token_chain(), is_hyperliquid(), is_solana_only(), Check if token is available on Hyperliquid. (+4 more)
 
-### Community 110 - "refresh_current_prices"
-Cohesion: 0.16
-Nodes (16): main(), force_atr_update(), get_open_hype_positions(), Get open positions. Uses subprocess curl to avoid SDK caching issues and…, _atr_multiplier(), _compute_dynamic_sl(), _compute_dynamic_tp(), _execute_atr_bulk_updates() (+8 more)
+### Community 110 - "bollinger_squeeze.py"
+Cohesion: 0.22
+Nodes (12): _aggregate_candles(), _compute_bb(), _detect_signal(), _get_ticks(), _in_cooldown(), Check if token+direction is in cooldown., Main scan entry point. Called by signals_runner., Fetch recent ticks for a token from price_history. (+4 more)
 
 ### Community 111 - "run_backtest"
 Cohesion: 0.23
@@ -735,9 +740,9 @@ Nodes (13): _atr(), _atr_pct(), _bounce_confirmed(), _build_level_touches(), _cl
 Cohesion: 0.15
 Nodes (14): _ctx_gate_get_market_context(), _ctx_gate_get_momentum(), _ctx_gate_get_phase(), _ctx_gate_get_speed(), _ctx_gate_get_zscore(), _get_recent_prices(), Get last N close prices from get_price_history. Returns list of floats or empty., Get speed percentile — same source as EXEC path (SpeedTracker). CEO 2026-08-02:… (+6 more)
 
-### Community 114 - "ai_decide_batch"
-Cohesion: 0.14
-Nodes (17): ai_decide(), ai_decide_batch(), _check_token_budget(), _do_compaction_llm(), get_fear(), get_open_trade_details(), get_regime(), _log_wandb() (+9 more)
+### Community 114 - "mtf_macd.py"
+Cohesion: 0.16
+Nodes (17): get_macd_params(), Return MACD params for token, falling back to DEFAULT., get_tf_zscores(), Return (z, tier_str) or (None, None)., Z-score across all timeframes. Returns {tf_name: (z, tier)}. Cached for 60s —…, zscore(), get_1h_zscore(), is_delisted() (+9 more)
 
 ### Community 115 - "macd_accel.py"
 Cohesion: 0.20
@@ -757,11 +762,11 @@ Nodes (12): extract_entities(), Extract all typed entities from text. Returns li
 
 ### Community 119 - "hl_copy_signal.py"
 Cohesion: 0.22
-Nodes (10): calculate_confidence(), generate_hl_signal(), get_recent_pro_trades(), get_trader_performance(), Get recent trades from pro traders., Write signal to the signals database via add_signal() for pipeline processing., Get trader's historical performance for confidence calculation., Calculate signal confidence based on trader performance. (+2 more)
+Nodes (12): calculate_confidence(), generate_hl_signal(), get_recent_pro_trades(), get_trader_performance(), Get recent trades from pro traders., Write signal to the signals database for pipeline processing., Main function: detect pro trades and generate pipeline signals., Get trader's historical performance for confidence calculation. (+4 more)
 
 ### Community 120 - "is_cooldown_active"
-Cohesion: 0.22
-Nodes (12): _get_candles_1m(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Scan pre-filtered tokens for 8/50 MA cross SHORT signals and write to DB. All…, scan_ma_fast_signals(), get_latest_prices_from_candles(), get_open_positions(), is_blacklisted(), main() (+4 more)
+Cohesion: 0.15
+Nodes (18): detect_ma_fast_cross(), _ema(), _ema_series(), _get_candles_1m(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Scan pre-filtered tokens for 8/50 MA cross SHORT signals and write to DB. All…, Compute EMA(period) from a list of prices (oldest first). Returns the most…, Compute EMA series — returns EMA value at each index (oldest first). Returns a… (+10 more)
 
 ### Community 121 - "obs_dashboard.py"
 Cohesion: 0.23
@@ -815,17 +820,17 @@ Nodes (11): extract_entities(), get_connection(), infer_label(), learn_pair(), n
 Cohesion: 0.24
 Nodes (11): acquire_lock(), append_audit_log(), audit_find_stale(), check_kanban_sync(), main(), Find tasks with stale revisit dates or blocked > 7 days., # TODO: implement, Verify TASKS.md and kanban.json are in sync. (+3 more)
 
-### Community 134 - "main"
-Cohesion: 0.13
-Nodes (17): _clear_pending_retry(), _close_orphan_paper_trade_by_id(), _get_hl_exit_price(), _load_pending_retry(), _load_pending_retry_unlocked(), main(), _poll_close_fills_once(), _poll_hl_fills_for_close() (+9 more)
+### Community 134 - "hl_copy_tui.py"
+Cohesion: 0.27
+Nodes (11): draw_fills(), draw_footer(), draw_header(), draw_traders(), get_recent_fills(), get_stats(), get_traders(), main() (+3 more)
 
 ### Community 135 - "ma_cross.py"
 Cohesion: 0.23
 Nodes (11): detect_ma_cross(), _ema(), _ema_series(), _get_candles_1m(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Entry point for signals_runner. Returns count of signals emitted., Compute EMA(period) from a list of prices (oldest first). Returns the most…, Compute EMA series — returns EMA value at each index (oldest first). Returns a… (+3 more)
 
-### Community 136 - "add_signal"
-Cohesion: 0.09
-Nodes (29): detect_r2_rev_signal(), _get_candles_5m(), _ols_params(), _precompute_x(), Fetch 5m OHLCV candles from candles.db (oldest first). Freshness guard: skip if…, Scan pre-filtered tokens for R² mean reversion signals on 5m. All guards…, Compute OLS slope, intercept, R² from a list of prices (oldest first)., Precompute x stats for fast rolling OLS. Call once per window size. (+21 more)
+### Community 136 - "r2_rev.py"
+Cohesion: 0.24
+Nodes (11): detect_r2_rev_signal(), _get_candles_5m(), _ols_params(), _precompute_x(), Fetch 5m OHLCV candles from candles.db (oldest first). Freshness guard: skip if…, Entry point for signals_runner. Returns count of signals emitted., Compute OLS slope, intercept, R² from a list of prices (oldest first)., Precompute x stats for fast rolling OLS. Call once per window size. (+3 more)
 
 ### Community 137 - "backtest_bb_bounce_v2.py"
 Cohesion: 0.40
@@ -835,13 +840,13 @@ Nodes (10): backtest_token(), compute_bb(), compute_rsi(), detect_bb_bounce(), g
 Cohesion: 0.33
 Nodes (10): compute_stats(), _ema_series(), find_signals(), get_candles(), get_tokens(), main(), Find MA300 + candle confirmation signals and simulate trades., Compute EMA series — returns EMA value at each index (oldest first). None for… (+2 more)
 
-### Community 139 - "_secrets.py"
-Cohesion: 0.24
-Nodes (8): increment_pipeline_cycle(), Increment and persist the pipeline cycle counter. Called once per pipeline run…, main(), Run a step in the background so the pipeline is not blocked. Used for slow…, # NOTE: --live is NOT passed to step scripts., run(), run_bg(), Centralized secret loader — reads from .secrets.local in project root. All…
+### Community 139 - "run_pipeline.py"
+Cohesion: 0.32
+Nodes (7): increment_pipeline_cycle(), Increment and persist the pipeline cycle counter. Called once per pipeline run…, main(), Run a step in the background so the pipeline is not blocked. Used for slow…, # NOTE: --live is NOT passed to step scripts., run(), run_bg()
 
-### Community 140 - "macd_rules.py"
-Cohesion: 0.15
-Nodes (17): _check_cascade_direction_flip(), _check_macd_rules_flip(), _check_mtf_alignment_flip(), _get_open_positions(), Cascade direction flip: cascade_entry_signal() says cascade is ACTIVE and its…, MACD rules engine flip: macd histogram has turned against our position. Returns…, Read open positions from PostgreSQL brain DB. {TOKEN: direction}., Called by signal_gen.run() every pipeline run. For each open position, run… (+9 more)
+### Community 140 - "compute_mtf_macd_alignment"
+Cohesion: 0.20
+Nodes (14): _check_cascade_direction_flip(), _check_macd_rules_flip(), _check_mtf_alignment_flip(), _get_open_positions(), Cascade direction flip: cascade_entry_signal() says cascade is ACTIVE and its…, MACD rules engine flip: macd histogram has turned against our position. Returns…, Read open positions from PostgreSQL brain DB. {TOKEN: direction}., Called by signal_gen.run() every pipeline run. For each open position, run… (+6 more)
 
 ### Community 141 - "error_breadcrumbs.py"
 Cohesion: 0.22
@@ -851,9 +856,9 @@ Nodes (10): BREADCRUMB(), breadcrumb_trace(), check_step_health(), get_breadcrum
 Cohesion: 0.38
 Nodes (10): check_sl_tp(), get_all_prices(), load_config(), log_error(), main(), pg_exec(), pg_query(), Execute a SELECT query with parameterized inputs (+2 more)
 
-### Community 143 - "get_token_data_for_prediction"
-Cohesion: 0.16
-Nodes (16): build_ohlcv(), compute_macd_ohlc(), compute_mtf_macd(), compute_rsi_ohlc(), estimate_volume(), get_prices_db(), get_runtime_db(), get_token_data_for_prediction() (+8 more)
+### Community 143 - "r2_rev_5m_signals.py"
+Cohesion: 0.25
+Nodes (10): detect_r2_rev_signal(), _get_candles_5m(), _ols_params(), _precompute_x(), Fetch 5m OHLCV candles from candles.db (oldest first). Freshness guard: skip if…, Scan pre-filtered tokens for R² mean reversion signals on 5m. All guards…, Compute OLS slope, intercept, R² from a list of prices (oldest first)., Precompute x stats for fast rolling OLS. Call once per window size. (+2 more)
 
 ### Community 144 - "study_winning_combos.py"
 Cohesion: 0.29
@@ -879,9 +884,9 @@ Nodes (8): _determine_is_closed(), fetch_and_store(), _klines(), Fetch klines fr
 Cohesion: 0.31
 Nodes (9): build_commit_message(), categorize_changes(), get_changed_files(), main(), Run a shell command and return output., Get list of changed files (modified, new, deleted)., Categorize changes for commit message., Build a descriptive commit message. (+1 more)
 
-### Community 150 - "price_collector.py"
-Cohesion: 0.12
-Nodes (23): _aggregate_tf(), fetch_all_prices(), _fetch_binance_candles(), _get_active_tokens(), _get_candle_progress(), _init_candles_db(), main(), Store candles to candles.db. (+15 more)
+### Community 150 - "_seed_universe_candles"
+Cohesion: 0.17
+Nodes (12): _fetch_binance_candles(), _get_candle_progress(), _init_candles_db(), Store candles to candles.db., Load or init the universe token list + cursor., Persist universe token list + cursor., Seed multi-TF candles for the full universe — 1 token per run, all 3 TFs.…, Ensure candles.db has all required tables. (+4 more)
 
 ### Community 151 - "fetch_hl_volume.py"
 Cohesion: 0.29
@@ -903,17 +908,17 @@ Nodes (6): backtest_signal(), compute_accel(), compute_pct_rank(), get_candles()
 Cohesion: 0.36
 Nodes (8): _get_token_data(), get_universe(), load_blacklists(), main(), Load closes + pre-compute z-scores for all lookbacks (one-time per token)., Sweep ALL thresholds × directions for one token, one lookback. Returns list of…, run_lookback(), sweep_combo()
 
-### Community 156 - "hl_signal_notifier.py"
-Cohesion: 0.31
-Nodes (8): check_for_signals(), format_signal(), get_new_trades(), Get trades from the last N minutes., Format a trade as a signal message., Save signal to file for dashboard., Check for new trades and fire signals., save_signal()
+### Community 156 - "get_db"
+Cohesion: 0.16
+Nodes (21): get_db(), init_db(), Get database connection with WAL mode., Create all tables if they don't exist., generate_report(), main(), Run one complete cycle: scan, monitor, report., Run as daemon with periodic cycles. (+13 more)
 
 ### Community 157 - "exhaustion.py"
 Cohesion: 0.36
 Nodes (8): detect_exhaustion(), _ema(), main(), Entry point for signals_runner. Returns count of signals emitted., Compute EMA30 over a list of closing prices., Detect exhaustion reversal signal for a token. exhaustion SHORT: prior…, run(), scan()
 
-### Community 158 - "backfill_trade_indicators.py"
-Cohesion: 0.36
-Nodes (7): compute_indicators(), get_atr_at(), get_prices_at(), main(), Get n 1m close prices ending at timestamp ts from price_history., Compute ATR(period) from 5m candles at timestamp ts., Compute z_score, RSI, MACD, BB, momentum from close prices. Returns dict.
+### Community 158 - "_secrets.py"
+Cohesion: 0.21
+Nodes (8): compute_indicators(), get_atr_at(), get_prices_at(), main(), Get n 1m close prices ending at timestamp ts from price_history., Compute ATR(period) from 5m candles at timestamp ts., Compute z_score, RSI, MACD, BB, momentum from close prices. Returns dict., Centralized secret loader — reads from .secrets.local in project root. All…
 
 ### Community 159 - "backtest_mtp_zscore.py"
 Cohesion: 0.39
@@ -927,9 +932,9 @@ Nodes (7): backtest_threshold(), get_candles(), main(), Get 4h candles sorted ol
 Cohesion: 0.20
 Nodes (10): _apply_inversion(), _load_delayed(), process_delayed_entries(), Apply static + dynamic signal inversion. Returns (new_direction, was_flipped)., Load pending delayed entries., Save pending delayed entries., Check pending delayed-entry signals. For each: if pullback reached OR max_wait…, Check if a signal source should be dynamically inverted based on24h WR. Returns… (+2 more)
 
-### Community 162 - "FileLock"
-Cohesion: 0.15
-Nodes (12): FileLock, Exclusive flock context manager with retry. Args: lockname: Base name for…, _clear_closing_marker(), _is_closing_marker_active(), _load_closing_markers(), Mark a token as being closed by guardian (before market_close is called)., Clear the closing marker after guardian close completes (success or exhausted)., Load the current closing markers dict. (+4 more)
+### Community 162 - ".learn_pair"
+Cohesion: 0.24
+Nodes (5): Ensure consistent ordering for symmetric storage., Record that concept_a and concept_b fired together. Increments synapse weight.…, Decrement synapse weight between two concepts (loss learning). Creates the…, Hebbian write-back from a closed trade. Won (pnl_pct > 0) → strengthen all…, Get node id, creating if needed. Updates last_seen.
 
 ### Community 163 - "rebuild_ab_results.py"
 Cohesion: 0.39
@@ -971,25 +976,25 @@ Nodes (6): call_minimax(), compute_indicators(), load_candles(), load_price_hist
 Cohesion: 0.48
 Nodes (6): backtest_momentum_cross(), get_candles(), main(), Returns list of (z, prev_z) tuples for each price point. prev_z = z from…, LONG: z crosses above +threshold (prev_z < threshold, z >= threshold) SHORT: z…, rolling_zscore()
 
-### Community 173 - "context_gate"
-Cohesion: 0.13
-Nodes (15): context_gate(), _ctx_load_cache(), _ctx_save_cache(), hebbian_trade_boost(), llm_context_gate(), Estimate historical win rate from Hebbian memory for (token, signal) pair.…, Main entry point. Rule-based gate → similar setup lookup → LLM. Returns…, Load persistent LLM cache from tmpfs (shared across pipeline runs). (+7 more)
+### Community 173 - "graceful_close.py"
+Cohesion: 0.38
+Nodes (5): close_hl(), fix_and_close_db(), Market close on Hyperliquid. Returns True on success., Fix entry_price if needed, mark closed in DB. Returns trade info., ts()
 
 ### Community 174 - "grid_backtest.py"
 Cohesion: 0.43
 Nodes (5): compute_adx(), ema(), Compute ADX using Wilder smoothing., run_backtest(), true_range()
 
-### Community 175 - "hype-sync.py"
-Cohesion: 0.12
-Nodes (23): close_trade(), _close_trade_impl(), Close an existing trade. Computes PnL from signal prices (no extra HL API…, Implementation of close_trade. Assumes conn/cur are managed by caller., close_brain_trade(), get_brain_positions(), get_brain_trade_by_token(), get_hot_tokens() (+15 more)
+### Community 175 - "_close_trade_impl"
+Cohesion: 0.22
+Nodes (9): trade_close(), close_trade(), _close_trade_impl(), _load_cooldowns(), Record a loss cooldown for token+direction. Guards against duplicates., Close an existing trade. Computes PnL from signal prices (no extra HL API…, Implementation of close_trade. Assumes conn/cur are managed by caller., _record_loss_cooldown() (+1 more)
 
 ### Community 176 - "monte_carlo_gate"
 Cohesion: 0.38
 Nodes (6): _get_returns(), monte_carlo_gate(), monte_carlo_gate_oracle(), Shadow-mode wrapper — always allows but logs what WOULD have been blocked. Use…, Fetch last N trade returns from signal_outcomes., Run Monte Carlo simulation to estimate if a signal type is still profitable.…
 
-### Community 177 - "is_position_open"
-Cohesion: 0.25
-Nodes (10): detect_gap300_5m(), _ema300_5m(), _get_5m_candles(), Scan tokens for gap300_5m signals. prices_dict: token -> {price, ts} (from…, Compute EMA300 on a 5m close series. Returns same-length list with None for…, Fetch 5m close prices from candles.db, MOST RECENT first, then reverse. Returns…, Detect gap300_5m LONG or SHORT signal on 5m candles only. Returns dict with…, scan_gap300_5m_signals() (+2 more)
+### Community 177 - "gap300_5m_signals.py"
+Cohesion: 0.31
+Nodes (8): detect_gap300_5m(), _ema300_5m(), _get_5m_candles(), Scan tokens for gap300_5m signals. prices_dict: token -> {price, ts} (from…, Compute EMA300 on a 5m close series. Returns same-length list with None for…, Fetch 5m close prices from candles.db, MOST RECENT first, then reverse. Returns…, Detect gap300_5m LONG or SHORT signal on 5m candles only. Returns dict with…, scan_gap300_5m_signals()
 
 ### Community 178 - "volume_alert.py"
 Cohesion: 0.43
@@ -1003,9 +1008,9 @@ Nodes (6): apply_to_confidence(), get_directional_vol(), _neutral_result(), Retu
 Cohesion: 0.52
 Nodes (6): compute_z(), evaluate_trade_1m(), main(), Uses price_history (1m resolution, timestamps in seconds). Speed: % change over…, wave_phase_from_snapshot(), z_trajectory()
 
-### Community 181 - "backtest_ma100_cross.py"
-Cohesion: 0.17
-Nodes (17): forward_returns(), get_candles_raw(), get_tokens(), main(), Compute forward returns for each signal., Raw 1m close data from candles.db., Walk through 1m closes, resample to 5m windows, detect signals at each 5m…, walk_signals() (+9 more)
+### Community 181 - "detect_ma_100_signal"
+Cohesion: 0.28
+Nodes (9): _compute_atr(), _compute_ma(), detect_ma_100_signal(), ndarray, Resample 1m closes to 5m (every 5th candle)., Simple moving average., ATR from close-only data., Detect 100MA cross signal on 5m data. Args: token: token symbol candles: list… (+1 more)
 
 ### Community 182 - "abandoned_trade_root_cause.py"
 Cohesion: 0.53
@@ -1027,9 +1032,9 @@ Nodes (5): PYTHONPATH, dashboard.sh script, start(), status(), stop()
 Cohesion: 0.40
 Nodes (5): get_cached_ab_variant(), _get_wandb_run(), Shared A/B testing utilities — canonical Thompson sampling implementation. Both…, Lazily initialize W&B run for Hermes A/B tests (offline, project=hermes-ai)., Get A/B variant for test_name, cached globally per test_name. Token and…
 
-### Community 188 - "hl-sync-guardian.py"
-Cohesion: 0.06
-Nodes (37): _acquire_lock_with_heartbeat(), get_all_open_trades(), _is_loss_cooldown_active(), _is_primary_alive(), _is_tpsl_cooldown_active(), _load_closed_set(), _load_cooldowns(), DEPRECATED — Orphan HL positions are now handled by… (+29 more)
+### Community 188 - "_acquire_lock_with_heartbeat"
+Cohesion: 0.33
+Nodes (6): _acquire_lock_with_heartbeat(), _is_primary_alive(), Check if the primary guardian process is still alive by reading its PID from…, Write heartbeat with PID so other guardians can detect if we're alive., Acquire lock using flock + heartbeat file for stale lock detection., _write_heartbeat()
 
 ### Community 189 - "backtest"
 Cohesion: 0.47
@@ -1039,9 +1044,9 @@ Nodes (5): backtest(), ema(), Return (win_rate, avg_pnl, n_signals) for SHORT si
 Cohesion: 0.33
 Nodes (5): Ceiling Analysis, Ollama Model Benchmarks, qwen2.5:1.5b (Q4_K_M, 986MB) — PRODUCTION RECOMMENDED, qwen2.5:3b (Q4_K_M, 1.9GB) — NOT VIABLE, Runner Management
 
-### Community 191 - "macd_1m.py"
-Cohesion: 0.18
-Nodes (14): compute_histogram(), ema(), get_1m_closes(), load_token_params(), Compute EMA of data. Seeds with SMA of first n values (consistent with…, Compute MACD histogram. Returns list of hist values (oldest first)., Scan all tokens for MACD 1m crossovers and emit signals. Args: prices_dict:…, Entry point for signals_runner. Returns count of signals emitted. (+6 more)
+### Community 191 - "get_trade_history"
+Cohesion: 0.39
+Nodes (7): backfill(), get_closed_trades_without_hl_pnl(), get_hl_close_fill(), Get the most recent HL close fill (side=B) for a token after start_time_ms.…, update_trade(), get_trade_history(), Fetch user's fill history from Hyperliquid /info endpoint. Used to sync…
 
 ### Community 192 - "backtest_mtp_zscore_full.py"
 Cohesion: 0.46
@@ -1064,8 +1069,8 @@ Cohesion: 0.50
 Nodes (4): backtest_token(), ols_slope_r2(), Compute slope and R² of closes (y) vs index (x)., Backtest R² regression signal on one token's close series. direction: 'long' or…
 
 ### Community 197 - "hermes_file_lock.py"
-Cohesion: 0.13
-Nodes (17): cache_age(), cache_fresh(), get_atr(), ATR cache — persistent file + in-memory ATR cache with 300s TTL. Survives…, Return seconds since cache was written, or 999 if no cache., True if cache exists and is within TTL., Read ATR cache from disk. Returns {token: {atr, ts}} or empty dict., Write ATR cache to disk atomically under file lock. (+9 more)
+Cohesion: 0.40
+Nodes (4): atomic_write_json(), load_json(), Write JSON data atomically using temp file + os.replace. Prevents corruption…, Load JSON file safely, returning default on any error.
 
 ### Community 198 - "wandb-sync.sh"
 Cohesion: 0.40
@@ -1083,13 +1088,13 @@ Nodes (7): detect_exhaustion(), _ema(), main(), Scan all tokens (or single token
 Cohesion: 0.39
 Nodes (7): detect_trend_purity(), _ema(), main(), Scan all tokens (or single token) and emit trend_purity signals. Args:…, Compute EMA30 over a list of closing prices., Detect trend purity signal for a token. LONG: price consistently above EMA30…, scan()
 
-### Community 203 - "range_finder.py"
-Cohesion: 0.21
-Nodes (14): _compute_bb(), _compute_rsi(), _count_band_touches(), detect_range_signal(), _get_candles_5m(), _log(), Detect range-bound signal on 5m data. Args: closes: list of float (5m close…, Fetch 1m closes and resample to 5m. (+6 more)
+### Community 203 - "volume_hl_signals.py"
+Cohesion: 0.29
+Nodes (6): get_candles(), get_tokens(), Returns True if a signal was emitted for this token., Fetch all tokens that have 1m candle data (from signal_schema price list)., Fetch last N 1m candles for token: price from price_history, volume from…, scan_token()
 
-### Community 204 - "close_position"
-Cohesion: 0.18
-Nodes (14): _check_hard_stops(), _check_stale_rotation(), _get_cached_hl_positions(), Sync HL unrealized PnL to paper trades. Uses HL's margin-based calculation…, Emergency backup: close any trade whose price has crossed its DB SL or TP. This…, Stale Trade Rotation: close trades whose price has been flat (velocity near 0)…, Return cached HL positions if fresh, else refetch. Tries shared hype_cache…, Wait for a position to actually disappear from HL. Returns True if position is… (+6 more)
+### Community 204 - "main"
+Cohesion: 0.29
+Nodes (4): main(), Learn all pairs from a set of concepts that fired together. Creates C(n,2)…, Apply decay to old synapses. Returns number of rows affected., Return summary statistics.
 
 ### Community 205 - "_call_minimax"
 Cohesion: 0.50
@@ -1103,37 +1108,33 @@ Nodes (3): backtest(), ols_slope_r2(), Mean reversion entry: enter when price ha
 Cohesion: 0.67
 Nodes (3): backtest_fast(), ols_slope_r2(), Fast version: skip SAMPLE_RATE bars.
 
-### Community 223 - "ma_100_bounce.py"
-Cohesion: 0.19
-Nodes (14): _compute_atr(), _compute_ma(), detect_ma_100_signal(), _get_candles(), ndarray, 100MA Bounce/Cross signal — mean-reversion at moving average with trend…, Fetch 1m close prices from price_history., Scan tokens for 100MA signals. Args: prices_dict: token -> {'price': float,… (+6 more)
+### Community 223 - "detect_ma_100_signal"
+Cohesion: 0.33
+Nodes (7): _compute_atr(), _compute_ma(), detect_ma_100_signal(), ndarray, Simple moving average. Returns array same length as input (NaN for first…, ATR from close-only data (synthesized as |close[i]-close[i-1]|)., Detect 100MA bounce or cross signal. Args: token: token symbol candles: list of…
 
 ### Community 224 - "audit_dependencies.py"
 Cohesion: 0.47
 Nodes (5): main(), Run pip-audit if installed, return list of findings., Run pip check, return list of incompatibility messages., run_pip_audit(), run_pip_check()
 
-### Community 225 - "_hl_info"
-Cohesion: 0.20
-Nodes (12): _fetch_funding(), _fetch_orderbook(), _fetch_volume(), get_hl_data(), Worker: fetch funding rate for one token., Worker: fetch l2Book spread for one token., Worker: estimate volume ratio from recentTrades., Fetch HL market data in parallel: funding rates, orderbook spread, volume. All… (+4 more)
+### Community 225 - "get_embedding"
+Cohesion: 0.33
+Nodes (6): backfill_embeddings(), get_embedding(), Get vector embedding for text using nomic-embed-text, Search memories by semantic similarity (vector search), Backfill embeddings for thoughts without them, semantic_search()
 
-### Community 226 - "run_better_coder.py"
-Cohesion: 0.24
-Nodes (11): acquire_lock(), check_disk_space(), extract_open_tasks(), main(), Check disk space on /root and /tmp. Returns (ok, message)., Acquire a file lock to prevent concurrent runs., Release the file lock., Extract open tasks from TASKS.md. (+3 more)
+### Community 226 - "store_thought"
+Cohesion: 0.33
+Nodes (6): call_ollama(), extract_and_store(), Store thought and metadata in database, Main function: extract metadata and store, Call Ollama API to extract metadata. Truncates prompts >3000 tokens., store_thought()
 
-### Community 227 - "r2_trend.py"
-Cohesion: 0.24
-Nodes (11): detect_r2_short(), _get_candles_1m(), _ols_params(), _precompute_x(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Entry point for signals_runner. Returns count of signals emitted., Compute OLS slope, intercept, R² from a list of prices (oldest first). Returns…, Precompute x stats for fast rolling OLS. Call once per window size. (+3 more)
+### Community 227 - ".recall"
+Cohesion: 0.33
+Nodes (3): Estimate historical win rate for a (token, signal) pair from Hebbian memory.…, Given a concept, return top-K associated concepts ranked by weight. Returns…, Returns (-1.0 to +1.0) sentiment from recall(token). Positive = token has…
 
-### Community 228 - "run_rs_signals.py"
-Cohesion: 0.25
-Nodes (10): _get_candles_1m(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Scan pre-filtered tokens for support/resistance signals and write to DB. All…, scan_rs_signals(), get_latest_prices_from_candles(), get_open_positions(), is_blacklisted(), main() (+2 more)
+### Community 228 - "detect_macd_accel"
+Cohesion: 0.33
+Nodes (6): compute_macd_series(), detect_macd_accel(), _ema(), Detect MACD(8,50,12) crossover with acceleration confirmation. Args: closes:…, Return EMA series (oldest first), None for indices < period-1., Compute MACD(8,50,12) on a closes list. Returns (macd_line, signal_line,…
 
-### Community 229 - "_clear_reconciled_token"
-Cohesion: 0.22
-Nodes (10): _clear_reconciled_token(), _get_reconciled_trade_id(), _load_reconciled_state(), _mark_hl_reconciled(), Load persisted reconciled state from disk., Persist reconciled state to disk, pruning entries older than 24 hours., Record that an HL position has been reconciled to a specific trade_id., Get the trade_id that was reconciled for this HL position, or None. (+2 more)
-
-### Community 230 - "mtp_zscore.py"
-Cohesion: 0.31
-Nodes (9): compute_zscore(), detect_mtp_zscore(), _get_1m_prices(), _log(), Fetch 1m close prices from price_history (signals_hermes.db), oldest first.…, Detect multi-timeperiod z-score signal given pre-fetched price history. Fire…, Scan tokens for multi-timeperiod z-score momentum signals. All guards…, Compute z-score of the last value in the series. Returns None if stddev==0… (+1 more)
+### Community 229 - "archive-signals.py"
+Cohesion: 0.50
+Nodes (3): archive_month(), Write rows to a gzipped JSONL file for the given year/month., run_archive()
 
 ### Community 231 - "get_fast_group_direction"
 Cohesion: 0.50
@@ -1143,73 +1144,29 @@ Nodes (4): get_fast_group_direction(), get_group_slope(), Slope of the group EMA
 Cohesion: 0.50
 Nodes (4): _fetch_trades_sync(), prefetch_volume(), Fetch recentTrades for one token (called from background thread)., Batch-fetch recentTrades for all tokens in parallel using threads. Runs in…
 
-### Community 233 - "squeeze_cross.py"
-Cohesion: 0.36
-Nodes (9): _atr(), _cooldown_ok(), detect_squeeze_cross(), _ema(), _get_closes(), _mark_signal(), Detect EMA squeeze expansion: squeeze + alignment + widening + momentum. Args:…, run() (+1 more)
-
-### Community 234 - "get_category_multipliers"
-Cohesion: 0.25
-Nodes (9): get_calibration_summary(), get_category_multipliers(), get_signal_type_stats(), _get_source_weight(), Query signal_outcomes for per-signal-type win rate stats. Returns dict:…, Human-readable calibration report for all signal types with enough data., Aggregate per-signal-type stats into category multipliers. Returns: {category:…, Return confidence multiplier for (signal_type, source). Two-layer system: 1.… (+1 more)
-
-### Community 235 - "candle_predictor.py"
-Cohesion: 0.25
-Nodes (8): acquire_lock(), _get_mtf_macd_summary(), get_prediction_accuracy(), main(), CLI: candle_predictor.py [--nowandb] [--interval 15|60|240] [--minimax], Format MTF MACD data into a readable string for the prompt., Get per-token prediction accuracy for the last 20 predictions., # NOTE: lowered from 40→25 on 2026-04-06 to let new prompt variants accumulate
-
-### Community 236 - "pnl_utils.py"
-Cohesion: 0.22
-Nodes (8): apply_pnl_ground_truth(), compute_hl_pnl_pct(), pnl_sanity_check(), Compute pnl_pct from HL's unrealized_pnl and position_value. Used when we have…, Apply HL ground truth at close time. When hype_pnl_usdt is available (HL fills…, Check if PnL values are suspicious (>1000% or <-99%). Returns True if PnL is…, Zero out PnL when values are suspicious. Returns (0.0, 0.0, entry_price) to…, zero_suspicious_pnl()
-
-### Community 237 - "record_cooldown_start"
-Cohesion: 0.33
-Nodes (8): get_latest_prices_from_candles(), get_open_positions(), is_blacklisted(), main(), Get the most recent price per token from candles.db., Return token -> direction dict for currently open HL positions., Write a cooldown entry when a trade CLOSES so the same direction cannot re-…, record_cooldown_start()
-
-### Community 238 - "_add_to_kill_switch"
-Cohesion: 0.25
-Nodes (8): _add_to_kill_switch(), _is_token_killed(), _load_kill_switch(), Load set of tokens T has manually closed (guardian will skip these)., Check if token is in the manual kill switch (T closed it manually)., Add a token to the kill switch. Call this when T manually closes a token., Remove a token from the kill switch (e.g., when re-entering the position)., _remove_from_kill_switch()
-
-### Community 239 - "_dr_atr"
-Cohesion: 0.25
-Nodes (8): _atr_sl_k_scaled(), _dr_atr(), get_trade_params(), _pm_get_atr(), Fetch ATR(14) for token. Reuses _ATR_CACHE from decider-run if available via…, Local proxy — uses _atr_multiplier from this module (no decider_run dependency)., Scale k_SL by z-score exhaustion + velocity stall + speed. Returns k multiplier…, Compute SL and TP for a new trade. SL is ATR(14)-based via _dr_atr() →…
-
-### Community 240 - "add_to_watch_list"
-Cohesion: 0.33
-Nodes (6): add_to_watch_list(), get_effective_tokens(), load_watch_list(), Load dynamically-added tokens (from traded coins)., Add a token to the watch list (called when a coin is traded)., TOP_TOKENS + dynamically watched tokens (recently traded).
-
-### Community 241 - "_warmup_volume_cache"
-Cohesion: 0.33
-Nodes (6): Pre-fetch HL volume data for all tokens with open positions. Runs in a…, _warmup_volume_cache(), _fetch_volume_data(), Save volume cache to disk atomically., Fetch last 24h of 1h candles for token via ccxt+Hyperliquid. Returns {vol_last,…, _save_volume_cache()
-
-### Community 243 - "decide_inversion"
-Cohesion: 0.50
-Nodes (4): decide_inversion(), get_accuracy_stats(), Get direction-specific accuracy for a token, optionally filtered by…, Decide whether to INVERT a prediction based on historical accuracy. Returns…
-
-### Community 244 - "detect_ma_fast_cross"
-Cohesion: 0.50
-Nodes (4): detect_ma_fast_cross(), _ema_series(), Compute EMA series — returns EMA value at each index (oldest first). Returns a…, Detect 8/50 EMA crossover on 1m candles — SHORT only. Args: token: token symbol…
-
-### Community 245 - "is_sol_token"
-Cohesion: 0.50
-Nodes (4): get_token_exchange(), is_sol_token(), Check if token is Solana-only, Get exchange for token
+### Community 233 - "run_checks"
+Cohesion: 0.67
+Nodes (3): main(), Run checks. If heal=True, apply fixes for failed checks., run_checks()
 
 ## Knowledge Gaps
 - **22 isolated node(s):** `PYTHONPATH`, `start-litellm.sh script`, `wandb-sync.sh script`, `WANDB_API_KEY`, `WANDB_DIR` (+17 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **28 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `log()` connect `log` to `sync`, `signal_gen.py`, `decider_run.py`, `hermes-brain-sync.py`, `main`, `main_loop`, `_secrets.py`, `hyperliquid-trader.py`, `pump_hunter.py`, `study_winning_combos.py`, `position_manager.py`, `scan_for_signals`, `run_guppy_signals.py`, `cut_loser.py`, `signal_compactor.py`, `process_delayed_entries`, `FileLock`, `unified_scanner.py`, `ai_decider.py`, `breakout_engine.py`, `ab_optimizer.py`, `context_gate`, `run`, `hype-sync.py`, `is_position_open`, `sync_open_trades.py`, `4h_regime_scanner.py`, `hl-sync-guardian.py`, `backtest_mtp_zscore_full.py`, `context-compactor.py`, `signal_importer.py`, `15m_regime_scanner.py`, `log_error`, `bug_hunter.py`, `close_position`, `profit_monster.py`, `candle_tuner.py`, `ab_learner.py`, `get_db_connection`, `away_detector.py`, `run_better_coder.py`, `_clear_reconciled_token`, `sync_kanban_tasks.py`, `trading-checklist.py`, `candle_predictor.py`, `_add_to_kill_switch`, `refresh_current_prices`, `add_to_watch_list`?**
-  _High betweenness centrality (0.105) - this node is a cross-community bridge._
-- **Why does `add_signal()` connect `add_signal` to `signal_gen.py`, `phase_accel.py`, `signal_schema.py`, `__init__.py`, `ma_cross.py`, `atr_compression.py`, `macd_rules.py`, `hh_hl.py`, `wyckoff.py`, `pattern_scanner.py`, `position_manager.py`, `zscore_pump.py`, `zscore_momentum.py`, `exhaustion.py`, `rs.py`, `unified_scanner.py`, `breakout_engine.py`, `signals/ma_cross_5m.py`, `ma_cross_5m.py`, `inverse_accel_300.py`, `oc_signal_importer.py`, `monte_carlo_gate`, `is_position_open`, `rs_signals.py`, `get_directional_vol`, `macd_accel_signals.py`, `init_db`, `ema20_50_signals.py`, `tl_break.py`, `macd_1m.py`, `ema20_50.py`, `ma300_candle_confirm_signals.py`, `signal_importer.py`, `gap300_signals.py`, `scan`, `trend_purity_signals.py`, `gap_300.py`, `range_finder.py`, `ema9_sma20_signals.py`, `compute_mtf_macd_alignment`, `hh_hl_signals.py`, `run_ma_cross_signals.py`, `vortex_break.py`, `ma_100_bounce.py`, `momentum_leaderboard.py`, `r2_trend.py`, `run_rs_signals.py`, `ema9_sma20.py`, `ema_angle.py`, `mtp_zscore.py`, `squeeze_cross.py`, `macd_accel.py`, `atr_compression_signals.py`, `hl_copy_signal.py`, `is_cooldown_active`, `r2_trend_signals.py`?**
+- **Why does `log()` connect `log` to `hl-sync-guardian.py`, `add_signal`, `hyperliquid_exchange.py`, `decider_run.py`, `hermes-brain-sync.py`, `candle_predictor.py`, `run_pipeline.py`, `hyperliquid-trader.py`, `pump_hunter.py`, `study_winning_combos.py`, `_get_conn`, `position_manager.py`, `scan_for_signals`, `run_guppy_signals.py`, `close_position`, `signal_compactor.py`, `process_delayed_entries`, `unified_scanner.py`, `ai_decider.py`, `breakout_engine.py`, `ab_optimizer.py`, `run`, `sync_open_trades.py`, `4h_regime_scanner.py`, `_acquire_lock_with_heartbeat`, `backtest_mtp_zscore_full.py`, `context-compactor.py`, `signal_importer.py`, `15m_regime_scanner.py`, `log_error`, `bug_hunter.py`, `profit_monster.py`, `candle_tuner.py`, `ab_learner.py`, `away_detector.py`, `sync_kanban_tasks.py`, `trading-checklist.py`?**
+  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+- **Why does `add_signal()` connect `add_signal` to `get_momentum_stats`, `signal_schema.py`, `__init__.py`, `ma_cross.py`, `r2_rev.py`, `atr_compression.py`, `compute_mtf_macd_alignment`, `hh_hl.py`, `r2_rev_5m_signals.py`, `wyckoff.py`, `pattern_scanner.py`, `_get_conn`, `position_manager.py`, `zscore_pump.py`, `zscore_momentum.py`, `exhaustion.py`, `rs.py`, `unified_scanner.py`, `breakout_engine.py`, `signals/ma_cross_5m.py`, `ma_cross_5m.py`, `get_cooldown`, `oc_signal_importer.py`, `monte_carlo_gate`, `gap300_5m_signals.py`, `rs_signals.py`, `get_directional_vol`, `init_db`, `tl_break.py`, `ma300_candle_confirm_signals.py`, `signal_importer.py`, `scan`, `trend_purity_signals.py`, `volume_hl_signals.py`, `counter_flip.py`, `hh_hl_signals.py`, `record_cooldown_start`, `vortex_break.py`, `fast_momentum.py`, `ema_angle.py`, `bollinger_squeeze.py`, `mtf_macd.py`, `macd_accel.py`, `atr_compression_signals.py`, `is_cooldown_active`, `r2_trend_signals.py`?**
   _High betweenness centrality (0.042) - this node is a cross-community bridge._
-- **Why does `FileLock` connect `FileLock` to `sync`, `signal_gen.py`, `hyperliquid_exchange.py`, `decider_run.py`, `main`, `brain.py`, `position_manager.py`, `zscore_momentum.py`, `signal_compactor.py`, `process_delayed_entries`, `cascade_flip.py`, `ai_decider.py`, `breakout_engine.py`, `context_gate`, `run`, `sync_open_trades.py`, `hl-sync-guardian.py`, `hermes_file_lock.py`, `close_position`, `profit_monster.py`, `get_trade_history`, `_clear_reconciled_token`, `_add_to_kill_switch`, `ai_decide_batch`, `pipeline_breadcrumbs.py`?**
+- **Why does `init_db()` connect `init_db` to `add_signal`, `get_momentum_stats`, `signal_schema.py`, `decider_run.py`, `__init__.py`, `ma_cross.py`, `r2_rev.py`, `hh_hl.py`, `r2_rev_5m_signals.py`, `_get_conn`, `zscore_pump.py`, `rs.py`, `get_cooldown`, `hermes-trades-api.py`, `run`, `price_collector.py`, `rs_signals.py`, `backtest_ema20_50`, `ma300_candle_confirm_signals.py`, `hh_hl_signals.py`, `record_cooldown_start`, `mtf_macd.py`, `is_cooldown_active`, `r2_trend_signals.py`?**
   _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **What connects `PYTHONPATH`, `start-litellm.sh script`, `wandb-sync.sh script` to the rest of the system?**
   _22 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `sync` be split into smaller, more focused modules?**
-  _Cohesion score 0.08199643493761141 - nodes in this community are weakly interconnected._
-- **Should `signal_gen.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.028432671081677706 - nodes in this community are weakly interconnected._
-- **Should `hyperliquid_exchange.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.060814383923849816 - nodes in this community are weakly interconnected._
+- **Should `hl-sync-guardian.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.028470111448834854 - nodes in this community are weakly interconnected._
+- **Should `add_signal` be split into smaller, more focused modules?**
+  _Cohesion score 0.027795031055900622 - nodes in this community are weakly interconnected._
+- **Should `get_momentum_stats` be split into smaller, more focused modules?**
+  _Cohesion score 0.055152394775036286 - nodes in this community are weakly interconnected._
