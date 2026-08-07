@@ -575,11 +575,13 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 _trend_ts[_trend_cache_key] = now_ts
 
             # Block counter-trend signals
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT':
+            # CHoCH exemption: reversal signals are SUPPOSED to fire counter-trend
+            _choch_exempt = signal_type and 'choch' in signal_type.lower()
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
-            if trend_dir == 'BEARISH' and direction.upper() == 'LONG':
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
@@ -921,6 +923,219 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     from hermes_constants import BB_BOUNCE_ENABLED
                     if not BB_BOUNCE_ENABLED:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BB_BOUNCE_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'bb_bounce+':
+                try:
+                    from hermes_constants import BB_BOUNCE_PLUS_ENABLED
+                    if not BB_BOUNCE_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BB_BOUNCE_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'bb_bounce-':
+                try:
+                    from hermes_constants import BB_BOUNCE_MINUS_ENABLED
+                    if not BB_BOUNCE_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" BB_BOUNCE_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # range_finder
+            if _comp == 'range_finder':
+                try:
+                    from hermes_constants import RANGE_FINDER_ENABLED
+                    if not RANGE_FINDER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RANGE_FINDER_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'range_finder+':
+                try:
+                    from hermes_constants import RANGE_FINDER_PLUS_ENABLED
+                    if not RANGE_FINDER_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RANGE_FINDER_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'range_finder-':
+                try:
+                    from hermes_constants import RANGE_FINDER_MINUS_ENABLED
+                    if not RANGE_FINDER_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RANGE_FINDER_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # vortex_break
+            if _comp == 'vortex_break':
+                try:
+                    from hermes_constants import VORTEX_BREAK_ENABLED
+                    if not VORTEX_BREAK_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VORTEX_BREAK_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp in ('vortex_break+', 'vortex_break_long'):
+                try:
+                    from hermes_constants import VORTEX_BREAK_PLUS_ENABLED
+                    if not VORTEX_BREAK_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VORTEX_BREAK_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp in ('vortex_break-', 'vortex_break_short'):
+                try:
+                    from hermes_constants import VORTEX_BREAK_MINUS_ENABLED
+                    if not VORTEX_BREAK_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VORTEX_BREAK_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # return_exhaustion
+            if _comp == 'return_exhaustion':
+                try:
+                    from hermes_constants import RETURN_EXHAUSTION_ENABLED
+                    if not RETURN_EXHAUSTION_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RETURN_EXHAUSTION_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp in ('return_exhaustion+', 'return_exhaustion_long'):
+                try:
+                    from hermes_constants import RETURN_EXHAUSTION_PLUS_ENABLED
+                    if not RETURN_EXHAUSTION_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RETURN_EXHAUSTION_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp in ('return_exhaustion-', 'return_exhaustion_short'):
+                try:
+                    from hermes_constants import RETURN_EXHAUSTION_MINUS_ENABLED
+                    if not RETURN_EXHAUSTION_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RETURN_EXHAUSTION_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # wyckoff
+            if _comp == 'wyckoff':
+                try:
+                    from hermes_constants import WYCKOFF_ENABLED
+                    if not WYCKOFF_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WYCKOFF_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'wyckoff+':
+                try:
+                    from hermes_constants import WYCKOFF_PLUS_ENABLED
+                    if not WYCKOFF_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WYCKOFF_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'wyckoff-':
+                try:
+                    from hermes_constants import WYCKOFF_MINUS_ENABLED
+                    if not WYCKOFF_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WYCKOFF_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # hl_copy_trader
+            if _comp == 'hl_copy_trader':
+                try:
+                    from hermes_constants import HL_COPY_SIGNAL_ENABLED
+                    if not HL_COPY_SIGNAL_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HL_COPY_SIGNAL_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp in ('hl_copy_trader+', 'hl_copy_signal+'):
+                try:
+                    from hermes_constants import HL_COPY_SIGNAL_PLUS_ENABLED
+                    if not HL_COPY_SIGNAL_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HL_COPY_SIGNAL_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp in ('hl_copy_trader-', 'hl_copy_signal-'):
+                try:
+                    from hermes_constants import HL_COPY_SIGNAL_MINUS_ENABLED
+                    if not HL_COPY_SIGNAL_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" HL_COPY_SIGNAL_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # atr_compression (source: atr5m-comp@vol{X})
+            if _comp.startswith('atr5m-comp') or _comp == 'atr_compression':
+                try:
+                    from hermes_constants import ATR_COMPRESSION_ENABLED
+                    if not ATR_COMPRESSION_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_COMPRESSION_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp.startswith('atr5m-comp') and _comp.endswith('+'):
+                try:
+                    from hermes_constants import ATR_COMPRESSION_PLUS_ENABLED
+                    if not ATR_COMPRESSION_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_COMPRESSION_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp.startswith('atr5m-comp') and _comp.endswith('-'):
+                try:
+                    from hermes_constants import ATR_COMPRESSION_MINUS_ENABLED
+                    if not ATR_COMPRESSION_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_COMPRESSION_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # counter-flip
+            if _comp == 'counter-flip':
+                try:
+                    from hermes_constants import COUNTER_FLIP_ENABLED
+                    if not COUNTER_FLIP_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COUNTER_FLIP_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'counter-flip+':
+                try:
+                    from hermes_constants import COUNTER_FLIP_PLUS_ENABLED
+                    if not COUNTER_FLIP_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COUNTER_FLIP_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'counter-flip-':
+                try:
+                    from hermes_constants import COUNTER_FLIP_MINUS_ENABLED
+                    if not COUNTER_FLIP_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COUNTER_FLIP_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # rs (support_resistance) — sources: rs-s30 (support→LONG), rs-r45 (resistance→SHORT)
+            if _comp.startswith('rs') and not _comp.startswith('rs-'):
+                try:
+                    from hermes_constants import RS_ENABLED
+                    if not RS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # rs-s* = support bounce (LONG), rs-r* = resistance rejection (SHORT)
+            # rs-s-broken = broken support (SHORT), rs-r-broken = broken resistance (LONG)
+            if _comp.startswith('rs-s') or _comp.startswith('rs-r'):
+                try:
+                    from hermes_constants import RS_PLUS_ENABLED, RS_MINUS_ENABLED
+                    if direction.upper() == 'LONG' and not RS_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RS_PLUS_ENABLED=False', flush=True)
+                        return None
+                    if direction.upper() == 'SHORT' and not RS_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RS_MINUS_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass

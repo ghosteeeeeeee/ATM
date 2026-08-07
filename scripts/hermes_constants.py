@@ -35,8 +35,7 @@ LIVE_TRADING_ENABLED = True
 SHORT_BLACKLIST = {
     # High-volatility / inverse-beta tokens (shorting meme coins = lottery)
     'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','SOPH','XAI','ZEC','GAS','BLAST','MELANIA','BTC','ZETA','SPX','DOGE','ARK','RUNE','AR',
-    'TST','NXPC','TRUMP','CELO',
-    'ACE','YZY','ZEREBRO','WLFI','HBAR','MEGA',
+    # TST, NXPC, TRUMP, CELO, ACE, YZY, ZEREBRO, WLFI, HBAR, MEGA removed 2026-08-07 — no specific block reason
     # Historical 0% SHORT win rate (2026-04-01 analysis):
     'SOL','MEW',        # avg SHORT pnl: deeply negative, bull market leader
     # HYPE, YGG removed for Batch 5 trial 2026-08-03
@@ -100,7 +99,8 @@ SHORT_BLACKLIST = {
     # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
     # OP: 4 trades, 0% WR — RE-BLACKLIST
     # All others: 0-2 trades — INSUFFICIENT (signals don't fire for these tokens)
-    'COMP', 'CRV', 'DYDX', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    # DYDX removed 2026-08-07 — user request
+    'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
     'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
     'SEI', 'MET', 'DASH', 'WLD',
     # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
@@ -126,7 +126,8 @@ SHORT_BLACKLIST = {
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
     'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','DOGE','MEW',
-    'TST', 'ACE', 'KAS', 'PROVE', 'BOME', 'USTC', 'RSR',
+    # TST, ACE, KAS, PROVE removed 2026-08-07 — no specific block reason
+    'BOME', 'USTC', 'RSR',
     # 2026-04-24: REZ, HMSTR, BNB — block both directions
     'REZ', 'HMSTR', 'BNB',
     # 2026-07-21: 48h/72h signal quality analysis — worst performing tokens
@@ -141,7 +142,8 @@ LONG_BLACKLIST = {
     'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
     'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
     # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    'COMP', 'CRV', 'DYDX', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    # DYDX removed 2026-08-07 — user request
+    'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
     'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
     'SEI', 'MET', 'DASH', 'WLD',
     'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
@@ -957,6 +959,8 @@ COUNTER_FLIP_ENABLED     = False   # controlled by counter_flip_signal.py indepe
 # wyckoff.py — detects Wyckoff accumulation springs (LONG) and distribution
 # upthrusts (SHORT) using volume and price structure analysis on 5m candles.
 WYCKOFF_ENABLED = False   # CEO 2026-08-05 — 0% WR (48h). DISABLED.
+WYCKOFF_PLUS_ENABLED = True     # wyckoff+ LONG (accumulation spring)
+WYCKOFF_MINUS_ENABLED = True    # wyckoff- SHORT (distribution upthrust)
 
 # ── EMA300 Angle Signal ────────────────────────────────────────────────────────
 # ema_angle.py — detects when EMA300 starts lifting from flat (LONG setup)
@@ -1263,6 +1267,8 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 # ── HL Copy Trading Signal ────────────────────────────────────────────────────
 # hl_copy_signal.py — Generates signals from pro trader activity
 HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
+HL_COPY_SIGNAL_PLUS_ENABLED = True     # hl_copy_signal+ LONG
+HL_COPY_SIGNAL_MINUS_ENABLED = True    # hl_copy_signal- SHORT
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal

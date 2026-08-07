@@ -509,6 +509,16 @@ def run(prices_dict: Dict = None) -> int:
         # Detect pattern
         sig = detect_wyckoff(token, candles)
         if sig is not None:
+            # ── Per-direction kill-switch ─────────────────────────────────────
+            try:
+                from hermes_constants import WYCKOFF_PLUS_ENABLED, WYCKOFF_MINUS_ENABLED
+                if sig['direction'] == 'LONG' and not WYCKOFF_PLUS_ENABLED:
+                    continue
+                if sig['direction'] == 'SHORT' and not WYCKOFF_MINUS_ENABLED:
+                    continue
+            except ImportError:
+                pass
+
             result = add_signal(
                 token=token,
                 direction=sig['direction'],

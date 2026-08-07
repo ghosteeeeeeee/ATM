@@ -158,6 +158,16 @@ def run_hl_copy_signal():
         # Generate signal
         signal = generate_hl_signal(trade, trade['score'])
         
+        # ── Per-direction kill-switch ─────────────────────────────────────────
+        try:
+            from hermes_constants import HL_COPY_SIGNAL_PLUS_ENABLED, HL_COPY_SIGNAL_MINUS_ENABLED
+            if signal['direction'] == 'LONG' and not HL_COPY_SIGNAL_PLUS_ENABLED:
+                continue
+            if signal['direction'] == 'SHORT' and not HL_COPY_SIGNAL_MINUS_ENABLED:
+                continue
+        except ImportError:
+            pass
+        
         # Write to pipeline
         write_signal_to_pipeline(signal)
         signals.append(signal)

@@ -281,11 +281,14 @@ def scan_counter_flip_signals(prices_dict: dict = None) -> int:
             price = prices_dict.get(token, {}).get('price')
         
         # ── Per-direction kill-switch ─────────────────────────────────────────
-        from hermes_constants import COUNTER_FLIP_PLUS_ENABLED, COUNTER_FLIP_MINUS_ENABLED
-        if counter_dir == 'LONG' and not COUNTER_FLIP_PLUS_ENABLED:
-            return None
-        if counter_dir == 'SHORT' and not COUNTER_FLIP_MINUS_ENABLED:
-            return None
+        try:
+            from hermes_constants import COUNTER_FLIP_PLUS_ENABLED, COUNTER_FLIP_MINUS_ENABLED
+            if counter_dir == 'LONG' and not COUNTER_FLIP_PLUS_ENABLED:
+                continue
+            if counter_dir == 'SHORT' and not COUNTER_FLIP_MINUS_ENABLED:
+                continue
+        except ImportError:
+            pass
 
         result = add_signal(
             token=token,
