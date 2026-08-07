@@ -290,7 +290,7 @@ def compute_atr_sl_tp(
     # ── PHANTOM TRADE DEBUG (2026-08-07) ────────────────────────────────────────
     # Comprehensive input trace for debugging tight-SL phantom trades.
     # Fires for ALL tokens — this is a systemic bug, not token-specific.
-    _phantom_dbg = True  # Set False to disable after bug is found
+    _phantom_dbg = False  # Disabled 2026-08-07: bug fixed (SL capped below entry for LONG)
     if _phantom_dbg:
         _sl_dist_pct = abs(current_sl - entry_price) / entry_price * 100 if current_sl > 0 and entry_price > 0 else 0
         _too_tight = _sl_dist_pct < 0.15 and current_sl > 0  # SL < 0.15% from entry = suspicious
