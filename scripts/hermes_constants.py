@@ -116,6 +116,10 @@ SHORT_BLACKLIST = {
     'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
     # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
     'GALA', 'STRK',
+    # 2026-08-06: Worst switch offenders — signals flip direction, both sides lose
+    'TAO', 'UMA', 'MOODENG', 'XMR', '0G',
+    # 2026-08-07: 5 SL hits in 48h, -$0.28 total — both directions lose
+    'KAITO',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -157,6 +161,10 @@ LONG_BLACKLIST = {
     'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
     # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
     'GALA', 'STRK',
+    # 2026-08-06: Worst switch offenders — signals flip direction, both sides lose
+    'TAO', 'UMA', 'MOODENG', 'XMR', '0G',
+    # 2026-08-07: 5 SL hits in 48h, -$0.28 total — both directions lose
+    'KAITO',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 
@@ -365,8 +373,8 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.008   # 0.8% floor — survive normal crypto retracements (was 0.5% — low-vol tokens with ATR<1% get k=0.5, producing SL=0.03% which triggers on noise; 0.8% gives breathing room)
-ATR_SL_MAX             = 0.021  # AUTO-TUNED 2026-08-020   # 2.0% cap — survive P90 MAE
+ATR_SL_MIN             = 0.012   # 1.2% floor — widened 2026-08-07 (was 0.8%). 48h data: 29/48 SL hits drift >60min — stops too tight for hold time. 0.8% = noise in low-vol tokens.
+ATR_SL_MAX             = 0.025  # 2.5% cap — widened 2026-08-07 (was 2.1%). High-vol tokens (ATR>3%) getting squeezed at 2.1%.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.015   # 1.50% cap — match wider SL for R:R (was 1.00% — too tight with 1.0% SL)
 ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
@@ -409,7 +417,7 @@ WIN_COOLDOWN_MINUTES   = 3         # block same direction for 3 min after a win 
 #   > 3%  → k=2.5  (high volatility — wide stops)
 #   1–3%  → k=2.0  (normal — balanced stops)
 ATR_K_INITIAL      = 1.2   # initial SL only (reverted to original)
-ATR_K_LOW_VOL      = 0.5   # trailing/accel SL — atr_pct < 1%
+ATR_K_LOW_VOL      = 0.8   # trailing/accel SL — atr_pct < 1% (was 0.5 — effective SL=0.4%, noise-level. 0.8 gives min 0.96% SL)
 ATR_K_NORMAL_VOL   = 1.0   # trailing/accel SL — 1.25% <= atr_pct <= 3%
 ATR_K_HIGH_VOL     = 0.25  # trailing/accel SL — atr_pct > 3%
 ATR_PCT_LOW_THRESH = 0.01  # 1%
@@ -602,6 +610,12 @@ HH_HL_BASE_CONFIDENCE    = 62
 HH_HL_STRUCT_BONUS_MAX  = 15    # per consecutive HH/HL pair
 HH_HL_BREAKOUT_BONUS_MAX = 12   # bonus for strong breakout
 HH_HL_RECENCY_BONUS_MAX = 8     # bonus for fresh signals
+
+# ── CHoCH (Change of Character) ────────────────────────────────────────────────
+HH_HL_CHOCH_BASE_CONFIDENCE = 70   # higher base — CHoCH is a stronger reversal signal
+HH_HL_CHOCH_STRUCT_BONUS_MAX = 10  # bonus for clean 4-swing structure
+HH_HL_CHOCH_RECENCY_BONUS_MAX = 6  # bonus for fresh flip
+HH_HL_CHOCH_MAX_BARS_SINCE   = 15  # reject if flip is older than this many bars
 
 # ── Profit Monster ─────────────────────────────────────────────────────────────
 # profit_monster.py — closes medium-profit positions (2-5%) at random intervals.
@@ -1108,7 +1122,7 @@ ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when
 #   DEAD_HOURS_START/END = hour range in UTC
 #   DEAD_HOURS_SIGNALS = list of signal prefixes to block during dead hours
 #   DEAD_HOURS_DEFAULT = True = block ALL signals not in list, False = only block listed signals
-DEAD_HOURS_ENABLED = False  # disabled 2026-08-06 — yesterday showed dead hours can be productive
+DEAD_HOURS_ENABLED = True  # re-enabled 2026-08-07 — 48h data: 13:00-17:00 UTC losses cluster, dead-hours WR=16%
 DEAD_HOURS_START = 3   # 03:00 UTC
 DEAD_HOURS_END = 8     # 08:00 UTC
 DEAD_HOURS_SIGNALS = [
