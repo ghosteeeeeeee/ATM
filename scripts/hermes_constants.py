@@ -120,6 +120,8 @@ SHORT_BLACKLIST = {
     'TAO', 'UMA', 'MOODENG', 'XMR', '0G',
     # 2026-08-07: 5 SL hits in 48h, -$0.28 total — both directions lose
     'KAITO',
+    # 2026-08-07: HIP-3 asset, hl_copy SHORT signal — user requested block
+    '@107',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -165,6 +167,8 @@ LONG_BLACKLIST = {
     'TAO', 'UMA', 'MOODENG', 'XMR', '0G',
     # 2026-08-07: 5 SL hits in 48h, -$0.28 total — both directions lose
     'KAITO',
+    # 2026-08-07: HIP-3 asset, hl_copy signal — user requested block
+    '@107',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 
