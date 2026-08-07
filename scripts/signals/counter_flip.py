@@ -71,7 +71,7 @@ _RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 _PRICE_DB   = '/root/.hermes/data/signals_hermes.db'
 
 # ── Feature flag ───────────────────────────────────────────────────────────────
-COUNTER_FLIP_ENABLED = True  # set False to disable without removing the file
+from hermes_constants import COUNTER_FLIP_ENABLED  # import from constants, don't shadow locally
 
 # ── Signal constants ───────────────────────────────────────────────────────────
 SIGNAL_TYPE_LONG  = 'counter_flip_long'   # counter to SHORT position

@@ -1139,6 +1139,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # zscore-rising
+            if _comp == 'zscore-rising+':
+                try:
+                    from hermes_constants import ZSCORE_RISING_PLUS_ENABLED
+                    if not ZSCORE_RISING_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ZSCORE_RISING_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'zscore-rising-':
+                try:
+                    from hermes_constants import ZSCORE_RISING_MINUS_ENABLED
+                    if not ZSCORE_RISING_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ZSCORE_RISING_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'zscore-rising':
+                try:
+                    from hermes_constants import ZSCORE_RISING_ENABLED
+                    if not ZSCORE_RISING_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ZSCORE_RISING_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
