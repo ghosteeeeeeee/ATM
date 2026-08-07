@@ -1274,3 +1274,13 @@ HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
 HL_COPY_SIGNAL_LOOKBACK_MINUTES = 5 # How far back to look for trades
 HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
+
+# ── Momentum Leaderboard Signal ─────────────────────────────────────────────
+# momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
+MOMENTUM_LEADERBOARD_ENABLED = False           # master switch — off until tested
+MOMENTUM_LEADERBOARD_PLUS_ENABLED = True       # LONG direction
+MOMENTUM_LEADERBOARD_MINUS_ENABLED = True      # SHORT direction
+MOMENTUM_LEADERBOARD_TOP_N = 10               # top movers to evaluate
+MOMENTUM_LEADERBOARD_MOVE_MIN = 1.0           # min move_score % to emit signal
+MOMENTUM_LEADERBOARD_COOLDOWN_MIN = 30        # per token+direction cooldown
+MOMENTUM_LEADERBOARD_RET_WINDOWS = (6, 5, 5)  # candles lookback for 5m/15m/1h

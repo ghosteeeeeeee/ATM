@@ -250,6 +250,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # Higher weight than breakout/pullback — CHoCH is a stronger reversal signal
     ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
     ('hh_hl_choch', 'choch-'):  1.3,   # bearish flip (HH_HL→LH_LL)
+    # momentum_leaderboard — top movers
+    ('mover_long',  'mover+'):  1.0,
+    ('mover_short', 'mover-'):  1.0,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
