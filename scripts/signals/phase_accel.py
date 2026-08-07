@@ -266,7 +266,7 @@ def run(prices_dict):
             if velocity > 0.05:
                 confidence = min(98.0, confidence + 5)
 
-            add_signal(
+            sid = add_signal(
                 token=token,
                 direction=direction,
                 signal_type='phase_accel_long',
@@ -279,10 +279,11 @@ def run(prices_dict):
                 z_score=mom.get('avg_z'),
                 z_score_tier=mom.get('z_direction'),
             )
-            set_cooldown(token, direction, hours=COOLDOWN_MINUTES / 60.0)
-            log(f'SIGNAL:  {token} {direction} phase-accel+ @{price:.6f} {confidence:.1f}% '
-                f'[vel={velocity:+.3f} pct={pct_for_phase:.0f} {prev_phase}→{curr_phase}]')
-            added += 1
+            if sid:
+                set_cooldown(token, direction, hours=COOLDOWN_MINUTES / 60.0)
+                log(f'SIGNAL:  {token} {direction} phase-accel+ @{price:.6f} {confidence:.1f}% '
+                    f'[vel={velocity:+.3f} pct={pct_for_phase:.0f} {prev_phase}→{curr_phase}]')
+                added += 1
 
         # Check for downward transition (SHORT signal)
         elif _is_downward_transition(prev_phase, curr_phase, velocity):
@@ -302,7 +303,7 @@ def run(prices_dict):
             if velocity < -0.05:
                 confidence = min(98.0, confidence + 5)
 
-            add_signal(
+            sid = add_signal(
                 token=token,
                 direction=direction,
                 signal_type='phase_accel_short',
@@ -315,10 +316,11 @@ def run(prices_dict):
                 z_score=mom.get('avg_z'),
                 z_score_tier=mom.get('z_direction'),
             )
-            set_cooldown(token, direction, hours=COOLDOWN_MINUTES / 60.0)
-            log(f'SIGNAL:  {token} {direction} phase-accel- @{price:.6f} {confidence:.1f}% '
-                f'[vel={velocity:+.3f} pct={pct_for_phase:.0f} {prev_phase}→{curr_phase}]')
-            added += 1
+            if sid:
+                set_cooldown(token, direction, hours=COOLDOWN_MINUTES / 60.0)
+                log(f'SIGNAL:  {token} {direction} phase-accel- @{price:.6f} {confidence:.1f}% '
+                    f'[vel={velocity:+.3f} pct={pct_for_phase:.0f} {prev_phase}→{curr_phase}]')
+                added += 1
 
     return added
 
