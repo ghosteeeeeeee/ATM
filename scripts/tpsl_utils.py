@@ -520,8 +520,9 @@ def compute_atr_sl_tp(
                 # Cap at min_from_entry (1.2% below entry) when trail_floor is wrong-sided.
                 if new_sl >= entry_f:
                     new_sl = min_from_entry
-                if current_sl > 0:
-                    new_sl = max(new_sl, current_sl)
+                # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
+                # one-way logic AND wrong-side correction. Adding one-way here would block
+                # the trailing gate from correcting a wrong-sided current_sl.
             else:
                 # In loss: entry floor is absolute — SL must stay at least ATR_SL_MIN from entry
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
@@ -539,8 +540,7 @@ def compute_atr_sl_tp(
                 # far below entry, trail_ceil can go below entry, causing instant stop-out.
                 if new_sl <= entry_f:
                     new_sl = min_from_entry
-                if current_sl > 0:
-                    new_sl = min(new_sl, current_sl)
+                # NOTE: No one-way gate here — the trailing gate handles one-way + correction.
             else:
                 # In loss: entry ceiling is absolute floor — SL must stay at least ATR_SL_MIN from entry
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
