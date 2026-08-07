@@ -1139,6 +1139,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # ma100-cross
+            if _comp == 'ma100-cross':
+                try:
+                    from hermes_constants import MA_100_CROSS_ENABLED
+                    if not MA_100_CROSS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_100_CROSS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'ma100-cross+':
+                try:
+                    from hermes_constants import MA_100_CROSS_PLUS_ENABLED
+                    if not MA_100_CROSS_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_100_CROSS_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'ma100-cross-':
+                try:
+                    from hermes_constants import MA_100_CROSS_MINUS_ENABLED
+                    if not MA_100_CROSS_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_100_CROSS_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # zscore-rising
             if _comp == 'zscore-rising+':
                 try:
