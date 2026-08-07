@@ -362,9 +362,6 @@ def compute_atr_sl_tp(
             ref_price = float(current_price)
         else:
             ref_price = float(entry_price)
-    if _phantom_dbg and (token in ('LINK', 'OG', 'AAVE') or (current_sl > 0 and entry_price > 0 and abs(current_sl - entry_price) / entry_price < 0.0015)):
-        print(f"  [TPSL-ANCHOR] {token} {direction}: ref_price={ref_price:.6f} "
-              f"is_initial_write={is_initial_write} _brand_new={_brand_new}")
     if direction == 'SHORT':
         if is_initial_write and entry_price > 0:
             ref_price = float(entry_price)
@@ -385,6 +382,9 @@ def compute_atr_sl_tp(
             ref_price = float(entry_price)
     else:
         ref_price = current_price if (current_price and current_price > 0) else float(entry_price)
+    if _phantom_dbg and (token in ('LINK', 'OG', 'AAVE') or (current_sl > 0 and entry_price > 0 and abs(current_sl - entry_price) / entry_price < 0.0015)):
+        print(f"  [TPSL-ANCHOR] {token} {direction}: ref_price={ref_price:.6f} "
+              f"is_initial_write={is_initial_write} _brand_new={_brand_new}")
 
     # ── Fetch ATR ───────────────────────────────────────────────────────────────
     atr = get_fresh_atr(token)

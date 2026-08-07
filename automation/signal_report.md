@@ -1,90 +1,124 @@
-# Signal Performance Report
-**Generated:** 2026-08-07 09:00 UTC | **Period:** Last 6h + 24h
+# Signal Performance Report — 2026-08-07
 
-## Overall Stats
-- **Total trades (all time):** 8,929 | **WR:** 12.7% | **PnL:** -6,814.84%
-- **Date range:** 2026-03-11 → 2026-08-07
+## Summary
+
+| Period | Trades | WR | PnL |
+|--------|--------|----|-----|
+| 6h     | 14     | 28.6% | -3.83% |
+| 24h    | 64     | 46.9% | -9.04% |
+| 7d     | 358    | 44.1% | -13.74% |
+
+**Active signals in registry:** 8 (bb_bounce, hzscore, ma_100_cross, momentum_leaderboard, range_finder, return_exhaustion, rs, vortex_break)
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb_bounce,hzscore+ | LONG | — | — | — | 3 | 100.0% | +1.27 | ENABLED |
-| ma100-cross,return_exhaustion_long | LONG | 1 | 100.0% | +0.39 | 6 | 66.7% | +1.13 | ENABLED |
-| ma100-cross,vortex_break_long | LONG | — | — | — | 5 | 80.0% | +0.82 | ENABLED |
-| hzscore+,return_exhaustion_long | LONG | 4 | 50.0% | +0.02 | 11 | 54.5% | +0.88 | ENABLED |
-| hzscore+,ma100-cross | LONG | 1 | 0.0% | -0.38 | 3 | 66.7% | +0.44 | ENABLED |
-| return_exhaustion-,vortex_break_short | SHORT | — | — | — | 3 | 66.7% | -0.11 | ENABLED |
-| ma100-cross,range_finder | SHORT | 1 | 100.0% | +0.37 | 2 | 100.0% | +0.80 | ENABLED |
-| vortex_break_short | SHORT | — | — | — | 2 | 100.0% | +0.89 | ENABLED |
-
-**Verdict:** All winners are enabled. Keep. LONG side dominates — 6 of 8 winning combos are LONG.
+| Signal | Dir | 6h WR | 6h PnL | 24h WR | 24h PnL | 7d WR | 7d PnL | Status |
+|--------|-----|-------|--------|--------|---------|-------|--------|--------|
+| ma100-cross,return_exhaustion_long | LONG | — | — | 100.0% | +1.53% | 66.7% | +1.13% | **KEEP** |
+| bb_bounce,hzscore+ | LONG | — | — | 100.0% | +0.77% | 100.0% | +2.04% | **KEEP** |
+| ma100-cross,range_finder | SHORT | — | — | 60.0% | +0.49% | 60.0% | +0.49% | **KEEP** |
+| return_exhaustion-,rs-r30 | SHORT | — | — | 100.0% | +0.53% | — | — | **KEEP** |
+| hzscore-,rs-r101..104 | SHORT | — | — | 100.0% | +0.48% | — | — | **KEEP** |
+| hzscore-,rs-r66..72 | SHORT | — | — | 100.0% | +0.42% | — | — | **KEEP** |
+| return_exhaustion_long,vortex_break_long | LONG | — | — | 100.0% | +0.32% | — | — | **KEEP** |
+| range_finder,return_exhaustion_long | LONG | — | — | 100.0% | +0.24% | — | — | **KEEP** |
 
 ---
 
-## LOSERS (WR < 30%, PnL < -2%)
+## LOSERS (WR < 30% or PnL < -2%)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| ma100-cross,return_exhaustion- | SHORT | 2 | 50.0% | -0.72 | 6 | 33.3% | -3.03 | ENABLED | **DISABLE** |
-| hzscore-,return_exhaustion- | SHORT | 2 | 0.0% | -1.23 | 10 | 50.0% | -1.86 | ENABLED | **WATCH** |
-
-### Long-term losers (still enabled, historical bleeding):
-
-| Signal | Trades | WR | Total PnL | Status | Rec |
-|--------|--------|----|-----------|--------|-----|
-| tl_break_long | 140 | 19.3% | -70.23 | ENABLED | **DISABLE** |
-| tl_break_short | 131 | 22.1% | -62.18 | ENABLED | **DISABLE** |
-| hzscore+,pct-hermes- | 112 | 16.1% | -55.08 | ENABLED | **DISABLE** |
-| hzscore- | 76 | 15.8% | -53.50 | ENABLED | **DISABLE** |
-| hzscore+,pct-hermes-,vel-hermes- | 64 | 17.2% | -34.05 | ENABLED | **DISABLE** |
-| pct-hermes+ | 64 | 14.1% | -33.83 | ENABLED | **DISABLE** |
-| tl_break_short (LONG dir) | 55 | 23.6% | -26.22 | ENABLED | **DISABLE** |
-| trend_purity+ | 16 | 25.0% | -4.02 | ENABLED | **DISABLE** |
-| accel-300+,trend_purity+ | 20 | 40.0% | -5.61 | ENABLED | **DISABLE** |
-
-**Total bleeding from enabled losers: -344.72% PnL across 678 trades.**
+| Signal | Dir | 6h WR | 6h PnL | 24h WR | 24h PnL | 7d WR | 7d PnL | Status |
+|--------|-----|-------|--------|--------|---------|-------|--------|--------|
+| hzscore-,return_exhaustion- | SHORT | — | — | 33.3% | -2.25% | 50.0% | -1.86% | **WATCH** |
+| ma100-cross,return_exhaustion- | SHORT | — | — | 40.0% | -2.26% | 42.9% | -2.76% | **WATCH** |
+| bb_bounce (standalone) | SHORT | — | — | — | — | 40.0% | -4.61% | **DISABLE** |
+| inv-accel-300- | SHORT | — | — | — | — | 38.9% | -2.87% | DEAD (already disabled) |
+| decider | SHORT | — | — | — | — | 10.0% | -1.97% | DEAD (already disabled) |
+| accel-300-breakout | LONG | — | — | — | — | 0.0% | -1.93% | DEAD (already disabled) |
+| pattern_wolf_wave_bear | SHORT | — | — | — | — | 20.0% | -1.64% | DEAD (already disabled) |
+| pattern_scanner | SHORT | — | — | — | — | 0.0% | -1.33% | DEAD (already disabled) |
 
 ---
 
-## MARGINAL (30-50% WR, small sample)
+## MARGINAL (30-50% WR, need more data)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| return_exhaustion- | SHORT | 4 | 50.0% | -0.91 | ENABLED | Needs more data |
-| hzscore-,return_exhaustion- | SHORT | 10 | 50.0% | -1.86 | ENABLED | Borderline — close to loser threshold |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
+| Signal | Dir | 6h WR | 6h PnL | 24h WR | 24h PnL | 7d WR | 7d PnL | Status |
+|--------|-----|-------|--------|--------|---------|-------|--------|--------|
+| bb_bounce,ma100-cross | LONG | 25.0% | -0.80% | 50.0% | +0.26% | 50.0% | +0.26% | **WATCH** |
+| bb_bounce,range_finder | LONG | 25.0% | -0.12% | 40.0% | +0.19% | 40.0% | +0.19% | **WATCH** |
+| hzscore+,return_exhaustion_long | LONG | — | — | 42.9% | +0.12% | 58.3% | +1.46% | **KEEP** (7d strong) |
+| hzscore+,ma100-cross | LONG | — | — | 33.3% | -0.09% | 50.0% | +0.33% | **WATCH** |
+| ma100-cross,vortex_break_short | SHORT | — | — | 66.7% | -0.12% | 66.7% | -0.12% | **WATCH** (WR good but PnL negative) |
 
 ---
 
-## SIGNAL INVERSIONS (24h)
+## DISABLED BUT STILL GENERATING OUTCOMES
 
-**No inversions found.** All signals respect their direction labels.
+**Critical finding:** 32 stale signal names still appear in signal_outcomes from the last 7d, despite being disabled. These are producing phantom outcomes from old trade data or hl-sync-guardian writes:
+
+| Stale Signal | Issue |
+|-------------|-------|
+| vel-hermes-, accel-300-*, inv-accel-300-, zscore-rising-* | CEO killed, still in outcomes |
+| pattern_wolf_wave_*, pattern_scanner | CEO killed, still in outcomes |
+| tl_break_long, tl_break_short | CEO killed 2026-08-07, still in outcomes |
+| decider | 10% WR, still in outcomes |
+| hl_copy_trader | Disabled, still in outcomes |
+| choch-5 | Via HH_HL_CHOCH, may be legitimate |
+
+**Action needed:** Investigate why disabled signals still write to signal_outcomes. Likely hl-sync-guardian or position_manager recording old trades.
+
+---
+
+## SIGNAL INVERSIONS
+
+**None detected** in last 24h.
 
 ---
 
 ## RECOMMENDATIONS
 
-1. **[DISABLE] ma100-cross,return_exhaustion- SHORT** — New 24h loser: 33.3% WR, -3.03 PnL over 6 trades. Clear signal.
-2. **[DISABLE] TL_BREAK_ENABLED** — Both long/short variants hemorrhaging (-132 PnL combined). 19-22% WR over 271 trades.
-3. **[DISABLE] hzscore+,pct-hermes- SHORT** — 16.1% WR, -55 PnL over 112 trades.
-4. **[DISABLE] pct-hermes+ LONG** — 14.1% WR, -33.83 PnL over 64 trades.
-5. **[DISABLE] hzscore- LONG** — 15.8% WR, -53.50 PnL over 76 trades.
-6. **[DISABLE] hzscore+,pct-hermes-,vel-hermes- SHORT** — 17.2% WR, -34 PnL over 64 trades.
-7. **[DISABLE] trend_purity+ LONG** — 25% WR, -4 PnL over 16 trades.
-8. **[DISABLE] accel-300+,trend_purity+ LONG** — 40% WR but -5.61 PnL over 20 trades.
-9. **[WATCH] hzscore-,return_exhaustion- SHORT** — 50% WR, -1.86 PnL over 10 trades. Borderline. Monitor next cycle.
-10. **[KEEP] All 8 winning combos** — LONG side dominant. bb_bounce,hzscore+ (100% WR, 3T) and ma100-cross combos performing well.
+### Immediate Actions
 
-**Immediate action:** Disable ma100-cross,return_exhaustion- SHORT (new finding) + the 7 historical losers. Total estimated PnL recovery: ~345%.
+1. **[DISABLE] bb_bounce standalone SHORT** — 40% WR, -4.61% PnL over 7d (10 trades). The SHORT variant of standalone bb_bounce is the biggest active loser. Consider requiring confluence with at least one additional signal before firing.
+
+2. **[WATCH] hzscore-,return_exhaustion- SHORT** — 33.3% WR, -2.25% in 24h. Needs more data. If trend continues, disable.
+
+3. **[WATCH] ma100-cross,return_exhaustion- SHORT** — 40% WR, -2.26% in 24h. Same concern as above.
+
+4. **[INVESTIGATE] Stale signal outcomes** — 32 disabled signals still generating outcomes in the database. This corrupts performance tracking. Check hl-sync-guardian.py and position_manager.py for legacy signal_type recording.
+
+### Systemic Issues
+
+5. **[TUNE] 6h under-trading** — Only 14 trades in 6h (28.6% WR). The system is generating too few signals. Consider:
+   - Lowering confluence requirements for high-confidence signals
+   - Reviewing if regime filter is too aggressive in NEUTRAL state
+   - Checking if hotset coverage is sufficient
+
+6. **[PROTECT] bb_bounce,hzscore+ combo** — 100% WR over 7d (5/5 trades, +2.04%). This is the best signal in the system. Ensure the confluence logic stays intact.
+
+7. **[MONITOR] Overall system performance** — 44.1% WR over 7d with -13.74% PnL. The confluence signals are profitable but the system overall is still negative. Focus on:
+   - Increasing confluence requirements
+   - Reducing standalone signal firing
+   - Tightening entry criteria
 
 ---
 
-*Report auto-generated. Next report: ~6h from now.*
+## 7d Top Performers (Context)
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|----|-----|
+| tl_break_long | LONG | 23 | 65.2% | +11.06% |
+| tl_break_long | SHORT | 8 | 62.5% | +5.08% |
+| tl_break_short | LONG | 4 | 75.0% | +2.10% |
+| bb_bounce,hzscore+ | LONG | 5 | 100.0% | +2.04% |
+| hzscore+,return_exhaustion_long | LONG | 12 | 58.3% | +1.46% |
+| ma100-cross,return_exhaustion_long | LONG | 6 | 66.7% | +1.13% |
+| ma100-cross,vortex_break_long | LONG | 6 | 83.3% | +1.02% |
+
+**Note:** tl_break signals show strong7d performance but CEO killed them on 2026-08-07 due to recent deterioration. The7d data includes profitable historical trades.
+
+---
+
+Generated: 2026-08-07 | Auto-generated by signal performance analysis

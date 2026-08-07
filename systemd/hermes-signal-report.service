@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes Signal Performance Report
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/signal_performance_report.py
+WorkingDirectory=/root/.hermes
+StandardOutput=append:/root/.hermes/logs/pipeline.log
+StandardError=append:/root/.hermes/logs/pipeline.log

@@ -45,6 +45,48 @@ Criteria: 20+ trades AND negative total PnL.
 
 ---
 
+## 2026-08-07: Daily Orchestrator Run (17:30 JST)
+
+### Pipeline Status (Latest)
+- **Portfolio**: 6 open | 67 closed today | **-1.88% PnL**
+- **Market regime**: 1 LONG / 0 SHORT / 105 NEUTRAL — heavily neutral
+- **Speed**: 42% tokens >= 50% — market too quiet for active trading
+- **Hotset**: 0-2 tokens (confluence gate working correctly)
+- **Errors**: 0 (only [SLOW] runner warnings)
+
+### Actions Taken
+
+**1. Disabled bb_bounce standalone SHORT**
+- File: `scripts/hermes_constants.py:936`
+- Change: `BB_BOUNCE_MINUS_ENABLED = False`
+- Reason: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled (100% WR).
+
+**2. Investigated hotset empty issue**
+- Finding: Hotset IS working correctly. Confluence gate requires 2+ unique signal types.
+- In quiet market (42% speed, 105/106 neutral), most signals are single-source and correctly blocked.
+- When confluence signals fire (bb_bounce+ + range_finder+, ma100-cross- + vortex_break_short), they DO get through.
+- Recent examples: ETH LONG (bb_bounce+ + hl_copy_trader), ENS LONG (bb_bounce+ + range_finder+)
+- **No action needed** — system working as designed.
+
+**3. Investigated stale signal names in signal_outcomes**
+- Finding: 5106 out of 8980 records (56.9%) are from stale/disabled signals.
+- Offenders: accel-300 variants, inv-accel-300, tl_break, vel-hermes, pattern_scanner, decider.
+- These are HISTORICAL records from when signals were enabled, not current writes.
+- Impact: Corrupts performance tracking metrics in signal_reporter.
+- **Recommendation**: Add filter in signal_reporter to exclude stale signal types, or purge records older than 30 days.
+
+### Recommendations for CEO
+1. **Stale signal cleanup** — 56.9% of signal_outcomes are from dead signals. Add exclusion filter or purge.
+2. **Monitor bb_bounce+hzscore+ combo** — 100% WR, best signal in system. Protect from accidental disable.
+3. **Market quietness** — 42% speed, 105/106 neutral. System correctly reducing trade frequency.
+
+### Quality Metrics
+- Tasks completed: 3/3
+- First-attempt success: 100%
+- Critical issues found: 1 (stale signal records corrupting metrics)
+
+---
+
 ## 2026-08-06: Daily Orchestrator Report
 
 ### Pipeline Status
