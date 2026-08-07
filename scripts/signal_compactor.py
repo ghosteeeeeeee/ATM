@@ -1157,6 +1157,25 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if expired_ids:
                 log(f"EXPIRED {len(expired_ids)} signals whose sources were blacklisted since entry (enforcement gap fix)")
 
+            # ── Step 12c: Proactively expire signals for blacklisted tokens ──────
+            # FIX (2026-08-07): When a token is added to SHORT/LONG_BLACKLIST,
+            # existing PENDING signals for that token are never purged — add_signal()
+            # only blocks NEW writes. This catches stale entries for blacklisted tokens.
+            cur = c.execute("SELECT id, token, direction FROM signals WHERE decision IN ('PENDING','APPROVED') AND executed=0")
+            expired_token_ids = []
+            for row_id, tok, direc in cur.fetchall():
+                blocked = (direc.upper() == 'SHORT' and tok.upper() in SHORT_BLACKLIST) or \
+                          (direc.upper() == 'LONG' and tok.upper() in LONG_BLACKLIST)
+                if blocked:
+                    c.execute("""
+                        UPDATE signals
+                        SET decision='EXPIRED', expired_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP
+                        WHERE id=? AND decision IN ('PENDING','APPROVED') AND executed=0
+                    """, (row_id,))
+                    expired_token_ids.append(row_id)
+            if expired_token_ids:
+                log(f"EXPIRED {len(expired_token_ids)} signals for blacklisted tokens (enforcement gap fix)")
+
             top10_keys = {f"{e['token']}:{e['direction']}" for e in hotset_final}
             top10_combos = {e.get('combo_key') for e in hotset_final if e.get('combo_key')}
 

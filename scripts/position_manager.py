@@ -1721,6 +1721,10 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         #   - trailing SL gate (only tighten, never loosen)
         #   - trailing TP gate (only tighten, never loosen)
         #   - INIT-to-ACCEL migration detection
+        # ── PHANTOM TRADE DEBUG (2026-08-07) ────────────────────────────────────
+        _sl_dist = abs(current_sl - _entry) / _entry * 100 if current_sl > 0 and _entry > 0 else 0
+        if _sl_dist < 0.15 and current_sl > 0:
+            log(f"  ⚠️ [PHANTOM-DBG] {token} {direction}: TIGHT SL DETECTED sl={current_sl:.6f} entry={_entry:.6f} dist={_sl_dist:.3f}% — tracing compute_atr_sl_tp inputs")
         result = compute_atr_sl_tp(
             token=token,
             direction=direction,
@@ -1741,6 +1745,14 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         new_tp = result['new_tp']
         needs_sl = result['needs_sl']
         needs_tp = result['needs_tp']
+
+        # ── PHANTOM TRADE DEBUG — result trace ─────────────────────────────────
+        if _sl_dist < 0.15 and current_sl > 0:
+            _new_dist = abs(new_sl - _entry) / _entry * 100 if new_sl > 0 and _entry > 0 else 0
+            log(f"  ⚠️ [PHANTOM-DBG] {token} {direction}: RESULT sl={current_sl:.6f}→{new_sl:.6f} "
+                f"old_dist={_sl_dist:.3f}% new_dist={_new_dist:.3f}% needs_sl={needs_sl} "
+                f"is_new={result['is_new_trade']} anchor={result.get('anchor','?')} "
+                f"eff_sl={result.get('eff_sl_pct',0)*100:.3f}% k={result.get('k',0):.3f}")
 
         # ── Force-write conditions (bypass delta gate for stale/missing values) ──
         sl_stale = not current_sl or float(current_sl) <= 0
@@ -1810,6 +1822,14 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
             new_tp = u.get('new_tp')
             if not trade_id or new_sl is None or new_tp is None:
                 continue
+            # ── PHANTOM TRADE DEBUG — catch tight SL at write time ──────────
+            _entry_chk = float(u.get('entry_price', 0) or 0)
+            if _entry_chk > 0 and new_sl > 0:
+                _dist = abs(new_sl - _entry_chk) / _entry_chk * 100
+                if _dist < 0.15:
+                    log(f"  ⚠️ [PHANTOM-WRITE] {u.get('token')} {u.get('direction')}: "
+                        f"WRITING TIGHT SL={new_sl:.6f} entry={_entry_chk:.6f} dist={_dist:.3f}% "
+                        f"(old_sl={u.get('old_sl')}) trade_id={trade_id}")
             cur.execute(
                 "UPDATE trades SET stop_loss = %s, target = %s, atr_managed = TRUE WHERE id = %s AND status = 'open'",
                 (round(new_sl, 8), round(new_tp, 8), trade_id)

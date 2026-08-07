@@ -31,10 +31,13 @@ from hermes_constants import (
     HH_HL_BREAKOUT_BONUS_MAX, HH_HL_RECENCY_BONUS_MAX,
     HH_HL_ENABLED,
     HH_HL_SHORT_RANGE_TOP_ATR, HH_HL_LONG_RANGE_BOTTOM_ATR,
+    HH_HL_CHOCH_BASE_CONFIDENCE, HH_HL_CHOCH_STRUCT_BONUS_MAX,
+    HH_HL_CHOCH_RECENCY_BONUS_MAX, HH_HL_CHOCH_MAX_BARS_SINCE,
 )
 
 SIGNAL_TYPE_BREAKOUT = 'hh_hl_breakout'
 SIGNAL_TYPE_PULLBACK = 'hh_hl_pullback'
+SIGNAL_TYPE_CHOCH    = 'hh_hl_choch'
 _PRICE_DB = '/root/.hermes/data/signals_hermes.db'
 
 # ── ATR ────────────────────────────────────────────────────────────────────────
@@ -418,6 +421,157 @@ def _detect_pullback(token: str, candles: list, structure: str,
     }
 
 
+# ── CHoCH (Change of Character) detection ──────────────────────────────────────
+
+def _structure_from_swings(swings_4: list) -> str:
+    """Classify structure from swing points. Returns 'HH_HL', 'LH_LL', or 'NEUTRAL'.
+
+    Uses the same logic as _classify_structure — checks for H,L,H,L or L,H,L,H patterns
+    in the sorted swing list. Handles non-alternating sequences by checking all valid patterns.
+    Checks 4-swing patterns first (more specific) before 3-swing patterns.
+    """
+    if len(swings_4) < 3:
+        return 'NEUTRAL'
+
+    # Sort by index
+    sorted_swings = sorted(swings_4, key=lambda x: x[0])
+    # Deduplicate by index, keeping last type
+    deduped = {}
+    for s in sorted_swings:
+        deduped[s[0]] = s
+    swings = sorted(deduped.values(), key=lambda x: x[0])
+
+    if len(swings) < 3:
+        return 'NEUTRAL'
+
+    # Check 4-swing patterns FIRST (more specific, higher confidence)
+    # Pattern: H,L,H,L (full HH_HL or LH_LL)
+    for i in range(len(swings) - 3):
+        s0, s1, s2, s3 = swings[i], swings[i+1], swings[i+2], swings[i+3]
+        if s0[2] == 'H' and s1[2] == 'L' and s2[2] == 'H' and s3[2] == 'L':
+            if s2[1] > s0[1] and s3[1] > s1[1]:
+                return 'HH_HL'
+            elif s2[1] < s0[1] and s3[1] < s1[1]:
+                return 'LH_LL'
+
+    # Pattern: L,H,L,H (full)
+    for i in range(len(swings) - 3):
+        s0, s1, s2, s3 = swings[i], swings[i+1], swings[i+2], swings[i+3]
+        if s0[2] == 'L' and s1[2] == 'H' and s2[2] == 'L' and s3[2] == 'H':
+            if s3[1] > s1[1]:
+                return 'HH_HL'
+            elif s3[1] < s1[1]:
+                return 'LH_LL'
+
+    # Then check 3-swing patterns (partial, less specific)
+    # Pattern: H,L,H (partial HH_HL)
+    for i in range(len(swings) - 2):
+        s0, s1, s2 = swings[i], swings[i+1], swings[i+2]
+        if s0[2] == 'H' and s1[2] == 'L' and s2[2] == 'H':
+            if s2[1] > s0[1]:  # higher high
+                return 'HH_HL'
+            elif s2[1] < s0[1]:  # lower high
+                return 'LH_LL'
+
+    # Pattern: L,H,L (partial LH_LL)
+    for i in range(len(swings) - 2):
+        s0, s1, s2 = swings[i], swings[i+1], swings[i+2]
+        if s0[2] == 'L' and s1[2] == 'H' and s2[2] == 'L':
+            if s2[1] < s0[1]:  # lower low
+                return 'LH_LL'
+            elif s2[1] > s0[1]:  # higher low
+                return 'HH_HL'
+
+    return 'NEUTRAL'
+
+
+def _detect_choch(token: str, candles: list, price: float) -> Optional[dict]:
+    """Detect Change of Character — structure flip from HH_HL→LH_LL or LH_LL→HH_HL.
+
+    Looks at the last 8 swings: first 4 = previous structure, last 4 = current structure.
+    If both are non-NEUTRAL and differ, that's a CHoCH.
+    """
+    highs, lows = _find_swing_highs_lows(candles)
+    if not highs or not lows:
+        return None
+
+    all_swings = []
+    for idx in highs:
+        all_swings.append((idx, candles[idx]['high'], 'H'))
+    for idx in lows:
+        all_swings.append((idx, candles[idx]['low'], 'L'))
+    all_swings.sort(key=lambda x: x[0])
+
+    # Need at least 7 swings: 3 for "previous" window overlap + 4 for current
+    # Actually need 8 for two independent sets of 4
+    if len(all_swings) < 8:
+        return None
+
+    # Previous structure: swings[-8:-4], Current structure: swings[-4:]
+    prev_swings = all_swings[-8:-4]
+    curr_swings = all_swings[-4:]
+
+    prev_struct = _structure_from_swings(prev_swings)
+    curr_struct = _structure_from_swings(curr_swings)
+
+    # Must have a flip between two defined structures
+    if prev_struct == curr_struct or prev_struct == 'NEUTRAL' or curr_struct == 'NEUTRAL':
+        return None
+
+    # CHoCH confirmed: structure flipped
+    # Determine direction based on NEW structure
+    if curr_struct == 'LH_LL':
+        direction = 'SHORT'
+        source_prefix = 'choch-'
+    elif curr_struct == 'HH_HL':
+        direction = 'LONG'
+        source_prefix = 'choch+'
+    else:
+        return None
+
+    # Bars since the flip (distance from current bar to last swing point)
+    last_swing_idx = all_swings[-1][0]
+    bars_since = len(candles) - 1 - last_swing_idx
+
+    if bars_since > HH_HL_CHOCH_MAX_BARS_SINCE:
+        return None
+
+    # Structure clarity: how many of the 4 curr swings are strictly monotonic
+    strict_pairs = 0
+    for i in range(len(curr_swings) - 1):
+        _, p_a, t_a = curr_swings[i]
+        _, p_b, t_b = curr_swings[i + 1]
+        if t_a == 'H' and t_b == 'L' and p_a > p_b:
+            strict_pairs += 1
+        elif t_a == 'L' and t_b == 'H' and p_b > p_a:
+            strict_pairs += 1
+
+    atr = _compute_atr(candles) or (price * 0.01)  # fallback to 1% of price
+
+    # Confidence
+    clarity_bonus = min(strict_pairs * 3, HH_HL_CHOCH_STRUCT_BONUS_MAX)
+    recency_bonus = max(HH_HL_CHOCH_RECENCY_BONUS_MAX - bars_since, 0)
+    confidence = int(min(
+        HH_HL_CHOCH_BASE_CONFIDENCE + clarity_bonus + recency_bonus,
+        HH_HL_CONFIDENCE_CAP
+    ))
+    if confidence < HH_HL_CONFIDENCE_FLOOR:
+        return None
+
+    source = f'{source_prefix}{bars_since}'
+
+    return {
+        'direction':   direction,
+        'confidence':  confidence,
+        'source':      source,
+        'prev_struct': prev_struct,
+        'curr_struct': curr_struct,
+        'bars_since':  bars_since,
+        'structure':   curr_struct,
+        'value':       float(confidence),
+    }
+
+
 # ── Data fetch ─────────────────────────────────────────────────────────────────
 
 def _get_candles_from_price_history(token: str, lookback: int = HH_HL_LOOKBACK) -> list:
@@ -501,19 +655,20 @@ def _get_candles_from_ohlcv_1m(token: str, lookback: int = HH_HL_LOOKBACK) -> li
 # ── Main scanner ────────────────────────────────────────────────────────────────
 
 def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
-    from hermes_constants import HH_HL_ENABLED
-    if not HH_HL_ENABLED:
-        return 0
     """Scan tokens for HH/HL structure signals and write to DB.
 
     Args:
         prices_dict: token -> {'price': float, ...} (pre-filtered by caller)
-        variant:     'breakout' | 'pullback' | 'both'
+        variant:     'breakout' | 'pullback' | 'choch' | 'both'
 
     Returns:
         list of dicts — [{'token': str, 'direction': str, 'variant': str}]
     """
-    if not HH_HL_ENABLED:
+    from hermes_constants import HH_HL_ENABLED, HH_HL_CHOCH_ENABLED
+    # Allow CHoCH to run independently of HH_HL_ENABLED
+    if not HH_HL_ENABLED and not HH_HL_CHOCH_ENABLED:
+        return []
+    if not HH_HL_ENABLED and variant not in ('choch', 'both'):
         return []
 
     from signal_schema import add_signal
@@ -538,6 +693,43 @@ def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
         if not highs or not lows:
             continue
 
+        # ── CHoCH variant (independent of current structure — detects flips) ───
+        if variant in ('choch', 'both'):
+            from hermes_constants import HH_HL_CHOCH_ENABLED
+            if HH_HL_CHOCH_ENABLED:
+                sig = _detect_choch(token, candles, price)
+                if sig:
+                    from hermes_constants import HH_HL_CHOCH_PLUS_ENABLED, HH_HL_CHOCH_MINUS_ENABLED
+                    blocked = (
+                        (sig['direction'] == 'LONG' and not HH_HL_CHOCH_PLUS_ENABLED) or
+                        (sig['direction'] == 'SHORT' and not HH_HL_CHOCH_MINUS_ENABLED)
+                    )
+                    if not blocked:
+                        sid = add_signal(
+                            token=token.upper(),
+                            direction=sig['direction'],
+                            signal_type=SIGNAL_TYPE_CHOCH,
+                            source=sig['source'],
+                            confidence=sig['confidence'],
+                            value=sig['value'],
+                            price=price,
+                            exchange='hyperliquid',
+                            timeframe='1m',
+                            z_score=None,
+                            z_score_tier=None,
+                        )
+                        if sid:
+                            fired.append({
+                                'token': token.upper(),
+                                'direction': sig['direction'],
+                                'variant': 'choch',
+                            })
+                            print(f'  HH-HL CHOCH   {sig["direction"]:5s} {token:8s} '
+                                  f'conf={sig["confidence"]:.0f}% '
+                                  f'{sig["prev_struct"]}→{sig["curr_struct"]} '
+                                  f'bars={sig["bars_since"]} '
+                                  f'[{sig["source"]}]')
+
         # ── Classify structure ───────────────────────────────────────────────────
         structure, breakout_strength, bars_since = _classify_structure(
             highs, lows, candles
@@ -551,15 +743,12 @@ def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
                 token, candles, structure, breakout_strength, price, bars_since
             )
             if sig:
-                # ── Per-direction kill-switch ─────────────────────────────────────────
                 from hermes_constants import HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED
                 blocked = (
                     (sig['direction'] == 'LONG' and not HH_HL_PLUS_ENABLED) or
                     (sig['direction'] == 'SHORT' and not HH_HL_MINUS_ENABLED)
                 )
-                if blocked:
-                    pass  # skip breakout, fall through to pullback check
-                else:
+                if not blocked:
                     sid = add_signal(
                         token=token.upper(),
                         direction=sig['direction'],
@@ -590,15 +779,12 @@ def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
                 token, candles, structure, price
             )
             if sig:
-                # ── Per-direction kill-switch ─────────────────────────────────────────
                 from hermes_constants import HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED
                 blocked = (
                     (sig['direction'] == 'LONG' and not HH_HL_PLUS_ENABLED) or
                     (sig['direction'] == 'SHORT' and not HH_HL_MINUS_ENABLED)
                 )
-                if blocked:
-                    pass  # skip pullback variant for this direction
-                else:
+                if not blocked:
                     sid = add_signal(
                         token=token.upper(),
                         direction=sig['direction'],
@@ -641,10 +827,16 @@ if __name__ == '__main__':
     if not test_tokens:
         test_tokens = dict(list(prices.items())[:10])
 
-    print(f"[hh_hl] Testing on {len(test_tokens)} tokens (breakout + pullback)...")
+    print(f"[hh_hl] Testing on {len(test_tokens)} tokens (breakout + pullback + choch)...")
     result = scan_hh_hl_signals(test_tokens, variant='both')
     print(f"[hh_hl] Done. {len(result)} signals emitted.")
     for r in result:
+        print(f"  {r}")
+
+    # Also test CHoCH specifically
+    choch_result = scan_hh_hl_signals(test_tokens, variant='choch')
+    print(f"[hh_hl] CHoCH test: {len(choch_result)} signals emitted.")
+    for r in choch_result:
         print(f"  {r}")
 
 

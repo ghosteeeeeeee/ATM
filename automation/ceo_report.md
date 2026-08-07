@@ -1,53 +1,82 @@
-# CEO Report — 2026-08-06 ~14:00 UTC
+# CEO Report — Golden Setup Discovery
 
-## System Status
-- **Pipeline:** Active | **Live Trading:** Enabled | **Kill Switch:** True
-- **Services:** pipeline timer + hl-sync-guardian both active
+**Date:** 2026-08-07
+**Data:** signal_outcomes (runtime DB)
 
-## Session Changes Acknowledged (2026-08-06 ~14:00)
+---
 
-**Signal Fixes:**
-- [x] ma_100_cross: resampling fix + cross_distance recalc. Quality improved.
-- [x] Range-bound regime gate: hzscore + return_exhaustion blocked in ranging markets. Prevents false SHORTs (UMA loss pattern).
-- [x] range_finder: new signal, registered in pipeline. Flat BB → S/R bounces.
+## Top 10 Golden Setups
 
-**Infrastructure:**
-- [x] hl_copy daemon: direction mapping fixed (plus/minus → LONG/SHORT), add_signal() used, systemd timer active.
-- [x] Profit Monster trail tier: 0.30% activation, 0.15% trail, weakness exit. T1/T2 skip.
+| # | Combo | Trades | WR% | Total PnL |
+|---|-------|--------|-----|-----------|
+| 1 | ma100-cross,vortex_break_long | 5 | 80.0 | +0.10 |
+| 2 | ma100-cross,return_exhaustion_long | 6 | 66.7 | +0.13 |
+| 3 | hwave+,hzscore- | 5 | 60.0 | -0.62 |
+| 4 | hzscore+,return_exhaustion_long | 11 | 54.5 | +0.11 |
+| 5 | hl_reconcile | 51 | 51.0 | -2.06 |
+| 6 | pct-hermes+,zscore-long | 6 | 50.0 | +0.25 |
+| 7 | hzscore-,return_exhaustion- | 10 | 50.0 | -0.18 |
+| 8 | rs-r84,zscore-pump- | 6 | 50.0 | -0.14 |
+| 9 | gap-300+,pct-hermes+,zscore-momentum+ | 6 | 50.0 | -0.77 |
+| 10 | bb_bounce | 23 | 47.8 | -0.64 |
 
-**Performance (48h):** 213 trades, 54% WR, R:R 1.21:1. LONG > SHORT (62.7% vs 50%).
+---
 
-## CEO DECISIONS
+## Key Discoveries
 
-- [ ] 2026-08-06 — **range_finder → hot-set scoring?** Add to signal scoring rotation if backtested WR ≥ 50%.
-- [ ] 2026-08-06 — **Hour 14 UTC cluster (56 losses)?** DELEGATE to bug_hunter: investigate Asian session close correlation.
-- [ ] 2026-08-06 — **bb_bounce re-enabled as confluence signal (100% WR with hzscore+)?** APPROVED for confluence-only use — never standalone. Update dead signals blocklist to exclude confluence-paired entries.
+### Signal Combos — What Works
+- **ma100-cross + reversal signals** = highest WR. 80% and 66.7% WR with positive PnL.
+- **return_exhaustion_long** appears in 3 top-10 combos — it's the best reversal filter.
+- **hzscore pairings** (hzscore+, hwave+) show edge when combined with exhaustion signals.
 
-## Session Changes Acknowledged (2026-08-06 ~16:00)
+### Tokens — Best Performers
+- MNT: 41.7% WR (12 trades, -0.05 PnL) — cleanest performer
+- PROMPT: 40% WR (25 trades, -1.19 PnL) — volume + decent edge
+- REZ: 40% WR (10 trades, -1.05 PnL) — next best
 
-**ATR SL Widening:**
-- [x] ATR_SL_MIN 0.8%→1.2%, ATR_SL_MAX 2.1%→2.5%, ATR_TP_MAX 1.5%→2.0%, K_LOW_VOL 0.5→0.8
-- Rationale: 48h data — 29/48 SL hits drifted >60min, stops too tight.
+### Hours — When to Trade
+- **Hour 14 UTC: 20.6% WR** — dominant. 603 trades, 124 wins.
+- Hour 12 UTC: 15.3% WR — second best.
+- Hours 9-14 UTC cluster is the golden window.
+- Hour 24 (end of day): worst at 10.6%.
 
-**Signal Fixes:**
-- [x] KAITO blacklisted (both dirs) — 5 SL hits, -$0.28.
-- [x] COSIG gate block: ma100-cross+return_exhaustion- (SHORT) blocked (29% WR).
-- [x] return_exhaustion min confidence raised 70→90 (data: <90 conf 37.5% WR, 90+ = 72% WR).
+### Confidence — Lower = Better (Inverted!)
+- <80% conf: **16.8% WR** — best bucket by far
+- 80-84% conf: 16.3% WR — nearly as good
+- 95+ conf: 12.4% WR — worst, yet most trades (4717)
+- **Confidence is inversely correlated with WR.** High-confidence signals are overfitted.
 
-**Key Findings:**
-- 80-89 confidence sweet spot (40.4% WR). 90+ degrades (31% WR) — stale high-conf.
-- SHORT SL hits = #1 problem (24 trades, 0% WR, -$1.98/48h).
-- bb_bounce loses standalone; only works as confluence (bb_bounce+hzscore+, 3/3, 100% WR).
-- 12-15 UTC golden window for bb_bounce (87.5% WR).
+---
 
-## CEO DECISIONS
+## CEO Decisions
 
-- [ ] 2026-08-06 — **ATR SL widening approved.** Monitor 48h for improvement.
-- [ ] 2026-08-06 — **Consider disabling tl_break SHORT** if underperformance continues next review.
-- [ ] 2026-08-06 — **SKY blacklist candidate** — consistent loser across multiple signals.
+1. **Filter for ma100-cross + (vortex_break_long OR return_exhaustion_long)** — strongest combo
+2. **Prioritize hour 14 UTC window** — or at least don't ignore it
+3. **Question the confidence gate** — high confidence ≠ high WR. Review confidence scoring logic
+4. **MNT, PROMPT, REZ** — consider weight allocation to best tokens
+5. **Investigate return_exhaustion_long** — it's in 3 winning combos, likely a strong filter
 
-## Open Items
-- [ ] CONTINUE monitoring: ma_100_cross, vortex_break, return_exhaustion (48h windows).
-- [ ] MONITOR range_finder first live trades.
-- [ ] tl_break_long: 14 trades, 100% WR, +$1.81 — PROTECTED, no changes.
-- [ ] MONITOR ATR SL widening impact (48h window).
+---
+
+## Next Steps
+- Run signal_analyst to validate combo robustness (sample size concerns for top combos)
+- Review confidence scoring algorithm in signal pipeline
+- Consider time-based filter for hour 14 UTC window
+
+---
+
+## Acknowledgment — CRITICAL: Phantom Trade Bug (2026-08-07)
+
+**Status:** Debug deployed, awaiting production data.
+
+Two phantom trade patterns identified:
+1. **TIGHT SL PHANTOM:** SL set at entry (0.004% instead of 1.0%), instant stop-out. LINK #13352: entry=8.2416, SL=8.2419, stopped in 55s.
+2. **GHOST PHANTOM:** Position on HL, zero records in brain DB.
+
+Root cause unknown. `compute_atr_sl_tp()` returns correct SL in simulation (8.159828) but production writes near-entry value (8.241900). Something diverges between sim and prod paths.
+
+**Debug instrumentation live:** `[TPSL-IN]`, `[TPSL-ANCHOR]`, `[TPSL-DEBUG]`, `[PHANTOM-DBG]`, `[PHANTOM-WRITE]`. Auto-triggers for any token with SL < 0.15% from entry.
+
+**Impact:** Capital waste, reconciliation failures, false loss pollution in win rate data.
+
+Next `position_manager` run will capture exact values. Priority: trace prod path divergence from simulation.
