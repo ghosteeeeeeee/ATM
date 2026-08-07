@@ -31,3 +31,19 @@ BOUNCE_MIN_PCT = 0.05  # was 0.03 — require stronger bounce confirmation
 
 ### Files to change
 - `scripts/signals/bb_bounce.py`: lines 27-29 (RSI + BOUNCE_MIN_PCT)
+
+---
+
+## 2026-08-07 — Post-Change Acknowledgment
+
+Three signal files updated and committed:
+
+| Signal | Change | Commits |
+|--------|--------|---------|
+| **bb_bounce.py** | Direction suffix (`+`/`-`), RSI tightened (40/60), BOUNCE_MIN_PCT 0.05 | 00a57f9, 56036e4 |
+| **ma_100_cross.py** | Direction suffix (`+`/`-`) | 2f99dce |
+| **range_finder.py** | Direction suffix (`+`/`-`) | 76ef098 |
+
+Bug hunter audit: **ALL CLEAR** — no bugs found in any of the three files.
+
+Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tighter filters.
