@@ -246,6 +246,10 @@ SIGNAL_SOURCE_WEIGHTS = {
     # inv_accel_300: suppress so accel_300 SHORT wins when both fire for same token
     ('inverse_accel_300_long',  'inv-accel-300+'):  0.7,  # LONG: lower priority than accel-300 SHORT
     ('inverse_accel_300_short', 'inv-accel-300-'):  1.0,  # SHORT: no suppression
+    # hh_hl_choch: Change of Character — structure flip signals (HH_HL↔LH_LL)
+    # Higher weight than breakout/pullback — CHoCH is a stronger reversal signal
+    ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
+    ('hh_hl_choch', 'choch-'):  1.3,   # bearish flip (HH_HL→LH_LL)
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
@@ -526,6 +530,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # POISON: hzscore+ + vel-hermes- without pct-hermes- = 20% WR
                 if has_hz_pos and has_vel_neg and not has_pct_neg:
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: hzscore++vel-hermes- without pct-hermes- blocked (20% WR, poison)")
+                    continue
+                # POISON: ma100-cross + return_exhaustion- = 29% WR (7 trades, -$0.30)
+                if 'ma100-cross' in source_parts and 'return_exhaustion-' in source_parts:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: ma100-cross+return_exhaustion- blocked (29% WR, -$0.30)")
                     continue
                 # accel-300- barely fires; no special gate needed
                 if has_accel_minus and has_ma5m_pos:
