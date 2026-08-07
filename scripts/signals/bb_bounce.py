@@ -24,9 +24,9 @@ BB_STDDEV = 1.8          # was 2.0 — more band touches for ranging markets
 BB_TOUCH_PCT = 0.30      # was 0.20 — wider crypto tolerance
 BB_MIN_BARS = 30
 RSI_PERIOD = 14
-RSI_OVERSOLD = 45        # was 40 — more permissive but not neutral
-RSI_OVERBOUGHT = 55      # was 60 — more permissive but not neutral
-BOUNCE_MIN_PCT = 0.03    # was 0.05 — above noise floor, catches real bounces
+RSI_OVERSOLD = 40        # tightened 2026-08-07 — CEO: filter weak bounces
+RSI_OVERBOUGHT = 60      # tightened 2026-08-07 — CEO: filter weak bounces
+BOUNCE_MIN_PCT = 0.05    # tightened 2026-08-07 — CEO: require stronger bounce
 COOLDOWN_MIN = 5         # was 10 — faster re-entries
 
 # ── State ───────────────────────────────────────────────────────────────
