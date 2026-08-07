@@ -263,10 +263,10 @@ SIGNAL_SOURCE_WEIGHTS = {
     # ── Combo suppressions (7d data: 2026-08-07) ────────────────────────────
     # SHORT combos that bleed: hzscore- and return_exhaustion- agree on losers
     ('mtf_zscore',  'hzscore-,return_exhaustion-'):      0.6,  # 10T 50% WR -$0.18
-    ('return_exhaustion','return_exhaustion-'):           0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
+    ('return_exhaustion_short','return_exhaustion-'):     0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
     ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28
     # zscore-rising- is the biggest volume loser (38T, 32% WR)
-    ('zscore_momentum','zscore-rising-'):                 0.5,  # 38T 32% WR -$0.22
+    ('zscore_rising_short','zscore-rising-'):             0.5,  # 38T 32% WR -$0.22
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

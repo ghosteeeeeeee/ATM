@@ -510,35 +510,42 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                # In profit: SL trails from peak at 0.4%, minimum 0.5% from entry
+                # In profit: SL trails from peak at TRAILING_DISTANCE_PCT, minimum ATR_SL_MIN from entry
                 trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
-                # Ensure SL is at least 0.5% from entry (initial SL level)
+                # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
                 new_sl = max(trail_floor, min_from_entry)
+                # FIX: SL must never be above entry for LONG — when highest_price spikes
+                # far above entry, trail_floor can exceed entry, causing instant stop-out.
+                # Cap at min_from_entry (1.2% below entry) when trail_floor is wrong-sided.
+                if new_sl >= entry_f:
+                    new_sl = min_from_entry
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             else:
-                # In loss: entry floor is absolute — SL must stay at least 0.5% from entry
+                # In loss: entry floor is absolute — SL must stay at least ATR_SL_MIN from entry
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)  # one-way: never go down
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: SL trails from nadir at 0.50%, minimum 0.80% from entry
+                # In profit: SL trails from nadir at TRAILING_DISTANCE_PCT, minimum ATR_SL_MIN from entry
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
-                # Ensure SL is at least 0.80% from entry (initial SL level)
+                # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                # FIX: floor must always win — use max() not min() (matches LONG logic)
                 new_sl = max(trail_ceil, min_from_entry)
+                # FIX: SL must never be below entry for SHORT — when lowest_price spikes
+                # far below entry, trail_ceil can go below entry, causing instant stop-out.
+                if new_sl <= entry_f:
+                    new_sl = min_from_entry
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:
-                # In loss: entry ceiling is absolute floor — SL must stay at least 0.5% from entry
+                # In loss: entry ceiling is absolute floor — SL must stay at least ATR_SL_MIN from entry
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)  # one-way: never go up
-                # In profit: trail_ceil handles SL — no entry cap needed
 
     if _phantom_dbg and (token in ('LINK', 'OG', 'AAVE') or (entry_f > 0 and new_sl > 0 and abs(new_sl - entry_f) / entry_f < 0.0015)):
         print(f"  [TPSL-DEBUG] {token} {direction}: AFTER MIN GUARD new_sl={new_sl:.6f} "
@@ -721,6 +728,9 @@ def compute_atr_sl_tp(
                 trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
                 new_sl = max(trail_floor, min_from_entry)
+                # FIX: SL must never be above entry for LONG (same as pre-gate)
+                if new_sl >= entry_f:
+                    new_sl = min_from_entry
                 if current_sl > 0:
                     new_sl = max(new_sl, current_sl)
             else:
@@ -734,8 +744,10 @@ def compute_atr_sl_tp(
             if in_profit:
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                # FIX: floor must always win — use max() not min() (matches LONG logic)
                 new_sl = max(trail_ceil, min_from_entry)
+                # FIX: SL must never be below entry for SHORT (same as pre-gate)
+                if new_sl <= entry_f:
+                    new_sl = min_from_entry
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)
             else:

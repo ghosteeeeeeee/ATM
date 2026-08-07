@@ -47,3 +47,24 @@ Three signal files updated and committed:
 Bug hunter audit: **ALL CLEAR** — no bugs found in any of the three files.
 
 Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tighter filters.
+
+---
+
+## 2026-08-07 — Signal Combo Weight Update
+
+**Source:** 7-day trade analysis (341 trades, 42% WR).
+
+| Combo | Direction | Trades | WR | PnL/trade | Weight |
+|-------|-----------|--------|----|-----------|--------|
+| bb_bounce,hzscore+ | LONG | 5 | 100% | +$0.20 | **1.3** (boost) |
+| hzscore+,return_exhaustion_long | LONG | 12 | 58% | +$0.13 | **1.2** (boost) |
+| ma100-cross,return_exhaustion_long | LONG | 6 | 67% | +$0.12 | **1.15** (boost) |
+| ma100-cross,vortex_break_long | LONG | 8 | 62% | +$0.08 | **1.1** (boost) |
+| zscore-rising- | SHORT | 38 | 32% | -$0.22 | **0.5** (suppress) |
+| ma100-cross,return_exhaustion- | SHORT | 7 | 43% | -$0.28 | **0.5** (suppress) |
+| hzscore-,return_exhaustion- | SHORT | 10 | 50% | -$0.18 | **0.6** (suppress) |
+| inv-accel-300- | SHORT | 16 | 31% | -$0.27 | **0.6** (suppress) |
+
+**Bug fixes:** Corrected signal_type strings for `return_exhaustion_short` and `zscore_rising_short` entries.
+
+**Decision:** Changes accepted. Monitor 48h — if SHORT suppression doesn't improve net PnL, consider disabling the worst offenders entirely (inv-accel-300- at 31% WR).
