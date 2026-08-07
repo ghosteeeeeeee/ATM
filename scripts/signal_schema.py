@@ -653,6 +653,20 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         # Fast path: if source is blocklisted, blacklist layer already caught it
         # Check per-source kill switches
         _src = source or ''
+        # ── Normalize bare source names to directional versions ──────────
+        # Some signals historically wrote bare names (e.g. 'ma100-cross')
+        # without +/- suffix. Normalize at write time so the compactor's
+        # confluence gate doesn't treat bare + directional as 2 types.
+        _BARE_TO_DIRECTIONAL = {'ma100-cross', 'range_finder', 'bb_bounce'}
+        _parts_tmp = _src.split(',')
+        _parts_norm = []
+        for _p in _parts_tmp:
+            _p_stripped = _p.strip()
+            if _p_stripped in _BARE_TO_DIRECTIONAL:
+                _p_stripped = f'{_p_stripped}{"+" if direction.upper() == "LONG" else "-"}'
+            _parts_norm.append(_p_stripped)
+        _src = ','.join(_parts_norm)
+        source = _src  # use normalized source for DB write + combo_key
         _components = _src.split(',')
         for _comp in _components:
             # pct-hermes
