@@ -376,7 +376,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 ATR_SL_MIN             = 0.012   # 1.2% floor — widened 2026-08-07 (was 0.8%). 48h data: 29/48 SL hits drift >60min — stops too tight for hold time. 0.8% = noise in low-vol tokens.
 ATR_SL_MAX             = 0.025  # 2.5% cap — widened 2026-08-07 (was 2.1%). High-vol tokens (ATR>3%) getting squeezed at 2.1%.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
-ATR_TP_MAX             = 0.015   # 1.50% cap — match wider SL for R:R (was 1.00% — too tight with 1.0% SL)
+ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
@@ -828,8 +828,11 @@ GUPPY_ENABLED            = False
 GUPPY_PLUS_ENABLED             = False   # guppy+ LONG
 GUPPY_MINUS_ENABLED            = False   # guppy- SHORT
 HH_HL_ENABLED            = False   # HH/HL breakout + pullback structure
-HH_HL_PLUS_ENABLED            = True    # hh_hl+ LONG
-HH_HL_MINUS_ENABLED           = True    # hh_hl- SHORT
+HH_HL_PLUS_ENABLED            = True    # hh_hl+ LONG (breakout/pullback)
+HH_HL_MINUS_ENABLED           = True    # hh_hl- SHORT (breakout/pullback)
+HH_HL_CHOCH_ENABLED           = False   # CHoCH reversal signals (separate from breakout/pullback)
+HH_HL_CHOCH_PLUS_ENABLED      = True    # choch+ bullish flip (LH_LL→HH_HL)
+HH_HL_CHOCH_MINUS_ENABLED     = True    # choch- bearish flip (HH_HL→LH_LL)
 MA300_CANDLE_ENABLED     = False
 MA300_CANDLE_PLUS_ENABLED     = False    # ma300_candle_confirm+ LONG
 MA300_CANDLE_MINUS_ENABLED   = True    # ma300_candle_confirm- SHORT
