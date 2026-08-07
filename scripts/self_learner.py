@@ -44,6 +44,16 @@ except ImportError:
 
 CRITICAL_WR = 0.25  # Below this = emergency disable
 
+# ── Combo weight tuning ────────────────────────────────────────────────
+COMBO_WEIGHTS_FILE = '/root/.hermes/data/combo_weights.json'
+COMBO_MIN_TRADES = 5        # minimum trades to adjust a combo
+COMBO_WINDOW_DAYS = 7       # lookback window
+COMBO_BOOST_WR = 0.60       # WR above this → boost
+COMBO_SUPPRESS_WR = 0.40    # WR below this → suppress
+COMBO_SUPPRESS_PNL = -0.10  # avg PnL below this with 10+ trades → suppress
+COMBO_BOOST_MAX = 1.3
+COMBO_SUPPRESS_MIN = 0.5
+
 # Parameter config: name -> {min, max, step, tighten_dir}
 # Only params that exist in hermes_constants.py
 PARAM_CONFIG = {
@@ -310,21 +320,154 @@ def analyze_and_adjust():
 
 def run():
     """Entry point for pipeline/systemd."""
-    # Lock file — prevent concurrent runs
     lock_fd = open(LOCK_FILE, 'w')
     try:
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except IOError:
         _log("Another instance running, exiting")
         return 0
-    
     try:
         _log("=== Self-learning cycle ===")
         adjustments = analyze_and_adjust()
-        _log(f"Completed: {adjustments} adjustments made")
-        return adjustments
+        combo_changes = analyze_combo_weights()
+        _log(f"Completed: {adjustments} param adjustments, {combo_changes} combo weight changes")
+        return adjustments + combo_changes
     finally:
         lock_fd.close()
+
+
+# ── Combo weight tuning ────────────────────────────────────────────────
+
+def _get_combo_stats():
+    """Query signal_outcomes for combo performance (7d window, 3+ trades)."""
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT signal_type, COUNT(*) as n,
+                   SUM(CASE WHEN is_win=1 THEN 1 ELSE 0 END)*1.0/COUNT(*) as wr,
+                   SUM(pnl_usdt) as total_pnl,
+                   SUM(pnl_usdt)*1.0/COUNT(*) as avg_pnl
+            FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+            AND created_at > datetime('now', ? || ' days')
+            GROUP BY signal_type
+            HAVING n >= ?
+            ORDER BY total_pnl DESC
+        """, (f'-{COMBO_WINDOW_DAYS}', COMBO_MIN_TRADES))
+        rows = cur.fetchall()
+        conn.close()
+        return [(r[0], r[1], r[2], r[3], r[4]) for r in rows]
+    except Exception as e:
+        _log(f"Error querying combo stats: {e}")
+        return []
+
+
+def _calc_combo_weight(wr, avg_pnl, n_trades):
+    """Map WR + avg PnL to a weight multiplier."""
+    if wr >= COMBO_BOOST_WR and avg_pnl > 0:
+        # Boost winning combos: higher WR → higher boost
+        boost = 1.0 + (wr - COMBO_BOOST_WR) * 1.5  # 60%→1.0, 80%→1.3
+        return min(COMBO_BOOST_MAX, round(boost, 2))
+    elif wr < COMBO_SUPPRESS_WR or (avg_pnl < COMBO_SUPPRESS_PNL and n_trades >= 10):
+        # Suppress losers
+        if wr < 0.25:
+            return COMBO_SUPPRESS_MIN  # 0.5 — heavy suppress
+        elif wr < 0.35:
+            return 0.6
+        else:
+            return 0.7
+    return None  # no change needed
+
+
+def _load_combo_weights():
+    """Load existing combo weights from JSON."""
+    if os.path.exists(COMBO_WEIGHTS_FILE):
+        try:
+            with open(COMBO_WEIGHTS_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
+def _save_combo_weights(weights):
+    """Save combo weights atomically.
+    
+    Args:
+        weights: dict of {combo_source: weight} — from signal_outcomes.signal_type
+    """
+    try:
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(COMBO_WEIGHTS_FILE), suffix='.tmp')
+        try:
+            with os.fdopen(fd, 'w') as f:
+                json.dump(weights, f, indent=2)
+            os.replace(tmp, COMBO_WEIGHTS_FILE)
+        except Exception:
+            os.unlink(tmp)
+            raise
+    except Exception as e:
+        _log(f"Error saving combo weights: {e}")
+
+
+def _is_signal_disabled(signal_type):
+    """Check if a signal type is disabled via hermes_constants flags."""
+    try:
+        with open(HERMES_CONSTANTS) as f:
+            content = f.read()
+        # Check SIGNAL_BLOCKED set
+        if f"'{signal_type}'" in content.split('SIGNAL_BLOCKED')[1].split(']')[0] if 'SIGNAL_BLOCKED' in content else False:
+            return True
+        # Check *_ENABLED flags (crude but works for most)
+        import re
+        flag_name = signal_type.upper().replace('-', '_') + '_ENABLED'
+        match = re.search(rf'{flag_name}\s*=\s*(True|False)', content)
+        if match:
+            return match.group(1) == 'False'
+    except Exception:
+        pass
+    return False
+
+
+def analyze_combo_weights():
+    """Analyze combo performance and update weights JSON."""
+    _log("--- Combo weight analysis ---")
+    stats = _get_combo_stats()
+    
+    if not stats:
+        _log("  No combos with enough trades")
+        return 0
+    
+    old_weights = _load_combo_weights()
+    new_weights = {}
+    changes = 0
+    
+    for signal_type, n, wr, total_pnl, avg_pnl in stats:
+        # Skip disabled signals
+        if _is_signal_disabled(signal_type):
+            _log(f"  {signal_type}: DISABLED, skipping")
+            continue
+        
+        weight = _calc_combo_weight(wr, avg_pnl, n)
+        old_w = old_weights.get(signal_type)
+        
+        if weight is not None and weight != old_w:
+            new_weights[signal_type] = weight
+            direction = "BOOST" if weight > 1.0 else "SUPPRESS"
+            _log(f"  {signal_type}: {n}T WR={wr:.0%} avg_pnl=${avg_pnl:+.4f} → {direction} {weight}")
+            changes += 1
+        elif old_w is not None:
+            new_weights[signal_type] = old_w  # keep existing
+        else:
+            _log(f"  {signal_type}: {n}T WR={wr:.0%} avg_pnl=${avg_pnl:+.4f} — no change")
+    
+    if changes > 0:
+        _save_combo_weights(new_weights)
+        _log(f"  Wrote {len(new_weights)} weights ({changes} changed) to {COMBO_WEIGHTS_FILE}")
+    else:
+        _log("  No weight changes needed")
+    
+    return changes
 
 
 if __name__ == '__main__':
@@ -337,5 +480,11 @@ if __name__ == '__main__':
                 pnl = _calculate_pnl(trades)
                 decay = _detect_decay(trades)
                 _log(f"  {signal_type}: WR={wr:.1%} PnL=${pnl:+.2f} decay={decay}")
+        _log("\n--- Combo analysis (dry) ---")
+        stats = _get_combo_stats()
+        for signal_type, n, wr, total_pnl, avg_pnl in stats:
+            weight = _calc_combo_weight(wr, avg_pnl, n)
+            status = f"→ {'BOOST' if weight and weight > 1.0 else 'SUPPRESS' if weight else 'no change'} {weight or ''}"
+            _log(f"  {signal_type}: {n}T WR={wr:.0%} avg_pnl=${avg_pnl:+.4f} {status}")
     else:
         run()

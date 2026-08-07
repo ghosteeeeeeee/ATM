@@ -68,3 +68,15 @@ Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tig
 **Bug fixes:** Corrected signal_type strings for `return_exhaustion_short` and `zscore_rising_short` entries.
 
 **Decision:** Changes accepted. Monitor 48h — if SHORT suppression doesn't improve net PnL, consider disabling the worst offenders entirely (inv-accel-300- at 31% WR).
+
+---
+
+## 2026-08-07 — Bug Fix: Phantom Trades in tpsl_utils.py
+
+**Root cause:** MINIMUM SL DISTANCE guard computed trail_floor exceeding entry_price when price spiked (e.g., MORPHO 1.90 vs entry 1.8826). Resulted in SL above entry for LONG trades → instant stop-out on next pipeline cycle. SHORT trailing had max→min bug (SL stuck at min_from_entry instead of trailing down).
+
+**Fix:** Entry-cap guards in pre-gate and POST-GATE SAFETY NET sections. SHORT trailing max→min corrected. One-way gates removed from "in-profit" branch.
+
+**Impact:** Eliminates phantom atr_sl_hit trades. SHORT trailing now functional.
+
+**Files:** `scripts/tpsl_utils.py` (commits c701d92, 23bbf1e)

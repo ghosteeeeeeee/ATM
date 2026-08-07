@@ -26,7 +26,7 @@ from hermes_file_lock import FileLock
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
-from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON
+from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON, CANDLES_DB
 
 from hermes_log import log
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
@@ -188,6 +188,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('mtf_zscore','hzscore,pct-hermes,momentum'): 1.1,  # triple combo — slightly boosted
     ('mtf_zscore','hzscore,pct-hermes'):           1.0,  # standard zscore combo
     ('mtf_zscore','hmacd-,hzscore'):              1.25,  # hzscore without pct-hermes
+    # NOTE: longer prefixes must come before shorter ones (dict iteration = first match wins)
+    ('mtf_zscore','hzscore+,return_exhaustion_long'): 1.2,  # 12T 58% WR +$0.13
+    ('mtf_zscore','hzscore-,return_exhaustion-'):      0.6,  # 10T 50% WR -$0.18
     ('mtf_zscore','hzscore'):                     0.15,  # bare hzscore — suppressed
     ('pattern_flag',    'pattern_scanner'): 1.25,
     ('pattern_hns',    'pattern_scanner'): 1.25,
@@ -254,15 +257,11 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('mover_long',  'mover+'):  1.0,
     ('mover_short', 'mover-'):  1.0,
     # ── Combo boosts (7d data: 2026-08-07) ──────────────────────────────────
-    # LONG combos that win: hzscore+ and return_exhaustion_long agree
-    ('mtf_zscore',  'hzscore+,return_exhaustion_long'):  1.2,  # 12T 58% WR +$0.13
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.3,  # 5T 100% WR +$0.20
     ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.15, # 6T 67% WR +$0.12
     ('vortex_break','ma100-cross,vortex_break_long'):     1.1,  # 8T 62% WR +$0.08
     ('range_finder','ma100-cross,range_finder'):          1.05, # 7T 57% WR +$0.07
     # ── Combo suppressions (7d data: 2026-08-07) ────────────────────────────
-    # SHORT combos that bleed: hzscore- and return_exhaustion- agree on losers
-    ('mtf_zscore',  'hzscore-,return_exhaustion-'):      0.6,  # 10T 50% WR -$0.18
     ('return_exhaustion_short','return_exhaustion-'):     0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
     ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28
     # zscore-rising- is the biggest volume loser (38T, 32% WR)
@@ -270,10 +269,28 @@ SIGNAL_SOURCE_WEIGHTS = {
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
+# Load auto-tuned combo weights (written by self_learner.py)
+COMBO_WEIGHTS_FILE = '/root/.hermes/data/combo_weights.json'
+_AUTO_COMBO_WEIGHTS = {}
+try:
+    with open(COMBO_WEIGHTS_FILE) as _f:
+        _AUTO_COMBO_WEIGHTS = json.load(_f)
+except (FileNotFoundError, json.JSONDecodeError):
+    pass
+
 def _get_source_weight(signal_type, source):
-    """Return confidence multiplier for (signal_type, source). First-match wins."""
+    """Return confidence multiplier for (signal_type, source). First-match wins.
+    
+    Auto-tuned combo weights (from self_learner) take priority over static weights.
+    Uses exact match or delimiter-bound match to avoid false prefix collisions.
+    """
     if not source:
         return DEFAULT_SOURCE_WEIGHT
+    # Check auto-tuned combo weights first (highest priority)
+    for combo_src, weight in _AUTO_COMBO_WEIGHTS.items():
+        if source == combo_src or source.startswith(combo_src + ','):
+            return weight
+    # Then check static weights
     for (stype, prefix), weight in SIGNAL_SOURCE_WEIGHTS.items():
         if signal_type == stype and source.startswith(prefix):
             return weight
@@ -1684,7 +1701,7 @@ def _filter_safe_prev_hotset(prev_hotset):
         entry['timestamp'] = current_ts
         age_min = (current_ts - entry_origin_ts) / 60.0
         entry['staleness'] = max(0.0, 1.0 - age_min * 0.2)
-# Expire entries with staleness <= 0.01 (5+ minutes old from entry_origin_ts)
+        # Expire entries with staleness <= 0.01 (5+ minutes old from entry_origin_ts)
         if entry['staleness'] <= 0.01:
             continue
         # ── Per-coin WR filter (2026-05-11) ─────────────────────────────────
