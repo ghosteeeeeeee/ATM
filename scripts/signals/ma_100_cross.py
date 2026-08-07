@@ -22,7 +22,7 @@ import os
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal
+from signal_schema import add_signal, get_cooldown, set_cooldown
 
 # ── Parameters (backtested optimal) ────────────────────────────────────────
 MA_PERIOD = 20               # MA(20) on 5m = 100 minutes lookback
@@ -225,6 +225,9 @@ def scan_ma_100_signals(prices_dict: dict) -> tuple:
         if sig['direction'] == 'SHORT' and token_upper in SHORT_BLACKLIST:
             continue
 
+        if get_cooldown(token_upper, direction=sig['direction']):
+            continue
+
         sid = add_signal(
             token=token_upper,
             direction=sig['direction'],
@@ -237,6 +240,7 @@ def scan_ma_100_signals(prices_dict: dict) -> tuple:
             timeframe='5m',
         )
         if sid:
+            set_cooldown(token_upper, sig['direction'], hours=0.5)  # 30 min cooldown
             added += 1
             signaled_tokens.append(token_upper)
             ma_dist = abs(price - sig['ma']) / price * 100

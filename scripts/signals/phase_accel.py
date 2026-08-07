@@ -32,6 +32,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from signal_schema import add_signal, price_age_minutes
 
 
+COOLDOWN_MINUTES = 30
+
 _RUNTIME_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 
 # In-memory prev_phase tracker — updated each cycle, no DB latency
@@ -196,7 +198,11 @@ def run(prices_dict):
         PHASE_ACCEL_ENABLED,
         PHASE_ACCEL_PLUS_ENABLED,
         PHASE_ACCEL_MINUS_ENABLED,
+        LONG_BLACKLIST,
+        SHORT_BLACKLIST,
     )
+
+    from signal_schema import get_cooldown, set_cooldown
 
     from signal_gen import (
         get_momentum_stats,
@@ -247,6 +253,12 @@ def run(prices_dict):
                 continue  # neutral, skip
             if not PHASE_ACCEL_PLUS_ENABLED:
                 continue
+            if direction == 'LONG' and token.upper() in LONG_BLACKLIST:
+                continue
+            if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+                continue
+            if get_cooldown(token, direction=direction):
+                continue
 
             # Confidence: based on pct_for_phase (phase strength), boost for velocity
             confidence = min(95.0, pct_for_phase)
@@ -267,6 +279,7 @@ def run(prices_dict):
                 z_score=mom.get('avg_z'),
                 z_score_tier=mom.get('z_direction'),
             )
+            set_cooldown(token, direction, hours=COOLDOWN_MINUTES / 60.0)
             log(f'SIGNAL:  {token} {direction} phase-accel+ @{price:.6f} {confidence:.1f}% '
                 f'[vel={velocity:+.3f} pct={pct_for_phase:.0f} {prev_phase}→{curr_phase}]')
             added += 1
@@ -277,6 +290,12 @@ def run(prices_dict):
             if direction is None:
                 continue
             if not PHASE_ACCEL_MINUS_ENABLED:
+                continue
+            if direction == 'LONG' and token.upper() in LONG_BLACKLIST:
+                continue
+            if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+                continue
+            if get_cooldown(token, direction=direction):
                 continue
 
             confidence = min(95.0, pct_for_phase)
@@ -296,6 +315,7 @@ def run(prices_dict):
                 z_score=mom.get('avg_z'),
                 z_score_tier=mom.get('z_direction'),
             )
+            set_cooldown(token, direction, hours=COOLDOWN_MINUTES / 60.0)
             log(f'SIGNAL:  {token} {direction} phase-accel- @{price:.6f} {confidence:.1f}% '
                 f'[vel={velocity:+.3f} pct={pct_for_phase:.0f} {prev_phase}→{curr_phase}]')
             added += 1

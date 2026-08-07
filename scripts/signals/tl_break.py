@@ -939,7 +939,7 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
             continue
 
         # ── Per-direction kill-switch ─────────────────────────────────────────
-        from hermes_constants import TL_BREAK_PLUS_ENABLED, TL_BREAK_MINUS_ENABLED
+        from hermes_constants import TL_BREAK_PLUS_ENABLED, TL_BREAK_MINUS_ENABLED, LONG_BLACKLIST, SHORT_BLACKLIST
         if sig['direction'] == 'LONG' and not TL_BREAK_PLUS_ENABLED:
             continue
         if sig['direction'] == 'SHORT' and not TL_BREAK_MINUS_ENABLED:
@@ -955,6 +955,11 @@ def scan_tl_break_signals(prices_dict: dict) -> tuple[int, list]:
                 continue  # don't buy when price is below average
             if sig['direction'] == 'SHORT' and z > 0.5:
                 continue  # don't sell when price is above average
+
+        if sig['direction'] == 'LONG' and token.upper() in LONG_BLACKLIST:
+            continue
+        if sig['direction'] == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+            continue
 
         sid = add_signal(
             token=sig['token'],

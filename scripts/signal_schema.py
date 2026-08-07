@@ -487,7 +487,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     threshold generate noise without ever reaching execution — they just create WAIT
     records. This floor prevents signal spam from low-quality indicators."""
     # ── Dead signal blocklist — defense-in-depth against NEVER_REENABLE bypass ──
-    _DEAD_SIGNALS = {'bb_bounce', 'decider', 'pattern_scanner'}
+    _DEAD_SIGNALS = {'decider', 'pattern_scanner'}
     if signal_type in _DEAD_SIGNALS:
         print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" [DEAD_SIGNAL]', flush=True)
         return None
@@ -1161,6 +1161,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     from hermes_constants import MA_100_CROSS_MINUS_ENABLED
                     if not MA_100_CROSS_MINUS_ENABLED:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MA_100_CROSS_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            # mtp-zscore
+            if _comp == 'mtp-zscore+':
+                try:
+                    from hermes_constants import MTP_ZSCORE_PLUS_ENABLED
+                    if not MTP_ZSCORE_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MTP_ZSCORE_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'mtp-zscore-':
+                try:
+                    from hermes_constants import MTP_ZSCORE_MINUS_ENABLED
+                    if not MTP_ZSCORE_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MTP_ZSCORE_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'mtp-zscore':
+                try:
+                    from hermes_constants import MTP_ZSCORE_ENABLED
+                    if not MTP_ZSCORE_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MTP_ZSCORE_ENABLED=False', flush=True)
                         return None
                 except ImportError:
                     pass
