@@ -109,7 +109,7 @@ def scan_signals(prices_dict: dict) -> int:
         )
         if sid:
             added += 1
-            from signal_gen import set_cooldown
+            from signal_schema import set_cooldown
             set_cooldown(token, direction, hours=3)
     return added
 
@@ -185,11 +185,15 @@ except Exception:
 {'name': 'your_signal', 'enabled': 'YOUR_SIGNAL_ENABLED', 'run': _your_signal_run},
 ```
 
-### 3D. If signal takes >60s, add to slow set (~line 338)
+### 3D. If signal scans all tokens (>60s), add to slow set (~line 338)
+
+If your signal iterates over all ~191 tokens (like momentum, mtf_momentum, ma_100_cross), it's a slow signal. Add it:
 
 ```python
 _SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'your_signal'}
 ```
+
+Slow signals run every 5 min instead of every 1 min. Symptom of missing this: pipeline timeout, signal runner blocks fast signals.
 
 ---
 
@@ -236,12 +240,28 @@ if _comp == 'your-signal-':
 | `your-signal` (bare) | `_comp == 'your-signal'` checks ENABLED |
 | `your_signal_long` | `_comp in ('your-signal+', 'your_signal_long')` checks PLUS_ENABLED |
 | `your_signal_short` | `_comp in ('your-signal-', 'your_signal_short')` checks MINUS_ENABLED |
+| Asymmetric (e.g. `return_exhaustion_long` / `return_exhaustion-`) | `_comp in (...)` with both variants |
 
-**Bug pattern to avoid**: If your source is bare (no `+`/`-`), the `+`/`-` Layer 2 checks are dead code. Use `direction` param or add direction suffix to source.
+**Bug patterns to avoid**:
+1. If your source is bare (no `+`/`-`), the `+`/`-` Layer 2 checks are dead code. Use `direction` param or add direction suffix to source.
+2. Asymmetric sources (different format per direction) — list BOTH variants in `_comp in (...)`.
+
+### ALLOWED_SIGNAL_SOURCES
+
+**File**: `/root/.hermes/scripts/signal_schema.py` (~line 1610)
+
+New source strings must be in the `ALLOWED_SIGNAL_SOURCES` frozenset or they route to `'unknown'`. Add your source(s):
+
+```python
+ALLOWED_SIGNAL_SOURCES = frozenset({
+    ...,
+    'your-signal+', 'your-signal-',   # or 'your-signal' if bare
+})
+```
 
 ---
 
-## Step 5: Source weight in signal_compactor.py (optional)
+## Step 5: Source weight in signal_compactor.py (recommended)
 
 **File**: `/root/.hermes/scripts/signal_compactor.py`
 
@@ -260,7 +280,7 @@ In `SIGNAL_SOURCE_WEIGHTS` (~line 177-253):
 # 1. Syntax check
 python3 -c "import py_compile; py_compile.compile('scripts/signals/your_signal.py', doraise=True)"
 
-# 2. Dry run
+# 2. Dry run (--dry logs decisions but still writes to DB — not a true dry run)
 cd /root/.hermes/scripts && python3 signals/your_signal.py --dry
 
 # 3. Check logs
