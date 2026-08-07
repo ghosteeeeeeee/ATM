@@ -119,6 +119,7 @@ def _get_current_phase(token: str) -> Optional[str]:
     Returns None if data not available (fail-open for signal filters).
     """
     import sqlite3
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         c = conn.cursor()
@@ -129,7 +130,6 @@ def _get_current_phase(token: str) -> Optional[str]:
             ORDER BY updated_at DESC LIMIT 1
         """, (token.upper(),))
         row = c.fetchone()
-        conn.close()
         if not row:
             return None
         pct = float(row[0] or 50)
@@ -137,6 +137,9 @@ def _get_current_phase(token: str) -> Optional[str]:
         return _phase_from_pct(pct, velocity)
     except Exception:
         return None
+    finally:
+        if conn:
+            conn.close()
 
 
 def _atr_sl_k_scaled(
@@ -733,11 +736,18 @@ def compute_atr_sl_tp(
                 if new_sl >= entry_f:
                     new_sl = min_from_entry
                 if current_sl > 0:
-                    new_sl = max(new_sl, current_sl)
+                    # Only enforce one-way when current_sl is correct-side (below entry for LONG).
+                    # If current_sl is wrong-sided (above entry), the trailing gate's correction
+                    # must not be overwritten by this one-way gate.
+                    current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
+                    if not current_above_entry:
+                        new_sl = max(new_sl, current_sl)
             else:
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
-                    new_sl = max(new_sl, current_sl)
+                    current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
+                    if not current_above_entry:
+                        new_sl = max(new_sl, current_sl)
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
@@ -751,11 +761,17 @@ def compute_atr_sl_tp(
                 if new_sl < current_price:
                     new_sl = min_from_entry
                 if current_sl > 0:
-                    new_sl = min(new_sl, current_sl)
+                    # Only enforce one-way when current_sl is correct-side (above entry for SHORT).
+                    # If current_sl is wrong-sided (below entry), trailing gate's correction must stick.
+                    current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
+                    if not current_below_entry:
+                        new_sl = min(new_sl, current_sl)
             else:
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
-                    new_sl = min(new_sl, current_sl)
+                    current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
+                    if not current_below_entry:
+                        new_sl = min(new_sl, current_sl)
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
 
