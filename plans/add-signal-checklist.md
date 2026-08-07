@@ -352,3 +352,28 @@ This prevents `signal_rotator.py` from auto-re-enabling it.
 6. **Wrong column names** — use `pnl_usdt` and `amount_usdt`, never `pnl_usd` or `size`.
 
 7. **SQL placeholders** — use `?` or named params, never `***`.
+
+---
+
+## Step 7: Call bug_hunter to verify
+
+Always run the bug_hunter as the final step. No exceptions.
+
+```bash
+cd /root/.hermes
+python3 -c "
+import sys
+sys.argv = ['bug_hunter', 'scripts/signals/your_signal.py', 'scripts/signal_schema.py', 'scripts/hermes_constants.py', 'scripts/signals/__init__.py']
+exec(open('automation/bug_hunter_prompt.md').read())
+"
+```
+
+The bug_hunter checks:
+- Source string matches between script and Layer 2 enforcement
+- Import safety (try/except ImportError on all new checks)
+- Flag naming consistency
+- Control flow bugs (return None vs continue in loops)
+- Missing blacklist checks
+- Dead code paths
+
+**Do not skip this step.** Every signal addition has caught issues on the first bug_hunter pass.
