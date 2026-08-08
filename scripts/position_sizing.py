@@ -135,9 +135,10 @@ def calculate_kelly_size(
     avg_win: float,
     avg_loss: float,
     bankroll: float,
-    max_position_pct: float = 0.10,  # Max 10% of bankroll per trade
-    kelly_fraction: float = 0.5,      # Half-Kelly by default
-    min_size: float = 5.0,            # Minimum $5 per trade
+    max_position_pct: float = 0.05,  # Max 5% of bankroll per trade
+    kelly_fraction: float = 0.25,     # Quarter-Kelly by default
+    min_size: float = 11.0,           # HL minimum notional
+    max_size: float = 20.0,           # Hard cap
 ) -> float:
     """
     Calculate position size in USDT using Kelly criterion.
@@ -148,8 +149,9 @@ def calculate_kelly_size(
         avg_loss: Average losing trade PnL %
         bankroll: Total bankroll in USDT
         max_position_pct: Maximum position size as % of bankroll
-        kelly_fraction: Fraction of Kelly to use (0.5 = half-Kelly)
-        min_size: Minimum position size in USDT
+        kelly_fraction: Fraction of Kelly to use (0.25 = quarter-Kelly)
+        min_size: Minimum position size in USDT (HL minimum = $11)
+        max_size: Maximum position size in USDT
     
     Returns:
         Position size in USDT
