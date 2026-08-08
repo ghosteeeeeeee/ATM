@@ -108,3 +108,22 @@ All deliverables committed. Ready for next phase implementation.
 
 ### Status
 Phase 1 and 2 complete. Awaiting integration into live pipeline.
+
+---
+
+## CEO Report — Position Sizing Spec Decisions (2026-08-08)
+
+### Verified Numbers
+- 24h: 55 trades, +$0.51, 61.8% WR (system recovering)
+- 7d: 408 trades, -$8.92 (Aug 2-4 bled ~$10, Aug 5-8 profitable)
+- Worst signals: `inv-accel-300-` SHORT 16.7% WR (30t, -$2.06), `zscore-rising+` LONG 26.9% WR (26t, -$1.01)
+
+### Decisions
+
+**1. Phase 1: All three, in order.** Signal Weighting (#1) first — it's the only one that directly addresses the bleeders (D/F grade signals). Drawdown-Responsive (#2) and Portfolio Heat (#3) follow this week. All three are <20 lines each, low risk, composable.
+
+**2. Circuit breaker: 10% drawdown — keep current.** `KELLY_DRAWDOWN_CIRCUIT_BREAKER = 0.10` is already set. The Drawdown-Responsive Sizing (#2) has tiers at 5%/10% — consistent. No change needed.
+
+**3. Kelly at 50 trades, not 30.** Signal-specific variance is too high (some signals at 0% WR). 50 trades gives enough statistical confidence per signal. The DB shows 55 trades in 24h — the threshold will be met soon anyway. Keep `KELLY_MIN_TRADES = 50`.
+
+**4. Conservative mode toggle: Yes.** One `CONSERVATIVE_MODE_ENABLED = False` flag + one multiplier (0.5x). Trivial, gives manual override during uncertainty periods. Add to Phase 1 as item #4.

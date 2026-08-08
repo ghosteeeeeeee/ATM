@@ -466,19 +466,18 @@ class HebbianEngine:
         """Get weight and co_occurrences for a synapse pair. Returns (weight, count) or (0, 0).
         Checks both orderings since DB stores normalized (a_id < b_id)."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.execute("""
-                SELECT s.weight, s.co_occurrences
-                FROM synapse_weights s
-                JOIN concept_nodes a ON s.concept_a_id = a.id
-                JOIN concept_nodes b ON s.concept_b_id = b.id
-                WHERE (a.name = ? AND b.name = ?) OR (a.name = ? AND b.name = ?)
-                LIMIT 1
-            """, (concept_a, concept_b, concept_b, concept_a))
-            row = cur.fetchone()
-            conn.close()
-            if row:
-                return (float(row[0]), int(row[1]))
+            with sqlite3.connect(self.db_path) as conn:
+                cur = conn.execute("""
+                    SELECT s.weight, s.co_occurrences
+                    FROM synapse_weights s
+                    JOIN concept_nodes a ON s.concept_a_id = a.id
+                    JOIN concept_nodes b ON s.concept_b_id = b.id
+                    WHERE (a.name = ? AND b.name = ?) OR (a.name = ? AND b.name = ?)
+                    LIMIT 1
+                """, (concept_a, concept_b, concept_b, concept_a))
+                row = cur.fetchone()
+                if row:
+                    return (float(row[0]), int(row[1]))
         except Exception:
             pass
         return (0.0, 0)
@@ -722,7 +721,8 @@ class HebbianEngine:
         """
         Apply decay to old synapses. Returns number of rows affected.
         """
-        cutoff = datetime.now() - timedelta(days=min_age_days)
+        from datetime import timezone
+        cutoff = datetime.now(timezone.utc) - timedelta(days=min_age_days)
         cutoff_str = cutoff.isoformat()
 
         with sqlite3.connect(self.db_path) as conn:

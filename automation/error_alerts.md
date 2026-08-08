@@ -85,3 +85,10 @@
 ## Error Alerts — 2026-08-06 22:08 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`
+
+## Error Alerts — 2026-08-08 04:40 UTC
+- **WARN** (1x): `pipeline.log at 1.6GB` — no log rotation configured
+- **WARN** (236/549): `token_speeds.is_stale=1` — many stale tokens (old delisted tokens)
+- **WARN**: `trades.db` and `positions.db` are empty (0 bytes) — trades tracked via hl_copy.db
+- **INFO**: Disk at 81% (22GB free) — approaching 85% threshold
+- **INFO**: No errors/exceptions in pipeline last 30min

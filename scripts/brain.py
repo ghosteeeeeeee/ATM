@@ -883,18 +883,27 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             # Update circuit breaker stats with actual outcome
             try:
                 import json as _json
+                import tempfile as _tf
                 stats_file = '/root/.hermes/data/hebbian_gate_stats.json'
                 with open(stats_file) as f:
                     stats = _json.load(f)
-                # Find matching auto-decision (same token+signal, no actual yet)
+                # Find matching auto-decision (same token+signal+direction, no actual yet)
                 for dec in reversed(stats.get('auto_decisions', [])):
                     if (dec.get('token') == token.upper() and 
                         dec.get('signal') == signal and
+                        dec.get('direction') == direction and
                         dec.get('actual') is None):
                         dec['actual'] = hype_pnl_pct > 0
                         break
-                with open(stats_file, 'w') as f:
-                    _json.dump(stats, f, indent=2)
+                # Atomic write
+                fd, tmp = _tf.mkstemp(dir='/root/.hermes/data', suffix='.tmp')
+                try:
+                    with os.fdopen(fd, 'w') as f:
+                        _json.dump(stats, f, indent=2)
+                    os.replace(tmp, stats_file)
+                except Exception:
+                    try: os.unlink(tmp)
+                    except Exception: pass
             except Exception:
                 pass
         except Exception:
