@@ -209,3 +209,22 @@ Step 5: VERIFY
 - Update kanban
 - Append to report
 ```
+
+## NEW DIRECTIVE (2026-08-09 — from T)
+
+**Priority #1: Improve win rate. Every trade should be a winner.**
+
+**Current state:**
+- 24h WR: 50-62% (fluctuating)
+- LONG: 75% WR — strong
+- SHORT: 0-44% WR — needs improvement
+- Target: 65%+ consistently
+
+**Actions required:**
+1. Do NOT pause progress/innovation when system is profitable
+2. Keep improving — find ways to filter out losers
+3. Monitor each signal combo — disable any below 50% WR after 10+ trades
+4. Use new position_sizing.py signal quality scoring to filter trades
+5. Report WR improvements in each run
+
+**Your role:** Make decisions that improve WR while maintaining or growing PnL.

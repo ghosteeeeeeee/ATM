@@ -67,3 +67,24 @@ No new changes. Earlier fixes (signal kills, ATR SL widening 1.0→1.2%) need mo
 SHORT improved from -$0.54/24h to expected breakeven after signal kills propagate. LONG is strong at 71.4% WR. All recent fixes working.
 
 ---
+
+---
+
+## NEW DIRECTIVE (2026-08-09 — from T)
+
+**Priority #1: Improve win rate. Every trade should be a winner.**
+
+**Current state:**
+- 24h WR: 50-62% (fluctuating)
+- LONG: 75% WR — strong
+- SHORT: 0-44% WR — needs improvement
+- Target: 65%+ consistently
+
+**Actions required:**
+1. Do NOT pause progress/innovation when system is profitable
+2. Keep improving — find ways to filter out losers
+3. Consider: signal quality gating, regime filters, tighter confluence requirements
+4. Monitor each signal combo — disable any below 50% WR after 10+ trades
+5. Use new position_sizing.py signal quality scoring to filter trades
+
+**Your role:** Make decisions that improve WR while maintaining or growing PnL.

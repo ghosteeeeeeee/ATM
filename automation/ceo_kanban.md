@@ -210,3 +210,24 @@
 - [x] 2026-08-09 15:18 — CEO review: 24h +$0.17 (50% WR, 24 trades). 7d -$8.09 (42.1% WR). LONG +$0.73 (75% WR, 16 trades) — strong. SHORT -$0.56 (0% WR, 8 trades) — ALL pre-bug-fix (13:25 UTC). Bug fix working: 0 ma100-cross SHORT trades after fix. Star: bb_bounce+,range_finder+ LONG 75% WR, +$0.32/24h. No changes — all fixes deployed, system profitable.
 - [x] 2026-08-08 15:50 — CEO review: 24h +$0.68 (61.4% WR, 44 trades). 7d -$1.05 (44.2% WR). LONG +$1.16 (76.7% WR) — strong. SHORT -$0.48 (28.6% WR) — residual pre-disable trades. Star: bb_bounce+,range_finder+ LONG 71.4% WR, +$0.51. No changes — system profitable, all fixes working.
 - [x] 2026-08-09 10:50 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
+
+## NEW DIRECTIVE (2026-08-09 — from T)
+
+- [ ] **PRIORITY #1: IMPROVE WIN RATE** — Every trade should be a winner
+  - Current 24h WR: 50-62% (fluctuating)
+  - Target WR: 65%+ consistently
+  - LONG: 75% WR — strong, protect
+  - SHORT: 0-44% WR — needs improvement
+  - Use signal quality scoring to filter trades
+  - Disable any signal combo below 50% WR after 10+ trades
+
+- [ ] **DO NOT PAUSE PROGRESS** — Keep innovating when system is profitable
+  - Signal quality gating
+  - Regime filters
+  - Tighter confluence requirements
+  - Position sizing improvements
+
+- [ ] **ACTION:** Implement signal quality gate in signal_compactor.py
+  - Score each signal before entry
+  - Block D/F grade signals
+  - Require C or better for live trading
