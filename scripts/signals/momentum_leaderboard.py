@@ -195,11 +195,15 @@ def detect_leaderboard_signals() -> list:
         # Velocity for overextension detection (5m per-candle avg)
         vel_5m = _compute_velocity(closes_5m, lb_5m) if len(closes_5m) >= lb_5m + 1 else None
 
-        # move_score: weighted absolute returns
+        # move_score: 1h is the primary mover signal, shorter TFs confirm
         abs_1h = abs(ret_1h)
         abs_15m = abs(ret_15m) if ret_15m is not None else 0
         abs_5m = abs(ret_5m) if ret_5m is not None else 0
-        move_score = abs_1h * 0.5 + abs_15m * 0.3 + abs_5m * 0.2
+        move_score = abs_1h * 0.7 + abs_15m * 0.2 + abs_5m * 0.1
+
+        # Require meaningful 1h move — this is a leaderboard, not a scalper
+        if abs_1h < 2.0:
+            continue
 
         if move_score < MOMENTUM_LEADERBOARD_MOVE_MIN:
             continue
