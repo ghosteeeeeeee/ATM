@@ -1334,7 +1334,7 @@ RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data
 # Best on high-ATR tokens (ATR% >= 0.04%)
 MA_100_CROSS_ENABLED = False          # DISABLED — replaced by ma_100_cross_long + ma_100_cross_short
 MA_100_CROSS_PLUS_ENABLED = True      # LONG (price crosses above MA)
-MA_100_CROSS_MINUS_ENABLED = False    # SHORT DISABLED 2026-08-08 — 40% WR, -$0.31/24h. All ma100-cross SHORT combos bleeding.
+MA_100_CROSS_MINUS_ENABLED = True     # Re-enabled 2026-08-08 — new ma_100_cross_short.py with tighter params
 
 # ── HL Copy Trading ───────────────────────────────────────────────────────────
 # hl_copy_trader.py — Track top Hyperliquid traders and copy their trades
