@@ -1324,3 +1324,14 @@ CONTINUATION_CONF_BASE = 80
 CONTINUATION_CONF_FLOOR = 65
 CONTINUATION_CONF_CAP = 90
 CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)
+
+# ── Hebbian autonomous gate ─────────────────────────────────────────────
+HEBBIAN_GATE_ENABLED = True                   # master switch for autonomous decisions
+HEBBIAN_AUTO_APPROVE_WR = 0.60               # WR >= this AND n >= min_n → auto-approve
+HEBBIAN_AUTO_REJECT_WR = 0.30                # WR <= this AND n >= min_n → auto-reject
+HEBBIAN_AUTO_MIN_N = 5                       # minimum trades for autonomous decision
+HEBBIAN_EXIT_PROFIT_BOOST = 5                # +conf when exit_profit dominant
+HEBBIAN_EXIT_SL_PENALTY = 8                  # -conf when exit_sl dominant
+HEBBIAN_COMBO_PART_BOOST = 3                 # +conf when combo parts both have high WR
+HEBBIAN_CIRCUIT_BREAKER_WR = 0.45            # if auto-decision WR drops below, disable gate
+HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before circuit breaker

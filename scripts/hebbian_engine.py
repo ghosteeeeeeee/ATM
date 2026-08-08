@@ -396,6 +396,57 @@ class HebbianEngine:
             wr = 0.5
         return (min(max(wr, 0.0), 1.0), int(count), float(weight))
 
+    def synapse_weight(self, concept_a: str, concept_b: str) -> tuple:
+        """Get weight and co_occurrences for a synapse pair. Returns (weight, count) or (0, 0).
+        Checks both orderings since DB stores normalized (a_id < b_id)."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cur = conn.execute("""
+                SELECT s.weight, s.co_occurrences
+                FROM synapse_weights s
+                JOIN concept_nodes a ON s.concept_a_id = a.id
+                JOIN concept_nodes b ON s.concept_b_id = b.id
+                WHERE (a.name = ? AND b.name = ?) OR (a.name = ? AND b.name = ?)
+                LIMIT 1
+            """, (concept_a, concept_b, concept_b, concept_a))
+            row = cur.fetchone()
+            conn.close()
+            if row:
+                return (float(row[0]), int(row[1]))
+        except Exception:
+            pass
+        return (0.0, 0)
+
+    def exit_quality_score(self, signal: str) -> dict:
+        """Get exit-profit vs exit-sl weight for a signal.
+        Returns {'profit_w': float, 'profit_n': int, 'sl_w': float, 'sl_n': int, 'ratio': float}.
+        ratio > 1.0 means profit exits dominate.
+        """
+        profit_w, profit_n = self.synapse_weight(signal, 'exit_profit')
+        sl_w, sl_n = self.synapse_weight(signal, 'exit_sl')
+        total_w = profit_w + sl_w
+        ratio = profit_w / sl_w if sl_w > 0 else (999.0 if profit_w > 0 else 1.0)
+        return {
+            'profit_w': profit_w, 'profit_n': profit_n,
+            'sl_w': sl_w, 'sl_n': sl_n,
+            'ratio': ratio,
+        }
+
+    def combo_part_wr(self, token: str, signal: str) -> list:
+        """For combo signals like 'bb_bounce+,range_finder+', look up individual part WR.
+        Returns list of (part_name, wr, n, weight) for each part with data.
+        """
+        if not signal or ',' not in signal:
+            return []
+        parts = [s.strip() for s in signal.split(',') if s.strip()]
+        results = []
+        for part in parts:
+            wr_est = self.wr_estimate(token, part)
+            if wr_est:
+                wr, n, weight = wr_est
+                results.append((part, wr, n, weight))
+        return results
+
     def recall(
         self,
         concept: str,

@@ -53,6 +53,9 @@ from hermes_constants import (
     HEBBIAN_BOOST_WR, HEBBIAN_BOOST_AMOUNT, HEBBIAN_BOOST_MIN_N,
     HEBBIAN_PENALTY_WR, HEBBIAN_PENALTY_AMOUNT, HEBBIAN_PENALTY_MIN_N,
     HEBBIAN_CACHE_TTL,
+    HEBBIAN_GATE_ENABLED, HEBBIAN_AUTO_APPROVE_WR, HEBBIAN_AUTO_REJECT_WR,
+    HEBBIAN_AUTO_MIN_N, HEBBIAN_EXIT_PROFIT_BOOST, HEBBIAN_EXIT_SL_PENALTY,
+    HEBBIAN_COMBO_PART_BOOST, HEBBIAN_CIRCUIT_BREAKER_WR, HEBBIAN_CIRCUIT_BREAKER_N,
     TOKEN_SENTIMENT_ENABLED, TOKEN_SENTIMENT_K,
     TOKEN_SENTIMENT_SKIP_THRESHOLD, TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD,
     TOKEN_SENTIMENT_BOOST_THRESHOLD, TOKEN_SENTIMENT_BOOST_AMOUNT,
@@ -868,9 +871,18 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
     if setup:
         heb_section += f"\nSimilar setup history: {setup.n} trades, WR={setup.win_rate*100:.0f}%, avg PnL={setup.avg_pnl:+.2f}%"
     if heb:
-        wr_est, n, weight, concepts = heb
+        wr_est, n, weight, concepts = heb[0], heb[1], heb[2], heb[3]
+        exit_quality = heb[4] if len(heb) > 4 else None
+        combo_parts = heb[5] if len(heb) > 5 else []
         wr_pct = wr_est * 100
         heb_section += f"\nHebbian estimate: WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})"
+        # Add exit-quality context
+        if exit_quality and exit_quality['profit_n'] + exit_quality['sl_n'] >= 3:
+            heb_section += f"\nExit quality: profit={exit_quality['profit_n']}T SL={exit_quality['sl_n']}T ratio={exit_quality['ratio']:.1f}"
+        # Add combo-part context
+        if combo_parts:
+            parts_str = ', '.join(f'{p[0]}={p[1]*100:.0f}%' for p in combo_parts)
+            heb_section += f"\nCombo parts: {parts_str}"
         # Add concept context for LLM
         if concepts:
             # Group concepts by type for readability
@@ -1011,37 +1023,40 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
         pass
     return None
 
-_hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, expiry)
+_hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, exit_quality, combo_parts, expiry)
 
 def hebbian_trade_boost(token, signal):
     """Estimate historical win rate from Hebbian memory for (token, signal) pair.
-    Returns (wr, n, weight, concepts) or None. Fail-open. 10min cache.
-    concepts = list of (concept_name, label, weight, count) for LLM context."""
+    Returns (wr, n, weight, concepts, exit_quality, combo_parts) or None. Fail-open. 10min cache.
+    concepts = list of (concept_name, label, weight, count) for LLM context.
+    exit_quality = {'profit_w', 'profit_n', 'sl_w', 'sl_n', 'ratio'} or None.
+    combo_parts = list of (part_name, wr, n, weight) for combo signal parts."""
     from hebbian_engine import HebbianEngine
     cache_key = f"{token}:{signal}"
     now = time.time()
     cached = _hebbian_cache.get(cache_key)
-    if cached and now - cached[4] < HEBBIAN_CACHE_TTL:
+    if cached and now - cached[6] < HEBBIAN_CACHE_TTL:
         if cached[0] is None:
-            return None  # cached as no-data
-        return (cached[0], cached[1], cached[2], cached[3])
+            return None
+        return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5])
     try:
         engine = HebbianEngine()
         result = engine.wr_estimate(token, signal)
-        # Get full recall data for LLM context
         recall = engine.recall(token, k=20)
-        # Filter to relevant concepts (exclude regime/decision nodes)
         concepts = [(c, l, w, n) for c, l, w, n in recall
                     if l == 'concept' and c not in ('SHORT_BIAS', 'LONG_BIAS', 'NEUTRAL',
                                                      'APPROVED', 'HOT_APPROVED', 'WAIT', 'SKIPPED')]
+        # Phase 1: exit-quality + combo-part lookups
+        exit_quality = engine.exit_quality_score(signal) if signal else None
+        combo_parts = engine.combo_part_wr(token, signal) if signal else []
     except Exception:
         return None
     if result is None:
-        _hebbian_cache[cache_key] = (None, None, None, [], now)
+        _hebbian_cache[cache_key] = (None, None, None, [], None, None, now)
         return None
     wr, n, weight = result
-    _hebbian_cache[cache_key] = (wr, n, weight, concepts, now)
-    return (wr, n, weight, concepts)
+    _hebbian_cache[cache_key] = (wr, n, weight, concepts, exit_quality, combo_parts, now)
+    return (wr, n, weight, concepts, exit_quality, combo_parts)
 
 def context_gate(token, direction, source, sig):
     """
@@ -1099,15 +1114,53 @@ def context_gate(token, direction, source, sig):
     # Hebbian WR estimate (brain.db token ↔ signal weight)
     heb = hebbian_trade_boost(token, source)
     if heb:
-        wr_est, n, weight, concepts = heb
+        wr_est, n, weight, concepts, exit_quality, combo_parts = heb
         wr_pct = wr_est * 100
         log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})')
+
+        # Phase 1: exit-quality enrichment
+        exit_boost = 0
+        if exit_quality:
+            eq = exit_quality
+            if eq['profit_n'] >= 3 and eq['ratio'] > 2.0:
+                exit_boost = HEBBIAN_EXIT_PROFIT_BOOST
+                log(f'  [HEBBIAN] exit-quality: profit dominant (ratio={eq["ratio"]:.1f}) → +{exit_boost}')
+            elif eq['sl_n'] >= 3 and eq['ratio'] < 0.5:
+                exit_boost = -HEBBIAN_EXIT_SL_PENALTY
+                log(f'  [HEBBIAN] exit-quality: SL dominant (ratio={eq["ratio"]:.1f}) → {exit_boost}')
+
+        # Phase 1: combo-part enrichment
+        combo_boost = 0
+        if combo_parts and len(combo_parts) >= 2:
+            all_high = all(cp[1] >= HEBBIAN_BOOST_WR for cp in combo_parts)
+            any_low = any(cp[1] <= HEBBIAN_PENALTY_WR for cp in combo_parts if cp[2] >= 3)
+            if all_high:
+                combo_boost = HEBBIAN_COMBO_PART_BOOST
+                log(f'  [HEBBIAN] combo-parts: all high WR → +{combo_boost}')
+            elif any_low:
+                combo_boost = -HEBBIAN_COMBO_PART_BOOST
+                log(f'  [HEBBIAN] combo-parts: one low WR → {combo_boost}')
+
+        # Existing boost/penalty logic
         if n >= HEBBIAN_BOOST_MIN_N and wr_est >= HEBBIAN_BOOST_WR:
             log(f'  [HEBBIAN] boost: +{HEBBIAN_BOOST_AMOUNT} confidence (high WR history)')
             return ('WARN', f'hebbian boost: est WR={wr_pct:.0f}% (n={n})', -HEBBIAN_BOOST_AMOUNT)
         if n >= HEBBIAN_PENALTY_MIN_N and wr_est <= HEBBIAN_PENALTY_WR:
             log(f'  [HEBBIAN] penalty: -{HEBBIAN_PENALTY_AMOUNT} confidence (low WR history)')
             return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
+
+        # Phase 2: Hebbian autonomous gate (before LLM)
+        if HEBBIAN_GATE_ENABLED and n >= HEBBIAN_AUTO_MIN_N:
+            total_conf_adj = exit_boost + combo_boost
+            if wr_est >= HEBBIAN_AUTO_APPROVE_WR and exit_boost >= 0:
+                log(f'  [HEBBIAN-GATE] AUTO-APPROVE: WR={wr_pct:.0f}% n={n} exit_boost={exit_boost} combo_boost={combo_boost}')
+                return ('GO', f'hebbian auto-approve: WR={wr_pct:.0f}% (n={n})', total_conf_adj)
+            if wr_est <= HEBBIAN_AUTO_REJECT_WR and exit_boost <= 0:
+                log(f'  [HEBBIAN-GATE] AUTO-REJECT: WR={wr_pct:.0f}% n={n} exit_boost={exit_boost} combo_boost={combo_boost}')
+                return ('SKIP', f'hebbian auto-reject: WR={wr_pct:.0f}% (n={n})', 0)
+            # Conflicting or uncertain → apply confidence adj but escalate to LLM
+            if total_conf_adj != 0:
+                log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → apply adj={total_conf_adj}, escalate to LLM')
 
     # Still ambiguous → LLM (soft advisory or hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
@@ -2521,6 +2574,9 @@ def run(dry_run=False):
         elif ctx_verdict == 'WARN' and ctx_penalty:
             confidence = max(confidence - ctx_penalty, 0)
             log(f'  ⚠️ [CTX-GATE] {token} {direction} WARN: {ctx_reason} (conf → {confidence:.0f}%)')
+        elif ctx_verdict == 'GO' and ctx_penalty:
+            confidence = max(min(confidence + ctx_penalty, 100), 0)
+            log(f'  ✅ [CTX-GATE] {token} {direction} GO (hebbian adj {ctx_penalty:+d}): {ctx_reason} (conf → {confidence:.0f}%)')
         else:
             log(f'  ✅ [CTX-GATE] {token} {direction} passed: {ctx_reason or "rule-based GO"}')
 
