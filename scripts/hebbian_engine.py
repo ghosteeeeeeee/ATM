@@ -127,7 +127,7 @@ class HebbianEngine:
             return 0.0  # Don't self-link
 
         a_norm, b_norm = self._normalize_pair(a_id, b_id)
-        inc = increment if increment is not None else WEIGHT_INCREMENT
+        inc = float(increment) if increment is not None else WEIGHT_INCREMENT
 
         with sqlite3.connect(self.db_path) as conn:
             # Upsert synapse
@@ -194,7 +194,7 @@ class HebbianEngine:
             return 0.0
 
         a_norm, b_norm = self._normalize_pair(a_id, b_id)
-        inc = increment if increment is not None else WEIGHT_INCREMENT
+        inc = float(increment) if increment is not None else WEIGHT_INCREMENT
 
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.execute(

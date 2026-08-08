@@ -2,7 +2,8 @@
 """Backfill Hebbian associations from historical closed trades.
 
 Learns all pairs from each closed trade: token ↔ signal ↔ direction ↔
-z_score_tier ↔ momentum_state. Won → strengthen. Lost → weaken.
+z_score_tier ↔ momentum_state ↔ exit_reason ↔ leverage ↔ hour.
+Won → strengthen. Lost → weaken.
 
 Reads: PostgreSQL trades table (close_time IS NOT NULL).
 Writes: brain.db /root/.hermes/brain/associative_memory.db.
@@ -22,7 +23,8 @@ def main():
     c = conn.cursor()
     c.execute("""
         SELECT token, signal, direction, pnl_pct,
-               signal_z_score_tier, signal_momentum_state
+               signal_z_score_tier, signal_momentum_state,
+               close_reason, leverage, close_time
         FROM trades
         WHERE close_time IS NOT NULL
           AND signal IS NOT NULL
@@ -37,10 +39,14 @@ def main():
     eng = HebbianEngine()
     wins = losses = 0
     t0 = time.time()
-    for i, (token, signal, direction, pnl_pct, z_tier, momentum) in enumerate(rows):
+    for i, (token, signal, direction, pnl_pct, z_tier, momentum,
+            exit_reason, leverage, close_time) in enumerate(rows):
         result = eng.learn_trade_outcome(
             token=token, signal=signal, direction=direction, pnl_pct=pnl_pct,
             z_score_tier=z_tier, momentum_state=momentum,
+            exit_reason=exit_reason,
+            leverage=int(float(leverage)) if leverage else None,
+            close_time=close_time,
         )
         if pnl_pct > 0:
             wins += 1
