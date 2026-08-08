@@ -130,3 +130,37 @@ Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tig
 **Files:** signals/continuation.py, hermes_constants.py, signals/__init__.py, signal_schema.py, signal_compactor.py
 
 **Action:** Will start firing on next profit-monster close. Monitor first 10 trades for WR validation.
+
+---
+
+## 2026-08-08 — CEO Assessment: Transcript Mining Quick Wins
+
+Reviewed three quick wins from the Ex-NASA video transcript (TRANSCRIPT_MINING_REPORT.md). All three are already implemented.
+
+### 1. Uncertainty check in bug_hunter/post-change — ✅ DONE
+
+- **bug-hunter** skill: Step 9 in audit workflow = "Uncertainty check — answer: 'What choices did you make that you're not confident of?'". Report format includes UNCERTAINTIES section (assumptions, unverified edge cases, potential side effects).
+- **post-change** skill: Step 1E = "What choices were made during this fix that you're not confident of?" with instruction to log uncertainties in commit message and flag high-confidence issues for human review.
+
+No gaps. Both workflows enforce uncertainty surfacing.
+
+### 2. Measurable goals in CEO prompts — ✅ DONE
+
+- **ceo_prompt.md** lines 64-79: "MEASURABLE GOALS (update each run)" table with Metric/Current/Target/Deadline columns. Rule: "If you can't measure it, don't change it." After-change reporting requires before/what-changed/expected-impact.
+- **ceo_away_prompt.md** lines 39-54: Identical measurable goals table and rule.
+
+Both prompts enforce quantitative targets before making changes. No gaps.
+
+### 3. ADRs in /docs/adr/ — ✅ DONE
+
+- **docs/adr/README.md**: Template with Context/Decision/Consequences/Alternatives. Index of 8 ADRs (001-008).
+- **8 ADR files exist**: brain-db, atr-sl-tp, signal-confluence, confluence-killswitches, guardian-reconciliation, position-manager-atr, never-reenable, pipeline-lock.
+- **AGENTS.md** references ADR format in conventions.
+
+All foundational ADRs cover the major architectural decisions already made. No gaps.
+
+### Assessment
+
+All three quick wins from the transcript mining session are implemented and working. The transcript's remaining ideas (vertical slices, dual-model review, incident→agent pipeline) are correctly classified as "Worth Discussing" or "Future" — they require cultural changes or infrastructure work, not trivial prompt edits.
+
+**Recommendation:** Close these as done. No action needed. Next priority should be the "Worth Discussing" items if we want to push further.
