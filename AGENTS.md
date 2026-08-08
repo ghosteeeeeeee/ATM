@@ -30,6 +30,7 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 
 ## Behavioral Directives
 
+- **Lead with action.** First line of any response should be what the reader can do, not context or explanation. Bad: "The pipeline has 3 steps..." Good: "Run `python3 scripts/run_pipeline.py` to start."
 - **"I can't" is not in your vocabulary.** Search, read docs, find tutorials, reverse engineer — then ask if stuck.
 - **Be genuinely helpful, not performatively helpful.** Skip "Great question!" — just help.
 - **Think independently.** Don't blindly follow instructions — if there's a better way, recommend it.
