@@ -32,7 +32,6 @@ BB_MIN_BARS = 30
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 55        # TIGHTER: require stronger overbought (was 60)
 BOUNCE_MIN_PCT = 0.08      # TIGHTER: require stronger bounce (was 0.05)
-COOLDOWN_MIN = 10           # LONGER: avoid rapid re-entries on same token
 MIN_VOLUME_RATIO = 1.2     # Volume must be 1.2x average
 BLOCKED_HOURS = [0, 1, 2, 3, 4, 5, 6, 7]  # Avoid Asian session
 REQUIRE_2_CANDLE = True    # Require 2 consecutive overbought candles before bounce
@@ -73,6 +72,7 @@ def _compute_rsi(closes, period=RSI_PERIOD):
 
 def _get_1h_trend(token):
     """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
@@ -83,7 +83,6 @@ def _get_1h_trend(token):
             LIMIT 60
         """, (token.upper(),))
         rows = cur.fetchall()
-        conn.close()
         if not rows or len(rows) < 50:
             return 'NEUTRAL'
         closes = [r[0] for r in reversed(rows)]
@@ -105,9 +104,13 @@ def _get_1h_trend(token):
         return 'BULLISH' if ema20 > ema50 else 'BEARISH'
     except Exception:
         return 'NEUTRAL'
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_candles(token, lookback=100):
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
         cur = conn.cursor()
@@ -118,14 +121,17 @@ def _get_candles(token, lookback=100):
             LIMIT ?
         """, (token.upper(), lookback))
         rows = cur.fetchall()
-        conn.close()
         return [r[0] for r in reversed(rows)] if rows else []
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_volume_avg(token, lookback=50):
     """Get average volume over last N candles."""
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
@@ -136,7 +142,6 @@ def _get_volume_avg(token, lookback=50):
             LIMIT ?
         """, (token.upper(), lookback))
         rows = cur.fetchall()
-        conn.close()
         if not rows or len(rows) < 10:
             return None
         volumes = [r[0] for r in rows if r[0] is not None and r[0] > 0]
@@ -145,10 +150,14 @@ def _get_volume_avg(token, lookback=50):
         return sum(volumes) / len(volumes)
     except Exception:
         return None
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_current_volume(token):
     """Get the most recent candle's volume."""
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
@@ -159,10 +168,12 @@ def _get_current_volume(token):
             LIMIT 1
         """, (token.upper(),))
         row = cur.fetchone()
-        conn.close()
         return row[0] if row and row[0] is not None else None
     except Exception:
         return None
+    finally:
+        if conn:
+            conn.close()
 
 
 def detect_bb_bounce_short(token, closes):
@@ -184,7 +195,7 @@ def detect_bb_bounce_short(token, closes):
         return None
 
     current = closes[-1]
-    prev = closes[-2] if len(closes) >= 2 else current
+    prev = closes[-2]
 
     rsi = _compute_rsi(closes)
     if rsi is None:
