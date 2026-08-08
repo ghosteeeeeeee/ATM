@@ -1115,15 +1115,20 @@ def hebbian_trade_boost(token, signal):
         return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5], cached[7], cached[8])
     try:
         engine = HebbianEngine()
-        # Try token-specific first
-        result = engine.wr_estimate(token, signal)
+        # Try decayed WR first (time-weighted, recent trades count more)
+        result = engine.decayed_wr_estimate(token, signal)
         is_token_specific = True
+        if not result:
+            # Fallback to standard WR estimate
+            result = engine.wr_estimate(token, signal)
         if not result:
             # Fallback to direction-agnostic lookup
             direction = 'LONG' if '+' in (signal or '') else 'SHORT' if '-' in (signal or '') else None
             if direction:
-                result = engine.wr_estimate(direction, signal)
+                result = engine.decayed_wr_estimate(direction, signal)
                 is_token_specific = False
+                if not result:
+                    result = engine.wr_estimate(direction, signal)
         recall = engine.recall(token, k=20)
         concepts = [(c, l, w, n) for c, l, w, n in recall
                     if l == 'concept' and c not in ('SHORT_BIAS', 'LONG_BIAS', 'NEUTRAL',

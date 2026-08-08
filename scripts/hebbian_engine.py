@@ -54,6 +54,21 @@ class HebbianEngine:
                     UNIQUE(concept_a_id, concept_b_id)
                 )
             """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS trade_log (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    token TEXT NOT NULL,
+                    signal TEXT NOT NULL,
+                    direction TEXT,
+                    won INTEGER NOT NULL,
+                    pnl_pct REAL,
+                    close_time TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_trade_log_token ON trade_log(token)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_trade_log_signal ON trade_log(signal)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_trade_log_time ON trade_log(close_time)")
             # Fix 4 (2026-06-24): session_summaries table for topic/file/coin-based
             # recall. Distinct from co-occurrence graph: stores per-session metadata
             # (summary text, discussion type, files/coins touched) so recall can
@@ -366,6 +381,18 @@ class HebbianEngine:
                 else:
                     self.weaken_pair(concepts[i], concepts[j], increment=pnl_increment)
                     weakened += 1
+
+        # Log to trade_log for time-decayed WR estimates
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    INSERT INTO trade_log (token, signal, direction, won, pnl_pct, close_time)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (token, signal, direction, 1 if won else 0, pnl_pct,
+                      close_time.isoformat() if close_time else None))
+        except Exception:
+            pass
+
         return {'strengthened': strengthened, 'weakened': weakened}
 
     def wr_estimate(self, token: str, signal: str, k: int = 50):
@@ -395,6 +422,45 @@ class HebbianEngine:
             # At floor — can't determine exact WR; conservative 50%
             wr = 0.5
         return (min(max(wr, 0.0), 1.0), int(count), float(weight))
+
+    def decayed_wr_estimate(self, token, signal, half_life_days=30):
+        """Time-decayed WR from trade_log. Recent trades count more."""
+        import math
+        from datetime import datetime, timezone
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT won, close_time FROM trade_log
+                    WHERE token = ? AND signal = ?
+                    AND close_time IS NOT NULL
+                    ORDER BY close_time DESC
+                """, (token, signal))
+                rows = cur.fetchall()
+                if not rows:
+                    return None
+                now = datetime.now(timezone.utc)
+                decay_constant = math.log(2) / half_life_days
+                weighted_wins = 0.0
+                total_weight = 0.0
+                for won, close_time_str in rows:
+                    try:
+                        ct = datetime.fromisoformat(close_time_str)
+                        if ct.tzinfo is None:
+                            ct = ct.replace(tzinfo=timezone.utc)
+                        age_days = (now - ct).total_seconds() / 86400
+                    except Exception:
+                        age_days = 30
+                    weight = math.exp(-decay_constant * age_days)
+                    total_weight += weight
+                    if won:
+                        weighted_wins += weight
+                if total_weight == 0:
+                    return None
+                decayed_wr = weighted_wins / total_weight
+                return (min(max(decayed_wr, 0.0), 1.0), len(rows), round(total_weight, 2))
+        except Exception:
+            return None
 
     def synapse_weight(self, concept_a: str, concept_b: str) -> tuple:
         """Get weight and co_occurrences for a synapse pair. Returns (weight, count) or (0, 0).
