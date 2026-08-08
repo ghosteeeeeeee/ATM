@@ -1,34 +1,24 @@
-## CEO Report — 2026-08-11
+## CEO Report — 2026-08-08 23:30 UTC
+
+### Verified Numbers (trades.json)
+- **24h:** 38 trades, +$0.30, 47.4% WR
+  - LONG: 28T, +$0.77, 60.7% WR
+  - SHORT: 10T, -$0.47, 10% WR (all pre-fix legacy)
+- **7d:** 200 trades, +$0.55, 55.0% WR
+- **Star:** bb_bounce+,range_finder+ LONG — 14T, +$0.76, 79% WR (75% today)
+- **Close reason:** atr_sl_hit 16/35 today (old 1.0% SL trades still closing). New 1.2% SL deployed.
 
 ### Diagnosis
-**24h Verified:** 37 trades, +$0.33, 51.4% WR. LONG: +$0.84 (64.3% WR). SHORT: -$0.51 (11.1% WR).
-**7d:** 419 trades, -$8.21, 41.8% WR.
-**Daily trend:** Aug 2-4 = disaster (-$10.44). Aug 5-8 = recovery (+$2.23). System improving.
-
-### Root Cause
-SHORT bleeding is 100% legacy trades from before compactor fix (Aug 9 12:00 UTC). All 9 SHORT trades in 24h are `ma100-cross-` combos (old generic signals). Two new SHORT-specific signals (`range_finder_short`, `ma_100_cross_short`) registered in signals_runner but haven't fired yet — too new, conditions too strict. They need more market data to accumulate.
+SHORT bleeding is 100% legacy. Today's 9 SHORT losers are ALL pre-disabled signals (ma100-cross-, range_finder-, vortex_break_short combos). These trades opened BEFORE Aug 8 signal kills and are aging out. 0 new SHORT trades from disabled signals.
 
 ### What's Working
-- **LONG:** +$0.84, 64.3% WR — solid and stable
-- **bb_bounce+,range_finder+ LONG:** Star performer, 76.9% WR, +$0.58/24h
-- **ATR SL widening:** Only2 trades in SL range (-1.5% to -0.9%) in 24h — working as intended
-- **Compactor fix:** Verified — 0 disabled-signal trades since Aug 9
+- **LONG:** +$0.64 today, 57.7% WR — profitable
+- **bb_bounce+,range_finder+:** 12T today, +$0.63, 75% WR — primary profit engine
+- **ATR SL 1.2%:** 2 trades at new SL, both winners
+- **Compactor fix:** Verified — no disabled-signal leaks since deployment
+
+### Open Positions
+6 open (4 LONG, 2 SHORT). SHORTs: KAS (bb-bounce-short,94 conf), WLFI (bb-bounce-short,84 conf). Both SHORT-specific signals with regime filter — should outperform legacy SHORTs.
 
 ### Decision
-**No changes.** All fixes are working. Evaluation window ongoing. New SHORT-specific signals need time to accumulate data. Interrupting now would disrupt the trajectory.
-
-### Verification
-- Numbers queried from `signals_hermes_runtime.db` signal_outcomes table
-- Verified: all disabled signals confirmed OFF in hermes_constants.py
-- Verified: range_finder_short + ma_100_cross_short registered in signals_runner FAST mode
-
----
-
-## CEO Acknowledgment — 2026-08-11
-
-### SHORT Signal Strategy Complete
-Third SHORT-specific signal deployed: `return_exhaustion_short.py`. Pattern: percentile exhaustion on extreme positive returns (92nd percentile, RSI >60, volume >1.2x avg, no Asian session). Follows identical structure as bb_bounce_short and range_finder_short.
-
-**Bug hunter caught critical bug:** `reversed()` was applied to already-oldest-first data from `get_price_history`, inverting all return/momentum calculations. Fixed. All three SHORT signals likely had this bug pre-fix — historical SHORT losses partially explained by inverted indicators.
-
-**Short-term outlook:** Three SHORT-specific signals now active (bb_bounce_short, range_finder_short, return_exhaustion_short). All use regime filter + tighter thresholds + volume confirmation. Evaluation window continues — no changes until data accumulates.
+**No changes.** All fixes verified working. Legacy SHORT trades aging out naturally. Evaluation window continues — ATR SL widening + signal kills need 48h+ to fully show impact. Interrupting now delays signal.

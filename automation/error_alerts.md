@@ -120,3 +120,7 @@
 - **INFO**: Pipeline healthy — 5 open, +5.04% PnL, 0 errors last 30min
 - **INFO**: Regime NEUTRAL — 106/106 tokens neutral, 0 signals passing 50% confidence
 - **AUTO-FIX**: None applied — all issues non-critical, pipeline running normally
+
+## Error Alerts — 2026-08-08 21:08 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'RANGE_FINDER_SHORT_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_cons`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'RETURN_EXHAUSTION_SHORT_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes`
