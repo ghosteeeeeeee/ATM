@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
-position_sizing.py — Kelly criterion and walk-forward testing for Hermes.
+position_sizing.py — Kelly criterion, walk-forward testing, and Phase 1 extensions for Hermes.
 
 Provides:
 1. Half-Kelly position sizing based on signal win rate
 2. Walk-forward testing with rolling windows
 3. Liquidity-adjusted sizing
+4. Signal weighting by quality score
+5. Drawdown-responsive sizing
+6. Portfolio heat limit
+7. Conservative mode toggle
 
 Usage:
-    from position_sizing import calculate_kelly_size, walk_forward_test
+    from position_sizing import calculate_kelly_size, walk_forward_test, get_signal_weight
 """
 
 import psycopg2
@@ -410,6 +414,234 @@ def calculate_optimal_size(
         return liquidity_adjusted_size(DEFAULT_TRADE_SIZE_USDT, volume_24h)
 
 
+# ── Phase 1 Extensions ────────────────────────────────────────────────────────
+
+# 1. Signal Weighting by Quality Score
+def get_signal_weight(grade: str) -> float:
+    """
+    Get position size multiplier based on signal quality grade.
+    
+    Grades from signal_quality.py:
+    - A: 80+ score (strong edge)
+    - B: 65-79 score (good edge)
+    - C: 50-64 score (moderate edge)
+    - D: 35-49 score (weak edge)
+    - F: <35 score (no edge)
+    
+    Returns:
+        Multiplier (0.5 to 1.5)
+    """
+    weights = {
+        'A': 1.5,   # Strong edge — full position
+        'B': 1.2,   # Good edge — slight boost
+        'C': 1.0,   # Moderate — standard size
+        'D': 0.8,   # Weak — reduce size
+        'F': 0.5,   # No edge — minimal size
+    }
+    return weights.get(grade, 1.0)
+
+
+def get_signal_quality(signal: str) -> str:
+    """
+    Get signal quality grade from signal_quality module.
+    
+    Returns:
+        Grade (A-F) or 'C' if unavailable
+    """
+    try:
+        from signal_quality import score_signal
+        result = score_signal(signal)
+        return result.get('grade', 'C')
+    except Exception:
+        return 'C'
+
+
+# 2. Drawdown-Responsive Sizing
+def get_peak_equity() -> float:
+    """
+    Get peak equity from HL API.
+    
+    Returns:
+        Peak equity in USDT
+    """
+    try:
+        import requests
+        from _secrets import HL_MAIN_ACCOUNT as MAIN_ACCOUNT_ADDRESS
+        
+        # For now, use current equity as peak
+        # TODO: Store peak_equity in database
+        return get_hl_account_equity()
+    except Exception:
+        return 0.0
+
+
+def get_drawdown_multiplier(equity: float, peak_equity: float) -> float:
+    """
+    Calculate position size multiplier based on drawdown.
+    
+    Tiers:
+    - <5% drawdown: full size (1.0x)
+    - 5-10% drawdown: half size (0.5x)
+    - >10% drawdown: quarter size (0.25x)
+    
+    Returns:
+        Multiplier (0.25 to 1.0)
+    """
+    if peak_equity <= 0:
+        return 1.0
+    
+    drawdown = (peak_equity - equity) / peak_equity
+    
+    if drawdown > 0.10:  # 10% drawdown
+        return 0.25
+    elif drawdown > 0.05:  # 5% drawdown
+        return 0.50
+    return 1.0
+
+
+# 3. Portfolio Heat Limit
+def calculate_portfolio_heat(positions: list) -> float:
+    """
+    Calculate total portfolio risk (heat).
+    
+    Heat = sum of (size * stop_distance_pct) for all positions.
+    
+    Args:
+        positions: List of position dicts with 'size', 'entry', 'stop_loss'
+    
+    Returns:
+        Total heat as decimal (0.0 to 1.0)
+    """
+    total_heat = 0.0
+    
+    for pos in positions:
+        size = pos.get('size', 0)
+        entry = pos.get('entry', 0)
+        stop_loss = pos.get('stop_loss', 0)
+        
+        if entry > 0 and stop_loss > 0 and size > 0:
+            stop_distance = abs(entry - stop_loss) / entry
+            total_heat += size * stop_distance
+    
+    return total_heat
+
+
+def can_open_position(
+    new_size: float,
+    new_stop_distance: float,
+    current_heat: float,
+    max_heat: float = 0.15,
+) -> bool:
+    """
+    Check if we can open a new position without exceeding heat limit.
+    
+    Args:
+        new_size: Size of new position
+        new_stop_distance: Stop distance as decimal (e.g., 0.02 for 2%)
+        current_heat: Current portfolio heat
+        max_heat: Maximum allowed heat (default 15%)
+    
+    Returns:
+        True if position can be opened
+    """
+    new_heat = new_size * new_stop_distance
+    return (current_heat + new_heat) <= max_heat
+
+
+# 4. Conservative Mode Toggle
+def apply_conservative_mode(size: float) -> float:
+    """
+    Apply conservative mode multiplier if enabled.
+    
+    Conservative mode reduces all position sizes by 50%.
+    Useful during uncertainty periods or high volatility.
+    
+    Returns:
+        Adjusted size
+    """
+    try:
+        from hermes_constants import CONSERVATIVE_MODE_ENABLED, CONSERVATIVE_MODE_MULTIPLIER
+        if CONSERVATIVE_MODE_ENABLED:
+            return size * CONSERVATIVE_MODE_MULTIPLIER
+    except ImportError:
+        pass
+    return size
+
+
+# ── Combined Position Sizing (Updated) ────────────────────────────────────────
+
+def calculate_optimal_size_v2(
+    signal: str,
+    volume_24h: float = 100000,
+    positions: list = None,
+    lookback_days: int = 30,
+) -> Dict:
+    """
+    Calculate optimal position size using all Phase 1 factors:
+    1. Kelly criterion based on signal history
+    2. Signal quality weighting
+    3. Drawdown-responsive sizing
+    4. Portfolio heat limit
+    5. Liquidity adjustment
+    6. Conservative mode
+    
+    Returns:
+        Dict with size, factors, and whether position can be opened
+    """
+    from hermes_constants import (
+        DEFAULT_TRADE_SIZE_USDT, KELLY_ENABLED,
+        KELLY_MIN_POSITION_USDT, KELLY_MAX_POSITION_USDT,
+        MAX_PORTFOLIO_HEAT,
+    )
+    
+    # Get base size
+    if KELLY_ENABLED:
+        base_size = calculate_optimal_size(signal, volume_24h=volume_24h, lookback_days=lookback_days)
+    else:
+        base_size = DEFAULT_TRADE_SIZE_USDT
+    
+    # Get signal quality grade
+    grade = get_signal_quality(signal)
+    quality_weight = get_signal_weight(grade)
+    
+    # Apply quality weighting
+    size = base_size * quality_weight
+    
+    # Apply drawdown-responsive sizing
+    equity = get_hl_account_equity()
+    peak = get_peak_equity()
+    dd_multiplier = get_drawdown_multiplier(equity, peak)
+    size *= dd_multiplier
+    
+    # Apply liquidity adjustment
+    size = liquidity_adjusted_size(size, volume_24h)
+    
+    # Apply conservative mode
+    size = apply_conservative_mode(size)
+    
+    # Apply hard limits
+    size = max(KELLY_MIN_POSITION_USDT, min(size, KELLY_MAX_POSITION_USDT))
+    
+    # Check portfolio heat
+    can_open = True
+    current_heat = 0.0
+    if positions:
+        current_heat = calculate_portfolio_heat(positions)
+        # Estimate stop distance (default 2%)
+        stop_distance = 0.02
+        can_open = can_open_position(size, stop_distance, current_heat, MAX_PORTFOLIO_HEAT)
+    
+    return {
+        'size': round(size, 2),
+        'grade': grade,
+        'quality_weight': quality_weight,
+        'dd_multiplier': dd_multiplier,
+        'current_heat': round(current_heat, 4),
+        'can_open': can_open,
+        'equity': round(equity, 2),
+    }
+
+
 # ── CLI Test ──────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
@@ -427,3 +659,24 @@ if __name__ == '__main__':
     print(f"$10 base, $100k volume: ${liquidity_adjusted_size(10, 100000)}")
     print(f"$10 base, $50k volume: ${liquidity_adjusted_size(10, 50000)}")
     print(f"$10 base, $10k volume: ${liquidity_adjusted_size(10, 10000)}")
+    
+    print("\n=== Signal Weighting ===")
+    for grade in ['A', 'B', 'C', 'D', 'F']:
+        print(f"Grade {grade}: {get_signal_weight(grade)}x")
+    
+    print("\n=== Drawdown Multiplier ===")
+    print(f"$100 equity, $100 peak (0% DD): {get_drawdown_multiplier(100, 100)}")
+    print(f"$95 equity, $100 peak (5% DD): {get_drawdown_multiplier(95, 100)}")
+    print(f"$85 equity, $100 peak (15% DD): {get_drawdown_multiplier(85, 100)}")
+    
+    print("\n=== Portfolio Heat ===")
+    positions = [
+        {'size': 11, 'entry': 100, 'stop_loss': 98},  # 2% stop
+        {'size': 11, 'entry': 50, 'stop_loss': 49},   # 2% stop
+    ]
+    heat = calculate_portfolio_heat(positions)
+    print(f"2 positions, 2% stops: heat={heat:.4f}")
+    print(f"Can open $11 more (2% stop)? {can_open_position(11, 0.02, heat)}")
+    
+    print("\n=== Conservative Mode ===")
+    print(f"$11 base, conservative OFF: ${apply_conservative_mode(11)}")

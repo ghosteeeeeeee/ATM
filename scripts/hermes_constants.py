@@ -365,6 +365,32 @@ SIGNAL_QUALITY_MIN_PROFIT_FACTOR = 1.5
 REGIME_ENABLED = True
 REGIME_SIZE_ADJUST = True      # Adjust size based on regime
 
+# ── Phase 1 Extensions (from Position Sizing Spec) ────────────────────────────
+
+# Signal Weighting
+SIGNAL_WEIGHT_ENABLED = True
+SIGNAL_WEIGHT_A = 1.5          # Grade A: strong edge
+SIGNAL_WEIGHT_B = 1.2          # Grade B: good edge
+SIGNAL_WEIGHT_C = 1.0          # Grade C: moderate edge
+SIGNAL_WEIGHT_D = 0.8          # Grade D: weak edge
+SIGNAL_WEIGHT_F = 0.5          # Grade F: no edge
+
+# Drawdown-Responsive Sizing
+DRAWDOWN_ENABLED = True
+DRAWDOWN_TIER_1_PCT = 0.05     # 5% drawdown → 0.5x size
+DRAWDOWN_TIER_1_MULT = 0.5
+DRAWDOWN_TIER_2_PCT = 0.10     # 10% drawdown → 0.25x size
+DRAWDOWN_TIER_2_MULT = 0.25
+
+# Portfolio Heat Limit
+PORTFOLIO_HEAT_ENABLED = True
+MAX_PORTFOLIO_HEAT = 0.15      # Max 15% total risk
+DEFAULT_STOP_DISTANCE = 0.02   # Default 2% stop distance for heat calc
+
+# Conservative Mode
+CONSERVATIVE_MODE_ENABLED = False
+CONSERVATIVE_MODE_MULTIPLIER = 0.5
+
 # ── Support & Resistance Signal Constants ─────────────────────────────────────
 # Used by rs_signals.py (top-level) and signals/rs.py (signals/ scanner)
 # NOTE: signals/rs.py had hardcoded values that diverged from this file.
