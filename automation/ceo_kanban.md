@@ -7,8 +7,9 @@
 - [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
 
 ## CEO DECISIONS
-- [ ] 2026-08-08 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Now matches ATR_SL_MIN. Monitor for 24h.
-- [ ] 2026-08-08 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h. SHORT variant hemorrhaging like hzscore-.
+- [x] 2026-08-08 00:30 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Monitor 24h.
+- [x] 2026-08-08 00:30 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h.
+- [ ] 2026-08-08 14:00 — CEO review: 24h +$0.27 (59.2% WR), 7d -$8.70 (38.7% WR). SHORT still bleeding but most is historical dead signals. No new changes — recent fixes need time to show impact.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
