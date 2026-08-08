@@ -21,3 +21,14 @@ SHORT bleeding is 100% legacy trades from before compactor fix (Aug 9 12:00 UTC)
 - Numbers queried from `signals_hermes_runtime.db` signal_outcomes table
 - Verified: all disabled signals confirmed OFF in hermes_constants.py
 - Verified: range_finder_short + ma_100_cross_short registered in signals_runner FAST mode
+
+---
+
+## CEO Acknowledgment — 2026-08-11
+
+### SHORT Signal Strategy Complete
+Third SHORT-specific signal deployed: `return_exhaustion_short.py`. Pattern: percentile exhaustion on extreme positive returns (92nd percentile, RSI >60, volume >1.2x avg, no Asian session). Follows identical structure as bb_bounce_short and range_finder_short.
+
+**Bug hunter caught critical bug:** `reversed()` was applied to already-oldest-first data from `get_price_history`, inverting all return/momentum calculations. Fixed. All three SHORT signals likely had this bug pre-fix — historical SHORT losses partially explained by inverted indicators.
+
+**Short-term outlook:** Three SHORT-specific signals now active (bb_bounce_short, range_finder_short, return_exhaustion_short). All use regime filter + tighter thresholds + volume confirmation. Evaluation window continues — no changes until data accumulates.
