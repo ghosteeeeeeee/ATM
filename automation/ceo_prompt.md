@@ -41,14 +41,7 @@ If old report says -6.64% but DB shows +$0.38, **use the DB number.**
 
 ## ⚠️ BEFORE MAKING ANY CHANGES — READ THIS
 
-### 1. Session Lock Check
-```bash
-cat /tmp/hermes-session-active.lock 2>/dev/null
-# If file exists: SKIP parameter changes, only monitor/report
-# If file does not exist: proceed normally
-```
-
-### 2. Recent Changes Log
+### 1. Recent Changes Log
 ```bash
 cat automation/recent_changes.log
 # If a flag was changed recently, DO NOT change it back
