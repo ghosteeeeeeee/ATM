@@ -158,9 +158,14 @@ def calculate_kelly_size(
         max_size: Maximum position size in USDT
     
     Returns:
-        Position size in USDT
+        Position size in USDT (0.0 if Kelly says don't trade)
     """
     kelly = calculate_kelly_fraction(win_rate, avg_win, avg_loss)
+    
+    # If Kelly says don't trade (negative edge), return 0
+    if kelly <= 0:
+        return 0.0
+    
     fractional_kelly = kelly * kelly_fraction
     
     # Calculate size
@@ -459,20 +464,44 @@ def get_signal_quality(signal: str) -> str:
 # 2. Drawdown-Responsive Sizing
 def get_peak_equity() -> float:
     """
-    Get peak equity from HL API.
+    Get peak equity from database or file.
     
     Returns:
         Peak equity in USDT
     """
     try:
-        import requests
-        from _secrets import HL_MAIN_ACCOUNT as MAIN_ACCOUNT_ADDRESS
+        import json
+        from pathlib import Path
         
-        # For now, use current equity as peak
-        # TODO: Store peak_equity in database
-        return get_hl_account_equity()
+        peak_file = Path('/root/.hermes/data/peak_equity.json')
+        if peak_file.exists():
+            data = json.loads(peak_file.read_text())
+            return float(data.get('peak_equity', 0.0))
+        return 0.0
     except Exception:
         return 0.0
+
+
+def update_peak_equity(equity: float) -> float:
+    """
+    Update peak equity if current equity is higher.
+    
+    Returns:
+        New peak equity
+    """
+    try:
+        import json
+        from pathlib import Path
+        
+        peak_file = Path('/root/.hermes/data/peak_equity.json')
+        current_peak = get_peak_equity()
+        
+        if equity > current_peak:
+            peak_file.write_text(json.dumps({'peak_equity': equity}))
+            return equity
+        return current_peak
+    except Exception:
+        return equity
 
 
 def get_drawdown_multiplier(equity: float, peak_equity: float) -> float:
@@ -500,14 +529,15 @@ def get_drawdown_multiplier(equity: float, peak_equity: float) -> float:
 
 
 # 3. Portfolio Heat Limit
-def calculate_portfolio_heat(positions: list) -> float:
+def calculate_portfolio_heat(positions: list, equity: float = 0.0) -> float:
     """
-    Calculate total portfolio risk (heat).
+    Calculate total portfolio risk (heat) normalized by equity.
     
-    Heat = sum of (size * stop_distance_pct) for all positions.
+    Heat = sum of (size * stop_distance_pct) / equity for all positions.
     
     Args:
         positions: List of position dicts with 'size', 'entry', 'stop_loss'
+        equity: Total account equity (if 0, uses sum of position sizes)
     
     Returns:
         Total heat as decimal (0.0 to 1.0)
@@ -523,6 +553,10 @@ def calculate_portfolio_heat(positions: list) -> float:
             stop_distance = abs(entry - stop_loss) / entry
             total_heat += size * stop_distance
     
+    # Normalize by equity
+    if equity > 0:
+        total_heat = total_heat / equity
+    
     return total_heat
 
 
@@ -530,6 +564,7 @@ def can_open_position(
     new_size: float,
     new_stop_distance: float,
     current_heat: float,
+    equity: float,
     max_heat: float = 0.15,
 ) -> bool:
     """
@@ -538,13 +573,16 @@ def can_open_position(
     Args:
         new_size: Size of new position
         new_stop_distance: Stop distance as decimal (e.g., 0.02 for 2%)
-        current_heat: Current portfolio heat
-        max_heat: Maximum allowed heat (default 15%)
+        current_heat: Current portfolio heat (normalized)
+        equity: Total account equity
+        max_heat: Maximum allowed heat (default 15% of equity)
     
     Returns:
         True if position can be opened
     """
-    new_heat = new_size * new_stop_distance
+    if equity <= 0:
+        return False
+    new_heat = (new_size * new_stop_distance) / equity
     return (current_heat + new_heat) <= max_heat
 
 
@@ -626,10 +664,10 @@ def calculate_optimal_size_v2(
     can_open = True
     current_heat = 0.0
     if positions:
-        current_heat = calculate_portfolio_heat(positions)
+        current_heat = calculate_portfolio_heat(positions, equity)
         # Estimate stop distance (default 2%)
         stop_distance = 0.02
-        can_open = can_open_position(size, stop_distance, current_heat, MAX_PORTFOLIO_HEAT)
+        can_open = can_open_position(size, stop_distance, current_heat, equity, MAX_PORTFOLIO_HEAT)
     
     return {
         'size': round(size, 2),
@@ -674,9 +712,10 @@ if __name__ == '__main__':
         {'size': 11, 'entry': 100, 'stop_loss': 98},  # 2% stop
         {'size': 11, 'entry': 50, 'stop_loss': 49},   # 2% stop
     ]
-    heat = calculate_portfolio_heat(positions)
-    print(f"2 positions, 2% stops: heat={heat:.4f}")
-    print(f"Can open $11 more (2% stop)? {can_open_position(11, 0.02, heat)}")
+    equity = 200  # $200 account
+    heat = calculate_portfolio_heat(positions, equity)
+    print(f"2 positions, 2% stops, $200 equity: heat={heat:.4f}")
+    print(f"Can open $11 more (2% stop)? {can_open_position(11, 0.02, heat, equity)}")
     
     print("\n=== Conservative Mode ===")
     print(f"$11 base, conservative OFF: ${apply_conservative_mode(11)}")
