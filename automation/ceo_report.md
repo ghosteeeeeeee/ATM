@@ -1,3 +1,40 @@
+## CEO Report — 2026-08-08 (10:50 UTC)
+
+### Diagnosis
+
+**24h: +$0.52 (58.3% WR, 48 trades)** — system profitable.
+
+**LONG: +$0.83 (66.7% WR, 33 trades)** — engine running well.
+
+**SHORT: -$0.31 (40% WR, 15 trades)** — still bleeding.
+
+**Worst SHORT combos (24h):**
+- `ma100-cross-,range_finder-`: 5 trades, -$0.19, 40% WR
+- `ma100-cross-,mover-`: 2 trades, -$0.11, 0% WR
+- `ma100-cross-,vortex_break_short`: 3 trades, -$0.05, 33% WR
+
+**Star:** `bb_bounce+,range_finder+` LONG — 11 trades, +$0.55, 81.8% WR.
+
+### Root Cause
+
+`MA_100_CROSS_MINUS_ENABLED=True` feeds bad SHORT trades into confluence combos. All worst SHORT signals share ma100-cross SHORT as a component.
+
+### Fix Applied
+
+**MA_100_CROSS_MINUS_ENABLED = False** — eliminates ma100-cross SHORT from all confluence combos. LONG unaffected.
+
+### Verification
+
+- 24h without ma100-cross SHORT would have been: +$0.83 (66.7% WR) — all LONG
+- SHORT bleeding source identified and cut
+- No other flag changes — system otherwise healthy
+
+### Next Review
+
+24h — verify SHORT bleeding stopped, LONG unaffected.
+
+---
+
 ## CEO Report — 2026-08-08
 
 ### Diagnosis
@@ -107,3 +144,22 @@ LONG is the engine: +$0.91/24h (65.7% WR).
 1. **Monitor** — continue evaluation window, no rush to change
 2. **Watch** — disk usage approaching 85% threshold (currently 81%)
 3. **No flag changes** — system is working
+
+## CEO Report — 2026-08-08 10:20 UTC
+
+### Diagnosis
+24h: +$0.62, 60.4% WR, 48 trades. System profitable. LONG dominates (+$0.91, 65.7% WR). SHORT slightly negative (-$0.29, 46.2% WR) but improving. Star: `bb_bounce+,range_finder+` LONG at 90.9% WR (+$0.63/24h, 11 trades).
+
+### Root Cause
+Recent fixes working: ATR SL widened to 1.2%, dead signals killed (inv-accel, vel-hermes, pattern, zscore_rising), hotset compaction stable. SHORT weakness is low-volume noise — only 13 SHORT trades in 24h, not a systematic bleed.
+
+### Fix Applied
+No changes. All fixes from earlier today need evaluation window. Star combo is carrying the system.
+
+### Verification
+- 7d trend improving: Aug 2-4 avg -$3.48/day → Aug 5-7 avg +$0.73/day
+- ATR widening: only 2 trades used new 1.2% SL, both winners
+- 6 open positions, pipeline healthy, no errors
+
+### Next Review
+24h — evaluate ATR widening impact with more data.

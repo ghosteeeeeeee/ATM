@@ -14,11 +14,13 @@
 - [x] 2026-08-08 22:00 — CEO review: 24h +$0.18 (57.1% WR, 49 trades). 7d -$8.77 (41.3% WR). SHORT still bleeding (-$0.52/24h, -$7.39/7d) but improving. Dead signals verified killed (inv-accel, vel-hermes, pattern, zscore_rising). No new changes — ATR SL widening + signal kills need more time. bb_bounce+,range_finder+ LONG = star (88.9% WR, +$0.38/24h).
 - [x] 2026-08-08 23:30 — CEO review: 24h +$0.41 (56.9% WR, 51 trades). SHORT -$0.33 (improving). ATR SL widening deployed but 49/51 trades still have old 1.0% SL — only 2 trades used new 1.2%, both winners. Profit monster star: 29 trades, 100% WR, +$1.66. No changes — evaluation window ongoing.
 - [x] 2026-08-09 09:50 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
+- [x] 2026-08-09 10:20 — CEO review: numbers stable vs 09:50 (same 24h window). 6 open positions, pipeline healthy. No changes — continuation of evaluation window.
+- [x] 2026-08-08 10:50 — CEO review: 24h +$0.52 (58.3% WR, 48 trades). LONG +$0.83 (66.7% WR). SHORT -$0.31 (40% WR). Worst: ma100-cross SHORT combos (0-40% WR). FIX: MA_100_CROSS_MINUS_ENABLED=False. Star: bb_bounce+,range_finder+ LONG 81.8% WR.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
 - [x] URGENT: bb_bounce root cause — RESOLVED (09:50 UTC). Trades were historical pre-fix. Root cause: master flag not checked in bb_bounce.py Layer 1 guard.
-- [ ] Monitor ma_100_cross live performance (W LONG is first trade)
+- [ ] Monitor ma_100_cross LONG live performance (SHORT disabled 2026-08-08)
 - [ ] Monitor vortex_break sustained performance
 - [ ] Monitor hzscore+ confluence (100% WR, 5 trades today)
 - [ ] Monitor ATR SL widening impact (24h window)
@@ -195,3 +197,4 @@
 - [x] 2026-08-08 — NO CHANGES: System recovering (4 consecutive improving days). Aug 7 was best day (+$0.40, 62.5% WR). Don't disrupt recovery.
 - [ ] 2026-08-08 — MONITOR: If SHORT PnL stays negative through Aug 10, add regime filter to SHORT signals.
 - [x] 2026-08-08 — CONFIRMED: Dead signals (inv-accel-300, vel-hermes, zscore-rising) are historical only. Zero new trades after flags killed.
+- [x] 2026-08-09 10:20 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
