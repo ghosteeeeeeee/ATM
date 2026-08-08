@@ -108,3 +108,25 @@ Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tig
 **Skill update:** Fixed broken `_get_closes` SQL template in add-signal skill (same bug that killed momentum_leaderboard). Added lessons: staleness thresholds, move_score weighting, combo auto-tuning.
 
 **Action:** Monitor next 24h — signals should appear in hotset on slow-signal cycle.
+
+---
+
+## 2026-08-08 — New Signal: continuation (Re-entry After Profitable Close)
+
+**Concept:** When a trade closes in profit, the momentum may still be active. Re-enter same direction within 5 min window.
+
+**Backtest (30d):**
+- 140 profit-monster closes >0.3% PnL
+- Re-enter with TP=0.3% / SL=0.5% / 15min max hold → **65% WR, +2.3% net PnL**
+- Sweet spot: 1-3 bar hold (5-15 min). Edge fades after 5 min.
+- 1h trend filter adds marginal improvement (65% → 65% WR, better avg PnL)
+
+**Filters:**
+- Only fires on profit-monster/T1/trail/atr_tp_hit exits
+- 5m pullback check (not reversed >50% of the move)
+- 1h RSI exhaustion (not overbought for LONG, oversold for SHORT)
+- z-score <2.0 (no extreme mean reversion setups)
+
+**Files:** signals/continuation.py, hermes_constants.py, signals/__init__.py, signal_schema.py, signal_compactor.py
+
+**Action:** Will start firing on next profit-monster close. Monitor first 10 trades for WR validation.
