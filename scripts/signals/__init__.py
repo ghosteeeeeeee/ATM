@@ -51,7 +51,7 @@ from hermes_constants import (
     MTP_ZSCORE_ENABLED, MTP_ZSCORE_PLUS_ENABLED, MTP_ZSCORE_MINUS_ENABLED,
     BOLLINGER_SQUEEZE_ENABLED,
     BB_BOUNCE_ENABLED, BB_BOUNCE_SHORT_ENABLED,
-    RANGE_FINDER_ENABLED,
+    RANGE_FINDER_ENABLED, RANGE_FINDER_SHORT_ENABLED,
     WYCKOFF_ENABLED,
     # NEW signals — vortex_break, return_exhaustion
     VORTEX_BREAK_ENABLED, VORTEX_BREAK_PLUS_ENABLED, VORTEX_BREAK_MINUS_ENABLED,
@@ -276,6 +276,11 @@ except Exception:
     _range_finder_run = None
 
 try:
+    from signals.range_finder_short import run as _range_finder_short_run
+except Exception:
+    _range_finder_short_run = None
+
+try:
     from signals.wyckoff import run as _wyckoff_run
 except Exception:
     _wyckoff_run = None
@@ -354,6 +359,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'bb_bounce',         'enabled': BB_BOUNCE_ENABLED, 'run': _bb_bounce_run},
     {'name': 'bb_bounce_short',   'enabled': BB_BOUNCE_SHORT_ENABLED, 'run': _bb_bounce_short_run},
     {'name': 'range_finder',      'enabled': RANGE_FINDER_ENABLED, 'run': _range_finder_run},
+    {'name': 'range_finder_short', 'enabled': RANGE_FINDER_SHORT_ENABLED, 'run': _range_finder_short_run},
     {'name': 'wyckoff',             'enabled': WYCKOFF_ENABLED,               'run': _wyckoff_run},
     {'name': 'vortex_break',        'enabled': VORTEX_BREAK_ENABLED,          'run': _vortex_break_run},
     {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},

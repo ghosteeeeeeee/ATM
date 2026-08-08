@@ -1020,6 +1020,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 RANGE_FINDER_ENABLED = True
 RANGE_FINDER_PLUS_ENABLED = True     # range_finder+ LONG (buy support)
 RANGE_FINDER_MINUS_ENABLED = False   # SIGNAL REPORTER 2026-08-08 — 40% WR, -$0.19 (5 trades 7d). ma100-cross-,range_finder- bleeding.
+RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
