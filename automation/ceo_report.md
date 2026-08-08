@@ -1,3 +1,10 @@
+## CEO Report — 2026-08-08 (cut_loser v2 deploy)
+
+### Acknowledgment
+cut_loser v2 deployed and verified. Two-tier loss cutting + trailing loss should cut vortex_break_long losses in 5-30 min instead of 50-260 min. Bug hunter all clear. Commits 57d1eb5, 3d46953. Monitoring impact.
+
+---
+
 ## CEO Report — 2026-08-08 (17:50 UTC)
 
 ### Diagnosis
