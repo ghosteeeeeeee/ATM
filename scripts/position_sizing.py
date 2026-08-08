@@ -28,7 +28,7 @@ def get_hl_account_equity() -> float:
     """
     try:
         import requests
-        from _secrets import HL_WALLET_ADDRESS as MAIN_ACCOUNT_ADDRESS
+        from _secrets import HL_MAIN_ACCOUNT as MAIN_ACCOUNT_ADDRESS
         
         resp = requests.post(
             'https://api.hyperliquid.xyz/info',
@@ -55,7 +55,7 @@ def get_open_positions_value() -> float:
     """
     try:
         import requests
-        from _secrets import HL_WALLET_ADDRESS as MAIN_ACCOUNT_ADDRESS
+        from _secrets import HL_MAIN_ACCOUNT as MAIN_ACCOUNT_ADDRESS
         
         resp = requests.post(
             'https://api.hyperliquid.xyz/info',
