@@ -127,3 +127,54 @@ SHORT improved from -$0.54/24h to expected breakeven after signal kills propagat
 5. Use new position_sizing.py signal quality scoring to filter trades
 
 **Your role:** Make decisions that improve WR while maintaining or growing PnL.
+
+---
+
+## CEO Report — 2026-08-09 (LONG/SHORT Separation Spec Review)
+
+### Diagnosis
+SHORT bleeding root cause: dead signals (vel-hermes-, zscore-rising-, inv-accel-300-) still appearing in historical combos. All three are already killed — trades aging out. vortex_break SHORT is actually profitable (+$0.10, 100% WR, 2 trades). MA_100_CROSS SHORT combos are bleeding but already killed (MA_100_CROSS_MINUS_ENABLED=False).
+
+### Fix Applied
+Reviewed LONG/SHORT separation spec. Recommendations written to spec file.
+
+### Key Decisions
+1. **Proceed with paper testing** for ma_100_cross only (vortex_break SHORT is working — don't touch)
+2. **Keep SL at 1.2%** (not 1.0% as spec says) — reverting the recent ATR SL widening would be regression
+3. **Defer vortex_break separation** — 2 trades is not enough data; wait for 10+ trades
+4. **Register ma_100_cross_long/short in `__init__.py`** — pending task
+
+### Expected Impact
+If ma_100_cross SHORT WR improves from 40% to 50%+, overall WR increases ~2-3%. SHORT PnL improves by ~$0.10-0.20/7d.
+
+### Verification
+Monitor `signal_outcomes` after paper testing. Compare `ma_100_cross_short` WR against historical `ma100-cross-` WR.
+
+---
+
+## LONG/SHORT Separation Spec — Status Update (2026-08-08)
+
+### Implementation Complete
+- `ma_100_cross_short.py` — SHORT-specific with tighter params
+- `ma_100_cross_long.py` — LONG-specific with standard params
+
+### SHORT-Specific Improvements
+| Parameter | Old | New | Why |
+|-----------|-----|-----|-----|
+| ATR confirm | 0.3 | 0.4 | Higher entry threshold |
+| Min ATR% | 0.04 | 0.05 | Filter low-vol |
+| Stop loss | 1.2% | 1.0% | Tighter protection |
+| Confirmation | 2 candles | 3 candles | More conservative |
+| Volume | None | 1.2x avg | Confirm momentum |
+| Time filter | None | Block 00:00-07:59 | Avoid Asian session |
+
+### Next Steps
+1. Register in `__init__.py`
+2. Add SHORT-specific params to `hermes_constants.py`
+3. Paper trade for 48h
+4. Compare WR with old SHORT
+5. Go live if WR improves by 5%+
+
+### CEO Decision Needed
+- Approve paper testing?
+- Approve vortex_break separation?

@@ -19,6 +19,7 @@
 - [x] 2026-08-08 10:50 — CEO review: 24h +$0.52 (58.3% WR, 48 trades). LONG +$0.83 (66.7% WR). SHORT -$0.31 (40% WR). Worst: ma100-cross SHORT combos (0-40% WR). FIX: MA_100_CROSS_MINUS_ENABLED=False. Star: bb_bounce+,range_finder+ LONG 81.8% WR.
 - [x] 2026-08-08 16:50 — CEO review: 24h +$0.54 (62.5% WR, 40 trades). LONG +$1.04 (77.8% WR). SHORT -$0.50 (30.8% WR). 7d -$8.04. Compactor fix verified working — 0 ma100-cross SHORT trades since fix. No changes — all fixes working, evaluation window ongoing.
 - [x] 2026-08-08 17:50 — CEO review: 24h +$0.29 (56.8% WR, 37 trades). LONG +$0.87 (76.9% WR). SHORT -$0.58 (9.1% WR — all pre-fix legacy). 7d +$0.43 (55% WR). All 10 losing SHORT trades opened before compactor fix (13:25 UTC) — will age out. Star: bb_bounce+,range_finder+ LONG 76.9% WR. No changes — all fixes working, evaluation ongoing. Monitor disk 81%, hl-sync-guardian stale.
+- [x] 2026-08-09 10:20 — CEO DECISION: LONG/SHORT separation spec reviewed. Proceed with ma_100_cross paper testing only. Keep SL at 1.2% (not 1.0%). Defer vortex_break separation — SHORT already profitable (100% WR, 2 trades). SHORT bleeding root cause: dead signals aging out, not vortex_break/ma_100_cross.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
