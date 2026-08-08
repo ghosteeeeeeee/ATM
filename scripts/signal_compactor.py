@@ -269,16 +269,24 @@ SIGNAL_SOURCE_WEIGHTS = {
     # ── hzscore SHORT RS confluence boosts (2026-08-08) ─────────────────────
     ('mtf_zscore',  'hzscore-,rs-'):                      1.5,  # 7T 86% WR +$0.23 — RS confluence = high conviction
     ('mtf_zscore',  'hzscore-,ma100-cross'):              1.3,  # 1T 100% WR +$0.06 — ma100 cross confirmation
-    # ── Combo suppressions (24h + 7d data: 2026-08-08) ────────────────────────
+    # ── NEW: tl_break boosts (14d data: 2026-08-08) ──────────────────────────
+    ('tl_break_long',  'tl_break_long'):                  1.3,  # 18T 50% WR +$0.51 — profitable standalone
+    ('tl_break_short', 'tl_break_short'):                 1.2,  # 70T 41% WR +$0.21 — high volume profitable
+    # ── NEW: hzscore+ LONG boosts (14d data: 2026-08-08) ─────────────────────
+    ('mtf_zscore',  'hzscore+,return_exhaustion_long'):   1.2,  # 12T 67% WR +$0.13
+    # ── Combo suppressions (14d data: 2026-08-08) ────────────────────────────
     ('return_exhaustion_short','return_exhaustion-'):     0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
     ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28
-    # zscore-rising- is the biggest volume loser (38T, 32% WR)
-    ('zscore_rising_short','zscore-rising-'):             0.5,  # 38T 32% WR -$0.22
-    # LONG poison combos — 24h data: losing money
-    ('bb_bounce',   'bb_bounce,ma100-cross'):             0.15, # 5T 20% WR -$0.21 (24h) — COSIG-GATE miss
-    ('bb_bounce',   'bb_bounce,range_finder'):            0.5,  # 6T 33% WR -$0.03 (24h) — marginal loser
+    ('zscore_rising_short','zscore-rising-'):             0.5,  # 38T 45% WR -$0.22
+    ('ma_100_cross','ma100-cross-,range_finder-'):        0.5,  # 5T 40% WR -$0.19
+    # ── inv-accel-300 DISABLED (14d data: 2026-08-08) ────────────────────────
+    ('inverse_accel_300_short','inv-accel-300-'):         0.3,  # 86T 31% WR -$0.31 — biggest loser
+    ('inverse_accel_300_long', 'inv-accel-300+'):         0.3,  # 74T 27% WR -$0.25 — biggest LONG loser
+    # ── LONG poison combos ───────────────────────────────────────────────────
+    ('bb_bounce',   'bb_bounce,ma100-cross'):             0.15, # 5T 20% WR -$0.21
+    ('bb_bounce',   'bb_bounce,range_finder'):            0.5,  # 6T 33% WR -$0.03
     # Preserve winning + variants (must come before shorter prefixes)
-    ('bb_bounce',   'bb_bounce,ma100-cross+'):            1.0,  # 3T 67% WR +$0.06 (24h) — keep alive
+    ('bb_bounce',   'bb_bounce,ma100-cross+'):            1.0,  # 3T 67% WR +$0.06
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
