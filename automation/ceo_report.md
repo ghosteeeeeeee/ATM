@@ -292,3 +292,41 @@ The 5-6 hours is better spent on:
 **Defer signal version tracking.** Revisit in 2 weeks — by then we'll have either solved signal decay (making version tracking less urgent) or have evidence that param-change rollbacks are actually needed (making the proposal justified).
 
 If you want a lightweight win: add a "param change log" section to `signal_performance_report.py` that reads git log for `hermes_constants.py` changes. Zero new files, zero new infrastructure, same audit trail value.
+
+---
+
+## 2026-08-08 — Hebbian Autonomous Gate: Strategic Analysis
+
+### Context
+Hebbian enhanced with 4 new data types (combos, exit reason, leverage, hour). 3115 trades backfilled → 1792 nodes, 21716 synapses. The question: should Hebbian become an autonomous gate that can approve/reject without LLM?
+
+### Risk Assessment
+
+| Risk | Severity | Mitigation |
+|---|---|---|
+| Hebbian wrong on low-data tokens | HIGH | n<5 → always escalate to LLM |
+| Hebbian overfits to historical patterns | MEDIUM | WR threshold conservative (60% for approve, 30% for reject) |
+| LLM loses context for edge cases | LOW | LLM stays as fallback, not removed |
+| New tokens have no Hebbian data | LOW | No data → escalate to LLM (fail-open) |
+
+### Verdict: PROCEED — Phased Approach
+
+**Phase 1 (this week):** Enrich `hebbian_trade_boost()` with exit_quality + combo lookups. This improves LLM decisions without changing control flow. Zero risk.
+
+**Phase 2 (next week):** Add `hebbian_autonomous_gate()` as a NEW check before LLM. Hebbian only decides when confident (high n, clear WR, exit_profit dominant). Everything else still goes to LLM.
+
+**Phase 3 (week 3):** Measure. If Hebbian handles 60%+ of trades autonomously with better WR than LLM-only, expand. If not, pull back.
+
+### Guardrails
+
+1. **Never fully disable LLM** — keep it as fallback for edge cases
+2. **Minimum n=5** before Hebbian acts autonomously — no decisions on thin data
+3. **Conservative thresholds** — 60% WR to approve, 30% to reject (not 50/50)
+4. **Audit trail** — log every Hebbian autonomous decision for review
+5. **Circuit breaker** — if Hebbian autonomous WR drops below 45% over 50 trades, auto-disable and escalate all to LLM
+
+### Recommendation
+
+Phase 1 is zero-risk and high-value. Start there. Phase 2-3 depend on Phase 1 results. The LLM is expensive and slow — Hebbian at <1s per decision vs 5-15s for LLM is a compelling reason to shift load.
+
+**Bottom line:** The data is there. The infrastructure is there. The risk is manageable with guardrails. Proceed with Phase 1 this week.
