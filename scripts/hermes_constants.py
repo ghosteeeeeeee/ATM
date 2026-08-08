@@ -1332,7 +1332,7 @@ RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data
 # ma_100_cross.py — Trend reversal at 100-period moving average
 # Backtested 14d: SHORT 51.4% WR +0.022%, LONG 46.7% WR +0.010%
 # Best on high-ATR tokens (ATR% >= 0.04%)
-MA_100_CROSS_ENABLED = True           # master kill-switch
+MA_100_CROSS_ENABLED = False          # DISABLED — replaced by ma_100_cross_long + ma_100_cross_short
 MA_100_CROSS_PLUS_ENABLED = True      # LONG (price crosses above MA)
 MA_100_CROSS_MINUS_ENABLED = False    # SHORT DISABLED 2026-08-08 — 40% WR, -$0.31/24h. All ma100-cross SHORT combos bleeding.
 
