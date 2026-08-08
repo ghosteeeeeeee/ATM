@@ -117,8 +117,9 @@ def calculate_kelly_fraction(win_rate: float, avg_win: float, avg_loss: float) -
     g = avg_win / 100  # Convert from percentage to decimal
     l = avg_loss / 100  # Convert from percentage to decimal (already positive)
     
-    # Kelly fraction
-    kelly = (p / l) - (q / g)
+    # Kelly fraction: f = p - q/b where b = avg_win/avg_loss
+    b = g / l if l > 0 else 0  # win-to-loss ratio
+    kelly = p - (q / b) if b > 0 else 0
     
     # Clamp to valid range
     return max(0.0, min(kelly, 1.0))
@@ -436,13 +437,22 @@ def get_signal_weight(grade: str) -> float:
     Returns:
         Multiplier (0.5 to 1.5)
     """
-    weights = {
-        'A': 1.5,   # Strong edge — full position
-        'B': 1.2,   # Good edge — slight boost
-        'C': 1.0,   # Moderate — standard size
-        'D': 0.8,   # Weak — reduce size
-        'F': 0.5,   # No edge — minimal size
-    }
+    try:
+        from hermes_constants import (
+            SIGNAL_WEIGHT_A, SIGNAL_WEIGHT_B, SIGNAL_WEIGHT_C,
+            SIGNAL_WEIGHT_D, SIGNAL_WEIGHT_F,
+        )
+        weights = {
+            'A': SIGNAL_WEIGHT_A,
+            'B': SIGNAL_WEIGHT_B,
+            'C': SIGNAL_WEIGHT_C,
+            'D': SIGNAL_WEIGHT_D,
+            'F': SIGNAL_WEIGHT_F,
+        }
+    except ImportError:
+        # Fallback if constants not available
+        weights = {'A': 1.5, 'B': 1.2, 'C': 1.0, 'D': 0.8, 'F': 0.5}
+    
     return weights.get(grade, 1.0)
 
 
