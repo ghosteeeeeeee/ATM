@@ -1,4 +1,9 @@
 
+## Health Report — 2026-08-08 08:40 UTC
+- **WARN**: pipeline.log was 1.6GB — compressed to 90MB, truncated active log
+- **WARN**: 10 signals PENDING in decision queue (no approvals this cycle)
+- **AUTO-FIX**: pipeline.log compressed: `gzip + truncate`
+
 ## Error Alerts — 2026-08-02 16:07 UTC
 - **REPEATED** (11x): `Aug N N:N:N python3[TOK]: TS TOK position_manager: timed out`
 

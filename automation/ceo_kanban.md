@@ -12,6 +12,7 @@
 - [x] 2026-08-08 14:00 — CEO review: 24h +$0.27 (59.2% WR), 7d -$8.70 (38.7% WR). SHORT still bleeding but most is historical dead signals. No new changes — recent fixes need time to show impact.
 - [x] 2026-08-08 19:00 — CEO review: 24h +$0.21 (58% WR, 50 trades). 7d -$8.77 (38.6% WR). bb_bounce+ confluence star performer (88.9% WR). No changes — ATR SL widening + signal kills need evaluation window.
 - [x] 2026-08-08 22:00 — CEO review: 24h +$0.18 (57.1% WR, 49 trades). 7d -$8.77 (41.3% WR). SHORT still bleeding (-$0.52/24h, -$7.39/7d) but improving. Dead signals verified killed (inv-accel, vel-hermes, pattern, zscore_rising). No new changes — ATR SL widening + signal kills need more time. bb_bounce+,range_finder+ LONG = star (88.9% WR, +$0.38/24h).
+- [x] 2026-08-08 23:30 — CEO review: 24h +$0.41 (56.9% WR, 51 trades). SHORT -$0.33 (improving). ATR SL widening deployed but 49/51 trades still have old 1.0% SL — only 2 trades used new 1.2%, both winners. Profit monster star: 29 trades, 100% WR, +$1.66. No changes — evaluation window ongoing.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
