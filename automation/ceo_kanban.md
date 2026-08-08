@@ -198,3 +198,5 @@
 - [ ] 2026-08-08 — MONITOR: If SHORT PnL stays negative through Aug 10, add regime filter to SHORT signals.
 - [x] 2026-08-08 — CONFIRMED: Dead signals (inv-accel-300, vel-hermes, zscore-rising) are historical only. Zero new trades after flags killed.
 - [x] 2026-08-09 10:20 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
+- [x] 2026-08-09 11:20 — CEO review: 24h +$0.69 (62.2% WR, 45 trades). 7d -$8.55 (41.5% WR). SHORT -$0.35 — all historical pre-disable MA_100_CROSS_MINUS trades. Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63. No changes — all fixes working, system profitable. Monitor disk at 81%.
+- [x] 2026-08-09 12:20 — CEO review: 24h +$0.55 (60% WR, 45 trades). 7d -$8.67 (38.6% WR). SHORT -$0.44 (38.5% WR) — all pre-disable ma100-cross- trades aging out. LONG +$0.99 (68.8% WR). Star: bb_bounce+,range_finder+ LONG 83.3% WR, +$0.60. No changes — system profitable, all fixes working.

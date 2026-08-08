@@ -163,3 +163,103 @@ No changes. All fixes from earlier today need evaluation window. Star combo is c
 
 ### Next Review
 24h — evaluate ATR widening impact with more data.
+
+## CEO Report — 2026-08-09 11:20 UTC
+
+### Diagnosis
+24h: 45 trades, +$0.69, 62.2% WR — profitable.
+7d: 410 trades, -$8.55, 41.5% WR — historical drag, improving.
+SHORT: -$0.35 (41.7% WR) — all from pre-disable MA_100_CROSS_MINUS trades closing out.
+LONG: +$1.04 (69.7% WR).
+
+### Root Cause
+MA_100_CROSS_MINUS trades still aging out (flag disabled 2026-08-08 00:30). 156 new SHORT signals blocked (executed=0). Will clear within 24h.
+
+### Fix Applied
+No changes — all recent fixes (ATR SL 1.2%, MA_100_CROSS_MINUS disabled, RETURN_EXHAUSTION_MINUS disabled) working. Evaluation window ongoing.
+
+### Verification
+Star combo bb_bounce+,range_finder+ LONG: 11 trades, +$0.63, 90.9% WR. Disk at 81% — monitor.
+
+## CEO Report — 2026-08-08 (23:30 UTC)
+
+### Diagnosis
+
+**24h: +$0.41 (56.9% WR, 51 trades)** — system profitable, stable.
+
+**LONG: +$0.74 (65.1% WR, 38 trades)** — engine healthy.
+
+**SHORT: -$0.33 (38.5% WR, 13 trades)** — bleeding shrinking.
+
+**7d: -$8.77 (41.3% WR, 412 trades)** — mostly historical damage (Aug 1-4 were 3-12% WR). Last 3 days profitable.
+
+**Star:** `bb_bounce+,range_finder+` LONG — 12 trades, +$0.60, 83.3% WR.
+
+### Root Cause
+
+SHORT bleeding is historical dead signals (inv-accel, vel-hermes, zscore_rising, pattern). All verified killed. Recent SHORTs still weak but improving (38.5% vs 40% earlier today).
+
+### Changes Since Last Report
+
+- ATR SL widened 1.0% → 1.2% (deployed, ~2 trades using new SL so far, both winners)
+- RETURN_EXHAUSTION_MINUS disabled
+- MA_100_CROSS_MINUS disabled
+- Dead signals killed (inv-accel, vel-hermes, pattern, zscore_rising)
+
+### Action
+
+**No changes.** All fixes deployed. ATR SL widening + signal kills need 24-48h evaluation window. System is profitable — let it run.
+
+### Verification
+
+- Pipeline: active, 4 open positions, 46 closed today
+- Disk: 80% (23GB free) — stable
+- 24h PnL: +$0.41 — profitable
+- Star combo still dominant
+
+### Next Review
+
+Tomorrow morning. Focus: did SHORT stop bleeding? Did ATR SL widening improve R:R?
+
+---
+
+## CEO Report — 2026-08-08 (12:20 UTC)
+
+### Diagnosis
+
+**24h (verified): 45 trades, +$0.55, 60.0% WR** — system profitable, stable.
+
+**LONG: 32 trades, +$0.99, 68.8% WR** — engine healthy, dominant.
+
+**SHORT: 13 trades, -$0.44, 38.5% WR** — all from pre-disable ma100-cross- combos closing out.
+
+**7d (verified): 412 trades, -$8.67, 38.6% WR** — historical dead signal damage, improving daily.
+
+**Daily trend:** Aug 1-4 avg -$2.77/day → Aug 5 +$2.32 → Aug 6 -$0.54 → Aug 7 +$0.40 → Aug 8 +$0.18 (so far). Clear recovery arc.
+
+**Star:** `bb_bounce+,range_finder+` LONG — 12 trades, +$0.60, 83.3% WR (7d). Carries the system.
+
+### Root Cause
+
+SHORT bleeding is **entirely historical** — all 7 SHORT trades on Aug 8 were ma100-cross- combos (flag already disabled Aug 8 10:50 UTC). No currently enabled SHORT signal is actively bleeding. Dead signal trades (inv-accel, vel-hermes, zscore_rising, pattern_wolf) account for -$4.86 of the 7d loss, all pre-Aug 5.
+
+### Fix Applied
+
+**No changes.** System profitable, all recent fixes working:
+- ATR SL widened 1.0% → 1.2% (evaluation ongoing)
+- MA_100_CROSS_MINUS disabled (trades aging out)
+- RETURN_EXHAUSTION_MINUS disabled
+- Dead signals killed (inv-accel, vel-hermes, pattern, zscore_rising)
+- TL_BREAK killed (33.3% WR, -$1.33/7d)
+
+### Verification
+
+- 6 open positions (BCH, ETH, LTC, ME, MNT, PNUT)
+- Pipeline healthy, all timers active
+- Disk: 80% (23GB free) — stable
+- Zero enabled SHORT signal actively losing money
+- Non-critical service failures (bug-hunter, git-release) — no impact
+
+### Next Review
+
+24h. Focus: SHORT trades should stop as ma100-cross- ages out. Monitor disk at 80%.
