@@ -11,10 +11,11 @@ Usage:
     from position_sizing import calculate_kelly_size, walk_forward_test
 """
 
-import sqlite3
+import psycopg2
 import numpy as np
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timedelta
+from _secrets import BRAIN_DB_DICT
 
 # ── Kelly Criterion ───────────────────────────────────────────────────────────
 
@@ -41,7 +42,7 @@ def calculate_kelly_fraction(win_rate: float, avg_win: float, avg_loss: float) -
     p = win_rate
     q = 1 - p
     g = avg_win / 100  # Convert from percentage to decimal
-    l = abs(avg_loss) / 100  # Convert from percentage to decimal
+    l = avg_loss / 100  # Convert from percentage to decimal (already positive)
     
     # Kelly fraction
     kelly = (p / l) - (q / g)
@@ -91,6 +92,8 @@ def calculate_kelly_size(
     size = bankroll * fractional_kelly
     
     # Apply constraints
+    if bankroll <= 0:
+        return 0.0
     max_size = bankroll * max_position_pct
     size = max(min_size, min(size, max_size))
     
@@ -111,8 +114,8 @@ def get_signal_performance(
         Dict with win_rate, avg_win, avg_loss, total_trades, profit_factor
         or None if insufficient data
     """
+    conn = None
     try:
-        from _secrets import BRAIN_DB_DICT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         
@@ -121,30 +124,29 @@ def get_signal_performance(
             FROM trades
             WHERE signal = %s
               AND status = 'closed'
-              AND close_time > NOW() - INTERVAL '%s days'
+              AND close_time > NOW() - INTERVAL '1 day' * %s
             ORDER BY close_time DESC
         """, (signal, lookback_days))
         
         rows = cur.fetchall()
-        conn.close()
         
         if len(rows) < min_trades:
             return None
         
         pnls = [float(r[0]) for r in rows]
         wins = [p for p in pnls if p > 0]
-        losses = [p for p in pnls if p <= 0]
+        losses = [abs(p) for p in pnls if p < 0]  # Make losses positive
         
         if not wins or not losses:
             return None
         
         win_rate = len(wins) / len(pnls)
         avg_win = np.mean(wins)
-        avg_loss = np.mean(losses)
+        avg_loss = np.mean(losses)  # Now positive
         
         # Profit factor
         total_wins = sum(wins)
-        total_losses = abs(sum(losses))
+        total_losses = sum(losses)
         profit_factor = total_wins / total_losses if total_losses > 0 else float('inf')
         
         return {
@@ -158,6 +160,9 @@ def get_signal_performance(
     except Exception as e:
         print(f"[position_sizing] Error getting signal performance: {e}")
         return None
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── Walk-Forward Testing ─────────────────────────────────────────────────────
@@ -198,7 +203,8 @@ def walk_forward_test(
     
     for start in range(0, n - window_size - min_test + 1, step_size):
         train = trades[start:start + window_size]
-        test = trades[start + window_size:start + window_size + int(n * 0.2)]
+        test_end = min(start + window_size + int(n * (1 - train_pct)), n)
+        test = trades[start + window_size:test_end]
         
         if len(test) < min_test:
             continue

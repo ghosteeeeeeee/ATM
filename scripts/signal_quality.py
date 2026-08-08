@@ -11,10 +11,11 @@ Usage:
     from signal_quality import score_signal, predict_success, detect_regime
 """
 
+import psycopg2
 import numpy as np
-import sqlite3
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
+from _secrets import BRAIN_DB_DICT
 
 # ── Signal Quality Scoring ───────────────────────────────────────────────────
 
@@ -34,8 +35,8 @@ def score_signal(
     Returns:
         Dict with score (0-100), grade (A-F), metrics, and pass/fail
     """
+    conn = None
     try:
-        from _secrets import BRAIN_DB_DICT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         
@@ -44,12 +45,11 @@ def score_signal(
             FROM trades
             WHERE signal = %s
               AND status = 'closed'
-              AND close_time > NOW() - INTERVAL '%s days'
+              AND close_time > NOW() - INTERVAL '1 day' * %s
             ORDER BY close_time DESC
         """, (signal, lookback_days))
         
         rows = cur.fetchall()
-        conn.close()
         
         if len(rows) < min_trades:
             return {
@@ -162,6 +162,9 @@ def score_signal(
             'reason': str(e),
             'metrics': {}
         }
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── Meta-Labeling ────────────────────────────────────────────────────────────
@@ -186,8 +189,8 @@ def predict_success(
     Returns:
         Dict with confidence (0-1), prediction (success/failure), features_used
     """
+    conn = None
     try:
-        from _secrets import BRAIN_DB_DICT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         
@@ -197,12 +200,11 @@ def predict_success(
             FROM trades
             WHERE signal = %s
               AND status = 'closed'
-              AND close_time > NOW() - INTERVAL '%s days'
+              AND close_time > NOW() - INTERVAL '1 day' * %s
             ORDER BY close_time DESC
         """, (signal, lookback_days))
         
         rows = cur.fetchall()
-        conn.close()
         
         if len(rows) < 20:
             return {
@@ -256,6 +258,9 @@ def predict_success(
             'prediction': 'unknown',
             'reason': str(e)
         }
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── Regime Detection ─────────────────────────────────────────────────────────
@@ -288,6 +293,15 @@ def detect_regime(
         }
     
     prices = prices[-lookback:]
+    
+    # Guard against non-positive prices
+    if any(p <= 0 for p in prices):
+        return {
+            'regime': 'unknown',
+            'adf_pvalue': None,
+            'confidence': 0,
+            'reason': 'Non-positive prices detected'
+        }
     
     # Simplified ADF test (in production, use statsmodels.tsa.stattools.adfuller)
     # Calculate variance ratio as proxy
@@ -333,8 +347,8 @@ def score_all_signals(lookback_days: int = 30) -> Dict:
     """
     Score all signals and return ranked list.
     """
+    conn = None
     try:
-        from _secrets import BRAIN_DB_DICT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
         
@@ -342,11 +356,10 @@ def score_all_signals(lookback_days: int = 30) -> Dict:
             SELECT DISTINCT signal
             FROM trades
             WHERE status = 'closed'
-              AND close_time > NOW() - INTERVAL '%s days'
+              AND close_time > NOW() - INTERVAL '1 day' * %s
         """, (lookback_days,))
         
         signals = [r[0] for r in cur.fetchall()]
-        conn.close()
         
         results = {}
         for signal in signals:
@@ -363,6 +376,9 @@ def score_all_signals(lookback_days: int = 30) -> Dict:
         }
     except Exception as e:
         return {'error': str(e)}
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── CLI Test ──────────────────────────────────────────────────────────────────

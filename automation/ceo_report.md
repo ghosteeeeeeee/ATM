@@ -94,3 +94,17 @@ Bug_hunter verified ALL CLEAR. Memory stored. System ready for live deployment.
 
 ### Status
 All deliverables committed. Ready for next phase implementation.
+
+---
+
+## Phase 1 & 2 Book-Informed Improvements — Acknowledgment (2026-08-08)
+
+### What Was Built
+1. **`scripts/position_sizing.py`** — Half-Kelly criterion, walk-forward testing, liquidity adjustment
+2. **`scripts/signal_quality.py`** — Signal scoring, meta-labeling, regime detection
+
+### Bug Hunter Verification
+8 bugs found and fixed (3 critical, 2 high, 3 medium). All clear.
+
+### Status
+Phase 1 and 2 complete. Awaiting integration into live pipeline.
