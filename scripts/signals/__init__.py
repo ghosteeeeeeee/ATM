@@ -134,6 +134,16 @@ except Exception:
     _ma_100_cross_run = None
 
 try:
+    from signals.ma_100_cross_long import run as _ma_100_cross_long_run
+except Exception:
+    _ma_100_cross_long_run = None
+
+try:
+    from signals.ma_100_cross_short import run as _ma_100_cross_short_run
+except Exception:
+    _ma_100_cross_short_run = None
+
+try:
     from signals.ema_angle import scan_ema_angle_signals as _ema_angle_run
 except Exception:
     _ema_angle_run = None
@@ -342,6 +352,8 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'vortex_break',        'enabled': VORTEX_BREAK_ENABLED,          'run': _vortex_break_run},
     {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},
     {'name': 'ma_100_cross',        'enabled': MA_100_CROSS_ENABLED,         'run': _ma_100_cross_run},
+    {'name': 'ma_100_cross_long',   'enabled': MA_100_CROSS_PLUS_ENABLED,    'run': _ma_100_cross_long_run},
+    {'name': 'ma_100_cross_short',  'enabled': MA_100_CROSS_MINUS_ENABLED,   'run': _ma_100_cross_short_run},
     {'name': 'momentum_leaderboard', 'enabled': 'MOMENTUM_LEADERBOARD_ENABLED', 'run': _momentum_leaderboard_run},
     {'name': 'continuation', 'enabled': 'CONTINUATION_ENABLED', 'run': _continuation_run},
 ]
