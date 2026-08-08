@@ -1304,3 +1304,23 @@ MOMENTUM_LEADERBOARD_CONF_PENALTY_PCT = 2.0   # % — confidence penalty when ab
 MOMENTUM_LEADERBOARD_CONF_BASE = 80           # base confidence — higher for high-conviction movers
 MOMENTUM_LEADERBOARD_CONF_FLOOR = 60          # minimum confidence
 MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches system ceiling)
+
+# ── Continuation (re-entry after profitable close) ──────────────────────
+# continuation.py — re-enter same direction after profit-monster exit
+CONTINUATION_ENABLED = True
+CONTINUATION_PLUS_ENABLED = True              # re-enter LONG after LONG close
+CONTINUATION_MINUS_ENABLED = True             # re-enter SHORT after SHORT close
+CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
+CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
+CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
+    'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
+    'profit_monster', 'atr_tp_hit',
+)
+CONTINUATION_RSI_MAX_LONG = 75                # don't re-enter LONG if 1h RSI > this
+CONTINUATION_RSI_MIN_SHORT = 25               # don't re-enter SHORT if 1h RSI < this
+CONTINUATION_ZSCORE_MAX = 2.0                 # don't re-enter if |z-score| > this
+CONTINUATION_PULLBACK_MAX_PCT = 50            # max pullback % of the move to still qualify
+CONTINUATION_CONF_BASE = 80
+CONTINUATION_CONF_FLOOR = 65
+CONTINUATION_CONF_CAP = 90
+CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)

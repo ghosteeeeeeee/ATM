@@ -59,6 +59,8 @@ from hermes_constants import (
     MA_100_CROSS_ENABLED, MA_100_CROSS_PLUS_ENABLED, MA_100_CROSS_MINUS_ENABLED,
     # momentum_leaderboard
     MOMENTUM_LEADERBOARD_ENABLED, MOMENTUM_LEADERBOARD_PLUS_ENABLED, MOMENTUM_LEADERBOARD_MINUS_ENABLED,
+    # continuation
+    CONTINUATION_ENABLED, CONTINUATION_PLUS_ENABLED, CONTINUATION_MINUS_ENABLED,
 )
 
 
@@ -278,6 +280,11 @@ try:
 except Exception:
     _momentum_leaderboard_run = None
 
+try:
+    from signals.continuation import run as _continuation_run
+except Exception:
+    _continuation_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -336,6 +343,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},
     {'name': 'ma_100_cross',        'enabled': MA_100_CROSS_ENABLED,         'run': _ma_100_cross_run},
     {'name': 'momentum_leaderboard', 'enabled': 'MOMENTUM_LEADERBOARD_ENABLED', 'run': _momentum_leaderboard_run},
+    {'name': 'continuation', 'enabled': 'CONTINUATION_ENABLED', 'run': _continuation_run},
 ]
 
 

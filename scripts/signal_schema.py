@@ -1253,6 +1253,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # continuation
+            if _comp == 'continuation+':
+                try:
+                    from hermes_constants import CONTINUATION_PLUS_ENABLED
+                    if not CONTINUATION_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUATION_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'continuation-':
+                try:
+                    from hermes_constants import CONTINUATION_MINUS_ENABLED
+                    if not CONTINUATION_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUATION_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'continuation':
+                try:
+                    from hermes_constants import CONTINUATION_ENABLED
+                    if not CONTINUATION_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CONTINUATION_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
