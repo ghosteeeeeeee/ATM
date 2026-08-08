@@ -526,6 +526,39 @@ class HebbianEngine:
         ratio = profit_w / sl_w if sl_w > 0 else (999.0 if profit_w > 0 else 1.0)
         return {'wr': wr, 'profit_n': profit_n, 'sl_n': sl_n, 'ratio': ratio}
 
+    def composite_score(self, token, signal):
+        """Composite confidence score (0-1). >0.65 auto-approve, <0.35 auto-reject."""
+        # 1. Decayed WR (weight: 0.5)
+        dec = self.decayed_wr_estimate(token, signal)
+        if not dec:
+            d = 'LONG' if '+' in (signal or '') else 'SHORT'
+            dec = self.decayed_wr_estimate(d, signal)
+        wr_score = dec[0] if dec else 0.5
+
+        # 2. Exit quality (weight: 0.2)
+        eq = self.exit_quality_score(signal)
+        if eq['profit_n'] + eq['sl_n'] >= 3:
+            if eq['ratio'] > 2.0:
+                exit_score = min(1.0, 0.5 + eq['ratio'] / 20)
+            elif 0 < eq['ratio'] < 0.5:
+                exit_score = max(0.0, 0.5 - (1/eq['ratio']) / 10)
+            else:
+                exit_score = 0.5
+        else:
+            exit_score = 0.5
+
+        # 3. Token WR (weight: 0.2)
+        tw = self.token_overall_wr(token)
+        token_score = min(1.0, tw['wr']) if tw else 0.5
+
+        # 4. Combo parts (weight: 0.1)
+        parts = self.combo_part_wr(token, signal)
+        combo_score = sum(p[1] for p in parts) / len(parts) if len(parts) >= 2 else 0.5
+
+        composite = wr_score * 0.5 + exit_score * 0.2 + token_score * 0.2 + combo_score * 0.1
+        return (composite, {'wr': wr_score, 'exit': exit_score, 'token': token_score, 'combo': combo_score})
+
+
     def recall(
         self,
         concept: str,

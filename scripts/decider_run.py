@@ -1260,25 +1260,43 @@ def context_gate(token, direction, source, sig):
                     _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, exit_boost + combo_boost + token_wr_boost)
                     return ('SKIP', f'hebbian auto-reject: SL dominant (ratio={eq["ratio"]:.2f})', 0)
 
-            # ── Autonomous gate — tiered min-n ───────────────────────────
+            # ── Autonomous gate — tiered min-n OR composite scoring ─────
             if HEBBIAN_GATE_ENABLED and is_token_specific:
                 total_conf_adj = exit_boost + combo_boost + token_wr_boost
-                # Tiered min-n: high-confidence (exit_profit ratio > 10) → n>=3, else n>=5
+
+                # Path A: tiered min-n (existing)
                 is_high_conf = (exit_quality and exit_quality['ratio'] > HEBBIAN_HIGH_CONF_EXIT_RATIO and exit_quality['profit_n'] >= 3)
                 min_n = HEBBIAN_AUTO_MIN_N_HIGH_CONF if is_high_conf else HEBBIAN_AUTO_MIN_N
-
+                n_based = False
                 if n >= min_n:
                     if wr_est >= HEBBIAN_AUTO_APPROVE_WR and total_conf_adj >= 0:
-                        log(f'  [HEBBIAN-GATE] AUTO-APPROVE: WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')
+                        log(f'  [HEBBIAN-GATE] AUTO-APPROVE (n-based): WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')
                         _log_auto_decision(token, source, direction, 'AUTO-APPROVE', wr_est, n, total_conf_adj)
                         return ('GO', f'hebbian auto-approve: WR={wr_pct:.0f}% (n={n})', total_conf_adj)
                     if wr_est <= HEBBIAN_AUTO_REJECT_WR and exit_boost <= 0:
-                        log(f'  [HEBBIAN-GATE] AUTO-REJECT: WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')
+                        log(f'  [HEBBIAN-GATE] AUTO-REJECT (n-based): WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')
                         _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, total_conf_adj)
                         return ('SKIP', f'hebbian auto-reject: WR={wr_pct:.0f}% (n={n})', 0)
-                    # Uncertain → apply adj but escalate
-                    if total_conf_adj != 0:
-                        log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → adj={total_conf_adj}, escalate to LLM')
+
+                # Path B: composite scoring (no n requirement)
+                try:
+                    from hebbian_engine import HebbianEngine
+                    _eng = HebbianEngine()
+                    score, breakdown = _eng.composite_score(token, source)
+                    if score >= 0.65:
+                        log(f'  [HEBBIAN-GATE] AUTO-APPROVE (composite): score={score:.3f} (wr={breakdown["wr"]:.2f} exit={breakdown["exit"]:.2f} token={breakdown["token"]:.2f} combo={breakdown["combo"]:.2f})')
+                        _log_auto_decision(token, source, direction, 'AUTO-APPROVE', wr_est, n, score)
+                        return ('GO', f'hebbian composite approve: score={score:.2f}', score - 0.5)
+                    if score <= 0.35:
+                        log(f'  [HEBBIAN-GATE] AUTO-REJECT (composite): score={score:.3f} (wr={breakdown["wr"]:.2f} exit={breakdown["exit"]:.2f} token={breakdown["token"]:.2f} combo={breakdown["combo"]:.2f})')
+                        _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, score)
+                        return ('SKIP', f'hebbian composite reject: score={score:.2f}', 0)
+                except Exception as e:
+                    log(f'  [HEBBIAN-GATE] composite scoring error: {e} (fail-open)')
+
+                # Uncertain → apply adj but escalate
+                if total_conf_adj != 0:
+                    log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → adj={total_conf_adj}, escalate to LLM')
 
     # Still ambiguous → LLM (soft advisory or hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)

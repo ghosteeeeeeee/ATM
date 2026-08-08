@@ -126,28 +126,34 @@ def _get_closes(token: str, table: str, limit: int) -> list:
             conn.close()
 
 
-def _get_candles_ohlcv(token: str, table: str, limit: int) -> list:
-    """Fetch OHLCV candles from candles.db, oldest first. Returns list of dicts."""
-    conn = None
+def _get_1m_candles(token: str, limit: int) -> list:
+    """Fetch 1m OHLCV candles from price_history (signals_hermes.db), oldest first.
+    Synthesizes OHLCV from close-only data. Freshness guard: returns [] if >2 min old."""
     try:
-        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
         c = conn.cursor()
-        c.execute(f"""
-            SELECT open, high, low, close FROM {table}
-            WHERE token = ?
-            ORDER BY ts DESC
-            LIMIT ?
+        c.execute("""
+            SELECT timestamp, price FROM (
+                SELECT timestamp, price
+                FROM price_history
+                WHERE token = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            ) sub
+            ORDER BY timestamp ASC
         """, (token.upper(), limit))
         rows = c.fetchall()
+        conn.close()
         if not rows:
             return []
-        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3]}
-                for r in reversed(rows)]
+        # Freshness guard
+        most_recent_ts = rows[-1][0]
+        if (time.time() - most_recent_ts) > 120:
+            return []
+        # Synthesize OHLCV (close-only)
+        return [{'open': r[1], 'high': r[1], 'low': r[1], 'close': r[1]} for r in rows]
     except Exception:
         return []
-    finally:
-        if conn:
-            conn.close()
 
 
 def _get_candle_ts(token: str, table: str) -> int:
@@ -387,8 +393,8 @@ def detect_leaderboard_signals() -> list:
     candidates = []
 
     for token in tokens:
-        # Fetch 1m candles for S/R and exhaustion
-        candles_1m = _get_candles_ohlcv(token, 'candles_1m', SR_LOOKBACK + 20)
+        # Fetch 1m candles for S/R and exhaustion (from price_history, real-time)
+        candles_1m = _get_1m_candles(token, SR_LOOKBACK + 20)
         closes_1m = _get_1m_closes(token, RET_EXHAUST_LOOKBACK + 50)
 
         if not candles_1m or len(candles_1m) < SR_LOOKBACK:
@@ -396,10 +402,9 @@ def detect_leaderboard_signals() -> list:
         if not closes_1m or len(closes_1m) < RET_EXHAUST_LOOKBACK + 20:
             continue
 
-        # Freshness check on 1m
-        latest_1m_ts = _get_candle_ts(token, 'candles_1m')
-        if latest_1m_ts and (time.time() - latest_1m_ts) > 300:  # 5 min stale
-            continue
+        # Freshness check — use price_history (real-time) not candles_1m (stale)
+        # Price freshness is checked in _get_1m_closes (returns [] if >2 min old)
+        # So if closes_1m is empty, token is stale — skip
 
         # Fetch 5m candles for trend context
         closes_5m = _get_closes(token, 'candles_5m', TREND_5M_LOOKBACK + 10)
