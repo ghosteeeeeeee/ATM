@@ -26,6 +26,7 @@ import os
 import sys
 import sqlite3
 import time
+import json
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -173,32 +174,9 @@ def _get_candle_ts(token: str, table: str) -> int:
 
 
 def _get_1m_closes(token: str, limit: int) -> list:
-    """Fetch 1m close prices from price_history (signals_hermes.db), oldest first.
-    Freshness guard: returns [] if most recent price is > 2 minutes old."""
-    try:
-        conn = sqlite3.connect(_PRICE_DB, timeout=10)
-        c = conn.cursor()
-        c.execute("""
-            SELECT timestamp, price FROM (
-                SELECT timestamp, price
-                FROM price_history
-                WHERE token = ?
-                ORDER BY timestamp DESC
-                LIMIT ?
-            ) sub
-            ORDER BY timestamp ASC
-        """, (token.upper(), limit))
-        rows = c.fetchall()
-        conn.close()
-        if not rows:
-            return []
-        # Freshness guard
-        most_recent_ts = rows[-1][0]
-        if (time.time() - most_recent_ts) > 120:
-            return []
-        return [r[1] for r in rows]
-    except Exception:
-        return []
+    """Fetch 1m close prices from price_history via _get_1m_candles."""
+    candles = _get_1m_candles(token, limit)
+    return [c['close'] for c in candles] if candles else []
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -373,8 +351,6 @@ def detect_leaderboard_signals() -> list:
     Scan all tokens, compute returns, rank by move_score, decide direction.
     v2: Uses 1m for entry, 5m for trend, requires confluence.
     """
-    import json
-
     lb_5m, lb_15m, lb_1h = MOMENTUM_LEADERBOARD_RET_WINDOWS
 
     # Gather all tokens with 1m data

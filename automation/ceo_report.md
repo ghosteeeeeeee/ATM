@@ -73,3 +73,11 @@ After implementation:
 2. If auto-decisions > 5% and WR > 80% → expand to 10% target
 3. If WR drops below 70% → circuit breaker should catch it; investigate root cause
 4. Weekly review of auto-decision audit log
+
+---
+
+### Hebbian Threshold Decision — 2026-08-08
+
+**Decision: 0.65**
+
+The circuit breaker equalizes downside risk — both 0.65 and 0.70 have W27 at 47% WR, meaning the worst-case week looks identical. The upside of 0.65 is 50% auto-decisions vs 39%, which means 28% more learning data for the self-learner to improve token WR estimates. The total PnL difference is $28 ($679 vs $651) — noise. Production gets 0.65. If the self-learner shows WR degradation after 48 hours, we can tighten to 0.70. Start aggressive, retreat only on evidence.
