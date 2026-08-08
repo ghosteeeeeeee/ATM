@@ -503,6 +503,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # They stay PENDING until a second source appears for the same token+direction.
             # Multi-source signals (2+ sources via GROUP_CONCAT) pass through freely.
             source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+            # ── DISABLED-COMPONENT GUARD (main loop) ─────────────────────────────
+            # FIX (2026-08-08): Skip signals whose components are disabled via *_ENABLED flags.
+            # Catches stale DB entries generated before a flag was set to False.
+            if any(is_component_disabled(p) for p in source_parts):
+                log(f"  🚫 [DISABLED-COMPONENT] {token} {direction} src='{source}' — skipping stale signal with disabled component")
+                continue
             conf_float = float(conf or 0)
 
             # ── DIRECTIONAL CONFLICT DETECTION (2026-04-18) ──────────────────────
@@ -759,6 +765,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             regime, regime_conf = get_regime_1m(token)
             speed_data = speed_cache.get(token.upper(), {})
             source_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+            # ── DISABLED-COMPONENT GUARD (scoring loop) ───────────────────────────
+            if any(is_component_disabled(p) for p in source_parts):
+                continue  # skip stale signal with disabled component
             # ── Confluence gate (2+ unique signal types) ──────────────────────────
             # Handled at line 573-608 (pre-filter). No per-signal-type hard requirements here.
             # Previously had a hard RS requirement — removed 2026-08-06 because:
@@ -993,6 +1002,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — source '{src}' in blacklist")
                 continue
             source_parts = [p.strip() for p in (src or '').split(',') if p.strip()]
+            # ── DISABLED-COMPONENT GUARD (hotset filter) ──────────────────────────
+            if any(is_component_disabled(p) for p in source_parts):
+                log(f"  🚫 [HOTSET-DISABLED] {tkn}: blocked — source '{src}' contains disabled component")
+                continue
             # ── CONFLUENCE CHECK ──────────────────────────────────────────────────
             # Previously required RS as a hard gate here (line 929-937).
             # Removed 2026-08-06 — confluence gate at line 573-608 already requires
@@ -1277,6 +1290,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # from add_signal() merges that lost a source. Skip any combo with
                     # only 1 source, regardless of its score or top-10 standing.
                     src_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+                    # ── DISABLED-COMPONENT GUARD (pending approve) ────────────────────
+                    if any(is_component_disabled(p) for p in src_parts):
+                        log(f"  🚫 [PENDING-DISABLED-BLOCK] {tok}:{d} — src='{source}' contains disabled component, skipping approval")
+                        continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
                         continue
