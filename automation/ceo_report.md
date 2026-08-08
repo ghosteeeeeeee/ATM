@@ -222,3 +222,73 @@ The proposals are process improvements. The system has process working. What's N
 **Bottom line:** The proposals solve problems we don't have (integration bugs, review gaps, slow error routing). The problems we DO have (signal decay, SHORT underperformance, new signal validation) are analytical, not procedural. Invest time in understanding WHY signals degrade, not in how we build them faster.
 
 **Recommendation:** Defer all three proposals. Revisit in 2 weeks if signal decay is resolved and we're building new signals regularly. Current priority: signal decay investigation + SHORT suppression validation + continuation monitoring.
+
+---
+
+## 2026-08-08 — CEO Assessment: Signal Version Tracking Spec
+
+### Context
+
+Reviewed `plans/signal-version-tracking.md`. Proposal: version tracking for param changes, regression detection (6h vs 48h), auto-rollback on CRITICAL regression. 5-6 hours effort.
+
+### 1. Is this worth doing NOW?
+
+**No. Defer.**
+
+We already have three systems that solve overlapping parts of this problem:
+
+- **`signal_decay_detector.py`** — auto-disables signals when WR drops below 20% (hard) or 30% (soft). Runs every 6h. This IS regression detection — it just doesn't track which param change caused it.
+- **`self_learner.py`** — auto-tunes params based on performance, detects decay patterns.
+- **`signal_rotator.py`** — enables/disables signals based on regime and performance.
+
+The proposal's pitch is "we tune params, can't roll back." But look at our actual param changes this week:
+- bb_bounce RSI tightened to 40/60 — deliberate, monitoring window
+- SHORT combos suppressed at 0.5-0.6 weight — deliberate, monitoring window
+- continuation signal added — deliberate, monitoring window
+
+These are all intentional changes with expected outcomes. We're not making accidental edits that need rollback. The version tracking solves a problem we don't currently have — the real problem is signal decay from market regime shifts, not from our param edits.
+
+### 2. Risk of doing vs not doing
+
+**Risk of doing it (5-6 hours):**
+- Time diverted from the three actual priorities: signal decay investigation, SHORT suppression validation, continuation monitoring
+- Auto-rollback in a live trading system is a liability. If it triggers on noise (sample size < 20 trades), it could revert a good change. The -10% WR threshold sounds conservative but with 5 trades, one loss flips WR by 20%.
+- Adds a new data file (`signal_versions.json`) that needs maintenance and integration with 4 existing automations
+
+**Risk of NOT doing it:**
+- Zero immediate risk. We have git history for param changes (commit messages document what changed and why)
+- The decay detector already auto-disables bad signals
+- Manual rollback is "grep git log, revert the change" — 5 minutes, not the 48h the proposal claims
+
+### 3. Full version or MVP?
+
+**Neither. Skip it.**
+
+If we MUST build something, the MVP (version tracking only, no auto-rollback) is the right scope. Version log + dashboard section in signal_report.md. ~2 hours.
+
+But even the MVP duplicates what `git log` and `signal_performance_report.py` already do. The only new value is "who changed it" (human vs CEO vs self_learner) — which is audit trail, not operational necessity.
+
+### 4. Auto-rollback concerns
+
+**High risk. Do not implement.**
+
+- **Sample size trap:** Regression thresholds (-10% WR) are meaningless with < 20 trades. One extra loss on a 5-trade sample = -20% WR swing. The system would rollback perfectly fine param changes.
+- **Market regime confusion:** If the whole market shifts, ALL signals degrade simultaneously. Auto-rollback would revert every signal to previous params, then the new params would also fail, then it would rollback again — oscillation.
+- **No human in the loop:** A CRITICAL regression might be expected (we tightened filters to reduce trades,WR naturally shifts). Auto-rollback undoes the deliberate decision.
+- **Compounding errors:** Rollback applies params from a version that was "good" in a different market context. That context may no longer exist.
+
+The decay detector's approach (disable the signal, don't revert params) is safer. A disabled signal loses opportunity but doesn't lose money. A reverted param on a different market regime could actively lose money.
+
+### What to do instead
+
+The 5-6 hours is better spent on:
+
+1. **Signal decay root cause investigation** — Why do signals go from 40-80% WR to 0% in 24-48h? Is it regime shift, overfitting, or sample noise? This is the $354/week loss source.
+2. **SHORT suppression validation** — We suppressed 4 SHORT combos on Aug 7. Need 48h data to confirm it's working. If not, disable the worst offenders entirely.
+3. **continuation signal first 10 trades** — New signal, 65% WR backtested. Needs live validation.
+
+### Recommendation
+
+**Defer signal version tracking.** Revisit in 2 weeks — by then we'll have either solved signal decay (making version tracking less urgent) or have evidence that param-change rollbacks are actually needed (making the proposal justified).
+
+If you want a lightweight win: add a "param change log" section to `signal_performance_report.py` that reads git log for `hermes_constants.py` changes. Zero new files, zero new infrastructure, same audit trail value.

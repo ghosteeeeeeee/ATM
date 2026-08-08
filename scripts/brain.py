@@ -754,7 +754,7 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             import sys, os
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             from hyperliquid_exchange import get_realized_pnl
-            from datetime import datetime
+            from datetime import datetime as _dt2, timezone as _tz2
 
             # Convert open_time to ms timestamp
             if open_time:
@@ -876,6 +876,9 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
                 rsi=rsi, z_score=z_score, speed=speed,
                 phase=phase, acceleration=accel,
                 llm_decision=llm_decision,
+                exit_reason=close_reason,
+                leverage=int(float(stored_lev or 1)),
+                close_time=datetime.now(timezone.utc),
             )
         except Exception:
             pass  # fail-open

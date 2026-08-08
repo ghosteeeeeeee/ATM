@@ -2597,7 +2597,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         conn3 = get_db_connection()
         cur3 = conn3.cursor()
         cur3.execute("""
-            SELECT id, token, direction, entry_price, leverage, amount_usdt
+            SELECT id, token, direction, entry_price, leverage, amount_usdt, stop_loss, target
             FROM trades
             WHERE status = 'open' AND paper = false AND exchange = 'Hyperliquid'
         """)
@@ -2605,7 +2605,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         conn3.close()
 
         for row in live_missing:
-            trade_id, token, direction, entry, lev, amount = row
+            trade_id, token, direction, entry, lev, amount, sl, tp = row
             trade_id_str = str(trade_id)
             if token in hl_pos and float(hl_pos[token].get('size', 0)) != 0:
                 continue  # On HL — reconciled by Step 3
@@ -2617,19 +2617,25 @@ def close_orphan_paper_trades(hl_pos, prices):
                 hl_exit_px, _ = _poll_hl_fills_for_close(token, close_start_ms)
                 if hl_exit_px > 0:
                     log(f'  [LIVE-MISS] {token}: recently closed on HL (exit={hl_exit_px}) — NOT re-opening', 'WARN')
-                    # Detect WHO closed on HL by checking recent fills
+                    # Detect close reason by comparing exit price to SL/TP (same logic as paper-trade block)
                     close_reason = 'hl_recently_closed'
-                    try:
-                        from hyperliquid_exchange import get_exchange, MAIN_ACCOUNT_ADDRESS
-                        ex = get_exchange()
-                        addr = getattr(ex, 'account_address', None) or MAIN_ACCOUNT_ADDRESS
-                        close_fills = ex.info.user_fills_by_time(addr, close_start_ms, int(time.time() * 1000))
-                        for cf in close_fills:
-                            if cf.get('coin', '').upper() == token.upper() and 'Close' in str(cf.get('dir', '')):
-                                close_reason = 'profit_monster'
-                                break
-                    except Exception:
-                        pass
+                    sl_f = float(sl) if sl else 0
+                    tp_f = float(tp) if tp else 0
+                    exit_f = float(hl_exit_px)
+                    if sl_f > 0 and tp_f > 0:
+                        if direction.upper() == 'LONG' and exit_f >= tp_f:
+                            close_reason = 'HL_TP_CLOSED'
+                        elif direction.upper() == 'LONG' and exit_f <= sl_f:
+                            close_reason = 'HL_SL_CLOSED'
+                        elif direction.upper() == 'SHORT' and exit_f <= tp_f:
+                            close_reason = 'HL_TP_CLOSED'
+                        elif direction.upper() == 'SHORT' and exit_f >= sl_f:
+                            close_reason = 'HL_SL_CLOSED'
+                        else:
+                            close_reason = 'HL_CLOSED'
+                    else:
+                        close_reason = 'HL_CLOSED'
+                    log(f'  [LIVE-MISS] {token} close reason: {close_reason} (exit={exit_f}, sl={sl_f}, tp={tp_f})', 'INFO')
                     # Close this stale DB trade
                     try:
                         conn_close = get_db_connection()

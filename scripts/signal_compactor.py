@@ -264,6 +264,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.15, # 6T 67% WR +$0.12
     ('vortex_break','ma100-cross,vortex_break_long'):     1.1,  # 8T 62% WR +$0.08
     ('range_finder','ma100-cross,range_finder'):          1.05, # 7T 57% WR +$0.07
+    ('bb_bounce',   'bb_bounce+,range_finder+'):          1.2,  # 7T 71% WR +$0.12
     # ── Combo suppressions (7d data: 2026-08-07) ────────────────────────────
     ('return_exhaustion_short','return_exhaustion-'):     0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
     ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28

@@ -112,7 +112,8 @@ class HebbianEngine:
         concept_a: str,
         concept_b: str,
         label_type_a: Optional[str] = None,
-        label_type_b: Optional[str] = None
+        label_type_b: Optional[str] = None,
+        increment: float = None,
     ) -> float:
         """
         Record that concept_a and concept_b fired together.
@@ -126,6 +127,7 @@ class HebbianEngine:
             return 0.0  # Don't self-link
 
         a_norm, b_norm = self._normalize_pair(a_id, b_id)
+        inc = increment if increment is not None else WEIGHT_INCREMENT
 
         with sqlite3.connect(self.db_path) as conn:
             # Upsert synapse
@@ -137,7 +139,7 @@ class HebbianEngine:
 
             if row:
                 old_weight = row[0]
-                new_weight = min(WEIGHT_CEILING, old_weight + WEIGHT_INCREMENT)
+                new_weight = min(WEIGHT_CEILING, old_weight + inc)
                 new_count = row[1] + 1
                 conn.execute("""
                     UPDATE synapse_weights
@@ -145,7 +147,7 @@ class HebbianEngine:
                     WHERE concept_a_id = ? AND concept_b_id = ?
                 """, (new_weight, new_count, a_norm, b_norm))
             else:
-                new_weight = WEIGHT_INCREMENT
+                new_weight = inc
                 conn.execute("""
                     INSERT INTO synapse_weights (concept_a_id, concept_b_id, weight, co_occurrences)
                     VALUES (?, ?, ?, 1)
@@ -177,7 +179,8 @@ class HebbianEngine:
         concept_a: str,
         concept_b: str,
         label_type_a: Optional[str] = None,
-        label_type_b: Optional[str] = None
+        label_type_b: Optional[str] = None,
+        increment: float = None,
     ) -> float:
         """
         Decrement synapse weight between two concepts (loss learning).
@@ -191,6 +194,7 @@ class HebbianEngine:
             return 0.0
 
         a_norm, b_norm = self._normalize_pair(a_id, b_id)
+        inc = increment if increment is not None else WEIGHT_INCREMENT
 
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.execute(
@@ -200,7 +204,7 @@ class HebbianEngine:
             row = cur.fetchone()
 
             if row:
-                new_weight = max(WEIGHT_FLOOR, row[0] - WEIGHT_INCREMENT)
+                new_weight = max(WEIGHT_FLOOR, row[0] - inc)
                 conn.execute("""
                     UPDATE synapse_weights
                     SET weight = ?, last_updated = CURRENT_TIMESTAMP
@@ -231,18 +235,21 @@ class HebbianEngine:
         phase: str = None,
         acceleration: float = None,
         llm_decision: str = None,
+        exit_reason: str = None,
+        leverage: int = None,
+        close_time=None,
     ) -> dict:
         """
         Hebbian write-back from a closed trade.
         Won (pnl_pct > 0) → strengthen all concept pairs.
         Lost (pnl_pct <= 0) → weaken all concept pairs.
 
-        Concepts: token, signal, direction, z_score_tier, momentum_state,
+        Concepts: token, signal, signal combos, direction, z_score_tier, momentum_state,
                   rsi_tier, z_score_tier_value, speed_tier, phase, accel_tier,
-                  llm_decision (GO/WARN/NAY/FLIP).
+                  llm_decision, exit_reason tier, leverage tier, hour tier.
         Returns {'strengthened': n, 'weakened': m} for logging.
         """
-        # Convert continuous values to tiers for Hebbian learning
+        # ── Convert continuous values to tiers ────────────────────────────
         rsi_tier = None
         if rsi is not None:
             rsi_tier = 'rsi_overbought' if rsi > 70 else 'rsi_oversold' if rsi < 30 else 'rsi_neutral'
@@ -263,23 +270,101 @@ class HebbianEngine:
         # LLM decision concept
         llm_concept = None
         if llm_decision:
-            llm_concept = f'llm_{llm_decision.lower()}'  # llm_go, llm_warn, llm_nay, llm_flip
+            llm_concept = f'llm_{llm_decision.lower()}'
 
-        concepts = [token, signal, direction, z_score_tier, momentum_state,
-                    rsi_tier, z_tier_value, speed_tier, phase, accel_tier, llm_concept]
+        # ── Exit reason tier ──────────────────────────────────────────────
+        exit_tier = None
+        if exit_reason:
+            if 'profit' in exit_reason or 'tp' in exit_reason:
+                exit_tier = 'exit_profit'
+            elif 'sl' in exit_reason or 'stop' in exit_reason:
+                exit_tier = 'exit_sl'
+            elif 'guardian' in exit_reason:
+                exit_tier = 'exit_guardian'
+            elif 'stale' in exit_reason:
+                exit_tier = 'exit_stale'
+            elif 'time' in exit_reason:
+                exit_tier = 'exit_time'
+            elif 'hl' in exit_reason.upper():
+                exit_tier = 'exit_hl'
+            else:
+                exit_tier = f'exit_{exit_reason[:20]}'
+
+        # ── Leverage tier ─────────────────────────────────────────────────
+        lev_tier = None
+        if leverage is not None:
+            if leverage <= 3:
+                lev_tier = 'lev_low'
+            elif leverage <= 5:
+                lev_tier = 'lev_mid'
+            elif leverage <= 10:
+                lev_tier = 'lev_high'
+            else:
+                lev_tier = 'lev_extreme'
+
+        # ── Time-of-day tier ──────────────────────────────────────────────
+        hour_tier = None
+        if close_time is not None:
+            try:
+                hour = close_time.hour if hasattr(close_time, 'hour') else close_time.timestamp()
+                if hasattr(close_time, 'hour'):
+                    h = close_time.hour
+                else:
+                    from datetime import datetime, timezone
+                    h = datetime.fromtimestamp(close_time, tz=timezone.utc).hour
+                if h < 4:
+                    hour_tier = 'hour_asia'
+                elif h < 8:
+                    hour_tier = 'hour_asia_late'
+                elif h < 12:
+                    hour_tier = 'hour_europe'
+                elif h < 16:
+                    hour_tier = 'hour_us_open'
+                elif h < 20:
+                    hour_tier = 'hour_us_afternoon'
+                else:
+                    hour_tier = 'hour_us_evening'
+            except Exception:
+                pass
+
+        # ── Signal combo decomposition ────────────────────────────────────
+        # Split "bb_bounce+,range_finder+" → ["bb_bounce+", "range_finder+"]
+        # Also keep full combo as a concept
+        signal_parts = []
+        if signal:
+            parts = [s.strip() for s in signal.split(',') if s.strip()]
+            if len(parts) > 1:
+                signal_parts = parts + [signal]  # individual + full combo
+            else:
+                signal_parts = [signal]
+
+        # ── Build concept list ────────────────────────────────────────────
+        concepts = [token, direction, z_score_tier, momentum_state,
+                    rsi_tier, z_tier_value, speed_tier, phase, accel_tier,
+                    llm_concept, exit_tier, lev_tier, hour_tier]
+        concepts = [c for c in concepts if c]
+        # Add signal concepts (combo + individual parts)
+        concepts = signal_parts + concepts
         concepts = [c for c in concepts if c]
         if len(concepts) < 2:
             return {'strengthened': 0, 'weakened': 0}
 
+        # ── PnL-scaled weight increment ───────────────────────────────────
         won = pnl_pct is not None and pnl_pct > 0
+        # Scale: 0.5 for tiny PnL, up to 2.0 for big moves
+        if pnl_pct is not None:
+            pnl_increment = min(2.0, max(0.5, abs(pnl_pct) * 2))
+        else:
+            pnl_increment = WEIGHT_INCREMENT
+
         strengthened = weakened = 0
         for i in range(len(concepts)):
             for j in range(i + 1, len(concepts)):
                 if won:
-                    self.learn_pair(concepts[i], concepts[j])
+                    self.learn_pair(concepts[i], concepts[j], increment=pnl_increment)
                     strengthened += 1
                 else:
-                    self.weaken_pair(concepts[i], concepts[j])
+                    self.weaken_pair(concepts[i], concepts[j], increment=pnl_increment)
                     weakened += 1
         return {'strengthened': strengthened, 'weakened': weakened}
 
