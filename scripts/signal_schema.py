@@ -1831,6 +1831,13 @@ def is_component_disabled(component: str) -> bool:
             CONTINUATION_PLUS_ENABLED, CONTINUATION_MINUS_ENABLED,
             ZSCORE_PUMP_PLUS_ENABLED, ZSCORE_PUMP_MINUS_ENABLED,
             MOMENTUM_LEADERBOARD_PLUS_ENABLED, MOMENTUM_LEADERBOARD_MINUS_ENABLED,
+            BB_BOUNCE_ENABLED, BB_BOUNCE_PLUS_ENABLED, BB_BOUNCE_MINUS_ENABLED,
+            RANGE_FINDER_ENABLED, RANGE_FINDER_PLUS_ENABLED, RANGE_FINDER_MINUS_ENABLED,
+            ZSCORE_RISING_ENABLED, ZSCORE_RISING_PLUS_ENABLED, ZSCORE_RISING_MINUS_ENABLED,
+            HH_HL_CHOCH_ENABLED, HH_HL_CHOCH_PLUS_ENABLED, HH_HL_CHOCH_MINUS_ENABLED,
+            INVERSE_ACCEL_300_ENABLED, INVERSE_ACCEL_300_PLUS_ENABLED, INVERSE_ACCEL_300_MINUS_ENABLED,
+            SQUEEZE_CROSS_ENABLED, SQUEEZE_CROSS_PLUS_ENABLED, SQUEEZE_CROSS_MINUS_ENABLED,
+            WYCKOFF_ENABLED, WYCKOFF_PLUS_ENABLED, WYCKOFF_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -1982,6 +1989,34 @@ def is_component_disabled(component: str) -> bool:
     # momentum-leaderboard
     if c == 'momentum-leaderboard+': return not MOMENTUM_LEADERBOARD_PLUS_ENABLED
     if c == 'momentum-leaderboard-': return not MOMENTUM_LEADERBOARD_MINUS_ENABLED
+    # bb_bounce
+    if c == 'bb_bounce+': return not BB_BOUNCE_PLUS_ENABLED
+    if c == 'bb_bounce-': return not BB_BOUNCE_MINUS_ENABLED
+    if c == 'bb_bounce': return not BB_BOUNCE_ENABLED
+    # range_finder
+    if c == 'range_finder+': return not RANGE_FINDER_PLUS_ENABLED
+    if c == 'range_finder-': return not RANGE_FINDER_MINUS_ENABLED
+    if c == 'range_finder': return not RANGE_FINDER_ENABLED
+    # zscore-rising
+    if c == 'zscore-rising+': return not ZSCORE_RISING_PLUS_ENABLED
+    if c == 'zscore-rising-': return not ZSCORE_RISING_MINUS_ENABLED
+    if c == 'zscore-rising': return not ZSCORE_RISING_ENABLED
+    # hh-hl-choch
+    if c == 'hh-hl-choch+': return not HH_HL_CHOCH_PLUS_ENABLED
+    if c == 'hh-hl-choch-': return not HH_HL_CHOCH_MINUS_ENABLED
+    if c == 'hh-hl-choch': return not HH_HL_CHOCH_ENABLED
+    # inverse-accel-300
+    if c in ('inverse-accel-300+', 'inv-accel-300+'): return not INVERSE_ACCEL_300_PLUS_ENABLED
+    if c in ('inverse-accel-300-', 'inv-accel-300-'): return not INVERSE_ACCEL_300_MINUS_ENABLED
+    if c in ('inverse-accel-300', 'inv-accel-300'): return not INVERSE_ACCEL_300_ENABLED
+    # squeeze-cross
+    if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
+    if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED
+    if c == 'squeeze-cross': return not SQUEEZE_CROSS_ENABLED
+    # wyckoff
+    if c == 'wyckoff+': return not WYCKOFF_PLUS_ENABLED
+    if c == 'wyckoff-': return not WYCKOFF_MINUS_ENABLED
+    if c == 'wyckoff': return not WYCKOFF_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

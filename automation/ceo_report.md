@@ -1,3 +1,30 @@
+## CEO Report — 2026-08-09 (is_component_disabled bug fix)
+
+### Diagnosis
+**24h Verified:** 27 trades, +$0.13, 48.1% WR. LONG: +$0.68 (68.4% WR). SHORT: -$0.56 (0% WR).
+**7d:** 414 trades, -$8.13, 42.0% WR.
+**Root cause:** `is_component_disabled()` in signal_schema.py was missing 20 signal flags (range_finder-, bb_bounce-, zscore-rising-, inv-accel-300-, etc.). These signals were disabled in hermes_constants.py but the compactor's guard function had no case for them — trades slipped through.
+
+### Fix Applied
+Added 8 signal families (20 flags) to `is_component_disabled()`:
+- `bb_bounce±` / `range_finder±` / `zscore-rising±` / `hh-hl-choch±`
+- `inv-accel-300±` (also fixed naming: `inv-accel-300-` vs `inverse-accel-300-`)
+- `squeeze-cross±` / `wyckoff±`
+
+**Impact:** All SHORT bleeders now BLOCKED at compactor level. No new `range_finder-`, `bb_bounce-`, `zscore-rising-`, `vel-hermes-`, `pct-hermes-`, `hzscore-`, `inv-accel-300-`, `ma100-cross-` SHORT trades will enter hotset.
+
+### Verification
+- `is_component_disabled('range_finder-')` → True (was False) ✓
+- `is_component_disabled('bb_bounce-')` → True (was False) ✓
+- `is_component_disabled('zscore-rising-')` → True (was False) ✓
+- `is_component_disabled('inv-accel-300-')` → True (was False) ✓
+- All 10 remaining SHORT components verified: 6 BLOCKED, 4 ACTIVE (hh-hl-, wyckoff-, hh-hl-choch-, mtp-zscore- — all intentionally enabled)
+
+### Expected Impact
+SHORT should stop bleeding -$0.56/24h. Legacy trades will age out within hours.
+
+---
+
 ## CEO Report — 2026-08-08 (trend filter fix)
 
 ### Acknowledgment
