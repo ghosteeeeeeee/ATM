@@ -76,3 +76,21 @@
 
 ### Status
 Bug_hunter verified ALL CLEAR. Memory stored. System ready for live deployment.
+
+---
+
+## Transcript Mining — Acknowledgment (2026-08-08)
+
+### Deliverables Completed
+1. `/book-skill` command created for ingesting trading books into knowledge base
+2. Trading books ranked list produced (Chan, López de Prado, Vince as top 3)
+3. `Lead-with-action` rule added to AGENTS.md (conciseness improvement)
+4. `Diff-review` step added to post-change skill (prevents regressions)
+
+### Key Quick Wins Identified
+- **Half-Kelly sizing** — conservative position sizing formula to reduce drawdown
+- **Walk-forward testing** — validates signal robustness across time windows
+- **Correlation check** — prevents adding redundant/overlapping signals
+
+### Status
+All deliverables committed. Ready for next phase implementation.
