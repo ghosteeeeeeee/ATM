@@ -176,3 +176,24 @@ Signal-specific variance is high (some at 0% WR, some at100%). 50 trades gives s
 
 ### No Changes Made
 Read-only review. Awaiting T's approval to proceed.
+
+---
+
+## CEO Acknowledgment — Phase 1 Position Sizing Implemented (2026-08-08)
+
+Phase 1 position sizing extensions shipped and verified:
+
+| Extension | Implementation | Status |
+|-----------|---------------|--------|
+| Signal Weighting | Grade A=1.5x, B=1.2x, C=1.0x, D=0.8x, F=0.5x | ✅ |
+| Drawdown-Responsive | 5% DD=0.5x, 10% DD=0.25x (peak equity file-tracked) | ✅ |
+| Portfolio Heat | Max 15% total risk, normalized by equity | ✅ |
+| Conservative Mode | Toggle for 0.5x reduction (disabled by default) | ✅ |
+
+### Bug Hunter Fixes (3 issues)
+1. Kelly returned min_size on negative edge → now returns 0
+2. Portfolio heat used raw USDT → now normalized by equity
+3. Peak equity used current equity → now tracked in file
+
+### Status
+Phase 1 complete. Awaiting integration testing or live deployment decision.
