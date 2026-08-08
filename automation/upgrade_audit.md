@@ -440,3 +440,34 @@ For each plan scanned, log:
 - conf-1s block: single-source signals are lower quality, keep as-is
 - Dead hours filter: proven 16% WR during dead hours, keep as-is
 - Context gate rule-based checks: all verified working, keep as-is
+
+---
+
+## Session 2026-08-08 — Plan Scan + Quick Wins + Signal Version Tracking
+
+### New Plan Evaluations
+
+| # | Plan | Difficulty | Value | Status |
+|---|------|-----------|-------|--------|
+| 1 | signal-version-tracking.md | L2 | HIGH | PENDING |
+| 2 | transcript-mining-worth-discussing.md | L2 | MEDIUM | PARTIALLY (ADRs exist, uncertainty check TODO) |
+| 3 | transcript-mining-quick-wins.md | L1 | HIGH | PARTIALLY (ADRs exist, uncertainty check TODO) |
+| 4 | post-change-workflow.md | N/A | N/A | Already a skill |
+| 5 | momentum-leaderboard-spec.md | N/A | N/A | ALREADY IMPLEMENTED |
+| 6 | trade-loss-elimination.md | N/A | N/A | ALREADY IMPLEMENTED |
+| 7 | system-improvements-spec.md | L1-2 | MEDIUM | PARTIALLY (2/5 scripts exist) |
+| 8 | hl-copy-trading-spec.md | N/A | N/A | ALREADY IMPLEMENTED (MVP) |
+| 9 | ceo-mcp-resources-spec.md | L2 | LOW | DEFERRED (CEO said ship only if needed) |
+| 10 | wyckoff-pattern-recognition.md | L2 | MEDIUM | NOT IMPLEMENTED |
+| 11 | self-learning-system-spec.md | L3 | MEDIUM | NOT IMPLEMENTED |
+| 12 | signal-quality-plan.md | L2 | MEDIUM | PARTIALLY IMPLEMENTED |
+| 13 | automation-team-spec.md | N/A | N/A | Reference doc |
+
+### Quick Win 1: Uncertainty Check — bug-hunter + post-change
+- **Type:** Level 1 skill edit
+- **What:** Add mandatory "What choices were uncertain?" question to bug_hunter and post-change workflows
+- **Source:** transcript-mining-quick-wins.md
+
+### Quick Win 2: Uncertainty Check — post-change skill
+- **Type:** Level 1 skill edit
+- **What:** Same uncertainty question added to post-change workflow

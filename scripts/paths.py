@@ -45,6 +45,8 @@ __all__ = [
     'REGIME_4H_FILE',
     # HL Copy Trading
     'HL_COPY_DB', 'HL_COPY_REPORT', 'HL_COPY_TRADERS',
+    # Signal version tracking
+    'SIGNAL_VERSIONS_FILE',
 ]
 
 # ── Base directories ──────────────────────────────────────────────────────────
@@ -123,3 +125,6 @@ WWW_LOG_DIR     = '/var/www/hermes/logs'
 HL_COPY_DB      = os.path.join(HERMES_DATA, 'hl_copy.db')
 HL_COPY_REPORT  = os.path.join(WWW_DATA, 'hl_copy_report.md')
 HL_COPY_TRADERS = os.path.join(WWW_DATA, 'hl_copy_traders.json')
+
+# ── Signal version tracking ────────────────────────────────────────────────────
+SIGNAL_VERSIONS_FILE = os.path.join(HERMES_DATA, 'signal_versions.json')

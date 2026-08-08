@@ -275,20 +275,21 @@ class HebbianEngine:
         # ── Exit reason tier ──────────────────────────────────────────────
         exit_tier = None
         if exit_reason:
-            if 'profit' in exit_reason or 'tp' in exit_reason:
+            er = exit_reason.lower()
+            if 'profit' in er or 'tp' in er:
                 exit_tier = 'exit_profit'
-            elif 'sl' in exit_reason or 'stop' in exit_reason:
+            elif 'sl' in er or 'stop' in er:
                 exit_tier = 'exit_sl'
-            elif 'guardian' in exit_reason:
+            elif 'guardian' in er:
                 exit_tier = 'exit_guardian'
-            elif 'stale' in exit_reason:
+            elif 'stale' in er:
                 exit_tier = 'exit_stale'
-            elif 'time' in exit_reason:
+            elif 'time' in er:
                 exit_tier = 'exit_time'
-            elif 'hl' in exit_reason.upper():
+            elif 'hl' in er:
                 exit_tier = 'exit_hl'
             else:
-                exit_tier = f'exit_{exit_reason[:20]}'
+                exit_tier = f'exit_{er[:20]}'
 
         # ── Leverage tier ─────────────────────────────────────────────────
         lev_tier = None
@@ -306,7 +307,6 @@ class HebbianEngine:
         hour_tier = None
         if close_time is not None:
             try:
-                hour = close_time.hour if hasattr(close_time, 'hour') else close_time.timestamp()
                 if hasattr(close_time, 'hour'):
                     h = close_time.hour
                 else:
