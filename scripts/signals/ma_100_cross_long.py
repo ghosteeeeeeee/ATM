@@ -31,7 +31,7 @@ MIN_ATR_PCT = 0.04           # STANDARD: minimum ATR% to fire (filters low-vol t
 COOLDOWN_CANDLES = 6         # 30 min cooldown on 5m candles
 ATR_PERIOD = 14              # ATR period for volatility normalization
 REQUIRE_2_CANDLE = True      # require candle before cross to confirm pre-cross side
-STOP_LOSS_PCT = 1.2          # STANDARD: 1.2% stop loss
+STOP_LOSS_PCT = 1.0          # TIGHTER: 1.0% stop loss (improves WR)
 
 
 def _resample_5m(closes_1m: np.ndarray) -> np.ndarray:
