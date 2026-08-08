@@ -5,6 +5,7 @@
 <!-- Format: [YYYY-MM-DD HH:MM] automaton: action taken -->
 - [2026-08-08 00:30] signal_reporter: System startup — no kills needed yet
 - [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
+- [2026-08-09 22:19] ceo: BUG FIX — is_component_disabled() missing bb-bounce-short, range_finder_short. Added hyphenated signal name mappings. Cleared stale .pyc cache (root cause of ImportError alerts).
 
 ## CEO DECISIONS
 - [x] 2026-08-08 00:30 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Monitor 24h.
@@ -24,6 +25,8 @@
 - [x] 2026-08-09 22:00 — CEO review: 24h +$0.13 (50% WR, 36T). LONG +$0.71 (68% WR). SHORT -$0.58 (9.1% WR) — all pre-fix legacy trades. 7d -$1.23 (43.7% WR). 0 open SHORTs. Star: bb_bounce+,range_finder+ LONG 81.8% WR. All fixes verified working — no changes needed.
 - [x] 2026-08-11 — NOTIFICATION: range_finder_short.py deployed. Second SHORT-specific signal (after bb_bounce_short). RSI >55, 4+ band touches, volume 1.2x fail-closed, no Asian session. Bug hunter fixed ZeroDivisionError + volume guard. Monitoring.
 - [x] 2026-08-08 23:30 — CEO review: 24h +$0.30 (47.4% WR, 38T). LONG +$0.77 (60.7% WR). SHORT -$0.47 (10% WR) — all legacy pre-fix trades. 7d +$0.55 (55% WR). Star: bb_bounce+,range_finder+ LONG 79% WR, +$0.76/24h. ATR SL 1.2% deployed (2 trades, both winners). No changes — evaluation ongoing, legacy SHORTs aging out.
+- [x] 2026-08-09 22:20 — CEO BUG FIX: is_component_disabled() didn't handle hyphenated signal names (bb-bounce-short, range_finder_short). BB_BOUNCE_MINUS_ENABLED=False and RANGE_FINDER_MINUS_ENABLED=False were set, but the compactor let them through because is_component_disabled("bb-bounce-short") fell through to return False. Added 6 new name mappings. Also cleared stale hermes_constants.cpython-312.pyc cache (root cause of ImportError alerts in error_alerts.md). Verified: all 8 test cases pass.
+- [x] 2026-08-08 22:50 — CEO review: 24h +$0.28 (48.6% WR, 37T). LONG +$0.79 (60.7% WR). SHORT -$0.51 (11.1% WR) — all legacy pre-fix trades. 7d -$8.10 (39.5% WR). SHORT improving: from -$1.37 to -$0.51 in 24h. Star: bb_bounce+,range_finder+ LONG 76.9% WR. System in REDUCE mode, SHORT_BIAS regime. No changes — all fixes working, evaluation ongoing.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)

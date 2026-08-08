@@ -1990,13 +1990,17 @@ def is_component_disabled(component: str) -> bool:
     if c == 'momentum-leaderboard+': return not MOMENTUM_LEADERBOARD_PLUS_ENABLED
     if c == 'momentum-leaderboard-': return not MOMENTUM_LEADERBOARD_MINUS_ENABLED
     # bb_bounce
-    if c == 'bb_bounce+': return not BB_BOUNCE_PLUS_ENABLED
-    if c == 'bb_bounce-': return not BB_BOUNCE_MINUS_ENABLED
-    if c == 'bb_bounce': return not BB_BOUNCE_ENABLED
+    if c in ('bb_bounce+', 'bb-bounce+'): return not BB_BOUNCE_PLUS_ENABLED
+    if c in ('bb_bounce-', 'bb-bounce-'): return not BB_BOUNCE_MINUS_ENABLED
+    if c in ('bb_bounce', 'bb-bounce'): return not BB_BOUNCE_ENABLED
+    if c in ('bb-bounce-short',): return not BB_BOUNCE_MINUS_ENABLED  # SHORT-specific, same gate
+    if c in ('bb-bounce-long',): return not BB_BOUNCE_PLUS_ENABLED   # LONG-specific, same gate
     # range_finder
-    if c == 'range_finder+': return not RANGE_FINDER_PLUS_ENABLED
-    if c == 'range_finder-': return not RANGE_FINDER_MINUS_ENABLED
-    if c == 'range_finder': return not RANGE_FINDER_ENABLED
+    if c in ('range_finder+',): return not RANGE_FINDER_PLUS_ENABLED
+    if c in ('range_finder-',): return not RANGE_FINDER_MINUS_ENABLED
+    if c in ('range_finder',): return not RANGE_FINDER_ENABLED
+    if c in ('range_finder_short',): return not RANGE_FINDER_MINUS_ENABLED  # SHORT-specific, same gate
+    if c in ('range_finder_long',): return not RANGE_FINDER_PLUS_ENABLED   # LONG-specific, same gate
     # zscore-rising
     if c == 'zscore-rising+': return not ZSCORE_RISING_PLUS_ENABLED
     if c == 'zscore-rising-': return not ZSCORE_RISING_MINUS_ENABLED
