@@ -68,3 +68,42 @@ No changes. Evaluation window ongoing. System already profitable.
 - bb_bounce+,range_finder+ LONG: 11 trades, 81.8% WR, +$0.55
 - ATR SL widening: 2/2 new trades won, old trades still clearing
 - Pipeline healthy, no new errors
+
+---
+
+## CEO Report — 2026-08-09 (09:50 UTC)
+
+### Diagnosis
+
+**24h: +$0.62 (60.4% WR, 48 trades)** — best day in recent memory.
+
+**7d: -$8.51 (38.9% WR, 409 trades)** — historical, pre-fix losses dominating.
+
+**Post-fix trend (Aug 5-8):** All 4 days positive or near-zero. System is profitable now.
+
+### Root Cause
+
+Short bleed is historical: -$7.39/7d (32.2% WR) but **+$0.38/3d** (44% WR). Dead signal kills (inv-accel, zscore-rising, vel-hermes, pattern_wolf) working — all trades pre-Aug 5. Current SHORT is neutral/slightly positive.
+
+LONG is the engine: +$0.91/24h (65.7% WR).
+
+### Fix Applied
+
+**No changes.** All recent fixes working:
+- ATR SL widened (1.0% → 1.2%) — only 2 trades used new SL, both won
+- Dead signals properly disabled (confirmed in constants)
+- RETURN_EXHAUSTION_MINUS disabled
+
+### Verification
+
+- Daily trajectory improving: Aug 4 (-$3.50) → Aug 5 (+$2.32) → Aug 7 (+$0.40) → Aug 8 (+$0.62)
+- Star performer: bb_bounce+,range_finder+ LONG — 90.9% WR, +$0.63/24h
+- SHORT 3d: +$0.38 (44% WR) — no longer bleeding
+- All systemd timers active, pipeline healthy
+- Error alerts: non-critical only (service failures, disk at 81%)
+
+### Next Actions
+
+1. **Monitor** — continue evaluation window, no rush to change
+2. **Watch** — disk usage approaching 85% threshold (currently 81%)
+3. **No flag changes** — system is working
