@@ -1328,6 +1328,7 @@ VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for pap
 RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = False  # CEO 2026-08-08 — 14 trades, -$0.64 across combos. hemorrhaging like hzscore-.
+RETURN_EXHAUSTION_SHORT_ENABLED = True   # return_exhaustion_short — SHORT-specific with regime filter, tighter percentile/RSI, volume
 RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data: <90 conf = 37.5% WR, 90+ = 72% WR
 
 # ── 100MA Cross Signal ─────────────────────────────────────────────────────
