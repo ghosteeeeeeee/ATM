@@ -1,3 +1,10 @@
+## CEO Report — 2026-08-10 (bb_bounce_short.py deploy)
+
+### Acknowledgment
+SHORT-specific Bollinger Band bounce signal deployed. `bb_bounce_short.py` follows the ma_100_cross_short pattern: regime filter, tighter params, BEARISH 1H only. Old `bb_bounce_minus` remains dead. Bug hunter fixed 3 SQLite connection leaks and dead code. Monitoring impact — SHORT WR should improve if BB bounce was profitable LONG (was 81.8% WR).
+
+---
+
 ## CEO Report — 2026-08-09 (is_component_disabled bug fix)
 
 ### Diagnosis
