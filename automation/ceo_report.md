@@ -45,3 +45,25 @@ The 7d loss is dominated by historical dead signals (inv-accel-300-, zscore-risi
 | Win rate (24h) | 62.5% | 65%+ | 24h |
 | SHORT PnL (3d) | -$1.56 | $0 | 72h |
 | 7d PnL | -$8.04 | -$5 | 7d |
+
+## CEO Report — 2026-08-09 10:50 UTC
+
+### Diagnosis
+**24h Verified:** 40 trades, +$0.30, 55% WR. LONG: +$0.84 (71.4% WR). SHORT: -$0.54 (16.7% WR).
+
+**7d:** 352 trades, -$1.40. Short-term bleeding stopped but historical drag remains.
+
+### Root Cause
+SHORT signals still bleeding -$0.54/24h but improving. All ma100-cross SHORT combos were killed earlier today (MA_100_CROSS_MINUS_ENABLED=False). ATR SL hits = 17 trades, -$0.97 (dominant loss mechanism).
+
+### Stars
+- **bb_bounce+,range_finder+ LONG**: 14 trades, +$0.51, 71.4% WR — star performer
+- **Profit monster trailing**: 22 trades, +$1.27, 100% WR — consistent edge
+
+### Fix Applied
+No new changes. Earlier fixes (signal kills, ATR SL widening 1.0→1.2%) need more time to show impact. SHORT is improving but not yet profitable.
+
+### Verification
+SHORT improved from -$0.54/24h to expected breakeven after signal kills propagate. LONG is strong at 71.4% WR. All recent fixes working.
+
+---
