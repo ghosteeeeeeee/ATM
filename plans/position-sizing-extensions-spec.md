@@ -1,7 +1,7 @@
 # Position Sizing Extensions Spec
 
 **Date**: 2026-08-08
-**Status**: Draft — awaiting CEO input
+**Status**: Approved — ready for implementation
 **Priority**: High
 
 ## Current State
@@ -87,9 +87,46 @@ def can_open_position(new_risk: float, current_heat: float) -> bool:
 **Risk**: Medium — may block legitimate trades
 **Impact**: High — prevents overconcentration
 
+#### 4. Conservative Mode Toggle
+**What**: Manual override to reduce all sizing by 50%
+**Why**: Human control during uncertainty periods
+**Where**: `hermes_constants.py`, `position_manager.py`
+
+```python
+# hermes_constants.py
+CONSERVATIVE_MODE_ENABLED = False
+CONSERVATIVE_MODE_MULTIPLIER = 0.5
+
+# position_manager.py
+def apply_conservative_mode(size: float) -> float:
+    if CONSERVATIVE_MODE_ENABLED:
+        return size * CONSERVATIVE_MODE_MULTIPLIER
+    return size
+```
+
+**Risk**: Low — manual toggle only
+**Impact**: High — instant human override capability
+
 ### Phase 2: Next 2 Weeks
 
-#### 4. Walk-Forward Validation Pipeline
+#### 5. Correlation Matrix
+**What**: Check if new signal is redundant with existing
+**Why**: Avoid correlated signals that don't diversify
+**Where**: `signal_validator.py`
+
+```python
+def check_correlation(new_signal_returns, existing_signals, threshold=0.7):
+    for name, returns in existing_signals.items():
+        corr = np.corrcoef(new_signal_returns, returns)[0, 1]
+        if abs(corr) > threshold:
+            return False, f"Correlated with {name}: {corr:.2f}"
+    return True, "OK"
+```
+
+**Risk**: Low — check only
+**Impact**: Medium — better diversification
+
+#### 6. Walk-Forward Validation Pipeline
 **What**: Auto-disable signals that fail walk-forward test
 **Why**: Prevents overfit signals from trading live
 **Where**: `signal_auditor.py`
@@ -109,24 +146,7 @@ def validate_signal(signal: str, trades: list) -> bool:
 **Risk**: Low — validation only
 **Impact**: Medium — prevents overfit signals
 
-#### 5. Correlation Matrix
-**What**: Check if new signal is redundant with existing
-**Why**: Avoid correlated signals that don't diversify
-**Where**: `signal_validator.py`
-
-```python
-def check_correlation(new_signal_returns, existing_signals, threshold=0.7):
-    for name, returns in existing_signals.items():
-        corr = np.corrcoef(new_signal_returns, returns)[0, 1]
-        if abs(corr) > threshold:
-            return False, f"Correlated with {name}: {corr:.2f}"
-    return True, "OK"
-```
-
-**Risk**: Low — check only
-**Impact**: Medium — better diversification
-
-#### 6. Adaptive Kelly Fraction
+#### 7. Adaptive Kelly Fraction
 **What**: Increase/decrease Kelly based on recent performance
 **Why**: Scale with demonstrated edge
 **Where**: `position_sizing.py`
@@ -150,7 +170,7 @@ def get_adaptive_kelly_fraction(recent_sharpe: float) -> float:
 
 ### Phase 3: Month 2
 
-#### 7. Signal Decay Detection
+#### 8. Signal Decay Detection (HIGH PRIORITY)
 **What**: Detect when signals stop working
 **Why**: Catch regime changes
 **Where**: `hebbian_learner.py`
@@ -164,7 +184,10 @@ def detect_signal_decay(signal: str, lookback=50) -> bool:
     return False
 ```
 
-#### 8. Volatility-Normalized Sizing
+**Risk**: Low — detection only
+**Impact**: High — prevents trading dead signals
+
+#### 9. Volatility-Normalized Sizing (MEDIUM PRIORITY)
 **What**: Size inversely proportional to volatility
 **Why**: Equal risk per trade
 **Where**: `position_manager.py`
@@ -175,7 +198,10 @@ def volatility_adjusted_size(base_size: float, atr_pct: float, target_vol=2.0):
     return base_size * min(adjustment, 2.0)  # Cap at 2x
 ```
 
-#### 9. Session-Based Sizing
+**Risk**: Medium — dynamic adjustment
+**Impact**: Medium — better risk normalization
+
+#### 10. Session-Based Sizing (LOW PRIORITY)
 **What**: More capital during high-liquidity sessions
 **Why**: Better fills, less slippage
 **Where**: `position_manager.py`
@@ -190,13 +216,16 @@ def get_session_multiplier() -> float:
     return 1.0
 ```
 
+**Risk**: Low — timing adjustment
+**Impact**: Low — crypto is 24/7, weak correlation
+
 ## Implementation Order
 
 | Phase | Items | Timeline | Risk |
 |-------|-------|----------|------|
-| Phase 1 | #1, #2, #3 | This week | Low-Medium |
-| Phase 2 | #4, #5, #6 | Next 2 weeks | Low-Medium |
-| Phase 3 | #7, #8, #9 | Month 2 | Medium |
+| Phase 1 | #1, #2, #3, #4 | This week | Low-Medium |
+| Phase 2 | #5, #6, #7 | Next 2 weeks | Low-Medium |
+| Phase 3 | #8, #9, #10 | Month 2 | Medium |
 
 ## Testing Plan
 
@@ -205,9 +234,20 @@ def get_session_multiplier() -> float:
 3. **A/B test**: Compare sizing with/without extensions
 4. **Monitor**: Watch for overfitting or regime sensitivity
 
-## Open Questions for CEO
+## Implementation Cautions (from CEO)
 
-1. Should we implement all Phase 1 items or start with specific ones?
-2. What's the maximum acceptable drawdown before circuit breaker?
-3. Should Kelly be enabled sooner (e.g., 30 trades instead of 50)?
-4. Should we add a "conservative mode" toggle for manual override?
+1. Signal Weighting must use quality grades from hebbian_learner (already produces A-F)
+2. Drawdown-Responsive needs equity tracking — verify `equity_history` table exists or add peak_equity tracking
+3. Portfolio Heat needs open positions data — check if positions table is populated
+4. Conservative Mode must override all other sizing logic (Kelly, quality weighting, etc.)
+
+## CEO Decisions (2026-08-08)
+
+| Question | Decision |
+|----------|----------|
+| Phase 1 items | All four — Signal Weighting → Drawdown-Responsive → Portfolio Heat → Conservative Mode |
+| Circuit breaker | 10% — keep current (`KELLY_DRAWDOWN_CIRCUIT_BREAKER = 0.10`) |
+| Kelly trades | 50 — keep current, variance too high for 30 |
+| Conservative mode | Yes — `CONSERVATIVE_MODE_ENABLED = False` + 0.5x multiplier |
+| Phase 2 reorder | Correlation Matrix before Walk-Forward (simpler first) |
+| Phase 3 priority | Signal Decay (HIGH) > Volatility-Normalized (MEDIUM) > Session-Based (LOW) |
