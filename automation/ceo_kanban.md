@@ -6,12 +6,16 @@
 - [2026-08-08 00:30] signal_reporter: System startup — no kills needed yet
 - [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
 
+## CEO DECISIONS
+- [ ] 2026-08-08 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Now matches ATR_SL_MIN. Monitor for 24h.
+
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
 - [x] URGENT: bb_bounce root cause — RESOLVED (09:50 UTC). Trades were historical pre-fix. Root cause: master flag not checked in bb_bounce.py Layer 1 guard.
 - [ ] Monitor ma_100_cross live performance (W LONG is first trade)
 - [ ] Monitor vortex_break sustained performance
 - [ ] Monitor hzscore+ confluence (100% WR, 5 trades today)
+- [ ] Monitor ATR SL widening impact (24h window)
 
 ## IN PROGRESS
 - [x] LIVE TRADING RE-ENABLED — 2026-08-06 02:15 UTC, trailing tightened
