@@ -8,6 +8,7 @@
 
 ## CEO DECISIONS
 - [ ] 2026-08-08 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Now matches ATR_SL_MIN. Monitor for 24h.
+- [ ] 2026-08-08 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h. SHORT variant hemorrhaging like hzscore-.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)

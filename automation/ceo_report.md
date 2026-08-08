@@ -4,37 +4,42 @@
 
 | Period | Trades | PnL | WR |
 |--------|--------|-----|-----|
-| Last 24h | 57 | +$0.29 | 56.1% |
-| Last 7d | 434 | -$1.65 | 46.5% |
+| Last 24h | 52 | +$0.42 | 61.5% |
+| Last 7d | 406 | -$1.23 | 48.0% |
+| Lifetime | 9004 | -$1782.95 | 13.1% |
 
 **Daily trend (7d):**
-- Aug 1: 5t, -$0.13, 20.0% WR
-- Aug 2: 36t, -$0.78, 19.4% WR
-- Aug 3: 93t, -$0.22, 32.3% WR
-- Aug 4: 26t, -$0.69, 30.8% WR
-- Aug 5: 22t, +$0.21, 45.5% WR
-- Aug 6: 90t, -$0.08, 58.9% WR
-- Aug 7: 58t, +$0.34, 58.6% WR (best day)
-- Aug 8: 12t, +$0.06, 50.0% WR (partial day)
+- Aug 1: 8t, -$0.60, 12.5% WR
+- Aug 2: 46t, -$3.87, 8.7% WR
+- Aug 3: 32t, -$3.07, 6.3% WR
+- Aug 4: 32t, -$3.50, 3.1% WR
+- Aug 5: 139t, +$2.32, 52.5% WR ← turning point
+- Aug 6: 82t, -$0.54, 56.1% WR
+- Aug 7: 56t, +$0.40, 62.5% WR
+- Aug 8: 11t, +$0.15, 54.5% WR (partial)
 
-**Close reasons (last 24h):**
-- profit-monster-trail: 32t, +$1.62, 100% WR ← trailing working perfectly
-- atr_sl_hit: 22t, -$1.33, 0% WR ← **THE bleed point**
-- Other: 3t, $0.00
+**Signal combos bleeding (48h, worst):**
+- hzscore-,return_exhaustion-: 8t, -$0.27, 37.5% WR
+- ma100-cross,return_exhaustion-: 7t, -$0.28, 42.9% WR
+- return_exhaustion-: 4t, -$0.09, 50% WR
 
-**Signal combos bleeding (7d, worst):**
-- inv-accel-300- SHORT: 15t, -$0.33, 26.7% WR (already disabled)
-- ma100-cross,return_exhaustion- SHORT: 7t, -$0.28, 42.9% WR
-- zscore-rising- SHORT: 38t, -$0.22, 31.6% WR
+**Winning combos (48h):**
+- bb_bounce+,range_finder+: 9t, +$0.38, 88.9% WR
+- hzscore+,return_exhaustion_long: 11t, +$0.12, 54.5% WR
+- vortex_break_short: 2t, +$0.10, 100% WR
+
+**System health:**
+- 238/549 tokens stale (43%) — dead tokens cluttering speed tracker
+- ATR SL widening (1.0%→1.2%) showing improvement
 
 ### Root Cause
 
-**ATR SL too tight at 1.0%.** All 22 SL hits hit exactly 1.0% — trades stopped before trailing (0.30% activation) can engage. The 1.0% floor was set 2026-08-05 but data shows it's still too tight for low-vol tokens. Trailing itself works perfectly (100% WR when it activates).
+**return_exhaustion- is hemorrhaging.** 14 trades across combos in 48h, -$0.64 total. The SHORT direction of return_exhaustion is consistently losing while the LONG variant (return_exhaustion_long) is profitable. Same pattern as hzscore- — SHORT variants of trend-fading signals lose in this market.
 
 ### Fix Applied
 
-Widened `ATR_SL_MIN_INIT` from 1.0% → 1.2% (commit c3daf6a). Also updated `SL_PCT_FALLBACK` and `STOP_LOSS_DEFAULT` to match. `TP_PCT_FALLBACK` 2.0% → 2.4% to maintain 2:1 R:R. This gives trades 20% more room before the hard stop, matching the already-widened `ATR_SL_MIN` (1.2% for trailing).
+Disabled `RETURN_EXHAUSTION_MINUS_ENABLED = False` (hermes_constants.py:1301). This kills return_exhaustion- SHORT signals. The LONG variant (return_exhaustion_long) and confluence combos remain enabled.
 
 ### Verification
 
-Monitor for 24h: expect fewer atr_sl_hit exits, more profit-monster-trail exits. Target: reduce SL hits from 22/day to <15/day, maintain or improve WR.
+Monitor for 24h: expect return_exhaustion- combos to stop appearing. Target: eliminate the -$0.28/day bleed from return_exhaustion- losses. Also watch for stale token count — may need cleanup mechanism.
