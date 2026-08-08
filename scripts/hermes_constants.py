@@ -448,11 +448,11 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 # CEO 2026-08-05: lowered from 2.0% — trades exit at -1.0% avg, 2.0% floor never reached
-ATR_SL_MIN_INIT    = 0.010  # 1.0% — matches actual exit behavior (was 2.0%, never reached)
+ATR_SL_MIN_INIT    = 0.012  # 1.2% — widened 2026-08-08 (was 1.0%). 22/22 SL hits at exactly 1.0% — too tight for low-vol tokens. Now matches ATR_SL_MIN.
 ATR_SL_MAX_INIT    = 0.025  # 2.5% — initial SL cap
-SL_PCT_FALLBACK    = 0.010  # 1.0% if ATR unavailable (matched to ATR_SL_MIN_INIT)
-TP_PCT_FALLBACK    = 0.020  # 2.0% fallback target (2:1 R:R with 1.0% SL)
-STOP_LOSS_DEFAULT  = 0.010  # 1.0% hard fallback (matched to ATR_SL_MIN_INIT)
+SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN_INIT)
+TP_PCT_FALLBACK    = 0.024  # 2.4% fallback target (2:1 R:R with 1.2% SL)
+STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN_INIT)
 SL_PCT_MIN        = 0.005  # 0.5% minimum SL for any trade (hard floor)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
