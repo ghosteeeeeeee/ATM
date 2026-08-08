@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 """
-momentum_leaderboard.py — Top Movers Signal (pipeline-integrated).
+momentum_leaderboard.py — Top Movers Signal v2 (1m-aware, confluence-gated).
 
-Scans the HL tradable universe for biggest gainers/losers across multiple
-timeframes, then decides direction: ride continuation or fade overextension.
+Scans for biggest movers using 1m candles for entry timing and 5m for trend
+context. Requires confluence (range-bound or exhaustion) before firing.
 
-Data: candles.db (5m/15m/1h) — zero external API calls.
+Key improvements over v1:
+  - 1m candles for primary signal (matches trading timeframe)
+  - 5m trend context for direction confirmation
+  - S/R awareness: won't short near support or long near resistance
+  - Exhaustion filter: won't chase moves already extended >15%
+  - Confluence: requires range_finder (BB narrow) or return_exhaustion (percentile extreme)
+  - Regime awareness: uses 5m regime to confirm direction
 
 Signal types:
-  - mover_long  : LONG (momentum continuation or oversold bounce)
-  - mover_short : SHORT (momentum continuation or blow-off fade)
+  - mover_long  : LONG (momentum continuation in range, or oversold bounce)
+  - mover_short : SHORT (momentum continuation in range, or overbought fade)
 
 Run:
     python3 signals/momentum_leaderboard.py           # live scan
@@ -20,6 +26,7 @@ import os
 import sys
 import sqlite3
 import time
+import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -45,8 +52,31 @@ from hermes_constants import (
     SHORT_BLACKLIST,
 )
 
+# ── New v2 constants ─────────────────────────────────────────────────────────
+# S/R awareness
+SR_LOOKBACK = 100            # 1m candles for swing detection
+SR_PROXIMITY_PCT = 1.0       # % — don't trade within this % of S/R level
+
+# Exhaustion filter
+EXHAUSTION_MAX_MOVE_PCT = 15.0  # % — don't chase moves already >15% extended
+
+# Confluence: BB range detection
+BB_PERIOD = 20
+BB_STDDEV = 1.8
+BB_WIDTH_MAX = 0.04          # % — BB width < 4% = range-bound (confluence)
+
+# Confluence: return percentile exhaustion
+RET_EXHAUST_LOOKBACK = 60    # 1m candles for percentile ranking
+RET_EXHAUST_LOW = 10         # percentile — extreme negative = LONG exhaustion
+RET_EXHAUST_HIGH = 90        # percentile — extreme positive = SHORT exhaustion
+
+# Trend context
+TREND_5M_LOOKBACK = 60       # 5m candles for trend (5 hours)
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
 _CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
+_PRICE_DB = os.path.join(HERMES_DATA, 'signals_hermes.db')
+_REGIME_FILE = '/var/www/hermes/data/regime_5m.json'
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
@@ -70,11 +100,11 @@ SOURCE_SHORT      = 'mover-'
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Data fetch — candle close prices from candles.db
+# Data fetch
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _get_closes(token: str, table: str, limit: int) -> list:
-    """Fetch close prices from candles.db, oldest first. Returns list of float."""
+    """Fetch close prices from candles.db, oldest first."""
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
@@ -88,8 +118,31 @@ def _get_closes(token: str, table: str, limit: int) -> list:
         rows = c.fetchall()
         if not rows:
             return []
-        # Reverse to get oldest-first (matching original intent)
         return [r[0] for r in reversed(rows)]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
+def _get_candles_ohlcv(token: str, table: str, limit: int) -> list:
+    """Fetch OHLCV candles from candles.db, oldest first. Returns list of dicts."""
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute(f"""
+            SELECT open, high, low, close FROM {table}
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), limit))
+        rows = c.fetchall()
+        if not rows:
+            return []
+        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3]}
+                for r in reversed(rows)]
     except Exception:
         return []
     finally:
@@ -103,9 +156,7 @@ def _get_candle_ts(token: str, table: str) -> int:
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
-        c.execute(f"""
-            SELECT MAX(ts) FROM {table} WHERE token = ?
-        """, (token.upper(),))
+        c.execute(f"SELECT MAX(ts) FROM {table} WHERE token = ?", (token.upper(),))
         row = c.fetchone()
         return row[0] if row and row[0] else 0
     except Exception:
@@ -113,6 +164,35 @@ def _get_candle_ts(token: str, table: str) -> int:
     finally:
         if conn:
             conn.close()
+
+
+def _get_1m_closes(token: str, limit: int) -> list:
+    """Fetch 1m close prices from price_history (signals_hermes.db), oldest first.
+    Freshness guard: returns [] if most recent price is > 2 minutes old."""
+    try:
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT timestamp, price FROM (
+                SELECT timestamp, price
+                FROM price_history
+                WHERE token = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            ) sub
+            ORDER BY timestamp ASC
+        """, (token.upper(), limit))
+        rows = c.fetchall()
+        conn.close()
+        if not rows:
+            return []
+        # Freshness guard
+        most_recent_ts = rows[-1][0]
+        if (time.time() - most_recent_ts) > 120:
+            return []
+        return [r[1] for r in rows]
+    except Exception:
+        return []
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -144,22 +224,159 @@ def _compute_velocity(closes: list, window: int) -> float | None:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# S/R awareness — simplified swing detection
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _find_nearest_sr(price: float, candles_1m: list) -> tuple:
+    """Find nearest support and resistance from 1m swing points.
+    Returns (nearest_support, nearest_resistance) as price levels."""
+    if len(candles_1m) < SR_LOOKBACK:
+        return None, None
+
+    highs = np.array([c['high'] for c in candles_1m[-SR_LOOKBACK:]], dtype=np.float64)
+    lows = np.array([c['low'] for c in candles_1m[-SR_LOOKBACK:]], dtype=np.float64)
+
+    # Simple swing detection: local max/min over 5-candle window
+    window = 5
+    swing_highs = []
+    swing_lows = []
+
+    for i in range(window, len(highs) - window):
+        # Swing high: high is max in window
+        if highs[i] == max(highs[i-window:i+window+1]):
+            swing_highs.append(highs[i])
+        # Swing low: low is min in window
+        if lows[i] == min(lows[i-window:i+window+1]):
+            swing_lows.append(lows[i])
+
+    if not swing_highs and not swing_lows:
+        return None, None
+
+    # Find nearest support (swing low below price) and resistance (swing high above price)
+    supports = [s for s in swing_lows if s < price]
+    resistances = [r for r in swing_highs if r > price]
+
+    nearest_support = max(supports) if supports else None
+    nearest_resistance = min(resistances) if resistances else None
+
+    return nearest_support, nearest_resistance
+
+
+def _is_near_sr(price: float, support, resistance) -> tuple:
+    """Check if price is near S/R levels. Returns (near_support, near_resistance)."""
+    near_support = False
+    near_resistance = False
+
+    if support and support > 0:
+        dist_pct = (price - support) / price * 100
+        if dist_pct < SR_PROXIMITY_PCT:
+            near_support = True
+
+    if resistance and resistance > 0:
+        dist_pct = (resistance - price) / price * 100
+        if dist_pct < SR_PROXIMITY_PCT:
+            near_resistance = True
+
+    return near_support, near_resistance
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Confluence: Range detection (Bollinger Bands)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _is_range_bound(closes_5m: list) -> bool:
+    """Check if market is range-bound via Bollinger Band width.
+    Narrow bands (< 4%) indicate range — good for momentum continuation."""
+    if len(closes_5m) < BB_PERIOD + 10:
+        return False
+
+    arr = np.array(closes_5m[-BB_PERIOD:], dtype=np.float64)
+    middle = np.mean(arr)
+    std = np.std(arr)
+    if middle <= 0:
+        return False
+    width = (2 * BB_STDDEV * std) / middle
+    return width < BB_WIDTH_MAX
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Confluence: Return percentile exhaustion
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _compute_percentile_rank(values: list, current: float) -> float | None:
+    """Compute percentile rank of `current` within `values`."""
+    if not values or current is None:
+        return None
+    arr = np.array(values, dtype=np.float64)
+    return float(np.sum(arr < current) / len(arr) * 100)
+
+
+def _is_exhausted(closes_1m: list) -> tuple:
+    """Check if short-term return is at percentile extreme.
+    Returns (is_exhausted, percentile_rank, direction_hint).
+    direction_hint: 'LONG' if exhausted to downside, 'SHORT' if upside."""
+    if len(closes_1m) < RET_EXHAUST_LOOKBACK + 20:
+        return False, None, None
+
+    # Compute rolling returns for percentile ranking
+    returns = []
+    for i in range(20, len(closes_1m)):
+        ret = (closes_1m[i] - closes_1m[i-20]) / closes_1m[i-20] * 100
+        returns.append(ret)
+
+    if len(returns) < 20:
+        return False, None, None
+
+    # Current 20-period return
+    current_ret = (closes_1m[-1] - closes_1m[-21]) / closes_1m[-21] * 100
+    pctile = _compute_percentile_rank(returns, current_ret)
+
+    if pctile is None:
+        return False, None, None
+
+    if pctile < RET_EXHAUST_LOW:
+        return True, pctile, 'LONG'  # exhausted to downside → bounce
+    elif pctile > RET_EXHAUST_HIGH:
+        return True, pctile, 'SHORT'  # exhausted to upside → fade
+    else:
+        return False, pctile, None
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Regime awareness
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _get_regime(token: str) -> str:
+    """Return regime string from regime_5m.json."""
+    try:
+        with open(_REGIME_FILE) as f:
+            data = json.load(f)
+        if token.upper() in data.get('regimes', {}):
+            return data['regimes'][token.upper()].get('regime', 'NEUTRAL')
+    except Exception:
+        pass
+    return 'NEUTRAL'
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Detection — rank and decide direction
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def detect_leaderboard_signals() -> list:
     """
     Scan all tokens, compute returns, rank by move_score, decide direction.
-    Returns list of signal dicts.
+    v2: Uses 1m for entry, 5m for trend, requires confluence.
     """
+    import json
+
     lb_5m, lb_15m, lb_1h = MOMENTUM_LEADERBOARD_RET_WINDOWS
 
-    # Gather all tokens with 1h data
+    # Gather all tokens with 1m data
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
-        c.execute("SELECT DISTINCT token FROM candles_1h")
+        c.execute("SELECT DISTINCT token FROM candles_1m")
         tokens = [r[0] for r in c.fetchall()]
     except Exception:
         return []
@@ -170,78 +387,98 @@ def detect_leaderboard_signals() -> list:
     candidates = []
 
     for token in tokens:
-        # Fetch candles
-        closes_5m = _get_closes(token, 'candles_5m', lb_5m + 10)
-        closes_15m = _get_closes(token, 'candles_15m', lb_15m + 10)
-        closes_1h = _get_closes(token, 'candles_1h', lb_1h + 10)
+        # Fetch 1m candles for S/R and exhaustion
+        candles_1m = _get_candles_ohlcv(token, 'candles_1m', SR_LOOKBACK + 20)
+        closes_1m = _get_1m_closes(token, RET_EXHAUST_LOOKBACK + 50)
 
-        if not closes_1h or len(closes_1h) < lb_1h + 1:
+        if not candles_1m or len(candles_1m) < SR_LOOKBACK:
+            continue
+        if not closes_1m or len(closes_1m) < RET_EXHAUST_LOOKBACK + 20:
             continue
 
-        # Staleness check — skip if latest 1h candle is > 90 min old
-        # (1h candles naturally update hourly; 15min threshold was too strict)
-        latest_ts = _get_candle_ts(token, 'candles_1h')
-        if latest_ts and (time.time() - latest_ts) > 5400:
+        # Freshness check on 1m
+        latest_1m_ts = _get_candle_ts(token, 'candles_1m')
+        if latest_1m_ts and (time.time() - latest_1m_ts) > 300:  # 5 min stale
             continue
 
-        # Compute returns
-        ret_5m = _compute_return(closes_5m, lb_5m) if len(closes_5m) >= lb_5m + 1 else None
-        ret_15m = _compute_return(closes_15m, lb_15m) if len(closes_15m) >= lb_15m + 1 else None
-        ret_1h = _compute_return(closes_1h, lb_1h)
-
-        if ret_1h is None or ret_1h == 0:
+        # Fetch 5m candles for trend context
+        closes_5m = _get_closes(token, 'candles_5m', TREND_5M_LOOKBACK + 10)
+        if not closes_5m or len(closes_5m) < 20:
             continue
 
-        # Velocity for overextension detection (5m per-candle avg)
-        vel_5m = _compute_velocity(closes_5m, lb_5m) if len(closes_5m) >= lb_5m + 1 else None
+        # ── S/R awareness ────────────────────────────────────────────────────
+        price = closes_1m[-1]
+        support, resistance = _find_nearest_sr(price, candles_1m)
+        near_support, near_resistance = _is_near_sr(price, support, resistance)
 
-        # move_score: 1h is the primary mover signal, shorter TFs confirm
-        abs_1h = abs(ret_1h)
-        abs_15m = abs(ret_15m) if ret_15m is not None else 0
-        abs_5m = abs(ret_5m) if ret_5m is not None else 0
-        move_score = abs_1h * 0.7 + abs_15m * 0.2 + abs_5m * 0.1
+        # ── Exhaustion check ─────────────────────────────────────────────────
+        is_exhausted, pctile, exhaust_dir = _is_exhausted(closes_1m)
 
-        # Require meaningful 1h move — this is a leaderboard, not a scalper
-        if abs_1h < 2.0:
+        # ── Range check (confluence) ─────────────────────────────────────────
+        is_range = _is_range_bound(closes_5m)
+
+        # ── Compute returns across timeframes ────────────────────────────────
+        # Use 1m for short-term, 5m for trend
+        ret_1m = _compute_return(closes_1m, 20)   # 20-min return
+        ret_5m = _compute_return(closes_5m, lb_5m)  # 5-hour return (trend)
+        ret_15m = _compute_return(closes_5m, min(lb_15m, len(closes_5m) - 1))  # longer trend
+
+        if ret_5m is None or ret_5m == 0:
             continue
+
+        # ── Move score ───────────────────────────────────────────────────────
+        abs_5m = abs(ret_5m)
+        abs_1m = abs(ret_1m) if ret_1m is not None else 0
+        move_score = abs_5m * 0.7 + abs_1m * 0.3
 
         if move_score < MOMENTUM_LEADERBOARD_MOVE_MIN:
             continue
 
-        # Overextended — fire opposing (fade) signal
-        if ret_5m is not None and abs(ret_5m) > MOMENTUM_LEADERBOARD_OVEREXTENDED_PCT:
-            # 5m moved hard against 1h trend → fade it
-            direction = 'SHORT' if ret_1h > 0 else 'LONG'
-            confidence = MOMENTUM_LEADERBOARD_CONF_BASE + 5  # slight boost for strong fade
-            candidates.append({
-                'token': token,
-                'direction': direction,
-                'confidence': min(MOMENTUM_LEADERBOARD_CONF_CAP, confidence),
-                'move_score': move_score,
-                'ret_1h': ret_1h,
-                'ret_15m': ret_15m,
-                'ret_5m': ret_5m,
-                'overextended': True,
-            })
-            continue
+        # ── Exhaustion filter: don't chase extended moves ────────────────────
+        if abs_5m > EXHAUSTION_MAX_MOVE_PCT:
+            continue  # already moved too much, skip
 
-        # Direction decision
-        direction = _decide_direction(ret_1h, ret_5m, ret_15m, vel_5m)
+        # ── Direction decision with S/R and confluence ───────────────────────
+        direction = _decide_direction_v2(
+            ret_5m, ret_1m, near_support, near_resistance,
+            is_range, is_exhausted, exhaust_dir
+        )
         if direction is None:
             continue
 
-        # Confidence
-        confidence = _compute_confidence(ret_1h, ret_5m, ret_15m, direction, vel_5m)
+        # ── Block trades at wrong S/R ────────────────────────────────────────
+        # Don't SHORT near support (bounce risk)
+        if direction == 'SHORT' and near_support:
+            continue
+        # Don't LONG near resistance (rejection risk)
+        if direction == 'LONG' and near_resistance:
+            continue
+
+        # ── Regime confirmation ──────────────────────────────────────────────
+        regime = _get_regime(token)
+        regime_aligned = (
+            (direction == 'LONG' and regime in ('BULLISH', 'NEUTRAL')) or
+            (direction == 'SHORT' and regime in ('BEARISH', 'NEUTRAL'))
+        )
+
+        # ── Confidence ───────────────────────────────────────────────────────
+        confidence = _compute_confidence_v2(
+            ret_5m, ret_1m, direction, move_score,
+            is_range, is_exhausted, regime_aligned
+        )
 
         candidates.append({
             'token': token,
             'direction': direction,
             'confidence': confidence,
             'move_score': move_score,
-            'ret_1h': ret_1h,
-            'ret_15m': ret_15m,
             'ret_5m': ret_5m,
-            'overextended': False,
+            'ret_1m': ret_1m,
+            'near_support': near_support,
+            'near_resistance': near_resistance,
+            'is_range': is_range,
+            'is_exhausted': is_exhausted,
+            'regime_aligned': regime_aligned,
         })
 
     # Rank by move_score, take top N
@@ -249,54 +486,70 @@ def detect_leaderboard_signals() -> list:
     return candidates[:MOMENTUM_LEADERBOARD_TOP_N]
 
 
-def _decide_direction(ret_1h, ret_5m, ret_15m, vel_5m) -> str | None:
+def _decide_direction_v2(ret_5m, ret_1m, near_support, near_resistance,
+                          is_range, is_exhausted, exhaust_dir) -> str | None:
     """
-    Decide LONG or SHORT based on multi-timeframe returns.
+    Decide LONG or SHORT with S/R and confluence awareness.
 
     Logic:
-      - 1h up + 5m still up → LONG (continuation)
-      - 1h up + 5m reversing + fast velocity → SHORT (fade)
-      - 1h down + 5m still down → SHORT (continuation)
-      - 1h down + 5m bouncing + fast velocity → LONG (bounce)
+      - If exhausted to downside → LONG (bounce)
+      - If exhausted to upside → SHORT (fade)
+      - If range-bound: follow 5m trend direction
+      - If trending: require 1m confirmation
     """
-    if ret_5m is None:
-        # No 5m data — direction from 1h sign only
-        return 'LONG' if ret_1h > 0 else 'SHORT'
+    # Exhaustion takes priority
+    if is_exhausted and exhaust_dir:
+        return exhaust_dir
 
-    fast = vel_5m is not None and abs(vel_5m) > MOMENTUM_LEADERBOARD_FAST_VEL
-
-    if ret_1h > 0:
+    # Range-bound: follow trend
+    if is_range:
         if ret_5m > 0:
-            return 'LONG'   # trend continuation
-        elif ret_5m < 0 and fast:
-            return 'SHORT'  # fade the blow-off
+            return 'LONG'   # uptrend in range
         else:
-            return 'LONG'   # 5m flat — still bullish trend
-    else:
-        if ret_5m < 0:
-            return 'SHORT'  # breakdown continuation
-        elif ret_5m > 0 and fast:
-            return 'LONG'   # oversold bounce
+            return 'SHORT'  # downtrend in range
+
+    # Trending: require 1m confirmation
+    if ret_1m is not None:
+        if ret_5m > 0 and ret_1m > 0:
+            return 'LONG'   # trend continuation confirmed
+        elif ret_5m < 0 and ret_1m < 0:
+            return 'SHORT'  # trend continuation confirmed
         else:
-            return 'SHORT'  # 5m flat — still bearish trend
+            return None     # 1m against trend — skip (no confluence)
+
+    # No 1m data: use 5m only
+    return 'LONG' if ret_5m > 0 else 'SHORT'
 
 
-def _compute_confidence(ret_1h, ret_5m, ret_15m, direction, vel_5m) -> int:
-    """Confidence scaling based on confluence and speed."""
+def _compute_confidence_v2(ret_5m, ret_1m, direction, move_score,
+                            is_range, is_exhausted, regime_aligned) -> int:
+    """Confidence scaling with confluence bonuses."""
     conf = MOMENTUM_LEADERBOARD_CONF_BASE
 
-    # Confluence: 15m and 1h agree on sign
-    if ret_15m is not None:
-        if (ret_1h > 0 and ret_15m > 0) or (ret_1h < 0 and ret_15m < 0):
-            conf += 5
+    # Range confluence bonus
+    if is_range:
+        conf += 10
 
-    # Elite velocity
-    if vel_5m is not None and abs(vel_5m) > MOMENTUM_LEADERBOARD_ELITE_VEL:
+    # Exhaustion confluence bonus
+    if is_exhausted:
+        conf += 10
+
+    # Regime alignment bonus
+    if regime_aligned:
         conf += 5
 
-    # Overextension penalty
-    if ret_5m is not None and abs(ret_5m) > MOMENTUM_LEADERBOARD_CONF_PENALTY_PCT:
+    # Strong momentum bonus
+    if move_score > 5.0:
+        conf += 5
+
+    # Weak momentum penalty
+    if move_score < 3.0:
         conf -= 10
+
+    # 1m confirmation bonus
+    if ret_1m is not None:
+        if (direction == 'LONG' and ret_1m > 0) or (direction == 'SHORT' and ret_1m < 0):
+            conf += 5
 
     return max(MOMENTUM_LEADERBOARD_CONF_FLOOR, min(MOMENTUM_LEADERBOARD_CONF_CAP, conf))
 
@@ -353,14 +606,25 @@ def scan_leaderboard_signals() -> int:
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
+        # Build confluence tags for logging
+        tags = []
+        if cand['is_range']:
+            tags.append('range')
+        if cand['is_exhausted']:
+            tags.append('exhaust')
+        if cand['regime_aligned']:
+            tags.append('regime')
+        tag_str = f" [{','.join(tags)}]" if tags else ''
+
         if DRY_RUN:
             _log(f"  [DRY] {direction:5s}-mover {token:8s} "
                  f"move={cand['move_score']:.2f}% conf={cand['confidence']}% "
-                 f"1h={cand['ret_1h']:+.2f}% [{source}]")
+                 f"5m={cand['ret_5m']:+.2f}%{tag_str} [{source}]")
             continue
 
         try:
-            price_closes = _get_closes(token, 'candles_1h', 2)
+            # Fetch current price from 1m data
+            price_closes = _get_1m_closes(token, 2)
             price = price_closes[-1] if price_closes else 0
 
             sid = add_signal(
@@ -372,14 +636,14 @@ def scan_leaderboard_signals() -> int:
                 value=round(cand['move_score'], 4),
                 price=price,
                 exchange='hyperliquid',
-                timeframe='1h',
+                timeframe='1m',
             )
             if sid:
                 added += 1
                 set_cooldown(token, direction, hours=MOMENTUM_LEADERBOARD_COOLDOWN_MIN / 60.0)
                 _log(f"  {direction:5s}-mover {token:8s} "
                      f"move={cand['move_score']:.2f}% conf={cand['confidence']}% "
-                     f"1h={cand['ret_1h']:+.2f}% [{source}]")
+                     f"5m={cand['ret_5m']:+.2f}%{tag_str} [{source}]")
         except Exception as e:
             _log(f"[momentum_leaderboard] add_signal error for {token}: {e}")
 
@@ -391,7 +655,7 @@ def scan_leaderboard_signals() -> int:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def run():
-    """Entry point for signals_runner. No prices_dict needed — reads from candles.db."""
+    """Entry point for signals_runner."""
     return scan_leaderboard_signals()
 
 
