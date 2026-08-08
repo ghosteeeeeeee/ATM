@@ -330,3 +330,41 @@ Hebbian enhanced with 4 new data types (combos, exit reason, leverage, hour). 31
 Phase 1 is zero-risk and high-value. Start there. Phase 2-3 depend on Phase 1 results. The LLM is expensive and slow — Hebbian at <1s per decision vs 5-15s for LLM is a compelling reason to shift load.
 
 **Bottom line:** The data is there. The infrastructure is there. The risk is manageable with guardrails. Proceed with Phase 1 this week.
+
+---
+
+## 2026-08-08 — Hebbian Gate Improvements: Strategic Review
+
+### Current State
+- 333 trades tested, 4 auto-decisions (1.2%), 75% WR
+- Gate requires token-specific data (n>=5) — too strict
+- LLM handles 102 escalated trades at 86% WR — doing its job well
+
+### Verdict: PROCEED — 7-9% is the right initial target
+
+**Why not more aggressive (15-20%)?**
+- Token-specific data is thin — most tokens have <5 trades with same signal
+- Exit-quality data is sparse for many signals
+- Rushing to 15-20% would require using aggregate data, which we proved is unreliable (was approving losers)
+
+**Why not more conservative (3-5%)?**
+- We're already at 1.2% — too conservative means the gate is useless
+- 7-9% is achievable with tiered min-n alone (improvement #1)
+- Each percentage point of auto-decisions = fewer LLM calls = faster decisions
+
+### Recommended Approach
+
+**Phase 1 (this week):** Improvements #1 (tiered min-n) + #5 (circuit breaker). This gets us to ~5-6% auto-decisions with safety net. Zero risk — circuit breaker disables gate if accuracy drops.
+
+**Phase 2 (next week):** Improvements #2 (token WR) + #4 (exit-sl reject). This gets us to 7-9%. Medium risk — exit-sl reject is aggressive, needs monitoring.
+
+**Phase 3 (week 3):** Measure. Target: 7-9% auto-decisions at 80%+ WR. If hit, expand. If not, pull back to Phase 1 levels.
+
+### Guardrails
+1. Circuit breaker: auto-disable if WR < 45% over 50 auto-decisions
+2. 1-hour cooldown when tripped
+3. Never auto-reject without exit_sl data (no blind rejections)
+4. Audit trail on every auto-decision
+
+### Bottom line
+7-9% is ambitious but achievable. The tiered min-n approach is the biggest lever — it alone gets us to 5-6%. The circuit breaker ensures we can't accidentally hurt performance. Proceed with Phase 1 this week.
