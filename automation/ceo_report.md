@@ -96,3 +96,15 @@ Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tig
 **Result:** 5 candidates detected, 3 pass all filters (ACE SHORT, CC SHORT, AVNT LONG).
 
 **Action:** Monitor next 24h — signal should start appearing in hotset.
+
+---
+
+## 2026-08-07 — momentum_leaderboard Tuning + Skill Update
+
+**Signal tuning:** Raised thresholds to filter noise — MOVE_MIN 1.0→3.0, 1h lookback 5→12 candles, overextension 3%→4%. move_score now weights 1h at 0.7 (primary mover signal). Added 2% minimum1h return floor.
+
+**Result:** ACE SHORT (-16.64%), SAGA SHORT (-8.53%), HEMI SHORT (-4.27%) — genuine movers only.
+
+**Skill update:** Fixed broken `_get_closes` SQL template in add-signal skill (same bug that killed momentum_leaderboard). Added lessons: staleness thresholds, move_score weighting, combo auto-tuning.
+
+**Action:** Monitor next 24h — signals should appear in hotset on slow-signal cycle.
