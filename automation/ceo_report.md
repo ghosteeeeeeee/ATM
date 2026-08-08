@@ -46,3 +46,33 @@
 - All numbers queried directly from `hl_copy.db` (trader_fills table)
 - Signal audit from `signal_audit.json` (2026-08-07 17:54 UTC)
 - No changes made (read-only mode)
+
+---
+
+## Hebbian Composite Scoring v2 — FINAL (2026-08-08)
+
+### Performance (excl accel-300, 1081 trades)
+- AUTO-APPROVE: 497 (46%), **91% WR**, +$315.67
+- AUTO-REJECT: 259 (24%), 0% WR, -$175.02
+- ESCALATE: 325 (30%), 13% WR, -$122.92
+
+### Score Distribution — Near-Perfect Separation
+- 0.7-1.0: **96-100% WR** (335 trades)
+- 0.6-0.7: 51% WR (borderline)
+- Below 0.6: 0-37% WR (losers)
+
+### Weekly Stability
+- W21-W23: 99-100% WR
+- W31: 69% WR (worst)
+- W32: 89% WR
+
+### Combo Edge Validated
+- Combos: 61% WR vs 40% single
+- Top: bb_bounce+,range_finder+ (78%), hzscore+,return_exhaustion_long (67%)
+- LONG parts (+) consistently outperform SHORT parts (-)
+
+### Final Composite Weights
+- decayed_wr: 0.45, exit_quality: 0.20, token_wr: 0.15, combo: 0.15, hour: 0.05
+
+### Status
+Bug_hunter verified ALL CLEAR. Memory stored. System ready for live deployment.

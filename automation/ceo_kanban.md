@@ -178,3 +178,8 @@
 - [ ] 2026-08-06 ~14:00 — DELEGATE to bug_hunter: Investigate hour 14 UTC loss cluster (56 losses) — Asian session close correlation?
 - [x] 2026-08-06 ~14:00 — bb_bounce confluence APPROVED: 100% WR with hzscore+. Confluence-only, never standalone. Update dead signals blocklist.
 - [x] 2026-08-06 ~14:00 — SESSION CHANGES ACKNOWLEDGED: range_finder, ma_100_cross fix, regime gate, hl_copy daemon, profit trail tier all noted.
+
+## CEO DECISIONS
+- [ ] 2026-08-08 — AUDIT: Read-only CEO run. Verified 24h: +$0.12, 60% WR (60 trades). 7d: -$3.42, 44.3% WR. System improving (3 days of gains).
+- [ ] 2026-08-08 — RECOMMEND: Re-evaluate TL_BREAK_LONG re-enable. Signal audit shows 67% WR, +1.911 edge (best standalone). Old kill was based on pre-split 33% WR data.
+- [ ] 2026-08-08 — NOTE: bb_bounce standalone bleeds (48% WR, -0.444 edge) but confluence (bb_bounce+hzscore+) is 100% WR. Protected by ROTATOR_PROTECTED_FLAGS — correct behavior.
