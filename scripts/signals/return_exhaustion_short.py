@@ -381,7 +381,7 @@ def scan_return_exhaustion_short_signals(prices_dict: dict) -> int:
         if not rows or len(rows) < MIN_BARS:
             continue
 
-        prices = [r[1] for r in reversed(rows)]  # oldest first
+        prices = [r[1] for r in rows]  # already oldest-first from get_price_history (ORDER BY timestamp ASC)
 
         sig = detect_return_exhaustion_short(token, prices)
         if sig is None:
