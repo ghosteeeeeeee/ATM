@@ -92,3 +92,9 @@
 - **WARN**: `trades.db` and `positions.db` are empty (0 bytes) — trades tracked via hl_copy.db
 - **INFO**: Disk at 81% (22GB free) — approaching 85% threshold
 - **INFO**: No errors/exceptions in pipeline last 30min
+
+## Error Alerts — 2026-08-08 07:42 UTC
+- **[WARN]** (6x): Non-critical service failures — bug-hunter, git-release, hl-volume, mtf-macd-tuner, trading-checklist, upgrade-implementer
+- **[WARN]**: `hermes-mtf-macd-tuner` AttributeError: 'PrecomputedMACD' has no attribute 'warmup'
+- **[WARN]**: Disk at 81% — pipeline.log 1.6GB, 15m_regime.log 447MB
+- **AUTO-FIX**: None applied — pipeline running normally, all failures non-critical
