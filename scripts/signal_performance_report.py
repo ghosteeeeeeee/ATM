@@ -38,23 +38,24 @@ def log(msg):
 def query_period(hours):
     """Query signal performance for a time period, grouped by (signal_type, direction)."""
     conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    c.execute("""
-        SELECT signal_type, direction,
-               COUNT(*) as trades,
-               SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) as wins,
-               ROUND(SUM(pnl_pct), 2) as total_pnl,
-               ROUND(AVG(pnl_pct), 3) as avg_pnl
-        FROM signal_outcomes
-        WHERE created_at > datetime('now', '-' || ? || ' hours')
-          AND trade_id IS NOT NULL
-        GROUP BY signal_type, direction
-        HAVING trades >= ?
-        ORDER BY total_pnl DESC
-    """, (hours, MIN_TRADES_MARGINAL))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    try:
+        c = conn.cursor()
+        c.execute("""
+            SELECT signal_type, direction,
+                   COUNT(*) as trades,
+                   SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) as wins,
+                   ROUND(SUM(pnl_pct), 2) as total_pnl,
+                   ROUND(AVG(pnl_pct), 3) as avg_pnl
+            FROM signal_outcomes
+            WHERE created_at > datetime('now', '-' || ? || ' hours')
+              AND trade_id IS NOT NULL
+            GROUP BY signal_type, direction
+            HAVING trades >= ?
+            ORDER BY total_pnl DESC
+        """, (hours, MIN_TRADES_MARGINAL))
+        return c.fetchall()
+    finally:
+        conn.close()
 
 
 def get_registry_status():
@@ -114,38 +115,40 @@ def map_signal_to_flag(signal_type):
 def check_inversions(hours=24):
     """Check for direction mismatches (signal says LONG but direction is SHORT, or vice versa)."""
     conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    c.execute("""
-        SELECT token, signal_type, direction, is_win, pnl_pct, created_at
-        FROM signal_outcomes
-        WHERE created_at > datetime('now', '-' || ? || ' hours')
-          AND trade_id IS NOT NULL
-          AND (
-              (signal_type LIKE '%long%' AND direction = 'SHORT')
-              OR (signal_type LIKE '%short%' AND direction = 'LONG')
-          )
-        ORDER BY created_at DESC LIMIT 20
-    """, (hours,))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    try:
+        c = conn.cursor()
+        c.execute("""
+            SELECT token, signal_type, direction, is_win, pnl_pct, created_at
+            FROM signal_outcomes
+            WHERE created_at > datetime('now', '-' || ? || ' hours')
+              AND trade_id IS NOT NULL
+              AND (
+                  (signal_type LIKE '%long%' AND direction = 'SHORT')
+                  OR (signal_type LIKE '%short%' AND direction = 'LONG')
+              )
+            ORDER BY created_at DESC LIMIT 20
+        """, (hours,))
+        return c.fetchall()
+    finally:
+        conn.close()
 
 
 def get_overall_stats():
     """Get total trade stats."""
     conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    c.execute("""
-        SELECT COUNT(*) as total,
-               SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) as wins,
-               ROUND(SUM(pnl_pct), 2) as total_pnl,
-               MIN(created_at) as first,
-               MAX(created_at) as last
-        FROM signal_outcomes WHERE trade_id IS NOT NULL
-    """)
-    row = c.fetchone()
-    conn.close()
-    return row
+    try:
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) as wins,
+                   ROUND(SUM(pnl_pct), 2) as total_pnl,
+                   MIN(created_at) as first,
+                   MAX(created_at) as last
+            FROM signal_outcomes WHERE trade_id IS NOT NULL
+        """)
+        return c.fetchone()
+    finally:
+        conn.close()
 
 
 def status_str(flag, registry):
