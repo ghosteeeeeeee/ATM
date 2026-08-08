@@ -57,7 +57,7 @@ COMBO_SUPPRESS_MIN = 0.5
 # Parameter config: name -> {min, max, step, tighten_dir}
 # Only params that exist in hermes_constants.py
 PARAM_CONFIG = {
-    'TREND_FILTER_NEUTRAL_PCT': {'min': 0.05, 'max': 0.20, 'step': 0.05, 'tighten': 'down'},
+    'TREND_FILTER_NEUTRAL_PCT': {'min': 0.20, 'max': 0.60, 'step': 0.05, 'tighten': 'down'},
     'SPEED_MIN_THRESHOLD': {'min': 20, 'max': 40, 'step': 0.05, 'tighten': 'up'},
     'MACRO_HIGH_VOL_THRESHOLD': {'min': 0.03, 'max': 0.08, 'step': 0.05, 'tighten': 'down'},
     'MACRO_LOW_WR_THRESHOLD': {'min': 20, 'max': 40, 'step': 0.05, 'tighten': 'up'},
