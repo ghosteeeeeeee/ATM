@@ -22,6 +22,7 @@
 - [x] 2026-08-09 10:20 — CEO DECISION: LONG/SHORT separation spec reviewed. Proceed with ma_100_cross paper testing only. Keep SL at 1.2% (not 1.0%). Defer vortex_break separation — SHORT already profitable (100% WR, 2 trades). SHORT bleeding root cause: dead signals aging out, not vortex_break/ma_100_cross.
 - [x] 2026-08-09 12:00 — BUG FIX: is_component_disabled() missing 20 signal flags. range_finder-, bb_bounce-, zscore-rising-, inv-accel-300- etc. were disabled via hermes_constants.py but is_component_disabled() had no case for them — compactor let them through. Added 8 signal families (20 flags) to the function. Root cause: is_component_disabled() was written with partial coverage, new signals added without updating it. Verified: all SHORT bleeders now BLOCKED.
 - [x] 2026-08-09 22:00 — CEO review: 24h +$0.13 (50% WR, 36T). LONG +$0.71 (68% WR). SHORT -$0.58 (9.1% WR) — all pre-fix legacy trades. 7d -$1.23 (43.7% WR). 0 open SHORTs. Star: bb_bounce+,range_finder+ LONG 81.8% WR. All fixes verified working — no changes needed.
+- [x] 2026-08-11 — NOTIFICATION: range_finder_short.py deployed. Second SHORT-specific signal (after bb_bounce_short). RSI >55, 4+ band touches, volume 1.2x fail-closed, no Asian session. Bug hunter fixed ZeroDivisionError + volume guard. Monitoring.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)

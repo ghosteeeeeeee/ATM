@@ -1,3 +1,10 @@
+## CEO Report — 2026-08-11 (range_finder_short.py deploy)
+
+### Acknowledgment
+Second SHORT-specific signal deployed. `range_finder_short.py` follows ma_100_cross_short / bb_bounce_short pattern. Key additions: RSI >55 (relaxed from 60), 4+ band touches (was 3), volume 1.2x avg (fail-closed), no Asian session, tighter bounce/proximity. Bug hunter fixed ZeroDivisionError guard and volume fail-closed. Old `RANGE_FINDER_MINUS_ENABLED` stays dead. Monitoring SHORT impact — two SHORT-specific signals now active (bb_bounce_short + range_finder_short).
+
+---
+
 ## CEO Report — 2026-08-10 (bb_bounce_short.py deploy)
 
 ### Acknowledgment
