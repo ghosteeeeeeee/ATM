@@ -10,7 +10,7 @@ Usage:
   python3 signal_performance_report.py
 """
 
-import sys, os, re, fcntl, sqlite3
+import sys, os, re, fcntl, sqlite3, subprocess
 from datetime import datetime, timezone
 from collections import defaultdict
 
@@ -164,6 +164,37 @@ def format_pct(val):
 def format_pnl(val):
     """Format PnL with sign."""
     return f"{val:+.2f}" if val is not None else "—"
+
+
+def get_param_change_log(days=7):
+    """Get recent param changes to hermes_constants.py from git log."""
+    changes = []
+    try:
+        result = subprocess.run(
+            ['git', 'log', f'--since={days} days', '--oneline', '--no-merges',
+             '-20', '--', 'scripts/hermes_constants.py'],
+            capture_output=True, text=True, cwd='/root/.hermes'
+        )
+        for line in result.stdout.strip().split('\n'):
+            if not line.strip():
+                continue
+            parts = line.split(' ', 1)
+            if len(parts) == 2:
+                commit_hash, message = parts
+                # Get the date from git log
+                date_result = subprocess.run(
+                    ['git', 'log', '-1', '--format=%ai', commit_hash],
+                    capture_output=True, text=True, cwd='/root/.hermes'
+                )
+                date_str = date_result.stdout.strip()[:10] if date_result.stdout.strip() else 'unknown'
+                changes.append({
+                    'commit': commit_hash,
+                    'message': message.strip(),
+                    'date': date_str,
+                })
+    except Exception as e:
+        log(f"Error getting param change log: {e}")
+    return changes
 
 
 def main():
@@ -391,6 +422,22 @@ def main():
         lines.append("---")
         lines.append("")
         lines.append("*Report auto-generated. Next report: ~6h from now.*")
+
+        # Param change log
+        param_changes = get_param_change_log(7)
+        if param_changes:
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+            lines.append("## PARAM CHANGE LOG (last 7 days)")
+            lines.append("")
+            lines.append("| Date | Commit | Change |")
+            lines.append("|------|--------|--------|")
+            for c in param_changes[:10]:
+                msg = c['message'][:60] + ('...' if len(c['message']) > 60 else '')
+                lines.append(f"| {c['date']} | {c['commit'][:7]} | {msg} |")
+            lines.append("")
+            lines.append("*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*")
 
         # Write atomically
         os.makedirs(os.path.dirname(REPORT_MD), exist_ok=True)
