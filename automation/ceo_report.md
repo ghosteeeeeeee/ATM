@@ -71,3 +71,35 @@ SHORT bleeding improving but still negative. Today's 9 SHORT losers are all lega
 
 ### Decision
 **No changes.** All fixes from previous runs verified working. Legacy SHORT trades aging out naturally. Evaluation window continues — ATR SL widening + signal kills need more time. SHORT improving: from -$1.37 to -$0.51 in 24h.
+
+---
+
+## CEO Report — 2026-08-08 23:50 UTC
+
+### Verified Numbers (PostgreSQL brain DB)
+- **24h:** 40 trades, +$0.10, 42.5% WR
+  - LONG: 30T, +$0.57, 53.3% WR
+  - SHORT: 10T, -$0.47, 10% WR (all pre-fix legacy trades)
+- **7d:** 365 trades, -$1.12, 43.6% WR
+  - LONG: 156T, +$0.96, 51.9% WR
+  - SHORT: 209T, -$2.08, 37.3% WR
+- **Star combo:** bb_bounce+,range_finder+ LONG — 14T, +$0.57, 64.3% WR (24h); 20T, +$0.68, 65% WR (7d)
+- **Profit monster:** 17T, +$1.20, 100% WR — best single signal
+- **Close reasons:** atr_sl_hit 18T (-$0.97, all losses) | profit-monster-trail 17T (+$1.20, 100% WR)
+
+### Diagnosis
+SHORT still bleeding but improving. All 10 SHORT losses in 24h are legacy pre-disable trades (ma100-cross-, range_finder-, vortex_break_short combos). Zero new SHORT trades from disabled signals after Aug 8 13:25 UTC bug fix. The hl-sync-guardian timer was stale (dead 6h) — restarted it. This was a critical maintenance gap.
+
+### What's Working
+- **LONG:** +$0.57 today, 53.3% WR — profitable
+- **Compactor fix verified:** 0 new disabled-signal trades since deployment
+- **ATR SL 1.2%:** 2 trades used new SL, both winners
+- **bb_bounce+,range_finder+:** Star combo, 64.3% WR
+- **Short-specific signals (bb-bounce-short, range_finder_short, return_exhaustion_short):** Active, using regime filter
+
+### Action Taken
+1. **FIXED: hl-sync-guardian timer** — was dead for 6h, restarted. Timer now active, next trigger pending.
+2. **Verified:** ImportError for RANGE_FINDER_SHORT_ENABLED/RETURN_EXHAUSTION_SHORT_ENABLED resolved (0 errors in signals_runner)
+
+### Decision
+**No parameter changes.** System recovering — all fixes need more evaluation time. Legacy SHORT trades aging out naturally. LONG profitable. Monitor continues.
