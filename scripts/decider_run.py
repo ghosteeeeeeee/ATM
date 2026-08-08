@@ -874,8 +874,9 @@ def llm_context_gate(token, direction, source, sig, rule_result, setup=None, heb
         wr_est, n, weight, concepts = heb[0], heb[1], heb[2], heb[3]
         exit_quality = heb[4] if len(heb) > 4 else None
         combo_parts = heb[5] if len(heb) > 5 else []
+        is_token_specific = heb[6] if len(heb) > 6 else False
         wr_pct = wr_est * 100
-        heb_section += f"\nHebbian estimate: WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})"
+        heb_section += f"\nHebbian estimate: WR={wr_pct:.0f}% (n={n}, weight={weight:.2f}, {'token-specific' if is_token_specific else 'aggregate'})"
         # Add exit-quality context
         if exit_quality and exit_quality['profit_n'] + exit_quality['sl_n'] >= 3:
             heb_section += f"\nExit quality: profit={exit_quality['profit_n']}T SL={exit_quality['sl_n']}T ratio={exit_quality['ratio']:.1f}"
@@ -1027,10 +1028,9 @@ _hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, exit_quality, com
 
 def hebbian_trade_boost(token, signal):
     """Estimate historical win rate from Hebbian memory for (token, signal) pair.
-    Returns (wr, n, weight, concepts, exit_quality, combo_parts) or None. Fail-open. 10min cache.
-    concepts = list of (concept_name, label, weight, count) for LLM context.
-    exit_quality = {'profit_w', 'profit_n', 'sl_w', 'sl_n', 'ratio'} or None.
-    combo_parts = list of (part_name, wr, n, weight) for combo signal parts."""
+    Returns (wr, n, weight, concepts, exit_quality, combo_parts, is_token_specific) or None.
+    Fail-open. 10min cache.
+    is_token_specific = True if data is from token↔signal, False if from direction↔signal fallback."""
     from hebbian_engine import HebbianEngine
     cache_key = f"{token}:{signal}"
     now = time.time()
@@ -1038,25 +1038,34 @@ def hebbian_trade_boost(token, signal):
     if cached and now - cached[6] < HEBBIAN_CACHE_TTL:
         if cached[0] is None:
             return None
-        return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5])
+        return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5], cached[7])
     try:
         engine = HebbianEngine()
+        # Try token-specific first
         result = engine.wr_estimate(token, signal)
+        is_token_specific = True
+        if not result:
+            # Fallback to direction-agnostic lookup
+            from hermes_constants import LONG_BLACKLIST, SHORT_BLACKLIST
+            # Use direction from signal source
+            direction = 'LONG' if '+' in (signal or '') else 'SHORT' if '-' in (signal or '') else None
+            if direction:
+                result = engine.wr_estimate(direction, signal)
+                is_token_specific = False
         recall = engine.recall(token, k=20)
         concepts = [(c, l, w, n) for c, l, w, n in recall
                     if l == 'concept' and c not in ('SHORT_BIAS', 'LONG_BIAS', 'NEUTRAL',
                                                      'APPROVED', 'HOT_APPROVED', 'WAIT', 'SKIPPED')]
-        # Phase 1: exit-quality + combo-part lookups
         exit_quality = engine.exit_quality_score(signal) if signal else None
         combo_parts = engine.combo_part_wr(token, signal) if signal else []
     except Exception:
         return None
     if result is None:
-        _hebbian_cache[cache_key] = (None, None, None, [], None, None, now)
+        _hebbian_cache[cache_key] = (None, None, None, [], None, None, now, None)
         return None
     wr, n, weight = result
-    _hebbian_cache[cache_key] = (wr, n, weight, concepts, exit_quality, combo_parts, now)
-    return (wr, n, weight, concepts, exit_quality, combo_parts)
+    _hebbian_cache[cache_key] = (wr, n, weight, concepts, exit_quality, combo_parts, now, is_token_specific)
+    return (wr, n, weight, concepts, exit_quality, combo_parts, is_token_specific)
 
 def context_gate(token, direction, source, sig):
     """
@@ -1114,9 +1123,10 @@ def context_gate(token, direction, source, sig):
     # Hebbian WR estimate (brain.db token ↔ signal weight)
     heb = hebbian_trade_boost(token, source)
     if heb:
-        wr_est, n, weight, concepts, exit_quality, combo_parts = heb
+        wr_est, n, weight, concepts, exit_quality, combo_parts, is_token_specific = heb
         wr_pct = wr_est * 100
-        log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f})')
+        data_src = 'token-specific' if is_token_specific else 'direction-agg'
+        log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f}, {data_src})')
 
         # Phase 1: exit-quality enrichment
         exit_boost = 0
@@ -1141,7 +1151,7 @@ def context_gate(token, direction, source, sig):
                 combo_boost = -HEBBIAN_COMBO_PART_BOOST
                 log(f'  [HEBBIAN] combo-parts: one low WR → {combo_boost}')
 
-        # Existing boost/penalty logic
+        # Existing boost/penalty logic (still uses aggregate data for soft advisories)
         if n >= HEBBIAN_BOOST_MIN_N and wr_est >= HEBBIAN_BOOST_WR:
             log(f'  [HEBBIAN] boost: +{HEBBIAN_BOOST_AMOUNT} confidence (high WR history)')
             return ('WARN', f'hebbian boost: est WR={wr_pct:.0f}% (n={n})', -HEBBIAN_BOOST_AMOUNT)
@@ -1149,8 +1159,8 @@ def context_gate(token, direction, source, sig):
             log(f'  [HEBBIAN] penalty: -{HEBBIAN_PENALTY_AMOUNT} confidence (low WR history)')
             return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
 
-        # Phase 2: Hebbian autonomous gate (before LLM)
-        if HEBBIAN_GATE_ENABLED and n >= HEBBIAN_AUTO_MIN_N:
+        # Phase 2: Hebbian autonomous gate — ONLY with token-specific data
+        if HEBBIAN_GATE_ENABLED and is_token_specific and n >= HEBBIAN_AUTO_MIN_N:
             total_conf_adj = exit_boost + combo_boost
             if wr_est >= HEBBIAN_AUTO_APPROVE_WR and exit_boost >= 0:
                 log(f'  [HEBBIAN-GATE] AUTO-APPROVE: WR={wr_pct:.0f}% n={n} exit_boost={exit_boost} combo_boost={combo_boost}')
