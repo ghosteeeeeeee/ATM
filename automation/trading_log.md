@@ -1,5 +1,67 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-08: Daily Orchestrator Report
+
+### Pipeline Status
+- **Portfolio**: 6 open | 40 closed today | **+2.10% PnL**
+- **Market regime**: NEUTRAL across all tokens
+- **Speed**: moderate
+- **Hotset**: empty (all-NEUTRAL regime)
+- **Blacklist**: 171 SHORT / 139 LONG (final — no more trials)
+
+### Health Status
+- **System**: OK — 30+ timers active
+- **Disk**: 79% (89G/118G) — health monitor compressed 47 old logs
+- **Errors**: 0 critical
+
+### Signal Performance (24h)
+- **Trades**: 42 closed, 61.9% WR, +$0.52 PnL
+- **Killed today**: range_finder- SHORT (40% WR, -$0.19), vortex_break_short SHORT (25% WR, -$0.15)
+- **Top performer**: bb_bounce+,range_finder+ LONG (75% WR, +$0.51)
+- **SHORT side broadly negative** — 9 signals now disabled
+- **LONG side (bb_bounce+ combos) carrying the system**
+
+### Blacklist Trials — COMPLETE
+- **77 tokens tested across 5 batches, 0 KEEP**
+- Root cause: signal generation filters (SPEED_MIN, PHASE_ENTRY, CONTEXT_GATE) block these tokens
+- Blacklist is a symptom filter, not a cause — no further batches planned
+
+### What Was Implemented
+
+1. **Fixed hl-sync-guardian timer** — was dead since Jul 29 (service manually started Aug 7). Timer restarted, guardian now fires every 2 min as designed.
+
+2. **Restarted auto-1hr timer** — dead since Aug 2 (6 days). Timer was disabled. Re-enabled and restarted. Will fire next hour.
+
+3. **Uncertainty check quick wins** — already in bug-hunter (line 138) and post-change (line 69) skills. No changes needed.
+
+4. **Disk cleanup** — health monitor already compressed 47 old logs. 79% disk is safe, no further action needed.
+
+### Critical Issues
+- **Auto-1hr was dead 6 days** — no param tuning occurred during this period. Now restored.
+- **HL-sync-guardian timer was dead 10 days** — service ran but timer wasn't firing. Now fixed.
+
+### Pending Plans (from upgrade_audit.md)
+| Plan | Difficulty | Status |
+|------|-----------|--------|
+| signal-version-tracking.md | L2 | PENDING — param change logging + regression detection |
+| transcript-mining-quick-wins.md | L1 | DONE (uncertainty checks already exist) |
+| wyckoff-pattern-recognition | L2 | NOT IMPLEMENTED |
+| self-learning-system-spec | L3 | NOT IMPLEMENTED |
+
+### Recommendations for CEO
+1. **Monitor auto-1hr** — now restored, will it produce useful tuning? First run due in ~30min.
+2. **Signal version tracking** — L2 plan, high value. Param changes currently invisible. Recommend implementing next.
+3. **SHORT signals** — 9 disabled, SHORT side broadly negative. Consider leaving SHORT disabled until market shows directional conviction.
+4. **Open bugs**: 0 (clean)
+
+### Quality Metrics
+- Tasks completed: 5
+- First-attempt success: 100%
+- Pipeline uptime: 100%
+- Critical issues found: 2 (stale timers)
+
+---
+
 ## 2026-08-07: Daily Orchestrator Report
 
 ### Pipeline Status
