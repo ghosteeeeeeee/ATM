@@ -2676,16 +2676,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     closed_count += 1
                     continue  # Position was flipped — skip remaining checks
 
-        # ── 5. Cut loser (DISABLED — guardian handles all emergency exits) ──
-        # Cut_loser was causing races: position_manager uses fresh prices and cuts tight
-        # (sl_distance from A/B test can be 0.5%), before guardian's flip can fire.
-        # Guardian is the designated emergency handler (flip, hard SL, cut_loser at -5%).
-        # Cut_loser is DISABLED here to prevent duplicate closing of the same position.
-        # if not trailing_active and should_cut_loser(live_pnl, pos):
-        #     reason = f"cut_loser_{live_pnl:+.2f}%"
-        #     close_paper_position(trade_id, reason)
-        #     closed_count += 1
-        #     log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
+        # ── 5. Cut loser — immediate SL breach only ──────────────────────────────
+        # Only fires when actual stop_loss price is breached (Priority 1 in should_cut_loser).
+        # Probabilistic cutting is handled by cut_loser.py (two-tier + trailing).
+        # Race prevention: check guardian markers before closing.
+        if should_cut_loser(live_pnl, pos):
+            reason = f"cut_loser_{live_pnl:+.2f}%"
+            close_paper_position(trade_id, reason)
+            closed_count += 1
+            log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
 
         # ── 6. SPEED: Stale winner/loser exit ─────────────────────────────────
         # SPEED FEATURE: closes positions that are in profit but flat (stale winner)

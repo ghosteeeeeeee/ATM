@@ -1,23 +1,34 @@
 #!/usr/bin/env python3
 """
-Cut Loser — closes medium-loss positions (-0.5% to -3%) at random intervals.
-Never touches profitable positions. A/B testable fire intervals (5-10min vs 10-18min).
+Cut Loser v2 — Two-tier loss cutting + trailing loss. Mirror of profit_monster.py.
+
+Tier 1 (Quick Cut): Lower loss range, fires frequently. Catches small losses fast.
+Tier 2 (Deep Cut):  Higher loss range, fires less frequently. Handles bigger bleeds.
+Trailing Loss:       Track worst point, cut if recovery fails.
+
+All params tunable via hermes_constants.py (CL_TIER1_*, CL_TIER2_*, CL_TRAIL_*).
 """
 from paths import *
 from hermes_constants import (
-    CUT_LOSER_ENABLED, LOSS_MIN_PCT, LOSS_MAX_PCT,
-    CUT_LOSER_MAX_CLOSE, SKIP_BOTTOM_PCT, CUT_LOSER_FIRE_WINDOWS
+    CUT_LOSER_ENABLED,
+    CL_TIER1_MIN_PCT, CL_TIER1_MAX_PCT, CL_TIER1_MAX_CLOSE, CL_TIER1_SKIP_BOTTOM_PCT, CL_TIER1_FIRE_WINDOWS,
+    CL_TIER2_MIN_PCT, CL_TIER2_MAX_PCT, CL_TIER2_MAX_CLOSE, CL_TIER2_SKIP_BOTTOM_PCT, CL_TIER2_FIRE_WINDOWS,
+    CL_TRAIL_ENABLED, CL_TRAIL_ACTIVATE_PCT, CL_TRAIL_RECOVER_PCT, CL_TRAIL_MIN_HOLD, CL_TRAIL_FIRE_WINDOWS,
 )
 import sys, os, json, time, random, argparse
+from datetime import datetime
 from pathlib import Path
 
 from hermes_log import log
-# ── Constants ─────────────────────────────────────────────────────────────────
-LOG_FILE   = Path("/root/.hermes/logs/cut_loser.log")
-CONFIG_FILE = Path(CUT_LOSER_CONFIG)
-BRAIN_CMD   = "/root/.hermes/scripts/brain.py"
+from hermes_file_lock import FileLock
 
-# ── Logging ───────────────────────────────────────────────────────────────────
+# ── Constants ────────────────────────────────────────────────────────────────
+LOG_FILE          = Path("/root/.hermes/logs/cut_loser.log")
+CONFIG_FILE       = Path(CUT_LOSER_CONFIG)
+BRAIN_CMD         = "/root/.hermes/scripts/brain.py"
+GUARDIAN_LOCK     = '/tmp/hermes-guardian.lock'
+
+# ── Config ───────────────────────────────────────────────────────────────────
 def load_config():
     try:
         with open(CONFIG_FILE) as f:
@@ -25,19 +36,20 @@ def load_config():
     except Exception:
         return {"enabled": True, "ab_group": "B", "dry_run": False}
 
-# ── Fire decision (random timer) ───────────────────────────────────────────────
-def should_fire(ab_group: str, last_run_ts: float) -> bool:
+
+def should_fire(ab_group: str, last_run_ts: float, fire_windows: dict) -> bool:
     """Return True if enough minutes have passed since last_run_ts."""
-    window = CUT_LOSER_FIRE_WINDOWS.get(ab_group, CUT_LOSER_FIRE_WINDOWS["B"])
+    window = fire_windows.get(ab_group, fire_windows.get("B", (5, 10)))
     min_wait, max_wait = window
     jitter = random.uniform(0, 1)
     fire_interval_sec = (min_wait + (max_wait - min_wait) * jitter) * 60
     elapsed = time.time() - last_run_ts
     return elapsed >= fire_interval_sec
 
-# ── Query open positions ────────────────────────────────────────────────────────
+
+# ── DB Queries ───────────────────────────────────────────────────────────────
 def get_losing_positions():
-    """Return list of dicts for open positions with pnl_pct < 0."""
+    """Return all open Hermes positions ordered by pnl_pct ASC (worst losers first)."""
     try:
         import psycopg2
         from _secrets import BRAIN_PASSWORD, BRAIN_HOST
@@ -47,10 +59,8 @@ def get_losing_positions():
         cur.execute("""
             SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time
             FROM trades
-            WHERE server = 'Hermes'
-              AND status = 'open'
-              AND entry_price > 0
-              AND current_price > 0
+            WHERE server = 'Hermes' AND status = 'open'
+              AND entry_price > 0 AND current_price > 0
             ORDER BY pnl_pct ASC
         """)
         rows = cur.fetchall()
@@ -64,161 +74,382 @@ def get_losing_positions():
         log(f"DB query error: {e}", "ERROR")
         return []
 
-def filter_losing_positions(positions, min_pct=LOSS_MIN_PCT, max_pct=LOSS_MAX_PCT):
-    """Compute live pnl_pct from entry_price vs current_price and filter to loss range."""
+
+def filter_by_pnl(positions, min_pct, max_pct):
+    """Filter positions to those within loss range.
+    
+    min_pct is more negative (floor), max_pct is less negative (ceiling).
+    Example: T1 range is min_pct=-1.0, max_pct=-0.3
+    """
+    from pnl_utils import compute_live_pnl
     filtered = []
     for pos in positions:
         if pos["entry_price"] > 0 and pos["current_price"] > 0:
-            if pos["direction"].upper() == "LONG":
-                live_pnl = (pos["current_price"] - pos["entry_price"]) / pos["entry_price"] * 100
-            else:
-                live_pnl = (pos["entry_price"] - pos["current_price"]) / pos["entry_price"] * 100
+            live_pnl = compute_live_pnl(pos["entry_price"], pos["current_price"], pos["direction"])
             pos["live_pnl_pct"] = live_pnl
-            # live_pnl is negative for losses; LOSS_MIN_PCT=-3.0 (catastrophic floor),
-            # LOSS_MAX_PCT=-0.5 (threshold). Cut positions where:
-            #   live_pnl <= -0.5  (loss worse than -0.5%) AND
-            #   live_pnl >= -3.0  (not worse than -3%, not catastrophic)
-            # Note: min_pct=-3.0 > max_pct=-0.5 on the number line (less negative).
-            # Use explicit operators to avoid Python chained-comparison pitfall:
-            #   a <= b <= c  ==  (a <= b) and (b <= c)  — fails here because -0.35 <= -0.5 is False.
-            if (live_pnl <= max_pct) and (live_pnl >= min_pct):
+            # min_pct is more negative, max_pct is less negative
+            # e.g. T1: min=-1.0, max=-0.3 → cut if -1.0 <= pnl <= -0.3
+            if min_pct <= live_pnl <= max_pct:
                 filtered.append(pos)
     return filtered
 
-# ── Select positions to close (skip bottom SKIP_BOTTOM_PCT worst losers) ───────
-def select_positions(positions, max_close=CUT_LOSER_MAX_CLOSE, skip_bottom_pct=SKIP_BOTTOM_PCT):
+
+def select_positions(positions, max_close, skip_bottom_pct, trail_state=None):
+    """Select positions to close: skip worst losers + trailed, pick random subset."""
     if not positions:
         return []
-
-    # Skip bottom losers (let them recover or get stopped out by ATR)
+    # Skip bottom worst losers (let them recover or hit ATR SL)
     skip_count = max(0, int(len(positions) * skip_bottom_pct / 100))
     candidates = positions[skip_count:]
+    # Skip trades being trailed (trail tier handles those)
+    if trail_state:
+        trailed_ids = set(trail_state.keys())
+        candidates = [p for p in candidates if str(p["id"]) not in trailed_ids]
     if not candidates:
         return []
-
     count = random.randint(1, min(max_close, len(candidates)))
     return random.sample(candidates, count)
 
-# ── Close a position via brain.py + HL mirror ──────────────────────────────────
-def close_position(trade_id: int, token: str, direction: str, pnl_pct: float, current_price: float, dry_run: bool):
+
+# ── Safety Checks ────────────────────────────────────────────────────────────
+def is_position_on_hl(token: str) -> bool:
+    """Check if token still has an open position on HL."""
+    try:
+        from hyperliquid_exchange import get_exchange, MAIN_ACCOUNT_ADDRESS
+        ex = get_exchange()
+        addr = getattr(ex, 'account_address', None) or MAIN_ACCOUNT_ADDRESS
+        state = ex.info.user_state(addr)
+        for p in state.get('assetPositions', []) or []:
+            item = p.get('position') or {}
+            if item.get('coin') == token.upper() and abs(float(item.get('szi') or 0)) > 0:
+                return True
+        return False
+    except Exception as e:
+        log(f"HL check failed for {token}: {e} — skipping", "WARN")
+        return False
+
+
+def is_token_being_closed_by_guardian(token: str) -> bool:
+    """Check if guardian closing markers include this token."""
+    try:
+        markers_path = Path("/root/.hermes/data/guardian-closing-markers.json")
+        data = json.loads(markers_path.read_text())
+        markers = data.get('tokens', {}) if isinstance(data, dict) else data
+        return token.upper() in {k.upper() for k in markers.keys()}
+    except Exception:
+        return False
+
+
+def is_token_being_closed_by_profit_monster(token: str) -> bool:
+    """Check if profit_monster is currently closing this token."""
+    try:
+        trail_path = Path("/root/.hermes/data/profit_monster_trail_state.json")
+        state = json.loads(trail_path.read_text())
+        return token.upper() in {v.get('token', '').upper() for v in state.values()}
+    except Exception:
+        return False
+
+
+# ── Close Position ───────────────────────────────────────────────────────────
+def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, tier):
+    """Close a position on HL then update DB. Returns True on success."""
     if dry_run:
-        log(f"[DRY RUN] Would close id={trade_id} {token} {direction} @ {pnl_pct:.2f}% loss", "WARN")
+        log(f"[DRY RUN] [{tier}] Would close {token} {direction} @ {pnl_pct:.2f}% loss", "WARN")
         return True
 
-    # Step 1: Close the HL position FIRST (prevents guardian from creating duplicate orphan trade)
+    if is_token_being_closed_by_guardian(token):
+        log(f"  [{tier}] Guardian closing marker for {token} — skipping", "WARN")
+        return False
+    if is_token_being_closed_by_profit_monster(token):
+        log(f"  [{tier}] Profit monster closing {token} — skipping", "WARN")
+        return False
+    if not is_position_on_hl(token):
+        log(f"  [{tier}] {token} not on HL — already closed, skipping", "WARN")
+        return False
+
+    # Close on HL
     hl_fill_price = None
     try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from hyperliquid_exchange import is_live_trading_enabled, close_position
+        from hyperliquid_exchange import is_live_trading_enabled, close_position as hl_close
         if is_live_trading_enabled():
-            result = close_position(token.upper())
+            result = hl_close(token.upper())
             if result.get("success"):
-                log(f"  HL close OK: {token} (realized_pnl={result.get('hl_realized_pnl', 'N/A')})", "PASS")
-                # Extract actual fill price from HL response
+                log(f"  [{tier}] HL close OK: {token}", "PASS")
                 try:
                     statuses = result.get("result", {}).get("response", {}).get("data", {}).get("statuses", [])
                     for s in statuses:
-                        filled = s.get("filled", {})
-                        avg_px = filled.get("avgPx")
+                        avg_px = s.get("filled", {}).get("avgPx")
                         if avg_px:
                             hl_fill_price = float(avg_px)
-                            log(f"  HL fill price: ${hl_fill_price:.6f}", "INFO")
                             break
                 except Exception:
                     pass
             else:
-                log(f"  HL close failed for {token}: {result.get('error', 'unknown')} — will still close DB", "WARN")
-        else:
-            log(f"  HL close skipped for {token} (paper mode — no real HL position)", "INFO")
+                log(f"  [{tier}] HL close failed for {token}: {result.get('error', result.get('message', 'unknown'))}", "WARN")
     except Exception as e:
-        log(f"  HL close error for {token}: {e} — will still close DB", "WARN")
+        log(f"  [{tier}] HL close error for {token}: {e}", "WARN")
 
-    # Step 2: Update the paper DB (brain.py handles this)
-    # Use HL fill price if available, otherwise fall back to current market price
+    # Re-check HL before DB write — only if close wasn't confirmed
+    if hl_fill_price is None and not is_position_on_hl(token):
+        log(f"  [{tier}] {token} gone from HL during close (no fill price) — skipping DB write", "WARN")
+        return False
+
+    # Update DB
     exit_price = f"{hl_fill_price:.8f}" if hl_fill_price else f"{current_price:.8f}"
     cmd = [sys.executable, BRAIN_CMD, "trade", "close", str(trade_id), exit_price,
-           "--notes", f"cut-loser({pnl_pct:.2f}%)",
-           "--close-reason", "cut-loser",
+           "--notes", f"cut-loser-{tier}({pnl_pct:.2f}%)",
+           "--close-reason", f"cut-loser-{tier}",
            "--skip-hl"]
     try:
         import subprocess
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
-            log(f"Closed id={trade_id} {token} {direction} — {pnl_pct:.2f}% loss", "INFO")
+            log(f"  [{tier}] Closed id={trade_id} {token} {direction} — {pnl_pct:.2f}% loss", "INFO")
+            # Record to signal_outcomes for WR tracking
+            try:
+                from signal_schema import record_signal_outcome
+                actual_pnl_pct = float(pnl_pct or 0)
+                notional = 11.0
+                try:
+                    import psycopg2
+                    from _secrets import BRAIN_DB_DICT
+                    _conn = psycopg2.connect(**BRAIN_DB_DICT)
+                    try:
+                        _cur = _conn.cursor()
+                        _cur.execute("SELECT amount_usdt, signal, confidence FROM trades WHERE id=%s", (trade_id,))
+                        _row = _cur.fetchone()
+                        if _row:
+                            notional = float(_row[0]) if _row[0] else 11.0
+                            _signal_type = _row[1] or 'unknown'
+                            _confidence = float(_row[2]) if _row[2] else 80
+                        else:
+                            _signal_type = 'unknown'
+                            _confidence = 80
+                    finally:
+                        try: _conn.close()
+                        except: pass
+                except Exception:
+                    _signal_type = 'unknown'
+                    _confidence = 80
+                actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
+                record_signal_outcome(
+                    token=token,
+                    direction=direction,
+                    pnl_pct=round(actual_pnl_pct, 4),
+                    pnl_usdt=round(actual_pnl_usdt, 4),
+                    signal_type=_signal_type,
+                    confidence=_confidence,
+                    trade_id=trade_id
+                )
+            except Exception as sig_err:
+                log(f"  [{tier}] Signal outcome record error: {sig_err}", "WARN")
             return True
         else:
-            log(f"Close failed for id={trade_id} {token}: {result.stderr.strip()[:120]}", "ERROR")
+            log(f"  [{tier}] Close failed id={trade_id} {token}: {result.stderr.strip()[:120]}", "ERROR")
             return False
     except Exception as e:
-        log(f"Close error for id={trade_id} {token}: {e}", "ERROR")
+        log(f"  [{tier}] Close error id={trade_id} {token}: {e}", "ERROR")
         return False
 
-# ── Load / save last run timestamp ─────────────────────────────────────────────
-def get_last_run_ts():
-    ts_file = Path(CUT_LOSER_LAST)
+
+# ── Tier Runner ──────────────────────────────────────────────────────────────
+def run_tier(tier_name, min_pct, max_pct, max_close, skip_bottom_pct, fire_windows, positions, dry_run, trail_state=None):
+    """Run one tier: check fire timing, filter positions, close picks."""
+    ts_file = Path(f"/root/.hermes/data/cut_loser_{tier_name}.json")
     try:
-        with open(ts_file) as f:
-            return json.load(f).get("ts", 0.0)
+        last_ts = json.loads(ts_file.read_text()).get("ts", 0.0)
     except Exception:
-        return 0.0
+        last_ts = 0.0
 
-def save_last_run_ts():
-    ts_file = Path(CUT_LOSER_LAST)
-    with open(ts_file, "w") as f:
-        json.dump({"ts": time.time()}, f)
+    ab_group = load_config().get("ab_group", "B")
+    if not should_fire(ab_group, last_ts, fire_windows):
+        elapsed = time.time() - last_ts
+        log(f"  [{tier_name}] Not time to fire (elapsed={elapsed:.0f}s)")
+        return 0
 
-# ── Main ───────────────────────────────────────────────────────────────────────
+    in_range = filter_by_pnl(positions, min_pct, max_pct)
+    log(f"  [{tier_name}] {len(in_range)} positions in [{min_pct}-{max_pct}%]")
+
+    if not in_range:
+        ts_file.write_text(json.dumps({"ts": time.time()}))
+        return 0
+
+    picks = select_positions(in_range, max_close, skip_bottom_pct, trail_state)
+    if not picks:
+        log(f"  [{tier_name}] No positions selected — letting losers recover")
+        ts_file.write_text(json.dumps({"ts": time.time()}))
+        return 0
+
+    closed = 0
+    for pos in picks:
+        tier_label = f"CL-T{tier_name[-1]}"  # CL-T1 or CL-T2
+        ok = close_position(pos["id"], pos["token"], pos["direction"],
+                            pos.get("live_pnl_pct", pos["pnl_pct"]),
+                            pos["current_price"], dry_run, tier_label)
+        if ok:
+            closed += 1
+
+    ts_file.write_text(json.dumps({"ts": time.time()}))
+    return closed
+
+
+# ── Trailing Loss Tier ───────────────────────────────────────────────────────
+_TRAIL_STATE_FILE = Path("/root/.hermes/data/cut_loser_trail_state.json")
+
+def _load_trail_state():
+    """Load trailing state: {trade_id: {worst_pnl, activated_at, token}}"""
+    try:
+        return json.loads(_TRAIL_STATE_FILE.read_text())
+    except Exception:
+        return {}
+
+def _save_trail_state(state):
+    _TRAIL_STATE_FILE.write_text(json.dumps(state, indent=2))
+
+def run_trail(positions, dry_run):
+    """Trailing loss tier: track worst point, cut on recovery failure.
+
+    Mirror of profit_monster.run_trail() but inverted:
+    
+    profit_monster trail:
+      - Activates at +0.30% profit
+      - Tracks PEAK (highest pnl)
+      - Cuts when pnl drops 0.15% below peak
+    
+    cut_loser trail:
+      - Activates at -0.30% loss
+      - Tracks WORST (lowest pnl / most negative)
+      - Cuts when pnl recovers 0.15% from worst then drops back
+    """
+    if not CL_TRAIL_ENABLED:
+        return 0
+
+    ab_group = load_config().get("ab_group", "B")
+    window = CL_TRAIL_FIRE_WINDOWS.get(ab_group, (0.5, 1))
+    ts_file = Path("/root/.hermes/data/cut_loser_trail.json")
+    try:
+        last_ts = json.loads(ts_file.read_text()).get("ts", 0.0)
+    except Exception:
+        last_ts = 0.0
+
+    min_wait, max_wait = window
+    jitter = random.uniform(0, 1)
+    fire_interval = (min_wait + (max_wait - min_wait) * jitter) * 60
+    if time.time() - last_ts < fire_interval:
+        return 0
+
+    state = _load_trail_state()
+    closed = 0
+
+    for pos in positions:
+        tid = str(pos["id"])
+        pnl = pos.get("live_pnl_pct", pos["pnl_pct"])
+        now = time.time()
+
+        if tid in state:
+            # ── Already trailing ──────────────────────────────────────────
+            trail = state[tid]
+
+            # If trade recovered above activation threshold, clear (recovered)
+            if pnl > CL_TRAIL_ACTIVATE_PCT * 0.5:
+                log(f"  [CL-TRAIL] {pos['token']} recovered to {pnl:.2f}% — clearing trail state")
+                del state[tid]
+                continue
+
+            # Update worst (most negative = lowest pnl)
+            if pnl < trail["worst_pnl"]:
+                trail["worst_pnl"] = pnl
+                trail["worst_time"] = now
+
+            # Check minimum hold time
+            if now - trail["activated_at"] < CL_TRAIL_MIN_HOLD * 60:
+                continue
+
+            # Cut if current pnl recovered from worst then dropped back
+            # recovered = current is better (less negative) than worst by CL_TRAIL_RECOVER_PCT
+            recovery = pnl - trail["worst_pnl"]  # positive if recovered
+            if recovery >= CL_TRAIL_RECOVER_PCT:
+                log(f"  [CL-TRAIL] {pos['token']} trailing exit: worst={trail['worst_pnl']:.2f}% "
+                    f"current={pnl:.2f}% recovery={recovery:.2f}%")
+                ok = close_position(pos["id"], pos["token"], pos["direction"],
+                                    pnl, pos["current_price"], dry_run, "CL-trail")
+                if ok:
+                    closed += 1
+                del state[tid]
+
+        else:
+            # ── New candidate: just entered loss zone ─────────────────────
+            if pnl <= CL_TRAIL_ACTIVATE_PCT:
+                # Check minimum hold time since trade opened
+                try:
+                    opened = datetime.fromisoformat(pos["opened_at"])
+                    hold_min = (datetime.now() - opened).total_seconds() / 60
+                except Exception:
+                    hold_min = 999
+
+                if hold_min >= CL_TRAIL_MIN_HOLD:
+                    state[tid] = {
+                        "worst_pnl": pnl,
+                        "activated_at": now,
+                        "worst_time": now,
+                        "token": pos["token"],
+                    }
+                    log(f"  [CL-TRAIL] {pos['token']} activated: pnl={pnl:.2f}% "
+                        f"worst={pnl:.2f}%")
+
+    _save_trail_state(state)
+    ts_file.write_text(json.dumps({"ts": time.time()}))
+    return closed
+
+
+# ── Main ─────────────────────────────────────────────────────────────────────
 def run(dry_run=False):
     if not CUT_LOSER_ENABLED:
         log("disabled via CUT_LOSER_ENABLED — exiting")
         return
 
     cfg = load_config()
-
     if not cfg.get("enabled", True):
         log("disabled — exiting")
         return
 
+    effective_dry_run = dry_run or cfg.get("dry_run", False)
     ab_group = cfg.get("ab_group", "B")
-    last_ts  = get_last_run_ts()
 
-    if not should_fire(ab_group, last_ts):
-        log(f"Group {ab_group} — not time to fire yet (elapsed={time.time()-last_ts:.0f}s)")
-        return
-
-    log(f"Firing — group {ab_group}, loss range [{cfg.get('loss_min_pct', LOSS_MIN_PCT)} to {cfg.get('loss_max_pct', LOSS_MAX_PCT)}%]")
+    log(f"Firing — group {ab_group}" + (" [DRY RUN]" if effective_dry_run else ""))
 
     positions = get_losing_positions()
-    log(f"Found {len(positions)} open positions (computing live pnl...)")
+    log(f"Found {len(positions)} open positions")
 
-    min_pct = cfg.get("loss_min_pct", LOSS_MIN_PCT)
-    max_pct = cfg.get("loss_max_pct", LOSS_MAX_PCT)
-    in_range = filter_losing_positions(positions, min_pct, max_pct)
-    log(f"  {len(in_range)} positions in loss range [{min_pct} to {max_pct}%]")
-
-    to_close = select_positions(
-        in_range,
-        max_close=cfg.get("max_closes_per_wake", CUT_LOSER_MAX_CLOSE),
-        skip_bottom_pct=cfg.get("skip_bottom_pct", SKIP_BOTTOM_PCT)
-    )
-
-    if not to_close:
-        log("No positions selected for close — letting them recover")
-        save_last_run_ts()
+    if not positions:
         return
 
-    for pos in to_close:
-        close_position(pos["id"], pos["token"], pos["direction"],
-                       pos.get("live_pnl_pct", pos["pnl_pct"]),
-                       pos["current_price"],
-                       dry_run or cfg.get("dry_run", False))
+    # Tier trail: Trailing loss (runs first — catches early losses and trails)
+    trail_closed = run_trail(positions, effective_dry_run)
 
-    save_last_run_ts()
+    # Load trail state for T1/T2 to skip trailed trades
+    trail_state = _load_trail_state() if CL_TRAIL_ENABLED else {}
 
-# ── CLI ─────────────────────────────────────────────────────────────────────────
+    # Tier 1: Quick cut
+    t1_closed = run_tier("tier1", CL_TIER1_MIN_PCT, CL_TIER1_MAX_PCT,
+                         CL_TIER1_MAX_CLOSE, CL_TIER1_SKIP_BOTTOM_PCT,
+                         CL_TIER1_FIRE_WINDOWS, positions, effective_dry_run, trail_state)
+
+    # Tier 2: Deep cut (re-check positions after tier 1 closes)
+    if t1_closed > 0:
+        positions = get_losing_positions()
+    t2_closed = run_tier("tier2", CL_TIER2_MIN_PCT, CL_TIER2_MAX_PCT,
+                         CL_TIER2_MAX_CLOSE, CL_TIER2_SKIP_BOTTOM_PCT,
+                         CL_TIER2_FIRE_WINDOWS, positions, effective_dry_run, trail_state)
+
+    total = trail_closed + t1_closed + t2_closed
+    if total > 0:
+        log(f"Total closed: {total} (trail={trail_closed}, T1={t1_closed}, T2={t2_closed})")
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Cut Loser")
-    parser.add_argument("--dry-run", action="store_true", help="Preview closes without executing")
+    parser = argparse.ArgumentParser(description="Cut Loser v2 — Two-tier loss cutting + trailing")
+    parser.add_argument("--dry-run", action="store_true", help="Preview without executing")
     args = parser.parse_args()
 
     run(dry_run=args.dry_run)

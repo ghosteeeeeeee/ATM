@@ -717,18 +717,39 @@ STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggre
 TIME_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/4), closing positions at small losses
 PEAK_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/3), locking in losses on reversals
 
-# ── Cut Loser ─────────────────────────────────────────────────────────────────
-# cut_loser.py — closes medium-loss positions (-0.5% to -3%) at random intervals.
-# Never touches profitable positions. Fire intervals A/B tested (10-15min vs 20-30min).
-CUT_LOSER_ENABLED      = True
-LOSS_MIN_PCT           = -3.0   # cut positions down to this threshold (more negative)
-LOSS_MAX_PCT           = -0.5   # only cut if loss is <= -0.5% (don't cut tiny drawdowns)
-CUT_LOSER_MAX_CLOSE    = 1      # max positions to close per wake
-SKIP_BOTTOM_PCT        = 0      # don't touch the bottom 10% worst losers (let them recover)
-CUT_LOSER_FIRE_WINDOWS = {
-    "A": (5, 10),    # 5-10 min — cut faster
-    "B": (10, 18),   # 10-18 min — slightly slower but still frequent
-}
+# ── Cut Loser v2 ──────────────────────────────────────────────────────────────
+# cut_loser.py — Two-tier loss cutting + trailing loss. Mirror of profit_monster.
+# Tier 1 (Quick Cut): catches small losses fast. Tier 2 (Deep Cut): handles bigger bleeds.
+# Trailing Loss: tracks worst point, cuts on recovery failure.
+CUT_LOSER_ENABLED      = True   # master switch
+
+# Tier 1: Quick Cut — -0.3% to -1.0%, fires frequently
+CL_TIER1_MIN_PCT      = -1.0    # floor (don't cut deeper than this in T1)
+CL_TIER1_MAX_PCT      = -0.3    # ceiling (don't cut tiny drawdowns)
+CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
+CL_TIER1_SKIP_BOTTOM_PCT = 10   # don't touch bottom 10% worst losers
+CL_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}
+
+# Tier 2: Deep Cut — -1.0% to -3.0%, fires less frequently
+CL_TIER2_MIN_PCT      = -3.0    # floor
+CL_TIER2_MAX_PCT      = -1.0    # ceiling (T1 handles above this)
+CL_TIER2_MAX_CLOSE    = 1       # max positions to close per wake
+CL_TIER2_SKIP_BOTTOM_PCT = 20   # don't touch bottom 20% — let ATR SL handle catastrophic
+CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
+
+# Trailing Loss — mirror of PM_TRAIL (inverted logic)
+CL_TRAIL_ENABLED        = True
+CL_TRAIL_ACTIVATE_PCT   = -0.3   # start tracking at -0.3% loss
+CL_TRAIL_RECOVER_PCT    = 0.15   # cut if recovers 0.15% from worst then drops back
+CL_TRAIL_MIN_HOLD       = 2      # minimum minutes before trailing activates
+CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
+
+# Legacy constants (keep for backward compat / guardian)
+LOSS_MIN_PCT           = -3.0   # deprecated → use CL_TIER2_MIN_PCT
+LOSS_MAX_PCT           = -0.5   # deprecated → use CL_TIER1_MAX_PCT
+CUT_LOSER_MAX_CLOSE    = 1      # deprecated → use CL_TIER1_MAX_CLOSE
+SKIP_BOTTOM_PCT        = 0      # deprecated → use CL_TIER1_SKIP_BOTTOM_PCT
+CUT_LOSER_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}  # deprecated
 
 # ── Signal Kill Switches ───────────────────────────────────────────────────────
 # Master kill switches for each signal family. True = signal can fire.
@@ -766,7 +787,7 @@ NEVER_REENABLE_FLAGS = {
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
-PCT_HERMES_MINUS_ENABLED = True   # pct-hermes- — 46.2% WR in hzscore+,pct-hermes-,vel-hermes- combo (best SHORT)
+PCT_HERMES_MINUS_ENABLED = False  # CEO 2026-08-09 — 25% WR, -$0.15/7d. All SHORT combos negative.
 VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 7d), -$1.61. No edge.
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
@@ -878,7 +899,7 @@ PATTERN_WOLF_ENABLED       = False  # CEO 2026-08-05 — 0% WR (10 trades 7d), -
 PATTERN_CHANNEL_ENABLED    = False   # DISABLED 2026-08-02 — matches master flag
 MA_CROSS_ENABLED         = False   # ma_cross (short only historically)
 MA_CROSS_PLUS_ENABLED     = False  # ma_cross+ — catastrophic losses
-MA_CROSS_MINUS_ENABLED    = True
+MA_CROSS_MINUS_ENABLED    = False  # CEO 2026-08-09 — all ma100-cross SHORT combos bleeding (-$0.84/7d)
 MA_CROSS_5M_ENABLED       = False
 MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blacklist
 MA_CROSS_5M_MINUS_ENABLED = False
