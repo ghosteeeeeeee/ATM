@@ -210,6 +210,8 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 from signal_schema import record_signal_outcome
                 actual_pnl_pct = float(pnl_pct or 0)
                 notional = 11.0
+                _signal_type = 'unknown'
+                _confidence = 80
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
@@ -222,15 +224,11 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                             notional = float(_row[0]) if _row[0] else 11.0
                             _signal_type = _row[1] or 'unknown'
                             _confidence = float(_row[2]) if _row[2] else 80
-                        else:
-                            _signal_type = 'unknown'
-                            _confidence = 80
                     finally:
                         try: _conn.close()
                         except: pass
                 except Exception:
-                    _signal_type = 'unknown'
-                    _confidence = 80
+                    pass
                 actual_pnl_usdt = float(pnl_pct or 0) / 100 * notional
                 record_signal_outcome(
                     token=token,
@@ -307,7 +305,7 @@ def _save_trail_state(state):
     _TRAIL_STATE_FILE.write_text(json.dumps(state, indent=2))
 
 def run_trail(positions, dry_run):
-    """Trailing loss tier: track worst point, cut on recovery failure.
+    """Trailing loss tier: track worst point, cut when recovery threshold reached.
 
     Mirror of profit_monster.run_trail() but inverted:
     
@@ -319,7 +317,7 @@ def run_trail(positions, dry_run):
     cut_loser trail:
       - Activates at -0.30% loss
       - Tracks WORST (lowest pnl / most negative)
-      - Cuts when pnl recovers 0.15% from worst then drops back
+      - Cuts when recovery from worst reaches 0.15% (take the exit on signs of life)
     """
     if not CL_TRAIL_ENABLED:
         return 0
@@ -423,6 +421,12 @@ def run(dry_run=False):
 
     if not positions:
         return
+
+    # Compute live PnL for all positions (prevents stale DB values in trail tier)
+    from pnl_utils import compute_live_pnl
+    for pos in positions:
+        if pos["entry_price"] > 0 and pos["current_price"] > 0:
+            pos["live_pnl_pct"] = compute_live_pnl(pos["entry_price"], pos["current_price"], pos["direction"])
 
     # Tier trail: Trailing loss (runs first — catches early losses and trails)
     trail_closed = run_trail(positions, effective_dry_run)
