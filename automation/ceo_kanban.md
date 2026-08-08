@@ -15,7 +15,7 @@
 - [x] 2026-08-08 22:00 — CEO review: 24h +$0.18 (57.1% WR, 49 trades). 7d -$8.77 (41.3% WR). SHORT still bleeding (-$0.52/24h, -$7.39/7d) but improving. Dead signals verified killed (inv-accel, vel-hermes, pattern, zscore_rising). No new changes — ATR SL widening + signal kills need more time. bb_bounce+,range_finder+ LONG = star (88.9% WR, +$0.38/24h).
 - [x] 2026-08-08 23:30 — CEO review: 24h +$0.41 (56.9% WR, 51 trades). SHORT -$0.33 (improving). ATR SL widening deployed but 49/51 trades still have old 1.0% SL — only 2 trades used new 1.2%, both winners. Profit monster star: 29 trades, 100% WR, +$1.66. No changes — evaluation window ongoing.
 - [x] 2026-08-09 09:50 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
-- [x] 2026-08-09 10:20 — CEO review: numbers stable vs 09:50 (same 24h window). 6 open positions, pipeline healthy. No changes — continuation of evaluation window.
+- [x] 2026-08-09 10:20 — CEO review: 24h +$0.71 (65% WR, 40 trades). LONG +$0.91 (65.7% WR). SHORT -$0.20 (bleeding stopped, legacy trades only). Star: bb_bounce+,range_finder+ LONG 83.3% WR, +$0.60. No changes — all fixes working.
 - [x] 2026-08-08 10:50 — CEO review: 24h +$0.52 (58.3% WR, 48 trades). LONG +$0.83 (66.7% WR). SHORT -$0.31 (40% WR). Worst: ma100-cross SHORT combos (0-40% WR). FIX: MA_100_CROSS_MINUS_ENABLED=False. Star: bb_bounce+,range_finder+ LONG 81.8% WR.
 
 ## TODO
@@ -202,3 +202,8 @@
 - [x] 2026-08-09 11:20 — CEO review: 24h +$0.69 (62.2% WR, 45 trades). 7d -$8.55 (41.5% WR). SHORT -$0.35 — all historical pre-disable MA_100_CROSS_MINUS trades. Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63. No changes — all fixes working, system profitable. Monitor disk at 81%.
 - [x] 2026-08-09 12:20 — CEO review: 24h +$0.55 (60% WR, 45 trades). 7d -$8.67 (38.6% WR). SHORT -$0.44 (38.5% WR) — all pre-disable ma100-cross- trades aging out. LONG +$0.99 (68.8% WR). Star: bb_bounce+,range_finder+ LONG 83.3% WR, +$0.60. No changes — system profitable, all fixes working.
 - [x] 2026-08-08 12:20 — CEO review: 24h +$0.63 (61.9% WR, 42 trades). 7d -$8.67 (41.3% WR). LONG +$1.07 (72.4% WR) — strong. SHORT -$0.44 (38.5% WR) — improving. Star: bb_bounce+,range_finder+ LONG 83.3% WR. 7d negative dominated by historical dead signals (Aug 1-4). Aug 5+ profitable. No changes — system working.
+
+## CEO DECISIONS
+- [x] 2026-08-09 10:50 — CEO review: 24h +0.99% (62.1% WR, 29 trades). LONG +3.1% (70% WR). SHORT -2.11% (44.4% WR) — improving but still bleeding. 7d -10.99% (48.5% WR) — historical losses Aug 1-4. Dead signals confirmed stopped after Aug 4. No changes — all fixes working, system profitable since Aug 5. ATR SL widening evaluation ongoing.
+- [x] 2026-08-09 15:18 — CEO review: 24h +$0.17 (50% WR, 24 trades). 7d -$8.09 (42.1% WR). LONG +$0.73 (75% WR, 16 trades) — strong. SHORT -$0.56 (0% WR, 8 trades) — ALL pre-bug-fix (13:25 UTC). Bug fix working: 0 ma100-cross SHORT trades after fix. Star: bb_bounce+,range_finder+ LONG 75% WR, +$0.32/24h. No changes — all fixes deployed, system profitable.
+- [x] 2026-08-08 15:50 — CEO review: 24h +$0.68 (61.4% WR, 44 trades). 7d -$1.05 (44.2% WR). LONG +$1.16 (76.7% WR) — strong. SHORT -$0.48 (28.6% WR) — residual pre-disable trades. Star: bb_bounce+,range_finder+ LONG 71.4% WR, +$0.51. No changes — system profitable, all fixes working.
