@@ -90,9 +90,9 @@ def _count_band_touches(closes, upper, lower, window=TOUCH_WINDOW):
     upper_touches = 0
     lower_touches = 0
     for c in recent:
-        if abs(c - upper) / upper < 0.01:
+        if upper > 0 and abs(c - upper) / upper < 0.01:
             upper_touches += 1
-        if abs(c - lower) / lower < 0.01:
+        if lower > 0 and abs(c - lower) / lower < 0.01:
             lower_touches += 1
     return upper_touches, lower_touches
 
@@ -285,13 +285,14 @@ def detect_range_short(token, closes):
     if bounce_pct < BOUNCE_MIN_PCT:
         return None
 
-    # Volume confirmation
+    # Volume confirmation — required, fail-closed
     vol_avg = _get_volume_avg(token)
     vol_current = _get_current_volume(token)
-    if vol_avg and vol_avg > 0 and vol_current is not None:
-        vol_ratio = vol_current / vol_avg
-        if vol_ratio < MIN_VOLUME_RATIO:
-            return None
+    if not vol_avg or vol_avg <= 0 or vol_current is None:
+        return None  # No volume data — can't confirm, skip
+    vol_ratio = vol_current / vol_avg
+    if vol_ratio < MIN_VOLUME_RATIO:
+        return None
 
     # Confidence: touches + range width + trend alignment
     touch_bonus = min(20, total_touches * 3)
