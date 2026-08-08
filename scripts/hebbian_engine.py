@@ -527,15 +527,19 @@ class HebbianEngine:
         return {'wr': wr, 'profit_n': profit_n, 'sl_n': sl_n, 'ratio': ratio}
 
     def composite_score(self, token, signal):
-        """Composite confidence score (0-1). >0.65 auto-approve, <0.35 auto-reject."""
-        # 1. Decayed WR (weight: 0.5)
+        """Composite confidence score (0-1). >0.65 auto-approve, <0.35 auto-reject.
+        
+        Weights: decayed_wr=0.45, exit_quality=0.20, token_wr=0.15, 
+                 combo_parts=0.15, hour_of_day=0.05
+        """
+        # 1. Decayed WR (weight: 0.45)
         dec = self.decayed_wr_estimate(token, signal)
         if not dec:
             d = 'LONG' if '+' in (signal or '') else 'SHORT'
             dec = self.decayed_wr_estimate(d, signal)
         wr_score = dec[0] if dec else 0.5
 
-        # 2. Exit quality (weight: 0.2)
+        # 2. Exit quality (weight: 0.20)
         eq = self.exit_quality_score(signal)
         if eq['profit_n'] + eq['sl_n'] >= 3:
             if eq['ratio'] > 2.0:
@@ -547,16 +551,36 @@ class HebbianEngine:
         else:
             exit_score = 0.5
 
-        # 3. Token WR (weight: 0.2)
+        # 3. Token WR (weight: 0.15)
         tw = self.token_overall_wr(token)
         token_score = min(1.0, tw['wr']) if tw else 0.5
 
-        # 4. Combo parts (weight: 0.1)
+        # 4. Combo parts (weight: 0.15)
         parts = self.combo_part_wr(token, signal)
         combo_score = sum(p[1] for p in parts) / len(parts) if len(parts) >= 2 else 0.5
 
-        composite = wr_score * 0.5 + exit_score * 0.2 + token_score * 0.2 + combo_score * 0.1
-        return (composite, {'wr': wr_score, 'exit': exit_score, 'token': token_score, 'combo': combo_score})
+        # 5. Hour-of-day (weight: 0.05)
+        # Best hours: 06-07, 12 (54% WR). Worst: 00, 09, 17 (34-37% WR)
+        hour_score = 0.5  # default
+        try:
+            from datetime import datetime, timezone
+            now = datetime.now(timezone.utc)
+            h = now.hour
+            if h in (6, 7, 12):
+                hour_score = 0.8  # best hours
+            elif h in (3, 14, 15):
+                hour_score = 0.65  # good hours
+            elif h in (0, 9, 17, 20):
+                hour_score = 0.3  # worst hours
+            elif h in (10, 11):
+                hour_score = 0.4  # below average
+        except Exception:
+            pass
+
+        composite = (wr_score * 0.45 + exit_score * 0.20 + token_score * 0.15 + 
+                     combo_score * 0.15 + hour_score * 0.05)
+        return (composite, {'wr': wr_score, 'exit': exit_score, 'token': token_score, 
+                           'combo': combo_score, 'hour': hour_score})
 
 
     def recall(
