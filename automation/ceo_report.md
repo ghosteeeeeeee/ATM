@@ -81,3 +81,54 @@ After implementation:
 **Decision: 0.65**
 
 The circuit breaker equalizes downside risk — both 0.65 and 0.70 have W27 at 47% WR, meaning the worst-case week looks identical. The upside of 0.65 is 50% auto-decisions vs 39%, which means 28% more learning data for the self-learner to improve token WR estimates. The total PnL difference is $28 ($679 vs $651) — noise. Production gets 0.65. If the self-learner shows WR degradation after 48 hours, we can tighten to 0.70. Start aggressive, retreat only on evidence.
+
+---
+
+## Hebbian Insights — Full Analysis (2026-08-08)
+
+### Composite Gate Performance (excluding accel-300, 520 trades)
+- AUTO-APPROVE: 242 (46.5%), 82% WR, +$84.66
+- AUTO-REJECT: 65 (12.5%), 100% WR, -$30.09
+- ESCALATE: 213 (41.0%), 18% WR, -$53.67
+
+### Key Edges
+
+**1. Combo signals outperform single signals**
+- Combo: 61% WR, 83% auto-approve rate
+- Single: 40% WR, 42% auto-approve rate
+- **Action:** Increase combo weight in composite scoring from 0.1 to 0.15
+
+**2. Leverage: 5x > 3x**
+- 5x: 53% auto, +$0.81 PnL
+- 3x: 39% auto, +$0.09 PnL
+- **Action:** Add leverage score to composite (5x → +0.05 boost)
+
+**3. Best tokens (by token↔exit_profit synapse)**
+- BSV, GRIFFAIN, SKR, 2Z, BLUR — all at max weight (100)
+- These tokens consistently exit profitably
+
+**4. Hour-of-day edge**
+- Best hours: 06:00-07:00 (54% WR), 12:00 (54% WR)
+- Worst hours: 00:00 (37% WR), 09:00 (37% WR), 17:00 (34% WR)
+- **Action:** Consider hour-based confidence adjustment
+
+**5. Day-of-week edge**
+- Friday: 49% WR (best), Sunday/Monday: 41% (worst)
+- Minimal impact, not worth automating
+
+**6. Top winning signals**
+- `bb_bounce,hzscore+`: 100% WR (5T)
+- `bb_bounce+,range_finder+`: 75% WR (8T)
+- `hzscore+,return_exhaustion_long`: 67% WR (12T)
+- `ma100-cross,vortex_break_long`: 75% WR (8T)
+
+**7. ATR SL hits are the biggest loss driver**
+- 294T, 27% auto rate, -$82.86
+- Gate correctly keeps these at low auto rate
+
+### Recommendations
+
+1. **Boost combo weight** in composite scoring (0.1 → 0.15) — combos clearly outperform
+2. **Add hour-of-day factor** — boost during 06-07 and 12 UTC, penalize during 00 and 17 UTC
+3. **Keep 0.65 threshold** — circuit breaker handles bad weeks
+4. **Monitor ATR SL hit rate** — if it increases, may need tighter stops

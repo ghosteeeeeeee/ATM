@@ -551,8 +551,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             has_pct_neg    = 'pct-hermes-'  in source_parts
             has_ma5m_pos   = 'ma-cross-5m+' in source_parts
             has_trend_pos  = 'trend_purity+' in source_parts
-            has_ma100      = 'ma100-cross'  in source_parts
-            has_bb_bounce  = 'bb_bounce'    in source_parts
+            has_ma100      = any(p.startswith('ma100-cross') for p in source_parts)
+            has_bb_bounce  = any(p.startswith('bb_bounce') for p in source_parts)
             has_re_neg     = 'return_exhaustion-' in source_parts
 
             # ── LONG poison blocks ──────────────────────────────────────────────
