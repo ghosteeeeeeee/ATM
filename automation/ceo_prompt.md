@@ -61,6 +61,23 @@ cat automation/recent_changes.log
 - `ROTATOR_PROTECTED_FLAGS` — prevents stale data kills
 - Any flag in `CEO_PROTECTED_FLAGS` dict in hermes_constants.py
 
+## MEASURABLE GOALS (update each run)
+
+Before making changes, set a specific goal:
+
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate | X% | X+3% | 24h |
+| Phantom trades | X | 0 | 48h |
+| SHORT PnL | -$X | $0 | 72h |
+
+After making changes, report:
+- What was the metric before?
+- What changed?
+- What's the expected impact?
+
+**Rule: If you can't measure it, don't change it.**
+
 ## STEP-BY-STEP WORKFLOW
 
 ### Step 1: Read Team Updates (MANDATORY)

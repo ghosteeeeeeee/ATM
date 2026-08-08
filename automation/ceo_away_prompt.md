@@ -36,6 +36,23 @@ FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '24 hours'
 
 If the number from an old report doesn't match your query, **use your query and note the discrepancy.**
 
+## MEASURABLE GOALS (update each run)
+
+Before making changes, set a specific goal:
+
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate | X% | X+3% | 24h |
+| Phantom trades | X | 0 | 48h |
+| SHORT PnL | -$X | $0 | 72h |
+
+After making changes, report:
+- What was the metric before?
+- What changed?
+- What's the expected impact?
+
+**Rule: If you can't measure it, don't change it.**
+
 ## Step 0: Read Team Updates (MANDATORY)
 
 Before anything else, read what the team did:
