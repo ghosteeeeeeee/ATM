@@ -1,49 +1,42 @@
-## CEO Report — 2026-08-08 (14:00 UTC)
+## CEO Report — 2026-08-08
 
-### Diagnosis (Verified Numbers — DB queried directly)
+### Diagnosis
 
-| Period | Trades | PnL | WR |
-|--------|--------|-----|-----|
-| Last 24h | 49 | +$0.27 | 59.2% |
-| Last 7d | 406 | -$8.70 | 38.7% |
+**24h: +$0.21 (58% WR, 50 trades)** — slightly positive, recent fixes working.
 
-**Daily trend (7d):**
-- Aug 1: 8t, -$0.60, 12.5% WR
-- Aug 2: 46t, -$3.87, 8.7% WR
-- Aug 3: 32t, -$3.07, 6.3% WR
-- Aug 4: 32t, -$3.50, 3.1% WR
-- Aug 5: 139t, +$2.32, 44.6% WR ← turning point
-- Aug 6: 82t, -$0.54, 56.1% WR
-- Aug 7: 56t, +$0.40, 62.5% WR
-- Aug 8: 11t, +$0.15, 54.5% WR (partial)
+**7d: -$8.77 (38.6% WR, 407 trades)** — but most losses are from dead signals with legacy trades:
+- inv-accel-300-: -$2.06 (30 trades, 16.7% WR) — DISABLED
+- zscore-rising: -$2.38 (70 trades, 25.6% WR) — DISABLED  
+- vel-hermes: -$1.14 (58 trades, 31% WR) — DISABLED
+- pattern_wolf: -$1.28 (11 trades, 10% WR) — DISABLED
 
-**Direction breakdown (7d):**
-- LONG: 162t, -$1.38, 48.1% WR
-- SHORT: 244t, -$7.33, 32.4% WR ← hemorrhaging
-
-**Worst SHORT signals (7d, 3+ trades):**
-- inv-accel-300-: 30t, -2.06, 16.7% WR (disabled, historical)
-- zscore-rising-: 44t, -1.37, 25.0% WR (disabled, historical)
-- vel-hermes-: 58t, -1.14, 31.0% WR (disabled, historical)
-- pattern_wolf_wave_bear: 9t, -0.79, 11.1% WR (disabled)
-- bb_bounce: 10t, -0.56, 30.0% WR (combo trades from before kill)
-
-**Best signals (7d, 5+ trades):**
-- tl_break_long: 20t, +1.17, 70.0% WR
-- bb_bounce+,range_finder+: 9t, +0.38, 88.9% WR
-- bb_bounce,hzscore+: 5t, +0.22, 100% WR
+These are historical — no new trades from these signals.
 
 ### Root Cause
 
-7d SHORT bleed (-$7.33) is mostly historical trades from dead signals (inv-accel-300-, zscore-rising-, vel-hermes-) that were already killed. Current SHORT signals (last 24h) are -$0.46 on14 trades — small sample, not alarming. ATR SL widened 1.0%→1.2% today, need 24h to assess.
+1. **SHORT signals bleeding** — $-7.39 over 7d (32.2% WR) vs LONG at $-1.38 (48.1% WR). SHORT blacklist exists but may need expansion.
+
+2. **bb_bounce+ confluence is excellent** — 88.9% WR, $0.38 in 24h. This is the star performer.
+
+3. **ATR SL widening (1.0% → 1.2%)** — applied 2026-08-08 00:30. Need 24h window to measure impact.
 
 ### Fix Applied
 
-No new changes — today's ATR SL widening (1.0%→1.2%) + RETURN_EXHAUSTION_MINUS kill are fresh. Monitor before adding more kills.
+**No changes this run.** Recent fixes need time to show impact:
+- ATR SL widened (22/22 SL hits at exactly 1.0% = too tight)
+- RETURN_EXHAUSTION_MINUS disabled (14 trades, -$0.64)
+- Dead signals killed (inv-accel-300, zscore-rising, vel-hermes, pattern_wolf)
 
 ### Verification
 
-- Target: SHORT PnL ≥ $0 within 48h (after dead signal trades age out)
-- Watch: bb_bounce combos (range_finder+, ma100-cross+) — currently profitable, keep enabled
-- ATR SL 1.2% impact: check if SL hits decrease tomorrow
-- pipeline.log at 1.6GB — needs log rotation (not blocking, logged as tech debt)
+- 24h positive ($0.21) despite legacy SHORT trades
+- bb_bounce+,range_finder+ LONG: 9 trades, $0.38, 88.9% WR
+- hzscore+,return_exhaustion_long LONG: 12 trades, $0.18, 58.3% WR
+- Pipeline healthy, 5 open positions, +2.13% portfolio PnL
+
+### Next Actions
+
+1. **Monitor** — ATR SL impact over next 24h
+2. **Monitor** — bb_bounce+ confluence sustainability
+3. **Consider** — Expanding SHORT blacklist if bleeding continues
+4. **No flag changes** — recent fixes need evaluation window

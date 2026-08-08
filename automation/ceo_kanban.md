@@ -9,7 +9,8 @@
 ## CEO DECISIONS
 - [x] 2026-08-08 00:30 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Monitor 24h.
 - [x] 2026-08-08 00:30 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h.
-- [ ] 2026-08-08 14:00 — CEO review: 24h +$0.27 (59.2% WR), 7d -$8.70 (38.7% WR). SHORT still bleeding but most is historical dead signals. No new changes — recent fixes need time to show impact.
+- [x] 2026-08-08 14:00 — CEO review: 24h +$0.27 (59.2% WR), 7d -$8.70 (38.7% WR). SHORT still bleeding but most is historical dead signals. No new changes — recent fixes need time to show impact.
+- [x] 2026-08-08 19:00 — CEO review: 24h +$0.21 (58% WR, 50 trades). 7d -$8.77 (38.6% WR). bb_bounce+ confluence star performer (88.9% WR). No changes — ATR SL widening + signal kills need evaluation window.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
