@@ -164,3 +164,61 @@ All foundational ADRs cover the major architectural decisions already made. No g
 All three quick wins from the transcript mining session are implemented and working. The transcript's remaining ideas (vertical slices, dual-model review, incident→agent pipeline) are correctly classified as "Worth Discussing" or "Future" — they require cultural changes or infrastructure work, not trivial prompt edits.
 
 **Recommendation:** Close these as done. No action needed. Next priority should be the "Worth Discussing" items if we want to push further.
+
+---
+
+## 2026-08-08 — CEO Strategic Assessment: Worth Discussing Proposals
+
+Reviewed three proposals from Ex-NASA transcript (transcript-mining-worth-discussing.md). Current system state: 58% WR, +$2-3/24h, phantom trades fixed, SHORT signals suppressed, confluence required, new signals (continuation, ma_100_cross) in monitoring windows.
+
+### 1. Vertical Slices for Signal Development
+
+**Worth doing NOW?** No. Wait.
+
+**Why:** This is a process improvement for future signal development. We're not building new signals right now — we're tuning existing ones (bb_bounce filters, SHORT suppression, continuation monitoring). When we build the next signal, we can apply vertical slices naturally without a formal process rewrite. The current add-skill workflow works; the integration bugs it describes haven't actually been a problem — our recent signal additions (ma_100_cross, vortex_break, return_exhaustion, continuation) all went end-to-end without horizontal-build integration issues.
+
+**Risk of doing it:** Low. But it's 2-3 hours of skill/ADR work for a process change that solves a problem we don't currently have. Opportunity cost: that time goes to signal decay investigation or SHORT suppression analysis.
+
+**Risk of NOT doing it:** Zero. We'll naturally build vertically when the next signal comes. The "cultural shift" is unnecessary — we already test end-to-end before refining.
+
+**Priority:** LOW. Defer until we actually build a signal and hit integration problems.
+
+### 2. Dual-Model Review
+
+**Worth doing NOW?** No. Wait.
+
+**Why:** Our current review process (bug_hunter + post-change verification) already caught the phantom trade bug, verified the tpsl_utils fix, and cleared the signal direction changes. The proposal adds a second model for "20-30% more critical bugs caught" — but we haven't had a critical bug slip through review in the last 5 code changes. The phantom trade fix (the most critical recent change) went through bug_hunter audit: ALL CLEAR.
+
+**Risk of doing it:** Doubles review time for every critical change (5-10 min extra). Marginal benefit for marginal cost. The opencode-command skill adds a dependency on external model availability.
+
+**Risk of NOT doing it:** Minimal. Single-model review has been sufficient. If we start shipping bugs that slip through, revisit.
+
+**Priority:** LOW. Nice-to-have, not need-to-have. Add when we have evidence of review gaps.
+
+### 3. Incident → Agent Pipeline
+
+**Worth doing NOW?** No. Wait.
+
+**Why:** The health monitor already auto-fixes simple issues (restarts, retries). The complex issues that "sit for 4-8 hours" are the ones that need human judgment — phantom trades, code bugs, signal logic errors. An agent that "applies minimal fix" to a phantom trade bug would likely make it worse. The proposal's own rules ("max 1 code change per incident", "never change locked params", "escalate architecture changes") basically describe what the CEO already does, just faster and with less context.
+
+**Risk of doing it:** HIGH. An auto-fixing agent that touches code without full context is a liability. The "max 1 code change" guard helps but doesn't prevent bad fixes. A wrong auto-fix at 3am could compound the original error.
+
+**Risk of NOT doing it:** Errors sit longer, but they get fixed correctly. The 4-8 hour delay is the price of human judgment. Worth it for a live trading system.
+
+**Priority:** LOW. The real bottleneck is diagnosis time, not routing time. If we want faster resolution, invest in better error context (structured error logs, automatic root-cause hints) rather than auto-fixing agents.
+
+### What's MORE Important Right Now
+
+The proposals are process improvements. The system has process working. What's NOT working:
+
+1. **Signal decay pattern** — Every signal follows strong WR (40-80%) → 0% within 24-48h. This is the $354 loss source (7d report). No process improvement fixes this. Investigation needed: is it market regime shift, overfitting to recent data, or sample size illusion? This is the #1 priority.
+
+2. **SHORT signal suppression validation** — We suppressed 4 SHORT combos at 0.5-0.6 weight on Aug 7. Need 48h data to confirm it's actually improving net PnL. If SHORT suppression doesn't move the needle, consider disabling the worst offenders entirely (inv-accel-300- at 31% WR).
+
+3. **continuation signal first 10 trades** — New signal, 65% WR backtested. Needs live validation. If it holds, it's the first signal designed around exits (re-entry after profit-monster close) rather than entries.
+
+4. **bb_bounce tighter filters** — RSI tightened to 40/60, BOUNCE_MIN_PCT raised to 0.05. 48h monitoring window. If standalone WR stays <40%, reduce confidence weight in compactor.
+
+**Bottom line:** The proposals solve problems we don't have (integration bugs, review gaps, slow error routing). The problems we DO have (signal decay, SHORT underperformance, new signal validation) are analytical, not procedural. Invest time in understanding WHY signals degrade, not in how we build them faster.
+
+**Recommendation:** Defer all three proposals. Revisit in 2 weeks if signal decay is resolved and we're building new signals regularly. Current priority: signal decay investigation + SHORT suppression validation + continuation monitoring.
