@@ -1283,7 +1283,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '1h'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.0997 # EMA spread % for neutral zone (allow both)
+TREND_FILTER_NEUTRAL_PCT = 0.5  # EMA spread % for neutral zone (allow both) — widened to allow SHORT in weak BULLISH
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
