@@ -9,6 +9,7 @@
 ## CEO DECISIONS
 - [x] 2026-08-08 00:30 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Monitor 24h.
 - [x] 2026-08-08 00:30 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h.
+- [x] 2026-08-08 13:25 — BUG FIX: Compactor disabled-component bug. signal_compactor.py re-inserted preserved entries with disabled components (e.g. ma100-cross- when MA_100_CROSS_MINUS_ENABLED=False). Added is_component_disabled() helper + 4 guard points in compactor. Root cause: compactor bypassed add_signal() Layer 2 ENABLED checks.
 - [x] 2026-08-08 14:00 — CEO review: 24h +$0.27 (59.2% WR), 7d -$8.70 (38.7% WR). SHORT still bleeding but most is historical dead signals. No new changes — recent fixes need time to show impact.
 - [x] 2026-08-08 19:00 — CEO review: 24h +$0.21 (58% WR, 50 trades). 7d -$8.77 (38.6% WR). bb_bounce+ confluence star performer (88.9% WR). No changes — ATR SL widening + signal kills need evaluation window.
 - [x] 2026-08-08 22:00 — CEO review: 24h +$0.18 (57.1% WR, 49 trades). 7d -$8.77 (41.3% WR). SHORT still bleeding (-$0.52/24h, -$7.39/7d) but improving. Dead signals verified killed (inv-accel, vel-hermes, pattern, zscore_rising). No new changes — ATR SL widening + signal kills need more time. bb_bounce+,range_finder+ LONG = star (88.9% WR, +$0.38/24h).

@@ -997,7 +997,7 @@ BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = True
 RANGE_FINDER_PLUS_ENABLED = True     # range_finder+ LONG (buy support)
-RANGE_FINDER_MINUS_ENABLED = True    # range_finder- SHORT (sell resistance)
+RANGE_FINDER_MINUS_ENABLED = False   # SIGNAL REPORTER 2026-08-08 — 40% WR, -$0.19 (5 trades 7d). ma100-cross-,range_finder- bleeding.
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
@@ -1295,7 +1295,7 @@ DECISION_LOG_CACHE_TTL = 300
 # Catches trend inception via VI crossover + ADX strength filter.
 VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 VORTEX_BREAK_PLUS_ENABLED = True    # vortex_break+ LONG
-VORTEX_BREAK_MINUS_ENABLED = True   # vortex_break- SHORT
+VORTEX_BREAK_MINUS_ENABLED = False  # SIGNAL REPORTER 2026-08-08 — 25% WR, -$0.15 (4 trades 7d) in ma100-cross-,vortex_break_short compound.
 VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for paper testing
 
 # ── Return Exhaustion Signal (NEW 2026-08-05) ────────────────────────────────

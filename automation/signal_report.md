@@ -1,81 +1,66 @@
-# Signal Performance Report
-**Generated:** 2026-08-08 08:05 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-08-08 14:00 UTC
 
-## Overall Stats
-- **24h:** 51 trades | 52.9% WR | +$0.09 PnL
-- **7d:** 342 trades | 43.6% WR | -$1.31 PnL
+Period: Last 6h | 24h | 7d
 
 ---
 
-## ACTIONS TAKEN
+## KILLED (executed)
 
-### Suppressed (source weight 0.15)
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Action |
-|--------|-----|-------|--------|---------|--------|
-| bb_bounce,ma100-cross | LONG | 5 | 20.0% | -$0.21 | **Weight 0.15** — COSIG-GATE miss, source weight kills it |
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| range_finder- | SHORT | 40.0% | -$0.19 | 5 (7d) | DISABLED — compound ma100-cross-,range_finder- bleeding |
+| vortex_break_short | SHORT | 25.0% | -$0.15 | 4 (7d) | DISABLED — compound ma100-cross-,vortex_break_short bleeding |
 
-### Suppressed (source weight 0.5)
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Action |
-|--------|-----|-------|--------|---------|--------|
-| bb_bounce,range_finder | LONG | 6 | 33.3% | -$0.03 | **Weight 0.5** — marginal loser, reduced |
+## ALREADY DISABLED (confirmed dead)
 
----
+| Signal | Dir | WR | PnL | Trades | Killed |
+|--------|-----|-----|-----|--------|--------|
+| inv-accel-300- | SHORT | 26.7% | -$0.33 | 15 (7d) | 2026-08-04 (NEVER_REENABLE) |
+| zscore-rising- | SHORT | 31.6% | -$0.22 | 38 (7d) | 2026-08-07 |
+| hzscore- | SHORT | 15.8% | -$53.50 | 76 (7d) | 2026-08-07 |
+| return_exhaustion- | SHORT | 14 trades | -$0.64 | combos | 2026-08-08 |
+| ma100-cross- | SHORT | 40.0% | -$0.31 | 24h | 2026-08-08 |
+| vel-hermes- | SHORT | 34.6% | -$0.06 | 52 (7d) | signal_decay_detector |
+| bb_bounce- | SHORT | 40.0% | -$4.61% | 7d | 2026-08-07 |
+| pattern_wolf_wave_bear | SHORT | 20.0% | -$0.16 | 5 (7d) | 2026-08-05 |
+| pattern_scanner | SHORT | 0.0% | -$0.14 | 3 (7d) | permanently dead |
 
-## WINNERS (24h)
+## WATCH LIST
 
-| Signal | Dir | T | WR | PnL | Status |
-|--------|-----|---|-----|-----|--------|
-| bb_bounce+,range_finder+ | LONG | 9 | 77.8% | +$0.31 | ENABLED — best performer |
-| bb_bounce+,ma100-cross+ | LONG | 3 | 66.7% | +$0.06 | ENABLED |
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pct-hermes- | SHORT | 33.3% | -$0.03 | 3 (7d) | Borderline — best SHORT in combos (hzscore+,pct-hermes-,vel-hermes-). Monitor. |
+| return_exhaustion-,vortex_break_short | SHORT | 66.7% | +$0.01 | 3 (7d) | OK — vortex_break SHORT now disabled, won't fire |
 
----
+## WINNERS
 
-## LOSERS (24h, not yet killed)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb_bounce+,range_finder+ | LONG | 75.0% | +$0.51 | 12 (24h) | HOT — top performer |
+| bb_bounce,hzscore+ | LONG | 100.0% | +$0.20 | 5 (7d) | HOT — perfect WR |
+| bb_bounce | LONG | 80.0% | +$0.15 | 5 (7d) | Strong |
+| hzscore+,return_exhaustion_long | LONG | 58.3% | +$0.13 | 12 (7d) | Solid |
+| bb_bounce+,ma100-cross+ | LONG | 66.7% | +$0.06 | 3 (24h) | OK |
+| ma100-cross+,vortex_break_long | LONG | 62.5% | +$0.08 | 8 (7d) | OK |
+| bb_bounce+,range_finder+ | LONG | 66.7% | +$0.20 | 3 (6h) | Active winner |
 
-| Signal | Dir | T | WR | PnL | Status | Note |
-|--------|-----|---|-----|-----|--------|------|
-| ma100-cross-,range_finder- | SHORT | 5 | 40.0% | -$0.19 | WATCH | 40% WR — above kill threshold |
-| ma100-cross-,mover- | SHORT | 2 | 0.0% | -$0.11 | WATCH | Only 2 trades |
+## 24h OVERALL
 
----
+| Metric | Value |
+|--------|-------|
+| Total trades | 42 |
+| Win rate | 61.9% |
+| Net PnL | +$0.52 |
 
-## SIGNAL INVERSIONS (24h)
+## DIRECTION INVERSIONS
 
-**No inversions found.**
+None found.
 
----
+## NOTES
 
-## 7d BIGGEST LOSERS (already killed/suppressed)
-
-| Signal | Dir | T | WR | PnL | Status |
-|--------|-----|---|-----|-----|--------|
-| inv-accel-300- | SHORT | 15 | 26.7% | -$0.33 | KILLED (NEVER_REENABLE) |
-| ma100-cross,return_exhaustion- | SHORT | 7 | 42.9% | -$0.28 | Suppressed (0.5 weight) |
-| zscore-rising- | SHORT | 38 | 31.6% | -$0.22 | KILLED + Suppressed (0.5) |
-| pattern_wolf_wave_bear | SHORT | 5 | 20.0% | -$0.16 | KILLED (SIGNAL_SOURCE_BLACKLIST) |
-
----
-
-## EXIT REASON ANALYSIS (24h)
-
-| Exit Reason | Count | WR | PnL |
-|-------------|-------|-----|-----|
-| profit-monster-trail | 27 | 100.0% | +$1.42 |
-| atr_sl_hit | 22 | 0.0% | -$1.33 |
-| HL_SL_CLOSED | 1 | 0.0% | $0.00 |
-| profit_monster | 1 | 0.0% | $0.00 |
-
-**Key insight:** profit-monster-trail is the only profitable exit. SL hits account for all losses.
-
----
-
-## RECOMMENDATIONS
-
-1. ~~**DISABLE bb_bounce,ma100-cross LONG**~~ — **DONE** via source weight 0.15
-2. **[WATCH] ma100-cross-,range_finder- SHORT** — 40% WR, -$0.19. Needs 5+ more trades to judge.
-3. **[BOOST] bb_bounce+,range_finder+ LONG** — 77.8% WR, +$0.31. Already at weight 1.2.
-4. **[NEXT]**: Re-run in 6h. If ma100-cross-,range_finder- drops below 30% WR with 5+ trades, kill it.
-
----
-
-*Report generated by signal_perf_reporter. Source weights updated in signal_compactor.py.*
+- SHORT side is broadly negative. Most SHORT signals are disabled or bleeding.
+- LONG side is carrying the system — bb_bounce+ combinations are consistently profitable.
+- The compound signal name format (e.g. `ma100-cross-,range_finder-`) reflects which signals fired together, not a single signal source.
+- `pct-hermes-` is borderline (33% WR, -$0.03) but appears in the best-performing SHORT combo (hzscore+,pct-hermes-,vel-hermes-). Leaving enabled for now.
+- All kills committed to `scripts/hermes_constants.py`.

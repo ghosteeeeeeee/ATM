@@ -112,3 +112,11 @@
 - **INFO**: 80 signals generated in last hour, 0 errors
 - **INFO**: Regime NEUTRAL — 105/106 tokens neutral, 1 LONG_BIAS (ACE)
 - **AUTO-FIX**: None applied — all issues non-critical
+
+## Error Alerts — 2026-08-08 13:40 UTC
+- **[WARN]** (338x in 6h): `hotset.json is empty — no signals survived compaction` — all-NEUTRAL regime, expected behavior
+- **[WARN]**: Disk at 80% (89G/118G) — approaching 85% threshold
+- **[WARN]**: `hermes-hl-sync-guardian.timer` stale — last fired 1 week 3 days ago, service shows active
+- **INFO**: Pipeline healthy — 5 open, +5.04% PnL, 0 errors last 30min
+- **INFO**: Regime NEUTRAL — 106/106 tokens neutral, 0 signals passing 50% confidence
+- **AUTO-FIX**: None applied — all issues non-critical, pipeline running normally
