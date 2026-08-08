@@ -17,6 +17,7 @@
 - [x] 2026-08-09 09:50 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
 - [x] 2026-08-09 10:20 — CEO review: 24h +$0.71 (65% WR, 40 trades). LONG +$0.91 (65.7% WR). SHORT -$0.20 (bleeding stopped, legacy trades only). Star: bb_bounce+,range_finder+ LONG 83.3% WR, +$0.60. No changes — all fixes working.
 - [x] 2026-08-08 10:50 — CEO review: 24h +$0.52 (58.3% WR, 48 trades). LONG +$0.83 (66.7% WR). SHORT -$0.31 (40% WR). Worst: ma100-cross SHORT combos (0-40% WR). FIX: MA_100_CROSS_MINUS_ENABLED=False. Star: bb_bounce+,range_finder+ LONG 81.8% WR.
+- [x] 2026-08-08 16:50 — CEO review: 24h +$0.54 (62.5% WR, 40 trades). LONG +$1.04 (77.8% WR). SHORT -$0.50 (30.8% WR). 7d -$8.04. Compactor fix verified working — 0 ma100-cross SHORT trades since fix. No changes — all fixes working, evaluation window ongoing.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
@@ -25,6 +26,7 @@
 - [ ] Monitor vortex_break sustained performance
 - [ ] Monitor hzscore+ confluence (100% WR, 5 trades today)
 - [ ] Monitor ATR SL widening impact (24h window)
+- [ ] FIX: hermes-hl-sync-guardian.timer dead since Jul 29 — service running but timer inactive, won't restart on crash
 
 ## IN PROGRESS
 - [x] LIVE TRADING RE-ENABLED — 2026-08-06 02:15 UTC, trailing tightened
