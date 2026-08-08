@@ -1,3 +1,10 @@
+## CEO Report — 2026-08-08 (trend filter fix)
+
+### Acknowledgment
+Trend filter fix deployed. TREND_FILTER_NEUTRAL_PCT widened 0.0997% → 0.5%, allowing SHORT in weak BULLISH trends (~37% more eligible tokens). self_learner PARAM_CONFIG range updated to match. Bug hunter verified — no regressions. Monitoring SHORT impact.
+
+---
+
 ## CEO Report — 2026-08-08 (cut_loser v2 deploy)
 
 ### Acknowledgment
