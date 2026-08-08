@@ -265,11 +265,16 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('vortex_break','ma100-cross,vortex_break_long'):     1.1,  # 8T 62% WR +$0.08
     ('range_finder','ma100-cross,range_finder'):          1.05, # 7T 57% WR +$0.07
     ('bb_bounce',   'bb_bounce+,range_finder+'):          1.2,  # 7T 71% WR +$0.12
-    # ── Combo suppressions (7d data: 2026-08-07) ────────────────────────────
+    # ── Combo suppressions (24h + 7d data: 2026-08-08) ────────────────────────
     ('return_exhaustion_short','return_exhaustion-'):     0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
     ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28
     # zscore-rising- is the biggest volume loser (38T, 32% WR)
     ('zscore_rising_short','zscore-rising-'):             0.5,  # 38T 32% WR -$0.22
+    # LONG poison combos — 24h data: losing money
+    ('bb_bounce',   'bb_bounce,ma100-cross'):             0.15, # 5T 20% WR -$0.21 (24h) — COSIG-GATE miss
+    ('bb_bounce',   'bb_bounce,range_finder'):            0.5,  # 6T 33% WR -$0.03 (24h) — marginal loser
+    # Preserve winning + variants (must come before shorter prefixes)
+    ('bb_bounce',   'bb_bounce,ma100-cross+'):            1.0,  # 3T 67% WR +$0.06 (24h) — keep alive
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
