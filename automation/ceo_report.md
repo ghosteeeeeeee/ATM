@@ -22,3 +22,28 @@ SHORT bleeding is 100% legacy. Today's 9 SHORT losers are ALL pre-disabled signa
 
 ### Decision
 **No changes.** All fixes verified working. Legacy SHORT trades aging out naturally. Evaluation window continues — ATR SL widening + signal kills need 48h+ to fully show impact. Interrupting now delays signal.
+
+---
+
+## Cut Loser Monitor — 2026-08-08 22:00 UTC
+
+### Activity (48h)
+- **3 cut-loser exits**, all LONG, all small losses: LINK (-$0.04), ENS (-$0.02), AAVE (-$0.04)
+- **Total PnL: -$0.10** — minimal damage, cut early as designed
+- **Zero trades with loss > $0.30** — cut_loser catching losers before they grow
+
+### Config Verified
+| Param | Value | Status |
+|-------|-------|--------|
+| CUT_LOSER_ENABLED | True | ✅ |
+| CUT_LOSER_PNL | -2.0% | ✅ unchanged |
+| CL_TIER1 | -1.0% to -0.3%, max 2/wake, skip bottom 10% | ✅ unchanged |
+| CL_TIER2 | -3.0% to -1.0%, max 1/wake, skip bottom 20% | ✅ unchanged |
+
+### Assessment
+Cut_loser is functioning correctly:
+1. **Not cutting winners** — no false positives detected
+2. **Cutting losers fast** — max loss per cut = -$0.04 (well under -3% threshold)
+3. **No config drift** — all params unchanged from baseline
+
+**Action: None needed.** Cut_loser is operating as designed. Monitor continues.
