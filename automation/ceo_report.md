@@ -157,6 +157,22 @@ SHORT improved from -$0.54/24h to expected breakeven after signal kills propagat
 
 ---
 
+## CEO Report — 2026-08-09 (signal_combo_report.py Review)
+
+### Diagnosis
+Reviewed new `signal_combo_report.py`. Read-only analysis tool, safe to run alongside self_learner.
+
+### Feedback
+1. **Useful?** Yes. Categorizes combos into winners/losers/neutral with actionable recommendations. Run daily.
+2. **Run alongside self_learner?** Yes — different concerns (report = visibility, self_learner = action). No conflict.
+3. **Concerns:** SQL f-string interpolation (safe now, fragile later). Thresholds hardcoded vs self_learner's PARAM_CONFIG — potential disagreement on "loser" definition.
+4. **Missing metrics:** Add profit factor (gross wins / gross losses). Sharpe ratio and max drawdown are nice-to-haves but profit factor catches the "55% WR but $0.01 avg PnL" trap in one number.
+
+### Action
+No changes needed. Add profit factor to the query when convenient.
+
+---
+
 ## CEO Report — 2026-08-09 (LONG/SHORT Separation Spec Review)
 
 ### Diagnosis
@@ -205,3 +221,32 @@ Monitor `signal_outcomes` after paper testing. Compare `ma_100_cross_short` WR a
 ### CEO Decision Needed
 - Approve paper testing?
 - Approve vortex_break separation?
+
+---
+
+## CEO Report — 2026-08-09 22:00 UTC
+
+### Diagnosis
+**24h Verified (DB):** 36 trades, +$0.13, 50.0% WR. LONG: +$0.71 (68% WR, 25T). SHORT: -$0.58 (9.1% WR, 11T).
+**7d Verified (DB):** 355 trades, -$1.23, 43.7% WR. LONG: +$0.89 (53.1% WR, 147T). SHORT: -$2.12 (37% WR, 208T).
+**5 open trades:** all LONG, 0 SHORT bleeding.
+**Daily trend:** Aug 2 -$0.78 → Aug 6 -$0.08 → Aug 7 +$0.34 → Aug 8 -$0.01. Improving.
+**Star:** bb_bounce+,range_finder+ LONG: 11T, 81.8% WR, +$0.54/24h.
+**Root cause of SHORT losses:** ALL 11 SHORT trades opened BEFORE compactor fix (13:25 UTC) and signal kills (range_finder-, vortex_break_short, mover-). 0 new SHORTs since fixes deployed. Historical debt aging out.
+
+### Fix Applied
+**No changes.** All previous fixes working:
+1. Compactor disabled-component bug fixed → 0 phantom SHORT trades since 13:25 UTC ✓
+2. range_finder-, vortex_break_short, mover- killed → no new entries ✓
+3. ATR SL widened to 1.2% → long trades surviving longer ✓
+4. Dead signals (inv-accel, vel-hermes, pattern, zscore_rising) killed → 0 trades since ✓
+
+### Verification
+- 0 open SHORT positions (was 5+ before fixes)
+- All 11 SHORT losers opened before fix timestamp
+- LONG win rate: 68% (24h), up from 53% (7d) — trajectory positive
+- System approaching breakeven on 7d (-$1.23 from -$8.77 last week)
+
+### Next
+- Monitor Aug 9 full day for continued profitability
+- 7d PnL should flip positive by tomorrow if LONG WR holds

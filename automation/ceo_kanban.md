@@ -21,6 +21,7 @@
 - [x] 2026-08-08 17:50 — CEO review: 24h +$0.29 (56.8% WR, 37 trades). LONG +$0.87 (76.9% WR). SHORT -$0.58 (9.1% WR — all pre-fix legacy). 7d +$0.43 (55% WR). All 10 losing SHORT trades opened before compactor fix (13:25 UTC) — will age out. Star: bb_bounce+,range_finder+ LONG 76.9% WR. No changes — all fixes working, evaluation ongoing. Monitor disk 81%, hl-sync-guardian stale.
 - [x] 2026-08-09 10:20 — CEO DECISION: LONG/SHORT separation spec reviewed. Proceed with ma_100_cross paper testing only. Keep SL at 1.2% (not 1.0%). Defer vortex_break separation — SHORT already profitable (100% WR, 2 trades). SHORT bleeding root cause: dead signals aging out, not vortex_break/ma_100_cross.
 - [x] 2026-08-09 12:00 — BUG FIX: is_component_disabled() missing 20 signal flags. range_finder-, bb_bounce-, zscore-rising-, inv-accel-300- etc. were disabled via hermes_constants.py but is_component_disabled() had no case for them — compactor let them through. Added 8 signal families (20 flags) to the function. Root cause: is_component_disabled() was written with partial coverage, new signals added without updating it. Verified: all SHORT bleeders now BLOCKED.
+- [x] 2026-08-09 22:00 — CEO review: 24h +$0.13 (50% WR, 36T). LONG +$0.71 (68% WR). SHORT -$0.58 (9.1% WR) — all pre-fix legacy trades. 7d -$1.23 (43.7% WR). 0 open SHORTs. Star: bb_bounce+,range_finder+ LONG 81.8% WR. All fixes verified working — no changes needed.
 
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
@@ -213,6 +214,7 @@
 - [x] 2026-08-09 15:18 — CEO review: 24h +$0.17 (50% WR, 24 trades). 7d -$8.09 (42.1% WR). LONG +$0.73 (75% WR, 16 trades) — strong. SHORT -$0.56 (0% WR, 8 trades) — ALL pre-bug-fix (13:25 UTC). Bug fix working: 0 ma100-cross SHORT trades after fix. Star: bb_bounce+,range_finder+ LONG 75% WR, +$0.32/24h. No changes — all fixes deployed, system profitable.
 - [x] 2026-08-08 15:50 — CEO review: 24h +$0.68 (61.4% WR, 44 trades). 7d -$1.05 (44.2% WR). LONG +$1.16 (76.7% WR) — strong. SHORT -$0.48 (28.6% WR) — residual pre-disable trades. Star: bb_bounce+,range_finder+ LONG 71.4% WR, +$0.51. No changes — system profitable, all fixes working.
 - [x] 2026-08-09 10:50 — CEO review: 24h +$0.62 (60.4% WR, 48 trades). 7d -$8.51 (38.9% WR). SHORT 3d: +$0.38 (44% WR) — no longer bleeding. LONG: +$0.91/24h (65.7% WR). Star: bb_bounce+,range_finder+ LONG 90.9% WR, +$0.63/24h. No changes — all fixes working, system profitable.
+- [x] 2026-08-09 — Reviewed signal_combo_report.py. Useful, run daily. Add profit factor metric. SQL f-strings fragile but safe for now.
 
 ## NEW DIRECTIVE (2026-08-09 — from T)
 
