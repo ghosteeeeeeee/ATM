@@ -1,10 +1,9 @@
-# Pipeline Health Monitor + System Status Dashboard
+# Pipeline Health Monitor + Auto-Fix
 
-You are the system health checker for the Hermes trading bot. Check pipeline health and report status.
+You are the system health checker for Hermes. **Detect problems AND fix them.**
 
 ## Step 1: Pipeline Health (last 30 minutes)
 
-Run these checks:
 ```bash
 # Recent pipeline output
 journalctl -u hermes-pipeline.service --since "30 minutes ago" --no-pager | tail -20
@@ -13,91 +12,79 @@ journalctl -u hermes-pipeline.service --since "30 minutes ago" --no-pager | tail
 journalctl -u hermes-pipeline.service --since "30 minutes ago" --no-pager | grep -i "error\|fail\|exception" | tail -10
 ```
 
-**Check for:**
-- Signals generated (should be >0 in 30min)
-- Hotset status (should have entries if signals exist)
-- Trade execution (any new trades opened/closed)
-- Errors or exceptions
-
-## Step 2: Signal Generation Status
+## Step 2: Quick Status Checks
 
 ```bash
-# Last signal timestamp
-sqlite3 /root/.hermes/data/signals_hermes_runtime.db "SELECT MAX(created_at) FROM signals"
-
-# Signals in last hour
-sqlite3 /root/.hermes/data/signals_hermes_runtime.db "SELECT signal_type, COUNT(*) FROM signals WHERE created_at > datetime('now', '-1 hour') GROUP BY signal_type"
-```
-
-**Alert if:** 0 signals in last hour (may indicate data issue or overly restrictive params)
-
-## Step 3: Active Positions
-
-```bash
-# Check open positions
-journalctl -u hermes-pipeline.service --since "30 minutes ago" --no-pager | grep "Open positions"
-```
-
-## Step 4: System Status Summary
-
-### Timers
-```bash
+# Timers
 systemctl list-timers hermes-* --no-pager
+
+# Services
+systemctl is-active hermes-pipeline.service hermes-hl-sync-guardian.service
+
+# Disk
+df -h / | tail -1
 ```
 
-### Speed Distribution
+## Step 3: Detect Issues
+
+| Issue | Detection | Severity |
+|-------|-----------|----------|
+| Pipeline not running | `systemctl is-active` = inactive | CRITICAL |
+| Position manager crashing | grep "CRASH\|Traceback" in logs | CRITICAL |
+| 0 signals in last hour | Query signal DB | WARN |
+| Disk >85% | `df -h` | WARN |
+| Timer not firing | `systemctl list-timers` shows missed | WARN |
+| Phantom trades | `atr_sl_hit` with <0.01% PnL | WARN |
+| Prices stale >5min | Compare latest price timestamp to now | WARN |
+
+## Step 4: Auto-Fix What You Can
+
+### Pipeline crashed → Restart
 ```bash
-cd /root/.hermes/scripts && python3 -c "
-import sqlite3
-from paths import RUNTIME_DB
-conn = sqlite3.connect(RUNTIME_DB)
-cur = conn.cursor()
-cur.execute('SELECT COUNT(*) FROM token_speeds WHERE speed_percentile >= 50')
-above_50 = cur.fetchone()[0]
-cur.execute('SELECT COUNT(*) FROM token_speeds')
-total = cur.fetchone()[0]
-cur.close()
-conn.close()
-print(f'Speed: {above_50}/{total} tokens >= 50% ({above_50/total*100:.0f}%)')
-"
+systemctl restart hermes-pipeline.service
 ```
 
-### Regime Distribution
+### Position manager crashing → Check error, restart
 ```bash
-cat /var/www/hermes/data/regime_5m.json | python3 -c "
-import json,sys
-d = json.load(sys.stdin)
-agg = d.get('aggregate', {})
-print(f'Regime: {agg.get(\"long_bias\",0)} LONG / {agg.get(\"short_bias\",0)} SHORT / {agg.get(\"neutral\",0)} NEUTRAL')
-"
+journalctl -u hermes-pipeline.service --since "10 minutes ago" --no-pager | grep -A 5 "Traceback"
+systemctl restart hermes-pipeline.service
 ```
 
-### Blacklist Status
+### Disk full → Clean old logs
 ```bash
-cd /root/.hermes/scripts && python3 -c "
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
-print(f'Blacklist: {len(SHORT_BLACKLIST)} SHORT / {len(LONG_BLACKLIST)} LONG')
-"
+# Find large files
+du -sh /root/.hermes/logs/* | sort -rh | head -5
+# Compress old logs
+find /root/.hermes/logs -name "*.log" -mtime +7 -exec gzip {} \;
 ```
 
-### Price Data
+### Timer missed → Force run
 ```bash
-sqlite3 /root/.hermes/data/signals_hermes.db "SELECT COUNT(*) FROM latest_prices"
+systemctl start hermes-pipeline.service
 ```
 
-## Step 5: Report Format
+### Phantom trades detected → Log for CEO
+Add to `automation/error_alerts.md`:
+```
+## Phantom Trades Detected — [timestamp]
+- [trade details]
+- Root cause: [atrs_sl hit with near-zero PnL]
+- Action needed: Check tpsl_utils.py
+```
 
-Output a compact status report:
+## Step 5: Report
+
+Output a compact status:
 
 ```
-=== Hermes Health Report ===
+=== Health Report ===
 Time: YYYY-MM-DD HH:MM UTC
 
 PIPELINE: [OK/WARN/ERROR]
+- Status: [running/crashed]
 - Signals (1h): X generated
-- Hotset: X tokens
 - Trades: X open, X closed today
-- Errors: X (or None)
+- Errors: X
 
 MARKET:
 - Regime: X LONG / X SHORT / X NEUTRAL
@@ -105,25 +92,30 @@ MARKET:
 
 SYSTEM:
 - Timers: X active
+- Disk: X% used
 - Prices: X tokens
-- Blacklist: X SHORT / X LONG
 
-LAST AUTO-1HR: [time] — [brief summary of changes]
+AUTO-FIXES APPLIED:
+- [fix 1]
+- [fix 2]
+
+ALERTS:
+- [alert 1]
 ```
 
-## Step 6: Alert Conditions
+## Step 6: Log to Error Alerts
 
-If any of these are true, flag as WARN or ERROR:
-- 0 signals in last hour → WARN (check signal generation)
-- Pipeline errors → ERROR
-- Timer not running → ERROR
-- Price data stale (>5min) → WARN
-- 0 tokens with speed >= 50% → WARN (market too quiet)
+If any WARN or CRITICAL issue found, append to `automation/error_alerts.md`:
+
+```markdown
+## Error Alerts — YYYY-MM-DD HH:MM UTC
+- **[SEVERITY]** (Nx): `[error pattern]`
+- **AUTO-FIX**: [what was done]
+```
 
 ## Key File Paths
 - Pipeline logs: `journalctl -u hermes-pipeline.service`
+- Error alerts: `automation/error_alerts.md`
 - Signal DB: `data/signals_hermes_runtime.db`
-- Price DB: `data/signals_hermes.db`
 - Speed DB: via RUNTIME_DB
 - Regime: `/var/www/hermes/data/regime_5m.json`
-- Constants: `scripts/hermes_constants.py`

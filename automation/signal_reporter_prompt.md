@@ -1,118 +1,131 @@
 # Signal Performance Reporter
 
-You are analyzing signal performance for the Hermes trading system. Run every 6 hours.
+You are analyzing signal performance for the Hermes trading system. Run every 6 hours. **Act on findings, don't just report.**
 
-## Step 1: Query Signal Outcomes (last 6h and 24h)
+## Step 1: Verify Numbers (MANDATORY)
 
-```sql
--- Signal type performance (last 6h)
-SELECT signal_type, direction, COUNT(*) trades, SUM(is_win) wins,
-       ROUND(CAST(SUM(is_win) AS FLOAT)/COUNT(*)*100, 1) wr,
-       ROUND(SUM(pnl_pct), 2) total_pnl,
-       ROUND(AVG(pnl_pct), 3) avg_pnl
-FROM signal_outcomes 
-WHERE created_at > datetime('now', '-6 hours')
-GROUP BY signal_type, direction 
-HAVING COUNT(*) >= 2
-ORDER BY total_pnl DESC;
-
--- Signal type performance (last 24h)
-SELECT signal_type, direction, COUNT(*) trades, SUM(is_win) wins,
-       ROUND(CAST(SUM(is_win) AS FLOAT)/COUNT(*)*100, 1) wr,
-       ROUND(SUM(pnl_pct), 2) total_pnl,
-       ROUND(AVG(pnl_pct), 3) avg_pnl
-FROM signal_outcomes 
-WHERE created_at > datetime('now', '-24 hours')
-GROUP BY signal_type, direction 
-HAVING COUNT(*) >= 3
-ORDER BY total_pnl DESC;
-```
-
-Run against: `data/signals_hermes_runtime.db`
-
-## Step 2: Identify Winners and Losers
-
-### Losers (candidates for disabling)
-Flag signals that meet ALL of these criteria:
-- WR < 30% (over 5+ trades)
-- Total PnL < -2%
-- Active for > 24h (not just bad luck)
-
-### Winners (candidates for boosting)
-Flag signals that meet ALL of these criteria:
-- WR > 55% (over 5+ trades)
-- Total PnL > 0
-- Consistent across timeframes
-
-### Marginal (watch list)
-- WR 30-50% with small sample size
-- Mixed results across directions
-
-## Step 3: Check Signal Enabled Status
+**Never trust old reports. Query the DB yourself.**
 
 ```python
-from hermes_constants import (
-    TL_BREAK_ENABLED, BOLLINGER_SQUEEZE_ENABLED,
-    ACCEL_300_ENABLED, INVERSE_ACCEL_300_ENABLED,
-    # ... etc
-)
+import psycopg2
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+cur = conn.cursor()
+
+# Last 6h performance by signal+direction
+cur.execute("""
+    SELECT signal, direction, COUNT(*) as trades, 
+           ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+           ROUND(SUM(pnl_usdt),2) as pnl
+    FROM trades 
+    WHERE close_time > NOW() - INTERVAL '6 hours' AND status = 'closed'
+    GROUP BY signal, direction 
+    HAVING COUNT(*) >= 2
+    ORDER BY pnl
+""")
+print("=== 6h Performance ===")
+for r in cur.fetchall():
+    print(r)
+
+# Last 24h performance by signal+direction
+cur.execute("""
+    SELECT signal, direction, COUNT(*) as trades, 
+           ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+           ROUND(SUM(pnl_usdt),2) as pnl
+    FROM trades 
+    WHERE close_time > NOW() - INTERVAL '24 hours' AND status = 'closed'
+    GROUP BY signal, direction 
+    HAVING COUNT(*) >= 3
+    ORDER BY pnl
+""")
+print("\n=== 24h Performance ===")
+for r in cur.fetchall():
+    print(r)
+conn.close()
 ```
 
-Compare performance against enabled/disabled status.
+## Step 2: Identify Kill Candidates
 
-## Step 4: Recommendations
+**Kill immediately if ALL of these are true:**
+- WR < 30% with 5+ trades (24h)
+- Net PnL < -$0.10 (24h)
+- Signal has been active > 24h (not just bad luck)
 
-For each signal, recommend:
-- **KEEP** — performing well, leave enabled
-- **DISABLE** — performing poorly, should be disabled
-- **WATCH** — needs more data before decision
-- **TUNE** — params need adjustment (not signal itself)
+**Candidates for tuning if:**
+- WR 30-40% with 10+ trades
+- Net PnL negative but small losses per trade
 
-## Step 5: Report Format
+## Step 3: Execute Kills
+
+**You can disable signals directly** — don't wait for CEO approval on clear losers.
+
+```python
+# Check current status
+import sys
+sys.path.insert(0, '/root/.hermes/scripts')
+from hermes_constants import *
+
+# Example: if inv-accel-300- has 0% WR with 10+ trades
+# INVERSE_ACCEL_300_MINUS_ENABLED = False  # Kill it
+```
+
+For each kill:
+1. Edit `scripts/hermes_constants.py` to set `*_ENABLED = False`
+2. Add to `NEVER_REENABLE_FLAGS` if it's a repeat offender
+3. Git commit: `git commit -m "signals: kill [signal] — X% WR, $Y PnL (24h)"`
+
+## Step 4: Identify Boost Candidates
+
+**Boost if ALL of these are true:**
+- WR > 55% with 5+ trades (24h)
+- Net PnL > $0.05 (24h)
+- Consistent across multiple tokens
+
+Boost by increasing confidence weight in `signal_compactor.py` or adding to hot-set priority.
+
+## Step 5: Check for Signal Inversions
+
+```sql
+-- Direction mismatches
+SELECT token, signal, direction, close_reason, pnl_usdt
+FROM trades 
+WHERE close_time > NOW() - INTERVAL '24 hours'
+  AND ((signal LIKE '%long%' AND direction = 'SHORT')
+    OR (signal LIKE '%short%' AND direction = 'LONG'))
+ORDER BY created_at DESC LIMIT 10;
+```
+
+If inversions found → CRITICAL bug, fix immediately.
+
+## Step 6: Report
+
+Write to `automation/signal_report.md`:
 
 ```
 === Signal Performance Report ===
 Period: Last 6h | 24h
 
-WINNERS (WR > 55%, PnL > 0):
-| Signal | Dir | 6h WR | 6h PnL | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|--------|---------|--------|
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
 
-LOSERS (WR < 30%, PnL < -2%):
-| Signal | Dir | 6h WR | 6h PnL | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|--------|---------|--------|
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
 
-MARGINAL (30-50% WR):
-| Signal | Dir | 6h WR | 6h PnL | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|--------|---------|--------|
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
 
-DISABLED BUT GOOD:
-| Signal | Dir | Last WR | Last PnL | Recommendation |
-|--------|-----|---------|----------|----------------|
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
 
-RECOMMENDATIONS:
-1. [ACTION] Signal X — reason
-2. [ACTION] Signal Y — reason
+ISSUES:
+- [any inversions, bugs, or anomalies]
 ```
-
-## Step 6: Check for Signal Inversions
-
-```sql
--- Check for direction mismatches (signal_type says LONG but direction is SHORT)
-SELECT token, signal_type, direction, is_win, pnl_pct, created_at
-FROM signal_outcomes 
-WHERE created_at > datetime('now', '-24 hours')
-AND (
-    (signal_type LIKE '%long%' AND direction = 'SHORT')
-    OR (signal_type LIKE '%short%' AND direction = 'LONG')
-)
-ORDER BY created_at DESC LIMIT 20;
-```
-
-If inversions found, flag as critical issue.
 
 ## Key File Paths
-- Signal outcomes: `data/signals_hermes_runtime.db`
+- Brain DB: PostgreSQL at `/var/run/postgresql/brain`
 - Constants: `scripts/hermes_constants.py`
+- Signal outcomes: `data/signals_hermes_runtime.db`
 - Trading log: `automation/trading_log.md`
-- Health report: append findings to `automation/signal_report.md`
