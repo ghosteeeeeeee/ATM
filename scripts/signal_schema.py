@@ -585,6 +585,63 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
+
+            # ── 5m+15m Regime Confirmation (for SHORT) ────────────────────────
+            # Only block SHORT if BOTH 5m AND 15m confirm BULLISH
+            # This prevents SHORT in strong uptrends while allowing in weak/mixed
+            if direction.upper() == 'SHORT' and not _choch_exempt:
+                try:
+                    import sqlite3 as _sqlite3
+                    from paths import CANDLES_DB
+
+                    def _get_regime(tf, lookback=50):
+                        table = f'candles_{tf}'
+                        _conn = _sqlite3.connect(CANDLES_DB, timeout=5)
+                        try:
+                            _cur = _conn.cursor()
+                            _cur.execute(f"""
+                                SELECT close FROM {table}
+                                WHERE token = ?
+                                ORDER BY ts DESC
+                                LIMIT ?
+                            """, (token.upper(), lookback + 10))
+                            _rows = _cur.fetchall()
+                        finally:
+                            _conn.close()
+
+                        if not _rows or len(_rows) < lookback:
+                            return None
+                        _closes = [r[0] for r in reversed(_rows)]
+
+                        def _ema(data, period):
+                            k = 2 / (period + 1)
+                            val = data[0]
+                            for v in data[1:]:
+                                val = v * k + val * (1 - k)
+                            return val
+
+                        _ema_fast = _ema(_closes, 20)
+                        _ema_slow = _ema(_closes, 50)
+                        if _ema_slow > 0:
+                            _spread = abs(_ema_fast - _ema_slow) / _ema_slow * 100
+                            if _spread < 0.5:
+                                return 'NEUTRAL'
+                            elif _ema_fast > _ema_slow:
+                                return 'BULLISH'
+                            else:
+                                return 'BEARISH'
+                        return None
+
+                    _regime_5m = _get_regime('5m')
+                    _regime_15m = _get_regime('15m')
+
+                    # Block SHORT only if BOTH 5m AND 15m are BULLISH
+                    if _regime_5m == 'BULLISH' and _regime_15m == 'BULLISH':
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
+                              f'5m={_regime_5m} 15m={_regime_15m} [regime_confirmation]', flush=True)
+                        return None
+                except Exception:
+                    pass  # fail open
     except ImportError:
         pass  # hermes_constants not available
 
