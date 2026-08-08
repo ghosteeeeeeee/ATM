@@ -63,13 +63,10 @@ find /root/.hermes/logs -name "*.log" -mtime +7 -exec gzip {} \;
 systemctl start hermes-pipeline.service
 ```
 
-### Phantom trades detected → Log for CEO
-Add to `automation/error_alerts.md`:
-```
-## Phantom Trades Detected — [timestamp]
-- [trade details]
-- Root cause: [atrs_sl hit with near-zero PnL]
-- Action needed: Check tpsl_utils.py
+### Auto-fixes applied → Log to kanban for CEO
+```markdown
+## TEAM UPDATES
+- [YYYY-MM-DD HH:MM] health_monitor: Auto-fixed [issue] — [what was done]
 ```
 
 ## Step 5: Report

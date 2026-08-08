@@ -63,7 +63,21 @@ cat automation/recent_changes.log
 
 ## STEP-BY-STEP WORKFLOW
 
-### Step 1: Verify Numbers (MANDATORY)
+### Step 1: Read Team Updates (MANDATORY)
+**Before anything else, read what the team did:**
+```bash
+head -20 automation/ceo_kanban.md  # TEAM UPDATES section
+cat automation/error_alerts.md | tail -20  # Any alerts
+```
+
+This tells you:
+- What signals were killed/boosted by signal_reporter
+- What auto-fixes health_monitor applied
+- What auto_1hr changed
+
+**Steer based on team activity.** If signal_reporter killed a signal, don't re-enable it. If health_monitor fixed a crash, check if it was a one-time issue.
+
+### Step 2: Verify Numbers (MANDATORY)
 Query the DB for:
 - Last 24h: total trades, PnL, WR
 - Last 7d: daily breakdown

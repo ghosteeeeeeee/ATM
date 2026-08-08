@@ -1,5 +1,11 @@
 # CEO Kanban — Away Mode Tasks
 
+## TEAM UPDATES (read this first)
+<!-- Automations log their actions here. CEO reads this to know what the team did. -->
+<!-- Format: [YYYY-MM-DD HH:MM] automaton: action taken -->
+- [2026-08-08 00:30] signal_reporter: System startup — no kills needed yet
+- [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
+
 ## TODO
 - [x] URGENT: Kill decider permanently — RESOLVED (commit 62c549f, historical records only)
 - [x] URGENT: bb_bounce root cause — RESOLVED (09:50 UTC). Trades were historical pre-fix. Root cause: master flag not checked in bb_bounce.py Layer 1 guard.

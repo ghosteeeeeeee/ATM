@@ -72,6 +72,11 @@ For each kill:
 1. Edit `scripts/hermes_constants.py` to set `*_ENABLED = False`
 2. Add to `NEVER_REENABLE_FLAGS` if it's a repeat offender
 3. Git commit: `git commit -m "signals: kill [signal] — X% WR, $Y PnL (24h)"`
+4. **Report to CEO kanban:**
+```markdown
+## TEAM UPDATES
+- [YYYY-MM-DD HH:MM] signal_reporter: Killed [signal] — [reason]
+```
 
 ## Step 4: Identify Boost Candidates
 

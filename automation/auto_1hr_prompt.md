@@ -81,6 +81,11 @@ Rules:
 - Only change non-locked params
 - Git commit each change
 - Log to `automation/trading_log.md`
+- **Report to CEO kanban:**
+```markdown
+## TEAM UPDATES
+- [YYYY-MM-DD HH:MM] auto_1hr: [what was changed] — [why]
+```
 
 ## Step 6: Document
 

@@ -114,7 +114,7 @@ After implementation:
 
 ### Phase 5: Report
 
-Generate daily report:
+Generate daily report and **update CEO kanban with team activity:**
 
 ```
 === Daily Orchestrator Report ===
@@ -126,14 +126,12 @@ PIPELINE STATUS:
 - PnL: X%
 - Current: X open
 
-AUTOMATIONS RUN:
-- Health monitor: X reports
-- Auto-1hr: X runs, X changes
-- Signal reporter: X reports
-- Blacklist tester: X trials
-- Upgrade implementer: X implementations
+TEAM ACTIVITY (from TEAM UPDATES in kanban):
+- signal_reporter: [what it did]
+- health_monitor: [what it did]
+- auto_1hr: [what it did]
 
-IMPLEMENTS TODAY:
+IMPLEMENTED TODAY:
 1. [Change] — [result]
 2. [Change] — [result]
 
