@@ -103,3 +103,12 @@
 - **[WARN]**: `hermes-mtf-macd-tuner` AttributeError: 'PrecomputedMACD' has no attribute 'warmup'
 - **[WARN]**: Disk at 81% — pipeline.log 1.6GB, 15m_regime.log 447MB
 - **AUTO-FIX**: None applied — pipeline running normally, all failures non-critical
+
+## Error Alerts — 2026-08-08 12:40 UTC
+- **[WARN]**: `hermes-hl-sync-guardian.timer` stale — last fired 1 week 3 days ago (service marked active but timer dead)
+- **[WARN]**: 1 phantom trade — BCH LONG at 0.0% PnL (entry=216.59, current=216.4)
+- **[WARN]**: Disk at 80% — 15m_regime.log=448MB, 4h_regime.log=100MB
+- **INFO**: Pipeline healthy — 6 open, 45 closed today, +2.71% PnL
+- **INFO**: 80 signals generated in last hour, 0 errors
+- **INFO**: Regime NEUTRAL — 105/106 tokens neutral, 1 LONG_BIAS (ACE)
+- **AUTO-FIX**: None applied — all issues non-critical

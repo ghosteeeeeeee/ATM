@@ -24,6 +24,7 @@ sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE
+from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON, CANDLES_DB
@@ -1099,6 +1100,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             continue
                         elif not CONFLUENCE_REQUIRED and len(pe_parts) < 2:
                             log(f"  ➡️  [PRESERVE-MERGE-ALLOW] {pe['token']}:{pe['direction']} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{pe_src}'")
+                        # ── DISABLED-COMPONENT GUARD ──────────────────────────────────────
+                        # FIX (2026-08-08): Preserved entries with disabled components were
+                        # re-inserted without checking *_ENABLED flags. E.g. ma100-cross-
+                        # (MA_100_CROSS_MINUS_ENABLED=False) still appeared in combos.
+                        _has_disabled = any(is_component_disabled(p) for p in pe_parts)
+                        if _has_disabled:
+                            log(f"  🚫 [PRESERVE-DISABLED-BLOCK] {pe['token']}:{pe['direction']} src='{pe_src}' — contains disabled component(s)")
+                            continue
                         # Track whether preserved entry won the merge (for APPROVED upsert below)
                         _preserved_won = False
                         if existing is None:

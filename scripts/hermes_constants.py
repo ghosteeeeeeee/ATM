@@ -35,7 +35,8 @@ LIVE_TRADING_ENABLED = True
 SHORT_BLACKLIST = {
     # High-volatility / inverse-beta tokens (shorting meme coins = lottery)
     'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','SOPH','XAI','ZEC','GAS','BLAST','MELANIA','BTC','ZETA','SPX','DOGE','ARK','RUNE','AR',
-    # TST, NXPC, TRUMP, CELO, ACE, YZY, ZEREBRO, WLFI, HBAR, MEGA removed 2026-08-07 — no specific block reason
+    # TST, NXPC, CELO, ACE, YZY, ZEREBRO, WLFI, HBAR, MEGA removed 2026-08-07 — no specific block reason
+    # TRUMP added 2026-08-08 — political meme coin, high volatility
     # Historical 0% SHORT win rate (2026-04-01 analysis):
     'SOL','MEW',        # avg SHORT pnl: deeply negative, bull market leader
     # HYPE, YGG removed for Batch 5 trial 2026-08-03
@@ -126,11 +127,14 @@ SHORT_BLACKLIST = {
     'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
     'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
     'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
+    # 2026-08-08: Political meme coin, high volatility
+    'TRUMP',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
     'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','DOGE','MEW',
     # TST, ACE, KAS, PROVE removed 2026-08-07 — no specific block reason
+    # TRUMP added 2026-08-08 — political meme coin, high volatility
     'BOME', 'USTC', 'RSR',
     # 2026-04-24: REZ, HMSTR, BNB — block both directions
     'REZ', 'HMSTR', 'BNB',
@@ -179,6 +183,8 @@ LONG_BLACKLIST = {
     'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
     'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
     'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
+    # 2026-08-08: Political meme coin, high volatility
+    'TRUMP',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 

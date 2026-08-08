@@ -1731,6 +1731,203 @@ ALLOWED_SIGNAL_SOURCES = frozenset({
 })
 
 
+def is_component_disabled(component: str) -> bool:
+    """Check if a signal component is disabled via its *_ENABLED flag.
+    Used by add_signal() Layer 2 and signal_compactor.py preserved-entry guard.
+    Returns True if the component should be blocked, False if allowed."""
+    try:
+        from hermes_constants import (
+            PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
+            VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
+            HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
+            HMACD_ENABLED, HMACD_PLUS_ENABLED, HMACD_MINUS_ENABLED,
+            MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED,
+            PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
+            FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
+            MOMENTUM_ENABLED, MOMENTUM_PLUS_ENABLED, MOMENTUM_MINUS_ENABLED,
+            GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
+            ACCEL_300_ENABLED, ACCEL_300_PLUS_ENABLED, ACCEL_300_MINUS_ENABLED,
+            ACCEL_300_VELOCITY_PLUS_ENABLED, ACCEL_300_VELOCITY_MINUS_ENABLED,
+            EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
+            COUNTER_FLIP_ENABLED, COUNTER_FLIP_PLUS_ENABLED, COUNTER_FLIP_MINUS_ENABLED,
+            HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
+            RS_ENABLED, RS_PLUS_ENABLED, RS_MINUS_ENABLED,
+            TL_BREAK_ENABLED, TL_BREAK_PLUS_ENABLED, TL_BREAK_MINUS_ENABLED,
+            BOLLINGER_SQUEEZE_ENABLED, BOLLINGER_SQUEEZE_PLUS_ENABLED, BOLLINGER_SQUEEZE_MINUS_ENABLED,
+            MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
+            MA_CROSS_5M_ENABLED, MA_CROSS_5M_PLUS_ENABLED, MA_CROSS_5M_MINUS_ENABLED,
+            HH_HL_ENABLED, HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED,
+            GUPPY_ENABLED, GUPPY_PLUS_ENABLED, GUPPY_MINUS_ENABLED,
+            MACD_ACCEL_ENABLED, MACD_ACCEL_PLUS_ENABLED, MACD_ACCEL_MINUS_ENABLED,
+            TREND_PURITY_ENABLED, TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED,
+            EMA9_SMA20_ENABLED, EMA9_SMA20_PLUS_ENABLED, EMA9_SMA20_MINUS_ENABLED,
+            R2_REV_ENABLED, R2_REV_PLUS_ENABLED, R2_REV_MINUS_ENABLED,
+            R2_TREND_ENABLED, R2_TREND_PLUS_ENABLED, R2_TREND_MINUS_ENABLED,
+            VOLUME_HL_ENABLED, VOLUME_HL_PLUS_ENABLED, VOLUME_HL_MINUS_ENABLED,
+            MA300_CANDLE_ENABLED, MA300_CANDLE_PLUS_ENABLED, MA300_CANDLE_MINUS_ENABLED,
+            ATR_COMPRESSION_ENABLED, ATR_COMPRESSION_PLUS_ENABLED, ATR_COMPRESSION_MINUS_ENABLED,
+            EXHAUSTION_ENABLED, EXHAUSTION_PLUS_ENABLED, EXHAUSTION_MINUS_ENABLED,
+            VORTEX_BREAK_ENABLED, VORTEX_BREAK_PLUS_ENABLED, VORTEX_BREAK_MINUS_ENABLED,
+            RETURN_EXHAUSTION_ENABLED, RETURN_EXHAUSTION_PLUS_ENABLED, RETURN_EXHAUSTION_MINUS_ENABLED,
+            MA_100_CROSS_ENABLED, MA_100_CROSS_PLUS_ENABLED, MA_100_CROSS_MINUS_ENABLED,
+            HL_COPY_SIGNAL_ENABLED, HL_COPY_SIGNAL_PLUS_ENABLED, HL_COPY_SIGNAL_MINUS_ENABLED,
+            CONTINUATION_PLUS_ENABLED, CONTINUATION_MINUS_ENABLED,
+            ZSCORE_PUMP_PLUS_ENABLED, ZSCORE_PUMP_MINUS_ENABLED,
+            MOMENTUM_LEADERBOARD_PLUS_ENABLED, MOMENTUM_LEADERBOARD_MINUS_ENABLED,
+        )
+    except ImportError:
+        return False  # can't check — allow
+    c = component.strip()
+    # pct-hermes
+    if c == 'pct-hermes+': return not PCT_HERMES_PLUS_ENABLED
+    if c == 'pct-hermes-': return not PCT_HERMES_MINUS_ENABLED
+    if c == 'pct-hermes': return not PCT_HERMES_ENABLED
+    # vel-hermes
+    if c == 'vel-hermes+': return not VEL_HERMES_PLUS_ENABLED
+    if c == 'vel-hermes-': return not VEL_HERMES_MINUS_ENABLED
+    if c == 'vel-hermes': return not VEL_HERMES_ENABLED
+    # hzscore
+    if c == 'hzscore+': return not HZSCORE_PLUS_ENABLED
+    if c == 'hzscore-': return not HZSCORE_MINUS_ENABLED
+    if c == 'hzscore': return not HZSCORE_ENABLED
+    # hmacd
+    if c == 'hmacd+': return not HMACD_PLUS_ENABLED
+    if c == 'hmacd-': return not HMACD_MINUS_ENABLED
+    if c == 'hmacd': return not HMACD_ENABLED
+    # mtf-momentum
+    if c == 'mtf-momentum+': return not MTF_MOMENTUM_PLUS_ENABLED
+    if c == 'mtf-momentum-': return not MTF_MOMENTUM_MINUS_ENABLED
+    if c == 'mtf-momentum': return not MTF_MOMENTUM_ENABLED
+    # phase-accel
+    if c == 'phase-accel+': return not PHASE_ACCEL_PLUS_ENABLED
+    if c == 'phase-accel-': return not PHASE_ACCEL_MINUS_ENABLED
+    if c == 'phase-accel': return not PHASE_ACCEL_ENABLED
+    # fast-momentum
+    if c == 'fast-momentum+': return not FAST_MOMENTUM_PLUS_ENABLED
+    if c == 'fast-momentum-': return not FAST_MOMENTUM_MINUS_ENABLED
+    if c == 'fast-momentum': return not FAST_MOMENTUM_ENABLED
+    # momentum
+    if c == 'momentum+': return not MOMENTUM_PLUS_ENABLED
+    if c == 'momentum-': return not MOMENTUM_MINUS_ENABLED
+    if c == 'momentum': return not MOMENTUM_ENABLED
+    # gap-300
+    if c in ('gap-300+', 'gap300-5m+'): return not GAP_300_PLUS_ENABLED
+    if c in ('gap-300-', 'gap300-5m-'): return not GAP_300_MINUS_ENABLED
+    if c in ('gap-300', 'gap-300+', 'gap-300-'): return not GAP_300_ENABLED
+    # accel-300
+    if c == 'accel-300+': return not ACCEL_300_PLUS_ENABLED
+    if c == 'accel-300-': return not ACCEL_300_MINUS_ENABLED
+    if c == 'accel-300': return not ACCEL_300_ENABLED
+    if c.startswith('accel-300-velocity'):
+        if c.endswith('+'): return not ACCEL_300_VELOCITY_PLUS_ENABLED
+        if c.endswith('-'): return not ACCEL_300_VELOCITY_MINUS_ENABLED
+    # ema-angle
+    if c == 'ema-angle+': return not EMA_ANGLE_PLUS_ENABLED
+    if c == 'ema-angle-': return not EMA_ANGLE_MINUS_ENABLED
+    if c == 'ema-angle': return not EMA_ANGLE_ENABLED
+    # counter-flip
+    if c == 'counter-flip+': return not COUNTER_FLIP_PLUS_ENABLED
+    if c == 'counter-flip-': return not COUNTER_FLIP_MINUS_ENABLED
+    if c == 'counter-flip': return not COUNTER_FLIP_ENABLED
+    # hmacd-mtf
+    if c == 'hmacd-mtf+': return not HMACD_MTF_PLUS_ENABLED
+    if c == 'hmacd-mtf-': return not HMACD_MTF_MINUS_ENABLED
+    # rs
+    if c.startswith('rs-s') or c.startswith('rs-r'):
+        return False  # checked via RS_PLUS/MINUS in add_signal
+    if c.startswith('rs') and not c.startswith('rs-'): return not RS_ENABLED
+    # tl-break
+    if c in ('tl_break+', 'tl_break_long'): return not TL_BREAK_PLUS_ENABLED
+    if c in ('tl_break-', 'tl_break_short'): return not TL_BREAK_MINUS_ENABLED
+    if c == 'tl_break': return not TL_BREAK_ENABLED
+    # bollinger-squeeze
+    if c == 'bollinger-squeeze+': return not BOLLINGER_SQUEEZE_PLUS_ENABLED
+    if c == 'bollinger-squeeze-': return not BOLLINGER_SQUEEZE_MINUS_ENABLED
+    if c == 'bollinger-squeeze': return not BOLLINGER_SQUEEZE_ENABLED
+    # ma-cross
+    if c == 'ma-cross+': return not MA_CROSS_PLUS_ENABLED
+    if c == 'ma-cross-': return not MA_CROSS_MINUS_ENABLED
+    if c == 'ma-cross': return not MA_CROSS_ENABLED
+    # ma-cross-5m
+    if c == 'ma-cross-5m+': return not MA_CROSS_5M_PLUS_ENABLED
+    if c == 'ma-cross-5m-': return not MA_CROSS_5M_MINUS_ENABLED
+    if c == 'ma-cross-5m': return not MA_CROSS_5M_ENABLED
+    # hh-hl
+    if c == 'hh-hl+': return not HH_HL_PLUS_ENABLED
+    if c == 'hh-hl-': return not HH_HL_MINUS_ENABLED
+    if c == 'hh-hl': return not HH_HL_ENABLED
+    # guppy
+    if c == 'guppy+': return not GUPPY_PLUS_ENABLED
+    if c == 'guppy-': return not GUPPY_MINUS_ENABLED
+    if c == 'guppy': return not GUPPY_ENABLED
+    # macd-accel
+    if c == 'macd-accel+': return not MACD_ACCEL_PLUS_ENABLED
+    if c == 'macd-accel-': return not MACD_ACCEL_MINUS_ENABLED
+    if c == 'macd-accel': return not MACD_ACCEL_ENABLED
+    # trend-purity
+    if c == 'trend-purity+': return not TREND_PURITY_PLUS_ENABLED
+    if c == 'trend-purity-': return not TREND_PURITY_MINUS_ENABLED
+    if c == 'trend-purity': return not TREND_PURITY_ENABLED
+    # ema9-sma20
+    if c == 'ema9-sma20+': return not EMA9_SMA20_PLUS_ENABLED
+    if c == 'ema9-sma20-': return not EMA9_SMA20_MINUS_ENABLED
+    if c == 'ema9-sma20': return not EMA9_SMA20_ENABLED
+    # r2-rev
+    if c == 'r2-rev+': return not R2_REV_PLUS_ENABLED
+    if c == 'r2-rev-': return not R2_REV_MINUS_ENABLED
+    if c == 'r2-rev': return not R2_REV_ENABLED
+    # r2-trend
+    if c == 'r2-trend+': return not R2_TREND_PLUS_ENABLED
+    if c == 'r2-trend-': return not R2_TREND_MINUS_ENABLED
+    if c == 'r2-trend': return not R2_TREND_ENABLED
+    # volume-hl
+    if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED
+    if c == 'volume-hl-': return not VOLUME_HL_MINUS_ENABLED
+    if c == 'volume-hl': return not VOLUME_HL_ENABLED
+    # ma300-candle
+    if c == 'ma300-candle+': return not MA300_CANDLE_PLUS_ENABLED
+    if c == 'ma300-candle-': return not MA300_CANDLE_MINUS_ENABLED
+    if c == 'ma300-candle': return not MA300_CANDLE_ENABLED
+    # atr-compression (5m variant)
+    if c.startswith('atr5m-comp') and c.endswith('+'): return not ATR_COMPRESSION_PLUS_ENABLED
+    if c.startswith('atr5m-comp') and c.endswith('-'): return not ATR_COMPRESSION_MINUS_ENABLED
+    if c.startswith('atr5m-comp'): return not ATR_COMPRESSION_ENABLED
+    # atr-compression
+    if c == 'atr-compression+': return not ATR_COMPRESSION_PLUS_ENABLED
+    if c == 'atr-compression-': return not ATR_COMPRESSION_MINUS_ENABLED
+    if c == 'atr-compression': return not ATR_COMPRESSION_ENABLED
+    # exhaustion
+    if c == 'exhaustion+': return not EXHAUSTION_PLUS_ENABLED
+    if c == 'exhaustion-': return not EXHAUSTION_MINUS_ENABLED
+    if c == 'exhaustion': return not EXHAUSTION_ENABLED
+    # vortex_break
+    if c in ('vortex_break+', 'vortex_break_long'): return not VORTEX_BREAK_PLUS_ENABLED
+    if c in ('vortex_break-', 'vortex_break_short'): return not VORTEX_BREAK_MINUS_ENABLED
+    if c == 'vortex_break': return not VORTEX_BREAK_ENABLED
+    # return_exhaustion
+    if c in ('return_exhaustion+', 'return_exhaustion_long'): return not RETURN_EXHAUSTION_PLUS_ENABLED
+    if c in ('return_exhaustion-', 'return_exhaustion_short'): return not RETURN_EXHAUSTION_MINUS_ENABLED
+    if c == 'return_exhaustion': return not RETURN_EXHAUSTION_ENABLED
+    # ma100-cross
+    if c == 'ma100-cross+': return not MA_100_CROSS_PLUS_ENABLED
+    if c == 'ma100-cross-': return not MA_100_CROSS_MINUS_ENABLED
+    if c == 'ma100-cross': return not MA_100_CROSS_ENABLED
+    # hl_copy_signal
+    if c in ('hl_copy_signal+', 'hl_copy_trader'): return not HL_COPY_SIGNAL_PLUS_ENABLED
+    if c in ('hl_copy_signal-',): return not HL_COPY_SIGNAL_MINUS_ENABLED
+    if c == 'hl_copy_signal': return not HL_COPY_SIGNAL_ENABLED
+    # continuation
+    if c == 'continuation+': return not CONTINUATION_PLUS_ENABLED
+    if c == 'continuation-': return not CONTINUATION_MINUS_ENABLED
+    # zscore-pump
+    if c == 'zscore-pump+': return not ZSCORE_PUMP_PLUS_ENABLED
+    if c == 'zscore-pump-': return not ZSCORE_PUMP_MINUS_ENABLED
+    # momentum-leaderboard
+    if c == 'momentum-leaderboard+': return not MOMENTUM_LEADERBOARD_PLUS_ENABLED
+    if c == 'momentum-leaderboard-': return not MOMENTUM_LEADERBOARD_MINUS_ENABLED
+    return False  # unknown component — allow (don't block what we can't identify)
+
+
 def validate_source(source: str) -> str:
     """
     Validate source against blacklist (SIGNAL_SOURCE_BLACKLIST).
