@@ -238,3 +238,4 @@
   - Score each signal before entry
   - Block D/F grade signals
   - Require C or better for live trading
+- [2026-08-08 20:29] CEO: return_exhaustion_short.py deployed — 3rd SHORT-specific signal active. All use regime filter, tighter thresholds, volume confirmation. bug_hunter fixed reversed() data ordering bug. Old MINUS flags remain disabled.
