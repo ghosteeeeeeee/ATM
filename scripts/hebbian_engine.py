@@ -447,6 +447,19 @@ class HebbianEngine:
                 results.append((part, wr, n, weight))
         return results
 
+    def token_overall_wr(self, token: str) -> dict:
+        """Estimate token-level WR from exit_profit vs exit_sl synapses.
+        Returns {'wr': float, 'profit_n': int, 'sl_n': int, 'ratio': float} or None.
+        """
+        profit_w, profit_n = self.synapse_weight(token, 'exit_profit')
+        sl_w, sl_n = self.synapse_weight(token, 'exit_sl')
+        total = profit_n + sl_n
+        if total < 3:
+            return None
+        wr = profit_n / total if total > 0 else 0.5
+        ratio = profit_w / sl_w if sl_w > 0 else (999.0 if profit_w > 0 else 1.0)
+        return {'wr': wr, 'profit_n': profit_n, 'sl_n': sl_n, 'ratio': ratio}
+
     def recall(
         self,
         concept: str,

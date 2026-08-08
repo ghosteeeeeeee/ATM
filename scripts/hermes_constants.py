@@ -1327,11 +1327,20 @@ CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than 
 
 # ── Hebbian autonomous gate ─────────────────────────────────────────────
 HEBBIAN_GATE_ENABLED = True                   # master switch for autonomous decisions
-HEBBIAN_AUTO_APPROVE_WR = 0.60               # WR >= this AND n >= min_n → auto-approve
-HEBBIAN_AUTO_REJECT_WR = 0.30                # WR <= this AND n >= min_n → auto-reject
-HEBBIAN_AUTO_MIN_N = 5                       # minimum trades for autonomous decision
+HEBBIAN_AUTO_APPROVE_WR = 0.60               # WR >= this → auto-approve
+HEBBIAN_AUTO_REJECT_WR = 0.30                # WR <= this → auto-reject
+HEBBIAN_AUTO_MIN_N = 5                       # standard threshold
+HEBBIAN_AUTO_MIN_N_HIGH_CONF = 3             # high-confidence threshold (exit_profit ratio > 10)
+HEBBIAN_HIGH_CONF_EXIT_RATIO = 10.0          # exit_profit/SL ratio for high-confidence tier
 HEBBIAN_EXIT_PROFIT_BOOST = 5                # +conf when exit_profit dominant
 HEBBIAN_EXIT_SL_PENALTY = 8                  # -conf when exit_sl dominant
+HEBBIAN_EXIT_SL_AUTO_REJECT_RATIO = 0.2      # profit/SL ratio below this → auto-reject
+HEBBIAN_EXIT_SL_AUTO_REJECT_MIN_N = 5        # minimum SL exits for this rule
 HEBBIAN_COMBO_PART_BOOST = 3                 # +conf when combo parts both have high WR
+HEBBIAN_TOKEN_WR_BOOST = 3                   # ±conf based on token history
+HEBBIAN_TOKEN_WR_MIN_N = 5                   # minimum exit events for token-level estimate
+HEBBIAN_TOKEN_WR_RATIO_HIGH = 3.0            # profit/SL ratio threshold for boost
+HEBBIAN_TOKEN_WR_RATIO_LOW = 0.5             # profit/SL ratio threshold for penalty
 HEBBIAN_CIRCUIT_BREAKER_WR = 0.45            # if auto-decision WR drops below, disable gate
 HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before circuit breaker
+HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped

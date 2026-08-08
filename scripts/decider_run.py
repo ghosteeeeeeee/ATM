@@ -54,8 +54,12 @@ from hermes_constants import (
     HEBBIAN_PENALTY_WR, HEBBIAN_PENALTY_AMOUNT, HEBBIAN_PENALTY_MIN_N,
     HEBBIAN_CACHE_TTL,
     HEBBIAN_GATE_ENABLED, HEBBIAN_AUTO_APPROVE_WR, HEBBIAN_AUTO_REJECT_WR,
-    HEBBIAN_AUTO_MIN_N, HEBBIAN_EXIT_PROFIT_BOOST, HEBBIAN_EXIT_SL_PENALTY,
-    HEBBIAN_COMBO_PART_BOOST, HEBBIAN_CIRCUIT_BREAKER_WR, HEBBIAN_CIRCUIT_BREAKER_N,
+    HEBBIAN_AUTO_MIN_N, HEBBIAN_AUTO_MIN_N_HIGH_CONF, HEBBIAN_HIGH_CONF_EXIT_RATIO,
+    HEBBIAN_EXIT_PROFIT_BOOST, HEBBIAN_EXIT_SL_PENALTY,
+    HEBBIAN_EXIT_SL_AUTO_REJECT_RATIO, HEBBIAN_EXIT_SL_AUTO_REJECT_MIN_N,
+    HEBBIAN_COMBO_PART_BOOST, HEBBIAN_TOKEN_WR_BOOST, HEBBIAN_TOKEN_WR_MIN_N,
+    HEBBIAN_TOKEN_WR_RATIO_HIGH, HEBBIAN_TOKEN_WR_RATIO_LOW,
+    HEBBIAN_CIRCUIT_BREAKER_WR, HEBBIAN_CIRCUIT_BREAKER_N, HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC,
     TOKEN_SENTIMENT_ENABLED, TOKEN_SENTIMENT_K,
     TOKEN_SENTIMENT_SKIP_THRESHOLD, TOKEN_SENTIMENT_HARD_SKIP_THRESHOLD,
     TOKEN_SENTIMENT_BOOST_THRESHOLD, TOKEN_SENTIMENT_BOOST_AMOUNT,
@@ -1024,13 +1028,83 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
         pass
     return None
 
-_hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, exit_quality, combo_parts, expiry)
+_hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, exit_quality, combo_parts, expiry, is_token_specific, token_wr)
+
+# ── Hebbian circuit breaker + audit logging ──────────────────────────────
+_GATE_STATS_FILE = '/root/.hermes/data/hebbian_gate_stats.json'
+
+def _load_gate_stats():
+    try:
+        with open(_GATE_STATS_FILE) as f:
+            return json.load(f)
+    except Exception:
+        return {'auto_decisions': [], 'disabled_until': None}
+
+def _save_gate_stats(stats):
+    import tempfile
+    try:
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(_GATE_STATS_FILE), suffix='.tmp')
+        with os.fdopen(fd, 'w') as f:
+            json.dump(stats, f, indent=2)
+        os.replace(tmp, _GATE_STATS_FILE)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except Exception:
+            pass
+
+def _log_auto_decision(token, signal, direction, decision, wr_est, n, conf_adj):
+    """Log auto-decision for audit trail."""
+    from datetime import datetime, timezone
+    stats = _load_gate_stats()
+    stats['auto_decisions'].append({
+        'ts': datetime.now(timezone.utc).isoformat(),
+        'token': token, 'signal': signal, 'direction': direction,
+        'decision': decision, 'wr_est': round(wr_est, 3), 'n': n,
+        'conf_adj': conf_adj, 'actual': None,
+    })
+    # Keep last 200 entries
+    if len(stats['auto_decisions']) > 200:
+        stats['auto_decisions'] = stats['auto_decisions'][-200:]
+    _save_gate_stats(stats)
+
+def _check_circuit_breaker():
+    """Check if circuit breaker should disable the gate."""
+    stats = _load_gate_stats()
+    # Check if cooldown is active
+    if stats.get('disabled_until'):
+        from datetime import datetime as _dt, timezone as _tz
+        try:
+            disabled_until = _dt.fromisoformat(stats['disabled_until'])
+            if _dt.now(_tz) < disabled_until:
+                return True  # still disabled
+            else:
+                stats['disabled_until'] = None
+                _save_gate_stats(stats)
+        except Exception:
+            stats['disabled_until'] = None
+            _save_gate_stats(stats)
+    # Check accuracy over last N auto-decisions
+    recent = [d for d in stats.get('auto_decisions', []) if d.get('actual') is not None]
+    if len(recent) >= HEBBIAN_CIRCUIT_BREAKER_N:
+        last_n = recent[-HEBBIAN_CIRCUIT_BREAKER_N:]
+        wins = sum(1 for d in last_n if d['actual'] == True)
+        wr = wins / len(last_n)
+        if wr < HEBBIAN_CIRCUIT_BREAKER_WR:
+            from datetime import datetime as _dt, timezone as _tz, timedelta
+            cooldown = timedelta(seconds=HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC)
+            stats['disabled_until'] = (_dt.now(_tz) + cooldown).isoformat()
+            _save_gate_stats(stats)
+            log(f'  [HEBBIAN-GATE] CIRCUIT BREAKER TRIPPED: WR={wr:.0%} over {len(last_n)} auto-decisions. Disabled for {HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC//3600}h')
+            return True
+    return False
 
 def hebbian_trade_boost(token, signal):
     """Estimate historical win rate from Hebbian memory for (token, signal) pair.
-    Returns (wr, n, weight, concepts, exit_quality, combo_parts, is_token_specific) or None.
+    Returns (wr, n, weight, concepts, exit_quality, combo_parts, is_token_specific, token_wr) or None.
     Fail-open. 10min cache.
-    is_token_specific = True if data is from token↔signal, False if from direction↔signal fallback."""
+    is_token_specific = True if data is from token↔signal, False if from direction↔signal fallback.
+    token_wr = token-level WR estimate or None."""
     from hebbian_engine import HebbianEngine
     cache_key = f"{token}:{signal}"
     now = time.time()
@@ -1038,7 +1112,7 @@ def hebbian_trade_boost(token, signal):
     if cached and now - cached[6] < HEBBIAN_CACHE_TTL:
         if cached[0] is None:
             return None
-        return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5], cached[7])
+        return (cached[0], cached[1], cached[2], cached[3], cached[4], cached[5], cached[7], cached[8])
     try:
         engine = HebbianEngine()
         # Try token-specific first
@@ -1046,8 +1120,6 @@ def hebbian_trade_boost(token, signal):
         is_token_specific = True
         if not result:
             # Fallback to direction-agnostic lookup
-            from hermes_constants import LONG_BLACKLIST, SHORT_BLACKLIST
-            # Use direction from signal source
             direction = 'LONG' if '+' in (signal or '') else 'SHORT' if '-' in (signal or '') else None
             if direction:
                 result = engine.wr_estimate(direction, signal)
@@ -1058,14 +1130,15 @@ def hebbian_trade_boost(token, signal):
                                                      'APPROVED', 'HOT_APPROVED', 'WAIT', 'SKIPPED')]
         exit_quality = engine.exit_quality_score(signal) if signal else None
         combo_parts = engine.combo_part_wr(token, signal) if signal else []
+        token_wr = engine.token_overall_wr(token)
     except Exception:
         return None
     if result is None:
-        _hebbian_cache[cache_key] = (None, None, None, [], None, None, now, None)
+        _hebbian_cache[cache_key] = (None, None, None, [], None, None, now, None, None)
         return None
     wr, n, weight = result
-    _hebbian_cache[cache_key] = (wr, n, weight, concepts, exit_quality, combo_parts, now, is_token_specific)
-    return (wr, n, weight, concepts, exit_quality, combo_parts, is_token_specific)
+    _hebbian_cache[cache_key] = (wr, n, weight, concepts, exit_quality, combo_parts, now, is_token_specific, token_wr)
+    return (wr, n, weight, concepts, exit_quality, combo_parts, is_token_specific, token_wr)
 
 def context_gate(token, direction, source, sig):
     """
@@ -1121,56 +1194,86 @@ def context_gate(token, direction, source, sig):
             log(f'  [TOKEN-SENTIMENT] {token}: error {e} (fail-open)')
 
     # Hebbian WR estimate (brain.db token ↔ signal weight)
-    heb = hebbian_trade_boost(token, source)
-    if heb:
-        wr_est, n, weight, concepts, exit_quality, combo_parts, is_token_specific = heb
-        wr_pct = wr_est * 100
-        data_src = 'token-specific' if is_token_specific else 'direction-agg'
-        log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f}, {data_src})')
+    # Check circuit breaker first
+    heb = None
+    if HEBBIAN_GATE_ENABLED and _check_circuit_breaker():
+        log(f'  [HEBBIAN-GATE] DISABLED (circuit breaker active)')
+    else:
+        heb = hebbian_trade_boost(token, source)
+        if heb:
+            wr_est, n, weight, concepts, exit_quality, combo_parts, is_token_specific, token_wr = heb
+            wr_pct = wr_est * 100
+            data_src = 'token-specific' if is_token_specific else 'direction-agg'
+            log(f'  [HEBBIAN] {token} {source}: est WR={wr_pct:.0f}% (n={n}, weight={weight:.2f}, {data_src})')
 
-        # Phase 1: exit-quality enrichment
-        exit_boost = 0
-        if exit_quality:
-            eq = exit_quality
-            if eq['profit_n'] >= 3 and eq['ratio'] > 2.0:
-                exit_boost = HEBBIAN_EXIT_PROFIT_BOOST
-                log(f'  [HEBBIAN] exit-quality: profit dominant (ratio={eq["ratio"]:.1f}) → +{exit_boost}')
-            elif eq['sl_n'] >= 3 and eq['ratio'] < 0.5:
-                exit_boost = -HEBBIAN_EXIT_SL_PENALTY
-                log(f'  [HEBBIAN] exit-quality: SL dominant (ratio={eq["ratio"]:.1f}) → {exit_boost}')
+            # ── Exit-quality enrichment ──────────────────────────────────
+            exit_boost = 0
+            if exit_quality:
+                eq = exit_quality
+                if eq['profit_n'] >= 3 and eq['ratio'] > 2.0:
+                    exit_boost = HEBBIAN_EXIT_PROFIT_BOOST
+                    log(f'  [HEBBIAN] exit-quality: profit dominant (ratio={eq["ratio"]:.1f}) → +{exit_boost}')
+                elif eq['sl_n'] >= 3 and eq['ratio'] < 0.5:
+                    exit_boost = -HEBBIAN_EXIT_SL_PENALTY
+                    log(f'  [HEBBIAN] exit-quality: SL dominant (ratio={eq["ratio"]:.1f}) → {exit_boost}')
 
-        # Phase 1: combo-part enrichment
-        combo_boost = 0
-        if combo_parts and len(combo_parts) >= 2:
-            all_high = all(cp[1] >= HEBBIAN_BOOST_WR for cp in combo_parts)
-            any_low = any(cp[1] <= HEBBIAN_PENALTY_WR for cp in combo_parts if cp[2] >= 3)
-            if all_high:
-                combo_boost = HEBBIAN_COMBO_PART_BOOST
-                log(f'  [HEBBIAN] combo-parts: all high WR → +{combo_boost}')
-            elif any_low:
-                combo_boost = -HEBBIAN_COMBO_PART_BOOST
-                log(f'  [HEBBIAN] combo-parts: one low WR → {combo_boost}')
+            # ── Combo-part enrichment ────────────────────────────────────
+            combo_boost = 0
+            if combo_parts and len(combo_parts) >= 2:
+                all_high = all(cp[1] >= HEBBIAN_BOOST_WR for cp in combo_parts)
+                any_low = any(cp[1] <= HEBBIAN_PENALTY_WR for cp in combo_parts if cp[2] >= 3)
+                if all_high:
+                    combo_boost = HEBBIAN_COMBO_PART_BOOST
+                    log(f'  [HEBBIAN] combo-parts: all high WR → +{combo_boost}')
+                elif any_low:
+                    combo_boost = -HEBBIAN_COMBO_PART_BOOST
+                    log(f'  [HEBBIAN] combo-parts: one low WR → {combo_boost}')
 
-        # Existing boost/penalty logic (still uses aggregate data for soft advisories)
-        if n >= HEBBIAN_BOOST_MIN_N and wr_est >= HEBBIAN_BOOST_WR:
-            log(f'  [HEBBIAN] boost: +{HEBBIAN_BOOST_AMOUNT} confidence (high WR history)')
-            return ('WARN', f'hebbian boost: est WR={wr_pct:.0f}% (n={n})', -HEBBIAN_BOOST_AMOUNT)
-        if n >= HEBBIAN_PENALTY_MIN_N and wr_est <= HEBBIAN_PENALTY_WR:
-            log(f'  [HEBBIAN] penalty: -{HEBBIAN_PENALTY_AMOUNT} confidence (low WR history)')
-            return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
+            # ── Token overall WR boost ───────────────────────────────────
+            token_wr_boost = 0
+            if token_wr and token_wr['profit_n'] + token_wr['sl_n'] >= HEBBIAN_TOKEN_WR_MIN_N:
+                if token_wr['ratio'] > HEBBIAN_TOKEN_WR_RATIO_HIGH:
+                    token_wr_boost = HEBBIAN_TOKEN_WR_BOOST
+                    log(f'  [HEBBIAN] token WR: profitable (ratio={token_wr["ratio"]:.1f}) → +{token_wr_boost}')
+                elif token_wr['ratio'] < HEBBIAN_TOKEN_WR_RATIO_LOW:
+                    token_wr_boost = -HEBBIAN_TOKEN_WR_BOOST
+                    log(f'  [HEBBIAN] token WR: losing (ratio={token_wr["ratio"]:.1f}) → {token_wr_boost}')
 
-        # Phase 2: Hebbian autonomous gate — ONLY with token-specific data
-        if HEBBIAN_GATE_ENABLED and is_token_specific and n >= HEBBIAN_AUTO_MIN_N:
-            total_conf_adj = exit_boost + combo_boost
-            if wr_est >= HEBBIAN_AUTO_APPROVE_WR and exit_boost >= 0:
-                log(f'  [HEBBIAN-GATE] AUTO-APPROVE: WR={wr_pct:.0f}% n={n} exit_boost={exit_boost} combo_boost={combo_boost}')
-                return ('GO', f'hebbian auto-approve: WR={wr_pct:.0f}% (n={n})', total_conf_adj)
-            if wr_est <= HEBBIAN_AUTO_REJECT_WR and exit_boost <= 0:
-                log(f'  [HEBBIAN-GATE] AUTO-REJECT: WR={wr_pct:.0f}% n={n} exit_boost={exit_boost} combo_boost={combo_boost}')
-                return ('SKIP', f'hebbian auto-reject: WR={wr_pct:.0f}% (n={n})', 0)
-            # Conflicting or uncertain → apply confidence adj but escalate to LLM
-            if total_conf_adj != 0:
-                log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → apply adj={total_conf_adj}, escalate to LLM')
+            # ── Existing boost/penalty logic (soft advisories) ───────────
+            if n >= HEBBIAN_BOOST_MIN_N and wr_est >= HEBBIAN_BOOST_WR:
+                log(f'  [HEBBIAN] boost: +{HEBBIAN_BOOST_AMOUNT} confidence (high WR history)')
+                return ('WARN', f'hebbian boost: est WR={wr_pct:.0f}% (n={n})', -HEBBIAN_BOOST_AMOUNT)
+            if n >= HEBBIAN_PENALTY_MIN_N and wr_est <= HEBBIAN_PENALTY_WR:
+                log(f'  [HEBBIAN] penalty: -{HEBBIAN_PENALTY_AMOUNT} confidence (low WR history)')
+                return ('WARN', f'hebbian penalty: est WR={wr_pct:.0f}% (n={n})', HEBBIAN_PENALTY_AMOUNT)
+
+            # ── Exit-sl auto-reject (regardless of WR) ───────────────────
+            if is_token_specific and exit_quality:
+                eq = exit_quality
+                if eq['sl_n'] >= HEBBIAN_EXIT_SL_AUTO_REJECT_MIN_N and eq['ratio'] < HEBBIAN_EXIT_SL_AUTO_REJECT_RATIO:
+                    log(f'  [HEBBIAN-GATE] AUTO-REJECT: exit_sl dominant (ratio={eq["ratio"]:.2f}, sl_n={eq["sl_n"]})')
+                    _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, exit_boost + combo_boost + token_wr_boost)
+                    return ('SKIP', f'hebbian auto-reject: SL dominant (ratio={eq["ratio"]:.2f})', 0)
+
+            # ── Autonomous gate — tiered min-n ───────────────────────────
+            if HEBBIAN_GATE_ENABLED and is_token_specific:
+                total_conf_adj = exit_boost + combo_boost + token_wr_boost
+                # Tiered min-n: high-confidence (exit_profit ratio > 10) → n>=3, else n>=5
+                is_high_conf = (exit_quality and exit_quality['ratio'] > HEBBIAN_HIGH_CONF_EXIT_RATIO and exit_quality['profit_n'] >= 3)
+                min_n = HEBBIAN_AUTO_MIN_N_HIGH_CONF if is_high_conf else HEBBIAN_AUTO_MIN_N
+
+                if n >= min_n:
+                    if wr_est >= HEBBIAN_AUTO_APPROVE_WR and total_conf_adj >= 0:
+                        log(f'  [HEBBIAN-GATE] AUTO-APPROVE: WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')
+                        _log_auto_decision(token, source, direction, 'AUTO-APPROVE', wr_est, n, total_conf_adj)
+                        return ('GO', f'hebbian auto-approve: WR={wr_pct:.0f}% (n={n})', total_conf_adj)
+                    if wr_est <= HEBBIAN_AUTO_REJECT_WR and exit_boost <= 0:
+                        log(f'  [HEBBIAN-GATE] AUTO-REJECT: WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')
+                        _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, total_conf_adj)
+                        return ('SKIP', f'hebbian auto-reject: WR={wr_pct:.0f}% (n={n})', 0)
+                    # Uncertain → apply adj but escalate
+                    if total_conf_adj != 0:
+                        log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → adj={total_conf_adj}, escalate to LLM')
 
     # Still ambiguous → LLM (soft advisory or hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)

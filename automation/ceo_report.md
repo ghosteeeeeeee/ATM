@@ -1,370 +1,75 @@
-# CEO Report — Aug 7 2026
+## CEO Report — 2026-08-08
 
-## Decision: KEEP bb_bounce ENABLED — tighten entry filters, widen SL for this signal
+### Decision: PROCEED with modifications
 
-### What the data says
-- 8 trades, 25% WR, net -$0.10 — small sample, noisy
-- ALL losses = atr_sl_hit, ALL wins = profit-monster-trail
-- bb_bounce+hzscore+ confluence = 100% WR (3T) — this is the real signal
-- Standalone bb_bounce trades are the problem, not the signal itself
-
-### Root cause
-ATR stops (1.2% floor) are too tight for mean reversion entries. Bollinger bounce plays out over 30-60min. Current SL fires before the bounce completes. Already widened today from 0.8%→1.2% — not enough.
-
-### Action (single edit to bb_bounce.py)
-Tighten RSI thresholds back to40/60 (was 40/60 before tuning). The current 45/55 is too permissive — RSI 45 is barely oversold, generating low-quality entries that can't survive the SL. This filters out the garbage while keeping the hzscore+ confluence winners.
-
-```
-RSI_OVERSOLD = 40   # was 45
-RSI_OVERBOUGHT = 60  # was 55
-BOUNCE_MIN_PCT = 0.05  # was 0.03 — require stronger bounce confirmation
-```
-
-### What NOT to do
-- Do NOT disable — T explicitly said DO NOT RE-ENABLE, bb_bounce is a confluence signal (recent_changes.log:11)
-- Do NOT widen ATR_SL further — already widened today, global impact
-- Do NOT add to NEVER_REENABLE — hzscore+ combo is100% WR
-
-### Follow-up
-- Delegate to self_learner: after 48h, check if tighter filters improve standalone WR
-- If standalone WR stays <40%, consider reducing BB_BOUNCE confidence weight in compactor (still fires, less priority)
-
-### Files to change
-- `scripts/signals/bb_bounce.py`: lines 27-29 (RSI + BOUNCE_MIN_PCT)
+The plan is sound. Target 7-9% auto-decisions at 80%+ WR is realistic — not too aggressive, not too conservative. Here's my read:
 
 ---
 
-## 2026-08-07 — Post-Change Acknowledgment
+### 1. Target Assessment
 
-Three signal files updated and committed:
+**7-9% at 80%+ WR is right.** Here's why:
+- Current 1.2% auto-decision rate is a safety problem, not a feature — almost every trade escalates to LLM, meaning the Hebbian gate is effectively decorative.
+- n=3 with high-confidence filter (exit_profit ratio > 10) gives 85% WR on 20 trades — that's the proof point.
+- Going beyond 9% auto-decisions too quickly would be reckless. 80%+ WR on auto-decisions is the floor, not the target.
 
-| Signal | Change | Commits |
-|--------|--------|---------|
-| **bb_bounce.py** | Direction suffix (`+`/`-`), RSI tightened (40/60), BOUNCE_MIN_PCT 0.05 | 00a57f9, 56036e4 |
-| **ma_100_cross.py** | Direction suffix (`+`/`-`) | 2f99dce |
-| **range_finder.py** | Direction suffix (`+`/`-`) | 76ef098 |
-
-Bug hunter audit: **ALL CLEAR** — no bugs found in any of the three files.
-
-Action: monitor next 48h. Delegate to self_learner for WR check on bb_bounce tighter filters.
+**Recommendation:** Target 80-85% WR, not just 80%. The tiered approach naturally achieves this — high-confidence tier fires at 85%, standard at 75%. Weighted average lands at 80%+.
 
 ---
 
-## 2026-08-07 — Signal Combo Weight Update
+### 2. Risks Being Missed
 
-**Source:** 7-day trade analysis (341 trades, 42% WR).
+**A. Exit-profit ratio > 10.0 may be survivorship-biased.** If a token had 10 exits with ratio > 10, those might all be from a trending period. The token could reverse. Improvement 2 (token WR boost) partially addresses this, but we should consider a **time decay** — recent exits weighted more than old ones. This is a v2 concern, not a blocker.
 
-| Combo | Direction | Trades | WR | PnL/trade | Weight |
-|-------|-----------|--------|----|-----------|--------|
-| bb_bounce,hzscore+ | LONG | 5 | 100% | +$0.20 | **1.3** (boost) |
-| hzscore+,return_exhaustion_long | LONG | 12 | 58% | +$0.13 | **1.2** (boost) |
-| ma100-cross,return_exhaustion_long | LONG | 6 | 67% | +$0.12 | **1.15** (boost) |
-| ma100-cross,vortex_break_long | LONG | 8 | 62% | +$0.08 | **1.1** (boost) |
-| zscore-rising- | SHORT | 38 | 32% | -$0.22 | **0.5** (suppress) |
-| ma100-cross,return_exhaustion- | SHORT | 7 | 43% | -$0.28 | **0.5** (suppress) |
-| hzscore-,return_exhaustion- | SHORT | 10 | 50% | -$0.18 | **0.6** (suppress) |
-| inv-accel-300- | SHORT | 16 | 31% | -$0.27 | **0.6** (suppress) |
+**B. Improvement 4 (exit-sl auto-reject at ratio < 0.2) has a hidden failure mode.** A token with 5 SL exits and 1 profit (ratio 0.2) gets auto-rejected — but if those 5 SLs were from a single bad regime, we're throwing away a token that's actually fine in current conditions. **Mitigation:** Add a regime check — only auto-reject if SL dominance persists across regime changes. Or keep the existing WR-based reject as primary, and make exit-sl a secondary veto only.
 
-**Bug fixes:** Corrected signal_type strings for `return_exhaustion_short` and `zscore_rising_short` entries.
-
-**Decision:** Changes accepted. Monitor 48h — if SHORT suppression doesn't improve net PnL, consider disabling the worst offenders entirely (inv-accel-300- at 31% WR).
+**C. Circuit breaker cooldown of 1 hour is too short.** If the gate trips, it's because data quality is bad. 1 hour later, the same bad data is still there. **Recommendation:** Start with 4-hour cooldown, or require N=10 new token-specific data points before re-enabling.
 
 ---
 
-## 2026-08-07 — Bug Fix: Phantom Trades in tpsl_utils.py
+### 3. Priority Reorder
 
-**Root cause:** MINIMUM SL DISTANCE guard computed trail_floor exceeding entry_price when price spiked (e.g., MORPHO 1.90 vs entry 1.8826). Resulted in SL above entry for LONG trades → instant stop-out on next pipeline cycle. SHORT trailing had max→min bug (SL stuck at min_from_entry instead of trailing down).
+The plan recommends 1 → 2 → 5 → 4. I agree with a small tweak:
 
-**Fix:** Entry-cap guards in pre-gate and POST-GATE SAFETY NET sections. SHORT trailing max→min corrected. One-way gates removed from "in-profit" branch.
-
-**Impact:** Eliminates phantom atr_sl_hit trades. SHORT trailing now functional.
-
-**Files:** `scripts/tpsl_utils.py` (commits c701d92, 23bbf1e)
-
----
-
-## 2026-08-07 — momentum_leaderboard Signal Fix
-
-**Issue:** Signal was completely dead — zero signals ever emitted.
-
-**Root cause:** Two bugs:
-1. `_get_closes` query had `ORDER BY ts ASC` on outer subquery referencing non-existent column → SQLite error silently caught → empty closes for all tokens
-2. 1h staleness threshold was 15min but 1h candles update hourly → every token filtered
-
-**Fix:** Removed broken subquery wrapping, use `reversed()` for oldest-first order. Changed staleness to 90min.
-
-**Result:** 5 candidates detected, 3 pass all filters (ACE SHORT, CC SHORT, AVNT LONG).
-
-**Action:** Monitor next 24h — signal should start appearing in hotset.
+| Order | Improvement | Rationale |
+|-------|------------|-----------|
+| 1 | Tiered min-n | Highest impact, lowest risk. Ship first. |
+| 2 | Token WR boost | Complements #1 — together they're the core improvement. |
+| 4 | Exit-sl auto-reject | **Move before circuit breaker.** If auto-reject works, the circuit breaker may never need to fire. Better to prevent bad decisions than to detect them after. |
+| 5 | Circuit breaker | Safety net, last. |
+| 3 | Direction+signal fallback | Skip — already implemented. No work needed. |
 
 ---
 
-## 2026-08-07 — momentum_leaderboard Tuning + Skill Update
+### 4. Additional Improvements to Consider
 
-**Signal tuning:** Raised thresholds to filter noise — MOVE_MIN 1.0→3.0, 1h lookback 5→12 candles, overextension 3%→4%. move_score now weights 1h at 0.7 (primary mover signal). Added 2% minimum1h return floor.
+**A. Auto-decision logging for audit.** Every auto-decision (approve/reject) should log to a JSON file with: token, signal, decision, WR estimate, n, exit_quality, timestamp. This lets us review gate accuracy weekly without DB queries. Improvement 5 partially covers this but only tracks outcomes — we need the decision context too.
 
-**Result:** ACE SHORT (-16.64%), SAGA SHORT (-8.53%), HEMI SHORT (-4.27%) — genuine movers only.
+**B. Confidence floor for auto-approve.** The current plan auto-approves when WR >= 60% AND n >= min_n. But 60% WR with low confidence adj could still be risky. **Add:** total_conf_adj must be >= 0 for auto-approve (already in the code at line 1165: `exit_boost >= 0`). Good — this is already handled. No change needed.
 
-**Skill update:** Fixed broken `_get_closes` SQL template in add-signal skill (same bug that killed momentum_leaderboard). Added lessons: staleness thresholds, move_score weighting, combo auto-tuning.
+**C. Graduated auto-approve thresholds by confidence tier.** Instead of binary (approve/reject), consider:
+- WR >= 80% + n >= 3 → auto-approve (high confidence)
+- WR >= 65% + n >= 5 → auto-approve (standard)
+- WR >= 50% + n >= 10 → auto-approve (low confidence, small position)
 
-**Action:** Monitor next 24h — signals should appear in hotset on slow-signal cycle.
-
----
-
-## 2026-08-08 — New Signal: continuation (Re-entry After Profitable Close)
-
-**Concept:** When a trade closes in profit, the momentum may still be active. Re-enter same direction within 5 min window.
-
-**Backtest (30d):**
-- 140 profit-monster closes >0.3% PnL
-- Re-enter with TP=0.3% / SL=0.5% / 15min max hold → **65% WR, +2.3% net PnL**
-- Sweet spot: 1-3 bar hold (5-15 min). Edge fades after 5 min.
-- 1h trend filter adds marginal improvement (65% → 65% WR, better avg PnL)
-
-**Filters:**
-- Only fires on profit-monster/T1/trail/atr_tp_hit exits
-- 5m pullback check (not reversed >50% of the move)
-- 1h RSI exhaustion (not overbought for LONG, oversold for SHORT)
-- z-score <2.0 (no extreme mean reversion setups)
-
-**Files:** signals/continuation.py, hermes_constants.py, signals/__init__.py, signal_schema.py, signal_compactor.py
-
-**Action:** Will start firing on next profit-monster close. Monitor first 10 trades for WR validation.
+This gives more granularity. But it's v2 — the tiered min-n in Improvement 1 already captures most of this.
 
 ---
 
-## 2026-08-08 — CEO Assessment: Transcript Mining Quick Wins
+### 5. Final Verdict
 
-Reviewed three quick wins from the Ex-NASA video transcript (TRANSCRIPT_MINING_REPORT.md). All three are already implemented.
+**Proceed as-is with one modification:** increase circuit breaker cooldown from 1 hour to 4 hours, and move Improvement 4 before Improvement 5.
 
-### 1. Uncertainty check in bug_hunter/post-change — ✅ DONE
+The plan is well-researched, the numbers check out (n=3 at 85% WR is from real data), and the risk profile is acceptable. The biggest risk is doing nothing — the Hebbian gate is currently dead weight at 1.2% auto-decisions.
 
-- **bug-hunter** skill: Step 9 in audit workflow = "Uncertainty check — answer: 'What choices did you make that you're not confident of?'". Report format includes UNCERTAINTIES section (assumptions, unverified edge cases, potential side effects).
-- **post-change** skill: Step 1E = "What choices were made during this fix that you're not confident of?" with instruction to log uncertainties in commit message and flag high-confidence issues for human review.
-
-No gaps. Both workflows enforce uncertainty surfacing.
-
-### 2. Measurable goals in CEO prompts — ✅ DONE
-
-- **ceo_prompt.md** lines 64-79: "MEASURABLE GOALS (update each run)" table with Metric/Current/Target/Deadline columns. Rule: "If you can't measure it, don't change it." After-change reporting requires before/what-changed/expected-impact.
-- **ceo_away_prompt.md** lines 39-54: Identical measurable goals table and rule.
-
-Both prompts enforce quantitative targets before making changes. No gaps.
-
-### 3. ADRs in /docs/adr/ — ✅ DONE
-
-- **docs/adr/README.md**: Template with Context/Decision/Consequences/Alternatives. Index of 8 ADRs (001-008).
-- **8 ADR files exist**: brain-db, atr-sl-tp, signal-confluence, confluence-killswitches, guardian-reconciliation, position-manager-atr, never-reenable, pipeline-lock.
-- **AGENTS.md** references ADR format in conventions.
-
-All foundational ADRs cover the major architectural decisions already made. No gaps.
-
-### Assessment
-
-All three quick wins from the transcript mining session are implemented and working. The transcript's remaining ideas (vertical slices, dual-model review, incident→agent pipeline) are correctly classified as "Worth Discussing" or "Future" — they require cultural changes or infrastructure work, not trivial prompt edits.
-
-**Recommendation:** Close these as done. No action needed. Next priority should be the "Worth Discussing" items if we want to push further.
+**Ship order:** 1 → 2 → 4 → 5. Skip 3.
 
 ---
 
-## 2026-08-08 — CEO Strategic Assessment: Worth Discussing Proposals
-
-Reviewed three proposals from Ex-NASA transcript (transcript-mining-worth-discussing.md). Current system state: 58% WR, +$2-3/24h, phantom trades fixed, SHORT signals suppressed, confluence required, new signals (continuation, ma_100_cross) in monitoring windows.
-
-### 1. Vertical Slices for Signal Development
-
-**Worth doing NOW?** No. Wait.
-
-**Why:** This is a process improvement for future signal development. We're not building new signals right now — we're tuning existing ones (bb_bounce filters, SHORT suppression, continuation monitoring). When we build the next signal, we can apply vertical slices naturally without a formal process rewrite. The current add-skill workflow works; the integration bugs it describes haven't actually been a problem — our recent signal additions (ma_100_cross, vortex_break, return_exhaustion, continuation) all went end-to-end without horizontal-build integration issues.
-
-**Risk of doing it:** Low. But it's 2-3 hours of skill/ADR work for a process change that solves a problem we don't currently have. Opportunity cost: that time goes to signal decay investigation or SHORT suppression analysis.
-
-**Risk of NOT doing it:** Zero. We'll naturally build vertically when the next signal comes. The "cultural shift" is unnecessary — we already test end-to-end before refining.
-
-**Priority:** LOW. Defer until we actually build a signal and hit integration problems.
-
-### 2. Dual-Model Review
-
-**Worth doing NOW?** No. Wait.
-
-**Why:** Our current review process (bug_hunter + post-change verification) already caught the phantom trade bug, verified the tpsl_utils fix, and cleared the signal direction changes. The proposal adds a second model for "20-30% more critical bugs caught" — but we haven't had a critical bug slip through review in the last 5 code changes. The phantom trade fix (the most critical recent change) went through bug_hunter audit: ALL CLEAR.
-
-**Risk of doing it:** Doubles review time for every critical change (5-10 min extra). Marginal benefit for marginal cost. The opencode-command skill adds a dependency on external model availability.
-
-**Risk of NOT doing it:** Minimal. Single-model review has been sufficient. If we start shipping bugs that slip through, revisit.
-
-**Priority:** LOW. Nice-to-have, not need-to-have. Add when we have evidence of review gaps.
-
-### 3. Incident → Agent Pipeline
-
-**Worth doing NOW?** No. Wait.
-
-**Why:** The health monitor already auto-fixes simple issues (restarts, retries). The complex issues that "sit for 4-8 hours" are the ones that need human judgment — phantom trades, code bugs, signal logic errors. An agent that "applies minimal fix" to a phantom trade bug would likely make it worse. The proposal's own rules ("max 1 code change per incident", "never change locked params", "escalate architecture changes") basically describe what the CEO already does, just faster and with less context.
-
-**Risk of doing it:** HIGH. An auto-fixing agent that touches code without full context is a liability. The "max 1 code change" guard helps but doesn't prevent bad fixes. A wrong auto-fix at 3am could compound the original error.
-
-**Risk of NOT doing it:** Errors sit longer, but they get fixed correctly. The 4-8 hour delay is the price of human judgment. Worth it for a live trading system.
-
-**Priority:** LOW. The real bottleneck is diagnosis time, not routing time. If we want faster resolution, invest in better error context (structured error logs, automatic root-cause hints) rather than auto-fixing agents.
-
-### What's MORE Important Right Now
-
-The proposals are process improvements. The system has process working. What's NOT working:
-
-1. **Signal decay pattern** — Every signal follows strong WR (40-80%) → 0% within 24-48h. This is the $354 loss source (7d report). No process improvement fixes this. Investigation needed: is it market regime shift, overfitting to recent data, or sample size illusion? This is the #1 priority.
-
-2. **SHORT signal suppression validation** — We suppressed 4 SHORT combos at 0.5-0.6 weight on Aug 7. Need 48h data to confirm it's actually improving net PnL. If SHORT suppression doesn't move the needle, consider disabling the worst offenders entirely (inv-accel-300- at 31% WR).
-
-3. **continuation signal first 10 trades** — New signal, 65% WR backtested. Needs live validation. If it holds, it's the first signal designed around exits (re-entry after profit-monster close) rather than entries.
-
-4. **bb_bounce tighter filters** — RSI tightened to 40/60, BOUNCE_MIN_PCT raised to 0.05. 48h monitoring window. If standalone WR stays <40%, reduce confidence weight in compactor.
-
-**Bottom line:** The proposals solve problems we don't have (integration bugs, review gaps, slow error routing). The problems we DO have (signal decay, SHORT underperformance, new signal validation) are analytical, not procedural. Invest time in understanding WHY signals degrade, not in how we build them faster.
-
-**Recommendation:** Defer all three proposals. Revisit in 2 weeks if signal decay is resolved and we're building new signals regularly. Current priority: signal decay investigation + SHORT suppression validation + continuation monitoring.
-
----
-
-## 2026-08-08 — CEO Assessment: Signal Version Tracking Spec
-
-### Context
-
-Reviewed `plans/signal-version-tracking.md`. Proposal: version tracking for param changes, regression detection (6h vs 48h), auto-rollback on CRITICAL regression. 5-6 hours effort.
-
-### 1. Is this worth doing NOW?
-
-**No. Defer.**
-
-We already have three systems that solve overlapping parts of this problem:
-
-- **`signal_decay_detector.py`** — auto-disables signals when WR drops below 20% (hard) or 30% (soft). Runs every 6h. This IS regression detection — it just doesn't track which param change caused it.
-- **`self_learner.py`** — auto-tunes params based on performance, detects decay patterns.
-- **`signal_rotator.py`** — enables/disables signals based on regime and performance.
-
-The proposal's pitch is "we tune params, can't roll back." But look at our actual param changes this week:
-- bb_bounce RSI tightened to 40/60 — deliberate, monitoring window
-- SHORT combos suppressed at 0.5-0.6 weight — deliberate, monitoring window
-- continuation signal added — deliberate, monitoring window
-
-These are all intentional changes with expected outcomes. We're not making accidental edits that need rollback. The version tracking solves a problem we don't currently have — the real problem is signal decay from market regime shifts, not from our param edits.
-
-### 2. Risk of doing vs not doing
-
-**Risk of doing it (5-6 hours):**
-- Time diverted from the three actual priorities: signal decay investigation, SHORT suppression validation, continuation monitoring
-- Auto-rollback in a live trading system is a liability. If it triggers on noise (sample size < 20 trades), it could revert a good change. The -10% WR threshold sounds conservative but with 5 trades, one loss flips WR by 20%.
-- Adds a new data file (`signal_versions.json`) that needs maintenance and integration with 4 existing automations
-
-**Risk of NOT doing it:**
-- Zero immediate risk. We have git history for param changes (commit messages document what changed and why)
-- The decay detector already auto-disables bad signals
-- Manual rollback is "grep git log, revert the change" — 5 minutes, not the 48h the proposal claims
-
-### 3. Full version or MVP?
-
-**Neither. Skip it.**
-
-If we MUST build something, the MVP (version tracking only, no auto-rollback) is the right scope. Version log + dashboard section in signal_report.md. ~2 hours.
-
-But even the MVP duplicates what `git log` and `signal_performance_report.py` already do. The only new value is "who changed it" (human vs CEO vs self_learner) — which is audit trail, not operational necessity.
-
-### 4. Auto-rollback concerns
-
-**High risk. Do not implement.**
-
-- **Sample size trap:** Regression thresholds (-10% WR) are meaningless with < 20 trades. One extra loss on a 5-trade sample = -20% WR swing. The system would rollback perfectly fine param changes.
-- **Market regime confusion:** If the whole market shifts, ALL signals degrade simultaneously. Auto-rollback would revert every signal to previous params, then the new params would also fail, then it would rollback again — oscillation.
-- **No human in the loop:** A CRITICAL regression might be expected (we tightened filters to reduce trades,WR naturally shifts). Auto-rollback undoes the deliberate decision.
-- **Compounding errors:** Rollback applies params from a version that was "good" in a different market context. That context may no longer exist.
-
-The decay detector's approach (disable the signal, don't revert params) is safer. A disabled signal loses opportunity but doesn't lose money. A reverted param on a different market regime could actively lose money.
-
-### What to do instead
-
-The 5-6 hours is better spent on:
-
-1. **Signal decay root cause investigation** — Why do signals go from 40-80% WR to 0% in 24-48h? Is it regime shift, overfitting, or sample noise? This is the $354/week loss source.
-2. **SHORT suppression validation** — We suppressed 4 SHORT combos on Aug 7. Need 48h data to confirm it's working. If not, disable the worst offenders entirely.
-3. **continuation signal first 10 trades** — New signal, 65% WR backtested. Needs live validation.
-
-### Recommendation
-
-**Defer signal version tracking.** Revisit in 2 weeks — by then we'll have either solved signal decay (making version tracking less urgent) or have evidence that param-change rollbacks are actually needed (making the proposal justified).
-
-If you want a lightweight win: add a "param change log" section to `signal_performance_report.py` that reads git log for `hermes_constants.py` changes. Zero new files, zero new infrastructure, same audit trail value.
-
----
-
-## 2026-08-08 — Hebbian Autonomous Gate: Strategic Analysis
-
-### Context
-Hebbian enhanced with 4 new data types (combos, exit reason, leverage, hour). 3115 trades backfilled → 1792 nodes, 21716 synapses. The question: should Hebbian become an autonomous gate that can approve/reject without LLM?
-
-### Risk Assessment
-
-| Risk | Severity | Mitigation |
-|---|---|---|
-| Hebbian wrong on low-data tokens | HIGH | n<5 → always escalate to LLM |
-| Hebbian overfits to historical patterns | MEDIUM | WR threshold conservative (60% for approve, 30% for reject) |
-| LLM loses context for edge cases | LOW | LLM stays as fallback, not removed |
-| New tokens have no Hebbian data | LOW | No data → escalate to LLM (fail-open) |
-
-### Verdict: PROCEED — Phased Approach
-
-**Phase 1 (this week):** Enrich `hebbian_trade_boost()` with exit_quality + combo lookups. This improves LLM decisions without changing control flow. Zero risk.
-
-**Phase 2 (next week):** Add `hebbian_autonomous_gate()` as a NEW check before LLM. Hebbian only decides when confident (high n, clear WR, exit_profit dominant). Everything else still goes to LLM.
-
-**Phase 3 (week 3):** Measure. If Hebbian handles 60%+ of trades autonomously with better WR than LLM-only, expand. If not, pull back.
-
-### Guardrails
-
-1. **Never fully disable LLM** — keep it as fallback for edge cases
-2. **Minimum n=5** before Hebbian acts autonomously — no decisions on thin data
-3. **Conservative thresholds** — 60% WR to approve, 30% to reject (not 50/50)
-4. **Audit trail** — log every Hebbian autonomous decision for review
-5. **Circuit breaker** — if Hebbian autonomous WR drops below 45% over 50 trades, auto-disable and escalate all to LLM
-
-### Recommendation
-
-Phase 1 is zero-risk and high-value. Start there. Phase 2-3 depend on Phase 1 results. The LLM is expensive and slow — Hebbian at <1s per decision vs 5-15s for LLM is a compelling reason to shift load.
-
-**Bottom line:** The data is there. The infrastructure is there. The risk is manageable with guardrails. Proceed with Phase 1 this week.
-
----
-
-## 2026-08-08 — Hebbian Gate Improvements: Strategic Review
-
-### Current State
-- 333 trades tested, 4 auto-decisions (1.2%), 75% WR
-- Gate requires token-specific data (n>=5) — too strict
-- LLM handles 102 escalated trades at 86% WR — doing its job well
-
-### Verdict: PROCEED — 7-9% is the right initial target
-
-**Why not more aggressive (15-20%)?**
-- Token-specific data is thin — most tokens have <5 trades with same signal
-- Exit-quality data is sparse for many signals
-- Rushing to 15-20% would require using aggregate data, which we proved is unreliable (was approving losers)
-
-**Why not more conservative (3-5%)?**
-- We're already at 1.2% — too conservative means the gate is useless
-- 7-9% is achievable with tiered min-n alone (improvement #1)
-- Each percentage point of auto-decisions = fewer LLM calls = faster decisions
-
-### Recommended Approach
-
-**Phase 1 (this week):** Improvements #1 (tiered min-n) + #5 (circuit breaker). This gets us to ~5-6% auto-decisions with safety net. Zero risk — circuit breaker disables gate if accuracy drops.
-
-**Phase 2 (next week):** Improvements #2 (token WR) + #4 (exit-sl reject). This gets us to 7-9%. Medium risk — exit-sl reject is aggressive, needs monitoring.
-
-**Phase 3 (week 3):** Measure. Target: 7-9% auto-decisions at 80%+ WR. If hit, expand. If not, pull back to Phase 1 levels.
-
-### Guardrails
-1. Circuit breaker: auto-disable if WR < 45% over 50 auto-decisions
-2. 1-hour cooldown when tripped
-3. Never auto-reject without exit_sl data (no blind rejections)
-4. Audit trail on every auto-decision
-
-### Bottom line
-7-9% is ambitious but achievable. The tiered min-n approach is the biggest lever — it alone gets us to 5-6%. The circuit breaker ensures we can't accidentally hurt performance. Proceed with Phase 1 this week.
+### Verification Plan
+
+After implementation:
+1. Run 48-hour observation period — track auto-decision count and WR
+2. If auto-decisions > 5% and WR > 80% → expand to 10% target
+3. If WR drops below 70% → circuit breaker should catch it; investigate root cause
+4. Weekly review of auto-decision audit log
