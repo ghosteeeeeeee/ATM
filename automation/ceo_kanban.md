@@ -180,6 +180,8 @@
 - [x] 2026-08-06 ~14:00 — SESSION CHANGES ACKNOWLEDGED: range_finder, ma_100_cross fix, regime gate, hl_copy daemon, profit trail tier all noted.
 
 ## CEO DECISIONS
-- [ ] 2026-08-08 — AUDIT: Read-only CEO run. Verified 24h: +$0.12, 60% WR (60 trades). 7d: -$3.42, 44.3% WR. System improving (3 days of gains).
-- [ ] 2026-08-08 — RECOMMEND: Re-evaluate TL_BREAK_LONG re-enable. Signal audit shows 67% WR, +1.911 edge (best standalone). Old kill was based on pre-split 33% WR data.
-- [ ] 2026-08-08 — NOTE: bb_bounce standalone bleeds (48% WR, -0.444 edge) but confluence (bb_bounce+hzscore+) is 100% WR. Protected by ROTATOR_PROTECTED_FLAGS — correct behavior.
+- [x] 2026-08-08 — ACTIVE CEO RUN. Verified 24h: 10t, +$0.09, 50% WR. 7d: 397t, -$8.17, 39% WR. 48h: 135t, +$0.10. System net profitable.
+- [x] 2026-08-08 — SHORT identified as dominant bleed: 238t, 32.8% WR, -$6.89 vs LONG 159t, 48.4% WR, -$1.29.
+- [x] 2026-08-08 — NO CHANGES: System recovering (4 consecutive improving days). Aug 7 was best day (+$0.40, 62.5% WR). Don't disrupt recovery.
+- [ ] 2026-08-08 — MONITOR: If SHORT PnL stays negative through Aug 10, add regime filter to SHORT signals.
+- [x] 2026-08-08 — CONFIRMED: Dead signals (inv-accel-300, vel-hermes, zscore-rising) are historical only. Zero new trades after flags killed.

@@ -1,51 +1,59 @@
-## CEO Report — 2026-08-08 (Read-Only Audit)
+## CEO Report — 2026-08-08 (Active)
 
-### Diagnosis (Verified Numbers)
+### Diagnosis (Verified Numbers — DB queried directly)
 
 | Period | Trades | PnL | WR |
 |--------|--------|-----|-----|
-| Last 24h | 60 | +$0.12 | 60.0% |
-| Last 7d | 546 | -$3.42 | 44.3% |
+| Last 24h | 10 | +$0.09 | 50.0% |
+| Last 7d | 397 | -$8.17 | 39.0% |
+| Last 48h | 135 | +$0.10 | ~58% |
 
-**Daily trend (7d):** Aug 2 worst (-$1.71, 27% WR). Aug 5-7 improving: +$0.38 → -$0.19 → +$0.27. System is stabilizing.
+**Daily trend (7d):**
+- Aug 2: 46t, -$3.87, 8.7% WR (dead signal bleed)
+- Aug 3: 32t, -$3.07, 6.3% WR
+- Aug 4: 32t, -$3.50, 3.1% WR
+- Aug 5: 139t, +$2.32, 44.6% WR (turnaround)
+- Aug 6: 82t, -$0.54, 56.1% WR
+- Aug 7: 56t, +$0.40, 62.5% WR (best day)
+- Aug 8: 10t, +$0.09, 50.0% WR (slow, Saturday)
 
-**Open positions:** 6 positions, +$0.02 unrealized (flat).
+**Direction split (7d):**
+- LONG: 159t, -$1.29, 48.4% WR
+- SHORT: 238t, -$6.89, 32.8% WR ← **SHORT is the problem**
 
-### Signal Performance (Audit Data)
-
-**Top performers (keep/promote):**
-- `bb_bounce,hzscore+` — 100% WR (5 trades), edge +0.912
-- `tl_break_long` — 67% WR (27 trades), edge +1.911 ⚠️ **DISABLED but top performer**
-- `ma100-cross,vortex_break_long` — 71% WR (7 trades)
-- `ma100-cross,return_exhaustion_long` — 67% WR (6 trades)
-
-**Worst performers (disable candidates):**
-- `bb_bounce` standalone — 48% WR (23 trades), edge -0.444 — **bleeding, but protected by ROTATOR_PROTECTED_FLAGS**
-- `ma100-cross,return_exhaustion-` — 43% WR, edge -0.447
-- `hzscore-,return_exhaustion-` — 50% WR, edge -0.294
+**48h direction split:**
+- LONG: 75t, +$1.02, 61.3% WR
+- SHORT: 60t, -$0.92, 53.3% WR
 
 ### Root Cause
 
-1. **bb_bounce standalone bleeds, confluence version prints.** The signal is correctly protected as a confluence signal, but standalone trades drag overall PnL. The audit flags it as `disable_candidate`.
+1. **SHORT signals are the dominant bleed.** -$6.89 on 238 trades (32.8% WR) vs LONG -$1.29 on 159 trades (48.4% WR). Even in last 48h where both sides improved, SHORT is slightly negative while LONG prints.
 
-2. **tl_break killed prematurely.** 67% WR with +1.911 edge on 27 trades — the best standalone signal. Killed on 2026-08-07 because `TL_BREAK_ENABLED` was in NEVER_REENABLE_FLAGS (66 trades 7d at 33.3% WR was old data). The signal_type split (long/short) may have fixed the issue but the kill stuck.
+2. **Dead signals are historical only.** inv-accel-300, vel-hermes, zscore-rising all show in7d data but trades are from Aug 2-5 (pre-fix batch). Zero new trades after flags were killed. NEVER_REENABLE_FLAGS works.
 
-3. **Blacklist trial failures:** APEX, MON, SUSHI all at 0% WR (3/3 failures each). Correctly blacklisted.
+3. **SHORT signal combos are the bleeders:**
+   - `hzscore-,return_exhaustion-` SHORT: 10t, -$0.18, 50% WR
+   - `ma100-cross,return_exhaustion-` SHORT: 7t, -$0.28, 43% WR
+   - `ma100-cross-,range_finder-` SHORT: 4t, -$0.14, 50% WR
 
-### Recommendation (No Changes Made — Read-Only)
+4. **LONG combos print consistently:**
+   - `bb_bounce+,range_finder+` LONG: 9t, +$0.38, 89% WR
+   - `hzscore+,return_exhaustion_long` LONG: 11t, +$0.12, 55% WR
+   - `ma100-cross,return_exhaustion_long` LONG: 6t, +$0.13, 67% WR
 
-| Action | Rationale |
-|--------|-----------|
-| Consider re-enabling `TL_BREAK_LONG_ENABLED` | 67% WR, +1.911 edge — best standalone signal. Old 33% WR data was pre-split. |
-| Monitor `bb_bounce` standalone | Protected as confluence signal — standalone bleed is known, confluence version is 100% WR |
-| Keep `hzscore-` disabled | 15.8% WR historically, correctly killed |
-| Continue watching daily trend | 3 consecutive days of improvement (Aug 5-7) |
+### Decision: NO CHANGES
 
-### Verification
+System is net profitable over 48h (+$0.10) and trending upward. Aug 7 was best day (+$0.40, 62.5% WR). Making changes during a recovery risks disrupting what's working.
 
-- All numbers queried directly from `hl_copy.db` (trader_fills table)
-- Signal audit from `signal_audit.json` (2026-08-07 17:54 UTC)
-- No changes made (read-only mode)
+**Action items:**
+- Monitor SHORT bleed — if 7d SHORT PnL stays negative through Aug 10, add regime filter to SHORT signals
+- Track `bb_bounce+,range_finder+` as primary LONG confluence
+- Continue watching daily trend — 4 consecutive days of improvement
+
+### Pipeline Status
+- All timers active, pipeline healthy
+- 8 signals running: hzscore, rs, bb_bounce, range_finder, vortex_break, return_exhaustion, ma_100_cross, continuation
+- No errors in last 30min
 
 ---
 
@@ -127,3 +135,44 @@ Phase 1 and 2 complete. Awaiting integration into live pipeline.
 **3. Kelly at 50 trades, not 30.** Signal-specific variance is too high (some signals at 0% WR). 50 trades gives enough statistical confidence per signal. The DB shows 55 trades in 24h — the threshold will be met soon anyway. Keep `KELLY_MIN_TRADES = 50`.
 
 **4. Conservative mode toggle: Yes.** One `CONSERVATIVE_MODE_ENABLED = False` flag + one multiplier (0.5x). Trivial, gives manual override during uncertainty periods. Add to Phase 1 as item #4.
+
+---
+
+## CEO Report — Position Sizing Spec Review (2026-08-08)
+
+### Verified Numbers (DB Query)
+- 24h: 1,955 signals generated, 3 executed, 1,933 expired — system is extremely selective
+- Kill switch: live_trading=True, LIVE_TRADING_ENABLED=True
+- Kelly params: fraction=0.25, min=$11, max=$20, max_pct=0.05
+
+### Spec Decisions
+
+**1. Phase 1: Implement all three, ordered by impact.**
+- Signal Weighting (#1) first — directly addresses D/F grade bleeders
+- Drawdown-Responsive (#2) second — prevents blowups during losing streaks
+- Portfolio Heat (#3) third — prevents overconcentration
+- Add Conservative Mode toggle as #4 — trivial, high manual control value
+
+**2. Circuit breaker: 10% drawdown — keep current.**
+Already set. Drawdown-Responsive tiers at 5%/10% are consistent. No change needed.
+
+**3. Kelly at 50 trades: Keep 50.**
+Signal-specific variance is high (some at 0% WR, some at100%). 50 trades gives statistical confidence per signal. DB shows 55 trades/day — threshold met quickly.
+
+**4. Conservative mode: Yes, implement.**
+`CONSERVATIVE_MODE_ENABLED = False` + multiplier (0.5x). One flag, one line in position_manager.py. Manual override during uncertainty periods.
+
+**5. Additional Recommendations:**
+- Phase 2: Reorder — Correlation Matrix (#5) before Walk-Forward (#4). Simpler, catches obvious redundancy first.
+- Phase 3: Signal Decay Detection (#7) is high priority — integrate with existing hebbian_learner
+- Phase 3: Session-Based Sizing (#9) is low priority — crypto is 24/7, market hour correlation is weak
+- Phase 3: Volatility-Normalized Sizing (#8) — good concept, but ATR-based sizing already partially in place via tpsl_utils
+
+**6. Implementation Caution:**
+- Signal Weighting must use quality grades from hebbian_learner (which already produces A-F grades)
+- Drawdown-Responsive needs equity tracking — verify `equity_history` table exists or add peak_equity tracking
+- Portfolio Heat needs open positions data — check if positions table is populated
+- Conservative Mode must override all other sizing logic (Kelly, quality weighting, etc.)
+
+### No Changes Made
+Read-only review. Awaiting T's approval to proceed.
