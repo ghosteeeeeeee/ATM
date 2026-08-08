@@ -346,6 +346,25 @@ DEFAULT_TRADE_SIZE_USDT = 11.0  # local DB signal-level default for amount_usdt
                                  # hype_realized_pnl_usdt (HL ground-truth) instead.
 HL_MIN_NOTIONAL_USDT     = 11.0 # HL minimum notional ($10 + $1 buffer)
 
+# ── Kelly Criterion Sizing (from Trading Books) ──────────────────────────────
+KELLY_ENABLED = False           # Disabled until 50+ trades per signal
+KELLY_FRACTION = 0.25          # Quarter-Kelly (conservative: 50% growth, 12% drawdown)
+KELLY_MAX_POSITION_PCT = 0.05  # Max 5% of bankroll per trade
+KELLY_MIN_POSITION_USDT = 5.0  # Minimum $5 per trade
+KELLY_MAX_POSITION_USDT = 20.0 # Maximum $20 per trade (hard cap)
+KELLY_MIN_TRADES = 50          # Minimum trades before Kelly activates
+KELLY_DRAWDOWN_CIRCUIT_BREAKER = 0.10  # Stop Kelly at 10% drawdown
+
+# ── Signal Quality Gate ───────────────────────────────────────────────────────
+SIGNAL_QUALITY_ENABLED = True
+SIGNAL_QUALITY_MIN_GRADE = 'C'  # Only trade C or better (A, B, C)
+SIGNAL_QUALITY_MIN_SHARPE = 1.0
+SIGNAL_QUALITY_MIN_PROFIT_FACTOR = 1.5
+
+# ── Regime Detection ──────────────────────────────────────────────────────────
+REGIME_ENABLED = True
+REGIME_SIZE_ADJUST = True      # Adjust size based on regime
+
 # ── Support & Resistance Signal Constants ─────────────────────────────────────
 # Used by rs_signals.py (top-level) and signals/rs.py (signals/ scanner)
 # NOTE: signals/rs.py had hardcoded values that diverged from this file.

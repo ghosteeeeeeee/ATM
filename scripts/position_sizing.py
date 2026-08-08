@@ -17,6 +17,75 @@ from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timedelta
 from _secrets import BRAIN_DB_DICT
 
+# ── Account Equity from HL ───────────────────────────────────────────────────
+
+def get_hl_account_equity() -> float:
+    """
+    Get current account equity from Hyperliquid API.
+    
+    Returns:
+        Account value in USDT, or 0.0 if unavailable
+    """
+    try:
+        import requests
+        from _secrets import HL_WALLET_ADDRESS as MAIN_ACCOUNT_ADDRESS
+        
+        resp = requests.post(
+            'https://api.hyperliquid.xyz/info',
+            json={'type': 'clearinghouseState', 'user': MAIN_ACCOUNT_ADDRESS},
+            timeout=10
+        )
+        if resp.status_code != 200:
+            return 0.0
+        
+        state = resp.json()
+        account_value = float(state.get('marginSummary', {}).get('accountValue', 0))
+        return account_value
+    except Exception as e:
+        print(f"[position_sizing] Error getting HL equity: {e}")
+        return 0.0
+
+
+def get_open_positions_value() -> float:
+    """
+    Get total value of open positions from Hyperliquid.
+    
+    Returns:
+        Total position value in USDT
+    """
+    try:
+        import requests
+        from _secrets import HL_WALLET_ADDRESS as MAIN_ACCOUNT_ADDRESS
+        
+        resp = requests.post(
+            'https://api.hyperliquid.xyz/info',
+            json={'type': 'clearinghouseState', 'user': MAIN_ACCOUNT_ADDRESS},
+            timeout=10
+        )
+        if resp.status_code != 200:
+            return 0.0
+        
+        state = resp.json()
+        positions = state.get('assetPositions', [])
+        
+        total_value = 0.0
+        for p in positions:
+            pos = p.get('position', {})
+            szi = float(pos.get('szi', 0))
+            entry_px = float(pos.get('entryPx', 0))
+            leverage = float(pos.get('leverage', {}).get('value', 1))
+            
+            if szi != 0 and entry_px > 0:
+                # Position value = |size| * entry_price / leverage
+                position_value = abs(szi) * entry_px / leverage
+                total_value += position_value
+        
+        return total_value
+    except Exception as e:
+        print(f"[position_sizing] Error getting positions value: {e}")
+        return 0.0
+
+
 # ── Kelly Criterion ───────────────────────────────────────────────────────────
 
 def calculate_kelly_fraction(win_rate: float, avg_win: float, avg_loss: float) -> float:
@@ -284,30 +353,43 @@ def liquidity_adjusted_size(
 
 def calculate_optimal_size(
     signal: str,
-    bankroll: float,
-    volume_24h: float,
+    bankroll: float = None,
+    volume_24h: float = 100000,
     lookback_days: int = 30,
+    use_hl_equity: bool = True,
 ) -> float:
     """
     Calculate optimal position size using all factors:
-    1. Kelly criterion based on signal history
-    2. Liquidity adjustment
-    3. Default fallback
+    1. Real account equity from HL API
+    2. Kelly criterion based on signal history
+    3. Liquidity adjustment
+    4. Hard safety limits
     
     Args:
         signal: Signal name
-        bankroll: Total bankroll
+        bankroll: Total bankroll (if None, queries HL API)
         volume_24h: 24h volume
         lookback_days: Days to look back for performance
+        use_hl_equity: Whether to query HL for real equity
     
     Returns:
         Optimal position size in USDT
     """
     from hermes_constants import DEFAULT_TRADE_SIZE_USDT
     
+    # Get real bankroll from HL if not provided
+    if bankroll is None or bankroll <= 0:
+        if use_hl_equity:
+            bankroll = get_hl_account_equity()
+            if bankroll <= 0:
+                return DEFAULT_TRADE_SIZE_USDT
+        else:
+            return DEFAULT_TRADE_SIZE_USDT
+    
     # Get signal performance
     perf = get_signal_performance(signal, lookback_days)
     
+    # Safety: need enough history for Kelly
     if perf and perf['total_trades'] >= 20:
         # Use Kelly sizing
         kelly_size = calculate_kelly_size(
