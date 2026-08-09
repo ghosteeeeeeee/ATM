@@ -405,3 +405,40 @@ All 7d bleeds are pre-fix Aug 4-8 era: vortex_break_long unfiltered, ma_100_cros
 2. bb_bounce+,hzscore+ star promotion (currently 5T n 24h, 80% WR)
 3. 7d legacy bleeds fully aged out
 4. Auto-kill of bb-bounce-short,hl_copy_trader if it hits 5T<30%
+
+## CEO Report — 2026-08-09 (22:49 UTC)
+
+### Diagnosis
+**9th consecutive green day, strongest 24h of cycle.** Verified DB (signals_hermes_runtime.signal_outcomes, 22:49 UTC):
+- 24h **65T +$0.80 (60.0% WR)** — +$0.07 vs 21:50 read
+- today **62T +$0.91 (62.9% WR)** — strongest day of week
+- 6h **10T +$0.49 (90.0% WR)** — exceptional
+- 4d **241T +$0.53 (56.8% WR)** — clean rolling positive
+- 7d **444T -$3.69 (45.5% WR)** — legacy bleeds aging out (was -$8+ last week)
+- LONG 24h 49T +$0.76 (63.3% WR), SHORT 24h 16T +$0.04 (50.0% WR) — **bleeding STOPPED 8th day**
+
+Stars (24h):
+- bb_bounce+,hzscore+ LONG: **5T +$0.41 (80.0% WR)** — EMERGING 3rd star, up from 66.7% yesterday
+- bb_bounce+,range_finder+ LONG: 27T +$0.18 (55.6% WR) / 7d 42T +$0.83 (61.9% WR) ★
+- bb-bounce-short,hzscore- SHORT: 12T +$0.16 (58.3% WR) ★
+- continuation+,hzscore+ LONG: 3T +$0.08 (100% WR)
+- hzscore+,range_finder+ LONG: 5T +$0.03 (80% WR)
+- hzscore+,mover+ LONG: 3T +$0.04 (66.7% WR)
+
+### Bleeds (7d, all DISABLED — decaying)
+zscore-rising- SHORT 44T -$1.37 (25%) | vel-hermes- SHORT 58T -$1.14 (31%) | zscore-rising+ LONG 26T -$1.01 (27%) | pattern_wolf_wave_bear SHORT 9T -$0.79 (11%) | bb_bounce SHORT 10T -$0.56 (30%) | decider SHORT 10T -$0.22 (0%) — **last fires Aug 2-5, all 0 fires in 24h, aging out of window**.
+
+### Fix Applied
+**NONE (trading).** All flags verified correct from prior reads. NO TOUCH.
+
+### Watch (no action — sub-threshold)
+- bb-bounce-short,hl_copy_trader SHORT 2T 0% -$0.07 (last Aug 9 13:30) — signal_reporter auto-kill at 5T<30%WR. Will resolve on its own.
+
+### Verification
+- 22:49:13 pipeline LIVE ran clean: Portfolio 3 open | 65 closed today | +6.55% PnL
+- 22:49:35 HL sync reconciled 3 paper trades (ETH/PROVE/AXS)
+- Regime last scan: LONG_BIAS at 19:37 UTC (3h old — next 15m-regime-scanner 23:00 UTC)
+- hype_live_trading.json: ENABLED, kill switch off
+- All 20+ systemd timers on schedule; hermes-pipeline, price-collector, 1m-candle, watchdog, hl-sync-guardian all healthy
+- Failed services (bug-hunter.timer at 23:25, trading-checklist.timer at 22:53, hl-volume — last rate-limit WARN) — none impact trading
+- 0 phantoms 24h
