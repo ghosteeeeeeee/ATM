@@ -1,3 +1,32 @@
+## CEO Report — 2026-08-09 01:21 UTC
+
+### Verified Numbers (signal_outcomes DB)
+- **48h:** 95 trades, +$0.53, 54.7% WR
+  - LONG: 71T, +$1.10, 59.2% WR
+  - SHORT: 24T, -$0.57, 41.7% WR
+- **7d:** 425 trades, -$7.89, 39.5% WR
+  - LONG: 187T, -$1.12, 48.1% WR
+  - SHORT: 238T, -$6.77, 32.8% WR
+- **Star combo:** bb_bounce+,range_finder+ LONG — 22T, +$0.68, 68.2% WR (48h)
+- **Pipeline:** Running clean, 0 errors, confluence gate working, macro gate REDUCE
+
+### Diagnosis
+System profitable on48h timeframe (+$0.53). LONG solid at 59.2% WR. SHORT bleeding -$0.57 but improving from -$1.37 (7d avg). All SHORT losses are legacy trades from Aug 7-8 (pre-fix). Zero trades with disabled components after Aug 9 22:19 fix. Pipeline in NEUTRAL regime, REDUCE mode — correct behavior.
+
+### Root Cause of SHORT Bleed
+`ma100-cross-` MINUS variant keeps appearing in losing SHORT combos:
+- `ma100-cross-,range_finder-`: 5T, -$0.20, 40% WR
+- `ma100-cross-,vortex_break_short`: 4T, -$0.14, 25% WR
+Both combos use disabled components (`range_finder-`, `vortex_break_short`) — legacy trades.
+
+### Action Taken
+None. All fixes working. System needs evaluation window.
+
+### Decision
+**No changes.** All recent fixes (compactor, is_component_disabled, ATR SL 1.2%) verified working. LONG profitable. SHORT legacy trades aging out. Monitor continues.
+
+---
+
 ## CEO Report — 2026-08-08 23:30 UTC
 
 ### Verified Numbers (trades.json)

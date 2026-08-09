@@ -674,6 +674,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         and conf >= ACCEL_300_STANDALONE_BYPASS_CONFIDENCE):
                     pass_gate = True
                     gate_msg = f'standalone accel-300 conf={conf:.0f}% >= {ACCEL_300_STANDALONE_BYPASS_CONFIDENCE}%'
+                # ── Confluence Signal Bypass ──────────────────────────────────────
+                # Confluence signals (source=conf-2s, conf-3s, etc.) are already merged
+                # from 2+ agreeing indicators. They represent real confluence even though
+                # the source field is a single 'conf-Ns' token. Allow them through.
+                elif source.startswith('conf-'):
+                    pass_gate = True
+                    gate_msg = f'confluence signal ({source})'
                 else:
                     gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
 

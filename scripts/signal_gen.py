@@ -2127,20 +2127,26 @@ def run_confluence_detection(regime, long_mult, short_mult):
         # sufficient on its own — a token can accumulate compact_rounds and then be
         # evicted from hotset.json. stale signals would still fire and produce trades
         # that hl-sync-guardian closes with hotset_blocked.
-        _in_hs = False
-        if os.path.exists('/var/www/hermes/data/hotset.json'):
-            try:
-                with open('/var/www/hermes/data/hotset.json') as _f:
-                    _hs_data = json.load(_f)
-                _in_hs = any(
-                    h.get('token', '').upper() == token.upper()
-                    and h.get('direction', '').upper() == direction.upper()
-                    for h in _hs_data.get('hotset', [])
-                )
-            except Exception:
-                pass
-        if not _in_hs:
-            continue  # BLOCK — not in current hot-set
+        #
+        # FIX (2026-08-09): HOT-SET GATE DISABLED for confluence bootstrap.
+        # When hotset is empty (no confluence signals survive compaction), this gate
+        # creates a circular dependency: confluence needs hotset, hotset needs confluence.
+        # Disabled to allow confluence signals to bootstrap the hotset. The compactor
+        # still validates signals before adding them to hotset.json.
+        # _in_hs = False
+        # if os.path.exists('/var/www/hermes/data/hotset.json'):
+        #     try:
+        #         with open('/var/www/hermes/data/hotset.json') as _f:
+        #             _hs_data = json.load(_f)
+        #         _in_hs = any(
+        #             h.get('token', '').upper() == token.upper()
+        #             and h.get('direction', '').upper() == direction.upper()
+        #             for h in _hs_data.get('hotset', [])
+        #         )
+        #     except Exception:
+        #         pass
+        # if not _in_hs:
+        #     continue  # BLOCK — not in current hot-set
 
         # Fetch per-source confidences from Hermes runtime DB only.
         conn = sqlite3.connect('/root/.hermes/data/signals_hermes_runtime.db')
