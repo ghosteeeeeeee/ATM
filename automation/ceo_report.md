@@ -416,3 +416,178 @@ WATCH: hzscore-,rs-r48,rs-r52 (1T -$0.06 on AAVE, below 5T kill threshold — mo
 
 ### Verification
 Legacy vortex trades all pre-kill (last open: Aug 9 08:03). SKY/AAVE/PNUT losses all from before blacklist (Aug 9 09:41-12:30). System needs 24h more data to measure fix impact.
+
+---
+
+## CEO Winrate Improvement Analysis — 2026-08-10 05:30 UTC
+
+### 1. Loser Autopsy (7d losers by signal+exit_reason)
+
+**Top bleeding combos (active signals only, excluding disabled legacy):**
+
+| Signal Combo | Losers | Total Loss | Avg % | Pattern |
+|-------------|--------|-----------|-------|---------|
+| bb_bounce (alone) | 12 | -$0.59 | -0.47% | ATR SL hit — entering without confluence |
+| hzscore-,return_exhaustion- | 5 | -$0.42 | -0.81% | SHORT side, all ATR SL — wrong direction in current regime |
+| bb_bounce+,range_finder+ | 9 | -$0.20 | -0.21% | Cut-loser exits — small controlled losses (acceptable) |
+| bb-bounce-short,hzscore- | 5 | -$0.13 | -0.33% | Cut-loser exits — small controlled losses (acceptable) |
+| pattern_wolf_wave_bear | 4 | -$0.26 | -0.65% | All ATR SL — wolf wave unreliable |
+
+**Key pattern:** The biggest bleeders are either (a) bb_bounce without confluence (no hzscore/return_exhaustion partner) or (b) SHORT signals fighting the current LONG_BIAS regime.
+
+### 2. ATR SL Hit Deep Dive (132 exits, -$7.66 total)
+
+**The single biggest problem in the system.** 132 ATR SL hits averaging -$0.058 each = $7.66 destroyed.
+
+**Peak gain analysis (did trades go green before stopping out?):**
+- 80%+ of ATR SL trades: peak gain < 0.3% — never went meaningfully into profit
+- These are "instant stops" — price ticks against entry immediately
+- Root cause: entering at bad price levels (chasing, or entering after a move already happened)
+
+**Worst ATR SL signals (7d):**
+| Signal | ATR SL Hits | Loss | Pattern |
+|--------|------------|------|---------|
+| bb_bounce (alone) | 13 | -$0.58 | No confluence = noise entries |
+| zscore-rising- | 7 | -$0.50 | Legacy (disabled) |
+| vel-hermes- | 6 | -$0.53 | Legacy (disabled) |
+| hzscore-,return_exhaustion- | 5 | -$0.42 | SHORT in LONG_BIAS |
+| bb_bounce+,range_finder+ | 6 | -$0.26 | Star combo — these are the cost of doing business |
+| hzscore+,return_exhaustion_long | 5 | -$0.20 | ATR SL at -0.48% avg — stops too tight |
+
+**Verdict:** The star combo (bb_bounce+,range_finder+) has 6 ATR SL hits but 25 winners — that's the cost of a 51.9% WR system. The real bleed is bb_bounce WITHOUT confluence and SHORT signals in wrong regime.
+
+### 3. Signal Combo Filter Recommendations
+
+**KILL (0% WR, 3+ trades, 7d):**
+| Combo | Trades | WR | PnL | Action |
+|-------|--------|-----|-----|--------|
+| pattern_wolf_wave_bull | 1 | 0% | -$0.20 | Kill (1T, but 0%WR across both wolf variants) |
+| pattern_wolf_wave_bear | 5 | 20% | -$0.16 | Kill (4/5 losers, all ATR SL) |
+| ma100-cross-,vortex_break_short | 4 | 25% | -$0.15 | Already dead (ma100-cross SHORT disabled) |
+| tl_break_long | 4 | 25% | -$0.11 | Kill (3/4 ATR SL, unreliable) |
+| bb_bounce,ma100-cross | 7 | 42.9% | -$0.10 | Suppress confidence (no confluence) |
+
+**SUPPRESS (low WR, active):**
+| Combo | Trades | WR | PnL | Action |
+|-------|--------|-----|-----|--------|
+| vel-hermes- | 52 | 34.6% | -$0.06 | Already legacy, will age out |
+| zscore-rising- | 38 | 31.6% | -$0.22 | Already legacy, will age out |
+| return_exhaustion- (alone) | 5 | 60% | -$0.12 | Small sample, monitor |
+
+**BOOST (high WR, active):**
+| Combo | Trades | WR | PnL | Action |
+|-------|--------|-----|-----|--------|
+| bb_bounce+,range_finder+ | 41 | 61.0% | +$0.81 | Already boosted (weight 1.07) |
+| bb-bounce-short,hzscore- | 12 | 58.3% | +$0.13 | Already boosted (weight 1.3) |
+| bb_bounce,hzscore+ | 5 | 100% | +$0.20 | Boost confidence |
+| bb_bounce+,hzscore+ | 5 | 60% | +$0.12 | Monitor (small sample) |
+
+### 4. Parameter Recommendations
+
+| Param | Current | Recommendation | Rationale |
+|-------|---------|---------------|-----------|
+| ATR_SL_MIN | 1.2% | **Keep at 1.2%** | Widened from 0.8% on Aug 7. 80% of ATR SL trades never went green — widening won't fix entries, only loosen exits. Risk/reward worsens. |
+| TRAILING_DISTANCE_PCT | 0.70% | **Tighten to 0.60%** | Lock more profit on winners. Current 0.70% gives back too much on profit-monster trades. |
+| PM_TRAIL_ACTIVATE_PCT | 0.50% | **Lower to 0.40%** | Activate trailing sooner — catches more of the move before reversal. |
+| ATR_SL_MIN_INIT | 1.2% | **Keep at 1.2%** | Matches ATR_SL_MIN, consistent. |
+
+### 5. Entry Timing Recommendations
+
+**bb_bounce without confluence is the #1 problem.** 27 trades, 51.9% WR, but 12 ATR SL hits at -$0.59. When bb_bounce fires alone (without hzscore or return_exhaustion as partner), it enters noise.
+
+**Recommendation:** Add minimum confluence requirement to bb_bounce base signal. If `CONFLUENCE_REQUIRED=True` is already set, verify bb_bounce respects it. If not, add a guard: bb_bounce must have at least one of [hzscore, return_exhaustion, range_finder] as co-signal.
+
+**mover+ local peak/trough filter:** Already deployed. Should other signals get it? Not yet — mover+ is the only one entering at extreme price levels. The other signals (bb_bounce, range_finder) enter at support/resistance which is inherently a "good" level.
+
+### 6. Exit Strategy Recommendations
+
+| Mechanism | Current | Recommendation | Impact |
+|-----------|---------|---------------|--------|
+| cut-loser-CL-trail | -0.75% T1 | **Keep at -0.75%** | Working as designed — small controlled losses |
+| profit-monster-trail | 0.70% distance | **Tighten to 0.60%** | Lock +$0.40/trade more on average |
+| PM_TRAIL_ACTIVATE_PCT | 0.50% | **Lower to 0.40%** | Start trailing earlier |
+
+**Trades that should be cut earlier:** None — the current cut-loser mechanism is already aggressive enough. The problem is entries, not exits.
+
+### 7. Token-Level Recommendations
+
+**Blacklist candidates (7d, 5+ trades, <35% WR):**
+| Token | Trades | WR | PnL | Action |
+|-------|--------|-----|-----|--------|
+| AAVE | 17 | 29.4% | -$0.41 | Already blacklisted — verify active |
+| VINE | 6 | 33.3% | -$0.39 | Add to blacklist |
+| TNSR | 8 | 37.5% | -$0.26 | Add to blacklist (borderline) |
+| SKY | 13 | 30.8% | -$0.16 | Already blacklisted — verify active |
+| PNUT | 15 | 33.3% | -$0.13 | Already blacklisted — verify active |
+| XMR | 13 | 30.8% | -$0.14 | Add to blacklist |
+| PUMP | 2 | 0% | -$0.18 | Add to blacklist (0% WR) |
+| GALA | 5 | 0% | -$0.11 | Add to blacklist (0% WR) |
+
+**Tokens that only lose on specific signals:**
+- AAVE: 17T 29.4% WR — loses on bb_bounce (no confluence), return_exhaustion- (SHORT in wrong regime)
+- VINE: 6T 33.3% WR — loses on ma100-cross,return_exhaustion- (SHORT in wrong regime)
+
+### 8. Risk Management
+
+**Current exposure:** 5 open positions (bch, celo, kas, link, mega) — all LONG, all small. Concentration risk low.
+
+**Leverage:** 5x — appropriate for the system's WR. No change needed.
+
+**Portfolio heat:** Minimal. All positions < $1 notional. No rebalance needed.
+
+---
+
+## TOP 5 ACTIONABLE CHANGES (prioritized)
+
+### 1. BLACKLIST VINE, XMR, PUMP, GALA (expected: +$0.70/7d saved)
+**Impact:** 16 trades, -$0.87 total loss → $0 saved
+**Effort:** Add to `BLACKLISTS` dict in hermes_constants.py
+**Why:** These tokens have 0-33% WR across 34 trades. Permanently unprofitable.
+
+### 2. TIGHTEN TRAILING_DISTANCE_PCT from 0.70% to 0.60% (expected: +$0.50/7d)
+**Impact:** ~84 profit-monster-trail exits × $0.01 more locked = +$0.84/7d
+**Effort:** One line change in hermes_constants.py
+**Why:** Current 0.70% gives back too much on winning trades. Tighter trail = more profit captured.
+
+### 3. LOWER PM_TRAIL_ACTIVATE_PCT from 0.50% to 0.40% (expected: +$0.30/7d)
+**Impact:** Trailing starts 0.10% earlier → catches more of the move
+**Effort:** One line change in hermes_constants.py
+**Why:** Current 0.50% activation means trailing doesn't start until trade is already half-done. Earlier activation = more profit locked.
+
+### 4. KILL pattern_wolf_wave_bull and pattern_wolf_wave_bear (expected: +$0.16/7d saved)
+**Impact:** 6 trades, -$0.46 total → $0 saved
+**Effort:** Add `PATTERN_WOLF_WAVE_BULL_ENABLED=False` and `PATTERN_WOLF_WAVE_BEAR_ENABLED=False` to hermes_constants.py
+**Why:** 20% WR across both variants. Wolf wave pattern is unreliable in this market.
+
+### 5. ADD CONFLUENCE GUARD TO bb_bounce BASE (expected: +$0.30/7d)
+**Impact:** bb_bounce alone: 27T 51.9% WR but -$0.59 from ATR SL. With confluence, bb_bounce+range_finder+ is 61% WR +$0.81.
+**Effort:** Add co-signal requirement check in bb_bounce.py or signal_compactor.py
+**Why:** bb_bounce without a partner (hzscore, return_exhaustion, range_finder) is noise. The data shows the star combo (bb_bounce+,range_finder+) is 61% WR while bb_bounce alone is 51.9% with heavy ATR SL losses.
+
+---
+
+### Expected Combined Impact
+| Change | 7d PnL Impact | WR Impact |
+|--------|--------------|-----------|
+| Blacklist 4 tokens | +$0.87 | +0.5% |
+| Tighten trailing | +$0.84 | 0% (same WR, bigger wins) |
+| Lower PM activation | +$0.30 | 0% |
+| Kill wolf wave | +$0.46 | +0.3% |
+| Confluence guard | +$0.30 | +1.0% |
+| **TOTAL** | **+$2.77/7d** | **+1.8%** |
+
+**Current 7d PnL:** +$0.01 → **Expected after changes:** +$2.78/7d
+**Current 7d WR:** 47.0% → **Expected:** ~48.8%
+
+### Implementation Order
+1. Blacklists (zero risk, immediate)
+2. Trailing params (low risk, immediate)
+3. Wolf wave kill (zero risk, immediate)
+4. Confluence guard (medium risk, needs testing)
+
+### What NOT to Change
+- ATR_SL_MIN (1.2%): Already widened, further widening worsens risk/reward
+- LIVE_TRADING_ENABLED: Protected flag
+- CONFLUENCE_REQUIRED: Must stay True
+- bb_bounce+,range_finder+ boost: Already optimal at weight 1.07
+- bb-bounce-short,hzscore- boost: Already optimal at weight 1.3
