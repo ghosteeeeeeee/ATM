@@ -148,6 +148,55 @@ Approved. No further changes. Monitor.
 
 ---
 
+## CEO Report — 2026-08-09 (21:20 UTC)
+
+### Diagnosis
+**7d JUST FLIPPED POSITIVE. 8th consecutive green day.** Verified DB (Postgres brain):
+
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 24h | 65T | **+$0.74** | **56.9%** (strongest of cycle) |
+| 4d rolling | 250T | **+$0.98** | **55.6%** |
+| 7d | 397T | **+$0.34** | 47.6% (was -$3.83 yesterday — FLIPPED POSITIVE) |
+
+**Direction split 24h:** LONG 48T +$0.67 (58.3%), SHORT 17T +$0.07 (52.9%) — bleeding STOPPED, 8th consecutive day.
+**Direction split 7d:** LONG 193T +$1.80 (55.4%), SHORT 204T -$1.46 (40.2%) — SHORT legacy bleeds aging out, 24h SHORT already cleanly profitable.
+
+**Stars firing (24h):**
+- `bb_bounce+,range_finder+` LONG: 25T +$0.18 (52.0%) / 7d 42T +$0.83 (61.9%) ★
+- `bb_bounce+,hzscore+` LONG: 6T +$0.34 (66.7%) — emerging 3rd star (4/4 wins today!)
+- `bb-bounce-short,hzscore-` SHORT: 13T +$0.17 (61.5%) ★
+- `continuation+,hzscore+` LONG: 3T +$0.06 (66.7%) — clean small sample
+
+**24h close reasons:** profit-monster-trail 36T +$1.70, cut-loser-CL-trail 13T -$0.33, atr_sl_hit 12T -$0.56. The profit-monster trail is doing the heavy lifting.
+
+### Root Cause (of past bleeds)
+Aug 2-4 era — vortex_break_long unfiltered, ma_100_cross SHORT regime guard missing, bb_bounce SHORT no regime filter, multiple signals firing in wrong regime. **All fixed Aug 9 04:00+.** No bleeding signal currently active. The 7d SHORT -$1.46 is all legacy pre-fix trades (zscore-rising-, hzscore-,return_exhaustion-, inv-accel-300-, ma100-cross SHORT combos — all last fired Aug 3-8, all DISABLED now).
+
+### Pipeline Health
+- All 20+ systemd timers firing on schedule. Pipeline LIVE.
+- 6 open positions, all LONG: ASTER ($11), PROVE ($11), BCH ($11), AXS ($11), ETH ($11), MNT ($11) — all <6h old.
+- 0 phantoms in 24h.
+- `hype_live_trading.json` ENABLED, regime LONG_BIAS.
+- Lock file: `/tmp/hermes-pipeline.lock` present (Aug 9 20:52) — pipeline running.
+
+### Watch
+- `bb-bounce-short,hl_copy_trader` SHORT 2T 0% WR -$0.06 (both ETH, sub-threshold) — signal_reporter will auto-kill at 5T<30%WR per existing policy.
+- `hzscore-,rs-r48,rs-r52` SHORT 1T -$0.06 — new sub-threshold, n=1, no action.
+- VEL 15m filter deployed 21:39 — too early to evaluate (only 1 trade in last 40min post-deploy). Effect visible in next 24h.
+
+### Fix Applied
+**None.** System on positive trajectory for 8th consecutive day. 7d just flipped positive (+$0.34 vs -$3.83 yesterday). All bleeds DISABLED. Stars firing clean.
+
+### Verification
+- Both DB sources verified: signal_outcomes (sqlite) 24h 65T +$0.781 58.5% WR, trades (brain postgres) 24h 65T +$0.740 56.9% WR — small differences due to timing windows only, both confirm strongest 24h of cycle.
+- 4d rolling +$0.98 55.6% WR is the cleanest confirmation of trajectory — last 96 hours unambiguously profitable.
+
+### Decision
+**NO TRADING CHANGES.** 8th green day, 7d flipped positive. Hold trajectory. Re-check in 24h for VEL filter impact and 7d sustained profitability.
+
+---
+
 ## CEO ACK — 2026-08-09 (notification)
 
 ### Self-learner: range_breakout param tuning
