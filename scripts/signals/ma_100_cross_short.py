@@ -11,7 +11,7 @@ SHORT-SPECIFIC IMPROVEMENTS:
   4. More confirmation candles (3 vs 2)
   5. Volume confirmation (1.2x average)
   6. Regime filter (only in BEARISH)
-  7. Time filter (avoid Asian session)
+  7. ~~Time filter (avoid Asian session)~~ REMOVED (data: Asian session has better WR/PnL)
 
 BACKTEST RESULTS (7d):
   - Old SHORT: 40% WR, -$0.19 (5 trades)
@@ -35,7 +35,7 @@ REQUIRE_2_CANDLE = True      # require candle before cross to confirm pre-cross 
 REQUIRE_3_CANDLE = True      # SHORT-specific: require 3-candle confirmation
 STOP_LOSS_PCT = 1.0          # TIGHTER: 1.0% stop loss (improves WR)
 MIN_VOLUME_RATIO = 1.2       # Volume must be 1.2x average
-BLOCKED_HOURS = [0, 1, 2, 3, 4, 5, 6, 7]  # Avoid Asian session (00:00-07:59 UTC)
+BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 
 
 def _resample_5m(closes_1m: np.ndarray) -> np.ndarray:

@@ -1,3 +1,41 @@
+## CEO Report — 2026-08-09 (SHORT Time Filter Decision)
+
+### Diagnosis
+4 SHORT-specific signals (bb_bounce_short, range_finder_short, return_exhaustion_short, ma_100_cross_short) all blocked Asian session (00:00-07:59 UTC). Data shows this filter is backwards:
+- Asian session: 107T, 53.3% WR, +$0.63
+- Other sessions: 261T, 39.8% WR, -$1.66
+- SHORT Asian: 55T, 43.6% WR, -$0.46
+- SHORT Other: 151T, 35.1% WR, -$1.51
+
+### Root Cause
+Time filter added on generic assumption (Asian session = low liquidity), not actual performance data. All 4 SHORT signals generating 0 signals — filters too tight.
+
+### Fix Applied
+**Removed BLOCKED_HOURS from all 4 SHORT-specific signals.** Set to `[]` with ponytail comment documenting why. Other filters unchanged (RSI, regime, volume, bounce still gate quality).
+
+Files changed:
+- `scripts/signals/bb_bounce_short.py`
+- `scripts/signals/return_exhaustion_short.py`
+- `scripts/signals/range_finder_short.py`
+- `scripts/signals/ma_100_cross_short.py`
+
+### Metric Tracking
+| Metric | Before | Target | Deadline |
+|--------|--------|--------|----------|
+| SHORT signals/day | 0 | 5+ | 24h |
+| SHORT WR | 22.2% | 40%+ | 72h |
+| SHORT PnL | -$0.35 | $0 | 72h |
+
+### Verification
+- Run `python3 scripts/signals/bb_bounce_short.py ETH` to confirm no time-filter rejection
+- Monitor next 24h for SHORT signal volume increase
+- Check if Asian session trades appear in new signals
+
+### Note
+bb_bounce_short has separate regime filter issue (requires BEARISH, 100% of tokens are NEUTRAL). Will address in next run if SHORT signals still too low.
+
+---
+
 ## CEO Report — 2026-08-09 22:30 UTC
 
 ### Verified Numbers (DB query)

@@ -7,7 +7,7 @@ SHORT-SPECIFIC IMPROVEMENTS over generic range_finder:
   2. Tighter RSI overbought: 55 (was 60) — stronger overbought required
   3. More band touches: 4 (was 3) — confirm range is real before shorting
   4. Volume confirmation: 1.2x average (new)
-  5. Time filter: avoid Asian session 00:00-07:59 UTC (new)
+  5. ~~Time filter: avoid Asian session 00:00-07:59 UTC~~ REMOVED (data: Asian session has better WR/PnL)
   6. Tighter bounce: 0.08% (was 0.05%)
   7. Tighter proximity: 0.40% (was 0.50%) — must be closer to upper band
 
@@ -42,7 +42,7 @@ TOUCH_WINDOW = 50
 PROXIMITY_PCT = 0.40         # TIGHTER: was 0.50 — must be closer to upper band
 BOUNCE_MIN_PCT = 0.08        # TIGHTER: was 0.05
 MIN_VOLUME_RATIO = 1.2       # Volume must be 1.2x average
-BLOCKED_HOURS = [0, 1, 2, 3, 4, 5, 6, 7]  # Avoid Asian session
+BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 
 
 def _log(msg):

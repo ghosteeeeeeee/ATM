@@ -7,7 +7,7 @@ SHORT-SPECIFIC IMPROVEMENTS over generic bb_bounce:
   3. Tighter BB touch: 0.20% (was 0.30%) — require closer touch to band
   4. Stronger bounce required: 0.08% (was 0.05%)
   5. Volume confirmation: 1.2x average (new)
-  6. Time filter: avoid Asian session 00:00-07:59 UTC (new)
+  6. ~~Time filter: avoid Asian session 00:00-07:59 UTC~~ REMOVED (data: Asian session has better WR/PnL)
   7. 2-candle overbought confirmation (new)
   8. Tighter cooldown: 10 min (was 5)
 
@@ -33,7 +33,7 @@ RSI_PERIOD = 14
 RSI_OVERBOUGHT = 55        # TIGHTER: require stronger overbought (was 60)
 BOUNCE_MIN_PCT = 0.08      # TIGHTER: require stronger bounce (was 0.05)
 MIN_VOLUME_RATIO = 1.2     # Volume must be 1.2x average
-BLOCKED_HOURS = [0, 1, 2, 3, 4, 5, 6, 7]  # Avoid Asian session
+BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 REQUIRE_2_CANDLE = True    # Require 2 consecutive overbought candles before bounce
 
 # ── State ───────────────────────────────────────────────────────────────

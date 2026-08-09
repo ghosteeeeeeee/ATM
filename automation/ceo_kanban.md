@@ -8,6 +8,7 @@
 - [2026-08-09 22:19] ceo: BUG FIX — is_component_disabled() missing bb-bounce-short, range_finder_short. Added hyphenated signal name mappings. Cleared stale .pyc cache (root cause of ImportError alerts).
 
 ## CEO DECISIONS
+- [x] 2026-08-09 — FIX: Removed BLOCKED_HOURS from all 4 SHORT-specific signals. Data: Asian session 43.6% WR vs 35.1% WR other sessions for SHORTs. Time filter was backwards. Files: bb_bounce_short.py, return_exhaustion_short.py, range_finder_short.py, ma_100_cross_short.py. Monitoring 24h for SHORT signal volume increase.
 - [x] 2026-08-08 00:30 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Monitor 24h.
 - [x] 2026-08-08 00:30 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h.
 - [x] 2026-08-08 13:25 — BUG FIX: Compactor disabled-component bug. signal_compactor.py re-inserted preserved entries with disabled components (e.g. ma100-cross- when MA_100_CROSS_MINUS_ENABLED=False). Added is_component_disabled() helper + 4 guard points in compactor. Root cause: compactor bypassed add_signal() Layer 2 ENABLED checks.

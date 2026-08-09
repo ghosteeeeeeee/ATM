@@ -10,7 +10,7 @@ SHORT-SPECIFIC IMPROVEMENTS over generic return_exhaustion:
   2. Tighter percentile: 92 (was 90) — more extreme positive return required
   3. Tighter RSI overbought: 60 (was 70) — stronger overbought confirmation
   4. Volume confirmation: 1.2x average (new, fail-closed)
-  5. Time filter: avoid Asian session 00:00-07:59 UTC (new)
+  5. ~~Time filter: avoid Asian session 00:00-07:59 UTC~~ REMOVED (data: Asian session has better WR/PnL)
 
 LOGIC:
   SHORT: short-term return > p92 (extreme positive) AND
@@ -47,7 +47,7 @@ MIN_BARS = 220
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 60     # TIGHTER: was 70 — stronger overbought required
 MIN_VOLUME_RATIO = 1.2  # Volume must be 1.2x average
-BLOCKED_HOURS = [0, 1, 2, 3, 4, 5, 6, 7]  # Avoid Asian session
+BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 COOLDOWN_MINUTES = 15
 CONF_BASE = 60
 CONF_PCT_EXTREME_MAX = 15
