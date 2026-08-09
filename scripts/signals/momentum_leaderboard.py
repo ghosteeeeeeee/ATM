@@ -66,6 +66,10 @@ BB_PERIOD = 20
 BB_STDDEV = 1.8
 BB_WIDTH_MAX = 0.04          # % — BB width < 4% = range-bound (confluence)
 
+# Local peak/trough detection
+LOCAL_EXTREMUM_WINDOW = 30   # 1m candles to look back for local peak/trough
+LOCAL_PEAK_THRESHOLD_PCT = 0.3  # % — if price is within this % of recent high, reject LONG
+
 # Confluence: return percentile exhaustion
 RET_EXHAUST_LOOKBACK = 60    # 1m candles for percentile ranking
 RET_EXHAUST_LOW = 10         # percentile — extreme negative = LONG exhaustion
@@ -265,6 +269,45 @@ def _is_near_sr(price: float, support, resistance) -> tuple:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Local peak/trough detection — reject entries at extremes
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _is_at_local_extremum(closes_1m: list, direction: str) -> bool:
+    """
+    Reject entries when price is at a local peak (LONG) or trough (SHORT).
+
+    If price is within LOCAL_PEAK_THRESHOLD_PCT of the recent high → reject LONG.
+    If price is within LOCAL_PEAK_THRESHOLD_PCT of the recent low  → reject SHORT.
+
+    Catches: entering at the top of a move that's about to reverse.
+    """
+    if len(closes_1m) < LOCAL_EXTREMUM_WINDOW:
+        return False
+
+    window = closes_1m[-LOCAL_EXTREMUM_WINDOW:]
+    current = window[-1]
+    recent_high = max(window)
+    recent_low = min(window)
+
+    # Skip if no real variation (flat market)
+    price_range_pct = (recent_high - recent_low) / recent_high * 100 if recent_high > 0 else 0
+    if price_range_pct < LOCAL_PEAK_THRESHOLD_PCT * 2:
+        return False
+
+    if direction == 'LONG' and recent_high > 0:
+        dist_from_peak = (recent_high - current) / recent_high * 100
+        if dist_from_peak < LOCAL_PEAK_THRESHOLD_PCT:
+            return True  # at local peak — reject LONG
+
+    if direction == 'SHORT' and recent_low > 0:
+        dist_from_trough = (current - recent_low) / recent_low * 100
+        if dist_from_trough < LOCAL_PEAK_THRESHOLD_PCT:
+            return True  # at local trough — reject SHORT
+
+    return False
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Confluence: Range detection (Bollinger Bands)
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -433,6 +476,10 @@ def detect_leaderboard_signals() -> list:
             continue
         # Don't LONG near resistance (rejection risk)
         if direction == 'LONG' and near_resistance:
+            continue
+
+        # ── Local peak/trough filter ────────────────────────────────────────
+        if _is_at_local_extremum(closes_1m, direction):
             continue
 
         # ── Regime confirmation ──────────────────────────────────────────────

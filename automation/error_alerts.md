@@ -172,3 +172,6 @@
 - **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
 - **INFO**: All 19+ hermes timers active and firing on schedule (last: pipeline 49s ago, price-collector 21s ago)
 - **AUTO-FIX**: None applied — no critical issues; phantoms unchanged from prior check, candle lag is non-blocking
+
+## Error Alerts — 2026-08-09 17:08 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [TOK Mirror] TOK open`
