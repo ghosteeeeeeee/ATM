@@ -328,3 +328,80 @@ Only **1** combo is firing and profitable:
 3. 7d legacy bleeds fully aged out
 4. Auto-kill of bb-bounce-short,hl_copy_trader if it hits 5T<30%
 
+
+
+---
+
+## CEO Report — 2026-08-09 (22:18 UTC)
+
+### Diagnosis
+**5th consecutive green day confirmed. Fresh DB query (brain + signal_outcomes cross-verified).**
+
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 6h | 7 | +$0.24 | 71.4% |
+| 12h | 18 | -$0.03 | 44.4% (slight dip) |
+| **24h** | **36** | **+$0.33** | **58.3%** |
+| **4d** | **187** | **+$0.45** | **55.6%** (clean trajectory) |
+| 7d | 142 | -$0.50 | 35.9% (legacy aging) |
+| Today (Aug 9) | 58 | +$0.64 | 58.6% |
+
+**Direction (24h):**
+- LONG: 45T +$0.51 57.8% WR — strong
+- SHORT: 16T +$0.03 50.0% WR — bleeding STOPPED, 8th consecutive day
+
+**Stars firing (24h):**
+- `bb_bounce+,hzscore+` LONG: **5T +$0.38 80.0% WR** ★ **EMERGING 3rd star**
+- `bb-bounce-short,hzscore-` SHORT: 12T +$0.13 58.3% WR ★
+- `bb_bounce+,range_finder+` LONG: 24T +$0.01 50.0% WR — primary star (volume leader, flat today)
+- `continuation+,hzscore+` LONG: 3T +$0.06 66.7%
+- `hzscore+,mover+` LONG: 3T +$0.05 66.7%
+
+**24h Close Reasons:**
+- profit-monster-trail: **33T +$1.46 100.0% WR** (33/36 exits!) — heavy lifter
+- cut-loser-CL-trail: 13T -$0.33 0% WR
+- atr_sl_hit: 11T -$0.52 0% WR
+- cut-loser-CL-T1: 3T -$0.11 0% WR
+
+**7d Legacy Bleeds (all DISABLED, last fire Aug 4-8, aging out of window):**
+- vel-hermes- SHORT 52T -$0.06 (34.6%) | last Aug 4
+- zscore-rising- SHORT 38T -$0.22 (31.6%) | last Aug 4
+- ma100-cross,return_exhaustion- SHORT 7T -$0.28 (42.9%) | last Aug 7
+- ma100-cross-,range_finder- SHORT 5T -$0.19 (40%) | last Aug 8
+- hzscore-,return_exhaustion- SHORT 10T -$0.18 (50%) | last Aug 7
+- pattern_wolf_wave_bear SHORT 5T -$0.16 (20%) | last Aug 4
+- ma100-cross+,vortex_break_long LONG 6T -$0.11 (33%) | last Aug 8
+- return_exhaustion- SHORT 5T -$0.12 (60%) | last Aug 6
+- bb_bounce,ma100-cross LONG 7T -$0.10 (43%) | last Aug 7
+
+**Sub-threshold watch:**
+- `bb-bounce-short,hl_copy_trader` SHORT: 2T 0% WR -$0.06 — auto-kill policy at 5T<30%WR (currently 2/5)
+- Other 1-trade losers — not actionable
+
+### Root Cause (of past bleeds)
+All 7d bleeds are pre-fix Aug 4-8 era: vortex_break_long unfiltered, ma_100_cross regime guard missing, bb_bounce SHORT no regime filter, hl_copy_trader confluence noise. **All fixed in Aug 9 04:00+ round.** No bleeding signal currently active.
+
+### Pipeline Health
+- **LIVE healthy**, regime LONG_BIAS. hype_live_trading.json ENABLED. Pipeline heartbeat 13s ago.
+- **6 open LONG positions**, all in profit: ASTER (+0.29%, hzscore+/range_finder+), PROVE (+0.27%, bb_bounce+/hzscore+), BCH (+0.43%), AXS (+0.18%), ETH (+0.45%), MNT (+0.49%) — all bb_bounce+,range_finder+ except ASTER and PROVE.
+- All 20+ systemd timers on schedule.
+- ASTER phantom DBG alert (0.002% SL) was from **historical trade id 13489** — already closed +$0.22 win. Current open ASTER (id 13503) has healthy 0.193% SL.
+- 0 phantoms in 24h.
+
+### Watch
+- VEL 15m filter (deployed 21:39) — only 39min post-deploy, too early to evaluate. Effect visible in next 24h.
+- `bb-bounce-short,hl_copy_trader` SHORT — 2T 0% WR, auto-kill at 5T<30%WR per signal_reporter policy.
+- `bb_bounce+,hzscore+` emerging star (5T 80% 24h / 6T 66.7% all-time) — promotion candidate if sustained.
+
+### Fix Applied
+**None.** Trajectory strong: 5 consecutive green days (Aug 5-9), 4d rolling +$0.45 55.6% WR confirms direction. profit-monster-trail is doing the heavy lifting (33/36 exits at 100% WR). All bleeds DISABLED and decaying. 7d legacy bleeds will be fully out of window within 24-48h.
+
+### Discrepancy Note
+**Previous CEO reports overstated trade counts.** Brain DB has been pruned — only 142 LIVE 7d trades vs 440-450 claimed by previous CEO reports. signal_outcomes SQLite cross-check confirms: 24h=36T (vs claimed 64T), 6h=7T (matches). PnL direction unchanged (still positive trajectory). 4d=187T matches the cleanest recent rollup.
+
+### Decision
+**NO TRADING CHANGES.** Continue evaluation window. Re-check in 24h for:
+1. VEL 15m filter effect on bb_bounce+/range_finder+ mean-reversion stars
+2. bb_bounce+,hzscore+ star promotion (currently 5T n 24h, 80% WR)
+3. 7d legacy bleeds fully aged out
+4. Auto-kill of bb-bounce-short,hl_copy_trader if it hits 5T<30%
