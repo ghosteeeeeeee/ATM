@@ -57,6 +57,7 @@ from hermes_constants import (
     VORTEX_BREAK_ENABLED, VORTEX_BREAK_PLUS_ENABLED, VORTEX_BREAK_MINUS_ENABLED,
     RETURN_EXHAUSTION_ENABLED, RETURN_EXHAUSTION_PLUS_ENABLED, RETURN_EXHAUSTION_MINUS_ENABLED,
     RETURN_EXHAUSTION_SHORT_ENABLED,
+    ENGULFING_ENABLED, ENGULFING_PLUS_ENABLED, ENGULFING_MINUS_ENABLED,
     MA_100_CROSS_ENABLED, MA_100_CROSS_PLUS_ENABLED, MA_100_CROSS_MINUS_ENABLED,
     # momentum_leaderboard
     MOMENTUM_LEADERBOARD_ENABLED, MOMENTUM_LEADERBOARD_PLUS_ENABLED, MOMENTUM_LEADERBOARD_MINUS_ENABLED,
@@ -302,6 +303,11 @@ except Exception:
     _return_exhaustion_short_run = None
 
 try:
+    from signals.engulfing import run as _engulfing_run
+except Exception:
+    _engulfing_run = None
+
+try:
     from signals.momentum_leaderboard import run as _momentum_leaderboard_run
 except Exception:
     _momentum_leaderboard_run = None
@@ -370,6 +376,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'vortex_break',        'enabled': VORTEX_BREAK_ENABLED,          'run': _vortex_break_run},
     {'name': 'return_exhaustion',   'enabled': RETURN_EXHAUSTION_ENABLED,     'run': _return_exhaustion_run},
     {'name': 'return_exhaustion_short', 'enabled': RETURN_EXHAUSTION_SHORT_ENABLED, 'run': _return_exhaustion_short_run},
+    {'name': 'engulfing', 'enabled': ENGULFING_ENABLED, 'run': _engulfing_run},
     {'name': 'ma_100_cross',        'enabled': MA_100_CROSS_ENABLED,         'run': _ma_100_cross_run},
     {'name': 'ma_100_cross_long',   'enabled': MA_100_CROSS_PLUS_ENABLED,    'run': _ma_100_cross_long_run},
     {'name': 'ma_100_cross_short',  'enabled': MA_100_CROSS_MINUS_ENABLED,   'run': _ma_100_cross_short_run},

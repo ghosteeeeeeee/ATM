@@ -1113,6 +1113,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # engulfing
+            if _comp == 'engulfing':
+                try:
+                    from hermes_constants import ENGULFING_ENABLED
+                    if not ENGULFING_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ENGULFING_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'engulfing+':
+                try:
+                    from hermes_constants import ENGULFING_PLUS_ENABLED
+                    if not ENGULFING_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ENGULFING_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'engulfing-':
+                try:
+                    from hermes_constants import ENGULFING_MINUS_ENABLED
+                    if not ENGULFING_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ENGULFING_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # hl_copy_trader
             if _comp == 'hl_copy_trader':
                 try:

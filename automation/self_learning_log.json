@@ -35,8 +35,17 @@
       "new_value": 0.4512,
       "reason": "WR=70.0%, decay=True",
       "wr_before": 0.7
+    },
+    {
+      "timestamp": "2026-08-09T06:00:04.932933+00:00",
+      "signal_type": "tl_break",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.4512,
+      "new_value": 0.4286,
+      "reason": "WR=70.0%, decay=True",
+      "wr_before": 0.7
     }
   ],
-  "daily_count": 2,
-  "last_reset": 1786218176.394685
+  "daily_count": 1,
+  "last_reset": 1786255204.900262
 }

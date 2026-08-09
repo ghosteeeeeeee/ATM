@@ -1285,7 +1285,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '1h'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.4512 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.4286 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
@@ -1330,6 +1330,19 @@ RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme nega
 RETURN_EXHAUSTION_MINUS_ENABLED = False  # CEO 2026-08-08 — 14 trades, -$0.64 across combos. hemorrhaging like hzscore-.
 RETURN_EXHAUSTION_SHORT_ENABLED = True   # return_exhaustion_short — SHORT-specific with regime filter, tighter percentile/RSI, volume
 RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data: <90 conf = 37.5% WR, 90+ = 72% WR
+
+# ── Engulfing Candle Signal ──────────────────────────────────────────────
+# engulfing.py — Detect large single-candle moves after tight consolidation
+# Based on MORPHO observation: 0.22% drop in 1 min after range compression
+ENGULFING_ENABLED = True
+ENGULFING_PLUS_ENABLED = True           # LONG (bullish engulfing)
+ENGULFING_MINUS_ENABLED = True          # SHORT (bearish engulfing)
+ENGULFING_MIN_MOVE = 0.15               # min candle move % to qualify
+ENGULFING_PRIOR_RANGE = 0.10            # max prior N-candle range % (tight consolidation)
+ENGULFING_LOOKBACK = 5                  # candles to check for prior range
+ENGULFING_VOLUME_RATIO = 1.5            # volume must be 1.5x average
+ENGULFING_CONF_BASE = 75               # base confidence
+ENGULFING_CONF_CAP = 88               # max confidence
 
 # ── 100MA Cross Signal ─────────────────────────────────────────────────────
 # ma_100_cross.py — Trend reversal at 100-period moving average

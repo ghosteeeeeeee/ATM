@@ -256,6 +256,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # continuation — re-entry after profitable close (65% WR in backtest)
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,
+    # engulfing: large single-candle momentum moves
+    ('engulfing_long',  'engulfing+'):  1.0,
+    ('engulfing_short', 'engulfing-'):  1.0,
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.3,  # 5T 100% WR +$0.20
     ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.25, # 6T 67% WR +$0.12 (boosted)
