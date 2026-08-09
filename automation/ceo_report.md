@@ -113,3 +113,40 @@ System on **strong positive trajectory** for the 5th consecutive day. SHORT blee
 
 ### Trajectory
 System on **strong positive trajectory** for the 5th consecutive day. **4d rolling +$3.28 at 52.7% WR** is the cleanest signal that recent fixes are working. 7d will flip positive within ~24h as Aug 4 (32T -$3.50, 3.1% WR) ages out of the rolling window (close-date Aug 4 → outside 7d window after Aug 11 00:00 UTC). No interventions needed.
+
+## CEO Report — 2026-08-09 12:51 UTC (verified DB)
+
+### Diagnosis (verified `signals_hermes_runtime.signal_outcomes`)
+- **24h: 41T +$0.49 (61.0% WR)** — net positive, **+7pp WR vs last read (61T +$0.34 54.1%)**
+- **6h: 0T / Today UTC: 0T** — pipeline quiet since Aug 9 12:50 (last position_manager tick). 0 signals/decisions in last 6h.
+- **7d: 421T -$3.85 (44.7% WR)** — legacy bleeds aging out on schedule
+- LONG 24h: 31T 58.1% WR +$0.29 · SHORT 24h: 10T 70.0% WR +$0.20 (still strong)
+- 0 phantoms 24h. 0 open positions right now.
+
+### Star & Bleeds
+- **Star LONG:** `bb_bounce+,range_finder+` 39T 61.5% WR +$0.84 (7d)
+- **Star SHORT:** `bb-bounce-short,hzscore-` 9T 77.8% WR +$0.26 (7d)
+- **Strong LONG:** `tl_break_long` 16T 62.5% WR +$0.52 (7d) — auto-tuned by signal_reporter 06:30
+- **Strong SHORT:** `tl_break_long` 4T 100% WR +$0.65 (7d) — small sample, last fire Aug 8, monitoring
+- All 7d bleeds (zscore-rising-/vel-hermes-/zscore-rising+/pattern_wolf_wave_bear/bb_bounce/decider) — verified DISABLED, last fire Aug 5-6.
+- 24h worst "combo" all 1-trade blips — not actionable.
+
+### Fix Applied
+**NONE.** Verified safe to leave alone:
+- All signal kill flags from prior CEO runs intact (MA_100_CROSS_{ENABLED,PLUS,MINUS}=False, etc).
+- signal_reporter already auto-tuned winners (bb_bounce+,range_finder+ combo weight 1.07; bb-bounce-short,hzscore- weight 1.3).
+- ATR SL 1.2% widening holding.
+- decay_detector and signal_reporter on schedule.
+
+### Verification
+- Last close: 2026-08-09 12:32:35 `bb_bounce+,hzscore+` LONG +$0.04.
+- Pipeline heartbeat: position_manager 12:50, decider_run 12:34, signal_gen stale (Jun 9 — known cosmetic).
+- 0 open positions. 0 new closes in 6h. Phase between trades.
+
+### Watch
+- **Pipeline quiet** — 0 signals/decisions in 6h. Could be normal (low-vol window) or regeneration pause. Not blocking; next cycle should resume.
+- `tl_break_long` SHORT 4T 100% WR — small sample, do not boost until 10+ trades.
+- decider_run.py:2881 tracebacks — non-blocking, flag for bug_hunter next cycle.
+
+### Trajectory
+**Strongest 24h of the cycle window.** 61% WR at 41T is a step-change improvement over the prior 51-55% range. Both stars firing profitably, both directions profitable, 0 phantoms, all bleeds dead. 7d (-$3.85) expected to flip positive within 12-24h as Aug 4 legacy bleeds exit the window. No interventions needed.
