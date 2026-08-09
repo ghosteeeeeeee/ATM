@@ -695,7 +695,7 @@ HH_HL_CHOCH_MAX_BARS_SINCE   = 15  # reject if flip is older than this many bars
 # Never touches losing positions.
 # ── Profit Monster — Two-Tier Take-Profit ──────────────────────────────────────
 # Tier 1: Quick scalp — lower profit, fires frequently
-PM_TIER1_MIN_PCT    = 0.4    # min profit % to close
+PM_TIER1_MIN_PCT    = 0.5    # min profit % to close
 PM_TIER1_MAX_PCT    = 2.0    # max profit % to close
 PM_TIER1_MAX_CLOSE  = 2      # max positions to close per wake
 PM_TIER1_SKIP_TOP_PCT = 0    # don't touch top X% most profitable (0 = disabled)
@@ -710,7 +710,7 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # master switch for trailing tier
-PM_TRAIL_ACTIVATE_PCT = 0.50  # mark trade as "in profit" at this threshold (widened from 0.25 — catches more of the wave)
+PM_TRAIL_ACTIVATE_PCT = 0.40  # mark trade as "in profit" at this threshold — activate trailing sooner to lock more profit
 PM_TRAIL_DISTANCE_PCT = 0.25  # trail 0.25% behind peak (widened from 0.15 — 0.15% triggered on normal wicks)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.5, 1), "B": (1, 2)}  # check every 30-60s (fast)
@@ -1030,6 +1030,27 @@ RANGE_FINDER_ENABLED = True
 RANGE_FINDER_PLUS_ENABLED = True     # range_finder+ LONG (buy support)
 RANGE_FINDER_MINUS_ENABLED = False   # SIGNAL REPORTER 2026-08-08 — 40% WR, -$0.19 (5 trades 7d). ma100-cross-,range_finder- bleeding.
 RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific with regime filter, tighter RSI, volume confirm
+
+# range_breakout.py — breakout from tight range with retest confirmation
+RANGE_BREAKOUT_ENABLED = True
+RANGE_BREAKOUT_PLUS_ENABLED = True   # range_breakout+ LONG (breakout above resistance)
+RANGE_BREAKOUT_MINUS_ENABLED = True  # range_breakout- SHORT (breakout below support)
+RANGE_BREAKOUT_BB_PERIOD = 20        # Bollinger Band period
+RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)
+RANGE_BREAKOUT_BB_WIDTH_MAX = 0.04   # Max band width % to consider range-bound (4%)
+RANGE_BREAKOUT_BB_SLOPE_MAX = 0.001  # Max BB middle slope per candle (flat bands)
+RANGE_BREAKOUT_LOOKBACK = 100        # 5m candles to analyze (8+ hours)
+RANGE_BREAKOUT_TOUCH_MIN = 3         # Min band touches to confirm range
+RANGE_BREAKOUT_TOUCH_WINDOW = 50     # Lookback for counting touches
+RANGE_BREAKOUT_RETEST_PCT = 0.3      # Retest proximity to band (% of band price)
+RANGE_BREAKOUT_BOUNCE_MIN = 0.05     # Min bounce % after retest
+RANGE_BREAKOUT_BREAKOUT_WINDOW = 10  # Candles to look back for breakout
+RANGE_BREAKOUT_INVALIDATION_WINDOW = 5  # Candles to check for invalidation
+RANGE_BREAKOUT_COOLDOWN_HOURS = 2    # Cooldown per token+direction
+RANGE_BREAKOUT_CONF_BASE = 55        # Base confidence
+RANGE_BREAKOUT_CONF_CAP = 88         # Max confidence (system ceiling)
+RANGE_BREAKOUT_RSI_LONG_MAX = 75     # Skip LONG if RSI above this (overextended)
+RANGE_BREAKOUT_RSI_SHORT_MIN = 25    # Skip SHORT if RSI below this (overextended)
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period

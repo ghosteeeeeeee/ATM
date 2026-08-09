@@ -1038,6 +1038,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # range_breakout
+            if _comp == 'range_breakout':
+                try:
+                    from hermes_constants import RANGE_BREAKOUT_ENABLED
+                    if not RANGE_BREAKOUT_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RANGE_BREAKOUT_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'range_breakout+':
+                try:
+                    from hermes_constants import RANGE_BREAKOUT_PLUS_ENABLED
+                    if not RANGE_BREAKOUT_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RANGE_BREAKOUT_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'range_breakout-':
+                try:
+                    from hermes_constants import RANGE_BREAKOUT_MINUS_ENABLED
+                    if not RANGE_BREAKOUT_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" RANGE_BREAKOUT_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # vortex_break
             if _comp == 'vortex_break':
                 try:
@@ -2030,6 +2055,10 @@ def is_component_disabled(component: str) -> bool:
     if c in ('range_finder',): return not RANGE_FINDER_ENABLED
     if c in ('range_finder_short', 'range-finder-short'): return not RANGE_FINDER_SHORT_ENABLED
     if c in ('range_finder_long',): return not RANGE_FINDER_PLUS_ENABLED   # LONG-specific, same gate
+    # range_breakout
+    if c in ('range_breakout+',): return not RANGE_BREAKOUT_PLUS_ENABLED
+    if c in ('range_breakout-',): return not RANGE_BREAKOUT_MINUS_ENABLED
+    if c in ('range_breakout',): return not RANGE_BREAKOUT_ENABLED
     # zscore-rising
     if c == 'zscore-rising+': return not ZSCORE_RISING_PLUS_ENABLED
     if c == 'zscore-rising-': return not ZSCORE_RISING_MINUS_ENABLED
