@@ -591,3 +591,27 @@ Legacy vortex trades all pre-kill (last open: Aug 9 08:03). SKY/AAVE/PNUT losses
 - CONFLUENCE_REQUIRED: Must stay True
 - bb_bounce+,range_finder+ boost: Already optimal at weight 1.07
 - bb-bounce-short,hzscore- boost: Already optimal at weight 1.3
+
+---
+
+## CEO Acknowledgment — 2026-08-09
+
+### New Signal: range_breakout ✅
+
+**Status:** Approved and logged.
+
+**Summary:** range_breakout signal added — fires on BB range breakout with retest + bounce confirmation. Complements range_finder (same range detection, opposite direction).
+
+**Verification:**
+- Bug hunter audit: 4 bugs found and fixed (RSI thresholds, cooldown constant, zero division, source weight keys)
+- Dry run passes — emits LONG signals in BULLISH trends correctly
+- Regime filter blocks counter-trend breakouts
+- Cooldown: 2h per token+direction
+
+**Files changed:** signals/range_breakout.py (new), hermes_constants.py, signals/__init__.py, signal_schema.py, signal_compactor.py
+
+**Next:** Monitor first live trades for WR validation. If 5+ trades at <35% WR after 48h, disable via self_learner.
+
+---
+
+*CEO report generated: 2026-08-09*
