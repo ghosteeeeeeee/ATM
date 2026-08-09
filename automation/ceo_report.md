@@ -29,3 +29,45 @@ None needed. is_component_disabled() bug fix deployed at 22:19 UTC — verified 
 ## Action
 
 **No changes.** All fixes operational. Legacy SHORT trades aging out. Evaluation window ongoing. Next review: 2026-08-10 10:00 UTC.
+
+# CEO Report — 2026-08-09 (02:50 UTC)
+
+## Diagnosis
+
+**Verified from PostgreSQL brain DB:**
+- 24h: 42 trades, +$0.40, 47.6% WR (improving from +$0.16 yesterday)
+- 7d: 368 trades, -$0.91, 44.0% WR (improving from -$7.52)
+
+**LONG: 35 trades, +$0.61, 51.4% WR** — profitable, on track.
+**SHORT: 7 trades, -$0.21, 28.6% WR** — still bleeding, but legacy trades aging out.
+
+**Star:** bb_bounce+,range_finder+ LONG — 17 trades, +$0.60, 58.8% WR
+**New star:** bb-bounce-short,hzscore- SHORT — 2 trades, +$0.11, 100% WR ✓
+
+**Worst bleeders (24h):**
+- ma100-cross-,range_finder- SHORT: 2T, -$0.14, 0% WR
+- ma100-cross-,vortex_break_short SHORT: 2T, -$0.14, 0% WR
+- ma100-cross+,vortex_break_long LONG: 6T, -$0.11, 33.3% WR
+
+## Root Cause
+
+All SHORT bleeders are legacy trades from before is_component_disabled fix (2026-08-08 22:19). They will age out by tomorrow. No new SHORT trades generated after the fix.
+
+## Fix Applied
+
+**None needed.** All recent fixes operational:
+- is_component_disabled() bug — fixed (0 broken SHORT trades since)
+- ATR SL widened to 1.2% — working
+- Dead signals (zscore-rising, vel-hermes, inv-accel-300, pattern) — confirmed disabled
+- Confluence gate — blocking single-signal entries (verified in pipeline log)
+
+## Verification
+
+- Pipeline healthy, 1 token in hotset (LTC LONG, bb_bounce+,range_finder+)
+- 6 open positions (LINK, ASTER, ETH, ME, BCH, ENS — all LONG)
+- All systemd timers running
+- 7d WR trending up: 38.7% → 44.0% (+5.3% in 24h)
+
+## Action
+
+**No changes.** All fixes working. Legacy SHORT trades aging out. System profitable. Next review: 2026-08-09 10:00 UTC.

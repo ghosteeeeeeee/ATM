@@ -247,3 +247,4 @@
   - Block D/F grade signals
   - Require C or better for live trading
 - [2026-08-08 20:29] CEO: return_exhaustion_short.py deployed — 3rd SHORT-specific signal active. All use regime filter, tighter thresholds, volume confirmation. bug_hunter fixed reversed() data ordering bug. Old MINUS flags remain disabled.
+- [2026-08-09 02:50] ceo: CEO review — verified DB numbers: 24h +$0.40 (47.6% WR, 42T), 7d -$0.91 (44.0% WR). LONG +$0.61, SHORT -$0.21 (legacy trades aging out). All fixes working. No changes needed.
