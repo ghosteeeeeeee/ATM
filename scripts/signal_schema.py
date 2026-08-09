@@ -1832,12 +1832,15 @@ def is_component_disabled(component: str) -> bool:
             ZSCORE_PUMP_PLUS_ENABLED, ZSCORE_PUMP_MINUS_ENABLED,
             MOMENTUM_LEADERBOARD_PLUS_ENABLED, MOMENTUM_LEADERBOARD_MINUS_ENABLED,
             BB_BOUNCE_ENABLED, BB_BOUNCE_PLUS_ENABLED, BB_BOUNCE_MINUS_ENABLED,
+            BB_BOUNCE_SHORT_ENABLED,
             RANGE_FINDER_ENABLED, RANGE_FINDER_PLUS_ENABLED, RANGE_FINDER_MINUS_ENABLED,
+            RANGE_FINDER_SHORT_ENABLED,
             ZSCORE_RISING_ENABLED, ZSCORE_RISING_PLUS_ENABLED, ZSCORE_RISING_MINUS_ENABLED,
             HH_HL_CHOCH_ENABLED, HH_HL_CHOCH_PLUS_ENABLED, HH_HL_CHOCH_MINUS_ENABLED,
             INVERSE_ACCEL_300_ENABLED, INVERSE_ACCEL_300_PLUS_ENABLED, INVERSE_ACCEL_300_MINUS_ENABLED,
             SQUEEZE_CROSS_ENABLED, SQUEEZE_CROSS_PLUS_ENABLED, SQUEEZE_CROSS_MINUS_ENABLED,
             WYCKOFF_ENABLED, WYCKOFF_PLUS_ENABLED, WYCKOFF_MINUS_ENABLED,
+            RETURN_EXHAUSTION_SHORT_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -1970,7 +1973,8 @@ def is_component_disabled(component: str) -> bool:
     if c == 'vortex_break': return not VORTEX_BREAK_ENABLED
     # return_exhaustion
     if c in ('return_exhaustion+', 'return_exhaustion_long'): return not RETURN_EXHAUSTION_PLUS_ENABLED
-    if c in ('return_exhaustion-', 'return_exhaustion_short'): return not RETURN_EXHAUSTION_MINUS_ENABLED
+    if c in ('return_exhaustion-', 'return_exhaustion-'): return not RETURN_EXHAUSTION_MINUS_ENABLED
+    if c in ('return_exhaustion_short', 'return-exhaustion-short'): return not RETURN_EXHAUSTION_SHORT_ENABLED
     if c == 'return_exhaustion': return not RETURN_EXHAUSTION_ENABLED
     # ma100-cross
     if c == 'ma100-cross+': return not MA_100_CROSS_PLUS_ENABLED
@@ -1992,14 +1996,14 @@ def is_component_disabled(component: str) -> bool:
     # bb_bounce
     if c in ('bb_bounce+', 'bb-bounce+'): return not BB_BOUNCE_PLUS_ENABLED
     if c in ('bb_bounce-', 'bb-bounce-'): return not BB_BOUNCE_MINUS_ENABLED
-    if c in ('bb_bounce', 'bb-bounce'): return not BB_BOUNCE_ENABLED
-    if c in ('bb-bounce-short',): return not BB_BOUNCE_MINUS_ENABLED  # SHORT-specific, same gate
+    if c == 'bb_bounce': return not BB_BOUNCE_ENABLED
+    if c in ('bb_bounce_short', 'bb-bounce-short'): return not BB_BOUNCE_SHORT_ENABLED
     if c in ('bb-bounce-long',): return not BB_BOUNCE_PLUS_ENABLED   # LONG-specific, same gate
     # range_finder
     if c in ('range_finder+',): return not RANGE_FINDER_PLUS_ENABLED
     if c in ('range_finder-',): return not RANGE_FINDER_MINUS_ENABLED
     if c in ('range_finder',): return not RANGE_FINDER_ENABLED
-    if c in ('range_finder_short',): return not RANGE_FINDER_MINUS_ENABLED  # SHORT-specific, same gate
+    if c in ('range_finder_short', 'range-finder-short'): return not RANGE_FINDER_SHORT_ENABLED
     if c in ('range_finder_long',): return not RANGE_FINDER_PLUS_ENABLED   # LONG-specific, same gate
     # zscore-rising
     if c == 'zscore-rising+': return not ZSCORE_RISING_PLUS_ENABLED
