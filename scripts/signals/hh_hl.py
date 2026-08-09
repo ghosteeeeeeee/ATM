@@ -652,6 +652,45 @@ def _get_candles_from_ohlcv_1m(token: str, lookback: int = HH_HL_LOOKBACK) -> li
         return []
 
 
+def _get_candles_from_5m(token: str, lookback: int = 200) -> list:
+    """Fetch 5m OHLCV from candles.db, oldest first.
+
+    Uses candles_5m table which has more tokens than price_history.
+    Returns list of {open, high, low, close} dicts.
+    Returns [] if no data or stale.
+    """
+    try:
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT open, high, low, close, ts FROM (
+                SELECT open, high, low, close, ts
+                FROM candles_5m
+                WHERE token = ?
+                ORDER BY ts DESC
+                LIMIT ?
+            ) sub
+            ORDER BY ts ASC
+        """, (token.upper(), lookback))
+        rows = c.fetchall()
+        conn.close()
+
+        if not rows:
+            return []
+
+        most_recent_ts = rows[-1][4]
+        if (time.time() - most_recent_ts) > 300:  # 5 min staleness
+            return []
+
+        return [
+            {'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3]}
+            for r in rows
+        ]
+    except Exception:
+        return []
+
+
 # ── Main scanner ────────────────────────────────────────────────────────────────
 
 def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
@@ -685,6 +724,9 @@ def scan_hh_hl_signals(prices_dict: dict, variant: str = 'both') -> list:
         if not candles or len(candles) < 30:
             # Fallback: ohlcv_1m
             candles = _get_candles_from_ohlcv_1m(token, lookback=HH_HL_LOOKBACK)
+        if not candles or len(candles) < 30:
+            # Fallback: 5m candles (more tokens available)
+            candles = _get_candles_from_5m(token, lookback=200)
         if not candles or len(candles) < 30:
             continue
 
