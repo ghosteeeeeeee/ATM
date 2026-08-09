@@ -150,3 +150,42 @@ System on **strong positive trajectory** for the 5th consecutive day. **4d rolli
 
 ### Trajectory
 **Strongest 24h of the cycle window.** 61% WR at 41T is a step-change improvement over the prior 51-55% range. Both stars firing profitably, both directions profitable, 0 phantoms, all bleeds dead. 7d (-$3.85) expected to flip positive within 12-24h as Aug 4 legacy bleeds exit the window. No interventions needed.
+
+## CEO Report — 2026-08-09 13:21 UTC (verified DB)
+
+### Diagnosis (verified `signals_hermes_runtime.signal_outcomes` + Postgres `brain.trades`)
+- **24h: 62T +$0.29 (53.2% WR)** — net positive, slight WR dip from 12:51 (61.0%→53.2%) as more LONG closes landed
+- **12h: 36T +$0.41 (61.1% WR)** — strong
+- **6h: 17T +$0.20 (64.7% WR)** — exceptional
+- **4d rolling: 351T +$3.30 (52.7% WR)** — STRONG positive, unchanged
+- **7d: 433T -$5.01 (43.4% WR)** — legacy bleeds (Aug 2-4 = 110T -$10.43, 6.4% WR) still in window; Aug 5-9 = 357T +$2.72 51.8% WR
+- LONG 24h: 50T 50.0% WR +$0.08 · SHORT 24h: 12T 66.7% WR +$0.20 (bleeding STOPPED, 6th consecutive day)
+- 4d LONG 169T 60.9% +$2.85 · 4d SHORT 182T 45.1% +$0.45 — both profitable
+- **6 open positions** (3L/3S): LINK/BCH/ASTER LONG, ETH/MEGA/AAVE SHORT — all opened <4h ago, small live pnl ±0.3%
+- 0 phantoms 24h. Only 1 zero-pnl in last 200 closed (0.5% rate, below 1% threshold).
+
+### Star & Bleeds
+- **Star LONG:** `bb_bounce+,range_finder+` 27T 51.9% +$0.24 (24h) / 39T 61.5% +$0.84 (7d)
+- **Star SHORT:** `bb-bounce-short,hzscore-` 9T 77.8% +$0.26 (24h, 7d)
+- **Strong LONG:** `tl_break_long` 16T 62.5% +$0.52 (7d, last fire Aug 5)
+- All 7d bleeds (zscore-rising-/vel-hermes-/zscore-rising+/pattern_wolf_wave_bear/bb_bounce/decider) — verified DISABLED, last fire Aug 5-6.
+- 24h ma100-cross+,vortex_break_long LONG 4T -$0.19 (0% WR) — **all 4 are Aug 8 pre-fix (16:52-19:53)**, MA_100_CROSS_PLUS_ENABLED=False verified, 0 new fires since fix.
+- New combos appearing: `bb-bounce-short,hl_copy_trader` (1T -$0.03 7d), `hzscore-,rs-r48,rs-r52` (0T 7d) — far below disable threshold (5T). Watching.
+
+### Fix Applied
+**NONE.** System on strong positive trajectory for 6th consecutive day. All signal kill flags intact (MA_100_CROSS_{ENABLED,PLUS,MINUS}=False). signal_reporter auto-tuned winners intact. ATR SL 1.2% widening holding. decay_detector + signal_reporter on schedule.
+
+### Verification
+- Last close: 2026-08-09 12:32:35
+- Pipeline: position_manager 12:50, decider_run 12:34 (4 tracebacks line 2881 — non-blocking, recent cycles clean)
+- 6 open positions all opened within last 4h — fresh churn, healthy
+- Disk 80% (24GB free) — below 85% WARN threshold
+- All 19+ hermes timers active and on schedule
+
+### Watch
+- `bb-bounce-short,hl_copy_trader` and `hzscore-,rs-r48,rs-r52` — new combos, sub-threshold. Will review at 5T.
+- decider_run.py:2881 tracebacks recurring — non-blocking, flag for bug_hunter next cycle.
+- LONG 24h WR dipped to 50% from 58% — sample of 50T, normal variance.
+
+### Trajectory
+**System healthy, on positive trajectory for 6th consecutive day.** 4d rolling +$3.30 at 52.7% WR is the cleanest signal that recent fixes are working. 7d will flip positive within ~24-48h as Aug 2-4 legacy bleeds ($-10.43/110T/6.4% WR) age out. Both directions profitable, both stars firing, 0 phantoms, all bleeds dead. NO interventions needed.
