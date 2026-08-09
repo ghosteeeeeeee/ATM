@@ -733,7 +733,7 @@ CUT_LOSER_ENABLED      = True   # master switch
 
 # Tier 1: Quick Cut — -0.3% to -1.0%, fires frequently
 CL_TIER1_MIN_PCT      = -1.0    # floor (don't cut deeper than this in T1)
-CL_TIER1_MAX_PCT      = -0.3    # ceiling (don't cut tiny drawdowns)
+CL_TIER1_MAX_PCT      = -0.5    # ceiling (start cutting at -0.5% instead of -0.3%)
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 10   # don't touch bottom 10% worst losers
 CL_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}
