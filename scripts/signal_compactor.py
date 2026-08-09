@@ -256,12 +256,12 @@ SIGNAL_SOURCE_WEIGHTS = {
     # continuation — re-entry after profitable close (65% WR in backtest)
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,
-    # ── Combo boosts (7d data: 2026-08-07) ──────────────────────────────────
+    # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.3,  # 5T 100% WR +$0.20
-    ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.15, # 6T 67% WR +$0.12
-    ('vortex_break','ma100-cross,vortex_break_long'):     1.1,  # 8T 62% WR +$0.08
+    ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.25, # 6T 67% WR +$0.12 (boosted)
+    ('vortex_break','ma100-cross,vortex_break_long'):     1.2,  # 8T 63% WR +$0.08 (boosted)
     ('range_finder','ma100-cross,range_finder'):          1.05, # 7T 57% WR +$0.07
-    ('bb_bounce',   'bb_bounce+,range_finder+'):          1.2,  # 7T 71% WR +$0.12
+    ('bb_bounce',   'bb_bounce+,range_finder+'):          1.2,  # 27T 59% WR +$0.67
     # ── hzscore SHORT RS confluence boosts (2026-08-08) ─────────────────────
     ('mtf_zscore',  'hzscore-,rs-'):                      1.5,  # 7T 86% WR +$0.23 — RS confluence = high conviction
     ('mtf_zscore',  'hzscore-,ma100-cross'):              1.3,  # 1T 100% WR +$0.06 — ma100 cross confirmation
@@ -270,11 +270,18 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('tl_break_short', 'tl_break_short'):                 1.2,  # 70T 41% WR +$0.21 — high volume profitable
     # ── NEW: hzscore+ LONG boosts (14d data: 2026-08-08) ─────────────────────
     ('mtf_zscore',  'hzscore+,return_exhaustion_long'):   1.2,  # 12T 67% WR +$0.13
-    # ── Combo suppressions (14d data: 2026-08-08) ────────────────────────────
-    ('return_exhaustion_short','return_exhaustion-'):     0.7,  # 5T 60% WR -$0.12 (neg avg PnL)
+    # ── Combo suppressions (14d data: 2026-08-09) ────────────────────────────
+    ('return_exhaustion_short','return_exhaustion-'):     0.5,  # 5T 60% WR -$0.12 (suppressed)
     ('ma_100_cross','ma100-cross,return_exhaustion-'):    0.5,  # 7T 43% WR -$0.28
     ('zscore_rising_short','zscore-rising-'):             0.5,  # 38T 45% WR -$0.22
     ('ma_100_cross','ma100-cross-,range_finder-'):        0.5,  # 5T 40% WR -$0.19
+    ('ma_100_cross','ma100-cross+,vortex_break_long'):    0.5,  # 6T 33% WR -$0.11 (new)
+    ('vortex_break','vel-hermes-'):                       0.5,  # 52T 39% WR -$0.06 (suppressed)
+    ('accel_300_velocity','accel-300-vel+'):              0.5,  # 5T 20% WR -$0.09 (new)
+    ('accel_300_velocity','accel-300-vel-'):              0.3,  # 5T 0% WR -$0.12 (new)
+    ('squeeze_cross','sqx-'):                             0.5,  # 10T 40% WR -$0.12 (new)
+    ('squeeze_cross','sqx+'):                             0.3,  # 7T 0% WR -$0.14 (new)
+    ('pattern_wolf','pattern_wolf_wave_bear'):            0.5,  # 5T 20% WR -$0.16 (new)
     # ── inv-accel-300 DISABLED (14d data: 2026-08-08) ────────────────────────
     ('inverse_accel_300_short','inv-accel-300-'):         0.3,  # 86T 31% WR -$0.31 — biggest loser
     ('inverse_accel_300_long', 'inv-accel-300+'):         0.3,  # 74T 27% WR -$0.25 — biggest LONG loser
