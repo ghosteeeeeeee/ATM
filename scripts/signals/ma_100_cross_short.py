@@ -65,6 +65,40 @@ def _compute_atr(closes: np.ndarray, period: int = ATR_PERIOD) -> np.ndarray:
     return atr
 
 
+def _get_1h_trend(token: str) -> str:
+    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+    import sqlite3
+    try:
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1h
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT 60
+        """, (token.upper(),))
+        rows = cur.fetchall()
+        conn.close()
+        if not rows or len(rows) < 50:
+            return 'NEUTRAL'
+        closes = [r[0] for r in reversed(rows)]
+
+        def ema(data, period):
+            k = 2 / (period + 1)
+            val = data[0]
+            for v in data[1:]:
+                val = v * k + val * (1 - k)
+            return val
+
+        ema20 = ema(closes, 20)
+        ema50 = ema(closes, 50)
+        if ema50 == 0:
+            return 'NEUTRAL'
+        return 'BULLISH' if ema20 > ema50 else 'BEARISH'
+    except Exception:
+        return 'NEUTRAL'
+
+
 def detect_ma_100_short(token: str, candles: list, price: float) -> dict:
     """Detect 100MA cross SHORT signal on 5m data.
 
@@ -216,6 +250,11 @@ def scan_ma_100_short_signals(prices_dict: dict) -> int:
         # Check kill switch
         from hermes_constants import MA_100_CROSS_MINUS_ENABLED
         if not MA_100_CROSS_MINUS_ENABLED:
+            continue
+
+        # Regime filter: skip SHORT in BULLISH regimes (docstring says "only BEARISH" but was never implemented)
+        trend = _get_1h_trend(token)
+        if trend == 'BULLISH':
             continue
 
         # Add signal
