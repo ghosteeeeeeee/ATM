@@ -136,3 +136,11 @@
 - **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
 - **INFO**: All 20+ hermes timers active, pipeline + price-collector firing on schedule
 - **AUTO-FIX**: None applied — no critical issues, all warnings non-blocking
+- **INFO**: Pipeline LIVE healthy — ran 09:38 UTC, signal_compactor OK (0 hotset entries in NEUTRAL regime, expected)
+- **INFO**: Regime NEUTRAL — 102 NEUTRAL / 1 LONG / 3 SHORT of 106 tokens; macro gate REDUCE
+- **INFO**: 87 signals in 1h; 4 open positions, 57 closed today, +2.62% PnL
+- **WARN**: 2 phantom trades in last 200 closed (AXS LONG, LINK LONG pnl_pct=-0.0) — 1% rate, below threshold
+- **INFO**: Price freshness OK — latest updated_at 3s ago, 46 tokens fresh in 5min (219 stale are #placeholders)
+- **INFO**: 30+ hermes timers active, pipeline + price-collector firing on schedule (last 47s ago)
+- **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
+- **AUTO-FIX**: None applied — no critical issues
