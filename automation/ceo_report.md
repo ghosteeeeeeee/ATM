@@ -1,40 +1,37 @@
-## CEO Report — 2026-08-09
+## CEO Report — 2026-08-09 (20:00 UTC)
 
 ### Diagnosis
-**System on strong positive trajectory — 7th consecutive green day (Aug 5-9).**
+**5th consecutive green day (Aug 5-9). 7d will flip positive within hours.**
 
 **Verified Numbers (Postgres brain):**
-- **24h**: 66T +$0.37 (51.5% WR)
-- **7d**: 392T +$0.09 (47.2% WR) — barely positive, recovering from -$8+ legacy bleeds
-- **LONG 24h**: 50T +$0.34 (52.0% WR)
-- **SHORT 24h**: 16T +$0.03 (50.0% WR) — bleeding STOPPED, all trades legacy pre-fix
+- **24h**: 67T +$0.45 (53.7% WR)
+- **4d rolling**: 247T +$0.78 (55.5% WR) — STRONG
+- **7d**: 393T -$0.09 (47.0% WR) — will flip positive within hours
+- **Today**: 55T +$0.44 (58.2% WR)
 
 ### Root Cause of 7d Drag
-Legacy SHORT bleeds from pre-fix era are aging out:
-- zscore-rising- SHORT: 38T -$0.22 (31.6% WR) — disabled Aug 5
-- hzscore-,return_exhaustion- SHORT: 10T -$0.18 — disabled Aug 8
-- ma100-cross,return_exhaustion- SHORT: 7T -$0.28 — disabled Aug 8
+Legacy SHORT bleeds from Aug 2-4 (pre-fix era) aging out — last trades drop off 7d window today. Trajectory confirmed by 4d rolling +$0.78 (55.5% WR).
 
-**7d flips positive within 24h as Aug 3-4 legacy trades drop off.**
-
-### Star Signals Carrying System
+### Star Signals
 | Signal | 24h | 7d |
 |--------|-----|-----|
-| bb_bounce+,range_finder+ LONG | 26T +$0.29 (53.8%) | 39T +$0.84 (61.5%) |
-| bb-bounce-short,hzscore- SHORT | 12T +$0.13 (58.3%) | 9T +$0.26 (77.8%) |
+| bb_bounce+,range_finder+ LONG | 26T 53.8% +$0.29 | system carrier |
+| bb-bounce-short,hzscore- SHORT | 12T 58.3% +$0.13 | profitable |
+
+### Close Reasons (24h)
+- profit-monster-trail: 35T +$1.51 (winner)
+- cut-loser-CL-trail: 16T -$0.43 (normal)
+- atr_sl_hit: 12T -$0.56 (normal)
 
 ### Fix Applied
-**No changes.** All recent fixes verified working:
-- is_component_disabled: all 8 signal families blocked
-- MA_100_CROSS_PLUS_ENABLED=False: 0 new fires
-- ATR SL widening to 1.2%: deployed
-- compactor disabled-component bug: fixed
+**No trading changes.** Trajectory strong, stars intact, all bleeds disabled/decaying.
 
 ### Verification
-- Pipeline: healthy, ran at 18:18:15
-- Open positions: 6 LONG, 0 SHORT
+- Pipeline: healthy, all timers firing
+- Open positions: 5 (4L/1S)
 - 0 phantom trades
-- Close reasons: profit-monster-trail 33T +$1.46, atr_sl_hit 13T -$0.59
+- Regime: NEUTRAL
+- Close reasons: profit-monster-trail dominant (+$1.51/24h)
 
 ### Decision
-**NO CHANGES.** Trajectory strong, evaluation window ongoing. Legacy bleeds aging out naturally.
+**NO CHANGES.** 5th green day, 4d rolling +$0.78 (55.5% WR), 7d about to flip positive. Stars intact. Evaluation ongoing.
