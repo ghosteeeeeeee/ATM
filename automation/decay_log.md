@@ -266,3 +266,12 @@
 [2026-08-09 09:49 UTC]   🟢 bb_bounce+,range_finder+: 25 trades, 56.0% WR, PnL=2.24
 [2026-08-09 09:49 UTC]   🟢 bb-bounce-short,hzscore-: 9 trades, 77.8% WR, PnL=2.4
 [2026-08-09 09:49 UTC] Done. Disabled 0 signals.
+[2026-08-09 15:49 UTC] === Signal Decay Detector ===
+[2026-08-09 15:49 UTC]   SKIP: No flag mapping for ma100-cross+,vortex_break_long
+[2026-08-09 15:49 UTC]   🔴 ma100-cross+,vortex_break_long: 4 trades, 0.0% WR, PnL=-1.89
+[2026-08-09 15:49 UTC]   🟢 bb_bounce+,range_finder+: 26 trades, 53.8% WR, PnL=3.28
+[2026-08-09 15:49 UTC]   🟢 bb_bounce+,hzscore+: 5 trades, 60.0% WR, PnL=0.25
+[2026-08-09 15:49 UTC]   🟢 bb-bounce-short,hzscore-: 11 trades, 63.6% WR, PnL=1.86
+[2026-08-09 15:49 UTC]   🟢 hzscore+,range_finder+: 3 trades, 66.7% WR, PnL=-0.46
+[2026-08-09 15:49 UTC]   🟢 continuation+,hzscore+: 3 trades, 100.0% WR, PnL=0.73
+[2026-08-09 15:49 UTC] Done. Disabled 0 signals.
