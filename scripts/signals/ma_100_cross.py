@@ -191,6 +191,36 @@ def _get_candles(token: str, lookback: int = 2500) -> list:
         return []
 
 
+def _get_1h_trend(token: str) -> str:
+    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+    try:
+        import sqlite3
+        from paths import HERMES_DATA
+        conn = sqlite3.connect(f'{HERMES_DATA}/candles.db')
+        c = conn.cursor()
+        c.execute(
+            "SELECT close FROM candles WHERE token=? AND timeframe='1h' ORDER BY ts DESC LIMIT 60",
+            (token.upper(),)
+        )
+        rows = [r[0] for r in c.fetchall()]
+        conn.close()
+        if len(rows) < 30:
+            return 'NEUTRAL'
+
+        def ema(data, period):
+            k = 2 / (period + 1)
+            e = data[0]
+            for v in data[1:]:
+                e = v * k + e * (1 - k)
+            return e
+
+        ema20 = ema(rows[:20], 20)
+        ema50 = ema(rows[:50], 50)
+        return 'BULLISH' if ema20 > ema50 else 'BEARISH'
+    except Exception:
+        return 'NEUTRAL'
+
+
 def scan_ma_100_signals(prices_dict: dict) -> tuple:
     """Scan tokens for 100MA cross signals."""
     from hermes_constants import (
@@ -218,6 +248,12 @@ def scan_ma_100_signals(prices_dict: dict) -> tuple:
             continue
         if sig['direction'] == 'SHORT' and not MA_100_CROSS_MINUS_ENABLED:
             continue
+
+        # Regime filter: skip SHORT in BULLISH regimes (matches ma_100_cross_short.py)
+        if sig['direction'] == 'SHORT':
+            trend = _get_1h_trend(token)
+            if trend == 'BULLISH':
+                continue
 
         token_upper = token.upper()
         if sig['direction'] == 'LONG' and token_upper in LONG_BLACKLIST:

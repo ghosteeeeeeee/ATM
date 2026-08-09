@@ -5,6 +5,7 @@
 <!-- Format: [YYYY-MM-DD HH:MM] automaton: action taken -->
 - [2026-08-08 00:30] signal_reporter: System startup — no kills needed yet
 - [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
+- [2026-08-10 05:30] ceo: DISABLED MA_100_CROSS_MINUS_ENABLED. All ma100-cross SHORT combos bled in 24h (0% WR). bb-bounce-short and choch-5 handle SHORT side. Also added regime filter to base ma_100_cross.py (was missing, base signal disabled but future-proofing).
 - [2026-08-09 22:19] ceo: BUG FIX — is_component_disabled() missing bb-bounce-short, range_finder_short. Added hyphenated signal name mappings. Cleared stale .pyc cache (root cause of ImportError alerts).
 - [2026-08-09 22:30] ceo: CEO review — verified DB numbers: 24h +$0.16 (45.5% WR, 44T), 7d -$7.52 (42.5% WR). All fixes working. No changes needed.
 - [2026-08-09 23:00] ceo: CEO review — verified DB: 24h +$0.36 (46.5% WR, 43T), 7d -$0.95 (43.9% WR). LONG +$0.95/7d (51.5% WR). SHORT -$1.90/7d (37.7% WR) — all legacy pre-fix trades. 7 SHORT in 24h only. ATR SL hits $-0.84/24h (16T) but 1.2% widening deployed. All fixes working. No changes needed.
