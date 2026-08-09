@@ -1035,7 +1035,7 @@ RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific wit
 RANGE_BREAKOUT_ENABLED = True
 RANGE_BREAKOUT_PLUS_ENABLED = True   # range_breakout+ LONG (breakout above resistance)
 RANGE_BREAKOUT_MINUS_ENABLED = True  # range_breakout- SHORT (breakout below support)
-RANGE_BREAKOUT_BB_PERIOD = 20        # Bollinger Band period
+RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)
 RANGE_BREAKOUT_BB_WIDTH_MAX = 0.04   # Max band width % to consider range-bound (4%)
 RANGE_BREAKOUT_BB_SLOPE_MAX = 0.001  # Max BB middle slope per candle (flat bands)
@@ -1049,8 +1049,8 @@ RANGE_BREAKOUT_INVALIDATION_WINDOW = 5  # Candles to check for invalidation
 RANGE_BREAKOUT_COOLDOWN_HOURS = 2    # Cooldown per token+direction
 RANGE_BREAKOUT_CONF_BASE = 55        # Base confidence
 RANGE_BREAKOUT_CONF_CAP = 88         # Max confidence (system ceiling)
-RANGE_BREAKOUT_RSI_LONG_MAX = 75     # Skip LONG if RSI above this (overextended)
-RANGE_BREAKOUT_RSI_SHORT_MIN = 25    # Skip SHORT if RSI below this (overextended)
+RANGE_BREAKOUT_RSI_LONG_MAX = 70     # Skip LONG if RSI above this (overextended)
+RANGE_BREAKOUT_RSI_SHORT_MIN = 30    # Skip SHORT if RSI below this (overextended)
 
 # Mean-reversion velocity gate — block entries when price still trending against signal
 MEAN_REVERSION_VEL_ENABLED = True

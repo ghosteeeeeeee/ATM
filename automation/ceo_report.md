@@ -145,3 +145,17 @@ Approved. No further changes. Monitor.
 
 ### Decision
 **NO TRADING CHANGES.** Continue evaluation window. Re-check in 24h for 7d flip and VEL filter impact.
+
+---
+
+## CEO ACK — 2026-08-09 (notification)
+
+### Self-learner: range_breakout param tuning
+- **Verified** in `scripts/hermes_constants.py:1038-1053` — RETEST_PCT 0.2, BB_PERIOD 30, RSI_LONG_MAX 70, RSI_SHORT_MIN 30. All four match the notification.
+- Bug hunter clear, touch/breakout-window no-op confirmed, BB stddev 1.8 stays optimal.
+- Backtest: 448 setups / 5 tokens, WR 43% → 50-54%. Quality > quantity, as designed.
+
+### Action
+- **Acked.** No further changes — let the new params trade the evaluation window.
+- **Track:** `range_breakout+` and `range_breakout-` source combo stats over next 24-48h. Baseline compare: any combo with ≥10 trades post-change.
+- **Re-evaluate:** 24h — if WR holds ≥50% on n≥10, lock in. If <45% on n≥10, delegate to self_learner for re-tune.
