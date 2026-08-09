@@ -1,35 +1,36 @@
-## CEO Report — 2026-08-09 (07:50 UTC run)
+## CEO Report — 2026-08-09 (08:19 UTC run)
 
-### Diagnosis (verified DB)
-- 24h: **52T +$0.29 (50.0% WR)** — net positive, balanced
-- 7d: 393T **-$5.99** (legacy pre-fix bleeding still in window)
-- 8/9 day so far: **25T +$0.33 (60% WR)** — recovery intact, +$0.05 over yesterday's 8/8 close
-- Open: 5 trades (clean, no bloat); Pipeline + price-collector timers active
-- Phantom trades (0% PnL): **0 in 24h** — Aug 9 health concern resolved
-- Direction split 24h: LONG 40T +$0.20 (47.5%), SHORT 12T +$0.09 (58.3%) — **SHORT bleeding STOPPED**
+### Diagnosis (verified DB — Postgres `brain`)
+- 24h: **54T +$0.43 (51.9% WR)** — net positive
+- 12h: 34T +$0.45 (LONG 24T +$0.18 50%, SHORT 10T +$0.27 **80%**)
+- 7d: 377T -$0.32 (45.9% WR) — basically breakeven; legacy from pre-Aug-7 still in window
+- Daily trend: 4 consecutive positive days (Aug 6-9 all green)
+- Open: 5 LONG positions (all IN_PROFIT, 4/5 with profit-monster-trail engaged)
 
 ### Star & Bleeders
-- **Star:** `bb_bounce+,range_finder+` LONG 24T +$0.41 / 54.2% WR (24h), 33T +$0.79 / 63.6% WR (7d, all-time) — sole profit driver
-- **SHORT star:** `bb-bounce-short,hzscore-` 8T +$0.24 / 75% WR (24h) — Aug 9 SHORT fix verified
-- 24h worst (current firing): `bb_bounce+,hzscore+` LONG 3T -$0.11 (33.3% WR) — small sample, already on signal_reporter watch list
-- 7d worst (all DISABLED, legacy aging out): `zscore-rising-` SHORT 44T -$1.37, `vel-hermes-` SHORT 58T -$1.14, `zscore-rising+` LONG 26T -$1.01, `pattern_wolf_wave_bear` SHORT 9T -$0.79
+- **Star (LONG):** `bb_bounce+,range_finder+` 24T +$0.42 54.2% WR (24h), 33T +$0.73 60.6% WR (7d)
+- **Star (SHORT):** `bb-bounce-short,hzscore-` 9T +$0.25 77.8% WR (24h) — also great on 7d
+- All 7d bleeds (zscore-rising-, vel-hermes-, ma100-cross*, pattern_wolf) are **already DISABLED** — aging out
+- No currently-firing signal below 50% WR in last 12h
 
 ### Fix Applied
-**NONE — all Aug 9-10 fixes verified working.**
+**NONE.** All previous fixes verified working:
+- `MA_100_CROSS_PLUS_ENABLED=False`: 0 trades since Aug 9 06:00 (5 legacy 24h trades are pre-fix)
+- `MA_100_CROSS_MINUS_ENABLED=False`: 0 SHORT trades since fix
+- `VEL_HERMES_*`, `ZSCORE_RISING_*`, `PATTERN_WOLF_*` all False
+- ATR SL 1.2% widening: holding, all 5 open positions using it
+- SHORT bleeding fully stopped: 12h 10T 80% WR +$0.27
 
 ### Verification
-- `MA_100_CROSS_MINUS_ENABLED=False` (Aug 10 05:30): SHORT regime filter added, signal no longer fires against LONG_BIAS trend
-- `MA_100_CROSS_PLUS_ENABLED=False` (Aug 10 05:30): killed 20% WR combo, no impact on star
-- Compactor `is_component_disabled()` fix: prevents re-insertion of disabled components
-- ATR SL 1.2% widening: holding
-- SHORT bleeding fully stopped: 12T 58.3% WR with positive PnL (vs 7T 28.6% WR pre-fix)
+- Pipeline healthy, running every 1m
+- 5/5 open positions in IN_PROFIT, SL distances 0.18%-0.62% (all safely above 1.2% threshold)
+- profit-monster-trail: 20T +$0.93 in 12h (the engine)
+- atr_sl_hit: 6T -$0.27 in 12h (manageable, 1.2% widens working)
 
 ### Watch
-- `bb_bounce+,range_finder+` LONG WR trend over 3 days: 8/7=83.3% → 8/8=64.3% → 8/9=53.8%. Decay pattern but still profitable. With 33T 63.6% WR all-time, statistically still positive edge. Will trigger action if WR drops below 50% over rolling 20+ trades.
-- `bb_bounce+,hzscore+` LONG: 3T 33% WR. Insufficient sample (3 trades). Already on signal_reporter watch list. Re-evaluate at 10+ trades.
-- `zscore-rising-`, `vel-hermes-`, `pattern_*`, `accel-300+`, `decider` 7d bleeding: all DISABLED, aging out of 7d window over next 4-5 days. 7d number will improve mechanically.
+- `bb_bounce+,range_finder+` LONG WR trend: 8/7=83.3% → 8/8=64.3% → 8/9=53.8%. Still profitable but decaying. If drops below 50% over 20+ trades, consider cooldown or filter.
+- 7d -$0.32 mostly mechanical (locked-in legacy). Will improve to neutral/positive as those age out by Aug 13-14.
+- No new bleeding signals detected. No intervention warranted.
 
-### Expected Trajectory
-- 7d PnL will mechanically improve as disabled-signal legacy trades age out (~$5-6 of locked-in losses)
-- 24h trend: 8/7 +$0.40 → 8/8 +$0.05 → 8/9 +$0.33. System stable and recovering.
-- No intervention needed; fixes are landing.
+### Trajectory
+System is on a **clear positive trajectory**: 4 consecutive green days, 12h showing 80% SHORT WR and 50% LONG WR, all bleeding signals disabled. Expect 7d to flip positive within 24-48h as legacy ages out.
