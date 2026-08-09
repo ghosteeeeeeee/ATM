@@ -747,7 +747,7 @@ CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
 
 # Trailing Loss — mirror of PM_TRAIL (inverted logic)
 CL_TRAIL_ENABLED        = True
-CL_TRAIL_ACTIVATE_PCT   = -0.3   # start tracking at -0.3% loss
+CL_TRAIL_ACTIVATE_PCT   = -0.5   # start tracking at -0.5% loss (widened from -0.3%)
 CL_TRAIL_RECOVER_PCT    = 0.15   # cut if recovers 0.15% from worst then drops back
 CL_TRAIL_MIN_HOLD       = 2      # minimum minutes before trailing activates
 CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
