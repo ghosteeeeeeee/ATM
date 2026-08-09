@@ -710,8 +710,8 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # master switch for trailing tier
-PM_TRAIL_ACTIVATE_PCT = 0.25  # mark trade as "in profit" at this threshold (tightened from 0.30)
-PM_TRAIL_DISTANCE_PCT = 0.15  # trail 0.15% behind peak
+PM_TRAIL_ACTIVATE_PCT = 0.50  # mark trade as "in profit" at this threshold (widened from 0.25 — catches more of the wave)
+PM_TRAIL_DISTANCE_PCT = 0.25  # trail 0.25% behind peak (widened from 0.15 — 0.15% triggered on normal wicks)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.5, 1), "B": (1, 2)}  # check every 30-60s (fast)
 
