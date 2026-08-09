@@ -1,36 +1,39 @@
-## CEO Report — 2026-08-09 (08:19 UTC run)
+## CEO Report — 2026-08-09 (08:50 UTC run)
 
 ### Diagnosis (verified DB — Postgres `brain`)
-- 24h: **54T +$0.43 (51.9% WR)** — net positive
-- 12h: 34T +$0.45 (LONG 24T +$0.18 50%, SHORT 10T +$0.27 **80%**)
-- 7d: 377T -$0.32 (45.9% WR) — basically breakeven; legacy from pre-Aug-7 still in window
-- Daily trend: 4 consecutive positive days (Aug 6-9 all green)
-- Open: 5 LONG positions (all IN_PROFIT, 4/5 with profit-monster-trail engaged)
+- 24h: **55T +$0.28 (52.7% WR)** — net positive (cooling from 08:19 +$0.43)
+- 12h: 37T +$0.54 (62.2% WR) — strong
+- 7d: 379T -$0.21 (46.4% WR) — basically breakeven; legacy aging out
+- Daily trend: 5 consecutive green days (Aug 5-9 all green)
+- Open: 4 positions (3 LONG + 1 SHORT), mix of fresh (2 <15min) and one stale (ASTER 6.5h, -0.20%)
 
 ### Star & Bleeders
-- **Star (LONG):** `bb_bounce+,range_finder+` 24T +$0.42 54.2% WR (24h), 33T +$0.73 60.6% WR (7d)
-- **Star (SHORT):** `bb-bounce-short,hzscore-` 9T +$0.25 77.8% WR (24h) — also great on 7d
-- All 7d bleeds (zscore-rising-, vel-hermes-, ma100-cross*, pattern_wolf) are **already DISABLED** — aging out
-- No currently-firing signal below 50% WR in last 12h
+- **Star (LONG):** `bb_bounce+,range_finder+` 18T +$0.22 55.6% WR (12h) — engine holding
+- **Star (SHORT):** `bb-bounce-short,hzscore-` 9T +$0.25 77.8% WR (12h) — SHORT engine
+- All 7d bleeds (`zscore-rising-`, `vel-hermes-`, `ma100-cross*`, `pattern_wolf`, `hzscore-,return_exhaustion-`) **already DISABLED** — aging out
+- No new bleeding signals in 12h
 
 ### Fix Applied
 **NONE.** All previous fixes verified working:
-- `MA_100_CROSS_PLUS_ENABLED=False`: 0 trades since Aug 9 06:00 (5 legacy 24h trades are pre-fix)
+- `MA_100_CROSS_PLUS_ENABLED=False`: confirmed 0 trades since 08:00 Aug 9 (5 legacy 24h trades are pre-fix)
 - `MA_100_CROSS_MINUS_ENABLED=False`: 0 SHORT trades since fix
 - `VEL_HERMES_*`, `ZSCORE_RISING_*`, `PATTERN_WOLF_*` all False
-- ATR SL 1.2% widening: holding, all 5 open positions using it
-- SHORT bleeding fully stopped: 12h 10T 80% WR +$0.27
+- ATR SL 1.2% widening: deployed, holding
+- Compactor `is_component_disabled()` fix: verified — 0 disabled signals leaking
+- SHORT bleeding fully stopped (12h 16T +$0.43, ~80% SHORT WR)
 
 ### Verification
-- Pipeline healthy, running every 1m
-- 5/5 open positions in IN_PROFIT, SL distances 0.18%-0.62% (all safely above 1.2% threshold)
-- profit-monster-trail: 20T +$0.93 in 12h (the engine)
-- atr_sl_hit: 6T -$0.27 in 12h (manageable, 1.2% widens working)
+- Pipeline LIVE, heartbeat 13.5s, 15+ timers on schedule
+- Open positions healthy: 2 fresh positions (AAVE LONG, ETH SHORT) flat; ASTER LONG 6.5h -0.20% (slightly stale, still in range); DYDX LONG 0.76h -0.32% (fresh, normal SL)
+- profit-monster-trail: continuing to carry profit
+- atr_sl_hit: manageable, 1.2% widens working
+- Disk 80% (24GB free) — stable
 
 ### Watch
-- `bb_bounce+,range_finder+` LONG WR trend: 8/7=83.3% → 8/8=64.3% → 8/9=53.8%. Still profitable but decaying. If drops below 50% over 20+ trades, consider cooldown or filter.
-- 7d -$0.32 mostly mechanical (locked-in legacy). Will improve to neutral/positive as those age out by Aug 13-14.
-- No new bleeding signals detected. No intervention warranted.
+- `bb_bounce+,hzscore+` LONG: 3T -$0.01 (33.3% WR) — small sample, NOT yet actionable (need 10+). ASTER position open 6.5h at -0.20% will resolve via cut-loser-trail if needed.
+- `bb_bounce+,range_finder+` LONG WR trend: 8/7=83.3% → 8/8=64.3% → 8/9=55.6% — cooling slightly but still profitable
+- 7d -$0.21 mostly mechanical (legacy from pre-Aug-7). Will improve to neutral/positive as those age out
+- `position_manager` close_reason `notes` field still NULL for some closes — minor bookkeeping bug, no PnL impact (noted since Aug 9 03:50, not blocking)
 
 ### Trajectory
-System is on a **clear positive trajectory**: 4 consecutive green days, 12h showing 80% SHORT WR and 50% LONG WR, all bleeding signals disabled. Expect 7d to flip positive within 24-48h as legacy ages out.
+System is on a **clear positive trajectory**: 5 consecutive green days (Aug 5-9), 12h showing 62.2% WR with stars firing consistently, all bleeding signals disabled, regime filters working, compactor fix holding. Expect 7d to flip positive within 24-48h as legacy ages out by Aug 13-14.
