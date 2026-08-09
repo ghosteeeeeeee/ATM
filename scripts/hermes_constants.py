@@ -1349,7 +1349,7 @@ ENGULFING_CONF_CAP = 88               # max confidence
 # Backtested 14d: SHORT 51.4% WR +0.022%, LONG 46.7% WR +0.010%
 # Best on high-ATR tokens (ATR% >= 0.04%)
 MA_100_CROSS_ENABLED = False          # DISABLED — replaced by ma_100_cross_long + ma_100_cross_short
-MA_100_CROSS_PLUS_ENABLED = True      # LONG (price crosses above MA)
+MA_100_CROSS_PLUS_ENABLED = False     # CEO 2026-08-10: ma100-cross+,vortex_break_long 5T -$0.14 20% WR (24h), 6T -$0.11 33% WR (7d). bb_bounce+,range_finder+ LONG carries system.
 MA_100_CROSS_MINUS_ENABLED = False  # CEO 2026-08-10: all ma100-cross SHORT combos 0% WR in 24h. bb-bounce-short and choch-5 handle SHORT side.     # Re-enabled 2026-08-08 — new ma_100_cross_short.py with tighter params
 
 # ── HL Copy Trading ───────────────────────────────────────────────────────────

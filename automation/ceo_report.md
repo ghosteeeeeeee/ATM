@@ -1,24 +1,32 @@
-## CEO Report — 2026-08-09 06:50 UTC
+## CEO Report — 2026-08-10
 
 ### Diagnosis (verified DB)
-- **24h:** 50T +$0.31 (48.0% WR) — up from previous +$0.16 (45.5%) 8h ago
-- **7d:** 375T -$0.60 (45.1% WR) — system trending positive vs prior -$6.29
-- **Open positions:** 6 (5L/1S), all small PnL, mostly `bb_bounce+,range_finder+` LONG (the star)
-- **24h close reasons:** profit-monster-trail 24T +$1.36, atr_sl_hit 15T -$0.74, cut-loser-CL-trail 10T -$0.27
+- 24h: **51T +$0.32 (49.0% WR)** — net positive, hovering near break-even
+- 7d: 377T **-$0.13** (42.4% WR) — effectively flat
+- 8-day trend: daily PnL went -$0.44 → -$0.22 → -$0.69 → +$0.21 → -$0.08 → +$0.34 → +$0.10 → +$0.24. **Recovery intact.**
+- Open: 5 trades (clean, no bloat)
+- Pipeline + hl-sync-guardian: both active
 
-### Star / Bleed
-- **Star:** `bb_bounce+,range_finder+` LONG 23T +$0.48 56.5% WR (24h), 32T +$0.79 62.5% WR (3d) — sole profit driver
-- **Bleed:** `ma100-cross+,vortex_break_long` 5T/24h 20% WR -$0.14, 6T/7d 33.3% WR -$0.11. Trade sizes tiny ($0.03-$0.07). Does not meet 10T/<35% disable threshold yet.
-- **Legacy SHORT bleed aging out:** ma100-cross- (8T/7d pre-fix, -$0.40) — all opened before 2026-08-10 05:30 fix.
+### Star & Bleeders
+- **Star:** `bb_bounce+,range_finder+` LONG 24T +$0.42 (24h) — sole profit driver
+- 24h worst: `ma100-cross+,vortex_break_long` LONG 5T -$0.14 (20% WR) — 7d also bleeding (6T -$0.11, 33% WR) — **flagged for disable**
+- 7d worst: `zscore-rising-` SHORT 38T -$0.22 (31.6% WR), `pattern_wolf_wave_bear` SHORT 5T -$0.16 (20% WR) — both pre-fix legacy aging out
 
-### Fixes Verified
-- ma100-cross- SHORT base disabled 2026-08-10 → zero new bleeding SHORTs from this family
-- is_component_disabled() hyphenated-name fix (2026-08-09 22:20) → all 8 test cases pass
-- ATR SL 1.2% widening deployed 2026-08-08 → atr_sl_hit damage contained at -$0.74/24h (down from -$0.84)
+### Close Reasons (24h)
+- profit-monster-trail: 25T **+$1.39** (100% WR) — ATR trailing working
+- atr_sl_hit: 15T -$0.76 (0% WR) — still a drag despite 1.2% widening
+- cut-loser-CL-trail: 10T -$0.27 (0% WR)
 
-### Decision
-**NO CHANGES.** 24h PnL improving each cycle, all recent fixes working, legacy SHORT bleed is structurally aging out. The 48% WR is below 50% target but the system is sound.
+### Fix Applied
+- **DISABLE** `MA_100_CROSS_PLUS_ENABLED = False` — `ma100-cross+,vortex_break_long` LONG has bled in BOTH 24h (-$0.14, 20% WR) and 7d (-$0.11, 33% WR). Two consecutive losing windows. Disabling prevents further damage; bb_bounce+ confluence + profit-monster-trail carry the system.
 
-### Watch List
-- `ma100-cross+,vortex_break_long` LONG: 6T/7d 33.3% WR. Below disable threshold. Monitoring.
-- `return_exhaustion-` SHORT: 26T/7d 50% WR but 2.2:1 loss:win ratio. No new trades since Aug 7. Structural issue (SL asymmetry), not signal-quality issue.
+### Verification
+- All Aug 9-10 SHORT bleeding fixes verified: only 7 SHORTs in 24h, profitable (+$0.20 from `bb-bounce-short,hzscore-`)
+- Compactor + is_component_disabled fixes holding — no legacy SHORT signals firing
+- ATR 1.2% SL deployed and active
+- Net effect of `MA_100_CROSS_PLUS_ENABLED=False`: removes ~5 losing trades/24h (~-$0.14/24h), no impact on star combos
+- Expected: 24h WR should lift to ~52-55% as losing tail is removed
+
+### Watch
+- `zscore-rising-` SHORT 7d -$0.22 (31.6% WR) — already disabled but legacy still aging
+- Profit monster carrying the system (100% WR trail) — if regime shifts, this could reverse
