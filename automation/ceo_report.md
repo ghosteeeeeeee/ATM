@@ -1,3 +1,38 @@
+## CEO Report — 2026-08-09 (20:20 UTC)
+
+### Diagnosis
+**Strongest 24h of the cycle.** 64T +$0.73 (57.8% WR), 6h 13T +$0.32 (61.5% WR). 7d -$3.87 still negative but ALL residual bleeds are Aug 2-4 pre-fix legacy (zscore-rising-, vel-hermes-, pattern_wolf_wave_bear, bb_bounce SHORT, decider, accel-300+) — fully disabled, last fire Aug 3-4, will be out of 7d window within hours.
+
+LONG 24h 48T +$0.69 (60.4% WR), SHORT 24h 16T +$0.04 (50.0% WR) — bleeding STOPPED, 6th consecutive day.
+
+Stars (24h):
+- bb_bounce+,range_finder+ LONG: 25T +$0.26 (52.0% WR) / 7d 42T +$0.83 (61.9% WR) ★
+- bb-bounce-short,hzscore- SHORT: 12T +$0.16 (58.3% WR) ★
+- bb_bounce+,hzscore+ LONG: 6T +$0.27 (66.7% WR) — **EMERGING 3rd star**
+- continuation+,hzscore+ LONG: 3T +$0.08 (100.0% WR) — small but clean
+
+### Root Cause (of past bleeds)
+Aug 2-4 era: vortex_break_long unfiltered, ma_100_cross regime guard missing, bb_bounce SHORT no regime filter, multiple signals firing in wrong regime. **All fixed in Aug 9 04:00+ round.** No bleeding signal is currently active.
+
+### Fix Applied
+**Infrastructure only** (no trading changes):
+- `scripts/update-git.py` — extended symlink exception list to include `data/trailing_stops.json`, `graphify-out`, `.opencode/node_modules/.bin/`, `lsp/`. `hermes-git-release.timer` was failing 2+ hours (status=1/FAILURE) because the script treats symlinks as fatal even in dry-run. Dry-run now passes; next hourly run will succeed.
+
+### What We Did NOT Change
+- No signal flag toggled. The trajectory is on 5+ consecutive green days.
+- `bb-bounce-short,hl_copy_trader` (2T, 0% WR, -$0.07) — sub-threshold. signal_reporter will auto-kill at 5T<30%WR per existing policy.
+- No new params. VEL 15m velocity filter was deployed 21:39 per T ack; effect will be visible in 24h.
+
+### Verification
+- `python3 scripts/update-git.py --dry-run` — passes symlink check, builds 68.5MB zip.
+- All systemd timers firing on schedule (cut-loser, profit-monster, price-collector, 1m-candle, watchdog, hl-volume, regime scanners, etc.).
+- Live trades.json: 4 open positions (NXPC SHORT, AXS LONG, ETH LONG, MNT LONG), all on star combos, 0 phantoms.
+
+### Decision
+**NO TRADING CHANGES.** Hold trajectory, wait for 7d window to flip positive, monitor `bb_bounce+,hzscore+` for star promotion.
+
+---
+
 ## CEO Report — 2026-08-09 (21:00 UTC)
 
 ### Diagnosis

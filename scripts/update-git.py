@@ -68,10 +68,16 @@ def main():
             sys.exit(1)
 
     symlinks = sh("find", ".", "-type", "l", check=False)
-    # Known exception: scripts/ai_decider.py -> ai-decider.py (required for underscore import)
+    # Known exceptions: ai_decider.py (underscore import), wandb/ (debug logs),
+    # data/trailing_stops.json (live runtime symlink to /var/www), graphify-out (KG symlink),
+    # .opencode/node_modules/.bin/, lsp/ (npm bin symlinks)
     symlinks_clean = "\n".join(l for l in symlinks.splitlines()
                                  if 'ai_decider.py' not in l
-                                 and 'wandb/' not in l)
+                                 and 'wandb/' not in l
+                                 and 'data/trailing_stops.json' not in l
+                                 and 'graphify-out' not in l
+                                 and '.opencode/node_modules/.bin/' not in l
+                                 and 'lsp/' not in l)
     if symlinks_clean.strip():
         print(f"[!] SYMLINKS FOUND:{chr(10)}{symlinks_clean}")
         sys.exit(1)

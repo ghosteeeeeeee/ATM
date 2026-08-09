@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-08-09 13:48 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-09 19:48 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 636 | **WR:** 44.5% | **PnL:** -14.15%
+- **Total trades (all time):** 649 | **WR:** 44.7% | **PnL:** -14.09%
 - **Date range:** 2026-07-29 → 2026-08-09
 
 ---
@@ -11,7 +11,9 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb-bounce-short,hzscore- | SHORT | — | —% | — | 9 | 77.8% | +2.40 | ENABLED |
+| bb-bounce-short,hzscore- | SHORT | 3 | 0.0% | -0.97 | 12 | 58.3% | +1.43 | ENABLED |
+| bb_bounce+,hzscore+ | LONG | — | —% | — | 5 | 60.0% | +0.25 | ENABLED |
+| hzscore+,range_finder+ | LONG | 3 | 100.0% | +0.85 | 5 | 80.0% | +0.24 | ENABLED |
 
 ---
 
@@ -23,10 +25,7 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| bb_bounce+,hzscore+ | LONG | 4 | 50.0% | -0.73 | ENABLED | Needs more data |
-| hzscore+,range_finder+ | LONG | 2 | 50.0% | -0.61 | ENABLED | Needs more data |
+None found.
 
 ---
 
@@ -44,9 +43,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] bb_bounce+,hzscore+ LONG** — WR=50.0%, PnL=-0.73% over 4 trades. Monitor next cycle.
-2. **[WATCH] hzscore+,range_finder+ LONG** — WR=50.0%, PnL=-0.61% over 2 trades. Monitor next cycle.
-3. **[KEEP] 1 winning combos** — bb-bounce-short,hzsc. LONG side dominant.
+1. **[KEEP] 3 winning combos** — bb-bounce-short,hzsc, bb_bounce+,hzscore+, hzscore+,range_finde. LONG side dominant.
 
 ---
 
@@ -58,15 +55,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-08-09 | 28c6aee | signals: add range_breakout — breakout from tight ranges wit... |
+| 2026-08-09 | 14c3b27 | signals: widen profit-monster trail — PM_TRAIL_ACTIVATE 0.25... |
+| 2026-08-09 | a95ea3c | config: lower momentum_leaderboard MOVE_MIN 3.0%→1.0% (was t... |
+| 2026-08-09 | 3422a08 | config: raise cut-loser T1 threshold to -0.75% (start cuttin... |
+| 2026-08-09 | 0b7f3af | config: raise cut-loser T1 threshold to -0.5% (T1 starts lat... |
+| 2026-08-09 | 2fcb232 | config: widen cut-loser trailing activation to -0.5% (from -... |
+| 2026-08-09 | be9af28 | blacklist: AAVE, SKY, PNUT (worst 7d performers) |
 | 2026-08-09 | 7aba5df | signals: kill vortex_break_long — 22.2% WR (9T 24h), -$0.18 ... |
 | 2026-08-09 | 0ed1acf | CEO 2026-08-10: disable MA_100_CROSS_PLUS — losing 5T/24h, 2... |
 | 2026-08-09 | 56a6fe6 | signals: add engulfing candle signal |
-| 2026-08-09 | e50164f | config: tighten PM_TRAIL_ACTIVATE_PCT 0.30→0.25 |
-| 2026-08-09 | 2884d93 | CEO: Disabled MA_100_CROSS_MINUS_ENABLED, added regime filte... |
-| 2026-08-08 | f5aa0d5 | signals: add return_exhaustion_short.py — SHORT-specific per... |
-| 2026-08-08 | 8b8e345 | signals: add range_finder_short.py — SHORT-specific range fi... |
-| 2026-08-08 | bb61874 | signals: add bb_bounce_short.py — SHORT-specific BB bounce w... |
-| 2026-08-08 | 51754e3 | CEO: 24h +$0.13 (50% WR), 7d -$1.23. All fixes verified work... |
-| 2026-08-08 | 16900d9 | signals: re-enable hzscore- with RS confluence boost |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

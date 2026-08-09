@@ -1,88 +1,71 @@
-# Hermes Automation Plan
+# Plan: VEL 15m Velocity Gate for Mean-Reversion Signals
 
-## Automations to Create
+## Problem
 
-### 1. Pipeline Health Monitor + System Status Dashboard
-- **Status:** ACTIVE
-- **Schedule:** Every hour at :20 (30min offset from auto-1hr)
-- **Purpose:** Check pipeline health, signal generation, trade execution, show system status
-- **File:** `automation/health_monitor_prompt.md`
-- **Script:** `automation/run_health_monitor.sh`
-- **Systemd:** `hermes-health-monitor.timer` / `hermes-health-monitor.service`
-- **First run:** 2026-08-01 13:37 UTC ✓
+Mean-reversion signals (bb_bounce, range_finder) fire at band edges when price is "oversold" or "overbought", but sometimes price keeps trending through the band instead of reversing. Result: entry goes opposite direction from start. Example: BCH LONG at $216.68 while in a 4-hour downtrend ($218.32→$216.62).
 
-### 2. Signal Performance Reporter
-- **Status:** ACTIVE
-- **Schedule:** Every 6 hours
-- **Purpose:** Calculate WR by signal type, flag losers, suggest changes
-- **File:** `automation/signal_reporter_prompt.md`
-- **Script:** `automation/run_signal_reporter.sh`
-- **Systemd:** `hermes-signal-reporter.timer` / `hermes-signal-reporter.service`
-- **First run:** 2026-08-01 13:43 UTC ✓
+## Solution
 
-### 3. Auto-1hr Results Summarizer
-- **Status:** ACTIVE
-- **Schedule:** Every 12 hours
-- **Purpose:** Summarize all automation outputs, pipeline performance, key decisions
-- **File:** `automation/summarizer_prompt.md`
-- **Script:** `automation/run_summarizer.sh`
-- **Systemd:** `hermes-summarizer.timer` / `hermes-summarizer.service`
-- **First run:** 2026-08-01 13:44 UTC ✓
+Add a 15m velocity gate: block signal if price is moving >0.3% against the trade direction over the last 15 minutes. Catches the "still falling" problem directly.
 
-### 4. Blacklist Tester
-- **Status:** ACTIVE
-- **Schedule:** Every 12 hours
-- **Purpose:** Rotate blacklisted tokens for trials, evaluate performance
-- **File:** `automation/blacklist_tester_prompt.md`
-- **Systemd:** `hermes-blacklist-tester.timer` / `hermes-blacklist-tester.service`
-- **First run:** 2026-08-01 12:52 UTC ✓
+## Backtest Results (140 historical mean-reversion signals)
 
-### 5. Upgrade Implementer
-- **Status:** ACTIVE
-- **Schedule:** Every 12 hours
-- **Purpose:** Scan plans/, evaluate projects, implement improvements progressively
-- **File:** `automation/upgrade_implementer_prompt.md`
-- **Script:** `automation/run_upgrade_implementer.sh`
-- **Systemd:** `hermes-upgrade-implementer.timer` / `hermes-upgrade-implementer.service`
-- **First run:** 2026-08-01 13:49 UTC ✓
-- **Features:** Progressive difficulty (Level 1-4), audit trail, success tracking
+| Filter | Trades Kept | WR% | PnL | Net Improvement |
+|--------|------------|-----|-----|----------------|
+| BASELINE | 140 | 55.0% | $+0.10 | — |
+| VEL 15m (-0.3%) | 127 | 59.1% | $+1.11 | +9 net trades |
+| VEL+MTF | 84 | 63.1% | $+1.50 | +8 net trades |
+| VEL+MTF+1H | 79 | 64.6% | $+1.61 | +9 net trades |
 
-### 6. Daily Orchestrator
-- **Status:** ACTIVE
-- **Schedule:** Every 12 hours
-- **Purpose:** Autonomous pipeline manager, coordinate all automations, implement improvements
-- **File:** `automation/orchestrator_prompt.md`
-- **Script:** `automation/run_orchestrator.sh`
-- **Systemd:** `hermes-daily-orchestrator.timer` / `hermes-daily-orchestrator.service`
-- **First run:** 2026-08-01 17:22 UTC ✓
-- **Features:** Gather intelligence, analyze, implement, validate, report
+CEO recommendation: VEL alone — conservative, preserves signal flow, mean-reversion fit is high.
 
-### 7. CEO
-- **Status:** ACTIVE
-- **Schedule:** Every 24 hours (staggered from orchestrator)
-- **Purpose:** Strategic oversight, capital allocation, risk management, system governance
-- **File:** `automation/ceo_prompt.md`
-- **Script:** `automation/run_ceo.sh`
-- **Systemd:** `hermes-ceo.timer` / `hermes-ceo.service`
-- **First run:** 2026-08-01 17:27 UTC ✓
-- **Features:** Performance review, capital allocation, strategic decisions, system health
+## Files to Modify
 
-## Existing Automations
+| File | Change |
+|------|--------|
+| `scripts/hermes_constants.py` | Add `MEAN_REVERSION_VEL_ENABLED`, `MEAN_REVERSION_VEL_THRESHOLD` |
+| `scripts/signals/bb_bounce.py` | Add velocity check before `add_signal()` |
+| `scripts/signals/range_finder.py` | Add velocity check before `add_signal()` |
+| `scripts/signals/range_finder_short.py` | Add velocity check before `add_signal()` |
 
-| Timer | Schedule | Purpose |
-|-------|----------|---------|
-| hermes-auto-1hr | Every hour at :50 | Analyze trades, tune params |
-| hermes-blacklist-tester | Every 12 hours | Test blacklisted tokens |
-| hermes-pipeline | Every minute | Main trading pipeline |
-| hermes-price-collector | Every ~1min | Collect prices |
-| hermes-15m-regime-scanner | Every 15min | Regime analysis |
+## Constants
 
-## Timing Layout
-
+```python
+MEAN_REVERSION_VEL_ENABLED = True
+MEAN_REVERSION_VEL_THRESHOLD = 0.3   # block if 15m velocity > 0.3% against direction
 ```
-:00 - pipeline
-:05 - price collector
-:15 - regime scanner
-:20 - health monitor (NEW)
-:50 - auto-1hr analyzer
+
+## Velocity Check Pattern
+
+```python
+if MEAN_REVERSION_VEL_ENABLED:
+    vel = _get_15m_velocity(token)
+    if vel is not None:
+        if direction == 'LONG' and vel < -MEAN_REVERSION_VEL_THRESHOLD:
+            continue
+        if direction == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD:
+            continue
 ```
+
+## `_get_15m_velocity()` Implementation
+
+- Query `price_history` for last 15 closes (15 minutes of 1m data)
+- Calculate `(last - first) / first * 100`
+- Return float (positive = upward, negative = downward)
+- Return `None` on error (fail-open — don't block trades on data issues)
+
+## Tracking
+
+- Store `velocity_15m` in `signal_metadata` JSON via `add_signal()` for post-hoc analysis
+- Log filtered signals to `automation/velocity_filter_log.json`
+- Compare 24h/48h/7d stats for bb_bounce+ and range_finder+ source combos
+
+## Rollback
+
+Set `MEAN_REVERSION_VEL_ENABLED = False` in hermes_constants.py. Instant. No code deploy.
+
+## Safety
+
+- Negative gate only — doesn't change entry logic, just blocks bad entries
+- Fail-open on data errors — no trades blocked on missing data
+- Kill switch in constants — instant rollback without code changes
