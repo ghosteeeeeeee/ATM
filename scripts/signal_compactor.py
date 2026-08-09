@@ -260,7 +260,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('engulfing_long',  'engulfing+'):  1.0,
     ('engulfing_short', 'engulfing-'):  1.0,
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
-    ('bb_bounce',   'bb_bounce,hzscore+'):               1.3,  # 5T 100% WR +$0.20
+    ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)
+    ('mtf_zscore',  'bb-bounce-short,hzscore-'):           1.5,  # 11T 64% WR +$0.18 (boosted)
     ('ma_100_cross','ma100-cross,return_exhaustion_long'): 1.25, # 6T 67% WR +$0.12 (boosted)
     ('range_finder','ma100-cross,range_finder'):          1.05, # 7T 57% WR +$0.07
     ('bb_bounce',   'bb_bounce+,range_finder+'):          1.35, # 41T 61% WR +$0.81 (boosted)
