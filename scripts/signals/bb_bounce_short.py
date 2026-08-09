@@ -32,7 +32,7 @@ BB_MIN_BARS = 30
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 55        # TIGHTER: require stronger overbought (was 60)
 BOUNCE_MIN_PCT = 0.08      # TIGHTER: require stronger bounce (was 0.05)
-MIN_VOLUME_RATIO = 1.2     # Volume must be 1.2x average
+MIN_VOLUME_RATIO = 1.0     # ponytail: was 1.2x, relaxed — low-volume NEUTRAL market makes 1.2x unachievable. Restore to 1.2x if volume returns.
 BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 REQUIRE_2_CANDLE = True    # Require 2 consecutive overbought candles before bounce
 

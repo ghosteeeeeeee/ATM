@@ -34,7 +34,7 @@ ATR_PERIOD = 14              # ATR period for volatility normalization
 REQUIRE_2_CANDLE = True      # require candle before cross to confirm pre-cross side
 REQUIRE_3_CANDLE = True      # SHORT-specific: require 3-candle confirmation
 STOP_LOSS_PCT = 1.0          # TIGHTER: 1.0% stop loss (improves WR)
-MIN_VOLUME_RATIO = 1.2       # Volume must be 1.2x average
+MIN_VOLUME_RATIO = 1.0       # ponytail: was 1.2x, relaxed — low-volume NEUTRAL market makes 1.2x unachievable. Restore to 1.2x if volume returns.
 BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 
 
