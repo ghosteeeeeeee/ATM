@@ -5,6 +5,7 @@
 <!-- Format: [YYYY-MM-DD HH:MM] automaton: action taken -->
 - [2026-08-08 00:30] signal_reporter: System startup — no kills needed yet
 - [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
+- [2026-08-09 07:30] signal_reporter: 6h report. 24h: bb_bounce+,range_finder+ LONG 24T 54.2% WR +$0.42 (winner, combo weight 1.07), bb-bounce-short,hzscore- SHORT 8T 75% WR +$0.23 (winner, weight 1.3), ma100-cross+,vortex_break_long 5T 20% WR -$0.14 (KILLED by CEO commit 0ed1acf — verified, 0 fires today). No inversions. No new kills or boosts needed — both winners auto-tuned, loser already dead.
 - [2026-08-09 05:30] ceo: CEO review — verified DB: 24h +$0.25 (49.0% WR, 49T), 7d -$6.29 (41.6% WR). SHORT bleeding STOPPED: 6T +$0.22 since Aug 9 fix. Star: bb_bounce+,range_finder+ LONG 23T +$0.47 56.5% WR. All fixes verified working. No changes needed — evaluation ongoing.
 - [2026-08-10 05:30] ceo: DISABLED MA_100_CROSS_MINUS_ENABLED. All ma100-cross SHORT combos bled in 24h (0% WR). bb-bounce-short and choch-5 handle SHORT side. Also added regime filter to base ma_100_cross.py (was missing, base signal disabled but future-proofing).
 - [2026-08-09 22:19] ceo: BUG FIX — is_component_disabled() missing bb-bounce-short, range_finder_short. Added hyphenated signal name mappings. Cleared stale .pyc cache (root cause of ImportError alerts).

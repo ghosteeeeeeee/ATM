@@ -124,3 +124,15 @@
 ## Error Alerts — 2026-08-08 21:08 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'RANGE_FINDER_SHORT_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_cons`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'RETURN_EXHAUSTION_SHORT_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes`
+
+## Health Report — 2026-08-09 07:40 UTC
+- **WARN**: 2 phantom trades in today's closes — AXS and LINK at 0.0000% PnL (close_reason=atr_sl_hit). Persistent pattern; ATR SL not triggering on actual move.
+- **WARN**: `pipeline_heartbeat.json` signal_gen timestamp 2026-06-09 (stale 2mo) — heartbeat file not auto-updating; cosmetic, pipeline.log shows signal_compactor running fine
+- **INFO**: Pipeline LIVE healthy — cycle #147352 ran at 07:38 UTC, signal_compactor OK (0 hotset entries, expected in NEUTRAL regime)
+- **INFO**: Regime NEUTRAL — 105 NEUTRAL / 0 LONG / 0 SHORT of 106 tokens scanned; macro gate REDUCE (wr=60%)
+- **INFO**: 96 signals in 1h, 1995 in 24h; 5 open positions, 3209 closed today, +4.35% PnL, 56.5% WR (200 trades)
+- **INFO**: Price freshness OK — candles_5m latest 07:35 UTC (5min ago), 172 tokens tracked, 44 fresh in last 5min
+- **INFO**: 234/549 tokens speed >=50% (87 >=80%) — speed tracker working
+- **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
+- **INFO**: All 20+ hermes timers active, pipeline + price-collector firing on schedule
+- **AUTO-FIX**: None applied — no critical issues, all warnings non-blocking
