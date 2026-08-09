@@ -127,6 +127,10 @@ SHORT_BLACKLIST = {
     'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
     'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
     'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
+    # 2026-08-09: Worst performers (7d) — both directions bleed
+    'AAVE',  # 17T 29.4% WR -$0.41
+    'SKY',   # 13T 30.8% WR -$0.16
+    'PNUT',  # 15T 33.3% WR -$0.13
     # 2026-08-08: Political meme coin, high volatility
     'TRUMP',
 }
@@ -183,6 +187,10 @@ LONG_BLACKLIST = {
     'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
     'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
     'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
+    # 2026-08-09: Worst performers (7d) — both directions bleed
+    'AAVE',  # 17T 29.4% WR -$0.41
+    'SKY',   # 13T 30.8% WR -$0.16
+    'PNUT',  # 15T 33.3% WR -$0.13
     # 2026-08-08: Political meme coin, high volatility
     'TRUMP',
 }
