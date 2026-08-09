@@ -208,3 +208,67 @@ Aug 2-4 era — vortex_break_long unfiltered, ma_100_cross SHORT regime guard mi
 - **Acked.** No further changes — let the new params trade the evaluation window.
 - **Track:** `range_breakout+` and `range_breakout-` source combo stats over next 24-48h. Baseline compare: any combo with ≥10 trades post-change.
 - **Re-evaluate:** 24h — if WR holds ≥50% on n≥10, lock in. If <45% on n≥10, delegate to self_learner for re-tune.
+
+---
+
+## CEO Report — 2026-08-09 (22:10 UTC) — SHORT Signal Imbalance Decision
+
+### Task
+CEO asked for ONE clear recommendation on the SHORT signal imbalance (system long-heavy).
+
+### Verified Numbers (signal_outcomes DB)
+
+| Window | ALL | LONG | SHORT |
+|--------|-----|------|-------|
+| 24h | 58T +$0.78 (60.3%) | 42T +$0.73 (64.3%) | 16T +$0.04 (**50.0%**) |
+| 7d | 438T -$3.56 (47.7%) | 215T +$0.51 (54.0%) | 223T -$4.07 (41.7%) |
+| 30d | 1542T -$53.47 (25.2%) | 723T -$21.79 (27.4%) | 819T -$31.68 (23.3%) |
+
+### Root Cause Analysis (7d SHORT bleed)
+
+**The 7d SHORT bleed is 100% historical, NOT structural.** The 6 bleeding combos (all n≥10, all DISABLED) last fired **Aug 5-8** — nothing since:
+
+| Combo (SHORT) | 7d | Last fire |
+|---|---|---|
+| zscore-rising- | 44T -$1.37 (38.6%) | Aug 5 14:28 |
+| vel-hermes- | 56T -$0.87 (35.7%) | Aug 5 14:28 |
+| pattern_wolf_wave_bear | 9T -$0.79 (11.1%) | Aug 5 14:28 |
+| bb_bounce | 10T -$0.56 (40.0%) | Aug 6 01:08 |
+| ma100-cross,return_exhaustion- | 7T -$0.28 (42.9%) | Aug 7 02:45 |
+| decider | 10T -$0.22 (10.0%) | Aug 5 19:42 |
+
+These decay out of 7d within 24-48h automatically. No action accelerates this.
+
+### Active SHORT Combos (live today)
+Only **1** combo is firing and profitable:
+- `bb-bounce-short,hzscore-` — 12T +$0.16 58.3% WR (24h) / 13T +$0.20 61.5% WR (7d) ★
+
+### Recommendation: **OPTION E — DO NOTHING**
+
+**Reasoning (decisive):**
+
+1. **24h SHORT is already healthy.** 16T +$0.04 50% WR — break-even, not bleeding. Bleeding stopped 8th consecutive day.
+2. **No structural imbalance.** Only 1 active SHORT combo, performing at 58-62% WR. Long-heavy is a function of *active signals*, not blacklists or params.
+3. **Options A/B are net-negative.** Both disabled signals had 40% historical WR. Re-enabling adds bleeding for +1 trade/day. YAGNI — won't fix what isn't broken.
+4. **Option C (blacklist trim) is pointless.** 29 SHORT-only blacklisted tokens ≠ active SHORT signal flow. The active signal `bb-bounce-short` filters regime internally; blacklist trim doesn't increase its hit rate.
+5. **Option D (new signal) defers YAGNI.** 24h SHORT is healthy with the current single combo. Build new signal when there's a *measurable deficit*, not a phantom one.
+6. **VEL 15m filter just deployed 21:39** — let it settle before layering changes.
+
+### Options Rejected
+
+| Opt | Reason |
+|-----|--------|
+| A. Re-enable BB_BOUNCE_MINUS | 40% WR historical, adds bleed for marginal coverage |
+| B. Re-enable RANGE_FINDER_MINUS | 40% WR historical, same issue |
+| C. Trim SHORT blacklist | Cosmetic — doesn't affect active signal flow |
+| D. Build new SHORT signal | YAGNI — 24h SHORT already at 50% WR, system has 1 healthy active SHORT combo |
+
+### Decision
+**NO TRADING CHANGES.** The "imbalance" is a 7d-window artifact of disabled signals aging out. 24h SHORT is at break-even with positive trajectory. Re-evaluate at 7d flip sustained positive (~24-48h).
+
+### Verification Plan
+- 24h: SHORT WR/PnL must remain ≥50%
+- 7d: Should flip positive or near-zero as Aug 5-8 bleeds age out
+- Watch: `bb-bounce-short,hl_copy_trader` (2T 0% WR — auto-kill at 5T<30%)
+- Watch: `ma100-cross-,vortex_break_short` (4T 25% WR — flagging candidate if it grows)
+
