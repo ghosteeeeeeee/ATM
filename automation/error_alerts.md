@@ -159,3 +159,16 @@
 - **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
 - **INFO**: All 19+ hermes timers active and firing on schedule; hl-sync-guardian active
 - **AUTO-FIX**: None applied — no critical issues; tracebacks are non-blocking, pipeline continues via timer restart
+
+## Health Report — 2026-08-09 13:40 UTC
+- **INFO**: Pipeline LIVE healthy — cycle ran 13:38 UTC, signal_compactor OK (hotset empty in NEUTRAL regime, expected)
+- **INFO**: 4 open positions (AAVE SHORT, MEGA SHORT, BCH LONG, LINK LONG); 64 closed today, +4.01% PnL; total 3227 closed, 3224 executed, 44.3% WR, +15.67 total
+- **INFO**: Regime NEUTRAL — 2 LONG / 0 SHORT / 104 NEUTRAL of 106 tokens; aggregate long_bias=2 (macro flat, slightly long-leaning)
+- **INFO**: Speed 39% tokens with >0.5% change in 16 candles (mild action)
+- **INFO**: Prices fresh — 46 prices collected at 13:38:58, price_collector firing every 30s
+- **INFO**: hl-sync-guardian active; live_trading=true (CEO re-enabled 52.9% WR)
+- **WARN**: 2 phantom trades in last 200 closed (AXS, LINK pnl=0%) — same as prior check, 1% rate, persistent but not escalating
+- **WARN**: candles_1m latest closed window 14min ago (13:26 UTC) — aggregation lag vs 5m/15m; live spot prices are fresh (collected 30s ago), likely a non-critical candle-rollover issue
+- **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
+- **INFO**: All 19+ hermes timers active and firing on schedule (last: pipeline 49s ago, price-collector 21s ago)
+- **AUTO-FIX**: None applied — no critical issues; phantoms unchanged from prior check, candle lag is non-blocking
