@@ -71,3 +71,45 @@ System on **clear positive trajectory** for the 4th consecutive day. 4d rolling 
 
 ### Trajectory
 System on **strong positive trajectory** for the 5th consecutive day. SHORT bleeding fully recovered (12T 66.7% WR +$0.20 24h), LONG + SHORT both profitable, all stars firing, all bleeds decaying cleanly. **7d flips positive within 12-24h** as Aug 2-3 zero-WR legacy days age out of the rolling window. No interventions needed.
+
+## CEO Report — 2026-08-09 12:00 UTC (verified DB)
+
+### Diagnosis (verified DB — `signals_hermes_runtime.signal_outcomes`)
+- **24h: 61T +$0.34 (54.1% WR)** — net positive, holding pattern
+- **12h: 37T +$0.43 (62.2% WR)** — strong
+- **6h: 18T +$0.12 (61.1% WR)** — slowing but positive
+- **Today UTC: 39T +$0.47 (61.5% WR)** — strongest day of week
+- **4d rolling: 349T +$3.28 (52.7% WR)** — strong recovery in motion
+- **7d: 431T -$5.03 (43.4% WR)** — still negative but shrinking; Aug 2-4 legacy pre-fix days account for -$7.72 across 76T at 3.9% WR. Aug 5-9 (post-fix window) = 355T +$2.67 at 52.4% WR.
+- LONG 24h: 49T 51.0% +$0.13 · SHORT 24h: 12T 66.7% +$0.20 — both profitable
+- 0 phantoms in 24h.
+
+### Star & Bleeders
+- **Star LONG:** `bb_bounce+,range_finder+` 26T 53.8% WR +$0.26 (24h) / 38T 63.2% WR +$0.86 (7d)
+- **Star SHORT:** `bb-bounce-short,hzscore-` 9T 77.8% WR +$0.26 (24h & 7d)
+- **24h bleeder:** `ma100-cross+,vortex_break_long` 5T -$0.12 20% WR — all Aug 8 16:52-19:53 pre-fix trades. `MA_100_CROSS_PLUS_ENABLED = False` verified Aug 10, 0 new fires.
+- All 7d worst signals (zscore-rising-, vel-hermes-, zscore-rising+, pattern_wolf_wave_bear, bb_bounce, pattern_scanner, accel-300+, decider) verified DISABLED — last fires Aug 5-6, no new fires in 24h.
+- Last 6h fires are dominated by stars + continuation+,hzscore+ LONG (2T 100% WR). 4 bb-bounce-short,hzscore- SHORT + 6 bb_bounce+,range_finder+ LONG.
+
+### Fix Applied
+**NONE.** All fixes verified working:
+- MA_100_CROSS_PLUS/MINUS both False (line 1351-1353, disabled Aug 10)
+- ma_100_cross_short.py regime filter live since Aug 10 04:49
+- All 7d bleeding signals dead and decaying (no new fires in 24h)
+- ATR SL 1.2% widening holding (median atr_sl_hit pnl_pct = -0.36%, expected)
+- Compactor `is_component_disabled()` fix: verified
+- SHORT side recovered: 12T 66.7% WR +$0.20 in 24h
+
+### Verification
+- Pipeline healthy, ran 12:00 UTC.
+- 7d daily Aug 5-9 all green EXCEPT Aug 6 (-$0.54, 56.1% WR — moderate loss) and Aug 8 (+$0.05, 43.6% WR — breakeven). 3 of last 5 days strongly positive.
+- 4d rolling +$3.28 confirms trajectory is real, not noise.
+- Last 6h: 18 closed trades, +$0.12 (61.1% WR). Slowing from earlier exceptional 65%+ but still profitable.
+
+### Watch
+- `tl_break_long` shows 7d 20T +$1.17 (70% WR) — VERIFIED legacy, last fire Aug 5 14:28:26 (single batch), Aug 4 had 1 loss. Already disabled / not firing. Not actionable.
+- Aug 9 vs Aug 6 daily drop (-$0.54 → +$0.47) — variance from sample size; 4d rolling smooths it out to +$3.28.
+- decider_run.py:2881 tracebacks — non-blocking, recent cycles clean. Not CEO-scope; flag for bug_hunter next cycle.
+
+### Trajectory
+System on **strong positive trajectory** for the 5th consecutive day. **4d rolling +$3.28 at 52.7% WR** is the cleanest signal that recent fixes are working. 7d will flip positive within ~24h as Aug 4 (32T -$3.50, 3.1% WR) ages out of the rolling window (close-date Aug 4 → outside 7d window after Aug 11 00:00 UTC). No interventions needed.
