@@ -7,8 +7,11 @@
 - [2026-08-08 00:30] health_monitor: System startup — pipeline healthy
 - [2026-08-09 22:19] ceo: BUG FIX — is_component_disabled() missing bb-bounce-short, range_finder_short. Added hyphenated signal name mappings. Cleared stale .pyc cache (root cause of ImportError alerts).
 - [2026-08-09 22:30] ceo: CEO review — verified DB numbers: 24h +$0.16 (45.5% WR, 44T), 7d -$7.52 (42.5% WR). All fixes working. No changes needed.
+- [2026-08-09 23:00] ceo: CEO review — verified DB: 24h +$0.36 (46.5% WR, 43T), 7d -$0.95 (43.9% WR). LONG +$0.95/7d (51.5% WR). SHORT -$1.90/7d (37.7% WR) — all legacy pre-fix trades. 7 SHORT in 24h only. ATR SL hits $-0.84/24h (16T) but 1.2% widening deployed. All fixes working. No changes needed.
 
 ## CEO DECISIONS
+- [x] 2026-08-10 03:50 — CEO review: 24h +$0.13 (42.9% WR, 42T). 7d -$0.95 (43.9% WR). bb_bounce+,range_finder+ LONG carries entire profit (+$0.36/24h, +$0.67/7d). All recent fixes verified working. NOTED: close_reason fields all None — position_manager not recording exit rationale. No changes — evaluation ongoing.
+- [x] 2026-08-09 23:00 — NO CHANGES. 24h +$0.36 (46.5% WR, 43T). LONG +$0.95/7d profitable. SHORT -$1.90/7d all legacy pre-fix trades (zscore-rising-, hzscore-,return_exhaustion-, inv-accel-300- last fired 08-04 to 08-07, all disabled now). Only 7 SHORT in 24h. ATR SL 1.2% widening deployed. All fixes verified working — evaluation window ongoing.
 - [x] 2026-08-09 — FIX: Removed BLOCKED_HOURS from all 4 SHORT-specific signals. Data: Asian session 43.6% WR vs 35.1% WR other sessions for SHORTs. Time filter was backwards. Files: bb_bounce_short.py, return_exhaustion_short.py, range_finder_short.py, ma_100_cross_short.py. Monitoring 24h for SHORT signal volume increase.
 - [x] 2026-08-08 00:30 — ATR SL widened 1.0% → 1.2%. 22/22 SL hits at exactly 1.0% = too tight. Monitor 24h.
 - [x] 2026-08-08 00:30 — RETURN_EXHAUSTION_MINUS_ENABLED=False. 14 trades, -$0.64 across combos in 48h.
