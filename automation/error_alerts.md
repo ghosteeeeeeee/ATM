@@ -144,3 +144,18 @@
 - **INFO**: 30+ hermes timers active, pipeline + price-collector firing on schedule (last 47s ago)
 - **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
 - **AUTO-FIX**: None applied — no critical issues
+
+## Error Alerts — 2026-08-09 11:08 UTC
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+
+## Health Report — 2026-08-09 11:40 UTC
+- **WARN**: 4 tracebacks in `decider_run.py:2881` between 10:24-10:54 UTC — recurring crash inside decider step, but pipeline service (oneshot) kept restarting via timer; recent cycles (11:00+) clean. Not blocking; needs root-cause look at line 2881.
+- **INFO**: Pipeline LIVE healthy — cycle ran 11:39 UTC, signal_compactor OK (hotset empty in NEUTRAL regime, expected)
+- **INFO**: 83 signals in 1h, 2027 in 24h; 0 approved decisions in 24h (no signal passing 50% confidence)
+- **INFO**: 6 open positions (AXS, ETH, SKY, LINK, AAVE, ASTER); 60 closed today, +3.45% PnL
+- **INFO**: Regime NEUTRAL — 0 LONG / 0 SHORT / 105 NEUTRAL of 106 tokens; aggregate long_bias=1 (macro flat)
+- **INFO**: Prices fresh — 124 tokens, latest 0.5min ago
+- **INFO**: Speed 234/549 tokens >=50th percentile (42.6%)
+- **INFO**: Disk 80% (24GB free) — below 85% WARN threshold
+- **INFO**: All 19+ hermes timers active and firing on schedule; hl-sync-guardian active
+- **AUTO-FIX**: None applied — no critical issues; tracebacks are non-blocking, pipeline continues via timer restart
