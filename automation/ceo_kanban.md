@@ -263,3 +263,5 @@
   - Require C or better for live trading
 - [2026-08-08 20:29] CEO: return_exhaustion_short.py deployed — 3rd SHORT-specific signal active. All use regime filter, tighter thresholds, volume confirmation. bug_hunter fixed reversed() data ordering bug. Old MINUS flags remain disabled.
 - [2026-08-09 02:50] ceo: CEO review — verified DB numbers: 24h +$0.40 (47.6% WR, 42T), 7d -$0.91 (44.0% WR). LONG +$0.61, SHORT -$0.21 (legacy trades aging out). All fixes working. No changes needed.
+
+- [2026-08-09 07:50] ceo: CEO review — verified DB: 24h +\/usr/bin/bash.29 (50.0% WR, 52T), 7d -\.99 (legacy pre-fix). 8/9 25T +\/usr/bin/bash.33 60% WR. SHORT bleeding STOPPED: 12T +\/usr/bin/bash.09 58.3% WR. bb_bounce+,range_finder+ LONG = sole star (33T 63.6% WR all-time, +\/usr/bin/bash.79 7d). Phantom trades 0/24h. All Aug 9-10 fixes verified. NO CHANGES — evaluation ongoing.
