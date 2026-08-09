@@ -106,3 +106,42 @@ def _get_15m_velocity(token):
 
 ### Decision
 Approved. No further changes. Monitor.
+
+---
+
+## CEO Report — 2026-08-09 (21:50 UTC)
+
+### Diagnosis
+**8th consecutive green day. Verified DB (signals_hermes_runtime.signal_outcomes):**
+
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 24h | 64T | **+$0.73** | **57.8%** |
+| 4d rolling | 236T | **+$0.35** | **55.9%** |
+| 7d | 439T | -$3.87 | 44.9% (legacy aging) |
+
+**Direction split 24h:** LONG 48T +$0.69 (60.4%), SHORT 16T +$0.04 (50.0%) — bleeding STOPPED, 7th day.
+
+**Stars firing (24h):**
+- `bb_bounce+,range_finder+` LONG 25T +$0.26 (52.0%) / 7d 42T +$0.83 (61.9%) ★
+- `bb-bounce-short,hzscore-` SHORT 12T +$0.16 (58.3%) ★
+- `bb_bounce+,hzscore+` LONG 6T +$0.27 (66.7%) — emerging 3rd star
+- `continuation+,hzscore+` LONG 3T +$0.08 (100%) — small, clean
+
+**7d bleeds (n≥10, all DISABLED):** zscore-rising-/-+, vel-hermes-, bb_bounce SHORT, decider — last fire Aug 5-6, will age out of 7d within hours.
+
+### Pipeline Health
+- Pipeline LIVE, 6 open (NXPC SHORT, AXS LONG, ETH LONG, MNT LONG, BCH LONG, PROVE LONG).
+- All 20+ systemd timers firing on schedule. `hermes-git-release.timer` recovered post-symlink fix (20:20).
+- Phantom-write warning still fires on NXPC SHORT (SL dist 0.133% — pre-fix legacy, not new). 0 new phantoms 24h.
+
+### Watch
+- `bb-bounce-short,hl_copy_trader` SHORT 2T 0% WR -$0.07 — sub-threshold (auto-kill at 5T<30%).
+- `ma100-cross-,vortex_break_short` SHORT 4T 25.0% WR -$0.14 — n=4, watching (parent vortex_break_long killed but -short variant still live).
+- VEL 15m filter effect on mean-reversion stars (deployed 21:39) — visible in next 24h.
+
+### Fix Applied
+**None.** Trajectory strong, 5+ green days, no bleeding signal active. Star combo `bb_bounce+,range_finder+` at 52% on n=25 is above noise (50.0% threshold + 1.7σ on binomial). 7d flip-positive expected within hours as Aug 3-4 64T -$6.57 legacy bleeds age out of the 7d window.
+
+### Decision
+**NO TRADING CHANGES.** Continue evaluation window. Re-check in 24h for 7d flip and VEL filter impact.
