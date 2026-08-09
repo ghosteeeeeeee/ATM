@@ -272,3 +272,59 @@ Only **1** combo is firing and profitable:
 - Watch: `bb-bounce-short,hl_copy_trader` (2T 0% WR — auto-kill at 5T<30%)
 - Watch: `ma100-cross-,vortex_break_short` (4T 25% WR — flagging candidate if it grows)
 
+
+---
+
+## CEO Report — 2026-08-09 (21:50 UTC)
+
+### Diagnosis
+**9th green day confirmed. Strongest 24h of cycle.** Verified DB (signals_hermes_runtime.signal_outcomes, queried fresh):
+
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| 24h | 63T | **+$0.75** | **58.7%** |
+| Today | 58T | +$0.78 | 60.3% |
+| 12h | 26T | +$0.24 | 53.8% |
+| 6h | 8T | +$0.25 | 62.5% |
+| 4d | 237T | **+$0.40** | **56.1%** |
+| 7d | 440T | -$3.83 | 45.0% (legacy aging) |
+
+**Direction split 24h:** LONG 46T +$0.65 (60.9%), SHORT 17T +$0.09 (52.9%) — SHORT bleeding STOPPED 8th consecutive day.
+**Direction split 4d:** LONG 153T +$1.57 (59.5%) strong, SHORT 84T -$1.17 (50.0%) break-even, not bleeding.
+
+### Stars (24h)
+- **`bb_bounce+,range_finder+` LONG**: 24T +$0.08 (50.0%) / 7d 42T +$0.83 (61.9%) ★ primary star
+- **`bb-bounce-short,hzscore-` SHORT**: 13T +$0.20 (61.5%) ★ SHORT star
+- **`bb_bounce+,hzscore+` LONG**: 5T +$0.41 (80.0% 24h) / 6T +$0.27 (66.7% all-time) — **EMERGING 3rd star** ★
+- **`continuation+,hzscore+` LONG**: 3T +$0.08 (100%) — small sample, clean
+- **`hzscore+,range_finder+` LONG**: 5T +$0.03 (80%) — emerging
+- **`hzscore+,mover+` LONG**: 3T +$0.04 (66.7%)
+
+### Bleeds — All Resolved
+**7d bleeds (all DISABLED, last fire Aug 5-8, aging out of window):**
+- zscore-rising- SHORT 44T -$1.37 (25%), vel-hermes- SHORT 58T -$1.14 (31%), zscore-rising+ LONG 26T -$1.01 (27%), pattern_wolf_wave_bear SHORT 9T -$0.79 (11%), bb_bounce SHORT 23T -$0.64 (39%), accel-300+ LONG 5T -$0.31 (0%), ma100-cross,return_exhaustion- SHORT 7T -$0.28 (43%), decider SHORT 10T -$0.22 (0%), ma100-cross-,range_finder- SHORT 5T -$0.20 (40%), hzscore-,return_exhaustion- SHORT 10T -$0.18 (50%)
+
+**Verified kills (last 24h):**
+- `vortex_break_long`: last fire Aug 9 13:45:04 (1min before 13:46 signal_reporter kill). 0 fires since. KILL CONFIRMED.
+- `vortex_break_short`: 0 fires in 24h. Clean.
+- `ma100-cross-,vortex_break_short`: 0 fires in 24h (last Aug 8 11:45). Decayed out. RESOLVED.
+
+**Active sub-threshold watch (auto-kill policy):**
+- `bb-bounce-short,hl_copy_trader` SHORT 2T 0% WR -$0.07 (last Aug 9 13:30, both ETH). signal_reporter will auto-kill at 5T<30%WR per existing policy.
+
+### Pipeline Health
+- LIVE, regime LONG_BIAS. hype_live_trading.json enabled. Pipeline heartbeat LIVE.
+- 6 open positions per previous read (NXPC SHORT, AXS/ETH/MNT/BCH/PROVE LONG).
+- 0 phantoms in 24h. All 20+ systemd timers on schedule.
+- VEL 15m velocity filter deployed 21:39 per T ack — too early to evaluate effect (only 10min of post-deploy trades so far).
+
+### Fix Applied
+**None.** Trajectory strong, 9th consecutive green day, 4d rolling +$0.40 56.1% WR confirms direction. All bleeds DISABLED and decaying. Emerging 3rd star `bb_bounce+,hzscore+` at 80% on n=5 is significant — keep eyes on it for promotion.
+
+### Decision
+**NO TRADING CHANGES.** Continue evaluation window. Re-check in 24h for:
+1. VEL 15m filter effect on bb_bounce+/range_finder+ mean-reversion stars
+2. bb_bounce+,hzscore+ star promotion (currently 6T n all-time, 80% 24h)
+3. 7d legacy bleeds fully aged out
+4. Auto-kill of bb-bounce-short,hl_copy_trader if it hits 5T<30%
+
