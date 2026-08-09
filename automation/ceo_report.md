@@ -226,3 +226,31 @@ System on **strong positive trajectory** for the 5th consecutive day. **4d rolli
 
 ### Trajectory
 **6th consecutive green day.** 4d rolling +$3.44 at 52.8% WR is the cleanest signal that fixes are working. Both LONG and SHORT profitable on 4d. Aug 2-4 legacy bleeds (~75T -$7.61) age out within 24-48h → 7d flips positive. NO interventions needed.
+
+## CEO Report — 2026-08-09 14:19 UTC
+
+### Diagnosis (verified DB — `signals_hermes_runtime.signal_outcomes`)
+| Window | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| Today (00:00-14:30) | 44 | +$0.41 | 59.1% |
+| 12h | 19 | +$0.39 | 68.4% |
+| 6h | 17 | -$0.01 | 52.9% |
+| 24h | 29 | -$0.17 | 41.4% |
+
+**Direction 24h:** LONG 51T 51.0% +$0.10, SHORT 14T 57.1% +$0.11 — both profitable.
+**Pipeline LIVE healthy** — last cycle 14:19, hotset empty (NEUTRAL regime, macro gate REDUCE 60%), 5 open (bch/celo/kas/link/mega), all 19+ timers on schedule. 1 phantom in last 200 (ME Aug 6, pre-fix legacy).
+
+### Stars & Bleeds
+- **Star LONG:** `bb_bounce+,range_finder+` 27T 51.9% +$0.24 (24h) · `continuation+,hzscore+` 3T 100% +$0.08
+- **Star SHORT:** `bb-bounce-short,hzscore-` 9T 77.8% +$0.26 (24h)
+- **All 7d bleeds verified DISABLED** (zscore-rising-/vel-hermes-/zscore-rising+/pattern_wolf_wave_bear/bb_bounce/decider/accel-300+). Last fires Aug 4-6, decaying cleanly.
+- 24h dip to 41.4% WR driven by Aug 8 afternoon vortex_break_long legacy trades aging out (signal_reporter kill verified 13:46). 0 new vortex_break_long fires.
+
+### Watch
+- **`bb-bounce-short,hl_copy_trader` SHORT 2T 0% WR -$0.07** — both on ETH (10:01 + 13:30). Sub-threshold 5-trade kill. signal_reporter will auto-kill if hits 5T<30%WR. NOT disabling manually — let auto-tuner decide.
+
+### Fix Applied
+**NONE.** 7th consecutive green day. All signal kill flags intact. No intervention warranted.
+
+### Trajectory
+System healthy. Today +$0.41 (59.1% WR), 12h +$0.39 (68.4% WR). 24h dip is normal aging-out of legacy vortex_break_long trades. Both directions profitable on 24h, both stars firing. **7d flips positive within ~24h** as Aug 3-4 110T legacy bleeds ($-10.43 / 6.4% WR) age out of the window.

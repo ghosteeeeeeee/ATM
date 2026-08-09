@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes Key Rotation Check — weekly API key rotation audit
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/check_key_rotation.py
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
