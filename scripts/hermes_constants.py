@@ -784,6 +784,7 @@ NEVER_REENABLE_FLAGS = {
     'ZSCORE_RISING_MINUS_ENABLED',# CEO 2026-08-07 — master ZSCORE_RISING killed
     'HZSCORE_MINUS_ENABLED',      # CEO 2026-08-07 — 15.8% WR, -$53.50 (76 trades 7d). hemorrhaging.
     'PCT_HERMES_PLUS_ENABLED',    # CEO 2026-08-07 — historical 100% WR, but combo signals bleeding (-$33.83 standalone)
+    'VORTEX_BREAK_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-09 — vortex_break_long: 22.2% WR (9 trades 24h), -$0.18. Compounds hemorrhaging.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1317,7 +1318,7 @@ DECISION_LOG_CACHE_TTL = 300
 # Uses true range (high-low) directional movement, not price closes.
 # Catches trend inception via VI crossover + ADX strength filter.
 VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
-VORTEX_BREAK_PLUS_ENABLED = True    # vortex_break+ LONG
+VORTEX_BREAK_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-09 — vortex_break_long LONG: 22.2% WR (9 trades 24h), -$0.18. 7d: 25 trades, 44% WR, -$0.19. Compounds hemorrhaging. KILLED.
 VORTEX_BREAK_MINUS_ENABLED = False  # SIGNAL REPORTER 2026-08-08 — 25% WR, -$0.15 (4 trades 7d) in ma100-cross-,vortex_break_short compound.
 VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for paper testing
 
