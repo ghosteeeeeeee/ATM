@@ -109,8 +109,9 @@ def detect_engulfing(candles):
 
     # Volume confirmation
     prior_volumes = [c['volume'] for c in prior_candles if c['volume'] and c['volume'] > 0]
-    if prior_volumes:
-        avg_volume = sum(prior_volumes) / len(prior_volumes)
+    if not prior_volumes:
+        return None  # no volume data — can't confirm, skip
+    avg_volume = sum(prior_volumes) / len(prior_volumes)
     if avg_volume > 0 and not (current['volume'] and current['volume'] >= avg_volume * ENGULFING_VOLUME_RATIO):
         return None  # volume doesn't confirm
 
