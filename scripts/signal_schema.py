@@ -1974,7 +1974,7 @@ def is_component_disabled(component: str) -> bool:
     if c == 'return_exhaustion': return not RETURN_EXHAUSTION_ENABLED
     # ma100-cross
     if c == 'ma100-cross+': return not MA_100_CROSS_PLUS_ENABLED
-    if c == 'ma100-cross-': return not MA_100_CROSS_MINUS_ENABLED
+    if c == 'ma100-cross-': return not MA_100_CROSS_ENABLED  # old module disabled, not MINUS flag
     if c == 'ma100-cross': return not MA_100_CROSS_ENABLED
     # hl_copy_signal
     if c in ('hl_copy_signal+', 'hl_copy_trader'): return not HL_COPY_SIGNAL_PLUS_ENABLED

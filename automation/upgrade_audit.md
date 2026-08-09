@@ -450,12 +450,12 @@ For each plan scanned, log:
 | # | Plan | Difficulty | Value | Status |
 |---|------|-----------|-------|--------|
 | 1 | signal-version-tracking.md | L2 | HIGH | PENDING |
-| 2 | transcript-mining-worth-discussing.md | L2 | MEDIUM | PARTIALLY (ADRs exist, uncertainty check TODO) |
-| 3 | transcript-mining-quick-wins.md | L1 | HIGH | PARTIALLY (ADRs exist, uncertainty check TODO) |
+| 2 | transcript-mining-worth-discussing.md | L2 | MEDIUM | PARTIALLY (ADRs done, vertical slices + dual-model TODO) |
+| 3 | transcript-mining-quick-wins.md | L1 | HIGH | DONE (ADRs, uncertainty check, measurable goals all implemented) |
 | 4 | post-change-workflow.md | N/A | N/A | Already a skill |
 | 5 | momentum-leaderboard-spec.md | N/A | N/A | ALREADY IMPLEMENTED |
 | 6 | trade-loss-elimination.md | N/A | N/A | ALREADY IMPLEMENTED |
-| 7 | system-improvements-spec.md | L1-2 | MEDIUM | PARTIALLY (2/5 scripts exist) |
+| 7 | system-improvements-spec.md | L1-2 | MEDIUM | PARTIALLY (3/5 scripts exist: audit_deps, watchdog, security docs) |
 | 8 | hl-copy-trading-spec.md | N/A | N/A | ALREADY IMPLEMENTED (MVP) |
 | 9 | ceo-mcp-resources-spec.md | L2 | LOW | DEFERRED (CEO said ship only if needed) |
 | 10 | wyckoff-pattern-recognition.md | L2 | MEDIUM | NOT IMPLEMENTED |
@@ -471,3 +471,38 @@ For each plan scanned, log:
 ### Quick Win 2: Uncertainty Check — post-change skill
 - **Type:** Level 1 skill edit
 - **What:** Same uncertainty question added to post-change workflow
+
+---
+
+## Session 2026-08-09 — Comprehensive Re-Scan
+
+### Verified Implementation Status (all plans)
+
+| Plan | Difficulty | Value | Status | Evidence |
+|------|-----------|-------|--------|----------|
+| long-short-separation-spec | L2 | HIGH | DONE (ma_100_cross only) | Files exist, registered in __init__.py. vortex_break deferred per CEO (100% WR, don't touch). |
+| cut-loser-v2-spec | L2 | HIGH | DONE | cut_loser.py rewritten (v2 structure), systemd timer active. |
+| position-sizing-extensions-spec | L2 | HIGH | DONE (Phase 1) | All 4 Phase 1 items: get_signal_weight, get_drawdown_multiplier, portfolio_heat, conservative_mode in position_sizing.py. |
+| book-informed-improvements-spec | L2 | MEDIUM | DONE (overlaps) | Items 1,3,4 covered by position-sizing-extensions. |
+| trading-book-action-items | L1-2 | MEDIUM | DONE (overlaps) | Items 1,3,4 covered by position-sizing-extensions. |
+| signal-version-tracking | L2 | HIGH | PENDING | signal_version.py does not exist. |
+| transcript-mining-quick-wins | L1 | HIGH | DONE | ADRs exist (docs/adr/), uncertainty check in bug-hunter+post-change, measurable goals in CEO prompts. |
+| transcript-mining-worth-discussing | L2 | MEDIUM | PARTIALLY | ADRs done. Vertical slices + dual-model review NOT implemented. |
+| 2026-08-07_trade-loss-elimination | L1 | HIGH | DONE | ATR SL params updated (0.8→1.2, 2.1→2.5), dead hours enabled, KAITO blacklisted. |
+| 2026-08-05_system-improvements-spec | L1-2 | MEDIUM | PARTIALLY (3/5) | SECURITY.md ✅, requirements.txt ✅, audit_dependencies.py ✅, pipeline_watchdog.py ✅. Missing: audit_memory.py, weekly_signal_review.py, check_key_rotation.py. |
+| 2026-08-05_hl-copy-trading-spec | L3 | MEDIUM | DONE (MVP) | hl_copy_trader.py exists. |
+| 2026-08-05_ceo-mcp-resources-spec | L2 | LOW | DEFERRED | CEO said "ship only if needed". |
+| 2026-08-05_wyckoff-pattern-recognition | L2 | MEDIUM | NOT IMPLEMENTED | pattern_recognition.py does not exist. wyckoff.py exists but no integration. |
+| self-learning-system-spec | L3 | MEDIUM | NOT IMPLEMENTED | 825-line spec, deferred until core profitable. |
+| signal-quality-plan | L2 | MEDIUM | PARTIALLY | tl_break re-enabled. Regime filtering in compactor not done. |
+| 2026-08-07_momentum-leaderboard-spec | N/A | N/A | DONE | momentum_leaderboard.py exists. |
+
+### Next Candidates (prioritized)
+
+| # | Plan | Difficulty | Value | Reason to implement |
+|---|------|-----------|-------|---------------------|
+| 1 | signal-version-tracking | L2 | HIGH | Prevents param regressions. Auto-rollback on CRITICAL WR drops. Protects against losing money from bad tuning. |
+| 2 | system-improvements: audit_memory | L1 | MEDIUM | Hebbian memory accumulates without cleanup. Low effort, prevents memory bloat. |
+| 3 | system-improvements: weekly_signal_review | L2 | MEDIUM | Weekly trend analysis catches signal decay faster than 6h checks. |
+| 4 | wyckoff-pattern-recognition | L2 | MEDIUM | Improves mean-reversion signal quality. Needs pattern_recognition.py first. |
+| 5 | transcript-mining: vertical-slice-signal-dev | L2 | MEDIUM | Faster signal development workflow. Cultural/process change. |

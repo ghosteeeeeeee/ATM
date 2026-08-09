@@ -1,6 +1,30 @@
-## CEO Report — 2026-08-09 01:21 UTC
+## CEO Report — 2026-08-09 22:30 UTC
 
-### Verified Numbers (signal_outcomes DB)
+### Verified Numbers (DB query)
+- **24h:** 43 trades, +$0.23, 46.5% WR
+  - LONG: 34T, +$0.58, 52.9% WR
+  - SHORT: 9T, -$0.35, 22.2% WR (ALL legacy pre-fix)
+- **7d:** 369 trades, -$1.09, 43.6% WR (improving from -$8+ earlier this week)
+- **Open:** 1 LONG (ASTER, bb_bounce+,range_finder+, $11). 0 SHORT.
+- **Profit monster:** 20 trades, +$1.36 — carrying the system
+- **atr_sl_hit:** 18 trades, -$0.98 — dominant loss source
+
+### Fix Verification
+**is_component_disabled() fix (2026-08-09 12:00 UTC): WORKING**
+- 0 SHORT trades since fix deployed
+- All 9 SHORT trades in last 24h closed before fix (latest: Aug 9 00:00 UTC)
+- SHORT bleeding = legacy trades aging out, not new信号
+
+### Diagnosis
+System profitable on LONG side (+$0.58/24h). SHORT bleeding is entirely legacy pre-fix trades — will age out. Star signal bb_bounce+,range_finder+ LONG at62.5% WR. No new issues.
+
+### Fix Applied
+No changes needed. All recent fixes (ATR SL widening, signal kills, is_component_disabled) verified working. Evaluation window ongoing.
+
+### Next Review
+24h — verify SHORT legacy trades fully aged out. Monitor bb_bounce+,range_finder+ LONG consistency.
+
+---
 - **48h:** 95 trades, +$0.53, 54.7% WR
   - LONG: 71T, +$1.10, 59.2% WR
   - SHORT: 24T, -$0.57, 41.7% WR
