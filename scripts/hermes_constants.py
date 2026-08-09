@@ -1052,6 +1052,10 @@ RANGE_BREAKOUT_CONF_CAP = 88         # Max confidence (system ceiling)
 RANGE_BREAKOUT_RSI_LONG_MAX = 75     # Skip LONG if RSI above this (overextended)
 RANGE_BREAKOUT_RSI_SHORT_MIN = 25    # Skip SHORT if RSI below this (overextended)
 
+# Mean-reversion velocity gate — block entries when price still trending against signal
+MEAN_REVERSION_VEL_ENABLED = True
+MEAN_REVERSION_VEL_THRESHOLD = 0.3   # block if 15m velocity > 0.3% against direction
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period

@@ -37,6 +37,35 @@ def _log(msg):
     print(f"[bb-bounce] {msg}", flush=True)
 
 
+def _get_15m_velocity(token):
+    """15m price velocity (% change over last 15 minutes). Returns float or None."""
+    from paths import HERMES_DATA
+    import sqlite3
+    conn = None
+    try:
+        conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT price FROM (
+                SELECT price, timestamp FROM price_history
+                WHERE token = ?
+                ORDER BY timestamp DESC LIMIT 15
+            ) sub ORDER BY timestamp ASC
+        """, (token.upper(),))
+        rows = c.fetchall()
+        if len(rows) < 5:
+            return None
+        prices = [r[0] for r in rows]
+        if prices[0] <= 0:
+            return None
+        return (prices[-1] - prices[0]) / prices[0] * 100
+    except Exception:
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+
 def _compute_bb(closes, period=BB_PERIOD, stddev=BB_STDDEV):
     if len(closes) < period:
         return None, None, None, None
@@ -256,6 +285,18 @@ def scan_bb_bounce_signals(prices_dict):
             continue
         if direction == 'SHORT' and not BB_BOUNCE_MINUS_ENABLED:
             continue
+
+        # Velocity gate: skip if price still trending against signal
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+        if MEAN_REVERSION_VEL_ENABLED:
+            vel = _get_15m_velocity(token)
+            if vel is not None:
+                if direction == 'LONG' and vel < -MEAN_REVERSION_VEL_THRESHOLD:
+                    _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold -{MEAN_REVERSION_VEL_THRESHOLD}%)")
+                    continue
+                if direction == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD:
+                    _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD}%)")
+                    continue
 
         # Confidence based on quality indicators
         base_conf = 65

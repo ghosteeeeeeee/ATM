@@ -49,6 +49,33 @@ def _log(msg):
     print(f"[range-finder-short] {msg}", flush=True)
 
 
+def _get_15m_velocity(token):
+    """15m price velocity (% change over last 15 minutes). Returns float or None."""
+    conn = None
+    try:
+        conn = sqlite3.connect('/root/.hermes/data/signals_hermes.db', timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT price FROM (
+                SELECT price, timestamp FROM price_history
+                WHERE token = ?
+                ORDER BY timestamp DESC LIMIT 15
+            ) sub ORDER BY timestamp ASC
+        """, (token.upper(),))
+        rows = c.fetchall()
+        if len(rows) < 5:
+            return None
+        prices = [r[0] for r in rows]
+        if prices[0] <= 0:
+            return None
+        return (prices[-1] - prices[0]) / prices[0] * 100
+    except Exception:
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+
 def _compute_bb(closes, period=BB_PERIOD, stddev=BB_STDDEV):
     """Bollinger Bands: middle (SMA), upper, lower, width %, slope."""
     import numpy as np
@@ -349,6 +376,14 @@ def scan_range_short_signals(prices_dict):
         sig = detect_range_short(token, closes)
         if sig is None:
             continue
+
+        # Velocity gate: skip if price still trending against signal (SHORT only)
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+        if MEAN_REVERSION_VEL_ENABLED:
+            vel = _get_15m_velocity(token)
+            if vel is not None and vel > MEAN_REVERSION_VEL_THRESHOLD:
+                _log(f"{token} SHORT BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD}%)")
+                continue
 
         sid = add_signal(
             token=token.upper(),
