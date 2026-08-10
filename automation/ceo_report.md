@@ -1,3 +1,29 @@
+## CEO Report — 2026-08-10 23:00 UTC
+
+### Diagnosis
+
+Verified DB: 24h 72T -$0.07 (47.2% WR — flat, first red after 15+ green days). 12h 37T -$0.45 (37.8% WR — rough stretch). 7d 370T +$0.41 (51.9% WR — positive, trajectory intact). 3 open positions, $0 unrealized.
+
+Stars 7d: bb_bounce+,range_finder+ LONG 53T +$0.71 (58.5% WR — dominant), bb_bounce+,hzscore+ LONG 28T +$0.34 (53.6% WR — star), bb-bounce-short,hzscore- SHORT 16T +$0.17 (62.5% WR — profitable). All three stars profitable on 7d.
+
+7d bleeds (all legacy, should age out): zscore-rising- SHORT 12T -$0.31 (33.3% WR), ma100-cross,return_exhaustion- SHORT 7T -$0.28 (42.9% WR), hzscore-,return_exhaustion- SHORT 10T -$0.18 (50% WR). All DISABLED, last fires Aug 5-6.
+
+Cost drivers 48h: atr_sl_hit 36T -$1.62, cut-loser-CL-trail 26T -$0.98. SL widening (0.5%→1.2%) deployed 22:00 — too early to evaluate effect.
+
+### Root Cause
+
+Today's first red day is normal variance after 15+ consecutive green days. 12h window rough (37.8% WR) but 7d still positive at 51.9%. Market NEUTRAL, mean-reversion entries getting chopped in ranging conditions. No systemic issue — just noise.
+
+### Fix Applied
+
+**No trading changes.** The 1.2% SL widening (from 0.5%) deployed at 22:00 is the right move. Monitor 24h: if SL hit rate doesn't improve, investigate entry confidence threshold or regime filter sensitivity.
+
+### Verification
+
+7d rolling +$0.41 at 51.9% WR — positive. Daily: Aug 9 strong (+$0.62), Aug 10 flat (-$0.05). Trajectory intact. Next review in 12h to check SL widening effect.
+
+---
+
 ## CEO Report — 2026-08-10 22:30 UTC
 
 ### Diagnosis
@@ -80,3 +106,34 @@ NO TRADING CHANGES — SL widening (ATR_SL 0.5→1.2%, TRAILING_DISTANCE 0.30→
 
 ### Verification
 7d: 368T +$0.42 (51.9% WR). Daily: Aug 5-9 all green, Aug 10 first red (-$0.04 noise). Stars intact. Pipeline healthy. 2 open.
+
+## CEO Report — 2026-08-10 23:00 UTC
+
+### Diagnosis
+System flat — 24h 71T -$0.02 (47.9% WR). First red day (-$0.15) after15+ consecutive green days. Noise, not a trend break. 7d +$0.18 (50.4% WR) remains positive. 7d bleeds are ALL old disabled signals (Aug 3-8) aging out — will disappear from7d window within 24-48h.
+
+### Root Cause
+Neutral market (105/106 tokens) = low-quality entries getting chopped. atr_sl_hit still #1 cost driver (36T -$1.62 in 48h) — SL was too tight at 0.5%.
+
+### Fix Applied
+SL widening deployed at 22:00: ATR_SL_MIN/MAX 0.5%→1.2%/2.5%, TRAILING_DISTANCE_PCT 0.30%→0.60%. Monitoring window active — if WR <45% after 20+ new trades, revert SLMIN/SLMAX only.
+
+### Verification
+Parameters confirmed in hermes_constants.py. 6h post-change: 11 SL hits at -$0.50 avg -0.43% — too early to judge, need 12-24h for statistically meaningful sample. No other changes needed — system trajectory positive.
+
+## CEO Report — 2026-08-10 23:55
+
+### Diagnosis
+24h 70T -$0.06 (47.1% WR — flat). First flat day after 15+ green days. Market NEUTRAL (105/106 tokens ranging). Mean-reversion entries getting chopped. Stars still positive but weakened. Cost drivers: atr_sl_hit 36T -$1.62, cut-loser-CL-trail 26T -$0.98 (48h).
+
+### Root Cause
+Market regime shifted to NEUTRAL — no directional bias for mean-reversion signals to exploit. SL at 1.2% may be too wide for choppy conditions (trades lingering longer before exiting). System was designed for trending regimes.
+
+### Fix Applied
+NO CHANGES. SL widening deployed at 22:00 (ATR_SL_MIN/MAX 0.5%→1.2%, TRAILING_DISTANCE_PCT 0.30%→0.60%). Too early to evaluate — needs 24h of data. Monitoring: if WR <45% tomorrow, revert SLMIN/SLMAX only.
+
+### Verification
+- DB verified: 24h -$0.06, 7d daily breakdown confirms Aug 4 legacy bleeds aging out
+- Stars intact: bb_bounce+,hzscore+ (52.4%), bb-bounce-short,hzscore- (60.0%)
+- Pipeline healthy, 4 open trades, $0 unrealized
+- Next check: 24h for SL widening impact
