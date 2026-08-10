@@ -996,7 +996,7 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
     Returns SetupStats(n, win_rate, avg_pnl) or None. Fail-open on error."""
     if not SIMILAR_SETUP_LOOKUP_ENABLED:
         return None
-    cache_key = f"{token}:{source}:{direction}:{z_tier or ''}"
+    cache_key = f"{token}:{source}:{direction}:{rsi or ''}:{z_tier or ''}"
     now = time.time()
     cached = _setup_lookup_cache.get(cache_key)
     if cached and now - cached[1] < SIMILAR_SETUP_CACHE_TTL:
@@ -1012,9 +1012,9 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
                 FROM trades
                 WHERE close_time IS NOT NULL
                     AND signal = %s AND direction = %s
-                    AND signal_z_score_tier = %s
+                    AND (%s IS NULL OR signal_z_score_tier = %s)
                     AND (%s IS NULL OR signal_rsi_14 IS NULL OR signal_rsi_14 BETWEEN %s AND %s)
-            """, (source, direction, z_tier, rsi,
+            """, (source, direction, z_tier, z_tier, rsi,
                   (rsi or 0) - SIMILAR_SETUP_RSI_BAND, (rsi or 100) + SIMILAR_SETUP_RSI_BAND))
             row = c.fetchone()
             n, wr, avg_pnl = row[0], row[1], row[2]
@@ -1024,8 +1024,8 @@ def similar_setup_lookup(token, source, direction, rsi=None, z_tier=None):
             stats = SetupStats(n=int(n), win_rate=float(wr), avg_pnl=float(avg_pnl or 0))
             _setup_lookup_cache[cache_key] = (stats, now)
             return stats
-    except Exception:
-        pass
+    except Exception as e:
+        log(f'  [SETUP-RECALL] {token} {source} {direction} lookup failed: {e}')
     return None
 
 _hebbian_cache = {}  # cache_key → (wr, n, weight, concepts, exit_quality, combo_parts, expiry, is_token_specific, token_wr)
