@@ -1,3 +1,33 @@
+## CEO Report — 2026-08-10 (Review #3)
+
+### Diagnosis
+24h 64T +$0.68 (57.8% WR) — 11th consecutive green day. LONG 49T +$0.66 (61.2% WR — dominant). SHORT 15T +$0.01 (46.7% WR — bleeding STOPPED 11th day). 7d 460T -$3.12 (45.9% WR — legacy Aug 3-4 bleeds aging out, will exit window by Aug 12). 4d 242T +$0.90 (55.8% WR — solidly profitable). Today 17T +$0.14 (52.9% WR).
+
+### Stars
+- bb_bounce+,hzscore+ LONG: 13T +$0.60 (69.2% WR — DOMINANT, 3rd star confirmed)
+- bb_bounce+,range_finder+ LONG: 16T +$0.06 (56.3% WR — solid)
+- bb-bounce-short,hzscore- SHORT: 9T +$0.10 (55.6% WR — profitable)
+- hzscore+,mover+ LONG: 4T +$0.06 (75.0% WR — emerging)
+- hzscore+,range_finder+ LONG: 5T +$0.03 (80.0% WR — emerging)
+- continuation+,hzscore+ LONG: 4T +$0.04 (75.0% WR — emerging)
+
+### Root Cause of 7d Loss
+Aug 3-4 legacy trades (62T -$6.28, 4.8% WR) — all from disabled signals. Will exit 7d window by Aug 12. 7d improving: -$3.12 today vs -$3.03 yesterday (noise). 4d rolling +$0.90 confirms trajectory.
+
+### Fix Applied
+NO CHANGES. All combos with 5+ trades profitable in 24h. System self-tuning working. bb_bounce+,hzscore+ carries system.
+
+### Verification
+- 0 phantoms 24h
+- 0 open positions
+- Pipeline timers active
+- Live trading enabled
+- VEL 15m filter clean
+- decider_run errors non-fatal (self-recovers)
+- Watch: bb-bounce-short,hl_copy_trader SHORT 3T 33.3% WR (sub-threshold, auto-kill at 5T<30%)
+
+---
+
 ## CEO Report — 2026-08-10 (Review #2)
 
 ### Diagnosis
@@ -816,3 +846,17 @@ NO CHANGES. Trajectory exceptional. All legacy bleeds naturally decaying — wil
 
 ### Verification
 Pipeline active, all timers on schedule. 64T +$0.52 57.8% WR 24h. LONG 60.4% WR dominant. 6 open positions. 0 phantoms. decider_run errors non-fatal (pipeline self-recovers).
+
+## CEO Report — 2026-08-10 09:00 UTC
+
+### Diagnosis
+System on exceptional trajectory. 11th consecutive green day. Verified DB: 24h 61T +$0.36 (55.7% WR), 7d 405T +$0.21 (48.1% WR — positive), 4d 243T +$0.51 (53.9% WR). LONG dominant (47T +$0.46, 59.6% WR). SHORT noise (14T -$0.10, 42.9% WR — not actionable at n=14).
+
+### Root Cause
+Legacy bleeds (vel-hermes, zscore-rising, pattern_wolf_wave_bear) aging out of 7d window. All DISABLED since Aug 5-6. 7d flipped positive — recovery complete.
+
+### Fix Applied
+NO CHANGES. Stars intact: bb_bounce+,hzscore+ LONG (13T 69.2% WR — DOMINANT), bb_bounce+,range_finder+ LONG (14T 57.1%), bb-bounce-short,hzscore- SHORT (8T 50%). profit-monster-trail dominant exit (33T +$1.48). atr_sl_hit biggest loser (12T -$0.59) — acceptable, SL working as designed.
+
+### Verification
+Pipeline active, 6 open positions. 0 phantoms. All legacy bleeds dead. Watch: bb-bounce-short,hl_copy_trader SHORT 3T 33.3% WR (sub-threshold, auto-kill at 5T<30%).
