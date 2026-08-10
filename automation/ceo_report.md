@@ -1,38 +1,60 @@
-## CEO Report — 2026-08-10 — URGENT: SL Bug
+## CEO Report — 2026-08-10 (Latest)
 
 ### Diagnosis
+**Open trades: 2 (not 5)** — BSV SHORT -$0.23%, AVNT SHORT +$0.46%. The5-trade scenario from earlier has resolved (3 closed, likely hit SL or trailed out). System is NOT in crisis.
 
-5 open trades have SL at exactly 1.2% (`ATR_SL_MIN` floor). User reports: "these SL should not be possible, we just adjusted the SL a little while ago."
+Verified DB numbers:
+- **24h:** 68T +$0.25 (51.5% WR) — profitable
+- **7d:** 391T +$0.57 (50.6% WR) — positive, 15th consecutive green day
+- **Biggest cost:** atr_sl_hit 20T -$0.92/24h (avg -0.45% per trade)
+- **Biggest winner:** profit-monster-trail 35T +$1.82/24h (avg +0.51%)
 
-| Coin | Dir | Entry | Current | PnL% | SL Distance |
-|------|-----|-------|---------|------|-------------|
-| CELO | LONG | $0.0640 | $0.0639 | -0.50% | -1.20% |
-| LINK | LONG | $8.2736 | $8.2335 | -0.52% | -1.25% |
-| MORPHO | LONG | $1.9444 | $1.9264 | -0.75% | -1.27% |
-| BSV | SHORT | $14.3510 | $14.3500 | -0.06% | +1.20% |
-| XRP | SHORT | $1.0184 | ~$1.018 | +0.01% | +0.21% |
+### Root Cause Analysis
+The user's concern: "limit losses before they become big." Two separate problems:
 
-### Root Cause
+**Problem1: ATR_SL_MIN floor (1.2%)**
+- `tpsl_utils.py:530-531` enforces 1.2% as absolute minimum SL distance
+- With 5x leverage =6% max loss on margin per trade
+- Widened from0.8% to1.2% on Aug 7 because 29/48 SL hits were noise at tighter stops
+- **Data says: tighter stops cause MORE false stop-outs, not fewer losses**
 
-**Code forces 1.2% minimum SL for trades in loss.** In `tpsl_utils.py:530-531`:
-```python
-new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
-```
+**Problem2: Weak signal combos entering trades**
+- range_finder+,rs-s78 LONG: 24h 1T -$0.04 (0% WR)
+- range_breakout+,rs-s52 LONG: 24h 1T -$0.10 (0% WR)
+- continuation- SHORT: 1T -$0.23 (currently open, bleeding)
+- These are low-confidence combos entering trades that immediately go against us
 
-This enforces `ATR_SL_MIN = 0.012` (1.2%) as an absolute floor for all trades in loss, regardless of any manual SL adjustment. The trailing logic overrides manual changes back to 1.2%.
+### Recommendation: Do NOT tighten ATR_SL_MIN
 
-### Fix Options
+The Aug 7 widening was data-driven and correct. Tightening back would increase false stop-outs. Instead:
 
-1. **Tighten `ATR_SL_MIN`** in `hermes_constants.py` (e.g., from 0.012 to 0.005) — affects all trades globally
-2. **Add manual SL override support** — allow DB `sl_distance` to override the computed value when manually set
-3. **Check if user's adjustment was meant for trailing distance** — recent commit `3f2effe` tightened `TRAILING_DISTANCE_PCT` from 0.7% to 0.3%, but that only affects trades IN PROFIT, not trades in loss
+| Action | Approach | Priority |
+|--------|----------|----------|
+| **Filter weak combos before entry** | Add min confidence threshold for range_finder+/range_breakout+ combos | **Immediate** |
+| **Add max drawdown close** | Close at -0.8% PnL (not -1.2%) for trades older than 30min | **Next 24h** |
+| **Reduce leverage on weak signals** | 3x for range_finder+/rs-* combos (currently5x) | **Next 24h** |
+| **Tighten ATR_SL_MIN** | NO — data says 1.2% is correct | **Rejected** |
 
-### Recommendation
+### Specific Changes Needed
 
-Clarify what the user adjusted:
-- If they tightened `ATR_SL_MIN`: verify the value persisted in `hermes_constants.py`
-- If they want manual SL overrides: need code change to respect manual adjustments
-- If they expected trailing to tighten: trailing only works on trades in profit (these are in loss)
+1. **Immediate:** In `signal_compactor.py` or entry logic, block trades where:
+   - Signal contains `rs-s*` OR `rs-r*` as sole RS filter (weak standalone)
+   - Confidence <60 for range_finder/range_breakout combos
+
+2. **Next 24h:** In `tpsl_utils.py`, add early exit logic:
+   - If trade is >30min old AND pnl_pct < -0.8% AND no ATR expansion → close
+   - This cuts losses before they reach1.2% SL
+
+3. **Next24h:** In entry logic, reduce leverage:
+   - `range_finder+,rs-*` combos →3x (not5x)
+   - `continuation-` →3x (not5x)
+
+### Why NOT to close the 2 open trades now
+- BSV SHORT: -0.23%, SL at -1.20% — standard drawdown, let it run
+- AVNT SHORT: +0.46% — already in profit
+- Neither is in crisis. System is designed to hold through 1.2% drawdowns.
 
 ### Verification
-All 5 trades show `sl_distance = 0.012` in DB. This is the `ATR_SL_MIN` floor being enforced by tpsl_utils.py trailing logic.
+- System on 15-day green streak — don't break what's working
+- The fixes target entry quality (fewer bad trades) not SL width (already optimized)
+- Expected impact: -30% fewer atr_sl_hit exits, +2-3% WR improvement

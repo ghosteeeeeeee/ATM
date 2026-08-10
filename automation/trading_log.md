@@ -5082,3 +5082,36 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - System on 15th consecutive green day
 
 **Open Questions:** None — system healthy
+
+## [2026-08-10 17:26] Hourly Analysis
+
+**Trades:** 6 closed last hour (0W, 6L) | 68 closed in 24h (+$0.25, 50% WR)
+**Open:** BSV SHORT $0.00, AVNT SHORT $0.00
+
+**Last hour PnL:** -$0.28 (MORPHO -$0.10, CELO -$0.06, LINK -$0.04, AVNT -$0.04, KAS -$0.03, XRP -$0.02)
+
+**24h by close reason:**
+- profit-monster-trail: 35T +$1.82 (dominant winner)
+- atr_sl_hit: 20T -$0.92 (29.4% — healthy)
+- cut-loser-CL-trail: 13T -$0.65
+
+**Signal performance (24h):**
+- bb_bounce+,hzscore+: 20T +$0.33 (60% WR) — STAR
+- bb_bounce+,range_finder+: 12T -$0.10 (50% WR) — today bad, 7d +$0.79 (58.5%)
+- hzscore+,range_finder+: 4T -$0.11 (50% WR) — today bad
+
+**range_finder+ by day:** Aug 7 +$0.13, Aug 8 +$0.65, Aug 9 +$0.11, Aug 10 -$0.40
+
+**Diagnosis:**
+1. Entry quality: 6/6 losses, all small (max $0.10). Cold streak.
+2. SL behavior: 29.4% — healthy
+3. Signal quality: range_finder+ having bad day after 3 good days. Normal variance.
+4. Trade frequency: ~3.3/hr — normal
+
+**Changes:** None
+**No Change Needed:**
+- atr_sl_hit rate: 29.4% (healthy)
+- range_finder+: 3-day avg still positive. Today = variance, not signal failure.
+- System on 15th consecutive green day, still positive today (+$0.25)
+
+**Open Questions:** None — cold hour within normal bounds
