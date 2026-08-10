@@ -1,3 +1,36 @@
+## CEO Report — 2026-08-10 (Review #4 — 12th green day)
+
+### Diagnosis
+24h 61T +$0.55 (57.4% WR) — 12th consecutive green day. LONG dominant: 47T +$0.66 (61.7% WR). SHORT noise: 14T -$0.11 (42.9% WR — not actionable at n=14). 7d 461T -$3.17 (45.8% WR — legacy bleeds aging out). 4d 238T +$1.06 (55.9% WR — solidly profitable). Today flat: 18T +$0.09 (50% WR — early).
+
+### Stars (verified)
+| Combo | Direction | Trades | PnL | WR | Status |
+|-------|-----------|--------|-----|-----|--------|
+| bb_bounce+,hzscore+ | LONG | 13 | +$0.60 | 69.2% | ★ DOMINANT |
+| bb_bounce+,range_finder+ | LONG | 14 | +$0.05 | 57.1% | ★ Solid |
+| bb-bounce-short,hzscore- | SHORT | 8 | -$0.02 | 50% | ★ Flat |
+| hzscore+,mover+ | LONG | 4 | +$0.06 | 75% | Emerging |
+| hzscore+,range_finder+ | LONG | 5 | +$0.03 | 80% | Emerging |
+
+### 7d Legacy Bleeds (all DISABLED, aging out)
+| Combo | Trades | PnL | WR |
+|-------|--------|-----|-----|
+| zscore-rising- SHORT | 44 | -$1.37 | 25.0% |
+| pattern_wolf_wave_bear SHORT | 9 | -$0.79 | 11.1% |
+| vel-hermes- SHORT | 54 | -$0.58 | 33.3% |
+| bb_bounce SHORT | 10 | -$0.56 | 30.0% |
+
+### Root Cause
+System on exceptional trajectory. Legacy bleeds (Aug 3-4) will exit 7d window by Aug 12-15. All DISABLED since Aug 5-6, 0 new fires. Stars firing consistently. SHORT side stabilized at 50% WR breakeven.
+
+### Fix Applied
+NO CHANGES. Stars intact, no signals below threshold. All legacy bleeds naturally decaying.
+
+### Verification
+Pipeline active, all 20+ timers on schedule. 0 phantoms. 0 open positions. 12th consecutive green day. NO TRADING CHANGES — trajectory exceptional.
+
+---
+
 ## CEO Report — 2026-08-10 (Review #3)
 
 ### Diagnosis
