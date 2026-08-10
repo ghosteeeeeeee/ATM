@@ -586,3 +586,23 @@ Tested: INSERT ok, ON CONFLICT increment verified on duplicate `(token, side, re
 **DELEGATE** to bug_hunter / signal_analyst: trace `signal_history` writes. The signal_compactor must be persisting compact rounds somewhere — find where, or wire the write. Then verify end-to-end: trade close → pattern update → count > 255 within 24h.
 
 **NO trading changes.** Acknowledge fix, log blocker, keep current trajectory.
+
+---
+
+## CEO Report — 2026-08-10 (Hebbian Live Path Decision)
+
+### Decision: YES — wire `HebbianEngine().learn_trade_outcome()` into `close_paper_position()` NOW.
+
+### Reasoning
+1. **Hebbian is the silent backbone** of every future concept-pair weight in `synapse_weights`. If it stops learning, every downstream bias (co-occurrence strengths, regen gates) quietly decays toward Aug 8 data.
+2. **Verified facts** (just re-read): `close_paper_position()` at `position_manager.py:888` is the primary close path (14+ call sites in position_manager + cascade_flip). It does direct SQL UPDATE and never calls Hebbian. The only existing call site is `brain.py:872` inside `brain.close_trade()`, which is only invoked from the **dead `hype-sync.py` timer** (last successful trigger: Aug 8). Result: ~141 closes since Aug 8 have produced zero Hebbian writes.
+3. **Risk is asymmetric.** The fix is one additive call in a `try/except` wrapper. Worst case: log "non-fatal Hebbian error" and the close still commits. Best case: future signal quality reflects the actual 9-green-day reality instead of pre-Aug-8 stale weights.
+4. **Window is right.** 9 consecutive green days, 24h 68T +$1.10 63.2% WR — additive improvements are safe; never make this kind of change during a bleed.
+5. **All data in scope:** `token`, `signal_type` (line 923), `direction`, `actual_pnl_pct` (line 1198 — uses HL exit price when available, the most accurate PnL in this function), `reason`, `leverage` (line 938), `now`.
+
+### What I'm NOT doing
+- Not changing `brain.close_trade()` or `hype-sync.py` — leaving the dead path alone, no resurrection. Hebbian is now single-source from `close_paper_position()`, simpler than dual-write.
+- Not touching `LIVE_TRADING_ENABLED`, `CONFLUENCE_REQUIRED`, or any protected flag.
+
+### Expected impact
+After deployment: every paper close → immediate Hebbian write. synapse_weights co-occurrence counts should rise visibly within 1-2 hours (current close rate ~3-5/hr). Will verify `synapse_weights.updated_at` distribution in 24h review.

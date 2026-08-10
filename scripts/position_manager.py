@@ -1210,6 +1210,26 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         except Exception as rso_err:
             log(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")
 
+        # ── Hebbian write-back: strengthen/weaken concept pairs from this trade ──
+        # BUG-FIX (2026-08-10): close_paper_position() was the primary close path
+        # but never called HebbianEngine().learn_trade_outcome(). The only call
+        # lived in brain.close_trade() (brain.py:872) which is only invoked from
+        # hype-sync.py — a dead timer (last fire Aug 8). Result: ~141 closes
+        # produced zero Hebbian writes. Wire it here, single-source. Fail-open.
+        try:
+            from hebbian_engine import HebbianEngine
+            HebbianEngine().learn_trade_outcome(
+                token=token,
+                signal=signal_type or 'unknown',
+                direction=direction,
+                pnl_pct=round(actual_pnl_pct, 4),
+                exit_reason=reason,
+                leverage=int(leverage),
+                close_time=now,
+            )
+        except Exception as hebb_err:
+            log(f"[Position Manager] Hebbian learn_trade_outcome error (non-fatal): {hebb_err}")
+
         # Loss cooldown — block re-entry after loss (prevents revenge trading)
         is_win = 1 if float(actual_pnl_usdt or 0) > 0 else 0
         if is_win == 0:
