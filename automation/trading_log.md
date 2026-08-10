@@ -50,6 +50,29 @@
 
 ---
 
+## 2026-08-10 18:00 Hourly Analysis
+
+**Trades:** 4 closed (1 win, 3 losses)
+**PnL:** -$0.08 (WR: 25.0%)
+
+**24h Summary:** 72 trades, +$0.17, 50.0% WR
+
+**Changes:**
+1. **Killed range_finder+** — 20 trades -$0.44 (24h), all combos negative. bb_bounce+,range_finder+ degraded from 64.3% WR (Aug 8) to 42.9% (today). VEL filter already deployed but not helping. Signal is bleeding across every pairing.
+
+**No Change Needed:**
+- atr_sl_hit = 31.5% of closes (under 40% threshold)
+- profit-monster-trail carrying system: 36T +$1.85 (24h)
+- No other signal hit kill threshold
+- Trade frequency normal (72/24h = 3/hr)
+
+**Open Questions:**
+- range_finder+ was system star 2 days ago. Market regime shift or signal decay?
+- bb_bounce+ standalone still viable? (21T +$0.29 57.1% WR 24h)
+- 5-hour losing streak 14:00-18:00 UTC — noise or regime?
+
+---
+
 ## 2026-08-10 07:00 Hourly Analysis
 
 **Trades:** 3 closed (2 wins, 1 loss)

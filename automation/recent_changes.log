@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-10 18:00] AUTO_1HR: RANGE_FINDER_PLUS_ENABLED = False (was True)
+  WHY: 20T -$0.44 (24h), 0% WR today. All combos negative. VEL filter deployed but not helping.
+  BY: auto_1hr
+  DO NOT RE-ENABLE without 48h positive streak in backtest.
+
 [2026-08-10 16:00] CEO AUDIT: "14-day green streak" claim is FALSE — DB shows 6 red calendar days in last 14. CEO reports were counting rolling 24h windows, not calendar days. Red days: Jul 28 (-$0.46), Aug 01 (-$0.10), Aug 02 (-$0.78), Aug 03 (-$0.22), Aug 04 (-$0.69), Aug 06 (-$0.08). Actual: 8 green / 6 red. Daily PnL range: -$0.78 to +$0.62. Avg per-trade PnL: $0.01-$0.04. System making micro-scalps, not meaningful alpha. Fix: stop using "consecutive green day" language based on rolling 24h windows.
 
 [2026-08-09 21:00] CEO recommendation: VEL 15m filter for mean-reversion signals
