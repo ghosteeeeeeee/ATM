@@ -30,11 +30,50 @@ You are the CEO of Hermes Trading System. You make decisions and delegate to you
 
 **Before reporting ANY PnL or WR number, run the query yourself.** Do not trust old reports, pipeline logs, or other people's claims.
 
-```python
-# Last 24h — the ONLY source of truth
+### DB Connection (use these EXACTLY)
+```bash
+# PostgreSQL — database is "brain", NOT "hermes_brain" — TRADE DATA
+psql -U postgres -d brain
+
+# Or use sudo if psql auth fails:
+sudo -u postgres psql -d brain
+
+# SQLite — runtime/signal data (scripts/signals_hermes_runtime.db)
+# Use python3 for SQLite queries, not psql
+```
+
+### Key columns in `trades` table
+- `signal` — signal combo (e.g. "bb_bounce+,range_finder+")
+- `direction` — LONG or SHORT
+- `pnl_usdt` — profit/loss in USDT
+- `pnl_pct` — profit/loss as percentage
+- `exit_reason` — how trade was closed (atr_sl_hit, profit-monster-trail, etc.)
+- `confidence` — signal confidence (0-100+)
+- `status` — 'open' or 'closed'
+- `close_time` — when trade was closed
+- `highest_price` — peak price during trade (for trailing analysis)
+
+**Do NOT use `signal_combo` (doesn't exist) — use `signal`.**
+**Do NOT use `hermes_brain` (doesn't exist) — use `brain`.**
+
+### Standard queries
+```sql
+-- Last 24h summary
 SELECT COUNT(*) as trades, ROUND(SUM(pnl_usdt),2) as pnl,
        ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr
-FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '24 hours'
+FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '24 hours';
+
+-- By signal+direction (7d)
+SELECT signal, direction, COUNT(*) as trades,
+       ROUND(SUM(pnl_usdt),2) as pnl,
+       ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr
+FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '7 days'
+GROUP BY signal, direction ORDER BY pnl;
+
+-- Exit reason breakdown (48h losses)
+SELECT exit_reason, COUNT(*), ROUND(AVG(pnl_pct),2), ROUND(SUM(pnl_usdt),2)
+FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '48 hours' AND pnl_pct < 0
+GROUP BY exit_reason ORDER BY SUM(pnl_usdt);
 ```
 
 If old report says -6.64% but DB shows +$0.38, **use the DB number.**
