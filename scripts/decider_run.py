@@ -1161,12 +1161,11 @@ def context_gate(token, direction, source, sig):
 
     if verdict == 'SKIP':
         return ('SKIP', ctx, 0)
-    if verdict == 'GO':
-        return ('GO', None, 0)
     if verdict == 'FLIP':
         return ('FLIP', ctx, 0)  # ctx = {'new_dir': ..., 'reason': ...}
 
-    # AMBIGUOUS → similar setup lookup (historical recall)
+    # CEO FIX 2026-08-10: similar_setup_lookup runs ALWAYS, even on GO path.
+    # Bad historical WR should override strong speed/z-score.
     rsi = sig.get('rsi_14') if isinstance(sig, dict) else None
     z_tier = sig.get('z_score_tier') if isinstance(sig, dict) else None
     setup = similar_setup_lookup(token, source, direction, rsi, z_tier)
@@ -1179,6 +1178,9 @@ def context_gate(token, direction, source, sig):
             penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 40 else SIMILAR_SETUP_PENALTY_40
             log(f'  [SETUP-RECALL] {token}: WR={wr_pct:.0f}% → confidence penalty -{penalty} (advisory)')
             return ('WARN', f'similar setup: n={setup.n} WR={wr_pct:.0f}% → -{penalty} confidence', penalty)
+
+    if verdict == 'GO':
+        return ('GO', None, 0)
 
     # Token sentiment (Hebbian Phase 3a — chronic loser filter) — AMBIGUOUS, not SKIP
     if TOKEN_SENTIMENT_ENABLED:
