@@ -679,10 +679,10 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
 
                 cur_brain.execute("""
                     INSERT INTO trade_patterns
-                        (pattern_name, token, side, is_positive, confidence,
+                        (pattern_name, token, side, regime, is_positive, confidence,
                          adjustment, sample_count, reason, created_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, 1, %s, NOW())
-                    ON CONFLICT (pattern_name, token) DO UPDATE SET
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, 1, %s, NOW())
+                    ON CONFLICT (token, side, regime, pattern_name) DO UPDATE SET
                         sample_count = trade_patterns.sample_count + 1,
                         is_positive = CASE
                             WHEN trade_patterns.is_positive = 1 THEN 1
@@ -690,12 +690,15 @@ def _bridge_signal_history_to_patterns(token: str, direction: str, trade_id: int
                             ELSE trade_patterns.is_positive END,
                         confidence = (trade_patterns.confidence * trade_patterns.sample_count + %s)
                                     / (trade_patterns.sample_count + 1),
+                        last_seen = NOW(),
                         updated_at = NOW()
                 """, (
-                    pattern_name, token.upper(), direction.upper(), is_positive,
+                    pattern_name, token.upper(), direction.upper(), 'unknown',
+                    is_positive,
                     0.7 if is_win else 0.4,
                     json.dumps({'compact_rounds': cround, 'score_before': score_b,
                                 'score_after': score_a, 'survival_reason': reason}),
+                    reason or 'no_reason',
                     is_positive,
                     0.7 if is_win else 0.4,
                 ))

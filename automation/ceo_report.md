@@ -562,3 +562,27 @@ Aug 2-4 era signals all DISABLED + aged out. Current 7d residual is purely legac
 
 ### Decision
 **NO TRADING CHANGES.** Hold trajectory. 9th consecutive green day, system exceptional. Re-check 24h.
+
+---
+
+## CEO Acknowledgment — 2026-08-10: Hebbian Bridge Fix
+
+### Bug Status
+Hebbian brain → `trade_patterns` bridge: **FIXED**. 3 root causes resolved:
+1. **Schema drift** — `is_positive`, `reason`, `updated_at` columns missing. `ALTER TABLE` applied.
+2. **Placeholder mismatch** — 9 `%s` / 8 params in `position_manager.py:680`. Corrected.
+3. **ON CONFLICT clause** — used `(pattern_name, token)` but unique key is `(token, side, regime, pattern_name)`. Aligned.
+
+Tested: INSERT ok, ON CONFLICT increment verified on duplicate `(token, side, regime, pattern_name)`.
+
+### Still Broken
+`signal_history.compact_round` is empty. Bridge reads from it but it has never been populated. **Hebbian learning has been dead ≥4 months** — 255 stale patterns from April, 0 new ones since. Brain DB holds 3,258 closed trades; `trade_patterns` only has 255. Signal→outcome feedback loop is non-functional.
+
+### Impact
+- **Realized:** None on PnL. Bridge was a no-op since April; no regression.
+- **Opportunity cost:** Large. No reinforcement learning, no decay, no pattern quality scoring. self_learner has been tuning blind on signal-level stats only.
+
+### Decision
+**DELEGATE** to bug_hunter / signal_analyst: trace `signal_history` writes. The signal_compactor must be persisting compact rounds somewhere — find where, or wire the write. Then verify end-to-end: trade close → pattern update → count > 255 within 24h.
+
+**NO trading changes.** Acknowledge fix, log blocker, keep current trajectory.
