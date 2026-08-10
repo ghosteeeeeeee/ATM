@@ -715,7 +715,7 @@ def close_trade(trade_id: int, exit_price: float, pnl_usdt: float = None,
     try:
         cur = conn.cursor()
         try:
-            _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur)
+            return _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_hl, conn, cur)
         finally:
             cur.close()
     finally:
@@ -857,6 +857,7 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
         try:
             from hebbian_engine import HebbianEngine
             from signal_schema import _enrich_indicators
+            from datetime import timezone as _tz
             # Enrich indicators from current market state
             enriched = _enrich_indicators(token)
             # Use enriched data if trade record fields are NULL
@@ -869,7 +870,7 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             accel = enriched.get('price_acceleration')
             # LLM decision from signal_decision field
             llm_decision = signal_decision  # GO, WARN, NAY, FLIP
-            HebbianEngine().learn_trade_outcome(
+            _heb_result = HebbianEngine().learn_trade_outcome(
                 token=token, signal=signal, direction=direction,
                 pnl_pct=hype_pnl_pct, z_score_tier=z_tier,
                 momentum_state=momentum,
@@ -878,8 +879,9 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
                 llm_decision=llm_decision,
                 exit_reason=close_reason,
                 leverage=int(float(stored_lev or 1)),
-                close_time=datetime.now(timezone.utc),
+                close_time=datetime.now(_tz.utc),
             )
+            print(f"[close_trade] Hebbian: {_heb_result}")
             # Update circuit breaker stats with actual outcome
             try:
                 import json as _json
@@ -906,7 +908,8 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
                     except Exception: pass
             except Exception:
                 pass
-        except Exception:
+        except Exception as _heb_err:
+            print(f"[close_trade] Hebbian error: {_heb_err}")
             pass  # fail-open
 
     return True

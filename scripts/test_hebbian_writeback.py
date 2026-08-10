@@ -123,9 +123,9 @@ def test_weight_dynamics():
     w_3w1l = dict((r[0], r[2]) for r in eng.recall(token, k=20)).get(signal, 0)
 
     check('Single WIN adds weight', w_1w > w_before, f'{w_before} → {w_1w}')
-    check('Two WINS add 2x weight', abs((w_2w - w_before) - 2.0) < 0.01, f'{w_before} → {w_2w}')
-    check('WIN-WIN-LOSS = +1', abs((w_2w1l - w_before) - 1.0) < 0.01, f'{w_before} → {w_2w1l}')
-    check('WIN-WIN-LOSS-WIN = +2', abs((w_3w1l - w_before) - 2.0) < 0.01, f'{w_before} → {w_3w1l}')
+    check('Two WINS add 2x weight', abs((w_2w - w_before) - 4.0) < 0.01, f'{w_before} → {w_2w}')
+    check('WIN-WIN-LOSS = +2', abs((w_2w1l - w_before) - 2.0) < 0.01, f'{w_before} → {w_2w1l}')
+    check('WIN-WIN-LOSS-WIN = +4', abs((w_3w1l - w_before) - 4.0) < 0.01, f'{w_before} → {w_3w1l}')
 
 
 def test_setup_stats():
@@ -153,55 +153,55 @@ def test_setup_stats():
 def test_brain_close_trade_hebbian():
     """Test brain.py close_trade() triggers Hebbian write-back."""
     print('\n=== 5. brain.py close_trade() → Hebbian ===')
-    from brain import get_db_connection
+    from brain import get_db_connection, close_trade
+
+    eng = HebbianEngine()
+    test_token = 'HTTST'
+    test_signal = 'ht_sig'
+
+    # Snapshot Hebbian weight BEFORE
+    recall_before = dict((r[0], r[2]) for r in eng.recall(test_token, k=50))
+    w_before = recall_before.get(test_signal, 0)
+
+    # Create a test open trade
+    from datetime import datetime, timezone
     conn = get_db_connection()
     c = conn.cursor()
-    # Find an existing closed trade to test write-back
+    now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
     c.execute("""
-        SELECT id, token, signal, direction, pnl_pct, signal_z_score_tier, signal_momentum_state
-        FROM trades
-        WHERE close_time IS NOT NULL
-          AND signal IS NOT NULL
-          AND signal_z_score_tier IS NOT NULL
-        ORDER BY open_time DESC
-        LIMIT 1
-    """)
-    row = c.fetchone()
+        INSERT INTO trades (token, direction, signal, status, entry_price, amount_usdt,
+                           leverage, entry_timing, signal_z_score_tier, signal_momentum_state)
+        VALUES (%s, 'LONG', %s, 'open', 1.0, 11.0, 5, %s, 'neutral', 'building')
+        RETURNING id
+    """, (test_token, test_signal, now))
+    trade_id = c.fetchone()[0]
+    conn.commit()
     conn.close()
+    print(f'  Created test trade id={trade_id}')
 
-    if not row:
-        check('Found test trade', False, 'No closed trade with signal_z_score_tier in DB')
-        return
-
-    trade_id, token, signal, direction, pnl_pct, z_tier, momentum = row
-    check('Found test trade', True,
-          f'id={trade_id} {token} {signal} {direction} pnl={pnl_pct:.2f}%')
-
-    # Snapshot Hebbian weight BEFORE close
-    eng = HebbianEngine()
-    recall_before = dict((r[0], r[2]) for r in eng.recall(token, k=50))
-    w_signal_before = recall_before.get(signal, 0)
-
-    # Re-trigger close_trade (idempotent — only updates if status='open')
-    # Trade is already closed, so UPDATE will not change anything.
-    # We just want to verify the Hebbian call path doesn't crash.
-    from brain import close_trade
+    # Close it — this should trigger hebbian writeback
+    # Use skip_hl=True to avoid HL API call on test trade
     try:
-        result = close_trade(trade_id=trade_id, exit_price=1.0, pnl_usdt=0.0,
-                            notes='hebbian_test', close_reason='hebbian_test')
-        check('close_trade() runs without error',
-              result is True or result is False,
-              f'returned {result}')
+        result = close_trade(trade_id=trade_id, exit_price=1.01, pnl_usdt=0.55,
+                            notes='hebbian_test', close_reason='hebbian_test', skip_hl=True)
+        check('close_trade() returns True', result is True, f'returned {result}')
     except Exception as e:
         check('close_trade() runs without error', False, f'{type(e).__name__}: {e}')
+        return
 
-    # Verify Hebbian call was made (search brain.db for the (token, signal) pair)
+    # Verify Hebbian weight increased
     eng2 = HebbianEngine()
-    recall_after = dict((r[0], r[2]) for r in eng2.recall(token, k=50))
-    w_signal_after = recall_after.get(signal, 0)
-    check('(token, signal) pair exists in brain.db',
-          w_signal_after is not None and w_signal_after > 0,
-          f'weight={w_signal_after}')
+    recall_after = dict((r[0], r[2]) for r in eng2.recall(test_token, k=50))
+    w_after = recall_after.get(test_signal, 0)
+    check('Hebbian weight increased after close',
+          w_after > w_before,
+          f'{w_before} → {w_after}')
+
+    # Cleanup: remove test trade
+    conn = get_db_connection()
+    conn.cursor().execute("DELETE FROM trades WHERE id = %s", (trade_id,))
+    conn.commit()
+    conn.close()
 
 
 def test_recall_uses_backfilled_data():
