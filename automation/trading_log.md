@@ -5204,3 +5204,33 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Today: -$0.02 flat (not losing)
 
 **Open Questions:** None — system healthy
+
+## [2026-08-10 22:05] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W, 1L — ASTER SL) | 71 closed in 24h (-$0.10, 46.5% WR)
+**Open:** BSV SHORT, JUP SHORT, HTTST4 LONG (test)
+
+**24h by close reason:**
+- profit-monster-trail: 32T +$1.54 (dominant winner)
+- atr_sl_hit: 25T -$1.10 (35.2% — healthy)
+- cut-loser-CL-trail: 13T -$0.65
+
+**Star signals 7d:**
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 (58.5% WR) ★★
+- bb_bounce+,hzscore+ LONG: 28T +$0.34 (53.6% WR) ★★
+- bb-bounce-short,hzscore- SHORT: 15T +$0.14 (60.0% WR) ★
+
+**Diagnosis:**
+1. Entry quality: 1 SL hit — quiet
+2. SL behavior: 38.2% 7d — healthy
+3. Signal quality: All stars positive 7d, 24h variance normal
+4. Trade frequency: 1-2/hr — no overtrading
+
+**Changes:** None
+**No Change Needed:**
+- atr_sl_hit: 38.2% (healthy)
+- All 3 stars profitable 7d
+- Trade frequency normal
+- Today's cold stretch: normal variance after 15 green days
+
+**Open Questions:** None — system healthy, cold day within bounds
