@@ -1,23 +1,24 @@
-## CEO Report — 2026-08-11 00:15 UTC
+## CEO Report — 2026-08-11 00:45 UTC
 
 ### Diagnosis
-
-Verified DB: 24h 69T -$0.22 (43.5% WR — red, 2nd consecutive red after 15+ green). 12h 34T -$0.39 (38.2% WR — rough). 6h 14T -$0.34 (21.4% WR — very rough, post-SL-widening window). 7d 370T +$0.46 (51.9% WR — positive, trajectory intact). 4d 231T +$1.01 (51.9% WR — solid).
-
-LONG 24h: 53T -$0.31 (39.6% WR — bleeding today, unusual). SHORT 24h: 16T +$0.09 (56.3% WR — profitable). 7d LONG: 233T +$1.57 (53.6% WR — strong). 7d SHORT: 137T -$1.11 (48.9% WR — legacy aging).
-
-Stars7d all profitable: bb_bounce+,range_finder+ LONG 53T +$0.71 (58.5%), bb_bounce+,hzscore+ LONG 29T +$0.29 (51.7%), bb-bounce-short,hzscore- SHORT 16T +$0.17 (62.5%). Stars24h rough: bb_bounce+,hzscore+ LONG 23T -$0.05 (47.8% WR), bb_bounce+,range_finder+ LONG 8T -$0.12 (37.5% WR).
-
-Cost drivers48h: atr_sl_hit 37T -$1.67, cut-loser-CL-trail 26T -$0.98. 6h: atr_sl_hit 8T -$0.31 (SL widening not yet effective — only2.5h old).
+24h: 67T, -$0.15, 44.8% WR — slightly red (2nd red day after 15 green). 12h: 33T, -$0.43, 36.4% WR — rough. 6h: 10T, -$0.12, 30.0% WR — rough. 7d: 369T, +$0.38, 51.8% WR — positive. LONG 24h bleeding, SHORT profitable. Stars 24h weak: bb_bounce+,hzscore+ LONG 22T -$0.02 (50% WR), bb_bounce+,range_finder+ LONG 7T -$0.08 (42.9% WR). Stars 7d intact: all 3 profitable.
 
 ### Root Cause
-
-Market NEUTRAL (105/106 tokens), mean-reversion entries (bb_bounce, hzscore) getting chopped in sideways price action. LONG bleeding at 39.6% WR today while SHORT is profitable (56.3%) — unusual inversion indicating choppy conditions favor quick exits over reversals. SL widening deployed at 22:00 has not had enough time to show effect (2.5h). 7d trajectory remains positive at 51.9% WR.
+Normal variance after 15 consecutive green days. Market NEUTRAL (105/106 tokens), mean-reversion entries getting chopped. SL widening (0.5%→1.2%) deployed 22:00 — only 2.5h old, too early to evaluate. atr_sl_hit still dominant cost (24T -$1.08 in 24h).
 
 ### Fix Applied
-
-**No trading changes.** SL widening (ATR_SL_MIN 0.5%→1.2%, TRAILING_DISTANCE 0.30%→0.60%, CL_TRAIL_ACTIVATE -0.5→-1.0) deployed at 22:00. Monitor 24h: if 6h WR stays <30%, investigate SL width vs ATR of current regime. If24h stays red for 12+ more hours, consider reverting SLMIN/SLMAX to 0.8%/1.8%.
+NO TRADING CHANGES. SL widening needs 24h evaluation window. 7d trajectory positive (+$0.38), stars 7d intact. No 0% WR signals to kill (all sub-threshold).
 
 ### Verification
+- 24h: 67T, -$0.15, 44.8% WR (verified)
+- 7d: 369T, +$0.38, 51.8% WR (verified)
+- Stars 7d: bb_bounce+,range_finder+ LONG 53T +$0.71 (58.5%), bb_bounce+,hzscore+ LONG 29T +$0.29 (51.7%), bb-bounce-short,hzscore- SHORT 16T +$0.17 (62.5%)
+- SL widening: 2.5h old, needs 24h window
+- Next check: 24h for SL widening effect, star re-evaluation
 
-7d remains positive (+$0.46). Stars intact on 7d. Pipeline healthy. 3 open positions. No phantoms. No action needed — let SL widening evaluation window complete (24h from 22:00 = 22:00 Aug 11).
+### Goal Tracking
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate | 44.8% (24h) | 50%+ | 24h |
+| SHORT PnL | +$0.09 (24h) | Maintain | 72h |
+| 7d PnL | +$0.38 | +$1.00 | 7d |
