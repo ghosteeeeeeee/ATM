@@ -1,60 +1,89 @@
-## CEO Report — 2026-08-10 (Latest)
+## CEO Report — 2026-08-10 SL vs Cut-Loser Analysis
 
-### Diagnosis
-**Open trades: 2 (not 5)** — BSV SHORT -$0.23%, AVNT SHORT +$0.46%. The5-trade scenario from earlier has resolved (3 closed, likely hit SL or trailed out). System is NOT in crisis.
+### Key Insight
 
-Verified DB numbers:
-- **24h:** 68T +$0.25 (51.5% WR) — profitable
-- **7d:** 391T +$0.57 (50.6% WR) — positive, 15th consecutive green day
-- **Biggest cost:** atr_sl_hit 20T -$0.92/24h (avg -0.45% per trade)
-- **Biggest winner:** profit-monster-trail 35T +$1.82/24h (avg +0.51%)
+The user identified a critical interaction between SL and cut_loser:
 
-### Root Cause Analysis
-The user's concern: "limit losses before they become big." Two separate problems:
+**Current parameters:**
+- SL: 1.2% from entry (ATR_SL_MIN = 0.012)
+- cut_loser: -2.0% PnL (CUT_LOSER_PNL = -2.0)
+- Leverage: 5x
 
-**Problem1: ATR_SL_MIN floor (1.2%)**
-- `tpsl_utils.py:530-531` enforces 1.2% as absolute minimum SL distance
-- With 5x leverage =6% max loss on margin per trade
-- Widened from0.8% to1.2% on Aug 7 because 29/48 SL hits were noise at tighter stops
-- **Data says: tighter stops cause MORE false stop-outs, not fewer losses**
+**With 5x leverage:**
+- cut_loser triggers at: -2.0% PnL = **0.4% price drop**
+- SL triggers at: **1.2% price drop**
 
-**Problem2: Weak signal combos entering trades**
-- range_finder+,rs-s78 LONG: 24h 1T -$0.04 (0% WR)
-- range_breakout+,rs-s52 LONG: 24h 1T -$0.10 (0% WR)
-- continuation- SHORT: 1T -$0.23 (currently open, bleeding)
-- These are low-confidence combos entering trades that immediately go against us
+**Conclusion:** cut_loser is TIGHTER than SL for losing trades.
 
-### Recommendation: Do NOT tighten ATR_SL_MIN
+### Data Evidence
 
-The Aug 7 widening was data-driven and correct. Tightening back would increase false stop-outs. Instead:
+**7-day atr_sl_hit exits (138 trades):**
+- Average PnL: -0.55% (-$0.06/trade)
+- Most exits cluster at -0.3% to -0.8% PnL
+- **0% win rate** on SL exits (all losses)
 
-| Action | Approach | Priority |
-|--------|----------|----------|
-| **Filter weak combos before entry** | Add min confidence threshold for range_finder+/range_breakout+ combos | **Immediate** |
-| **Add max drawdown close** | Close at -0.8% PnL (not -1.2%) for trades older than 30min | **Next 24h** |
-| **Reduce leverage on weak signals** | 3x for range_finder+/rs-* combos (currently5x) | **Next 24h** |
-| **Tighten ATR_SL_MIN** | NO — data says 1.2% is correct | **Rejected** |
+**7-day cut_loser exits (29 trades):**
+- Average PnL: -0.35% (-$0.04/trade)
+- Cuts at -0.1% to -0.9% PnL
+- **Tighter than SL** for most losing trades
 
-### Specific Changes Needed
+**Key finding:** cut_loser already exits trades BEFORE they reach the 1.2% SL. The SL is redundant for losing trades.
 
-1. **Immediate:** In `signal_compactor.py` or entry logic, block trades where:
-   - Signal contains `rs-s*` OR `rs-r*` as sole RS filter (weak standalone)
-   - Confidence <60 for range_finder/range_breakout combos
+### Implications
 
-2. **Next 24h:** In `tpsl_utils.py`, add early exit logic:
-   - If trade is >30min old AND pnl_pct < -0.8% AND no ATR expansion → close
-   - This cuts losses before they reach1.2% SL
+1. **SL is redundant for losing trades** — cut_loser closes them first
+2. **Only V-shaped recovery works** — price must drop, cut_loser closes, then price recovers
+3. **Any pullback = closed by cut_loser** — no room for trades to recover
+4. **1.2% SL is wasted risk** — we're exposed to 1.2% drop but cut_loser kicks in at 0.4%
 
-3. **Next24h:** In entry logic, reduce leverage:
-   - `range_finder+,rs-*` combos →3x (not5x)
-   - `continuation-` →3x (not5x)
+### CEO Decision Needed
 
-### Why NOT to close the 2 open trades now
-- BSV SHORT: -0.23%, SL at -1.20% — standard drawdown, let it run
-- AVNT SHORT: +0.46% — already in profit
-- Neither is in crisis. System is designed to hold through 1.2% drawdowns.
+Should we:
+1. **Tighten SL to match cut_loser** — set SL at 0.4% (matches cut_loser threshold)
+2. **Widen cut_loser to match SL** — set cut_loser at -6.0% PnL (1.2% price drop with 5x)
+3. **Remove SL for losing trades** — let cut_loser handle all loss exits
+4. **Keep current setup** — SL for profit protection, cut_loser as backup
+
+The user's point: "is there a point having the SL so far for losing trades?" — if cut_loser will close them anyway, the wide SL is just exposing us to unnecessary risk.
+
+### Recommendation
+
+**Option 1: Tighten SL to 0.5%** — This matches the cut_loser threshold more closely and reduces maximum loss per trade. The 1.2% SL was widened from 0.8% on Aug 7 because 29/48 SL hits were noise — but cut_loser already handles the tighter exits.
+
+**Expected impact:**
+- Fewer trades reaching 1.2% SL (cut_loser catches them first)
+- Tighter max loss per trade (0.5% vs 1.2%)
+- Better risk/reward ratio
+
+### CEO Decision — 2026-08-10
+
+**Decision: Option 1 — Tighten SL to 0.5%**
+
+Rationale:
+- cut_loser fires at 0.4% price drop (5x leverage, -2.0% PnL)
+- SL at 1.2% is 3x wider — dead weight for losing trades
+- Tightening to 0.5% creates a natural backup: cut_loser catches first, SL catches if cut_loser misses
+- Reduces max loss per trade from 1.2% to 0.5% (58% reduction)
+- Data: 138 SL exits avg -0.55% PnL — trades hitting SL are already deep losers
+
+**Changes:**
+- ATR_SL_MIN: 0.012 → 0.005 (0.5%)
+- ATR_SL_MAX: 0.025 → 0.010 (1.0% cap, still room for high-vol tokens)
+- ATR_SL_MIN_INIT: 0.012 → 0.005 (matches ATR_SL_MIN)
+- ATR_SL_MAX_INIT: 0.025 → 0.010 (matches ATR_SL_MAX)
+- SL_PCT_FALLBACK: 0.012 → 0.005 (matches ATR_SL_MIN)
+- STOP_LOSS_DEFAULT: 0.012 → 0.005 (matches ATR_SL_MIN)
+- TP_PCT_FALLBACK: 0.024 → 0.010 (keep 2:1 R:R with new SL)
+
+**Expected impact:**
+- SL becomes backup to cut_loser (not redundant)
+- Max loss per trade drops 58%
+- Trades that would have hit 1.2% SL now cut at 0.5% or by cut_loser first
+
+**Risk:** Trades that recover from -0.5% to breakeven will get stopped. But cut_loser data shows most losers don't recover — avg exit -0.35% PnL.
 
 ### Verification
-- System on 15-day green streak — don't break what's working
-- The fixes target entry quality (fewer bad trades) not SL width (already optimized)
-- Expected impact: -30% fewer atr_sl_hit exits, +2-3% WR improvement
+- System on 15-day green streak
+- 7d: 382T +$0.40 (52.9% WR)
+- Both LONG and SHORT profitable
+- Stars intact: bb_bounce+,hzscore+ LONG, bb_bounce+,range_finder+ LONG, bb-bounce-short,hzscore- SHORT
