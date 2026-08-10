@@ -4925,3 +4925,36 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - SHORT bleeding: stopped, flat at +$0.01
 
 **Open Questions:** None — system healthy
+
+## [2026-08-10 06:00] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses) in last hour | 61 closed in 24h (+$0.36, 55.7% WR)
+**Open:** 6 (ETH LONG +$0.05, XRP LONG +$0.05, MEGA LONG +$0.02, KAS LONG +$0.02, AXS SHORT +$0.01, JUP SHORT -$0.01)
+
+**24h by close reason:**
+- profit-monster-trail: 33T +$1.48 (avg +$0.045) — dominant winner
+- cut-loser-CL-trail: 13T -$0.50 (avg -$0.038) — risk management working
+- atr_sl_hit: 12T -$0.59 (avg -$0.049) — 19.7% of closes (healthy)
+- cut-loser-CL-T1: 2T -$0.07
+- profit-monster-T1: 1T +$0.04
+
+**Signal performance (24h):**
+- bb_bounce+,hzscore+ LONG: 13T +$0.48 (69.2% WR) — STAR
+- hzscore+,mover+ LONG: 4T +$0.08 (75% WR)
+- bb_bounce+,range_finder+ LONG: 14T $0.00 (57.1% WR) — break-even
+- bb-bounce-short,hzscore- SHORT: 8T -$0.02 (50% WR) — slight bleed
+
+**Diagnosis:**
+1. Entry quality: Last 2 trades on star signal both cut losers at -$0.05 — micro-positions, likely early exits on whipsaw
+2. SL behavior: atr_sl_hit = 19.7% — healthy (well below 40% threshold)
+3. Signal quality: Star signal dominant. All 0%-WR signals are single-sample noise
+4. Trade frequency: 2.5/hr — normal
+
+**Changes:** None
+**No Change Needed:**
+- atr_sl_hit rate: 19.7% (healthy)
+- Trade frequency: 2.5/hr (normal)
+- Star signals: performing well
+- System on 12th consecutive green day (net +$0.36 24h)
+
+**Open Questions:** None — system healthy
