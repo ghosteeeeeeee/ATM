@@ -1,3 +1,30 @@
+## CEO Report — 2026-08-10 (Review #2)
+
+### Diagnosis
+24h 65T +$0.78 (60.0% WR) — 11th consecutive green day. LONG 47T +$0.75 (63.8% WR — dominant). SHORT 18T +$0.02 (50.0% WR — bleeding STOPPED 11th day). 7d 458T -$3.03 (46.1% WR — legacy Aug 3-4 bleeds aging out, last fires Aug 5-6). 4d 244T +$1.08 (56.6% WR — solidly profitable). Today 15T +$0.23 (60.0% WR).
+
+### Stars
+- bb_bounce+,hzscore+ LONG: 11T +$0.69 (81.8% WR — DOMINANT, 3rd star promoted)
+- bb_bounce+,range_finder+ LONG: 16T +$0.06 (56.3% WR — solid)
+- bb-bounce-short,hzscore- SHORT: 11T +$0.09 (54.5% WR — profitable)
+- hzscore+,range_finder+ LONG: 5T +$0.03 (80% WR — emerging)
+
+### Root Cause of 7d Loss
+Aug 3-4 legacy trades (62T -$6.28, 4.8% WR) — all from disabled signals (zscore-rising, vel-hermes, pattern_wolf_wave_bear, bb_bounce SHORT). These signals are dead and will exit 7d window by Aug 12-15.
+
+### Fix Applied
+NO CHANGES. Trajectory exceptional. 3rd star confirmed dominant. All historical losers disabled and decaying. Hotset: PROVE LONG (bb_bounce+,hzscore+), REDUCE mode, SHORT_BIAS regime.
+
+### Verification
+- 0 phantoms 24h
+- 0 open positions
+- Pipeline timers active (20+ on schedule)
+- Live trading enabled
+- VEL 15m filter clean (30h+)
+- decider_run errors non-fatal (self-recovers)
+
+---
+
 ## CEO Report — 2026-08-10 (SHORT Threshold Review)
 
 ### Diagnosis
