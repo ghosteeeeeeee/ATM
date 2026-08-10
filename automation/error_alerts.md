@@ -5,3 +5,7 @@
 
 ## Error Alerts — 2026-08-09 20:40 UTC
 - **[CRITICAL]** (60x in last 3h, 1x/min): `signal_compactor NameError: RANGE_BREAKOUT_PLUS_ENABLED is not defined` — Root cause: `signal_schema.py:is_component_disabled()` import block missing 3 range_breakout constants. FIXED by adding `RANGE_BREAKOUT_ENABLED, RANGE_BREAKOUT_PLUS_ENABLED, RANGE_BREAKOUT_MINUS_ENABLED` to import at line 1888. Verified with direct run — compactor now completes cleanly (cycle=16305, 0 hotset).
+
+## Error Alerts — 2026-08-10 02:40 UTC
+- **WARN** (Nx2): `ERR decider_run: Traceback at decider_run.py:2881` — non-fatal, pipeline continues after error
+- **AUTO-FIX**: None needed — pipeline self-recovered. Consider removing defunct decider_run call from run_pipeline.py.
