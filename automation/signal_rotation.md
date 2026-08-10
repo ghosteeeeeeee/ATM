@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-10 01:49 UTC
+# Signal Rotation — 2026-08-10 05:49 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -9,7 +9,7 @@
 | 1 | tl_break_long | 82% | 3.160 | 3.160 | ❌ |  |
 | 2 | bb_bounce,hzscore+ | 100% | 0.912 | 0.912 | ✅ |  |
 | 3 | bb_bounce+,range_finder+ | 63% | 0.784 | 0.784 | ✅ |  |
-| 4 | tl_break_short | 80% | 0.760 | 0.760 | ❌ |  |
+| 4 | tl_break_short | 80% | 0.760 | 0.760 | ✅ |  |
 | 5 | ma100-cross,return_exhaus | 67% | 0.307 | 0.307 | ❓ |  |
 | 6 | hzscore+,return_exhaustio | 58% | 0.245 | 0.245 | ✅ |  |
 | 7 | bb-bounce-short,hzscore- | 58% | 0.240 | 0.240 | ✅ |  |

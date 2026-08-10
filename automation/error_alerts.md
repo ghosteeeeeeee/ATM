@@ -12,3 +12,13 @@
 
 ## Error Alerts — 2026-08-10 04:08 UTC
 - **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-10 06:41 UTC
+- **[INFO]** (6x): `hermes-bug-hunter.service` — failed: imports defunct `ai_decider`/`signal_gen`. Non-critical, needs code cleanup.
+- **[INFO]** (3x): `hermes-hl-volume.service` — failed: exit-code. Non-critical utility.
+- **[INFO]** (1x): `hermes-mtf-macd-tuner.service` — failed: exit-code. Non-critical.
+- **[INFO]** (1x): `hermes-signal-reporter.service` — failed: timeout. Non-critical.
+- **[INFO]** (1x): `hermes-trading-checklist.service` — failed: exit-code. Non-critical.
+- **[INFO]** (1x): `hermes-upgrade-implementer.service` — failed: exit-code. Non-critical.
+- **[INFO]** (repeated): `[PHANTOM-DBG] ETH LONG` — SL stable at0.102% distance, no action needed. Debug output only.
+- **AUTO-FIX**: None needed — all issues are non-critical utilities. Core pipeline healthy.
