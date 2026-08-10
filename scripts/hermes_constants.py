@@ -192,6 +192,10 @@ LONG_BLACKLIST = {
     'AAVE',  # 17T 29.4% WR -$0.41
     'SKY',   # 13T 30.8% WR -$0.16
     'PNUT',  # 15T 33.3% WR -$0.13
+    # 2026-08-10: 48h loss clustering — consistently losing
+    'AXS',   # 5T 0% WR -$0.19 — all losses
+    'LINK',  # 5T 20% WR -$0.18 — mostly losses
+    'CELO',  # 4T 50% WR -$0.05 — losses > wins
     # 2026-08-08: Political meme coin, high volatility
     'TRUMP',
 }
