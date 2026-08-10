@@ -136,9 +136,10 @@ SHORT_BLACKLIST = {
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
-    'ACE','GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','DOGE','MEW',
-    # TST, ACE, KAS, PROVE removed 2026-08-07 — no specific block reason
+    'ACE','GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','DOGE','MEW','PROVE',
+    # TST, ACE, KAS removed 2026-08-07 — no specific block reason
     # TRUMP added 2026-08-08 — political meme coin, high volatility
+    # PROVE re-blacklisted 2026-08-10 — 25% WR, -0.25% avg PnL, -$0.22 total
     'BOME', 'USTC', 'RSR',
     # 2026-04-24: REZ, HMSTR, BNB — block both directions
     'REZ', 'HMSTR', 'BNB',
@@ -473,7 +474,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
 TRAILING_ACTIVATION_PCT = 0.0030  # 0.30% — CEO tightened to lock profits faster (was 0.35%)
-TRAILING_DISTANCE_PCT   = 0.0070  # 0.70% — CEO tightened (was 0.80%)
+TRAILING_DISTANCE_PCT   = 0.0030  # 0.30% — CEO tightened (was 0.70%)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
