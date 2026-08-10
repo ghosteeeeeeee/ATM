@@ -4978,3 +4978,37 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - System on 12th consecutive green day (net +$0.36 24h)
 
 **Open Questions:** None — system healthy
+
+## [2026-08-10 07:00] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses) in last hour | 63 closed in 24h (+$0.50, 55.6% WR)
+**Open:** ETH SHORT +$0.02, WLFI LONG +$0.03, HBAR LONG -$0.04, ASTER LONG -$0.04
+
+**Last hour PnL:** -$0.03 (2W: ETH +$0.02, WLFI +$0.03; 2L: HBAR -$0.04, ASTER -$0.04)
+
+**24h by close reason:**
+- profit-monster-trail: 33T +$1.70 (avg +$0.052) — dominant winner
+- atr_sl_hit: 15T -$0.67 (avg -$0.045) — 23.8% of closes (healthy)
+- cut-loser-CL-trail: 12T -$0.53 (avg -$0.044) — risk management working
+- cut-loser-CL-T1: 1T -$0.04
+- profit-monster-T1: 1T +$0.04
+
+**Last hour signal performance:**
+- bb_bounce+,hzscore+ LONG: 2T -$0.01 (50% WR) — normal
+- continuation+,hzscore+ LONG: 1T -$0.04 (0% WR, 1 sample — noise)
+- hl_copy_trader,range_breakout- SHORT: 1T +$0.02 (100% WR, 1 sample — noise)
+
+**Diagnosis:**
+1. Entry quality: 2 SL hits on hbAR and aster both micro -$0.04 — normal variance, not pattern
+2. SL behavior: atr_sl_hit = 23.8% — healthy (well below 40% threshold)
+3. Signal quality: continuation+,hzscore+ 1 trade = single-sample noise, no action needed
+4. Trade frequency: 4/hr — normal
+
+**Changes:** None
+**No Change Needed:**
+- atr_sl_hit rate: 23.8% (healthy)
+- Trade frequency: 4/hr (normal)
+- All signals within normal variance
+- System on 12th+ consecutive green day
+
+**Open Questions:** None — system healthy

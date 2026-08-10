@@ -22,3 +22,10 @@
 - **[INFO]** (1x): `hermes-upgrade-implementer.service` — failed: exit-code. Non-critical.
 - **[INFO]** (repeated): `[PHANTOM-DBG] ETH LONG` — SL stable at0.102% distance, no action needed. Debug output only.
 - **AUTO-FIX**: None needed — all issues are non-critical utilities. Core pipeline healthy.
+
+## Error Alerts — 2026-08-10 14:40 UTC
+- **[WARN]** (1x): `Disk 82% used` — approaching 85% threshold. `self_close_watcher.err.log` is 35MB — should be rotated/compressed.
+- **[INFO]** (1x): `Pipeline OK` — running clean at 14:38, no errors in last 30min.
+- **[INFO]** (1x): `100 signals generated (1h)` — 0 approved (all filtered by confidence threshold at compaction).
+- **[INFO]** (1x): `Only 1/6 positions open` — capital under-utilized. No signals above 50% confidence.
+- **[AUTO-FIX]**: None needed — all systems nominal.

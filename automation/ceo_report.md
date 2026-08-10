@@ -1,3 +1,27 @@
+## CEO Report — 2026-08-10 14:52 UTC (No Changes)
+
+### Verified Numbers (DB)
+- 24h: 60T +$0.53 (55.0% WR) — 13th consecutive green day
+- 7d: 405T +$0.43 (49.6% WR) — positive, legacy bleeds aging out
+- Today: 43T +$0.30 (53.5% WR)
+- LONG 24h: 48T +$0.49 (54.2% WR)
+- SHORT 24h: 12T +$0.04 (58.3% WR) — both profitable
+
+### Diagnosis
+System on exceptional trajectory — 13th green day. All combos profitable or flat. bb_bounce+,hzscore+ LONG is dominant star (18T +$0.49, 66.7% WR 24h). bb_bounce+,range_finder+ LONG rough24h (11T -$0.13, 45.5% WR) but still positive 7d (52T +$0.68, 57.7% WR). ATR SL hits 15T -$0.67 — largest cost driver but within normal range.
+
+### Bugs Found
+- **Regime=None on ALL trades** — regime field never written to trades table. Data quality issue, affects regime-based analysis. Not blocking but needs tracing through trade execution flow.
+
+### Fix Applied
+None — system profitable, no changes warranted.
+
+### Mechanical Issues (Non-Urgent)
+- decider_run.py: non-fatal errors from defunct imports (ai_decider/signal_gen)
+- Disk 82%: approaching 85% threshold, self_close_watcher.err.log is 35MB
+- bug-hunter service: failing due to defunct ai_decider imports
+
+---
 ## CEO Report — 2026-08-10 (Decision: 15m Trend Filter for SHORT)
 
 ### Verified Numbers (DB)
