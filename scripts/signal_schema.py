@@ -1385,6 +1385,14 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            if _comp in ('trend_momentum_near_sma+', 'trend_momentum_near_sma'):
+                try:
+                    from hermes_constants import TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED
+                    if not TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 

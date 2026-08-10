@@ -52,3 +52,6 @@
 - **[WARN]** (14x): `ERR decider_run: Traceback ... decider_run.py line 2888` (22:27-22:35 UTC)
 - **AUTO-FIX**: None needed — self-resolved at 22:38. Traceback truncated in journalctl; manual dry-run confirmed decider_run.py runs clean now.
 - **NOTE**: Likely transient DB lock or race condition during BSV signal processing. Pipeline continued operating (position_manager, trades-api, signals_runner all unaffected).
+
+## Error Alerts — 2026-08-10 23:08 UTC
+- **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`

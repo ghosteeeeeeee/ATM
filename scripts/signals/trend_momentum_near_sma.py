@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """
-Signal: trend_momentum_near_sma
+trend_momentum_near_sma — Buy in uptrend with momentum near SMA.
 
-Thesis: Buy when price is in an uptrend (above SMA20), has positive
-        momentum (5-period rising), and is near the SMA (within 0.5%).
-        These conditions historically produce 47.8% WR with +$9.66/14d.
+Thesis: Price in uptrend (close > SMA20) with positive momentum
+        and near SMA (not extended) historically produces 47.8% WR
+        with +$9.66/14d.
 
-Entry:  close > SMA20 (trend up)
-        + 5-period price change > 0.5% (momentum)
-        + |close - SMA20| / SMA20 < 0.005 (near SMA, not extended)
-
-Exit:   Trail at 0.8% from peak
-        Stop at -1.2% from entry (ATR-based)
+Entry:  close > SMA20 + 5-period momentum > 0.5% + within 0.5% of SMA
+Exit:   Trail 0.8%, stop -1.2%
 
 Data:   candles_1h from candles.db
 """
@@ -19,116 +15,152 @@ Data:   candles_1h from candles.db
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from paths import *
+from signal_schema import add_signal, get_cooldown, set_cooldown, price_age_minutes
+from paths import HERMES_DATA
+from hermes_constants import (
+    TREND_MOMENTUM_NEAR_SMA_ENABLED,
+    TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED,
+    TREND_MOMENTUM_NEAR_SMA_MOMENTUM_THRESHOLD,
+    TREND_MOMENTUM_NEAR_SMA_DIST_SMA_MAX,
+    TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD,
+    TREND_MOMENTUM_NEAR_SMA_MOMENTUM_PERIOD,
+    TREND_MOMENTUM_NEAR_SMA_CONF_BASE,
+    TREND_MOMENTUM_NEAR_SMA_CONF_STRONG_MOM,
+    TREND_MOMENTUM_NEAR_SMA_CONF_CLOSE_SMA,
+    TREND_MOMENTUM_NEAR_SMA_CONF_CAP,
+    LONG_BLACKLIST,
+)
 import sqlite3
-from datetime import datetime, timezone
+
+_CANDLES_DB = None
+
+def _get_db():
+    global _CANDLES_DB
+    if _CANDLES_DB is None:
+        _CANDLES_DB = f'{HERMES_DATA}/candles.db'
+    return _CANDLES_DB
 
 
-def run(token: str = None, **kwargs) -> list:
-    """Generate trend_momentum_near_sma signals for active tokens."""
-    signals = []
+def detect(token):
+    """Check if token meets trend_momentum_near_sma entry conditions."""
+    conn = None
+    try:
+        conn = sqlite3.connect(_get_db(), timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1h
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC LIMIT ?
+        """, (token.upper(), TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD + TREND_MOMENTUM_NEAR_SMA_MOMENTUM_PERIOD))
+        rows = cur.fetchall()
+        if len(rows) < TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD:
+            return None
+        closes = [r[0] for r in reversed(rows)]
+    except Exception:
+        return None
+    finally:
+        if conn:
+            conn.close()
 
-    conn = sqlite3.connect(f'{HERMES_DATA}/candles.db')
-    cur = conn.cursor()
+    close = closes[-1]
+    if close <= 0:
+        return None
 
-    # Get tokens with recent candles (not just "active" flag)
-    if token:
-        tokens = [token]
-    else:
+    # SMA
+    sma = sum(closes[-TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD:]) / TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD
+
+    # Momentum
+    mom_period = TREND_MOMENTUM_NEAR_SMA_MOMENTUM_PERIOD
+    if closes[-mom_period - 1] <= 0:
+        return None
+    momentum = (closes[-1] - closes[-mom_period - 1]) / closes[-mom_period - 1]
+
+    # Distance from SMA
+    dist_sma = abs(close - sma) / sma
+
+    # Entry conditions
+    if close <= sma:
+        return None  # not uptrend
+    if momentum <= TREND_MOMENTUM_NEAR_SMA_MOMENTUM_THRESHOLD:
+        return None  # no momentum
+    if dist_sma >= TREND_MOMENTUM_NEAR_SMA_DIST_SMA_MAX:
+        return None  # too far from SMA
+
+    # Confidence
+    conf = TREND_MOMENTUM_NEAR_SMA_CONF_BASE
+    if momentum > 0.01:
+        conf += TREND_MOMENTUM_NEAR_SMA_CONF_STRONG_MOM
+    if dist_sma < 0.002:
+        conf += TREND_MOMENTUM_NEAR_SMA_CONF_CLOSE_SMA
+    conf = min(conf, TREND_MOMENTUM_NEAR_SMA_CONF_CAP)
+
+    return {
+        'direction': 'LONG',
+        'confidence': conf,
+        'value': momentum,
+        'price': close,
+        'z_score': None,
+    }
+
+
+def scan_signals():
+    """Scan all tokens and add signals via add_signal()."""
+    if not TREND_MOMENTUM_NEAR_SMA_ENABLED:
+        return 0
+    if not TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED:
+        return 0
+
+    added = 0
+    conn = None
+    try:
+        conn = sqlite3.connect(_get_db(), timeout=10)
+        cur = conn.cursor()
         cur.execute("""
             SELECT DISTINCT token FROM candles_1h
             WHERE ts > strftime('%s', 'now') - 86400
-            ORDER BY token
         """)
         tokens = [r[0] for r in cur.fetchall()]
+    except Exception:
+        return 0
+    finally:
+        if conn:
+            conn.close()
 
     for tok in tokens:
-        # Get 1h candles (need 20 for SMA20)
-        cur.execute("""
-            SELECT ts, open, high, low, close, volume
-            FROM candles_1h
-            WHERE token = ? AND is_closed = 1
-            ORDER BY ts DESC
-            LIMIT 25
-        """, (tok,))
-        rows = cur.fetchall()
-
-        if len(rows) < 20:
+        if price_age_minutes(tok) > 10:
+            continue
+        if tok.upper() in LONG_BLACKLIST:
+            continue
+        if get_cooldown(tok, direction='LONG'):
             continue
 
-        # Parse candles (newest first)
-        candles = []
-        for r in rows:
-            candles.append({
-                'ts': r[0], 'open': r[1], 'high': r[2],
-                'low': r[3], 'close': r[4], 'volume': r[5]
-            })
-
-        close = candles[0]['close']
-        if close <= 0:
+        sig = detect(tok)
+        if not sig:
             continue
 
-        # Compute indicators
-        closes = [c['close'] for c in candles]
-        sma20 = sum(closes[:20]) / 20
+        sid = add_signal(
+            token=tok.upper(),
+            direction='LONG',
+            signal_type='trend_momentum_near_sma',
+            source='trend_momentum_near_sma+',
+            confidence=sig['confidence'],
+            value=sig.get('value'),
+            price=sig['price'],
+            exchange='hyperliquid',
+            timeframe='1h',
+            z_score=sig.get('z_score'),
+        )
+        if sid:
+            added += 1
+            set_cooldown(tok, direction='LONG', hours=3)
 
-        # 5-period momentum
-        if closes[4] > 0:
-            momentum = (closes[0] - closes[4]) / closes[4]
-        else:
-            continue
+    return added
 
-        # Distance from SMA
-        dist_sma = abs(close - sma20) / sma20
 
-        # Entry conditions
-        trend_up = close > sma20
-        has_momentum = momentum > 0.005  # >0.5% rise in 5 periods
-        near_sma = dist_sma < 0.005  # within 0.5% of SMA
-
-        if not (trend_up and has_momentum and near_sma):
-            continue
-
-        # Compute confidence based on strength
-        conf = 70  # base
-        if momentum > 0.01:
-            conf += 10  # strong momentum
-        if dist_sma < 0.002:
-            conf += 5  # very close to SMA
-        conf = min(conf, 95)
-
-        # Check for existing signal (avoid duplicates)
-        cur2 = sqlite3.connect(f'{HERMES_DATA}/signals_hermes_runtime.db').cursor()
-        cur2.execute("""
-            SELECT id FROM signals
-            WHERE token = ? AND direction = 'LONG'
-              AND created_at > datetime('now', '-5 minutes')
-              AND decision != 'EXPIRED'
-        """, (tok,))
-        if cur2.fetchone():
-            continue
-        cur2.connection.close()
-
-        signals.append({
-            'token': tok,
-            'direction': 'LONG',
-            'signal_type': 'trend_momentum_near_sma',
-            'confidence': conf,
-            'reason': f'trend_up + momentum({momentum:+.3f}) + near_sma({dist_sma:.4f})',
-            'metadata': {
-                'sma20': sma20,
-                'momentum': momentum,
-                'dist_sma': dist_sma,
-                'close': close,
-            }
-        })
-
-    conn.close()
-    return signals
+def run():
+    return scan_signals()
 
 
 if __name__ == '__main__':
-    signals = run()
-    print(f'Generated {len(signals)} signals')
-    for s in signals:
-        print(f"  {s['token']} {s['direction']} conf={s['confidence']} — {s['reason']}")
+    added = run()
+    print(f'Added {added} signals')

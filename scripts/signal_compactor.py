@@ -256,6 +256,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # continuation — re-entry after profitable close (65% WR in backtest)
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,
+    # trend_momentum_near_sma — uptrend + momentum + near SMA (47.8% WR, +$9.66/14d)
+    ('trend_momentum_near_sma', 'trend_momentum_near_sma+'): 1.0,
     # engulfing: large single-candle momentum moves
     ('engulfing_long',  'engulfing+'):  1.0,
     ('engulfing_short', 'engulfing-'):  1.0,

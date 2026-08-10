@@ -1440,6 +1440,15 @@ CONTINUATION_MINUS_ENABLED = True             # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
 TREND_MOMENTUM_NEAR_SMA_ENABLED = True       # paper testing — buy trend+momentum+near-SMA
+TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED = True  # LONG direction only
+TREND_MOMENTUM_NEAR_SMA_MOMENTUM_THRESHOLD = 0.005  # 0.5% min 5-period momentum
+TREND_MOMENTUM_NEAR_SMA_DIST_SMA_MAX = 0.005        # 0.5% max distance from SMA
+TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD = 20             # SMA lookback
+TREND_MOMENTUM_NEAR_SMA_MOMENTUM_PERIOD = 5         # momentum lookback
+TREND_MOMENTUM_NEAR_SMA_CONF_BASE = 70              # base confidence
+TREND_MOMENTUM_NEAR_SMA_CONF_STRONG_MOM = 10        # +10 if momentum > 1%
+TREND_MOMENTUM_NEAR_SMA_CONF_CLOSE_SMA = 5          # +5 if within 0.2% of SMA
+TREND_MOMENTUM_NEAR_SMA_CONF_CAP = 95               # max confidence
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',
