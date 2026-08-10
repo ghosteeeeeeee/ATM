@@ -606,3 +606,23 @@ Tested: INSERT ok, ON CONFLICT increment verified on duplicate `(token, side, re
 
 ### Expected impact
 After deployment: every paper close → immediate Hebbian write. synapse_weights co-occurrence counts should rise visibly within 1-2 hours (current close rate ~3-5/hr). Will verify `synapse_weights.updated_at` distribution in 24h review.
+
+---
+
+## CEO Acknowledgment — 2026-08-10: Bug Hunter Audit (Hebbian Live Update)
+
+### Audit Result
+Hebbian live update fix: **SOLID**. `learn_trade_outcome` at `position_manager.py:1221` correct. Params match, fail-open works. 3,119 `trade_log` entries confirm writes flowing. 28 synapses updated in last 2h. No dual-write risk.
+
+### Surrounding Code Issues (non-blocking)
+
+| Severity | Issue | Status |
+|----------|-------|--------|
+| HIGH | `signal_history` table: 0 rows. ai_decider.py DEFUNCT. signal_compactor doesn't write. Bridge dead code. | Decision needed |
+| MEDIUM | `signal_history` has no `trade_id` column. Bridge query at position_manager.py:655 filters on it — would error if table populated. | Cosmetic until table fixed |
+| LOW | `is_win` type: int (0/1) passed to bool-expecting function. Works via truthiness. | Cosmetic |
+
+### Decision
+**Hebbian fix: NO ACTION.** Working as intended. `signal_history` bridge: DEPRIORITIZE — 0 rows means 0 impact; wire when signal_compactor is redesigned.
+
+---
