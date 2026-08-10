@@ -1,3 +1,37 @@
+## CEO Report — 2026-08-10 (SHORT Threshold Review)
+
+### Diagnosis
+**Verified DB: 7d SHORT shows NO bleeding from any active signal.** All 7 bleeders are legacy pre-fix (zscore-rising-, vel-hermes-, ma100-cross variants, pattern_wolf, hzscore-+return_exhaustion-) — all DISABLED, last fire Aug 5-8, fully aged out. Active SHORT signals (bb_bounce_short, range_finder_short) have 0 trades in the 7d window that show bleeding.
+
+LONG/SHORT comparison (7d): LONG 241T +$1.80 (55.4% WR) vs SHORT 164T -$1.46 (40.2% WR) — but SHORT bleeding is entirely from dead signals. Active SHORT combos are flat-to-positive.
+
+### Threshold Review
+
+**range_finder_short.py (thresholds relaxed to match range_finder):**
+- RSI_OVERBOUGHT: 55→60, TOUCH_MIN: 4→3, PROXIMITY_PCT: 0.40→0.50, BOUNCE_MIN_PCT: 0.08→0.05
+- **Assessment: RISKY.** These now match the LONG side exactly, removing the SHORT-specific tighter filters. The original tighter thresholds existed for a reason — SHORT entries are inherently riskier (price can spike against you). Matching LONG thresholds = same signal quality, but SHORT has worse R:R on average. **Recommend keeping at least RSI_OVERBOUGHT at 55 and BOUNCE_MIN_PCT at 0.08** — the asymmetry was intentional protection, not a bug.
+
+**Velocity gate (MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.6):**
+- LONG threshold: 0.3, SHORT: 0.6 — asymmetric because price spikes up faster than drops
+- **Assessment: CORRECT.** The 2x asymmetry is reasonable. Price drops are gradual, spikes are fast. A SHORT blocked at 0.6% upward velocity avoids the worst spike-against-position entries. bb_bounce.py, range_finder.py, and range_finder_short.py all correctly use the SHORT-specific threshold. No missed signals.
+
+**Re-enabled signals (TL_BREAK_MINUS, VORTEX_BREAK_MINUS):**
+- TL_BREAK_MINUS: 70T 14d +$0.21 — justified, profitable standalone
+- VORTEX_BREAK_MINUS: 100% WR standalone — very small sample, monitor
+
+### Other SHORT Signals with Asymmetric Thresholds
+- **bb_bounce_short.py**: RSI_OVERBOUGHT=55 (tighter than LONG's 60), BOUNCE_MIN_PCT=0.08 (tighter than LONG's 0.05). Correct — bb_bounce_short has asymmetric R:R and the tighter filters were deliberately added.
+- **return_exhaustion_short.py**: RSI_OVERBOUGHT=60 (same as LONG). No asymmetry needed — return exhaustion works differently.
+- All other SHORT signals (choch, continuation, hzscore) share thresholds with LONG. These are trend/momentum signals where the asymmetry argument doesn't apply.
+
+### Verdict
+The velocity gate asymmetry (0.6 vs 0.3) is correct and well-reasoned. **The range_finder_short threshold relaxation is the concern** — making SHORT filters identical to LONG removes protection that compensated for SHORT's worse R:R. If range_finder_short starts bleeding after these changes, the first fix should be tightening RSI_OVERBOUGHT back to 55 and BOUNCE_MIN_PCT back to 0.08. The 0 trades in 7d from range_finder_short means we have no live data to validate either way — monitor closely.
+
+### Recommendation
+**Do not revert velocity gate** (0.6 SHORT threshold = correct). **Watch range_finder_short** — if it fires 5+ trades with <40% WR, tighten RSI_OVERBOUGHT to 55 and BOUNCE_MIN_PCT to 0.08. No other SHORT signals need threshold adjustments.
+
+---
+
 ## CEO Report — 2026-08-10 (06:00 UTC)
 
 ### Diagnosis
