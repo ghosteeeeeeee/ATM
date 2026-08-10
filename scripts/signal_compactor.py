@@ -628,6 +628,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: accel-300- + ma-cross-5m+ blocked (low WR)")
                     continue
 
+            # ── WEAK COMBO BLOCKS (2026-08-10) ──────────────────────────────────────
+            # CEO directive: limit losses by blocking weak signal combos before entry.
+            # These combos have poor WR or negative PnL in 7d data.
+            has_range_finder = any(p.startswith('range_finder') for p in source_parts)
+            has_range_breakout = any(p.startswith('range_breakout') for p in source_parts)
+            has_continuation_neg = 'continuation-' in source_parts
+            has_rs = any(p.startswith('rs-') for p in source_parts)
+
+            # BLOCK: range_finder+/rs-* — weak RS confirmation with range finder
+            # 24h: range_finder+,rs-s78 LONG -$0.04 (0% WR), range_finder+,rs-s39 -$0.06
+            if has_range_finder and has_rs:
+                log(f"  🛡️  [WEAK-COMBO] {token} {direction}: range_finder++rs-* blocked (weak RS confirmation)")
+                continue
+
+            # BLOCK: range_breakout+/rs-* — breakout with weak RS
+            # 24h: range_breakout+,rs-s52 LONG -$0.10 (0% WR)
+            if has_range_breakout and has_rs:
+                log(f"  🛡️  [WEAK-COMBO] {token} {direction}: range_breakout++rs-* blocked (weak RS confirmation)")
+                continue
+
+            # BLOCK: continuation- standalone — continuation signal alone is weak
+            # Currently open: continuation-,hzscore- SHORT BSV -$0.23
+            if has_continuation_neg and len(source_parts) == 1:
+                log(f"  🛡️  [WEAK-COMBO] {token} {direction}: continuation- standalone blocked (weak standalone)")
+                continue
+
             # ── CONFLUENCE: collapse same-type multi-level sources (e.g. rs-s386,rs-s406) ─
             # Different bars_since values for the SAME signal type are NOT real confluence.
             # They represent the same signal re-firing at different times — fake diversity.
