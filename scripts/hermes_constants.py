@@ -447,8 +447,8 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.012   # 1.2% floor — widened 2026-08-07 (was 0.8%). 48h data: 29/48 SL hits drift >60min — stops too tight for hold time. 0.8% = noise in low-vol tokens.
-ATR_SL_MAX             = 0.025  # 2.5% cap — widened 2026-08-07 (was 2.1%). High-vol tokens (ATR>3%) getting squeezed at 2.1%.
+ATR_SL_MIN             = 0.005   # 0.5% floor — tightened 2026-08-10 (was 1.2%). SL was redundant — cut_loser fires at 0.4% price drop with 5x leverage. SL becomes backup layer.
+ATR_SL_MAX             = 0.010  # 1.0% cap — tightened 2026-08-10 (was 2.5%). Still room for high-vol tokens.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
@@ -463,11 +463,11 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 # CEO 2026-08-05: lowered from 2.0% — trades exit at -1.0% avg, 2.0% floor never reached
-ATR_SL_MIN_INIT    = 0.012  # 1.2% — widened 2026-08-08 (was 1.0%). 22/22 SL hits at exactly 1.0% — too tight for low-vol tokens. Now matches ATR_SL_MIN.
-ATR_SL_MAX_INIT    = 0.025  # 2.5% — initial SL cap
-SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN_INIT)
-TP_PCT_FALLBACK    = 0.024  # 2.4% fallback target (2:1 R:R with 1.2% SL)
-STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN_INIT)
+ATR_SL_MIN_INIT    = 0.005  # 0.5% — tightened 2026-08-10 (was 1.2%). Matches ATR_SL_MIN. SL redundant with cut_loser.
+ATR_SL_MAX_INIT    = 0.010  # 1.0% — initial SL cap (was 2.5%)
+SL_PCT_FALLBACK    = 0.005  # 0.5% if ATR unavailable (matched to ATR_SL_MIN)
+TP_PCT_FALLBACK    = 0.010  # 1.0% fallback target (2:1 R:R with 0.5% SL)
+STOP_LOSS_DEFAULT  = 0.005  # 0.5% hard fallback (matched to ATR_SL_MIN)
 SL_PCT_MIN        = 0.005  # 0.5% minimum SL for any trade (hard floor)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
