@@ -576,7 +576,7 @@ INVERSE_ACCEL_300_CAUTION_PHASES = set()  # all phases allowed
 # Only fires when signal has passed ALL other filters (dead-hours, phase, position).
 CONTEXT_GATE_ENABLED = True          # master switch
 CONTEXT_GATE_LLM_ENABLED = True      # LLM fallback (rule-based always runs first)
-CONTEXT_GATE_LLM_MODEL = 'minimax/MiniMax-M3'  # model for context gate LLM calls
+CONTEXT_GATE_LLM_MODEL = 'opencode-go/mimo-v2.5'  # model for context gate LLM calls (switched from minimax/MiniMax-M3 2026-08-10)
 CONTEXT_GATE_SPEED_MIN = 20          # below this → SKIP (no wave)
 CONTEXT_GATE_Z_COUNTER_TREND = 1.5   # z-score contradicting signal + low speed → SKIP
 CONTEXT_GATE_Z_RANGING = 0.5         # |z| below this = ranging

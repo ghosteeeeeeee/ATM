@@ -1,18 +1,15 @@
 # Signal Performance Report
-**Generated:** 2026-08-10 13:48 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-10 19:48 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 697 | **WR:** 45.5% | **PnL:** -7.56%
+- **Total trades (all time):** 720 | **WR:** 45.0% | **PnL:** -10.82%
 - **Date range:** 2026-07-29 → 2026-08-10
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb_bounce+,hzscore+ | LONG | 3 | 66.7% | +0.12 | 16 | 68.8% | +5.90 | ENABLED |
-| hzscore+,range_finder+ | LONG | — | —% | — | 5 | 80.0% | +0.77 | ENABLED |
+None found.
 
 ---
 
@@ -26,8 +23,10 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| bb-bounce-short,hzscore- | SHORT | 6 | 33.3% | -0.72 | ENABLED | Borderline |
-| continuation+,hzscore+ | LONG | 3 | 33.3% | +1.67 | ENABLED | Needs more data |
+| hzscore+,range_finder+ | LONG | 3 | 33.3% | -1.29 | ENABLED | Needs more data |
+| hl_copy_trader,range_breakout- | SHORT | 2 | 50.0% | -0.20 | ❓ | Needs more data |
+| range_breakout-,vortex_break_short | SHORT | 2 | 50.0% | +0.12 | ENABLED | Needs more data |
+| hzscore-,vortex_break_short | SHORT | 2 | 50.0% | +0.74 | ENABLED | Needs more data |
 
 ---
 
@@ -45,9 +44,10 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] bb-bounce-short,hzscore- SHORT** — WR=33.3%, PnL=-0.72% over 6 trades. Monitor next cycle.
-2. **[WATCH] continuation+,hzscore+ LONG** — WR=33.3%, PnL=+1.67% over 3 trades. Monitor next cycle.
-3. **[KEEP] 2 winning combos** — bb_bounce+,hzscore+, hzscore+,range_finde. LONG side dominant.
+1. **[WATCH] hzscore+,range_finder+ LONG** — WR=33.3%, PnL=-1.29% over 3 trades. Monitor next cycle.
+2. **[WATCH] hl_copy_trader,range_breakout- SHORT** — WR=50.0%, PnL=-0.20% over 2 trades. Monitor next cycle.
+3. **[WATCH] range_breakout-,vortex_break_short SHORT** — WR=50.0%, PnL=+0.12% over 2 trades. Monitor next cycle.
+4. **[WATCH] hzscore-,vortex_break_short SHORT** — WR=50.0%, PnL=+0.74% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -59,15 +59,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-08-10 | d2c8eea | blacklist: add AXS, LINK, CELO to LONG_BLACKLIST |
+| 2026-08-10 | 4d961b4 | CEO: revert Aug 10 SL tightening + widen trailing + cut_lose... |
+| 2026-08-10 | 32d1a03 | CEO: disable vortex_break_short |
+| 2026-08-10 | 36e4cd0 | trading: tighten SL from 1.2% to 0.5% to match cut_loser thr... |
+| 2026-08-10 | 5b4876a | auto_1hr: kill range_finder+ — 20T -$0.44 (24h), 0% WR today... |
+| 2026-08-10 | 9dfb9e7 | signals: tune fast_momentum params and enable both direction... |
+| 2026-08-10 | 3f2effe | trading: tighten TRAILING_DISTANCE_PCT from 0.7% to 0.3% |
+| 2026-08-10 | fad8948 | CEO: Option A — 15m trend filter for SHORT (was 1h, too rest... |
 | 2026-08-10 | 3a0fb69 | Daily trading system update (2026-08-10) |
 | 2026-08-10 | 5a2429c | signals: relax SHORT thresholds to balance LONG/SHORT flow |
-| 2026-08-10 | dbea2fa | signals: re-enable TL_BREAK and VORTEX_BREAK SHORT signals |
-| 2026-08-10 | c4572eb | memory: bug_hunter audit of Hebbian fix + CEO acknowledgment |
-| 2026-08-09 | 60df870 | config: tune range_breakout params — retest 0.3→0.2, BB peri... |
-| 2026-08-09 | b078c58 | CEO 2026-08-09 21:50 review: NO CHANGES - 8th green day, 24h... |
-| 2026-08-09 | 33b6670 | signals: add VEL 15m velocity gate to mean-reversion signals |
-| 2026-08-09 | 28c6aee | signals: add range_breakout — breakout from tight ranges wit... |
-| 2026-08-09 | 14c3b27 | signals: widen profit-monster trail — PM_TRAIL_ACTIVATE 0.25... |
-| 2026-08-09 | a95ea3c | config: lower momentum_leaderboard MOVE_MIN 3.0%→1.0% (was t... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
