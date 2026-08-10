@@ -1053,7 +1053,8 @@ RANGE_BREAKOUT_RSI_SHORT_MIN = 30    # Skip SHORT if RSI below this (overextende
 
 # Mean-reversion velocity gate — block entries when price still trending against signal
 MEAN_REVERSION_VEL_ENABLED = True
-MEAN_REVERSION_VEL_THRESHOLD = 0.3   # block if 15m velocity > 0.3% against direction
+MEAN_REVERSION_VEL_THRESHOLD = 0.3   # block LONG if 15m velocity < -0.3% (price falling against LONG)
+MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.6  # block SHORT if 15m velocity > 0.6% (price spiking against SHORT — higher threshold because spikes reverse faster)
 
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period

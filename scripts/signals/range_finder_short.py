@@ -36,11 +36,11 @@ BB_WIDTH_MAX = 0.04          # Max band width % to consider range-bound
 BB_SLOPE_MAX = 0.001         # Max BB middle slope per candle
 LOOKBACK = 100               # 5m candles to analyze
 RSI_PERIOD = 14
-RSI_OVERBOUGHT = 55          # TIGHTER: was 60
-TOUCH_MIN = 4                # TIGHTER: was 3 — confirm range with more touches
+RSI_OVERBOUGHT = 60          # match range_finder (was 55 — too strict, killed SHORT flow)
+TOUCH_MIN = 3                # match range_finder (was 4 — too many touches, filtered real ranges)
 TOUCH_WINDOW = 50
-PROXIMITY_PCT = 0.40         # TIGHTER: was 0.50 — must be closer to upper band
-BOUNCE_MIN_PCT = 0.08        # TIGHTER: was 0.05
+PROXIMITY_PCT = 0.50         # match range_finder (was 0.40 — too tight)
+BOUNCE_MIN_PCT = 0.05        # match range_finder (was 0.08 — too strict)
 MIN_VOLUME_RATIO = 1.0       # ponytail: was 1.2x, relaxed — low-volume NEUTRAL market makes 1.2x unachievable. Restore to 1.2x if volume returns.
 BLOCKED_HOURS = []  # ponytail: was [0-7] (Asian session), removed — data shows Asian session has BETTER WR (43.6% vs 35.1%) and less negative PnL for SHORTs. Add back only if live data proves otherwise.
 
@@ -378,11 +378,11 @@ def scan_range_short_signals(prices_dict):
             continue
 
         # Velocity gate: skip if price still trending against signal (SHORT only)
-        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD_SHORT
         if MEAN_REVERSION_VEL_ENABLED:
             vel = _get_15m_velocity(token)
-            if vel is not None and vel > MEAN_REVERSION_VEL_THRESHOLD:
-                _log(f"{token} SHORT BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD}%)")
+            if vel is not None and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
+                _log(f"{token} SHORT BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD_SHORT}%)")
                 continue
 
         sid = add_signal(

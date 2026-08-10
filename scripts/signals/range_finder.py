@@ -318,15 +318,15 @@ def scan_range_signals(prices_dict: dict) -> tuple:
             continue
 
         # Velocity gate: skip if price still trending against signal
-        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD, MEAN_REVERSION_VEL_THRESHOLD_SHORT
         if MEAN_REVERSION_VEL_ENABLED:
             vel = _get_15m_velocity(token)
             if vel is not None:
                 if sig['direction'] == 'LONG' and vel < -MEAN_REVERSION_VEL_THRESHOLD:
                     _log(f'{token} {sig["direction"]} BLOCKED vel={vel:+.3f}% (threshold -{MEAN_REVERSION_VEL_THRESHOLD}%)')
                     continue
-                if sig['direction'] == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD:
-                    _log(f'{token} {sig["direction"]} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD}%)')
+                if sig['direction'] == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
+                    _log(f'{token} {sig["direction"]} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD_SHORT}%)')
                     continue
 
         sid = add_signal(

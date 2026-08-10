@@ -287,15 +287,15 @@ def scan_bb_bounce_signals(prices_dict):
             continue
 
         # Velocity gate: skip if price still trending against signal
-        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD
+        from hermes_constants import MEAN_REVERSION_VEL_ENABLED, MEAN_REVERSION_VEL_THRESHOLD, MEAN_REVERSION_VEL_THRESHOLD_SHORT
         if MEAN_REVERSION_VEL_ENABLED:
             vel = _get_15m_velocity(token)
             if vel is not None:
                 if direction == 'LONG' and vel < -MEAN_REVERSION_VEL_THRESHOLD:
                     _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold -{MEAN_REVERSION_VEL_THRESHOLD}%)")
                     continue
-                if direction == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD:
-                    _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD}%)")
+                if direction == 'SHORT' and vel > MEAN_REVERSION_VEL_THRESHOLD_SHORT:
+                    _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD_SHORT}%)")
                     continue
 
         # Confidence based on quality indicators
