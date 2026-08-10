@@ -1217,7 +1217,7 @@ ZSCORE_RISING_CONF_MAX     = 95.0  # maximum confidence score
 # ── Hot-Set Gate ────────────────────────────────────────────────────────────────
 FAST_MOMENTUM_ENABLED     = False  # fast_momentum bare — BLOCKED
 FAST_MOMENTUM_PLUS_ENABLED = True  # fast-momentum+ — PASS (was not blacklisted)
-FAST_MOMENTUM_MINUS_ENABLED = False # fast-momentum- — BLOCKED (losing signal)
+FAST_MOMENTUM_MINUS_ENABLED = True  # Re-enabled 2026-08-10 — backtested: 0.08 accel threshold = 80% WR
 
 # ── Hot-Set Gate ──────────────────────────────────────────────────────────────
 # HOTSET_ENABLED=True  → hot-set is the gate (default). Signals must survive

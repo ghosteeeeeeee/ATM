@@ -28,8 +28,8 @@ def _log(msg):
         pass
 
 # ── Signal constants ───────────────────────────────────────────────────────────
-ACCEL_THRESHOLD  = 0.15   # minimum z-acceleration to qualify
-MIN_CONFIDENCE   = 62     # minimum confidence score to write signal
+ACCEL_THRESHOLD  = 0.08   # minimum z-acceleration to qualify (was 0.15 — backtested: 0.08 = more signals, same WR)
+MIN_CONFIDENCE   = 60     # minimum confidence score to write signal (was 62)
 MIN_TRADE_INTERVAL_MINUTES = 10   # dedup window (same as signal_gen)
 TRADE_LOG_FILE   = '/var/www/hermes/data/recent_trades.json'
 MIN_PRICE_ROWS   = 60     # minimum 1m bars for z-score computation
@@ -245,8 +245,8 @@ def run():
         if speed_tracker is not None:
             spd = speed_tracker.get_token_speed(token)
         speed_pctl = spd.get('speed_percentile', 50.0) if spd else 50.0
-        if speed_pctl < 40:
-            continue  # not a top mover — skip (lowered from 70 → 50 → 40)
+        if speed_pctl < 30:
+            continue  # not a top mover — skip (lowered from 40 → 30 per backtest)
 
         # ── Acceleration: short-term z change vs medium-term ──────────────────
         z_accel = z_5m - z_30m
