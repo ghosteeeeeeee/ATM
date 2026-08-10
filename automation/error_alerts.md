@@ -9,3 +9,6 @@
 ## Error Alerts — 2026-08-10 02:40 UTC
 - **WARN** (Nx2): `ERR decider_run: Traceback at decider_run.py:2881` — non-fatal, pipeline continues after error
 - **AUTO-FIX**: None needed — pipeline self-recovered. Consider removing defunct decider_run call from run_pipeline.py.
+
+## Error Alerts — 2026-08-10 04:08 UTC
+- **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`

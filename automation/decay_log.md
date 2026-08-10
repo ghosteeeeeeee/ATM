@@ -283,3 +283,12 @@
 [2026-08-09 21:49 UTC]   🟢 hzscore+,range_finder+: 5 trades, 80.0% WR, PnL=0.24
 [2026-08-09 21:49 UTC]   🟢 continuation+,hzscore+: 3 trades, 100.0% WR, PnL=0.73
 [2026-08-09 21:49 UTC] Done. Disabled 0 signals.
+[2026-08-10 03:49 UTC] === Signal Decay Detector ===
+[2026-08-10 03:49 UTC]   🟢 bb-bounce-short,hl_copy_trader: 3 trades, 33.3% WR, PnL=0.04
+[2026-08-10 03:49 UTC]   🟢 bb-bounce-short,hzscore-: 11 trades, 54.5% WR, PnL=0.84
+[2026-08-10 03:49 UTC]   🟢 bb_bounce+,range_finder+: 19 trades, 63.2% WR, PnL=1.74
+[2026-08-10 03:49 UTC]   🟢 continuation+,hzscore+: 4 trades, 75.0% WR, PnL=0.37
+[2026-08-10 03:49 UTC]   🟢 hzscore+,mover+: 4 trades, 75.0% WR, PnL=0.53
+[2026-08-10 03:49 UTC]   🟢 hzscore+,range_finder+: 5 trades, 80.0% WR, PnL=0.23
+[2026-08-10 03:49 UTC]   🟢 bb_bounce+,hzscore+: 11 trades, 81.8% WR, PnL=6.2
+[2026-08-10 03:49 UTC] Done. Disabled 0 signals.

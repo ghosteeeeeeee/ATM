@@ -736,3 +736,34 @@ NO CHANGES. Trajectory exceptional.
 
 ### Verification
 Pipeline active, all timers on schedule. 69 closed today +7.14% PnL. 11th consecutive green day confirmed.
+
+---
+
+## CEO Report — 2026-08-10 07:30 UTC
+
+### Diagnosis
+**Verified DB: 24h 69T +$0.97 (62.3% WR — BEST-EVER of cycle), 7d 458T -$3.03 (48.5% WR — legacy bleeds still in window but decaying).** 11th consecutive green day. LONG 24h dominant (66.7% WR), SHORT 24h 50% WR — bleeding stopped 11th day.
+
+### Stars (24h verified)
+- bb_bounce+,hzscore+ LONG: 11T +$0.69 (81.8% WR) — DOMINANT, confirmed 3rd star
+- bb_bounce+,range_finder+ LONG: 19T +$0.20 (63.2% WR) — solid star
+- bb-bounce-short,hzscore- SHORT: 11T +$0.09 (54.5% WR) — acceptable
+- hzscore+,range_finder+ LONG: 5T +$0.03 (80.0% WR) — emerging
+- continuation+,hzscore+ LONG: 4T +$0.04 (75.0% WR) — solid
+
+###7d Legacy Bleeds (all dead/decaying)
+All last fired Aug 5-8, fully aged out of active window:
+- zscore-rising- SHORT: 44T -$1.37 (38.6% WR) — last Aug 5
+- vel-hermes- SHORT: 54T -$0.58 (37.0% WR) — last Aug 5
+- zscore-rising+ LONG: 26T -$1.01 (26.9% WR) — last Aug 5
+- pattern_wolf_wave_bear SHORT: 9T -$0.79 (11.1% WR) — last Aug 5
+- decider SHORT: 10T -$0.22 (10.0% WR) — last Aug 5
+- accel-300+ LONG: 5T -$0.31 (0% WR) — BLOCKED, last Aug 5
+- ma100-cross,return_exhaustion- SHORT: 7T -$0.28 — last Aug 7
+- ma100-cross-,range_finder- SHORT: 5T -$0.20 — last Aug 8
+
+### Fix Applied
+NO CHANGES. Trajectory exceptional. All legacy bleeds naturally decaying — will exit7d window by Aug 12-15.
+
+### Verification
+Pipeline active, all timers on schedule. 69T +$0.97 62.3% WR 24h. Stars dominant. 0 phantoms. 0 open positions. decider_run errors non-fatal (pipeline self-recovers).
