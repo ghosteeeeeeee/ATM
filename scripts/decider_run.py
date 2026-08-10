@@ -1042,16 +1042,21 @@ def _load_gate_stats():
 
 def _save_gate_stats(stats):
     import tempfile
+    fd, tmp = None, None
     try:
-        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(_GATE_STATS_FILE), suffix='.tmp')
+        fd, tmp = tempfile.mkstemp(dir='/root/.hermes/data', suffix='.tmp')
         with os.fdopen(fd, 'w') as f:
+            fd = None  # fdopen takes ownership
             json.dump(stats, f, indent=2)
         os.replace(tmp, _GATE_STATS_FILE)
+        tmp = None  # replace succeeded, nothing to clean up
     except Exception:
-        try:
-            os.unlink(tmp)
-        except Exception:
-            pass
+        if fd is not None:
+            try: os.close(fd)
+            except Exception: pass
+        if tmp is not None:
+            try: os.unlink(tmp)
+            except Exception: pass
 
 def _log_auto_decision(token, signal, direction, decision, wr_est, n, conf_adj):
     """Log auto-decision for audit trail."""

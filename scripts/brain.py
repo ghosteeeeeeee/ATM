@@ -901,11 +901,17 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
                 fd, tmp = _tf.mkstemp(dir='/root/.hermes/data', suffix='.tmp')
                 try:
                     with os.fdopen(fd, 'w') as f:
+                        fd = None  # fdopen takes ownership
                         _json.dump(stats, f, indent=2)
                     os.replace(tmp, stats_file)
+                    tmp = None  # replace succeeded
                 except Exception:
-                    try: os.unlink(tmp)
-                    except Exception: pass
+                    if fd is not None:
+                        try: os.close(fd)
+                        except Exception: pass
+                    if tmp is not None:
+                        try: os.unlink(tmp)
+                        except Exception: pass
             except Exception:
                 pass
         except Exception as _heb_err:
