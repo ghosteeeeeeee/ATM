@@ -5012,3 +5012,38 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - System on 12th+ consecutive green day
 
 **Open Questions:** None — system healthy
+
+## [2026-08-10 15:27] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W, 2L) | 61 closed in 24h (+$0.31, 54.1% WR)
+**Open:** BSV SHORT +$0.13, CELO LONG $0.00, WLFI LONG $0.00
+
+**Last hour PnL:** -$0.10 (DYDX +$0.03, JUP -$0.06, PROVE -$0.13)
+
+**24h by close reason:**
+- profit-monster-trail: 32T +$1.63 (avg +$0.051) — dominant winner
+- atr_sl_hit: 17T -$0.86 (27.9% — healthy)
+- cut-loser-CL-trail: 11T -$0.50 (risk management working)
+- profit-monster-T1: 1T +$0.04
+
+**Signal performance (24h):**
+- bb_bounce+,hzscore+: 17T +$0.40 (64.7% WR) — STAR
+- bb_bounce+,range_finder+: 12T -$0.10 (50% WR) — 24h flat, long-term star
+- continuation+,hzscore+: 4T +$0.14 (25% WR, 1 big winner +$0.25)
+- bb-bounce-short,hzscore-: 4T -$0.04 (50% WR) — flat
+
+**Diagnosis:**
+1. Entry quality: JUP -$0.06 and PROVE -$0.13 both atr_sl_hit — normal variance
+2. SL behavior: 27.9% — healthy (well below 40%)
+3. Signal quality: No bleeding signals. continuation+ low WR but positive PnL
+4. Trade frequency: ~2.5/hr — normal
+5. Rolling: 4d +$0.75 (52.7%), 7d +$0.30 (49.9%)
+
+**Changes:** None
+**No Change Needed:**
+- atr_sl_hit rate: 27.9% (healthy)
+- Trade frequency: 2.5/hr (normal)
+- No 0% WR signals with 3+ trades
+- System on 14th+ consecutive green day
+
+**Open Questions:** None — system healthy
