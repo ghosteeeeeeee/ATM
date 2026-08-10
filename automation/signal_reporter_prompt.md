@@ -2,6 +2,8 @@
 
 You are analyzing signal performance for the Hermes trading system. Run every 6 hours. **Act on findings, don't just report.**
 
+**IMPORTANT: Do NOT query OpenMemory during this task. The OpenMemory queries are failing with tenant_mismatch errors and causing timeouts. Skip all OpenMemory calls entirely.**
+
 ## Step 1: Verify Numbers (MANDATORY)
 
 **Never trust old reports. Query the DB yourself.**

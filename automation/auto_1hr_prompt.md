@@ -2,6 +2,8 @@
 
 You are analyzing Hermes trades and **making fixes** every hour. Be concise, data-driven, and actionable.
 
+**IMPORTANT: Do NOT query OpenMemory during this task. The OpenMemory queries are failing with tenant_mismatch errors and causing timeouts. Skip all OpenMemory calls entirely.**
+
 ## Step 1: Read Context
 
 ```bash

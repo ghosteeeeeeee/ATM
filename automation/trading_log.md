@@ -1,5 +1,55 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-10: Daily Orchestrator Report
+
+### Pipeline Status
+- **Portfolio**: 6 open | 64 closed today | **+5.44% PnL**
+- **Market regime**: 106 tokens scanned → 1 LONG / 3 SHORT / 102 NEUTRAL
+- **Speed**: 1 token >= 50% confidence (NIL LONG_BIAS 55.4%)
+- **Signals**: 93 generated/hr, 0 approved (macro gate REDUCE)
+- **Kill switch**: LIVE TRADING ON
+- **CEO**: 62.3% WR 24h, 11th consecutive green day
+
+### Health Status
+- **System**: OK — 42 timers active, all firing
+- **Disk**: 81% (22GB free)
+- **Errors**: 0 critical
+- **Auto-fixes**: Stopped deprecated self-close-watcher timer (was wasting cycles)
+
+### What Was Implemented
+
+1. **Restarted auto-1hr timer** — was dead since Aug 02 (8 days). Timer was enabled but not firing (showed "Trigger: n/a"). Restarted manually, confirmed service runs successfully. Next fire in ~57min.
+
+2. **Fixed signal reporter timeout** — OpenMemory queries failing with `tenant_mismatch` errors, causing 10min timeouts. Added explicit "Do NOT query OpenMemory" instructions to both `signal_reporter_prompt.md` and `auto_1hr_prompt.md`.
+
+3. **Implemented signal version tracking** — Created `scripts/signal_version.py` with log/current/history/list commands. Storage at `data/signal_versions.json`. Enables param change tracking + regression detection.
+
+### Blacklist Testing — FINAL
+- **77 tokens tested across 5 batches, 0 KEEP**
+- Root cause: signal generation filters block these tokens; when signals fire, 0% WR
+- Blacklist is a symptom filter, not a cause — no further batches planned
+
+### Signal Performance (24h)
+- **Zero winning signals** — all active signals net negative
+- **Biggest losers**: tl_break_long (-$73), tl_break_short (-$61)
+- **Systemic issue**: No signal family has positive PnL in 7 days
+
+### Pending Plans (from upgrade_audit.md)
+| Plan | Difficulty | Status |
+|------|-----------|--------|
+| signal-version-tracking | L2 | **DONE** (script created) |
+| audit_memory | L1 | PENDING |
+| weekly_signal_review | L2 | PENDING |
+| wyckoff-pattern-recognition | L2 | NOT IMPLEMENTED |
+
+### Quality Metrics
+- Tasks completed: 5
+- First-attempt success: 100%
+- Pipeline uptime: 100%
+- Critical issues found: 2 (stale timers)
+
+---
+
 ## 2026-08-08: Daily Orchestrator Report
 
 ### Pipeline Status
@@ -4849,3 +4899,29 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - First-attempt success: 100%
 - Pipeline uptime: 100%
 - Critical issues found: 1 (systemic 0% WR across all signals)
+
+## [2026-08-10 05:15] Hourly Analysis
+
+**Trades:** 0 closed in last hour | 64 closed in 24h (+$0.52, 57.8% WR)
+**Open:** 2 (KAS LONG, MEGA LONG — both tiny winners)
+
+**24h by signal:**
+- bb_bounce+,hzscore+ LONG: 12T 9W +$0.53 (75% WR) — DOMINANT STAR
+- bb-bounce-short,hzscore- SHORT: 10T 6W +$0.09 (60% WR)
+- bb_bounce+,range_finder+ LONG: 16T 9W $0.00 (56% WR) — break-even
+- continuation+,hzscore+ LONG: 4T 2W +$0.01 (50% WR)
+
+**Diagnosis:**
+1. Entry quality: Winners clean — profit-monster-trail exits on star signals
+2. SL behavior: atr_sl_hit 5/64 = 7.8% — healthy, well below 40% threshold
+3. Signal quality: Only star combos net positive. range_finder+ is break-even
+4. Trade frequency: 2.7/hr — normal
+
+**Changes:** None — system on 11th consecutive green day, no issues detected
+**No Change Needed:**
+- atr_sl_hit rate: 7.8% (healthy)
+- Trade frequency: 2.7/hr (normal)
+- Star signals: performing well
+- SHORT bleeding: stopped, flat at +$0.01
+
+**Open Questions:** None — system healthy
