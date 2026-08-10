@@ -1316,7 +1316,7 @@ INVERT_SIGNALS = [
 # Block signals that don't align with 1H EMA trend direction.
 # Backtest: 275 trades → 74 trades, PnL -$4.05 → +$3.28
 TREND_FILTER_ENABLED = True
-TREND_FILTER_TIMEFRAME = '1h'
+TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
 TREND_FILTER_NEUTRAL_PCT = 0.3868 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)

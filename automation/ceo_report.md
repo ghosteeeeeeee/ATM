@@ -1,3 +1,43 @@
+## CEO Report — 2026-08-10 (Decision: 15m Trend Filter for SHORT)
+
+### Verified Numbers (DB)
+- 24h: 65T +$0.76 (55.4% WR) — SHORT breakeven: 14T -$0.01 (50% WR)
+- 7d: 472T -$1.77 (49.8% WR) — SHORT 228T -$3.50 (43.4% WR) ← PRIMARY PROBLEM
+- LONG 7d: 244T +$1.73 (55.7% WR) — healthy
+- SHORT 7d: 228T -$3.50 (43.4% WR) — bleeding
+
+### Diagnosis
+SHORT is the clear system weak spot: -$3.50 on 228 trades at 43.4% WR over 7 days, vs LONG +$1.73 on 244 trades at 55.7% WR. The 1H BULLISH trend filter is the #1 SHORT bottleneck — 100% of blocked signals blocked by 1H BULLISH. Meanwhile mean-reversion SHORT signals (bb_bounce SHORT, range_finder SHORT) are designed to fire when overbought, often during 1H BULLISH pullbacks — the exact entries the 1H filter blocks.
+
+### Decision
+**APPROVE Option A** — Replace 1H with 15m trend filter.
+
+`TREND_FILTER_TIMEFRAME = '1h'` → `TREND_FILTER_TIMEFRAME = '15m'` in `scripts/hermes_constants.py` line 1319.
+
+Rationale:
+1. 38% more SHORT signals would be allowed (12/32 from plan's Test 1)
+2. 62% still blocked by 15m BULLISH — conservative enough
+3. 15m pullback during 1H BULLISH = ideal mean-reversion entry (shorting overbought that hasn't yet violated larger trend)
+4. Single constant change — instant revert if SHORT WR drops below 40%
+5. SHORT 24h already breakeven at 50% WR — more signals at similar quality = opportunity
+
+**Keep 5m+15m dual-BULLISH confirmation (signal_schema.py:638-642).** Removing it would eliminate a useful second layer. With 15m as the primary filter, 5m confirmation still adds value for short-term confirmation. Redundancy is fine when both filters serve the same purpose.
+
+### Guardrails
+Monitor SHORT WR every 24h. If SHORT WR drops below 40% for 5+ trades, revert to 1H filter. If SHORT WR >= 43% at 20+ new trades, consider removing the 5m+15m dual layer.
+
+### Fix Applied
+- Changed `TREND_FILTER_TIMEFRAME = '15m'` in `scripts/hermes_constants.py`
+
+### Expected Impact
+| Metric | Before | After (expected) |
+|--------|--------|------------------|
+| SHORT signals/24h | ~1-2 | ~2-4 |
+| SHORT WR 7d | 43.4% | >44% |
+| SHORT PnL 7d | -$3.50 | Improving toward breakeven |
+
+---
+
 ## CEO Report — 2026-08-10 (Review #4 — 12th green day)
 
 ### Diagnosis

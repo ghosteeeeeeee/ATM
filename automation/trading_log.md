@@ -50,6 +50,26 @@
 
 ---
 
+## 2026-08-10 07:00 Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** -$0.01 (WR: 66.7%)
+
+**24h Summary:** 60 trades, +$0.40, 56.7% WR
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit = 21.6% of closes (under 40% threshold — no TPSL fix alert needed)
+- No signal hit kill threshold (0% WR with 3+ trades in last hour)
+- Net positive system, balanced trade frequency (60/24h = 2.5/hr)
+- Hourly losses 01:00-06:00 are low-volume noise, not a regime issue
+
+**Open Questions:**
+- range_finder+ signals net -$0.29 (8 losers vs 3 winners) — monitor next hour; if persists, may need param adjustment (not kill — it's a confluence signal)
+
+---
+
 ## 2026-08-08: Daily Orchestrator Report
 
 ### Pipeline Status
