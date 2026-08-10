@@ -447,8 +447,8 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.005   # 0.5% floor — tightened 2026-08-10 (was 1.2%). SL was redundant — cut_loser fires at 0.4% price drop with 5x leverage. SL becomes backup layer.
-ATR_SL_MAX             = 0.010  # 1.0% cap — tightened 2026-08-10 (was 2.5%). Still room for high-vol tokens.
+ATR_SL_MIN             = 0.012   # 1.2% floor — reverted 2026-08-10 CEO review (was 0.5%, too tight, killed trades at 0.05% avg PnL)
+ATR_SL_MAX             = 0.025  # 2.5% cap — reverted 2026-08-10 CEO review (was 1.0%, high-vol tokens need room)
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
@@ -458,23 +458,23 @@ ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
 ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
 # Was 0.5% — too wide, prevented trailing from locking in profits
-# Lower than TRAILING_DISTANCE_PCT (0.40%) so trailing takes over
+# Lower than TRAILING_DISTANCE_PCT (0.60%) so trailing takes over
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 # CEO 2026-08-05: lowered from 2.0% — trades exit at -1.0% avg, 2.0% floor never reached
-ATR_SL_MIN_INIT    = 0.005  # 0.5% — tightened 2026-08-10 (was 1.2%). Matches ATR_SL_MIN. SL redundant with cut_loser.
-ATR_SL_MAX_INIT    = 0.010  # 1.0% — initial SL cap (was 2.5%)
-SL_PCT_FALLBACK    = 0.005  # 0.5% if ATR unavailable (matched to ATR_SL_MIN)
-TP_PCT_FALLBACK    = 0.010  # 1.0% fallback target (2:1 R:R with 0.5% SL)
-STOP_LOSS_DEFAULT  = 0.005  # 0.5% hard fallback (matched to ATR_SL_MIN)
-SL_PCT_MIN        = 0.005  # 0.5% minimum SL for any trade (hard floor)
+ATR_SL_MIN_INIT    = 0.012  # 1.2% — reverted 2026-08-10 CEO review. MUST match ATR_SL_MIN (tpsl_utils.py:465 uses this for new trade breathing room)
+ATR_SL_MAX_INIT    = 0.025  # 2.5% — reverted 2026-08-10 CEO review. MUST match ATR_SL_MAX
+SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN)
+TP_PCT_FALLBACK    = 0.024  # 2.4% fallback target (2:1 R:R with 1.2% SL)
+STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN)
+SL_PCT_MIN        = 0.012  # 1.2% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
 TRAILING_ACTIVATION_PCT = 0.0030  # 0.30% — CEO tightened to lock profits faster (was 0.35%)
-TRAILING_DISTANCE_PCT   = 0.0030  # 0.30% — CEO tightened (was 0.70%)
+TRAILING_DISTANCE_PCT   = 0.0060  # 0.60% — widened 2026-08-10 CEO review (was 0.30%, trades locked in micro-profits then clipped on pullback)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
@@ -748,7 +748,7 @@ CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
 
 # Trailing Loss — mirror of PM_TRAIL (inverted logic)
 CL_TRAIL_ENABLED        = True
-CL_TRAIL_ACTIVATE_PCT   = -0.5   # start tracking at -0.5% loss (widened from -0.3%)
+CL_TRAIL_ACTIVATE_PCT   = -1.0   # -1.0% — widened 2026-08-10 CEO review (was -0.5%, firing on normal pullbacks)
 CL_TRAIL_RECOVER_PCT    = 0.15   # cut if recovers 0.15% from worst then drops back
 CL_TRAIL_MIN_HOLD       = 2      # minimum minutes before trailing activates
 CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
