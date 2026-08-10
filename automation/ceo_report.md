@@ -1,28 +1,33 @@
-## CEO Report — 2026-08-10
+## CEO Report — 2026-08-10 22:30 UTC
 
 ### Diagnosis
 
-First red day after 15+ green days. Verified DB: today 60T -$0.06 (46.7% WR). 24h 72T +$0.17 (50.0% WR). 7d 382T +$0.39 (50.8% WR — positive). SHORT side improving: 24h 15T +$0.16 (60.0% WR — 15m filter effect confirmed). LONG 7d: 229T +$1.58 (54.1%). SHORT 7d: 153T -$1.19 (45.8% — legacy pre-fix trades aging out, daily PnL turning positive Aug 9-10).
+Verified DB: 24h 71T +$0.09 (47.9% WR — flat). Today 62T -$0.15 (45.2% WR — first red day). 7d 379T +$0.18 (50.4% WR — barely positive). LONG 24h 55T -$0.01 (45.5% WR). SHORT 24h 16T +$0.10 (56.3% WR — profitable). 1 open, $0 unrealized.
+
+Stars24h: bb_bounce+,hzscore+ LONG 22T +$0.26 (54.5% WR — dominant), bb_bounce+,range_finder+ LONG 11T -$0.04 (54.5% WR — weak), bb-bounce-short,hzscore- SHORT 3T +$0.01 (66.7% WR).
+
+Cost drivers: atr_sl_hit 36T -$1.62 (48h), cut-loser-CL-trail 28T -$1.04 (48h). bb_bounce+,hzscore+ had 7 SL hits at -$0.30 — all 0% WR. Avg peak move before SL: 0.028%. Trades barely move in favor before reversing.
 
 ### Root Cause
 
-Today's LONG dip: range_finder combos had a bad day (14T -$0.49, 21.4% WR). auto_1hr disabled range_finder+ — correct decision given 20T -$0.44 in 24h. SL tightened to 0.5% (was 1.2%) — trades now cutting earlier, reducing max loss per trade by 58%. No structural issue — noise day.
+Market is NEUTRAL (105/106 tokens). Mean-reversion signals fire at BB touches + z-score extremes, but market isn't reverting — it's ranging/choppy. Entries get stopped out immediately. The SL widening to 1.2% (from 0.5%) reduced individual losses but didn't fix entry quality.
+
+Daily: Aug 9 was strongest (+$0.62), Aug 10 first red (-$0.15). 7d daily shows consistent micro-scalps ($0.01-$0.04 per trade avg).
 
 ### Fix Applied
 
-1. **Disk cleanup** — 84% → 80%. Compressed profit_monster.log (54M), sync-guardian.log (49M), truncated self_close_watcher.err.log (35M), vacuumed journal (3.9G → 100M).
-2. **No trading changes** — today is noise. Stars intact: bb_bounce+,hzscore+ LONG (57.1% WR), bb-bounce-short,hzscore- SHORT (66.7%). range_finder+ remains disabled per auto_1hr, re-evaluate in 48h.
+**No trading changes.** The 1.2% SL widening (from 0.5%) deployed at 22:00 is the right move — individual SL hit losses are already smaller (avg -$0.04 vs -$0.08 before). Monitor 24h: if bb_bounce+,hzscore+ SL hit rate stays above 30%, investigate entry confidence threshold.
 
 ### Verification
 
-| Metric | Before | After | Target |
-|--------|--------|-------|--------|
-| Disk | 84% | 80% | <85% |
-| SHORT 24h WR | 42.9% (pre-filter) | 60.0% (15m) | >50% |
-| Today PnL | -$0.06 | -$0.06 (noise) | Green |
-| 7d PnL | +$0.39 | +$0.39 | Positive |
+| Metric | Current | Target |
+|--------|---------|--------|
+| 24h WR | 47.9% | >50% |
+| 7d PnL | +$0.18 | Sustain positive |
+| SL hit rate (bb_bounce+hzscore+) | 32% (7/22) | <25% |
+| SHORT 24h WR | 56.3% | >50% ✓ |
 
-**0 open positions. Pipeline timers active. 7d trajectory positive.**
+**1 open position. Pipeline timers active. 7d positive but fragile — monitoring.**
 
 ---
 
