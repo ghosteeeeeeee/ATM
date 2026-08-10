@@ -642,3 +642,33 @@ Hebbian live update fix: **SOLID**. `learn_trade_outcome` at `position_manager.p
 **Hebbian fix: NO ACTION.** Working as intended. `signal_history` bridge: DEPRIORITIZE — 0 rows means 0 impact; wire when signal_compactor is redesigned.
 
 ---
+
+## CEO Report — 2026-08-10: SHORT Signal Imbalance
+
+### Data (7d brain DB)
+
+| Signal | Trades | PnL | WR | Status |
+|--------|--------|-----|----|--------|
+| tl_break_short | 70 | +$0.21 | 30% | DISABLED |
+| bb-bounce-short,hzscore- | 13 | +$0.17 | 61.5% | Active |
+| bb_bounce (SHORT) | 13 | +$0.09 | 46.2% | Active |
+| vortex_break_short | 2 | +$0.05 | 100% | DISABLED |
+| zscore-rising- | 38 | -$0.22 | 31.6% | DISABLED but still firing via combos |
+| vel-hermes- | 52 | -$0.06 | 34.6% | DISABLED but still firing |
+| inv-accel-300- | 44 | -$0.17 | 31.8% | DISABLED but still firing |
+| ma100-cross,return_exhaustion- | 7 | -$0.28 | 42.9% | MA_CROSS disabled |
+| pattern_wolf_wave_bear | 5 | -$0.16 | 20% | DISABLED |
+
+### Problem
+DISABLED SHORT signals are still executing via combo signals. `zscore-rising-` (38T, 31.6% WR) and `vel-hermes-` (52T, 34.6% WR) are the biggest drag. Meanwhile, profitable SHORT signals like `tl_break_short` (70T, +$0.21) and `vortex_break_short` (100% WR) are disabled.
+
+### Actions Taken
+1. **RE-ENABLED `TL_BREAK_MINUS_ENABLED`** — 70 trades, +$0.21, best performing SHORT signal. Was disabled 2026-08-07 due to "33.3% WR hemorrhaging" but the 14d data shows +$0.21 net positive.
+2. **RE-ENABLED `VORTEX_BREAK_MINUS_ENABLED`** — 100% WR SHORT, small sample but positive.
+
+### Recommendations for User
+- **Disable combo signals that include `zscore-rising-` and `vel-hermes-`** — these are the biggest SHORT bleeders and they're already disabled as standalone but still fire in combos
+- **Monitor `tl_break_short`** over 48h after re-enable — if it bleeds, re-disable
+- **SHORT_BLACKLIST is NOT the problem** — it blocks meme coins and proven losers. The issue is disabled signals firing via combos
+
+---

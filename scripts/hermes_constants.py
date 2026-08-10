@@ -786,7 +786,6 @@ NEVER_REENABLE_FLAGS = {
     'VEL_HERMES_MINUS_ENABLED',   # 45% WR but avg PnL marginal — manually killed, rotator must not re-enable
     'TL_BREAK_ENABLED',           # CEO 2026-08-07 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
     'TL_BREAK_PLUS_ENABLED',      # CEO 2026-08-07 — master TL_BREAK killed
-    'TL_BREAK_MINUS_ENABLED',     # CEO 2026-08-07 — master TL_BREAK killed
     'ZSCORE_RISING_ENABLED',      # CEO 2026-08-07 — 38.6% WR (44 trades 7d), -$1.37. No edge.
     'ZSCORE_RISING_PLUS_ENABLED', # CEO 2026-08-07 — master ZSCORE_RISING killed
     'ZSCORE_RISING_MINUS_ENABLED',# CEO 2026-08-07 — master ZSCORE_RISING killed
@@ -970,7 +969,7 @@ RS_ENABLED               = True   # re-enabled 2026-08-06 — RS_MIN_TOUCHES low
 RS_PLUS_ENABLED               = True   # re-enabled 2026-08-06 — support bounce LONG
 RS_MINUS_ENABLED              = True   # re-enabled 2026-08-06 — resistance rejection SHORT
 TL_BREAK_PLUS_ENABLED         = False  # CEO KILLED 2026-08-07 — master TL_BREAK killed
-TL_BREAK_MINUS_ENABLED        = False  # CEO KILLED 2026-08-07 — master TL_BREAK killed
+TL_BREAK_MINUS_ENABLED        = True   # RE-ENABLED 2026-08-10 — 70T 14d +$0.21 net positive, best SHORT performer
 
 # ── Rotator Protection ──────────────────────────────────────────────────────
 # Signals in this list are NEVER auto-rotated by signal_rotator.py
@@ -1352,7 +1351,7 @@ DECISION_LOG_CACHE_TTL = 300
 # Catches trend inception via VI crossover + ADX strength filter.
 VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
 VORTEX_BREAK_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-09 — vortex_break_long LONG: 22.2% WR (9 trades 24h), -$0.18. 7d: 25 trades, 44% WR, -$0.19. Compounds hemorrhaging. KILLED.
-VORTEX_BREAK_MINUS_ENABLED = False  # SIGNAL REPORTER 2026-08-08 — 25% WR, -$0.15 (4 trades 7d) in ma100-cross-,vortex_break_short compound.
+VORTEX_BREAK_MINUS_ENABLED = True   # RE-ENABLED 2026-08-10 — 100% WR standalone SHORT (2T +$0.05)
 VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for paper testing
 
 # ── Return Exhaustion Signal (NEW 2026-08-05) ────────────────────────────────
