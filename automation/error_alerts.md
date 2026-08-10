@@ -47,3 +47,8 @@
 - **[INFO]**: 237/549 tokens >= 50% speed (43%). 326/549 speeds fresh (59%).
 - **[INFO]**: 3 zero-byte DBs: prices.db, speed_hermes.db, hermes_trades_runtime.db — likely legacy/unused.
 - **[AUTO-FIX]**: Compressed 64 old log files. Disk recovered from 84% to 80%.
+
+## Error Alerts — 2026-08-10 22:40 UTC
+- **[WARN]** (14x): `ERR decider_run: Traceback ... decider_run.py line 2888` (22:27-22:35 UTC)
+- **AUTO-FIX**: None needed — self-resolved at 22:38. Traceback truncated in journalctl; manual dry-run confirmed decider_run.py runs clean now.
+- **NOTE**: Likely transient DB lock or race condition during BSV signal processing. Pipeline continued operating (position_manager, trades-api, signals_runner all unaffected).
