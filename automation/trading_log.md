@@ -5172,3 +5172,35 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Today's loss: $0.09 on 61 trades = noise
 
 **Open Questions:** None — system healthy, cold day within bounds
+
+## [2026-08-10 21:05] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W, 1L) | 71 closed in 24h (-$0.02, 52% WR)
+**Open:** ASTER LONG $0.60, HTTST4 LONG $1.00 (test)
+
+**Last hour PnL:** +$0.05 (HTTST6 test +$0.11, ETH SHORT SL -$0.06)
+
+**24h by close reason:**
+- profit-monster-trail: 33T +$1.58 (dominant winner)
+- atr_sl_hit: 24T -$1.06 (33.8% — healthy)
+- cut-loser-CL-trail: 13T -$0.65
+
+**Signal performance (24h):**
+- bb_bounce+,hzscore+ LONG: 21T +$0.04 (52.4% WR) — STAR
+- bb_bounce+,range_finder+ LONG: 11T -$0.04 (54.5% WR — bad day)
+- continuation+,hzscore+ LONG: 4T +$0.14 (25% WR)
+- hzscore+,range_finder+ LONG: 3T -$0.14 (33.3% WR)
+
+**Diagnosis:**
+1. Entry quality: 1/2 SL hits this hour — quiet
+2. SL behavior: 33.8% — healthy
+3. Signal quality: range_finder+ combos -$0.18 today but 7d still positive
+4. Trade frequency: 2/hr — low (good)
+
+**Changes:** None
+**No Change Needed:**
+- atr_sl_hit rate: 33.8% (healthy)
+- range_finder+: 7d track record still positive
+- Today: -$0.02 flat (not losing)
+
+**Open Questions:** None — system healthy
