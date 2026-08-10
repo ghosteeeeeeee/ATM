@@ -323,6 +323,11 @@ try:
 except Exception:
     _continuation_run = None
 
+try:
+    from signals.trend_momentum_near_sma import run as _trend_momentum_near_sma_run
+except Exception:
+    _trend_momentum_near_sma_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -389,6 +394,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'ma_100_cross_short',  'enabled': MA_100_CROSS_MINUS_ENABLED,   'run': _ma_100_cross_short_run},
     {'name': 'momentum_leaderboard', 'enabled': 'MOMENTUM_LEADERBOARD_ENABLED', 'run': _momentum_leaderboard_run},
     {'name': 'continuation', 'enabled': 'CONTINUATION_ENABLED', 'run': _continuation_run},
+    {'name': 'trend_momentum_near_sma', 'enabled': 'TREND_MOMENTUM_NEAR_SMA_ENABLED', 'run': _trend_momentum_near_sma_run},
 ]
 
 

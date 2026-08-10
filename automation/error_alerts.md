@@ -37,3 +37,13 @@
 - **[INFO]**: 0 open positions, 60 closed today (-0.06 USDT PnL). Hotset empty — no signals survived compaction.
 - **[INFO]**: 218/549 tokens stale (40%). 1m candles fresh (1min), 15m at 11min, 1h at 41min.
 - **[AUTO-FIX]**: None needed — no actionable issues. Neutral market = expected low activity.
+
+## Error Alerts — 2026-08-10 20:40 UTC
+- **[INFO]**: Pipeline OK — running clean, last cycle #149574 at 20:39, no errors in 30min.
+- **[WARN]** (1x): `Disk 80% used` — down from 84% at 18:41 after log compression. 23GB free.
+- **[WARN]** (1x): `5m candle freshness 21%` — only 36/172 tokens have fresh 5m candles (10min window). 136 tokens missing recent candles.
+- **[INFO]**: 61 signals generated (1h), 0 approved, 1 executed. Market NEUTRAL (105/106 tokens). Macro gate: REDUCE (regime=NEUTRAL, wr=30%).
+- **[INFO]**: 2 open positions (BSV SHORT, ASTER LONG). 70 closed today (-0.62% PnL). Win rate 47.1% (33/70) in 24h.
+- **[INFO]**: 237/549 tokens >= 50% speed (43%). 326/549 speeds fresh (59%).
+- **[INFO]**: 3 zero-byte DBs: prices.db, speed_hermes.db, hermes_trades_runtime.db — likely legacy/unused.
+- **[AUTO-FIX]**: Compressed 64 old log files. Disk recovered from 84% to 80%.

@@ -1439,6 +1439,7 @@ CONTINUATION_PLUS_ENABLED = True              # re-enter LONG after LONG close
 CONTINUATION_MINUS_ENABLED = True             # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
+TREND_MOMENTUM_NEAR_SMA_ENABLED = True       # paper testing — buy trend+momentum+near-SMA
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',
