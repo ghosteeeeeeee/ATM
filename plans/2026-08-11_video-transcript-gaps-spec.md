@@ -2,7 +2,7 @@
 
 **Source:** "How To Build A Self-Improving AI Trading Agent" (YouTube)
 **Date:** 2026-08-11
-**Status:** Draft
+**Status:** Partial — #1 and #3 implemented
 
 ## Context
 

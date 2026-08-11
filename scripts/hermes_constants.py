@@ -1324,7 +1324,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.3868 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.3491 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────

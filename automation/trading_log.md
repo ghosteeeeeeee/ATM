@@ -50,6 +50,34 @@
 
 ---
 
+## 2026-08-11 00:00 Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.10 (WR: 100.0%)
+
+**24h Summary:** 64 trades, +$0.17, 50.0% WR
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit = 37.5% of closes (under 40% threshold — SL widening at 22:00 helping)
+- No signal hit kill threshold (0% WR with 3+ trades in last hour)
+- Trade frequency normal (2/hr)
+- Last hour was best in12h: both trades via profit-monster-trail, both wins
+- System recovering from 7-hour losing streak (13:00-19:00 UTC)
+
+**Key Observations:**
+- bb_bounce+,hzscore+ remains net negative (19T -$0.23, 42.1% WR 24h) — biggest drag
+- However, it had 0 trades in last hour (no kill threshold met)
+- SHORT signals outperforming: hzscore-,range_breakout- 3T +$0.07 (66.7% WR)
+- profit-monster-trail carrying system: 27T +$1.29 (24h)
+
+**Open Questions:**
+- Is bb_bounce+,hzscore+ decay temporary (regime chop) or structural?
+- SL widening impact needs 24h+ data to confirm — monitoring
+
+---
+
 ## 2026-08-10 18:00 Hourly Analysis
 
 **Trades:** 4 closed (1 win, 3 losses)
@@ -5265,3 +5293,30 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - No 0% WR signals with 3+ trades to kill
 
 **Open Questions:** None — system healthy, cold stretch within bounds
+
+## [2026-08-10 23:25] Hourly Analysis
+
+**Trades:** 1 closed last hour (MEGA LONG, atr_sl_hit -$0.05) | 67 in 24h (-$0.15, 44.8% WR)
+**Open:** 4 (HTTST4, JUP SHORT, ASTER LONG, MNT LONG)
+
+**24h by close reason:**
+- profit-monster-trail: 29T +$1.47 (avg +$0.05) — dominant winner
+- atr_sl_hit: 24T -$1.08 (35.8% — healthy)
+- cut-loser-CL-trail: 13T -$0.65
+
+**Diagnosis:**
+1. Entry quality: 1 SL hit last hour — quiet
+2. SL behavior: 35.8% (healthy, <40%)
+3. Signal quality: bb_bounce+,hzscore+ 22T -$0.02 (flat today), range_finder+ combos cold but 7d positive
+4. Trade frequency: 2.8/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 35.8% (healthy)
+- No 0% WR signals with 3+ trades to kill
+- Trade frequency normal
+- Today's cold day = normal variance after 15 green days
+- All star signals profitable 7d
+
+**Open Questions:** None — system healthy
