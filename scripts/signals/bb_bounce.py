@@ -365,7 +365,7 @@ def scan_bb_bounce_signals(prices_dict):
         if sig['trend'] != 'NEUTRAL':  # Trend-aligned = stronger
             base_conf += 5
         if sig['bounce_pct'] > 0.15:  # Strong bounce
-            base_conf += 5
+            base_conf += 10
 
         # Pattern recognition boost (AXS-style reversal setups)
         try:
