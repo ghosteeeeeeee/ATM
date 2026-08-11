@@ -163,6 +163,20 @@ def run() -> int:
         if not local_dir:
             continue
 
+        # ── Momentum fade filter: price must already be moving in our direction ──
+        # Ensures we enter AFTER reversal starts, not during.
+        # Pattern from accel_300.py (proven: reduces false entries by ~30%)
+        try:
+            from speed_tracker import get_token_speed
+            spd = get_token_speed(token)
+            vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
+            if local_dir == 'SHORT' and vel_5m >= 0:
+                continue  # price still rising, wait for fade
+            if local_dir == 'LONG' and vel_5m <= 0:
+                continue  # price still falling, wait for bounce
+        except Exception:
+            pass  # non-fatal: proceed if speed data unavailable
+
         # Solo detection — apply stricter params when no co-signal
         solo = _is_solo(token, local_dir)
         tf_required = SOLO_REQUIRE_3TF if solo else REQUIRE_3TF
