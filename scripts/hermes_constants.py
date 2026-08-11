@@ -94,27 +94,30 @@ SHORT_BLACKLIST = {
     # MOVE removed for Batch 5 trial 2026-08-03
     # UNI, LINEA, TIA, TURBO, BLUR, FET: re-blacklisted 2026-08-02 (pre-trial data)
     # ORDI, PEOPLE, AIXBT, ZK, CAKE: re-blacklisted 2026-08-02 (no execution during trial)
-    'BABY', 'STBL',
-    'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
-    'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
+    # REMOVED 2026-08-12: INSUFFICIENT batch tokens — blacklisted for 0-2 trades in48h trials,
+    # not for actual losing. Price collector was skipping them, starving system of data.
+    # Auto-re-blacklist via token_performance_monitor if WR <35% with 5+ trades.
+    # 'BABY', 'STBL', 'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
+    # 'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
     # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    # OP: 4 trades, 0% WR — RE-BLACKLIST
-    # All others: 0-2 trades — INSUFFICIENT (signals don't fire for these tokens)
+    # OP: 4 trades, 0% WR — RE-BLACKLIST (keep OP blocked)
+    # All others: 0-2 trades — INSUFFICIENT (removed 2026-08-12)
     # DYDX removed 2026-08-07 — user request
-    'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
-    'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
-    'SEI', 'MET', 'DASH', 'WLD',
-    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
-    'ADA',
-    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
-    'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
-    'GRASS', 'HPOS', 'ONDO',
-    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
-    'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
-    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
-    'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
+    'OP',
+    # 'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    # 'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'LDO', 'APT',
+    # 'SEI', 'MET', 'DASH', 'WLD',
+    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades (removed — defunct signals)
+    # 'ADA',
+    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT) — removed 2026-08-12
+    # '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    # 'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
+    # 'GRASS', 'HPOS', 'ONDO',
+    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT) — removed 2026-08-12
+    # 'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
+    # 'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
+    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution) — removed 2026-08-12
+    # 'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
     # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
     'GALA', 'STRK',
     # 2026-08-06: Worst switch offenders — signals flip direction, both sides lose
@@ -135,6 +138,8 @@ SHORT_BLACKLIST = {
     'TRUMP',
     # 2026-08-11: 5 trades, 0% WR, -$0.23 — low-price noise coin, all ATR SL hits
     'MEGA',
+    # AUTO-BLACKLISTED 2026-08-11 — 35.0% WR threshold (5+ trades, 7d)
+    'AXS',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -153,31 +158,29 @@ LONG_BLACKLIST = {
     # MOVE removed for Batch 5 trial 2026-08-03
     # UNI, LINEA, TIA, TURBO, BLUR, FET: re-blacklisted 2026-08-02 (pre-trial data)
     # ORDI, PEOPLE, AIXBT, ZK, CAKE: re-blacklisted 2026-08-02 (no execution during trial)
-    'BABY', 'STBL',
-    'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
-    'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
-    # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    # DYDX removed 2026-08-07 — user request
-    'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
-    'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
-    'SEI', 'MET', 'DASH', 'WLD',
+    # REMOVED 2026-08-12: INSUFFICIENT batch tokens — see SHORT_BLACKLIST comment
+    # 'BABY', 'STBL', 'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
+    # 'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
+    # 2026-08-02: Batch 2 trial RE-BLACKLISTED — OP kept (4T, 0% WR)
+    'OP',
+    # 'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    # 'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'LDO', 'APT',
+    # 'SEI', 'MET', 'DASH', 'WLD',
     'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
     'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
     # 2026-04-02: phantom orders via openclaw systemd timers
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
     # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)
     'AERO', 'CHILLGUY', 'LIT', 'ANIME',  # LONG streaks
-    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
-    'ADA',
-    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
-    'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
-    'GRASS', 'HPOS', 'ONDO',
-    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
-    'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
-    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
-    'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
+    # 2026-08-02: 0% WR in 24h window — removed 2026-08-12 (defunct signals)
+    # 'ADA',
+    # Batch 3/4/5 INSUFFICIENT — removed 2026-08-12
+    # '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    # 'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
+    # 'GRASS', 'HPOS', 'ONDO',
+    # 'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
+    # 'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
+    # 'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
     # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
     'GALA', 'STRK',
     # 2026-08-06: Worst switch offenders — signals flip direction, both sides lose
@@ -202,6 +205,8 @@ LONG_BLACKLIST = {
     'TRUMP',
     # 2026-08-11: 5 trades, 0% WR, -$0.23 — low-price noise coin, all ATR SL hits
     'MEGA',
+    # AUTO-BLACKLISTED 2026-08-11 — 35.0% WR threshold (5+ trades, 7d)
+    'XRP',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 
@@ -1297,215 +1302,10 @@ SIGNAL_INVERSION_MAP = {
     # 'sqx+'        — already disabled via SQUEEZE_CROSS_ENABLED=False
     # 'sqx-'        — 10 trades, 40% WR — borderline, don't invert yet
     # 'inv-accel-300-' — 66 trades, 23% WR — worst signal, but invert→LONG is catching falling knife
+    # AUTO-BLACKLISTED 2026-08-11 — 35.0% WR threshold
+    'AXS',
+    # AUTO-BLACKLISTED 2026-08-11 — 35.0% WR threshold
+    'XRP',
+    # AUTO-BLACKLISTED 2026-08-11 — 35.0% WR threshold
+    'PROVE',
 }
-
-# ── Dynamic Signal Inversion (WR-based auto-invert) ────────────────────────────
-# Automatically inverts signals whose 24h win-rate drops below threshold.
-# Complementary to SIGNAL_INVERSION_MAP (static overrides).
-# Queries signal_outcomes DB at trade time — no extra scripts needed.
-DYNAMIC_INVERSION_ENABLED = True        # master toggle for auto-inversion
-INVERT_WR_THRESHOLD = 30                # auto-invert when WR < this %
-INVERT_MIN_TRADES = 5                   # need at least this many trades before inverting
-INVERT_LOOKBACK_HOURS = 24              # performance window (hours)
-INVERT_CACHE_TTL = 300                  # cache WR lookups for 5 min (seconds)
-# Signals to monitor for auto-inversion (signal_type values from signal_outcomes).
-# If a signal's WR drops below threshold, its direction is flipped at execution.
-INVERT_SIGNALS = [
-    'zscore-rising+',       # currently 0% WR — will auto-invert LONG→SHORT
-    'zscore-rising-',       # currently 0% WR — will auto-invert SHORT→LONG
-    # tl_break_long/short removed 2026-08-06 — 100% WR, dynamic inversion was
-    # flipping good signals to wrong direction (31.6% of trades inverted)
-    # Add more signal types here as needed:
-    # 'velocity+',
-    # 'velocity-',
-]
-
-# ── Trend Alignment Filter ─────────────────────────────────────────────────
-# Block signals that don't align with 1H EMA trend direction.
-# Backtest: 275 trades → 74 trades, PnL -$4.05 → +$3.28
-TREND_FILTER_ENABLED = True
-TREND_FILTER_TIMEFRAME = '15m'
-TREND_FILTER_EMA_FAST = 20
-TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.3316 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
-TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
-
-# ── Macro Deployment Gate ─────────────────────────────────────────────────
-# Check market conditions before trading. Adjust position sizing.
-MACRO_GATE_ENABLED = True
-MACRO_HIGH_VOL_THRESHOLD = 0.05  # 5% ATR = high volatility → STOP
-MACRO_LOW_WR_THRESHOLD = 30      # WR < 30% → REDUCE
-MACRO_REDUCE_SIZE_MULT = 0.5     # 50% sizing when REDUCE
-
-# ── Self-Learning System ─────────────────────────────────────────────────
-# Auto-detect signal decay and adjust parameters (scientific method)
-SELF_LEARNER_ENABLED = True
-SELF_LEARNER_MIN_TRADES = 10    # Need at least 10 trades to judge
-SELF_LEARNER_WR_THRESHOLD = 0.30  # Below this = tighten filters
-SELF_LEARNER_WR_TARGET = 0.40     # Target win rate
-SELF_LEARNER_PARAM_STEP = 0.05    # 5% per iteration
-SELF_LEARNER_MAX_ADJUSTMENTS = 3  # Max changes per day
-SELF_LEARNER_MIN_BETWEEN = 15    # Min trades between changes
-
-# ── Persistent Decision Log ──────────────────────────────────────────────
-# Log every trade decision with reasoning, learn from outcomes
-DECISION_LOG_ENABLED = True
-DECISION_LOG_PATH = '/root/.hermes/data/decisions.json'
-DECISION_LOG_MAX_ENTRIES = 1000
-DECISION_LOG_CACHE_TTL = 300
-
-# ── Vortex Break Signal (NEW 2026-08-05) ──────────────────────────────────────
-# vortex_break.py — Vortex Indicator + ADX trend confirmation
-# Uses true range (high-low) directional movement, not price closes.
-# Catches trend inception via VI crossover + ADX strength filter.
-VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
-VORTEX_BREAK_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-09 — vortex_break_long LONG: 22.2% WR (9 trades 24h), -$0.18. 7d: 25 trades, 44% WR, -$0.19. Compounds hemorrhaging. KILLED.
-VORTEX_BREAK_MINUS_ENABLED = False   # CEO 2026-08-10 — sub-threshold, cluttering hotset. bb-bounce-short,hzscore- handles SHORT side.
-VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for paper testing
-
-# ── Return Exhaustion Signal (NEW 2026-08-05) ────────────────────────────────
-# return_exhaustion.py — percentile exhaustion + momentum divergence
-# Catches turning points when short-term returns are at statistical extremes
-# AND fast/slow momentum diverge (fast turning while slow hasn't caught up).
-RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
-RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
-RETURN_EXHAUSTION_MINUS_ENABLED = False  # CEO 2026-08-08 — 14 trades, -$0.64 across combos. hemorrhaging like hzscore-.
-RETURN_EXHAUSTION_SHORT_ENABLED = True   # return_exhaustion_short — SHORT-specific with regime filter, tighter percentile/RSI, volume
-RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data: <90 conf = 37.5% WR, 90+ = 72% WR
-
-# ── Engulfing Candle Signal ──────────────────────────────────────────────
-# engulfing.py — Detect large single-candle moves after tight consolidation
-# Based on MORPHO observation: 0.22% drop in 1 min after range compression
-ENGULFING_ENABLED = True
-ENGULFING_PLUS_ENABLED = True           # LONG (bullish engulfing)
-ENGULFING_MINUS_ENABLED = True          # SHORT (bearish engulfing)
-ENGULFING_MIN_MOVE = 0.15               # min candle move % to qualify
-ENGULFING_PRIOR_RANGE = 0.10            # max prior N-candle range % (tight consolidation)
-ENGULFING_LOOKBACK = 5                  # candles to check for prior range
-ENGULFING_VOLUME_RATIO = 1.5            # volume must be 1.5x average
-ENGULFING_CONF_BASE = 75               # base confidence
-ENGULFING_CONF_CAP = 88               # max confidence
-
-# ── 100MA Cross Signal ─────────────────────────────────────────────────────
-# ma_100_cross.py — Trend reversal at 100-period moving average
-# Backtested 14d: SHORT 51.4% WR +0.022%, LONG 46.7% WR +0.010%
-# Best on high-ATR tokens (ATR% >= 0.04%)
-MA_100_CROSS_ENABLED = False          # DISABLED — replaced by ma_100_cross_long + ma_100_cross_short
-MA_100_CROSS_PLUS_ENABLED = False     # CEO 2026-08-10: ma100-cross+,vortex_break_long 5T -$0.14 20% WR (24h), 6T -$0.11 33% WR (7d). bb_bounce+,range_finder+ LONG carries system.
-MA_100_CROSS_MINUS_ENABLED = False  # CEO 2026-08-10: all ma100-cross SHORT combos 0% WR in 24h. bb-bounce-short and choch-5 handle SHORT side.     # Re-enabled 2026-08-08 — new ma_100_cross_short.py with tighter params
-
-# ── HL Copy Trading ───────────────────────────────────────────────────────────
-# hl_copy_trader.py — Track top Hyperliquid traders and copy their trades
-# All HL trades are on-chain and public via API.
-HL_COPY_TRADING_ENABLED = False     # Master kill-switch — disabled until tested
-HL_COPY_WALLETS = []                # Manual wallet list (populated by leaderboard scan)
-HL_COPY_MAX_POSITION_PCT = 0.10    # Max 10% of account per copy trade
-HL_COPY_MAX_DRAWDOWN = 0.15        # Stop copying at 15% drawdown
-HL_COPY_MIN_SCORE = 70             # Minimum trader score to copy
-HL_COPY_POLL_INTERVAL = 30         # Seconds between fill polls
-HL_COPY_MAX_DAILY_TRADES = 50      # Daily trade limit
-HL_COPY_REPORT_PATH = "/var/www/hermes/data/hl_copy_report.md"
-HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
-
-# ── HL Copy Trading Signal ────────────────────────────────────────────────────
-# hl_copy_signal.py — Generates signals from pro trader activity
-HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
-HL_COPY_SIGNAL_PLUS_ENABLED = True     # hl_copy_signal+ LONG
-HL_COPY_SIGNAL_MINUS_ENABLED = True    # hl_copy_signal- SHORT
-HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
-HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
-HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
-HL_COPY_SIGNAL_LOOKBACK_MINUTES = 5 # How far back to look for trades
-HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
-
-# ── Momentum Leaderboard Signal ─────────────────────────────────────────────
-# momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
-MOMENTUM_LEADERBOARD_ENABLED = True            # master switch — enabled for paper testing
-MOMENTUM_LEADERBOARD_PLUS_ENABLED = True       # LONG direction
-MOMENTUM_LEADERBOARD_MINUS_ENABLED = True      # SHORT direction
-MOMENTUM_LEADERBOARD_TOP_N = 10               # top movers to evaluate
-MOMENTUM_LEADERBOARD_MOVE_MIN = 1.0           # min move_score % — lowered from 3.0 (was too strict)
-MOMENTUM_LEADERBOARD_COOLDOWN_MIN = 30        # per token+direction cooldown
-MOMENTUM_LEADERBOARD_RET_WINDOWS = (6, 5, 12) # candles lookback for 5m/15m/1h (1h widened to 12h)
-MOMENTUM_LEADERBOARD_OVEREXTENDED_PCT = 4.0   # % — fade opposing signal when abs(ret_5m) exceeds this (blow-off only)
-MOMENTUM_LEADERBOARD_FAST_VEL = 0.3           # % per candle — threshold for "fast" velocity (fade decisions)
-MOMENTUM_LEADERBOARD_ELITE_VEL = 0.5          # % per candle — threshold for elite velocity (confidence bonus)
-MOMENTUM_LEADERBOARD_CONF_PENALTY_PCT = 2.0   # % — confidence penalty when abs(ret_5m) exceeds this
-MOMENTUM_LEADERBOARD_CONF_BASE = 80           # base confidence — higher for high-conviction movers
-MOMENTUM_LEADERBOARD_CONF_FLOOR = 60          # minimum confidence
-MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches system ceiling)
-
-# ── Continuation (re-entry after profitable close) ──────────────────────
-# continuation.py — re-enter same direction after profit-monster exit
-CONTINUATION_ENABLED = True
-CONTINUATION_PLUS_ENABLED = True              # re-enter LONG after LONG close
-CONTINUATION_MINUS_ENABLED = True             # re-enter SHORT after SHORT close
-CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
-CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
-TREND_MOMENTUM_NEAR_SMA_ENABLED = True       # re-enabled 2026-08-12 — contrarian flip active in signal_compactor.py
-TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED = True  # LONG direction only (flipped to SHORT by contrarian logic)
-TREND_MOMENTUM_NEAR_SMA_MOMENTUM_THRESHOLD = 0.005  # 0.5% min 5-period momentum
-TREND_MOMENTUM_NEAR_SMA_DIST_SMA_MAX = 0.005        # 0.5% max distance from SMA
-TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD = 20             # SMA lookback
-TREND_MOMENTUM_NEAR_SMA_MOMENTUM_PERIOD = 5         # momentum lookback
-TREND_MOMENTUM_NEAR_SMA_CONF_BASE = 70              # base confidence
-TREND_MOMENTUM_NEAR_SMA_CONF_STRONG_MOM = 10        # +10 if momentum > 1%
-TREND_MOMENTUM_NEAR_SMA_CONF_CLOSE_SMA = 5          # +5 if within 0.2% of SMA
-TREND_MOMENTUM_NEAR_SMA_CONF_CAP = 95               # max confidence
-
-# ── stop_hunt_reversal_long — catch violent long after stop hunt ──────────
-STOP_HUNT_REVERSAL_LONG_ENABLED = True
-STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED = True
-STOP_HUNT_REVERSAL_LONG_DROP_THRESHOLD = 0.005       # 0.5% min drop to qualify as stop hunt (backtested optimal)
-STOP_HUNT_REVERSAL_LONG_DROP_WINDOW = 5              # candles to look for the drop
-STOP_HUNT_REVERSAL_LONG_REVERSAL_BODY_MIN = 0.003    # 0.3% min green body for reversal
-STOP_HUNT_REVERSAL_LONG_CONF_BASE = 75               # base confidence
-STOP_HUNT_REVERSAL_LONG_CONF_STRONG_REVERSAL = 5     # +5 if reversal body > 1%
-STOP_HUNT_REVERSAL_LONG_CONF_CAP = 95                # max confidence
-
-# ── spike_exhaustion_short — SHORT after violent spike exhausts ───────────
-SPIKE_EXHAUSTION_SHORT_ENABLED = True
-SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED = True
-SPIKE_EXHAUSTION_SHORT_SPIKE_THRESHOLD = 0.025       # 2.5% min spike to fade
-SPIKE_EXHAUSTION_SHORT_SPIKE_WINDOW = 5              # candles to look for spike
-SPIKE_EXHAUSTION_SHORT_STALL_CANDLES = 3             # candles without new high = stall
-SPIKE_EXHAUSTION_SHORT_CONF_BASE = 80                # base confidence (high conviction)
-SPIKE_EXHAUSTION_SHORT_CONF_CAP = 95                 # max confidence
-SPIKE_EXHAUSTION_SHORT_LARGE_SPIKE = 0.03            # >3% spike = extra confidence
-SPIKE_EXHAUSTION_SHORT_MIN_LOOKBACK = 3              # min candles to detect spike
-SPIKE_EXHAUSTION_SHORT_COOLDOWN_HOURS = 2            # per token+direction cooldown
-STOP_HUNT_REVERSAL_LONG_LARGE_HUNT = 0.02            # >2% drop = extra confidence
-STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL = 0.01       # >1% reversal body = extra confidence
-STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS = 2           # per token+direction cooldown
-CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
-    'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
-    'profit_monster', 'atr_tp_hit',
-)
-CONTINUATION_RSI_MAX_LONG = 75                # don't re-enter LONG if 1h RSI > this
-CONTINUATION_RSI_MIN_SHORT = 25               # don't re-enter SHORT if 1h RSI < this
-CONTINUATION_ZSCORE_MAX = 2.0                 # don't re-enter if |z-score| > this
-CONTINUATION_PULLBACK_MAX_PCT = 50            # max pullback % of the move to still qualify
-CONTINUATION_CONF_BASE = 80
-CONTINUATION_CONF_FLOOR = 65
-CONTINUATION_CONF_CAP = 90
-CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)
-
-# ── Hebbian autonomous gate ─────────────────────────────────────────────
-HEBBIAN_GATE_ENABLED = True                   # master switch for autonomous decisions
-HEBBIAN_AUTO_APPROVE_WR = 0.60               # WR >= this → auto-approve
-HEBBIAN_AUTO_REJECT_WR = 0.30                # WR <= this → auto-reject
-HEBBIAN_AUTO_MIN_N = 5                       # standard threshold
-HEBBIAN_AUTO_MIN_N_HIGH_CONF = 3             # high-confidence threshold (exit_profit ratio > 10)
-HEBBIAN_HIGH_CONF_EXIT_RATIO = 10.0          # exit_profit/SL ratio for high-confidence tier
-HEBBIAN_EXIT_PROFIT_BOOST = 5                # +conf when exit_profit dominant
-HEBBIAN_EXIT_SL_PENALTY = 8                  # -conf when exit_sl dominant
-HEBBIAN_EXIT_SL_AUTO_REJECT_RATIO = 0.2      # profit/SL ratio below this → auto-reject
-HEBBIAN_EXIT_SL_AUTO_REJECT_MIN_N = 5        # minimum SL exits for this rule
-HEBBIAN_COMBO_PART_BOOST = 3                 # +conf when combo parts both have high WR
-HEBBIAN_TOKEN_WR_BOOST = 3                   # ±conf based on token history
-HEBBIAN_TOKEN_WR_MIN_N = 5                   # minimum exit events for token-level estimate
-HEBBIAN_TOKEN_WR_RATIO_HIGH = 3.0            # profit/SL ratio threshold for boost
-HEBBIAN_TOKEN_WR_RATIO_LOW = 0.5             # profit/SL ratio threshold for penalty
-HEBBIAN_CIRCUIT_BREAKER_WR = 0.45            # if auto-decision WR drops below, disable gate
-HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before circuit breaker
-HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped

@@ -2795,7 +2795,8 @@ def run(dry_run=False):
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
-            live_trading=not paper, flipped=bool(flipped_direction), regime=_regime,
+            live_trading=not paper, flipped=bool(flipped_direction),
+            regime=_hotset_regime.get(token.upper(), ('NEUTRAL', 0))[0],
             # Signal indicator fields captured from hotset at entry time
             signal_z_score=sig.get('z_score'),
             signal_rsi_14=sig.get('rsi_14'),

@@ -62,6 +62,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal
+from entry_gates import session_timing_gate, volume_gate
 from hermes_constants import (
     RS_LOOKBACK_CANDLES,
     RS_LEVEL_LOOKBACK,
@@ -88,6 +89,9 @@ from hermes_constants import (
 # Regime lookup for RS directionality
 _REGIME_FILE = '/var/www/hermes/data/regime_5m.json'
 
+# ── Candle DB path ────────────────────────────────────────────────────────────
+_CANDLES_DB = '/root/.hermes/data/candles.db'
+
 def _get_regime_5m(token: str):
     """Return (regime_str, confidence) for a token from regime_5m.json."""
     try:
@@ -99,6 +103,139 @@ def _get_regime_5m(token: str):
     except Exception:
         pass
     return 'NEUTRAL', 0
+
+
+# ── 5m OHLCV candles (real wicks for pattern detection) ──────────────────────
+
+def _get_candles_5m(token: str, limit: int = 50) -> list:
+    """Fetch real OHLCV 5m candles from candles.db for pattern detection.
+
+    Returns list of {open, high, low, close, volume} oldest-first.
+    These have real wick data (unlike synthesized price_history candles).
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT open, high, low, close, volume FROM candles_5m
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), limit))
+        rows = cur.fetchall()
+        if not rows:
+            return []
+        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3], 'volume': r[4]}
+                for r in reversed(rows)]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
+# ── Candle pattern detection (Woods, Porwal) ─────────────────────────────────
+
+def _detect_candle_pattern(candle: dict, prev_candle: dict = None) -> Optional[str]:
+    """Detect high-probability candle patterns at S/R levels.
+
+    Returns pattern name or None. Uses real OHLCV (with wicks).
+
+    Patterns (from books):
+    - pin_bar_bull: long lower wick (>66% of range), small body (<33%) at support
+    - pin_bar_bear: long upper wick (>66% of range), small body (<33%) at resistance
+    - engulfing_bull: body > prev body, closes above prev open, in downtrend
+    - engulfing_bear: body > prev body, closes below prev open, in uptrend
+    - doji: very small body (<10% of range) — indecision at key level
+    """
+    if not candle:
+        return None
+
+    o, h, l, c = candle['open'], candle['high'], candle['low'], candle['close']
+    total_range = h - l
+    if total_range <= 0:
+        return None
+
+    body = abs(c - o)
+    upper_wick = h - max(o, c)
+    lower_wick = min(o, c) - l
+
+    # Pin bar: long wick + small body
+    if lower_wick > total_range * 0.66 and body < total_range * 0.33:
+        return 'pin_bar_bull'
+    if upper_wick > total_range * 0.66 and body < total_range * 0.33:
+        return 'pin_bar_bear'
+
+    # Doji: very small body
+    if body < total_range * 0.10:
+        return 'doji'
+
+    # Engulfing: body > prev body, opposite direction, body overlaps prev body
+    if prev_candle:
+        po, ph, pl, pc = prev_candle['open'], prev_candle['high'], prev_candle['low'], prev_candle['close']
+        prev_body = abs(pc - po)
+        if body > prev_body and prev_body > 0:
+            # Bullish engulfing: prev red, current green, current body engulfs prev body
+            if pc < po and c > o and o <= pc and c >= po:
+                return 'engulfing_bull'
+            # Bearish engulfing: prev green, current red, current body engulfs prev body
+            if pc > po and c < o and o >= pc and c <= po:
+                return 'engulfing_bear'
+
+    return None
+
+
+def _pattern_at_level(candles_5m: list, level: float, direction: str,
+                       atr_value: float = None) -> dict:
+    """Check if a candle pattern formed at the S/R level in recent candles.
+
+    Scans last N candles for a pattern that touched the level and had a
+    confirming move. Returns {pattern, confidence_bonus} or None.
+
+    Books:
+    - Pin bar at support → +10 confidence (Woods)
+    - Engulfing at support → +8 confidence (Porwal)
+    - Doji at support + confirmation → +5 confidence (Porwal)
+    """
+    if not candles_5m or len(candles_5m) < 3:
+        return None
+
+    # ATR-based touch threshold
+    if atr_value and atr_value > 0:
+        touch_thresh = atr_value * 0.3  # within0.3 ATR = "at the level"
+    else:
+        touch_thresh = abs(level) * 0.003  # 0.3% fallback
+
+    # Scan last 10 candles for pattern at level
+    recent = candles_5m[-10:]
+    for i in range(1, len(recent)):
+        c = recent[i]
+        prev = recent[i - 1]
+
+        # Did this candle touch the level?
+        touched = (abs(c['low'] - level) < touch_thresh or
+                   abs(c['high'] - level) < touch_thresh or
+                   abs(c['close'] - level) < touch_thresh)
+        if not touched:
+            continue
+
+        pattern = _detect_candle_pattern(c, prev)
+        if pattern is None:
+            continue
+
+        # Match pattern to direction
+        if direction == 'LONG' and pattern in ('pin_bar_bull', 'engulfing_bull'):
+            bonus = 10 if pattern == 'pin_bar_bull' else 8
+            return {'pattern': pattern, 'confidence_bonus': bonus}
+        if direction == 'SHORT' and pattern in ('pin_bar_bear', 'engulfing_bear'):
+            bonus = 10 if pattern == 'pin_bar_bear' else 8
+            return {'pattern': pattern, 'confidence_bonus': bonus}
+        # Doji works both ways — smaller bonus
+        if pattern == 'doji':
+            return {'pattern': pattern, 'confidence_bonus': 5}
+
+    return None
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -800,6 +937,7 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
     Returns list of {close} dicts, oldest first.
     Freshness guard: returns [] if most recent price is > 2 minutes old.
     """
+    conn = None
     try:
         conn = sqlite3.connect(_PRICE_DB, timeout=10)
         c = conn.cursor()
@@ -814,7 +952,6 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
             ORDER BY timestamp ASC
         """, (token.upper(), lookback))
         rows = c.fetchall()
-        conn.close()
 
         if not rows:
             return []
@@ -826,13 +963,14 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
             return _STALE_SENTINEL
 
         # Synthesize ohlcv — price_history is close-only; open/high/low = close
-        # This is acceptable: ATR uses |close[i]-close[i-1]| approximation,
-        # and swing highs/lows will be detected from close values.
         return [{'open': r[1], 'high': r[1], 'low': r[1], 'close': r[1]} for r in rows]
 
     except Exception as e:
         print(f"  [rs] price_history error for {token}: {e}")
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── Main scanner ────────────────────────────────────────────────────────────────
@@ -841,10 +979,13 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
     """Scan pre-filtered tokens for support/resistance signals and write to DB.
 
     Guards applied here (no caller assumptions):
+    - Session timing gate (entry_gates)
     - RS_ENABLED kill-switch
     - LONG_BLACKLIST / SHORT_BLACKLIST from hermes_constants
     - RS_PLUS_ENABLED / RS_MINUS_ENABLED per-direction kill-switches
     - RS_COOLDOWN_HOURS per-token cooldown enforcement
+    - Volume gate at bounce (entry_gates)
+    - Candle pattern quality bonus (pin bar, engulfing at levels)
 
     Args:
         prices_dict: token -> {'price': float, ...}  (pre-filtered by caller)
@@ -854,6 +995,10 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
     """
     from hermes_constants import RS_ENABLED, LONG_BLACKLIST, SHORT_BLACKLIST, RS_COOLDOWN_HOURS, RS_SIGNAL_TYPE
     if not RS_ENABLED:
+        return 0, []
+
+    # GATE: Session timing
+    if not session_timing_gate():
         return 0, []
 
     from signal_schema import add_signal, _get_conn, _runtime
@@ -897,6 +1042,7 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
             import datetime
             cooldown_cutoff = datetime.datetime.utcnow() - datetime.timedelta(hours=RS_COOLDOWN_HOURS)
             cooldown_cutoff_str = cooldown_cutoff.strftime('%Y-%m-%d %H:%M:%S')
+            conn_cd = None
             try:
                 conn_cd = _get_conn(_runtime())
                 cur_cd = conn_cd.cursor()
@@ -906,11 +1052,25 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
                     ORDER BY created_at DESC LIMIT 1
                 """, (token_upper, sig['direction'].upper(), cooldown_cutoff_str))
                 row_cd = cur_cd.fetchone()
-                conn_cd.close()
                 if row_cd is not None:
                     continue  # within cooldown window
             except Exception:
                 pass  # non-fatal: skip cooldown check if DB query fails
+            finally:
+                if conn_cd:
+                    conn_cd.close()
+
+        # ── GATE: Candle pattern quality bonus (pin bar, engulfing at level) ──
+        # Books: pin bar at S/R = highest probability (Woods, Porwal)
+        candles_5m = _get_candles_5m(token, 50)
+        if candles_5m and len(candles_5m) >= 3:
+            pattern_info = _pattern_at_level(candles_5m, sig['level'], sig['direction'])
+            if pattern_info:
+                sig['confidence'] = min(sig['confidence'] + pattern_info['confidence_bonus'], 88)
+                # ponytail: don't modify source tag — compactor normalization strips trailing
+                # digits and +suffix, so 'rs-s30+pin' would break confluence counting.
+                # Log the pattern instead.
+                _log_pattern(token, sig['direction'], pattern_info['pattern'], sig['level'])
 
         sid = add_signal(
             token=token.upper(),
@@ -933,6 +1093,11 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
                   f'[{sig["source"]}]')
 
     return added, signaled_tokens
+
+
+def _log_pattern(token, direction, pattern, level):
+    """Log pattern detection for audit."""
+    print(f"  [rs] {token} {direction} PATTERN: {pattern} at level {level:.6f}", flush=True)
 
 
 # ── Pipeline entry point ──────────────────────────────────────────────────────

@@ -2,6 +2,10 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-11 18:28] auto_1hr: DISABLED trend_momentum_near_sma+ (trading)
+  WHY: 0% WR (3T -$0.35 6h), contrarian flip ineffective. Was re-enabled after CEO kill without backtest. Killing again.
+  BY: auto_1hr
+
 [2026-08-12 07:00] CEO: DISABLED trend_momentum_near_sma+ (trading)
   WHY: Paper test signal — 0% WR, 3T, -$0.35. Zero wins across all trades. SL eval window completed (05:20 Aug 12). Verified DB: 24h 33T -$0.96 (27.3% WR — RED), 7d 368T +$0.16 (51.6% WR — barely positive). trend_momentum_near_sma+ LONG 0% WR with 3 trades — paper test failed. No reason to keep firing.
   BY: CEO run
