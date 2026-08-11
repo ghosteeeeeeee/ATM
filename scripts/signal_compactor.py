@@ -610,11 +610,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if has_bb_bounce and has_ma100:
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce+ma100-cross blocked (43% WR, -$0.10)")
                     continue
-                # RE-BLOCKED CEO 2026-08-12: 11.1% WR (9T, -$0.31) in 24h post SL revert.
-                # 7d was 48.5% WR but 24h catastrophic — signal is bleeding, not cold-streaking.
-                if has_bb_bounce and has_hz_pos:
-                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce++hzscore+ LONG blocked (11.1% WR 24h, bleeding)")
-                    continue
+                # REMOVED CEO 2026-08-12: poison block was based on 0.5% SL era data.
+                # 7d 33T +$0.20, 48.5% WR — cold streak at 1.2% SL, not broken.
+                # Monitor: if 7d WR drops below 40%, re-add block.
 
             # ── SHORT poison + required co-signal logic ──────────────────────────
             if direction.upper() == 'SHORT':
@@ -747,7 +745,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # ponytail: backtested standalone bypass — matches final guard (line 1162)
                     bare_src = source.rstrip('+-') if source else ''
                     if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
-                                    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                    'spike_exhaustion_short', 'bb_bounce',
                                     'range_finder', 'continuation'):
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
@@ -1171,7 +1169,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
                 bare_src = src.rstrip('+-') if src else ''
                 if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
-                                'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                'spike_exhaustion_short', 'bb_bounce',
                                 'range_finder', 'continuation'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and src.startswith('accel-300'):
