@@ -37,6 +37,7 @@ REGIME_SIGNALS = {
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
+        'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',  # 58.8% WR all-time
         'tl_break',
@@ -45,9 +46,11 @@ REGIME_SIGNALS = {
     },
     'HIGH': {
         # Breakout works in big moves
+        'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break',
         'accel-300-vel',
+        'continuation',  # standalone part
         'hzscore', 'range_finder',  # individual parts
     },
     'EXTREME': {
