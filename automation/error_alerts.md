@@ -78,3 +78,6 @@
 - **[OK]**: Regime NEUTRAL (103/106). 2 volatility-gated (JUP, BCH) — normal.
 - **[WARN]**: Disk 81% (90G/118G) — persistent, approaching 85% threshold.
 - **AUTO-FIX**: None needed.
+
+## Error Alerts — 2026-08-11 10:08 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [_get_meta] fetch failed: <urlopen TOK [Errno -N] Temporary failure in name resolution>`
