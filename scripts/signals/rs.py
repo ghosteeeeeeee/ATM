@@ -101,6 +101,142 @@ def _get_regime_5m(token: str):
     return 'NEUTRAL', 0
 
 
+# ── 5m OHLCV candles (real wicks for pattern detection) ──────────────────────
+
+_CANDLES_DB = '/root/.hermes/data/candles.db'
+
+
+def _get_candles_5m(token: str, limit: int = 50) -> list:
+    """Fetch real OHLCV 5m candles from candles.db for pattern detection.
+
+    Returns list of {open, high, low, close, volume} oldest-first.
+    These have real wick data (unlike synthesized price_history candles).
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT open, high, low, close, volume FROM candles_5m
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT ?
+        """, (token.upper(), limit))
+        rows = cur.fetchall()
+        if not rows:
+            return []
+        return [{'open': r[0], 'high': r[1], 'low': r[2], 'close': r[3], 'volume': r[4]}
+                for r in reversed(rows)]
+    except Exception:
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+
+# ── Candle pattern detection (Woods, Porwal) ─────────────────────────────────
+
+def _detect_candle_pattern(candle: dict, prev_candle: dict = None) -> Optional[str]:
+    """Detect high-probability candle patterns at S/R levels.
+
+    Returns pattern name or None. Uses real OHLCV (with wicks).
+
+    Patterns (from books):
+    - pin_bar_bull: long lower wick (>66% of range), small body (<33%) at support
+    - pin_bar_bear: long upper wick (>66% of range), small body (<33%) at resistance
+    - engulfing_bull: body > prev body, closes above prev open, body overlaps
+    - engulfing_bear: body > prev body, closes below prev open, body overlaps
+    - doji: very small body (<10% of range) — indecision at key level
+    """
+    if not candle:
+        return None
+
+    o, h, l, c = candle['open'], candle['high'], candle['low'], candle['close']
+    total_range = h - l
+    if total_range <= 0:
+        return None
+
+    body = abs(c - o)
+    upper_wick = h - max(o, c)
+    lower_wick = min(o, c) - l
+
+    # Pin bar: long wick + small body
+    if lower_wick > total_range * 0.66 and body < total_range * 0.33:
+        return 'pin_bar_bull'
+    if upper_wick > total_range * 0.66 and body < total_range * 0.33:
+        return 'pin_bar_bear'
+
+    # Doji: very small body
+    if body < total_range * 0.10:
+        return 'doji'
+
+    # Engulfing: body > prev body, opposite direction, body overlaps prev body
+    if prev_candle:
+        po, ph, pl, pc = prev_candle['open'], prev_candle['high'], prev_candle['low'], prev_candle['close']
+        prev_body = abs(pc - po)
+        if body > prev_body and prev_body > 0:
+            # Bullish engulfing: prev red, current green, current body engulfs prev body
+            if pc < po and c > o and o <= pc and c >= po:
+                return 'engulfing_bull'
+            # Bearish engulfing: prev green, current red, current body engulfs prev body
+            if pc > po and c < o and o >= pc and c <= po:
+                return 'engulfing_bear'
+
+    return None
+
+
+def _pattern_at_level(candles_5m: list, level: float, direction: str,
+                       atr_value: float = None) -> dict:
+    """Check if a candle pattern formed at the S/R level in recent candles.
+
+    Scans last N candles for a pattern that touched the level and had a
+    confirming move. Returns {pattern, confidence_bonus} or None.
+
+    Books:
+    - Pin bar at support → +10 confidence (Woods)
+    - Engulfing at support → +8 confidence (Porwal)
+    - Doji at support + confirmation → +5 confidence (Porwal)
+    """
+    if not candles_5m or len(candles_5m) < 3:
+        return None
+
+    # ATR-based touch threshold
+    if atr_value and atr_value > 0:
+        touch_thresh = atr_value * 0.3  # within 0.3 ATR = "at the level"
+    else:
+        touch_thresh = abs(level) * 0.003  # 0.3% fallback
+
+    # Scan last 10 candles for pattern at level
+    recent = candles_5m[-10:]
+    for i in range(1, len(recent)):
+        c = recent[i]
+        prev = recent[i - 1]
+
+        # Did this candle touch the level?
+        touched = (abs(c['low'] - level) < touch_thresh or
+                   abs(c['high'] - level) < touch_thresh or
+                   abs(c['close'] - level) < touch_thresh)
+        if not touched:
+            continue
+
+        pattern = _detect_candle_pattern(c, prev)
+        if pattern is None:
+            continue
+
+        # Match pattern to direction
+        if direction == 'LONG' and pattern in ('pin_bar_bull', 'engulfing_bull'):
+            bonus = 10 if pattern == 'pin_bar_bull' else 8
+            return {'pattern': pattern, 'confidence_bonus': bonus}
+        if direction == 'SHORT' and pattern in ('pin_bar_bear', 'engulfing_bear'):
+            bonus = 10 if pattern == 'pin_bar_bear' else 8
+            return {'pattern': pattern, 'confidence_bonus': bonus}
+        # Doji works both ways — smaller bonus
+        if pattern == 'doji':
+            return {'pattern': pattern, 'confidence_bonus': 5}
+
+    return None
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _atr(candles: list, period: int = RS_ATR_PERIOD) -> Optional[float]:
@@ -953,7 +1089,7 @@ def run(prices_dict=None):
 # ── CLI test ──────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     import sys, os
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     from signal_schema import get_all_latest_prices, init_db
 

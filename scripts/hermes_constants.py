@@ -94,27 +94,22 @@ SHORT_BLACKLIST = {
     # MOVE removed for Batch 5 trial 2026-08-03
     # UNI, LINEA, TIA, TURBO, BLUR, FET: re-blacklisted 2026-08-02 (pre-trial data)
     # ORDI, PEOPLE, AIXBT, ZK, CAKE: re-blacklisted 2026-08-02 (no execution during trial)
-    'BABY', 'STBL',
-    'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
-    'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
-    # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    # OP: 4 trades, 0% WR — RE-BLACKLIST
-    # All others: 0-2 trades — INSUFFICIENT (signals don't fire for these tokens)
-    # DYDX removed 2026-08-07 — user request
-    'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
-    'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
-    'SEI', 'MET', 'DASH', 'WLD',
-    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
-    'ADA',
-    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
-    'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
-    'GRASS', 'HPOS', 'ONDO',
-    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
-    'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
-    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
-    'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
+    # REMOVED 2026-08-12: INSUFFICIENT batch tokens — auto-re-blacklist via token_performance_monitor
+    # 'BABY', 'STBL', 'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
+    # 'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
+    # 2026-08-02: Batch 2 trial — OP kept (4T, 0% WR), rest removed
+    'OP',
+    # 'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    # 'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'LDO', 'APT',
+    # 'SEI', 'MET', 'DASH', 'WLD',
+    # 'ADA', (removed — defunct signals)
+    # Batch 3/4/5 INSUFFICIENT — removed 2026-08-12
+    # '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    # 'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
+    # 'GRASS', 'HPOS', 'ONDO',
+    # 'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
+    # 'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
+    # 'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
     # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
     'GALA', 'STRK',
     # 2026-08-06: Worst switch offenders — signals flip direction, both sides lose
@@ -135,6 +130,8 @@ SHORT_BLACKLIST = {
     'TRUMP',
     # 2026-08-11: 5 trades, 0% WR, -$0.23 — low-price noise coin, all ATR SL hits
     'MEGA',
+    # AUTO-BLACKLISTED 2026-08-12 — 35% WR threshold (5+ trades, 7d)
+    'AXS', 'XRP',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -153,31 +150,27 @@ LONG_BLACKLIST = {
     # MOVE removed for Batch 5 trial 2026-08-03
     # UNI, LINEA, TIA, TURBO, BLUR, FET: re-blacklisted 2026-08-02 (pre-trial data)
     # ORDI, PEOPLE, AIXBT, ZK, CAKE: re-blacklisted 2026-08-02 (no execution during trial)
-    'BABY', 'STBL',
-    'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
-    'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
-    # 2026-08-02: Batch 2 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    # DYDX removed 2026-08-07 — user request
-    'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
-    'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'OP', 'LDO', 'APT',
-    'SEI', 'MET', 'DASH', 'WLD',
+    # REMOVED 2026-08-12: INSUFFICIENT batch tokens — see SHORT_BLACKLIST comment
+    # 'BABY', 'STBL', 'UNI', 'LINEA', 'TIA', 'TURBO', 'BLUR', 'FET',
+    # 'ORDI', 'PEOPLE', 'AIXBT', 'ZK', 'CAKE',
+    # 2026-08-02: Batch 2 trial — OP kept, rest removed
+    'OP',
+    # 'COMP', 'CRV', 'IMX', 'SAND', 'NEAR', 'DOT', 'ICP',
+    # 'ATOM', 'INJ', 'FIL', 'ETC', 'ARB', 'LDO', 'APT',
+    # 'SEI', 'MET', 'DASH', 'WLD',
     'PANDORA', 'JELLY', 'FRIEND', 'FTM', 'CANTO', 'MANTA', 'LOOM',
     'BONK', 'WIF', 'PYTH', 'JTO', 'RAY', 'SRM', 'MNGO', 'APTOS',
     # 2026-04-02: phantom orders via openclaw systemd timers
     'OX', 'ORBS', 'LAUNCHCOIN', 'NEIROETH', 'NFTI', 'OMNI',
     # 2026-04-02: persistent losing LONG directions (loss cooldown streaks)
     'AERO', 'CHILLGUY', 'LIT', 'ANIME',  # LONG streaks
-    # 2026-08-02: 0% WR in 24h window — all inv-accel-300- and pattern_scanner trades
-    'ADA',
-    # 2026-08-03: Batch 3 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
-    'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
-    'GRASS', 'HPOS', 'ONDO',
-    # 2026-08-04: Batch 4 trial RE-BLACKLISTED (48h trial: 0% WR, INSUFFICIENT)
-    'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
-    'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
-    # 2026-08-04: Batch 5 trial RE-BLACKLISTED (48h trial: 0% WR, no execution)
-    'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
+    # Batch 3/4/5 INSUFFICIENT — removed 2026-08-12
+    # 'ADA', '2Z', 'AI16Z', 'BADGER', 'BANANA', 'BIGTIME', 'BLZ', 'CASHCAT', 'CFX',
+    # 'CHIP', 'DOOD', 'ENA', 'FOGO', 'FTT', 'FXS', 'GMT', 'GRAM',
+    # 'GRASS', 'HPOS', 'ONDO',
+    # 'ALT', 'APEX', 'IO', 'MERL', 'MON', 'NEO', 'POL', 'PURR', 'SKR', 'STX',
+    # 'SUSHI', 'USUAL', 'XPL', 'ZEN', 'ZORA', 'ZRO',
+    # 'HYPE', 'KNEIRO', 'KPEPE', 'MOVE', 'NOT', 'PUMP', 'SYRUP', 'YGG',
     # 2026-08-05: Trash tokens — consistently lose, fire signals but never profit
     'GALA', 'STRK',
     # 2026-08-06: Worst switch offenders — signals flip direction, both sides lose
@@ -202,6 +195,8 @@ LONG_BLACKLIST = {
     'TRUMP',
     # 2026-08-11: 5 trades, 0% WR, -$0.23 — low-price noise coin, all ATR SL hits
     'MEGA',
+    # AUTO-BLACKLISTED 2026-08-12 — 35% WR threshold (5+ trades, 7d)
+    'XRP',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 
@@ -1443,7 +1438,8 @@ CONTINUATION_MINUS_ENABLED = True             # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
 TREND_MOMENTUM_NEAR_SMA_ENABLED = True       # re-enabled 2026-08-12 — contrarian flip active in signal_compactor.py
-TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED = True  # LONG direction only (flipped to SHORT by contrarian logic)
+TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED = True  # LONG direction (flipped to SHORT by contrarian logic)
+TREND_MOMENTUM_NEAR_SMA_MINUS_ENABLED = True # SHORT direction (flipped to LONG by contrarian logic)
 TREND_MOMENTUM_NEAR_SMA_MOMENTUM_THRESHOLD = 0.005  # 0.5% min 5-period momentum
 TREND_MOMENTUM_NEAR_SMA_DIST_SMA_MAX = 0.005        # 0.5% max distance from SMA
 TREND_MOMENTUM_NEAR_SMA_SMA_PERIOD = 20             # SMA lookback
