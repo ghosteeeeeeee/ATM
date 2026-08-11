@@ -70,3 +70,11 @@
 - **[INFO]**: Regime NEUTRAL (105/106 tokens). Speed: 43% >=50th percentile (below 50% target).
 - **[WARN]**: Disk 81% (90G/118G) — approaching 85% threshold.
 - **AUTO-FIX**: None needed.
+
+## Error Alerts — 2026-08-11 06:41 UTC
+- **[OK]**: Pipeline healthy — last cycle completed at 06:40:11 (exit 0, 14.9s CPU). Next fire 06:41:00.
+- **[OK]**: 172 signals generated (1h). 1 executed, 5 pending. 0 errors.
+- **[OK]**: 1 open (ASTER LONG +0.08%), 56 closed today. PnL: -3.14%.
+- **[OK]**: Regime NEUTRAL (103/106). 2 volatility-gated (JUP, BCH) — normal.
+- **[WARN]**: Disk 81% (90G/118G) — persistent, approaching 85% threshold.
+- **AUTO-FIX**: None needed.
