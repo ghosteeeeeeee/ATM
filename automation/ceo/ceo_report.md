@@ -1,3 +1,18 @@
+## CEO Report — 2026-08-12 21:30 UTC
+
+### Decision: TRAILING_DISTANCE_PCT stays at 0.60%
+
+Options evaluated:
+- (A) Reduce to 0.30% — would re-introduce the problem we just fixed (locked in 0.15% profits, stopped on pullbacks)
+- (B) Keep at 0.60% — low-ATR tokens get tight trailing stops, inherent to their volatility profile
+- (C) ATR-scaled trailing — optimal but adds code complexity for 2-3 outlier tokens
+
+**Chose B.** The trailing distance is a global parameter; optimizing it for ADA (0.35% ATR) and ASTER (0.17% ATR) degrades the typical token. If low-ATR tokens are a problem, the fix is an ATR minimum filter (skip tokens with ATR < 0.5%), not changing the trailing distance.
+
+The tpsl_utils.py `if`→`elif` bug fix will self-correct on next position_manager cycle — no action needed.
+
+---
+
 ## CEO Report — 2026-08-12 20:15 UTC
 
 ### Diagnosis
