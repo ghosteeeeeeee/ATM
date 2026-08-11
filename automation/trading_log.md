@@ -5908,3 +5908,36 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - SL hit rate at 45% — monitor if it drops below 40% next few hours
 - JUP SHORT cut-loser-CL-T1 -$0.09 — check if signal was valid
+
+## [2026-08-11 23:25] Hourly Analysis
+
+**Trades:** 2 closed last hour (0W, 2L) — **-$0.11**
+**24h:** 41T 18W (43.9% WR) -$0.33
+**7d:** 383T 200W (52.2% WR) +$0.72
+
+**Close Reasons (24h):**
+- atr_sl_hit: 18T (43.9%) -$0.73 — elevated but profit-monster-trail compensates
+- profit-monster-trail: 18T (43.9%) +$0.82 — strong, net positive
+- cut-loser-CL-T1: 4T -$0.42 — bleed source
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- hzscore-,range_breakout-: 2T 2W +$0.10 — strong
+- bb_bounce+: 9T 5W +$0.08 — solid
+- hzscore+: 8T 4W +$0.02 — decent
+- bb_bounce+,hzscore+: 5T 2W -$0.07 — cold streak
+- trend_momentum_near_sma+: 5T 0W -$0.40 — **KILLED** (flag already False since 22:26)
+
+**Changes:** None
+
+**No Change Needed:**
+- trend_momentum_near_sma+ killed at 22:26 UTC. Residual APT trade closed at 23:10 (SL hit -$0.03) — pre-kill entry, no new signals generating.
+- Trade frequency normal (2/hr, well below 20/hr threshold)
+- No signals with 0% WR and 3+ trades needing kill
+- atr_sl_hit 43.9% — elevated but profit-monster-trail compensating equally ($0.82 vs -$0.73)
+- 7d system profitable at 52.2% WR, +$0.72
+- cut-loser-CL-T1 -$0.42 — CL_TRAIL_ENABLED=False already deployed, monitoring
+
+**Open Questions:**
+- atr_sl_hit trending down from 46% → 43.9% — positive sign, continue monitoring
+- bb_bounce+,hzscore+ cold at -$0.07 — 7d still intact, no kill warranted

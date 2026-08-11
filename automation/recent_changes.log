@@ -241,3 +241,6 @@
   WHAT: TREND_MOMENTUM_NEAR_SMA_ENABLED = False
   WHY: 4T 0W 0% WR -$0.37 in 24h. Contrarian flip didn't help. Kill threshold (3+ trades, 0% WR) met.
   BY: auto_1hr
+[2026-08-11 23:25] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W). trend_momentum_near_sma+ residual trade closed (pre-kill entry). 24h 41T 18W (43.9% WR) -$0.33. 7d 383T 200W (52.2% WR) +$0.72. Signal already killed at 22:26. No new 0% WR kill candidates. Trade freq 2/hr normal. atr_sl_hit 43.9% (down from 46%, positive trend). profit-monster-trail compensating SL losses. No param changes.
+  BY: auto_1hr
