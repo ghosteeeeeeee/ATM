@@ -20,10 +20,11 @@ from signal_schema import (
 )
 import hype_cache as hc
 from hyperliquid_exchange import is_delisted as _is_delisted, _info_rate_limit
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, BROAD_MARKET_TOKENS
 
 # Combined blacklist — tokens that should never be stored (not tradeable or systematically losing)
-SKIP_TOKENS = SHORT_BLACKLIST | LONG_BLACKLIST
+# EXCEPT broad market tokens — they must always have fresh data for speed/volatility calculations
+SKIP_TOKENS = (SHORT_BLACKLIST | LONG_BLACKLIST) - BROAD_MARKET_TOKENS
 
 STATIC = STATIC_DB
 init_db()  # Ensure tables exist
@@ -410,7 +411,8 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
     # then INSERT OR REPLACE marks them is_closed=1.
     # Tokens with no prior candles have last_closed_boundary = -tf_seconds (start from epoch).
     # Skip blacklisted tokens — reduces ~79 tokens × 5 queries × 4 TFs per run
-    skip = SHORT_BLACKLIST | LONG_BLACKLIST
+    # EXCEPT broad market tokens — they must always have fresh candle data
+    skip = (SHORT_BLACKLIST | LONG_BLACKLIST) - BROAD_MARKET_TOKENS
     last_closed_dict = {k: v for k, v in last_closed_dict.items() if k not in skip}
 
     filled = 0
