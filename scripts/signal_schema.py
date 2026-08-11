@@ -1401,6 +1401,14 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            if _comp in ('spike_exhaustion_short-', 'spike_exhaustion_short'):
+                try:
+                    from hermes_constants import SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED
+                    if not SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 

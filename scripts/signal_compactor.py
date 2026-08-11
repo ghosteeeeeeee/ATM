@@ -260,6 +260,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('trend_momentum_near_sma', 'trend_momentum_near_sma+'): 1.0,
     # stop_hunt_reversal_long — catch violent long after stop hunt
     ('stop_hunt_reversal_long', 'stop_hunt_reversal_long+'): 1.0,
+    # spike_exhaustion_short — fade violent spike after exhaustion
+    ('spike_exhaustion_short', 'spike_exhaustion_short-'): 1.0,
     # engulfing: large single-candle momentum moves
     ('engulfing_long',  'engulfing+'):  1.0,
     ('engulfing_short', 'engulfing-'):  1.0,

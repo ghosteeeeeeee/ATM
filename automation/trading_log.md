@@ -5346,3 +5346,31 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - All star signals profitable 7d
 
 **Open Questions:** None — system healthy
+
+## [2026-08-11 02:25] Hourly Analysis
+
+**Trades:** 1 closed last hour (MNT LONG profit-monster-trail WIN +$0.03) | 60 in 24h (-$0.32, 48.3% WR)
+**Open:** 4 (HTTST4, ASTER, KAS SHORT, MEGA SHORT)
+
+**24h by close reason:**
+- profit-monster-trail: 25T +$1.25 (sole winning exit)
+- atr_sl_hit: 23T -$1.03 (38.3% — healthy, <40%)
+- cut-loser-CL-trail: 11T -$0.55
+
+**Diagnosis:**
+1. Entry quality: 1 win last hour — quiet
+2. SL behavior: 38.3% (healthy, below 40%)
+3. Signal quality: bb_bounce+,hzscore+ 18T -$0.22 (38.9% WR 24h, but 30T +$0.23 7d — cold today only)
+4. Trade frequency: 2.5/hr — normal
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 38.3% (healthy)
+- No 0% WR signals with 3+ trades to kill
+- Trade frequency normal
+- 7d still positive ($0.37, 51.8% WR)
+- Trailing distance widened to 0.60% at 22:00 — too early to evaluate (4.5h old)
+- Cold day = normal variance after 15 green days
+
+**Open Questions:** None — system healthy

@@ -1459,6 +1459,15 @@ STOP_HUNT_REVERSAL_LONG_REVERSAL_BODY_MIN = 0.003    # 0.3% min green body for r
 STOP_HUNT_REVERSAL_LONG_CONF_BASE = 75               # base confidence
 STOP_HUNT_REVERSAL_LONG_CONF_STRONG_REVERSAL = 5     # +5 if reversal body > 1%
 STOP_HUNT_REVERSAL_LONG_CONF_CAP = 95                # max confidence
+
+# ── spike_exhaustion_short — SHORT after violent spike exhausts ───────────
+SPIKE_EXHAUSTION_SHORT_ENABLED = True
+SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED = True
+SPIKE_EXHAUSTION_SHORT_SPIKE_THRESHOLD = 0.025       # 2.5% min spike to fade
+SPIKE_EXHAUSTION_SHORT_SPIKE_WINDOW = 5              # candles to look for spike
+SPIKE_EXHAUSTION_SHORT_STALL_CANDLES = 3             # candles without new high = stall
+SPIKE_EXHAUSTION_SHORT_CONF_BASE = 80                # base confidence (high conviction)
+SPIKE_EXHAUSTION_SHORT_CONF_CAP = 95                 # max confidence
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',
