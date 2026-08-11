@@ -421,3 +421,4 @@ EOF
 
 ## TEAM UPDATES
 - [2026-08-11 21:05] auto_1hr: NO CHANGES — SL revert eval active (closes 05:20 Aug 12), only 3 trades since revert, need 20+ for signal. 0T last hour, flat market. 24h 37T 35.1% WR -$0.56.
+- [2026-08-11 13:48] signal_reporter: Killed bb_bounce+,hzscore+ LONG — COSIG-GATE poison block. 23.1% WR, -$0.33 (24h, 13T). Today alone 25% WR, -$0.09 (4T). Block at signal_compactor.py:613. Individual components remain enabled for other combos. No other kill candidates (all others under threshold). No boost candidates (none with 3+ trades AND WR>55% in 24h). No inversions. No open trades except stale ht_sig4 (paper).
