@@ -23,25 +23,24 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
 import sqlite3
 
-# Signals that work in each regime (from 30d backtest with actual ATR at entry)
+# Signals that work in each regime (from 30d backtest, 861 trades)
 # Source: correlated trade outcomes with volatility regime at entry time
 # ONLY signals with positive PnL in that regime are included
+# Updated: 2026-08-11 from 30d backtest
 REGIME_SIGNALS = {
     'FLAT': {
         # Mean reversion works in range-bound markets
-        'bb_bounce', 'bb_bounce+', 'bb_bounce,hzscore+',
-        'bb-bounce-short,hzscore-',
+        'bb_bounce', 'bb_bounce+',
     },
     'NORMAL': {
-        # Trend following works in steady waves
+        # Only 3 profitable combos — most signals bleed here (-$0.82)
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
-        'tl_break+', 'tl_break-', 'accel-300-',
-        'continuation+', 'ma_cross',
+        'tl_break',
     },
     'HIGH': {
-        # Breakout works in big moves
-        'bb_bounce+,range_finder+', 'tl_break-', 'tl_break+',
-        'accel-300-vel+', 'accel-300-vel-',
+        # Breakout works in big moves — only profitable regime (+$0.17)
+        'bb_bounce+,range_finder+', 'tl_break',
+        'accel-300-vel',
     },
     'EXTREME': {
         # Continuation works in storms
