@@ -232,6 +232,16 @@ def detect_bb_bounce(token, closes):
         if bounce_pct < bounce_thresh:
             return None  # Bounce too weak
 
+        # Momentum fade: require 5m velocity positive (price already rising)
+        try:
+            from speed_tracker import get_token_speed
+            spd = get_token_speed(token)
+            vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
+            if vel_5m <= 0:
+                return None  # price still falling, bounce not confirmed
+        except Exception:
+            pass
+
         return {
             'direction': 'LONG',
             'middle': middle,
@@ -262,6 +272,16 @@ def detect_bb_bounce(token, closes):
         bounce_pct = (upper - current) / upper * 100 if upper > 0 else 0
         if bounce_pct < bounce_thresh:
             return None
+
+        # Momentum fade: require 5m velocity negative (price already falling)
+        try:
+            from speed_tracker import get_token_speed
+            spd = get_token_speed(token)
+            vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
+            if vel_5m >= 0:
+                return None  # price still rising, fade not confirmed
+        except Exception:
+            pass
 
         return {
             'direction': 'SHORT',
