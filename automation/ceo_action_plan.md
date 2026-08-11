@@ -1,51 +1,65 @@
-# CEO Action Plan — 2026-08-06 02:15 UTC
+## CEO Action Plan — 2026-08-11
 
-## Status: LIVE · PROFITABLE · TIGHTENED
+### Priority 1: Unfreeze Volatility Gate (TODAY)
+**Owner:** CEO (direct edit)
+**File:** `/root/.hermes/scripts/volatility_gate.py`
 
-## Done (this session)
-- [x] RE-ENABLE live trading — kill switch set true (was paused since 2026-08-05 02:50)
-- [x] TIGHTEN trailing — activation 0.35%→0.30%, distance 0.80%→0.70%
-- [x] UPDATE ceo_report.md with 24h performance snapshot
+Expand `REGIME_SIGNALS` whitelist:
+- FLAT: Add `trend_momentum_near_sma`, `bb_bounce+,range_finder+` (60% WR all-time)
+- NORMAL: Add `trend_momentum_near_sma`, `bb-bounce-short,hzscore-` (58.8% WR)
+- HIGH: Add `bb_bounce+,hzscore+` (was 80% WR at 1.2% SL)
+- Keep existing profitable entries
 
-## Now (only)
+**Why:** Pipeline log shows `trend_momentum_near_sma+ not suited for NORMAL` every minute. Tokens generating valid signals get gate-rejected. 63 NORMAL tokens + 45 FLAT tokens = 108 tokens with blocked signals.
 
-| P | Action | Detail |
-|---|--------|--------|
-| P0 | MONITOR trailing impact | 0.30% activation may trigger too early on volatile tokens — watch for premature exits |
-| P1 | WATCH tl_break_long decay | 100% WR (14 trades) historically decays to 0% within 24-48h |
-| P1 | VERIFY return_exhaustion signals | Threshold lowered 80→70, should be firing now |
-| P2 | VERIFY vortex_break signals | Window expanded 3→5, should be firing now |
+### Priority 2: Remove COSIG-GATE Poison Block (TODAY)
+**Owner:** CEO (direct edit)
+**File:** `/root/.hermes/scripts/signal_compactor.py` lines 613-616
 
-## Locked Parameters
+Remove or comment out:
+```python
+# POISON: bb_bounce+ + hzscore+ LONG = 23% WR (13T, -$0.33) — hemorrhaging
+if has_bb_bounce and has_hz_pos:
+    log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce++hzscore+ LONG blocked (23.1% WR, -$0.33)")
+    continue
+```
 
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| ATR_SL_MIN_INIT | 1.0% | Matches exit behavior |
-| TRAILING_ACTIVATION | 0.30% | CEO tightened 2026-08-06 |
-| TRAILING_DISTANCE | 0.70% | CEO tightened 2026-08-06 |
-| STOP_LOSS_DEFAULT | 1.0% | Hard fallback |
-| MAX_OPEN_POSITIONS | 6 | Diversified |
+**Why:** The 23.1% WR was from the 0.5% SL era (Aug 10-11). Same signal was 80% WR at 1.2% SL (Aug 9). SL has been reverted. Poison block is based on damaged data.
 
-## Signal Stance
+### Priority 3: Monitor (24-48h)
+- [ ] Check pipeline log for VOL-GATE rejections after fix
+- [ ] Verify bb_bounce+,hzscore+ LONG trades resume
+- [ ] Track SL hit rate — target <30%
+- [ ] Track signal WR — target >50%
+- [ ] Verify 0 open → 1-3 open positions
 
-| Signal | Stance | Evidence |
-|--------|--------|----------|
-| tl_break_long | ON, WATCH | 100% WR — decay imminent |
-| zscore-rising± | ON | 55-63% WR, profitable |
-| vel-hermes- | ON | 43.5% WR, +$0.47 |
-| hzscore± | ON | Mixed but enabled |
-| bb_bounce | DEAD | Asymmetric R:R, never re-enable |
-| decider | DEAD | 11% WR, never re-enable |
-| accel-300 family | DEAD | 0% WR, never re-enable |
-| pattern_wolf | DEAD | 0% WR, never re-enable |
+### Do NOT change
+- SL params (1.2% min, 2.5% max) — correct
+- Trailing (0.60%) — correct
+- BLACKLISTS — MEGA stays blocked (5T, 0% WR)
+- SHORT trend filter (15m) — working
+- `bb_bounce+,range_finder+` — star, untouched
 
-## Do not
-- Pause live trading (boss directive: "Pausing is not an option")
-- Re-enable dead signals
-- Widen trailing without data evidence
-- Chase losses with parameter thrash
+### Verification after changes
+```bash
+# 1. Check pipeline log for VOL-GATE
+tail -100 /root/.hermes/logs/pipeline.log | grep VOL-GATE
 
-## Follow-up (CEO next run)
-- [ ] Check trailing stop-out frequency (too many premature exits?)
-- [ ] Verify return_exhaustion and vortex_break generating signals
-- [ ] tl_break_long WR decay check
+# 2. Check signal_compactor for COSIG-GATE
+tail -200 /root/.hermes/logs/pipeline.log | grep COSIG-GATE
+
+# 3. Verify trades resuming
+sudo -u postgres psql -d brain -c "SELECT COUNT(*) FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '1 hour';"
+
+# 4. Check open positions
+sudo -u postgres psql -d brain -c "SELECT COUNT(*) FROM trades WHERE status='open';"
+```
+
+### Commit message
+```
+CEO: Unfreeze volatility gate + remove stale COSIG-GATE poison block
+
+- Expand REGIME_SIGNALS whitelist (FLAT/NORMAL/HIGH)
+- Remove bb_bounce+,hzscore+ poison block (23% WR was from 0.5% SL era)
+- SL reverted to 1.2%, signal quality should recover
+```

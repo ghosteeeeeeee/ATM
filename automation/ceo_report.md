@@ -1,23 +1,41 @@
-## CEO Report — 2026-08-12 07:00 UTC
+## CEO Report — 2026-08-11 Signal Degradation Analysis
 
 ### Diagnosis
-Verified DB: 24h 37T -$0.56, 35.1% WR — RED. 7d 363T +$0.55, 52.1% WR — positive. 1 open (HTTST4 paper). Today Aug 12 partial: 10T -$0.13, 40% WR (low volume). Daily: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -0.13 (3 consecutive red after 15 green).
+Verified DB: 24h 33T -$0.53, 33.3% WR — RED. 7d 363T +$0.55, 52.1% WR — positive. Zero open positions. System functional but signal-starved — trades happening (33T/24h) but hotset empty, no new entries queuing.
 
-### Concern
-bb_bounce+,hzscore+ LONG: 24h 13T -$0.33, 23.1% WR — worst signal. 7d: 33T +$0.20, 48.5% WR — intact star, not broken. Getting entries chopped in NEUTRAL consolidation. Cost drivers: atr_sl_hit 35T -$1.61, cut-loser-CL-trail 15T -$0.73. No signal has 0% WR with 5+ trades. No signal has <35% WR with 10+ trades on 7d.
+### Root Cause (3 layers)
+1. **SL misfire (resolved):** Aug 10 tightened SL to 0.5% — SL hit rate jumped to 64.7%. Reverted to 1.2% Aug 11. `bb_bounce+,hzscore+` dropped from 80% WR → 25% WR at 0.5% SL. Same signal, same market — only SL changed.
 
-### SL Revert Status
-Reverted to 1.2% at 05:20 Aug 11. Eval window completing today — final check tomorrow. Post-revert data still sparse (NEUTRAL regime, low trade volume). Pre-revert at 0.5%: SL hit rate 64.7% — too tight. 1.2% now active.
+2. **Volatility gate over-blocking (active):** REGIME_SIGNALS whitelist too narrow. Pipeline log shows `trend_momentum_near_sma+ not suited for NORMAL` repeated every minute — this signal isn't in the NORMAL whitelist. Tokens like W (ATR 0.69%, NORMAL regime) are generating signals that get rejected by the gate. FLAT regime only allows `bb_bounce`/`bb_bounce+` — any combo signal not matching exactly gets blocked.
 
-### Fix Applied
-NO CHANGES. 7d trajectory solid, all 3 stars profitable, system calm. NEUTRAL regime = normal variance after Aug 9 peak. Monitoring:
-- bb_bounce+,hzscore+ LONG: if 7d WR < 45% → disable
-- return_exhaustion SHORT combos: if 7d bleeds exceed -$0.50 → disable
-- SL eval window: completes today, evaluate tomorrow
-- Disk 82% — approaching 85% threshold
+3. **COSIG-GATE poison block (active):** `bb_bounce+,hzscore+` LONG poison-blocked at line 613-614 of signal_compactor.py based on 23.1% WR — but that WR was from the 0.5% SL era. The signal was 80% WR 48h earlier under proper 1.2% SL params. Damaged-period data is poisoning the decision.
 
-### Verification
-- 7d: +$0.55 (52.1% WR) — positive, improved from yesterday
-- Stars intact: bb_bounce+,range_finder+ LONG 58.5%, bb_bounce+,hzscore+ LONG 48.5%, bb-bounce-short,hzscore- SHORT 58.8% — all profitable
-- Pipeline healthy, all timers running
-- Live trading enabled, NEUTRAL regime
+### Current Regime Distribution
+- FLAT: 45 tokens (AAVE, ADA, ASTER, BCH, etc.)
+- NORMAL: 63 tokens (0G, ALGO, AVAX, BNB, etc.)
+- HIGH: 28 tokens (AVNT, AXS, BERA, etc.)
+- EXTREME: 30 tokens (ACE, APE, AR, BIO, etc.)
+
+### Fix Required
+**Unfreeze the system** by addressing 2 code blocks:
+
+1. **Expand REGIME_SIGNALS** in `volatility_gate.py` — add `trend_momentum_near_sma` to NORMAL, add more combo signals to FLAT
+2. **Remove COSIG-GATE poison block** on `bb_bounce+,hzscore+` LONG (lines 613-616 of signal_compactor.py) — data is from wrong SL era
+
+### What NOT to change
+- SL params (1.2% min, 2.5% max) — correct, leave alone
+- Trailing distance (0.60%) — correct, leave alone
+- `bb_bounce+,range_finder+` — 60.4% WR all-time, 53T +$0.82 — star, leave alone
+- SHORT trend filter (15m) — working, SHORT profitable 7d
+
+### 24-48h Monitoring Plan
+| Metric | Current | Target | Action if missed |
+|--------|---------|--------|-----------------|
+| Volatility gate acceptance | ~0% | >50% | Expand whitelist further |
+| bb_bounce+,hzscore+ WR | 18.2% (24h) | >50% | COSIG-GATE removal should fix |
+| SL hit rate | unknown (frozen) | <30% | Already reverted, monitoring |
+| Open positions | 0 | 1-3 | System should self-correct after gate fix |
+| Daily trades | 33 | 30-60 | Gate expansion should restore volume |
+
+### Decision
+**Two code changes needed to unfreeze the system.** Neither is a param change — both are gate logic fixes based on stale data. The signal quality was fine at 1.2% SL; the gates are what's blocking recovery.
