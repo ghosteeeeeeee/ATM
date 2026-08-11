@@ -1468,6 +1468,12 @@ SPIKE_EXHAUSTION_SHORT_SPIKE_WINDOW = 5              # candles to look for spike
 SPIKE_EXHAUSTION_SHORT_STALL_CANDLES = 3             # candles without new high = stall
 SPIKE_EXHAUSTION_SHORT_CONF_BASE = 80                # base confidence (high conviction)
 SPIKE_EXHAUSTION_SHORT_CONF_CAP = 95                 # max confidence
+SPIKE_EXHAUSTION_SHORT_LARGE_SPIKE = 0.03            # >3% spike = extra confidence
+SPIKE_EXHAUSTION_SHORT_MIN_LOOKBACK = 3              # min candles to detect spike
+SPIKE_EXHAUSTION_SHORT_COOLDOWN_HOURS = 2            # per token+direction cooldown
+STOP_HUNT_REVERSAL_LONG_LARGE_HUNT = 0.02            # >2% drop = extra confidence
+STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL = 0.01       # >1% reversal body = extra confidence
+STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS = 2           # per token+direction cooldown
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',

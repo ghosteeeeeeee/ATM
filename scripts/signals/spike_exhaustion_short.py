@@ -32,6 +32,9 @@ from hermes_constants import (
     SPIKE_EXHAUSTION_SHORT_STALL_CANDLES,
     SPIKE_EXHAUSTION_SHORT_CONF_BASE,
     SPIKE_EXHAUSTION_SHORT_CONF_CAP,
+    SPIKE_EXHAUSTION_SHORT_LARGE_SPIKE,
+    SPIKE_EXHAUSTION_SHORT_MIN_LOOKBACK,
+    SPIKE_EXHAUSTION_SHORT_COOLDOWN_HOURS,
     SHORT_BLACKLIST,
 )
 import sqlite3
@@ -79,7 +82,7 @@ def detect(token):
     best_spike = 0
     best_spike_high = 0
 
-    for lookback in range(3, SPIKE_EXHAUSTION_SHORT_SPIKE_WINDOW + 1):
+    for lookback in range(SPIKE_EXHAUSTION_SHORT_MIN_LOOKBACK, SPIKE_EXHAUSTION_SHORT_SPIKE_WINDOW + 1):
         start_idx = search_end - lookback
         if start_idx < 0:
             continue
@@ -108,7 +111,7 @@ def detect(token):
         return None  # not red
 
     conf = SPIKE_EXHAUSTION_SHORT_CONF_BASE
-    if best_spike > 0.03:
+    if best_spike > SPIKE_EXHAUSTION_SHORT_LARGE_SPIKE:
         conf += 10
     conf = min(conf, SPIKE_EXHAUSTION_SHORT_CONF_CAP)
 
@@ -169,7 +172,7 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(tok, direction='SHORT', hours=2)
+            set_cooldown(tok, direction='SHORT', hours=SPIKE_EXHAUSTION_SHORT_COOLDOWN_HOURS)
 
     return added
 

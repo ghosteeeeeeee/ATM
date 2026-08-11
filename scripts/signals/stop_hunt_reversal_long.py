@@ -36,6 +36,9 @@ from hermes_constants import (
     STOP_HUNT_REVERSAL_LONG_CONF_BASE,
     STOP_HUNT_REVERSAL_LONG_CONF_STRONG_REVERSAL,
     STOP_HUNT_REVERSAL_LONG_CONF_CAP,
+    STOP_HUNT_REVERSAL_LONG_LARGE_HUNT,
+    STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL,
+    STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS,
     LONG_BLACKLIST,
 )
 import sqlite3
@@ -118,7 +121,7 @@ def detect(token):
     rev_low = reversal_candle[3]
 
     # Reversal: green candle (close > open) after the drop
-    if rev_close <= rev_open:
+    if rev_open <= 0 or rev_close <= rev_open:
         return None  # not a green reversal
 
     # Reversal body should be meaningful (not a doji)
@@ -133,9 +136,9 @@ def detect(token):
 
     # Confidence
     conf = STOP_HUNT_REVERSAL_LONG_CONF_BASE
-    if best_drop > 0.02:
-        conf += 10  # large stop hunt = bigger reversal potential
-    if rev_body > 0.01:
+    if best_drop > STOP_HUNT_REVERSAL_LONG_LARGE_HUNT:
+        conf += 10
+    if rev_body > STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL:
         conf += STOP_HUNT_REVERSAL_LONG_CONF_STRONG_REVERSAL
     conf = min(conf, STOP_HUNT_REVERSAL_LONG_CONF_CAP)
 
@@ -197,7 +200,7 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(tok, direction='LONG', hours=2)
+            set_cooldown(tok, direction='LONG', hours=STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS)
 
     return added
 
