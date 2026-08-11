@@ -50,6 +50,32 @@
 
 ---
 
+## 2026-08-11 01:26 Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses) in last 1.5h
+**PnL:** -$0.02 (WR: 50.0%)
+
+**24h Summary:** 62 trades, 22 wins, -$0.32, 35.5% WR
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal hit kill threshold (0% WR with 3+ trades in last hour)
+- Trade frequency normal (2.6/hr)
+- SL widening deployed 22:00 — needs 24h+ evaluation
+
+**Key Observations:**
+- atr_sl_hit = 41.9% of closes (just above 40% threshold — trending UP from 37.5% at 00:00)
+- profit-monster-trail = 38.7% of closes, +$1.22 — sole winning exit type
+- bb_bounce+,hzscore+ dominant signal (19T) but 36.8% WR, 8/19 SL hits — getting chopped
+- cut-loser-CL-trail 11T -$0.55 — losing exit type eating into profits
+
+**Open Questions:**
+- Is trailing distance at 0.60% too wide? Trades getting micro-profits then getting clipped on pullback
+- Should atr_sl_hit threshold be raised to 45% before intervention? (currently at 41.9%)
+
+---
+
 ## 2026-08-11 00:00 Hourly Analysis
 
 **Trades:** 2 closed (2 wins, 0 losses)
