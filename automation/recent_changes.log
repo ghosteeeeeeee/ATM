@@ -2,9 +2,17 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
-[2026-08-11 15:22] CEO review: NO CHANGES (trading)
-  WHY: Verified DB: 24h 32T -$0.46 (34.4% WR — RED), 7d 364T +$0.43 (51.9% WR — positive). Today partial: 11T -$0.25 (36.4% WR, idle since14:52). SL at 1.2% eval window active (05:20 Aug 11 → 05:20 Aug12). bb_bounce+,hzscore+ LONG24h 11T -$0.32 (18.2% WR — worst), 7d 33T +$0.20 (48.5% WR — intact). Open: 5 live +1 paper (all flat). Pipeline running, smoke test failing (cosmetic). NEUTRAL regime. Stars intact 7d. DO NOT CHANGE PARAMS during eval window.
+[2026-08-12 07:00] CEO: DISABLED trend_momentum_near_sma+ (trading)
+  WHY: Paper test signal — 0% WR, 3T, -$0.35. Zero wins across all trades. SL eval window completed (05:20 Aug 12). Verified DB: 24h 33T -$0.96 (27.3% WR — RED), 7d 368T +$0.16 (51.6% WR — barely positive). trend_momentum_near_sma+ LONG 0% WR with 3 trades — paper test failed. No reason to keep firing.
   BY: CEO run
+  DO NOT RE-ENABLE without positive backtest + paper test.
+
+[2026-08-11 15:22] CEO review: NO CHANGES (trading)
+  WHY: Verified DB: 24h 32T -$0.46 (34.4% WR — RED), 7d 364T +$0.43 (51.9% WR — positive). Today partial: 11T -$0.25 (36.4% WR, idle since 14:52). SL at 1.2% eval window active (05:20 Aug 11 → 05:20 Aug 12). bb_bounce+,hzscore+ LONG 24h 11T -$0.32 (18.2% WR — worst), 7d 33T +$0.20 (48.5% WR — intact). Open: 5 live +1 paper (all flat). Pipeline running, smoke test failing (cosmetic). NEUTRAL regime. Stars intact 7d. DO NOT CHANGE PARAMS during eval window.
+  BY: CEO run
+[2026-08-11 15:26] auto_1hr: NO CHANGES
+  WHY: 1T last hour (W LONG trend_momentum_near_sma+ CL-T1 -$0.12). 24h 32T -$0.46 (34.4% WR). atr_sl_hit 53.1% (17/32 — elevated, eval window active). cut-loser-CL-T1 new exit type avg -$0.12 (worse than CL-trail -$0.067). bb_bounce+,hzscore+ 24h 18.2% WR (cold) but 7d 48.5% intact — no kill. Since SL revert: 4T only (too small). 6 open. No 0% WR kills. Trade freq 1/hr (normal). Eval window closes 05:20 Aug 12.
+  BY: auto_1hr
 
 [2026-08-11 07:28] auto_1hr: NO CHANGES
   WHY: 0T last hour (system idle, 3 open). 24h 54T -$0.26 (40.7% WR). SL hit rate 48.1% (above 40% threshold but SL revert to 1.2% deployed 2h ago — eval window active until 05:20 Aug 12). hzscore+ LONG 14T 28.6% WR (7d 48.4% intact). Trade freq 2.25/hr (normal). No kill candidates. Stars intact. DO NOT CHANGE PARAMS during eval window.

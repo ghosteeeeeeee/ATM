@@ -108,6 +108,33 @@
 
 ---
 
+## 2026-08-11 15:26 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss) — W LONG trend_momentum_near_sma+ CL-T1 exit, -$0.12
+**PnL:** -$0.12 (WR: 0.0%)
+**24h:** 32T, -$0.46, 34.4% WR
+
+**Changes:** None
+
+**No Change Needed:**
+- SL eval window active until 05:20 Aug 12 — no param changes
+- atr_sl_hit 53.1% (17/32) — elevated but eval window constrains response
+- bb_bounce+,hzscore+ 24h 18.2% WR (11T) cold but 7d 48.5% intact — no kill
+- No 0% WR kill candidates (3+ trades threshold)
+- Trade frequency 1/hr (normal)
+- Since SL revert (05:20): 4T only — too small sample
+
+**Key Observations:**
+- cut-loser-CL-T1 new exit type: avg -$0.12 vs cut-loser-CL-trail -$0.067 — worse
+- trend_momentum_near_sma+ first fire: loss — monitor
+- 6 open positions, system calm
+
+**Open Questions:**
+- 53.1% SL hit rate at 1.2% — is this the new baseline or will it normalize?
+- cut-loser-CL-T1 root cause (new exit logic?)
+
+---
+
 ## 2026-08-11 03:38 Hourly Analysis
 
 **Trades:** 0 closed in last hour (system quiet, last trade at 02:29 UTC)

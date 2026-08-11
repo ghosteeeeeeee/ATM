@@ -81,3 +81,8 @@
 
 ## Error Alerts — 2026-08-11 10:08 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [_get_meta] fetch failed: <urlopen TOK [Errno -N] Temporary failure in name resolution>`
+
+## Error Alerts — 2026-08-11 15:42 UTC
+- **[WARN]** (Nx per run): `ERR decider_run: Traceback ... line 2908` — decider_run.py crashes every pipeline cycle. Pipeline continues (try/except wraps it). Error: truncated traceback, likely import or runtime error inside `run()`.
+- **[WARN]** (5x): `[PHANTOM-DBG] HBAR LONG` — SL not moving (0.086% distance unchanged across multiple runs). Position may be stuck.
+- **AUTO-FIX**: None applied — decider_run error is non-blocking, pipeline runs successfully despite it.
