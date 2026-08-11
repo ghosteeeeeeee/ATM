@@ -749,7 +749,7 @@ CL_TIER2_SKIP_BOTTOM_PCT = 20   # don't touch bottom 20% — let ATR SL handle c
 CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
 
 # Trailing Loss — mirror of PM_TRAIL (inverted logic)
-CL_TRAIL_ENABLED        = True
+CL_TRAIL_ENABLED        = False
 CL_TRAIL_ACTIVATE_PCT   = -1.0   # -1.0% — reverted from -0.5% (cut-loser needs room before trailing)
 CL_TRAIL_RECOVER_PCT    = 0.15   # cut if recovers 0.15% from worst then drops back
 CL_TRAIL_MIN_HOLD       = 2      # minimum minutes before trailing activates
