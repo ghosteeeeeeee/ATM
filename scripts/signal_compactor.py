@@ -610,11 +610,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if has_bb_bounce and has_ma100:
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce+ma100-cross blocked (43% WR, -$0.10)")
                     continue
-                # UNBLOCKED 2026-08-11: 23% WR was from 0.5% SL era (Aug 10-11)
-                # Same signal was 80% WR at 1.2% SL (Aug 9). SL reverted to 1.2%.
-                # if has_bb_bounce and has_hz_pos:
-                #     log(f"  [COSIG-GATE] {token} {direction}: bb_bounce++hzscore+ LONG blocked")
-                #     continue
+                # RE-BLOCKED CEO 2026-08-12: 11.1% WR (9T, -$0.31) in 24h post SL revert.
+                # 7d was 48.5% WR but 24h catastrophic — signal is bleeding, not cold-streaking.
+                if has_bb_bounce and has_hz_pos:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce++hzscore+ LONG blocked (11.1% WR 24h, bleeding)")
+                    continue
 
             # ── SHORT poison + required co-signal logic ──────────────────────────
             if direction.upper() == 'SHORT':
@@ -744,7 +744,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass_gate = True
                     gate_msg = f'confluence signal ({source})'
                 else:
-                    gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
+                    # ponytail: backtested standalone bypass — matches final guard (line 1162)
+                    bare_src = source.rstrip('+-') if source else ''
+                    if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                                    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                    'range_finder', 'continuation'):
+                        pass_gate = True
+                        gate_msg = f'backtested standalone ({source})'
+                    else:
+                        gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
 
             # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")

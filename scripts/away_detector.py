@@ -121,7 +121,7 @@ def call_ceo():
     log(f"  Calling CEO (away mode)...")
 
     # Write away prompt to a temp file for the CEO to read
-    away_prompt = '/root/.hermes/automation/ceo_away_prompt.md'
+    away_prompt = '/root/.hermes/automation/ceo/ceo_away_prompt.md'
     if not os.path.exists(away_prompt):
         log(f"  CEO away prompt not found: {away_prompt}")
         return

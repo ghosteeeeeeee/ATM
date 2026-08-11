@@ -115,7 +115,7 @@ After making changes, report:
 ### Step 1: Read Team Updates (MANDATORY)
 **Before anything else, read what the team did:**
 ```bash
-head -20 automation/ceo_kanban.md  # TEAM UPDATES section
+head -20 automation/ceo/ceo_kanban.md  # TEAM UPDATES section
 cat automation/error_alerts.md | tail -20  # Any alerts
 ```
 
@@ -159,8 +159,8 @@ Ask these questions:
 
 ### Step 4: Log Everything
 1. **Git commit**: `git add -A && git commit -m "CEO: [what you did]"`
-2. **Kanban**: Update `automation/ceo_kanban.md` with the decision
-3. **Report**: Append to `automation/ceo_report.md` with verified numbers
+2. **Kanban**: Update `automation/ceo/ceo_kanban.md` with the decision
+3. **Report**: Append to `automation/ceo/ceo_report.md` with verified numbers
 4. **OpenMemory**: Store for cross-session continuity
 
 ## DELEGATION
@@ -185,7 +185,7 @@ Every run, answer these:
 
 ## OUTPUT
 
-Write to `automation/ceo_report.md`. Max 300 words. Lead with decisions, not analysis.
+Write to `automation/ceo/ceo_report.md`. Max 300 words. Lead with decisions, not analysis.
 
 Format:
 ```

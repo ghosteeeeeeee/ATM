@@ -57,7 +57,7 @@ After making changes, report:
 
 Before anything else, read what the team did:
 ```bash
-head -20 automation/ceo_kanban.md  # TEAM UPDATES section
+head -20 automation/ceo/ceo_kanban.md  # TEAM UPDATES section
 cat automation/error_alerts.md | tail -20  # Any alerts
 ```
 
@@ -72,7 +72,7 @@ This tells you:
 
 ### A. Read the last CEO report
 ```bash
-cat automation/ceo_report.md
+cat automation/ceo/ceo_report.md
 ```
 What was the last PnL? WR? Any critical issues flagged?
 
@@ -156,8 +156,8 @@ Based on diagnosis, pick ONE of these actions (highest impact first):
 After making a change:
 1. **Git commit**: `git add -A && git commit -m "CEO: [what you did]"`
 2. **OpenMemory**: Store what you did for cross-session continuity
-3. **Kanban**: Update `automation/ceo_kanban.md` with the decision
-4. **Report**: Append to `automation/ceo_report.md`
+3. **Kanban**: Update `automation/ceo/ceo_kanban.md` with the decision
+4. **Report**: Append to `automation/ceo/ceo_report.md`
 
 ## CONSTRAINTS
 - Do NOT execute trades

@@ -29,7 +29,7 @@
 ### 3. Measurable Outputs for Agents
 - **What**: Give agents a specific number to optimize (conversion rate, PnL, win rate) rather than vague instructions
 - **Why Hermes**: Our CEO/automations could use this — "improve win rate by 3% in 24h" is better than "analyze and fix"
-- **Where**: `automation/ceo_prompt.md`, `ceo_away_prompt.md`
+- **Where**: `automation/ceo/ceo_prompt.md`, `ceo/ceo_away_prompt.md`
 - **Effort**: trivial (update prompts)
 - **Priority**: quick win
 

@@ -34,4 +34,4 @@ else
 fi
 
 # ── Run CEO ─────────────────────────────────────────────────────────────────
-timeout 600 bash -c "cat /root/.hermes/automation/ceo_prompt.md <(echo '$PROMPT_ADDITION') | /root/.opencode/bin/opencode run --port 4099"
+timeout 600 bash -c "cat /root/.hermes/automation/ceo/ceo_prompt.md <(echo '$PROMPT_ADDITION') | /root/.opencode/bin/opencode run --port 4099"
