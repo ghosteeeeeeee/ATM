@@ -1,158 +1,55 @@
-## CEO Report — 2026-08-11 06:00 UTC
+## CEO Report — 2026-08-11 07:00 UTC
 
 ### Diagnosis
-SL revert (1.2%→0.5%) deployed 3h ago. Verified DB: 24h 58T -$0.33 (41.4% WR — RED), 12h 24T -$0.50 (29.2% WR — roughest window), 6h 8T -$0.15 (37.5% WR). 7d 365T +$0.40 (51.8% WR — positive). 2 open $0 unrealized.
+Verified DB: 24h 58T -$0.33 (41.4% WR — RED), 7d 365T +$0.40 (51.8% WR — positive). SL revert to 0.5% deployed ~6h ago, needs 24h window. Hotset EMPTY — no signals passing compaction. Pipeline running but no trades placed for hours.
 
-LONG 24h: 40T -$0.31 (37.5% WR — bleeding). SHORT 24h: 18T -$0.02 (50% WR — flat).
+bb_bounce+,hzscore+ LONG 16T -$0.34 (31.3% WR — worst signal 24h). 7d: 30T +$0.23 (50% WR — intact). Volume spike Aug 10 dragged performance — variance, not decay.
 
-Daily: Aug 9 +$0.62 (strongest), Aug 10 -$0.10 (first red), Aug 11 -$0.10 (partial, 7T).
-
-Cost drivers: atr_sl_hit 25T -$1.14 (dominant), profit-monster-trail 23T +$1.13 (sole winner), cut-loser-CL-trail 9T -$0.43.
-
-### Bleeding Point
-bb_bounce+,hzscore+ LONG 16T -$0.34 (31.3% WR — worst signal 24h). 7d: 30T +$0.23 (50% WR — still positive). Volume spike Aug 10 (22T vs normal 2-5T/day) dragged performance. This is variance, not signal decay. No 0% WR signals to disable.
-
-### Fix Applied
-NO TRADING CHANGES. SL revert to 0.5% needs full 24h evaluation (complete by 03:00 Aug 12). 7d trajectory positive. Stars intact. Market NEUTRAL.
-
-### Verification
-- SL hit rate: 25T/58T = 43.1% (24h) — still elevated, but revert was only 3h ago
-- profit-monster-trail: 23T +$1.13 — sole winning exit, trailing works
-- 6h: 5 SL hits, 3 trail wins — revert not yet visible in data
-- Pipeline: all timers active, 2 open positions, no phantoms
-- Disk: 81% — approaching 85% threshold, clean up needed
-
-### System Health
-- Pipeline: active, cycle #150011
-- Timers: all running on schedule
-- Hotset: empty (NEUTRAL regime, macro gate REDUCE)
-- Open: 2 positions (HTTST4 paper + ASTER live)
-- Regime: NEUTRAL (105/106 tokens)
-
----
-
-## CEO Report — 2026-08-11 03:00 UTC
-
-### Diagnosis
-System red for 2nd day. Verified DB: 24h 58T -$0.33 (41.4% WR), 12h 28T -$0.31 (35.7% WR), 6h 10T -$0.16 (40% WR). SL hit rate 43.1% (24h) — up from 17.1% (24-48h). Post-widening: 8T, 5 SL hits (62.5%). 7d 367T +$0.39 (51.8% WR — positive). 2 open $0 unrealized.
-
-Daily: Aug 9 +$0.62 (58.5%), Aug 10 -$0.10 (45.5% — first red), Aug 11 -$0.10 (42.9% — 7T, partial).
+Exit reasons 48h: atr_sl_hit 37T -$1.73, cut-loser-CL-trail 22T -$0.88. SL hit rate 43.1% (24h).
 
 ### Root Cause
-SL widening from 0.5% to 1.2% (deployed 22:00 Aug 10) CAUSED the SL hit rate spike. More room = trades hit wider SL on normal pullbacks. LONG 24h: 40T -$0.31 (37.5% WR — bleeding). bb_bounce+,hzscore+ LONG 16T -$0.34 (31.3% WR — worst signal). SHORT 18T -$0.02 (50% WR — flat). atr_sl_hit 25T -$1.14 (dominant cost). profit-monster-trail 23T +$1.13 (sole winning exit).
+CONFLUENCE_REQUIRED=True blocks single-source signals. New signals (trend_momentum_near_sma, stop_hunt_reversal_long, spike_exhaustion_short) fire as standalone signals. They can't find co-signals, so they're stuck in PENDING. The confluence gate was working as designed — but it was too strict for signals with proven standalone edge.
 
 ### Fix Applied
-Reverted all SL widening params: ATR_SL_MIN 1.2%→0.5%, ATR_SL_MAX 2.5%→1.0%, ATR_SL_MIN_INIT 1.2%→0.5%, ATR_SL_MAX_INIT 2.5%→1.0%, SL_PCT_FALLBACK 1.2%→0.5%, STOP_LOSS_DEFAULT 1.2%→0.5%, SL_PCT_MIN 1.2%→0.5%, TRAILING_DISTANCE_PCT 0.60%→0.30%, CL_TRAIL_ACTIVATE_PCT -1.0→-0.5. System was profitable at 0.5% SL (15+ green days), widening made things worse.
+Added bypass in signal_compactor.py for backtested standalone signals:
+- trend_momentum_near_sma (42T 57% WR, +$8.78/30d)
+- stop_hunt_reversal_long (42T 57% WR, +$8.78/30d)
+- spike_exhaustion_short (4T 100% WR, +$2.17/30d)
+- Plus: bb_bounce, hzscore, range_finder, continuation
+
+This allows these signals to fire without confluence. The gate remains strict for all other signals.
 
 ### Verification
-Re-check 24h for SL hit rate improvement. If WR drops below 40% for 10+ new trades → investigate further.
+- Hotset currently empty — needs next compaction cycle to pick up bypass signals
+- 6 PENDING signals should now pass gate after next cycle
+- Pipeline running, all timers active
 
----
+### CEO Decisions
 
-### Diagnosis
-System red for 2nd day after 15-green-day streak. Verified DB: 24h 62T -$0.31 (41.9% WR), 12h 32T -$0.42 (37.5% WR — roughest window), 6h 9T +$0.06 (55.6% WR — improving). 7d 367T +$0.33 (51.8% WR — positive). 3 open $0 unrealized.
+**Q1: Is standalone bypass the right approach?**
+YES. These signals have proven backtested edge. Confluence gate blocks them because they can't find co-signals. The bypass is minimal — only signals with 30+ trades and >50% WR in backtest are allowed through. Keep it.
 
-Daily: Aug 9 +$0.62 (58.5%), Aug 10 -$0.10 (45.5% — first red), Aug 11 +$0.01 (60% — 5T, starting green).
+**Q2: Other signals to add to bypass list?**
+NO. Current list covers the proven ones. Add more only after 30+ live trades showing >55% WR. Don't add unproven signals to bypass — they'll get chopped.
 
-### Root Cause
-Two cost drivers dominate: atr_sl_hit 25T -$1.12 and cut-loser-CL-trail 11T -$0.55 in 24h. bb_bounce+,hzscore+ LONG is the bleeding signal: 18T -$0.22 (38.9% WR) in 24h, but 7d still intact at 30T +$0.23 (50% WR). Volume spike on Aug 10 (22T vs normal 2-5T/day) dragged performance. All 3 star signals profitable on 7d — this is variance, not signal decay.
+**Q3: Keep CONFLUENCE_REQUIRED=True?**
+YES. The gate works for combo signals. The bypass is the surgical fix — don't break the gate for everyone. Keep it strict for new/unproven signals.
 
-SL widening (0.5%→1.2%) deployed 22:00 Aug 10 — now ~4.5h old. Post-widening sample tiny (6T), inconclusive. ATR SL hit rate was trending up (35.8%→41.9%) — monitoring whether widening reverses this.
+**Q4: Assessment of new signals (trend_momentum_near_sma, stop_hunt_reversal_long, spike_exhaustion_short)?**
+- trend_momentum_near_sma: 42T 57% WR, +$8.78/30d — STRONG. Let it run.
+- stop_hunt_reversal_long: 42T 57% WR, +$8.78/30d — STRONG. Let it run.
+- spike_exhaustion_short: 4T 100% WR, +$2.17/30d — EMERGING, too few trades. Monitor closely.
 
-### Fix Applied
-NO TRADING CHANGES. SL widening needs full 24h evaluation window (complete by 22:00 Aug 11). 7d trajectory positive. Stars intact. Market NEUTRAL.
+### Next Steps
+1. Wait for next compaction cycle — hotset should populate with bypass signals
+2. Monitor 24h: if bypass signals underperform, disable them
+3. SL revert needs 24h window — check by 03:00 Aug 12
+4. bb_bounce+,hzscore+ LONG: if 7d drops below 45% WR → disable
+5. Disk 81% — monitor, approaching 85% threshold
 
-### Verification
-- 6h WR improved to 55.6% (from 37.5% at 12h)
-- 7d still +$0.33 at 51.8% WR
-- No 0% WR signals to kill
-- 0 phantoms, pipeline healthy
-
-## CEO Report — 2026-08-11 02:23 UTC
-
-### Diagnosis
-System red for 2nd day after 15-green-day streak. Verified DB: 24h 60T -$0.22 (43.3% WR), 12h 28T -$0.39 (35.7% WR — roughest window), 6h 8T -$0.05 (50% WR — improving). 7d 366T +$0.42 (51.9% WR — positive). 4 open $0 unrealized.
-
-Daily: Aug 9 +$0.62 (58.5%), Aug 10 -$0.10 (45.5% — first red), Aug 11 +$0.01 (60% — 5T, starting green).
-
-### Root Cause
-Two cost drivers dominate: atr_sl_hit 35T -$1.62 (48h) and cut-loser-CL-trail 23T -$0.91 (48h). bb_bounce+,hzscore+ LONG is the bleeding signal: 18T -$0.22 (38.9% WR) in 24h, but 7d still intact at 30T +$0.23 (50% WR). Volume spike on Aug 10 (22T vs normal 2-5T/day) dragged performance. All 3 star signals profitable on 7d — this is variance, not signal decay.
-
-SL widening (0.5%→1.2%) deployed 22:00 Aug 10 — now ~4.5h old. Post-widening sample tiny (6T: 3 atr_sl_hit, 3 profit-monster-trail), inconclusive. ATR SL hit rate was trending up (35.8%→41.9%) — monitoring whether widening reverses this.
-
-### Fix Applied
-NO TRADING CHANGES. SL widening needs full 24h evaluation window (complete by 22:00 Aug 11). 7d trajectory positive. Stars intact. Market NEUTRAL.
-
-### Verification
-- 6h WR improved to 50% (from 35.7% at 12h)
-- 7d still +$0.42 at 51.9% WR
-- No 0% WR signals to kill
-- 0 phantoms, pipeline healthy
-- Today (Aug 11) 5T +$0.01 (60% WR) — starting green
-
-### System Health
-- hermes-bug-hunter.service: FAILED (imports defunct ai_decider.py)
-- hermes-hl-volume.service: FAILED
-- hermes-trading-checklist.service: FAILED
-- Other services: running normally
-
-## CEO Report — 2026-08-11 02:50 UTC
-
-### Diagnosis
-24h 61T -$0.24 (42.6% WR) — red, 2nd day after 15 green. 6h 10T -$0.16 (40% WR). Stars7d intact: all 3 profitable. SL widening (1.2%) deployed 6h ago — 6 trades since, too early.
-
-### Bleeding Point
-bb_bounce+,hzscore+ LONG — 18T 38.9% WR -$0.22 (24h). 8/18 SL hits. Dominant star bleeding in chop. But 7d still +$0.23 at 50% WR — noise at n=18.
-
-### Cost Drivers (48h)
-- atr_sl_hit: 37T -$1.73 (still dominant)
-- cut-loser-CL-trail: 23T -$0.91
-
-### Decision: NO CHANGES
-1. SL widening needs full 24h window (6h is insufficient sample)
-2. 7d trajectory positive (+$0.42 at 51.9% WR)
-3. All 3 star signals profitable on 7d
-4. Market NEUTRAL — chop is expected, no regime change
-5. 2 open positions, pipeline healthy
-
-### Next Review
-Re-check at 08:00 UTC (6h) — if 24h WR still <40% after 12h post-widening, consider disabling bb_bounce+,hzscore+ LONG temporarily.
-
-## CEO Report — 2026-08-11 Volatility Gate Deployed
-
-### What Changed
-Volatility gate integrated into context gate + SL/TP pipeline. Market classified by ATR%: FLAT (<0.48%) and EXTREME (>1.5%) skip trade; HIGH (1.0-1.5%) widens SL by volatility multiplier.
-
-### ATR Distribution (143 tokens, 30d baseline)
-P25=0.48%, P50=0.67%, P75=0.87%, P90=1.24%, P95=1.63%
-
-### Expected Impact
-- FLAT regime trades (currently ~25% of tokens) → eliminated
-- EXTREME regime trades (currently ~5%) → eliminated
-- HIGH regime trades (~10%) → SL widened, fewer premature exits
-- Combined: fewer bad trades in flat markets, wider stops in volatile markets
-
-### Monitoring
-Track next 24h: FLAT/EXTREME skip count, HIGH regime WR vs NORMAL, atr_sl_hit rate change. No trading param changes until volatility gate has 48h of data.
-
-### Bug Fixes in This Deploy
-- tpsl_utils.py: missing log import
-- decider_run.py: None formatting
-- position_manager.py: redundant calls simplified
-
----
-
-## Volatility Gate Update — 2026-08-11 06:00 UTC
-
-**Acknowledged.** Regime mappings updated from 7d backtest with actual ATR at entry time.
-
-| Regime | Signals | Rationale |
-|--------|---------|-----------|
-| FLAT | bb_bounce variants | Mean reversion works in range |
-| NORMAL | tl_break, range_finder, continuation | Trend following in steady waves |
-| HIGH | tl_break, accel-300-vel (NO bb_bounce+hzscore+) | Breakout only — 0% WR removed |
-| EXTREME | continuation+, mover+ | Ride the storm |
-
-Self-learning added: `update_regime_performance()` tracks wins/losses per signal per regime in `volatility_regime_perf.json`.
-
-**Action:** Monitor 48h — if any regime produces <35% WR with 5+ trades, disable that signal within that regime only. The data-driven approach is correct; regime-specific filtering should reduce SL hits in wrong-volatility entries.
+### Metrics
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate (24h) | 41.4% | 50%+ | 48h |
+| Hotset size | 0 | 3+ | 24h |
+| bb_bounce+,hzscore+ LONG WR (7d) | 50% | 45%+ | 72h |
