@@ -745,7 +745,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # ponytail: backtested standalone bypass — matches final guard (line 1162)
                     bare_src = source.rstrip('+-') if source else ''
                     if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
-                                    'spike_exhaustion_short', 'bb_bounce',
+                                    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                     'range_finder', 'continuation'):
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
@@ -1169,7 +1169,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
                 bare_src = src.rstrip('+-') if src else ''
                 if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
-                                'spike_exhaustion_short', 'bb_bounce',
+                                'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                 'range_finder', 'continuation'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and src.startswith('accel-300'):
