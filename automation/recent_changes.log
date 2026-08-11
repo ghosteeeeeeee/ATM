@@ -2,6 +2,10 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-11 07:28] auto_1hr: NO CHANGES
+  WHY: 0T last hour (system idle, 3 open). 24h 54T -$0.26 (40.7% WR). SL hit rate 48.1% (above 40% threshold but SL revert to 1.2% deployed 2h ago — eval window active until 05:20 Aug 12). hzscore+ LONG 14T 28.6% WR (7d 48.4% intact). Trade freq 2.25/hr (normal). No kill candidates. Stars intact. DO NOT CHANGE PARAMS during eval window.
+  BY: auto_1hr
+
 [2026-08-11 18:15] auto_1hr: NO CHANGES
   WHY: 0T last hour (system idle). 24h 57T -$0.24 (42.1% WR). atr_sl_hit 45.6% (above 40% threshold but SL revert to 1.2% deployed 13h ago — needs 24h eval window). hzscore+ LONG 15T 33.3% WR (7d intact 50%, variance). Trade freq 2.4/hr (normal). No kill candidates. System calm, 0 open trades. Eval window closes 05:20 Aug 12.
   BY: auto_1hr

@@ -5539,3 +5539,34 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - System calm, 0 open trades
 
 **Open Questions:** hzscore+ LONG 24h bleed — monitor 7d WR, kill if drops below 45%
+
+## [2026-08-11 07:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (system idle). 3 open (HTTST4, MEGA, ASTER).
+**24h PnL:** -$0.26 (40.7% WR, 54T) — RED
+**7d PnL:** +$0.40 (50.9% WR, 365T) — positive
+
+**Key Metrics:**
+- SL hit rate 24h: 48.1% (above 40% threshold)
+- SL hit rate prior 24h: 18.3% (baseline before revert)
+- SL revert to 1.2% deployed 05:20 UTC today — eval window closes 05:20 Aug 12
+- Trade frequency: 2.25/hr (normal)
+- Profit monster trail: 38.9% of exits (+$1.06)
+- atr_sl_hit: 48.1% of exits (-$1.15)
+
+**Stars (7d):**
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5% WR
+- bb_bounce,hzscore+ LONG: 5T +$0.20 100% WR
+- continuation+,hzscore+ LONG: 7T +$0.20 42.9% WR
+- bb-bounce-short,hzscore- SHORT: 17T +$0.12 58.8% WR
+
+**No Change Needed:**
+- SL evaluation window active (05:20 Aug 11 → 05:20 Aug 12) — no parameter changes allowed
+- No signals with 0% WR and 3+ trades to kill
+- Trade frequency normal (2.25/hr)
+- 3 open trades, system calm
+- SL hit rate elevated but mostly pre-revert data — wait for eval window to complete
+
+**Open Questions:**
+- hzscore+ LONG 24h bleed: 14T -$0.29 28.6% WR — 7d intact at 48.4%, monitor
+- SL revert eval window closes tomorrow 05:20 — will assess then
