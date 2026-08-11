@@ -238,7 +238,7 @@ def _kill_underperformers():
             _log(f"  KILL CHECK {signal_type}: PROTECTED, skipping")
             continue
         
-        trades = _get_recent_trades(signal_type, limit=KILL_MIN_TRADES)
+        trades = _get_trades_exact(signal_type, limit=KILL_MIN_TRADES)
         if len(trades) < KILL_MIN_TRADES:
             continue
         
