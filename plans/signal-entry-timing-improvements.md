@@ -435,24 +435,24 @@ def detect_candle_pattern(candle, prev_candle):
 
 ## Implementation Order
 
-| Phase | What | Effort | Impact |
-|-------|------|--------|--------|
-| **1** | R:R pre-check utility | Small | Critical — all signals benefit |
-| **2** | Volume confirmation utility | Small | Critical — 10/15 books mandate |
-| **3** | Candle close gate | Trivial | High — prevents fakeouts |
-| **4** | Session timing filter | Trivial | Medium — avoids chop |
-| **5** | rs.py + candle patterns | Medium | High — best structural signal |
-| **6** | return_exhaustion + S/R + divergence | Medium | High — key signal improvement |
-| **7** | engulfing.py fixes | Small | Medium |
-| **8** | vortex_break fixes | Small | Medium |
-| **9** | bb_bounce fixes | Small | Medium |
-| **10** | Inside Bar Breakout (new) | Medium | High — new edge |
-| **11** | continuation + volume dryup | Small | Medium |
-| **12** | range_breakout fixes | Small | Low |
-| **13** | Doji at extremes (new) | Small | Medium |
-| **14** | Wyckoff Spring (new) | Medium | Medium |
-| **15** | Morning/Evening Star (new) | Medium | Low |
-| **16** | hzscore session timing | Trivial | Low |
+| Phase | What | Effort | Impact | Status |
+|-------|------|--------|--------|--------|
+| **1** | R:R pre-check utility | Small | Critical | ✅ DONE — `entry_gates.py:rr_gate()` |
+| **2** | Volume confirmation utility | Small | Critical | ✅ DONE — `entry_gates.py:volume_gate()` |
+| **3** | Candle close gate | Trivial | High | ✅ DONE — `entry_gates.py:candle_close_gate()` |
+| **4** | Session timing filter | Trivial | Medium | ✅ DONE — `entry_gates.py:session_timing_gate()` |
+| **5** | rs.py + candle patterns | Medium | High | ✅ DONE — pin bar/engulfing/doji at levels |
+| **6** | return_exhaustion + S/R + divergence | Medium | High | TODO |
+| **7** | engulfing.py fixes | Small | Medium | ✅ DONE — body check, trend, S/R, gates |
+| **8** | vortex_break fixes | Small | Medium | TODO |
+| **9** | bb_bounce fixes | Small | Medium | TODO |
+| **10** | Inside Bar Breakout (new) | Medium | High | TODO |
+| **11** | continuation + volume dryup | Small | Medium | TODO |
+| **12** | range_breakout fixes | Small | Low | TODO |
+| **13** | Doji at extremes (new) | Small | Medium | TODO |
+| **14** | Wyckoff Spring (new) | Medium | Medium | TODO |
+| **15** | Morning/Evening Star (new) | Medium | Low | TODO |
+| **16** | hzscore session timing | Trivial | Low | TODO |
 
 ---
 
@@ -460,16 +460,28 @@ def detect_candle_pattern(candle, prev_candle):
 
 | Rule | Books Citing | Status |
 |------|-------------|--------|
-| Min R:R = 1:2 before entry | 9/15 | **MISSING** |
-| Volume confirmation on entry | 10/15 | **MISSING** (1/20 signals) |
-| Wait for candle close | 6/15 | **MISSING** |
-| Trade with higher timeframe trend | 8/15 | Partial (some signals) |
+| Min R:R = 1:2 before entry | 9/15 | ✅ `rr_gate()` — all signals can use |
+| Volume confirmation on entry | 10/15 | ✅ `volume_gate()` — engulfing uses it |
+| Wait for candle close | 6/15 | ✅ `candle_close_gate()` — engulfing uses it |
+| Trade with higher timeframe trend | 8/15 | ✅ engulfing has 1H EMA filter |
 | Stop at pattern's logical extreme | All | ATR-based (acceptable) |
-| Use trailing stops | All | **YES** (trailing system exists) |
-| Avoid first 30 min of session | 5/15 | **MISSING** |
-| Divergence alone ≠ signal (need confirmation) | Carli | **MISSING** |
-| Candle pattern at S/R = high probability | Woods, Porwal | **MISSING** |
-| Volume drying on pullback = continuation | Wyckoff | **MISSING** |
+| Use trailing stops | All | ✅ (trailing system exists) |
+| Avoid first 30 min of session | 5/15 | ✅ `session_timing_gate()` — engulfing/rs use it |
+| Divergence alone ≠ signal (need confirmation) | Carli | TODO — return_exhaustion |
+| Candle pattern at S/R = high probability | Woods, Porwal | ✅ rs.py pin bar/engulfing/doji |
+| Volume drying on pullback = continuation | Wyckoff | TODO — continuation signal |
+
+---
+
+## Progress Log
+
+### 2026-08-11
+- Created `entry_gates.py` with 4 shared utilities (rr, volume, candle close, session timing)
+- Updated `engulfing.py`: body-vs-body check, 1H trend alignment, S/R proximity, all 4 gates
+- Updated `rs.py`: candle pattern detection (pin bar/engulfing/doji), session timing gate, DB leak fixes
+- Fixed `hermes_constants.py`: SIGNAL_INVERSION_MAP syntax error, added missing VORTEX_BREAK/RETURN_EXHAUSTION/ENGULFING constants, removed duplicate MTP_ZSCORE_LB_*
+- Created skill: `book-signal-upgrades`
+- Bug hunter verified: 0 CRITICAL, 0 HIGH across all changes
 
 ---
 

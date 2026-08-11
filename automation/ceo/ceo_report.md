@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-12 23:45 UTC
+
+### Diagnosis
+24h: 35T -$0.29 (42.9% WR — RED). 7d: 380T +$0.45 (51.8% WR — barely positive). Daily declining: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.23. Hotset 1 token (ADA LONG continuation+). Market NEUTRAL, macro gate REDUCE. System idle (6 open, 0 new trades in hours).
+
+### Root Cause
+Market regime: NEUTRAL 107/107 = no directional conviction. Macro gate REDUCE = correct behavior. Hotset nearly empty = compaction filtering low-conviction signals. Not a signal breakdown — cold streak on bb_bounce+,hzscore+ (16.7% WR 24h, but 48.5% WR 7d intact).
+
+### Fix Applied
+NO CHANGES. 7d positive, stars intact, trailing 0.60% deployed 27h. System idle by design. Overreacting destabilizes.
+
+### Verification
+Monitor: bb_bounce+,hzscore+ 7d WR. If drops <45% → escalate to disable. Disk84% — approaching WARN.
+
+---
+
 ## CEO Report — 2026-08-12 21:30 UTC
 
 ### Decision: TRAILING_DISTANCE_PCT stays at 0.60%
