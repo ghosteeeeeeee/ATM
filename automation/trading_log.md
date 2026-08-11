@@ -5876,3 +5876,35 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - trend_momentum_near_sma+ re-enabled with contrarian flip — 4T/7d at 0% WR. If doesn't improve in 48h, kill permanently.
 - SL hit rate trending up — monitor next few hours
+
+## [2026-08-12 13:05] Hourly Analysis
+
+**Trades:** 5 closed last hour (4W, 1L) — **+$0.09**
+**24h:** 40T 18W (45% WR) -$0.27
+**7d:** 383T 200W (52.2% WR) +$0.71
+
+**Close Reasons (24h):**
+- atr_sl_hit: 18T (45%) -$0.75 — still elevated
+- profit-monster-trail: 18T (45%) +$0.82 — strong, compensating SL
+- cut-loser-CL-T1: 3T -$0.34
+
+**Signal Performance (24h):**
+- bb_bounce+: 8T 5W +$0.16 — solid
+- hzscore+: 8T 4W +$0.02 — decent
+- bb_bounce+,hzscore+: 6T 2W -$0.12 — mixed
+- **trend_momentum_near_sma+: 4T 0W -$0.37 — 0% WR, KILLED**
+- hzscore-,range_breakout-: 2T 2W +$0.10 — strong
+
+**Changes:**
+1. **KILLED trend_momentum_near_sma** — 4T 0W 0% WR -$0.37 in 24h. Contrarian flip didn't help (re-enabled 8/12, still 0% WR). Set TREND_MOMENTUM_NEAR_SMA_ENABLED = False. Commit: b3049c6
+
+**No Change Needed:**
+- Trade frequency normal (5/hr, well below 20/hr threshold)
+- No overtrading
+- atr_sl_hit 45% — elevated but profit-monster-trail compensating equally
+- 7d system still profitable at 52.2% WR, +$0.71
+- Last hour was good (4W1L) — positive momentum
+
+**Open Questions:**
+- SL hit rate at 45% — monitor if it drops below 40% next few hours
+- JUP SHORT cut-loser-CL-T1 -$0.09 — check if signal was valid

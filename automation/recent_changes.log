@@ -237,3 +237,7 @@
 [2026-08-12 01:05] auto_1hr: NO CHANGES
   WHY: 1T last hour (AVNT SL hit -$0.04). 24h 28T -$0.63 (28.6% WR). atr_sl_hit 60.7% (elevated but eval window active until 05:20 Aug 12). Only 11T since SL revert — too early for signal. No 0% WR kill candidates (trend_momentum already killed). Trade freq 1/hr normal. 7d 364T +$0.51 (52.2% WR). No changes during eval window.
   BY: auto_1hr
+[2026-08-12 13:05] auto_1hr: KILL signal
+  WHAT: TREND_MOMENTUM_NEAR_SMA_ENABLED = False
+  WHY: 4T 0W 0% WR -$0.37 in 24h. Contrarian flip didn't help. Kill threshold (3+ trades, 0% WR) met.
+  BY: auto_1hr
