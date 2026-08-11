@@ -729,7 +729,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ── Backtested Signal Bypass ──────────────────────────────────────
                 # Signals with proven edge from backtesting — allow standalone.
                 elif unique_signal_types == 1 and source.rstrip('+-') in (
-                    'trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                    'stop_hunt_reversal_long',
                     'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                     'range_finder', 'continuation',
                 ):
