@@ -13,6 +13,7 @@ Flow:
 """
 import json
 import os
+import re
 import sys
 import time
 import fcntl
@@ -42,6 +43,7 @@ except ImportError:
     GOAL_WR = 0.40
     MAX_ADJUSTMENTS_PER_DAY = 3
     MIN_TRADES_BETWEEN = 15
+    CEO_PROTECTED_FLAGS = set()
 
 CRITICAL_WR = 0.25  # Below this = emergency disable
 GOAL_PROGRESS_FILE = '/root/.hermes/data/goal_progress.json'
@@ -159,7 +161,10 @@ def _max_consecutive_losses(trades):
 
 
 def _get_all_active_signal_types():
-    """Get distinct signal types from recent signal_outcomes."""
+    """Get distinct base signal types from recent signal_outcomes.
+    
+    Filters out combo types (contains ',' or '+') to return only base signals.
+    """
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         cur = conn.cursor()
@@ -170,7 +175,41 @@ def _get_all_active_signal_types():
         """)
         rows = cur.fetchall()
         conn.close()
-        return [r[0] for r in rows]
+        # Filter to base signal types only (no combos)
+        seen = set()
+        result = []
+        for r in rows:
+            st = r[0]
+            # Skip combos (contain comma or plus as separator)
+            if ',' in st:
+                continue
+            # Normalize to base: strip +/- direction suffixes
+            base = st.rstrip('+-')
+            if base not in seen:
+                seen.add(base)
+                result.append(base)
+        return result
+    except Exception:
+        return []
+
+
+def _get_trades_exact(signal_type, limit=50):
+    """Get recent trades for exact signal_type match (no LIKE)."""
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT token, direction, is_win, pnl_pct, pnl_usdt, created_at
+            FROM signal_outcomes
+            WHERE signal_type = ? AND trade_id IS NOT NULL
+            ORDER BY created_at DESC
+            LIMIT ?
+        """, (signal_type, limit))
+        rows = cur.fetchall()
+        conn.close()
+        return [{'token': r[0], 'direction': r[1], 'win': r[2],
+                 'pnl_pct': r[3], 'pnl_usdt': r[4], 'created_at': r[5]}
+                for r in rows]
     except Exception:
         return []
 
@@ -190,8 +229,12 @@ def _kill_underperformers():
             continue
         
         # Skip CEO-protected signals
-        norm = signal_type.upper().replace('-', '_')
-        if norm in (k.upper() for k in CEO_PROTECTED_FLAGS):
+        norm = signal_type.upper()
+        norm = re.sub(r'\+$', '_PLUS', norm)
+        norm = re.sub(r'-$', '_MINUS', norm)
+        norm = norm.replace('-', '_')
+        flag_name = f'{norm}_ENABLED'
+        if flag_name in CEO_PROTECTED_FLAGS:
             _log(f"  KILL CHECK {signal_type}: PROTECTED, skipping")
             continue
         
@@ -218,14 +261,16 @@ def _kill_underperformers():
 
 def _disable_signal(signal_type):
     """Disable a signal by setting its _ENABLED flag to False in hermes_constants.py."""
-    import re
     try:
         with open(HERMES_CONSTANTS) as f:
             content = f.read()
         
-        # Find the base flag name from signal_type
-        norm = signal_type.upper().replace('-', '_')
-        # Try matching e.g. BB_BOUNCE from bb_bounce, bb_bounce+, bb_bounce-
+        # Normalize: convert trailing +/- FIRST, then hyphens to underscores
+        norm = signal_type.upper()
+        norm = re.sub(r'\+$', '_PLUS', norm)
+        norm = re.sub(r'-$', '_MINUS', norm)
+        norm = norm.replace('-', '_')
+        # Try matching e.g. BB_BOUNCE_PLUS from bb_bounce+
         candidates = [f'{norm}_ENABLED']
         if not re.search(rf'^{re.escape(norm)}_ENABLED\s*=', content, re.MULTILINE):
             # Try without trailing direction variants
@@ -385,6 +430,7 @@ def _write_goal_progress():
     
     CEO and self_learner read this file to understand current state.
     """
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         cur = conn.cursor()
@@ -417,6 +463,7 @@ def _write_goal_progress():
         trades_2d = [{'win': r[0], 'pnl_usdt': r[1]} for r in cur.fetchall()]
         
         conn.close()
+        conn = None
         
         # Compute metrics
         wr_30d = _calculate_wr(trades_30d) if trades_30d else 0
@@ -470,6 +517,9 @@ def _write_goal_progress():
             raise
     except Exception as e:
         _log(f"Error writing goal progress: {e}")
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_all_trades_recent(limit=100):
@@ -645,7 +695,6 @@ def _save_combo_weights(weights):
 
 def _is_signal_disabled(signal_type):
     """Check if a signal type is disabled via hermes_constants flags."""
-    import re
     try:
         with open(HERMES_CONSTANTS) as f:
             content = f.read()
@@ -744,7 +793,7 @@ if __name__ == '__main__':
         for signal_type in all_signals:
             if _is_signal_disabled(signal_type):
                 continue
-            trades = _get_recent_trades(signal_type, limit=KILL_MIN_TRADES)
+            trades = _get_trades_exact(signal_type, limit=KILL_MIN_TRADES)
             if len(trades) < KILL_MIN_TRADES:
                 continue
             pnl = _calculate_pnl(trades)
