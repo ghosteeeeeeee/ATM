@@ -46,3 +46,25 @@ NO TRADING CHANGES. SL widening needs full 24h evaluation window (complete by 22
 - hermes-hl-volume.service: FAILED
 - hermes-trading-checklist.service: FAILED
 - Other services: running normally
+
+## CEO Report — 2026-08-11 02:50 UTC
+
+### Diagnosis
+24h 61T -$0.24 (42.6% WR) — red, 2nd day after 15 green. 6h 10T -$0.16 (40% WR). Stars7d intact: all 3 profitable. SL widening (1.2%) deployed 6h ago — 6 trades since, too early.
+
+### Bleeding Point
+bb_bounce+,hzscore+ LONG — 18T 38.9% WR -$0.22 (24h). 8/18 SL hits. Dominant star bleeding in chop. But 7d still +$0.23 at 50% WR — noise at n=18.
+
+### Cost Drivers (48h)
+- atr_sl_hit: 37T -$1.73 (still dominant)
+- cut-loser-CL-trail: 23T -$0.91
+
+### Decision: NO CHANGES
+1. SL widening needs full 24h window (6h is insufficient sample)
+2. 7d trajectory positive (+$0.42 at 51.9% WR)
+3. All 3 star signals profitable on 7d
+4. Market NEUTRAL — chop is expected, no regime change
+5. 2 open positions, pipeline healthy
+
+### Next Review
+Re-check at 08:00 UTC (6h) — if 24h WR still <40% after 12h post-widening, consider disabling bb_bounce+,hzscore+ LONG temporarily.

@@ -55,3 +55,10 @@
 
 ## Error Alerts — 2026-08-10 23:08 UTC
 - **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-11 02:41 UTC
+- **[WARN]** (12x in 30min): `ERR decider_run: Traceback at decider_run.py:2888` — crashes every pipeline cycle. Traceback truncated to 2 lines by run_pipeline.py:96 (`[:2]`). Pipeline continues and completes (exit 0). Runs clean when called directly — context-dependent, likely race condition.
+- **[INFO]**: Pipeline OK — 30 cycles/30min, 2 open trades (HTTST4 paper + ASTER live), 7 closed today (-0.10 USDT).
+- **[INFO]**: Regime NEUTRAL, macro gate REDUCE. Hotset empty (no signals above threshold). 84 signals generated (18 tokens).
+- **[INFO]**: Disk 81% (90G/118G). All 40+ hermes timers firing on schedule.
+- **AUTO-FIX**: None needed — pipeline self-recovered. Root cause of decider_run errors remains hidden due to stderr truncation.
