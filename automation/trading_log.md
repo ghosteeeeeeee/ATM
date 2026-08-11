@@ -5619,3 +5619,24 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - SL revert deployed 14.7h ago with only 2 closed trades — very low volume. Will need more data tomorrow
 - HTTST4 open trade is test signal (not in hermes_constants.py) — harmless but should close eventually
 - Aster open since Aug 10 22:02 — 22h old, long-duration hold
+
+## [2026-08-11 11:26] Hourly Analysis
+
+**Trades:** 0 closed last hour (dead market)
+**24h:** 43T 16W 37.2% WR PnL: -$0.56 avg: -$0.013
+
+**24h by exit:** atr_sl_hit 23T (53.5%, -$1.05) | profit-monster-trail 15T (+$0.61) | cut-loser-CL-trail 4T (-$0.23) | test 1T (+$0.11)
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active (closes 05:20 Aug 12) — no param changes
+- atr_sl_hit 53.5% elevated but revert only 6h old, 2T closed — need 20+ trades for signal
+- No 0% WR signals with 3+ trades to kill
+- bb_bounce+,hzscore+ dominant at 31.2% WR 24h but 7d intact — cold day variance
+- Trade freq 0/hr — under-trading, not over
+- System 7d positive (51.8% WR) — no crisis
+
+**Open Questions:**
+- SL revert eval window closes in ~18h — will have enough data by then?
+- bb_bounce+,hzscore+ 24h bleed: -$0.31. If SL revert doesn't fix, may need signal-specific tuning
