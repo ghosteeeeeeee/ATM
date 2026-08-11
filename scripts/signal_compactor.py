@@ -744,7 +744,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 else:
                     # ponytail: backtested standalone bypass — matches final guard (line 1162)
                     bare_src = source.rstrip('+-') if source else ''
-                    if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                    if bare_src in ('stop_hunt_reversal_long',
                                     'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                     'range_finder', 'continuation'):
                         pass_gate = True
@@ -1168,7 +1168,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
                 bare_src = src.rstrip('+-') if src else ''
-                if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                if bare_src in ('stop_hunt_reversal_long',
                                 'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                 'range_finder', 'continuation'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
@@ -1221,7 +1221,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
                         if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
                             bare_pe = pe_src.rstrip('+-') if pe_src else ''
-                            if bare_pe in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                            if bare_pe in ('stop_hunt_reversal_long',
                                             'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                             'range_finder', 'continuation'):
                                 log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} backtested standalone ({pe_src}) allowed at merge")
@@ -1421,7 +1421,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         bare_src = source.rstrip('+-') if source else ''
-                        if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                        if bare_src in ('stop_hunt_reversal_long',
                                         'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                         'range_finder', 'continuation'):
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
@@ -1582,7 +1582,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # this is the final catch before it reaches decider_run.
             if CONFLUENCE_REQUIRED and entries_count < 2:
                 bare_src = (src or '').rstrip('+-')
-                if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                if bare_src in ('stop_hunt_reversal_long',
                                 'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                 'range_finder', 'continuation'):
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")

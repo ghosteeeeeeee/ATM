@@ -170,9 +170,9 @@ def run() -> int:
             from speed_tracker import get_token_speed
             spd = get_token_speed(token)
             vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
-            if local_dir == 'SHORT' and vel_5m >= 0:
-                continue  # price still rising, wait for fade
-            if local_dir == 'LONG' and vel_5m <= 0:
+            if local_dir == 'SHORT' and vel_5m > 0:
+                continue  # price actively rising, wait for fade
+            if local_dir == 'LONG' and vel_5m < 0:
                 continue  # price still falling, wait for bounce
         except Exception:
             pass  # non-fatal: proceed if speed data unavailable
