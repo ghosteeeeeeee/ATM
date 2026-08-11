@@ -23,29 +23,30 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
 import sqlite3
 
-# Signals that work in each regime (from 7d backtest with actual ATR at entry)
+# Signals that work in each regime (from 30d backtest with actual ATR at entry)
 # Source: correlated trade outcomes with volatility regime at entry time
+# ONLY signals with positive PnL in that regime are included
 REGIME_SIGNALS = {
     'FLAT': {
         # Mean reversion works in range-bound markets
-        'bb_bounce,hzscore+', 'hzscore-,return_exhaustion-',
-        'bb-bounce-short,hzscore-', 'bb_bounce+', 'bb_bounce',
+        'bb_bounce', 'bb_bounce+', 'bb_bounce,hzscore+',
+        'bb-bounce-short,hzscore-',
     },
     'NORMAL': {
         # Trend following works in steady waves
-        'tl_break+', 'tl_break-', 'bb_bounce+,range_finder+',
-        'accel-300-', 'momentum+', 'continuation+', 'ma_cross',
-        'hzscore-,return_exhaustion-', 'hzscore+,return_exhaustion_long',
+        'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
+        'tl_break+', 'tl_break-', 'accel-300-',
+        'continuation+', 'ma_cross',
     },
     'HIGH': {
-        # Breakout works in big moves, but NOT bb_bounce+hzscore+ (0% WR in HIGH)
-        'tl_break-', 'tl_break+', 'accel-300-vel+', 'accel-300-vel-',
-        'breakout', 'squeeze_cross',
+        # Breakout works in big moves
+        'bb_bounce+,range_finder+', 'tl_break-', 'tl_break+',
+        'accel-300-vel+', 'accel-300-vel-',
     },
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
-        'continuation+', 'accel-300-',
+        'bb_bounce',
     },
 }
 
