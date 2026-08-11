@@ -95,3 +95,14 @@
 - **[WARN]** (5 tokens): `Stale 1m candles` — LIT (69h), SUSHI (67h), AAVE (50h), PNUT (50h), SKY (50h). Likely delisted/low-volume tokens not worth tracking.
 - **[INFO]** Disk at 83% (93G/118G) — approaching 85% WARN threshold. pipeline.log is 45M.
 - **AUTO-FIX**: None required. Pipeline operational. decider_run errors are non-blocking.
+
+## Error Alerts — 2026-08-11 19:08 UTC
+- **REPEATED** (18x): `Aug N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TOK hermes-trades-api: TOK (most recent call last):`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: TOK (most recent call last):`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: SyntaxError: ':' expected after dictionary key`
+- **REPEATED** (14x): `Aug N N:N:N systemd[N]: hermes-pipeline.service: Main process exited, code=exited, status=N/FAILURE`
+- **REPEATED** (14x): `Aug N N:N:N systemd[N]: hermes-pipeline.service: Failed with result 'exit-code'.`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'VORTEX_BREAK_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_constants.`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'RETURN_EXHAUSTION_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_const`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'ENGULFING_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_constants.py)`

@@ -1580,6 +1580,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'token': e['token'],
                 'direction': e['direction'],
                 'confidence': e['confidence'],
+                'final_confidence': e.get('final_confidence', e['confidence']),  # decider_run reads this
                 'reason': e['reason'],
                 'source': src,
                 'entries_count': entries_count,
