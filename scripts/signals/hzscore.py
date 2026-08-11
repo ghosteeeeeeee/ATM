@@ -26,7 +26,7 @@ MIN_Z_VALUE = 1.0   # |avg_z| must exceed this (backtested: 1.0 = 64.3% WR, 0.8 
 COOLDOWN_HOURS = 0.083  # 5 minutes per-token+direction cooldown (was 2h — too aggressive)
 REQUIRE_3TF = False  # if True, require 3/3 TF agreement (was always 2/3 minimum)
 # Solo-specific (stricter when no co-signal present)
-SOLO_MIN_Z_VALUE = 1.5   # require genuine extreme for standalone (solo avg_z losers ~1.1, winners ~1.8)
+SOLO_MIN_Z_VALUE = 1.2   # require genuine extreme for standalone (solo avg_z losers ~1.1, winners ~1.8)
 SOLO_REQUIRE_3TF = True  # require 3/3 TF agreement when solo (no co-signal backup)
 import statistics, sys, os
 
