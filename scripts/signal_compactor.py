@@ -721,6 +721,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         and conf >= ACCEL_300_STANDALONE_BYPASS_CONFIDENCE):
                     pass_gate = True
                     gate_msg = f'standalone accel-300 conf={conf:.0f}% >= {ACCEL_300_STANDALONE_BYPASS_CONFIDENCE}%'
+                # ── Backtested Signal Bypass ──────────────────────────────────────
+                # Signals with proven edge from backtesting — allow standalone.
+                elif unique_signal_types == 1 and source.rstrip('+-') in (
+                    'trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                    'range_finder', 'continuation',
+                ):
+                    pass_gate = True
+                    gate_msg = f'backtested standalone signal ({source})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
                 # Confluence signals (source=conf-2s, conf-3s, etc.) are already merged
                 # from 2+ agreeing indicators. They represent real confluence even though
