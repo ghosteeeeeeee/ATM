@@ -465,15 +465,15 @@ def compute_atr_sl_tp(
         # else: preserve flip_k_override (set above, don't overwrite)
         sl_pct = k * atr_pct
         if atr is not None and atr > 0:
-            MIN_SL_PCT = ATR_SL_MIN_INIT   # 0.5% — wider for new trades (breathing room)
+            MIN_SL_PCT = ATR_SL_MIN_INIT   # 0.60% — wider for new trades (breathing room)
         # else: MIN_SL_PCT already set to TRAILING_DISTANCE_PCT above
         MIN_TP_PCT = ATR_TP_MIN         # 1.5% — wider for new trades
     else:
-        # In loss: always use 0.5% floor (initial SL). Only use tighter floor when in profit.
+        # In loss: always use 0.60% floor (initial SL). Only use tighter floor when in profit.
         in_loss = (direction == 'LONG' and current_price < entry_f) or \
                   (direction == 'SHORT' and current_price > entry_f)
         if in_loss:
-            MIN_SL_PCT = ATR_SL_MIN   # 0.5% — initial SL, even for established trades
+            MIN_SL_PCT = ATR_SL_MIN   # 0.60% — initial SL, even for established trades
         elif atr is not None and atr > 0:
             MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.15% — established trade floor in profit
         MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades

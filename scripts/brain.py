@@ -333,6 +333,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                trailing_phase2_dist: float = None,
                leverage: int = 1, experiment: str = None,
                flipped_from_trade: bool = False,
+               regime: str = None,
                # ── Signal indicator fields (captured at entry from hotset) ──
                signal_z_score: float = None,
                signal_rsi_14: float = None,
@@ -539,9 +540,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     try:
         # DEBUG: Log the tuple construction so we can see exactly what brain.py sends
         # ── DEBUG: log the column-to-position mapping before INSERT ─────────────
-        # CRITICAL: column numbers in _col_map MUST match SQL column ordinal position (1-44)
-        # SQL has 44 columns: 11 before open_time, open_time=DEFAULT, 32 after
-        # TOTAL = 11 + 1 + 32 = 44 columns, 44 placeholders (open_time uses DEFAULT keyword, not %s)
+        # CRITICAL: column numbers in _col_map MUST match SQL column ordinal position (1-45)
+        # SQL has 45 columns: 11 before open_time, open_time=DEFAULT, 33 after
+        # TOTAL = 11 + 1 + 33 = 45 columns, 45 placeholders (open_time uses DEFAULT keyword, not %s)
         _col_map = [
             # Col  Name                   Value
             (1,   'token',               token),
@@ -588,17 +589,18 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             (42,  'test_trailing_variant', test_trailing_variant),
             (43,  '_signal_metadata',     json.dumps(signal_metadata, default=str) if signal_metadata else '{}'),
             (44,  '_exp_metadata',        _exp_metadata_str),
+            (45,  'regime',               regime),
         ]
         _params = [row[2] for row in _col_map]
         print(f"[brain.py] DEBUG _col_map: {len(_col_map)} entries → {len(_params)} params")
 
-        # Validate: 44 params must match 44 %s in VALUES
-        if len(_params) != 44:
-            print(f"[brain.py] ❌ MISMATCH: params={len(_params)} (need 44)")
+        # Validate: 45 params must match 45 %s in VALUES
+        if len(_params) != 45:
+            print(f"[brain.py] ❌ MISMATCH: params={len(_params)} (need 45)")
             for i, (col_num, col_name, val) in enumerate(_col_map):
                 print(f"  [{i:2d}] col={col_num:2d} {col_name:30s} = {repr(val)[:60]}")
         else:
-            print(f"[brain.py] ✅ 44 params ready")
+            print(f"[brain.py] ✅ 45 params ready")
 
         # ── ACTUAL INSERT with verbose error capture ─────────────────────────
         # VALUES: 44 %s matching 44 _col_map params (open_time is explicit 'now' string)
@@ -617,8 +619,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                       signal_momentum_state, signal_z_score_tier,
                       signal_decision, signal_leverage, signal_created_at,
                       test_sl_variant, test_timing_variant, test_trailing_variant,
-                      _signal_metadata, _exp_metadata)
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                      _signal_metadata, _exp_metadata, regime)
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
             """, tuple(_params))
         except Exception as _insert_err:
@@ -1126,6 +1128,8 @@ if __name__ == "__main__":
                                 help="JSON string of all signal metadata at entry (future-proof catch-all)")
         add_parser.add_argument("--exp-metadata-json", dest="exp_metadata_json",
                                 help="JSON string of all experiment metadata at entry")
+        add_parser.add_argument("--regime", dest="regime",
+                                help="Market regime at entry (BULL/BEAR/NEUTRAL/VOLATILE)")
         
         close_parser = subparsers.add_parser("close", help="Close a trade")
         close_parser.add_argument("id", type=int, help="Trade ID")
@@ -1165,6 +1169,7 @@ if __name__ == "__main__":
                 leverage=args.leverage,
                 experiment=args.experiment,
                 flipped_from_trade=args.flipped,
+                regime=args.regime,
                 signal_z_score=args.signal_z_score,
                 signal_rsi_14=args.signal_rsi_14,
                 signal_macd_hist=args.signal_macd_hist,
