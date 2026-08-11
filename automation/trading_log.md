@@ -5744,3 +5744,41 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - SL revert eval window closes in ~7h — will we have enough data? (only 3 trades since revert)
 - Hot-set missing — is discovery working? Or just low vol?
+
+## [2026-08-11 23:05] Hourly Analysis
+
+**Trades:** 6 closed last hour (2W, 4L) — net -$0.22
+**24h:** 33T 11W (33.3% WR) -$0.53
+**7d:** 363T 189W (52.1% WR) +$0.55
+
+**SL Hit Rate:**
+- 24h: 57.6% (19/33) — elevated, above 40% threshold
+- Since SL revert (05:20): 10T 3W — -$0.37, too small for signal
+- SL revert eval window closes 05:20 Aug 12 (~6h)
+
+**Signal Performance (24h):**
+- bb_bounce+,hzscore+: 9T 1W (11.1% WR) -$0.31 — cold streak, 7d intact (48.5% WR +$0.20)
+- trend_momentum_near_sma+: 3T 0W (0% WR) -$0.35 — KILLED by CEO (already disabled)
+- hzscore+: 3T 1W (33.3% WR) -$0.08
+- hzscore-,range_breakout-: 2T 2W (100% WR) +$0.10
+
+**Last Hour Trades:**
+- AVNT hzscore+,mover+ WIN +$0.09 (profit-monster-trail)
+- HBAR hzscore+ WIN +$0.01 (profit-monster-trail)
+- WLFI hzscore+ LOSS -$0.04 (atr_sl_hit)
+- ETH trend_momentum_near_sma+ LOSS -$0.10 (atr_sl_hit) — pre-disable position
+- W trend_momentum_near_sma+ LOSS -$0.13 (cut-loser-CL-T1) — pre-disable position
+- NXPC hzscore+ LOSS -$0.05 (atr_sl_hit)
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active until 05:20 Aug 12 — no param changes allowed
+- trend_momentum_near_sma+ already killed by CEO
+- No new 0% WR kill candidates with 3+ trades
+- Trade frequency normal (1.4/hr avg, 6 last hour = slight spike)
+- 7d system profitable (52.1% WR +$0.55) — cold day variance after 15 green days
+
+**Open Questions:**
+- SL revert eval window closes in ~6h — only 10 trades since revert, need 20+ for signal
+- bb_bounce+,hzscore+ cold streak: if SL revert doesn't fix, may need signal-specific tuning after eval window
