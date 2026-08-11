@@ -25,10 +25,31 @@ FIX (2026-05-07): Added MIN_Z_VALUE = 0.4.
 MIN_Z_VALUE = 1.0   # |avg_z| must exceed this (backtested: 1.0 = 64.3% WR, 0.8 = 58.3%, 0 = 51.2%)
 COOLDOWN_HOURS = 0.083  # 5 minutes per-token+direction cooldown (was 2h — too aggressive)
 REQUIRE_3TF = False  # if True, require 3/3 TF agreement (was always 2/3 minimum)
+# Solo-specific (stricter when no co-signal present)
+SOLO_MIN_Z_VALUE = 1.5   # require genuine extreme for standalone (solo avg_z losers ~1.1, winners ~1.8)
+SOLO_REQUIRE_3TF = True  # require 3/3 TF agreement when solo (no co-signal backup)
 import statistics, sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, price_age_minutes
+
+
+def _is_solo(token, direction):
+    """Check if this token+direction has any other active signals in DB (no co-signal)."""
+    try:
+        from signal_schema import _get_conn, _runtime
+        conn = _get_conn(_runtime())
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) FROM signals
+            WHERE token = ? AND direction = ? AND signal_type != 'mtf_zscore'
+              AND created_at > datetime('now', '-10 minutes')
+        """, (token.upper(), direction))
+        count = cur.fetchone()[0]
+        conn.close()
+        return count == 0
+    except Exception:
+        return True  # assume solo if DB check fails
 
 
 def run() -> int:
@@ -134,7 +155,10 @@ def run() -> int:
             continue
 
         # Optional: require 3/3 TF agreement (stronger confirmation)
-        if REQUIRE_3TF and len(valid_z) < 3:
+        # Solo detection — apply stricter params when no co-signal
+        solo = _is_solo(token, local_dir)
+        tf_required = SOLO_REQUIRE_3TF if solo else REQUIRE_3TF
+        if tf_required and len(valid_z) < 3:
             continue
 
         bullish_tfs = sum(1 for v in valid_z if v > 0)
@@ -168,7 +192,9 @@ def run() -> int:
 
         # FIX (2026-05-07): Only fire at genuine extremes, not marginal z-score readings.
         # |avg_z| < 0.6 is the chop zone — winners had avg_z ~2.0, losers ~0.72.
-        if abs(avg_z) < MIN_Z_VALUE:
+        # Solo-specific: require higher z-score when no co-signal (solo losers avg_z ~1.1)
+        z_thresh = SOLO_MIN_Z_VALUE if solo else MIN_Z_VALUE
+        if abs(avg_z) < z_thresh:
             continue
 
         # ── Per-token cooldown (2h default) ─────────────────────────────────

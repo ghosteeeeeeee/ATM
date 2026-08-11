@@ -27,6 +27,10 @@ RSI_PERIOD = 14
 RSI_OVERSOLD = 40        # tightened 2026-08-07 — CEO: filter weak bounces
 RSI_OVERBOUGHT = 60      # tightened 2026-08-07 — CEO: filter weak bounces
 BOUNCE_MIN_PCT = 0.05    # tightened 2026-08-07 — CEO: require stronger bounce
+# Solo-specific (stricter when no co-signal present)
+SOLO_RSI_OVERSOLD = 35   # require deeper oversold for standalone entries
+SOLO_RSI_OVERBOUGHT = 65 # require deeper overbought for standalone entries
+SOLO_BOUNCE_MIN_PCT = 0.10  # require stronger bounce confirmation
 COOLDOWN_MIN = 5         # was 10 — faster re-entries
 
 # ── State ───────────────────────────────────────────────────────────────
@@ -166,6 +170,23 @@ def _get_ohlcv_candles(token, lookback=100):
         return []
 
 
+def _is_solo(token, direction):
+    """Check if this token+direction has any other active signals in DB (no co-signal)."""
+    try:
+        conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), '..', 'data', 'signals_hermes_runtime.db'), timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) FROM signals
+            WHERE token = ? AND direction = ? AND signal_type != 'bb_bounce'
+              AND created_at > datetime('now', '-10 minutes')
+        """, (token.upper(), direction))
+        count = cur.fetchone()[0]
+        conn.close()
+        return count == 0
+    except Exception:
+        return True  # assume solo if DB check fails
+
+
 def detect_bb_bounce(token, closes):
     """Detect Bollinger Band bounce with quality filters."""
     if len(closes) < BB_MIN_BARS:
@@ -190,10 +211,17 @@ def detect_bb_bounce(token, closes):
     # Check 1H trend
     trend = _get_1h_trend(token)
 
+    # Solo detection — apply stricter params when no co-signal
+    solo = _is_solo(token, 'LONG')  # will re-check per direction below
+
     # LONG: lower band + RSI oversold + bullish/neutral trend + bounce up
     if dist_from_lower <= BB_TOUCH_PCT and current > prev:
+        solo_l = _is_solo(token, 'LONG')
+        rsi_thresh = SOLO_RSI_OVERSOLD if solo_l else RSI_OVERSOLD
+        bounce_thresh = SOLO_BOUNCE_MIN_PCT if solo_l else BOUNCE_MIN_PCT
+
         # Quality filters
-        if rsi > RSI_OVERSOLD:
+        if rsi > rsi_thresh:
             return None  # RSI not oversold enough
         if trend == 'BEARISH':
             return None  # Counter-trend
@@ -203,7 +231,7 @@ def detect_bb_bounce(token, closes):
             return None  # Still below band, no bounce yet
 
         bounce_pct = (current - lower) / lower * 100 if lower > 0 else 0
-        if bounce_pct < BOUNCE_MIN_PCT:
+        if bounce_pct < bounce_thresh:
             return None  # Bounce too weak
 
         return {
@@ -215,11 +243,16 @@ def detect_bb_bounce(token, closes):
             'rsi': rsi,
             'trend': trend,
             'bounce_pct': bounce_pct,
+            'solo': solo_l,
         }
 
     # SHORT: upper band + RSI overbought + bearish/neutral trend + bounce down
     if dist_from_upper <= BB_TOUCH_PCT and current < prev:
-        if rsi < RSI_OVERBOUGHT:
+        solo_s = _is_solo(token, 'SHORT')
+        rsi_thresh = SOLO_RSI_OVERBOUGHT if solo_s else RSI_OVERBOUGHT
+        bounce_thresh = SOLO_BOUNCE_MIN_PCT if solo_s else BOUNCE_MIN_PCT
+
+        if rsi < rsi_thresh:
             return None
         if trend == 'BULLISH':
             return None
@@ -229,7 +262,7 @@ def detect_bb_bounce(token, closes):
             return None  # Still above band, no bounce yet
 
         bounce_pct = (upper - current) / upper * 100 if upper > 0 else 0
-        if bounce_pct < BOUNCE_MIN_PCT:
+        if bounce_pct < bounce_thresh:
             return None
 
         return {
@@ -241,6 +274,7 @@ def detect_bb_bounce(token, closes):
             'rsi': rsi,
             'trend': trend,
             'bounce_pct': bounce_pct,
+            'solo': solo_s,
         }
 
     return None
