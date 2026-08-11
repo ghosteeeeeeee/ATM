@@ -5776,9 +5776,43 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - SL revert eval window active until 05:20 Aug 12 — no param changes allowed
 - trend_momentum_near_sma+ already killed by CEO
 - No new 0% WR kill candidates with 3+ trades
-- Trade frequency normal (1.4/hr avg, 6 last hour = slight spike)
+- Trade frequency normal (1/hr last hour)
 - 7d system profitable (52.1% WR +$0.55) — cold day variance after 15 green days
+- atr_sl_hit 60.7% 24h — elevated but within eval window, cannot tune
 
 **Open Questions:**
-- SL revert eval window closes in ~6h — only 10 trades since revert, need 20+ for signal
+- SL revert eval window closes in ~6h — only 11 trades since revert, need 20+ for signal
+- bb_bounce+,hzscore+ cold streak: if SL revert doesn't fix, may need signal-specific tuning after eval window
+- Hot-set file missing — low vol conditions
+
+## [2026-08-12 01:05] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W, 1L) — net -$0.04
+**24h:** 28T 8W (28.6% WR) -$0.63
+**7d:** 364T 190W (52.2% WR) +$0.51
+
+**SL Hit Rate:**
+- 24h: 60.7% (17/28) — elevated, above 40% threshold
+- Since SL revert (05:20): 11T — too small for signal, eval window active
+
+**Signal Performance (24h):**
+- bb_bounce+,hzscore+: 8T 12.5% WR -$0.25 — dominant but cold (7d: 48.5% WR +$0.20)
+- trend_momentum_near_sma+: 3T 0% WR -$0.35 — KILLED (already disabled)
+- hzscore+: 3T 33.3% WR -$0.08
+- continuation+,hzscore+: 1T 0% WR -$0.04 — 1 trade only
+
+**Last Hour Trades:**
+- AVNT continuation+,hzscore+ LOSS -$0.04 (atr_sl_hit)
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active until 05:20 Aug 12 — no param changes allowed
+- trend_momentum_near_sma+ already killed by CEO
+- No new 0% WR kill candidates with 3+ trades
+- Trade frequency normal (1/hr last hour)
+- 7d system profitable (52.2% WR +$0.51) — cold day variance after 15 green days
+
+**Open Questions:**
+- SL revert eval window closes in ~6h — only 11 trades since revert, need 20+ for signal
 - bb_bounce+,hzscore+ cold streak: if SL revert doesn't fix, may need signal-specific tuning after eval window
