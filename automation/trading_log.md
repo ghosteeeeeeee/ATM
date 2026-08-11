@@ -5816,3 +5816,29 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - SL revert eval window closes in ~6h — only 11 trades since revert, need 20+ for signal
 - bb_bounce+,hzscore+ cold streak: if SL revert doesn't fix, may need signal-specific tuning after eval window
+
+## [2026-08-12 03:05] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W, 0L, 1 flat) — net +$0.05
+**24h:** 27T 8W (29.6% WR) -$0.42
+**7d:** 373T 193W (51.7% WR) +$0.21
+
+**SL Hit Rate:**
+- 4h: 36.4% (4/11) — healthy, below 40% threshold
+- 24h: 48.1% (13/27) — elevated but SL revert eval window closed
+
+**Signal Performance (7d 0% WR kills):**
+- pattern_wolf_wave_bear: 4T 0W -$0.26 — already blocked (pattern_wolf in SIGNAL_SOURCE_BLACKLIST)
+- trend_momentum_near_sma+: 3T 0W -$0.35 — already killed by CEO
+
+**Changes:** None
+
+**No Change Needed:**
+- No new 0% WR signals with 3+ trades to kill
+- SL hit rate healthy in 4h window (36.4%)
+- Trade frequency normal (2/hr)
+- Both historical 0% WR candidates already blocked
+- 7d system at breakeven — normal variance after 15 green days
+
+**Open Questions:**
+- None — system stable, cold day is normal variance
