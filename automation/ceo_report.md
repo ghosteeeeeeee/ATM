@@ -2,18 +2,24 @@
 
 ### Verified Numbers (24h)
 - 58 trades, PnL: -$0.33, WR: 41.4%
-- Worst losers: `bb_bounce+,range_finder+` (LONG, +$0.71 over 7d but -0.10 recent), `ma100-cross,return_exhaustion-` (-$0.28), `hzscore-,return_exhaustion-` (-$0.18)
-- Best: `bb_bounce+,hzscore+` (+$0.23, 50% WR), `bb_bounce` LONG (+$0.24, 57.1% WR), `bb_bounce+,range_finder+` (+$0.71, 58.5% WR)
+- 12h: 23T, -$0.51, 26.1% WR (rough)
+- 6h: 8T, -$0.15, 37.5% WR
+- 7d: 365T, +$0.40, 51.8% WR (positive)
+- Open: 2 trades, $0 unrealized
 
 ### Diagnosis
-NORMAL regime is the biggest loser per 30d backtest (-$0.82). Most signals bleed there. HIGH regime is the only profitable one (+$0.17). The existing REGIME_SIGNALS was stale — signals like `tl_break+`, `tl_break-`, `accel-300-`, `ma_cross` were in NORMAL but aren't profitable there.
+**CRITICAL: Hotset EMPTY — system stopped trading for hours.** Pipeline was running but compactor rejected ALL signals. Root cause: `CONFLUENCE_REQUIRED=True` final guard at line 1145 had no backtested standalone bypass — even though the initial confluence gate (Step 2, line 726) correctly allowed `hzscore`, `bb_bounce`, `trend_momentum_near_sma` etc. through. The final guard was a hard block that didn't know about the bypass.
+
+Cost drivers 48h: `atr_sl_hit` 37T -$1.73, `cut-loser-CL-trail` 22T -$0.88.
 
 ### Fix Applied
-Updated `REGIME_SIGNALS` in `volatility_gate.py` from 30d backtest (861 trades):
-- FLAT: mean reversion only (bb_bounce variants)
-- NORMAL: restricted to 3 profitable combos (bb_bounce+,range_finder+, bb_bounce+,hzscore+, tl_break)
-- HIGH: breakout signals (bb_bounce+,range_finder+, tl_break, accel-300-vel)
-- EXTREME: continuation (continuation+,hzscore+, hzscore+,mover+, bb_bounce)
+Added backtested standalone bypass to 4 guards in `signal_compactor.py`:
+1. **HOTSET-FINAL guard** (line 1145) — allows `hzscore`, `bb_bounce`, `trend_momentum_near_sma`, `stop_hunt_reversal_long`, `spike_exhaustion_short`, `range_finder`, `continuation`
+2. **PRESERVE-MERGE guard** (line 1190) — same bypass
+3. **PENDING-APPROVE guard** (line 1384) — same bypass
+4. **SAFETY-FILTER guard** (line 1532) — same bypass
+
+Dry run result: 6 hotset entries (was 0). Live run: hotset populated with MORPHO:LONG, MNT:LONG, BCH:LONG, CC:SHORT, BSV:SHORT, JUP:SHORT.
 
 ### Verification
-30d backtest: 861 trades, only positive-PnL signal/regime combos included. Next: monitor regime performance over next 48h.
+Pipeline cycle #150044 at 04:24 picked up 6 tokens from hotset. Compactor now produces non-empty hotset. Monitor 24h for trade execution and WR improvement.

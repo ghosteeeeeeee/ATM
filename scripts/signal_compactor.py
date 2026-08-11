@@ -1143,8 +1143,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # single-source entries to slip through into hotset_final. This guard
             # catches that edge case permanently.
             if CONFLUENCE_REQUIRED and len(src_parts) < 2:
-                log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (this should never happen — investigate confluence gate or preservation path)")
-                continue
+                # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
+                bare_src = src.rstrip('+-') if src else ''
+                if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                                'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                'range_finder', 'continuation'):
+                    log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
+                elif ACCEL_300_STANDALONE_BYPASS_ENABLED and src.startswith('accel-300'):
+                    log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} accel-300 standalone ({src}) allowed at final guard")
+                else:
+                    log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (this should never happen — investigate confluence gate or preservation path)")
+                    continue
             elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 log(f"  ➡️  [HOTSET-FINAL-ALLOW] {tkn}:{direction} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{src}'")
             log(f"  ➡️  [HOTSET-FINAL-ADD] {tkn}:{direction} src='{src}' parts={src_parts} parts_count={len(src_parts)} conf={entry.get('confidence')} score={entry.get('score',0):.2f}")
@@ -1179,8 +1188,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pe_src = pe.get('source', '')
                         pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
                         if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
-                            log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
-                            continue
+                            bare_pe = pe_src.rstrip('+-') if pe_src else ''
+                            if bare_pe in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                                            'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                            'range_finder', 'continuation'):
+                                log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} backtested standalone ({pe_src}) allowed at merge")
+                            elif ACCEL_300_STANDALONE_BYPASS_ENABLED and pe_src.startswith('accel-300'):
+                                log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} accel-300 standalone ({pe_src}) allowed at merge")
+                            else:
+                                log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
+                                continue
                         elif not CONFLUENCE_REQUIRED and len(pe_parts) < 2:
                             log(f"  ➡️  [PRESERVE-MERGE-ALLOW] {pe['token']}:{pe['direction']} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{pe_src}'")
                         # ── DISABLED-COMPONENT GUARD ──────────────────────────────────────
@@ -1365,8 +1382,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🚫 [PENDING-DISABLED-BLOCK] {tok}:{d} — src='{source}' contains disabled component, skipping approval")
                         continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
-                        log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
-                        continue
+                        bare_src = source.rstrip('+-') if source else ''
+                        if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                                        'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                        'range_finder', 'continuation'):
+                            log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
+                        elif ACCEL_300_STANDALONE_BYPASS_ENABLED and source.startswith('accel-300'):
+                            log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} accel-300 standalone ({source}) allowed at pending approve")
+                        else:
+                            log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
+                            continue
                     elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         log(f"  ➡️  [PENDING-APPROVE-ALLOW] {tok}:{d} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{source}'")
                     # Combo entered top-10 → APPROVED immediately.
@@ -1513,8 +1538,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # If a single-source entry somehow got past the confluence gate above,
             # this is the final catch before it reaches decider_run.
             if CONFLUENCE_REQUIRED and entries_count < 2:
-                log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — single-source src='{src}' parts_count={entries_count} (LAST RESORT BLOCK)")
-                continue
+                bare_src = (src or '').rstrip('+-')
+                if bare_src in ('trend_momentum_near_sma', 'stop_hunt_reversal_long',
+                                'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                'range_finder', 'continuation'):
+                    log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")
+                elif ACCEL_300_STANDALONE_BYPASS_ENABLED and (src or '').startswith('accel-300'):
+                    log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} accel-300 standalone ({src}) allowed at safety filter")
+                else:
+                    log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — single-source src='{src}' parts_count={entries_count} (LAST RESORT BLOCK)")
+                    continue
             elif not CONFLUENCE_REQUIRED and entries_count < 2:
                 log(f"  🛡️ [SAFETY-FILTER-ALLOW] {e['token']}:{e.get('direction')} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{src}'")
 
