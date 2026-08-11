@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
-volatility_gate — Surf the right waves.
+volatility_gate — Surf the right waves with the right signals.
 
-Thesis: Don't trade in flat water (no edge) or storms (too risky).
-        Trade in the sweet spot: normal volatility with clear waves.
+Thesis: Different signals work in different volatility regimes.
+        Mean reversion works in FLAT (range-bound).
+        Trend following works in NORMAL (steady waves).
+        Breakout works in HIGH (big moves).
+        Continuation works in EXTREME (ride the storm).
 
 Classification (from 30d ATR distribution across 143 tokens):
-  FLAT:    ATR% < 0.48  (P25)  → SKIP (no wave to surf)
-  NORMAL:  ATR% 0.48-1.0 (P25-P75) → TRADE with standard SL
-  HIGH:    ATR% 1.0-1.5 (P75-P90) → TRADE with wider SL
-  EXTREME: ATR% > 1.5 (P90)  → SKIP (storm)
+  FLAT:    ATR% < 0.48  (P25)  → Mean reversion signals
+  NORMAL:  ATR% 0.48-1.0 (P25-P75) → Trend following signals
+  HIGH:    ATR% 1.0-1.5 (P75-P90) → Breakout signals
+  EXTREME: ATR% > 1.5 (P90)  → Continuation signals (or skip)
 
 Data: candles_1h from candles.db
 """
@@ -19,6 +22,26 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from paths import HERMES_DATA
 import sqlite3
+
+# Signals that work in each regime (from backtest analysis)
+REGIME_SIGNALS = {
+    'FLAT': {
+        'bb_bounce,hzscore+', 'hzscore-,return_exhaustion-',
+        'bb-bounce-short,hzscore-', 'mean_reversion',
+    },
+    'NORMAL': {
+        'tl_break+', 'tl_break-', 'bb_bounce+,hzscore+', 'bb_bounce+,range_finder+',
+        'accel-300-', 'momentum+', 'continuation+', 'ma_cross', 'bb_bounce+',
+    },
+    'HIGH': {
+        'tl_break-', 'accel-300-vel+', 'accel-300-vel-', 'bb_bounce+,range_finder+',
+        'breakout', 'squeeze_cross', 'tl_break+',
+    },
+    'EXTREME': {
+        'continuation+,hzscore+', 'hzscore+,mover+', 'bb_bounce',
+        'continuation+', 'accel-300-',
+    },
+}
 
 
 def get_atr_pct(token):
@@ -76,8 +99,8 @@ def classify_volatility(atr_pct):
         return 'EXTREME'
 
 
-def should_trade(token):
-    """Main entry point: should we trade this token based on volatility?
+def should_trade(token, signal=None):
+    """Main entry point: should we trade this token based on volatility + signal?
     Returns: ('TRADE', regime) or ('SKIP', reason)
     """
     atr_pct = get_atr_pct(token)
@@ -86,12 +109,37 @@ def should_trade(token):
 
     regime = classify_volatility(atr_pct)
 
-    if regime == 'FLAT':
-        return ('SKIP', f'flat_water: ATR={atr_pct:.4f}% < 0.48%')
-    elif regime == 'EXTREME':
+    # If signal is provided, check if it works in this regime
+    if signal:
+        regime_sigs = REGIME_SIGNALS.get(regime, set())
+        # Check full signal string first (e.g., 'bb_bounce+,hzscore+')
+        if signal in regime_sigs:
+            return ('TRADE', regime)
+        # Check individual parts
+        sig_parts = signal.split(',')
+        works_in_regime = False
+        for part in sig_parts:
+            part = part.strip()
+            if part in regime_sigs:
+                works_in_regime = True
+                break
+            base = part.rstrip('+-')
+            if base in regime_sigs:
+                works_in_regime = True
+                break
+
+        if works_in_regime:
+            return ('TRADE', regime)
+        elif regime == 'EXTREME':
+            return ('SKIP', f'storm: ATR={atr_pct:.4f}% > 1.5% (signal not suited)')
+        else:
+            return ('SKIP', f'{signal} not suited for {regime} (ATR={atr_pct:.4f}%)')
+
+    # No signal-specific filter — use generic regime rules
+    if regime == 'EXTREME':
         return ('SKIP', f'storm: ATR={atr_pct:.4f}% > 1.5%')
-    else:
-        return ('TRADE', regime)
+
+    return ('TRADE', regime)
 
 
 def get_sl_multiplier(atr_pct):

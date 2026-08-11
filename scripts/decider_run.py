@@ -1169,7 +1169,7 @@ def context_gate(token, direction, source, sig):
     # HIGH (1.0-1.5%): big waves — wider SL
     try:
         from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
-        vol_result, vol_regime = should_trade(token)
+        vol_result, vol_regime = should_trade(token, signal=source)
         atr_pct = get_atr_pct(token)
         atr_str = f'{atr_pct:.4f}%' if atr_pct is not None else 'N/A'
         log(f'  [VOL-GATE] {token}: ATR={atr_str} regime={vol_regime}')

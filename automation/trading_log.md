@@ -50,6 +50,34 @@
 
 ---
 
+## 2026-08-11 03:38 Hourly Analysis
+
+**Trades:** 0 closed in last hour (system quiet, last trade at 02:29 UTC)
+**PnL:** N/A
+
+**24h Summary:** 58 trades, -$0.33, 41.4% WR, -$0.006 avg
+
+**Changes:** None
+
+**No Change Needed:**
+- No trades in last hour — system quiet at this hour
+- SL reverted to tighter settings (0.5% min, 1.0% max) at 03:00 — needs 24h+ to show results
+- No signal meets kill threshold (0% WR with 3+ trades in 3h or 6h)
+- Trade frequency normal (58/24h = 2.4/hr)
+
+**Key Observations:**
+- atr_sl_hit = 43.1% of closes (24h) — still above 40% threshold, but CEO just reverted SL widening at 03:00
+- profit-monster-trail = 39.7% of closes, +$1.13 — sole winning exit type
+- cut-loser-CL-trail = 15.5% of closes, -$0.43 — losing exit type eating into profits
+- bb_bounce+,hzscore+ = 16T, -$0.34, 31.3% WR — worst signal, but not triggered recently (0 trades in 3h)
+- All other signals: small winners or breakeven
+
+**Open Questions:**
+- Will SL revert to 0.5% reduce atr_sl_hit rate below 40%? (needs 24h data)
+- Should cut-loser-CL-trail be disabled? (15.5% of closes, -$0.43, losing money)
+
+---
+
 ## 2026-08-11 01:26 Hourly Analysis
 
 **Trades:** 4 closed (2 wins, 2 losses) in last 1.5h
