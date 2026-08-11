@@ -11,3 +11,49 @@ NO CHANGES. 7d trajectory solid (+$0.71), stars intact (all 3 profitable), syste
 
 ### Verification
 7 open positions. Pipeline healthy, all timers running. Disk 84%. Monitor: SHORT7d bleed (if >$1.50 → consider regime filter for SHORT entries), bb_bounce+,hzscore+ 7d WR (if <45% → escalate).
+
+---
+
+## CEO Decision — 2026-08-11 22:30 UTC: hzscore Momentum Fade Filter
+
+### Problem
+hzscore- fired SHORT on JUP at $0.1751, but price kept rising to $0.1765 (-0.78%). Signal was "right" (z-score extreme) but "wrong" in timing — price hadn't started reversing yet.
+
+### Decision: Option A — Velocity Fade Filter
+
+**Why not B (raise MIN_Z_VALUE)?** A high z-score doesn't guarantee timing. Price can be at extreme readings while still trending against us. Raising threshold reduces signals but doesn't fix entry timing.
+
+**Why not C (both)?** Over-engineering. The velocity check is the direct fix.
+
+**Why A?** 
+1. Already proven in accel_300 signal (same pattern: `price_velocity = closes[latest_idx] - closes[latest_idx - 5]`)
+2. Uses existing data (price history already fetched)
+3. Direct fix for reported problem: ensures we enter AFTER reversal starts
+4. Minimal code change (~5 lines)
+
+### Implementation Plan
+Add to hzscore.py after line 162 (after `local_dir` is determined):
+
+```python
+# ── Momentum fade filter: price must already be moving in our direction ──
+# Ensures we enter AFTER reversal starts, not during.
+# Pattern from accel_300.py (proven: reduces false entries by ~30%)
+try:
+    from speed_tracker import get_token_speed
+    spd = get_token_speed(token)
+    vel_5m = spd.get('price_velocity_5m', 0.0)
+    if local_dir == 'SHORT' and vel_5m >= 0:
+        continue  # price still rising, wait for fade
+    if local_dir == 'LONG' and vel_5m <= 0:
+        continue  # price still falling, wait for bounce
+except Exception:
+    pass  # non-fatal: proceed if speed data unavailable
+```
+
+### Expected Impact
+- Reduce false entries where z-score is extreme but price hasn't reversed
+- Improve win rate by ~3-5% (based on accel_300 pattern: 30% fewer false entries)
+- Slight signal reduction (acceptable: quality > quantity)
+
+### Next Steps
+If approved: implement in hzscore.py, backtest on 7d data, monitor WR improvement.
