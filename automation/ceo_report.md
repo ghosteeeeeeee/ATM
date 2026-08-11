@@ -34,3 +34,46 @@ Spec items #1 (goal_progress.json) and #3 (faster kill threshold) now implemente
 | Win rate | 44.8% (24h) | 50%+ | 24h |
 | SHORT PnL | +$0.09 (24h) | Maintain | 72h |
 | 7d PnL | +$0.38 | +$1.00 | 7d |
+
+---
+
+## CEO Spec Review — Transcript Mining: Signum MCP (2026-08-11)
+
+### Verdict: APPROVE with one adoption
+
+The spec's TL;DR is correct — our system already outperforms the video's approach on every axis. Deterministic scoring > LLM-per-trade. ccxt HyperLiquid > Signum MCP wrapper. No gaps found.
+
+### One Actionable Finding
+
+**"AI-Filtered Coin Universe" → Wire top150.py into signal_gen.py.**
+
+`top150.py` already exists, filters HL tokens by Binance 24h volume, writes to `data/top150_tokens.json` — but **nothing reads it**. It's orphaned code. The spec suggests ~10 lines in signal_gen.py to filter by volume/liquidity. The real fix is even lazier: load top150 and use it as the token universe instead of scanning all ~500 tokens.
+
+`signal_gen.py:220` currently returns `get_all_tokens()` (full universe). Changing this to load top150 first would reduce noise on illiquid tokens with zero new filtering logic.
+
+**Effort:** ~5 lines. Load JSON, intersect with HL tradeable, return that list.
+
+**Risk:** Low. Illiquid tokens already fail z-score thresholds, so this mostly cuts wasted compute, not bad trades. But needs a 24h observation period after deployment.
+
+### Priority Ranking
+
+| # | Item | Action | Why |
+|---|------|--------|-----|
+| 1 | Wire top150.py | Adopt | Reduces universe from ~500→150 tokens, cuts noise, already built |
+| 2 | Weekly review timer (#4) | Adopt | Proactive CEO cycle catches drift between sessions |
+| 3 | Sharpe in self_learner (#2) | Pending | WR-only tuning is the weak link, but lower urgency than above |
+| 4 | Skip everything else | — | Claude MCP, plain English prompts, email summaries — all redundant |
+
+### Approved Changes
+- **Wire top150.py into signal_gen.py** — 5 lines, deploy after current SL widening evaluation window closes (~18h)
+- **Weekly review timer** — systemd unit + prompt, deploy independently
+
+### Rejected
+- Signum MCP, Claude Routines, email summaries, daily schedule — all covered by existing systems
+
+### Goal Tracking
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate | 44.8% (24h) | 50%+ | 24h |
+| SHORT PnL | +$0.09 (24h) | Maintain | 72h |
+| 7d PnL | +$0.38 | +$1.00 | 7d |
