@@ -216,3 +216,6 @@
 [2026-08-11 20:05] auto_1hr: NO CHANGES
   WHY: System calm. 0T last hour, 2T since SL revert (05:20) — too early to evaluate. 24h 51T -$0.43 (45.1% WR). 7d 365T +$0.45 (51.8% WR). SL eval window active until 05:20 Aug 12. No 0% WR signals to kill. No overtrading. Low volume since revert — need more data.
   BY: auto_1hr
+[2026-08-11 21:05] auto_1hr: NO CHANGES
+  WHY: System calm. 0T last hour, 3T since SL revert (05:20) — need 20+ trades for signal. 24h 37T -/usr/bin/bash.56 (35.1% WR). 7d 365T +/usr/bin/bash.45 (51.8% WR). SL eval window active until 05:20 Aug 12. No 0% WR signals to kill. Trade freq 0/hr. Market flat, no urgency.
+  BY: auto_1hr

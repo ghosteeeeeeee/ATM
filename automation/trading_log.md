@@ -5640,3 +5640,51 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - SL revert eval window closes in ~18h — will have enough data by then?
 - bb_bounce+,hzscore+ 24h bleed: -$0.31. If SL revert doesn't fix, may need signal-specific tuning
+
+## [2026-08-11 12:26] Hourly Analysis
+
+**Trades:** 0 closed last hour (2h25m since last close)
+**24h:** 40T 14W (35% WR) -$0.58
+**7d:** 364T 189W (51.9% WR) +$0.47
+**SL hit 7d:** 38.5% (just under 40% — SL revert working)
+
+**Pipeline:** Running every minute but zero trades entering. 3 signals fired, all blocked:
+- ETH/KAS: not in hot-set (only JUP in hot-set)
+- JUP: CTX-GATE blocked (hzscore- not suited for NORMAL regime, ATR=0.6164%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Pipeline functional — market not producing tradeable setups
+- Hot-set has only 1 token (JUP), volatility gate correctly filtering hzscore-
+- SL revert eval window active (closes 05:20 Aug 12) — no param changes
+- 7d system positive (51.9% WR) — no crisis
+- No 0% WR signals with 3+ trades to kill
+- Overtrading? No — 0 trades/hr
+
+**Open Questions:**
+- Hot-set very narrow (1 token) — is this normal market conditions or discovery issue?
+- HTTST4 still open (test signal, age unknown) — should eventually close
+- SL revert eval window closes in ~17h — will have enough data by then?
+
+## [2026-08-11 21:05] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 37T 13W (35.1% WR) -$0.56
+**Since SL Revert (05:20):** 3T 1W -$0.03
+**SL Hit Rate 24h:** 56.8% (mostly pre-revert)
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active (closes 05:20 Aug 12) — only 3 trades since revert, need 20+ for signal
+- No 0% WR signals with 3+ trades to kill
+- bb_bounce+,hzscore+ 23% WR but 7d intact — cold day variance after 15 green days
+- Trade frequency 0/hr — under-trading
+- Market flat (0 open trades, 1 test signal)
+- Hot-set narrow (JUP only) — not discovery issue, just low vol
+
+**Open Questions:**
+- SL revert eval window closes in ~8h — will we have enough data by then?
+- HTTST4 test signal still open — should eventually close
+- bb_bounce+,hzscore+ 24h bleed: -$0.33. If SL revert doesn't fix, may need signal-specific tuning after eval window

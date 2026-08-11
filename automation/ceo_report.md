@@ -1,21 +1,24 @@
-## CEO Report — 2026-08-12 01:15 UTC
+## CEO Report — 2026-08-11 13:18 UTC
 
 ### Diagnosis
-Verified DB: 24h 42T -$0.61, 35.7% WR — RED. 7d 366T +$0.48, 51.9% WR — positive. 1 open (ht_sig4 paper $11). System idle — NEUTRAL regime, 0 trades today. Daily: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.13 (10T partial). Cost drivers 48h: atr_sl_hit 37T -$1.72 (dominant), cut-loser-CL-trail 16T -$0.74.
+Verified DB: 24h 38T -$0.52, 36.8% WR — RED. 7d 364T +$0.47, 51.9% WR — positive. 1 open. Today Aug 11: 10T -$0.13, 40% WR (partial). Daily: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 partial.
 
 ### Concern
-bb_bounce+,hzscore+ LONG: 24h 15T -$0.36 (26.7% WR — worst signal) but 7d 17T +$0.51 (64.7% WR — intact star). Getting entries chopped in NEUTRAL consolidation. 7d return_exhaustion combos bleeding on SHORT side (ma100-cross,return_exhaustion- 7T -$0.28, hzscore-,return_exhaustion- 10T -$0.18). SL eval window (1.2%) closed 05:20 Aug 12 — post-revert sample too small (system idle).
+bb_bounce+,hzscore+ LONG: 24h 13T -$0.33, 23.1% WR — worst signal. 7d: 33T +$0.20, 48.5% WR — intact star, not broken. Getting entries chopped in NEUTRAL consolidation. Cost drivers: atr_sl_hit 36T -$1.64, cut-loser-CL-trail 15T -$0.73. No signal has 0% WR with 5+ trades. No signal has <35% WR with 10+ trades on 7d.
 
-### Root Cause
-Cold streak after 15-green-day streak is normal variance. NEUTRAL regime = low candle freshness + no trending setups. Mean-reversion entries (bb_bounce+) getting chopped. 7d trajectory intact, all 3 stars profitable.
+### SL Revert Status
+Reverted to 1.2% at 05:20 Aug 11. Post-revert: 3T -$0.03, 33.3% WR — too early (8h in, 16h remaining). Pre-revert at 0.5%: SL hit rate 64.7% — too tight. 1.2% now active, eval window ends 05:20 Aug 12.
 
 ### Fix Applied
-NO CHANGES. 7d trajectory solid, stars intact, NEUTRAL regime = normal variance. Monitoring:
-- bb_bounce+,hzscore+ LONG: if 7d WR drops below 45% → disable
+NO CHANGES. 7d trajectory solid, all 3 stars profitable, system calm (3 trades in 8h). NEUTRAL regime = normal variance after Aug 9 peak. Monitoring:
+- bb_bounce+,hzscore+ LONG: if 7d WR < 45% → disable
 - return_exhaustion SHORT combos: if 7d bleeds exceed -$0.50 → disable
-- Disk 81% — approaching 85% threshold
+- SL eval window: full 24h needed, ends 05:20 Aug 12
+- Disk 82% — approaching 85% threshold
 
 ### Verification
-- 7d: +$0.48 (51.9% WR) — positive
-- Stars intact: bb_bounce+,range_finder+ LONG, bb_bounce+,hzscore+ LONG, bb-bounce-short,hzscore- SHORT — all profitable 7d
+- 7d: +$0.47 (51.9% WR) — positive
+- Stars intact: bb_bounce+,range_finder+ LONG 58.5%, bb_bounce+,hzscore+ LONG 48.5%, bb-bounce-short,hzscore- SHORT 58.8% — all profitable
 - Pipeline healthy, all timers running
+- Live trading enabled, NEUTRAL regime
+- Hotset empty (correct for NEUTRAL)
