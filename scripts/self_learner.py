@@ -35,6 +35,7 @@ try:
         SELF_LEARNER_WR_TARGET as GOAL_WR,
         SELF_LEARNER_MAX_ADJUSTMENTS as MAX_ADJUSTMENTS_PER_DAY,
         SELF_LEARNER_MIN_BETWEEN as MIN_TRADES_BETWEEN,
+        CEO_PROTECTED_FLAGS,
     )
 except ImportError:
     MIN_WR = 0.30
@@ -43,6 +44,12 @@ except ImportError:
     MIN_TRADES_BETWEEN = 15
 
 CRITICAL_WR = 0.25  # Below this = emergency disable
+GOAL_PROGRESS_FILE = '/root/.hermes/data/goal_progress.json'
+
+# ── Kill threshold config ──────────────────────────────────────────────
+KILL_PNL_50 = -2.0    # 50-trade PnL below this → disable
+KILL_MAX_CONSEC = 10  # consecutive losses at or above this → disable
+KILL_MIN_TRADES = 50  # need at least this many trades to evaluate
 
 # ── Combo weight tuning ────────────────────────────────────────────────
 COMBO_WEIGHTS_FILE = '/root/.hermes/data/combo_weights.json'
@@ -136,6 +143,116 @@ def _detect_decay(trades):
     first_wr = _calculate_wr(trades[:half])
     second_wr = _calculate_wr(trades[half:])
     return first_wr - second_wr > 0.15
+
+
+def _max_consecutive_losses(trades):
+    """Compute max consecutive losses in a trades list."""
+    max_streak = 0
+    current = 0
+    for t in trades:
+        if t['win'] == 0:
+            current += 1
+            max_streak = max(max_streak, current)
+        else:
+            current = 0
+    return max_streak
+
+
+def _get_all_active_signal_types():
+    """Get distinct signal types from recent signal_outcomes."""
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT DISTINCT signal_type FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+            AND created_at > datetime('now', '-30 days')
+        """)
+        rows = cur.fetchall()
+        conn.close()
+        return [r[0] for r in rows]
+    except Exception:
+        return []
+
+
+def _kill_underperformers():
+    """Auto-disable signals with negative 50-trade PnL or 10+ consecutive losses.
+    
+    Respects CEO_PROTECTED_FLAGS — won't touch protected signals.
+    Returns number of signals disabled.
+    """
+    kills = 0
+    signal_types = _get_all_active_signal_types()
+    
+    for signal_type in signal_types:
+        # Skip already-disabled signals
+        if _is_signal_disabled(signal_type):
+            continue
+        
+        # Skip CEO-protected signals
+        norm = signal_type.upper().replace('-', '_')
+        if norm in (k.upper() for k in CEO_PROTECTED_FLAGS):
+            _log(f"  KILL CHECK {signal_type}: PROTECTED, skipping")
+            continue
+        
+        trades = _get_recent_trades(signal_type, limit=KILL_MIN_TRADES)
+        if len(trades) < KILL_MIN_TRADES:
+            continue
+        
+        pnl = _calculate_pnl(trades)
+        max_consec = _max_consecutive_losses(trades)
+        
+        kill_reason = None
+        if pnl < KILL_PNL_50:
+            kill_reason = f"50T PnL=${pnl:+.2f} < {KILL_PNL_50}"
+        elif max_consec >= KILL_MAX_CONSEC:
+            kill_reason = f"{max_consec} consecutive losses >= {KILL_MAX_CONSEC}"
+        
+        if kill_reason:
+            _log(f"  KILL {signal_type}: {kill_reason}")
+            _disable_signal(signal_type)
+            kills += 1
+    
+    return kills
+
+
+def _disable_signal(signal_type):
+    """Disable a signal by setting its _ENABLED flag to False in hermes_constants.py."""
+    import re
+    try:
+        with open(HERMES_CONSTANTS) as f:
+            content = f.read()
+        
+        # Find the base flag name from signal_type
+        norm = signal_type.upper().replace('-', '_')
+        # Try matching e.g. BB_BOUNCE from bb_bounce, bb_bounce+, bb_bounce-
+        candidates = [f'{norm}_ENABLED']
+        if not re.search(rf'^{re.escape(norm)}_ENABLED\s*=', content, re.MULTILINE):
+            # Try without trailing direction variants
+            base = re.sub(r'_(PLUS|MINUS|LONG|SHORT)$', '', norm)
+            candidates = [f'{base}_ENABLED']
+        
+        for flag in candidates:
+            pattern = rf'^({re.escape(flag)}\s*=\s*)(True|False)'
+            match = re.search(pattern, content, re.MULTILINE)
+            if match and match.group(2) == 'True':
+                content = content[:match.start(1)] + f'{flag} = False' + content[match.end(2):]
+                fd, tmp = tempfile.mkstemp(dir=os.path.dirname(HERMES_CONSTANTS), suffix='.tmp')
+                try:
+                    with os.fdopen(fd, 'w') as f:
+                        f.write(content)
+                    os.replace(tmp, HERMES_CONSTANTS)
+                    _log(f"  DISABLED {flag}")
+                except Exception:
+                    os.unlink(tmp)
+                    raise
+                return True
+        
+        _log(f"  {signal_type}: no _ENABLED flag found to disable")
+        return False
+    except Exception as e:
+        _log(f"Error disabling {signal_type}: {e}")
+        return False
 
 
 def _get_current_value(param_name):
@@ -263,6 +380,117 @@ def _check_daily_limit():
     return log_data.get('daily_count', 0) >= MAX_ADJUSTMENTS_PER_DAY
 
 
+def _write_goal_progress():
+    """Write current performance metrics + targets to goal_progress.json.
+    
+    CEO and self_learner read this file to understand current state.
+    """
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        
+        # Last 30 days of closed trades
+        cur.execute("""
+            SELECT is_win, pnl_usdt, pnl_pct
+            FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+            AND created_at > datetime('now', '-30 days')
+        """)
+        trades_30d = [{'win': r[0], 'pnl_usdt': r[1], 'pnl_pct': r[2]} for r in cur.fetchall()]
+        
+        # Last 7 days
+        cur.execute("""
+            SELECT is_win, pnl_usdt, pnl_pct
+            FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+            AND created_at > datetime('now', '-7 days')
+        """)
+        trades_7d = [{'win': r[0], 'pnl_usdt': r[1], 'pnl_pct': r[2]} for r in cur.fetchall()]
+        
+        # Last 2 days for trend
+        cur.execute("""
+            SELECT is_win, pnl_usdt
+            FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+            AND created_at > datetime('now', '-2 days')
+        """)
+        trades_2d = [{'win': r[0], 'pnl_usdt': r[1]} for r in cur.fetchall()]
+        
+        conn.close()
+        
+        # Compute metrics
+        wr_30d = _calculate_wr(trades_30d) if trades_30d else 0
+        pnl_30d = _calculate_pnl(trades_30d) if trades_30d else 0
+        pnl_7d = _calculate_pnl(trades_7d) if trades_7d else 0
+        sharpe_30d = None
+        if trades_30d and len(trades_30d) >= 10:
+            returns = [t['pnl_pct'] for t in trades_30d if t['pnl_pct'] is not None]
+            if returns:
+                mean_r = sum(returns) / len(returns)
+                std_r = (sum((r - mean_r)**2 for r in returns) / len(returns)) ** 0.5
+                sharpe_30d = round((mean_r / std_r), 3) if std_r > 0 else 0
+        
+        # Consecutive losses (from most recent trades)
+        recent_30 = _get_all_trades_recent(limit=100)
+        consec = _max_consecutive_losses(recent_30[:30]) if recent_30 else 0
+        
+        # Trend deltas
+        wr_2d = _calculate_wr(trades_2d) if trades_2d else 0
+        wr_7d = _calculate_wr(trades_7d) if trades_7d else 0
+        
+        data = {
+            'updated_at': datetime.now(timezone.utc).isoformat(),
+            'targets': {
+                'win_rate': GOAL_WR,
+                'daily_pnl': 0.05,
+                'min_sharpe_30d': 1.0,
+            },
+            'current': {
+                'win_rate_30d': round(wr_30d, 4),
+                'win_rate_7d': round(wr_7d, 4),
+                'daily_pnl_7d': round(pnl_7d / 7, 4) if pnl_7d else 0,
+                'pnl_30d': round(pnl_30d, 4),
+                'sharpe_30d': sharpe_30d,
+                'total_trades_30d': len(trades_30d),
+                'consecutive_losses': consec,
+            },
+            'trend': {
+                'win_rate_delta_2d': round(wr_2d - wr_7d, 4) if trades_2d and trades_7d else None,
+            },
+        }
+        
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(GOAL_PROGRESS_FILE), suffix='.tmp')
+        try:
+            with os.fdopen(fd, 'w') as f:
+                json.dump(data, f, indent=2)
+            os.replace(tmp, GOAL_PROGRESS_FILE)
+            _log(f"Wrote {GOAL_PROGRESS_FILE} — WR30d={wr_30d:.1%} PnL30d=${pnl_30d:+.2f}")
+        except Exception:
+            os.unlink(tmp)
+            raise
+    except Exception as e:
+        _log(f"Error writing goal progress: {e}")
+
+
+def _get_all_trades_recent(limit=100):
+    """Get most recent trades across all signals."""
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT is_win, pnl_usdt, pnl_pct
+            FROM signal_outcomes
+            WHERE trade_id IS NOT NULL
+            ORDER BY created_at DESC
+            LIMIT ?
+        """, (limit,))
+        rows = cur.fetchall()
+        conn.close()
+        return [{'win': r[0], 'pnl_usdt': r[1], 'pnl_pct': r[2]} for r in rows]
+    except Exception:
+        return []
+
+
 def analyze_and_adjust():
     """Main analysis and adjustment cycle."""
     log_data = _load_log()
@@ -328,10 +556,12 @@ def run():
         return 0
     try:
         _log("=== Self-learning cycle ===")
+        kills = _kill_underperformers()
         adjustments = analyze_and_adjust()
         combo_changes = analyze_combo_weights()
-        _log(f"Completed: {adjustments} param adjustments, {combo_changes} combo weight changes")
-        return adjustments + combo_changes
+        _write_goal_progress()
+        _log(f"Completed: {kills} kills, {adjustments} param adjustments, {combo_changes} combo weight changes")
+        return kills + adjustments + combo_changes
     finally:
         lock_fd.close()
 
@@ -509,5 +739,22 @@ if __name__ == '__main__':
             weight = _calc_combo_weight(wr, avg_pnl, n)
             status = f"→ {'BOOST' if weight and weight > 1.0 else 'SUPPRESS' if weight else 'no change'} {weight or ''}"
             _log(f"  {signal_type}: {n}T WR={wr:.0%} avg_pnl=${avg_pnl:+.4f} {status}")
+        _log("\n--- Kill threshold check (dry) ---")
+        all_signals = _get_all_active_signal_types()
+        for signal_type in all_signals:
+            if _is_signal_disabled(signal_type):
+                continue
+            trades = _get_recent_trades(signal_type, limit=KILL_MIN_TRADES)
+            if len(trades) < KILL_MIN_TRADES:
+                continue
+            pnl = _calculate_pnl(trades)
+            max_consec = _max_consecutive_losses(trades)
+            flag = ""
+            if pnl < KILL_PNL_50:
+                flag = f"WOULD KILL: PnL=${pnl:+.2f}"
+            elif max_consec >= KILL_MAX_CONSEC:
+                flag = f"WOULD KILL: {max_consec} consec losses"
+            if flag:
+                _log(f"  {signal_type}: {flag}")
     else:
         run()
