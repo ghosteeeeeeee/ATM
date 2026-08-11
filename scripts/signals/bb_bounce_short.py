@@ -241,6 +241,16 @@ def detect_bb_bounce_short(token, closes):
             return None  # Insufficient volume
     # If no volume data, allow (don't block on missing data)
 
+    # Momentum fade: require 5m velocity negative (price already falling)
+    try:
+        from speed_tracker import get_token_speed
+        spd = get_token_speed(token)
+        vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
+        if vel_5m >= 0:
+            return None  # price still rising, fade not confirmed
+    except Exception:
+        pass
+
     return {
         'direction': 'SHORT',
         'middle': middle,
