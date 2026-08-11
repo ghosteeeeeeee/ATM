@@ -31,15 +31,20 @@ REGIME_SIGNALS = {
     'FLAT': {
         # Mean reversion works in range-bound markets
         'bb_bounce', 'bb_bounce+',
+        'bb_bounce+,range_finder+',  # 60.4% WR all-time, star signal
+        'trend_momentum_near_sma',
     },
     'NORMAL': {
-        # Only 3 profitable combos — most signals bleed here (-$0.82)
+        # Trend following + mean reversion in steady markets
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
+        'bb-bounce-short,hzscore-',  # 58.8% WR all-time
         'tl_break',
+        'trend_momentum_near_sma',
     },
     'HIGH': {
-        # Breakout works in big moves — only profitable regime (+$0.17)
-        'bb_bounce+,range_finder+', 'tl_break',
+        # Breakout works in big moves
+        'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
+        'tl_break',
         'accel-300-vel',
     },
     'EXTREME': {
