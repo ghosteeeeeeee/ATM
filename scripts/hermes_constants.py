@@ -1449,6 +1449,16 @@ TREND_MOMENTUM_NEAR_SMA_CONF_BASE = 70              # base confidence
 TREND_MOMENTUM_NEAR_SMA_CONF_STRONG_MOM = 10        # +10 if momentum > 1%
 TREND_MOMENTUM_NEAR_SMA_CONF_CLOSE_SMA = 5          # +5 if within 0.2% of SMA
 TREND_MOMENTUM_NEAR_SMA_CONF_CAP = 95               # max confidence
+
+# ── stop_hunt_reversal_long — catch violent long after stop hunt ──────────
+STOP_HUNT_REVERSAL_LONG_ENABLED = True
+STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED = True
+STOP_HUNT_REVERSAL_LONG_DROP_THRESHOLD = 0.01        # 1% min drop to qualify as stop hunt
+STOP_HUNT_REVERSAL_LONG_DROP_WINDOW = 5              # candles to look for the drop
+STOP_HUNT_REVERSAL_LONG_REVERSAL_BODY_MIN = 0.003    # 0.3% min green body for reversal
+STOP_HUNT_REVERSAL_LONG_CONF_BASE = 75               # base confidence
+STOP_HUNT_REVERSAL_LONG_CONF_STRONG_REVERSAL = 5     # +5 if reversal body > 1%
+STOP_HUNT_REVERSAL_LONG_CONF_CAP = 95                # max confidence
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',

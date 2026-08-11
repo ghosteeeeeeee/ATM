@@ -1393,6 +1393,14 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            if _comp in ('stop_hunt_reversal_long+', 'stop_hunt_reversal_long'):
+                try:
+                    from hermes_constants import STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED
+                    if not STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
