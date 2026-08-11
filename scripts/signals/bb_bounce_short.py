@@ -306,7 +306,7 @@ def scan_bb_bounce_short_signals(prices_dict):
         if sig['width'] < 0.03:
             base_conf += 10  # Tight squeeze
         if sig['bounce_pct'] > 0.15:
-            base_conf += 5   # Strong bounce
+            base_conf += 10   # Strong bounce
         if sig['rsi'] > 70:
             base_conf += 5   # Extremely overbought
 
