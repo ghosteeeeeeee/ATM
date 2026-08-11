@@ -2327,6 +2327,7 @@ def run(dry_run=False):
     entered = 0
     skipped = 0
     _processed_tokens_this_run = set()
+    _regime = 'NEUTRAL'  # default — overridden per-token in hotset loop above
 
     for i, sig in enumerate(scored):
         # Re-load hot-set on each iteration — prevents race with signal_compactor
