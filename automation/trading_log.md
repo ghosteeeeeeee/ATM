@@ -5847,3 +5847,32 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 
 ## TEAM UPDATES
 - [2026-08-11 19:30] signal_reporter: Fixed contrarian flip bug for trend_momentum_near_sma — flip was dead code for standalone signals (only in confluence gate section, standalone signals bypass via 4 other paths). Added flip to HOTSET-FINAL-BYPASS, PRESERVE-MERGE-BYPASS, PENDING-APPROVE-BYPASS, SAFETY-FILTER-BYPASS. 0% WR → expected ~50%+ WR. Commit: 8bf6c10
+
+## [2026-08-12 04:05] Hourly Analysis
+
+**Trades:** 6 closed last hour (3W, 3L) — net -$0.02
+**24h:** 36T 15W (41.7% WR) -$0.33
+**7d:** 373T+ (51.7% WR) +$0.21
+
+**Close Reasons (24h):**
+- atr_sl_hit: 18T (50%) -$0.75 — elevated but not critical
+- profit-monster-trail: 15T (41.7%) +$0.67 — strong
+- cut-loser-CL-T1: 2T (5.6%) -$0.25
+
+**Signal Performance (last hour):**
+- hzscore+: 2T 50% WR +$0.05
+- bb_bounce+: 3T 33.3% WR -$0.02
+- trend_momentum_near_sma+: 1T 0% WR -$0.02 (re-enabled 8/12, contrarian flip active)
+
+**Changes:** None
+
+**No Change Needed:**
+- trend_momentum_near_sma+ 7d 0% WR but only 1T last hour — doesn't meet 3+ kill threshold
+- Trade frequency normal (6/hr)
+- No signals with 0% WR and 3+ trades last hour
+- SL hit rate 50% in 24h — elevated but profit-monster-trail compensating
+- 7d system still profitable — cold day normal after 15 green days
+
+**Open Questions:**
+- trend_momentum_near_sma+ re-enabled with contrarian flip — 4T/7d at 0% WR. If doesn't improve in 48h, kill permanently.
+- SL hit rate trending up — monitor next few hours

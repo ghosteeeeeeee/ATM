@@ -173,7 +173,8 @@ def _get_ohlcv_candles(token, lookback=100):
 def _is_solo(token, direction):
     """Check if this token+direction has any other active signals in DB (no co-signal)."""
     try:
-        conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), '..', 'data', 'signals_hermes_runtime.db'), timeout=5)
+        from paths import RUNTIME_DB
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
             SELECT COUNT(*) FROM signals
@@ -210,9 +211,6 @@ def detect_bb_bounce(token, closes):
 
     # Check 1H trend
     trend = _get_1h_trend(token)
-
-    # Solo detection — apply stricter params when no co-signal
-    solo = _is_solo(token, 'LONG')  # will re-check per direction below
 
     # LONG: lower band + RSI oversold + bullish/neutral trend + bounce up
     if dist_from_lower <= BB_TOUCH_PCT and current > prev:

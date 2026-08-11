@@ -154,13 +154,6 @@ def run() -> int:
         if len(valid_z) < 2:
             continue
 
-        # Optional: require 3/3 TF agreement (stronger confirmation)
-        # Solo detection — apply stricter params when no co-signal
-        solo = _is_solo(token, local_dir)
-        tf_required = SOLO_REQUIRE_3TF if solo else REQUIRE_3TF
-        if tf_required and len(valid_z) < 3:
-            continue
-
         bullish_tfs = sum(1 for v in valid_z if v > 0)
         bearish_tfs = len(valid_z) - bullish_tfs
 
@@ -168,6 +161,12 @@ def run() -> int:
         # z < 0 = price below mean = bullish = LONG
         local_dir = 'SHORT' if bullish_tfs >= 2 else ('LONG' if bearish_tfs >= 2 else None)
         if not local_dir:
+            continue
+
+        # Solo detection — apply stricter params when no co-signal
+        solo = _is_solo(token, local_dir)
+        tf_required = SOLO_REQUIRE_3TF if solo else REQUIRE_3TF
+        if tf_required and len(valid_z) < 3:
             continue
 
         # Map z_direction to regime direction for MTF agreement check.
