@@ -23,7 +23,7 @@ import os
 import sqlite3
 import time
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
 from paths import HERMES_DATA
 from entry_gates import (
@@ -31,9 +31,11 @@ from entry_gates import (
 )
 
 from hermes_constants import (
-    ENGULFING_ENABLED,
     ENGULFING_PLUS_ENABLED,
     ENGULFING_MINUS_ENABLED,
+    ENGULFING_MIN_MOVE, ENGULFING_PRIOR_RANGE,
+    ENGULFING_LOOKBACK,
+    ENGULFING_CONF_BASE, ENGULFING_CONF_CAP,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -186,12 +188,6 @@ def detect_engulfing(candles):
 
     Returns {direction, confidence, value, price} or None.
     """
-    from hermes_constants import (
-        ENGULFING_MIN_MOVE, ENGULFING_PRIOR_RANGE,
-        ENGULFING_LOOKBACK,
-        ENGULFING_CONF_BASE, ENGULFING_CONF_CAP,
-    )
-
     if len(candles) < ENGULFING_LOOKBACK + 2:
         return None
 
