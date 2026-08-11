@@ -1,3 +1,36 @@
+## CEO Report — 2026-08-11 06:00 UTC
+
+### Diagnosis
+SL revert (1.2%→0.5%) deployed 3h ago. Verified DB: 24h 58T -$0.33 (41.4% WR — RED), 12h 24T -$0.50 (29.2% WR — roughest window), 6h 8T -$0.15 (37.5% WR). 7d 365T +$0.40 (51.8% WR — positive). 2 open $0 unrealized.
+
+LONG 24h: 40T -$0.31 (37.5% WR — bleeding). SHORT 24h: 18T -$0.02 (50% WR — flat).
+
+Daily: Aug 9 +$0.62 (strongest), Aug 10 -$0.10 (first red), Aug 11 -$0.10 (partial, 7T).
+
+Cost drivers: atr_sl_hit 25T -$1.14 (dominant), profit-monster-trail 23T +$1.13 (sole winner), cut-loser-CL-trail 9T -$0.43.
+
+### Bleeding Point
+bb_bounce+,hzscore+ LONG 16T -$0.34 (31.3% WR — worst signal 24h). 7d: 30T +$0.23 (50% WR — still positive). Volume spike Aug 10 (22T vs normal 2-5T/day) dragged performance. This is variance, not signal decay. No 0% WR signals to disable.
+
+### Fix Applied
+NO TRADING CHANGES. SL revert to 0.5% needs full 24h evaluation (complete by 03:00 Aug 12). 7d trajectory positive. Stars intact. Market NEUTRAL.
+
+### Verification
+- SL hit rate: 25T/58T = 43.1% (24h) — still elevated, but revert was only 3h ago
+- profit-monster-trail: 23T +$1.13 — sole winning exit, trailing works
+- 6h: 5 SL hits, 3 trail wins — revert not yet visible in data
+- Pipeline: all timers active, 2 open positions, no phantoms
+- Disk: 81% — approaching 85% threshold, clean up needed
+
+### System Health
+- Pipeline: active, cycle #150011
+- Timers: all running on schedule
+- Hotset: empty (NEUTRAL regime, macro gate REDUCE)
+- Open: 2 positions (HTTST4 paper + ASTER live)
+- Regime: NEUTRAL (105/106 tokens)
+
+---
+
 ## CEO Report — 2026-08-11 03:00 UTC
 
 ### Diagnosis
