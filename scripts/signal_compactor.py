@@ -610,6 +610,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if has_bb_bounce and has_ma100:
                     log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce+ma100-cross blocked (43% WR, -$0.10)")
                     continue
+                # POISON: bb_bounce+ + hzscore+ LONG = 23% WR (13T, -$0.33) — hemorrhaging
+                if has_bb_bounce and has_hz_pos:
+                    log(f"  🛡️  [COSIG-GATE] {token} {direction}: bb_bounce++hzscore+ LONG blocked (23.1% WR, -$0.33)")
+                    continue
 
             # ── SHORT poison + required co-signal logic ──────────────────────────
             if direction.upper() == 'SHORT':
