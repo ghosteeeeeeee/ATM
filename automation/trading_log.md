@@ -1,5 +1,63 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-11: Daily Orchestrator Report
+
+### Pipeline Status (05:25 UTC)
+- **Portfolio**: 1 open (ASTER LONG, +0.19%) | 57 closed today | **-3.46% PnL**
+- **24h**: 56 trades, -$0.12, 41.1% WR (RED — 2nd rough day after 15 green)
+- **7d**: 477 trades, +$0.56, 50.9% WR (positive)
+- **Market regime**: 105 NEUTRAL / 1 LONG_BIAS (NIL)
+- **SL config**: REVERTED to 1.2%/2.5% (05:20 — 0.5% caused 64.7% SL hit rate)
+- **Confluence gate**: Fixed — standalone bypass deployed (04:24), hotset restored
+- **Kill switch**: LIVE TRADING ON
+- **Disk**: 81%
+
+### Key Events Today
+1. **03:00 — CEO reverted SL widening** to 0.5% (from 1.2%). Result: SL hit rate spiked to 64.7%, profit-monster trades killed (29.4% PM rate vs 56.3%). Wrong direction.
+2. **04:24 — CEO fixed hotset empty bug**. Root cause: confluence gate final guard blocked ALL single-source signals. Fixed by adding backtested standalone bypass to 4 guards. Hotset restored to 6 entries.
+3. **05:20 — CEO reverted SL back to 1.2%**. 0.5% experiment caused 64.7% SL hit rate (vs 35% at 1.2%). Tighter SL = more stop-outs, not fewer. Constants restored: ATR_SL_MIN/MAX/INIT 1.2%/2.5%, TRAILING_DISTANCE 0.60%, CL_TRAIL_ACTIVATE -1.0.
+4. **07:00 — Confluence gate assessment**. Hotset was empty again — no signals passing compaction. Pipeline running but no new entries. Needs monitoring.
+
+### SL Revert Evaluation Window
+- **Deployed**: 05:20 UTC (1.2% SL)
+- **Eval window**: 05:20 Aug 11 → 05:20 Aug 12 (24h)
+- **Baseline**: 0.5% SL caused 64.7% SL hit rate, profit-monster killed
+- **Target**: SL hit rate <40%, profit-monster restoring
+- **DO NOT REVERT** — system was profitable at 1.2% SL for 15+ days
+
+### Signal Performance (24h / 7d)
+| Signal | 24h | 7d | Status |
+|--------|-----|-----|--------|
+| bb_bounce+,range_finder+ | 7T -$0.08 43% | 53T +$0.82 60% | 7d STAR |
+| bb_bounce+,hzscore+ | 15T -$0.21 33% | 30T +$0.32 50% | 7d STAR, 24h bleeding |
+| tl_break_long | — | 20T +$1.17 70% | 7d TOP |
+| bb-bounce-short,hzscore- | 4T -$0.04 50% | 16T +$0.17 62% | 7d STAR |
+| continuation+,hzscore+ | 3T +$0.18 33% | 7T +$0.22 57% | Active |
+
+### Close Reasons (24h)
+- atr_sl_hit: dominant cost driver (trending up, SL revert should fix)
+- profit-monster-trail: sole winning exit (was killed by 0.5% SL, should restore)
+- cut-loser-CL-trail: moderate cost
+
+### Upgrade Audit Updates
+- **signal-version-tracking**: Script exists (108 LOC) but NOT integrated into pipeline. Needs wiring into CEO/auto_1hr for auto-logging.
+- **system-improvements**: check_key_rotation.py exists (was listed as missing). Still missing: audit_memory.py, weekly_signal_review.py.
+- **Blacklist testing**: Complete. 77 tokens tested, 0 KEEP. Blacklist is working as intended — signal generation filters are the bottleneck, not blacklist.
+
+### What NOT To Do
+- Do NOT revert SL from 1.2% to 0.5% again — experiment failed (64.7% SL hit rate)
+- Do NOT change parameters during SL evaluation window (until 05:20 Aug 12)
+- Do NOT kill bb_bounce+,hzscore+ LONG — 7d intact at 50% WR, 24h bleed is variance
+- Do NOT add more blacklisted tokens — testing conclusive (0 KEEP across 77 tokens)
+
+### Team Activity
+- **health_monitor**: All systems nominal, 48 timers active, 0 missed firings
+- **auto_1hr**: NO CHANGES (evaluating SL revert, no kill candidates)
+- **signal_reporter**: Report committed, no kills needed, 7d still profitable
+- **daily_orchestrator**: This report. Updated upgrade audit (signal-version-tracking status fix).
+
+---
+
 ## 2026-08-10: Daily Orchestrator Report
 
 ### Pipeline Status
