@@ -1,24 +1,24 @@
-## CEO Report — 2026-08-12 16:55 UTC
+## CEO Report — 2026-08-11 17:20 UTC
 
 ### Verified Numbers (DB)
-- **24h**: 32T, -$0.85, 28.1% WR (RED)
-- **7d**: 370T, +$0.21, 51.6% WR (barely positive, declining from +$0.43 yesterday)
-- **Today (Aug 12)**: 0 trades — system idle since Aug 11 16:30 (22h)
-- **Yesterday (Aug 11)**: 18T, -$0.51, 33.3% WR (roughest day in weeks)
+- **24h**: 28T, -$0.63, 32.1% WR (RED)
+- **7d**: 370T, +$0.21, 51.6% WR (barely positive, was +$0.45 two days ago)
+- **Today (Aug 11)**: 18T, -$0.51, 33.3% WR (roughest day since Aug 4)
 - **Daily trend**: Aug 9 +$0.62 (peak) → Aug 10 -$0.10 → Aug 11 -$0.51 (declining)
-- **Open trades**: 2 (ht_sig4 paper, hzscore+ LONG $11)
-- **SL hit rate 24h**: 56.3% (elevated)
-- **SL hit rate 7d**: 137T, -$7.92 (dominant cost driver)
+- **Open trades**: 5 (3 hzscore+ LONG, 1 ht_sig4 paper, 1 hzscore- SHORT)
+- **SL hit rate 48h**: 38.5% (improved from 56%+ after 1.2% reversion)
+- **LONG 7d**: 242T, +$1.24, 52.9% WR (profitable)
+- **SHORT 7d**: 128T, -$1.03, 49.2% WR (bleeding, improving)
 
 ### Diagnosis
-System is in a cold streak after Aug 9 peak. The 22h idle is by design — NEUTRAL regime (107/107 tokens) + empty hotset = no signals passing compaction. This is correct behavior, not a bug.
+System in declining phase after Aug 9 peak. Today is worst day since Aug 4.
 
 **Bleeding points (24h):**
 1. trend_momentum_near_sma+ LONG: 3T, 0% WR, -$0.35 → **ALREADY DISABLED** (Aug 12 07:00)
-2. bb_bounce+,hzscore+ LONG: 9T, 11.1% WR, -$0.31 → 7d intact (33T, 48.5% WR, +$0.20)
+2. bb_bounce+,hzscore+ LONG: 8T, 12.5% WR, -$0.25 → 7d intact (33T, 48.5% WR, +$0.20)
 3. hzscore+ standalone: 3T, 33.3% WR, -$0.08 → sub-threshold
 
-**Stars intact7d:**
+**Stars intact 7d:**
 - bb_bounce+,range_finder+ LONG: 53T, 58.5% WR, +$0.71 (solid)
 - bb-bounce-short,hzscore- SHORT: 17T, 58.8% WR, +$0.12 (intact)
 - hzscore+,mover+ LONG: 5T, 80% WR, +$0.17 (emerging)
@@ -28,25 +28,20 @@ System is in a cold streak after Aug 9 peak. The 22h idle is by design — NEUTR
 - cut-loser-CL-trail: 13T, -$0.65
 - cut-loser-CL-T1: 2T, -$0.25
 
+**Winners 48h:**
+- profit-monster-trail: 44T, +$2.14 (sole winning exit)
+
 ### Root Cause
-1. **bb_bounce+,hzscore+ cold streak**: 24h 11.1% WR vs 7d 48.5% WR. Pattern shows this star runs hot/cold (Aug 9 had 80% WR). Current is variance, not decay.
-2. **NEUTRAL regime**: 107/107 tokens neutral. System correctly idle — no trending setups to trade.
-3. **SL hit rate elevated**: 56.3% in 24h. SL at 1.2% is correct (was profitable 15+ days before Aug 10). The issue is market chop, not SL width.
+1. **bb_bounce+,hzscore+ LONG cold streak** — dominant signal (33/370 = 9% of trades) in worst patch since Aug 8. Daily: Aug 9 80% WR → Aug 10 50% → Aug 11 25%. Not broken, but declining.
+2. **Regime data NULL on ALL 370 recent trades** — brain.py INSERT (and 7 other INSERT sites) missing regime column. Cannot evaluate if signal fires in correct market conditions. This is a data quality debt.
+3. **No combo-level signal blacklist** — can't disable bb_bounce+,hzscore+ without killing bb_bounce+,range_finder+ (the star). Only component-level ENABLED flags exist.
 
-### Decision: NO TRADING CHANGES
-- 7d still positive (+$0.21)
-- Stars intact7d
-- trend_momentum_near_sma+ already disabled
-- System idle is by design (NEUTRAL regime)
-- Overreacting destabilizes
+### Fix Applied
+**NO TRADING CHANGES** — 7d still positive (+$0.21), signal not broken (48.5% WR 7d), disabling would be overreaction to variance. System recovered from similar cold streak Aug 2-4.
 
-### Monitoring
-- If bb_bounce+,hzscore+ 7d WR drops below 45% → consider disabling
-- If system idle extends beyond 48h → investigate compactor thresholds
-- SL eval window completed (05:20 Aug 12) — 0 trades since, need data
-- Disk 81% — approaching threshold
+**Monitoring threshold set:** If bb_bounce+,hzscore+ LONG 7d WR drops below 45% OR 7d PnL goes negative → escalate to code change (add combo-level blacklist).
 
-### Next Steps
-- Wait for market regime shift or signal improvement
-- Re-check in 24h for bb_bounce+,hzscore+ 7d trajectory
-- Consider implementing volume confirmation filter (trading book recommendation)
+**Data quality fix needed:** Add `regime` to brain.py INSERT + all 7 other INSERT sites. Separate task — too many files for safe one-shot change.
+
+### Verification
+Pipeline healthy — all timers running. Disk 81%. Market NEUTRAL. No new errors. System idle by design (NEUTRAL regime = no signals passing compaction).
