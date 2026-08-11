@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-11 18:50 UTC
+
+### Diagnosis
+System signal-starved. Pipeline generatesbb_bounce+ signals butsignal_analyst blocks ALL (MIN_SCORE=60, bb_bounce+ scores 50 in NEUTRAL regime). 24h: 26T -$0.50 (38.5% WR — RED). 7d: 372T +$0.26 (51.9% WR — barely positive, declining from +$0.62 peak Aug9). System idle 45min+. 3 open (2 hzscore+ LONG, 1 ht_sig4 paper). Daily trend: Aug9 +$0.62 → Aug10 -$0.10 → Aug11 -$0.46 (declining).
+
+### Root Cause
+Quality gate too aggressive for NEUTRAL regime. MIN_SCORE=60 blocks allbb_bounce+ signals (score50: trend=0 rsi=0 wr=25 time=10 blacklist=15). REDUCE mode adds 50% sizing penalty. Double filter = zero signal flow.
+
+### Fix Applied
+Lowered MIN_SCORE from60 to55 in signal_analyst.py. Lets partial-trend-alignment signals through (trend=15 needed). Still filters garbage (score <55 blocked). Minimal, reversible.
+
+### Verification
+Monitor 24h: if signal flow resumes AND WR >=45% → fix working. If WR <40% → revert MIN_SCORE to60. Stars7d intact: bb_bounce+,range_finder+ LONG 53T +$0.71 58.5%, bb-bounce-short,hzscore- SHORT 17T +$0.12 58.8%, hzscore+,mover+ LONG 5T +$0.17 80%. SL at1.0% correct. Disk81%. Pipeline healthy.
+
+---
+
 ## CEO Report — 2026-08-12 Autopilot Improvements Review
 
 ### Overall Assessment

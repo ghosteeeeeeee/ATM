@@ -30,7 +30,7 @@ from paths import RUNTIME_DB
 
 # ── Config ──────────────────────────────────────────────────────────────
 HOTSET_PATH = '/var/www/hermes/data/hotset.json'
-MIN_SCORE = 60  # Minimum quality score to pass
+MIN_SCORE = 55  # Minimum quality score to pass (lowered from 60 — NEUTRAL regime blocks all bb_bounce+ at 50)
 CACHE_TTL = 300  # Cache WR data for 5 min
 
 # ── Cache ───────────────────────────────────────────────────────────────

@@ -141,6 +141,7 @@ def rr_gate(token, direction, price, candles_5m=None):
 
         # R:R ratio
         if sl_distance <= 0:
+            _log(f"RR FAIL-OPEN: sl_distance={sl_distance} for {token} (ATR misconfigured?)")
             return True, 0, 0, 999  # fail-open
 
         rr = tp_distance / sl_distance

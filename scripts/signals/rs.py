@@ -60,8 +60,9 @@ import json
 from typing import Optional
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from signal_schema import add_signal
+from entry_gates import session_timing_gate
 from hermes_constants import (
     RS_LOOKBACK_CANDLES,
     RS_LEVEL_LOOKBACK,
@@ -936,6 +937,7 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
     Returns list of {close} dicts, oldest first.
     Freshness guard: returns [] if most recent price is > 2 minutes old.
     """
+    conn = None
     try:
         conn = sqlite3.connect(_PRICE_DB, timeout=10)
         c = conn.cursor()
@@ -950,7 +952,6 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
             ORDER BY timestamp ASC
         """, (token.upper(), lookback))
         rows = c.fetchall()
-        conn.close()
 
         if not rows:
             return []
@@ -962,13 +963,14 @@ def _get_candles_1m(token: str, lookback: int = RS_LOOKBACK_CANDLES) -> list:
             return _STALE_SENTINEL
 
         # Synthesize ohlcv — price_history is close-only; open/high/low = close
-        # This is acceptable: ATR uses |close[i]-close[i-1]| approximation,
-        # and swing highs/lows will be detected from close values.
         return [{'open': r[1], 'high': r[1], 'low': r[1], 'close': r[1]} for r in rows]
 
     except Exception as e:
         print(f"  [rs] price_history error for {token}: {e}")
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── Main scanner ────────────────────────────────────────────────────────────────
@@ -977,10 +979,12 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
     """Scan pre-filtered tokens for support/resistance signals and write to DB.
 
     Guards applied here (no caller assumptions):
+    - Session timing gate (entry_gates)
     - RS_ENABLED kill-switch
     - LONG_BLACKLIST / SHORT_BLACKLIST from hermes_constants
     - RS_PLUS_ENABLED / RS_MINUS_ENABLED per-direction kill-switches
     - RS_COOLDOWN_HOURS per-token cooldown enforcement
+    - Candle pattern quality bonus (pin bar, engulfing at levels)
 
     Args:
         prices_dict: token -> {'price': float, ...}  (pre-filtered by caller)
@@ -990,6 +994,10 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
     """
     from hermes_constants import RS_ENABLED, LONG_BLACKLIST, SHORT_BLACKLIST, RS_COOLDOWN_HOURS, RS_SIGNAL_TYPE
     if not RS_ENABLED:
+        return 0, []
+
+    # GATE: Session timing
+    if not session_timing_gate():
         return 0, []
 
     from signal_schema import add_signal, _get_conn, _runtime
@@ -1033,6 +1041,7 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
             import datetime
             cooldown_cutoff = datetime.datetime.utcnow() - datetime.timedelta(hours=RS_COOLDOWN_HOURS)
             cooldown_cutoff_str = cooldown_cutoff.strftime('%Y-%m-%d %H:%M:%S')
+            conn_cd = None
             try:
                 conn_cd = _get_conn(_runtime())
                 cur_cd = conn_cd.cursor()
@@ -1042,11 +1051,22 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
                     ORDER BY created_at DESC LIMIT 1
                 """, (token_upper, sig['direction'].upper(), cooldown_cutoff_str))
                 row_cd = cur_cd.fetchone()
-                conn_cd.close()
                 if row_cd is not None:
                     continue  # within cooldown window
             except Exception:
                 pass  # non-fatal: skip cooldown check if DB query fails
+            finally:
+                if conn_cd:
+                    conn_cd.close()
+
+        # ── GATE: Candle pattern quality bonus (pin bar, engulfing at level) ──
+        # Books: pin bar at S/R = highest probability (Woods, Porwal)
+        candles_5m = _get_candles_5m(token, 50)
+        if candles_5m and len(candles_5m) >= 3:
+            pattern_info = _pattern_at_level(candles_5m, sig['level'], sig['direction'])
+            if pattern_info:
+                sig['confidence'] = min(sig['confidence'] + pattern_info['confidence_bonus'], 88)
+                _log_pattern(token, sig['direction'], pattern_info['pattern'], sig['level'])
 
         sid = add_signal(
             token=token.upper(),
@@ -1069,6 +1089,11 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
                   f'[{sig["source"]}]')
 
     return added, signaled_tokens
+
+
+def _log_pattern(token, direction, pattern, level):
+    """Log pattern detection for audit."""
+    print(f"  [rs] {token} {direction} PATTERN: {pattern} at level {level:.6f}", flush=True)
 
 
 # ── Pipeline entry point ──────────────────────────────────────────────────────

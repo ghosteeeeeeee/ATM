@@ -1179,11 +1179,6 @@ MTP_ZSCORE_ENABLED         = False    # master kill-switch
 MTP_ZSCORE_PLUS_ENABLED    = True    # LONG
 MTP_ZSCORE_MINUS_ENABLED   = True    # SHORT
 
-# Lookback periods (bars)
-MTP_ZSCORE_LB_SHORT        = 14      # short/fast period
-MTP_ZSCORE_LB_MID          = 50     # medium period
-MTP_ZSCORE_LB_LONG         = 150     # long/structural period
-
 # Per-period Z-Score bounds
 # If |z| is BELOW Z_MIN → reject (not meaningful for this period)
 MTP_ZSCORE_LB_SHORT        = 50     # short/structural period (was 14 — too fast, noise)

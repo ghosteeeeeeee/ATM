@@ -54,6 +54,9 @@ def _log(msg):
 
 def _get_candles(token, table='candles_1m', limit=100):
     """Fetch OHLCV candles. Returns list of {open, high, low, close, volume} oldest-first."""
+    _VALID_TABLES = {'candles_1m', 'candles_5m', 'candles_1h'}
+    if table not in _VALID_TABLES:
+        return []
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
