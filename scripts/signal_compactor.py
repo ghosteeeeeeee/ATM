@@ -1172,6 +1172,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                 'range_finder', 'continuation'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
+                    # ── Contrarian flip: trend_momentum_near_sma ────────────────
+                    # This signal is consistently wrong — LONG loses, SHORT wins.
+                    # Flip: LONG→SHORT, SHORT→LONG. Must happen here too because
+                    # standalone signals bypass the confluence gate flip (line 765).
+                    if bare_src == 'trend_momentum_near_sma':
+                        original_dir = direction
+                        direction = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
+                        entry['direction'] = direction
+                        log(f"  🔄 [CONTRARIAN-FLIP-FINAL] {tkn}: {original_dir}→{direction} (trend_momentum_near_sma always wrong)")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and src.startswith('accel-300'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} accel-300 standalone ({src}) allowed at final guard")
                 else:
@@ -1216,6 +1225,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                             'range_finder', 'continuation'):
                                 log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} backtested standalone ({pe_src}) allowed at merge")
+                                # ── Contrarian flip for preserved entries ──────────
+                                if bare_pe == 'trend_momentum_near_sma':
+                                    original_dir = pe['direction']
+                                    pe['direction'] = 'SHORT' if pe['direction'].upper() == 'LONG' else 'LONG'
+                                    key = f"{pe['token']}:{pe['direction']}"
+                                    log(f"  🔄 [CONTRARIAN-FLIP-PRESERVE] {pe['token']}: {original_dir}→{pe['direction']} (trend_momentum_near_sma always wrong)")
                             elif ACCEL_300_STANDALONE_BYPASS_ENABLED and pe_src.startswith('accel-300'):
                                 log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} accel-300 standalone ({pe_src}) allowed at merge")
                             else:
@@ -1410,6 +1425,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                         'range_finder', 'continuation'):
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
+                            # ── Contrarian flip at pending approve ────────────────
+                            if bare_src == 'trend_momentum_near_sma':
+                                original_dir = d
+                                d = 'SHORT' if d.upper() == 'LONG' else 'LONG'
+                                log(f"  🔄 [CONTRARIAN-FLIP-APPROVE] {tok}: {original_dir}→{d} (trend_momentum_near_sma always wrong)")
                         elif ACCEL_300_STANDALONE_BYPASS_ENABLED and source.startswith('accel-300'):
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} accel-300 standalone ({source}) allowed at pending approve")
                         else:
@@ -1566,6 +1586,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                                 'range_finder', 'continuation'):
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")
+                    # ── Contrarian flip at safety filter (last resort) ───────────
+                    if bare_src == 'trend_momentum_near_sma':
+                        original_dir = e.get('direction')
+                        e['direction'] = 'SHORT' if (original_dir or '').upper() == 'LONG' else 'LONG'
+                        log(f"  🔄 [CONTRARIAN-FLIP-SAFETY] {e['token']}: {original_dir}→{e['direction']} (trend_momentum_near_sma always wrong)")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and (src or '').startswith('accel-300'):
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} accel-300 standalone ({src}) allowed at safety filter")
                 else:

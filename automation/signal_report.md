@@ -1,66 +1,62 @@
 # Signal Performance Report
-**Generated:** 2026-08-11 13:48 UTC | **Period:** Last 6h + 24h
+Generated: 2026-08-11 19:30 UTC
 
-## Overall Stats
-- **Total trades (all time):** 3330 | **Last 24h:** 37 trades, -$0.13 PnL, 40% WR
-- **Date range:** 2026-05-20 → 2026-08-11
+## 6h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| trend_momentum_near_sma+ | LONG | 3 | 0.0% | -$0.35 |
+| hzscore+ | LONG | 5 | 60.0% | -$0.01 |
+| hzscore- | SHORT | 2 | 50.0% | +$0.01 |
+| hzscore+,trend_momentum_near_sma+ | LONG | 2 | 50.0% | +$0.01 |
 
----
+## 24h Performance (3+ trades)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| trend_momentum_near_sma+ | LONG | 3 | 0.0% | -$0.35 |
+| bb_bounce+,hzscore+ | LONG | 6 | 16.7% | -$0.18 |
+| hzscore+ | LONG | 5 | 60.0% | -$0.10 |
 
-## KILLED (executed)
+## KILLED (executed): None
+No signals met all kill criteria (WR<30%, 5+ trades, active>24h, PnL<-$0.10).
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Action |
-|--------|-----|-------|--------|---------|--------|
-| bb_bounce+,hzscore+ | LONG | 13 | 23.1% | -$0.33 | **COSIG-GATE blocked** — poison combo, 23% WR hemorrhaging |
+## BOOSTED (executed): None
+No signals met all boost criteria (WR>55%, 5+ trades, PnL>$0.05, consistent across tokens).
 
-**Method:** Added poison block in `signal_compactor.py:613-615` — blocks `bb_bounce+ + hzscore+` LONG at signal creation time. Individual components (`bb_bounce+`, `hzscore+`) remain enabled for other profitable combos.
+## LOSERS (watch list)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| trend_momentum_near_sma+ | LONG | 0.0% | -$0.35 | 3 | **BUG: contrarian flip not applied** |
+| bb_bounce+,hzscore+ | LONG | 16.7% | -$0.18 | 6 | 24h bad streak, all-time 48.5% WR +$0.20 |
+| hzscore+ | LONG | 60.0% | -$0.01 | 5 | Good WR, breakeven PnL |
 
----
+## WINNERS
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| hzscore+,mover+ | LONG | 80.0% | +$0.17 | 5 | Strong |
+| hzscore-,range_breakout- | SHORT | 100.0% | +$0.10 | 2 | Strong |
+| bb_bounce+,range_finder+ | LONG | 58.5% | +$0.71 | 53 | System workhorse |
 
-## WINNERS (WR > 55%, PnL > 0, 24h)
+## Signal Inversions: None found
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Avg PnL |
-|--------|-----|-------|--------|---------|---------|
-| hzscore-,range_breakout- | SHORT | 2 | 100% | +$0.10 | +$0.050 |
-| hzscore-,vortex_break_short | SHORT | 2 | 50% | +$0.07 | +$0.035 |
-| ht_sig6 | LONG | 1 | 100% | +$0.11 | +$0.110 |
-| continuation+,range_breakout+ | LONG | 1 | 100% | +$0.08 | +$0.080 |
+## Issues
 
-**7d top performers:**
-- `bb_bounce+,range_finder+` LONG: 53T, 58.5% WR, +$0.71 — system workhorse
-- `bb_bounce` LONG: 14T, 57.1% WR, +$0.24
-- `bb_bounce,hzscore+` LONG: 5T, 100% WR, +$0.20 (note: different from `bb_bounce+,hzscore+` which is now blocked)
-- `continuation+,hzscore+` LONG: 7T, 42.9% WR, +$0.20
+### FIXED: Contrarian flip not applied to trend_momentum_near_sma
+- **Root cause:** `signal_compactor.py:765` contrarian flip was only in the confluence gate section. Standalone `trend_momentum_near_sma+` signals bypass this via the backtested standalone path (HOTSET-FINAL-BYPASS, PRESERVE-MERGE-BYPASS, PENDING-APPROVE-BYPASS, SAFETY-FILTER-BYPASS) — a completely separate code path that never reached the flip.
+- **Fix:** Added contrarian flip to all 4 bypass paths in signal_compactor.py (lines 1179, 1229, 1424, 1585). Signals will now be flipped to SHORT before reaching decider_run.
+- **Impact:** 0% WR, -$0.35 on 3 trades — should improve to ~50%+ WR once flip is active.
 
----
+### MEGA token: Recent cluster of losses
+- 4 of last 6 `bb_bounce+,hzscore+` trades on MEGA hit ATR SL
+- MEGA already blacklisted (line 132: "5 trades, 0% WR, -$0.23 — low-price noise coin")
+- Blacklist is working — no new MEGA trades should fire
 
-## LOSERS — WATCH LIST (24h)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| hzscore+,range_finder+ | LONG | 1 | 0% | -$0.13 | WATCH — 1 trade, needs data |
-| range_breakout+,rs-s52 | LONG | 1 | 0% | -$0.10 | WATCH — 1 trade |
-| hl_copy_trader,range_breakout- | SHORT | 2 | 50% | -$0.04 | WATCH — needs more data |
-| bb-bounce-short,hzscore- | SHORT | 2 | 50% | -$0.02 | WATCH — 7d is +$0.12 |
-
-**7d losers to watch:**
-- `ma100-cross,return_exhaustion-` SHORT: 7T, 42.9% WR, -$0.28 — bleeding
-- `ma100-cross-,range_finder-` SHORT: 5T, 40% WR, -$0.19
-- `hzscore-,return_exhaustion-` SHORT: 10T, 50% WR, -$0.18 — 50% WR but negative PnL = asymmetric losses
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## ISSUES
-
-- `bb_bounce+,hzscore+` LONG collapsed today: 25% WR (4T, -$0.09 today alone). 7d was +$0.20 but recent cluster of losses triggered kill.
-- No open trades except stale `ht_sig4` LONG (HTTST4, opened Aug 10 20:03 UTC) — may need manual close.
-
----
-
-*Report generated 2026-08-11 13:48 UTC. Next report: ~6h.*
+## Full History (all-time winners)
+| Signal | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| accel-300-,rs-s-broken | 1025 | 46.2% | +$6.22 |
+| bb_bounce+,range_finder+ | 53 | 58.5% | +$0.71 |
+| tl_break_long | 94 | 37.2% | +$0.58 |
+| bb_bounce+,hzscore+ | 33 | 48.5% | +$0.20 |
+| bb_bounce | 27 | 51.9% | +$0.33 |
+| hzscore+,mover+ | 5 | 80.0% | +$0.17 |
+| inv-accel-300+,tl_break_long | 8 | 12.5% | +$0.13 |
