@@ -1754,10 +1754,10 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         sl_mult = 1.0
         try:
             from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
-            atr = get_atr_pct(token)
-            if atr:
-                _, vol_regime = should_trade(token)
-                sl_mult = get_sl_multiplier(atr)
+            atr_pct = get_atr_pct(token)
+            if atr_pct:
+                sl_mult = get_sl_multiplier(atr_pct)
+            _, vol_regime = should_trade(token)
         except Exception:
             pass
 

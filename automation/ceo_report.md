@@ -68,3 +68,25 @@ bb_bounce+,hzscore+ LONG — 18T 38.9% WR -$0.22 (24h). 8/18 SL hits. Dominant s
 
 ### Next Review
 Re-check at 08:00 UTC (6h) — if 24h WR still <40% after 12h post-widening, consider disabling bb_bounce+,hzscore+ LONG temporarily.
+
+## CEO Report — 2026-08-11 Volatility Gate Deployed
+
+### What Changed
+Volatility gate integrated into context gate + SL/TP pipeline. Market classified by ATR%: FLAT (<0.48%) and EXTREME (>1.5%) skip trade; HIGH (1.0-1.5%) widens SL by volatility multiplier.
+
+### ATR Distribution (143 tokens, 30d baseline)
+P25=0.48%, P50=0.67%, P75=0.87%, P90=1.24%, P95=1.63%
+
+### Expected Impact
+- FLAT regime trades (currently ~25% of tokens) → eliminated
+- EXTREME regime trades (currently ~5%) → eliminated
+- HIGH regime trades (~10%) → SL widened, fewer premature exits
+- Combined: fewer bad trades in flat markets, wider stops in volatile markets
+
+### Monitoring
+Track next 24h: FLAT/EXTREME skip count, HIGH regime WR vs NORMAL, atr_sl_hit rate change. No trading param changes until volatility gate has 48h of data.
+
+### Bug Fixes in This Deploy
+- tpsl_utils.py: missing log import
+- decider_run.py: None formatting
+- position_manager.py: redundant calls simplified

@@ -50,6 +50,7 @@ from typing import Optional
 
 from atr_cache import get_atr
 from paths import RUNTIME_DB
+from hermes_log import log
 from hermes_constants import (
 
     # SL floor/cap

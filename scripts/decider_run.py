@@ -1171,10 +1171,10 @@ def context_gate(token, direction, source, sig):
         from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
         vol_result, vol_regime = should_trade(token)
         atr_pct = get_atr_pct(token)
-        if atr_pct:
-            log(f'  [VOL-GATE] {token}: ATR={atr_pct:.4f}% regime={vol_regime}')
+        atr_str = f'{atr_pct:.4f}%' if atr_pct is not None else 'N/A'
+        log(f'  [VOL-GATE] {token}: ATR={atr_str} regime={vol_regime}')
         if vol_result == 'SKIP':
-            return ('SKIP', f'volatility gate: {vol_regime} (ATR={atr_pct:.4f}%)', 0)
+            return ('SKIP', f'volatility gate: {vol_regime} (ATR={atr_str})', 0)
         # Store regime in sig for downstream use (SL/TP adjustment)
         if isinstance(sig, dict):
             sig['volatility_regime'] = vol_regime
