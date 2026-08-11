@@ -415,9 +415,9 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
 
     filled = 0
     for token, token_last_closed in last_closed_dict.items():
-        # Skip tokens with no last_closed_boundary
+        # Tokens with no prior closed candles start from beginning of price_history
         if token_last_closed is None or token_last_closed <= 0:
-            continue
+            token_last_closed = 0  # will fill all windows from epoch
         # Skip if no windows to fill
         if token_last_closed >= last_closed:
             continue
