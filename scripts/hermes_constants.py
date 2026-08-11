@@ -735,15 +735,15 @@ PEAK_EXIT_ENABLED = False   # DISABLED 2026-08-01 — 0% WR (0/3), locking in lo
 CUT_LOSER_ENABLED      = True   # master switch
 
 # Tier 1: Quick Cut — -0.3% to -1.0%, fires frequently
-CL_TIER1_MIN_PCT      = -1.0    # floor (don't cut deeper than this in T1)
-CL_TIER1_MAX_PCT      = -0.75   # ceiling (start cutting at -0.75%)
+CL_TIER1_MIN_PCT      = -2.0    # floor (don't cut deeper than this in T1)
+CL_TIER1_MAX_PCT      = -1.0    # ceiling (start cutting at -1.0%)
 CL_TIER1_MAX_CLOSE    = 2       # max positions to close per wake
 CL_TIER1_SKIP_BOTTOM_PCT = 10   # don't touch bottom 10% worst losers
 CL_TIER1_FIRE_WINDOWS = {"A": (1, 3), "B": (3, 6)}
 
 # Tier 2: Deep Cut — -1.0% to -3.0%, fires less frequently
-CL_TIER2_MIN_PCT      = -3.0    # floor
-CL_TIER2_MAX_PCT      = -1.0    # ceiling (T1 handles above this)
+CL_TIER2_MIN_PCT      = -5.0    # floor
+CL_TIER2_MAX_PCT      = -2.0    # ceiling (T1 handles above this)
 CL_TIER2_MAX_CLOSE    = 1       # max positions to close per wake
 CL_TIER2_SKIP_BOTTOM_PCT = 20   # don't touch bottom 20% — let ATR SL handle catastrophic
 CL_TIER2_FIRE_WINDOWS = {"A": (3, 6), "B": (6, 12)}
