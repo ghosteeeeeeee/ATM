@@ -5842,3 +5842,8 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 
 **Open Questions:**
 - None — system stable, cold day is normal variance
+
+---
+
+## TEAM UPDATES
+- [2026-08-11 19:30] signal_reporter: Fixed contrarian flip bug for trend_momentum_near_sma — flip was dead code for standalone signals (only in confluence gate section, standalone signals bypass via 4 other paths). Added flip to HOTSET-FINAL-BYPASS, PRESERVE-MERGE-BYPASS, PENDING-APPROVE-BYPASS, SAFETY-FILTER-BYPASS. 0% WR → expected ~50%+ WR. Commit: 8bf6c10
