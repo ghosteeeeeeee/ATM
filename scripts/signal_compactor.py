@@ -1819,13 +1819,11 @@ def _filter_safe_prev_hotset(prev_hotset):
         if validate_source(src_str) == 'unknown':
             continue
         sp = [p.strip() for p in src_str.split(',') if p.strip()]
-        # ── rs required for all entries (2026-05-15) ──────────────────────────────
-        # When CONFLUENCE_REQUIRED=False: skip RS requirement entirely
-        if CONFLUENCE_REQUIRED:
-            has_rs = any(p.startswith('rs') for p in sp)
-            if not has_rs:
-                log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — no rs signal (src='{src}')")
-                continue
+        # ── Hard requirements for preserve entries ──────────────────────────────
+        # Empty — no hard requirements. Add constraints here to filter
+        # preserve entries (e.g. require RS, require minimum confidence).
+        # These apply only to PRESERVED (prev_hotset) entries, not fresh signals.
+        HARD_REQUIREMENTS = []  # e.g. ['rs'] to require RS component
         # ── Trend purity: bonus multiplier (not hard requirement) ─────────────
         # Signals with trend_purity get +50% final score.
         has_trend_purity = ('trend_purity+' in sp or 'trend_purity-' in sp)
