@@ -1,4 +1,20 @@
-## CEO Report — 2026-08-11 02:30 UTC
+## CEO Report — 2026-08-11 03:00 UTC
+
+### Diagnosis
+System red for 2nd day. Verified DB: 24h 58T -$0.33 (41.4% WR), 12h 28T -$0.31 (35.7% WR), 6h 10T -$0.16 (40% WR). SL hit rate 43.1% (24h) — up from 17.1% (24-48h). Post-widening: 8T, 5 SL hits (62.5%). 7d 367T +$0.39 (51.8% WR — positive). 2 open $0 unrealized.
+
+Daily: Aug 9 +$0.62 (58.5%), Aug 10 -$0.10 (45.5% — first red), Aug 11 -$0.10 (42.9% — 7T, partial).
+
+### Root Cause
+SL widening from 0.5% to 1.2% (deployed 22:00 Aug 10) CAUSED the SL hit rate spike. More room = trades hit wider SL on normal pullbacks. LONG 24h: 40T -$0.31 (37.5% WR — bleeding). bb_bounce+,hzscore+ LONG 16T -$0.34 (31.3% WR — worst signal). SHORT 18T -$0.02 (50% WR — flat). atr_sl_hit 25T -$1.14 (dominant cost). profit-monster-trail 23T +$1.13 (sole winning exit).
+
+### Fix Applied
+Reverted all SL widening params: ATR_SL_MIN 1.2%→0.5%, ATR_SL_MAX 2.5%→1.0%, ATR_SL_MIN_INIT 1.2%→0.5%, ATR_SL_MAX_INIT 2.5%→1.0%, SL_PCT_FALLBACK 1.2%→0.5%, STOP_LOSS_DEFAULT 1.2%→0.5%, SL_PCT_MIN 1.2%→0.5%, TRAILING_DISTANCE_PCT 0.60%→0.30%, CL_TRAIL_ACTIVATE_PCT -1.0→-0.5. System was profitable at 0.5% SL (15+ green days), widening made things worse.
+
+### Verification
+Re-check 24h for SL hit rate improvement. If WR drops below 40% for 10+ new trades → investigate further.
+
+---
 
 ### Diagnosis
 System red for 2nd day after 15-green-day streak. Verified DB: 24h 62T -$0.31 (41.9% WR), 12h 32T -$0.42 (37.5% WR — roughest window), 6h 9T +$0.06 (55.6% WR — improving). 7d 367T +$0.33 (51.8% WR — positive). 3 open $0 unrealized.

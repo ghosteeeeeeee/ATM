@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-11 03:00] CEO review: REVERT SL WIDENING (trading)
+  WHY: Verified DB: SL hit rate 43.1% (24h) vs 17.1% (24-48h). Post-widening 62.5% SL hit rate (8T, 5 SL hits). Wider SL 1.2% caused MORE SL hits, not fewer. LONG 24h 40T -$0.31 37.5% WR (bleeding). bb_bounce+,hzscore+ LONG 16T -$0.34 31.3% WR (worst signal). ATR_SL_MIN 1.2%→0.5%, ATR_SL_MAX 2.5%→1.0%, ATR_SL_MIN_INIT 1.2%→0.5%, ATR_SL_MAX_INIT 2.5%→1.0%, SL_PCT_FALLBACK 1.2%→0.5%, STOP_LOSS_DEFAULT 1.2%→0.5%, SL_PCT_MIN 1.2%→0.5%, TRAILING_DISTANCE_PCT 0.60%→0.30%, CL_TRAIL_ACTIVATE_PCT -1.0→-0.5.
+  BY: CEO run
+  DO NOT REVERT — system was profitable at 0.5% SL (15+ green days), widening made things worse.
+
 [2026-08-10 22:30] CEO review: NO CHANGES (trading)
   WHY: Verified DB: 24h 71T +$0.09 (47.9% WR — flat), today 62T -$0.15 (45.2% WR — first red day). 7d 379T +$0.18 (50.4% WR — barely positive). Stars intact: bb_bounce+,hzscore+ LONG 22T +$0.26 (54.5% WR — dominant), bb_bounce+,range_finder+ LONG 11T -$0.04 (54.5% WR — weak). SHORT 24h 16T +$0.10 (56.3% WR — profitable). Cost drivers: atr_sl_hit 36T -$1.62, cut-loser-CL-trail 28T -$1.04 (48h). bb_bounce+,hzscore+ 7 SL hits at -$0.30 — avg peak move 0.028% before reversal. Market NEUTRAL (105/106 tokens), mean-reversion entries getting chopped. 1.2% SL widening deployed at 22:00, monitoring for improvement. 1 open $0.
   BY: CEO run
