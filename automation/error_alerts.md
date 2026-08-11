@@ -89,3 +89,9 @@
 
 ## Error Alerts — 2026-08-11 16:08 UTC
 - **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-11 17:40 UTC
+- **[WARN]** (2x): `decider_run crash at line 2908` — intermittent, non-fatal. Pipeline continues through position_manager. Only 2 occurrences in last hour; most cycles clean.
+- **[WARN]** (5 tokens): `Stale 1m candles` — LIT (69h), SUSHI (67h), AAVE (50h), PNUT (50h), SKY (50h). Likely delisted/low-volume tokens not worth tracking.
+- **[INFO]** Disk at 83% (93G/118G) — approaching 85% WARN threshold. pipeline.log is 45M.
+- **AUTO-FIX**: None required. Pipeline operational. decider_run errors are non-blocking.
