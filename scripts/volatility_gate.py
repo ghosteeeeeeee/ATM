@@ -204,4 +204,5 @@ if __name__ == '__main__':
     for tok in test_tokens:
         result = should_trade(tok)
         atr = get_atr_pct(tok)
-        print(f'{tok}: ATR={atr:.4f}% → {result}')
+        atr_str = f'{atr:.4f}%' if atr is not None else 'N/A'
+        print(f'{tok}: ATR={atr_str} → {result}')

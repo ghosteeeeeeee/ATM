@@ -106,3 +106,20 @@ Track next 24h: FLAT/EXTREME skip count, HIGH regime WR vs NORMAL, atr_sl_hit ra
 - tpsl_utils.py: missing log import
 - decider_run.py: None formatting
 - position_manager.py: redundant calls simplified
+
+---
+
+## Volatility Gate Update — 2026-08-11 06:00 UTC
+
+**Acknowledged.** Regime mappings updated from 7d backtest with actual ATR at entry time.
+
+| Regime | Signals | Rationale |
+|--------|---------|-----------|
+| FLAT | bb_bounce variants | Mean reversion works in range |
+| NORMAL | tl_break, range_finder, continuation | Trend following in steady waves |
+| HIGH | tl_break, accel-300-vel (NO bb_bounce+hzscore+) | Breakout only — 0% WR removed |
+| EXTREME | continuation+, mover+ | Ride the storm |
+
+Self-learning added: `update_regime_performance()` tracks wins/losses per signal per regime in `volatility_regime_perf.json`.
+
+**Action:** Monitor 48h — if any regime produces <35% WR with 5+ trades, disable that signal within that regime only. The data-driven approach is correct; regime-specific filtering should reduce SL hits in wrong-volatility entries.

@@ -62,3 +62,11 @@
 - **[INFO]**: Regime NEUTRAL, macro gate REDUCE. Hotset empty (no signals above threshold). 84 signals generated (18 tokens).
 - **[INFO]**: Disk 81% (90G/118G). All 40+ hermes timers firing on schedule.
 - **AUTO-FIX**: None needed — pipeline self-recovered. Root cause of decider_run errors remains hidden due to stderr truncation.
+
+## Error Alerts — 2026-08-11 03:41 UTC
+- **[INFO]**: Pipeline OK — all cycles on schedule, no errors in last 30min. Cycle #149999.
+- **[INFO]**: 106 signals generated (1h), 28004 active. Hotset empty (no signals survived compaction).
+- **[INFO]**: 1 open (ASTER LONG), 57 closed today. PnL: -0.16 USDT (24h). Win rate 40% (23/57).
+- **[INFO]**: Regime NEUTRAL (105/106 tokens). Speed: 43% >=50th percentile (below 50% target).
+- **[WARN]**: Disk 81% (90G/118G) — approaching 85% threshold.
+- **AUTO-FIX**: None needed.
