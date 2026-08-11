@@ -455,7 +455,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.006   # 0.60% floor — matches TRAILING_DISTANCE_PCT (MIN guard picks tighter of the two)
+ATR_SL_MIN             = 0.010   # 1.0% floor — matches TRAILING_DISTANCE_PCT
 ATR_SL_MAX             = 0.025  # 2.5% cap — wide enough for ATR-based breathing room
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
@@ -470,18 +470,18 @@ ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.006  # 0.60% — matches TRAILING_DISTANCE_PCT. MUST match ATR_SL_MIN
+ATR_SL_MIN_INIT    = 0.010  # 1.0% — matches TRAILING_DISTANCE_PCT. MUST match ATR_SL_MIN
 ATR_SL_MAX_INIT    = 0.025  # 2.5% — reverted from 1.0%. MUST match ATR_SL_MAX
-SL_PCT_FALLBACK    = 0.006  # 0.60% if ATR unavailable (matched to ATR_SL_MIN)
-TP_PCT_FALLBACK    = 0.012  # 1.2% fallback target (2:1 R:R with 0.60% SL)
-STOP_LOSS_DEFAULT  = 0.006  # 0.60% hard fallback (matched to ATR_SL_MIN)
-SL_PCT_MIN        = 0.006  # 0.60% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
+SL_PCT_FALLBACK    = 0.010  # 1.0% if ATR unavailable (matched to ATR_SL_MIN)
+TP_PCT_FALLBACK    = 0.020  # 2.0% fallback target (2:1 R:R with 1.0% SL)
+STOP_LOSS_DEFAULT  = 0.010  # 1.0% hard fallback (matched to ATR_SL_MIN)
+SL_PCT_MIN        = 0.010  # 1.0% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
 TRAILING_ACTIVATION_PCT = 0.0030  # 0.30% — CEO tightened to lock profits faster (was 0.35%)
-TRAILING_DISTANCE_PCT   = 0.0060  # 0.60% — reverted from 0.30% (tight trailing kills profit-monster trades)
+TRAILING_DISTANCE_PCT   = 0.0100  # 1.0% — trailing SL distance from peak
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...

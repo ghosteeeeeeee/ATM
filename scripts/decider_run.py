@@ -1347,7 +1347,7 @@ def execute_trade(token, direction, price, confidence, source,
                   trailing_activation=TRAILING_ACTIVATION_PCT, trailing_distance=TRAILING_DISTANCE_PCT,
                   trailing_phase2_dist=None,
                   experiment=None, variant_id=None, test_name=None,
-                  live_trading=False, flipped=False,
+                  live_trading=False, flipped=False, regime=None,
                   # ── Signal indicator fields (from hotset at entry) ──
                   signal_z_score=None, signal_rsi_14=None,
                   signal_macd_hist=None, signal_momentum_state=None,
@@ -1463,6 +1463,8 @@ def execute_trade(token, direction, price, confidence, source,
     if signal_metadata is not None:
         import json as _json
         cmd += ['--signal-metadata-json', _json.dumps(signal_metadata)]
+    if regime is not None:
+        cmd += ['--regime', str(regime)]
 
     # ── Duplicate-entry guard ───────────────────────────────────────────────
     # FIX (2026-04-14): If there's already an open trade for this token+direction
@@ -2793,7 +2795,7 @@ def run(dry_run=False):
             trailing_activation=trailing_activation, trailing_distance=trailing_distance,
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
-            live_trading=not paper, flipped=bool(flipped_direction),
+            live_trading=not paper, flipped=bool(flipped_direction), regime=_regime,
             # Signal indicator fields captured from hotset at entry time
             signal_z_score=sig.get('z_score'),
             signal_rsi_14=sig.get('rsi_14'),
