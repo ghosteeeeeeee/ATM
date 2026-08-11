@@ -5519,3 +5519,23 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Overreacting to cold streak destabilizes — wait for trailing distance evaluation window
 
 **Open Questions:** atr_sl_hit rate still climbing despite wider trailing — market regime shift or needs further widening? Evaluate again at 05:30 tomorrow (24h post-change)
+
+---
+
+## 2026-08-11 18:15 Hourly Analysis
+
+**Trades:** 0 closed last hour (system idle)
+**24h:** 57T -$0.24 (42.1% WR — RED)
+**PnL drivers:** atr_sl_hit 26T -$1.15 (45.6%), profit-monster-trail 23T +$1.13 (40.4%)
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert (1.2%) deployed 13h ago — needs full 24h eval window (until 05:20 Aug 12)
+- atr_sl_hit 45.6% above 40% threshold but trending down from 64.7% (at 0.5% SL)
+- hzscore+ LONG 15T 33.3% WR — 7d intact at 50%, not a kill candidate
+- No 0% WR signals with 3+ trades to kill
+- Trade frequency normal (2.4/hr)
+- System calm, 0 open trades
+
+**Open Questions:** hzscore+ LONG 24h bleed — monitor 7d WR, kill if drops below 45%
