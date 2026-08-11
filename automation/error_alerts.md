@@ -106,3 +106,44 @@
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'VORTEX_BREAK_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_constants.`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'RETURN_EXHAUSTION_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_const`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'ENGULFING_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_constants.py)`
+
+## Health Report — 2026-08-11 19:40 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-11 19:40 UTC
+
+PIPELINE: OK
+- Status: running (cycle #150960+)
+- Signals (1h): 0 generated, 0 executed
+- Trades: 5 open, 25 closed today
+- PnL: -3.34%
+- Errors: 0 (last 10 min); decider_run crash streak 19:09-19:27 resolved
+
+MARKET:
+- Regime: 104 LONG / 0 SHORT / 104 NEUTRAL (overall NEUTRAL)
+- Speed: 55% tokens fresh (299/549)
+- Macro gate: REDUCE (regime=NEUTRAL, wr=40%)
+- Hotset: empty (0 tokens survived compaction)
+
+SYSTEM:
+- Timers: 15+ active (pipeline, price-collector, cut-loser, profit-monster, etc.)
+- Disk: 84% (99G/118G) — approaching WARN threshold
+- Prices: 299 fresh, 250 stale
+- Pipeline: running normally
+- hl-sync-guardian: active
+
+AUTO-FIXES APPLIED:
+- None needed. Pipeline self-recovered from decider_run errors.
+
+ALERTS:
+- [WARN] Disk at84% — pipeline.log=47M, pipeline.log.gz=90M. Compress/rotate when >85%.
+- [WARN] Hotset empty — 0 signals survived compaction. Macro gate REDUCE active.
+- [INFO] decider_run crash streak (19:09-19:27) resolved by ~19:30. Non-blocking.
+```
+
+## Error Alerts — 2026-08-11 19:40 UTC
+- **[INFO]** Pipeline recovered from decider_run crash streak (19:09-19:27). Last error at 19:27, clean since 19:30+.
+- **[WARN]** Disk at 84% (99G/118G) — 1% from threshold. pipeline.log (47M) + .gz (90M) are largest.
+- **[WARN]** Hotset empty — 0 tokens survived compaction. Market is NEUTRAL, macro gate REDUCE (wr=40%).
+- **AUTO-FIX**: None required. Pipeline operational.

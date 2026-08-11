@@ -368,7 +368,7 @@ def compute_atr_sl_tp(
             ref_price = float(current_price)
         else:
             ref_price = float(entry_price)
-    if direction == 'SHORT':
+    elif direction == 'SHORT':
         if is_initial_write and entry_price > 0:
             ref_price = float(entry_price)
         elif lowest_price > 0:
@@ -540,8 +540,10 @@ def compute_atr_sl_tp(
             else:
                 # In loss: entry floor is absolute — SL must stay at least ATR_SL_MIN from entry
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
-                if current_sl > 0:
-                    new_sl = max(new_sl, current_sl)  # one-way: never go down
+                # One-way: SL tightens from highest_price (peak), never loosens
+                trail_floor_loss = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8) if highest_price > 0 else 0
+                if trail_floor_loss > 0:
+                    new_sl = max(new_sl, trail_floor_loss)
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
