@@ -23,22 +23,28 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
 import sqlite3
 
-# Signals that work in each regime (from backtest analysis)
+# Signals that work in each regime (from 7d backtest with actual ATR at entry)
+# Source: correlated trade outcomes with volatility regime at entry time
 REGIME_SIGNALS = {
     'FLAT': {
+        # Mean reversion works in range-bound markets
         'bb_bounce,hzscore+', 'hzscore-,return_exhaustion-',
-        'bb-bounce-short,hzscore-', 'mean_reversion',
+        'bb-bounce-short,hzscore-', 'bb_bounce+', 'bb_bounce',
     },
     'NORMAL': {
-        'tl_break+', 'tl_break-', 'bb_bounce+,hzscore+', 'bb_bounce+,range_finder+',
-        'accel-300-', 'momentum+', 'continuation+', 'ma_cross', 'bb_bounce+',
+        # Trend following works in steady waves
+        'tl_break+', 'tl_break-', 'bb_bounce+,range_finder+',
+        'accel-300-', 'momentum+', 'continuation+', 'ma_cross',
+        'hzscore-,return_exhaustion-', 'hzscore+,return_exhaustion_long',
     },
     'HIGH': {
-        'tl_break-', 'accel-300-vel+', 'accel-300-vel-', 'bb_bounce+,range_finder+',
-        'breakout', 'squeeze_cross', 'tl_break+',
+        # Breakout works in big moves, but NOT bb_bounce+hzscore+ (0% WR in HIGH)
+        'tl_break-', 'tl_break+', 'accel-300-vel+', 'accel-300-vel-',
+        'breakout', 'squeeze_cross',
     },
     'EXTREME': {
-        'continuation+,hzscore+', 'hzscore+,mover+', 'bb_bounce',
+        # Continuation works in storms
+        'continuation+,hzscore+', 'hzscore+,mover+',
         'continuation+', 'accel-300-',
     },
 }
@@ -154,6 +160,42 @@ def get_sl_multiplier(atr_pct):
         return 1.5  # wide
     else:
         return 0  # don't trade
+
+
+def update_regime_performance(token, signal, direction, pnl_pct, atr_pct):
+    """Track signal performance by regime for auto-learning.
+    Called after each trade closes. Updates a local JSON file.
+    """
+    import json
+    from datetime import datetime
+
+    regime = classify_volatility(atr_pct)
+    key = f'{signal}:{direction}'
+    perf_file = f'{HERMES_DATA}/volatility_regime_perf.json'
+
+    try:
+        with open(perf_file) as f:
+            perf = json.load(f)
+    except Exception:
+        perf = {}
+
+    if key not in perf:
+        perf[key] = {}
+    if regime not in perf[key]:
+        perf[key][regime] = {'wins': 0, 'losses': 0, 'pnl': 0}
+
+    if pnl_pct > 0:
+        perf[key][regime]['wins'] += 1
+    else:
+        perf[key][regime]['losses'] += 1
+    perf[key][regime]['pnl'] += round(pnl_pct, 4)
+    perf[key][regime]['updated'] = datetime.now().isoformat()
+
+    try:
+        with open(perf_file, 'w') as f:
+            json.dump(perf, f, indent=2)
+    except Exception:
+        pass
 
 
 if __name__ == '__main__':
