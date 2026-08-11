@@ -5589,3 +5589,33 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - SL revert eval window closes tomorrow 05:20 — will assess SL hit rate trend then
 - bb_bounce+,hzscore+ 24h bleed: -$0.34 on 15T. If SL revert doesn't fix, may need signal-specific tuning
+
+## [2026-08-11 20:05] Hourly Analysis
+
+**Trades:** 0 closed last hour (2 since SL revert — too early)
+**24h:** 51T -$0.43 (45.1% WR) — SL revert eval window active until 05:20 Aug 12
+**7d:** 365T +$0.45 (51.8% WR) — positive
+
+**Since SL Revert (05:20 UTC):**
+- Only 2 trades closed — both bb_bounce+,hzscore+ LONG SL hits (-$0.06 total)
+- SL hit rate: 100% but n=2, meaningless — need 20+ trades for signal
+
+**SL Trend (6h blocks):**
+- 0-6h: 2T, SL 100%, WR 0% (n too small)
+- 6-12h: 9T, SL 55.6%, WR 44.4%
+- 12-18h: 19T, SL 52.6%, WR 31.6%
+- 18-24h: 19T, SL 47.4%, WR 42.1%
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active (closes 05:20 Aug 12) — no param changes allowed
+- Trade volume too low since revert to evaluate (2T)
+- 7d system positive (51.8% WR) — no crisis
+- No 0% WR signals with 3+ trades
+- Overtrading? No — 0 trades last hour
+
+**Open Questions:**
+- SL revert deployed 14.7h ago with only 2 closed trades — very low volume. Will need more data tomorrow
+- HTTST4 open trade is test signal (not in hermes_constants.py) — harmless but should close eventually
+- Aster open since Aug 10 22:02 — 22h old, long-duration hold
