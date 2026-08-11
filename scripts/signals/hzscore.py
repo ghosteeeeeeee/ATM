@@ -218,7 +218,7 @@ def run() -> int:
             if last_ts_str:
                 try:
                     last_ts = datetime.datetime.strptime(last_ts_str, '%Y-%m-%d %H:%M:%S')
-                    now = datetime.datetime.utcnow()
+                    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
                     if (now - last_ts).total_seconds() < COOLDOWN_HOURS * 3600:
                         continue
                 except Exception:

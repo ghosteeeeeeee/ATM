@@ -98,6 +98,7 @@ def _compute_rsi(closes, period=RSI_PERIOD):
 
 def _get_1h_trend(token):
     """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
@@ -108,11 +109,9 @@ def _get_1h_trend(token):
             LIMIT 60
         """, (token.upper(),))
         rows = cur.fetchall()
-        conn.close()
         if not rows or len(rows) < 50:
             return 'NEUTRAL'
         closes = [r[0] for r in reversed(rows)]
-        # EMA20 vs EMA50
         def ema(data, period):
             k = 2 / (period + 1)
             val = data[0]
@@ -129,9 +128,13 @@ def _get_1h_trend(token):
         return 'BULLISH' if ema20 > ema50 else 'BEARISH'
     except Exception:
         return 'NEUTRAL'
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_candles(token, lookback=100):
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
         cur = conn.cursor()
@@ -142,14 +145,17 @@ def _get_candles(token, lookback=100):
             LIMIT ?
         """, (token.upper(), lookback))
         rows = cur.fetchall()
-        conn.close()
         return [r[0] for r in reversed(rows)] if rows else []
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_ohlcv_candles(token, lookback=100):
     """Get full OHLCV candle data for pattern recognition."""
+    conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
         cur = conn.cursor()
@@ -161,13 +167,15 @@ def _get_ohlcv_candles(token, lookback=100):
             LIMIT ?
         """, (token.upper(), lookback))
         rows = cur.fetchall()
-        conn.close()
         if not rows:
             return []
         return [{'ts': r[0], 'open': r[1], 'high': r[2], 'low': r[3],
                  'close': r[4], 'volume': r[5]} for r in reversed(rows)]
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _is_solo(token, direction):
