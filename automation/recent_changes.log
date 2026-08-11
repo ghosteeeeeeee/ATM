@@ -234,3 +234,6 @@
 [2026-08-11 22:05] auto_1hr: NO CHANGES
   WHY: System calm. 0T last hour, 3T since SL revert (05:20) — too early to evaluate. 24h 33T -$0.53 (33.3% WR). 7d 363T +$0.55 (52.1% WR). SL hit 57.6% 24h — elevated but eval window active until 05:20 Aug 12. bb_bounce+,hzscore+ cold streak (18.2% WR 24h) but 7d intact (48.5% WR). No 0% WR kills. No overtrading (1.4/hr). Hot-set file missing — low vol conditions. HTTST4 test signal still open.
   BY: auto_1hr
+[2026-08-12 01:05] auto_1hr: NO CHANGES
+  WHY: 1T last hour (AVNT SL hit -$0.04). 24h 28T -$0.63 (28.6% WR). atr_sl_hit 60.7% (elevated but eval window active until 05:20 Aug 12). Only 11T since SL revert — too early for signal. No 0% WR kill candidates (trend_momentum already killed). Trade freq 1/hr normal. 7d 364T +$0.51 (52.2% WR). No changes during eval window.
+  BY: auto_1hr
