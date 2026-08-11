@@ -729,6 +729,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ── Backtested Signal Bypass ──────────────────────────────────────
                 # Signals with proven edge from backtesting — allow standalone.
                 elif unique_signal_types == 1 and source.rstrip('+-') in (
+                    'trend_momentum_near_sma',
                     'stop_hunt_reversal_long',
                     'spike_exhaustion_short', 'bb_bounce', 'hzscore',
                     'range_finder', 'continuation',
@@ -751,6 +752,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if not pass_gate:
                 log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction}: {gate_msg}")
                 continue
+
+            # ── Contrarian flip: trend_momentum_near_sma ────────────────────────
+            # This signal is consistently wrong — LONG loses, SHORT wins.
+            # Flip: LONG→SHORT, SHORT→LONG
+            if source.rstrip('+-') == 'trend_momentum_near_sma':
+                row = list(row)
+                original_dir = row[1]
+                row[1] = 'SHORT' if direction.upper() == 'LONG' else 'LONG'
+                direction = row[1]
+                log(f"  🔄 [CONTRARIAN-FLIP] {token}: {original_dir}→{direction} (trend_momentum_near_sma always wrong)")
+                row = tuple(row)
 
             signals.append(row)
             log(f"  ✅ [CONFLUENCE-GATE-PASS] {token} {direction}: {{{source}}} ({gate_msg})")
