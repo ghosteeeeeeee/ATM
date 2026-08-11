@@ -5429,3 +5429,35 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Only 2 open trades — system calm
 
 **Open Questions:** None — quiet period, evaluating trailing distance change
+
+## [2026-08-11 05:30] Hourly Analysis
+
+**Trades:** 1 closed last hour | 58 in 24h (-$0.33, 41.4% WR)
+**Open:** 2
+
+**Last hour:**
+- MEGA LONG, bb_bounce+,hzscore+, atr_sl_hit, -$0.01
+
+**24h by close reason:**
+- atr_sl_hit: 26T -$1.15 (44.8% — above 40% threshold, trending UP)
+- profit-monster-trail: 23T +$1.13 (sole winning exit)
+- cut-loser-CL-trail: 8T -$0.38
+
+**Diagnosis:**
+1. Entry quality: 1 SL hit last hour — MEGA got stopped out
+2. SL behavior: 44.8% (above 40%, trending up: 35.8%→43.1%→44.8%)
+3. Signal quality: bb_bounce+,hzscore+ 16T 31.3% WR — dominant but cold today (7d profitable)
+4. Trade frequency: 2.5/hr — normal
+5. Last 3h: ALL 3 trades SL hits (MEGA, KAS, MEGA)
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 44.8% above threshold BUT trailing distance widened to 0.60% only7h ago — needs24h+ to evaluate
+- 7d still positive ($0.46, 51.8% WR) — cold day normal variance after 15 green days
+- No 0% WR signals with 3+ trades to kill in last hour
+- Trade frequency normal (2.5/hr)
+- Only 2 open trades — system calm
+- Overreacting to cold streak destabilizes — wait for trailing distance evaluation window
+
+**Open Questions:** atr_sl_hit rate still climbing despite wider trailing — market regime shift or needs further widening? Evaluate again at 05:30 tomorrow (24h post-change)

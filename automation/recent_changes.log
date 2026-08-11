@@ -199,3 +199,6 @@
 [2026-08-11 02:25] auto_1hr: NO CHANGES
   WHY: System healthy. 1 trade last hour (MNT LONG WIN +$0.03). 24h 60T -$0.32 (48.3% WR). 7d 367T +$0.37 (51.8% WR). atr_sl_hit 38.3% (healthy). All signals profitable 7d. Today cold day = normal variance after 15 green days. Trailing distance 0.60% deployed 4.5h ago — too early to evaluate. No 0% WR signals to kill. No overtrading.
   BY: auto_1hr
+[2026-08-11 05:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (MEGA SL hit -$0.01). 24h 58T -$0.33 (41.4% WR). 7d 365T +$0.46 (51.8% WR). atr_sl_hit 44.8% (above 40% threshold, trending UP). Last 3h ALL 3 trades SL hits. bb_bounce+,hzscore+ 16T 31.3% WR — dominant but cold today. Trailing distance 0.60% deployed7h ago — needs 24h+ evaluation. No 0% WR signals to kill. Trade frequency normal (2.5/hr). Cold day normal variance after 15 green days. Overreacting destabilizes — wait for trailing distance evaluation window.
+  BY: auto_1hr
