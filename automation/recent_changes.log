@@ -210,3 +210,6 @@
 [2026-08-11 05:30] auto_1hr: NO CHANGES
   WHY: 1T last hour (MEGA SL hit -$0.01). 24h 58T -$0.33 (41.4% WR). 7d 365T +$0.46 (51.8% WR). atr_sl_hit 44.8% (above 40% threshold, trending UP). Last 3h ALL 3 trades SL hits. bb_bounce+,hzscore+ 16T 31.3% WR — dominant but cold today. Trailing distance 0.60% deployed7h ago — needs 24h+ evaluation. No 0% WR signals to kill. Trade frequency normal (2.5/hr). Cold day normal variance after 15 green days. Overreacting destabilizes — wait for trailing distance evaluation window.
   BY: auto_1hr
+[2026-08-11 19:10] auto_1hr: NO CHANGES
+  WHY: 1T last hour (SL hit). 24h 50T -$0.68 (42.1% WR). atr_sl_hit 52% (elevated but SL revert eval window active until 05:20 Aug 12). Kill candidates checked — both hzscore+,range_finder+ and continuation+,hzscore+ 7d intact (62.5% and 42.9% WR). No 0% WR kills warranted. Trade frequency normal (2.1/hr). No param changes during eval window.
+  BY: auto_1hr

@@ -5570,3 +5570,22 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - hzscore+ LONG 24h bleed: 14T -$0.29 28.6% WR — 7d intact at 48.4%, monitor
 - SL revert eval window closes tomorrow 05:20 — will assess then
+
+## [2026-08-11 19:10] Hourly Analysis
+
+**Trades:** 1 closed last hour (MEGA LONG bb_bounce+,hzscore+ SL hit -$0.05)
+**24h:** 50T -$0.68 (42.1% WR)
+**24h by exit:** atr_sl_hit 26T (52%, -$1.17) | profit-monster-trail 17T (+$0.66) | cut-loser 6T (-$0.28)
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active (until 05:20 Aug 12) — no param changes allowed
+- Kill candidates hzscore+,range_finder+ and continuation+,hzscore+ both show 0% WR 24h but 7d intact (62.5% and 42.9%) — not kills
+- bb_bounce+,hzscore+ dominant signal: 7d trail exits 15/15 winners (+$0.92), SL is bottleneck — SL revert should fix
+- Trade frequency 2.1/hr (normal)
+- atr_sl_hit 52% elevated but SL revert deployed 13h ago — eval window in progress
+
+**Open Questions:**
+- SL revert eval window closes tomorrow 05:20 — will assess SL hit rate trend then
+- bb_bounce+,hzscore+ 24h bleed: -$0.34 on 15T. If SL revert doesn't fix, may need signal-specific tuning
