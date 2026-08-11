@@ -1152,7 +1152,7 @@ def hebbian_trade_boost(token, signal):
 
 def context_gate(token, direction, source, sig):
     """
-    Main entry point. Rule-based gate → similar setup lookup → LLM.
+    Main entry point. Volatility gate → Rule-based → similar setup → LLM.
     Returns (verdict, reason_or_data, penalty):
       - ('GO', None, 0): pass through
       - ('SKIP', reason, 0): hard block (no penalty, trade blocked)
@@ -1161,6 +1161,26 @@ def context_gate(token, direction, source, sig):
     """
     if not CONTEXT_GATE_ENABLED:
         return ('GO', None, 0)
+
+    # ── Volatility Gate (surfing analogy) ─────────────────────────────────
+    # FLAT (<0.48% ATR): no wave to surf — skip
+    # EXTREME (>1.5% ATR): storm — skip
+    # NORMAL (0.48-1.0%): sweet spot — standard SL
+    # HIGH (1.0-1.5%): big waves — wider SL
+    try:
+        from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
+        vol_result, vol_regime = should_trade(token)
+        atr_pct = get_atr_pct(token)
+        if atr_pct:
+            log(f'  [VOL-GATE] {token}: ATR={atr_pct:.4f}% regime={vol_regime}')
+        if vol_result == 'SKIP':
+            return ('SKIP', f'volatility gate: {vol_regime} (ATR={atr_pct:.4f}%)', 0)
+        # Store regime in sig for downstream use (SL/TP adjustment)
+        if isinstance(sig, dict):
+            sig['volatility_regime'] = vol_regime
+            sig['sl_multiplier'] = get_sl_multiplier(atr_pct) if atr_pct else 1.0
+    except Exception as e:
+        log(f'  [VOL-GATE] {token}: error {e} (fail-open)')
 
     verdict, ctx, _ = rule_based_context_gate(token, direction, source, sig)
 

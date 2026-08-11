@@ -257,6 +257,8 @@ def compute_atr_sl_tp(
     speed_percentile: float = 50.0,
     flip_k_override: Optional[float] = None,
     trade_open_time: Optional[str] = None,
+    volatility_regime: str = 'NORMAL',
+    sl_multiplier: float = 1.0,
 ) -> dict:
     """
     Compute trailing ATR SL and TP for a position.
@@ -482,6 +484,14 @@ def compute_atr_sl_tp(
 
     eff_sl_pct = min(max(sl_pct, MIN_SL_PCT), ATR_SL_MAX)
     eff_tp_pct = min(max(tp_pct, MIN_TP_PCT), ATR_TP_MAX)
+
+    # ── Volatility regime adjustment ────────────────────────────────────────
+    # HIGH regime: widen SL to avoid noise stop-outs
+    # NORMAL: standard SL
+    if volatility_regime == 'HIGH' and sl_multiplier > 1.0:
+        eff_sl_pct = min(eff_sl_pct * sl_multiplier, ATR_SL_MAX)
+        eff_tp_pct = min(eff_tp_pct * sl_multiplier, ATR_TP_MAX)
+        log(f'  [VOL-GATE] {token}: HIGH vol — SL widened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
 
     # For established trades: cap SL at TRAILING_DISTANCE_PCT so trailing can lock profits
     # Without this, the ATR-based floor (0.15-0.50%) overrides the trailing distance (0.20%)

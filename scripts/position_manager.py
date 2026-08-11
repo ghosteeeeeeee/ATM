@@ -1748,6 +1748,19 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         _sl_dist = abs(current_sl - _entry) / _entry * 100 if current_sl > 0 and _entry > 0 else 0
         if _sl_dist < 0.15 and current_sl > 0:
             log(f"  ⚠️ [PHANTOM-DBG] {token} {direction}: TIGHT SL DETECTED sl={current_sl:.6f} entry={_entry:.6f} dist={_sl_dist:.3f}% — tracing compute_atr_sl_tp inputs")
+
+        # ── Volatility regime for SL/TP adjustment ───────────────────────────
+        vol_regime = 'NORMAL'
+        sl_mult = 1.0
+        try:
+            from volatility_gate import should_trade, get_atr_pct, get_sl_multiplier
+            atr = get_atr_pct(token)
+            if atr:
+                _, vol_regime = should_trade(token)
+                sl_mult = get_sl_multiplier(atr)
+        except Exception:
+            pass
+
         result = compute_atr_sl_tp(
             token=token,
             direction=direction,
@@ -1762,6 +1775,8 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             speed_percentile=speed_by_token.get(token, 50),
             flip_k_override=flip_k_override,
             trade_open_time=pos.get('open_time'),
+            volatility_regime=vol_regime,
+            sl_multiplier=sl_mult,
         )
 
         new_sl = result['new_sl']
