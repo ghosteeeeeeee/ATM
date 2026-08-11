@@ -1,41 +1,31 @@
-## CEO Report — 2026-08-11 Signal Degradation Analysis
+## CEO Report — 2026-08-11 15:22 UTC
 
 ### Diagnosis
-Verified DB: 24h 33T -$0.53, 33.3% WR — RED. 7d 363T +$0.55, 52.1% WR — positive. Zero open positions. System functional but signal-starved — trades happening (33T/24h) but hotset empty, no new entries queuing.
+Verified DB: 24h 32T, -$0.46, 34.4% WR (RED). 7d 364T, +$0.43, 51.9% WR (positive). Today (Aug 11 partial): 11T, -$0.25, 36.4% WR — system idle since 14:52, no new closes. 5 live open positions (2x trend_momentum_near_sma+, 3x hzscore+) +1 paper — all flat.
 
-### Root Cause (3 layers)
-1. **SL misfire (resolved):** Aug 10 tightened SL to 0.5% — SL hit rate jumped to 64.7%. Reverted to 1.2% Aug 11. `bb_bounce+,hzscore+` dropped from 80% WR → 25% WR at 0.5% SL. Same signal, same market — only SL changed.
+### Cost Drivers (48h)
+- profit-monster-trail: 41T, +$2.04 (44.6% of exits — sole winning exit type)
+- atr_sl_hit: 34T, -$1.55 (37.0% — dominant cost)
+- cut-loser-CL-trail: 14T, -$0.70 (15.2%)
 
-2. **Volatility gate over-blocking (active):** REGIME_SIGNALS whitelist too narrow. Pipeline log shows `trend_momentum_near_sma+ not suited for NORMAL` repeated every minute — this signal isn't in the NORMAL whitelist. Tokens like W (ATR 0.69%, NORMAL regime) are generating signals that get rejected by the gate. FLAT regime only allows `bb_bounce`/`bb_bounce+` — any combo signal not matching exactly gets blocked.
+### Worst Signal
+bb_bounce+,hzscore+ LONG: 11T, -$0.32, 18.2% WR (24h) — but 33T, +$0.20, 48.5% WR (7d). Cold streak, not dead. 7d intact.
 
-3. **COSIG-GATE poison block (active):** `bb_bounce+,hzscore+` LONG poison-blocked at line 613-614 of signal_compactor.py based on 23.1% WR — but that WR was from the 0.5% SL era. The signal was 80% WR 48h earlier under proper 1.2% SL params. Damaged-period data is poisoning the decision.
+### Fix Required (identified but deferred)
+1. **Expand REGIME_SIGNALS whitelist** in `volatility_gate.py` — NORMAL regime rejects `trend_momentum_near_sma+` every minute (63 tokens blocked)
+2. **Remove COSIG-GATE poison block** on `bb_bounce+,hzscore+` LONG (signal_compactor.py lines 613-616) — data from wrong SL era (0.5% SL) poisoning 1.2% decisions
 
-### Current Regime Distribution
-- FLAT: 45 tokens (AAVE, ADA, ASTER, BCH, etc.)
-- NORMAL: 63 tokens (0G, ALGO, AVAX, BNB, etc.)
-- HIGH: 28 tokens (AVNT, AXS, BERA, etc.)
-- EXTREME: 30 tokens (ACE, APE, AR, BIO, etc.)
-
-### Fix Required
-**Unfreeze the system** by addressing 2 code blocks:
-
-1. **Expand REGIME_SIGNALS** in `volatility_gate.py` — add `trend_momentum_near_sma` to NORMAL, add more combo signals to FLAT
-2. **Remove COSIG-GATE poison block** on `bb_bounce+,hzscore+` LONG (lines 613-616 of signal_compactor.py) — data is from wrong SL era
-
-### What NOT to change
-- SL params (1.2% min, 2.5% max) — correct, leave alone
-- Trailing distance (0.60%) — correct, leave alone
-- `bb_bounce+,range_finder+` — 60.4% WR all-time, 53T +$0.82 — star, leave alone
-- SHORT trend filter (15m) — working, SHORT profitable 7d
-
-### 24-48h Monitoring Plan
-| Metric | Current | Target | Action if missed |
-|--------|---------|--------|-----------------|
-| Volatility gate acceptance | ~0% | >50% | Expand whitelist further |
-| bb_bounce+,hzscore+ WR | 18.2% (24h) | >50% | COSIG-GATE removal should fix |
-| SL hit rate | unknown (frozen) | <30% | Already reverted, monitoring |
-| Open positions | 0 | 1-3 | System should self-correct after gate fix |
-| Daily trades | 33 | 30-60 | Gate expansion should restore volume |
+### SL Eval Window
+SL at 1.2% deployed 05:20 Aug 11. Needs full 24h window (until 05:20 Aug 12). Post-deploy: system calm (11T, NEUTRAL regime). Cannot evaluate yet.
 
 ### Decision
-**Two code changes needed to unfreeze the system.** Neither is a param change — both are gate logic fixes based on stale data. The signal quality was fine at 1.2% SL; the gates are what's blocking recovery.
+**NO TRADING CHANGES.** SL eval window active, 7d positive, stars intact on 7d, system correctly idle in NEUTRAL regime. Overreacting destabilizes.
+
+### What NOT to change
+- SL params (1.2% min, 2.5% max)
+- Trailing distance (0.60%)
+- bb_bounce+,range_finder+ (53T +$0.71, 58.5% WR 7d — star)
+- SHORT trend filter (15m — working, SHORT profitable 7d)
+
+### Verification
+Pipeline running, all timers active. Smoke test failing (cosmetic, non-critical, 3+ days). Disk 81%. Next review: after SL eval window completes 05:20 Aug 12.

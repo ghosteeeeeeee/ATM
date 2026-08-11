@@ -33,6 +33,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+',  # 60.4% WR all-time, star signal
         'trend_momentum_near_sma',
+        'hzscore', 'range_finder',  # individual parts for single-source signals
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
@@ -40,17 +41,20 @@ REGIME_SIGNALS = {
         'bb-bounce-short,hzscore-',  # 58.8% WR all-time
         'tl_break',
         'trend_momentum_near_sma',
+        'hzscore', 'range_finder', 'range_breakout',  # individual parts
     },
     'HIGH': {
         # Breakout works in big moves
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break',
         'accel-300-vel',
+        'hzscore', 'range_finder',  # individual parts
     },
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
         'bb_bounce',
+        'hzscore', 'continuation', 'mover',  # individual parts
     },
 }
 

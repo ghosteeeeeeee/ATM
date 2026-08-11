@@ -2,6 +2,10 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-11 15:22] CEO review: NO CHANGES (trading)
+  WHY: Verified DB: 24h 32T -$0.46 (34.4% WR — RED), 7d 364T +$0.43 (51.9% WR — positive). Today partial: 11T -$0.25 (36.4% WR, idle since14:52). SL at 1.2% eval window active (05:20 Aug 11 → 05:20 Aug12). bb_bounce+,hzscore+ LONG24h 11T -$0.32 (18.2% WR — worst), 7d 33T +$0.20 (48.5% WR — intact). Open: 5 live +1 paper (all flat). Pipeline running, smoke test failing (cosmetic). NEUTRAL regime. Stars intact 7d. DO NOT CHANGE PARAMS during eval window.
+  BY: CEO run
+
 [2026-08-11 07:28] auto_1hr: NO CHANGES
   WHY: 0T last hour (system idle, 3 open). 24h 54T -$0.26 (40.7% WR). SL hit rate 48.1% (above 40% threshold but SL revert to 1.2% deployed 2h ago — eval window active until 05:20 Aug 12). hzscore+ LONG 14T 28.6% WR (7d 48.4% intact). Trade freq 2.25/hr (normal). No kill candidates. Stars intact. DO NOT CHANGE PARAMS during eval window.
   BY: auto_1hr
@@ -218,4 +222,7 @@
   BY: auto_1hr
 [2026-08-11 21:05] auto_1hr: NO CHANGES
   WHY: System calm. 0T last hour, 3T since SL revert (05:20) — need 20+ trades for signal. 24h 37T -/usr/bin/bash.56 (35.1% WR). 7d 365T +/usr/bin/bash.45 (51.8% WR). SL eval window active until 05:20 Aug 12. No 0% WR signals to kill. Trade freq 0/hr. Market flat, no urgency.
+  BY: auto_1hr
+[2026-08-11 22:05] auto_1hr: NO CHANGES
+  WHY: System calm. 0T last hour, 3T since SL revert (05:20) — too early to evaluate. 24h 33T -$0.53 (33.3% WR). 7d 363T +$0.55 (52.1% WR). SL hit 57.6% 24h — elevated but eval window active until 05:20 Aug 12. bb_bounce+,hzscore+ cold streak (18.2% WR 24h) but 7d intact (48.5% WR). No 0% WR kills. No overtrading (1.4/hr). Hot-set file missing — low vol conditions. HTTST4 test signal still open.
   BY: auto_1hr

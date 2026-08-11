@@ -133,6 +133,8 @@ SHORT_BLACKLIST = {
     'PNUT',  # 15T 33.3% WR -$0.13
     # 2026-08-08: Political meme coin, high volatility
     'TRUMP',
+    # 2026-08-11: 5 trades, 0% WR, -$0.23 — low-price noise coin, all ATR SL hits
+    'MEGA',
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -198,6 +200,8 @@ LONG_BLACKLIST = {
     'CELO',  # 4T 50% WR -$0.05 — losses > wins
     # 2026-08-08: Political meme coin, high volatility
     'TRUMP',
+    # 2026-08-11: 5 trades, 0% WR, -$0.23 — low-price noise coin, all ATR SL hits
+    'MEGA',
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
 

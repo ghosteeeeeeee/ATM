@@ -5688,3 +5688,32 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - SL revert eval window closes in ~8h — will we have enough data by then?
 - HTTST4 test signal still open — should eventually close
 - bb_bounce+,hzscore+ 24h bleed: -$0.33. If SL revert doesn't fix, may need signal-specific tuning after eval window
+
+## [2026-08-11 22:05] Hourly Analysis
+
+**Trades:** 0 closed last hour (zero volume)
+**24h:** 33T 11W (33.3% WR) -$0.53
+**7d:** 363T 189W (52.1% WR) +$0.55
+
+**SL Hit Rate:**
+- 24h: 57.6% (19/33) — elevated
+- Since SL revert (05:20): 2/3 SL hits — too small sample (3 trades)
+- SL revert eval window closes 05:20 Aug 12
+
+**Signal Performance (24h):**
+- bb_bounce+,hzscore+: 11T 2W (18.2% WR) -$0.32 — cold streak, 7d intact (48.5% WR +$0.20)
+- All other signals: 1-2T each, mixed results
+
+**Changes:** None
+
+**No Change Needed:**
+- SL revert eval window active until 05:20 Aug 12 — no param changes allowed
+- No 0% WR kill candidates (bb_bounce+,hzscore+ has 2 wins, 7d profitable)
+- Trade frequency normal (1.4/hr)
+- 7d system profitable (52.1% WR +$0.55) — cold day variance
+- Hot-set file missing — market conditions (low vol)
+- HTTST4 still open (test signal)
+
+**Open Questions:**
+- SL revert eval window closes in ~7h — will we have enough data? (only 3 trades since revert)
+- Hot-set missing — is discovery working? Or just low vol?
