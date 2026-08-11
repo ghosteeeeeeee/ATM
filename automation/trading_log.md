@@ -5402,3 +5402,30 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Cold day = normal variance after 15 green days
 
 **Open Questions:** None — system healthy
+
+## [2026-08-11 03:25] Hourly Analysis
+
+**Trades:** 0 closed last hour | 58 in 24h (-$0.33, 41.4% WR)
+**Open:** 2
+
+**24h by close reason:**
+- atr_sl_hit: 25T -$1.14 (43.1% — above 40% threshold, trending up)
+- profit-monster-trail: 23T +$1.13 (sole winning exit)
+- cut-loser-CL-trail: 9T -$0.43
+
+**Diagnosis:**
+1. Entry quality: 0 trades last hour — can't assess
+2. SL behavior: 43.1% (just above 40%, trending up from 35.8%→38.3%→43.1%)
+3. Signal quality: bb_bounce+,hzscore+ 16T 31.3% WR — cold today but 7d profitable
+4. Trade frequency: 1.25/hr — very low, calm period
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 43.1% barely above threshold — trailing distance widened to 0.60% at 22:00 (6h ago), needs 24h+ evaluation
+- No 0% WR signals with 3+ trades to kill
+- Trade frequency very low (1.25/hr)
+- 7d still positive ($0.40, 51.8% WR)
+- Only 2 open trades — system calm
+
+**Open Questions:** None — quiet period, evaluating trailing distance change
