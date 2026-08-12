@@ -21,22 +21,17 @@ from coin_tracker_schema import (
     init_db, ensure_coin_table, upsert_registry, write_event, write_score,
     update_registry_health, get_all_coins, COIN_TRACKER_DB
 )
+from coin_tracker_score import (
+    score_coin, health_from_score, WEIGHTS,
+    ema as _ema, rsi as _rsi, macd as _macd, atr as _atr,
+    spread_bps as _spread_bps, volume_trend as _volume_trend,
+    score_momentum as _score_momentum, score_volume as _score_volume,
+    score_volatility as _score_volatility, score_spread as _score_spread,
+    score_signals as _score_signals, score_regime as _score_regime,
+)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-MIN_SPREAD_BPS = 500        # Coins with spread > 50% are dead/illiquid
 MIN_PRICE = 1e-12           # Skip zero/near-zero prices
-MAX_EVENTS_PER_COIN = 5000  # Prune threshold per coin table
-CANDLES_LOOKBACK = 24 * 3600  # 24h of candle data
-
-HEALTH_STATES = ('dead', 'cold', 'warm', 'hot', 'setup', 'ready')
-WEIGHTS = {
-    'momentum': 0.25,
-    'volume': 0.25,
-    'volatility': 0.15,
-    'spread': 0.15,
-    'signals': 0.10,
-    'regime': 0.10,
-}
 
 # ── Data readers ───────────────────────────────────────────────────────────────
 
