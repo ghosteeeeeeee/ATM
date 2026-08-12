@@ -147,15 +147,15 @@ def collect():
 
     try:
         for symbol, mid_price in all_mids.items():
-            try:
-                price = float(mid_price) if mid_price else 0
-            except (ValueError, TypeError):
-                skipped += 1
-                continue
+        try:
+            price = float(mid_price) if mid_price else 0
+        except (ValueError, TypeError):
+            skipped += 1
+            continue
 
-            if price < MIN_PRICE:
-                skipped += 1
-                continue
+        if price < MIN_PRICE or price == 0:
+            skipped += 1
+            continue
 
             meta = universe_map.get(symbol, {})
             if meta.get('isDelisted', False):
