@@ -92,7 +92,7 @@ def export_all():
             table = _table_name(sym)
             try:
                 events = conn.execute(
-                    f"SELECT ts, price, vol_1m, health, health_score, signal_type, signal_confidence "
+                    f"SELECT ts, price, vol_1h, health, health_score, signal_type, signal_confidence "
                     f"FROM {table} WHERE price IS NOT NULL ORDER BY ts DESC LIMIT 1440"
                 ).fetchall()
                 if events:

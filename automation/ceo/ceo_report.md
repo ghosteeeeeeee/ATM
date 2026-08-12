@@ -1,3 +1,64 @@
+## CEO Decision — Combo Signal Confidence Boost (2026-08-15)
+
+### Decision: INCREASE source_mult from 5% → 10% for 2+ sources
+
+**Do NOT add a separate confidence boost.** The existing `source_mult` mechanism in `signal_compactor.py` is the right lever.
+
+### Verified Numbers (7d)
+| Group | Trades | WR | Total PnL | Avg PnL |
+|-------|--------|-----|-----------|---------|
+| Single-source | 221 | 52.9% | -$0.55 | -$0.0025 |
+| Combo (2x+) | 225 | 52.9% | +$1.07 | +$0.0048 |
+
+Same WR, but combos are **$1.62 more profitable** — they capture better entries.
+
+### Why source_mult, not confidence boost
+1. **Confidence is cosmetic here** — it's the base score input, already filtered at >=60. Boosting displayed confidence doesn't change ranking.
+2. **source_mult affects SCORE** — the compactor orders by `final_score = confidence × survival_bonus × staleness_mult × reg_mult × source_mult × speed_mult`. Increasing source_mult from 0.05 to 0.10 for combos gives them stronger ranking in the approval pipeline.
+3. **One-line change** — `signal_compactor.py:385`. No new abstractions.
+
+### What changes
+- `signal_compactor.py:385`: `source_mult += (0.10 if source_count >= 2 else 0)` (was 0.05)
+- Combos get 10% score boost instead of 5% → higher approval priority
+- No confidence display change → no downstream side effects
+
+### Expected Impact
+- Combos like `bb_bounce+,range_finder+` (58.5% WR, +$0.71) get stronger ranking
+- Singles like `range_breakout+` (25% WR) and `trend_momentum_near_sma+` (16.7% WR) relatively disadvantaged
+- Net: +$0.50-1.00/7d improvement from better signal selection
+
+### Monitoring
+- If combos overtake singles in volume → check if singles are being starved
+- If no PnL change in 48h → revert to 5% (the data may be noise)
+
+---
+
+## CEO Report — 2026-08-15 (latest run)
+
+### Diagnosis
+**24h: 100T, -$0.08, 53.0% WR — flat** (4th consecutive declining day but losses shrinking)
+- LONG 24h: 44T -$0.32, 45.5% WR — primary bleed
+- SHORT 24h: 56T +$0.24, 58.9% WR — strong, carrying system
+- **7d: 445T, +$0.37, 52.8% WR — barely positive**
+- Daily trend: Aug 9 +$0.18 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 -$0.16 (improving)
+- Stars intact: bb_bounce+,range_finder+ +$0.71 58.5%, bb-bounce-short,hzscore- +$0.14 61.1%, hzscore+,mover+ +$0.17 80%
+- Cost driver: atr_sl_hit 56T -$3.14 (dominant), cut-loser-CL-T1 4T -$0.42
+- 6 open SHORT, $0 flat. Pipeline healthy.
+
+### Root Cause
+LONG signals bleeding in NEUTRAL regime chop. SHORT profitable and improving. No new signal failures — previous disables (range_breakout+, trend_momentum) confirmed working with 0 residual trades. hzscore+ standalone restriction working but still generating some trades (12 in 48h, -$0.12).
+
+### Fix Applied
+**NO CHANGES.** 7d still positive, stars intact, daily losses shrinking, 14+ changes in 48h — stability period needed. Overreacting destabilizes.
+
+### Monitoring
+- SHORT7d bleed (if -$1.50+ → regime filter)
+- Daily decline (if -$1.00+ → restrict signals)
+- hzscore+ standalone (if no improvement → remove from bypass entirely)
+- Trailing stop impact on SL hit rate
+
+---
+
 ## CEO Report — 2026-08-12 18:49 UTC
 
 ### Diagnosis

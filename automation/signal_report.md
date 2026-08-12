@@ -1,5 +1,5 @@
 # Signal Performance Report
-**Generated:** 2026-08-12 13:48 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-12 18:00 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
 - **Total trades (all time):** 820 | **WR:** 45.2% | **PnL:** -18.68%
@@ -11,16 +11,18 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb_bounce+ | LONG | — | —% | — | 19 | 57.9% | +1.55 | ENABLED |
+| accel-300- | SHORT | 12 | 83.3% | +0.43 | 15 | 73.3% | +0.36 | ENABLED |
+| bb_bounce+ | LONG | — | —% | — | 19 | 57.9% | +0.16 | ENABLED |
+| range_breakout_short | SHORT | 3 | 100% | +0.11 | 3 | 100% | +0.11 | ENABLED |
 
 ---
 
-## LOSERS (WR < 30%, PnL < -2%)
+## LOSERS (WR < 30%, PnL < -0.10)
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| range_breakout+ | LONG | 2 | 0.0% | -1.61 | 8 | 25.0% | -4.02 | DISABLED | **DISABLE** |
-| trend_momentum_near_sma+ | LONG | — | —% | — | 6 | 16.7% | -2.93 | DISABLED | **DISABLE** |
+| range_breakout+ | LONG | — | —% | — | 8 | 25.0% | -0.41 | DISABLED | Already killed |
+| hzscore+ | LONG | — | —% | — | 7 | 28.6% | -0.11 | DISABLED | Already killed |
 
 ---
 
@@ -28,16 +30,15 @@
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| range_breakout- | SHORT | 16 | 50.0% | -1.39 | ENABLED | Borderline |
-| hzscore+ | LONG | 12 | 41.7% | -1.09 | ENABLED | Borderline |
-| accel-300- | SHORT | 3 | 33.3% | -0.60 | ENABLED | Needs more data |
-| hzscore- | SHORT | 16 | 50.0% | -0.39 | ENABLED | Borderline |
+| range_breakout- | SHORT | 20 | 45.0% | -0.12 | ENABLED | Borderline — near breakeven |
+| hzscore- | SHORT | 14 | 50.0% | -0.05 | ENABLED | Near breakeven |
+| trend_momentum_near_sma+ | LONG | 3 | 33.3% | -0.02 | ENABLED | Insufficient data |
 
 ---
 
 ## DISABLED BUT GOOD (candidates for re-enabling)
 
-None found. Top performers are already enabled.
+None. Top performers already active.
 
 ---
 
@@ -49,13 +50,12 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[DISABLE] range_breakout+ LONG** — WR=25.0%, PnL=-4.02% over 8 trades (24h).
-2. **[DISABLE] trend_momentum_near_sma+ LONG** — WR=16.7%, PnL=-2.93% over 6 trades (24h).
-3. **[WATCH] range_breakout- SHORT** — WR=50.0%, PnL=-1.39% over 16 trades. Monitor next cycle.
-4. **[WATCH] hzscore+ LONG** — WR=41.7%, PnL=-1.09% over 12 trades. Monitor next cycle.
-5. **[WATCH] accel-300- SHORT** — WR=33.3%, PnL=-0.60% over 3 trades. Monitor next cycle.
-6. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-0.39% over 16 trades. Monitor next cycle.
-7. **[KEEP] 1 winning combos** — bb_bounce+. LONG side dominant.
+1. **[NO ACTION] range_breakout+ LONG** — Already disabled. 25% WR, -$0.41 (24h).
+2. **[NO ACTION] hzscore+ LONG** — Already disabled. 28.6% WR, -$0.11 (24h).
+3. **[WATCH] range_breakout- SHORT** — 45% WR, -$0.12 over 20 trades. Near breakeven — keep enabled but monitor.
+4. **[KEEP] accel-300- SHORT** — Strong performer: 73.3% WR, +$0.36 (24h). Keep enabled.
+5. **[KEEP] bb_bounce+ LONG** — Solid: 57.9% WR, +$0.16 over 19 trades. Keep enabled.
+6. **[KEEP] range_breakout_short SHORT** — 100% WR (3 trades). Too small sample but promising.
 
 ---
 

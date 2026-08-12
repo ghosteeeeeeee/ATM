@@ -6545,3 +6545,24 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None — all metrics within expected range for stability period
+
+## [2026-08-12 21:00] Hourly Analysis
+
+**Trades:** 7 closed (7 wins, 0 losses)
+**PnL:** +$0.36 (100% WR) — strongest hour today
+
+**Changes:**
+1. None — system performing well
+
+**No Change Needed:**
+- All 7 trades exited via profit-monster-trail (accel-300- dominated)
+- ATR SL 42.6% (above 40% threshold but trail compensating $2.55 vs -$2.47)
+- No 0% WR kill candidates (no signal with 3+ losing trades)
+- Trade frequency normal (3-4/hr, not overtrading)
+- Dead signals clearing residual as expected
+- One change already today (range_breakout confidence)
+- 7d trend flat +$0.04, no deterioration
+
+**Open Questions:**
+- hzscore+ 28.6% WR -$0.11 (7 trades) — monitor next 2h, if 3+ consecutive losses consider kill
+- 7d barely flat — track if trend continues into tomorrow

@@ -316,3 +316,7 @@
   WHY: 1 trade last hour (BCH SHORT atr_sl_hit -$0.03). 24h flat: 96T 50% WR -$0.24. ATR SL 44.8% (above threshold but profit-monster-trail compensating). CEO stability period active.
   BY: auto_1hr
   NEXT: Re-run at 21:00 UTC
+[2026-08-12 21:00] auto_1hr: NO CHANGES
+  WHY: 7T last hour (7W +/usr/bin/bash.36). Strongest hour today — all profit-monster-trail exits. 24h 101T ~50% WR -/usr/bin/bash.24. ATR SL 42.6% (borderline, trail compensating .55 vs -.47). No 0% WR kill candidates. hzscore+ weakest active (28.6% WR -/usr/bin/bash.11) but not kill threshold. Trade freq 3-4/hr normal. Dead signals clearing residual. One change already today. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 22:00 UTC

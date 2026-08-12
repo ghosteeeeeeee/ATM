@@ -124,7 +124,7 @@ def ensure_coin_table(symbol, conn=None):
             _TABLE_EXISTS_CACHE.add(table)
             return table
         conn.execute(f"""
-            CREATE TABLE {table} (
+            CREATE TABLE IF NOT EXISTS {table} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ts INTEGER NOT NULL,
                 event_type TEXT NOT NULL,
@@ -150,9 +150,9 @@ def ensure_coin_table(symbol, conn=None):
                 notes TEXT
             )
         """)
-        conn.execute(f"CREATE INDEX idx_{table}_ts ON {table}(ts)")
-        conn.execute(f"CREATE INDEX idx_{table}_health ON {table}(health)")
-        conn.execute(f"CREATE INDEX idx_{table}_event ON {table}(event_type)")
+        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
+        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_health ON {table}(health)")
+        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_event ON {table}(event_type)")
         _TABLE_EXISTS_CACHE.add(table)
         return table
     # Standalone mode — use context manager
@@ -164,7 +164,7 @@ def ensure_coin_table(symbol, conn=None):
             _TABLE_EXISTS_CACHE.add(table)
             return table
         db.execute(f"""
-            CREATE TABLE {table} (
+            CREATE TABLE IF NOT EXISTS {table} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ts INTEGER NOT NULL,
                 event_type TEXT NOT NULL,
@@ -190,9 +190,9 @@ def ensure_coin_table(symbol, conn=None):
                 notes TEXT
             )
         """)
-        db.execute(f"CREATE INDEX idx_{table}_ts ON {table}(ts)")
-        db.execute(f"CREATE INDEX idx_{table}_health ON {table}(health)")
-        db.execute(f"CREATE INDEX idx_{table}_event ON {table}(event_type)")
+        db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
+        db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_health ON {table}(health)")
+        db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_event ON {table}(event_type)")
         db.commit()
         _TABLE_EXISTS_CACHE.add(table)
     return table

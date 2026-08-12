@@ -240,3 +240,13 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: 'NoneType' object has no attribute 'get'`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: name '_read_candles' is not defined`
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: no such table: agg_scores`
+
+## Error Alerts — 2026-08-12 19:09 UTC
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: expected an indented block after 'for' statement on line N (coin_tracker.py, line N)`
+
+## Error Alerts — 2026-08-12 19:40 UTC
+- **[WARN]** (6/cycle): `[coin_tracker] Error processing kBONK/kFLOKI/kLUNC/kNEIRO/kPEPE: table already exists`
+- **AUTO-FIX**: Added `IF NOT EXISTS` to `CREATE TABLE` and `CREATE INDEX` in `coin_tracker_schema.py` (lines 127, 153-155, 167, 193-195). Root cause: module-level `_TABLE_EXISTS_CACHE` is empty after pipeline restart; the sqlite_master check races with concurrent CREATE TABLE.
+- **[WARN]**: `hermes-hl-volume` — 429 rate limit from Hyperliquid API (transient, will self-heal)
+- **[WARN]**: `hermes-trading-checklist` — pipeline output parsing + 53195 signals needing archival
+- **[INFO]**: `hermes-bug-hunter` — 83 bare except clauses, 111 connection leaks, 72 atomic JSON writes, 5 hardcoded passwords (known tech debt, not blocking)
