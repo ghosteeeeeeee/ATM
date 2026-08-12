@@ -35,6 +35,15 @@ MIN_PRICE = 1e-12           # Skip zero/near-zero prices
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 SKIP_COINS = SHORT_BLACKLIST | LONG_BLACKLIST
 
+# Also filter test/fake coins (@ prefix, numeric-only names)
+def _is_fake_coin(symbol):
+    """Filter test tokens: @-prefixed, pure numeric, or too short."""
+    if '@' in symbol:
+        return True
+    if symbol.isdigit():
+        return True
+    return False
+
 # ── Data readers ───────────────────────────────────────────────────────────────
 
 def _read_cache():
@@ -150,6 +159,9 @@ def collect():
                 skipped += 1
                 continue
             if symbol in SKIP_COINS:
+                skipped += 1
+                continue
+            if _is_fake_coin(symbol):
                 skipped += 1
                 continue
 
