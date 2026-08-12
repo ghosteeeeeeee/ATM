@@ -59,7 +59,7 @@ TOUCH_WINDOW = 30          # bars to count touches
 
 # RSI parameters
 RSI_PERIOD = 14
-RSI_SHORT_MIN = 50         # SHORT: require RSI > 50 (not oversold)
+RSI_SHORT_MIN = 0           # SHORT: no RSI filter (breakout can happen at any RSI level, velocity filter is sufficient)
 
 # Velocity parameters
 VEL_5M_MAX = 0.1           # SHORT: block if vel > 0.1% (selling into rally = bad)
