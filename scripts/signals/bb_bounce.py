@@ -358,6 +358,30 @@ def scan_bb_bounce_signals(prices_dict):
                     _log(f"{token} {direction} BLOCKED vel={vel:+.3f}% (threshold +{MEAN_REVERSION_VEL_THRESHOLD_SHORT}%)")
                     continue
 
+        # Spike exhaustion filter: block entries after sharp 5m moves
+        try:
+            from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
+            from paths import HERMES_DATA
+            import sqlite3 as _sqlite3
+            _conn_se = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            _cur_se = _conn_se.cursor()
+            _cur_se.execute("""
+                SELECT price FROM (
+                    SELECT price, timestamp FROM price_history
+                    WHERE token = ?
+                    ORDER BY timestamp DESC LIMIT 6
+                ) sub ORDER BY timestamp ASC
+            """, (token.upper(),))
+            _prices_se = [r[0] for r in _cur_se.fetchall()]
+            _conn_se.close()
+            if len(_prices_se) >= 2 and _prices_se[0] > 0:
+                _vel_se = (_prices_se[-1] - _prices_se[0]) / _prices_se[0] * 100
+                if abs(_vel_se) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
+                    _log(f"{token} {direction} BLOCKED spike exhaustion vel_5m={_vel_se:+.3f}%")
+                    continue
+        except Exception:
+            pass
+
         # Confidence based on quality indicators
         base_conf = 60
         if sig['width'] < 0.03:  # Tight squeeze = stronger signal

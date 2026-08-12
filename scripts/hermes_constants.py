@@ -1070,6 +1070,10 @@ MEAN_REVERSION_VEL_ENABLED = True
 MEAN_REVERSION_VEL_THRESHOLD = 0.3   # block LONG if 15m velocity < -0.3% (price falling against LONG)
 MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.6  # block SHORT if 15m velocity > 0.6% (price spiking against SHORT — higher threshold because spikes reverse faster)
 
+# Spike exhaustion filter — block entries after sharp 5m moves (likely exhausted)
+# Applied to range_breakout, hzscore, bb_bounce to prevent chasing spikes
+SPIKE_EXHAUSTION_VEL_5M_THRESHOLD = 0.5  # block if abs(5m velocity) > 0.5% (spike exhaustion)
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period

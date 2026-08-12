@@ -170,3 +170,6 @@ ALERTS:
 ## Error Alerts — 2026-08-12 04:42 UTC
 - **[WARN]** (1x): `Signal accel_300: ERROR → ERROR: name '_get_1h_trend' is not defined`
 - **AUTO-FIX**: Added missing `_get_1h_trend()` function to `scripts/signals/accel_300.py` (copied from `range_breakout.py`). Syntax verified.
+
+## Error Alerts — 2026-08-12 05:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   Signal accel_300: TOK → TOK: name '_get_1h_trend' is not defined`

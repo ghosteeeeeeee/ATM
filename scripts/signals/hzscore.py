@@ -193,6 +193,29 @@ def run() -> int:
             if _conn:
                 _conn.close()
 
+        # Spike exhaustion filter: block entries after sharp 5m moves
+        try:
+            from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
+            from paths import HERMES_DATA
+            import sqlite3 as _sqlite3
+            _conn2 = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            _cur2 = _conn2.cursor()
+            _cur2.execute("""
+                SELECT price FROM (
+                    SELECT price, timestamp FROM price_history
+                    WHERE token = ?
+                    ORDER BY timestamp DESC LIMIT 6
+                ) sub ORDER BY timestamp ASC
+            """, (token.upper(),))
+            _prices2 = [r[0] for r in _cur2.fetchall()]
+            _conn2.close()
+            if len(_prices2) >= 2 and _prices2[0] > 0:
+                _vel_check = (_prices2[-1] - _prices2[0]) / _prices2[0] * 100
+                if abs(_vel_check) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
+                    continue  # spike exhaustion — skip
+        except Exception:
+            pass
+
         # Solo detection — apply stricter params when no co-signal
         solo = _is_solo(token, local_dir)
         tf_required = SOLO_REQUIRE_3TF if solo else REQUIRE_3TF

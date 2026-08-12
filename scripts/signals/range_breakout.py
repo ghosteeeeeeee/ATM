@@ -400,6 +400,29 @@ def scan_signals() -> int:
         if direction == 'LONG' and trend == 'BEARISH':
             continue
 
+        # Spike exhaustion filter: block entries after sharp 5m moves
+        try:
+            from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
+            from paths import HERMES_DATA
+            import sqlite3 as _sqlite3
+            _conn = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            _cur = _conn.cursor()
+            _cur.execute("""
+                SELECT price FROM (
+                    SELECT price, timestamp FROM price_history
+                    WHERE token = ?
+                    ORDER BY timestamp DESC LIMIT 6
+                ) sub ORDER BY timestamp ASC
+            """, (token_upper,))
+            _prices = [r[0] for r in _cur.fetchall()]
+            _conn.close()
+            if len(_prices) >= 2 and _prices[0] > 0:
+                _vel_5m = (_prices[-1] - _prices[0]) / _prices[0] * 100
+                if abs(_vel_5m) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
+                    continue  # spike exhaustion — skip
+        except Exception:
+            pass
+
         source = f'range_breakout{"+" if direction == "LONG" else "-"}'
 
         sid = add_signal(
