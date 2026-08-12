@@ -1,17 +1,17 @@
-## CEO Report — 2026-08-13 14:00 UTC
+## CEO Report — 2026-08-13 18:00 UTC
 
 ### Diagnosis
 24h: 41T, -$0.29, 43.9% WR (RED)
-7d: 382T, +$0.91, 52.6% WR (improved from +$0.70, solid)
+7d: 383T, +$0.93, 52.7% WR (improved from +$0.91, solid)
 
-Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 partial +$0.12 (1T)
+Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.14 (2T)
 
 ### Root Cause
-- **SHORT bleed persistent**: SHORT 7d 125T -$1.02 (49.6% WR) — regime-driven, star SHORT still profitable
-- **LONG solid**: LONG 7d 257T +$1.93, 54.1% WR
-- **cost drivers 7d**: atr_sl_hit 140T -$7.54 (dominant), cut-loser-CL-trail 29T -$1.08
-- **sole winning exit**: profit-monster-trail 140T +$6.91
-- trend_momentum_near_sma+ DISABLED (5T 0% WR -$0.40)
+- **SHORT bleed persistent**: SHORT 7d — many combos negative but star SHORT profitable. Regime-driven, not signal-driven.
+- **LONG solid**: LONG 7d profitable, bb_bounce+ combos dominating
+- **cost drivers 48h**: atr_sl_hit 42T -$1.81 (dominant), cut-loser-CL-trail 12T -$0.60
+- **sole winning exit**: profit-monster-trail
+- trend_momentum_near_sma+ DISABLED (5T 0% WR -$0.40, 1 residual open)
 
 ### Stars (7d, all intact)
 - bb_bounce+,range_finder+ LONG: 53T +$0.71, 58.5% WR
@@ -19,19 +19,20 @@ Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 partial 
 - bb-bounce-short,hzscore- SHORT: 17T +$0.12, 58.8% WR
 
 ### Fix Applied
-**NO CHANGES** — 7d improved to +$0.91, stars intact, system idle by design (NEUTRAL/REDUCE). Momentum fade filter deployed Aug13 — too early to evaluate. Overreacting destabilizes.
+**NO CHANGES** — 7d improved to +$0.93, stars intact, system idle by design (NEUTRAL/REDUCE). Hotset populated with 8 tokens post-compaction (accel-300- NEO SHORT first entry). Overreacting destabilizes.
 
 ### Monitoring
 - SHORT7d bleed (if -$1.50+ → consider regime filter for SHORT)
-- cut-loser-CL-T1 (7T -$0.53, watch for pattern)
-- Disk 84% (1% from WARN)
+- Disk 85% (at WARN threshold — pipeline.log 195M total)
+- trend_momentum_near_sma+ residual open trade (will close/age out)
+- Hotset: 8 tokens, accel-300- first firing since re-enable
 
 ### Verification
 - Pipeline healthy: 15+ active timers
 - Live trading: ON
-- Open: 7 trades (6 LONG +$0.03, 1 SHORT +$0.04)
-- Hotset: EMPTY (NEUTRAL regime, correct)
-- trend_momentum_near_sma+ DISABLED (0% WR)
+- Open: 7 trades (5 LONG +$0.06, 1 SHORT +$0.04, 1 paper)
+- Hotset: 8 tokens (NEO SHORT accel-300-, KAS SHORT hzscore-, SYRUP LONG bb_bounce+, ZRO LONG bb_bounce+, JUP SHORT hzscore-, HBAR LONG hzscore+, AVNT LONG hzscore+, WLFI SHORT hzscore-)
+- trend_momentum_near_sma+ DISABLED (0% WR, 1 residual open)
 
 ---
 

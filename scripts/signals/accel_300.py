@@ -725,8 +725,8 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             gap_bonus = max(0, abs(sig['gap_growth']) - 0.05) * 200
             gap_for_conf = abs(sig['gap_pct'])  # use absolute gap so SHORT earns bonus too
             min_gap_for_conf = ACCEL_300_MIN_GAP_PCT_LONG if direction == 'LONG' else ACCEL_300_MIN_GAP_PCT_SHORT
-            confidence = int(min(80, 65 + max(0, (gap_for_conf - min_gap_for_conf) * 80) + gap_bonus))
-            confidence = max(65, confidence)
+            confidence = int(min(85, 70 + max(0, (gap_for_conf - min_gap_for_conf) * 80) + gap_bonus))
+            confidence = max(70, confidence)
 
         # `_get_1m_prices` enforces freshness and returns the real latest
         # price_history point used by detection. Do not persist the separate
