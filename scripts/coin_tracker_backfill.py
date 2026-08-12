@@ -61,24 +61,20 @@ def backfill():
         write_conn = sqlite3.connect(COIN_TRACKER_DB, timeout=30)
         write_conn.execute("PRAGMA journal_mode=WAL")
 
-    total_events = 0
-    processed_tokens = 0
-    SAMPLE_EVERY = 4  # Write every 4th candle (20m resolution for chart)
+        total_events = 0
+        processed_tokens = 0
+        SAMPLE_EVERY = 4
 
-    try:
         for token in tokens:
-            # Skip blacklisted and fake coins
             if token in SKIP_COINS or _is_fake_coin(token):
                 continue
 
-            # Read all 5m candles for this token (oldest first for indicator calc)
-            # Read candles — cap at last 1000 for performance
             candles = candles_conn.execute(
                 "SELECT ts, open, high, low, close, volume FROM candles_5m "
                 "WHERE token=? ORDER BY ts DESC LIMIT 1000",
                 (token,)
             ).fetchall()
-            candles.reverse()  # oldest first for indicator calc
+            candles.reverse()
 
             if len(candles) < 2:
                 continue
@@ -86,14 +82,12 @@ def backfill():
             ensure_coin_table(token, conn=write_conn)
             events_written = 0
 
-            # Sliding window: compute indicators and write event for each candle
             closes = [c['close'] for c in candles]
             highs = [c['high'] for c in candles]
             lows = [c['low'] for c in candles]
             volumes = [c['volume'] for c in candles]
 
             for i in range(len(candles)):
-                # Sample: only write every Nth candle (but always write the last one)
                 if i % SAMPLE_EVERY != 0 and i != len(candles) - 1:
                     continue
 
@@ -104,13 +98,11 @@ def backfill():
                 if price <= 0:
                     continue
 
-                # Slice history up to this point
                 h_closes = closes[:i+1]
                 h_highs = highs[:i+1]
                 h_lows = lows[:i+1]
                 h_volumes = volumes[:i+1]
 
-                # Indicators
                 ema_9_val = ema(h_closes, 9) if len(h_closes) >= 9 else None
                 ema_20_val = ema(h_closes, 20) if len(h_closes) >= 20 else None
                 ema_50_val = ema(h_closes, 50) if len(h_closes) >= 50 else None
@@ -118,7 +110,6 @@ def backfill():
                 _, _, macd_hist_val = macd(h_closes) if len(h_closes) >= 35 else (None, None, None)
                 atr_14_val = atr(h_highs, h_lows, h_closes, 14) if len(h_closes) >= 15 else None
 
-                # Volume
                 vol_1h = sum(h_volumes[-12:]) if len(h_volumes) >= 12 else sum(h_volumes)
                 vol_avg = sum(h_volumes[-50:]) / min(50, len(h_volumes)) if h_volumes else None
                 vol_recent = h_volumes[-1] if h_volumes else 0
