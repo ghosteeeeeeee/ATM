@@ -1,5 +1,47 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-12: Daily Orchestrator Report (17:30 UTC)
+
+### Pipeline Status
+- **Portfolio**: 5 open (STBL, APT, KAS, BCH, ETH — all SHORT) | 95 closed today | **-1.30% PnL**
+- **24h**: 95T, -1.30% — choppy day (NEUTRAL regime)
+- **7d**: ~441T, +$0.14, 52.2% WR — barely positive, 4 consecutive declining days
+- **Market regime**: NEUTRAL (107/107 tokens)
+- **Open PnL**: ~$0 flat
+
+### CEO Directive
+**NO TRADING CHANGES.** Stability period. 14+ changes deployed Aug 13-15. Trailing stop fix (0.80%) needs more eval time. Overreacting destabilizes.
+
+### Team Activity (from kanban)
+- **signal_reporter**: No kills needed. Two worst performers (trend_momentum_near_sma+, range_breakout+) already killed. Key finding: bb_bounce+ LONG is the only consistent winner (57.9% WR, +$0.16, 19T). Most SHORT signals negative PnL despite neutral WR.
+- **health_monitor**: Two warnings — trades.json 0 bytes (false alarm: checking stale path at /root/.hermes/data/, real file at /var/www/hermes/data/ is 95KB). signals_runner slow (~5min/cycle, not crashing).
+- **auto_1hr**: System flat/stable. No changes needed for 24h+. ATR SL hit rate at 46.4% (above 40% threshold but profit-monster-trail compensating).
+- **upgrade_implementer**: Timed out (120s wrapper script timeout too short). FIXED: increased to 600s.
+
+### What Was Done (by orchestrator)
+1. **Fixed upgrade-implementer timeout** — wrapper script had `timeout 120` (2 min), agent needs ~5 min to read plans and generate audit. Changed to `timeout 600` (10 min).
+2. **Validated all systems** — pipeline running, all timers active, trades.json fresh, 6 open positions (max), no regressions.
+
+### Infrastructure Status
+- **Disk**: 78% (healthy)
+- **Failed services**: 5 non-critical (bug-hunter imports defunct ai_decider, hl-volume non-critical, mtf-macd-tuner non-critical, trading-checklist non-critical, upgrade-implementer fixed above)
+- **trades.json**: Healthy at /var/www/hermes/data/trades.json (95KB, 5 open trades). The 0-byte file at /root/.hermes/data/trades.json is a stale legacy path — not used by the system.
+
+### Signal Performance (24h)
+- **bb_bounce+ LONG**: 19T 57.9% WR +$0.16 — **sole winner**
+- **range_breakout- SHORT**: 20T 50% WR -$1.39 — borderline
+- **hzscore- SHORT**: 16T 50% WR -$0.39 — flat
+- **hzscore+ LONG**: 12T 41.7% WR -$1.09 — bleeding, monitor
+- **accel-300- SHORT**: 3T 33.3% WR -$0.60 — needs more data
+
+### Recommendations (for CEO)
+1. **No action needed** — system performing within normal NEUTRAL regime variance
+2. **Monitor**: SHORT 7d bleed -$0.87 (below -$1.50 threshold, no regime filter needed)
+3. **Monitor**: hzscore+ standalone already restricted to combo-only, working as intended
+4. **Next upgrade candidate**: weekly_signal_review.py (L2, MEDIUM) — weekly trend analysis catches signal decay faster than 6h checks
+
+---
+
 ## 2026-08-12: Daily Orchestrator Report
 
 ### Pipeline Status (05:25 UTC)
@@ -6445,3 +6487,41 @@ None — system stable, previous fixes settling in.
 - atr_sl_hit 7d trend 37.9% → 46.4% — monitor, if exceeds 55% consider SL adjustment
 - 7d degrading +$0.99 → +$0.04 — track if trend continues
 - hzscore+ bleeding — next run reassess
+
+## [2026-08-12 19:27] Hourly Analysis
+
+**Trades:** 5 closed (4 wins, 1 stale)
+**PnL:** +$0.14 (4 real trades, all profit-monster-trail)
+**24h:** 97T 51.4% WR -$0.34
+**7d:** 435T 52.0% WR +$0.04
+
+**Close Reasons (24h):**
+- profit-monster-trail: 49T (51%) +$2.29 (avg +$0.047)
+- atr_sl_hit: 42T (43.3%) -$2.44 (avg -$0.058)
+- cut-loser-CL-T1: 2T -$0.17
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- accel-300-: 9T 66.7%WR +$0.12 — strongest
+- bb_bounce+: 19T 57.9%WR +$0.16 — healthy
+- hzscore-: 16T 50%WR -$0.04 — flat
+- range_breakout-: 20T 45%WR -$0.12 — degraded (bad streak 11-12h, recovering)
+- hzscore+: 9T 44.4%WR -$0.04 — marginal
+- range_breakout+: 8T 25%WR -$0.41 — residual (DISABLED)
+- trend_momentum: 3T 33.3%WR -$0.02 — residual (DISABLED)
+
+**No Change Needed:**
+- No 0% WR kill candidates
+- Dead signals clearing residual, no action
+- ATR SL 43.3% borderline but trail compensating (49 trail wins vs 42 SL)
+- range_breakout- degraded but 45% WR not kill threshold
+- Daily flat -$0.34, no deterioration from -$0.33
+- One change already today (range_breakout confidence)
+
+**Open Questions:**
+- range_breakout- 6h trend: 8L streak in hours 11-12, recovering — monitor for 3 consecutive losing hours
+- 7d barely flat +$0.04 — track if trend continues
+- atr_sl_hit 43.3% — stable, no action needed
+
+### TEAM UPDATES
+- [2026-08-12 19:27] auto_1hr: NO CHANGES — 5T 4W +$0.14 flat. System healthy, trail compensating SL.
