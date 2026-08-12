@@ -1,3 +1,28 @@
+## CEO Report — 2026-08-12 12:54 UTC
+
+### Diagnosis
+**Verified DB numbers:**
+- **24h**: 84T, -$0.57, 47.6% WR — RED
+- **7d**: 415T, +$0.64, 52.8% WR — solid but declining
+- **Daily**: Aug 9 +$0.62 peak → Aug 12 -$0.37 (4 consecutive declines)
+- **LONG 24h**: 52T -$0.54 (46.2% WR — primary bleed)
+- **SHORT 24h**: 32T -$0.03 (50% WR — flat)
+- **SL hit rate**: Aug 9 16.9% → Aug 12 50.9% (climbing, entries whipsawed)
+- **PMtrail ratio**: 3.5:1 Aug 9 → 0.9:1 Aug 12 (compensation declining)
+- **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%
+- **range_breakout- SHORT**: 12T +$0.07 50% but last5 trades all losses (regime noise)
+
+### Root Cause
+SL hit rate climbed from 16.9% to 50.9% in 4 days. Entries are getting whipsawed — signal fires, trade enters, price moves against immediately. PMtrail compensation ratio declining (3.5:1 → 0.9:1). This is market-driven: NEUTRAL regime with choppy price action punishing mean-reversion entries.
+
+### Fix Applied
+**NO CHANGES.** All prior bleed sources correctly disabled (range_breakout+, trend_momentum, hzscore standalone). 7d still positive (+$0.64), stars intact, daily decline within normal variance for choppy regime. Overreacting destabilizes.
+
+### Verification
+Monitor: SL hit rate (if >55%持续 → investigate entry timing), LONG bleed (if -$1.00+ daily → restrict signals), range_breakout- SHORT (if 7d drops below 45% WR → disable).
+
+---
+
 ## CEO Report — 2026-08-12 12:20 UTC
 
 ### Diagnosis
