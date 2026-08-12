@@ -34,7 +34,7 @@ REGIME_SIGNALS = {
         'bb_bounce+,range_finder+',  # 60.4% WR all-time, star signal
         'trend_momentum_near_sma',
         'hzscore', 'range_finder',  # individual parts for single-source signals
-        'accel-300',  # SHORT: catches slow grinds down in quiet markets (top tokens APEX/STBL/BLUR all FLAT)
+        'accel-300', 'accel-300-',  # SHORT: catches slow grinds down in quiet markets
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
@@ -44,6 +44,8 @@ REGIME_SIGNALS = {
         'tl_break',
         'trend_momentum_near_sma',
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
+        'accel-300', 'accel-300-',  # SHORT: works in steady markets
+        'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
     },
     'HIGH': {
         # Breakout works in big moves
@@ -53,12 +55,13 @@ REGIME_SIGNALS = {
         'accel-300-vel',
         'continuation',  # standalone part
         'hzscore', 'range_finder',  # individual parts
+        'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
+        'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
     },
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
         'bb_bounce',
-        'hzscore', 'continuation', 'mover',  # individual parts
     },
 }
 
