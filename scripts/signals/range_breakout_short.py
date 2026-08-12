@@ -409,7 +409,7 @@ def scan_signals() -> int:
             if _conn_se:
                 _conn_se.close()
 
-        source = 'range_breakout-'
+        source = 'range_breakout_short'
 
         sid = add_signal(
             token=token_upper,
