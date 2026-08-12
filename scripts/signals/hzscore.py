@@ -225,7 +225,21 @@ def run() -> int:
                     pass  # non-fatal: proceed if parse fails
 
         # ── Build and emit signal ───────────────────────────────────────
-        z_conf = min(80, 45 + len(valid_z) * 8 + max(bullish_tfs, bearish_tfs) * 5)
+        # Dynamic confidence: z-score magnitude + TF agreement + speed
+        avg_z = abs(statistics.mean(valid_z))
+        z_bonus = min(15, int(avg_z * 8))         # 0.5→+4, 1.0→+8, 1.5→+12, 2.0→+15
+        tf_bonus = len(valid_z) * 3                 # 2→+6, 3→+9
+        agree_bonus = max(bullish_tfs, bearish_tfs) * 3  # 2→+6, 3→+9
+        speed_pct = 0
+        try:
+            from speed_tracker import get_token_speed
+            _spd = get_token_speed(token)
+            speed_pct = _spd.get('speed_percentile', 0) if _spd else 0
+        except Exception:
+            pass
+        speed_bonus = 5 if speed_pct >= 80 else 0
+        z_conf = min(88, 50 + z_bonus + tf_bonus + agree_bonus + speed_bonus)
+        z_conf = max(50, z_conf)
         z_tf_str = f'{max(bullish_tfs, bearish_tfs)}z{len(valid_z)}'
         rsi_val = mom.get('rsi_14')
 
