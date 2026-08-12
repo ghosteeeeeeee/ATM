@@ -6566,3 +6566,23 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - hzscore+ 28.6% WR -$0.11 (7 trades) — monitor next 2h, if 3+ consecutive losses consider kill
 - 7d barely flat — track if trend continues into tomorrow
+
+## [2026-08-12 22:00] Hourly Analysis
+
+**Trades:** 4 closed (1 win, 3 losses)
+**PnL:** -$0.16 (25% WR)
+
+**24h Summary:** ~100T, ~50% WR, -$0.24
+
+**Changes:**
+1. None — no action needed
+
+**No Change Needed:**
+- ATR SL 43.4% (above 40% threshold but profit-monster-trail compensating $2.45 vs $2.62 = net +$0.17)
+- No 0% WR kill candidates (range_breakout_short 0W 2L last hour but only 2T, below 3+ threshold)
+- Trade frequency normal (4/hr)
+- 7d flat +$0.36, no deterioration
+- One change already today (range_breakout confidence)
+
+**Open Questions:**
+- range_breakout_short monitor next 2h for consecutive losses

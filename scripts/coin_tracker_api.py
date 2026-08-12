@@ -85,9 +85,9 @@ def export_all():
 
         print(f'[coin_tracker_api] Exported {total} coins to coin_tracker_data.json')
 
-        # ── Per-coin history (top 50 only for dashboard) ──
+        # ── Per-coin history (all coins for sparklines) ──
         exported = 0
-        for coin in coins[:50]:
+        for coin in coins:
             sym = coin['symbol']
             table = _table_name(sym)
             try:

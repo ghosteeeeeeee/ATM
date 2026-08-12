@@ -345,3 +345,89 @@ Takes effect on next pipeline run. Combos get stronger score ranking in compacto
 
 ### Impact
 No trading impact. UI enhancement — coin icons improve visual identification on dashboard.
+
+---
+
+## CEO Report — 2026-08-12 (Weather Vane Spec Review)
+
+### Verdict: APPROVE WITH MODIFICATIONS
+
+The concept is sound — trade outcomes ARE a leading indicator of regime shifts, and slope-based scanners ARE lagging. But the spec's parameters are wrong and will render the system useless.
+
+### DB Verification (what actually happened)
+- **Last 20 SHORT trades:** 3 consecutive ATR SL losses at 20:03–20:19 (the cluster T cited), but 7 wins in the 10 before that = 70% WR.
+- **48h SHORT:** 68 trades, +$0.22, 57.4% WR — system is profitable on SHORT.
+- **7d SHORT:** 176 trades, -$0.59, 53.4% WR — mild bleed, not catastrophic.
+
+### Problem with the Spec
+
+**WR_THRESHOLD=30% will never trigger.** At 57% baseline WR, you need 7+ losses in 10 trades to hit 30%. That's a 0.6% probability event. The weather vane would be dead code.
+
+**The example (3 losses in 16 min) is normal variance.** At 57% WR, 3 losses in a row happens roughly every 15 trades. The spec misreads a cold streak as a regime shift.
+
+### What DOES work
+
+A **cluster-detection** approach, not a WR-threshold approach:
+- Trigger on **3+ losses in last 5 trades** within **30 minutes** — this catches real anomalies regardless of overall WR.
+- OR: WR < 40% with 5+ trades in 30min — a moderate threshold that can actually fire.
+
+### Modified Parameters
+
+```python
+DIRECTIONAL_OUTCOME_ENABLED = True
+DIRECTIONAL_OUTCOME_WINDOW = 5            # smaller window = faster detection
+DIRECTIONAL_OUTCOME_TIME_WINDOW = 30      # 30 min, not 60 (detect rapid clusters)
+DIRECTIONAL_OUTCOME_WR_THRESHOLD = 40     # higher threshold — can actually trigger
+DIRECTIONAL_OUTCOME_PENALTY = 0.7         # milder than 0.5 for first deploy
+DIRECTIONAL_OUTCOME_MIN_TRADES = 3        # 3+ losses to trigger, not 5
+DIRECTIONAL_OUTCOME_CONF_PENALTY = 10     # milder confidence hit
+```
+
+### Risk Assessment
+
+1. **Over-suppression:** At 40% WR with 5 trades in 30min, false triggers are possible but rare. The time window limits blast radius.
+2. **Missed entries:** If the vane suppresses SHORT and regime stays bearish, we lose valid trades. Mitigated by 0.7 penalty (not 0.0) — signals still fire, just ranked lower.
+3. **Implementation location:** signal_compactor.py is correct (scoring stage). decider_run.py addition is redundant — compactor scoring already gates execution. Skip the decider_run change.
+
+### Recommendation
+
+Deploy with modified params. Skip decider_run integration (compactor-only). Start with `DIRECTIONAL_OUTCOME_PENALTY = 0.7` (mild), evaluate 48h, tighten to 0.5 if effective.
+
+---
+
+## CEO Verdict — Weather Vane v2 (Component 2: Position Shield)
+
+### Verdict: APPROVE Component 1 (Signal Gate) — REJECT Component 2 (Position Shield) as spec'd
+
+### Component 1: Signal Gate — APPROVE
+
+The updated params (WINDOW=5, TIME_WINDOW=30min, WR_THRESHOLD=40, PENALTY=0.7, MIN_TRADES=3) are correct and match my earlier modifications. Ready to implement.
+
+### Component 2: Position Shield — REJECT (integration bug)
+
+**Critical flaw:** The spec claims updating `trailing_distance` in the `trades` table will tighten the trailing stop. **This is false.**
+
+`tpsl_utils.py` uses the GLOBAL constant `TRAILING_DISTANCE_PCT` (0.80%) everywhere:
+- Line 528: `trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)`
+- Line 551: `trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)`
+- Line 501: `eff_sl_pct = max(min(eff_sl_pct, TRAILING_DISTANCE_PCT), ATR_SL_MIN)`
+
+It never reads the per-trade `trailing_distance` column from the DB. Updating that field is a no-op — the guardian's next ATR cycle will use the same 0.80% from the global constant.
+
+**To make Position Shield work, you'd need to either:**
+1. Modify `tpsl_utils.py` to accept a per-trade trailing override (non-trivial, touches core SL logic)
+2. Temporarily mutate `TRAILING_DISTANCE_PCT` globally (dangerous — affects ALL positions, not just shielded ones)
+
+Neither is safe for first deploy.
+
+### Recommendation
+
+**Ship Component 1 only.** Component 2 is the right idea but needs a different implementation path:
+- Option A: Add a `trailing_distance_override` column and make `tpsl_utils` read it (proper fix, more work)
+- Option B: Skip the shield for now — the signal gate alone prevents NEW counter-regime entries, which is 80% of the value
+
+Ship the signal gate, evaluate 48h, then decide if the shield is worth the implementation cost.
+
+### 0.30% Trailing — Too Aggressive
+
+Even if the integration worked, 0.30% trailing on losing positions is too tight. Normal pullbacks in crypto are 0.3-0.5%. A position that's -0.5% and recovering would get stopped out at the first micro-bounce. 0.50% would be safer — still tighter than 0.80%, but avoids noise exits.

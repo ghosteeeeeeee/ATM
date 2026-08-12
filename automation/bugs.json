@@ -5,9 +5,11 @@
       "title": "MACD histogram returns macd_line instead of macd_line - signal_line",
       "severity": "CRITICAL",
       "status": "OPEN",
-      "files": ["coin_tracker_score.py"],
-      "symptom": "All macd_hist values in coin_tracker.db are wrong — equal to macd_line, not the actual histogram",
-      "root_cause": "macd() at line 64 returns (macd_line, None, macd_line) — third element should be macd_line - signal_line, but signal_line is never computed",
+      "files": [
+        "coin_tracker_score.py"
+      ],
+      "symptom": "All macd_hist values in coin_tracker.db are wrong \u2014 equal to macd_line, not the actual histogram",
+      "root_cause": "macd() at line 64 returns (macd_line, None, macd_line) \u2014 third element should be macd_line - signal_line, but signal_line is never computed",
       "fix": "Compute signal line as EMA of macd_line over `signal` period, then return (macd_line, signal_line, macd_line - signal_line)",
       "verified_by": "code review",
       "date_found": "2026-08-12",
@@ -18,10 +20,12 @@
     },
     {
       "id": "BUG-002",
-      "title": "Connection leaks in coin_tracker_backfill.py — no try/finally",
+      "title": "Connection leaks in coin_tracker_backfill.py \u2014 no try/finally",
       "severity": "CRITICAL",
       "status": "OPEN",
-      "files": ["coin_tracker_backfill.py"],
+      "files": [
+        "coin_tracker_backfill.py"
+      ],
       "symptom": "If backfill throws, candles_conn and write_conn leak (never closed)",
       "root_cause": "candles_conn (line 30) and write_conn (line 50) opened outside try/finally blocks",
       "fix": "Wrap backfill logic in try/finally to ensure both connections close",
@@ -30,31 +34,39 @@
       "date_fixed": null,
       "found_by": "agent",
       "git_commit": null,
-      "related_bugs": ["BUG-009"]
+      "related_bugs": [
+        "BUG-009"
+      ]
     },
     {
       "id": "BUG-003",
       "title": "SQLite connection leak in _read_regime()",
       "severity": "HIGH",
       "status": "OPEN",
-      "files": ["coin_tracker.py"],
+      "files": [
+        "coin_tracker.py"
+      ],
       "symptom": "Connection to signals_hermes.db leaked on query failure",
-      "root_cause": "_read_regime() opens conn at line 96 but close() at line 100 is only reached on success — exception skips close",
+      "root_cause": "_read_regime() opens conn at line 96 but close() at line 100 is only reached on success \u2014 exception skips close",
       "fix": "Wrap in try/finally: conn = sqlite3.connect(...); try: ... finally: conn.close()",
       "verified_by": "code review",
       "date_found": "2026-08-12",
       "date_fixed": null,
       "found_by": "agent",
       "git_commit": null,
-      "related_bugs": ["BUG-002"]
+      "related_bugs": [
+        "BUG-002"
+      ]
     },
     {
       "id": "BUG-004",
       "title": "Backfill spread uses wrong candle's highs/lows",
       "severity": "HIGH",
       "status": "OPEN",
-      "files": ["coin_tracker_backfill.py"],
-      "symptom": "Spread_bps values in backfilled events are incorrect — computed from candle i+1 range, not candle i",
+      "files": [
+        "coin_tracker_backfill.py"
+      ],
+      "symptom": "Spread_bps values in backfilled events are incorrect \u2014 computed from candle i+1 range, not candle i",
       "root_cause": "At iteration i, h_highs[-1] and h_lows[-1] are from candle i+1 (sliced array), but price is from candle i",
       "fix": "Use highs[i] and lows[i] instead of h_highs[-1] and h_lows[-1]",
       "verified_by": "code review",
@@ -69,8 +81,10 @@
       "title": "Silent except:pass hides real errors in batch readers",
       "severity": "HIGH",
       "status": "OPEN",
-      "files": ["coin_tracker.py"],
-      "symptom": "Schema changes, DB corruption, or permission errors silently swallowed — no log output",
+      "files": [
+        "coin_tracker.py"
+      ],
+      "symptom": "Schema changes, DB corruption, or permission errors silently swallowed \u2014 no log output",
       "root_cause": "_read_candles_batch (line 72) and _read_signals_batch (line 89) catch Exception and pass without logging",
       "fix": "Add logging: except Exception as e: print(f'[coin_tracker] WARN batch read: {e}')",
       "verified_by": "code review",
@@ -85,9 +99,11 @@
       "title": "ATR only uses first period candles instead of full range",
       "severity": "MEDIUM",
       "status": "OPEN",
-      "files": ["coin_tracker_score.py"],
+      "files": [
+        "coin_tracker_score.py"
+      ],
       "symptom": "ATR values are based on only the first 14 candles of data, not the full available range",
-      "root_cause": "atr() line 71 loops range(min(period, len(closes)-1)) — caps at period candles",
+      "root_cause": "atr() line 71 loops range(min(period, len(closes)-1)) \u2014 caps at period candles",
       "fix": "Loop over all candles: for i in range(1, len(closes)), compute TR for each, then average",
       "verified_by": "code review",
       "date_found": "2026-08-12",
@@ -101,7 +117,9 @@
       "title": "compute_coin_regime() biases to BEAR when EMA is None",
       "severity": "MEDIUM",
       "status": "OPEN",
-      "files": ["coin_tracker_score.py"],
+      "files": [
+        "coin_tracker_score.py"
+      ],
       "symptom": "Coins with <20 candles get unfair bearish regime because None comparisons count as bearish",
       "root_cause": "price > None evaluates to False in Python, incrementing bear counter",
       "fix": "Guard each EMA comparison: if ema_20 is not None: if price > ema_20: bull += 1 else: bear += 1",
@@ -117,7 +135,9 @@
       "title": "Global _TABLE_EXISTS_CACHE not process-safe",
       "severity": "MEDIUM",
       "status": "OPEN",
-      "files": ["coin_tracker_schema.py"],
+      "files": [
+        "coin_tracker_schema.py"
+      ],
       "symptom": "If two processes run coin_tracker simultaneously, they share stale cache and may skip table creation",
       "root_cause": "Module-level _TABLE_EXISTS_CACHE set persists across process boundaries via import cache",
       "fix": "Clear cache on each init_db() call, or use DB-level table existence checks instead of module cache",
@@ -133,7 +153,9 @@
       "title": "Backfill regime_conn not in try/finally",
       "severity": "LOW",
       "status": "OPEN",
-      "files": ["coin_tracker_backfill.py"],
+      "files": [
+        "coin_tracker_backfill.py"
+      ],
       "symptom": "Minor connection leak if regime query fails",
       "root_cause": "regime_conn at line 41 opened without try/finally",
       "fix": "Wrap in try/finally",
@@ -142,20 +164,79 @@
       "date_fixed": null,
       "found_by": "agent",
       "git_commit": null,
-      "related_bugs": ["BUG-002"]
+      "related_bugs": [
+        "BUG-002"
+      ]
     },
     {
       "id": "BUG-010",
       "title": "Per-coin JSON writes leave orphaned .tmp files on failure",
       "severity": "LOW",
       "status": "OPEN",
-      "files": ["coin_tracker_api.py"],
+      "files": [
+        "coin_tracker_api.py"
+      ],
       "symptom": "If os.replace() fails, .tmp files accumulate in coin_tracker_coins/",
       "root_cause": "No cleanup of .tmp files in exception path",
       "fix": "Add try/finally to remove .tmp on failure, or accept rare orphaned files",
       "verified_by": "code review",
       "date_found": "2026-08-12",
       "date_fixed": null,
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-011",
+      "title": "signal_compactor.py: PostgreSQL connections may leak on exception in _get_token_wr",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/signal_compactor.py"
+      ],
+      "symptom": "PostgreSQL connections opened at lines 51-52 and 89-90 may not close on exception",
+      "root_cause": "_get_token_wr (line 50-75) and _get_open_tokens (line 87-97) open psycopg2 connections but only call cur.close(); conn.close() in the happy path. If an exception occurs between open and close, the connection leaks.",
+      "fix": "Wrap in try/finally to ensure conn.close() is always called",
+      "verified_by": "code review",
+      "date_found": "2026-08-12",
+      "date_fixed": null,
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-012",
+      "title": "coin_tracker_schema.py: Duplicated table creation code in ensure_coin_table",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/coin_tracker_schema.py"
+      ],
+      "symptom": "Table creation SQL is duplicated between conn-provided (lines 126-156) and standalone (lines 166-196) paths",
+      "root_cause": "Two identical CREATE TABLE blocks exist \u2014 one for when conn is provided, one for standalone mode. If schema changes, both must be updated.",
+      "fix": "Extract table creation SQL into a shared constant or helper function",
+      "verified_by": "code review",
+      "date_found": "2026-08-12",
+      "date_fixed": null,
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-013",
+      "title": "hermes_constants.py: CONFLUENCE_REQUIRED and ACCEL_300_STANDALONE_BYPASS_ENABLED may be missing",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/hermes_constants.py",
+        "scripts/signal_compactor.py"
+      ],
+      "symptom": "signal_compactor.py imports CONFLUENCE_REQUIRED and ACCEL_300_STANDALONE_BYPASS_ENABLED from hermes_constants (line 26), but these are not visible in the first 732 lines of hermes_constants.py",
+      "root_cause": "False alarm \u2014 CONFLUENCE_REQUIRED (line 1258) and ACCEL_300_STANDALONE_BYPASS_ENABLED (line 1264) exist in hermes_constants.py beyond the truncation point",
+      "fix": "No fix needed \u2014 file was truncated at line 732 during audit",
+      "verified_by": "code review (partial \u2014 file truncated)",
+      "date_found": "2026-08-12",
+      "date_fixed": "2026-08-12",
       "found_by": "agent",
       "git_commit": null,
       "related_bugs": []
@@ -166,7 +247,9 @@
     "title": "one-line description",
     "severity": "CRITICAL|HIGH|MEDIUM|LOW",
     "status": "OPEN|IN_PROGRESS|FIXED|WONTFIX|REOPENED",
-    "files": ["affected files"],
+    "files": [
+      "affected files"
+    ],
     "symptom": "what was observed",
     "root_cause": "what was actually wrong",
     "fix": "what was changed",
@@ -175,6 +258,8 @@
     "date_fixed": "YYYY-MM-DD or null",
     "found_by": "agent|manual|monitoring",
     "git_commit": "commit hash or null",
-    "related_bugs": ["BUG-XXX if related"]
+    "related_bugs": [
+      "BUG-XXX if related"
+    ]
   }
 }

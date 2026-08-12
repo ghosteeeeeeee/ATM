@@ -63,7 +63,7 @@ def backfill():
 
         total_events = 0
         processed_tokens = 0
-        SAMPLE_EVERY = 4
+        SAMPLE_EVERY = 1  # every candle for smooth sparklines
 
         for token in tokens:
             if token in SKIP_COINS or _is_fake_coin(token):

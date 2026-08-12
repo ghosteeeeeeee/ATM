@@ -310,6 +310,12 @@ SIGNAL_SOURCE_BLACKLIST = {
     # Combos unaffected: hzscore+,return_exhaustion_long 58.3%, hzscore+,mover+ 80%,
     # bb_bounce+,hzscore+ 50%. validate_source() only blocks exact match for single-signal.
     'hzscore+',
+    # CEO 2026-08-15: BLOCK return_exhaustion- SHORT — ALL SL hits are losses (0% WR).
+    # Affected combos: hzscore-,return_exhaustion- 5T -$0.42, ma100-cross,return_exhaustion- 4T -$0.39,
+    # return_exhaustion- 2T -$0.23, return_exhaustion-,tl_break_short 1T -$0.12,
+    # return_exhaustion-,vortex_break_short 1T -$0.09. Total: 13T -$1.25.
+    # validate_source() blocks combos containing this as component.
+    'return_exhaustion-',
 }
 SERVER_NAME = 'Hermes'
 MAX_OPEN_POSITIONS = 6   # max open paper positions — diversified portfolio (was 3)

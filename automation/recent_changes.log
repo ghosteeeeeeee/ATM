@@ -325,3 +325,7 @@
   WHY: 7T last hour (7W +/usr/bin/bash.36). Strongest hour today — all profit-monster-trail exits. 24h 101T ~50% WR -/usr/bin/bash.24. ATR SL 42.6% (borderline, trail compensating .55 vs -.47). No 0% WR kill candidates. hzscore+ weakest active (28.6% WR -/usr/bin/bash.11) but not kill threshold. Trade freq 3-4/hr normal. Dead signals clearing residual. One change already today. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 22:00 UTC
+[2026-08-12 22:00] auto_1hr: NO CHANGES
+  WHY: 4T last hour (1W 3L -/usr/bin/bash.16). All 3 losses atr_sl_hit on choppy entries. 24h ~100T 50% WR -/usr/bin/bash.24. ATR SL 43.4% (above threshold but trail compensating .45 vs .62). No 0% WR kill candidates (range_breakout_short 0W 2L but only 2T). Trade freq normal. 7d flat +/usr/bin/bash.36. One change already today. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 23:00 UTC

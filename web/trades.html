@@ -345,9 +345,12 @@
         const globalIdx = start + i + 1;
         const dir = (t.direction || '').toUpperCase();
         const pnlUsdt = parseFloat(t.pnl_usdt) || 0;
-        const pnlPct  = parseFloat(t.pnl_pct)  || 0;
         const lev = t.leverage || 1;
         const size = t.amount_usdt || 50;
+        const entry = parseFloat(t.entry) || 0;
+        const exit = parseFloat(t.exit) || 0;
+        const rawPct = entry > 0 ? ((exit - entry) / entry) * 100 : 0;
+        const leveragedPct = dir === 'SHORT' ? rawPct * -lev : rawPct * lev;
         const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
         const closedTime = (t.closed || '').replace('T', ' ').slice(0, 19);
         return `<tr>
@@ -356,7 +359,7 @@
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${(t.entry||0).toFixed(4)}</td>
           <td>$${(t.exit||0).toFixed(4)}</td>
-          <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
+          <td class="${cls}">${leveragedPct>=0?'+':''}${leveragedPct.toFixed(2)}%</td>
           <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
           <td>${lev}x</td>
           <td>$${size.toFixed(1)}</td>
