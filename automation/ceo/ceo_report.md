@@ -1,40 +1,47 @@
-## CEO Report — 2026-08-15 (CEO run)
+## CEO Report — 2026-08-15 (CEO run — verification)
 
 ### Diagnosis
-**24h: 93T, -$0.33, 49.5% WR — RED** (5th consecutive decline)
-- Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 -$0.56 (peak-to-trough: -$0.94)
-- LONG 24h: 50T -$0.47 46% WR — primary bleed
-- SHORT 24h: 16T +$0.32 68.8% WR — strong
+**24h: 93T, -$0.34, 49.5% WR — RED** (4 consecutive declining days)
+- Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 -$0.48
+- LONG 24h: 47T -$0.29 46.8% WR — primary bleed
+- SHORT 24h: 46T -$0.05 52.2% WR — flat (improving from -$0.97 7d)
 
-**7d: 435T, +$0.04, 52.0% WR — barely positive**
+**7d: 437T, +$0.06, 51.9% WR — barely positive**
 - LONG 7d: 274T +$1.01 52.6% — solid
-- SHORT 7d: 161T -$0.97 50.9% — persistent bleed
+- SHORT 7d: 163T -$0.95 50.9% — persistent bleed (below -$1.50 threshold)
 
 **Stars 7d intact:**
 - bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5%
 - bb-bounce-short,hzscore- SHORT: 18T +$0.14 61.1%
 - hzscore+,mover+ LONG: 5T +$0.17 80%
 
-**Cost driver7d:** atr_sl_hit 168T -$9.46 (dominant). profit-monster-trail 171T +$8.30 (barely compensating). Net: +$1.40.
+**Cost drivers7d:** atr_sl_hit 168T -$9.46 (dominant). profit-monster-trail 172T +$8.38 (sole profit). Net SL trail: -$1.08.
 
 ### Root Cause
-**Trailing stop too tight** — TRAILING_DISTANCE_PCT 0.60% causes premature exits on normal pullbacks. 168 SL hits7d averaging -$0.56 each. Daily SL hit rate climbing: Aug 9 11 hits → Aug 12 34 hits. Trades can't breathe through volatility to reach profit targets.
+**Trailing stop too tight** — already diagnosed and fixed this run. TRAILING_DISTANCE_PCT widened 0.60%→0.80%, TRAILING_ACTIVATION_PCT 0.35%→0.40%. 168 SL hits7d averaging -$0.56 each. Fix needs 24-48h evaluation.
 
 ### Fix Applied
 - **TRAILING_DISTANCE_PCT: 0.60% → 0.80%** — wider trail, fewer premature exits
-- **TRAILING_ACTIVATION_PCT: 0.35% → 0.40%** — trailing engages slightly later, lets winners run longer
+- **TRAILING_ACTIVATION_PCT: 0.35% → 0.40%** — trailing engages later, lets winners run
 - Commit: 1534a8b
 
-### Verification (next run)
-- Monitor: daily PnL (if improves from -$0.33→flat, trailing was the issue)
-- Monitor:7d PnL (if improves from +$0.04→+$0.50+, fix working)
-- Stars should remain intact (independent of trailing params)
+### Verification Status
+- Trailing fix deployed, needs 24-48h evaluation window
+- SHORT side improving: Aug 12 +$0.03 (first positive day after -$0.97 7d bleed)
+- Stars intact — core signals unaffected by trailing params
+- All disabled signals confirmed (range_breakout+, trend_momentum)
+- hzscore+ combo-only restriction working (0 solo trades post-restriction)
+- 7 open $0 flat, pipeline healthy
 
-### Previous Fixes (all still active)
+### Decision: NO FURTHER CHANGES
+14+ changes deployed Aug 13-15. Stability period needed. Trailing stop fix is the highest-impact lever — let it settle before stacking more changes. Overreacting destabilizes.
+
+### Previous Fixes (all active)
 - RANGE_BREAKOUT_PLUS_ENABLED = False
 - trend_momentum_near_sma+ = False
 - hzscore+ removed from STANDALONE_BYPASS (combo-only)
 - BB_TOUCH_PCT tightened 0.20% → 0.15%
+- ACCEL_300 re-enabled (7T +$0.03 57.1% WR — working)
 - Pipeline healthy
 
 ---
