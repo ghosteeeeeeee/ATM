@@ -59,7 +59,7 @@ TOUCH_WINDOW = 30          # bars to count touches
 
 # RSI parameters
 RSI_PERIOD = 14
-RSI_SHORT_MIN = 0           # SHORT: no RSI filter (breakout can happen at any RSI level, velocity filter is sufficient)
+RSI_SHORT_MIN = 40          # SHORT: block if RSI below this (oversold = bounce risk)
 
 # Velocity parameters
 VEL_5M_MAX = 0.1           # SHORT: block if vel > 0.1% (selling into rally = bad)
@@ -358,6 +358,33 @@ def scan_signals() -> int:
         if trend == 'BULLISH':
             continue
 
+        # 5m candle momentum check: block SHORT after recent bullish spike
+        # Catches "spike then consolidate" pattern where velocity reads 0% but
+        # a strong bullish 5m candle happened recently (entry at spike high = loss)
+        try:
+            import sqlite3 as _sqlite3_candles
+            _conn_c = _sqlite3_candles.connect(_CANDLES_DB, timeout=5)
+            _cur_c = _conn_c.cursor()
+            _cur_c.execute("""
+                SELECT close, \"open\" FROM candles_5m
+                WHERE token = ? AND is_closed = 1
+                ORDER BY ts DESC LIMIT 3
+            """, (token_upper,))
+            _candle_rows = _cur_c.fetchall()
+            _conn_c.close()
+            for _cl, _op in _candle_rows:
+                if _op and _op > 0:
+                    _candle_chg = (_cl - _op) / _op * 100
+                    if _candle_chg > 0.2:  # bullish 5m candle > 0.2%
+                        _log(f'SKIP {token_upper}: recent bullish 5m candle +{_candle_chg:.3f}%')
+                        break
+            else:
+                _candle_chg = 0  # no break → continue to next filter
+            if _candle_chg > 0.2:
+                continue  # skip — recent bullish spike, SHORT would be chasing
+        except Exception:
+            pass
+
         # Velocity filter: block SHORT when price is rising (selling into rally)
         _conn_vel = None
         try:
@@ -369,7 +396,7 @@ def scan_signals() -> int:
                 SELECT price FROM (
                     SELECT price, timestamp FROM price_history
                     WHERE token = ?
-                    ORDER BY timestamp DESC LIMIT 6
+                    ORDER BY timestamp DESC LIMIT 12
                 ) sub ORDER BY timestamp ASC
             """, (token_upper,))
             _prices = [r[0] for r in _cur.fetchall()]
@@ -390,15 +417,15 @@ def scan_signals() -> int:
             from paths import HERMES_DATA as _HERMES_DATA_SE
             import sqlite3 as _sqlite3_se
             _conn_se = _sqlite3_se.connect(os.path.join(_HERMES_DATA_SE, 'signals_hermes.db'), timeout=10)
-            _cur = _conn_se.cursor()
-            _cur.execute("""
+            _cur_se = _conn_se.cursor()
+            _cur_se.execute("""
                 SELECT price FROM (
                     SELECT price, timestamp FROM price_history
                     WHERE token = ?
-                    ORDER BY timestamp DESC LIMIT 6
+                    ORDER BY timestamp DESC LIMIT 12
                 ) sub ORDER BY timestamp ASC
             """, (token_upper,))
-            _prices_se = [r[0] for r in _cur.fetchall()]
+            _prices_se = [r[0] for r in _cur_se.fetchall()]
             if len(_prices_se) >= 2 and _prices_se[0] > 0:
                 _vel_se = (_prices_se[-1] - _prices_se[0]) / _prices_se[0] * 100
                 if abs(_vel_se) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
