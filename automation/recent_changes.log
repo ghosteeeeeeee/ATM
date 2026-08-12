@@ -334,3 +334,7 @@
   WHY: 4T last hour (1W 3L -/usr/bin/bash.16). All 3 losses atr_sl_hit on choppy entries. 24h ~100T 50% WR -/usr/bin/bash.24. ATR SL 43.4% (above threshold but trail compensating .45 vs .62). No 0% WR kill candidates (range_breakout_short 0W 2L but only 2T). Trade freq normal. 7d flat +/usr/bin/bash.36. One change already today. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 23:00 UTC
+[2026-08-12 23:00] auto_1hr: NO CHANGES
+  WHY: 7T last hour (6W 1L +$0.35). 24h 100T 56% WR -$0.55. ATR SL 40% (at threshold, trail compensating net +$0.15). No 0% WR kill candidates (range_breakout+ 25%WR 8T, hzscore+ 25%WR 4T — below 3T last-hour threshold). Trade freq normal (3-8/hr). 7d flat +$0.36. One change already today. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 00:00 UTC
