@@ -227,7 +227,7 @@
             const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
             const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
             return `<tr>
-              <td>${t.coin}</td>
+              <td>${t.coin || '--'}</td>
               <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
               <td>$${entry.toFixed(4)}</td>
               <td>$${current.toFixed(4)}</td>
@@ -352,7 +352,7 @@
         const closedTime = (t.closed || '').replace('T', ' ').slice(0, 19);
         return `<tr>
           <td style="color:#444;font-size:0.75em">${globalIdx}</td>
-          <td>${t.coin}</td>
+          <td>${t.coin || '--'}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${(t.entry||0).toFixed(4)}</td>
           <td>$${(t.exit||0).toFixed(4)}</td>

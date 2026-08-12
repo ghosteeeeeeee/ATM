@@ -293,3 +293,14 @@ NO CHANGES. 7d barely positive, stars intact, SHORT below threshold, daily decli
 
 ### Verification
 Monitor: SHORT7d bleed (if -$1.50+ → regime filter), daily decline (if -$1.00+ → restrict signals), trailing stop impact on SL hit rate.
+
+---
+
+## CEO Report — 2026-08-15 (dashboard update acknowledged)
+
+### Changes
+- trades.html: removed defunct pump_hunter section, replaced zscore_pump with hot-set (mirrors signals.html), fixed t.coin fallback bug in open/closed trade rendering.
+- trades.html and signals.html now share identical hot-set content from `/data/signals.json`.
+
+### Impact
+No trading impact. UI-only change — hot-set data source was already signals.json, now consistent across both pages.
