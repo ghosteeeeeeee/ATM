@@ -98,8 +98,8 @@ def collect():
     now = int(time.time())
 
     cache = _read_cache()
-    all_mids = cache.get('allMids', {})
-    universe = cache.get('meta', {}).get('universe', [])
+    all_mids = cache.get('allMids') or {}
+    universe = (cache.get('meta') or {}).get('universe') or []
 
     if not all_mids or not universe:
         print('[coin_tracker] No data in hl_cache.json — skipping')
@@ -151,12 +151,16 @@ def collect():
             try:
                 # Ensure tables exist
                 ensure_coin_table(symbol, conn=write_conn)
-                upsert_registry(
-                    symbol,
-                    name=meta.get('name', symbol),
-                    max_leverage=meta.get('maxLeverage'),
-                    decimals=meta.get('decimals')
-                )
+                # Inline registry update (avoids new connection per call)
+                write_conn.execute("""
+                    INSERT INTO _coin_registry (symbol, name, first_seen, last_seen, max_leverage, decimals)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(symbol) DO UPDATE SET
+                        last_seen = excluded.last_seen,
+                        name = COALESCE(excluded.name, _coin_registry.name),
+                        max_leverage = COALESCE(excluded.max_leverage, _coin_registry.max_leverage),
+                        decimals = COALESCE(excluded.decimals, _coin_registry.decimals)
+                """, (symbol, meta.get('name', symbol), now, now, meta.get('maxLeverage'), meta.get('decimals')))
 
                 # Parse candles (newest first)
                 c5m = candles_5m.get(symbol, [])
@@ -273,7 +277,7 @@ def collect():
         if deleted:
             print(f'[coin_tracker] Pruned {deleted} old events')
 
-    print(f'[coin_tracker] Done: {processed} coins processed, {skipped} skipped, {errors} errors')
+    print(f'[coin_tracker] Done: {processed} coins processed, {skipped} skipped, {errors} errors', flush=True)
 
 if __name__ == '__main__':
     collect()
