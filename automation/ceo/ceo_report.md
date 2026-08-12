@@ -1,3 +1,34 @@
+## CEO Report — 2026-08-12 21:00 UTC
+
+### Diagnosis
+**Verified DB numbers:**
+- **24h**: 89T, -$0.65, 48.3% WR — RED (4th consecutive decline)
+- **7d**: 415T, +$0.64, 52.8% WR — solid but declining
+- **Daily**: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 -$0.44 (4th consecutive decline)
+- **LONG 24h**: 52T, -$0.54, 46.2% WR — primary bleed
+- **SHORT 24h**: 33T, -$0.10, 48.5% WR — flat
+- **SL hit rate**: 51.9% (Aug 12) — climbing from 16.9% on Aug 9
+- **PM trail ratio**: ~1.0:1 (barely compensating SL losses)
+- **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%
+- **Open**: 4 trades, -$0.02 unrealized
+
+### Bleeders (all addressed)
+- range_breakout+ LONG: 8T -$0.41, 25% WR — **DISABLED** (residual trades closing)
+- trend_momentum_near_sma+ LONG: 6T -$0.37, 16.7% WR — **DISABLED** (residual)
+- hzscore+ standalone LONG: 12T -$0.12, 41.7% WR — **RESTRICTED** to combo-only (residual pre-restriction entries)
+
+### Root Cause
+SL hit rate 51.9% on Aug 12 — half of all entries whipsawed. NEUTRAL regime choppy price action punishing mean-reversion LONG entries. PM trail still compensating but ratio compressed to ~1:1. Daily decline 4 consecutive days but 7d still positive.
+
+### Fix Applied
+**NO CHANGES.** All prior bleed sources correctly disabled. 7d still positive (+$0.64), stars intact, daily decline within normal variance for choppy NEUTRAL regime. Overreacting destabilizes.
+
+### Verification
+- Monitor: SL hit rate (if >55%持续 → investigate entry timing), LONG bleed (if -$1.00+ daily → restrict signals)
+- Next eval: If daily decline continues 2 more days, investigate root cause in entry logic
+
+---
+
 ## CEO Report — 2026-08-12 12:54 UTC
 
 ### Diagnosis

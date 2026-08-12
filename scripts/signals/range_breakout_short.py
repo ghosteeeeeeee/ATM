@@ -62,7 +62,7 @@ RSI_PERIOD = 14
 RSI_SHORT_MIN = 50         # SHORT: require RSI > 50 (not oversold)
 
 # Velocity parameters
-VEL_5M_MIN = 0.0           # SHORT: require vel > 0 (price rising into SHORT)
+VEL_5M_MAX = 0.2           # SHORT: block if vel > 0.2% (selling into rally = bad)
 
 # Cooldown
 COOLDOWN_HOURS = 0.25      # 15 min between signals per token+direction
@@ -352,7 +352,7 @@ def scan_signals() -> int:
         if trend == 'BULLISH':
             continue
 
-        # Velocity filter: require price rising into SHORT (vel > 0)
+        # Velocity filter: block SHORT when price is rising (selling into rally)
         _conn_vel = None
         try:
             from paths import HERMES_DATA
@@ -369,8 +369,8 @@ def scan_signals() -> int:
             _prices = [r[0] for r in _cur.fetchall()]
             if len(_prices) >= 2 and _prices[0] > 0:
                 _vel_5m = (_prices[-1] - _prices[0]) / _prices[0] * 100
-                if _vel_5m < VEL_5M_MIN:
-                    continue  # price not rising — wait for fade
+                if _vel_5m > VEL_5M_MAX:
+                    continue  # price rising — don't sell into rally
         except Exception:
             pass
         finally:

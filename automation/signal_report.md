@@ -1,70 +1,81 @@
 # Signal Performance Report
-**Generated:** 2026-08-12 07:50 UTC | **Period:** 6h / 24h / 7d
+**Generated:** 2026-08-12 13:48 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total closed trades:** 3,393 | **WR:** 41.6% | **PnL:** -$0.96
+- **Total trades (all time):** 820 | **WR:** 45.2% | **PnL:** -18.68%
+- **Date range:** 2026-07-29 → 2026-08-12
 
 ---
 
-## WINNERS (7d family level)
+## WINNERS (WR > 55%, PnL > 0)
 
-| Family | Trades | WR | PnL | Status |
-|--------|--------|-----|-----|--------|
-| bb_bounce | 172 | 56.4% | +$1.80 | ✅ System backbone |
-| hzscore | 91 | 54.9% | +$0.15 | ✅ Steady |
-| continuation | 12 | 41.7% | +$0.28 | ✅ Profitable |
-| range_breakout | 15 | 53.3% | -$0.01 | ➖ Neutral |
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| bb_bounce+ | LONG | — | —% | — | 19 | 57.9% | +1.55 | ENABLED |
 
-## WINNERS (24h individual signals)
+---
 
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| range_breakout- | SHORT | 5 | 100.0% | +$0.41 | ✅ Enabled |
-| bb_bounce+ | LONG | 19 | 57.9% | +$0.16 | ✅ Enabled |
+## LOSERS (WR < 30%, PnL < -2%)
 
-## LOSERS (7d family level)
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
+| range_breakout+ | LONG | 2 | 0.0% | -1.61 | 8 | 25.0% | -4.02 | DISABLED | **DISABLE** |
+| trend_momentum_near_sma+ | LONG | — | —% | — | 6 | 16.7% | -2.93 | DISABLED | **DISABLE** |
 
-| Family | Trades | WR | PnL | Status |
-|--------|--------|-----|-----|--------|
-| ma100-cross | 61 | 50.8% | -$0.44 | ❌ Per-dir disabled |
-| range_finder | 12 | 25.0% | -$0.33 | ❌ Per-dir disabled |
-| return_exhaustion | 17 | 52.9% | -$0.24 | ⚠️ Watch |
-| tl_break | 2 | 0.0% | -$0.16 | ❌ Dead (3 trades) |
+---
 
-## KILLED (executed this session)
+## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h WR | 24h PnL | Action |
-|--------|-----|--------|---------|--------|
-| trend_momentum_near_sma+ | LONG | 16.7% (6T) | -$0.37 | **KILLED** by T 13:05 UTC — all 3 tokens lost |
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| range_breakout- | SHORT | 16 | 50.0% | -1.39 | ENABLED | Borderline |
+| hzscore+ | LONG | 12 | 41.7% | -1.09 | ENABLED | Borderline |
+| accel-300- | SHORT | 3 | 33.3% | -0.60 | ENABLED | Needs more data |
+| hzscore- | SHORT | 16 | 50.0% | -0.39 | ENABLED | Borderline |
 
-## SIGNALS ALREADY DEAD (kill switches effective)
+---
 
-| Signal | Last Fire | Kill Date | Why |
-|--------|-----------|-----------|-----|
-| range_finder+ | Aug 10 | Aug 10 | Hotset: all EXPIRED, kill switch working |
-| trend_momentum_near_sma+ | Aug 12 | Aug 12 | 0% WR (6T), killed today |
-| inv-accel-300 | Aug 2 | Aug 4 | 11% WR, -$22.91, NEVER_REENABLE |
+## DISABLED BUT GOOD (candidates for re-enabling)
 
-## MARGINAL (24h, 30-50% WR)
+None found. Top performers are already enabled.
 
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| range_breakout+ | LONG | 6 | 33.3% | -$0.25 | ⚠️ Watch — was profitable on 7d |
-| hzscore+ | LONG | 11 | 36.4% | -$0.16 | ⚠️ 7d positive (+$0.15) |
-| hzscore- | SHORT | 12 | 50.0% | -$0.15 | ➖ Borderline |
+---
 
-## ISSUES
-- **No direction inversions** detected in 24h
-- **No active kills needed** — all clear losers already disabled
-- **range_breakout+** losing in 24h but was profitable on 7d — monitor, don't kill yet
-- **System is bb_bounce-dependent** — 56% of positive PnL comes from one signal family
+## SIGNAL INVERSIONS (24h)
 
-## 7d TOP COMBOS (signal_outcomes)
+**No inversions found.** All signals respect their direction labels.
 
-| Combo | Trades | WR | PnL |
-|-------|--------|-----|-----|
-| bb_bounce+,range_finder+ | 53 | 60.4% | +$0.82 |
-| bb_bounce+,hzscore+ | 34 | 50.0% | +$0.33 |
-| bb-bounce-short,hzscore- | 17 | 58.8% | +$0.17 |
-| hzscore+,mover+ | 5 | 80.0% | +$0.16 |
-| hzscore+,return_exhaustion_long | 12 | 58.3% | +$0.18 |
+---
+
+## RECOMMENDATIONS
+
+1. **[DISABLE] range_breakout+ LONG** — WR=25.0%, PnL=-4.02% over 8 trades (24h).
+2. **[DISABLE] trend_momentum_near_sma+ LONG** — WR=16.7%, PnL=-2.93% over 6 trades (24h).
+3. **[WATCH] range_breakout- SHORT** — WR=50.0%, PnL=-1.39% over 16 trades. Monitor next cycle.
+4. **[WATCH] hzscore+ LONG** — WR=41.7%, PnL=-1.09% over 12 trades. Monitor next cycle.
+5. **[WATCH] accel-300- SHORT** — WR=33.3%, PnL=-0.60% over 3 trades. Monitor next cycle.
+6. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-0.39% over 16 trades. Monitor next cycle.
+7. **[KEEP] 1 winning combos** — bb_bounce+. LONG side dominant.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-12 | 124def0 | CEO: restrict hzscore to combo-only (standalone bleeding 36.... |
+| 2026-08-12 | 5a72c64 | CEO: Disable range_breakout+ LONG (7T -$0.30 28.6% WR bleed)... |
+| 2026-08-12 | f53d4ac | signals: bump RANGE_BREAKOUT_CONF_BASE 65→70 to filter weak ... |
+| 2026-08-12 | 446e8ed | signals: fix _sqlite3 NameError in range_breakout_short spik... |
+| 2026-08-12 | dcb3090 | signals: add range_breakout_short (SHORT-specific with veloc... |
+| 2026-08-12 | 7da6787 | signals: remove dead market filter (velocity filter already ... |
+| 2026-08-12 | 593e67a | signals: add dead market filter to range_breakout (min 0.2% ... |
+| 2026-08-12 | e3010b3 | CEO: NO TRADING CHANGES — 2026-08-14 16:00 UTC |
+| 2026-08-12 | ba71af1 | signals: tighten BB_TOUCH_PCT 0.20->0.15, add staleness cons... |
+| 2026-08-12 | f8a3ff3 | signals: tighten BB_TOUCH_PCT 0.20->0.15, add staleness cons... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
