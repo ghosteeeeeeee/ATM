@@ -1032,7 +1032,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # Backtested and proven edge when firing solo.
 # Used in signal_compactor.py at 7 locations (confluence gate + preserve filter).
 STANDALONE_BYPASS_SIGNALS = (
-    'stop_hunt_reversal_long', 'range_breakout',
+    'stop_hunt_reversal_long', 'range_breakout', 'range_breakout_short',
     'spike_exhaustion_short', 'bb_bounce', 'hzscore',
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',

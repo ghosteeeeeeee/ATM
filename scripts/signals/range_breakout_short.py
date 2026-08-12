@@ -381,7 +381,9 @@ def scan_signals() -> int:
         _conn_se = None
         try:
             from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
-            _conn_se = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            from paths import HERMES_DATA as _HERMES_DATA_SE
+            import sqlite3 as _sqlite3_se
+            _conn_se = _sqlite3_se.connect(os.path.join(_HERMES_DATA_SE, 'signals_hermes.db'), timeout=10)
             _cur = _conn_se.cursor()
             _cur.execute("""
                 SELECT price FROM (

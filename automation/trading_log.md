@@ -6146,3 +6146,48 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - 24h WR dropped from 52.1% → 50% — slight drift, monitor
 - cut-loser-CL-T1 still negative at -$0.105 avg — need more data
+
+## [2026-08-12 07:26] Hourly Analysis
+
+**Trades:** 6 closed last hour (2W 4L -$0.11)
+**24h:** 67T 34W (50.7% WR) -$0.21 — flat/slightly negative
+**7d:** 407T 215W (52.8% WR) +$0.68 — profitable
+
+**Close Reasons (24h):**
+- profit-monster-trail: 33T (49.3%) +$1.57 avg +$0.048
+- atr_sl_hit: 28T (41.8%) -$1.51 avg -$0.054
+- cut-loser-CL-T1: 4T (6.0%) -$0.42 avg -$0.105
+- atr_tp_hit: 1T +$0.15
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- range_breakout-: 5T 5W (100%) +$0.41 — star
+- bb_bounce+: 19T 11W (57.9% WR) +$0.16 — solid
+- hzscore-: 11T 6W (54.5% WR) -$0.09 — minor bleed
+- hzscore+: 11T 4W (36.4% WR) -$0.16 — underperforming
+- range_breakout+: 5T 1W (20% WR) -$0.28 — BLEEDER (doesn't hit 0% WR kill threshold)
+- trend_momentum_near_sma+: 6T 1W -$0.37 — ALREADY KILLED (residual entries)
+
+**This Hour Breakdown:**
+- range_breakout+ (3): ALT -$0.07, CFX -$0.08, USUAL -$0.10 — ALL atr_sl_hit
+- accel-300- (1): SEI -$0.06 — atr_sl_hit (legit, ACCEL_300_MINUS_ENABLED=True per config)
+- hzscore+ (1): AVNT -$0.05 — atr_sl_hit
+- range_breakout- (1): SKR +$0.10 — profit-monster-trail
+- hzscore- (1): CC +$0.05 — profit-monster-trail
+
+**Changes:** None
+
+**No Change Needed:**
+- 6 trades last hour — normal freq (6/hr, well under 20/hour)
+- atr_sl_hit 41.8% — borderline but acceptable, avg loss small (-$0.054)
+- profit-monster-trail compensating ($1.57 vs $1.51 SL losses)
+- No 0% WR kill candidates (range_breakout+ has 1W, doesn't qualify)
+- accel-300- legitimately enabled per ACCEL_300_MINUS_ENABLED=True
+- trend_momentum_near_sma+ residual entries clearing
+- cut-loser-CL-T1 -$0.42 — CL_TRAIL_ENABLED=False already deployed, monitoring
+- 7d still profitable (52.8% WR +$0.68)
+
+**Open Questions:**
+- range_breakout+ bleeding at 20% WR — params tightened today, monitoring if improvement
+- hzscore+ underperforming at 36.4% WR — -$0.16 in 24h, near kill threshold
+- cut-loser-CL-T1 still at -$0.105 avg — need more data with CL_TRAIL_ENABLED=False
