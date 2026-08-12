@@ -59,6 +59,9 @@ def _read_cache():
 
 def _read_candles_batch(tokens, tf='5m', limit=200, conn=None):
     """Read recent candles for multiple tokens in one connection."""
+    VALID_TF = ('1m', '5m', '15m', '1h', '4h')
+    if tf not in VALID_TF:
+        raise ValueError(f'Invalid timeframe: {tf}')
     results = {}
     try:
         table = f'candles_{tf}'
@@ -192,17 +195,18 @@ def collect():
                         decimals = COALESCE(excluded.decimals, _coin_registry.decimals)
                 """, (symbol, meta.get('name', symbol), now, now, meta.get('maxLeverage'), meta.get('decimals')))
 
-                # Parse candles (newest first)
+                # Parse candles (newest first from DB, reverse to oldest first for indicators)
                 c5m = candles_5m.get(symbol, [])
                 c1h = candles_1h.get(symbol, [])
 
-                closes_5m = [c[4] for c in c5m if c[4]]
-                highs_5m = [c[2] for c in c5m if c[2]]
-                lows_5m = [c[3] for c in c5m if c[3]]
-                volumes_5m = [c[5] for c in c5m if c[5]]
+                # Reverse to oldest-first for indicator calculation (EMA, RSI, MACD, ATR all expect this)
+                closes_5m = [c[4] for c in reversed(c5m) if c[4]]
+                highs_5m = [c[2] for c in reversed(c5m) if c[2]]
+                lows_5m = [c[3] for c in reversed(c5m) if c[3]]
+                volumes_5m = [c[5] for c in reversed(c5m) if c[5]]
 
-                closes_1h = [c[4] for c in c1h if c[4]]
-                volumes_1h = [c[5] for c in c1h if c[5]]
+                closes_1h = [c[4] for c in reversed(c1h) if c[4]]
+                volumes_1h = [c[5] for c in reversed(c1h) if c[5]]
 
                 # ── Compute indicators ──
                 ema_9 = _ema(closes_5m, 9) if len(closes_5m) >= 9 else None
@@ -363,13 +367,16 @@ def collect():
     finally:
         write_conn.close()
 
-    # ── Prune old events (every 100 runs) ──
-    run_count = int(time.time() / 60)
-    if run_count % 100 == 0:
+    # ── Prune old events (every 24h) ──
+    from coin_tracker_schema import get_meta, set_meta
+    last_prune = get_meta('last_prune_ts')
+    now_ts = int(time.time())
+    if not last_prune or (now_ts - int(last_prune)) > 86400:
         from coin_tracker_schema import prune_old_events
         deleted = prune_old_events(days=30)
+        set_meta('last_prune_ts', str(now_ts))
         if deleted:
-            print(f'[coin_tracker] Pruned {deleted} old events')
+            print(f'[coin_tracker] Pruned {deleted} old events', flush=True)
 
     print(f'[coin_tracker] Done: {processed} coins processed, {skipped} skipped, {errors} errors', flush=True)
 

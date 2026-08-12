@@ -28,35 +28,38 @@ def backfill():
     init_db()
     _TABLE_EXISTS_CACHE.clear()  # Force table checks
 
-    candles_conn = sqlite3.connect(CANDLES_DB, timeout=10)
-    candles_conn.row_factory = sqlite3.Row
-
-    # Get all tokens with 5m candles
-    tokens = [r[0] for r in candles_conn.execute(
-        "SELECT DISTINCT token FROM candles_5m ORDER BY token"
-    ).fetchall()]
-    print(f'[backfill] {len(tokens)} tokens with 5m candles', flush=True)
-
-    # Read regime once
-    regime = 'NEUTRAL'
-    regime_conn = None
+    candles_conn = None
+    write_conn = None
     try:
-        regime_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
-        row = regime_conn.execute(
-            "SELECT regime FROM regime_log ORDER BY timestamp DESC LIMIT 1"
-        ).fetchone()
-        regime = row[0] if row else 'NEUTRAL'
-    except Exception:
-        pass
-    finally:
-        if regime_conn:
-            try:
-                regime_conn.close()
-            except Exception:
-                pass
+        candles_conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        candles_conn.row_factory = sqlite3.Row
 
-    write_conn = sqlite3.connect(COIN_TRACKER_DB, timeout=30)
-    write_conn.execute("PRAGMA journal_mode=WAL")
+        # Get all tokens with 5m candles
+        tokens = [r[0] for r in candles_conn.execute(
+            "SELECT DISTINCT token FROM candles_5m ORDER BY token"
+        ).fetchall()]
+        print(f'[backfill] {len(tokens)} tokens with 5m candles', flush=True)
+
+        # Read regime once
+        regime = 'NEUTRAL'
+        regime_conn = None
+        try:
+            regime_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            row = regime_conn.execute(
+                "SELECT regime FROM regime_log ORDER BY timestamp DESC LIMIT 1"
+            ).fetchone()
+            regime = row[0] if row else 'NEUTRAL'
+        except Exception:
+            pass
+        finally:
+            if regime_conn:
+                try:
+                    regime_conn.close()
+                except Exception:
+                    pass
+
+        write_conn = sqlite3.connect(COIN_TRACKER_DB, timeout=30)
+        write_conn.execute("PRAGMA journal_mode=WAL")
 
     total_events = 0
     processed_tokens = 0
@@ -171,9 +174,17 @@ def backfill():
             if processed_tokens % 20 == 0:
                 print(f'[backfill] {processed_tokens}/{len(tokens)} tokens, {total_events} events', flush=True)
     finally:
-        write_conn.commit()
-        write_conn.close()
-        candles_conn.close()
+        if write_conn:
+            try:
+                write_conn.commit()
+                write_conn.close()
+            except Exception:
+                pass
+        if candles_conn:
+            try:
+                candles_conn.close()
+            except Exception:
+                pass
 
     print(f'[backfill] Done: {processed_tokens} tokens, {total_events} events', flush=True)
 

@@ -105,13 +105,15 @@ def spread_bps(bid, ask, price):
     return ((ask - bid) / price) * 10000
 
 def volume_trend(volumes):
-    """Volume trend: positive = increasing. Returns -1 to 1."""
+    """Volume trend: positive = increasing. Returns -1 to 1.
+    Data is oldest-first (index 0 = oldest)."""
     if not volumes or len(volumes) < 2:
         return 0.0
     n = len(volumes)
     split = max(1, n // 3)
-    recent = sum(volumes[:split]) / split
-    earlier = sum(volumes[split:split * 2]) / max(1, split)
+    # Oldest-first: use last third as recent, middle third as earlier
+    recent = sum(volumes[-split:]) / split
+    earlier = sum(volumes[-split*2:-split]) / max(1, split)
     if earlier == 0:
         return 1.0 if recent > 0 else 0.0
     ratio = (recent - earlier) / earlier
