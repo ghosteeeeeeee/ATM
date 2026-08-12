@@ -214,9 +214,22 @@ def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=Non
         if momentum > 0.5: bull += 1
         elif momentum < -0.5: bear += 1
     
-    if bull >= 4:
+    # Price momentum (last 20 candles)
+    if len(closes) >= 20:
+        momentum20 = (closes[0] - closes[19]) / closes[19] * 100
+        if momentum20 > 1.0: bull += 1
+        elif momentum20 < -1.0: bear += 1
+    
+    # EMA 9 slope (short-term momentum)
+    if len(closes) >= 12 and ema_9:
+        ema_9_prev = ema(closes[1:11], 9) if len(closes) >= 11 else None
+        if ema_9_prev and ema_9 > ema_9_prev * 1.001: bull += 1
+        elif ema_9_prev and ema_9 < ema_9_prev * 0.999: bear += 1
+    
+    # 3+ bull signals = BULL, 3+ bear signals = BEAR, else NEUTRAL
+    if bull >= 3 and bull > bear:
         return 'BULL'
-    elif bear >= 4:
+    elif bear >= 3 and bear > bull:
         return 'BEAR'
     return 'NEUTRAL'
 
