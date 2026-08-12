@@ -1,3 +1,38 @@
+## CEO Report — 2026-08-14 14:30 UTC
+
+### Diagnosis
+System healthy, no changes needed. Verified DB: 24h 53T +$0.01 (52.8% WR — flat), 7d 394T +$1.01 (53.3% WR — solid). Daily recovery confirmed: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.23 (65% WR). 7 open positions +$0.03 unrealized. Disk 76%. Pipeline healthy, all timers active.
+
+**Aug 13 changes eval window closing today (14:00 cutoff).** No red flags. SHORT 7d still at -$0.80 but improving (was -$0.89 yesterday). Stars intact. BB_BOUNCE decay fix deployed (BB_TOUCH_PCT 0.20%→0.15%) — separate from Aug 13 eval, targeting signal quality.
+
+### Root Cause
+No active problem. The system is healthy:
+- Stars intact: 4 profitable combos all above threshold
+- Daily trend positive (Aug 12 +$0.23 65% WR recovery)
+- LONG 7d solid (+$1.81 54.3% WR)
+- SHORT bleed stabilizing (51.2% WR, was 49.6%)
+- 24h flat (no degradation)
+
+### Fix Applied
+No changes. Eval window for Aug 13 changes is closing — results are satisfactory (trailing stop fix confirmed working, momentum fade filter active, accel-300 re-enabled). BB_BOUNCE decay fix (BB_TOUCH_PCT) deployed separately.
+
+### Verification
+- Stars 7d: all 4 profitable combos intact (bb_bounce+,range_finder+ LONG $0.71 58.5%, bb-bounce-short,hzscore- SHORT $0.12 58.8%, hzscore+,mover+ LONG $0.17 80%, bb_bounce+,hzscore+ LONG $0.22 50%)
+- Cost drivers 48h: atr_sl_hit 46T -$2.10 (dominant), cut-loser-CL-T1 4T -$0.42, cut-loser-CL-trail 7T -$0.33
+- trend_momentum_near_sma+ DISABLED (5T 0% WR legacy, stays dead)
+
+### Goals
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Win rate | 53.3% (7d) | 54%+ | 72h |
+| SHORT PnL | -$0.80 (7d) | $0 | 72h |
+| Daily PnL | +$0.23 | +$0.10+ avg | 48h |
+
+### Next
+Monitor: SHORT7d bleed (if -$1.50+ → consider regime filter), bb_bounce decay fix impact, Aug 13 changes post-eval confirmation.
+
+---
+
 ## CEO Report — 2026-08-14 08:00 UTC
 
 ### Diagnosis
