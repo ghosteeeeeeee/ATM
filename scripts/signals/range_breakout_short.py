@@ -62,7 +62,7 @@ RSI_PERIOD = 14
 RSI_SHORT_MIN = 50         # SHORT: require RSI > 50 (not oversold)
 
 # Velocity parameters
-VEL_5M_MAX = 0.2           # SHORT: block if vel > 0.2% (selling into rally = bad)
+VEL_5M_MAX = 0.1           # SHORT: block if vel > 0.1% (selling into rally = bad)
 
 # Cooldown
 COOLDOWN_HOURS = 0.25      # 15 min between signals per token+direction
