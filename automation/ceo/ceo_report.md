@@ -1,3 +1,32 @@
+## CEO Report — 2026-08-12 10:00 UTC
+
+### Diagnosis
+**Verified DB numbers:**
+- **24h**: 69T, -$0.24, 50.7% WR — flat
+- **7d**: 410T, +$0.60, 52.7% WR — positive
+- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33, Aug 12 -$0.07 (improving)
+- **LONG7d**: 274T +$1.33 (53.3% WR — strong)
+- **SHORT7d**: 136T -$0.73 (51.5% WR — bleed improving from -$0.89)
+- **Stars intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%, range_breakout- 5T +$0.41 100%
+
+### Bleeders
+- range_breakout+ LONG: 7T -$0.30, 28.6% WR — **DISABLED** (this run)
+- hzscore+ standalone: 12T -$0.24, 33.3% WR — monitor (performs well in combos)
+- trend_momentum_near_sma+: DISABLED (legacy 0% WR)
+
+### Fix Applied
+**RANGE_BREAKOUT_PLUS_ENABLED = False** (line 1049 in hermes_constants.py)
+- Rationale: 7d bleed -$0.30, 28.6% WR while range_breakout- SHORT is profitable (5T +$0.41 100%)
+- Impact: eliminates worst LONG bleeder, preserves profitable SHORT breakout
+- Risk: minimal — range_breakout- SHORT unaffected, combo breakouts unaffected
+
+### Next Review
+- Monitor hzscore+ standalone (if no improvement → remove from STANDALONE_BYPASS)
+- SHORT7d bleed tracking (if >-$1.50 → consider regime filter)
+- 7 open positions, all manageable
+
+---
+
 ## CEO Report — 2026-08-12 07:49 UTC
 
 ### Diagnosis

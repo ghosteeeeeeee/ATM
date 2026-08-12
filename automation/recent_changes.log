@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-12 10:00] CEO: RANGE_BREAKOUT_PLUS_ENABLED = False (was True)
+  WHY: 7T -$0.30 (24h), 28.6% WR. 4/5 last trades hit atr_sl_hit. range_breakout- SHORT profitable (5T +$0.41 100%). LONG breakout bleeding, SHORT breakout working — disable LONG only.
+  BY: CEO run
+  DO NOT RE-ENABLE without 48h positive streak in backtest.
+
 [2026-08-12 03:26] auto_1hr: NO CHANGES
   WHY: 0T last hour (night session). 24h 45T ~22W (~49% WR) +$0.08 (flat). atr_sl_hit 37.8% (below 40% threshold). profit-monster-trail compensating (+$1.05 vs -$0.70). No 0% WR kill candidates. Trade freq 2.5/hr normal. System calm, no intervention needed.
   BY: auto_1hr
@@ -277,4 +282,7 @@
   BY: auto_1hr
 [2026-08-12 07:26] auto_1hr: NO CHANGES
   WHY: 6T last hour (2W 4L -$0.11). 24h 67T 34W (50.7% WR) -$0.21. atr_sl_hit 41.8% (borderline, avg loss $0.054 small). profit-monster-trail compensating ($1.57 vs $1.51 SL). range_breakout+ bleeding (5T 1W 20% WR -$0.28) but doesn't hit 0% WR kill threshold. accel-300- legit (ACCEL_300_MINUS_ENABLED=True per config). No 0% WR kill candidates. Trade freq 6/hr normal. 7d profitable (52.8% WR +$0.68). No param changes.
+  BY: auto_1hr
+[2026-08-12 08:27] auto_1hr: RANGE_BREAKOUT_CONF_BASE 65→70
+  WHY: range_breakout+ 28.6% WR -$0.30 in 24h. 4/5 last trades hit atr_sl_hit. Higher confidence floor filters weak entries. Params tightened today but still underperforming. commit f53d4ac.
   BY: auto_1hr

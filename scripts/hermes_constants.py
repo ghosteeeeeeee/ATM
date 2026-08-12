@@ -1046,7 +1046,7 @@ RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific wit
 
 # range_breakout.py — breakout from tight range with retest confirmation
 RANGE_BREAKOUT_ENABLED = True
-RANGE_BREAKOUT_PLUS_ENABLED = True   # range_breakout+ LONG (breakout above resistance)
+RANGE_BREAKOUT_PLUS_ENABLED = False  # CEO 2026-08-12 — 7T -$0.30 28.6% WR. range_breakout- SHORT profitable (5T +$0.41 100%).
 RANGE_BREAKOUT_MINUS_ENABLED = True  # range_breakout- SHORT (breakout below support)
 RANGE_BREAKOUT_SHORT_ENABLED = True  # range_breakout_short (SHORT-specific with tighter params)
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period

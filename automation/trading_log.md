@@ -6191,3 +6191,41 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - range_breakout+ bleeding at 20% WR — params tightened today, monitoring if improvement
 - hzscore+ underperforming at 36.4% WR — -$0.16 in 24h, near kill threshold
 - cut-loser-CL-T1 still at -$0.105 avg — need more data with CL_TRAIL_ENABLED=False
+
+## [2026-08-12 08:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (most recent close: 08:16 UTC) — 10T in last 2h (4W 6L -$0.13)
+**24h:** 69T 35W (50.7% WR) -$0.24 — flat/slightly negative
+**7d:** 410T 216W (52.8% WR) +$0.60 — profitable
+
+**Close Reasons (24h):**
+- profit-monster-trail: 34T (49.3%) +$1.60 avg +$0.047
+- atr_sl_hit: 29T (42.0%) -$1.57 avg -$0.054
+- cut-loser-CL-T1: 4T (5.8%) -$0.42 avg -$0.105
+- atr_tp_hit: 1T +$0.15
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- range_breakout-: 5T 5W (100%) +$0.41 — star
+- bb_bounce+: 19T 11W (57.9% WR) +$0.16 — solid
+- range_breakout+: 7T 2W (28.6% WR) -$0.30 — BLEEDER
+- hzscore+: 11T 4W (36.4% WR) -$0.16 — underperforming
+- hzscore-: 12T 6W (50% WR) -$0.15 — minor bleed
+- trend_momentum_near_sma+: 6T 1W -$0.37 — ALREADY KILLED
+
+**Changes:**
+1. RANGE_BREAKOUT_CONF_BASE: 65→70 — range_breakout+ 28.6% WR -$0.30 in 24h, 4/5 last trades hit atr_sl_hit. Higher confidence floor filters weak entries.
+
+**No Change Needed:**
+- Trade freq 0/hr — normal
+- atr_sl_hit 42.0% (borderline, avg loss $0.054 small)
+- profit-monster-trail compensating ($1.60 vs $1.57 SL)
+- No 0% WR kill candidates (range_breakout+ has 2 wins, trend_momentum already killed)
+- cut-loser-CL-T1 -$0.42 — CL_TRAIL_ENABLED=False deployed, monitoring
+- 7d still profitable (52.8% WR +$0.60)
+- hzscore+ -$0.16 — near kill threshold, next run will reassess
+
+**Open Questions:**
+- Will CONF_BASE 70 filter enough weak range_breakout+ entries?
+- hzscore+ underperforming at 36.4% WR — watch for 0% WR kill threshold
+- cut-loser-CL-T1 still -$0.105 avg — need more data with CL_TRAIL_ENABLED=False
