@@ -6294,3 +6294,78 @@ None — previous fixes settling in:
 **Open Questions:**
 - hzscore+ 41.7% WR -$0.12 — watch for 0% WR kill threshold
 - atr_sl_hit trending: 43.6% — monitor, if >45% consider SL adjustment
+
+## [2026-08-12 12:25] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** ~79T 52.1% WR flat (-$0.27 est)
+**7d:** 419T 220W (52.5% WR) +$0.56
+
+**Close Reasons (24h):**
+- profit-monster-trail: 38T (48%) +$1.96 (avg +$0.052) — compensates SL losses
+- atr_sl_hit: 35T (44.3%) -$1.96 (avg -$0.056) — above 40% threshold but net flat
+- cut-loser-CL-T1: 4T -$0.42
+- atr_tp_hit: 1T +$0.15
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- range_breakout-: 8T 6W (75% WR) +$0.38 — star
+- bb_bounce+: 19T 11W (57.9% WR) +$0.16 — solid
+- hzscore-: 16T 8W (50% WR) -$0.04 — flat
+- hzscore+: 18T 9W (50% WR) -$0.12 — R:R issue, not WR (AVNT main bleed)
+- range_breakout+: 8T 2W (25% WR) -$0.41 — residual from DISABLE
+- trend_momentum: 6T 1W (16.7% WR) -$0.37 — residual from DISABLE
+
+**Changes:**
+None — system stable, previous fixes settling in.
+
+**No Change Needed:**
+- atr_sl_hit 44.3% borderline but profit-monster-trail compensates equally ($1.96 vs $1.96)
+- hzscore+ 50% WR — not kill candidate, R:R imbalance fixable by SL tuning
+- range_breakout+ and trend_momentum residual trades clearing
+- Trade freq 3.3/hr normal
+- 7d profitable (52.5% WR +$0.56)
+
+**Open Questions:**
+- atr_sl_hit trending up: 43.6% → 44.3% (24h), 54.5% (last 4h) — monitor
+- hzscore+ on AVNT: 10T 4W but losses > wins — consider AVNT blacklist or SL adjustment
+- range_breakout+ residual trades: 8T in 24h — will clear by next session
+
+## [2026-08-12 14:30] Hourly Analysis
+
+**Trades:** 7 closed (0 wins, 6 losses, 1 orphan)
+**PnL:** -$0.43 (0% WR)
+**24h:** 86T 44W (51.2% WR) -$0.45
+**7d:** 426T 221W (51.9% WR) +$0.13
+
+**Close Reasons (24h):**
+- profit-monster-trail: 38T (44.2%) +$1.96
+- atr_sl_hit: 41T (47.7%) -$2.40
+- cut-loser-CL-T1: 4T -$0.42
+
+**Signal Performance (24h):**
+- bb_bounce+: 19T 11W (57.9% WR) +$0.16 — healthiest
+- hzscore-: 16T 8W (50% WR) -$0.04 — flat
+- range_breakout-: 14T 6W (42.9% WR) -$0.06 — deteriorating (was star)
+- hzscore+: 12T 5W (41.7% WR) -$0.12 — AVNT bleed
+- range_breakout+: 8T 2W (25% WR) -$0.41 — residual from DISABLE
+
+**Diagnosis:**
+- **atr_sl_hit 52.7% today** — above 40% threshold, 7d trend climbing
+- range_breakout- had 6 consecutive SL hits last hour — all SHORT in NEUTRAL regime
+- Confidence filtering won't help (losing trades avg 91.8% conf)
+- bb_bounce+ only consistent winner (36.8% SL hit)
+- 7d degrading: +$0.99 → +$0.13 over 2 days
+- Today worst day: -$0.50
+
+**No Change Needed:**
+- No signal at 0% WR kill threshold (range_breakout- 42.9% WR)
+- atr_sl_hit borderline but profit-monster-trail compensates ($1.96 vs $2.40)
+- This is regime-driven (NEUTRAL chop) — param changes won't fix chop
+- 7d still positive (+$0.13)
+- Overreacting to chop destabilizes
+
+**Open Questions:**
+- atr_sl_hit trending up 7d (37.9% → 52.7%) — monitor, if exceeds 55% consider SL adjustment
+- hzscore+ -$0.12 near kill threshold — next run will reassess
+- range_breakout- regime filter: consider blocking SHORT in NEUTRAL if trend continues

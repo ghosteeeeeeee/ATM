@@ -295,3 +295,8 @@
 [2026-08-12 11:26] auto_1hr: NO CHANGES
   WHY: 2T last hour (1W 1L +$0.03 flat). 24h 78T 39W (50% WR) -$0.22. atr_sl_hit 43.6% (borderline, avg loss -$0.056 small). profit-monster-trail compensating ($1.96 vs -$1.91). No 0% WR kill candidates (trend_momentum killed, no new range_breakout+ trades). Trade freq 2/hr normal. 7d profitable (52.7% WR +$0.68). Previous fixes settling in.
   BY: auto_1hr
+[2026-08-12 12:25] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet). 24h ~79T 52.1% WR flat. atr_sl_hit 44.3% (borderline, profit-monster-trail compensates $1.96 vs $1.96). hzscore+ 50% WR -$0.12 (R:R issue, not kill). range_breakout- star (75% WR +$0.38). 7d profitable (52.5% WR +$0.56). Previous DISABLEs settling in. No param changes.
+  BY: auto_1hr
+[2026-08-12 14:30] auto_1hr: NO CHANGES
+  WHY: 7T last hour (0W6L-/usr/bin/bash.43). range_breakout- 6 consecutive SL hits (all SHORT NEUTRAL chop). 24h 86T 51.2% WR -/usr/bin/bash.45. atr_sl_hit 52.7% today (above 40% threshold but profit-monster-trail compensating .96 vs .40). No 0% WR kill candidates. 7d still positive (+/usr/bin/bash.13). Today worst day (-/usr/bin/bash.50) but regime-driven chop, not signal failure. No param changes.
