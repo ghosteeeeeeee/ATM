@@ -1034,7 +1034,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long', 'range_breakout',
     'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-    'range_finder', 'continuation',
+    'range_finder', 'continuation', 'continuation_long', 'continuation_short',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
