@@ -3,8 +3,6 @@
 > **Hyperliquid momentum-based algorithmic trading system**
 > 544 tokens monitored · 55+ signal types · Paper & live modes · Kill switch safety
 
-[![Pipeline Architecture](docs/pipeline-diagram.png)](docs/pipeline-diagram.png)
-
 ---
 
 ## Live Dashboard
@@ -21,113 +19,89 @@ ATM is an event-driven trading system that continuously monitors cryptocurrency 
 
 ---
 
-## Full Pipeline (7 Phases)
+## Full Pipeline
 
 ```mermaid
-flowchart TD
-    subgraph PHASE0["PHASE 0: MARKET DATA (1 min timer)"]
-        HL[HL allMids API<br/>542 tokens] --> HC[hype_cache.py<br/>hl_cache.json]
-        HC --> SQLite[(SQLite<br/>price_history<br/>latest_prices)]
-        SQLite --> Candles[(candles.db<br/>1m/5m/15m/1h/4h)]
+flowchart LR
+    classDef data fill:#1f6feb,stroke:#58a6ff,color:#fff
+    classDef db fill:#a371f7,stroke:#d2a8ff,color:#fff
+    classDef proc fill:#21262d,stroke:#8b949e,color:#c9d1d9
+    classDef gate fill:#da3633,stroke:#f85149,color:#fff,stroke-width:2px
+    classDef exit fill:#238636,stroke:#3fb950,color:#fff
+    classDef skip fill:#30363d,stroke:#484f58,color:#8b949e
+    classDef signal fill:#1c2333,stroke:#58a6ff,color:#79c0ff
+    classDef layer fill:#1c1c2e,stroke:#8b949e,color:#c9d1d9
+
+    subgraph INGEST["  INGEST  "]
+        direction TB
+        HL["<b>HL allMids</b><br/>542 token prices"]:::data
+        CACHE["<b>hype_cache</b><br/>hl_cache.json"]:::proc
+        DB1[(<b>candles.db</b><br/>1m 5m 15m 1h 4h)]:::db
+        HL --> CACHE --> DB1
     end
 
-    subgraph PHASE1["PHASE 1: SIGNAL GENERATION (1 min)"]
-        Candles --> SR[signals_runner.py<br/>55+ signal scripts]
-        SR --> SigDB[(signals_hermes_runtime.db<br/>decision=PENDING)]
+    subgraph SIGNALS["  SIGNALS  "]
+        direction TB
+        SIG["<b>signals_runner</b><br/>55+ scripts"]:::proc
+        S1["<b>macd_accel</b><br/>per-token 1m MACD"]:::signal
+        S2["<b>hh_hl_choch</b><br/>HH/HL + Change of Character"]:::signal
+        S3["<b>hzscore</b><br/>multi-TF z-score"]:::signal
+        S4["<b>bb_bounce</b><br/>Bollinger Band"]:::signal
+        S5["<b>momentum</b><br/>pct-hermes + accel"]:::signal
+        SIGDB[(<b>signals DB</b><br/>decision=PENDING)]:::db
+        SIG --> S1
+        S1 --> S2 --> S3 --> S4 --> S5 --> SIGDB
     end
 
-    subgraph PHASE2["PHASE 2: SIGNAL COMPACTION"]
-        SigDB --> SC[signal_compactor.py]
-        SC --> |"1. Expire stale (>10m)"| SC
-        SC --> |"2. Group by combo_key"| SC
-        SC --> |"3. Pre-filter"| SC
-        SC --> |"4. Score + rank top 10"| SC
-        SC --> |"5. Safety filters"| SC
-        SC --> HS[(hotset.json<br/>top 10 APPROVED)]
+    subgraph FILTER["  FILTER  "]
+        direction TB
+        COMPACT["<b>signal_compactor</b><br/>expire · group · blacklist<br/>score · rank top 10"]:::proc
+        ANALYST["<b>signal_analyst</b><br/>trend 0-30 · RSI 0-20<br/>WR 0-25 · time 0-10<br/>blacklist 0-15 · pass ≥60"]:::proc
+        HS[(<b>hotset.json</b><br/>top 10 APPROVED)]:::db
+        COMPACT --> ANALYST --> HS
     end
 
-    subgraph PHASE2_5["PHASE 2.5: SIGNAL ANALYST"]
-        HS --> SA[signal_analyst.py<br/>Quality 0-100]
-        SA --> |"Score >= 60"| HS2[(hotset.json<br/>adjusted confidence)]
+    subgraph DECIDE["  DECIDE  "]
+        direction TB
+        DECIDER["<b>decider_run</b><br/>eligibility · inversion<br/>z-score freshness"]:::proc
+        L1["<b>L1 Rule-based</b><br/>speed · momentum · RSI"]:::layer
+        L2["<b>L2 Similar setup</b><br/>hist WR <30% = SKIP"]:::layer
+        L3["<b>L3 Token sentiment</b><br/>≤ -0.7 = SKIP"]:::layer
+        L4["<b>L4 Hebbian gate</b><br/>score ≥0.65 = approve"]:::layer
+        L5["<b>L5 LLM gate</b><br/>MiniMax-M3"]:::layer
+        GATE{"<b>GO?</b>"}:::gate
+        BRAIN["<b>brain.py</b><br/>atomic claim · HL API"]:::exit
+        SKIP["SKIP"]:::skip
+        DECIDER --> L1 --> L2 --> L3 --> L4 --> L5 --> GATE
+        GATE -->|"PASS"| BRAIN
+        GATE -->|"NAY"| SKIP
     end
 
-    subgraph PHASE3["PHASE 3: TRADE DECISION"]
-        HS2 --> DR[decider_run.py]
-        DR --> |"Eligibility checks"| DR
-        DR --> |"Signal inversion"| DR
-        DR --> |"Z-score freshness"| DR
-
-        DR --> CG
-
-        subgraph CONTEXT_GATE["CONTEXT GATE (5 layers)"]
-            L1["L1: Rule-based gate<br/>Speed, momentum, RSI, z-score"]
-            L2["L2: Similar setup lookup<br/>PostgreSQL historical WR"]
-            L3["L3: Token sentiment<br/>Hebbian Phase 3a"]
-            L4["L4: Hebbian gate<br/>Token-signal WR weights"]
-            L5["L5: LLM gate<br/>MiniMax-M3<br/>(GO/WARN/NAY)"]
-
-            L1 --> L2 --> L3 --> L4 --> L5
-        end
-
-        CG{Context Gate}
-        CG -->|PASS| EX[execute_trade]
-        CG -->|SKIP/WARN| SKIP[Signal skipped]
-
-        EX --> |"Atomic signal claim"| BRAIN[brain.py]
-        BRAIN --> HL_API[HL API<br/>mirror_open]
+    subgraph EXIT["  EXIT  "]
+        direction TB
+        PM["<b>position_manager</b><br/>ATR SL/TP + trailing"]:::proc
+        PMDETAIL["ATR(14) tiers<br/>LOW=0.8 · NORMAL=1.0 · HIGH=0.25<br/>Trailing: +0.30% act, 0.30% trail<br/>Stale: winner ≥60m / loser ≥8m"]:::layer
+        PROFIT["<b>profit_monster</b><br/>T1: 0.5-2% max 2/wake<br/>T2: 2-5% max 1/wake<br/>Trail: +0.40% act, 0.25%"]:::exit
+        CUT["<b>cut_loser</b><br/>T1: -0.75% quick cut<br/>T2: -3% deep cut<br/>Trailing loss recovery"]:::exit
+        GUARD["<b>guardian</b><br/>orphan detect · HL sync<br/>loss cooldowns"]:::proc
+        CLOSE["<b>CLOSE</b><br/>HL market order"]:::exit
+        PM --> PMDETAIL --> PROFIT --> CUT --> GUARD --> CLOSE
     end
 
-    subgraph PHASE4["PHASE 4: POSITION MANAGEMENT (1 min)"]
-        HL_API --> PM[position_manager.py]
-        PM --> ATR[tpsl_utils.py<br/>ATR SL/TP compute]
-        ATR --> |"ATR SL hit"| CLOSE_SL[Close via HL]
-        ATR --> |"ATR TP hit"| CLOSE_TP[Close via HL]
-        ATR --> |"Trailing stop<br/>activate +0.30%<br/>trail 0.30%"| ATR
-        PM --> |"Stale winner (>0.6%, 60m+)"| CLOSE_STALE[Close]
-        PM --> |"Stale loser (<-0.6%, 8m+)"| CUT_STALE[Cut]
-    end
+    DB1 --> SIG
+    SIGDB --> COMPACT
+    HS --> DECIDER
+    BRAIN --> PM
+    BRAIN -.-> PROFIT
+    BRAIN -.-> CUT
+    BRAIN -.-> GUARD
 
-    subgraph PHASE5["PHASE 5: PROFIT MONSTER (timer)"]
-        PMPositions[Open positions] --> PM2[profit_monster.py]
-        PM2 --> T1["TIER 1: Quick Scalp<br/>0.5-2.0% profit<br/>max 2/wake"]
-        PM2 --> T2["TIER 2: Runner<br/>2.0-5.0% profit<br/>max 1/wake"]
-        T1 --> CLOSE_PM[Close via HL]
-        T2 --> CLOSE_PM
-        PM2 --> |"Trailing: +0.40% act<br/>0.25% trail"| PM2
-    end
-
-    subgraph PHASE6["PHASE 6: CUT LOSER (timer)"]
-        PMPositions --> CL[cut_loser.py]
-        CL --> CT1["TIER 1: Quick Cut<br/>-0.75% to -1.0%"]
-        CL --> CT2["TIER 2: Deep Cut<br/>-1.0% to -3.0%"]
-        CT1 --> CUT[Cut via HL]
-        CT2 --> CUT
-        CL --> |"Trailing loss:<br/>track worst, cut on<br/>recovery fail"| CL
-    end
-
-    subgraph PHASE7["PHASE 7: GUARDIAN (60s timer)"]
-        HL_ACTUAL[HL Actual Positions] --> GUARD[hl-sync-guardian.py]
-        GUARD --> |"Orphan detection"| GUARD
-        GUARD --> |"HL sync reconcile"| GUARD
-        GUARD --> |"Loss cooldowns"| GUARD
-        GUARD --> |"Self-close orphans"| GUARD_CLOSE[Close via HL]
-    end
-
-    style PHASE0 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE1 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE2 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE2_5 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE3 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style CONTEXT_GATE fill:#0f3460,stroke:#533483,color:#fff
-    style PHASE4 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE5 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE6 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style PHASE7 fill:#1a1a2e,stroke:#16213e,color:#fff
-    style CG fill:#e94560,stroke:#533483,color:#fff
-    style SKIP fill:#666,stroke:#333,color:#fff
+    style INGEST fill:#0d1117,stroke:#1f6feb,stroke-width:2px,color:#58a6ff
+    style SIGNALS fill:#0d1117,stroke:#a371f7,stroke-width:2px,color:#d2a8ff
+    style FILTER fill:#0d1117,stroke:#8b949e,stroke-width:2px,color:#8b949e
+    style DECIDE fill:#0d1117,stroke:#da3633,stroke-width:2px,color:#f85149
+    style EXIT fill:#0d1117,stroke:#238636,stroke-width:2px,color:#3fb950
 ```
-
-> **Full text diagram:** [docs/pipeline-diagram.md](docs/pipeline-diagram.md)
 
 ---
 
