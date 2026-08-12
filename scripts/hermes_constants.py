@@ -879,7 +879,7 @@ ACCEL_300_CHOP_LOOKBACK        = 50   # bars used for EMA angle and avg-gap chop
 # ── Accel-300 Ultra-Fast Breakout (signals/accel_300.py) ──────────────────────
 # Fires on high-velocity breakouts BEFORE persistence confirms the trend.
 # Backtested: 78% WR, +1.60% avg PnL on STX (11 signals in 3 days).
-ACCEL_300_BREAKOUT_ENABLED     = False  # DISABLED 2026-08-02 — 0% WR (0/3 in 24h), -$1.93 total. All trades hit SL immediately.
+ACCEL_300_BREAKOUT_ENABLED     = True   # re-enabled 2026-08-12 — confidence raised to 80
 ACCEL_300_BREAKOUT_VELOCITY    = 1.0    # min price move % in 5 bars (1.0% = fast breakout)
 ACCEL_300_BREAKOUT_GAP_MIN     = 0.5    # min gap % from EMA60 (was 1.0 — too restrictive)
 ACCEL_300_BREAKOUT_TREND_EMA   = 200    # LONG only above this EMA, SHORT only below
@@ -1246,7 +1246,7 @@ CONFLUENCE_REQUIRED = True   # DO NOT DISABLE — paralysis was caused by 5min e
 # Problem: confluence gate blocks pure accel-300 signals (no RS co-signal) even when
 # accel-300 is very strong. Strong accel-300 alone should sometimes fire.
 ACCEL_300_STANDALONE_BYPASS_ENABLED = True   # re-enabled 2026-08-12 — SHORT edge confirmed
-ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when disabled)
+ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # minimum confidence for standalone bypass
 
 # ── Dead-Hours Entry Filter ───────────────────────────────────────────────────
 # Block entries during low-liquidity hours (whitewater, no wave).
