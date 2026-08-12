@@ -2733,14 +2733,16 @@ def _compute_mfe_mae(token, direction, entry_price, open_time, close_time):
         import sqlite3 as _sqlite3
         from paths import HERMES_DATA
         conn = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT timestamp, price FROM price_history 
-            WHERE token = ? AND timestamp BETWEEN ? AND ?
-            ORDER BY timestamp ASC
-        """, (token.upper(), int(open_time.timestamp()), int(close_time.timestamp())))
-        rows = cur.fetchall()
-        conn.close()
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT timestamp, price FROM price_history 
+                WHERE token = ? AND timestamp BETWEEN ? AND ?
+                ORDER BY timestamp ASC
+            """, (token.upper(), int(open_time.timestamp()), int(close_time.timestamp())))
+            rows = cur.fetchall()
+        finally:
+            conn.close()
         
         if not rows:
             return None, None, None, None
@@ -2751,12 +2753,12 @@ def _compute_mfe_mae(token, direction, entry_price, open_time, close_time):
         
         if direction.upper() == 'LONG':
             mfe_pct = (max_price - entry_price) / entry_price * 100
-            mae_pct = (min_price - entry_price) / entry_price * 100
+            mae_pct = abs(min_price - entry_price) / entry_price * 100  # always positive
             mfe_price = max_price
             mae_price = min_price
         else:  # SHORT
             mfe_pct = (entry_price - min_price) / entry_price * 100
-            mae_pct = (max_price - entry_price) / entry_price * 100
+            mae_pct = abs(max_price - entry_price) / entry_price * 100  # always positive
             mfe_price = min_price
             mae_price = max_price
         
@@ -2889,8 +2891,10 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             exit_price = entry_price  # close at entry = no loss/no win
 
         # Compute MFE/MAE from price history
+        from datetime import datetime, timezone
+        _close_time = datetime.now(timezone.utc)
         mfe_pct, mae_pct, mfe_price, mae_price = _compute_mfe_mae(
-            token, direction, float(entry_price), open_time, close_time
+            token, direction, float(entry_price), open_time, _close_time
         )
 
         # Commit IMMEDIATELY to release row lock — prevents deadlocks with position_manager
