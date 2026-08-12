@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -726,11 +726,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     gate_msg = f'standalone accel-300 conf={conf:.0f}% >= {ACCEL_300_STANDALONE_BYPASS_CONFIDENCE}%'
                 # ── Backtested Signal Bypass ──────────────────────────────────────
                 # Signals with proven edge from backtesting — allow standalone.
-                elif unique_signal_types == 1 and source.rstrip('+-') in (
-                    'stop_hunt_reversal_long', 'range_breakout',
-                    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                    'range_finder', 'continuation',
-                ):
+                elif unique_signal_types == 1 and source.rstrip('+-') in STANDALONE_BYPASS_SIGNALS:
                     pass_gate = True
                     gate_msg = f'backtested standalone signal ({source})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
@@ -743,9 +739,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 else:
                     # ponytail: backtested standalone bypass — matches final guard (line 1162)
                     bare_src = source.rstrip('+-') if source else ''
-                    if bare_src in ('stop_hunt_reversal_long', 'range_breakout',
-                                    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                                    'range_finder', 'continuation'):
+                    if bare_src in STANDALONE_BYPASS_SIGNALS:
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
                     else:
@@ -1167,9 +1161,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
                 bare_src = src.rstrip('+-') if src else ''
-                if bare_src in ('stop_hunt_reversal_long', 'range_breakout',
-                                'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                                'range_finder', 'continuation'):
+                if bare_src in STANDALONE_BYPASS_SIGNALS:
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
                     # ── Contrarian flip: trend_momentum_near_sma ────────────────
                     # This signal is consistently wrong — LONG loses, SHORT wins.
@@ -1220,9 +1212,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
                         if CONFLUENCE_REQUIRED and len(pe_parts) < 2:
                             bare_pe = pe_src.rstrip('+-') if pe_src else ''
-                            if bare_pe in ('stop_hunt_reversal_long', 'range_breakout',
-                                            'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                                            'range_finder', 'continuation'):
+                            if bare_pe in STANDALONE_BYPASS_SIGNALS:
                                 log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} backtested standalone ({pe_src}) allowed at merge")
                                 # ── Contrarian flip for preserved entries ──────────
                                 if bare_pe == 'trend_momentum_near_sma':
@@ -1420,9 +1410,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         bare_src = source.rstrip('+-') if source else ''
-                        if bare_src in ('stop_hunt_reversal_long', 'range_breakout',
-                                        'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                                        'range_finder', 'continuation'):
+                        if bare_src in STANDALONE_BYPASS_SIGNALS:
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
                             # ── Contrarian flip at pending approve ────────────────
                             if bare_src == 'trend_momentum_near_sma':
@@ -1581,9 +1569,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # this is the final catch before it reaches decider_run.
             if CONFLUENCE_REQUIRED and entries_count < 2:
                 bare_src = (src or '').rstrip('+-')
-                if bare_src in ('stop_hunt_reversal_long', 'range_breakout',
-                                'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                                'range_finder', 'continuation'):
+                if bare_src in STANDALONE_BYPASS_SIGNALS:
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")
                     # ── Contrarian flip at safety filter (last resort) ───────────
                     if bare_src == 'trend_momentum_near_sma':
@@ -1863,9 +1849,7 @@ def _filter_safe_prev_hotset(prev_hotset):
         elif len(sp) < 2:
             # Check if single-source signal is in the standalone bypass list
             bare_src_check = src.rstrip('+-') if src else ''
-            if bare_src_check in ('stop_hunt_reversal_long', 'range_breakout',
-                                  'spike_exhaustion_short', 'bb_bounce', 'hzscore',
-                                  'range_finder', 'continuation'):
+            if bare_src_check in STANDALONE_BYPASS_SIGNALS:
                 pass  # backtested standalone — allow through preserve
             else:
                 log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")

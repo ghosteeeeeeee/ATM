@@ -1027,6 +1027,16 @@ BB_BOUNCE_PLUS_ENABLED = True    # bb_bounce+ LONG
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
+# ── Standalone Bypass Signals ──────────────────────────────────────────────
+# Signals that can bypass the confluence gate (single-source allowed).
+# Backtested and proven edge when firing solo.
+# Used in signal_compactor.py at 6 locations (confluence gate + preserve filter).
+STANDALONE_BYPASS_SIGNALS = (
+    'stop_hunt_reversal_long', 'range_breakout',
+    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+    'range_finder', 'continuation',
+)
+
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = True
 RANGE_FINDER_PLUS_ENABLED = False    # AUTO_1HR 2026-08-10 — 20T -$0.44 (24h), 0% WR today. All combos negative. VEL filter already deployed but not helping.
