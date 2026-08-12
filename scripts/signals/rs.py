@@ -107,6 +107,49 @@ def _get_regime_5m(token: str):
 _CANDLES_DB = '/root/.hermes/data/candles.db'
 
 
+def _get_1h_trend(token: str) -> str:
+    """Check 1H EMA trend for alignment bonus. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'.
+
+    Uses EMA(20) vs EMA(50) crossover on 1H candles.
+    Trend alignment (Warrior Trading): LONG with BULLISH 1H trend = stronger signal.
+    """
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1h
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT 60
+        """, (token.upper(),))
+        rows = cur.fetchall()
+        if not rows or len(rows) < 50:
+            return 'NEUTRAL'
+        closes = [r[0] for r in reversed(rows)]
+
+        def ema(data, period):
+            k = 2.0 / (period + 1)
+            val = data[0]
+            for v in data[1:]:
+                val = v * k + val * (1.0 - k)
+            return val
+
+        ema20 = ema(closes, 20)
+        ema50 = ema(closes, 50)
+        if ema50 == 0:
+            return 'NEUTRAL'
+        spread = abs(ema20 - ema50) / ema50 * 100
+        if spread < 0.1:
+            return 'NEUTRAL'
+        return 'BULLISH' if ema20 > ema50 else 'BEARISH'
+    except Exception:
+        return 'NEUTRAL'
+    finally:
+        if conn:
+            conn.close()
+
+
 def _get_candles_5m(token: str, limit: int = 50) -> list:
     """Fetch real OHLCV 5m candles from candles.db for pattern detection.
 
@@ -386,17 +429,16 @@ def _price_near_level(price: float, level: float, atr_pct: float, k: float = RS_
 def _bounce_confirmation(candles: list, level: float, direction: str,
                           atr_value: float = None,
                           lookback: int = RS_BOUNCE_LOOKBACK) -> bool:
-    """Check if price recently bounced from the level.
+    """Check if price recently bounced from the level with volume confirmation.
 
     For LONG (near support): find at least one candle whose close was near the
     level, then verify the next candle's close moved UP by >0.05%.
     For SHORT (near resistance): close near level, next close moved DOWN >0.05%.
 
-    Works on close-only (synthesized) candles: we detect bounces across candle
-    boundaries using successive close prices. Intra-candle wicks cannot be
-    detected since open=high=low=close for every candle.
+    Volume confirmation (Warrior Trading): bounce candle must have volume above
+    average — weak volume bounces are filtered out.
 
-    Returns True if bounce is confirmed.
+    Returns True if bounce is confirmed with volume.
     """
     if len(candles) < lookback:
         return False
@@ -414,20 +456,23 @@ def _bounce_confirmation(candles: list, level: float, direction: str,
     # require candle to be within 0.2 * ATR of the level (only candles that actually
     # HIT the level trigger the bounce check — not just any candle within 1 ATR).
     # The 0.025% follow-through requires the NEXT candle to commit in the bounce direction.
-    # FIX: was using full thresh (1.0 ATR), which caught any candle within 1 ATR and
-    # caused false positives (a candle 0.8 ATR away with a later upward move counted as bounce).
     touch_thresh = thresh * 0.2  # only count as a touch if within 0.2 ATR
+
+    # Volume SMA for confirmation (Warrior Trading: volume confirms price moves)
+    vols = [c.get('volume', 0) for c in recent if c.get('volume', 0) > 0]
+    vol_sma = sum(vols) / len(vols) if vols else 0
 
     if direction == 'LONG':
         for i, c in enumerate(recent):
             if abs(c['close'] - level) < touch_thresh:
                 if i + 1 < len(recent):
                     next_close = recent[i + 1]['close']
-                    # FIX: compare to LEVEL, not to candle close.
-                    # Old: next_close > c['close'] * 1.00025 (any candle 0.2% away from level
-                    # confirms with just 0.025% move above ITSELF — scale mismatch, 8:1 ratio).
-                    # New: next_close must move 0.025% ABOVE the level itself.
+                    next_vol = recent[i + 1].get('volume', 0)
+                    # Bounce: next candle closes above level + volume confirmation
                     if next_close > level * 1.00025:
+                        # Volume check: bounce candle must have >1.2x average volume
+                        if vol_sma > 0 and next_vol < vol_sma * 1.2:
+                            continue  # weak bounce, skip
                         return True
         return False
 
@@ -436,9 +481,12 @@ def _bounce_confirmation(candles: list, level: float, direction: str,
             if abs(c['close'] - level) < touch_thresh:
                 if i + 1 < len(recent):
                     next_close = recent[i + 1]['close']
-                    # FIX: compare to LEVEL, not to candle close.
-                    # New: next_close must move 0.025% BELOW the level itself.
+                    next_vol = recent[i + 1].get('volume', 0)
+                    # Rejection: next candle closes below level + volume confirmation
                     if next_close < level * 0.99975:
+                        # Volume check: rejection candle must have >1.2x average volume
+                        if vol_sma > 0 and next_vol < vol_sma * 1.2:
+                            continue  # weak rejection, skip
                         return True
         return False
 
@@ -819,6 +867,10 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
                 # NEUTRAL penalty: 15% haircut
                 elif regime == 'NEUTRAL' and regime_conf > 55:
                     confidence = confidence * 0.85
+                # Trend alignment bonus (Warrior Trading: trade with the trend)
+                trend_1h = _get_1h_trend(token)
+                if trend_1h == 'BULLISH':
+                    confidence = min(RS_MAX_CONFIDENCE, confidence * 1.10)  # +10% bonus
                 source = f'{RS_SOURCE_PREFIX}-s{touch_count}'
                 signal = {
                     'direction':  'LONG',
@@ -903,6 +955,10 @@ def detect_rs_signal(token: str, candles: list, price: float) -> Optional[dict]:
                 # NEUTRAL penalty: 15% haircut
                 elif regime == 'NEUTRAL' and regime_conf > 55:
                     confidence = confidence * 0.85
+                # Trend alignment bonus (Warrior Trading: trade with the trend)
+                trend_1h = _get_1h_trend(token)
+                if trend_1h == 'BEARISH':
+                    confidence = min(RS_MAX_CONFIDENCE, confidence * 1.10)  # +10% bonus
                 source = f'{RS_SOURCE_PREFIX}-r{touch_count}'
                 cand_signal = {
                     'direction':  'SHORT',

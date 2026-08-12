@@ -494,10 +494,10 @@ WIN_COOLDOWN_MINUTES   = 3         # block same direction for 3 min after a win 
 #   1–3%  → k=2.0  (normal — balanced stops)
 ATR_K_INITIAL      = 1.2   # initial SL only (reverted to original)
 ATR_K_LOW_VOL      = 0.8   # trailing/accel SL — atr_pct < 1% (was 0.5 — effective SL=0.4%, noise-level. 0.8 gives min 0.96% SL)
-ATR_K_NORMAL_VOL   = 1.0   # trailing/accel SL — 1.25% <= atr_pct <= 3%
-ATR_K_HIGH_VOL     = 0.25  # trailing/accel SL — atr_pct > 3%
+ATR_K_NORMAL_VOL   = 1.0   # trailing/accel SL — 1.0% <= atr_pct <= 1.5%
+ATR_K_HIGH_VOL     = 0.25  # trailing/accel SL — atr_pct > 1.5% (EXTREME regime)
 ATR_PCT_LOW_THRESH = 0.01  # 1%
-ATR_PCT_HIGH_THRESH= 0.015  # 3%
+ATR_PCT_HIGH_THRESH= 0.015  # 1.5% — matches EXTREME regime threshold
 
 # ── ATR Fallback ───────────────────────────────────────────────────────────────
 # Used when real ATR cannot be fetched (e.g., unprotectable coins first-seen).
