@@ -1,3 +1,35 @@
+## CEO Report — 2026-08-12 07:49 UTC
+
+### Diagnosis
+**Verified DB numbers (not trusting old reports):**
+- **24h**: 69T, -$0.24, 50.7% WR — flat
+- **7d**: 409T, +$0.65, 52.8% WR — solid
+- **Today (Aug 12)**: 36T, -$0.02, 55.6% WR — flat, improving from Aug 11
+- **Open**: 6T, all small/unrealized
+
+**Stars (7d intact):**
+- bb_bounce+,range_finder+ LONG: 53T, +$0.71, 58.5% WR ★
+- bb_bounce+,hzscore+ LONG: 34T, +$0.22, 50.0% WR ★
+- hzscore+,mover+ LONG: 5T, +$0.17, 80.0% WR ★
+- range_breakout- SHORT: 5T, +$0.41, 100% WR ★
+
+**Cost drivers (48h):**
+- atr_sl_hit: 54T, -$2.69 (dominant)
+- profit-monster-trail: 55T, +$2.66 (sole winning exit)
+- cut-loser-CL-T1: 4T, -$0.42
+- cut-loser-CL-trail: 6T, -$0.28
+
+### Root Cause
+24h flat due to SL hits (-$2.69) offset by profit-monster-trail (+$2.66). System naturally reverting after Aug 11 dip. Stars intact, no signal bleeding hard enough to disable.
+
+### Fix Applied
+**NO CHANGES.** 7d solid, stars intact, daily recovering, pipeline healthy. Overreacting destabilizes.
+
+### Verification
+Pipeline: active. Disk: 77%. Open: 6 (all small). Stars: 4 profitable 7d. trend_momentum_near_sma+ already disabled (0% WR legacy).
+
+---
+
 ## CEO Report — 2026-08-14 23:00 UTC
 
 ### Diagnosis
