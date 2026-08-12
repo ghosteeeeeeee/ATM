@@ -147,3 +147,9 @@ ALERTS:
 - **[WARN]** Disk at 84% (99G/118G) — 1% from threshold. pipeline.log (47M) + .gz (90M) are largest.
 - **[WARN]** Hotset empty — 0 tokens survived compaction. Market is NEUTRAL, macro gate REDUCE (wr=40%).
 - **AUTO-FIX**: None required. Pipeline operational.
+
+## Health Report — 2026-08-12 01:42 UTC
+- **WARN** (Nx): Disk at 85% — **AUTO-FIX**: Removed 3.1GB pre-update snapshot, cleaned 2GB old sessions, freed 12GB total (now 76%)
+- **WARN** (2x): `decider_run.py` crashes at line 2911 (file is 2896 lines) — non-fatal, pipeline continues
+- **WARN**: PHANTOM-WRITE ATOM LONG SL very tight (0.1% from entry)
+- **INFO**: trades_hermes.db and speed_hermes.db are empty (0 bytes) — not used by current pipeline

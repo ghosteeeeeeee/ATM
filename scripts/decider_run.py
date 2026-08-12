@@ -1287,14 +1287,13 @@ def context_gate(token, direction, source, sig):
                     _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, exit_boost + combo_boost + token_wr_boost)
                     return ('SKIP', f'hebbian auto-reject: SL dominant (ratio={eq["ratio"]:.2f})', 0)
 
-            # ── Autonomous gate — tiered min-n OR composite scoring ─────
+            # ── Autonomous gate — tiered min-n ────────────────────────────────
             if HEBBIAN_GATE_ENABLED and is_token_specific:
                 total_conf_adj = exit_boost + combo_boost + token_wr_boost
 
-                # Path A: tiered min-n (existing)
+                # Path A: tiered min-n
                 is_high_conf = (exit_quality and exit_quality['ratio'] > HEBBIAN_HIGH_CONF_EXIT_RATIO and exit_quality['profit_n'] >= 3)
                 min_n = HEBBIAN_AUTO_MIN_N_HIGH_CONF if is_high_conf else HEBBIAN_AUTO_MIN_N
-                n_based = False
                 if n >= min_n:
                     if wr_est >= HEBBIAN_AUTO_APPROVE_WR and total_conf_adj >= 0:
                         log(f'  [HEBBIAN-GATE] AUTO-APPROVE (n-based): WR={wr_pct:.0f}% n={n} (min={min_n}) exit={exit_boost} combo={combo_boost} token={token_wr_boost}')

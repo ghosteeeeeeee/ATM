@@ -1,55 +1,77 @@
 # Signal Performance Report
-Generated: 2026-08-12 15:00 UTC
+**Generated:** 2026-08-12 01:48 UTC | **Period:** Last 6h + 24h
 
-## 6h Performance (2+ trades)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| hzscore- | SHORT | 2 | 50.0% | -$0.06 |
-| trend_momentum_near_sma+ | LONG | 2 | 0.0% | -$0.05 |
-| hzscore+ | LONG | 3 | 33.3% | +$0.03 |
-| bb_bounce+ | LONG | 14 | 57.1% | +$0.10 |
+## Overall Stats
+- **Total trades (all time):** 770 | **WR:** 45.2% | **PnL:** -12.34%
+- **Date range:** 2026-07-29 → 2026-08-12
 
-## 24h Performance (3+ trades)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| trend_momentum_near_sma+ | LONG | 5 | 0.0% | -$0.40 |
-| hzscore- | SHORT | 4 | 50.0% | -$0.05 |
-| bb_bounce+,hzscore+ | LONG | 4 | 50.0% | -$0.01 |
-| hzscore+ | LONG | 8 | 50.0% | +$0.02 |
-| bb_bounce+ | LONG | 14 | 57.1% | +$0.10 |
+---
 
-## KILLED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| trend_momentum_near_sma+ | LONG | 0.0% | -$0.40 | 5 | Base already killed 2026-08-12 13:05 UTC. PLUS/MINUS flags now False. |
+## WINNERS (WR > 55%, PnL > 0)
 
-## BOOSTED (executed): None
-No signals met all boost criteria (WR>55%, 5+ trades, PnL>$0.05, consistent across tokens). bb_bounce+ is the closest (57.1% WR, +$0.10) but below trade threshold for boost.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| bb_bounce+ | LONG | 14 | 57.1% | +0.73 | 14 | 57.1% | +0.73 | ENABLED |
 
-## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| hzscore- | SHORT | 50.0% | -$0.05 | 4 | Marginal — below kill threshold |
-| bb_bounce+,hzscore+ | LONG | 50.0% | -$0.01 | 4 | Breakeven — monitoring |
+---
 
-## WINNERS
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb_bounce+ | LONG | 57.1% | +$0.10 | 14 | Steady performer |
+## LOSERS (WR < 30%, PnL < -2%)
 
-## Signal Inversions: None found
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
+| trend_momentum_near_sma+ | LONG | 2 | 0.0% | -0.46 | 5 | 0.0% | -3.23 | DISABLED | **DISABLE** |
 
-## Issues
-- **trend_momentum_near_sma**: Base flag killed earlier today but PLUS/MINUS flags were still True. Fixed — all three flags now False.
-- **Stale open position**: 1 open trend_momentum_near_sma+ LONG from Aug 11 22:14 UTC — may need manual close.
+---
 
-## Full History (all-time winners)
-| Signal | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| accel-300-,rs-s-broken | 1025 | 46.2% | +$6.22 |
-| bb_bounce+,range_finder+ | 53 | 58.5% | +$0.71 |
-| tl_break_long | 94 | 37.2% | +$0.58 |
-| bb_bounce+,hzscore+ | 33 | 48.5% | +$0.20 |
-| bb_bounce | 27 | 51.9% | +$0.33 |
-| hzscore+,mover+ | 5 | 80.0% | +$0.17 |
-| inv-accel-300+,tl_break_long | 8 | 12.5% | +$0.13 |
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| hzscore- | SHORT | 4 | 50.0% | -0.23 | ENABLED | Needs more data |
+| bb_bounce+,hzscore+ | LONG | 4 | 50.0% | +0.00 | ENABLED | Needs more data |
+| hzscore+ | LONG | 8 | 50.0% | +0.39 | ENABLED | Borderline |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[DISABLE] trend_momentum_near_sma+ LONG** — WR=0.0%, PnL=-3.23% over 5 trades (24h).
+2. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-0.23% over 4 trades. Monitor next cycle.
+3. **[WATCH] bb_bounce+,hzscore+ LONG** — WR=50.0%, PnL=+0.00% over 4 trades. Monitor next cycle.
+4. **[WATCH] hzscore+ LONG** — WR=50.0%, PnL=+0.39% over 8 trades. Monitor next cycle.
+5. **[KEEP] 1 winning combos** — bb_bounce+. LONG side dominant.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-12 | 5d7b527 | signals: kill trend_momentum_near_sma PLUS/MINUS flags — bas... |
+| 2026-08-12 | 7f9339f | config: increase range_breakout and accel_300 confidence to ... |
+| 2026-08-12 | 6986ab4 | post-change: accel-300 re-enable + confidence boost + bug fi... |
+| 2026-08-12 | bea53f1 | config: increase accel_300 confidence range to compete with ... |
+| 2026-08-12 | 9576091 | config: re-enable accel_300- SHORT + add to bypass |
+| 2026-08-12 | 3745fe8 | post-change: kanban + docstring fix for bypass centralizatio... |
+| 2026-08-12 | 397f9c7 | config: add continuation_long and continuation_short to STAN... |
+| 2026-08-12 | 5de699a | refactor: centralize bypass list into hermes_constants.STAND... |
+| 2026-08-11 | de10909 | config: disable trailing cut_loser (CL_TRAIL_ENABLED=False) |
+| 2026-08-11 | bc4ade7 | config: widen cut_loser tiers — T1 1-2%, T2 2-5% |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
