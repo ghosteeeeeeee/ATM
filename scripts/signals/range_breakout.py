@@ -405,15 +405,13 @@ def scan_signals() -> int:
         if direction == 'LONG':
             _conn_long = None
             try:
-                from paths import HERMES_DATA
-                import sqlite3 as _sqlite3
-                _conn_long = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+                _conn_long = sqlite3.connect(_PRICE_DB, timeout=10)
                 _cur = _conn_long.cursor()
                 _cur.execute("""
                     SELECT price FROM (
                         SELECT price, timestamp FROM price_history
                         WHERE token = ?
-                        ORDER BY timestamp DESC LIMIT 6
+                        ORDER BY timestamp DESC LIMIT 15
                     ) sub ORDER BY timestamp ASC
                 """, (token_upper,))
                 _prices_long = [r[0] for r in _cur.fetchall()]
@@ -447,9 +445,7 @@ def scan_signals() -> int:
         _conn_se = None
         try:
             from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
-            from paths import HERMES_DATA
-            import sqlite3 as _sqlite3
-            _conn_se = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            _conn_se = sqlite3.connect(_PRICE_DB, timeout=10)
             _cur = _conn_se.cursor()
             _cur.execute("""
                 SELECT price FROM (
