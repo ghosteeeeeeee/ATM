@@ -163,3 +163,6 @@ ALERTS:
 - **[INFO]**: 254 signals generated in last hour, 22W/21L (52% winrate) in 24h
 - **[INFO]**: Regime — 1 LONG (IOTA bias), 0 SHORT, 104 NEUTRAL — market mostly flat
 - **[INFO]**: All 50+ timers active, disk at 76%
+
+## Error Alerts — 2026-08-12 04:09 UTC
+- **NEW** (1x): `Aug N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`

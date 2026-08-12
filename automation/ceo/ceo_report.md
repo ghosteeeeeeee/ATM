@@ -1,3 +1,34 @@
+## CEO Report — 2026-08-14 04:30 UTC
+
+### Diagnosis
+System healthy, no changes needed. Verified DB: 24h 48T +$0.05 (52.1% WR — flat/improving), 7d 391T +$0.99 (53.2% WR — solid). Daily recovery confirmed: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.28 (71.4% WR). 7 open positions. Disk 76%. Pipeline healthy, all timers active.
+
+### Stars (7d)
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5% WR ✅
+- bb-bounce-short,hzscore- SHORT: 17T +$0.12 58.8% WR ✅
+- hzscore+,mover+ LONG: 5T +$0.17 80% WR ✅
+- bb_bounce+,hzscore+ LONG: 34T +$0.22 50% WR (intact, above 45% threshold)
+
+### Cost Drivers (48h)
+- atr_sl_hit: 43T -$1.95 (dominant loss driver — expected)
+- cut-loser-CL-trail: 9T -$0.43
+- profit-monster-trail compensating (sole winning exit)
+
+### Key Signals (7d, bleeding)
+- trend_momentum_near_sma+ LONG: DISABLED (0% WR legacy)
+- ma100-cross,return_exhaustion- SHORT: 7T -$0.28 42.9% WR
+- hzscore+ LONG: 11T -$0.19 36.4% WR (cold streak, but 34T +$0.22 in combo)
+
+### Fix Applied
+NO CHANGES. 9 changes deployed Aug 13 (momentum fade, confidence tightening, accel-300 re-enable) ~10h into 24-48h eval window. Window closes ~14:00 Aug 14. Premature changes destabilize.
+
+### Monitor
+1. SHORT 7d bleed — if -$1.50+ → consider regime filter
+2. Aug 13 changes eval window — closes ~14:00 Aug 14
+3. bb_bounce+,hzscore+ LONG — if 7d WR drops <45% → escalate
+
+---
+
 ## CEO Report — 2026-08-14 01:00 UTC
 
 ### Diagnosis
