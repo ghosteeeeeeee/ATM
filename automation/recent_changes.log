@@ -292,3 +292,6 @@
   WHY: range_breakout+ 28.6% WR -$0.30 in 24h. 4/5 last trades hit atr_sl_hit. Higher confidence floor filters weak entries. Params tightened today but still underperforming. commit f53d4ac.
   BY: auto_1hr
 [2026-08-12 (latest)] ceo: NO TRADING CHANGES. Verified DB: 24h 75T -/usr/bin/bash.23 (50.7% WR flat), 7d 415T +/usr/bin/bash.64 (52.8% WR solid). Daily improving: Aug 11 -/usr/bin/bash.33 → Aug 12 -/usr/bin/bash.06. All 3 bleed sources addressed (range_breakout+ DISABLED, hzscore+ combo-only, trend_momentum DISABLED). SHORT 24h +/usr/bin/bash.32 60.9% WR strong. Aug 13 eval still running. No changes — overreacting destabilizes.
+[2026-08-12 11:26] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.03 flat). 24h 78T 39W (50% WR) -$0.22. atr_sl_hit 43.6% (borderline, avg loss -$0.056 small). profit-monster-trail compensating ($1.96 vs -$1.91). No 0% WR kill candidates (trend_momentum killed, no new range_breakout+ trades). Trade freq 2/hr normal. 7d profitable (52.7% WR +$0.68). Previous fixes settling in.
+  BY: auto_1hr

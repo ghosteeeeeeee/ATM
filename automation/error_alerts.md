@@ -173,3 +173,44 @@ ALERTS:
 
 ## Error Alerts — 2026-08-12 05:09 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   Signal accel_300: TOK → TOK: name '_get_1h_trend' is not defined`
+
+## Health Report — 2026-08-12 10:40 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-12 10:40 UTC
+
+PIPELINE: OK
+- Status: running (cycle #151860, last at 10:39:05)
+- Signals (1h): 198 generated, 0 approved (all blocked by signal_analyst)
+- Trades: 0 open, 0 closed today, PnL: 0.00 USDT
+- Errors: 0 (no tracebacks in last 10min)
+
+MARKET:
+- Regime: 2 LONG_BIAS / 1 SHORT_BIAS / 101 NEUTRAL (overall NEUTRAL)
+- Speed: 231/549 tokens >= 50% percentile (42%)
+- Hotset: 2 tokens (INJ SHORT conf=78 score=105.4, MERL SHORT conf=88 score=0)
+- 192/549 speeds stale (35%)
+
+SYSTEM:
+- Timers: 61 loaded, all active
+- Disk: 77% used (26G free)
+- Failed services: 5 (bug-hunter, hl-volume, mtf-macd-tuner, trading-checklist, upgrade-implementer)
+- hl-sync-guardian: active
+- Pipeline timer: running (1min)
+
+AUTO-FIXES APPLIED:
+- None needed. Pipeline operational. hl-volume 429 is transient.
+
+ALERTS:
+- [WARN] 5 failed services (non-critical): bug-hunter, hl-volume (429 rate limit), mtf-macd-tuner, trading-checklist, upgrade-implementer
+- [WARN] 192/549 speeds stale (35%) — expected for inactive tokens
+- [WARN] MERL SHORT in hotset has score=0, rounds=1 — likely to be filtered
+- [INFO] Market overwhelmingly NEUTRAL — expected low trading activity
+```
+
+## Error Alerts — 2026-08-12 10:40 UTC
+- **[WARN]** (5x): Non-critical services failed — `hermes-bug-hunter` (3h ago, imports defunct ai_decider), `hermes-hl-volume` (27min ago, Hyperliquid 429 rate limit), `hermes-mtf-macd-tuner` (3h53m ago), `hermes-trading-checklist` (45min ago, CRIT=1), `hermes-upgrade-implementer` (8h ago)
+- **[WARN]** (1x): `hermes-hl-volume` 429 rate limit — transient, self-correcting on next timer fire
+- **[INFO]**: Pipeline healthy — cycle #151860, 0 errors in last 30min. 198 signals generated but all blocked by signal_analyst (scores too low). 0 open positions, 0 closed today.
+- **AUTO-FIX**: None needed — all issues are non-critical utilities or transient API limits.

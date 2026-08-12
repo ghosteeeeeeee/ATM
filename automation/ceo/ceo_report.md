@@ -1,25 +1,26 @@
-## CEO Report — 2026-08-14
+## CEO Report — 2026-08-12 (latest verified)
 
 ### Diagnosis
 **Verified DB numbers:**
-- **24h**: 77T, -$0.19, 50.6% WR — flat
-- **7d**: 418T, +$0.71, 53.0% WR — solid
-- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 +$0.01 (recovery)
+- **24h**: 78T, -$0.22, 50.0% WR — flat
+- **7d**: 419T, +$0.68, 52.9% WR — solid
+- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 -$0.02 (recovery)
 - **LONG 7d**: 276T, +$1.26, 53.3% WR — solid
-- **SHORT 7d**: 142T, -$0.55, 52.1% WR — bleed improving
+- **SHORT 7d**: 143T, -$0.58, 51.7% WR — bleed below threshold
 - **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%, range_breakout- 7T +$0.43 85.7%
-- **Open**: 7 trades, flat
+- **Open**: 6 trades, $0 unrealized
+- **Pipeline**: active (running), hl-sync-guardian active, disk 77%
 
 ### Bleeders (all addressed)
-- range_breakout+ LONG: 8T -$0.41, 25% WR — **DISABLED** (legacy, fading)
-- trend_momentum_near_sma+ LONG: 6T -$0.37, 16.7% WR — **DISABLED** (legacy, fading)
+- range_breakout+ LONG: 8T -$0.41, 25% WR — **DISABLED** (0 trades last 48h, legacy fading)
+- trend_momentum_near_sma+ LONG: 6T -$0.37, 16.7% WR — **DISABLED** (last trade Aug 12 06:09, residual)
 - hzscore+ standalone LONG: 12T -$0.12, 41.7% WR — **RESTRICTED** to combo-only
 
 ### Fix Applied
-**NO CHANGES.** All bleed sources addressed. Aug 12 recovered from Aug 11 worst (-$0.33 → +$0.01). 7d solid (+$0.71), stars intact (4 profitable). SHORT 7d -$0.55 below -$1.50 regime filter threshold. Overreacting destabilizes.
+**NO CHANGES.** All bleed sources addressed. Aug 12 recovering from Aug 11 (-$0.33 → -$0.02). 7d solid (+$0.68), stars intact (4 profitable). SHORT7d -$0.58 below -$1.50 threshold. ATR SL hit dominant (57T -$2.96 48h) but expected cost of doing business. Overreacting destabilizes.
 
 ### Verification
-Monitor: SHORT7d bleed (if -$1.50+ → consider regime filter).
+Monitor: SHORT7d bleed (if -$1.50+ → consider regime filter), pipeline health.
 
 ---
 

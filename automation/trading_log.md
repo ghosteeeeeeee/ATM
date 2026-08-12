@@ -6229,3 +6229,68 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 - Will CONF_BASE 70 filter enough weak range_breakout+ entries?
 - hzscore+ underperforming at 36.4% WR — watch for 0% WR kill threshold
 - cut-loser-CL-T1 still -$0.105 avg — need more data with CL_TRAIL_ENABLED=False
+
+## [2026-08-12 10:10] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L +$0.01)
+**24h:** ~76T ~38W (50% WR) -$0.25
+**SL hit rate:** 43.4% (borderline, avg loss -$0.057)
+
+**Close Reasons (24h):**
+- profit-monster-trail: 37T (49%) +$1.90 (+$0.051/trade)
+- atr_sl_hit: 33T (43%) -$1.88 (-$0.057/trade)
+- cut-loser-CL-T1: 4T -$0.42
+
+**Changes:**
+None — CEO already addressed worst bleeders today (range_breakout+ DISABLED, trend_momentum_near_sma+ KILLED)
+
+**No Change Needed:**
+- atr_sl_hit 43.4% borderline but avg loss small, profit-monster-trail compensating
+- Trade freq 2/hr normal
+- 7d profitable (52.2% WR +$0.72)
+- No 0% WR kill candidates
+- range_breakout- (86% WR +$0.43) strong
+
+**Open Questions:**
+- atr_sl_hit trending up from 38.5% → 43.4% over last few hours — monitor
+- Will hzscore+ improve with combo-only mode?
+
+## [2026-08-12 11:26] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L +$0.03)
+**24h:** 78T 39W (50.0% WR) -$0.22 (flat)
+**7d:** 419T 221W (52.7% WR) +$0.68
+
+**Close Reasons (24h):**
+- profit-monster-trail: 38T (49%) +$1.96 (avg +$0.052) — money maker
+- atr_sl_hit: 34T (43.6%) -$1.91 (avg -$0.056) — borderline but avg loss small
+- cut-loser-CL-T1: 4T -$0.42 (avg -$0.105)
+- atr_tp_hit: 1T +$0.15
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- range_breakout-: 7T 6W (85.7% WR) +$0.43 — star
+- bb_bounce+: 19T 11W (57.9% WR) +$0.16 — solid
+- hzscore+: 12T 5W (41.7% WR) -$0.12 — underperforming
+- hzscore-: 16T 8W (50% WR) -$0.04 — flat
+- range_breakout+: 8T 2W (25% WR) -$0.41 — all residual trades from before DISABLE
+- trend_momentum_near_sma+: 6T 1W (16.7% WR) -$0.37 — all residual, already killed
+
+**Changes:**
+None — previous fixes settling in:
+- range_breakout+ DISABLED (CEO, no new trades since ~09:00) ✓
+- trend_momentum_near_sma+ DISABLED ✓
+- CL_TRAIL_ENABLED=False deployed ✓
+- CONF_BASE 70 for range_breakout (last change 08:27) ✓
+
+**No Change Needed:**
+- atr_sl_hit 43.6% borderline but avg loss small, profit-monster-trail compensating
+- Trade freq 2/hr normal (no overtrading)
+- No 0% WR kill candidates (no new trades from killed signals)
+- 7d profitable (52.7% WR +$0.68)
+- range_breakout- (85.7% WR +$0.43) strong
+- hzscore+ -$0.12 — near kill threshold, next run will reassess
+
+**Open Questions:**
+- hzscore+ 41.7% WR -$0.12 — watch for 0% WR kill threshold
+- atr_sl_hit trending: 43.6% — monitor, if >45% consider SL adjustment
