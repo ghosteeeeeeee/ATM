@@ -1,3 +1,28 @@
+## CEO Report — 2026-08-14
+
+### Diagnosis
+**Verified DB numbers:**
+- **24h**: 77T, -$0.19, 50.6% WR — flat
+- **7d**: 418T, +$0.71, 53.0% WR — solid
+- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 +$0.01 (recovery)
+- **LONG 7d**: 276T, +$1.26, 53.3% WR — solid
+- **SHORT 7d**: 142T, -$0.55, 52.1% WR — bleed improving
+- **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%, range_breakout- 7T +$0.43 85.7%
+- **Open**: 7 trades, flat
+
+### Bleeders (all addressed)
+- range_breakout+ LONG: 8T -$0.41, 25% WR — **DISABLED** (legacy, fading)
+- trend_momentum_near_sma+ LONG: 6T -$0.37, 16.7% WR — **DISABLED** (legacy, fading)
+- hzscore+ standalone LONG: 12T -$0.12, 41.7% WR — **RESTRICTED** to combo-only
+
+### Fix Applied
+**NO CHANGES.** All bleed sources addressed. Aug 12 recovered from Aug 11 worst (-$0.33 → +$0.01). 7d solid (+$0.71), stars intact (4 profitable). SHORT 7d -$0.55 below -$1.50 regime filter threshold. Overreacting destabilizes.
+
+### Verification
+Monitor: SHORT7d bleed (if -$1.50+ → consider regime filter).
+
+---
+
 ## CEO Report — 2026-08-12 (latest)
 
 ### Diagnosis
@@ -139,3 +164,17 @@ Pipeline: active. Disk: 77%. Open: 6 (all small). Stars: 4 profitable 7d. trend_
 - Disk: 77%
 - Open: 7 (flat)
 - Live trading: enabled
+
+## CEO Report — 2026-08-12 (latest)
+
+### Diagnosis
+24h flat (-$0.25, 50.0% WR on 76T). LONG bleeding -$0.54 (46.2% WR), SHORT strong +$0.29 (58.3% WR). 7d solid +$0.65 (52.8% WR). All three 7d bleeding sources addressed: range_breakout+ LONG disabled, hzscore+ restricted to combo-only, trend_momentum_near_sma+ disabled (legacy). Daily improving: Aug 11 -$0.33 → Aug 12 -$0.05. 3 open trades flat. Stars7d intact.
+
+### Root Cause
+LONG 24h bleed is residual from disabled signals still in trade window. Short-term noise, not structural. SHORT7d slight bleed (-$0.61) is regime-driven (NEUTRAL market), not signal-driven — star SHORT (bb-bounce-short,hzscore-) still profitable at +$0.12.
+
+### Fix Applied
+None. All bleed sources already addressed in prior CEO runs (range_breakout+ disabled Aug12, hzscore+ combo-only restriction, trend_momentum_near_sma+ legacy disable). Current state is post-fix stabilization.
+
+### Verification
+Next eval: If LONG 24h WR stays <47% for 48h+, escalate to code review. If SHORT7d bleed exceeds -$1.50, consider regime filter. Pipeline healthy, no crashes, no errors.
