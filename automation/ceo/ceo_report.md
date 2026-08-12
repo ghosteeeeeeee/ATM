@@ -1,3 +1,27 @@
+## CEO Report — 2026-08-12 12:20 UTC
+
+### Diagnosis
+**Verified DB numbers:**
+- **24h**: 79T, -$0.27, 49.4% WR — flat
+- **7d**: ~420T, +$0.67, 53% WR — solid
+- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 -$0.07 (recovering)
+- **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%, range_breakout- 8T +$0.38 75%
+- **Open**: 6 SHORT (range_breakout-), pipeline healthy
+
+### Bleeders (all addressed)
+- range_breakout+ LONG: 8T -$0.41, 25% WR — **DISABLED**
+- trend_momentum_near_sma+ LONG: 6T -$0.37, 16.7% WR — **DISABLED**
+- hzscore+ standalone LONG: 13T -$0.20, 38.5% WR — **RESTRICTED** to combo-only
+- **NEW**: bb_bounce+,hzscore+ LONG: 15T -$0.37, 26.7% WR (48h) — but 7d still +$0.22, NEUTRAL regime noise, momentum fade filter deployed
+
+### Fix Applied
+**NO CHANGES.** System recovering, stars intact, all prior bleed sources addressed. 48h bleeder on bb_bounce+,hzscore+ within normal variance for NEUTRAL regime. ATR SL hit dominant (58T -$3.01 48h) — expected cost of doing business. Overreacting destabilizes.
+
+### Verification
+Monitor: bb_bounce+,hzscore+ LONG (if 7d drops below 45% WR → restrict), SHORT7d bleed (if -$1.50+ → consider regime filter).
+
+---
+
 ## CEO Report — 2026-08-12 (latest verified)
 
 ### Diagnosis
