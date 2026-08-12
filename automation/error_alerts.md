@@ -166,3 +166,7 @@ ALERTS:
 
 ## Error Alerts — 2026-08-12 04:09 UTC
 - **NEW** (1x): `Aug N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-08-12 04:42 UTC
+- **[WARN]** (1x): `Signal accel_300: ERROR → ERROR: name '_get_1h_trend' is not defined`
+- **AUTO-FIX**: Added missing `_get_1h_trend()` function to `scripts/signals/accel_300.py` (copied from `range_breakout.py`). Syntax verified.

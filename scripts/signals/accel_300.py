@@ -77,6 +77,46 @@ BARS_UNKNOWN     = ACCEL_300_BARS_UNKNOWN
 BAR_GAP_THRESH_SEC = ACCEL_300_BAR_GAP_THRESH_SEC
 DRY_RUN            = '--dry' in sys.argv
 
+
+def _get_1h_trend(token):
+    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+    conn = None
+    try:
+        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1h
+            WHERE token = ?
+            ORDER BY ts DESC
+            LIMIT 60
+        """, (token.upper(),))
+        rows = cur.fetchall()
+        if not rows or len(rows) < 50:
+            return 'NEUTRAL'
+        closes = [r[0] for r in reversed(rows)]
+
+        def ema(data, period):
+            k = 2.0 / (period + 1)
+            val = data[0]
+            for v in data[1:]:
+                val = v * k + val * (1.0 - k)
+            return val
+
+        ema20 = ema(closes, 20)
+        ema50 = ema(closes, 50)
+        if ema50 == 0:
+            return 'NEUTRAL'
+        spread = abs(ema20 - ema50) / ema50 * 100
+        if spread < 0.1:
+            return 'NEUTRAL'
+        return 'BULLISH' if ema20 > ema50 else 'BEARISH'
+    except Exception:
+        return 'NEUTRAL'
+    finally:
+        if conn:
+            conn.close()
+
+
 SIGNAL_TYPE_LONG   = 'accel_300_long'
 SIGNAL_TYPE_SHORT  = 'accel_300_short'
 SOURCE_LONG        = 'accel-300+'
