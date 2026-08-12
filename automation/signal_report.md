@@ -1,54 +1,47 @@
 # Signal Performance Report
-Generated: 2026-08-11 19:30 UTC
+Generated: 2026-08-12 15:00 UTC
 
-## 6h Performance
+## 6h Performance (2+ trades)
 | Signal | Dir | Trades | WR | PnL |
 |--------|-----|--------|-----|-----|
-| trend_momentum_near_sma+ | LONG | 3 | 0.0% | -$0.35 |
-| hzscore+ | LONG | 5 | 60.0% | -$0.01 |
-| hzscore- | SHORT | 2 | 50.0% | +$0.01 |
-| hzscore+,trend_momentum_near_sma+ | LONG | 2 | 50.0% | +$0.01 |
+| hzscore- | SHORT | 2 | 50.0% | -$0.06 |
+| trend_momentum_near_sma+ | LONG | 2 | 0.0% | -$0.05 |
+| hzscore+ | LONG | 3 | 33.3% | +$0.03 |
+| bb_bounce+ | LONG | 14 | 57.1% | +$0.10 |
 
 ## 24h Performance (3+ trades)
 | Signal | Dir | Trades | WR | PnL |
 |--------|-----|--------|-----|-----|
-| trend_momentum_near_sma+ | LONG | 3 | 0.0% | -$0.35 |
-| bb_bounce+,hzscore+ | LONG | 6 | 16.7% | -$0.18 |
-| hzscore+ | LONG | 5 | 60.0% | -$0.10 |
+| trend_momentum_near_sma+ | LONG | 5 | 0.0% | -$0.40 |
+| hzscore- | SHORT | 4 | 50.0% | -$0.05 |
+| bb_bounce+,hzscore+ | LONG | 4 | 50.0% | -$0.01 |
+| hzscore+ | LONG | 8 | 50.0% | +$0.02 |
+| bb_bounce+ | LONG | 14 | 57.1% | +$0.10 |
 
-## KILLED (executed): None
-No signals met all kill criteria (WR<30%, 5+ trades, active>24h, PnL<-$0.10).
+## KILLED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| trend_momentum_near_sma+ | LONG | 0.0% | -$0.40 | 5 | Base already killed 2026-08-12 13:05 UTC. PLUS/MINUS flags now False. |
 
 ## BOOSTED (executed): None
-No signals met all boost criteria (WR>55%, 5+ trades, PnL>$0.05, consistent across tokens).
+No signals met all boost criteria (WR>55%, 5+ trades, PnL>$0.05, consistent across tokens). bb_bounce+ is the closest (57.1% WR, +$0.10) but below trade threshold for boost.
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| trend_momentum_near_sma+ | LONG | 0.0% | -$0.35 | 3 | **BUG: contrarian flip not applied** |
-| bb_bounce+,hzscore+ | LONG | 16.7% | -$0.18 | 6 | 24h bad streak, all-time 48.5% WR +$0.20 |
-| hzscore+ | LONG | 60.0% | -$0.01 | 5 | Good WR, breakeven PnL |
+| hzscore- | SHORT | 50.0% | -$0.05 | 4 | Marginal — below kill threshold |
+| bb_bounce+,hzscore+ | LONG | 50.0% | -$0.01 | 4 | Breakeven — monitoring |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| hzscore+,mover+ | LONG | 80.0% | +$0.17 | 5 | Strong |
-| hzscore-,range_breakout- | SHORT | 100.0% | +$0.10 | 2 | Strong |
-| bb_bounce+,range_finder+ | LONG | 58.5% | +$0.71 | 53 | System workhorse |
+| bb_bounce+ | LONG | 57.1% | +$0.10 | 14 | Steady performer |
 
 ## Signal Inversions: None found
 
 ## Issues
-
-### FIXED: Contrarian flip not applied to trend_momentum_near_sma
-- **Root cause:** `signal_compactor.py:765` contrarian flip was only in the confluence gate section. Standalone `trend_momentum_near_sma+` signals bypass this via the backtested standalone path (HOTSET-FINAL-BYPASS, PRESERVE-MERGE-BYPASS, PENDING-APPROVE-BYPASS, SAFETY-FILTER-BYPASS) — a completely separate code path that never reached the flip.
-- **Fix:** Added contrarian flip to all 4 bypass paths in signal_compactor.py (lines 1179, 1229, 1424, 1585). Signals will now be flipped to SHORT before reaching decider_run.
-- **Impact:** 0% WR, -$0.35 on 3 trades — should improve to ~50%+ WR once flip is active.
-
-### MEGA token: Recent cluster of losses
-- 4 of last 6 `bb_bounce+,hzscore+` trades on MEGA hit ATR SL
-- MEGA already blacklisted (line 132: "5 trades, 0% WR, -$0.23 — low-price noise coin")
-- Blacklist is working — no new MEGA trades should fire
+- **trend_momentum_near_sma**: Base flag killed earlier today but PLUS/MINUS flags were still True. Fixed — all three flags now False.
+- **Stale open position**: 1 open trend_momentum_near_sma+ LONG from Aug 11 22:14 UTC — may need manual close.
 
 ## Full History (all-time winners)
 | Signal | Trades | WR | PnL |
