@@ -37,8 +37,10 @@ SKIP_COINS = SHORT_BLACKLIST | LONG_BLACKLIST
 
 # Also filter test/fake coins (@ prefix, numeric-only names)
 def _is_fake_coin(symbol):
-    """Filter test tokens: @-prefixed, pure numeric, or too short."""
+    """Filter test tokens: @-prefixed, #-prefixed, pure numeric, or too short."""
     if '@' in symbol:
+        return True
+    if symbol.startswith('#'):
         return True
     if symbol.isdigit():
         return True
