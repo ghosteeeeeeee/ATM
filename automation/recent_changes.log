@@ -300,3 +300,6 @@
   BY: auto_1hr
 [2026-08-12 14:30] auto_1hr: NO CHANGES
   WHY: 7T last hour (0W6L-/usr/bin/bash.43). range_breakout- 6 consecutive SL hits (all SHORT NEUTRAL chop). 24h 86T 51.2% WR -/usr/bin/bash.45. atr_sl_hit 52.7% today (above 40% threshold but profit-monster-trail compensating .96 vs .40). No 0% WR kill candidates. 7d still positive (+/usr/bin/bash.13). Today worst day (-/usr/bin/bash.50) but regime-driven chop, not signal failure. No param changes.
+[2026-08-12 18:27] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.06 flat). 24h 97T 48.5% WR -$0.58. atr_sl_hit 46.4% (borderline, trail compensating $2.17 vs -$2.61). Dead signals (range_breakout+, trend_momentum) clearing residual, no 0% WR kill candidates. hzscore+ bleeding -$0.12 (41.7% WR) but not kill threshold. Trade freq 4/hr normal. 7d barely flat +$0.04. One change made today (range_breakout confidence). No param changes.
+  BY: auto_1hr

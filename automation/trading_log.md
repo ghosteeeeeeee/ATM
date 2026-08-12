@@ -6410,3 +6410,38 @@ None — system stable, previous fixes settling in.
 - atr_sl_hit 7d trend 37.9% → 46.3% — monitor, if exceeds 55% consider SL adjustment
 - hzscore+ -$0.12 — next run will reassess
 - 7d degrading — track if trend continues
+
+## [2026-08-12 18:27] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.06 (flat)
+**24h:** 97T 48.5% WR -$0.58
+**7d:** 435T 52.0% WR +$0.04
+
+**Close Reasons (24h):**
+- profit-monster-trail: 46T (47.4%) +$2.17
+- atr_sl_hit: 45T (46.4%) -$2.61
+- cut-loser-CL-T1: 3T -$0.30
+- atr_tp_hit: 1T +$0.15
+
+**Signal Performance (24h):**
+- bb_bounce+: 19T 57.9% WR +$0.16 — healthiest
+- range_breakout-: 20T 45% WR -$0.12 — mediocre
+- hzscore-: 16T 50% WR -$0.04 — flat
+- hzscore+: 12T 41.7% WR -$0.12 — bleeding, monitor
+- range_breakout+: 8T 25% WR -$0.41 — residual from DISABLE
+- trend_momentum: 5T 20% WR -$0.25 — residual from DISABLE
+- accel-300-: 5T 60% WR +$0.01 — OK
+
+**No Change Needed:**
+- No 0% WR kill candidates
+- Dead signals (range_breakout+, trend_momentum) already DISABLED, clearing residual
+- hzscore+ -$0.12 borderline but not kill threshold
+- atr_sl_hit 46.4% above 40% but trail compensating
+- Regime-driven chop (NEUTRAL), not signal failure
+- One change already made today (range_breakout confidence)
+
+**Open Questions:**
+- atr_sl_hit 7d trend 37.9% → 46.4% — monitor, if exceeds 55% consider SL adjustment
+- 7d degrading +$0.99 → +$0.04 — track if trend continues
+- hzscore+ bleeding — next run reassess
