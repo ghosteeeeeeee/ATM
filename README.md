@@ -227,7 +227,7 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 
 ## Automation Team
 
-Hermes runs a **CEO + automation team** that continuously improves the system.
+ATM runs a **CEO + automation team** that continuously improves the system.
 
 ### The Team
 
@@ -272,8 +272,9 @@ apt install python3-pip sqlite3
 # Python deps
 pip install requests sqlite3 openai
 
-# OpenCode (for AI-powered development)
-# See: https://opencode.ai
+# OpenCode — AI-powered development assistant (required)
+# Install: https://opencode.ai
+# Recommended: opencode go + mimo v2.5 model
 ```
 
 ### Setup
