@@ -6637,3 +6637,23 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - range_breakout+ and hzscore+ both at 25% WR 24h — monitor, if next hour shows 3+ consecutive losses, kill
+
+## [2026-08-13 00:00] Hourly Analysis
+
+**Trades:** 0 closed (off-hours quiet)
+**PnL:** $0.00
+
+**24h Summary:** 98T, 58.2% WR, net +$0.18. Trail +$2.73 vs atr_sl -$2.55. ATR SL 40.2% (at threshold).
+
+**Changes:**
+1. None — no action needed
+
+**No Change Needed:**
+- ATR SL 40.2% (at threshold, trail fully compensating)
+- No 0% WR kill candidates (no signal with 3+ losing trades last hour)
+- Trade frequency normal
+- 7d flat +$0.36
+- One change already today (range_breakout confidence)
+
+**Open Questions:**
+- None — system stable
