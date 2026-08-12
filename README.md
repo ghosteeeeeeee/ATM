@@ -15,6 +15,33 @@
 
 ATM is an event-driven trading system that continuously monitors cryptocurrency markets, identifies momentum-based trading opportunities using technical indicators (RSI, MACD, z-score velocity, percentile rank), and executes trades on Hyperliquid exchange.
 
+### Top Signals
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `bb_bounce` | Bollinger Band | Bounce off lower/upper band |
+| `macd_accel` | Momentum | 1m MACD acceleration per-token |
+| `hzscore` | Statistical | Multi-TF z-score velocity |
+| `hh_hl` | Structure | Higher High / Higher Low + CHoCH |
+| `ema9_sma20` | Moving Average | EMA9/SMA20 crossover |
+| `continuation` | Trend | Trend continuation after pullback |
+| `engulfing` | Candlestick | Bullish/bearish engulfing |
+| `ma_100_bounce` | Support/Resistance | MA100 bounce |
+| `gap_300` | Volatility | 300%+ volume gap |
+| `fast_momentum` | Speed | High-speed momentum burst |
+
+**Plus 49 more** — 59 total signal types. All signals are **plug-and-play**:
+drop a script in `scripts/signals/`, register it, and it's live.
+
+### How to Make a Signal
+
+See the **[add-signal](skills/add-signal/)** skill — complete checklist:
+- Create script in `scripts/signals/`
+- Add flags to `hermes_constants.py`
+- Register in `signals/__init__.py`
+- Add Layer 2 enforcement in `signal_schema.py`
+- Run `bug_hunter` → commit → done
+
 ---
 
 ## Full Pipeline
