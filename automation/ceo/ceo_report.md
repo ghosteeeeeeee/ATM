@@ -76,3 +76,63 @@ NO TRADING CHANGES. System self-correcting. Recent Aug 13 changes (momentum fade
 - Aug 13 changes eval window (24-48h from deployment)
 - accel-300 re-enable performance (was #1 signal historically)
 - bb_bounce+,hzscore+ LONG 7d 50% WR — intact but watch if drops below 45%
+
+---
+
+## CEO Report — 2026-08-12 (Scaling Spec Review)
+
+### Decision: APPROVE Phase 1+2, DEFER Phase 3, REJECT Phase 4
+
+**Verified numbers**: 7d 383T +$0.93 (53.0% WR). atr_sl_hit dominates: 138T -$7.81 (7d loss driver). Daily trend declining but still positive.
+
+### Phase 1 — Late Entry Filter: ✅ APPROVED (Low risk, high value)
+
+The spec correctly identifies the problem (trade 13656 entered after move exhausted). Implementation is trivial — one price check before trade execution.
+
+**Concern**: Spec says integrate in `signal_compactor.py` or `signals_runner.py`. WRONG LOCATION. Late entry filter must run in `position_manager.py` at trade execution time, not at signal generation. Signal compactor fires signals; position_manager executes them. Filter must check price move before placing the order, not before scoring the signal.
+
+**Constants**: `LATE_ENTRY_MAX_MOVE_PCT = 0.005`, `LATE_ENTRY_LOOKBACK_MINUTES = 15` — reasonable defaults.
+
+### Phase 2 — ATR Trailing: ✅ APPROVED (Medium risk, high value)
+
+Replacing fixed 0.60% trail with 1.5× ATR is sound. Current trail (0.60%) was set Aug12 after 0.20% proved too tight. ATR-adaptive trail naturally handles both low-ATR tokens (ADA ATR=0.35%) and high-ATR tokens without manual tuning.
+
+**Key implementation detail**: The `trail_floor` logic in `tpsl_utils.py:528` currently hardcodes `TRAILING_DISTANCE_PCT`. Replace with `TRAILING_ATR_MULTIPLE × atr`. Keep `ATR_SL_MIN` as floor — SL must never be tighter than 1.0% from entry.
+
+**Backtest concern**: Spec shows ATR trail +$0.042 vs fixed -$0.018 on ONE trade. Need broader backtest across top 10 tokens by trade count before deploying. Single-trade backtests are noise, not signal.
+
+### Phase 3 — Scale Out: ⏳ DEFER (High complexity, needs more evidence)
+
+Spec proposes 1/3 at 1.5×ATR, 1/3 at 3×ATR, trail remaining. This requires:
+- State file (`scale_state.json`) tracking partial closes per trade
+- Modified order execution (partial close API calls)
+- Breakeven stop logic after TP1
+
+**Risk**: State file adds failure mode. If position_manager crashes between TP1 hit and state write, orphaned state = wrong behavior on next run. Need idempotent state recovery.
+
+**Defer until**: Phase 1+2 validated for 2+ weeks. If atr_sl_hit drops below 50% of losses, scale out becomes unnecessary. If atr_sl_hit remains dominant, scale out becomes justified.
+
+### Phase 4 — Scale In: ❌ REJECTED (High complexity, low value)
+
+Pyramiding adds to winners at better average. Sounds good on paper, but:
+- Increases max position size per token (conflicts with MAX_POSITIONS/MAX_LEVERAGE)
+- Scale-in confirmation (0.3% move) may trigger on noise
+- No backtest data provided — pure theory
+
+**Philosophy misalignment**: Hermes is a high-frequency system with many small positions. Scale-in is a swing trading technique. Adding to winners works when you have 5-10 positions; we have 50-100+ trades/week. The edge is in signal quality, not position sizing complexity.
+
+### Summary
+
+| Phase | Decision | Why |
+|-------|----------|-----|
+| 1. Late Entry | ✅ APPROVED | Simple, high value, addresses real problem |
+| 2. ATR Trail | ✅ APPROVED | Better than fixed, needs broader backtest |
+| 3. Scale Out | ⏳ DEFER | Complex, needs Phase 1+2 validation first |
+| 4. Scale In | ❌ REJECTED | Wrong philosophy, no data, high risk |
+
+### Before Implementation
+
+1. Run backtest across top 10 tokens (not just AVNT) for ATR trail vs fixed
+2. Late entry filter goes in position_manager.py, NOT signal_compactor
+3. ATR trail replaces TRAILING_DISTANCE_PCT in tpsl_utils.py lines 528, 544, 551, 744, 769
+4. Keep ATR_SL_MIN = 0.010 as floor — never loosen SL below 1.0% from entry
