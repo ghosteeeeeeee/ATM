@@ -247,3 +247,6 @@
 [2026-08-12 15:05] auto_1hr: NO CHANGES
   WHY: 5T last hour (2W 3L -$0.09). 24h 43T 20W (46.5% WR) -$0.28. atr_sl_hit 41.9% (down from 45%, improving). profit-monster-trail compensating ($0.93 vs -$0.79). No 0% WR kill candidates (trend_momentum already killed). Trade freq 5/hr normal. 7d profitable (52.2% WR +$0.72). cut-loser-CL-T1 -$0.42 — CL_TRAIL_ENABLED=False deployed, monitoring.
   BY: auto_1hr
+[2026-08-12 16:05] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.02). 24h 44T 20W (45.5% WR) -$0.29. atr_sl_hit 43.2% stable. profit-monster-trail compensating ($0.94 vs -$0.81). No 0% WR kill candidates. Trade freq 2/hr normal. 7d profitable (52.2% WR +$0.72).
+  BY: auto_1hr
