@@ -743,10 +743,11 @@ def compute_atr_sl_tp(
             if in_profit:
                 trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
-                new_sl = max(trail_floor, min_from_entry)
-                # FIX: SL must never be above entry for LONG (same as pre-gate)
-                if new_sl >= entry_f:
-                    new_sl = min_from_entry
+                # When trail_floor > entry (low ATR token), use ATR from highest
+                if trail_floor >= entry_f:
+                    new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
+                else:
+                    new_sl = trail_floor    # normal case: trail from peak
                 if current_sl > 0:
                     # Only enforce one-way when current_sl is correct-side (below entry for LONG).
                     # If current_sl is wrong-sided (above entry), the trailing gate's correction
