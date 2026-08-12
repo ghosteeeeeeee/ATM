@@ -88,8 +88,10 @@ def _read_signals_batch(tokens, hours=24, conn=None):
                 (token, cutoff)
             ).fetchall()
             results[token] = rows
-    except Exception:
-        pass
+    except sqlite3.OperationalError as e:
+        print(f'[coin_tracker] Signal table error: {e}', flush=True)
+    except Exception as e:
+        print(f'[coin_tracker] Signal read error: {e}', flush=True)
     return results
 
 def _read_regime():

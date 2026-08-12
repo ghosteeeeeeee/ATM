@@ -125,6 +125,8 @@ def score_momentum(closes, ema_9=None, ema_20=None, ema_50=None):
         return 50.0
     # Price change over last 20 candles (or fewer if not available)
     lookback = min(19, len(closes) - 1)
+    if closes[lookback] == 0:
+        return 50.0
     price_change = (closes[0] - closes[lookback]) / closes[lookback] * 100
     # Map price change to score: -10% → 10, 0% → 50, +10% → 90
     score = 50.0 + max(-40, min(40, price_change * 4))
@@ -229,14 +231,14 @@ def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=Non
     bull = 0
     bear = 0
     
-    if above_20: bull += 1
-    else: bear += 1
+    if above_20 is True: bull += 1
+    elif above_20 is False: bear += 1
     
-    if above_50: bull += 1
-    else: bear += 1
+    if above_50 is True: bull += 1
+    elif above_50 is False: bear += 1
     
-    if ema20_above_50: bull += 1
-    else: bear += 1
+    if ema20_above_50 is True: bull += 1
+    elif ema20_above_50 is False: bear += 1
     
     if rsi_14:
         if rsi_14 > 55: bull += 1
