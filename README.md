@@ -123,8 +123,6 @@ flowchart LR
 
 ## Context Gate (5 Layers)
 
-The Context Gate is the brain of the system — a 5-layer funnel that decides which signals become trades:
-
 ```
 Layer 1: RULE-BASED GATE
   ├─ Speed < 20% = AMBIGUOUS
@@ -149,6 +147,73 @@ Layer 5: LLM CONTEXT GATE (MiniMax-M3)
 
 ---
 
+## Tuning Parameters (`hermes_constants.py`)
+
+All system constants live in `scripts/hermes_constants.py`. Edit to tune.
+
+### Position Limits
+
+| Constant | Default | Controls |
+|----------|---------|----------|
+| `MAX_OPEN_POSITIONS` | 6 | Max concurrent trades |
+| `MAX_HYPE_POSITIONS` | 5 | Max in top-hype tokens |
+| `MAX_TOTAL_POSITIONS` | 10 | Max including pending |
+| `DEFAULT_TRADE_SIZE_USDT` | $11 | Default trade size |
+
+### Trailing Stops & Exits
+
+| Constant | Default | Controls |
+|----------|---------|----------|
+| `TRAILING_ACTIVATION_PCT` | 0.40% | When trailing activates |
+| `TRAILING_DISTANCE_PCT` | 0.30% | Trail distance behind peak |
+| `STALE_WINNER_TIMEOUT_MINUTES` | 60 | Close winners flat for 60+ min |
+| `STALE_LOSER_TIMEOUT_MINUTES` | 8 | Cut losers flat for 8+ min |
+| `STALE_WINNER_MIN_PROFIT` | 0.6% | Min profit to be "winner" |
+| `ATR_SL_MIN` | 1.2% | Minimum stop loss |
+| `ATR_TP_MIN` | 0.8% | Minimum take profit |
+
+### Signal Filtering
+
+| Constant | Default | Controls |
+|----------|---------|----------|
+| `SPEED_BOOST_THRESHOLD` | 70 | pctl ≥70 → easier entry |
+| `SPEED_HOTSET_THRESHOLD` | 80 | pctl ≥80 → hot-set boost |
+| `SPEED_ABS_MIN_THRESHOLD` | 2.5% | Absolute speed floor per 5m |
+| `VEL_STALE_THRESHOLD_PCT` | 0.05% | Below this = "flat" |
+| `MOMENTUM_EXHAUSTION_THRESHOLD` | 0.5% | Price moved 0.5% in 30m = no enter |
+| `SIGNAL_QUALITY_MIN_GRADE` | 'C' | Only trade C or better |
+
+### Blacklists
+
+| Constant | Purpose |
+|----------|---------|
+| `LONG_BLACKLIST` | Tokens blocked for LONG |
+| `SHORT_BLACKLIST` | Tokens blocked for SHORT |
+| `SIGNAL_SOURCE_BLACKLIST` | Signal combos blocked (e.g. `return_exhaustion-`) |
+
+### Risk Management
+
+| Constant | Default | Controls |
+|----------|---------|----------|
+| `KELLY_ENABLED` | False | Kelly criterion (until 50+ trades) |
+| `KELLY_FRACTION` | 0.25 | Quarter-Kelly |
+| `DRAWDOWN_ENABLED` | True | Drawdown circuit breaker |
+| `PORTFOLIO_HEAT_ENABLED` | True | Portfolio heat tracking |
+| `MAX_PORTFOLIO_HEAT` | 0.15 | Max 15% total risk |
+| `CONSERVATIVE_MODE_ENABLED` | False | 0.5x size multiplier |
+
+### Signal Grades
+
+| Grade | Weight | Meaning |
+|-------|--------|---------|
+| A | 1.5x | Strong edge |
+| B | 1.2x | Good edge |
+| C | 1.0x | Moderate edge |
+| D | 0.8x | Weak edge |
+| F | 0.5x | No edge |
+
+---
+
 ## Kill Switch
 
 | Mode | Behavior |
@@ -157,6 +222,42 @@ Layer 5: LLM CONTEXT GATE (MiniMax-M3)
 | `live_trading: true` | Guardian mirrors approved trades to real HL orders |
 
 **Guardian reconciliation** (every 60s): reads kill switch → mirrors paper positions to HL → reconciles HL ↔ paper DB → marks orphan closes.
+
+---
+
+## Automation Team
+
+Hermes runs a **CEO + automation team** that continuously improves the system.
+
+### The Team
+
+| Role | Script | Job |
+|------|--------|-----|
+| **CEO** | `automation/ceo/ceo_prompt.md` | Strategic decisions, param changes, signal enable/disable |
+| **Orchestrator** | `automation/orchestrator_prompt.md` | Daily implementation pipeline (12h) |
+| **Health Monitor** | `automation/health_monitor_prompt.md` | Pipeline health + anomalies (hourly) |
+| **Signal Reporter** | `automation/signal_reporter_prompt.md` | Signal performance analysis (6h) |
+| **Blacklist Tester** | `automation/blacklist_tester.py` | Test blacklisted tokens (12h) |
+| **Self Learner** | CEO team member | Parameter tuning, signal tuning |
+| **Bug Hunter** | `skills/bug-hunter/` | Find and fix bugs |
+| **Summarizer** | `automation/summarizer_prompt.md` | All automation results summary (12h) |
+| **Upgrade Implementer** | `automation/upgrade_implementer_prompt.md` | Scan plans, implement upgrades (12h) |
+
+### Automation Schedule
+
+```
+Hourly:     health_monitor, auto_1hr (trade analysis + tuning)
+Every 6h:   signal_reporter
+Every 12h:  blacklist_tester, summarizer, upgrade_implementer
+Daily:      orchestrator (full pipeline audit)
+```
+
+### CEO Workflow
+
+1. **Verify numbers** — queries DB directly, never trusts old reports
+2. **Find biggest problem** — worst signal, worst regime, worst close reason
+3. **Fix it** — change param, disable signal, or delegate to team
+4. **Log it** — kanban + report + OpenMemory
 
 ---
 
@@ -225,12 +326,37 @@ python3 scripts/hermes-trades-api.py  # Runs on :8080
 
 ---
 
+## Debugging
+
+```bash
+# Check price data
+sqlite3 scripts/signals_hermes.db "SELECT token, COUNT(*) FROM price_history GROUP BY token LIMIT 5"
+
+# Check runtime signals
+sqlite3 scripts/signals_hermes_runtime.db "SELECT * FROM signals ORDER BY created_at DESC LIMIT 5"
+
+# Check hotset
+cat /var/www/hermes/data/hotset.json | python3 -m json.tool | head -50
+
+# Check kill switch
+cat /var/www/hermes/data/hype_live_trading.json
+
+# Logs
+tail -f /var/log/hermes/pipeline.log
+tail -f /var/log/hermes/errors.log
+
+# PostgreSQL (trade data)
+sudo -u postgres psql -d brain -c "SELECT * FROM trades ORDER BY closed_at DESC LIMIT 10"
+```
+
+---
+
 ## Configuration
 
 - `config/` — tokens, thresholds, regime parameters
 - `.env` — API keys (not committed)
 - `cron/jobs.json` — cron schedule
-- `hermes_constants.py` — all system constants
+- `hermes_constants.py` — all system constants (see Tuning Parameters above)
 
 ---
 
