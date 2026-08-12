@@ -192,7 +192,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # NOTE: longer prefixes must come before shorter ones (dict iteration = first match wins)
     ('mtf_zscore','hzscore+,return_exhaustion_long'): 1.2,  # 12T 58% WR +$0.13
     ('mtf_zscore','hzscore-,return_exhaustion-'):      0.6,  # 10T 50% WR -$0.18
-    ('mtf_zscore','hzscore'):                     0.15,  # bare hzscore — suppressed
+    # NOTE: bare 'hzscore' prefix removed — was catching ALL hzscore signals via
+    # startswith() and suppressing them to 0.15 weight. Specific combos above
+    # handle hzscore weights. Unrecognized hzscore signals use DEFAULT_SOURCE_WEIGHT.
     ('pattern_flag',    'pattern_scanner'): 1.25,
     ('pattern_hns',    'pattern_scanner'): 1.25,
     ('pattern_wyckoff', 'pattern_scanner'): 1.25,
