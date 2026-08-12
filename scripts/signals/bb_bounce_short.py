@@ -27,7 +27,7 @@ from paths import RUNTIME_DB
 # ── SHORT-Specific Parameters ──────────────────────────────────────────────
 BB_PERIOD = 20
 BB_STDDEV = 1.8
-BB_TOUCH_PCT = 0.20        # TIGHTER: require closer touch to upper band
+BB_TOUCH_PCT = 0.15        # TIGHTENED: require very close to upper band (signal decay prevention)
 BB_MIN_BARS = 30
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 55        # TIGHTER: require stronger overbought (was 60)

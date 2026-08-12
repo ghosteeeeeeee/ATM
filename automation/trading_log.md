@@ -6111,3 +6111,38 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - hzscore+ bleeding from AVNT specifically — is AVNT just choppy or signal issue?
 - cut-loser-CL-T1 still negative — need more data on CL_TRAIL_ENABLED=False effect
+
+## [2026-08-12 17:05] Hourly Analysis
+
+**Trades:** 5 closed last hour (2W 3L -$0.03 — flat)
+**24h:** 52T 26W (50% WR) -$0.04 — flat
+**7d:** ~391T 53.2% WR +$0.99 — profitable
+
+**Close Reasons (24h):**
+- profit-monster-trail: 26T (50%) +$1.20 avg +$0.046
+- atr_sl_hit: 20T (38.5%) -$0.95 avg -$0.048
+- cut-loser-CL-T1: 4T (7.7%) -$0.42 avg -$0.105
+- atr_tp_hit: 1T +$0.15
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- bb_bounce+: 18T 11W (61.1% WR) +$0.24 — star
+- hzscore+: 10T 4W (40% WR) -$0.11 — break-even, AVNT +$0.03
+- hzscore-: 6T 3W (50% WR) -$0.08 — minor
+- range_breakout-: 2T 2W (100%) +$0.18 — good
+- trend_momentum_near_sma+: 5T 0W -$0.40 — ALREADY KILLED (residual entries)
+
+**Changes:** None
+
+**No Change Needed:**
+- 5 trades last hour — normal freq (2.2/hr)
+- atr_sl_hit 38.5% — below 40% threshold
+- profit-monster-trail compensating ($1.20 vs $0.95 SL losses)
+- No 0% WR kill candidates (trend_momentum already killed)
+- hzscore+ break-even, not bleeding
+- cut-loser-CL-T1 -$0.42 — monitoring CL_TRAIL_ENABLED=False
+- System flat but stable
+
+**Open Questions:**
+- 24h WR dropped from 52.1% → 50% — slight drift, monitor
+- cut-loser-CL-T1 still negative at -$0.105 avg — need more data

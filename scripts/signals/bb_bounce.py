@@ -21,7 +21,7 @@ from paths import RUNTIME_DB
 # ── Config ──────────────────────────────────────────────────────────────
 BB_PERIOD = 20
 BB_STDDEV = 1.8          # was 2.0 — more band touches for ranging markets
-BB_TOUCH_PCT = 0.20      # tightened 2026-08-12 — filter weak band touches
+BB_TOUCH_PCT = 0.15      # tightened 2026-08-12 — require very close to band (signal decay prevention)
 BB_MIN_BARS = 30
 RSI_PERIOD = 14
 RSI_OVERSOLD = 40        # tightened 2026-08-07 — CEO: filter weak bounces

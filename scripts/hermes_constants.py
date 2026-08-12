@@ -1074,6 +1074,12 @@ MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.6  # block SHORT if 15m velocity > 0.6% (
 # Applied to range_breakout, hzscore, bb_bounce to prevent chasing spikes
 SPIKE_EXHAUSTION_VEL_5M_THRESHOLD = 0.5  # block if abs(5m velocity) > 0.5% (spike exhaustion)
 
+# Signal staleness — reject trade if price moved too far since signal fired
+# Prevents entering after opportunity has passed (e.g., bb_bounce fires near lower BB,
+# price rallies to upper BB by execution time)
+SIGNAL_STALENESS_PRICE_PCT = 0.25  # block if price moved >0.25% since signal (bb_bounce-specific)
+SIGNAL_STALENESS_MAX_AGE_MIN = 3   # max minutes between signal generation and execution
+
 # EMA periods
 SQUEEZE_CROSS_EMA_FAST      = 5       # fast EMA period
 SQUEEZE_CROSS_EMA_SLOW      = 180     # slow EMA period
