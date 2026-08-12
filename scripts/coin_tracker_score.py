@@ -164,19 +164,23 @@ def score_spread(spread):
     else:
         return 10.0
 
-def score_signals(signal_count, avg_confidence, mixed=False):
+def score_signals(signal_count, avg_confidence, mixed_overall=False, mixed_recent=False):
     """Signal confluence score 0-100. 
     - Based on unique signal types (1-10 range)
-    - Mixed long+short signals reduce score (conflicted coin)"""
+    - Mixed long+short signals reduce score (conflicted coin)
+    - Recent conflicts (last 2h) penalize more heavily for 1m trading"""
     if signal_count == 0:
         return 20.0
     # Base: 1 type=30, 3 types=50, 5 types=65, 10+ types=80
     score = 20.0 + min(60, signal_count * 6)
     if avg_confidence:
         score += (avg_confidence - 50) * 0.1
-    # Mixed signals = conflicted → penalty
-    if mixed:
-        score *= 0.6  # 40% penalty for mixed directions
+    # Mixed signals overall = conflicted
+    if mixed_overall:
+        score *= 0.7  # 30% penalty
+    # Recent conflict (last 2h) = severe penalty for 1m trading
+    if mixed_recent:
+        score *= 0.5  # Additional 50% penalty
     return max(0, min(100, score))
 
 def score_regime(regime):

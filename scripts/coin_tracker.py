@@ -216,24 +216,68 @@ def collect():
                     if recent_range:
                         spread_bps = (recent_range / price) * 10000
 
-                # ── Recent signals ──
+                # ── Recent signals (time-weighted) ──
                 coin_signals = signals.get(symbol, [])
-                # Count unique signal types and check direction agreement
-                signal_types = set()
-                directions = set()
-                for s in coin_signals:
-                    if s[0]:
-                        signal_types.add(s[0])
-                    if s[1]:
-                        directions.add(s[1].upper())
-                signal_count = len(signal_types)
-                # Penalize mixed directions
-                has_long = 'LONG' in directions
-                has_short = 'SHORT' in directions
-                mixed = has_long and has_short
-                avg_confidence = sum(s[2] for s in coin_signals if s[2]) / len(coin_signals) if coin_signals else None
+                signal_count = 0
+                avg_confidence = None
                 last_signal_type = coin_signals[0][0] if coin_signals else None
                 last_signal_conf = coin_signals[0][2] if coin_signals else None
+
+                if coin_signals:
+                    # Time weights: recent signals matter more for 1m trading
+                    # Last 1h = 1.0, 1-4h = 0.5, 4-12h = 0.2, 12-24h = 0.1
+                    now_ts = time.time()
+                    weighted_types = {}  # signal_type -> max weight seen
+                    weighted_conf = []   # (weight, confidence) pairs
+                    recent_directions = []  # directions from last 2 hours
+
+                    for s in coin_signals:
+                        sig_type, direction, confidence, price, created_at = s
+                        # Parse timestamp
+                        try:
+                            sig_ts = time.mktime(time.strptime(created_at, '%Y-%m-%d %H:%M:%S'))
+                        except:
+                            sig_ts = now_ts
+
+                        hours_ago = (now_ts - sig_ts) / 3600
+                        if hours_ago <= 1:
+                            weight = 1.0
+                        elif hours_ago <= 4:
+                            weight = 0.5
+                        elif hours_ago <= 12:
+                            weight = 0.2
+                        else:
+                            weight = 0.1
+
+                        # Track signal type with highest weight
+                        if sig_type:
+                            if sig_type not in weighted_types or weight > weighted_types[sig_type]:
+                                weighted_types[sig_type] = weight
+
+                        # Track confidence with weight
+                        if confidence and weight > 0.2:
+                            weighted_conf.append((weight, confidence))
+
+                        # Track recent directions (last 2h)
+                        if hours_ago <= 2 and direction:
+                            recent_directions.append(direction.upper())
+
+                    # Count weighted signal types
+                    signal_count = len(weighted_types)
+
+                    # Weighted average confidence
+                    if weighted_conf:
+                        total_weight = sum(w for w, _ in weighted_conf)
+                        avg_confidence = sum(w * c for w, c in weighted_conf) / total_weight if total_weight > 0 else None
+
+                    # Check for recent conflicts (last 2h)
+                    has_long_recent = 'LONG' in recent_directions
+                    has_short_recent = 'SHORT' in recent_directions
+                    mixed_recent = has_long_recent and has_short_recent
+
+                    # Also check overall mix
+                    all_dirs = set(s[1].upper() for s in coin_signals if s[1])
+                    mixed_overall = 'LONG' in all_dirs and 'SHORT' in all_dirs
 
                 # ── Compute scores ──
                 has_candles = bool(closes_5m)
@@ -241,7 +285,7 @@ def collect():
                 s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 30.0
                 s_volatility = _score_volatility(atr_14, price)
                 s_spread = _score_spread(spread_bps)
-                s_signals = _score_signals(signal_count, avg_confidence, mixed)
+                s_signals = _score_signals(signal_count, avg_confidence, mixed_overall, mixed_recent)
                 coin_regime = _compute_coin_regime(closes_5m, ema_9, ema_20, ema_50, rsi_14)
                 s_regime = _score_regime(coin_regime)
 
