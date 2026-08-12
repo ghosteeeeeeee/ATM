@@ -28,6 +28,7 @@ from coin_tracker_score import (
     score_momentum as _score_momentum, score_volume as _score_volume,
     score_volatility as _score_volatility, score_spread as _score_spread,
     score_signals as _score_signals, score_regime as _score_regime,
+    compute_coin_regime as _compute_coin_regime,
 )
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -229,7 +230,8 @@ def collect():
                 s_volatility = _score_volatility(atr_14, price)
                 s_spread = _score_spread(spread_bps)
                 s_signals = _score_signals(signal_count, avg_confidence)
-                s_regime = _score_regime(regime)
+                coin_regime = _compute_coin_regime(closes_5m, ema_9, ema_20, ema_50, rsi_14)
+                s_regime = _score_regime(coin_regime)
 
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +
@@ -259,7 +261,7 @@ def collect():
                     'ema_9': ema_9, 'ema_20': ema_20, 'ema_50': ema_50, 'atr_14': atr_14,
                     'health': health, 'health_score': composite,
                     'signal_type': last_signal_type, 'signal_confidence': last_signal_conf,
-                    'regime': regime
+                    'regime': coin_regime
                 }
                 event_cols = {k: v for k, v in event_data.items() if k in allowed and v is not None}
                 event_cols['ts'] = now

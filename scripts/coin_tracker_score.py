@@ -181,6 +181,45 @@ def score_regime(regime):
         return 40.0
     return 50.0
 
+def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=None):
+    """Compute per-coin regime based on individual price action."""
+    if not closes or len(closes) < 20:
+        return 'NEUTRAL'
+    
+    price = closes[0]
+    above_20 = price > ema_20 if ema_20 else None
+    above_50 = price > ema_50 if ema_50 else None
+    ema20_above_50 = ema_20 > ema_50 if ema_20 and ema_50 else None
+    
+    # Count bullish vs bearish signals
+    bull = 0
+    bear = 0
+    
+    if above_20: bull += 1
+    else: bear += 1
+    
+    if above_50: bull += 1
+    else: bear += 1
+    
+    if ema20_above_50: bull += 1
+    else: bear += 1
+    
+    if rsi_14:
+        if rsi_14 > 55: bull += 1
+        elif rsi_14 < 45: bear += 1
+    
+    # Price momentum (last 10 candles)
+    if len(closes) >= 10:
+        momentum = (closes[0] - closes[9]) / closes[9] * 100
+        if momentum > 0.5: bull += 1
+        elif momentum < -0.5: bear += 1
+    
+    if bull >= 4:
+        return 'BULL'
+    elif bear >= 4:
+        return 'BEAR'
+    return 'NEUTRAL'
+
 # ── Health state ───────────────────────────────────────────────────────────────
 
 def health_from_score(composite):

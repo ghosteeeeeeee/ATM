@@ -17,7 +17,7 @@ from coin_tracker_schema import (
 from coin_tracker_score import (
     ema, rsi, macd, atr, volume_trend,
     score_momentum, score_volume, score_volatility, score_spread,
-    score_signals, score_regime, health_from_score, WEIGHTS
+    score_signals, score_regime, compute_coin_regime, health_from_score, WEIGHTS
 )
 
 BATCH_SIZE = 500  # Events per commit
@@ -121,7 +121,8 @@ def backfill():
             s_vola = score_volatility(atr_14_val, price)
             s_spread = score_spread(spread_bps)
             s_sig = score_signals(0, None)  # No signal history in backfill
-            s_reg = score_regime(regime)
+            coin_regime = compute_coin_regime(h_closes, ema_9_val, ema_20_val, ema_50_val, rsi_14_val)
+            s_reg = score_regime(coin_regime)
 
             composite = (
                 s_mom * WEIGHTS['momentum'] +
@@ -144,7 +145,7 @@ def backfill():
                 f"VALUES (?, 'candle', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (ts, price, spread_bps, vol_1h,
                  rsi_14_val, macd_hist_val, ema_9_val, ema_20_val, ema_50_val, atr_14_val,
-                 health, composite, regime)
+                 health, composite, coin_regime)
             )
             events_written += 1
             total_events += 1
