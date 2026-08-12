@@ -29,7 +29,7 @@
     .page-btn.active { background: #00ff8833; border-color: #00ff88; }
     .page-btn:disabled { opacity: 0.3; cursor: default; }
     .page-info { color: #666; font-size: 0.8em; }
-    .stats-bar { display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap; }
+    .stats-bar { display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap; position: sticky; top: 0; z-index: 10; background: #0a0a0f; padding: 10px 0; border-bottom: 1px solid #00ff8833; }
     .stat { background: #1a1a2e; padding: 8px 14px; border-radius: 4px; border-left: 3px solid #00ff88; }
     .stat .label { color: #666; font-size: 0.75em; }
     .stat .value { color: #00ff88; font-size: 1.1em; font-weight: bold; }
@@ -101,10 +101,6 @@
     <div class="stat" style="border-left-color:#ff8844">
       <div class="label">WORST LOSS STREAK</div>
       <div class="value" id="stat-loss-streak" style="color:#ff8844">--</div>
-    </div>
-    <div class="stat">
-      <div class="label">LAST UPDATED</div>
-      <div class="value" id="stat-updated" style="font-size:0.8em;color:#888">--</div>
     </div>
   </div>
 
@@ -239,7 +235,6 @@
         document.getElementById('stat-win-streak').textContent = bestWin > 0 ? bestWin + 'W' : '--';
         document.getElementById('stat-loss-streak').textContent = bestLoss > 0 ? bestLoss + 'L' : '--';
         document.getElementById('stat-pnl').innerHTML = totalPnl > 0 ? '<span class="win">+' + totalPnl.toFixed(2) + '</span>' : '<span class="' + (totalPnl < 0 ? 'loss' : 'neutral') + '">' + totalPnl.toFixed(2) + '</span>';
-        document.getElementById('stat-updated').textContent = new Date(d.updated).toLocaleTimeString();
         document.getElementById('status').textContent =
           `Updated: ${new Date(d.updated).toLocaleString()} | Open: ${d.open_count} | Closed: ${d.closed_count} | Win Rate: ${winRate}%`;
 
