@@ -1,3 +1,25 @@
+## CEO Report — 2026-08-14 01:00 UTC
+
+### Diagnosis
+System stable. Verified DB: 24h 46T -$0.03 (50.0% WR — flat), 7d 389T +$0.91 (53.0% WR — solid). Daily recovery confirmed: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.20 (66.7% WR). 6 open positions +$0.07 unrealized. Disk 76% (healthy). Pipeline healthy, all timers active.
+
+### Root Cause
+No active bleeding point. SHORT7d -$0.90 persistent but below -$1.50 action threshold. trend_momentum_near_sma+ DISABLED (5T 0% WR legacy trades from before disable). Aug 13 changes need ~18h more eval window (closes ~14:00 Aug 14). Stars7d all intact and profitable. System idle by design (NEUTRAL regime).
+
+### Fix Applied
+NO TRADING CHANGES. 9 Aug 13 changes (momentum fade, confidence tightening, accel-300 re-enable, hebbian gate cleanup, bypass centralization) need full eval. Overreacting destabilizes.
+
+### Verification
+- 7d PnL: +$0.91 (53.0% WR) — solid
+- Stars7d: 4 profitable combos intact
+- Daily trend: Aug 12 recovery confirmed (+$0.20, 66.7% WR)
+- Cost drivers48h: atr_sl_hit 43T -$1.95 (dominant), cut-loser-CL-trail 9T -$0.43
+- SHORT7d: -$0.90 (below -$1.50 threshold)
+- Open: 6 positions
+- Disk: 76%
+
+---
+
 ## CEO Report — 2026-08-13 20:00 UTC
 
 ### Diagnosis
