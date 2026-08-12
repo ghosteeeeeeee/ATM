@@ -1,3 +1,32 @@
+## CEO Report — 2026-08-12 (latest)
+
+### Diagnosis
+**Verified DB numbers:**
+- **24h**: 74T, -$0.16, 51.4% WR — flat, recovering from Aug 11
+- **48h**: 123T, -$0.82, 45.5% WR — RED (Aug 11 worst day -$0.33)
+- **7d**: 415T, +$0.68, 52.8% WR — solid
+- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 +$0.01 (recovery)
+- **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%, range_breakout- 6T +$0.46 100%
+- **Open**: 5 trades, nearly flat
+
+### Bleeders
+- hzscore+ standalone LONG: 11T -$0.16, 36.4% WR — **FIXED** (removed from STANDALONE_BYPASS)
+- range_breakout+ LONG: 8T -$0.41, 25% WR — already DISABLED (legacy trades)
+- trend_momentum_near_sma+: already DISABLED (legacy)
+
+### Fix Applied
+**Removed 'hzscore' from STANDALONE_BYPASS_SIGNALS** (hermes_constants.py:1034)
+- Rationale: standalone hzscore+ LONG bleeding at 36.4% WR, but all hzscore combos profitable (mover+ 80%, return_exhaustion_long 58.3%, range_finder+ 62.5%)
+- Impact: hzscore now requires confluence to fire — eliminates standalone bleed, preserves profitable combos
+- Risk: minimal — hzscore combos unaffected, standalone was the only loser
+
+### Verification
+- Import test passed
+- 7d system solid (+$0.68, 52.8% WR), stars intact, daily recovering
+- No overreaction — surgical fix on only active bleed source
+
+---
+
 ## CEO Report — 2026-08-12 10:00 UTC
 
 ### Diagnosis

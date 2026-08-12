@@ -1031,9 +1031,10 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # Signals that can bypass the confluence gate (single-source allowed).
 # Backtested and proven edge when firing solo.
 # Used in signal_compactor.py at 7 locations (confluence gate + preserve filter).
+# CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long', 'range_breakout', 'range_breakout_short',
-    'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+    'spike_exhaustion_short', 'bb_bounce',
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
 )
