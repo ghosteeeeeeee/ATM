@@ -30,17 +30,20 @@ ATM is an event-driven trading system that continuously monitors cryptocurrency 
 | `gap_300` | Volatility | 300%+ volume gap |
 | `fast_momentum` | Speed | High-speed momentum burst |
 
-**Plus 49 more** — 59 total signal types. All signals are **plug-and-play**:
-drop a script in `scripts/signals/`, register it, and it's live.
+**Plus 49 more** — 59 total. All signals are **plug-and-play**: drop a script in `scripts/signals/`, register it, and it's live.
 
-### How to Make a Signal
+<details>
+<summary><b>How to Make a Signal</b></summary>
 
 See the **[add-signal](skills/add-signal/)** skill — complete checklist:
-- Create script in `scripts/signals/`
-- Add flags to `hermes_constants.py`
-- Register in `signals/__init__.py`
-- Add Layer 2 enforcement in `signal_schema.py`
-- Run `bug_hunter` → commit → done
+
+1. Create script in `scripts/signals/`
+2. Add flags to `hermes_constants.py`
+3. Register in `signals/__init__.py`
+4. Add Layer 2 enforcement in `signal_schema.py`
+5. Run `bug_hunter` → commit → done
+
+</details>
 
 ---
 
@@ -128,14 +131,13 @@ flowchart LR
     style EXIT fill:#0d1117,stroke:#238636,stroke-width:2px,color:#3fb950
 ```
 
----
-
-## Architecture at a Glance
+<details>
+<summary><b>Architecture at a Glance</b></summary>
 
 | Phase | Script | What it does | Frequency |
 |-------|--------|--------------|-----------|
 | **0. Data** | `price_collector.py` | Fetch 542 token prices from HL API | 1 min |
-| **1. Signals** | `signals_runner.py` | Run 55+ signal scripts (RSI, MACD, etc) | 1 min |
+| **1. Signals** | `signals_runner.py` | Run 55+ signal scripts | 1 min |
 | **2. Compact** | `signal_compactor.py` | Score, rank, dedupe → top 10 | 1 min |
 | **2.5. Analyst** | `signal_analyst.py` | Quality score 0-100 | 1 min |
 | **3. Decide** | `decider_run.py` | Context Gate (5 layers) → execute | 1 min |
@@ -144,9 +146,10 @@ flowchart LR
 | **6. Cut** | `cut_loser.py` | Quick cut + deep cut | frequent |
 | **7. Guardian** | `hl-sync-guardian.py` | Kill switch, HL reconciliation | 60s |
 
----
+</details>
 
-## Context Gate (5 Layers)
+<details>
+<summary><b>Context Gate (5 Layers)</b></summary>
 
 ```
 Layer 1: RULE-BASED GATE
@@ -170,13 +173,28 @@ Layer 5: LLM CONTEXT GATE (MiniMax-M3)
   └─ GO / WARN (penalty) / NAY (block)
 ```
 
+</details>
+
+<details>
+<summary><b>Kill Switch</b></summary>
+
+| Mode | Behavior |
+|------|----------|
+| `live_trading: false` | All trades stay in paper DB (simulation only) |
+| `live_trading: true` | Guardian mirrors approved trades to real HL orders |
+
+**Guardian reconciliation** (every 60s): reads kill switch → mirrors paper positions to HL → reconciles HL ↔ paper DB → marks orphan closes.
+
+</details>
+
 ---
 
 ## Tuning Parameters (`hermes_constants.py`)
 
 All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 
-### Position Limits
+<details>
+<summary><b>Position Limits</b></summary>
 
 | Constant | Default | Controls |
 |----------|---------|----------|
@@ -185,7 +203,10 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 | `MAX_TOTAL_POSITIONS` | 10 | Max including pending |
 | `DEFAULT_TRADE_SIZE_USDT` | $11 | Default trade size |
 
-### Trailing Stops & Exits
+</details>
+
+<details>
+<summary><b>Trailing Stops & Exits</b></summary>
 
 | Constant | Default | Controls |
 |----------|---------|----------|
@@ -197,7 +218,10 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 | `ATR_SL_MIN` | 1.2% | Minimum stop loss |
 | `ATR_TP_MIN` | 0.8% | Minimum take profit |
 
-### Signal Filtering
+</details>
+
+<details>
+<summary><b>Signal Filtering</b></summary>
 
 | Constant | Default | Controls |
 |----------|---------|----------|
@@ -208,7 +232,10 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 | `MOMENTUM_EXHAUSTION_THRESHOLD` | 0.5% | Price moved 0.5% in 30m = no enter |
 | `SIGNAL_QUALITY_MIN_GRADE` | 'C' | Only trade C or better |
 
-### Blacklists
+</details>
+
+<details>
+<summary><b>Blacklists</b></summary>
 
 | Constant | Purpose |
 |----------|---------|
@@ -216,7 +243,10 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 | `SHORT_BLACKLIST` | Tokens blocked for SHORT |
 | `SIGNAL_SOURCE_BLACKLIST` | Signal combos blocked (e.g. `return_exhaustion-`) |
 
-### Risk Management
+</details>
+
+<details>
+<summary><b>Risk Management</b></summary>
 
 | Constant | Default | Controls |
 |----------|---------|----------|
@@ -227,7 +257,10 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 | `MAX_PORTFOLIO_HEAT` | 0.15 | Max 15% total risk |
 | `CONSERVATIVE_MODE_ENABLED` | False | 0.5x size multiplier |
 
-### Signal Grades
+</details>
+
+<details>
+<summary><b>Signal Grades</b></summary>
 
 | Grade | Weight | Meaning |
 |-------|--------|---------|
@@ -237,16 +270,7 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 | D | 0.8x | Weak edge |
 | F | 0.5x | No edge |
 
----
-
-## Kill Switch
-
-| Mode | Behavior |
-|------|----------|
-| `live_trading: false` | All trades stay in paper DB (simulation only) |
-| `live_trading: true` | Guardian mirrors approved trades to real HL orders |
-
-**Guardian reconciliation** (every 60s): reads kill switch → mirrors paper positions to HL → reconciles HL ↔ paper DB → marks orphan closes.
+</details>
 
 ---
 
@@ -254,21 +278,25 @@ All system constants live in `scripts/hermes_constants.py`. Edit to tune.
 
 ATM runs a **CEO + automation team** that continuously improves the system.
 
-### The Team
+<details>
+<summary><b>The Team</b></summary>
 
 | Role | Script | Job |
 |------|--------|-----|
-| **CEO** | `automation/ceo/ceo_prompt.md` | Strategic decisions, param changes, signal enable/disable |
+| **CEO** | `automation/ceo/ceo_prompt.md` | Strategic decisions, param changes |
 | **Orchestrator** | `automation/orchestrator_prompt.md` | Daily implementation pipeline (12h) |
 | **Health Monitor** | `automation/health_monitor_prompt.md` | Pipeline health + anomalies (hourly) |
 | **Signal Reporter** | `automation/signal_reporter_prompt.md` | Signal performance analysis (6h) |
 | **Blacklist Tester** | `automation/blacklist_tester.py` | Test blacklisted tokens (12h) |
 | **Self Learner** | CEO team member | Parameter tuning, signal tuning |
 | **Bug Hunter** | `skills/bug-hunter/` | Find and fix bugs |
-| **Summarizer** | `automation/summarizer_prompt.md` | All automation results summary (12h) |
-| **Upgrade Implementer** | `automation/upgrade_implementer_prompt.md` | Scan plans, implement upgrades (12h) |
+| **Summarizer** | `automation/summarizer_prompt.md` | All automation results (12h) |
+| **Upgrade Implementer** | `automation/upgrade_implementer_prompt.md` | Scan plans, implement (12h) |
 
-### Automation Schedule
+</details>
+
+<details>
+<summary><b>Automation Schedule</b></summary>
 
 ```
 Hourly:     health_monitor, auto_1hr (trade analysis + tuning)
@@ -277,12 +305,17 @@ Every 12h:  blacklist_tester, summarizer, upgrade_implementer
 Daily:      orchestrator (full pipeline audit)
 ```
 
-### CEO Workflow
+</details>
+
+<details>
+<summary><b>CEO Workflow</b></summary>
 
 1. **Verify numbers** — queries DB directly, never trusts old reports
 2. **Find biggest problem** — worst signal, worst regime, worst close reason
 3. **Fix it** — change param, disable signal, or delegate to team
 4. **Log it** — kanban + report + OpenMemory
+
+</details>
 
 ---
 
@@ -343,7 +376,8 @@ python3 scripts/hermes-trades-api.py  # Runs on :8080
 
 ---
 
-## Data Stores
+<details>
+<summary><b>Data Stores</b></summary>
 
 | Store | Contents |
 |-------|----------|
@@ -354,9 +388,10 @@ python3 scripts/hermes-trades-api.py  # Runs on :8080
 | `hype_live_trading.json` | **KILL SWITCH** — live_trading flag |
 | `hotset.json` | Current hot set (top 10 signals) |
 
----
+</details>
 
-## Debugging
+<details>
+<summary><b>Debugging</b></summary>
 
 ```bash
 # Check price data
@@ -379,14 +414,17 @@ tail -f /var/log/hermes/errors.log
 sudo -u postgres psql -d brain -c "SELECT * FROM trades ORDER BY closed_at DESC LIMIT 10"
 ```
 
----
+</details>
 
-## Configuration
+<details>
+<summary><b>Configuration</b></summary>
 
 - `config/` — tokens, thresholds, regime parameters
 - `.env` — API keys (not committed)
 - `cron/jobs.json` — cron schedule
 - `hermes_constants.py` — all system constants (see Tuning Parameters above)
+
+</details>
 
 ---
 
