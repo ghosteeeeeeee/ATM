@@ -449,7 +449,7 @@ For each plan scanned, log:
 
 | # | Plan | Difficulty | Value | Status |
 |---|------|-----------|-------|--------|
-| 1 | signal-version-tracking.md | L2 | HIGH | DONE (script created) |
+| 1 | signal-version-tracking.md | L2 | HIGH | DONE (script + auto_1hr integration) |
 | 2 | transcript-mining-worth-discussing.md | L2 | MEDIUM | PARTIALLY (ADRs done, vertical slices + dual-model TODO) |
 | 3 | transcript-mining-quick-wins.md | L1 | HIGH | DONE (ADRs, uncertainty check, measurable goals all implemented) |
 | 4 | post-change-workflow.md | N/A | N/A | Already a skill |
@@ -485,7 +485,7 @@ For each plan scanned, log:
 | position-sizing-extensions-spec | L2 | HIGH | DONE (Phase 1) | All 4 Phase 1 items: get_signal_weight, get_drawdown_multiplier, portfolio_heat, conservative_mode in position_sizing.py. |
 | book-informed-improvements-spec | L2 | MEDIUM | DONE (overlaps) | Items 1,3,4 covered by position-sizing-extensions. |
 | trading-book-action-items | L1-2 | MEDIUM | DONE (overlaps) | Items 1,3,4 covered by position-sizing-extensions. |
-| signal-version-tracking | L2 | HIGH | DONE (script created) | signal_version.py exists (108 LOC), not yet integrated into pipeline/automations. Needs wiring into CEO/auto_1hr for auto-logging. |
+| signal-version-tracking | L2 | HIGH | DONE (script + integration) | signal_version.py exists (108 LOC), wired into auto_1hr_prompt.md — param changes auto-logged. |
 | transcript-mining-quick-wins | L1 | HIGH | DONE | ADRs exist (docs/adr/), uncertainty check in bug-hunter+post-change, measurable goals in CEO prompts. |
 | transcript-mining-worth-discussing | L2 | MEDIUM | PARTIALLY | ADRs done. Vertical slices + dual-model review NOT implemented. |
 | 2026-08-07_trade-loss-elimination | L1 | HIGH | DONE | ATR SL params updated (0.8→1.2, 2.1→2.5), dead hours enabled, KAITO blacklisted. |
@@ -501,8 +501,9 @@ For each plan scanned, log:
 
 | # | Plan | Difficulty | Value | Reason to implement |
 |---|------|-----------|-------|---------------------|
-| 1 | system-improvements: audit_memory | L1 | MEDIUM | Hebbian memory accumulates without cleanup. Low effort, prevents memory bloat. |
-| 2 | system-improvements: weekly_signal_review | L2 | MEDIUM | Weekly trend analysis catches signal decay faster than 6h checks. |
-| 3 | signal-version-tracking integration | L1 | HIGH | Wire signal_version.py into CEO/auto_1hr automations for auto-logging on param changes. Script exists, just needs callers. |
-| 4 | wyckoff-pattern-recognition | L2 | MEDIUM | Improves mean-reversion signal quality. Needs pattern_recognition.py first. |
-| 5 | transcript-mining: vertical-slice-signal-dev | L2 | MEDIUM | Faster signal development workflow. Cultural/process change. |
+| 1 | system-improvements: weekly_signal_review | L2 | MEDIUM | Weekly trend analysis catches signal decay faster than 6h checks. |
+| 2 | wyckoff-pattern-recognition | L2 | MEDIUM | Improves mean-reversion signal quality. Needs pattern_recognition.py first. |
+| 3 | transcript-mining: vertical-slice-signal-dev | L2 | MEDIUM | Faster signal development workflow. Cultural/process change. |
+
+**Completed since last run:** signal-version-tracking integration (wired into auto_1hr prompt).
+**Skipped:** audit_memory (brain_hebbian.db is empty — no cleanup needed).

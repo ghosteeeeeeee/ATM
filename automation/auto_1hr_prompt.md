@@ -83,6 +83,12 @@ Rules:
 - Only change non-locked params
 - Git commit each change
 - Log to `automation/trading_log.md`
+
+### After ANY hermes_constants.py change, log the version:
+```bash
+python3 scripts/signal_version.py log <signal_name> '{"param": "value"}' --by auto_1hr --reason "brief reason"
+```
+This creates an audit trail of all parameter changes. Without this, we lose track of what changed and why.
 - **Report to CEO kanban:**
 ```markdown
 ## TEAM UPDATES
@@ -115,3 +121,4 @@ Append to `automation/trading_log.md`:
 - TPSL logic: `scripts/tpsl_utils.py`
 - Trading log: `automation/trading_log.md`
 - Recent changes: `automation/recent_changes.log`
+- Signal versions: `scripts/signal_version.py` (log changes after every edit)

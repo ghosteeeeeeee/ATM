@@ -1,5 +1,37 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-12: Daily Orchestrator Report
+
+### Pipeline Status (05:25 UTC)
+- **Portfolio**: 6 open | 52 closed today | **+0.66% PnL** (green day)
+- **24h**: 48T 25W (52.1% WR) +$0.05 — flat
+- **7d**: 391T 208W (53.2% WR) +$0.99 — profitable
+- **Market regime**: 103 NEUTRAL / 0 LONG / 2 SHORT (flat)
+- **BTC**: $63,797
+
+### What Was Done
+1. **signal_version.py wired into auto_1hr** — param changes to hermes_constants.py now auto-logged with reason/by. Script existed but had zero callers. Now integrated into Step 5 of auto_1hr_prompt.md.
+2. **audit_memory.py skipped** — brain_hebbian.db is an empty file (no tables, no data). Nothing to clean up.
+3. **upgrade_audit.md updated** — signal-version-tracking marked DONE, next candidates list trimmed.
+
+### What Was Already Done (by other automations)
+- **health_monitor**: Fixed accel_300.py (added missing `_get_1h_trend()` — was ERROR every cycle)
+- **signal_reporter**: Killed trend_momentum_near_sma PLUS/MINUS flags (base was already killed, directional flags still True)
+- **auto_1hr**: System calm, no changes needed for 12h+
+
+### Signal Performance (24h)
+- bb_bounce+: 16T 10W (62.5% WR) +$0.23 — **star signal**
+- range_breakout-: 2T 2W +$0.18 — good
+- hzscore+: 10T 4W (40% WR) -$0.11 — AVNT bleeding (4 SL hits)
+- hzscore-: 4T 2W -$0.05 — minor
+
+### Next Steps
+1. Monitor hzscore+ AVNT bleed (4 SL hits — is AVNT choppy or signal issue?)
+2. Weekly signal review automation (L2, next candidate)
+3. Wyckoff pattern recognition (L2, needs pattern_recognition.py)
+
+---
+
 ## 2026-08-11: Daily Orchestrator Report
 
 ### Pipeline Status (05:25 UTC)
