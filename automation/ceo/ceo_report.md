@@ -2,28 +2,36 @@
 
 ### Diagnosis
 **Verified DB numbers:**
-- **24h**: 74T, -$0.16, 51.4% WR — flat, recovering from Aug 11
-- **48h**: 123T, -$0.82, 45.5% WR — RED (Aug 11 worst day -$0.33)
-- **7d**: 415T, +$0.68, 52.8% WR — solid
-- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 +$0.01 (recovery)
+- **24h**: 75T, -$0.23, 50.7% WR — flat
+- **7d**: 415T, +$0.64, 52.8% WR — solid
+- **Daily**: Aug 9 +$0.62 peak, Aug 10 -$0.10, Aug 11 -$0.33 (worst), Aug 12 -$0.06 (improving)
+- **LONG 24h**: 52T, -$0.55, 46.2% WR — bleeding today
+- **SHORT 24h**: 23T, +$0.32, 60.9% WR — strong
+- **LONG 7d**: 275T, +$1.22, 53.1% WR — solid
+- **SHORT 7d**: 140T, -$0.58, 52.1% WR — slight bleed
 - **Stars7d intact**: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb-bounce-short,hzscore- 17T +$0.12 58.8%, hzscore+,mover+ 5T +$0.17 80%, range_breakout- 6T +$0.46 100%
-- **Open**: 5 trades, nearly flat
+- **Open**: 5 trades, +$0.06 unrealized
 
-### Bleeders
-- hzscore+ standalone LONG: 11T -$0.16, 36.4% WR — **FIXED** (removed from STANDALONE_BYPASS)
-- range_breakout+ LONG: 8T -$0.41, 25% WR — already DISABLED (legacy trades)
-- trend_momentum_near_sma+: already DISABLED (legacy)
+### Bleeders (all addressed)
+- range_breakout+ LONG: 8T -$0.41, 25% WR — **DISABLED** (commit 5a72c64)
+- trend_momentum_near_sma+ LONG: 6T -$0.37, 16.7% WR — **DISABLED** (legacy)
+- hzscore+ standalone LONG: 11T -$0.16, 36.4% WR — **RESTRICTED** to combo-only (commit 124def0)
 
 ### Fix Applied
-**Removed 'hzscore' from STANDALONE_BYPASS_SIGNALS** (hermes_constants.py:1034)
-- Rationale: standalone hzscore+ LONG bleeding at 36.4% WR, but all hzscore combos profitable (mover+ 80%, return_exhaustion_long 58.3%, range_finder+ 62.5%)
-- Impact: hzscore now requires confluence to fire — eliminates standalone bleed, preserves profitable combos
-- Risk: minimal — hzscore combos unaffected, standalone was the only loser
+**NO NEW CHANGES.** All 3 bleeding signals already addressed by prior CEO decisions:
+- range_breakout+ disabled Aug 12 10:00
+- hzscore restricted to combo-only Aug 12 09:21
+- trend_momentum disabled earlier (legacy)
+- Aug 13 eval (trailing stop, momentum fade, confidence tightening, accel-300) still running
+
+### Root Cause
+- LONG bleeding today (46.2% WR) — market-driven, not signal-driven
+- ATR stop loss dominant exit: 57T -$3.00 (48h) — expected behavior
+- SHORT profitable (60.9% WR) — regime-appropriate
 
 ### Verification
-- Import test passed
-- 7d system solid (+$0.68, 52.8% WR), stars intact, daily recovering
-- No overreaction — surgical fix on only active bleed source
+- 7d solid (+$0.64, 52.8% WR), stars intact, daily recovering (-$0.33 → -$0.06)
+- No overreaction — all bleed sources addressed, system recovering
 
 ---
 

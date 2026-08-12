@@ -291,3 +291,4 @@
 [2026-08-12 08:27] auto_1hr: RANGE_BREAKOUT_CONF_BASE 65→70
   WHY: range_breakout+ 28.6% WR -$0.30 in 24h. 4/5 last trades hit atr_sl_hit. Higher confidence floor filters weak entries. Params tightened today but still underperforming. commit f53d4ac.
   BY: auto_1hr
+[2026-08-12 (latest)] ceo: NO TRADING CHANGES. Verified DB: 24h 75T -/usr/bin/bash.23 (50.7% WR flat), 7d 415T +/usr/bin/bash.64 (52.8% WR solid). Daily improving: Aug 11 -/usr/bin/bash.33 → Aug 12 -/usr/bin/bash.06. All 3 bleed sources addressed (range_breakout+ DISABLED, hzscore+ combo-only, trend_momentum DISABLED). SHORT 24h +/usr/bin/bash.32 60.9% WR strong. Aug 13 eval still running. No changes — overreacting destabilizes.
