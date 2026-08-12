@@ -53,17 +53,37 @@ def rsi(closes, period=14):
     return 100 - (100 / (1 + rs))
 
 def macd(closes, fast=12, slow=26, signal_period=9):
-    """MACD histogram. Returns (macd_line, signal_line, histogram)."""
+    """MACD histogram. Returns (macd_line, signal_line, histogram).
+    Requires slow + signal_period + fast candles minimum."""
     if len(closes) < slow + signal_period:
         return None, None, None
-    ema_fast = ema(closes, fast)
-    ema_slow = ema(closes, slow)
-    if ema_fast is None or ema_slow is None:
-        return None, None, None
-    macd_line = ema_fast - ema_slow
-    # Approximate signal line as EMA of MACD values over last signal_period
-    # (simplified: use current macd_line as proxy since we don't have full series)
-    signal_line = macd_line * 0.8  # rough approximation
+    
+    # Compute MACD line series for signal line EMA
+    macd_series = []
+    k_fast = 2 / (fast + 1)
+    k_slow = 2 / (slow + 1)
+    
+    # Initialize EMAs
+    ema_fast = sum(closes[:fast]) / fast
+    ema_slow = sum(closes[:slow]) / slow
+    
+    # Compute MACD series from slow onwards
+    for i in range(slow, len(closes)):
+        if i >= fast:
+            ema_fast = closes[i] * k_fast + ema_fast * (1 - k_fast)
+        ema_slow = closes[i] * k_slow + ema_slow * (1 - k_slow)
+        macd_series.append(ema_fast - ema_slow)
+    
+    if len(macd_series) < signal_period:
+        return macd_series[-1] if macd_series else None, None, None
+    
+    # Signal line = EMA of MACD series
+    k_signal = 2 / (signal_period + 1)
+    signal_line = sum(macd_series[:signal_period]) / signal_period
+    for m in macd_series[signal_period:]:
+        signal_line = m * k_signal + signal_line * (1 - k_signal)
+    
+    macd_line = macd_series[-1]
     histogram = macd_line - signal_line
     return macd_line, signal_line, histogram
 

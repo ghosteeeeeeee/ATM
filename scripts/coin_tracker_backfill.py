@@ -19,6 +19,7 @@ from coin_tracker_score import (
     score_momentum, score_volume, score_volatility, score_spread,
     score_signals, score_regime, compute_coin_regime, health_from_score, WEIGHTS
 )
+from coin_tracker import SKIP_COINS, _is_fake_coin
 
 BATCH_SIZE = 500  # Events per commit
 
@@ -63,6 +64,10 @@ def backfill():
 
     try:
         for token in tokens:
+            # Skip blacklisted and fake coins
+            if token in SKIP_COINS or _is_fake_coin(token):
+                continue
+
             # Read all 5m candles for this token (oldest first for indicator calc)
             # Read candles — cap at last 1000 for performance
             candles = candles_conn.execute(

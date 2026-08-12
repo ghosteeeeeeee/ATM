@@ -69,8 +69,10 @@ def _read_candles_batch(tokens, tf='5m', limit=200, conn=None):
                 (token, limit)
             ).fetchall()
             results[token] = rows
-    except Exception:
-        pass
+    except sqlite3.OperationalError as e:
+        print(f'[coin_tracker] Candle table error: {e}', flush=True)
+    except Exception as e:
+        print(f'[coin_tracker] Candle read error: {e}', flush=True)
     return results
 
 def _read_signals_batch(tokens, hours=24, conn=None):
@@ -242,7 +244,7 @@ def collect():
                         # Parse timestamp
                         try:
                             sig_ts = time.mktime(time.strptime(created_at, '%Y-%m-%d %H:%M:%S'))
-                        except:
+                        except (ValueError, TypeError):
                             sig_ts = now_ts
 
                         hours_ago = (now_ts - sig_ts) / 3600
@@ -351,6 +353,8 @@ def collect():
                 processed += 1
             except Exception as e:
                 errors += 1
+                if errors <= 5:  # Log first 5 errors for debug
+                    print(f'[coin_tracker] Error processing {symbol}: {e}', flush=True)
 
         # Commit all writes at once
         write_conn.commit()
