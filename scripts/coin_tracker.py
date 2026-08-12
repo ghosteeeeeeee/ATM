@@ -209,8 +209,9 @@ def collect():
                 last_signal_conf = coin_signals[0][2] if coin_signals else None
 
                 # ── Compute scores ──
+                has_candles = bool(closes_5m)
                 s_momentum = _score_momentum(closes_5m, ema_9, ema_20, ema_50)
-                s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 50.0
+                s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 30.0
                 s_volatility = _score_volatility(atr_14, price)
                 s_spread = _score_spread(spread_bps)
                 s_signals = _score_signals(signal_count, avg_confidence)
@@ -224,6 +225,10 @@ def collect():
                     s_signals * WEIGHTS['signals'] +
                     s_regime * WEIGHTS['regime']
                 )
+
+                # No candle data = no real activity → force cold/dead
+                if not has_candles:
+                    composite = min(composite, 30.0)
 
                 health = health_from_score(composite)
 
