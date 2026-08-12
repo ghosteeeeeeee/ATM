@@ -400,6 +400,49 @@ def scan_signals() -> int:
         if direction == 'LONG' and trend == 'BEARISH':
             continue
 
+        # LONG-specific filters: block entries at bad times
+        # Based on MFE/MAE analysis: RSI>70, vel>0.3%, pos<80% → bad entry timing
+        if direction == 'LONG':
+            _conn_long = None
+            try:
+                from paths import HERMES_DATA
+                import sqlite3 as _sqlite3
+                _conn_long = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+                _cur = _conn_long.cursor()
+                _cur.execute("""
+                    SELECT price FROM (
+                        SELECT price, timestamp FROM price_history
+                        WHERE token = ?
+                        ORDER BY timestamp DESC LIMIT 6
+                    ) sub ORDER BY timestamp ASC
+                """, (token_upper,))
+                _prices_long = [r[0] for r in _cur.fetchall()]
+                _conn_long.close()
+                if len(_prices_long) >= 2 and _prices_long[0] > 0:
+                    _vel_long = (_prices_long[-1] - _prices_long[0]) / _prices_long[0] * 100
+                    # Block if velocity > 0.3% (price rising too fast — catching top)
+                    if _vel_long > 0.3:
+                        continue
+                    # Block if price not at top of range (pos < 80%)
+                    _range_recent = _prices_long[-15:] if len(_prices_long) >= 15 else _prices_long
+                    if len(_range_recent) >= 2:
+                        _range_min = min(_range_recent)
+                        _range_max = max(_range_recent)
+                        if _range_max > _range_min:
+                            _pos = (_prices_long[-1] - _range_min) / (_range_max - _range_min)
+                            if _pos < 0.80:
+                                continue  # not at top of range — bad breakout entry
+            except Exception:
+                pass
+            finally:
+                if _conn_long:
+                    _conn_long.close()
+
+            # RSI filter: block if RSI > 70 (overbought — price likely to reverse)
+            rsi = sig.get('rsi')
+            if rsi is not None and rsi > 70:
+                continue
+
         # Spike exhaustion filter: block entries after sharp 5m moves
         _conn_se = None
         try:
