@@ -1,5 +1,36 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-12 22:00 UTC — Hourly Analysis
+
+**Trades:** 5 closed (5 wins, 0 losses)
+**PnL:** +$0.48 (100% WR)
+**Exit Reasons:** profit-monster-trail (4), atr_tp_hit (1)
+
+**24h Snapshot:**
+- 98 trades, 53 profit-monster-trail (+$2.48), 39 atr_sl_hit (-$2.50)
+- ATR SL hit rate: 39.8% (just under 40% threshold)
+- Net 24h: roughly flat (profit-monster-trail compensates SL losses)
+
+**Signal Performance (24h):**
+- ✅ accel-300- SHORT: 18T, +$0.37, 72.2% WR
+- ✅ range_breakout_short SHORT: 8T, +$0.37, 75% WR
+- ✅ bb_bounce+ LONG: 14T, +$0.16, 64.3% WR (sole profitable LONG)
+- ❌ range_breakout+ LONG: 8T, -$0.41, 25% WR (already killed)
+- ❌ hzscore+ LONG: 4T, -$0.14, 25% WR (already blacklisted)
+
+**Diagnosis:**
+1. **Entry quality:** Excellent — last hour 100% WR, winners moved in favor quickly
+2. **SL behavior:** ATR SL at 39.8% borderline but profit-monster-trail compensates
+3. **Signal quality:** SHORT signals profitable, LONG signals mostly dead
+4. **Trade frequency:** ~4/hour average, normal
+
+**Changes:** None. CEO stability period active (14+ changes in 48h, trailing stop fix evaluating). No signal has 0% WR with 3+ trades in last hour. System within NEUTRAL regime variance.
+
+**Open Questions:**
+- 7-day trend: Aug 9 +$0.62 → Aug 11 -$0.33 (2 declines) → Aug 12 +$0.31 (recovery). Watching for continuation.
+
+---
+
 ## 2026-08-12: Daily Orchestrator Report (17:30 UTC)
 
 ### Pipeline Status
