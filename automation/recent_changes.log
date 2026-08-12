@@ -311,3 +311,8 @@
 [2026-08-12 19:27] auto_1hr: NO CHANGES
   WHY: 5T last hour (4W 1 stale +$0.14). 24h 97T 51.4% WR -$0.34. atr_sl_hit 43.3% (stable, trail compensating 49 wins vs 42 SL). No 0% WR kill candidates. range_breakout- 45%WR (degraded but not kill). Dead signals clearing residual. Trade freq 5/hr normal. 7d barely flat +$0.04. One change already today (range_breakout confidence). No param changes.
   BY: auto_1hr
+
+[2026-08-12 20:00] auto_1hr: NO CHANGES
+  WHY: 1 trade last hour (BCH SHORT atr_sl_hit -$0.03). 24h flat: 96T 50% WR -$0.24. ATR SL 44.8% (above threshold but profit-monster-trail compensating). CEO stability period active.
+  BY: auto_1hr
+  NEXT: Re-run at 21:00 UTC

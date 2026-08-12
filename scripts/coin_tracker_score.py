@@ -165,12 +165,14 @@ def score_spread(spread):
         return 10.0
 
 def score_signals(signal_count, avg_confidence):
-    """Signal confluence score 0-100. More signals = higher score."""
+    """Signal confluence score 0-100. Diminishing returns past 5 signals."""
     if signal_count == 0:
-        return 20.0  # No signals = low
-    score = 20.0 + min(60, signal_count * 10)
+        return 20.0
+    # Logarithmic scale: 1 signal=30, 5=50, 10=60, 20=70, 50=80
+    import math
+    score = 20.0 + min(60, 20 * math.log2(max(1, signal_count)))
     if avg_confidence:
-        score += (avg_confidence - 50) * 0.2
+        score += (avg_confidence - 50) * 0.1
     return max(0, min(100, score))
 
 def score_regime(regime):

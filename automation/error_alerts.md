@@ -4,6 +4,17 @@
 
 ---
 
+## Error Alerts — 2026-08-12 17:40 UTC
+- **[WARN]** (Nx): `coin_tracker` intermittent errors — `_read_candles` not defined, `no such table: agg_scores`, `no such table: _coin_registry`, NoneType. Most runs succeed (888/892), but sporadic failures. Root cause: missing tables/functions hit during certain processing branches.
+- **[WARN]** (Nx): `coin_tracker` 891 errors in 2 consecutive runs (17:26, 17:34) — only 1 coin processed, 891 errors. Likely a DB connection issue causing cascading failures. Self-recovered.
+- **[INFO]** (5 services): `hermes-bug-hunter`, `hermes-hl-volume`, `hermes-mtf-macd-tuner`, `hermes-trading-checklist`, `hermes-upgrade-implementer` — all in `failed` state. Non-critical services; timers still fire them but they fail immediately.
+- **[INFO]** (1x): `prices_hermes.db` is 0 bytes — empty. Prices now served via JSON/API, not local SQLite. Not an issue.
+- **[INFO]** (1x): `brain.db` is 0 bytes at both `/root/.hermes/brain.db` and `/root/.hermes/data/brain.db`. Trade data lives in `signals_hermes_runtime.db` now. Not an issue.
+- **[INFO]** (1x): `hermes-hl-volume.timer` — LAST passed 27min ago (should fire more often). Service is failed so timer is stuck.
+- **[INFO]**: Pipeline at 6/6 max positions — 2 signals approved but skipped (MERL SHORT conf=99, etc). Positions need to close before new entries.
+
+---
+
 ## Error Alerts — 2026-08-09 18:40 UTC
 - **[WARN]** (1x): `[PHANTOM-DBG] ASTER LONG: TIGHT SL DETECTED sl=0.602210 entry=0.602220 dist=0.002%` — SL distance too tight, phantom trade risk. Needs param review.
 - **[WARN]** (1x): `hermes-hl-volume: 429 rate limit` — Hyperliquid API rate limited, transient. Will recover.
@@ -224,3 +235,8 @@ ALERTS:
 ## Error Alerts — 2026-08-12 17:09 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: no such table: _coin_registry`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
+
+## Error Alerts — 2026-08-12 18:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: 'NoneType' object has no attribute 'get'`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: name '_read_candles' is not defined`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: no such table: agg_scores`
