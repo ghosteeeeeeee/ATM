@@ -164,16 +164,19 @@ def score_spread(spread):
     else:
         return 10.0
 
-def score_signals(signal_count, avg_confidence):
-    """Signal confluence score 0-100. Based on unique signal types, not total count.
-    High signal count with same type = less conviction than multiple different types."""
+def score_signals(signal_count, avg_confidence, mixed=False):
+    """Signal confluence score 0-100. 
+    - Based on unique signal types (1-10 range)
+    - Mixed long+short signals reduce score (conflicted coin)"""
     if signal_count == 0:
         return 20.0
-    # Treat signal_count as "unique signal types" (1-10 range typical)
-    # 1 type = 30, 3 types = 50, 5 types = 65, 10+ types = 80
+    # Base: 1 type=30, 3 types=50, 5 types=65, 10+ types=80
     score = 20.0 + min(60, signal_count * 6)
     if avg_confidence:
         score += (avg_confidence - 50) * 0.1
+    # Mixed signals = conflicted → penalty
+    if mixed:
+        score *= 0.6  # 40% penalty for mixed directions
     return max(0, min(100, score))
 
 def score_regime(regime):

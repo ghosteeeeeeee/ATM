@@ -218,9 +218,19 @@ def collect():
 
                 # ── Recent signals ──
                 coin_signals = signals.get(symbol, [])
-                # Count unique signal types, not total count
-                signal_types = set(s[0] for s in coin_signals if s[0])
+                # Count unique signal types and check direction agreement
+                signal_types = set()
+                directions = set()
+                for s in coin_signals:
+                    if s[0]:
+                        signal_types.add(s[0])
+                    if s[1]:
+                        directions.add(s[1].upper())
                 signal_count = len(signal_types)
+                # Penalize mixed directions
+                has_long = 'LONG' in directions
+                has_short = 'SHORT' in directions
+                mixed = has_long and has_short
                 avg_confidence = sum(s[2] for s in coin_signals if s[2]) / len(coin_signals) if coin_signals else None
                 last_signal_type = coin_signals[0][0] if coin_signals else None
                 last_signal_conf = coin_signals[0][2] if coin_signals else None
@@ -231,7 +241,7 @@ def collect():
                 s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 30.0
                 s_volatility = _score_volatility(atr_14, price)
                 s_spread = _score_spread(spread_bps)
-                s_signals = _score_signals(signal_count, avg_confidence)
+                s_signals = _score_signals(signal_count, avg_confidence, mixed)
                 coin_regime = _compute_coin_regime(closes_5m, ema_9, ema_20, ema_50, rsi_14)
                 s_regime = _score_regime(coin_regime)
 
