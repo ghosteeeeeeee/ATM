@@ -153,3 +153,13 @@ ALERTS:
 - **WARN** (2x): `decider_run.py` crashes at line 2911 (file is 2896 lines) — non-fatal, pipeline continues
 - **WARN**: PHANTOM-WRITE ATOM LONG SL very tight (0.1% from entry)
 - **INFO**: trades_hermes.db and speed_hermes.db are empty (0 bytes) — not used by current pipeline
+
+## Health Report — 2026-08-12 02:42 UTC
+- **[WARN]** (5x): `PHANTOM-WRITE` APT LONG trade_id=13649 — SL=0.574200 dist=0.122% from entry=0.573500 (tight, re-written every cycle). Token not in token_intel. Needs param review.
+- **[WARN]** (1x): `HYPE mirror_close FAILED` PEOPLE — DB committed but HL still open (02:36:33). Transient API error, HL position may remain open.
+- **[WARN]**: 230/549 tokens (42%) marked stale in token_speeds — expected for inactive tokens but worth monitoring
+- **[INFO]**: Price collector running normally (104 prices/30s)
+- **[INFO]**: Pipeline cycle #151381 — 6 open, 0 closed, 0.40% PnL, 43 closed today
+- **[INFO]**: 254 signals generated in last hour, 22W/21L (52% winrate) in 24h
+- **[INFO]**: Regime — 1 LONG (IOTA bias), 0 SHORT, 104 NEUTRAL — market mostly flat
+- **[INFO]**: All 50+ timers active, disk at 76%

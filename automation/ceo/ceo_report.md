@@ -1,26 +1,23 @@
-## CEO Report — 2026-08-12 02:20 UTC
+## CEO Report — 2026-08-13 18:00 UTC
 
 ### Diagnosis
-System healthy, trend improving. Verified DB:
-- **24h**: 44T, -$0.29, 45.5% WR — RED (improving from -$0.33 yesterday)
-- **7d**: 385T, +$0.76, 52.7% WR — solid positive
- - LONG 7d: 260T+, ~54% WR — solid
- - SHORT 7d: ~125T, ~-$1.05 — persistent bleed (regime-driven)
-- **Stars intact**: bb_bounce+,range_finder+ LONG 53T +$0.71 58.5%, bb-bounce-short,hzscore- SHORT 17T +$0.12 58.8%, hzscore+,mover+ LONG 5T +$0.17 80%
-- **Daily**: Aug9 +$0.62 peak → Aug10 -$0.10 → Aug11 -$0.33 → Aug12 +$0.05 (8T partial, 62.5% WR — reversal)
-- **bb_bounce+,hzscore+ LONG**: 34T +$0.22 50% WR — declining but above 45% threshold
-- **trend_momentum_near_sma+**: DISABLED (0% WR) — correct
-- **Hotset**: 8 tokens active (4 LONG, 4 SHORT)
-- **Open**: 7 trades (mixed), flat
-- **Live trading**: enabled
-- **Cost drivers48h**: atr_sl_hit 42T -$1.84 (dominant), cut-loser-CL-trail 11T -$0.55
+System healthy, stable. Verified DB:
+- **24h**: 44T, +$0.05, 50.0% WR — flat, breakeven
+- **7d**: 387T, +$0.99, 53.0% WR — positive, solid
+- **LONG 7d**: 261T +$1.89 54.4% — solid
+- **SHORT 7d**: 126T -$0.90 50.0% — persistent bleed, improving (Aug 12 +$0.18 100%)
+- **Stars intact**: bb_bounce+,range_finder+ LONG 53T +$0.71 58.5%, bb-bounce-short,hzscore- SHORT 17T +$0.12 58.8%, hzscore+,mover+ LONG 5T +$0.17 80%, bb_bounce+,hzscore+ LONG 34T +$0.22 50%
+- **Daily**: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.28 70% WR (recovery confirmed)
+- **Cost drivers 7d**: atr_sl_hit 141T -$7.69 (dominant), cut-loser-CL-trail 29T -$1.08
+- **Winners 7d**: profit-monster-trail 145T +$7.12, profit-monster-T1 42T +$2.01
 
 ### Root Cause
-SHORT bleed is regime-driven (NEUTRAL = range-bound, SHORTs get chopped). Star SHORT combo (bb-bounce-short,hzscore-) still profitable. System designed to reduce activity in NEUTRAL — correct behavior. Recent infrastructure improvements (hebbian gate cleanup, bypass centralization) should improve quality.
+No urgent issues. SHORT bleed improving (Aug 8 10% WR → Aug 12 100%). LONG recovering (Aug 10 -0.19 → Aug 12 +0.10). Recent changes (Aug 13): accel-300 re-enabled, momentum fade filter, confidence tightening, hebbian gate cleanup — all need 24-48h evaluation window.
 
 ### Fix Applied
-**NO CHANGES** — 7d positive ($0.76), stars intact, daily trend reversing (Aug12 positive), system idle by design, overreacting destabilizes.
+**NO CHANGES** — 7d positive ($0.99), stars intact, daily trend recovering, 9 changes deployed Aug 13 need evaluation, overreacting destabilizes.
 
 ### Verification
-- Monitor: SHORT7d bleed (if -$1.50+ → consider regime filter for SHORT), bb_bounce+,hzscore+ if 7d <45% WR → escalate
-- Pipeline healthy. Both timers active.
+- Monitor: SHORT7d bleed (if -$1.50+ → consider regime filter), recent Aug 13 changes (24-48h eval window)
+- accel-300 re-enabled (no trades yet, monitor for WR)
+- Pipeline healthy. 7 open trades.
