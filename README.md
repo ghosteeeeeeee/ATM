@@ -9,8 +9,6 @@
 
 [![Trades Dashboard](docs/trades_dashboard.png)](docs/trades_dashboard.png)
 
-[![Coin Tracker](docs/coin_tracker.png)](docs/coin_tracker.png)
-
 ---
 
 ## System Overview
@@ -311,6 +309,10 @@ python3 scripts/hermes-trades-api.py  # Runs on :8080
 | `trades.html` | `:12345/trades.html` | Main trading dashboard |
 | `signals.html` | `:12345/signals.html` | Live signal feed |
 | `coin_tracker.html` | `:12345/coin_tracker.html` | Per-coin intelligence |
+
+### Coming Soon
+
+[![Coin Tracker](docs/coin_tracker.png)](docs/coin_tracker.png)
 
 ---
 
