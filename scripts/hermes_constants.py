@@ -833,7 +833,7 @@ ACCEL_300_MIN_GAP_PCT_SHORT = 0.35  # min EMA gap % for SHORT (was 0.50 — symm
 ACCEL_300_MIN_GAP_GROWTH_SHORT = -0.10  # allow slight gap narrowing for SHORT (was 0.06)
 ACCEL_300_COOLDOWN_BARS   = 10   # dedup: only fire once per N bars per token+direction (was 12 → tightened 2026-05-11)
 ACCEL_300_LOOKBACK_1M     = 700  # 1m prices to fetch per token (warmup + detection window)
-ACCEL_300_ENABLED        = False  # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
+ACCEL_300_ENABLED        = True   # re-enabled 2026-08-12 — SHORT edge confirmed (+$6.22, 1025T, 14-win streaks)
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
 ACCEL_300_REGIME_SLOPE_PCT = 0.0005  # min price slope % — allow very weak trends (was 0.001)
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
@@ -960,7 +960,7 @@ EMA20_50_MINUS_ENABLED        = False    # ema20_50- SHORT
 MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
 ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
-ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-04 21:05 — 15% WR, -$1.26 in 7d. No SHORT edge.
+ACCEL_300_MINUS_ENABLED       = True    # re-enabled 2026-08-12 — SHORT edge confirmed (+$6.22, 1025T, 14-win streaks)
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
@@ -1035,6 +1035,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long', 'range_breakout',
     'spike_exhaustion_short', 'bb_bounce', 'hzscore',
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
+    'accel-300',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1244,7 +1245,7 @@ CONFLUENCE_REQUIRED = True   # DO NOT DISABLE — paralysis was caused by 5min e
 # When a single-source accel-300 has very high confidence, bypass confluence gate.
 # Problem: confluence gate blocks pure accel-300 signals (no RS co-signal) even when
 # accel-300 is very strong. Strong accel-300 alone should sometimes fire.
-ACCEL_300_STANDALONE_BYPASS_ENABLED = False  # TEMPORARILY DISABLED — was firing too many weak pure-accel signals (40% WR)
+ACCEL_300_STANDALONE_BYPASS_ENABLED = True   # re-enabled 2026-08-12 — SHORT edge confirmed
 ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # kept for reference (not used when disabled)
 
 # ── Dead-Hours Entry Filter ───────────────────────────────────────────────────
