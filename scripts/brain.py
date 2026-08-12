@@ -492,9 +492,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         _marker = {}
         if os.path.exists(_marker_path):
             _marker = _json.loads(open(_marker_path).read())
-        _marker[token.upper()] = time.time()
+        _marker[token.upper()] = _time.time()
         # Prune entries older than 60s
-        _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+        _marker = {k: v for k, v in _marker.items() if _time.time() - v < 60}
         with open(_marker_path, 'w') as _f:
             _json.dump(_marker, _f)
     except Exception:
