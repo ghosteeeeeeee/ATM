@@ -250,3 +250,11 @@ ALERTS:
 - **[WARN]**: `hermes-hl-volume` — 429 rate limit from Hyperliquid API (transient, will self-heal)
 - **[WARN]**: `hermes-trading-checklist` — pipeline output parsing + 53195 signals needing archival
 - **[INFO]**: `hermes-bug-hunter` — 83 bare except clauses, 111 connection leaks, 72 atomic JSON writes, 5 hardcoded passwords (known tech debt, not blocking)
+
+## Error Alerts — 2026-08-12 20:09 UTC
+- **REPEATED** (13x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: expected an indented block after 'for' statement on line N (coin_tracker.py, line N)`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing kBONK: table coin_kBONK already exists`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing kFLOKI: table coin_kFLOKI already exists`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing kLUNC: table coin_kLUNC already exists`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing kNEIRO: table coin_kNEIRO already exists`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing kPEPE: table coin_kPEPE already exists`

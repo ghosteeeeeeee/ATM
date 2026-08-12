@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-12
+
+### Diagnosis
+24h: 99T -$0.18 (52.5% WR — flat). 7d: 450T +$0.36 (52.7% WR — barely positive). 3 consecutive declining days (Aug 10-12) but losses shrinking. LONG primary bleed, SHORT flat.
+
+### Root Cause
+hzscore+ standalone LONG is the worst active bleed source: 13T -$0.20 (38.5% WR 7d), 6T -$0.09 (33% WR 24h). Previous restrictions (combo-only bypass removal) insufficient — signal still fires through normal path and loses.
+
+### Fix Applied
+Added 'hzscore+' to SIGNAL_SOURCE_BLACKLIST in hermes_constants.py. validate_source() blocks standalone 'hzscore+' at entry. Combos unaffected: hzscore+,return_exhaustion_long (58.3%), hzscore+,mover+ (80%), bb_bounce+,hzscore+ (50%). No open hzscore+ positions.
+
+### Verification
+Blacklist confirmed active: `True` in SIGNAL_SOURCE_BLACKLIST. Pipeline active, all timers running. Previous disables confirmed (range_breakout+ FALSE, trend_momentum FALSE). 5 open SHORT positions ($0 flat). Stars7d intact (3/3 profitable).
+
+---
+
 ## CEO Decision — Combo Signal Confidence Boost (2026-08-15)
 
 ### Decision: INCREASE source_mult from 5% → 10% for 2+ sources
@@ -317,3 +333,15 @@ source_mult increased from 5% → 10% for 2+ source combos in `signal_compactor.
 
 ### Impact
 Takes effect on next pipeline run. Combos get stronger score ranking in compactor — should improve signal selection without affecting confidence display or downstream logic.
+
+---
+
+## CEO Report — 2026-08-12 (dashboard update acknowledged)
+
+### Changes
+- coin_tracker.html: coin icons from CoinGecko (100 icons → `/var/www/html/coin_icons/`), ICON_MAP JS lookup, `iconHtml()` with 2-letter badge fallback, 32px round icons
+- mapping.json available for other pages
+- screenshot skill added (Playwright headless screenshots)
+
+### Impact
+No trading impact. UI enhancement — coin icons improve visual identification on dashboard.

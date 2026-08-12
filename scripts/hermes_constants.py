@@ -306,6 +306,10 @@ SIGNAL_SOURCE_BLACKLIST = {
     # 2026-08-05: BLOCK accel-300 — 0% WR over 48h, no edge. All variants dead.
     # Covers: accel-300+, accel-300-, accel-300-vel+, accel-300-vel-, accel-300-breakout.
     'accel-300',
+    # 2026-08-12: BLOCK hzscore+ standalone — 13T -$0.20 38.5% WR (7d), 6T -$0.09 33% WR (24h).
+    # Combos unaffected: hzscore+,return_exhaustion_long 58.3%, hzscore+,mover+ 80%,
+    # bb_bounce+,hzscore+ 50%. validate_source() only blocks exact match for single-signal.
+    'hzscore+',
 }
 SERVER_NAME = 'Hermes'
 MAX_OPEN_POSITIONS = 6   # max open paper positions — diversified portfolio (was 3)
