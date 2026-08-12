@@ -1,16 +1,17 @@
-## CEO Report — 2026-08-13 11:00 UTC
+## CEO Report — 2026-08-13 14:00 UTC
 
 ### Diagnosis
-24h: 41T, -$0.33, 43.9% WR (RED)
-7d: 383T, +$0.72, 52.2% WR (positive, solid)
+24h: 41T, -$0.29, 43.9% WR (RED)
+7d: 382T, +$0.91, 52.6% WR (improved from +$0.70, solid)
 
-Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 (declining, worst since Aug 4)
+Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 partial +$0.12 (1T)
 
 ### Root Cause
 - **SHORT bleed persistent**: SHORT 7d 125T -$1.02 (49.6% WR) — regime-driven, star SHORT still profitable
-- **cost drivers 48h**: atr_sl_hit 42T -$1.81 (dominant), cut-loser-CL-trail 13T -$0.65, cut-loser-CL-T1 4T -$0.42
-- **regime data NULL**: 366/383 trades have NULL regime (data quality debt)
-- trend_momentum_near_sma+ already killed (5T 0% WR -$0.40)
+- **LONG solid**: LONG 7d 257T +$1.93, 54.1% WR
+- **cost drivers 7d**: atr_sl_hit 140T -$7.54 (dominant), cut-loser-CL-trail 29T -$1.08
+- **sole winning exit**: profit-monster-trail 140T +$6.91
+- trend_momentum_near_sma+ DISABLED (5T 0% WR -$0.40)
 
 ### Stars (7d, all intact)
 - bb_bounce+,range_finder+ LONG: 53T +$0.71, 58.5% WR
@@ -18,19 +19,19 @@ Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 (declining, worst s
 - bb-bounce-short,hzscore- SHORT: 17T +$0.12, 58.8% WR
 
 ### Fix Applied
-**NO CHANGES** — 7d positive (+$0.72), stars intact, system idle by design (NEUTRAL/REDUCE). Momentum fade filter deployed Aug13 — too early to evaluate.
+**NO CHANGES** — 7d improved to +$0.91, stars intact, system idle by design (NEUTRAL/REDUCE). Momentum fade filter deployed Aug13 — too early to evaluate. Overreacting destabilizes.
 
 ### Monitoring
 - SHORT7d bleed (if -$1.50+ → consider regime filter for SHORT)
-- Daily declining trend (if Aug 12 negative → investigate)
-- cut-loser-CL-T1 (4T -$0.42, 0% WR — watch for pattern)
+- cut-loser-CL-T1 (7T -$0.53, watch for pattern)
 - Disk 84% (1% from WARN)
 
 ### Verification
 - Pipeline healthy: 15+ active timers
 - Live trading: ON
+- Open: 7 trades (6 LONG +$0.03, 1 SHORT +$0.04)
 - Hotset: EMPTY (NEUTRAL regime, correct)
-- trend_momentum_near_sma+ DISABLED (0% WR, 1 open trade)
+- trend_momentum_near_sma+ DISABLED (0% WR)
 
 ---
 
