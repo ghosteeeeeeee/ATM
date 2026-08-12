@@ -122,118 +122,148 @@ def collect():
         candles_conn.close()
         signals_conn.close()
 
+    # Open a single write connection for all DB operations
+    from coin_tracker_schema import _table_name
+    write_conn = sqlite3.connect(COIN_TRACKER_DB, timeout=30)
+    write_conn.execute("PRAGMA journal_mode=WAL")
+
     processed = 0
     skipped = 0
     errors = 0
 
-    for symbol, mid_price in all_mids.items():
-        try:
-            price = float(mid_price) if mid_price else 0
-        except (ValueError, TypeError):
-            skipped += 1
-            continue
+    try:
+        for symbol, mid_price in all_mids.items():
+            try:
+                price = float(mid_price) if mid_price else 0
+            except (ValueError, TypeError):
+                skipped += 1
+                continue
 
-        if price < MIN_PRICE:
-            skipped += 1
-            continue
+            if price < MIN_PRICE:
+                skipped += 1
+                continue
 
-        meta = universe_map.get(symbol, {})
-        if meta.get('isDelisted', False):
-            skipped += 1
-            continue
+            meta = universe_map.get(symbol, {})
+            if meta.get('isDelisted', False):
+                skipped += 1
+                continue
 
-        try:
-            # Ensure tables exist
-            ensure_coin_table(symbol)
-            upsert_registry(
-                symbol,
-                name=meta.get('name', symbol),
-                max_leverage=meta.get('maxLeverage'),
-                decimals=meta.get('decimals')
-            )
+            try:
+                # Ensure tables exist
+                ensure_coin_table(symbol, conn=write_conn)
+                upsert_registry(
+                    symbol,
+                    name=meta.get('name', symbol),
+                    max_leverage=meta.get('maxLeverage'),
+                    decimals=meta.get('decimals')
+                )
 
-            # Parse candles (newest first)
-            c5m = candles_5m.get(symbol, [])
-            c1h = candles_1h.get(symbol, [])
+                # Parse candles (newest first)
+                c5m = candles_5m.get(symbol, [])
+                c1h = candles_1h.get(symbol, [])
 
-            closes_5m = [c[4] for c in c5m if c[4]]
-            highs_5m = [c[2] for c in c5m if c[2]]
-            lows_5m = [c[3] for c in c5m if c[3]]
-            volumes_5m = [c[5] for c in c5m if c[5]]
+                closes_5m = [c[4] for c in c5m if c[4]]
+                highs_5m = [c[2] for c in c5m if c[2]]
+                lows_5m = [c[3] for c in c5m if c[3]]
+                volumes_5m = [c[5] for c in c5m if c[5]]
 
-            closes_1h = [c[4] for c in c1h if c[4]]
-            volumes_1h = [c[5] for c in c1h if c[5]]
+                closes_1h = [c[4] for c in c1h if c[4]]
+                volumes_1h = [c[5] for c in c1h if c[5]]
 
-            # ── Compute indicators ──
-            ema_9 = _ema(closes_5m, 9) if len(closes_5m) >= 9 else None
-            ema_20 = _ema(closes_5m, 20) if len(closes_5m) >= 20 else None
-            ema_50 = _ema(closes_5m, 50) if len(closes_5m) >= 50 else None
-            rsi_14 = _rsi(closes_5m, 14) if len(closes_5m) >= 15 else None
-            _, _, macd_hist = _macd(closes_5m) if len(closes_5m) >= 35 else (None, None, None)
-            atr_14 = _atr(highs_5m, lows_5m, closes_5m, 14) if len(closes_5m) >= 15 else None
+                # ── Compute indicators ──
+                ema_9 = _ema(closes_5m, 9) if len(closes_5m) >= 9 else None
+                ema_20 = _ema(closes_5m, 20) if len(closes_5m) >= 20 else None
+                ema_50 = _ema(closes_5m, 50) if len(closes_5m) >= 50 else None
+                rsi_14 = _rsi(closes_5m, 14) if len(closes_5m) >= 15 else None
+                _, _, macd_hist = _macd(closes_5m) if len(closes_5m) >= 35 else (None, None, None)
+                atr_14 = _atr(highs_5m, lows_5m, closes_5m, 14) if len(closes_5m) >= 15 else None
 
-            # ── Volume analysis ──
-            vol_1h = volumes_1h[0] if volumes_1h else None
-            vol_24h = sum(volumes_1h[:24]) if len(volumes_1h) >= 24 else sum(volumes_1h) if volumes_1h else None
-            vol_avg = sum(volumes_5m[:50]) / min(50, len(volumes_5m)) if volumes_5m else None
-            vol_recent = volumes_5m[0] if volumes_5m else 0
-            vol_trend = _volume_trend(volumes_5m[:60])
+                # ── Volume analysis ──
+                vol_1h = volumes_1h[0] if volumes_1h else None
+                vol_24h = sum(volumes_1h[:24]) if len(volumes_1h) >= 24 else sum(volumes_1h) if volumes_1h else None
+                vol_avg = sum(volumes_5m[:50]) / min(50, len(volumes_5m)) if volumes_5m else None
+                vol_recent = volumes_5m[0] if volumes_5m else 0
+                vol_trend = _volume_trend(volumes_5m[:60])
 
-            # ── Spread (approximate from candle range) ──
-            spread_bps = None
-            if highs_5m and lows_5m and price > 0:
-                recent_range = highs_5m[0] - lows_5m[0]
-                if recent_range:
-                    spread_bps = (recent_range / price) * 10000
+                # ── Spread (approximate from candle range) ──
+                spread_bps = None
+                if highs_5m and lows_5m and price > 0:
+                    recent_range = highs_5m[0] - lows_5m[0]
+                    if recent_range:
+                        spread_bps = (recent_range / price) * 10000
 
-            # ── Recent signals ──
-            coin_signals = signals.get(symbol, [])
-            signal_count = len(coin_signals)
-            avg_confidence = sum(s[2] for s in coin_signals) / len(coin_signals) if coin_signals else None
-            last_signal_type = coin_signals[0][0] if coin_signals else None
-            last_signal_conf = coin_signals[0][2] if coin_signals else None
+                # ── Recent signals ──
+                coin_signals = signals.get(symbol, [])
+                signal_count = len(coin_signals)
+                avg_confidence = sum(s[2] for s in coin_signals) / len(coin_signals) if coin_signals else None
+                last_signal_type = coin_signals[0][0] if coin_signals else None
+                last_signal_conf = coin_signals[0][2] if coin_signals else None
 
-            # ── Compute scores ──
-            s_momentum = _score_momentum(closes_5m, ema_9, ema_20, ema_50)
-            s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 50.0
-            s_volatility = _score_volatility(atr_14, price)
-            s_spread = _score_spread(spread_bps)
-            s_signals = _score_signals(signal_count, avg_confidence)
-            s_regime = _score_regime(regime)
+                # ── Compute scores ──
+                s_momentum = _score_momentum(closes_5m, ema_9, ema_20, ema_50)
+                s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 50.0
+                s_volatility = _score_volatility(atr_14, price)
+                s_spread = _score_spread(spread_bps)
+                s_signals = _score_signals(signal_count, avg_confidence)
+                s_regime = _score_regime(regime)
 
-            composite = (
-                s_momentum * WEIGHTS['momentum'] +
-                s_volume * WEIGHTS['volume'] +
-                s_volatility * WEIGHTS['volatility'] +
-                s_spread * WEIGHTS['spread'] +
-                s_signals * WEIGHTS['signals'] +
-                s_regime * WEIGHTS['regime']
-            )
+                composite = (
+                    s_momentum * WEIGHTS['momentum'] +
+                    s_volume * WEIGHTS['volume'] +
+                    s_volatility * WEIGHTS['volatility'] +
+                    s_spread * WEIGHTS['spread'] +
+                    s_signals * WEIGHTS['signals'] +
+                    s_regime * WEIGHTS['regime']
+                )
 
-            health = health_from_score(composite)
+                health = health_from_score(composite)
 
-            # ── Write event ──
-            write_event(symbol, 'tick', ts=now,
-                price=price, spread_bps=spread_bps,
-                vol_1h=vol_1h, vol_24h=vol_24h,
-                rsi_14=rsi_14, macd_hist=macd_hist,
-                ema_9=ema_9, ema_20=ema_20, ema_50=ema_50, atr_14=atr_14,
-                health=health, health_score=composite,
-                signal_type=last_signal_type, signal_confidence=last_signal_conf,
-                regime=regime
-            )
+                # ── Write event + score + registry update using shared connection ──
+                table = _table_name(symbol)
+                # Event
+                allowed = {'price', 'spread_bps', 'vol_1h', 'vol_24h',
+                           'rsi_14', 'macd_hist', 'ema_9', 'ema_20', 'ema_50', 'atr_14',
+                           'health', 'health_score', 'signal_type', 'signal_confidence', 'regime'}
+                event_data = {
+                    'ts': now, 'event_type': 'tick', 'price': price, 'spread_bps': spread_bps,
+                    'vol_1h': vol_1h, 'vol_24h': vol_24h,
+                    'rsi_14': rsi_14, 'macd_hist': macd_hist,
+                    'ema_9': ema_9, 'ema_20': ema_20, 'ema_50': ema_50, 'atr_14': atr_14,
+                    'health': health, 'health_score': composite,
+                    'signal_type': last_signal_type, 'signal_confidence': last_signal_conf,
+                    'regime': regime
+                }
+                event_cols = {k: v for k, v in event_data.items() if k in allowed and v is not None}
+                event_cols['ts'] = now
+                event_cols['event_type'] = 'tick'
+                placeholders = ', '.join(['?'] * len(event_cols))
+                col_names = ', '.join(event_cols.keys())
+                write_conn.execute(f"INSERT INTO {table} ({col_names}) VALUES ({placeholders})", list(event_cols.values()))
 
-            # ── Write score ──
-            write_score(symbol, now, health, composite,
-                s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite
-            )
+                # Score
+                write_conn.execute("""
+                    INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(symbol) DO UPDATE SET
+                        ts=excluded.ts, health=excluded.health, score=excluded.score,
+                        momentum=excluded.momentum, volume=excluded.volume, volatility=excluded.volatility,
+                        spread=excluded.spread, signals=excluded.signals, regime=excluded.regime,
+                        composite=excluded.composite
+                """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite))
 
-            # ── Update registry ──
-            update_registry_health(symbol, health, composite)
+                # Registry
+                write_conn.execute("""
+                    UPDATE _coin_registry SET health=?, health_score=?, last_seen=? WHERE symbol=?
+                """, (health, composite, now, symbol))
 
-            processed += 1
-        except Exception as e:
-            errors += 1
+                processed += 1
+            except Exception as e:
+                errors += 1
+
+        # Commit all writes at once
+        write_conn.commit()
+    finally:
+        write_conn.close()
 
     # ── Prune old events (every 100 runs) ──
     run_count = int(time.time() / 60)

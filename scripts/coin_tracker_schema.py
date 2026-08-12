@@ -109,13 +109,14 @@ def init_db():
 
 _TABLE_EXISTS_CACHE = set()
 
-def ensure_coin_table(symbol):
-    """Create per-coin table if it doesn't exist. Returns table name."""
+def ensure_coin_table(symbol, conn=None):
+    """Create per-coin table if it doesn't exist. Returns table name.
+    If conn is provided, use it (caller manages lifecycle). Otherwise use _db()."""
     table = _table_name(symbol)
     if table in _TABLE_EXISTS_CACHE:
         return table
-    with _db() as conn:
-        # Fast check: does the table already exist?
+    if conn:
+        # Caller manages connection — just check and create
         exists = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,)
         ).fetchone()
@@ -152,7 +153,47 @@ def ensure_coin_table(symbol):
         conn.execute(f"CREATE INDEX idx_{table}_ts ON {table}(ts)")
         conn.execute(f"CREATE INDEX idx_{table}_health ON {table}(health)")
         conn.execute(f"CREATE INDEX idx_{table}_event ON {table}(event_type)")
-        conn.commit()
+        _TABLE_EXISTS_CACHE.add(table)
+        return table
+    # Standalone mode — use context manager
+    with _db() as db:
+        exists = db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,)
+        ).fetchone()
+        if exists:
+            _TABLE_EXISTS_CACHE.add(table)
+            return table
+        db.execute(f"""
+            CREATE TABLE {table} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                price REAL,
+                bid REAL,
+                ask REAL,
+                spread_bps REAL,
+                vol_1m REAL,
+                vol_5m REAL,
+                vol_1h REAL,
+                vol_24h REAL,
+                rsi_14 REAL,
+                macd_hist REAL,
+                ema_9 REAL,
+                ema_20 REAL,
+                ema_50 REAL,
+                atr_14 REAL,
+                health TEXT,
+                health_score REAL,
+                signal_type TEXT,
+                signal_confidence REAL,
+                regime TEXT,
+                notes TEXT
+            )
+        """)
+        db.execute(f"CREATE INDEX idx_{table}_ts ON {table}(ts)")
+        db.execute(f"CREATE INDEX idx_{table}_health ON {table}(health)")
+        db.execute(f"CREATE INDEX idx_{table}_event ON {table}(event_type)")
+        db.commit()
         _TABLE_EXISTS_CACHE.add(table)
     return table
 

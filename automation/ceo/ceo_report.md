@@ -1,3 +1,16 @@
+## CEO Report — 2026-08-15 (RS signal improvements — commit 7acf1a3)
+
+### RS Signal Improvements
+- **Volume Confirmation at Bounce** — `_bounce_confirmation()` now requires volume > 1.2x average. Weak volume bounces filtered out. Warrior Trading principle: volume confirms price moves.
+- **Trend Alignment Bonus** — Added `_get_1h_trend()` + 10% confidence boost. LONG + BULLISH 1H EMA(20/50) = stronger signal; SHORT + BEARISH 1H EMA(20/50) = stronger signal.
+
+### Status
+- Bug hunter audit: ALL CLEAR
+- Plan updated: `plans/warrior_trading_signals.md`
+- Impact: RS signals should filter weak bounces and reward trend-aligned entries. Monitor for 24-48h.
+
+---
+
 ## CEO Report — 2026-08-15 (CEO run — latest)
 
 ### Diagnosis
