@@ -211,18 +211,6 @@ def detect_breakout(closes, token):
     if not range_confirmed:
         return None
 
-    # Dead market filter: block if recent price range too tight (< 0.2%)
-    # Price in dead markets doesn't have enough momentum to reach TP
-    # Use 15min range from closes (not BB width which uses longer lookback)
-    recent_range = closes[-15:] if len(closes) >= 15 else closes
-    if len(recent_range) >= 2:
-        range_min = min(recent_range)
-        range_max = max(recent_range)
-        recent_range_pct = (range_max - range_min) / range_min if range_min > 0 else 0
-        from hermes_constants import RANGE_BREAKOUT_BB_WIDTH_MIN
-        if recent_range_pct < RANGE_BREAKOUT_BB_WIDTH_MIN:
-            return None
-
     # Count band touches on current BB
     upper_touches, lower_touches = _count_band_touches(
         closes, upper, lower, RANGE_BREAKOUT_TOUCH_WINDOW

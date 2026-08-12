@@ -1051,7 +1051,6 @@ RANGE_BREAKOUT_MINUS_ENABLED = True  # range_breakout- SHORT (breakout below sup
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)
 RANGE_BREAKOUT_BB_WIDTH_MAX = 0.04   # Max band width % to consider range-bound (4%)
-RANGE_BREAKOUT_BB_WIDTH_MIN = 0.002  # Min band width % — block dead markets (<0.2% = no volatility)
 RANGE_BREAKOUT_BB_SLOPE_MAX = 0.001  # Max BB middle slope per candle (flat bands)
 RANGE_BREAKOUT_LOOKBACK = 100        # 5m candles to analyze (8+ hours)
 RANGE_BREAKOUT_TOUCH_MIN = 3         # Min band touches to confirm range
