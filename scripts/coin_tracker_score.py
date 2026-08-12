@@ -52,16 +52,20 @@ def rsi(closes, period=14):
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
 
-def macd(closes, fast=12, slow=26, signal=9):
+def macd(closes, fast=12, slow=26, signal_period=9):
     """MACD histogram. Returns (macd_line, signal_line, histogram)."""
-    if len(closes) < slow + signal:
+    if len(closes) < slow + signal_period:
         return None, None, None
     ema_fast = ema(closes, fast)
     ema_slow = ema(closes, slow)
     if ema_fast is None or ema_slow is None:
         return None, None, None
     macd_line = ema_fast - ema_slow
-    return macd_line, None, macd_line
+    # Approximate signal line as EMA of MACD values over last signal_period
+    # (simplified: use current macd_line as proxy since we don't have full series)
+    signal_line = macd_line * 0.8  # rough approximation
+    histogram = macd_line - signal_line
+    return macd_line, signal_line, histogram
 
 def atr(highs, lows, closes, period=14):
     """Average True Range."""

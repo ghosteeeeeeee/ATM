@@ -92,16 +92,22 @@ def _read_signals_batch(tokens, hours=24, conn=None):
 
 def _read_regime():
     """Read current market regime."""
+    conn = None
     try:
         conn = sqlite3.connect(STATIC_DB, timeout=10)
         row = conn.execute(
             "SELECT regime, broad_z FROM regime_log ORDER BY timestamp DESC LIMIT 1"
         ).fetchone()
-        conn.close()
         if row:
             return row[0], row[1]
     except Exception:
         pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
     return 'NEUTRAL', 0.0
 
 # ── Main collector ─────────────────────────────────────────────────────────────
