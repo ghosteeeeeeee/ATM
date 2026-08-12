@@ -359,6 +359,7 @@ def scan_bb_bounce_signals(prices_dict):
                     continue
 
         # Spike exhaustion filter: block entries after sharp 5m moves
+        _conn_se = None
         try:
             from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
             from paths import HERMES_DATA
@@ -373,7 +374,6 @@ def scan_bb_bounce_signals(prices_dict):
                 ) sub ORDER BY timestamp ASC
             """, (token.upper(),))
             _prices_se = [r[0] for r in _cur_se.fetchall()]
-            _conn_se.close()
             if len(_prices_se) >= 2 and _prices_se[0] > 0:
                 _vel_se = (_prices_se[-1] - _prices_se[0]) / _prices_se[0] * 100
                 if abs(_vel_se) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
@@ -381,6 +381,9 @@ def scan_bb_bounce_signals(prices_dict):
                     continue
         except Exception:
             pass
+        finally:
+            if _conn_se:
+                _conn_se.close()
 
         # Confidence based on quality indicators
         base_conf = 60
