@@ -1861,8 +1861,15 @@ def _filter_safe_prev_hotset(prev_hotset):
         elif not CONFLUENCE_REQUIRED and len(sp) >= 1:
             pass  # ponytail: CONFLUENCE_REQUIRED=False → single-source allowed through preserve
         elif len(sp) < 2:
-            log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")
-            continue
+            # Check if single-source signal is in the standalone bypass list
+            bare_src_check = src.rstrip('+-') if src else ''
+            if bare_src_check in ('stop_hunt_reversal_long', 'range_breakout',
+                                  'spike_exhaustion_short', 'bb_bounce', 'hzscore',
+                                  'range_finder', 'continuation'):
+                pass  # backtested standalone — allow through preserve
+            else:
+                log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")
+                continue
         # NOTE: The old hzscore-only filter (first-source='hzscore' + no comma) was
         # removed — it was redundant with the confluence gate above. If a preserved
         # entry has 2+ sources it passed the gate legitimately. If it has 1 source
