@@ -313,6 +313,26 @@ def detect_breakout(closes, token):
         trend_bonus = 5
     conf += trend_bonus
 
+    # ── Dynamic bonuses (like accel_300) ──────────────────────────────────
+    # Strong bounce: bounce_pct > 0.15% = confirmed breakout
+    if bounce_pct > 0.15:
+        conf = min(88, conf + 3)
+    # Deep squeeze: squeeze_bars > 10 = long consolidation = stronger breakout
+    if squeeze_bars > 10:
+        conf = min(88, conf + 3)
+    # Wide range: range_width > 0.5% = established range, not noise
+    if width * 100 > 0.5:
+        conf = min(88, conf + 3)
+    # Speed bonus: high velocity = breakout has momentum
+    try:
+        from speed_tracker import get_token_speed
+        spd = get_token_speed(token)
+        vel = spd.get('speed_percentile', 0) if spd else 0
+        if vel >= 80:
+            conf = min(88, conf + 5)
+    except Exception:
+        pass
+
     conf = min(RANGE_BREAKOUT_CONF_CAP, max(50, conf))
 
     return {
