@@ -165,12 +165,13 @@ def score_spread(spread):
         return 10.0
 
 def score_signals(signal_count, avg_confidence):
-    """Signal confluence score 0-100. Diminishing returns past 5 signals."""
+    """Signal confluence score 0-100. Based on unique signal types, not total count.
+    High signal count with same type = less conviction than multiple different types."""
     if signal_count == 0:
         return 20.0
-    # Logarithmic scale: 1 signal=30, 5=50, 10=60, 20=70, 50=80
-    import math
-    score = 20.0 + min(60, 20 * math.log2(max(1, signal_count)))
+    # Treat signal_count as "unique signal types" (1-10 range typical)
+    # 1 type = 30, 3 types = 50, 5 types = 65, 10+ types = 80
+    score = 20.0 + min(60, signal_count * 6)
     if avg_confidence:
         score += (avg_confidence - 50) * 0.1
     return max(0, min(100, score))

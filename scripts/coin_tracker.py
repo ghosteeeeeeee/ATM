@@ -218,8 +218,10 @@ def collect():
 
                 # ── Recent signals ──
                 coin_signals = signals.get(symbol, [])
-                signal_count = len(coin_signals)
-                avg_confidence = sum(s[2] for s in coin_signals) / len(coin_signals) if coin_signals else None
+                # Count unique signal types, not total count
+                signal_types = set(s[0] for s in coin_signals if s[0])
+                signal_count = len(signal_types)
+                avg_confidence = sum(s[2] for s in coin_signals if s[2]) / len(coin_signals) if coin_signals else None
                 last_signal_type = coin_signals[0][0] if coin_signals else None
                 last_signal_conf = coin_signals[0][2] if coin_signals else None
 
