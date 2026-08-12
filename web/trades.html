@@ -291,15 +291,15 @@
             // Distance to SL/TP from current price
             const dirLower = dir === 'LONG';
             let slDistPct = 0, tpDistPct = 0, slClass = '', tpClass = '';
-            if (current > 0 && sl > 0) {
+            if (entry > 0 && sl > 0) {
               slDistPct = dirLower
-                ? ((sl - current) / current) * 100   // LONG: how far SL is below current
-                : ((current - sl) / current) * 100;  // SHORT: how far SL is above current
+                ? ((sl - entry) / entry) * 100   // LONG: SL distance from entry
+                : ((entry - sl) / entry) * 100;  // SHORT: SL distance from entry
             }
-            if (current > 0 && tp > 0) {
+            if (entry > 0 && tp > 0) {
               tpDistPct = dirLower
-                ? ((tp - current) / current) * 100   // LONG: how far TP is above current
-                : ((current - tp) / current) * 100;  // SHORT: how far TP is below current
+                ? ((tp - entry) / entry) * 100   // LONG: TP distance from entry
+                : ((entry - tp) / entry) * 100;  // SHORT: TP distance from entry
             }
             if (sl > 0 && ((dirLower && current <= sl) || (!dirLower && current >= sl))) slClass = 'sl-hit';
             else if (sl > 0 && Math.abs(slDistPct) < 0.5) slClass = 'near-sl';
