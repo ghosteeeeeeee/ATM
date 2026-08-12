@@ -89,8 +89,26 @@
       "new_value": 0.3316,
       "reason": "WR=70.0%, decay=True",
       "wr_before": 0.7
+    },
+    {
+      "timestamp": "2026-08-12T06:00:00.521336+00:00",
+      "signal_type": "bb_bounce",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.3316,
+      "new_value": 0.315,
+      "reason": "WR=53.3%, decay=True",
+      "wr_before": 0.5333333333333333
+    },
+    {
+      "timestamp": "2026-08-12T06:00:00.537885+00:00",
+      "signal_type": "tl_break",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.315,
+      "new_value": 0.2992,
+      "reason": "WR=70.0%, decay=True",
+      "wr_before": 0.7
     }
   ],
-  "daily_count": 3,
-  "last_reset": 1786408437.801999
+  "daily_count": 2,
+  "last_reset": 1786514400.507183
 }
