@@ -321,12 +321,14 @@ It never read the per-trade `trailing_distance` column from the DB. Updating tha
 2. Monitor: does it trigger on real regime shifts? Does it recover properly?
 3. Tune: adjust LOSS_THRESHOLD, WR_THRESHOLD, PENALTY based on live data
 
-### Files to Modify (Phase 1 only)
+### Files to Modify
 
-| File | Change |
-|------|--------|
-| `scripts/hermes_constants.py` | Add Weather Vane params |
-| `scripts/signal_compactor.py` | Add `get_directional_outcome()` + `dir_outcome_mult` in scoring |
+| File | Change | Status |
+|------|--------|--------|
+| `scripts/hermes_constants.py` | Add Weather Vane params | PENDING (Phase 1) |
+| `scripts/signal_compactor.py` | Add `get_directional_outcome()` + `dir_outcome_mult` in scoring | PENDING (Phase 1) |
+| `scripts/tpsl_utils.py` | Add `trailing_distance` param to `compute_atr_sl_tp()` | DONE (2026-08-12) |
+| `scripts/position_manager.py` | Pass `pos.get('trailing_distance')` to compute_atr_sl_tp | DONE (2026-08-12) |
 
 ---
 
