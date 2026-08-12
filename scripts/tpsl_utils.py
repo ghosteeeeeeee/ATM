@@ -550,12 +550,11 @@ def compute_atr_sl_tp(
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                # For SHORT, tighter SL = lower (closer to price). Use min, not max.
-                new_sl = min(trail_ceil, min_from_entry)
-                # FIX: SL must never be below current_price for SHORT — when lowest_price
-                # spikes far below entry, trail_ceil can go below current, causing instant stop-out.
-                if new_sl < current_price:
-                    new_sl = min_from_entry
+                # When trail_ceil <= entry (low ATR token, trail too tight), use entry-based ceiling
+                if trail_ceil <= entry_f:
+                    new_sl = min_from_entry  # entry-based ceiling (always above entry)
+                else:
+                    new_sl = trail_ceil    # normal case: trail from nadir
                 # NOTE: No one-way gate here — the trailing gate handles one-way + correction.
             else:
                 # In loss: entry ceiling is absolute floor — SL must stay at least ATR_SL_MIN from entry
@@ -768,11 +767,11 @@ def compute_atr_sl_tp(
             if in_profit:
                 trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                # For SHORT, tighter SL = lower. Use min, not max.
-                new_sl = min(trail_ceil, min_from_entry)
-                # FIX: SL must never be below current_price for SHORT (same as pre-gate)
-                if new_sl < current_price:
-                    new_sl = min_from_entry
+                # When trail_ceil <= entry (low ATR token, trail too tight), use entry-based ceiling
+                if trail_ceil <= entry_f:
+                    new_sl = min_from_entry  # entry-based ceiling (always above entry)
+                else:
+                    new_sl = trail_ceil    # normal case: trail from nadir
                 if current_sl > 0:
                     # Only enforce one-way when current_sl is correct-side (above entry for SHORT).
                     # If current_sl is wrong-sided (below entry), trailing gate's correction must stick.
