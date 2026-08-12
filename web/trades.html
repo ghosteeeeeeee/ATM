@@ -40,17 +40,28 @@
     .near-sl { color: #ff8844; }
     .near-tp { color: #88ff44; }
     .dist { color: #666; font-size: 0.75em; }
-    .pump-hunter { border-left: 3px solid #ff8800; }
-    .pump-hunter h2 { color: #ff8800; font-size: 1em; margin: 0 0 8px 0; }
-    .pump-stats { display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
-    .pump-stat { background: #1a1a2e; padding: 6px 12px; border-radius: 4px; border-left: 3px solid #ff8800; }
-    .pump-stat .label { color: #666; font-size: 0.7em; }
-    .pump-stat .value { color: #ff8800; font-size: 1em; font-weight: bold; }
-    .pump-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 0.7em; background: #ff880033; color: #ff8800; border: 1px solid #ff880066; }
-    .pump-tp { color: #00ff88; }
-    .pump-sl { color: #ff4444; }
-    .pump-hl { color: #bf8700; }
-    .pump-section { background: #0f0f18; border: 1px solid #ff880033; border-radius: 6px; padding: 12px; margin-bottom: 16px; }
+    /* Hot set section */
+    .hot-section { margin-bottom: 20px; }
+    .hot-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #ffd700; font-size: 1em; font-weight: bold; }
+    .hot-header .fish { font-size: 1.2em; }
+    .hot-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .hot-table th { background: #1a1400; color: #ffd700; padding: 6px 10px; text-align: left; border-bottom: 2px solid #ffd70044; font-size: 0.8em; white-space: nowrap; }
+    .hot-table td { padding: 6px 10px; border-bottom: 1px solid #1a1a2e; }
+    .hot-table tr:hover td { background: #1a1400; }
+    .hot-table .dir-long { color: #00ff88; }
+    .hot-table .dir-short { color: #ff4444; }
+    .hot-table .rounds-badge { background: #00b4d822; border: 1px solid #00b4d844; color: #00b4d8; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+    .hot-table .survival-badge { background: #ffd70022; border: 1px solid #ffd70044; color: #ffd700; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+    .hot-table .entry-badge { background: #aa44ff22; border: 1px solid #aa44ff44; color: #aa44ff; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+    .hot-table .sources-tag { background: #4488ff15; border: 1px solid #4488ff33; color: #4488ff; padding: 1px 5px; border-radius: 3px; font-size: 0.75em; white-space: nowrap; }
+    .hot-table .speed-badge { background: #ffd70022; border: 1px solid #ffd70066; color: #ffd700; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+    .hot-table .speed-hot { background: #ffd70044; border-color: #ffd700; color: #fff; }
+    .hot-table .speed-stale { background: #ff444422; border: 1px solid #ff444466; color: #ff4444; }
+    .hot-table .vel-5m { font-size: 0.8em; }
+    .hot-table .vel-up { color: #00ff88; }
+    .hot-table .vel-down { color: #ff4444; }
+    .hot-table .vel-flat { color: #888; }
+    .hot-empty { text-align: center; padding: 15px; color: #444; border: 1px dashed #ffd70033; border-radius: 4px; margin-bottom: 20px; font-size: 0.9em; }
   </style>
 </head>
 <body>
@@ -81,48 +92,36 @@
 
   <div id="status" style="margin-bottom:5px">Loading...</div>
 
-  <!-- ═══ ZSCORE PUMP ═══ -->
-  <div class="pump-section" id="zscore-pump">
-    <h2>&#9889; ZScore Pump <span style="color:#666;font-size:0.7em;font-weight:normal">(z-score momentum · mean reversion)</span></h2>
-    <div class="pump-stats" id="zscore-stats">
-      <div class="pump-stat"><div class="label">MODE</div><div class="value" id="zs-mode">--</div></div>
-      <div class="pump-stat"><div class="label">OPEN</div><div class="value" id="zs-open">--</div></div>
-      <div class="pump-stat"><div class="label">CLOSED</div><div class="value" id="zs-closed">--</div></div>
-      <div class="pump-stat"><div class="label">WIN RATE</div><div class="value" id="zs-wr">--</div></div>
-      <div class="pump-stat"><div class="label">TOTAL P&amp;L</div><div class="value" id="zs-pnl">--</div></div>
-      <div class="pump-stat"><div class="label">LAST SIGNAL</div><div class="value" id="zs-updated" style="font-size:0.8em;color:#888">--</div></div>
+  <!-- Hot Set Section -->
+  <div class="hot-section" id="hotSection">
+    <div class="hot-header">
+      <span class="fish">🎣</span>
+      Hot Set — survived AI compaction rounds
     </div>
-    <table style="margin-top:8px">
-      <thead>
-        <tr>
-          <th>Token</th><th>Dir</th><th>Entry</th><th>Target</th><th>Stop</th>
-          <th>Z-Score</th><th>Lookback</th><th>Opened</th>
-        </tr>
-      </thead>
-      <tbody id="zs-open-tbody"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
-    </table>
-  </div>
-
-  <!-- ═══ PUMP HUNTER (IMPULSE) ═══ -->
-  <div class="pump-section" id="pump-hunter">
-    <h2>&#9889; Pump Hunter <span style="color:#666;font-size:0.7em;font-weight:normal">(impulse · vol explosion)</span></h2>
-    <div class="pump-stats" id="pump-stats">
-      <div class="pump-stat"><div class="label">MODE</div><div class="value" id="pump-mode">--</div></div>
-      <div class="pump-stat"><div class="label">OPEN</div><div class="value" id="pump-open">--</div></div>
-      <div class="pump-stat"><div class="label">CLOSED</div><div class="value" id="pump-closed">--</div></div>
-      <div class="pump-stat"><div class="label">WIN RATE</div><div class="value" id="pump-wr">--</div></div>
-      <div class="pump-stat"><div class="label">TOTAL P&amp;L</div><div class="value" id="pump-pnl">--</div></div>
-      <div class="pump-stat"><div class="label">LAST SIGNAL</div><div class="value" id="pump-updated" style="font-size:0.8em;color:#888">--</div></div>
+    <div id="hotTableContainer">
+      <div class="hot-empty" id="hotEmpty">No hot signals yet — run a few compaction cycles first</div>
+      <table class="hot-table" id="hotTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Coins</th>
+            <th>Dir</th>
+            <th>Confidence</th>
+            <th>Entries</th>
+            <th>Sources</th>
+            <th>Price</th>
+            <th>RSI</th>
+            <th>MACD</th>
+            <th>Z-Score</th>
+            <th>Rounds</th>
+            <th>Survival</th>
+            <th>Speed</th>
+            <th>Vel 5m</th>
+            <th>Last Seen</th>
+          </tr>
+        </thead>
+        <tbody id="hotBody"></tbody>
+      </table>
     </div>
-    <table style="margin-top:8px">
-      <thead>
-        <tr>
-          <th>Token</th><th>Dir</th><th>Entry</th><th>Target</th><th>Stop</th>
-          <th>Impulse</th><th>Vol Ratio</th><th>Opened</th>
-        </tr>
-      </thead>
-      <tbody id="pump-open-tbody"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
-    </table>
   </div>
 
   <div class="section-title">Open Positions</div>
@@ -156,100 +155,20 @@
     let currentPage = 1;
     let allClosed = [];
     let totalClosed = 0;
+    let hotSet = [];
 
     async function load() {
       try {
-        const [tradesR, pumpR, zsR] = await Promise.all([
+        const [tradesR, signalsR] = await Promise.all([
           fetch('/data/trades.json?t=' + Date.now()),
-          fetch('/data/pump-hunter.json?t=' + Date.now()),
-          fetch('/data/zscore-pump.json?t=' + Date.now()),
+          fetch('/data/signals.json?t=' + Date.now()),
         ]);
         const d = await tradesR.json().catch(() => ({ open: [], closed: [], open_count: 0, closed_count: 0 }));
-        let pump = { positions: {}, closed: [], mode: 'DRY', last_updated: null };
-        try { pump = await pumpR.json(); } catch {}
-        let zsPump = { positions: {}, closed: [], mode: 'DRY', last_updated: null };
-        try { zsPump = await zsR.json(); } catch {}
-        const pMode = pump.mode || 'DRY';
-        const zsMode = zsPump.mode || 'DRY';
+        let signals = { hot_set: [] };
+        try { signals = await signalsR.json(); } catch {}
+        hotSet = signals.hot_set || [];
 
-        // ── ZScore Pump ──
-        const zsPositions = Object.values(zsPump.positions || {});
-        const zsClosed = (zsPump.closed || []).slice(-20).reverse();
-        const zsWins = zsClosed.filter(t => (t.pnl_pct || 0) > 0).length;
-        const zsWinRate = zsClosed.length ? Math.round(zsWins / zsClosed.length * 100) : 0;
-        const zsPnL = zsClosed.reduce((s, t) => s + (t.pnl_usdt || 0), 0);
-
-        document.getElementById('zs-mode').textContent = zsMode;
-        document.getElementById('zs-mode').style.color = zsMode === 'LIVE' ? '#ff4444' : '#3fb950';
-        document.getElementById('zs-open').textContent = zsPositions.length;
-        document.getElementById('zs-closed').textContent = zsClosed.length;
-        document.getElementById('zs-wr').textContent = zsWinRate + '%';
-        const zsPnLEl = document.getElementById('zs-pnl');
-        zsPnLEl.textContent = (zsPnL >= 0 ? '+' : '') + '$' + zsPnL.toFixed(2);
-        zsPnLEl.style.color = zsPnL > 0 ? '#00ff88' : zsPnL < 0 ? '#ff4444' : '#888';
-        document.getElementById('zs-updated').textContent = zsPump.last_updated
-          ? new Date(zsPump.last_updated).toLocaleTimeString()
-          : '--';
-
-        const zsBody = document.getElementById('zs-open-tbody');
-        if (!zsPositions.length) {
-          zsBody.innerHTML = '<tr><td colspan="8" class="empty">No open ZScore positions</td></tr>';
-        } else {
-          zsBody.innerHTML = zsPositions.map(p => {
-            const opened = p.opened_at ? new Date(p.opened_at * 1000).toLocaleTimeString() : '—';
-            return `<tr>
-              <td><strong>${p.token}</strong></td>
-              <td class="${p.direction.toLowerCase()}">${p.direction}</td>
-              <td>$${parseFloat(p.entry_price).toFixed(6)}</td>
-              <td class="pump-tp">$${parseFloat(p.revert_target).toFixed(6)}</td>
-              <td class="pump-sl">$${parseFloat(p.stop_price).toFixed(6)}</td>
-              <td><span class="pump-badge" style="background:#00bfff33;color:#00bfff;border-color:#00bfff66">${(p.z_score || 0).toFixed(2)}</span></td>
-              <td>${p.lookback || '—'}</td>
-              <td style="color:#666;font-size:0.75em">${opened}</td>
-            </tr>`;
-          }).join('');
-        }
-
-        // ── Pump Hunter (impulse) ──
-        const pPositions = Object.values(pump.positions || {});
-        const pClosed = (pump.closed || []).slice(-20).reverse();
-        const pWins = pClosed.filter(t => (t.pnl_pct || 0) > 0).length;
-        const pWinRate = pClosed.length ? Math.round(pWins / pClosed.length * 100) : 0;
-        const pPnL = pClosed.reduce((s, t) => s + (t.pnl_usdt || 0), 0);
-
-        const pModeEl = document.getElementById('pump-mode');
-        pModeEl.textContent = pMode;
-        pModeEl.style.color = pMode === 'LIVE' ? '#ff4444' : '#3fb950';
-        document.getElementById('pump-open').textContent = pPositions.length + ' / 3';
-        document.getElementById('pump-closed').textContent = pClosed.length;
-        document.getElementById('pump-wr').textContent = pWinRate + '%';
-        const pPnLEl = document.getElementById('pump-pnl');
-        pPnLEl.textContent = (pPnL >= 0 ? '+' : '') + '$' + pPnL.toFixed(2);
-        pPnLEl.style.color = pPnL > 0 ? '#00ff88' : pPnL < 0 ? '#ff4444' : '#888';
-        document.getElementById('pump-updated').textContent = pump.last_updated
-          ? new Date(pump.last_updated).toLocaleTimeString()
-          : '--';
-
-        const ptBody = document.getElementById('pump-open-tbody');
-        if (!pPositions.length) {
-          ptBody.innerHTML = '<tr><td colspan="8" class="empty">No open positions · scanning 170 tokens</td></tr>';
-        } else {
-          ptBody.innerHTML = pPositions.map(p => {
-            const impulse = p.impulse_pct ? p.impulse_pct.toFixed(2) + '%' : '—';
-            const volRatio = p.vol_ratio ? p.vol_ratio.toFixed(1) + 'x' : '—';
-            const opened = p.opened_at ? new Date(p.opened_at * 1000).toLocaleTimeString() : '—';
-            return `<tr>
-              <td><strong>${p.token}</strong></td>
-              <td class="${p.direction.toLowerCase()}">${p.direction}</td>
-              <td>$${parseFloat(p.entry_price).toFixed(6)}</td>
-              <td class="pump-tp">$${parseFloat(p.revert_target).toFixed(6)}</td>
-              <td class="pump-sl">$${parseFloat(p.stop_price).toFixed(6)}</td>
-              <td><span class="pump-badge">${impulse}</span></td>
-              <td>${volRatio}</td>
-              <td style="color:#666;font-size:0.75em">${opened}</td>
-            </tr>`;
-          }).join('');
-        }
+        renderHotSet();
 
         // ── Standard trades ──
 
@@ -337,6 +256,81 @@
         document.getElementById('open-tbody').innerHTML = '<tr><td colspan="13" class="empty">Error: ' + e.message + '</td></tr>';
         document.getElementById('closed-tbody').innerHTML = '<tr><td colspan="12" class="empty">Error: ' + e.message + '</td></tr>';
       }
+    }
+
+    function renderHotSet() {
+      if (hotSet.length === 0) {
+        document.getElementById('hotEmpty').style.display = 'block';
+        document.getElementById('hotTable').style.display = 'none';
+        return;
+      }
+      document.getElementById('hotEmpty').style.display = 'none';
+      document.getElementById('hotTable').style.display = 'table';
+
+      const rows = hotSet.map(s => {
+        const dir = (s.direction || '').toUpperCase();
+        const conf = parseFloat(s.confidence) || 0;
+        const confColor = conf >= 80 ? '#00ff88' : conf >= 60 ? '#4488ff' : '#ff4444';
+        const baseConf = parseFloat(s.base_conf) || conf;
+        const entryCount = parseInt(s.entry_count) || 1;
+        const rounds = parseInt(s.rounds) || 0;
+        const survival = parseFloat(s.survival) || 0;
+        const lastSeen = (s.last_seen || '').replace('T', ' ').slice(0, 16);
+        const price = parseFloat(s.price) || 0;
+        const sources = (s.sources || '').split(',').slice(0, 3).join(', ');
+        const rsi = parseFloat(s.rsi);
+        const rsiColor = !isNaN(rsi) ? (rsi > 70 ? '#ff4444' : rsi < 30 ? '#00ff88' : '#888') : '#444';
+        const rsiDisplay = !isNaN(rsi) ? rsi.toFixed(1) : '--';
+        const macd = parseFloat(s.macd);
+        const macdDisplay = !isNaN(macd) ? (macd >= 0 ? `<span style="color:#00ff88">+${macd.toFixed(4)}</span>` : macd.toFixed(4)) : '<span style="color:#444">--</span>';
+        const zscore = parseFloat(s.zscore);
+        const zDisplay = !isNaN(zscore) ? (zscore > 0 ? `<span style="color:#ff4444">+${zscore.toFixed(3)}</span>` : zscore.toFixed(3)) : '--';
+
+        const speedPctl = parseFloat(s.speed_pctl);
+        const isStale = s.is_stale;
+        const hasSpeed = s.speed_pctl !== undefined && s.speed_pctl !== null;
+
+        let speedBadge = '--';
+        if (hasSpeed) {
+          if (isStale) {
+            speedBadge = `<span class="speed-badge speed-stale">⏸ ${speedPctl.toFixed(0)}%</span>`;
+          } else if (speedPctl >= 80) {
+            speedBadge = `<span class="speed-badge speed-hot">⚡ ${speedPctl.toFixed(0)}%</span>`;
+          } else {
+            speedBadge = `<span class="speed-badge">${speedPctl.toFixed(0)}%</span>`;
+          }
+        }
+
+        let velDisplay = '--';
+        if (s.vel_5m !== undefined && s.vel_5m !== null) {
+          const v = parseFloat(s.vel_5m);
+          const velClass = v > 0.1 ? 'vel-up' : v < -0.1 ? 'vel-down' : 'vel-flat';
+          const sign = v > 0 ? '+' : '';
+          velDisplay = `<span class="vel-5m ${velClass}">${sign}${v.toFixed(3)}%</span>`;
+        }
+
+        return `<tr>
+          <td><strong style="color:#ffd700">${s.token || '--'}</strong></td>
+          <td class="${dir === 'LONG' ? 'dir-long' : 'dir-short'}">${dir}</td>
+          <td>
+            <span style="color:${confColor}">${conf.toFixed(1)}%</span>
+            ${entryCount > 1 ? `<span style="color:#666;font-size:0.8em"> (base ${baseConf.toFixed(0)}%)</span>` : ''}
+          </td>
+          <td><span class="entry-badge">${entryCount}x</span></td>
+          <td><span class="sources-tag">${sources || '--'}</span></td>
+          <td>${price > 0 ? '$' + price.toFixed(6) : '--'}</td>
+          <td style="color:${rsiColor}">${rsiDisplay}</td>
+          <td style="color:#888">${macdDisplay}</td>
+          <td>${zDisplay}</td>
+          <td><span class="rounds-badge">r${rounds}+</span></td>
+          <td><span class="survival-badge">${survival.toFixed(1)}</span></td>
+          <td>${speedBadge}</td>
+          <td>${velDisplay}</td>
+          <td style="color:#666;font-size:0.75em">${lastSeen}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('hotBody').innerHTML = rows;
     }
 
     function renderClosedPage() {
