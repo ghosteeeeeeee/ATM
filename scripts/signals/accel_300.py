@@ -705,6 +705,15 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
         if is_breakout:
             source = 'accel-300-breakout'
             confidence = ACCEL_300_BREAKOUT_CONFIDENCE
+            # Bonus: strong 5-bar move
+            move_5bar = abs(sig.get('move_5bar', 0))
+            if move_5bar > 1.0:
+                confidence = min(88, confidence + 5)
+            # Bonus: 1H trend alignment
+            trend_1h = _get_1h_trend(token)
+            if (direction == 'LONG' and trend_1h == 'BULLISH') or \
+               (direction == 'SHORT' and trend_1h == 'BEARISH'):
+                confidence = min(88, confidence + 3)
         elif is_vi:
             # ponytail: explicit vel kill switches — safety net at source-assignment level
             from hermes_constants import ACCEL_300_VELOCITY_PLUS_ENABLED, ACCEL_300_VELOCITY_MINUS_ENABLED
@@ -717,6 +726,15 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             velocity_ratio = sig.get('velocity_ratio', 1.0)
             confidence = int(min(85, 65 + (velocity_ratio - 1.0) * 20))
             confidence = max(65, confidence)
+            # Bonus: early entry (few bars since cross = stronger signal)
+            bars = sig.get('bars_since_cross', 10)
+            if bars <= 5:
+                confidence = min(88, confidence + 5)
+            # Bonus: 1H trend alignment
+            trend_1h = _get_1h_trend(token)
+            if (direction == 'LONG' and trend_1h == 'BULLISH') or \
+               (direction == 'SHORT' and trend_1h == 'BEARISH'):
+                confidence = min(88, confidence + 3)
         else:
             source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
             # Confidence: base on gap strength + absolute gap growth. SHORT growth
@@ -727,6 +745,22 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             min_gap_for_conf = ACCEL_300_MIN_GAP_PCT_LONG if direction == 'LONG' else ACCEL_300_MIN_GAP_PCT_SHORT
             confidence = int(min(85, 70 + max(0, (gap_for_conf - min_gap_for_conf) * 80) + gap_bonus))
             confidence = max(70, confidence)
+            # Bonus: strong gap (well above minimum)
+            if gap_for_conf > min_gap_for_conf * 2:
+                confidence = min(88, confidence + 3)
+            # Bonus: accelerating gap (gap growing fast)
+            gap_accel = abs(sig.get('gap_acceleration', 0))
+            if gap_accel > 0.1:
+                confidence = min(88, confidence + 3)
+            # Bonus: early entry (few bars since cross)
+            bars = sig.get('bars_since_cross', 10)
+            if bars <= 5:
+                confidence = min(88, confidence + 3)
+            # Bonus: 1H trend alignment
+            trend_1h = _get_1h_trend(token)
+            if (direction == 'LONG' and trend_1h == 'BULLISH') or \
+               (direction == 'SHORT' and trend_1h == 'BEARISH'):
+                confidence = min(88, confidence + 3)
 
         # `_get_1m_prices` enforces freshness and returns the real latest
         # price_history point used by detection. Do not persist the separate
