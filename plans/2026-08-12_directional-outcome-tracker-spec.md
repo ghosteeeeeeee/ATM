@@ -301,19 +301,20 @@ Weather vane triggers at 20:19, triggers again at 20:25 (still in loss cluster) 
 3. Add `dir_outcome_mult` in compactor scoring (after `reg_mult`)
 4. Test: verify it triggers on simulated loss clusters
 
-### Phase 2: Position Shield — CEO REJECTED (integration bug)
-**Blocker:** `tpsl_utils.py` uses the global `TRAILING_DISTANCE_PCT` constant everywhere:
+### Phase 2: Position Shield — CEO REJECTED (integration bug) → FIXED 2026-08-12
+
+**Blocker (now fixed):** `tpsl_utils.py` used the global `TRAILING_DISTANCE_PCT` constant everywhere:
 - Line 528: `trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)`
 - Line 551: `trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)`
 - Line 501: `eff_sl_pct = max(min(eff_sl_pct, TRAILING_DISTANCE_PCT), ATR_SL_MIN)`
 
-It never reads the per-trade `trailing_distance` column from the DB. Updating that field is a no-op.
+It never read the per-trade `trailing_distance` column from the DB. Updating that field was a no-op.
 
-**To make Position Shield work:**
-- Option A: Add `trailing_distance_override` column to trades table, modify tpsl_utils.py to read it (proper fix, more work)
-- Option B: Skip shield for now — signal gate alone prevents NEW counter-regime entries (80% of value)
+**Fix applied:** Added `trailing_distance: Optional[float] = None` parameter to `compute_atr_sl_tp()`. Uses per-trade value when set, falls back to global constant when None. Caller (`position_manager.py`) passes `pos.get('trailing_distance')`. Edge case: `trailing_distance=0` guarded with `> 0` check.
 
-**Recommendation:** Ship Phase 1 only. Evaluate 48h. Then decide if Phase 2 is worth the tpsl_utils.py modification.
+**Bug hunter reviewed:** PASS — all 8 functional uses replaced, default behavior identical, no regressions.
+
+**Status:** Phase 2 is now unblocked. Can proceed with Position Shield implementation.
 
 ### Phase 3: Recovery & Monitoring
 1. Add weather vane status to dashboard (hotset or signal_outcomes view)

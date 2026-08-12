@@ -1777,6 +1777,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             trade_open_time=pos.get('open_time'),
             volatility_regime=vol_regime,
             sl_multiplier=sl_mult,
+            trailing_distance=pos.get('trailing_distance'),
         )
 
         new_sl = result['new_sl']

@@ -260,6 +260,7 @@ def compute_atr_sl_tp(
     trade_open_time: Optional[str] = None,
     volatility_regime: str = 'NORMAL',
     sl_multiplier: float = 1.0,
+    trailing_distance: Optional[float] = None,
 ) -> dict:
     """
     Compute trailing ATR SL and TP for a position.
@@ -292,7 +293,14 @@ def compute_atr_sl_tp(
 
     Caller (position_manager) writes new_sl/new_tp to DB via _persist_atr_levels.
     Caller applies the needs_sl/needs_tp flags to determine if write is needed.
+
+    trailing_distance: per-trade override for TRAILING_DISTANCE_PCT. When set,
+    this trade uses its own trailing distance instead of the global constant.
+    Used by Weather Vane position shield to tighten stops on counter-regime positions.
     """
+    # ── Per-trade trailing distance override ─────────────────────────────────────
+    _trail_dist = trailing_distance if (trailing_distance is not None and trailing_distance > 0) else TRAILING_DISTANCE_PCT
+
     # ── PHANTOM TRADE DEBUG (2026-08-07) ────────────────────────────────────────
     # Comprehensive input trace for debugging tight-SL phantom trades.
     # Fires for ALL tokens — this is a systemic bug, not token-specific.
@@ -424,7 +432,7 @@ def compute_atr_sl_tp(
         atr_pct = 0.0
         k = _atr_tier(ATR_PCT_FALLBACK)
         # Override MIN_SL_PCT to use trailing distance when ATR is unavailable
-        MIN_SL_PCT = TRAILING_DISTANCE_PCT
+        MIN_SL_PCT = _trail_dist
     else:
         atr_pct = atr / entry_price
         k = _atr_sl_k_scaled(token, direction, atr_pct, speed_percentile, momentum_stats)
@@ -494,11 +502,11 @@ def compute_atr_sl_tp(
         eff_tp_pct = min(eff_tp_pct * sl_multiplier, ATR_TP_MAX)
         log(f'  [VOL-GATE] {token}: HIGH vol — SL widened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
 
-    # For established trades: cap SL at TRAILING_DISTANCE_PCT so trailing can lock profits
+    # For established trades: cap SL at trailing distance so trailing can lock profits
     # Without this, the ATR-based floor (0.15-0.50%) overrides the trailing distance (0.20%)
     # FIX: Ensure ATR_SL_MIN floor is never violated — floor must always win
     if not is_new_trade:
-        eff_sl_pct = max(min(eff_sl_pct, TRAILING_DISTANCE_PCT), ATR_SL_MIN)
+        eff_sl_pct = max(min(eff_sl_pct, _trail_dist), ATR_SL_MIN)
 
     # ── Compute raw SL/TP from anchor price ───────────────────────────────────────
     if direction == 'LONG':
@@ -524,8 +532,8 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                # In profit: SL trails from peak at TRAILING_DISTANCE_PCT, minimum ATR_SL_MIN from entry
-                trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                # In profit: SL trails from peak at trailing distance, minimum ATR_SL_MIN from entry
+                trail_floor = round(highest_price * (1 - _trail_dist), 8)
                 # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
                 # When trail_floor > entry (low ATR token, trail too wide), use ATR from highest
@@ -541,14 +549,14 @@ def compute_atr_sl_tp(
                 # In loss: entry floor is absolute — SL must stay at least ATR_SL_MIN from entry
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 # One-way: SL tightens from highest_price (peak), never loosens
-                trail_floor_loss = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8) if highest_price > 0 else 0
+                trail_floor_loss = round(highest_price * (1 - _trail_dist), 8) if highest_price > 0 else 0
                 if trail_floor_loss > 0:
                     new_sl = max(new_sl, trail_floor_loss)
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: SL trails from nadir at TRAILING_DISTANCE_PCT, minimum ATR_SL_MIN from entry
-                trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                # In profit: SL trails from nadir at trailing distance, minimum ATR_SL_MIN from entry
+                trail_ceil = round(lowest_price * (1 + _trail_dist), 8)
                 # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
                 # When trail_ceil <= entry (low ATR token, trail too tight), use entry-based ceiling
@@ -719,9 +727,9 @@ def compute_atr_sl_tp(
             elif new_sl > current_sl:
                 # Bug-fix: new_sl is higher than current_sl
                 # For SHORT, higher SL = more protection (SL above entry is correct)
-                # Allow if new_sl is at TRAILING_DISTANCE_PCT from entry (correct trailing)
+                # Allow if new_sl is at trailing distance from entry (correct trailing)
                 sl_distance = abs(new_sl - entry_f) / entry_f if entry_f > 0 else 0
-                if abs(sl_distance - TRAILING_DISTANCE_PCT) < 0.001:  # within 0.1% of trailing distance
+                if abs(sl_distance - _trail_dist) < 0.001:  # within 0.1% of trailing distance
                     result['needs_sl'] = True
                     result['_force_write'] = True
                 else:
@@ -741,7 +749,7 @@ def compute_atr_sl_tp(
         if direction == 'LONG' and highest_price > 0:
             in_profit = current_price > entry_f
             if in_profit:
-                trail_floor = round(highest_price * (1 - TRAILING_DISTANCE_PCT), 8)
+                trail_floor = round(highest_price * (1 - _trail_dist), 8)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
                 # When trail_floor > entry (low ATR token), use ATR from highest
                 if trail_floor >= entry_f:
@@ -766,7 +774,7 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                trail_ceil = round(lowest_price * (1 + TRAILING_DISTANCE_PCT), 8)
+                trail_ceil = round(lowest_price * (1 + _trail_dist), 8)
                 min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
                 # When trail_ceil <= entry (low ATR token, trail too tight), use entry-based ceiling
                 if trail_ceil <= entry_f:
