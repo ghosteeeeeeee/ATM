@@ -2721,6 +2721,51 @@ def close_orphan_paper_trades(hl_pos, prices):
         return 0, 0
 
 
+def _compute_mfe_mae(token, direction, entry_price, open_time, close_time):
+    """Compute MFE (Maximum Favorable Excursion) and MAE (Maximum Adverse Excursion).
+    
+    For LONG: MFE = highest price reached, MAE = lowest price reached
+    For SHORT: MFE = lowest price reached, MAE = highest price reached
+    
+    Returns (mfe_pct, mae_pct, mfe_price, mae_price) or (None, None, None, None) on error.
+    """
+    try:
+        import sqlite3 as _sqlite3
+        from paths import HERMES_DATA
+        conn = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT timestamp, price FROM price_history 
+            WHERE token = ? AND timestamp BETWEEN ? AND ?
+            ORDER BY timestamp ASC
+        """, (token.upper(), int(open_time.timestamp()), int(close_time.timestamp())))
+        rows = cur.fetchall()
+        conn.close()
+        
+        if not rows:
+            return None, None, None, None
+        
+        prices = [(ts, float(p)) for ts, p in rows]
+        min_price = min(p for _, p in prices)
+        max_price = max(p for _, p in prices)
+        
+        if direction.upper() == 'LONG':
+            mfe_pct = (max_price - entry_price) / entry_price * 100
+            mae_pct = (min_price - entry_price) / entry_price * 100
+            mfe_price = max_price
+            mae_price = min_price
+        else:  # SHORT
+            mfe_pct = (entry_price - min_price) / entry_price * 100
+            mae_pct = (max_price - entry_price) / entry_price * 100
+            mfe_price = min_price
+            mae_price = max_price
+        
+        return mfe_pct, mae_pct, mfe_price, mae_price
+    except Exception as e:
+        log(f'  MFE/MAE computation failed for {token}: {e}', 'WARN')
+        return None, None, None, None
+
+
 def _close_paper_trade_db(trade_id, token, exit_price, reason):
     """Close a paper trade in the DB without touching HL. Idempotent — checks status='open'.
     Calculates pnl_usdt and pnl_pct from entry_price stored in DB.
@@ -2754,9 +2799,9 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         return
     try:
         cur = conn.cursor()
-        # Look up entry price, direction, amount, leverage, and paper flag for PnL calc
+        # Look up entry price, direction, amount, leverage, paper flag, and open_time for PnL calc
         cur.execute(
-            "SELECT entry_price, direction, amount_usdt, leverage, paper FROM trades WHERE id=%s AND status='open'",
+            "SELECT entry_price, direction, amount_usdt, leverage, paper, open_time FROM trades WHERE id=%s AND status='open'",
             (trade_id,))
         row = cur.fetchone()
         if not row:
@@ -2764,7 +2809,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             cur.close(); conn.close()
             return
 
-        entry_price, direction, amount_usdt, leverage, is_paper = row
+        entry_price, direction, amount_usdt, leverage, is_paper, open_time = row
 
         # FIX (2026-04-05): Sanity-check entry_price against current market price.
         # If entry_price is <10% or >10x current market, the entry was corrupted (e.g.
@@ -2843,16 +2888,23 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             final_pnl_pct = 0.0
             exit_price = entry_price  # close at entry = no loss/no win
 
+        # Compute MFE/MAE from price history
+        mfe_pct, mae_pct, mfe_price, mae_price = _compute_mfe_mae(
+            token, direction, float(entry_price), open_time, close_time
+        )
+
         # Commit IMMEDIATELY to release row lock — prevents deadlocks with position_manager
         cur.execute("""
             UPDATE trades SET status = 'closed', exit_price = %s,
                 pnl_pct = %s, pnl_usdt = %s,
                 close_time = NOW(), close_reason = %s, exit_reason = %s,
                 is_guardian_close = TRUE, guardian_closed = TRUE, guardian_reason = %s,
-                hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s
+                hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s,
+                mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s
             WHERE id = %s AND status = 'open'
         """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, reason, reason,
               hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
+              mfe_pct, mae_pct, mfe_price, mae_price,
               trade_id))
         if cur.rowcount == 0:
             log(f'  Dedup: trade #{trade_id} ({token}) already closed, skipping', 'WARN')
