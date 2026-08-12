@@ -85,6 +85,22 @@
       <div class="value" id="stat-pnl">--</div>
     </div>
     <div class="stat">
+      <div class="label">SHORT WINRATE</div>
+      <div class="value" id="stat-short-wr">--</div>
+    </div>
+    <div class="stat">
+      <div class="label">LONG WINRATE</div>
+      <div class="value" id="stat-long-wr">--</div>
+    </div>
+    <div class="stat" style="border-left-color:#aa44ff">
+      <div class="label">BEST WIN STREAK</div>
+      <div class="value" id="stat-win-streak" style="color:#aa44ff">--</div>
+    </div>
+    <div class="stat" style="border-left-color:#ff8844">
+      <div class="label">WORST LOSS STREAK</div>
+      <div class="value" id="stat-loss-streak" style="color:#ff8844">--</div>
+    </div>
+    <div class="stat">
       <div class="label">LAST UPDATED</div>
       <div class="value" id="stat-updated" style="font-size:0.8em;color:#888">--</div>
     </div>
@@ -180,9 +196,40 @@
         const totalPnl = closed.reduce((s, t) => s + parseFloat(t.pnl_usdt || 0), 0);
         const pnlClass = totalPnl > 0 ? '' : totalPnl < 0 ? ' neg' : ' neutral';
 
+        // Short/Long winrate
+        const shortTrades = closed.filter(t => (t.direction || '').toUpperCase() === 'SHORT');
+        const longTrades = closed.filter(t => (t.direction || '').toUpperCase() === 'LONG');
+        const shortWins = shortTrades.filter(t => parseFloat(t.pnl_pct || 0) > 0).length;
+        const longWins = longTrades.filter(t => parseFloat(t.pnl_pct || 0) > 0).length;
+        const shortWR = shortTrades.length > 0 ? Math.round(shortWins / shortTrades.length * 100) : 0;
+        const longWR = longTrades.length > 0 ? Math.round(longWins / longTrades.length * 100) : 0;
+
+        // Streaks: scan chronologically (oldest = end of array, newest = index 0)
+        let curWin = 0, curLoss = 0, bestWin = 0, bestLoss = 0;
+        const n = closed.length;
+        for (let i = n - 1; i >= 0; i--) {
+          const won = parseFloat(closed[i].pnl_pct || 0) > 0;
+          if (won) { curWin++; curLoss = 0; } else { curLoss++; curWin = 0; }
+          if (curWin > bestWin) bestWin = curWin;
+          if (curLoss > bestLoss) bestLoss = curLoss;
+        }
+        // Most recent occurrence: scan newest→oldest, first time we hit bestWin/BestLoss
+        curWin = 0; curLoss = 0;
+        let recentWinIdx = -1, recentLossIdx = -1;
+        for (let i = 0; i < n; i++) {
+          const won = parseFloat(closed[i].pnl_pct || 0) > 0;
+          if (won) { curWin++; curLoss = 0; } else { curLoss++; curWin = 0; }
+          if (curWin >= bestWin && recentWinIdx === -1) recentWinIdx = i;
+          if (curLoss >= bestLoss && recentLossIdx === -1) recentLossIdx = i;
+        }
+
         document.getElementById('stat-open').textContent = d.open_count || 0;
         document.getElementById('stat-closed').textContent = d.closed_count || 0;
         document.getElementById('stat-wr').textContent = total > 0 ? winRate + '%' : '--';
+        document.getElementById('stat-short-wr').textContent = shortTrades.length > 0 ? shortWR + '%' : '--';
+        document.getElementById('stat-long-wr').textContent = longTrades.length > 0 ? longWR + '%' : '--';
+        document.getElementById('stat-win-streak').textContent = bestWin > 0 ? bestWin + 'W' : '--';
+        document.getElementById('stat-loss-streak').textContent = bestLoss > 0 ? bestLoss + 'L' : '--';
         document.getElementById('stat-pnl').innerHTML = totalPnl > 0 ? '<span class="win">+' + totalPnl.toFixed(2) + '</span>' : '<span class="' + (totalPnl < 0 ? 'loss' : 'neutral') + '">' + totalPnl.toFixed(2) + '</span>';
         document.getElementById('stat-updated').textContent = new Date(d.updated).toLocaleTimeString();
         document.getElementById('status').textContent =

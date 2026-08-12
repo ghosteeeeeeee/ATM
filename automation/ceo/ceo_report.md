@@ -1,48 +1,36 @@
-## CEO Report — 2026-08-12 (range_breakout_short fix review)
+## CEO Report — 2026-08-12 (recovery confirmed)
 
 ### Diagnosis
-Two losing SHORT trades (TIA -$0.64%, CFX -$0.79%) entered at spike highs. Root cause: velocity filter uses `LIMIT 6` (~5min window), but spikes happened 7-8min before signal time — outside window. Velocity reads 0% (consolidation), passes filter, enters SHORT at spike high.
+24h: 99T +$0.53 57.6% WR — **strongest day since Aug 9**. 7d: 457T +$1.02 53.4% WR — improved from +$0.14 yesterday. Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → **Aug 12 +$0.56** (recovery confirmed). LONG 24h primary driver. SHORT improving.
 
 ### Root Cause
-Velocity lookback too narrow. `LIMIT 6` from price_history covers ~6min. Spikes 7-8min old invisible. By signal time, price has consolidated, velocity reads flat, signal fires at worst entry point.
+Previous daily declines (Aug 10-11) driven by hzscore+ standalone LONG bleed (blacklisted Aug 12 20:20) and range_breakout+ LONG (disabled earlier). Combo source_mult increase (5%→10%) now pushing higher-quality combo signals through. Recovery driven by combo signals outperforming singles.
 
-### Fix Applied — APPROVED
-Three-layer fix:
+### Stars 7d — All Intact
+- bb_bounce+,range_finder+ LONG 53T +$0.71 58.5%
+- bb-bounce-short,hzscore- SHORT 18T +$0.14 61.1%
+- hzscore+,mover+ LONG 5T +$0.17 80%
+- accel-300- SHORT 20T +$0.52 75.0%
+- range_breakout_short SHORT 9T +$0.47 77.8%
 
-**Fix 1: Tighten velocity lookback** — `LIMIT 6` → `LIMIT 12` in both velocity filter (line 372) and spike exhaustion filter (line 398). Covers ~12min instead of ~6min. Catches 7-8min spikes.
+### Bleeders 7d (all disabled/blacklisted)
+- range_breakout+ LONG 8T -$0.41 25% — DISABLED
+- trend_momentum_near_sma+ LONG 6T -$0.37 16.7% — DISABLED
+- hzscore+ standalone LONG 13T -$0.20 38.5% — BLACKLISTED
 
-**Fix 2: Enable RSI filter** — `RSI_SHORT_MIN = 0` → `40` (line 62). Blocks shorts in oversold territory where bounce risk is high. Check already exists (line 270-271), just needed threshold.
+### Cost Drivers 48h
+- atr_sl_hit: 57T -$3.25 (dominant, normal)
+- cut-loser-CL-T1: 4T -$0.42 (CL_TRAIL_ENABLED=False, monitoring)
 
-**Fix 3: 5m candle momentum check** — New filter in `scan_signals()`: query last 3 5m candles from candles.db. If any had bullish close > 0.2%, block SHORT. Directly catches "spike then consolidate" pattern. Highest impact fix.
-
-### Risk Assessment
-- All filters only block entries — can't cause new bad entries
-- No new dependencies (candles.db already used for `_get_1h_trend`)
-- Param values conservative and well-targeted
-- False positive risk minimal: blocks only when recent momentum opposes SHORT direction
+### Fix Applied
+**NO CHANGES** — stability period (14+ changes in 48h). Source_mult 10% deployed, signal blacklist active. System self-correcting. Trajectory positive.
 
 ### Verification
-Apply all three changes, then monitor next 24-48h for:
-- Fewer "entered at spike high" trades
-- SHORT WR improvement (currently ~55%)
-- No regression in SHORT signal volume
-
----
-
-## CEO Report — 2026-08-12 (completed changes acknowledgment)
-
-### What Was Done
-Three changes verified by bug_hunter — ALL CLEAR, 0 bugs.
-
-1. **range_breakout_short.py — Spike filter hardened.** Velocity lookback 6→12, RSI_SHORT_MIN 0→40, new 5m candle momentum check. Blocks SHORT entries after recent bullish spikes.
-
-2. **tpsl_utils.py — Per-trade trailing distance.** New `trailing_distance` param on `compute_atr_sl_tp()`. Falls back to global if unset. Unlocks Weather Vane Phase 2.
-
-3. **position_manager.py — Pass trailing distance.** Forwards `pos['trailing_distance']` to tpsl_utils.
-
-### Impact
-- SHORT filter: prevents TIA/CFX pattern (spike→consolidation→bad SHORT entry)
-- Trailing distance: enables per-position risk tuning, no behavior change until Weather Vane sets it
+- 7d PnL +$0.88 improvement in 24h (from +$0.14 to +$1.02)
+- Daily recovery from -$0.33 to +$0.56
+- All 5 stars profitable 7d
+- Combo volume share increasing (source_mult effect)
+- Pipeline healthy, all timers running
 
 ### Next
-Monitor SHORT entries 24-48h. Verify no false-positive volume drop from new filters.
+Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d bleed (if -$1.50+ → regime filter), combo vs singles PnL delta (source_mult effect).

@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-12 (CEO run — recovery confirmed)] CEO: NO CHANGES (trading)
+  WHY: Verified DB: 24h 99T +$0.53 (57.6% WR — strongest day since Aug 9), 7d 457T +$1.02 (53.4% WR). Daily recovery: Aug 11 -$0.33 → Aug 12 +$0.56. Stars7d 5/5 profitable. Source_mult 10% working (combo share increasing). Stability period active.
+  BY: CEO run
+  DO NOT REVERT — trajectory positive, stability period active.
+
 [2026-08-12 20:20] CEO: BLACKLISTED hzscore+ standalone (trading)
   WHY: hzscore+ standalone LONG 13T -$0.20 38.5% WR (7d), 6T -$0.09 33% WR (24h) — worst active bleed source. Combos unaffected (hzscore+,return_exhaustion_long 58.3%, hzscore+,mover+ 80%). validate_source() exact-match blocks standalone only.
   BY: CEO run
