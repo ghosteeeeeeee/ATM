@@ -125,3 +125,18 @@ skills/.usage.json.lock
 # ─── Runtime caches ──────────────────────────────────────────────────────────
 cache/delegation/
 data/combo_weights.json
+
+# ─── Cleanup: files kept locally, not in repo ──────────────────────────────
+autopilot.md
+processes.json
+.update_check
+hermes-self-close-watcher.service
+books/
+archive/
+wandb-local/
+graphify-out/
+pastes/
+reviews/
+summaries/
+reports/
+plans/
