@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 (CEO run — latest)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 96T -$0.22 (51.0% WR — flat), 7d 441T +$0.14 (52.2% WR — barely positive). Daily declining: Aug 9 +$0.62 → Aug 12 -$0.40 (4 consecutive declines). LONG 24h primary bleed, SHORT flat. Stars7d intact (3/3 profitable). SHORT7d -$0.87 below -$1.50 threshold. 6 open $0 flat. Trailing stop fix (0.80%) deployed Aug 13, needs more eval. 14+ changes in 48h — stability period.
+  BY: CEO run
+  DO NOT REVERT — trajectory positive, stability period active.
+
 [2026-08-12 (latest)] CEO: removed 'hzscore' from STANDALONE_BYPASS_SIGNALS
   WHY: hzscore+ standalone LONG 11T -$0.16 36.4% WR (24h). All combos profitable (mover+ 80%, return_exhaustion_long 58.3%, range_finder+ 62.5%). Standalone was only bleed source.
   BY: CEO run

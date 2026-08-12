@@ -1,3 +1,43 @@
+## CEO Report — 2026-08-15 (CEO run — latest)
+
+### Diagnosis
+**24h: 96T, -$0.22, 51.0% WR — flat** (4 consecutive declining days)
+- LONG 24h: 47T -$0.25, 46.8% WR — primary bleed
+- SHORT 24h: 49T +$0.03, 55.1% WR — flat/slight positive
+- Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 -$0.40
+
+**7d: 441T, +$0.14, 52.2% WR — barely positive**
+- LONG 7d: 275T +$0.71, 52.6% WR — solid
+- SHORT 7d: 166T -$0.87, 51.8% WR — below -$1.50 threshold (no regime filter needed)
+
+**Stars 7d intact:**
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5%
+- bb-bounce-short,hzscore- SHORT: 18T +$0.14 61.1%
+- hzscore+,mover+ LONG: 5T +$0.17 80%
+
+**Cost drivers48h:** atr_sl_hit 59T -$3.25 (dominant). cut-loser-CL-T1 4T -$0.42.
+
+### Root Cause
+**Mild cold streak, not a crisis.** 7d still positive, stars intact. LONG bleed driven by hzscore+ standalone (9T -$0.04, 44.4% WR — already restricted to combo-only) and range_breakout+ legacy trades (8T -$0.41, 25% WR — already disabled). SHORT bleed distributed across many combos (regime-driven, not signal-driven). Daily decline 4 consecutive days — within normal NEUTRAL regime variance.
+
+### Fix Applied
+- **NO TRADING CHANGES.** Confirming previous CEO decision.
+- Trailing stop fix (0.80%) deployed Aug 13, needs more eval time.
+- 6 open positions ($0 flat), pipeline healthy.
+
+### Verification
+- Stars confirmed intact (3/3 profitable 7d)
+- Disabled signals: range_breakout+ (False), trend_momentum (False)
+- hzscore+ standalone restriction working (0 solo trades post-restriction)
+- SHORT7d -$0.87 — below -$1.50 threshold, no regime filter needed
+
+### Monitor
+- SHORT7d bleed (if -$1.50+ → consider regime filter)
+- Daily decline (if -$1.00+ → investigate root cause)
+- Trailing stop impact (needs 24-48h eval from Aug 13 deploy)
+
+---
+
 ## CEO Report — 2026-08-12 16:55 UTC (verification run)
 
 ### Diagnosis

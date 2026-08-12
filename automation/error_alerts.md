@@ -220,3 +220,7 @@ ALERTS:
 - **[WARN]** (1x): `hermes-hl-volume` 429 rate limit — transient, self-correcting on next timer fire
 - **[INFO]**: Pipeline healthy — cycle #151860, 0 errors in last 30min. 198 signals generated but all blocked by signal_analyst (scores too low). 0 open positions, 0 closed today.
 - **AUTO-FIX**: None needed — all issues are non-critical utilities or transient API limits.
+
+## Error Alerts — 2026-08-12 17:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: no such table: _coin_registry`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`

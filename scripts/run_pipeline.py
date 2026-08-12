@@ -168,6 +168,15 @@ def main():
 
     log(f'=== Pipeline {mode} ({"1m+5m+10m" if every_5 else ("1m+10m" if every_10 else "1m")}) ===')
 
+    # Step 0: Coin tracker (collect per-coin intelligence, export JSON for dashboard)
+    try:
+        from coin_tracker import collect as coin_collect
+        from coin_tracker_api import export_all as coin_export
+        coin_collect()
+        coin_export()
+    except Exception as e:
+        log(f'  [coin_tracker] error: {e}')
+
     # Increment pipeline cycle counter (used for cascade-flip eviction tracking)
     try:
         sys.path.insert(0, SCRIPTS)
