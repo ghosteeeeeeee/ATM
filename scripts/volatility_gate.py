@@ -34,6 +34,7 @@ REGIME_SIGNALS = {
         'bb_bounce+,range_finder+',  # 60.4% WR all-time, star signal
         'trend_momentum_near_sma',
         'hzscore', 'range_finder',  # individual parts for single-source signals
+        'accel-300',  # SHORT: catches slow grinds down in quiet markets (top tokens APEX/STBL/BLUR all FLAT)
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
