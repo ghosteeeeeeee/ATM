@@ -96,48 +96,61 @@ def volume_trend(volumes):
 # ── Component scorers (0-100) ──────────────────────────────────────────────────
 
 def score_momentum(closes, ema_9=None, ema_20=None, ema_50=None):
-    """Momentum score 0-100."""
+    """Momentum score 0-100. Centered at 50, wide spread."""
     if not closes or len(closes) < 5:
         return 50.0
-    price_change = (closes[0] - closes[min(19, len(closes) - 1)]) / closes[min(19, len(closes) - 1)] * 100
-    score = 50.0
-    score += max(-30, min(30, price_change * 3))
+    # Price change over last 20 candles (or fewer if not available)
+    lookback = min(19, len(closes) - 1)
+    price_change = (closes[0] - closes[lookback]) / closes[lookback] * 100
+    # Map price change to score: -10% → 10, 0% → 50, +10% → 90
+    score = 50.0 + max(-40, min(40, price_change * 4))
+    # EMA alignment: strong bonus/penalty
     if ema_9 and ema_20:
-        score += 10 if ema_9 > ema_20 else -10
+        if ema_9 > ema_20:
+            score += 15  # Uptrend
+        else:
+            score -= 15  # Downtrend
     if ema_20 and ema_50:
-        score += 5 if ema_20 > ema_50 else -5
+        if ema_20 > ema_50:
+            score += 10
+        else:
+            score -= 10
     return max(0, min(100, score))
 
 def score_volume(vol_recent, vol_avg, vol_trend):
-    """Volume score 0-100."""
+    """Volume score 0-100. High relative volume = high score."""
     if not vol_avg or vol_avg == 0:
-        return 50.0
+        return 30.0  # No data = low score
     ratio = vol_recent / vol_avg if vol_recent else 0
-    score = 50.0
-    score += max(-30, min(40, (ratio - 1) * 20))
+    # Map ratio to score: 0x → 10, 1x → 50, 3x → 90
+    score = 10.0 + max(0, min(80, ratio * 25))
+    # Trend bonus
     score += vol_trend * 15
     return max(0, min(100, score))
 
 def score_volatility(atr_val, price):
-    """Volatility score 0-100. Moderate = best."""
+    """Volatility score 0-100. Moderate volatility is best for trading."""
     if not atr_val or not price or price <= 0:
-        return 50.0
+        return 30.0  # No data = low score
     atr_pct = (atr_val / price) * 100
+    # Too quiet (<0.3%) = low, sweet spot (0.5-3%) = high, too wild (>10%) = low
     if atr_pct < 0.3:
-        return 20.0
+        return 15.0
     elif atr_pct < 0.5:
-        return 40.0
+        return 35.0
+    elif atr_pct < 1.0:
+        return 60.0 + (atr_pct - 0.5) * 40
     elif atr_pct < 3.0:
-        return 70.0 + (atr_pct - 0.5) * 8
+        return 80.0 + (3.0 - atr_pct) * 5  # Peak at 1%
     elif atr_pct < 10.0:
-        return 80.0 - (atr_pct - 3) * 5
+        return 60.0 - (atr_pct - 3) * 5
     else:
-        return 30.0
+        return 20.0
 
 def score_spread(spread):
-    """Spread score 0-100. Tight = high."""
+    """Spread score 0-100. Tight spread = liquid = high score."""
     if spread is None:
-        return 50.0
+        return 40.0
     if spread < 5:
         return 95.0
     elif spread < 10:
@@ -152,34 +165,35 @@ def score_spread(spread):
         return 10.0
 
 def score_signals(signal_count, avg_confidence):
-    """Signal confluence score 0-100."""
-    score = 50.0
-    score += min(25, signal_count * 5)
+    """Signal confluence score 0-100. More signals = higher score."""
+    if signal_count == 0:
+        return 20.0  # No signals = low
+    score = 20.0 + min(60, signal_count * 10)
     if avg_confidence:
-        score += (avg_confidence - 50) * 0.3
+        score += (avg_confidence - 50) * 0.2
     return max(0, min(100, score))
 
 def score_regime(regime):
-    """Regime alignment score 0-100."""
+    """Regime alignment score 0-100. Moderate influence."""
     if regime in ('LONG_BIAS', 'BULL'):
-        return 75.0
+        return 60.0
     elif regime in ('SHORT_BIAS', 'BEAR'):
-        return 25.0
+        return 40.0
     return 50.0
 
 # ── Health state ───────────────────────────────────────────────────────────────
 
 def health_from_score(composite):
     """Map composite score to health state."""
-    if composite >= 91:
+    if composite >= 85:
         return 'ready'
-    elif composite >= 76:
+    elif composite >= 70:
         return 'setup'
-    elif composite >= 51:
+    elif composite >= 55:
         return 'hot'
-    elif composite >= 26:
+    elif composite >= 40:
         return 'warm'
-    elif composite >= 11:
+    elif composite >= 25:
         return 'cold'
     return 'dead'
 

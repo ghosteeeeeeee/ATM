@@ -32,6 +32,8 @@ from coin_tracker_score import (
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 MIN_PRICE = 1e-12           # Skip zero/near-zero prices
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+SKIP_COINS = SHORT_BLACKLIST | LONG_BLACKLIST
 
 # ── Data readers ───────────────────────────────────────────────────────────────
 
@@ -145,6 +147,9 @@ def collect():
 
             meta = universe_map.get(symbol, {})
             if meta.get('isDelisted', False):
+                skipped += 1
+                continue
+            if symbol in SKIP_COINS:
                 skipped += 1
                 continue
 
