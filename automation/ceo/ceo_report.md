@@ -1,17 +1,16 @@
-## CEO Report — 2026-08-13 18:00 UTC
+## CEO Report — 2026-08-12 01:25 UTC
 
 ### Diagnosis
-24h: 41T, -$0.29, 43.9% WR (RED)
-7d: 383T, +$0.93, 52.7% WR (improved from +$0.91, solid)
+24h: 42T, -$0.16, 47.6% WR (RED but improving from -$0.29)
+7d: 383T, +$0.93, 53.0% WR (solid, stable)
 
-Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.14 (2T)
+Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.15 (5T, 80% WR — strong start)
 
 ### Root Cause
-- **SHORT bleed persistent**: SHORT 7d — many combos negative but star SHORT profitable. Regime-driven, not signal-driven.
-- **LONG solid**: LONG 7d profitable, bb_bounce+ combos dominating
-- **cost drivers 48h**: atr_sl_hit 42T -$1.81 (dominant), cut-loser-CL-trail 12T -$0.60
-- **sole winning exit**: profit-monster-trail
-- trend_momentum_near_sma+ DISABLED (5T 0% WR -$0.40, 1 residual open)
+- **SHORT bleed persistent**: SHORT 7d 125T -$1.05 (49.6% WR) — regime-driven, not signal-driven. Star SHORT (bb-bounce-short,hzscore-) still profitable 17T +$0.12 58.8%. Top losers: ma100-cross,return_exhaustion- (-$0.28), ma100-cross-,range_finder- (-$0.19), hzscore-,return_exhaustion- (-$0.18). SHORT stopped firing after Aug 12 — system self-correcting.
+- **LONG solid**: LONG 7d 258T +$1.98 (54.7% WR) — strong, bb_bounce+ combos dominating
+- **Cost drivers 7d**: atr_sl_hit 139T -$7.55 (dominant), profit-monster-trail 143T +$7.00 (sole winning exit net)
+- trend_momentum_near_sma+ DISABLED (5T 0% WR -$0.40)
 
 ### Stars (7d, all intact)
 - bb_bounce+,range_finder+ LONG: 53T +$0.71, 58.5% WR
@@ -19,20 +18,20 @@ Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.14 (
 - bb-bounce-short,hzscore- SHORT: 17T +$0.12, 58.8% WR
 
 ### Fix Applied
-**NO CHANGES** — 7d improved to +$0.93, stars intact, system idle by design (NEUTRAL/REDUCE). Hotset populated with 8 tokens post-compaction (accel-300- NEO SHORT first entry). Overreacting destabilizes.
+**NO CHANGES** — 7d solid at +$0.93, stars intact, system idle by design (NEUTRAL/REDUCE). SHORT stopped firing (0 SHORT trades since Aug 12 01:11). Overreacting destabilizes.
 
 ### Monitoring
 - SHORT7d bleed (if -$1.50+ → consider regime filter for SHORT)
-- Disk 85% (at WARN threshold — pipeline.log 195M total)
-- trend_momentum_near_sma+ residual open trade (will close/age out)
-- Hotset: 8 tokens, accel-300- first firing since re-enable
+- Disk 85% (WARN threshold — pipeline.log 195M total)
+- trend_momentum_near_sma+ residual (will close/age out)
+- accel-300 SHORT re-enabled — monitor first trades
 
 ### Verification
-- Pipeline healthy: 15+ active timers
+- Pipeline healthy: 15+ active timers, last run 01:21 UTC
 - Live trading: ON
-- Open: 7 trades (5 LONG +$0.06, 1 SHORT +$0.04, 1 paper)
-- Hotset: 8 tokens (NEO SHORT accel-300-, KAS SHORT hzscore-, SYRUP LONG bb_bounce+, ZRO LONG bb_bounce+, JUP SHORT hzscore-, HBAR LONG hzscore+, AVNT LONG hzscore+, WLFI SHORT hzscore-)
-- trend_momentum_near_sma+ DISABLED (0% WR, 1 residual open)
+- Open: 7 trades (all LONG, 0 SHORT)
+- Hotset: empty (NEUTRAL regime, macro gate REDUCE — correct)
+- trend_momentum_near_sma+ DISABLED (0% WR)
 
 ---
 

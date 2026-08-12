@@ -244,3 +244,6 @@
 [2026-08-11 23:25] auto_1hr: NO CHANGES
   WHY: 2T last hour (0W). trend_momentum_near_sma+ residual trade closed (pre-kill entry). 24h 41T 18W (43.9% WR) -$0.33. 7d 383T 200W (52.2% WR) +$0.72. Signal already killed at 22:26. No new 0% WR kill candidates. Trade freq 2/hr normal. atr_sl_hit 43.9% (down from 46%, positive trend). profit-monster-trail compensating SL losses. No param changes.
   BY: auto_1hr
+[2026-08-12 15:05] auto_1hr: NO CHANGES
+  WHY: 5T last hour (2W 3L -$0.09). 24h 43T 20W (46.5% WR) -$0.28. atr_sl_hit 41.9% (down from 45%, improving). profit-monster-trail compensating ($0.93 vs -$0.79). No 0% WR kill candidates (trend_momentum already killed). Trade freq 5/hr normal. 7d profitable (52.2% WR +$0.72). cut-loser-CL-T1 -$0.42 — CL_TRAIL_ENABLED=False deployed, monitoring.
+  BY: auto_1hr
