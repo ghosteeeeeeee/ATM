@@ -166,16 +166,32 @@ def run() -> int:
         # ── Momentum fade filter: price must already be moving in our direction ──
         # Ensures we enter AFTER reversal starts, not during.
         # Pattern from accel_300.py (proven: reduces false entries by ~30%)
+        # FIX: compute velocity directly from price_history (speed tracker singleton
+        # may not be updated when signals_runner calls this module).
+        _conn = None
         try:
-            from speed_tracker import get_token_speed
-            spd = get_token_speed(token)
-            vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
+            from paths import HERMES_DATA
+            import sqlite3 as _sqlite3
+            _conn = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            _cur = _conn.cursor()
+            _cur.execute("""
+                SELECT price FROM (
+                    SELECT price, timestamp FROM price_history
+                    WHERE token = ?
+                    ORDER BY timestamp DESC LIMIT 6
+                ) sub ORDER BY timestamp ASC
+            """, (token.upper(),))
+            _prices = [r[0] for r in _cur.fetchall()]
+            vel_5m = (_prices[-1] - _prices[0]) / _prices[0] * 100 if len(_prices) >= 2 and _prices[0] > 0 else 0.0
             if local_dir == 'SHORT' and vel_5m > 0:
                 continue  # price actively rising, wait for fade
             if local_dir == 'LONG' and vel_5m < 0:
                 continue  # price still falling, wait for bounce
         except Exception:
-            pass  # non-fatal: proceed if speed data unavailable
+            pass  # non-fatal: proceed if price data unavailable
+        finally:
+            if _conn:
+                _conn.close()
 
         # Solo detection — apply stricter params when no co-signal
         solo = _is_solo(token, local_dir)
