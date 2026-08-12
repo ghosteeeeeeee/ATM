@@ -304,3 +304,16 @@ Monitor: SHORT7d bleed (if -$1.50+ → regime filter), daily decline (if -$1.00+
 
 ### Impact
 No trading impact. UI-only change — hot-set data source was already signals.json, now consistent across both pages.
+
+---
+
+## CEO Report — 2026-08-12 (source_mult increase acknowledged)
+
+### What
+source_mult increased from 5% → 10% for 2+ source combos in `signal_compactor.py:385`.
+
+### Status
+✅ Implemented. bug_hunter verified ALL CLEAR. OpenMemory stored.
+
+### Impact
+Takes effect on next pipeline run. Combos get stronger score ranking in compactor — should improve signal selection without affecting confidence display or downstream logic.

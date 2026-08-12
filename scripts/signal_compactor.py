@@ -380,9 +380,9 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Source weight multiplier
     source_mult = _get_source_weight(signal_type, source)
 
-    # Source count bonus: +5% when 2+ distinct sources
+    # Source count bonus: +10% when 2+ distinct sources (CEO: combos are $1.62 more profitable)
     source_count = len([s for s in (source or '').split(',') if s])
-    source_mult += (0.05 if source_count >= 2 else 0)
+    source_mult += (0.10 if source_count >= 2 else 0)
 
     # Speed percentile bonus: +15% if speed_percentile >= 80
     speed_mult = 1.0 + (SPEED_HOTSET_BONUS if speed_data.get('speed_percentile', 0) >= SPEED_HOTSET_THRESHOLD else 0)
