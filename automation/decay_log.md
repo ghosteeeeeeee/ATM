@@ -341,3 +341,11 @@
 [2026-08-11 21:49 UTC]   🟢 bb_bounce+: 6 trades, 50.0% WR, PnL=0.71
 [2026-08-11 21:49 UTC]   🟢 hzscore+: 8 trades, 50.0% WR, PnL=0.39
 [2026-08-11 21:49 UTC] Done. Disabled 0 signals.
+[2026-08-12 03:49 UTC] === Signal Decay Detector ===
+[2026-08-12 03:49 UTC]   SKIP: No flag mapping for trend_momentum_near_sma+
+[2026-08-12 03:49 UTC]   🔴 trend_momentum_near_sma+: 5 trades, 0.0% WR, PnL=-3.23
+[2026-08-12 03:49 UTC]   🟢 hzscore+: 10 trades, 40.0% WR, PnL=-0.92
+[2026-08-12 03:49 UTC]   🟢 bb_bounce+,hzscore+: 4 trades, 50.0% WR, PnL=0.0
+[2026-08-12 03:49 UTC]   🟢 hzscore-: 4 trades, 50.0% WR, PnL=-0.23
+[2026-08-12 03:49 UTC]   🟢 bb_bounce+: 15 trades, 60.0% WR, PnL=1.56
+[2026-08-12 03:49 UTC] Done. Disabled 0 signals.

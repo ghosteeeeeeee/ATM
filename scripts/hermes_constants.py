@@ -618,8 +618,8 @@ SIMILAR_SETUP_LOOKUP_ENABLED = True
 SIMILAR_SETUP_MIN_SAMPLE = 3          # need >= 3 similar trades to act
 SIMILAR_SETUP_HARD_BLOCK_WR = 30      # <30% WR with >=5 similar → hard SKIP
 SIMILAR_SETUP_HARD_BLOCK_MIN_N = 5    # minimum n for hard block
-SIMILAR_SETUP_PENALTY_40 = 10         # WR 40-49% → -10 confidence
-SIMILAR_SETUP_PENALTY_30 = 15         # WR 30-39% → -15 confidence
+SIMILAR_SETUP_PENALTY_40 = 20         # WR 40-49% → -20 confidence (was -10, too lenient for losing setups)
+SIMILAR_SETUP_PENALTY_30 = 25         # WR 30-39% → -25 confidence (was -15, low WR needs stronger suppression)
 SIMILAR_SETUP_RSI_BAND = 15           # RSI ± this for "similar"
 SIMILAR_SETUP_CACHE_TTL = 300         # 5 min cache per token+source+direction+tier
 
