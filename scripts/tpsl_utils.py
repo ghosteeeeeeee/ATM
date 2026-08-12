@@ -531,6 +531,9 @@ def compute_atr_sl_tp(
                 # When trail_floor > entry (low ATR token, trail too wide), use ATR from highest
                 if trail_floor >= entry_f:
                     new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
+                    # If ATR floor from highest is still above entry, cap at entry-based floor
+                    if new_sl >= entry_f:
+                        new_sl = min_from_entry
                 else:
                     new_sl = trail_floor    # normal case: trail from peak
                 # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
@@ -745,6 +748,9 @@ def compute_atr_sl_tp(
                 # When trail_floor > entry (low ATR token), use ATR from highest
                 if trail_floor >= entry_f:
                     new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
+                    # If ATR floor from highest is still above entry, cap at entry-based floor
+                    if new_sl >= entry_f:
+                        new_sl = min_from_entry
                 else:
                     new_sl = trail_floor    # normal case: trail from peak
                 if current_sl > 0:
