@@ -32,7 +32,7 @@ from signal_schema import add_signal, get_cooldown, set_cooldown, price_age_minu
 from paths import HERMES_DATA
 
 from hermes_constants import (
-    RANGE_BREAKOUT_ENABLED, RANGE_BREAKOUT_SHORT_ENABLED,
+    RANGE_BREAKOUT_SHORT_ENABLED,
     SHORT_BLACKLIST,
 )
 
@@ -127,6 +127,7 @@ def _get_candles_5m(token, lookback=100):
     """Get 5m candle closes from candles.db."""
     if not os.path.exists(_CANDLES_DB):
         return []
+    conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=5)
         cur = conn.cursor()
@@ -137,14 +138,17 @@ def _get_candles_5m(token, lookback=100):
             LIMIT ?
         """, (token.upper(), lookback))
         rows = cur.fetchall()
-        conn.close()
         return [r[0] for r in reversed(rows)] if rows else []
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_1h_trend(token):
     """Check 1H EMA trend for regime filter."""
+    conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=5)
         cur = conn.cursor()
@@ -155,7 +159,6 @@ def _get_1h_trend(token):
             LIMIT 50
         """, (token.upper(),))
         rows = cur.fetchall()
-        conn.close()
         if len(rows) < 20:
             return 'NEUTRAL'
         closes = [r[0] for r in reversed(rows)]
@@ -169,6 +172,9 @@ def _get_1h_trend(token):
         return 'NEUTRAL'
     except Exception:
         return 'NEUTRAL'
+    finally:
+        if conn:
+            conn.close()
 
 
 def detect_breakout_short(closes, token):
@@ -316,6 +322,10 @@ def scan_signals() -> int:
     added = 0
     now = time.time()
 
+    # Kill-switch
+    if not RANGE_BREAKOUT_SHORT_ENABLED:
+        return 0
+
     for token, data in get_all_latest_prices().items():
         price = data.get('price')
         if not price or price <= 0:
@@ -337,10 +347,6 @@ def scan_signals() -> int:
 
         sig = detect_breakout_short(closes, token)
         if sig is None:
-            continue
-
-        # Kill-switch
-        if not RANGE_BREAKOUT_SHORT_ENABLED:
             continue
 
         # Blacklist
