@@ -6006,3 +6006,39 @@ These signals bypassed the kill-switch entirely. Added guards for all pattern_sc
 **Open Questions:**
 - atr_sl_hit stable at 43% — acceptable with PM trail compensation
 - hzscore+ flat at $0.00 — 7d intact, no kill warranted
+
+---
+
+## [2026-08-12 03:26] Hourly Analysis
+
+**Trades:** 0 closed last hour (night time, low activity)
+**24h:** 45T ~22W (~49% WR) +$0.08 (flat)
+
+**Close Reasons (24h):**
+- profit-monster-trail: 22T (48.9%) +$1.05 avg $0.048
+- atr_sl_hit: 17T (37.8%) -$0.70 avg -$0.041
+- cut-loser-CL-T1: 4T (8.9%) -$0.42 avg -$0.105
+- atr_tp_hit: 1T +$0.15
+- pm_hard_tp: 1T $0.00
+
+**Signal Performance (24h):**
+- bb_bounce+: 15T 9W (60% WR) +$0.18 — star signal
+- hzscore+: 9T 4W (44% WR) $0.00 — break-even
+- trend_momentum_near_sma+: 5T 0W -$0.40 — **ALREADY KILLED**
+- hzscore-: 4T 2W -$0.05 — minor bleed
+- bb_bounce+,hzscore+: 4T 2W -$0.01 — marginal
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — night session (03:26 UTC), normal low activity
+- Trade freq 2.5/hr (last 2h) — normal
+- atr_sl_hit 37.8% — below 40% threshold, stable
+- profit-monster-trail compensating well (+$1.05 vs -$0.70)
+- cut-loser-CL-T1 -$0.42 — CL_TRAIL_ENABLED=False deployed, monitoring
+- No 0% WR kill candidates (trend_momentum already killed)
+- System flat but stable, no intervention needed
+
+**Open Questions:**
+- atr_sl_hit trending down from 43% → 37.8% — positive
+- hzscore+ still break-even at $0.00 — monitor for degradation
