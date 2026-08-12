@@ -482,6 +482,24 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
 
     leverage = max(1, int(leverage))  # caller (decider_run.py:2415) already caps at 5x
 
+    # ── RACE CONDITION FIX: Write marker BEFORE mirror_open ────────────────
+    # Guardian checks this file to skip orphan creation for recently opened trades.
+    # Must be written BEFORE mirror_open to prevent guardian from seeing HL position
+    # before DB record exists.
+    try:
+        import json as _json
+        _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
+        _marker = {}
+        if os.path.exists(_marker_path):
+            _marker = _json.loads(open(_marker_path).read())
+        _marker[token.upper()] = time.time()
+        # Prune entries older than 60s
+        _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+        with open(_marker_path, 'w') as _f:
+            _json.dump(_marker, _f)
+    except Exception:
+        pass  # non-fatal
+
     # ── Step 3: mirror_open on HL ──────────────────────────────────────
     print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage})")
     result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage)
