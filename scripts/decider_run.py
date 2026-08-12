@@ -1305,23 +1305,8 @@ def context_gate(token, direction, source, sig):
                         _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, total_conf_adj)
                         return ('SKIP', f'hebbian auto-reject: WR={wr_pct:.0f}% (n={n})', 0)
 
-                # Path B: composite scoring (no n requirement)
-                try:
-                    from hebbian_engine import HebbianEngine
-                    _eng = HebbianEngine()
-                    score, breakdown = _eng.composite_score(token, source)
-                    if score >= 0.65:
-                        log(f'  [HEBBIAN-GATE] AUTO-APPROVE (composite): score={score:.3f} (wr={breakdown["wr"]:.2f} exit={breakdown["exit"]:.2f} token={breakdown["token"]:.2f} combo={breakdown["combo"]:.2f})')
-                        _log_auto_decision(token, source, direction, 'AUTO-APPROVE', wr_est, n, score)
-                        return ('GO', f'hebbian composite approve: score={score:.2f}', score - 0.5)
-                    if score <= 0.35:
-                        log(f'  [HEBBIAN-GATE] AUTO-REJECT (composite): score={score:.3f} (wr={breakdown["wr"]:.2f} exit={breakdown["exit"]:.2f} token={breakdown["token"]:.2f} combo={breakdown["combo"]:.2f})')
-                        _log_auto_decision(token, source, direction, 'AUTO-REJECT', wr_est, n, score)
-                        return ('SKIP', f'hebbian composite reject: score={score:.2f}', 0)
-                except Exception as e:
-                    log(f'  [HEBBIAN-GATE] composite scoring error: {e} (fail-open)')
-
-                # Uncertain → apply adj but escalate
+                # ponytail: composite scoring removed — it bypassed HEBBIAN_AUTO_MIN_N,
+                # rubber-stamping n=1-2 trades. Path A (n-based) enforces min_n=5.
                 if total_conf_adj != 0:
                     log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → adj={total_conf_adj}, escalate to LLM')
 

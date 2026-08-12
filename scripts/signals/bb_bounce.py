@@ -21,16 +21,16 @@ from paths import RUNTIME_DB
 # ── Config ──────────────────────────────────────────────────────────────
 BB_PERIOD = 20
 BB_STDDEV = 1.8          # was 2.0 — more band touches for ranging markets
-BB_TOUCH_PCT = 0.30      # was 0.20 — wider crypto tolerance
+BB_TOUCH_PCT = 0.20      # tightened 2026-08-12 — filter weak band touches
 BB_MIN_BARS = 30
 RSI_PERIOD = 14
 RSI_OVERSOLD = 40        # tightened 2026-08-07 — CEO: filter weak bounces
 RSI_OVERBOUGHT = 60      # tightened 2026-08-07 — CEO: filter weak bounces
-BOUNCE_MIN_PCT = 0.05    # tightened 2026-08-07 — CEO: require stronger bounce
+BOUNCE_MIN_PCT = 0.08    # tightened 2026-08-12 — filter weak bounces
 # Solo-specific (stricter when no co-signal present)
-SOLO_RSI_OVERSOLD = 35   # require deeper oversold for standalone entries
-SOLO_RSI_OVERBOUGHT = 65 # require deeper overbought for standalone entries
-SOLO_BOUNCE_MIN_PCT = 0.10  # require stronger bounce confirmation
+SOLO_RSI_OVERSOLD = 30   # tightened 2026-08-12 — require deeper oversold for standalone
+SOLO_RSI_OVERBOUGHT = 70 # tightened 2026-08-12 — require deeper overbought for standalone
+SOLO_BOUNCE_MIN_PCT = 0.15  # tightened 2026-08-12 — require stronger bounce confirmation
 COOLDOWN_MIN = 5         # was 10 — faster re-entries
 
 # ── State ───────────────────────────────────────────────────────────────
