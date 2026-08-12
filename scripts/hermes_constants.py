@@ -885,7 +885,7 @@ ACCEL_300_BREAKOUT_GAP_MIN     = 0.5    # min gap % from EMA60 (was 1.0 — too 
 ACCEL_300_BREAKOUT_TREND_EMA   = 200    # LONG only above this EMA, SHORT only below
 ACCEL_300_BREAKOUT_VOL_MULT    = 1.5    # volume must be > N * 20-bar average
 ACCEL_300_BREAKOUT_COOLDOWN    = 8      # bars between signals per token (40min = 8 * 5m)
-ACCEL_300_BREAKOUT_CONFIDENCE  = 70     # base confidence for breakout signals
+ACCEL_300_BREAKOUT_CONFIDENCE  = 80     # base confidence for breakout signals
 
 # ── Velocity Ignition (FIX 2026-07-31) ────────────────────────────────────────
 # Catches the FIRST strong momentum bar after EMA300 cross — enters 15-20 min

@@ -715,8 +715,8 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             source = 'accel-300-vel+' if direction == 'LONG' else 'accel-300-vel-'
             # Confidence based on velocity ratio (how much faster than average)
             velocity_ratio = sig.get('velocity_ratio', 1.0)
-            confidence = int(min(75, 60 + (velocity_ratio - 1.0) * 15))
-            confidence = max(60, confidence)
+            confidence = int(min(85, 65 + (velocity_ratio - 1.0) * 20))
+            confidence = max(65, confidence)
         else:
             source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
             # Confidence: base on gap strength + absolute gap growth. SHORT growth
@@ -725,8 +725,8 @@ def scan_accel_300_signals(prices_dict: dict) -> int:
             gap_bonus = max(0, abs(sig['gap_growth']) - 0.05) * 200
             gap_for_conf = abs(sig['gap_pct'])  # use absolute gap so SHORT earns bonus too
             min_gap_for_conf = ACCEL_300_MIN_GAP_PCT_LONG if direction == 'LONG' else ACCEL_300_MIN_GAP_PCT_SHORT
-            confidence = int(min(70, 65 + max(0, (gap_for_conf - min_gap_for_conf) * 80) + gap_bonus))
-            confidence = max(60, confidence)
+            confidence = int(min(80, 65 + max(0, (gap_for_conf - min_gap_for_conf) * 80) + gap_bonus))
+            confidence = max(65, confidence)
 
         # `_get_1m_prices` enforces freshness and returns the real latest
         # price_history point used by detection. Do not persist the separate
