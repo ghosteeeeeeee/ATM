@@ -188,3 +188,16 @@ Investigation: is_stale=True for 85% of signals because tokens have speed<30 (de
 4. **PM_DEFAULT_NOTIONAL** — New constant replaces hardcoded `11.0`.
 
 All verified clean by bug_hunter. No trading param changes. Monitor profit-monster-trail exit behavior over next 24h.
+
+---
+
+## CEO Report — 2026-08-13 (signal stabilization acknowledged)
+
+### Signal Fixes Applied — 4 changes, all verified
+
+1. **volatility_gate** — Strip trailing numbers from signal names (e.g. `r2-trend-long0` → `r2-trend-long`). Prevents phantom signal combos from mismatching.
+2. **Slope filter relaxed** — 0.001 → 0.0005. Reduces signal starvation from overly strict slope requirement.
+3. **mover+ weight boosted** — 1.0 → 1.3. Gives mover+ more influence in combo scoring.
+4. **stop_hunt_reversal_long+ weight boosted** — 1.0 → 1.3. Same rationale as mover+.
+
+All changes are non-protected params. bug_hunter verified clean. No risk to core gates (CONFLUENCE_REQUIRED intact, LIVE_TRADING_ENABLED unchanged).
