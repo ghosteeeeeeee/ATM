@@ -18,6 +18,7 @@ Data: candles_1h from candles.db
 """
 
 import sys, os
+import re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from paths import HERMES_DATA
@@ -152,7 +153,6 @@ def should_trade(token, signal=None):
                 works_in_regime = True
                 break
             # Strip trailing numbers (e.g., r2-trend-long0 → r2-trend-long)
-            import re
             base_no_num = re.sub(r'\d+$', '', base)
             if base_no_num in regime_sigs:
                 works_in_regime = True
