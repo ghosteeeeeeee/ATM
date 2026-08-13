@@ -1,152 +1,160 @@
-# Weather Vane v3 — Predictive Detection + CHoCH Integration
+# Weather Vane v3 — CHoCH-Inspired Structure Shift Detection
 
 **Date:** 2026-08-13
-**Status:** BACKTESTED — CHoCH integration proposed
-**Based on:** market structure + signal patterns as leading indicators
+**Status:** BACKTESTED — ready to implement
+**Based on:** market structure stability as predictive indicator
 
 ---
 
-## CEO Verdict (Original)
+## Backtest Results (7 days, 391 trades)
 
-**APPROVE with modifications.** Same-hour-yesterday baseline, 65% threshold, 20 min baseline, 30min cooldown. Backtest before deploy.
+### Key Finding: Structure Shifts Are Bad for ALL Trades
 
-## Backtest Results (7 days)
+| Direction | Stable Structure | Shifted Structure |
+|-----------|-----------------|-------------------|
+| **SHORT** | 145T, 54% WR, -$0.23 | 20T, 50% WR, **-$0.36** |
+| **LONG** | 189T, 50% WR, **+$0.31** | 37T, 46% WR, **-$0.32** |
 
-### Signal Volume Drop (65% threshold, same-hour-yesterday)
-- 13 triggers in 7 days (~2/day)
-- In triggered hours: 4W/3L, PnL +$0.07 (flat)
-- 2 hours after triggers: 5W/4L, PnL -$0.07 (slightly negative)
-- **Verdict: NOT a strong predictor.** Volume drops for many reasons (time of day, quiet market) not just regime shifts. Supplementary only.
+**The pattern is symmetric:** Stable structure = predictable = profitable. Shifted structure = uncertainty = losing.
 
-### Confidence Trend (5+ point drop)
-- Only 2 triggers in 7 days — too rare to be useful
-- Both triggers had NO trades or WINNING trades
-- Counter-intuitive: low-confidence SHORT trades actually have HIGHER WR (58.3% vs 51.5%)
-- **Verdict: NOT useful.** Skip.
+### Structure Shift Detail (SHORT)
 
-### What Worked vs What Didn't
+| Previous → Current | Trades | WR | PnL |
+|--------------------|--------|-----|-----|
+| HH_HL → HH_HL (stable bullish) | 9 | **89%** | **+$0.24** |
+| NEUTRAL → LH_LL (stable bearish) | 33 | 52% | +$0.23 |
+| HH_HL → LH_LL (shift to bearish) | 13 | 46% | **-$0.34** |
+| LH_LL → HH_HL (shift to bullish) | 7 | 57% | -$0.02 |
+| LH_LL → LH_LL (stable bearish) | 12 | 33% | **-$0.37** |
 
-| Layer | Predictive Power | Verdict |
-|-------|-----------------|---------|
-| Signal volume drop | Weak — too many false positives | Supplementary only (0.85x) |
-| Confidence trend | Near-zero — too rare, counter-intuitive | Skip |
-| Loss cluster (v2) | Strong — proven | Keep as primary |
+### Structure Shift Detail (LONG)
+
+| Previous → Current | Trades | WR | PnL |
+|--------------------|--------|-----|-----|
+| N → LH_LL (emerging bearish) | 19 | **68%** | **+$0.29** |
+| LH_LL → LH_LL (stable bearish) | 3 | 67% | +$0.06 |
+| N → HH_HL (emerging bullish) | 27 | 37% | **-$0.62** |
+| HH_HL → LH_LL (shift to bearish) | 19 | 47% | -$0.18 |
+| LH_LL → HH_HL (shift to bullish) | 18 | 44% | -$0.14 |
 
 ---
 
-## CHoCH Integration: Market Structure as Leading Indicator
+## Design: Structure Shift Detector
 
-### New Insight
+### How It Works
 
-CHoCH (Change of Character) is a **structural** leading indicator — it detects market structure shifts (HH_HL → LH_LL or vice versa) BEFORE losses accumulate. This is fundamentally different from signal volume (which measures our system's output) — CHoCH measures the MARKET's structure.
+Inspired by CHoCH (Change of Character) from `signals/hh_hl.py`, but applied as a weather vane filter, not a trade signal:
 
-When a bullish CHoCH fires (LH_LL → HH_HL), the market structure has shifted bullish. SHORT signals will start losing. This happens BEFORE the loss cluster appears.
+1. **Detect swings** on 1h candles (same algorithm as hh_hl.py)
+2. **Compare structures:** previous 4 swings vs last 4 swings
+3. **If structure changed** → suppress ALL signals for that token (direction-agnostic)
+4. **If structure stable** → no suppression
 
-### How CHoCH Works
+### Why Direction-Agnostic
 
-From `signals/hh_hl.py`:
-- Detects swing highs/lows over last 8 swings
-- Previous structure: swings[-8:-4] → HH_HL (bullish) or LH_LL (bearish)
-- Current structure: swings[-4:] → HH_HL or LH_LL
-- If structures differ → CHoCH confirmed
-
-**CHoCH+ (bullish):** LH_LL → HH_HL (market turned bullish)
-**CHoCH- (bearish):** HH_HL → LH_LL (market turned bearish)
-
-### Weather Vane Integration
-
-When a CHoCH fires AGAINST the current trade direction, suppress that direction:
-
-```
-CHoCH+ fires (bullish) → SHORT is now counter-structure → suppress SHORT
-CHoCH- fires (bearish) → LONG is now counter-structure → suppress LONG
-```
-
-This is a STRUCTURAL prediction — the market has changed character, and trades against the new character will lose.
-
-### Why This Is Better Than Signal Volume
-
-| Signal Volume | CHoCH |
-|--------------|-------|
-| Measures our system's output | Measures market structure |
-| Drops for many reasons (noise) | Only fires on genuine structure shifts |
-| Reactive to signal generators | Leading indicator of price action |
-| High false positive rate | Low false positive rate (structural) |
+The backtest shows shifts are bad for BOTH LONG and SHORT. This isn't a directional call — it's a volatility/uncertainty call. When the market is in flux, no trades should be taken.
 
 ### Implementation
 
 New function in signal_compactor.py:
 
 ```python
-def get_choch_suppression(direction: str) -> float:
+def check_structure_shift(token: str) -> bool:
     """
-    Check if a CHoCH signal has fired against this direction.
-    Returns penalty multiplier (1.0 = no suppression, 0.75 = suppressed).
+    Check if market structure shifted for this token in the last 4 swings.
+    Uses 1h candles — same algorithm as hh_hl.py CHoCH detection.
+    Returns True if structure shifted (suppress signals).
     """
     from hermes_constants import (
-        CHOCH_WEATHER_VANE_ENABLED, CHOCH_WEATHER_VANE_PENALTY,
-        CHOCH_WEATHER_VANE_WINDOW, CHOCH_WEATHER_VANE_MIN_CONFIDENCE,
+        STRUCTURE_SHIFT_ENABLED, STRUCTURE_SHIFT_WINDOW,
+        STRUCTURE_SHIFT_MIN_SWINGS,
     )
-    if not CHOCH_WEATHER_VANE_ENABLED:
-        return 1.0
+    if not STRUCTURE_SHIFT_ENABLED:
+        return False
 
-    conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+    conn = sqlite3.connect(CANDLES_DB, timeout=5)
     cur = conn.cursor()
     cur.execute("""
-        SELECT direction, confidence, created_at FROM signals
-        WHERE signal_type = 'hh_hl_choch'
-          AND created_at > datetime('now', '-' || ? || ' minutes')
-        ORDER BY created_at DESC
-    """, (CHOCH_WEATHER_VANE_WINDOW,))
-    rows = cur.fetchall()
+        SELECT close FROM candles_1h
+        WHERE token = ? AND is_closed = 1
+        ORDER BY ts DESC LIMIT ?
+    """, (token.upper(), STRUCTURE_SHIFT_WINDOW))
+    closes = [r[0] for r in cur.fetchall()]
     conn.close()
 
-    for choch_dir, conf, ts in rows:
-        if conf < CHOCH_WEATHER_VANE_MIN_CONFIDENCE:
-            continue
-        # CHoCH fired AGAINST our direction
-        if (choch_dir == 'LONG' and direction == 'SHORT') or \
-           (choch_dir == 'SHORT' and direction == 'LONG'):
-            conf_factor = min(conf / 88.0, 1.0)
-            penalty = 1.0 - (1.0 - CHOCH_WEATHER_VANE_PENALTY) * conf_factor
-            return penalty
+    if len(closes) < STRUCTURE_SHIFT_MIN_SWINGS:
+        return False
 
-    return 1.0
+    closes.reverse()  # chronological
+
+    # Find swing highs and lows (window=3, same as hh_hl.py)
+    highs, lows = [], []
+    w = 3
+    for i in range(w, len(closes) - w):
+        if all(closes[i] >= closes[i-j] for j in range(1, w+1)) and \
+           all(closes[i] >= closes[i+j] for j in range(1, w+1)):
+            highs.append(i)
+        if all(closes[i] <= closes[i-j] for j in range(1, w+1)) and \
+           all(closes[i] <= closes[i+j] for j in range(1, w+1)):
+            lows.append(i)
+
+    all_swings = sorted(highs + lows)
+    if len(all_swings) < 8:
+        return False
+
+    # Determine structure from swing values
+    def _structure(swing_indices):
+        vals = [closes[i] for i in swing_indices]
+        if len(vals) < 4:
+            return 'NEUTRAL'
+        hs = [v for i, v in enumerate(vals) if i % 2 == 0]
+        ls = [v for i, v in enumerate(vals) if i % 2 == 1]
+        if len(hs) >= 2 and len(ls) >= 2:
+            if all(hs[i] > hs[i-1] for i in range(1, len(hs))) and \
+               all(ls[i] > ls[i-1] for i in range(1, len(ls))):
+                return 'HH_HL'
+            if all(hs[i] < hs[i-1] for i in range(1, len(hs))) and \
+               all(ls[i] < ls[i-1] for i in range(1, len(ls))):
+                return 'LH_LL'
+        return 'NEUTRAL'
+
+    prev_struct = _structure(all_swings[-8:-4])
+    curr_struct = _structure(all_swings[-4:])
+
+    # Structure shifted if both are non-NEUTRAL and different
+    return (prev_struct != curr_struct and prev_struct != 'NEUTRAL' and curr_struct != 'NEUTRAL')
 ```
 
-### Integration in _score_signal()
+### Integration in signal_compactor.py (HOTSET-FILTER)
 
 ```python
-# Layer 0: CHoCH structural prediction (NEW — highest predictive power)
-choch_mult = get_choch_suppression(direction)
-dir_outcome_mult = min(dir_outcome_mult, choch_mult)
-
-# Layer 1: Signal volume drop (supplementary — weak predictor)
-# Layer 2: Confidence trend (SKIP — not useful)
-# Layer 3: Loss cluster (primary — proven reactive fallback)
+# Structure shift filter: suppress signals for tokens with shifting market structure
+if STRUCTURE_SHIFT_ENABLED:
+    if check_structure_shift(tkn):
+        log(f"  🚫 [STRUCTURE-SHIFT] {tkn}: market structure shifting — suppressing")
+        continue
 ```
 
 ### Params
 
 ```python
-CHOCH_WEATHER_VANE_ENABLED = True
-CHOCH_WEATHER_VANE_PENALTY = 0.75       # score multiplier when CHoCH fires against direction
-CHOCH_WEATHER_VANE_WINDOW = 120          # minutes — how recent must the CHoCH be
-CHOCH_WEATHER_VANE_MIN_CONFIDENCE = 70   # only suppress if CHoCH confidence >= this
+STRUCTURE_SHIFT_ENABLED = True
+STRUCTURE_SHIFT_WINDOW = 50          # 1h candles to analyze (~2 days)
+STRUCTURE_SHIFT_MIN_SWINGS = 10      # minimum swings needed for reliable detection
 ```
 
 ---
 
-## Updated Detection Layers
+## Detection Layers (Updated)
 
-| Layer | Indicator | Speed | Predictive? | Status |
-|-------|-----------|-------|-------------|--------|
-| 0. CHoCH | Market structure flip | Fast (structural) | ✅ YES | **PROPOSED** |
-| 1. Signal volume | SHORT signals/hour dropping | Fast | ✅ Yes (weak) | Backtested — supplementary |
-| 2. Confidence trend | SHORT avg_conf declining | Fast | ❌ No | Backtested — **SKIP** |
-| 3. Loss cluster | 3+ losses in 5 trades | Slow | ❌ No (reactive) | ✅ DONE (v2) |
+| Layer | Indicator | Direction | Predictive? | Status |
+|-------|-----------|-----------|-------------|--------|
+| 0. Structure shift | Market structure flip | Agnostic | ✅ YES (backtested) | **PROPOSED** |
+| 1. Signal volume | Signals/hour dropping | Per-direction | Weak | Supplementary |
+| 2. Confidence trend | avg_conf declining | Per-direction | No | **SKIP** |
+| 3. Loss cluster | 3+ losses in 5 trades | Per-direction | No (reactive) | ✅ DONE (v2) |
 
-**Recommended deployment:** CHoCH layer first (strongest predictor), signal volume as supplementary, skip confidence trend, keep loss cluster as fallback.
+**Structure shift is the strongest predictive layer** — backtested, direction-agnostic, and catches the uncertainty that kills trades.
 
 ---
 
@@ -154,5 +162,5 @@ CHOCH_WEATHER_VANE_MIN_CONFIDENCE = 70   # only suppress if CHoCH confidence >= 
 
 | File | Change |
 |------|--------|
-| `scripts/hermes_constants.py` | Add CHOCH_WEATHER_VANE_* params |
-| `scripts/signal_compactor.py` | Add `get_choch_suppression()`, integrate into `_score_signal()` |
+| `scripts/hermes_constants.py` | Add STRUCTURE_SHIFT_* params |
+| `scripts/signal_compactor.py` | Add `check_structure_shift()`, add to HOTSET-FILTER |
