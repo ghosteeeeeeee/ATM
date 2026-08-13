@@ -1517,7 +1517,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # catches that edge case permanently.
             if CONFLUENCE_REQUIRED and len(src_parts) < 2:
                 # ponytail: backtested standalone bypass — matches Step 2 gate (line 726)
-                bare_src = src.rstrip('+-') if src else ''
+                bare_src = src.rstrip('+-0123456789') if src else ''
                 if bare_src in STANDALONE_BYPASS_SIGNALS:
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} backtested standalone ({src}) allowed at final guard")
                     # ── Contrarian flip: trend_momentum_near_sma ────────────────
