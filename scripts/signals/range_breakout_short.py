@@ -243,7 +243,6 @@ def detect_breakout_short(closes, token):
     # If price is above EMA200, the breakout is likely a pullback, not a reversal.
     # Backtest: all winners had price below EMA200, all losers above.
     if len(closes) >= 200:
-        ema200_vals = []
         k200 = 2.0 / 201
         ema200_val = closes[0]
         for p in closes[1:]:
