@@ -403,3 +403,7 @@
   WHY: 0T last hour (quiet market). 24h 87T 52.9% WR -$0.60 (flat). ATR SL 44.1% (above 40% threshold but trail compensating +$1.91 vs SL -$2.79). accel-300- kill confirmed working — last trade closed 08:55 UTC. No 0% WR kill candidates (0 trades last hour). 2 open trades healthy. Today 34T 41.2% WR -$1.16 (low sample). No param changes.
   BY: auto_1hr
   NEXT: Re-run at 12:30 UTC
+[2026-08-13 13:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (+$0.03). 24h 81T 58% WR -$0.11 (flat). ATR SL 38.3% (below 40%). 4 open trades (all range_breakout_short). accel-300- kill working. Market quiet. No action needed.
+  BY: auto_1hr
+  NEXT: Re-run at 14:30 UTC

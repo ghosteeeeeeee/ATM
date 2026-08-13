@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -645,6 +645,33 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 continue
             if is_delisted(token):
                 continue
+
+            # ── SLOPE FILTER (2026-08-13) ──────────────────────────────────────
+            # Block SHORT signals when price is trending UP (positive slope).
+            # Catches hzscore-, range_breakout_short, continuation- chasing upward moves.
+            # Uses 20-bar linear regression on 1m candles.
+            if direction.upper() == 'SHORT':
+                try:
+                    conn_slope = sqlite3.connect(CANDLES_DB, timeout=5)
+                    rows_slope = conn_slope.execute(
+                        "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 25",
+                        (token.upper(),)
+                    ).fetchall()
+                    conn_slope.close()
+                    if rows_slope and len(rows_slope) >= 20:
+                        closes = [r[0] for r in reversed(rows_slope)]
+                        chunk = closes[-20:]
+                        x_mean = 9.5
+                        y_mean = sum(chunk) / 20
+                        denom = sum((i - x_mean) ** 2 for i in range(20))
+                        numer = sum((i - x_mean) * (chunk[i] - y_mean) for i in range(20))
+                        slope_pct = (numer / denom) / y_mean * 100 if denom > 0 and y_mean != 0 else 0
+                        if slope_pct >= -ACCEL_300_REGIME_SLOPE_PCT:
+                            log(f"  🚫 [SLOPE-FILTER] {token} SHORT: slope={slope_pct:+.4f}% >= -{ACCEL_300_REGIME_SLOPE_PCT}% — price trending up, skip")
+                            continue
+                except Exception:
+                    pass  # non-fatal: skip slope check if DB query fails
+
             # ── CONFLUENCE ENFORCEMENT (2026-04-18) ─────────────────────────────────
             # Single-source signals must NEVER be approved to hot-set.
             # They stay PENDING until a second source appears for the same token+direction.

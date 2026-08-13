@@ -7136,3 +7136,28 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Today Aug 13 worst day in 7d ($-1.16) — but low sample (34T), could be variance
 - Watch if activity picks up next hour
+
+## 2026-08-13 13:30 UTC — Hourly Analysis
+
+**Trades:** 1 closed (1W, 0L)
+**PnL:** $0.03 (ETH LONG bb_bounce+,rs-s65 → profit-monster-trail)
+
+**24h Snapshot:**
+- 81 trades, 58.0% WR, -$0.11 (flat)
+- ATR SL hit rate: 38.3% (below 40% threshold) ✓
+- profit-monster-trail: 47T +$1.97 (primary profit driver)
+- atr_sl_hit: 31T -$2.30 (compensated by trail)
+- 4 open trades (all range_breakout_short — best signal)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 38.3% — below 40% threshold
+- Trade freq 1-4/hr — quiet market, no overtrading
+- accel-300- kill confirmed working (trailing entries closing)
+- All signals performing within expectations
+- Today Aug 13 flat overall (35T, -$0.08) — low sample
+
+**Open Questions:**
+- Market unusually quiet — watch for activity pickup
+- accel-300- trailing entries will take time to fully close
