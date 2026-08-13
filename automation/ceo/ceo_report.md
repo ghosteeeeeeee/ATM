@@ -1,3 +1,39 @@
+## CEO Report — 2026-08-15 (latest verified)
+
+### Diagnosis
+24h: 65T **-$0.76** (52.3% WR — RED). 7d: 439T **-$0.30** (51.3% WR — flat, stable). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 50T **-$1.35** (46.0% WR — worst day, legacy clearing). 2 open $0 flat. Pipeline healthy.
+
+### Root Cause
+All losses from legacy disabled signals clearing. No new bleeders:
+- accel-300- SHORT 40T -$0.30 (55% WR, inverted R:R) — **DISABLED**, legacy draining
+- range_breakout+ LONG 8T -$0.41 (25% WR) — **DISABLED**
+- trend_momentum_near_sma+ LONG 6T -$0.37 (16.7% WR) — **DISABLED**
+- continuation-,hzscore- SHORT 5T -$0.24 (40% WR) — **DISABLED**
+
+Active SHORT profitable: range_breakout_short 23T +$0.07 (52.2%), hzscore- 30T -$0.02 (56.7%), bb-bounce-short,hzscore- 18T +$0.14 (61.1%).
+
+Cost drivers 48h: atr_sl_hit 71T **-$4.91** (dominant). profit-monster-trail compensating.
+
+### Stars7d (profitable, intact)
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5%
+- bb_bounce+ LONG: 21T +$0.21 61.9%
+- bb_bounce+,hzscore+ LONG: 34T +$0.22 50%
+- hzscore+,mover+ LONG: 5T +$0.17 80%
+- bb-bounce-short,hzscore- SHORT: 18T +$0.14 61.1%
+
+### Fix Applied
+NO CHANGES. System flat, all bleeders disabled, legacy clearing, stability period. 7d stable at -$0.30. hzscore+ standalone 14d -$0.20 (38.5% WR, inverted R:R at high confidence) — monitor, next signal quality tuner will assess.
+
+### Verification
+Stars7d: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb_bounce+ 21T +$0.21 61.9%, bb_bounce+,hzscore+ 34T +$0.22 50%, hzscore+,mover+ 5T +$0.17 80%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Active SHORT profitable: hzscore- 29T +$0.09 58.6%, range_breakout_short 23T +$0.07 52.2%. 2 open SHORT $0 flat (range_breakout_short, hzscore-). Pipeline healthy.
+
+### Monitor
+- daily PnL (if -2 consecutive red after legacy clears → investigate)
+- SHORT7d (if -$1.50+ persists after accel-300- fully clears → regime filter)
+- hzscore+ standalone (if continues bleeding → disable HZSCORE_PLUS_ENABLED)
+
+---
+
 ## CEO Report — 2026-08-15 (verified)
 
 ### Diagnosis
@@ -78,3 +114,27 @@ All losses from legacy draining — no new bleeders:
 - range_breakout_short: if another red day → consider disable
 - daily PnL: 2 consecutive red days after legacy clears → investigate
 - SHORT7d: if -$1.50+ persists → regime filter
+
+---
+
+## CEO Report — 2026-08-13 (acknowledgment)
+
+### SHORT Velocity Filter Deployed
+Global SHORT velocity filter live in `signal_compactor.py` HOTSET-FILTER.
+
+**What:** Blocks SHORT when price rising (vel>0.1%) OR last 3 candles green. LONG unaffected.
+**Backtest:** Blocked trades 12% WR (losers), kept 89% WR (winners). Net +$3.52/14d.
+**Bugs fixed:** 3 issues caught by bug_hunter — dead code green candle check, wrong candle order, connection leak. All resolved.
+
+No trading param changes. Monitor SHORT WR next 24h for filter impact.
+
+---
+
+## CEO Report — 2026-08-13 (r2_trend_long deployed)
+
+New signal: r2_trend_long — R² trend confirmation for LONG entries.
+Fires when R²>0.6, slope>0, price above regression line. Catches slow grinds.
+Backtested on BSV: R²=0.91 during +3.5% rally.
+Bug hunter: 2 bugs fixed (connection leak, flag check ordering).
+Also updated add-signal skill with solo variant docs.
+No trading changes. Signal is live, monitoring for first trades.
