@@ -133,3 +133,16 @@ This is a "nice to have" — hysteresis is the priority fix. Graduation adds com
 | MIN_TRADES | 3 | 3 | Keep |
 | WINDOW | 5 | 5 | Keep |
 | TIME_WINDOW | 30 | 30 | Keep |
+
+---
+
+## Weather Vane v2 — Deployed (2026-08-13)
+
+**Status:** Live. Bug hunter: ALL CLEAR.
+
+**Changes:**
+- `signal_compactor.py`: Hysteresis — stays suppressed until WR >= 45% (prevents on/off thrashing at boundary)
+- `signal_compactor.py`: Off-course alarm — logs warning at 2/5 losses (early visibility, no scoring impact)
+- `hermes_constants.py`: `DIRECTIONAL_OUTCOME_RECOVERY_WR = 45`
+
+**No trading changes.** Pure scoring adjustment — cold directions stay suppressed longer until proven recovery. Per CEO approval from v2 evaluation.
