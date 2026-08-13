@@ -1,3 +1,42 @@
+## CEO Report — 2026-08-13 (Spec Review: Progressive Context Shaping)
+
+### Verdict: NOT APPROVED — Over-engineering, revisit if drift is validated
+
+**The spec solves a problem we don't have.** Hermes already has 6 overlapping context/state files: AGENTS.md (stable rules), orchestrator_prompt.md (execution context), ceo_prompt.md (strategy), OpenMemory (cross-session memory), ceo_kanban.md (decision history), ceo_report.md (session summaries). Adding a 7th file (CURRENT.md) is complexity, not simplicity.
+
+### What's wrong
+
+1. **No validated problem.** The spec claims "agents drift on stale context" but provides no evidence. The orchestrator already has 218 lines of structured phases. The CEO prompt already reads kanban at session start. Where's the actual drift?
+
+2. **OpenMemory already does this.** The `openmemory_openmemory_store/query` system is literally "cross-session context for agents." CURRENT.md is a markdown reimplementation of what OpenMemory already provides, but worse (no search, no salience, manual maintenance).
+
+3. **CURRENT.md is unfocused.** It mixes 6 concerns: active goal, decisions, limitations, backlog, guardrails, stop conditions. That's not "short, live, readable in <30s" — it's a mini-AGENTS.md.
+
+4. **YouTube transcript ≠ system requirements.** This was mined from "Three OpenAI Engineers Shipped A Million Lines." That's a different scale, different architecture, different problem. Applying their solution without validating we have their problem is cargo-cult engineering.
+
+5. **Maintenance burden.** Who updates CURRENT.md? If agents do, it becomes stale like the orchestrator prompt it's supposed to fix. If humans do, it's one more file to maintain. The spec doesn't answer this.
+
+### What's right
+
+- The4-layer mental model (stable/current/map/history) is useful as a diagnostic lens, not as an implementation plan.
+- Recording signal deprecation *reasons* (not just state) is genuinely good. That should be a standalone improvement to `signal_lifecycle.py`, not bundled into this spec.
+- The context map idea (where signals live, how to test) is useful as a one-time documentation effort, not a living file.
+
+### What to do instead
+
+1. **Don't create CURRENT.md.** Use OpenMemory for cross-session state. Use kanban for decisions. Use ceo_report.md for session summaries. These already work.
+2. **Extract the good parts as standalone changes:**
+   - Add deprecation reasons to `signal_lifecycle.py` (small, useful)
+   - Add a signal context map as a one-time doc (not a living file)
+3. **If drift is actually observed** (agents repeating work, missing context), then and only then revisit. But measure first — grep CEO reports for "repeated" decisions or "missed" context.
+4. **Don't modify orchestrator_prompt.md or ceo_prompt.md** for this. Those files are already long enough. Adding CURRENT.md references adds complexity without fixing root causes.
+
+### CURRENT.md focus issues
+
+The current CURRENT.md is 56 lines — already over the 50-line "graveyard" stop condition it sets for itself. The "System Improvement Backlog" section (lines 23-38) is a duplicate of what should be in a separate planning file, not in the "current state" document. The "What NOT To Do" section (lines 39-45) duplicates AGENTS.md behavioral directives. This file is trying to be everything, which means it's nothing.
+
+---
+
 ## CEO Report — 2026-08-13 (Latest)
 
 ### Diagnosis
@@ -358,3 +397,54 @@ NO CHANGES. Stability period active. System flat (7d +$0.16). Stars intact. acce
 ## CEO Report — 2026-08-15 (Z-Score+Accel Thresholds Refactor — Noted)
 
 **Acknowledged.** Thresholds for Z-Score+Acceleration alignment filter hardcoded in `decider_run.py` (0.5, 0.005) moved to `hermes_constants.py` as `ZSCORE_ACCEL_Z_THRESHOLD` and `ZSCORE_ACCEL_ACCEL_THRESHOLD`. Named constants imported by `decider_run.py`. Bug hunter: ALL CLEAR. No trading changes — single source of truth refactor only.
+
+---
+
+## CEO Report — 2026-08-15 (Weather Vane v4 — Tide Detection)
+
+### Verdict: APPROVED WITH MODIFICATIONS
+
+**Correlations are strong.** 839 trades, 14 days. 22-point WR gap (57.1% vs 35.2%) is the largest single-signal gap in our backtests. SHORT win rate as tide indicator is clean: >55% = bearish (SHORTs winning), <45% = bullish (SHORTs losing). BTC z-score adds confirmation but less standalone signal.
+
+**Risks identified:**
+1. **Backward-looking SHORT WR.** It reflects *recent outcomes*, not *future direction*. By the time SHORT WR hits 55%, the bearish move may already be priced in. Lag = missed entries on the best trades.
+2. **Data gap: BTC 1h candles.** Only 18 available (need 20 for z-score). Minor — works at 18 with `if len(closes) < 10: return 0.0` fallback. But if price_collector stalls, z-score degrades to 0.0 (neutral). Acceptable fail-open.
+3. **Feedback loop.** Suppressing LONGs during "bearish tide" reduces LONG volume → SHORT WR stays high → suppression persists. In a ranging market this could lock us out of LONG entries for hours. Circuit breaker needed.
+4. **Dead zone 45-55%.** Neither condition fires → no suppression. This is correct (neutral = trade both), but means tide detection is binary: full suppression or nothing. No gradient.
+
+### Modifications Required
+
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | **Soft penalty 0.7x** (not hard SKIP) | Aligns with Weather Vane v3 precedent. Hard blocks too blunt — 22-point gap is strong but 839 trades is still modest. |
+| 2 | **Circuit breaker**: if >25% of signals penalized in 24h, auto-disable TIDE_ENABLED | Prevents feedback-loop lockout in ranging markets |
+| 3 | **Minimum SHORT trade count: 10** (not 5) | 5 trades is noise. Need 10+ for WR to be meaningful. Spec says "if len(short_rows) < 5: return 1.0" — change to 10. |
+| 4 | **Fallback: z-score uses closes[-1] if <20 candles** | Currently returns 0.0 (neutral). Better: use available candles (min 10 per existing code). Already handled. |
+
+### Data Freshness Assessment
+
+| Data | Source | Fresh? | Notes |
+|------|--------|--------|-------|
+| SHORT win rate | signal_outcomes (SQLite) | YES — 194 SHORT trades in 7d | Real-time |
+| BTC z-score | candles_1h (candles.db) | YES — 18 candles available | Needs price_collector running |
+| PostgreSQL trades | brain DB | YES — 103 trades in 24h | Real-time |
+
+No data freshness blockers. Both sources are actively populated.
+
+### Integration (2 files only)
+
+1. `hermes_constants.py` — add 6 TIDE_* params (~8 lines)
+2. `signal_compactor.py` — add `get_tide_penalty()` + `_get_btc_z_score()` (~40 lines), integrate into `_score_signal()` (~3 lines)
+
+### Expected Impact
+
+- **Target**: +2-4% WR on counter-tide trades
+- **Risk**: Low — soft penalty (0.7x) means counter-tide trades still fire, just ranked lower
+- **Revert**: `TIDE_ENABLED = False` (one-line toggle)
+
+### Priorities After Approval
+
+1. Implement tide detection (30 min)
+2. Monitor 48h — verify SHORT WR window behaves as expected
+3. Circuit breaker: add auto-disable if feedback loop detected
+4. If tide detection shows <1% WR improvement after 7d → disable (YAGNI)
