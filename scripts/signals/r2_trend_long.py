@@ -16,6 +16,7 @@ Source: r2l-long{N}
 """
 
 import sys, os, sqlite3, time
+import numpy as np
 from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -25,6 +26,11 @@ from paths import HERMES_DATA
 from hermes_constants import (
     R2_TREND_LONG_ENABLED,
     R2_TREND_LONG_MIN_SLOPE,
+    R2_TREND_LONG_MIN_R2,
+    R2_TREND_LONG_MAX_RSI,
+    R2_TREND_LONG_MIN_SPEED,
+    R2_TREND_LONG_MAX_BB_POS,
+    R2_TREND_LONG_BLOCK_STALE,
     LONG_BLACKLIST,
 )
 
@@ -83,8 +89,8 @@ def detect_r2_long(token, candles, price):
     y = closes[-R2_WINDOW:]
     slope, intercept, r2 = _ols_params(y)
 
-    # LONG conditions: slope > 0, price above line, R² meaningful
-    if slope <= 0 or closes[-1] <= intercept:
+    # LONG conditions: slope > 0, price above line, R² strong enough
+    if r2 < R2_TREND_LONG_MIN_R2 or slope <= 0 or closes[-1] <= intercept:
         return None
 
     # Transition detector: R² must be RISING from below threshold
@@ -191,6 +197,25 @@ def scan_signals():
         if token.upper() in LONG_BLACKLIST:
             continue
 
+        # ── Speed/momentum filters ──────────────────────────────────────
+        # Check token_speeds for stale and speed
+        try:
+            _conn_spd = sqlite3.connect(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'signals_hermes_runtime.db'), timeout=5)
+            _cur_spd = _conn_spd.cursor()
+            _cur_spd.execute('''SELECT speed_percentile, is_stale, momentum_score FROM token_speeds WHERE token = ?''', (token.upper(),))
+            _spd_row = _cur_spd.fetchone()
+            _conn_spd.close()
+            if _spd_row:
+                _speed, _is_stale, _mom = _spd_row
+                # Block stale tokens (no momentum)
+                if R2_TREND_LONG_BLOCK_STALE and _is_stale:
+                    continue
+                # Require minimum speed
+                if _speed is not None and _speed < R2_TREND_LONG_MIN_SPEED:
+                    continue
+        except Exception:
+            pass  # non-fatal
+
         candles = _get_candles_1m(token)
         if not candles or len(candles) < R2_WINDOW * 2:
             continue
@@ -198,6 +223,30 @@ def scan_signals():
         sig = detect_r2_long(token, candles, price)
         if sig is None:
             continue
+
+        # ── RSI filter: don't buy overbought ──────────────────────────────
+        closes_list = [c['close'] for c in candles]
+        if len(closes_list) >= 15:
+            deltas = [closes_list[i] - closes_list[i-1] for i in range(1, len(closes_list))]
+            gains = [d if d > 0 else 0 for d in deltas[-14:]]
+            losses_rsi = [-d if d < 0 else 0 for d in deltas[-14:]]
+            avg_gain = sum(gains) / 14
+            avg_loss = sum(losses_rsi) / 14
+            if avg_loss > 0:
+                rsi = 100 - (100 / (1 + avg_gain / avg_loss))
+            else:
+                rsi = 100.0
+            if rsi > R2_TREND_LONG_MAX_RSI:
+                continue
+
+        # ── BB position filter: don't chase at band top ──────────────────
+        if len(closes_list) >= 20:
+            mean_20 = np.mean(closes_list[-20:])
+            std_20 = np.std(closes_list[-20:])
+            if std_20 > 0:
+                bb_pos = (closes_list[-1] - (mean_20 - 2 * std_20)) / (4 * std_20)
+                if bb_pos > R2_TREND_LONG_MAX_BB_POS:
+                    continue
 
         sid = add_signal(
             token=token.upper(),
