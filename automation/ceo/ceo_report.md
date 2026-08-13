@@ -29,3 +29,17 @@ All prior fixes confirmed: range_breakout+ 0 trades post-disable, hzscore+ stand
 **Expected impact:** Reduces score for directions on cold streaks, should cut consecutive losses in a direction. Milder penalty (0.7x) for first deploy — can tighten to 0.5x if needed.
 
 **Component 2 (Position Shield):** Unblocked. Ready when needed.
+
+---
+
+## Global Spike Filter — Acknowledged (2026-08-13)
+
+**Status:** Deployed. Code in `signal_compactor.py`, constants in `hermes_constants.py:615-620`.
+
+**What it does:** Blocks SHORT entries during bullish momentum:
+1. Last 3 closed 5m candles with bullish close > 0.3% → block
+2. RSI < 30 → block (oversold bounce risk)
+
+Backtested 195 SHORT trades: blocks 6 losers (TIA, CFX, IO, YGG, LINEA, BIGTIME) vs 3 tiny winners ($0.01-$0.03). Ratio 0.5x — good.
+
+**Expected impact:** Reduces SHORT entries against momentum. Global filter applies to all SHORT signals. range_breakout_short still has its own spike filters as second layer.
