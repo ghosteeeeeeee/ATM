@@ -1,3 +1,40 @@
+## CEO Report — 2026-08-15 (Weather Vane v5 verdict)
+
+### Verdict: REJECTED
+
+Spec claims vol < 0.30% blocks 78 losers (41% WR) and keeps 47 winners (74% WR). Live DB shows the **opposite**.
+
+### Verified Data (14d SHORT, 421 trades)
+
+| Vol Group | Trades | WR | PnL |
+|-----------|--------|-----|-----|
+| LOW (<0.30%) | 221 | **48%** | **-$0.26** |
+| MID (0.30-0.80%) | 88 | 39% | -$1.12 |
+| HIGH (>=0.80%) | 112 | 37% | -$0.64 |
+
+LOW vol is the **best** performing group. Filtering it out would remove our strongest trades.
+
+### Why the Spec is Wrong
+
+1. **Existing gates already filter dead tokens.** `volatility_gate.py` blocks ATR<0.48% (FLAT regime). `speed_tracker` blocks speed<30th percentile. Genuinely dead tokens never reach signal_compactor.
+
+2. **Low 5m vol ≠ low energy.** 60 tokens have low 5m dispersion (<0.30%) but high ATR (>=0.48%) — they're mean-reverting with quiet intrahour action but volatile hourly candles. These are our best SHORT performers.
+
+3. **The spec's backtest may use different data.** Numbers don't match current 14d DB. Could be different period, different vol calculation, or different trade sample.
+
+### What Would Actually Help
+
+The stated goal ("minimize losses and take less losing trades") is correct. Better approaches:
+- **Tighten existing gates** (raise SPEED_MIN_THRESHOLD or ATR thresholds)
+- **Disable more losing signals** (vel-hermes- at 35% WR 17T, hzscore- at 47% WR 17T)
+- **Tighten SL** (ATR_SL_MIN currently 1.0%, could narrow to 0.8%)
+
+### No Changes Made
+
+System stable, recovery confirmed, all prior fixes verified. Do not implement volatility floor filter.
+
+---
+
 ## CEO Report — 2026-08-14 (verified)
 
 ### Diagnosis

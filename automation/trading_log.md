@@ -7161,3 +7161,28 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Market unusually quiet — watch for activity pickup
 - accel-300- trailing entries will take time to fully close
+
+## 2026-08-13 14:30 UTC — Hourly Analysis
+
+**Trades:** 1 closed (0W, 1L)
+**PnL:** $-0.08 (FIL SHORT, atr_sl_hit)
+
+**24h Snapshot:**
+- 73 trades, 57.5% WR, -$0.13 (flat)
+- ATR SL hit rate: 39.7% (just under 40% threshold) ✓
+- profit-monster-trail: 41T +$1.84 (primary profit driver)
+- accel-300-: 35T, 54.3% WR, -$0.31 — all trades opened before 03:37 UTC, kill confirmed working
+- range_breakout_short: 20T, 55% WR, +$0.10 (best performer)
+- 6 open trades healthy
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 39.7% — below 40% threshold, profit-monster-trail compensating (+$1.84 vs -$2.19)
+- Trade freq 1/hr — quiet market, no overtrading
+- accel-300- kill working — all trailing entries closed
+- System flat — no param changes needed
+
+**Open Questions:**
+- Market quiet — 1 trade/hr, watch for activity pickup
+- FIL trade -77.4% pnl_pct extreme but only -$0.08 actual loss (low-priced token effect)
