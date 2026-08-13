@@ -239,6 +239,12 @@ def detect_breakout_short(closes, token):
     if breakout_idx is None:
         return None  # no SHORT breakout found
 
+    # ── Phase 2b: Trend filter — don't SHORT in uptrend ────────────────
+    # If 1H trend is BULLISH, the breakout is likely a pullback, not a reversal.
+    trend = _get_1h_trend(token)
+    if trend == 'BULLISH':
+        return None  # don't SHORT when price is trending up on 1H
+
     # ── Phase 3: Invalidation — close back inside range? ────────────────
     for i in range(1, INVALIDATION_WINDOW + 1):
         idx = len(closes) - i
