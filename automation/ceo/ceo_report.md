@@ -1,7 +1,16 @@
-## CEO Report — 2026-08-13 22:30 UTC (verified)
+## CEO Report — 2026-08-13 (latest verified)
 
 ### Diagnosis
-24h: 53T **-$1.62** (43.4% WR — RED, worst recent 24h). 7d: 425T **-$0.28** (51.5% WR — flat). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 51T **-$1.45** (45.1% WR — worst day). 5 open. Pipeline healthy.
+24h: 54T **-$1.66** (42.6% WR — RED). 7d: 424T **-$0.32** (51.4% WR — flat). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 52T **-$1.49** (44.2% WR — worst day). 4 open SHORT -$0.11. Pipeline healthy.
+
+### Root Cause
+hzscore- standalone SHORT has inverted R:R — 31T 53.1% WR but avg_win $0.053 vs avg_loss $0.073 = -$0.12/7d. Still generating new signals today (15T -$0.08 24h). All other bleeders are disabled legacy clearing naturally.
+
+### Fix Applied
+DISABLED HZSCORE_MINUS_ENABLED=False. Expected: -$0.12/7d saved. Stars7d intact (5 profitable): bb_bounce+,range_finder+ +$0.71 58.5%, bb_bounce+ +$0.21 61.9%, bb_bounce+,hzscore+ +$0.22 50%, hzscore+,mover+ +$0.17 80%, bb-bounce-short,hzscore- +$0.14 61.1%. Cost drivers48h: atr_sl_hit 68T -$4.90 (dominant).
+
+### Verification
+Monitor 48h: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ after legacy clears → regime filter), hzscore- legacy positions draining naturally.
 
 ### Root Cause
 Two active problems:

@@ -294,3 +294,16 @@ ALERTS:
 
 ## Error Alerts — 2026-08-13 21:09 UTC
 - **REPEATED** (23x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'R2_TREND_LONG_ENABLED' is not defined`
+
+## Health Check — 2026-08-13 22:40 UTC
+- **Status**: ALL CLEAR — no issues detected
+- **Pipeline**: active, last run completed 22:39:19 (18.7s CPU)
+- **Guardian**: active
+- **Signals (1h)**: 155 generated, 64 in last 30min
+- **Open positions**: 5/6 (logs show 5 active)
+- **Prices**: 1m candles 1.3min old, 123 coins — fresh
+- **Candles**: 212 coins on 15m — healthy
+- **Disk**: 81% (118G total, 22G free)
+- **Timers**: hermes-pipeline.timer firing on schedule (next: 22:41)
+- **Errors**: 0 in last 30min
+- **Regime**: 1 long bias, 1 short bias, 102 neutral
