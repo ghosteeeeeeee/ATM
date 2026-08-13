@@ -6784,3 +6784,34 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - hzscore+ 33.3% WR on 3T — approaching kill threshold, watch next hour
 - accel-300- volume leader but slight negative — monitor if degrading
+
+## [2026-08-13 03:26 UTC] Hourly Analysis
+
+**Trades:** 5 closed since 02:30 (2 wins, 3 losses)
+**PnL:** -$0.25 (40% WR)
+
+**24h Snapshot:**
+- 106T, 56W (52.8% WR), ~$0 flat
+- ATR SL: 48/106 = 45.3% — above 40% threshold
+- profit-monster-trail: 54/106 (+$2.59) — compensates SL losses (-$3.37)
+- Net trail+SL: -$0.78
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 15T, +$0.43, 66.7% WR
+- ✅ hzscore- SHORT: 12T, +$0.01, 50% WR
+- ⚠️ accel-300- SHORT: 35T, -$0.17, 57.1% WR — volume leader
+- ⚠️ range_breakout- SHORT: 19T, -$0.27, 42.1% WR — losing
+- ❌ hzscore+ LONG: 3T, -$0.12, 33.3% WR — at threshold but only 3T
+- ❌ range_breakout+ LONG: 7T, -$0.44, 14.3% WR — already killed
+
+**Changes:** NONE — no kill candidates. ATR SL above threshold but trail compensating. No signal has 3+ trades with 0% WR in last hour. Trade freq normal.
+
+**No Change Needed:**
+- ATR SL at 45.3% — above threshold but profit-monster-trail net compensates
+- hzscore+ at kill threshold (33.3% WR, 3T) but too few trades — watch next hour
+- Trade frequency 5T/5h — normal range
+- Pipeline active, 5 open trades healthy
+
+**Open Questions:**
+- range_breakout- at 42.1% WR, 19T — trending toward kill threshold if degrades further
+- accel-300- volume leader but slight negative PnL — monitor if degrading

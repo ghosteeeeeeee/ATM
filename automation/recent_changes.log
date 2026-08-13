@@ -361,3 +361,7 @@
   WHY: 1T last hour (ETC SHORT accel-300- atr_sl_hit -$0.06). 24h 103T 53.4% WR -$0.22 (flat). ATR SL 43.7% (above 40% threshold but profit-monster-trail compensating +$2.52 vs -$3.12). No 0% WR kill candidates. hzscore+ 33.3% WR 3T (approaching kill threshold but below sample). Trade freq 4.3/hr normal. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 03:30 UTC
+[2026-08-13 03:26] auto_1hr: NO CHANGES
+  WHY: 5T since last analysis (2W 3L -$0.25). 24h 106T 52.8% WR flat. ATR SL 45.3% (above 40% threshold, trail compensating +$2.59 vs -$3.37). No 0% WR kill candidates (hzscore+ 33.3%WR 3T — at threshold but too few). range_breakout+ already killed. Trade freq 5T/5h normal. 5 open trades active. Pipeline healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 04:26 UTC
