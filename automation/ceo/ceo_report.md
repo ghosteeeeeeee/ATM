@@ -105,3 +105,41 @@ Aug 12 recovery confirmed (+$0.49, 57.0% WR). Aug 13 11T -$0.52 (36.4% WR — co
 - Daily PnL: if -2 consecutive red days → investigate
 - accel-300- SHORT: if持续 bleeding → disable ACCEL_300_MINUS_ENABLED
 - SHORT7d: currently improving, below -$1.50 threshold
+
+---
+
+## CEO Report — 2026-08-13 (Weather Vane v3 Evaluation)
+
+### Verdict: APPROVE WITH MODIFICATIONS
+
+**Core insight is sound.** Structure shifts (HH_HL↔LH_LL) indicate uncertainty, and uncertainty kills trades. The data is direction-symmetric: shifts hurt LONG AND SHORT. This is a volatility filter, not a directional call.
+
+### Concerns
+
+1. **Sample sizes too small.** 20 SHORT shifted trades and 37 LONG shifted trades are not statistically significant. Need 14-day backtest with 100+ shifted trades per direction before deploying live.
+
+2. **"N → HH_HL" is not a shift — it's emergence.** The spec conflates emerging structure (N → HH_HL) with actual shifts (HH_HL → LH_LL). These are different things. The backtest shows emerging bullish (N → HH_HL) hurts LONG (37% WR, -$0.62) — but that's because LONG entries during emerging bullish are chasing, not because structure is uncertain. Separate these cases.
+
+3. **Suppression is too blunt.** 57/391 trades (15%) suppressed for ~$1.33/week net benefit (saves $19 losses, loses $17.67 wins). Use soft penalty (0.7x-0.8x) instead of hard suppression — preserves high-confidence trades while penalizing uncertainty.
+
+### Required Changes
+
+| Item | Spec Says | Should Be | Why |
+|------|-----------|-----------|-----|
+| Filter type | Hard suppression (continue) | Soft penalty (0.75x mult) | Preserves high-confidence trades during shifts |
+| Emerging structure | Treated same as shift | Separate category — no penalty | N→HH_HL is not HH_HL→LH_LL |
+| Backtest | 7 days | 14 days, 100+ shifted trades each | 20/37 trades is not significant |
+| Circuit breaker | None | Disable if >20% signals suppressed in 24h | Prevents over-filtering in choppy markets |
+| Min swings | 8 | 10 | 8 is too few for reliable structure classification |
+
+### Implementation Path
+
+1. Add `STRUCTURE_SHIFT_ENABLED`, `STRUCTURE_SHIFT_PENALTY=0.75`, `STRUCTURE_SHIFT_WINDOW=50`, `STRUCTURE_SHIFT_MIN_SWINGS=10` to `hermes_constants.py`
+2. Add `check_structure_shift(token)` to `signal_compactor.py` — returns penalty multiplier, not bool
+3. Apply as soft penalty in `_score_signal()`, not hard block in HOTSET-FILTER
+4. Backtest 14 days before live deploy
+5. Add circuit breaker: if >20% of signals penalized in any 24h window → auto-disable STRUCTURE_SHIFT_ENABLED
+
+### Decision
+
+**APPROVE with modifications.** Implement soft penalty version, backtest 14 days, deploy only if backtest shows >$2/week improvement. No rush — system flat, stability period active.
