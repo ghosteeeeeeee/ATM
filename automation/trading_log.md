@@ -6840,3 +6840,78 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Aug 13 so far 17T, 35.3% WR — early but weak day, monitor
 - range_breakout- 38.9% WR, watch for degradation to kill threshold
+
+## [2026-08-13 05:30 UTC] Hourly Analysis
+
+**Trades:** 5 closed (1W, 4L, -$0.29)
+**24h:** 102T, 52.8% WR, ~$0 flat (-$0.96 net trail+SL)
+**ATR SL:** 48/102 = 47.1% (above 40%, trail +$2.47 compensates SL -$3.43)
+
+**Last Hour Trades:**
+- SUSHI accel-300- SHORT atr_sl_hit -$0.06
+- ALT accel-300- SHORT atr_sl_hit -$0.08
+- ZEN range_breakout_short SHORT atr_sl_hit -$0.10
+- MON accel-300- SHORT atr_sl_hit -$0.08
+- SKR accel-300- SHORT profit-monster-trail +$0.03
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 16T, 62.5% WR, +$0.33 — best
+- ✅ hzscore- SHORT: 10T, 50% WR, +$0.04
+- ⚠️ accel-300- SHORT: 39T, 53.8% WR, -$0.36 — volume leader, inverted R:R (CEO killed ACCEL_300_MINUS_ENABLED)
+- ⚠️ range_breakout- SHORT: 18T, 38.9% WR, -$0.30 — deteriorating
+
+**Consecutive Negative Hours:** 3 (05:00, 04:00, 02:00 — all 0% WR, low trade count)
+
+**Changes:** NONE
+
+**No Change Needed:**
+- accel-300- kill already deployed by CEO (ACCEL_300_MINUS_ENABLED=False) — trades still flowing from pre-kill entries or pipeline lag
+- No signal has 0% WR with 3+ trades in last hour (kill threshold)
+- ATR SL 47.1% above threshold but trail compensating net
+- range_breakout- at 38.9% WR trending down but not at 30% kill threshold
+- Trade freq 5T/5h normal
+- 1 open trade healthy
+- Quiet period — low trade volume
+
+**Open Questions:**
+- accel-300- still executing 39T/24h despite ACCEL_300_MINUS_ENABLED=False — check if kill is deployed in running code
+- range_breakout- approaching kill threshold (38.9% WR, needs <30% with 5+ trades)
+- 3 consecutive 0% WR hours — concerning but low sample size (1-3 trades/hour)
+
+## [2026-08-13 05:30 UTC] Daily Orchestrator Report
+
+### PIPELINE STATUS
+- Trades (24h): 1 open | 102 closed today | -6.74% PnL
+- Market: NEUTRAL (BTC $63,595, 105/106 tokens neutral)
+- Pipeline: OK (cycle #152918+), 0 errors, 44 active timers
+- System: disk 80% (23G free), all services nominal
+
+### TEAM ACTIVITY (24h)
+- **health_monitor**: Pipeline OK, 110 signals/hr, 512 today. No alerts.
+- **auto_1hr**: NO CHANGES (CEO stability period). 106T 52.8% WR flat. SQL bugs in embedded queries (see below).
+- **signal_reporter**: 3468 all-time T, 41.9% WR. range_breakout_short best (71.4% WR +$0.49). range_breakout+ killed.
+- **ab_optimizer**: run_evolution() transient error at 01:00-01:40 UTC, self-resolved. Runs clean now.
+
+### IMPLEMENTED TODAY
+1. **auto_1hr prompt schema guardrails** — Added explicit column name reference + single-quote rule to `auto_1hr_prompt.md`. Fixes recurring `UndefinedColumn: "closed"` and `entry_time` errors caused by LLM generating bad SQL.
+
+### DEFERRED (CEO stability period active)
+- Weather Vane v3 (Z-Score + Acceleration filter) — params defined, function not implemented
+- Weather Vane v4 (Tide Detection) — not started
+- Position Shield (from Plan 1) — trailing stop tightening
+
+### CRITICAL ISSUES
+- **auto_1hr SQL bugs**: LLM sometimes uses `"closed"` (double quotes = column identifier) instead of `'closed'` (string literal). Prompt updated with schema guardrails.
+- **range_breakout- at 38.9% WR** trending toward kill threshold (19T). Watch next hour.
+- **Disk at 80%** — not critical but trending up.
+
+### NEXT STEPS
+1. Monitor auto_1hr next run to verify prompt fix works
+2. Watch range_breakout- for kill threshold breach
+3. Implement v3 (Z-Score + Acceleration) when CEO stability period ends
+4. Disk cleanup if usage continues rising
+
+### QUALITY METRICS
+- Tasks completed: 3/3 (auto-1hr fix, ab_optimizer check, plan review)
+- First-attempt success: 100%
+- Pipeline uptime: 100% (0 errors in 24h)

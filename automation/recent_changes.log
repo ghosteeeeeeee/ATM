@@ -369,3 +369,7 @@
   WHY: 0T last hour (quiet period). 24h 103T 52.8% WR ~$0 flat. ATR SL 45.6% (above 40% threshold, trail compensating +$2.51 vs -$3.26). No kill candidates (no last-hour trades). range_breakout- 38.9% WR 18T deteriorating but no 0% WR last hour. Trade freq 4.3/hr normal. 6 open trades healthy. Aug 13 early but weak 35.3% WR. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 05:26 UTC
+[2026-08-13 05:30] auto_1hr: NO CHANGES
+  WHY: 5T last hour (1W 4L -$0.29). All SHORT, 4 atr_sl_hit. 24h 102T 52.8% WR ~$0 flat. ATR SL 47.1% (above 40% threshold, trail compensating +$2.47 vs SL -$3.43). No 0% WR kill candidates (accel-300- killed by CEO, range_breakout- 38.9% WR not at 30% threshold). Trade freq 5T/5h normal. 1 open trade. 3 consecutive negative hours but low sample. accel-300- still executing 39T/24h despite ACCEL_300_MINUS_ENABLED=False — may be pipeline lag or pre-kill entries. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 06:30 UTC

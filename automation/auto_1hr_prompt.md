@@ -115,6 +115,25 @@ Append to `automation/trading_log.md`:
 - [Anything unclear]
 ```
 
+## CRITICAL: SQL Rules
+
+PostgreSQL treats `"double quotes"` as column identifiers, NOT string literals. Always use `'single quotes'` for string values:
+- ✅ `WHERE status = 'closed'`
+- ❌ `WHERE status = "closed"` ← this means "find a column named closed"
+
+**Correct column names for `trades` table:**
+- `open_time` (NOT `entry_time` or `entry_timing` for the trade open timestamp)
+- `close_time` (trade close timestamp)
+- `status` ('open' or 'closed')
+- `signal` (signal name)
+- `direction` ('LONG' or 'SHORT')
+- `exit_reason` (close reason: 'atr_sl_hit', 'tp_hit', etc.)
+- `pnl_usdt`, `pnl_pct` (PnL columns)
+- `entry_price`, `exit_price`, `stop_loss`, `target`
+- `amount_usdt` (position size)
+
+If a query fails with `UndefinedColumn`, check column names against this list before retrying.
+
 ## Key File Paths
 - Trades: PostgreSQL at `/var/run/postgresql/brain`
 - Constants: `scripts/hermes_constants.py`
