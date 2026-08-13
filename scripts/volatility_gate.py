@@ -46,6 +46,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
+        'r2-trend-long',  # R² trend confirmation for LONG (slow grinds)
     },
     'HIGH': {
         # Breakout works in big moves
@@ -57,6 +58,7 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
+        'r2-trend-long',  # R² trend confirmation for LONG (slow grinds)
     },
     'EXTREME': {
         # Continuation works in storms
