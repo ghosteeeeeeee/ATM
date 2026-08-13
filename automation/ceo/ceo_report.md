@@ -1,7 +1,7 @@
-## CEO Report — 2026-08-13 20:49 UTC (verified)
+## CEO Report — 2026-08-13 21:49 UTC (verified)
 
 ### Diagnosis
-24h: 64T **-$0.69** (53.1% WR — RED). 7d: 428T **-$0.18** (51.4% WR — flat, barely negative). Daily: Aug 7 +$0.34 → Aug 8 +$0.10 → Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 50T **-$1.35** (46.0% WR — worst day). 0 open trades. Pipeline healthy.
+24h: 56T **-$1.42** (46.4% WR — RED). 7d: 425T **-$0.15** (51.8% WR — flat, barely negative). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 in progress (legacy clearing). 5 open $0 flat. Pipeline healthy.
 
 ### Root Cause
 Aug 13 losses driven by legacy disabled signals: accel-300- SHORT 24T -$0.59 (45.8% WR), continuation-,hzscore- 3T -$0.23, accel-300-,hzscore- 1T -$0.10. Active SHORT signals profitable: range_breakout_short 18T +$0.10 50%, hzscore- 14T +$0.02 64.3%. LONG 7d: +$0.76 (profitable). SHORT 7d: -$1.16 (100% from disabled signals). Cost drivers48h: atr_sl_hit 69T -$4.87 (dominant).

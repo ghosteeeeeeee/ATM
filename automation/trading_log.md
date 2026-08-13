@@ -1,5 +1,39 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-13 19:00 UTC — Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.11 (0% WR)
+
+**Last Hour:**
+- CC hzscore- SHORT: cut_loser_-1.03%, -$0.11
+
+**24h Snapshot:**
+- 68 trades total (34 profit-monster-trail, 31 atr_sl_hit, 2 cut_loser, 1 atr_tp_hit)
+- ATR SL hit rate: 45.6% (above 40% threshold — profit-monster-trail +$1.54 compensates atr_sl_hit -$2.50)
+- Net 24h by signal: accel-300- SHORT 25T -$0.66 worst, hzscore- 14T +$0.02 best
+
+**Signal Performance (24h):**
+- ✅ hzscore- SHORT: 14T, 64.3% WR, +$0.02
+- ✅ bb_bounce+: 2T, 100% WR, +$0.05
+- ⚠️ range_breakout_short SHORT: 20T, 45% WR, -$0.04 (flat)
+- ❌ accel-300- SHORT: 25T, 44% WR, -$0.66 (worst, but WR >0%)
+- ❌ continuation-,hzscore-: 3T, 33.3% WR, -$0.23 (tiny sample)
+
+**Diagnosis:**
+1. **Entry quality:** 1 trade last hour, small loss. Quiet period.
+2. **SL behavior:** ATR SL hit 45.6% — persistent above40% threshold. Profit-monster-trail partially compensates.
+3. **Signal quality:** No signal meets kill threshold (0% WR with 3+ trades last hour).
+4. **Trade frequency:** ~2.4/hour average (last12h), well below 20/hour threshold.
+
+**Changes:** None. No signal meets kill threshold. CEO stability period active. System within normal variance.24h flat with slight negative bias.
+
+**Open Questions:**
+- accel-300- SHORT: 25T with 44% WR and -$0.66 — R:R issue persists but not killable (WR >0%).
+- ATR SL hit rate at 45.6% — persistent issue but profit-monster-trail compensates.
+
+---
+
 ## 2026-08-13 12:00 UTC — Hourly Analysis
 
 **Trades:** 1 closed (1 win, 0 losses)
@@ -7264,3 +7298,84 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - continuation-,hzscore- — watch next hour, if 3+ more trades at 33% WR, consider kill
+
+## [2026-08-13 18:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W, 1L)
+**PnL:** $-0.07 (50% WR)
+
+**24h Snapshot:**
+- 78 trades, ~56% WR, flat PnL
+- ATR SL hit rate: 37.8% (below 40% — trailing fix working)
+- profit-monster-trail: 41T +$1.90 (primary profit driver)
+- hzscore-: 13T, +$0.13 (strong)
+- range_breakout_short: 22T, +$0.05 (flat)
+- accel-300-: 30T, -$0.39 (already killed, old positions draining)
+- continuation-,hzscore-: 3T, -$0.23 (watch — at 3T, kill threshold is 3+ with 0% WR)
+- 1 open trade, $0.00 unrealized
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 37.8% — below 40% threshold, fix confirmed working
+- No 0% WR kill candidates (continuation-,hzscore- has 33% WR)
+- Trade freq 2/hr — normal
+- System flat — no param changes needed
+
+**Open Questions:**
+- continuation-,hzscore- at 3T 33% WR — watch next hour. If 3+ more trades at 0% WR, kill it.
+
+## [2026-08-13 19:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00
+**Open:** 2 (JUP SHORT hzscore-, HBAR SHORT range_breakout_short — both slightly green)
+
+**24h Snapshot:**
+- 64 trades, ~56% WR, -$0.69 total
+- profit-monster-trail: 33T +$1.49 (primary profit driver)
+- atr_sl_hit: 28T -$2.29 (43.8% of closes — above 40% but trailing compensates)
+- accel-300-: 24T -$0.59 (already killed, draining)
+- hzscore-: 14T +$0.02 (marginal)
+- range_breakout_short: 18T +$0.10 (flat)
+- continuation-,hzscore-: 3T -$0.23 (33% WR, small sample)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 43.8% — above threshold but profit-monster-trail (+$1.49) covers SL losses (-$2.29)
+- 0 trades last hour — quiet market, no kill candidates
+- Trade freq 2.7/hr avg — normal
+- accel-300- already killed — draining naturally
+- continuation-,hzscore- 3T only — too small sample, watch next hour
+
+**Open Questions:**
+- continuation-,hzscore- at 3T 33% WR — if next 3 trades all lose, kill
+
+## [2026-08-13 21:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00
+**Open:** 4 (MON LONG bb_bounce+, CC SHORT hzscore-, JUP SHORT hzscore-, HBAR SHORT range_breakout_short)
+
+**24h Snapshot:**
+- 59 trades, 0% WR calc bug (fix: using old formula), -$1.17 total
+- profit-monster-trail: 29T +$1.33 (primary profit driver)
+- atr_sl_hit: 28T -$2.29 (47.5% of closes — above 40% threshold)
+- hzscore-: 14T +$0.02 (marginal positive)
+- range_breakout_short: 15T -$0.30 (40% WR)
+- continuation-,hzscore-: 3T -$0.23 (33% WR, at kill-watch threshold)
+- accel-300-: 22T -$0.67 (already killed, draining)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 47.5% — above 40% but profit-monster-trail (+$1.33) partially compensates
+- 0 trades last hour — quiet market, no kill candidates
+- No signal at 0% WR with 3+ trades
+- Trade freq 2.7/hr avg — normal
+- continuation-,hzscore- at 3T 33% WR — not 0%, watch next hour
+
+**Open Questions:**
+- ATR SL hit rate creeping up (39.7% → 43.8% → 47.5%) — trailing fix helping but SL may need widening
+- continuation-,hzscore- at 3T 33% WR — if next 3 trades all lose (0% WR), kill

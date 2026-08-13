@@ -277,3 +277,20 @@ ALERTS:
 - **WARN** (1x): `hotset empty` — 0 signals survived compaction, expected in flat market (104/104 NEUTRAL)
 - **WARN** (1x): `disk 81%` — 90G/118G used, 22G free. Compress if >85%.
 - **INFO** (7x): `service failures` — better-coder, bug-hunter, hl-volume, mtf-macd-tuner, signal-reporter, study-winning-combos, trading-checklist all FAILED (non-critical). mtf-macd-tuner had multiprocessing pool crash.
+
+## Health Monitor — 2026-08-13 19:41 UTC
+- **INFO**: Pipeline healthy — last run 19:39, 0 errors, timer active
+- **WARN**: Disk at 81% (22GB free of 118GB) — approaching 85% threshold
+- **INFO**: 81 signals generated in last hour, 0 open trades, 68 closed today
+- **INFO**: Today PnL: -0.85 USDT
+- **INFO**: Regime: 103 NEUTRAL / 1 SHORT / 0 LONG
+- **INFO**: Hotset empty (normal for neutral regime)
+- **INFO**: Prices fresh (<1 min stale)
+- **AUTO-FIX**: None required
+
+## Error Alerts — 2026-08-13 20:40 UTC
+- **CRITICAL** (Nx/min): `signals_runner: ERROR — name 'R2_TREND_LONG_ENABLED' is not defined` — broke entire signal generation
+- **AUTO-FIX**: Added missing import `R2_TREND_LONG_ENABLED` to `scripts/signals/__init__.py:31`
+
+## Error Alerts — 2026-08-13 21:09 UTC
+- **REPEATED** (23x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'R2_TREND_LONG_ENABLED' is not defined`
