@@ -1,10 +1,10 @@
-## CEO Report — 2026-08-15 (verified)
+## CEO Report — 2026-08-13 (verified)
 
 ### Diagnosis
-24h: 73T -$0.19 (57.5% WR — FLAT). 7d: 438T -$0.48 (51.1% WR — slightly negative, improved from -$0.67 last read). Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 (recovery) → Aug 13 -$1.24 (43.9% WR — legacy clearing). Aug 14 5T +$0.02 (recovering). SHORT7d: 195T -$1.17 (51.3% WR — all from disabled signals). LONG7d: 243T +$0.69 (profitable). 3 open $0 flat. Pipeline healthy.
+24h: 76T -$0.27 (56.6% WR — FLAT). 7d: 439T -$0.44 (51.3% WR — slightly negative, improved from -$0.67 last read). Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 (recovery) → Aug 13 -$1.21 (45.7% WR — legacy clearing). SHORT7d: 196T -$1.13 (51.5% WR — all from disabled signals). LONG7d: 243T +$0.69 (profitable). 2 open $-0.02 flat. Pipeline healthy.
 
 ### Root Cause
-Aug 13 -$1.24 worst day = legacy disabled signal clearing:
+Aug 13 -$1.21 worst day = legacy disabled signal clearing:
 - accel-300- SHORT: 40T -$0.30 55% WR (disabled, legacy trades)
 - range_breakout+ LONG: 8T -$0.41 25% WR (disabled)
 - trend_momentum_near_sma+ LONG: 6T -$0.37 16.7% WR (disabled)
@@ -18,16 +18,16 @@ All three bleeders disabled/blacklisted — no new entries. Legacy fully clearin
 - bb-bounce-short,hzscore- SHORT: 18T +$0.14 61.1%
 
 ### Cost Drivers (48h)
-- atr_sl_hit: 72T -$4.75 (dominant)
+- atr_sl_hit: 73T -$4.88 (dominant, 97% of losses)
 - profit-monster-trail compensating
 - Net SL impact stabilizing
 
 ### Fix Applied
-NO CHANGES — system flat, all bleeders disabled, stability period active. 7d improved from -$0.67 to -$0.48 (legacy aging out). Aug 14 early +$0.02 recovery. No actionable problem to fix.
+NO CHANGES — system flat, all bleeders disabled, stability period active. 7d improved from -$0.67 to -$0.44 (legacy aging out). No actionable problem to fix.
 
 ### Verification
 - Stars intact (5 profitable)
-- 3 open $0 flat
+- 2 open $-0.02 flat
 - Pipeline healthy
 - All disabled signals confirmed (0 new entries post-disable)
 
