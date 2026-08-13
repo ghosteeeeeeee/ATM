@@ -1,13 +1,16 @@
-## CEO Report — 2026-08-13 (latest verified)
+## CEO Report — 2026-08-13 23:50 UTC
 
 ### Diagnosis
-24h: 54T **-$1.66** (42.6% WR — RED). 7d: 424T **-$0.32** (51.4% WR — flat). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 52T **-$1.49** (44.2% WR — worst day). 4 open SHORT -$0.11. Pipeline healthy.
+24h: 52T **-$1.49** (44.2% WR — RED). 7d: 422T **-$0.37** (51.4% WR — flat). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 52T **-$1.49** (44.2% WR — worst day). 5 open (3 LONG, 2 SHORT) healthy. Pipeline active.
 
 ### Root Cause
-hzscore- standalone SHORT has inverted R:R — 31T 53.1% WR but avg_win $0.053 vs avg_loss $0.073 = -$0.12/7d. Still generating new signals today (15T -$0.08 24h). All other bleeders are disabled legacy clearing naturally.
+All 24h losses from DISABLED legacy signals: accel-300- 19T -$0.73 (disabled 10:30), range_breakout_short 9T -$0.42 (disabled 22:30), continuation-,hzscore- 3T -$0.23 (continuation- disabled). No new bleeders. System flat, stability period.
 
 ### Fix Applied
-DISABLED HZSCORE_MINUS_ENABLED=False. Expected: -$0.12/7d saved. Stars7d intact (5 profitable): bb_bounce+,range_finder+ +$0.71 58.5%, bb_bounce+ +$0.21 61.9%, bb_bounce+,hzscore+ +$0.22 50%, hzscore+,mover+ +$0.17 80%, bb-bounce-short,hzscore- +$0.14 61.1%. Cost drivers48h: atr_sl_hit 68T -$4.90 (dominant).
+NO CHANGES. All major bleeders already disabled. Stars7d intact (5 profitable): bb_bounce+,range_finder+ +$0.71 58.5%, bb_bounce+ +$0.21 61.9%, bb_bounce+,hzscore+ +$0.22 50%, hzscore+,mover+ +$0.17 80%, bb-bounce-short,hzscore- +$0.14 61.1%. Cost drivers48h: atr_sl_hit 68T -$4.90 (dominant).
+
+### Verification
+Pipeline healthy (timer firing). 5 open positions draining legacy. LONG7d profitable (+$0.76). SHORT7d -$1.13 but 100% from disabled signals — will clear as legacy ages out. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ persists → regime filter).
 
 ### Verification
 Monitor 48h: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ after legacy clears → regime filter), hzscore- legacy positions draining naturally.
