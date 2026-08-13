@@ -64,7 +64,7 @@
     .hot-empty { text-align: center; padding: 15px; color: #444; border: 1px dashed #ffd70033; border-radius: 4px; margin-bottom: 20px; font-size: 0.9em; }
     .coin-icon { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; vertical-align: middle; margin-right: 4px; object-fit: contain; }
     .coin-icon-fallback { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 8px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 4px; border: 1px solid #00ff8833; }
-    .pm-badge { background: #ffd70022; border: 1px solid #ffd70044; color: #ffd700; padding: 1px 4px; border-radius: 3px; font-size: 0.7em; margin-left: 4px; vertical-align: middle; white-space: nowrap; }
+    .pm-badge { color: #00b4d8; font-size: 0.9em; margin-left: 2px; vertical-align: middle; }
   </style>
 </head>
 <body>
@@ -279,7 +279,7 @@
             const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
             const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
             return `<tr>
-              <td>${iconHtml(t.coin)}${t.coin || '--'}${Object.values(trailState).some(ts => ts.token === t.coin) ? '<span class="pm-badge">🎯 PM</span>' : ''}</td>
+              <td>${iconHtml(t.coin)}${t.coin || '--'}${trailState[t.id] ? '<span class="pm-badge">👾</span>' : ''}</td>
               <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
               <td>$${entry.toFixed(4)}</td>
               <td>$${current.toFixed(4)}</td>

@@ -371,6 +371,7 @@ def _build_open_trades(open_t):
                 pnl_usdt = 0
 
         out.append({
+            "id": r[0],
             "coin": token,
             "direction": direction,
             "entry": entry_px,
