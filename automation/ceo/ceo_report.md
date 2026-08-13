@@ -1,23 +1,24 @@
-## CEO Report — 2026-08-13 (latest verified)
+## CEO Report — 2026-08-13 (verified)
 
 ### Diagnosis
-24h: 82T -$0.17 (57.3% WR — DECENT). 7d: 439T -$0.78 (50.8% WR — slightly negative). Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 36T -$1.10 (44.4% WR — legacy clearing). 4 open $0 flat. SHORT7d: legacy clearing (all from disabled signals). LONG7d: profitable. All known bleeders disabled. Pipeline healthy (timers active).
+24h: 79T -$0.24 (55.7% WR — FLAT). 7d: 439T -$0.74 (LONG +$0.74 profitable, SHORT -$1.48 AT threshold). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 37T -$1.18 (43.2% WR — legacy clearing, worst day). 3 open $0 flat (all range_breakout_short SHORT). Pipeline healthy.
 
 ### Root Cause
-No active bleed source. All 7d losers are disabled/blacklisted legacy:
-- accel-300-: 40T -$0.30 (disabled Aug 13)
-- range_breakout-: 20T -$0.12 (disabled)
-- return_exhaustion- combos: ~20T -$1.02 (blacklisted Aug 12)
-- trend_momentum_near_sma+: 6T -$0.37 (disabled)
-Active signals healthy: range_breakout_short 19T +$0.18 57.9%, bb-bounce-short,hzscore- 18T +$0.14 61.1%, bb_bounce+,range_finder+ 53T +$0.71 58.5%. SL exit dominates 48h: 72T -$4.70. Weather Vane v1+v2 live, Z-score+accel live. v3 (consecutive losses, price extremes), v4 (tide), structure shift approved but NOT deployed.
+SHORT7d -$1.48 is 100% legacy disabled signals — no active bleed:
+- range_breakout+ LONG: 8T -$0.41 25% WR (disabled)
+- accel-300- SHORT: 40T -$0.30 55% WR (disabled)
+- trend_momentum_near_sma+ LONG: 6T -$0.37 16.7% WR (disabled)
+- return_exhaustion- combos: blacklisted, aging out
+
+Active SHORT signals profitable: range_breakout_short 20T +$0.10 55%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Cost driver: atr_sl_hit 73T -$4.78 (87% of 48h losses).
 
 ### Fix Applied
-NO CHANGES. System flat and healthy — 57.3% WR 24h, legacy clearing naturally. Deploying untested features into stable system = unnecessary risk. Continue stability period.
+NO CHANGES. Legacy will age out of 7d window naturally. Stars7d intact (5 profitable): bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb_bounce+ 20T +$0.19 60%, bb_bounce+,hzscore+ 34T +$0.22 50%, hzscore+,mover+ 5T +$0.17 80%, bb-bounce-short,hzscore- 18T +$0.14 61.1%.
 
 ### Verification
-24h: 82T -$0.17, 57.3% WR (decent). 4 open $0 flat. Pipeline healthy. All timers active. No new errors.
+24h 79T -$0.24 55.7% WR. 7d LONG +$0.74 profitable. 3 open $0 flat. Pipeline healthy, all timers active.
 
 ### Monitor
-- daily PnL: if -2 consecutive red days after legacy clears → investigate
-- SHORT7d: if still negative after accel-300- legacy fully clears → regime filter
-- Deploy approved features (v3, v4, structure shift) once legacy fully clears and 7d confirms positive trend
+- SHORT7d: if still -$1.50+ after 48h legacy ages out → regime filter
+- daily PnL: if -2 consecutive red after legacy clears → investigate
+- Deploy approved features (v3 consecutive losses, v4 tide, structure shift) once 7d confirms positive
