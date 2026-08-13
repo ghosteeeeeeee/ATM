@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-08-13 01:48 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-13 07:48 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 872 | **WR:** 46.3% | **PnL:** -14.92%
+- **Total trades (all time):** 887 | **WR:** 46.1% | **PnL:** -23.03%
 - **Date range:** 2026-07-29 → 2026-08-13
 
 ---
@@ -11,16 +11,14 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| range_breakout_short | SHORT | 11 | 63.6% | +2.82 | 14 | 71.4% | +4.04 | ENABLED |
-| bb_bounce+ | LONG | — | —% | — | 5 | 60.0% | +0.82 | ENABLED |
+| range_breakout_short | SHORT | 3 | 0.0% | -2.87 | 17 | 58.8% | +1.17 | ENABLED |
+| hzscore- | SHORT | 2 | 100.0% | +0.69 | 7 | 57.1% | +0.54 | ENABLED |
 
 ---
 
 ## LOSERS (WR < 30%, PnL < -2%)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| range_breakout+ | LONG | — | —% | — | 8 | 25.0% | -4.02 | DISABLED | **DISABLE** |
+None found.
 
 ---
 
@@ -28,14 +26,16 @@
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| range_breakout- | SHORT | 20 | 50.0% | -1.92 | DISABLED | Borderline |
-| hzscore- | SHORT | 12 | 50.0% | -0.16 | ENABLED | Borderline |
+| range_breakout- | SHORT | 15 | 33.3% | -4.88 | DISABLED | Borderline |
+| continuation-,hzscore- | SHORT | 2 | 50.0% | -0.76 | ENABLED | Needs more data |
 
 ---
 
 ## DISABLED BUT GOOD (candidates for re-enabling)
 
-None found. Top performers are already enabled.
+| Signal | Dir | Last WR | Last PnL | Recommendation |
+|--------|-----|---------|----------|----------------|
+| accel-300- | SHORT | 55.3% | -4.71 | **WATCH** — re-enable candidate |
 
 ---
 
@@ -47,10 +47,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[DISABLE] range_breakout+ LONG** — WR=25.0%, PnL=-4.02% over 8 trades (24h).
-2. **[WATCH] range_breakout- SHORT** — WR=50.0%, PnL=-1.92% over 20 trades. Monitor next cycle.
-3. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-0.16% over 12 trades. Monitor next cycle.
-4. **[KEEP] 2 winning combos** — range_breakout_short, bb_bounce+. LONG side dominant.
+1. **[WATCH] range_breakout- SHORT** — WR=33.3%, PnL=-4.88% over 15 trades. Monitor next cycle.
+2. **[WATCH] continuation-,hzscore- SHORT** — WR=50.0%, PnL=-0.76% over 2 trades. Monitor next cycle.
+3. **[KEEP] 2 winning combos** — range_breakout_short, hzscore-. LONG side dominant.
 
 ---
 
@@ -62,15 +61,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-08-13 | 2dbd8e9 | Daily trading system update (2026-08-13) |
+| 2026-08-13 | e6a05d0 | CEO: disable ACCEL_300_MINUS_ENABLED (inverted R:R bleeding ... |
+| 2026-08-13 | de9add5 | fix: add bb-bounce-short to solo bypass (hyphen/underscore m... |
+| 2026-08-13 | cff29ab | signals: disable ATR floor filter — backtest shows ATR overl... |
+| 2026-08-13 | ef91324 | signals: accel-300- ATR floor filter (0.02% min, zero winner... |
+| 2026-08-13 | 9a9ad46 | CEO: NO TRADING CHANGES — verified DB 24h 107T -/usr/bin/bas... |
+| 2026-08-13 | 56c92ba | signals: accel-300- slope filter 0.0005→0.001 (CEO approved) |
+| 2026-08-13 | 7e2a49f | Weather Vane v2: velocity tiers + integral long-window catch |
+| 2026-08-13 | b2f3893 | CEO: no trading changes, verified flat day |
 | 2026-08-13 | dcdf4c1 | feat: Weather Vane v2 — hysteresis + off-course alarm |
-| 2026-08-13 | 12cb22f | feat: global spike filter for SHORT entries |
-| 2026-08-13 | 16e6abf | CEO: NO TRADING CHANGES — 24h 106T -$0.26 flat, 7d +$0.37 po... |
-| 2026-08-12 | c367e1d | CEO: recovery confirmed, 24h +/usr/bin/bash.53 57.6% WR, 7d ... |
-| 2026-08-12 | 4586229 | CEO: BLACKLISTED return_exhaustion- SHORT — ALL SL hits loss... |
-| 2026-08-12 | a6a5739 | CEO: blacklisted hzscore+ standalone (38.5% WR bleed source) |
-| 2026-08-12 | 8d36599 | CEO: 2026-08-12 18:49 UTC — NO CHANGES. Verified 24h 98T -/u... |
-| 2026-08-12 | 7acf1a3 | hermes_constants: fix ATR_K threshold comments (3% → 1.5%) |
-| 2026-08-12 | 1534a8b | CEO: widen trailing stop distance 0.60%→0.80%, activation 0.... |
-| 2026-08-12 | 1e47094 | CEO: disable RANGE_BREAKOUT_PLUS_ENABLED (8T 25% WR -$0.41 2... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

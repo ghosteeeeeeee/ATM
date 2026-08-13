@@ -6975,3 +6975,29 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - accel-300- still has 38T/24h — all pre-kill entries. Will die off as trail closes them.
 - ATR SL structural issue persists but system is flat — not bleeding, not making. Hold steady.
+
+## [2026-08-13 08:30 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W 2L). 91T/24h, 51.6% WR, -$0.65.
+**PnL:** $-0.15/1h. 24h: -$0.65 (flat).
+
+**24h by close reason:**
+- profit-monster-trail: 46T +$2.17 (avg +$0.047)
+- atr_sl_hit: 41T -$3.05 (avg -$0.074) — 45% of closes (above 40% threshold)
+
+**24h by signal:**
+- range_breakout_short: 19T 57.9% WR +$0.18 ← BEST
+- hzscore-: 6T 66.7% WR +$0.17
+- accel-300-: 38T 55.3% WR -$0.30 (trailing entries only)
+- range_breakout-: 15T 26.7% WR -$0.53 (killed, trailing)
+
+**Changes:** None.
+
+**No Change Needed:**
+- ATR SL at 45% structural but profit-monster-trail compensates
+- No 0% WR kill candidates (0 trades last hour matching criteria)
+- Trade freq 3/hr normal. 4 open trades healthy.
+- accel-300- kill working — trailing entries closing naturally.
+
+**Open Questions:**
+- ATR SL persistent at 45% — structural but net flat. Hold.
