@@ -13,7 +13,7 @@ from hermes_constants import (
     PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT, PM_TIER1_FIRE_WINDOWS,
     PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT, PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT, PM_TIER2_FIRE_WINDOWS,
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
-    PM_DRY_RUN,
+    PM_DRY_RUN, PM_DEFAULT_NOTIONAL,
 )
 import sys, os, json, time, random, argparse
 from datetime import datetime
@@ -26,7 +26,7 @@ from hermes_file_lock import FileLock
 LOG_FILE          = Path("/root/.hermes/logs/profit_monster.log")
 CONFIG_FILE       = Path(PROFIT_MONSTER_CONFIG)
 BRAIN_CMD         = "/root/.hermes/scripts/brain.py"
-GUARDIAN_LOCK     = '/tmp/hermes-guardian.lock'
+GUARDIAN_LOCK     = '/tmp/hermes-guardian.lock'  # noqa: F811 — used by external callers
 
 # ── Config ───────────────────────────────────────────────────────────────────
 def load_config():
@@ -50,6 +50,7 @@ def should_fire(ab_group: str, last_run_ts: float, fire_windows: dict) -> bool:
 # ── DB Queries ───────────────────────────────────────────────────────────────
 def get_all_open_positions():
     """Return all open Hermes positions from DB."""
+    conn = None
     try:
         import psycopg2
         from _secrets import BRAIN_PASSWORD, BRAIN_HOST
@@ -64,7 +65,6 @@ def get_all_open_positions():
             ORDER BY pnl_pct DESC
         """)
         rows = cur.fetchall()
-        conn.close()
         return [
             {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
              "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6]}
@@ -73,6 +73,10 @@ def get_all_open_positions():
     except Exception as e:
         log(f"DB query error: {e}", "ERROR")
         return []
+    finally:
+        if conn:
+            try: conn.close()
+            except: pass
 
 
 def filter_by_pnl(positions, min_pct, max_pct):
@@ -193,7 +197,7 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 # Fetch amount_usdt (margin) for PnL calc — NOT hl_notional_usdt
                 # (hl_notional_usdt is actual fill notional which varies; amount_usdt
                 #  is the margin we risk per trade, matching dashboard convention)
-                notional = 11.0
+                notional = PM_DEFAULT_NOTIONAL
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
@@ -397,6 +401,12 @@ def run(dry_run=False):
 
     if not positions:
         return
+
+    # Compute live PnL for all positions (needed by trail tier)
+    from pnl_utils import compute_live_pnl
+    for pos in positions:
+        if pos["entry_price"] > 0 and pos["current_price"] > 0:
+            pos["live_pnl_pct"] = compute_live_pnl(pos["entry_price"], pos["current_price"], pos["direction"])
 
     # Tier T: Trailing profit (runs first — catches early profit and trails)
     trail_closed = run_trail(positions, effective_dry_run)

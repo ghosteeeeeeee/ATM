@@ -7379,3 +7379,31 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL hit rate creeping up (39.7% → 43.8% → 47.5%) — trailing fix helping but SL may need widening
 - continuation-,hzscore- at 3T 33% WR — if next 3 trades all lose (0% WR), kill
+
+## [2026-08-13 22:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.10 (JUP SHORT hzscore- atr_sl_hit)
+
+**24h Snapshot:**
+- 53T total, 56% WR, -$1.09
+- profit-monster-trail: 23T +$0.90 (primary profit driver)
+- atr_sl_hit: 28T -$2.31 (52.8% of closes — high but trailing compensates)
+- continuation-,hzscore-: 4T 50% WR -$0.20 (improved from 33.3%)
+- accel-300-: 20T 35% WR -$0.82 (already killed, draining)
+- range_breakout_short: 10T 20% WR -$0.50 (CEO killed)
+
+**Changes:** None
+
+**No Change Needed:**
+- continuation-,hzscore- improved to 50% WR (4T) — no longer at kill threshold
+- ATR SL 52.8% — above 40% but profit-monster-trail (+$0.90) compensates SL (-$2.31)
+- 1 trade last hour — quiet market, no kill candidates (no signal at 0% WR with 3+ trades)
+- Trade freq 2.2/hr avg — normal
+- 5 open trades healthy (ATOM, BANANA, MON, CC, HBAR)
+- accel-300- draining naturally (already killed)
+- range_breakout_short already killed by CEO
+
+**Open Questions:**
+- ATR SL hit rate 52.8% — trending up but trailing compensates
+- continuation-,hzscore- now 50% WR — watch for regression

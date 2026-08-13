@@ -463,3 +463,7 @@
   BY: auto_1hr
   NEXT: Re-run at 22:30 UTC
 [2026-08-13 22:30 UTC] CEO: DISABLED RANGE_BREAKOUT_SHORT_ENABLED=False — 24h 10T 20% WR -/usr/bin/bash.50 (was +/usr/bin/bash.18 57.9% 7d star, flipped). Revert if regime improves.
+[2026-08-13 22:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.10). 24h 53T 56% WR -$1.09. ATR SL 52.8% (high but profit-monster-trail +$0.90 compensates SL -$2.31). continuation-,hzscore- improved to 50% WR (4T, was 33%). accel-300- draining naturally (20T 35%). range_breakout_short killed by CEO. 5 open trades healthy. No 0% WR kill candidates. Trade freq 2.2/hr normal. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 23:30 UTC
