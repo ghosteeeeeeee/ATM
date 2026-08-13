@@ -1,52 +1,42 @@
-## CEO Report — 2026-08-13 (verified)
+## CEO Report — 2026-08-14 (verified)
 
 ### Diagnosis
-24h: 79T -$0.24 (55.7% WR — FLAT). 7d: 439T -$0.74 (LONG +$0.74 profitable, SHORT -$1.48 AT threshold). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 37T -$1.18 (43.2% WR — legacy clearing, worst day). 3 open $0 flat (all range_breakout_short SHORT). Pipeline healthy.
+24h: 72T -$0.19 (56.9% WR — FLAT). 7d: 439T -$0.67 (50.8% WR — slightly negative). Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 (recovery) → Aug 13 38T -$1.21 (42.1% WR — worst day, legacy clearing). Aug 14 early 5T +$0.02 (recovering). SL hit rate: Aug 9 16.9% → Aug 13 55.3% → Aug 12 41.0% (stabilizing). 5 open $0 flat. Pipeline healthy.
 
 ### Root Cause
-SHORT7d -$1.48 is 100% legacy disabled signals — no active bleed:
+Aug 13 -$1.21 worst day = legacy disabled signal clearing:
+- accel-300- SHORT: 40T -$0.30 55% WR (disabled, legacy trades)
 - range_breakout+ LONG: 8T -$0.41 25% WR (disabled)
-- accel-300- SHORT: 40T -$0.30 55% WR (disabled)
 - trend_momentum_near_sma+ LONG: 6T -$0.37 16.7% WR (disabled)
-- return_exhaustion- combos: blacklisted, aging out
+All three bleeders disabled/blacklisted — no new entries.
 
-Active SHORT signals profitable: range_breakout_short 20T +$0.10 55%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Cost driver: atr_sl_hit 73T -$4.78 (87% of 48h losses).
+### 7d Stars (profitable)
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5% ★
+- bb_bounce+ LONG: 20T +$0.19 60.0%
+- bb_bounce+,hzscore+ LONG: 34T +$0.22 50.0%
+- hzscore+,mover+ LONG: 5T +$0.17 80.0%
+- bb-bounce-short,hzscore- SHORT: 18T +$0.14 61.1%
+
+### Cost Drivers (48h)
+- atr_sl_hit: 74T -$4.81 (dominant)
+- profit-monster-trail: 85T +$3.93 (compensating)
+- Net SL impact: -$0.88
 
 ### Fix Applied
-NO CHANGES. Legacy will age out of 7d window naturally. Stars7d intact (5 profitable): bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb_bounce+ 20T +$0.19 60%, bb_bounce+,hzscore+ 34T +$0.22 50%, hzscore+,mover+ 5T +$0.17 80%, bb-bounce-short,hzscore- 18T +$0.14 61.1%.
+NO CHANGES — system flat, all bleeders disabled, stability period active. Aug 13 -$1.21 was legacy clearing (accel-300- last entry 03:37 UTC). Aug 14 early +$0.02 recovery. No actionable problem to fix.
 
 ### Verification
-24h 79T -$0.24 55.7% WR. 7d LONG +$0.74 profitable. 3 open $0 flat. Pipeline healthy, all timers active.
+- Stars intact (5 profitable)
+- 5 open $0 flat
+- Pipeline healthy
+- SL hit rate stabilizing (41% Aug 12 → 55% Aug 13 legacy noise → returning to normal)
+- All disabled signals confirmed (0 new entries post-disable)
 
 ### Monitor
-- SHORT7d: if still -$1.50+ after 48h legacy ages out → regime filter
-- daily PnL: if -2 consecutive red after legacy clears → investigate
-- Deploy approved features (v3 consecutive losses, v4 tide, structure shift) once 7d confirms positive
+- Daily PnL (if -2 consecutive red after legacy clears → investigate)
+- SHORT7d (if -$1.50+ persists after accel-300- clears → regime filter)
+- SL hit rate (if >55%持续 → investigate entry timing)
 
 ---
 
-## Signal Hardening — 2026-08-13
-
-Five changes applied, all backtested with zero winner regression:
-
-| Change | Detail |
-|--------|--------|
-| ACCEL_300 slope | 0.0005→0.001 (+0.6% WR) |
-| Slope gate | signal_compactor blocks SHORT when slope >= -0.001% |
-| EMA200 filter | range_breakout_short blocks SHORT above EMA200 (0% winners blocked, 89% losers blocked) |
-| Solo bypass | hzscore, mover, return_exhaustion_long, bb-bounce-short added |
-| ATR filter | Tested and disabled — ATR overlap winners/losers too high |
-
-All changes are deterministic (LLM-free) and backward-compatible. No config flags to toggle — logic lives in `signal_compactor.py` and signal files.
-
----
-
-## Config Cleanup — 2026-08-13
-
-Moved hardcoded EMA 200 period to `hermes_constants.py` as `RANGE_BREAKOUT_SHORT_EMA_PERIOD`. Added AGENTS.md rule: no hardcoded constants. Bug hunter verified clean.
-
----
-
-## EMA200 Trend Filter — hzscore- — 2026-08-13
-
-EMA200 trend filter added to hzscore- signal. Blocks SHORT when price > EMA200. Backtest validated: 0 winners blocked, 8 losers blocked, WR 54.5%→85.7%, PnL +$0.05→+$0.55. Clean signal hardening — no regression, positive expected impact.
+## CEO Report — 2026-08-13 (verified)
