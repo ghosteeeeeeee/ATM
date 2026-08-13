@@ -1,8 +1,27 @@
 # Weather Vane v2 — Autopilot-Inspired Improvements
 
 **Date:** 2026-08-13
-**Status:** PROPOSED
+**Status:** IMPLEMENTED (all active layers deployed)
 **Based on:** autopilot-mechanics PID control theory
+
+---
+
+## CEO Verdict Summary
+
+| # | Proposal | CEO Decision | Status |
+|---|----------|-------------|--------|
+| 1 | Hysteresis | APPROVE (45% WR exit) | ✅ DONE |
+| 2 | Off-course alarm | APPROVE | ✅ DONE |
+| 3 | Derivative (velocity tiers) | ALREADY LIVE | ✅ DONE |
+| 4 | Integral (cumulative) | ALREADY LIVE | ✅ DONE |
+| 5 | Gain scheduling | SKIP (YAGNI) | — |
+| 6 | Watchdog | SKIP (YAGNI) | — |
+| 7 | Time-weighted outcomes | REJECT (redundant) | — |
+| 8 | Direction Lock | APPROVE | NEXT |
+| 9 | Opposite direction boost | REJECT (regime_mult covers) | — |
+| 10 | Trade size scaling | REJECT (too invasive) | — |
+
+**Bug fixed:** velocity_mult defaulted to 1.0 (no-op) when velocity tiers disabled — fixed to DIRECTIONAL_OUTCOME_PENALTY (0.7x).
 
 ---
 
@@ -254,6 +273,122 @@ WEATHER_VANE_WATCHDOG_MIN_TRADES = 50
 ### Phase 3 (Later): Gain Scheduling + Watchdog
 - Add market speed lookup
 - Add time-since-last-trigger tracking
+
+---
+
+## Additional Proposals (2026-08-13)
+
+### Proposal 7: Time-Weighted Outcomes
+**Concept:** Recent losses count more than older losses. A loss 2 minutes ago is more meaningful than one 28 minutes ago.
+
+**Current:** All trades in the window are weighted equally (5 trades, equal weight).
+
+**Proposed:** Weight each trade by recency:
+```
+weight = 1.0 - (age_minutes / TIME_WINDOW)
+```
+- Loss at minute 0: weight = 1.0
+- Loss at minute 15: weight = 0.5
+- Loss at minute 30: weight = 0.0
+
+Weighted loss score = sum(loss × weight) / sum(weights)
+
+This means a single recent loss has more impact than multiple old losses. The vane responds faster to fresh deterioration.
+
+**Impact:** Faster trigger on new loss clusters. Slower recovery when losses are old.
+
+**Complexity:** MEDIUM — needs weighted calculation in `get_directional_outcome()`.
+
+---
+
+### Proposal 8: Direction Lock
+**Concept:** After severe suppression (5/5 losses or hard block), lock the direction for N minutes regardless of recovery. Prevents re-entry during a clear bad streak.
+
+**Current:** Even after 5/5 losses, if 2 wins come in and WR recovers, the vane unsuppresses immediately.
+
+**Proposed:** After catastrophic loss (loss_velocity >= 0.8, i.e., 4+/5 losses), lock the direction for `LOCK_MINUTES` (e.g., 30 minutes). No unsuppression during lock period.
+
+**Implementation:**
+```python
+if loss_velocity >= 0.8:  # 4+ losses in 5
+    lock_until = now + LOCK_MINUTES
+    # Check if lock has expired before allowing unsuppression
+```
+
+**Impact:** Prevents re-entering a direction that just had a catastrophic failure. Forces a cooling-off period.
+
+**Complexity:** LOW — needs timestamp tracking (DB or file).
+
+---
+
+### Proposal 9: Opposite Direction Boost
+**Concept:** When one direction is suppressed, boost the opposite direction. Markets are zero-sum — if SHORT is losing, LONG is likely winning.
+
+**Current:** Weather Vane only penalizes the losing direction. The winning direction gets no benefit.
+
+**Proposed:** When SHORT is suppressed, apply a small boost to LONG signals (and vice versa).
+
+**Implementation:**
+```python
+# In _score_signal():
+if dir_outcome_mult < 1.0:
+    # This direction is suppressed — check if opposite is healthy
+    opp_losses, opp_total, opp_wr = get_directional_outcome(opp_direction)
+    if opp_total >= MIN_TRADES and opp_wr >= 50:
+        opp_boost = 1.1  # +10% boost to opposite direction
+```
+
+**Impact:** Shifts capital toward the winning direction during regime shifts. Could amplify gains when the system correctly identifies the winning side.
+
+**Risk:** If both directions are losing (choppy market), both get boosted → more trades in a bad market. Need a gate: only boost if opposite WR >= 50%.
+
+**Complexity:** LOW — one extra `get_directional_outcome()` call per signal.
+
+---
+
+### Proposal 10: Trade Size Scaling
+**Concept:** Instead of just scoring penalties, scale actual position size. When suppressed, reduce trade size by 50% instead of blocking entirely.
+
+**Current:** Suppression = 0.7x score penalty → may or may not block the signal (depends on other factors).
+
+**Proposed:** When suppressed, also reduce `amount_usdt` by 50%. Keeps some exposure but limits damage.
+
+**Implementation:** This would require changes in `decider_run.py` or `position_manager.py` to read the weather vane state and adjust trade size. More invasive than scoring-only changes.
+
+**Impact:** Instead of all-or-nothing (block vs allow), graduated response. Reduces losses on suppressed directions without eliminating all opportunity.
+
+**Complexity:** HIGH — crosses into position sizing, needs integration with execution layer.
+
+**Recommendation:** Defer — too invasive for now. Score-only approach is cleaner.
+
+---
+
+## Updated Priority Table
+
+| # | Proposal | Impact | Complexity | CEO Decision | Status |
+|---|----------|--------|------------|-------------|--------|
+| 1 | Hysteresis | HIGH | LOW | APPROVE (45% WR exit) | **DONE** |
+| 2 | Off-course alarm | LOW | LOW | APPROVE | **DONE** |
+| 3 | Derivative (acceleration) | HIGH | LOW | ALREADY LIVE | **DONE** |
+| 4 | Integral (cumulative) | MEDIUM | MEDIUM | ALREADY LIVE | **DONE** |
+| 5 | Gain scheduling | MEDIUM | MEDIUM | SKIP (YAGNI) | — |
+| 6 | Watchdog | LOW | LOW | SKIP (YAGNI) | — |
+| 7 | Time-weighted outcomes | MEDIUM | MEDIUM | REJECT (redundant) | — |
+| 8 | Direction lock | MEDIUM | LOW | APPROVE | **NEXT** |
+| 9 | Opposite direction boost | MEDIUM | LOW | REJECT (regime_mult covers) | — |
+| 10 | Trade size scaling | HIGH | HIGH | REJECT (too invasive) | — |
+
+## CEO Reasoning
+
+**Proposal 7 (Time-weighted) — REJECT:** Derivative already captures acceleration. Velocity = losses/total IS a recency proxy. Redundant.
+
+**Proposal 9 (Opposite boost) — REJECT:** Choppy markets double-boost both directions. +10% marginal. Regime_mult already does +50%/-50%.
+
+**Proposal 10 (Size scaling) — REJECT:** Crosses into position sizing layer (decider_run/position_manager). High complexity. Velocity tiers already do graduated response (0.7x→0.5x→0.0x).
+
+**Proposal 5 (Gain scheduling) — SKIP:** Velocity tiers already graduate severity. Regime_mult handles market conditions. YAGNI.
+
+**Proposal 6 (Watchdog) — SKIP:** Silent failures rare with systemd. Add if needed later. YAGNI.
 
 ## Files to Modify
 
