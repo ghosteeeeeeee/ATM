@@ -253,7 +253,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
     ('hh_hl_choch', 'choch-'):  1.3,   # bearish flip (HH_HL→LH_LL)
     # momentum_leaderboard — top movers
-    ('mover_long',  'mover+'):  1.0,
+    ('mover_long',  'mover+'):  1.3,  # boosted 2026-08-13 — GRASS LONG setup, z=-1.19
     ('mover_short', 'mover-'):  1.0,
     # continuation — re-entry after profitable close (65% WR in backtest)
     ('continuation_long',  'continuation+'):  1.15,
