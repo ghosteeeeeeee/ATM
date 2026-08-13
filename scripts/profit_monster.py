@@ -333,13 +333,7 @@ def run_trail(positions, dry_run):
             # ── Already trailing ──────────────────────────────────────────
             trail = state[tid]
 
-            # If trade went back below activation, clear (didn't hold)
-            if pnl < PM_TRAIL_ACTIVATE_PCT * 0.5:
-                log(f"  [TRAIL] {pos['token']} dropped to {pnl:.2f}% — clearing trail state")
-                del state[tid]
-                continue
-
-            # Update peak
+            # Update peak first (need current peak for floor calc)
             if pnl > trail["peak_pnl"]:
                 trail["peak_pnl"] = pnl
                 trail["peak_time"] = now
@@ -349,6 +343,8 @@ def run_trail(positions, dry_run):
                 continue
 
             # Exit if current price dropped trail distance from peak
+            # MUST check this BEFORE "dropped below activation" — otherwise
+            # a sharp drop clears state instead of triggering exit.
             trail_floor = trail["peak_pnl"] - PM_TRAIL_DISTANCE_PCT
             if pnl <= trail_floor:
                 log(f"  [TRAIL] {pos['token']} trailing exit: peak={trail['peak_pnl']:.2f}% "
@@ -357,6 +353,10 @@ def run_trail(positions, dry_run):
                                     pnl, pos["current_price"], dry_run, "trail")
                 if ok:
                     closed += 1
+                del state[tid]
+            elif pnl < PM_TRAIL_ACTIVATE_PCT * 0.5:
+                # Trade went back below activation threshold — clear (didn't hold)
+                log(f"  [TRAIL] {pos['token']} dropped to {pnl:.2f}% — clearing trail state")
                 del state[tid]
 
         else:
