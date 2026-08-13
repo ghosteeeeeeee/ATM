@@ -428,19 +428,26 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Speed percentile bonus: +15% if speed_percentile >= 80
     speed_mult = 1.0 + (SPEED_HOTSET_BONUS if speed_data.get('speed_percentile', 0) >= SPEED_HOTSET_THRESHOLD else 0)
 
-    # Weather vane: directional outcome penalty
-    # If this direction is losing cluster-wide, suppress the signal
+    # Weather vane: directional outcome penalty with hysteresis
+    # Hysteresis: once suppressed, stay suppressed until WR recovers (prevents thrashing)
     dir_outcome_mult = 1.0
     from hermes_constants import (
         DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_MIN_TRADES,
         DIRECTIONAL_OUTCOME_LOSS_THRESHOLD, DIRECTIONAL_OUTCOME_WR_THRESHOLD,
-        DIRECTIONAL_OUTCOME_PENALTY,
+        DIRECTIONAL_OUTCOME_PENALTY, DIRECTIONAL_OUTCOME_RECOVERY_WR,
     )
     if DIRECTIONAL_OUTCOME_ENABLED:
         losses, total, wr = get_directional_outcome(direction)
         if total >= DIRECTIONAL_OUTCOME_MIN_TRADES:
+            # Off-course alarm: warn at 2 losses (one before trigger)
+            if losses >= DIRECTIONAL_OUTCOME_LOSS_THRESHOLD - 1 and losses < DIRECTIONAL_OUTCOME_LOSS_THRESHOLD:
+                log(f"  ⚠️ [WEATHER-VANE] {token} {direction}: {losses}/{total} losses ({wr}% WR) — approaching trigger")
+            # Trigger: activate suppression
             if losses >= DIRECTIONAL_OUTCOME_LOSS_THRESHOLD or wr < DIRECTIONAL_OUTCOME_WR_THRESHOLD:
                 dir_outcome_mult = DIRECTIONAL_OUTCOME_PENALTY
+            # Hysteresis: stay suppressed until BOTH losses dropped AND WR recovered
+            elif losses < DIRECTIONAL_OUTCOME_LOSS_THRESHOLD and wr < DIRECTIONAL_OUTCOME_RECOVERY_WR:
+                dir_outcome_mult = DIRECTIONAL_OUTCOME_PENALTY  # stay suppressed
 
     final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult
     return final_score

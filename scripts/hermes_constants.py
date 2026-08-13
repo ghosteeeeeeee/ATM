@@ -625,6 +625,7 @@ DIRECTIONAL_OUTCOME_LOSS_THRESHOLD = 3    # N losses in window to trigger
 DIRECTIONAL_OUTCOME_WR_THRESHOLD = 40     # backup: WR below this also triggers
 DIRECTIONAL_OUTCOME_PENALTY = 0.7         # score multiplier (milder for first deploy)
 DIRECTIONAL_OUTCOME_MIN_TRADES = 3        # minimum trades before activating
+DIRECTIONAL_OUTCOME_RECOVERY_WR = 45      # hysteresis: WR% required to deactivate suppression
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
