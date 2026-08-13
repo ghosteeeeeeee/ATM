@@ -135,6 +135,28 @@ def run() -> int:
         except Exception:
             pass
 
+        # ── EMA200 trend filter (2026-08-13) ──────────────────────────────
+        # Don't SHORT when price is above EMA200 — uptrend, breakout likely pullback.
+        # Backtest: 0/12 winners blocked, 8/10 losers blocked (WR 54.5% → 85.7%)
+        try:
+            from hermes_constants import RANGE_BREAKOUT_SHORT_EMA_PERIOD
+            conn_ema = sqlite3.connect(_CANDLES_DB, timeout=5)
+            rows_ema = conn_ema.execute(
+                "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT ?",
+                (token.upper(), RANGE_BREAKOUT_SHORT_EMA_PERIOD + 10)
+            ).fetchall()
+            conn_ema.close()
+            if rows_ema and len(rows_ema) >= RANGE_BREAKOUT_SHORT_EMA_PERIOD:
+                closes_ema = [r[0] for r in reversed(rows_ema)]
+                k_ema = 2.0 / (RANGE_BREAKOUT_SHORT_EMA_PERIOD + 1)
+                ema_val = closes_ema[0]
+                for p in closes_ema[1:]:
+                    ema_val = p * k_ema + ema_val * (1 - k_ema)
+                if closes_ema[-1] > ema_val:
+                    continue  # price above EMA200 — uptrend, skip SHORT
+        except Exception:
+            pass
+
         price = data['price']
 
         # ── Get momentum stats for regime direction ───────────────────────
