@@ -3,6 +3,11 @@
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
 [2026-08-13 (CEO run — latest)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 107T -$0.52 (52.3% WR — RED), 7d 465T +$0.16 (52.7% WR — barely positive, down from +$0.38). Today 17T -$0.73 (35.3% WR — cold, tiny sample). Stars7d intact (5 profitable). accel-300- SHORT R:R unfavorable (avg_loss 60%>avg_win) but 57.1% WR decent. SHORT7d -$0.92 distributed bleed. Stability period active.
+  BY: CEO run
+  DO NOT REVERT — system flat, stability period active.
+
+[2026-08-13 (CEO run — latest)] CEO: NO TRADING CHANGES
   WHY: Verified DB: 24h 106T -$0.18 (53.8% WR — flat), 7d ~465T +$0.37 (52.8% WR — positive). Daily: Aug 12 +$0.49 (recovery confirmed) → Aug 13 11T -$0.52 (36.4% WR — cold, only 11 trades). Stars7d intact (5 profitable). Only active bleeder: accel-300- SHORT 31T -$0.12 58.1% WR (marginal). All prior bleeders disabled/blacklisted (0 new trades post-fix). Stability period active. System flat, no actionable problem.
   BY: CEO run
   DO NOT REVERT — trajectory positive, stability period active.

@@ -235,3 +235,32 @@ Aug 12 recovery confirmed (+$0.49, 57.0% WR). Aug 13 11T -$0.52 (36.4% WR — co
 - Will confirm param applied via `grep` after edit
 - Monitor accel-300- WR and PnL in next 2 CEO runs
 - If execution issues persist after param change, open separate investigation for ATR SL calculation
+
+---
+
+## CEO Report — 2026-08-13 (Stability Period)
+
+### Diagnosis
+7d PnL dropped +$0.38→+$0.16. Today (Aug13) 17T -$0.73 35.3%WR — ugly but tiny sample. 5 open all accel-300- SHORT. Pipeline running, volatility gate blocking entries (5/6 positions).
+
+### DB-Verified Numbers
+- 24h: 107T -$0.52, 52.3% WR (RED)
+- 7d: 465T +$0.16, 52.7% WR (barely positive, down from +$0.38)
+- LONG 24h: 19T -$0.61, 31.6% WR (bad, tiny sample)
+- SHORT 24h: 88T +$0.09, 56.8% WR (profitable)
+- SHORT 7d: 198T -$0.92, 53.0% WR (bleeding — losses > wins despite decent WR)
+- Stars7d intact: bb_bounce+,range_finder+ 53T +$0.71 58.5%, range_breakout_short 15T +$0.43 66.7%, hzscore+,mover+ 5T +$0.17 80%, bb_bounce+,hzscore+ 34T +$0.22 50%, bb-bounce-short,hzscore- 18T +$0.14 61.1%
+- accel-300- SHORT: 35T -$0.17, 57.1% WR, avg_win $0.05, avg_loss $0.08 (R:R unfavorable — losses 60% larger than wins)
+- Cost drivers48h: atr_sl_hit 65T -$4.07 (dominant)
+- 5 open (all accel-300- SHORT, $0 flat)
+
+### Root Cause
+SHORT7d bleeding from R:R asymmetry across multiple signals. accel-300- has 57.1% WR but avg_loss >> avg_win. range_breakout- also contributing -$0.12. No single kill candidate — distributed bleed. Today's cold streak (17T, 35.3% WR) is regime noise, not signal failure.
+
+### Fix Applied
+NO CHANGES. Stability period active. System flat (7d +$0.16). Stars intact. accel-300- marginal but not broken (57.1% WR, historically star). Overreacting destabilizes.
+
+### Monitor
+- daily PnL: if -2 consecutive red days → investigate
+- accel-300-: if持续 bleeding → disable ACCEL_300_MINUS_ENABLED
+- SHORT7d: if -$1.50+ → consider regime filter

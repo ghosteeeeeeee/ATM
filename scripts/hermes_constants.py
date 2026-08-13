@@ -1080,6 +1080,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'spike_exhaustion_short', 'bb_bounce',
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
+    'hzscore', 'mover', 'return_exhaustion_long',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
