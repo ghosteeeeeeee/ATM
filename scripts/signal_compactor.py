@@ -351,7 +351,7 @@ def get_directional_outcome(direction: str) -> tuple:
         DIRECTIONAL_OUTCOME_TIME_WINDOW,
     )
     try:
-        conn = sqlite3.connect(SIGNAL_DB, timeout=10)
+        conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
             SELECT
@@ -424,7 +424,21 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Speed percentile bonus: +15% if speed_percentile >= 80
     speed_mult = 1.0 + (SPEED_HOTSET_BONUS if speed_data.get('speed_percentile', 0) >= SPEED_HOTSET_THRESHOLD else 0)
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * source_mult * speed_mult
+    # Weather vane: directional outcome penalty
+    # If this direction is losing cluster-wide, suppress the signal
+    dir_outcome_mult = 1.0
+    from hermes_constants import (
+        DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_MIN_TRADES,
+        DIRECTIONAL_OUTCOME_LOSS_THRESHOLD, DIRECTIONAL_OUTCOME_WR_THRESHOLD,
+        DIRECTIONAL_OUTCOME_PENALTY,
+    )
+    if DIRECTIONAL_OUTCOME_ENABLED:
+        losses, total, wr = get_directional_outcome(direction)
+        if total >= DIRECTIONAL_OUTCOME_MIN_TRADES:
+            if losses >= DIRECTIONAL_OUTCOME_LOSS_THRESHOLD or wr < DIRECTIONAL_OUTCOME_WR_THRESHOLD:
+                dir_outcome_mult = DIRECTIONAL_OUTCOME_PENALTY
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult
     return final_score
 
 
