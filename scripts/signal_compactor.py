@@ -830,6 +830,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             NON_DIRECTIONAL_PREFIXES = (
                 'hzscore', 'oc-mtf-macd', 'oc-mtf-rsi', 'gap-300',
                 'phase-accel', 'fast-momentum', 'zscore-momentum',
+                'rs-', 'rs-r',  # support/resistance levels — not directional
             )
             directional_parts = [
                 p for p in source_parts
@@ -995,6 +996,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ── Accel-300 Standalone Bypass ───────────────────────────────────
                 # Strong standalone accel-300 (no RS co-signal needed) — fire on
                 # high-confidence accel-300 alone when the momentum is very strong.
+                bare_source = source.rstrip('+-0123456789') if source else ''
                 if (ACCEL_300_STANDALONE_BYPASS_ENABLED
                         and unique_signal_types == 1
                         and source.startswith('accel-300')
@@ -1003,7 +1005,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     gate_msg = f'standalone accel-300 conf={conf:.0f}% >= {ACCEL_300_STANDALONE_BYPASS_CONFIDENCE}%'
                 # ── Backtested Signal Bypass ──────────────────────────────────────
                 # Signals with proven edge from backtesting — allow standalone.
-                elif unique_signal_types == 1 and source.rstrip('+-') in STANDALONE_BYPASS_SIGNALS:
+                # Strip trailing digits (bars_since) and +/- suffixes for matching.
+                elif unique_signal_types == 1 and bare_source in STANDALONE_BYPASS_SIGNALS:
                     pass_gate = True
                     gate_msg = f'backtested standalone signal ({source})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
