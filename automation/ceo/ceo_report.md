@@ -44,3 +44,9 @@ All changes are deterministic (LLM-free) and backward-compatible. No config flag
 ## Config Cleanup — 2026-08-13
 
 Moved hardcoded EMA 200 period to `hermes_constants.py` as `RANGE_BREAKOUT_SHORT_EMA_PERIOD`. Added AGENTS.md rule: no hardcoded constants. Bug hunter verified clean.
+
+---
+
+## EMA200 Trend Filter — hzscore- — 2026-08-13
+
+EMA200 trend filter added to hzscore- signal. Blocks SHORT when price > EMA200. Backtest validated: 0 winners blocked, 8 losers blocked, WR 54.5%→85.7%, PnL +$0.05→+$0.55. Clean signal hardening — no regression, positive expected impact.

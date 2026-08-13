@@ -28,9 +28,10 @@ REQUIRE_3TF = False  # if True, require 3/3 TF agreement (was always 2/3 minimum
 # Solo-specific (stricter when no co-signal present)
 SOLO_MIN_Z_VALUE = 1.2   # require genuine extreme for standalone (solo avg_z losers ~1.1, winners ~1.8)
 SOLO_REQUIRE_3TF = True  # require 3/3 TF agreement when solo (no co-signal backup)
-import statistics, sys, os
+import sqlite3, statistics, sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from paths import CANDLES_DB
 from signal_schema import add_signal, price_age_minutes
 
 
@@ -140,7 +141,7 @@ def run() -> int:
         # Backtest: 0/12 winners blocked, 8/10 losers blocked (WR 54.5% → 85.7%)
         try:
             from hermes_constants import RANGE_BREAKOUT_SHORT_EMA_PERIOD
-            conn_ema = sqlite3.connect(_CANDLES_DB, timeout=5)
+            conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
             rows_ema = conn_ema.execute(
                 "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT ?",
                 (token.upper(), RANGE_BREAKOUT_SHORT_EMA_PERIOD + 10)
