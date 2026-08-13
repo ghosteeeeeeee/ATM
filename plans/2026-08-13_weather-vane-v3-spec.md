@@ -1,273 +1,192 @@
-# Weather Vane v3 — Predictive Methods Deep Dive
+# Weather Vane v3 — Predictive Detection (CEO-Verified)
 
 **Date:** 2026-08-13
-**Status:** PROPOSED — awaiting CEO review
-**Goal:** Give the Weather Vane PREDICTIVE powers — detect regime shifts BEFORE losses happen
+**Status:** CEO-BACKTESTED — Z-Score + Acceleration is the winning approach
+**Key Finding:** Surfing.md quadrants are REAL — z-score + acceleration together predict outcomes better than either alone
 
 ---
 
-## Current Weather Vane (v2) — Reactive Only
+## CEO Backtest Results (Corrected)
 
-The v2 weather vane is purely reactive: it watches losses accumulate, then suppresses. By the time it fires, the damage is done. We need leading indicators that detect the weather changing BEFORE the storm hits.
+### Method 5: Price Extremes — REVERSED from earlier analysis
 
----
+Our earlier backtest had data alignment issues. CEO's corrected data:
 
-## Proposed Predictive Methods
+| Position | Trades | WR | Total PnL |
+|----------|--------|-----|-----------|
+| LONG at extreme | 99 | **71.7%** | **+$4.00** |
+| SHORT at extreme | 82 | **79.3%** | **+$3.23** |
+| LONG normal | 329 | 40.7% | -$3.26 |
+| SHORT normal | 357 | 36.4% | -$5.13 |
 
-### Method 1: Per-Token Consecutive Loss Counter
+**Extreme positions are the WINNERS.** Chasing works in this system. Do NOT suppress extremes.
 
-**Concept:** Track consecutive losses per token (not per direction). If a token has 3+ consecutive losses, something is wrong with that token's setup — suppress ALL signals for it.
+### Idea A: Z-Score + Acceleration — THE PREDICTIVE SIGNAL
 
-**Why it's predictive:** A token that just lost 3 times in a row is likely in a choppy or adverse regime. The NEXT signal for that token is likely to lose too.
+From surfing.md wave-turn detection. Data validated by CEO:
 
-**Implementation:**
-```python
-def get_consecutive_losses(token: str, direction: str) -> int:
-    """Count consecutive losses for this token+direction."""
-    # Query signal_outcomes ORDER BY created_at DESC
-    # Count losses from most recent until first win
-    # Return count
+| Quadrant | Trades | WR | Avg PnL | Interpretation |
+|----------|--------|-----|---------|----------------|
+| LONG z>0 + accel>0 | 89 | **76.4%** | **+$0.041** | Momentum building → BEST for LONG |
+| LONG z>0 + accel<0 | 70 | 52.9% | +$0.013 | Top forming → weaker |
+| LONG z<0 + accel>0 | 68 | 30.9% | -$0.022 | Bottom building → too early |
+| LONG z<0 + accel<0 | 97 | **24.7%** | **-$0.027** | Collapsing → WORST for LONG |
+| SHORT z>0 + accel>0 | 101 | **23.8%** | **-$0.032** | Wrong direction → WORST for SHORT |
+| SHORT z>0 + accel<0 | 47 | 36.2% | -$0.020 | Overbought fading → weak |
+| SHORT z<0 + accel>0 | 93 | 52.7% | +$0.005 | Oversold bouncing → mediocre |
+| SHORT z<0 + accel<0 | 79 | **63.3%** | **+$0.018** | Downward momentum → BEST for SHORT |
 
-# In _score_signal():
-consec = get_consecutive_losses(token, direction)
-if consec >= 3:
-    dir_outcome_mult = min(dir_outcome_mult, 0.6)  # strong penalty
-elif consec >= 2:
-    dir_outcome_mult = min(dir_outcome_mult, 0.8)  # mild penalty
-```
-
-**Params:**
-```python
-CONSEC_LOSS_ENABLED = True
-CONSEC_LOSS_THRESHOLD_HARD = 3    # 3+ consecutive → 0.6x penalty
-CONSEC_LOSS_THRESHOLD_MILD = 2    # 2 consecutive → 0.8x penalty
-```
-
-**Backtest plan:** Query signal_outcomes for consecutive loss streaks, check if 3+ streaks predict future losses.
+**The pattern is crystal clear:**
+- LONG wins when z>0 AND accel>0 (momentum building)
+- SHORT wins when z<0 AND accel<0 (downward momentum)
+- Both lose when z and accel disagree (wrong direction)
 
 ---
 
-### Method 2: Volume Spike Detection
+## The Surfing.md Quadrant System — Explained
 
-**Concept:** Unusual volume spikes often precede price reversals. If a token's volume spikes 3x+ above its 24h average, a move is coming.
+From `brain/surfing.md`:
 
-**Why it's predictive:** Volume spikes indicate institutional activity or accumulation/distribution. The direction of the spike predicts the next move.
+```
+Z-Score  = (current_price - 20h_mean) / 20h_std
+           → How far price has drifted from recent average
+           → Positive = price high relative to history
+           → Negative = price low relative to history
 
-**Implementation:**
-```python
-def check_volume_spike(token: str) -> str:
-    """Check if token has a volume spike. Returns 'BULLISH_SPIKE', 'BEARISH_SPIKE', or None."""
-    # Query candles_1h volume for last 24h
-    # Compute avg volume per hour
-    # Compare current hour to avg
-    # If >3x avg: check if price closed up (bullish spike) or down (bearish spike)
+Speed    = price_velocity_5m
+           → How fast price is moving RIGHT NOW
 
-# In _score_signal():
-spike = check_volume_spike(token)
-if spike == 'BULLISH_SPIKE' and direction == 'SHORT':
-    dir_outcome_mult = min(dir_outcome_mult, 0.7)  # bullish spike = bad for SHORT
-elif spike == 'BEARISH_SPIKE' and direction == 'LONG':
-    dir_outcome_mult = min(dir_outcome_mult, 0.7)  # bearish spike = bad for LONG
+Accel    = price_acceleration (rate of change of velocity)
+           → Is velocity increasing or decreasing?
 ```
 
-**Params:**
-```python
-VOLUME_SPIKE_ENABLED = True
-VOLUME_SPIKE_THRESHOLD = 3.0    # 3x average volume = spike
-VOLUME_SPIKE_PENALTY = 0.7
-```
+### The 4 Quadrants:
+
+| Z-Score | Speed | Accel | Meaning | Action |
+|---------|-------|-------|---------|--------|
+| Near 0 | Low | Flat | Range-bound, no wave | Sit out |
+| Negative | HIGH | Positive | Wave building UP — bottom picked | Paddle for LONG |
+| Negative | LOW | Positive | Wave building but slow | Wait, too early |
+| Positive | HIGH | Negative | Wave cresting — top in | Take SHORT |
+| Positive | LOW | Negative | Wave collapsing from high | Exit LONGs |
+| Near 0 | HIGH | Positive | Mid-range explosion building | Confirm with confluence |
+
+**The key insight:** Z-score tells you WHERE in the range price is. Acceleration tells you if the wave is building or collapsing. Together they predict the NEXT move.
+
+**Example from real data:**
+- LONG at z>0 + accel>0: 76.4% WR (price is high AND accelerating up → strong trend)
+- SHORT at z>0 + accel>0: 23.8% WR (price is high AND accelerating up → wrong direction for SHORT)
 
 ---
 
-### Method 3: Volatility Expansion
+## Data Already Available
 
-**Concept:** Periods of low volatility (tight BB, low ATR) are followed by explosive moves. Detect compression → expect expansion → suppress signals during expansion.
+From `token_speeds` table (populated by speed_tracker.py):
 
-**Why it's predictive:** Volatility is mean-reverting. After compression comes expansion. Entering during expansion = chasing.
-
-**Implementation:**
-```python
-def check_volatility_expansion(token: str) -> bool:
-    """Check if ATR expanded 2x+ from recent average."""
-    # Get ATR(14) from candles_1h
-    # Compare to 24h average ATR
-    # If current > 2x avg: expansion detected
-
-# In _score_signal():
-if check_volatility_expansion(token):
-    dir_outcome_mult = min(dir_outcome_mult, 0.75)  # volatility = uncertainty
+```sql
+SELECT token, 
+    price_velocity_5m,      -- speed
+    price_acceleration,     -- acceleration
+    speed_percentile,       -- rank vs universe
+    is_stale,               -- flat for 3+ hours
+    wave_phase,             -- 'accelerating', 'falling', 'neutral'
+    momentum_score          -- 0-100 momentum score
+FROM token_speeds;
 ```
 
-**Params:**
-```python
-VOL_EXPANSION_ENABLED = True
-VOL_EXPANSION_THRESHOLD = 2.0    # 2x ATR expansion
-VOL_EXPANSION_PENALTY = 0.75
+And from `signals` table:
+```sql
+SELECT token, z_score, z_score_tier FROM signals;
 ```
+
+**No new data sources needed.** The predictive data is already being collected.
 
 ---
 
-### Method 4: Time-of-Day Pattern
+## Implementation: Z-Score + Acceleration Filter
 
-**Concept:** Certain hours consistently produce worse trades. Suppress signals during historically bad hours.
+### New function in signal_compactor.py:
 
-**Why it's predictive:** Market microstructure creates predictable patterns. Low-liquidity hours (3-5 AM) have wider spreads and more noise.
-
-**Implementation:**
 ```python
-def get_time_penalty() -> float:
-    """Return penalty based on current hour's historical performance."""
-    hour = datetime.now().hour
-    # Look up historical WR for this hour
-    # If WR < 45%: return 0.8x penalty
-    # If WR > 55%: return 1.0x (no penalty)
+def get_zscore_accel_penalty(token: str, direction: str) -> float:
+    """
+    Surfing.md quadrant-based penalty.
+    Returns penalty multiplier based on z-score + acceleration alignment.
+    
+    Aligned (momentum with direction): 1.0 (no penalty)
+    Misaligned (momentum against direction): 0.7 (penalty)
+    """
+    from hermes_constants import ZSCORE_ACCEL_ENABLED, ZSCORE_ACCEL_PENALTY
+    if not ZSCORE_ACCEL_ENABLED:
+        return 1.0
+    
+    # Get z-score from token_speeds or signals
+    conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT price_acceleration, speed_percentile, wave_phase
+        FROM token_speeds WHERE token = ?
+    """, (token.upper(),))
+    speed_row = cur.fetchone()
+    
+    cur.execute("""
+        SELECT z_score FROM signals
+        WHERE token = ? ORDER BY created_at DESC LIMIT 1
+    """, (token.upper(),))
+    z_row = cur.fetchone()
+    conn.close()
+    
+    if not speed_row or not z_row:
+        return 1.0
+    
+    accel = speed_row[0] or 0
+    z_score = z_row[0] or 0
+    
+    # Surfing.md quadrants:
+    # Aligned: LONG + z>0 + accel>0, SHORT + z<0 + accel<0
+    # Misaligned: LONG + z<0 + accel<0, SHORT + z>0 + accel>0
+    
+    if direction == 'LONG':
+        if z_score > 0.5 and accel > 0:
+            return 1.0  # aligned — momentum building for LONG
+        elif z_score < -0.5 and accel < 0:
+            return ZSCORE_ACCEL_PENALTY  # collapsing — wrong for LONG
+    elif direction == 'SHORT':
+        if z_score < -0.5 and accel < 0:
+            return 1.0  # aligned — downward momentum for SHORT
+        elif z_score > 0.5 and accel > 0:
+            return ZSCORE_ACCEL_PENALTY  # rising — wrong for SHORT
+    
+    return 1.0  # neutral quadrant — no penalty
 ```
 
-**Params:**
+### Integration in _score_signal():
+
 ```python
-TIME_PATTERN_ENABLED = True
-TIME_PATTERN_BAD_WR = 45        # hours with WR below this get penalized
-TIME_PATTERN_PENALTY = 0.8
+# Surfing.md quadrant filter: z-score + acceleration alignment
+zscore_accel_mult = get_zscore_accel_penalty(token, direction)
+dir_outcome_mult = min(dir_outcome_mult, zscore_accel_mult)
 ```
 
----
+### Params
 
-### Method 5: Entry Price vs Recent Range
-
-**Concept:** If entry price is at the extreme of the recent range (top for LONG, bottom for SHORT), the trade is chasing. Suppress signals at extremes.
-
-**Why it's predictive:** Buying at the top or selling at the bottom = chasing. Mean reversion is more likely.
-
-**Implementation:**
 ```python
-def check_price_extreme(token: str, direction: str, price: float) -> bool:
-    """Check if price is at extreme of recent range."""
-    # Get 24h high/low from candles_1h
-    # Compute position: (price - low) / (high - low)
-    # If LONG and position > 0.90: price near top → chasing
-    # If SHORT and position < 0.10: price near bottom → chasing
-
-# In _score_signal():
-if check_price_extreme(token, direction, price):
-    dir_outcome_mult = min(dir_outcome_mult, 0.75)
-```
-
-**Params:**
-```python
-PRICE_EXTREME_ENABLED = True
-PRICE_EXTREME_THRESHOLD = 0.90   # 90th percentile = extreme
-PRICE_EXTREME_PENALTY = 0.75
-```
-
----
-
-### Method 6: Multi-Token Correlation Break
-
-**Concept:** When correlated tokens diverge, the market is shifting. Track correlation between token pairs — when it drops, suppress signals.
-
-**Why it's predictive:** Correlated assets moving together = stable market. Divergence = regime change.
-
-**Implementation:**
-```python
-def check_correlation_break(token: str) -> bool:
-    """Check if token's correlation with its peers dropped."""
-    # Define peer groups (e.g., SOL ecosystem: SOL, RAY, JTO)
-    # Compute 24h price correlation
-    # If correlation dropped below 0.5: divergence detected
-
-# In _score_signal():
-if check_correlation_break(token):
-    dir_outcome_mult = min(dir_outcome_mult, 0.8)
-```
-
-**Params:**
-```python
-CORRELATION_BREAK_ENABLED = True
-CORRELATION_BREAK_THRESHOLD = 0.5
-CORRELATION_BREAK_PENALTY = 0.8
+ZSCORE_ACCEL_ENABLED = True
+ZSCORE_ACCEL_PENALTY = 0.7    # penalty when z-score + accel disagree with direction
 ```
 
 ---
 
-### Method 7: Regime Scanner Alignment
+## Updated Detection Layers
 
-**Concept:** If the 4h regime scanner says LONG_BIAS but the Weather Vane sees SHORT losses, there's a conflict. Trust the real-time data.
+| Layer | Indicator | Predictive Power | Status |
+|-------|-----------|-----------------|--------|
+| 0. Z-Score + Acceleration | Surfing.md quadrants | **HIGH** (76% vs 24% WR) | **IMPLEMENT NOW** |
+| 1. Structure shift | Market structure flip | Medium | PROPOSED (14d backtest needed) |
+| 2. Consecutive losses | Per-token loss streaks | Moderate (5pt WR gap) | PROPOSED |
+| 3. Loss cluster | Directional outcome tracker | Proven (v2) | ✅ DONE |
 
-**Why it's predictive:** The regime scanner is lagging. When it disagrees with real-time outcomes, the real-time data is usually right.
-
-**Implementation:**
-```python
-def check_regime_conflict(token: str, direction: str) -> bool:
-    """Check if regime scanner contradicts recent outcomes."""
-    # Get regime from regime_4h.json
-    # Get recent outcomes for this direction
-    # If regime says LONG_BIAS but SHORT is losing: conflict
-
-# In _score_signal():
-if check_regime_conflict(token, direction):
-    dir_outcome_mult = min(dir_outcome_mult, 0.7)
-```
-
-**Params:**
-```python
-REGIME_CONFLICT_ENABLED = True
-REGIME_CONFLICT_PENALTY = 0.7
-```
-
----
-
-### Method 8: Spread/Tightness Monitor
-
-**Concept:** Wide bid-ask spreads indicate illiquidity or uncertainty. Signals fired during wide spreads get worse fills.
-
-**Why it's predictive:** Wide spreads = market makers uncertain = incoming move.
-
-**Implementation:** Requires real-time spread data (not currently tracked). Defer until data source available.
-
-**Params:** N/A (deferred)
-
----
-
-## Priority Ranking
-
-| # | Method | Predictive Power | Complexity | Data Available | Priority |
-|---|--------|-----------------|------------|----------------|----------|
-| 1 | Consecutive losses | High | Low | ✅ signal_outcomes | **NOW** |
-| 5 | Price extremes | Medium | Low | ✅ candles_1h | **NOW** |
-| 2 | Volume spikes | Medium | Low | ✅ candles_1h | **NOW** |
-| 4 | Time-of-day | Low-Medium | Low | ✅ trade outcomes | **NOW** |
-| 3 | Volatility expansion | Medium | Low | ✅ candles_1h | NEXT |
-| 7 | Regime conflict | Medium | Low | ✅ regime_4h.json | NEXT |
-| 6 | Correlation break | Medium | Medium | ✅ price history | LATER |
-| 8 | Spread monitor | High | High | ❌ needs data | DEFERRED |
-
----
-
-## Recommended Implementation Order
-
-1. **Consecutive losses** (#1) — most direct, highest impact
-2. **Price extremes** (#5) — simple, catches chasing
-3. **Volume spikes** (#2) — catches institutional activity
-4. **Time-of-day** (#4) — catches low-liquidity hours
-
-Methods 5-8 can be added later as data sources become available.
-
----
-
-## Integration Approach
-
-All methods feed into the same `_score_signal()` function as the existing Weather Vane:
-
-```python
-# Layer 0: Structure shift (LONG only, per 14-day backtest)
-# Layer 1: Consecutive losses (per-token)
-# Layer 2: Price extremes (per-token)
-# Layer 3: Volume spikes (per-token)
-# Layer 4: Time-of-day (market-wide)
-# Layer 5: Loss cluster (existing v2)
-
-# Minimum penalty wins — any layer can trigger suppression
-```
+**Z-Score + Acceleration is the strongest predictive signal** — 52-point WR gap between best and worst quadrants. And the data is already being collected.
 
 ---
 
@@ -275,5 +194,5 @@ All methods feed into the same `_score_signal()` function as the existing Weathe
 
 | File | Change |
 |------|--------|
-| `scripts/hermes_constants.py` | Add all new params |
-| `scripts/signal_compactor.py` | Add helper functions + integrate into `_score_signal()` |
+| `scripts/hermes_constants.py` | Add ZSCORE_ACCEL_* params |
+| `scripts/signal_compactor.py` | Add `get_zscore_accel_penalty()`, integrate into `_score_signal()` |
