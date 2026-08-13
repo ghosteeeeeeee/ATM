@@ -211,6 +211,11 @@ except Exception:
     _r2_trend_run = None
 
 try:
+    from signals.r2_trend_long import run as _r2_trend_long_run
+except Exception:
+    _r2_trend_long_run = None
+
+try:
     from signals.volume_hl import main as _volume_hl_run
 except Exception:
     _volume_hl_run = None
@@ -387,6 +392,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'ema9_sma20',           'enabled': EMA9_SMA20_ENABLED,         'run': _ema9_sma20_run},
     {'name': 'r2_rev',               'enabled': R2_REV_ENABLED,             'run': _r2_rev_run},
     {'name': 'r2_trend',             'enabled': R2_TREND_ENABLED,           'run': _r2_trend_run},
+    {'name': 'r2_trend_long',        'enabled': R2_TREND_LONG_ENABLED,      'run': _r2_trend_long_run},
     {'name': 'volume_hl',            'enabled': VOLUME_HL_ENABLED,           'run': _volume_hl_run},
     {'name': 'ma300_candle_confirm', 'enabled': MA300_CANDLE_ENABLED,        'run': _ma300_candle_run},
     {'name': 'atr_compression',      'enabled': ATR_COMPRESSION_ENABLED,     'run': _atr_compression_run},

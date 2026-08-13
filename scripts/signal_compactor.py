@@ -269,6 +269,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('engulfing_short', 'engulfing-'):  1.0,
     ('range_breakout', 'range_breakout+'):  1.0,
     ('range_breakout', 'range_breakout-'):  1.0,
+    # r2_trend_long — R² trend confirmation for LONG (slow grinds, R²>0.6, slope>0)
+    ('r2_trend_long', 'r2l-long'):          1.0,
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)
     ('mtf_zscore',  'bb-bounce-short,hzscore-'):           1.5,  # 11T 64% WR +$0.18 (boosted)
@@ -1402,6 +1404,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             pass
             # ── Global SHORT velocity filter (backtested: vel>0.1% OR last3_green>=3 → 12% WR) ──
             if direction == 'SHORT' and SHORT_VEL_FILTER_ENABLED:
+                _conn_vel = None
                 try:
                     import sqlite3 as _sqlite3_vel
                     _conn_vel = _sqlite3_vel.connect(CANDLES_DB, timeout=5)
@@ -1412,15 +1415,22 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         ORDER BY ts DESC LIMIT 10
                     """, (tkn.upper(),))
                     _vel_closes = [r[0] for r in _cur_vel.fetchall()]
-                    _conn_vel.close()
+                    _cur_vel.close()
                     if len(_vel_closes) >= 6:
                         _vel_5h = (_vel_closes[0] - _vel_closes[5]) / _vel_closes[5] * 100 if _vel_closes[5] > 0 else 0
-                        _last3_green = sum(1 for i in range(-3, 0) if i < -abs(len(_vel_closes)-1) and _vel_closes[i] > _vel_closes[i-1]) if len(_vel_closes) >= 4 else 0
+                        # Check newest 3 candles for green (DESC order: [0]=newest, [1]=2nd, [2]=3rd)
+                        _last3_green = sum(1 for i in range(3) if i + 1 < len(_vel_closes) and _vel_closes[i] > _vel_closes[i + 1])
                         if _vel_5h > SHORT_VEL_FILTER_VEL_THRESHOLD or _last3_green >= SHORT_VEL_FILTER_GREEN_THRESHOLD:
                             log(f"  🚫 [VEL-FILTER] {tkn}: SHORT blocked — vel={_vel_5h:+.3f}% last3g={_last3_green}")
                             continue
                 except Exception:
                     pass  # non-fatal
+                finally:
+                    if _conn_vel:
+                        try:
+                            _conn_vel.close()
+                        except Exception:
+                            pass
             # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
             # Uses validate_source() for correct handling:
             # 1. Exact match: whole source in blacklist → block

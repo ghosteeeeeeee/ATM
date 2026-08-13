@@ -702,7 +702,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             MA_CROSS_5M_ENABLED, MA_CROSS_5M_PLUS_ENABLED, MA_CROSS_5M_MINUS_ENABLED,
             HH_HL_ENABLED, GUPPY_ENABLED, MACD_ACCEL_ENABLED,
             TREND_PURITY_ENABLED, EMA9_SMA20_ENABLED,
-            R2_REV_ENABLED, R2_TREND_ENABLED,
+            R2_REV_ENABLED, R2_TREND_ENABLED, R2_TREND_LONG_ENABLED,
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
         )
@@ -836,6 +836,10 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 return None
             if _comp == 'r2_rev' and not R2_REV_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_REV_ENABLED=False', flush=True)
+                return None
+            # r2_trend_long — R² trend confirmation for LONG (slow grinds)
+            if _comp == 'r2l-long' and not R2_TREND_LONG_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_TREND_LONG_ENABLED=False', flush=True)
                 return None
             # oc-mtf-macd — OpenClaw signals
             if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:

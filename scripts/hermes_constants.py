@@ -1027,6 +1027,7 @@ R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT
 R2_TREND_ENABLED         = False
 R2_TREND_PLUS_ENABLED        = False   # r2_trend+ LONG (was single flag only, SHORT only)
 R2_TREND_MINUS_ENABLED       = False    # r2_trend- SHORT
+R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT
