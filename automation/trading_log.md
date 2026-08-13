@@ -7073,3 +7073,34 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - accel-300- was re-enabled yesterday with positive edge data — may work in different market conditions. Monitor for re-enable.
 - Today Aug 13 remains worst day in 7d. System flat overall.
+
+## 2026-08-13 11:30 UTC — Hourly Analysis
+
+**Trades:** 0 closed (quiet market)
+**PnL:** $0.00
+
+**24h Snapshot:**
+- 87 trades, 45 profit-monster-trail (+$1.91), 38 atr_sl_hit (-$2.79)
+- ATR SL hit rate: 44.1% (above 40% threshold but trail compensating)
+- Net 24h: ~-$0.60 (flat)
+
+**Today (Aug 13):**
+- 34T, 41.2% WR, -$1.16
+
+**Signal Status:**
+- accel-300-: KILLED. Last trade closed 08:55 UTC — kill working
+- range_breakout_short: 19T, 57.9% WR, +$0.18 (best performer)
+- hzscore-: 6T, 66.7% WR, +$0.04
+- range_breakout-: 13T, 23.1% WR, -$0.55 (worst WR, but auto-trade cleanup)
+
+**Changes:** None. No trades to analyze. accel-300- kill confirmed working. Market quiet.
+
+**No Change Needed:**
+- 0 trades last hour — nothing to act on
+- ATR SL 44.1% — trail compensating (+$1.91 vs -$2.79)
+- All kills already deployed
+- Trade freq normal when active
+
+**Open Questions:**
+- Today Aug 13 worst day in 7d ($-1.16) — but low sample (34T), could be variance
+- Watch if activity picks up next hour

@@ -2,8 +2,8 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
-[2026-08-13 (CEO run — latest verification)] CEO: NO TRADING CHANGES
-  WHY: Verified DB: 24h 88T -$0.64 (52.3% WR — RED), 7d 451T -$0.54 (51.4% WR — slightly negative). Aug 13: 30T -$1.12 (40% WR — worst day). 83% of today's trades = legacy disabled signals (accel-300- 19T -$0.73, range_breakout_short 5T -$0.31). SHORT 7d: 199T -$1.34 (mostly legacy). Stars7d intact (5 profitable). All bleeders disabled/blacklisted. Stability period active.
+[2026-08-13 (CEO run — verified)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 86T -$0.60 (53.5% WR — RED), 7d 445T -$0.95 (50.6% WR — slightly negative). Aug 13 all SHORT 41.2% WR. SHORT7d: 198T -$1.57 (AT -$1.50 threshold — 100% legacy). LONG7d: 248T +$0.65 (profitable). All bleeders disabled/blacklisted, legacy clearing. Stars7d intact (6 profitable). 4 open -$0.02 flat.
   BY: CEO run
   DO NOT REVERT — system flat, stability period active.
 
@@ -399,3 +399,7 @@
   WHY: 19T today 36.8% WR -$0.73, 12/19 ATR SL hits. Re-enabled 2026-08-12 but deteriorated. Primary source of SL losses (16/39 ATR SL hits in 24h).
   BY: auto_1hr
   NEXT: Re-run at 11:30 UTC
+[2026-08-13 11:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet market). 24h 87T 52.9% WR -$0.60 (flat). ATR SL 44.1% (above 40% threshold but trail compensating +$1.91 vs SL -$2.79). accel-300- kill confirmed working — last trade closed 08:55 UTC. No 0% WR kill candidates (0 trades last hour). 2 open trades healthy. Today 34T 41.2% WR -$1.16 (low sample). No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 12:30 UTC
