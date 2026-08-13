@@ -647,6 +647,24 @@ DIRECTIONAL_OUTCOME_INTEGRAL_ENABLED = True
 DIRECTIONAL_OUTCOME_INTEGRAL_WINDOW = 240     # minutes (4 hours)
 DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD = 5    # losses in long window to trigger
 DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY = 0.8    # milder than short-window penalty
+# Direction Lock: after catastrophic loss (4+/5), lock direction for N minutes.
+# Prevents re-entry during clear bad streaks — no unsuppression during lock.
+DIRECTIONAL_OUTCOME_LOCK_ENABLED = True
+DIRECTIONAL_OUTCOME_LOCK_MINUTES = 30         # lock duration after catastrophic failure
+DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.8       # loss_velocity threshold for lock activation
+
+# ── Tide Detection (Weather Vane v4) ───────────────────────────────────────
+# BTC 3h momentum as fastest lagging indicator for regime shift detection.
+# Bearish tide: BTC 3h falling + SHORT WR > 55% → suppress LONG
+# Bullish tide: BTC 3h rising + SHORT WR < 45% → suppress SHORT
+TIDE_ENABLED = True
+TIDE_PENALTY = 0.7
+TIDE_BTC_MOM_WINDOW = 3          # hours for BTC momentum
+TIDE_BTC_MOM_FALLING = -0.1      # % — below this = falling
+TIDE_BTC_MOM_RISING = 0.1        # % — above this = rising
+TIDE_SHORT_WR_WINDOW = 10        # trades for confirmation
+TIDE_SHORT_WR_THRESHOLD_HIGH = 55
+TIDE_SHORT_WR_THRESHOLD_LOW = 45
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.

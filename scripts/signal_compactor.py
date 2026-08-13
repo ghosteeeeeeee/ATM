@@ -414,6 +414,127 @@ def get_directional_outcome_long(direction: str) -> tuple:
             conn.close()
 
 
+def _is_direction_locked(direction: str) -> bool:
+    """Check if direction is locked due to recent catastrophic loss (4+/5 trades).
+    Returns True if lock is active (suppress all signals in this direction)."""
+    from hermes_constants import (
+        DIRECTIONAL_OUTCOME_LOCK_ENABLED,
+        DIRECTIONAL_OUTCOME_LOCK_MINUTES,
+        DIRECTIONAL_OUTCOME_LOCK_VELOCITY,
+    )
+    if not DIRECTIONAL_OUTCOME_LOCK_ENABLED:
+        return False
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT is_win, created_at FROM signal_outcomes
+            WHERE direction = ?
+            ORDER BY created_at DESC LIMIT 5
+        """, (direction.upper(),))
+        rows = c.fetchall()
+        if len(rows) < 5:
+            return False
+        losses = sum(1 for is_win, _ in rows if is_win == 0)
+        loss_velocity = losses / len(rows)
+        if loss_velocity < DIRECTIONAL_OUTCOME_LOCK_VELOCITY:
+            return False
+        last_at = rows[0][1]
+        last_dt = datetime.strptime(last_at, '%Y-%m-%d %H:%M:%S')
+        lock_until = last_dt + timedelta(minutes=DIRECTIONAL_OUTCOME_LOCK_MINUTES)
+        locked = datetime.now() < lock_until
+        if locked:
+            log(f"  🔒 [DIRECTION-LOCK] {direction}: locked until {lock_until:%H:%M} ({losses}/5 catastrophic, {DIRECTIONAL_OUTCOME_LOCK_MINUTES}min lock)")
+        return locked
+    except Exception:
+        return False
+    finally:
+        if conn:
+            conn.close()
+
+
+def _get_btc_momentum() -> float:
+    """Get BTC 3h momentum as percentage change.
+    Uses 1h candles: (current - 3h ago) / 3h ago * 100.
+    Returns momentum % or 0.0 on error."""
+    try:
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT close FROM candles_1h
+            WHERE token = 'BTC'
+            ORDER BY ts DESC LIMIT 4
+        """)
+        rows = c.fetchall()
+        conn.close()
+        if len(rows) < 4:
+            return 0.0
+        now_price = rows[0][0]
+        ago_price = rows[3][0]
+        if ago_price <= 0:
+            return 0.0
+        return (now_price - ago_price) / ago_price * 100
+    except Exception:
+        return 0.0
+
+
+def _get_short_wr(window: int = 10) -> float:
+    """Get SHORT win rate over last N trades across all tokens.
+    Returns WR% (0-100) or 50.0 on error (neutral)."""
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) as wins
+            FROM (
+                SELECT is_win FROM signal_outcomes
+                WHERE direction = 'SHORT'
+                ORDER BY created_at DESC LIMIT ?
+            )
+        """, (window,))
+        row = c.fetchone()
+        if row and row[0] > 0:
+            return round((row[1] or 0) / row[0] * 100, 1)
+        return 50.0
+    except Exception:
+        return 50.0
+    finally:
+        if conn:
+            conn.close()
+
+
+def get_tide_penalty(token: str, direction: str) -> float:
+    """Tide detection: BTC 3h momentum + SHORT win rate confirmation.
+    Returns penalty multiplier (1.0 = no penalty, TIDE_PENALTY = suppressed).
+
+    Bearish tide: BTC 3h falling AND SHORT WR > 55% → suppress LONG
+    Bullish tide: BTC 3h rising AND SHORT WR < 45% → suppress SHORT
+    """
+    from hermes_constants import (
+        TIDE_ENABLED, TIDE_PENALTY, TIDE_BTC_MOM_WINDOW,
+        TIDE_BTC_MOM_FALLING, TIDE_BTC_MOM_RISING,
+        TIDE_SHORT_WR_THRESHOLD_HIGH, TIDE_SHORT_WR_THRESHOLD_LOW,
+    )
+    if not TIDE_ENABLED:
+        return 1.0
+    btc_mom = _get_btc_momentum()
+    short_wr = _get_short_wr()
+    # Bearish tide: BTC falling + SHORT winning → suppress LONG
+    if btc_mom < TIDE_BTC_MOM_FALLING and short_wr > TIDE_SHORT_WR_THRESHOLD_HIGH:
+        if direction.upper() == 'LONG':
+            log(f"  🌊 [TIDE] {token} LONG: bearish tide (BTC {btc_mom:+.2f}%, SHORT WR={short_wr:.0f}%) → {TIDE_PENALTY}x")
+            return TIDE_PENALTY
+    # Bullish tide: BTC rising + SHORT losing → suppress SHORT
+    if btc_mom > TIDE_BTC_MOM_RISING and short_wr < TIDE_SHORT_WR_THRESHOLD_LOW:
+        if direction.upper() == 'SHORT':
+            log(f"  🌊 [TIDE] {token} SHORT: bullish tide (BTC {btc_mom:+.2f}%, SHORT WR={short_wr:.0f}%) → {TIDE_PENALTY}x")
+            return TIDE_PENALTY
+    return 1.0
+
+
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data):
@@ -504,7 +625,15 @@ def _score_signal(token, direction, conf, source, signal_type,
         if long_losses >= DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD:
             dir_outcome_mult = min(dir_outcome_mult, DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY)
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult
+    # Direction Lock: after catastrophic loss (4+/5), suppress for N minutes
+    # Overrides all other weather vane logic — no unsuppression during lock
+    if _is_direction_locked(direction):
+        dir_outcome_mult = 0.0
+
+    # Tide detection: BTC 3h momentum + SHORT WR confirmation
+    tide_mult = get_tide_penalty(token, direction)
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult
     return final_score
 
 
@@ -2181,7 +2310,6 @@ def _enrich_and_write_signals(hotset_entries):
     from what was actually in the hot-set.
     """
     import fcntl
-    from datetime import datetime, timezone
 
     def _atomic_write(data, path):
         lock_path = path + '.lock'
