@@ -482,7 +482,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                 log(f"  ⚠️ [WEATHER-VANE] {token} {direction}: {losses}/{total} losses ({wr}% WR) — approaching trigger")
             # Derivative: tiered penalty based on loss velocity
             loss_velocity = losses / total if total > 0 else 0
-            velocity_mult = 1.0
+            velocity_mult = DIRECTIONAL_OUTCOME_PENALTY  # default to static penalty (fallback when velocity tiers disabled)
             if DIRECTIONAL_OUTCOME_VELOCITY_ENABLED:
                 for threshold, mult in sorted(DIRECTIONAL_OUTCOME_VELOCITY_TIERS.items(), reverse=True):
                     if loss_velocity >= threshold:

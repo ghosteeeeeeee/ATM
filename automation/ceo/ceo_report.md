@@ -29,3 +29,6 @@ Pipeline healthy (all timers active). 6 open trades flat. Weather Vane v2 deploy
 - Daily PnL: if -2 consecutive red days → investigate
 - accel-300- SHORT: if持续 bleeding → disable ACCEL_300_MINUS_ENABLED
 - SHORT7d: currently -$0.50 — below -$1.50 regime filter threshold
+
+### Weather Vane v2 — Complete
+Bug fix: velocity_mult defaulted to 1.0 (no-op) when velocity tiers disabled → fixed to DIRECTIONAL_OUTCOME_PENALTY (0.7x). Proposals 3-4 (velocity tiers, integral) already live. Proposals 5-6 (gain scheduling, watchdog) YAGNI. All layers active: hysteresis, off-course alarm, velocity tiers, integral. No trading changes.
