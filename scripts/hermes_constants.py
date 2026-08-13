@@ -1086,7 +1086,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long', 'range_breakout', 'range_breakout_short',
-    'spike_exhaustion_short', 'bb_bounce',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
