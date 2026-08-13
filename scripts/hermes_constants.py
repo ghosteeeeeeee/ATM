@@ -622,6 +622,14 @@ ZSCORE_ACCEL_Z_THRESHOLD = 0.5       # z-score threshold for alignment check
 ZSCORE_ACCEL_ACCEL_THRESHOLD = 0.005 # acceleration threshold (0.5% hourly)
 ZSCORE_ACCEL_PENALTY = 0.7           # used if soft penalty mode enabled
 
+# ── Short Velocity Filter (global) ───────────────────────────────────────
+# Block SHORT when price is rising or last 3 candles are green.
+# Backtested: vel>0.1% OR last3_green>=3 → 12% WR (losers), kept → 89% WR.
+# SHORT-only filter — does NOT apply to LONG.
+SHORT_VEL_FILTER_ENABLED = True
+SHORT_VEL_FILTER_VEL_THRESHOLD = 0.1   # % — block SHORT if 5h velocity > this
+SHORT_VEL_FILTER_GREEN_THRESHOLD = 3   # block SHORT if last N candles are green
+
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.
 # Fires when 3+ of last 5 trades in same direction are losses within 30min.
