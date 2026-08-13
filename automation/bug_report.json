@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-12 23:25:31",
+  "timestamp": "2026-08-13 07:25:31",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -7,7 +7,7 @@
   "criticals": [
     {
       "name": "sqlite_leaks",
-      "msg": "103 files: study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py, wave_backtest.py",
+      "msg": "104 files: study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py, backtest_accel_300.py",
       "file": "study_winning_combos.py.py",
       "fix": "Move conn.close() to a finally block or use context manager"
     },
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "113 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "114 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
       "file": "study_winning_combos.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -37,7 +37,7 @@
     },
     {
       "name": "connection_leaks",
-      "msg": "111 files with sqlite3.connect but no finally block: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "112 files with sqlite3.connect but no finally block: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },

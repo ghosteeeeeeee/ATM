@@ -6946,3 +6946,32 @@ None — system stable, previous fixes settling in.
 - accel-300- still executing 39T/24h despite kill — may be pipeline cache or pre-kill entries
 - Today 31.8% WR low sample (22T) — monitor next hour
 - range_breakout_short (62.5% WR) is best performer — consider increasing confidence?
+
+## [2026-08-13 07:30 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W 2L). 91T/24h, 51.6% WR, -$0.58.
+**PnL:** $-0.04/1h (flat). 24h: $-0.58 (flat).
+
+**24h by close reason:**
+- profit-monster-trail: 46T +$2.16 (avg +$0.047) — compensating
+- atr_sl_hit: 41T -$2.97 (avg -$0.072) — 45% of closes (above 40% threshold)
+
+**24h by signal:**
+- range_breakout_short: 16T 62.5% WR +$0.33 ← BEST
+- hzscore-: 7T 57.1% WR +$0.11
+- accel-300-: 38T 55.3% WR -$0.30 (trailing entries, no new opens since ~03:37)
+- range_breakout-: 15T 26.7% WR -$0.53 (killed, trailing)
+- range_breakout+: 3T 33.3% WR -$0.13 (killed, trailing)
+
+**Changes:** None.
+
+**No Change Needed:**
+- accel-300- kill working — last entry 03:37 UTC, no new entries after flag set. Trailing trades closing naturally.
+- ATR SL at45% — structural but stable. profit-monster-trail (+$2.16) partially compensates SL losses (-$2.97). Net from these two: -$0.81. Wider SL would reduce hit rate but increase avg loss — neutral tradeoff at current flat PnL.
+- No 0% WR kill candidates (0 trades last hour, no new underperformers).
+- Trade freq 3/hr normal. 5 open trades healthy.
+- range_breakout_short (62.5% WR) best performer — no action needed, already running.
+
+**Open Questions:**
+- accel-300- still has 38T/24h — all pre-kill entries. Will die off as trail closes them.
+- ATR SL structural issue persists but system is flat — not bleeding, not making. Hold steady.
