@@ -239,11 +239,17 @@ def detect_breakout_short(closes, token):
     if breakout_idx is None:
         return None  # no SHORT breakout found
 
-    # ── Phase 2b: Trend filter — don't SHORT in uptrend ────────────────
-    # If 1H trend is BULLISH, the breakout is likely a pullback, not a reversal.
-    trend = _get_1h_trend(token)
-    if trend == 'BULLISH':
-        return None  # don't SHORT when price is trending up on 1H
+    # ── Phase 2b: Trend filter — don't SHORT above EMA200 ──────────────
+    # If price is above EMA200, the breakout is likely a pullback, not a reversal.
+    # Backtest: all winners had price below EMA200, all losers above.
+    if len(closes) >= 200:
+        ema200_vals = []
+        k200 = 2.0 / 201
+        ema200_val = closes[0]
+        for p in closes[1:]:
+            ema200_val = p * k200 + ema200_val * (1 - k200)
+        if closes[-1] > ema200_val:
+            return None  # price above EMA200 — uptrend, skip SHORT
 
     # ── Phase 3: Invalidation — close back inside range? ────────────────
     for i in range(1, INVALIDATION_WINDOW + 1):
