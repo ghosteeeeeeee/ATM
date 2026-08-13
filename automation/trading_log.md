@@ -7001,3 +7001,35 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - ATR SL persistent at 45% — structural but net flat. Hold.
+
+## 2026-08-13 09:30 UTC — Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** +$0.12 (100% WR)
+
+**Exit Reasons:** profit-monster-trail (3)
+
+**24h Snapshot:**
+- 88 trades, 46 profit-monster-trail (+$2.00), 38 atr_sl_hit (-$2.77), 1 atr_tp_hit (+$0.32)
+- ATR SL hit rate: 43.2% (above 40% threshold, down from 46.4%)
+- Net 24h: roughly flat (-$0.27)
+- Today (Aug 13): 31T, -$1.09, 41.9% WR (worst day in 7d)
+
+**Signal Performance (24h):**
+- ❌ range_breakout- SHORT: 14T, -$0.58, 21.4% WR — 10/14 trades are SL hits
+- ⚠️ accel-300- SHORT: 38T, -$0.26, 55.3% WR — marginal, R:R unfavorable
+- ✅ hzscore- SHORT: 5T, +$0.18, 100% WR
+- ✅ range_breakout_short SHORT: 19T, +$0.18, 57.9% WR
+
+**Diagnosis:**
+1. **Entry quality:** Excellent — last hour 100% WR, profit-monster-trail exits
+2. **SL behavior:** 43.2% SL hit rate (down from 46.4% — improving). SL cost -$2.77 vs trail profit +$2.00
+3. **Signal quality:** range_breakout- SHORT is the worst performer (21.4% WR, 10/14 SL hits). accel-300- marginal.
+4. **Trade frequency:** ~3.7/hour, normal
+
+**Changes:** None. No signal meets kill criteria (0% WR with 3+ trades in last hour). CEO stability period active. ATR SL rate improving (46.4% → 43.2%). System flat.
+
+**Open Questions:**
+- range_breakout- SHORT has 21.4% WR over 24h but no last-hour trades — monitoring for next hour
+- Today Aug 13 worst day in 7d ($-1.09 on 31T). Watching if this continues.
+- ATR SL hit rate trending down (46.4% → 43.2%) — trailing stop fix may be helping
