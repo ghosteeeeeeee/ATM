@@ -1,3 +1,11 @@
+## CEO Report — 2026-08-15 (Z-Score + Acceleration Filter — Deployed)
+
+**DEPLOYED.** Z-Score + Acceleration alignment filter now live in `decider_run.py:762-772`. Hard block: LONG z>0.5+accel>0.005, SHORT z<-0.5+accel<-0.005. Bug hunter: ALL CLEAR. No trading changes.
+
+Goal: +2-4% WR by blocking ~23.8% WR misaligned trades. Monitor 48h for false positive rate. If >10% of valid signals blocked, tighten thresholds.
+
+---
+
 ## CEO Report — 2026-08-15 (Z-Score + Acceleration Filter — Pipeline Placement)
 
 ### Verdict: Separate gate in `rule_based_context_gate()`. NOT part of volatility_gate.py.

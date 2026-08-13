@@ -226,6 +226,7 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         ACCEL_300_MIN_GAP_GROWTH_SHORT,
         ACCEL_300_REGIME_SLOPE_PCT,
         ACCEL_300_SLOPE_WINDOW,
+        ACCEL_300_MIN_ATR_PCT,
         ACCEL_300_BARS_UNKNOWN,
         PHASE_ENTRY_FILTER_ENABLED,
         ACCEL_300_ALLOWED_PHASES,
@@ -238,6 +239,15 @@ def detect_accel_300(token: str, prices: list) -> Optional[dict]:
         return None
 
     closes = [float(point['price']) for point in prices]
+
+    # ── ATR floor filter: skip ultra-low-vol tokens (SL too tight, stops on noise)
+    if ACCEL_300_MIN_ATR_PCT > 0 and len(closes) >= 15:
+        atr_changes = [abs(closes[i] - closes[i-1]) for i in range(max(1, len(closes)-14), len(closes))]
+        atr_val = sum(atr_changes) / len(atr_changes) if atr_changes else 0
+        atr_pct = atr_val / closes[-1] if closes[-1] > 0 else 0
+        if atr_pct < ACCEL_300_MIN_ATR_PCT:
+            return None
+
     ema300 = _ema_series(closes, period)
     gap_pcts = [
         None if ema is None or ema == 0 else (price - ema) / ema * 100.0

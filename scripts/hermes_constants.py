@@ -880,6 +880,7 @@ ACCEL_300_ENABLED        = True   # re-enabled 2026-08-12 — SHORT edge confirm
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
 ACCEL_300_REGIME_SLOPE_PCT = 0.001  # min price slope % — filter weak trends (was 0.0005, backtest: +0.6% WR, +0.05% PnL)
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
+ACCEL_300_MIN_ATR_PCT      = 0.0002  # min ATR % — block SHORT on ultra-low-vol tokens (SL too tight, stops on noise). Backtest: zero winner kills, +0.05% PnL
 ACCEL_300_STALE_BARS = 15   # max bars since EMA cross for LONG (was 25 — fresher signals, catch moves earlier)
 ACCEL_300_STALE_BARS_SHORT = 15   # max bars since EMA cross for SHORT (was 25 — fresher signals)
 ACCEL_300_STALE_LOOKBACK   = 400  # detection bar must be within N bars of latest bar — older = stale, skip

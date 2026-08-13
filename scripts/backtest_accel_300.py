@@ -70,6 +70,7 @@ def detect_short(closes, params):
     min_growth = params['min_growth']
     slope_pct = params['slope_pct']
     slope_window = params['slope_window']
+    min_atr_pct = params.get('min_atr_pct', 0)
 
     min_rows = period + max(persistence, 3)
     if len(closes) < min_rows:
@@ -87,6 +88,14 @@ def detect_short(closes, params):
     for idx in range(min_rows - 1, len(closes)):
         if idx <= cooldown_until:
             continue
+
+        # ATR floor filter
+        if min_atr_pct > 0 and idx >= 14:
+            atr_changes = [abs(closes[i] - closes[i-1]) for i in range(idx-13, idx+1)]
+            atr_val = sum(atr_changes) / len(atr_changes) if atr_changes else 0
+            atr_pct = atr_val / closes[idx] if closes[idx] > 0 else 0
+            if atr_pct < min_atr_pct:
+                continue
 
         latest_ema = ema[idx]
         gap_now = gap_pcts[idx]
@@ -209,17 +218,52 @@ PARAM_SETS = {
     'baseline': {
         'period': 300, 'persistence': 7, 'min_gap': 0.35,
         'min_growth': 0.10, 'slope_pct': 0.0005, 'slope_window': 20,
-        'cooldown': 10,
+        'cooldown': 10, 'min_atr_pct': 0,
     },
     'F_slope_001': {
         'period': 300, 'persistence': 7, 'min_gap': 0.35,
         'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
-        'cooldown': 10,
+        'cooldown': 10, 'min_atr_pct': 0,
+    },
+    'ATR_0005': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.0005,
+    },
+    'ATR_0003': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.0003,
+    },
+    'ATR_0002': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.0002,
+    },
+    'ATR_0001': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.0001,
+    },
+    'ATR_001': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.001,
+    },
+    'ATR_0015': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.0015,
+    },
+    'ATR_002': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10, 'min_atr_pct': 0.002,
     },
     'H_combo': {
         'period': 300, 'persistence': 9, 'min_gap': 0.40,
         'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
-        'cooldown': 10,
+        'cooldown': 10, 'min_atr_pct': 0,
     },
     'I_slope_0008': {
         'period': 300, 'persistence': 7, 'min_gap': 0.35,
