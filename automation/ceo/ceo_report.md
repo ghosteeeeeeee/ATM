@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-13 15:20 UTC
+
+### Diagnosis
+24h 73T -$0.12 (57.5% WR — FLAT). 7d 439T -$0.67 (51.2% WR — slightly negative). Aug 13 worst day: 40T -$1.11 (45% WR). SHORT7d -$1.13 (51.3% WR — losses > wins).
+
+### Root Cause
+SHORT7d -$1.13 driven entirely by disabled signals: accel-300- 40T -$0.30, return_exhaustion- combos ~$0.45, range_breakout- 20T -$0.12. Active SHORT signals profitable: range_breakout_short 22T +$0.10 54.5%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Aug 13 SHORT 38T -$1.17 = accel-300- legacy clearing (last entry Aug 12 23:59, all trailing positions closing). Cost driver: atr_sl_hit 170T -$9.88 vs profit-monster-trail 212T +$10.16 (ratio 1.03:1 — razor thin).
+
+### Fix Applied
+NO CHANGES. All bleeders already disabled. Legacy clearing in progress. System flat.
+
+### Verification
+Stars7d intact (5 profitable). LONG7d +$0.74 (solid). 4 open SHORT -$0.14 flat. Pipeline healthy. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ after accel-300- clears → regime filter), profit-monster-trail ratio (if <1.0 → investigate trail params).
+
+---
+
 ## CEO Report — 2026-08-15 (Weather Vane v5 verdict)
 
 ### Verdict: REJECTED
