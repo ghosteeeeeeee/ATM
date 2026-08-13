@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-08-12 19:48 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-13 01:48 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 843 | **WR:** 46.0% | **PnL:** -13.59%
-- **Date range:** 2026-07-29 → 2026-08-12
+- **Total trades (all time):** 872 | **WR:** 46.3% | **PnL:** -14.92%
+- **Date range:** 2026-07-29 → 2026-08-13
 
 ---
 
@@ -11,8 +11,8 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| accel-300- | SHORT | 12 | 83.3% | +4.19 | 15 | 73.3% | +3.59 | ENABLED |
-| bb_bounce+ | LONG | — | —% | — | 19 | 57.9% | +1.55 | ENABLED |
+| range_breakout_short | SHORT | 11 | 63.6% | +2.82 | 14 | 71.4% | +4.04 | ENABLED |
+| bb_bounce+ | LONG | — | —% | — | 5 | 60.0% | +0.82 | ENABLED |
 
 ---
 
@@ -29,8 +29,7 @@
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
 | range_breakout- | SHORT | 20 | 50.0% | -1.92 | DISABLED | Borderline |
-| hzscore- | SHORT | 14 | 50.0% | -0.58 | ENABLED | Borderline |
-| trend_momentum_near_sma+ | LONG | 3 | 33.3% | -0.16 | DISABLED | Needs more data |
+| hzscore- | SHORT | 12 | 50.0% | -0.16 | ENABLED | Borderline |
 
 ---
 
@@ -50,9 +49,8 @@ None found. Top performers are already enabled.
 
 1. **[DISABLE] range_breakout+ LONG** — WR=25.0%, PnL=-4.02% over 8 trades (24h).
 2. **[WATCH] range_breakout- SHORT** — WR=50.0%, PnL=-1.92% over 20 trades. Monitor next cycle.
-3. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-0.58% over 14 trades. Monitor next cycle.
-4. **[WATCH] trend_momentum_near_sma+ LONG** — WR=33.3%, PnL=-0.16% over 3 trades. Monitor next cycle.
-5. **[KEEP] 2 winning combos** — accel-300-, bb_bounce+. LONG side dominant.
+3. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-0.16% over 12 trades. Monitor next cycle.
+4. **[KEEP] 2 winning combos** — range_breakout_short, bb_bounce+. LONG side dominant.
 
 ---
 
@@ -64,15 +62,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-08-13 | dcdf4c1 | feat: Weather Vane v2 — hysteresis + off-course alarm |
+| 2026-08-13 | 12cb22f | feat: global spike filter for SHORT entries |
+| 2026-08-13 | 16e6abf | CEO: NO TRADING CHANGES — 24h 106T -$0.26 flat, 7d +$0.37 po... |
+| 2026-08-12 | c367e1d | CEO: recovery confirmed, 24h +/usr/bin/bash.53 57.6% WR, 7d ... |
+| 2026-08-12 | 4586229 | CEO: BLACKLISTED return_exhaustion- SHORT — ALL SL hits loss... |
+| 2026-08-12 | a6a5739 | CEO: blacklisted hzscore+ standalone (38.5% WR bleed source) |
 | 2026-08-12 | 8d36599 | CEO: 2026-08-12 18:49 UTC — NO CHANGES. Verified 24h 98T -/u... |
 | 2026-08-12 | 7acf1a3 | hermes_constants: fix ATR_K threshold comments (3% → 1.5%) |
 | 2026-08-12 | 1534a8b | CEO: widen trailing stop distance 0.60%→0.80%, activation 0.... |
 | 2026-08-12 | 1e47094 | CEO: disable RANGE_BREAKOUT_PLUS_ENABLED (8T 25% WR -$0.41 2... |
-| 2026-08-12 | de0ff90 | signals: disable RANGE_BREAKOUT_MINUS_ENABLED (SHORT now fro... |
-| 2026-08-12 | 124def0 | CEO: restrict hzscore to combo-only (standalone bleeding 36.... |
-| 2026-08-12 | 5a72c64 | CEO: Disable range_breakout+ LONG (7T -$0.30 28.6% WR bleed)... |
-| 2026-08-12 | f53d4ac | signals: bump RANGE_BREAKOUT_CONF_BASE 65→70 to filter weak ... |
-| 2026-08-12 | 446e8ed | signals: fix _sqlite3 NameError in range_breakout_short spik... |
-| 2026-08-12 | dcb3090 | signals: add range_breakout_short (SHORT-specific with veloc... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

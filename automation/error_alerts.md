@@ -261,3 +261,8 @@ ALERTS:
 
 ## Error Alerts — 2026-08-13 01:09 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TOK ab_optimizer: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-13 01:41 UTC
+- **WARN** (6x): `ab_optimizer` crash on missing `/root/.hermes/config/ab_tests.json`
+- **AUTO-FIX**: Created config directory + empty `ab_tests.json` — ab_optimizer now runs clean
+- **INFO**: `hermes-hl-sync-guardian.timer` and `hermes-atr-sl-updater.timer` disabled (not running)
