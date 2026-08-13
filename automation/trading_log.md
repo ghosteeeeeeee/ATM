@@ -7186,3 +7186,29 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Market quiet — 1 trade/hr, watch for activity pickup
 - FIL trade -77.4% pnl_pct extreme but only -$0.08 actual loss (low-priced token effect)
+
+## 2026-08-13 15:30 UTC — Hourly Analysis
+
+**Trades:** 3 closed (2W, 1L)
+**PnL:** $0.07 (66.7% WR)
+
+**24h Snapshot:**
+- 73 trades, 57.5% WR, -$0.12 (flat)
+- ATR SL hit rate: 39.7% (just under 40% threshold) ✓
+- profit-monster-trail: 41T +$1.86 (primary profit driver)
+- accel-300-: 35T, 54.3% WR, -$0.31 — kill confirmed, all trailing entries closing
+- range_breakout_short: 22T, 54.5% WR, +$0.10 (best performer)
+- hzscore-: 7T, 71.4% WR, +$0.11 (strong)
+- 4 open trades healthy
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 39.7% — below 40% threshold
+- Trade freq 1-4/hr — quiet market, no overtrading
+- accel-300- kill working — all trailing entries closing
+- No 0% WR kill candidates (0 trades last hour with 3+ trades)
+- System flat — no param changes needed
+
+**Open Questions:**
+- Market quiet — 1-3 trades/hr, watch for activity pickup

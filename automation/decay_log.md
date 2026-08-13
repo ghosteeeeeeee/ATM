@@ -392,3 +392,9 @@
 [2026-08-13 09:49 UTC]   🟢 continuation-,hzscore-: 3 trades, 66.7% WR, PnL=-0.58
 [2026-08-13 09:49 UTC]   🟢 hzscore-: 6 trades, 83.3% WR, PnL=1.57
 [2026-08-13 09:49 UTC] Done. Disabled 0 signals.
+[2026-08-13 15:49 UTC] === Signal Decay Detector ===
+[2026-08-13 15:49 UTC]   🟢 range_breakout_short: 22 trades, 54.5% WR, PnL=0.05
+[2026-08-13 15:49 UTC]   🟢 accel-300-: 34 trades, 55.9% WR, PnL=-4.23
+[2026-08-13 15:49 UTC]   🟢 hzscore-: 8 trades, 62.5% WR, PnL=0.05
+[2026-08-13 15:49 UTC]   🟢 continuation-,hzscore-: 3 trades, 66.7% WR, PnL=-0.58
+[2026-08-13 15:49 UTC] Done. Disabled 0 signals.
