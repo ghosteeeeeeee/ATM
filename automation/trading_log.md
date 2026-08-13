@@ -6815,3 +6815,28 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_breakout- at 42.1% WR, 19T — trending toward kill threshold if degrades further
 - accel-300- volume leader but slight negative PnL — monitor if degrading
+
+## [2026-08-13 04:26 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour
+**24h:** 103T, 52.8% WR, ~$0 flat (-$0.52)
+**ATR SL:** 47/103 = 45.6% (above 40%, trail compensating +$2.51 vs -$3.26)
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 15T, 66.7% WR, +$0.43 — best
+- ✅ accel-300- SHORT: 35T, 57.1% WR, -$0.17 — volume leader
+- ✅ hzscore- SHORT: 12T, 50% WR, +$0.01
+- ⚠️ range_breakout- SHORT: 18T, 38.9% WR, -$0.30 — deteriorating
+
+**Changes:** NONE
+
+**No Change Needed:**
+- 0 trades closed in last hour = no kill candidates
+- ATR SL above threshold but trail compensating net
+- range_breakout- at 38.9% WR trending toward kill threshold but no last-hour 0% WR
+- Trade freq 4.3/hr normal
+- 6 open trades healthy (5x accel-300-, 1x range_breakout_short)
+
+**Open Questions:**
+- Aug 13 so far 17T, 35.3% WR — early but weak day, monitor
+- range_breakout- 38.9% WR, watch for degradation to kill threshold
