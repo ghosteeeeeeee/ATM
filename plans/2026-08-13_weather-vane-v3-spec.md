@@ -1,238 +1,152 @@
-# Weather Vane v3 — Predictive Signal Volume Detection
+# Weather Vane v3 — Predictive Detection + CHoCH Integration
 
 **Date:** 2026-08-13
-**Status:** APPROVED WITH MODIFICATIONS (CEO)
-**Based on:** signal generation rate as leading indicator of regime shifts
+**Status:** BACKTESTED — CHoCH integration proposed
+**Based on:** market structure + signal patterns as leading indicators
 
 ---
 
-## CEO Verdict
+## CEO Verdict (Original)
 
-**APPROVE with modifications.** Core insight is sound — signal volume IS a leading indicator. Required changes:
-1. Baseline: same-hour-yesterday (not 24h avg — 24x natural variance causes false positives)
-2. Threshold: 50% → 65%
-3. Min baseline: 10 → 20 signals/hr
-4. Add 30-min cooldown after trigger
-5. Backtest 7d before deploying live
+**APPROVE with modifications.** Same-hour-yesterday baseline, 65% threshold, 20 min baseline, 30min cooldown. Backtest before deploy.
 
----
+## Backtest Results (7 days)
 
-## Core Insight
+### Signal Volume Drop (65% threshold, same-hour-yesterday)
+- 13 triggers in 7 days (~2/day)
+- In triggered hours: 4W/3L, PnL +$0.07 (flat)
+- 2 hours after triggers: 5W/4L, PnL -$0.07 (slightly negative)
+- **Verdict: NOT a strong predictor.** Volume drops for many reasons (time of day, quiet market) not just regime shifts. Supplementary only.
 
-The current Weather Vane is **reactive** — waits for losses to happen, then suppresses. But losses are a LAGGING indicator. By the time 3 losses accumulate, the regime has already shifted.
+### Confidence Trend (5+ point drop)
+- Only 2 triggers in 7 days — too rare to be useful
+- Both triggers had NO trades or WINNING trades
+- Counter-intuitive: low-confidence SHORT trades actually have HIGHER WR (58.3% vs 51.5%)
+- **Verdict: NOT useful.** Skip.
 
-A better leading indicator: **signal generation rate per direction**. When the market turns bullish:
-1. Signal generators stop finding SHORT setups (fewer SHORT signals generated)
-2. SHORT signals that do fire get blocked by spike/RSI filters (higher rejection rate)
-3. SHORT signal confidences trend down (weaker conviction)
+### What Worked vs What Didn't
 
-These happen BEFORE losses. The market tells us the weather changed before our trades tell us.
-
----
-
-## Three Detection Layers
-
-| Layer | Indicator | Speed | Data Source |
-|-------|-----------|-------|-------------|
-| 1. **Signal Volume** | SHORT signals/hour dropping | Fastest (real-time) | `signals` table |
-| 2. **Confidence Trend** | SHORT avg_conf declining | Fast (within hours) | `signals` table |
-| 3. **Loss Cluster** | 3+ losses in 5 trades | Slow (after damage) | `signal_outcomes` table |
-
-Layers 1-2 are **predictive** (detect before losses). Layer 3 is the existing **reactive** fallback.
+| Layer | Predictive Power | Verdict |
+|-------|-----------------|---------|
+| Signal volume drop | Weak — too many false positives | Supplementary only (0.85x) |
+| Confidence trend | Near-zero — too rare, counter-intuitive | Skip |
+| Loss cluster (v2) | Strong — proven | Keep as primary |
 
 ---
 
-## Layer 1: Signal Volume Detection
+## CHoCH Integration: Market Structure as Leading Indicator
 
-### How it works
+### New Insight
 
-Track the rolling average of SHORT (or LONG) signals generated per hour. When the rate drops significantly below the baseline, flag it as a potential regime shift.
+CHoCH (Change of Character) is a **structural** leading indicator — it detects market structure shifts (HH_HL → LH_LL or vice versa) BEFORE losses accumulate. This is fundamentally different from signal volume (which measures our system's output) — CHoCH measures the MARKET's structure.
 
-### Baseline calculation
+When a bullish CHoCH fires (LH_LL → HH_HL), the market structure has shifted bullish. SHORT signals will start losing. This happens BEFORE the loss cluster appears.
 
-**CEO feedback:** 24h rolling average causes constant false positives during quiet hours. SHORT volume swings 16-386/hr (24x) naturally.
+### How CHoCH Works
 
-**Fix:** Use same-hour yesterday as baseline, not 24h average.
+From `signals/hh_hl.py`:
+- Detects swing highs/lows over last 8 swings
+- Previous structure: swings[-8:-4] → HH_HL (bullish) or LH_LL (bearish)
+- Current structure: swings[-4:] → HH_HL or LH_LL
+- If structures differ → CHoCH confirmed
+
+**CHoCH+ (bullish):** LH_LL → HH_HL (market turned bullish)
+**CHoCH- (bearish):** HH_HL → LH_LL (market turned bearish)
+
+### Weather Vane Integration
+
+When a CHoCH fires AGAINST the current trade direction, suppress that direction:
+
+```
+CHoCH+ fires (bullish) → SHORT is now counter-structure → suppress SHORT
+CHoCH- fires (bearish) → LONG is now counter-structure → suppress LONG
+```
+
+This is a STRUCTURAL prediction — the market has changed character, and trades against the new character will lose.
+
+### Why This Is Better Than Signal Volume
+
+| Signal Volume | CHoCH |
+|--------------|-------|
+| Measures our system's output | Measures market structure |
+| Drops for many reasons (noise) | Only fires on genuine structure shifts |
+| Reactive to signal generators | Leading indicator of price action |
+| High false positive rate | Low false positive rate (structural) |
+
+### Implementation
+
+New function in signal_compactor.py:
 
 ```python
-# Baseline: signals/hour from the SAME HOUR yesterday
-yesterday_hour = now - 24h
-baseline = count_signals(direction, yesterday_hour, yesterday_hour + 1h)
+def get_choch_suppression(direction: str) -> float:
+    """
+    Check if a CHoCH signal has fired against this direction.
+    Returns penalty multiplier (1.0 = no suppression, 0.75 = suppressed).
+    """
+    from hermes_constants import (
+        CHOCH_WEATHER_VANE_ENABLED, CHOCH_WEATHER_VANE_PENALTY,
+        CHOCH_WEATHER_VANE_WINDOW, CHOCH_WEATHER_VANE_MIN_CONFIDENCE,
+    )
+    if not CHOCH_WEATHER_VANE_ENABLED:
+        return 1.0
 
-# Current: signals/hour in last 2 hours
-current = count_signals(direction, now - 2h, now)
+    conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT direction, confidence, created_at FROM signals
+        WHERE signal_type = 'hh_hl_choch'
+          AND created_at > datetime('now', '-' || ? || ' minutes')
+        ORDER BY created_at DESC
+    """, (CHOCH_WEATHER_VANE_WINDOW,))
+    rows = cur.fetchall()
+    conn.close()
 
-# Drop ratio: how much has the rate dropped?
-drop_ratio = 1.0 - (current / baseline)  # 0.0 = no drop, 0.5 = 50% drop
+    for choch_dir, conf, ts in rows:
+        if conf < CHOCH_WEATHER_VANE_MIN_CONFIDENCE:
+            continue
+        # CHoCH fired AGAINST our direction
+        if (choch_dir == 'LONG' and direction == 'SHORT') or \
+           (choch_dir == 'SHORT' and direction == 'LONG'):
+            conf_factor = min(conf / 88.0, 1.0)
+            penalty = 1.0 - (1.0 - CHOCH_WEATHER_VANE_PENALTY) * conf_factor
+            return penalty
+
+    return 1.0
 ```
 
-### Trigger threshold
+### Integration in _score_signal()
 
 ```python
-SIGNAL_VOLUME_DROP_THRESHOLD = 0.65  # 65% drop from baseline → flag (CEO: raised from 50%)
+# Layer 0: CHoCH structural prediction (NEW — highest predictive power)
+choch_mult = get_choch_suppression(direction)
+dir_outcome_mult = min(dir_outcome_mult, choch_mult)
+
+# Layer 1: Signal volume drop (supplementary — weak predictor)
+# Layer 2: Confidence trend (SKIP — not useful)
+# Layer 3: Loss cluster (primary — proven reactive fallback)
 ```
-
-If SHORT signals/hour drops by 65%+ from same-hour-yesterday, the market may have shifted bullish.
-
-### Example
-
-```
-Yesterday 14:00: 287 SHORT signals
-Today 14:00: 80 SHORT signals (last 2h)
-Drop ratio: 1.0 - (80/287) = 0.72 = 72% drop → TRIGGER
-```
-
-### Edge cases
-
-- **First day (no yesterday data):** Skip detection until 48h of data accumulated.
-- **Low baseline (< 20 signals/hr):** Skip — too few signals to measure reliably (CEO: min baseline raised from 10 to 20).
-- **System restart:** Gap in signal data. Skip detection until data accumulates.
-- **Cooldown:** After trigger fires, 30-minute cooldown before re-triggering (CEO: prevents thrashing on hour boundaries).
 
 ### Params
 
 ```python
-SIGNAL_VOLUME_ENABLED = True
-SIGNAL_VOLUME_BASELINE_WINDOW = 24    # hours for same-hour-yesterday lookup
-SIGNAL_VOLUME_CURRENT_WINDOW = 2      # hours for current rate
-SIGNAL_VOLUME_DROP_THRESHOLD = 0.65   # 65% drop → flag (CEO: raised from 50%)
-SIGNAL_VOLUME_MIN_BASELINE = 20       # minimum signals/hr for valid baseline (CEO: raised from 10)
-SIGNAL_VOLUME_PENALTY = 0.8           # score multiplier when triggered (milder than loss-based)
-SIGNAL_VOLUME_COOLDOWN_MINUTES = 30   # cooldown after trigger (CEO: new)
+CHOCH_WEATHER_VANE_ENABLED = True
+CHOCH_WEATHER_VANE_PENALTY = 0.75       # score multiplier when CHoCH fires against direction
+CHOCH_WEATHER_VANE_WINDOW = 120          # minutes — how recent must the CHoCH be
+CHOCH_WEATHER_VANE_MIN_CONFIDENCE = 70   # only suppress if CHoCH confidence >= this
 ```
 
 ---
 
-## Layer 2: Confidence Trend Detection
+## Updated Detection Layers
 
-### How it works
+| Layer | Indicator | Speed | Predictive? | Status |
+|-------|-----------|-------|-------------|--------|
+| 0. CHoCH | Market structure flip | Fast (structural) | ✅ YES | **PROPOSED** |
+| 1. Signal volume | SHORT signals/hour dropping | Fast | ✅ Yes (weak) | Backtested — supplementary |
+| 2. Confidence trend | SHORT avg_conf declining | Fast | ❌ No | Backtested — **SKIP** |
+| 3. Loss cluster | 3+ losses in 5 trades | Slow | ❌ No (reactive) | ✅ DONE (v2) |
 
-Track the rolling average confidence of SHORT signals. When confidence trends down, the signal generators are less convinced about SHORT setups.
-
-### Metric
-
-```python
-# Confidence trend: compare avg_conf of last 10 SHORT signals vs previous 10
-recent_conf = avg(confidence of last 10 SHORT signals)
-older_conf = avg(confidence of previous 10 SHORT signals)
-conf_delta = recent_conf - older_conf  # negative = declining
-```
-
-### Trigger threshold
-
-```python
-SIGNAL_CONF_TREND_THRESHOLD = -5.0  # confidence dropped by 5+ points → flag
-```
-
-### Why this works
-
-Signal generators assign confidence based on how well the setup matches their criteria. When the market shifts bullish:
-- SHORT setups match fewer criteria → lower confidence scores
-- The signal generators are "uncertain" about SHORT → confidence drops
-- This happens BEFORE the signals start losing
-
-### Params
-
-```python
-SIGNAL_CONF_TREND_ENABLED = True
-SIGNAL_CONF_TREND_WINDOW = 10         # signals to compare
-SIGNAL_CONF_TREND_THRESHOLD = -5.0    # confidence drop to trigger
-SIGNAL_CONF_TREND_PENALTY = 0.85      # score multiplier (mild)
-```
-
----
-
-## Integration with Existing Weather Vane
-
-The predictive layers (1-2) feed into the same `_score_signal()` function as the reactive layer (3):
-
-```python
-# In _score_signal():
-dir_outcome_mult = 1.0
-
-# Layer 1: Signal volume drop
-if SIGNAL_VOLUME_ENABLED:
-    vol_drop = get_signal_volume_drop(direction)
-    if vol_drop >= SIGNAL_VOLUME_DROP_THRESHOLD:
-        dir_outcome_mult = min(dir_outcome_mult, SIGNAL_VOLUME_PENALTY)
-
-# Layer 2: Confidence trend
-if SIGNAL_CONF_TREND_ENABLED:
-    conf_delta = get_signal_conf_trend(direction)
-    if conf_delta <= SIGNAL_CONF_TREND_THRESHOLD:
-        dir_outcome_mult = min(dir_outcome_mult, SIGNAL_CONF_TREND_PENALTY)
-
-# Layer 3: Loss cluster (existing)
-if DIRECTIONAL_OUTCOME_ENABLED:
-    losses, total, wr = get_directional_outcome(direction)
-    # ... existing trigger + hysteresis + velocity logic ...
-    dir_outcome_mult = min(dir_outcome_mult, loss_based_penalty)
-```
-
-The **minimum** penalty wins — if ANY layer flags the direction, the penalty applies. This means:
-- Predictive layers can trigger BEFORE losses happen
-- If predictive layers are wrong (false positive), the milder penalty (0.8x) is less damaging than the loss-based penalty (0.7x or 0.5x)
-- If both predictive and reactive layers trigger, the stronger penalty (0.7x) applies
-
----
-
-## Data Flow
-
-```
-Signal generated → signals table updated
-    ↓
-get_signal_volume_drop() queries signals/hour for this direction
-    ↓
-50%+ drop from 24h baseline?
-    ├─ YES → dir_outcome_mult = 0.8 (mild penalty, early warning)
-    └─ NO  → no action
-    ↓
-get_signal_conf_trend() queries confidence trend
-    ↓
-Confidence dropped 5+ points?
-    ├─ YES → dir_outcome_mult = min(current, 0.85)
-    └─ NO  → no action
-    ↓
-Existing loss-based Weather Vane (layers 3+)
-    ↓
-Minimum penalty applies
-```
-
----
-
-## Performance Considerations
-
-The signal volume and confidence queries hit the `signals` table which can be large. Optimizations:
-
-1. **Hourly aggregation:** Pre-compute signals/hour per direction every hour (new function `update_signal_volume_cache()`). Store in `data/signal_volume_cache.json`.
-2. **Index:** Ensure `signals(created_at, direction)` index exists.
-3. **Cache TTL:** Recompute volume stats every 5 minutes (not every compaction round).
-
-### Cache structure
-
-```json
-{
-  "SHORT": {
-    "baseline_24h": 200,
-    "current_2h": 80,
-    "drop_ratio": 0.6,
-    "avg_conf_recent": 81.2,
-    "avg_conf_older": 86.5,
-    "conf_delta": -5.3,
-    "updated_at": "2026-08-13T22:00:00"
-  },
-  "LONG": { ... }
-}
-```
-
----
-
-## Backtest Plan
-
-1. Query last 7 days of signals table
-2. For each hour, compute signal volume drop and confidence trend
-3. Check if predictive triggers would have fired BEFORE loss clusters
-4. Measure: how many hours of early warning did we get? How many false positives?
+**Recommended deployment:** CHoCH layer first (strongest predictor), signal volume as supplementary, skip confidence trend, keep loss cluster as fallback.
 
 ---
 
@@ -240,16 +154,5 @@ The signal volume and confidence queries hit the `signals` table which can be la
 
 | File | Change |
 |------|--------|
-| `scripts/hermes_constants.py` | Add v3 params |
-| `scripts/signal_compactor.py` | Add `get_signal_volume_drop()`, `get_signal_conf_trend()`, integrate into `_score_signal()` |
-| `data/signal_volume_cache.json` | New: hourly signal volume cache |
-
----
-
-## Risk
-
-**False positives:** Signal volume can drop for reasons other than regime shift (system restart, low-activity period, new token onboarding). The milder penalty (0.8x) limits damage from false positives.
-
-**Depends on signal quality:** If signal generators fire garbage signals regardless of market conditions, volume won't drop. The loss-based fallback (Layer 3) catches this.
-
-**Cache staleness:** If the cache isn't updated regularly, the baseline becomes stale. Mitigated by 5-minute TTL and timestamp check.
+| `scripts/hermes_constants.py` | Add CHOCH_WEATHER_VANE_* params |
+| `scripts/signal_compactor.py` | Add `get_choch_suppression()`, integrate into `_score_signal()` |
