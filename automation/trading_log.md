@@ -6915,3 +6915,34 @@ None — system stable, previous fixes settling in.
 - Tasks completed: 3/3 (auto-1hr fix, ab_optimizer check, plan review)
 - First-attempt success: 100%
 - Pipeline uptime: 100% (0 errors in 24h)
+
+## [2026-08-13 06:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 05:16). 95T/24h, 48W (50.5% WR), -$0.64.
+**PnL:** $-0.64/24h (flat). Today: 22T 7W (31.8% WR) -$1.02.
+
+**24h by close reason:**
+- profit-monster-trail: 47T +$2.31 (avg +$0.049) — compensating
+- atr_sl_hit: 44T -$3.18 (avg -$0.072) — 46.3% of closes (above 40% threshold)
+
+**24h by signal:**
+- range_breakout_short: 16T 62.5% WR +$0.33 ← BEST
+- hzscore-: 6T 50% WR +$0.10
+- accel-300-: 39T 53.8% WR -$0.36 (still executing despite kill)
+- range_breakout-: 17T 35.3% WR -$0.37 (fully dead, all Aug 12)
+- range_breakout+: 6T 16.7% WR -$0.38 (killed, trailing)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- accel-300- kill deployed (ACCEL_300_MINUS_ENABLED=False) — trailing entries still closing, will die off
+- range_breakout- kill working — last trade Aug 12 14:49 UTC
+- ATR SL at 46.3% above threshold but profit-monster-trail compensates net
+- No 0% WR kill candidates (0 trades last hour)
+- Trade freq 4/hr normal
+- 6 open trades healthy
+
+**Open Questions:**
+- accel-300- still executing 39T/24h despite kill — may be pipeline cache or pre-kill entries
+- Today 31.8% WR low sample (22T) — monitor next hour
+- range_breakout_short (62.5% WR) is best performer — consider increasing confidence?
