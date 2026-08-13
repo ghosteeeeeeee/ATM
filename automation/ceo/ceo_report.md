@@ -50,3 +50,31 @@ NO CHANGES — system flat, stability period active. All bleeders disabled. Moni
 - Daily PnL (if -2 consecutive red after legacy clears → investigate)
 - SHORT7d (if -$1.50+ persists after accel-300- fully clears → regime filter)
 - Stars retention (if any star drops below 45% WR → investigate)
+
+## CEO Report — 2026-08-13
+
+### Diagnosis
+24h: 73T, **-$0.53**, 54.8% WR — RED. Today: 50T, **-$1.35**, 46.0% WR (worst day). 7d: -$0.47. 0 open trades.
+
+### Root Cause
+All losses from legacy draining — no new bleeders:
+- `accel-300-` SHORT 19T -$0.73 (36.8%) — **disabled**, legacy positions closing
+- `range_breakout_short` SHORT 9T -$0.42 (22.2%) — bad day variance (was +$0.49 yesterday at 71.4%, 7d still +$0.07)
+- `continuation-,hzscore-` SHORT 3T -$0.23 — **disabled**, legacy
+
+### Fix Applied
+**NO CHANGES** — all bleeders already disabled, legacy clearing, stability period.
+
+### Verification
+- `ACCEL_300_MINUS_ENABLED = False` ✓
+- `CONTINUATION_MINUS_ENABLED = False` ✓
+- `TREND_MOMENTUM_NEAR_SMA_ENABLED = False` ✓
+- `RANGE_BREAKOUT_SHORT_ENABLED = True` — 7d +$0.07 (52.2% WR), one bad day not a pattern
+- LONG 7d: +$0.69 (profitable)
+- Stars7d intact (5 profitable)
+- 0 open trades — clean slate
+
+### Monitor
+- range_breakout_short: if another red day → consider disable
+- daily PnL: 2 consecutive red days after legacy clears → investigate
+- SHORT7d: if -$1.50+ persists → regime filter
