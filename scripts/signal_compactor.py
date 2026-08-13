@@ -1766,7 +1766,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🚫 [PENDING-DISABLED-BLOCK] {tok}:{d} — src='{source}' contains disabled component, skipping approval")
                         continue
                     if CONFLUENCE_REQUIRED and len(src_parts) < 2:
-                        bare_src = source.rstrip('+-') if source else ''
+                        bare_src = source.rstrip('+-0123456789') if source else ''
                         if bare_src in STANDALONE_BYPASS_SIGNALS:
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
                             # ── Contrarian flip at pending approve ────────────────
@@ -1925,7 +1925,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # If a single-source entry somehow got past the confluence gate above,
             # this is the final catch before it reaches decider_run.
             if CONFLUENCE_REQUIRED and entries_count < 2:
-                bare_src = (src or '').rstrip('+-')
+                bare_src = (src or '').rstrip('+-0123456789')
                 if bare_src in STANDALONE_BYPASS_SIGNALS:
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} backtested standalone ({src}) allowed at safety filter")
                     # ── Contrarian flip at safety filter (last resort) ───────────
