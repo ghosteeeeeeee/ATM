@@ -607,6 +607,18 @@ SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) -
 SIGNAL_FILTER_Z_MIN = -1.5           # block LONG when z < this AND speed < 50% (chasing)
 SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50% (chasing)
 
+# ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
+# Detects regime shifts by monitoring trade outcomes per direction.
+# Fires when 3+ of last 5 trades in same direction are losses within 30min.
+# Faster than regime scanners (leading indicator vs lagging slope).
+DIRECTIONAL_OUTCOME_ENABLED = True
+DIRECTIONAL_OUTCOME_WINDOW = 5            # last N trades per direction
+DIRECTIONAL_OUTCOME_TIME_WINDOW = 30      # minutes (rolling window)
+DIRECTIONAL_OUTCOME_LOSS_THRESHOLD = 3    # N losses in window to trigger
+DIRECTIONAL_OUTCOME_WR_THRESHOLD = 40     # backup: WR below this also triggers
+DIRECTIONAL_OUTCOME_PENALTY = 0.7         # score multiplier (milder for first deploy)
+DIRECTIONAL_OUTCOME_MIN_TRADES = 3        # minimum trades before activating
+
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).

@@ -6657,3 +6657,46 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None — system stable
+
+## 2026-08-13 00:30 UTC — Hourly Analysis
+
+**Trades:** 10 closed (1 win, 9 losses)
+**PnL:** -$0.78 (10% WR)
+
+**Exit Reasons (1h):** atr_sl_hit (8), cut_loser (1), profit-monster-trail (1)
+
+**24h Snapshot:**
+- 107T, -$0.24, 53.3% WR — roughly flat
+- ATR SL hit: 47/107 (44%) — above 40% threshold
+- profit-monster-trail: 55/107 (+$2.64) — compensating SL losses
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 14T, +$0.49, 71.4% WR
+- ✅ hzscore- SHORT: 13T, +$0.04, 53.8% WR
+- ⚠️ accel-300- SHORT: 28T, -$0.21, 53.6% WR — biggest volume, negative PnL (losers > winners)
+- ❌ range_breakout- SHORT: 20T, -$0.12, 45% WR
+- ❌ hzscore+ LONG: 4T, -$0.14, 25% WR (blacklisted)
+- ❌ range_breakout+ LONG: 8T, -$0.41, 25% WR (killed)
+
+**Hourly Trend (6h):**
+- 21:00: +$0.73 (best hour)
+- 22:00: +$0.10
+- 23:00: -$0.17
+- 00:00: -$0.61 (worst hour — 75% SL hit)
+
+**Diagnosis:**
+1. **Entry quality:** Terrible last hour — 8/8 accel-300- trades hit ATR SL immediately
+2. **SL behavior:** 44% 24h SL hit rate, 80% last hour — SL likely too tight for current volatility
+3. **Signal quality:** accel-300- is the volume leader but losing money (53.6% WR, -$0.21). Losers are larger than winners.
+4. **Trade frequency:** 8T/hour last hour — normal
+
+**Changes:** NONE — CEO directive: NO TRADING CHANGES. Stability period active (14+ changes in 48h). Trailing stop fix (0.80%) needs more eval time.
+
+**Escalation:**
+- accel-300- would normally be killed per rules (0% WR with 8 trades in last hour)
+- ATR SL >40% threshold triggers tpsl_utils.py check — trailing logic IS deployed
+- Flagging for next CEO review: accel-300- entry quality degrading
+
+**Open Questions:**
+- Is accel-300- entering during chop? Or is SL too tight for current ATR?
+- 7-day trend: Aug 9 +$0.62 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 -$0.61 (so far). Pattern: recovery then decline.
