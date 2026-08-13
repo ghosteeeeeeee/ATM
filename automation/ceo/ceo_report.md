@@ -203,3 +203,35 @@ Aug 12 recovery confirmed (+$0.49, 57.0% WR). Aug 13 11T -$0.52 (36.4% WR — co
 ### Decision
 
 **APPROVE with modifications.** Implement soft penalty version, backtest 14 days, deploy only if backtest shows >$2/week improvement. No rush — system flat, stability period active.
+
+---
+
+## CEO Report — 2026-08-13 (Accel-300- Param Tuning)
+
+### Decision: APPROVE Option A (F_slope_001)
+
+**Change `ACCEL_300_REGIME_SLOPE_PCT` from `0.0005` to `0.001` in `hermes_constants.py`.**
+
+### DB-Verified Numbers
+- 24h: 107T -$0.52, 52.3% WR (flat/slight red)
+- 7d accel-300- SHORT: 35T -$0.17, 57.1% WR (marginal — WR fine, losses > wins)
+- Exit: 15/16 losses via `atr_sl_hit`, 1 via `cut_loser_-1.01%`
+
+### Why Option A
+- **Single param change** — minimal risk, easy to revert
+- Backtest: +0.05% PnL, +0.6% WR over 8 days (310 trades)
+- Only -8 trades vs baseline — doesn't over-filter
+- Best PnL of all tested combos
+
+### Why Not Option B or C
+- **Option B (M_conservative)**: -45 trades, slightly lower PnL. More aggressive filtering not needed — 57% WR is fine, issue is loss magnitude not signal quality.
+- **Option C (fix execution)**: Valid finding — NXPC/ETC were winners in backtest, so execution (stale price, ATR miscalc) is the real problem. But that's a separate investigation. Don't block a +EV param change on an unrelated fix.
+
+### Risks
+- Backtest is 8 days / 310 trades — small sample. Monitor 48h post-change.
+- If WR drops below 35% or PnL goes negative after 48h, revert to 0.0005.
+
+### Verification
+- Will confirm param applied via `grep` after edit
+- Monitor accel-300- WR and PnL in next 2 CEO runs
+- If execution issues persist after param change, open separate investigation for ATR SL calculation

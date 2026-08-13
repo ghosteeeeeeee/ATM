@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 PRICE_DB = '/root/.hermes/data/signals_hermes.db'
+CANDLES_DB = '/root/.hermes/data/candles.db'
 OUTCOMES_DB = '/root/.hermes/data/signals_hermes_runtime.db'
 
 # ── EMA helper ──────────────────────────────────────────────────────────────
@@ -162,17 +163,30 @@ def detect_short(closes, params):
 
 # ── Load price data ─────────────────────────────────────────────────────────
 
-def load_prices(token):
-    conn = sqlite3.connect(PRICE_DB, timeout=10)
-    c = conn.cursor()
-    c.execute("""
-        SELECT timestamp, price FROM price_history
-        WHERE token = ?
-        ORDER BY timestamp ASC
-    """, (token.upper(),))
-    rows = c.fetchall()
-    conn.close()
-    return [{'timestamp': r[0], 'price': r[1]} for r in rows]
+def load_prices(token, source='candles'):
+    """Load 1m close prices. source='candles' uses candles_1m (8 days), 'price_history' uses live 1m."""
+    if source == 'candles':
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT ts, close FROM candles_1m
+            WHERE token = ?
+            ORDER BY ts ASC
+        """, (token.upper(),))
+        rows = c.fetchall()
+        conn.close()
+        return [{'timestamp': r[0], 'price': r[1]} for r in rows]
+    else:
+        conn = sqlite3.connect(PRICE_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT timestamp, price FROM price_history
+            WHERE token = ?
+            ORDER BY timestamp ASC
+        """, (token.upper(),))
+        rows = c.fetchall()
+        conn.close()
+        return [{'timestamp': r[0], 'price': r[1]} for r in rows]
 
 # ── Get actual trade outcomes for comparison ────────────────────────────────
 
@@ -197,44 +211,39 @@ PARAM_SETS = {
         'min_growth': 0.10, 'slope_pct': 0.0005, 'slope_window': 20,
         'cooldown': 10,
     },
-    'A_strict_slope': {
-        'period': 300, 'persistence': 7, 'min_gap': 0.35,
-        'min_growth': 0.10, 'slope_pct': 0.002, 'slope_window': 20,
-        'cooldown': 10,
-    },
-    'B_big_gap': {
-        'period': 300, 'persistence': 7, 'min_gap': 0.50,
-        'min_growth': 0.10, 'slope_pct': 0.0005, 'slope_window': 20,
-        'cooldown': 10,
-    },
-    'C_more_persist': {
-        'period': 300, 'persistence': 10, 'min_gap': 0.35,
-        'min_growth': 0.10, 'slope_pct': 0.0005, 'slope_window': 20,
-        'cooldown': 10,
-    },
-    'D_fresher': {
-        'period': 300, 'persistence': 7, 'min_gap': 0.35,
-        'min_growth': 0.10, 'slope_pct': 0.0005, 'slope_window': 20,
-        'cooldown': 10,
-    },
-    'E_all_tight': {
-        'period': 300, 'persistence': 10, 'min_gap': 0.50,
-        'min_growth': 0.15, 'slope_pct': 0.002, 'slope_window': 20,
-        'cooldown': 10,
-    },
     'F_slope_001': {
         'period': 300, 'persistence': 7, 'min_gap': 0.35,
         'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
         'cooldown': 10,
     },
-    'G_slope_003': {
-        'period': 300, 'persistence': 7, 'min_gap': 0.35,
-        'min_growth': 0.10, 'slope_pct': 0.003, 'slope_window': 20,
-        'cooldown': 10,
-    },
-    'H_persist9_gap04': {
+    'H_combo': {
         'period': 300, 'persistence': 9, 'min_gap': 0.40,
         'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10,
+    },
+    'I_slope_0008': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.0008, 'slope_window': 20,
+        'cooldown': 10,
+    },
+    'J_persist8': {
+        'period': 300, 'persistence': 8, 'min_gap': 0.35,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10,
+    },
+    'K_gap_045': {
+        'period': 300, 'persistence': 7, 'min_gap': 0.45,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10,
+    },
+    'L_slopePersist': {
+        'period': 300, 'persistence': 8, 'min_gap': 0.40,
+        'min_growth': 0.10, 'slope_pct': 0.001, 'slope_window': 20,
+        'cooldown': 10,
+    },
+    'M_conservative': {
+        'period': 300, 'persistence': 9, 'min_gap': 0.40,
+        'min_growth': 0.15, 'slope_pct': 0.0015, 'slope_window': 20,
         'cooldown': 10,
     },
 }
@@ -266,24 +275,27 @@ def simulate_trade(closes, entry_idx, entry_price, direction='SHORT'):
     return 0.0, len(closes) - 1
 
 
-def run_sweep(tokens=None):
+def run_sweep(tokens=None, source='candles'):
     """Run param sweep across all tokens with price data."""
     # Get tokens from actual outcomes
     outcomes = get_actual_outcomes()
     if tokens is None:
         tokens = list(set(r[0] for r in outcomes))
 
-    print(f"Running backtest on {len(tokens)} tokens...")
+    print(f"Running backtest on {len(tokens)} tokens (source={source})...")
     print(f"Actual outcomes: {len(outcomes)} trades")
 
     # Load price data
     price_data = {}
     for token in tokens:
-        prices = load_prices(token)
+        prices = load_prices(token, source=source)
         if prices and len(prices) > 310:  # need 300+ for EMA warmup
             price_data[token] = [p['price'] for p in prices]
 
     print(f"Tokens with sufficient price data: {len(price_data)}")
+    if price_data:
+        sample_token = list(price_data.keys())[0]
+        print(f"  Sample: {sample_token} has {len(price_data[sample_token])} bars")
 
     results = {}
     for name, params in PARAM_SETS.items():
@@ -382,8 +394,30 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--tokens', nargs='*', help='Specific tokens to test')
+    parser.add_argument('--source', choices=['candles', 'price_history'], default='candles')
     parser.add_argument('--verbose', '-v', action='store_true')
     args = parser.parse_args()
 
-    results = run_sweep(tokens=args.tokens)
+    results = run_sweep(tokens=args.tokens, source=args.source)
     print_results(results)
+
+    # Also validate against actual outcomes
+    print("\n" + "=" * 70)
+    print("VALIDATION: Comparing backtest signals with actual trade outcomes")
+    print("=" * 70)
+    outcomes = get_actual_outcomes()
+    actual_tokens = set(r[0] for r in outcomes)
+    print(f"Actual trades: {len(outcomes)} across {len(actual_tokens)} tokens")
+
+    # Check if baseline backtest captured the actual losers
+    if 'baseline' in results:
+        bl_trades = results['baseline']['trade_list']
+        # Find NXPC and ETC trades in baseline
+        for token in ['NXPC', 'ETC']:
+            token_trades = [t for t in bl_trades if t['token'] == token]
+            if token_trades:
+                print(f"\n{token}: {len(token_trades)} backtest signals")
+                for t in token_trades[:5]:
+                    print(f"  idx={t['entry_idx']} price={t['entry_price']:.6f} pnl={t['pnl_pct']:+.3f}% {'WIN' if t['is_win'] else 'LOSS'}")
+            else:
+                print(f"\n{token}: No backtest signals (insufficient data or different timestamps)")
