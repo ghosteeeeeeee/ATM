@@ -24,6 +24,7 @@ from paths import HERMES_DATA
 
 from hermes_constants import (
     R2_TREND_LONG_ENABLED,
+    R2_TREND_LONG_MIN_SLOPE,
     LONG_BLACKLIST,
 )
 
@@ -31,7 +32,7 @@ from hermes_constants import (
 R2_WINDOW            = 16
 R2_THRESHOLD         = 0.60
 SIGNAL_TYPE          = 'r2_trend_long'
-SOURCE_PREFIX        = 'r2l'
+SOURCE_PREFIX        = 'r2-trend-long'
 LOOKBACK_CANDLES     = 50
 COOLDOWN_MINUTES     = 15
 MIN_CONFIDENCE       = 50
@@ -82,8 +83,21 @@ def detect_r2_long(token, candles, price):
     y = closes[-R2_WINDOW:]
     slope, intercept, r2 = _ols_params(y)
 
-    # LONG conditions: slope > 0, price above line, R² high enough
-    if r2 < R2_THRESHOLD or slope <= 0 or closes[-1] <= intercept:
+    # LONG conditions: slope > 0, price above line, R² meaningful
+    if slope <= 0 or closes[-1] <= intercept:
+        return None
+
+    # Transition detector: R² must be RISING from below threshold
+    # This catches the START of a trend, not flat periods
+    if len(closes) >= R2_WINDOW + 3:
+        y_prev = closes[-(R2_WINDOW + 3):-3]
+        _, _, r2_prev = _ols_params(y_prev)
+        # R² must have been below threshold recently and now rising above it
+        if not (r2_prev < R2_THRESHOLD and r2 >= R2_THRESHOLD):
+            # Also allow if R² is rising strongly (even if already above threshold)
+            if r2 < R2_THRESHOLD or (r2 - r2_prev) < 0.05:
+                return None
+    elif r2 < R2_THRESHOLD:
         return None
 
     # Find how many bars since slope flipped negative (trend started)
@@ -108,7 +122,7 @@ def detect_r2_long(token, candles, price):
         MAX_CONFIDENCE
     ))
 
-    source = f'{SOURCE_PREFIX}-long{bars_since}'
+    source = f'{SOURCE_PREFIX}{bars_since}'
 
     return {
         'direction':  'LONG',
