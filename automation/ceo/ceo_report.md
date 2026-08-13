@@ -1,7 +1,16 @@
-## CEO Report — 2026-08-15 (latest verified)
+## CEO Report — 2026-08-13 20:49 UTC (verified)
 
 ### Diagnosis
-24h: 65T **-$0.76** (52.3% WR — RED). 7d: 439T **-$0.30** (51.3% WR — flat, stable). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 50T **-$1.35** (46.0% WR — worst day, legacy clearing). 2 open $0 flat. Pipeline healthy.
+24h: 64T **-$0.69** (53.1% WR — RED). 7d: 428T **-$0.18** (51.4% WR — flat, barely negative). Daily: Aug 7 +$0.34 → Aug 8 +$0.10 → Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 50T **-$1.35** (46.0% WR — worst day). 0 open trades. Pipeline healthy.
+
+### Root Cause
+Aug 13 losses driven by legacy disabled signals: accel-300- SHORT 24T -$0.59 (45.8% WR), continuation-,hzscore- 3T -$0.23, accel-300-,hzscore- 1T -$0.10. Active SHORT signals profitable: range_breakout_short 18T +$0.10 50%, hzscore- 14T +$0.02 64.3%. LONG 7d: +$0.76 (profitable). SHORT 7d: -$1.16 (100% from disabled signals). Cost drivers48h: atr_sl_hit 69T -$4.87 (dominant).
+
+### Fix Applied
+NO CHANGES. All bleeders already disabled. System flat, legacy clearing, stability period.
+
+### Verification
+Active SHORTs intact: range_breakout_short 18T +$0.10 50%, hzscore- 14T +$0.02 64.3%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Stars7d intact. Pipeline healthy. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ after accel-300- fully clears → regime filter).
 
 ### Root Cause
 All losses from legacy disabled signals clearing. No new bleeders:
@@ -148,3 +157,11 @@ BSV backtest: 35 trades, 54% WR, +5.78% PnL.
 Big moves caught: 7 entries, +8.43% (06:40, 06:56, 07:13, 07:28, 11:31, 16:14, 16:34).
 Noise entries: 28 trades, -2.63%.
 Recommendation: increase cooldown from 3h to 6h to reduce noise. Signal catches big moves but fires too often. Regime/volatility gates should filter BSV noise.
+
+---
+
+## CEO Report — 2026-08-13 (r2_trend_long tuning + bug fixes)
+
+r2_trend_long tuned: R² 0.60→0.70, RSI max 75, speed min 30, BB pos max 0.85, block stale. 72/74 PENDING signals blocked — only LDO/GRASS pass (quality over quantity).
+Bugs fixed: bare_source syntax error, rs-s/rs-r misclassified as directional in conflict detection (caused false ALT LONG skip).
+Investigation: is_stale=True for 85% of signals because tokens have speed<30 (dead) — correctly identified, signal was firing on dead tokens.
