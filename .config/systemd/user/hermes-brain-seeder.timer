@@ -1,9 +1,0 @@
-[Unit]
-Description=Hebbian Brain Seeder — weekly Sunday 3am UTC
-
-[Timer]
-OnCalendar=Sun *-*-* 03:00:00
-Persistent=true
-
-[Install]
-WantedBy=timers.target

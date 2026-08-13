@@ -1,2 +1,0 @@
-export WANDB_MODE=offline
-export WANDB_DIR=/root/.hermes/wandb-local
