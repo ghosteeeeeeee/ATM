@@ -1,3 +1,62 @@
+## CEO Report — 2026-08-15 (Z-Score + Acceleration Filter — Pipeline Placement)
+
+### Verdict: Separate gate in `rule_based_context_gate()`. NOT part of volatility_gate.py.
+
+**Why separate?** volatility_gate answers "which signals work in which ATR regime?" (FLAT/NORMAL/HIGH/EXTREME → signal mapping). Z-Score+Acceleration answers "is the direction aligned with momentum?" (z>0 + accel>0 → SHORT aligned, LONG misaligned). Different questions, different data, different pipeline positions. Merging conflates two orthogonal concerns.
+
+**Where?** New rule in `rule_based_context_gate()` in `decider_run.py` — the execution-path gate that already checks z-score, speed, momentum, acceleration. Position: after speed check (#1) and before FLIP territory (#3). ~15 lines.
+
+**Why not signal_compactor scoring?** signal_compactor `_score_signal()` applies soft multipliers (regime_mult 1.5x/0.5x). Z-Score+Acceleration is a hard directional alignment check — misaligned trades have 23.8% WR. Soft penalty doesn't cut it. Hard block in context gate = right layer.
+
+**Interaction concerns:**
+- Overlap with existing `SIGNAL_FILTER` (speed/momentum/RSI/z checks in context gate): Z-Score+Acceleration is distinct — checks directional alignment of z AND accel together, not individual thresholds. No double-penalization.
+- Overlap with `regime_mult` in signal_compactor: regime_mult is regime-level (LONG_BIAS/SHORT_BIAS), Z-Score+Acceleration is token-level z+accel alignment. Different granularity.
+- Interaction with context gate FLIP: FLIP already handles z>1.0 LONG / z<-1.0 SHORT. Z-Score+Acceleration catches the more specific case where z+accel direction conflicts with trade direction.
+
+### Implementation spec
+
+New rule after speed check in `rule_based_context_gate()`:
+
+```python
+# Z-Score + Acceleration Alignment
+# surfing.md backtest: aligned (z>0 + accel>0 for SHORT) = 76.4% WR
+#                       misaligned (z>0 + accel>0 for LONG) = 23.8% WR
+# This catches trades where price is extended AND accelerating AGAINST us.
+if z_score is not None and accel is not None:
+    # LONG + z positive + accel positive = price above mean and rising = chasing
+    if direction == 'LONG' and z_score > 0.5 and accel > 0.005:
+        return ('SKIP', f'misaligned LONG: z={z_score:.2f} accel={accel:+.4f} (price extended, accelerating away)')
+    # SHORT + z negative + accel negative = price below mean and falling = chasing
+    if direction == 'SHORT' and z_score < -0.5 and accel < -0.005:
+        return ('SKIP', f'misaligned SHORT: z={z_score:.2f} accel={accel:+.4f} (price extended, accelerating away)')
+```
+
+**Thresholds:** z>0.5 / z<-0.5 (conservative — not extreme), accel>0.005 / accel<-0.005 (meaningful acceleration, not noise).
+
+### Risk assessment
+- **Low risk.** Pure additive gate — can't break existing logic. Fail-open (only blocks, never forces).
+- **Expected impact:** Eliminates ~5-10% of trades (the misaligned ones with 23.8% WR). Net WR improvement: +2-4%.
+- **Revert: remove the rule or set CONTEXT_GATE_ENABLED=False.**
+
+### Measurable Goal
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| Misaligned trade WR | ~24% | 0 (blocked) | Immediate |
+| Overall WR | 52.8% | 55%+ | 72h |
+
+### Verification
+After deployment, query DB for blocked trades:
+```sql
+SELECT COUNT(*) FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '48 hours'
+  AND signal_metadata LIKE '%misaligned%';
+```
+If misaligned trades still appearing → threshold too loose, tighten z to 0.3 / accel to 0.003.
+
+### Recommendation
+**APPROVE.** Implement as new rule in `rule_based_context_gate()`. No volatility_gate changes needed. Ship it.
+
+---
+
 ## CEO Report — 2026-08-13 (Weather Vane v3 — Predictive Methods)
 
 ### DB-Verified Numbers
