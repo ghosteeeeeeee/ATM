@@ -1138,6 +1138,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
             from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
+                _conn_sf = None
                 try:
                     _skip = False
                     _conn_sf = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -1171,11 +1172,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 if _rsi < SPIKE_FILTER_RSI_THRESHOLD:
                                     log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — RSI {_rsi:.1f} < {SPIKE_FILTER_RSI_THRESHOLD}")
                                     _skip = True
-                    _conn_sf.close()
                     if _skip:
                         continue
                 except Exception:
                     pass  # non-fatal — let signal through on DB error
+                finally:
+                    if _conn_sf:
+                        try:
+                            _conn_sf.close()
+                        except Exception:
+                            pass
             # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
             # Uses validate_source() for correct handling:
             # 1. Exact match: whole source in blacklist → block
