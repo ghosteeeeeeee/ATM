@@ -272,3 +272,8 @@ ALERTS:
 
 ## Error Alerts — 2026-08-13 03:09 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [TOK] trail load TOK: name 'Path' is not defined`
+
+## Error Alerts — 2026-08-13 10:40 UTC
+- **WARN** (1x): `hotset empty` — 0 signals survived compaction, expected in flat market (104/104 NEUTRAL)
+- **WARN** (1x): `disk 81%` — 90G/118G used, 22G free. Compress if >85%.
+- **INFO** (7x): `service failures` — better-coder, bug-hunter, hl-volume, mtf-macd-tuner, signal-reporter, study-winning-combos, trading-checklist all FAILED (non-critical). mtf-macd-tuner had multiprocessing pool crash.

@@ -395,3 +395,7 @@
   WHY: 3T last hour (1W 2L -$0.15). 24h 91T 51.6% WR -$0.65 (flat). ATR SL 45% (above 40% threshold but profit-monster-trail compensating +$2.17 vs SL -$3.05). No 0% WR kill candidates (0 trades last hour). Trade freq 3/hr normal. 4 open trades healthy. System flat — no action needed.
   BY: auto_1hr
   NEXT: Re-run at 09:30 UTC
+[2026-08-13 10:30] auto_1hr: DISABLED ACCEL_300_ENABLED
+  WHY: 19T today 36.8% WR -$0.73, 12/19 ATR SL hits. Re-enabled 2026-08-12 but deteriorated. Primary source of SL losses (16/39 ATR SL hits in 24h).
+  BY: auto_1hr
+  NEXT: Re-run at 11:30 UTC

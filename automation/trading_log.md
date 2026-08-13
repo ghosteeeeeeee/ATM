@@ -7033,3 +7033,43 @@ None — system stable, previous fixes settling in.
 - range_breakout- SHORT has 21.4% WR over 24h but no last-hour trades — monitoring for next hour
 - Today Aug 13 worst day in 7d ($-1.09 on 31T). Watching if this continues.
 - ATR SL hit rate trending down (46.4% → 43.2%) — trailing stop fix may be helping
+
+## 2026-08-13 10:30 UTC — Hourly Analysis
+
+**Trades:** 3 closed (1W 2L)
+**PnL:** -$0.07 (33.3% WR)
+
+**Exit Reasons:** atr_sl_hit (2), profit-monster-trail (1)
+
+**24h Snapshot:**
+- 89 trades, 46 profit-monster-trail (+$1.97), 39 atr_sl_hit (-$2.82)
+- ATR SL hit rate: 44.3% (above 40% threshold)
+- Net 24h: ~-$0.64 (flat)
+
+**Signal Performance (24h):**
+- accel-300-: 38T, 55.3% WR, -$0.26 (16 ATR SL hits — worst SL contributor)
+- range_breakout_short: 19T, 57.9% WR, +$0.18
+- hzscore-: 7T, 71.4% WR, +$0.10
+
+**Today (Aug 13):**
+- accel-300-: 19T, 36.8% WR, -$0.73 (12/19 ATR SL hits — worst performer)
+- hzscore-: 6T, 66.7% WR, +$0.04
+
+**Diagnosis:**
+1. **Entry quality:** Mixed — winners trail well, losers hit SL immediately
+2. **SL behavior:** 44.3% SL hit rate. accel-300- responsible for 41% of all SL hits
+3. **Signal quality:** accel-300- deteriorated after re-enable (36.8% WR today)
+4. **Trade frequency:** ~3.7/hr normal
+
+**Changes:**
+1. Disabled ACCEL_300_ENABLED — 19T today with 36.8% WR, 12/19 ATR SL hits, net -$0.73. Re-enabled yesterday but already deteriorated. Removing primary source of SL losses.
+
+**No Change Needed:**
+- ATR SL at 44.3% — structural but profit-monster-trail compensating
+- No consecutive negative hours
+- range_breakout- already dead
+- Trade freq normal
+
+**Open Questions:**
+- accel-300- was re-enabled yesterday with positive edge data — may work in different market conditions. Monitor for re-enable.
+- Today Aug 13 remains worst day in 7d. System flat overall.
