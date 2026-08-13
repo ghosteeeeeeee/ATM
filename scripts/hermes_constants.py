@@ -602,10 +602,17 @@ CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block go
 SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
 SIGNAL_FILTER_SPEED_MIN = 45  # CEO LOCK 2026-08-02 23:15 UTC — freeze 48h (was 65 thrash)
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
-SIGNAL_FILTER_RSI_MIN = 20           # block SHORT when RSI < this (oversold) - was 30, lowered to allow bounces
+SIGNAL_FILTER_RSI_MIN = 30           # block SHORT when RSI < this (oversold = bounce risk)
 SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) - was 70, raised to allow reversals
 SIGNAL_FILTER_Z_MIN = -1.5           # block LONG when z < this AND speed < 50% (chasing)
 SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50% (chasing)
+
+# ── Global Spike Filter ────────────────────────────────────────────────────
+# Block SHORT entries after recent bullish 5m candle (spike → consolidation → bad SHORT)
+# Backtested: spike>0.3% + RSI<30 blocks 2x more losers than winners (0.5x ratio)
+SPIKE_FILTER_ENABLED = True
+SPIKE_FILTER_5M_THRESHOLD = 0.3      # % — block SHORT if last 3 5m candles had bullish candle > this
+SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = bounce risk)
 
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.

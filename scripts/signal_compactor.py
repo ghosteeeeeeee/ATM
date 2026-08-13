@@ -1134,6 +1134,48 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if is_delisted(tkn):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — delisted")
                 continue
+            # ── Global spike filter: block SHORT after recent bullish 5m candle ──
+            # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD
+            if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
+                try:
+                    _skip = False
+                    _conn_sf = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_sf = _conn_sf.cursor()
+                    _cur_sf.execute("""
+                        SELECT close, open FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 3
+                    """, (tkn.upper(),))
+                    for _cl, _op in _cur_sf.fetchall():
+                        if _op and _op > 0 and (_cl - _op) / _op * 100 > SPIKE_FILTER_5M_THRESHOLD:
+                            log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — recent bullish 5m candle +{(_cl-_op)/_op*100:.3f}%")
+                            _skip = True
+                            break
+                    if not _skip:
+                        # No spike — check RSI
+                        _cur_sf.execute("""
+                            SELECT close FROM candles_5m
+                            WHERE token = ? AND is_closed = 1
+                            ORDER BY ts DESC LIMIT 15
+                        """, (tkn.upper(),))
+                        _closes = [r[0] for r in _cur_sf.fetchall()]
+                        if len(_closes) >= 15:
+                            _deltas = [_closes[i] - _closes[i-1] for i in range(1, len(_closes))]
+                            _gains = [d if d > 0 else 0 for d in _deltas[-14:]]
+                            _losses = [-d if d < 0 else 0 for d in _deltas[-14:]]
+                            _ag = sum(_gains) / 14
+                            _al = sum(_losses) / 14
+                            if _al > 0:
+                                _rsi = 100 - (100 / (1 + _ag / _al))
+                                if _rsi < SPIKE_FILTER_RSI_THRESHOLD:
+                                    log(f"  🚫 [SPIKE-FILTER] {tkn}: SHORT blocked — RSI {_rsi:.1f} < {SPIKE_FILTER_RSI_THRESHOLD}")
+                                    _skip = True
+                    _conn_sf.close()
+                    if _skip:
+                        continue
+                except Exception:
+                    pass  # non-fatal — let signal through on DB error
             # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
             # Uses validate_source() for correct handling:
             # 1. Exact match: whole source in blacklist → block
