@@ -350,27 +350,31 @@ def get_directional_outcome(direction: str) -> tuple:
         DIRECTIONAL_OUTCOME_WINDOW,
         DIRECTIONAL_OUTCOME_TIME_WINDOW,
     )
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         c = conn.cursor()
         c.execute("""
-            SELECT
-                COUNT(*) as total,
-                SUM(CASE WHEN is_win = 0 THEN 1 ELSE 0 END) as losses,
-                ROUND(100.0 * SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
-            FROM signal_outcomes
-            WHERE direction = ?
-              AND created_at > datetime('now', '-' || ? || ' minutes')
-            ORDER BY created_at DESC
-            LIMIT ?
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN is_win = 0 THEN 1 ELSE 0 END) as losses,
+                   ROUND(100.0 * SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+            FROM (
+                SELECT is_win FROM signal_outcomes
+                WHERE direction = ?
+                  AND created_at > datetime('now', '-' || ? || ' minutes')
+                ORDER BY created_at DESC
+                LIMIT ?
+            )
         """, (direction.upper(), DIRECTIONAL_OUTCOME_TIME_WINDOW, DIRECTIONAL_OUTCOME_WINDOW))
         row = c.fetchone()
-        conn.close()
         if row and row[0] > 0:
             return (row[1] or 0, row[0], row[2] or 0.0)
         return (0, 0, 0.0)
     except Exception:
         return (0, 0, 0.0)
+    finally:
+        if conn:
+            conn.close()
 
 
 # ── Scoring ───────────────────────────────────────────────────────────────────
