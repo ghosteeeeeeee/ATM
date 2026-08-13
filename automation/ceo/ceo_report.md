@@ -38,3 +38,9 @@ Five changes applied, all backtested with zero winner regression:
 | ATR filter | Tested and disabled — ATR overlap winners/losers too high |
 
 All changes are deterministic (LLM-free) and backward-compatible. No config flags to toggle — logic lives in `signal_compactor.py` and signal files.
+
+---
+
+## Config Cleanup — 2026-08-13
+
+Moved hardcoded EMA 200 period to `hermes_constants.py` as `RANGE_BREAKOUT_SHORT_EMA_PERIOD`. Added AGENTS.md rule: no hardcoded constants. Bug hunter verified clean.
