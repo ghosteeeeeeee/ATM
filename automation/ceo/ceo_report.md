@@ -1,16 +1,17 @@
-## CEO Report — 2026-08-13 21:49 UTC (verified)
+## CEO Report — 2026-08-13 22:30 UTC (verified)
 
 ### Diagnosis
-24h: 56T **-$1.42** (46.4% WR — RED). 7d: 425T **-$0.15** (51.8% WR — flat, barely negative). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 in progress (legacy clearing). 5 open $0 flat. Pipeline healthy.
+24h: 53T **-$1.62** (43.4% WR — RED, worst recent 24h). 7d: 425T **-$0.28** (51.5% WR — flat). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 51T **-$1.45** (45.1% WR — worst day). 5 open. Pipeline healthy.
 
 ### Root Cause
-Aug 13 losses driven by legacy disabled signals: accel-300- SHORT 24T -$0.59 (45.8% WR), continuation-,hzscore- 3T -$0.23, accel-300-,hzscore- 1T -$0.10. Active SHORT signals profitable: range_breakout_short 18T +$0.10 50%, hzscore- 14T +$0.02 64.3%. LONG 7d: +$0.76 (profitable). SHORT 7d: -$1.16 (100% from disabled signals). Cost drivers48h: atr_sl_hit 69T -$4.87 (dominant).
+Two active problems:
+1. `range_breakout_short` SHORT 10T **-$0.50** (20% WR) — flipped from star (+$0.18 57.9% 7d) to disaster in 24h. Last 3 trades: all SL hit.
+2. `accel-300-` SHORT 20T -$0.82 (35% WR) — LEGACY only (last close 08:55 UTC), draining old positions.
+
+Cost drivers 48h: atr_sl_hit 68T **-$4.89** (dominant, 88% of losses). profit-monster-trail compensating but not enough.
 
 ### Fix Applied
-NO CHANGES. All bleeders already disabled. System flat, legacy clearing, stability period.
-
-### Verification
-Active SHORTs intact: range_breakout_short 18T +$0.10 50%, hzscore- 14T +$0.02 64.3%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Stars7d intact. Pipeline healthy. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ after accel-300- fully clears → regime filter).
+**DISABLED `RANGE_BREAKOUT_SHORT_ENABLED=False.** Reason: 20% WR in 24h, clear regime flip. 2 open trades will close naturally, no new entries. Revert if regime improves.
 
 ### Root Cause
 All losses from legacy disabled signals clearing. No new bleeders:

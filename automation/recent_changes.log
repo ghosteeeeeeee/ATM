@@ -462,3 +462,4 @@
   WHY: 0T last hour (quiet). 24h 59T -$1.17. ATR SL 47.5% (above 40% but profit-monster-trail compensates +$1.33 vs -$2.29). 4 open trades healthy (MON, CC, JUP, HBAR). No 0% WR kill candidates (continuation-,hzscore- 33% WR at 3T — watch). Trade freq 2.7/hr normal. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 22:30 UTC
+[2026-08-13 22:30 UTC] CEO: DISABLED RANGE_BREAKOUT_SHORT_ENABLED=False — 24h 10T 20% WR -/usr/bin/bash.50 (was +/usr/bin/bash.18 57.9% 7d star, flipped). Revert if regime improves.
