@@ -1,11 +1,13 @@
 # Current State — System Improvement Focus
 
 **Last updated:** 2026-08-13
-**Updated by:** Human (initial version)
+**Updated by:** Human (initial version), Agent (Weather Vane upgrades)
 
 ## What We're Working On
 
 Implementing **progressive context shaping** — giving Hermes agents structured state between sessions so they don't drift on stale context. This is a meta-improvement to how the system improves itself.
+
+**Also completed:** Weather Vane v2+v4 upgrades (Direction Lock + Tide Detection).
 
 ## Active Decisions
 
@@ -13,12 +15,15 @@ Implementing **progressive context shaping** — giving Hermes agents structured
 - **Orchestrator reads CURRENT.md before gathering intelligence.** Prevents stale instruction drift. — 2026-08-13
 - **Signal deprecation reasons are recorded, not just state transitions.** Carry the lesson, not the noise. — 2026-08-13
 - **Context layers are separated:** stable instructions (AGENTS.md) vs current state (this file) vs map (contextmap.md) vs history (logs, Hebbian, checkpoints). History must not masquerade as current guidance. — 2026-08-13
+- **Direction Lock: 30min lock after catastrophic loss (4+/5).** Prevents re-entry during clear bad streaks. — 2026-08-13
+- **Tide Detection: BTC 3h momentum + SHORT WR confirmation.** Bearish tide suppresses LONG, bullish tide suppresses SHORT. — 2026-08-13
 
 ## Known Limitations / Failed Approaches
 
 - **Monolithic orchestrator prompt** becomes a graveyard of stale rules over time. Fix: progressive context shaping via CURRENT.md. — 2026-08-13
 - **Editing constants.py or AGENTS.md for temporary steering** is too heavy — those are permanent. CURRENT.md is the ephemeral steering layer. — 2026-08-13
 - **No session handoff protocol** — when human sessions end, context is lost. CEO sometimes repeats work or misses decisions from the last session. — 2026-08-13
+- **Z-Score + Acceleration filter** — spec proposed soft penalty in signal_compactor, but hard block already exists in decider_run.py. No duplicate needed. — 2026-08-13
 
 ## System Improvement Backlog
 
@@ -35,6 +40,7 @@ Implementing **progressive context shaping** — giving Hermes agents structured
 ### Future
 7. Formalize the 4-layer context separation in AGENTS.md (structural refactor)
 8. Progress file as portable memory between CEO sessions
+9. Weather Vane Component 2 (Position Shield) — tighten trailing stops on losing positions during regime shifts
 
 ## What NOT To Do
 
@@ -42,6 +48,7 @@ Implementing **progressive context shaping** — giving Hermes agents structured
 - Don't edit AGENTS.md for ephemeral state — that's stable instructions only
 - Don't add session persistence to the pipeline — it's stateless by design (correct)
 - Don't add new dependencies — just markdown files and minor script changes
+- Don't duplicate Z-Score + Acceleration filter — already in decider_run.py as hard block
 
 ## Stop Conditions
 

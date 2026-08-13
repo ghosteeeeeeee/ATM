@@ -1121,6 +1121,7 @@ RANGE_BREAKOUT_ENABLED = True
 RANGE_BREAKOUT_PLUS_ENABLED = False   # range_breakout+ LONG — DISABLED CEO 2026-08-12 — 8T 25% WR -$0.41 in 24h. All losses.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
 RANGE_BREAKOUT_SHORT_ENABLED = True  # range_breakout_short (SHORT-specific with velocity/regime filters)
+RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)
 RANGE_BREAKOUT_BB_WIDTH_MAX = 0.04   # Max band width % to consider range-bound (4%)

@@ -56,6 +56,7 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 - **Column names** — `pnl_usdt` and `amount_usdt` (NOT `pnl_usd` or `size`)
 - **SQL placeholders** — use `?` or named params, never `***` (was a silent bug source)
 - **Token vs coin** — the standard is `coin` in the codebase, but some files still use `token`
+- **No hardcoded constants** — all thresholds, periods, and tunable parameters MUST go in `hermes_constants.py`. Never hardcode magic numbers in signal files or scripts. Import from hermes_constants and reference by name.
 - **Mandatory subagent code review** — after any major change (new feature, bug fix, refactor), call a subagent to audit the diff. Look for bugs, scoping issues, edge cases, connection leaks, and future failure modes. Never skip this.
 - **Mandatory bug_hunter verification** — after any major change, call the bug_hunter subagent to verify the fix. This is always the last step. No exceptions.
 

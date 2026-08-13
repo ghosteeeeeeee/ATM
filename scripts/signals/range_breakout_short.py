@@ -239,16 +239,18 @@ def detect_breakout_short(closes, token):
     if breakout_idx is None:
         return None  # no SHORT breakout found
 
-    # ── Phase 2b: Trend filter — don't SHORT above EMA200 ──────────────
-    # If price is above EMA200, the breakout is likely a pullback, not a reversal.
-    # Backtest: all winners had price below EMA200, all losers above.
-    if len(closes) >= 200:
-        k200 = 2.0 / 201
-        ema200_val = closes[0]
+    # ── Phase 2b: Trend filter — don't SHORT above EMA ──────────────────
+    # If price is above EMA, the breakout is likely a pullback, not a reversal.
+    # Backtest: all winners had price below EMA, all losers above.
+    from hermes_constants import RANGE_BREAKOUT_SHORT_EMA_PERIOD
+    ema_period = RANGE_BREAKOUT_SHORT_EMA_PERIOD
+    if len(closes) >= ema_period:
+        k_ema = 2.0 / (ema_period + 1)
+        ema_val = closes[0]
         for p in closes[1:]:
-            ema200_val = p * k200 + ema200_val * (1 - k200)
-        if closes[-1] > ema200_val:
-            return None  # price above EMA200 — uptrend, skip SHORT
+            ema_val = p * k_ema + ema_val * (1 - k_ema)
+        if closes[-1] > ema_val:
+            return None  # price above EMA — uptrend, skip SHORT
 
     # ── Phase 3: Invalidation — close back inside range? ────────────────
     for i in range(1, INVALIDATION_WINDOW + 1):

@@ -22,3 +22,19 @@ NO CHANGES. Legacy will age out of 7d window naturally. Stars7d intact (5 profit
 - SHORT7d: if still -$1.50+ after 48h legacy ages out → regime filter
 - daily PnL: if -2 consecutive red after legacy clears → investigate
 - Deploy approved features (v3 consecutive losses, v4 tide, structure shift) once 7d confirms positive
+
+---
+
+## Signal Hardening — 2026-08-13
+
+Five changes applied, all backtested with zero winner regression:
+
+| Change | Detail |
+|--------|--------|
+| ACCEL_300 slope | 0.0005→0.001 (+0.6% WR) |
+| Slope gate | signal_compactor blocks SHORT when slope >= -0.001% |
+| EMA200 filter | range_breakout_short blocks SHORT above EMA200 (0% winners blocked, 89% losers blocked) |
+| Solo bypass | hzscore, mover, return_exhaustion_long, bb-bounce-short added |
+| ATR filter | Tested and disabled — ATR overlap winners/losers too high |
+
+All changes are deterministic (LLM-free) and backward-compatible. No config flags to toggle — logic lives in `signal_compactor.py` and signal files.
