@@ -1,8 +1,19 @@
 # Weather Vane v3 — Predictive Signal Volume Detection
 
 **Date:** 2026-08-13
-**Status:** PROPOSED
+**Status:** APPROVED WITH MODIFICATIONS (CEO)
 **Based on:** signal generation rate as leading indicator of regime shifts
+
+---
+
+## CEO Verdict
+
+**APPROVE with modifications.** Core insight is sound — signal volume IS a leading indicator. Required changes:
+1. Baseline: same-hour-yesterday (not 24h avg — 24x natural variance causes false positives)
+2. Threshold: 50% → 65%
+3. Min baseline: 10 → 20 signals/hr
+4. Add 30-min cooldown after trigger
+5. Backtest 7d before deploying live
 
 ---
 
@@ -39,12 +50,17 @@ Track the rolling average of SHORT (or LONG) signals generated per hour. When th
 
 ### Baseline calculation
 
+**CEO feedback:** 24h rolling average causes constant false positives during quiet hours. SHORT volume swings 16-386/hr (24x) naturally.
+
+**Fix:** Use same-hour yesterday as baseline, not 24h average.
+
 ```python
-# Baseline: average signals/hour over last 24 hours
-baseline = total_signals_last_24h / 24
+# Baseline: signals/hour from the SAME HOUR yesterday
+yesterday_hour = now - 24h
+baseline = count_signals(direction, yesterday_hour, yesterday_hour + 1h)
 
 # Current: signals/hour in last 2 hours
-current = total_signals_last_2h / 2
+current = count_signals(direction, now - 2h, now)
 
 # Drop ratio: how much has the rate dropped?
 drop_ratio = 1.0 - (current / baseline)  # 0.0 = no drop, 0.5 = 50% drop
@@ -53,34 +69,36 @@ drop_ratio = 1.0 - (current / baseline)  # 0.0 = no drop, 0.5 = 50% drop
 ### Trigger threshold
 
 ```python
-SIGNAL_VOLUME_DROP_THRESHOLD = 0.5  # 50% drop from baseline → flag
+SIGNAL_VOLUME_DROP_THRESHOLD = 0.65  # 65% drop from baseline → flag (CEO: raised from 50%)
 ```
 
-If SHORT signals/hour drops by 50%+ from the 24h baseline, the market may have shifted bullish.
+If SHORT signals/hour drops by 65%+ from same-hour-yesterday, the market may have shifted bullish.
 
 ### Example
 
 ```
-Baseline (24h avg): 200 SHORT signals/hour
-Current (last 2h): 80 SHORT signals/hour
-Drop ratio: 1.0 - (80/200) = 0.6 = 60% drop → TRIGGER
+Yesterday 14:00: 287 SHORT signals
+Today 14:00: 80 SHORT signals (last 2h)
+Drop ratio: 1.0 - (80/287) = 0.72 = 72% drop → TRIGGER
 ```
 
 ### Edge cases
 
-- **Low activity hours (e.g., 3-5 AM):** Signal volume is naturally lower. Use time-of-day adjusted baseline (compare to same hour yesterday, not 24h average).
-- **New token added:** Sudden volume spike followed by normalcy. Baseline adjusts over 24h.
-- **System restart:** Gap in signal data. Skip detection until 24h of data accumulated.
+- **First day (no yesterday data):** Skip detection until 48h of data accumulated.
+- **Low baseline (< 20 signals/hr):** Skip — too few signals to measure reliably (CEO: min baseline raised from 10 to 20).
+- **System restart:** Gap in signal data. Skip detection until data accumulates.
+- **Cooldown:** After trigger fires, 30-minute cooldown before re-triggering (CEO: prevents thrashing on hour boundaries).
 
 ### Params
 
 ```python
 SIGNAL_VOLUME_ENABLED = True
-SIGNAL_VOLUME_BASELINE_WINDOW = 24    # hours for baseline calculation
+SIGNAL_VOLUME_BASELINE_WINDOW = 24    # hours for same-hour-yesterday lookup
 SIGNAL_VOLUME_CURRENT_WINDOW = 2      # hours for current rate
-SIGNAL_VOLUME_DROP_THRESHOLD = 0.5    # 50% drop → flag
-SIGNAL_VOLUME_MIN_BASELINE = 10       # minimum signals/hour to have a valid baseline
+SIGNAL_VOLUME_DROP_THRESHOLD = 0.65   # 65% drop → flag (CEO: raised from 50%)
+SIGNAL_VOLUME_MIN_BASELINE = 20       # minimum signals/hr for valid baseline (CEO: raised from 10)
 SIGNAL_VOLUME_PENALTY = 0.8           # score multiplier when triggered (milder than loss-based)
+SIGNAL_VOLUME_COOLDOWN_MINUTES = 30   # cooldown after trigger (CEO: new)
 ```
 
 ---
