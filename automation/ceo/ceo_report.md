@@ -1,33 +1,32 @@
 ## CEO Report — 2026-08-13 (verified)
 
 ### Diagnosis
-24h: 76T -$0.27 (56.6% WR — FLAT). 7d: 439T -$0.44 (51.3% WR — slightly negative, improved from -$0.67 last read). Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 (recovery) → Aug 13 -$1.21 (45.7% WR — legacy clearing). SHORT7d: 196T -$1.13 (51.5% WR — all from disabled signals). LONG7d: 243T +$0.69 (profitable). 2 open $-0.02 flat. Pipeline healthy.
+24h: 72T -$0.31 (56.9% WR — FLAT). 7d: 435T -$0.17 (51.7% WR — barely negative, improved from -$0.67). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 47T -$1.17 (46.8% WR — legacy clearing). 3 open $0 flat. Pipeline healthy.
 
 ### Root Cause
-Aug 13 -$1.21 worst day = legacy disabled signal clearing:
-- accel-300- SHORT: 40T -$0.30 55% WR (disabled, legacy trades)
-- range_breakout+ LONG: 8T -$0.41 25% WR (disabled)
-- trend_momentum_near_sma+ LONG: 6T -$0.37 16.7% WR (disabled)
-All three bleeders disabled/blacklisted — no new entries. Legacy fully clearing.
+System flat. 7d -$0.17 = residual legacy from disabled signals (improving):
+- accel-300- SHORT 40T -$0.30 55% WR (disabled, legacy draining)
+- range_breakout+ LONG 8T -$0.41 25% WR (disabled)
+- trend_momentum_near_sma+ LONG 6T -$0.37 16.7% WR (disabled)
+Active SHORT signals profitable: range_breakout_short 23T +$0.07, hzscore- 27T +$0.14, bb-bounce-short,hzscore- 18T +$0.14.
 
 ### 7d Stars (profitable, intact)
-- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5% ★
-- bb_bounce+ LONG: 20T +$0.19 60.0%
-- bb_bounce+,hzscore+ LONG: 34T +$0.22 50.0%
-- hzscore+,mover+ LONG: 5T +$0.17 80.0%
+- bb_bounce+,range_finder+ LONG: 53T +$0.71 58.5%
+- bb_bounce+ LONG: 20T +$0.19 60%
+- bb_bounce+,hzscore+ LONG: 34T +$0.22 50%
+- hzscore+,mover+ LONG: 5T +$0.17 80%
 - bb-bounce-short,hzscore- SHORT: 18T +$0.14 61.1%
 
 ### Cost Drivers (48h)
-- atr_sl_hit: 73T -$4.88 (dominant, 97% of losses)
+- atr_sl_hit: 73T -$4.88 (dominant)
 - profit-monster-trail compensating
-- Net SL impact stabilizing
 
 ### Fix Applied
-NO CHANGES — system flat, all bleeders disabled, stability period active. 7d improved from -$0.67 to -$0.44 (legacy aging out). No actionable problem to fix.
+NO CHANGES — system flat, stability period active. All bleeders disabled. Monitor: continuation-,hzscore- SHORT 5T -$0.24 40% WR (if bleeds further → blacklist).
 
 ### Verification
 - Stars intact (5 profitable)
-- 2 open $-0.02 flat
+- 3 open $0 flat
 - Pipeline healthy
 - All disabled signals confirmed (0 new entries post-disable)
 
