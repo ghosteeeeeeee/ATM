@@ -377,6 +377,43 @@ def get_directional_outcome(direction: str) -> tuple:
             conn.close()
 
 
+def get_directional_outcome_long(direction: str) -> tuple:
+    """
+    Long-window version: catches slow bleeds over 4 hours that don't hit the
+    short-window threshold (3 losses in 5 trades / 30 min).
+    Returns (losses, total, win_rate) from a 240-minute window.
+    """
+    from hermes_constants import (
+        DIRECTIONAL_OUTCOME_INTEGRAL_WINDOW,
+        DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD,
+    )
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN is_win = 0 THEN 1 ELSE 0 END) as losses,
+                   ROUND(100.0 * SUM(CASE WHEN is_win = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+            FROM (
+                SELECT is_win FROM signal_outcomes
+                WHERE direction = ?
+                  AND created_at > datetime('now', '-' || ? || ' minutes')
+                ORDER BY created_at DESC
+                LIMIT ?
+            )
+        """, (direction.upper(), DIRECTIONAL_OUTCOME_INTEGRAL_WINDOW, DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD + 5))
+        row = c.fetchone()
+        if row and row[0] > 0:
+            return (row[1] or 0, row[0], row[2] or 0.0)
+        return (0, 0, 0.0)
+    except Exception:
+        return (0, 0, 0.0)
+    finally:
+        if conn:
+            conn.close()
+
+
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data):
@@ -435,6 +472,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_MIN_TRADES,
         DIRECTIONAL_OUTCOME_LOSS_THRESHOLD, DIRECTIONAL_OUTCOME_WR_THRESHOLD,
         DIRECTIONAL_OUTCOME_PENALTY, DIRECTIONAL_OUTCOME_RECOVERY_WR,
+        DIRECTIONAL_OUTCOME_VELOCITY_ENABLED, DIRECTIONAL_OUTCOME_VELOCITY_TIERS,
     )
     if DIRECTIONAL_OUTCOME_ENABLED:
         losses, total, wr = get_directional_outcome(direction)
@@ -442,12 +480,29 @@ def _score_signal(token, direction, conf, source, signal_type,
             # Off-course alarm: warn at 2 losses (one before trigger)
             if losses >= DIRECTIONAL_OUTCOME_LOSS_THRESHOLD - 1 and losses < DIRECTIONAL_OUTCOME_LOSS_THRESHOLD:
                 log(f"  ⚠️ [WEATHER-VANE] {token} {direction}: {losses}/{total} losses ({wr}% WR) — approaching trigger")
+            # Derivative: tiered penalty based on loss velocity
+            loss_velocity = losses / total if total > 0 else 0
+            velocity_mult = 1.0
+            if DIRECTIONAL_OUTCOME_VELOCITY_ENABLED:
+                for threshold, mult in sorted(DIRECTIONAL_OUTCOME_VELOCITY_TIERS.items(), reverse=True):
+                    if loss_velocity >= threshold:
+                        velocity_mult = mult
+                        break
             # Trigger: activate suppression
             if losses >= DIRECTIONAL_OUTCOME_LOSS_THRESHOLD or wr < DIRECTIONAL_OUTCOME_WR_THRESHOLD:
-                dir_outcome_mult = DIRECTIONAL_OUTCOME_PENALTY
+                dir_outcome_mult = velocity_mult
             # Hysteresis: stay suppressed until BOTH losses dropped AND WR recovered
             elif losses < DIRECTIONAL_OUTCOME_LOSS_THRESHOLD and wr < DIRECTIONAL_OUTCOME_RECOVERY_WR:
-                dir_outcome_mult = DIRECTIONAL_OUTCOME_PENALTY  # stay suppressed
+                dir_outcome_mult = velocity_mult  # stay suppressed (use velocity)
+    # Integral: long-window catch for slow bleeds (240min window)
+    from hermes_constants import (
+        DIRECTIONAL_OUTCOME_INTEGRAL_ENABLED, DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD,
+        DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY,
+    )
+    if DIRECTIONAL_OUTCOME_INTEGRAL_ENABLED:
+        long_losses, long_total, long_wr = get_directional_outcome_long(direction)
+        if long_losses >= DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD:
+            dir_outcome_mult = min(dir_outcome_mult, DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY)
 
     final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult
     return final_score

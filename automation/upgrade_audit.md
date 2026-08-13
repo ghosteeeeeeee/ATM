@@ -507,3 +507,42 @@ For each plan scanned, log:
 
 **Completed since last run:** signal-version-tracking integration (wired into auto_1hr prompt).
 **Skipped:** audit_memory (brain_hebbian.db is empty — no cleanup needed).
+
+---
+
+## Session 2026-08-13 — Weather Vane v2 (PID-Inspired Improvements)
+
+### Plan: 2026-08-12_directional-outcome-tracker-spec.md
+- **Date scanned:** 2026-08-13 12:00
+- **Core request:** Directional outcome tracker — 3 components: signal gate, position shield, recovery
+- **Difficulty:** Level 1-2
+- **Value:** HIGH
+- **Status:** IMPLEMENTED (Component 1 + 3), Component 2 PENDING
+- **Reason:** Component 1 (signal gate with hysteresis) already live. Component 3 (recovery) inherent. Component 2 (position shield — tighten stops on losing direction) not yet implemented.
+
+### Plan: 2026-08-13_weather-vane-v2-spec.md
+- **Date scanned:** 2026-08-13 12:00
+- **Core request:** PID-inspired Weather Vane v2 — hysteresis, derivative (velocity tiers), integral (long window), off-course alarm, gain scheduling, watchdog
+- **Difficulty:** Level 1-2
+- **Value:** HIGH
+- **Status:** IMPLEMENTED (4/6 improvements)
+- **Reason:** Hysteresis already existed (DIRECTIONAL_OUTCOME_RECOVERY_WR). Off-course alarm already existed. Derivative (velocity tiers) + Integral (long window) implemented this session. Gain scheduling and watchdog deferred.
+
+### Changes Applied (2026-08-13)
+
+**1. Derivative: Velocity tiers** — `signal_compactor.py` + `hermes_constants.py`
+- **What:** Tiered penalty based on loss_velocity (losses/total) instead of flat 0.7x
+- **Tiers:** 0.8+ velocity → hard block (0.0x), 0.6+ → strong penalty (0.5x), 0.4+ → mild (0.7x)
+- **File:** hermes_constants.py:629-633, signal_compactor.py:483-490
+- **Impact:** Catastrophic loss clusters (4+/5) now fully blocked, not just penalized
+
+**2. Integral: Long-window catch** — `signal_compactor.py` + `hermes_constants.py`
+- **What:** 240-minute (4hr) window catches slow bleeds that don't hit the 30min/5-trade threshold
+- **Params:** 5 losses in 240min → 0.8x penalty (milder than short-window)
+- **File:** hermes_constants.py:634-637, signal_compactor.py:378-403 (new function) + 498-503 (integration)
+- **Impact:** Catches 1-loss-per-hour slow bleeds that previously evaded detection
+
+**Deferred:**
+- Gain scheduling (needs market-wide speed percentile — per-token only exists today)
+- Watchdog (low priority, logging-only improvement)
+- Position Shield from Plan 1 (Level 2, needs trailing stop tightening logic)

@@ -626,6 +626,19 @@ DIRECTIONAL_OUTCOME_WR_THRESHOLD = 40     # backup: WR below this also triggers
 DIRECTIONAL_OUTCOME_PENALTY = 0.7         # score multiplier (milder for first deploy)
 DIRECTIONAL_OUTCOME_MIN_TRADES = 3        # minimum trades before activating
 DIRECTIONAL_OUTCOME_RECOVERY_WR = 45      # hysteresis: WR% required to deactivate suppression
+# Velocity tiers: tiered penalty based on loss_velocity (losses/total).
+# Higher velocity = faster deterioration = stronger penalty.
+DIRECTIONAL_OUTCOME_VELOCITY_ENABLED = True
+DIRECTIONAL_OUTCOME_VELOCITY_TIERS = {
+    0.8: 0.0,   # catastrophic (4+/5 losses) → hard block
+    0.6: 0.5,   # severe (3/5) → strong penalty
+    0.4: 0.7,   # moderate (2/5) → mild penalty (matches DIRECTIONAL_OUTCOME_PENALTY)
+}
+# Integral: long-window catch for slow bleeds that don't hit short-window threshold.
+DIRECTIONAL_OUTCOME_INTEGRAL_ENABLED = True
+DIRECTIONAL_OUTCOME_INTEGRAL_WINDOW = 240     # minutes (4 hours)
+DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD = 5    # losses in long window to trigger
+DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY = 0.8    # milder than short-window penalty
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
