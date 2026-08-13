@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-13 (latest)
+## CEO Report — 2026-08-13 (CEO run)
 
 ### Diagnosis
-24h 106T -$0.26 (52.8% WR — flat). 7d ~465T +$0.37 (52.8% WR — positive). Daily: Aug 9 +$0.62 peak → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 (recovery) → Aug 13 9T -$0.58 (22.2% WR — cold streak, only 9 trades). 2 open +$0.06 flat. Stars7d intact (5 profitable).
+24h 106T -$0.18 (53.8% WR — flat). 7d ~465T +$0.37 (52.8% WR — positive). Daily: Aug 12 +$0.49 (recovery confirmed) → Aug 13 11T -$0.52 (36.4% WR — cold, only 11 trades). 5 open $0 flat. Stars7d intact (5 profitable): bb_bounce+,range_finder+ 53T +$0.71 58.5%, range_breakout_short 14T +$0.49 71.4%, hzscore+,mover+ 5T +$0.17 80%, bb_bounce+,hzscore+ 34T +$0.22 50%, bb-bounce-short,hzscore- 18T +$0.14 61.1%.
 
 ### Root Cause
-Aug 13 cold streak: 9T at 22.2% WR is noise, not signal failure. Only active bleeder: accel-300- SHORT 29T -$0.18 (55.2% WR — losses slightly larger than wins, not a win-rate issue). All prior bleed sources disabled/blacklisted. Atr_sl_hit dominates: 65T -$3.99 in 48h. System flat, no clear actionable problem.
+Aug 13 cold streak: 11T at 36.4% WR is noise (too few trades). Only active bleeder: accel-300- SHORT 31T -$0.12 58.1% WR (marginal — losses > wins but WR fine). All prior bleeders disabled/blacklisted. Atr_sl_hit dominates: 63T -$3.87 in 48h. System flat, no clear actionable problem.
 
 ### Fix Applied
-NO CHANGES. Stability period active. Aug 13 too early to judge (9 trades). All prior disables confirmed (range_breakout+ FALSE, trend_momentum FALSE, hzscore+ BLACKLISTED, return_exhaustion- BLACKLISTED). System flat, no actionable bleed.
+NO CHANGES. Stability period active. Aug 13 too early to judge (11 trades). All prior disables confirmed working (0 new trades post-disable/blacklist). Pipeline healthy.
 
 ### Verification
-7d positive (+$0.37), stars intact (5/6 profitable). accel-300- SHORT 7d 28T -$0.21 at 53.6% WR — marginal, not kill-worthy. Pipeline healthy. Monitor: daily PnL (if -2 consecutive red days → investigate), accel-300- (if持续 bleeding → disable ACCEL_300_MINUS_ENABLED).
+All prior fixes confirmed: range_breakout+ 0 trades post-disable, hzscore+ standalone 0 trades post-blacklist, return_exhaustion- 0 trades post-blacklist. System flat, no actionable bleed. Monitor: accel-300- (if持续 bleeding → disable ACCEL_300_MINUS_ENABLED), daily PnL (if -2 consecutive red → investigate).
 
 ---
 
