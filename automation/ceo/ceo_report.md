@@ -1,3 +1,24 @@
+## CEO Report — 2026-08-13 (Latest)
+
+### Diagnosis
+24h: 105T, -$0.44 PnL, 52.4% WR — RED day. Aug 13 only 17T at35.3% WR (tiny sample). 7d: 460T +$0.3853.0% WR — barely positive, holding.
+
+### Root Cause
+Cold streak, not systemic. Aug 12 recovered to +$0.4957% WR, Aug 13 is just 17 trades with bad distribution. accel-300- SHORT remains marginal: 35T -$0.1757.1% WR but R:R unfavorable (avg_win $0.05 vs avg_loss $0.08). atr_sl_hit 65T -$4.07 dominates cost — trailing stop compensating but not enough.
+
+### Fix Applied
+NO CHANGES. Stability period active. System flat, stars intact, no clear bleeding point to fix.
+
+### Verification
+Stars7d intact: bb_bounce+,range_finder+ +$0.71, range_breakout_short +$0.43, hzscore+,mover+ +$0.17, bb_bounce+,hzscore+ +$0.22, bb-bounce-short,hzscore- +$0.14. All previously disabled/blacklisted signals confirmed. Pipeline healthy, 6 open -$0.16 flat.
+
+### Monitor
+- accel-300- SHORT: disable ACCEL_300_MINUS_ENABLED if PnL drops below -$0.30
+- SHORT7d: add regime filter if total drops below -$1.50
+- Daily: investigate if 2 consecutive red days after today
+
+---
+
 ## CEO Report — 2026-08-15 (Z-Score + Acceleration Filter — Deployed)
 
 **DEPLOYED.** Z-Score + Acceleration alignment filter now live in `decider_run.py:762-772`. Hard block: LONG z>0.5+accel>0.005, SHORT z<-0.5+accel<-0.005. Bug hunter: ALL CLEAR. No trading changes.
@@ -331,3 +352,9 @@ NO CHANGES. Stability period active. System flat (7d +$0.16). Stars intact. acce
 - daily PnL: if -2 consecutive red days → investigate
 - accel-300-: if持续 bleeding → disable ACCEL_300_MINUS_ENABLED
 - SHORT7d: if -$1.50+ → consider regime filter
+
+---
+
+## CEO Report — 2026-08-15 (Z-Score+Accel Thresholds Refactor — Noted)
+
+**Acknowledged.** Thresholds for Z-Score+Acceleration alignment filter hardcoded in `decider_run.py` (0.5, 0.005) moved to `hermes_constants.py` as `ZSCORE_ACCEL_Z_THRESHOLD` and `ZSCORE_ACCEL_ACCEL_THRESHOLD`. Named constants imported by `decider_run.py`. Bug hunter: ALL CLEAR. No trading changes — single source of truth refactor only.
