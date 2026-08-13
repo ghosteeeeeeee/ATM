@@ -6700,3 +6700,44 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Is accel-300- entering during chop? Or is SL too tight for current ATR?
 - 7-day trend: Aug 9 +$0.62 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 -$0.61 (so far). Pattern: recovery then decline.
+
+## 2026-08-13 01:30 UTC — Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** +$0.09 (100% WR)
+
+**Exit Reasons (1h):** profit-monster-trail (3)
+
+**24h Snapshot:**
+- 105T, -$0.06, 57.1% WR — flat
+- ATR SL hit: 45/105 (42.9%) — above 40% threshold
+- profit-monster-trail: 55/105 (+$2.64) — compensating SL losses
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 14T, +$0.49, 71.4% WR
+- ✅ bb_bounce+ LONG: 6T, +$0.10, 66.7% WR
+- ✅ hzscore- SHORT: 12T, +$0.01, 50% WR
+- ⚠️ accel-300- SHORT: 31T, -$0.12, 58% WR — volume leader, slight negative
+- ⚠️ range_breakout- SHORT: 20T, -$0.12, 45% WR
+- ❌ hzscore+ LONG: 4T, -$0.14, 25% WR (active, below kill threshold)
+- ❌ range_breakout+ LONG: 8T, -$0.41, 25% WR (killed)
+
+**Hourly Trend (6h):**
+- 20:00: -$0.16 (1W 3L)
+- 21:00: +$0.73 (8W 0L — best hour)
+- 22:00: +$0.10 (3W 1L)
+- 23:00: -$0.17 (0W 2L)
+- 00:00: -$0.54 (3W 7L — worst hour)
+- 01:00: +$0.02 (1W 0L)
+
+**Diagnosis:**
+1. **Entry quality:** Clean last hour — all 3 accel-300- SHORT wins via trailing
+2. **SL behavior:** 42.9% ATR SL hit (above 40% but trail compensates net +$0.04)
+3. **Signal quality:** hzscore+ 25% WR, below 3T kill threshold — monitor
+4. **Trade frequency:** 3T/hour — normal
+
+**Changes:** NONE — CEO stability period active. ATR SL above threshold but profit-monster-trail compensating. No kill candidates.
+
+**Open Questions:**
+- Is accel-300- entering during chop? 00:00 hour had 7/10 SL hits
+- hzscore+ approaching kill threshold — watch next hour
