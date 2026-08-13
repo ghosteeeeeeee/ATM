@@ -6741,3 +6741,46 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Is accel-300- entering during chop? 00:00 hour had 7/10 SL hits
 - hzscore+ approaching kill threshold — watch next hour
+
+## 2026-08-13 02:30 UTC — Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.06 (0% WR)
+
+**24h Snapshot:**
+- 103T, 55W (53.4% WR), -$0.22 (flat)
+- ATR SL: 45/103 = 43.7% — above 40% threshold
+- profit-monster-trail: 53/103 (+$2.52) — compensating SL losses
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 14T, +$0.49, 71.4% WR
+- ✅ hzscore- SHORT: 12T, +$0.01, 50% WR
+- ⚠️ accel-300- SHORT: 32T, -$0.18, 56.2% WR — volume leader
+- ⚠️ range_breakout- SHORT: 20T, -$0.12, 45% WR
+- ❌ hzscore+ LONG: 3T, -$0.12, 33.3% WR — approaching kill threshold
+- ❌ range_breakout+ LONG: killed
+
+**Hourly Trend (6h):**
+- 21:00: +$0.73 (8W 0L — best)
+- 22:00: +$0.10 (3W 1L)
+- 23:00: -$0.17 (0W 2L)
+- 00:00: -$0.54 (3W 7L — worst)
+- 01:00: +$0.02 (1W 0L)
+- 02:00: -$0.06 (0W 1L)
+
+**Diagnosis:**
+1. **Entry quality:** Last hour single trade ETC SHORT accel-300- hit ATR SL
+2. **SL behavior:** 43.7% ATR SL (above 40% threshold, trail compensates net)
+3. **Signal quality:** No 0% WR kill candidates (hzscore+ 33% but only 3T)
+4. **Trade frequency:** 4.3/hr avg — normal
+
+**Changes:** NONE — no kill candidates, trail compensating SL losses, flat 24h PnL.
+
+**No Change Needed:**
+- ATR SL above threshold but profit-monster-trail compensating (+$2.52 vs -$3.12)
+- Trade frequency normal (4.3/hr)
+- No signal has 3+ trades with 0% WR in last hour
+
+**Open Questions:**
+- hzscore+ 33.3% WR on 3T — approaching kill threshold, watch next hour
+- accel-300- volume leader but slight negative — monitor if degrading

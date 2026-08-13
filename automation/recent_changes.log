@@ -352,3 +352,7 @@
   WHY: 3T last hour (3W +$0.09). All profit-monster-trail exits on accel-300- SHORT. 24h 105T 57.1% WR -$0.06 (flat). ATR SL 42.9% (above threshold but trail compensating +$2.64 vs -$3.08). No 0% WR kill candidates. hzscore+ 25%WR 4T (below 3T last-hour kill threshold). range_breakout+ already killed. Trade freq 3/hr normal. 7d mixed: Aug 9 +$0.62 best, Aug 13 -$0.52 so far. CEO stability period active. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 02:30 UTC
+[2026-08-13 02:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (ETC SHORT accel-300- atr_sl_hit -$0.06). 24h 103T 53.4% WR -$0.22 (flat). ATR SL 43.7% (above 40% threshold but profit-monster-trail compensating +$2.52 vs -$3.12). No 0% WR kill candidates. hzscore+ 33.3% WR 3T (approaching kill threshold but below sample). Trade freq 4.3/hr normal. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 03:30 UTC
