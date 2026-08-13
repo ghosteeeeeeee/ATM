@@ -1,5 +1,37 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-13 12:00 UTC — Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.03 (100% WR)
+**Exit Reasons:** profit-monster-trail (1)
+
+**24h Snapshot:**
+- 87 trades, 46 profit-monster-trail (+$1.94), 37 atr_sl_hit (-$2.74)
+- ATR SL hit rate: 42.5% (above 40% threshold but profit-monster-trail compensates)
+- Net 24h: -$0.57 (54% WR — slightly negative)
+- Today: 35T, -$1.13, 42.9% WR (cold day)
+
+**Signal Performance (24h):**
+- ✅ range_breakout_short SHORT: 19T, +$0.18, 57.9% WR
+- ✅ bb_bounce+ LONG: 1T, +$0.03, 100% WR
+- ❌ accel-300- SHORT: 37T, -$0.23, 56.8% WR (R:R issue — avg_loss > avg_win)
+- ❌ range_breakout- SHORT: 12T, -$0.50, 25% WR (legacy signal)
+
+**Diagnosis:**
+1. **Entry quality:** Only 1 trade last hour — quiet period
+2. **SL behavior:** ATR SL at 42.5% — above 40% threshold but profit-monster-trail (+$1.94) compensates atr_sl_hit (-$2.74)
+3. **Signal quality:** accel-300- SHORT has decent WR (56.8%) but negative PnL due to R:R imbalance
+4. **Trade frequency:** Very low — 1/hour, below normal
+
+**Changes:** None. No signal meets kill threshold (0% WR with 3+ trades last hour). CEO stability period active. System within normal variance.
+
+**Open Questions:**
+- accel-300- SHORT: 37T in 24h with 56.8% WR but -$0.23 — R:R issue (avg_loss 60% > avg_win). Legacy signal still executing despite ACCEL_300_MINUS_ENABLED=False.
+- Today's 42.9% WR is cold but sample size small (35T).
+
+---
+
 ## 2026-08-12 22:00 UTC — Hourly Analysis
 
 **Trades:** 5 closed (5 wins, 0 losses)
