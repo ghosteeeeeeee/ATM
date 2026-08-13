@@ -1028,6 +1028,7 @@ R2_TREND_ENABLED         = False
 R2_TREND_PLUS_ENABLED        = False   # r2_trend+ LONG (was single flag only, SHORT only)
 R2_TREND_MINUS_ENABLED       = False    # r2_trend- SHORT
 R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
+R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope % to fire (filters noise, only fires on meaningful trends)
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT
@@ -1117,6 +1118,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
+    'r2_trend_long',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
