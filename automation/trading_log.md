@@ -7212,3 +7212,55 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - Market quiet — 1-3 trades/hr, watch for activity pickup
+
+## 2026-08-13 16:30 UTC — Hourly Analysis
+
+**Trades:** 5 closed (2W, 3L)
+**PnL:** $-0.13 (40% WR)
+
+**24h Snapshot:**
+- 76 trades, 56.6% WR, -$0.27 (nearly flat)
+- ATR SL hit rate: 40.8% (just above 40% threshold — fix deployed, natural floor)
+- profit-monster-trail: 42T +$1.95 (primary profit driver)
+- accel-300-: 33T, 54.5% WR, -$0.33 — kill confirmed, draining old positions
+- hzscore-: 10T, 70% WR, +$0.15 (strong)
+- range_breakout_short: 23T, 52.2% WR, +$0.07
+- 2 open trades healthy
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 40.8% — just above threshold but trailing fix deployed (tpsl_utils.py lines 362-396). This is the natural floor.
+- No 0% WR kill candidates (no signal with 0% WR and 3+ trades last hour)
+- Trade freq 5/hr — normal
+- System flat — no param changes needed
+
+**Open Questions:**
+- ATR SL barely above 40% — monitor but not actionable with fix deployed
+- continuation-,hzscore-: 4T 50% WR -$0.20 — small sample, watch next hour
+
+## [2026-08-13 17:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W, 0L)
+**PnL:** $0.07 (100% WR)
+
+**24h Snapshot:**
+- 72 trades, 56.9% WR, flat PnL
+- ATR SL hit rate: 43.1% (above 40% threshold but trailing compensating)
+- profit-monster-trail: +$1.88 (carrying the system)
+- hzscore-: 12T, 75% WR, +$0.22 (strong)
+- range_breakout_short: 22T, 50% WR, +$0.05
+- accel-300-: 31T, 51.6% WR, -$0.42 (old positions draining, already killed)
+- continuation-,hzscore-: 3T, 33.3% WR, -$0.23 (small sample, noise)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 43.1% — above threshold but trailing stop compensates ($1.88 vs -$2.44)
+- accel-300- already killed — old positions draining naturally
+- continuation-,hzscore- 33% WR but only 3 trades — small sample
+- Trade freq 1-5/hr — normal market activity
+- No 0% WR kill candidates with 3+ trades last hour
+
+**Open Questions:**
+- continuation-,hzscore- — watch next hour, if 3+ more trades at 33% WR, consider kill

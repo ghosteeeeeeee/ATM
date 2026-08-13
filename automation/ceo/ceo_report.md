@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (verified)
+
+### Diagnosis
+24h: 74T -$0.38 (56.8% WR — FLAT). 7d: 438T -$0.30 (51.3% WR — stable, improved from -$0.48). Daily: Aug 9 +$0.62 → Aug 10 -$0.10 → Aug 11 -$0.33 → Aug 12 +$0.49 → Aug 13 49T -$1.24 (46.9% WR — legacy clearing). 1 open $0 flat. Pipeline healthy.
+
+### Root Cause
+Aug 13 -$1.24 = accel-300- SHORT 30T -$0.39 (legacy, disabled) + continuation-,hzscore- SHORT 3T -$0.23 (legacy, CONTINUATION_MINUS_ENABLED=False). Both signals already disabled — legacy trades clearing through. No new bleeders. Stars intact (5 profitable). Cost drivers: atr_sl_hit 74T -$4.97, profit-monster-trail 41T +$1.90 compensating.
+
+### Fix Applied
+NO CHANGES. System flat, all bleeders disabled, legacy clearing, stability period. 7d stable at -$0.30.
+
+### Verification
+Stars7d: bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb_bounce+ 21T +$0.21 61.9%, bb_bounce+,hzscore+ 34T +$0.22 50%, hzscore+,mover+ 5T +$0.17 80%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Active SHORT profitable: hzscore- 29T +$0.09 58.6%, range_breakout_short 23T +$0.07 52.2%. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if -$1.50+ persists → regime filter).
+
+---
+
 ## CEO Report — 2026-08-13 (verified)
 
 ### Diagnosis

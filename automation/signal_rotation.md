@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-13 13:49 UTC
+# Signal Rotation — 2026-08-13 17:54 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,22 +6,22 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | bb_bounce,hzscore+ | 100% | 0.912 | 0.912 | ✅ |  |
-| 2 | bb_bounce+,range_finder+ | 60% | 0.594 | 0.594 | ✅ |  |
-| 3 | hzscore+,mover+ | 80% | 0.508 | 0.508 | ❌ | ENABLE |
-| 4 | ma100-cross,return_exhaus | 67% | 0.307 | 0.307 | ❓ |  |
-| 5 | continuation+,hzscore+ | 50% | 0.278 | 0.278 | ✅ |  |
-| 6 | hzscore+,return_exhaustio | 58% | 0.245 | 0.245 | ❌ | ENABLE |
-| 7 | bb-bounce-short,hzscore- | 61% | 0.245 | 0.245 | ✅ |  |
-| 8 | bb_bounce+,hzscore+ | 50% | 0.222 | 0.222 | ✅ |  |
-| 9 | bb_bounce+ | 58% | 0.206 | 0.206 | ✅ |  |
-| 10 | ma100-cross,vortex_break_ | 71% | 0.186 | 0.186 | ❓ |  |
-| 11 | accel-300- | 60% | 0.170 | 0.170 | ❌ |  |
-| 12 | ma100-cross,range_finder | 57% | 0.113 | 0.113 | ❓ |  |
-| 13 | bb_bounce,range_finder | 43% | -0.000 | -0.000 | ✅ |  |
-| 14 | hzscore- | 50% | -0.049 | -0.049 | ✅ |  |
-| 15 | ma100-cross+,vortex_break | 33% | -0.106 | -0.106 | ❓ |  |
+| 1 | bb_bounce+,range_finder+ | 60% | 0.594 | 0.594 | ✅ |  |
+| 2 | hzscore+,mover+ | 80% | 0.508 | 0.508 | ❌ | ENABLE |
+| 3 | hzscore- | 61% | 0.312 | 0.312 | ✅ |  |
+| 4 | continuation+,hzscore+ | 50% | 0.278 | 0.278 | ✅ |  |
+| 5 | bb-bounce-short,hzscore- | 61% | 0.245 | 0.245 | ✅ |  |
+| 6 | bb_bounce+ | 60% | 0.241 | 0.241 | ✅ |  |
+| 7 | bb_bounce+,hzscore+ | 50% | 0.222 | 0.222 | ✅ |  |
+| 8 | ma100-cross,range_finder | 57% | 0.113 | 0.113 | ❓ |  |
+| 9 | hzscore+,return_exhaustio | 43% | 0.019 | 0.019 | ❌ |  |
+| 10 | bb_bounce,range_finder | 43% | -0.000 | -0.000 | ✅ |  |
+| 11 | range_breakout_short | 52% | -0.057 | -0.057 | ✅ |  |
+| 12 | ma100-cross+,vortex_break | 33% | -0.106 | -0.106 | ❓ |  |
+| 13 | hzscore+ | 42% | -0.131 | -0.131 | ❌ |  |
+| 14 | trend_momentum_near_sma+ | 17% | -0.199 | -0.199 | ❌ |  |
+| 15 | range_breakout- | 50% | -0.215 | -0.215 | ❌ |  |
 
 ## Changes Applied
 - **ENABLE**: HZSCORE_PLUS_ENABLED (WR=80%, edge=0.508, regime-aligned)
-- **ENABLE**: HZSCORE_PLUS_ENABLED (WR=58%, edge=0.245, regime-aligned)
+- **DISABLE**: CONTINUATION_MINUS_ENABLED (WR=40%, edge=-0.454, bleeding capital)
