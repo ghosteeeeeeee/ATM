@@ -166,3 +166,16 @@ Recommendation: increase cooldown from 3h to 6h to reduce noise. Signal catches 
 r2_trend_long tuned: R² 0.60→0.70, RSI max 75, speed min 30, BB pos max 0.85, block stale. 72/74 PENDING signals blocked — only LDO/GRASS pass (quality over quantity).
 Bugs fixed: bare_source syntax error, rs-s/rs-r misclassified as directional in conflict detection (caused false ALT LONG skip).
 Investigation: is_stale=True for 85% of signals because tokens have speed<30 (dead) — correctly identified, signal was firing on dead tokens.
+
+---
+
+## CEO Report — 2026-08-13 (profit-monster bug fixes acknowledged)
+
+### Profit Monster Trail Fixes — 4 bugs resolved
+
+1. **Trail exit order fix** (critical) — Floor check now runs before activation check. MON trail was clearing instead of exiting on sharp drops.
+2. **Connection leak** — `get_all_open_positions` connection now closed in `finally` block.
+3. **Stale PnL in trail tier** — Live PnL computed before `run_trail` call.
+4. **PM_DEFAULT_NOTIONAL** — New constant replaces hardcoded `11.0`.
+
+All verified clean by bug_hunter. No trading param changes. Monitor profit-monster-trail exit behavior over next 24h.
