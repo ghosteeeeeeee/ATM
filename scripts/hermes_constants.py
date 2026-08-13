@@ -614,6 +614,14 @@ SPIKE_FILTER_ENABLED = True
 SPIKE_FILTER_5M_THRESHOLD = 0.3      # % — block SHORT if last 3 5m candles had bullish candle > this
 SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = bounce risk)
 
+# ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
+# Hard block trades where z-score and acceleration disagree with direction.
+# CEO backtested: misaligned = 23.8% WR, aligned = 76.4% WR (52pt gap).
+ZSCORE_ACCEL_ENABLED = True
+ZSCORE_ACCEL_Z_THRESHOLD = 0.5       # z-score threshold for alignment check
+ZSCORE_ACCEL_ACCEL_THRESHOLD = 0.005 # acceleration threshold (0.5% hourly)
+ZSCORE_ACCEL_PENALTY = 0.7           # used if soft penalty mode enabled
+
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.
 # Fires when 3+ of last 5 trades in same direction are losses within 30min.
@@ -880,7 +888,7 @@ ACCEL_300_ENABLED        = True   # re-enabled 2026-08-12 — SHORT edge confirm
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
 ACCEL_300_REGIME_SLOPE_PCT = 0.001  # min price slope % — filter weak trends (was 0.0005, backtest: +0.6% WR, +0.05% PnL)
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
-ACCEL_300_MIN_ATR_PCT      = 0.0002  # min ATR % — block SHORT on ultra-low-vol tokens (SL too tight, stops on noise). Backtest: zero winner kills, +0.05% PnL
+ACCEL_300_MIN_ATR_PCT      = 0  # disabled — backtest shows ATR alone can't separate winners from losers (overlap 0.07-0.25%)
 ACCEL_300_STALE_BARS = 15   # max bars since EMA cross for LONG (was 25 — fresher signals, catch moves earlier)
 ACCEL_300_STALE_BARS_SHORT = 15   # max bars since EMA cross for SHORT (was 25 — fresher signals)
 ACCEL_300_STALE_LOOKBACK   = 400  # detection bar must be within N bars of latest bar — older = stale, skip
