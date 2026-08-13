@@ -138,3 +138,13 @@ Backtested on BSV: R²=0.91 during +3.5% rally.
 Bug hunter: 2 bugs fixed (connection leak, flag check ordering).
 Also updated add-signal skill with solo variant docs.
 No trading changes. Signal is live, monitoring for first trades.
+
+---
+
+## CEO Report — 2026-08-13 (r2_trend_long tuned)
+
+Signal tuned: transition detector (R² crossing above 0.30 from below).
+BSV backtest: 35 trades, 54% WR, +5.78% PnL.
+Big moves caught: 7 entries, +8.43% (06:40, 06:56, 07:13, 07:28, 11:31, 16:14, 16:34).
+Noise entries: 28 trades, -2.63%.
+Recommendation: increase cooldown from 3h to 6h to reduce noise. Signal catches big moves but fires too often. Regime/volatility gates should filter BSV noise.
