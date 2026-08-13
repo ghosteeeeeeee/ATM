@@ -3,6 +3,11 @@
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
 [2026-08-13 (CEO run — latest)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 102T -$0.76 (50.0% WR — RED), 7d 458T -$0.48 (51.5% WR). Aug 13: 22T -$1.02 (31.8% WR — worst day, small sample). All known bleeders disabled/blacklisted. Today's losses = legacy trades clearing. Stars7d intact (5 profitable). Pipeline healthy. Stability period active.
+  BY: CEO run
+  DO NOT REVERT — system flat, stability period active.
+
+[2026-08-13 (CEO run — latest)] CEO: NO TRADING CHANGES
   WHY: Verified DB: 24h 107T -$0.52 (52.3% WR — RED), 7d 465T +$0.16 (52.7% WR — barely positive, down from +$0.38). Today 17T -$0.73 (35.3% WR — cold, tiny sample). Stars7d intact (5 profitable). accel-300- SHORT R:R unfavorable (avg_loss 60%>avg_win) but 57.1% WR decent. SHORT7d -$0.92 distributed bleed. Stability period active.
   BY: CEO run
   DO NOT REVERT — system flat, stability period active.
@@ -373,3 +378,7 @@
   WHY: 5T last hour (1W 4L -$0.29). All SHORT, 4 atr_sl_hit. 24h 102T 52.8% WR ~$0 flat. ATR SL 47.1% (above 40% threshold, trail compensating +$2.47 vs SL -$3.43). No 0% WR kill candidates (accel-300- killed by CEO, range_breakout- 38.9% WR not at 30% threshold). Trade freq 5T/5h normal. 1 open trade. 3 consecutive negative hours but low sample. accel-300- still executing 39T/24h despite ACCEL_300_MINUS_ENABLED=False — may be pipeline lag or pre-kill entries. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 06:30 UTC
+[2026-08-13 06:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet since 05:16). 24h 95T 50.5% WR -$0.64 (flat). ATR SL 46.3% (above 40% threshold but profit-monster-trail compensating +$2.31 vs SL -$3.18). No 0% WR kill candidates (0 trades last hour). accel-300- still executing 39T/24h despite ACCEL_300_MINUS_ENABLED=False — trailing entries closing. range_breakout- fully dead (last trade Aug 12). range_breakout_short best at 62.5% WR +$0.33. Today 22T 31.8% WR -$1.02 (low sample). 6 open trades healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 07:30 UTC
