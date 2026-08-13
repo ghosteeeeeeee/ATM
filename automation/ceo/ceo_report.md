@@ -1,3 +1,63 @@
+## CEO Report — 2026-08-13 (Weather Vane v3 — Predictive Methods)
+
+### DB-Verified Numbers
+24h: 107T -$0.52, 52.3% WR (flat). 7d: ~464T +$0.37, 53.0% WR (barely positive). Stars7d intact.
+
+### Method 1: Consecutive Loss Counter — **APPROVED, HIGHEST PRIORITY**
+DB backtest (14d) validates this HARD:
+- After 3+ consecutive losses: 444 trades, **37.8% WR**, **-$2.44 total PnL**
+- Normal trades: 402 trades, **51.5% WR**, **+$1.60 total PnL**
+- **14-point WR gap. $4.04 PnL spread.** This is the strongest predictive signal in the dataset.
+- Real bleeders: BSV SHORT (7/10 losses), AXS LONG (6/9), AAVE SHORT (5/8)
+
+**Implementation:** New `get_consecutive_losses(token, direction)` function querying `signal_outcomes` per token+direction. Apply as multiplier in `_score_signal()`. Hard block at 5+ consecutive, soft penalty at 3-4.
+
+**Risk:** Low. All data already in signal_outcomes table. ~30 lines of code. Integrates into existing `_score_signal()` flow alongside existing directional outcome tracker.
+
+**Circuit breaker:** If >30% of signals penalized in 24h → auto-disable (prevents over-suppression during choppy markets).
+
+### Method 5: Entry Price vs Range — **APPROVED, SECOND PRIORITY**
+Catches chasing: LONG at 90th percentile = buying the top, SHORT at 10th = selling the bottom.
+
+**Data issue:** `candles_1h` is in SQLite (RUNTIME_DB), not PostgreSQL. Query needs to use `sqlite3.connect(RUNTIME_DB)` not PostgreSQL.
+
+**Implementation:** New `check_price_extreme(token, direction, price)` function querying SQLite candles. ~25 lines. Apply as 0.75x penalty at extremes.
+
+### Method 2: Volume Spikes — **DEFERRED**
+Sound concept but needs candle volume data from SQLite. More complex to integrate correctly. Can add after Methods 1+5 proven.
+
+### Method 4: Time-of-Day — **REJECTED**
+Insufficient sample sizes per hour. Current trade volume (~15/hr) means <10 trades per hour bucket. Noise dominates signal. Revisit when volume 3x+.
+
+### Implementation Order
+1. Method 1 (consecutive losses) — implement NOW, deploy after 14d backtest
+2. Method 5 (price extremes) — implement NEXT, deploy with Method 1
+3. Method 2 (volume spikes) — LATER, after Methods 1+5 validated
+4. Method 4 (time-of-day) — NOT NOW
+
+### Target
+Combined effect of Methods 1+5: reduce LONG bleed by $0.50-1.00/week (from ~$0.50 to break-even). Expected WR improvement: +2-3% on penalized trades.
+
+---
+
+## CEO Report — 2026-08-13 (CEO Run)
+
+### Diagnosis
+24h: 105T -$0.36, 53.3% WR (flat). 7d: 464T +$0.33, 53.0% WR (barely positive). Aug 13: 15T -$0.57, 40% WR — cold but only 15 trades (too early to act). Stars7d intact: bb_bounce+,range_finder+ $0.71, range_breakout_short $0.49, hzscore+,mover+ $0.17, bb_bounce+,hzscore+ $0.22, bb-bounce-short,hzscore- $0.14.
+
+### Root Cause
+No single bleed source. accel-300- SHORT is the only active bleeder (35T -$0.17, 57.1% WR — WR fine, losses slightly larger than wins). All previously identified bleeders (range_breakout+, trend_momentum, hzscore+ standalone, return_exhaustion- combos) already disabled/blacklisted. atr_sl_hit dominates cost at -$3.91 (48h). Today's cold reading is low volume, not a new problem.
+
+### Fix Applied
+NO CHANGES — stability period. System flat, no clear actionable bleed.
+
+### Monitor
+- Daily PnL: if -2 consecutive red days → investigate
+- accel-300- SHORT: if持续 bleeding past -$0.50 → disable ACCEL_300_MINUS_ENABLED
+- 6 open trades at -$0.19 — normal
+
+---
+
 ## CEO Report — 2026-08-13 (Weather Vane v3 Evaluation)
 
 ### Verdict: MODIFY — Concept approved, implementation has a critical flaw
