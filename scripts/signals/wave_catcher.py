@@ -33,6 +33,7 @@ from hermes_constants import (
     WAVE_CATCHER_CONF_BASE,
     WAVE_CATCHER_CONF_CAP,
     WAVE_CATCHER_COOLDOWN_HOURS,
+    WAVE_CATCHER_TREND_FILTER_BARS,
     SHORT_BLACKLIST,
     LONG_BLACKLIST,
 )
@@ -97,6 +98,18 @@ def detect(token):
 
     # ── Determine direction ───────────────────────────────────────────────
     direction = 'LONG' if velocity > 0 else 'SHORT'
+
+    # ── Trend filter: price must be in direction of recent trend ──────────
+    # Ensures we don't enter during dead-cat bounces or exhaustion spikes.
+    # For LONG: price must be above the N-bar open (uptrend)
+    # For SHORT: price must be below the N-bar open (downtrend)
+    trend_bars = WAVE_CATCHER_TREND_FILTER_BARS
+    if len(closes) > trend_bars:
+        trend_open = closes[-trend_bars - 1]
+        if direction == 'LONG' and closes[-1] < trend_open:
+            return None  # price below recent open — not in uptrend
+        if direction == 'SHORT' and closes[-1] > trend_open:
+            return None  # price above recent open — not in downtrend
 
     # ── Check EMA60 confirmation ──────────────────────────────────────────
     if direction == 'LONG' and closes[-1] < ema60:

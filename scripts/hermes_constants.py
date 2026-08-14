@@ -1633,6 +1633,7 @@ WAVE_CATCHER_ZSCORE_MAX         = 1.5     # max z-score — don't chase overexte
 WAVE_CATCHER_CONF_BASE          = 75      # base confidence
 WAVE_CATCHER_CONF_CAP           = 90      # max confidence
 WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
+WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True

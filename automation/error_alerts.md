@@ -364,3 +364,33 @@ ALERTS:
 - **[INFO]**: Pipeline healthy — no crashes, no tracebacks. All core timers (pipeline, price-collector, regime-scanner, watchdog, candle) firing on schedule.
 - **INFO**: Market 100% NEUTRAL (105/105 tokens). 0 signals above 50% confidence. Expected: no new trades in flat market.
 - **AUTO-FIX**: Compressed pipeline.log from 40MB to .gz archive, truncated live log.
+
+## Error Alerts — 2026-08-14 06:40 UTC
+
+### WASP Service Failing (20x in 24h)
+- **CRITICAL** (20x): `hermes-wasp.service` exits code 1 every 30min
+- **Root cause**: Ollama unreachable (port 11434 refused) — WASP marks as CRITICAL
+- **Impact**: Low — Ollama not needed since ai_decider.py replaced by deterministic signal_compactor.py
+- **AUTO-FIX**: None needed — expected behavior. Consider downgrading ollama check to WARNING in wasp.py
+
+### Trading Checklist WARN
+- **WARN** (Nx): `hermes-trading-checklist.service` exits code 1 due to 57761 signals in runtime DB
+- **Root cause**: Signal purge running but not cleaning old non-executed signals effectively
+- **Impact**: Low — purge runs hourly, DB just hasn't been compacted below50MB yet
+
+### Signals Runtime DB Bloat
+- **WARN**: Runtime DB is 79MB (threshold50MB)
+- **Root cause**:50381 signals older than48h still in DB
+- **Impact**: Low — DB functional, just larger than ideal
+
+### Empty Hotset
+- **WARN**: Hotset.json is empty — no signals survived compaction
+- **Impact**: Normal for NEUTRAL market regime (102/104 tokens neutral)
+
+### Duplicate Signals Detected
+- **WARN**: 2Z(wave_catcher_long,4x), AVNT(wave_catcher_short,4x), BTC(coin_tracker_hot_long,5x), USUAL(coin_tracker_hot_long,4x) rapid-fire duplicates
+- **Impact**: Low — compactor filters duplicates before execution
+
+### Ollama Not Running
+- **INFO**: Ollama service inactive, port 11434 refused
+- **Impact**: None — system migrated to LLM-free signal_compactor.py
