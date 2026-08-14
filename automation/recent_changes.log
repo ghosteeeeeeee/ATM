@@ -545,3 +545,7 @@
   WHY: Verified DB: 24h 80T -$0.65 52.5% WR — FLAT. atr_sl_hit 38.75% (below 40% — ATR_TP_K_MULT fix working). wave_catcher+ SHORT 13T -$0.19 38.5% WR (worst active but SHORT profitable). mover+ 6T -$0.14 33.3% WR. No kill triggers. CEO stability period active. System stabilizing.
   BY: auto_1hr
   DO NOT REVERT — system stabilizing, ATR fix evaluation in progress.
+[2026-08-14 16:09] auto_1hr: NO CHANGES
+  WHY: 5T last 2h (1W 4L -$0.21). 24h 77T 50% WR -$0.80. ATR SL 39% (below 40%). No kill triggers (hzscore- 6T 33% WR, wave_catcher+ 13T 38.5% WR, mover+ 7T 28.6% WR — all above 0% threshold). Trade freq 2.5/hr normal. No consecutive negative hours. R:R 0.38:1 structural. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 17:09 UTC
