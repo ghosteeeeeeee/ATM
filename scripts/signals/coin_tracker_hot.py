@@ -25,6 +25,7 @@ from hermes_constants import (
     COIN_TRACKER_HOT_CONF_BASE,
     COIN_TRACKER_HOT_CONF_CAP,
     COIN_TRACKER_HOT_COOLDOWN_HOURS,
+    COIN_TRACKER_HOT_MIN_COMPOSITE,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -94,11 +95,14 @@ def detect(token, data):
     if health not in ('hot', 'ready'):
         return None
 
-    # Must have at least one structure signal (not just echoes from other signals)
+    # Must meet minimum composite threshold
+    if composite < COIN_TRACKER_HOT_MIN_COMPOSITE:
+        return None
+
+    # Must have real structure signal (wyckoff or ewave — trend alone is not enough)
     has_structure = (
         (wyckoff and wyckoff != 'none') or
-        (data.get('ewave_count') is not None) or
-        (trend_dir and trend_dir != 'NEUTRAL')
+        (data.get('ewave_count') is not None)
     )
     if not has_structure:
         return None
