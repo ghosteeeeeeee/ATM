@@ -59,7 +59,7 @@ SR_LOOKBACK = 100            # 1m candles for swing detection
 SR_PROXIMITY_PCT = 1.0       # % — don't trade within this % of S/R level
 
 # Exhaustion filter
-EXHAUSTION_MAX_MOVE_PCT = 15.0  # % — don't chase moves already >15% extended
+EXHAUSTION_MAX_MOVE_PCT = 3.0   # % — don't chase moves already >3% extended (lowered from 15% — catches exhausted moves)
 
 # Confluence: BB range detection
 BB_PERIOD = 20
