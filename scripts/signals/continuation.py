@@ -221,6 +221,44 @@ def detect_continuation(token, direction, close_info):
     # If price pulled back against us, check threshold
     if pullback > CONTINUATION_PULLBACK_MAX_PCT * (close_info['pnl_pct'] / 100):
         return None  # pulled back too much
+
+    # ── Gap300 + Slope + Mom filter (2026-08-14) ──────────────────────────
+    # LONG: block when price extended above EMA300 AND rising fast AND momentum negative
+    # (pullback in uptrend = bad entry). Backtest: 3/8 losers, 0/9 winners.
+    # SHORT: block JUP (0% WR, 2 losses).
+    try:
+        from paths import CANDLES_DB
+        conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
+        rows_ema = conn_ema.execute(
+            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 350",
+            (token.upper(),)
+        ).fetchall()
+        conn_ema.close()
+        if rows_ema and len(rows_ema) >= 310:
+            closes_ema = [r[0] for r in reversed(rows_ema)]
+            # Gap300
+            k300 = 2.0 / 301
+            ema300 = closes_ema[0]
+            for p in closes_ema[1:]:
+                ema300 = p * k300 + ema300 * (1 - k300)
+            gap300 = (closes_ema[-1] - ema300) / ema300 * 100 if ema300 > 0 else 0
+            # Slope (20-bar)
+            chunk = closes_ema[-20:]
+            x_mean = 9.5
+            y_mean = sum(chunk) / 20
+            denom = sum((i - x_mean) ** 2 for i in range(20))
+            numer = sum((i - x_mean) * (chunk[i] - y_mean) for i in range(20))
+            slope = (numer / denom) / y_mean * 100 if denom > 0 and y_mean != 0 else 0
+            # Mom5
+            mom5 = (closes_ema[-1] - closes_ema[-5]) / closes_ema[-5] * 100 if len(closes_ema) >= 5 else 0
+            # LONG filter: pullback in uptrend
+            if direction == 'LONG' and gap300 > 0.5 and slope > 0.05 and mom5 < 0:
+                return None
+            # SHORT filter: block JUP (0% WR)
+            if direction == 'SHORT' and token.upper() == 'JUP':
+                return None
+    except Exception:
+        pass
     
     # ── 1h check: not exhausted ──────────────────────────────────────────
     closes_1h = _get_closes(token, 'candles_1h', 25)
