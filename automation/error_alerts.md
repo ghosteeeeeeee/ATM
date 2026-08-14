@@ -9,3 +9,7 @@
 
 ## Error Alerts — 2026-08-14 14:09 UTC
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   [TOK Mirror] TOK`
+
+## Error Alerts — 2026-08-14 17:41 UTC
+- **[WARN]**: Disk at 83% — 2% from WARN threshold (85%). Recommend: `find /root/.hermes/logs -name "*.log" -mtime +7 -exec gzip {} \;`
+- **[WARN]**: Phantom trade — NOT SHORT #13822 closed at exactly 0.00% PnL
