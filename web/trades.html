@@ -66,6 +66,9 @@
     .coin-icon-fallback { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 8px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 4px; border: 1px solid #00ff8833; }
     .pm-badge { color: #00ff88; font-size: 1.2em; margin-left: 2px; vertical-align: middle; }
     .pm-row { background: #00ff8811 !important; }
+    .sortable { cursor: pointer; user-select: none; }
+    .sortable:hover { background: #00ff8822; }
+    .sort-arrow { font-size: 0.7em; margin-left: 2px; }
   </style>
 </head>
 <body>
@@ -144,12 +147,23 @@
   <table>
     <thead>
       <tr>
-        <th>Coins</th><th>Dir</th><th>Entry</th><th>Current</th>
-        <th>P&amp;L %</th><th>P&amp;L $</th><th>Size</th><th>Eff. Size</th>
-        <th>Lev</th><th>SL</th><th>TP</th><th>Signal</th><th>Opened</th>
+        <th class="sortable" data-col="0" data-type="string">Coins</th>
+        <th class="sortable" data-col="1" data-type="string">Dir</th>
+        <th class="sortable" data-col="2" data-type="num">Entry</th>
+        <th class="sortable" data-col="3" data-type="num">Current</th>
+        <th></th>
+        <th class="sortable" data-col="5" data-type="num">P&amp;L %</th>
+        <th class="sortable" data-col="6" data-type="num">P&amp;L $</th>
+        <th class="sortable" data-col="7" data-type="num">Size</th>
+        <th class="sortable" data-col="8" data-type="num">Eff. Size</th>
+        <th class="sortable" data-col="9" data-type="num">Lev</th>
+        <th>SL</th>
+        <th>TP</th>
+        <th class="sortable" data-col="12" data-type="string">Signal</th>
+        <th class="sortable" data-col="13" data-type="string">Opened</th>
       </tr>
     </thead>
-    <tbody id="open-tbody"><tr><td colspan="13" class="empty">Loading...</td></tr></tbody>
+    <tbody id="open-tbody"><tr><td colspan="14" class="empty">Loading...</td></tr></tbody>
   </table>
 
   <div class="section-title">Closed Trades</div>
@@ -172,6 +186,10 @@
     let allClosed = [];
     let totalClosed = 0;
     let hotSet = [];
+    let openSortCol = -1;
+    let openSortAsc = true;
+    let allOpen = [];
+    let trailState = {};
     const ICON_MAP = {"ASTER":"/coin_icons/aster.png","WCT":"/coin_icons/wct.png","SYRUP":"/coin_icons/syrup.png","STBL":"/coin_icons/stbl.png","APEX":"/coin_icons/apex.png","POL":"/coin_icons/pol.png","HEMI":"/coin_icons/hemi.png","BSV":"/coin_icons/bsv.png","UNI":"/coin_icons/uni.png","INJ":"/coin_icons/inj.png","BANANA":"/coin_icons/banana.png","MNT":"/coin_icons/mnt.png","DYDX":"/coin_icons/dydx.png","ADA":"/coin_icons/ada.png","PUMP":"/coin_icons/pump.png","GMT":"/coin_icons/gmt.png","SUSHI":"/coin_icons/sushi.png","CC":"/coin_icons/cc.png","STX":"/coin_icons/stx.png","AIXBT":"/coin_icons/aixbt.png","SKR":"/coin_icons/skr.png","MOVE":"/coin_icons/move.png","GMX":"/coin_icons/gmx.png","NXPC":"/coin_icons/nxpc.png","MERL":"/coin_icons/merl.png","CHIP":"/coin_icons/chip.png","DOT":"/coin_icons/dot.png","ZRO":"/coin_icons/zro.png","2Z":"/coin_icons/2z.png","ZEN":"/coin_icons/zen.png","WLFI":"/coin_icons/wlfi.png","ME":"/coin_icons/me.png","CFX":"/coin_icons/cfx.png","IMX":"/coin_icons/imx.png","KAS":"/coin_icons/kas.png","WLD":"/coin_icons/wld.png","YGG":"/coin_icons/ygg.png","ATOM":"/coin_icons/atom.png","GOAT":"/coin_icons/goat.png","IO":"/coin_icons/io.png","FIL":"/coin_icons/fil.png","DASH":"/coin_icons/dash.png","SUPER":"/coin_icons/super.png","CRV":"/coin_icons/crv.png","MET":"/coin_icons/met.png","GRAM":"/coin_icons/gram.png","TIA":"/coin_icons/tia.png","LDO":"/coin_icons/ldo.png","XPL":"/coin_icons/xpl.png","AZTEC":"/coin_icons/aztec.png","ALGO":"/coin_icons/algo.png","HYPE":"/coin_icons/hype.png","MORPHO":"/coin_icons/morpho.png","COMP":"/coin_icons/comp.png","ETC":"/coin_icons/etc.png","JUP":"/coin_icons/jup.png","CAKE":"/coin_icons/cake.png","ICP":"/coin_icons/icp.png","APT":"/coin_icons/apt.png","PEOPLE":"/coin_icons/people.png","IOTA":"/coin_icons/iota.png","USUAL":"/coin_icons/usual.png","ALT":"/coin_icons/alt.png","HYPER":"/coin_icons/hyper.png","ZORA":"/coin_icons/zora.png","W":"/coin_icons/w.png","SAND":"/coin_icons/sand.png","TURBO":"/coin_icons/turbo.png","LTC":"/coin_icons/ltc.png","PURR":"/coin_icons/purr.png","SAGA":"/coin_icons/saga.png","ONDO":"/coin_icons/ondo.png","ZK":"/coin_icons/zk.png","NEO":"/coin_icons/neo.png","BIGTIME":"/coin_icons/bigtime.png","ORDI":"/coin_icons/ordi.png","ARB":"/coin_icons/arb.png","BABY":"/coin_icons/baby.png","HBAR":"/coin_icons/hbar.png","SEI":"/coin_icons/sei.png","ENS":"/coin_icons/ens.png","BCH":"/coin_icons/bch.png","FOGO":"/coin_icons/fogo.png","NOT":"/coin_icons/not.png","MON":"/coin_icons/mon.png","ENA":"/coin_icons/ena.png","FET":"/coin_icons/fet.png","LINEA":"/coin_icons/linea.png","AVNT":"/coin_icons/avnt.png","BLUR":"/coin_icons/blur.png","NEAR":"/coin_icons/near.png","ETH":"/coin_icons/eth.png","RESOLV":"/coin_icons/resolv.png","kBONK":"/coin_icons/kbonk.png","kFLOKI":"/coin_icons/kfloki.png","kPEPE":"/coin_icons/kpepe.png","kSHIB":"/coin_icons/kshib.png","TRX":"/coin_icons/trx.png","GRASS":"/coin_icons/grass.png","CASHCAT":"/coin_icons/cashcat.png"};
     function iconHtml(sym) {
       const src = ICON_MAP[sym];
@@ -189,7 +207,7 @@
         let signals = { hot_set: [] };
         try { signals = await signalsR.json(); } catch {}
         hotSet = signals.hot_set || [];
-        const trailState = d.profit_monster_trail || {};
+        trailState = d.profit_monster_trail || {};
 
         renderHotSet();
 
@@ -241,61 +259,9 @@
         document.getElementById('status').textContent =
           `Updated: ${new Date(d.updated).toLocaleString()} | Open: ${d.open_count} | Closed: ${d.closed_count} | Win Rate: ${winRate}%`;
 
-        // Render open positions
-        const ot = document.getElementById('open-tbody');
-        const open = d.open || [];
-        if (!open.length) {
-          ot.innerHTML = '<tr><td colspan="13" class="empty">No open positions</td></tr>';
-        } else {
-          ot.innerHTML = open.map(t => {
-            const dir = (t.direction || '').toUpperCase();
-            const size = t.amount_usdt || 50;
-            const lev  = t.leverage || 1;
-            const entry  = t.entry || 0;
-            const current = t.current || entry;
-            const pnlUsdt = parseFloat(t.pnl_usdt) || 0;
-            const pnlPct  = parseFloat(t.pnl_pct)  || 0;
-            const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
-            const effSize = size * lev;
-            // Canonical SL/TP from DB (ATR-computed)
-            const sl = t.sl || 0;
-            const tp = t.tp || 0;
-            // Distance to SL/TP from current price
-            const dirLower = dir === 'LONG';
-            let slDistPct = 0, tpDistPct = 0, slClass = '', tpClass = '';
-            if (current > 0 && sl > 0) {
-              slDistPct = dirLower
-                ? ((sl - current) / current) * 100   // LONG: how far SL is below current
-                : ((current - sl) / current) * 100;  // SHORT: how far SL is above current
-            }
-            if (current > 0 && tp > 0) {
-              tpDistPct = dirLower
-                ? ((tp - current) / current) * 100   // LONG: how far TP is above current
-                : ((current - tp) / current) * 100;  // SHORT: how far TP is below current
-            }
-            if (sl > 0 && ((dirLower && current <= sl) || (!dirLower && current >= sl))) slClass = 'sl-hit';
-            else if (sl > 0 && Math.abs(slDistPct) < 0.5) slClass = 'near-sl';
-            if (tp > 0 && ((dirLower && current >= tp) || (!dirLower && current <= tp))) tpClass = 'tp-hit';
-            else if (tp > 0 && Math.abs(tpDistPct) < 0.5) tpClass = 'near-tp';
-            const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
-            const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
-            return `<tr class="${trailState[t.id] ? 'pm-row' : ''}">
-              <td>${iconHtml(t.coin)}${t.coin || '--'}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}</td>
-              <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
-              <td>$${entry.toFixed(4)}</td>
-              <td>$${current.toFixed(4)}</td>
-              <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
-              <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
-              <td>$${size.toFixed(1)}</td>
-              <td>$${effSize.toFixed(1)}</td>
-              <td>${lev}x</td>
-              <td class="${slClass}">$${sl.toFixed(6)}<br><span class="dist">${slDistStr}</span></td>
-              <td class="${tpClass}">$${tp.toFixed(4)}<br><span class="dist">${tpDistStr}</span></td>
-              <td style="color:#888;font-size:0.8em">${t.signal||''}</td>
-              <td style="color:#666;font-size:0.75em">${(t.opened||'').replace('T',' ').slice(0,16)}</td>
-            </tr>`;
-          }).join('');
-        }
+        // Store open positions and render
+        allOpen = d.open || [];
+        renderOpen();
 
         // Store closed and render
         allClosed = closed;
@@ -448,6 +414,103 @@
       document.getElementById('pagination-bottom').innerHTML = html;
     }
 
+    function sortOpen(col, type) {
+      if (openSortCol === col) openSortAsc = !openSortAsc;
+      else { openSortCol = col; openSortAsc = true; }
+
+      const keys = ['coin','direction','entry','current','_badge','pnl_pct','pnl_usdt','amount_usdt','effective_size','leverage','_sl','_tp','signal','opened'];
+      const key = keys[col];
+
+      allOpen.sort((a, b) => {
+        let va = a[key], vb = b[key];
+        if (type === 'num') {
+          va = parseFloat(va) || 0;
+          vb = parseFloat(vb) || 0;
+        } else {
+          va = (va || '').toString().toLowerCase();
+          vb = (vb || '').toString().toLowerCase();
+        }
+        if (va < vb) return openSortAsc ? -1 : 1;
+        if (va > vb) return openSortAsc ? 1 : -1;
+        return 0;
+      });
+
+      renderOpen();
+      updateSortArrows();
+    }
+
+    function renderOpen() {
+      const ot = document.getElementById('open-tbody');
+      if (!allOpen.length) {
+        ot.innerHTML = '<tr><td colspan="14" class="empty">No open positions</td></tr>';
+        return;
+      }
+      ot.innerHTML = allOpen.map(t => {
+        const dir = (t.direction || '').toUpperCase();
+        const size = t.amount_usdt || 50;
+        const lev  = t.leverage || 1;
+        const entry  = t.entry || 0;
+        const current = t.current || entry;
+        const pnlUsdt = parseFloat(t.pnl_usdt) || 0;
+        const pnlPct  = parseFloat(t.pnl_pct)  || 0;
+        const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
+        const effSize = size * lev;
+        const sl = t.sl || 0;
+        const tp = t.tp || 0;
+        const dirLower = dir === 'LONG';
+        let slDistPct = 0, tpDistPct = 0, slClass = '', tpClass = '';
+        if (current > 0 && sl > 0) {
+          slDistPct = dirLower
+            ? ((sl - current) / current) * 100
+            : ((current - sl) / current) * 100;
+        }
+        if (current > 0 && tp > 0) {
+          tpDistPct = dirLower
+            ? ((tp - current) / current) * 100
+            : ((current - tp) / current) * 100;
+        }
+        if (sl > 0 && ((dirLower && current <= sl) || (!dirLower && current >= sl))) slClass = 'sl-hit';
+        else if (sl > 0 && Math.abs(slDistPct) < 0.5) slClass = 'near-sl';
+        if (tp > 0 && ((dirLower && current >= tp) || (!dirLower && current <= tp))) tpClass = 'tp-hit';
+        else if (tp > 0 && Math.abs(tpDistPct) < 0.5) tpClass = 'near-tp';
+        const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
+        const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
+        return `<tr class="${trailState[t.id] ? 'pm-row' : ''}">
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}</td>
+          <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
+          <td>$${entry.toFixed(4)}</td>
+          <td>$${current.toFixed(4)}</td>
+          <td></td>
+          <td class="${cls}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</td>
+          <td class="${cls}">${pnlUsdt>=0?'+':''}$${pnlUsdt.toFixed(2)}</td>
+          <td>$${size.toFixed(1)}</td>
+          <td>$${effSize.toFixed(1)}</td>
+          <td>${lev}x</td>
+          <td class="${slClass}">$${sl.toFixed(6)}<br><span class="dist">${slDistStr}</span></td>
+          <td class="${tpClass}">$${tp.toFixed(4)}<br><span class="dist">${tpDistStr}</span></td>
+          <td style="color:#888;font-size:0.8em">${t.signal||''}</td>
+          <td style="color:#666;font-size:0.75em">${(t.opened||'').replace('T',' ').slice(0,16)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function updateSortArrows() {
+      document.querySelectorAll('thead .sortable').forEach(th => {
+        const existing = th.querySelector('.sort-arrow');
+        if (existing) existing.remove();
+      });
+      const ths = document.querySelectorAll('thead .sortable');
+      ths.forEach(th => {
+        const col = parseInt(th.dataset.col);
+        if (col === openSortCol) {
+          const arrow = document.createElement('span');
+          arrow.className = 'sort-arrow';
+          arrow.textContent = openSortAsc ? ' ▲' : ' ▼';
+          th.appendChild(arrow);
+        }
+      });
+    }
+
     function goPage(p) {
       const totalPages = Math.ceil(totalClosed / PAGE_SIZE) || 1;
       currentPage = Math.max(1, Math.min(p, totalPages));
@@ -458,6 +521,13 @@
 
     load();
     setInterval(load, 30000);
+
+    // Add click handlers for sortable headers
+    document.querySelectorAll('thead .sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        sortOpen(parseInt(th.dataset.col), th.dataset.type);
+      });
+    });
   </script>
 </body>
 </html>
