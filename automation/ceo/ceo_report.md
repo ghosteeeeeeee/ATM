@@ -1,3 +1,21 @@
+## CEO Report — 2026-08-15 (22:00 UTC — stability check)
+
+### Diagnosis
+24h: 75T -$0.74 (50.7% WR — RED). **0 trades closed today (Aug 15)** — all from Aug 14. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.51. **48h R:R inverted: avg win 0.458% vs avg loss -0.753% = 0.61:1.** 1 open (r2-trend-long2 LONG). Stars7d intact (5 profitable). Disk 83%. Pipeline healthy. All timers running.
+
+**Eval windows active:** ATR_TP_K_MULT 2.0 (today), PM_TRAIL_ACTIVATE_PCT 0.60, PM_TRAIL_DISTANCE_PCT 0.40 — all need 48h.
+
+### Root Cause
+R:R inverted (0.61:1) is structural — atr_sl_hit dominates (167T -$10.49/7d vs profit-monster-trail 225T +$10.17/7d). Three param changes deployed to fix: ATR TP pushed further out (2.0x), PM trail arms later (0.60%), trail distance wider (0.40%).
+
+### Fix Applied
+**NO CHANGES — stability period.** All 3 param changes (ATR 2.0, PM_TRAIL 0.60, PM_DIST 0.40) are in their48h eval windows. Changing now would invalidate the data. All bad signals already killed. Stars7d intact.
+
+### Verification
+Eval windows close ~Aug 17. Next CEO run should check: avg trail win (should ↑ from 0.458%), R:R ratio (should approach1:1), daily PnL (should turn green). If R:R still inverted after eval → escalate to ATR_SL_K_MULT or regime filter.
+
+---
+
 ## CEO Report — 2026-08-14 (latest run)
 
 ### Diagnosis
