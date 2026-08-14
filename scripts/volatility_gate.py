@@ -47,7 +47,9 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
-        'r2-trend-long',  # R² trend confirmation for LONG (slow grinds)
+        'r2-trend-long', 'r2l',  # R² trend LONG (slow grinds)
+        'r2s',  # R² downtrend SHORT detector
+        'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
     },
     'HIGH': {
         # Breakout works in big moves
@@ -59,14 +61,15 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
-        'wave_catcher',  # catches velocity spikes in big moves
+        'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
+        'r2s',  # R² downtrend SHORT detector
     },
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
         'mover+',  # added 2026-08-14 — AVNT LONG blocked at ATR=4.29%
         'bb_bounce',
-        'wave_catcher',  # catches violent spikes in extreme vol
+        'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
     },
 }
 

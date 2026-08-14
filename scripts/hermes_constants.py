@@ -1147,7 +1147,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
-    'r2-trend-long', 'r2l-long',
+    'r2-trend-long', 'r2l-long', 'r2s',  # r2s = r2_trend SHORT (downtrend detector)
     'wave_catcher',  # velocity spike detector — catches violent moves
 )
 

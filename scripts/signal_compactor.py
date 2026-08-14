@@ -279,6 +279,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('range_breakout', 'range_breakout-'):  1.0,
     # r2_trend_long — R² trend confirmation for LONG (slow grinds, R²>0.6, slope>0)
     ('r2_trend_long', 'r2l-long'):          1.0,
+    # r2_trend — R² downtrend detector (SHORT only, R²>0.6, slope<0)
+    ('r2_trend', 'r2s'):                    1.0,
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)
     ('mtf_zscore',  'bb-bounce-short,hzscore-'):           1.5,  # 11T 64% WR +$0.18 (boosted)
