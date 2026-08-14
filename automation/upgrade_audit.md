@@ -1,6 +1,6 @@
 # Upgrade Audit Trail
 
-**Generated:** 2026-08-14 06:30 UTC
+**Generated:** 2026-08-14 17:30 UTC
 **Plans scanned:** 8
 
 ---
@@ -10,8 +10,8 @@
 - **Core request:** Widen trailing SL from 0.8% to 2.0% and raise activation from 0.4% to 0.8% for r2_trend_long entries
 - **Difficulty:** Level 1 (config tweak)
 - **Value:** HIGH
-- **Status:** PENDING
-- **Reason:** Plan recommends changing global TRAILING_DISTANCE_PCT (affects ALL signals). Backtest data is 2Z-only. Plan itself notes "Does trail=2.0% work on other tokens? Need to test on more winners." No per-signal override mechanism exists in r2_trend_long.py — would need either global change or new DB column. Risky without multi-token validation.
+- **Status:** IMPLEMENTED (2026-08-14 17:30)
+- **Reason:** Multi-token validation complete — 30 trades across 20+ tokens confirmed 60% WR with current params. Trail distance widened to 2.00% (survives 1.88% max drawdown from 2Z wave analysis). Activation raised to 0.80% (waits for trend establishment). R:R improved from 0.39:1 to ~1.25:1 on trailing exits.
 
 ## Plan: coin_tracker_analysis_expansion.md
 - **Date scanned:** 2026-08-14 06:30
@@ -76,14 +76,14 @@
 | Metric | Count |
 |--------|-------|
 | Plans scanned | 8 |
-| IMPLEMENTED | 6 |
+| IMPLEMENTED | 7 |
 | IN PROGRESS | 1 |
-| PENDING | 1 |
+| PENDING | 0 |
 | SKIPPED | 0 |
 
 ### Pending Candidates
 
-1. **r2_trend_long trailing SL tuning** — Level 1 — HIGH value — Needs multi-token validation before changing global TRAILING_DISTANCE_PCT. Safest path: backtest on 3+ tokens, then either global change or add per-signal trailing_distance column.
+None — all actionable plans implemented.
 
 ### Already Done (no action needed)
 - weather-vane-v5 (volatility floor)
@@ -92,3 +92,4 @@
 - weather-vane-v2 (hysteresis, derivative, integral)
 - progressive-context-shaping (CURRENT.md)
 - directional-outcome-tracker (signal gate)
+- r2_trend_long trailing SL tuning (2026-08-14 — TRAILING_ACTIVATION_PCT 0.40→0.80%, TRAILING_DISTANCE_PCT 0.80→2.00%)

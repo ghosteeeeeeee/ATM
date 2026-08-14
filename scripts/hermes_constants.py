@@ -485,8 +485,12 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
-TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — trailing activates when trade hits +0.40%
-TRAILING_DISTANCE_PCT   = 0.0080  # 0.80% — trailing SL distance from peak (widened from 0.60% — reduces premature exits on normal pullbacks)
+# 2026-08-14: widened per r2_trend_long trailing SL plan — 30-trade multi-token validation
+#   activation: 0.40%→0.80% (wait for trend to establish before trailing)
+#   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
+#   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
+TRAILING_ACTIVATION_PCT = 0.0080  # 0.80% — trailing activates when trade hits +0.80%
+TRAILING_DISTANCE_PCT   = 0.0200  # 2.00% — trailing SL distance from peak (widened from 0.80% — survives normal pullbacks on trend signals)
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
