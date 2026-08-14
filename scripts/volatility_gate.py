@@ -64,6 +64,7 @@ REGIME_SIGNALS = {
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
+        'mover+',  # added 2026-08-14 — AVNT LONG blocked at ATR=4.29%
         'bb_bounce',
     },
 }
