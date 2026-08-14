@@ -31,6 +31,8 @@ from hermes_constants import (
     R2_TREND_LONG_MIN_SPEED,
     R2_TREND_LONG_MAX_BB_POS,
     R2_TREND_LONG_BLOCK_STALE,
+    R2_TREND_LONG_MAX_ACCEL,
+    CANDLES_STALENESS_SEC,
     LONG_BLACKLIST,
 )
 
@@ -161,7 +163,7 @@ def _get_candles_1m(token, lookback=LOOKBACK_CANDLES):
             return []
 
         most_recent_ts = rows[-1][0]
-        if (time.time() - most_recent_ts) > 120:
+        if (time.time() - most_recent_ts) > CANDLES_STALENESS_SEC:
             return []
 
         return [{'close': r[1]} for r in rows]
@@ -197,24 +199,30 @@ def scan_signals():
         if token.upper() in LONG_BLACKLIST:
             continue
 
-        # ── Speed/momentum filters ──────────────────────────────────────
-        # Check token_speeds for stale and speed
+        # ── Speed/momentum/accel filters ────────────────────────────────
+        # Check token_speeds for stale, speed, and price acceleration
+        _conn_spd = None
         try:
             _conn_spd = sqlite3.connect(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'signals_hermes_runtime.db'), timeout=5)
             _cur_spd = _conn_spd.cursor()
-            _cur_spd.execute('''SELECT speed_percentile, is_stale, momentum_score FROM token_speeds WHERE token = ?''', (token.upper(),))
+            _cur_spd.execute('''SELECT speed_percentile, is_stale, momentum_score, price_acceleration FROM token_speeds WHERE token = ?''', (token.upper(),))
             _spd_row = _cur_spd.fetchone()
-            _conn_spd.close()
             if _spd_row:
-                _speed, _is_stale, _mom = _spd_row
+                _speed, _is_stale, _mom, _accel = _spd_row
                 # Block stale tokens (no momentum)
                 if R2_TREND_LONG_BLOCK_STALE and _is_stale:
                     continue
                 # Require minimum speed
                 if _speed is not None and _speed < R2_TREND_LONG_MIN_SPEED:
                     continue
-        except Exception:
-            pass  # non-fatal
+                # Block overextended: price accelerating up = about to reverse
+                if _accel is not None and _accel > R2_TREND_LONG_MAX_ACCEL:
+                    continue
+        except Exception as _e:
+            print(f'  [r2_trend_long] WARN: failed to read token_speeds for {token}: {_e}')
+        finally:
+            if _conn_spd:
+                _conn_spd.close()
 
         candles = _get_candles_1m(token)
         if not candles or len(candles) < R2_WINDOW * 2:

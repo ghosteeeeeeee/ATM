@@ -1041,6 +1041,7 @@ R2_TREND_LONG_MAX_RSI       = 75      # max RSI — don't buy overbought (chasin
 R2_TREND_LONG_MIN_SPEED     = 30      # min speed percentile — require some momentum
 R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band top
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
+R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT
