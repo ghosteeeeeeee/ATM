@@ -64,6 +64,9 @@ RSI_SHORT_MIN = 40          # SHORT: block if RSI below this (oversold = bounce 
 # Velocity parameters
 VEL_5M_MAX = 0.1           # SHORT: block if vel > 0.1% (selling into rally = bad)
 
+# Pre-entry move parameters
+PRE_ENTRY_MOVE_MIN = -0.3   # SHORT: require price dropped at least 0.3% in 30min before entry (established downtrend)
+
 # Cooldown
 COOLDOWN_HOURS = 0.25      # 15 min between signals per token+direction
 
@@ -282,6 +285,27 @@ def detect_breakout_short(closes, token):
     # ── Phase 5: RSI sanity (SHORT-specific) ─────────────────────────────
     if rsi is not None and rsi < RSI_SHORT_MIN:
         return None  # not overbought enough for SHORT
+
+    # ── Phase 6: Pre-entry move filter (2026-08-14) ───────────────────────
+    # Block SHORT when price hasn't dropped enough — catches weak breakouts.
+    # Backtest: blocks 1/9W, 3/11L when pre30m < -0.3%.
+    try:
+        from paths import CANDLES_DB
+        conn_pm = sqlite3.connect(CANDLES_DB, timeout=5)
+        try:
+            rows_pm = conn_pm.execute(
+                "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 31",
+                (token.upper(),)
+            ).fetchall()
+        finally:
+            conn_pm.close()
+        if rows_pm and len(rows_pm) >= 30:
+            closes_pm = [r[0] for r in reversed(rows_pm)]
+            pre_move = (closes_pm[-1] - closes_pm[0]) / closes_pm[0] * 100 if closes_pm[0] > 0 else 0
+            if pre_move > PRE_ENTRY_MOVE_MIN:
+                return None  # price hasn't dropped enough — weak breakout
+    except Exception:
+        pass
 
     # ── Confidence scoring ───────────────────────────────────────────────
     conf = CONF_BASE
