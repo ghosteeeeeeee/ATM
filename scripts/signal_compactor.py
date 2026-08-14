@@ -1783,6 +1783,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             top10_combos = {e.get('combo_key') for e in hotset_final if e.get('combo_key')}
 
             # ── Process PENDING/WAIT candidates ───────────────────────────────────
+            # FIX (2026-08-14): Removed NOT IN exclusion — PENDING signals for tokens
+            # with APPROVED signals are now considered for cross-combo confluence merge.
+            # Example: wave_catcher+ is APPROVED for STBL LONG, ct-hot+ fires PENDING —
+            # they merge into a 2-source combo and get confluence bonus.
             c.execute("""
                 SELECT id, token, direction, COALESCE(compact_rounds, 0) AS cr,
                        combo_key, created_at, source
@@ -1791,12 +1795,24 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                   AND executed = 0
                   AND created_at > datetime('now', '-60 minutes')
                   AND token NOT LIKE '@%'
-                  AND (token, direction) NOT IN (
-                      SELECT token, direction FROM signals
-                      WHERE decision = 'APPROVED' AND executed = 0
-                  )
             """)
             all_sig_rows = c.fetchall()
+
+            # Build lookup: (token:direction) -> set of APPROVED sources
+            # Used for cross-combo confluence merging
+            approved_sources_by_key = {}
+            c.execute("""
+                SELECT token, direction, source FROM signals
+                WHERE decision = 'APPROVED' AND executed = 0
+            """)
+            for _tok, _dir, _src in c.fetchall():
+                _key = f"{_tok.upper()}:{_dir.upper()}"
+                if _key not in approved_sources_by_key:
+                    approved_sources_by_key[_key] = set()
+                if _src:
+                    approved_sources_by_key[_key].update(
+                        p.strip() for p in _src.split(',') if p.strip()
+                    )
 
             approved_ids = []      # PENDING→APPROVED transitions
             expired_ids = []      # PENDING→EXPIRED (staleness=0)
@@ -1804,14 +1820,20 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
             for sid, tok, d, cr, ck, sig_created_at, source in all_sig_rows:
                 key = f"{tok.upper()}:{d.upper()}"
+                # ── CROSS-COMBO CONFLUENCE MERGE (2026-08-14) ─────────────────────
+                # Merge PENDING source with any APPROVED sources for same token+direction.
+                # If wave_catcher+ is APPROVED and ct-hot+ fires PENDING, they combine
+                # into a 2-source combo — confluence strengthens the signal.
+                pending_src_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+                approved_src_parts = list(approved_sources_by_key.get(key, set()))
+                all_src_parts = list(set(pending_src_parts + approved_src_parts))
+                merged_source = ','.join(sorted(all_src_parts)) if all_src_parts else source
+
                 if key in top10_keys:
                     # ── CONFLUENCE CHECK (2026-05-12) ─────────────────────────────────
                     # A PENDING row entering top-10 must have 2+ unique signal sources.
-                    # The DB pre-filter already gates new signals, but this loop processes
-                    # ALL PENDING rows in the 60-min window — including single-source rows
-                    # from add_signal() merges that lost a source. Skip any combo with
-                    # only 1 source, regardless of its score or top-10 standing.
-                    src_parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+                    # Now counts BOTH pending sources AND approved sources for same token.
+                    src_parts = all_src_parts  # merged pending + approved sources
                     # ── DISABLED-COMPONENT GUARD (pending approve) ────────────────────
                     if any(is_component_disabled(p) for p in src_parts):
                         log(f"  🚫 [PENDING-DISABLED-BLOCK] {tok}:{d} — src='{source}' contains disabled component, skipping approval")
@@ -1820,7 +1842,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         bare_src = source.rstrip('+-0123456789') if source else ''
                         if bare_src in STANDALONE_BYPASS_SIGNALS:
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} backtested standalone ({source}) allowed at pending approve")
-                            # ── Contrarian flip at pending approve ────────────────
+                            # ── Contrarian flip at pending approve ────────────────────
                             if bare_src == 'trend_momentum_near_sma':
                                 original_dir = d
                                 d = 'SHORT' if d.upper() == 'LONG' else 'LONG'
@@ -1832,6 +1854,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             continue
                     elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         log(f"  ➡️  [PENDING-APPROVE-ALLOW] {tok}:{d} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{source}'")
+                    # ── Log cross-combo merge ────────────────────────────────────────
+                    if approved_src_parts and pending_src_parts != approved_src_parts:
+                        log(f"  🔗 [CONFLUENCE-MERGE] {tok}:{d} — pending {pending_src_parts} + approved {approved_src_parts} → {len(src_parts)} sources")
                     # Combo entered top-10 → APPROVED immediately.
                     # No age gate — if it's in top-10 it's signal-worthy.
                     # If it stops firing, staleness=0 will expire it within 5 min.
@@ -1843,12 +1868,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     c.execute("""
                         UPDATE signals
                         SET decision = 'APPROVED',
+                            source = ?,
                             survival_rounds = ?,
                             hot_cycle_count = COALESCE(hot_cycle_count, 0) + 1,
                             review_count = COALESCE(review_count, 0) + 1,
                             updated_at = CURRENT_TIMESTAMP
                         WHERE id = ?
-                    """, (new_sr, sid))
+                    """, (merged_source, new_sr, sid))
                     approved_ids.append(sid)
                 else:
                     # Not in top-10: check staleness directly via created_at

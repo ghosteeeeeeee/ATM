@@ -83,35 +83,53 @@ def detect(token, data):
     """
     setup_score = data.get('setup_score') or 0
     health = data.get('health') or 'unknown'
+    composite = data.get('composite') or 0
     clustering_bull = data.get('clustering_bullish') or 0
     clustering_bear = data.get('clustering_bearish') or 0
     recency = data.get('recency') or 0.5
     setup_type = data.get('setup_type') or 'NEUTRAL'
+    trend_dir = data.get('trend_direction') or 'NEUTRAL'
+    wyckoff = data.get('wyckoff_phase') or 'none'
 
-    # Must meet minimum thresholds
-    if setup_score < COIN_TRACKER_HOT_SETUP_THRESHOLD:
-        return None
-    if health not in ('hot', 'ready', 'setup', 'warm'):
-        return None
-    if recency < COIN_TRACKER_HOT_RECENCY_MIN:
+    # Primary trigger: health must be hot or ready
+    if health not in ('hot', 'ready'):
         return None
 
-    # Determine direction from clustering
+    # Must have some directional signal
+    has_direction = False
     if clustering_bull > clustering_bear and clustering_bull >= COIN_TRACKER_HOT_CLUSTER_MIN:
-        direction = 'LONG'
+        has_direction = True
     elif clustering_bear > clustering_bull and clustering_bear >= COIN_TRACKER_HOT_CLUSTER_MIN:
-        direction = 'SHORT'
-    elif setup_type == 'LONG' and clustering_bull > 0:
+        has_direction = True
+    elif setup_type in ('LONG', 'SHORT'):
+        has_direction = True
+    elif trend_dir in ('BULL', 'BEAR'):
+        has_direction = True
+
+    if not has_direction:
+        return None
+
+    # Determine direction from strongest signal
+    if clustering_bull > clustering_bear:
         direction = 'LONG'
-    elif setup_type == 'SHORT' and clustering_bear > 0:
+    elif clustering_bear > clustering_bull:
+        direction = 'SHORT'
+    elif setup_type == 'LONG':
+        direction = 'LONG'
+    elif setup_type == 'SHORT':
+        direction = 'SHORT'
+    elif trend_dir == 'BULL':
+        direction = 'LONG'
+    elif trend_dir == 'BEAR':
         direction = 'SHORT'
     else:
-        return None  # no clear direction
+        return None
 
-    # Compute confidence
+    # Compute confidence from composite + bonuses
     conf = COIN_TRACKER_HOT_CONF_BASE
-    conf += min(10, setup_score * 0.1)  # setup score bonus
-    conf += min(5, recency * 5)         # recency bonus
+    conf += min(10, composite * 0.1)         # composite score bonus
+    conf += min(5, setup_score * 0.1)        # setup score bonus
+    conf += min(5, recency * 5)              # recency bonus
     conf += min(5, max(clustering_bull, clustering_bear) * 2)  # clustering bonus
     conf = min(conf, COIN_TRACKER_HOT_CONF_CAP)
 
