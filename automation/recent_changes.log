@@ -498,3 +498,7 @@
   WHY: 6T last hour (4W 2L +$0.05). 24h 61T 54.1% WR -$0.50. ATR SL 39.3% (just under 40% threshold). profit-monster-trail +$1.49 carrying system vs SL -$1.88. wave_catcher+ new signal (4T 25% WR, too small sample to kill — first trade today). Trade freq 2.5/hr normal. 4 open trades healthy. No 0% WR kill candidates. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 07:30 UTC
+[2026-08-14 08:30] auto_1hr: NO CHANGES
+  WHY: 4T last hour (0W 4L -$0.34). 24h 61T 54% WR -$0.50. ATR SL 44.3% (above 40% but profit-monster-trail +$1.43 compensates SL -$2.12). wave_catcher+ 6T 33.3% WR -$0.10 (weak but not 0% WR kill threshold). Trade freq 1.4/hr normal. No 0% WR kill candidates. Structural R:R imbalance needs dedicated tuning session. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 09:30 UTC

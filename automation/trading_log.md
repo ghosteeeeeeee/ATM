@@ -7596,3 +7596,19 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - wave_catcher+ needs 8-10 more trades before meaningful evaluation.
 - R:R imbalance persists (avg SL -$0.078 vs avg trail +$0.043).
+
+## [2026-08-14 08:30 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0 wins, 4 losses)
+**PnL:** -$0.34 (0% WR)
+
+**Changes:** None — no signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL hit 44.3% (27/61 24h) — above 40% threshold but profit-monster-trail compensates (+$1.43 vs SL -$2.12). Structural issue, needs dedicated tuning session.
+- wave_catcher+ (6T 33.3% WR -$0.10) — weak but not at 0% WR kill threshold. Watch next hour.
+- Trade frequency 1.4/hr — normal, not overtrading.
+- All 4 last-hour trades hit ATR SL — bad hour but within normal variance.
+
+**Open Questions:**
+- R:R imbalance persists (avg SL -$0.079 vs avg trail +$0.043). Needs dedicated tuning session.
