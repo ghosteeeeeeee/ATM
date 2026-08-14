@@ -82,7 +82,8 @@ def _read_candles_batch(tokens, tf='5m', limit=200, conn=None):
     return results
 
 def _read_signals_batch(tokens, hours=24, conn=None):
-    """Read recent signals for multiple tokens in one connection."""
+    """Read recent signals for multiple tokens in one connection.
+    Excludes coin_tracker_hot signals to prevent echo feedback."""
     results = {}
     try:
         cutoff = time.time() - (hours * 3600)
@@ -90,6 +91,7 @@ def _read_signals_batch(tokens, hours=24, conn=None):
             rows = conn.execute(
                 "SELECT signal_type, direction, confidence, price, created_at "
                 "FROM signals WHERE token=? AND created_at > datetime(?, 'unixepoch') "
+                "AND signal_type NOT LIKE 'coin_tracker_hot%' "
                 "ORDER BY created_at DESC LIMIT 20",
                 (token, cutoff)
             ).fetchall()
