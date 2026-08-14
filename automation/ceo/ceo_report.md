@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-14 (CEO run — verified latest)
+
+### Diagnosis
+24h: 59T -$0.58 (54.2% WR — RED). 7d: 436T -$0.59 (51.4% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.02 (flat). 5 open +$0.10. LONG profitable. SHORT: all losses from disabled legacy.
+
+### Root Cause
+SHORT7d losses entirely from disabled signals (accel-300-, hzscore-, range_breakout-, continuation-,hzscore-). Active SHORT range_breakout_short 7d +$0.06 52% but 24h -$0.27 33.3% (Aug 13 flipped from Aug 12 star). atr_sl_hit 70T -$5.16 dominant cost. Market 100% NEUTRAL — no signals expected.
+
+### Fix Applied
+NO CHANGES. System flat, legacy clearing, stability period. Stars intact (5 profitable). All legacy bleeders disabled.
+
+### Verification
+Monitor: range_breakout_short (if 7d <45% WR → disable), SHORT7d (if still negative after legacy clears → regime filter), daily PnL (if -2 consecutive red → investigate).
+
+---
+
 ## CEO Report — 2026-08-14 (CEO run — verified)
 
 ### Diagnosis
