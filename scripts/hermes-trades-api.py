@@ -287,11 +287,22 @@ def write_trades():
     # For simplicity, write a flat list with pagination metadata
     closed_t = get_trades('closed', 200)  # enough for 4 pages
 
+    # Load profit monster trail state
+    trail_state = {}
+    try:
+        trail_file = Path("/root/.hermes/data/profit_monster_trail_state.json")
+        if trail_file.exists():
+            with open(trail_file) as f:
+                trail_state = json.load(f)
+    except Exception:
+        pass
+
     result = {
         "updated": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
         "open_count": len(open_t),
         "closed_count": total_closed,
         "page_size": 50,
+        "profit_monster_trail": trail_state,
         "open": _build_open_trades(open_t),
         "closed": [{
             "coin": r[1], "direction": r[2],
@@ -360,6 +371,7 @@ def _build_open_trades(open_t):
                 pnl_usdt = 0
 
         out.append({
+            "id": r[0],
             "coin": token,
             "direction": direction,
             "entry": entry_px,
