@@ -1,7 +1,16 @@
-## CEO Report — 2026-08-15 (verified latest)
+## CEO Report — 2026-08-15 (latest verified)
 
 ### Diagnosis
-24h: 76T -$0.83 (50.0% WR — RED, 3rd consecutive red day). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.46. Today Aug 15: 0 trades closed yet. 0 open flat. 7d 463T +$0.38 (52.8% WR — slightly positive). R:R inverted: avg win 0.51% ($0.051) vs avg loss -0.74% (-$0.076) = 0.69:1. ATR_SL hit 61T -$4.87 in 48h (96% of losses). Stars7d intact (5 profitable). Legacy SHORT bleeders aging out. mover+ LONG 7T -$0.15 28.6% WR, r2-trend-long3 9T -$0.12 — both below 10T disable threshold.
+24h: 76T -$0.83 (50.0% WR — RED). 7d: 447T -$1.08 (51.0% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.46 (recovering). Today Aug 15: 0T closed, 0 open — system idle. R:R 48h: avg win 0.52% vs avg loss -0.74% = 0.69:1 (inverted, improving from 0.57:1). ATR_SL 61T -$4.87 dominant (96% losses). Stars7d intact (5 profitable). Legacy SHORT bleeders aging out. ATR_TP_K_MULT 2.0 deployed today — 0 eval trades.
+
+### Root Cause
+Structural R:R inversion persists: avg win 0.52% vs avg loss -0.74%. ATR_SL hits dominate losses. PM_TRAIL 0.40% and ATR_TP_K_MULT 2.0 targeting improvement but need closed trades to evaluate.
+
+### Fix Applied
+NO CHANGES — ATR 2.0 eval window active (0 trades closed). System idle today (no forced trades).
+
+### Verification
+Monitor 48h: avg trail win (should ↑ from 0.52%), R:R ratio (target 1:1+), daily PnL (if -2 more red → deeper investigation).
 
 ### Root Cause
 R:R structurally inverted — ATR_SL exits at -0.74% avg while trail wins only 0.51%. ATR_TP_K_MULT 2.0 deployed today (bumped from 1.5) but 0 trades closed to evaluate yet. The 0.69:1 R:R means system needs ~59% WR to break even — currently at 50%.
