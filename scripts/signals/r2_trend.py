@@ -47,26 +47,9 @@ R2_RECENCY_BONUS_MAX = 10    # max bonus for fresh cross
 
 # ── Tunable params from hermes_constants (SHORT direction) ─────────────────────
 try:
-    from hermes_constants import (
-        R2_TREND_SHORT_MIN_R2,
-        R2_TREND_SHORT_MIN_SLOPE,
-        R2_TREND_SHORT_MAX_RSI,
-        R2_TREND_SHORT_MIN_SPEED,
-        R2_TREND_SHORT_MIN_BB_POS,
-        R2_TREND_SHORT_BLOCK_STALE,
-        R2_TREND_SHORT_MAX_ACCEL,
-        R2_TREND_SHORT_MIN_PRE_MOVE,
-    )
+    from hermes_constants import R2_TREND_SHORT_MIN_R2
 except ImportError:
-    # Fallback defaults if hermes_constants not available
-    R2_TREND_SHORT_MIN_R2 = 0.60
-    R2_TREND_SHORT_MIN_SLOPE = -0.003
-    R2_TREND_SHORT_MAX_RSI = 65
-    R2_TREND_SHORT_MIN_SPEED = 30
-    R2_TREND_SHORT_MIN_BB_POS = 0.15
-    R2_TREND_SHORT_BLOCK_STALE = True
-    R2_TREND_SHORT_MAX_ACCEL = 0.005
-    R2_TREND_SHORT_MIN_PRE_MOVE = 0.0
+    R2_TREND_SHORT_MIN_R2 = 0.60  # fallback default
 
 # ── Linear Regression ─────────────────────────────────────────────────────────
 
@@ -234,7 +217,7 @@ def _get_candles_1m(token: str, lookback: int = R2_LOOKBACK_CANDLES) -> list:
 def scan_r2_trend_signals(prices_dict: dict) -> list:
     from hermes_constants import R2_TREND_ENABLED
     if not R2_TREND_ENABLED:
-        return 0
+        return []
     """Scan pre-filtered tokens for R² confirmed downtrend signals.
 
     All guards (blacklists, open positions, cooldowns, price age) must be
