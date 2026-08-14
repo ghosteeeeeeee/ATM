@@ -95,6 +95,29 @@ def detect_r2_long(token, candles, price):
     if r2 < R2_TREND_LONG_MIN_R2 or slope <= 0 or closes[-1] <= intercept:
         return None
 
+    # ── Gap300 filter (2026-08-14) ──────────────────────────────────────
+    # Don't LONG when price is too far above EMA300 — extended, revert risk.
+    # Backtest: Gap300 > +0.50% blocks 4/5 losers, 1/9 winners.
+    try:
+        from paths import CANDLES_DB
+        conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
+        rows_ema = conn_ema.execute(
+            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 310",
+            (token.upper(),)
+        ).fetchall()
+        conn_ema.close()
+        if rows_ema and len(rows_ema) >= 300:
+            closes_ema = [r[0] for r in reversed(rows_ema)]
+            k_ema = 2.0 / 301
+            ema_val = closes_ema[0]
+            for p in closes_ema[1:]:
+                ema_val = p * k_ema + ema_val * (1 - k_ema)
+            gap300 = (closes_ema[-1] - ema_val) / ema_val * 100 if ema_val > 0 else 0
+            if gap300 > 0.50:
+                return None  # price too far above EMA300 — extended, skip LONG
+    except Exception:
+        pass
+
     # Transition detector: R² must be RISING from below threshold
     # This catches the START of a trend, not flat periods
     if len(closes) >= R2_WINDOW + 3:
