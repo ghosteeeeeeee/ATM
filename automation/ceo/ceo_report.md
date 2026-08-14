@@ -1,69 +1,23 @@
-## CEO Report — 2026-08-14 (latest verified)
+## CEO Report — 2026-08-14 (12:49 UTC — verified)
 
 ### Diagnosis
-24h: 72T -$0.79 (51.4% WR — RED). 7d: 446T -$0.90 (51.3% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.37 (52.8% WR — recovering). 4 open flat (-$0.07). LONG7d: profitable. SHORT7d: all from disabled legacy. Cost drivers48h: atr_sl_hit 67T -$5.14 (96% of losses). Stars7d intact (5 profitable).
+24h: 75T -$0.85 (52.0% WR — RED). 7d daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.40 (recovering). 2 open flat ($0). Stars7d intact (5 profitable). Cost drivers48h: atr_sl_hit 64T -$4.89 (96% of losses). Wave_catcher+ LONG already disabled. mover+ LONG 4T -$0.24 25% WR (below 10-trade threshold).
 
 ### Root Cause
-System recovering from Aug 13 legacy clearing. All legacy bleeders disabled. ATR stop-loss dominates exits — SHORT signals avg -0.74% per stop, LONG avg -0.80%. Recent ATR_TP_K_MULT 1.0→1.2 should improve R:R but too early to evaluate.
+R:R imbalance structural: avg SL loss -$0.077 vs avg trail win +$0.039 (2:1 unfavorable). ATR_SL hit dominates (64T -$4.89 in 48h). Legacy SHORT bleeders (accel-300-, hzscore-, range_breakout-) draining via residual trades — all disabled. Wave_catcher+ LONG already disabled. mover+ standalone bleeding but combo (hzscore+,mover+ 80% WR) is a star — can't disable without collateral.
 
 ### Fix Applied
-NO CHANGES — ATR_TP_K_MULT adjustment (1.0→1.2) just applied, needs48h evaluation. mover+ LONG4T -$0.24 25% WR (below 10-trade threshold, can't disable without killing profitable hzscore+,mover+ star).
+NO CHANGES — system in stability period (14+ changes in 48h). Stars intact. Daily recovering. ATR_TP_K_MULT 1.0→1.2 deployed, needs48h evaluation. Dedicated R:R tuning session needed (not CEO band-aid).
 
 ### Verification
-Monitor: daily PnL (if -2 consecutive red → investigate), ATR avg win magnitude (should increase from ~0.49%), range_breakout_short (if 7d degrades below 45% WR → re-disable).
-
-### Root Cause
-System recovering from Aug 13 legacy clearing (-$1.58). Aug 14 flat at -$0.32. All legacy bleeders disabled. Active signals within normal variance. atr_sl_hit dominates losses — SL too tight vs trailing activation (needs dedicated tuning session, not quick fix).
-
-### Fix Applied
-NO CHANGES — system stabilizing, recovery trend, stars intact.
-
-### Verification
-Monitor: daily PnL (if -2 consecutive red → investigate), wave_catcher+ LONG (if hits 10T without improvement → disable), range_breakout_short (if7d degrades below 45% WR → re-disable).
-
----
-
-## CEO Report — 2026-08-15 (latest run)
-
-### Diagnosis
-24h: 66T -$0.75 (51.5% WR — RED). 7d: 444T -$0.83 (51.4% WR — slightly negative). Daily: Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.33 (recovering). 5 open r2-trend-long positions flat. LONG7d: profitable. SHORT7d: all from disabled legacy (accel-300- 40T -$0.30, hzscore- 32T -$0.21, range_breakout- 20T -$0.12). Cost drivers48h: atr_sl_hit 66T -$5.01 (96% of losses). Stars7d intact (5 profitable).
-
-### Root Cause
-All losses from atr_sl_hit (66T -$5.01, 96% of 48h losses). Legacy SHORT bleeders (accel-300-, hzscore-, range_breakout-) all disabled — draining via residual trades. wave_catcher+ LONG already disabled (6T -$0.34 residual). No new active signal degradation. System flat — daily improving from Aug 13 legacy clearing spike.
-
-### Fix Applied
-NO CHANGES — all previous fixes in place. Stars7d intact (5 profitable). Legacy bleeders draining naturally.
-
-### Verification
-- 24h: -$0.75 (stable vs -$0.77 last run) ✓
-- 7d: -$0.83 (improving vs -$0.99 last run) ✓
-- Daily: Aug 13 -$1.58 → Aug 14 -$0.33 (recovering) ✓
+- 24h: -$0.85 (stable vs -$0.75 last run) ✓
+- 7d daily: Aug 13 -$1.58 → Aug 14 -$0.40 (recovering) ✓
 - Stars7d: 5 profitable intact ✓
 - Pipeline: healthy ✓
-- 5 open positions flat ✓
+- 2 open trades flat ✓
 
 ### Monitor
+- daily PnL: if -2 consecutive red after today → investigate root cause
 - range_breakout_short: if 7d degrades below 45% WR → re-disable
-- daily PnL: if -2 consecutive red → investigate
-- SHORT7d: if still negative after all legacy clears → regime filter for SHORTs
-## CEO Report — 2026-08-14
-
-### Diagnosis
-24h: 64T -$0.72 (51.6% WR — RED but recovering). Aug13 was -$1.58 (legacy clearing), Aug14 -$0.30 (recovering). 7d: -$0.93 (50.9% WR — slightly negative).
-
-### Root Cause
-All losses from disabled legacy signals. SHORT7d -$0.88 is 100% legacy (accel-300-, hzscore-, range_breakout-, continuation-,hzscore-). Active SHORT signals profitable: range_breakout_short +$0.06, bb-bounce-short,hzscore- +$0.14. Stars7d intact (5 profitable). wave_catcher+ LONG 6T -$0.34 (PLUS side already killed).
-
-### Fix Applied
-NO CHANGES — system stabilizing, all legacy bleeders already disabled, Aug14 recovering. stars intact.
-
-### Verification
-- Aug12: +$0.49 → Aug13: -$1.58 (clearing) → Aug14: -$0.30 (recovering) ✓
-- SHORT7d: -$0.88 (100% legacy, draining) — active SHORT profitable ✓
-- Stars7d: 5 profitable intact ✓
-- Pipeline: healthy ✓
-
-### Monitor
-- daily PnL (if -2 consecutive red → investigate)
-- wave_catcher+ LONG (if no improvement by 10+ trades → disable entirely)
-- SHORT7d (when legacy fully clears → should be profitable)
+- mover+ LONG: if reaches 10T without improvement → consider standalone disable
+- ATR avg win: should increase from ~0.49% after TP_K_MULT adjustment
