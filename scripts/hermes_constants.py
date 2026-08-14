@@ -1148,7 +1148,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
     'r2-trend-long', 'r2l-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
-    'wave_catcher',  # velocity spike detector — catches violent moves
+    'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector — catches violent moves
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1638,7 +1638,7 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = False  # CEO KILLED 2026-08-15 — master flag re-enabled LONG despite PLUS being killed. 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15) but net -$0.27.
+WAVE_CATCHER_ENABLED            = True    # re-enabled 2026-08-15 — SHORT profitable (+$0.15), LONG still blocked via PLUS_ENABLED=False
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).
 WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)

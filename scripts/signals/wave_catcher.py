@@ -214,7 +214,7 @@ def scan_signals():
 
         # Add signal
         sig_type = 'wave_catcher_long' if direction == 'LONG' else 'wave_catcher_short'
-        source = 'wave_catcher+'
+        source = 'wave_catcher+' if direction == 'LONG' else 'wave_catcher-'
         conf = sig['confidence']
 
         sid = add_signal(

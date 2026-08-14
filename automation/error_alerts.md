@@ -19,3 +19,6 @@
 - **[WARN]**: Market 100% NEUTRAL — 104 tokens, no directional bias, hotset empty
 - **[INFO]**: Pipeline healthy — 0 open positions, 73 closed today, -8.10% PnL
 - **ROOT CAUSES**: hl-volume=429 rate limit, mtf-macd=AttributeError, better-coder=ModuleNotFoundError
+
+## Error Alerts — 2026-08-14 22:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'R2_TREND_PLUS_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_constants`
