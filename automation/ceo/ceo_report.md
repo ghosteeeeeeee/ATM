@@ -1,13 +1,13 @@
-## CEO Report — 2026-08-15 (CEO run — verified latest)
+## CEO Report — 2026-08-15 (latest verified run)
 
 ### Diagnosis
-24h: 63T -$0.73 (50.8% WR — RED). 7d: 438T -$0.82 (50.9% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.11 (recovering). 4 open -$0.09. LONG7d: profitable. SHORT7d: all from disabled legacy. wave_catcher+ LONG: 4T -$0.27 25% WR (new, 6 trades total).
+24h: 62T -$0.47 (53.2% WR — RED). 7d: 438T -$0.81 (50.9% WR — slightly negative). Daily: Aug 9 +$0.62 (peak) → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.08 (recovering). 4 open: 2 r2-trend-long2 (flat), 1 wave_catcher+ LONG (PUMP -0.86%), 1 wave_catcher+ SHORT (AVNT -0.39%). LONG7d: profitable. SHORT7d: all from disabled legacy. wave_catcher+ LONG: 5T -$0.24 40% WR (new, 7 trades total).
 
 ### Root Cause
-All48h losses from DISABLED legacy signals (expected to clear as trades age out). wave_catcher+ LONG bleeding but only 4 trades — too early to evaluate. atr_sl_hit 69T -$5.15 dominant cost (38.8% of exits). Stars intact (5 profitable). System flat, stability period.
+All 48h losses from DISABLED legacy signals (expected to clear as trades age out). wave_catcher+ LONG bleeding but only 5 trades — too early to evaluate. atr_sl_hit 68T -$5.09 dominant cost (97% of 48h losses). Stars intact (5 profitable). System flat, stability period.
 
 ### Fix Applied
-NO CHANGES. System stabilizing, legacy clearing, stars intact. wave_catcher+ too new (6 trades) — monitor until 10+ trades before tuning.
+NO CHANGES. System stabilizing, legacy clearing, stars intact. wave_catcher+ too new (7 trades) — monitor until 10+ trades before tuning.
 
 ### Verification
 Monitor: daily PnL (if -2 consecutive red → investigate), wave_catcher+ LONG (if doesn't improve by 10+ trades → disable PLUS side), range_breakout_short (if 7d <45% WR → re-disable).
