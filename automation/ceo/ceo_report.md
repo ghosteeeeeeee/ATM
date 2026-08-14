@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-14 (CEO run — verified latest)
+## CEO Report — 2026-08-15 (CEO run — verified latest)
 
 ### Diagnosis
-24h: 59T -$0.58 (54.2% WR — RED). 7d: 436T -$0.59 (51.4% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.02 (flat). 5 open +$0.10. LONG profitable. SHORT: all losses from disabled legacy.
+24h: 63T -$0.73 (50.8% WR — RED). 7d: 438T -$0.82 (50.9% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.11 (recovering). 4 open -$0.09. LONG7d: profitable. SHORT7d: all from disabled legacy. wave_catcher+ LONG: 4T -$0.27 25% WR (new, 6 trades total).
 
 ### Root Cause
-SHORT7d losses entirely from disabled signals (accel-300-, hzscore-, range_breakout-, continuation-,hzscore-). Active SHORT range_breakout_short 7d +$0.06 52% but 24h -$0.27 33.3% (Aug 13 flipped from Aug 12 star). atr_sl_hit 70T -$5.16 dominant cost. Market 100% NEUTRAL — no signals expected.
+All48h losses from DISABLED legacy signals (expected to clear as trades age out). wave_catcher+ LONG bleeding but only 4 trades — too early to evaluate. atr_sl_hit 69T -$5.15 dominant cost (38.8% of exits). Stars intact (5 profitable). System flat, stability period.
 
 ### Fix Applied
-NO CHANGES. System flat, legacy clearing, stability period. Stars intact (5 profitable). All legacy bleeders disabled.
+NO CHANGES. System stabilizing, legacy clearing, stars intact. wave_catcher+ too new (6 trades) — monitor until 10+ trades before tuning.
 
 ### Verification
-Monitor: range_breakout_short (if 7d <45% WR → disable), SHORT7d (if still negative after legacy clears → regime filter), daily PnL (if -2 consecutive red → investigate).
+Monitor: daily PnL (if -2 consecutive red → investigate), wave_catcher+ LONG (if doesn't improve by 10+ trades → disable PLUS side), range_breakout_short (if 7d <45% WR → re-disable).
 
 ---
 
