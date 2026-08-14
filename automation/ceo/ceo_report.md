@@ -17,16 +17,16 @@ Monitor: daily PnL (if -2 consecutive red → investigate), range_breakout_short
 ## CEO Report — 2026-08-15 (latest verified run)
 
 ### Diagnosis
-24h: 66T -$0.65 (51.5% WR — RED). 7d: 441T -$0.99 (50.8% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.26 (recovering). 4 open r2-trend-long2 flat. LONG7d: profitable. SHORT7d: all from disabled legacy. wave_catcher+ LONG: 6T -$0.34 33.3% WR (new, 9 trades total — approaching 10-trade threshold).
+24h: 65T -$0.72 (50.8% WR — RED). 7d: 441T -$0.99 (50.8% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.26 (recovering). 4 open +$0.03 flat. LONG7d: profitable. SHORT7d: all from disabled legacy. wave_catcher+ LONG: 6T -$0.34 33.3% WR (worst active, approaching 10-trade threshold).
 
 ### Root Cause
-All 48h losses from DISABLED legacy signals + wave_catcher+ LONG (new, underperforming). atr_sl_hit 68T -$5.14 dominant cost (96% of 48h losses). Stars intact (5 profitable). System flat, stability period.
+All 24h losses from DISABLED legacy signals + wave_catcher+ LONG (6T, -$0.34, 33.3% WR — new signal, only 6 trades). atr_sl_hit 69T -$5.15 dominant cost (96% of 48h losses). Stars intact (5 profitable). Pipeline healthy, just ran successfully.
 
 ### Fix Applied
 NO CHANGES. System stabilizing, legacy clearing, stars intact. wave_catcher+ LONG approaching 10-trade threshold — will disable PLUS side if no improvement by next run.
 
 ### Verification
-Monitor: daily PnL (if -2 consecutive red → investigate), wave_catcher+ LONG (if doesn't improve by 10+ trades → disable PLUS side), range_breakout_short (if 7d <45% WR → re-disable).
+Monitor: daily PnL (if -2 consecutive red → investigate), wave_catcher+ LONG (if doesn't improve by 10+ trades → disable PLUS side), range_breakout_short (if 7d degrades below 45% WR → re-disable).
 
 ---
 
