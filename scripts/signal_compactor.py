@@ -456,6 +456,44 @@ def _is_direction_locked(direction: str) -> bool:
             conn.close()
 
 
+def check_volatility_floor(token: str) -> float:
+    """Check if token has enough price volatility to trade.
+    Returns penalty multiplier (1.0 = OK, 0.0 = hard block).
+    Uses std/mean of last 20 5m closes as volatility metric.
+    Backtested: vol<0.30% on SHORT → 74% WR on kept trades, +$1.79/14d."""
+    from hermes_constants import VOL_FLOOR_ENABLED, VOL_FLOOR_THRESHOLD
+    if not VOL_FLOOR_ENABLED:
+        return 1.0
+    conn = None
+    try:
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_5m
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC LIMIT 20
+        """, (token.upper(),))
+        closes = [r[0] for r in cur.fetchall()]
+        if len(closes) < 10:
+            return 1.0  # not enough data, fail open
+        mean_c = sum(closes) / len(closes)
+        if mean_c <= 0:
+            return 1.0
+        variance = sum((c - mean_c) ** 2 for c in closes) / len(closes)
+        volatility = (variance ** 0.5) / mean_c * 100  # std/mean as %
+        if volatility < VOL_FLOOR_THRESHOLD:
+            return 0.0  # hard block — no energy
+        return 1.0
+    except Exception:
+        return 1.0  # fail open on error
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
 def _get_btc_momentum() -> float:
     """Get BTC 3h momentum as percentage change.
     Uses 1h candles: (current - 3h ago) / 3h ago * 100.
@@ -1434,6 +1472,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_vel.close()
                         except Exception:
                             pass
+            # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
+            vol_ok = check_volatility_floor(tkn)
+            if vol_ok == 0.0:
+                log(f"  🚫 [VOL-FLOOR] {tkn}: blocked — price volatility too low (<0.30%)")
+                continue
             # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
             # Uses validate_source() for correct handling:
             # 1. Exact match: whole source in blacklist → block

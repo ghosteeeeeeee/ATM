@@ -1,3 +1,30 @@
+## CEO Report — 2026-08-14 (CEO run — verified)
+
+### Diagnosis
+24h: 52T **-$0.83** (51.9% WR — slightly red, legacy closes). 7d: 426T **-$0.30** (51.6% WR — stable). Daily: Aug 12 +$0.49 → Aug 13 53T **-$1.58** (43.4% WR — legacy clearing) → Aug 14 10T **+$0.23** (80% WR — strong start). 3 open $0 flat.
+
+### Root Cause
+24h losses ALL from disabled legacy trades closing out:
+- range_breakout_short SHORT 11T -$0.43 (27.3% WR) — opened Aug 13 before disable, flag correctly False
+- continuation-,hzscore- SHORT 3T -$0.23 (33.3% WR) — disabled legacy
+- accel-300- SHORT 9T -$0.18 (44.4% WR) — disabled legacy
+- hzscore- SHORT 16T -$0.17 (56.3% WR) — disabled legacy
+No new bleeders. SHORT7d -$1.13 100% from disabled signals. LONG7d +$0.83 profitable.
+
+### Fix Applied
+NO CHANGES. All bleeders already disabled, legacy closing naturally. System stable.
+
+### Stars7d (5 intact)
+bb_bounce+,range_finder+ 53T +$0.71 58.5% | bb_bounce+ 21T +$0.21 61.9% | bb_bounce+,hzscore+ 34T +$0.22 50% | hzscore+,mover+ 5T +$0.17 80% | bb-bounce-short,hzscore- 18T +$0.14 61.1%
+
+### Cost Drivers48h
+atr_sl_hit 68T -$4.95 (dominant). profit-monster-trail compensating.
+
+### Verification
+Aug 14 green (+$0.23, 80% WR). 3 open trades flat. Pipeline healthy. 7d stable at -$0.30. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if still negative after legacy fully clears → regime filter).
+
+---
+
 ## CEO Report — 2026-08-14 01:49 UTC (CEO run)
 
 ### Diagnosis

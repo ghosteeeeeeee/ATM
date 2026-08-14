@@ -674,6 +674,12 @@ TIDE_SHORT_WR_WINDOW = 10        # trades for confirmation
 TIDE_SHORT_WR_THRESHOLD_HIGH = 55
 TIDE_SHORT_WR_THRESHOLD_LOW = 45
 
+# ── Volatility Floor Filter ───────────────────────────────────────────────────
+# Block low-volatility entries — no energy = no trade.
+# Backtested 14d: SHORT vol<0.30% → blocks 78T (41% WR), keeps 47T (74% WR), net +$1.79.
+VOL_FLOOR_ENABLED = True
+VOL_FLOOR_THRESHOLD = 0.30             # % — block if price volatility (std/mean) below this
+
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).

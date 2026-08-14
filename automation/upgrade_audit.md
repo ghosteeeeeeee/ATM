@@ -45,5 +45,5 @@
 - **Core request:** Filter out low-volatility entries (no energy = no trade)
 - **Difficulty:** Level 1
 - **Value:** HIGH ($1.79/14d SHORT savings, 74% WR on kept trades)
-- **Status:** ❌ NOT IMPLEMENTED
-- **Reason:** Backtested and validated. Simple single-function addition. Lowest-hanging fruit.
+- **Status:** ✅ IMPLEMENTED
+- **Reason:** Added check_volatility_floor() to signal_compactor.py + VOL_FLOOR constants. Blocks tokens with price vol <0.30% (std/mean of 20 5m closes). Pure stdlib, no numpy needed. Fail-open on insufficient data.
