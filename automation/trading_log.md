@@ -7744,3 +7744,40 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - R:R imbalance worsening (0.44:1 vs 0.77:1 earlier today). Needs dedicated session.
 - wave_catcher+ and hzscore- both draining money — watch for further deterioration.
+
+## [2026-08-15 (hourly)] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** -$0.05 (50% WR)
+
+**Last Hour:**
+- ARB r2-trend-long3 LONG: profit-monster-trail +$0.03
+- CASHCAT wave_catcher+ SHORT: profit-monster-trail -$0.01
+- LDO bb_bounce+,r2-trend-long3 LONG: profit-monster-trail +$0.03
+- MOVE mover+ LONG: atr_sl_hit -$0.10
+
+**24h Snapshot:**
+- 80 trades, -$0.65, 52.5% WR
+- profit-monster-trail: 46T +$1.57 (avg +$0.034)
+- atr_sl_hit: 31T -$2.48 (avg -$0.080) — **38.75%** of closes (below 40% threshold!)
+- ATR_TP_K_MULT 1.2→1.5 effect: SL hit rate dropped from 45.6% to 38.75%
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long2: 10T +$0.16, 60% WR
+- ✅ r2-trend-long0: 3T +$0.07, 66.7% WR
+- ✅ bb_bounce+: 1T +$0.02, 100% WR
+- ⚠️ wave_catcher+ SHORT: 13T -$0.19, 38.5% WR (worst active)
+- ❌ mover+: 6T -$0.14, 33.3% WR
+- ❌ hzscore-: 10T -$0.21, 50% WR (inverted R:R)
+
+**Diagnosis:**
+1. **Entry quality:** 4 trades, small net loss. Normal variance.
+2. **SL behavior:** 38.75% — **improved below 40% threshold**. ATR_TP_K_MULT fix working.
+3. **Signal quality:** No kill triggers. wave_catcher+ still underperforming but SHORT profitable.
+4. **Trade frequency:** 4/hr — healthy.
+
+**Changes:** None. CEO stability period active. ATR_TP_K_MULT evaluation in progress. System stabilizing.
+
+**Open Questions:**
+- wave_catcher+ SHORT 13T -$0.19 — approaching kill threshold but SHORT was profitable before. Monitor.
+- mover+ 6T -$0.14 33.3% WR — new signal, still accumulating data.
