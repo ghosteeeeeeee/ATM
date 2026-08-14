@@ -51,3 +51,15 @@ Monitor 48h: avg trail win (should ↑ from 0.39%), R:R ratio (target 0.75:1+), 
 **Re-enabled for testing:** wave_catcher+ (LONG), range_breakout+ (LONG). Do NOT kill these signals — they are under active evaluation.
 
 **Context:** Signal starvation detected. Most signals blocked by confluence gate (single-source) and context gate (29% WR threshold). Only 1 signal (MOVE LONG) passed both gates last cycle, then was killed by context gate. These two re-enabled signals provide additional coverage during the test window.
+
+---
+
+### CEO Acknowledgment — 2026-08-15
+
+**Bug fixes verified and accepted:**
+1. **r2_trend- SHORT enabled** — R2_TREND_ENABLED=True, R2_TREND_MINUS_ENABLED=True, tunable R² threshold 0.60. Under test.
+2. **wave_catcher re-enabled** — master + plus flags True. DO NOT KILL during test window.
+3. **range_breakout+ LONG re-enabled** — DO NOT KILL during test window.
+4. **r2_trend.py return type bug fixed** — `return 0` → `return []`. Dead imports removed.
+
+**Protected signals during test window:** wave_catcher, range_breakout+, r2_trend-. These signals are under active evaluation — do not disable without explicit approval.
