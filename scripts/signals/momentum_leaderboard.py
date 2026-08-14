@@ -481,29 +481,26 @@ def detect_leaderboard_signals() -> list:
         # ── ATR floor filter (2026-08-14) ──────────────────────────────────
         # Don't enter when ATR > 0.40% — high-vol tokens get stopped out on noise.
         # Backtest: blocks 2/4 losers, 0/6 winners.
-        try:
-            changes = [abs(closes_1m[i] - closes_1m[i-1]) for i in range(max(1, len(closes_1m)-14), len(closes_1m))]
-            atr_val = sum(changes) / len(changes) if changes else 0
+        if len(closes_1m) >= 15:  # need 14 diffs + 1
+            changes = [abs(closes_1m[i] - closes_1m[i-1]) for i in range(len(closes_1m)-14, len(closes_1m))]
+            atr_val = sum(changes) / len(changes)
             atr_pct = atr_val / closes_1m[-1] * 100 if closes_1m[-1] > 0 else 0
             if atr_pct > 0.40:
                 continue  # high volatility — skip
-        except Exception:
-            pass
 
         # ── Z-score alignment filter (2026-08-14) ───────────────────────────
         # LONG only when z < 0 (oversold), SHORT only when z > 0 (overbought).
         # Backtest: blocks 2/4 losers, 1/6 winners.
-        try:
-            if len(closes_1m) >= 20:
-                z_mean = sum(closes_1m[-20:]) / 20
-                z_std = (sum((c - z_mean) ** 2 for c in closes_1m[-20:]) / 20) ** 0.5
-                zscore = (closes_1m[-1] - z_mean) / z_std if z_std > 0 else 0
-                if direction == 'LONG' and zscore > 0:
-                    continue  # buying into strength — skip
-                if direction == 'SHORT' and zscore < 0:
-                    continue  # selling into weakness — skip
-        except Exception:
-            pass
+        if len(closes_1m) >= 20:
+            z_mean = sum(closes_1m[-20:]) / 20
+            z_std = (sum((c - z_mean) ** 2 for c in closes_1m[-20:]) / 20) ** 0.5
+            if z_std == 0:
+                continue  # flat price — no directional edge
+            zscore = (closes_1m[-1] - z_mean) / z_std
+            if direction == 'LONG' and zscore > 0:
+                continue  # buying into strength — skip
+            if direction == 'SHORT' and zscore < 0:
+                continue  # selling into weakness — skip
 
         # ── Local peak/trough filter ────────────────────────────────────────
         if _is_at_local_extremum(closes_1m, direction):
