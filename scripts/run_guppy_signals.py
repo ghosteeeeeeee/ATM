@@ -261,7 +261,7 @@ def _close_brain_record(token: str, reason: str, pnl_pct: float):
         """, (
             _get_current_price(token) or 0,
             pnl_pct,
-            f'guppy_{reason}',
+            reason,
             reason,
             token.upper()
         ))

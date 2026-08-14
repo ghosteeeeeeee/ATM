@@ -1746,7 +1746,7 @@ def sync_pnl_from_hype(prices):
                             log(f'  [CUT-LOSER] FATAL: could not close {token} on HL after 2 attempts '
                                 f'— force-closing paper trade', 'FAIL')
                             try:
-                                _close_paper_trade_db(trade_id, token, curr_price_hl, 'CUT_LOSER_CLOSE_FAILED')
+                                _close_paper_trade_db(trade_id, token, curr_price_hl, 'CUT_LOSER_FAILED')
                                 log(f'  [CUT-LOSER] {token} paper trade force-closed '
                                     f'at {curr_price_hl:.6f} ({pnl_pct:.2f}%) — HL position may be ghost', 'WARN')
                             except Exception as db_err:
@@ -1941,7 +1941,7 @@ def _check_hard_stops(prices: dict):
                                     close_reason=%s, exit_reason=%s,
                                     exit_price=%s, pnl_pct=%s, close_time=NOW()
                                 WHERE id=%s AND status='open'
-                            """, (hit_reason, f'guardian_hard_{hit_reason}',
+                            """, (hit_reason, f'guardian_{hit_reason}',
                                   cur_price, pnl_pct, trade_id))
                             conn2.commit()
                             cur2.close()
@@ -1964,7 +1964,7 @@ def _check_hard_stops(prices: dict):
                     # Add to _CLOSED_HL_COINS so Step 11 doesn't also attempt to close this token
                     _CLOSED_HL_COINS.add(token.upper())
                     try:
-                        _close_paper_trade_db(trade_id, token, cur_price, 'HARD_SL_CLOSE_FAILED')
+                        _close_paper_trade_db(trade_id, token, cur_price, 'HARD_SL_FAILED')
                         log(f'  [HARD-{hit_reason.upper()}] {token} paper trade force-closed '
                             f'at {cur_price:.6f} ({pnl_pct:.2f}%) — HL position may be ghost', 'WARN')
                     except Exception as db_err:
@@ -2898,6 +2898,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         )
 
         # Commit IMMEDIATELY to release row lock — prevents deadlocks with position_manager
+        # exit_reason is VARCHAR(20) — truncate to prevent overflow
+        _exit_reason_short = reason[:20] if reason else reason
         cur.execute("""
             UPDATE trades SET status = 'closed', exit_price = %s,
                 pnl_pct = %s, pnl_usdt = %s,
@@ -2906,7 +2908,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s,
                 mfe_pct = %s, mae_pct = %s, mfe_price = %s, mae_price = %s
             WHERE id = %s AND status = 'open'
-        """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, reason, reason,
+        """, (exit_price, final_pnl_pct, final_pnl_usdt, reason, _exit_reason_short, reason,
               hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
               mfe_pct, mae_pct, mfe_price, mae_price,
               trade_id))
@@ -3016,6 +3018,8 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
     close_success = False
     try:
         cur = conn.cursor()
+        # exit_reason is VARCHAR(20) — truncate to prevent overflow
+        _exit_reason_short = reason[:20] if reason else reason
         cur.execute("""
             UPDATE trades SET status='closed', exit_price=%s,
                 pnl_pct=%s, pnl_usdt=%s,
@@ -3025,7 +3029,7 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 hype_realized_pnl_usdt=%s, hype_realized_pnl_pct=%s
             WHERE id=%s AND status='open'
         """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
-              reason, reason, reason,
+              reason, _exit_reason_short, reason,
               realized_pnl if realized_pnl else None,
               computed_pnl_pct if realized_pnl else None,
               trade_id))
@@ -3177,7 +3181,7 @@ def _sweep_blocklist_trades(prices):
                 continue
 
             # Determine direction-appropriate close reason
-            reason = 'HOTSET_BLOCKED_SHORT' if blocked_short else 'HOTSET_BLOCKED_LONG'
+            reason = 'HOTSET_BLOCKED_S' if blocked_short else 'HOTSET_BLOCKED_L'
             exit_price = prices.get(ht) or prices.get(token) or entry_px or 0
 
             trade_id_str = str(trade_id)
@@ -4523,7 +4527,7 @@ def main():
                     hl_exit_px, realized_pnl = _poll_hl_fills_for_close(token, close_start_ms)
                     _close_orphan_paper_trade_by_id(
                         trade_id, token, retry_direction, hl_exit_px, retry_lev,
-                        'guardian_orphan_retry',
+                        'orphan_retry',
                         amount_usdt_override=None
                     )
                     _CLOSED_HL_COINS.add(token.upper())  # prevent Step 11 double-close

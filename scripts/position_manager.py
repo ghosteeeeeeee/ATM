@@ -1041,7 +1041,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                 hype_realized_pnl_usdt = %s,
                 hype_realized_pnl_pct = %s
             WHERE id = %s AND status = 'open'
-        """, (now, reason, reason, current_price,
+        """, (now, reason, reason[:20] if reason else reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee_paid, 6), 'exit_fee': round(exit_fee, 6), 'fee_total': round(fee_total, 6), 'net_pnl': round(net_pnl, 6)}),
               None, None,  # hype_realized_pnl_* will be backfilled after HL confirms

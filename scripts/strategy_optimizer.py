@@ -239,7 +239,7 @@ def sync_active_trades():
     for tid in closed:
         c.execute('DELETE FROM active_trades WHERE trade_id=?', (tid,))
     conn.commit()
-    removed = c.rowcount
+    removed = len(closed)
     conn.close()
     return removed
 
