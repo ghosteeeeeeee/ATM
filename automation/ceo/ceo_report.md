@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (verified)
+
+### Diagnosis
+24h: 79T -$0.97 (49.4% WR — RED, 3rd consecutive red day). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.46 → Aug 15 -$0.97 (worsening). 0 open. R:R inverted: avg win 0.507% vs avg loss -0.743% (0.68:1). ATR_SL hit 61T -$4.87 in 48h (dominant cost). wave_catcher+ LONG 6T -$0.34 33.3% WR (below 10T threshold). mover+ LONG 7T -$0.15 28.6% WR (below 10T). Stars7d intact (5 profitable).
+
+### Root Cause
+ATR_TP_K_MULT 1.5 too tight — winners capped at 0.51% while SL takes 0.74%. 3rd red day confirms fix insufficient. wave_catcher+ and mover+ below 10-trade disable threshold.
+
+### Fix Applied
+BUMPED ATR_TP_K_MULT 1.5→2.0. Expected: avg win increases from 0.51% toward 0.74%+, R:R improves to ~1:1. 48h eval window starts now.
+
+### Verification
+Monitor: daily PnL (if -2 more red → investigate deeper), R:R ratio (48h), wave_catcher+ LONG (if hits 10T without improvement → disable), mover+ LONG (same).
+
+---
+
 ## CEO Report — 2026-08-14 15:20 UTC (verified)
 
 ### Diagnosis
