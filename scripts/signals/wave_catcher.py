@@ -79,8 +79,8 @@ def detect(token):
         return None
 
     k = 2.0 / (ema_period + 1)
-    ema_val = closes[0]
-    for p in closes[1:]:
+    ema_val = sum(closes[:ema_period]) / ema_period  # seed with SMA
+    for p in closes[ema_period:]:
         ema_val = p * k + ema_val * (1 - k)
     ema60 = ema_val
 
@@ -146,7 +146,7 @@ def detect(token):
         'value': velocity,
         'price': closes[-1],
         'z_score': zscore,
-        'source': f'wave_catcher',
+        'source': 'wave_catcher',
     }
 
 
@@ -226,7 +226,5 @@ def scan_signals():
 
 # Entry point for signals_runner
 def run(prices_dict=None):
-    if prices_dict is None:
-        from signal_schema import get_all_latest_prices
-        prices_dict = get_all_latest_prices()
+    """Entry point for signals_runner."""
     return scan_signals()
