@@ -1148,7 +1148,7 @@ RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific wit
 
 # range_breakout.py — breakout from tight range with retest confirmation
 RANGE_BREAKOUT_ENABLED = True
-RANGE_BREAKOUT_PLUS_ENABLED = False   # range_breakout+ LONG — DISABLED CEO 2026-08-12 — 8T 25% WR -$0.41 in 24h. All losses.
+RANGE_BREAKOUT_PLUS_ENABLED = True    # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
 RANGE_BREAKOUT_SHORT_ENABLED = True   # CEO RE-ENABLED 2026-08-14 — 25T +$0.06 52% WR (7d), legacy SHORT bleed clearing. Revert if regime degrades.
 RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
@@ -1627,8 +1627,8 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = False  # CEO KILLED 2026-08-15 — wave_catcher+ LONG 6T -$0.34 33.3% WR (24h worst). SHORT profitable. Revert if LONG improves.
-WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 6T -$0.34 33.3% WR (24h). SHORT profitable (+$0.19). Revert if LONG improves.
+WAVE_CATCHER_ENABLED            = True   # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
+WAVE_CATCHER_PLUS_ENABLED       = True    # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
 WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
 WAVE_CATCHER_VELOCITY_WINDOW    = 3       # bars to measure velocity
