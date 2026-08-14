@@ -1630,7 +1630,7 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = True   # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
+WAVE_CATCHER_ENABLED            = False  # CEO 2026-08-15 — re-enabled Aug 14, bled 4T -$0.45 0% WR in 24h. Master flag overriding killed PLUS. DISABLED.
 WAVE_CATCHER_PLUS_ENABLED       = False   # SIGNAL REPORTER 2026-08-15 — 6T 33.3% WR -$0.34 (24h). Kill LONG, keep SHORT.
 WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
