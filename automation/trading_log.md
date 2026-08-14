@@ -8050,3 +8050,26 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - 26h without a closed trade is unusual. Filters may be too tight for current market. Consider relaxing vol floor or spike filter if dormancy continues past 48h.
+
+## [2026-08-15 09:30] Hourly Analysis
+
+**Trades:** 0 closed last hour (system dormant 25+ hours). 1 open: CASHCAT SHORT $11 (wave_catcher-).
+**24h:** 0T in window (last closed: Aug 14 23:25). Pipeline timer active.
+
+**Diagnosis:**
+- System dormant — no qualifying signals produced in 25h
+- 0 hotset entries likely (all tokens filtered)
+- Last 24h before dormancy: 43T 50% WR +$1.36 (profit-monster-trail dominant)
+- ATR SL% was 39.2% (below 40% ✅)
+- CEO stability period active — eval window for PM_TRAIL_ACTIVATE_PCT 0.60 and ATR_TP_K_MULT 2.0
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Dormancy is market-driven (low volatility/no qualifying setups), not a bug
+- 1 open position tracking normally
+- No 0% WR kill candidates
+- CEO stability period — no param changes
+
+**Open Questions:**
+- Dormancy >48h would warrant relaxing vol floor or spike filter. Currently at 25h.

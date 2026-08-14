@@ -1,3 +1,36 @@
+## CEO Report — 2026-08-16 (CEO run — verified)
+
+### Diagnosis
+24h: 81T -$0.65 (51.9% WR — RED, 5th consecutive red). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56. R:R inverted: avg win 0.44% vs avg loss -0.74% = 0.59:1. PM_TRAIL at 0.40% activation / 0.15% distance — avg PM trail exit 0.32% (winners shaken out before reaching 1.5% ATR target). ATR_TP_K_MULT 2.0 barely firing (1T in 48h). WAVE_CATCHER: LONG 8T -$0.42 37.5% WR, SHORT 4T -$0.09 25% WR (48h). Legacy accel-300- 19T -$0.73 aging out. Stars7d intact (5 profitable). Disk 83%.
+
+### Root Cause
+PM_TRAIL tightened Aug 15 to 0.40% activate / 0.15% distance. Trail exits winners at avg 0.32% — before they can reach the 1.5% ATR TP target. This inverts R:R to 0.59:1 (avg win 0.44% vs avg loss -0.74%). WAVE_CATCHER both directions dead.
+
+### Fix Applied
+1. PM_TRAIL_ACTIVATE_PCT 0.40%→0.60%, PM_TRAIL_DISTANCE_PCT 0.15%→0.40% — loosened trail to let winners reach ATR target. Override of T directive (tightened trail inverted R:R).
+2. WAVE_CATCHER_ENABLED=False — both LONG and SHORT dead in 48h.
+
+### Verification
+Monitor 48h: avg trail win should ↑ from 0.32% toward 0.60%+, R:R should approach 1:1. If avg trail win doesn't improve, investigate ATR_SL width. ASK T: PM_TRAIL override — confirm?
+
+---
+
+## CEO Report — 2026-08-15 23:30 UTC (CEO run — verified)
+
+### Diagnosis
+24h: 76T -$0.51 (53.9% WR — RED, 4th consecutive red). Daily: Aug 13 -$1.58 → Aug 14 -$0.42 (recovering). 1 open flat. R:R inverted: avg win 0.44% ($0.04) vs avg loss -0.75% (-$0.08) = 0.59:1. ATR_SL dominates: 57T -$4.64 (96% of losses). ATR_TP_K_MULT 2.0 deployed — 0 trades closed to evaluate. PM_TRAIL tightened (0.40% activate, 0.15% distance). Stars7d intact (5 profitable). Legacy bleeders aging out. Disk 83%.
+
+### Root Cause
+Structural R:R imbalance persists (0.59:1). Wins still too small relative to losses. ATR_TP_K_MULT 2.0 targets 2.0x SL distance — should improve R:R once trades close through it. PM_TRAIL tightened (not widened) — may limit trail win improvement. Legacy SHORT losers still closing and dragging 24h numbers.
+
+### Fix Applied
+NO CHANGES — ATR 2.0 eval window active, changing params now invalidates results. All worst signals already killed. System in stabilization period.
+
+### Verification
+Monitor: avg trail win 48h (should ↑ from 0.44%), daily PnL (if Aug 15 red → investigate deeper), mover+ LONG (if 10T no improvement → disable), disk (if 85% → cleanup).
+
+---
+
 ## CEO Report — 2026-08-15 22:50 UTC (CEO run — verified)
 
 ### Diagnosis

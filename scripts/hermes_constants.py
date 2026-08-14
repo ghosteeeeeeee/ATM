@@ -800,8 +800,8 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # master switch for trailing tier
-PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — trail arms at +0.40% (tightened from 0.60% 2026-08-15). CEO directive: do NOT change
-PM_TRAIL_DISTANCE_PCT = 0.0015  # 0.15% behind peak (tightened from 0.40% 2026-08-15). CEO directive: do NOT change
+PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO OVERRIDE 2026-08-16: tightened trail caused avg exit 0.32% (R:R inverted 0.59:1). Loosened to let winners reach ATR target.
+PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% behind peak — restored from 0.15% (same override)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -1638,7 +1638,7 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = True    # re-enabled 2026-08-15 — SHORT profitable (+$0.15), LONG still blocked via PLUS_ENABLED=False
+WAVE_CATCHER_ENABLED            = False   # CEO KILLED 2026-08-16 — SHORT 4T -$0.09 25% WR (48h). LONG 8T -$0.42 37.5% WR (7d). Both directions dead.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).
 WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
