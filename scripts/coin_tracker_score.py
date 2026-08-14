@@ -91,15 +91,21 @@ def macd(closes, fast=12, slow=26, signal_period=9):
     return macd_line, signal_line, histogram
 
 def atr(highs, lows, closes, period=14):
-    """Average True Range."""
+    """Average True Range with Wilder's smoothing."""
     if len(closes) < period + 1:
         return None
     trs = []
-    for i in range(min(period, len(closes) - 1)):
-        h, l, c_prev = highs[i], lows[i], closes[i + 1]
-        tr = max(h - l, abs(h - c_prev), abs(l - c_prev))
+    for i in range(1, len(closes)):
+        h, l, prev = highs[i], lows[i], closes[i-1]
+        tr = max(h - l, abs(h - prev), abs(l - prev))
         trs.append(tr)
-    return sum(trs) / len(trs) if trs else None
+    if len(trs) < period:
+        return None
+    # ponytail: Wilder's smoothing (matches coin_tracker_analysis.py)
+    atr_val = sum(trs[:period]) / period
+    for tr in trs[period:]:
+        atr_val = (atr_val * (period - 1) + tr) / period
+    return atr_val
 
 def spread_bps(bid, ask, price):
     """Spread in basis points."""

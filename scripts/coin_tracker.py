@@ -29,6 +29,8 @@ from coin_tracker_score import (
     score_volatility as _score_volatility, score_spread as _score_spread,
     score_signals as _score_signals, score_regime as _score_regime,
     compute_coin_regime as _compute_coin_regime,
+    score_wyckoff as _score_wyckoff, score_ewave as _score_ewave,
+    score_trend_quality as _score_trend_quality,
 )
 from coin_tracker_analysis import analyze_coin
 
@@ -321,10 +323,9 @@ def collect():
                 vol_profile = analysis.get('vol_profile', {})
 
                 # ── Compute analysis-based scores ──
-                from coin_tracker_score import score_wyckoff, score_ewave, score_trend_quality
-                s_wyckoff = score_wyckoff(wyckoff.get('phase'))
-                s_ewave = score_ewave(ewave.get('wave'), ewave.get('direction'))
-                s_trend_quality = score_trend_quality(trend.get('score'))
+                s_wyckoff = _score_wyckoff(wyckoff.get('phase'))
+                s_ewave = _score_ewave(ewave.get('wave'), ewave.get('direction'))
+                s_trend_quality = _score_trend_quality(trend.get('score'))
 
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +

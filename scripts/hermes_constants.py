@@ -887,7 +887,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-14 # hzscore+ — 31.3% WR, +13.92% PnL
+HZSCORE_PLUS_ENABLED     = False  # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
@@ -1144,7 +1144,7 @@ RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific wit
 RANGE_BREAKOUT_ENABLED = True
 RANGE_BREAKOUT_PLUS_ENABLED = False   # range_breakout+ LONG — DISABLED CEO 2026-08-12 — 8T 25% WR -$0.41 in 24h. All losses.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
-RANGE_BREAKOUT_SHORT_ENABLED = False  # CEO KILLED 2026-08-13 — 10T 20% WR -$0.50 in 24h (was +$0.18 57.9% 7d, flipped). Revert if regime improves.
+RANGE_BREAKOUT_SHORT_ENABLED = True   # CEO RE-ENABLED 2026-08-14 — 25T +$0.06 52% WR (7d), legacy SHORT bleed clearing. Revert if regime degrades.
 RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)

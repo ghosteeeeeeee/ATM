@@ -1,13 +1,18 @@
-## CEO Report — 2026-08-14 (CEO run — verified)
+## CEO Report — 2026-08-14 (CEO run — verified + 2 changes)
 
 ### Diagnosis
-24h: 52T **-$0.94** (50% WR — RED). 7d: 428T **-$0.48** (51.3% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 53T **-$1.58** (43.4% WR — worst day, legacy clearing) → Aug 14 14T **+$0.07** (64.3% WR — recovering). 6 open **-$0.03** flat. LONG 7d: 240T +$0.76 (profitable). SHORT 7d: 188T -$1.24 (100% legacy disabled signals). Active SHORT signals flat/profitable (range_breakout_short 25T +$0.06, bb-bounce-short,hzscore- 18T +$0.14). Stars7d intact (5 profitable): bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb_bounce+ 21T +$0.21 61.9%, bb_bounce+,hzscore+ 34T +$0.22 50%, hzscore+,mover+ 5T +$0.17 80%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Cost drivers48h: atr_sl_hit 70T **-$5.12** (dominant), profit-monster-trail compensating. hzscore+ standalone 14d -$0.20 (38.5% WR, inverted R:R at confidence 84+: 0% WR 6T -$0.29 vs confidence ≤80: 71.4% WR 7T +$0.09) — small impact, auto-rotated.
+24h: 56T **-$0.76** (53.6% WR — RED but recovering). 7d: 439T **-$0.30** (51.3% WR — flat, stable). Daily: Aug 13 53T **-$1.58** (43.4% WR — worst day, legacy clearing) → Aug 14 20T **+$0.09** (65% WR — recovering). 5 open LONG **$0** flat. LONG 7d: profitable. SHORT 7d: legacy clearing. Stars7d intact (5 profitable): bb_bounce+,range_finder+ 53T +$0.71 58.5%, bb_bounce+ 21T +$0.21 61.9%, bb_bounce+,hzscore+ 34T +$0.22 50%, hzscore+,mover+ 5T +$0.17 80%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Cost drivers48h: atr_sl_hit 71T **-$5.19** (dominant). hzscore+ standalone 30d 13T **-$0.20** (38.5% WR, inverted R:R: avg_win $0.053 vs avg_loss $0.073). range_breakout_short 25T **+$0.06** (52% WR, 7d — slightly profitable).
 
 ### Root Cause
-All 7d SHORT losses from disabled legacy signals: accel-300- 40T -$0.30, range_breakout+ 8T -$0.41, trend_momentum 6T -$0.37, hzscore- 32T -$0.21, continuation-,hzscore- 5T -$0.24. Aug 13 was worst day (-$1.58) from legacy clearing. Active SHORT signals flat/profitable. hzscore+ standalone bleeding -$0.20/14d (inverted R:R at high confidence 84+) — small impact, auto-rotated.
+1. hzscore+ standalone bleeding -$0.20/30d (38.5% WR, inverted R:R) — combo versions profitable, standalone dead weight.
+2. Legacy SHORT trades clearing slowly — all from disabled signals, Aug 13 was worst day.
+3. Aug 14 recovering: 20T +$0.09 (65% WR), 5 fresh LONG entries.
 
 ### Fix Applied
-NO CHANGES. All bleeders already disabled, legacy closing naturally. System stabilizing — Aug 14 recovering (+$0.07, 64.3% WR). 7d improved from -$0.67 to -$0.48 over past week.
+1. **DISABLED HZSCORE_PLUS_ENABLED=False** — standalone hzscore+ 13T -$0.20/30d, 38.5% WR. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable.
+2. **RE-ENABLED RANGE_BREAKOUT_SHORT_ENABLED=True** — 25T +$0.06/7d, 52% WR. Slightly profitable, adds SHORT signal diversity as legacy bleed clears.
+
+Expected: -$0.20/30d saved (hzscore+ standalone), +$0.06/7d maintained (range_breakout_short). Monitor: daily PnL (if -2 consecutive red → investigate), range_breakout_short (if degrades → re-disable), SHORT7d (if still negative after legacy fully clears → regime filter).
 
 ### Stars7d (5 intact)
 bb_bounce+,range_finder+ 53T +$0.71 58.5% | bb_bounce+ 21T +$0.21 61.9% | bb_bounce+,hzscore+ 34T +$0.22 50% | hzscore+,mover+ 5T +$0.17 80% | bb-bounce-short,hzscore- 18T +$0.14 61.1%
