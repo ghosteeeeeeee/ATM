@@ -1,3 +1,36 @@
+## CEO Report — 2026-08-15 (verified)
+
+### Diagnosis
+24h: 79T -$0.62 (53.2% WR — RED). 7d: 438T -$0.30 (51.3% WR — stable). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.25 (recovering). 4 open $0 flat. R:R inverted: avg win 0.44% vs avg loss 0.77% (0.57:1). ATR_TP_K_MULT 1.5 and PM_TRAIL 0.40 deployed, evaluation window active.
+
+### Root Cause
+R:R structural: stop losses avg -$0.077 vs trailing profits avg +$0.039. Even 53% WR can't overcome 0.57:1 ratio. ATR fix should increase TP target, PM_TRAIL widening should let winners run longer.
+
+### Fix Applied
+NO CHANGES — stability period. ATR_TP_K_MULT 1.5 and PM_TRAIL_DISTANCE_PCT 0.40 in 48h evaluation window. Changing params during eval invalidates results.
+
+### Verification
+Monitor 48h: avg trail win (should increase from 0.44% toward 0.77%+), daily PnL (if -2 consecutive red → investigate), atr_sl_hit count (should decrease). Secondary: phantom trades (128x), stale prices (17 tokens), disk at 82%.
+
+---
+
+## CEO Report — 2026-08-15 (latest verified)
+
+### Diagnosis
+24h: 80T -$0.65 (52.5% WR — RED). 7d: 445T +$0.38 (53.0% WR — barely positive). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.25 (recovering). 2 open flat. Both LONG (-$0.41 56.1% WR) and SHORT (-$0.24 43.5% WR) negative 24h. Biggest bleeder: wave_catcher+ LONG 6T -$0.34 33.3% WR. R:R structural: avg SL -$0.080 vs avg trail +$0.034 (0.43:1 inverted). ATR_TP_K_MULT 1.5 deployed, needs 48h eval.
+
+### Root Cause
+1. wave_catcher+ LONG consistently worst performer — 6T -$0.34 33.3% WR 24h, negative across all timeframes. Base WAVE_CATCHER_ENABLED still fires LONG despite PLUS variant killed.
+2. R:R inverted: stop losses avg -$0.080, trailing profits avg +$0.034. Even 52.5% WR can't overcome 0.43:1 ratio.
+
+### Fix Applied
+DISABLED WAVE_CATCHER_ENABLED (was True). wave_catcher+ LONG is worst active signal. SHORT profitable but base flag fires both directions. No R:R param changes during stability period (ATR_TP_K_MULT 1.5 eval window active).
+
+### Verification
+Monitor 24h: daily PnL (should improve ~$0.06/day from wave_catcher+ kill), R:R ratio (ATR_TP_K_MULT eval closes in ~24h), SHORT7d (legacy clearing, should improve).
+
+---
+
 ## CEO Report — 2026-08-14 (latest verified)
 
 ### Diagnosis
@@ -11,45 +44,3 @@ CHANGED PM_TRAIL_DISTANCE_PCT 0.20→0.40. Trail now gives 0.40% room behind pea
 
 ### Verification
 Monitor 48h: avg trail win (should increase from 0.46%), daily PnL (if -2 consecutive red → revert PM_TRAIL), atr_sl_hit count (should decrease as fewer premature exits).
-
----
-
-## CEO Report — 2026-08-15 (verified latest)
-
-### Diagnosis
-24h: 77T -$0.68 (51.9% WR — RED). 7d: ~445T -$0.83 (51.3% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.20 (recovering). Stars7d intact (5 profitable). Cost drivers48h: atr_sl_hit 63T -$4.82 (96% of losses).
-
-### Root Cause
-R:R imbalance structural: avg SL loss -$0.077 vs avg trail win +$0.039 (2:1 unfavorable). ATR_TP_K_MULT was 1.2 — TP target too close to SL, trades get stopped out before reaching profit. atr_sl_hit dominates losses (63T -$4.82 in 48h).
-
-### Fix Applied
-CHANGED ATR_TP_K_MULT 1.2→1.5. Targets 1.5:1 R:R instead of 1.2:1. Gives trades more room to reach profit before trailing SL takes over. Expected: fewer premature atr_sl_hit exits, higher avg win.
-
-### Verification
-Monitor 48h: ATR avg win (should increase from $0.039), atr_sl_hit count (should decrease), daily PnL (if -2 consecutive red → revert).
-
----
-
-## CEO Report — 2026-08-14 (12:49 UTC — verified)
-
-### Diagnosis
-24h: 75T -$0.85 (52.0% WR — RED). 7d daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.40 (recovering). 2 open flat ($0). Stars7d intact (5 profitable). Cost drivers48h: atr_sl_hit 64T -$4.89 (96% of losses). Wave_catcher+ LONG already disabled. mover+ LONG 4T -$0.24 25% WR (below 10-trade threshold).
-
-### Root Cause
-R:R imbalance structural: avg SL loss -$0.077 vs avg trail win +$0.039 (2:1 unfavorable). ATR_SL hit dominates (64T -$4.89 in 48h). Legacy SHORT bleeders (accel-300-, hzscore-, range_breakout-) draining via residual trades — all disabled. Wave_catcher+ LONG already disabled. mover+ standalone bleeding but combo (hzscore+,mover+ 80% WR) is a star — can't disable without collateral.
-
-### Fix Applied
-NO CHANGES — system in stability period (14+ changes in 48h). Stars intact. Daily recovering. ATR_TP_K_MULT 1.0→1.2 deployed, needs48h evaluation. Dedicated R:R tuning session needed (not CEO band-aid).
-
-### Verification
-- 24h: -$0.85 (stable vs -$0.75 last run) ✓
-- 7d daily: Aug 13 -$1.58 → Aug 14 -$0.40 (recovering) ✓
-- Stars7d: 5 profitable intact ✓
-- Pipeline: healthy ✓
-- 2 open trades flat ✓
-
-### Monitor
-- daily PnL: if -2 consecutive red after today → investigate root cause
-- range_breakout_short: if 7d degrades below 45% WR → re-disable
-- mover+ LONG: if reaches 10T without improvement → consider standalone disable
-- ATR avg win: should increase from ~0.49% after TP_K_MULT adjustment
