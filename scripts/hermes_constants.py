@@ -799,7 +799,7 @@ PM_TRAIL_ENABLED     = True   # master switch for trailing tier
 PM_TRAIL_ACTIVATE_PCT = 0.30  # mark trade as "in profit" at this threshold — activate trailing sooner to lock more profit (backtested optimal for wave_catcher)
 PM_TRAIL_DISTANCE_PCT = 0.40  # trail 0.40% behind peak (widened from 0.20% — avg trail win was 0.46% vs avg SL 0.60%, inverted R:R. 0.40% lets winners run closer to ATR_TP_K_MULT target)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
-PM_TRAIL_FIRE_WINDOWS = {"A": (0.5, 1), "B": (1, 2)}  # check every 30-60s (fast)
+PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
 PM_DRY_RUN          = False  # global kill switch
 PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB amount_usdt unavailable
@@ -1042,6 +1042,7 @@ R2_TREND_LONG_MIN_SPEED     = 30      # min speed percentile — require some mo
 R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band top
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
+R2_TREND_LONG_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces)
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT

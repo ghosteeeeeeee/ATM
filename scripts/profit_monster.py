@@ -346,9 +346,11 @@ def run_trail(positions, dry_run):
             # MUST check this BEFORE "dropped below activation" — otherwise
             # a sharp drop clears state instead of triggering exit.
             trail_floor = trail["peak_pnl"] - PM_TRAIL_DISTANCE_PCT
-            if pnl <= trail_floor:
+            # Breakeven guard: never hold a trailed trade into loss
+            effective_floor = max(trail_floor, 0.0)
+            if pnl <= effective_floor:
                 log(f"  [TRAIL] {pos['token']} trailing exit: peak={trail['peak_pnl']:.2f}% "
-                    f"current={pnl:.2f}% floor={trail_floor:.2f}%")
+                    f"current={pnl:.2f}% floor={effective_floor:.2f}% (raw={trail_floor:.2f}%)")
                 ok = close_position(pos["id"], pos["token"], pos["direction"],
                                     pnl, pos["current_price"], dry_run, "trail")
                 if ok:

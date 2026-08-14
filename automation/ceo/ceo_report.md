@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-14 15:20 UTC (verified)
+
+### Diagnosis
+24h: 80T -$0.93 (50.0% WR — RED). 7d: 451T -$0.74 (51.7% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.46 (67T, 52.2%). 2 open $0 flat. ATR fix eval ~26h: avg win 0.51% (up from 0.44%), avg loss 0.74%, R:R 0.69:1 (improving but still inverted). Exit reasons: atr_sl_hit 32T -$2.65 (96% of losses), profit-monster-trail 45T +$1.46 (avg 0.34%). Stars7d intact: bb_bounce+,range_finder+ 52T +$0.70 57.7%, bb_bounce+ 21T +$0.21 61.9%.
+
+### Root Cause
+R:R structural: avg win 0.51% vs avg loss 0.74% — trailing exits too early (0.34% avg), ATR SL too wide (0.82% avg). wave_catcher+ LONG already disabled. Accel-300- (35T -$0.31) and hzscore- (16T -$0.17) legacy SHORTs still draining 7d but clearing.
+
+### Fix Applied
+NO CHANGES — ATR_TP_K_MULT 1.5 eval window ~26h old. Changing now invalidates measurement. If Aug 15 also red → bump ATR_TP_K_MULT 1.5→2.0 (expected avg win 0.68%, R:R ~0.92:1).
+
+### Verification
+Monitor: daily PnL (if 3rd consecutive red → ATR_TP_K_MULT 2.0), avg trail win (should reach 0.55%+ by 48h), disk (82% — if hits 85% → cleanup).
+
+---
+
 ## CEO Report — 2026-08-15 (verified)
 
 ### Diagnosis

@@ -32,6 +32,7 @@ from hermes_constants import (
     R2_TREND_LONG_MAX_BB_POS,
     R2_TREND_LONG_BLOCK_STALE,
     R2_TREND_LONG_MAX_ACCEL,
+    R2_TREND_LONG_MIN_PRE_MOVE,
     CANDLES_STALENESS_SEC,
     LONG_BLACKLIST,
 )
@@ -117,6 +118,27 @@ def detect_r2_long(token, candles, price):
             gap300 = (closes_ema[-1] - ema_val) / ema_val * 100 if ema_val > 0 else 0
             if gap300 > 0.50:
                 return None  # price too far above EMA300 — extended, skip LONG
+    except Exception:
+        pass
+
+    # ── Pre-entry move filter (2026-08-14) ─────────────────────────────────
+    # Block LONG when price was dropping before entry — catches dead-cat bounces.
+    # Backtest: blocks 3/6 losers, 4/13 winners. Net: avoids -0.95%, -0.33%, -0.78%.
+    try:
+        from paths import CANDLES_DB
+        conn_pm = sqlite3.connect(CANDLES_DB, timeout=5)
+        try:
+            rows_pm = conn_pm.execute(
+                "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 16",
+                (token.upper(),)
+            ).fetchall()
+        finally:
+            conn_pm.close()
+        if rows_pm and len(rows_pm) >= 15:
+            closes_pm = [r[0] for r in reversed(rows_pm)]
+            pre_move = (closes_pm[-1] - closes_pm[0]) / closes_pm[0] * 100 if closes_pm[0] > 0 else 0
+            if pre_move < R2_TREND_LONG_MIN_PRE_MOVE:
+                return None  # price dropping before entry — skip LONG
     except Exception:
         pass
 
