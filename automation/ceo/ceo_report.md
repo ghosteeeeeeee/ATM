@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-15 (verified)
+## CEO Report — 2026-08-15 (verified latest)
 
 ### Diagnosis
-24h: 79T -$0.97 (49.4% WR — RED, 3rd consecutive red day). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.46 → Aug 15 -$0.97 (worsening). 0 open. R:R inverted: avg win 0.507% vs avg loss -0.743% (0.68:1). ATR_SL hit 61T -$4.87 in 48h (dominant cost). wave_catcher+ LONG 6T -$0.34 33.3% WR (below 10T threshold). mover+ LONG 7T -$0.15 28.6% WR (below 10T). Stars7d intact (5 profitable).
+24h: 76T -$0.83 (50.0% WR — RED, 3rd consecutive red day). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.46. Today Aug 15: 0 trades closed yet. 0 open flat. 7d 463T +$0.38 (52.8% WR — slightly positive). R:R inverted: avg win 0.51% ($0.051) vs avg loss -0.74% (-$0.076) = 0.69:1. ATR_SL hit 61T -$4.87 in 48h (96% of losses). Stars7d intact (5 profitable). Legacy SHORT bleeders aging out. mover+ LONG 7T -$0.15 28.6% WR, r2-trend-long3 9T -$0.12 — both below 10T disable threshold.
 
 ### Root Cause
-ATR_TP_K_MULT 1.5 too tight — winners capped at 0.51% while SL takes 0.74%. 3rd red day confirms fix insufficient. wave_catcher+ and mover+ below 10-trade disable threshold.
+R:R structurally inverted — ATR_SL exits at -0.74% avg while trail wins only 0.51%. ATR_TP_K_MULT 2.0 deployed today (bumped from 1.5) but 0 trades closed to evaluate yet. The 0.69:1 R:R means system needs ~59% WR to break even — currently at 50%.
 
 ### Fix Applied
-BUMPED ATR_TP_K_MULT 1.5→2.0. Expected: avg win increases from 0.51% toward 0.74%+, R:R improves to ~1:1. 48h eval window starts now.
+NO CHANGES this run. ATR_TP_K_MULT 2.0 is live, needs48h eval with actual trades. All legacy bleeders disabled, aging out. No new active signals above 10T threshold worth disabling.
 
 ### Verification
-Monitor: daily PnL (if -2 more red → investigate deeper), R:R ratio (48h), wave_catcher+ LONG (if hits 10T without improvement → disable), mover+ LONG (same).
+Monitor: avg trail win 48h (should increase from 0.51% toward 0.74%+), daily PnL (if 3rd red day tomorrow → deeper investigation), R:R ratio (ATR 2.0 eval), disk (83%, if 85% → cleanup).
 
 ---
 

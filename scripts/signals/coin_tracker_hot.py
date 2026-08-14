@@ -91,18 +91,22 @@ def detect(token, data):
     trend_dir = data.get('trend_direction') or 'NEUTRAL'
     wyckoff = data.get('wyckoff_phase') or 'none'
 
-    # Primary trigger: health must be hot or ready
-    if health not in ('hot', 'ready'):
+    # Primary trigger: health must be hot/ready OR warm with strong momentum
+    is_hot = health in ('hot', 'ready')
+    is_warm_momentum = health == 'warm' and (data.get('momentum') or 0) > 70 and max(clustering_bull, clustering_bear) >= 2
+    
+    if not is_hot and not is_warm_momentum:
         return None
 
     # Must meet minimum composite threshold
     if composite < COIN_TRACKER_HOT_MIN_COMPOSITE:
         return None
 
-    # Must have real structure signal (wyckoff or ewave — trend alone is not enough)
+    # Must have structure signal: wyckoff/ewave OR trend + clustering
     has_structure = (
         (wyckoff and wyckoff != 'none') or
-        (data.get('ewave_count') is not None)
+        (data.get('ewave_count') is not None) or
+        (trend_dir and trend_dir != 'NEUTRAL' and max(clustering_bull, clustering_bear) >= 1)
     )
     if not has_structure:
         return None
