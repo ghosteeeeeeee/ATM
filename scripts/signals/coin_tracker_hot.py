@@ -43,7 +43,7 @@ def _read_tracker_data():
         conn = sqlite3.connect(COIN_TRACKER_DB, timeout=10)
         conn.row_factory = sqlite3.Row
         rows = conn.execute("""
-            SELECT symbol, health, composite, setup_score, setup_type, setup_details,
+            SELECT symbol, health, composite, momentum, setup_score, setup_type, setup_details,
                    clustering_bullish, clustering_bearish, recency,
                    wyckoff_phase, ewave_count, ewave_direction,
                    trend_quality, trend_direction
@@ -93,7 +93,7 @@ def detect(token, data):
 
     # Primary trigger: health must be hot/ready OR warm with strong momentum
     is_hot = health in ('hot', 'ready')
-    is_warm_momentum = health == 'warm' and (data.get('momentum') or 0) > 70 and max(clustering_bull, clustering_bear) >= 2
+    is_warm_momentum = health == 'warm' and (data.get('momentum') or 0) > 70 and max(clustering_bull, clustering_bear) >= 1
     
     if not is_hot and not is_warm_momentum:
         return None
