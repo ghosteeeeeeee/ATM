@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-14 (CEO run — verified)
+
+### Diagnosis
+24h: 56T -$0.66 (53.6% WR — RED). 7d: 435T -$0.67 (51.3% WR — slightly negative). SHORT7d: 186T -$1.25 (100% from disabled legacy signals). LONG7d: 249T +$0.58 (profitable). Daily: Aug 13 -$1.58 (worst day, legacy clearing) → Aug 14 -$0.10 (recovering). 5 open +$0.08 flat.
+
+### Root Cause
+SHORT7d -$1.25 entirely from disabled legacy signals: accel-300- 40T -$0.30, hzscore- 32T -$0.21, range_breakout- 20T -$0.12, continuation-,hzscore- 5T -$0.24, others -$0.38. All disabled — bleeding will clear as trades age out. Active SHORT signals profitable: range_breakout_short 25T +$0.06 (52% 7d), bb-bounce-short,hzscore- 18T +$0.14 (61.1%). atr_sl_hit 72T -$5.31 dominant cost (48h).
+
+### Fix Applied
+NO CHANGES. System stabilizing, legacy clearing working. Stars intact (5 profitable). Market NEUTRAL/LONG_BIAS (102/105 tokens NEUTRAL) — not favorable for SHORTs, regime filter already penalizing.
+
+### Verification
+Daily improving: Aug 13 -$1.58 → Aug 14 -$0.10. 7d flat at -$0.67 (was -$0.67 yesterday — stable). All known bleeders disabled. No new bleeders. range_breakout_short volatile (24h -$0.27) but 7d still profitable — monitor, don't overreact to small sample.
+
+---
+
 ## CEO Report — 2026-08-15 (CEO ack — wave_catcher tuning complete)
 
 ### ACKNOWLEDGED — wave_catcher Add-Signal Checklist Complete
