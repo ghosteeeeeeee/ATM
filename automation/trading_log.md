@@ -7894,3 +7894,35 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - hzscore- 0% WR — if next trade is also a loss, kill it
 - R:R imbalance needs ATR_TP_K_MULT or trailing param tuning (dedicated session)
+
+## [2026-08-14 17:30] Hourly Analysis
+
+**Trades:** 0 closed last hour. System flat (0 open).
+**24h:** 73T 52.1% WR -$0.62
+
+**24h Close Reasons:**
+- profit-monster-trail: 41T +$1.28 (avg +$0.031)
+- atr_sl_hit: 29T -$2.34 (avg -$0.081) — **40.0%** of closes (at threshold)
+- atr_tp_hit: 1T +$0.20
+- cut_loser: 1T -$0.11
+- HL_CLOSED: 1T +$0.17
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long2: 12T 58.3% WR +$0.14 (best)
+- ⚠️ wave_catcher+: 13T 38.5% WR -$0.19 (worst volume signal)
+- ⚠️ mover+: 7T 28.6% WR -$0.15
+- ❌ hzscore-: 3T 0% WR -$0.30 (below kill threshold sample size)
+- ⚠️ range_breakout_short: 3T 33.3% WR -$0.11
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No trades to analyze this hour
+- ATR SL% stable at 40.0% (was 42% earlier — fix working)
+- No 0% WR kill candidates with 3+ trades (hzscore- has exactly 3T)
+- System flat, no open risk
+- Trade freq normal
+
+**Open Questions:**
+- hzscore- at 3T 0% WR — kill on next loss or wait?
+- R:R imbalance structural (SL avg -$0.081 vs trail avg +$0.031)

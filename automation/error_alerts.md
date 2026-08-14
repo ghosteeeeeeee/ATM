@@ -13,3 +13,9 @@
 ## Error Alerts — 2026-08-14 17:41 UTC
 - **[WARN]**: Disk at 83% — 2% from WARN threshold (85%). Recommend: `find /root/.hermes/logs -name "*.log" -mtime +7 -exec gzip {} \;`
 - **[WARN]**: Phantom trade — NOT SHORT #13822 closed at exactly 0.00% PnL
+
+## Error Alerts — 2026-08-14 18:42 UTC
+- **[WARN]** (6x): Auxiliary services in failed state (better-coder, bug-hunter, hl-volume, mtf-macd-tuner, trading-checklist, wasp)
+- **[WARN]**: Market 100% NEUTRAL — 104 tokens, no directional bias, hotset empty
+- **[INFO]**: Pipeline healthy — 0 open positions, 73 closed today, -8.10% PnL
+- **ROOT CAUSES**: hl-volume=429 rate limit, mtf-macd=AttributeError, better-coder=ModuleNotFoundError
