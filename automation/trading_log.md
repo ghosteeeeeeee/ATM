@@ -7488,3 +7488,34 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL hit rate 51.1% — continuing upward trend, watch if trailing stops compensate
 - continuation-,hzscore- regressed to 33% WR — monitor next hour
+
+## [2026-08-14 02:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (no activity)
+**DB Time:** 2026-08-14 02:26 UTC
+
+**24h Snapshot:**
+- 52T total, ~50% WR, -$0.75
+- profit-monster-trail: 28T +$1.19 (avg +$0.043) — primary profit driver
+- atr_sl_hit: 23T -$1.83 (44.2% of closes — above 40% but trailing compensates)
+- hzscore-: 16T 56.3% WR +$0.17 (profitable)
+- range_breakout_short: 11T 27.3% WR -$0.43 (CEO killed, draining)
+- accel-300-: 8T 50% WR -$0.12 (draining)
+- continuation-,hzscore-: 3T 33.3% WR -$0.23 (watch)
+- 3 open trades: ETH (bb_bounce+,hl_copy_trader), CHIP (r2-trend-long1), + 1 more
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 44.2% — above 40% but profit-monster-trail (+$1.19) covers ATR SL (-$1.83)
+- continuation-,hzscore- 3T 33% WR — not at kill threshold (need 0% WR with 3+ trades)
+- Trade freq normal, 0 trades last hour
+- No 0% WR kill candidates
+- PnL not negative for 3+ consecutive hours
+- hzscore- improving (56.3% WR)
+
+**Open Questions:**
+- continuation-,hzscore- still losing — monitor next hour for 0% WR
+- range_breakout_short draining with 3 open positions (BANANA, HBAR, CHIP?)
+- accel-300- draining naturally

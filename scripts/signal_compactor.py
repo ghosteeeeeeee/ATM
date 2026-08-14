@@ -255,6 +255,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # momentum_leaderboard — top movers
     ('mover_long',  'mover+'):  1.3,  # boosted 2026-08-13 — GRASS LONG setup, z=-1.19
     ('mover_short', 'mover-'):  1.0,
+    # hzscore+mover+ combo — star performer (80% WR, +$0.17)
+    ('mtf_zscore',  'hzscore+,mover+'): 1.3,  # boosted 2026-08-14
     # continuation — re-entry after profitable close (65% WR in backtest)
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,

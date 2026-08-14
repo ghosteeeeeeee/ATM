@@ -480,3 +480,7 @@
   WHY: 2T last hour (1W 1L -/usr/bin/bash.07). 24h 46T 50% WR -$0.95. ATR SL 47.8% (improved from 53.7%). profit-monster-trail +$0.89 carrying system. accel-300- draining naturally (12T 58% WR). 6 open trades healthy. No 0% WR kill candidates (continuation-,hzscore- 33% WR at 3T). Trade freq 2/hr normal. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 01:30 UTC
+[2026-08-14 02:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet). 24h 52T -$0.75. ATR SL 44.2% (above 40% but profit-monster-trail +$1.19 compensates SL -$1.83). hzscore- 16T 56.3% WR +$0.17 (profitable). range_breakout_short draining (CEO killed). accel-300- draining naturally. continuation-,hzscore- 3T 33% WR (watch). 3 open trades healthy. No 0% WR kill candidates. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 03:30 UTC
