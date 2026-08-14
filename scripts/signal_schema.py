@@ -1424,6 +1424,17 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            if _comp in ('ct-hot+', 'ct-hot-'):
+                try:
+                    from hermes_constants import COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED
+                    if direction == 'LONG' and not COIN_TRACKER_HOT_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COIN_TRACKER_HOT_PLUS_ENABLED=False', flush=True)
+                        return None
+                    if direction == 'SHORT' and not COIN_TRACKER_HOT_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" COIN_TRACKER_HOT_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -1931,6 +1942,7 @@ def is_component_disabled(component: str) -> bool:
             SQUEEZE_CROSS_ENABLED, SQUEEZE_CROSS_PLUS_ENABLED, SQUEEZE_CROSS_MINUS_ENABLED,
             WYCKOFF_ENABLED, WYCKOFF_PLUS_ENABLED, WYCKOFF_MINUS_ENABLED,
             RETURN_EXHAUSTION_SHORT_ENABLED,
+            COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2119,6 +2131,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'wyckoff+': return not WYCKOFF_PLUS_ENABLED
     if c == 'wyckoff-': return not WYCKOFF_MINUS_ENABLED
     if c == 'wyckoff': return not WYCKOFF_ENABLED
+    # coin_tracker_hot
+    if c == 'ct-hot+': return not COIN_TRACKER_HOT_PLUS_ENABLED
+    if c == 'ct-hot-': return not COIN_TRACKER_HOT_MINUS_ENABLED
+    if c == 'ct-hot': return not COIN_TRACKER_HOT_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 
