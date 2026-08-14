@@ -289,25 +289,29 @@ def _get_recent_wr():
 
 
 def macro_deployment_gate():
-    """Check market conditions. Returns 'FULL', 'REDUCE', or 'STOP'."""
+    """Check market conditions. Returns deployment modes per direction.
+
+    Returns dict: {'LONG': mode, 'SHORT': mode} where mode is 'FULL', 'REDUCE', or 'STOP'.
+    Regime-aware: aligned directions get FULL, counter-regime gets REDUCE, extreme gets STOP.
+    """
     try:
         from hermes_constants import (
             MACRO_GATE_ENABLED, MACRO_HIGH_VOL_THRESHOLD,
             MACRO_LOW_WR_THRESHOLD
         )
         if not MACRO_GATE_ENABLED:
-            return 'FULL'
+            return {'LONG': 'FULL', 'SHORT': 'FULL'}
     except ImportError:
-        return 'FULL'
+        return {'LONG': 'FULL', 'SHORT': 'FULL'}
 
-    # Check regime
+    # Check regime — regime scanner outputs LONG_BIAS, SHORT_BIAS, or NEUTRAL
     try:
         import json as _json
         regime_file = '/var/www/hermes/data/regime_5m.json'
         if os.path.exists(regime_file):
             with open(regime_file) as f:
                 regime_data = _json.load(f)
-            overall = regime_data.get('overall', 'NEUTRAL')
+            overall = regime_data.get('aggregate', {}).get('overall', 'NEUTRAL')
         else:
             overall = 'NEUTRAL'
     except Exception:
@@ -319,16 +323,26 @@ def macro_deployment_gate():
     # Check recent win rate
     wr = _get_recent_wr()
 
-    # Decision
-    if overall == 'BEARISH' or vol > MACRO_HIGH_VOL_THRESHOLD:
-        _log(f"Macro gate: STOP (regime={overall}, vol={vol:.3f})")
-        return 'STOP'
-    elif overall == 'NEUTRAL' or wr < MACRO_LOW_WR_THRESHOLD:
-        _log(f"Macro gate: REDUCE (regime={overall}, wr={wr:.0f}%)")
-        return 'REDUCE'
+    # High volatility → STOP all directions
+    if vol > MACRO_HIGH_VOL_THRESHOLD:
+        _log(f"Macro gate: STOP (vol={vol:.3f} > {MACRO_HIGH_VOL_THRESHOLD})")
+        return {'LONG': 'STOP', 'SHORT': 'STOP'}
+
+    # Low win rate → REDUCE all directions
+    if wr < MACRO_LOW_WR_THRESHOLD:
+        _log(f"Macro gate: REDUCE (wr={wr:.0f}% < {MACRO_LOW_WR_THRESHOLD})")
+        return {'LONG': 'REDUCE', 'SHORT': 'REDUCE'}
+
+    # Regime-based: aligned = FULL, counter = REDUCE
+    if overall == 'LONG_BIAS':
+        _log(f"Macro gate: LONG=FULL, SHORT=REDUCE (regime={overall}, wr={wr:.0f}%)")
+        return {'LONG': 'FULL', 'SHORT': 'REDUCE'}
+    elif overall == 'SHORT_BIAS':
+        _log(f"Macro gate: LONG=REDUCE, SHORT=FULL (regime={overall}, wr={wr:.0f}%)")
+        return {'LONG': 'REDUCE', 'SHORT': 'FULL'}
     else:
         _log(f"Macro gate: FULL (regime={overall}, vol={vol:.3f}, wr={wr:.0f}%)")
-        return 'FULL'
+        return {'LONG': 'FULL', 'SHORT': 'FULL'}
 
 
 def score_signal(entry):
@@ -397,10 +411,12 @@ def score_signal(entry):
 
 def analyze_hotset():
     """Read hotset, score each signal, filter low-quality ones."""
-    # 1. Macro deployment gate
+    # 1. Macro deployment gate — returns per-direction modes
     deployment = macro_deployment_gate()
-    if deployment == 'STOP':
-        _log("Macro gate STOP — clearing hotset")
+
+    # If both directions STOP, clear hotset entirely
+    if deployment.get('LONG') == 'STOP' and deployment.get('SHORT') == 'STOP':
+        _log("Macro gate STOP (all directions) — clearing hotset")
         try:
             import tempfile
             fd, tmp = tempfile.mkstemp(dir=os.path.dirname(HOTSET_PATH), suffix='.tmp')
@@ -440,20 +456,29 @@ def analyze_hotset():
         direction = entry.get('direction', '')
         source = entry.get('source', '')
 
+        # Per-direction deployment
+        dir_deploy = deployment.get(direction, 'FULL')
+
+        # Skip signals stopped by macro gate
+        if dir_deploy == 'STOP':
+            blocked += 1
+            _log(f"  MACRO-BLOCK: {token} {direction} (regime counter)")
+            continue
+
         score, breakdown = score_signal(entry)
 
         # Apply deployment multiplier
-        if deployment == 'REDUCE':
+        if dir_deploy == 'REDUCE':
             entry['size_multiplier'] = 0.5
 
         if score >= MIN_SCORE:
             entry['ceo_score'] = score
             entry['ceo_breakdown'] = breakdown
-            entry['deployment'] = deployment
+            entry['deployment'] = dir_deploy
             filtered.append(entry)
             _log(f"  PASS: {token} {direction} score={score} "
                  f"trend={breakdown['trend']} rsi={breakdown['rsi']} "
-                 f"wr={breakdown['wr']}")
+                 f"wr={breakdown['wr']} deploy={dir_deploy}")
             
             # Log decision to persistent decision log
             try:
