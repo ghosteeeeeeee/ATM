@@ -318,7 +318,7 @@ SIGNAL_SOURCE_BLACKLIST = {
     'return_exhaustion-',
 }
 SERVER_NAME = 'Hermes'
-MAX_OPEN_POSITIONS = 6   # max open paper positions — diversified portfolio (was 3)
+MAX_OPEN_POSITIONS = 5   # max open paper positions — diversified portfolio (was 3)
 
 # ── Scanner Position Limits ─────────────────────────────────────────────────────
 # Unified limits for scanner slot allocation (unified_scanner.py)

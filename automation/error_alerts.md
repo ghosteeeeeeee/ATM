@@ -315,3 +315,7 @@ ALERTS:
 - **WARN** (1x): `0 signals above 50% confidence` — decider skipped execution. Expected given flat market.
 - **INFO**: Pipeline healthy, no crashes/errors. 5 open positions, 55 closed today (-7.66% PnL). All timers firing.
 - **NO AUTO-FIXES NEEDED** — all issues are market-state driven, not system failures.
+
+## Error Alerts — 2026-08-14 04:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing 2Z: cannot import name 'score_wyckoff' from 'coin_tracker_score' (/root/.hermes/scripts/coin_tracker_score.py)`
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: cannot import name 'score_wyckoff' from 'coin_tracker_score' (/root/.hermes/scripts/coin_tracker_score.py)`

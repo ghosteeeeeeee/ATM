@@ -106,6 +106,14 @@ def export_all():
                         'name': coin.get('name', sym),
                         'health': coin.get('health'),
                         'composite': coin.get('composite'),
+                        'wyckoff_phase': coin.get('wyckoff_phase'),
+                        'ewave_count': coin.get('ewave_count'),
+                        'ewave_degree': coin.get('ewave_degree'),
+                        'ewave_direction': coin.get('ewave_direction'),
+                        'trend_quality': coin.get('trend_quality'),
+                        'trend_direction': coin.get('trend_direction'),
+                        'sr_levels': coin.get('sr_levels'),
+                        'vol_profile': coin.get('vol_profile'),
                         'events': [dict(e) for e in events],
                     }
                     path = os.path.join(WWW_COINS, f'{sym}.json')
