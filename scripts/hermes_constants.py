@@ -797,7 +797,7 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # master switch for trailing tier
 PM_TRAIL_ACTIVATE_PCT = 0.30  # mark trade as "in profit" at this threshold — activate trailing sooner to lock more profit (backtested optimal for wave_catcher)
-PM_TRAIL_DISTANCE_PCT = 0.20  # trail 0.20% behind peak (backtested optimal for wave_catcher)
+PM_TRAIL_DISTANCE_PCT = 0.40  # trail 0.40% behind peak (widened from 0.20% — avg trail win was 0.46% vs avg SL 0.60%, inverted R:R. 0.40% lets winners run closer to ATR_TP_K_MULT target)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.5, 1), "B": (1, 2)}  # check every 30-60s (fast)
 
@@ -887,7 +887,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-14 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-14 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
@@ -1622,7 +1622,7 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = True
+WAVE_CATCHER_ENABLED            = False  # CEO KILLED 2026-08-15 — wave_catcher+ LONG 6T -$0.34 33.3% WR (24h worst). SHORT profitable. Revert if LONG improves.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 6T -$0.34 33.3% WR (24h). SHORT profitable (+$0.19). Revert if LONG improves.
 WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)

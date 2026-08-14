@@ -7715,3 +7715,32 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - R:R imbalance persists across 7d. Needs dedicated tuning session (not hourly band-aid).
 - continuation-,hzscore- combo 3T 33% WR — watch for deterioration.
+
+## [2026-08-14 14:30 UTC] Hourly Analysis
+
+**Trades:** 7 closed (4W 3L)
+**PnL:** +$0.17 (57.1% WR)
+**24h:** 77T, 51.9% WR, -$0.68
+**5d:** Aug 9 +$0.17, Aug 10 -$0.10, Aug 11 -$0.33, Aug 12 +$0.49, Aug 13 -$1.58, Aug 14 -$0.20
+
+**Changes:** None — no param changes this hour.
+
+**No Change Needed:**
+- No signal meets kill threshold (0% WR + 3+ trades). Only 1T 0% WR signals (continuation-,hzscore-, r2-trend-long2,rs-s45, bb_bounce+,r2-trend-long1) — too few trades to kill.
+- ATR SL hit 40.3% (31/77 24h) — barely above 40%, profit-monster-trail (+$1.52) compensates SL (-$2.46). Net from these two exits: -$0.94.
+- wave_catcher+ 12T 41.7% WR -$0.18 — weak but not 0% WR kill threshold.
+- hzscore- 10T 50% WR -$0.21 — WR fine but losing money.
+- mover+ 5T 40% WR -$0.04 — borderline.
+- range_breakout_short 6T 33.3% WR -$0.12 — CEO re-enabled, borderline.
+- Trade frequency 7/hr — normal.
+- 4 open trades healthy.
+- Aug 14 recovering (-$0.20 with 55% WR vs Aug 13's -$1.58).
+
+**R:R Imbalance (structural, needs dedicated session):**
+- 24h: atr_sl_hit avg -$0.079 vs profit-monster-trail avg +$0.035 (R:R ratio 0.44:1)
+- Trail wins are only 44% the size of SL losses → system needs ~69% WR to break even
+- This has persisted for days — needs dedicated tuning session, not hourly band-aid.
+
+**Open Questions:**
+- R:R imbalance worsening (0.44:1 vs 0.77:1 earlier today). Needs dedicated session.
+- wave_catcher+ and hzscore- both draining money — watch for further deterioration.

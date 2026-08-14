@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-14 (latest verified)
+
+### Diagnosis
+24h: 77T -$0.70 (51.9% WR — RED). 7d: daily Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.30 (54.1% WR — recovering). 3 open +$0.07. Stars7d intact (5 profitable). Exit reason 7d: profit-monster-trail 233T +$10.62 (avg 0.46%), atr_sl_hit 169T -$10.49 (avg 0.60%). R:R ratio 0.60:0.46 ≈ 1.3:1 UNFAVORABLE.
+
+### Root Cause
+PM_TRAIL too tight: distance 0.20% exits winners at avg 0.46% while SL avg loss is 0.60%. Trail activates at +0.30% and only gives 0.20% room — winners get shaken out on normal pullbacks before reaching ATR_TP_K_MULT target (1.5x SL). atr_sl_hit still dominant (169T -$10.49 7d).
+
+### Fix Applied
+CHANGED PM_TRAIL_DISTANCE_PCT 0.20→0.40. Trail now gives 0.40% room behind peak instead of 0.20%. Expected: avg trail win increases from 0.46% toward 0.60%+, R:R approaches 1:1 or better. ATR_TP_K_MULT 1.5 already in place from previous run.
+
+### Verification
+Monitor 48h: avg trail win (should increase from 0.46%), daily PnL (if -2 consecutive red → revert PM_TRAIL), atr_sl_hit count (should decrease as fewer premature exits).
+
+---
+
 ## CEO Report — 2026-08-15 (verified latest)
 
 ### Diagnosis
