@@ -11,12 +11,15 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.25,
-    'volume': 0.25,
-    'volatility': 0.15,
-    'spread': 0.15,
+    'momentum': 0.20,
+    'volume': 0.15,
+    'volatility': 0.10,
+    'spread': 0.10,
     'signals': 0.10,
-    'regime': 0.10,
+    'regime': 0.05,
+    'wyckoff': 0.15,
+    'ewave': 0.10,
+    'trend': 0.05,
 }
 
 # ── Indicators ─────────────────────────────────────────────────────────────────
@@ -218,6 +221,46 @@ def score_regime(regime):
     elif regime in ('SHORT_BIAS', 'BEAR'):
         return 40.0
     return 50.0
+
+def score_wyckoff(phase):
+    """Wyckoff phase score 0-100. Phase transitions are high-value."""
+    if phase == 'markup':
+        return 80.0  # Best long setup
+    elif phase == 'accumulation':
+        return 70.0  # Building position
+    elif phase == 'markdown':
+        return 25.0  # Avoid longs
+    elif phase == 'distribution':
+        return 35.0  # Potential short
+    return 50.0  # No pattern = neutral
+
+def score_ewave(wave, direction):
+    """Elliott Wave score 0-100. Wave 3 is strongest, wave 5 is late."""
+    if wave is None:
+        return 50.0
+    if wave == 3:
+        return 85.0  # Strongest wave
+    elif wave == 1:
+        return 65.0  # Early, good R:R
+    elif wave == 5:
+        return 55.0  # Late, lower conviction
+    elif wave == 2:
+        return 70.0  # Pullback = entry opportunity
+    elif wave == 4:
+        return 60.0  # Another pullback
+    elif wave == 'C':
+        return 45.0  # End of correction
+    elif wave == 'A':
+        return 35.0  # Start of correction
+    elif wave == 'B':
+        return 40.0  # Counter-trend bounce
+    return 50.0
+
+def score_trend_quality(trend_score):
+    """Trend quality score 0-100. Pass through with scaling."""
+    if trend_score is None:
+        return 50.0
+    return max(0, min(100, trend_score))
 
 def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=None):
     """Compute per-coin regime based on individual price action."""

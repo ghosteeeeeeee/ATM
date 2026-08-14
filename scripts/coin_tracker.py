@@ -30,6 +30,7 @@ from coin_tracker_score import (
     score_signals as _score_signals, score_regime as _score_regime,
     compute_coin_regime as _compute_coin_regime,
 )
+from coin_tracker_analysis import analyze_coin
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 MIN_PRICE = 1e-12           # Skip zero/near-zero prices
@@ -144,6 +145,7 @@ def collect():
     try:
         candles_5m = _read_candles_batch(tokens, '5m', 200, candles_conn)
         candles_1h = _read_candles_batch(tokens, '1h', 100, candles_conn)
+        candles_4h = _read_candles_batch(tokens, '4h', 100, candles_conn)
         signals = _read_signals_batch(tokens, hours=24, conn=signals_conn)
     finally:
         candles_conn.close()
@@ -303,13 +305,37 @@ def collect():
                 coin_regime = _compute_coin_regime(closes_5m, ema_9, ema_20, ema_50, rsi_14)
                 s_regime = _score_regime(coin_regime)
 
+                # ── Run analysis (Wyckoff, Elliott Wave, S/R, Trend, Volume Profile) ──
+                c5m_dicts = [{'ts': c[0], 'open': c[1], 'high': c[2], 'low': c[3], 'close': c[4], 'volume': c[5]}
+                             for c in reversed(candles_5m.get(symbol, []))]
+                c1h_dicts = [{'ts': c[0], 'open': c[1], 'high': c[2], 'low': c[3], 'close': c[4], 'volume': c[5]}
+                             for c in reversed(candles_1h.get(symbol, []))]
+                c4h_dicts = [{'ts': c[0], 'open': c[1], 'high': c[2], 'low': c[3], 'close': c[4], 'volume': c[5]}
+                             for c in reversed(candles_4h.get(symbol, []))]
+
+                analysis = analyze_coin(c5m_dicts, c1h_dicts, c4h_dicts)
+                wyckoff = analysis.get('wyckoff', {})
+                ewave = analysis.get('ewave', {})
+                sr_levels = analysis.get('sr_levels', [])
+                trend = analysis.get('trend', {})
+                vol_profile = analysis.get('vol_profile', {})
+
+                # ── Compute analysis-based scores ──
+                from coin_tracker_score import score_wyckoff, score_ewave, score_trend_quality
+                s_wyckoff = score_wyckoff(wyckoff.get('phase'))
+                s_ewave = score_ewave(ewave.get('wave'), ewave.get('direction'))
+                s_trend_quality = score_trend_quality(trend.get('score'))
+
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +
                     s_volume * WEIGHTS['volume'] +
                     s_volatility * WEIGHTS['volatility'] +
                     s_spread * WEIGHTS['spread'] +
                     s_signals * WEIGHTS['signals'] +
-                    s_regime * WEIGHTS['regime']
+                    s_regime * WEIGHTS['regime'] +
+                    s_wyckoff * WEIGHTS['wyckoff'] +
+                    s_ewave * WEIGHTS['ewave'] +
+                    s_trend_quality * WEIGHTS['trend']
                 )
 
                 # No candle data = no real activity → force cold/dead
@@ -323,7 +349,9 @@ def collect():
                 # Event
                 allowed = {'price', 'spread_bps', 'vol_1h', 'vol_24h',
                            'rsi_14', 'macd_hist', 'ema_9', 'ema_20', 'ema_50', 'atr_14',
-                           'health', 'health_score', 'signal_type', 'signal_confidence', 'regime'}
+                           'health', 'health_score', 'signal_type', 'signal_confidence', 'regime',
+                           'wyckoff_phase', 'ewave_count', 'ewave_degree', 'ewave_direction',
+                           'trend_quality', 'trend_direction', 'sr_levels', 'vol_profile'}
                 event_data = {
                     'ts': now, 'event_type': 'tick', 'price': price, 'spread_bps': spread_bps,
                     'vol_1h': vol_1h, 'vol_24h': vol_24h,
@@ -331,7 +359,15 @@ def collect():
                     'ema_9': ema_9, 'ema_20': ema_20, 'ema_50': ema_50, 'atr_14': atr_14,
                     'health': health, 'health_score': composite,
                     'signal_type': last_signal_type, 'signal_confidence': last_signal_conf,
-                    'regime': coin_regime
+                    'regime': coin_regime,
+                    'wyckoff_phase': wyckoff.get('phase'),
+                    'ewave_count': ewave.get('wave') if isinstance(ewave.get('wave'), int) else None,
+                    'ewave_degree': ewave.get('degree'),
+                    'ewave_direction': ewave.get('direction'),
+                    'trend_quality': trend.get('score'),
+                    'trend_direction': trend.get('direction'),
+                    'sr_levels': json.dumps(sr_levels[:5]) if sr_levels else None,
+                    'vol_profile': json.dumps(vol_profile) if vol_profile.get('poc') else None,
                 }
                 event_cols = {k: v for k, v in event_data.items() if k in allowed and v is not None}
                 event_cols['ts'] = now
@@ -342,14 +378,32 @@ def collect():
 
                 # Score
                 write_conn.execute("""
-                    INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
+                                            wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
+                                            trend_quality, trend_direction, sr_levels, vol_profile)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(symbol) DO UPDATE SET
                         ts=excluded.ts, health=excluded.health, score=excluded.score,
                         momentum=excluded.momentum, volume=excluded.volume, volatility=excluded.volatility,
                         spread=excluded.spread, signals=excluded.signals, regime=excluded.regime,
-                        composite=excluded.composite
-                """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite))
+                        composite=excluded.composite,
+                        wyckoff_phase=COALESCE(excluded.wyckoff_phase, agg_scores.wyckoff_phase),
+                        ewave_count=COALESCE(excluded.ewave_count, agg_scores.ewave_count),
+                        ewave_degree=COALESCE(excluded.ewave_degree, agg_scores.ewave_degree),
+                        ewave_direction=COALESCE(excluded.ewave_direction, agg_scores.ewave_direction),
+                        trend_quality=COALESCE(excluded.trend_quality, agg_scores.trend_quality),
+                        trend_direction=COALESCE(excluded.trend_direction, agg_scores.trend_direction),
+                        sr_levels=COALESCE(excluded.sr_levels, agg_scores.sr_levels),
+                        vol_profile=COALESCE(excluded.vol_profile, agg_scores.vol_profile)
+                """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite,
+                      wyckoff.get('phase'),
+                      ewave.get('wave') if isinstance(ewave.get('wave'), int) else None,
+                      ewave.get('degree'),
+                      ewave.get('direction'),
+                      trend.get('score'),
+                      trend.get('direction'),
+                      json.dumps(sr_levels[:5]) if sr_levels else None,
+                      json.dumps(vol_profile) if vol_profile.get('poc') else None))
 
                 # Registry
                 write_conn.execute("""

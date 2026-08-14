@@ -98,7 +98,15 @@ def init_db():
                 spread REAL,
                 signals REAL,
                 regime REAL,
-                composite REAL
+                composite REAL,
+                wyckoff_phase TEXT,
+                ewave_count INTEGER,
+                ewave_degree TEXT,
+                ewave_direction TEXT,
+                trend_quality REAL,
+                trend_direction TEXT,
+                sr_levels TEXT,
+                vol_profile TEXT
             )
         """)
         cur.execute("CREATE INDEX IF NOT EXISTS idx_scores_composite ON agg_scores(composite DESC)")
@@ -106,6 +114,7 @@ def init_db():
 
         conn.commit()
     _INIT_DONE = True
+    migrate_tables()
 
 _TABLE_EXISTS_CACHE = set()
 
@@ -147,7 +156,15 @@ def ensure_coin_table(symbol, conn=None):
                 signal_type TEXT,
                 signal_confidence REAL,
                 regime TEXT,
-                notes TEXT
+                notes TEXT,
+                wyckoff_phase TEXT,
+                ewave_count INTEGER,
+                ewave_degree TEXT,
+                ewave_direction TEXT,
+                trend_quality REAL,
+                trend_direction TEXT,
+                sr_levels TEXT,
+                vol_profile TEXT
             )
         """)
         conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
@@ -187,7 +204,15 @@ def ensure_coin_table(symbol, conn=None):
                 signal_type TEXT,
                 signal_confidence REAL,
                 regime TEXT,
-                notes TEXT
+                notes TEXT,
+                wyckoff_phase TEXT,
+                ewave_count INTEGER,
+                ewave_degree TEXT,
+                ewave_direction TEXT,
+                trend_quality REAL,
+                trend_direction TEXT,
+                sr_levels TEXT,
+                vol_profile TEXT
             )
         """)
         db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
@@ -196,6 +221,45 @@ def ensure_coin_table(symbol, conn=None):
         db.commit()
         _TABLE_EXISTS_CACHE.add(table)
     return table
+
+# ── Migration ────────────────────────────────────────────────────────────────
+
+_NEW_COLUMNS = [
+    ('wyckoff_phase', 'TEXT'),
+    ('ewave_count', 'INTEGER'),
+    ('ewave_degree', 'TEXT'),
+    ('ewave_direction', 'TEXT'),
+    ('trend_quality', 'REAL'),
+    ('trend_direction', 'TEXT'),
+    ('sr_levels', 'TEXT'),
+    ('vol_profile', 'TEXT'),
+]
+
+def migrate_tables():
+    """Add new columns to existing tables. Safe to call on every run."""
+    with _db() as conn:
+        # Migrate agg_scores
+        existing = {row[1] for row in conn.execute("PRAGMA table_info(agg_scores)").fetchall()}
+        for col, typ in _NEW_COLUMNS:
+            if col not in existing:
+                try:
+                    conn.execute(f"ALTER TABLE agg_scores ADD COLUMN {col} {typ}")
+                except sqlite3.OperationalError:
+                    pass
+
+        # Migrate per-coin tables
+        tables = [r[0] for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'coin_%' AND name != '_coin_registry'"
+        ).fetchall()]
+        for table in tables:
+            existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+            for col, typ in _NEW_COLUMNS:
+                if col not in existing:
+                    try:
+                        conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {typ}")
+                    except sqlite3.OperationalError:
+                        pass
+        conn.commit()
 
 def upsert_registry(symbol, name=None, max_leverage=None, decimals=None):
     """Add or update coin in registry. Idempotent."""
@@ -223,7 +287,9 @@ def write_event(symbol, event_type, ts=None, **kwargs):
         'rsi_14', 'macd_hist', 'ema_9', 'ema_20', 'ema_50', 'atr_14',
         'health', 'health_score',
         'signal_type', 'signal_confidence',
-        'regime', 'notes'
+        'regime', 'notes',
+        'wyckoff_phase', 'ewave_count', 'ewave_degree', 'ewave_direction',
+        'trend_quality', 'trend_direction', 'sr_levels', 'vol_profile'
     }
     cols = {k: v for k, v in kwargs.items() if k in allowed and v is not None}
     cols['ts'] = ts
@@ -236,12 +302,16 @@ def write_event(symbol, event_type, ts=None, **kwargs):
         conn.execute(f"INSERT INTO {table} ({col_names}) VALUES ({placeholders})", list(cols.values()))
         conn.commit()
 
-def write_score(symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite):
+def write_score(symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
+                wyckoff_phase=None, ewave_count=None, ewave_degree=None, ewave_direction=None,
+                trend_quality=None, trend_direction=None, sr_levels=None, vol_profile=None):
     """Write composite score for a coin. Upserts into agg_scores."""
     with _db() as conn:
         conn.execute("""
-            INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
+                                    wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
+                                    trend_quality, trend_direction, sr_levels, vol_profile)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(symbol) DO UPDATE SET
                 ts = excluded.ts,
                 health = excluded.health,
@@ -252,8 +322,18 @@ def write_score(symbol, ts, health, score, momentum, volume, volatility, spread,
                 spread = excluded.spread,
                 signals = excluded.signals,
                 regime = excluded.regime,
-                composite = excluded.composite
-        """, (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite))
+                composite = excluded.composite,
+                wyckoff_phase = COALESCE(excluded.wyckoff_phase, agg_scores.wyckoff_phase),
+                ewave_count = COALESCE(excluded.ewave_count, agg_scores.ewave_count),
+                ewave_degree = COALESCE(excluded.ewave_degree, agg_scores.ewave_degree),
+                ewave_direction = COALESCE(excluded.ewave_direction, agg_scores.ewave_direction),
+                trend_quality = COALESCE(excluded.trend_quality, agg_scores.trend_quality),
+                trend_direction = COALESCE(excluded.trend_direction, agg_scores.trend_direction),
+                sr_levels = COALESCE(excluded.sr_levels, agg_scores.sr_levels),
+                vol_profile = COALESCE(excluded.vol_profile, agg_scores.vol_profile)
+        """, (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
+              wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
+              trend_quality, trend_direction, sr_levels, vol_profile))
         conn.commit()
 
 def update_registry_health(symbol, health, health_score):

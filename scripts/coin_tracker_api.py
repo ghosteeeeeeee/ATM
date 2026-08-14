@@ -34,7 +34,9 @@ def export_all():
             SELECT r.symbol, r.name, r.health, r.health_score, r.status,
                    r.signal_count_24h, r.win_rate, r.total_trades,
                    r.avg_spread_bps, r.max_leverage, r.decimals,
-                   s.momentum, s.volume, s.volatility, s.spread, s.signals, s.regime, s.composite, s.ts
+                   s.momentum, s.volume, s.volatility, s.spread, s.signals, s.regime, s.composite, s.ts,
+                   s.wyckoff_phase, s.ewave_count, s.ewave_degree, s.ewave_direction,
+                   s.trend_quality, s.trend_direction, s.sr_levels, s.vol_profile
             FROM _coin_registry r
             LEFT JOIN agg_scores s ON r.symbol = s.symbol
             WHERE r.status = 'active'
@@ -49,7 +51,9 @@ def export_all():
             try:
                 latest = conn.execute(
                     f"SELECT price, vol_1h, vol_24h, spread_bps, rsi_14, macd_hist, "
-                    f"ema_9, ema_20, ema_50, atr_14, signal_type, signal_confidence, regime "
+                    f"ema_9, ema_20, ema_50, atr_14, signal_type, signal_confidence, regime, "
+                    f"wyckoff_phase, ewave_count, ewave_degree, ewave_direction, "
+                    f"trend_quality, trend_direction, sr_levels, vol_profile "
                     f"FROM {table} ORDER BY ts DESC LIMIT 1"
                 ).fetchone()
                 if latest:
@@ -92,7 +96,8 @@ def export_all():
             table = _table_name(sym)
             try:
                 events = conn.execute(
-                    f"SELECT ts, price, vol_1h, health, health_score, signal_type, signal_confidence "
+                    f"SELECT ts, price, vol_1h, health, health_score, signal_type, signal_confidence, "
+                    f"wyckoff_phase, ewave_count, ewave_degree, trend_quality, trend_direction "
                     f"FROM {table} WHERE price IS NOT NULL ORDER BY ts DESC LIMIT 1440"
                 ).fetchall()
                 if events:

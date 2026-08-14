@@ -338,3 +338,36 @@ All verified clean by bug_hunter. No trading param changes. Monitor profit-monst
 4. **stop_hunt_reversal_long+ weight boosted** — 1.0 → 1.3. Same rationale as mover+.
 
 All changes are non-protected params. bug_hunter verified clean. No risk to core gates (CONFLUENCE_REQUIRED intact, LIVE_TRADING_ENABLED unchanged).
+
+---
+
+## CEO Acknowledgment — Mover Signal Hardening
+
+**Acknowledged 2026-08-14.** Mover signal hardening applied and backtested. Changes:
+
+1. **ATR > 0.40% filter** — blocks high-vol tokens (2/4 losers, 0/6 winners). R:R negative on extreme vol.
+2. **Z-score alignment** — LONG only when z<0, SHORT only when z>0 (2/4 losers, 1/6 winners). Filters counter-trend entries.
+3. **hzscore+,mover+ combo weight 1.0 → 1.3** — 80% WR star (5T +$0.17). Boosts proven combo.
+4. **mover+ added to EXTREME regime** — was missing, caught only HIGH/NORMAL.
+5. **Slope filter 0.001 → 0.0005** — signal starvation fix. More entries without quality loss.
+
+**Backtest impact:** Combined filters block 3/4 losers with 1 winner regression. Net positive.
+
+**Cross-reference:** hzscore+,mover+ already a 7d star at 80% WR. These hardening rules protect the existing edge — fewer bad entries, same good ones.
+
+**Status:** No further action required. Monitor live for 48h to confirm backtest holds. If mover+ WR drops below 70% post-change, investigate ATR threshold calibration.
+
+---
+
+## CEO Report — 2026-08-14 (Notification Acknowledged)
+
+### Decision
+**r2-trend-long hardening acknowledged.** Gap300 > +0.50% filter added — blocks LONG when price too far above EMA300.
+
+### Backtest
+4/5 losers blocked (ATOM -1.10%, 2Z -1.01%, CHIP -0.84%, LDO -0.13%). 1/9 winners blocked. Net positive filter.
+
+### Status
+Change accepted. No further action required. Monitor live for 48h — if win rate improves on r2-trend-long, keep filter. If winner regression persists, loosen to +0.75%.
+
+---

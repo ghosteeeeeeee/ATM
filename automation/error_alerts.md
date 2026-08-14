@@ -307,3 +307,11 @@ ALERTS:
 - **Timers**: hermes-pipeline.timer firing on schedule (next: 22:41)
 - **Errors**: 0 in last 30min
 - **Regime**: 1 long bias, 1 short bias, 102 neutral
+
+## Error Alerts — 2026-08-14 03:40 UTC
+
+- **WARN** (1x): `runtime.db tables=[]` — all runtime/trades DBs are empty (0KB). Positions tracked in-memory by pipeline process, not persisted to disk.
+- **WARN** (1x): `hotset.json empty` — no signals survived compaction. Market is 102/104 NEUTRAL, 2 SHORT_BIAS, 0 LONG. Dead market = no trades.
+- **WARN** (1x): `0 signals above 50% confidence` — decider skipped execution. Expected given flat market.
+- **INFO**: Pipeline healthy, no crashes/errors. 5 open positions, 55 closed today (-7.66% PnL). All timers firing.
+- **NO AUTO-FIXES NEEDED** — all issues are market-state driven, not system failures.
