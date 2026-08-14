@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coin Tracker - Live Intelligence</title>
+    <meta http-equiv="refresh" content="60">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.85em;
+        }
+        a { color: #00ff88; text-decoration: none; }
+        h1 { color: #00ff88; font-size: 20px; border-bottom: 1px solid #00ff8833; padding-bottom: 10px; }
+        h2 { color: #00ff88; font-size: 14px; margin: 16px 0 8px; border-bottom: 1px solid #00ff8833; padding-bottom: 6px; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .timestamp { color: #666; font-size: 11px; }
+
+        /* Stats bar */
+        .stats-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .stat {
+            background: #1a1a2e;
+            padding: 10px 14px;
+            border-radius: 4px;
+            border-left: 3px solid #00ff88;
+            min-width: 100px;
+        }
+        .stat-val { font-size: 18px; font-weight: bold; color: #00ff88; }
+        .stat-label { color: #666; font-size: 10px; text-transform: uppercase; }
+
+        /* Health distribution bar */
+        .health-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+        .health-bar div { height: 100%; }
+
+        /* Controls */
+        .controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+        .controls input, .controls select {
+            background: #1a1a2e;
+            border: 1px solid #00ff8844;
+            color: #e0e0e0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 12px;
+        }
+        .controls input { width: 200px; }
+        .controls select { min-width: 120px; }
+        .controls label { color: #666; font-size: 11px; }
+        .controls .count { color: #666; font-size: 11px; margin-left: auto; }
+
+        /* Coin grid */
+        .coin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 12px;
+        }
+
+        /* Coin card */
+        .coin-card {
+            background: #0f0f18;
+            border: 1px solid #00ff8833;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .coin-card:hover { border-color: #00ff88; }
+        .coin-card.expanded { grid-column: 1 / -1; }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .card-top-left { display: flex; align-items: center; gap: 8px; }
+        .coin-icon { width: 32px; height: 32px; border-radius: 50%; background: #1a1a2e; flex-shrink: 0; object-fit: contain; }
+        .coin-icon-fallback { width: 32px; height: 32px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #00ff8833; }
+        .coin-sym { font-weight: bold; color: #00ff88; font-size: 15px; }
+        .coin-name { color: #666; font-size: 11px; margin-left: 6px; }
+
+        /* Health badge */
+        .health-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .health-dead { background: #44444422; color: #666; }
+        .health-cold { background: #4488ff22; color: #4488ff; }
+        .health-warm { background: #ffaa0022; color: #ffaa00; }
+        .health-hot { background: #00ff8822; color: #00ff88; }
+        .health-setup { background: #ff880022; color: #ff8800; }
+        .health-ready { background: #00ff8833; color: #00ff88; border: 1px solid #00ff8866; }
+
+        /* Score */
+        .score-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+        .score-val { font-size: 22px; font-weight: bold; }
+        .score-dead { color: #666; }
+        .score-cold { color: #4488ff; }
+        .score-warm { color: #ffaa00; }
+        .score-hot { color: #00ff88; }
+        .score-setup { color: #ff8800; }
+        .score-ready { color: #00ff88; }
+
+        /* Mini chart */
+        .chart-container { margin: 8px 0; position: relative; }
+        .chart-container svg { width: 100%; height: 60px; display: block; }
+
+        /* Stats row */
+        .stats-row { display: flex; gap: 12px; font-size: 11px; color: #666; margin-top: 6px; }
+        .stats-row .up { color: #00ff88; }
+        .stats-row .down { color: #ff4444; }
+
+        /* Signal summary */
+        .signals-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .signal-tag {
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            background: #1a1a2e;
+            color: #00ff88;
+            border: 1px solid #00ff8844;
+        }
+        .signal-tag.long { background: #00ff8822; color: #00ff88; }
+        .signal-tag.short { background: #ff444422; color: #ff4444; }
+
+        /* Score breakdown bars */
+        .breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin-top: 8px; font-size: 10px; }
+        .breakdown-row { display: flex; align-items: center; gap: 6px; }
+        .breakdown-label { color: #666; width: 70px; }
+        .breakdown-bar { flex: 1; height: 4px; background: #1a1a2e; border-radius: 2px; overflow: hidden; }
+        .breakdown-fill { height: 100%; border-radius: 2px; background: #00ff88; }
+        .breakdown-val { width: 28px; text-align: right; color: #00ff88; }
+
+        /* Expanded detail */
+        .detail { display: none; margin-top: 12px; border-top: 1px solid #00ff8833; padding-top: 12px; }
+        .coin-card.expanded .detail { display: block; }
+        .detail-table { width: 100%; font-size: 11px; border-collapse: collapse; }
+        .detail-table th, .detail-table td { padding: 4px 8px; border-bottom: 1px solid #1a1a2e; text-align: left; }
+        .detail-table th { color: #00ff88; }
+
+        /* Health colors for bars */
+        .bg-dead { background: #666; }
+        .bg-cold { background: #4488ff; }
+        .bg-warm { background: #ffaa00; }
+        .bg-hot { background: #00ff88; }
+        .bg-setup { background: #ff8800; }
+        .bg-ready { background: #00ff88; }
+
+        /* Wyckoff phase badges */
+        .wyckoff-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .wyckoff-accumulation { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8844; }
+        .wyckoff-markup { background: #00ff8844; color: #00ff88; border: 1px solid #00ff8866; }
+        .wyckoff-distribution { background: #ff444422; color: #ff4444; border: 1px solid #ff444444; }
+        .wyckoff-markdown { background: #ff444444; color: #ff4444; border: 1px solid #ff444466; }
+        .wyckoff-none { background: #1a1a2e; color: #666; }
+
+        /* Elliott wave badge */
+        .ewave-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            background: #1a1a2e;
+            color: #a371f7;
+            border: 1px solid #a371f744;
+        }
+        .ewave-badge.impulse { color: #00ff88; border-color: #00ff8844; }
+        .ewave-badge.corrective { color: #ffaa00; border-color: #ffaa0044; }
+
+        /* Trend gauge */
+        .trend-gauge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+        }
+        .trend-bar {
+            width: 40px;
+            height: 4px;
+            background: #1a1a2e;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .trend-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        .trend-fill.bull { background: #00ff88; }
+        .trend-fill.bear { background: #ff4444; }
+        .trend-fill.neutral { background: #ffaa00; }
+
+        @media (max-width: 700px) {
+            .coin-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <h1>Coin Tracker</h1>
+        <span class="timestamp" id="ts">Loading...</span>
+    </div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+<div class="health-bar" id="health-bar"></div>
+
+<div class="controls">
+    <input type="text" id="search" placeholder="Search symbol...">
+    <select id="health-filter">
+        <option value="">All Health</option>
+        <option value="ready">Ready</option>
+        <option value="setup">Setup</option>
+        <option value="hot">Hot</option>
+        <option value="warm">Warm</option>
+        <option value="cold">Cold</option>
+        <option value="dead">Dead</option>
+    </select>
+    <select id="sort">
+        <option value="composite">Score</option>
+        <option value="momentum">Momentum</option>
+        <option value="volume">Volume</option>
+        <option value="volatility">Volatility</option>
+        <option value="spread">Spread (liquidity)</option>
+        <option value="signals">Signals</option>
+        <option value="trend_quality">Trend Quality</option>
+        <option value="price">Price</option>
+        <option value="change">24h Change</option>
+    </select>
+    <span class="count" id="count"></span>
+</div>
+
+<div class="coin-grid" id="grid"></div>
+
+<script>
+const HEALTH_COLORS = {
+    dead: '#666', cold: '#4488ff', warm: '#ffaa00',
+    hot: '#00ff88', setup: '#ff8800', ready: '#00ff88'
+};
+const ICON_MAP = {"ASTER":"coin_icons/aster.png","WCT":"coin_icons/wct.png","SYRUP":"coin_icons/syrup.png","STBL":"coin_icons/stbl.png","APEX":"coin_icons/apex.png","POL":"coin_icons/pol.png","HEMI":"coin_icons/hemi.png","BSV":"coin_icons/bsv.png","UNI":"coin_icons/uni.png","INJ":"coin_icons/inj.png","BANANA":"coin_icons/banana.png","MNT":"coin_icons/mnt.png","DYDX":"coin_icons/dydx.png","ADA":"coin_icons/ada.png","PUMP":"coin_icons/pump.png","GMT":"coin_icons/gmt.png","SUSHI":"coin_icons/sushi.png","CC":"coin_icons/cc.png","STX":"coin_icons/stx.png","AIXBT":"coin_icons/aixbt.png","SKR":"coin_icons/skr.png","MOVE":"coin_icons/move.png","GMX":"coin_icons/gmx.png","NXPC":"coin_icons/nxpc.png","MERL":"coin_icons/merl.png","CHIP":"coin_icons/chip.png","DOT":"coin_icons/dot.png","ZRO":"coin_icons/zro.png","2Z":"coin_icons/2z.png","ZEN":"coin_icons/zen.png","WLFI":"coin_icons/wlfi.png","ME":"coin_icons/me.png","CFX":"coin_icons/cfx.png","IMX":"coin_icons/imx.png","KAS":"coin_icons/kas.png","WLD":"coin_icons/wld.png","YGG":"coin_icons/ygg.png","ATOM":"coin_icons/atom.png","GOAT":"coin_icons/goat.png","IO":"coin_icons/io.png","FIL":"coin_icons/fil.png","DASH":"coin_icons/dash.png","SUPER":"coin_icons/super.png","CRV":"coin_icons/crv.png","MET":"coin_icons/met.png","GRAM":"coin_icons/gram.png","TIA":"coin_icons/tia.png","LDO":"coin_icons/ldo.png","XPL":"coin_icons/xpl.png","AZTEC":"coin_icons/aztec.png","ALGO":"coin_icons/algo.png","HYPE":"coin_icons/hype.png","MORPHO":"coin_icons/morpho.png","COMP":"coin_icons/comp.png","ETC":"coin_icons/etc.png","JUP":"coin_icons/jup.png","CAKE":"coin_icons/cake.png","ICP":"coin_icons/icp.png","APT":"coin_icons/apt.png","PEOPLE":"coin_icons/people.png","IOTA":"coin_icons/iota.png","USUAL":"coin_icons/usual.png","ALT":"coin_icons/alt.png","HYPER":"coin_icons/hyper.png","ZORA":"coin_icons/zora.png","W":"coin_icons/w.png","SAND":"coin_icons/sand.png","TURBO":"coin_icons/turbo.png","LTC":"coin_icons/ltc.png","PURR":"coin_icons/purr.png","SAGA":"coin_icons/saga.png","ONDO":"coin_icons/ondo.png","ZK":"coin_icons/zk.png","NEO":"coin_icons/neo.png","BIGTIME":"coin_icons/bigtime.png","ORDI":"coin_icons/ordi.png","ARB":"coin_icons/arb.png","BABY":"coin_icons/baby.png","HBAR":"coin_icons/hbar.png","SEI":"coin_icons/sei.png","ENS":"coin_icons/ens.png","BCH":"coin_icons/bch.png","FOGO":"coin_icons/fogo.png","NOT":"coin_icons/not.png","MON":"coin_icons/mon.png","ENA":"coin_icons/ena.png","FET":"coin_icons/fet.png","LINEA":"coin_icons/linea.png","AVNT":"coin_icons/avnt.png","BLUR":"coin_icons/blur.png","NEAR":"coin_icons/near.png","ETH":"coin_icons/eth.png","RESOLV":"coin_icons/resolv.png","kBONK":"coin_icons/kbonk.png","kFLOKI":"coin_icons/kfloki.png","kPEPE":"coin_icons/kpepe.png","kSHIB":"coin_icons/kshib.png","TRX":"coin_icons/trx.png","GRASS":"coin_icons/grass.png","CASHCAT":"coin_icons/cashcat.png"};
+let DATA = null;
+
+function fmt(n, dec=2) {
+    if (n == null) return '-';
+    if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
+    if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(1) + 'K';
+    return n.toFixed(dec);
+}
+
+function iconHtml(sym) {
+    const src = ICON_MAP[sym];
+    if (src) return `<img class="coin-icon" src="${src}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" loading="lazy"><span class="coin-icon-fallback" style="display:none">${sym.slice(0,2)}</span>`;
+    return `<span class="coin-icon-fallback">${sym.slice(0,2)}</span>`;
+}
+
+function fmtPrice(n) {
+    if (n == null || n === 0) return '-';
+    if (n >= 1) return '$' + n.toFixed(2);
+    if (n >= 0.01) return '$' + n.toFixed(4);
+    if (n >= 0.001) return '$' + n.toFixed(6);
+    return '$' + n.toFixed(8);
+}
+
+function pctClass(v) { return v >= 0 ? 'up' : 'down'; }
+
+function sparkline(events, health) {
+    if (!events || events.length < 2) return '';
+    const sorted = [...events].reverse(); // oldest first
+    const prices = sorted.map(e => e.price).filter(p => p != null);
+    if (prices.length < 2) return '';
+
+    const w = 280, h = 56, pad = 4;
+    const min = Math.min(...prices), max = Math.max(...prices);
+    const range = max - min || 1;
+    const step = (w - pad*2) / (prices.length - 1);
+
+    // Build points array
+    const points = prices.map((p, i) => ({
+        x: pad + i * step,
+        y: h - pad - ((p - min) / range) * (h - pad*2)
+    }));
+
+    // Smooth path using cubic bezier curves
+    let path = 'M' + points[0].x.toFixed(1) + ',' + points[0].y.toFixed(1);
+    for (let i = 1; i < points.length; i++) {
+        const prev = points[i-1];
+        const curr = points[i];
+        const cpx = (prev.x + curr.x) / 2;
+        path += ' C' + cpx.toFixed(1) + ',' + prev.y.toFixed(1) +
+                ' ' + cpx.toFixed(1) + ',' + curr.y.toFixed(1) +
+                ' ' + curr.x.toFixed(1) + ',' + curr.y.toFixed(1);
+    }
+
+    // Fill area (smooth)
+    const lastX = points[points.length-1].x;
+    const fillPath = path + ' L' + lastX + ',' + h + ' L' + pad + ',' + h + ' Z';
+
+    // Signal markers
+    let markers = '';
+    sorted.forEach((e, i) => {
+        if (e.signal_type && e.price != null) {
+            const x = pad + i * step;
+            const y = h - pad - ((e.price - min) / range) * (h - pad*2);
+            const isLong = e.signal_type.toLowerCase().includes('long') ||
+                           e.signal_type.toLowerCase().includes('bull');
+            const color = isLong ? '#00ff88' : '#ff4444';
+            markers += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2" fill="' + color + '" opacity="0.9"/>';
+        }
+    });
+
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+        '<defs>' +
+        '<linearGradient id="g-' + health + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="' + (HEALTH_COLORS[health] || '#00ff88') + '" stop-opacity="0.25"/>' +
+        '<stop offset="100%" stop-color="' + (HEALTH_COLORS[health] || '#00ff88') + '" stop-opacity="0.02"/>' +
+        '</linearGradient>' +
+        '</defs>' +
+        '<path d="' + fillPath + '" fill="url(#g-' + health + ')" />' +
+        '<path d="' + path + '" fill="none" stroke="' + (HEALTH_COLORS[health] || '#00ff88') + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        markers +
+        '</svg>';
+}
+
+function breakdownBar(label, val, max=100) {
+    const n = parseFloat(val) || 0;
+    const pct = Math.min(100, Math.max(0, n / max * 100));
+    const color = pct > 70 ? '#00ff88' : pct > 40 ? '#ffaa00' : '#ff4444';
+    return `<div class="breakdown-row">
+        <span class="breakdown-label">${label}</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="breakdown-val">${n.toFixed(0)}</span>
+    </div>`;
+}
+
+function renderCard(c) {
+    const health = c.health || 'unknown';
+    const score = c.composite || 0;
+    const price = c.price;
+    const change = c.price && c.events && c.events.length > 10
+        ? ((c.events[0].price - c.events[Math.min(287, c.events.length-1)].price) / c.events[Math.min(287, c.events.length-1)].price * 100)
+        : null;
+
+    // Fetch per-coin history
+    let events = c.events || [];
+
+    // Wyckoff phase badge
+    const wyckoff = c.wyckoff_phase || 'none';
+    const wyckoffClass = wyckoff !== 'none' ? `wyckoff-${wyckoff}` : 'wyckoff-none';
+    const wyckoffLabel = wyckoff !== 'none' ? wyckoff : '-';
+
+    // Elliott wave badge
+    const ewave = c.ewave_count;
+    const ewaveDir = c.ewave_direction || '';
+    const ewaveBadge = ewave ? `<span class="ewave-badge ${ewaveDir === 'up' ? 'impulse' : 'corrective'}">W${ewave} ${ewaveDir === 'up' ? '▲' : '▼'}</span>` : '';
+
+    // Trend gauge
+    const trendScore = parseFloat(c.trend_quality) || 50;
+    const trendDir = c.trend_direction || 'NEUTRAL';
+    const trendColor = trendDir === 'BULL' ? '#00ff88' : trendDir === 'BEAR' ? '#ff4444' : '#ffaa00';
+
+    return `<div class="coin-card" data-sym="${c.symbol}" onclick="toggleDetail(this)">
+        <div class="card-top">
+            <div class="card-top-left">
+                ${iconHtml(c.symbol)}
+                <div>
+                    <span class="coin-sym">${c.symbol}</span>
+                    <span class="coin-name">${c.name || ''}</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:4px;align-items:center">
+                ${ewaveBadge}
+                <span class="wyckoff-badge ${wyckoffClass}">${wyckoffLabel}</span>
+                <span class="health-badge health-${health}">${health}</span>
+            </div>
+        </div>
+        <div class="score-row">
+            <span class="score-val score-${health}">${parseFloat(score).toFixed(0)}</span>
+            <span style="color:#666;font-size:11px">/ 100</span>
+        </div>
+        <div class="chart-container" id="chart-${c.symbol}">${sparkline(events, health)}</div>
+        <div class="stats-row">
+            <span>${fmtPrice(price)}</span>
+            ${change != null ? `<span class="${pctClass(change)}">${parseFloat(change) >= 0 ? '+' : ''}${parseFloat(change).toFixed(1)}%</span>` : ''}
+            ${c.vol_1h != null ? `<span>Vol: ${fmt(c.vol_1h)}</span>` : ''}
+            ${c.spread_bps != null ? `<span>Spread: ${parseFloat(c.spread_bps).toFixed(0)}bps</span>` : ''}
+        </div>
+        ${c.signal_type ? `<div class="signals-row"><span class="signal-tag">${c.signal_type}</span>${c.signal_confidence ? `<span class="signal-tag">${parseFloat(c.signal_confidence).toFixed(0)}%</span>` : ''}</div>` : ''}
+        <div class="breakdown">
+            ${breakdownBar('Momentum', c.momentum)}
+            ${breakdownBar('Volume', c.volume)}
+            ${breakdownBar('Volatility', c.volatility)}
+            ${breakdownBar('Spread', c.spread)}
+            ${breakdownBar('Signals', c.signals)}
+        </div>
+        <div style="margin-top:6px;font-size:10px;color:#666;display:flex;justify-content:space-between;align-items:center">
+            <span>Regime: <span style="color:${c.regime === 'LONG_BIAS' ? '#00ff88' : c.regime === 'SHORT_BIAS' ? '#ff4444' : '#ffaa00'};font-weight:bold">${c.regime || 'NEUTRAL'}</span></span>
+            <div class="trend-gauge">
+                <span style="color:${trendColor}">Trend</span>
+                <div class="trend-bar"><div class="trend-fill ${trendDir.toLowerCase()}" style="width:${trendScore}%"></div></div>
+                <span style="color:${trendColor}">${trendScore.toFixed(0)}</span>
+            </div>
+        </div>
+        <div class="detail" id="detail-${c.symbol}">
+            <div style="color:#666;font-size:11px">Loading history...</div>
+        </div>
+    </div>`;
+}
+
+function toggleDetail(el) {
+    const sym = el.dataset.sym;
+    const card = el;
+    const wasExpanded = card.classList.contains('expanded');
+
+    // Collapse all
+    document.querySelectorAll('.coin-card.expanded').forEach(c => c.classList.remove('expanded'));
+
+    if (!wasExpanded) {
+        card.classList.add('expanded');
+        loadDetail(sym);
+    }
+}
+
+async function loadDetail(sym) {
+    const detail = document.getElementById('detail-' + sym);
+    if (!detail) return;
+    try {
+        const r = await fetch(`coin_tracker_coins/${sym}.json`);
+        if (!r.ok) throw new Error(r.status);
+        const data = await r.json();
+        const events = data.events || [];
+        if (!events.length) {
+            detail.innerHTML = '<div style="color:#666">No history yet</div>';
+            return;
+        }
+
+        // Get coin data from main DATA
+        const coin = DATA.coins.find(c => c.symbol === sym) || {};
+
+        let html = '';
+
+        // Analysis summary section
+        html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">`;
+
+        // Wyckoff phase
+        html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+            <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Wyckoff Phase</div>
+            <div class="wyckoff-badge wyckoff-${coin.wyckoff_phase || 'none'}" style="font-size:12px">${(coin.wyckoff_phase || 'none').toUpperCase()}</div>
+        </div>`;
+
+        // Elliott Wave
+        html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+            <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Elliott Wave</div>
+            <div>${coin.ewave_count ? `<span class="ewave-badge ${coin.ewave_direction === 'up' ? 'impulse' : 'corrective'}" style="font-size:12px">Wave ${coin.ewave_count} ${coin.ewave_direction === 'up' ? '▲' : '▼'}</span>` : '<span style="color:#666">-</span>'}</div>
+            <div style="color:#666;font-size:10px;margin-top:4px">${coin.ewave_degree || ''}</div>
+        </div>`;
+
+        // Trend Quality
+        const trendScore = parseFloat(coin.trend_quality) || 50;
+        const trendDir = coin.trend_direction || 'NEUTRAL';
+        const trendColor = trendDir === 'BULL' ? '#00ff88' : trendDir === 'BEAR' ? '#ff4444' : '#ffaa00';
+        html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+            <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Trend Quality</div>
+            <div style="font-size:18px;font-weight:bold;color:${trendColor}">${trendScore.toFixed(0)}<span style="font-size:11px;color:#666">/100</span></div>
+            <div style="color:${trendColor};font-size:11px">${trendDir}</div>
+        </div>`;
+
+        // Volume Profile
+        if (coin.vol_profile) {
+            try {
+                const vp = typeof coin.vol_profile === 'string' ? JSON.parse(coin.vol_profile) : coin.vol_profile;
+                html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+                    <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Volume Profile</div>
+                    <div style="font-size:11px">POC: ${fmtPrice(vp.poc)}</div>
+                    <div style="font-size:10px;color:#666">VA: ${fmtPrice(vp.value_area_low)} - ${fmtPrice(vp.value_area_high)}</div>
+                    <div style="font-size:10px;color:${vp.balance ? '#00ff88' : '#ff4444'}">${vp.balance ? 'Balanced' : 'Imbalanced'}</div>
+                </div>`;
+            } catch(e) {}
+        }
+
+        html += `</div>`;
+
+        // S/R levels
+        if (coin.sr_levels) {
+            try {
+                const sr = typeof coin.sr_levels === 'string' ? JSON.parse(coin.sr_levels) : coin.sr_levels;
+                if (sr && sr.length) {
+                    html += `<div style="margin-bottom:16px">
+                        <h2>Support / Resistance</h2>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">`;
+                    sr.forEach(s => {
+                        const color = s.type === 'support' ? '#00ff88' : '#ff4444';
+                        html += `<span style="background:${color}22;color:${color};padding:2px 8px;border-radius:4px;font-size:10px;border:1px solid ${color}44">
+                            ${s.type === 'support' ? 'S' : 'R'} ${fmtPrice(s.price)} <span style="color:#666">(${s.strength})</span>
+                        </span>`;
+                    });
+                    html += `</div></div>`;
+                }
+            } catch(e) {}
+        }
+
+        // Recent events table
+        html += `<h2>Recent Events (${events.length})</h2>
+        <table class="detail-table">
+            <tr><th>Time</th><th>Price</th><th>Vol</th><th>RSI</th><th>Health</th><th>Signal</th></tr>`;
+        events.slice(0, 50).forEach(e => {
+            const t = new Date(e.ts * 1000).toLocaleTimeString();
+            html += `<tr>
+                <td>${t}</td>
+                <td>${fmtPrice(e.price)}</td>
+                <td>${e.vol_1h != null ? fmt(e.vol_1h) : '-'}</td>
+                <td>${e.rsi_14 != null ? parseFloat(e.rsi_14).toFixed(1) : '-'}</td>
+                <td><span class="health-badge health-${e.health || 'unknown'}">${e.health || '?'}</span></td>
+                <td>${e.signal_type || '-'}</td>
+            </tr>`;
+        });
+        html += '</table>';
+        detail.innerHTML = html;
+    } catch (e) {
+        detail.innerHTML = `<div style="color:#ff4444">Failed to load: ${e.message}</div>`;
+    }
+}
+
+function render() {
+    if (!DATA) return;
+
+    // Header timestamp
+    document.getElementById('ts').textContent = `Updated: ${DATA.generated_iso} | Auto-refresh: 60s`;
+
+    // Stats bar
+    const bar = document.getElementById('stats-bar');
+    bar.innerHTML = `
+        <div class="stat"><div class="stat-val">${DATA.total}</div><div class="stat-label">Coins Tracked</div></div>
+        <div class="stat"><div class="stat-val" style="color:#00ff88">${DATA.by_health.ready || 0}</div><div class="stat-label">Ready</div></div>
+        <div class="stat"><div class="stat-val" style="color:#a371f7">${DATA.by_health.setup || 0}</div><div class="stat-label">Setup</div></div>
+        <div class="stat"><div class="stat-val" style="color:#f0883e">${DATA.by_health.hot || 0}</div><div class="stat-label">Hot</div></div>
+        <div class="stat"><div class="stat-val" style="color:#ffaa00">${DATA.by_health.warm || 0}</div><div class="stat-label">Warm</div></div>
+        <div class="stat"><div class="stat-val" style="color:#388bfd">${DATA.by_health.cold || 0}</div><div class="stat-label">Cold</div></div>
+        <div class="stat"><div class="stat-val" style="color:#484f58">${DATA.by_health.dead || 0}</div><div class="stat-label">Dead</div></div>
+        <div class="stat"><div class="stat-val">${parseFloat(DATA.avg_score).toFixed(0)}</div><div class="stat-label">Avg Score</div></div>
+    `;
+
+    // Health distribution bar
+    const hbar = document.getElementById('health-bar');
+    const total = DATA.total || 1;
+    const order = ['ready', 'setup', 'hot', 'warm', 'cold', 'dead'];
+    hbar.innerHTML = order.map(h => {
+        const pct = ((DATA.by_health[h] || 0) / total * 100);
+        return pct > 0 ? `<div class="bg-${h}" style="width:${pct}%" title="${h}: ${DATA.by_health[h] || 0}"></div>` : '';
+    }).join('');
+
+    filterAndRender();
+}
+
+function filterAndRender() {
+    if (!DATA) return;
+    const search = document.getElementById('search').value.toUpperCase();
+    const healthFilter = document.getElementById('health-filter').value;
+    const sortKey = document.getElementById('sort').value;
+
+    let coins = DATA.coins.filter(c => {
+        if (search && !c.symbol.includes(search) && !(c.name || '').toUpperCase().includes(search)) return false;
+        if (healthFilter && c.health !== healthFilter) return false;
+        return true;
+    });
+
+    coins.sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+
+    document.getElementById('count').textContent = `${coins.length} / ${DATA.total} coins`;
+
+    const grid = document.getElementById('grid');
+    // Limit to 200 for performance
+    grid.innerHTML = coins.slice(0, 200).map(renderCard).join('');
+
+    // Load charts for all visible coins
+    loadCharts(coins);
+}
+
+async function loadCharts(coins) {
+    await Promise.all(coins.map(async c => {
+        try {
+            const r = await fetch(`coin_tracker_coins/${c.symbol}.json`);
+            if (!r.ok) return;
+            const data = await r.json();
+            c.events = data.events;
+            const el = document.getElementById('chart-' + c.symbol);
+            if (el) el.innerHTML = sparkline(data.events, c.health);
+        } catch (e) {}
+    }));
+}
+
+// Event listeners
+document.getElementById('search').addEventListener('input', filterAndRender);
+document.getElementById('health-filter').addEventListener('change', filterAndRender);
+document.getElementById('sort').addEventListener('change', filterAndRender);
+
+// Load data
+fetch('coin_tracker_data.json')
+    .then(r => r.json())
+    .then(d => { DATA = d; render(); })
+    .catch(e => { document.getElementById('grid').innerHTML = `<div style="color:#ff4444;padding:20px">Failed to load data: ${e.message}<br>Run: python3 scripts/coin_tracker.py</div>`; });
+</script>
+</body>
+</html>
