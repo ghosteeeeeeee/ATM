@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (verified latest)
+
+### Diagnosis
+24h: 77T -$0.68 (51.9% WR — RED). 7d: ~445T -$0.83 (51.3% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.20 (recovering). Stars7d intact (5 profitable). Cost drivers48h: atr_sl_hit 63T -$4.82 (96% of losses).
+
+### Root Cause
+R:R imbalance structural: avg SL loss -$0.077 vs avg trail win +$0.039 (2:1 unfavorable). ATR_TP_K_MULT was 1.2 — TP target too close to SL, trades get stopped out before reaching profit. atr_sl_hit dominates losses (63T -$4.82 in 48h).
+
+### Fix Applied
+CHANGED ATR_TP_K_MULT 1.2→1.5. Targets 1.5:1 R:R instead of 1.2:1. Gives trades more room to reach profit before trailing SL takes over. Expected: fewer premature atr_sl_hit exits, higher avg win.
+
+### Verification
+Monitor 48h: ATR avg win (should increase from $0.039), atr_sl_hit count (should decrease), daily PnL (if -2 consecutive red → revert).
+
+---
+
 ## CEO Report — 2026-08-14 (12:49 UTC — verified)
 
 ### Diagnosis
