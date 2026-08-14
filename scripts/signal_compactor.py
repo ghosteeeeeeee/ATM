@@ -266,6 +266,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('stop_hunt_reversal_long', 'stop_hunt_reversal_long+'): 1.3,  # boosted 2026-08-13
     # spike_exhaustion_short — fade violent spike after exhaustion
     ('spike_exhaustion_short', 'spike_exhaustion_short-'): 1.0,
+    # wave_catcher — catch violent spikes in both directions
+    ('wave_catcher', 'wave_catcher+'): 1.0,
+    ('wave_catcher', 'wave_catcher-'): 1.0,
     # engulfing: large single-candle momentum moves
     ('engulfing_long',  'engulfing+'):  1.0,
     ('engulfing_short', 'engulfing-'):  1.0,

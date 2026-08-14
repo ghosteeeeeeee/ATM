@@ -7519,3 +7519,41 @@ None — system stable, previous fixes settling in.
 - continuation-,hzscore- still losing — monitor next hour for 0% WR
 - range_breakout_short draining with 3 open positions (BANANA, HBAR, CHIP?)
 - accel-300- draining naturally
+
+## [2026-08-14 05:30 UTC] Daily Orchestrator Report
+
+**Date:** 2026-08-14
+**Pipeline Status:** Running (LIVE)
+**Market:** 100% NEUTRAL, macro gate REDUCE
+
+### Pipeline Metrics
+- Open positions: 4
+- Closed today: 55
+- PnL: -5.23%
+- Win rate: ~50%
+
+### Signal Status
+- range_breakout_short: RE-ENABLED by CEO (25T +$0.06 52% WR 7d)
+- hzscore+: KILLED by CEO (standalone inverted R:R, combos remain profitable)
+- accel-300-: Being watched (44.4% WR, draining)
+- continuation-,hzscore-: Being watched (33.3% WR)
+
+### Health Warnings
+- coin_tracker score_wyckoff import: FALSE ALARM (works fine)
+- Disk 82% (22G free): Monitor, not critical
+- hermes-smoke-test timer: DEAD (3 weeks stale) — DISABLED
+
+### Actions Taken
+1. Disabled dead hermes-smoke-test.timer (3 weeks stale, never firing)
+
+### Plans Status
+- coin_tracker_analysis_expansion: Phase 1 complete
+- progressive_context_shaping: DRAFT awaiting CEO feedback
+- autopilot improvements: Fully implemented
+- weather vane v3/v4/v5: All implemented
+- volatility floor: Implemented
+
+### Recommendations
+1. Monitor disk usage — 82% with 22G free
+2. continuation-,hzscore- — watch for 0% WR kill threshold
+3. No new signal changes needed — stability period respected

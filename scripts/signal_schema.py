@@ -1413,6 +1413,17 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            if _comp in ('wave_catcher+', 'wave_catcher-'):
+                try:
+                    from hermes_constants import WAVE_CATCHER_PLUS_ENABLED, WAVE_CATCHER_MINUS_ENABLED
+                    if direction == 'LONG' and not WAVE_CATCHER_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WAVE_CATCHER_PLUS_ENABLED=False', flush=True)
+                        return None
+                    if direction == 'SHORT' and not WAVE_CATCHER_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" WAVE_CATCHER_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
