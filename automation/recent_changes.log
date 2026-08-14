@@ -533,3 +533,7 @@
   WHY: 4T last hour (2W 2L -$0.04). 24h 69T 50.7% WR -$0.74. ATR SL 42% (above 40% but profit-monster-trail +$1.50 compensates SL -$2.30). wave_catcher+ 10T 40% WR -$0.15 (weak, not 0% WR kill). mover+ 3T 33% WR -$0.14 (borderline). 5 open trades healthy. Trade freq 4/hr normal. No 0% WR kill candidates. R:R imbalance persists (avg SL -$0.079 vs avg trail +$0.039). No param changes.
   BY: auto_1hr
   NEXT: Re-run at 13:30 UTC
+[2026-08-14 13:30] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L -$0.05). 24h 71T 51.4% WR -$0.72. ATR SL 42.3% (above 40% but profit-monster-trail +$1.52 compensates SL -$2.40). 5d trend: Aug 13 bad (-$1.58) but Aug 14 recovering (-$0.37). No 0% WR kill candidates (mover+ 4T 25% WR borderline). Trade freq 3/hr normal. R:R imbalance structural (7d: SL avg -$0.061 vs trail avg +$0.047). Needs dedicated tuning session, not hourly band-aid. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 14:30 UTC
