@@ -421,3 +421,17 @@ All changes are non-protected params. bug_hunter verified clean. No risk to core
 Change accepted. No further action required. Monitor live for 48h — if win rate improves on r2-trend-long, keep filter. If winner regression persists, loosen to +0.75%.
 
 ---
+
+## CEO Report — 2026-08-14 (Verified)
+
+### Diagnosis
+24h: 54T -$0.52 (55.6% WR — RED). 7d: 435T -$0.44 (51.7% WR — stable, improving from -$0.67). LONG7d: +$0.76 (profitable). SHORT7d: -$1.20 (100% from disabled legacy signals). Pipeline healthy, market 100% NEUTRAL, 4 open $0 flat.
+
+### Root Cause
+SHORT7d bleeding entirely from legacy trades: accel-300- 40T -$0.30, range_breakout+ 8T -$0.41, trend_momentum 6T -$0.37 — all from signals already disabled. No active SHORT signal bleeding. Stars7d intact (5 profitable combos).
+
+### Fix Applied
+**NO CHANGES.** System stabilizing. 7d improving (-$0.67 → -$0.44). All legacy bleeders draining naturally. range_breakout_short re-enabled Aug 14 at 52% WR ($0.06) — volatile but profitable. hzscore+ standalone disabled (inverted R:R). No new action needed.
+
+### Verification
+Daily PnL trend: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 +$0.04 (recovering). Next check: if range_breakout_short degrades → re-disable. If SHORT7d still negative after legacy fully clears → add regime filter.

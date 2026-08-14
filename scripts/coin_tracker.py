@@ -322,6 +322,7 @@ def collect():
                 sr_levels = analysis.get('sr_levels', [])
                 trend = analysis.get('trend', {})
                 vol_profile = analysis.get('vol_profile', {})
+                setup = analysis.get('setup', {})
 
                 # ── Compute analysis-based scores ──
                 s_wyckoff = _score_wyckoff(wyckoff.get('phase'))
@@ -340,6 +341,10 @@ def collect():
                     s_trend_quality * WEIGHTS['trend']
                 )
 
+                # Boost composite if strong setup forming
+                if setup.get('setup_score', 0) > 60:
+                    composite = min(100, composite + setup['setup_score'] * 0.1)
+
                 # No candle data = no real activity → force cold/dead
                 if not has_candles:
                     composite = min(composite, 30.0)
@@ -353,7 +358,9 @@ def collect():
                            'rsi_14', 'macd_hist', 'ema_9', 'ema_20', 'ema_50', 'atr_14',
                            'health', 'health_score', 'signal_type', 'signal_confidence', 'regime',
                            'wyckoff_phase', 'ewave_count', 'ewave_degree', 'ewave_direction',
-                           'trend_quality', 'trend_direction', 'sr_levels', 'vol_profile'}
+                           'trend_quality', 'trend_direction', 'sr_levels', 'vol_profile',
+                           'setup_score', 'setup_type', 'setup_details', 'clustering_bullish', 'clustering_bearish', 'recency'}
+                clustering = setup.get('clustering', {})
                 event_data = {
                     'ts': now, 'event_type': 'tick', 'price': price, 'spread_bps': spread_bps,
                     'vol_1h': vol_1h, 'vol_24h': vol_24h,
@@ -370,6 +377,12 @@ def collect():
                     'trend_direction': trend.get('direction'),
                     'sr_levels': json.dumps(sr_levels[:5]) if sr_levels else None,
                     'vol_profile': json.dumps(vol_profile) if vol_profile.get('poc') else None,
+                    'setup_score': setup.get('setup_score'),
+                    'setup_type': setup.get('setup_type'),
+                    'setup_details': setup.get('setup_details'),
+                    'clustering_bullish': clustering.get('bullish_clusters'),
+                    'clustering_bearish': clustering.get('bearish_clusters'),
+                    'recency': setup.get('recency'),
                 }
                 event_cols = {k: v for k, v in event_data.items() if k in allowed and v is not None}
                 event_cols['ts'] = now
@@ -379,11 +392,13 @@ def collect():
                 write_conn.execute(f"INSERT INTO {table} ({col_names}) VALUES ({placeholders})", list(event_cols.values()))
 
                 # Score
+                clustering = setup.get('clustering', {})
                 write_conn.execute("""
                     INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
                                             wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
-                                            trend_quality, trend_direction, sr_levels, vol_profile)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                            trend_quality, trend_direction, sr_levels, vol_profile,
+                                            setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(symbol) DO UPDATE SET
                         ts=excluded.ts, health=excluded.health, score=excluded.score,
                         momentum=excluded.momentum, volume=excluded.volume, volatility=excluded.volatility,
@@ -396,7 +411,13 @@ def collect():
                         trend_quality=COALESCE(excluded.trend_quality, agg_scores.trend_quality),
                         trend_direction=COALESCE(excluded.trend_direction, agg_scores.trend_direction),
                         sr_levels=COALESCE(excluded.sr_levels, agg_scores.sr_levels),
-                        vol_profile=COALESCE(excluded.vol_profile, agg_scores.vol_profile)
+                        vol_profile=COALESCE(excluded.vol_profile, agg_scores.vol_profile),
+                        setup_score=COALESCE(excluded.setup_score, agg_scores.setup_score),
+                        setup_type=COALESCE(excluded.setup_type, agg_scores.setup_type),
+                        setup_details=COALESCE(excluded.setup_details, agg_scores.setup_details),
+                        clustering_bullish=COALESCE(excluded.clustering_bullish, agg_scores.clustering_bullish),
+                        clustering_bearish=COALESCE(excluded.clustering_bearish, agg_scores.clustering_bearish),
+                        recency=COALESCE(excluded.recency, agg_scores.recency)
                 """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite,
                       wyckoff.get('phase'),
                       ewave.get('wave') if isinstance(ewave.get('wave'), int) else None,
@@ -405,7 +426,13 @@ def collect():
                       trend.get('score'),
                       trend.get('direction'),
                       json.dumps(sr_levels[:5]) if sr_levels else None,
-                      json.dumps(vol_profile) if vol_profile.get('poc') else None))
+                      json.dumps(vol_profile) if vol_profile.get('poc') else None,
+                      setup.get('setup_score'),
+                      setup.get('setup_type'),
+                      setup.get('setup_details'),
+                      clustering.get('bullish_clusters'),
+                      clustering.get('bearish_clusters'),
+                      setup.get('recency')))
 
                 # Registry
                 write_conn.execute("""

@@ -106,7 +106,13 @@ def init_db():
                 trend_quality REAL,
                 trend_direction TEXT,
                 sr_levels TEXT,
-                vol_profile TEXT
+                vol_profile TEXT,
+                setup_score REAL,
+                setup_type TEXT,
+                setup_details TEXT,
+                clustering_bullish REAL,
+                clustering_bearish REAL,
+                recency REAL
             )
         """)
         cur.execute("CREATE INDEX IF NOT EXISTS idx_scores_composite ON agg_scores(composite DESC)")
@@ -233,6 +239,12 @@ _NEW_COLUMNS = [
     ('trend_direction', 'TEXT'),
     ('sr_levels', 'TEXT'),
     ('vol_profile', 'TEXT'),
+    ('setup_score', 'REAL'),
+    ('setup_type', 'TEXT'),
+    ('setup_details', 'TEXT'),
+    ('clustering_bullish', 'REAL'),
+    ('clustering_bearish', 'REAL'),
+    ('recency', 'REAL'),
 ]
 
 def migrate_tables():
@@ -304,14 +316,17 @@ def write_event(symbol, event_type, ts=None, **kwargs):
 
 def write_score(symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
                 wyckoff_phase=None, ewave_count=None, ewave_degree=None, ewave_direction=None,
-                trend_quality=None, trend_direction=None, sr_levels=None, vol_profile=None):
+                trend_quality=None, trend_direction=None, sr_levels=None, vol_profile=None,
+                setup_score=None, setup_type=None, setup_details=None,
+                clustering_bullish=None, clustering_bearish=None, recency=None):
     """Write composite score for a coin. Upserts into agg_scores."""
     with _db() as conn:
         conn.execute("""
             INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
                                     wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
-                                    trend_quality, trend_direction, sr_levels, vol_profile)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    trend_quality, trend_direction, sr_levels, vol_profile,
+                                    setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(symbol) DO UPDATE SET
                 ts = excluded.ts,
                 health = excluded.health,
@@ -330,10 +345,17 @@ def write_score(symbol, ts, health, score, momentum, volume, volatility, spread,
                 trend_quality = COALESCE(excluded.trend_quality, agg_scores.trend_quality),
                 trend_direction = COALESCE(excluded.trend_direction, agg_scores.trend_direction),
                 sr_levels = COALESCE(excluded.sr_levels, agg_scores.sr_levels),
-                vol_profile = COALESCE(excluded.vol_profile, agg_scores.vol_profile)
+                vol_profile = COALESCE(excluded.vol_profile, agg_scores.vol_profile),
+                setup_score = COALESCE(excluded.setup_score, agg_scores.setup_score),
+                setup_type = COALESCE(excluded.setup_type, agg_scores.setup_type),
+                setup_details = COALESCE(excluded.setup_details, agg_scores.setup_details),
+                clustering_bullish = COALESCE(excluded.clustering_bullish, agg_scores.clustering_bullish),
+                clustering_bearish = COALESCE(excluded.clustering_bearish, agg_scores.clustering_bearish),
+                recency = COALESCE(excluded.recency, agg_scores.recency)
         """, (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
               wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
-              trend_quality, trend_direction, sr_levels, vol_profile))
+              trend_quality, trend_direction, sr_levels, vol_profile,
+              setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency))
         conn.commit()
 
 def update_registry_health(symbol, health, health_score):

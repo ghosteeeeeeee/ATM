@@ -36,7 +36,9 @@ def export_all():
                    r.avg_spread_bps, r.max_leverage, r.decimals,
                    s.momentum, s.volume, s.volatility, s.spread, s.signals, s.regime, s.composite, s.ts,
                    s.wyckoff_phase, s.ewave_count, s.ewave_degree, s.ewave_direction,
-                   s.trend_quality, s.trend_direction, s.sr_levels, s.vol_profile
+                   s.trend_quality, s.trend_direction, s.sr_levels, s.vol_profile,
+                   s.setup_score, s.setup_type, s.setup_details,
+                   s.clustering_bullish, s.clustering_bearish, s.recency
             FROM _coin_registry r
             LEFT JOIN agg_scores s ON r.symbol = s.symbol
             WHERE r.status = 'active'
@@ -53,7 +55,8 @@ def export_all():
                     f"SELECT price, vol_1h, vol_24h, spread_bps, rsi_14, macd_hist, "
                     f"ema_9, ema_20, ema_50, atr_14, signal_type, signal_confidence, regime, "
                     f"wyckoff_phase, ewave_count, ewave_degree, ewave_direction, "
-                    f"trend_quality, trend_direction, sr_levels, vol_profile "
+                    f"trend_quality, trend_direction, sr_levels, vol_profile, "
+                    f"setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency "
                     f"FROM {table} ORDER BY ts DESC LIMIT 1"
                 ).fetchone()
                 if latest:
