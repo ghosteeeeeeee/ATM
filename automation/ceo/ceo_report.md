@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-15 (R:R adjustment)
+## CEO Report — 2026-08-14 (latest verified)
 
 ### Diagnosis
-24h: 70T -$0.71 (51.4% WR — RED). 7d: 444T -$0.82 (51.4% WR — slightly negative). Daily: Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.29 (52.9% WR — recovering). 5 open flat. LONG7d: profitable. SHORT7d: all from disabled legacy. Cost drivers48h: atr_sl_hit 67T -$5.09 (96% of losses — structural R:R imbalance: avg win 0.49% vs avg loss -0.74%). Stars7d intact (5 profitable).
+24h: 72T -$0.79 (51.4% WR — RED). 7d: 446T -$0.90 (51.3% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.37 (52.8% WR — recovering). 4 open flat (-$0.07). LONG7d: profitable. SHORT7d: all from disabled legacy. Cost drivers48h: atr_sl_hit 67T -$5.14 (96% of losses). Stars7d intact (5 profitable).
 
 ### Root Cause
-System recovering from legacy clearing. All legacy bleeders disabled. Active signals within normal variance. atr_sl_hit dominates losses — R:R imbalance (avg win 0.49% vs avg loss -0.74%) yields negative expected value despite 51.4% WR.
+System recovering from Aug 13 legacy clearing. All legacy bleeders disabled. ATR stop-loss dominates exits — SHORT signals avg -0.74% per stop, LONG avg -0.80%. Recent ATR_TP_K_MULT 1.0→1.2 should improve R:R but too early to evaluate.
 
 ### Fix Applied
-INCREASED ATR_TP_K_MULT from 1.0 to 1.2 (hermes_constants.py:467). This widens take-profit targets relative to stop-loss, aiming to increase average win magnitude and flip expected value positive.
+NO CHANGES — ATR_TP_K_MULT adjustment (1.0→1.2) just applied, needs48h evaluation. mover+ LONG4T -$0.24 25% WR (below 10-trade threshold, can't disable without killing profitable hzscore+,mover+ star).
 
 ### Verification
-Monitor: 24h avg win (should increase from 0.49%), daily PnL (if -2 consecutive red → investigate), R:R ratio (if avg win doesn't improve within 48h → revert change).
+Monitor: daily PnL (if -2 consecutive red → investigate), ATR avg win magnitude (should increase from ~0.49%), range_breakout_short (if 7d degrades below 45% WR → re-disable).
 
 ### Root Cause
 System recovering from Aug 13 legacy clearing (-$1.58). Aug 14 flat at -$0.32. All legacy bleeders disabled. Active signals within normal variance. atr_sl_hit dominates losses — SL too tight vs trailing activation (needs dedicated tuning session, not quick fix).
