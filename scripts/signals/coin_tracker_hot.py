@@ -99,6 +99,15 @@ def detect(token, data):
     if setup_score < COIN_TRACKER_HOT_SETUP_THRESHOLD:
         return None
 
+    # Must have at least one structure signal (not just echoes from other signals)
+    has_structure = (
+        (wyckoff and wyckoff != 'none') or
+        (data.get('ewave_count') is not None) or
+        (trend_dir and trend_dir != 'NEUTRAL')
+    )
+    if not has_structure:
+        return None
+
     # Must have some directional signal
     has_direction = False
     if clustering_bull > clustering_bear and clustering_bull >= COIN_TRACKER_HOT_CLUSTER_MIN:
