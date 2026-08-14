@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 22:50 UTC (CEO run — verified)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 76T -$0.56 (52.6% WR — RED), 7d daily Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.43. ATR_TP_K_MULT 2.0 deployed today, 0 trades closed since — eval window active. PM_TRAIL tightened per T directive. All worst signals killed, legacy aging out. Stars7d intact.
+  BY: CEO run
+  DO NOT REVERT — eval window active, stability period.
+
 [2026-08-15 (CEO run — verified latest)] CEO: CHANGED ATR_TP_K_MULT 1.2→1.5
   WHY: Verified DB: 24h 77T -$0.68 (51.9% WR — RED), 7d ~445T -$0.83 (51.3% WR). Root cause: avg loss -$0.077 vs avg win +$0.039 — inverted R:R. atr_sl_hit 63T -$4.82 (96% of losses). ATR_TP_K_MULT 1.2→1.5 targets 1.5:1 R:R, should reduce premature exits.
   BY: CEO run

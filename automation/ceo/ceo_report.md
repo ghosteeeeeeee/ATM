@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 22:50 UTC (CEO run — verified)
+
+### Diagnosis
+24h: 76T -$0.56 (52.6% WR — RED, 3rd+ consecutive red day). R:R inverted: avg win 0.41% vs avg loss -0.79% = 0.52:1. 0 open. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.43 (recovering). ATR_TP_K_MULT 2.0 deployed today — 0 trades closed since, eval needs 48h. PM_TRAIL tightened (0.40% activate, 0.15% distance) by T directive. Stars7d intact (5 profitable). Legacy bleeders (accel-300-, range_breakout_short, wave_catcher+ LONG) all disabled, aging out. Disk 83%.
+
+### Root Cause
+Structural R:R imbalance persists (0.52:1). Wins too small relative to losses. ATR_TP_K_MULT 2.0 targets 1.6% TP — should improve R:R once trades close through it. PM_TRAIL was tightened (not widened) — may limit trail win improvement. Legacy SHORT losers still closing and dragging 24h numbers.
+
+### Fix Applied
+NO CHANGES — ATR 2.0 eval window active, changing params now invalidates results. All worst signals already killed. System in stabilization period.
+
+### Verification
+Monitor: (1) ATR avg win 48h — should increase from 0.41% toward 0.79%+ as ATR_TP_K_MULT 2.0 takes effect. (2) Daily PnL — if Aug 15 red again, investigate deeper. (3) mover+ LONG — 7T 28.6% WR, approaching 10T disable threshold. (4) Disk — if 85% → cleanup.
+
+---
+
 ## CEO Report — 2026-08-15 (CEO run — verified)
 
 ### Diagnosis
