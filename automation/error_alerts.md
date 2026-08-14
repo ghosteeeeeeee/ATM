@@ -394,3 +394,10 @@ ALERTS:
 ### Ollama Not Running
 - **INFO**: Ollama service inactive, port 11434 refused
 - **Impact**: None — system migrated to LLM-free signal_compactor.py
+
+## Health Monitor — 2026-08-14 07:42 UTC
+- **INFO**: Pipeline healthy, all timers firing, no crashes
+- **INFO**: Market regime NEUTRAL (103/104 tokens) — 0 signals above 50% effective conf, expected behavior
+- **WARN**: -6.93% PnL today (62 closed trades, 4 open positions all slightly negative)
+- **INFO**: Disk at 82% — monitoring, not critical
+- **INFO**: No auto-fixes required

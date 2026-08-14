@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-08-14 01:48 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-14 07:48 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 918 | **WR:** 46.3% | **PnL:** -27.53%
+- **Total trades (all time):** 948 | **WR:** 46.7% | **PnL:** -28.22%
 - **Date range:** 2026-07-29 → 2026-08-14
 
 ---
@@ -15,9 +15,7 @@ None found.
 
 ## LOSERS (WR < 30%, PnL < -2%)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| range_breakout_short | SHORT | — | —% | — | 10 | 20.0% | -5.05 | DISABLED | **DISABLE** |
+None found.
 
 ---
 
@@ -25,16 +23,17 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| accel-300- | SHORT | 9 | 44.4% | -3.33 | DISABLED | Borderline |
-| continuation-,hzscore- | SHORT | 3 | 33.3% | -2.41 | DISABLED | Needs more data |
+| range_breakout_short | SHORT | 8 | 37.5% | -1.88 | ENABLED | Borderline |
+| wave_catcher+ | LONG | 5 | 40.0% | -1.61 | ENABLED | Borderline |
+| hzscore- | SHORT | 14 | 50.0% | -1.47 | DISABLED | Borderline |
+| continuation-,hzscore- | SHORT | 2 | 50.0% | -1.37 | DISABLED | Needs more data |
+| mover+ | LONG | 2 | 50.0% | -0.59 | ❓ | Needs more data |
 
 ---
 
 ## DISABLED BUT GOOD (candidates for re-enabling)
 
-| Signal | Dir | Last WR | Last PnL | Recommendation |
-|--------|-----|---------|----------|----------------|
-| hzscore- | SHORT | 56.2% | -0.77 | **WATCH** — re-enable candidate |
+None found. Top performers are already enabled.
 
 ---
 
@@ -46,9 +45,11 @@ None found.
 
 ## RECOMMENDATIONS
 
-1. **[DISABLE] range_breakout_short SHORT** — WR=20.0%, PnL=-5.05% over 10 trades (24h).
-2. **[WATCH] accel-300- SHORT** — WR=44.4%, PnL=-3.33% over 9 trades. Monitor next cycle.
-3. **[WATCH] continuation-,hzscore- SHORT** — WR=33.3%, PnL=-2.41% over 3 trades. Monitor next cycle.
+1. **[WATCH] range_breakout_short SHORT** — WR=37.5%, PnL=-1.88% over 8 trades. Monitor next cycle.
+2. **[WATCH] wave_catcher+ LONG** — WR=40.0%, PnL=-1.61% over 5 trades. Monitor next cycle.
+3. **[WATCH] hzscore- SHORT** — WR=50.0%, PnL=-1.47% over 14 trades. Monitor next cycle.
+4. **[WATCH] continuation-,hzscore- SHORT** — WR=50.0%, PnL=-1.37% over 2 trades. Monitor next cycle.
+5. **[WATCH] mover+ LONG** — WR=50.0%, PnL=-0.59% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -60,15 +61,15 @@ None found.
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-08-13 | e0e2bd2 | config: relax slope filter 0.001→0.0005 (signal starvation) |
-| 2026-08-13 | add0d9f | CEO: Disabled hzscore- standalone SHORT (inverted R:R) |
-| 2026-08-13 | 5224237 | fix: profit_monster bug fixes from bug_hunter audit |
-| 2026-08-13 | 1781f45 | CEO: DISABLED RANGE_BREAKOUT_SHORT — 24h 20% WR flip, -/usr/... |
-| 2026-08-13 | a9a1696 | CEO: verified run 2026-08-13 21:49 UTC — NO CHANGES, flat sy... |
-| 2026-08-13 | 473b4ed | feat: r2_trend_long tuning — filters for stale/overbought/ex... |
-| 2026-08-13 | eab7960 | fix: add both r2-trend-long and r2l-long to STANDALONE_BYPAS... |
-| 2026-08-13 | 3dde6ff | fix: r2_trend_long source string mismatch with STANDALONE_BY... |
-| 2026-08-13 | 81cc8b5 | config: add r2_trend_long to STANDALONE_BYPASS_SIGNALS |
-| 2026-08-13 | 4601d78 | signals: add r2_trend_long — R² trend confirmation for LONG ... |
+| 2026-08-14 | d807d8c | signals: add trend filter to wave_catcher+ to block dead-cat... |
+| 2026-08-14 | 7cbed0b | signals: add coin_tracker_hot — fire signals from coin_track... |
+| 2026-08-14 | 83e04a6 | config: update profit_monster trailing params |
+| 2026-08-14 | 8b132da | signals: wave_catcher tuned for PUMP pattern |
+| 2026-08-14 | 1e38d75 | signals: wave_catcher added to solo bypass and volatility ga... |
+| 2026-08-14 | 9e67d89 | signals: new wave_catcher signal — catch violent spikes |
+| 2026-08-14 | 7a0a5a7 | coin_tracker: Fix analysis coverage and scoring |
+| 2026-08-14 | 6c88560 | dashboard: Add Wyckoff, Elliott Wave, Trend to coin_tracker.... |
+| 2026-08-14 | ab722a4 | CEO: disable hzscore+ standalone, re-enable range_breakout_s... |
+| 2026-08-14 | 6379482 | signals: add price_acceleration filter to r2_trend_long |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

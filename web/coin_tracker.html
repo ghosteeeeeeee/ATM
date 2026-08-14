@@ -126,6 +126,40 @@
         .signal-tag.long { background: #00ff8822; color: #00ff88; }
         .signal-tag.short { background: #ff444422; color: #ff4444; }
 
+        /* Signal overlay on card */
+        .signal-overlay {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 10;
+            animation: signalPulse 2s ease-in-out infinite;
+        }
+        .signal-overlay.long {
+            background: #00ff8833;
+            color: #00ff88;
+            border: 1px solid #00ff8866;
+        }
+        .signal-overlay.short {
+            background: #ff444433;
+            color: #ff4444;
+            border: 1px solid #ff444466;
+        }
+        .signal-arrow {
+            font-size: 14px;
+        }
+        @keyframes signalPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .coin-card { position: relative; }
+
         /* Score breakdown bars */
         .breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin-top: 8px; font-size: 10px; }
         .breakdown-row { display: flex; align-items: center; gap: 6px; }
@@ -420,7 +454,18 @@ function renderCard(c) {
     const clusterBull = parseFloat(c.clustering_bullish) || 0;
     const clusterBear = parseFloat(c.clustering_bearish) || 0;
 
+    // Signal overlay
+    const signalType = c.signal_type || '';
+    const signalConf = c.signal_confidence || 0;
+    const isLong = signalType.toLowerCase().includes('long');
+    const isShort = signalType.toLowerCase().includes('short');
+    const hasSignal = (isLong || isShort) && signalConf > 0 && health in ('hot', 'ready');
+    const signalClass = isLong ? 'long' : isShort ? 'short' : '';
+    const signalArrow = isLong ? '▲' : isShort ? '▼' : '';
+    const signalLabel = signalType.replace(/_/g, ' ').replace(/(long|short)/i, '').trim();
+
     return `<div class="coin-card" data-sym="${c.symbol}" onclick="toggleDetail(this)">
+        ${hasSignal ? `<div class="signal-overlay ${signalClass}"><span class="signal-arrow">${signalArrow}</span> ${signalLabel} ${signalConf.toFixed(0)}%</div>` : ''}
         <div class="card-top">
             <div class="card-top-left">
                 ${iconHtml(c.symbol)}
