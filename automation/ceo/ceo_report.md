@@ -1,7 +1,19 @@
-## CEO Report — 2026-08-15 (22:00 UTC — stability check)
+## CEO Report — 2026-08-15 (CEO run — verified)
 
 ### Diagnosis
-24h: 75T -$0.74 (50.7% WR — RED). **0 trades closed today (Aug 15)** — all from Aug 14. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.51. **48h R:R inverted: avg win 0.458% vs avg loss -0.753% = 0.61:1.** 1 open (r2-trend-long2 LONG). Stars7d intact (5 profitable). Disk 83%. Pipeline healthy. All timers running.
+24h: 74T -$0.64 (51.4% WR — RED). **R:R still inverted: avg win 0.45% vs avg loss -0.75% = 0.60:1.** 2 open (r2-trend-long2 LONG). ATR_TP_K_MULT 2.0 and PM_TRAIL 0.60 in eval window (needs ~48h more). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.51. Stars7d intact (5 profitable). Disk 83%.
+
+### Root Cause
+**range_breakout_short SHORT** — worst active signal: 13T 48h, 23.1% WR, -$0.61. Re-enabled Aug 14 at 52% WR, deteriorated to 23% in 48h. atr_sl_hit dominates (10T, -$0.71). wave_catcher+ LONG (8T 37.5% WR -$0.42) and mover+ LONG (7T 28.6% WR -$0.15) are below 10T threshold — aging out since master flags disabled.
+
+### Fix Applied
+**DISABLED RANGE_BREAKOUT_SHORT_ENABLED=False.** Expected: -$0.61/48h saved. No other changes — eval windows for ATR_TP_K_MULT 2.0 and PM_TRAIL 0.60 still active.
+
+### Verification
+- range_breakout_short SHORT: 13T 48h, 23.1% WR, -$0.61 → killed
+- Eval windows: ATR_TP_K_MULT 2.0 (deployed Aug 15), PM_TRAIL 0.60 (deployed Aug 14) — monitor R:R improvement
+- mover+ LONG: 7T 28.6% WR -$0.15 — if hits 10T without improvement → disable
+- Disk: 83% — if hits 85% → cleanup
 
 **Eval windows active:** ATR_TP_K_MULT 2.0 (today), PM_TRAIL_ACTIVATE_PCT 0.60, PM_TRAIL_DISTANCE_PCT 0.40 — all need 48h.
 
