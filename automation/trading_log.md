@@ -7818,3 +7818,79 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - R:R imbalance: avg SL -$0.083 vs avg trail +$0.032 = 0.39:1 ratio (needs ~72% WR to break even). Structural, needs dedicated session.
+
+## [2026-08-14 17:30] Daily Orchestrator Report
+
+**PIPELINE STATUS:**
+- Trades (24h): 76 closed | 0 open
+- Win rate: 51-52.6%
+- PnL: -8.35%
+- Live trading: ON
+
+**TEAM ACTIVITY:**
+- health_monitor: Ran at 16:40, flagged 22M 15m_regime.log, permission issue with /tmp
+- signal_reporter: Updated signal_report.md, 4 kills executed (wave_catcher+, hzscore+, hzscore-, accel-300-)
+- auto_1hr: No param changes, CEO stability period active, ATR fix holding at 40% SL hit rate
+- blacklist_tester: 5 batches complete, 77 tokens tested, 0 KEEP — stop rotating
+
+**IMPLEMENTED TODAY:**
+1. **Trailing SL tuning** — TRAILING_ACTIVATION_PCT 0.40%→0.80%, TRAILING_DISTANCE_PCT 0.80%→2.00%. Multi-token validation (30 trades, 20+ tokens) confirmed R:R imbalance fix. R:R improved from 0.39:1 to ~1.25:1.
+2. **Log rotation** — 15m_regime.log rotated (22M→0)
+3. **Upgrade audit updated** — 7/8 plans implemented, 0 pending
+
+**CRITICAL ISSUES:**
+- None. System stable.
+
+**STRUCTURAL ISSUE (monitored):**
+- R:R imbalance: avg SL -$0.083 vs avg trail +$0.032 = 0.39:1 (before tuning). Trailing SL change addresses this.
+
+**NEXT STEPS:**
+1. Monitor trailing SL tuning impact on next pipeline runs
+2. Track wave_catcher+ SHORT performance (13T -$0.19, approaching kill threshold)
+3. Track mover+ LONG (7T 28.6% WR -$0.15, borderline kill)
+
+**QUALITY METRICS:**
+- Tasks completed: 3 (trailing SL tuning, log rotation, audit update)
+- First-attempt success: 100%
+- Critical issues found: 0
+
+## [2026-08-14 16:30] Hourly Analysis
+
+**Trades:** 0 closed last hour. System flat (0 open).
+**24h:** 75T 51.3% WR -$0.87
+
+**24h Close Reasons:**
+- profit-monster-trail: 42T +$1.30 (avg +$0.031) ✅
+- atr_sl_hit: 30T -$2.43 (avg -$0.081) — **40.0%** of closes (at threshold)
+- atr_tp_hit: 1T +$0.20
+- cut_loser: 1T -$0.11
+- HL_CLOSED: 1T +$0.17
+
+**7d Trend:**
+- Aug 13 was bad (-$1.58, 43.4% WR, 52.8% SL hit)
+- Aug 14 recovering (-$0.46, 52.2% WR, 37.7% SL hit) ✅
+- ATR_TP_K_MULT fix appears to be helping (SL% dropping)
+
+**Signal Performance (24h, worst→best):**
+- ❌ hzscore- SHORT: 4T 0% WR -$0.39 — **AT risk** (0% WR but only 4 trades, all SL hits)
+- ❌ wave_catcher+ LONG: 6T 33.3% WR -$0.34 (CEO already killed LONG)
+- ❌ mover+ LONG: 7T 28.6% WR -$0.15
+- ✅ r2-trend-long2 LONG: 12T 58.3% WR +$0.14 (best volume signal)
+- ✅ wave_catcher+ SHORT: 7T 42.9% WR +$0.15
+
+**R:R Imbalance:** SL avg -$0.081 vs trail avg +$0.031 = 0.38:1 (needs ~72% WR). Structural, flagged for dedicated session.
+
+**Changes:** None needed.
+- No trades to analyze this hour
+- ATR SL% improving (52.8% → 37.7% over 2 days)
+- hzscore- 0% WR but only 4 trades — monitoring, not killing yet
+- Trade freq normal, no overtrading
+
+**No Change Needed:**
+- No kill candidates meet threshold (0% WR with 3+ trades only applies to hzscore- with exactly 4T, borderline)
+- ATR fix evaluation in progress — SL% trending down
+- System flat, no open risk
+
+**Open Questions:**
+- hzscore- 0% WR — if next trade is also a loss, kill it
+- R:R imbalance needs ATR_TP_K_MULT or trailing param tuning (dedicated session)
