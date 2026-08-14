@@ -8027,3 +8027,26 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - R:R imbalance structural (SL avg -$0.081 vs trail avg +$0.031 = 0.38:1) — needs dedicated tuning session
 - System dormant (no trades closed in 12+ hours) — check if pipeline running
+
+## [2026-08-15 08:30] Hourly Analysis
+
+**Trades:** 0 closed last hour (system dormant since Aug 14 20:40). 2 open: NEAR (+$0.04), BANANA (-$0.03).
+**24h:** 43T 50.0% WR +$1.36 (profit-monster-trail: 43T +$1.32, atr_sl_hit: 29T -$2.33)
+
+**Diagnosis:**
+- Pipeline running (1min cycle), 18 signals active, breakout engine scanning 108 tokens
+- 0 hotset entries — all tokens filtered (vol floor, spike filter, vel filter)
+- System dormant because market conditions aren't producing qualifying signals — not a bug
+- ATR SL% = 39.2% (below 40% threshold ✅, trending down from 52.8%)
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No 0% WR kill candidates with 3+ trades (hzscore- only 2T)
+- Trade freq normal, no overtrading
+- CEO stability period active — eval window for PM_TRAIL_ACTIVATE_PCT 0.60 and ATR_TP_K_MULT 2.0
+- R:R imbalance structural (0.38:1) — needs dedicated tuning session, not hourly fix
+- 2 open positions tracking — NEAR slightly green, BANANA slightly red
+
+**Open Questions:**
+- 26h without a closed trade is unusual. Filters may be too tight for current market. Consider relaxing vol floor or spike filter if dormancy continues past 48h.

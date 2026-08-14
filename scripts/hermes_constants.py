@@ -469,7 +469,7 @@ ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL (bumped from 1.5 — 3rd red day,
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
-ATR_SL_MIN_ACCEL   = 0.0015  # 0.15% floor — allow trailing to lock in profits
+ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits. CEO directive: do NOT change
 # Was 0.5% — too wide, prevented trailing from locking in profits
 # Lower than TRAILING_DISTANCE_PCT (0.20%) so trailing takes over
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
@@ -800,8 +800,8 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # master switch for trailing tier
-PM_TRAIL_ACTIVATE_PCT = 0.60  # trail arms at +0.60% — prevents premature exit (was 0.30: avg trail win 0.39% vs avg SL 0.79% = 0.49:1 inverted R:R). 0.60 lets winners approach ATR_TP_K_MULT 2.0 target (1.6%). CEO 2026-08-15
-PM_TRAIL_DISTANCE_PCT = 0.40  # trail 0.40% behind peak (widened from 0.20% — avg trail win was 0.46% vs avg SL 0.60%, inverted R:R. 0.40% lets winners run closer to ATR_TP_K_MULT target)
+PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — trail arms at +0.40% (tightened from 0.60% 2026-08-15). CEO directive: do NOT change
+PM_TRAIL_DISTANCE_PCT = 0.0015  # 0.15% behind peak (tightened from 0.40% 2026-08-15). CEO directive: do NOT change
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 

@@ -483,7 +483,7 @@ def compute_atr_sl_tp(
         if in_loss:
             MIN_SL_PCT = ATR_SL_MIN   # 1.0% — initial SL, even for established trades
         elif atr is not None and atr > 0:
-            MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.15% — established trade floor in profit
+            MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.30% — established trade floor in profit
         MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades
 
     # ── Clamp effective percentages ─────────────────────────────────────────────
