@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (CEO ack — wave_catcher tuning complete)
+
+### ACKNOWLEDGED — wave_catcher Add-Signal Checklist Complete
+
+All add-signal checklist items verified:
+
+- **Layer 2 enforcement** added in `signal_schema.py`
+- **Source weights** added in `signal_compactor.py`
+- **Velocity threshold tuned:** 0.3% → 0.4% (backtested, reduces noise entries)
+- **PUMP backtest:** 39 trades, 69.2% WR, +6.06% PnL (SL=0.8%, trail activate=0.4%, close=0.15%)
+- **Bug hunter verified clean**
+
+**Action:** Signal is live. Monitor 48h for first live trades. Evaluate WR and PnL after 10+ trades before any param tuning.
+
+---
+
 ## CEO Report — 2026-08-15 (CEO ack — wave_catcher signal)
 
 ### ACKNOWLEDGED — wave_catcher New Signal
