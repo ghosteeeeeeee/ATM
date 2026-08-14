@@ -319,3 +319,48 @@ ALERTS:
 ## Error Alerts — 2026-08-14 04:09 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing 2Z: cannot import name 'score_wyckoff' from 'coin_tracker_score' (/root/.hermes/scripts/coin_tracker_score.py)`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: cannot import name 'score_wyckoff' from 'coin_tracker_score' (/root/.hermes/scripts/coin_tracker_score.py)`
+
+## Health Report — 2026-08-14 04:40 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-14 04:40 UTC
+
+PIPELINE: OK
+- Status: running (last cycle completed 04:39:30, 32.5s CPU)
+- Signals (1h): ~94 runner cycles, 0 approved (all filtered by confidence)
+- Trades: 5 open, 57 closed today
+- PnL: -7.77%
+- Errors: 0 tracebacks/crashes
+
+MARKET:
+- Regime: 0 LONG / 0 SHORT / 105 NEUTRAL (dead flat)
+- Speed: not available in regime file
+- Hotset: empty (0 tokens survived compaction)
+- Macro gate: REDUCE (regime=NEUTRAL)
+
+SYSTEM:
+- Timers: 44 active, all firing on schedule
+- Guardian: active
+- Disk: 82% (91G/118G, 27G free)
+- Prices: 103 coins tracked by coin_tracker
+- Kill switch: LIVE enabled
+
+AUTO-FIXES APPLIED:
+- Compressed + truncated pipeline.log (was 40MB → compressed archive)
+
+ALERTS:
+- [WARN] coin_tracker: score_wyckoff import error (4x) — function missing from coin_tracker_score.py
+- [WARN] Disk at 82% — 3% from 85% threshold
+- [WARN] -7.77% PnL today (57 closed trades)
+- [WARN] hermes-smoke-test timer dead (3 weeks stale, no trigger)
+- [INFO] Market 100% NEUTRAL — no signals expected, no trades warranted
+```
+
+## Error Alerts — 2026-08-14 04:40 UTC
+- **[WARN]** (4x): `coin_tracker: cannot import name 'score_wyckoff'` — function not defined in coin_tracker_score.py. Non-blocking (coin_tracker processes 103/103 coins, 0 errors otherwise).
+- **[WARN]** (1x): `Disk 82%` — 91G/118G used, 27G free. 3% from threshold.
+- **[WARN]** (1x): `hermes-smoke-test timer dead` — no trigger, last fired 3+ weeks ago. Timer enabled but no OnCalendar/OnUnitActiveSec set.
+- **[INFO]**: Pipeline healthy — no crashes, no tracebacks. All core timers (pipeline, price-collector, regime-scanner, watchdog, candle) firing on schedule.
+- **INFO**: Market 100% NEUTRAL (105/105 tokens). 0 signals above 50% confidence. Expected: no new trades in flat market.
+- **AUTO-FIX**: Compressed pipeline.log from 40MB to .gz archive, truncated live log.

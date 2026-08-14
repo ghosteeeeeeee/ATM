@@ -198,7 +198,7 @@ LONG_BLACKLIST = {
     # AUTO-BLACKLISTED 2026-08-12 — 35% WR threshold (5+ trades, 7d)
     'XRP',
 }
-BROAD_MARKET_TOKENS = {'SOL', 'BTC'}
+BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset

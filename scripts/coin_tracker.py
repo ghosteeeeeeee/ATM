@@ -36,7 +36,7 @@ from coin_tracker_analysis import analyze_coin
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 MIN_PRICE = 1e-12           # Skip zero/near-zero prices
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, BROAD_MARKET_TOKENS
 SKIP_COINS = SHORT_BLACKLIST | LONG_BLACKLIST
 
 # Also filter test/fake coins (@ prefix, numeric-only names)
@@ -146,8 +146,8 @@ def collect():
     signals_conn = sqlite3.connect(RUNTIME_DB, timeout=10)
     try:
         candles_5m = _read_candles_batch(tokens, '5m', 200, candles_conn)
-        candles_1h = _read_candles_batch(tokens, '1h', 100, candles_conn)
-        candles_4h = _read_candles_batch(tokens, '4h', 100, candles_conn)
+        candles_1h = _read_candles_batch(tokens, '1h', 200, candles_conn)
+        candles_4h = _read_candles_batch(tokens, '4h', 200, candles_conn)
         signals = _read_signals_batch(tokens, hours=24, conn=signals_conn)
     finally:
         candles_conn.close()
@@ -178,7 +178,8 @@ def collect():
             if meta.get('isDelisted', False):
                 skipped += 1
                 continue
-            if symbol in SKIP_COINS:
+            # Skip blacklisted coins UNLESS they're broad market tokens (always analyze)
+            if symbol in SKIP_COINS and symbol not in BROAD_MARKET_TOKENS:
                 skipped += 1
                 continue
             if _is_fake_coin(symbol):

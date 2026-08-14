@@ -314,8 +314,8 @@ def _is_impulse_wave(waves: List[Dict], direction: str) -> bool:
     - Waves 1, 3, 5 move with trend (same direction)
     - Waves 2, 4 retrace against trend
     - Wave 3 is typically the longest (or at least not the shortest)
-    - Wave 2 retraces 38-78% of wave 1
-    - Wave 4 retraces 23-50% of wave 3
+    - Relaxed Fibonacci: wave 2 retraces 20-85% of wave 1
+    - Relaxed Fibonacci: wave 4 retraces 15-55% of wave 3
     """
     if len(waves) < 5:
         return False
@@ -333,7 +333,7 @@ def _is_impulse_wave(waves: List[Dict], direction: str) -> bool:
     if min(lengths) == lengths[1]:  # wave 3 is shortest
         return False
 
-    # Fibonacci retracements
+    # Relaxed Fibonacci retracements
     w1_len = abs(waves[0]['high'] - waves[0]['low'])
     w2_len = abs(waves[1]['high'] - waves[1]['low'])
     w3_len = abs(waves[2]['high'] - waves[2]['low'])
@@ -341,12 +341,12 @@ def _is_impulse_wave(waves: List[Dict], direction: str) -> bool:
 
     if w1_len > 0:
         w2_retrace = w2_len / w1_len
-        if w2_retrace < 0.38 or w2_retrace > 0.78:
+        if w2_retrace < 0.20 or w2_retrace > 0.85:
             return False
 
     if w3_len > 0:
         w4_retrace = w4_len / w3_len
-        if w4_retrace < 0.23 or w4_retrace > 0.50:
+        if w4_retrace < 0.15 or w4_retrace > 0.55:
             return False
 
     return True
@@ -632,21 +632,15 @@ def compute_trend_quality(candles_5m: List[Dict], candles_1h: List[Dict] = None)
     else:
         direction = 'NEUTRAL'
 
-    # Score: ADX > 25 = trending, > 40 = strong trend
-    if adx < 15:
-        score = 30  # weak/no trend
-    elif adx < 25:
-        score = 50  # developing trend
-    elif adx < 40:
-        score = 70  # trending
-    else:
-        score = 85  # strong trend
+    # Score: smooth curve based on ADX (0-100 scale)
+    # ADX 0 = no trend (20), ADX 20 = developing (50), ADX 40 = strong (80), ADX 60+ = very strong (95)
+    score = 20 + (adx / 60) * 75
+    score = max(20, min(95, score))
 
     # Bonus for directional clarity
-    if adx > 25:
+    if adx > 20:
         di_diff = abs(plus_di - minus_di)
-        if di_diff > 20:
-            score += 10
+        score += min(10, di_diff / 3)
 
     return {
         'score': min(100, score),

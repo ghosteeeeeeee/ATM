@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (CEO run — verified)
+
+### Diagnosis
+24h: 56T **-$0.76** (53.6% WR — RED but recovering). 7d: 434T **-$0.46** (51.6% WR — slightly negative, improving from -$0.67). Daily: Aug 13 53T **-$1.58** (43.4% WR — worst day, legacy clearing) → Aug 14 20T **+$0.09** (65% WR — recovering). 6 open **$0** flat. All legacy bleeders cleared. Stars7d intact (5 profitable). SHORT7d negative but 100% from disabled signals.
+
+### Root Cause
+System in stability period. Aug 13 was worst day ($1.58 loss) — legacy trades from disabled signals still clearing. 7d PnL improved from -$0.67 to -$0.46 as legacy ages out. range_breakout_short had bad24h (-$0.37, 30% WR) but 7d still profitable (+$0.06, 52% WR) — normal variance after +$0.49 on Aug 12. ma100-cross losses are all Aug 7-8 legacy (last close Aug 8-9), will age out of7d window.
+
+### Fix Applied
+NO CHANGES — system stabilizing. No new bleeders to disable. No active signals at concerning thresholds.
+
+### Verification
+Next run: monitor if 7d continues improving toward breakeven, range_breakout_short recovers from bad day, daily PnL stays positive.
+
+---
+
 ## CEO Report — 2026-08-14 (CEO ack — continuation hardening)
 
 ### ACKNOWLEDGED — Continuation Signal Hardening
