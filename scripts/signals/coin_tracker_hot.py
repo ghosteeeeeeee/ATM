@@ -95,10 +95,6 @@ def detect(token, data):
     if health not in ('hot', 'ready'):
         return None
 
-    # Must meet minimum setup threshold
-    if setup_score < COIN_TRACKER_HOT_SETUP_THRESHOLD:
-        return None
-
     # Must have at least one structure signal (not just echoes from other signals)
     has_structure = (
         (wyckoff and wyckoff != 'none') or

@@ -11,15 +11,18 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.20,
-    'volume': 0.15,
-    'volatility': 0.10,
-    'spread': 0.10,
-    'signals': 0.10,
-    'regime': 0.05,
+    'momentum': 0.18,
+    'volume': 0.12,
+    'volatility': 0.08,
+    'spread': 0.08,
+    'signals': 0.05,    # reduced to prevent echo
+    'regime': 0.04,
     'wyckoff': 0.15,
     'ewave': 0.10,
-    'trend': 0.05,
+    'trend': 0.08,
+    'setup': 0.12,      # NEW: setup strength
+    'clustering': 0.05, # NEW: indicator alignment
+    'recency': 0.05,    # NEW: data freshness
 }
 
 # ── Indicators ─────────────────────────────────────────────────────────────────

@@ -332,6 +332,10 @@ def collect():
                 s_wyckoff = _score_wyckoff(wyckoff.get('phase'))
                 s_ewave = _score_ewave(ewave.get('wave'), ewave.get('direction'))
                 s_trend_quality = _score_trend_quality(trend.get('score'))
+                s_setup = _score_wyckoff(setup.get('setup_type'))  # reuse wyckoff scoring for setup type
+                clustering = setup.get('clustering', {})
+                s_clustering = min(100, (clustering.get('bullish_clusters', 0) + clustering.get('bearish_clusters', 0)) * 20)
+                s_recency = (setup.get('recency') or 0.5) * 100
 
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +
@@ -342,12 +346,11 @@ def collect():
                     s_regime * WEIGHTS['regime'] +
                     s_wyckoff * WEIGHTS['wyckoff'] +
                     s_ewave * WEIGHTS['ewave'] +
-                    s_trend_quality * WEIGHTS['trend']
+                    s_trend_quality * WEIGHTS['trend'] +
+                    s_setup * WEIGHTS['setup'] +
+                    s_clustering * WEIGHTS['clustering'] +
+                    s_recency * WEIGHTS['recency']
                 )
-
-                # Boost composite if strong setup forming
-                if setup.get('setup_score', 0) > 60:
-                    composite = min(100, composite + setup['setup_score'] * 0.1)
 
                 # No candle data = no real activity → force cold/dead
                 if not has_candles:
