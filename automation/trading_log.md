@@ -7651,3 +7651,41 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - R:R imbalance persists (avg SL -$0.078 vs avg trail +$0.040). Needs dedicated tuning session.
+
+## [2026-08-14 11:30 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** $0.01 (75% WR)
+**24h:** 65T, 51.6% WR, -$0.61
+
+**Changes:** None — no signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL hit 41.5% (27/65 24h) — above 40% threshold but profit-monster-trail +$1.43 compensates SL -$2.19. Structural, needs dedicated tuning session.
+- wave_catcher+ (10T 40% WR -$0.15) — weak but not at 0% WR kill threshold.
+- hzscore- (10T 40% WR -$0.21) — likely already killed by CEO, draining old positions.
+- mover+ (3T 33.3% WR -$0.14) — exactly 3 trades, borderline but not 0% WR.
+- range_breakout_short (6T 33.3% WR -$0.12) — CEO re-enabled Aug 14, losing but 7d profitable. Variance.
+- Trade frequency 4/hr — normal.
+
+**Open Questions:**
+- R:R imbalance persists (avg SL -$0.081 vs avg trail +$0.040). Needs dedicated tuning session.
+
+## [2026-08-14 12:30 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L)
+**PnL:** -$0.04 (50% WR)
+**24h:** 69T, 50.7% WR, -$0.74
+
+**Changes:** None — no signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL hit 42% (29/69) — above 40% threshold but profit-monster-trail (+$1.50) compensates SL (-$2.30). Structural, needs dedicated tuning session.
+- wave_catcher+ (10T 40% WR -$0.15) — weak but not at 0% WR kill threshold.
+- mover+ (3T 33% WR -$0.14) — borderline, not 0% WR.
+- range_breakout_short (6T 33% WR -$0.12) — borderline.
+- 5 open trades (all r2-trend signals, minor unrealized PnL).
+- Trade freq 4/hr — normal.
+
+**Open Questions:**
+- R:R imbalance persists (avg SL -$0.079 vs avg trail +$0.039). Needs dedicated tuning session.

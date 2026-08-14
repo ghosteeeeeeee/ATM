@@ -525,3 +525,11 @@
   WHY: 2T last hour (1W 1L -$0.01). 24h 64T 51.6% WR -$0.61. ATR SL 43.8% (above 40% but profit-monster-trail +$1.36 compensates SL -$2.17). hzscore- 12T 41.7% WR -$0.29 (likely already killed, draining). wave_catcher+ 10T 40% WR -$0.15 (weak, not 0% WR kill). mover+ 3T 33.3% WR -$0.14 (borderline). 4 open trades healthy. Trade freq 2/hr normal. No 0% WR kill candidates. R:R imbalance persists. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 11:30 UTC
+[2026-08-14 11:30] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L +$0.01). 24h 65T 51.6% WR -$0.61. ATR SL 41.5% (above 40% but profit-monster-trail +$1.43 compensates SL -$2.19). wave_catcher+ 10T 40% WR -$0.15 (weak, not 0% WR kill). hzscore- 10T 40% WR -$0.21 (draining). mover+ 3T 33.3% WR -$0.14 (borderline). range_breakout_short 6T 33.3% WR -$0.12 (CEO re-enabled, 7d profitable). Trade freq 4/hr normal. No 0% WR kill candidates. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 12:30 UTC
+[2026-08-14 12:30] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L -$0.04). 24h 69T 50.7% WR -$0.74. ATR SL 42% (above 40% but profit-monster-trail +$1.50 compensates SL -$2.30). wave_catcher+ 10T 40% WR -$0.15 (weak, not 0% WR kill). mover+ 3T 33% WR -$0.14 (borderline). 5 open trades healthy. Trade freq 4/hr normal. No 0% WR kill candidates. R:R imbalance persists (avg SL -$0.079 vs avg trail +$0.039). No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 13:30 UTC
