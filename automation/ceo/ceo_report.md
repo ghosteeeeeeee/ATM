@@ -1,3 +1,31 @@
+## CEO Report — 2026-08-14 01:49 UTC (CEO run)
+
+### Diagnosis
+24h: 46T **-$1.14** (45.7% WR — RED). 7d: 421T **-$0.56** (51.1% WR — flat). Daily: Aug 12 +$0.49 → Aug 13 53T **-$1.58** (43.4% WR — worst day, legacy clearing) → Aug 14 4T -$0.08 (barely started). 6 open flat.
+
+### Root Cause
+All 24h/7d losses from DISABLED legacy signals — no new bleeders:
+- range_breakout+ LONG 8T -$0.41 (25% WR) — disabled
+- trend_momentum_near_sma+ LONG 6T -$0.37 (16.7% WR) — disabled
+- accel-300- SHORT 40T -$0.30 (55% WR) — disabled
+- continuation-,hzscore- SHORT 5T -$0.24 (40% WR) — disabled
+- hzscore- SHORT 32T -$0.21 (53.1% WR) — disabled
+SHORT7d: 187T -$1.21 (100% from disabled legacy). LONG7d: 234T +$0.81 (profitable).
+
+### Fix Applied
+NO CHANGES — all bleeders already disabled, legacy clearing in progress. System flat, stability period.
+
+### Stars7d (intact, 5 profitable)
+bb_bounce+,range_finder+ 53T +$0.71 58.5% | bb_bounce+ 21T +$0.21 61.9% | bb_bounce+,hzscore+ 34T +$0.22 50% | hzscore+,mover+ 5T +$0.17 80% | bb-bounce-short,hzscore- 18T +$0.14 61.1%
+
+### Cost Drivers48h
+atr_sl_hit 69T -$4.97 (dominant). profit-monster-trail compensating.
+
+### Verification
+Pipeline healthy. LONG7d profitable. SHORT7d negative but 100% from disabled signals — will clear. 6 open trades healthy. Monitor: daily PnL (if -2 consecutive red → investigate), SHORT7d (if still negative after legacy fully clears → regime filter).
+
+---
+
 ## CEO Report — 2026-08-14 01:21 UTC (CEO run)
 
 ### Diagnosis

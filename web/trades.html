@@ -64,7 +64,8 @@
     .hot-empty { text-align: center; padding: 15px; color: #444; border: 1px dashed #ffd70033; border-radius: 4px; margin-bottom: 20px; font-size: 0.9em; }
     .coin-icon { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; vertical-align: middle; margin-right: 4px; object-fit: contain; }
     .coin-icon-fallback { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 8px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 4px; border: 1px solid #00ff8833; }
-    .pm-badge { color: #4488ff; font-size: 0.9em; margin-left: 2px; vertical-align: middle; }
+    .pm-badge { color: #00ff88; font-size: 1.2em; margin-left: 2px; vertical-align: middle; }
+    .pm-row { background: #00ff8811 !important; }
   </style>
 </head>
 <body>
@@ -278,8 +279,8 @@
             else if (tp > 0 && Math.abs(tpDistPct) < 0.5) tpClass = 'near-tp';
             const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
             const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
-            return `<tr>
-              <td>${iconHtml(t.coin)}${t.coin || '--'}${trailState[t.id] ? '<span class="pm-badge">👾</span>' : ''}</td>
+            return `<tr class="${trailState[t.id] ? 'pm-row' : ''}">
+              <td>${iconHtml(t.coin)}${t.coin || '--'}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}</td>
               <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
               <td>$${entry.toFixed(4)}</td>
               <td>$${current.toFixed(4)}</td>

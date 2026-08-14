@@ -39,3 +39,11 @@
 - **Value:** HIGH (70.6% WR on SHORT when BTC falling)
 - **Status:** ✅ IMPLEMENTED — get_tide_penalty() in signal_compactor.py
 - **Reason:** BTC 3h momentum + SHORT WR confirmation. Bearish tide: BTC falling + SHORT WR>55% → suppress LONG. Bullish tide: BTC rising + SHORT WR<45% → suppress SHORT.
+
+## Plan: 2026-08-15_weather-vane-v5-volatility-floor.md
+- **Date scanned:** 2026-08-14 15:03
+- **Core request:** Filter out low-volatility entries (no energy = no trade)
+- **Difficulty:** Level 1
+- **Value:** HIGH ($1.79/14d SHORT savings, 74% WR on kept trades)
+- **Status:** ❌ NOT IMPLEMENTED
+- **Reason:** Backtested and validated. Simple single-function addition. Lowest-hanging fruit.

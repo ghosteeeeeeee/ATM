@@ -7435,3 +7435,56 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL hit rate 53.7% — continuing upward trend, watch if trailing stops compensating
 - continuation-,hzscore- regressed to 33.3% WR (was 50% at 22:30) — watch closely next hour
+
+## [2026-08-14 00:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+**PnL:** -$0.07 (TIA r2-trend-long0 WIN +$0.02, CC hzscore- LOSS -$0.09)
+
+**24h Snapshot:**
+- 46T total, 50% WR, -$0.95
+- profit-monster-trail: 23T +$0.89 (avg +$0.039) — primary profit driver
+- atr_sl_hit: 22T -$1.73 (47.8% of closes — improved from 53.7%)
+- hzscore-: 16T 56.3% WR -$0.01 (slightly negative)
+- accel-300-: 12T 58.3% WR -$0.008 (draining, already killed)
+- range_breakout_short: 9T 22.2% WR (killed by CEO, 2 open positions draining)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 47.8% — improved from 53.7%, trending right direction
+- continuation-,hzscore- 33.3% WR but only 3T — below kill threshold
+- Trade freq ~2/hr — normal, no overtrading
+- PnL not negative for 3+ consecutive hours (last hour slightly negative, prior hours mixed)
+- 6 open trades healthy, all slightly positive or flat
+
+**Open Questions:**
+- BANANA and HBAR range_breakout_short positions open — will drain as trades close
+- continuation-,hzscore- still watch — 33.3% WR, needs more data
+
+## [2026-08-14 01:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+**PnL:** -$0.06 (ME r2-trend-long0 WIN +$0.06, WLD r2-trend-long2,rs-s45 LOSS -$0.12)
+
+**24h Snapshot:**
+- 45T total, ~50% WR, -$1.10
+- profit-monster-trail: 21T +$0.86 (avg +$0.041) — primary profit driver
+- atr_sl_hit: 23T -$1.85 (51.1% of closes — above 40% but trailing compensates)
+- range_breakout_short: 9T -$0.42 (CEO killed, draining)
+- continuation-,hzscore-: 3T -$0.23 (33% WR — watch)
+- accel-300-: 9T -$0.18 (already killed, draining)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 51.1% — above 40% but profit-monster-trail (+$0.86) compensates ATR SL (-$1.85)
+- continuation-,hzscore- 3T 33% WR — below kill threshold (need 0% WR with 3+ trades)
+- Trade freq 1-2/hr — normal, no overtrading
+- 6 open trades healthy (ATOM, DYDX, ETH, SYRUP LONG, HBAR, BANANA SHORT)
+- No 0% WR kill candidates last hour
+- PnL not negative for 3+ consecutive hours
+
+**Open Questions:**
+- ATR SL hit rate 51.1% — continuing upward trend, watch if trailing stops compensate
+- continuation-,hzscore- regressed to 33% WR — monitor next hour
