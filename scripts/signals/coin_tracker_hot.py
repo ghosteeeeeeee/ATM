@@ -20,7 +20,6 @@ from hermes_constants import (
     COIN_TRACKER_HOT_ENABLED,
     COIN_TRACKER_HOT_PLUS_ENABLED,
     COIN_TRACKER_HOT_MINUS_ENABLED,
-    COIN_TRACKER_HOT_SETUP_THRESHOLD,
     COIN_TRACKER_HOT_CLUSTER_MIN,
     COIN_TRACKER_HOT_RECENCY_MIN,
     COIN_TRACKER_HOT_CONF_BASE,
@@ -102,6 +101,10 @@ def detect(token, data):
         (trend_dir and trend_dir != 'NEUTRAL')
     )
     if not has_structure:
+        return None
+
+    # Must have sufficient recency (data freshness)
+    if recency < COIN_TRACKER_HOT_RECENCY_MIN:
         return None
 
     # Must have some directional signal

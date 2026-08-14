@@ -305,7 +305,7 @@ def collect():
                 # ── Compute scores ──
                 has_candles = bool(closes_5m)
                 s_momentum = _score_momentum(closes_5m, ema_9, ema_20, ema_50)
-                s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 30.0
+                s_volume = _score_volume(vol_recent, vol_avg, vol_trend) if vol_avg else 50.0
                 s_volatility = _score_volatility(atr_14, price)
                 s_spread = _score_spread(spread_bps)
                 s_signals = _score_signals(signal_count, avg_confidence, mixed_overall, mixed_recent)
@@ -335,7 +335,8 @@ def collect():
                 s_setup = _score_wyckoff(setup.get('setup_type'))  # reuse wyckoff scoring for setup type
                 clustering = setup.get('clustering', {})
                 s_clustering = min(100, (clustering.get('bullish_clusters', 0) + clustering.get('bearish_clusters', 0)) * 20)
-                s_recency = (setup.get('recency') or 0.5) * 100
+                recency_val = setup.get('recency')
+                s_recency = (recency_val if recency_val is not None else 0.5) * 100
 
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +

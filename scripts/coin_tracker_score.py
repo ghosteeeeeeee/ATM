@@ -11,19 +11,20 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.18,
-    'volume': 0.12,
+    'momentum': 0.16,
+    'volume': 0.10,
     'volatility': 0.08,
     'spread': 0.08,
-    'signals': 0.05,    # reduced to prevent echo
+    'signals': 0.04,    # reduced to prevent echo
     'regime': 0.04,
-    'wyckoff': 0.15,
-    'ewave': 0.10,
-    'trend': 0.08,
-    'setup': 0.12,      # NEW: setup strength
-    'clustering': 0.05, # NEW: indicator alignment
-    'recency': 0.05,    # NEW: data freshness
+    'wyckoff': 0.14,
+    'ewave': 0.09,
+    'trend': 0.07,
+    'setup': 0.10,
+    'clustering': 0.05,
+    'recency': 0.05,
 }
+# ponytail: weights sum to 1.0 — verified
 
 # ── Indicators ─────────────────────────────────────────────────────────────────
 
@@ -381,13 +382,27 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
     s_signals = score_signals(signal_count, avg_confidence)
     s_regime = score_regime(regime)
 
+    # Default neutral scores for analysis components (not available in simplified mode)
+    s_wyckoff = 50.0
+    s_ewave = 50.0
+    s_trend_quality = 50.0
+    s_setup = 50.0
+    s_clustering = 50.0
+    s_recency = 75.0  # assume decent recency
+
     composite = (
         s_momentum * WEIGHTS['momentum'] +
         s_volume * WEIGHTS['volume'] +
         s_volatility * WEIGHTS['volatility'] +
         s_spread * WEIGHTS['spread'] +
         s_signals * WEIGHTS['signals'] +
-        s_regime * WEIGHTS['regime']
+        s_regime * WEIGHTS['regime'] +
+        s_wyckoff * WEIGHTS['wyckoff'] +
+        s_ewave * WEIGHTS['ewave'] +
+        s_trend_quality * WEIGHTS['trend'] +
+        s_setup * WEIGHTS['setup'] +
+        s_clustering * WEIGHTS['clustering'] +
+        s_recency * WEIGHTS['recency']
     )
 
     return {
