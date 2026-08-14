@@ -34,7 +34,7 @@ from typing import Optional
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 R2_WINDOW             = 16    # regression window in bars (16 × 1m = 16 min)
-R2_THRESHOLD         = 0.60  # minimum R² to confirm a real trend
+R2_THRESHOLD         = 0.60  # minimum R² to confirm a real trend (default, overridden by hermes_constants)
 R2_SIGNAL_TYPE       = 'r2_trend'
 R2_SOURCE_PREFIX     = 'r2s'    # r2-short source tag
 R2_LOOKBACK_CANDLES  = 50    # enough for regression + exit scan
@@ -44,6 +44,29 @@ R2_MAX_CONFIDENCE    = 88    # cap
 R2_BASE_CONFIDENCE   = 65    # base confidence
 R2_R2_BONUS_MAX      = 15    # max bonus for high R²
 R2_RECENCY_BONUS_MAX = 10    # max bonus for fresh cross
+
+# ── Tunable params from hermes_constants (SHORT direction) ─────────────────────
+try:
+    from hermes_constants import (
+        R2_TREND_SHORT_MIN_R2,
+        R2_TREND_SHORT_MIN_SLOPE,
+        R2_TREND_SHORT_MAX_RSI,
+        R2_TREND_SHORT_MIN_SPEED,
+        R2_TREND_SHORT_MIN_BB_POS,
+        R2_TREND_SHORT_BLOCK_STALE,
+        R2_TREND_SHORT_MAX_ACCEL,
+        R2_TREND_SHORT_MIN_PRE_MOVE,
+    )
+except ImportError:
+    # Fallback defaults if hermes_constants not available
+    R2_TREND_SHORT_MIN_R2 = 0.60
+    R2_TREND_SHORT_MIN_SLOPE = -0.003
+    R2_TREND_SHORT_MAX_RSI = 65
+    R2_TREND_SHORT_MIN_SPEED = 30
+    R2_TREND_SHORT_MIN_BB_POS = 0.15
+    R2_TREND_SHORT_BLOCK_STALE = True
+    R2_TREND_SHORT_MAX_ACCEL = 0.005
+    R2_TREND_SHORT_MIN_PRE_MOVE = 0.0
 
 # ── Linear Regression ─────────────────────────────────────────────────────────
 
@@ -118,7 +141,10 @@ def detect_r2_short(token: str, candles: list, price: float) -> Optional[dict]:
     y = closes[-R2_WINDOW:]
     slope, intercept, r2 = _ols_params(y)
 
-    if r2 < R2_THRESHOLD or slope >= 0 or closes[-1] >= intercept:
+    # Use tunable R² threshold from hermes_constants
+    r2_threshold = R2_TREND_SHORT_MIN_R2
+
+    if r2 < r2_threshold or slope >= 0 or closes[-1] >= intercept:
         return None
 
     # Find how many bars since slope flipped positive (find entry point)
@@ -127,7 +153,7 @@ def detect_r2_short(token: str, candles: list, price: float) -> Optional[dict]:
     for i in range(n - R2_WINDOW, -1, -1):
         y_i = closes[i:i + R2_WINDOW]
         b_i, a_i, r2_i = _ols_params(y_i)
-        if b_i >= 0 or r2_i < R2_THRESHOLD:
+        if b_i >= 0 or r2_i < r2_threshold:
             break
         bars_since = n - R2_WINDOW - i
         entry_idx = i
@@ -135,7 +161,7 @@ def detect_r2_short(token: str, candles: list, price: float) -> Optional[dict]:
     bars_since = max(n - R2_WINDOW - entry_idx, 0)
 
     # Confidence scoring
-    r2_bonus     = min((r2 - R2_THRESHOLD) / (1.0 - R2_THRESHOLD) * R2_R2_BONUS_MAX, R2_R2_BONUS_MAX)
+    r2_bonus     = min((r2 - r2_threshold) / (1.0 - r2_threshold) * R2_R2_BONUS_MAX, R2_R2_BONUS_MAX)
     recency_bonus = max(R2_RECENCY_BONUS_MAX - bars_since, 0)
 
     confidence = int(min(
