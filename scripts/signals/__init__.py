@@ -348,6 +348,11 @@ except Exception:
     _stop_hunt_reversal_long_run = None
 
 try:
+    from signals.wave_catcher import run as _wave_catcher_run
+except Exception:
+    _wave_catcher_run = None
+
+try:
     from signals.spike_exhaustion_short import run as _spike_exhaustion_short_run
 except Exception:
     _spike_exhaustion_short_run = None
@@ -423,6 +428,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'trend_momentum_near_sma', 'enabled': 'TREND_MOMENTUM_NEAR_SMA_ENABLED', 'run': _trend_momentum_near_sma_run},
     {'name': 'stop_hunt_reversal_long', 'enabled': 'STOP_HUNT_REVERSAL_LONG_ENABLED', 'run': _stop_hunt_reversal_long_run},
     {'name': 'spike_exhaustion_short', 'enabled': 'SPIKE_EXHAUSTION_SHORT_ENABLED', 'run': _spike_exhaustion_short_run},
+    {'name': 'wave_catcher', 'enabled': 'WAVE_CATCHER_ENABLED', 'run': _wave_catcher_run},
 ]
 
 

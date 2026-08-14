@@ -1619,3 +1619,16 @@ HEBBIAN_TOKEN_WR_RATIO_LOW = 0.5             # profit/SL ratio threshold for pen
 HEBBIAN_CIRCUIT_BREAKER_WR = 0.45            # if auto-decision WR drops below, disable gate
 HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before circuit breaker
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
+
+# ── Wave Catcher — catch violent spikes in both directions ──────────────────
+WAVE_CATCHER_ENABLED            = True
+WAVE_CATCHER_PLUS_ENABLED       = True    # LONG direction
+WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
+WAVE_CATCHER_VELOCITY_THRESHOLD = 0.3     # % per bar — minimum velocity to trigger
+WAVE_CATCHER_VELOCITY_WINDOW    = 3       # bars to measure velocity
+WAVE_CATCHER_EMA_PERIOD         = 60      # EMA for trend confirmation
+WAVE_CATCHER_MIN_ATR            = 0.05    # % — minimum ATR to trade (lowered from 0.10 — ATR lags spikes)
+WAVE_CATCHER_ZSCORE_MAX         = 1.5     # max z-score — don't chase overextended
+WAVE_CATCHER_CONF_BASE          = 75      # base confidence
+WAVE_CATCHER_CONF_CAP           = 90      # max confidence
+WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown

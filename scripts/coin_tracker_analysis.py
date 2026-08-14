@@ -754,4 +754,342 @@ def analyze_coin(candles_5m: List[Dict], candles_1h: List[Dict],
     # Volume profile (use 5m)
     result['vol_profile'] = compute_volume_profile(candles_5m)
 
+    # Setup detection and clustering
+    result['setup'] = detect_setup(candles_5m, candles_1h, candles_4h)
+
     return result
+
+
+# ── Setup Detection ──────────────────────────────────────────────────────────
+
+def detect_wyckoff_forming(candles: List[Dict]) -> Dict:
+    """Detect Wyckoff patterns that are FORMING but not complete.
+
+    Returns: {forming: bool, phase, confidence, details}
+    """
+    if len(candles) < 40:
+        return {'forming': False, 'phase': 'none', 'confidence': 0, 'details': 'insufficient data'}
+
+    vol_sma = _volume_sma(candles)
+
+    # Check for recent climax (last 30 bars)
+    climax_idx = _find_climax(candles[-30:], vol_sma[-30:], 'accumulation')
+    if climax_idx is not None:
+        # Climax detected — range should be forming
+        return {
+            'forming': True,
+            'phase': 'accumulation',
+            'confidence': 40,
+            'details': f'selling climax detected at bar {len(candles) - 30 + climax_idx}, range forming'
+        }
+
+    # Check for range without climax (consolidation)
+    recent = candles[-40:]
+    highs = [c['high'] for c in recent]
+    lows = [c['low'] for c in recent]
+    range_pct = (max(highs) - min(lows)) / min(lows) * 100 if min(lows) > 0 else 0
+
+    if range_pct < 3.0:  # Tight range = consolidation
+        # Check for volume decline (characteristic of accumulation)
+        early_vol = sum(vol_sma[-40:-20]) / 20
+        late_vol = sum(vol_sma[-20:]) / 20
+        vol_declining = late_vol < early_vol * 0.8
+
+        if vol_declining:
+            return {
+                'forming': True,
+                'phase': 'accumulation',
+                'confidence': 30,
+                'details': f'tight range ({range_pct:.1f}%), volume declining — potential accumulation'
+            }
+
+    # Check for distribution forming
+    climax_idx_d = _find_climax(candles[-30:], vol_sma[-30:], 'distribution')
+    if climax_idx_d is not None:
+        return {
+            'forming': True,
+            'phase': 'distribution',
+            'confidence': 40,
+            'details': f'buying climax detected, distribution phase forming'
+        }
+
+    return {'forming': False, 'phase': 'none', 'confidence': 0, 'details': 'no pattern forming'}
+
+
+def detect_ewave_forming(candles_4h: List[Dict]) -> Dict:
+    """Detect Elliott Wave patterns that are FORMING.
+
+    Returns: {forming: bool, expected_wave, confidence, details}
+    """
+    if len(candles_4h) < 30:
+        return {'forming': False, 'expected_wave': None, 'confidence': 0, 'details': 'insufficient data'}
+
+    pivots = find_pivots(candles_4h, left=3, right=3)
+    if len(pivots) < 5:
+        return {'forming': False, 'expected_wave': None, 'confidence': 0, 'details': 'insufficient pivots'}
+
+    waves = _label_waves_from_pivots(pivots)
+    if len(waves) < 3:
+        return {'forming': False, 'expected_wave': None, 'confidence': 0, 'details': 'insufficient waves'}
+
+    # Determine what wave should come next
+    last_wave = waves[-1]
+    prev_wave = waves[-2] if len(waves) > 1 else None
+
+    # Count completed waves
+    up_count = sum(1 for w in waves[-6:] if w['direction'] == 'up')
+    down_count = sum(1 for w in waves[-6:] if w['direction'] == 'down')
+
+    # Estimate current wave position
+    if up_count > down_count:
+        # We're in an uptrend — expect correction next
+        expected = 4 if up_count >= 3 else 2
+        confidence = 35 if expected == 2 else 45
+        return {
+            'forming': True,
+            'expected_wave': expected,
+            'confidence': confidence,
+            'details': f'uptrend with {up_count} up waves, expecting wave {expected} correction'
+        }
+    elif down_count > up_count:
+        # We're in a downtrend — expect bounce next
+        expected = 4 if down_count >= 3 else 2
+        confidence = 35 if expected == 2 else 45
+        return {
+            'forming': True,
+            'expected_wave': expected,
+            'confidence': confidence,
+            'details': f'downtrend with {down_count} down waves, expecting wave {expected} bounce'
+        }
+
+    return {'forming': False, 'expected_wave': None, 'confidence': 0, 'details': 'no clear wave forming'}
+
+
+def detect_sr_testing(candles: List[Dict], sr_levels: List[Dict]) -> Dict:
+    """Detect if price is testing S/R levels.
+
+    Returns: {testing: bool, type, level, distance_pct, details}
+    """
+    if not candles or not sr_levels:
+        return {'testing': False, 'type': None, 'level': None, 'distance_pct': None, 'details': 'no data'}
+
+    current_price = candles[-1]['close']
+    if current_price <= 0:
+        return {'testing': False, 'type': None, 'level': None, 'distance_pct': None, 'details': 'invalid price'}
+
+    # Find nearest support and resistance
+    supports = [s for s in sr_levels if s['type'] == 'support']
+    resistances = [r for r in sr_levels if r['type'] == 'resistance']
+
+    nearest_support = max(supports, key=lambda s: s['price']) if supports else None
+    nearest_resistance = min(resistances, key=lambda r: r['price']) if resistances else None
+
+    # Check if price is near a level (within 1%)
+    test_threshold = 1.0  # percent
+
+    if nearest_support:
+        dist = (current_price - nearest_support['price']) / nearest_support['price'] * 100
+        if 0 <= dist <= test_threshold:
+            return {
+                'testing': True,
+                'type': 'support',
+                'level': nearest_support['price'],
+                'distance_pct': dist,
+                'details': f'testing support at {nearest_support["price"]:.8f} ({dist:.2f}% away)'
+            }
+
+    if nearest_resistance:
+        dist = (nearest_resistance['price'] - current_price) / current_price * 100
+        if 0 <= dist <= test_threshold:
+            return {
+                'testing': True,
+                'type': 'resistance',
+                'level': nearest_resistance['price'],
+                'distance_pct': dist,
+                'details': f'testing resistance at {nearest_resistance["price"]:.8f} ({dist:.2f}% away)'
+            }
+
+    return {'testing': False, 'type': None, 'level': None, 'distance_pct': None, 'details': 'not near any level'}
+
+
+def compute_recency_weight(candles: List[Dict], lookback: int = 20) -> float:
+    """Compute recency weight based on recent price action consistency.
+
+    Returns 0.0-1.0. Higher = more consistent recent action = more reliable.
+    """
+    if len(candles) < lookback:
+        return 0.5
+
+    recent = candles[-lookback:]
+    closes = [c['close'] for c in recent if c['close']]
+
+    if len(closes) < 5:
+        return 0.5
+
+    # Count direction changes (fewer = more consistent)
+    changes = 0
+    for i in range(1, len(closes)):
+        if closes[i] != closes[i-1]:
+            changes += 1
+
+    # Normalize: 0 changes = perfect consistency (1.0), many changes = noisy (0.3)
+    consistency = max(0.3, 1.0 - (changes / len(closes)) * 0.7)
+
+    # Recent momentum (last 5 bars vs previous 5)
+    if len(closes) >= 10:
+        recent_momentum = closes[-1] - closes[-5]
+        earlier_momentum = closes[-5] - closes[-10]
+        if recent_momentum * earlier_momentum > 0:  # Same direction
+            consistency = min(1.0, consistency + 0.15)
+
+    return consistency
+
+
+def compute_clustering_score(wyckoff: Dict, ewave: Dict, trend: Dict, sr_testing: Dict) -> Dict:
+    """Compute clustering score — how many indicators align.
+
+    Returns: {score: 0-100, bullish_clusters: int, bearish_clusters: int, details}
+    """
+    bullish = 0
+    bearish = 0
+
+    # Wyckoff signals
+    if wyckoff.get('phase') == 'accumulation':
+        bullish += 1
+    elif wyckoff.get('phase') == 'distribution':
+        bearish += 1
+    if wyckoff.get('forming') and wyckoff.get('phase') == 'accumulation':
+        bullish += 0.5
+
+    # Elliott Wave signals
+    if ewave.get('wave') in [1, 2, 3] and ewave.get('direction') == 'up':
+        bullish += 1
+    elif ewave.get('wave') in [1, 2, 3] and ewave.get('direction') == 'down':
+        bearish += 1
+    if ewave.get('forming'):
+        if ewave.get('expected_wave') in [2, 4]:  # Correction = entry opportunity
+            bullish += 0.5
+
+    # Trend signals
+    if trend.get('direction') == 'BULL':
+        bullish += 1
+    elif trend.get('direction') == 'BEAR':
+        bearish += 1
+
+    # S/R testing
+    if sr_testing.get('testing'):
+        if sr_testing.get('type') == 'support':
+            bullish += 1
+        elif sr_testing.get('type') == 'resistance':
+            bearish += 1
+
+    # Compute score
+    total = bullish + bearish
+    if total == 0:
+        score = 50
+    else:
+        score = (bullish / total) * 100 if bullish > bearish else (bearish / total) * 100
+        # Boost for higher total clusters
+        score = min(100, score + total * 5)
+
+    return {
+        'score': score,
+        'bullish_clusters': bullish,
+        'bearish_clusters': bearish,
+        'details': f'{bullish:.1f} bullish, {bearish:.1f} bearish clusters'
+    }
+
+
+def compute_setup_strength(wyckoff: Dict, ewave: Dict, trend: Dict, sr_testing: Dict,
+                           clustering: Dict, recency: float) -> Dict:
+    """Compute overall setup strength — is a trade setup forming?
+
+    Returns: {score: 0-100, setup_type, confidence, details}
+    """
+    score = 0
+    factors = []
+
+    # Wyckoff contribution
+    if wyckoff.get('phase') in ('accumulation', 'markup'):
+        score += 25
+        factors.append(f'wyckoff={wyckoff["phase"]}')
+    elif wyckoff.get('forming'):
+        score += 15
+        factors.append(f'wyckoff_forming={wyckoff.get("phase")}')
+
+    # Elliott Wave contribution
+    if ewave.get('wave') in [2, 3]:  # Best entry points
+        score += 20
+        factors.append(f'ewave={ewave["wave"]}')
+    elif ewave.get('forming') and ewave.get('expected_wave') in [2, 4]:
+        score += 12
+        factors.append(f'ewave_forming={ewave.get("expected_wave")}')
+
+    # Trend contribution
+    if trend.get('score', 0) > 60:
+        score += 15
+        factors.append(f'trend={trend.get("direction")}')
+
+    # S/R testing
+    if sr_testing.get('testing') and sr_testing.get('type') == 'support':
+        score += 15
+        factors.append('at_support')
+
+    # Clustering boost
+    if clustering.get('bullish_clusters', 0) >= 3 or clustering.get('bearish_clusters', 0) >= 3:
+        score += 15
+        factors.append('strong_clustering')
+
+    # Recency multiplier
+    score = score * (0.7 + 0.3 * recency)
+
+    # Determine setup type
+    if clustering.get('bullish_clusters', 0) > clustering.get('bearish_clusters', 0):
+        setup_type = 'LONG'
+    elif clustering.get('bearish_clusters', 0) > clustering.get('bullish_clusters', 0):
+        setup_type = 'SHORT'
+    else:
+        setup_type = 'NEUTRAL'
+
+    return {
+        'score': min(100, score),
+        'setup_type': setup_type,
+        'confidence': min(100, score * 0.8),
+        'details': ', '.join(factors) if factors else 'no setup'
+    }
+
+
+def detect_setup(candles_5m: List[Dict], candles_1h: List[Dict],
+                 candles_4h: List[Dict]) -> Dict:
+    """Full setup detection — combines all analysis into actionable intelligence.
+
+    Returns: {setup_score, setup_type, forming_patterns, clustering, recency, details}
+    """
+    # Run all detection
+    wyckoff_forming = detect_wyckoff_forming(candles_1h if candles_1h else candles_5m)
+    ewave_forming = detect_ewave_forming(candles_4h)
+    sr_levels = compute_sr_levels(candles_1h if candles_1h else candles_5m)
+    sr_testing = detect_sr_testing(candles_5m, sr_levels)
+    trend = compute_trend_quality(candles_5m, candles_1h)
+    recency = compute_recency_weight(candles_5m)
+
+    # Get existing analysis if available
+    wyckoff = detect_wyckoff_phase(candles_1h if candles_1h else candles_5m)
+    ewave = detect_ewave_count(candles_4h, candles_1h)
+
+    # Compute clustering
+    clustering = compute_clustering_score(wyckoff, ewave, trend, sr_testing)
+
+    # Compute setup strength
+    setup = compute_setup_strength(wyckoff, ewave, trend, sr_testing, clustering, recency)
+
+    return {
+        'setup_score': setup['score'],
+        'setup_type': setup['setup_type'],
+        'setup_details': setup['details'],
+        'wyckoff_forming': wyckoff_forming,
+        'ewave_forming': ewave_forming,
+        'sr_testing': sr_testing,
+        'clustering': clustering,
+        'recency': recency,
+    }

@@ -1,3 +1,18 @@
+## CEO Report — 2026-08-15 (CEO ack — r2-trend-long hardening)
+
+### ACKNOWLEDGED — r2-trend-long Entry Hardening
+
+**Changes received:**
+- Require `bars_since >= 2` on long entries
+- Skip long0/long1 entries (50-67% WR, -$0.10)
+- Keep long2+ entries (67-100% WR, +$0.18)
+
+**Backtested:** Clean. No regressions.
+
+**Action:** Monitor 48h for live validation. Expected: fewer early-bar LONG losers, slight WR improvement on r2-trend-long.
+
+---
+
 ## CEO Report — 2026-08-15 (CEO run — verified)
 
 ### Diagnosis
