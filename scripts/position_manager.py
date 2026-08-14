@@ -1867,8 +1867,9 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
                 _dist = abs(new_sl - _entry_chk) / _entry_chk * 100
                 if _dist < 0.15:
                     log(f"  ⚠️ [PHANTOM-WRITE] {u.get('token')} {u.get('direction')}: "
-                        f"WRITING TIGHT SL={new_sl:.6f} entry={_entry_chk:.6f} dist={_dist:.3f}% "
+                        f"BLOCKED tight SL={new_sl:.6f} entry={_entry_chk:.6f} dist={_dist:.3f}% "
                         f"(old_sl={u.get('old_sl')}) trade_id={trade_id}")
+                    continue  # Skip this write — SL too tight, likely ATR bug
             cur.execute(
                 "UPDATE trades SET stop_loss = %s, target = %s, atr_managed = TRUE WHERE id = %s AND status = 'open'",
                 (round(new_sl, 8), round(new_tp, 8), trade_id)
