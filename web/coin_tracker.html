@@ -459,7 +459,7 @@ function renderCard(c) {
     const signalConf = c.signal_confidence || 0;
     const isLong = signalType.toLowerCase().includes('long');
     const isShort = signalType.toLowerCase().includes('short');
-    const hasSignal = (isLong || isShort) && signalConf > 0 && health in ('hot', 'ready');
+    const hasSignal = (isLong || isShort) && signalConf > 0 && (health === 'hot' || health === 'ready');
     const signalClass = isLong ? 'long' : isShort ? 'short' : '';
     const signalArrow = isLong ? '▲' : isShort ? '▼' : '';
     const signalLabel = signalType.replace(/_/g, ' ').replace(/(long|short)/i, '').trim();

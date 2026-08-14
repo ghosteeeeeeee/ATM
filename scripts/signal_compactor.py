@@ -270,8 +270,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('wave_catcher', 'wave_catcher+'): 1.0,
     ('wave_catcher', 'wave_catcher-'): 1.0,
     # coin_tracker_hot — signal when coin_tracker detects hot setup
-    ('coin_tracker_hot', 'ct-hot+'): 1.0,
-    ('coin_tracker_hot', 'ct-hot-'): 1.0,
+    ('coin_tracker_hot_long', 'ct-hot+'): 1.0,
+    ('coin_tracker_hot_short', 'ct-hot-'): 1.0,
     # engulfing: large single-candle momentum moves
     ('engulfing_long',  'engulfing+'):  1.0,
     ('engulfing_short', 'engulfing-'):  1.0,

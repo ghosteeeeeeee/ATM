@@ -396,7 +396,6 @@ def collect():
                 write_conn.execute(f"INSERT INTO {table} ({col_names}) VALUES ({placeholders})", list(event_cols.values()))
 
                 # Score
-                clustering = setup.get('clustering', {})
                 write_conn.execute("""
                     INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
                                             wyckoff_phase, ewave_count, ewave_degree, ewave_direction,

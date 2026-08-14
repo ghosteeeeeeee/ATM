@@ -95,6 +95,10 @@ def detect(token, data):
     if health not in ('hot', 'ready'):
         return None
 
+    # Must meet minimum setup threshold
+    if setup_score < COIN_TRACKER_HOT_SETUP_THRESHOLD:
+        return None
+
     # Must have some directional signal
     has_direction = False
     if clustering_bull > clustering_bear and clustering_bull >= COIN_TRACKER_HOT_CLUSTER_MIN:
