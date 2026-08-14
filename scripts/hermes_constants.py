@@ -883,6 +883,9 @@ NEVER_REENABLE_FLAGS = {
     'HZSCORE_MINUS_ENABLED',      # CEO 2026-08-07 — 15.8% WR, -$53.50 (76 trades 7d). hemorrhaging.
     'PCT_HERMES_PLUS_ENABLED',    # CEO 2026-08-07 — historical 100% WR, but combo signals bleeding (-$33.83 standalone)
     'VORTEX_BREAK_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-09 — vortex_break_long: 22.2% WR (9 trades 24h), -$0.18. Compounds hemorrhaging.
+    'WAVE_CATCHER_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 33.3% WR, -$0.34 (24h). LONG dead.
+    'MOMENTUM_LEADERBOARD_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 28.6% WR, -$0.15 (24h). LONG dead.
+    'RANGE_BREAKOUT_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 25% WR, -$0.41 (7d). LONG dead.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1148,7 +1151,7 @@ RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific wit
 
 # range_breakout.py — breakout from tight range with retest confirmation
 RANGE_BREAKOUT_ENABLED = True
-RANGE_BREAKOUT_PLUS_ENABLED = True    # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
+RANGE_BREAKOUT_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-15 — 8T 25% WR -$0.41 (7d). Kill LONG.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
 RANGE_BREAKOUT_SHORT_ENABLED = True   # CEO RE-ENABLED 2026-08-14 — 25T +$0.06 52% WR (7d), legacy SHORT bleed clearing. Revert if regime degrades.
 RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
@@ -1536,7 +1539,7 @@ HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 # ── Momentum Leaderboard Signal ─────────────────────────────────────────────
 # momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
 MOMENTUM_LEADERBOARD_ENABLED = True            # master switch — enabled for paper testing
-MOMENTUM_LEADERBOARD_PLUS_ENABLED = True       # LONG direction
+MOMENTUM_LEADERBOARD_PLUS_ENABLED = False      # SIGNAL REPORTER 2026-08-15 — 7T 28.6% WR -$0.15 (24h). Kill LONG, keep SHORT.
 MOMENTUM_LEADERBOARD_MINUS_ENABLED = True      # SHORT direction
 MOMENTUM_LEADERBOARD_TOP_N = 10               # top movers to evaluate
 MOMENTUM_LEADERBOARD_MOVE_MIN = 1.0           # min move_score % — lowered from 3.0 (was too strict)
@@ -1628,7 +1631,7 @@ HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
 WAVE_CATCHER_ENABLED            = True   # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
-WAVE_CATCHER_PLUS_ENABLED       = True    # RE-ENABLED 2026-08-14 — CEO request. Monitor 24h.
+WAVE_CATCHER_PLUS_ENABLED       = False   # SIGNAL REPORTER 2026-08-15 — 6T 33.3% WR -$0.34 (24h). Kill LONG, keep SHORT.
 WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
 WAVE_CATCHER_VELOCITY_WINDOW    = 3       # bars to measure velocity
