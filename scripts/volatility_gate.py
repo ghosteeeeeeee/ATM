@@ -48,7 +48,7 @@ REGIME_SIGNALS = {
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'r2-trend-long', 'r2l',  # R² trend LONG (slow grinds)
-        'r2s',  # R² downtrend SHORT detector
+        'r2-trend-short',  # R² downtrend SHORT detector
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
     },
     'HIGH': {
@@ -62,7 +62,7 @@ REGIME_SIGNALS = {
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
-        'r2s',  # R² downtrend SHORT detector
+        'r2-trend-short',  # R² downtrend SHORT detector
     },
     'EXTREME': {
         # Continuation works in storms

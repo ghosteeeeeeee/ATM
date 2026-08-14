@@ -1919,7 +1919,7 @@ def is_component_disabled(component: str) -> bool:
             TREND_PURITY_ENABLED, TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED,
             EMA9_SMA20_ENABLED, EMA9_SMA20_PLUS_ENABLED, EMA9_SMA20_MINUS_ENABLED,
             R2_REV_ENABLED, R2_REV_PLUS_ENABLED, R2_REV_MINUS_ENABLED,
-            R2_TREND_ENABLED, R2_TREND_PLUS_ENABLED, R2_TREND_MINUS_ENABLED,
+            R2_TREND_ENABLED, R2_TREND_SHORT_ENABLED,
             VOLUME_HL_ENABLED, VOLUME_HL_PLUS_ENABLED, VOLUME_HL_MINUS_ENABLED,
             MA300_CANDLE_ENABLED, MA300_CANDLE_PLUS_ENABLED, MA300_CANDLE_MINUS_ENABLED,
             ATR_COMPRESSION_ENABLED, ATR_COMPRESSION_PLUS_ENABLED, ATR_COMPRESSION_MINUS_ENABLED,
@@ -2045,9 +2045,8 @@ def is_component_disabled(component: str) -> bool:
     if c == 'r2-rev+': return not R2_REV_PLUS_ENABLED
     if c == 'r2-rev-': return not R2_REV_MINUS_ENABLED
     if c == 'r2-rev': return not R2_REV_ENABLED
-    # r2-trend
-    if c == 'r2-trend+': return not R2_TREND_PLUS_ENABLED
-    if c == 'r2-trend-': return not R2_TREND_MINUS_ENABLED
+    # r2-trend-short
+    if c == 'r2-trend-short': return not R2_TREND_SHORT_ENABLED
     if c == 'r2-trend': return not R2_TREND_ENABLED
     # volume-hl
     if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED

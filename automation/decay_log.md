@@ -436,3 +436,13 @@
 [2026-08-14 15:49 UTC]   🟢 r2-trend-long3: 8 trades, 75.0% WR, PnL=-0.56
 [2026-08-14 15:49 UTC]   🟢 r2-trend-long0: 3 trades, 100.0% WR, PnL=0.82
 [2026-08-14 15:49 UTC] Done. Disabled 0 signals.
+[2026-08-14 21:49 UTC] === Signal Decay Detector ===
+[2026-08-14 21:49 UTC]   🟡 mover+: 7 trades, 28.6% WR, PnL=-3.06
+[2026-08-14 21:49 UTC]   🟢 range_breakout_short: 3 trades, 33.3% WR, PnL=-1.12
+[2026-08-14 21:49 UTC]   🟢 wave_catcher+: 14 trades, 42.9% WR, PnL=-2.47
+[2026-08-14 21:49 UTC]   🟢 r2-trend-long1: 7 trades, 57.1% WR, PnL=-0.35
+[2026-08-14 21:49 UTC]   🟢 r2-trend-long2: 13 trades, 61.5% WR, PnL=0.51
+[2026-08-14 21:49 UTC]   🟢 continuation+: 3 trades, 66.7% WR, PnL=0.16
+[2026-08-14 21:49 UTC]   🟢 r2-trend-long3: 9 trades, 66.7% WR, PnL=-1.35
+[2026-08-14 21:49 UTC]   🟢 r2-trend-long0: 3 trades, 100.0% WR, PnL=0.82
+[2026-08-14 21:49 UTC] Done. Disabled 0 signals.

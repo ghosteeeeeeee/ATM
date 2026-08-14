@@ -40,7 +40,7 @@ from hermes_constants import (
     MA300_CANDLE_PLUS_ENABLED, MA300_CANDLE_MINUS_ENABLED,
     MACD_ACCEL_PLUS_ENABLED, MACD_ACCEL_MINUS_ENABLED,
     R2_REV_PLUS_ENABLED, R2_REV_MINUS_ENABLED,
-    R2_TREND_PLUS_ENABLED, R2_TREND_MINUS_ENABLED,
+    R2_TREND_SHORT_ENABLED,
     TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED,
     VOLUME_HL_PLUS_ENABLED, VOLUME_HL_MINUS_ENABLED,
     EMA20_50_PLUS_ENABLED, EMA20_50_MINUS_ENABLED,
@@ -206,7 +206,7 @@ except Exception:
     _r2_rev_run = None
 
 try:
-    from signals.r2_trend import scan_r2_trend_signals as _r2_trend_run
+    from signals.r2_trend import run as _r2_trend_run
 except Exception:
     _r2_trend_run = None
 
@@ -401,7 +401,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'trend_purity',         'enabled': TREND_PURITY_ENABLED,        'run': _trend_purity_run},
     {'name': 'ema9_sma20',           'enabled': EMA9_SMA20_ENABLED,         'run': _ema9_sma20_run},
     {'name': 'r2_rev',               'enabled': R2_REV_ENABLED,             'run': _r2_rev_run},
-    {'name': 'r2_trend',             'enabled': R2_TREND_ENABLED,           'run': _r2_trend_run},
+    {'name': 'r2_trend_short',        'enabled': R2_TREND_SHORT_ENABLED,      'run': _r2_trend_run},
     {'name': 'r2_trend_long',        'enabled': R2_TREND_LONG_ENABLED,      'run': _r2_trend_long_run},
     {'name': 'volume_hl',            'enabled': VOLUME_HL_ENABLED,           'run': _volume_hl_run},
     {'name': 'ma300_candle_confirm', 'enabled': MA300_CANDLE_ENABLED,        'run': _ma300_candle_run},

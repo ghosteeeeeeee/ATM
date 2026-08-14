@@ -894,7 +894,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-14 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-14 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
@@ -1038,9 +1038,8 @@ MACD_ACCEL_MINUS_ENABLED      = True    # macd_accel- SHORT
 R2_REV_ENABLED           = False  # r2_rev — blocked in blacklist
 R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT
-R2_TREND_ENABLED         = True   # RE-ENABLED 2026-08-14 — SHORT variant active, LONG disabled (use r2_trend_long instead)
-R2_TREND_PLUS_ENABLED        = False   # r2_trend+ LONG — disabled, use r2_trend_long instead
-R2_TREND_MINUS_ENABLED       = True    # r2_trend- SHORT — downtrend detector
+R2_TREND_ENABLED         = True   # master kill switch for r2_trend SHORT
+R2_TREND_SHORT_ENABLED   = True   # r2_trend_short — downtrend detector (renamed from r2_trend)
 R2_TREND_SHORT_MIN_SLOPE    = -0.003  # maximum slope % (negative = downtrend) — mirrors LONG but inverted
 R2_TREND_SHORT_MIN_R2       = 0.60    # minimum R² threshold (lower than LONG 0.70 — SHORT trends are sharper)
 R2_TREND_SHORT_MAX_RSI      = 65      # max RSI — don't short overbought (wait for weakness)
@@ -1049,6 +1048,7 @@ R2_TREND_SHORT_MIN_BB_POS   = 0.15    # min BB position — don't short at band 
 R2_TREND_SHORT_BLOCK_STALE  = True    # block signals on stale tokens
 R2_TREND_SHORT_MAX_ACCEL    = 0.005   # block SHORT when price_acceleration > this (overextended)
 R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT when price rising before entry
+R2_TREND_SHORT_MIN_BARS     = 2       # min bars since trend started — don't enter too early
 R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope % to fire (filters noise, only fires on meaningful trends)
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
@@ -1147,7 +1147,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
-    'r2-trend-long', 'r2l-long', 'r2s',  # r2s = r2_trend SHORT (downtrend detector)
+    'r2-trend-long', 'r2l-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
     'wave_catcher',  # velocity spike detector — catches violent moves
 )
 
