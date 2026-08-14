@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 (CEO run — verified latest)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 65T -$0.77 (50.8% WR — RED), 7d 438T -$0.99 (50.8% WR — slightly negative). Daily: Aug 13 -$1.58 legacy clearing, Aug 14 -$0.30 recovering. All legacy bleeders cleared. Stars7d intact (5 profitable). wave_catcher+ LONG 6T -$0.34 33.3% WR (approaching 10-trade threshold — will disable if no improvement). Pipeline healthy. System in stability period.
+  BY: CEO run
+  DO NOT REVERT — system stabilizing, legacy clearing.
+
 [2026-08-14 (CEO run — verified)] CEO: DISABLED WAVE_CATCHER_PLUS_ENABLED
   WHY: Verified DB: 24h 65T -$0.58 (52.3% WR — RED), 7d 442T -$0.83 (51.1% WR — slightly negative). wave_catcher+ LONG 6T -$0.34 33.3% WR — worst active signal, no improvement at 6 trades. SHORT side profitable (+$0.19). All other losses from disabled legacy signals aging out.
   BY: CEO run
@@ -516,3 +521,7 @@
   WHY: 0T last hour (quiet since 08:22). 24h 65T 52.3% WR -$0.62. ATR SL 41.5% (just above 40% but profit-monster-trail +$1.41 compensates SL -$2.09). wave_catcher+ 9T 33.3% WR -$0.22 (weak, not 0% WR kill). mover+ 3T 33.3% WR -$0.14 (borderline). 4 open trades minor unrealized losses. Trade freq 0/hr (undertrading). No 0% WR kill candidates. R:R imbalance persists (avg SL -$0.077 vs avg trail +$0.039). No param changes.
   BY: auto_1hr
   NEXT: Re-run at 10:30 UTC
+[2026-08-14 10:30] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.01). 24h 64T 51.6% WR -$0.61. ATR SL 43.8% (above 40% but profit-monster-trail +$1.36 compensates SL -$2.17). hzscore- 12T 41.7% WR -$0.29 (likely already killed, draining). wave_catcher+ 10T 40% WR -$0.15 (weak, not 0% WR kill). mover+ 3T 33.3% WR -$0.14 (borderline). 4 open trades healthy. Trade freq 2/hr normal. No 0% WR kill candidates. R:R imbalance persists. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 11:30 UTC

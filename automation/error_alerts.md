@@ -401,3 +401,8 @@ ALERTS:
 - **WARN**: -6.93% PnL today (62 closed trades, 4 open positions all slightly negative)
 - **INFO**: Disk at 82% — monitoring, not critical
 - **INFO**: No auto-fixes required
+
+## Error Alerts — 2026-08-14 09:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(2Z): HL TOK failed — Unknown TOK`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing 2Z: cannot access local variable 'clustering' where it is not associated with a value`
+- **REPEATED** (8x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: cannot access local variable 'clustering' where it is not associated with a value`
