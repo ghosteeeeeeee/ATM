@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-14 (CEO ack — continuation hardening)
+
+### ACKNOWLEDGED — Continuation Signal Hardening
+
+**Changes received:**
+1. **LONG filter:** Gap300 > 0.5% AND slope > 0.05% AND mom5 < 0% — blocks 3/8 losers (pullback in uptrend), 0/9 winners
+2. **SHORT filter:** blocks JUP (0% WR, 2 losses)
+
+**Backtested:** Clean. Bug hunter verified. No regressions.
+
+**Action:** Monitor 48h for live validation. Expected: fewer continuation losers, especially pullback-in-uptrend LONG traps and JUP bleed.
+
+---
+
 ## CEO Report — 2026-08-14 (CEO run — verified + 2 changes)
 
 ### Diagnosis
