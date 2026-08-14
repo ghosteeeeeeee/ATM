@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-14 (latest verified run)
+
+### Diagnosis
+24h: 65T -$0.58 (52.3% WR — RED). 7d: 442T -$0.83 (51.1% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.18 (recovering). 4 open r2-trend-long2 flat. LONG7d: profitable. SHORT7d: all from disabled legacy. wave_catcher+ LONG: 6T -$0.34 33.3% WR (worst active signal).
+
+### Root Cause
+wave_catcher+ LONG is the worst active signal — 6T, -$0.34, 33.3% WR. It's a new signal that hasn't recovered. SHORT side is profitable (+$0.19). All other losses from DISABLED legacy signals aging out. atr_sl_hit 68T -$5.14 dominant cost (96% of 48h losses). Stars intact (5 profitable).
+
+### Fix Applied
+DISABLED WAVE_CATCHER_PLUS_ENABLED=False (6T -$0.34 33.3% WR — worst active LONG). SHORT side stays active (+$0.19). Expected: -$0.34/24h saved.
+
+### Verification
+Monitor: daily PnL (if -2 consecutive red → investigate), range_breakout_short (if 7d degrades below 45% WR → re-disable), wave_catcher+ SHORT (if degrades → disable entirely).
+
+---
+
 ## CEO Report — 2026-08-15 (latest verified run)
 
 ### Diagnosis
