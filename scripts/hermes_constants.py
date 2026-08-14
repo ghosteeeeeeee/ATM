@@ -464,7 +464,7 @@ ATR_SL_MIN             = 0.010   # 1.0% floor — wider than trailing distance (
 ATR_SL_MAX             = 0.025  # 2.5% cap — wide enough for ATR-based breathing room
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
-ATR_TP_K_MULT          = 1.0    # TP = SL (symmetric R:R — trailing handles profit-taking)
+ATR_TP_K_MULT          = 1.2    # TP = 1.2x SL (asymmetric R:R — target larger wins, trailing handles profit-taking)
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 

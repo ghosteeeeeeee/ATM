@@ -1,3 +1,28 @@
+## CEO Report — 2026-08-15 (R:R adjustment)
+
+### Diagnosis
+24h: 70T -$0.71 (51.4% WR — RED). 7d: 444T -$0.82 (51.4% WR — slightly negative). Daily: Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.29 (52.9% WR — recovering). 5 open flat. LONG7d: profitable. SHORT7d: all from disabled legacy. Cost drivers48h: atr_sl_hit 67T -$5.09 (96% of losses — structural R:R imbalance: avg win 0.49% vs avg loss -0.74%). Stars7d intact (5 profitable).
+
+### Root Cause
+System recovering from legacy clearing. All legacy bleeders disabled. Active signals within normal variance. atr_sl_hit dominates losses — R:R imbalance (avg win 0.49% vs avg loss -0.74%) yields negative expected value despite 51.4% WR.
+
+### Fix Applied
+INCREASED ATR_TP_K_MULT from 1.0 to 1.2 (hermes_constants.py:467). This widens take-profit targets relative to stop-loss, aiming to increase average win magnitude and flip expected value positive.
+
+### Verification
+Monitor: 24h avg win (should increase from 0.49%), daily PnL (if -2 consecutive red → investigate), R:R ratio (if avg win doesn't improve within 48h → revert change).
+
+### Root Cause
+System recovering from Aug 13 legacy clearing (-$1.58). Aug 14 flat at -$0.32. All legacy bleeders disabled. Active signals within normal variance. atr_sl_hit dominates losses — SL too tight vs trailing activation (needs dedicated tuning session, not quick fix).
+
+### Fix Applied
+NO CHANGES — system stabilizing, recovery trend, stars intact.
+
+### Verification
+Monitor: daily PnL (if -2 consecutive red → investigate), wave_catcher+ LONG (if hits 10T without improvement → disable), range_breakout_short (if7d degrades below 45% WR → re-disable).
+
+---
+
 ## CEO Report — 2026-08-15 (latest run)
 
 ### Diagnosis
