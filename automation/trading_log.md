@@ -7959,3 +7959,37 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - R:R imbalance persists (SL avg -$0.081 vs trail avg +$0.031 = 0.38:1) — needs dedicated tuning session
 - wave_catcher+ LONG 33% WR — monitor, not kill (not 0% WR)
+
+## [2026-08-15 07:30] Hourly Analysis
+
+**Trades:** 0 closed last hour (system dormant since Aug 14 19:39). 1 open (BANANA r2-trend-long2 -$7.73%).
+**24h:** 73T 50.0% WR -$0.66 (flat)
+
+**24h Close Reasons:**
+- profit-monster-trail: 42T +$1.31 (avg +$0.031) — 57.5% of exits ✅
+- atr_sl_hit: 29T -$2.34 (avg -$0.081) — 39.7% of exits (below 40% threshold ✅)
+- atr_tp_hit: 1T +$0.20
+- HL_CLOSED: 1T +$0.17
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long2: 13T 61.5% WR +$0.17 (best active)
+- ✅ bb_bounce+: 2T 100% WR +$0.11
+- ⚠️ wave_catcher+: 13T 38.5% WR -$0.19 (worst active but not killable)
+- ⚠️ mover+: 7T 28.6% WR -$0.15
+- ⚠️ range_breakout_short: 3T 33.3% WR -$0.11
+- ❌ hzscore-: 2T 0% WR -$0.19 (below kill threshold)
+
+**7-Day Trend:** Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.43 (recovering). System stabilizing.
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No 0% WR kill candidates with 3+ trades (hzscore- only 2T)
+- ATR SL% 39.7% — trending down from 52.8% (ATR fix working)
+- Trade freq normal, no overtrading
+- CEO stability period active — don't touch params
+- BANANA open -$7.73% — SL at 3.71, will likely hit SL (no action needed)
+
+**Open Questions:**
+- R:R imbalance structural (SL avg -$0.081 vs trail avg +$0.031 = 0.38:1) — needs dedicated tuning session
+- System dormant (no trades closed in 12+ hours) — check if pipeline running

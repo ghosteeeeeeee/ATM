@@ -556,3 +556,12 @@
 [2026-08-14 19:35] auto_1hr: RE-ENABLED wave_catcher+ LONG, range_breakout+ LONG
   WHY: CEO request. wave_catcher master + plus flag enabled. range_breakout plus flag enabled (master was already True). bb_bounce_short already active. Monitor 24h.
   BY: auto_1hr
+
+[2026-08-15 (CEO run — verified latest)] CEO: NO TRADING CHANGES
+  WHY: Verified DB: 24h 73T -$0.66 (50.7% WR — RED), 7d 440T -$0.98 (51.1% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.43 (recovering). R:R inverted: avg win 0.51% vs avg loss 0.75% = 0.68:1. PM_TRAIL_ACTIVATE_PCT 0.60 and ATR_TP_K_MULT 2.0 deployed — in 48h eval window. wave_catcher+ LONG 6T -$0.34 33.3% WR (below 10T threshold). mover+ LONG 7T -$0.15 28.6% WR (below 10T). Stars7d intact (5 profitable). Pipeline healthy.
+  BY: CEO run
+  DO NOT REVERT — stability period, eval window active.
+[2026-08-15 07:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour (system dormant since Aug 14 19:39). 1 open BANANA -$7.73%. 24h 73T 50% WR -$0.66 (flat). ATR SL 39.7% (below 40% — fix working). No 0% WR kill candidates (hzscore- only 2T). wave_catcher+ 13T 38.5% WR -$0.19 (worst active but not killable). CEO stability period active. R:R imbalance structural (0.38:1). No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 08:30 UTC

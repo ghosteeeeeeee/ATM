@@ -1,16 +1,32 @@
-## CEO Report — 2026-08-15
+## CEO Report — 2026-08-14 (latest run)
 
 ### Diagnosis
-24h: 73T -$0.66 (50.7% WR — RED). 7d: 441T -$1.09 (51.0% WR). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.43 (recovering). 0 open. **48h R:R: avg win 0.51% vs avg loss -0.75% = 0.68:1 (inverted).** PM_TRAIL_ACTIVATE_PCT 0.60 and ATR_TP_K_MULT 2.0 deployed — both need 48h evaluation. wave_catcher+ LONG re-enabled Aug 14, immediately bled 4T -$0.45 (0% WR). Stars7d intact (5 profitable). Disk 83%.
+24h: 75T -$0.74 (50.7% WR — RED). 7d daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy) → Aug 14 -$0.51. 1 open. **48h R:R: avg win 0.51% vs avg loss -0.75% = 0.68:1 (inverted).** PM_TRAIL_ACTIVATE_PCT 0.60 and ATR_TP_K_MULT 2.0 in eval window. wave_catcher+ LONG 8T -$0.42 37.5% WR — PLUS flag still True despite kanban claiming Aug 15 kill. SHORT profitable (+$0.15). mover+ LONG 7T -$0.15 28.6% WR (below 10T). Stars7d intact (5 profitable). Disk 83%.
 
 ### Root Cause
-wave_catcher+ LONG re-enabled via master flag `WAVE_CATCHER_ENABLED=True` despite `WAVE_CATCHER_PLUS_ENABLED=False`. Master flag overrode the PLUS kill, allowing LONG to fire and bleed at 0% WR. R:R still inverted (0.68:1) but PM_TRAIL fix just deployed — needs time.
+wave_catcher+ LONG bled -$0.42 at 37.5% WR — WAVE_CATCHER_PLUS_ENABLED was never actually set to False (kanban logged kill but code had True). R:R still inverted (0.68:1) — PM_TRAIL 0.60 and ATR_TP_K_MULT 2.0 need more eval time.
 
 ### Fix Applied
-**WAVE_CATCHER_ENABLED = False.** Master flag disabled to fully stop wave_catcher+ LONG. SHORT (MINUS) was profitable but master flag also controlled it — if SHORT resumes profitability, re-enable MINUS flag only.
+**WAVE_CATCHER_PLUS_ENABLED True → False.** Kills LONG side (8T -$0.42 37.5% WR), keeps SHORT profitable (+$0.15 42.9%). No other changes — PM_TRAIL 0.60 and ATR_TP_K_MULT 2.0 still in eval window.
 
 ### Verification
-Monitor 48h: avg trail win (should ↑ from 0.51% with PM_TRAIL 0.60), R:R ratio (target 0.75:1+), daily PnL (if -2 more red → investigate deeper), mover+ LONG (at 7T, 3 more to 10T disable threshold), disk (if 85% → cleanup).
+Monitor 48h: avg trail win (should ↑ from 0.51%), R:R ratio (target 0.75:1+), daily PnL (if -2 more red → investigate deeper), mover+ LONG (if 10T without improvement → disable), disk (if 85% → cleanup).
+
+---
+
+## CEO Report — 2026-08-15 (latest run)
+
+### Diagnosis
+24h: 73T -$0.66 (50.7% WR — RED). 7d: 440T -$0.98 (51.1% WR — slightly negative). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 (legacy clearing) → Aug 14 -$0.43 (recovering). 1 open flat. **48h R:R: avg win 0.51% vs avg loss 0.75% = 0.68:1 (inverted).** atr_sl_hit 57T -$4.63 (dominant). PM_TRAIL_ACTIVATE_PCT 0.60 and ATR_TP_K_MULT 2.0 deployed — in 48h eval window. wave_catcher+ LONG 6T -$0.34 33.3% WR (below 10T threshold). mover+ LONG 7T -$0.15 28.6% WR (below 10T). Stars7d intact (5 profitable). Disk 83%.
+
+### Root Cause
+R:R still inverted (0.68:1) — avg win 0.51% vs avg loss 0.75%. PM_TRAIL_ACTIVATE_PCT 0.60 just deployed (Aug 15) and ATR_TP_K_MULT 2.0 just deployed — both need 48h evaluation. wave_catcher+ LONG and mover+ LONG are worst performers but below 10T disable threshold.
+
+### Fix Applied
+**NO CHANGES** — stability period. Two param changes in eval window (PM_TRAIL 0.60, ATR_TP_K_MULT 2.0). Changing params now invalidates evaluation results.
+
+### Verification
+Monitor 48h: avg trail win (should ↑ from 0.51%), R:R ratio (target 0.75:1+), daily PnL (if -2 more red → investigate deeper), wave_catcher+ LONG (if hits 10T without improvement → disable), mover+ LONG (if hits 10T without improvement → disable), disk (if 85% → cleanup).
 
 ---
 
