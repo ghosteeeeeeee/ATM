@@ -241,6 +241,8 @@ def collect():
                 avg_confidence = None
                 last_signal_type = coin_signals[0][0] if coin_signals else None
                 last_signal_conf = coin_signals[0][2] if coin_signals else None
+                mixed_overall = False
+                mixed_recent = False
 
                 if coin_signals:
                     # Time weights: recent signals matter more for 1m trading

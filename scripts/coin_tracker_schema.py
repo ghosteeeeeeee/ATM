@@ -170,7 +170,13 @@ def ensure_coin_table(symbol, conn=None):
                 trend_quality REAL,
                 trend_direction TEXT,
                 sr_levels TEXT,
-                vol_profile TEXT
+                vol_profile TEXT,
+                setup_score REAL,
+                setup_type TEXT,
+                setup_details TEXT,
+                clustering_bullish REAL,
+                clustering_bearish REAL,
+                recency REAL
             )
         """)
         conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
@@ -218,7 +224,13 @@ def ensure_coin_table(symbol, conn=None):
                 trend_quality REAL,
                 trend_direction TEXT,
                 sr_levels TEXT,
-                vol_profile TEXT
+                vol_profile TEXT,
+                setup_score REAL,
+                setup_type TEXT,
+                setup_details TEXT,
+                clustering_bullish REAL,
+                clustering_bearish REAL,
+                recency REAL
             )
         """)
         db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")

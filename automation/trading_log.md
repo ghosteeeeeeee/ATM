@@ -7557,3 +7557,22 @@ None — system stable, previous fixes settling in.
 1. Monitor disk usage — 82% with 22G free
 2. continuation-,hzscore- — watch for 0% WR kill threshold
 3. No new signal changes needed — stability period respected
+
+---
+
+## [2026-08-14 05:30 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1 win, 3 losses)
+**PnL:** -$0.08 (25% WR)
+
+**Changes:** None — no signal meets kill threshold.
+
+**No Change Needed:**
+- hzscore- (16T -$0.17 24h) — already killed by HZSCORE_MINUS_ENABLED=False, no new trades in 4h
+- continuation-,hzscore- (3T -$0.23) — already killed, 0 trades in 12h
+- range_breakout_short (9T -$0.27 24h) — CEO re-enabled Aug 14, 7d profitable (+$0.06). Bad day is variance.
+- atr_sl_hit at 41.8% — persistent but profit-monster-trail compensates (+$1.33 vs -$1.77)
+- Trade frequency ~2.3/hr — normal
+
+**Open Questions:**
+- R:R imbalance: avg SL loss -$0.077 vs avg trail win +$0.043. Structural, needs dedicated tuning session.
