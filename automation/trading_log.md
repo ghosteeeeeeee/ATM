@@ -7926,3 +7926,36 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - hzscore- at 3T 0% WR — kill on next loss or wait?
 - R:R imbalance structural (SL avg -$0.081 vs trail avg +$0.031)
+
+## [2026-08-14 18:30] Hourly Analysis
+
+**Trades:** 0 closed last hour. 1 open (GMT r2-trend-long2 +40%).
+**24h:** 72T 50.0% WR -$0.69
+
+**24h Close Reasons:**
+- profit-monster-trail: 41T +$1.28 (avg +$0.031)
+- atr_sl_hit: 29T -$2.34 (avg -$0.081) — **40.3%** of closes (at threshold)
+- atr_tp_hit: 1T +$0.20
+- HL_CLOSED: 1T +$0.17
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long2: 12T 58.3% WR +$0.14 (best)
+- ✅ wave_catcher+ SHORT: 7T 42.9% WR +$0.15 (SHORT profitable)
+- ⚠️ wave_catcher+ LONG: 6T 33.3% WR -$0.34 (weakest standalone)
+- ⚠️ mover+: 7T 28.6% WR -$0.15
+- ⚠️ range_breakout_short: 3T 33.3% WR -$0.11
+- ❌ hzscore-: 2T 0% WR -$0.19 (below kill threshold)
+
+**7-Day Trend:** Aug 13 bad (-$1.58) → Aug 14 recovering (-$0.46). System stabilizing.
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- No 0% WR kill candidates with 3+ trades (hzscore- only 2T)
+- ATR SL% 40.3% — trending down from 52.8% (ATR fix working)
+- Trade freq 3/hr normal, no overtrading
+- System nearly flat (1 open trade)
+
+**Open Questions:**
+- R:R imbalance persists (SL avg -$0.081 vs trail avg +$0.031 = 0.38:1) — needs dedicated tuning session
+- wave_catcher+ LONG 33% WR — monitor, not kill (not 0% WR)

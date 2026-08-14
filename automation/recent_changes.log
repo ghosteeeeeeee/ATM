@@ -549,3 +549,10 @@
   WHY: 0T last hour. System flat (0 open). 24h 75T 51.3% WR -$0.87. ATR SL 40.0% (at threshold). hzscore- 4T 0% WR -$0.39 (borderline kill — only 4 trades, all SL hits). mover+ 7T 28.6% WR -$0.15. wave_catcher+ LONG already killed by CEO. Aug 14 recovering (-$0.46 vs Aug 13 -$1.58). ATR fix trending well (SL% 52.8%→37.7%). No 0% WR kill candidates with sufficient sample. R:R imbalance structural. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 17:30 UTC
+[2026-08-14 18:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 1 open (GMT +40%). 24h 72T 50% WR -$0.69. ATR SL 40.3% (at threshold, trending down). No 0% WR kill candidates (hzscore- only 2T). wave_catcher+ LONG 6T 33% WR -$0.34 (weak, not kill). mover+ 7T 28.6% WR -$0.15. Trade freq 3/hr normal. R:R imbalance structural (SL avg -$0.081 vs trail avg +$0.031). Needs dedicated tuning session. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 19:30 UTC
+[2026-08-14 19:35] auto_1hr: RE-ENABLED wave_catcher+ LONG, range_breakout+ LONG
+  WHY: CEO request. wave_catcher master + plus flag enabled. range_breakout plus flag enabled (master was already True). bb_bounce_short already active. Monitor 24h.
+  BY: auto_1hr

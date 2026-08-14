@@ -1,49 +1,81 @@
 # Signal Performance Report
-**Generated:** 2026-08-15 | **Period:** Last 6h + 24h + 7d
+**Generated:** 2026-08-14 19:48 UTC | **Period:** Last 6h + 24h
 
-## KILLED (executed)
+## Overall Stats
+- **Total trades (all time):** 983 | **WR:** 46.9% | **PnL:** -32.99%
+- **Date range:** 2026-07-29 → 2026-08-14
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| wave_catcher+ | LONG | 33.3% | -$0.34 | 6 (24h) | KILLED — added NEVER_REENABLE |
-| mover+ | LONG | 28.6% | -$0.15 | 7 (24h) | KILLED — added NEVER_REENABLE |
-| range_breakout+ | LONG | 25.0% | -$0.41 | 8 (7d) | KILLED — added NEVER_REENABLE |
+---
 
-## BOOSTED (executed)
+## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long2 | LONG | 61.5% | +$0.17 | 13 (24h) | WATCH — consistent winner |
-| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 (24h) | KEEP — net positive |
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| r2-trend-long2 | LONG | 3 | 66.7% | +0.03 | 13 | 61.5% | +0.51 | ❓ |
 
-## LOSERS (watch list)
+---
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| hzscore- | SHORT | 53.1% | -$0.21 | 32 (7d) | inverted R:R — avg_win $0.053 vs avg_loss $0.073 |
-| range_breakout_short | SHORT | 33.3% | -$0.11 | 3 (24h) | borderline — needs more trades |
-| r2-trend-long3 | LONG | 66.7% | -$0.12 | 9 (7d) | high WR but negative PnL — wins too small |
-| r2-trend-long1 | LONG | 57.1% | -$0.02 | 7 (7d) | near breakeven |
-| continuation+ | LONG | 66.7% | +$0.01 | 3 (24h) | small sample, needs data |
+## LOSERS (WR < 30%, PnL < -2%)
 
-## WINNERS
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
+| mover+ | LONG | — | —% | — | 7 | 28.6% | -3.06 | ❓ | **DISABLE** |
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long2 | LONG | 61.5% | +$0.17 | 13 (24h) | best performing active signal |
-| r2-trend-long0 | LONG | 66.7% | +$0.07 | 3 (24h) | small sample |
-| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 (24h) | net positive despite low WR |
-| bb-bounce-short,hzscore- | SHORT | 61.1% | +$0.14 | 18 (7d) | confluence combo winner |
+---
 
-## ISSUES
-- **No signal inversions found** — all trades match expected direction
-- **hzscore- SHORT** has53.1% WR but negative PnL ($0.053 avg win vs $0.073 avg loss) — inverted R:R
-- **r2-trend-long3** has66.7% WR but -$0.12 PnL — wins are small, losses are large
+## MARGINAL (30-50% WR)
 
-## 6h Performance
-Only 3 signals had 2+ trades: mover+ LONG (0% WR, -$0.11), r2-trend-long3 (50%, -$0.05), r2-trend-long2 (66.7%, +$0.01)
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| wave_catcher+ | LONG | 6 | 33.3% | -2.58 | DISABLED | Borderline |
+| range_breakout_short | SHORT | 3 | 33.3% | -1.12 | ENABLED | Needs more data |
+| r2-trend-long4 | LONG | 2 | 50.0% | -0.42 | ❓ | Needs more data |
+| ct-hot+,mover+ | LONG | 2 | 50.0% | +0.66 | ❓ | Needs more data |
+| wave_catcher+ | SHORT | 6 | 50.0% | +0.79 | DISABLED | Borderline |
 
-## Changes Made
-- `WAVE_CATCHER_PLUS_ENABLED = False` + NEVER_REENABLE
-- `MOMENTUM_LEADERBOARD_PLUS_ENABLED = False` + NEVER_REENABLE
-- `RANGE_BREAKOUT_PLUS_ENABLED = False` + NEVER_REENABLE
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[DISABLE] mover+ LONG** — WR=28.6%, PnL=-3.06% over 7 trades (24h).
+2. **[WATCH] wave_catcher+ LONG** — WR=33.3%, PnL=-2.58% over 6 trades. Monitor next cycle.
+3. **[WATCH] range_breakout_short SHORT** — WR=33.3%, PnL=-1.12% over 3 trades. Monitor next cycle.
+4. **[WATCH] r2-trend-long4 LONG** — WR=50.0%, PnL=-0.42% over 2 trades. Monitor next cycle.
+5. **[WATCH] ct-hot+,mover+ LONG** — WR=50.0%, PnL=+0.66% over 2 trades. Monitor next cycle.
+6. **[WATCH] wave_catcher+ SHORT** — WR=50.0%, PnL=+0.79% over 6 trades. Monitor next cycle.
+7. **[KEEP] 1 winning combos** — r2-trend-long2. LONG side dominant.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-14 | 8161d34 | signals: kill wave_catcher+, mover+, range_breakout+ LONG — ... |
+| 2026-08-14 | 5be3229 | signals: re-enable wave_catcher+ and range_breakout+ LONG pe... |
+| 2026-08-14 | 5aba5dc | CEO: PM_TRAIL_ACTIVATE_PCT 0.30→0.60 — fix inverted R:R (0.4... |
+| 2026-08-14 | 804a0b5 | CEO: verified run 2026-08-15 — NO CHANGES, ATR 2.0 eval acti... |
+| 2026-08-14 | 3069a9e | CEO: 2026-08-15 verified run — NO CHANGES, ATR 2.0 eval acti... |
+| 2026-08-14 | 822ddad | trailing SL tuning: ACTIVATION 0.40→0.80%, DISTANCE 0.80→2.0... |
+| 2026-08-14 | 4a95822 | coin_tracker_hot: Tune thresholds for fast-moving coins |
+| 2026-08-14 | 0011ec7 | CEO: no changes — ATR 2.0 eval window active, 76T -$0.83 RED |
+| 2026-08-14 | 4d0056d | coin_tracker_hot: Raise thresholds to reduce noise |
+| 2026-08-14 | 2010160 | Revert "fix: add ct-hot to standalone bypass to unblock coin... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

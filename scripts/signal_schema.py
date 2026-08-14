@@ -2842,7 +2842,7 @@ def get_cooldown(token, direction=None):
                 return True
         except Exception:
             pass
-    return None
+    return False  # No active cooldown found
 
 def set_cooldown(token, direction=None, hours=1):
     # Primary: loss_cooldowns.json (shared with guardian — consistent format).

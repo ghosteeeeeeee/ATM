@@ -12,7 +12,7 @@ Exit: Standard trailing stop from position_manager
 import sys, os, sqlite3, time, json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, get_cooldown, set_cooldown, price_age_minutes
+from signal_schema import add_signal, price_age_minutes
 from paths import HERMES_DATA
 from coin_tracker_schema import COIN_TRACKER_DB, _table_name
 
@@ -34,6 +34,52 @@ SIGNAL_TYPE_LONG  = 'coin_tracker_hot_long'
 SIGNAL_TYPE_SHORT = 'coin_tracker_hot_short'
 SOURCE_LONG       = 'ct-hot+'
 SOURCE_SHORT      = 'ct-hot-'
+
+# Separate cooldown file for coin_tracker_hot (not in loss_cooldowns.json)
+_CT_HOT_COOLDOWN_FILE = os.path.join(HERMES_DATA, 'coin_tracker_hot_cooldowns.json')
+
+
+def _get_cooldown(token, direction):
+    """Check if token+direction is in cooldown."""
+    try:
+        with open(_CT_HOT_COOLDOWN_FILE) as f:
+            data = json.load(f)
+    except Exception:
+        return False
+
+    key = f"{token.upper()}:{direction.upper()}"
+    entry = data.get(key)
+    if not entry:
+        return False
+
+    expires = entry.get('expires') if isinstance(entry, dict) else entry
+    return bool(expires and expires > time.time())
+
+
+def _set_cooldown(token, direction, hours):
+    """Set cooldown for token+direction."""
+    try:
+        try:
+            with open(_CT_HOT_COOLDOWN_FILE) as f:
+                data = json.load(f)
+        except Exception:
+            data = {}
+
+        key = f"{token.upper()}:{direction.upper()}"
+        expires_ts = time.time() + (hours * 3600)
+
+        # Extend only if new expiry is later
+        existing = data.get(key)
+        if existing is not None:
+            existing_expires = existing.get('expires') if isinstance(existing, dict) else existing
+            if existing_expires and existing_expires > expires_ts:
+                expires_ts = existing_expires
+
+        data[key] = {'expires': expires_ts, 'hours': hours}
+        with open(_CT_HOT_COOLDOWN_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass  # Best-effort
 
 
 def _read_tracker_data():
@@ -198,7 +244,7 @@ def scan_signals():
             continue
 
         # Cooldown
-        if get_cooldown(token, direction=direction):
+        if _get_cooldown(token, direction):
             continue
 
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
@@ -227,7 +273,7 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(token, direction, hours=COIN_TRACKER_HOT_COOLDOWN_HOURS)
+            _set_cooldown(token, direction, COIN_TRACKER_HOT_COOLDOWN_HOURS)
 
     return added
 
