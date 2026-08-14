@@ -7612,3 +7612,23 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - R:R imbalance persists (avg SL -$0.079 vs avg trail +$0.043). Needs dedicated tuning session.
+
+## [2026-08-14 09:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (system quiet since 08:22 UTC)
+**PnL:** $0.00 (no closes)
+**24h:** 65T, 52.3% WR, -$0.62
+
+**Changes:** None — no signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL hit 41.5% (27/65 24h) — just above 40% threshold but profit-monster-trail compensates (+$1.41 vs SL -$2.09).
+- wave_catcher+ (9T 33.3% WR -$0.22) — weak but not at 0% WR kill threshold. Needs 3+ more trades to evaluate.
+- mover+ (3T 33.3% WR -$0.14) — exactly 3 trades, borderline but not 0% WR.
+- range_breakout_short (6T 33.3% WR -$0.12) — CEO re-enabled Aug 14, losing but 7d profitable (+$0.06). Variance.
+- 4 open trades (DASH, SAND, ALT, ORDI) — all r2-trend signals, minor unrealized losses.
+- Trade frequency 0/hr — undertrading, not overtrading.
+
+**Open Questions:**
+- R:R imbalance persists (avg SL -$0.077 vs avg trail +$0.039). Needs dedicated tuning session.
+- DASH pnl_pct shows -81% but actual risk is ~1% (entry $30.34, SL $30.04). Display bug in unrealized PnL calculation.
