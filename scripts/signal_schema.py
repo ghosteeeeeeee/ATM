@@ -1569,7 +1569,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     momentum_state=COALESCE(?, momentum_state),
                     combo_key=?,
                     signal_metadata=?,
-                    updated_at=CURRENT_TIMESTAMP
+                    updated_at=CURRENT_TIMESTAMP,
+                    created_at=CURRENT_TIMESTAMP
                 WHERE id=?
             ''', (new_conf, merged_sources, merged_types,
                   z_score, z_score_tier, rsi_14,
