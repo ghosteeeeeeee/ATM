@@ -176,6 +176,39 @@
         .ewave-badge.impulse { color: #00ff88; border-color: #00ff8844; }
         .ewave-badge.corrective { color: #ffaa00; border-color: #ffaa0044; }
 
+        /* Setup badge */
+        .setup-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .setup-strong { background: #00ff8833; color: #00ff88; border: 1px solid #00ff8866; }
+        .setup-forming { background: #ffaa0022; color: #ffaa00; border: 1px solid #ffaa0044; }
+        .setup-none { background: #1a1a2e; color: #666; }
+
+        /* Clustering indicator */
+        .cluster-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9px;
+        }
+        .cluster-bar {
+            width: 30px;
+            height: 4px;
+            background: #1a1a2e;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .cluster-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+        .cluster-fill.bull { background: #00ff88; }
+        .cluster-fill.bear { background: #ff4444; }
+
         /* Trend gauge */
         .trend-gauge {
             display: flex;
@@ -229,6 +262,7 @@
     </select>
     <select id="sort">
         <option value="composite">Score</option>
+        <option value="setup_score">Setup Strength</option>
         <option value="momentum">Momentum</option>
         <option value="volume">Volume</option>
         <option value="volatility">Volatility</option>
@@ -369,6 +403,23 @@ function renderCard(c) {
     const trendDir = c.trend_direction || 'NEUTRAL';
     const trendColor = trendDir === 'BULL' ? '#00ff88' : trendDir === 'BEAR' ? '#ff4444' : '#ffaa00';
 
+    // Setup badge
+    const setupScore = parseFloat(c.setup_score) || 0;
+    const setupType = c.setup_type || 'NEUTRAL';
+    let setupClass = 'setup-none';
+    let setupLabel = '-';
+    if (setupScore > 50) {
+        setupClass = 'setup-strong';
+        setupLabel = `${setupType} ${setupScore.toFixed(0)}`;
+    } else if (setupScore > 25) {
+        setupClass = 'setup-forming';
+        setupLabel = `${setupType} ${setupScore.toFixed(0)}`;
+    }
+
+    // Clustering
+    const clusterBull = parseFloat(c.clustering_bullish) || 0;
+    const clusterBear = parseFloat(c.clustering_bearish) || 0;
+
     return `<div class="coin-card" data-sym="${c.symbol}" onclick="toggleDetail(this)">
         <div class="card-top">
             <div class="card-top-left">
@@ -379,6 +430,7 @@ function renderCard(c) {
                 </div>
             </div>
             <div style="display:flex;gap:4px;align-items:center">
+                <span class="setup-badge ${setupClass}">${setupLabel}</span>
                 ${ewaveBadge}
                 <span class="wyckoff-badge ${wyckoffClass}">${wyckoffLabel}</span>
                 <span class="health-badge health-${health}">${health}</span>
@@ -405,6 +457,12 @@ function renderCard(c) {
         </div>
         <div style="margin-top:6px;font-size:10px;color:#666;display:flex;justify-content:space-between;align-items:center">
             <span>Regime: <span style="color:${c.regime === 'LONG_BIAS' ? '#00ff88' : c.regime === 'SHORT_BIAS' ? '#ff4444' : '#ffaa00'};font-weight:bold">${c.regime || 'NEUTRAL'}</span></span>
+            <div class="cluster-indicator">
+                <span style="color:#00ff88">${clusterBull.toFixed(0)}B</span>
+                <div class="cluster-bar"><div class="cluster-fill bull" style="width:${clusterBull * 20}%"></div></div>
+                <span style="color:#ff4444">${clusterBear.toFixed(0)}B</span>
+                <div class="cluster-bar"><div class="cluster-fill bear" style="width:${clusterBear * 20}%"></div></div>
+            </div>
             <div class="trend-gauge">
                 <span style="color:${trendColor}">Trend</span>
                 <div class="trend-bar"><div class="trend-fill ${trendDir.toLowerCase()}" style="width:${trendScore}%"></div></div>
@@ -448,6 +506,27 @@ async function loadDetail(sym) {
         const coin = DATA.coins.find(c => c.symbol === sym) || {};
 
         let html = '';
+
+        // Setup summary section
+        const setupScore = parseFloat(coin.setup_score) || 0;
+        const setupType = coin.setup_type || 'NEUTRAL';
+        const setupDetails = coin.setup_details || 'no setup';
+        const clusterBull = parseFloat(coin.clustering_bullish) || 0;
+        const clusterBear = parseFloat(coin.clustering_bearish) || 0;
+        const recency = parseFloat(coin.recency) || 0.5;
+
+        html += `<div style="background:#1a1a2e;padding:12px;border-radius:4px;margin-bottom:16px;border-left:3px solid ${setupScore > 50 ? '#00ff88' : setupScore > 25 ? '#ffaa00' : '#666'}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="color:#666;font-size:10px;text-transform:uppercase">Setup Strength</span>
+                <span class="setup-badge ${setupScore > 50 ? 'setup-strong' : setupScore > 25 ? 'setup-forming' : 'setup-none'}" style="font-size:11px">${setupType} ${setupScore.toFixed(0)}</span>
+            </div>
+            <div style="font-size:11px;color:#888;margin-bottom:8px">${setupDetails}</div>
+            <div style="display:flex;gap:16px;font-size:10px">
+                <span>Recency: <span style="color:#00ff88">${(recency * 100).toFixed(0)}%</span></span>
+                <span>Bull clusters: <span style="color:#00ff88">${clusterBull.toFixed(1)}</span></span>
+                <span>Bear clusters: <span style="color:#ff4444">${clusterBear.toFixed(1)}</span></span>
+            </div>
+        </div>`;
 
         // Analysis summary section
         html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">`;
