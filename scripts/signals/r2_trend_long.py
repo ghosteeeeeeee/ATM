@@ -101,11 +101,13 @@ def detect_r2_long(token, candles, price):
     try:
         from paths import CANDLES_DB
         conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
-        rows_ema = conn_ema.execute(
-            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 310",
-            (token.upper(),)
-        ).fetchall()
-        conn_ema.close()
+        try:
+            rows_ema = conn_ema.execute(
+                "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 310",
+                (token.upper(),)
+            ).fetchall()
+        finally:
+            conn_ema.close()
         if rows_ema and len(rows_ema) >= 300:
             closes_ema = [r[0] for r in reversed(rows_ema)]
             k_ema = 2.0 / 301
