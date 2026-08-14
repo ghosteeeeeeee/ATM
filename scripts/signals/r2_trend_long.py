@@ -146,6 +146,12 @@ def detect_r2_long(token, candles, price):
 
     bars_since = max(n - R2_WINDOW - entry_idx, 0)
 
+    # ── Minimum bars filter (2026-08-14) ──────────────────────────────────
+    # Require bars_since >= 2 — entering too early (0-1 bars) is risky.
+    # Backtest: long0/long1 have 50-67% WR, long2+ have 67-100% WR.
+    if bars_since < 2:
+        return None
+
     # Confidence scoring
     r2_bonus = min((r2 - R2_THRESHOLD) / (1.0 - R2_THRESHOLD) * R2_BONUS_MAX, R2_BONUS_MAX)
     recency_bonus = max(RECENCY_BONUS_MAX - bars_since, 0)
