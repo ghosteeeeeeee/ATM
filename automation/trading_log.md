@@ -7781,3 +7781,40 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - wave_catcher+ SHORT 13T -$0.19 — approaching kill threshold but SHORT was profitable before. Monitor.
 - mover+ 6T -$0.14 33.3% WR — new signal, still accumulating data.
+
+## [2026-08-14 15:26] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L, -$0.21)
+**24h:** 80T 52.5% WR -$0.65
+
+**Last Hour Trades:**
+- PURR range_breakout_short SHORT: atr_sl_hit -$0.10
+- CFX r2-trend-long2 LONG: atr_sl_hit -$0.10
+- CHIP mover+ LONG: profit-monster-trail -$0.01
+
+**24h Close Reasons:**
+- profit-monster-trail: 45T +$1.46 (avg +$0.032) ✅
+- atr_sl_hit: 32T -$2.65 (avg -$0.083) — **40.0%** of closes (at threshold)
+- atr_tp_hit: 1T +$0.20
+- cut_loser: 1T -$0.11
+
+**Signal Performance (24h):**
+- ❌ mover+: 7T 28.6% WR -$0.15 (worst standalone)
+- ❌ hzscore-: 9T 44.4% WR -$0.28
+- ❌ wave_catcher+: 13T 38.5% WR -$0.19 (LONG already killed by CEO)
+- ❌ range_breakout_short: 4T 25% WR -$0.14
+- ✅ r2-trend-long2: 11T 54.5% WR +$0.06
+- ✅ r2-trend-long0: 3T 66.7% WR +$0.07
+
+**Changes:** None.
+- mover+ losing but hzscore+,mover+ combo profitable (+$0.17 7d) — disabling leaderboard = net ~$0 gain, not worth churn.
+- wave_catcher+ LONG already killed by CEO. SHORT mixed.
+- No kill triggers (no 0% WR with 3+ trades).
+
+**No Change Needed:**
+- ATR_SL hit rate 40.0% — at threshold, ATR_TP_K_MULT fix holding
+- Trade frequency normal (~4/hr)
+- 2 open trades healthy
+
+**Open Questions:**
+- R:R imbalance: avg SL -$0.083 vs avg trail +$0.032 = 0.39:1 ratio (needs ~72% WR to break even). Structural, needs dedicated session.
