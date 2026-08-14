@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-15 (CEO ack — wave_catcher signal)
+
+### ACKNOWLEDGED — wave_catcher New Signal
+
+**Signal:** wave_catcher — catches violent spikes in both directions.
+**What it does:** Detects velocity spikes (>0.3% per bar), enters in spike direction (LONG if rising, SHORT if falling), confirmed by EMA60 trend.
+**Filters:** ATR > 0.05%, Z-score < 1.5.
+**Backtest claim:** Would have caught PUMP +1.16% spike.
+**Bug fixes:** 3 minor issues resolved by bug_hunter. Registered in signals runner.
+
+**Action:** Monitor 48h for first live trades. Evaluate WR and PnL after 10+ trades before any param tuning. Signal is NEW — no legacy bias, clean slate.
+
+---
+
 ## CEO Report — 2026-08-15 (CEO ack — r2-trend-long hardening)
 
 ### ACKNOWLEDGED — r2-trend-long Entry Hardening

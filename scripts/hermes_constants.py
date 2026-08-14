@@ -1132,6 +1132,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
     'r2-trend-long', 'r2l-long',
+    'wave_catcher',  # velocity spike detector — catches violent moves
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)

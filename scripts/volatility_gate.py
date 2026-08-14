@@ -59,13 +59,14 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
-        'r2-trend-long',  # R² trend confirmation for LONG (slow grinds)
+        'wave_catcher',  # catches velocity spikes in big moves
     },
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
         'mover+',  # added 2026-08-14 — AVNT LONG blocked at ATR=4.29%
         'bb_bounce',
+        'wave_catcher',  # catches violent spikes in extreme vol
     },
 }
 
