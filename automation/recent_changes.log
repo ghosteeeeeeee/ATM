@@ -677,3 +677,7 @@
   WHY: 3T last hour (HYPE +/usr/bin/bash.01 profit-monster-trail, SAND -/usr/bin/bash.05 atr_sl_hit, BCH -/usr/bin/bash.08 atr_sl_hit — net -/usr/bin/bash.12). 24h 45T 46.7% WR -/usr/bin/bash.35. ATR SL 31.1% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -/usr/bin/bash.14 persistent but not kill threshold). 5 open positions near breakeven. No overtrading. System stable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 21:30 UTC
+[2026-08-15 21:30] auto_1hr: NO CHANGES
+  WHY: 3T last hour (SYRUP +$0.21, DYDX +$0.03, PUMP -$0.10 — net +$0.14). 24h 48T 47.9% WR -$0.21. ATR SL 31.3% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR persistent but only 1T last hour — below kill threshold). 5 open positions. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 22:30 UTC

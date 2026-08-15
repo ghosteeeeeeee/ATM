@@ -8512,3 +8512,35 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - range_finder+ 9T -$0.14 persistent but not killable (33.3% WR)
+
+## [2026-08-15 21:30 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L)
+- SYRUP return_exhaustion_long LONG: +$0.21 (profit-monster-trail)
+- DYDX ct-hot+ LONG: +$0.03 (profit-monster-trail)
+- PUMP ct-hot+,rs-s30,rs-s32 LONG: -$0.10 (atr_sl_hit)
+
+**PnL:** +$0.14
+**24h:** 48T, 47.9% WR, -$0.21
+**ATR SL:** 31.3% ✅
+
+**Signal Performance (24h):**
+- ✅ return_exhaustion_long 1T +$0.21 100% WR
+- ✅ r2-trend-long6 2T +$0.11 100% WR
+- ✅ ct-hot+ 14T +$0.09 57% WR
+- ✅ r2-trend-long2 5T +$0.05 80% WR
+- ❌ range_finder+ 9T -$0.14 33% WR (persistent)
+- ❌ wave_catcher- 4T -$0.09 25% WR
+- ❌ ct-hot- 2T -$0.10 0% WR
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 31.3% ✅
+- No overtrading (3T last hour)
+- No kill candidates (0% WR with 3+ trades last hour)
+- Hourly PnL positive (+$0.14)
+
+**Open Questions:**
+- range_finder+ 9T -$0.14 persistent but only 1T last hour — below kill threshold
+- wave_catcher- 4T -$0.09 persistent — 2T last hour, still below threshold
