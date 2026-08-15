@@ -8366,3 +8366,30 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_finder+ persistent loser — may need kill if no improvement
 - TIA -99.72% pnl_pct seems like data artifact (amount likely tiny)
+
+## 2026-08-15 16:30 UTC — Hourly Analysis
+
+**Trades:** 0 closed last hour (system dormant)
+**24h:** 46T, -$0.44 (45.7% WR, R:R 0.70:1 inverted)
+**ATR SL:** 30.4% ✅ (14/46 — below 40%)
+
+**Signal Performance (24h):**
+- ✅ ct-hot+ 8T +$0.14 62.5% WR
+- ✅ r2-trend-long6 2T +$0.11 100% WR
+- ❌ range_finder+ 9T -$0.14 33.3% WR (persistent, no kill trigger)
+- ❌ mover+ 2T -$0.11 0% WR (2T — below 3T kill threshold)
+
+**Open Positions:** 5 (all ct-hot based, near PnL)
+- DYDX +$0.01, LINEA -$0.04, MON -$0.06, ZRO +$0.01, BIGTIME +$0.03
+
+**Changes:** None. System dormant, no kill triggers.
+
+**No Change Needed:**
+- ATR SL 30.4% ✅
+- No overtrading
+- No 0% WR signals with 3+ trades
+- Stale positions: 0
+
+**Open Questions:**
+- range_finder+ persistent loser — monitor for kill threshold (3+ trades, 0% WR)
+- R:R still inverted (0.70:1) — TRAILING_ACTIVATION_PCT 0.60% eval ongoing

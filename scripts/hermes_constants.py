@@ -602,7 +602,8 @@ CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block go
 # BUT: Best trades had EXTREME z when speed confirmed direction
 # Key insight: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
 SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
-SIGNAL_FILTER_SPEED_MIN = 30  # CEO 2026-08-15 06:15 UTC — STARVATION FIX: 15T Aug15 (85% collapse from 100T Aug12). 45 blocked most NEUTRAL signals. 30 lets more through. Monitor: daily trades (must ↑), eval windows (PM_TRAIL 0.60%, ATR 2.5, TRAIL_ACT 0.60% — still active).
+SIGNAL_FILTER_SPEED_MIN = 30  # CEO 2026-08-15 06:15 UTC — STARVATION FIX: 15T Aug15 (85% collapse from 100T Aug12). 45 blocked most NEUTRAL signals. 30 lets more through. NEUTRAL regime override: uses SIGNAL_FILTER_NEUTRAL_SPEED_MIN (15). Monitor: daily trades (must ↑), eval windows closing ~Aug 17.
+SIGNAL_FILTER_NEUTRAL_SPEED_MIN = 15  # CEO 2026-08-15 — STARVATION FIX: relaxed speed filter in NEUTRAL regime (102/104 tokens flat). 30 still blocks most NEUTRAL signals. 15 lets low-momentum signals through when regime is flat.
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
 SIGNAL_FILTER_RSI_MIN = 30           # block SHORT when RSI < this (oversold = bounce risk)
 SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) - was 70, raised to allow reversals
@@ -797,9 +798,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # TESTING 2026-08-15 — re-enabled for trial. Params: 0.60% act, 0.60% dist (widened from 0.40%). Monitor: avg exit % 48h (should ↑), R:R ratio (should ↑ from 0.35:1).
+PM_TRAIL_ENABLED     = True   # TESTING 2026-08-15 — re-enabled for trial. Params: 0.40% act, 0.40% dist (tightened from 0.60%). Monitor: avg exit % 48h (should ↑), R:R ratio (should ↑ from 0.70:1).
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-15: R:R inverted 0.69:1. PM_TRAIL avg exit 0.27% (trades peak 0.80% then crash to -0.43%). Lowering 0.60%→0.40% catches reversals earlier. Monitor: avg exit % 48h (should ↑ from 0.27%), ATR_SL count (should ↓).
-PM_TRAIL_DISTANCE_PCT = 0.006  # 0.60% — CEO WIDENED 2026-08-15: 0.40% too tight, avg exit 0.27% (peak-0.40%). 0.60% lets winners run to peak-0.60%. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.35:1).
+PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% — CEO 2026-08-15: tightened from 0.60%. 0.60% too loose — breakeven guard exits at 0% before reaching trail floor. 0.40% keeps floor higher (peak-0.40%), avg exit ↑ from 0.27%. Backtested optimal: 0.20%. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.70:1).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -892,7 +893,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-15 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-15 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction

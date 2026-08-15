@@ -1,16 +1,17 @@
 ## CEO Report — 2026-08-15 (latest run — verified)
 
 ### Diagnosis
-24h 50T -$0.23 (48.0% WR — RED, 6th consecutive red). 48h 124T -$1.09 (50.0% WR). R:R inverted 0.69:1 (avg win 0.48% vs avg loss 0.65%). ATR_SL 45T avg -0.79% (-$3.60) dominates. PM_TRAIL 69T avg +0.27% (+$1.83) — trail exits too low. 5 open -$0.08. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 -$0.08 (26T low volume). Best7d: r2-trend-long2 17T +$0.19 64.7%, bb_bounce+ 21T +$0.21 61.9%, bb-bounce-short,hzscore- 18T +$0.14 61.1%, ct-hot+ 8T +$0.14 62.5%. Worst7d: wave_catcher+ 8T -$0.42 37.5% (killed), range_finder+ 9T -$0.14 33.3% (bleeding).
+24h 46T -$0.44 (45.7% WR — RED). 48h 123T -$1.12 (49.6% WR). 7d 453T -$1.52 (50.6% WR). R:R inverted 0.70:1 (avg win 0.48% vs avg loss -0.69%). ATR_SL 167T/7d dominates losses (-$10.61). PM_TRAIL 232T/7d generates wins (+$9.49) but avg exit only 0.27% (breakeven guard exits at 0% before trail floor). Daily: Aug 12 +$0.49 (100T) → Aug 13 -$1.58 (53T) → Aug 14 -$0.56 (80T) → Aug 15 -$0.08 (26T — 85% collapse). 5 open $0 flat. Signal starvation: 26T today vs 100T Aug 12. Best 7d: accel-300- SHORT 22T +$1.05, bb_bounce+,hzscore+ 17T +$0.97, hzscore- SHORT 17T +$0.90, range_breakout_short 13T +$0.89. Worst 7d: wave_catcher+ 8T -$0.42 (killed), range_breakout+ 8T -$0.41, trend_momentum 6T -$0.37 (killed).
 
 ### Root Cause
-PM_TRAIL activates at 0.60% — too late. Trades peak ~0.80% then crash to -0.43% before trail catches them. Peak data: trades peaking 0.80% exit at -0.43% avg (should exit at breakeven 0.0%). The trail can't protect trades it hasn't activated on yet.
+Two problems: (1) PM_TRAIL distance 0.60% too loose — floor = peak-0.60%, breakeven guard exits at 0% before reaching floor. Trades peaking 0.80% exit at avg 0.27% instead of 0.40%+. (2) Signal starvation — speed filter 30% blocks most NEUTRAL signals (102/104 tokens flat). Combined: R:R inverted because PM_TRAIL exits too early while ATR_SL takes full loss.
 
 ### Fix Applied
-LOWERED PM_TRAIL_ACTIVATE_PCT 0.60%→0.40%. Trail now activates 0.20% earlier, catching reversals before they turn into ATR_SL losses. Expected: avg exit ↑ from 0.27%, ATR_SL count ↓, R:R improves from 0.69:1.
+1. TIGHTENED PM_TRAIL_DISTANCE_PCT 0.60%→0.40%. Floor now peak-0.40% (was peak-0.60%). Expected: avg exit ↑ from 0.27% toward 0.40%+, R:R improves from 0.70:1.
+2. ADDED SIGNAL_FILTER_NEUTRAL_SPEED_MIN=15 — relaxed speed filter in NEUTRAL regime. 30→15 when regime=NEUTRAL. Expected: daily trades ↑ from 26 toward 40+.
 
 ### Verification
-Monitor: avg exit % 48h (should ↑ from 0.27%), ATR_SL count (should ↓ from 45), R:R (should ↑ from 0.69:1), eval close ~Aug 17 (TRAIL_ACT 0.40%, PM_TRAIL_DIST 0.60%, ATR_TP_K_MULT 2.5, SIGNAL_FILTER_SPEED_MIN 30).
+Monitor 48h: avg PM_TRAIL exit % (should ↑ from 0.27%), daily trades (should ↑ from 26), R:R (should ↑ from 0.70:1), ATR_SL count (should ↓). Eval windows closing ~Aug 17 — if R:R still inverted post-eval, escalate. Best signals (accel-300- SHORT, bb_bounce+,hzscore+) generating most profit — monitor for degradation.
 
 ---
 

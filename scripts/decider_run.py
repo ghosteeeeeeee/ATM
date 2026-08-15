@@ -40,7 +40,7 @@ from hermes_constants import (
      CONTEXT_GATE_Z_RANGING, CONTEXT_GATE_RANGING_SPEED,
      CONTEXT_GATE_SPEED_CONFIRM, CONTEXT_GATE_CACHE_TTL,
      CONTEXT_GATE_LLM_TIMEOUT, CONTEXT_GATE_FAIL_OPEN,
-    SIGNAL_FILTER_ENABLED, SIGNAL_FILTER_SPEED_MIN, SIGNAL_FILTER_MOMENTUM_MIN,
+    SIGNAL_FILTER_ENABLED, SIGNAL_FILTER_SPEED_MIN, SIGNAL_FILTER_NEUTRAL_SPEED_MIN, SIGNAL_FILTER_MOMENTUM_MIN,
     SIGNAL_FILTER_RSI_MIN, SIGNAL_FILTER_RSI_MAX,
     SIGNAL_FILTER_Z_MIN, SIGNAL_FILTER_Z_MAX,
     ZSCORE_ACCEL_ENABLED, ZSCORE_ACCEL_Z_THRESHOLD, ZSCORE_ACCEL_ACCEL_THRESHOLD,
@@ -736,8 +736,11 @@ def rule_based_context_gate(token, direction, source, sig):
     # Based on winning trade analysis: speed>50%, momentum>25, RSI 30-70, z neutral
     if SIGNAL_FILTER_ENABLED:
         # Speed filter: penalize when momentum is weak
-        if speed is not None and speed < SIGNAL_FILTER_SPEED_MIN:
-            return ('AMBIGUOUS', f'speed {speed:.0f}% < {SIGNAL_FILTER_SPEED_MIN}% (weak momentum)', 15)
+        # CEO 2026-08-15: NEUTRAL regime override — relaxed speed threshold
+        _regime = sig.get('volatility_regime') if isinstance(sig, dict) else None
+        _speed_min = SIGNAL_FILTER_NEUTRAL_SPEED_MIN if _regime == 'NEUTRAL' else SIGNAL_FILTER_SPEED_MIN
+        if speed is not None and speed < _speed_min:
+            return ('AMBIGUOUS', f'speed {speed:.0f}% < {_speed_min:.0f}% (weak momentum, regime={_regime})', 15)
 
         # Momentum filter: penalize when trend is weak
         if momentum < SIGNAL_FILTER_MOMENTUM_MIN:
