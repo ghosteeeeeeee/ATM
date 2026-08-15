@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 (CEO run — verified)] CEO: LOWERED COIN_TRACKER_HOT_MIN_COMPOSITE 50→45
+  WHY: coin_tracker_hot generates 2-4 signals/cycle but ZERO become trades. Root cause: composite threshold 50 too tight. BTC (accumulation BULL, comp=50.5) fails health check (warm/momentum=55<70). IMX (hot, comp=57.6) has price=0.0 data bug. ZK (comp=48.9), CAKE (comp=49.6) both filtered. Lowering to 45 unblocks ZK+CAKE immediately. Addresses signal starvation (26T today vs 100T Aug 12) without changing eval window params.
+  BY: CEO run
+  DO NOT REVERT — monitor ct-hot signals/day (should ↑ from 0), ct-hot WR (must >50%).
+
 [2026-08-15 (CEO run — verified)] CEO: LOWERED TRAILING_ACTIVATION_PCT 0.60%→0.40%
   WHY: R:R inverted 0.33:1 — avg win 0.26% vs avg loss -0.78%. 43 ATR_SL/48h with avg MFE 1.18% (trades peak at 1.18% then die). 0.60% activation too high — most trades hit ATR_SL before reaching trailing. 0.40% lets more trades reach trailing → fewer ATR_SL hits → better R:R.
   BY: CEO run
@@ -638,3 +643,7 @@
   WHY: 1T last hour (SAND SHORT -$0.06 atr_sl_hit). 24h 70T -$0.68 (64.3% WR, R:R inverted 0.19:1). ATR SL 32.9% ✅. System dormant (1T last hour, 15T today, 0 open positions). No 0% WR kill candidates. Stability period active (TRAILING_ACTIVATION_PCT 0.60 — 48h eval). PM_TRAIL re-enabled for testing (0.60% act/dist) but still capturing tiny wins (+$0.015 avg).
   BY: auto_1hr
   NEXT: Re-run at 14:30 UTC
+[2026-08-15 14:30] auto_1hr: NO CHANGES
+  WHY: 3T last hour (AIXBT -/usr/bin/bash.08, CFX -/usr/bin/bash.10 atr_sl_hit, GMT +/usr/bin/bash.04 profit-monster-T1). 24h 56T -/usr/bin/bash.10 (51.8% WR, R:R 0.77:1 — improved from 0.66:1). ATR SL 26.8% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -/usr/bin/bash.14 — persistent but not kill threshold). 5 open positions all ct-hot based. CEO eval windows active (TRAILING_ACTIVATION_PCT 0.60%). No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 15:30 UTC

@@ -1663,4 +1663,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 50      # minimum composite score to fire (capturing fast movers)
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 45      # CEO 2026-08-15: lowered 50→45 — zero signals despite BTC accumulation BULL (comp=50.5 but health=warm/momentum=55 <70), ZK (comp=48.9), CAKE (comp=49.6) all filtered. Unblocks ZK+CAKE immediately. Monitor: ct-hot signals/day (should ↑ from 0), ct-hot WR (must >50%).

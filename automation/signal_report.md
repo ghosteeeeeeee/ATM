@@ -1,74 +1,78 @@
 # Signal Performance Report
-**Period:** Last 6h | 24h  
-**Generated:** 2026-08-15 ~04:10 UTC
+**Generated:** 2026-08-15 11:02 UTC | **Period:** Last 6h + 24h
+
+## Overall Stats
+- **Total trades (all time):** 1,018 | **WR:** 46.9% | **PnL:** -35.14%
+- **Date range:** 2026-07-29 → 2026-08-15
 
 ---
 
-## System Summary
-| Metric | 24h |
-|--------|-----|
-| Total Trades | 73 |
-| Overall WR | 46.6% |
-| Total PnL | -$0.72 |
-| Signal Inversions | 0 |
+## WINNERS (WR > 55%, PnL > 0)
+
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| ct-hot+ | LONG | 7 | 57.1% | +1.92 | 7 | 57.1% | +1.92 | ❓ |
+| r2-trend-long2 | LONG | — | —% | — | 9 | 55.6% | +0.67 | ❓ |
+| r2-trend-long3 | LONG | — | —% | — | 7 | 71.4% | +0.65 | ❓ |
 
 ---
 
-## KILLED (executed this session)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No new kills needed |
+## LOSERS (WR < 30%, PnL < -2%)
 
-All losers from previous reports already terminated:
-- mover+ (MOMENTUM_LEADERBOARD_PLUS_ENABLED=False, killed 2026-08-15)
-- wave_catcher all variants (WAVE_CATCHER_ENABLED=False, killed 2026-08-16)
-- range_breakout_short (killed 2026-08-15)
+None found.
 
 ---
 
-## BOOSTED (executed this session)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No boosts — system at -0.72 PnL, wrong time |
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| range_finder+ | LONG | 9 | 33.3% | -2.33 | DISABLED | Borderline |
+| wave_catcher- | SHORT | 4 | 50.0% | -0.86 | DISABLED | Needs more data |
+| wave_catcher+ | LONG | 2 | 50.0% | -0.69 | DISABLED | Needs more data |
+| wave_catcher+ | SHORT | 3 | 33.3% | +0.02 | DISABLED | Needs more data |
 
 ---
 
-## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| range_finder+ | LONG | 33.3% | -$0.14 | 9 | WATCH — re-enabled 2026-08-15 for testing, monitoring |
-| wave_catcher- | SHORT | 25.0% | -$0.09 | 4 | DEAD — master kill active, settling trades |
-| wave_catcher+ | LONG | 37.5% | -$0.42 | 8 | DEAD — master kill active, settling trades |
-| r2-trend-long4 | LONG | 33.3% | -$0.11 | 3 | WATCH — needs 5+ trades for threshold |
-| mover+ | LONG | 16.7% | -$0.16 | 6 | DEAD — killed 2026-08-15 |
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
 
 ---
 
-## WINNERS
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long1 | LONG | 66.7% | +$0.08 | 3 | ACTIVE — needs more trades |
-| r2-trend-long2 | LONG | 60.0% | +$0.01 | 15 | ACTIVE — solid performer |
-| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 | DEAD — master kill, but SHORT was profitable |
-| r2-trend-long3 | LONG | 62.5% | -$0.04 | 8 | MIXED — high WR but losses > wins |
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
 
 ---
 
-## Key Observations
+## RECOMMENDATIONS
 
-1. **R2-trend family is the best performer** — r2-trend-long1/2/3 all have 60%+ WR. The r2-trend-long3 negative PnL is from 2 ATR SL hits (-$0.18) offsetting 6 profit-monster exits (+$0.14).
-
-2. **Most 24h losses are settling trades** from already-killed signals (wave_catcher, mover+). The kill switches worked — no new entries after kill timestamps.
-
-3. **range_finder+ is the only active concern** — re-enabled for testing 2026-08-15, currently 33.3% WR with 9 trades. Mostly small losses from profit-monster-trail exits. Worth monitoring for another 24h before deciding.
-
-4. **profit-monster-trail is the dominant close reason** — many exits are small-profit or flat, which is good risk management but contributes to negative PnL when losses are larger than wins.
-
-5. **No signal inversions detected** — all trades match expected direction.
+1. **[WATCH] range_finder+ LONG** — WR=33.3%, PnL=-2.33% over 9 trades. Monitor next cycle.
+2. **[WATCH] wave_catcher- SHORT** — WR=50.0%, PnL=-0.86% over 4 trades. Monitor next cycle.
+3. **[WATCH] wave_catcher+ LONG** — WR=50.0%, PnL=-0.69% over 2 trades. Monitor next cycle.
+4. **[WATCH] wave_catcher+ SHORT** — WR=33.3%, PnL=+0.02% over 3 trades. Monitor next cycle.
+5. **[KEEP] 3 winning combos** — ct-hot+, r2-trend-long2, r2-trend-long3. LONG side dominant.
 
 ---
 
-## Action Items
-- [ ] Monitor range_finder+ for 24h — if WR stays <35%, kill it
-- [ ] Track r2-trend-long3 — high WR but negative PnL needs investigation (ATR SL too tight?)
-- [ ] No immediate kills or boosts warranted — system is in cleanup mode from previous session's mass kills
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-15 | 59c1f0a | CEO: 3 fixes — trailing activation 0.40%, PM_TRAIL race fix,... |
+| 2026-08-15 | d8fb23f | CEO: added range_finder to STANDALONE_BYPASS (volume fix for... |
+| 2026-08-15 | 58f2671 | CEO: Remove range_breakout from STANDALONE_BYPASS (25% WR st... |
+| 2026-08-15 | c562a8f | CEO: cleaned STANDALONE_BYPASS — removed dead signals (wave_... |
+| 2026-08-15 | 0ac3ecd | CEO: FIX SIGNAL STARVATION — lowered SPEED_MIN 45→30 |
+| 2026-08-15 | d02de1b | CEO: Added coin_tracker intelligence development — predict m... |
+| 2026-08-15 | e62c8db | CEO: Updated prompt — added active winrate improvement and s... |
+| 2026-08-15 | 505c742 | CEO: WIDENED PM_TRAIL_DISTANCE_PCT 0.40%→0.60% — R:R inverte... |
+| 2026-08-15 | 8e923cb | Daily trading system update (2026-08-15) |
+| 2026-08-15 | c095ba1 | CEO: ATR_TP_K_MULT 2.0→2.5 — fix inverted R:R (0.60:1→0.75:1... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

@@ -8285,3 +8285,46 @@ None — system stable, previous fixes settling in.
 - r2-trend-long4: 2T 0% WR — will kill if next trade loses
 - R:R inverted 0.66:1 — ATR_TP_K_MULT 2.5 should fix, needs eval time
 - 7d: 5 profitable days, 7 consecutive red days overall — watching for trend break
+
+## 2026-08-15 14:30 UTC — Hourly Analysis
+
+**Trades:** 3 closed last hour (1W, 2L)
+- AIXBT continuation+ LONG: -$0.08 (atr_sl_hit)
+- CFX ct-hot+ LONG: -$0.10 (atr_sl_hit)
+- GMT r2-trend-long6 LONG: +$0.04 (profit-monster-T1)
+**PnL:** -$0.14 (33.3% WR)
+
+**24h Snapshot:**
+- 56T, -$0.10, 51.8% WR (29W/27L)
+- Exit reasons: profit-monster-trail 33T +$0.48, atr_sl_hit 15T -$1.20, profit-monster-T1 7T +$0.42, atr_tp_hit 1T +$0.20
+- ATR SL hit rate: 26.8% (15/56 — BELOW 40% threshold ✅)
+- R:R: avg_win $0.046, avg_loss $0.060, ratio 0.77:1 (still inverted but improved from 0.66:1)
+
+**Signal Performance (24h):**
+- ✅ ct-hot+ LONG: 7T 71.4% WR +$0.24
+- ✅ r2-trend-long2 LONG: 9T 66.7% WR +$0.09
+- ✅ r2-trend-long3 LONG: 7T 71.4% WR +$0.06
+- ✅ r2-trend-long6 LONG: 2T 100% WR +$0.11
+- ❌ range_finder+ LONG: 9T 33.3% WR -$0.14
+- ❌ wave_catcher- SHORT: 4T 25% WR -$0.09
+
+**Open Positions:** 5 (DYDX +$0.00, TIA -$0.00, LINEA -$0.00, MON -$0.00, ZRO +$0.00)
+
+**Diagnosis:**
+1. **Entry quality:** 2/3 last hour entries hit ATR SL quickly — entries slightly late or SL too tight for these tokens
+2. **SL behavior:** ATR SL hit 26.8% — healthy, below 40% threshold
+3. **Signal quality:** No kill candidates (0% WR with 3+ trades last hour). range_finder+ persistent loser but not meeting kill criteria
+4. **Trade frequency:** ~2.3/hr — normal
+5. **R:R:** 0.77:1 improved from 0.66:1 but still inverted — PM_TRAIL changes (0.60% act) still in eval window
+
+**Changes:** None. No signal meets kill threshold. CEO stability period active (TRAILING_ACTIVATION_PCT 0.60% eval).
+
+**No Change Needed:**
+- ATR SL hit rate 26.8% ✅
+- No overtrading (2.3/hr)
+- R:R improving (0.66→0.77 in 5.5h)
+- CEO eval windows active (48h monitoring)
+
+**Open Questions:**
+- range_finder+ LONG: 9T 33.3% WR -$0.14 — persistent loser, may need kill if no improvement by next eval
+- R:R inversion narrowing — ATR_TP_K_MULT 2.5 + PM_TRAIL disabled should help, needs more data
