@@ -63,13 +63,13 @@ REGIME_SIGNALS = {
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
-        'r2-trend-short',  # R² downtrend SHORT detector
+        'r2-trend-long', 'r2-trend-short',  # R² trend detectors
         'mover', 'mover+', 'mover-',  # momentum spike detector
     },
     'EXTREME': {
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
-        'mover+',  # added 2026-08-14 — AVNT LONG blocked at ATR=4.29%
+        'mover+', 'mover-',  # momentum spike detector
         'bb_bounce',
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
     },
