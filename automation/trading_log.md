@@ -8182,3 +8182,31 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - R:R inversion persists (0.19:1) — PM_TRAIL re-enabled for testing with wider params (0.60% act/dist), still capturing tiny wins
 - Need 48h eval data before next PM_TRAIL disable/re-enable cycle
+
+## [2026-08-15 14:30] Hourly Analysis
+
+**Trades:** 0 closed last hour, 0 open positions
+**24h:** 62T -$0.76 (50% WR). ATR SL% 32.3% ✅.
+**Today:** 15T -$0.22 (33.3% WR)
+
+**Diagnosis:**
+- System dormant: 0 trades last hour, weekend/low-vol
+- ATR SL% at 32.3% — well below 40% threshold
+- PM_TRAIL 39T +$0.47 — trailing capturing small wins (+$0.012 avg)
+- ATR_SL 20T -$1.56 — main loss driver (-$0.078 avg)
+- No 0% WR kill candidates (0 trades last hour)
+- All underperforming signals (mover+, wave_catcher+) already disabled or not killable
+
+**Changes:** None.
+- 0 trades last hour → no kill candidates
+- ATR SL% below threshold
+- System dormant (weekend)
+- No param changes during stability period
+
+**No Change Needed:**
+- ATR SL% at 32.3% — below threshold
+- System too quiet for action
+- Stability period active (TRAILING_ACTIVATION_PCT 0.60%)
+
+**Open Questions:**
+- R:R inversion (0.21:1) persists — PM_TRAIL captures tiny wins while ATR_SL takes bigger losses. Needs dedicated tuning session.
