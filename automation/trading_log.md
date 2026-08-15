@@ -8099,3 +8099,28 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Dormancy >48h would warrant relaxing vol floor or spike filter. Currently at 30h.
 - R:R imbalance (0.34:1) is structural — trailing activation/distance needs dedicated tuning session.
+
+## [2026-08-15 11:30] Hourly Analysis
+
+**Trades:** 1 closed (BANANA +$0.06 via profit-monster-T1). 4 open positions all deep underwater.
+**24h:** 66T -$0.66 (63.6% WR but R:R inverted 0.26:1). ATR SL% 36.4% ✅.
+
+**Diagnosis:**
+- R:R inverted: avg win 0.021% (profit-monster-trail) vs avg loss 0.082% (atr_sl_hit) = 0.26:1
+- profit-monster-trail dominates 38/66 exits at near-breakeven — trailing catches tiny reversals
+- 4 stale open positions: YGG -44%, ZRO -38%, WLD -21%, SAND -14% — SL not triggering (bug?)
+- No overtrading (6.6T/hr avg). No 0% WR kill candidates.
+
+**Changes:** None.
+- CEO stability period active (TRAILING_ACTIVATION_PCT 0.60, ATR_TP_K_MULT 2.5 in 48h eval)
+- System dormant (2T today) — insufficient data for param changes
+- Only 1 change/hr rule — stale positions are higher priority investigation
+
+**No Change Needed:**
+- ATR SL% at 36.4% (below 40% threshold ✅)
+- No overtrading or signal kills needed
+- Stability period forbids param changes
+
+**Open Questions:**
+1. 4 positions stuck at massive losses with no SL — are these stale pre-param-change positions?
+2. profit-monster-trail exits at +0.021% avg despite TRAILING_DISTANCE_PCT=2.00% — why so tight?

@@ -34,3 +34,6 @@
 - **[INFO]**: Disk — 83% used (93G/118G), 2% from WARN threshold
 - **[INFO]**: Data freshness — candles 1m: 1min, coin_tracker: 1min, regime: 10min
 - **NO AUTO-FIXES NEEDED** — system healthy
+
+## Error Alerts — 2026-08-15 04:09 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Reduce only order would increase position. asset=N`

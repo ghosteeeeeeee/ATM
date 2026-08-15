@@ -168,10 +168,11 @@ def detect_r2_long(token, candles, price):
 
     bars_since = max(n - R2_WINDOW - entry_idx, 0)
 
-    # ── Minimum bars filter (2026-08-14) ──────────────────────────────────
-    # Require bars_since >= 2 — entering too early (0-1 bars) is risky.
-    # Backtest: long0/long1 have 50-67% WR, long2+ have 67-100% WR.
-    if bars_since < 2:
+    # ── Minimum bars filter (2026-08-14, RAISED 2026-08-15) ──────────────
+    # Require bars_since >= 3 — entering at 2 is too early (fading moves).
+    # Backtest: long2 has 58.8% WR (17T), long3+ has 66.7% WR (15T).
+    # ZRO/YGG long2/long4 losers entered on fading momentum.
+    if bars_since < 3:
         return None
 
     # Confidence scoring

@@ -121,7 +121,6 @@ SHORT_BLACKLIST = {
     # 2026-08-07: Consistent losers — 48h + all-time net negative
     'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
     'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
-    'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
     # 2026-08-09: Worst performers (7d) — both directions bleed
     'AAVE',  # 17T 29.4% WR -$0.41
     'SKY',   # 13T 30.8% WR -$0.16
@@ -182,7 +181,6 @@ LONG_BLACKLIST = {
     # 2026-08-07: Consistent losers — 48h + all-time net negative
     'TNSR',  # 18T all-time, 28% WR, -$0.22. 48h: 5T, 20% WR, -$0.30
     'VINE',  # 16T all-time, 19% WR, -$0.40. 48h: 5T, 40% WR, -$0.19
-    'AVAX',  # 47T all-time, 34% WR, -$0.12. 48h: 2T, 0% WR, -$0.13
     # 2026-08-09: Worst performers (7d) — both directions bleed
     'AAVE',  # 17T 29.4% WR -$0.41
     'SKY',   # 13T 30.8% WR -$0.16
@@ -799,7 +797,7 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = False  # CEO KILLED 2026-08-15 — cuts winners at avg 0.39% while ATR_SL takes -0.81%. R:R 0.48:1 inverted. Override backfired (0.40% dist = exits at lower profit). Let main trailing (0.80% act, 2.0% dist) handle exits. Monitor: avg win 48h (should ↑ from 0.39%), R:R ratio (should approach 1:1).
+PM_TRAIL_ENABLED     = True   # TESTING 2026-08-15 — re-enabled for trial. Was killed 2026-08-15 for 0.48:1 R:R. Params: 0.60% act, 0.40% dist. Monitor: avg exit %, R:R ratio.
 PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO OVERRIDE 2026-08-16: tightened trail caused avg exit 0.32% (R:R inverted 0.59:1). Loosened to let winners reach ATR target.
 PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% behind peak — restored from 0.15% (same override)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
@@ -1057,7 +1055,7 @@ R2_TREND_LONG_MIN_SPEED     = 30      # min speed percentile — require some mo
 R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band top
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
-R2_TREND_LONG_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces)
+R2_TREND_LONG_MIN_PRE_MOVE = 0.1     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-15 from 0.0 (disabled) — ZRO/YGG losers entered on fading moves
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT
@@ -1147,7 +1145,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'range_finder', 'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'mover', 'mover+', 'mover-', 'return_exhaustion_long',
-    'r2-trend-long', 'r2l-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
+    'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
     'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector — catches violent moves
 )
 
@@ -1453,7 +1451,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.27 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.2693 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
