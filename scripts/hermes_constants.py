@@ -489,7 +489,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0080  # 0.80% — trailing activates when trade hits +0.80%
+TRAILING_ACTIVATION_PCT = 0.0060  # 0.60% — CEO LOWERED 2026-08-15: 0.80% too high, most trades hit ATR_SL (-0.73% avg) before activating trailing. 0.60% lets more trades reach trailing → fewer ATR_SL hits → better R:R (was 0.63:1 inverted). Monitor: atr_sl_hit count 48h (should ↓), avg win (should ↑ from 0.456%).
 TRAILING_DISTANCE_PCT   = 0.0200  # 2.00% — trailing SL distance from peak (widened from 0.80% — survives normal pullbacks on trend signals)
 
 # ── Loss Cooldown Constants
@@ -894,7 +894,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-14 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-15 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction

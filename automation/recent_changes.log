@@ -587,3 +587,7 @@
   WHY: PM_TRAIL cuts winners at avg 0.39% while ATR_SL takes -0.81%. R:R 0.48:1 inverted. Override that loosened PM_TRAIL backfired. Main trailing (0.80% act, 2.0% dist) will handle exits.
   BY: CEO run
   DO NOT REVERT — monitor 48h for avg win improvement.
+[2026-08-15 (CEO run — verified)] CEO: LOWERED TRAILING_ACTIVATION_PCT 0.80%→0.60%
+  WHY: R:R inverted 0.63:1 (avg win 0.456% vs avg loss -0.727%). ATR_SL dominates 166T -$10.50 (37.6% exits). 0.80% activation too high — most trades hit ATR_SL before activating trailing.
+  BY: CEO run
+  DO NOT REVERT — monitor 48h for atr_sl_hit reduction and avg win improvement.
