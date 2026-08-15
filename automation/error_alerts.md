@@ -15,3 +15,10 @@
 
 ## Error Alerts — 2026-08-15 21:02 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Non-dict response from exchange: None`
+
+## Error Alerts — 2026-08-15 22:02 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   [TOK CLEANUP] Failed to cancel stale orders for TOK: TOK TOK N: Too Many Requests`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): HL TOK TOK: N null`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK: Command '['/usr/bin/python3', '/root/.hermes/scripts/brain.py', 'trade', 'add',`

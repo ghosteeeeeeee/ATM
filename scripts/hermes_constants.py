@@ -144,6 +144,8 @@ SHORT_BLACKLIST = {
     'ZK',     # 11T 18% WR SHORT, 12T 25% WR LONG — -$1.12
     'ORDI',   # 22T 36% WR SHORT, 21T 24% WR LONG — -$1.07
     'SKR',    # 15T 33% WR SHORT, 15T 33% WR LONG — -$1.08
+    # 2026-08-15: 96h both-direction loser
+    '2Z',     # 3T 33% WR SHORT, 7T 29% WR LONG — -$0.28
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -221,6 +223,8 @@ LONG_BLACKLIST = {
     'ZK',     # 12T 25% WR LONG, 11T 18% WR SHORT — -$1.12
     'ORDI',   # 21T 24% WR LONG, 22T 36% WR SHORT — -$1.07
     'SKR',    # 15T 33% WR LONG, 15T 33% WR SHORT — -$1.08
+    # 2026-08-15: 96h both-direction loser
+    '2Z',     # 7T 29% WR LONG, 3T 33% WR SHORT — -$0.28
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 

@@ -8605,3 +8605,21 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - ct-hot- 3T 0% WR, -$0.14 — monitor next hour, if hits 4T+ with 0% WR, kill
+
+## [2026-08-16 00:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet period)
+**24h:** 55T, 46% WR, +$0.25
+
+**Changes:**
+1. Killed `COIN_TRACKER_HOT_MINUS_ENABLED` (ct-hot- SHORT direction) — 4T 0% WR, all SHORTs losing to atr_sl
+
+**No Change Needed:**
+- ATR SL rate 37.5% ✅ (under 40%)
+- ct-hot+ performing well (18T, 61% WR, +$0.31)
+- range_finder+ underperforming (9T, 33% WR) but not at kill threshold
+- No overtrading (0T last hour, 16T in 6h)
+- 5 open positions, all near breakeven
+
+**Open Questions:**
+- Why no trades closed in ~1 hour? Market may be in consolidation, or signals not firing
