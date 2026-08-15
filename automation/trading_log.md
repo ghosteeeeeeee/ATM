@@ -8544,3 +8544,23 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_finder+ 9T -$0.14 persistent but only 1T last hour — below kill threshold
 - wave_catcher- 4T -$0.09 persistent — 2T last hour, still below threshold
+
+## [2026-08-15 22:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L)
+- NOT return_exhaustion_long: +$0.13 (profit-monster-trail)
+- GRASS return_exhaustion_long: +$0.05 (profit-monster-T1)
+
+**PnL:** +$0.18
+**24h:** 50T, 46% WR, -$0.18
+**ATR SL:** 30% ✅
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 30% ✅
+- No overtrading (2T last hour)
+- No kill candidates (0% WR with 3+ trades last hour)
+- Hourly PnL positive (+$0.18)
+
+**Open Questions:** None — system stable

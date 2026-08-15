@@ -681,3 +681,7 @@
   WHY: 3T last hour (SYRUP +$0.21, DYDX +$0.03, PUMP -$0.10 — net +$0.14). 24h 48T 47.9% WR -$0.21. ATR SL 31.3% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR persistent but only 1T last hour — below kill threshold). 5 open positions. No overtrading. System stable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 22:30 UTC
+[2026-08-15 22:30] auto_1hr: NO CHANGES
+  WHY: 2T last hour (NOT +$0.13, GRASS +$0.05 — net +$0.18). 24h 50T 46% WR -$0.18. ATR SL 30% ✅. No 0% WR kill candidates (ct-hot- 2T below 3T threshold). 5 open positions near breakeven. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 23:30 UTC
