@@ -602,7 +602,7 @@ CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block go
 # BUT: Best trades had EXTREME z when speed confirmed direction
 # Key insight: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
 SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
-SIGNAL_FILTER_SPEED_MIN = 45  # CEO LOCK 2026-08-02 23:15 UTC — freeze 48h (was 65 thrash)
+SIGNAL_FILTER_SPEED_MIN = 30  # CEO 2026-08-15 06:15 UTC — STARVATION FIX: 15T Aug15 (85% collapse from 100T Aug12). 45 blocked most NEUTRAL signals. 30 lets more through. Monitor: daily trades (must ↑), eval windows (PM_TRAIL 0.60%, ATR 2.5, TRAIL_ACT 0.60% — still active).
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
 SIGNAL_FILTER_RSI_MIN = 30           # block SHORT when RSI < this (oversold = bounce risk)
 SIGNAL_FILTER_RSI_MAX = 80           # block LONG when RSI > this (overbought) - was 70, raised to allow reversals
@@ -1142,7 +1142,8 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long', 'range_breakout', 'range_breakout_short',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
-    'range_finder', 'continuation', 'continuation_long', 'continuation_short',
+    'ct-hot',
+    'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'mover', 'mover+', 'mover-', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
@@ -1451,7 +1452,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.2693 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.2687 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────

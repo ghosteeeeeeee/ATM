@@ -8154,3 +8154,31 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - R:R imbalance (0.21:1) is structural — trailing activation too eager, catches tiny reversals. Needs dedicated tuning session after stability period ends.
+
+## [2026-08-15 06:04] Hourly Analysis
+
+**Trades:** 1 closed (SAND SHORT -$0.06, range_finder-, atr_sl_hit)
+**24h:** 70T -$0.68 (64.3% WR). ATR SL% 32.9% ✅.
+
+**Diagnosis:**
+- R:R inverted 0.19:1 (PM_TRAIL avg +$0.015 vs atr_sl_hit avg -$0.079) — structural
+- PM_TRAIL 43T (+$0.63) catches tiny wins; ATR_SL 23T (-$1.81) takes big losses
+- System dormant: 1T last hour, 15T today, 0 open positions
+- No 0% WR kill candidates with 3+ trades in last hour
+- Aug 15: 15T -$0.22, WR 33.3% — weakest day in 3 days
+
+**Changes:** None.
+- No overtrading (1T/hr)
+- No 0% WR kill candidates (mover+ 16.7% WR but only 6T total, trades from Aug 14)
+- ATR SL% below 40% threshold
+- Stability period active (TRAILING_ACTIVATION_PCT 0.60 — 48h eval)
+- System too quiet for param changes
+
+**No Change Needed:**
+- ATR SL% at 32.9% — well below kill threshold
+- Stability period forbids param tuning
+- No actionable signals — system dormant
+
+**Open Questions:**
+- R:R inversion persists (0.19:1) — PM_TRAIL re-enabled for testing with wider params (0.60% act/dist), still capturing tiny wins
+- Need 48h eval data before next PM_TRAIL disable/re-enable cycle

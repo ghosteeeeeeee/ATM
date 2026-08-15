@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 06:15 UTC (CEO run — verified)] CEO: LOWERED SIGNAL_FILTER_SPEED_MIN 45→30
+  WHY: SIGNAL STARVATION — 15T Aug 15 (85% collapse from 100T Aug 12). System starving to death. 45 blocked most NEUTRAL signals. 30 lets more through.
+  BY: CEO run
+  DO NOT REVERT — monitor daily trades (must ↑ within 24h), eval windows (PM_TRAIL 0.60%, ATR 2.5, TRAIL_ACT 0.60% — still active).
+
 [2026-08-15 (CEO run — verified)] CEO: CHANGED ATR_TP_K_MULT 2.0→2.5
   WHY: Verified DB: 24h 71T -$0.72 (49.3% WR — RED). 48h R:R inverted 0.60:1 — avg win 0.45% vs avg loss -0.73%. atr_sl_hit 50T avg -0.79% dominates losses. ATR_TP barely fires (1T/48h). Bumped to target 2.0% TP (was 1.6%). Expected: R:R improves to ~0.75:1.
   BY: CEO run
@@ -604,3 +609,7 @@
   WHY: 2T last hour (XPL -$0.03, CRV -$0.01 — both tiny losses). 24h 73T -$0.72 (46.6% WR, R:R inverted 0.21:1). ATR SL 34.2% ✅. No 0% WR kill candidates — mover+ and wave_catcher+ trades all from Aug 14 (already dormant/disabled). 1 open SAND SHORT -$0.04. CEO stability period active. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 13:30 UTC
+[2026-08-15 13:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (SAND SHORT -$0.06 atr_sl_hit). 24h 70T -$0.68 (64.3% WR, R:R inverted 0.19:1). ATR SL 32.9% ✅. System dormant (1T last hour, 15T today, 0 open positions). No 0% WR kill candidates. Stability period active (TRAILING_ACTIVATION_PCT 0.60 — 48h eval). PM_TRAIL re-enabled for testing (0.60% act/dist) but still capturing tiny wins (+$0.015 avg).
+  BY: auto_1hr
+  NEXT: Re-run at 14:30 UTC
