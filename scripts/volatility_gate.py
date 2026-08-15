@@ -36,6 +36,7 @@ REGIME_SIGNALS = {
         'trend_momentum_near_sma',
         'hzscore', 'range_finder',  # individual parts for single-source signals
         'accel-300', 'accel-300-',  # SHORT: catches slow grinds down in quiet markets
+        'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
@@ -51,6 +52,7 @@ REGIME_SIGNALS = {
         'r2-trend-short',  # R² downtrend SHORT detector
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
+        'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
     },
     'HIGH': {
         # Breakout works in big moves
@@ -65,6 +67,7 @@ REGIME_SIGNALS = {
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
         'mover', 'mover+', 'mover-',  # momentum spike detector
+        'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
     },
     'EXTREME': {
         # Continuation works in storms
