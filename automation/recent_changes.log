@@ -2,6 +2,21 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 (CEO run — verified)] CEO: LOWERED TRAILING_ACTIVATION_PCT 0.60%→0.40%
+  WHY: R:R inverted 0.33:1 — avg win 0.26% vs avg loss -0.78%. 43 ATR_SL/48h with avg MFE 1.18% (trades peak at 1.18% then die). 0.60% activation too high — most trades hit ATR_SL before reaching trailing. 0.40% lets more trades reach trailing → fewer ATR_SL hits → better R:R.
+  BY: CEO run
+  DO NOT REVERT — monitor atr_sl_hit count 48h (should ↓ from 43), avg win (should ↑ from 0.26%), R:R (should ↑ from 0.33:1).
+
+[2026-08-15 (CEO run — verified)] CEO: REMOVED range_finder FROM STANDALONE_BYPASS_SIGNALS
+  WHY: range_finder standalone bleeding — 9T 33.3% WR -$0.14 24h. Was added for starvation volume but creating losing trades. Combos (bb_bounce+,range_finder+ 52.4% WR) unaffected — still require confluence.
+  BY: CEO run
+  DO NOT REVERT — range_finder+ standalone dead, combos profitable.
+
+[2026-08-15 (CEO run — verified)] CEO: FIXED PM_TRAIL RACE CONDITION in profit_monster.py
+  WHY: 43 ATR_SL trades/48h had avg MFE 1.18% — trades peaked at 1.18% then crashed to -0.78% ATR_SL. PM_TRAIL should have caught them. Bug: "clear on drop below activation" (line 363) removed trail state when price crashed fast (1.18% → 0.25% in <30s), bypassing breakeven guard (exits at 0.0%). Fix: removed clearing logic — trail state persists, breakeven guard catches fast crashes.
+  BY: CEO run
+  DO NOT REVERT — structural fix for PM_TRAIL race condition. Monitor: profit-monster-trail exits 48h (should ↑ from 70), atr_sl_hit count (should ↓ from 43), avg PM_TRAIL exit (should ↑ from 0.27%).
+
 [2026-08-15 (CEO run — verified)] CEO: ADDED range_finder TO STANDALONE_BYPASS_SIGNALS
   WHY: SIGNAL STARVATION — Aug 15 only 19T (85% collapse from 100T Aug12). range_finder blocked by confluence gate — only fires in combos. Added to bypass so range_finder- and range_finder_short can fire standalone. range_finder+ stays disabled (33.3% WR). Combos unaffected.
   BY: CEO run

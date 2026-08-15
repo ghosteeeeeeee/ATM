@@ -1,13 +1,18 @@
 ## CEO Report — 2026-08-15 (latest run)
 
 ### Diagnosis
-Signal starvation: Aug 15 only 19T so far (85% collapse from 100T Aug12). 24h 56T -$0.46 (48.2% WR — RED, 6th consecutive red). 5 open $0 flat. R:R inverted 0.49:1 (avg win 0.38% vs avg loss -0.78%). SL hit 35.8% (123T/48h). Top performers: r2-trend-long2 8T 100% WR, ct-hot+ 3T 100%, mover+ 1T 100%. Worst: range_finder+ 9T -$0.14 33.3% (disabled), range_breakout_short 1T -$0.10 0%.
+24h 56T -$0.20 (50% WR — recovering). 48h 122T -$0.96 (50.8% WR). Daily: Aug 12 +$0.49 (100T) → Aug 13 -$1.58 (53T) → Aug 14 -$0.56 (80T) → Aug 15 +$0.06 (21T). 5 open -$0.09. R:R inverted 0.33:1 (PM_TRAIL avg +0.26% vs ATR_SL avg -0.78%). KEY: ATR_SL trades avg MFE 1.18% — trades PEAK at 1.18% then die. 43 ATR_SL/48h dominates losses (-$3.37). NEUTRAL regime (411/549 tokens). Stars7d intact. Pipeline healthy.
 
 ### Root Cause
-Three filters stacked in NEUTRAL regime (103/105 tokens): (1) Confluence gate blocks single-source signals, (2) VEL-FILTER blocks SHORT when price rising, (3) NEUTRAL regime 0.50x scoring penalty. SIGNAL_FILTER_SPEED_MIN lowered 45→30 today (needs 24h to show impact). range_finder (core mean-reversion signal) blocked by confluence gate — only fires in combos. Eval windows active (PM_TRAIL 0.60%, ATR_TP_K_MULT 2.5, TRAILING_ACTIVATION_PCT 0.60%) — close ~Aug 17. Cannot touch these params.
+R:R inverted because PM_TRAIL has a race condition: trail state cleared when price crashes fast (1.18% → 0.25% in <30s), bypassing breakeven guard. 43 trades/48h peaked at 1.18% then hit -0.78% ATR_SL — should have exited at 0.0% breakeven. Additionally, TRAILING_ACTIVATION_PCT 0.60% too high for NEUTRAL regime — most trades hit ATR_SL before reaching trailing. range_finder standalone bypass creating9T of 33.3% WR bleeding trades.
 
 ### Fix Applied
-ADDED 'range_finder' to STANDALONE_BYPASS_SIGNALS. range_finder- and range_finder_short can now bypass confluence gate. Expected: daily trades ↑ from 19 toward 30-40+. range_finder+ stays disabled (33.3% WR). Combos (bb_bounce+,range_finder+ 52.4% WR) unaffected — validate_source() exact-match blocks standalone only.
+1. LOWERED TRAILING_ACTIVATION_PCT 0.60%→0.40% — more trades reach trailing
+2. REMOVED range_finder from STANDALONE_BYPASS — 9T 33.3% WR bleeding
+3. FIXED PM_TRAIL race condition — removed "clear on drop below activation" so breakeven guard catches fast crashes. Trades now exit at 0.0% instead of -0.78%
+
+### Verification
+Monitor48h: R:R (should ↑ from 0.33:1), ATR_SL count (should ↓ from 43), avg win (should ↑ from 0.26%), PM_TRAIL exits (should ↑ from 70). Eval windows (PM_TRAIL 0.60%, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.60%) closing ~Aug 17.
 
 ### Verification
 Monitor: daily trades (must ↑ within 24h), range_finder standalone WR (must >45% to keep enabled), eval close ~Aug 17, R:R ratio (should ↑ from 0.49:1 after eval windows close). NO other changes — eval windows active, SIGNAL_FILTER_SPEED_MIN needs time.

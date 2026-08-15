@@ -360,10 +360,10 @@ def run_trail(positions, dry_run):
                 if ok:
                     closed += 1
                 del state[tid]
-            elif pnl < PM_TRAIL_ACTIVATE_PCT * 0.5:
-                # Trade went back below activation threshold — clear (didn't hold)
-                log(f"  [TRAIL] {pos['token']} dropped to {pnl:.2f}% — clearing trail state")
-                del state[tid]
+            # ponytail: removed "clear on drop below activation" — was causing race
+            # condition where fast crashes (1.18% peak → -0.78% ATR_SL in <30s)
+            # cleared trail state before breakeven guard could exit at 0.0%.
+            # 43 ATR_SL trades/48h had avg MFE 1.18% — should have been trailed.
 
         else:
             # ── New candidate: just entered profit zone ───────────────────

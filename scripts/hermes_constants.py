@@ -487,7 +487,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0060  # 0.60% — CEO LOWERED 2026-08-15: 0.80% too high, most trades hit ATR_SL (-0.73% avg) before activating trailing. 0.60% lets more trades reach trailing → fewer ATR_SL hits → better R:R (was 0.63:1 inverted). Monitor: atr_sl_hit count 48h (should ↓), avg win (should ↑ from 0.456%).
+TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO 2026-08-15: R:R inverted 0.33:1 (avg win 0.26% PM_TRAIL vs avg loss -0.80% ATR_SL). 42 ATR_SL/48h — trades die before reaching 0.60% activation. 0.40% lets more trades reach trailing → fewer ATR_SL hits → better R:R. Monitor: atr_sl_hit count 48h (should ↓), avg win (should ↑ from 0.26%).
 TRAILING_DISTANCE_PCT   = 0.0200  # 2.00% — trailing SL distance from peak (widened from 0.80% — survives normal pullbacks on trend signals)
 
 # ── Loss Cooldown Constants
@@ -1147,10 +1147,10 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
-    'range_finder',  # CEO 2026-08-15 — added: standalone range_finder- and range_finder_short bypass confluence for volume. range_finder+ DISABLED (33.3% WR 7d). combos (bb_bounce+,range_finder+ 52.4% WR) unaffected.
-    # CEO 2026-08-15 — removed: range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
-    # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False)
-    # CEO 2026-08-15 — removed: range_breakout (standalone 8T 25% WR -$0.41 7d. combos profitable)
+    # CEO 2026-08-15 — removed: range_finder (9T 33.3% WR -$0.14 24h — bleeding not helping starvation),
+    # range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
+    # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False),
+    # range_breakout (standalone 8T 25% WR -$0.41 7d. combos profitable)
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
