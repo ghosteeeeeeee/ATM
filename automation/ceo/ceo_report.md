@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-16 07:30 UTC (verified)
+
+### Diagnosis
+24h 49T -$0.16 (49.0% WR — RED). 7d 456T -$1.54 (50.4% WR). R:R 0.79:1 (avg win 0.456% vs avg loss -0.581%). ATR_SL 44T/48h avg -0.772% (-$3.43) dominates losses. PM_TRAIL 67T/48h avg +0.254% (+$1.74) — healthy but range_finder+ PM_TRAIL exits avg -0.077% (7T -$0.05 dragging). profit-monster-T1 8T avg +0.584% (+$0.47). atr_tp_hit 1T +1.983% — barely firing (K_MULT 2.5 possibly too high). 4 open $0 flat. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 -$0.06 (improving trend).
+
+### Root Cause
+Legacy losers still aging out in 7d window (wave_catcher+, range_finder+, accel-300-). ATR_SL still dominates at -0.772% avg loss. PM_TRAIL range_finder+ exits are negative (-0.077% avg) — signal fires PM_TRAIL on weak entries. ATR_TP barely fires (1T in 48h) — K_MULT 2.5 may be too high for current volatility.
+
+### Fix Applied
+NO CHANGES — 6 eval windows active closing ~Aug 17 (PM_TRAIL 0.60% act/0.50% dist, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.40%, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45). Changing now invalidates eval results.
+
+### Verification
+System stabilizing: daily PnL improving (-$1.58 → -$0.56 → -$0.06). Volume recovering (38T Aug 15 vs 15T low). Legacy trades aging out. Stars7d intact: r2-trend-long2 64.7%, bb_bounce+ 61.9%, bb-bounce-short,hzscore- 61.1%, hzscore+,mover+ 80%. Monitor: eval close ~Aug 17, R:R (should ↑ from 0.79:1), atr_tp_hit count (should ↑ from 1), daily trades (should stay >30T).
+
+---
+
 ## CEO Report — 2026-08-15 23:00 UTC (verified)
 
 ### Diagnosis
