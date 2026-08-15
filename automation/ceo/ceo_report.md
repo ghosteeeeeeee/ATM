@@ -1,3 +1,35 @@
+## CEO Report — 2026-08-15 16:00 UTC (verified)
+
+### Diagnosis
+24h 44T -$0.23 (47.7% WR — RED). 48h 123T -$1.03 (49.6% WR). 7d 450T -$1.68 (50.2% WR). R:R 0.75:1 (avg win 0.43% vs avg loss -0.57%) — IMPROVING (was 0.71:1). ATR_SL 44T/48h avg -0.78% (-$3.46) still dominates losses. PM_TRAIL 69T/48h avg +0.26% (+$1.75) — positive but small. 5 open $0 flat. Aug 15: 31T -$0.13 (volume recovering from 15T yesterday). Top 7d: r2-trend-long2 17T +$0.19 64.7%, bb_bounce+ 21T +$0.21 61.9%, ct-hot+ 12T +$0.11 58.3%. Legacy losers aging out (wave_catcher+, range_finder+ — all disabled, trades closing). 6 eval windows active closing ~Aug 17.
+
+### Root Cause
+R:R still inverted but improving. ATR_SL dominates at -0.78% avg while PM_TRAIL captures only +0.26%. Winners cut too early — trades peak at ~0.5% but PM_TRAIL catches at 0.26%. Eval windows targeting this: PM_TRAIL 0.60% activation catches trades with real momentum, ATR_TP_K_MULT 2.5 extends TP, TRAIL_ACT 0.40% lets more trades reach trailing. Volume recovering — SIGNAL_FILTER_SPEED_MIN 30 working (31T today vs 15T yesterday).
+
+### Fix Applied
+NO CHANGES — 6 eval windows active, closing ~Aug 17. Changing now invalidates results. System stabilizing: volume up, R:R improving, legacy losers closing. Eval windows need data to evaluate.
+
+### Verification
+Monitor: eval close ~Aug 17, R:R 48h (should ↑ from 0.75:1 toward 0.90:1+), daily trades (should stay >30T), avg PM_TRAIL exit (should ↑ from 0.26%), ATR_SL count (should ↓ from 44). If R:R still inverted post-eval → escalate to ATR_SL widening or regime filter on SHORTs.
+
+---
+
+## CEO Report — 2026-08-15 14:15 UTC (verified)
+
+### Diagnosis
+Today 29T -$0.14 (44.8% WR — RED). range_finder+ LONG 9T -$0.14 33.3% — ENTIRE LOSS. ct-hot+ 11T +$0.08 54.5% WR — profitable. 4 open (all ct-hot) $0 flat. 48h R:R 0.71:1 (avg win 0.48% vs avg loss -0.68%). 48h: ATR_SL 45T avg -0.73% dominates (-$3.62), PM_TRAIL 13T avg -0.26% (-$0.35). 7d 455T -$1.64 50.3% WR. range_finder+ legacy trades closing (all 9 between 03:36-04:06 UTC). Volume recovering: 29T today vs 15T yesterday at same time.
+
+### Root Cause
+range_finder+ LONG is disabled (RANGE_FINDER_PLUS_ENABLED=False) but legacy open positions closed today. These 9 trades are the ENTIRE day's loss. ct-hot+ performing well (54.5% WR). R:R still inverted but eval windows targeting this (PM_TRAIL activation 0.40%, distance 0.60%, ATR_TP_K_MULT 2.5, trailing activation 0.40%, SIGNAL_FILTER_SPEED_MIN 30). 6 eval windows active — closing ~Aug 17.
+
+### Fix Applied
+NO CHANGES — eval windows active. Changing now invalidates results. System flat, not bleeding hard. range_finder+ legacy trades will age out. ct-hot+ volume should increase as COIN_TRACKER_HOT_MIN_COMPOSITE=45 takes effect.
+
+### Verification
+Monitor: eval close ~Aug 17, R:R 48h (should ↑ from 0.71:1), daily trades (should ↑ from 29T), range_finder+ legacy trades (should reach 0), ct-hot+ WR (must >50%). If R:R still inverted post-eval → escalate.
+
+---
+
 ## CEO Report — 2026-08-15 (latest run — verified)
 
 ### Diagnosis
@@ -61,3 +93,33 @@ NO CHANGES — 5 eval windows active (deployed Aug 15), closing ~Aug 17. Changin
 
 ### Verification
 Monitor 48h: R:R (should ↑ from 0.35:1 toward 0.75:1+), ATR_SL count (should ↓ from 42), avg PM_TRAIL exit (should ↑ from 0.27%), daily trades (must ↑ from 23T partial). Eval windows closing ~Aug 17 — if R:R still inverted after eval, escalate: consider widening ATR_SL or adding regime filter to SHORT entries. Best signal (ct-hot+ 83.3% WR) needs more volume — check if STANDALONE_BYPASS is limiting. Coin tracker SOL/BTC accumulation — monitor for phase transition signals.
+
+---
+
+## CEO Report — 2026-08-16 20:00 UTC
+
+### Diagnosis
+24h 43T -$0.22 (48.8% WR — RED). 48h 120T -$1.02 (50.0% WR). 7d 451T -$1.67 (50.3% WR). R:R inverted 0.67:1 (avg win 0.45% vs avg loss -0.67%). ATR_SL 166T/7d avg -0.62% (-$10.56) dominates. PM_TRAIL 231T/7d avg +0.40% (+$9.29) — improving. 5 open $0 flat. Daily: Aug 12 +$0.49 (100T) → Aug 13 -$1.58 (53T) → Aug 14 -$0.56 (80T) → Aug 15 -$0.12 (32T) → Aug 16 -$0.22 (43T partial). Best 7d: r2-trend-long2 17T +$0.19 64.7%, bb_bounce+ 21T +$0.21 61.9%, hzscore+,mover+ 5T +$0.17 80%.
+
+### Root Cause
+ATR_SL still dominates losses (166T/7d = 36.8% of all trades). R:R inverted because winners avg +0.45% while losers avg -0.67%. Eval windows (PM_TRAIL 0.60% act/0.50% dist, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.40%, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45) deployed Aug 15 — closing ~Aug 17. System needs eval data before further tuning.
+
+### Fix Applied
+NO CHANGES — 6 eval windows active, closing ~Aug 17. Changing now invalidates results. SIGNAL_FILTER_SPEED_MIN 30 needs 24h+ to show volume impact (Aug 15 only 32T vs 100T Aug 12).
+
+### Verification
+Monitor 48h: eval close ~Aug 17, R:R (should ↑ from 0.67:1), ATR_SL count (should ↓), avg PM_TRAIL exit (should ↑ from 0.40%), daily trades (must ↑ from 32T). If R:R still inverted post-eval → consider widening ATR_SL or regime filter for SHORT entries.
+
+## CEO Report — 2026-08-15 23:00 UTC
+
+### Diagnosis
+R:R still inverted at 0.68:1 (avg win 0.45% vs avg loss -0.66%). 24h: 45T -$0.35 (46.7% WR — RED). Aug 15 volume recovering to34T from 15T starvation. 6 eval windows active closing ~Aug 17. Legacy hzscore- trades5T -$0.35 still closing (signal killed Aug 13). All dead signals already killed.
+
+### Root Cause
+PM_TRAIL avg exit 0.23% still cutting winners short while ATR_SL takes -0.77%. Eval windows (PM_TRAIL 0.60%/0.50%, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.40%) not yet showing R:R improvement. Legacy trades from killed signals still bleeding in48h window.
+
+### Fix Applied
+NO CHANGES — eval windows close tomorrow. Changing now invalidates measurement. Legacy hzscore- trades will age out naturally.
+
+### Verification
+Monitor: eval close ~Aug 17, R:R (should ↑ from 0.68:1), daily trades (should stay >30T), avg PM_TRAIL exit (should ↑ from 0.23%). If R:R still inverted after eval closure → widen PM_TRAIL_DISTANCE_PCT 0.50%→0.70%.

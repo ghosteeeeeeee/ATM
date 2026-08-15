@@ -8393,3 +8393,122 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_finder+ persistent loser — monitor for kill threshold (3+ trades, 0% WR)
 - R:R still inverted (0.70:1) — TRAILING_ACTIVATION_PCT 0.60% eval ongoing
+
+## 2026-08-15 17:30 UTC — Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+- LINEA ct-hot+ LONG: -$0.03 (atr_sl_hit)
+- BIGTIME ct-hot+ LONG: +$0.04 (profit-monster-trail)
+**PnL:** +$0.01
+
+**24h:** 46T, 54.3% WR, -$0.36
+**ATR SL:** 30.4% ✅ (below 40%)
+
+**Signal Performance (24h):**
+- ✅ ct-hot+ 8T +$0.14 62.5% WR
+- ✅ profit-monster-trail 25T +$0.29 (dominant exit)
+- ✅ profit-monster-T1 7T +$0.42
+- ❌ mover+ 2T -$0.11 0% WR (below 3T kill threshold)
+- ❌ wave_catcher+ 5T -$0.12 40% WR (no kill)
+
+**Open Positions:** 5 (DYDX +$0.01, LINEA -$0.04, MON -$0.06, ZRO +$0.01, BIGTIME +$0.03)
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 30.4% ✅
+- No overtrading
+- No kill candidates
+- R:R improving
+
+**Open Questions:**
+- range_finder+ 9T 33.3% WR -$0.14 persistent but not kill threshold
+
+## [2026-08-15 18:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L)
+- MON ct-hot+ LONG: -$0.07 (atr_sl_hit)
+
+**PnL:** -$0.07
+
+**24h:** 45T, 44.4% WR, -$0.45
+**ATR SL:** 33.3% ✅ (below 40%)
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long6 2T +$0.11 100% WR
+- ✅ ct-hot+ 11T +$0.08 54.5% WR
+- ✅ r2-trend-long2 7T +$0.03 71.4% WR
+- ❌ range_finder+ 9T -$0.14 33.3% WR (persistent)
+- ❌ wave_catcher- 4T -$0.09 25% WR
+
+**Open Positions:** 5 (GRASS +$0.04, SAND -$0.01, HYPE -$0.05, ZRO +$0.06, DYDX -$0.01)
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 33.3% ✅
+- No overtrading (1T last hour)
+- No kill candidates (0% WR with 3+ trades last hour)
+- Last 3h avg_pnl not consistently negative
+
+**Open Questions:**
+- range_finder+ 9T 33.3% WR -$0.14 persistent — still below kill threshold (needs 0% WR)
+
+## [2026-08-15 19:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+- GRASS ct-hot+ LONG: +$0.03 (profit-monster-trail)
+- ZRO ct-hot- SHORT: -$0.02 (profit-monster-trail)
+
+**PnL:** +$0.01 (net positive)
+
+**24h:** 44T, 47.7% WR, -$0.23
+**ATR SL:** 29.5% ✅ (below 40%)
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long2 6T +$0.13 83.3% WR
+- ✅ ct-hot+ 12T +$0.11 58.3% WR
+- ✅ r2-trend-long6 2T +$0.11 100% WR
+- ❌ range_finder+ 9T -$0.14 33.3% WR (persistent, not killable)
+
+**Open Positions:** 5 (DYDX +$0.04, HYPE +$0.04, SAND +$0.04, BCH -$0.01, SYRUP $0.00)
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 29.5% ✅
+- No overtrading (2T last hour)
+- No kill candidates (0% WR with 3+ trades last hour)
+- 3h hourly PnL near breakeven
+
+**Open Questions:**
+- range_finder+ 9T -$0.14 persistent but not killable (33.3% WR)
+
+## [2026-08-15 20:30 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L)
+- HYPE ct-hot+ LONG: +$0.01 (profit-monster-trail)
+- SAND ct-hot+ LONG: -$0.05 (atr_sl_hit)
+- BCH ct-hot- SHORT: -$0.08 (atr_sl_hit)
+
+**PnL:** -$0.12
+**24h:** 45T, 46.7% WR, -$0.35
+**ATR SL:** 31.1% ✅
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long6 2T +$0.11 100% WR
+- ✅ ct-hot+ 13T +$0.06 53.8% WR
+- ✅ r2-trend-long2 5T +$0.05 80% WR
+- ❌ range_finder+ 9T -$0.14 33.3% WR (persistent)
+- ❌ wave_catcher- 4T -$0.09 25% WR
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 31.1% ✅
+- No overtrading (3T last hour)
+- No kill candidates (0% WR with 3+ trades last hour)
+- 4h hourly PnL mixed, not consistently negative
+
+**Open Questions:**
+- range_finder+ 9T -$0.14 persistent but not killable (33.3% WR)

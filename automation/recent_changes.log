@@ -661,3 +661,19 @@
   WHY: 1T last hour (TIA ct-hot+ -$0.10 atr_sl_hit). 24h 54T, 2.2/hr, ATR SL 27.8% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -$0.14 persistent but no hourly kill trigger). R:R improving (0.77:1). 5 open positions all ct-hot based. CEO stability period active. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 16:30 UTC
+[2026-08-15 17:30] auto_1hr: NO CHANGES
+  WHY: 2T last hour (LINEA -/usr/bin/bash.03 atr_sl_hit, BIGTIME +/usr/bin/bash.04 profit-monster-trail — net +/usr/bin/bash.01). 24h 46T 54.3% WR -/usr/bin/bash.36. ATR SL 30.4% ✅. No 0% WR kill candidates (mover+ 2T below 3T threshold, wave_catcher+ 5T 40% WR no kill). 5 open positions all ct-hot based near /usr/bin/bash. CEO stability period active. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 18:30 UTC
+[2026-08-15 18:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (MON -/usr/bin/bash.07 atr_sl_hit). 24h 45T 44.4% WR -/usr/bin/bash.45. ATR SL 33.3% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR persistent but not kill threshold). 5 open positions. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 19:30 UTC
+[2026-08-15 19:30] auto_1hr: NO CHANGES
+  WHY: 2T last hour (GRASS +/usr/bin/bash.03 profit-monster-trail, ZRO -/usr/bin/bash.02 profit-monster-trail). 24h 44T 47.7% WR -/usr/bin/bash.23. ATR SL 29.5% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -/usr/bin/bash.14 persistent but not kill threshold). 5 open positions all near breakeven. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 20:30 UTC
+[2026-08-15 20:30] auto_1hr: NO CHANGES
+  WHY: 3T last hour (HYPE +/usr/bin/bash.01 profit-monster-trail, SAND -/usr/bin/bash.05 atr_sl_hit, BCH -/usr/bin/bash.08 atr_sl_hit — net -/usr/bin/bash.12). 24h 45T 46.7% WR -/usr/bin/bash.35. ATR SL 31.1% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -/usr/bin/bash.14 persistent but not kill threshold). 5 open positions near breakeven. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 21:30 UTC

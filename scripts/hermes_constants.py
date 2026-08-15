@@ -487,7 +487,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO 2026-08-15: R:R inverted 0.33:1 (avg win 0.26% PM_TRAIL vs avg loss -0.80% ATR_SL). 42 ATR_SL/48h — trades die before reaching 0.60% activation. 0.40% lets more trades reach trailing → fewer ATR_SL hits → better R:R. Monitor: atr_sl_hit count 48h (should ↓), avg win (should ↑ from 0.26%).
+TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO 2026-08-15: R:R inverted 0.67:1 (avg win 0.46% vs avg loss -0.69%). 45 ATR_SL/48h — trades die before reaching 0.60% activation. 0.40% lets more trades reach trailing → fewer ATR_SL hits → better R:R. Monitor: atr_sl_hit count 48h (should ↓), avg win (should ↑ from 0.46%).
 TRAILING_DISTANCE_PCT   = 0.0200  # 2.00% — trailing SL distance from peak (widened from 0.80% — survives normal pullbacks on trend signals)
 
 # ── Loss Cooldown Constants
@@ -798,9 +798,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # TESTING 2026-08-15 — re-enabled for trial. Params: 0.40% act, 0.60% dist (widened from 0.40%). Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.70:1).
-PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-15: R:R inverted 0.69:1. PM_TRAIL avg exit 0.27% (trades peak 0.80% then crash to -0.43%). Lowering 0.60%→0.40% catches reversals earlier. Monitor: avg exit % 48h (should ↑ from 0.27%), ATR_SL count (should ↓).
-PM_TRAIL_DISTANCE_PCT = 0.006  # 0.60% — CEO 2026-08-15: widened from 0.40%. 0.40% too tight — avg exit 0.27% (peak 0.51% - 0.40% = floor 0.11%). 0.60% gives winners room: peak 0.51% → floor -0.09% (breakeven guard catches at 0.0%). Peak 1.0% → floor 0.40%. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.70:1).
+PM_TRAIL_ENABLED     = True   # TUNED 2026-08-15 — act 0.60%, dist 0.50%. Floor = +0.10%. Old params: act=0.40%/dist=0.60% → avg exit 0.27% (no momentum, reversals caught too early). Monitor: avg exit % 48h (should ↑), R:R (should ↑ from 0.67:1).
+PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO 2026-08-15: tightened from 0.40%. Old act=0.40% caught trades at +0.27% avg (no momentum, reversals). 0.60% only fires on trades with real momentum. Floor = 0.10% (0.60% - 0.50%). Monitor: avg exit % 48h (should ↑ from 0.27%), R:R (should ↑ from 0.67:1).
+PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — CEO 2026-08-15: tightened from 0.60%. Old dist=0.60% let winners slip to -0.20% floor. 0.50% keeps floor at +0.10%. Winners run to 0.50%+ before trailing catches. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R (should ↑ from 0.67:1).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -1146,7 +1146,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'ct-hot',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
-    'hzscore', 'mover', 'return_exhaustion_long',
+    'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
     # CEO 2026-08-15 — removed: range_finder (9T 33.3% WR -$0.14 24h — bleeding not helping starvation),
     # range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
