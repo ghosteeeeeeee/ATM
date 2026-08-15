@@ -35,6 +35,10 @@ from hermes_constants import (
     CASCADE_FLIP_ENABLED,
     ATR_UPDATE_THRESHOLD,
     TIME_EXIT_ENABLED, PEAK_EXIT_ENABLED,
+    WEATHER_VANE_SHIELD_ENABLED, WEATHER_VANE_SHIELD_TRAILING_PCT,
+    WEATHER_VANE_SHIELD_MAX_HOLD_MIN, WEATHER_VANE_SHIELD_LOSING_ONLY,
+    DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_LOSS_THRESHOLD,
+    DIRECTIONAL_OUTCOME_WR_THRESHOLD, DIRECTIONAL_OUTCOME_MIN_TRADES,
 )
 from paths import *
 from _secrets import BRAIN_DB_DICT
@@ -2428,6 +2432,86 @@ def _warmup_volume_cache_pm(tokens: List[str]):
         t.start()
 
 
+def _apply_weather_vane_shield(positions: List[Dict]) -> int:
+    """
+    Weather Vane Position Shield: tighten trailing stops on counter-regime
+    LOSING positions when Weather Vane detects a regime shift.
+
+    Returns number of positions shielded.
+    """
+    if not WEATHER_VANE_SHIELD_ENABLED or not DIRECTIONAL_OUTCOME_ENABLED:
+        return 0
+
+    try:
+        from signal_compactor import get_directional_outcome
+    except ImportError:
+        return 0
+
+    shielded = 0
+    now = datetime.now(timezone.utc)
+
+    for direction in ('LONG', 'SHORT'):
+        losses, total, wr = get_directional_outcome(direction)
+        if total < DIRECTIONAL_OUTCOME_MIN_TRADES:
+            continue
+        # Check if this direction is suppressed by Weather Vane
+        is_suppressed = (losses >= DIRECTIONAL_OUTCOME_LOSS_THRESHOLD
+                         or wr < DIRECTIONAL_OUTCOME_WR_THRESHOLD)
+        if not is_suppressed:
+            continue
+
+        # Find open positions in the suppressed direction
+        for pos in positions:
+            pos_dir = str(pos.get('direction', '')).upper()
+            if pos_dir != direction:
+                continue
+            if WEATHER_VANE_SHIELD_LOSING_ONLY:
+                pnl = float(pos.get('pnl_pct') or 0)
+                if pnl >= 0:
+                    continue  # winners left alone
+
+            trade_id = pos.get('id')
+            token = pos.get('token', '?')
+            if not trade_id:
+                continue
+
+            # Check max hold time
+            open_time = pos.get('open_time')
+            if open_time and WEATHER_VANE_SHIELD_MAX_HOLD_MIN > 0:
+                try:
+                    if hasattr(open_time, 'timestamp'):
+                        age_min = (now - open_time).total_seconds() / 60
+                    else:
+                        age_min = 0
+                    if age_min >= WEATHER_VANE_SHIELD_MAX_HOLD_MIN:
+                        log(f"  [SHIELD] {token} {direction}: force-close — held {age_min:.0f}min > {WEATHER_VANE_SHIELD_MAX_HOLD_MIN}min during regime shift")
+                        close_paper_position(trade_id, "WEATHER_VANE_SHIELD_MAX_HOLD")
+                        shielded += 1
+                        continue
+                except Exception:
+                    pass
+
+            # Tighten trailing distance in DB
+            try:
+                conn = get_db_connection()
+                if conn:
+                    cur = get_cursor(conn)
+                    cur.execute(
+                        "UPDATE trades SET trailing_distance = %s WHERE id = %s AND status = 'open'",
+                        (WEATHER_VANE_SHIELD_TRAILING_PCT, trade_id)
+                    )
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+                    log(f"  [SHIELD] {token} {direction}: tightened trail to {WEATHER_VANE_SHIELD_TRAILING_PCT*100:.2f}% "
+                        f"(regime shift: {losses}/{total} losses, {wr}% WR)")
+                    shielded += 1
+            except Exception as e:
+                log(f"  [SHIELD] {token} {direction}: DB update failed: {e}")
+
+    return shielded
+
+
 def check_and_manage_positions() -> Tuple[int, int, int]:
     """
     Called every pipeline run.
@@ -2465,6 +2549,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     # SPEED FEATURE: update speed tracker once per pipeline run (<2s)
     if SPEED_TRACKER is not None:
         SPEED_TRACKER.update()
+
+    # ── Weather Vane Position Shield ────────────────────────────────────────
+    # Tighten trailing stops on counter-regime losing positions when regime shifts.
+    # Runs BEFORE ATR updates so tightened trail_distance is used in this cycle.
+    _shield_count = _apply_weather_vane_shield(positions)
+    if _shield_count:
+        # Refresh positions if any were force-closed by shield
+        positions = refresh_current_prices()
 
     # ── 0. Refresh ATR SL/TP levels in DB ─────────────────────────────────────
     # Compute fresh ATR-based SL/TP for all positions and write to DB.

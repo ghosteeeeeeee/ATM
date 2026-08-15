@@ -664,6 +664,14 @@ DIRECTIONAL_OUTCOME_LOCK_ENABLED = True
 DIRECTIONAL_OUTCOME_LOCK_MINUTES = 30         # lock duration after catastrophic failure
 DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.8       # loss_velocity threshold for lock activation
 
+# ── Position Shield (Weather Vane Component 2) ─────────────────────────────
+# Tighten trailing stops on counter-regime LOSING positions when Weather Vane fires.
+# Winners left alone — trailing already protecting them.
+WEATHER_VANE_SHIELD_ENABLED = True
+WEATHER_VANE_SHIELD_TRAILING_PCT = 0.0030   # 0.30% tightened from default 2.00%
+WEATHER_VANE_SHIELD_MAX_HOLD_MIN = 30       # force-close if still open after this
+WEATHER_VANE_SHIELD_LOSING_ONLY = True      # only shield positions with pnl < 0
+
 # ── Tide Detection (Weather Vane v4) ───────────────────────────────────────
 # BTC 3h momentum as fastest lagging indicator for regime shift detection.
 # Bearish tide: BTC 3h falling + SHORT WR > 55% → suppress LONG

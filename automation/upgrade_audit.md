@@ -67,8 +67,8 @@
 - **Core request:** Real-time regime shift detection using trade outcomes as leading indicator
 - **Difficulty:** Level 1-2
 - **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** Component 1 (Signal Gate) live. Component 2 (Position Shield) unblocked but not implemented. Component 3 (Recovery) inherent in rolling window.
+- **Status:** IMPLEMENTED (2026-08-15 — Component 2 Position Shield deployed)
+- **Reason:** All 3 components live. Component 1 (Signal Gate) — get_directional_outcome() in signal_compactor.py. Component 2 (Position Shield) — _apply_weather_vane_shield() in position_manager.py tightens trail to 0.30% + force-closes after 30min on counter-regime losing positions. Component 3 (Recovery) inherent in rolling window.
 
 ---
 
@@ -77,14 +77,14 @@
 | Metric | Count |
 |--------|-------|
 | Plans scanned | 8 |
-| IMPLEMENTED | 7 |
-| IN PROGRESS | 1 |
+| IMPLEMENTED | 8 |
+| IN PROGRESS | 0 |
 | PENDING | 0 |
 | SKIPPED | 0 |
 
 ### Pending Candidates
 
-None — all actionable plans implemented.
+None — all plans fully implemented.
 
 ### Already Done (no action needed)
 - weather-vane-v5 (volatility floor)
