@@ -11,3 +11,5 @@ REVERTED PM_TRAIL_ACTIVATE_PCT 0.60% → 0.40%. PM_TRAIL_DISTANCE_PCT stays 0.50
 
 ### Verification
 Monitor 48h: atr_sl_hit count (should ↓ from 49), avg exit % (should ↑ from 0.29%), R:R (should ↑ from 0.37:1). Stars7d intact: return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, hzscore+,mover+ 5T 80%.
+
+- [2026-08-16 (HL API rate limit)] CEO: APPROVED 3 HL API fixes — 1) shared positions cache (position_manager writes, all read, saves ~10 calls/min), 2) slow hl-sync-guardian 30s→60s (saves ~3-4 calls/min), 3) brain.py timeout 30s→60s (prevents phantom trades). Priority: cache first (biggest savings), then guardian, then timeout. 429s kill trading — fix immediately.

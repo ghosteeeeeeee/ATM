@@ -3917,21 +3917,22 @@ def sync():
 
     log(f'── Sync cycle ──')
 
-    # Step 1: Get HL positions (retry on error, but accept empty as valid)
-    # Rate-limiting raises exceptions or returns garbage — retry those.
-    # An empty dict from a successful call means 0 positions — valid state, skip retries.
-    hl_pos = {}
-    for attempt in range(4):
-        try:
-            hl_pos = get_open_hype_positions_curl()
-            # Got a response (even empty) — 0 positions is valid, don't retry
-            break
-        except Exception as e:
-            log(f'HL fetch error: {e}', 'WARN')
-            if attempt < 3:
-                wait = 5 * (2 ** attempt)
-                log(f'Retrying in {wait}s... ({attempt+1}/4)', 'WARN')
-                time.sleep(wait)
+    # Step 1: Get HL positions (use shared cache, retry on error)
+    # FIX (2026-08-16): Use cached positions first to avoid redundant /info calls.
+    # Only fall back to direct API if cache is stale (>60s).
+    hl_pos = _get_cached_hl_positions()
+    if not hl_pos:
+        # Cache cold or stale — try direct API with retry
+        for attempt in range(4):
+            try:
+                hl_pos = get_open_hype_positions_curl()
+                break
+            except Exception as e:
+                log(f'HL fetch error: {e}', 'WARN')
+                if attempt < 3:
+                    wait = 5 * (2 ** attempt)
+                    log(f'Retrying in {wait}s... ({attempt+1}/4)', 'WARN')
+                    time.sleep(wait)
             else:
                 log('HL still erroring after 4 retries — skipping this cycle', 'WARN')
                 _CLOSED_HL_COINS.clear()
@@ -4484,7 +4485,10 @@ def main():
             # If HL position is gone (filled by a prior cycle or 429 made it temporarily
             # invisible), skip close_position_hl and just clear the pending retry + DB trade.
             try:
-                hl_pos_pending = get_open_hype_positions_curl()
+                # FIX (2026-08-16): Use cached positions to avoid redundant /info call
+                hl_pos_pending = _get_cached_hl_positions()
+                if not hl_pos_pending:
+                    hl_pos_pending = get_open_hype_positions_curl()
             except Exception:
                 hl_pos_pending = {}
             pending_in_hl = [t for t in sorted(pending) if t.upper() in hl_pos_pending]

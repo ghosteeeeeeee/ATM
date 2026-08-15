@@ -571,7 +571,7 @@ def process_delayed_entries(paper=False):
                + exp_arg)
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
             if result.returncode == 0 and 'trade' in result.stdout.lower():
                 log(f'  ✅ DELAYED ENTERED: {token} {direction}')
                 executed += 1
