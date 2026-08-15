@@ -1934,6 +1934,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # NEW BEHAVIOR: Any APPROVED signal not refreshed in top-10 within 5 min expires.
             # This matches the 5-min staleness boundary used for PENDING signals.
             if approved_ids:
+                # FIX (BUG-014): Don't expire APPROVED signals still in current hotset_final.
+                # Preserved signals (PRESERVE-APPROVED-UPSERT) are written as APPROVED but
+                # have no corresponding PENDING row — the old logic expired them immediately.
                 c.execute(f"""
                     UPDATE signals
                     SET decision = 'EXPIRED',
@@ -1954,7 +1957,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                           -- No combo_key (null signals never expire — FIX: now they do)
                           OR (combo_key IS NULL)
                       )
-                """, approved_ids)
+                      AND combo_key NOT IN ({','.join(['?' for _ in top10_combos]) if top10_combos else "''"})
+                """, approved_ids + list(top10_combos) if top10_combos else approved_ids)
             else:
                 # FIX (BUG-014): Don't expire APPROVED signals still in current hotset_final.
                 # Preserved signals (PRESERVE-APPROVED-UPSERT) are written as APPROVED but
