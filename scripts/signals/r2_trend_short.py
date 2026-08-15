@@ -1,47 +1,49 @@
 #!/usr/bin/env python3
 """
-r2_trend_long.py — R² Trend Confirmation Signal for LONG entries.
+r2_trend.py — R² Trend Confirmation Signal for SHORT entries.
 
-Detects confirmed uptrends on 1m candles via OLS regression.
-Fires LONG when:
+Detects confirmed downtrends on 1m candles via OLS regression.
+Fires SHORT when:
   1. R² >= threshold (confirmed trend = not chop)
-  2. Slope > 0 (uptrend)
-  3. Price > regression line (bullish alignment)
+  2. Slope < 0 (downtrend)
+  3. Price < regression line (bearish alignment)
 
-Inspired by BSV backtest: R² > 0.6 with positive slope detected slow grinds
-that missed by other signals.
-
-Signal type: r2_trend_long
-Source: r2l-long{N}
+Signal type: r2_trend_short
+Source: r2-trend-short{N}
 """
 
-import sys, os, sqlite3, time
+import sqlite3
+import sys
+import os
+import time
 import numpy as np
 from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
-from paths import HERMES_DATA
+from paths import HERMES_DATA, CANDLES_DB
 
 from hermes_constants import (
-    R2_TREND_LONG_ENABLED,
-    R2_TREND_LONG_MIN_SLOPE,
-    R2_TREND_LONG_MIN_R2,
-    R2_TREND_LONG_MAX_RSI,
-    R2_TREND_LONG_MIN_SPEED,
-    R2_TREND_LONG_MAX_BB_POS,
-    R2_TREND_LONG_BLOCK_STALE,
-    R2_TREND_LONG_MAX_ACCEL,
-    R2_TREND_LONG_MIN_PRE_MOVE,
+    R2_TREND_ENABLED,
+    R2_TREND_SHORT_ENABLED,
+    R2_TREND_SHORT_MIN_SLOPE,
+    R2_TREND_SHORT_MIN_R2,
+    R2_TREND_SHORT_MAX_RSI,
+    R2_TREND_SHORT_MIN_SPEED,
+    R2_TREND_SHORT_MIN_BB_POS,
+    R2_TREND_SHORT_BLOCK_STALE,
+    R2_TREND_SHORT_MAX_ACCEL,
+    R2_TREND_SHORT_MIN_PRE_MOVE,
+    R2_TREND_SHORT_MIN_BARS,
     CANDLES_STALENESS_SEC,
-    LONG_BLACKLIST,
+    SHORT_BLACKLIST,
 )
 
 # ── Constants ─────────────────────────────────────────────────────────────
 R2_WINDOW            = 16
 R2_THRESHOLD         = 0.60
-SIGNAL_TYPE          = 'r2_trend_long'
-SOURCE_PREFIX        = 'r2-trend-long'
+SIGNAL_TYPE          = 'r2_trend_short'
+SOURCE_PREFIX        = 'r2-trend-short'
 LOOKBACK_CANDLES     = 50
 COOLDOWN_MINUTES     = 15
 MIN_CONFIDENCE       = 50
@@ -76,13 +78,13 @@ def _ols_params(y_vals):
 
 # ── Trend Detection ─────────────────────────────────────────────────────
 
-def detect_r2_long(token, candles, price):
-    """Detect confirmed uptrend on 1m candles via R² regression.
+def detect_r2_short(token, candles, price):
+    """Detect confirmed downtrend on 1m candles via R² regression.
 
-    Fires LONG when:
-      - R² >= R2_THRESHOLD (confirmed trend, not chop)
-      - Slope > 0 (uptrend)
-      - Price > regression intercept (bullish alignment)
+    Fires SHORT when:
+      - R² >= R2_TREND_SHORT_MIN_R2 (confirmed trend, not chop)
+      - Slope < 0 (downtrend)
+      - Price < regression intercept (bearish alignment)
     """
     n = len(candles)
     if n < R2_WINDOW * 2:
@@ -92,15 +94,13 @@ def detect_r2_long(token, candles, price):
     y = closes[-R2_WINDOW:]
     slope, intercept, r2 = _ols_params(y)
 
-    # LONG conditions: slope > 0, price above line, R² strong enough
-    if r2 < R2_TREND_LONG_MIN_R2 or slope <= 0 or closes[-1] <= intercept:
+    # SHORT conditions: slope < 0, price below line, R² strong enough
+    if r2 < R2_TREND_SHORT_MIN_R2 or slope >= 0 or closes[-1] >= intercept:
         return None
 
-    # ── Gap300 filter (2026-08-14) ──────────────────────────────────────
-    # Don't LONG when price is too far above EMA300 — extended, revert risk.
-    # Backtest: Gap300 > +0.50% blocks 4/5 losers, 1/9 winners.
+    # ── Gap300 filter — don't SHORT when price too far below EMA300 ─────
+    # Price extended below EMA = bounce risk. Mirror of LONG gap300 filter.
     try:
-        from paths import CANDLES_DB
         conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
         try:
             rows_ema = conn_ema.execute(
@@ -116,16 +116,13 @@ def detect_r2_long(token, candles, price):
             for p in closes_ema[1:]:
                 ema_val = p * k_ema + ema_val * (1 - k_ema)
             gap300 = (closes_ema[-1] - ema_val) / ema_val * 100 if ema_val > 0 else 0
-            if gap300 > 0.50:
-                return None  # price too far above EMA300 — extended, skip LONG
+            if gap300 < -0.50:
+                return None  # price too far below EMA300 — extended, skip SHORT
     except Exception:
         pass
 
-    # ── Pre-entry move filter (2026-08-14) ─────────────────────────────────
-    # Block LONG when price was dropping before entry — catches dead-cat bounces.
-    # Backtest: blocks 3/6 losers, 4/13 winners. Net: avoids -0.95%, -0.33%, -0.78%.
+    # ── Pre-entry move filter — block SHORT when price rising before entry ─
     try:
-        from paths import CANDLES_DB
         conn_pm = sqlite3.connect(CANDLES_DB, timeout=5)
         try:
             rows_pm = conn_pm.execute(
@@ -137,19 +134,17 @@ def detect_r2_long(token, candles, price):
         if rows_pm and len(rows_pm) >= 15:
             closes_pm = [r[0] for r in reversed(rows_pm)]
             pre_move = (closes_pm[-1] - closes_pm[0]) / closes_pm[0] * 100 if closes_pm[0] > 0 else 0
-            if pre_move < R2_TREND_LONG_MIN_PRE_MOVE:
-                return None  # price dropping before entry — skip LONG
+            if pre_move > R2_TREND_SHORT_MIN_PRE_MOVE:
+                return None  # price rising before entry — skip SHORT
     except Exception:
         pass
 
     # Transition detector: R² must be RISING from below threshold
-    # This catches the START of a trend, not flat periods
+    # Catches the START of a trend, not flat periods
     if len(closes) >= R2_WINDOW + 3:
         y_prev = closes[-(R2_WINDOW + 3):-3]
         _, _, r2_prev = _ols_params(y_prev)
-        # R² must have been below threshold recently and now rising above it
         if not (r2_prev < R2_THRESHOLD and r2 >= R2_THRESHOLD):
-            # Also allow if R² is rising strongly (even if already above threshold)
             if r2 < R2_THRESHOLD or (r2 - r2_prev) < 0.05:
                 return None
     elif r2 < R2_THRESHOLD:
@@ -161,21 +156,19 @@ def detect_r2_long(token, candles, price):
     for i in range(n - R2_WINDOW, -1, -1):
         y_i = closes[i:i + R2_WINDOW]
         b_i, a_i, r2_i = _ols_params(y_i)
-        if b_i <= 0 or r2_i < R2_THRESHOLD:
+        if b_i >= 0 or r2_i < R2_TREND_SHORT_MIN_R2:
             break
         bars_since = n - R2_WINDOW - i
         entry_idx = i
 
     bars_since = max(n - R2_WINDOW - entry_idx, 0)
 
-    # ── Minimum bars filter (2026-08-14) ──────────────────────────────────
-    # Require bars_since >= 2 — entering too early (0-1 bars) is risky.
-    # Backtest: long0/long1 have 50-67% WR, long2+ have 67-100% WR.
-    if bars_since < 2:
+    # Minimum bars filter — don't enter too early
+    if bars_since < R2_TREND_SHORT_MIN_BARS:
         return None
 
     # Confidence scoring
-    r2_bonus = min((r2 - R2_THRESHOLD) / (1.0 - R2_THRESHOLD) * R2_BONUS_MAX, R2_BONUS_MAX)
+    r2_bonus = min((r2 - R2_TREND_SHORT_MIN_R2) / (1.0 - R2_TREND_SHORT_MIN_R2) * R2_BONUS_MAX, R2_BONUS_MAX)
     recency_bonus = max(RECENCY_BONUS_MAX - bars_since, 0)
 
     confidence = int(min(
@@ -186,7 +179,7 @@ def detect_r2_long(token, candles, price):
     source = f'{SOURCE_PREFIX}{bars_since}'
 
     return {
-        'direction':  'LONG',
+        'direction':  'SHORT',
         'confidence': confidence,
         'source':     source,
         'slope':      round(slope, 8),
@@ -230,7 +223,7 @@ def _get_candles_1m(token, lookback=LOOKBACK_CANDLES):
 # ── Scanner ─────────────────────────────────────────────────────────────
 
 def scan_signals():
-    if not R2_TREND_LONG_ENABLED:
+    if not R2_TREND_ENABLED or not R2_TREND_SHORT_ENABLED:
         return 0
 
     from signal_schema import get_all_latest_prices
@@ -246,14 +239,13 @@ def scan_signals():
         if price_age_minutes(token) > 10:
             continue
 
-        if get_cooldown(token, direction='LONG'):
+        if get_cooldown(token, direction='SHORT'):
             continue
 
-        if token.upper() in LONG_BLACKLIST:
+        if token.upper() in SHORT_BLACKLIST:
             continue
 
         # ── Speed/momentum/accel filters ────────────────────────────────
-        # Check token_speeds for stale, speed, and price acceleration
         _conn_spd = None
         try:
             _conn_spd = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes_runtime.db'), timeout=5)
@@ -263,16 +255,16 @@ def scan_signals():
             if _spd_row:
                 _speed, _is_stale, _mom, _accel = _spd_row
                 # Block stale tokens (no momentum)
-                if R2_TREND_LONG_BLOCK_STALE and _is_stale:
+                if R2_TREND_SHORT_BLOCK_STALE and _is_stale:
                     continue
                 # Require minimum speed
-                if _speed is not None and _speed < R2_TREND_LONG_MIN_SPEED:
+                if _speed is not None and _speed < R2_TREND_SHORT_MIN_SPEED:
                     continue
-                # Block overextended: price accelerating up = about to reverse
-                if _accel is not None and _accel > R2_TREND_LONG_MAX_ACCEL:
+                # Block overextended: price accelerating down = about to reverse
+                if _accel is not None and _accel > R2_TREND_SHORT_MAX_ACCEL:
                     continue
         except Exception as _e:
-            print(f'  [r2_trend_long] WARN: failed to read token_speeds for {token}: {_e}')
+            print(f'  [r2_trend_short] WARN: failed to read token_speeds for {token}: {_e}')
         finally:
             if _conn_spd:
                 _conn_spd.close()
@@ -281,11 +273,11 @@ def scan_signals():
         if not candles or len(candles) < R2_WINDOW * 2:
             continue
 
-        sig = detect_r2_long(token, candles, price)
+        sig = detect_r2_short(token, candles, price)
         if sig is None:
             continue
 
-        # ── RSI filter: don't buy overbought ──────────────────────────────
+        # ── RSI filter: don't short oversold ──────────────────────────────
         closes_list = [c['close'] for c in candles]
         if len(closes_list) >= 15:
             deltas = [closes_list[i] - closes_list[i-1] for i in range(1, len(closes_list))]
@@ -297,21 +289,21 @@ def scan_signals():
                 rsi = 100 - (100 / (1 + avg_gain / avg_loss))
             else:
                 rsi = 100.0
-            if rsi > R2_TREND_LONG_MAX_RSI:
-                continue
+            if rsi < R2_TREND_SHORT_MAX_RSI:
+                continue  # oversold — bounce risk
 
-        # ── BB position filter: don't chase at band top ──────────────────
+        # ── BB position filter: don't short at band bottom ────────────────
         if len(closes_list) >= 20:
             mean_20 = np.mean(closes_list[-20:])
             std_20 = np.std(closes_list[-20:])
             if std_20 > 0:
                 bb_pos = (closes_list[-1] - (mean_20 - 2 * std_20)) / (4 * std_20)
-                if bb_pos > R2_TREND_LONG_MAX_BB_POS:
-                    continue
+                if bb_pos < R2_TREND_SHORT_MIN_BB_POS:
+                    continue  # at band bottom — bounce risk
 
         sid = add_signal(
             token=token.upper(),
-            direction='LONG',
+            direction='SHORT',
             signal_type=SIGNAL_TYPE,
             source=sig['source'],
             confidence=sig['confidence'],
@@ -324,21 +316,33 @@ def scan_signals():
         )
         if sid:
             added += 1
-            set_cooldown(token, direction='LONG', hours=3)
-            print(f'  LONG  {token:8s} conf={sig["confidence"]:.0f}% '
+            print(f'  SHORT {token:8s} conf={sig["confidence"]:.0f}% '
                   f'slope={sig["slope"]:.6f} r2={sig["r2"]:.4f} '
                   f'price={price:.6f} intercept={sig["intercept"]:.6f} '
-                  f'bars={sig["bars_since"]} [{sig["source"]}]')
+                  f'bars={sig["bars_since"]} '
+                  f'[{sig["source"]}]')
 
     return added
 
 
-def run():
+# ── signals_runner entry point ──────────────────────────────────────────
+
+def run(prices_dict=None):
+    """Entry point for signals_runner. Returns count of signals emitted."""
+    if prices_dict is None:
+        from signal_schema import get_all_latest_prices
+        prices_dict = get_all_latest_prices()
     return scan_signals()
 
 
 if __name__ == '__main__':
-    from signal_schema import init_db
+    from signal_schema import get_all_latest_prices, init_db
     init_db()
+    prices = get_all_latest_prices()
+    test_tokens = {k: v for k, v in prices.items()
+                   if k in ('BTC', 'ETH', 'SOL', 'AVAX', 'LINK') and v.get('price')}
+    if not test_tokens:
+        test_tokens = dict(list(prices.items())[:10])
+    print(f"[r2_trend_short] Testing on {len(test_tokens)} tokens...")
     n = scan_signals()
-    print(f'[r2_trend_long] Done. {n} signals emitted.')
+    print(f"[r2_trend_short] Done. {n} signals emitted.")
