@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 23:00 UTC (verified)
+
+### Diagnosis
+24h 46T -$0.14 (47.8% WR — RED). 7d 453T -$1.52 (50.3% WR). R:R 0.85:1 (avg win 0.485% vs avg loss -0.571%) — IMPROVED from 0.75:1. ATR_SL 43T/48h avg -0.79% (-$3.42) still dominates. PM_TRAIL only 14T/48h (down from 69T — new params taking effect). 5 open -$0.05 flat. Aug 15: 35T -$0.04 (volume stable after recovery). Legacy losers closing: wave_catcher+, range_finder+, accel-300- all disabled and aging out. ct-hot+ 13T +$0.06 53.8% — profitable. Coin tracker: SOL hot comp=58.7 setup=60.7 — strongest candidate.
+
+### Root Cause
+Eval windows (PM_TRAIL 0.60% act/0.50% dist, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.40%, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45) closing ~Aug 17. R:R improving as eval params take effect. PM_TRAIL exits reduced (69T→14T) — trades now reaching main trailing. ATR_SL still dominant but R:R approaching neutral (0.85:1).
+
+### Fix Applied
+NO CHANGES — eval windows active. System flat, not bleeding hard. R:R trending toward 1:1.
+
+### Verification
+Monitor: eval close ~Aug 17, R:R 48h (should ↑ from 0.85:1 toward 1:1+), daily trades (must stay >30T), PM_TRAIL exits (should ↓ further), ATR_SL count (should ↓). If R:R still <0.90:1 post-eval → widen ATR_SL or add regime filter on SHORTs.
+
+---
+
 ## CEO Report — 2026-08-15 16:00 UTC (verified)
 
 ### Diagnosis
