@@ -206,7 +206,7 @@ except Exception:
     _r2_rev_run = None
 
 try:
-    from signals.r2_trend import run as _r2_trend_run
+    from signals.r2_trend_short import run as _r2_trend_run
 except Exception:
     _r2_trend_run = None
 
