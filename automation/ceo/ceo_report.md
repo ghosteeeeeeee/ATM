@@ -1,3 +1,22 @@
+## CEO Report — 2026-08-15 07:15 UTC
+
+### Diagnosis
+**8th consecutive red day. Signal starvation persists.** Verified DB: 24h 64T -$0.76 (46.9% WR). 0 open. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 -$0.22 (17T — 83% collapse from Aug 12's 100T). R:R improved to 0.84:1 (avg win 0.48% vs avg loss -0.57%) — up from 0.35:1 last run. ATR_SL dominates: 46T -$3.69 (48h). PM_TRAIL re-enabled (0.60% act/dist), eval active closing ~Aug 17.
+
+### Root Cause
+**Starvation is filter-driven.** SIGNAL_FILTER_SPEED_MIN=30 (lowered from 45 at 06:15 UTC) needs 12h+ to show impact — too early to evaluate. NEUTRAL regime (102/104 tokens) + REGIME_ENABLED + CONTEXT_GATE_ENABLED strangle signal flow. coin_tracker_hot fires 14 candidates but 2h cooldowns limit volume (4 trades today).
+
+### Fix Applied
+**CLEANED STANDALONE_BYPASS** — removed wave_catcher/* (WAVE_CATCHER_ENABLED=False), range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False), mover+ (standalone dead 28.6% WR). Defense-in-depth against dead signals bypassing confluence. No param changes — eval windows active.
+
+### Verification (next run ~12h)
+- Daily trade volume (must ↑ from 17T — starvation fix needs time)
+- R:R ratio (should ↑ from 0.84:1 toward 1:1+)
+- Eval windows close ~Aug 17 — first meaningful data then
+- Disk 71% — fine
+
+---
+
 ## CEO Report — 2026-08-15 06:15 UTC
 
 ### Diagnosis

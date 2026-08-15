@@ -1140,14 +1140,15 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # Used in signal_compactor.py at 7 locations (confluence gate + preserve filter).
 # CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
 STANDALONE_BYPASS_SIGNALS = (
-    'stop_hunt_reversal_long', 'range_breakout', 'range_breakout_short',
+    'stop_hunt_reversal_long', 'range_breakout',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
     'ct-hot',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
-    'hzscore', 'mover', 'mover+', 'mover-', 'return_exhaustion_long',
+    'hzscore', 'mover', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
-    'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector — catches violent moves
+    # CEO 2026-08-15 — removed: range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
+    # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False)
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
