@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16
+**Last updated:** 2026-08-16 (latest CEO run)
 **Updated by:** CEO run
 
 ## What We're Working On
@@ -49,7 +49,7 @@
 
 ## Next Actions
 
-1. **After eval close (~Aug 17):** Tune TRAILING_ACTIVATION_PCT to fix R:R inversion (target 1:1+)
+1. **Aug 17:** Evaluate all 5 eval windows after 48h data. Tune R:R (target 1:1+).
 2. **CEO:** range_finder+ 9T 33.3% WR — disable if doesn't improve after 10T
-3. **Monitor:** ct-hot+ performance (must stay >55% WR), r2-trend family (60-67% WR)
-4. **Verified 24h (Aug 16):** 51T +$0.09 51% WR — flat, best in 4 days. R:R 0.89:1
+3. **Monitor:** ct-hot+ 15T 60.0% WR $0.21 (must stay >55% WR), r2-trend family (60-67% WR)
+4. **Verified 24h (Aug 16):** 50T +$0.06 50% WR — flat, first positive in 5 days. R:R 0.73:1
