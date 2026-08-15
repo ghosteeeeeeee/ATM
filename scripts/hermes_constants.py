@@ -798,9 +798,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # TESTING 2026-08-15 — re-enabled for trial. Params: 0.40% act, 0.40% dist (tightened from 0.60%). Monitor: avg exit % 48h (should ↑), R:R ratio (should ↑ from 0.70:1).
+PM_TRAIL_ENABLED     = True   # TESTING 2026-08-15 — re-enabled for trial. Params: 0.40% act, 0.60% dist (widened from 0.40%). Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.70:1).
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-15: R:R inverted 0.69:1. PM_TRAIL avg exit 0.27% (trades peak 0.80% then crash to -0.43%). Lowering 0.60%→0.40% catches reversals earlier. Monitor: avg exit % 48h (should ↑ from 0.27%), ATR_SL count (should ↓).
-PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% — CEO 2026-08-15: tightened from 0.60%. 0.60% too loose — breakeven guard exits at 0% before reaching trail floor. 0.40% keeps floor higher (peak-0.40%), avg exit ↑ from 0.27%. Backtested optimal: 0.20%. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.70:1).
+PM_TRAIL_DISTANCE_PCT = 0.006  # 0.60% — CEO 2026-08-15: widened from 0.40%. 0.40% too tight — avg exit 0.27% (peak 0.51% - 0.40% = floor 0.11%). 0.60% gives winners room: peak 0.51% → floor -0.09% (breakeven guard catches at 0.0%). Peak 1.0% → floor 0.40%. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R ratio (should ↑ from 0.70:1).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
