@@ -1691,7 +1691,7 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True
 COIN_TRACKER_HOT_PLUS_ENABLED       = True    # LONG direction
-COIN_TRACKER_HOT_MINUS_ENABLED      = True    # SHORT direction
+COIN_TRACKER_HOT_MINUS_ENABLED      = False   # SHORT direction — killed 2026-08-16 00:30 UTC: 4T 0% WR, all SHORTs losing to atr_sl
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
