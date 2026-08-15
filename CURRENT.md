@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-15 23:30 UTC (CEO run — verified)
+**Last updated:** 2026-08-15 (CEO run — verified)
 **Updated by:** CEO run
 
 ## What We're Working On
@@ -49,7 +49,7 @@
 
 ## Next Actions
 
-1. **Aug 17:** Evaluate all 6 eval windows. Key: PM_TRAIL avg >0.25%, ATR_SL count ↓, R:R ↑ from 0.37:1
-2. **Post-eval:** If R:R still <0.5:1, widen ATR_SL or further loosen PM_TRAIL
-3. **Monitor:** ct-hot+ 16T 56.3% WR +$0.16 (must >55% WR), return_exhaustion_long 3T 100% (must >80% WR)
-4. **Verified 24h (Aug 15):** 51T +$0.11 49.0% WR — flat, PM_TRAIL holding +0.283% avg
+1. **Aug 17 (TOMORROW):** Evaluate all 6 eval windows. CRITICAL: exit-type R:R must ↑ from 0.38:1. PM_TRAIL avg >0.25%, ATR_SL count ↓
+2. **Post-eval:** If R:R still <0.5:1 → widen ATR_SL_MIN 1.0%→1.25% (trades need more room before SL hit)
+3. **Monitor:** ct-hot+ 20T 60.0% WR +$0.27 (must >55%), return_exhaustion_long 3T 100% +$0.39 (must >80%)
+4. **Verified 24h:** 57T +$0.07 49.1% WR — flat, PM_TRAIL holding +0.29% avg
