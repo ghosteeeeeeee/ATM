@@ -37,6 +37,9 @@ REGIME_SIGNALS = {
         'hzscore', 'range_finder',  # individual parts for single-source signals
         'accel-300', 'accel-300-',  # SHORT: catches slow grinds down in quiet markets
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
+        'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
+        'return_exhaustion_long',  # extreme negative return reversal
+        'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
@@ -53,6 +56,10 @@ REGIME_SIGNALS = {
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # velocity spike detector
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
+        'continuation', 'continuation+',  # re-entry after close
+        'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
+        'return_exhaustion_long',  # extreme negative return reversal
+        'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
     },
     'HIGH': {
         # Breakout works in big moves
@@ -60,7 +67,7 @@ REGIME_SIGNALS = {
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break',
         'accel-300-vel',
-        'continuation',  # standalone part
+        'continuation', 'continuation+',  # re-entry after close
         'hzscore', 'range_finder',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
@@ -68,6 +75,9 @@ REGIME_SIGNALS = {
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
+        'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
+        'return_exhaustion_long',  # extreme negative return reversal
+        'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
     },
     'EXTREME': {
         # Continuation works in storms
