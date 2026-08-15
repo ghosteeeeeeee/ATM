@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 12:15 UTC
+
+### Diagnosis
+24h 53T -$0.27 (49.1% WR — FLAT). 48h 125T -$1.06 (50.4% WR). Today 26T -$0.08. 5 open (all ct-hot: BIGTIME/ZRO/MON/LINEA/DYDX) $0 flat. ATR_SL still dominates losses (44T/48h -$3.60). 7d: 6 of 8 days red. Best7d: r2-trend-long2 17T +$0.19 64.7%, bb_bounce+ 21T +$0.21 61.9%, bb-bounce-short,hzscore- 18T +$0.14 61.1%. Worst7d: wave_catcher+ LONG 8T -$0.42 37.5%, range_breakout+ 8T -$0.41 25%, range_finder+ 9T -$0.14 33.3%.
+
+### Root Cause
+R:R inverted persists — ATR_SL exits avg -0.81% while PM_TRAIL/trailing exits avg ~0.26%. Signal starvation ongoing (26T today vs 100T Aug 12). 5 eval windows deployed Aug 15 closing ~Aug 17 — TRAIL_ACT 0.40%, PM_TRAIL_DIST 0.60%, ATR_TP_K_MULT 2.5, PM_TRAIL race fix, SIGNAL_FILTER_SPEED_MIN 30. COIN_TRACKER_HOT_MIN_COMPOSITE 50→45 deployed to unblock ct-hot volume.
+
+### Fix Applied
+NO CHANGES — eval windows active. Changing now invalidates results. System flat, not bleeding hard. Wait for eval close Aug 17.
+
+### Verification
+Monitor: eval close ~Aug 17, R:R 48h (should ↑ from 0.70:1), daily trades (must ↑ from 26T), ct-hot volume (should ↑ after composite threshold drop), ATR_SL count (should ↓ from 44). If R:R still inverted post-eval → escalate.
+
+---
+
 ## CEO Report — 2026-08-15 (latest run)
 
 ### Diagnosis

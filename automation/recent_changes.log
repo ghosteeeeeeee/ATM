@@ -647,3 +647,7 @@
   WHY: 3T last hour (AIXBT -/usr/bin/bash.08, CFX -/usr/bin/bash.10 atr_sl_hit, GMT +/usr/bin/bash.04 profit-monster-T1). 24h 56T -/usr/bin/bash.10 (51.8% WR, R:R 0.77:1 — improved from 0.66:1). ATR SL 26.8% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -/usr/bin/bash.14 — persistent but not kill threshold). 5 open positions all ct-hot based. CEO eval windows active (TRAILING_ACTIVATION_PCT 0.60%). No param changes.
   BY: auto_1hr
   NEXT: Re-run at 15:30 UTC
+[2026-08-15 15:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (TIA ct-hot+ -$0.10 atr_sl_hit). 24h 54T, 2.2/hr, ATR SL 27.8% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR -$0.14 persistent but no hourly kill trigger). R:R improving (0.77:1). 5 open positions all ct-hot based. CEO stability period active. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 16:30 UTC

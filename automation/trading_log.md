@@ -8328,3 +8328,41 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_finder+ LONG: 9T 33.3% WR -$0.14 — persistent loser, may need kill if no improvement by next eval
 - R:R inversion narrowing — ATR_TP_K_MULT 2.5 + PM_TRAIL disabled should help, needs more data
+
+## 2026-08-15 15:30 UTC — Hourly Analysis
+
+**Trades:** 1 closed last hour (0W, 1L)
+- TIA ct-hot+ LONG: -$0.10 (atr_sl_hit)
+**PnL:** -$0.10 (0% WR)
+
+**24h Snapshot:**
+- 54T, 2.2/hr, ATR SL 27.8% ✅ (15/54 — below 40%)
+- Exit: profit-monster-trail 31T +$0.33, atr_sl_hit 15T -$1.20, profit-monster-T1 7T +$0.42, atr_tp_hit 1T +$0.20
+- R:R: avg_win $0.046, avg_loss $0.060, ratio 0.77:1 (improving from 0.66)
+
+**Signal Performance (24h):**
+- ✅ ct-hot+ 8T +$0.14 62.5% WR
+- ✅ r2-trend-long6 2T +$0.11 100% WR
+- ✅ mover+ 3T +$0.09 33.3% WR
+- ❌ range_finder+ 9T -$0.14 33.3% WR (persistent loser, no hourly kill trigger)
+- ❌ wave_catcher+ 5T -$0.12 40% WR
+
+**Open Positions:** 5 (DYDX, LINEA, MON, ZRO, BIGTIME — all ct-hot based, near $0 PnL)
+
+**Diagnosis:**
+1. Entry quality: TIA hit ATR SL — late entry or tight SL for this token
+2. SL behavior: 27.8% — healthy ✅
+3. Signal quality: No 0% WR with 3+ trades last hour — no kill trigger
+4. Trade frequency: 2.2/hr — normal ✅
+
+**Changes:** None. No signal meets kill threshold. CEO stability period active (TRAILING_ACTIVATION_PCT 0.60% eval window).
+
+**No Change Needed:**
+- ATR SL hit 27.8% ✅
+- No overtrading
+- R:R improving (0.66→0.77 in ~6h)
+- CEO eval windows active
+
+**Open Questions:**
+- range_finder+ persistent loser — may need kill if no improvement
+- TIA -99.72% pnl_pct seems like data artifact (amount likely tiny)
