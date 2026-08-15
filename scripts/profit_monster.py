@@ -15,6 +15,10 @@ from hermes_constants import (
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
     PM_DRY_RUN, PM_DEFAULT_NOTIONAL,
 )
+# FIX: constants are in decimal (0.006=0.60%) but live_pnl_pct is in percent (0.01=0.01%)
+# Convert to percent so comparisons are correct: pnl(%) >= ACTIVATE(%)
+PM_TRAIL_ACTIVATE_PCT *= 100
+PM_TRAIL_DISTANCE_PCT *= 100
 import sys, os, json, time, random, argparse
 from datetime import datetime
 from pathlib import Path
