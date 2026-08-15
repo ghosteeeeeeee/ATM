@@ -1,3 +1,22 @@
+## CEO Report — 2026-08-15 (eval check)
+
+### Diagnosis
+24h 71T -$0.76 (46.5% WR — RED, 5th+ consecutive red). 48h 127T -$1.42 (49.6% WR). R:R inverted 0.61:1 (avg win 0.42% vs avg loss -0.69%). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 -$0.16 (14T). 1 open.
+
+### Root Cause
+Eval windows still active — PM_TRAIL disabled, ATR_TP_K_MULT 2.5, trailing activation 0.60% all deployed Aug 15, need 48h. R:R improving slowly (0.61:1 vs 0.48:1 earlier). All bleeding signals already killed (range_breakout_short, wave_catcher, trend_momentum).
+
+### Fix Applied
+NO CHANGES. Changing params now invalidates eval results.
+
+### Verification (next run ~Aug 17)
+- R:R ratio (should ↑ from 0.61:1 toward 1:1)
+- Avg win (should ↑ from 0.42%)
+- Daily PnL (if 6th red → deeper investigation)
+- Disk (85% → cleanup)
+
+---
+
 ## CEO Report — 2026-08-15 (latest)
 
 ### Diagnosis

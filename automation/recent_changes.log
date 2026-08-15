@@ -600,3 +600,7 @@
   WHY: 1T last hour (BANANA +$0.06). 24h 66T -$0.66 (63.6% WR, R:R inverted 0.26:1). ATR SL 36.4% ✅. 4 stale open positions (YGG -44%, ZRO -38%, WLD -21%, SAND -14%) — SL not triggering, needs investigation. No 0% WR kill candidates. CEO stability period active. System dormant (2T today). No param changes.
   BY: auto_1hr
   NEXT: Re-run at 12:30 UTC
+[2026-08-15 12:30] auto_1hr: NO CHANGES
+  WHY: 2T last hour (XPL -$0.03, CRV -$0.01 — both tiny losses). 24h 73T -$0.72 (46.6% WR, R:R inverted 0.21:1). ATR SL 34.2% ✅. No 0% WR kill candidates — mover+ and wave_catcher+ trades all from Aug 14 (already dormant/disabled). 1 open SAND SHORT -$0.04. CEO stability period active. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 13:30 UTC
