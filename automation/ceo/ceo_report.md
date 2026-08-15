@@ -1,13 +1,43 @@
-## CEO Report — 2026-08-15
+## CEO Report — 2026-08-15 (22:00 UTC)
 
 ### Diagnosis
-24h 71T -$0.72 (49.3% WR — RED). 48h R:R inverted 0.60:1: avg win 0.45% ($0.045) vs avg loss -0.73% (-$0.074). ATR_SL dominates losses: 50T avg -0.79% (-$4.03). Profit-monster-trail exits at avg 0.32% (+$2.15 winners). ATR_TP barely fires (1T/48h). SHORT atr_sl_hit trades have 1.85% avg MFE but still close at -0.78% — trailing not catching reversals. NEUTRAL regime (102/104 tokens), 2 open, disk 83%.
+24h 65T -$0.72 (49.2% WR — RED). 48h R:R still inverted0.62:1: avg win0.45% vs avg loss -0.73%. ATR_SL dominates46T -$3.72 (48h losses). System idle — only 1 trade closed today (Aug 15: +$0.07). 5 open ($0 flat). NEUTRAL regime (102/104 tokens). Disk 83%. Pipeline healthy.
+
+### Recent Changes (in eval)
+| Change | Deployed | Eval closes |
+|--------|----------|-------------|
+| PM_TRAIL_ENABLED=False | Aug 15 | ~Aug 17 |
+| ATR_TP_K_MULT 2.0→2.5 | Aug 15 | ~Aug 17 |
+| TRAILING_ACTIVATION 0.80%→0.60% | Aug 15 | ~Aug 17 |
+
+### Bleeding Signals (48h, all legacy from disabled signals)
+| Signal | Trades | PnL | WR | Status |
+|--------|--------|-----|-----|--------|
+| range_breakout_short SHORT |11 | -$0.47 | 27.3% | DISABLED Aug15 — legacy closing |
+| wave_catcher+ LONG |8 | -$0.42 | 37.5% | DISABLED Aug15 — legacy closing |
+| hzscore- SHORT |16 | -$0.17 | 56.3% | DISABLED Aug13 — legacy aging |
+| continuation-,hzscore- SHORT |3 | -$0.23 | 33.3% | Legacy |
+| accel-300- SHORT |5 | -$0.13 | 40.0% | DISABLED Aug13 — legacy |
+
+No new trades from disabled signals. All bleeding is legacy positions aging out.
 
 ### Root Cause
-Structural R:R inversion. Losses are 1.6x larger than wins (-0.73% vs 0.45%). ATR_TP_K_MULT 2.0 sets target at ~1.6%, but trailing exits winners at 0.32% before reaching it. ATR_SL at -0.79% is the dominant exit. The gap between win size and loss size is the core bleed.
+R:R inversion persists (0.62:1) but all three structural fixes deployed today haven't had time to take effect. System went dormant (1T today) so no new data to evaluate. Legacy losers still skewing 48h window.
 
 ### Fix Applied
-BUMPED ATR_TP_K_MULT 2.0→2.5. New target: ~2.0% (capped by ATR_TP_MAX). Expected R:R improvement: 0.60:1 → 0.75:1. Even if trailing continues to dominate, higher target means winners that do reach ATR_TP capture more profit.
+**NO CHANGES** — three fixes in eval window (PM_TRAIL disabled, ATR_TP_K_MULT 2.5, trailing activation0.60%). Changing now invalidates results. Legacy bleeders aging out naturally.
 
-### Verification
-Monitor 48h: R:R ratio (should ↑ from 0.60:1), avg win (should ↑ from 0.45%), atr_sl_hit count (should ↓). If no improvement by Aug 17 → consider widening ATR_SL range or adjusting trailing activation.
+### Verification (next run ~Aug 16)
+- R:R ratio (should ↑ from 0.62:1 as trailing activation 0.60% takes effect)
+- Avg win (should ↑ from0.45% as PM_TRAIL no longer capping winners)
+- atr_sl_hit count (should ↓ as more trades reach trailing before SL)
+- Daily PnL (if system resumes and still red after eval closes → deeper investigation)
+
+### Stars7d (intact, 5 profitable)
+| Signal | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| bb_bounce+,range_finder+ |45 | +$0.57 | 55.6% |
+| r2-trend-long2 |16 | +$0.26 | 68.8% |
+| bb_bounce+,hzscore+ |34 | +$0.22 | 50.0% |
+| bb_bounce+ |21 | +$0.21 | 61.9% |
+| bb-bounce-short,hzscore- |18 | +$0.14 | 61.1% |
