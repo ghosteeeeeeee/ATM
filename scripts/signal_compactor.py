@@ -1669,7 +1669,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     if _sf_al > 0:
                                         _sf_rsi = 100 - (100 / (1 + _sf_ag / _sf_al))
                                         if _sf_rsi < _SpikeRSI:
-                                            log(f"  🚫 [PRESERVE-SPIKE-BLOCK] {pe['token']} SHORT preserved entry blocked — RSI {_sf_rsi:.1f} < {SPIKE_FILTER_RSI_THRESHOLD}")
+                                            log(f"  🚫 [PRESERVE-SPIKE-BLOCK] {pe['token']} SHORT preserved entry blocked — RSI {_sf_rsi:.1f} < {_SpikeRSI}")
                                             continue
                             except Exception:
                                 pass  # non-fatal — let signal through on DB error

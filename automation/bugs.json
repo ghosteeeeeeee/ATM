@@ -277,6 +277,26 @@
       "found_by": "agent",
       "git_commit": "a64ed65",
       "related_bugs": []
+    },
+    {
+      "id": "BUG-016",
+      "title": "Preserved SHORT entries bypass spike filter \u2014 oversold RSI trades",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/signal_compactor.py"
+      ],
+      "symptom": "BLUR SHORT entered at RSI 13.2 (-1.26%), BCH SHORT at RSI 6.1 (-0.75%). Preserved entries skip pre-filter.",
+      "root_cause": "Preserved entries (PRESERVE-APPROVED-UPSERT) go from previous hotset to hotset_final without passing through the pre-filter where spike filter runs.",
+      "fix": "Added spike filter check (RSI < 30 blocks SHORT) to Step 12 preserved entries loop.",
+      "verified_by": "Bug hunter: confirmed preserved entries skip pre-filter, RSI values at entry confirm oversold.",
+      "date_found": "2026-08-15",
+      "date_fixed": "2026-08-15",
+      "found_by": "agent",
+      "git_commit": "dd281ee",
+      "related_bugs": [
+        "BUG-014"
+      ]
     }
   ],
   "schema": {
