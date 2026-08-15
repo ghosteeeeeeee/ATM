@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (latest run — verified)
+
+### Diagnosis
+24h 50T -$0.23 (48.0% WR — RED, 6th consecutive red). 48h 124T -$1.09 (50.0% WR). R:R inverted 0.69:1 (avg win 0.48% vs avg loss 0.65%). ATR_SL 45T avg -0.79% (-$3.60) dominates. PM_TRAIL 69T avg +0.27% (+$1.83) — trail exits too low. 5 open -$0.08. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 -$0.08 (26T low volume). Best7d: r2-trend-long2 17T +$0.19 64.7%, bb_bounce+ 21T +$0.21 61.9%, bb-bounce-short,hzscore- 18T +$0.14 61.1%, ct-hot+ 8T +$0.14 62.5%. Worst7d: wave_catcher+ 8T -$0.42 37.5% (killed), range_finder+ 9T -$0.14 33.3% (bleeding).
+
+### Root Cause
+PM_TRAIL activates at 0.60% — too late. Trades peak ~0.80% then crash to -0.43% before trail catches them. Peak data: trades peaking 0.80% exit at -0.43% avg (should exit at breakeven 0.0%). The trail can't protect trades it hasn't activated on yet.
+
+### Fix Applied
+LOWERED PM_TRAIL_ACTIVATE_PCT 0.60%→0.40%. Trail now activates 0.20% earlier, catching reversals before they turn into ATR_SL losses. Expected: avg exit ↑ from 0.27%, ATR_SL count ↓, R:R improves from 0.69:1.
+
+### Verification
+Monitor: avg exit % 48h (should ↑ from 0.27%), ATR_SL count (should ↓ from 45), R:R (should ↑ from 0.69:1), eval close ~Aug 17 (TRAIL_ACT 0.40%, PM_TRAIL_DIST 0.60%, ATR_TP_K_MULT 2.5, SIGNAL_FILTER_SPEED_MIN 30).
+
+---
+
 ## CEO Report — 2026-08-15 12:15 UTC
 
 ### Diagnosis
