@@ -693,3 +693,7 @@
   WHY: 4T 0% WR, all SHORTs losing to atr_sl (-$0.19 total). LONG side (ct-hot+) fine at 61% WR.
   BY: auto_1hr
   NEXT: Re-run at 01:30 UTC
+[2026-08-16 01:30] auto_1hr: NO CHANGES
+  WHY: 6T last hour (W +$0.10, HYPE $0.00, SYRUP/GRASS/BIGTIME -$0.28 — net -$0.18). 24h 59T 52.5% WR. ATR SL 33.9% ✅. No 0% WR kill candidates (range_finder+ 9T 33.3% WR persistent but not kill threshold). 3 open positions near breakeven. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 02:30 UTC

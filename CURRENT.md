@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-15 (CEO run — verified)
+**Last updated:** 2026-08-16 (CEO run — verified)
 **Updated by:** CEO run
 
 ## What We're Working On
@@ -49,7 +49,6 @@
 
 ## Next Actions
 
-1. **Aug 17 (TOMORROW):** Evaluate all 6 eval windows. CRITICAL: exit-type R:R must ↑ from 0.38:1. PM_TRAIL avg >0.25%, ATR_SL count ↓
-2. **Post-eval:** If R:R still <0.5:1 → widen ATR_SL_MIN 1.0%→1.25% (trades need more room before SL hit)
-3. **Monitor:** ct-hot+ 20T 60.0% WR +$0.27 (must >55%), return_exhaustion_long 3T 100% +$0.39 (must >80%)
-4. **Verified 24h:** 57T +$0.07 49.1% WR — flat, PM_TRAIL holding +0.29% avg
+1. **Aug 17 (TOMORROW):** Evaluate all 6 eval windows. CRITICAL: exit-type R:R must ↑ from 0.56:1. PM_TRAIL avg +0.44% (must hold). SHORT bleed -$0.95 (must ↓).
+2. **Post-eval:** If R:R still <0.56:1 → widen ATR_SL_MIN 1.0%→1.25%. If SHORT negative → add regime filter.
+3. **Monitor:** ct-hot+ 21T 57.1% WR +$0.19 (must >55%), daily trades (must stay >30T).

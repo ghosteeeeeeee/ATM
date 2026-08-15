@@ -8623,3 +8623,31 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - Why no trades closed in ~1 hour? Market may be in consolidation, or signals not firing
+
+## [2026-08-16 01:30 UTC] Hourly Analysis
+
+**Trades:** 6 closed (2W 4L)
+- W LONG (ct-hot+): +$0.06 (profit-monster-T1)
+- W LONG (no signal): +$0.04 (guardian_orphan)
+- HYPE LONG (continuation+,ct-hot+): $0.00 (guardian_hard_sl) — small position
+- SYRUP LONG (ct-hot+): -$0.08 (atr_sl_hit)
+- GRASS LONG (ct-hot+): -$0.10 (atr_sl_hit)
+- BIGTIME LONG (continuation+): -$0.10 (atr_sl_hit)
+
+**PnL:** -$0.18
+**24h:** 59T, 52.5% WR (profit-monster-trail 25T +$0.68, atr_sl_hit 20T -$1.42)
+**ATR SL:** 33.9% ✅
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 33.9% ✅ (under 40%)
+- No overtrading (6T last hour, threshold >20)
+- No kill candidates (0% WR with 3+ trades)
+- 3 open positions near breakeven (CC, MON, LDO — all ct-hot+ LONG)
+- ct-hot+ still the primary profit driver (21T 57.1% WR +$0.19)
+- System roughly breakeven — profit-monster exits barely offset atr_sl losses
+
+**Open Questions:**
+- range_finder+ persistent underperformer (9T 33.3% WR -$0.14) — monitor, may need param tuning
+- wave_catcher- (4T 25% WR -$0.09) — also underperforming but only 4T
