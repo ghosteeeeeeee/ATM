@@ -940,6 +940,35 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # 7d 33T +$0.20, 48.5% WR — cold streak at 1.2% SL, not broken.
                 # Monitor: if 7d WR drops below 40%, re-add block.
 
+            # ── LONG oversold RSI filter (2026-08-15) ───────────────────────────
+            # Block LONG when RSI < 20 — price in freefall, no bounce coming.
+            # Backtest: blocks 3 losers (LINEA RSI=0, SAND RSI=12.7, ICP RSI=11.9),
+            # 0 winners. WR: 50% → 61.5% on ct-hot+.
+            if direction.upper() == 'LONG':
+                try:
+                    _rsi_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _rsi_cur = _rsi_conn.cursor()
+                    _rsi_cur.execute("""
+                        SELECT close FROM candles_1m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (token.upper(),))
+                    _rsi_closes = [r[0] for r in _rsi_cur.fetchall()]
+                    _rsi_conn.close()
+                    if len(_rsi_closes) >= 14:
+                        _rsi_deltas = [_rsi_closes[i] - _rsi_closes[i-1] for i in range(1, len(_rsi_closes))]
+                        _rsi_gains = [d if d > 0 else 0 for d in _rsi_deltas[-14:]]
+                        _rsi_losses = [-d if d < 0 else 0 for d in _rsi_deltas[-14:]]
+                        _rsi_ag = sum(_rsi_gains) / 14
+                        _rsi_al = sum(_rsi_losses) / 14
+                        if _rsi_al > 0:
+                            _rsi_val = 100 - (100 / (1 + _rsi_ag / _rsi_al))
+                            if _rsi_val < 20:
+                                log(f"  🚫 [LONG-RSI-BLOCK] {token}: LONG blocked — RSI {_rsi_val:.1f} < 20 (oversold freefall)")
+                                continue
+                except Exception:
+                    pass  # non-fatal — let signal through on DB error
+
             # ── SHORT poison + required co-signal logic ──────────────────────────
             if direction.upper() == 'SHORT':
                 # POISON: hzscore+ + vel-hermes- without pct-hermes- = 20% WR
