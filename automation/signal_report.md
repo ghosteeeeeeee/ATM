@@ -1,64 +1,58 @@
 # Signal Performance Report
-**Generated:** 2026-08-15 17:02 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-16 00:45 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 1,027 | **WR:** 46.8% | **PnL:** -37.51%
-- **Date range:** 2026-07-29 → 2026-08-15
+- **Date range:** 2026-07-29 → 2026-08-16
 
 ---
 
-## WINNERS (WR > 55%, PnL > 0)
+## KILLED (executed)
+All underperformers already disabled in previous cycles:
+| Signal | Dir | WR | PnL (24h) | Trades | Action |
+|--------|-----|----|-----------|--------|--------|
+| ct-hot- | SHORT | 0.0% | -$0.19 | 4 | Already killed (COIN_TRACKER_HOT_MINUS_ENABLED=False) |
+| range_finder+ | LONG | 33.3% | -$0.14 | 9 | Already killed (RANGE_FINDER_PLUS_ENABLED=False) |
+| wave_catcher- | SHORT | 25.0% | -$0.09 | 4 | Already killed (WAVE_CATCHER_MINUS_ENABLED=False) |
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| r2-trend-long2 | LONG | — | —% | — | 5 | 60.0% | +0.38 | ❓ |
-
----
-
-## LOSERS (WR < 30%, PnL < -2%)
-
-None found.
+**No new kills this cycle.** All losers already disabled.
 
 ---
 
-## MARGINAL (30-50% WR)
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL (24h) | Trades | Action |
+|--------|-----|----|-----------|--------|--------|
+| ct-hot+ | LONG | 57.1% | +$0.19 | 21 | Already boosted (hot-set primary) |
+| return_exhaustion_long | LONG | 100.0% | +$0.39 | 3 | Watch — needs 5+ trades to boost |
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| range_finder+ | LONG | 9 | 33.3% | -2.33 | DISABLED | Borderline |
-| wave_catcher- | SHORT | 4 | 50.0% | -0.86 | DISABLED | Needs more data |
-| ct-hot- | SHORT | 2 | 50.0% | -0.71 | ❓ | Needs more data |
-| wave_catcher+ | LONG | 2 | 50.0% | -0.69 | DISABLED | Needs more data |
-| ct-hot+ | LONG | 13 | 46.2% | +0.11 | ❓ | Borderline |
-| r2-trend-long3 | LONG | 2 | 50.0% | +0.59 | ❓ | Needs more data |
+**No new boosts this cycle.** Winners already promoted.
 
 ---
 
-## DISABLED BUT GOOD (candidates for re-enabling)
+## LOSERS (watch list)
+| Signal | Dir | WR | PnL (24h) | Trades | Status |
+|--------|-----|----|-----------|--------|--------|
+| continuation+ | LONG | 0.0% | -$0.18 | 2 | WATCH — too few trades |
+| range_finder- | SHORT | 0.0% | -$0.06 | 1 | WATCH — too few trades |
 
-None found. Top performers are already enabled.
+---
+
+## WINNERS
+| Signal | Dir | WR | PnL (24h) | Trades | Status |
+|--------|-----|----|-----------|--------|--------|
+| return_exhaustion_long | LONG | 100.0% | +$0.39 | 3 | Active — needs 5+ trades for boost |
+| ct-hot+ | LONG | 57.1% | +$0.19 | 21 | Active — hot-set primary |
+| r2-trend-long6 | LONG | 100.0% | +$0.11 | 2 | Active |
+| ct-hot+,hl_copy_trader | LONG | 100.0% | +$0.07 | 2 | Active |
 
 ---
 
 ## SIGNAL INVERSIONS (24h)
-
 **No inversions found.** All signals respect their direction labels.
 
 ---
 
-## RECOMMENDATIONS
-
-1. **[WATCH] range_finder+ LONG** — WR=33.3%, PnL=-2.33% over 9 trades. Monitor next cycle.
-2. **[WATCH] wave_catcher- SHORT** — WR=50.0%, PnL=-0.86% over 4 trades. Monitor next cycle.
-3. **[WATCH] ct-hot- SHORT** — WR=50.0%, PnL=-0.71% over 2 trades. Monitor next cycle.
-4. **[WATCH] wave_catcher+ LONG** — WR=50.0%, PnL=-0.69% over 2 trades. Monitor next cycle.
-5. **[WATCH] ct-hot+ LONG** — WR=46.2%, PnL=+0.11% over 13 trades. Monitor next cycle.
-6. **[WATCH] r2-trend-long3 LONG** — WR=50.0%, PnL=+0.59% over 2 trades. Monitor next cycle.
-7. **[KEEP] 1 winning combos** — r2-trend-long2. LONG side dominant.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
+## ISSUES
+- None this cycle. System stable.
 
 ---
 
@@ -66,15 +60,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-08-15 | 011fb51 | config: blacklist 2Z (96h both-direction loser) |
+| 2026-08-15 | d6f0a87 | signals: kill ct-hot- (SHORT direction) — 4T 0% WR, all losi... |
+| 2026-08-15 | c917915 | CEO: Aug 16 verified run — no changes, eval windows closing ... |
+| 2026-08-15 | 0844a0c | config: blacklist 12 both-direction losers (30d analysis) |
+| 2026-08-15 | 7d054f6 | scripts: deploy Weather Vane Position Shield (Component 2) |
+| 2026-08-15 | 96ab3a3 | CEO: 2026-08-15 23:00 UTC — no changes, eval windows active,... |
+| 2026-08-15 | 5538ed0 | CEO: NO CHANGES — eval windows closing tomorrow, R:R 0.68:1 ... |
 | 2026-08-15 | 18c9764 | CEO: widened PM_TRAIL_DISTANCE_PCT 0.40%→0.60% — R:R fix |
 | 2026-08-15 | 9987e77 | CEO: PM_TRAIL tightened 0.60%→0.40% + NEUTRAL speed override... |
 | 2026-08-15 | 387b54b | CEO: LOWERED PM_TRAIL_ACTIVATE_PCT 0.60%→0.40% — R:R fix |
-| 2026-08-15 | da7a56c | CEO: Lower COIN_TRACKER_HOT_MIN_COMPOSITE 50→45 — unblock ct... |
-| 2026-08-15 | 59c1f0a | CEO: 3 fixes — trailing activation 0.40%, PM_TRAIL race fix,... |
-| 2026-08-15 | d8fb23f | CEO: added range_finder to STANDALONE_BYPASS (volume fix for... |
-| 2026-08-15 | 58f2671 | CEO: Remove range_breakout from STANDALONE_BYPASS (25% WR st... |
-| 2026-08-15 | c562a8f | CEO: cleaned STANDALONE_BYPASS — removed dead signals (wave_... |
-| 2026-08-15 | 0ac3ecd | CEO: FIX SIGNAL STARVATION — lowered SPEED_MIN 45→30 |
-| 2026-08-15 | d02de1b | CEO: Added coin_tracker intelligence development — predict m... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
