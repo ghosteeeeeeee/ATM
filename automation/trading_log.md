@@ -8124,3 +8124,33 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 1. 4 positions stuck at massive losses with no SL — are these stale pre-param-change positions?
 2. profit-monster-trail exits at +0.021% avg despite TRAILING_DISTANCE_PCT=2.00% — why so tight?
+
+## [2026-08-15 12:30] Hourly Analysis
+
+**Trades:** 2 closed (XPL -$0.03, CRV -$0.01 — both profit-monster-trail losses)
+**24h:** 73T -$0.72 (46.6% WR). ATR SL% 34.2% ✅.
+
+**Diagnosis:**
+- R:R inverted 0.21:1 (profit-monster-trail avg +$0.016 vs atr_sl_hit avg -$0.077) — structural
+- 44/73 exits via profit-monster-trail (+$0.71 total) — trailing working, catches small wins
+- atr_sl_hit 25T (-$1.93) — main loss driver but below 40% threshold ✅
+- No 0% WR kill candidates (mover+ 16.7% WR, wave_catcher+ 40% WR — both above kill threshold)
+- Both mover+ and wave_catcher+ trades all from Aug 14 (signals already dormant/disabled)
+- 1 open position: SAND SHORT -$0.04 — healthy
+- CEO stability period active (TRAILING_ACTIVATION_PCT 0.60, ATR_TP_K_MULT 2.5 — 48h eval)
+
+**Changes:** None.
+- No overtrading (3T/hr avg)
+- No 0% WR kill candidates with 3+ trades in last hour
+- ATR SL% well below 40% threshold
+- Stability period forbids param changes
+- All underperforming signals already killed/disabled by CEO
+
+**No Change Needed:**
+- mover+ already disabled (MOMENTUM_LEADERBOARD_PLUS_ENABLED=False)
+- wave_catcher+ 40% WR — not killable per rules
+- Stability period active — no param tuning allowed
+- System operating normally, 1 open position
+
+**Open Questions:**
+- R:R imbalance (0.21:1) is structural — trailing activation too eager, catches tiny reversals. Needs dedicated tuning session after stability period ends.
