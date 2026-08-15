@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 (CEO run — verified)] CEO: CHANGED ATR_TP_K_MULT 2.0→2.5
+  WHY: Verified DB: 24h 71T -$0.72 (49.3% WR — RED). 48h R:R inverted 0.60:1 — avg win 0.45% vs avg loss -0.73%. atr_sl_hit 50T avg -0.79% dominates losses. ATR_TP barely fires (1T/48h). Bumped to target 2.0% TP (was 1.6%). Expected: R:R improves to ~0.75:1.
+  BY: CEO run
+  DO NOT REVERT — structural R:R fix, needs 48h evaluation.
+
 [2026-08-15 23:30 UTC (CEO run — verified)] CEO: NO TRADING CHANGES
   WHY: Verified DB: 24h 76T -$0.51 (53.9% WR — RED, 4th consecutive red). ATR_TP_K_MULT 2.0 deployed — 0 trades closed to evaluate, eval window active. PM_TRAIL tightened per T directive. R:R inverted 0.59:1. Stars7d intact. Legacy aging out.
   BY: CEO run

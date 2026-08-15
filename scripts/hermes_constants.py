@@ -464,7 +464,7 @@ ATR_SL_MIN             = 0.010   # 1.0% floor — wider than trailing distance (
 ATR_SL_MAX             = 0.025  # 2.5% cap — wide enough for ATR-based breathing room
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
-ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL (bumped from 1.5 — 3rd red day, R:R still inverted: avg win 0.51% vs avg loss 0.74%. Target 1.49:1 R:R)
+ATR_TP_K_MULT          = 2.5    # TP = 2.5x SL (bumped from 2.0 — R:R inverted 0.60:1: avg win 0.45% vs avg loss -0.73%. Target 0.75:1 R:R. 48h: ATR_TP only 1T, trailing dominates at 0.32% avg exit)
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
