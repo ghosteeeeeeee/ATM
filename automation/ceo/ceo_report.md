@@ -1,3 +1,8 @@
+⚠️ CRITICAL: SIGNAL STARVATION ⚠️
+Aug 12: 100 trades → Aug 13: 53 → Aug 14: 80 → Aug 15: 15. That's an 85% collapse. Zero open positions. 17 signals running, 15 trades closed. The filter stack (SPEED_MIN=45, REGIME_ENABLED, CONTEXT_GATE_ENABLED) strangles signal flow in NEUTRAL. Stop tweaking trailing on zero trades — fix the starvation first. No volume = no data = no improvement = death spiral.
+
+---
+
 ## CEO Report — 2026-08-15 (eval check)
 
 ### Diagnosis
