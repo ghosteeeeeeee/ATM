@@ -845,8 +845,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         denom = sum((i - x_mean) ** 2 for i in range(20))
                         numer = sum((i - x_mean) * (chunk[i] - y_mean) for i in range(20))
                         slope_pct = (numer / denom) / y_mean * 100 if denom > 0 and y_mean != 0 else 0
-                        if slope_pct >= -ACCEL_300_REGIME_SLOPE_PCT:
-                            log(f"  🚫 [SLOPE-FILTER] {token} SHORT: slope={slope_pct:+.4f}% >= -{ACCEL_300_REGIME_SLOPE_PCT}% — price trending up, skip")
+                        if slope_pct >= ACCEL_300_REGIME_SLOPE_PCT:
+                            log(f"  🚫 [SLOPE-FILTER] {token} SHORT: slope={slope_pct:+.4f}% >= {ACCEL_300_REGIME_SLOPE_PCT}% — price trending up, skip")
                             continue
                 except Exception:
                     pass  # non-fatal: skip slope check if DB query fails

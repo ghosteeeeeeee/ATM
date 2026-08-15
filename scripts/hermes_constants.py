@@ -630,7 +630,7 @@ ZSCORE_ACCEL_PENALTY = 0.7           # used if soft penalty mode enabled
 # SHORT-only filter — does NOT apply to LONG.
 SHORT_VEL_FILTER_ENABLED = True
 SHORT_VEL_FILTER_VEL_THRESHOLD = 0.1   # % — block SHORT if 5h velocity > this
-SHORT_VEL_FILTER_GREEN_THRESHOLD = 3   # block SHORT if last N candles are green
+SHORT_VEL_FILTER_GREEN_THRESHOLD = 5   # CEO 2026-08-16 — STARVATION FIX: 3 green candles blocked BCH SHORT (vel=-0.056%, last3g=3). 5 green candles = stronger signal SHORT is counter-trend. Monitor: SHORT WR (should stay ≥50%), daily trades (must ↑).
 
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
 # Detects regime shifts by monitoring trade outcomes per direction.
@@ -680,7 +680,7 @@ TIDE_SHORT_WR_THRESHOLD_LOW = 45
 # Block low-volatility entries — no energy = no trade.
 # Backtested 14d: SHORT vol<0.30% → blocks 78T (41% WR), keeps 47T (74% WR), net +$1.79.
 VOL_FLOOR_ENABLED = True
-VOL_FLOOR_THRESHOLD = 0.30             # % — block if price volatility (std/mean) below this
+VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30% killed every signal in NEUTRAL regime (102/104 tokens, low vol). 0.15% keeps safety net but unblocks signal flow. Monitor: daily trades (must ↑ from 0), vol-floor blocks (should ↓).
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
@@ -924,7 +924,7 @@ ACCEL_300_COOLDOWN_BARS   = 10   # dedup: only fire once per N bars per token+di
 ACCEL_300_LOOKBACK_1M     = 700  # 1m prices to fetch per token (warmup + detection window)
 ACCEL_300_ENABLED        = False  # DISABLED 2026-08-13 10:30 — 19T today 36.8% WR -$0.73, 12/19 ATR SL hits. Re-enabled yesterday but deteriorated.
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
-ACCEL_300_REGIME_SLOPE_PCT = 0.0005  # min price slope % — relaxed from 0.001 (signal starvation), backtest: +0.6% WR, +0.05% PnL
+ACCEL_300_REGIME_SLOPE_PCT = 0.002   # CEO 2026-08-16 — STARVATION FIX: 0.0005% blocked SHORT signals at +0.0003% slope (flat on 5m). 0.002% allows near-flat slopes, only blocks truly trending-up. Monitor: SHORT WR (should stay ≥50%), daily trades (must ↑).
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
 ACCEL_300_MIN_ATR_PCT      = 0  # disabled — backtest shows ATR alone can't separate winners from losers (overlap 0.07-0.25%)
 ACCEL_300_STALE_BARS = 15   # max bars since EMA cross for LONG (was 25 — fresher signals, catch moves earlier)
@@ -1140,7 +1140,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # Used in signal_compactor.py at 7 locations (confluence gate + preserve filter).
 # CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
 STANDALONE_BYPASS_SIGNALS = (
-    'stop_hunt_reversal_long', 'range_breakout',
+    'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
     'ct-hot',
     'continuation', 'continuation_long', 'continuation_short',
@@ -1149,6 +1149,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
     # CEO 2026-08-15 — removed: range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
     # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False)
+    # CEO 2026-08-15 — removed: range_breakout (standalone 8T 25% WR -$0.41 7d. combos profitable)
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)

@@ -8210,3 +8210,41 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - R:R inversion (0.21:1) persists — PM_TRAIL captures tiny wins while ATR_SL takes bigger losses. Needs dedicated tuning session.
+
+## [2026-08-15 15:30] Hourly Analysis
+
+**Trades:** 3 closed last hour (2 wins, 1 loss), 1 open (XPL LONG ct-hot+)
+**24h:** 62T -$0.59 (48.4% WR). ATR SL% 30.6% ✅.
+**Today:** 18T -$0.16 (38.9% WR)
+
+**Last hour trades:**
+- LDO LONG ct-hot+ profit-monster-T1 +$0.06
+- BSV LONG ct-hot+ profit-monster-trail +$0.02
+- GRASS LONG ct-hot+ profit-monster-trail -$0.02
+
+**24h by exit reason:**
+- profit-monster-trail: 39T +$0.49 (avg +$0.013) — main profit driver
+- atr_sl_hit: 19T -$1.47 (avg -$0.077) — main loss driver
+- profit-monster-T1: 3T +$0.19 (avg +$0.063)
+- atr_tp_hit: 1T +$0.20
+
+**Diagnosis:**
+- ATR SL% at 30.6% — well below 40% kill threshold
+- R:R inverted 0.17:1 (PM_TRAIL avg +$0.013 vs ATR_SL avg -$0.077) — structural
+- System low-activity (3T last hour, weekend/low-vol)
+- No 0% WR kill candidates — wave_catcher+ (42.9% WR) and range_finder+ (33.3% WR) are weakest but have enough wins to survive
+- Stability period active (TRAILING_ACTIVATION_PCT 0.60%)
+
+**Changes:** None.
+- 3T last hour — no overtrading
+- ATR SL% below threshold
+- No kill candidates (no signal has 0% WR with 3+ trades last hour)
+- Stability period forbids param tuning
+
+**No Change Needed:**
+- ATR SL% at 30.6% — below threshold
+- System quiet (3T/hr)
+- Stability period active
+
+**Open Questions:**
+- R:R inversion persists (0.17:1) — PM_TRAIL captures micro-wins while ATR_SL takes bigger losses. Needs dedicated session post-stability period.
