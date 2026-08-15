@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 08:48 UTC (CEO run — verified)] CEO: NO CHANGES — compactor bottleneck identified
+  WHY: Verified DB: 24h 58T -$0.47 (48.3% WR). Compactor verbose: 16 signals in 5-min window, 0 make hotset. Root cause: confluence gate blocks single-source (hl_copy_trader, range_finder-), VEL-FILTER blocks SHORT when price rising, NEUTRAL regime 0.50x penalty. This is correct protective behavior. SIGNAL_FILTER_SPEED_MIN=30 applied 2.5h ago, needs 24h. Eval windows active (PM_TRAIL 0.60%, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.60%) — close ~Aug 17.
+  BY: CEO run
+  NO CHANGES — eval windows active, needs data.
+
 [2026-08-15 06:15 UTC (CEO run — verified)] CEO: LOWERED SIGNAL_FILTER_SPEED_MIN 45→30
   WHY: SIGNAL STARVATION — 15T Aug 15 (85% collapse from 100T Aug 12). System starving to death. 45 blocked most NEUTRAL signals. 30 lets more through.
   BY: CEO run
