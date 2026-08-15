@@ -8584,3 +8584,24 @@ None — system stable, previous fixes settling in.
 - Hourly PnL positive (+$0.18)
 
 **Open Questions:** None — system stable
+
+## [2026-08-16 00:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L)
+- ICP ct-hot+ LONG: -$0.05 (atr_sl_hit)
+- BLUR ct-hot- SHORT: -$0.04 (atr_sl_hit)
+
+**PnL:** -$0.09
+**24h:** 51T, 46% WR, ~breakeven
+**ATR SL:** 31.4% ✅
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 31.4% ✅ (under 40% threshold)
+- No overtrading (2T last hour)
+- No kill candidates (ct-hot- 3T 0% WR — but only 3T, below 3+ threshold)
+- System stable, consistent with recent hours
+
+**Open Questions:**
+- ct-hot- 3T 0% WR, -$0.14 — monitor next hour, if hits 4T+ with 0% WR, kill

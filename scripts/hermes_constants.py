@@ -131,6 +131,19 @@ SHORT_BLACKLIST = {
     'MEGA',
     # AUTO-BLACKLISTED 2026-08-12 — 35% WR threshold (5+ trades, 7d)
     'AXS', 'XRP',
+    # 2026-08-15: both-direction losers (30d, min 3 trades each side)
+    'MOVE',   # 15T 0% WR SHORT, 21T 24% WR LONG — -$1.72
+    'PEOPLE', # 22T 18% WR SHORT, 10T 30% WR LONG — -$1.51
+    'APEX',   # 24T 25% WR SHORT, 18T 22% WR LONG — -$1.48
+    'TIA',    # 12T 33% WR SHORT, 16T 12% WR LONG — -$1.35
+    'STBL',   # 9T 11% WR SHORT, 23T 26% WR LONG — -$1.34
+    'UNI',    # 16T 6% WR SHORT, 9T 22% WR LONG — -$1.33
+    'LINEA',  # 19T 26% WR SHORT, 11T 0% WR LONG — -$1.20
+    'FET',    # 14T 7% WR SHORT, 12T 25% WR LONG — -$1.19
+    'MORPHO', # 20T 25% WR SHORT, 30T 33% WR LONG — -$1.19
+    'ZK',     # 11T 18% WR SHORT, 12T 25% WR LONG — -$1.12
+    'ORDI',   # 22T 36% WR SHORT, 21T 24% WR LONG — -$1.07
+    'SKR',    # 15T 33% WR SHORT, 15T 33% WR LONG — -$1.08
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -195,6 +208,19 @@ LONG_BLACKLIST = {
     'MEGA',
     # AUTO-BLACKLISTED 2026-08-12 — 35% WR threshold (5+ trades, 7d)
     'XRP',
+    # 2026-08-15: both-direction losers (30d, min 3 trades each side)
+    'MOVE',   # 21T 24% WR LONG, 15T 0% WR SHORT — -$1.72
+    'PEOPLE', # 10T 30% WR LONG, 22T 18% WR SHORT — -$1.51
+    'APEX',   # 18T 22% WR LONG, 24T 25% WR SHORT — -$1.48
+    'TIA',    # 16T 12% WR LONG, 12T 33% WR SHORT — -$1.35
+    'STBL',   # 23T 26% WR LONG, 9T 11% WR SHORT — -$1.34
+    'UNI',    # 9T 22% WR LONG, 16T 6% WR SHORT — -$1.33
+    'LINEA',  # 11T 0% WR LONG, 19T 26% WR SHORT — -$1.20
+    'FET',    # 12T 25% WR LONG, 14T 7% WR SHORT — -$1.19
+    'MORPHO', # 30T 33% WR LONG, 20T 25% WR SHORT — -$1.19
+    'ZK',     # 12T 25% WR LONG, 11T 18% WR SHORT — -$1.12
+    'ORDI',   # 21T 24% WR LONG, 22T 36% WR SHORT — -$1.07
+    'SKR',    # 15T 33% WR LONG, 15T 33% WR SHORT — -$1.08
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 

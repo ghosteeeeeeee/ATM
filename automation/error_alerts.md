@@ -12,3 +12,6 @@
 - **WARN** (1x): hl_cache.json has only 6 tokens vs 108 in price collector (may be expected if HL-only)
 - **INFO**: Pipeline running, 5 open positions, 53 closed today, -0.58% PnL
 - **AUTO-FIX**: None needed — no CRITICAL issues
+
+## Error Alerts — 2026-08-15 21:02 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Non-dict response from exchange: None`
