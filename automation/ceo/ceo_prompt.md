@@ -118,6 +118,13 @@ After making changes, report:
 
 ## STEP-BY-STEP WORKFLOW
 
+### Step 0: Read CURRENT.md (MANDATORY)
+**Before anything else, read the current state file:**
+```bash
+cat CURRENT.md
+```
+This tells you what's being worked on, active decisions, known limitations, and next actions. **Don't repeat work already done or drift on stale context.**
+
 ### Step 1: Read Team Updates (MANDATORY)
 **Before anything else, read what the team did:**
 ```bash
@@ -232,6 +239,7 @@ The coin_tracker already computes:
 2. **Kanban**: Update `automation/ceo/ceo_kanban.md` with the decision
 3. **Report**: Append to `automation/ceo/ceo_report.md` with verified numbers
 4. **OpenMemory**: Store for cross-session continuity
+5. **CURRENT.md**: Update `CURRENT.md` if you made decisions that affect session context (new focus, completed backlog items, new known limitations)
 
 ## DELEGATION
 

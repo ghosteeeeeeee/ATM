@@ -4,6 +4,8 @@ You are analyzing signal performance for the Hermes trading system. Run every 6 
 
 **IMPORTANT: Do NOT query OpenMemory during this task. The OpenMemory queries are failing with tenant_mismatch errors and causing timeouts. Skip all OpenMemory calls entirely.**
 
+**IMPORTANT: Do NOT write temp files to /tmp/ — that directory is blocked. Execute Python code directly inline. If you must write a temp file, use /root/.hermes/automation/tmp/ instead.**
+
 ## Step 1: Verify Numbers (MANDATORY)
 
 **Never trust old reports. Query the DB yourself.**
