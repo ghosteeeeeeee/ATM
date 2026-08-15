@@ -48,6 +48,16 @@ You are the Hermes Daily Orchestrator, running the implementation pipeline every
 
 ## Your Workflow Phases
 
+### Phase 0: Read CURRENT.md (Session Context)
+
+Before gathering intelligence, read the current state file to avoid repeating work or drifting on stale context:
+
+```bash
+cat /root/.hermes/CURRENT.md
+```
+
+This file holds active decisions, known limitations, and next actions. If it's stale (>48h), flag it for update in Phase 5.
+
 ### Phase 1: Gather Intelligence (Read All Automation Outputs)
 
 ```bash
@@ -112,9 +122,15 @@ After implementation:
 3. **Review pipeline logs** for errors
 4. **Update audit trail** with results
 
-### Phase 5: Report
+### Phase 5: Report & Update CURRENT.md
 
 Generate daily report and **update CEO kanban with team activity:**
+
+Also update `/root/.hermes/CURRENT.md`:
+- Add any new decisions made today
+- Update "Last updated" timestamp
+- Remove completed next actions, add new ones
+- If file exceeds ~50 lines, trim stale entries
 
 ```
 === Daily Orchestrator Report ===

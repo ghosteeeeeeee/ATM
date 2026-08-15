@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-13
-**Updated by:** Human (initial version), Agent (Weather Vane upgrades)
+**Last updated:** 2026-08-15
+**Updated by:** Daily Orchestrator
 
 ## What We're Working On
 
-Implementing **progressive context shaping** — giving Hermes agents structured state between sessions so they don't drift on stale context. This is a meta-improvement to how the system improves itself.
+**Completed:** Progressive context shaping (CURRENT.md) + Weather Vane v2+v4 upgrades.
 
-**Also completed:** Weather Vane v2+v4 upgrades (Direction Lock + Tide Detection).
+**Current focus:** R:R inversion fix (after stability period ends ~Aug 17) + signal quality monitoring.
 
 ## Active Decisions
 
@@ -28,9 +28,9 @@ Implementing **progressive context shaping** — giving Hermes agents structured
 ## System Improvement Backlog
 
 ### Quick Wins (do first)
-1. Wire CURRENT.md into orchestrator prompt (Phase 0 read, Phase 5 write)
-2. Wire CURRENT.md into CEO prompt (read at start, update on decisions)
-3. Add deprecation reason to signal_lifecycle.py state transitions
+1. ~~Wire CURRENT.md into orchestrator prompt~~ ✅ Done 2026-08-15
+2. Wire CURRENT.md into CEO prompt (next session)
+3. ~~Add deprecation reason to signal_lifecycle.py~~ ✅ Already exists (line 164-182)
 
 ### Worth Doing
 4. Extend checkpoint_utils.py to write human-readable progress summaries
@@ -58,6 +58,6 @@ Implementing **progressive context shaping** — giving Hermes agents structured
 
 ## Next Actions
 
-1. **CEO**: Review the spec at `plans/2026-08-13_progressive-context-shaping-spec.md` and give feedback
-2. **Human**: Approve spec or adjust scope
-3. **Implementation**: Wire CURRENT.md into orchestrator + CEO (smallest change first)
+1. **After stability period (~Aug 17):** Tune TRAILING_ACTIVATION_PCT to fix R:R inversion (0.21:1 → target 0.75:1)
+2. **CEO:** Review range_finder+ re-enable results (9 trades, 33.3% WR — on watch list)
+3. **Monitor:** r2-trend family performance (best performers at 60-67% WR)

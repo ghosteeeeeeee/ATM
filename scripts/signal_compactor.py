@@ -1956,6 +1956,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                       )
                 """, approved_ids)
             else:
+                # FIX (BUG-014): Don't expire APPROVED signals still in current hotset_final.
+                # Preserved signals (PRESERVE-APPROVED-UPSERT) are written as APPROVED but
+                # have no corresponding PENDING row — the old logic expired them immediately.
                 c.execute(f"""
                     UPDATE signals
                     SET decision = 'EXPIRED',
@@ -1973,7 +1976,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                           ))
                           OR (combo_key IS NULL)
                       )
-                """)
+                      AND combo_key NOT IN ({','.join(['?' for _ in top10_combos]) if top10_combos else "''"})
+                """, list(top10_combos) if top10_combos else [])
             left_and_stale = c.rowcount
             if left_and_stale:
                 log(f"EXPIRED {left_and_stale} APPROVED signals (left hot-set, staleness=0)")
