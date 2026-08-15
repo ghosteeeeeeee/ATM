@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 (CEO run — verified)
+
+### Diagnosis
+24h: 79T -$0.58 (51.9% WR — RED, 5th consecutive red). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56. R:R inverted: avg win 0.39% (PM trail) vs avg loss -0.81% (ATR SL) = 0.48:1. PM_TRAIL fires 62% of exits (49T/24h) at avg 0.39%. ATR_TP barely fires (1T/24h). Override that loosened PM_TRAIL_DISTANCE_PCT 0.15%→0.40% backfired — wider trail = exits at LOWER profit (peak-0.40% vs peak-0.15%). Stars7d intact (5 profitable). Legacy bleeders aging out. Disk 83%.
+
+### Root Cause
+PM_TRAIL is the bottleneck. It fires first (0.60% activation), exits at peak-0.40% = avg 0.39% win. ATR_SL takes -0.81%. R:R 0.48:1 inverted. The override that "loosened" PM_TRAIL backfired — 0.40% distance means trade must drop 0.40% from peak to exit, which is WORSE than old 0.15% distance (exit at peak-0.15%). PM_TRAIL cuts winners before they reach ATR target (1.6%).
+
+### Fix Applied
+1. PM_TRAIL_ENABLED=False — disabled entirely. Main trailing (0.80% activation, 2.0% distance) will handle exits. Winners can now reach ATR target (1.6%).
+
+### Verification
+Monitor 48h: avg trail win should ↑ from 0.39% toward 0.60%+, R:R should approach 1:1. If main trailing exits too early, re-enable PM_TRAIL with tighter params (0.80% act, 0.15% dist). ASK T: PM_TRAIL disabled — it was cutting winners at 0.39% while ATR SL took -0.81%. Confirm?
+
+---
+
 ## CEO Report — 2026-08-16 (CEO run — verified)
 
 ### Diagnosis

@@ -799,7 +799,7 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # master switch for trailing tier
+PM_TRAIL_ENABLED     = False  # CEO KILLED 2026-08-15 — cuts winners at avg 0.39% while ATR_SL takes -0.81%. R:R 0.48:1 inverted. Override backfired (0.40% dist = exits at lower profit). Let main trailing (0.80% act, 2.0% dist) handle exits. Monitor: avg win 48h (should ↑ from 0.39%), R:R ratio (should approach 1:1).
 PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO OVERRIDE 2026-08-16: tightened trail caused avg exit 0.32% (R:R inverted 0.59:1). Loosened to let winners reach ATR target.
 PM_TRAIL_DISTANCE_PCT = 0.004  # 0.40% behind peak — restored from 0.15% (same override)
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
