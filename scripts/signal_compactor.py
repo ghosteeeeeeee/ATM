@@ -1645,6 +1645,34 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _has_disabled:
                             log(f"  🚫 [PRESERVE-DISABLED-BLOCK] {pe['token']}:{pe['direction']} src='{pe_src}' — contains disabled component(s)")
                             continue
+                        # ── SPIKE FILTER for preserved SHORT entries ──────────────────────
+                        # FIX: Preserved entries skip pre-filter, so oversold SHORT signals
+                        # (RSI < 30) slip through and get stopped out (BLUR/BCH pattern).
+                        from hermes_constants import SPIKE_FILTER_ENABLED as _SPIKEEnabled, SPIKE_FILTER_RSI_THRESHOLD as _SpikeRSI
+                        if pe.get('direction', '').upper() == 'SHORT' and _SPIKEEnabled:
+                            try:
+                                _sf_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+                                _sf_cur = _sf_conn.cursor()
+                                _sf_cur.execute("""
+                                    SELECT close FROM candles_5m
+                                    WHERE token = ? AND is_closed = 1
+                                    ORDER BY ts DESC LIMIT 15
+                                """, (pe['token'].upper(),))
+                                _sf_closes = [r[0] for r in _sf_cur.fetchall()]
+                                _sf_conn.close()
+                                if len(_sf_closes) >= 15:
+                                    _sf_deltas = [_sf_closes[i] - _sf_closes[i-1] for i in range(1, len(_sf_closes))]
+                                    _sf_gains = [d if d > 0 else 0 for d in _sf_deltas[-14:]]
+                                    _sf_losses = [-d if d < 0 else 0 for d in _sf_deltas[-14:]]
+                                    _sf_ag = sum(_sf_gains) / 14
+                                    _sf_al = sum(_sf_losses) / 14
+                                    if _sf_al > 0:
+                                        _sf_rsi = 100 - (100 / (1 + _sf_ag / _sf_al))
+                                        if _sf_rsi < _SpikeRSI:
+                                            log(f"  🚫 [PRESERVE-SPIKE-BLOCK] {pe['token']} SHORT preserved entry blocked — RSI {_sf_rsi:.1f} < {SPIKE_FILTER_RSI_THRESHOLD}")
+                                            continue
+                            except Exception:
+                                pass  # non-fatal — let signal through on DB error
                         # Track whether preserved entry won the merge (for APPROVED upsert below)
                         _preserved_won = False
                         if existing is None:
