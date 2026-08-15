@@ -1,12 +1,12 @@
-# Signal Rotation — 2026-08-15 01:49 UTC
+# Signal Rotation — 2026-08-15 05:17 UTC
 
-## Market Regime: SHORT_BIAS
+## Market Regime: LONG_BIAS
 
 ## Signals Ranked by Regime-Adjusted Score
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | hzscore+,mover+ | 80% | 0.508 | 0.762 | ❌ | ENABLE |
+| 1 | hzscore+,mover+ | 80% | 0.508 | 0.762 | ✅ |  |
 | 2 | bb_bounce+,range_finder+ | 59% | 0.572 | 0.572 | ✅ |  |
 | 3 | continuation+,hzscore+ | 50% | 0.278 | 0.278 | ✅ |  |
 | 4 | bb_bounce+ | 62% | 0.268 | 0.268 | ✅ |  |
@@ -17,10 +17,10 @@
 | 9 | ma100-cross+,vortex_break | 33% | -0.106 | -0.106 | ❓ |  |
 | 10 | range_breakout_short | 50% | -0.162 | -0.162 | ❌ |  |
 | 11 | hzscore- | 53% | -0.109 | -0.164 | ❌ |  |
-| 12 | hzscore+ | 42% | -0.131 | -0.196 | ❌ |  |
+| 12 | hzscore+ | 42% | -0.131 | -0.196 | ✅ | DISABLE |
 | 13 | trend_momentum_near_sma+ | 17% | -0.199 | -0.199 | ❌ |  |
-| 14 | accel-300- | 55% | -0.404 | -0.202 | ❌ |  |
-| 15 | wave_catcher+ | 42% | -0.215 | -0.215 | ❌ |  |
+| 14 | wave_catcher+ | 42% | -0.215 | -0.215 | ❌ |  |
+| 15 | range_breakout- | 50% | -0.215 | -0.215 | ❌ |  |
 
 ## Changes Applied
-- **ENABLE**: HZSCORE_PLUS_ENABLED (WR=80%, edge=0.508, regime-aligned)
+- **DISABLE**: HZSCORE_PLUS_ENABLED (WR=42%, edge=-0.131, bleeding capital)
