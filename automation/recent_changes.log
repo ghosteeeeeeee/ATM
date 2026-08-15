@@ -583,3 +583,7 @@
   WHY: 13T 48h 23.1% WR -$0.61. Re-enabled Aug 14 at 52% WR, deteriorated to 23% in 48h. atr_sl_hit dominates (10T -$0.71). Worst active signal.
   BY: CEO run
   DO NOT REVERT — signal deteriorated after re-enable.
+[2026-08-15 (CEO run — verified)] CEO: DISABLED PM_TRAIL_ENABLED=False
+  WHY: PM_TRAIL cuts winners at avg 0.39% while ATR_SL takes -0.81%. R:R 0.48:1 inverted. Override that loosened PM_TRAIL backfired. Main trailing (0.80% act, 2.0% dist) will handle exits.
+  BY: CEO run
+  DO NOT REVERT — monitor 48h for avg win improvement.

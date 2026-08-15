@@ -22,3 +22,15 @@
 
 ## Error Alerts — 2026-08-14 22:09 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: ImportError — signals module not available: cannot import name 'R2_TREND_PLUS_ENABLED' from 'hermes_constants' (/root/.hermes/scripts/hermes_constants`
+
+## Error Alerts — 2026-08-15 00:40 UTC
+- **[INFO]**: Pipeline OK — ran 00:39:26, completed in 26s, 0 errors
+- **[INFO]**: 85 signals generated in last hour (60766 total)
+- **[INFO]**: Trades — 78 closed today, -0.46 USDT PnL, 0 open positions
+- **[WARN]** (2x): Phantom trades — CASHCAT SHORT + NOT SHORT closed at 0.00% PnL via profit-monster-trail
+- **[INFO]**: Regime — 102/104 NEUTRAL, 1 LONG, 1 SHORT. Speed: 7 hot, 94 warm, 8 cold
+- **[INFO]**: Timers — 43 active, all core timers firing (pipeline 646ms ago, price-collector 10s ago, regime-scanner 9min ago)
+- **[INFO]**: Services — hl-sync-guardian active, hl-copy daemon running (since Aug 6)
+- **[INFO]**: Disk — 83% used (93G/118G), 2% from WARN threshold
+- **[INFO]**: Data freshness — candles 1m: 1min, coin_tracker: 1min, regime: 10min
+- **NO AUTO-FIXES NEEDED** — system healthy

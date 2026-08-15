@@ -8073,3 +8073,29 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - Dormancy >48h would warrant relaxing vol floor or spike filter. Currently at 25h.
+
+## [2026-08-15 10:30] Hourly Analysis
+
+**Trades:** 0 closed last hour (system dormant 30+ hours). 0 open positions.
+**24h:** 0T in window (last closed: Aug 14 23:46). 7d: 444T -$0.79 (51% WR).
+
+**Diagnosis:**
+- System dormant — no qualifying signals in 30+ hours (market-driven, not a bug)
+- ATR SL% at 35.4% (below 40% ✅, fix deployed and holding)
+- 0 hotset entries likely (vol/spike filters blocking all tokens)
+- Last active 24h: profit-monster-trail 49T +$1.35, atr_sl_hit 28T -$2.30
+- R:R inverted (avg win 0.028 vs avg loss 0.082 = 0.34:1) — structural, needs dedicated tuning
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Dormancy is market-driven (low volatility/no setups) — not a code issue
+- 0 open positions — no exposure risk
+- No 0% WR kill candidates with 3+ trades in last hour (0 trades total)
+- No overtrading
+- CEO stability period active (PM_TRAIL_ACTIVATE_PCT 0.60, ATR_TP_K_MULT 2.0 eval)
+- ATR SL% 35.4% — well below 40% threshold
+
+**Open Questions:**
+- Dormancy >48h would warrant relaxing vol floor or spike filter. Currently at 30h.
+- R:R imbalance (0.34:1) is structural — trailing activation/distance needs dedicated tuning session.

@@ -1640,7 +1640,7 @@ HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
 WAVE_CATCHER_ENABLED            = False   # CEO KILLED 2026-08-16 — SHORT 4T -$0.09 25% WR (48h). LONG 8T -$0.42 37.5% WR (7d). Both directions dead.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).
-WAVE_CATCHER_MINUS_ENABLED      = True    # SHORT direction
+WAVE_CATCHER_MINUS_ENABLED      = False   # SIGNAL REPORTER 2026-08-16 — 4T 25% WR -$0.09 (6h). Master switch already dead.
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
 WAVE_CATCHER_VELOCITY_WINDOW    = 3       # bars to measure velocity
 WAVE_CATCHER_EMA_PERIOD         = 60      # EMA for trend confirmation
