@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-15 21:00 UTC (verified)
+
+### Diagnosis
+24h 50T -$0.03 (50.0% WR — FLAT, best day in 4). 7d 456T. R:R 0.70:1 (avg win 0.469% vs avg loss -0.666%) — still inverted but improving (was 0.67:1). ATR_SL 43T/48h avg -0.79% (-$3.43) dominates. PM_TRAIL 14T/48h avg -0.26% (-$0.37) — fewer exits with new params (was 69T). profit-monster-T1 8T avg +0.584% (+$0.47) — strong. 5 open $0 flat. Signal starvation recovery: 50T (from 15T low). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.07 (recovering).
+
+### Root Cause
+Eval windows (PM_TRAIL 0.60% act/0.50% dist, TRAIL_ACT 0.40%, ATR_TP_K_MULT 2.5, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45) closing ~Aug 17. PM_TRAIL tightening reduced exits from 69T to 14T/48h — trades with real momentum only. R:R still needs eval closure to fully measure.
+
+### Fix Applied
+NO CHANGES — eval windows close tomorrow. Changing now invalidates results. Signal starvation partially resolved (SIGNAL_FILTER_SPEED_MIN 45→30 + NEUTRAL override 15).
+
+### Verification
+System stabilizing: daily PnL recovering (-$1.58 → -$0.56 → +$0.07). Volume recovering (50T vs 15T low). Stars7d intact: r2-trend-long2 64.7%, bb_bounce+ 61.9%, bb-bounce-short,hzscore- 61.1%, hzscore+,mover+ 80%. Monitor: eval close ~Aug 17, R:R (should ↑ from 0.70:1), daily trades (must stay >30T), PM_TRAIL avg exit (should ↑).
+
+---
+
 ## CEO Report — 2026-08-16 07:30 UTC (verified)
 
 ### Diagnosis
