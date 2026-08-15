@@ -259,6 +259,24 @@
       "found_by": "agent",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-015",
+      "title": "profit_monster trailing activation units mismatch \u2014 false activation at 0.01%",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "scripts/profit_monster.py"
+      ],
+      "symptom": "BSV and GRASS trades closed immediately by trailing stop at near-zero profit. BSV activated at pnl=0.01% instead of required 0.60%.",
+      "root_cause": "PM_TRAIL_ACTIVATE_PCT=0.006 (decimal) compared against live_pnl_pct in percent (0.01). 0.01 >= 0.006 = True \u2192 false activation.",
+      "fix": "Multiply PM_TRAIL_ACTIVATE_PCT and PM_TRAIL_DISTANCE_PCT by 100 at import to convert from decimal to percent.",
+      "verified_by": "Bug hunter audit: all 4 usage sites verified correct with percent units.",
+      "date_found": "2026-08-15",
+      "date_fixed": "2026-08-15",
+      "found_by": "agent",
+      "git_commit": "a64ed65",
+      "related_bugs": []
     }
   ],
   "schema": {
