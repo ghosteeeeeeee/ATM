@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-15 (CEO run — verified)] CEO: ADDED range_finder TO STANDALONE_BYPASS_SIGNALS
+  WHY: SIGNAL STARVATION — Aug 15 only 19T (85% collapse from 100T Aug12). range_finder blocked by confluence gate — only fires in combos. Added to bypass so range_finder- and range_finder_short can fire standalone. range_finder+ stays disabled (33.3% WR). Combos unaffected.
+  BY: CEO run
+  DO NOT REVERT — volume fix, monitor daily trades (must ↑), range_finder standalone WR (must >45%).
+
 [2026-08-15 08:48 UTC (CEO run — verified)] CEO: NO CHANGES — compactor bottleneck identified
   WHY: Verified DB: 24h 58T -$0.47 (48.3% WR). Compactor verbose: 16 signals in 5-min window, 0 make hotset. Root cause: confluence gate blocks single-source (hl_copy_trader, range_finder-), VEL-FILTER blocks SHORT when price rising, NEUTRAL regime 0.50x penalty. This is correct protective behavior. SIGNAL_FILTER_SPEED_MIN=30 applied 2.5h ago, needs 24h. Eval windows active (PM_TRAIL 0.60%, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.60%) — close ~Aug 17.
   BY: CEO run

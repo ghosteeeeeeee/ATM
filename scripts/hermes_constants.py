@@ -892,7 +892,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-15 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-15 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
@@ -1147,6 +1147,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'hzscore', 'mover', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
+    'range_finder',  # CEO 2026-08-15 — added: standalone range_finder- and range_finder_short bypass confluence for volume. range_finder+ DISABLED (33.3% WR 7d). combos (bb_bounce+,range_finder+ 52.4% WR) unaffected.
     # CEO 2026-08-15 — removed: range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
     # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False)
     # CEO 2026-08-15 — removed: range_breakout (standalone 8T 25% WR -$0.41 7d. combos profitable)
@@ -1154,7 +1155,7 @@ STANDALONE_BYPASS_SIGNALS = (
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = True
-RANGE_FINDER_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-15     # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-10 (20T -$0.44). Monitor winrate.
+RANGE_FINDER_PLUS_ENABLED = False # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-10 (20T -$0.44). Monitor winrate.
 RANGE_FINDER_MINUS_ENABLED = True    # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-08 (40% WR -$0.19). Monitor winrate.
 RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 

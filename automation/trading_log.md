@@ -8248,3 +8248,40 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - R:R inversion persists (0.17:1) — PM_TRAIL captures micro-wins while ATR_SL takes bigger losses. Needs dedicated session post-stability period.
+
+## 2026-08-15 09:00 UTC — Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**PnL:** $0.00 (no activity)
+
+**24h Snapshot:**
+- 57T, -$0.54, 47.4% WR (27W/30L)
+- Close reasons: profit-monster-trail 36T +$0.38, atr_sl_hit 17T -$1.31, profit-monster-T1 3T +$0.19, atr_tp_hit 1T +$0.20
+- ATR SL hit rate: 29.8% (17/57 — BELOW 40% threshold — good)
+- R:R: avg_win $0.039, avg_loss $0.059, ratio 0.66:1 (inverted, structural issue)
+
+**Signal Performance (24h):**
+- ❌ r2-trend-long4 LONG: 2T 0% WR -$0.15 (approaching kill threshold)
+- ❌ range_finder+ LONG: 9T 33.3% WR -$0.14
+- ❌ wave_catcher- SHORT: 4T 25% WR -$0.09
+- ✅ ct-hot+ LONG: 3T 66.7% WR +$0.06
+- ✅ r2-trend-long6 LONG: 2T 100% WR +$0.12
+
+**Diagnosis:**
+1. **Entry quality:** No trades last hour — data unavailable
+2. **SL behavior:** ATR SL hit 29.8% — improved from 45.6% (Aug 13). Below 40% threshold.
+3. **Signal quality:** No signal meets kill threshold (0% WR with 3+ trades last hour). r2-trend-long4 at 2T with 0% WR — one more loss triggers kill.
+4. **Trade frequency:** ~2.9/hour avg (last 12h) — low but acceptable.
+5. **R:R:** 0.66:1 inverted — structural issue. ATR_TP_K_MULT 2.5 eval window active (changed today), needs 48h data.
+
+**Changes:** None. No signal meets kill threshold. Eval windows active (PM_TRAIL 0.60%, ATR_TP_K_MULT 2.5, TRAIL_ACT 0.60%). Stability period.
+
+**No Change Needed:**
+- ATR SL hit rate improved to 29.8% (was 45.6% Aug 13) — profit-monster-trail working
+- SIGNAL_FILTER_SPEED_MIN=30 applied today, monitoring trade count recovery
+- No overtrading (2.9/hr)
+
+**Open Questions:**
+- r2-trend-long4: 2T 0% WR — will kill if next trade loses
+- R:R inverted 0.66:1 — ATR_TP_K_MULT 2.5 should fix, needs eval time
+- 7d: 5 profitable days, 7 consecutive red days overall — watching for trend break
