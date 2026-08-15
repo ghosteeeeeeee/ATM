@@ -836,8 +836,8 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # TUNED 2026-08-15 — act 0.60%, dist 0.50%. Floor = +0.10%. Old params: act=0.40%/dist=0.60% → avg exit 0.27% (no momentum, reversals caught too early). Monitor: avg exit % 48h (should ↑), R:R (should ↑ from 0.67:1).
-PM_TRAIL_ACTIVATE_PCT = 0.006  # 0.60% — CEO 2026-08-15: tightened from 0.40%. Old act=0.40% caught trades at +0.27% avg (no momentum, reversals). 0.60% only fires on trades with real momentum. Floor = 0.10% (0.60% - 0.50%). Monitor: avg exit % 48h (should ↑ from 0.27%), R:R (should ↑ from 0.67:1).
+PM_TRAIL_ENABLED     = True   # TUNED 2026-08-16 — act 0.40%, dist 0.50%. Floor = -0.10%. Eval: 0.60% act made R:R worse (0.37:1). Reverted to 0.40% — catches trades before ATR_SL. Monitor: atr_sl_hit count (should ↓), avg exit % (should ↑ from 0.29%), R:R (should ↑ from 0.37:1).
+PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-16: REVERTED from 0.60%. Eval results: R:R worsened to 0.37:1 (from 0.67:1). ATR_SL trades MFE 0.94% avg but trail never activates (needs 0.60%), so they die at -0.79%. 0.40% activation catches trades earlier → fewer ATR_SL hits → better R:R. Floor = -0.10% (0.40% - 0.50%). Monitor: atr_sl_hit count 48h (should ↓ from 49), avg exit % (should ↑ from 0.29%), R:R (should ↑ from 0.37:1).
 PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — CEO 2026-08-15: tightened from 0.60%. Old dist=0.60% let winners slip to -0.20% floor. 0.50% keeps floor at +0.10%. Winners run to 0.50%+ before trailing catches. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R (should ↑ from 0.67:1).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B

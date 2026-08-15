@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 (CEO run — verified)
+**Last updated:** 2026-08-16 (CEO run — verified, 3rd run)
 **Updated by:** CEO run
 
 ## What We're Working On
 
-**Completed:** Progressive context shaping (CURRENT.md) + Weather Vane v2+v4 upgrades + all 8 upgrade plans.
+**Completed:** Progressive context shaping (CURRENT.md) + Weather Vane v2+v4 upgrades + all 8 upgrade plans + eval window (PM_TRAIL, ATR, trailing params).
 
-**Current focus:** R:R inversion fix (after stability period ends ~Aug 17) + signal quality monitoring.
+**Current focus:** R:R inversion fix (PM_TRAIL_ACTIVATE reverted to 0.40%) + SHORT bleed monitoring.
 
 ## Active Decisions
 
@@ -17,6 +17,7 @@
 - **Direction Lock: 30min lock after catastrophic loss (4+/5).** Prevents re-entry during clear bad streaks. — 2026-08-13
 - **Tide Detection: BTC 3h momentum + SHORT WR confirmation.** Bearish tide suppresses LONG, bullish tide suppresses SHORT. — 2026-08-13
 - **Blacklist testing complete.** 77 tokens tested, 0 KEEP. Signal generation filters are the bottleneck, not the blacklist. Stop rotating tokens. — 2026-08-15
+- **PM_TRAIL_ACTIVATE reverted to 0.40%.** Eval showed 0.60% hurt R:R (0.37:1 vs 0.67:1 pre-eval). ATR_SL trades peak 0.94% MFE but trail never activates. — 2026-08-16
 
 ## Known Limitations
 
@@ -26,13 +27,12 @@
 ## System Improvement Backlog
 
 ### Worth Doing
-1. Wire CURRENT.md into CEO prompt (next session)
-2. Extend checkpoint_utils.py to write human-readable progress summaries
-3. Create contextmap.md for the 58-signal ecosystem
+1. Extend checkpoint_utils.py to write human-readable progress summaries
+2. Create contextmap.md for the 58-signal ecosystem
 
 ### Future
-4. Formalize the 4-layer context separation in AGENTS.md
-5. Weather Vane Component 2 (Position Shield) — tighten trailing stops on losing positions during regime shifts
+3. Formalize the 4-layer context separation in AGENTS.md
+4. Weather Vane Component 2 (Position Shield) — tighten trailing stops on losing positions during regime shifts
 
 ## What NOT To Do
 
@@ -49,6 +49,7 @@
 
 ## Next Actions
 
-1. **Aug 17 (TOMORROW):** Evaluate all 6 eval windows. CRITICAL: exit-type R:R must ↑ from 0.56:1. PM_TRAIL avg +0.44% (must hold). SHORT bleed -$0.95 (must ↓).
-2. **Post-eval:** If R:R still <0.56:1 → widen ATR_SL_MIN 1.0%→1.25%. If SHORT negative → add regime filter.
-3. **Monitor:** ct-hot+ 21T 57.1% WR +$0.19 (must >55%), daily trades (must stay >30T).
+1. **Monitor PM_TRAIL revert:** atr_sl_hit count should ↓ from 49 (48h), avg exit should ↑ from 0.29%, R:R should ↑ from 0.37:1.
+2. **SHORT bleed:** -$0.95/7d — mostly legacy aging out. If still negative in 48h → add regime filter.
+3. **Daily trades:** should stay >30T (currently 55T — healthy).
+4. **Stars7d:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, hzscore+,mover+ 5T 80% — all intact.

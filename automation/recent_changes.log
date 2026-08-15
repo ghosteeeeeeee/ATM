@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-16 (CEO run — verified)] CEO: REVERTED PM_TRAIL_ACTIVATE_PCT 0.60%→0.40%
+  WHY: Eval window closing Aug 17. Eval results: R:R worsened to 0.37:1 (from 0.67:1 pre-eval). PM_TRAIL avg exit 0.29% (down from 0.44% pre-eval). ATR_SL 49T/48h avg -0.78% (-$3.81) still dominates. Root cause: 0.60% activation too high — ATR_SL trades peak at 0.94% MFE but trail never activates (needs 0.60%), so they die at -0.79%. Reverting to 0.40% catches trades earlier → fewer ATR_SL hits → better R:R. PM_TRAIL_DISTANCE_PCT stays at 0.50% (floor = -0.10%).
+  BY: CEO run
+  DO NOT REVERT — monitor atr_sl_hit count 48h (should ↓ from 49), avg exit % (should ↑ from 0.29%), R:R (should ↑ from 0.37:1).
+
 [2026-08-15 (CEO run — verified)] CEO: WIDENED PM_TRAIL_DISTANCE_PCT 0.40%→0.60%
   WHY: R:R inverted 0.70:1 (avg win 0.48% vs avg loss -0.69%). PM_TRAIL avg exit 0.27% — trades peak at 0.51% MFE, trail floor = peak-0.40% = 0.11%, breakeven guard exits at 0.0%. 0.40% too tight — winners cut before reaching meaningful profit. 0.60% gives room: peak 0.51% → floor -0.09% (breakeven guard catches at 0.0%). Peak 1.0% → floor 0.40%. Expected: avg exit ↑ from 0.27% toward 0.40%+, R:R ↑ from 0.70:1 toward 0.90:1+.
   BY: CEO run
