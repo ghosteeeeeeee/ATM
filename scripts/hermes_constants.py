@@ -1153,8 +1153,8 @@ STANDALONE_BYPASS_SIGNALS = (
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = True
-RANGE_FINDER_PLUS_ENABLED = False    # AUTO_1HR 2026-08-10 — 20T -$0.44 (24h), 0% WR today. All combos negative. VEL filter already deployed but not helping.
-RANGE_FINDER_MINUS_ENABLED = False   # SIGNAL REPORTER 2026-08-08 — 40% WR, -$0.19 (5 trades 7d). ma100-cross-,range_finder- bleeding.
+RANGE_FINDER_PLUS_ENABLED = True     # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-10 (20T -$0.44). Monitor winrate.
+RANGE_FINDER_MINUS_ENABLED = True    # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-08 (40% WR -$0.19). Monitor winrate.
 RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
 # range_breakout.py — breakout from tight range with retest confirmation
