@@ -1189,7 +1189,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
-    'hl_copy_trader',
     'wave_catcher', 'wave-catcher',
     'ct-hot+', 'ct-hot-', 'coin_tracker_hot',  # re-enabled 2026-08-16 per user
 )
