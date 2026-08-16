@@ -1,19 +1,19 @@
-## CEO Report — 2026-08-16 (25th run)
+## CEO Report — 2026-08-16 (26th run)
 
 ### Diagnosis
-NO CHANGES. Real system HEALTHY, legacy clearing. Verified DB: 24h 50T -$0.58 (36.0% WR — legacy-heavy: ct-hot+ 25T -$0.56, phantom 5T -$0.10). Real system today (excl ct-hot+, phantom): 11T +$0.30 (54.5% WR). 48h 106T -$0.90 (43.4% WR). 7d 443T -$2.62 (48.5% WR). 2 open flat ($0.01, -$0.04). PM_TRAIL 48h: 45T avg +0.243% +$1.12. ATR_SL 48h: 40T avg -0.703% -$2.81. R:R 0.35:1. Sunday low volume.
+NO CHANGES. Real system HEALTHY, legacy draining. Verified DB: 24h 50T -$0.58 (36.0% WR — legacy-heavy: ct-hot+ 25T -$0.56, ct-hot- 4T -$0.19, phantom 5T -$0.10). Real system (excl legacy+phantoms): ~16T +$0.27 (56% WR). 48h 103T -$0.85 (42.7% WR). 7d 442T -$2.54 (48.6% WR). 3 open flat ($0.00 unrealized). PM_TRAIL 48h: 55T avg +0.24% +$1.07. ATR_SL 48h: 39T avg -0.70% -$2.71. R:R 0.34:1.
 
 ### Root Cause
-Legacy losers (ct-hot+ 25T/24h) still aging out — should clear by Aug 17-18. Today's 36% WR is noise: ct-hot+ legacy + phantom trades. Real system today: 11T +$0.30 (54.5% WR). ATR_SL remains dominant loss (-$2.81/48h) but fix (3.0% cap) needs more time. Sunday low volume expected.
+Legacy losers still aging out — ct-hot+ 25T/24h should clear by Aug 17-18. Today's 36% WR is noise. ATR_SL remains dominant drag but fix (3.0% cap) needs 48h+ data. PM_TRAIL avg peak capture 0.61% (exit 0.32%) — working as designed.
 
 ### Fix Applied
-None. Eval windows just closed. Need 48h+ data on current params (PM_TRAIL 0.30%/0.50%, ATR_SL_MAX 3.0%, ATR_TP_K_MULT 2.0) before further changes. All bad actors DISABLED. No new kill candidates.
+None. Eval windows closed. Need 48h+ data on current params before further changes. All bad actors DISABLED.
 
 ### Verification
 - Pipeline: active ✅ | Kill switch: enabled ✅
-- PM_TRAIL: working (48h +$1.12, avg +0.243%) ✅
+- PM_TRAIL: working (48h +$1.07, avg +0.24%) ✅
 - Stars7d: return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7% ✅
-- 2 open: flat ($0.01, -$0.04) ✅ | No new kill candidates ✅
+- 3 open: flat ($0.00 unrealized) ✅ | No new kill candidates ✅
 
 ### Next Actions
 1. **Monitor legacy clear** — ct-hot+ ages out Aug 17-18, daily trades should recover
