@@ -8791,3 +8791,36 @@ None — system stable, previous fixes settling in.
 - W token had 2 losses in one hour — is W consistently problematic?
 - range_finder- only 1T in 24h — too small to evaluate
 - continuation+ 2T 0% WR — approaching threshold if more trades come in
+
+## [2026-08-16 05:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1 win, 1 breakeven, 2 losses)
+**PnL:** -$0.09 (WR: 25%)
+
+**24h Snapshot:**
+- 55 trades total, -$0.42 net, ~42% WR
+- ATR SL hit rate: 41.8% (23/55) — above 40% threshold
+- ct-hot+ responsible for 15/23 ATR SL hits (65%)
+
+**Last Hour Trades:**
+- XPL ct-hot+ LONG: +$0.03 (profit-monster-trail) ✅
+- HYPE LONG: $0.00 (guardian_orphan)
+- KAS ct-hot+ LONG: -$0.03 (atr_sl_hit)
+- ATOM ct-hot+ LONG: -$0.09 (atr_sl_hit)
+
+**Diagnosis:**
+1. **Entry quality:** ATOM had -82.77% PnL% — very bad entry
+2. **SL behavior:** ATR SL 41.8% — above 40% threshold, driven by ct-hot+
+3. **Signal quality:** No kill candidates (0% WR with 3+ trades last hour)
+4. **Trade frequency:** 4/hr — normal
+
+**Changes:** None. ct-hot+ already disabled (2026-08-16). ATR SL rate will improve as 3 remaining ct-hot+ positions close.
+
+**No Change Needed:**
+- ct-hot+ already disabled — ATR SL rate will naturally improve
+- No 0% WR kill candidates
+- Trade frequency normal
+
+**Open Questions:**
+- ATOM entry was -82.77% — is there an entry timing issue?
+- 3 remaining ct-hot+ positions — monitoring for closure

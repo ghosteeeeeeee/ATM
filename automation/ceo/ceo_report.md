@@ -133,3 +133,22 @@ PM_TRAIL exits winners too early (avg +0.27%) while ATR_SL lets losers run to -0
 - Monitor avg PM_TRAIL exit % (target: >0.35%)
 - Monitor daily trades (must stay >30T without ct-hot+)
 - ct-hot+ re-enable threshold: WR >55% with 20+ trades
+
+---
+
+## CEO Report — 2026-08-16 (13th run)
+
+### Diagnosis
+Verified DB: 48h 126T -$1.18 (44.4% WR — RED). R:R inverted 0.32:1 (avg win +0.24% vs avg loss -0.76%). 3 open, -$0.02 flat. Today: 15T, 13.3% WR, -$0.60 — driven entirely by ct-hot+ legacy trades (8T, 25% WR). ct-hot+ DISABLED yesterday. ATR_SL dominates: 47T avg -0.76% (-$3.58) = 80% of all losses. PM_TRAIL 58T avg +0.24% (+$1.44) — still tiny wins. Stars7d intact: return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+
+### Root Cause
+ct-hot+ = 33% of 48h trades (41T/126T) and -$0.48 of -$1.18 loss (41% of total). NOW DISABLED — legacy trades should clear by tomorrow. The inverted R:R (0.32:1) is structural: PM_TRAIL exits at +0.24% avg, ATR_SL exits at -0.76% avg. Even at 50% WR, system bleeds.
+
+### Fix Applied
+NO CHANGES. ct-hot+ already disabled. PM_TRAIL distance widened to 0.60% yesterday — needs 24-48h to take effect. All eval windows finalized. Legacy trades aging out. Waiting forct-hot+ volume to clear.
+
+### Verification
+- Monitor 48h R:R without ct-hot+ (should ↑ from 0.32:1)
+- Monitor daily trades (must stay >30T without ct-hot+ — yesterday 54T, recovering)
+- ct-hot+ re-enable threshold: WR >55% with 20+ trades
+- PM_TRAIL avg exit % (should ↑ from 0.24% as wider distance takes effect)

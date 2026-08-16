@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 (CEO run — verified, 12th run)
+**Last updated:** 2026-08-16 (CEO run — verified, 13th run)
 **Updated by:** CEO run
 
 ## What We're Working On
@@ -54,8 +54,8 @@
 
 ## Next Actions
 
-1. **R:R fix applied.** PM_TRAIL_DISTANCE 0.50%→0.60%. Monitor 48h: avg exit should ↑ from 0.27%, R:R should ↑ from 0.36:1. If no improvement, widen to 0.70%.
-2. **ct-hot+ legacy trades aging out.** 8T today at 25% WR. Should clear by tomorrow. Monitor daily trades (must stay >30T without ct-hot+).
+1. **R:R monitor.** PM_TRAIL_DISTANCE 0.60% (widened yesterday). 48h R:R 0.32:1 (avg win +0.24% vs avg loss -0.76%). Monitor: avg exit should ↑ from 0.24%, R:R should ↑ from 0.32:1. If no improvement by tomorrow, widen to 0.70%.
+2. **ct-hot+ legacy trades aging out.** 8T today at 25% WR. Should clear by tomorrow. ct-hot+ = 41T/126T 48h, -$0.48. Once cleared, R:R should improve significantly.
 3. **Daily trades:** 15T today (low, ct-hot+ legacy). Should recover to 40T+ tomorrow with bb_bounce+, r2-trend, hzscore+ combos.
 4. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-5. **Today critical:** 15T 13.3% WR -$0.60 (ct-hot+ legacy). Expect improvement as ct-hot+ ages out.
+5. **Tomorrow critical:** ct-hot+ legacy clears, PM_TRAIL wider distance takes effect. R:R must ↑ from 0.32:1.

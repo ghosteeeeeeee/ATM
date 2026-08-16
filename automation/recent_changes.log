@@ -723,3 +723,7 @@
   WHY: 5T last hour (WLFI +$0.01, HYPE $0.00, HYPE -$0.09, W -$0.10, W -$0.11 — net -$0.29). 24h 53T 39.6% ATR SL ✅ (below 40%). No 0% WR kill candidates. range_finder+ 1T 0% WR (not enough trades). continuation+ 2T 0% WR (below 3T threshold). 5/hr normal. System stable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 05:30 UTC
+[2026-08-16 05:00] auto_1hr: NO CHANGES
+  WHY: 4T last hour (XPL +$0.03, HYPE $0.00, KAS -$0.03, ATOM -$0.09 — net -$0.09). 24h 55T 41.8% ATR SL (above 40% threshold). ct-hot+ responsible for 15/23 ATR SL hits (65%) but already disabled. 3 remaining ct-hot+ positions waiting to close. No 0% WR kill candidates. 4/hr normal. System correcting itself via ct-hot+ disable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 06:00 UTC

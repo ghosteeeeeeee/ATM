@@ -490,3 +490,8 @@
 [2026-08-15 23:07 UTC]   🟢 ct-hot+: 21 trades, 52.4% WR, PnL=1.37
 [2026-08-15 23:07 UTC]   🟢 return_exhaustion_long: 3 trades, 100.0% WR, PnL=4.04
 [2026-08-15 23:07 UTC] Done. Disabled 0 signals.
+[2026-08-16 05:07 UTC] === Signal Decay Detector ===
+[2026-08-16 05:07 UTC]   🟢 ct-hot-: 4 trades, 25.0% WR, PnL=-3.34
+[2026-08-16 05:07 UTC]   🟢 ct-hot+: 30 trades, 43.3% WR, PnL=-4.16
+[2026-08-16 05:07 UTC]   🟢 return_exhaustion_long: 3 trades, 100.0% WR, PnL=4.04
+[2026-08-16 05:07 UTC] Done. Disabled 0 signals.
