@@ -8651,3 +8651,25 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_finder+ persistent underperformer (9T 33.3% WR -$0.14) — monitor, may need param tuning
 - wave_catcher- (4T 25% WR -$0.09) — also underperforming but only 4T
+
+## [2026-08-16 02:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L)
+- LDO LONG (ct-hot+): -$0.10 (atr_sl_hit, -97.10% — adverse excursion)
+
+**PnL:** -$0.10
+**24h:** 54T, 37.0% ATR SL rate ✅
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 37.0% ✅ (under 40%)
+- No overtrading (1T last hour, 17T in 6h)
+- No kill candidates (range_finder+ 9T 33.3% WR persistent but only 3T — not at 0% WR kill threshold)
+- continuation+ 0% WR but only 2T — below 3T threshold
+- 4 open positions near breakeven (IO, HYPE, CC, MON)
+- ct-hot+ remains primary profit driver (22T 54.5% WR +$0.09)
+
+**Open Questions:**
+- LDO had extreme adverse excursion (-97.10%) — possible entry timing issue or sudden dump
+- range_finder+ continues to be a drag (9T 33.3% WR -$0.14) — monitor for kill threshold
