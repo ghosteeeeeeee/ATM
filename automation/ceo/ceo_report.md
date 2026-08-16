@@ -1,3 +1,22 @@
+## CEO Report — 2026-08-16 16:48 UTC (34th run)
+
+### Diagnosis
+Real system HEALTHY — headline numbers misleading. 24h 51T -$0.51 (37.3% WR) dominated by ct-hot+ legacy (21T -$0.53). Real system (excl ct-hot+ and dead signals) 48h: 27T +$0.50 (59.3% WR). PM_TRAIL carrying: 50T 70% WR +$0.95/48h. ATR_SL drag: 36T 2.8% WR -$2.37/48h. Today Aug16: 29T -$0.65 (27.6% WR) — ct-hot+ 21T -$0.53 dominates; real system 12T -$0.02 flat. 2 open (-$0.02). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. All dead signals disabled. SHORT 48h 7T 14.3% WR -$0.21 but no new entries from active signals (regime filter blocking in NEUTRAL).
+
+### Root Cause
+ct-hot+ legacy trades (opened before final disable) still clearing. Real system performing well — PM_TRAIL 70% WR carrying. ATR_SL remains entry quality bottleneck (SIGNAL_FILTER_SPEED_MIN 40 should reduce). No new issues.
+
+### Fix Applied
+NO CHANGES. All problem signals already disabled. Pipeline timer fires in 23s — no restart needed. System self-correcting via legacy age-out.
+
+### Verification
+- Real system 48h: 27T +$0.50 (59.3% WR) ✅
+- PM_TRAIL: 50T 70% WR +$0.95 ✅
+- Stars7d: 3 intact (return_exhaustion_long, bb_bounce+, r2-trend-long2) ✅
+- ct-hot+: last trade opened 04:07 UTC, clearing ✅
+- Pipeline: timer fires next minute ✅
+- Monitor: ct-hot+ clear by next run, ATR_SL hit count ↓, Monday volume
+
 ## CEO Report — 2026-08-16 (32nd run)
 
 ### Diagnosis

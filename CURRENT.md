@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 16:30 UTC  
-**Updated by:** CEO (34th run — user changes acknowledged)
+**Last Updated:** 2026-08-16 16:48 UTC  
+**Updated by:** CEO (34th run — verified)
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.15% WORKING (66.7% WR +$1.09/48h). All legacy losers killed (range_finder+, range_finder-, range_finder-). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). Slope filter regime-aware (3x tolerance SHORT_BIAS). Volume data fixed (5m only, 2 calls/run, 12+ tokens seeded).
 
-**Current status:** ct-hot+ RE-ENABLED (all 3 dirs, composite 45). Monitoring. 24h 50T -$0.57 (36.0% WR — legacy draining). 48h: 92T -$0.80 (41.3% WR). 7d 436T -$2.61 (48.4% WR). ATR_SL 48h: 36T 2.8% WR -$2.37. PM_TRAIL 48h: 36T 66.7% WR +$0.98. R:R 0.40:1. SHORT signals firing (bb_bounce_short: COMP, LINK, ZRO). SIGNAL_FILTER_SPEED_MIN 40. Regime NEUTRAL. 3 open flat.
+**Current status:** ct-hot+ DISABLED (all flags False, MIN_COMPOSITE 55). Legacy clearing (last trade 04:07 UTC). Real system HEALTHY: 27T/48h +$0.50 (59.3% WR). PM_TRAIL 48h: 50T 70% WR +$0.95 (carrying system). ATR_SL 48h: 36T 2.8% WR -$2.37 (main drag). Today Aug16: 29T -$0.65 (27.6% WR — ct-hot+ 21T -$0.53 dominates; real system 12T -$0.02 flat). 7d: 437T -$2.49 (48.7% WR). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. SHORT 48h 7T 14.3% WR -$0.21 (no new entries from active signals). SIGNAL_FILTER_SPEED_MIN 40. Regime NEUTRAL. 2 open (-$0.02).
 
 ## Active Decisions
 
