@@ -8996,3 +8996,40 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL rate should drop below 40% as ct-hot+ positions close
 - continuation+ at 2T 0% — watching for kill threshold
+
+## [2026-08-16 09:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed (Sunday slow market)
+**PnL:** $0.00
+
+**24h Snapshot:**
+- 50 trades, -$1.03 net, 38% WR
+- ATR SL hit: 24/50 = 48.0% (above 40% threshold)
+- ct-hot+: 26T 34.6% WR -$0.66 — already disabled, 3 positions remaining
+- ct-hot-: 4T 0% WR -$0.19 — already killed
+- return_exhaustion_long: 3T 100% WR +$0.39 (best signal)
+- r2-trend: 2T 100% WR +$0.11
+- guardian: 6T 16.7% WR -$0.10
+
+**Open Positions (3):**
+- HYPE SHORT $11 @ 57.101 (entry ~breakeven)
+- BLUR LONG $11 @ 0.013105 (entry ~breakeven)
+- ALT LONG $11 @ 0.006057 (just entered)
+
+**Diagnosis:**
+1. **Entry quality:** 0 trades last hour, can't assess. Open positions at breakeven.
+2. **SL behavior:** 48.0% ATR SL — above 40% but ALL driven by ct-hot+ (24/26 ATR SL hits). Already disabled. Will self-correct as positions close.
+3. **Signal quality:** No kill candidates. continuation+ 1T 0% (below 3T threshold). return_exhaustion_long best performer.
+4. **Trade frequency:** 1-3/hr (normal, Sunday market)
+
+**Changes:** None. System self-correcting via ct-hot+ disable.
+
+**No Change Needed:**
+- ATR SL rate driven entirely by disabled ct-hot+ legacy
+- No signals at kill threshold
+- Trade frequency normal
+- Open positions small ($11) with normal risk
+
+**Open Questions:**
+- ATR SL rate should drop below 40% as remaining ct-hot+ positions close
+- continuation+ 1T 0% WR — watch for kill threshold

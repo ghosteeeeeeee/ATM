@@ -1,44 +1,55 @@
-=== Signal Performance Report ===
-Generated: 2026-08-16
+# Signal Performance Report
+**Generated:** 2026-08-16 17:45 UTC | **Period:** Last 6h + 24h
 
-## 6h Performance (2+ trades)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| ct-hot+ | LONG | 9 | 22.2% | -$0.48 |
+## Overall Stats (24h)
+- **Trades:** 51 | **WR:** 35.3% | **PnL:** -$0.68
 
-## 24h Performance (3+ trades)
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| return_exhaustion_long | LONG | 3 | 100.0% | +$0.39 |
-| ct-hot+ | LONG | 30 | 46.7% | -$0.29 |
-| None | LONG | 4 | 25.0% | -$0.10 |
-| ct-hot- | SHORT | 4 | 0.0% | -$0.19 |
+---
 
-## KILLED (executed): None
-No signals meet kill criteria (WR <30% with 5+ trades AND PnL <-$0.10 in 24h).
+## KILLS (already executed)
 
-## BOOSTED (executed): None
-return_exhaustion_long (100% WR, +$0.39) needs 5+ trades before boost.
+All underperformers already disabled in hermes_constants.py:
+- ct-hot+ LONG: 26T 34.6% WR -$0.66 (legacy trades clearing)
+- ct-hot- SHORT: 4T 0% WR -$0.19
+- wave_catcher: all variants killed 2026-08-14/16
+- range_breakout: all variants killed 2026-08-15/16
+- trend_momentum_near_sma: killed 2026-08-12
 
-## LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| ct-hot+ | LONG | 46.7% | -$0.29 | 30 | KILLED 2026-08-16 (CEO). Re-enable when WR >55% with 20+ trades. |
-| ct-hot- | SHORT | 0.0% | -$0.19 | 4 | WATCH — too few trades. |
-| continuation+ | LONG | 0.0% | -$0.18 | 2 | KILLED 2026-08-16 per hermes_constants.py. |
+---
 
-## WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| return_exhaustion_long | LONG | 100.0% | +$0.39 | 3 | HOT — needs more volume. All exits via profit-monster. |
-| r2-trend-long6 | LONG | 100.0% | +$0.04 | 1 | Low volume. |
-| ct-hot+,hl_copy_trader | LONG | 100.0% | +$0.07 | 2 | Low volume. |
+## BOOST CANDIDATES
 
-## 7d Context (5+ trades, sorted by PnL)
-Worst: wave_catcher+ -$0.42, range_breakout+ -$0.41, trend_momentum_near_sma+ -$0.37
-Best: bb_bounce+ +$0.25, bb_bounce+,hzscore+ +$0.23, r2-trend-long2 +$0.19
+| Signal | Dir | 7d T | 7d WR | 7d PnL | Status |
+|--------|-----|------|-------|--------|--------|
+| bb_bounce+ | LONG | 22 | 63.6% | $0.25 | Hot-set priority |
+| r2-trend-long2 | LONG | 17 | 64.7% | $0.19 | Monitor |
+| r2-trend-long3 | LONG | 12 | 66.7% | $0.01 | High WR, low PnL |
+| bb_bounce+,hzscore+ | LONG | 31 | 51.6% | $0.23 | Combo stable |
 
-## ISSUES:
-- ct-hot+ ATR SL exits: 15/30 trades hit ATR SL = 0% WR avg -$0.07 each. Profit-monster exits: 15/30 = 93% WR. The ATR SL is too tight — consider widening ATR_SL_ATR_MULT or raising ATR_SL_FLOOR.
-- No direction inversions found.
-- 6h period: ct-hot+ LONG only 22.2% WR — short-term weakness.
+---
+
+## LOSERS (watch list)
+
+| Signal | Dir | 7d T | 7d WR | 7d PnL | Note |
+|--------|-----|------|-------|--------|------|
+| hzscore- | SHORT | 32 | 53.1% | -$0.21 | R:R inverted (wins small, losses large) |
+| accel-300- | SHORT | 40 | 55.0% | -$0.30 | Same R:R issue |
+
+---
+
+## SIGNAL INVERSIONS
+
+**None found.** All signals respect direction labels.
+
+---
+
+## KEY OBSERVATIONS
+
+1. **Legacy ct-hot trades** still clearing — not new signals firing
+2. **hzscore- and accel-300-** have decent WR but negative PnL — R:R problem (avg win < avg loss)
+3. **bb_bounce+** is the most consistent performer — 63.6% WR with positive PnL
+4. **6 trades with NULL signal** — data quality issue, -$0.10 PnL
+
+---
+
+*No new kills executed — all losers already disabled. Monitor hzscore-/accel-300- R:R for potential parameter tuning.*

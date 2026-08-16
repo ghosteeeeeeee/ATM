@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 ~11:15 UTC (CEO run — 22nd run)
-**Updated by:** CEO
+**Last Updated:** 2026-08-16 11:30 UTC  
+**Updated by:** CEO (24th run — verified)
 
 ## What We're Working On
 
 **Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ DISABLED (flag False, pipeline restarted). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). range_finder+ DISABLED (0.12:1 R:R, never captures gains).
 
-**Current status:** Real system HEALTHY. PM_TRAIL fix CONFIRMED working: 48h trail avg +0.25% +$1.21 (breakeven guard removal allowing trades to run). 24h 53T -$0.76 (35.8% WR — legacy clearing: ct-hot+ 33T, wave_catcher+ 8T, trend_momentum 6T, phantom 5T). 7d stars intact: return_exhaustion_long 3T 100% +$0.39, bb_bounce+ 22T 63.6% +$0.25, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19. 2 open flat. R:R 0.71:1 (improved from 0.42:1). ATR_SL still dominant (41T -$2.86) but fix needs time. Pipeline active.
+**Current status:** Real system HEALTHY. PM_TRAIL fix CONFIRMED working: 48h trail avg +0.24% +$1.12 (68.9% WR). 24h 51T -$0.68 (35.3% WR — legacy clearing: ct-hot+ 26T -$0.66, phantom 5T -$0.10). 48h 106T -$0.90 (43.4% WR). 7d 444T -$2.65 (48.4% WR). 2 open flat ($0.01). R:R 0.34:1 (PM_TRAIL avg +0.24% vs ATR_SL avg -0.70%). ATR_SL still dominant (40T/48h -$2.81, 2.5% WR) but fix (3.0% cap) needs more time. Regime NEUTRAL (100/104 tokens). Pipeline active.
 
 ## Active Decisions
 
@@ -62,8 +62,8 @@
 
 ## Next Actions
 
-1. **Monitor ct-hot+ clear.** Should be 0 open by ~10:00 UTC. Real system trades only after.
-2. **Phantom trades.** Delegate to bug_hunter — investigate guardian_orphan root cause in hl-sync-guardian.
-3. **Daily trades must ↑.** Real system only 5T today (low volume). Monitor hl_copy_trader and range_finder standalone.
-4. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-5. **R:R 0.27:1 real system.** Inverted but high WR (58.8%) compensates. System profitable. Don't chase R:R at cost of WR.
+1. **Monitor ct-hot+ clear.** Legacy still 26T/24h but should age out by Aug 18-19. No new ct-hot+ trades.
+2. **ATR_SL fix evaluation.** Need 48h+ data after Aug 17 to assess 3.0% cap impact. Currently 40T/48h 2.5% WR.
+3. **Phantom trades.** 6T/48h -$0.10, root cause in guardian_orphan (hl-sync-guardian). Backlog item.
+4. **Daily trades must ↑.** Low volume Sunday + ct-hot+ disabled = fewer trades. Monitor hl_copy_trader volume.
+5. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%, hzscore+,mover+ 4T 75%.
