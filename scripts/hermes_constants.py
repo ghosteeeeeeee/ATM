@@ -1694,7 +1694,7 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True
-COIN_TRACKER_HOT_PLUS_ENABLED       = True    # LONG direction
+COIN_TRACKER_HOT_PLUS_ENABLED       = False   # CEO 2026-08-16: DISABLED. 28T/7d 46.4% WR -$0.29, 12h 16T 37.5% WR -$0.40. Composite threshold 50 didn't filter enough. #1 ATR_SL producer. Monitor: daily trades (must stay >30T without ct-hot+), R:R (should ↑). Re-enable when WR >55% with 20+ trades.
 COIN_TRACKER_HOT_MINUS_ENABLED      = False   # SHORT direction — killed 2026-08-16 00:30 UTC: 4T 0% WR, all SHORTs losing to atr_sl
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)

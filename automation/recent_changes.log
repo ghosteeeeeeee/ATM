@@ -719,3 +719,7 @@
   WHY: 4T last hour (all atr_sl: IO -/usr/bin/bash.08, SUSHI -/usr/bin/bash.11, MON -/usr/bin/bash.03, CC -/usr/bin/bash.05 — net -/usr/bin/bash.27). 24h 58T 37% ATR SL ✅ (41.4% by count but borderline). No 0% WR kill candidates. range_finder+ 9T 33.3% WR persistent but not at kill threshold. tpsl_utils fixes deployed. 2 open positions near breakeven. No overtrading. System stable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 05:30 UTC
+[2026-08-16 04:30] auto_1hr: NO CHANGES
+  WHY: 5T last hour (WLFI +$0.01, HYPE $0.00, HYPE -$0.09, W -$0.10, W -$0.11 — net -$0.29). 24h 53T 39.6% ATR SL ✅ (below 40%). No 0% WR kill candidates. range_finder+ 1T 0% WR (not enough trades). continuation+ 2T 0% WR (below 3T threshold). 5/hr normal. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 05:30 UTC

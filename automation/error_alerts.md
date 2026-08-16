@@ -36,3 +36,6 @@
 ## Error Alerts — 2026-08-16 02:02 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=[_http_post] N rate-limited, attempt N/N, waiting 1s...`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK: [_http_post] N rate-limited, attempt N/N, waiting 1s...`
+
+## Error Alerts — 2026-08-16 04:02 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(W): HL TOK failed — Non-dict response from exchange: None`

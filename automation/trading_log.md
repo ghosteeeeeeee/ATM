@@ -8755,3 +8755,39 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ct-hot+ at 25T with 48% WR and -$0.10 — persistent small loser but WR not 0%
 - Last 6h slightly negative (-$0.49 across 14 trades) — normal variance or regime shift?
+
+## 2026-08-16 04:00 UTC — Hourly Analysis
+
+**Trades:** 5 closed (1 win, 1 breakeven, 3 losses)
+**PnL:** -$0.29 (WR: 20%)
+
+**24h Snapshot:**
+- 53 trades total, -$0.37 net, ~42% WR
+- ATR SL hit rate: 39.6% (21/53) — below 40% threshold
+- Profit-monster combined: 26T, +$1.30 — offsets atr_sl -$1.57
+
+**Last Hour Trades:**
+- WLFI ct-hot+ LONG: +$0.01 (profit-monster-trail) ✅
+- HYPE SHORT guardian_orphan: $0.00 (breakeven)
+- HYPE hl_copy_trader,range_finder- SHORT: -$0.09 (HL_CLOSED)
+- W guardian_orphan LONG: -$0.10 (guardian_orphan)
+- W ct-hot+ LONG: -$0.11 (atr_sl_hit)
+
+**Diagnosis:**
+1. **Entry quality:** W had 2 losses in one hour (orphan + atr_sl) — possible bad entry timing
+2. **SL behavior:** ATR SL 39.6% — below 40% threshold ✅
+3. **Signal quality:** No kill candidates (0% WR with 3+ trades last hour)
+4. **Trade frequency:** 5/hr — normal, no overtrading
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 39.6% — below 40% trigger
+- No 0% WR kill candidates (continuation+ 2T 0% but <3T)
+- Trade frequency normal
+- tpsl_utils fixes deployed
+
+**Open Questions:**
+- W token had 2 losses in one hour — is W consistently problematic?
+- range_finder- only 1T in 24h — too small to evaluate
+- continuation+ 2T 0% WR — approaching threshold if more trades come in
