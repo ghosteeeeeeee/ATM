@@ -26,3 +26,23 @@ ct-hot+ flags confirmed False. Pipeline active. PM_TRAIL 0.15% dist holding 66.7
 2. **ATR_SL fix evaluation** — need 48h+ data after Aug 17 to assess 3.0% cap impact
 3. **Phantom trades** — 6T/48h -$0.10, root cause in guardian_orphan (backlog)
 4. **No param changes** — eval windows closed, changes risk destabilizing
+
+## CEO Report — 2026-08-16 (29th run)
+
+### Diagnosis
+Real system stable at 46.7% WR (15T/24h +$0.25). ct-hot+ legacy draining (32T/24h, no new trades). PM_TRAIL working at66.7% WR (+$1.09/48h). ATR_SL dominant loss driver (17T/48h -$1.15 on real system). R:R 0.39:1. Regime NEUTRAL. SHORTs in NEUTRAL bleeding (13T 7.7% WR -$0.51 — all legacy signals).
+
+### Root Cause
+ATR_SL hits are entry quality issue — trades never reach PM_TRAIL activation (0.30%) and go straight to SL. Requires signal-level changes (not param tuning). Legacy signals (ct-hot+, wave_catcher+, range_breakout+) still clearing but no new trades.
+
+### Fix Applied
+NO CHANGES — real system stable, PM_TRAIL working, legacy draining naturally. Eval windows just closed (Aug 16). Need 48h+ data on current params before making changes.
+
+### Verification
+- 24h real system: 15T +$0.25 (46.7% WR) — positive
+- 48h real system: 52T -$0.37 (42.3% WR) — slightly negative
+- PM_TRAIL: 66.7% WR, +$1.09 — working
+- ATR_SL: 17T/48h -$1.15 — entry quality bottleneck
+- ct-hot+ legacy: 32T/24h, no new trades — draining
+- Pipeline: healthy, timer firing
+- Stars7d intact: return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%

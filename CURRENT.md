@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 13:20 UTC  
-**Updated by:** CEO (28th run — verified)
+**Last Updated:** 2026-08-16 13:48 UTC  
+**Updated by:** CEO (29th run — verified)
 
 ## What We're Working On
 
 **Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.15% (reverted from 0.50% — working at 66.7% WR). All legacy losers killed. ct-hot+ DISABLED AGAIN (re-enabled earlier today per user request, but 25T/24h 36% WR -$0.56 still bleeding). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). range_finder+ DISABLED (0.12:1 R:R, never captures gains).
 
-**Current status:** ct-hot+ re-disabled. PM_TRAIL dist 0.15% REVERTED and WORKING: 48h 39T 66.7% WR +$1.09 (avg +0.273%). 24h 51T -$0.53 (37.3% WR — ct-hot+ legacy 25T -$0.56, phantom 5T -$0.10). Real system (excl ct-hot+): healthy. 48h 97T -$0.97 (41.2% WR). 7d 441T -$2.52 (48.8% WR). 2 open flat ($0.00). R:R 0.36:1 (PM_TRAIL +0.273% vs ATR_SL -0.75%). ATR_SL 36T/48h -$2.68 still dominant. Regime NEUTRAL. Pipeline restarted 13:20 UTC.
+**Current status:** ct-hot+ legacy draining (32T/24h, no new trades). PM_TRAIL dist 0.15% WORKING: 48h 39T 66.7% WR +$1.09 (avg +0.27%). 24h 52T -$0.67 (34.6% WR — ct-hot+ legacy 32T). Real system (excl ct-hot+): 15T +$0.25 (46.7% WR). 48h 99T -$1.07 (40.4% WR). Real 48h (excl ct-hot+): 52T -$0.37 (42.3% WR). 7d 441T -$2.61 (48.5% WR). 1 open: GRASS ct-hot+ LONG -0.36% (draining). R:R 0.39:1 (PM_TRAIL +0.27% vs ATR_SL -0.69%). ATR_SL 40T/48h -$2.75 (17T real system -$1.15). Regime NEUTRAL. Pipeline healthy, timer firing. NO CHANGES — real system stable.
 
 ## Active Decisions
 
@@ -63,9 +63,9 @@
 
 ## Next Actions
 
-1. **Monitor ct-hot+ clear.** Re-disabled (flags False). Legacy 25T/24h should age out by Aug 17-18. No new ct-hot+ trades.
-2. **ATR_SL fix evaluation.** Need 48h+ data after Aug 17 to assess 3.0% cap impact. Currently 36T/48h -$2.68.
+1. **Monitor ct-hot+ clear.** Legacy 32T/24h draining. Should age out by Aug 17-18. No new trades. 1 open GRASS position draining.
+2. **ATR_SL entry quality.** 17T/48h real system ATR_SL, -$1.15. Entry quality bottleneck — requires signal-level changes (not param tuning). Monitor.
 3. **PM_TRAIL 0.15% dist monitoring.** Working at 66.7% WR. Must hold >60% WR over 48h. If degrades, revisit 0.25% dist.
-4. **Phantom trades.** 5T/48h -$0.10, root cause in guardian_orphan (hl-sync-guardian). Backlog item.
-5. **Daily trades must ↑.** Low volume Sunday + ct-hot+ disabled = fewer trades. Monitor hl_copy_trader volume.
+4. **Phantom trades.** 6T/48h -$0.10, root cause in guardian_orphan (hl-sync-guardian). Backlog item.
+5. **Daily trades must ↑.** 15T/24h real system. Low volume Sunday + ct-hot+ disabled = fewer trades. Monitor hl_copy_trader volume.
 6. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%, hzscore+,mover+ 4T 75%.
