@@ -88,14 +88,14 @@ def _count_band_touches(closes, upper, lower, window):
     return upper_touches, lower_touches
 
 
-def _get_1h_trend(token):
-    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+def _get_15m_trend(token):
+    """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
-        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 60
@@ -305,8 +305,8 @@ def detect_breakout(closes, token):
     bounce_bonus = min(10, bounce_pct * 20)
     conf += squeeze_bonus + bounce_bonus
 
-    # 1H trend bonus
-    trend = _get_1h_trend(token)
+    # 15m trend bonus
+    trend = _get_15m_trend(token)
     trend_bonus = 0
     if (direction == 'LONG' and trend == 'BULLISH') or \
        (direction == 'SHORT' and trend == 'BEARISH'):

@@ -2,7 +2,7 @@
 """Bollinger Band Bounce — mean reversion for ranging markets.
 
 Improved version with quality filters:
-1. Trend alignment — bounce must align with 1H EMA trend
+1. Trend alignment — bounce must align with 15m EMA trend
 2. RSI confirmation — RSI must confirm oversold/overbought
 3. Strong bounce — price must move away from band significantly
 4. Volume confirmation — bounce should have above-average volume
@@ -96,14 +96,14 @@ def _compute_rsi(closes, period=RSI_PERIOD):
     return 100 - (100 / (1 + rs))
 
 
-def _get_1h_trend(token):
-    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+def _get_15m_trend(token):
+    """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 60
@@ -217,8 +217,8 @@ def detect_bb_bounce(token, closes):
     dist_from_upper = abs(current - upper) / upper * 100 if upper > 0 else 999
     dist_from_lower = abs(current - lower) / lower * 100 if lower > 0 else 999
 
-    # Check 1H trend
-    trend = _get_1h_trend(token)
+    # Check 15m trend
+    trend = _get_15m_trend(token)
 
     # LONG: lower band + RSI oversold + bullish/neutral trend + bounce up
     if dist_from_lower <= BB_TOUCH_PCT and current > prev:

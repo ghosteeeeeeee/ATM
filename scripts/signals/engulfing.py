@@ -9,7 +9,7 @@ Detection (improved 2026-08-11):
   2. Current candle moves > ENGULFING_MIN_MOVE% from previous close
   3. Previous N candles had tight range (< ENGULFING_PRIOR_RANGE%)
   4. Volume confirms the move (> 1.2× average) — entry_gates.volume_gate
-  5. 1H EMA trend alignment — don't fire counter-trend
+  5. 15m EMA trend alignment — don't fire counter-trend
   6. S/R proximity — prefer bounces near structural levels
   7. R:R pre-check — suppress if < 2:1 — entry_gates.rr_gate
   8. Candle close confirmation — skip forming candles — entry_gates.candle_close_gate
@@ -103,14 +103,14 @@ def _get_5m_candles(token, limit=100):
             conn.close()
 
 
-def _get_1h_trend(token):
-    """Check 1H EMA20/50 trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+def _get_15m_trend(token):
+    """Check 15m EMA20/50 trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
-        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 60
@@ -305,8 +305,8 @@ def scan_engulfing_signals():
         if get_cooldown(token, direction=direction):
             continue
 
-        # GATE: 1H trend alignment — block counter-trend engulfing
-        trend = _get_1h_trend(token)
+        # GATE: 15m trend alignment — block counter-trend engulfing
+        trend = _get_15m_trend(token)
         if trend == 'BULLISH' and direction == 'SHORT':
             _log(f"{token} SHORT BLOCKED trend={trend} (counter-trend)")
             continue
