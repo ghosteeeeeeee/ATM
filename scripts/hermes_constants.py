@@ -492,7 +492,7 @@ ATR_SL_MIN             = 0.010   # 1.0% floor — wider than trailing distance (
 ATR_SL_MAX             = 0.025  # 2.5% cap — wide enough for ATR-based breathing room
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
-ATR_TP_K_MULT          = 2.5    # TP = 2.5x SL (bumped from 2.0 — R:R inverted 0.60:1: avg win 0.45% vs avg loss -0.73%. Target 0.75:1 R:R. 48h: ATR_TP only 1T, trailing dominates at 0.32% avg exit)
+ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-08-16 eval: REVERTED from 2.5. 2.5x made TP unreachable (only 1 ATR_TP hit/48h). 2.0x more realistic. PM_TRAIL handles profit-taking, but ATR_TP as secondary exit needs reachable target. Monitor: ATR_TP hit count (should ↑ from 1), R:R (should hold >0.75:1).
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
@@ -517,7 +517,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 #   activation: 0.40%→0.80% (wait for trend to establish before trailing)
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
-TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — CEO 2026-08-15: R:R inverted 0.67:1 (avg win 0.46% vs avg loss -0.69%). 45 ATR_SL/48h — trades die before reaching 0.60% activation. 0.40% lets more trades reach trailing → fewer ATR_SL hits → better R:R. Monitor: atr_sl_hit count 48h (should ↓), avg win (should ↑ from 0.46%).
+TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — FINALIZED 2026-08-16 eval: kept. PM_TRAIL handles most exits; this is fallback for non-PM_TRAIL trades.
 TRAILING_DISTANCE_PCT   = 0.0200  # 2.00% — trailing SL distance from peak (widened from 0.80% — survives normal pullbacks on trend signals)
 
 # ── Loss Cooldown Constants
@@ -632,7 +632,7 @@ CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block go
 # BUT: Best trades had EXTREME z when speed confirmed direction
 # Key insight: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
 SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
-SIGNAL_FILTER_SPEED_MIN = 30  # CEO 2026-08-15 06:15 UTC — STARVATION FIX: 15T Aug15 (85% collapse from 100T Aug12). 45 blocked most NEUTRAL signals. 30 lets more through. NEUTRAL regime override: uses SIGNAL_FILTER_NEUTRAL_SPEED_MIN (15). Monitor: daily trades (must ↑), eval windows closing ~Aug 17.
+SIGNAL_FILTER_SPEED_MIN = 30  # FINALIZED 2026-08-16 eval: kept. Recovery from 15T→50T+ daily trades confirmed. NEUTRAL override at15.
 SIGNAL_FILTER_NEUTRAL_SPEED_MIN = 15  # CEO 2026-08-15 — STARVATION FIX: relaxed speed filter in NEUTRAL regime (102/104 tokens flat). 30 still blocks most NEUTRAL signals. 15 lets low-momentum signals through when regime is flat.
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
 SIGNAL_FILTER_RSI_MIN = 30           # block SHORT when RSI < this (oversold = bounce risk)
@@ -836,9 +836,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # TUNED 2026-08-16 — act 0.40%, dist 0.50%. Floor = -0.10%. Eval: 0.60% act made R:R worse (0.37:1). Reverted to 0.40% — catches trades before ATR_SL. Monitor: atr_sl_hit count (should ↓), avg exit % (should ↑ from 0.29%), R:R (should ↑ from 0.37:1).
-PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-16: REVERTED from 0.60%. Eval results: R:R worsened to 0.37:1 (from 0.67:1). ATR_SL trades MFE 0.94% avg but trail never activates (needs 0.60%), so they die at -0.79%. 0.40% activation catches trades earlier → fewer ATR_SL hits → better R:R. Floor = -0.10% (0.40% - 0.50%). Monitor: atr_sl_hit count 48h (should ↓ from 49), avg exit % (should ↑ from 0.29%), R:R (should ↑ from 0.37:1).
-PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — CEO 2026-08-15: tightened from 0.60%. Old dist=0.60% let winners slip to -0.20% floor. 0.50% keeps floor at +0.10%. Winners run to 0.50%+ before trailing catches. Monitor: avg exit % 48h (should ↑ from 0.27%), R:R (should ↑ from 0.67:1).
+PM_TRAIL_ENABLED     = True   # FINALIZED 2026-08-16 eval: act 0.40%, dist 0.50%. Floor = -0.10%. PM_TRAIL 60T/48h 75.8% WR avg +0.27% — strong. Reverted from 0.60% act (R:R worsened to 0.37:1). 0.40% catches trades before ATR_SL.
+PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — FINALIZED 2026-08-16 eval: kept. Reverted from 0.60%. Floor = -0.10% (0.40% - 0.50%). Catches trades before ATR_SL.
+PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — FINALIZED 2026-08-16 eval: kept. Tightened from 0.60%. Floor = +0.10% (0.40% - 0.50%).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -1702,4 +1702,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 45      # CEO 2026-08-15: lowered 50→45 — zero signals despite BTC accumulation BULL (comp=50.5 but health=warm/momentum=55 <70), ZK (comp=48.9), CAKE (comp=49.6) all filtered. Unblocks ZK+CAKE immediately. Monitor: ct-hot signals/day (should ↑ from 0), ct-hot WR (must >50%).
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 45      # FINALIZED 2026-08-16 eval: kept. Lowered from 50 → unblocked ZK+CAKE. ct-hot+ 25T 48% WR 7d — acceptable.

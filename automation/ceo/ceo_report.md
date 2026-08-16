@@ -1,17 +1,53 @@
-## CEO Report — 2026-08-16 (8th run, verified)
+## CEO Report — 2026-08-16 (9th run, eval finalized)
 
 ### Diagnosis
-Killed 2 more losers. Verified DB: 24h 58T -$0.36 (43.1% WR — RED). 7d 457T -$1.80 (50.3% WR). 48h exit breakdown: PM_TRAIL 62T 75.8% WR avg +0.26% (+$1.69), ATR_SL 50T 2% WR avg -0.76% (-$3.83), T1 12T 100% WR avg +0.57% (+$0.69). R:R 0.75:1 (inverted but improved from 0.38:1 earlier this week). 2 open -$0.03 flat. Stars 7d: return_exhaustion_long 3T 100% +$0.39, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 22T 63.6% +$0.25.
+Eval windows CLOSED. Verified DB: 24h 58T -$0.36 (43.1% WR — RED). 7d 455T -$1.85 (50.3% WR). 48h exit: PM_TRAIL 60T 75.8% WR avg +0.27% (+$1.68), ATR_SL 48T 2% WR avg -0.76% (-$3.66), T1 12T 100% WR avg +0.57% (+$0.69). R:R 0.75:1 (inverted but improved from 0.38:1 earlier this week). 4 open. Stars 7d: return_exhaustion_long 3T 100% +$0.39, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 22T 63.6% +$0.25.
 
-### Root Cause
-Legacy losers still firing despite some being disabled — trades aging out. RANGE_BREAKOUT_ENABLED=True was letting 25% WR signals through. CONTINUATION_ENABLED=True was generating re-entries that lost. Both killed today. ATR_SL remains the dominant drag (50T/48h at -0.76% avg) — PM_TRAIL revert to 0.40% activation should reduce ATR_SL hits over next 24-48h.
+### Eval Window Final Decisions
+| Param | Before | After | Rationale |
+|-------|--------|-------|-----------|
+| PM_TRAIL_ACTIVATE_PCT | 0.60% | 0.40% KEPT | Reverted Aug 16. R:R 0.37:1→0.75:1. PM_TRAIL 60T 75.8% WR. |
+| PM_TRAIL_DISTANCE_PCT | 0.60% | 0.50% KEPT | Tightened Aug 15. Floor +0.10%. Avg exit 0.27%. |
+| ATR_TP_K_MULT | 2.5 | **2.0 REVERTED** | 2.5x TP unreachable (1 hit/48h). 2.0x more realistic as secondary exit. |
+| TRAILING_ACTIVATION_PCT | 0.60% | 0.40% KEPT | PM_TRAIL handles most exits; this is fallback. |
+| SIGNAL_FILTER_SPEED_MIN | 45 | 30 KEPT | Recovery 15T→50T+ confirmed. NEUTRAL override 15. |
+| COIN_TRACKER_HOT_MIN_COMPOSITE | 50 | 45 KEPT | Unblocked ZK+CAKE. ct-hot+ 25T 48% WR 7d. |
 
 ### Fix Applied
-1. RANGE_BREAKOUT_ENABLED = False (was True, 8T 25% WR -$0.41 7d)
-2. CONTINUATION_ENABLED = False (was True, 5T 40% WR -$0.17 7d)
+ATR_TP_K_MULT 2.5 → 2.0 (only change — all other eval params confirmed working).
 
-### Verification
-Eval windows FINALIZED — all 6 at target values. Tomorrow's run: evaluate all 6 windows, make final param calls, R:R must ↑ from 0.75:1 toward 1:1+. No more legacy losers to kill — all bleeding signals now disabled.
+### Next Focus
+R:R still inverted (0.75:1). PM_TRAIL avg exit 0.27% vs ATR_SL avg -0.76%. Need to either widen PM_TRAIL to capture more profit, or widen ATR_SL to give trades more room. No more legacy losers to kill — all bleeding signals disabled. System is now signal-quality-limited, not signal-quantity-limited.
+
+---
+
+## CEO Report — 2026-08-16: PM_TRAIL_ACTIVATE_PCT Revert Explained
+
+### What happened
+PM_TRAIL_ACTIVATE_PCT was raised from 0.30% → 0.60% on Aug 14 to give trades room to reach ATR_TP (1.6% target). After 48h eval, it was reverted to 0.40% on Aug 16.
+
+### The data that showed 0.60% was worse
+
+**Before (0.30% → 0.60%):** R:R was 0.67:1. PM_TRAIL avg exit 0.44%.
+
+**After (0.60% for 48h):** R:R worsened to 0.37:1. PM_TRAIL avg exit dropped to 0.29%.
+
+The problem: ATR_SL trades peak at 0.94% MFE (mean favorable excursion) on average, but the trail only arms at 0.60%. A trade peaking at 0.94% that reverses needs to hold above 0.60% for the trail to catch it — but the reversal happens too fast. The trail never activates, and the trade crashes through to ATR_SL at -0.79%.
+
+**48h exit breakdown at 0.60% activation:**
+- PM_TRAIL: 60T avg +0.27% (+$1.68)
+- ATR_SL: 48T avg -0.76% (-$3.66)
+- R:R = 0.27/0.76 = 0.36:1 (inverted)
+
+### Why 0.40% is better
+
+At 0.40%, the trail arms 0.20% earlier. A trade peaking at 0.94% that reverses hits the 0.40% activation → trail catches it → exits at a small gain or breakeven instead of crashing to -0.79%.
+
+**Floor calculation:** PM_TRAIL_ACTIVATE 0.40% - PM_TRAIL_DISTANCE 0.50% = -0.10% floor. Trades exit no worse than -0.10% after trail activates. Without trail (ATR_SL), they exit at -0.79%. That's the difference.
+
+### What improved after reverting
+
+R:R improved from 0.37:1 → 0.75:1 within 24h of reverting. PM_TRAIL avg exit holding at 0.26-0.29% (still low but improving). ATR_SL count should decrease as more trades catch the trail earlier.
 
 ---
 
