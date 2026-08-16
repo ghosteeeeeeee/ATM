@@ -836,9 +836,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # CEO 2026-08-16: act 0.40%, dist 0.60% (widened from 0.50%). Floor = -0.20%. PM_TRAIL R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance to let winners run. Monitor: avg exit % (should ↑ from 0.27%), R:R (should ↑ from 0.36:1).
-PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-16: kept. Reverted from 0.60% (R:R worsened). Floor = -0.20% (0.40% - 0.60%). Catches trades before ATR_SL.
-PM_TRAIL_DISTANCE_PCT = 0.006  # 0.60% — CEO 2026-08-16: WIDENED from 0.50%. R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance lets winners run. Floor = -0.20% (0.40% - 0.60%). Monitor: avg PM_TRAIL exit (should ↑ from 0.27%), R:R (should ↑ from 0.36:1).
+PM_TRAIL_ENABLED     = True   # CEO 2026-08-16: act 0.30%, dist 0.50%, breakeven guard REMOVED. Floor = -0.20%. Was capping avg exit at 0.24% despite 0.40% activation. Monitor: avg exit % (should ↑ from 0.24%), R:R (should ↑ from 0.42:1), PM_TRAIL capture rate (should ↑ from 54/48h).
+PM_TRAIL_ACTIVATE_PCT = 0.003  # 0.30% — CEO 2026-08-16: LOWERED from 0.40%. Breakeven guard removed. More trades qualify for trailing. Floor = -0.20% (0.30% - 0.50%). Monitor: PM_TRAIL capture rate (should ↑), avg exit (should ↑ from 0.24%).
+PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — CEO 2026-08-16: TIGHTENED from 0.60%. Breakeven guard removed, tighter trail protects gains. Floor = -0.20% (0.30% - 0.50%). Monitor: R:R (should ↑ from 0.42:1), avg PM_TRAIL exit (should ↑ from 0.24%).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 

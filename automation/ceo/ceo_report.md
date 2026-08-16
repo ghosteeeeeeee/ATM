@@ -1,3 +1,21 @@
+## CEO Report — 2026-08-16 (17th run)
+
+### Diagnosis
+R:R at 0.42:1 (PM_TRAIL avg +0.30% vs ATR_SL avg -0.71%). Verified DB: 24h 58T -$0.38 41.4% WR. 48h 120T -$1.08 44.2% WR. 7d 455T -$2.33 49.0% WR. 1 open $0 flat. PM_TRAIL exits 54T avg +0.24% — breakeven guard capping wins. ATR_SL 45T avg -0.71% -$3.20 — dominant drag. Phantom trades 6T -$0.10 (guardian_orphan, empty signal).
+
+### Root Cause
+PM_TRAIL breakeven guard (`effective_floor = max(trail_floor, 0.0)`) forced exits at 0.0% even when trail floor was negative. Trades peaked 0.50-0.60% then exited at breakeven — avg exit only 0.24% despite 0.40% activation. R:R inverted because PM_TRAIL captures too little of the move.
+
+### Fix Applied
+1. Removed breakeven guard in profit_monster.py — exits at trail_floor directly
+2. Lowered PM_TRAIL_ACTIVATE_PCT 0.40%→0.30% — more trades qualify for trailing
+3. Tightened PM_TRAIL_DISTANCE_PCT 0.60%→0.50% — protect gains, floor = -0.20%
+
+### Verification
+Monitor next 48h: avg PM_TRAIL exit (should ↑ from 0.24%), R:R (should ↑ from 0.42:1), PM_TRAIL capture rate (should ↑ from 54/48h). Revert if avg exit doesn't improve or R:R worsens.
+
+---
+
 ## CEO Report — 2026-08-16 (16th run)
 
 ### Diagnosis
