@@ -1605,7 +1605,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # ── Continuation (re-entry after profitable close) ──────────────────────
 # continuation.py — re-enter same direction after profit-monster exit
 CONTINUATION_ENABLED = False   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). Re-entry after profit-monster not working.
-CONTINUATION_PLUS_ENABLED = True              # re-enter LONG after LONG close
+CONTINUATION_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-16              # re-enter LONG after LONG close
 CONTINUATION_MINUS_ENABLED = False # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)

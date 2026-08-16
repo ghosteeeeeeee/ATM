@@ -1,154 +1,25 @@
-## CEO Report — 2026-08-16 (9th run, eval finalized)
+## CEO Report — 2026-08-16 (14th run, verified)
 
 ### Diagnosis
-Eval windows CLOSED. Verified DB: 24h 58T -$0.36 (43.1% WR — RED). 7d 455T -$1.85 (50.3% WR). 48h exit: PM_TRAIL 60T 75.8% WR avg +0.27% (+$1.68), ATR_SL 48T 2% WR avg -0.76% (-$3.66), T1 12T 100% WR avg +0.57% (+$0.69). R:R 0.75:1 (inverted but improved from 0.38:1 earlier this week). 4 open. Stars 7d: return_exhaustion_long 3T 100% +$0.39, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 22T 63.6% +$0.25.
-
-### Eval Window Final Decisions
-| Param | Before | After | Rationale |
-|-------|--------|-------|-----------|
-| PM_TRAIL_ACTIVATE_PCT | 0.60% | 0.40% KEPT | Reverted Aug 16. R:R 0.37:1→0.75:1. PM_TRAIL 60T 75.8% WR. |
-| PM_TRAIL_DISTANCE_PCT | 0.60% | 0.50% KEPT | Tightened Aug 15. Floor +0.10%. Avg exit 0.27%. |
-| ATR_TP_K_MULT | 2.5 | **2.0 REVERTED** | 2.5x TP unreachable (1 hit/48h). 2.0x more realistic as secondary exit. |
-| TRAILING_ACTIVATION_PCT | 0.60% | 0.40% KEPT | PM_TRAIL handles most exits; this is fallback. |
-| SIGNAL_FILTER_SPEED_MIN | 45 | 30 KEPT | Recovery 15T→50T+ confirmed. NEUTRAL override 15. |
-| COIN_TRACKER_HOT_MIN_COMPOSITE | 50 | 45 KEPT | Unblocked ZK+CAKE. ct-hot+ 25T 48% WR 7d. |
-
-### Fix Applied
-ATR_TP_K_MULT 2.5 → 2.0 (only change — all other eval params confirmed working).
-
-### Next Focus
-R:R still inverted (0.75:1). PM_TRAIL avg exit 0.27% vs ATR_SL avg -0.76%. Need to either widen PM_TRAIL to capture more profit, or widen ATR_SL to give trades more room. No more legacy losers to kill — all bleeding signals disabled. System is now signal-quality-limited, not signal-quantity-limited.
-
----
-
-## CEO Report — 2026-08-16: PM_TRAIL_ACTIVATE_PCT Revert Explained
-
-### What happened
-PM_TRAIL_ACTIVATE_PCT was raised from 0.30% → 0.60% on Aug 14 to give trades room to reach ATR_TP (1.6% target). After 48h eval, it was reverted to 0.40% on Aug 16.
-
-### The data that showed 0.60% was worse
-
-**Before (0.30% → 0.60%):** R:R was 0.67:1. PM_TRAIL avg exit 0.44%.
-
-**After (0.60% for 48h):** R:R worsened to 0.37:1. PM_TRAIL avg exit dropped to 0.29%.
-
-The problem: ATR_SL trades peak at 0.94% MFE (mean favorable excursion) on average, but the trail only arms at 0.60%. A trade peaking at 0.94% that reverses needs to hold above 0.60% for the trail to catch it — but the reversal happens too fast. The trail never activates, and the trade crashes through to ATR_SL at -0.79%.
-
-**48h exit breakdown at 0.60% activation:**
-- PM_TRAIL: 60T avg +0.27% (+$1.68)
-- ATR_SL: 48T avg -0.76% (-$3.66)
-- R:R = 0.27/0.76 = 0.36:1 (inverted)
-
-### Why 0.40% is better
-
-At 0.40%, the trail arms 0.20% earlier. A trade peaking at 0.94% that reverses hits the 0.40% activation → trail catches it → exits at a small gain or breakeven instead of crashing to -0.79%.
-
-**Floor calculation:** PM_TRAIL_ACTIVATE 0.40% - PM_TRAIL_DISTANCE 0.50% = -0.10% floor. Trades exit no worse than -0.10% after trail activates. Without trail (ATR_SL), they exit at -0.79%. That's the difference.
-
-### What improved after reverting
-
-R:R improved from 0.37:1 → 0.75:1 within 24h of reverting. PM_TRAIL avg exit holding at 0.26-0.29% (still low but improving). ATR_SL count should decrease as more trades catch the trail earlier.
-
----
-
-## CEO Report — 2026-08-16 (7th run, verified)
-
-### Diagnosis
-Eval windows closing TOMORROW. Verified DB: 24h 58T -$0.36 (43.1% WR — RED). 48h R:R 0.75:1 (avg win 0.49% / avg loss -0.66%) — improved from 0.38:1 earlier today. PM_TRAIL 68T avg +0.29% (+$2.00), ATR_SL 50T avg -0.76% (-$3.83), T1 12T avg +0.57% (+$0.69). 2 open $0 flat. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.31 (5T all losses, ct-hot+ 4T -0.89% avg — likely noise). Best 7d: return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+24h: 55T, -$0.36, 41.8% WR — RED. Today: 16T, 12.5% WR, -$0.60 (ct-hot+ legacy 8T 25% WR -$0.38, 5 unnamed trades 0% WR -$0.14). 48h: 125T, R:R inverted 0.31:1 (PM_TRAIL avg +0.24% vs ATR_SL avg -0.77%). PM_TRAIL 58T +$1.44, ATR_SL 45T -$3.44. 3 open flat. Stars7d intact: return_exhaustion_long 3T 100% +$0.39, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 22T 63.6% +$0.25.
 
 ### Root Cause
-System flat, R:R still inverted but improving (0.38:1 → 0.75:1). PM_TRAIL at 0.40% activation exits at avg 0.29% while ATR_SL takes -0.76% — winners cut too early. Today's 5T all losses is noise (ct-hot+ 4T at -0.89% avg — needs monitoring tomorrow). All legacy bleeders disabled. Eval windows close tomorrow — cannot change params without invalidating results.
+Today's -12.5% WR is **all ct-hot+ legacy trades** — 8T at 25% WR, -$0.38. ct-hot+ disabled earlier today. Legacy trades will clear by tomorrow. The 5 unnamed trades (-$0.14) are also legacy (empty signal field). PM_TRAIL widened to 0.60% distance yesterday — too early to measure impact (needs 48h data).
 
 ### Fix Applied
-NO CHANGES. Eval windows closing tomorrow. Changing params now invalidates 6 eval windows worth of data. All bleeding signals already disabled. Stars intact.
+NO CHANGES. All actions already in place:
+1. ct-hot+ DISABLED (should clear by tomorrow)
+2. PM_TRAIL distance widened 0.50%→0.60% (needs 48h data)
+3. Legacy losers killed (wave_catcher+, range_breakout+, trend_momentum, continuation+)
 
 ### Verification
-Tomorrow's run is CRITICAL: 1) Evaluate all 6 eval windows (PM_TRAIL 0.40% act/0.50% dist, ATR_TP_K_MULT 2.5, TRAILING_ACTIVATION_PCT 0.40%, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45), 2) Final param decisions, 3) R:R must ↑ from 0.75:1 toward 1:1+, 4) ct-hot+ must recover from today's 0% WR (noise or deterioration?), 5) Daily trades must stay >30T.
+- ct-hot+ is 41T/125T 48h, -$0.48 — **38% of total 48h loss**. Once cleared, R:R should improve significantly.
+- PM_TRAIL avg exit 0.24% is still below 0.40% activation target. Wider distance (0.60%) needs time.
+- Without ct-hot+, system runs on bb_bounce+, r2-trend, hzscore+, return_exhaustion — all stars intact.
+- Tomorrow is critical: ct-hot+ legacy clears, wider PM_TRAIL takes effect. R:R must improve from 0.31:1.
 
----
-
-## CEO Report — 2026-08-16 (6th run, verified)
-
-### Diagnosis
-Eval windows closing tomorrow. Verified DB: 24h 55T -$0.14 (45.5% WR — SLIGHTLY RED). 7d: all bad signals already disabled (wave_catcher, mover+, accel-300, trend_momentum). 48h: ATR_SL 48T avg -0.76% (-$3.65), PM_TRAIL 68T avg +0.29% (+$2.00), T1 12T avg +0.57% (+$0.69). 5 open $0 flat. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.09 (2T early). auto_1hr killed ct-hot- SHORT (4T 0% WR -$0.19).
-
-### Root Cause
-System flat, no emergency. PM_TRAIL revert (0.60%→0.40%) just happened — needs 24-48h data. R:R still inverted (PM_TRAIL +0.29% vs ATR_SL -0.76% = 0.38:1) but PM_TRAIL net positive (+$2.00). All legacy bleeders already disabled or aging out. Eval windows close tomorrow — no changes today to keep eval clean.
-
-### Fix Applied
-NO CHANGES. Eval windows closing tomorrow. PM_TRAIL revert needs data. All bleeding signals already disabled. Stars intact.
-
-### Verification
-Tomorrow's run is CRITICAL: 1) Evaluate PM_TRAIL revert (48h data at 0.40% activation), 2) Final eval window decisions (6 windows), 3) Check R:R (should ↑ from 0.38:1), 4) Check daily trades healthy (>30T).
-
----
-
-- [2026-08-16 (5th run, verified)] CEO: NO CHANGES — eval windows closing tomorrow, system flat. Verified DB: 24h 55T -$0.02 (47.3% WR — FLAT). 7d 456T -$1.55 (50.9% WR). R:R 0.43:1 (avg win 0.33% / avg loss 0.77%) — improved from 0.37:1. 48h: ATR_SL 47T avg -0.76% (-$3.60), PM_TRAIL 69T avg +0.29% (+$2.06). 5 open $0 flat. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.04 (1T early). PM_TRAIL revert (0.60%→0.40%) just happened — only 1 trade since, needs 24-48h data. 6 eval windows closing ~Aug 17. DECISION: NO CHANGES — eval windows closing tomorrow, PM_TRAIL revert needs data. CRITICAL: Tomorrow's run evaluates 6 eval windows + PM_TRAIL revert. Monitor: R:R (should ↑ from 0.43:1), atr_sl_hit count (should ↓ from 48), avg exit % (should ↑ from 0.33%).
-
-### Diagnosis
-Eval windows closing tomorrow. Verified DB: 24h 55T -$0.02 (47.3% WR — FLAT). 7d 456T -$1.55 (50.9% WR). R:R 0.43:1 (avg win 0.33% / avg loss 0.77%) — improved from 0.37:1. 48h: ATR_SL 47T avg -0.76% (-$3.60), PM_TRAIL 69T avg +0.29% (+$2.06). 5 open $0 flat. Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.04 (1T early).
-
-### Root Cause
-PM_TRAIL revert from 0.60%→0.40% just happened — only1 trade on Aug 16 since revert. 48h data is mostly from old params. R:R improving (0.37:1→0.43:1). All bad signals already disabled (wave_catcher, mover+, accel-300, trend_momentum). SHORT bleed is legacy trades aging out. System flat — no urgent action needed.
-
-### Fix Applied
-NO CHANGES. Eval windows closing tomorrow. PM_TRAIL revert needs 24-48h data. All bleeding signals already disabled. Stars intact. System flat.
-
-### Verification
-Tomorrow's run is CRITICAL: 1) Evaluate PM_TRAIL revert (48h data), 2) Final eval window decisions (6 windows), 3) Check if SHORT bleed aging out, 4) Check daily trades healthy (>30T).
-
----
-
-- [2026-08-16 (4th run, verified)] CEO: NO CHANGES — eval windows closing tomorrow, system flat. Verified DB: 24h 55T -$0.02 (47.3% WR — FLAT). 7d 458T -$1.53 (50.9% WR). R:R 0.43:1 (avg win 0.33% / avg loss 0.77%) — improved from 0.37:1 earlier. 48h: ATR_SL 48T avg -0.77% (-$3.72), PM_TRAIL 81T avg +0.33% (+$2.75 est). 4 open -$0.02 flat. SHORT 24h: 5T -$0.25 0% WR (ct-hot- 4T + range_finder- 1T — tiny sample). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.04 (1T early). PM_TRAIL revert (0.60%→0.40%) just happened — only 1 trade since, needs 24-48h data. 6 eval windows closing ~Aug 17. DECISION: NO CHANGES — eval windows closing tomorrow, PM_TRAIL revert needs data. CRITICAL: Tomorrow's run evaluates 6 eval windows + PM_TRAIL revert. Monitor: R:R (should ↑ from 0.43:1), atr_sl_hit count (should ↓ from 48), avg exit % (should ↑ from 0.33%).
-
----
-
-## CEO Report — 2026-08-16 (10th run)
-
-### Diagnosis
-ct-hot+ actively deteriorating: 14T/12h at 35.7% WR (was 48-61% earlier this week). #1 ATR_SL producer (13 hits/48h). Verified DB: 24h 59T -$0.47 (40.7% WR — RED). 7d 458T -$1.99 (50.0% WR). R:R 0.47:1 (avg win 0.34% / avg loss 0.72%). 5 open $0 flat. Disabled signals (27T -$1.37) aging out of 7d window.
-
-### Root Cause
-ct-hot+ composite threshold too low (45) — firing on lower-quality setups that immediately hit ATR_SL. Signal degraded post-eval. ATR_SL trades have MFE of only 0.25% — entering at local tops.
-
-### Fix Applied
-RAISED COIN_TRACKER_HOT_MIN_COMPOSITE 45→50. Filters lower-quality entries while maintaining signal diversity. Less aggressive than full kill. Pipeline healthy (restarted 03:46 UTC after crash).
-
-### Verification
-Monitor: ct-hot+ WR (must recover >50%), daily trades (must stay >30T), R:R (should improve as disabled signals age out of 7d window in 24-48h). If ct-hot+ doesn't recover at threshold 50, disable entirely.
-
-## CEO Report — 2026-08-16 (12th run)
-
-### Diagnosis
-24h: 55T -$0.42 (41.8% WR — RED). Today: 15T -$0.60 (13.3% WR — CRITICAL). R:R inverted 0.36:1 (avg win +0.27% vs avg loss -0.76%). ct-hot+ DISABLED but 8T legacy losses today (25% WR). 3 open $0 flat. Daily: Aug 15 +$0.18 → Aug 16 -$0.60. Best 7d: return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-
-### Root Cause
-PM_TRAIL exits winners too early (avg +0.27%) while ATR_SL lets losers run to -0.76%. R:R = 0.36:1 — system bleeds even at 50% WR. Today's critical day driven by ct-hot+ legacy trades (8T all losses). Signal starvation risk without ct-hot+ volume.
-
-### Fix Applied
-**PM_TRAIL_DISTANCE_PCT widened 0.50%→0.60%.** Wider trail distance lets winners run further before trailing catches. Floor moves from -0.10% to -0.20%. Expected: avg exit ↑ from 0.27% toward 0.40%+, R:R ↑ from 0.36:1 toward 0.60:1+. ct-hot+ still disabled — legacy trades aging out.
-
-### Verification
-- R:R should improve in 24-48h as wider PM_TRAIL takes effect
-- Monitor avg PM_TRAIL exit % (target: >0.35%)
-- Monitor daily trades (must stay >30T without ct-hot+)
-- ct-hot+ re-enable threshold: WR >55% with 20+ trades
-
----
-
-## CEO Report — 2026-08-16 (13th run)
-
-### Diagnosis
-Verified DB: 48h 126T -$1.18 (44.4% WR — RED). R:R inverted 0.32:1 (avg win +0.24% vs avg loss -0.76%). 3 open, -$0.02 flat. Today: 15T, 13.3% WR, -$0.60 — driven entirely by ct-hot+ legacy trades (8T, 25% WR). ct-hot+ DISABLED yesterday. ATR_SL dominates: 47T avg -0.76% (-$3.58) = 80% of all losses. PM_TRAIL 58T avg +0.24% (+$1.44) — still tiny wins. Stars7d intact: return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-
-### Root Cause
-ct-hot+ = 33% of 48h trades (41T/126T) and -$0.48 of -$1.18 loss (41% of total). NOW DISABLED — legacy trades should clear by tomorrow. The inverted R:R (0.32:1) is structural: PM_TRAIL exits at +0.24% avg, ATR_SL exits at -0.76% avg. Even at 50% WR, system bleeds.
-
-### Fix Applied
-NO CHANGES. ct-hot+ already disabled. PM_TRAIL distance widened to 0.60% yesterday — needs 24-48h to take effect. All eval windows finalized. Legacy trades aging out. Waiting forct-hot+ volume to clear.
-
-### Verification
-- Monitor 48h R:R without ct-hot+ (should ↑ from 0.32:1)
-- Monitor daily trades (must stay >30T without ct-hot+ — yesterday 54T, recovering)
-- ct-hot+ re-enable threshold: WR >55% with 20+ trades
-- PM_TRAIL avg exit % (should ↑ from 0.24% as wider distance takes effect)
+### Next
+1. **Tomorrow**: Verify R:R without ct-hot+ (target: >0.50:1)
+2. **48h**: PM_TRAIL avg exit should ↑ from 0.24% (wider distance effect)
+3. **Daily trades**: Must recover to 30T+ once ct-hot+ clears
+4. **Stars7d**: Monitor bb_bounce+ (22T 63.6%) and r2-trend-long2 (17T 64.7%) — both performing
