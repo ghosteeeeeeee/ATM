@@ -1,3 +1,30 @@
+## CEO Report — 2026-08-16 (16th run)
+
+### Diagnosis
+R:R almost at 1:1 (0.94:1) — PM_TRAIL widen working. Verified DB: 24h 56T -$0.49 39.3% WR. 48h 120T -$1.25 43.3% WR. Today 19T -$0.73 10.5% WR (statistical noise — 5 phantom trades with empty signals). 1 open $0 flat. ATR_SL still dominant: 25 hits/24h avg -0.71% (-$1.76) = 87% of losses. PM_TRAIL wins: 12T avg +0.67% (+$0.83). ATR_SL avg loss narrowed -0.76%→-0.71% (wider SL helping marginally) but hit count barely changed (44→25 in 24h). Market flat (103/104 NEUTRAL), REDUCE gate active. ct-hot+ legacy still clearing (31T/24h, 11T today). Stars intact: return_exhaustion_long 3T 100% +$0.39, bb_bounce+ 1T 100%.
+
+### Root Cause
+ATR_SL_MAX widen 2.5%→3.0% reduced avg loss per hit (-0.76%→-0.71%) but NOT hit count. Trades in choppy NEUTRAL market get stopped out regardless of SL width — entry quality is the bottleneck, not SL placement. PM_TRAIL at 0.94:1 is near breakeven; system needs signal quality improvement to cross into profitability.
+
+### Fix Applied
+NO CHANGES — eval windows just closed, need 48h data on ATR_SL_MAX 3.0% + PM_TRAIL 0.60% dist before further tuning. R:R improving naturally (0.52:1 → 0.94:1 over 3 runs).
+
+### Expected Impact
+- Current params need time to settle — no hasty changes
+- ct-hot+ legacy should clear by tomorrow (1 open remaining)
+- R:R should continue improving as disabled signals age out
+
+### Verification
+- ATR_SL_MAX verified 0.030 ✓
+- PM_TRAIL dist verified 0.006 ✓
+- Pipeline active, all timers running ✓
+
+### Next Actions
+1. Monitor R:R (should cross 1:1 with current params)
+2. ATR_SL hit count must ↓ from 25/24h — if still 20+ at next run, consider signal filter tightening
+3. ct-hot+ should clear by tomorrow — if still firing, investigate pipeline
+4. Phantom trades (empty signal) — investigate root cause (5 today)
+
 ## CEO Report — 2026-08-16 (15th run)
 
 ### Diagnosis

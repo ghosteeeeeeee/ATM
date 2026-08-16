@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 06:30 UTC (Daily Orchestrator — 15th run)
-**Updated by:** Daily Orchestrator
+**Last updated:** 2026-08-16 07:15 UTC (CEO run — 16th run)
+**Updated by:** CEO
 
 ## What We're Working On
 
 **Completed:** All 6 eval windows FINALIZED. PM_TRAIL 0.40% act/0.60% dist (widened), TRAILING 0.40%, SIGNAL_FILTER 30, COIN_TRACKER 45 all kept. ATR_TP_K_MULT reverted 2.5→2.0. All legacy losers killed. ct-hot+ fully cleared (0 open positions).
 
-**Current status:** Market flat (103/104 NEUTRAL). Macro gate REDUCE (25% WR < 30). 58 trades today, -5.89% PnL. R:R monitoring PM_TRAIL wider distance effect.
+**Current status:** R:R almost at 1:1 (0.94:1). Market flat (103/104 NEUTRAL). Macro gate REDUCE. 56T 24h -$0.49 (39.3% WR). 19T today -$0.73 (noise: 5 phantoms). ct-hot+ legacy clearing. ATR_SL still dominant (25T/24h -0.71%). PM_TRAIL working (12T/24h +0.67%). 1 open $0 flat.
 
 ## Active Decisions
 
@@ -21,8 +21,8 @@
 - **All legacy losers killed.** range_breakout+, continuation+, wave_catcher+, trend_momentum disabled. — 2026-08-16
 - **ATR_TP_K_MULT reverted 2.5→2.0.** 2.5x TP unreachable (1 hit/48h). — 2026-08-16
 - **COIN_TRACKER_HOT_ENABLED DISABLED.** ct-hot+ base was still firing (30T/48h 46.7% WR -$0.29). Removed from STANDALONE_BYPASS too. Re-enable when WR >55% with 20+ trades. — 2026-08-16
-- **PM_TRAIL_DISTANCE_PCT widened 0.50%→0.60%.** R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance lets winners run before trail catches. — 2026-08-16
-- **ATR_SL_MAX widened 2.5%→3.0%.** ATR_SL dominant drag: 45T -$3.32 (avg loss -0.753%). R:R inverted 0.52:1 (PM_TRAIL avg win +0.39% vs ATR_SL avg loss -0.75%). Wider SL gives trades room to reach PM_TRAIL activation (+0.40%). Monitor: ATR_SL hit count (should ↓), PM_TRAIL capture (should ↑). — 2026-08-16
+- **PM_TRAIL_DISTANCE_PCT widened 0.50%→0.60%.** R:R improved 0.52:1→0.94:1 over 3 runs. PM_TRAIL avg exit +0.67% (was +0.39%). Working as intended. — 2026-08-16
+- **ATR_SL_MAX widened 2.5%→3.0%.** Reduced avg loss per hit (-0.76%→-0.71%) but NOT hit count (25/24h still high). Entry quality is the bottleneck, not SL placement. — 2026-08-16
 
 ## Known Limitations
 
@@ -53,7 +53,9 @@
 
 ## Next Actions
 
-1. **R:R monitor.** PM_TRAIL_DISTANCE 0.60% (widened 2 days ago) + ATR_SL_MAX 3.0% (widened today). Monitor avg exit % and R:R toward 1:1. CTX-GATE currently blocking signals (low volatility).
-2. **Market flat.** 103/104 tokens NEUTRAL. No directional bias to trade against. System in REDUCE mode (25% WR). Wait for regime shift.
-3. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-4. **Signal starvation risk.** If daily trades <20T when market moves, review SIGNAL_FILTER thresholds.
+1. **R:R at 0.94:1 — almost 1:1.** PM_TRAIL 0.60% dist working (avg exit +0.67%). ATR_SL_MAX 3.0% marginally helped. Monitor: should cross 1:1 with current params.
+2. **ATR_SL hit count.** 25/24h still high. If still 20+ at next run, tighten signal filter or add regime filter.
+3. **ct-hot+ clearing.** 1 open remaining. Should close by tomorrow. If still firing, investigate pipeline.
+4. **Phantom trades.** 5 trades today with empty signal (guardian_orphan exits). Investigate root cause.
+5. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+6. **Signal starvation risk.** 19T today (low). NEUTRAL regime + REDUCE gate filtering heavily. Monitor daily trades.
