@@ -155,6 +155,35 @@
     </div>
   </div>
 
+  <!-- Raw Signals Section (pre-filter) -->
+  <div class="hot-section" id="rawSection" style="margin-top:20px">
+    <div class="hot-header" style="color:#00b4d8">
+      <span class="fish">📡</span>
+      Raw Signals — before filters/gates
+      <span style="color:#666;font-size:0.7em;margin-left:auto" id="rawUpdated">--</span>
+    </div>
+    <div id="rawTableContainer">
+      <div class="hot-empty" id="rawEmpty">No raw signals — pipeline hasn't written raw data yet</div>
+      <table class="hot-table" id="rawTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Tokens</th>
+            <th>Dir</th>
+            <th>Signal</th>
+            <th>Conf</th>
+            <th>Sources</th>
+            <th>Price</th>
+            <th>RSI</th>
+            <th>Z-Score</th>
+            <th>Blocked By</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="rawBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tab active" onclick="filterTab('all')">All <span id="tab-count-all"></span></button>
     <button class="tab" onclick="filterTab('PENDING')">Pending <span id="tab-count-pending"></span></button>
@@ -404,8 +433,45 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ── Raw Signals (pre-filter) ─────────────────────────────────────────
+    async function loadRaw() {
+      try {
+        const r = await fetch('/data/raw_signals.json?t=' + Date.now());
+        if (!r.ok) { document.getElementById('rawEmpty').style.display = 'block'; document.getElementById('rawTable').style.display = 'none'; return; }
+        const d = await r.json();
+        const signals = d.signals || [];
+        document.getElementById('rawUpdated').textContent = 'Updated: ' + new Date(d.updated * 1000).toLocaleTimeString();
+        if (!signals.length) { document.getElementById('rawEmpty').style.display = 'block'; document.getElementById('rawTable').style.display = 'none'; return; }
+        document.getElementById('rawEmpty').style.display = 'none';
+        document.getElementById('rawTable').style.display = 'table';
+        document.getElementById('rawBody').innerHTML = signals.map(s => {
+          const dir = (s.direction || '').toUpperCase();
+          const dirClass = dir === 'LONG' ? 'dir-long' : dir === 'SHORT' ? 'dir-short' : '';
+          const conf = parseFloat(s.confidence) || 0;
+          const confColor = conf >= 75 ? '#00ff88' : conf >= 50 ? '#ffaa00' : '#ff4444';
+          const blocked = s.blocked_by || '';
+          const blockedColor = blocked ? '#ff4444' : '#00ff88';
+          const blockedText = blocked ? blocked : (s.decision || 'PASS');
+          return `<tr>
+            <td><strong style="color:#00b4d8">${s.token || '--'}</strong></td>
+            <td class="${dirClass}">${dir}</td>
+            <td style="color:#888">${s.signal || '--'}</td>
+            <td><span style="color:${confColor}">${conf.toFixed(1)}%</span></td>
+            <td style="color:#666;font-size:0.8em">${(s.sources || '--')}</td>
+            <td>${s.price ? '$' + parseFloat(s.price).toFixed(6) : '--'}</td>
+            <td style="color:${(s.rsi||0) > 70 ? '#ff4444' : (s.rsi||0) < 30 ? '#00ff88' : '#888'}">${s.rsi ? parseFloat(s.rsi).toFixed(1) : '--'}</td>
+            <td>${s.zscore ? (parseFloat(s.zscore) > 0 ? '<span style="color:#ff4444">+' : '') + parseFloat(s.zscore).toFixed(3) + '</span>' : '--'}</td>
+            <td style="color:${blockedColor};font-size:0.8em">${blockedText}</td>
+            <td style="color:#666;font-size:0.75em">${(s.time || '').replace('T', ' ').slice(0, 16)}</td>
+          </tr>`;
+        }).join('');
+      } catch(e) { document.getElementById('rawEmpty').textContent = 'Error: ' + e.message; }
+    }
+
     load();
+    loadRaw();
     setInterval(load, 30000);
+    setInterval(loadRaw, 10000);
   </script>
 </body>
 </html>

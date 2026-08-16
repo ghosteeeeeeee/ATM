@@ -86,11 +86,20 @@
 
 None — all plans fully implemented.
 
+### Open Items (from CURRENT.md backlog, not in plans/)
+1. **Phantom trades** (guardian_orphan with empty signal) — ~6T/day, -$0.10. Level 2.
+2. **ATR_SL entry quality** — 36T/48h 2.8% WR -$2.37. Main drag. Speed filter raised to 40, monitoring.
+3. **contextmap.md** — signal ecosystem map. Level 1. LOW priority.
+4. **checkpoint_utils.py progress summaries** — human-readable cycle output. Level 1. LOW priority.
+
 ### Already Done (no action needed)
 - weather-vane-v5 (volatility floor) — check_volatility_floor() in signal_compactor.py
 - weather-vane-v4 (tide detection) — get_tide_penalty() in signal_compactor.py
 - weather-vane-v3 (z-score + accel) — get_zscore_accel_penalty() in signal_compactor.py (re-implemented 2026-08-16, was inverted in decider_run.py)
-- weather-vane-v2 (hysteresis, derivative, integral) — directional outcome system in signal_compactor.py
+- weather-vane-v2 (hysteresis, derivative, integral, direction lock, off-course alarm) — directional outcome system in signal_compactor.py
 - progressive-context-shaping (CURRENT.md)
 - directional-outcome-tracker (signal gate + position shield)
 - r2_trend_long trailing SL tuning (TRAILING_ACTIVATION_PCT 0.40%, TRAILING_DISTANCE_PCT 2.00%)
+
+### Re-scan: 2026-08-16 17:20 UTC
+All 8 plans confirmed implemented. No new plan files added since last scan. Next valuable work is from CURRENT.md backlog (phantom trades, ATR_SL monitoring).
