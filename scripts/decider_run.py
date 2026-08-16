@@ -1488,7 +1488,7 @@ def execute_trade(token, direction, price, confidence, source,
 
     try:
         log(f'  [brain.py] EXEC: {" ".join(cmd[:8])}... [{paper_flag}]')
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         log(f'  [brain.py] RC={result.returncode} stdout={result.stdout[:200] if result.stdout else "(empty)"}')
         if result.returncode == 0:
             import re

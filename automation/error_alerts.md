@@ -22,3 +22,13 @@
 - **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK: Command '['/usr/bin/python3', '/root/.hermes/scripts/brain.py', 'trade', 'add',`
+
+## Error Alerts — 2026-08-16 00:18 UTC
+- **CRITICAL** (1x): `hermes-pipeline.service` was INACTIVE — restarted successfully
+- **WARN** (1x): ROLLBACK FAILED: sig#1551768 already claimed by another process (race condition)
+- **WARN** (6x): 6 services in failed state: better-coder (missing module), hl-volume (API error), mtf-macd-tuner, bug-hunter, trading-checklist, wasp
+- **INFO**: Pipeline OK after restart. 5 open positions, 0 closed today, -1.57% PnL
+- **INFO**: Regime NEUTRAL (102 neutral, 1 long, 1 short). 56 signals/hr. 412 in queue
+- **INFO**: Disk 72% used, all critical timers firing
+- **AUTO-FIX**: Restarted `hermes-pipeline.service` (was inactive)
+- **NOTE**: better-coder/hl-volume/mtf-macd-tuner failures are non-critical code/API issues, not trading-impacting
