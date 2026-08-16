@@ -740,3 +740,7 @@
   WHY: 2T last hour (ALT +$0.08, SUSHI +$0.03 — net +$0.11). 24h 57T 45.6% ATR SL (above 40% but ct-hot+ disabled). ct-hot+ still generating composite trades (7 opened in last 6h). No 0% WR kill candidates. continuation+ 5T 40% WR. 2/hr normal. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 08:30 UTC
+[2026-08-16 08:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour (dead hour, Sunday morning UTC). 24h 53T 49.1% ATR SL (above 40% but ct-hot+ disabled). ct-hot+ 27T 33.3% WR -$0.76 — positions draining. return_exhaustion_long 3T 100% WR best signal. continuation+ 2T 0% WR (below 3T kill threshold). 2 open positions at breakeven. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 09:30 UTC

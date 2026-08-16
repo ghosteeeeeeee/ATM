@@ -8961,3 +8961,38 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ct-hot+ composite signals still opening trades despite disable — need composite signal filtering?
 - ATR SL rate should improve as ct-hot+ positions close
+
+## [2026-08-16 08:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed (dead hour — Sunday morning UTC)
+**PnL:** $0.00
+
+**24h Snapshot:**
+- 53 trades, -$0.76 net, 35.8% WR
+- ATR SL hit: 26/53 = 49.1% (above 40% but driven by ct-hot+ legacy)
+- ct-hot+: 27T 33.3% WR -$0.76 — already disabled, positions draining
+- ct-hot-: 4T 0% WR -$0.19 — already killed Aug 15
+- return_exhaustion_long: 3T 100% WR +$0.39 (best signal)
+- r2-trend signals: 3T 100% WR +$0.15 (all winners)
+- continuation+: 2T 0% WR -$0.18 (below 3T kill threshold)
+
+**Open Positions:** 2 (BLUR LONG, HYPE SHORT) — both at $0.00 unrealized
+
+**Diagnosis:**
+1. **Entry quality:** No trades last hour, can't assess
+2. **SL behavior:** ATR SL 49.1% — above 40% but entirely from ct-hot+ legacy (27 of 26 ATR SL hits are ct-hot+). Already disabled.
+3. **Signal quality:** No new kill candidates. continuation+ at 2T 0% (below 3T threshold).
+4. **Trade frequency:** 0/hr dead hour. 53/24h = ~2.2/hr normal.
+
+**Changes:** None. System self-correcting via ct-hot+ disable.
+
+**No Change Needed:**
+- ct-hot+ already disabled, positions draining
+- ct-hot- already killed
+- No 0% WR kill candidates
+- 0 trades = Sunday morning market conditions
+- 2 open positions near breakeven
+
+**Open Questions:**
+- ATR SL rate should drop below 40% as ct-hot+ positions close
+- continuation+ at 2T 0% — watching for kill threshold
