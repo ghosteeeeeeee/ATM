@@ -315,11 +315,11 @@ def detect_range_short(token, closes):
     # Volume confirmation — required, fail-closed
     vol_avg = _get_volume_avg(token)
     vol_current = _get_current_volume(token)
-    if not vol_avg or vol_avg <= 0 or vol_current is None:
-        return None  # No volume data — can't confirm, skip
-    vol_ratio = vol_current / vol_avg
-    if vol_ratio < MIN_VOLUME_RATIO:
-        return None
+    if vol_avg and vol_avg > 0 and vol_current is not None and vol_current > 0:
+        vol_ratio = vol_current / vol_avg
+        if vol_ratio < MIN_VOLUME_RATIO:
+            return None
+    # If no volume data or zero volume, allow (don't block on missing data)
 
     # Confidence: touches + range width + trend alignment
     touch_bonus = min(20, total_touches * 3)

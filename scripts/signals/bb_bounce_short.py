@@ -235,11 +235,11 @@ def detect_bb_bounce_short(token, closes):
     # Volume confirmation
     vol_avg = _get_volume_avg(token)
     vol_current = _get_current_volume(token)
-    if vol_avg and vol_avg > 0 and vol_current is not None:
+    if vol_avg and vol_avg > 0 and vol_current is not None and vol_current > 0:
         vol_ratio = vol_current / vol_avg
         if vol_ratio < MIN_VOLUME_RATIO:
             return None  # Insufficient volume
-    # If no volume data, allow (don't block on missing data)
+    # If no volume data or zero volume, allow (don't block on missing data)
 
     # Momentum fade: require 5m velocity negative (price already falling)
     try:

@@ -239,11 +239,11 @@ def detect_return_exhaustion_short(token: str, prices: list) -> Optional[Dict]:
     # Volume confirmation — fail-closed
     vol_avg = _get_volume_avg(token)
     vol_current = _get_current_volume(token)
-    if not vol_avg or vol_avg <= 0 or vol_current is None:
-        return None  # No volume data — skip
-    vol_ratio = vol_current / vol_avg
-    if vol_ratio < MIN_VOLUME_RATIO:
-        return None
+    if vol_avg and vol_avg > 0 and vol_current is not None and vol_current > 0:
+        vol_ratio = vol_current / vol_avg
+        if vol_ratio < MIN_VOLUME_RATIO:
+            return None
+    # If no volume data or zero volume, allow (don't block on missing data)
 
     # Compute returns at multiple periods
     short_ret = (prices[-1] - prices[-1 - RETURN_SHORT]) / (prices[-1 - RETURN_SHORT] + 1e-10) * 100
