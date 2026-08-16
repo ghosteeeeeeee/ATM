@@ -1184,16 +1184,14 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
-    # ct-hot — CEO 2026-08-16: removed, ct-hot+ DISABLED (30T/48h 46.7% WR -$0.29)
-    # continuation — CEO 2026-08-16: removed, CONTINUATION_ENABLED=False. No bypass for dead signals.
+    'tl_break_short', 'tl-break-short',  # re-enabled 2026-08-16 per user
+    'return_exhaustion_short', 'return-exhaustion-short',  # re-enabled 2026-08-16 per user
+    'range_breakout_short', 'range-breakout-short',  # re-enabled 2026-08-16 per user (12-trade streak)
     'accel-300',
     'hzscore', 'return_exhaustion_long',
-    'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
-    'hl_copy_trader',  # CEO 2026-08-16: copy-trading signal — inherent confluence (follows top traders). Blocked by confluence gate in NEUTRAL.
-    # CEO 2026-08-15 — removed: range_finder (9T 33.3% WR -$0.14 24h — bleeding not helping starvation),
-    # range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
-    # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False),
-    # range_breakout (standalone 8T 25% WR -$0.41 7d. combos profitable)
+    'r2l-long', 'r2-trend-long', 'r2-trend-short',
+    'hl_copy_trader',
+    'wave_catcher', 'wave-catcher',  # re-enabled 2026-08-16 per user
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
