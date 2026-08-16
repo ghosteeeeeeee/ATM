@@ -1184,13 +1184,14 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce',
-    'return_exhaustion_short', 'return-exhaustion-short',  # re-enabled 2026-08-16 per user
-    'range_breakout_short', 'range-breakout-short',  # re-enabled 2026-08-16 per user (12-trade streak)
+    'return_exhaustion_short', 'return-exhaustion-short',
+    'range_breakout_short', 'range-breakout-short',
     'accel-300',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'hl_copy_trader',
-    'wave_catcher', 'wave-catcher',  # re-enabled 2026-08-16 per user
+    'wave_catcher', 'wave-catcher',
+    'ct-hot+', 'ct-hot-', 'coin_tracker_hot',  # re-enabled 2026-08-16 per user
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)

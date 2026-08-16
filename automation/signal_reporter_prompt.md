@@ -73,10 +73,11 @@ from hermes_constants import *
 ```
 
 For each kill:
-1. Edit `scripts/hermes_constants.py` to set `*_ENABLED = False`
+1. Edit `scripts/hermes_constants.py` to set `*_ENABLED = False` (MUST actually change True→False)
 2. Add to `NEVER_REENABLE_FLAGS` if it's a repeat offender
-3. Git commit: `git commit -m "signals: kill [signal] — X% WR, $Y PnL (24h)"`
-4. **Report to CEO kanban:**
+3. **VERIFY the flag is actually False** — re-read the file and confirm the line reads `= False`
+4. Git commit: `git commit -m "signals: kill [signal] — X% WR, $Y PnL (24h)"`
+5. **Report to CEO kanban:**
 ```markdown
 ## TEAM UPDATES
 - [YYYY-MM-DD HH:MM] signal_reporter: Killed [signal] — [reason]
