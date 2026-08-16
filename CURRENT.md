@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 22:00 UTC  
-**Updated by:** CEO (41st run)
+**Last Updated: 2026-08-16 22:30 UTC
+**Updated by: CEO (42nd run)
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.15% WORKING (68.3% WR +$1.09/48h). All legacy losers killed. Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→15).
 
-**Current status:** ct-hot+ USER TESTING MODE (flags True, "DO NOT DISABLE"). MIN_COMPOSITE raised 65→70 (65 wasn't filtering — 15T/24h 20% WR -$0.73, ALL in NEUTRAL regime). Non-ct-hot system: 57T/48h -$0.06 (flat/healthy). PM_TRAIL 48h: 41T 68.3% WR +$1.09 (only winner). ATR_SL 48h: 39T 2.6% WR -$2.42 (dominant drag). R:R 0.41:1. 7d: 439T -$2.79 (48.3% WR). Today Aug16: 38T -$0.71 (31.6% WR — worst day). 3 open: BSV SHORT +0.48%, JUP SHORT +1.17%, INJ LONG -0.34%. Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 23T 60.9% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
+**Current status:** ct-hot+ USER TESTING MODE (flags True, "DO NOT DISABLE"). MIN_COMPOSITE raised 70→75 (70 wasn't filtering — 12T/24h 25% WR -$0.49, ALL 11 trades NEUTRAL regime). Non-ct-hot system: 28T/24h -$0.09 (flat/healthy). PM_TRAIL 48h: 43T 69.8% WR +$1.22 (only winner). ATR_SL 48h: 39T 2.6% WR -$2.42 (dominant drag, ct-hot+ = 18/39 = 46%). R:R 0.51:1. 7d: 441T -$2.66 (48.5% WR). Today Aug16: 40T -$0.58 (35.0% WR). 3 open: ETH +$0.01, W +$0.24, INJ -$0.50. Stars7d: return_exhaustion_long 4T 100% +$0.43, r2-trend-long2 17T 64.7% +$0.19, r2-trend-long6 3T 100% +$0.16.
 
 ## Active Decisions
 
@@ -32,6 +32,7 @@
 - **RANGE_FINDER_SHORT_ENABLED DISABLED.** All range_finder variants dead. — 2026-08-16
 - **SHORT side is a net drag.** 12T/48h 8.3% WR -$0.40. All range_finder SHORT killed. Do NOT enable new SHORT signals until regime shifts to SHORT_BIAS. — 2026-08-16
 - **MIN_COMPOSITE raised 65→70.** ct-hot+ 15T/24h 20% WR -$0.73 (74% of loss). ALL 12 trades today NEUTRAL regime 25% WR. Higher threshold = fewer noise entries in flat markets. — 2026-08-16
+- **MIN_COMPOSITE raised 70→75.** ct-hot+ 12T/24h 25% WR -$0.49 (100% of loss). ALL 11 trades NEUTRAL regime. 70 still lets marginal setups through. Target: <5 ct-hot+ trades/24h. — 2026-08-16
 - **COIN_TRACKER_HOT DISABLED AGAIN.** MIN_COMPOSITE 70 — ct-hot+ still bleeding in NEUTRAL. Re-enable only when WR >55% with 20+ trades and MIN_COMPOSITE filter proven. — 2026-08-16
 - **SIGNAL_FILTER_SPEED_MIN raised 30→40.** ATR_SL 37T/48h 2.7% WR -$2.45 dominates. Higher speed min = fewer but better entries. NEUTRAL override at15 unchanged. — 2026-08-16
 - **WAVE_CATCHER_MINUS_ENABLED DISABLED.** Was True per user testing, but 4T/48h 25% WR -$0.09. No edge. — 2026-08-16
@@ -71,10 +72,10 @@
 
 ## Next Actions
 
-1. **MIN_COMPOSITE 70 eval window.** Just raised 65→70. ct-hot+ 15T/24h 20% WR -$0.73 — ALL in NEUTRAL regime. Target: <8 ct-hot+ trades/24h. Monitor daily trades (must >20T). — 2026-08-16
-2. **ct-hot+ user TESTING MODE.** Flags True (user re-enabled). 15T/24h -$0.73 20% WR. Cannot disable. MIN_COMPOSITE 70 should filter NEUTRAL noise. — 2026-08-16
-3. **PM_TRAIL 0.20% dist.** 68.3% WR +$1.09/48h (41T). Must hold >60%. — 2026-08-16
-4. **R:R 0.41:1** — still inverted. PM_TRAIL +0.257% vs ATR_SL -0.633%. Only lever: reduce ATR_SL frequency (MIN_COMPOSITE 70, SPEED_MIN 40). — 2026-08-16
-5. **Stars7d intact:** return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 23T 60.9% +$0.21, r2-trend-long2 17T 64.7% +$0.19. — 2026-08-16
+1. **MIN_COMPOSITE 75 eval window.** Just raised 70→75. ct-hot+ 12T/24h 25% WR -$0.49 — ALL NEUTRAL regime. Target: <5 ct-hot+ trades/24h. Monitor daily trades (must >20T). — 2026-08-16
+2. **ct-hot+ user TESTING MODE.** Flags True (user re-enabled). 12T/24h -$0.49 25% WR. Cannot disable. MIN_COMPOSITE 75 should further filter NEUTRAL noise. — 2026-08-16
+3. **PM_TRAIL 0.20% dist.** 69.8% WR +$1.22/48h (43T). Must hold >65%. — 2026-08-16
+4. **R:R 0.51:1** — still inverted. PM_TRAIL +0.28% vs ATR_SL -0.63%. Only lever: reduce ATR_SL frequency (MIN_COMPOSITE 75, SPEED_MIN 40). — 2026-08-16
+5. **Stars7d intact:** return_exhaustion_long 4T 100% +$0.43, r2-trend-long2 17T 64.7% +$0.19, r2-trend-long6 3T 100% +$0.16. — 2026-08-16
 6. **Phantom trades.** guardian_orphan 6T -$0.10/48h. Backlog item. — 2026-08-16
 7. **Legacy age-out.** ct-hot+ old entries clearing Aug 17-18. — 2026-08-16

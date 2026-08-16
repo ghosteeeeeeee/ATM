@@ -1183,7 +1183,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce',
+    'spike_exhaustion_short',
     'return_exhaustion_short', 'return-exhaustion-short',
     'range_breakout_short', 'range-breakout-short',
     'accel-300',
@@ -1704,4 +1704,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 70      # CEO 2026-08-16: RAISED from 65. ct-hot+ 15T/24h 20% WR -$0.73 (74% of loss). ALL 12 trades today NEUTRAL regime 25% WR. Higher composite = fewer noise entries in flat markets. Target: <8 ct-hot+ trades/24h.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 75      # CEO 2026-08-16 (42nd run): RAISED from 70. ct-hot+ 12T today 25% WR -$0.49 (100% of loss). ALL 11 trades NEUTRAL regime. MIN_COMPOSITE 70 still lets marginal setups through. Target: <5 ct-hot+ trades/24h, daily trades >20T.
