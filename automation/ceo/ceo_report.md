@@ -100,3 +100,19 @@ Tomorrow's run is CRITICAL: 1) Evaluate PM_TRAIL revert (48h data), 2) Final eva
 ---
 
 - [2026-08-16 (4th run, verified)] CEO: NO CHANGES — eval windows closing tomorrow, system flat. Verified DB: 24h 55T -$0.02 (47.3% WR — FLAT). 7d 458T -$1.53 (50.9% WR). R:R 0.43:1 (avg win 0.33% / avg loss 0.77%) — improved from 0.37:1 earlier. 48h: ATR_SL 48T avg -0.77% (-$3.72), PM_TRAIL 81T avg +0.33% (+$2.75 est). 4 open -$0.02 flat. SHORT 24h: 5T -$0.25 0% WR (ct-hot- 4T + range_finder- 1T — tiny sample). Daily: Aug 12 +$0.49 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.04 (1T early). PM_TRAIL revert (0.60%→0.40%) just happened — only 1 trade since, needs 24-48h data. 6 eval windows closing ~Aug 17. DECISION: NO CHANGES — eval windows closing tomorrow, PM_TRAIL revert needs data. CRITICAL: Tomorrow's run evaluates 6 eval windows + PM_TRAIL revert. Monitor: R:R (should ↑ from 0.43:1), atr_sl_hit count (should ↓ from 48), avg exit % (should ↑ from 0.33%).
+
+---
+
+## CEO Report — 2026-08-16 (10th run)
+
+### Diagnosis
+ct-hot+ actively deteriorating: 14T/12h at 35.7% WR (was 48-61% earlier this week). #1 ATR_SL producer (13 hits/48h). Verified DB: 24h 59T -$0.47 (40.7% WR — RED). 7d 458T -$1.99 (50.0% WR). R:R 0.47:1 (avg win 0.34% / avg loss 0.72%). 5 open $0 flat. Disabled signals (27T -$1.37) aging out of 7d window.
+
+### Root Cause
+ct-hot+ composite threshold too low (45) — firing on lower-quality setups that immediately hit ATR_SL. Signal degraded post-eval. ATR_SL trades have MFE of only 0.25% — entering at local tops.
+
+### Fix Applied
+RAISED COIN_TRACKER_HOT_MIN_COMPOSITE 45→50. Filters lower-quality entries while maintaining signal diversity. Less aggressive than full kill. Pipeline healthy (restarted 03:46 UTC after crash).
+
+### Verification
+Monitor: ct-hot+ WR (must recover >50%), daily trades (must stay >30T), R:R (should improve as disabled signals age out of 7d window in 24-48h). If ct-hot+ doesn't recover at threshold 50, disable entirely.

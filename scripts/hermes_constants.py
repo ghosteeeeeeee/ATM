@@ -1702,4 +1702,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 45      # FINALIZED 2026-08-16 eval: kept. Lowered from 50 → unblocked ZK+CAKE. ct-hot+ 25T 48% WR 7d — acceptable.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 50      # CEO 2026-08-16: RAISED from 45→50. ct-hot+ deteriorating: 14T/12h 35.7% WR -$0.32, #1 ATR_SL producer (13 hits/48h). Eval finalized at 45 but signal degraded post-eval. Filter out lower-quality entries. Monitor: ct-hot+ WR (must recover >50%), daily trades (must stay >30T).

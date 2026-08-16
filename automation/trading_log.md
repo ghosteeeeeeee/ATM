@@ -8720,3 +8720,38 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - 4T all SL in one hour is a cluster — possible market micro-dump. Monitor next hour.
 - range_finder+ continues to drag (9T 33.3% WR -$0.14) — approaching kill threshold
+
+---
+
+## 2026-08-16 02:00 UTC — Hourly Analysis
+
+**Trades:** 1 closed (1 breakeven, 0 losses)
+**PnL:** $0.00 (profit-monster-trail breakeven guard exit)
+
+**24h Snapshot:**
+- 59 trades total, -$0.36 net, 42.4% WR
+- ATR SL hit rate: 40.7% (at threshold)
+- Profit-monster-trail: 21T, +$0.71, compensates atr_sl_hit 24T -$1.69
+
+**Signal Performance (24h):**
+- ⚠️ ct-hot+: 25T, 48% WR, -$0.10 (highest volume, slightly negative)
+- ⚠️ range_finder+: 9T, 33.3% WR, -$0.14 (losing)
+- ❌ ct-hot-: 4T, 0% WR, -$0.19 (below kill threshold — only 4T)
+- ✅ return_exhaustion_long: 3T, 100% WR, +$0.39 (tiny sample)
+
+**Diagnosis:**
+1. **Entry quality:** Last trade breakeven — PM trail guard caught at 0.0%.
+2. **SL behavior:** ATR SL at 40.7% — at threshold. CEO reverted PM_TRAIL_ACTIVATE_PCT to 0.40% to address.
+3. **Signal quality:** No signal meets kill threshold (0% WR with 3+ trades last hour).
+4. **Trade frequency:** ~2.3/hr — normal.
+
+**Changes:** None. No signal meets kill threshold. CEO eval window closes Aug 17 — monitoring PM_TRAIL adjustments.
+
+**No Change Needed:**
+- ATR SL rate at threshold, not above 40% trigger
+- No signal at kill criteria
+- Trade frequency normal
+
+**Open Questions:**
+- ct-hot+ at 25T with 48% WR and -$0.10 — persistent small loser but WR not 0%
+- Last 6h slightly negative (-$0.49 across 14 trades) — normal variance or regime shift?
