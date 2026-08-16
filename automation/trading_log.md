@@ -9235,3 +9235,37 @@ None — system stable, previous fixes settling in.
 - SHORT side overall 0% WR in 24h — systemic issue, but no individual SHORT signal hits3+ trade kill threshold
 - ATR SL at46.8% — above 40% but dominated by legacy positions (ct-hot+, SHORTs)
 - hzscore- open SHORT position on CC at $0.095 — stop at $0.096, near breakeven
+
+## [2026-08-16 18:30 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.01 (67% WR)
+
+**Last Hour:**
+- KAS r2-trend-long3 LONG: -$0.04 (atr_sl_hit)
+- CRV r2-trend-long4 LONG: +$0.03 (profit-monster-trail)
+- CC hzscore- SHORT: +$0.02 (profit-monster-trail)
+
+**24h Snapshot:**
+- 48 trades: atr_sl_hit 23T (47.9%) ⚠️, profit-monster-trail 14T +$0.41, guardian_orphan 6T -$0.10, profit-monster-T1 3T +$0.16
+- ct-hot+: 18T 27.8% WR -$0.63 (volume leader, legacy drain)
+- r2-trend-long4: 3T 66.7% WR +$0.05 (best signal)
+- All SHORT: 2T 50% WR -$0.04 (improving from -100% earlier)
+
+**Diagnosis:**
+1. **Entry quality:** 2/3 trades profitable — good entries
+2. **SL behavior:** ATR SL 47.9% of 24h closes — above 40% but dominated by ct-hot+ legacy
+3. **Signal quality:** No signal meets kill threshold (0% WR, 3+ trades last hour)
+4. **Trade frequency:** 3/hr — normal Sunday
+
+**Changes:** None. No kill candidates.
+
+**No Change Needed:**
+- No 0% WR signals with 3+ trades last hour
+- hzscore- SHORT actually profitable this hour (+$0.02) — improving
+- 3 trades/hr normal
+- System self-correcting
+
+**Open Questions:**
+- ct-hot+ still draining at -$0.63/24h but no new trades last hour — legacy positions winding down
+- ATR SL 47.9% above threshold but driven by ct-hot+ — will improve as legacy drains

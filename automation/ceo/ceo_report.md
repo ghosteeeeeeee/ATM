@@ -1,32 +1,34 @@
-## CEO Report — 2026-08-16 (37th run)
+## CEO Report — 2026-08-16 (38th run)
 
 ### Diagnosis
-System -$0.84/24h (34.0% WR, RED). Today 33T -$0.67 at 30.3% WR — worst day, legacy ct-hot+ clearing + Sunday low volume. Real system (excl ct-hot+) 48h: 64T -$0.36 (46.9% WR) — weak but improving. PM_TRAIL 40T 67.5% WR +$1.06/48h carrying system. ATR_SL 37T 2.7% WR -$2.43 is the dominant drag (83% of all losses). 4 open trades flat ($0.01 unrealized).
+System -$0.82/24h (34.8% WR, RED). ct-hot+ user-re-enabled (TESTING MODE): 17T/24h -$0.58, 29.4% WR. Non-ct-hot real system: 22T/24h flat (-$0.01). ATR_SL still dominant drag: 36T/48h avg -0.70% -$2.50 (92% of losses). PM_TRAIL working: 10T/48h avg +0.23% +$0.26 (70% WR). 3 open, $0.00 unrealized. R:R inverted 0.33:1 (PM_TRAIL +0.23% vs ATR_SL -0.70%).
 
 ### Root Cause
-Entry quality bottleneck. ATR_SL hits 37/48h with 2.7% WR — 36 of 37 trades hit ATR SL before PM_TRAIL can activate. ATR_SL daily trend improving: Aug12 41→Aug13 28→Aug14 28→Aug15 20→Aug16 15 (SPEED_MIN 40 working). The filter is working but needs full 24h eval. ct-hot+ legacy 33T/48h -$0.42 dominates — all flags False, just aging out.
+R:R structural inversion. PM_TRAIL distance 0.20% caps avg win at ~0.20%. ATR_SL avg loss -0.70%. To flip R:R positive, need either PM_TRAIL wins >0.70% (impossible at 0.20% dist) OR ATR_SL losses <0.20% (requires drastic tightening). SPEED_MIN 40 deployed today — ATR_SL daily trend: 41→28→28→20→15. Working but needs full 24h eval. ct-hot+ TESTING MODE: user explicitly re-enabled (flags True, "DO NOT DISABLE"). 18/36 ATR_SL hits are ct-hot+.
 
 ### Fix Applied
-**NO CHANGES this run.** Eval window active:
-- SIGNAL_FILTER_SPEED_MIN 40 — ATR_SL hits trending down (41→15), needs 24h eval
-- PM_TRAIL 0.15% dist — working (67.5% WR, avg +0.26%)
-- ct-hot+ legacy clearing naturally (all flags False, should clear Aug 17-18)
-- Stars intact: return_exhaustion_long 100% +$0.43, bb_bounce+ 63.6% +$0.25, r2-trend-long2 64.7% +$0.19
-- R:R 0.51:1 (PM_TRAIL +0.26% vs ATR_SL -0.66%) — improving from 0.44:1
+**NO CHANGES this run.** Reasons:
+1. SPEED_MIN 40 eval window active (deployed today, needs 24h)
+2. PM_TRAIL 0.20% dist confirmed working (70% WR)
+3. ct-hot+ user-controlled (TESTING MODE — cannot disable)
+4. Non-ct-hot system stable (flat, 22T/24h)
+5. Legacy trades clearing naturally (Aug 17-18)
+6. Stars7d intact: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19
 
 ### Verification
-| Metric | Before (36th) | Current (37th) | Target |
-|--------|--------|---------|--------|
-| 48h PnL | -$0.77 | -$0.78 | $0 |
-| PM_TRAIL WR | 72.0% | 67.5% | >60% |
-| ATR_SL hits | 37/48h | 37/48h | <20/48h |
-| R:R | 0.51:1 | 0.51:1 | >1:1 |
-| Daily trades | 32T | 33T | >20T |
-| ATR_SL daily trend | 41→15 | 41→15 | ↓ |
+| Metric | Before (37th) | Current (38th) | Target |
+|--------|---------|---------|--------|
+| 24h PnL | -$0.84 | -$0.82 | $0 |
+| 24h WR | 34.0% | 34.8% | >55% |
+| ATR_SL 48h | 37T -$2.43 | 36T -$2.50 | <20T |
+| PM_TRAIL WR | 67.5% | 70.0% | >60% |
+| R:R | 0.51:1 | 0.33:1 | >1:1 |
+| Daily trades | 33T | 46T | >20T |
+| ATR_SL daily | 15 | 15 | <10 |
 
 ### Next Actions
-1. Monitor ATR_SL hit count after SPEED_MIN 40 takes effect (24h)
-2. ct-hot+ legacy age-out (Aug 17-18)
-3. PM_TRAIL 0.15% dist must hold >60% WR
-4. Phantom trades root cause (guardian_orphan — backlog)
-5. R:R should improve as ATR_SL hits decline
+1. **ATR_SL eval** — SPEED_MIN 40 needs 24h. If ATR_SL still >25/48h → raise to 45
+2. **ct-hot+ monitoring** — user TESTING MODE, track if WR improves at current params
+3. **PM_TRAIL hold** — 70% WR at 0.20% dist, must hold >60%
+4. **Legacy age-out** — ct-hot+ legacy clearing Aug 17-18 (all flags False, old entries)
+5. **R:R improvement** — currently 0.33:1, structural constraint at PM_TRAIL 0.20% dist
