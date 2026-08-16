@@ -155,35 +155,6 @@
     </div>
   </div>
 
-  <!-- Raw Signals Section (pre-filter) -->
-  <div class="hot-section" id="rawSection" style="margin-top:20px">
-    <div class="hot-header" style="color:#00b4d8">
-      <span class="fish">📡</span>
-      Raw Signals — before filters/gates
-      <span style="color:#666;font-size:0.7em;margin-left:auto" id="rawUpdated">--</span>
-    </div>
-    <div id="rawTableContainer">
-      <div class="hot-empty" id="rawEmpty">No raw signals — pipeline hasn't written raw data yet</div>
-      <table class="hot-table" id="rawTable" style="display:none">
-        <thead>
-          <tr>
-            <th>Tokens</th>
-            <th>Dir</th>
-            <th>Signal</th>
-            <th>Conf</th>
-            <th>Sources</th>
-            <th>Price</th>
-            <th>RSI</th>
-            <th>Z-Score</th>
-            <th>Blocked By</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody id="rawBody"></tbody>
-      </table>
-    </div>
-  </div>
-
   <div class="tabs">
     <button class="tab active" onclick="filterTab('all')">All <span id="tab-count-all"></span></button>
     <button class="tab" onclick="filterTab('PENDING')">Pending <span id="tab-count-pending"></span></button>
@@ -216,6 +187,35 @@
   </table>
 
   <div id="pagination-bottom"></div>
+
+  <!-- Raw Signals Section (pre-filter) -->
+  <div class="hot-section" id="rawSection" style="margin-top:30px;border-top:1px solid #00b4d833;padding-top:20px">
+    <div class="hot-header" style="color:#00b4d8">
+      <span class="fish">📡</span>
+      Raw Signals — before filters/gates
+      <span style="color:#666;font-size:0.7em;margin-left:auto" id="rawUpdated">--</span>
+    </div>
+    <div id="rawTableContainer">
+      <div class="hot-empty" id="rawEmpty">No raw signals — pipeline hasn't written raw data yet</div>
+      <table class="hot-table" id="rawTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Tokens</th>
+            <th>Dir</th>
+            <th>Signal</th>
+            <th>Conf</th>
+            <th>Sources</th>
+            <th>Price</th>
+            <th>RSI</th>
+            <th>Z-Score</th>
+            <th>Blocked By</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="rawBody"></tbody>
+      </table>
+    </div>
+  </div>
 
   <script>
     const PAGE_SIZE = 50;
