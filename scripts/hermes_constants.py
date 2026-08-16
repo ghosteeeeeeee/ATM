@@ -1203,7 +1203,7 @@ RANGE_FINDER_SHORT_ENABLED = False   # CEO KILLED 2026-08-16 — range_finder SH
 RANGE_BREAKOUT_ENABLED = False   # CEO KILLED 2026-08-16 — 8T 25% WR -$0.41 (7d). All variants dead.
 RANGE_BREAKOUT_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-15 — 8T 25% WR -$0.41 (7d). Kill LONG.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
-RANGE_BREAKOUT_SHORT_ENABLED = False  # CEO KILLED 2026-08-15 — 13T 48h 23.1% WR -$0.61. Deteriorated from 52% WR at re-enable. atr_sl_hit dominates (10T -$0.71).
+RANGE_BREAKOUT_SHORT_ENABLED = True   # RE-ENABLED 2026-08-16 per user for testing. Had 12-trade winning streak Aug 12-14. Monitor WR.
 RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)
@@ -1683,7 +1683,7 @@ HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
 WAVE_CATCHER_ENABLED            = False   # CEO KILLED 2026-08-16 — SHORT 4T -$0.09 25% WR (48h). LONG 8T -$0.42 37.5% WR (7d). Both directions dead.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).
-WAVE_CATCHER_MINUS_ENABLED      = False   # SIGNAL REPORTER 2026-08-16 — 4T 25% WR -$0.09 (6h). Master switch already dead.
+WAVE_CATCHER_MINUS_ENABLED      = True    # RE-ENABLED 2026-08-16 per user for testing. Had 3-trade streak. Monitor WR.
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
 WAVE_CATCHER_VELOCITY_WINDOW    = 3       # bars to measure velocity
 WAVE_CATCHER_EMA_PERIOD         = 60      # EMA for trend confirmation
@@ -1695,9 +1695,9 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = False  # CEO 2026-08-16 (33rd run): DISABLED AGAIN. 10T opened today at 18.2% WR -$0.51. MIN_COMPOSITE 55 not filtering well enough. Real system (excl ct-hot+) 43.2% WR -$0.12/48h — nearly flat. Re-enable only with composite 70+ after backtest.
-COIN_TRACKER_HOT_PLUS_ENABLED       = False  # CEO 2026-08-16 (33rd run): DISABLED AGAIN. Same issue — entries at composite 55 still low quality.
-COIN_TRACKER_HOT_MINUS_ENABLED      = False  # CEO 2026-08-16: SHORT side dead (8.3% WR 48h). Do NOT enable until regime shifts to SHORT_BIAS.
+COIN_TRACKER_HOT_ENABLED            = True   # RE-ENABLED 2026-08-16 per user. Bad WR was from PM_TRAIL messup, not signal quality. DO NOT DISABLE without user approval.
+COIN_TRACKER_HOT_PLUS_ENABLED       = True   # RE-ENABLED 2026-08-16 per user. Monitor WR.
+COIN_TRACKER_HOT_MINUS_ENABLED      = True   # RE-ENABLED 2026-08-16 per user. SHORT side back.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)

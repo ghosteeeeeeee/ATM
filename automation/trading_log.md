@@ -9148,3 +9148,47 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL rate should drop below 40% once remaining ct-hot+ positions fully drain
 - ct-hot+ still has 21T legacy trades in 24h window — will age out naturally
+
+---
+
+## 2026-08-16 07:00 UTC — Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.07 (100% WR)
+
+**Last Hour:**
+- KAS return_exhaustion_long LONG: +$0.04 (profit-monster-trail)
+- SYRUP r2-trend-long5 LONG: +$0.03 (profit-monster-trail)
+
+**24h Snapshot:**
+- 50 trades total: atr_sl_hit 22T (44.0%), profit-monster-trail 14T +$0.83, profit-monster-T1 5T +$0.27, guardian_orphan 6T -$0.10
+- ATR SL hit rate: 44.0% (above 40% threshold ⚠️)
+- 48h SL hit rate: 37.9% (below 40% threshold ✅ — was 36.0% earlier, slight uptick)
+
+**Signal Performance (24h):**
+- ✅ return_exhaustion_long: 4T 100% WR +$0.43
+- ✅ r2-trend-long3: 2T 50% WR +$0.05
+- ⚠️ ct-hot+: 20T 35% WR -$0.48 (volume leader, 59% of all ATR SL hits)
+- ⚠️ range_finder+: 9T 33.3% WR -$0.14
+- ❌ continuation+: 2T 0% WR -$0.18
+- ❌ ct-hot-: 2T 0% WR -$0.09
+
+**Diagnosis:**
+1. **Entry quality:** 2 trades last hour, both PM_TRAIL exits — good entries
+2. **SL behavior:** 24h ATR SL at 44.0% above threshold, but 48h at 37.9% below. ct-hot+ responsible for 13/22 (59%) of all ATR SL hits.
+3. **Signal quality:** No signal meets kill threshold (0% WR with 3+ trades last hour). ct-hot+ 35% WR is weakest high-volume signal but WR >0%.
+4. **Trade frequency:** 2/hr last hour — normal
+
+**Changes:** None. No signal meets kill threshold. PM_TRAIL eval window active (0.30% act / 0.15% dist reverted today). 48h ATR SL at37.9% below threshold.
+
+**No Change Needed:**
+- Last hour: 2 trades, both winners, PM_TRAIL exits
+- 48h ATR SL at 37.9% — below 40% threshold
+- No 0% WR signals with 3+ trades in last hour
+- Trade frequency normal (~2/hr)
+- PM_TRAIL eval window needs 48h to assess
+
+**Open Questions:**
+- ct-hot+ responsible for 59% of ATR SL hits — signal quality issue (35% WR) not SL config issue
+- 24h ATR SL uptick to44.0% from 36.0% — may be noise from PM_TRAIL revert, monitoring
+- PM_TRAIL eval window closes Aug 17 — need more data
