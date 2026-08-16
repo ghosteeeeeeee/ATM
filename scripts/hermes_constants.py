@@ -1046,7 +1046,7 @@ MA_CROSS_MINUS_ENABLED    = False  # CEO 2026-08-09 — all ma100-cross SHORT co
 MA_CROSS_5M_ENABLED       = False
 MA_CROSS_5M_PLUS_ENABLED   = False  # ma_cross_5m+ — WR=19%, blocked in blacklist
 MA_CROSS_5M_MINUS_ENABLED = False
-TL_BREAK_ENABLED         = False  # CEO KILLED 2026-08-07 — 33.3% WR (66 trades 7d), -$1.33. hemorrhaging.
+TL_BREAK_ENABLED         = True   # RE-ENABLED 2026-08-16 per user. Master switch for tl_break-.
 ATR_COMPRESSION_ENABLED  = False  # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 
 # ── Per-Direction Signal Killswitches ─────────────────────────────────────────
@@ -1684,7 +1684,7 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = False   # CEO KILLED 2026-08-16 — SHORT 4T -$0.09 25% WR (48h). LONG 8T -$0.42 37.5% WR (7d). Both directions dead.
+WAVE_CATCHER_ENABLED            = True    # RE-ENABLED 2026-08-16 per user. Master switch for wave_catcher-.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).
 WAVE_CATCHER_MINUS_ENABLED      = False   # CEO KILLED 2026-08-16 — 4T/48h 25% WR -$0.09. No edge.
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
