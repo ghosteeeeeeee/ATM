@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 (CEO run — verified, 3rd run)
+**Last updated:** 2026-08-16 (CEO run — verified, 4th run)
 **Updated by:** CEO run
 
 ## What We're Working On
@@ -49,7 +49,8 @@
 
 ## Next Actions
 
-1. **Monitor PM_TRAIL revert:** atr_sl_hit count should ↓ from 49 (48h), avg exit should ↑ from 0.29%, R:R should ↑ from 0.37:1.
-2. **SHORT bleed:** -$0.95/7d — mostly legacy aging out. If still negative in 48h → add regime filter.
-3. **Daily trades:** should stay >30T (currently 55T — healthy).
-4. **Stars7d:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, hzscore+,mover+ 5T 80% — all intact.
+1. **CRITICAL — Eval windows close tomorrow (Aug 17).** 6 eval windows need final decisions: PM_TRAIL 0.40% act/0.50% dist, ATR_TP_K_MULT 2.5, TRAILING_ACTIVATION_PCT 0.40%, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45.
+2. **PM_TRAIL revert monitoring:** Reverted 0.60%→0.40% today. Only 1 trade since. Need 24-48h data. Expected: atr_sl_hit ↓ from 48, avg exit ↑ from 0.33%, R:R ↑ from 0.43:1.
+3. **SHORT bleed:** -$0.25/24h (5T 0% WR) — tiny sample, mostly legacy ct-hot- and range_finder-. If still bleeding after legacy clears → add regime filter.
+4. **Daily trades:** 55T/24h — healthy (>30T threshold).
+5. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, hzscore+,mover+ 5T 80%.

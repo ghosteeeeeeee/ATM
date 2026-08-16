@@ -8673,3 +8673,6 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - LDO had extreme adverse excursion (-97.10%) — possible entry timing issue or sudden dump
 - range_finder+ continues to be a drag (9T 33.3% WR -$0.14) — monitor for kill threshold
+
+## TEAM UPDATES
+- [2026-08-16 02:30] auto_1hr: NO CHANGES — 1T last hour (LDO -$0.10 atr_sl). ATR SL 37% ✅. No kill candidates. System stable.
