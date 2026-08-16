@@ -1,28 +1,28 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 (CEO run — verified, 4th run)
+**Last updated:** 2026-08-16 (CEO run — verified, 5th run)
 **Updated by:** CEO run
 
 ## What We're Working On
 
 **Completed:** Progressive context shaping (CURRENT.md) + Weather Vane v2+v4 upgrades + all 8 upgrade plans + eval window (PM_TRAIL, ATR, trailing params).
 
-**Current focus:** R:R inversion fix (PM_TRAIL_ACTIVATE reverted to 0.40%) + SHORT bleed monitoring.
+**Current focus:** R:R inversion fix (PM_TRAIL_ACTIVATE reverted to 0.40%) + eval window closing tomorrow.
 
 ## Active Decisions
 
-- **CURRENT.md is the single source of truth for agent sessions.** All agents read this at start and update it after consequential decisions. — 2026-08-13
-- **Orchestrator reads CURRENT.md before gathering intelligence.** Prevents stale instruction drift. — 2026-08-13
-- **Context layers are separated:** stable instructions (AGENTS.md) vs current state (this file) vs history (logs, Hebbian). History must not masquerade as current guidance. — 2026-08-13
-- **Direction Lock: 30min lock after catastrophic loss (4+/5).** Prevents re-entry during clear bad streaks. — 2026-08-13
-- **Tide Detection: BTC 3h momentum + SHORT WR confirmation.** Bearish tide suppresses LONG, bullish tide suppresses SHORT. — 2026-08-13
-- **Blacklist testing complete.** 77 tokens tested, 0 KEEP. Signal generation filters are the bottleneck, not the blacklist. Stop rotating tokens. — 2026-08-15
-- **PM_TRAIL_ACTIVATE reverted to 0.40%.** Eval showed 0.60% hurt R:R (0.37:1 vs 0.67:1 pre-eval). ATR_SL trades peak 0.94% MFE but trail never activates. — 2026-08-16
+- **CURRENT.md is the single source of truth for agent sessions.** — 2026-08-13
+- **Orchestrator reads CURRENT.md before gathering intelligence.** — 2026-08-13
+- **Context layers separated:** stable (AGENTS.md) vs current (this file) vs history (logs, Hebbian). — 2026-08-13
+- **Direction Lock: 30min after catastrophic loss (4+/5).** — 2026-08-13
+- **Tide Detection: BTC 3h momentum + SHORT WR confirmation.** — 2026-08-13
+- **Blacklist testing complete.** 77 tokens tested, 0 KEEP. Signal filters are the bottleneck. — 2026-08-15
+- **PM_TRAIL_ACTIVATE reverted to 0.40%.** Eval showed 0.60% hurt R:R. — 2026-08-16
 
 ## Known Limitations
 
-- **No session handoff protocol** — when human sessions end, context is lost. — 2026-08-13
-- **Signal reporter has /tmp/ permission issue** — fixed prompt to avoid /tmp/ writes. — 2026-08-15
+- **No session handoff protocol** — context lost on session end. — 2026-08-13
+- **Signal reporter /tmp/ permission issue** — fixed. — 2026-08-15
 
 ## System Improvement Backlog
 
@@ -31,8 +31,8 @@
 2. Create contextmap.md for the 58-signal ecosystem
 
 ### Future
-3. Formalize the 4-layer context separation in AGENTS.md
-4. Weather Vane Component 2 (Position Shield) — tighten trailing stops on losing positions during regime shifts
+3. Formalize 4-layer context separation in AGENTS.md
+4. Weather Vane Component 2 (Position Shield) — tighten trailing on losing positions during regime shifts
 
 ## What NOT To Do
 
@@ -50,7 +50,7 @@
 ## Next Actions
 
 1. **CRITICAL — Eval windows close tomorrow (Aug 17).** 6 eval windows need final decisions: PM_TRAIL 0.40% act/0.50% dist, ATR_TP_K_MULT 2.5, TRAILING_ACTIVATION_PCT 0.40%, SIGNAL_FILTER_SPEED_MIN 30, COIN_TRACKER_HOT_MIN_COMPOSITE 45.
-2. **PM_TRAIL revert monitoring:** Reverted 0.60%→0.40% today. Only 1 trade since. Need 24-48h data. Expected: atr_sl_hit ↓ from 48, avg exit ↑ from 0.33%, R:R ↑ from 0.43:1.
-3. **SHORT bleed:** -$0.25/24h (5T 0% WR) — tiny sample, mostly legacy ct-hot- and range_finder-. If still bleeding after legacy clears → add regime filter.
+2. **PM_TRAIL revert monitoring:** Reverted 0.60%→0.40% today. Need 24-48h data. Expected: atr_sl_hit ↓, avg exit ↑, R:R ↑ from 0.43:1.
+3. **SHORT bleed:** -$0.25/24h (5T 0% WR) — legacy aging out. If persists → add regime filter.
 4. **Daily trades:** 55T/24h — healthy (>30T threshold).
 5. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, hzscore+,mover+ 5T 80%.

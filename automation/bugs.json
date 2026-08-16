@@ -297,6 +297,46 @@
       "related_bugs": [
         "BUG-014"
       ]
+    },
+    {
+      "id": "BUG-017",
+      "title": "brain.py timeout 30s caused phantom trades (second instance missed)",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "NOT LONG orphan trade \u2014 HL order sent, DB write killed by 30s timeout. Same pattern as W LONG incident.",
+      "root_cause": "Two subprocess.run calls in decider_run.py: line 574 (delayed entries) and line 1491 (main trade path). Only line 574 was fixed initially. Line 1491 still had timeout=30.",
+      "fix": "Changed both subprocess.run calls to timeout=60.",
+      "verified_by": "Bug hunter audit: confirmed both timeouts fixed, no other subprocess timeout=30 in trade execution paths.",
+      "date_found": "2026-08-16",
+      "date_fixed": "2026-08-16",
+      "found_by": "agent",
+      "git_commit": "75ab631",
+      "related_bugs": [
+        "BUG-017"
+      ]
+    },
+    {
+      "id": "BUG-018",
+      "title": "HL API rate limiting \u2014 redundant /info calls from hl-sync-guardian",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/hl-sync-guardian.py"
+      ],
+      "symptom": "HL API returning 429 errors during rate limit storms. hl-sync-guardian making redundant /info calls alongside position_manager.",
+      "root_cause": "hl-sync-guardian called get_open_hype_positions_curl() directly in main sync and pending check, bypassing shared hype_cache. position_manager writes to cache but guardian ignores it.",
+      "fix": "Modified hl-sync-guardian to use _get_cached_hl_positions() first, direct API fallback only if cache stale (>60s).",
+      "verified_by": "Bug hunter audit: confirmed all direct API calls now use cache-first pattern.",
+      "date_found": "2026-08-16",
+      "date_fixed": "2026-08-16",
+      "found_by": "agent",
+      "git_commit": "2060bbe",
+      "related_bugs": [
+        "BUG-017"
+      ]
     }
   ],
   "schema": {
