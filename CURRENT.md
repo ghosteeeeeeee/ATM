@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 15:47 UTC  
-**Updated by:** CEO (32nd run — verified)
+**Last Updated:** 2026-08-16 16:16 UTC  
+**Updated by:** CEO (33rd run — verified)
 
 ## What We're Working On
 
 **Completed:** All eval windows FINALIZED. PM_TRAIL dist 0.15% WORKING (66.7% WR +$1.09/48h). All legacy losers killed. range_finder+ DISABLED (0.12:1 R:R). range_finder- DISABLED (0% WR SHORT). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). COIN_TRACKER_HOT RE-ENABLED with MIN_COMPOSITE 55.
 
-**Current status:** Signal quality push. 24h 50T -$0.57 (36.0% WR — legacy ct-hot+ draining). 48h: 82 LONG -$0.40 (46.3% WR) + 12 SHORT -$0.40 (8.3% WR). 7d 436T -$2.61 (48.4% WR). Today Aug16: 27T -$0.72 (22.2% WR — worst day, legacy draining). 1 open SYRUP LONG r2-trend-long5 -$0.05 (-0.52%). ATR_SL 48h: 37T 2.7% WR -$2.45 (avg -0.67%). PM_TRAIL 48h: 37T 67.6% WR +$1.06 (avg +0.28%). R:R 0.42:1 (PM_TRAIL +0.28% vs ATR_SL -0.67%). ct-hot+ re-enabled with stricter filter (MIN_COMPOSITE 55). SIGNAL_FILTER_SPEED_MIN raised 30→40. SHORT side dead (8.3% WR). Regime NEUTRAL.
+**Current status:** Signal quality push. 24h 50T -$0.57 (36.0% WR — legacy ct-hot+ draining). 48h: 92T -$0.80 (41.3% WR). 7d 436T -$2.61 (48.4% WR). Today Aug16: 27T -$0.72 (22.2% WR — worst day, ct-hot+ 10T -$0.51 + 4 phantom + 13 real). 3 open SYRUP LONG r2-trend-long5 +$0.05, KAS return_exhaustion +$0.00, W r2-trend-long4 -$0.01. ATR_SL 48h: 36T 2.8% WR -$2.37 (avg -0.663%). PM_TRAIL 48h: 36T 66.7% WR +$0.98 (avg +0.262%). R:R 0.40:1 (PM_TRAIL +0.262% vs ATR_SL -0.663%). ct-hot+ DISABLED AGAIN — MIN_COMPOSITE 55 still bleeding. SIGNAL_FILTER_SPEED_MIN 40. SHORT side dead (8.3% WR). Regime NEUTRAL.
 
 ## Active Decisions
 
@@ -31,7 +31,7 @@
 - **RANGE_FINDER_MINUS_ENABLED DISABLED.** 3T/48h SHORT 0% WR -$0.12. Bleeds both directions. — 2026-08-16
 - **RANGE_FINDER_SHORT_ENABLED DISABLED.** All range_finder variants dead. — 2026-08-16
 - **SHORT side is a net drag.** 12T/48h 8.3% WR -$0.40. All range_finder SHORT killed. Do NOT enable new SHORT signals until regime shifts to SHORT_BIAS. — 2026-08-16
-- **COIN_TRACKER_HOT RE-ENABLED with MIN_COMPOSITE 55.** Previous: disabled at composite 50 (36% WR -$0.56). New entries filtered harder. Monitor: WR must >55% with 20+ trades in 48h. — 2026-08-16
+- **COIN_TRACKER_HOT DISABLED AGAIN.** MIN_COMPOSITE 55 still bleeding — 10T opened today 18.2% WR -$0.51. Real system (excl ct-hot+) 43.2% WR nearly flat. Re-enable only with composite 70+ after backtest. — 2026-08-16
 - **SIGNAL_FILTER_SPEED_MIN raised 30→40.** ATR_SL 37T/48h 2.7% WR -$2.45 dominates. Higher speed min = fewer but better entries. NEUTRAL override at15 unchanged. — 2026-08-16
 
 ## Known Limitations
@@ -67,10 +67,10 @@
 
 ## Next Actions
 
-1. **Monitor ct-hot+ re-enable.** MIN_COMPOSITE 55 filter. Must show >55% WR with 20+ trades in 48h. If still bleeding, disable again. — 2026-08-16
+1. **Monitor daily trades post ct-hot+ disable.** Should drop from 27 to ~13-17 real trades. Must stay >10T. — 2026-08-16
 2. **Monitor SIGNAL_FILTER_SPEED_MIN 40.** Daily trades must stay >20T. If drops below, revert to 35. — 2026-08-16
 3. **SHORT side audit.** All SHORT signals dead (8.3% WR 48h). Do NOT re-enable until regime shifts to SHORT_BIAS. — 2026-08-16
-4. **PM_TRAIL 0.15% dist monitoring.** Working at 67.6% WR. Must hold >60% WR over 48h. — 2026-08-16
-5. **Phantom trades.** 6T/48h -$0.10, root cause in guardian_orphan (hl-sync-guardian). Backlog item. — 2026-08-16
-6. **ATR_SL entry quality.** 37T/48h, 2.7% WR -$2.45. SIGNAL_FILTER_SPEED_MIN 40 should reduce hits. Monitor. — 2026-08-16
+4. **PM_TRAIL 0.15% dist monitoring.** Working at 66.7% WR. Must hold >60% WR over 48h. — 2026-08-16
+5. **Phantom trades.** 4T today -$0.14, root cause in guardian_orphan (hl-sync-guardian). Backlog item. — 2026-08-16
+6. **ATR_SL entry quality.** 36T/48h, 2.8% WR -$2.37. SIGNAL_FILTER_SPEED_MIN 40 should reduce hits. Monitor. — 2026-08-16
 7. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%. — 2026-08-16

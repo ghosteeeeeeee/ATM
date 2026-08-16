@@ -1695,8 +1695,8 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # CEO 2026-08-16: RE-ENABLED with MIN_COMPOSITE 55 (raised from 50). ct-hot+ legacy clearing, new entries filtered harder. Monitor: WR must >55% with 20+ trades in 48h.
-COIN_TRACKER_HOT_PLUS_ENABLED       = True   # CEO 2026-08-16: RE-ENABLED. MIN_COMPOSITE 55 filters low-quality entries.
+COIN_TRACKER_HOT_ENABLED            = False  # CEO 2026-08-16 (33rd run): DISABLED AGAIN. 10T opened today at 18.2% WR -$0.51. MIN_COMPOSITE 55 not filtering well enough. Real system (excl ct-hot+) 43.2% WR -$0.12/48h — nearly flat. Re-enable only with composite 70+ after backtest.
+COIN_TRACKER_HOT_PLUS_ENABLED       = False  # CEO 2026-08-16 (33rd run): DISABLED AGAIN. Same issue — entries at composite 55 still low quality.
 COIN_TRACKER_HOT_MINUS_ENABLED      = False  # CEO 2026-08-16: SHORT side dead (8.3% WR 48h). Do NOT enable until regime shifts to SHORT_BIAS.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)
