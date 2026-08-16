@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-16 (40th run)
+
+### Diagnosis
+System -$0.85/24h (33.3% WR — worst day). ct-hot+ TESTING MODE: 17T/24h -$0.58, 29.4% WR (68% of loss). Non-ct-hot: 19T/24h -$0.10 (flat). ATR_SL: 38T/48h 2.6% WR -$2.42 (dominant drag). PM_TRAIL: 40T/48h 67.5% WR +$1.08 (only winner). T1: 12T 100% +$0.69. R:R 0.41:1 (PM_TRAIL +0.27% vs ATR_SL -0.64%). 7d: 437T -$2.80 (48.3% WR). 4 open $0.00.
+
+### Root Cause
+MIN_COMPOSITE 60 not filtering ct-hot+ noise — 17T still bleeding at 29.4% WR. Today 36T/24h (below 45T minimum). System flat without ct-hot+ but can't disable (user testing mode). ATR_SL 38T/48h -$2.42 overwhelms PM_TRAIL +$1.08.
+
+### Fix Applied
+**RAISED MIN_COMPOSITE 60→65.** Conservative +5 to filter more ct-hot+ noise without signal starvation (36T daily). ct-hot+ user testing mode respected.
+
+### Verification
+Monitor next 24h: ct-hot+ ATR_SL count (should ↓ from 18/48h), daily trades (must >25T), PM_TRAIL WR (must hold >60%). Target: MIN_COMPOSITE 65 reduces ct-hot+ to <10 ATR_SL/48h.
+
+---
+
 ## CEO Report — 2026-08-16 (39th run)
 
 ### Diagnosis

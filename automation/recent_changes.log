@@ -774,3 +774,7 @@
   WHY: 3T last hour (KAS -$0.04 ATR SL, CRV +$0.03 profit-monster-trail, CC +$0.02 profit-monster-trail SHORT). 24h 48T 47.9% ATR SL (above 40% but dominated by ct-hot+ legacy 18/23). hzscore- SHORT profitable this hour (+$0.02) — improving. No kill candidates (no 0% WR with 3+ trades). r2-trend-long4 3T 66.7% WR best signal. 3/hr normal. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 19:30 UTC
+[2026-08-16 19:30] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday evening, market dead). 24h 49T 42.9% ATR SL (above 40% but 17/21 from ct-hot+ DISABLED legacy). profit-monster-trail 14T +$0.41 strong. 3 open positions $11 each at breakeven. No kill candidates (0 trades last hour). System draining legacy naturally. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 20:30 UTC

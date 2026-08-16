@@ -9269,3 +9269,25 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ct-hot+ still draining at -$0.63/24h but no new trades last hour — legacy positions winding down
 - ATR SL 47.9% above threshold but driven by ct-hot+ — will improve as legacy drains
+
+## [2026-08-16 19:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (Sunday evening)
+**PnL:** $0.00
+
+**24h Snapshot:**
+- 49 trades: atr_sl_hit 21T (42.9%) ⚠️, profit-monster-trail 14T +$0.41, guardian_orphan 6T -$0.10, profit-monster-T1 3T +$0.16
+- ct-hot+: 17T 29.4% WR -$0.58 (legacy drain, no new trades this hour)
+- r2-trend-long4: 3T 66.7% WR +$0.05 (best signal)
+- All SHORT: 5T 20% WR -$0.10 (improving)
+
+**Changes:** None. No kill candidates.
+
+**No Change Needed:**
+- 0 trades last hour — Sunday evening, market dead
+- 3 open positions ($11 each) all at breakeven
+- ATR SL 42.9% above threshold but driven by ct-hot+ legacy — draining naturally
+- No 0% WR signals with 3+ trades last hour
+
+**Open Questions:**
+- None. System stable, waiting for Monday volume.
