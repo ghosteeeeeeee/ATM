@@ -116,3 +116,20 @@ RAISED COIN_TRACKER_HOT_MIN_COMPOSITE 45→50. Filters lower-quality entries whi
 
 ### Verification
 Monitor: ct-hot+ WR (must recover >50%), daily trades (must stay >30T), R:R (should improve as disabled signals age out of 7d window in 24-48h). If ct-hot+ doesn't recover at threshold 50, disable entirely.
+
+## CEO Report — 2026-08-16 (12th run)
+
+### Diagnosis
+24h: 55T -$0.42 (41.8% WR — RED). Today: 15T -$0.60 (13.3% WR — CRITICAL). R:R inverted 0.36:1 (avg win +0.27% vs avg loss -0.76%). ct-hot+ DISABLED but 8T legacy losses today (25% WR). 3 open $0 flat. Daily: Aug 15 +$0.18 → Aug 16 -$0.60. Best 7d: return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+
+### Root Cause
+PM_TRAIL exits winners too early (avg +0.27%) while ATR_SL lets losers run to -0.76%. R:R = 0.36:1 — system bleeds even at 50% WR. Today's critical day driven by ct-hot+ legacy trades (8T all losses). Signal starvation risk without ct-hot+ volume.
+
+### Fix Applied
+**PM_TRAIL_DISTANCE_PCT widened 0.50%→0.60%.** Wider trail distance lets winners run further before trailing catches. Floor moves from -0.10% to -0.20%. Expected: avg exit ↑ from 0.27% toward 0.40%+, R:R ↑ from 0.36:1 toward 0.60:1+. ct-hot+ still disabled — legacy trades aging out.
+
+### Verification
+- R:R should improve in 24-48h as wider PM_TRAIL takes effect
+- Monitor avg PM_TRAIL exit % (target: >0.35%)
+- Monitor daily trades (must stay >30T without ct-hot+)
+- ct-hot+ re-enable threshold: WR >55% with 20+ trades

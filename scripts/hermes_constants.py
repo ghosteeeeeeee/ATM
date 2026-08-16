@@ -836,9 +836,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # FINALIZED 2026-08-16 eval: act 0.40%, dist 0.50%. Floor = -0.10%. PM_TRAIL 60T/48h 75.8% WR avg +0.27% — strong. Reverted from 0.60% act (R:R worsened to 0.37:1). 0.40% catches trades before ATR_SL.
-PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — FINALIZED 2026-08-16 eval: kept. Reverted from 0.60%. Floor = -0.10% (0.40% - 0.50%). Catches trades before ATR_SL.
-PM_TRAIL_DISTANCE_PCT = 0.005  # 0.50% — FINALIZED 2026-08-16 eval: kept. Tightened from 0.60%. Floor = +0.10% (0.40% - 0.50%).
+PM_TRAIL_ENABLED     = True   # CEO 2026-08-16: act 0.40%, dist 0.60% (widened from 0.50%). Floor = -0.20%. PM_TRAIL R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance to let winners run. Monitor: avg exit % (should ↑ from 0.27%), R:R (should ↑ from 0.36:1).
+PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — CEO 2026-08-16: kept. Reverted from 0.60% (R:R worsened). Floor = -0.20% (0.40% - 0.60%). Catches trades before ATR_SL.
+PM_TRAIL_DISTANCE_PCT = 0.006  # 0.60% — CEO 2026-08-16: WIDENED from 0.50%. R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance lets winners run. Floor = -0.20% (0.40% - 0.60%). Monitor: avg PM_TRAIL exit (should ↑ from 0.27%), R:R (should ↑ from 0.36:1).
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
