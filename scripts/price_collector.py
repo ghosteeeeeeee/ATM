@@ -185,12 +185,11 @@ def _seed_universe_candles(universe: list):
             cursor += 1
             continue  # Already fresh, skip
 
-        # Fetch all 4 TFs for this token
-        intervals = {'1m': 1000, '5m': 500, '15m': 500, '1h': 500, '4h': 200}
-        for interval, limit in intervals.items():
-            candles = _fetch_binance_candles(token, interval, limit)
-            if candles:
-                _store_candles(token, interval, candles)
+        # Fetch 5m candles only (volume data for signals). Other TFs already
+        # populated by historical seeding — skip to avoid Binance API blocking.
+        candles = _fetch_binance_candles(token, '5m', 100)
+        if candles:
+            _store_candles(token, '5m', candles)
 
         seeded += 1
         cursor += 1
@@ -577,7 +576,7 @@ def main():
 
     # candles now updated — timestamp already reflects post-aggregation freshness
     # save_prices() removed — was redundant second write, doubled DB time
-    # _seed_universe_candles disabled — Binance API calls caused 100s+ blocking, conflicts with aggregation lock
+    _seed_universe_candles(universe)  # Re-enabled: only fetches 5m (2 calls/run, ~0.5s)
 
 if __name__ == '__main__':
     main()

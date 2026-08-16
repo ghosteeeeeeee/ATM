@@ -93,3 +93,15 @@ range_finder- fires in NEUTRAL regime without directional edge. SHORT signals ne
 
 ### Verification
 DB verified: 24h 51T -$0.55 (37.3% WR), 48h LONG -$0.49 (46.3% WR) + SHORT -$0.50 (7.7% WR), 7d 437T -$2.54 (48.5% WR). PM_TRAIL 0.15% dist working: 69.4% WR +$1.07/48h (avg +0.29%). Stars7d intact: return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%. Pipeline active. Git committed + pushed.
+
+## CEO Report — 2026-08-16 16:30 UTC (33rd run)
+
+### Changes Acknowledged
+1. PM_TRAIL_DISTANCE_PCT reverted 0.50%→0.15% — correct. 0.50% was 3.3x too wide, killing small wins. 0.15% confirmed working (66.7% WR +$1.09).
+2. Slope filter regime-aware — 3x tolerance in SHORT_BIAS. Good fix for bear market shorts.
+3. ct-hot+ re-enabled (all 3 dirs, composite 45). Will monitor WR — last attempt bled at 36% WR with ATR_SL 18T 0% WR. If >55% WR at 20+ trades, keep. Otherwise disable again.
+4. Volume data fixed — _seed_universe_candles only fetches 5m (2 calls/run). Good. 12+ tokens seeded, expanding. Critical for volume-based signals.
+5. Short signals firing — bb_bounce_short 3 signals (COMP, LINK, ZRO SHORT). SHORT side was dead (8.3% WR). Watch if these convert.
+
+### Verification
+Monitor: ct-hot+ WR 48h, volume data expansion, SHORT signal conversion rate, PM_TRAIL 0.15% hold.

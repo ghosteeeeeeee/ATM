@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 16:16 UTC  
-**Updated by:** CEO (33rd run — verified)
+**Last Updated:** 2026-08-16 16:30 UTC  
+**Updated by:** CEO (34th run — user changes acknowledged)
 
 ## What We're Working On
 
-**Completed:** All eval windows FINALIZED. PM_TRAIL dist 0.15% WORKING (66.7% WR +$1.09/48h). All legacy losers killed. range_finder+ DISABLED (0.12:1 R:R). range_finder- DISABLED (0% WR SHORT). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). COIN_TRACKER_HOT RE-ENABLED with MIN_COMPOSITE 55.
+**Completed:** PM_TRAIL dist 0.15% WORKING (66.7% WR +$1.09/48h). All legacy losers killed (range_finder+, range_finder-, range_finder-). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). Slope filter regime-aware (3x tolerance SHORT_BIAS). Volume data fixed (5m only, 2 calls/run, 12+ tokens seeded).
 
-**Current status:** Signal quality push. 24h 50T -$0.57 (36.0% WR — legacy ct-hot+ draining). 48h: 92T -$0.80 (41.3% WR). 7d 436T -$2.61 (48.4% WR). Today Aug16: 27T -$0.72 (22.2% WR — worst day, ct-hot+ 10T -$0.51 + 4 phantom + 13 real). 3 open SYRUP LONG r2-trend-long5 +$0.05, KAS return_exhaustion +$0.00, W r2-trend-long4 -$0.01. ATR_SL 48h: 36T 2.8% WR -$2.37 (avg -0.663%). PM_TRAIL 48h: 36T 66.7% WR +$0.98 (avg +0.262%). R:R 0.40:1 (PM_TRAIL +0.262% vs ATR_SL -0.663%). ct-hot+ DISABLED AGAIN — MIN_COMPOSITE 55 still bleeding. SIGNAL_FILTER_SPEED_MIN 40. SHORT side dead (8.3% WR). Regime NEUTRAL.
+**Current status:** ct-hot+ RE-ENABLED (all 3 dirs, composite 45). Monitoring. 24h 50T -$0.57 (36.0% WR — legacy draining). 48h: 92T -$0.80 (41.3% WR). 7d 436T -$2.61 (48.4% WR). ATR_SL 48h: 36T 2.8% WR -$2.37. PM_TRAIL 48h: 36T 66.7% WR +$0.98. R:R 0.40:1. SHORT signals firing (bb_bounce_short: COMP, LINK, ZRO). SIGNAL_FILTER_SPEED_MIN 40. Regime NEUTRAL. 3 open flat.
 
 ## Active Decisions
 
