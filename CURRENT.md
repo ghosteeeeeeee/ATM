@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 (CEO run — verified, 14th run)
-**Updated by:** CEO run
+**Last updated:** 2026-08-16 06:30 UTC (Daily Orchestrator — 15th run)
+**Updated by:** Daily Orchestrator
 
 ## What We're Working On
 
-**Completed:** All 6 eval windows FINALIZED. PM_TRAIL 0.40% act/0.60% dist (widened), TRAILING 0.40%, SIGNAL_FILTER 30, COIN_TRACKER 45 all kept. ATR_TP_K_MULT reverted 2.5→2.0. All legacy losers killed.
+**Completed:** All 6 eval windows FINALIZED. PM_TRAIL 0.40% act/0.60% dist (widened), TRAILING 0.40%, SIGNAL_FILTER 30, COIN_TRACKER 45 all kept. ATR_TP_K_MULT reverted 2.5→2.0. All legacy losers killed. ct-hot+ fully cleared (0 open positions).
 
-**Current focus:** ct-hot+ BASE was still enabled (only PLUS was disabled). Disabled COIN_TRACKER_HOT_ENABLED + removed from STANDALONE_BYPASS. 30T/48h 46.7% WR -$0.29 was the #1 loser. PM_TRAIL widened to 0.60% — needs 48h to show effect. R:R 0.69:1 (still inverted).
+**Current status:** Market flat (103/104 NEUTRAL). Macro gate REDUCE (25% WR < 30). 58 trades today, -5.89% PnL. R:R monitoring PM_TRAIL wider distance effect.
 
 ## Active Decisions
 
@@ -26,17 +26,16 @@
 ## Known Limitations
 
 - **No session handoff protocol** — context lost on session end. — 2026-08-13
-- **Signal reporter /tmp/ permission issue** — fixed. — 2026-08-15
 
 ## System Improvement Backlog
 
 ### Worth Doing
 1. Extend checkpoint_utils.py to write human-readable progress summaries
 2. Create contextmap.md for the 58-signal ecosystem
-
-### Future
 3. Formalize 4-layer context separation in AGENTS.md
-4. Weather Vane Component 2 (Position Shield) — tighten trailing on losing positions during regime shifts
+
+### Implemented (no action)
+- Weather Vane Components 1-3 all live (2026-08-15). Shield trail 0.30%, force-close 30min on counter-regime losers.
 
 ## What NOT To Do
 
@@ -47,14 +46,13 @@
 
 ## Stop Conditions
 
-- If CURRENT.md grows beyond ~50 lines, trim it
-- If agents stop reading it, check orchestrator/CEO prompts
-- If it hasn't been updated in 48h, investigate
+- CURRENT.md >50 lines → trim
+- No update in 48h → investigate
+- Agents stop reading → check orchestrator prompts
 
 ## Next Actions
 
-1. **R:R monitor.** PM_TRAIL_DISTANCE 0.60% (widened 2 days ago). 48h R:R 0.69:1 (avg win +0.45% vs avg loss -0.65%). Monitor: avg exit should ↑ from 0.45%, R:R should ↑ from 0.69:1 toward 1:1.
-2. **ct-hot+ disabled.** Base was still enabled (PLUS only was killed). Now fully off. 3 open ct-hot+ positions will age out. Daily trades may drop — monitor bb_bounce+, r2-trend, hzscore+ volume.
-3. **Daily trades:** 16T today (ct-hot+ legacy). Should recover to 30T+ with remaining signals. If <20T, consider signal starvation.
-4. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-5. **Tomorrow critical:** PM_TRAIL wider distance full effect, ct-hot+ fully cleared. R:R must ↑ from 0.69:1.
+1. **R:R monitor.** PM_TRAIL_DISTANCE 0.60% (widened 2 days ago). Monitor avg exit % and R:R toward 1:1. CTX-GATE currently blocking signals (low volatility).
+2. **Market flat.** 103/104 tokens NEUTRAL. No directional bias to trade against. System in REDUCE mode (25% WR). Wait for regime shift.
+3. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+4. **Signal starvation risk.** If daily trades <20T when market moves, review SIGNAL_FILTER thresholds.
