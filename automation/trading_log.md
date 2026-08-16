@@ -9069,3 +9069,29 @@ None — system stable, previous fixes settling in.
 - Open positions small ($11) with manageable risk
 
 **Next:** Re-run at 11:30 UTC
+
+## [2026-08-16 11:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (ATOM -$0.07 ATR SL, ALT -$0.03 ATR SL)
+**PnL:** -$0.10 (0% WR)
+
+**24h Snapshot:**
+- 51 trades, net negative (ct-hot+ drain)
+- ATR SL: 25/51 = 49% (23/25 from ct-hot+ — disabled, draining)
+- profit-monster-trail: 13T best exit type (+$0.77)
+- return_exhaustion_long: 3T 100% WR +$0.39 (best signal)
+- No signals at kill threshold (all <3T with 0% WR)
+
+**ct-hot+ Status:** Confirmed disabled. Last trade opened 04:07 UTC, all pre-disable positions closing. Drain expected to complete within hours.
+
+**Changes:** None.
+
+**No Change Needed:**
+- ATR SL rate driven by disabled ct-hot+ (legacy positions)
+- No kill candidates (continuation+ 1T 0% below 3T)
+- Trade frequency normal (2/hr)
+- Open positions: r2-trend-long5 ($11) — only remaining
+
+**Open Questions:**
+- ATR SL rate should drop below 40% once ct-hot+ drain completes
+- Watch continuation+ if it adds more losing trades

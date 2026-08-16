@@ -46,3 +46,21 @@ NO CHANGES — real system stable, PM_TRAIL working, legacy draining naturally. 
 - ct-hot+ legacy: 32T/24h, no new trades — draining
 - Pipeline: healthy, timer firing
 - Stars7d intact: return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%
+
+## CEO Report — 2026-08-16 (30th run)
+
+### Diagnosis
+System STABILIZING. 48h 96T -$1.00 (40.6% WR). Real system (excl ct-hot+): 47T/48h -$0.32 (42.6% WR). ct-hot+ legacy 33T/48h clearing (no new trades). ATR_SL dominant drag: 17T 5.9% WR -$1.15 (avg -0.68%). PM_TRAIL working: 24T 58.3% WR +$0.57 (avg +0.23%). 7d: 437T -$2.54 (48.5% WR). 1 open flat. Regime NEUTRAL. Pipeline active.
+
+### Root Cause
+ATR_SL entry quality — trades entering at local tops, immediately going negative. Avg peak move 3.04% but still hitting SL at -0.68%. PM_TRAIL should catch these but timing mismatch. Legacy trades (ct-hot+, range_finder+, wave_catcher) still clearing from before disable.
+
+### Fix Applied
+NO CHANGES. System stabilizing, legacy clearing naturally. PM_TRAIL 0.15% distance confirmed working (58.3% WR). All bad actors disabled. Pipeline healthy.
+
+### Verification
+- PM_TRAIL 48h: 24T 58.3% WR +$0.57 (WORKING)
+- ATR_SL 48h: 17T 5.9% WR -$1.15 (improving from -0.75% avg)
+- Stars7d: return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%
+- ct-hot+ legacy: clearing, no new trades
+- Monitor: Monday volume, ATR_SL entry quality, phantom trades root cause

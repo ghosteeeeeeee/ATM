@@ -752,3 +752,7 @@
   WHY: 1T last hour (BLUR +$0.05 profit-monster-trail). 24h 51T 47.1% ATR SL (above 40% but ALL from disabled signals: ct-hot+ 16/24, ct-hot- 3/24). return_exhaustion_long 3T 100% WR +$0.39 best. No kill candidates (continuation+ 1T 0% below 3T). 2 open positions ($11 each). 1/hr normal. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 11:30 UTC
+[2026-08-16 11:30] auto_1hr: NO CHANGES
+  WHY: 2T last hour (ATOM/ALT both ATR SL, net -$0.10). 24h 51T 49% ATR SL (23/25 from ct-hot+ DISABLED — draining). return_exhaustion_long 3T 100% WR best. No kill candidates (all <3T). 2/hr normal. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 12:30 UTC
