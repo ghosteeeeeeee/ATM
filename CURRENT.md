@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 17:20 UTC  
-**Updated by:** CEO (33rd run — verified)
+**Last Updated:** 2026-08-16 18:30 UTC  
+**Updated by:** CEO (34th run — verified)
 
 ## What We're Working On
 
-**Completed:** PM_TRAIL dist 0.15% WORKING (66.7% WR +$1.09/48h). All legacy losers killed (range_finder+, range_finder-, range_finder-). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). Slope filter regime-aware (3x tolerance SHORT_BIAS). Volume data fixed (5m only, 2 calls/run, 12+ tokens seeded).
+**Completed:** PM_TRAIL dist 0.15% WORKING (75.0% WR +$1.76/48h). All legacy losers killed (range_finder+, range_finder-, range_finder-). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). Slope filter regime-aware (3x tolerance SHORT_BIAS). Volume data fixed (5m only, 2 calls/run, 12+ tokens seeded).
 
-**Current status:** ct-hot+ DISABLED (all flags False, MIN_COMPOSITE 55). Legacy clearing (last trade 13:16 UTC). WAVE_CATCHER_MINUS DISABLED (was True, 25% WR). continuation removed from STANDALONE_BYPASS. Real system: 45T/24h opened, 35.6% WR -$0.59 (ct-hot+ legacy 18T -$0.46 dominates). PM_TRAIL 48h: 39T 66.7% WR +$1.04 (carrying system). ATR_SL 48h: 36T 2.8% WR -$2.37 (main drag). T1 12T 100% WR +$0.69. 7d: 437T -$2.49 (48.7% WR). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. SIGNAL_FILTER_SPEED_MIN 40. Regime NEUTRAL. 2 open flat.
+**Current status:** ct-hot+ DISABLED (all flags False, MIN_COMPOSITE 55). Legacy clearing (33T -$0.42/48h, should clear Aug 17-18). WAVE_CATCHER_MINUS DISABLED. continuation removed from STANDALONE_BYPASS. Real system: 47T/24h 36.2% WR -$0.55 (ct-hot+ legacy dominates). PM_TRAIL 48h: 52T 75.0% WR +$1.76 (carrying system, avg +0.331%). ATR_SL 48h: 34T 2.8% WR -$2.40 (main drag, 84% of losses). R:R 0.74:1. 7d: 437T -$2.46 (48.7% WR). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. SIGNAL_FILTER_SPEED_MIN 40 (set, needs 24h eval). Market bearish (74/109 BEAR in coin_tracker). 2 open flat.
 
 ## Active Decisions
 
@@ -69,10 +69,11 @@
 
 ## Next Actions
 
-1. **Monitor SIGNAL_FILTER_SPEED_MIN 40.** Daily trades must stay >20T. If drops below, revert to 35. Hotset intermittent (0-1 entries/cycle) — normal selective behavior. — 2026-08-16
-2. **ATR_SL entry quality.** 36T/48h, 2.8% WR -$2.37. SIGNAL_FILTER_SPEED_MIN 40 should reduce hits. Monitor for 24h. — 2026-08-16
-3. **ct-hot+ legacy age-out.** 18T today -$0.46. Should clear by Aug 17-18. All flags False. — 2026-08-16
-4. **PM_TRAIL 0.15% dist monitoring.** Working at 66.7% WR. Must hold >60% WR over 48h. — 2026-08-16
-5. **SHORT side audit.** All SHORT signals dead. Do NOT re-enable until regime shifts to SHORT_BIAS. — 2026-08-16
+1. **Monitor SIGNAL_FILTER_SPEED_MIN 40.** Daily trades 31T (must stay >20T). ATR_SL 34T/48h (should ↓). Hotset intermittent — normal selective behavior. — 2026-08-16
+2. **ATR_SL entry quality.** 34T/48h, 2.8% WR -$2.40 (84% of losses). SPEED_MIN 40 should reduce hits. Monitor for 24h. — 2026-08-16
+3. **ct-hot+ legacy age-out.** 33T -$0.42 clearing. Should clear by Aug 17-18. All flags False. — 2026-08-16
+4. **PM_TRAIL 0.15% dist monitoring.** Working at 75.0% WR +$1.76. Must hold >60% WR. — 2026-08-16
+5. **SHORT side audit.** All SHORT signals dead. Do NOT re-enable until regime shifts to SHORT_BIAS. Market bearish (74/109 BEAR). — 2026-08-16
 6. **Phantom trades.** guardian_orphan with empty signal. Backlog item. — 2026-08-16
-7. **Stars7d intact:** return_exhaustion_long 4T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%. — 2026-08-16
+7. **Stars7d intact:** return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. — 2026-08-16
+8. **R:R 0.74:1** — improving from 0.44:1. PM_TRAIL +0.331% vs ATR_SL -0.663%. Target >1:1. — 2026-08-16
