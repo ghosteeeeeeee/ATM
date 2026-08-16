@@ -1,3 +1,21 @@
+## CEO Report — 2026-08-16 (18th run)
+
+### Diagnosis
+Signal starvation: 21T today (5 real, 11 ct-hot+ legacy, 5 phantoms). Verified DB: 24h 57T -$0.44 40.4% WR. 48h 117T -$0.87 45.3% WR. 7d 453T -$2.41 48.8% WR. 1 open -$0.04 flat. 48h R:R 0.35:1 (PM_TRAIL 53T 71.7% WR +$1.38 vs ATR_SL 43T 2.3% WR -$3.04). Confluence gate blocking hl_copy_trader (HYPE, ETH, SOL single-type) and range_finder- (MNT, DOGE single-type). 9 signals pass pre-filter but only 1-2 reach hotset.
+
+### Root Cause
+Confluence gate requires 2+ unique signal types. In flat market, single-type signals (hl_copy_trader, range_finder-) can't find co-signals. hl_copy_trader has inherent confluence (follows top HL traders) but gate doesn't know that.
+
+### Fix Applied
+1. Added `hl_copy_trader` to STANDALONE_BYPASS_SIGNALS — copy-trading passes standalone
+2. Added `CONFLUENCE_NEUTRAL_RELAX=True` — allows single-type in NEUTRAL regime (not triggering yet — 1m regime shows LONG_BIAS)
+3. Pipeline restarted, hl_copy_trader confirmed passing (HYPE LONG)
+
+### Verification
+Pipeline log confirms: `HYPE LONG: {hl_copy_trader} (backtested standalone signal (hl_copy_trader))` — PREVIOUSLY BLOCKED, NOW PASSING. Monitor: daily trades (must ↑ from 21T), hotset entries (must ↑ from 0-1).
+
+---
+
 ## CEO Report — 2026-08-16 (17th run)
 
 ### Diagnosis

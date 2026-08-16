@@ -8927,3 +8927,37 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - 3 remaining ct-hot+ positions draining — will ATR SL drop below 40% after they close?
 - continuation+ 2T 0% WR — watching for kill threshold
+
+## [2026-08-16 07:30 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.11 (WR: 100%)
+
+**24h Snapshot:**
+- 57 trades total, -$0.44 net, 40.4% WR
+- ATR SL hit rate: 45.6% (26/57) — above 40% threshold
+- ct-hot+: 30T 40% WR -$0.48 — still generating composite trades
+- return_exhaustion_long: 3T 100% WR +$0.39 (best signal)
+- continuation+: 5T 40% WR -$0.17
+
+**Last Hour Trades:**
+- ALT r2-trend-long3 LONG: +$0.08 (profit-monster-trail, +83.21% PnL%) ✅
+- SUSHI r2-trend-long9 LONG: +$0.03 (atr_sl_hit, +23.80% PnL%) ✅
+
+**Diagnosis:**
+1. **Entry quality:** Excellent — both entries profitable with high PnL%
+2. **SL behavior:** ATR SL 45.6% — above 40% but mostly from ct-hot+ legacy positions
+3. **Signal quality:** No kill candidates. ct-hot+ disabled but composite signals still open trades
+4. **Trade frequency:** 2/hr — normal
+
+**Changes:** None. System self-correcting.
+
+**No Change Needed:**
+- Last hour was profitable (+$0.11)
+- ct-hot+ positions continuing to drain
+- No 0% WR kill candidates
+- Trade frequency normal
+
+**Open Questions:**
+- ct-hot+ composite signals still opening trades despite disable — need composite signal filtering?
+- ATR SL rate should improve as ct-hot+ positions close

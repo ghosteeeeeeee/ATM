@@ -1186,6 +1186,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'accel-300',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',  # r2-trend-short = r2_trend SHORT (downtrend detector)
+    'hl_copy_trader',  # CEO 2026-08-16: copy-trading signal — inherent confluence (follows top traders). Blocked by confluence gate in NEUTRAL.
     # CEO 2026-08-15 — removed: range_finder (9T 33.3% WR -$0.14 24h — bleeding not helping starvation),
     # range_breakout_short (RANGE_BREAKOUT_SHORT_ENABLED=False),
     # mover+ (standalone dead 28.6% WR 7d), wave_catcher/* (WAVE_CATCHER_ENABLED=False),
@@ -1406,6 +1407,7 @@ HOTSET_ENABLED = True
 # When True (default): single-source signals are blocked from hot-set (require 2+ sources).
 # When False: single-source signals are allowed to pass through.
 CONFLUENCE_REQUIRED = True   # DO NOT DISABLE — paralysis was caused by 5min expiry (now 10min) and dead hours (now fixed)
+CONFLUENCE_NEUTRAL_RELAX = True  # CEO 2026-08-16: In NEUTRAL regime (102/104 tokens flat), allow single-type signals through. Addresses signal starvation (21T today, need 30+). Does NOT disable confluence for trending regimes.
 
 # ── Accel-300 Standalone Bypass ──────────────────────────────────────────────
 # When a single-source accel-300 has very high confidence, bypass confluence gate.

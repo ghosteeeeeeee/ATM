@@ -39,3 +39,6 @@
 
 ## Error Alerts — 2026-08-16 04:02 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(W): HL TOK failed — Non-dict response from exchange: None`
+
+## Error Alerts — 2026-08-16 08:02 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS TOK position_manager: timed out`

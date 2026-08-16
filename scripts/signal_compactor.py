@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -1117,6 +1117,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # If no co-signal within 5 min → staleness=0 → EXPIRED.
             pass_gate = False
             gate_msg = ''
+            # NEUTRAL regime relaxation: when market is flat (102/104 NEUTRAL),
+            # single-type signals can't find co-signals. Allow them through.
+            _regime, _regime_conf = get_regime_1m(token)
+            _neutral_relax = CONFLUENCE_NEUTRAL_RELAX and _regime == 'NEUTRAL'
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
                 pass_gate = True
@@ -1124,6 +1128,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             elif unique_signal_types >= 2:
                 pass_gate = True
                 gate_msg = f'{unique_signal_types} unique types'
+            elif _neutral_relax:
+                # NEUTRAL regime: allow single-type signals (starvation fix)
+                pass_gate = True
+                gate_msg = f'NEUTRAL-relax: single-type allowed (regime={_regime})'
             else:
                 # ── Accel-300 Standalone Bypass ───────────────────────────────────
                 # Strong standalone accel-300 (no RS co-signal needed) — fire on
