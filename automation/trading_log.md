@@ -9125,3 +9125,26 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ct-hot+ generated 1 trade at 13:16 UTC today (GRASS +$0.02) despite being disabled — possible race condition or brief re-enable. Monitor for more.
 - ATR SL rate should continue dropping as remaining ct-hot+ positions drain.
+
+## [2026-08-16 16:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (WLFI stop_hunt_reversal_long+ → -$0.01 profit-monster-trail, breakeven)
+**24h:** 50T, 47% ATR SL (all from disabled ct-hot+ legacy — 22/24)
+
+**24h Signal Performance:**
+- return_exhaustion_long: 3T 100% WR +$0.39 (best, $0.130 avg)
+- ct-hot+: 21T 33.3% WR -$0.53 (legacy, draining)
+- ct-hot-: 3T 0% WR -$0.17 (at kill threshold, already disabled)
+- All others: 1-2T mixed
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL rate 48% entirely from disabled ct-hot+ (22/24). Active signal ATR SL: 2/26 = 7.7% ✅
+- No kill candidates (continuation+ 1T 0% below 3T threshold)
+- Trade frequency normal (~2/hr)
+- Open positions: 2 (SYRUP $11, KAS $11 return_exhaustion_long)
+
+**Open Questions:**
+- ATR SL rate should drop below 40% once remaining ct-hot+ positions fully drain
+- ct-hot+ still has 21T legacy trades in 24h window — will age out naturally
