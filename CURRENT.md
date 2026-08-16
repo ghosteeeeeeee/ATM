@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 20:00 UTC  
-**Updated by:** CEO (35th run)
+**Last Updated:** 2026-08-16 19:00 UTC  
+**Updated by:** CEO (36th run)
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.15% WORKING (75.0% WR +$1.76/48h). All legacy losers killed (range_finder+, range_finder-, range_finder-). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). Slope filter regime-aware (3x tolerance SHORT_BIAS). Volume data fixed (5m only, 2 calls/run, 12+ tokens seeded).
 
-**Current status:** ct-hot+ DISABLED (all flags False, MIN_COMPOSITE 55). Legacy clearing (33T -$0.42/48h, should clear Aug 17-18). WAVE_CATCHER_MINUS DISABLED. continuation removed from STANDALONE_BYPASS. Real system: 46T/24h 34.8% WR -$0.68 (ct-hot+ legacy dominates). PM_TRAIL 48h: 52T 75.0% WR +$1.76 (carrying system, avg +0.331%). ATR_SL 48h: 36T 2.8% WR -$2.37 (main drag, 78% of losses). R:R 0.50:1. 7d: 437T -$2.46 (48.7% WR). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. SIGNAL_FILTER_SPEED_MIN 40 active (ATR_SL daily trend: 41→28→28→20→14). Market bearish (74/109 BEAR in coin_tracker). 5 open flat ($0.00 total).
+**Current status:** ct-hot+ DISABLED (all flags False, MIN_COMPOSITE 55). Legacy clearing (33T -$0.42/48h, should clear Aug 17-18). WAVE_CATCHER_MINUS DISABLED. continuation removed from STANDALONE_BYPASS. Real system: 46T/24h 32.6% WR -$0.86 (ct-hot+ legacy dominates). PM_TRAIL 48h: 52T 72% WR +$1.76 (carrying system, avg +0.27%). ATR_SL 48h: 37T 2.7% WR -$2.43 (main drag, 79% of losses). R:R 0.51:1. 7d: 437T -$2.55 (48.5% WR). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 22T 63.6% +$0.25, r2-trend-long2 17T 64.7% +$0.19. SIGNAL_FILTER_SPEED_MIN 40 active (ATR_SL daily trend: 41→28→28→20→15). Market bearish (74/109 BEAR in coin_tracker). 4 open flat ($0.00 total).
 
 ## Active Decisions
 
