@@ -346,7 +346,7 @@ SIGNAL_SOURCE_BLACKLIST = {
     'return_exhaustion-',
 }
 SERVER_NAME = 'Hermes'
-MAX_OPEN_POSITIONS = 5   # max open paper positions — diversified portfolio (was 3)
+MAX_OPEN_POSITIONS = 4   # max open paper positions
 
 # ── Scanner Position Limits ─────────────────────────────────────────────────────
 # Unified limits for scanner slot allocation (unified_scanner.py)
@@ -836,9 +836,9 @@ PM_TIER2_SKIP_TOP_PCT = 0   # don't touch top 20% — let best runners go
 PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
-PM_TRAIL_ENABLED     = True   # CEO 2026-08-16: act 0.30%, dist 0.15% (reverted). Floor = +0.15%. Was 0.50% dist — 3.3x too wide, killed small wins.
-PM_TRAIL_ACTIVATE_PCT = 0.003  # 0.30% — CEO 2026-08-16: LOWERED from 0.40%. Breakeven guard removed. More trades qualify for trailing. Floor = -0.20% (0.30% - 0.50%). Monitor: PM_TRAIL capture rate (should ↑), avg exit (should ↑ from 0.24%).
-PM_TRAIL_DISTANCE_PCT = 0.0015  # 0.15% — REVERTED 2026-08-16. Original from Aug 6. 0.50% was 3.3x too wide, killed small wins. 0.15% catches small wins before they reverse. Floor = +0.15% (0.30% - 0.15%).
+PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%.
+PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40%
+PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20%
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
