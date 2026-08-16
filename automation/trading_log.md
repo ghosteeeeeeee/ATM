@@ -1,5 +1,35 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-16 06:30 UTC — Daily Orchestrator Report
+
+**Pipeline Status:**
+- Trades (24h): 58 closed, 0 open
+- PnL: -5.89% (flat market variance)
+- Market: Dead neutral (1 LONG_BIAS, 0 SHORT, 103 NEUTRAL)
+- Macro gate: REDUCE (25% WR < 30)
+
+**System State:**
+- ct-hot+ fully cleared (0 open positions)
+- PM_TRAIL deployed correctly (act 0.40%, dist 0.60%)
+- All upgrades implemented (8/8 plans)
+- No critical issues, no signals meet kill threshold
+
+**Current Focus:**
+- R:R monitoring: PM_TRAIL wider distance needs more time to show effect
+- Market flat: CTX-GATE blocking signals (low volatility)
+- ATR SL improving (36.0% vs 40% threshold)
+
+**Implemented Today:**
+- CURRENT.md updated (ct-hot+ cleared, market state, trimmed to 58 lines)
+- Git committed and pushed
+
+**Next Actions:**
+1. Monitor R:R improvement from PM_TRAIL distance widening
+2. Wait for market directional bias (regime shift)
+3. Watch signal starvation if daily trades <20T when market moves
+
+---
+
 ## 2026-08-16 05:30 UTC — Hourly Analysis
 
 **Trades:** 1 closed (0 wins, 0 losses)
@@ -8862,3 +8892,38 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATOM entry was -82.77% — is there an entry timing issue?
 - 3 remaining ct-hot+ positions — monitoring for closure
+
+## [2026-08-16 06:30 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 0 breakeven, 3 losses)
+**PnL:** -$0.13 (WR: 0%)
+
+**24h Snapshot:**
+- 58 trades total, -$0.55 net, 42% WR
+- ATR SL hit rate: 43.1% (25/58) — above 40% threshold
+- ct-hot+ responsible for 15/25 ATR SL hits (60%) — already disabled
+- return_exhaustion_long: 3T 100% WR, +$0.39 (best signal)
+- ct-hot+: 33T 42% WR, -$0.42 (killed signal still closing positions)
+
+**Last Hour Trades:**
+- PURR ct-hot+ LONG: -$0.04 (atr_sl_hit, -39.94% PnL%)
+- COMP ct-hot+ LONG: -$0.03 (atr_sl_hit, -30.77% PnL%)
+- CFX ct-hot+ LONG: -$0.06 (atr_sl_hit, -64.88% PnL%)
+
+**Diagnosis:**
+1. **Entry quality:** All 3 entries losing -30% to -65% PnL% — bad entries but from killed signal
+2. **SL behavior:** ATR SL 43.1% — above 40% threshold but entirely driven by ct-hot+ (already killed)
+3. **Signal quality:** No kill candidates (continuation+ 2T 0% below 3T threshold)
+4. **Trade frequency:** 3/hr — normal
+
+**Changes:** None. System self-correcting via ct-hot+ disable.
+
+**No Change Needed:**
+- ct-hot+ already disabled — remaining positions draining, ATR SL rate will improve
+- No 0% WR kill candidates (continuation+ only 2T)
+- return_exhaustion_long performing well at 100% WR
+- Trade frequency normal
+
+**Open Questions:**
+- 3 remaining ct-hot+ positions draining — will ATR SL drop below 40% after they close?
+- continuation+ 2T 0% WR — watching for kill threshold

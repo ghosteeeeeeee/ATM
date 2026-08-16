@@ -489,7 +489,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.010   # 1.0% floor — wider than trailing distance (0.20%) for breathing room
-ATR_SL_MAX             = 0.025  # 2.5% cap — wide enough for ATR-based breathing room
+ATR_SL_MAX             = 0.030  # 3.0% cap — widened from 2.5% 2026-08-16. ATR_SL dominant drag: 45T -$3.32 (avg loss -0.75%). Wider SL gives trades room to reach PM_TRAIL activation (+0.40%). Monitor: ATR_SL hit count (should ↓ from 45/48h), PM_TRAIL capture rate (should ↑). Revert if avg loss widens without fewer hits.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-08-16 eval: REVERTED from 2.5. 2.5x made TP unreachable (only 1 ATR_TP hit/48h). 2.0x more realistic. PM_TRAIL handles profit-taking, but ATR_TP as secondary exit needs reachable target. Monitor: ATR_TP hit count (should ↑ from 1), R:R (should hold >0.75:1).
@@ -504,7 +504,7 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 ATR_SL_MIN_INIT    = 0.010  # 1.0% — MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.025  # 2.5% — reverted from 1.0%. MUST match ATR_SL_MAX
+ATR_SL_MAX_INIT    = 0.030  # 3.0% — widened from 2.5%. MUST match ATR_SL_MAX
 SL_PCT_FALLBACK    = 0.010  # 1.0% if ATR unavailable (matched to ATR_SL_MIN)
 TP_PCT_FALLBACK    = 0.020  # 2.0% fallback target (2:1 R:R with 1.0% SL)
 STOP_LOSS_DEFAULT  = 0.010  # 1.0% hard fallback (matched to ATR_SL_MIN)

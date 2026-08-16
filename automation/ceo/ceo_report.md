@@ -1,3 +1,32 @@
+## CEO Report — 2026-08-16 (15th run)
+
+### Diagnosis
+ATR_SL is the #1 system drag. 45T/48h avg loss -0.753% (-$3.32). Only 2.2% WR on ATR_SL exits. R:R severely inverted: ATR_SL avg loss -0.753% vs PM_TRAIL avg win +0.390% (0.52:1). 24h: 58T -$0.49 39.7% WR. 7d: 458T -$1.99 50.0% WR. 0 open trades flat. All legacy losers already disabled (ct-hot+, wave_catcher+, range_breakout+, trend_momentum, continuation+). Stars7d intact: return_exhaustion_long 100%, hzscore+,mover+ 80%, r2-trend-long2 64.7%, bb_bounce+ 63.6%.
+
+### Root Cause
+ATR_SL_MAX (2.5%) too tight for current volatility. Trades get stopped out before reaching PM_TRAIL activation (+0.40%). PM_TRAIL fires 54T/48h at 75.9% WR — it works, but only catches trades that survive long enough to reach +0.40%.
+
+### Fix Applied
+1. WIDENED ATR_SL_MAX 2.5% → 3.0% (hermes_constants.py:492)
+2. WIDENED ATR_SL_MAX_INIT 2.5% → 3.0% (hermes_constants.py:507) — must match
+
+### Expected Impact
+- Fewer ATR_SL hits (trades have more room to breathe)
+- More trades reaching PM_TRAIL activation → higher PM_TRAIL capture rate
+- R:R should improve from 0.52:1 toward 1:1
+- Risk: avg loss per ATR_SL hit may widen slightly (2.5%→3.0% cap)
+
+### Verification
+- ATR_SL_MAX verified 0.030 in hermes_constants.py
+- ATR_SL_MAX_INIT verified 0.030 to match
+- Revert if avg loss widens without fewer ATR_SL hits
+
+### Next Actions
+1. Monitor ATR_SL hit count (should ↓ from 45/48h)
+2. Monitor PM_TRAIL capture rate (should ↑ from 54/48h)
+3. R:R must ↑ from 0.52:1 toward 1:1
+4. ATR_SL_MAX needs 48h data — if avg loss widens to -0.90%+ with same hit count, revert
+
 ## CEO Report — 2026-08-16 (14th run)
 
 ### Diagnosis

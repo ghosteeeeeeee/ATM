@@ -732,3 +732,7 @@
   WHY: 4T last hour (XPL +$0.03, HYPE $0.00, KAS -$0.03, ATOM -$0.09 — net -$0.09). 24h 55T 41.8% ATR SL (above 40% threshold). ct-hot+ responsible for 15/23 ATR SL hits (65%) but already disabled. 3 remaining ct-hot+ positions waiting to close. No 0% WR kill candidates. 4/hr normal. System correcting itself via ct-hot+ disable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 06:00 UTC
+[2026-08-16 06:30] auto_1hr: NO CHANGES
+  WHY: 3T last hour (PURR -$0.04, COMP -$0.03, CFX -$0.06 — net -$0.13). All ct-hot+ atr_sl hits. 24h 58T 43.1% ATR SL (above 40% but ct-hot+ already disabled). 15/25 ATR SL hits from ct-hot+. 3 remaining ct-hot+ positions. No 0% WR kill candidates (continuation+ 2T 0% below 3T). return_exhaustion_long 3T 100% WR best signal. 3/hr normal. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 07:30 UTC
