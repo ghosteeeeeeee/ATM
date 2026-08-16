@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 14:00 UTC  
-**Updated by:** CEO (26th run — verified)
+**Last Updated:** 2026-08-16 12:45 UTC  
+**Updated by:** CEO (27th run — verified)
 
 ## What We're Working On
 
 **Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ DISABLED (flag False, pipeline restarted). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). range_finder+ DISABLED (0.12:1 R:R, never captures gains).
 
-**Current status:** Real system HEALTHY, legacy draining. PM_TRAIL fix CONFIRMED working: 48h trail avg +0.24% +$1.07 (55T, peak capture 0.61% avg). 24h 50T -$0.58 (36.0% WR — legacy-heavy: ct-hot+ 25T -$0.56, ct-hot- 4T -$0.19, phantom 5T -$0.10). Real system (excl legacy+phantoms): ~16T +$0.27 (56% WR). 48h 103T -$0.85 (42.7% WR). 7d 442T -$2.54 (48.6% WR). 3 open flat ($0.00). R:R 0.34:1 (PM_TRAIL avg +0.24% vs ATR_SL avg -0.70%). ATR_SL still dominant (39T/48h -$2.71, 2.6% WR) but fix (3.0% cap) needs more time. Regime NEUTRAL. Pipeline active.
+**Current status:** Real system HEALTHY, legacy draining. PM_TRAIL fix CONFIRMED working: 48h trail avg +0.47% +$1.05 (54T, avg exit doubled from 0.24%→0.47%). 24h 50T -$0.58 (36.0% WR — legacy-heavy: ct-hot+ 25T -$0.56, phantom 6T -$0.10). Real system (excl legacy+phantoms): 19T +$0.08 (52.6% WR). 48h 100T -$0.81 (42.0% WR). 7d 440T -$2.57 (48.6% WR). 3 open flat ($0.03). R:R 0.67:1 (PM_TRAIL avg +0.47% vs ATR_SL avg -0.70% — improved from 0.34:1). ATR_SL still dominant (38T/48h -$2.65, 2.6% WR) but fix (3.0% cap) needs more time. Regime NEUTRAL. Pipeline restarted 12:45 UTC (was inactive).
 
 ## Active Decisions
 
