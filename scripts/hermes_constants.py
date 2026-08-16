@@ -632,7 +632,7 @@ CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block go
 # BUT: Best trades had EXTREME z when speed confirmed direction
 # Key insight: Extreme z + high speed = reversal (win), Extreme z + low speed = chasing (lose)
 SIGNAL_FILTER_ENABLED = True         # master switch for all filters below
-SIGNAL_FILTER_SPEED_MIN = 30  # FINALIZED 2026-08-16 eval: kept. Recovery from 15T→50T+ daily trades confirmed. NEUTRAL override at15.
+SIGNAL_FILTER_SPEED_MIN = 40  # CEO 2026-08-16: RAISED from 30. ATR_SL 37T/48h 2.7% WR -$2.45 dominates. Higher speed min = fewer but better entries. NEUTRAL override at15 unchanged.
 SIGNAL_FILTER_NEUTRAL_SPEED_MIN = 15  # CEO 2026-08-15 — STARVATION FIX: relaxed speed filter in NEUTRAL regime (102/104 tokens flat). 30 still blocks most NEUTRAL signals. 15 lets low-momentum signals through when regime is flat.
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
 SIGNAL_FILTER_RSI_MIN = 30           # block SHORT when RSI < this (oversold = bounce risk)
@@ -1695,13 +1695,13 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = False  # CEO 2026-08-16 run 28: DISABLED AGAIN. Re-enabled earlier today but 25T/24h 36% WR -$0.56 still bleeding. ATR_SL 18T 0% WR -$1.23 dominates. Re-enable when WR >55% with 20+ trades.
-COIN_TRACKER_HOT_PLUS_ENABLED       = False  # CEO 2026-08-16 run 28: DISABLED. Same bleed as base.
-COIN_TRACKER_HOT_MINUS_ENABLED      = False  # CEO 2026-08-16 run 28: DISABLED. SHORT 4T 0% WR -$0.19.
+COIN_TRACKER_HOT_ENABLED            = True   # CEO 2026-08-16: RE-ENABLED with MIN_COMPOSITE 55 (raised from 50). ct-hot+ legacy clearing, new entries filtered harder. Monitor: WR must >55% with 20+ trades in 48h.
+COIN_TRACKER_HOT_PLUS_ENABLED       = True   # CEO 2026-08-16: RE-ENABLED. MIN_COMPOSITE 55 filters low-quality entries.
+COIN_TRACKER_HOT_MINUS_ENABLED      = False  # CEO 2026-08-16: SHORT side dead (8.3% WR 48h). Do NOT enable until regime shifts to SHORT_BIAS.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 50      # CEO 2026-08-16: RAISED from 45. ct-hot+ deteriorating. When re-enabled, filter out low-quality entries.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 55      # CEO 2026-08-16: RAISED from 50. Re-enabled with stricter filter. Previous: 36% WR with composite 50. Target: >55% WR with composite 55.
