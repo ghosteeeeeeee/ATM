@@ -32,3 +32,7 @@
 - **INFO**: Disk 72% used, all critical timers firing
 - **AUTO-FIX**: Restarted `hermes-pipeline.service` (was inactive)
 - **NOTE**: better-coder/hl-volume/mtf-macd-tuner failures are non-critical code/API issues, not trading-impacting
+
+## Error Alerts — 2026-08-16 02:02 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=[_http_post] N rate-limited, attempt N/N, waiting 1s...`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK: [_http_post] N rate-limited, attempt N/N, waiting 1s...`

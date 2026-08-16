@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-16 (CEO run — verified, 8th run)] CEO: KILLED RANGE_BREAKOUT_ENABLED + CONTINUATION_ENABLED
+  WHY: range_breakout+ 8T 25% WR -$0.41 (7d), continuation+ 5T 40% WR -$0.17 (7d). Both negative, all trades closed (no open positions). Legacy losers aging out.
+  BY: CEO run
+  DO NOT REVERT — both signals dead on WR and PnL.
+
 [2026-08-16 (CEO run — verified)] CEO: REVERTED PM_TRAIL_ACTIVATE_PCT 0.60%→0.40%
   WHY: Eval window closing Aug 17. Eval results: R:R worsened to 0.37:1 (from 0.67:1 pre-eval). PM_TRAIL avg exit 0.29% (down from 0.44% pre-eval). ATR_SL 49T/48h avg -0.78% (-$3.81) still dominates. Root cause: 0.60% activation too high — ATR_SL trades peak at 0.94% MFE but trail never activates (needs 0.60%), so they die at -0.79%. Reverting to 0.40% catches trades earlier → fewer ATR_SL hits → better R:R. PM_TRAIL_DISTANCE_PCT stays at 0.50% (floor = -0.10%).
   BY: CEO run
@@ -710,3 +715,7 @@
   WHY: 1T last hour (NOT -$0.04 guardian_orphan). 24h 55T 37% ATR SL ✅. No kill candidates. System stable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 04:30 UTC
+[2026-08-16 04:30] auto_1hr: NO CHANGES
+  WHY: 4T last hour (all atr_sl: IO -/usr/bin/bash.08, SUSHI -/usr/bin/bash.11, MON -/usr/bin/bash.03, CC -/usr/bin/bash.05 — net -/usr/bin/bash.27). 24h 58T 37% ATR SL ✅ (41.4% by count but borderline). No 0% WR kill candidates. range_finder+ 9T 33.3% WR persistent but not at kill threshold. tpsl_utils fixes deployed. 2 open positions near breakeven. No overtrading. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 05:30 UTC

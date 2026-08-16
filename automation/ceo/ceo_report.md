@@ -1,3 +1,20 @@
+## CEO Report — 2026-08-16 (8th run, verified)
+
+### Diagnosis
+Killed 2 more losers. Verified DB: 24h 58T -$0.36 (43.1% WR — RED). 7d 457T -$1.80 (50.3% WR). 48h exit breakdown: PM_TRAIL 62T 75.8% WR avg +0.26% (+$1.69), ATR_SL 50T 2% WR avg -0.76% (-$3.83), T1 12T 100% WR avg +0.57% (+$0.69). R:R 0.75:1 (inverted but improved from 0.38:1 earlier this week). 2 open -$0.03 flat. Stars 7d: return_exhaustion_long 3T 100% +$0.39, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 22T 63.6% +$0.25.
+
+### Root Cause
+Legacy losers still firing despite some being disabled — trades aging out. RANGE_BREAKOUT_ENABLED=True was letting 25% WR signals through. CONTINUATION_ENABLED=True was generating re-entries that lost. Both killed today. ATR_SL remains the dominant drag (50T/48h at -0.76% avg) — PM_TRAIL revert to 0.40% activation should reduce ATR_SL hits over next 24-48h.
+
+### Fix Applied
+1. RANGE_BREAKOUT_ENABLED = False (was True, 8T 25% WR -$0.41 7d)
+2. CONTINUATION_ENABLED = False (was True, 5T 40% WR -$0.17 7d)
+
+### Verification
+Eval windows FINALIZED — all 6 at target values. Tomorrow's run: evaluate all 6 windows, make final param calls, R:R must ↑ from 0.75:1 toward 1:1+. No more legacy losers to kill — all bleeding signals now disabled.
+
+---
+
 ## CEO Report — 2026-08-16 (7th run, verified)
 
 ### Diagnosis

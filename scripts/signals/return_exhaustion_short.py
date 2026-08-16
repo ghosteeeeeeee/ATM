@@ -6,7 +6,7 @@ Catches overextended rallies by detecting when short-term returns are at a
 percentile extreme (>p92) with momentum divergence confirming the turn.
 
 SHORT-SPECIFIC IMPROVEMENTS over generic return_exhaustion:
-  1. Regime filter: only fire when 1H trend is BEARISH or NEUTRAL (not BULLISH)
+  1. Regime filter: only fire when 15m trend is BEARISH or NEUTRAL (not BULLISH)
   2. Tighter percentile: 92 (was 90) — more extreme positive return required
   3. Tighter RSI overbought: 60 (was 70) — stronger overbought confirmation
   4. Volume confirmation: 1.2x average (new, fail-closed)
@@ -16,7 +16,7 @@ LOGIC:
   SHORT: short-term return > p92 (extreme positive) AND
          fast momentum < slow momentum (turning down) AND
          RSI overbought AND
-         1H trend BEARISH/NEUTRAL AND
+         15m trend BEARISH/NEUTRAL AND
          volume 1.2x average
 
 BACKTEST CONTEXT:
@@ -170,14 +170,14 @@ def _rsi(prices: list, period: int = RSI_PERIOD) -> Optional[float]:
     return 100.0 - (100.0 / (1.0 + rs))
 
 
-def _get_1h_trend(token: str) -> str:
-    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+def _get_15m_trend(token: str) -> str:
+    """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 60
@@ -232,7 +232,7 @@ def detect_return_exhaustion_short(token: str, prices: list) -> Optional[Dict]:
     price = prices[-1]
 
     # Regime filter: block BULLISH (shorting extreme positive in uptrend = dangerous)
-    trend = _get_1h_trend(token)
+    trend = _get_15m_trend(token)
     if trend == 'BULLISH':
         return None
 

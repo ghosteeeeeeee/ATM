@@ -8695,3 +8695,28 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - guardian_orphan closed NOT LONG at -$0.04 — position was likely orphaned (no signal)
+
+## [2026-08-16 04:30 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0W 4L)
+- IO LONG (bb_bounce+,rs-s66): -$0.08 (atr_sl_hit, -80.86%)
+- SUSHI LONG (ct-hot+): -$0.11 (atr_sl_hit, -106.03%)
+- MON LONG (ct-hot+): -$0.03 (atr_sl_hit, -28.72%)
+- CC LONG (ct-hot+): -$0.05 (atr_sl_hit, -46.28%)
+
+**PnL:** -$0.27
+**24h:** 58T, 37.0% ATR SL ✅ (but 41.4% by trade count)
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- ATR SL 41.4% — borderline but 24h still roughly breakeven (profit-monster +$1.33 offsets)
+- No 0% WR kill candidates (range_finder+ 9T 33.3% WR persistent but not 0% WR)
+- Only 1T in last hour — no overtrading
+- tpsl_utils.py has recent fixes deployed (per-trade trailing, MIN GUARD cap)
+- 2 open positions near breakeven (HYPE, KAS)
+- ct-hot+ still primary profit driver over 24h despite last hour cluster
+
+**Open Questions:**
+- 4T all SL in one hour is a cluster — possible market micro-dump. Monitor next hour.
+- range_finder+ continues to drag (9T 33.3% WR -$0.14) — approaching kill threshold

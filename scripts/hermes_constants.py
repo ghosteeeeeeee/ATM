@@ -1199,7 +1199,7 @@ RANGE_FINDER_MINUS_ENABLED = True    # TESTING 2026-08-15 — re-enabled for tes
 RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
 # range_breakout.py — breakout from tight range with retest confirmation
-RANGE_BREAKOUT_ENABLED = True
+RANGE_BREAKOUT_ENABLED = False   # CEO KILLED 2026-08-16 — 8T 25% WR -$0.41 (7d). All variants dead.
 RANGE_BREAKOUT_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-15 — 8T 25% WR -$0.41 (7d). Kill LONG.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
 RANGE_BREAKOUT_SHORT_ENABLED = False  # CEO KILLED 2026-08-15 — 13T 48h 23.1% WR -$0.61. Deteriorated from 52% WR at re-enable. atr_sl_hit dominates (10T -$0.71).
@@ -1604,7 +1604,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 
 # ── Continuation (re-entry after profitable close) ──────────────────────
 # continuation.py — re-enter same direction after profit-monster exit
-CONTINUATION_ENABLED = True
+CONTINUATION_ENABLED = False   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). Re-entry after profit-monster not working.
 CONTINUATION_PLUS_ENABLED = True              # re-enter LONG after LONG close
 CONTINUATION_MINUS_ENABLED = False # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry

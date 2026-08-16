@@ -3,7 +3,7 @@
 Range Finder SHORT — mean-reversion at range resistance (SHORT-specific).
 
 SHORT-SPECIFIC IMPROVEMENTS over generic range_finder:
-  1. Regime filter: only fire when 1H trend is BEARISH or NEUTRAL (not BULLISH)
+  1. Regime filter: only fire when 15m trend is BEARISH or NEUTRAL (not BULLISH)
   2. Tighter RSI overbought: 55 (was 60) — stronger overbought required
   3. More band touches: 4 (was 3) — confirm range is real before shorting
   4. Volume confirmation: 1.2x average (new)
@@ -124,14 +124,14 @@ def _count_band_touches(closes, upper, lower, window=TOUCH_WINDOW):
     return upper_touches, lower_touches
 
 
-def _get_1h_trend(token):
-    """Check 1H EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
+def _get_15m_trend(token):
+    """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
         conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 60
@@ -270,7 +270,7 @@ def detect_range_short(token, closes):
         return None
 
     # Regime filter: block BULLISH (shorting resistance in uptrend = dangerous)
-    trend = _get_1h_trend(token)
+    trend = _get_15m_trend(token)
     if trend == 'BULLISH':
         return None
 

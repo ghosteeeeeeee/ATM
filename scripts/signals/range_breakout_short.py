@@ -3,7 +3,7 @@
 Range Breakout SHORT — breakout signal for SHORT entries.
 
 SHORT-SPECIFIC IMPROVEMENTS over generic range_breakout:
-  1. Regime filter: only fire when 1H trend is BEARISH or NEUTRAL (not BULLISH)
+  1. Regime filter: only fire when 15m trend is BEARISH or NEUTRAL (not BULLISH)
   2. Tighter RSI threshold: require stronger overbought
   3. Velocity filter: require price rising into SHORT (vel > 0)
   4. Spike exhaustion filter: block after sharp rises
@@ -149,14 +149,14 @@ def _get_candles_5m(token, lookback=100):
             conn.close()
 
 
-def _get_1h_trend(token):
-    """Check 1H EMA trend for regime filter."""
+def _get_15m_trend(token):
+    """Check 15m EMA trend for regime filter."""
     conn = None
     try:
-        conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         cur = conn.cursor()
         cur.execute("""
-            SELECT close FROM candles_1h
+            SELECT close FROM candles_15m
             WHERE token = ?
             ORDER BY ts DESC
             LIMIT 50
@@ -314,7 +314,7 @@ def detect_breakout_short(closes, token):
     conf += squeeze_bonus + bounce_bonus
 
     # 1H trend bonus (SHORT + BEARISH = aligned)
-    trend = _get_1h_trend(token)
+    trend = _get_15m_trend(token)
     if trend == 'BEARISH':
         conf += 5
 
