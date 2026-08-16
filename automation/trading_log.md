@@ -9095,3 +9095,33 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL rate should drop below 40% once ct-hot+ drain completes
 - Watch continuation+ if it adds more losing trades
+
+## [2026-08-16 14:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (Sunday quiet)
+**24h:** 51 trades, net negative — dominated by ct-hot+ legacy bleed (22T -$0.50)
+
+**24h Exit Breakdown:**
+- atr_sl_hit: 24T 47.1% — BUT 22/24 from ct-hot+ (disabled). Active signal ATR SL: 2/27 = 7.4% ✅
+- profit-monster-trail: 14T +$0.79 (best exit, +$0.056 avg)
+- guardian_orphan: 6T -$0.10 (legacy cleanup)
+- profit-monster-T1: 5T +$0.27
+
+**Signal Quality:**
+- return_exhaustion_long: 3T 100% WR +$0.39 (best signal)
+- ct-hot-: 4T 0% WR -$0.19 — kill threshold BUT already DISABLED
+- continuation+: 1T 0% -$0.10 (below 3T kill threshold)
+- All other signals: 1-2T, mixed
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL rate above 40% is entirely from disabled ct-hot+ legacy positions (22/24). Active signal ATR SL is 7.4% — excellent.
+- ct-hot- at kill threshold already disabled (COIN_TRACKER_HOT_MINUS_ENABLED = False)
+- continuation+ only 1T, below 3T kill threshold
+- Trade frequency normal (~1-2/hr)
+- Open positions: 1 (SYRUP $11 at breakeven)
+
+**Open Questions:**
+- ct-hot+ generated 1 trade at 13:16 UTC today (GRASS +$0.02) despite being disabled — possible race condition or brief re-enable. Monitor for more.
+- ATR SL rate should continue dropping as remaining ct-hot+ positions drain.

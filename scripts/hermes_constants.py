@@ -1196,8 +1196,8 @@ STANDALONE_BYPASS_SIGNALS = (
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = False  # CEO 2026-08-16: DISABLED. 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos (hzscore+,range_finder+ and bb_bounce+,range_finder+ both bleeding). Re-enable when R:R >1:1.
 RANGE_FINDER_PLUS_ENABLED = False # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-10 (20T -$0.44). Monitor winrate.
-RANGE_FINDER_MINUS_ENABLED = True    # TESTING 2026-08-15 — re-enabled for testing. Was disabled 2026-08-08 (40% WR -$0.19). Monitor winrate.
-RANGE_FINDER_SHORT_ENABLED = True    # range_finder_short — SHORT-specific with regime filter, tighter RSI, volume confirm
+RANGE_FINDER_MINUS_ENABLED = False   # CEO KILLED 2026-08-16 — 3T 0% WR -$0.12 (48h SHORT). Bleeds both directions. Re-enable only in confirmed downtrend.
+RANGE_FINDER_SHORT_ENABLED = False   # CEO KILLED 2026-08-16 — range_finder SHORT dead. All range_finder variants disabled.
 
 # range_breakout.py — breakout from tight range with retest confirmation
 RANGE_BREAKOUT_ENABLED = False   # CEO KILLED 2026-08-16 — 8T 25% WR -$0.41 (7d). All variants dead.
