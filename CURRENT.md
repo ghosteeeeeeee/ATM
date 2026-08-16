@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated:** 2026-08-16 12:45 UTC  
-**Updated by:** CEO (27th run — verified)
+**Last Updated:** 2026-08-16 13:20 UTC  
+**Updated by:** CEO (28th run — verified)
 
 ## What We're Working On
 
-**Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ DISABLED (flag False, pipeline restarted). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). range_finder+ DISABLED (0.12:1 R:R, never captures gains).
+**Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.15% (reverted from 0.50% — working at 66.7% WR). All legacy losers killed. ct-hot+ DISABLED AGAIN (re-enabled earlier today per user request, but 25T/24h 36% WR -$0.56 still bleeding). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). range_finder+ DISABLED (0.12:1 R:R, never captures gains).
 
-**Current status:** Real system HEALTHY, legacy draining. PM_TRAIL fix CONFIRMED working: 48h trail avg +0.47% +$1.05 (54T, avg exit doubled from 0.24%→0.47%). 24h 50T -$0.58 (36.0% WR — legacy-heavy: ct-hot+ 25T -$0.56, phantom 6T -$0.10). Real system (excl legacy+phantoms): 19T +$0.08 (52.6% WR). 48h 100T -$0.81 (42.0% WR). 7d 440T -$2.57 (48.6% WR). 3 open flat ($0.03). R:R 0.67:1 (PM_TRAIL avg +0.47% vs ATR_SL avg -0.70% — improved from 0.34:1). ATR_SL still dominant (38T/48h -$2.65, 2.6% WR) but fix (3.0% cap) needs more time. Regime NEUTRAL. Pipeline restarted 12:45 UTC (was inactive).
+**Current status:** ct-hot+ re-disabled. PM_TRAIL dist 0.15% REVERTED and WORKING: 48h 39T 66.7% WR +$1.09 (avg +0.273%). 24h 51T -$0.53 (37.3% WR — ct-hot+ legacy 25T -$0.56, phantom 5T -$0.10). Real system (excl ct-hot+): healthy. 48h 97T -$0.97 (41.2% WR). 7d 441T -$2.52 (48.8% WR). 2 open flat ($0.00). R:R 0.36:1 (PM_TRAIL +0.273% vs ATR_SL -0.75%). ATR_SL 36T/48h -$2.68 still dominant. Regime NEUTRAL. Pipeline restarted 13:20 UTC.
 
 ## Active Decisions
 
@@ -22,12 +22,13 @@
 - **PM_TRAIL_DISTANCE tightened 0.60%→0.50%.** Protect gains after breakeven guard removal. — 2026-08-16
 - **All legacy losers killed.** range_breakout+, continuation+, wave_catcher+, trend_momentum disabled. — 2026-08-16
 - **ATR_TP_K_MULT reverted 2.5→2.0.** 2.5x TP unreachable (1 hit/48h). — 2026-08-16
-- **COIN_TRACKER_HOT_ENABLED DISABLED.** ct-hot+ base was still firing (30T/48h 46.7% WR -$0.29). Removed from STANDALONE_BYPASS too. Re-enable when WR >55% with 20+ trades. — 2026-08-16
+- **COIN_TRACKER_HOT_ENABLED DISABLED.** Re-enabled earlier today per user request, but data shows 25T/24h 36% WR -$0.56 still bleeding. ATR_SL 18T 0% WR -$1.23 dominates. RE-DISABLED. MIN_COMPOSITE raised to 50. Re-enable when WR >55% with 20+ trades. — 2026-08-16
 - **ATR_SL_MAX widened 2.5%→3.0%.** Reduced avg loss per hit (-0.76%→-0.71%) but NOT hit count. Entry quality is the bottleneck. — 2026-08-16
 - **hl_copy_trader added to STANDALONE_BYPASS.** Copy-trading signal blocked by confluence gate in NEUTRAL. Now passes standalone. — 2026-08-16
 - **CONFLUENCE_NEUTRAL_RELAX=True.** Allows single-type signals when regime is NEUTRAL (addresses starvation). Currently 1m regime shows LONG_BIAS for most tokens — will activate if regime shifts. — 2026-08-16
 - **NO PARAM CHANGES.** Real system healthy at 58.3% WR. ct-hot+ clearing, no new trades since 06:24. — 2026-08-16
 - **RANGE_FINDER_ENABLED DISABLED.** 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos. — 2026-08-16
+- **PM_TRAIL_DISTANCE_PCT reverted 0.50%→0.15%.** Per user request (commit a0a971a). Working: 48h 39T 66.7% WR +$1.09 (avg +0.273%). Floor = +0.15%. Keep. — 2026-08-16
 
 ## Known Limitations
 
@@ -62,8 +63,9 @@
 
 ## Next Actions
 
-1. **Monitor ct-hot+ clear.** Legacy 29T/24h (ct-hot+ 25T, ct-hot- 4T) should age out by Aug 17-18. No new ct-hot+ trades.
-2. **ATR_SL fix evaluation.** Need 48h+ data after Aug 17 to assess 3.0% cap impact. Currently 39T/48h 2.6% WR.
-3. **Phantom trades.** 6T/48h -$0.10, root cause in guardian_orphan (hl-sync-guardian). Backlog item.
-4. **Daily trades must ↑.** Low volume Sunday + ct-hot+ disabled = fewer trades. Monitor hl_copy_trader volume.
-5. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%, hzscore+,mover+ 4T 75%.
+1. **Monitor ct-hot+ clear.** Re-disabled (flags False). Legacy 25T/24h should age out by Aug 17-18. No new ct-hot+ trades.
+2. **ATR_SL fix evaluation.** Need 48h+ data after Aug 17 to assess 3.0% cap impact. Currently 36T/48h -$2.68.
+3. **PM_TRAIL 0.15% dist monitoring.** Working at 66.7% WR. Must hold >60% WR over 48h. If degrades, revisit 0.25% dist.
+4. **Phantom trades.** 5T/48h -$0.10, root cause in guardian_orphan (hl-sync-guardian). Backlog item.
+5. **Daily trades must ↑.** Low volume Sunday + ct-hot+ disabled = fewer trades. Monitor hl_copy_trader volume.
+6. **Stars7d intact:** return_exhaustion_long 3T 100%, bb_bounce+ 22T 63.6%, r2-trend-long2 17T 64.7%, hzscore+,mover+ 4T 75%.

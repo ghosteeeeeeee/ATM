@@ -931,7 +931,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-16 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-16 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-13 — 31T -$0.12 7d (53.1% WR but inverted R:R: avg_win $0.053 vs avg_loss $0.073). Revert if R:R improves.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
@@ -1607,7 +1607,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # ── Continuation (re-entry after profitable close) ──────────────────────
 # continuation.py — re-enter same direction after profit-monster exit
 CONTINUATION_ENABLED = False   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). Re-entry after profit-monster not working.
-CONTINUATION_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-16 # re-enter LONG after LONG close
+CONTINUATION_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-16 # re-enter LONG after LONG close
 CONTINUATION_MINUS_ENABLED = False # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
@@ -1695,13 +1695,13 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # RE-ENABLED 2026-08-16 per user request. Was disabled for 46.7% WR bleed. Monitor WR.
-COIN_TRACKER_HOT_PLUS_ENABLED       = True   # RE-ENABLED 2026-08-16 per user request. Monitor WR and ATR_SL count.
-COIN_TRACKER_HOT_MINUS_ENABLED      = True   # RE-ENABLED 2026-08-16 per user request. SHORT direction back.
+COIN_TRACKER_HOT_ENABLED            = False  # CEO 2026-08-16 run 28: DISABLED AGAIN. Re-enabled earlier today but 25T/24h 36% WR -$0.56 still bleeding. ATR_SL 18T 0% WR -$1.23 dominates. Re-enable when WR >55% with 20+ trades.
+COIN_TRACKER_HOT_PLUS_ENABLED       = False  # CEO 2026-08-16 run 28: DISABLED. Same bleed as base.
+COIN_TRACKER_HOT_MINUS_ENABLED      = False  # CEO 2026-08-16 run 28: DISABLED. SHORT 4T 0% WR -$0.19.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 45      # REVERTED 2026-08-16 per user request. Was 50 to filter entries. Monitor WR.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 50      # CEO 2026-08-16: RAISED from 45. ct-hot+ deteriorating. When re-enabled, filter out low-quality entries.
