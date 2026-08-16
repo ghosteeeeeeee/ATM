@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-16 (39th run)
+
+### Diagnosis
+System -$0.82/24h (34.8% WR). ct-hot+ TESTING MODE: 20T/24h -$0.61, 30% WR. Today's ct-hot+ collapsed: 18.2% WR (yesterday 54.5%). ATR_SL: 37T/48h -$2.38 (ct-hot+ = 18 hits -$1.23 = 52% of ATR_SL losses). PM_TRAIL: 52T/48h 73.1% WR +$1.77 (carrying system). Non-ct-hot: 23T/24h -$0.14 (flat). 3 open -$0.02. R:R 0.74:1.
+
+### Root Cause
+ct-hot+ entries hitting ATR_SL immediately after entry. Today: 9/11 ATR_SL vs 2/11 PM_TRAIL (82% stop rate). Yesterday: 9/22 ATR_SL vs 13/22 PM_TRAIL (41% stop rate). Same signal, different day — MIN_COMPOSITE 55 not filtering weak entries. Market conditions unchanged (NEUTRAL regime). SPEED_MIN 40 reducing overall ATR_SL (41→15 daily) but ct-hot+ still entering noise.
+
+### Fix Applied
+**RAISED MIN_COMPOSITE 55→60.** Higher threshold = fewer ct-hot+ noise entries. Conservative (+5, not +10) to avoid signal starvation. ct-hot+ user testing mode respected (flags still True).
+
+### Verification
+Monitor next 24h: ct-hot+ ATR_SL count (should ↓ from 18/24h), daily trades (must >20T), PM_TRAIL WR (must hold >60%). SPEED_MIN 40 eval window still active.
+
+---
+
 ## CEO Report — 2026-08-16 (38th run)
 
 ### Diagnosis
