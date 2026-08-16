@@ -1704,4 +1704,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 65      # CEO 2026-08-16: RAISED from 60. ct-hot+ 17T/24h 29.4% WR -$0.58 (68% of loss) despite 60 threshold. 18 ATR_SL/48h still dominates. Higher composite = fewer noise entries. Target: <10 ATR_SL/48h from ct-hot+.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 70      # CEO 2026-08-16: RAISED from 65. ct-hot+ 15T/24h 20% WR -$0.73 (74% of loss). ALL 12 trades today NEUTRAL regime 25% WR. Higher composite = fewer noise entries in flat markets. Target: <8 ct-hot+ trades/24h.

@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-16 (41st run)
+
+### Diagnosis
+System -$0.99/24h (31.1% WR — worst day). ct-hot+ TESTING MODE: 15T/24h -$0.73, 20% WR (74% of loss). ALL 12 ct-hot+ trades today NEUTRAL regime (25% WR). Non-ct-hot: 57T/48h -$0.06 (flat/healthy). ATR_SL: 39T/48h 2.6% WR -$2.42. PM_TRAIL: 41T/48h 68.3% WR +$1.09 (only winner). R:R 0.41:1. 7d: 439T -$2.79 (48.3% WR). 3 open: BSV SHORT +0.48%, JUP SHORT +1.17%, INJ LONG -0.34%.
+
+### Root Cause
+ct-hot+ firing in NEUTRAL regime — all 12 trades today entered flat markets where coin_tracker finds "hot" setups but no trend exists. MIN_COMPOSITE 65 still lets marginal entries through. Non-ct-hot system is healthy at near-breakeven.
+
+### Fix Applied
+**RAISED MIN_COMPOSITE 65→70.** Filters more ct-hot+ noise in flat markets. Target: <8 ct-hot+ trades/24h. Pipeline restarted.
+
+### Verification
+Monitor: ct-hot+ trade count (should ↓ from 15T/24h), daily trades (must >20T), PM_TRAIL WR (must hold >60%), R:R (should ↑ from 0.41:1).
+
+---
+
 ## CEO Report — 2026-08-16 (40th run)
 
 ### Diagnosis
