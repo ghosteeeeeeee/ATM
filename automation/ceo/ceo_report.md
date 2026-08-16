@@ -1,20 +1,21 @@
-## CEO Report — 2026-08-16 (44th run)
+## CEO Report — 2026-08-16 (45th run)
 
 ### Diagnosis
-System IMPROVING. Last 6h: 12T +$0.11, 58.3% WR (positive). Last 3h: 8T +$0.13, 62.5% WR. Verified 48h: PM_TRAIL 41T 69.0% WR +$1.17 (R:R 2.70:1 — strongest edge). T1 12T 100% WR +$0.69. ATR_SL 39T -0.633% avg -$2.42 (dominant drag). ct-hot+ legacy 33T/48h 42.4% WR -$0.42 (draining). 7d: 436T -$2.65, 48.4% WR. 4 open ~$0 flat.
+System IMPROVING. Last 3h: 7T +$0.17, 71.4% WR (STRONG). Last 6h: 11T +$0.12, 63.6% WR. Verified 48h excl ct-hot+: 48T +$0.22, 50.0% WR (POSITIVE). PM_TRAIL 39T 74.4% WR +$1.27 (R:R 2.70:1 — strongest edge). T1 12T 100% WR +$0.69. ATR_SL 38T 2.6% WR -$2.32 (dominant drag). ct-hot+ 33T/48h 42.4% WR -$0.42 (draining, user TESTING MODE). 7d: 437T -$2.62, 48.5% WR. 3 open ~$0 flat.
 
 ### Key Findings
-- **ct-hot+ STILL ENABLED** — flags True (user re-enabled, TESTING MODE). 12T/24h 16.7% WR -$0.61. NEVER_REENABLE_FLAGS doesn't block running, only re-enabling. This is the #1 drag.
-- **ATR_SL improving** — daily: 41→28→28→20→18 (SPEED_MIN 40 working).
-- **PM_TRAIL edge confirmed** — 69% WR, avg +0.276%, R:R 2.70:1. Strongest signal.
-- **Real system positive** — excl ct-hot+ legacy, last 6h 12T +$0.11 58.3% WR.
-- **SHORT side dead** — 12T/48h 8.3% WR -$0.40. All range_finder SHORT killed. Do NOT enable.
+- **Real system is HEALTHY** — 48h excl ct-hot+ = +$0.22 (50% WR). Last 3h 71.4% WR. Self-correcting.
+- **ct-hot+ STILL ENABLED** — flags True (user TESTING MODE). 11T today 18.2% WR -$0.51. MIN_COMPOSITE 55 not filtering enough.
+- **PM_TRAIL edge confirmed** — 74.4% WR, avg +0.32%, R:R 2.70:1. T1 100% WR. Combined: $1.96/48h.
+- **ATR_SL improving** — daily: 41→18 (SPEED_MIN 40 working). Still 38T/48h at 2.6% WR.
+- **SHORT side dead** — hzscore- 35T 54.3% WR -$0.22 (user TESTING). accel-300- disabled. All range_finder SHORT killed.
+- **Phantom trades** — 6T/48h guardian_orphan -$0.10 (empty signal from HL sync).
 
 ### Root Cause
-ct-hot+ re-enabled by user in TESTING MODE. 12T/24h at 16.7% WR = $0.61 drag. MIN_COMPOSITE 55 still lets noise through. Legacy trades from before disable also draining (-$0.42 of -$0.64 total 24h loss).
+System is self-correcting. Real system positive at 50% WR. ct-hot+ is the only drag (user-controlled TESTING MODE). ATR_SL still dominant but improving. SHORT signals bleeding but user-controlled.
 
 ### Fix Applied
-NO CHANGES — respecting user's TESTING MODE decision on ct-hot+. ATR_SL fix (SPEED_MIN 40) needs continued evaluation. PM_TRAIL params holding.
+NO CHANGES — respecting user's TESTING MODE on ct-hot+ and hzscore-. ATR_SL fix (SPEED_MIN 40) evaluating. PM_TRAIL params holding. System needs time to clear legacy trades.
 
 ### Verification
-Pipeline active. PM_TRAIL 41T 69% WR +$1.17/48h (only profitable exit). ATR_SL daily declining (41→18). Real system positive. ct-hot+ legacy will age out Aug 17-18 if no new entries. If TESTING MODE ends, disable ct-hot+ flags → system immediately improves.
+Pipeline active. PM_TRAIL 39T 74.4% WR +$1.27/48h. T1 12T 100% +$0.69/48h. Real system positive. ATR_SL daily declining (41→18). 3h recent: 71.4% WR. ct-hot+ legacy will age out Aug 17-18. Monitor: ATR_SL count (should ↓ from 38/48h), daily trades (must >20T), PM_TRAIL WR (must hold >65%).
