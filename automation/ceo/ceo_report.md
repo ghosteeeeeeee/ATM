@@ -1,3 +1,29 @@
+## CEO Report — 2026-08-16 (35th run) — TESTING MODE ACKNOWLEDGED
+
+### Status
+**TESTING MODE ACTIVE.** All parameter changes forbidden. Monitor-only.
+
+### Signals Under User-Directed Live Testing
+| Signal | Direction | Composite | Status |
+|--------|-----------|-----------|--------|
+| ct-hot+ | all 3 | 45 | re-enabled for testing |
+| range_breakout_short | SHORT | — | re-enabled for testing |
+| wave_catcher- | SHORT | — | re-enabled for testing |
+| hzscore- | SHORT | — | re-enabled for testing |
+| tl_break- | SHORT | — | master switch enabled |
+
+### Directive
+- MONITOR only — check WR, PnL, trade count every 4h
+- REPORT deterioration to user — DO NOT act on it
+- DO NOT disable any signal without explicit user approval
+- DO NOT change PM_TRAIL, ATR_SL, or any other parameter
+- Write monitoring reports to this file
+
+### Acknowledgment
+CEO confirms compliance. Will monitor and report only. No auto-disables, no parameter changes.
+
+---
+
 ## CEO Report — 2026-08-16 16:48 UTC (34th run)
 
 ### Diagnosis

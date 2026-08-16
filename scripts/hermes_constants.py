@@ -1184,7 +1184,6 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
-    'tl_break_short', 'tl-break-short',  # re-enabled 2026-08-16 per user
     'return_exhaustion_short', 'return-exhaustion-short',  # re-enabled 2026-08-16 per user
     'range_breakout_short', 'range-breakout-short',  # re-enabled 2026-08-16 per user (12-trade streak)
     'accel-300',
