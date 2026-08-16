@@ -869,6 +869,47 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         rows = c.fetchall()
         log(f"Query: {len(rows)} combo_keys in 5-min window (conf>=60, not executed)")
 
+        # ── Write raw signals (pre-filter) for dashboard ───────────────────
+        try:
+            raw_signals = []
+            for row in rows[:100]:
+                token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
+                zscore = row[9] if len(row) > 9 else None
+                rsi = row[8] if len(row) > 8 else None
+                price_val = None
+                try:
+                    _pc = sqlite3.connect(STATIC_DB, timeout=3)
+                    _pr = _pc.execute("SELECT price FROM latest_prices WHERE token=?", (token,)).fetchone()
+                    _pc.close()
+                    if _pr: price_val = _pr[0]
+                except Exception: pass
+                # Detect block reason
+                block_reason = ''
+                dir_upper = (direction or '').upper()
+                source_parts_raw = [p.strip() for p in (source or '').split(',') if p.strip()]
+                if dir_upper == 'SHORT' and token in SHORT_BLACKLIST:
+                    block_reason = 'SHORT_BLACKLIST'
+                elif dir_upper == 'LONG' and token in LONG_BLACKLIST:
+                    block_reason = 'LONG_BLACKLIST'
+                elif any(is_component_disabled(p) for p in source_parts_raw):
+                    block_reason = 'DISABLED_COMPONENT'
+                elif len(source_parts_raw) < 2 and not any(
+                    sp in STANDALONE_BYPASS_SIGNALS for sp in source_parts_raw
+                ):
+                    block_reason = 'CONFLUENCE_GATE'
+                raw_signals.append({
+                    'token': token, 'direction': direction, 'signal': stype,
+                    'confidence': conf, 'sources': source, 'time': created,
+                    'zscore': zscore, 'rsi': rsi, 'price': price_val,
+                    'blocked_by': block_reason, 'decision': 'BLOCKED' if block_reason else 'PASS'
+                })
+            import json as _json
+            raw_path = '/var/www/hermes/data/raw_signals.json'
+            with open(raw_path, 'w') as _f:
+                _json.dump({'signals': raw_signals, 'updated': time.time(), 'count': len(raw_signals)}, _f)
+        except Exception as _e:
+            log(f"  [RAW-SIGNALS] write failed: {_e}")
+
         # ── Step 2: Pre-filter ─────────────────────────────────────────────────
         signals = []
         for row in rows:
