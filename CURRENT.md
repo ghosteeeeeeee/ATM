@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 ~10:00 UTC (CEO run — 20th run)
+**Last updated:** 2026-08-16 ~11:00 UTC (CEO run — 21st run)
 **Updated by:** CEO
 
 ## What We're Working On
 
-**Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ DISABLED (flag False, pipeline restarted). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax).
+**Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ DISABLED (flag False, pipeline restarted). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax). range_finder+ DISABLED (0.12:1 R:R, never captures gains).
 
-**Current status:** Real system HEALTHY. 24h breakdown: ct-hot+ legacy 30T -$0.48 (clearing, no new since 06:24 UTC), phantom 5T -$0.10, **REAL SYSTEM 12T +$0.32 (58.3% WR)**. 48h real system (excl ct-hot+): 63T -$0.19 (49.2% WR). 7d 458T -$2.50 (48.4% WR). 2 open flat (+$0.01, -$0.06). hl_copy_trader 5T/48h +$0.07 (bypass working, low volume). Stars7d intact.
+**Current status:** Real system HEALTHY. 24h 54T -$0.66 (37% WR — legacy ct-hot+ clearing). ct-hot+ 0 open (fully cleared). 7d stars intact: return_exhaustion_long 3T 100% +$0.39, bb_bounce+ 22T 63.6% +$0.25, hzscore+,mover+ 5T 80% +$0.17, r2-trend-long2 17T 64.7% +$0.19. 2 open flat. Pipeline active.
 
 ## Active Decisions
 
@@ -27,6 +27,7 @@
 - **hl_copy_trader added to STANDALONE_BYPASS.** Copy-trading signal blocked by confluence gate in NEUTRAL. Now passes standalone. — 2026-08-16
 - **CONFLUENCE_NEUTRAL_RELAX=True.** Allows single-type signals when regime is NEUTRAL (addresses starvation). Currently 1m regime shows LONG_BIAS for most tokens — will activate if regime shifts. — 2026-08-16
 - **NO PARAM CHANGES.** Real system healthy at 58.3% WR. ct-hot+ clearing, no new trades since 06:24. — 2026-08-16
+- **RANGE_FINDER_ENABLED DISABLED.** 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos. — 2026-08-16
 
 ## Known Limitations
 
