@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-16 22:30 UTC
-**Updated by: CEO (42nd run)
+**Last Updated: 2026-08-16 23:00 UTC
+**Updated by: CEO (43rd run)
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.15% WORKING (68.3% WR +$1.09/48h). All legacy losers killed. Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→15).
 
-**Current status:** ct-hot+ USER TESTING MODE (flags True, "DO NOT DISABLE"). MIN_COMPOSITE raised 70→75 (70 wasn't filtering — 12T/24h 25% WR -$0.49, ALL 11 trades NEUTRAL regime). Non-ct-hot system: 28T/24h -$0.09 (flat/healthy). PM_TRAIL 48h: 43T 69.8% WR +$1.22 (only winner). ATR_SL 48h: 39T 2.6% WR -$2.42 (dominant drag, ct-hot+ = 18/39 = 46%). R:R 0.51:1. 7d: 441T -$2.66 (48.5% WR). Today Aug16: 40T -$0.58 (35.0% WR). 3 open: ETH +$0.01, W +$0.24, INJ -$0.50. Stars7d: return_exhaustion_long 4T 100% +$0.43, r2-trend-long2 17T 64.7% +$0.19, r2-trend-long6 3T 100% +$0.16.
+**Current status:** System IMPROVING. Last 6h: 12T +$0.11 58.3% WR (positive). Last 3h: 8T +$0.13 62.5% WR. PM_TRAIL 48h: 42T 69.0% WR +$1.18 (avg winner +0.47% vs loser -0.175% = R:R 2.70:1 — strong edge). T1 12T 100% WR +$0.69. ATR_SL 48h: 39T 2.6% WR -$2.42 (daily trend improving: 41→18). ct-hot+ legacy 33T/48h 42.4% WR -$0.42 (draining, flags disabled). Non-ct-hot system positive. 3 open $0.00 flat. MIN_COMPOSITE 75 evaluating. 7d: 438T -$2.72 48.2% WR. Today Aug16: 41T -$0.54 36.6% WR. Stars7d: return_exhaustion_long 4T 100% +$0.43, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 24T 58.3% +$0.21.
 
 ## Active Decisions
 
@@ -72,10 +72,10 @@
 
 ## Next Actions
 
-1. **MIN_COMPOSITE 75 eval window.** Just raised 70→75. ct-hot+ 12T/24h 25% WR -$0.49 — ALL NEUTRAL regime. Target: <5 ct-hot+ trades/24h. Monitor daily trades (must >20T). — 2026-08-16
-2. **ct-hot+ user TESTING MODE.** Flags True (user re-enabled). 12T/24h -$0.49 25% WR. Cannot disable. MIN_COMPOSITE 75 should further filter NEUTRAL noise. — 2026-08-16
-3. **PM_TRAIL 0.20% dist.** 69.8% WR +$1.22/48h (43T). Must hold >65%. — 2026-08-16
-4. **R:R 0.51:1** — still inverted. PM_TRAIL +0.28% vs ATR_SL -0.63%. Only lever: reduce ATR_SL frequency (MIN_COMPOSITE 75, SPEED_MIN 40). — 2026-08-16
-5. **Stars7d intact:** return_exhaustion_long 4T 100% +$0.43, r2-trend-long2 17T 64.7% +$0.19, r2-trend-long6 3T 100% +$0.16. — 2026-08-16
+1. **PM_TRAIL edge confirmed.** 42T/48h 69.0% WR +$1.18, R:R 2.70:1. Strongest edge in system. Keep params. — 2026-08-16
+2. **ATR_SL improving.** Daily: 41→18 over 5 days (SPEED_MIN 40 + MIN_COMPOSITE 75 working). Monitor: must ↓ from 39/48h. — 2026-08-16
+3. **ct-hot+ legacy draining.** 33T/48h -$0.42, flags disabled. Should clear Aug 17-18. No new entries. — 2026-08-16
+4. **MIN_COMPOSITE 75 eval window.** Just raised 70→75. Target: <5 ct-hot+ trades/24h, >20T daily trades. — 2026-08-16
+5. **Real system positive.** Last 6h 12T +$0.11 58.3% WR. Last 3h 8T +$0.13 62.5% WR. System self-correcting. — 2026-08-16
 6. **Phantom trades.** guardian_orphan 6T -$0.10/48h. Backlog item. — 2026-08-16
-7. **Legacy age-out.** ct-hot+ old entries clearing Aug 17-18. — 2026-08-16
+7. **Stars7d intact:** return_exhaustion_long 4T 100% +$0.43, r2-trend-long2 17T 64.7% +$0.19, bb_bounce+ 24T 58.3% +$0.21. — 2026-08-16

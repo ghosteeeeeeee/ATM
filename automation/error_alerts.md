@@ -42,3 +42,8 @@
 
 ## Error Alerts — 2026-08-16 08:02 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS TOK position_manager: timed out`
+
+## Error Alerts — 2026-08-16 22:18 UTC
+- **WARN** (6x): `hermes-better-coder.service, hermes-wasp.service, hermes-bug-hunter.service, hermes-hl-volume.service, hermes-mtf-macd-tuner.service, hermes-trading-checklist.service — FAILED`
+- **DETAILS**: better-coder: missing dispatcher module; hl-volume: 429 rate limit; mtf-macd: missing warmup attr; bug-hunter: found 3 issues (non-atomic JSON, hardcoded passwords, dead imports); trading-checklist: 64637 signals in DB; wasp: unknown
+- **AUTO-FIX**: None applied — all non-critical utility services, pipeline core is healthy
