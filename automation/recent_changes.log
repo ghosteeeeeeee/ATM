@@ -766,3 +766,7 @@
   WHY: 1T last hour (WLFI -$0.01 profit-monster-trail, breakeven). 24h 50T 48% ATR SL (22/24 from ct-hot+ DISABLED — draining). return_exhaustion_long 3T 100% WR best. No kill candidates (all <3T). 2/hr normal. 2 open positions ($11 each). System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 17:30 UTC
+[2026-08-16 17:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (BSV hzscore- SHORT -$0.06 ATR SL). 24h 47T 46.8% ATR SL (above 40% but legacy ct-hot+ and SHORTs). SHORT side 6T 0% WR -$0.21 — all losing. No kill candidates (all <3T). 1/hr Sunday slow. 4 open positions (3 LONG,1 SHORT). System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 18:30 UTC

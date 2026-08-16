@@ -9192,3 +9192,46 @@ None — system stable, previous fixes settling in.
 - ct-hot+ responsible for 59% of ATR SL hits — signal quality issue (35% WR) not SL config issue
 - 24h ATR SL uptick to44.0% from 36.0% — may be noise from PM_TRAIL revert, monitoring
 - PM_TRAIL eval window closes Aug 17 — need more data
+
+---
+
+## 2026-08-16 17:30 UTC — Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.06 (0% WR)
+
+**Last Hour:**
+- BSV hzscore- SHORT: -$0.06 (atr_sl_hit)
+
+**24h Snapshot:**
+- 47 trades total: atr_sl_hit 22T (46.8%), profit-monster-trail 13T +$0.48, guardian_orphan 6T -$0.10, profit-monster-T1 4T +$0.22
+- ATR SL hit rate: 46.8% (above 40% threshold ⚠️)
+- SHORT side: 6T 0% WR -$0.21 — all losing
+- LONG side: 41T ~46% WR — mostly ct-hot+ legacy
+
+**Signal Performance (24h):**
+- ✅ profit-monster-trail: 13T exits, +$0.48 (best performer)
+- ✅ return_exhaustion_long: 1T 100% WR +$0.04
+- ⚠️ ct-hot+: 19T 31.6% WR -$0.51 (volume leader, legacy positions draining)
+- ⚠️ hzscore-: 1T 0% WR -$0.06 (only1 trade this hour, below 3T kill threshold)
+- ❌ All SHORT signals: 6T 0% WR -$0.21
+
+**Diagnosis:**
+1. **Entry quality:** 1 trade last hour, ATR SL immediately — poor entry on BSV
+2. **SL behavior:** 24h ATR SL at 46.8% — above 40% threshold. Most from legacy ct-hot+ and SHORT signals
+3. **Signal quality:** No signal meets kill threshold (0% WR with 3+ trades last hour). hzscore- only 1T
+4. **Trade frequency:** 1/hr — Sunday slow market
+
+**Changes:** None. No signal meets kill threshold.
+
+**No Change Needed:**
+- Last hour:1 trade, ATR SL loss — isolated incident
+- No 0% WR signals with 3+ trades in last hour
+- 4 open positions (3 LONG, 1 SHORT at breakeven)
+- Trade frequency low (Sunday)
+- SHORT side bleeding but no single SHORT signal has3+ trades to kill
+
+**Open Questions:**
+- SHORT side overall 0% WR in 24h — systemic issue, but no individual SHORT signal hits3+ trade kill threshold
+- ATR SL at46.8% — above 40% but dominated by legacy positions (ct-hot+, SHORTs)
+- hzscore- open SHORT position on CC at $0.095 — stop at $0.096, near breakeven

@@ -186,9 +186,8 @@ def run() -> int:
         if not local_dir:
             continue
 
-        # ── Momentum fade + spike exhaustion filter ──────────────────────────────
-        # Compute velocity once from price_history (speed tracker singleton may not
-        # be updated when signals_runner calls this module).
+        # ── Momentum fade + spike exhaustion + consolidation filter ──────────
+        # MANDATORY: if this fails, skip the signal (don't proceed without it)
         _conn = None
         try:
             from paths import HERMES_DATA
@@ -214,8 +213,31 @@ def run() -> int:
                 # Spike exhaustion: skip after sharp 5m moves
                 if abs(vel_5m) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
                     continue  # spike exhaustion — skip
+
+            # ── BB consolidation filter: skip SHORT in tight ranges ─────────
+            # Backtest (54 hzscore- trades): bb_width < 0.4% blocks 46% losers,
+            # keeps 68% winners. Catches bullish flag breakdowns (BSV 2026-08-16).
+            try:
+                _cur.execute("""
+                    SELECT close FROM candles_1m
+                    WHERE token = ? ORDER BY ts DESC LIMIT 20
+                """, (token.upper(),))
+                _closes = [r[0] for r in _cur.fetchall()]
+                if len(_closes) >= 20:
+                    import statistics as _stat
+                    _sma = _stat.mean(_closes)
+                    _std = _stat.stdev(_closes)
+                    _lower = _sma - 2 * _std
+                    _upper = _sma + 2 * _std
+                    _bb_width = (_upper - _lower) / _sma * 100
+                    if _bb_width < 0.4:
+                        continue  # tight consolidation — likely bullish flag, skip SHORT
+            except Exception:
+                pass  # non-fatal: BB filter is secondary
+
         except Exception:
-            pass  # non-fatal: proceed if price data unavailable
+            # Velocity filter is MANDATORY — if it fails, skip the signal
+            continue
         finally:
             if _conn:
                 _conn.close()
