@@ -9033,3 +9033,39 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL rate should drop below 40% as remaining ct-hot+ positions close
 - continuation+ 1T 0% WR — watch for kill threshold
+
+## [2026-08-16 10:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (BLUR LONG bb_bounce+, profit-monster-trail, +$0.05)
+**PnL:** $0.05 (+45.82% on trade)
+
+**24h Snapshot:**
+- 51 trades, -$0.83 net, 43% WR
+- ATR SL hit: 24/51 = 47.1% (above 40% but self-correcting)
+  - ct-hot+: 16/24 ATR SL hits — already disabled
+  - ct-hot-: 3/24 — already killed
+  - Remaining: 5 spread across other signals (1 each)
+- profit-monster-trail: 14/51 = 27.5%, +$0.81 (best exit type)
+- return_exhaustion_long: 3T 100% WR +$0.39 (best signal)
+- guardian_orphan: 6T -$0.10
+- continuation+: 1T -$0.10 (below 3T kill threshold)
+
+**Open Positions (2):**
+- ATOM LONG $11 @ 1.4917 (r2-trend-long12, -$0.05)
+- ALT LONG $11 @ 0.0061 (r2-trend-long3, $0.00)
+
+**Diagnosis:**
+1. **Entry quality:** BLUR entry solid (+45.82% on trade)
+2. **SL behavior:** 47.1% ATR SL but ALL major contributors (ct-hot+ 16, ct-hot- 3) are disabled/killed. 5 remaining ATR SL hits are 1 each across 5 signals — normal baseline.
+3. **Signal quality:** No kill candidates. return_exhaustion_long best performer. continuation+ 1T 0% (below 3T).
+4. **Trade frequency:** 1/hr last hour, ~2/hr 24h average — normal Sunday market.
+
+**Changes:** None. System self-correcting via ct-hot+ disable.
+
+**No Change Needed:**
+- ATR SL rate driven by disabled signals (legacy positions closing)
+- No signals at kill threshold (0% WR with 3+ trades)
+- Trade frequency normal
+- Open positions small ($11) with manageable risk
+
+**Next:** Re-run at 11:30 UTC

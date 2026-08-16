@@ -748,3 +748,7 @@
   WHY: 0T last hour (Sunday slow market). 24h 50T 48% ATR SL (above 40% but ALL from ct-hot+ — already disabled). return_exhaustion_long 3T 100% WR +$0.39 (best). 3 open positions at breakeven ($11 each). continuation+ 1T 0% (below 3T kill threshold). 1-3/hr normal. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 10:30 UTC
+[2026-08-16 10:30] auto_1hr: NO CHANGES
+  WHY: 1T last hour (BLUR +$0.05 profit-monster-trail). 24h 51T 47.1% ATR SL (above 40% but ALL from disabled signals: ct-hot+ 16/24, ct-hot- 3/24). return_exhaustion_long 3T 100% WR +$0.39 best. No kill candidates (continuation+ 1T 0% below 3T). 2 open positions ($11 each). 1/hr normal. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 11:30 UTC
