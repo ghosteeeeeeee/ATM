@@ -1181,7 +1181,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
-    'ct-hot',
+    # ct-hot — CEO 2026-08-16: removed, ct-hot+ DISABLED (30T/48h 46.7% WR -$0.29)
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
     'hzscore', 'return_exhaustion_long',
@@ -1494,7 +1494,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.2687 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.2553 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
@@ -1693,7 +1693,7 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True
+COIN_TRACKER_HOT_ENABLED            = False  # CEO 2026-08-16: DISABLED. 30T/48h 46.7% WR -$0.29 — #1 loser. Only PLUS was disabled, base still firing. In STANDALONE_BYPASS so fires without confluence. Re-enable when WR >55% with 20+ trades.
 COIN_TRACKER_HOT_PLUS_ENABLED       = False   # CEO 2026-08-16: DISABLED. 28T/7d 46.4% WR -$0.29, 12h 16T 37.5% WR -$0.40. Composite threshold 50 didn't filter enough. #1 ATR_SL producer. Monitor: daily trades (must stay >30T without ct-hot+), R:R (should ↑). Re-enable when WR >55% with 20+ trades.
 COIN_TRACKER_HOT_MINUS_ENABLED      = False   # SHORT direction — killed 2026-08-16 00:30 UTC: 4T 0% WR, all SHORTs losing to atr_sl
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire

@@ -1,5 +1,43 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-16 05:30 UTC — Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 0 losses)
+**PnL:** $0.00 (guardian_orphan flat exit)
+
+**24h Snapshot:**
+- 55 trades total: atr_sl_hit 22T -$1.63, profit-monster-trail 15T +$0.81, profit-monster-T1 10T +$0.56
+- ATR SL hit rate: 40.0% (exactly at threshold)
+- 48h SL hit rate: 36.0% (below 40% threshold — improving from PM_TRAIL revert)
+
+**Signal Performance (48h):**
+- ✅ return_exhaustion_long: 3T 100% WR +$0.39
+- ✅ r2-trend-long6: 3T 100% WR +$0.16
+- ⚠️ ct-hot+: 30T 46.7% WR -$0.29 (volume leader, slightly negative)
+- ⚠️ wave_catcher+: 14T 42.9% WR -$0.16
+- ❌ ct-hot-: 4T 0% WR -$0.19 (persistent loser, doesn't meet kill threshold — only 4T in 48h, 0T last hour)
+- ❌ mover+: 6T 16.7% WR -$0.16
+
+**Diagnosis:**
+1. **Entry quality:** 1 trade last hour (orphan guard exit), can't assess entry quality
+2. **SL behavior:** ATR SL hit 40.0% (24h) exactly at threshold; 48h at 36.0% (below threshold, improving)
+3. **Signal quality:** No signal meets kill threshold (0% WR with 3+ trades in last hour). ct-hot- 0% WR but only 0T last hour.
+4. **Trade frequency:** ~2.3/hr average (24h), normal
+
+**Changes:** None. No signal meets kill threshold. CEO eval window active (PM_TRAIL_ACTIVATE_PCT revert to 0.40% deployed today). ATR SL hit rate improving (36.0% vs 40% threshold).
+
+**No Change Needed:**
+- ATR SL hit rate at 40.0% — exactly at threshold, trending down from recent changes
+- pm-trail + pm-T1 = 25T +$1.37 compensating SL losses
+- Trade frequency normal, no overtrading
+- No 0% WR signals with 3+ trades in last hour
+
+**Open Questions:**
+- ct-hot- persistent 0% WR (4T/48h) — below kill threshold but worth monitoring
+- PM_TRAIL revert to 0.40% needs 48h eval — monitoring avg exit % and R:R
+
+---
+
 ## 2026-08-13 19:00 UTC — Hourly Analysis
 
 **Trades:** 1 closed (0 wins, 1 loss)

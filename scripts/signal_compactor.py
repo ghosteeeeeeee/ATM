@@ -585,6 +585,58 @@ def get_tide_penalty(token: str, direction: str) -> float:
     return 1.0
 
 
+def get_zscore_accel_penalty(token: str, direction: str) -> float:
+    """Surfing.md quadrant filter: z-score + acceleration alignment.
+
+    Aligned (momentum with direction):  1.0 (no penalty)
+    Misaligned (momentum against dir):  ZSCORE_ACCEL_PENALTY
+    Neutral (no clear signal):          1.0
+    """
+    from hermes_constants import (
+        ZSCORE_ACCEL_ENABLED, ZSCORE_ACCEL_Z_THRESHOLD,
+        ZSCORE_ACCEL_ACCEL_THRESHOLD, ZSCORE_ACCEL_PENALTY,
+    )
+    if not ZSCORE_ACCEL_ENABLED:
+        return 1.0
+
+    conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT price_acceleration FROM token_speeds WHERE token = ?
+    """, (token.upper(),))
+    speed_row = cur.fetchone()
+    cur.execute("""
+        SELECT z_score FROM signals
+        WHERE token = ? AND z_score IS NOT NULL
+        ORDER BY created_at DESC LIMIT 1
+    """, (token.upper(),))
+    z_row = cur.fetchone()
+    conn.close()
+
+    if not speed_row or not z_row:
+        return 1.0
+
+    accel = speed_row[0] or 0.0
+    z_score = z_row[0] or 0.0
+
+    # Surfing.md quadrants: z-score = WHERE in range, accel = WHERE it's going
+    # Aligned:  LONG + z>0 + accel>0 (momentum building up)
+    #           SHORT + z<0 + accel<0 (downward momentum)
+    # Misaligned: opposite directions — wrong wave
+    if direction.upper() == 'LONG':
+        if z_score > ZSCORE_ACCEL_Z_THRESHOLD and accel > ZSCORE_ACCEL_ACCEL_THRESHOLD:
+            return 1.0  # aligned — momentum building for LONG
+        if z_score < -ZSCORE_ACCEL_Z_THRESHOLD and accel < -ZSCORE_ACCEL_ACCEL_THRESHOLD:
+            return ZSCORE_ACCEL_PENALTY  # collapsing — wrong for LONG
+    elif direction.upper() == 'SHORT':
+        if z_score < -ZSCORE_ACCEL_Z_THRESHOLD and accel < -ZSCORE_ACCEL_ACCEL_THRESHOLD:
+            return 1.0  # aligned — downward momentum for SHORT
+        if z_score > ZSCORE_ACCEL_Z_THRESHOLD and accel > ZSCORE_ACCEL_ACCEL_THRESHOLD:
+            return ZSCORE_ACCEL_PENALTY  # rising — wrong for SHORT
+
+    return 1.0  # neutral quadrant
+
+
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data):
@@ -683,7 +735,10 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Tide detection: BTC 3h momentum + SHORT WR confirmation
     tide_mult = get_tide_penalty(token, direction)
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult
+    # Surfing.md quadrant filter: z-score + acceleration alignment
+    zscore_accel_mult = get_zscore_accel_penalty(token, direction)
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult
     return final_score
 
 

@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 (CEO run — verified, 13th run)
+**Last updated:** 2026-08-16 (CEO run — verified, 14th run)
 **Updated by:** CEO run
 
 ## What We're Working On
 
-**Completed:** All 6 eval windows FINALIZED. PM_TRAIL 0.40% act/0.60% dist (widened), TRAILING 0.40%, SIGNAL_FILTER 30, COIN_TRACKER 45 all kept. ATR_TP_K_MULT reverted 2.5→2.0. All legacy losers killed. ct-hot+ DISABLED.
+**Completed:** All 6 eval windows FINALIZED. PM_TRAIL 0.40% act/0.60% dist (widened), TRAILING 0.40%, SIGNAL_FILTER 30, COIN_TRACKER 45 all kept. ATR_TP_K_MULT reverted 2.5→2.0. All legacy losers killed.
 
-**Current focus:** R:R inverted (0.36:1). PM_TRAIL widened 0.50%→0.60% to let winners run. ct-hot+ legacy trades aging out (8T today at 25% WR). Monitor avg PM_TRAIL exit (should ↑ from 0.27%).
+**Current focus:** ct-hot+ BASE was still enabled (only PLUS was disabled). Disabled COIN_TRACKER_HOT_ENABLED + removed from STANDALONE_BYPASS. 30T/48h 46.7% WR -$0.29 was the #1 loser. PM_TRAIL widened to 0.60% — needs 48h to show effect. R:R 0.69:1 (still inverted).
 
 ## Active Decisions
 
@@ -20,9 +20,8 @@
 - **PM_TRAIL_ACTIVATE reverted to 0.40%.** Eval showed 0.60% hurt R:R. — 2026-08-16
 - **All legacy losers killed.** range_breakout+, continuation+, wave_catcher+, trend_momentum disabled. — 2026-08-16
 - **ATR_TP_K_MULT reverted 2.5→2.0.** 2.5x TP unreachable (1 hit/48h). — 2026-08-16
-- **COIN_TRACKER_HOT_MIN_COMPOSITE raised 45→50.** ct-hot+ deteriorating: 14T/12h 35.7% WR. Filter lower-quality entries. — 2026-08-16
-- **COIN_TRACKER_HOT_PLUS_ENABLED DISABLED.** ct-hot+ 28T/7d 46.4% WR -$0.29. Re-enable when WR >55% with 20+ trades. — 2026-08-16
-- **PM_TRAIL_DISTANCE_PCT widened 0.50%→0.60%.** R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance lets winners run before trail catches. Floor = -0.20%. — 2026-08-16
+- **COIN_TRACKER_HOT_ENABLED DISABLED.** ct-hot+ base was still firing (30T/48h 46.7% WR -$0.29). Removed from STANDALONE_BYPASS too. Re-enable when WR >55% with 20+ trades. — 2026-08-16
+- **PM_TRAIL_DISTANCE_PCT widened 0.50%→0.60%.** R:R inverted (avg win +0.27% vs avg loss -0.76% = 0.36:1). Wider distance lets winners run before trail catches. — 2026-08-16
 
 ## Known Limitations
 
@@ -54,8 +53,8 @@
 
 ## Next Actions
 
-1. **R:R monitor.** PM_TRAIL_DISTANCE 0.60% (widened yesterday). 48h R:R 0.32:1 (avg win +0.24% vs avg loss -0.76%). Monitor: avg exit should ↑ from 0.24%, R:R should ↑ from 0.32:1. If no improvement by tomorrow, widen to 0.70%.
-2. **ct-hot+ legacy trades aging out.** 8T today at 25% WR. Should clear by tomorrow. ct-hot+ = 41T/126T 48h, -$0.48. Once cleared, R:R should improve significantly.
-3. **Daily trades:** 15T today (low, ct-hot+ legacy). Should recover to 40T+ tomorrow with bb_bounce+, r2-trend, hzscore+ combos.
+1. **R:R monitor.** PM_TRAIL_DISTANCE 0.60% (widened 2 days ago). 48h R:R 0.69:1 (avg win +0.45% vs avg loss -0.65%). Monitor: avg exit should ↑ from 0.45%, R:R should ↑ from 0.69:1 toward 1:1.
+2. **ct-hot+ disabled.** Base was still enabled (PLUS only was killed). Now fully off. 3 open ct-hot+ positions will age out. Daily trades may drop — monitor bb_bounce+, r2-trend, hzscore+ volume.
+3. **Daily trades:** 16T today (ct-hot+ legacy). Should recover to 30T+ with remaining signals. If <20T, consider signal starvation.
 4. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
-5. **Tomorrow critical:** ct-hot+ legacy clears, PM_TRAIL wider distance takes effect. R:R must ↑ from 0.32:1.
+5. **Tomorrow critical:** PM_TRAIL wider distance full effect, ct-hot+ fully cleared. R:R must ↑ from 0.69:1.

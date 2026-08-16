@@ -764,13 +764,14 @@ def rule_based_context_gate(token, direction, source, sig):
                 return ('AMBIGUOUS', f'z={z_score:.2f} > {SIGNAL_FILTER_Z_MAX} + speed={_spd_str}% (chasing uptrend)', 15)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
-    # Hard block: misaligned direction = 23.8% WR (CEO backtested)
+    # Hard block: misaligned direction = low WR (CEO backtested)
     # Aligned: LONG z>0 + accel>0 (76.4%), SHORT z<0 + accel<0 (63.3%)
+    # Misaligned: LONG z<0 + accel<0 (24.7%), SHORT z>0 + accel>0 (23.8%)
     if ZSCORE_ACCEL_ENABLED and z_score is not None and accel is not None:
-        if direction == 'LONG' and z_score > ZSCORE_ACCEL_Z_THRESHOLD and accel > ZSCORE_ACCEL_ACCEL_THRESHOLD:
-            return ('SKIP', f'misaligned LONG: z={z_score:.2f} accel={accel:+.4f} (price extended, accelerating away)', 0)
-        if direction == 'SHORT' and z_score < -ZSCORE_ACCEL_Z_THRESHOLD and accel < -ZSCORE_ACCEL_ACCEL_THRESHOLD:
-            return ('SKIP', f'misaligned SHORT: z={z_score:.2f} accel={accel:+.4f} (price extended, accelerating away)', 0)
+        if direction == 'LONG' and z_score < -ZSCORE_ACCEL_Z_THRESHOLD and accel < -ZSCORE_ACCEL_ACCEL_THRESHOLD:
+            return ('SKIP', f'misaligned LONG: z={z_score:.2f} accel={accel:+.4f} (collapsing, wrong for LONG)', 0)
+        if direction == 'SHORT' and z_score > ZSCORE_ACCEL_Z_THRESHOLD and accel > ZSCORE_ACCEL_ACCEL_THRESHOLD:
+            return ('SKIP', f'misaligned SHORT: z={z_score:.2f} accel={accel:+.4f} (rising, wrong for SHORT)', 0)
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     # But only if price history is fresh (< 5 min old)

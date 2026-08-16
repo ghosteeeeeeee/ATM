@@ -1,7 +1,7 @@
 # Upgrade Audit Trail
 
 **Generated:** 2026-08-14 17:30 UTC
-**Last scanned:** 2026-08-15 20:00 UTC (all plans still implemented, no new plans)
+**Last scanned:** 2026-08-16 06:00 UTC (weather-vane-v3 re-implemented correctly)
 **Plans scanned:** 8
 
 ---
@@ -51,8 +51,8 @@
 - **Core request:** Z-Score + Acceleration alignment filter (surfing.md quadrants) — strongest predictive signal (76% vs 24% WR gap)
 - **Difficulty:** Level 2
 - **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** ZSCORE_ACCEL_ENABLED in hermes_constants.py (line 620). Logic implemented in decider_run.py (lines 766-770) as hard block, not penalty multiplier. Different integration point than planned but same effect.
+- **Status:** IMPLEMENTED (2026-08-16 — added to signal_compactor.py as penalty multiplier; fixed inverted logic in decider_run.py)
+- **Reason:** ZSCORE_ACCEL_ENABLED in hermes_constants.py (line 653). get_zscore_accel_penalty() added to signal_compactor.py. Fixed critical bug in decider_run.py: old code blocked LONG when z>0 + accel>0 (76.4% WR winners) and SHORT when z<0 + accel<0 (63.3% WR winners) — inverted from what backtest showed. Now correctly blocks misaligned entries (z<0+accel<0 for LONG, z>0+accel>0 for SHORT).
 
 ## Plan: 2026-08-13_weather-vane-v2-spec.md
 - **Date scanned:** 2026-08-14 06:30
@@ -87,10 +87,10 @@
 None — all plans fully implemented.
 
 ### Already Done (no action needed)
-- weather-vane-v5 (volatility floor)
-- weather-vane-v4 (tide detection)
-- weather-vane-v3 (z-score + accel)
-- weather-vane-v2 (hysteresis, derivative, integral)
+- weather-vane-v5 (volatility floor) — check_volatility_floor() in signal_compactor.py
+- weather-vane-v4 (tide detection) — get_tide_penalty() in signal_compactor.py
+- weather-vane-v3 (z-score + accel) — get_zscore_accel_penalty() in signal_compactor.py (re-implemented 2026-08-16, was inverted in decider_run.py)
+- weather-vane-v2 (hysteresis, derivative, integral) — directional outcome system in signal_compactor.py
 - progressive-context-shaping (CURRENT.md)
-- directional-outcome-tracker (signal gate)
-- r2_trend_long trailing SL tuning (2026-08-14 — TRAILING_ACTIVATION_PCT 0.40→0.80%, TRAILING_DISTANCE_PCT 0.80→2.00%)
+- directional-outcome-tracker (signal gate + position shield)
+- r2_trend_long trailing SL tuning (TRAILING_ACTIVATION_PCT 0.40%, TRAILING_DISTANCE_PCT 2.00%)

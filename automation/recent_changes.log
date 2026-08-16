@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-16 05:30 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (guardian_orphan flat). 24h 55T -$0.36 (40% SL hit rate, exactly at threshold). 48h SL hit 36.0% (below threshold, improving from PM_TRAIL revert). No 0% WR signals with 3+ trades in last hour. ct-hot- 0% WR 4T/48h but below kill threshold. Trade freq 2.3/hr normal. Eval window active (PM_TRAIL_ACTIVATE_PCT revert to 0.40%).
+  BY: auto_1hr
+  NO CHANGES — system within normal variance, eval window active.
+
 [2026-08-16 (CEO run — verified, 8th run)] CEO: KILLED RANGE_BREAKOUT_ENABLED + CONTINUATION_ENABLED
   WHY: range_breakout+ 8T 25% WR -$0.41 (7d), continuation+ 5T 40% WR -$0.17 (7d). Both negative, all trades closed (no open positions). Legacy losers aging out.
   BY: CEO run
