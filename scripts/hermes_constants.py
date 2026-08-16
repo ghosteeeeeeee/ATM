@@ -1190,7 +1190,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'wave_catcher', 'wave-catcher',
-    'ct-hot+', 'ct-hot-', 'coin_tracker_hot',  # re-enabled 2026-08-16 per user
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1699,9 +1698,9 @@ COIN_TRACKER_HOT_ENABLED            = True   # RE-ENABLED 2026-08-16 per user. T
 COIN_TRACKER_HOT_PLUS_ENABLED       = True   # RE-ENABLED 2026-08-16 per user. TESTING MODE — DO NOT DISABLE.
 COIN_TRACKER_HOT_MINUS_ENABLED      = True   # RE-ENABLED 2026-08-16 per user. TESTING MODE — DO NOT DISABLE.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
-COIN_TRACKER_HOT_CLUSTER_MIN        = 2.0     # minimum cluster count for direction (raised from 1.0)
+COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 75      # CEO 2026-08-16 (42nd run): RAISED from 70. ct-hot+ 12T today 25% WR -$0.49 (100% of loss). ALL 11 trades NEUTRAL regime. MIN_COMPOSITE 70 still lets marginal setups through. Target: <5 ct-hot+ trades/24h, daily trades >20T.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 55      # TESTING MODE — DO NOT CHANGE. User set to 55 for live testing.

@@ -9291,3 +9291,26 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None. System stable, waiting for Monday volume.
+
+## [2026-08-16 22:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed (W r2-trend-long18 LONG, +$0.04 profit-monster-trail, +35.20%)
+
+**24h Snapshot:**
+- 42 trades: atr_sl_hit 19T (45.2%) ⚠️, profit-monster-trail 17T +$0.50, guardian_orphan 5T -$0.14
+- ct-hot+: 12T -$0.61 (legacy drain, no new trades)
+- r2-trend-long4: 3T +$0.05 (best signal)
+- guardian_orphan: 5T -$0.14 (orphaned trades, signal=None, early morning hours)
+
+**Changes:** None. No kill candidates.
+
+**No Change Needed:**
+- No 0% WR signals with 3+ trades last hour
+- guardian_orphan is orphaned positions (signal=None), not a signal issue
+- System draining legacy naturally
+- Trade frequency normal (1/hr Sunday)
+- New trades profitable (r2-trend-long18 +35.20%)
+
+**Open Questions:**
+- ATR SL 45.2% above 40% threshold but dominated by ct-hot+ legacy (12/19) — will improve as legacy drains
+- 4 open positions ($11 each) all healthy, all LONG

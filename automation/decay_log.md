@@ -504,3 +504,10 @@
 [2026-08-16 17:07 UTC]   🟢 ct-hot+: 20 trades, 35.0% WR, PnL=-6.7
 [2026-08-16 17:07 UTC]   🟢 return_exhaustion_long: 4 trades, 100.0% WR, PnL=4.48
 [2026-08-16 17:07 UTC] Done. Disabled 0 signals.
+[2026-08-16 23:07 UTC] === Signal Decay Detector ===
+[2026-08-16 23:07 UTC]   SKIP: No flag mapping for ct-hot+
+[2026-08-16 23:07 UTC]   🔴 ct-hot+: 12 trades, 16.7% WR, PnL=-7.96
+[2026-08-16 23:07 UTC]   🟢 r2-trend-long3: 3 trades, 33.3% WR, PnL=0.15
+[2026-08-16 23:07 UTC]   🟢 hzscore-: 3 trades, 66.7% WR, PnL=-0.07
+[2026-08-16 23:07 UTC]   🟢 r2-trend-long4: 3 trades, 66.7% WR, PnL=0.68
+[2026-08-16 23:07 UTC] Done. Disabled 0 signals.

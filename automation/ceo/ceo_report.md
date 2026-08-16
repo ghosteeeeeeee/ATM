@@ -1,17 +1,20 @@
-## CEO Report — 2026-08-16 (43rd run)
+## CEO Report — 2026-08-16 (44th run)
 
 ### Diagnosis
-System IMPROVING. Last 6h: 12T +$0.11, 58.3% WR (positive). Last 3h: 8T +$0.13, 62.5% WR. Verified 48h: PM_TRAIL 42T 69.0% WR +$1.18 (only profitable exit). T1 12T 100% WR +$0.69. ATR_SL 39T 2.6% WR -$2.42 (dominant drag). ct-hot+ legacy 33T/48h 42.4% WR -$0.42 (draining, flags disabled, no new entries). 7d: 438T -$2.72, 48.2% WR. 3 open $0.00 flat.
+System IMPROVING. Last 6h: 12T +$0.11, 58.3% WR (positive). Last 3h: 8T +$0.13, 62.5% WR. Verified 48h: PM_TRAIL 41T 69.0% WR +$1.17 (R:R 2.70:1 — strongest edge). T1 12T 100% WR +$0.69. ATR_SL 39T -0.633% avg -$2.42 (dominant drag). ct-hot+ legacy 33T/48h 42.4% WR -$0.42 (draining). 7d: 436T -$2.65, 48.4% WR. 4 open ~$0 flat.
+
+### Key Findings
+- **ct-hot+ STILL ENABLED** — flags True (user re-enabled, TESTING MODE). 12T/24h 16.7% WR -$0.61. NEVER_REENABLE_FLAGS doesn't block running, only re-enabling. This is the #1 drag.
+- **ATR_SL improving** — daily: 41→28→28→20→18 (SPEED_MIN 40 working).
+- **PM_TRAIL edge confirmed** — 69% WR, avg +0.276%, R:R 2.70:1. Strongest signal.
+- **Real system positive** — excl ct-hot+ legacy, last 6h 12T +$0.11 58.3% WR.
+- **SHORT side dead** — 12T/48h 8.3% WR -$0.40. All range_finder SHORT killed. Do NOT enable.
 
 ### Root Cause
-PM_TRAIL has strong edge: avg winner +0.47% vs avg loser -0.175% = R:R 2.70:1. But overall R:R inverted because ATR_SL hits are frequent (39T/48h) while PM_TRAIL captures are smaller in absolute terms. Entry quality is the bottleneck — when trades reach PM_TRAIL, they win 69% of the time. ATR_SL hits come from premature entries, not bad exits.
+ct-hot+ re-enabled by user in TESTING MODE. 12T/24h at 16.7% WR = $0.61 drag. MIN_COMPOSITE 55 still lets noise through. Legacy trades from before disable also draining (-$0.42 of -$0.64 total 24h loss).
 
 ### Fix Applied
-NO CHANGES — recent fixes still evaluating:
-- SPEED_MIN 40 (reducing ATR_SL daily: 41→18 over 5 days)
-- MIN_COMPOSITE 75 (filtering NEUTRAL noise entries)
-- PM_TRAIL dist 0.15% (69% WR, working)
-- Pipeline healthy, timer running, real system positive
+NO CHANGES — respecting user's TESTING MODE decision on ct-hot+. ATR_SL fix (SPEED_MIN 40) needs continued evaluation. PM_TRAIL params holding.
 
 ### Verification
-Monitor 24h: ATR_SL hit count (should ↓ from 39/48h), daily trades (must >20T), PM_TRAIL WR (must hold >65%), ct-hot+ legacy clear (should be near 0 by Aug 17-18). Last 6h positive = system self-correcting. No param changes needed.
+Pipeline active. PM_TRAIL 41T 69% WR +$1.17/48h (only profitable exit). ATR_SL daily declining (41→18). Real system positive. ct-hot+ legacy will age out Aug 17-18 if no new entries. If TESTING MODE ends, disable ct-hot+ flags → system immediately improves.
