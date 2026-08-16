@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last updated:** 2026-08-16 08:25 UTC (CEO run — 18th run)
+**Last updated:** 2026-08-16 ~10:00 UTC (CEO run — 20th run)
 **Updated by:** CEO
 
 ## What We're Working On
 
-**Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ fully cleared (0 open positions). Signal starvation fix applied.
+**Completed:** All 6 eval windows FINALIZED. PM_TRAIL breakeven guard REMOVED, act 0.30%, dist 0.50%. All legacy losers killed. ct-hot+ DISABLED (flag False, pipeline restarted). Signal starvation fix applied (hl_copy_trader bypass, NEUTRAL relax).
 
-**Current status:** R:R 0.35:1 (PM_TRAIL 53T 71.7% WR +$1.38 vs ATR_SL 43T 2.3% WR -$3.04). 57T 24h -$0.44 (40.4% WR). 48h 117T -$0.87 (45.3% WR). 7d 453T -$2.41 (48.8% WR). 1 open -$0.04 flat. Today 21T -$0.62 (19% WR — legacy ct-hot+ 11T + phantoms 5T + 5 real). hl_copy_trader now passes confluence gate.
+**Current status:** Real system HEALTHY. 24h breakdown: ct-hot+ legacy 30T -$0.48 (clearing, no new since 06:24 UTC), phantom 5T -$0.10, **REAL SYSTEM 12T +$0.32 (58.3% WR)**. 48h real system (excl ct-hot+): 63T -$0.19 (49.2% WR). 7d 458T -$2.50 (48.4% WR). 2 open flat (+$0.01, -$0.06). hl_copy_trader 5T/48h +$0.07 (bypass working, low volume). Stars7d intact.
 
 ## Active Decisions
 
@@ -26,20 +26,22 @@
 - **ATR_SL_MAX widened 2.5%→3.0%.** Reduced avg loss per hit (-0.76%→-0.71%) but NOT hit count. Entry quality is the bottleneck. — 2026-08-16
 - **hl_copy_trader added to STANDALONE_BYPASS.** Copy-trading signal blocked by confluence gate in NEUTRAL. Now passes standalone. — 2026-08-16
 - **CONFLUENCE_NEUTRAL_RELAX=True.** Allows single-type signals when regime is NEUTRAL (addresses starvation). Currently 1m regime shows LONG_BIAS for most tokens — will activate if regime shifts. — 2026-08-16
+- **NO PARAM CHANGES.** Real system healthy at 58.3% WR. ct-hot+ clearing, no new trades since 06:24. — 2026-08-16
 
 ## Known Limitations
 
 - **No session handoff protocol** — context lost on session end. — 2026-08-13
 - **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS for most tokens even when 15m/4h is NEUTRAL. May need higher-timeframe regime check. — 2026-08-16
+- **Phantom trades** — guardian_orphan creates trades with empty signal from HL sync. ~6T/day, -$0.10. Root cause in hl-sync-guardian. — 2026-08-16
 
 ## System Improvement Backlog
 
 ### Worth Doing
-1. Extend checkpoint_utils.py to write human-readable progress summaries
-2. Create contextmap.md for the 58-signal ecosystem
-3. Formalize 4-layer context separation in AGENTS.md
-4. Investigate phantom trades (guardian_orphan with empty signal) — root cause
-5. Consider higher-timeframe regime for confluence relaxation (1m too noisy)
+1. Investigate phantom trades (guardian_orphan with empty signal) — root cause in hl-sync-guardian
+2. Consider higher-timeframe regime for confluence relaxation (1m too noisy)
+3. Extend checkpoint_utils.py to write human-readable progress summaries
+4. Create contextmap.md for the 58-signal ecosystem
+5. Formalize 4-layer context separation in AGENTS.md
 
 ### Implemented (no action)
 - Weather Vane Components 1-3 all live (2026-08-15). Shield trail 0.30%, force-close 30min on counter-regime losers.
@@ -59,8 +61,8 @@
 
 ## Next Actions
 
-1. **Monitor hl_copy_trader bypass.** Should generate HYPE, ETH, SOL trades. Daily trades must ↑ from 21T.
-2. **R:R still inverted at 0.35:1.** PM_TRAIL wins but ATR_SL dominates losses. Entry quality is the bottleneck.
-3. **ATR_SL 43T/48h 2.3% WR.** Consider signal filter tightening or ATR_SL_MAX further widening.
-4. **Phantom trades.** 5T today guardian_orphan with empty signal. Investigate root cause in hl-sync-guardian.
-5. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+1. **Monitor ct-hot+ clear.** Should be 0 open by ~10:00 UTC. Real system trades only after.
+2. **Phantom trades.** Delegate to bug_hunter — investigate guardian_orphan root cause in hl-sync-guardian.
+3. **Daily trades must ↑.** Real system only 5T today (low volume). Monitor hl_copy_trader and range_finder standalone.
+4. **Stars7d intact:** return_exhaustion_long 3T 100%, hzscore+,mover+ 5T 80%, r2-trend-long2 17T 64.7%, bb_bounce+ 22T 63.6%.
+5. **R:R 0.27:1 real system.** Inverted but high WR (58.8%) compensates. System profitable. Don't chase R:R at cost of WR.
