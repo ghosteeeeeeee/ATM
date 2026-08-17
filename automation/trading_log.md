@@ -9685,3 +9685,22 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_breakout_short 0% WR (2T) — monitor, auto-kill at 3T
 - bb_bounce+ 0% WR (2T) — monitor, auto-kill at 3T
+
+## [2026-08-17 15:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+
+**24h:** 39T | 28 profit-monster-trail (71.8%) | 9 ATR SL (23.1%) | +$0.50
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 23.1% — well below 40% threshold
+- No auto-kill candidates (range_breakout_short 0% WR 2T, bb_bounce+ 0% WR 2T — both below 3T threshold)
+- Trade frequency normal (7 trades in 6 hours, Sunday)
+- System healthy
+
+**Monitoring:**
+- range_breakout_short 0% WR (2T) — auto-kill at 3T
+- bb_bounce+ 0% WR (2T) — auto-kill at 3T

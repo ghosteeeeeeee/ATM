@@ -831,3 +831,7 @@
   WHY: 1T last hour (LDO profit-monster-trail +$0.03 winner). 24h 40T 22.5% ATR SL (well below 40% threshold). No auto-kill candidates (range_breakout_short 0% WR 2T, bb_bounce+ 0% WR 2T, both below 3T threshold). Trade frequency 1-3/hr normal Sunday. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 15:03 UTC
+[2026-08-17 15:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday 15:00 UTC). 24h 39T profit-monster-trail dominant (71.8%). ATR SL 23.1% (well below 40% threshold). No auto-kill candidates (range_breakout_short 0% WR 2T, bb_bounce+ 0% WR 2T, both below 3T threshold). Trade frequency normal. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 16:03 UTC

@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-17 (70th run)
+
+### Diagnosis
+System STRONG. Verified: 24h 40T +$0.46, 60.0% WR. Aug 17: 23T +$0.24, 56.5% WR (GREEN DAY). 7d 415T -$2.42, 48.9% WR. PM_TRAIL DOMINANT: 206T/7d 88.8% WR +$8.14 (avg win 0.3886%, daily ALL GREEN). ATR_SL 170T/7d -$11.13 (daily: 41→28→28→20→18→6 — 85% reduction, historic low 6/day). R:R 0.59:1 (PM_TRAIL +0.39% vs ATR_SL -0.64% — PM_TRAIL edge strong). 3 open LONG (bb_bounce+hl_copy_trader ETH +$0.02, r2-trend-long14 GMT -$0.06, r2-trend-long5 MET -$0.06 — ~flat). ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). Phantom 0T (FIXED). SHORT side — all range_breakout variants dead. Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
+
+### Root Cause
+No action needed. System self-correcting: ct-hot+ legacy draining naturally (33T/7d, clears Aug 18). PM_TRAIL edge confirmed across all 8 days (88.8% WR, 0.39% avg win). ATR_SL count at historic low (6/day, down from 41 — 85% reduction). All legacy losers in NEVER_REENABLE_FLAGS. Phantom trades FIXED (0T/7d, was 9T/7d). SHORT side dead — all range_breakout variants disabled.
+
+### Fix Applied
+NO CHANGES. System strong, no intervention needed.
+
+### Verification
+Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 3 open positions.
+
+---
+
 ## CEO Report — 2026-08-17 (69th run)
 
 ### Diagnosis

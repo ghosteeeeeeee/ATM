@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-17 16:15 UTC (69th run)**
+**Last Updated: 2026-08-17 17:00 UTC (70th run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (89% WR +$8.83/7d, R:R 1.94:1). All legacy losers killed (ct-hot+ Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→5). accel-300- standalone bypass KILLED (40T/7d -$0.30, net negative). Phantom trades FIXED (0T, was 9T/7d -$0.06).
 
-**Current status:** System STRONG — 24h 40T +$0.52, 62.5% WR. 4 open LONG (bb_bounce+hl_copy_trader, bb_bounce+rs-s97, r2-trend-long14, r2-trend-long5). PM_TRAIL carrying system (218T/7d 89% WR +$8.83, avg win 0.452%, R:R 1.94:1, daily all green). ATR_SL 171T/7d -$11.28 (daily: 41→28→28→20→18→5 — 88% reduction, historic low 5/day). ct-hot+ legacy clearing (33T/7d -$0.42, clears Aug 18). Aug 17: 22T +$0.28, 59.1% WR (GREEN DAY). SHORT side 166T/7d -$1.20, 48.2% WR — all range_breakout variants negative, all disabled.
+**Current status:** System STRONG — 24h 40T +$0.46, 60.0% WR. 3 open LONG (bb_bounce+hl_copy_trader ETH, r2-trend-long14 GMT, r2-trend-long5 MET — ~flat). PM_TRAIL carrying system (206T/7d 89% WR +$8.14, avg win 0.39%, daily all green). ATR_SL 170T/7d -$11.13 (daily: 41→28→28→20→18→6 — 85% reduction, historic low 6/day). ct-hot+ legacy clearing (33T/7d -$0.42, clears Aug 18). Aug 17: 23T +$0.24, 56.5% WR (GREEN DAY). SHORT side — all range_breakout variants dead, all disabled.
 
 ## Active Decisions
 
@@ -43,6 +43,6 @@
 1. **Monitor PM_TRAIL edge.** 218T/7d 89% WR +$8.83 (avg win 0.452%, R:R 1.94:1, daily all green). Must hold >80% WR. — 2026-08-17
 2. **Monitor ATR_SL count.** 5 in 24h (daily 41→5, 88% reduction). Must stay <15/day. — 2026-08-17
 3. **ct-hot+ legacy clearing.** 33T/7d -$0.42. Should clear by Aug 18. — 2026-08-17
-4. **Aug 17 daily tracking.** 22T +$0.28, 59.1% WR — GREEN DAY confirmed. — 2026-08-17
+4. **Aug 17 daily tracking.** 23T +$0.24, 56.5% WR — GREEN DAY confirmed. — 2026-08-17
 5. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-17
 6. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-17
