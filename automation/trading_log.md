@@ -9755,3 +9755,25 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - bb_bounce+ 0% WR 2T — next check for auto-kill
+
+## [2026-08-17 18:03 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.02 (WR: 100%)
+
+**24h:** 41T | 65.9% WR | +$0.43
+- profit-monster-trail: 27/41 (65.9%) +$1.18 dominant
+- atr_sl_hit: 12/41 (29.3%) — well below 40% threshold
+
+**Last Hour:**
+- STX bb_bounce+,rs-s176,rs-s78: profit-monster-trail +$0.02 (winner)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 29.3% — well below 40% threshold
+- Trade frequency 1/hr — normal Sunday volume
+- bb_bounce+ 0% WR 2T — still below 3T auto-kill threshold, monitoring
+
+**Monitoring:**
+- bb_bounce+ 0% WR (2T) — auto-kill at 3T
