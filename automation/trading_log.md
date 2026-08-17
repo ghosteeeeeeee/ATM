@@ -9611,3 +9611,27 @@ None — system stable, previous fixes settling in.
 - bb_bounce+ 0% WR (2T 24h) — too few trades to judge, monitor
 - r2-trend-long3 40% WR (5T 24h) — borderline but acceptable
 - Sunday low volume — re-check Monday patterns
+
+## [2026-08-17 10:03 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.15 (WR: 0%)
+
+**24h:** 36T | profit-monster-trail dominant (+$1.07, 72.2%)
+**ATR SL:** 33.3% (12/36, below 40% threshold)
+
+**Last Hour Breakdown:**
+- APT range_breakout_short: ATR SL -$0.05
+- ZEN r2-trend-long3: ATR SL -$0.10
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 33.3% — well below 40% kill threshold
+- No auto-kill candidates (range_breakout_short 0% WR but only 2T 24h)
+- Trade frequency 2/hr — normal Sunday
+- All signals performing within tolerance
+
+**Open Questions:**
+- range_breakout_short 0% WR (2T) — monitor, will auto-kill at 3T
+- r2-trend-long3 33.3% WR (6T) — borderline, monitor

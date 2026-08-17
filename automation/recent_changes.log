@@ -819,3 +819,7 @@
   WHY: 0T last hour (Sunday 07:00 UTC, dead market). 24h 33T profit-monster-trail dominant (+$1.04). ATR SL 22.2% (well below 40% threshold). No auto-kill candidates (no 0% WR with 3+ trades). System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 08:03 UTC
+[2026-08-17 10:03] auto_1hr: NO CHANGES
+  WHY: 2T last hour (APT range_breakout_short -$0.05, ZEN r2-trend-long3 -$0.10). Both ATR SL hits. 24h 36T profit-monster-trail dominant (+$1.07). ATR SL 33.3% (well below 40% threshold). No auto-kill candidates (range_breakout_short 0% WR but only 2T, below 3T threshold). 2/hr normal Sunday. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 11:03 UTC
