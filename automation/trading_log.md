@@ -9386,3 +9386,28 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ct-hot- in testing mode, 0% WR 4T — user explicitly testing, do not touch
 - DOT open position at -11% — monitor for stop loss hit
+
+## [2026-08-17 03:03 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.23 (WR: 100%)
+
+**24h Snapshot:**
+- 41 trades: profit-monster-trail 22T +$0.94, atr_sl_hit 14T -$0.63, guardian_orphan 4T -$0.10
+- ATR SL34.1% — below 40% threshold (improving from42.9%)
+- ct-hot+ 8T -$0.32 (25% WR, 75% ATR SL) — worst signal but system improving
+- 2 trades last hour: AVAX r2-trend-long6 +$0.04, HYPE bb_bounce+,hl_copy_trader +$0.19
+- 2 open positions ($22 total): DOT -2.48%, DASH +68.98%
+
+**Changes:** None.
+
+**No Change Needed:**
+- ATR SL dropped below 40% threshold — system self-correcting
+- Last hour 100% win rate
+- No 0% WR signals with 3+ trades (0 trades last hour)
+- Trade frequency normal (1-2/hr)
+- ct-hot+ worst signal but recently re-enabled (user testing mode)
+- Open positions healthy
+
+**Open Questions:**
+- ct-hot+ 75% ATR SL rate — monitor, disable if WR stays <25% after 50+ trades
