@@ -9800,3 +9800,30 @@ None — system stable, previous fixes settling in.
 
 **Monitoring:**
 - bb_bounce+ 0% WR (2T) — auto-kill at 3T
+
+## [2026-08-17 20:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (Sunday evening quiet)
+**24h:** 41T | 73.2% WR | +$0.47
+
+**24h by close reason:**
+- profit-monster-trail: 26T 100%WR +$1.18 (dominant)
+- atr_sl_hit: 11T -$0.56 (28.2% of closes — healthy)
+- cut-loser-CL-T1: 1T -$0.15
+- guardian_orphan: 1T $0.00
+
+**bb_bounce+ standalone:** 2T/0%WR — one more loss triggers auto-kill
+**bb_bounce+ with filters:** 5T/100%WR +$0.33 — confluence works
+
+**Open trades:** 2 (BABY r2-trend-long4, MON return_exhaustion_long)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 28.2% — well below 40% threshold
+- Trade frequency 0/hr — normal Sunday evening
+- bb_bounce+ 2T/0%WR — still below 3T auto-kill threshold (1 more loss triggers)
+- range_breakout_short — already killed last cycle
+
+**Monitoring:**
+- bb_bounce+ standalone 0% WR (2T) — auto-kill at 3T

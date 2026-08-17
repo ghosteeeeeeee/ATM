@@ -851,3 +851,7 @@
   WHY: 2T last hour (BABY profit-monster +$0.05, HYPE atr_sl_hit -$0.03). 24h 42T 83% WR +$0.48. ATR SL 28.6% (below 40%). bb_bounce+ 0% WR 2T still below 3T threshold. Trade frequency 2/hr normal Sunday. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 20:03 UTC
+[2026-08-17 20:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday 20:00 UTC evening quiet). 24h 41T 73%WR +$0.47. ATR SL 28.2% (well below 40%). bb_bounce+ standalone 0% WR 2T (below 3T auto-kill). range_breakout_short already killed last cycle. Trade frequency 0/hr normal Sunday. 2 open trades (BABY r2-trend, MON return_exhaustion). System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 21:03 UTC
