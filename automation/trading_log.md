@@ -9730,3 +9730,28 @@ None — system stable, previous fixes settling in.
 **Monitoring:**
 - range_breakout_short 0% WR (2T) — auto-kill at 3T
 - bb_bounce+ 0% WR (2T) — auto-kill at 3T
+
+## [2026-08-17 17:03 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.03 (WR: 66.7%)
+
+**24h:** 41T | 66% WR | +$0.41
+- profit-monster-trail: 27/41 (65.9%) +$1.19 dominant
+- atr_sl_hit: 12/41 (29.3%) — below 40% threshold
+
+**Last Hour:**
+- ETH bb_bounce+,hl_copy_trader: profit-monster-trail +$0.05 (winner)
+- SYRUP r2-trend-long7: profit-monster-trail +$0.02 (winner)
+- GMT r2-trend-long14: atr_sl_hit -$0.04 (loss)
+
+**Changes:**
+1. **Killed range_breakout_short** — 0% WR 3T (0W 3L -$0.17). Was at 2T/0%WR for 3+ monitoring cycles, now confirmed 3T. SIGNAL KILLED.
+
+**No Change Needed:**
+- ATR SL 29.3% — well below 40% threshold
+- Trade frequency 3/hr — normal Sunday volume
+- bb_bounce+ 0% WR 2T — monitoring, auto-kill at 3T
+
+**Open Questions:**
+- bb_bounce+ 0% WR 2T — next check for auto-kill

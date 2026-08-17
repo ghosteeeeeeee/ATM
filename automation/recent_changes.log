@@ -839,3 +839,7 @@
   WHY: 3T last hour (SYRUP stop_hunt +$0.03, MET r2-trend -$0.06, ZEN bb_bounce+,rs-s97 -$0.04). 24h 41T profit-monster-trail dominant (68.3% +$1.18). ATR SL 26.8% (well below 40% threshold). No auto-kill candidates (bb_bounce+ 0% WR 2T, range_breakout_short 0% WR 2T, both below 3T threshold). Trade frequency 3/hr normal Sunday. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 17:03 UTC
+[2026-08-17 17:03] auto_1hr: KILLED range_breakout_short
+  WHY: 3T last hour (GMT atr_sl_hit -$0.04, SYRUP profit-monster +$0.02, ETH profit-monster +$0.05). 24h 41T 66% WR +$0.41. ATR SL 29.3% (below 40%). range_breakout_short 0% WR 3T (0W 3L -$0.17) — was at 2T/0%WR for 3+ cycles, now confirmed. Signal killed per auto-kill protocol. bb_bounce+ 0% WR 2T still below threshold. Trade frequency 3/hr normal. No other changes.
+  BY: auto_1hr
+  NEXT: Re-run at 18:03 UTC
