@@ -47,3 +47,10 @@
 - **WARN** (6x): `hermes-better-coder.service, hermes-wasp.service, hermes-bug-hunter.service, hermes-hl-volume.service, hermes-mtf-macd-tuner.service, hermes-trading-checklist.service — FAILED`
 - **DETAILS**: better-coder: missing dispatcher module; hl-volume: 429 rate limit; mtf-macd: missing warmup attr; bug-hunter: found 3 issues (non-atomic JSON, hardcoded passwords, dead imports); trading-checklist: 64637 signals in DB; wasp: unknown
 - **AUTO-FIX**: None applied — all non-critical utility services, pipeline core is healthy
+
+## Error Alerts — 2026-08-17 01:20 UTC
+- **WARN** (1x): Hotset empty — 0 signals survived compaction, no new entries considered
+- **WARN** (1x): HYPE LONG phantom-write guard active — blocking SL tighten to 0.105% from entry (trade_id=13971)
+- **INFO**: Pipeline running, 2 open positions, 1 closed today (+$0.07), -1.51% portfolio PnL
+- **INFO**: 42% of tracked tokens stale (low velocity) — expected in quiet NEUTRAL market
+- **AUTO-FIX**: None needed — no CRITICAL issues

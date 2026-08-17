@@ -514,11 +514,13 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # mirror_open returning success=True means the order was SENT, not that it filled.
     # We must verify the position appears in /info before committing to DB.
     # This prevents phantom DB records when HL fills are rejected (margin, delist, etc.)
+    # NOTE: get_open_hype_positions() returns a DICT keyed by coin, not a list.
     try:
         from hyperliquid_exchange import get_open_hype_positions
         verify_positions = get_open_hype_positions()
-        if not any(p.get('coin', '').upper() == hype_token.upper() and float(p.get('size', 0)) != 0
-                   for p in verify_positions):
+        # verify_positions is {"DOT": {"size": 9.5, ...}, "HYPE": {...}}
+        pos_data = verify_positions.get(hype_token.upper())
+        if not pos_data or float(pos_data.get('size', 0)) == 0:
             print(f"[brain.py] ❌ mirror_open reported success but {hype_token} not in HL positions — rolling back")
             try:
                 from hyperliquid_exchange import close_position
