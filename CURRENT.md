@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-17 20:00 UTC (75th run)**
-**Updated by: CEO**
+**Last Updated: 2026-08-17 18:30 UTC (76th run)**
+**Updated by: Daily Orchestrator**
 
 ## What We're Working On
 
-**Completed:** PM_TRAIL dist 0.20% WORKING (89% WR +$8.83/7d, R:R 1.94:1). All legacy losers killed (ct-hot+ Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→5). accel-300- standalone bypass KILLED (40T/7d -$0.30, net negative). Phantom trades FIXED (0T, was 9T/7d -$0.06).
+**Completed:** PM_TRAIL dist 0.20% WORKING (89% WR +$8.01/7d). All legacy losers killed (ct-hot+ Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→8). Phantom trades FIXED (0T, was 9T/7d -$0.06).
 
-**Current status:** System STRONG — 24h 41T +$0.40, 61.0% WR. 1 open LONG (r2-trend-long3 flat). PM_TRAIL carrying system (217T/7d 89.4% WR +$8.70, avg win 0.42%, every day green). ATR_SL 166T/7d 0.6% WR -$11.05 (24h 12T historic low, 71% reduction from peak). R:R 0.79:1 (7d) / 1.87:1 (24h). ct-hot+ legacy clearing (33T/7d, expected Aug 18). Aug 17: 29T +$0.26, 58.6% WR (GREEN DAY). range_breakout_short AUTO_KILLED (0% WR 3T/48h -$0.17). Phantom 0T (FIXED).
+**Current status:** System STRONG — 24h 41T +$0.40, 61.0% WR. 2 open LONG (HYPE -0.23%, BABY flat). PM_TRAIL carrying system (205T/7d 88.8% WR +$8.01, every day green). ATR_SL 165T/7d 0.6% WR -$11.01 (8T/24h, 80% reduction from peak 41). ct-hot+ legacy cleared (1T/24h, effectively done). Aug 17: 29T +$0.26, 58.6% WR (GREEN DAY).
 
 ## Active Decisions
 
@@ -40,10 +40,9 @@
 
 ## Next Actions
 
-1. **Monitor PM_TRAIL edge.** 28T/24h 89.3% WR +$1.18 (avg win 0.41%, R:R 1.87:1). Must hold >80% WR. — 2026-08-17
-2. **Monitor ATR_SL count.** 12T/24h (7d daily: 41→8, 80% reduction from peak). Must stay <15/day. — 2026-08-17
-3. **ct-hot+ legacy clearing.** 33T/7d clearing naturally. Should be gone by Aug 18. — 2026-08-17
-4. **Aug 17 daily tracking.** 28T +$0.24, 57.1% WR — GREEN DAY confirmed. — 2026-08-17
-5. **range_breakout_short monitoring.** AUTO_KILLED by system (0% WR 3T/48h -$0.17). User had re-enabled but auto-killer correctly killed. — 2026-08-17
-6. **SHORT side signals.** All range_breakout variants dead except range_breakout_short (user re-enabled). Need new SHORT signals for SHORT_BIAS regime. — 2026-08-17
-7. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-17
+1. **Monitor PM_TRAIL edge.** 205T/7d 88.8% WR +$8.01. Must hold >80% WR. — 2026-08-17
+2. **Monitor ATR_SL count.** 8T/24h (7d daily: 41→8, 80% reduction from peak). Must stay <15/day. — 2026-08-17
+3. **ct-hot+ legacy cleared.** 1T/24h remaining, effectively done. — 2026-08-17
+4. **bb_bounce+ monitoring.** 2T/7d 50% WR -$0.04 — below 3T auto-kill threshold. Auto-kill at 3T. — 2026-08-17
+5. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-17
+6. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-17
