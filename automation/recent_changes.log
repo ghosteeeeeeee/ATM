@@ -810,3 +810,7 @@
   WHY: 1T last hour (DOT profit-monster-trail +$0.03, winner). 24h 36T 30.6% ATR SL (well below 40%, improving from 42.9%). No auto-kill candidates (no 0% WR with 3+ trades in last hour). ct-hot+ testing mode DO NOT DISABLE. 4 open positions healthy. Sunday quiet market. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 07:06 UTC
+[2026-08-17 07:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday 07:00 UTC, dead market). 24h 33T profit-monster-trail dominant (+$1.04). ATR SL 22.2% (well below 40% threshold). No auto-kill candidates (no 0% WR with 3+ trades). System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 08:03 UTC

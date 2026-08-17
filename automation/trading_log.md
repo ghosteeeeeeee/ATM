@@ -9520,3 +9520,22 @@ None — system stable, previous fixes settling in.
 1. Verify bb_bounce+ WR improves without hzscore+ combo drag
 2. Monitor wave_catcher+ for continued underperformance
 3. Investigate phantom trades (guardian_orphan) when system has bandwidth
+
+## [2026-08-17 07:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed (Sunday dead market)
+**PnL:** $0.00
+
+**24h Snapshot:** 33T | profit-monster-trail dominant (+$1.04) | ATR SL 22.2% (well below 40% threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 22.2% — system self-correcting, well below 40% kill threshold
+- No 0% WR signals with 3+ trades (auto-kill criteria not met)
+- Trade frequency normal (<20/hr)
+- All signals performing or borderline — no crisis
+
+**Open Questions:**
+- bb_bounce+ 0% WR (2T 24h) — too few trades to judge
+- Sunday low volume — re-check Monday volume patterns
