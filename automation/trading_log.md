@@ -9564,3 +9564,27 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - bb_bounce+ 0% WR (2T 24h) — too few trades to judge, monitor
 - Sunday low volume — re-check Monday
+
+## [2026-08-17 09:03 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.04 (WR: 0%)
+**Last Hour:** USUAL r2-trend-long3 ATR SL -$0.04
+
+**24h:** 35T | 54.3% WR | ~+$0.60 | profit-monster-trail dominant (25/35 = 71.4%)
+**ATR SL:** 25.7% (9/35, well below 40% threshold)
+**Open:** 2 positions ($22) STX+APT range_breakout_short, both flat
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 25.7% — healthy, well below 40% kill threshold
+- No auto-kill candidates (bb_bounce+ 0% WR but only 2T, below 3T threshold)
+- Trade frequency 1/hr — normal Sunday volume
+- All signals performing within tolerance
+- No overtrading
+
+**Open Questions:**
+- bb_bounce+ 0% WR (2T 24h) — too few trades to judge, monitor
+- r2-trend-long3 40% WR (5T 24h) — borderline but acceptable
+- Sunday low volume — re-check Monday patterns

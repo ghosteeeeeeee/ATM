@@ -58,3 +58,9 @@
 ## Error Alerts — 2026-08-17 02:02 UTC
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK: TOK (most recent call last):`
+
+## Health Report — 2026-08-17 09:19 UTC
+- **OK** Pipeline: running, cycle #158920, 50 signals generated (1h), 0 errors
+- **WARN** Phantom trades (6): SYRUP, CFX, HYPE, NOT with 0% PnL in closed_today
+- **INFO** Market: 102 NEUTRAL / 1 LONG (ACE) / 1 SHORT (CHIP) — very quiet
+- **INFO** Positions: 2 open (MERL -0.25%, APT -0.19%), SLs healthy

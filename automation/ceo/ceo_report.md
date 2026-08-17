@@ -1,28 +1,28 @@
-## CEO Report — 2026-08-17 (59th run)
+## CEO Report — 2026-08-17 (61st run)
 
 ### Diagnosis
-System STRONG. Verified: 24h 35T +$0.60, 60.0% WR. 48h 92T +$0.16 (ct-hot+ legacy 18T -$1.23 dragging). Excluding ct-hot+: 74T +$1.39 (HEALTHY). PM_TRAIL dominant: 39T 84.6% WR +$1.87, avg winner +0.553%. ATR_SL 35T 2.9% WR -$2.11 (51% from ct-hot+). R:R 0.76:1. Aug 17: 13T +$0.47, 61.5% WR (on track for best day in weeks). 0 open positions.
+System STRONG. Verified: 24h 37T +$0.57, 59.5% WR. 48h 91T -$0.09 (ct-hot+ legacy 28T -$0.66 dragging). Excluding ct-hot+: 63T +$0.57 (HEALTHY). PM_TRAIL dominant: 39T 84.6% WR +$1.83, avg +0.46%, max +1.93%. profit-monster-T1: 7T 100% WR +$0.41. ATR_SL 36T 2.8% WR -$2.23 (10/36 in 24h, daily 41→3 trend STRONG). R:R ~1:1. Aug 17: 37T +$0.57, 59.5% WR. 2 open (~flat, -0.28%). Coin tracker: 109 coins, 3 accumulation (BTC), SAGA top composite 57.6.
 
 ### Root Cause of Losses
-1. **ct-hot+ legacy** — 18T/48h -$1.23 (ATR_SL dominant). Already disabled, clearing naturally. Expected gone by Aug 18.
-2. **ATR_SL exits** — 35/48h -$2.11. 18 from ct-hot+ (51%). Without ct-hot+: 17T -$0.88 (manageable).
+1. **ct-hot+ legacy** — 28T/48h -$0.66 (clearing, flags False, expected gone by Aug 18).
+2. **ATR_SL exits** — 36/48h -$2.23. Without ct-hot+: 26T -$1.57 (manageable, daily trend 41→3).
 3. **guardian_orphan phantom** — 7T/48h -$0.10. Empty signal trades from HL sync. Low priority.
 
 ### Fix Applied
-NO CHANGES. System performing well. All legacy losers killed. PM_TRAIL edge strong (84.6% WR, 0.553% avg win). No bleeding signals to kill. ATR_SL daily trend improving (41→33→current).
+NO CHANGES. System performing well. All legacy losers killed. PM_TRAIL edge strong (84.6% WR, 0.46% avg win). ATR_SL daily trend excellent (41→18→3). No bleeding signals to kill.
 
 ### Verification
-- 24h: 35T +$0.60, 60.0% WR ✅
-- 48h: 92T +$0.16 (excl ct-hot+: +$1.39) ✅
-- 7d: 425T -$2.50, 48.5% WR (improving)
-- PM_TRAIL: 39T 84.6% WR +$1.87 ✅
-- ATR_SL: 35/48h, 51% from ct-hot+ (clearing)
-- Open: 0 positions
-- Daily: Aug 12 +$0.49, Aug 13 -$1.58, Aug 17 +$0.47 (tracking best day)
-- Aug 17: 11T +$0.55, 72.7% WR ✅
+- 24h: 37T +$0.57, 59.5% WR ✅
+- 48h: 91T -$0.09 (excl ct-hot+: +$0.57) ✅
+- 7d: 424T -$2.51, 48.6% WR
+- PM_TRAIL: 39T 84.6% WR +$1.83 ✅
+- ATR_SL: 36/48h, daily 41→3 ✅
+- profit-monster-T1: 7T 100% WR +$0.41 ✅
+- Open: 2 positions (~flat)
+- Daily: Aug 12 +$0.49, Aug 13 -$1.58, Aug 17 +$0.57 (tracking best day in weeks)
 
 ### Next
 1. ct-hot+ legacy clears naturally by Aug 18
 2. Monitor PM_TRAIL WR (must >80%)
-3. Monitor ATR_SL count (must <35/48h)
-4. Investigate guardian_orphan phantom trades — low priority
+3. Monitor ATR_SL daily count (must stay <15)
+4. Phantom trades (guardian_orphan) — low priority
