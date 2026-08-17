@@ -1,54 +1,96 @@
-=== Signal Performance Report ===
-Generated: 2026-08-16 23:08 UTC
+# Signal Performance Report
+**Generated:** 2026-08-17 05:07 UTC | **Period:** Last 6h + 24h + 7d
 
-## Period: Last 6h | 24h
+## Overall Stats (24h)
+- **Total closed trades:** 35
+- **Active signals:** ~22 signal+direction combos
 
-### KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
+---
+
+## KILLED (executed)
+
+All kill candidates already dead — no new kills needed this run.
+
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No kill candidates below threshold |
+| range_breakout+ | LONG | 25.0% | -$0.41 | 8 (7d) | Already killed (RANGE_BREAKOUT_PLUS_ENABLED=False) |
+| trend_momentum_near_sma+ | LONG | 16.7% | -$0.37 | 6 (7d) | Already killed (TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED=False) |
+| mover+ | LONG | 28.6% | -$0.15 | 7 (7d) | Already killed (MOMENTUM_LEADERBOARD_PLUS_ENABLED=False) |
 
-### BLOCKED BY USER (cannot kill):
-| Signal | Dir | WR | PnL | Trades (24h) | Status |
+**Note:** ct-hot- SHORT (0% WR, -$0.19, 4 trades 7d) is in NEVER_REENABLE_FLAGS but was re-enabled per user 2026-08-16. Flag reads "TESTING MODE — DO NOT DISABLE." Respecting user override.
+
+---
+
+## BOOSTED (executed)
+
+No new boosts — top performers already enabled.
+
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| ct-hot+ | LONG | 16.7% | -$0.61 | 12 | TESTING MODE — DO NOT DISABLE per user (re-enabled 2026-08-16). In NEVER_REENABLE_FLAGS but overridden. |
+| bb_bounce+ | LONG | 58.3% | +$0.21 | 24 (7d) | Already enabled (BB_BOUNCE_PLUS_ENABLED=True) |
+| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 (7d) | Part of R2_TREND_LONG_ENABLED=True |
+| bb_bounce+,hl_copy_trader | LONG | 100.0% | +$0.26 | 2 (24h) | Already enabled |
+| r2-trend-long3 | LONG | 60.0% | +$0.11 | 5 (24h) | Part of R2_TREND_LONG_ENABLED=True |
 
-### BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
+---
+
+## LOSERS (watch list)
+
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| r2-trend-long4 | LONG | 66.7% | +$0.05 | 3 (24h) | On watch — needs 5+ trades to boost |
+| ct-hot+ | LONG | 42.4% | -$0.42 | 33 (7d) | NEVER_REENABLE, user override testing |
+| wave_catcher+ | LONG | 37.5% | -$0.42 | 8 (7d) | Monitor — near kill threshold |
+| bb_bounce+,hzscore+ | LONG | 36.8% | -$0.30 | 19 (7d) | hzscore+ standalone blocked, combo bleeding |
+| accel-300- | SHORT | 55.0% | -$0.30 | 40 (7d) | Inverted R:R — wins small, losses big |
+| continuation-,hzscore- | SHORT | 40.0% | -$0.24 | 5 (7d) | Bleeding combo |
+| hzscore- | SHORT | 54.3% | -$0.22 | 35 (7d) | Killed today — inverted R:R |
+| ct-hot- | SHORT | 0.0% | -$0.19 | 4 (7d) | NEVER_REENABLE but user testing |
+| mover+ | LONG | 28.6% | -$0.15 | 7 (7d) | Already killed |
+| range_finder+ | LONG | 33.3% | -$0.14 | 9 (7d) | Already disabled |
 
-### LOSERS (watch list):
-| Signal | Dir | WR | PnL (24h) | Trades | Status |
+---
+
+## WINNERS
+
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| (null) | LONG | 0% | -$0.14 | 4 | guardian_orphan trades — not a signal bug |
-| bb_bounce+ | LONG | 0% | -$0.04 | 2 | Under threshold (needs 5+) |
-| hl_copy_trader,range_finder- | SHORT | 0% | -$0.06 | 2 | Under threshold |
+| return_exhaustion_long | LONG | 100.0% | +$0.43 | 4 (7d) | Enabled, niche |
+| bb_bounce+ | LONG | 58.3% | +$0.21 | 24 (7d) | Enabled — system workhorse |
+| bb_bounce+,hl_copy_trader | LONG | 40.0% | +$0.21 | 5 (7d) | Enabled |
+| r2-trend-long6 | LONG | 100.0% | +$0.20 | 4 (7d) | Enabled |
+| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 (7d) | Enabled — best r2 variant |
+| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 (7d) | Enabled |
+| hzscore-,range_breakout- | SHORT | 75.0% | +$0.12 | 4 (7d) | Enabled |
+| range_breakout_short | SHORT | 50.0% | -$0.04 | 26 (7d) | Enabled — re-tested |
 
-### WINNERS:
-| Signal | Dir | WR | PnL (24h) | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long4 | LONG | 66.7% | +$0.05 | 3 | Healthy |
-| r2-trend-long5 | LONG | 100% | +$0.03 | 1 | Sample too small |
-| r2-trend-long9 | LONG | 100% | +$0.03 | 1 | Sample too small |
-| return_exhaustion_long | LONG | 100% | +$0.04 | 1 | Sample too small |
-| bb_bounce+,hzscore- | SHORT | 100% | +$0.10 | 1 | Sample too small |
-| r2-trend-long2 (7d) | LONG | 64.7% | +$0.19 | 17 | Best 7d performer |
-| bb_bounce+ (7d) | LONG | 58.3% | +$0.21 | 24 | Consistent winner |
+---
 
-### 7d Top Losers (for reference):
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| wave_catcher+ | LONG | 37.5% | -$0.42 | 8 |
-| ct-hot+ | LONG | 42.4% | -$0.42 | 33 |
-| range_breakout+ | LONG | 25.0% | -$0.41 | 8 |
-| trend_momentum_near_sma+ | LONG | 16.7% | -$0.37 | 6 |
+## ISSUES
 
-### ISSUES:
-- **COIN_TRACKER_HOT conflict**: ct-hot+ is in NEVER_REENABLE_FLAGS (line 926-928) but also set to True (line 1697-1699) with "TESTING MODE — DO NOT DISABLE". These are contradictory. The signal_rotator will skip it per NEVER_REENABLE, but the flag is True. Either remove from NEVER_REENABLE or set flag False.
-- **Null signal trades**: 5 guardian_orphan trades closed with $0 or small losses. These are orphaned positions cleaned up by the guardian, not signal bugs.
-- **Overall system quiet**: Only 16.7% of 24h trades are from ct-hot+. System activity is low.
+- **No signal inversions found.** All signals respect direction labels.
+- **ct-hot+ LONG** (33T, 42.4% WR, -$0.42) is the biggest active bleed — in NEVER_REENABLE but user re-enabled for testing. Watch closely.
+- **Accelerated SL hits** continue to dominate losses system-wide — ATR_SL is the #1 exit reason for losers.
+- **7d overall:** System is roughly flat to slightly negative. Winners and losers cancel out. No extreme drawdowns.
 
-### ACTION REQUIRED:
-1. Resolve COIN_TRACKER_HOT conflict — either remove from NEVER_REENABLE_FLAGS or disable the flags
-2. ct-hot+ has 12 trades at 16.7% WR in 24h — clear loser but user-protected
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-17 | 0abb30f | CEO: 53rd run — NO CHANGES, system strong, PM_TRAIL 84.2% WR... |
+| 2026-08-17 | a61d89d | CEO run 46: system IMPROVING, hzscore- killed, NO param chan... |
+| 2026-08-17 | 5da2ebe | CEO: Kill hzscore- (testing failed, inverted R:R) |
+| 2026-08-16 | 442af24 | CEO: 44th run - no changes, system improving, ct-hot+ testin... |
+| 2026-08-16 | 9c40820 | CEO: RAISED MIN_COMPOSITE 70→75. ct-hot+ 12T/24h 25% WR ALL ... |
+| 2026-08-16 | ce0169f | CEO: RAISED MIN_COMPOSITE 65→70. ct-hot+ ALL entries NEUTRAL... |
+| 2026-08-16 | 5e49f6e | CEO: RAISED MIN_COMPOSITE 60→65 (40th run) |
+| 2026-08-16 | 9a6c712 | CEO: RAISED MIN_COMPOSITE 55→60 — ct-hot+ ATR_SL 52% of loss... |
+| 2026-08-16 | 607c6f0 | CEO: 37th run — NO CHANGES, eval window active, legacy clear... |
+| 2026-08-16 | ceba10c | CEO: 35th run — NO CHANGES, eval window active |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

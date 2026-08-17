@@ -802,3 +802,7 @@
   WHY: 3T last hour (NXPC stop_hunt_reversal_long+ +$0.03, CFX orphan $0.00, DASH r2-trend-long3 +$0.08). All winners, 100% WR. 24h 39T 34.2% ATR SL (below 40% threshold, improving). ct-hot+ 6T -$0.22 (16.7% WR) worst signal but not 0% WR auto-kill. No kill candidates (<3T for all 0% WR signals). 3/hr normal. 2 open positions ($22) DOT +3.27%, STX +5.77% healthy. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 05:03 UTC
+[2026-08-17 05:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday 05:00 UTC, dead market). 24h 41T, 100% WR last 3 hours. ATR SL 40.6% (7d) / ~34% (24h) below 40% threshold, improving from 42.9%. ct-hot+ 33T 42.4% WR worst signal but in testing mode. wave_catcher+ 15T 40% WR, bb_bounce+,hzscore+ 19T 36.8% WR underperforming but not auto-kill candidates. No 0% WR signals with 3+ trades (ct-hot- excluded per user). 3 open positions (DOT, STX, ALT) all small. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 06:03 UTC

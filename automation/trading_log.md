@@ -9436,3 +9436,34 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - ct-hot+ 16.7% WR (6T) — monitor, disable if WR stays <20% after 20+ trades
+
+## [2026-08-17 05:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+
+**24h Snapshot:**
+- 41 trades: profit-monster-trail dominant winner, atr_sl_hit dominant loser
+- ATR SL 40.6% (7d) / ~34% (24h) — below 40% threshold, improving from 42.9%
+- 3 open positions: DOT, STX, ALT (all small, Sunday quiet)
+- Trade frequency normal (1.7/hr avg)
+
+**Worst signals (7d, >10T):**
+- ct-hot+ 33T -$0.42 (42.4% WR) — testing mode, DO NOT DISABLE
+- wave_catcher+ 15T -$0.27 (40.0% WR)
+- bb_bounce+,hzscore+ 19T -$0.30 (36.8% WR)
+- accel-300- 40T -$0.30 (55.0% WR) — asymmetric losses
+
+**Changes:** None.
+
+**No Change Needed:**
+- ATR SL below 40% threshold — system self-correcting
+- No auto-kill candidates (ct-hot- excluded per user)
+- Trade frequency normal (<20/hr)
+- Market quiet on Sunday early morning
+- Last 3 hours 100% win rate
+
+**Open Questions:**
+- ct-hot+ 42.4% WR (33T) — monitor, disable if WR stays <40% after 50+ trades
+- wave_catcher+ 40% WR (15T) — candidate for disable if trend continues
+- bb_bounce+,hzscore+ combo 36.8% WR (19T) — combo underperforming, consider disabling
