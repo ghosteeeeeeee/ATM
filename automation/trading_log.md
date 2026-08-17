@@ -9827,3 +9827,40 @@ None — system stable, previous fixes settling in.
 
 **Monitoring:**
 - bb_bounce+ standalone 0% WR (2T) — auto-kill at 3T
+
+## [2026-08-17 21:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (Sunday evening quiet)
+**24h:** 39T | 66.7% WR | +$0.54
+
+**24h by close reason:**
+- profit-monster-trail: 26T (66.7%) +$1.18 (dominant)
+- atr_sl_hit: 11T (28.2%) -$0.56 (healthy, below 40% threshold)
+- cut-loser-CL-T1: 1T -$0.15
+- guardian_orphan: 1T $0.00
+
+**Signal performance:**
+- bb_bounce+,hl_copy_trader: 3T/100%WR +$0.31 (confluence works)
+- stop_hunt_reversal_long+: 3T/100%WR +$0.07 (solid)
+- r2-trend-long3: 7T/57%WR -$0.01 (breakeven, most traded)
+- bb_bounce+ standalone: 2T/0%WR -$0.04 (below 3T auto-kill)
+- range_breakout_short: 2T/0%WR -$0.17 (killed earlier)
+
+**Open trades:** 2 (BABY r2-trend-long4, MON return_exhaustion_long)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 28.2% — well below 40% threshold
+- Trade frequency 0/hr — normal Sunday evening
+- bb_bounce+ standalone 2T/0%WR — still below 3T auto-kill threshold
+- range_breakout_short — already killed last cycle
+- No new signals crossing 3T/0%WR threshold
+
+**Monitoring:**
+- bb_bounce+ standalone 0% WR (2T) — auto-kill at 3T
+- return_exhaustion_long 0%WR (1T) — monitor, not yet at threshold
+
+**Open Questions:**
+- Sunday evening volume expected to pick up after 22:00 UTC?
+- MON return_exhaustion_long entry at 0.0207 with SL 0.0206 — tight stop, monitor
