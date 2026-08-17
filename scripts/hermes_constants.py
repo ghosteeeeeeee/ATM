@@ -929,6 +929,7 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_ENABLED',      # SIGNAL REPORTER 2026-08-16 — ct-hot+ 35% WR, -$0.48 (24h). ct-hot- 0% WR.
     'COIN_TRACKER_HOT_PLUS_ENABLED', # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48 (24h 20T).
     'COIN_TRACKER_HOT_MINUS_ENABLED',# SIGNAL REPORTER 2026-08-16 — 0% WR, -$0.19 (48h 4T).
+    'RANGE_BREAKOUT_SHORT_ENABLED',  # SIGNAL REPORTER 2026-08-17 — 28T 46.4% WR -$0.21 (7d). Test failed. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1207,7 +1208,7 @@ RANGE_FINDER_SHORT_ENABLED = False   # CEO KILLED 2026-08-16 — range_finder SH
 RANGE_BREAKOUT_ENABLED = False   # CEO KILLED 2026-08-16 — 8T 25% WR -$0.41 (7d). All variants dead.
 RANGE_BREAKOUT_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-15 — 8T 25% WR -$0.41 (7d). Kill LONG.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
-RANGE_BREAKOUT_SHORT_ENABLED = True   # RE-ENABLED 2026-08-16 per user for testing. Had 12-trade winning streak Aug 12-14. Monitor WR.
+RANGE_BREAKOUT_SHORT_ENABLED = False  # KILLED 2026-08-17 — test failed. 28T 46.4% WR -$0.21 (7d). Last 2 trades both ATR SL hits. NEVER_REENABLE.
 RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)
