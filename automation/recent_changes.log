@@ -835,3 +835,7 @@
   WHY: 0T last hour (Sunday 15:00 UTC). 24h 39T profit-monster-trail dominant (71.8%). ATR SL 23.1% (well below 40% threshold). No auto-kill candidates (range_breakout_short 0% WR 2T, bb_bounce+ 0% WR 2T, both below 3T threshold). Trade frequency normal. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 16:03 UTC
+[2026-08-17 16:03] auto_1hr: NO CHANGES
+  WHY: 3T last hour (SYRUP stop_hunt +$0.03, MET r2-trend -$0.06, ZEN bb_bounce+,rs-s97 -$0.04). 24h 41T profit-monster-trail dominant (68.3% +$1.18). ATR SL 26.8% (well below 40% threshold). No auto-kill candidates (bb_bounce+ 0% WR 2T, range_breakout_short 0% WR 2T, both below 3T threshold). Trade frequency 3/hr normal Sunday. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 17:03 UTC

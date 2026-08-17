@@ -838,7 +838,7 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%.
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40%
-PM_TRAIL_DISTANCE_PCT = 0.0015  # 0.15%
+PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20%
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -929,7 +929,6 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_ENABLED',      # SIGNAL REPORTER 2026-08-16 — ct-hot+ 35% WR, -$0.48 (24h). ct-hot- 0% WR.
     'COIN_TRACKER_HOT_PLUS_ENABLED', # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48 (24h 20T).
     'COIN_TRACKER_HOT_MINUS_ENABLED',# SIGNAL REPORTER 2026-08-16 — 0% WR, -$0.19 (48h 4T).
-    'RANGE_BREAKOUT_SHORT_ENABLED',  # SIGNAL REPORTER 2026-08-17 — 28T 46.4% WR -$0.21 (7d). Test failed. NEVER_REENABLE.
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -971,7 +970,7 @@ ACCEL_300_COOLDOWN_BARS   = 10   # dedup: only fire once per N bars per token+di
 ACCEL_300_LOOKBACK_1M     = 700  # 1m prices to fetch per token (warmup + detection window)
 ACCEL_300_ENABLED        = False  # DISABLED 2026-08-13 10:30 — 19T today 36.8% WR -$0.73, 12/19 ATR SL hits. Re-enabled yesterday but deteriorated.
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
-ACCEL_300_REGIME_SLOPE_PCT = 0.002   # CEO 2026-08-16 — STARVATION FIX: 0.0005% blocked SHORT signals at +0.0003% slope (flat on 5m). 0.002% allows near-flat slopes, only blocks truly trending-up. Monitor: SHORT WR (should stay ≥50%), daily trades (must ↑).
+ACCEL_300_REGIME_SLOPE_PCT = 0.0005  # Backtested: slope filter doesn't differentiate winners/losers. 0.0005% blocks only strongly uptrending SHORTs.
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
 ACCEL_300_MIN_ATR_PCT      = 0  # disabled — backtest shows ATR alone can't separate winners from losers (overlap 0.07-0.25%)
 ACCEL_300_STALE_BARS = 15   # max bars since EMA cross for LONG (was 25 — fresher signals, catch moves earlier)
@@ -1114,7 +1113,7 @@ EMA20_50_MINUS_ENABLED        = False    # ema20_50- SHORT
 MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
 ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
-ACCEL_300_MINUS_ENABLED       = False   # CEO KILLED 2026-08-13 — 35T -$0.17 (57.1% WR but inverted R:R: avg_win $0.05 vs avg_loss $0.08). 24h: 15T -$1.13. Re-enable if R:R improves.
+ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13-win streak Aug 12.
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
@@ -1147,6 +1146,10 @@ CEO_PROTECTED_FLAGS = {
     'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
     'PM_TRAIL_ACTIVATE_PCT': ('Profit monster trail activation — CEO changed without authorization 2026-08-16', '2026-08-17'),
     'PM_TRAIL_DISTANCE_PCT': ('Profit monster trail distance — CEO changed without authorization 2026-08-16', '2026-08-17'),
+    'ACCEL_300_MINUS_ENABLED': ('Winning SHORT signal — 13-win streak Aug 12. CEO killed, user re-enabled', '2026-08-17'),
+    'RANGE_BREAKOUT_SHORT_ENABLED': ('Winning SHORT signal — 11-win streak Aug 12. CEO killed, user re-enabled', '2026-08-17'),
+    'R2_TREND_LONG_ENABLED': ('Winning LONG signal — 8/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
+    'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
@@ -1179,7 +1182,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-17  # AUTO-ROTATED 2026-08-17  # bb_bounce+ LONG
+BB_BOUNCE_PLUS_ENABLED = True   # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1191,7 +1194,10 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # CEO 2026-08-17 — removed 'accel-300' (40T/7d 55% WR -$0.30, net negative), 'wave_catcher' (killed), 'range_breakout_short' (killed)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short',
+    'spike_exhaustion_short', 'bb_bounce',
+    'range_breakout', 'range_breakout_short',
+    'continuation', 'continuation_long', 'continuation_short',
+    'accel-300',
     'return_exhaustion_short', 'return-exhaustion-short',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
@@ -1207,7 +1213,7 @@ RANGE_FINDER_SHORT_ENABLED = False   # CEO KILLED 2026-08-16 — range_finder SH
 RANGE_BREAKOUT_ENABLED = False   # CEO KILLED 2026-08-16 — 8T 25% WR -$0.41 (7d). All variants dead.
 RANGE_BREAKOUT_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-15 — 8T 25% WR -$0.41 (7d). Kill LONG.
 RANGE_BREAKOUT_MINUS_ENABLED = False # range_breakout- SHORT — DISABLED, use range_breakout_short instead
-RANGE_BREAKOUT_SHORT_ENABLED = False  # KILLED 2026-08-17 — test failed. 28T 46.4% WR -$0.21 (7d). Last 2 trades both ATR SL hits. NEVER_REENABLE.
+RANGE_BREAKOUT_SHORT_ENABLED = True   # RE-ENABLED 2026-08-17 per user. Had 11-win streak Aug 12.
 RANGE_BREAKOUT_SHORT_EMA_PERIOD = 200  # EMA period for trend filter — block SHORT above this EMA
 RANGE_BREAKOUT_BB_PERIOD = 30        # Bollinger Band period
 RANGE_BREAKOUT_BB_STDDEV = 1.8       # Band width (1.8σ, matches range_finder)

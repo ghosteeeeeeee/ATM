@@ -69,3 +69,11 @@
 - **WARN** (1x): `APT mirror_close FAILED` — HL API returned non-dict response at 10:34. DB committed, HL position still open (degraded gracefully).
 - **WARN** (5x): Auxiliary services in failed state: hermes-better-coder, hermes-bug-hunter, hermes-mtf-macd-tuner, hermes-trading-checklist, hermes-wasp. All non-critical monitoring/tuning services, not auto-restarted to avoid masking root cause.
 - **INFO**: No auto-fixes applied — pipeline core is healthy.
+
+## Health Report — 2026-08-17 15:19 UTC
+- **OK** Pipeline: running, 3 open trades, 3,706 closed all-time, +3.20% PnL today, 0 errors
+- **INFO** Market: 3 LONG_BIAS (HEMI +6.6%, KAITO +6.2%, ACE +2.6%) / 0 SHORT / 102 NEUTRAL — mostly flat
+- **INFO** Signals: 0 HOT/WARM in last hour — expected given neutral-dominated market
+- **OK** Timers: hermes-pipeline ✓ | hermes-price-collector ✓ | hl-sync-guardian ✓
+- **OK** Disk: 74% (30GB free), no stale logs bloating
+- **NO AUTO-FIX NEEDED**

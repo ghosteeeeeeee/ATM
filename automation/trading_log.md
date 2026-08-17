@@ -9704,3 +9704,29 @@ None — system stable, previous fixes settling in.
 **Monitoring:**
 - range_breakout_short 0% WR (2T) — auto-kill at 3T
 - bb_bounce+ 0% WR (2T) — auto-kill at 3T
+
+## [2026-08-17 16:03 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** -$0.07 (WR: 33.3%)
+
+**24h:** 41T | 68.3% WR | +$0.44
+- profit-monster-trail: 28/41 (68.3%) +$1.18 dominant
+- atr_sl_hit: 11/41 (26.8%) — well below 40% threshold
+
+**Last Hour:**
+- SYRUP stop_hunt_reversal_long+: profit-monster-trail +$0.03 (winner)
+- MET r2-trend-long5: atr_sl_hit -$0.06 (loss)
+- ZEN bb_bounce+,rs-s97: atr_sl_hit -$0.04 (loss)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 26.8% — well below 40% threshold
+- No auto-kill candidates (bb_bounce+ 0% WR 2T, range_breakout_short 0% WR 2T — both below 3T threshold)
+- Trade frequency 3/hr — normal Sunday volume
+- System healthy
+
+**Monitoring:**
+- range_breakout_short 0% WR (2T) — auto-kill at 3T
+- bb_bounce+ 0% WR (2T) — auto-kill at 3T
