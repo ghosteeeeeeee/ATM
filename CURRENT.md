@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 01:30 UTC (85th run)**
+**Last Updated: 2026-08-18 02:00 UTC (86th run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
-**Completed:** PM_TRAIL dist 0.20% WORKING (89% WR +$8.07/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→9). Phantom trades FIXED (0T, was 9T/7d -$0.06).
+**Completed:** PM_TRAIL dist 0.20% WORKING (88.5% WR +$8.07/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→9). Phantom trades FIXED (0T, was 9T/7d -$0.06).
 
-**Current status:** System STRONG — 24h 36T +$0.42, 61.1% WR. 7d: 405T -$2.08, 50.1% WR (crossed 50% — legacy clearing). 2 open LONG (+$0.01 unrealized). PM_TRAIL carrying system (208T/7d 88.5% WR +$8.12, avg +0.38%, every trade green). ATR_SL 162T/7d 0.6% WR -$10.86 (historic low 9/day). ct-hot+ CLEARING (1T/24h — 33T/7d legacy, expected gone). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). 0 phantom trades. 94.4% of ATR_SL trades peaked green but never reached PM_TRAIL activation — signal quality issue. All 48 timers active.
+**Current status:** System STRONG — 24h 35T +$0.39, 60.0% WR. 7d: -$2.08. 2 open LONG (+$0.02 unrealized). PM_TRAIL carrying system (208T/7d 88.5% WR +$8.07, avg +0.38%, every trade green). ATR_SL 162T/7d 0.6% WR -$10.86 (historic low 9/day). ct-hot+ CLEARING (expected gone). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). 0 phantom trades. 94.4% of ATR_SL trades peaked green but never reached PM_TRAIL activation (+0.40%) — structural issue. All 48 timers active.
 
 ## Active Decisions
 
@@ -40,9 +40,8 @@
 
 ## Next Actions
 
-1. **Monitor PM_TRAIL edge.** 206T/7d 88.8% WR +$8.07. Must hold >80% WR. — 2026-08-17
-2. **Monitor ATR_SL count.** 9T/24h (7d daily: 41→9, 78% reduction from peak). Must stay <15/day. — 2026-08-17
-3. **ct-hot+ CLEARED.** 0T/24h, confirmed gone Aug 18 as expected. — 2026-08-17
-4. **bb_bounce+ healthy.** 24T/7d 58.3% +$0.21 — above 3T threshold, performing. — 2026-08-17
-5. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-17
-6. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-17
+1. **Monitor PM_TRAIL edge.** 208T/7d 88.5% WR +$8.07. Must hold >80% WR. — 2026-08-18
+2. **Monitor ATR_SL count.** 9T/24h (7d daily: 41→9, 78% reduction from peak). Must stay <15/day. — 2026-08-18
+3. **ct-hot+ clearing.** Expected gone, monitoring. — 2026-08-18
+4. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-18
+5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-18

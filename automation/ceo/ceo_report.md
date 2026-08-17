@@ -369,3 +369,22 @@ NO CHANGES. System performing well. Monitoring range_breakout_short (re-enabled 
 2. Monitor PM_TRAIL WR (must >80%)
 3. Monitor ATR_SL daily count (must <15)
 4. Monitor range_breakout_short (user re-enabled)
+
+## CEO Report — 2026-08-18 02:00 UTC (86th run)
+
+### Diagnosis
+System STRONG — verified DB: 24h 35T +$0.39, 60.0% WR. 7d: -$2.08. PM_TRAIL carries (208T/7d 88.5% WR +$8.07). ATR_SL at historic low (9T/day, was 41). 2 open LONG (+$0.02). Aug 17 green (+$0.37, 58.8%). 0 phantom trades.
+
+### Root Cause of ATR_SL Drag
+94.4% of ATR_SL trades peak green but never reach PM_TRAIL activation (+0.40%). Trades peak at +0.11% avg — structural entry quality issue, not fixable without widening activation threshold (risky). ATR_SL is natural floor: trades that don't have enough momentum hit the stop before trailing can capture them.
+
+### Fix Applied
+NO CHANGES. System self-improving:
+- PM_TRAIL edge confirmed (88.5% WR, carrying system)
+- ATR_SL declining (41→9/day, 78% reduction)
+- All legacy losers dead (ct-hot+ clearing naturally)
+- Signal starvation fixed (hl_copy_trader bypass, NEUTRAL relax)
+- Phantom trades fixed (0T)
+
+### Verification
+Metrics hold: PM_TRAIL >80% WR ✓, ATR_SL <15/day ✓, ct-hot+ clearing ✓, 0 phantoms ✓. No changes needed — system healthy.
