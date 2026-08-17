@@ -1,20 +1,20 @@
-## CEO Report — 2026-08-17 (80th run)
+## CEO Report — 2026-08-17 (81st run)
 
 ### Diagnosis
-System STRONG — no changes needed. Verified: 24h 39T +$0.47, 61.5% WR. 7d: 405T -$2.23, 49.9% WR. PM_TRAIL DOMINANT: 206T/7d 88.8% WR +$8.06 (carrying system). ATR_SL 164T/7d 0.6% WR -$10.95 (historic low 11/day). 2 open LONG (return_exhaustion_long +$0.02, r2-trend-long4 -$0.01 — flat). Aug 17: 31T +$0.28, 58.1% WR (GREEN DAY). bb_bounce+ 24T/7d 58.3% +$0.21 (healthy). r2-trend-long2 17T/7d 64.7% +$0.19 (best r2-trend). ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). All legacy losers in NEVER_REENABLE_FLAGS.
+System STRONG — no changes needed. Verified: 24h 39T +$0.55, 64.1% WR. 7d: 406T -$2.19, 49.5% WR. PM_TRAIL DOMINANT: 207T/7d 88.9% WR +$8.10 (carrying system, avg +0.38%). ATR_SL 164T/7d 0.6% WR -$10.95 (daily: 41→9, 78% reduction, historic low). 1 open LONG (BABY r2-trend-long4 -0.19% — flat). Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY). bb_bounce+ 24T/7d 58.3% +$0.21 (healthy). r2-trend-long2 17T/7d 64.7% +$0.19. return_exhaustion_long 6T/7d 83.3% +$0.32 (best WR). ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). All legacy losers in NEVER_REENABLE_FLAGS.
 
 ### Root Cause
-No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.8% WR, avg +0.39%). ATR_SL at historic low. All legacy losers killed or clearing.
+No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.9% WR, avg +0.38%). ATR_SL at historic low. All legacy losers killed or clearing.
 
 ### Fix Applied
-NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 2 open positions.
+NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 1 open position.
 
 ### Verification
-- 24h: 39T +$0.47, 61.5% WR ✅
-- PM_TRAIL: 206T/7d 88.8% WR +$8.06 ✅
-- ATR_SL: 164T/7d (daily 41→8, 80% reduction) ✅
-- 2 open positions (flat) ✅
-- Aug 17: 31T +$0.28, 58.1% WR (GREEN DAY) ✅
+- 24h: 39T +$0.55, 64.1% WR ✅
+- PM_TRAIL: 207T/7d 88.9% WR +$8.10 ✅
+- ATR_SL: 164T/7d (daily 41→9, 78% reduction) ✅
+- 1 open position (flat) ✅
+- Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY) ✅
 
 ---
 
