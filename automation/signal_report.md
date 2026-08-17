@@ -1,45 +1,63 @@
-=== Signal Performance Report ===
-Period: 2026-08-17 | 48h window
+# Signal Performance Report
+**Generated:** 2026-08-17 23:07 UTC | **Period:** Last 6h + 24h
 
-**System Health: 41T 61% WR +$0.41 PnL (48h) — PROFITABLE**
+## Overall Stats
+- **Total trades (all time):** 1,113 | **WR:** 47.4% | **PnL:** -42.23%
+- **Date range:** 2026-07-29 → 2026-08-17
 
-KILLED (executed this cycle):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | All clear losers already killed |
+---
 
-BOOSTED (executed this cycle):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | return_exhaustion_long already at 1.5x boost |
+## KILLED (executed this cycle):
 
-LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| ct-hot+ | LONG | 35.0% | -$0.48 | 20 | KILLED 2026-08-16 — still settling legacy trades |
-| (none) | — | — | — | — | All other active signals positive |
+None. No signals met kill criteria (WR < 30%, 5+ trades, PnL < -$0.10).
 
-WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| return_exhaustion_long | LONG | 80.0% | +$0.28 | 5 | BOOSTED 1.5x — star performer |
-| bb_bounce+,hl_copy_trader | LONG | 75.0% | +$0.31 | 4 | Active — consistent winners |
-| stop_hunt_reversal_long+ | LONG | 75.0% | +$0.06 | 4 | Active |
-| r2-trend-long3 | LONG | 55.6% | +$0.03 | 9 | Active |
-| r2-trend-long5 | LONG | 66.7% | +$0.02 | 3 | Active |
-| r2-trend-long4 | LONG | 50.0% | +$0.01 | 4 | Active |
-| bb_bounce+ | LONG | 33.3% | $0.00 | 3 | Breakeven |
+---
 
-PREVIOUSLY KILLED (confirmed dead):
-| Signal | Killed | Reason |
-|--------|--------|--------|
-| range_breakout+ | 2026-08-16 | 25% WR, -$0.41 (7d) |
-| range_breakout_short | 2026-08-17 | 0% WR, -$0.17 |
-| ct-hot+/- | 2026-08-16 | 35%/-0% WR, -$0.48/-$0.19 |
-| trend_momentum_near_sma+ | 2026-08-12 | 16.7% WR, -$0.37 |
-| hzscore+/- | 2026-08-17 | ~38%/54% WR, inverted R:R |
-| wave_catcher+/- | 2026-08-15/17 | 33%/25% WR, no edge |
+## BOOSTED (executed this cycle):
 
-ISSUES:
-- None. No signal inversions found. System operating normally.
-- SHORT side quiet — only hzscore- (3T, 66.7% WR but -$0.01) and range_breakout_short (2T, 0% WR) fired. Most SHORT signals killed. Consider if SHORT starvation is acceptable or if new SHORT signals needed.
+None. No signals met boost criteria (WR > 55%, 5+ trades, PnL > $0.05).
+
+---
+
+## WINNERS (WR > 55%, PnL > 0)
+
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| bb_bounce+,hl_copy_trader | LONG | — | —% | — | 3 | 100.0% | +0.31 | ⚠️ 3 trades |
+| r2-trend-long4 | LONG | 2 | 100.0% | +0.10 | 3 | 66.7% | +0.06 | ⚠️ 3 trades |
+| r2-trend-long3 | LONG | — | —% | — | 7 | 57.1% | -0.01 | ❓ WR ok, PnL flat |
+
+---
+
+## LOSERS (WR < 30%, PnL < -$0.10)
+
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| return_exhaustion_long | LONG | 2 | 50.0% | +0.04 | 3 | 33.3% | -0.11 | ⚠️ Low trades |
+
+---
+
+## MARGINAL (30-55% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| return_exhaustion_long | LONG | 3 | 33.3% | -0.11 | ❓ | Needs 5+ trades to judge |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **Low activity overall** — only 4 signals produced trades in 24h. Consider reviewing signal trigger thresholds.
+2. **bb_bounce+,hl_copy_trader** — 100% WR but only 3 trades. Monitor; boost if reaches 5+ trades with WR > 55%.
+3. **return_exhaustion_long** — 33.3% WR, -$0.11 PnL. Needs 2+ more data points before kill decision.
+4. **No immediate kills or boosts** — trade volume too low to make confident calls.
+
+---
+
+*Next report in 6h.*

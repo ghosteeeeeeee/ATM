@@ -532,3 +532,9 @@
 [2026-08-17 17:07 UTC]   🟢 bb_bounce+,hl_copy_trader: 3 trades, 100.0% WR, PnL=2.87
 [2026-08-17 17:07 UTC]   🟢 stop_hunt_reversal_long+: 3 trades, 100.0% WR, PnL=0.77
 [2026-08-17 17:07 UTC] Done. Disabled 0 signals.
+[2026-08-17 23:07 UTC] === Signal Decay Detector ===
+[2026-08-17 23:07 UTC]   🟢 r2-trend-long3: 7 trades, 57.1% WR, PnL=0.01
+[2026-08-17 23:07 UTC]   🟢 r2-trend-long4: 3 trades, 66.7% WR, PnL=0.58
+[2026-08-17 23:07 UTC]   🟢 return_exhaustion_long: 3 trades, 66.7% WR, PnL=-0.73
+[2026-08-17 23:07 UTC]   🟢 bb_bounce+,hl_copy_trader: 3 trades, 100.0% WR, PnL=2.87
+[2026-08-17 23:07 UTC] Done. Disabled 0 signals.

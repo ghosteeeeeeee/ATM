@@ -9901,3 +9901,42 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - Volume expected to pick up Monday UTC morning
+
+## [2026-08-17 23:03 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (BABY r2-trend-long4, profit-monster-trail +$0.05 winner)
+**24h:** 35T | 62.9% WR | +$0.55
+
+**24h by close reason:**
+- profit-monster-trail: 24T (68.6%) +$1.09 (dominant)
+- atr_sl_hit: 9T (25.7%) -$0.52 (healthy, below 40%)
+- cut-loser-CL-T1: 1T -$0.15
+- guardian_orphan: 1T $0.00
+
+**Signal performance:**
+- bb_bounce+,hl_copy_trader: 3T/100%WR +$0.31 (confluence, strong)
+- r2-trend-long4: 3T/67%WR +$0.06
+- stop_hunt_reversal_long+: 2T/100%WR +$0.06
+- r2-trend-long3: 7T/57%WR -$0.01 (breakeven, most traded)
+- range_breakout_short: 2T/0%WR -$0.17 (already killed)
+- return_exhaustion_long: 2T/50%WR -$0.11 (healthy)
+- bb_bounce+,rs-s97: 1T/0%WR -$0.04 (just appeared, below threshold)
+- r2-trend-long14: 1T/0%WR -$0.04 (just appeared)
+
+**Open trades:** 3 (LDO bb_bounce+ SL 0.3003, POL return_exhaustion SL 0.0793, BANANA r2-trend-long3 SL 3.626)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 25.7% — well below 40% threshold
+- Trade frequency 1/hr — normal Sunday evening
+- No signal crossing 3T/0%WR auto-kill threshold
+- return_exhaustion_long 50% WR — healthy
+- bb_bounce+ standalone still at 2T — monitoring
+
+**Monitoring:**
+- bb_bounce+,rs-s97 just hit 0%WR at 1T — watch next cycle
+- r2-trend-long14 just hit 0%WR at 1T — watch next cycle
+
+**Open Questions:**
+- Volume expected to pick up Monday UTC morning
