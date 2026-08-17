@@ -9314,3 +9314,25 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - ATR SL 45.2% above 40% threshold but dominated by ct-hot+ legacy (12/19) — will improve as legacy drains
 - 4 open positions ($11 each) all healthy, all LONG
+
+## [2026-08-17 00:03 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses)
+**PnL:** $0.05 (WR: 100%)
+
+**24h Snapshot:**
+- 43 trades: profit-monster-trail 19T +$0.55, atr_sl_hit 18T -$0.90, guardian_orphan 5T -$0.14
+- ATR SL 41.9% above 40% threshold BUT 11/18 from ct-hot+ DISABLED legacy → excluding: 21.9% (healthy)
+- r2-trend variants: Best performers, consistently profitable
+- Open: 2 LONG (HYPE $57.22, ETH $1876.10)
+
+**Changes:** None.
+
+**No Change Needed:**
+- No 0% WR signals with 3+ trades last hour
+- ATR SL driven by ct-hot+ legacy — draining naturally
+- Trade frequency normal (~1/hr Sunday)
+- System self-correcting, profits improving (21:00-23:00 all profitable hours)
+
+**Open Questions:**
+- ct-hot+ legacy still accounting for61% of ATR SL hits — will clear as positions drain

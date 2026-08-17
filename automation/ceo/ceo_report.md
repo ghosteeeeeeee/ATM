@@ -19,3 +19,17 @@ NO CHANGES — respecting user's TESTING MODE on ct-hot+ and hzscore-. ATR_SL fi
 
 ### Verification
 Pipeline active. PM_TRAIL 39T 74.4% WR +$1.27/48h. T1 12T 100% +$0.69/48h. Real system positive. ATR_SL daily declining (41→18). 3h recent: 71.4% WR. ct-hot+ legacy will age out Aug 17-18. Monitor: ATR_SL count (should ↓ from 38/48h), daily trades (must >20T), PM_TRAIL WR (must hold >65%).
+
+## CEO Report — 2026-08-17
+
+### Diagnosis
+System self-correcting. Last 3h: 7T +$0.17 71.4% WR (STRONG). 48h: 97T -$0.47 44.3% WR. Real system (excl ct-hot+ legacy): 48T/48h +$0.22 50% WR — positive. PM_TRAIL carrying system: 39T 74.4% WR +$1.26, R:R 2.70:1. ATR_SL dominant drag: 38T 2.6% WR -$2.32 (18/38 from ct-hot+ legacy). ct-hot+ still enabled (user TESTING MODE). hzscore- testing failed: 35T 54.3% WR -$0.22/7d, inverted R:R (+0.25% avg win vs -0.43% avg loss).
+
+### Root Cause
+hzscore- has decent win rate but terrible R:R — winners are small, losers are large. The signal fires on z-score extremes but the mean reversion doesn't materialize consistently enough to overcome the wider stops. Testing confirmed: not profitable.
+
+### Fix Applied
+Disabled HZSCORE_MINUS_ENABLED (was True per user testing). Already in NEVER_REENABLE_FLAGS. No other changes — system improving, PM_TRAIL edge strong, ATR_SL trending down.
+
+### Verification
+Next run should show: no new hzscore- trades, ATR_SL count continuing downward trend (41→18 daily), PM_TRAIL maintaining >65% WR. Monitor ct-hot+ legacy age-out (Aug 17-18).

@@ -782,3 +782,7 @@
   WHY: 1T last hour (W r2-trend-long18 +$0.04 profit-monster-trail +35.20%). 24h 42T 45.2% ATR SL (above 40% but 12/19 from ct-hot+ DISABLED legacy). guardian_orphan 5T -$0.14 (orphaned trades signal=None, not a signal issue). No kill candidates (all <3T). 1/hr Sunday normal. 4 open positions $11 each all healthy. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 23:30 UTC
+[2026-08-17 00:03] auto_1hr: NO CHANGES
+  WHY: 2T last hour (INJ r2-trend-long3 +$0.02, ARB r2-trend-long11 +$0.03). Both profit-monster-trail. 24h 43T 41.9% ATR SL (11/18 from ct-hot+ DISABLED legacy; excluding: 21.9%). r2-trend signals best performers. No kill candidates (<3T for any 0% WR signal). 1/hr Sunday normal. 2 open positions ($57 HYPE, $1876 ETH) both LONG. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 01:03 UTC
