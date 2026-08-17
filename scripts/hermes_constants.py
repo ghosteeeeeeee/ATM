@@ -930,6 +930,7 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_PLUS_ENABLED', # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48 (24h 20T).
     'COIN_TRACKER_HOT_MINUS_ENABLED',# SIGNAL REPORTER 2026-08-16 — 0% WR, -$0.19 (48h 4T).
     'RANGE_BREAKOUT_SHORT_ENABLED',  # SIGNAL REPORTER 2026-08-17 — 28T 46.4% WR -$0.21 (7d). Test failed. NEVER_REENABLE.
+    'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1178,7 +1179,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-17  # AUTO-ROTATED 2026-08-17  # bb_bounce+ LONG
+BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-17  # AUTO-ROTATED 2026-08-17  # bb_bounce+ LONG
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1187,15 +1188,13 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # Backtested and proven edge when firing solo.
 # Used in signal_compactor.py at 7 locations (confluence gate + preserve filter).
 # CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
+# CEO 2026-08-17 — removed 'accel-300' (40T/7d 55% WR -$0.30, net negative), 'wave_catcher' (killed), 'range_breakout_short' (killed)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short',
     'return_exhaustion_short', 'return-exhaustion-short',
-    'range_breakout_short', 'range-breakout-short',
-    'accel-300',
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
-    'wave_catcher', 'wave-catcher',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1418,7 +1417,7 @@ CONFLUENCE_NEUTRAL_RELAX = True  # CEO 2026-08-16: In NEUTRAL regime (102/104 to
 # When a single-source accel-300 has very high confidence, bypass confluence gate.
 # Problem: confluence gate blocks pure accel-300 signals (no RS co-signal) even when
 # accel-300 is very strong. Strong accel-300 alone should sometimes fire.
-ACCEL_300_STANDALONE_BYPASS_ENABLED = True   # re-enabled 2026-08-12 — SHORT edge confirmed
+ACCEL_300_STANDALONE_BYPASS_ENABLED = False  # CEO KILLED 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative despite PM_TRAIL capturing winners. ATR_SL kills losers. Never reenable without proven edge.
 ACCEL_300_STANDALONE_BYPASS_CONFIDENCE = 70  # minimum confidence for standalone bypass
 
 # ── Dead-Hours Entry Filter ───────────────────────────────────────────────────

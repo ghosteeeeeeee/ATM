@@ -1,16 +1,48 @@
-## CEO Report — 2026-08-17 (65th run)
+## CEO Report — 2026-08-17 (68th run)
 
 ### Diagnosis
-System STRONG. Verified: 24h 40T +$0.36, 57.5% WR. 48h 90T -$0.22 (ct-hot+ legacy clearing). 7d 421T -$2.79, 48.2% WR. PM_TRAIL dominant: 206T/7d 88.8% WR +$8.12 (avg win +0.39%). ATR_SL 175T/7d -$11.45 (daily: 41→5, 88% reduction). R:R 0.71:1. Aug 17: 19T +$0.17, 52.6% WR (GREEN DAY on track). 3 open (ICP -0.17%, CFX +0.39%, ETH +0.06%). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
+System STRONG. Verified: 24h 40T +$0.52, 62.5% WR. 48h 92T -$0.15, 46.7% WR. 7d 420T -$2.60, 48.8% WR. PM_TRAIL DOMINANT: 208T/7d 88.9% WR +$8.19 (avg win 0.387%, daily ALL GREEN). ATR_SL 173T/7d -$8.64 (daily: 15→18→41→28→28→20→18→5 — 88% reduction, historic low 5/day). R:R 0.45:1 (PM_TRAIL edge strong, ATR_SL inverted). Aug 17: 22T +$0.28, 59.1% WR (GREEN DAY confirmed). 4 open LONG mixed. ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). accel-300- 40T/7d 55% WR -$0.30 (KILLED — standalone bypass net negative). Phantom 9T/7d -$0.06 (guardian_orphan). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
 
 ### Root Cause
-No issues — system healthy. PM_TRAIL carrying all profits. ATR_SL daily count at5 (best in 7 days). ct-hot+ legacy 25T/48h clearing naturally.
+accel-300- standalone bypass was net negative despite 55% WR — PM_TRAIL captures winners but ATR_SL kills losers, net -$0.30/7d. Worth killing for clean signal set.
+
+### Fix Applied
+KILLED accel-300- standalone bypass: disabled ACCEL_300_STANDALONE_BYPASS_ENABLED, removed 'accel-300' from STANDALONE_BYPASS_SIGNALS, added to NEVER_REENABLE_FLAGS. Pipeline restarted. Expected impact: +$0.30/7d improvement.
+
+### Verification
+Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 4 open positions.
+
+---
+
+## CEO Report — 2026-08-17 (67th run)
+
+### Diagnosis
+System STRONG. Verified: 24h 41T +$0.39, 58.5% WR. 7d 420T -$2.59, 48.8% WR. PM_TRAIL DOMINANT: 208T/7d 88.9% WR +$8.20 (avg win 0.46%, daily ALL GREEN: Aug10 +$0.37 → Aug17 +$0.75). ATR_SL 173T/7d -$11.36 (daily: 15→18→41→28→28→20→18→5 — 88% reduction, historic low 5/day). R:R 0.72:1. 4 open ~flat (-$0.02). ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. All legacy losers in NEVER_REENABLE_FLAGS.
+
+### Root Cause
+No action needed. System self-correcting: ct-hot+ legacy draining naturally (33T/7d, clears Aug 18). PM_TRAIL edge confirmed across all 8 days (88.9% WR, 0.46% avg win). ATR_SL count at historic low (5/day, down from 41). No new losers emerging.
+
+### Fix Applied
+NO CHANGES. System strong, no intervention needed.
+
+### Verification
+Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 4 open positions.
+
+---
+
+## CEO Report — 2026-08-17 (66th run)
+
+### Diagnosis
+System STRONG. Verified: 24h 41T +$0.39, 58.5% WR (improving from 57.5%). 48h 91T -$0.19, 46.2% WR. 7d 421T -$2.70, 48.5% WR. PM_TRAIL dominant: 219T/7d 89.5% WR +$8.84 (avg win +0.040%). ATR_SL 174T/7d -$11.39 (daily: 41→28→28→20→18→5 — STRONG trend, 88% reduction). R:R 0.78:1. Aug 17: 20T +$0.20, 55.0% WR (GREEN DAY on track). 3 open (ICP +$0.06, ETH -$0.03, LDO -$0.03 — ~flat). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. All legacy losers killed.
+
+### Root Cause
+No issues — system healthy. PM_TRAIL carrying all profits. ATR_SL daily count at 5 (best in 7 days, 88% reduction from peak 41). ct-hot+ legacy clearing naturally. accel-300- standalone bypass borderline (-$0.30/7d, 55% WR) — keeping for now.
 
 ### Fix Applied
 NO CHANGES. System strong, no action needed.
 
 ### Verification
-All metrics confirmed via direct DB query. PM_TRAIL 88.8% WR holding above 80% threshold. ATR_SL daily5 well below 15/day threshold. Aug 17 green day on track.
+All metrics confirmed via direct DB query. PM_TRAIL 89.5% WR holding above 80% threshold. ATR_SL daily 5 well below 15/day threshold. Aug 17 green day on track.
 
 ---
 
