@@ -1,4 +1,7 @@
-## CEO Report — 2026-08-17 (75th run)
+## CEO Report — 2026-08-17 (76th run)
+
+### Diagnosis
+System STRONG — no changes needed. Verified: 24h 42T +$0.45, 61.9% WR (improved from 41T +$0.40). Aug 17: 29T +$0.26, 58.6% WR (GREEN DAY). 7d: 406T -$2.23, 48.5% WR. PM_TRAIL DOMINANT: 205T/7d 88.8% WR +$8.01 (24h: 27T 92.6% WR +$1.18, avg win 0.42%, daily ALL GREEN). ATR_SL 165T/7d 0.6% WR -$11.01 (24h: 12T 0% WR -$0.63, avg -0.66%). 24h R:R 1.87:1. 7d R:R 0.73:1 (PM_TRAIL +$8.01 vs ATR_SL -$11.01). 1 open LONG (r2-trend-long3 flat -0.21%). SHORT side -$1.24/7d (all range_breakout variants dead, LONG -$0.99/7d). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. ATR_SL daily: 41→8 (80% reduction, historic low). ct-hot+ legacy 33T/7d clearing naturally (expected Aug 18). All legacy losers killed + in NEVER_REENABLE_FLAGS.
 
 ### Diagnosis
 System STRONG. Verified: 24h 41T +$0.40, 61.0% WR. Aug 17: 29T +$0.26, 58.6% WR (GREEN DAY confirmed). 7d: 407T -$2.27, 49.6% WR. PM_TRAIL DOMINANT: 217T/7d 89.4% WR +$8.70 (24h: 27T 92.6% WR +$1.18, avg win 0.42%, daily ALL GREEN). ATR_SL 166T/7d 0.6% WR -$11.05 (24h: 12T 0% WR -$0.63, avg -0.54%). 24h R:R 1.87:1 (PM_TRAIL +$1.18 vs ATR_SL -$0.63). 7d R:R 0.79:1 (PM_TRAIL +$8.70 vs ATR_SL -$11.05 — inverted due to ATR_SL legacy volume). 1 open LONG (r2-trend-long3 flat -$0.23). auto_1hr killed range_breakout_short at 17:03 UTC (0% WR 3T/48h -$0.17). ct-hot+ legacy 33T/7d clearing naturally (expected Aug 18). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
