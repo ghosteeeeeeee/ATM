@@ -1,36 +1,45 @@
 === Signal Performance Report ===
-Period: 2026-08-17 10:30 UTC | Last 6h: 9 trades, -$0.21 | Last 24h: 38 trades, +$0.48
+Period: 2026-08-17 | 48h window
 
-## KILLED (executed):
+**System Health: 41T 61% WR +$0.41 PnL (48h) — PROFITABLE**
+
+KILLED (executed this cycle):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| range_breakout_short | SHORT | 46.4% | -$0.21 | 28 (7d) | KILLED — re-enabled test failed. Last 2 trades ATR SL hits. Added to NEVER_REENABLE. |
+| (none) | — | — | — | — | All clear losers already killed |
 
-## BOOSTED: None
-No signals meet boost criteria (WR >55%, 5+ trades, PnL > $0.05, consistent across tokens).
+BOOSTED (executed this cycle):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | return_exhaustion_long already at 1.5x boost |
 
-## LOSERS (watch list):
+LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| r2-trend-long3 | LONG | 33.3% | -$0.11 | 6 (24h) | WATCH — overall 55.6% WR (18T), 24h slump may be noise |
-| bb_bounce+ | LONG | 0.0% | -$0.04 | 2 (24h) | WATCH — overall 58.3% WR (24T), not enough 24h trades |
+| ct-hot+ | LONG | 35.0% | -$0.48 | 20 | KILLED 2026-08-16 — still settling legacy trades |
+| (none) | — | — | — | — | All other active signals positive |
 
-## WINNERS:
+WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb_bounce+,hl_copy_trader | LONG | 100.0% | +$0.26 | 2 (24h) | Good |
-| hzscore-,tl_break_short | SHORT | 100.0% | +$0.10 | 1 (24h) | Combo fired before kill — hzscore dead now |
-| ct-hot+,rs-s53 | LONG | 100.0% | +$0.09 | 1 (24h) | ct-hot killed, combos may still fire from compactor |
-| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 (7d) | Best r2_trend variant |
-| stop_hunt_reversal_long+ | LONG | 66.7% | +$0.03 | 3 (24h) | Consistent |
+| return_exhaustion_long | LONG | 80.0% | +$0.28 | 5 | BOOSTED 1.5x — star performer |
+| bb_bounce+,hl_copy_trader | LONG | 75.0% | +$0.31 | 4 | Active — consistent winners |
+| stop_hunt_reversal_long+ | LONG | 75.0% | +$0.06 | 4 | Active |
+| r2-trend-long3 | LONG | 55.6% | +$0.03 | 9 | Active |
+| r2-trend-long5 | LONG | 66.7% | +$0.02 | 3 | Active |
+| r2-trend-long4 | LONG | 50.0% | +$0.01 | 4 | Active |
+| bb_bounce+ | LONG | 33.3% | $0.00 | 3 | Breakeven |
 
-## ISSUES:
-- No direction inversions detected
-- hzscore- killed Aug 17 — last trades were Aug 16, kill working
-- ct-hot killed Aug 17 — combos (ct-hot+,rs-s46, ct-hot+,rs-s53) still appearing in 24h from compactor (trades opened before kill)
-- range_breakout_short RE-KILLED — was re-enabled Aug 16 for testing, test failed (2/2 ATR SL hits in 6h)
+PREVIOUSLY KILLED (confirmed dead):
+| Signal | Killed | Reason |
+|--------|--------|--------|
+| range_breakout+ | 2026-08-16 | 25% WR, -$0.41 (7d) |
+| range_breakout_short | 2026-08-17 | 0% WR, -$0.17 |
+| ct-hot+/- | 2026-08-16 | 35%/-0% WR, -$0.48/-$0.19 |
+| trend_momentum_near_sma+ | 2026-08-12 | 16.7% WR, -$0.37 |
+| hzscore+/- | 2026-08-17 | ~38%/54% WR, inverted R:R |
+| wave_catcher+/- | 2026-08-15/17 | 33%/25% WR, no edge |
 
-## SYSTEM TOTALS:
-- 24h: 38 trades, +$0.48 PnL (positive but slim)
-- 6h: 9 trades, -$0.21 PnL (small negative)
-- No critical bugs found
+ISSUES:
+- None. No signal inversions found. System operating normally.
+- SHORT side quiet — only hzscore- (3T, 66.7% WR but -$0.01) and range_breakout_short (2T, 0% WR) fired. Most SHORT signals killed. Consider if SHORT starvation is acceptable or if new SHORT signals needed.
