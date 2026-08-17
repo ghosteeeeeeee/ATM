@@ -9635,3 +9635,29 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - range_breakout_short 0% WR (2T) — monitor, will auto-kill at 3T
 - r2-trend-long3 33.3% WR (6T) — borderline, monitor
+
+## [2026-08-17 12:03 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.12 (WR: 50%)
+
+**Last Hour:**
+- PURR return_exhaustion_long: cut-loser-CL-T1 -$0.15
+- MET r2-trend-long3: profit-monster-trail +$0.03
+
+**24h:** 40T | 57.5% WR | +$0.36
+- profit-monster-trail: 27/40 (67.5%) +$1.10 dominant
+- ATR SL: 27.5% (11/40, healthy)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 27.5% — well below 40% threshold
+- No auto-kill candidates (0% WR signals below 3T)
+- Trade frequency normal (2/hr Sunday)
+- cut-loser-CL-T1 working as designed (1 trade)
+
+**Monitoring:**
+- range_breakout_short 0% WR (2T) — auto-kill at 3T
+- bb_bounce+ 0% WR (2T) — auto-kill at 3T
+- ICP -18.4% open — market position

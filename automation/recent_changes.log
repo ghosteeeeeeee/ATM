@@ -823,3 +823,7 @@
   WHY: 2T last hour (APT range_breakout_short -$0.05, ZEN r2-trend-long3 -$0.10). Both ATR SL hits. 24h 36T profit-monster-trail dominant (+$1.07). ATR SL 33.3% (well below 40% threshold). No auto-kill candidates (range_breakout_short 0% WR but only 2T, below 3T threshold). 2/hr normal Sunday. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 11:03 UTC
+[2026-08-17 12:03] auto_1hr: NO CHANGES
+  WHY: 2T last hour (PURR return_exhaustion_long cut-loser -$0.15, MET r2-trend-long3 profit-monster +$0.03). 24h 40T 57.5% WR +$0.36. ATR SL 27.5% (well below 40% threshold). No auto-kill candidates (range_breakout_short 0% WR 2T, bb_bounce+ 0% WR 2T, both below 3T threshold). 2/hr normal Sunday. 2 open positions (CFX +21.3%, ICP -18.4%). System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 13:03 UTC
