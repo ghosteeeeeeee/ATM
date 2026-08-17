@@ -9467,3 +9467,28 @@ None — system stable, previous fixes settling in.
 - ct-hot+ 42.4% WR (33T) — monitor, disable if WR stays <40% after 50+ trades
 - wave_catcher+ 40% WR (15T) — candidate for disable if trend continues
 - bb_bounce+,hzscore+ combo 36.8% WR (19T) — combo underperforming, consider disabling
+
+## [2026-08-17 06:06 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.03 (WR: 100%)
+
+**24h Snapshot:**
+- 36 trades: profit-monster-trail 24T +$1.04, atr_sl_hit 11T -$0.40, guardian_orphan 1T $0.00
+- ATR SL 30.6% — well below 40% threshold (improving from 42.9%)
+- 4 open positions: SYRUP SHORT -$3.11%, USUAL LONG $0.00, ALT LONG +4.99%, STX LONG $0.00
+- Trade frequency normal (1.5/hr)
+
+**Changes:** None.
+
+**No Change Needed:**
+- ATR SL well below 40% threshold — system self-correcting
+- Last hour 100% win rate
+- No auto-kill candidates (no 0% WR signals with 3+ trades in last hour)
+- Trade frequency normal (<20/hr)
+- ct-hot+ testing mode — DO NOT DISABLE
+
+**Open Questions:**
+- ct-hot+ 42.4% WR (33T 7d) — monitor, disable if WR stays <40% after 50+ trades
+- wave_catcher+ 40% WR (15T 7d), bb_bounce+,hzscore+ 38.9% WR (18T 7d) — chronic underperformers, candidates for disable
+- accel-300- 55% WR but -$0.30 (40T 7d) — asymmetric losses (loses bigger than wins)
