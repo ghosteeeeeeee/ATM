@@ -106,3 +106,10 @@ All 8 plans confirmed implemented. No new plan files added since last scan. Next
 
 ### Re-scan: 2026-08-17 06:00 UTC
 All 8 plans confirmed implemented. No new plan files added since Aug 14. System running strong: 24h +$0.64, 61.1% WR. Open backlog items (not in plans/): phantom trades (Level 2-3), higher-TF regime (Level 2).
+
+### Re-scan: 2026-08-17 17:45 UTC
+All 8 plans in /root/.hermes/plans/ confirmed implemented. No new plan files added since Aug 14. coin_tracker_hot signal exists (Phase 2 of coin_tracker_analysis_expansion). System stable. All Weather Vane layers (v1-v5) deployed. No pending plan work.
+
+### Additional plans in automation/plans/:
+1. zscore-macd-filter-plan.md — DEFERRED (data gap: only 19.5% trades have z-score/MACD data)
+2. accel-300-param-tuning.md — OBSOLETE (accel-300- standalone bypass killed by CEO 2026-08-17)
