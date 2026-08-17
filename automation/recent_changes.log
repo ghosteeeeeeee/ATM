@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-17 10:00 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L, -$0.03). 24h 37T +$0.57 (27% SL hit rate, well below 40% threshold). PM_TRAIL revert effective — ATR SL dropped from 40% to 27%. No 0% WR signals with 3+ trades in last hour. No kill candidates. Trade freq 3/hr normal. 2 open positions (ZEN LONG, APT SHORT). System healthy.
+  BY: auto_1hr
+  NO CHANGES — PM_TRAIL revert working, 24h PnL positive, no action needed.
+
 [2026-08-16 07:00 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (both PM_TRAIL exits +$0.07). 24h 50T -$0.38 (44% SL hit rate, above 40% threshold but 48h at 37.9% below threshold). No 0% WR signals with 3+ trades in last hour. ct-hot+ 35% WR -$0.48 is volume leader and 59% of ATR SL hits but WR >0% (doesn't meet kill threshold). Trade freq 2/hr normal. PM_TRAIL eval window active (0.30% act / 0.15% dist).
   BY: auto_1hr

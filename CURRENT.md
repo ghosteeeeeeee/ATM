@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-17 09:48 UTC (61st run)**
+**Last Updated: 2026-08-17 10:30 UTC (62nd run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (84.6% WR +$1.87/48h). All legacy losers killed (ct-hot+ Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 13). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→33).
 
-**Current status:** System STRONG — 24h 37T 59.5% WR +$0.57. 2 open (~flat). PM_TRAIL carrying system (39T 84.6% +$1.83). ct-hot+ legacy clearing (28T/48h -$0.66, expected gone Aug 18). Aug 17: 37T +$0.57, 59.5% WR. ATR_SL daily 41→3 (excellent trend). profit-monster-T1 7T 100% WR +$0.41.
+**Current status:** System STRONG — 24h 37T 59.5% WR +$0.57. 2 open (~flat). PM_TRAIL carrying system (39T +$1.83). ct-hot+ legacy clearing (27T/48h -$0.76, expected gone Aug 18). Aug 17: 15T +$0.44, 60.0% WR. ATR_SL daily 41→3 (excellent trend). profit-monster-T1 6T +$0.31.
 
 ## Active Decisions
 
@@ -40,9 +40,9 @@
 ## Next Actions
 
 1. **Monitor PM_TRAIL edge.** 39T +$1.83/48h. Must hold >80% WR. — 2026-08-17
-2. **Monitor ATR_SL count.** 36/48h (10 in 24h). Must stay <15/day. — 2026-08-17
-3. **ct-hot+ legacy clearing.** Should clear by Aug 18 (28T/48h remaining). — 2026-08-17
-4. **Aug 17 daily tracking.** 37T +$0.57, 59.5% WR — on track for best day in weeks. — 2026-08-17
-5. **Market quiet.** 109 coins, 3 accumulation (BTC). Signal volume expected low. — 2026-08-17
+2. **Monitor ATR_SL count.** 36/48h (3 in 24h). Must stay <15/day. — 2026-08-17
+3. **ct-hot+ legacy clearing.** Should clear by Aug 18 (27T/48h remaining). — 2026-08-17
+4. **Aug 17 daily tracking.** 15T +$0.44, 60.0% WR — on track for best day in weeks. — 2026-08-17
+5. **Market quiet.** 109 coins, 3 accumulation. Signal volume expected low. — 2026-08-17
 6. **Investigate phantom trades.** guardian_orphan ~7T/48h -$0.10 — root cause in hl-sync-guardian. — 2026-08-17
 7. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-17

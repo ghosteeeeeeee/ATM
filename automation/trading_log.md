@@ -1,5 +1,28 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-17 10:00 UTC — Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.03 (50% WR)
+
+**24h Snapshot:**
+- 37 trades total: PM_TRAIL 26T +$1.07, ATR_SL 10T -$0.50, orphan 1T $0
+- ATR SL hit rate: 27.0% ✅ (well below 40% threshold)
+- 24h net PnL: +$0.57 (positive)
+
+**Hourly:** 2T (MERL +$0.09 PM_TRAIL, STX -$0.12 ATR_SL). Normal frequency ~3/hr.
+
+**Signal Performance (24h):**
+- ✅ bb_bounce+,hl_copy_trader: 2T 100% WR +$0.26
+- ✅ r2-trend-long4: 4T 50% WR +$0.01
+- ⚠️ range_breakout_short: 1T 0% WR -$0.12 (1 trade only, below kill threshold)
+
+**Open:** ZEN LONG (r2-trend-long3), APT SHORT (range_breakout_short) — both with stops.
+
+**Changes:** None — system within normal parameters, PM_TRAIL revert showing positive effect.
+
+---
+
 ## 2026-08-16 06:30 UTC — Daily Orchestrator Report
 
 **Pipeline Status:**
