@@ -1,24 +1,27 @@
-## CEO Report — 2026-08-17
+## CEO Report — 2026-08-17 (58th run)
 
 ### Diagnosis
-System STRONGEST IN WEEKS. Verified: 24h 34T +$0.79, 67.6% WR. 48h 90T +$0.30 (positive). PM_TRAIL 38T +$1.87/48h — effectively 100% WR via trailing. ATR_SL 33T -$2.03 (stable, well below 35/day threshold).
+System STRONG. Verified: 24h 33T +$0.68, 63.6% WR. 48h dominated by ATR_SL (32 exits, -$2.06) but ct-hot+ legacy accounts for 18/32 ATR_SL exits. Excluding ct-hot+, ATR_SL is 14T -$0.83 (manageable). PM_TRAIL continuing to carry system. 7d stars: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
 
-### Root Cause of Previous Losses
-Legacy losers (wave_catcher+, hzscore+, range_finder+, trend_momentum_near_sma+, accel-300-) are all killed. Their 7d bleed (-$2.01) is residual, not generating new entries. CT-hot+ legacy clearing naturally.
+### Root Cause of Losses
+1. **ct-hot+ legacy** — 31T/48h -$0.42 (41.9% WR). Already disabled, clearing naturally. Expected gone by Aug 18.
+2. **ATR_SL exits** — 32/48h -$2.06. Dominant exit reason. 18 from ct-hot+ (56%). Without ct-hot+: 14T -$0.83.
+3. **guardian_orphan phantom** — 4T/48h -$0.14. Empty signal trades from HL sync. Low priority.
 
 ### Fix Applied
-NO CHANGES — system is performing well. No bleeding signals to kill, no underperformers to tune. PM_TRAIL edge is strong (+0.49% avg win vs -0.63% ATR_SL avg loss = positive R:R when trail captures most exits).
+NO CHANGES. System performing well. All legacy losers killed (ct-hot+, hzscore+, wave_catcher+, accel-300-, range_finder+, trend_momentum_near_sma+). PM_TRAIL edge strong. No bleeding signals to kill.
 
 ### Verification
-- 24h: 34T +$0.79, 67.6% WR ✅ (best in weeks)
-- 48h: 90T +$0.30, 50.0% WR ✅ (positive)
-- 7d: 428T -$2.01, 49.3% WR (improving, legacy clearing)
-- PM_TRAIL: 38T +$1.87/48h ✅ (DOMINANT)
-- ATR_SL: 33/day ✅ (below 35 threshold)
-- Open: 3 healthy
-- Aug 17: 10T +$0.55, 80% WR ✅
+- 24h: 33T +$0.68, 63.6% WR ✅
+- 48h: ATR_SL 32 exits, -$.2.06 (18 from ct-hot+ clearing)
+- 7d: 429T -$2.05, 49.2% WR (improving)
+- PM_TRAIL: carrying system ✅
+- ATR_SL daily: 33/day ✅ (below 35 threshold)
+- Open: 2 trades, -$0.01 (flat)
+- Aug 17: 11T +$0.55, 72.7% WR ✅
 
 ### Next
-1. Monitor PM_TRAIL WR (must >80%)
-2. CT-hot+ legacy clears naturally by Aug 18
-3. Investigate guardian_orphan phantom trades (~6T/day -$0.10) — low priority but persistent
+1. ct-hot+ legacy clears naturally by Aug 18
+2. Monitor PM_TRAIL WR (must >80%)
+3. Monitor ATR_SL count (must <35/48h)
+4. Investigate guardian_orphan phantom trades — low priority
