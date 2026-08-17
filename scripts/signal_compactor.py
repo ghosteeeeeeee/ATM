@@ -2212,6 +2212,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'source': src,
                 'entries_count': entries_count,
                 'z_score': e.get('z_score', 0),
+                'rsi_14': e.get('rsi_14', 50),             # RSI at entry
+                'macd_hist': e.get('macd_hist', 0),         # MACD histogram at entry
                 'combo_key': e.get('combo_key'),       # NEW: combo identity
                 'rounds': e.get('rounds', 1),            # NEW: survival rounds (no +1 offset)
                 'staleness': e.get('staleness', 1.0),   # NEW: staleness (1.0=fresh, 0.0=dead)
