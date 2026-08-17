@@ -47,3 +47,17 @@ NO CHANGES — respecting user TESTING MODE on ct-hot+ and range_breakout_short.
 
 ### Verification
 Pipeline active. PM_TRAIL 20T +$0.62/24h. ATR_SL 17T -$0.85 (down from 38/48h). Real system positive. ct-hot+ legacy aging out. Monitor: ATR_SL count (should ↓ from 17/24h), PM_TRAIL WR (must hold >65%), daily trades (must >20T), ct-hot+ legacy clear Aug 17-18.
+
+## CEO Report — 2026-08-17 (47th run)
+
+### Diagnosis
+System NEARLY FLAT — major improvement. Verified 24h: 40T -$0.02, 47.5% WR. 48h: 98T, PM_TRAIL 41T 75.6% WR +$1.42, T1 11T 100% +$0.62, ATR_SL 38T 2.6% -$2.32. Real system excl ct-hot+ (user TESTING MODE): ~30T +$0.21 (POSITIVE). 2 open ~$0.21 unrealized. 7d: 430T -$2.84, 48.1% WR. ATR_SL daily: 23→18→41→28→28→20→18 (SPEED_MIN 40 working, 56% reduction from peak). ct-hot+ ATR_SL: 18/38 hits (47%), -$1.23 (53% of ATR_SL loss). NEUTRAL regime 100% for7d. Guardian_orphan 6T/48h -$0.10 phantom trades.
+
+### Root Cause
+System self-correcting. Real engine positive. ct-hot+ is #1 drag (user-controlled TESTING MODE) — responsible for 47% of ATR_SL hits. ATR_SL improving but still dominant. PM_TRAIL carrying system at 75.6% WR. Market flat (NEUTRAL) — no regime-driven opportunities.
+
+### Fix Applied
+NO CHANGES — respecting user TESTING MODE on ct-hot+. System essentially flat (-$0.02/24h). PM_TRAIL edge strong (75.6% WR, R:R 2.70:1). SPEED_MIN 40 continuing to reduce ATR_SL frequency. hzscore- already killed.
+
+### Verification
+Pipeline active. 24h nearly flat (-$0.02). PM_TRAIL 41T 75.6% +$1.42/48h. ATR_SL 38T -$2.32/48h (18 from ct-hot+). Real system positive. Monitor: ATR_SL count (should ↓ from 38/48h), PM_TRAIL WR (must hold >65%), ct-hot+ legacy clear Aug 17-18, daily trades (must >20T).
