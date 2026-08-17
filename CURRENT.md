@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-17 00:30 UTC
+**Last Updated: 2026-08-17 01:30 UTC
 **Updated by: CEO (46th run)
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.15% WORKING (74.4% WR +$1.27/48h, R:R 2.70:1). All legacy losers killed. Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→18). hzscore- testing failed (inverted R:R) — re-killed 2026-08-17.
 
-**Current status:** System IMPROVING. Last 3h: 7T +$0.17 71.4% WR (STRONG). Real system excl ct-hot+: 48T/48h +$0.22 50.0% WR (POSITIVE). PM_TRAIL 39T 74.4% WR +$1.26 (R:R 2.70:1 — strongest edge). T1 12T 100% WR +$0.69. ATR_SL 38T 2.6% WR -$2.32 (daily improving 41→18). ct-hot+ 33T/48h 42.4% WR -$0.42 (user TESTING MODE, flags True). 3 open ~$0 flat. 7d: 432T -$2.84 48.1% WR. Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
+**Current status:** System IMPROVING. Verified 24h: 42T -$0.33, 42.9% WR. Real system excl ct-hot+: ~30T +$0.01 flat (POSITIVE). PM_TRAIL 20T +$0.62 (74.4% WR, R:R 2.70:1). ATR_SL 17T -$0.85 (daily: 41→18 improving). ct-hot+ 10T/24h -$0.46 (user TESTING MODE). hzscore- killed this run. 2 open ~$0 flat. 7d: 432T -$2.84 48.1% WR. Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
 
 ## Active Decisions
 

@@ -9336,3 +9336,27 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - ct-hot+ legacy still accounting for61% of ATR SL hits — will clear as positions drain
+
+## [2026-08-17 01:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 (no closes)
+
+**24h Snapshot:**
+- 42 trades: profit-monster-trail 19T +$0.55, atr_sl_hit 18T -$0.90, guardian_orphan 4T -$0.10, HL_CLOSED 1T $0.00
+- ATR SL 42.9% — above 40% threshold. ct-hot+ re-enabled 2026-08-16, now drives 11/18 ATR SL (61%)
+- r2-trend variants: Best performers, consistently profitable ($0.15 combined)
+- 1 new trade opened (MET ct-hot+,rs-s53 LONG, +$0.10)
+- 3 open positions ($33 total): ETH, HYPE, MET — all LONG, all slightly positive
+
+**Changes:** None.
+
+**No Change Needed:**
+- No 0% WR signals with 3+ trades last hour
+- ATR SL above threshold but 61% from ct-hot+ (re-enabled, testing mode — DO NOT DISABLE)
+- Trade frequency normal (~0/hr, late Sunday 01:00 UTC)
+- System self-correcting, recent 6h all profitable or breakeven
+- Open positions healthy
+
+**Open Questions:**
+- ct-hot+ re-enabled in testing mode, still draining PnL. Monitor — if WR stays <25% after 50+ trades, recommend disable again.

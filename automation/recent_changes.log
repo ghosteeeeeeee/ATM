@@ -786,3 +786,7 @@
   WHY: 2T last hour (INJ r2-trend-long3 +$0.02, ARB r2-trend-long11 +$0.03). Both profit-monster-trail. 24h 43T 41.9% ATR SL (11/18 from ct-hot+ DISABLED legacy; excluding: 21.9%). r2-trend signals best performers. No kill candidates (<3T for any 0% WR signal). 1/hr Sunday normal. 2 open positions ($57 HYPE, $1876 ETH) both LONG. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 01:03 UTC
+[2026-08-17 01:00] auto_1hr: NO CHANGES
+  WHY: 0T last hour (late Sunday 01:00 UTC). 24h 42T 42.9% ATR SL (61% from ct-hot+ re-enabled 08-16). profit-monster-trail 19T +/usr/bin/bash.55 dominant winner. No kill candidates (<3T for all 0% WR signals). 3 open positions (3) all LONG slightly positive. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 02:00 UTC

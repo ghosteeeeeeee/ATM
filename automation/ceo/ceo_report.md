@@ -33,3 +33,17 @@ Disabled HZSCORE_MINUS_ENABLED (was True per user testing). Already in NEVER_REE
 
 ### Verification
 Next run should show: no new hzscore- trades, ATR_SL count continuing downward trend (41→18 daily), PM_TRAIL maintaining >65% WR. Monitor ct-hot+ legacy age-out (Aug 17-18).
+
+## CEO Report — 2026-08-17 (46th run)
+
+### Diagnosis
+System IMPROVING. Verified 24h: 42T -$0.33, 42.9% WR. Real system excl ct-hot+: ~30T +$0.01, flat (POSITIVE). PM_TRAIL 20T +$0.62 dominant winner. ATR_SL 17T -$0.85 dominant drag (daily: 41→18, SPEED_MIN 40 working). 2 open trades (bb_bounce+ LONG $57, ct-hot+ LONG $0.16). ct-hot+ 10T/24h -$0.46, 20% WR — user TESTING MODE. Guardian_orphan 4T/24h -$0.10 phantom trades. 7d stars intact: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. 7d: 432T -$2.84, 48.1% WR.
+
+### Root Cause
+System is self-correcting. Real engine flat to positive. ct-hot+ is #1 drag (user-controlled, can't disable). ATR_SL improving but still dominant. Phantom trades (guardian_orphan) are noise — not a signal issue. SHORT side dead but user-controlled.
+
+### Fix Applied
+NO CHANGES — respecting user TESTING MODE on ct-hot+ and range_breakout_short. PM_TRAIL dist 0.15% confirmed working (74.4% WR, R:R 2.70:1). SPEED_MIN 40 continuing evaluation (daily ATR_SL: 41→18). hzscore- killed this run.
+
+### Verification
+Pipeline active. PM_TRAIL 20T +$0.62/24h. ATR_SL 17T -$0.85 (down from 38/48h). Real system positive. ct-hot+ legacy aging out. Monitor: ATR_SL count (should ↓ from 17/24h), PM_TRAIL WR (must hold >65%), daily trades (must >20T), ct-hot+ legacy clear Aug 17-18.

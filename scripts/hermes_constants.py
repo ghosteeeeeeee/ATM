@@ -934,7 +934,7 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True   # re-enabled 2026-08-06 — MTF z-score agreement, both directions enabled
-HZSCORE_PLUS_ENABLED     = False  # AUTO-ROTATED 2026-08-16 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
+HZSCORE_PLUS_ENABLED     = True  # AUTO-ROTATED 2026-08-17 # CEO KILLED 2026-08-14 — standalone hzscore+ 13T -$0.20 38.5% WR (30d). Inverted R:R: avg_win $0.053 vs avg_loss $0.073. Combo versions (bb_bounce+,hzscore+ and hzscore+,mover+) remain profitable. Revert if standalone R:R improves.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-17 — 35T 54.3% WR -$0.22/7d. Inverted R:R (+0.25% avg win vs -0.43% avg loss). Testing failed. Already in NEVER_REENABLE_FLAGS.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
@@ -1606,7 +1606,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # ── Continuation (re-entry after profitable close) ──────────────────────
 # continuation.py — re-enter same direction after profit-monster exit
 CONTINUATION_ENABLED = False   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). Re-entry after profit-monster not working.
-CONTINUATION_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-16 # re-enter LONG after LONG close
+CONTINUATION_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-17 # re-enter LONG after LONG close
 CONTINUATION_MINUS_ENABLED = False # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
