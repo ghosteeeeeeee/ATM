@@ -9661,3 +9661,27 @@ None — system stable, previous fixes settling in.
 - range_breakout_short 0% WR (2T) — auto-kill at 3T
 - bb_bounce+ 0% WR (2T) — auto-kill at 3T
 - ICP -18.4% open — market position
+
+## [2026-08-17 14:03 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.03 (WR: 100%)
+
+**24h:** 40T | 57.5% WR | +$0.36
+- profit-monster-trail: 29/40 (72.5%) +$1.16 dominant
+- ATR SL: 22.5% (9/40, well below 40% threshold)
+
+**Last Hour:**
+- LDO r2-trend-long3: profit-monster-trail +$0.03 (winner)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 22.5% — well below 40% threshold
+- No auto-kill candidates (range_breakout_short 0% WR 2T, bb_bounce+ 0% WR 2T — both below 3T threshold)
+- Trade frequency 1-3/hr — normal Sunday volume
+- MET open position -$0.06 unrealized, SL intact
+
+**Open Questions:**
+- range_breakout_short 0% WR (2T) — monitor, auto-kill at 3T
+- bb_bounce+ 0% WR (2T) — monitor, auto-kill at 3T
