@@ -1,7 +1,21 @@
-## CEO Report — 2026-08-17 (62nd run)
+## CEO Report — 2026-08-17 (63rd run)
 
 ### Diagnosis
-System STRONG. Verified: 24h 37T +$0.57, 59.5% WR. 48h 90T -$0.19 (ct-hot+ legacy 27T -$0.76 dragging). Excluding ct-hot+: 63T +$0.57 (HEALTHY). PM_TRAIL dominant: 39T +$1.83 (84.6% WR). profit-monster-T1: 6T +$0.31. ATR_SL 36T -$2.23 (daily: 41→28→28→20→18→3 — STRONG trend). R:R 0.82:1. Aug 17: 15T +$0.44, 60.0% WR. 2 open (range_breakout_short SHORT +0.31%, r2-trend-long3 LONG -0.44%). Coin tracker: 109 coins, 3 accumulation — quiet market.
+System STRONG. Verified: 24h 38T +$0.48, 57.9% WR. 48h 89T -$0.20 (ct-hot+ legacy 26T -$0.66 dragging). Excluding ct-hot+: 63T +$0.46 (HEALTHY). PM_TRAIL dominant: 39T +$1.83 (84.6% WR). profit-monster-T1: 5T +$0.27. ATR_SL 36T -$2.20 (daily: 41→28→28→20→18→5 — STRONG trend). R:R 0.83:1. Aug 17: 17T +$0.29, 52.9% WR (GREEN DAY). 1 open (ICP LONG r2-trend-long5 +0.12%). Coin tracker: 102 NEUTRAL, 1 LONG, 1 SHORT — quiet market.
+
+### Root Cause of Losses
+1. **ct-hot+ legacy** — 26T/48h -$0.66 (clearing, flags False, expected gone by Aug 18).
+2. **ATR_SL exits** — 36/48h -$2.20. Without ct-hot+: 26T -$1.54 (manageable, daily trend excellent at 5/24h).
+3. **guardian_orphan phantom** — 7T/48h -$0.10. Empty signal trades from HL sync. Low priority.
+
+### Fix Applied
+NO CHANGES — system strong, ct-hot+ clearing naturally. All legacy losers killed. PM_TRAIL edge confirmed (84.6% WR, R:R 0.83:1). ATR_SL daily count at 5/24h (excellent).
+
+### What's Next
+1. Monitor PM_TRAIL WR (must >80%) and ATR_SL count (must <15/day)
+2. ct-hot+ legacy should clear by Aug 18
+3. Investigate phantom trades (guardian_orphan)
+4. Higher-TF regime for confluence relaxation (1m too noisy)
 
 ### Root Cause of Losses
 1. **ct-hot+ legacy** — 27T/48h -$0.76 (clearing, flags False, expected gone by Aug 18).
