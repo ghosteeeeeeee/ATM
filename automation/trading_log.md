@@ -9360,3 +9360,29 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - ct-hot+ re-enabled in testing mode, still draining PnL. Monitor — if WR stays <25% after 50+ trades, recommend disable again.
+
+## [2026-08-17 02:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 (dead Sunday 02:00 UTC)
+
+**48h Snapshot:**
+- 97 trades: profit-monster-trail 41T +$1.42, profit-monster-T1 11T +$0.62, atr_sl_hit 38T -$2.32
+- ATR SL 39.2% — AT threshold (was 45%+ 24h ago, improving)
+- Kill candidates already handled: continuation+ killed, range_finder+ disabled
+- ct-hot- 0% WR 4T but in TESTING MODE (DO NOT DISABLE per user)
+- System stable: last 6 consecutive hours profitable
+- Open: HYPE $11 +207%, DOT $11 -11%, X $50 no signal
+
+**Changes:** None.
+
+**No Change Needed:**
+- No 0% WR signals with 3+ trades last hour (0 trades)
+- ATR SL at 39.2% — right at threshold, trending down
+- Trade frequency: 0/hr expected for Sunday 02:00 UTC
+- All recent poor performers already disabled or in testing mode
+- Open positions healthy
+
+**Open Questions:**
+- ct-hot- in testing mode, 0% WR 4T — user explicitly testing, do not touch
+- DOT open position at -11% — monitor for stop loss hit

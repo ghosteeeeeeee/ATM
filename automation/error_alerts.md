@@ -54,3 +54,7 @@
 - **INFO**: Pipeline running, 2 open positions, 1 closed today (+$0.07), -1.51% portfolio PnL
 - **INFO**: 42% of tracked tokens stale (low velocity) — expected in quiet NEUTRAL market
 - **AUTO-FIX**: None needed — no CRITICAL issues
+
+## Error Alerts — 2026-08-17 02:02 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK: TOK (most recent call last):`

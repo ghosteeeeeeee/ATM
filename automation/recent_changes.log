@@ -790,3 +790,7 @@
   WHY: 0T last hour (late Sunday 01:00 UTC). 24h 42T 42.9% ATR SL (61% from ct-hot+ re-enabled 08-16). profit-monster-trail 19T +/usr/bin/bash.55 dominant winner. No kill candidates (<3T for all 0% WR signals). 3 open positions (3) all LONG slightly positive. System stable. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 02:00 UTC
+[2026-08-17 02:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday 02:00 UTC, dead market). 48h 97T 39.2% ATR SL (AT threshold, improving from 45%+). continuation+ already killed, range_finder+ disabled. ct-hot- 0% WR 4T but in testing mode (DO NOT DISABLE per user). 6 consecutive profitable hours. 3 open positions (HYPE +207%, DOT -11%, X no signal). No kill candidates. System stable. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 03:03 UTC

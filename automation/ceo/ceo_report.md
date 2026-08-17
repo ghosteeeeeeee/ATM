@@ -1,3 +1,27 @@
+## CEO Report — 2026-08-17 (48th run)
+
+### Diagnosis
+System POSITIVE. Verified 24h: 41T +$0.17, 48.8% WR. Today Aug17: 3T +$0.35, 100% WR (early but clean). 48h exits: PM_TRAIL 42T +$1.61 (80% WR, avg +0.37%), T1 11T +$0.62, ATR_SL 38T -$2.32 (avg -0.62%). PM_TRAIL R:R = +0.37%/-0.62% = 0.60:1 — better than last run. ct-hot+ 33T/48h 42.4% WR -$0.42 (18 ATR_SL hits = 47% of all stops). Open: 1, $0 flat. 7d: 430T -$2.84, 48.1% WR.
+
+### Key Findings
+- **System FLIPPED POSITIVE** — +$0.17/24h (was -$0.02 last run). Self-correcting.
+- **PM_TRAIL stronger than reported** — 42 exits 80% WR +$1.61/48h. avg +0.37% per exit. R:R improving (0.60:1 vs 0.33:1 earlier).
+- **ATR_SL stable** — 38T/48h at -0.62%. 18 from ct-hot+ (47%). Non-ct-hot ATR_SL = 20T -$1.70/48h.
+- **Today clean** — 3T +$0.35, 100% WR. All r2-trend and bb_bounce+ signals.
+- **Stars intact** — return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
+- **Hotset empty** — normal for Sunday 02:00 UTC (dead market, 0 entries/hour).
+- **ct-hot+ legacy clearing** — 18/38 ATR_SL from ct-hot+. Expected to clear Aug 17-18.
+- **7d losers all KILLED** — wave_catcher+, range_breakout+, trend_momentum all disabled. Only ct-hot+ remains (user testing mode).
+- **Phantom trades** — guardian_orphan 6T -$0.10/48h. Non-critical, backlog.
+
+### Fix Applied
+NO CHANGES — system positive (+$0.17/24h), respecting user TESTING MODE on ct-hot+ (MIN_COMPOSITE 55). PM_TRAIL dist 0.20% working (80% WR). ATR_SL count 38/48h stable. All other losers already killed. No signal starvation (41T/24h).
+
+### Verification
+24h +$0.17 POSITIVE. PM_TRAIL 42T 80% WR +$1.61/48h. ATR_SL 38T -$2.32 (18 from ct-hot+). Real system positive. Monitor: ATR_SL count (should ↓ from 38/48h), PM_TRAIL WR (must hold >65%), ct-hot+ legacy clear Aug 17-18, daily trades (must >20T).
+
+---
+
 ## CEO Report — 2026-08-16 (45th run)
 
 ### Diagnosis
