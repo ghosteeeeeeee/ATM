@@ -859,3 +859,7 @@
   WHY: 0T last hour (Sunday 21:00 UTC evening quiet). 24h 39T 66.7% WR +$0.54. ATR SL 28.2% (well below 40%). bb_bounce+ standalone 0% WR 2T (below 3T auto-kill). range_breakout_short already killed. Trade frequency 0/hr normal Sunday. 2 open trades (BABY r2-trend-long4, MON return_exhaustion_long). System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 22:03 UTC
+[2026-08-17 22:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (Sunday 22:00 UTC evening quiet). 24h 35T 62.9% WR +$0.41. ATR SL 25.7% (well below 40%). return_exhaustion_long 50% WR (1W1L) — not at auto-kill threshold. range_breakout_short already killed. Trade frequency 0/hr normal Sunday. 2 open trades (BANANA r2-trend-long3, BABY r2-trend-long4). System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 23:03 UTC

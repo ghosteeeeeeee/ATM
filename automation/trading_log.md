@@ -9864,3 +9864,40 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - Sunday evening volume expected to pick up after 22:00 UTC?
 - MON return_exhaustion_long entry at 0.0207 with SL 0.0206 — tight stop, monitor
+
+## [2026-08-17 22:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (Sunday evening quiet)
+**24h:** 35T | 62.9% WR | +$0.41
+
+**24h by close reason:**
+- profit-monster-trail: 24T (68.6%) +$1.08 (dominant)
+- atr_sl_hit: 9T (25.7%) -$0.52 (healthy, below 40%)
+- cut-loser-CL-T1: 1T -$0.15
+- guardian_orphan: 1T $0.00
+
+**Signal performance:**
+- bb_bounce+,hl_copy_trader: 3T/100%WR +$0.31 (confluence)
+- r2-trend-long5,rs-s115: 1T/100%WR +$0.09
+- ct-hot+,rs-s53: 1T/100%WR +$0.09
+- stop_hunt_reversal_long+: 2T/100%WR +$0.06
+- r2-trend-long3: 7T/57%WR -$0.01 (breakeven, most traded)
+- return_exhaustion_long: 2T/50%WR -$0.11 (1W 1L, not at auto-kill)
+- range_breakout_short: already killed
+
+**Open trades:** 2 (BANANA r2-trend-long3 @ 3.663, BABY r2-trend-long4 @ 0.00997)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 25.7% — well below 40% threshold
+- Trade frequency 0/hr — normal Sunday evening
+- No signal crossing 3T/0%WR auto-kill threshold
+- return_exhaustion_long 50% WR overall — healthy
+
+**Monitoring:**
+- return_exhaustion_long 2T/0%WR standalone — monitor next cycle
+- 2 open trades — BABY SL at 0.00989, BANANA SL at 3.626
+
+**Open Questions:**
+- Volume expected to pick up Monday UTC morning

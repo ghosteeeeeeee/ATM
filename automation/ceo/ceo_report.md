@@ -1,24 +1,48 @@
-## CEO Report — 2026-08-17 (81st run)
+## CEO Report — 2026-08-17 (83rd run, 23:00 UTC)
 
 ### Diagnosis
-System STRONG — no changes needed. Verified: 24h 39T +$0.55, 64.1% WR. 7d: 406T -$2.19, 49.5% WR. PM_TRAIL DOMINANT: 207T/7d 88.9% WR +$8.10 (carrying system, avg +0.38%). ATR_SL 164T/7d 0.6% WR -$10.95 (daily: 41→9, 78% reduction, historic low). 1 open LONG (BABY r2-trend-long4 -0.19% — flat). Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY). bb_bounce+ 24T/7d 58.3% +$0.21 (healthy). r2-trend-long2 17T/7d 64.7% +$0.19. return_exhaustion_long 6T/7d 83.3% +$0.32 (best WR). ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). All legacy losers in NEVER_REENABLE_FLAGS.
+System STRONG — no changes needed. Verified: 24h 35T +$0.41, 62.9% WR. 7d: 404T -$2.18, 50.0% WR (crossed 50% for first time — legacy losers clearing). PM_TRAIL DOMINANT: 206T/7d 88.8% WR +$8.07 (carrying system, avg +0.39%). ATR_SL 163T/7d 0.6% WR -$10.91 (24h: 9T -$0.52, historic low 9/day). 2 open LONG (r2-trend-long4 +$0.06, r2-trend-long3 -$0.02, total +$0.04). ct-hot+ cleared (0T/24h — expected Aug 18, confirmed). Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY confirmed). All legacy losers in NEVER_REENABLE_FLAGS. All 48 timers active. 0 phantom trades.
 
 ### Root Cause
-No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.9% WR, avg +0.38%). ATR_SL at historic low. All legacy losers killed or clearing.
+No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.8% WR, avg +0.39%). ATR_SL at historic low (9/day, 78% reduction from peak 41). ct-hot+ legacy cleared as expected. 7d WR crossed 50% — legacy losers aging out.
+
+### Fix Applied
+NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. ct-hot+ cleared. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), 2 open positions.
+
+### Verification
+- 24h: 35T +$0.41, 62.9% WR ✅
+- PM_TRAIL: 206T/7d 88.8% WR +$8.07 ✅
+- ATR_SL: 9T/24h 0% WR -$0.52 (historic low) ✅
+- ct-hot+: 0T/24h (CLEARED) ✅
+- 2 open positions (+$0.04 unrealized) ✅
+- Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY) ✅
+- 0 phantom trades ✅
+
+---
+
+## CEO Report — 2026-08-17 (82nd run)
+
+### Diagnosis
+System STRONG — no changes needed. Verified: 24h 37T +$0.54, 64.9% WR (BEST WR in days). 7d: 404T -$2.18, 50.0% WR. PM_TRAIL DOMINANT: 206T/7d 88.9% WR +$8.07 (carrying system, avg +0.38%). ATR_SL 163T/7d 0.6% WR -$10.91 (daily: 41→9, 78% reduction, historic low). PM_TRAIL exit ratio: 70.3% (26/37) — BEST ratio yet. ATR_SL exit ratio: 24.3% (9/37) — BEST ratio yet. 1 open LONG (r2-trend-long4 -$0.01 flat). Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY confirmed). All legacy losers in NEVER_REENABLE_FLAGS. All 48 timers active. 0 phantom trades.
+
+### Root Cause
+No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.9% WR, avg +0.38%). ATR_SL at historic low (9/day,78% reduction from peak 41). All legacy losers killed or clearing (ct-hot+ expected gone Aug 18).
 
 ### Fix Applied
 NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 1 open position.
 
 ### Verification
-- 24h: 39T +$0.55, 64.1% WR ✅
-- PM_TRAIL: 207T/7d 88.9% WR +$8.10 ✅
-- ATR_SL: 164T/7d (daily 41→9, 78% reduction) ✅
+- 24h: 37T +$0.54, 64.9% WR ✅
+- PM_TRAIL: 206T/7d 88.9% WR +$8.07 ✅
+- ATR_SL: 163T/7d (daily 41→9, 78% reduction) ✅
+- PM_TRAIL exit ratio: 70.3% (26/37) ✅
+- ATR_SL exit ratio: 24.3% (9/37) ✅
 - 1 open position (flat) ✅
 - Aug 17: 32T +$0.32, 59.4% WR (GREEN DAY) ✅
 
 ---
 
-## CEO Report — 2026-08-17 (76th run)
+## CEO Report — 2026-08-17 (81st run)
 
 ### Diagnosis
 System STRONG — no changes needed. Verified: 24h 42T +$0.45, 61.9% WR (improved from 41T +$0.40). Aug 17: 29T +$0.26, 58.6% WR (GREEN DAY). 7d: 406T -$2.23, 48.5% WR. PM_TRAIL DOMINANT: 205T/7d 88.8% WR +$8.01 (24h: 27T 92.6% WR +$1.18, avg win 0.42%, daily ALL GREEN). ATR_SL 165T/7d 0.6% WR -$11.01 (24h: 12T 0% WR -$0.63, avg -0.66%). 24h R:R 1.87:1. 7d R:R 0.73:1 (PM_TRAIL +$8.01 vs ATR_SL -$11.01). 1 open LONG (r2-trend-long3 flat -0.21%). SHORT side -$1.24/7d (all range_breakout variants dead, LONG -$0.99/7d). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. ATR_SL daily: 41→8 (80% reduction, historic low). ct-hot+ legacy 33T/7d clearing naturally (expected Aug 18). All legacy losers killed + in NEVER_REENABLE_FLAGS.
