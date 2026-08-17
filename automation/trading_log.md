@@ -9539,3 +9539,28 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - bb_bounce+ 0% WR (2T 24h) — too few trades to judge
 - Sunday low volume — re-check Monday volume patterns
+
+## [2026-08-17 08:03 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $0.02 (WR: 66.7%)
+
+**24h:** 34T | 44.1% WR | +$0.64 | profit-monster-trail dominant (+$0.98)
+**ATR SL:** 23.5% (8/34, well below 40% threshold, improved from 42.9%)
+
+**Last Hour Breakdown:**
+- ALT r2-trend-long4: ATR SL -$0.04 (loss)
+- SYRUP range_breakout_short: profit-monster-trail $0.00 (flat)
+- STX r2-trend-long8: profit-monster-trail +$0.02 (winner)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 23.5% — system self-correcting
+- No auto-kill candidates (no 0% WR with 3+ trades)
+- Trade frequency normal (3/hr)
+- All signals performing within tolerance
+
+**Open Questions:**
+- bb_bounce+ 0% WR (2T 24h) — too few trades to judge, monitor
+- Sunday low volume — re-check Monday

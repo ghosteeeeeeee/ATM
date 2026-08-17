@@ -838,7 +838,7 @@ PM_TIER2_FIRE_WINDOWS = {"A": (5, 10), "B": (10, 20)}  # minutes between fires
 # Tier T: Trailing profit — marks trades in profit, trails peak, exits on weakness
 PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%.
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40%
-PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20%
+PM_TRAIL_DISTANCE_PCT = 0.0015  # 0.15%
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
@@ -1143,6 +1143,8 @@ CEO_PROTECTED_FLAGS = {
     'ROTATOR_PROTECTED_FLAGS': ('Prevents stale data kills on upgraded signals', '2026-08-06'),
     'BB_BOUNCE_ENABLED': ('Confluence signal — CEO keeps killing it, needs to stay on for testing', '2026-08-06'),
     'SIGNALS_REGISTRY': ('CEO commented out bb_bounce from signals/__init__.py on 2026-08-05 — signals must only be removed via NEVER_REENABLE_FLAGS', '2026-08-06'),
+    'PM_TRAIL_ACTIVATE_PCT': ('Profit monster trail activation — CEO changed without authorization 2026-08-16', '2026-08-17'),
+    'PM_TRAIL_DISTANCE_PCT': ('Profit monster trail distance — CEO changed without authorization 2026-08-16', '2026-08-17'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
