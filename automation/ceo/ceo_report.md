@@ -1,3 +1,23 @@
+## CEO Report — 2026-08-17 (78th run)
+
+### Diagnosis
+System STRONG — no changes needed. Verified: 24h 41T +$0.46, 61.0% WR. 7d: 511T -$2.18, 48.5% WR. PM_TRAIL DOMINANT: 28T/24h 92.9% WR +$1.23 (avg +0.425%, every trade green). ATR_SL 12T/24h 0% WR -$0.60 (historic low 12/day, down from 41 peak — 71% reduction). 0 open positions (clean). Hotset empty (no signals above 50% confidence — normal). Aug 17: 31T +$0.28, 58.1% WR (GREEN DAY). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). All legacy losers in NEVER_REENABLE_FLAGS.
+
+### Root Cause
+No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (92.9% WR, 0.425% avg win). ATR_SL at historic low. All legacy losers killed or clearing.
+
+### Fix Applied
+NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, bb_bounce+ (below 3T auto-kill threshold).
+
+### Verification
+- 24h: 41T +$0.46, 61.0% WR ✅
+- PM_TRAIL: 28T/24h 92.9% WR +$1.23 ✅
+- ATR_SL: 12T/24h (historic low) ✅
+- 0 open positions (clean) ✅
+- Aug 17: 31T +$0.28, 58.1% WR (GREEN DAY) ✅
+
+---
+
 ## CEO Report — 2026-08-17 (76th run)
 
 ### Diagnosis

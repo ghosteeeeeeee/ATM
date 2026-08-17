@@ -847,3 +847,7 @@
   WHY: 1T last hour (STX bb_bounce+,rs-s176,rs-s78 profit-monster-trail +$0.02 winner). 24h 41T 65.9% WR +$0.43. ATR SL 29.3% (well below 40% threshold). bb_bounce+ 0% WR 2T still below 3T auto-kill threshold. Trade frequency 1/hr normal Sunday. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 19:03 UTC
+[2026-08-17 19:03] auto_1hr: NO CHANGES
+  WHY: 2T last hour (BABY profit-monster +$0.05, HYPE atr_sl_hit -$0.03). 24h 42T 83% WR +$0.48. ATR SL 28.6% (below 40%). bb_bounce+ 0% WR 2T still below 3T threshold. Trade frequency 2/hr normal Sunday. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 20:03 UTC

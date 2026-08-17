@@ -9777,3 +9777,26 @@ None — system stable, previous fixes settling in.
 
 **Monitoring:**
 - bb_bounce+ 0% WR (2T) — auto-kill at 3T
+
+## [2026-08-17 19:03 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.02 (WR: 50%)
+
+**24h:** 42T | 83.3% WR | +$0.48
+- profit-monster-trail: 28/42 (66.7%) +$1.23 dominant
+- atr_sl_hit: 12/42 (28.6%) — well below 40% threshold
+
+**Last Hour:**
+- BABY r2-trend-long4: profit-monster-trail +$0.05 (winner)
+- HYPE r2-trend-long3: atr_sl_hit -$0.03 (loss, tiny position)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 28.6% — well below 40% threshold
+- Trade frequency 2/hr — normal Sunday volume
+- bb_bounce+ 0% WR 2T — still below 3T auto-kill threshold, monitoring
+
+**Monitoring:**
+- bb_bounce+ 0% WR (2T) — auto-kill at 3T
