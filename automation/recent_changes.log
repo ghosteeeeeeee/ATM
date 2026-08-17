@@ -798,3 +798,7 @@
   WHY: 2T last hour (AVAX r2-trend-long6 +$0.04, HYPE bb_bounce+,hl_copy_trader +$0.19). Both winners, 100% WR. 24h 41T 34.1% ATR SL (below 40% threshold, improving from 42.9%). ct-hot+ 8T -$0.32 (25% WR, 75% ATR SL) worst signal but recently re-enabled user testing. No kill candidates (<3T for all 0% WR signals). 2/hr Sunday normal. 2 open positions ($22) DOT -2.48%, DASH +68.98% healthy. System self-correcting. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 04:03 UTC
+[2026-08-17 04:03] auto_1hr: NO CHANGES
+  WHY: 3T last hour (NXPC stop_hunt_reversal_long+ +$0.03, CFX orphan $0.00, DASH r2-trend-long3 +$0.08). All winners, 100% WR. 24h 39T 34.2% ATR SL (below 40% threshold, improving). ct-hot+ 6T -$0.22 (16.7% WR) worst signal but not 0% WR auto-kill. No kill candidates (<3T for all 0% WR signals). 3/hr normal. 2 open positions ($22) DOT +3.27%, STX +5.77% healthy. System self-correcting. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 05:03 UTC

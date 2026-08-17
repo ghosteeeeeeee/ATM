@@ -9411,3 +9411,28 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - ct-hot+ 75% ATR SL rate — monitor, disable if WR stays <25% after 50+ trades
+
+## [2026-08-17 04:03 UTC] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $0.11 (WR: 100%)
+
+**24h Snapshot:**
+- 39 trades: profit-monster-trail 23T +$1.04, atr_sl_hit 13T -$0.52, guardian_orphan 3T $0.00
+- ATR SL34.2% — below 40% threshold (improving from42.9% yesterday)
+- ct-hot+ 6T -$0.22 (16.7% WR) — worst signal but not 0% WR (no auto-kill)
+- 3 trades last hour: NXPC stop_hunt_reversal_long+ +$0.03, CFX orphan $0.00, DASH r2-trend-long3 +$0.08
+- 2 open positions ($22): DOT +3.27%, STX +5.77%
+
+**Changes:** None.
+
+**No Change Needed:**
+- ATR SL below 40% threshold — system self-correcting
+- Last hour 100% win rate
+- No 0% WR signals with 3+ trades (bb_bounce+ 0% WR but only 2T)
+- Trade frequency normal (3/hr)
+- Open positions healthy
+- ct-hot+ worst signal but 16.7% WR (not auto-kill threshold)
+
+**Open Questions:**
+- ct-hot+ 16.7% WR (6T) — monitor, disable if WR stays <20% after 20+ trades
