@@ -1695,9 +1695,9 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # RE-ENABLED 2026-08-16 per user. TESTING MODE — DO NOT DISABLE.
-COIN_TRACKER_HOT_PLUS_ENABLED       = True   # RE-ENABLED 2026-08-16 per user. TESTING MODE — DO NOT DISABLE.
-COIN_TRACKER_HOT_MINUS_ENABLED      = True   # RE-ENABLED 2026-08-16 per user. TESTING MODE — DO NOT DISABLE.
+COIN_TRACKER_HOT_ENABLED            = False  # TESTING ENDED 2026-08-17. 42.4% WR -$0.42/7d. In NEVER_REENABLE_FLAGS.
+COIN_TRACKER_HOT_PLUS_ENABLED       = False  # TESTING ENDED 2026-08-17. 42.4% WR -$0.42/7d. In NEVER_REENABLE_FLAGS.
+COIN_TRACKER_HOT_MINUS_ENABLED      = False  # TESTING ENDED 2026-08-17. 0% WR -$0.19/48h. In NEVER_REENABLE_FLAGS.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)

@@ -9492,3 +9492,31 @@ None — system stable, previous fixes settling in.
 - ct-hot+ 42.4% WR (33T 7d) — monitor, disable if WR stays <40% after 50+ trades
 - wave_catcher+ 40% WR (15T 7d), bb_bounce+,hzscore+ 38.9% WR (18T 7d) — chronic underperformers, candidates for disable
 - accel-300- 55% WR but -$0.30 (40T 7d) — asymmetric losses (loses bigger than wins)
+
+## [2026-08-17 06:35 UTC] Daily Orchestrator Report
+
+**Pipeline Status:**
+- 24h: 33 closed | 66.7% WR | +$0.77 PnL
+- 4 open positions (SYRUP SHORT, USUAL LONG, ALT LONG, STX LONG) — all roughly flat
+- Market: NEUTRAL (106 tokens, 3 accumulation)
+- System: healthy, 34 timers active, no errors
+
+**Changes Implemented:**
+1. **ct-hot+ DISABLED** — testing window cleared Aug 17. Set COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED = False. Was 42.4% WR -$0.42/7d (33T). In NEVER_REENABLE_FLAGS.
+
+**No Action Needed:**
+- PM_TRAIL: 84.6% WR +$1.85/48h — DOMINANT, keep
+- ATR_SL: 33/day (improved from 41), SPEED_MIN 40 working
+- hzscore+: already killed (Aug 17)
+- All 8 upgrade plans implemented
+- Blacklist testing: complete (0 KEEP from 77 tokens)
+
+**Monitoring:**
+- wave_catcher+: 40% WR (15T) — borderline, auto-kill if drops below 30%
+- phantom trades: guardian_orphan ~6T/day -$0.10 — known issue, root cause in hl-sync-guardian
+- bb_bounce+: should recover now that hzscore+ combo drag removed
+
+**Next Actions:**
+1. Verify bb_bounce+ WR improves without hzscore+ combo drag
+2. Monitor wave_catcher+ for continued underperformance
+3. Investigate phantom trades (guardian_orphan) when system has bandwidth
