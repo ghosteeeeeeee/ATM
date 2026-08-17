@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-17 11:14 UTC (63rd run)**
+**Last Updated: 2026-08-17 11:45 UTC (64th run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (84.6% WR +$1.87/48h). All legacy losers killed (ct-hot+ Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 13). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→33).
 
-**Current status:** System STRONG — 24h 38T +$0.48, 57.9% WR. 1 open (ICP LONG r2-trend-long5 +0.12%). PM_TRAIL carrying system (39T +$1.83, 84.6% WR). ct-hot+ legacy clearing (26T/48h -$0.66, expected gone Aug 18). Aug 17: 17T +$0.29, 52.9% WR. ATR_SL daily 41→5 (excellent trend). R:R 0.83:1.
+**Current status:** System STRONG — 24h 39T +$0.51, 59.0% WR. 2 open (r2-trend-long5 -0.30%, return_exhaustion_long -0.60%). PM_TRAIL carrying system (39T +$1.83, 84.6% WR). ct-hot+ legacy clearing (25T/48h -$0.56, expected gone Aug 18). Aug 17: 18T +$0.32, 55.6% WR (GREEN DAY). ATR_SL daily 41→5 (excellent trend). R:R 0.87:1.
 
 ## Active Decisions
 

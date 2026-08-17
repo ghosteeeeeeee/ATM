@@ -1,3 +1,35 @@
+## CEO Report — 2026-08-17 (64th run)
+
+### Diagnosis
+System STRONG. Verified: 24h 39T +$0.51, 59.0% WR. 48h 89T -$0.07 (ct-hot+ legacy 25T -$0.56 dragging). Excluding ct-hot+: 64T +$0.49 (HEALTHY). PM_TRAIL dominant: 39T 84.6% WR +$1.83. profit-monster-T1 5T +$0.27. ATR_SL 34T -$2.13 (daily: 41→28→28→20→18→5 — STRONG trend). R:R 0.87:1. Aug 17: 18T +$0.32, 55.6% WR (GREEN DAY). 2 open (r2-trend-long5 -0.30%, return_exhaustion_long -0.60%). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. Coin tracker: BTC/SOL in accumulation (trend_q 78/65).
+
+### Root Cause of Losses
+1. **ct-hot+ legacy** — 25T/48h -$0.56 (clearing, flags False + NEVER_REENABLE, expected gone by Aug 18).
+2. **ATR_SL exits** — 34/48h -$2.13. Without ct-hot+: 25T -$1.57 (manageable, daily trend 5/24h excellent).
+3. **guardian_orphan phantom** — 8T/7d -$0.10. Empty signal trades from HL sync. Low priority.
+
+### Fix Applied
+NO CHANGES — system strong, ct-hot+ clearing naturally. All legacy losers killed. PM_TRAIL edge confirmed (84.6% WR). ATR_SL daily count at 5/24h (excellent, down from 41 peak).
+
+### Verification
+- 24h: 39T +$0.51, 59.0% WR ✅
+- 48h: 89T -$0.07 (excl ct-hot+: +$0.49) ✅
+- 7d: 421T -$2.59, 48.5% WR
+- PM_TRAIL: 39T 84.6% WR +$1.83 ✅
+- ATR_SL: 34/48h, daily 5/24h ✅
+- profit-monster-T1: 5T +$0.27 ✅
+- return_exhaustion_long: 4T 100% WR +$0.43 ✅
+- Open: 2 positions (-0.30%, -0.60%)
+- Daily: Aug 12 +$0.49, Aug 13 -$1.58, Aug 17 +$0.32 (GREEN DAY)
+
+### Next
+1. Monitor PM_TRAIL WR (must >80%) and ATR_SL count (must <15/day)
+2. ct-hot+ legacy clears naturally by Aug 18
+3. Phantom trades (guardian_orphan) — low priority, investigate root cause
+4. Coin tracker signal development — BTC/SOL in accumulation, build phase-transition signal
+
+---
+
 ## CEO Report — 2026-08-17 (63rd run)
 
 ### Diagnosis

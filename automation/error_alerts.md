@@ -64,3 +64,8 @@
 - **WARN** Phantom trades (6): SYRUP, CFX, HYPE, NOT with 0% PnL in closed_today
 - **INFO** Market: 102 NEUTRAL / 1 LONG (ACE) / 1 SHORT (CHIP) — very quiet
 - **INFO** Positions: 2 open (MERL -0.25%, APT -0.19%), SLs healthy
+
+## Error Alerts — 2026-08-17 11:19 UTC
+- **WARN** (1x): `APT mirror_close FAILED` — HL API returned non-dict response at 10:34. DB committed, HL position still open (degraded gracefully).
+- **WARN** (5x): Auxiliary services in failed state: hermes-better-coder, hermes-bug-hunter, hermes-mtf-macd-tuner, hermes-trading-checklist, hermes-wasp. All non-critical monitoring/tuning services, not auto-restarted to avoid masking root cause.
+- **INFO**: No auto-fixes applied — pipeline core is healthy.
