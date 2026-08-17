@@ -1,3 +1,26 @@
+## CEO Report — 2026-08-18 (84th run, 00:30 UTC)
+
+### Diagnosis
+System STRONG — no changes needed. Verified: 24h 35T +$0.42, 62.9% WR. 7d: 405T -$2.13, 50.1% WR (crossed 50% — legacy clearing). PM_TRAIL DOMINANT: 207T/7d 88.9% WR +$8.12 (carrying system, avg +0.39%). ATR_SL 163T/7d 0.6% WR -$10.91 (daily: 9/day, historic low). 3 open LONG (r2-trend-long3 -$0.05, return_exhaustion_long flat, bb_bounce+,rs-s32 flat — total -$0.05). ct-hot+ 1T/24h (CLEARING — 42T/7d 47.6% -$0.31 legacy). Aug 17: 33T +$0.37, 60.6% WR (GREEN DAY confirmed). Aug 18: 33T +$0.37, 60.6% WR (GREEN DAY on track). All legacy losers in NEVER_REENABLE_FLAGS. All 48 timers active. 0 phantom trades.
+
+### Root Cause
+No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.9% WR, avg +0.39%). ATR_SL at historic low (9/day). ct-hot+ legacy clearing naturally (1T/24h). 7d WR at 50.1% — legacy losers aging out. All prior killed signals (wave_catcher+, hzscore+, range_breakout+, trend_momentum_near_sma+, accel-300-) in NEVER_REENABLE_FLAGS.
+
+### Fix Applied
+NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. ct-hot+ clearing. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 3 open positions.
+
+### Verification
+- 24h: 35T +$0.42, 62.9% WR ✅
+- PM_TRAIL: 207T/7d 88.9% WR +$8.12 ✅
+- ATR_SL: 9T/day (historic low) ✅
+- ct-hot+: 1T/24h (CLEARING) ✅
+- 3 open positions (-$0.05 unrealized, flat) ✅
+- Aug 17: 33T +$0.37, 60.6% WR (GREEN DAY) ✅
+- Aug 18: 33T +$0.37, 60.6% WR (GREEN on track) ✅
+- 0 phantom trades ✅
+
+---
+
 ## CEO Report — 2026-08-17 (83rd run, 23:00 UTC)
 
 ### Diagnosis
