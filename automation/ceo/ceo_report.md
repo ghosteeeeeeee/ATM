@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-17 (57th run)
+
+### Diagnosis
+System STRONGEST IN DAYS — verified. 24h 33T +$0.77, 66.7% WR. 48h: PM_TRAIL 39T 84.6% WR +$1.85 (DOMINANT), T1 10T 100% +$0.56, ATR_SL 33T 3.0% WR -$2.03. R:R 0.87:1. 4 open ~flat (+$0.08). 7d: 429T -$2.05, 49.2% WR. Aug 17: 9T +$0.53, 77.8% WR (best day in a week). All legacy losers killed. wave_catcher master switch still True despite both variants dead.
+
+### Root Cause
+wave_catcher+ and wave_catcher- both dead (+37.5% WR -$0.42, -25% WR -$0.09) but master switch WAVE_CATCHER_ENABLED was still True. No new wave_catcher trades (0 in 48h) but flag inconsistency risked rotator re-enabling variants.
+
+### Fix Applied
+KILLED WAVE_CATCHER_ENABLED (True → False). Added WAVE_CATCHER_MINUS_ENABLED and WAVE_CATCHER_ENABLED to NEVER_REENABLE_FLAGS. Pipeline restarted.
+
+### Verification
+Pipeline active. System metrics unchanged (no wave_catcher trades were firing anyway). Expected impact: prevents future wave_catcher entries, eliminates flag inconsistency.
+
 ## CEO Report — 2026-08-17 (56th run)
 
 ### Diagnosis

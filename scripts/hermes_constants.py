@@ -922,6 +922,8 @@ NEVER_REENABLE_FLAGS = {
     'PCT_HERMES_PLUS_ENABLED',    # CEO 2026-08-07 — historical 100% WR, but combo signals bleeding (-$33.83 standalone)
     'VORTEX_BREAK_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-09 — vortex_break_long: 22.2% WR (9 trades 24h), -$0.18. Compounds hemorrhaging.
     'WAVE_CATCHER_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 33.3% WR, -$0.34 (24h). LONG dead.
+    'WAVE_CATCHER_MINUS_ENABLED', # CEO KILLED 2026-08-16 — 25% WR -$0.09. No edge.
+    'WAVE_CATCHER_ENABLED',       # CEO KILLED 2026-08-17 — both variants dead. Master switch.
     'MOMENTUM_LEADERBOARD_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 28.6% WR, -$0.15 (24h). LONG dead.
     'RANGE_BREAKOUT_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 25% WR, -$0.41 (7d). LONG dead.
     'COIN_TRACKER_HOT_ENABLED',      # SIGNAL REPORTER 2026-08-16 — ct-hot+ 35% WR, -$0.48 (24h). ct-hot- 0% WR.
@@ -1681,7 +1683,7 @@ HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before cir
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
-WAVE_CATCHER_ENABLED            = True    # RE-ENABLED 2026-08-16 per user. Master switch for wave_catcher-.
+WAVE_CATCHER_ENABLED            = False   # CEO KILLED 2026-08-17 — both variants dead (+37.5% WR -$0.42, -25% WR -$0.09). Master switch.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).
 WAVE_CATCHER_MINUS_ENABLED      = False   # CEO KILLED 2026-08-16 — 4T/48h 25% WR -$0.09. No edge.
 WAVE_CATCHER_VELOCITY_THRESHOLD = 0.40    # % per bar — minimum velocity to trigger (backtested optimal)
