@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-17 03:30 UTC
-**Updated by: CEO (49th run)
+**Last Updated: 2026-08-17 04:30 UTC
+**Updated by: CEO (50th run)
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (80% WR +$1.61/48h). All legacy losers killed. Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→18). hzscore- testing failed (inverted R:R) — killed 2026-08-17.
 
-**Current status:** System STABLE and POSITIVE. Verified 24h: 41T +$0.17, 48.8% WR (unchanged, Sunday quiet). PM_TRAIL 42T 80% WR +$1.61/48h dominant. ATR_SL 36T -$2.35 (36 exits, 18 from ct-hot+ = 50%). R:R 0.60:1. 3 open LONG healthy (+0.01%, +0.32%, +0.48%). 7d: 430T -$2.84, 48.1% WR. Phantom: 7T/7d -$0.09 (minimal). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
+**Current status:** System STABLE and POSITIVE. Verified 24h: 41T +$0.21, 51.2% WR (improved). 48h: 100T -$0.15, 46.0% WR (improved from -$0.66). PM_TRAIL 43T 80% WR +$1.65 dominant. ATR_SL 38T -$2.32 (stable). R:R 0.60:1. ct-hot+ 33T/48h -$0.42 (user TESTING MODE). 3 open LONG healthy. 7d: 434T -$2.84, 48.1% WR. Phantom: 7T/7d -$0.09 (minimal). Stars7d: return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19.
 
 ## Active Decisions
 
@@ -38,9 +38,9 @@
 
 ## Next Actions
 
-1. **PM_TRAIL edge confirmed.** 42T/48h 80% WR +$1.61, R:R 0.60:1. Strongest edge. Keep params. — 2026-08-17
-2. **ATR_SL improving.** 36T/48h, 18 from ct-hot+ (50%). SPEED_MIN 40 working. — 2026-08-17
-3. **ct-hot+ legacy draining.** 18/36 ATR_SL hits (50%). User TESTING MODE. Clear Aug 17-18. — 2026-08-17
-4. **Real system positive.** 24h +$0.17. Self-correcting. Sunday market quiet. — 2026-08-17
+1. **PM_TRAIL edge confirmed.** 43T/48h 80% WR +$1.65, R:R 0.60:1. Strongest edge. Keep params. — 2026-08-17
+2. **ATR_SL stable.** 38T/48h, 18 from ct-hot+ legacy (47%). SPEED_MIN 40 working. — 2026-08-17
+3. **ct-hot+ legacy draining.** 33T/48h -$0.42. User TESTING MODE. Clear Aug 17-18. — 2026-08-17
+4. **Real system positive.** 24h +$0.21, 51.2% WR. Self-correcting. — 2026-08-17
 5. **Phantom trades minimal.** guardian_orphan 7T/7d -$0.09. Acceptable. — 2026-08-17
 6. **Stars7d intact.** return_exhaustion_long 4T 100% +$0.43, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. — 2026-08-17
