@@ -1,13 +1,13 @@
-## CEO Report — 2026-08-17 (79th run)
+## CEO Report — 2026-08-17 (80th run)
 
 ### Diagnosis
-System STRONG — no changes needed. Verified: 24h 39T +$0.47, 61.5% WR. 7d: 405T -$2.23, 49.9% WR. PM_TRAIL DOMINANT: 206T/7d 88.8% WR +$8.06 (carrying system). ATR_SL 164T/7d 0.6% WR -$10.95 (daily: 41→8, 80% reduction, historic low). 2 open positions (BABY r2-trend-long4 flat, MON return_exhaustion_long flat). Aug 17: 31T +$0.28, 58.1% WR (GREEN DAY). Stars7d: return_exhaustion_long 5T 80% +$0.28, bb_bounce+ 24T 58.3% +$0.21, r2-trend-long2 17T 64.7% +$0.19. ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). All legacy losers in NEVER_REENABLE_FLAGS.
+System STRONG — no changes needed. Verified: 24h 39T +$0.47, 61.5% WR. 7d: 405T -$2.23, 49.9% WR. PM_TRAIL DOMINANT: 206T/7d 88.8% WR +$8.06 (carrying system). ATR_SL 164T/7d 0.6% WR -$10.95 (historic low 11/day). 2 open LONG (return_exhaustion_long +$0.02, r2-trend-long4 -$0.01 — flat). Aug 17: 31T +$0.28, 58.1% WR (GREEN DAY). bb_bounce+ 24T/7d 58.3% +$0.21 (healthy). r2-trend-long2 17T/7d 64.7% +$0.19 (best r2-trend). ct-hot+ 33T/7d 42.4% WR -$0.42 (legacy clearing, expected Aug 18). All legacy losers in NEVER_REENABLE_FLAGS.
 
 ### Root Cause
-No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.8% WR, 0.38% avg win). ATR_SL at historic low. All legacy losers killed or clearing.
+No active bleeding. System self-correcting. PM_TRAIL edge strong and consistent (88.8% WR, avg +0.39%). ATR_SL at historic low. All legacy losers killed or clearing.
 
 ### Fix Applied
-NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, bb_bounce+ (below 3T auto-kill threshold), 2 open positions.
+NO CHANGES. System healthy. PM_TRAIL carrying. ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear Aug 18, 2 open positions.
 
 ### Verification
 - 24h: 39T +$0.47, 61.5% WR ✅

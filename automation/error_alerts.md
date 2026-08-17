@@ -77,3 +77,35 @@
 - **OK** Timers: hermes-pipeline ✓ | hermes-price-collector ✓ | hl-sync-guardian ✓
 - **OK** Disk: 74% (30GB free), no stale logs bloating
 - **NO AUTO-FIX NEEDED**
+
+## Health Report — 2026-08-17 20:20 UTC
+
+=== Health Report ===
+Time: 2026-08-17 20:20 UTC
+
+PIPELINE: OK
+- Status: running (cycle #159582+)
+- Signals (1h): 65,856 generated (LONG: 31,860 / SHORT: 33,976)
+- Decisions (1h): 2 EXECUTED, 3 PENDING, 5,742 SKIPPED, 60,109 EXPIRED
+- Trades: 2 open, 39 closed today, +3.97% PnL
+- Errors: 0
+
+MARKET:
+- Regime: NEUTRAL (102 tokens) / 2 SHORT_BIAS (HEMI, POL) / 0 LONG
+- BTC: 4,309 (-0.21% 16c)
+- ETH: ,907 (-0.19% 16c)
+- SOL: 5.71 (-0.26% 16c)
+
+SYSTEM:
+- Timers: 48 active (all hermes timers running)
+- Disk: 75% used (83G/118G)
+- Pipeline: active, cycling every minute
+- hl-sync-guardian: active
+- cut-loser: active, no errors
+- Position manager: 2 open, 0 closed this cycle
+
+AUTO-FIXES APPLIED:
+- None needed
+
+ALERTS:
+- alerts.json has stale WARNING from ~18:40 UTC about low signal count (since resolved — 65K signals/hour now)
