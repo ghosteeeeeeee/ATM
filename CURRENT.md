@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 ~05:00 UTC (95th run)**
+**Last Updated: 2026-08-18 ~05:30 UTC (96th run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.3% WR +$8.03/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→1). Phantom trades FIXED (0T, was 9T/7d -$0.06).
 
-**Current status:** System STRONG — 24h 29T -$0.13, 51.7% WR (flat, within variance). 7d: 400T -$1.98, 50.3% WR. PM_TRAIL DOMINANT: 206T/7d 88.3% WR +$8.03. ATR_SL 1T/24h (historic low, was 41/day, 98% reduction). 0 open positions (clean). ct-hot+ CLEARED (0T/24h). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 2T $0.00 (early). 0 phantom trades. All 20 timers active. Regime: NEUTRAL (28/29 trades).
+**Current status:** System STRONG — 24h 27T -$0.16, 51.9% WR (flat, within variance). 7d: 399T -$1.97, 50.4% WR. PM_TRAIL DOMINANT: 206T/7d 88.3% WR +$8.03. ATR_SL 10T/24h (within 15/day target). 0 open positions (clean). ct-hot+ CLEARED (0T/24h). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 2T $0.00 (early). 0 phantom trades. All 20 timers active. Regime: NEUTRAL (28/29 trades).
 
 ## Active Decisions
 
@@ -41,7 +41,7 @@
 ## Next Actions
 
 1. **Monitor PM_TRAIL edge.** 206T/7d 88.3% WR +$8.03. Must hold >80% WR. — 2026-08-18
-2. **Monitor ATR_SL count.** 1T/24h (historic low, was 41/day). Must stay <15/day. — 2026-08-18
+2. **Monitor ATR_SL count.** 10T/24h (within 15/day target). Must stay <15/day. — 2026-08-18
 3. **ct-hot+ CLEARED.** 0T/24h, confirmed. — 2026-08-18
 4. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-18
 5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-18

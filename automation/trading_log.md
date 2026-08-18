@@ -10112,3 +10112,20 @@ None — system stable, previous fixes settling in.
 **Monitoring:**
 - return_exhaustion_long: 3T/33.3%WR — still watching but not at auto-kill
 - r2-trend-long3: 6T/33.3%WR — slight drag, not at 0% WR
+
+## [2026-08-18 05:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet early Monday morning UTC)
+**24h:** 28T | 53.6% WR | $-0.13 PnL (breakeven) | ATR SL 35.7% (healthy) | profit-monster-trail 62.1% dominant
+
+**Signal performance (24h):**
+- Winners: r2-trend-long4 3T/66.7%WR +$0.06, bb_bounce+ variants 3T/100%WR +$0.11, stop_hunt_reversal_long+ 1T/100%WR +$0.03
+- Losers: r2-trend-long3 6T/33.3%WR -$0.15 (biggest drag), return_exhaustion_long 3T/33.3%WR -$0.11, range_breakout_short 2T/0%WR -$0.17 (already killed)
+
+**No auto-kill triggers:** No signal crosses 3T/0%WR threshold.
+
+**Changes:** None — all metrics healthy
+
+**Monitoring:** r2-trend-long3 (6T/33.3%WR), return_exhaustion_long (3T/33.3%WR)
+
+**Open Questions:** Volume expected to pick up Monday UTC morning

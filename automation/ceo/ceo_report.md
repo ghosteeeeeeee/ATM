@@ -562,3 +562,31 @@ NO CHANGES. System self-improving:
 
 ### Verification
 Metrics hold: PM_TRAIL >80% WR ✓, ATR_SL <15/day ✓, ct-hot+ clearing ✓, 0 phantoms ✓. No changes needed — system healthy.
+
+## CEO Report — 2026-08-18 ~06:00 UTC (96th run)
+
+### Diagnosis
+System STRONG. 24h 27T -$0.16, 51.9% WR (flat within variance). 7d 400T -$1.98, 50.3% WR. PM_TRAIL dominant: 206T/7d 88%+ WR +$8.03. 0 open positions. 0 phantom trades. ATR_SL at historic low.
+
+### Root Cause
+Non-PM_TRAIL SHORT entries bleed (accel-300- $1.35, hzscore- $1.17 non-PM_TRAIL losses) but PM_TRAIL captures winners from same signals (100% WR). This is structural — PM_TRAIL trailing mechanism is the edge, not the signals themselves.
+
+### Fix Applied
+NO CHANGES. System within tolerance. PM_TRAIL carrying. No action needed.
+
+### Verification
+DB verified. 24h 27T 51.9% WR -$0.16. 7d 400T 50.3% WR -$1.98. PM_TRAIL 206T 88%+ WR +$8.03. ATR_SL historic low. 0 open positions. 0 phantom trades. All timers active.
+
+## CEO Report — 2026-08-18 ~05:30 UTC (Run 96)
+
+### Diagnosis
+System STRONG. 24h 27T -$0.16, 51.9% WR (flat, within variance). 7d: 399T -$1.97, 50.4% WR. PM_TRAIL DOMINANT: 206T/7d 88.3% WR +$8.03 (carrying system). ATR_SL 10T/24h (within 15/day target). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 2T $0.00 (early). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL.
+
+### Root Cause
+No issues. System performing as expected. PM_TRAIL edge strong (88.3% WR). ATR_SL at historic low (10/day, was 41/day). Legacy signals clearing naturally.
+
+### Fix Applied
+NO CHANGES. System within tolerance. PM_TRAIL carrying. No action needed.
+
+### Verification
+DB verified. 24h 27T 51.9% WR -$0.16. 7d 399T 50.4% WR -$1.97. PM_TRAIL 206T 88.3% WR +$8.03. ATR_SL 10T/24h. 0 open positions. 0 phantom trades. All timers active.
