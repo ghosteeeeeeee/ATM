@@ -10275,3 +10275,31 @@ None — system stable, previous fixes settling in.
 - 24h essentially breakeven (-$0.03)
 
 **Open Questions:** None
+
+## [2026-08-18 12:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet Monday UTC morning)
+**24h:** 22T | ~52% WR | ATR SL 33.3% (healthy) | profit-monster-trail dominant
+
+**Signal perf (24h):**
+- profit-monster-trail: 13T +$0.42 (backbone)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- r2-trend-long14: 1T/0%WR -$0.04 (single trade, not auto-kill)
+- bb_bounce+,rs-s97: 1T/0%WR -$0.04 (single trade, not auto-kill)
+- return_exhaustion_long: 3T/33.3%WR -$0.08 (mild drag, has 1 win)
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- r2-trend-long14: 1T only
+- bb_bounce+,rs-s97: 1T only
+- range_breakout_short: already killed
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 33.3% — well below 40% threshold
+- Trade frequency 0/hr — normal quiet period
+- No signal crosses auto-kill threshold
+- 1 open trade (WLFI) — low exposure
+- System healthy
+
+**Open Questions:** None
