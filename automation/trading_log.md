@@ -10153,3 +10153,26 @@ None — system stable, previous fixes settling in.
 - r2-trend-long3: 11T/45.5%WR — slight drag but not at auto-kill
 
 **Open Questions:** Volume expected to pick up Monday UTC morning
+
+## [2026-08-18 07:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet Monday UTC morning)
+**24h:** 27T | 51.9% WR | $-0.16 PnL (breakeven) | ATR SL 38.5% (healthy, below 40%)
+**7d:** 399T | 50.4% WR | $-1.97 PnL | ATR SL 39.6% (borderline but below threshold)
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold in 24h or 48h.
+
+**Signal watchlist:**
+- r2-trend-long3: 11T/48h, 45.5% WR, -$0.04 (6/11 losses are ATR SL — mild drag, not at auto-kill)
+- return_exhaustion_long: 4T/48h, 50% WR, -$0.07 (not at auto-kill)
+- range_breakout_short: 2T/0%WR, -$0.17 (already killed)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 38.5% (24h) — well below40% threshold
+- Trade frequency 0/hr — normal quiet period
+- No signal crosses 3T/0%WR auto-kill threshold
+- 0 open trades — all flat
+
+**Open Questions:** Volume expected to pick up Monday UTC morning
