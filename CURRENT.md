@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 ~14:50 UTC (CEO run 108)**
+**Last Updated: 2026-08-18 ~15:30 UTC (CEO run 109)**
 **Updated by: CEO**
 
 ## What We're Working On
 
-**Completed:** PM_TRAIL dist 0.20% WORKING (88.3% WR +$8.03/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→1). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended).
+**Completed:** PM_TRAIL dist 0.20% WORKING (88.4% WR +$8.09/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→1). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended).
 
-**Current status:** System STRONG — 24h 18T -$0.04, 55.6% WR (flat Monday, within variance). 48h: 58T +$0.48, 60.3% WR (healthy, R:R POSITIVE 1.68:1). 7d: 401T -$2.08, 50.4% WR (improving). PM_TRAIL DOMINANT: 40T/48h +$1.55, 87.5% WR (carrying system). ATR_SL 16T/48h -$0.92, 0% WR (8/day average, within 15/day target, historic low). 1 open position. 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 18T -$0.04, 55.6% WR (Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL (102 tokens) / 2 SHORT_BIAS (HEMI, POL). Coin tracker: DOGE in accumulation (48.8 composite, fading). Top: ZRO 58.9, ZORA 55.4, CASHCAT 54.0. SHORT side structural weakness: 154T/7d -$1.14, 48.7% WR. KEY FINDING: 48h R:R improved to 1.68:1 (PM_TRAIL +$1.55 vs ATR_SL -$0.92).
+**Current status:** System STRONG — 24h 19T -$0.11, 52.6% WR (flat Monday, within variance). 48h: 58T +$0.48, 60.3% WR (healthy, R:R POSITIVE 1.68:1). 7d: 402T -$2.15, 50.2% WR (improving). PM_TRAIL DOMINANT: 40T/48h +$1.55, 87.5% WR (carrying system). ATR_SL 17T/48h -$0.99, 0% WR (8.5/day average, within 15/day target, historic low). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 19T -$0.11, 52.6% WR (Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. SHORT side structural weakness: 141T/7d -$0.67. KEY FINDING: 48h R:R 1.68:1 (PM_TRAIL +$1.55 vs ATR_SL -$0.99).
 
 ## Active Decisions
 
