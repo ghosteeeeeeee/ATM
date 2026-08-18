@@ -953,3 +953,7 @@
   WHY: 3T last hour (SUSHI +$0.02 profit-monster-trail, XPL -$0.04 atr_sl_hit, GRASS -$0.09 atr_sl_hit). 24h 15T 46.7%WR -$0.30. profit-monster-trail 8T +$0.26 dominant. atr_sl_hit 7T -$0.56. 4h ATR SL 60% (3/5) above 40% threshold but small sample. No signal crosses 3T/0%WR auto-kill. 1 open trade low exposure. System break-even. Monitoring ATR SL rate — will consider ATR_K_HIGH_VOL bump next hour if persists.
   BY: auto_1hr
   NEXT: Re-run at 20:10 UTC
+[2026-08-18 20:10] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet Monday evening). 24h 15T 46.7%WR -$0.30. profit-monster-trail 8T +$0.26 dominant. atr_sl_hit 7T -$0.56 dominant loser. 4h ATR SL 60% (3/5) above 40% threshold but 5T sample too small. No signal crosses 3T/0%WR auto-kill. r2-trend-long3 4T/25%WR, return_exhaustion_long 4T/25%WR — both have 1 win each. 2 open trades $22 low exposure. Quiet evening. Monitoring ATR SL rate — will act if persists with larger sample.
+  BY: auto_1hr
+  NEXT: Re-run at 21:10 UTC

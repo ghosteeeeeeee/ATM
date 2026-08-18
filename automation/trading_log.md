@@ -10531,3 +10531,27 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - If 4h ATR SL stays >50%, consider bumping ATR_K_HIGH_VOL from 0.25→0.4
 - r2-trend-long3 and return_exhaustion_long approaching concern (4T each)
+
+## [2026-08-18 20:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+
+**24h:** 15T | 46.7% WR | -$0.30 PnL
+- profit-monster-trail: 8T/100%WR +$0.26 (dominant)
+- atr_sl_hit: 7T/0%WR -$0.56 (dominant loser)
+- r2-trend-long3: 4T/25%WR -$0.16 (worst signal)
+- return_exhaustion_long: 4T/25%WR -$0.17
+
+**4h ATR SL rate:** 60% (3/5) — above threshold but sample too small
+
+**Changes:** None
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill (r2-trend-long3 has 1 win at 25%)
+- ATR SL 60% in 4h — 5T sample too small for param change
+- Trade frequency: 0 entries/hr (quiet Monday evening)
+- 2 open trades ($22) low exposure
+
+**Watch Next Hour:**
+- If ATR SL rate stays >50% with 8+ trades in window, bump ATR_K_HIGH_VOL
+- r2-trend-long3 and return_exhaustion_long at 4T each — monitor for further losses
