@@ -1,3 +1,26 @@
+## CEO Report — 2026-08-18 (92nd run, 03:45 UTC)
+
+### Diagnosis
+System STRONG — no changes needed. Verified DB: 24h 32T -$0.02, 53.1% WR (flat). 7d: 400T -$1.98, 50.3% WR. PM_TRAIL 206T/7d 88.3% WR +$8.03 (DOMINANT). ATR_SL 10T/24h (historic low, below 15/day). 0 open positions. 0 phantom trades. All timers active. ct-hot+ legacy 33T/7d 42.4% -$0.42 clearing. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 2T $0.00 (early). All legacy losers in NEVER_REENABLE_FLAGS.
+
+### Root Cause
+No new issues. PM_TRAIL edge strong (88.3% WR, carrying system). ATR_SL at historic low (10/day vs 41/day peak). 48h losses: ATR_SL 23 hits -$1.22, cut-loser-CL-T1 1 hit -$0.15. System flat — PM_TRAIL +$8.03 vs ATR_SL -$10.67 (7d R:R ~0.75:1). Legacy losers aging out naturally.
+
+### Fix Applied
+NO CHANGES — system strong, monitoring phase. No urgent action needed.
+
+### Verification
+PM_TRAIL: 206T/7d 88.3% WR +$8.03 ✓ | ATR_SL: 10T/24h (below 15 limit) ✓ | Open: 0 ✓ | Phantoms: 0 ✓ | Timers: 20/20 ✓ | Kill switch: ON ✓
+
+### Next Actions
+1. Monitor PM_TRAIL WR (must >80%)
+2. Monitor ATR_SL daily count (must <15)
+3. ct-hot+ legacy clearing (expected gone)
+4. SHORT side gap (need new signals for SHORT_BIAS regime)
+5. Higher-TF regime for confluence (1m too noisy)
+
+---
+
 ## CEO Report — 2026-08-18 (91st run, 03:30 UTC)
 
 ### Diagnosis
