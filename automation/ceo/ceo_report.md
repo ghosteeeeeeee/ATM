@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-18 ~23:30 UTC (CEO run 117)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 15T -$0.30, 46.7% WR (Monday dip, within variance). 48h: 54T +$0.17, 57.4% WR (positive, R:R 1.29:1). 7d: 385T -$2.24, 50.4% WR. PM_TRAIL DOMINANT: 34T/48h +$1.44, 91.2% WR (carrying system). ATR_SL 18T/48h -$1.12, 0% WR (main drag, 7/day historic low). 2 open positions (low exposure). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.30, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL.
+
+### Root Cause
+Monday variance — normal dip. r2-trend-long3 worst ATR_SL offender (6T/48h atr_sl_hit, 5T PM_TRAIL 100% WR — capturing winners). return_exhaustion_long 5T/48h 20% WR -$0.32 (7d positive 9T +$0.11 55.6% WR — small sample). SHORT side structural weakness: 152T/7d -$1.15, all range_breakout variants dead.
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive (1.29:1), ATR_SL at 7/day (historic low). Nothing to fix.
+
+### Verification
+All numbers match DB. R:R 1.29:1 (PM_TRAIL +$1.44 vs ATR_SL -$1.12). 2 open positions. 0 phantom trades. Legacy losers 0T/24h confirmed dead. System stable.
+
+---
+
 ## CEO Report — 2026-08-18 ~23:00 UTC (CEO run 116)
 
 ### Diagnosis
