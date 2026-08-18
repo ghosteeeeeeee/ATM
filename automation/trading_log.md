@@ -10129,3 +10129,27 @@ None — system stable, previous fixes settling in.
 **Monitoring:** r2-trend-long3 (6T/33.3%WR), return_exhaustion_long (3T/33.3%WR)
 
 **Open Questions:** Volume expected to pick up Monday UTC morning
+
+## [2026-08-18 06:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet Monday morning UTC)
+**48h:** 63T | 57.1% WR | $+0.48 PnL (profitable) | ATR SL 33.3% (healthy) | profit-monster-trail 63.5% dominant
+
+**Signal performance (48h):**
+- Winners: bb_bounce+,hl_copy_trader 3T/100%WR +$0.31, r2-trend-long4 6T/66.7%WR +$0.11, stop_hunt_reversal_long+ 4T/75%WR +$0.06
+- Losers: range_breakout_short 2T/0%WR -$0.17 (already killed), ct-hot+ 3T/0%WR -$0.13 (last trade Aug 16, not active), r2-trend-long3 11T/45.5%WR -$0.04 (no auto-kill, not 0% WR)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 33.3% — well below 40% threshold
+- Trade frequency 0/hr — normal quiet period
+- No signal crosses 3T/0%WR auto-kill threshold in last hour
+- 0 open trades — all flat
+- 48h system is profitable (+$0.48)
+
+**Monitoring:**
+- ct-hot+ base signal: 3T/0%WR over 48h but last trade Aug 16 — not active
+- r2-trend-long3: 11T/45.5%WR — slight drag but not at auto-kill
+
+**Open Questions:** Volume expected to pick up Monday UTC morning

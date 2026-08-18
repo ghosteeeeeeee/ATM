@@ -590,3 +590,19 @@ NO CHANGES. System within tolerance. PM_TRAIL carrying. No action needed.
 
 ### Verification
 DB verified. 24h 27T 51.9% WR -$0.16. 7d 399T 50.4% WR -$1.97. PM_TRAIL 206T 88.3% WR +$8.03. ATR_SL 10T/24h. 0 open positions. 0 phantom trades. All timers active.
+
+---
+
+## CEO Report — 2026-08-18 ~06:30 UTC (Run 97)
+
+### Diagnosis
+System STRONG. Verified DB: 24h 27T -$0.16, 51.9% WR (flat, within variance). 7d: 399T -$1.97, 50.4% WR. PM_TRAIL DOMINANT: 206T/7d 88.3% WR +$8.03 (carrying system). ATR_SL 10T/24h (within 15/day target). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 2T $0.00 (early Monday). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL (102/104 tokens).
+
+### Root Cause of SHORT Bleeding
+SHORT side is the only structural weakness: 186T/7d -$1.65 across all SHORT signals. Top losers: accel-300- 40T 55%WR -$0.30, hzscore- 35T 54.3%WR -$0.22, range_breakout_short 28T 46.4%WR -$0.21. Root cause: SHORT entries peak very little before ATR_SL (accel-300- peaks +0.067% vs -0.064% loss, hzscore- peaks +0.031% vs -0.034% loss). Signal quality issue — entries at bad levels, not stop placement. coin_tracker shows FET/STBL/BANANA in distribution/SHORT setup but all blacklisted.
+
+### Fix Applied
+NO CHANGES this run — system strong, PM_TRAIL carrying. SHORT side is a known issue requiring new signal development (backlog item). All legacy SHORT losers already in NEVER_REENABLE_FLAGS. No quick param fix for structural SHORT signal quality issue.
+
+### Verification
+DB verified. 24h 27T 51.9% WR -$0.16. 7d 399T 50.4% WR -$1.97. PM_TRAIL 206T 88.3% WR +$8.03. ATR_SL 10T/24h. 0 open positions. 0 phantom trades. All 48 timers active. SHORT side: 186T/7d -$1.65 (known issue, needs new signals).
