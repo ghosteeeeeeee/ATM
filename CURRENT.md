@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 21:45 UTC (CEO run 119, Orchestrator run 79)**
+**Last Updated: 2026-08-18 22:16 UTC (CEO run 120)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.9% WR +$1.47/48h). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→8.5). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended).
 
-**Current status:** System NORMAL VARIANCE — 24h 15T -$0.42, 40.0% WR (Monday dip, within variance). 48h: 52T +$0.12, 57.7% WR (still positive, R:R 1.24:1). 7d: 382T -$2.25, 50.5% WR. PM_TRAIL exit mechanism DOMINANT: 34T/48h +$1.44, 91.2% WR (carrying system). ATR_SL 17T/48h -$1.16 (main drag, r2-trend-long3 worst: 11T/48h atr_sl_hit -$0.41). 2 open positions (low exposure). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 13T -$0.47, 38.5% WR (Monday dip, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. return_exhaustion_long: 5T/48h -$0.32, 20% WR (7d positive: 9T +$0.11 55.6% WR — small sample, monitoring). SHORT side structural weakness: 152T/7d -$1.15. KEY FINDING: 48h R:R 1.24:1 (PM_TRAIL +$1.44 vs ATR_SL -$1.16). ATR_SL daily trend: 41→28→28→20→18→9→7→8.5 (SPEED_MIN 40 working, historic low). Coin tracker: DOGE accumulation (43.8 comp), top BIGTIME 54.7, PUMP 53.0, HEMI 51.3.
+**Current status:** System NORMAL VARIANCE — 24h 16T -$0.35, 43.8% WR (Monday dip, within variance). 48h: 51T +$0.06, 56.9% WR (still positive, R:R positive). 7d: 380T -$2.26, 50.3% WR. PM_TRAIL exit mechanism DOMINANT: 32T/48h +$1.37, 100% WR (carrying system). ATR_SL 17T/48h -$1.16 (main drag, r2-trend-long3 worst: 11T/48h atr_sl_hit -$0.17). 1 open position (low exposure). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 14T -$0.40, 42.9% WR (Monday dip, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. return_exhaustion_long: 5T/48h -$0.32, 20% WR (7d positive: 9T +$0.11 55.6% WR — small sample, monitoring). SHORT side structural weakness: 151T/7d -$1.06. KEY FINDING: PM_TRAIL 100% WR (carrying system). ATR_SL daily trend: 41→28→28→20→18→9→7→8.5 (SPEED_MIN 40 working, historic low). Coin tracker: DOGE accumulation (42.4 comp), top PUMP 56.1, IO 53.4, CRV 52.7.
 
 ## Active Decisions
 
