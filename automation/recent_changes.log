@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-18 ~22:30 UTC] CEO: NO CHANGES (trading)
+  WHY: Verified DB: 24h 14T -$0.32 (42.9% WR — Monday dip, within variance). 48h: 55T +$0.14 (56.4% WR — still positive, R:R 1.25:1). 7d: 392T -$2.07 (50.3% WR). PM_TRAIL DOMINANT: 34T/48h +$1.45 (91.2% WR, carrying system). ATR_SL 19T/48h -$1.16 (0% WR, 7/day within target). 2 open positions (SUSHI, ARB — low exposure). 0 phantom trades. Aug 17: 34T +$0.37 (58.8% WR — GREEN DAY). Aug 18: 11T -$0.41 (36.4% WR — Monday dip, normal variance). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. return_exhaustion_long: 4T/24h -$0.17 (25% WR, 7d positive: 9T +$0.11 55.6% WR — small sample, monitoring). r2-trend-long3: 4T/24h -$0.16 (25% WR — worst ATR_SL offender, MIN_PRE_MOVE=0.2 applied). SHORT side: 152T/7d -$1.15 (48.7% WR — structural weakness, all range_breakout dead). 6 non-critical services failed (not trading-impacting). DECISION: NO CHANGES — system within normal variance, PM_TRAIL carrying, R:R positive (1.25:1), ATR_SL at 7/day. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), return_exhaustion_long (watch 10+ trades), SHORT side gap.
+  BY: CEO run
+  DO NOT REVERT — system within normal variance, trajectory positive.
+
 [2026-08-17 11:00 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (XPL r2-trend-long3 ATR_SL -$0.10). 24h 18T -$0.04 (38.9% SL hit rate, below 40% threshold). PM_TRAIL revert effective — 11T +$0.39. No 0% WR signals with 3+ trades in last hour. No kill candidates. Trade freq 0.8/hr low but market-driven. System healthy, within normal params.
   BY: auto_1hr
@@ -944,3 +949,7 @@
   WHY: 0T last hour (quiet Monday evening). 24h 12T 50%WR -$0.19 (breakeven). ATR SL 41.7% borderline but 12T sample too small. profit-monster-trail dominant. r2-trend-long3 worst 4T/25%WR but has 1 win (no auto-kill). return_exhaustion_long 3T/33%WR. 4 open trades low exposure ($11 each). No signal crosses 3T/0%WR threshold. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 19:03 UTC
+[2026-08-18 19:10] auto_1hr: NO CHANGES
+  WHY: 3T last hour (SUSHI +$0.02 profit-monster-trail, XPL -$0.04 atr_sl_hit, GRASS -$0.09 atr_sl_hit). 24h 15T 46.7%WR -$0.30. profit-monster-trail 8T +$0.26 dominant. atr_sl_hit 7T -$0.56. 4h ATR SL 60% (3/5) above 40% threshold but small sample. No signal crosses 3T/0%WR auto-kill. 1 open trade low exposure. System break-even. Monitoring ATR SL rate — will consider ATR_K_HIGH_VOL bump next hour if persists.
+  BY: auto_1hr
+  NEXT: Re-run at 20:10 UTC

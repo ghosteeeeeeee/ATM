@@ -10505,3 +10505,29 @@ None — system stable, previous fixes settling in.
 - System healthy
 
 **Next:** Re-run at 19:03 UTC
+
+## [2026-08-18 19:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+- SUSHI: r2-trend-long4, profit-monster-trail, +$0.02 ✓
+- XPL: bb_bounce+, atr_sl_hit, -$0.04 (SL 0.32% — noise)
+- GRASS: return_exhaustion_long, atr_sl_hit, -$0.09 (SL 0.82%)
+
+**24h:** 15T | 46.7% WR | -$0.30 PnL
+- profit-monster-trail: 8T +$0.26 (healthy)
+- atr_sl_hit: 7T -$0.56 (dominant loser)
+
+**4h ATR SL rate:** 60% (3/5) — above 40% threshold but small sample
+
+**Changes:** None
+
+**No Change Needed:**
+- 4h ATR SL 60% is concerning but only 5 trades — need next hour to confirm
+- No signal crosses 3T/0%WR auto-kill threshold
+- r2-trend-long3 and return_exhaustion_long both at 4T/25%WR but each has 1 win
+- Trade frequency normal (quiet Monday evening)
+- 1 open trade (ARB $11) — low exposure
+
+**Watch Next Hour:**
+- If 4h ATR SL stays >50%, consider bumping ATR_K_HIGH_VOL from 0.25→0.4
+- r2-trend-long3 and return_exhaustion_long approaching concern (4T each)
