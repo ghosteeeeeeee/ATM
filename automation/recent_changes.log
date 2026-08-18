@@ -871,3 +871,7 @@
   WHY: 0T last hour (Sunday 00:00 UTC quiet). 24h 34T 58.8%WR +$0.37. ATR SL 26.5% (well below 40%). r2-trend-long3 50%WR 6T (negative PnL but not at 3T/0%WR auto-kill). return_exhaustion_long 33.3%WR 3T (monitoring). range_breakout_short already killed. Trade frequency 0/hr normal Sunday. 2 open trades (LDO bb_bounce+, BANANA r2-trend-long3). System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 01:03 UTC (Monday)
+[2026-08-18 01:03] auto_1hr: NO CHANGES
+  WHY: 1T last hour (LDO bb_bounce+,rs-s32 profit-monster-trail +$0.04 winner). 24h 37T 58.8%WR +$1.13. ATR SL 24.3% (well below 40%). return_exhaustion_long 33.3%WR 3T (monitoring, not at 3T/0%WR auto-kill). range_breakout_short already killed. Trade frequency 1/hr normal Sunday. 1 open trade (BANANA r2-trend-long3). System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 02:03 UTC
