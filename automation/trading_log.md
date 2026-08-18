@@ -10090,3 +10090,25 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - Volume expected to pick up Monday UTC morning
+
+## [2026-08-18 04:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet Sunday night)
+**24h:** 29T | 51.7% WR | $-0.13 PnL (breakeven) | ATR SL 34.5% (healthy) | profit-monster-trail 62.1% dominant
+
+**Signal performance (24h):**
+- Winners: r2-trend-long5,rs-s115 1T/100%WR +$0.09, r2-trend-long4 3T/66.7%WR +$0.06, bb_bounce+ variants 3T/100%WR +$0.11
+- Losers: r2-trend-long3 6T/33.3%WR -$0.15, return_exhaustion_long 3T/33.3%WR -$0.11, range_breakout_short 2T/0%WR -$0.17 (killed)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 34.5% — well below 40% threshold
+- Trade frequency 0/hr — normal Sunday night
+- No signal crosses 3T/0%WR auto-kill threshold
+- 0 open trades — all flat
+- 24h basically breakeven ($-0.13 on 29 trades)
+
+**Monitoring:**
+- return_exhaustion_long: 3T/33.3%WR — still watching but not at auto-kill
+- r2-trend-long3: 6T/33.3%WR — slight drag, not at 0% WR
