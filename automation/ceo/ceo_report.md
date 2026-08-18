@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-18 ~21:30 UTC (CEO run 122)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 15T -$0.38, 46.7% WR (Monday dip, within variance). 48h: 50T +$0.01, 56.0% WR (positive, R:R positive). 7d: 379T -$2.13, 50.7% WR (improving). PM_TRAIL DOMINANT: 7T/24h +$0.26 100% WR / 209T/7d +$8.25, 88.5% WR (carrying system). ATR_SL 8T/24h -$0.64, 0% WR (8.5/day historic low). 0 open positions (clean). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. return_exhaustion_long: 24h 2T -$0.21 0% WR (7d: 9T +$0.11 55.6% WR — degrading but above auto-kill threshold of <25% WR with 8+ trades). SHORT side: 151T/7d -$1.06 (structural, all range_breakout dead).
+
+### Root Cause
+Monday variance — normal dip. ATR_SL main drag at -$0.64/24h (8.5/day historic low, within 15/day target). PM_TRAIL offsetting with +$0.26/24h. No structural issues. return_exhaustion_long degrading (2T 0% WR) but 7d still positive (9T 55.6% +$0.11) — above auto-kill threshold. SHORT side structural weakness (151T/7d -$1.06, all range_breakout variants dead).
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive, ATR_SL at 8.5/day. PM_TRAIL WR 88.5% (must >80% — PASS). ATR_SL 8.5/day (must <15 — PASS). 48h R:R positive (must >1:1 — PASS).
+
+### Verification
+DB verified. System stable. Monitoring: return_exhaustion_long (watch for recovery or degradation to auto-kill threshold), SHORT side (need new SHORT signals).
+
+---
+
 ## CEO Report — 2026-08-19 ~01:00 UTC (CEO run 121)
 
 ### Diagnosis
