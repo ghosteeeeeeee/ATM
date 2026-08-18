@@ -1,65 +1,86 @@
-# Signal Performance Report
-**Generated:** 2026-08-18 14:30 UTC | **Period:** Last 6h + 24h + 48h
+=== Signal Performance Report ===
+Period: 2026-08-18 23:00 UTC — Last 6h / 24h / 7d
+Generated: 2026-08-18 23:08 UTC
 
-## Overall Stats
-- **All-time:** 3,728 trades | 42.4% WR | -$2.89 PnL
-- **24h:** 13 trades | 53.8% WR | -$0.07 PnL
-
----
-
-## KILLED (executed)
-
-None. No signal meets kill criteria (5+ trades 24h, WR < 30%, PnL < -$0.10).
+## Summary
+- **24h**: 15 trades, all LONG, -$0.38 total PnL (46.7% WR)
+- **7d**: 200+ trades across all signals. System slightly negative overall.
+- **30d**: 1455 trades, -$3.20, 39% WR
+- **Inversions**: PASS — no direction mismatches found (24h or 7d)
 
 ---
 
-## BOOSTED (executed)
+## KILLED (executed this cycle)
 
-None. Winners already enabled, no tuning needed.
+None — all previous losers already disabled.
 
----
-
-## LOSERS — WATCH LIST
-
-| Signal | Dir | WR | PnL | Trades | Status |
+| Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| return_exhaustion_long | LONG | 25% | -$0.23 | 4 (48h) | WATCH — dropped from 60% all-time WR. Already tuning in progress? |
-| r2-trend-long3 | LONG | 25% | -$0.09 | 4 (24h) | WATCH — 54.2% all-time. MIN_PRE_MOVE already raised 0.1→0.2 today. |
+| (none) | — | — | — | — | No new kills needed |
 
 ---
 
-## WINNERS
+## PREVIOUSLY KILLED (confirmed still disabled)
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| stop_hunt_reversal_long+ | LONG | 100% | $0.07 | 3 (48h) | STRONG |
-| r2-trend-long4 | LONG | 80% | $0.12 | 5 (48h) | STRONG |
-| bb_bounce+,hl_copy_trader | LONG | 75% | $0.24 | 4 (48h) | STRONG |
-
----
-
-## SIGNAL INVERSIONS
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## KEY OBSERVATIONS
-
-1. **Very low trade volume** — 13 trades in 24h, well below normal. Market may be in a low-volatility regime.
-2. **return_exhaustion_long** has degraded: all-time 60% WR, 10T, +$0.21 but recent 48h is 25% WR, 4T, -$0.23. Needs monitoring — if 24h trade count reaches 5+ with continued poor WR, will kill.
-3. **r2-trend-long3** already had MIN_PRE_MOVE raised from 0.1 to 0.2 today to address ATR stop losses hitting before PM_TRAIL activation. Watching effectiveness.
-4. **Hot-set is empty** — compaction cycle 13287, no signals in hotset.
-5. **All-time PnL is -$2.89** across 3,728 trades — system is nearly breakeven overall, signal quality is adequate but not profitable enough.
+| Signal | Dir | 7d WR | 7d PnL | Status |
+|--------|-----|-------|--------|--------|
+| ct-hot+ | LONG | 42.4% | -$0.42 | DISABLED — COIN_TRACKER_HOT_PLUS_ENABLED=False, NEVER_REENABLE |
+| wave_catcher+ | LONG | 37.5% | -$0.42 | DISABLED — WAVE_CATCHER_PLUS_ENABLED=False, NEVER_REENABLE |
+| range_breakout+ | LONG | 25.0% | -$0.41 | DISABLED — RANGE_BREAKOUT_PLUS_ENABLED=False, NEVER_REENABLE |
+| accel-300- | SHORT | 55.0% | -$0.30 | NEVER_REENABLE (55% WR but net negative, inverted R:R) |
+| hzscore+ | LONG | 25.0% | -$0.14 | DISABLED — NEVER_REENABLE |
+| hzscore- | SHORT | 56.3% | -$0.14 | DISABLED — NEVER_REENABLE (inverted R:R) |
+| continuation+ | LONG | 40.0% | -$0.17 | DISABLED — CONTINUATION_ENABLED=False |
+| range_breakout_short | SHORT | 46.4% | -$0.21 | DISABLED — NEVER_REENABLE |
+| inv-accel-300+ | LONG | 14.3% | -$0.31 | NEVER_REENABLE |
+| inv-accel-300- | SHORT | 22.4% | -$0.30 | NEVER_REENABLE |
 
 ---
 
-## RECOMMENDATIONS
+## WATCH LIST (tuning candidates)
 
-1. **Monitor return_exhaustion_long** — if 24h hits 5+ trades with WR < 40%, escalate for disable
-2. **No parameter changes needed now** — volume too low to draw conclusions
-3. **Consider temporary cooldown on return_exhaustion_long** if next 6h shows continued 0% WR
+| Signal | Dir | 7d WR | 7d PnL | Trades | Avg PnL | Notes |
+|--------|-----|-------|--------|--------|---------|-------|
+| r2-trend-long3 | LONG | 52.0% | -$0.23 | 25 | -$0.009 | High WR but inverted R:R — avg win small, avg loss large. Tuning candidate, not kill. |
+| range_finder+ | LONG | 33.3% | -$0.14 | 9 | -$0.016 | DISABLED — R:R 0.12:1. Already killed. |
+| mover+ | LONG | 28.6% | -$0.15 | 7 | -$0.021 | Momentum leaderboard — PLUS already killed. MINUS still active. |
 
 ---
 
-*Report auto-generated. Next report: ~6h from now.*
+## WINNERS (7d, >=5 trades)
+
+| Signal | Dir | 7d WR | 7d PnL | Trades | Status |
+|--------|-----|-------|--------|--------|--------|
+| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 | ACTIVE — strong performer |
+| bb_bounce+,hl_copy_trader | LONG | 42.9% | +$0.19 | 7 | ACTIVE |
+| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 | KILLED (master switch) — SHORT was profitable but master killed |
+| return_exhaustion_long | LONG | 55.6% | +$0.11 | 9 | ACTIVE |
+| bb_bounce+ | LONG | 56.3% | +$0.09 | 16 | ACTIVE |
+| r2-trend-long6 | LONG | 100.0% | +$0.20 | 4 | ACTIVE — small sample but perfect |
+
+### 30d top performers (>=10 trades, WR>50%)
+
+| Signal | Dir | 30d WR | 30d PnL | Trades |
+|--------|-----|--------|---------|--------|
+| bb_bounce+,range_finder+ | LONG | 58.5% | +$0.71 | 53 |
+| bb_bounce | LONG | 57.1% | +$0.24 | 14 |
+| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 |
+| bb_bounce+ | LONG | 56.0% | +$0.17 | 25 |
+| bb-bounce-short,hzscore- | SHORT | 61.1% | +$0.14 | 18 |
+
+---
+
+## ISSUES
+
+1. **Low trade volume** — Only 15 trades in 24h. Market may be in consolidation.
+2. **r2-trend-long3 inverted R:R** — 52% WR but -$0.23/7d. Wins average +$0.04, losses average -$0.08. Needs ATR SL tuning or profit target adjustment.
+3. **No direction inversions** — system health OK.
+4. **30d system slightly negative** — -$3.20 across 1455 trades. Edge is thin.
+
+---
+
+## ACTIONS TAKEN
+
+- No kills executed (all losers already disabled)
+- No boosts executed (winners already active)
+- Report generated — next run in 6h
