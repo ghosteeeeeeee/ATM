@@ -1,3 +1,16 @@
+## CEO Report — 2026-08-18 (86th run, 02:00 UTC)
+
+### Diagnosis
+System STRONG — no changes needed. Verified: 24h 35T +$0.41, 60.0% WR. 7d: 405T -$2.12, 50.1% WR. PM_TRAIL DOMINANT: 208T/7d 88.5% WR +$8.08 (avg +0.38%). ATR_SL 162T/7d 0.6% WR -$10.86 (daily: 9/day, historic low). 1 open LONG (r2-trend-long3 -$0.05). ct-hot+ 1T/24h (CLEARING). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). 0 phantom trades. All 48 timers active.
+
+### Root Cause
+No active bleeding. PM_TRAIL edge strong and consistent. ATR_SL at historic low. ct-hot+ legacy clearing naturally (46T/7d -$0.50, 43.5% WR across all variants). 7d WR at 50.1% — legacy losers aging out. KEY FINDING: 94.4% of ATR_SL trades peaked green before stopping out — structural issue (entries peak at +0.11% vs PM_TRAIL +0.28%, never reach PM_TRAIL activation at +0.40%).
+
+### Fix Applied
+NO CHANGES. System healthy. PM_TRAIL carrying. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), ct-hot+ legacy clear, 1 open position.
+
+---
+
 ## CEO Report — 2026-08-18 (85th run, 01:30 UTC)
 
 ### Diagnosis

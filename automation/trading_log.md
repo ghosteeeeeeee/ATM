@@ -9940,3 +9940,39 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - Volume expected to pick up Monday UTC morning
+
+## [2026-08-18 00:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (Sunday night quiet)
+**24h:** 34T | 58.8% WR | +$0.37
+
+**24h by close reason:**
+- profit-monster-trail: 23T (67.6%) +$1.04 (dominant)
+- atr_sl_hit: 9T (26.5%) -$0.52 (healthy, below 40%)
+- cut-loser-CL-T1: 1T -$0.15
+- guardian_orphan: 1T $0.00
+
+**Signal performance:**
+- bb_bounce+,hl_copy_trader: 3T/100%WR +$0.31 (confluence, strong)
+- r2-trend-long4: 3T/67%WR +$0.06
+- stop_hunt_reversal_long+: 2T/100%WR +$0.06
+- r2-trend-long3: 6T/50%WR -$0.03 (breakeven, most traded)
+- return_exhaustion_long: 3T/33.3%WR -$0.11 (monitoring)
+- range_breakout_short: 2T/0%WR -$0.17 (already killed)
+
+**Open trades:** 2 (LDO bb_bounce+ SL 0.3023, BANANA r2-trend-long3 SL 3.6378)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 26.5% — well below 40% threshold
+- Trade frequency 0/hr — normal Sunday night
+- No signal crossing 3T/0%WR auto-kill threshold
+- return_exhaustion_long 33.3% WR — below auto-kill
+
+**Monitoring:**
+- r2-trend-long3 at 6T/50%WR/-$0.03 — negative PnL but not at auto-kill
+- return_exhaustion_long at 3T/33.3%WR — monitoring next cycle
+
+**Open Questions:**
+- Volume expected to pick up Monday UTC morning
