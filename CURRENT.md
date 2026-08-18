@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 ~14:30 UTC (CEO run 107)**
+**Last Updated: 2026-08-18 ~14:50 UTC (CEO run 108)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.3% WR +$8.03/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→1). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended).
 
-**Current status:** System STRONG — 24h 19T -$0.01, 57.9% WR (flat Monday, within variance). 48h: 60T +$0.38, 58.3% WR (healthy, R:R POSITIVE 1.52:1). 7d: 401T -$2.08, 50.4% WR (improving). PM_TRAIL DOMINANT: 207T/7d 88.4% WR +$8.09, 40T/48h 87.5% WR +$1.55 (carrying system). ATR_SL 159T/7d 0.6% WR -$10.83, 18T/48h 0% WR -$1.02 (historic low, R:R improving). 1 open position. 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 6T -$0.13, 50% WR (early Monday, normal). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. coin_tracker: DOGE cooled (47.7, was 54.6 — accumulation fading). Top: JUP 55.6, ALT 55.0. KEY FINDING: 48h R:R flipped POSITIVE 1.52:1 (PM_TRAIL +$1.55 vs ATR_SL -$1.02) — structural improvement.
+**Current status:** System STRONG — 24h 18T -$0.04, 55.6% WR (flat Monday, within variance). 48h: 58T +$0.48, 60.3% WR (healthy, R:R POSITIVE 1.68:1). 7d: 401T -$2.08, 50.4% WR (improving). PM_TRAIL DOMINANT: 40T/48h +$1.55, 87.5% WR (carrying system). ATR_SL 16T/48h -$0.92, 0% WR (8/day average, within 15/day target, historic low). 1 open position. 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 18T -$0.04, 55.6% WR (Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL (102 tokens) / 2 SHORT_BIAS (HEMI, POL). Coin tracker: DOGE in accumulation (48.8 composite, fading). Top: ZRO 58.9, ZORA 55.4, CASHCAT 54.0. SHORT side structural weakness: 154T/7d -$1.14, 48.7% WR. KEY FINDING: 48h R:R improved to 1.68:1 (PM_TRAIL +$1.55 vs ATR_SL -$0.92).
 
 ## Active Decisions
 
@@ -40,9 +40,9 @@
 
 ## Next Actions
 
-1. **Monitor PM_TRAIL edge.** 207T/7d 88.4% WR +$8.09, 40T/48h 87.5% WR +$1.55. Must hold >80% WR. — 2026-08-18
-2. **Monitor ATR_SL count.** 18T/48h (historic low, within 15/day target). Must stay <15/day. — 2026-08-18
-3. **Monitor 48h R:R.** Flipped POSITIVE 1.52:1 (PM_TRAIL +$1.55 vs ATR_SL -$1.02). Must stay >1:1. — 2026-08-18
-4. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-18
+1. **Monitor PM_TRAIL edge.** 40T/48h 87.5% WR +$1.55. Must hold >80% WR. — 2026-08-18
+2. **Monitor ATR_SL count.** 16T/48h (8/day average, within 15/day target). Must stay <15/day. — 2026-08-18
+3. **Monitor 48h R:R.** Improved to 1.68:1 (PM_TRAIL +$1.55 vs ATR_SL -$0.92). Must stay >1:1. — 2026-08-18
+4. **SHORT side signals.** 154T/7d -$1.14, 48.7% WR. All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-18
 5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-18
-6. **DOGE monitoring.** DOGE cooled to 47.7 (was 54.6, accumulation fading). Not actionable now. — 2026-08-18
+6. **DOGE monitoring.** DOGE in accumulation (48.8 composite, fading from 54.6). Not actionable now. — 2026-08-18

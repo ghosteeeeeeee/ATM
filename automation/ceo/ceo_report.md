@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-18 (107th run, ~14:30 UTC)
+## CEO Report — 2026-08-18 (108th run, ~14:50 UTC)
 
 ### Diagnosis
-System STRONG — no changes needed. Verified DB: 24h 19T -$0.01, 57.9% WR (flat Monday, within variance). 48h: 60T +$0.38, 58.3% WR (healthy, R:R POSITIVE 1.52:1). 7d: 401T -$2.08, 50.4% WR (improving). PM_TRAIL DOMINANT: 207T/7d 88.4% WR +$8.09, 40T/48h 87.5% WR +$1.55 (carrying system). ATR_SL 159T/7d 0.6% WR -$10.83, 18T/48h 0% WR -$1.02 (historic low, R:R improving). 1 open position. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 6T -$0.13, 50% WR (early Monday, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. coin_tracker: DOGE cooled (47.7, was 54.6 — accumulation fading). Top: JUP 55.6, ALT 55.0.
+System STRONG — no changes needed. Verified DB: 24h 18T -$0.04, 55.6% WR (flat Monday, within variance). 48h: 58T +$0.48, 60.3% WR (healthy, R:R POSITIVE 1.68:1 — improved from 1.52:1). 7d: 401T -$2.08, 50.4% WR (improving from legacy clearing). PM_TRAIL DOMINANT: 40T/48h +$1.55, 87.5% WR (carrying system). ATR_SL 16T/48h -$0.92, 0% WR (8/day average, within 15/day target, historic low). 1 open position. 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 18T -$0.04, 55.6% WR (Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL (102 tokens) / 2 SHORT_BIAS (HEMI, POL). Coin tracker: DOGE in accumulation (48.8 composite, down from 54.6 — fading). Top: ZRO 58.9, ZORA 55.4, CASHCAT 54.0. SHORT side structural weakness: 154T/7d -$1.14, 48.7% WR — needs new SHORT signals.
 
 ### Root Cause
-No root cause needed — system performing as expected. KEY FINDING: 48h R:R flipped POSITIVE 1.52:1 (PM_TRAIL +$1.55 vs ATR_SL -$1.02) — structural improvement. PM_TRAIL edge holding strong (88.4% WR 7d, 87.5% WR 48h). ATR_SL at historic low (6/day). ATR_SL daily trend: 41→28→28→20→18→9→2→6 (7-day declining). SHORT side dead (0T/24h, all legacy signals disabled). System is in a stable, profitable state with improving R:R.
+No root cause needed — system performing as expected. KEY FINDING: 48h R:R improved to 1.68:1 (PM_TRAIL +$1.55 vs ATR_SL -$0.92). PM_TRAIL edge holding strong (87.5% WR 48h). ATR_SL at historic low (8/day average). SHORT side structural weakness: 154T/7d -$1.14, 48.7% WR — all legacy SHORT signals killed, need new SHORT signals for SHORT_BIAS regime. System is in a stable, profitable state with improving R:R. DOGE accumulation fading (48.8 composite, not actionable).
 
 ### Fix Applied
-NO CHANGES — system strong. PM_TRAIL carrying, R:R positive (1.52:1), ATR_SL at historic low (6/day), all legacy losers dead, 0 phantom trades. DOGE accumulation phase fading (47.7, was 54.6) — not actionable.
+NO CHANGES — system strong. PM_TRAIL carrying, R:R positive (1.68:1), ATR_SL at 8/day (historic low), all legacy losers dead, 0 phantom trades, 1 open position.
 
 ### Verification
-DB verified: 24h 19T -$0.01, 57.9% WR. 48h: 60T +$0.38, 58.3% WR. 7d: 401T -$2.08, 50.4% WR. PM_TRAIL 207T/7d 88.4% WR +$8.09. ATR_SL 159T/7d 0.6% WR -$10.83. 1 open position. Aug 17: 34T +$0.37, 58.8% WR. All legacy losers 0T/24h. coin_tracker: DOGE 47.7 (warm, cooled from 54.6). JUP 55.6, ALT 55.0 top composites. R:R positive (1.52:1).
+DB verified: 24h 18T -$0.04, 55.6% WR. 48h: 58T +$0.48, 60.3% WR. 7d: 401T -$2.08, 50.4% WR. PM_TRAIL 40T/48h +$1.55, 87.5% WR. ATR_SL 16T/48h -$0.92, 0% WR. SHORT: 154T/7d -$1.14, 48.7% WR. LONG: 247T/7d -$0.94, 51.4% WR. 1 open position. 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR. All legacy losers 0T/24h. Regime: NEUTRAL (102 tokens) / 2 SHORT_BIAS (HEMI, POL). Coin tracker: DOGE 48.8 (accumulation, fading). ZRO 58.9, ZORA 55.4, CASHCAT 54.0 top composites.
 
 ---
 
