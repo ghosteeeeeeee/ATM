@@ -10474,3 +10474,34 @@ None — system stable, previous fixes settling in.
 **Open Questions:**
 - PUMP pnl_pct shows -92.36% but actual loss is ~0.9% of position — possible pnl_pct calc issue for low-priced tokens. pnl_usdt is correct. Low priority.
 - r2-trend-long3 at 5T/20%WR — monitor next hour, approaching concern threshold
+
+## [2026-08-18 18:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 12T | 50% WR | -$0.19 PnL (-$0.016 avg) | ATR SL 41.7% (borderline)
+
+**24h signal perf:**
+- r2-trend-long4: 1T/100%WR +$0.05
+- bb_bounce+,rs-s32: 1T/100%WR +$0.04
+- r2-trend-long28: 1T/100%WR +$0.02
+- hl_copy_trader,r2-trend-long5: 1T/100%WR +$0.01
+- return_exhaustion_long: 3T/33%WR -$0.08
+- r2-trend-long3: 4T/25%WR -$0.16 (worst)
+- bb_bounce+,hl_copy_trader: 1T/0%WR -$0.07
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- r2-trend-long3: 4T/25%WR but has 1 win
+- return_exhaustion_long: 3T/33%WR but has 1 win
+
+**Open trades:** 4 (ARB, GRASS, XPL, SUSHI) — all ~$11, low exposure
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 41.7% — borderline, 12T sample too small for action
+- No signal crosses auto-kill threshold
+- Trade frequency normal (quiet Monday evening)
+- 4 open trades low exposure
+- System healthy
+
+**Next:** Re-run at 19:03 UTC

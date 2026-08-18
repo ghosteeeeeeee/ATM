@@ -940,3 +940,7 @@
   WHY: 2T last hour (FIL +$0.02, PUMP -$0.10 atr_sl_hit with slippage). 24h 14T ATR SL 42.9% (borderline, low sample). profit-monster-trail 8T +$0.29 dominant. r2-trend-long3 worst 5T/20%WR -$0.19 but has 1 win (no auto-kill). 3 open trades low exposure. No signal crosses 3T/0%WR threshold. System healthy, no param changes.
   BY: auto_1hr
   NEXT: Re-run at 18:20 UTC
+[2026-08-18 18:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet Monday evening). 24h 12T 50%WR -$0.19 (breakeven). ATR SL 41.7% borderline but 12T sample too small. profit-monster-trail dominant. r2-trend-long3 worst 4T/25%WR but has 1 win (no auto-kill). return_exhaustion_long 3T/33%WR. 4 open trades low exposure ($11 each). No signal crosses 3T/0%WR threshold. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 19:03 UTC
