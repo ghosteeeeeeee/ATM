@@ -1,16 +1,16 @@
-## CEO Report — 2026-08-18 (102nd run, ~09:30 UTC)
+## CEO Report — 2026-08-18 (103rd run, ~10:15 UTC)
 
 ### Diagnosis
-System STRONG — no changes needed. Verified DB: 24h 22T -$0.06, 59.1% WR (flat Monday, within variance). 7d: 399T -$1.91, 50.6% WR. PM_TRAIL 207T/7d +$8.04 (DOMINANT — carrying system, 97% of PM exits at 100% WR). ATR_SL 7T/24h (within 15/day target). 2 open positions (r2-trend-long3, return_exhaustion_long — both flat, $0.00 unrealized). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 3T +$0.01, 66.7% WR (early Monday). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL.
+System STRONG — no changes needed. Verified DB: 24h 23T -$0.18, 56.5% WR (flat Monday, within variance). 7d: 399T -$2.06, 50.4% WR. PM_TRAIL 206T/7d +$8.01 (DOMINANT — 88.3% WR, carrying system). profit-monster-T1 12T/7d 100% WR +$0.69. ATR_SL 8T/24h -$0.48 (within 15/day target). 1 open position (WLFI r2-trend-long3 -$0.03). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 4T -$0.11, 50.0% WR (early Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL.
 
 ### Root Cause
-No root cause needed — system performing as expected. PM_TRAIL edge holding at 207T/7d +$8.04. ATR_SL improving (41→7/day over 10 days). 50.6% WR is within normal variance for a mean-reversion system.
+No root cause needed — system performing as expected. PM_TRAIL edge holding at 206T/7d +$8.01 (88.3% WR). ATR_SL 8T/24h (within 15/day target). 50.4% WR is within normal variance. Today's 4T -$0.11 is flat Monday noise — no signal is bleeding beyond auto-kill thresholds.
 
 ### Fix Applied
-NO CHANGES — system strong. PM_TRAIL carrying, ATR_SL at 7/day (within target), all legacy losers dead, 0 phantom trades.
+NO CHANGES — system strong. PM_TRAIL carrying, ATR_SL at 8/day (within target), all legacy losers dead, 0 phantom trades.
 
 ### Verification
-DB verified: 24h 22T -$0.06, 59.1% WR. 7d: 399T -$1.91, 50.6% WR. PM_TRAIL 207T/7d +$8.04. ATR_SL 7T/24h. 2 open positions (flat). All legacy losers 0T/24h.
+DB verified: 24h 23T -$0.18, 56.5% WR. 7d: 399T -$2.06, 50.4% WR. PM_TRAIL 206T/7d +$8.01 (88.3% WR). profit-monster-T1 12T/7d 100% WR +$0.69. ATR_SL 8T/24h -$0.48. 1 open (WLFI -$0.03). Aug 17: 34T +$0.37, 58.8% WR. All legacy losers 0T/24h.
 
 ---
 

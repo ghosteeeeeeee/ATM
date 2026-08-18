@@ -10222,3 +10222,28 @@ None — system stable, previous fixes settling in.
 - 48h PnL positive (+$0.50)
 
 **Open Questions:** Volume expected to pick up Monday UTC daytime
+
+## [2026-08-18 10:03 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+- HYPE: +$0.01 (profit-monster-trail) ✅
+- CC: -$0.12 (atr_sl_hit) ❌ return_exhaustion_long
+
+**24h:** 23T | 56.5% WR | -$0.18 | ATR SL 34.8%
+- profit-monster-trail: 14T +$0.45 (dominant, healthy)
+- atr_sl_hit: 8T -$0.48 (dominant loss source but <40%)
+
+**Signal perf (24h):**
+- return_exhaustion_long: 4T/25%WR -$0.23 (worst, has 1 win)
+- r2-trend-long3: 5T/40%WR -$0.11 (mild drag, 2 wins)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 34.8% — below 40% threshold
+- No signal crosses 3T/0%WR auto-kill
+- 1 open trade (WLFI) — low exposure
+- Trade frequency 2/hr — normal
+
+**Open Questions:** None
