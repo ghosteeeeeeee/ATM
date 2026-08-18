@@ -10580,3 +10580,37 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - If ATR SL persists >50% next hour with 6+ trades, will bump ATR_K_HIGH_VOL
+
+## [2026-08-18 22:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+- ENA: +$0.02 (profit-monster-trail)
+- INJ: +$0.07 (profit-monster-trail)
+
+**24h:** 15T | 46.7% WR | -$0.37 PnL
+- profit-monster-trail: 7T/100%WR +$0.26 (healthy)
+- atr_sl_hit: 8T/0%WR -$0.64 (dominant loser)
+
+**Signal breakdown (24h, >=2T):**
+- r2-trend-long3: 4T/25%WR -$0.16 (75% ATR SL)
+- r2-trend-long4: 2T/50%WR -$0.06 (50% ATR SL)
+- return_exhaustion_long: 2T/0%WR -$0.21 → KILLED last hour
+
+**ATR SL rate:** 53.3% (8/15) — above 40% threshold but:
+- Last hour broke streak (0/2 ATR SL)
+- ATR_SL_MAX already widened Aug 16
+- 15T sample still small
+- No consecutive negative hours
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 53% in 24h — last hour 0% ATR SL, trend improving
+- r2-trend-long3 at 4T/25%WR — has 1 win, not auto-kill
+- Trade frequency: 2/hr normal
+- 2 open trades low exposure
+- return_exhaustion_long already killed last hour
+
+**Watch Next Hour:**
+- ATR SL rate — if persists >50% with 8+ trades, will reconsider params
+- r2-trend-long3 — monitor for further losses toward auto-kill

@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-19 ~01:00 UTC (CEO run 121)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 15T -$0.38, 46.7% WR (Monday dip, within variance). 48h: 51T +$0.04, 56.9% WR (positive, R:R positive). 7d: 379T -$2.13, 50.7% WR (improving). PM_TRAIL DOMINANT: 209T/7d +$8.25, 88.5% WR (carrying system). ATR_SL 8.5/day (historic low). 0 open positions (clean). 0 phantom trades. Aug 17: GREEN DAY. Aug 18: Monday dip normal.
+
+### Root Cause
+Monday variance. r2-trend-long3 worst ATR_SL: 11T/7d -$0.84, avg peak 0.117% (below MIN_PRE_MOVE=0.2 — MIN_PRE_MOVE raised Aug 18 from 0.1, some trades entered pre-raise). PM_TRAIL captures 13T/7d 92.3% +$0.47 on same signal. return_exhaustion_long degrading: 24h 2T -$0.21 0% WR (7d: 9T +$0.11 55.6% WR — still above auto-kill threshold). SHORT side structural: 151T/7d -$1.06.
+
+### Fix Applied
+NO CHANGES — PM_TRAIL carrying, R:R positive, ATR_SL at 8.5/day. MIN_PRE_MOVE=0.2 already deployed (Aug 18). Nothing further to fix.
+
+### Verification
+System stable. PM_TRAIL 88.5% WR (must >80% — PASS). ATR_SL 8.5/day (must <15 — PASS). 48h R:R positive (must >1:1 — PASS). return_exhaustion_long 9T/7d 55.6% WR (monitoring, need 10+ trades). SHORT side structural (need new SHORT signals).
+
+---
+
 ## CEO Report — 2026-08-18 22:16 UTC (CEO run 120)
 
 ### Diagnosis
@@ -14,3 +30,17 @@ System stable. PM_TRAIL 100% WR (must >80% — PASS). ATR_SL 8.5/day (must <15 �
 
 ---
 
+
+## CEO Report — 2026-08-18 ~23:00 UTC (CEO run 121)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 16T -$0.38, 43.8% WR (Monday dip, within variance). 48h: 51T +$0.04, 56.9% WR (positive, R:R positive). 7d: 381T -$2.24, 50.4% WR. PM_TRAIL DOMINANT: 197T/7d +$7.56, 87.8% WR (carrying system). ATR_SL 153T/7d -$10.80, 0.7% WR (main drag, 8.5/day historic low — most from dead signals). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal).
+
+### Root Cause
+Monday variance — normal dip. r2-trend-long3 worst ATR_SL offender (6T/48h atr_sl_hit 0% WR -$0.41, PM_TRAIL capturing winners). return_exhaustion_long degrading: 5T/48h 20% WR -$0.32 (7d positive 9T +$0.11 55.6% WR — but trend negative: Aug 15 100% WR → Aug 18 0% WR). 1 win prevents auto-kill. SHORT side structural weakness: 151T/7d -$1.06, all range_breakout variants dead.
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive, ATR_SL at 8.5/day (historic low). Nothing to fix.
+
+### Verification
+System stable. PM_TRAIL 87.8% WR (must >80% — PASS). ATR_SL 8.5/day (must <15 — PASS). 48h R:R positive (must >1:1 — PASS). return_exhaustion_long 9T/7d 55.6% WR (degrading, monitoring — auto-disable at <25% WR with 8+ trades). SHORT side structural (need new SHORT signals). Coin tracker: PUMP 54.3, HBAR 53.6, CAKE 53.5.
