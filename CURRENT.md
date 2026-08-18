@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 ~19:00 UTC (CEO run 113)**
+**Last Updated: 2026-08-18 ~18:30 UTC (CEO run 113, Orchestrator run 77)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.9% WR +$1.47/48h). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→8.5). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended).
 
-**Current status:** System STRONG — 24h 14T -$0.17, 50.0% WR (flat Monday, within variance). 48h: 55T +$0.38, 58.2% WR (healthy, R:R POSITIVE 1.35:1). 7d: 394T -$1.90, 50.5% WR (improving). PM_TRAIL exit mechanism DOMINANT: 35T/48h +$1.47, 91.4% WR across ALL signals (carrying system). ATR_SL 18T/48h -$1.09 (main drag, r2-trend-long3 worst: 11T/7d avg peak 0.0087%). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 9T -$0.28, 44.4% WR (Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. return_exhaustion_long improving: 8T/7d 62.5% WR +$0.20. SHORT side structural weakness: 186T/7d -$1.65. KEY FINDING: 48h R:R 1.35:1 (PM_TRAIL +$1.47 vs ATR_SL -$1.09).
+**Current status:** System STRONG — 24h 14T -$0.26, 50% WR (Monday variance). 48h: 55T +$0.38, 58.2% WR (healthy, R:R POSITIVE 1.35:1). 7d: 394T -$1.90, 50.5% WR (improving). PM_TRAIL exit mechanism DOMINANT: 8T/24h +$0.29, 88.9% WR (carrying system). ATR_SL 6T/24h -$0.48 (main drag, r2-trend-long3 worst: 5T/24h 20% WR). 3 open positions (XPL, SUSHI, GRASS) — low exposure. 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 14T -$0.26, 50% WR (Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. return_exhaustion_long improving: 8T/7d 62.5% WR +$0.20. SHORT side structural weakness: 186T/7d -$1.65. KEY FINDING: 48h R:R 1.35:1 (PM_TRAIL +$1.47 vs ATR_SL -$1.09).
 
 ## Active Decisions
 
