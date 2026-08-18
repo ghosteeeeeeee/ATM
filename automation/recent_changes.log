@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-17 11:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (XPL r2-trend-long3 ATR_SL -$0.10). 24h 18T -$0.04 (38.9% SL hit rate, below 40% threshold). PM_TRAIL revert effective — 11T +$0.39. No 0% WR signals with 3+ trades in last hour. No kill candidates. Trade freq 0.8/hr low but market-driven. System healthy, within normal params.
+  BY: auto_1hr
+  NO CHANGES — PM_TRAIL working, no kill candidates, system healthy.
+
 [2026-08-17 10:00 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (1W 1L, -$0.03). 24h 37T +$0.57 (27% SL hit rate, well below 40% threshold). PM_TRAIL revert effective — ATR SL dropped from 40% to 27%. No 0% WR signals with 3+ trades in last hour. No kill candidates. Trade freq 3/hr normal. 2 open positions (ZEN LONG, APT SHORT). System healthy.
   BY: auto_1hr

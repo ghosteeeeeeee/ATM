@@ -1,5 +1,39 @@
 # Trading Log — Learnings & Decisions
 
+## 2026-08-17 11:00 UTC — Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.10 (0% WR)
+
+**24h Snapshot:**
+- 18 trades total: profit-monster-trail 11T +$0.39, atr_sl_hit 7T -$0.43
+- ATR SL hit rate: 38.9% ✅ (below 40% threshold)
+- 24h net PnL: -$0.04 (nearly flat)
+
+**Hourly:** 1T (XPL r2-trend-long3 LONG ATR_SL -$0.10). Low frequency 0.8/hr.
+
+**Signal Performance (24h):**
+- ✅ r2-trend-long4: 2T 100% WR +$0.10
+- ✅ bb_bounce+,hl_copy_trader: 1T 100% WR +$0.05
+- ⚠️ r2-trend-long3: 4T 25% WR -$0.09 (below kill threshold — not 0% WR)
+- ⚠️ return_exhaustion_long: 3T 33.3% WR -$0.08 (below kill threshold)
+
+**Open:** 1 position open.
+
+**Changes:** None — system within normal parameters, PM_TRAIL revert effective (38.9% SL hit rate vs 40% threshold).
+
+**No Change Needed:**
+- ATR SL hit rate 38.9% — below threshold, trending down
+- PM_TRAIL 11T +$0.39 compensating losses
+- No 0% WR signals with 3+ trades — no kill candidates
+- Trade frequency low (0.8/hr) but market-driven, not actionable
+
+**Open Questions:**
+- Low trade frequency (0.8/hr vs normal 2-3/hr) — market context gate filtering aggressively in current regime
+- r2-trend-long3 persistent underperformer (4T 25% WR) but doesn't meet kill threshold
+
+---
+
 ## 2026-08-17 10:00 UTC — Hourly Analysis
 
 **Trades:** 2 closed (1 win, 1 loss)
