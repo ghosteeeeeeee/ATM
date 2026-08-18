@@ -109,3 +109,8 @@ AUTO-FIXES APPLIED:
 
 ALERTS:
 - alerts.json has stale WARNING from ~18:40 UTC about low signal count (since resolved — 65K signals/hour now)
+
+## Error Alerts — 2026-08-18 08:19 UTC
+- **[WARN]** (Nx): `43% tokens stale (102/239)` — price data may be lagging for many tokens
+- **[WARN]** (Nx): `6 services FAILED` — hermes-better-coder, hermes-bug-hunter, hermes-hl-volume, hermes-mtf-macd-tuner, hermes-trading-checklist, hermes-wasp (all non-critical, Restart=no)
+- **[INFO]**: Pipeline running, 2/4 positions open, -1.48% PnL today, CHIP hotset signal at 75% confidence

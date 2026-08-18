@@ -903,3 +903,7 @@
   WHY: 0T last hour (quiet Monday UTC morning). 24h 24T 37.5% ATR SL (below 40%). profit-monster-trail 58.3% dominant. No signal crossing 3T/0%WR auto-kill. r2-trend-long3 6T/33.3%WR (2 wins, not 0%). return_exhaustion_long 3T/33.3%WR (1 win, not 0%). range_breakout_short 2T/0%WR (only 2T, already killed). 2 open trades low exposure. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 09:03 UTC
+[2026-08-18 09:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet Monday UTC morning). 24h 23T ATR SL 34.8% (below 40%). profit-monster-trail 60.9% dominant. 48h 58T 58%WR +$0.50 (healthy). No signal crossing 3T/0%WR auto-kill threshold. range_breakout_short already killed. 3 open trades low exposure. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 10:03 UTC

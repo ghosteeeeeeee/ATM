@@ -10198,3 +10198,27 @@ None — system stable, previous fixes settling in.
 - System healthy, no action
 
 **Open Questions:** Volume expected to pick up Monday UTC daytime
+
+## [2026-08-18 09:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet Monday UTC morning)
+**24h:** 23T | ATR SL 34.8% (below 40%) | profit-monster-trail 60.9% dominant
+**48h:** 58T | 58% WR | +$0.50 | ATR SL 29% (healthy)
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- range_breakout_short: 2T/0%WR (already killed, only 2T)
+- return_exhaustion_long: 3T/33%WR (has 1 win)
+- r2-trend-long3: 5T/40%WR (has 2 wins)
+
+**Open trades (3):** WLFI (r2-trend-long3), CC (return_exhaustion_long), HYPE (hl_copy_trader+r2-trend-long5)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 34.8% — well below 40% threshold
+- Trade frequency 0/hr — normal quiet period
+- No signal crosses auto-kill threshold
+- 3 open trades — low exposure
+- 48h PnL positive (+$0.50)
+
+**Open Questions:** Volume expected to pick up Monday UTC daytime
