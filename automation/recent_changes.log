@@ -915,3 +915,7 @@
   WHY: 0T last hour (quiet Monday UTC morning). 24h 22T ~52%WR ATR SL 33.3% (healthy). profit-monster-trail dominant (13T +$0.42). No signal crossing 3T/0%WR auto-kill threshold. r2-trend-long14 1T/0%WR -$0.04 (only 1 trade). bb_bounce+,rs-s97 1T/0%WR -$0.04 (only 1 trade). return_exhaustion_long 3T/33.3%WR (has 1 win). 1 open trade (WLFI) low exposure. System healthy. No param changes.
   BY: auto_1hr
   NEXT: Re-run at 13:03 UTC
+[2026-08-18 13:03] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1 win WLFI +$0.08). 24h 22T 33.3% ATR SL (healthy). profit-monster-trail dominant (12T +$0.42). return_exhaustion_long 3T/0%WR over 24h worst performer but only 1T in last hour — no auto-kill trigger. No signal crosses 3T/0%WR last-hour threshold. 1 open trade low exposure. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 14:03 UTC

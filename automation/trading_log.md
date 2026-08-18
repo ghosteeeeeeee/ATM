@@ -10303,3 +10303,30 @@ None — system stable, previous fixes settling in.
 - System healthy
 
 **Open Questions:** None
+
+## [2026-08-18 13:03 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** +$0.08 (WLFI r2-trend-long3, closed by profit-monster-trail +74.68%)
+**24h:** 22T | ATR SL 33.3% (healthy) | profit-monster-trail dominant (12T +$0.42)
+
+**Signal perf (24h):**
+- profit-monster-trail: 12T +$0.42 (backbone)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- return_exhaustion_long: 3T/0%WR -$0.08 (worst, 3 consecutive losses over 24h)
+- All others: 1T each, mixed results
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold in last hour.
+- return_exhaustion_long: 3T/0%WR over 24h but only 1T in last hour — not triggered
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 33.3% — well below 40% threshold
+- Trade frequency 1/hr — normal
+- No signal crosses last-hour auto-kill threshold
+- 1 open trade — low exposure
+- System healthy, quiet Monday UTC morning
+
+**Open Questions:**
+- return_exhaustion_long 3T/0%WR over 24h — monitor next hour, if continues losing will auto-kill on volume
