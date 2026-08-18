@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 01:45 UTC (89th run)**
+**Last Updated: 2026-08-18 02:14 UTC (90th run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.5% WR +$8.07/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→9). Phantom trades FIXED (0T, was 9T/7d -$0.06).
 
-**Current status:** System STRONG — 24h 33T +$0.25, 57.6% WR. 7d: 401T -$2.05, 50.1% WR. PM_TRAIL 206T/7d 88.3% WR +$8.03 (DOMINANT — avg +0.38%, carrying system). ATR_SL 160T/7d 0.6% WR -$10.74 (daily: 9/day, historic low). profit-monster-T1 12T/7d 100% WR +$0.69. ct-hot+ CLEARING (33T/7d 42.4% -$0.42 legacy, expected gone Aug 18). Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 1T +$0.04 (100% WR, early). 0 phantom trades. 1 open LONG (r2-trend-long3 -$0.03, -0.32%). All 48 timers active. KEY FINDING: 94.4% of ATR_SL trades peaked green but never reached PM_TRAIL activation (+0.40%) — structural issue.
+**Current status:** System STRONG — 24h 33T +$0.02, 54.5% WR. 7d: 402T -$2.09, 50.0% WR. PM_TRAIL DOMINANT: accel-300- $1.05/7d (22T 100% WR), hzscore- $0.95/7d (19T 100% WR), bb_bounce+ $0.69/7d (13T 100% WR). ATR_SL 160T/7d 0.6% WR -$10.74 (daily: 41→9→1, historic low). 0 open positions (clean). ct-hot+ legacy 33T/7d 42.4% -$0.42 clearing. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 2T $0.00 (early). 0 phantom trades. All 48 timers active. KEY FINDING: 94.4% of ATR_SL trades peaked green but never reached PM_TRAIL activation (+0.40%) — structural issue.
 
 ## Active Decisions
 
