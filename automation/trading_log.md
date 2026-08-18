@@ -10364,3 +10364,31 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - return_exhaustion_long 3T/0%WR over 24h — monitor next hour, if continues losing will auto-kill on volume
+
+## [2026-08-18 14:03 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.07 (HYPE bb_bounce+,hl_copy_trader, atr_sl_hit)
+**24h:** 19T | ATR SL 42.1% (borderline) | profit-monster-trail dominant (11T +$0.39)
+
+**Signal perf (24h):**
+- profit-monster-trail: 11T +$0.39 (backbone)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- r2-trend-long3: 4T/25%WR -$0.09 (worst, but has 1 win)
+- return_exhaustion_long: 3T/33%WR -$0.08
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- r2-trend-long3: 4T/25%WR (has1 win)
+- return_exhaustion_long: 3T/33%WR (has1 win)
+- All others: 1-2T only
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 42.1% — borderline but within noise for 19 trades, tpsl_utils.py comprehensive
+- Trade frequency 1/hr — normal
+- No signal crosses auto-kill threshold
+- 0 open trades — fully flat
+- System healthy
+
+**Open Questions:** None
