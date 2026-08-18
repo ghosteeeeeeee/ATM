@@ -10392,3 +10392,57 @@ None — system stable, previous fixes settling in.
 - System healthy
 
 **Open Questions:** None
+
+## [2026-08-18 15:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+**24h:** 16T | 50% WR | ATR SL 37.5% (healthy) | profit-monster-trail dominant (10T +$0.36)
+
+**Signal perf (24h):**
+- profit-monster-trail: 10T +$0.36 (backbone)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- r2-trend-long3: 4T/25%WR -$0.09 (worst, has 1 win)
+- return_exhaustion_long: 3T/33%WR -$0.08
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- r2-trend-long3: 4T/25%WR (has 1 win)
+- return_exhaustion_long: 3T/33%WR (has 1 win)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 37.5% — below 40% threshold
+- Trade frequency ~1/hr — normal
+- No signal crosses auto-kill threshold
+- 1 open trade — low exposure
+- System healthy, quiet Monday afternoon
+
+**Open Questions:** None
+
+## [2026-08-18 16:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+**24h:** 13 closed | ATR SL 38.5% (healthy) | profit-monster-trail dominant (8T +$0.29)
+
+**Signal perf (24h):**
+- profit-monster-trail: 8T +$0.29 (backbone)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- return_exhaustion_long: 3T/33%WR -$0.08 (has 1 win)
+- r2-trend-long3: 4T/25%WR -$0.09 (has 1 win)
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- r2-trend-long3: 4T but 1 win
+- return_exhaustion_long: 3T but 1 win
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 38.5% — below 40% threshold
+- Trade frequency — quiet Monday afternoon
+- No signal crosses auto-kill threshold
+- 3 open trades — low exposure
+- System healthy
+
+**Open Questions:** None

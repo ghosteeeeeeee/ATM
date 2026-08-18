@@ -928,3 +928,11 @@
   WHY: 1T last hour (HYPE atr_sl_hit -$0.07). 24h 19T ATR SL 42.1% (borderline, within noise). profit-monster-trail 11T/57.9% dominant. r2-trend-long3 worst 4T/25%WR but has 1 win (not auto-kill). No signal crosses 3T/0%WR threshold. 0 open trades flat. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 15:03 UTC
+[2026-08-18 15:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet Monday afternoon). 24h 16T 50%WR -$0.06 (breakeven). ATR SL 37.5% (healthy). profit-monster-trail 10T +$0.36 dominant. r2-trend-long3 worst 4T/25%WR -$0.09 but has 1 win (not auto-kill). return_exhaustion_long 3T/33%WR. 1 open trade low exposure. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 16:03 UTC
+[2026-08-18 16:03] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet Monday afternoon). 24h 13T ATR SL 38.5% (healthy). profit-monster-trail 8T +$0.29 dominant. r2-trend-long3 worst 4T/25%WR but has 1 win (not auto-kill). return_exhaustion_long 3T/33%WR. 3 open trades low exposure. System healthy. No param changes.
+  BY: auto_1hr
+  NEXT: Re-run at 17:03 UTC
