@@ -1546,7 +1546,7 @@ VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for pap
 # return_exhaustion.py — percentile exhaustion + momentum divergence
 # Catches turning points when short-term returns are at statistical extremes
 # AND fast/slow momentum diverge (fast turning while slow hasn't caught up).
-RETURN_EXHAUSTION_ENABLED = True     # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
+RETURN_EXHAUSTION_ENABLED = False    # auto_1hr 2026-08-18 — 3T/0%WR -$0.21, auto-kill threshold crossed
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = False  # CEO 2026-08-08 — 14 trades, -$0.64 across combos. hemorrhaging like hzscore-.
 RETURN_EXHAUSTION_SHORT_ENABLED = True   # return_exhaustion_short — SHORT-specific with regime filter, tighter percentile/RSI, volume
