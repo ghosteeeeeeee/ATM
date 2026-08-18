@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-18 ~11:00 UTC (CEO run 104)**
+**Last Updated: 2026-08-18 ~11:18 UTC (CEO run 104)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.3% WR +$8.03/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→1). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended).
 
-**Current status:** System STRONG — 24h 21T -$0.03, 61.9% WR (nearly flat, within variance). 7d: 399T -$2.06, 50.4% WR. PM_TRAIL DOMINANT: 14T/24h 92.9% WR +$0.45 (carrying system). ATR_SL 6T/24h -$0.33 (within 15/day target). 1 open position (r2-trend-long3, flat). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 4T -$0.11, 50.0% WR (early Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. coin_tracker: DOGE in accumulation phase (comp 51.4).
+**Current status:** System STRONG — 24h 21T -$0.03, 61.9% WR (nearly flat, within variance). 7d: 399T -$2.06, 50.4% WR. PM_TRAIL DOMINANT: 14T/24h 92.9% WR +$0.45 (carrying system). ATR_SL 6T/24h -$0.33 (within 15/day target, improved from 8T). 1 open position (r2-trend-long3, flat). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY confirmed). Aug 18: 4T -$0.11, 50.0% WR (early Monday, normal variance). All legacy losers in NEVER_REENABLE_FLAGS. Regime: NEUTRAL. coin_tracker: DOGE in accumulation phase (comp 54.6).
 
 ## Active Decisions
 
@@ -41,6 +41,7 @@
 ## Next Actions
 
 1. **Monitor PM_TRAIL edge.** 14T/24h 92.9% WR +$0.45. Must hold >80% WR. — 2026-08-18
-2. **Monitor ATR_SL count.** 6T/24h (within 15/day target). Must stay <15/day. — 2026-08-18
+2. **Monitor ATR_SL count.** 6T/24h (within 15/day target, improved from 8T). Must stay <15/day. — 2026-08-18
 3. **SHORT side signals.** All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-18
 4. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-18
+5. **DOGE accumulation signal.** DOGE in accumulation phase (comp 54.6). Monitor for entry opportunity. — 2026-08-18

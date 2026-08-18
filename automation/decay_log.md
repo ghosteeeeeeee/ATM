@@ -543,3 +543,7 @@
 [2026-08-18 05:07 UTC]   🟢 r2-trend-long4: 3 trades, 66.7% WR, PnL=0.58
 [2026-08-18 05:07 UTC]   🟢 return_exhaustion_long: 3 trades, 66.7% WR, PnL=-0.73
 [2026-08-18 05:07 UTC] Done. Disabled 0 signals.
+[2026-08-18 11:07 UTC] === Signal Decay Detector ===
+[2026-08-18 11:07 UTC]   🟢 r2-trend-long3: 4 trades, 50.0% WR, PnL=-0.11
+[2026-08-18 11:07 UTC]   🟢 return_exhaustion_long: 4 trades, 50.0% WR, PnL=-1.79
+[2026-08-18 11:07 UTC] Done. Disabled 0 signals.

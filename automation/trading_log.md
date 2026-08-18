@@ -10247,3 +10247,31 @@ None — system stable, previous fixes settling in.
 - Trade frequency 2/hr — normal
 
 **Open Questions:** None
+
+## [2026-08-18 11:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet Monday UTC morning)
+**24h:** 21T | 61.9% WR | -$0.03 (breakeven) | ATR SL 28.6% (healthy)
+
+**Signal performance (24h):**
+- profit-monster-trail: 14T dominant, +$0.45 (system backbone)
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- return_exhaustion_long: 4T/25%WR -$0.23 (worst, has 1 win)
+- atr_sl_hit: 6T -$0.33 (loss source but <40% threshold)
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- return_exhaustion_long: 4T/25%WR (has 1 win, not 0%)
+- r2-trend-long3: 4T/50%WR (has 2 wins)
+
+**Open trades (1):** WLFI (r2-trend-long3) — low exposure
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 28.6% — well below 40% threshold
+- Trade frequency 0/hr — normal quiet period
+- No signal crosses auto-kill threshold
+- 1 open trade — low exposure
+- 24h essentially breakeven (-$0.03)
+
+**Open Questions:** None
