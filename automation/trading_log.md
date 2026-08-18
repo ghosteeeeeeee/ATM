@@ -10446,3 +10446,31 @@ None — system stable, previous fixes settling in.
 - System healthy
 
 **Open Questions:** None
+
+## [2026-08-18 17:20 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss)
+**PnL:** -$0.08 (FIL +$0.02, PUMP -$0.10)
+**24h:** 14T | 50% WR | ATR SL 42.9% (borderline) | profit-monster-trail dominant (8T +$0.29)
+
+**Signal perf (24h):**
+- r2-trend-long4: 2T/100%WR +$0.10 (best)
+- r2-trend-long3: 5T/20%WR -$0.19 (worst, has 1 win — no auto-kill)
+- return_exhaustion_long: 3T/33%WR -$0.08
+
+**Auto-kill check:** No signal crosses 3T/0%WR threshold.
+- r2-trend-long3: 5T/20%WR but has 1 win
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR SL 42.9% — borderline above 40%, low sample (14T/24h), high hourly variance
+- No signal crosses auto-kill threshold (3T/0%WR)
+- r2-trend-long3 worst at 5T/20% but has 1 win
+- 3 open trades — low exposure, all slightly negative
+- Trade frequency normal (2/hr)
+- PUMP exit slippage $0.002788 vs SL $0.002792 — acceptable
+
+**Open Questions:**
+- PUMP pnl_pct shows -92.36% but actual loss is ~0.9% of position — possible pnl_pct calc issue for low-priced tokens. pnl_usdt is correct. Low priority.
+- r2-trend-long3 at 5T/20%WR — monitor next hour, approaching concern threshold
