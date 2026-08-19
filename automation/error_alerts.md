@@ -114,3 +114,11 @@ ALERTS:
 - **[WARN]** (Nx): `43% tokens stale (102/239)` — price data may be lagging for many tokens
 - **[WARN]** (Nx): `6 services FAILED` — hermes-better-coder, hermes-bug-hunter, hermes-hl-volume, hermes-mtf-macd-tuner, hermes-trading-checklist, hermes-wasp (all non-critical, Restart=no)
 - **[INFO]**: Pipeline running, 2/4 positions open, -1.48% PnL today, CHIP hotset signal at 75% confidence
+
+## Health Report — 2026-08-19 00:19 UTC
+- **STATUS**: ALL OK
+- Pipeline: running, 60 cycles/hour, 0 errors
+- Signals: 65/hour, market fully NEUTRAL (104 tokens)
+- Trades: 0 open, 0 closed today, 14 closed 24h (-$0.42)
+- System: 37 timers active, disk 76%, services active
+- Auto-fixes: none needed
