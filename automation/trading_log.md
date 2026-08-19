@@ -10661,3 +10661,32 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - ATR SL rate if new trades occur
 - AVAX open trade resolution
+
+## [2026-08-19 02:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+**Open:** 2 (AVAX +$0.05 45%, WLFI +$0.02 16.5%)
+
+**24h:** 13T | 46.2% WR | -$0.38 PnL
+- profit-monster-trail: 6T +$0.22 (dominant winner)
+- atr_sl_hit: 7T -$0.60 (dominant loser, 54%)
+
+**Signal breakdown (24h, >=2T):**
+- return_exhaustion_long: 2T/0%WR -$0.21 → KILLED (auto_1hr)
+- r2-trend-long3: 3T/33%WR -$0.12 (has 1 win, no auto-kill)
+- r2-trend-long4: 2T/50%WR -$0.06 (breakeven)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour (quiet Tuesday early morning)
+- 2 open trades both slightly positive, low exposure
+- ATR SL 54% persistent but ATR_SL_MAX already widened Aug 16
+- return_exhaustion_long already killed
+- No signal crosses 3T/0%WR auto-kill threshold
+- Trade frequency normal (13/24h)
+
+**Watch Next Hour:**
+- ATR SL rate if new trades occur
+- AVAX and WLFI open trade resolutions
