@@ -122,3 +122,15 @@ ALERTS:
 - Trades: 0 open, 0 closed today, 14 closed 24h (-$0.42)
 - System: 37 timers active, disk 76%, services active
 - Auto-fixes: none needed
+
+## Health Report — 2026-08-19 05:20 UTC
+- **STATUS**: ALL OK
+- Pipeline: running (1-min timer, last cycle 05:18:20, 20s CPU)
+- Signals: 43 generated (1h), 0 approved, 0 hot (>=50%)
+- Hotset: EMPTY — all signals filtered by compaction
+- Trades: 2 open (ICP +0.14%, BIGTIME -0.55%), 15 closed today, -4.19% PnL
+- Market: 1 LONG_BIAS (HEMI) / 0 SHORT / 103 NEUTRAL — flat market
+- Speed: 126/239 tokens >=50% (53%)
+- System: 47 timers active, disk 77%, kill switch ON
+- Auto-fixes: none needed
+- WARN: Hotset empty — no strong setups in neutral-dominated market

@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-19 05:17 UTC
+# Signal Rotation — 2026-08-19 05:27 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,20 +6,21 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | return_exhaustion_long | 86% | 1.214 | 1.214 | ❓ |  |
-| 2 | bb_bounce+,hl_copy_trader | 50% | 0.466 | 0.466 | ✅ |  |
-| 3 | bb_bounce+ | 58% | 0.110 | 0.110 | ✅ |  |
-| 4 | r2-trend-long2 | 59% | 0.087 | 0.087 | ❓ |  |
-| 5 | r2-trend-long4 | 56% | 0.020 | 0.020 | ❓ |  |
-| 6 | r2-trend-long5 | 60% | 0.004 | 0.004 | ❓ |  |
-| 7 | r2-trend-long1 | 57% | -0.076 | -0.076 | ❓ |  |
-| 8 | hzscore- | 54% | -0.113 | -0.113 | ❌ |  |
-| 9 | r2-trend-long3 | 55% | -0.117 | -0.117 | ❓ |  |
-| 10 | hzscore+ | 42% | -0.131 | -0.131 | ❌ |  |
-| 11 | trend_momentum_near_sma+ | 17% | -0.199 | -0.199 | ❌ |  |
-| 12 | range_breakout- | 50% | -0.215 | -0.215 | ❌ |  |
-| 13 | range_finder+ | 33% | -0.259 | -0.259 | ❌ |  |
-| 14 | wave_catcher+ | 43% | -0.283 | -0.283 | ❌ |  |
-| 15 | mover+ | 29% | -0.330 | -0.330 | ❓ |  |
+| 1 | return_exhaustion_long | 67% | 0.409 | 0.409 | ❓ |  |
+| 2 | bb_bounce+,hl_copy_trader | 43% | 0.255 | 0.255 | ✅ |  |
+| 3 | r2-trend-long2 | 59% | 0.087 | 0.087 | ❓ |  |
+| 4 | r2-trend-long5 | 60% | 0.004 | 0.004 | ❓ |  |
+| 5 | r2-trend-long1 | 57% | -0.076 | -0.076 | ❓ |  |
+| 6 | r2-trend-long4 | 55% | -0.083 | -0.083 | ❓ |  |
+| 7 | hzscore- | 55% | -0.095 | -0.095 | ❌ |  |
+| 8 | r2-trend-long3 | 52% | -0.234 | -0.234 | ❓ |  |
+| 9 | range_breakout+ | 17% | -0.256 | -0.256 | ❌ |  |
+| 10 | range_finder+ | 33% | -0.259 | -0.259 | ❌ |  |
+| 11 | bb_bounce+ | 43% | -0.278 | -0.278 | ✅ | DISABLE |
+| 12 | wave_catcher+ | 43% | -0.283 | -0.283 | ❌ |  |
+| 13 | range_breakout- | 44% | -0.293 | -0.293 | ❌ |  |
+| 14 | mover+ | 29% | -0.330 | -0.330 | ❓ |  |
+| 15 | range_breakout_short | 46% | -0.375 | -0.375 | ❌ |  |
 
-## No changes applied
+## Changes Applied
+- **DISABLE**: BB_BOUNCE_PLUS_ENABLED (WR=43%, edge=-0.278, bleeding capital)

@@ -92,7 +92,7 @@ def _read_tracker_data():
             SELECT symbol, health, composite, momentum, setup_score, setup_type, setup_details,
                    clustering_bullish, clustering_bearish, recency,
                    wyckoff_phase, ewave_count, ewave_direction,
-                   trend_quality, trend_direction
+                   trend_quality, trend_direction, regime
             FROM agg_scores
             WHERE setup_score IS NOT NULL
         """).fetchall()
@@ -137,11 +137,13 @@ def detect(token, data):
     trend_dir = data.get('trend_direction') or 'NEUTRAL'
     wyckoff = data.get('wyckoff_phase') or 'none'
 
-    # Primary trigger: health must be hot/ready OR warm with strong momentum
-    is_hot = health in ('hot', 'ready')
-    is_warm_momentum = health == 'warm' and (data.get('momentum') or 0) > 70 and max(clustering_bull, clustering_bear) >= 1
-    
-    if not is_hot and not is_warm_momentum:
+    # Regime gate: skip NEUTRAL (no directional edge — root cause of 42.4% WR)
+    regime = data.get('regime') or 'NEUTRAL'
+    if regime == 'NEUTRAL':
+        return None
+
+    # Primary trigger: health must be hot/ready
+    if health not in ('hot', 'ready'):
         return None
 
     # Must meet minimum composite threshold

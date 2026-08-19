@@ -995,3 +995,7 @@
   WHY: 0T last hour. 1 open ME -$0.04 with proper 1.0% SL. 24h 17T 47%WR -$0.46. ATR SL 53% (9/17) persistent. SL floor bug confirmed across 7d data (145/359 ATR SL hits = 40%). Recent SL distances: 0.32-0.94% — all below ATR_SL_MIN 1.0%. tpsl_utils.py line 509 floor not enforced. ct-hot- already killed (False since Aug 17). No signal crosses auto-kill threshold. Quiet morning.
   BY: auto_1hr
   NEXT: Re-run at 07:04 UTC
+[2026-08-19 07:04] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 1 open ME $0.00 with proper 1.0% SL. 24h 17T 47%WR -$0.46. ATR SL 53% (9/17) persistent. SL floor bug root cause: sl_distance=0.01 (initial SL correct) but final SL at 0.30-0.94% — tightened by MINIMUM SL DISTANCE guard (lines 531-570) overriding eff_sl_pct floor. trailing_activated=False for all. 85% of 7d ATR SL hits below 1.0%. Needs code audit, not safe to patch. No signal crosses auto-kill threshold. Quiet morning.
+  BY: auto_1hr
+  NEXT: Re-run at 08:04 UTC

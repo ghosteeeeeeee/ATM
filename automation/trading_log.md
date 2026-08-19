@@ -10810,3 +10810,50 @@ None — system stable, previous fixes settling in.
 - SL floor enforcement — needs code audit (tpsl_utils.py + position_manager.py)
 - ME trade resolution
 - Trade frequency
+
+## [2026-08-19 07:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet early morning)
+**Open:** 1 (ME r2-trend-long4 $0.00, SL 1.0% from entry — properly protected)
+
+**24h:** 17T | 47% WR | -$0.46
+- atr_sl_hit: 9T -$0.74 (53% of closes, avg -$0.082)
+- profit-monster-trail: 8T +$0.28 (captures winners)
+
+**7d:** 359T | ATR_SL=145 (40%) | PM_Trail=185 (52%) | PnL=-$2.35
+
+**SL Floor Bug — Root Cause Analysis:**
+- `sl_distance` column = 0.01 (1.0%) for ALL ATR SL hits — initial SL correct
+- `trailing_activated = False` — not a trailing issue
+- Actual SL at close: 0.30-0.94% from entry — tightened during tpsl_utils updates
+- 85% of 7d ATR SL hits (120/141) have final SL distance < 1.0%
+- The tightening happens in the MINIMUM SL DISTANCE guard (lines 531-570) which computes new_sl from trail_floor, overriding the eff_sl_pct floor at line 509
+- When highest_price is close to entry, trail_floor can be tighter than ATR_SL_MIN
+
+**Auto-Kill Check:**
+- No signal crosses 3T/0%WR threshold in 24h
+- return_exhaustion_long: 2T/0%WR/$-0.21 — below 3T threshold
+- ct-hot-: already killed (COIN_TRACKER_HOT_MINUS_ENABLED=False)
+- No new signals crossing thresholds
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet early morning
+- No signal crosses auto-kill threshold
+- SL floor bug identified: MINIMUM SL DISTANCE guard overrides eff_sl_pct floor
+  - Needs code audit of tpsl_utils.py lines 531-570 to understand why trail_floor < ATR_SL_MIN
+  - Possible fix: add `new_sl = max(new_sl, entry_f * (1 - ATR_SL_MIN))` after line 544
+  - But this would conflict with trailing logic — needs careful analysis
+  - NOT safe to patch blindly — could break trailing profit capture
+- Trade frequency normal (17/24h)
+
+**Open Questions:**
+- Why does trail_floor < ATR_SL_MIN for these trades? (highest_price close to entry?)
+- Should we add a hard guard: `new_sl = max(new_sl, entry_f * (1 - ATR_SL_MIN))` after line 544?
+- Would this conflict with the trailing gate logic at lines 670-720?
+
+**Watch Next Hour:**
+- SL floor enforcement — needs code audit (tpsl_utils.py lines 531-570)
+- ME trade resolution
+- Trade frequency
