@@ -11078,3 +11078,51 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - Trade activity
 - ATR SL trend
+
+## [2026-08-19 21:07 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.09 (67% WR)
+
+**24h:** 26T | 69.2% WR | +$0.54 | ATR SL: 27% (7/26)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL at 27% — continues decline from 53% baseline
+- Floor bug: 0/7 hits below 1% — appears fixed
+- profit-monster-trail dominant (69% of closes)
+- Trade frequency normal (1.1/hr)
+- All signals profitable or break-even
+- Open positions: 0
+
+**Open Questions:** None
+
+**Watch Next Hour:**
+- Trade activity
+- ATR SL trend
+- Open position accumulation
+
+## [2026-08-19 22:07 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.03 (100% WR)
+
+**24h:** 27T | 70.4% WR | +$0.57 | ATR SL: 22% (6/27) ↓ from 53%
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL at 22% — continued improvement from 53% baseline
+- profit-monster-trail dominant (70% of closes)
+- Trade frequency normal (1.1/hr)
+- 10 of last 12 hourly periods profitable
+- System net positive (+$0.57)
+
+**Open Questions:** None
+
+**Watch Next Hour:**
+- Trade activity
+- ATR SL trend

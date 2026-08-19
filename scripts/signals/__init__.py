@@ -206,9 +206,9 @@ except Exception:
     _r2_rev_run = None
 
 try:
-    from signals.r2_trend_short import run as _r2_trend_run
+    from signals.r2_trend_short import run as _r2_trend_short_run
 except Exception:
-    _r2_trend_run = None
+    _r2_trend_short_run = None
 
 try:
     from signals.r2_trend_long import run as _r2_trend_long_run
@@ -401,7 +401,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'trend_purity',         'enabled': TREND_PURITY_ENABLED,        'run': _trend_purity_run},
     {'name': 'ema9_sma20',           'enabled': EMA9_SMA20_ENABLED,         'run': _ema9_sma20_run},
     {'name': 'r2_rev',               'enabled': R2_REV_ENABLED,             'run': _r2_rev_run},
-    {'name': 'r2_trend_short',        'enabled': R2_TREND_SHORT_ENABLED,      'run': _r2_trend_run},
+    {'name': 'r2_trend_short',        'enabled': R2_TREND_SHORT_ENABLED,      'run': _r2_trend_short_run},
     {'name': 'r2_trend_long',        'enabled': R2_TREND_LONG_ENABLED,      'run': _r2_trend_long_run},
     {'name': 'volume_hl',            'enabled': VOLUME_HL_ENABLED,           'run': _volume_hl_run},
     {'name': 'ma300_candle_confirm', 'enabled': MA300_CANDLE_ENABLED,        'run': _ma300_candle_run},
@@ -538,7 +538,7 @@ def run_all_signals(signal_list=None):
         'ma_cross': 'scan_ma_cross_signals', 'ma_cross_5m': 'scan_ma_cross_5m_signals',
         'hh_hl': 'scan_hh_hl_signals', 'guppy': 'scan_all_tokens',
         'macd_accel': 'scan_macd_accel_signals', 'trend_purity': 'scan',
-        'ema9_sma20': 'scan_ema9_sma20_signals', 'r2_rev': 'run', 'r2_trend': 'run',
+        'ema9_sma20': 'scan_ema9_sma20_signals', 'r2_rev': 'run',
         'volume_hl': 'run', 'ma300_candle_confirm': 'run',
         'atr_compression': 'run',
         'exhaustion': 'run', 'counter_flip': 'run',
