@@ -7,6 +7,11 @@
   BY: CEO run
   DO NOT REVERT — system within normal variance, trajectory positive.
 
+[2026-08-19 ~23:04 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (ADA stop_hunt_reversal_long+ ATR SL hit -$0.15). 24h 25T 72%WR +$0.53. ATR SL 28% (7/25) DOWN from 53% — continued improvement. stop_hunt_reversal_long+ 6T 50%WR -$0.10 borderline but not at kill threshold. No signal crosses 3T/0%WR auto-kill. 0 open positions. System performing well.
+  BY: auto_1hr
+  NEXT: Re-run at 00:07 UTC
+
 [2026-08-19 ~22:00 UTC] auto_1hr: NO CHANGES
   WHY: 0T last hour. 2 open (YGG -$0.04, ETH +$0.03). 24h 17T 50%WR -$0.42. ATR SL 53% (9/17) persistent. PM_TRAIL 8T +$0.33 carrying. SL floor bug root cause: MINIMUM SL DISTANCE guard overrides eff_sl_pct floor — needs code audit, not safe to patch. No signal crosses 3T/0%WR auto-kill. return_exhaustion_long 1T/0%WR below threshold. CEO raised R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3 at ~08:00 — 48h eval active. Quiet morning.
   BY: auto_1hr
