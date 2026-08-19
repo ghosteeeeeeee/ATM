@@ -1,8 +1,24 @@
 # Upgrade Audit Trail
 
-**Last scanned:** 2026-08-18
+**Last scanned:** 2026-08-19
 
 ---
+
+## Plan: conf-filter-plan.md
+- **Date scanned:** 2026-08-19
+- **Core request:** Block confidence >= 90 trades (48.7% WR, -$1.45) + block 01-06 UTC (39.8% WR, -$1.34)
+- **Difficulty:** Level 1
+- **Value:** HIGH — turns losing system into break-even (+$2.22 combined)
+- **Status:** IMPLEMENTED
+- **Reason:** Added CONF_FILTER_MAX=89 and TIME_BLOCK 01-06 UTC to hermes_constants.py. Early-return in _score_signal(). Expected: 326T → 152T, WR 51.8% → 59.2%, PnL -$1.37 → +$0.85.
+
+## Plan: coin_tracker_setup_improvements.md
+- **Date scanned:** 2026-08-19
+- **Core request:** Fix coin_tracker_hot signal (42.4% WR) with regime gate, confirmations, MIN_COMPOSITE raise
+- **Difficulty:** Level 2
+- **Value:** LOW — coin_tracker_hot is KILLED (disabled 2026-08-17), fixes are theoretical
+- **Status:** SKIPPED
+- **Reason:** Signal killed after 42.4% WR. All 3 flags False in NEVER_REENABLE_FLAGS. Fixes only relevant if signal is re-enabled, which requires new testing first.
 
 ## Plan: 2026-08-12_directional-outcome-tracker-spec.md
 - **Date scanned:** 2026-08-18

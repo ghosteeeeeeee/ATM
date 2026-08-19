@@ -10965,3 +10965,40 @@ None — system stable, previous fixes settling in.
 - Trade activity resumption
 - r2-trend-long3 performance
 - ATR SL trend
+
+## [2026-08-19 17:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 35T | 60% WR | +$0.01 | ATR SL: 34% (12/35)
+
+**Today (Aug 19):** 15T | 67% WR | +$0.12
+- profit-monster-trail: 11T +$0.83 (73%)
+- atr_sl_hit: 4T -$0.38 (27%) — DOWN from 53%
+- cut_loser: 1T -$0.11
+
+**Signal Performance (48h):**
+- r2-trend-long4: 8T 75% WR +$0.16 — best performer
+- r2-trend-long3: 6T 33% WR -$0.17 — losing, not at kill threshold
+- return_exhaustion_long: 4T 25% WR -$0.17 — already killed
+
+**SL Floor Bug:** Still active — 9/13 ATR SL hits below ATR_SL_MIN (1.0%)
+- BIGTIME: 0.75%, WLFI: 0.43%, XPL: 0.32%, HYPE: 0.30%, BANANA: 0.41%
+
+**Open Position:** ENA LONG $11, SL at 0.08904 (proper 1.0%), TP at 0.09184
+
+**Changes:** None needed
+**No Change Needed:**
+- 0 trades this hour — quiet period
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL declining (53%→34%) — improvement continuing
+- System net positive today (+$0.12)
+- Trade frequency normal
+
+**Open Questions:**
+- SL floor bug persists — needs code audit of tpsl_utils.py before patching
+- r2-trend-long3 at 6T 33% WR — one more loss triggers review
+
+**Watch Next Hour:**
+- Trade activity resumption
+- r2-trend-long3 performance
+- ATR SL trend

@@ -721,6 +721,22 @@ TIDE_SHORT_WR_THRESHOLD_LOW = 45
 VOL_FLOOR_ENABLED = True
 VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30% killed every signal in NEUTRAL regime (102/104 tokens, low vol). 0.15% keeps safety net but unblocks signal flow. Monitor: daily trades (must ↑ from 0), vol-floor blocks (should ↓).
 
+# ── Confidence Filter ────────────────────────────────────────────────────────
+# Block trades with confidence >= threshold. 90+ trades are the worst performers
+# (48.7% WR, -$1.45 PnL over 7d). The signal fires on extended moves — by the
+# time confidence reaches 90+, the easy move is done and you're buying the top.
+# Plan: conf-filter-plan.md (2026-08-19)
+CONF_FILTER_ENABLED = True
+CONF_FILTER_MAX = 89                    # block if confidence >= this value
+
+# ── Time-of-Day Block ────────────────────────────────────────────────────────
+# Block entries between 01:00-06:00 UTC (Asian session close, low-liquidity
+# pre-market). 83T 33W (39.8%) -$1.34 in this window.
+# Plan: conf-filter-plan.md (2026-08-19)
+TIME_BLOCK_ENABLED = True
+TIME_BLOCK_START = 1                    # UTC hour (inclusive)
+TIME_BLOCK_END = 6                      # UTC hour (exclusive: blocks 01:00-05:59)
+
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
 # Used by signal_compactor (HOTSET-FILTER) and decider_run (direction WR).
@@ -1182,7 +1198,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-19 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-19 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 

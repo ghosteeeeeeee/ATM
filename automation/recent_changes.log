@@ -1016,3 +1016,7 @@
   WHY: 0T last hour. 0 open trades. 24h 22T 63.6%WR +/usr/bin/bash.08. ATR SL 31.8% (7/22) DOWN from 53%. profit-monster-trail dominant (63.6% of closes). No signal crosses 3T/0%WR auto-kill threshold. SL floor bug persists but not safe to patch. Quiet afternoon.
   BY: auto_1hr
   NEXT: Re-run at 17:07 UTC
+[2026-08-19 17:07] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 0 open positions (ENA closed at 17:04). Today 15T 67%WR +$0.12. 48h 35T 60%WR +$0.01. ATR SL 34% (12/35) DOWN from 53% — improvement visible. SL floor bug persists (9/13 hits below 1.0%). No signal crosses 3T/0%WR auto-kill threshold. r2-trend-long3 6T 33%WR -$0.17 borderline but not at threshold. System performing well.
+  BY: auto_1hr
+  NEXT: Re-run at 18:07 UTC

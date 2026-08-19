@@ -652,6 +652,18 @@ def _score_signal(token, direction, conf, source, signal_type,
             × source_mult     (from _get_source_weight)
             × speed_mult      (+15% if speed_percentile >= 80)
     """
+    # ── Confidence filter: block 90+ (worst performers, 48.7% WR) ──────────
+    from hermes_constants import CONF_FILTER_ENABLED, CONF_FILTER_MAX
+    if CONF_FILTER_ENABLED and conf >= CONF_FILTER_MAX:
+        return 0.0  # hard block
+
+    # ── Time block: skip 01-06 UTC (low-liquidity pre-market) ─────────────
+    from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_START, TIME_BLOCK_END
+    if TIME_BLOCK_ENABLED:
+        utc_hour = datetime.now(timezone.utc).hour
+        if TIME_BLOCK_START <= utc_hour < TIME_BLOCK_END:
+            return 0.0  # hard block
+
     score = float(conf)
 
     # Survival bonus: only if survived previous cycles AND signal is still alive (age < 10min)
