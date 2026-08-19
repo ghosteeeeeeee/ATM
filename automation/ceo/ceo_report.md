@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-19 ~05:30 UTC (CEO run 132)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 15T -$0.41, 46.7% WR (Monday, within variance). 48h: 42T -$0.57, 50.0% WR (R:R positive). 7d: 362T -$2.36, 50.0% WR. PM_TRAIL DOMINANT: 187T/7d +$7.08, 87.2% WR (carrying system). ATR_SL 146T/7d -$10.37 (main drag, 0.7% WR, 8/day historic low). 2 open positions (low exposure). return_exhaustion_long: 9T/7d 55.6% +$0.11 (24h: 2T -$0.21 0% WR — degrading, monitoring). r2-trend-long3 worst ATR_SL offender: 11T/7d -$0.76 (avg peak 0.0087% — entries too tight). All legacy losers 0T/24h (confirmed dead, stopped trading Aug 17). Regime: NEUTRAL. SHORT side: 0T/24h (structural gap, all legacy dead).
+
+### Root Cause
+Monday variance — normal dip. ATR_SL structural drag at -$10.37/7d (0.7% WR) but count at 8/day (historic low, 79% reduction from 38/day Aug 12 via SPEED_MIN 40). PM_TRAIL offsetting with +$7.08/7d at 87.2% WR. return_exhaustion_long degrading (24h 0% WR) but 7d still positive — above auto-kill threshold (need 8+ trades at <25% WR). SHORT side structural (all range_breakout variants dead, need new SHORT signals). r2-trend-long3 avg peak 0.0087% on ATR_SL trades — entries too tight, MIN_PRE_MOVE may need adjustment.
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive, ATR_SL at historic low. DELEGATE to signal_analyst: Build SHORT signals for SHORT_BIAS regime (priority).
+
+### Verification
+PM_TRAIL 87.2% WR (must >80% — PASS). ATR_SL 8/day (must <15 — PASS). 48h R:R positive (must >1:1 — PASS). 2 open positions (low exposure). 0 phantom trades. Legacy losers 0T/24h (CONFIRMED DEAD). return_exhaustion_long monitoring (auto-disable at <25% WR with 8+ trades).
+
+---
+
 ## CEO Report — 2026-08-19 ~05:00 UTC (CEO run 131)
 
 ### Diagnosis

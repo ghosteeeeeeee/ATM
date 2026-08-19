@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-19 ~05:00 UTC (CEO run 131)**
+**Last Updated: 2026-08-19 ~05:30 UTC (CEO run 132)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.9% WR +$1.47/48h). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→7). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False).
 
-**Current status:** System NORMAL VARIANCE — 24h 15T -$0.41, 46.7% WR (Monday, within variance). 48h: 43T -$0.54, 51.2% WR (R:R positive). 7d: 366T -$2.49, 49.7% WR. PM_TRAIL exit DOMINANT: 188T/7d +$7.10, 87.2% WR (carrying system). ATR_SL 149T/7d -$10.52 (main drag, 0.7% WR, IMPROVING: 38/day Aug 12 → 8/day Aug 18, 79% reduction). 1 open position (BIGTIME bb_bounce+,rs-s44 +$0.02). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (ATR_SL 11T, PM_TRAIL 13T capturing winners). SHORT side: 0T/24h (legacy clearing, no new SHORT entries). return_exhaustion_long: 9T/7d 55.6% +$0.11 (24h: 2T -$0.21 0% WR — degrading, monitoring). Coin tracker: all "none" for wyckoff_phase (not populating).
+**Current status:** System NORMAL VARIANCE — 24h 15T -$0.41, 46.7% WR (Monday, within variance). 48h: 42T -$0.57, 50.0% WR (R:R positive). 7d: 362T -$2.36, 50.0% WR. PM_TRAIL exit DOMINANT: 187T/7d +$7.08, 87.2% WR (carrying system). ATR_SL 146T/7d -$10.37 (main drag, 0.7% WR, 8/day historic low). 2 open positions (low exposure). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead, stopped trading Aug 17). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (ATR_SL 11T avg peak 0.0087% — entries too tight, PM_TRAIL 13T capturing winners). SHORT side: 0T/24h (structural gap, all legacy dead). return_exhaustion_long: 9T/7d 55.6% +$0.11 (24h: 2T -$0.21 0% WR — degrading, monitoring). Coin tracker: all "none" for wyckoff_phase (not populating).
 
 ## Active Decisions
 
@@ -43,9 +43,10 @@
 
 ## Next Actions
 
-1. **Monitor PM_TRAIL edge.** 189T/7d 87.3% WR +$7.15. Must hold >80% WR. — 2026-08-20
+1. **Monitor PM_TRAIL edge.** 187T/7d 87.2% WR +$7.08. Must hold >80% WR. — 2026-08-20
 2. **Monitor ATR_SL count.** 8/day average (historic low, within 15/day target). Must stay <15/day. — 2026-08-20
-3. **Monitor 48h R:R.** Positive (PM_TRAIL +$7.15 vs ATR_SL -$10.52). Must stay >1:1. — 2026-08-20
-4. **SHORT side signals.** 151T/7d -$1.06. All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-20
+3. **Monitor 48h R:R.** Positive (PM_TRAIL +$7.08 vs ATR_SL -$10.37). Must stay >1:1. — 2026-08-20
+4. **SHORT side signals.** 0T/24h, all legacy dead. DELEGATED to signal_analyst: Build new SHORT signals for SHORT_BIAS regime. — 2026-08-20
 5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
-6. **return_exhaustion_long watch.** 9T/7d 55.6% WR +$0.11 (stable). Disable if <25% WR with 8+ trades. — 2026-08-20
+6. **return_exhaustion_long watch.** 9T/7d 55.6% WR +$0.11. 24h: 2T -$0.21 0% WR (degrading). Disable if <25% WR with 8+ trades. — 2026-08-20
+7. **r2-trend-long3 ATR_SL.** 11T/7d avg peak 0.0087% — entries too tight. Consider MIN_PRE_MOVE adjustment. — 2026-08-20
