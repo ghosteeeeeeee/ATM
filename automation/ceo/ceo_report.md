@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-19 ~20:00 UTC (CEO run 146)
+
+### Diagnosis
+System HEALTHY — NO CHANGES. Verified DB: 24h 24T +$0.11, 62.5% WR (green day). 7d: 320T -$1.59, 51.3% WR (improving from -$2.35 Aug 19 morning). Daily: Aug 12 +$0.82 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.11 (green). PM_TRAIL DOMINANT: 170T/7d +$6.61, 86.5% WR (carrying system). ATR_SL: 122T/7d -$9.01, 0.8% WR (historic low: 3/day vs 28 peak Aug 13 — 89% reduction). profit-monster-T1: 12T/7d +$0.69, 100% WR. 1 open position (low exposure). 0 phantom trades. All legacy losers 0T/24h confirmed dead. conf-filter (conf<90) + time block (01-06 UTC) both ACTIVE in signal_compactor — filtering 90+ tier (114T 49.1% WR -$1.38) and Asian session (83T 39.8% WR -$1.34). Market: NEUTRAL. SHORT side: 0T/24h (structural gap, all legacy dead).
+
+### Root Cause
+Market flat, NEUTRAL regime holding. PM_TRAIL carrying system at 86.5% WR. ATR_SL at historic low (3/day) confirms SL floor fix working. Confidence filter already deployed — 90+ tier was worst performer, now blocked. MIN_PRE_MOVE 0.3 eval active through Aug 21 — needs more trades. SHORT side 0T/24h structural gap persists — all SHORT legacy signals dead, need new SHORT signal development.
+
+### Fix Applied
+NO CHANGES — system healthy. Conf-filter already implemented (CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89). Time block already implemented (TIME_BLOCK_ENABLED=True, 01-06 UTC). All targets met: PM_TRAIL WR >80% ✅, ATR_SL <15/day ✅, 0 phantom trades ✅, 0T/24h legacy dead ✅. DELEGATE to signal_analyst: build SHORT signals for SHORT_BIAS regime.
+
+### Verification
+Next run: monitor MIN_PRE_MOVE 0.3 eval (Aug 21 deadline), PM_TRAIL WR (must >80%), ATR_SL daily (must <15), SHORT signal development progress.
+
 ## CEO Report — 2026-08-19 ~18:16 UTC (CEO run 145)
 
 ### Diagnosis
