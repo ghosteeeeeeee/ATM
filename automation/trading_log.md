@@ -1,5 +1,42 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-19 08:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet early morning)
+**Open:** 2 (YGG r2-trend-long4 -$0.04, ETH bb_bounce+,hl_copy_trader +$0.03)
+
+**24h:** 17T | 50% WR | -$0.42
+- atr_sl_hit: 9T -$0.75 (53% of closes, avg -$0.083)
+- profit-monster-trail: 8T +$0.33 (captures winners)
+
+**7d:** 337T | ATR_SL=132 (39%) | PM_Trail=176 (52%)
+
+**Auto-Kill Check:**
+- No signal crosses 3T/0%WR threshold in 24h
+- return_exhaustion_long: 1T/0%WR/$-0.09 — below 3T threshold
+- No new signals crossing thresholds
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet early morning
+- No signal crosses auto-kill threshold
+- SL floor bug identified (MINIMUM SL DISTANCE guard overrides eff_sl_pct floor) — needs code audit, not safe to patch
+- Trade frequency normal (17/24h)
+- CEO raised R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3 at ~08:00 — 48h eval active
+
+**Open Questions:**
+- Why does trail_floor < ATR_SL_MIN for these trades? (highest_price close to entry?)
+- Should we add a hard guard: `new_sl = max(new_sl, entry_f * (1 - ATR_SL_MIN))` after line 544?
+- Would this conflict with the trailing gate logic at lines 670-720?
+
+**Watch Next Hour:**
+- SL floor enforcement — needs code audit (tpsl_utils.py lines 531-570)
+- r2-trend-long3 MIN_PRE_MOVE 0.3 eval (CEO change at ~08:00)
+- Trade frequency
+
+---
+
 ## 2026-08-17 11:00 UTC — Hourly Analysis
 
 **Trades:** 1 closed (0 wins, 1 loss)

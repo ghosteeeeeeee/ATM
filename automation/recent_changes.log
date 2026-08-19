@@ -2,6 +2,10 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-19 08:04 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 2 open (YGG -$0.04, ETH +$0.03). 24h 17T 50%WR -$0.42. ATR SL 53% (9/17) persistent. PM_TRAIL 8T +$0.33 carrying. SL floor bug root cause: MINIMUM SL DISTANCE guard overrides eff_sl_pct floor — needs code audit, not safe to patch. No signal crosses 3T/0%WR auto-kill. return_exhaustion_long 1T/0%WR below threshold. CEO raised R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3 at ~08:00 — 48h eval active. Quiet morning.
+  BY: auto_1hr
+  NEXT: Re-run at 09:04 UTC
 [2026-08-19 ~08:00 UTC] CEO: RAISED R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3 (trading)
   WHY: r2-trend-long3 25T/7d 52% -$0.23 — ATR_SL losers peak at MFE +0.12% (dead-cat bounces), winners peak +0.65%. MIN_PRE_MOVE 0.2 too weak to filter. RAISED to 0.3 to block entries where price moved <0.3% before signal. Expected: fewer ATR_SL hits, improved WR.
   BY: CEO run
