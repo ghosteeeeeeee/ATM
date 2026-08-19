@@ -11054,3 +11054,27 @@ None — system stable, previous fixes settling in.
 - Trade activity
 - ATR SL trend
 - stop_hunt_reversal_long+ performance
+
+## [2026-08-19 20:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (6 in last 3h)
+**PnL:** +$0.28 (last 3h: 4W 2L, 67% WR)
+
+**24h:** 23T | 70% WR | +$0.45 | ATR SL: 26% (6/23)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL continuing decline (53% → 36% → 26%) — excellent trajectory
+- Trade frequency normal (2/hour)
+- profit-monster-trail dominant (70% of closes) — working well
+- System net positive (+$0.45)
+- Open positions: 2 (DOT, SEI) — both flat with 1% SL
+
+**Open Questions:**
+- SL floor bug persists — needs code audit of tpsl_utils.py before patching
+
+**Watch Next Hour:**
+- Trade activity
+- ATR SL trend

@@ -1032,3 +1032,7 @@
   WHY: 2T last hour (2 stop_hunt_reversal_long+ ATR SL hits, -$0.23). 3 open positions flat. 24h 22T 59%WR +$0.02. ATR SL 36% (8/22) DOWN from 53%. SL floor bug persists (5/8 hits below 1.0%). No signal crosses 3T/0%WR auto-kill threshold. Trade frequency normal.
   BY: auto_1hr
   NEXT: Re-run at 19:07 UTC
+[2026-08-19 20:07] auto_1hr: NO CHANGES
+  WHY: 0T last hour, 6T in last 3h (4W 2L). 24h 23T 70%WR +$0.45. ATR SL 26% (6/23) DOWN from 36% — continued improvement from 53% baseline. profit-monster-trail dominant (70% of closes). No signal crosses 3T/0%WR auto-kill threshold. Open positions: 2 (DOT, SEI) flat with 1% SL. System performing well.
+  BY: auto_1hr
+  NEXT: Re-run at 21:07 UTC
