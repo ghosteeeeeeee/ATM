@@ -182,3 +182,22 @@ NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive, ATR_SL at 8/day.
 
 ### Verification
 System stable. PM_TRAIL 87.3% WR (must >80% — PASS). ATR_SL 8/day (must <15 — PASS). 48h R:R positive (must >1:1 — PASS). 0 open positions (clean). 0 phantom trades (FIXED). Legacy losers 0T/24h (CONFIRMED DEAD). SHORT side structural (need new SHORT signals — backlog item).
+
+## CEO Report — 2026-08-19 ~05:45 UTC (run 133)
+
+### Diagnosis
+24h 17T -$0.46, 47.1% WR (Monday, normal variance). 7d 362T -$2.36, 50.0% WR. PM_TRAIL 182T/7d +$6.84 (carrying system). ATR_SL 142T/7d -$10.13 (main drag). SL floor bug: 89% of ATR_SL hits (126/141) had SL < 1.0% from entry. 1 open position, 0 phantoms.
+
+### Root Cause
+tpsl_utils.py MIN GUARD (lines 531-570) and POST-GATE SAFETY NET (lines 748-797) violated ATR_SL_MIN floor in 3 code paths: (1) in-profit trail path ignored computed floor, (2) in-loss one-way gate pulled SL toward entry, (3) safety net replicated same bugs.
+
+### Fix Applied
+8-line fix: enforced `min(trail_floor, min_from_entry)` in in-profit else branches (LONG + SHORT), re-enforced floor/ceiling after one-way gates in in-loss paths, same in post-gate safety net.
+
+### Expected Impact
+- ATR_SL rate should drop as trades with tight SLs now hit PM_TRAIL activation instead
+- Current: 48 trades/7d with SL < 0.5% + 78 trades with SL 0.5-1.0% = 126 trades losing to ATR_SL unnecessarily
+- Expected: PM_TRAIL captures more winners, ATR_SL -$10.13/7d reduced by ~$2-4/week
+
+### Verification
+Monitor 48h: ATR_SL daily count (must stay <15), PM_TRAIL WR (must >80%), avg win size should increase.

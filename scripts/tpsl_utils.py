@@ -541,7 +541,7 @@ def compute_atr_sl_tp(
                 if trail_floor >= entry_f:
                     new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
                 else:
-                    new_sl = trail_floor    # normal case: trail from peak
+                    new_sl = min(trail_floor, min_from_entry)  # trail from peak, enforce floor
                 # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
                 # one-way logic AND wrong-side correction. Adding one-way here would block
                 # the trailing gate from correcting a wrong-sided current_sl.
@@ -552,6 +552,7 @@ def compute_atr_sl_tp(
                 trail_floor_loss = round(highest_price * (1 - _trail_dist), 8) if highest_price > 0 else 0
                 if trail_floor_loss > 0:
                     new_sl = max(new_sl, trail_floor_loss)
+                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))  # re-enforce floor after one-way
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
@@ -563,13 +564,14 @@ def compute_atr_sl_tp(
                 if trail_ceil <= entry_f:
                     new_sl = min_from_entry  # entry-based ceiling (always above entry)
                 else:
-                    new_sl = trail_ceil    # normal case: trail from nadir
+                    new_sl = max(trail_ceil, min_from_entry)  # trail from nadir, enforce ceiling
                 # NOTE: No one-way gate here — the trailing gate handles one-way + correction.
             else:
                 # In loss: entry ceiling is absolute floor — SL must stay at least ATR_SL_MIN from entry
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:
                     new_sl = min(new_sl, current_sl)  # one-way: never go up
+                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # re-enforce ceiling after one-way
 
     if _phantom_dbg and (token in ('LINK', 'OG', 'AAVE') or (entry_f > 0 and new_sl > 0 and abs(new_sl - entry_f) / entry_f < 0.0015)):
         print(f"  [TPSL-DEBUG] {token} {direction}: AFTER MIN GUARD new_sl={new_sl:.6f} "
@@ -755,7 +757,7 @@ def compute_atr_sl_tp(
                 if trail_floor >= entry_f:
                     new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
                 else:
-                    new_sl = trail_floor    # normal case: trail from peak
+                    new_sl = min(trail_floor, min_from_entry)  # trail from peak, enforce floor
                 if current_sl > 0:
                     # Only enforce one-way when current_sl is correct-side (below entry for LONG).
                     # If current_sl is wrong-sided (above entry), the trailing gate's correction
@@ -769,6 +771,7 @@ def compute_atr_sl_tp(
                     current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
                     if not current_above_entry:
                         new_sl = max(new_sl, current_sl)
+                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))  # re-enforce floor after one-way
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
@@ -780,7 +783,7 @@ def compute_atr_sl_tp(
                 if trail_ceil <= entry_f:
                     new_sl = min_from_entry  # entry-based ceiling (always above entry)
                 else:
-                    new_sl = trail_ceil    # normal case: trail from nadir
+                    new_sl = max(trail_ceil, min_from_entry)  # trail from nadir, enforce ceiling
                 if current_sl > 0:
                     # Only enforce one-way when current_sl is correct-side (above entry for SHORT).
                     # If current_sl is wrong-sided (below entry), trailing gate's correction must stick.
@@ -793,6 +796,7 @@ def compute_atr_sl_tp(
                     current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
                     if not current_below_entry:
                         new_sl = min(new_sl, current_sl)
+                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # re-enforce ceiling after one-way
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
 
