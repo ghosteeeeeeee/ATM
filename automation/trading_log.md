@@ -10630,3 +10630,34 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None — system quiet, will reassess next hour
+
+## [2026-08-19 01:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+**Open:** 1 (AVAX $11 breakeven, SL 6.278, TP 6.373)
+
+**24h:** 14T | 42.9% WR | -$0.42 PnL
+- profit-monster-trail: 6T/100%WR +$0.22 (healthy)
+- atr_sl_hit: 8T/0%WR -$0.64 (dominant loser, 57% of closes)
+
+**Signal breakdown (24h, >=2T):**
+- return_exhaustion_long: 2T/0%WR -$0.21 → KILLED (auto_1hr 2026-08-18)
+- r2-trend-long3: 4T/25%WR -$0.16 (75% ATR SL)
+- r2-trend-long4: 2T/50%WR -$0.06 (50% ATR SL)
+
+**ATR SL rate:** 57% (8/14) — above 40% threshold. ATR_SL_MAX widened Aug 16 to 3.0%. Still dominant drag.
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour (quiet late night)
+- AVAX open trade $11 low exposure, at breakeven
+- return_exhaustion_long already killed (3T/0%WR threshold crossed)
+- r2-trend-long3 4T/25%WR — has 1 win, not auto-kill (threshold: 3T/0%WR)
+- ATR SL 57% in 24h — persistent but ATR_SL_MAX already widened. Would need more data to justify further change
+- Trade frequency normal (14/24h)
+
+**Watch Next Hour:**
+- ATR SL rate if new trades occur
+- AVAX open trade resolution

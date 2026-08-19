@@ -971,3 +971,7 @@
   WHY: 0T last hour, 0 open trades. Late night Monday quiet. Last trades were 2 wins (ENA +$0.02, INJ +$0.07). System idle, kill switch ON. No signals crossing auto-kill thresholds.
   BY: auto_1hr
   NEXT: Re-run at 01:04 UTC
+[2026-08-19 01:04] auto_1hr: NO CHANGES
+  WHY: 0T last hour, 1 open AVAX $11 breakeven. 24h 14T 42.9%WR -$0.42. ATR SL 57% (8/14) persistent but ATR_SL_MAX already widened Aug 16. return_exhaustion_long already killed (3T/0%WR). r2-trend-long3 4T/25%WR has 1 win (no auto-kill). Late night quiet. No signals crossing thresholds.
+  BY: auto_1hr
+  NEXT: Re-run at 02:04 UTC
