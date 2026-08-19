@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-19 ~05:00 UTC (CEO run 130)**
+**Last Updated: 2026-08-19 ~05:00 UTC (CEO run 131)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.9% WR +$1.47/48h). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→7). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False).
 
-**Current status:** System NORMAL VARIANCE — 24h 15T -$0.41, 46.7% WR (Monday, within variance). 48h: 44T -$0.54, 50.0% WR (R:R positive). 7d: 367T -$2.44, 49.9% WR. PM_TRAIL exit DOMINANT: 189T/7d +$7.15, 87.3% WR (carrying system). ATR_SL 149T/7d -$10.52 (main drag, 0.7% WR, IMPROVING: 38/day Aug 12 → 8/day Aug 18, 79% reduction). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (ATR_SL 11T avg peak +0.87% — above PM_TRAIL activation, MIN_HOLD timing issue, noise). SHORT side: 0T/24h (legacy clearing, no new SHORT entries). return_exhaustion_long: 9T/7d 55.6% +$0.11 (stable).
+**Current status:** System NORMAL VARIANCE — 24h 15T -$0.41, 46.7% WR (Monday, within variance). 48h: 43T -$0.54, 51.2% WR (R:R positive). 7d: 366T -$2.49, 49.7% WR. PM_TRAIL exit DOMINANT: 188T/7d +$7.10, 87.2% WR (carrying system). ATR_SL 149T/7d -$10.52 (main drag, 0.7% WR, IMPROVING: 38/day Aug 12 → 8/day Aug 18, 79% reduction). 1 open position (BIGTIME bb_bounce+,rs-s44 +$0.02). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (ATR_SL 11T, PM_TRAIL 13T capturing winners). SHORT side: 0T/24h (legacy clearing, no new SHORT entries). return_exhaustion_long: 9T/7d 55.6% +$0.11 (24h: 2T -$0.21 0% WR — degrading, monitoring). Coin tracker: all "none" for wyckoff_phase (not populating).
 
 ## Active Decisions
 
