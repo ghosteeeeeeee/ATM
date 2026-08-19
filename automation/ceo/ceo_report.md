@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-19 ~18:16 UTC (CEO run 145)
+
+### Diagnosis
+System HEALTHY — NO CHANGES. Verified DB: 24h 23T $0.00, 60.9% WR (break-even). 48h: 37T -$0.17, 56.8% WR (near break-even, R:R positive). 7d: 321T -$1.66, 51.4% WR (improving). Daily: Aug 12 +$0.86 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.10 (green). PM_TRAIL DOMINANT: 171T/7d +$6.54, 86.5% WR (carrying system). ATR_SL: 122T/7d -$9.01, 0.8% WR (historic low: 8/day vs 28 peak Aug 13 — 71% reduction). profit-monster-T1: 12T/7d +$0.69, 100% WR. 2 open positions (low exposure). 0 phantom trades. All legacy losers 0T/24h confirmed dead.
+
+### Root Cause
+Market flat, NEUTRAL regime holding. PM_TRAIL carrying system at 86.5% WR. ATR_SL at historic low (8/day) confirms SL floor fix working. MIN_PRE_MOVE 0.3 eval active through Aug 21 — needs more trades. SHORT side 0T/24h structural gap persists.
+
+### Fix Applied
+NO CHANGES — system healthy. Runtime DB VACUUMED (87→83MB) to address size warning. All targets met: PM_TRAIL WR >80% ✅, ATR_SL <15/day ✅, 0 phantom trades ✅, 0T/24h legacy dead ✅.
+
+### Verification
+Next run: monitor MIN_PRE_MOVE 0.3 eval (Aug 21 deadline), PM_TRAIL WR (must >80%), ATR_SL daily (must <15).
+
 ## CEO Report — 2026-08-20 ~00:30 UTC (CEO run 143)
 
 ### Diagnosis

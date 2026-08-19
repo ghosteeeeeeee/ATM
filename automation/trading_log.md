@@ -11002,3 +11002,27 @@ None — system stable, previous fixes settling in.
 - Trade activity resumption
 - r2-trend-long3 performance
 - ATR SL trend
+
+## [2026-08-19 18:07 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.23 (0% WR)
+
+**24h:** 22T | 59% WR | +$0.02 | ATR SL: 36% (8/22)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL declining (53% → 36%) — improvement continuing
+- Trade frequency normal (2/hour)
+- System net positive today (+$0.02)
+
+**Open Positions:** 3 (MON, WLFI, SEI) — all flat
+
+**Open Questions:**
+- SL floor bug persists — needs code audit of tpsl_utils.py before patching
+
+**Watch Next Hour:**
+- Trade activity
+- ATR SL trend
