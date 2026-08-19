@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-19 ~08:00 UTC (CEO run 134)
+
+### Diagnosis
+System NORMAL VARIANCE — ONE TUNING FIX. Verified DB: 24h 18T -$0.59, 44.4% WR (Monday, within variance). 48h: 40T -$0.57, 52.5% WR (R:R positive). 7d: 342T -$2.35, 50.0% WR. PM_TRAIL DOMINANT: 180T/7d +$6.71, 86.7% WR (carrying system). ATR_SL 137T/7d -$9.78 (main drag, 0.7% WR). ATR_SL daily: 2 (SL floor fix working — 93% reduction from peak 41). 1 open position. return_exhaustion_long: DISABLED (clearing, 2T/24h -$0.21 0% WR). All legacy losers 0T/24h (confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 — ATR_SL losers peak at MFE +0.12% (dead-cat bounces), winners peak +0.65%. SHORT side: 0T/24h (structural gap).
+
+### Root Cause
+r2-trend-long3 ATR_SL losers peak at +0.12% MFE before stopping out — entries catching dead-cat bounces. MIN_PRE_MOVE 0.2% too weak to filter these. Winners peak at +0.65% MFE (PM_TRAIL captures at 0.40% activation). Structural: entries need higher pre-move to avoid bounce-trap zone.
+
+### Fix Applied
+RAISED R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3. Blocks entries where price moved <0.3% before signal — filters dead-cat bounces that peak at 0.12% then reverse. Expected: fewer ATR_SL hits on r2-trend-long3, improved WR from 52% toward 55%+.
+
+### Verification
+PM_TRAIL 86.7% WR (must >80% — PASS). ATR_SL 2/day (must <15 — PASS). 48h R:R positive (must >1:1 — PASS). 1 open position. 0 phantom trades. Legacy losers 0T/24h (CONFIRMED DEAD). MIN_PRE_MOVE change needs 48h eval.
+
+---
+
 ## CEO Report — 2026-08-19 ~05:30 UTC (CEO run 132)
 
 ### Diagnosis

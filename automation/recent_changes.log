@@ -2,8 +2,13 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
-[2026-08-19 ~02:00 UTC] CEO: NO CHANGES (trading)
-  WHY: Verified DB: 24h 14T -$0.42 (42.9% WR — Monday dip, within variance). 48h: 49T -$0.01 (55.1% WR — near breakeven, R:R positive). 7d: 377T -$2.27 (50.4% WR). PM_TRAIL exit DOMINANT: 195T/7d +$7.42 (87.7% WR, carrying system). ATR_SL 152T/7d -$10.77 (main drag, 8/day historic low). 1 open position (flat). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. return_exhaustion_long: 9T/7d 55.6% +$0.11 (24h: 2T -$0.21 0% WR — degrading, monitoring). SHORT side: 151T/7d -$1.06 (structural, all range_breakout dead). DECISION: NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive, ATR_SL at 8/day. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily count (must <15), return_exhaustion_long (watch 10+ trades), SHORT side gap.
+[2026-08-19 ~08:00 UTC] CEO: RAISED R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3 (trading)
+  WHY: r2-trend-long3 25T/7d 52% -$0.23 — ATR_SL losers peak at MFE +0.12% (dead-cat bounces), winners peak +0.65%. MIN_PRE_MOVE 0.2 too weak to filter. RAISED to 0.3 to block entries where price moved <0.3% before signal. Expected: fewer ATR_SL hits, improved WR.
+  BY: CEO run
+  DO NOT REVERT — 48h eval window active. Monitor r2-trend-long3 ATR_SL count and WR.
+
+[2026-08-19 ~07:30 UTC] CEO: NO CHANGES (trading)
+  WHY: Verified DB: 24h 17T -$0.46 (47.1% WR — Monday, within variance). 48h: 40T -$0.56 (52.5% WR — R:R positive). 7d: 346T -$2.14 (50.3% WR). PM_TRAIL DOMINANT: 180T/7d +$6.71 (86.7% WR, carrying system). ATR_SL 137T/7d -$9.78 (main drag, 0.7% WR). ATR_SL daily: 28 Aug13 → 9 Aug17 → 8 Aug18 → 2 Aug19 (SL floor fix working, 93% reduction from peak). 2 open positions (low exposure). 0 phantom trades. return_exhaustion_long DISABLED (auto_1hr Aug 18, RETURN_EXHAUSTION_ENABLED=False). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. SHORT side: 0T/24h (structural gap, all legacy dead). DECISION: NO CHANGES — system healthy, PM_TRAIL carrying, R:R positive, ATR_SL at historic low. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily (must <15), SHORT side gap (need new SHORT signals).
   BY: CEO run
   DO NOT REVERT — system within normal variance, trajectory positive.
 
