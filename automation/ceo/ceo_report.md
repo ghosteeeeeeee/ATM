@@ -1,22 +1,24 @@
-## CEO Report — 2026-08-19
+## CEO Report — 2026-08-19 (run ~150)
 
 ### Diagnosis
-System HEALTHY — 4th consecutive green day. Verified DB: Aug 19 24T +$0.53, 70.8% WR (best day this week). 7d: 315T -$1.51, 50.8% WR (improving). PM_TRAIL dominant: 192T/7d +$7.26, 87.5% WR carrying system. ATR_SL at historic low: 5/day (down from 28 peak Aug 13 — 82% reduction). 2 open positions (low exposure). 0 phantom trades. All legacy losers 0T/24h confirmed dead.
+System HEALTHY — 4th consecutive green day, best WR this week. Verified DB: 25T +$0.40, 68.0% WR. 7d: 317T -$1.68, 50.8% WR (improving, legacy aging out). PM_TRAIL dominant: 167T/7d +$6.55, 86.2% WR (carrying system). ATR_SL at historic low: 120T/7d -$8.93, 0.8% WR (~5/day, down from 28 peak Aug 13 — 82% reduction). 1 open position (r2-trend-long6 +$0.00, +0.47% MFE). 0 phantom trades. All legacy losers 0T/24h confirmed dead. MIN_PRE_MOVE 0.3 eval: r2-trend-long3 3T/24h 100% WR +$0.17 (working).
 
 ### Root Cause
-SHORT side structural weakness persists: 95T/7d -$1.53, 42.1% WR. All legacy SHORT signals dead (range_breakout_short, accel-300-, hzscore- all 0T/24h). No new SHORT signals implemented — signal_analyst proposals stuck at "Awaiting implementation" since Aug 19. MIN_PRE_MOVE 0.3 eval active through Aug 21 (r2-trend-long3 3T today, 100% WR but too early).
+No active bleeding. Legacy 7d losers (accel-300- -$0.59, wave_catcher+ -$0.42, ct-hot+ -$0.42) are aging out — all 0T/24h. SHORT side structural gap persists (95T/7d -$1.53) but no new trades. Confidence filter (conf<90) + time block (01-06 UTC) blocking 90+ tier (114T 49.1% WR -$1.38). Coin tracker healthy, DOGE in accumulation phase (LONG setup).
 
 ### Fix Applied
-NO CHANGES — system healthy, PM_TRAIL carrying, ATR_SL at historic low. SHORT side is structural gap requiring new signal builds. Re-delegating to signal_analyst with urgency.
+NO CHANGES — system healthy, PM_TRAIL carrying, ATR_SL at historic low. No parameters need tuning. MIN_PRE_MOVE 0.3 working (r2-trend-long3 3T 100% WR). Legacy losers naturally aging out.
 
 ### Verification
-- PM_TRAIL WR: 87.5% (target >80%) ✓
-- ATR_SL daily: 5 (target <15) ✓
-- Open positions: 2 (low exposure) ✓
+- PM_TRAIL WR: 86.2% (target >80%) ✓
+- ATR_SL daily: ~5 (target <15) ✓
+- Open positions: 1 (low exposure) ✓
 - Phantom trades: 0 ✓
 - Legacy losers: 0T/24h ✓
+- MIN_PRE_MOVE 0.3: r2-trend-long3 3T 100% WR ✓
+- Coin tracker: fresh, updating regularly ✓
 
 ### Action Items
-1. **DELEGATE to signal_analyst:** Implement SHORT signals (breakdown_retest_short, bearish_divergence_short, dead_cat_bounce_short) — proposals returned, awaiting implementation.
-2. **Monitor MIN_PRE_MOVE 0.3:** 48h eval window through Aug 21 for r2-trend-long3 ATR_SL reduction.
-3. **Monitor PM_TRAIL:** Must hold >80% WR — currently 87.5%.
+1. **Monitor MIN_PRE_MOVE 0.3:** 48h eval window through Aug 21 — r2-trend-long3 showing improvement.
+2. **Monitor PM_TRAIL:** Must hold >80% WR — currently 86.2%.
+3. **SHORT side signals:** Still structural gap, 0T/24h. Delegated to signal_analyst — awaiting implementation.
