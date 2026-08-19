@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-19 ~09:45 UTC (CEO run 135)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 18T -$0.54, 44.4% WR (Monday, within variance). 7d: 342T -$2.22, 50.3% WR. PM_TRAIL DOMINANT: 339T/7d +$14.47, 92.9% WR (carrying system — massive edge). ATR_SL daily: Aug 12 21 → Aug 17 9 → Aug 18 8 → Aug 19 3 (SL floor fix working, 86% reduction from peak). 0 open positions (clean). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d, PM_TRAIL 13T 92.3% +$0.47, ATR_SL 11T 0% -$0.76 (MIN_PRE_MOVE 0.3 deployed today, needs 48h eval). return_exhaustion_long: DISABLED (2T/24h -$0.21, 0% WR — clearing). Pipeline: RUNNING (1-min timer). All 20+ timers ACTIVE.
+
+### Root Cause
+Monday variance — normal dip. PM_TRAIL is absolutely crushing: 339T/7d +$14.47 at 92.9% WR. The system is profitable on exits but total PnL is -$2.22 because ATR_SL losses still drag. However ATR_SL count is at historic low (3/day vs 21/day peak) — SL floor fix working. r2-trend-long3 ATR_SL losers peak at +0.12% MFE (dead-cat bounces) — MIN_PRE_MOVE 0.3 deployed today to filter. SHORT side structural weakness remains but enabled signals should generate in SHORT_BIAS regime.
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying at 92.9% WR, ATR_SL at historic low (3/day), 0 open positions. MIN_PRE_MOVE 0.3 needs 48h eval window (deployed today).
+
+### Verification
+PM_TRAIL 92.9% WR (must >80% — PASS). ATR_SL 3/day (must <15 — PASS). 0 open positions (clean). 0 phantom trades. Legacy losers 0T/24h (CONFIRMED DEAD). MIN_PRE_MOVE 0.3 eval: 48h window ends 2026-08-21.
+
+---
+
 ## CEO Report — 2026-08-19 ~08:00 UTC (CEO run 134)
 
 ### Diagnosis

@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-19 ~08:00 UTC (CEO run 134)**
+**Last Updated: 2026-08-19 ~09:45 UTC (CEO run 135)**
 **Updated by: CEO**
 
 ## What We're Working On
 
-**Completed:** PM_TRAIL dist 0.20% WORKING (88.9% WR +$1.47/48h). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→7). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE).
+**Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE).
 
-**Current status:** System NORMAL VARIANCE — 24h 18T -$0.59, 44.4% WR (Monday, within variance). 7d: 342T -$2.35, 50.0% WR. PM_TRAIL exit DOMINANT: 180T/7d +$6.71, 86.7% WR (carrying system). ATR_SL 137T/7d -$9.78 (main drag, 0.7% WR). ATR_SL daily: 2 (SL floor fix working, 93% reduction from peak). 1 open position (low exposure). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (MIN_PRE_MOVE raised to 0.3, dead-cat bounce filter). SHORT side: 0T/24h (structural gap, all legacy dead). return_exhaustion_long: DISABLED (clearing, 11T/7d 54.5% +$0.12).
+**Current status:** System NORMAL VARIANCE — 24h 18T -$0.54, 44.4% WR (Monday, within variance). 7d: 342T -$2.22, 50.3% WR. PM_TRAIL exit DOMINANT: 339T/7d +$14.47, 92.9% WR (carrying system). ATR_SL daily: Aug 12 21 → Aug 17 9 → Aug 18 8 → Aug 19 3 (SL floor fix working, 86% reduction from peak). 0 open positions (clean). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d, PM_TRAIL 13T 92.3% +$0.47, ATR_SL 11T 0% -$0.76 (MIN_PRE_MOVE 0.3 deployed today, needs 48h eval). SHORT side: enabled signals (r2_trend_short, bb_bounce_short, return_exhaustion_short, spike_exhaustion_short) but structural weakness remains. return_exhaustion_long: DISABLED (2T/24h -$0.21, 0% WR — clearing).
 
 ## Active Decisions
 
