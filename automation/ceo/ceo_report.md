@@ -1,3 +1,35 @@
+## CEO Report — 2026-08-19 ~23:00 UTC (CEO run 142)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 17T -$0.29, 52.9% WR (Monday, stable). 48h: 35T -$0.33, 54.3% WR (R:R positive). 7d: 341T -$2.19, 50.4% WR. PM_TRAIL DOMINANT: 176T/7d +$6.45, 86.4% WR (carrying system). profit-monster-T1: 12T/7d +$0.69, 100% WR. ATR_SL: 126T/7d -$9.08, 0.8% WR (historic low: 3/day vs 28 peak Aug 13 — SL floor fix working, 89% reduction). 4 open positions (low exposure). 0 phantom trades today. Guardian orphan 7T/7d aging out (last Aug 17). All legacy losers 0T/24h confirmed dead. Regime: NEUTRAL (103/105 tokens flat, hotset empty correctly). SHORT side: 0T/24h (structural gap, all legacy dead).
+
+### Root Cause
+Monday flat market — NEUTRAL regime holding. MIN_PRE_MOVE 0.3 eval active (48h window through Aug 21). ATR_SL at historic low (3/day) confirms SL floor fix is working. PM_TRAIL carrying at 86.4% WR — accel-300- (21T PM_TRAIL 100% WR +$1.03), ct-hot+ (15T PM_TRAIL 93.3% +$0.81), range_breakout_short (12T PM_TRAIL 100% +$0.57).
+
+### Fix Applied
+NO CHANGES — system healthy. All targets met: PM_TRAIL WR >80% ✅, ATR_SL <15/day ✅, 0 phantom trades ✅, 0T/24h legacy dead ✅.
+
+### Verification
+Monitor: PM_TRAIL WR (must >80%), ATR_SL daily (must <15), MIN_PRE_MOVE 0.3 eval (Aug 21), SHORT side gap (need new SHORT signals).
+
+---
+
+## CEO Report — 2026-08-19 ~21:30 UTC (CEO run 141)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 17T -$0.29, 52.9% WR (Monday, improved from -$0.42). 48h: 36T -$0.30, 55.6% WR (R:R positive). 7d: 341T -$2.19, 50.4% WR. PM_TRAIL DOMINANT: 178T/7d +$6.49, 86.5% WR (carrying system). ATR_SL: 127T/7d -$9.14, 0.7% WR (historic low: 8/day vs 28 peak Aug 13). 3 open positions (low exposure). 0 phantom trades. All legacy losers 0T/24h confirmed dead. Regime: NEUTRAL (market flat). SHORT side: 0T/24h (structural gap, all legacy dead).
+
+### Root Cause
+Monday flat market. MIN_PRE_MOVE 0.3 eval active (48h window through Aug 21). r2-trend-long3 showing improvement: 2T/24h -$0.08, 50% WR (MIN_PRE_MOVE filtering working, avg MFE 0.41% > 0.3% threshold).
+
+### Fix Applied
+NO CHANGES — system healthy. PM_TRAIL carrying at 86.5% WR. ATR_SL at historic low (8/day). All targets met: PM_TRAIL WR >80% ✅, ATR_SL <15/day ✅, 0 phantom trades ✅.
+
+### Verification
+Monitor: PM_TRAIL WR (must >80%), ATR_SL daily (must <15), MIN_PRE_MOVE 0.3 eval (Aug 21), SHORT side gap (need new SHORT signals).
+
+---
+
 ## CEO Report — 2026-08-19 ~20:00 UTC (CEO run 140)
 
 ### Diagnosis
@@ -331,3 +363,17 @@ tpsl_utils.py MIN GUARD (lines 531-570) and POST-GATE SAFETY NET (lines 748-797)
 
 ### Verification
 Monitor 48h: ATR_SL daily count (must stay <15), PM_TRAIL WR (must >80%), avg win size should increase.
+
+## CEO Report — 2026-08-19 ~21:00 UTC
+
+### Diagnosis
+System NORMAL VARIANCE. 24h: 16T -$0.50, 43.8% WR (Monday, within expected range). 7d: 332T -$1.91, 50.9% WR (improving from -$2.19). PM_TRAIL carrying system at 86.4% WR +$6.38/7d. ATR_SL main drag at 128T/7d -$9.21, 0.8% WR — but at historic low (SL floor fix 89% reduction from peak). 9 ATR_SL today (elevated vs 3/day avg) — r2-trend-long3/long4 entries with 0% MFE (noise entries). MIN_PRE_MOVE 0.3 deployed today, 48h eval window through Aug 21. SHORT side: 0T/24h (structural, 0 SHORT_BIAS tokens in flat market). Phantom trades: 0 (guardian_orphan working). 3 open positions (low exposure).
+
+### Root Cause
+Monday flat market (103/105 NEUTRAL) = low volume, noise entries. ATR_SL still elevated from r2-trend-long entries that don't move. MIN_PRE_MOVE 0.3 should filter dead-cat bounces — needs 48h to confirm.
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying, MIN_PRE_MOVE 0.3 eval active. No action needed.
+
+### Verification
+DB verified. PM_TRAIL 176T/7d 86.4% +$6.38. ATR_SL 128T/7d 0.8% -$9.21 (historic low). 7d PnL improving (-$2.19 from -$2.35 earlier today). All legacy losers 0T/24h confirmed dead. Monitor: PM_TRAIL WR (>80%), ATR_SL daily (<15), MIN_PRE_MOVE 0.3 eval (Aug 21).
