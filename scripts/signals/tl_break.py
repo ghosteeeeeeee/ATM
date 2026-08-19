@@ -538,6 +538,7 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     # Trendline slope already gives direction (descending=LONG, ascending=SHORT).
     # Per-token regime confirms or penalizes — doesn't block in NEUTRAL.
     regime_penalty = 0
+    ema_penalty = 0  # default: no penalty (applied if EMA alignment is counter-trend)
     try:
         import json as _json
         regime_file = '/var/www/hermes/data/regime_5m.json'
@@ -601,11 +602,12 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         ema20 = _ema(closes, 20)
         ema50 = _ema(closes, 50)
 
-        # Direction alignment
+        # Direction alignment — penalty instead of hard block
+        # The trendline break IS the reversal signal. EMA alignment should weight, not block.
         if direction == 'LONG' and ema20 < ema50:
-            return None  # 5m bearish — don't go long
+            ema_penalty = 15  # counter-trend: reduce confidence
         if direction == 'SHORT' and ema20 > ema50:
-            return None  # 5m bullish — don't go short
+            ema_penalty = 15  # counter-trend: reduce confidence
 
         # ADX computation (Wilder's smoothing, 14-period)
         highs = [c.get('high', c['close']) for c in candles]
@@ -836,6 +838,10 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     # Apply regime penalty (set in Phase 2c)
     if regime_penalty:
         conf = max(50, conf - regime_penalty)
+
+    # Apply EMA alignment penalty (counter-trend haircut)
+    if ema_penalty:
+        conf = max(50, conf - ema_penalty)
 
     # ── Build signal ─────────────────────────────────────────────────────────
     signal_type = f'tl_break_{direction.lower()}'
