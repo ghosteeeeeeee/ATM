@@ -421,3 +421,17 @@ NO CHANGES — system healthy, PM_TRAIL carrying at 87.2% WR, ATR_SL at historic
 
 ### Verification
 All numbers verified from DB. 24h 22T +$0.08 (positive), 7d 326T -$1.37 (improving). MIN_PRE_MOVE 0.3 eval active through Aug 21. SHORT side gap persists but not urgent in NEUTRAL regime.
+
+## CEO Report — 2026-08-19 ~21:15 UTC (Run 145)
+
+### Diagnosis
+System HEALTHY, within normal variance. Verified DB: 24h 23T -$0.03, 60.9% WR (break-even). 7d: 349T -$2.19, 50.4% WR. PM_TRAIL DOMINANT: 171T/7d +$6.53, 86.5% WR (carrying system). ATR_SL: 122T/7d -$8.92, 0.8% WR (historic low: 3/day vs 28 peak Aug 13 — 89% reduction). 1 open position (clean). 0 phantom trades. All legacy losers 0T/24h confirmed dead. Regime: NEUTRAL. SHORT side: 2T/24h (spike_exhaustion_short-, small sample). Maintenance: runtime DB 87MB (needs VACUUM), 4h candles 83 days stale.
+
+### Root Cause
+PM_TRAIL exit reason dominates winners (171T/7d +$6.53, 86.5% WR). ATR_SL is the only meaningful drag (-$8.92/7d) but at historic low frequency (3/day). System fundamentally sound — PM_TRAIL edge real and sustained. Today's -$0.03 is pure variance at 60.9% WR.
+
+### Fix Applied
+NO CHANGES — system healthy, PM_TRAIL carrying at 86.5% WR, ATR_SL at historic low (3/day). All monitor targets met. MIN_PRE_MOVE 0.3 eval active through Aug 21. Runtime DB needs VACUUM (87MB, non-urgent).
+
+### Verification
+All numbers verified from DB. 24h 23T -$0.03 (break-even), 7d 349T -$2.19. PM_TRAIL 86.5% WR >80% threshold. ATR_SL 3/day <15 threshold. Monitor: PM_TRAIL WR (must >80%), ATR_SL daily (must <15), MIN_PRE_MOVE 0.3 eval (Aug 21), SHORT side gap.
