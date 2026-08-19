@@ -1,54 +1,86 @@
-=== Signal Performance Report ===
-Generated: 2026-08-19 05:08 UTC | Period: 6h / 24h / 72h
+# Signal Performance Report
+**Generated:** 2026-08-19 ~17:00 UTC | **Period:** 6h + 24h + 7d
 
-## KILLED (executed this cycle)
-None — no signal meets all kill criteria (WR<30%, 5+ trades24h, active>24h, PnL<-$0.10).
+## Overall Stats
+- **24h:** 17 trades | PnL: -$0.42
+- **7d:** 339 trades | PnL: -$2.29
+- **Inversions:** None
 
-## WATCH LIST (active losers — monitor next cycle)
-| Signal | Dir | WR | PnL | Trades (72h) | Avg PnL | Status |
-|--------|-----|-----|-----|--------|---------|--------|
-| return_exhaustion_long | LONG | 33.3% | -$0.28 | 6 | -$0.047 | BORDERLINE — WR just above 30% threshold, 3 of6 losses. Kill if drops below30% next cycle |
-| r2-trend-long3 | LONG | 42.9% | -$0.16 | 14 | -$0.011 | HIGH VOLUME underperformer —14 trades, small avg loss. Consider tightening entry criteria |
-| ct-hot+ | LONG | 0% | -$0.13 | 3 | -$0.043 | INSUFFICIENT DATA — only3 trades, needs 5+ to qualify for kill. Already killed by CEO on 8/16, these are combos |
-| bb_bounce+ (standalone) | LONG | 0% | -$0.08 | 3 | -$0.027 | INSUFFICIENT DATA — standalone underperforming but combos winning (bb_bounce+,hl_copy_trader at75% WR) |
+---
 
-## BOOSTED (executed this cycle)
-| Signal | Dir | WR | PnL | Trades (72h) | Action |
+## KILLED (executed)
+
+None. 7d losers already disabled.
+
+---
+
+## BOOSTED (executed)
+
+None. 24h volume too low (17T) to act on.
+
+---
+
+## WINNERS (7d, 3+ trades)
+
+| Signal | Dir | WR | PnL | Trades |
+|--------|-----|-----|-----|--------|
+| r2-trend-long6 | LONG | 100% | +$0.20 | 4 |
+| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 |
+| r2-trend-long0 | LONG | 66.7% | +$0.07 | 3 |
+| stop_hunt_reversal_long+ | LONG | 75% | +$0.06 | 4 |
+| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 |
+| bb_bounce+ | LONG | 50% | +$0.01 | 6 |
+
+---
+
+## LOSERS (7d, 3+ trades) — ALL ALREADY KILLED
+
+| Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb_bounce+,hl_copy_trader | LONG | 75.0% | +$0.24 | 4 | CONFIRMED winner — hot-set priority |
-| stop_hunt_reversal_long+ | LONG | 75.0% | +$0.06 | 4 | CONFIRMED winner — hot-set priority |
-| r2-trend-long4 | LONG | 62.5% | +$0.05 | 8 | SOLID — 8 trades, positive PnL |
+| range_breakout- | SHORT | 23.1% | -$0.55 | 13 | DISABLED |
+| ct-hot+ | LONG | 42.4% | -$0.42 | 33 | DISABLED |
+| wave_catcher+ | LONG | 37.5% | -$0.42 | 8 | DISABLED |
+| accel-300- | SHORT | 55.3% | -$0.26 | 38 | DISABLED |
+| range_breakout_short | SHORT | 46.4% | -$0.21 | 28 | DISABLED |
+| mover+ | LONG | 28.6% | -$0.15 | 7 | WATCH |
 
-## WINNERS (positive performers)
-| Signal | Dir | WR | PnL | Trades | Avg PnL |
-|--------|-----|-----|-----|--------|---------|
-| bb_bounce+,hl_copy_trader | LONG | 75.0% | +$0.24 | 4 | +$0.060 |
-| stop_hunt_reversal_long+ | LONG | 75.0% | +$0.06 | 4 | +$0.015 |
-| r2-trend-long4 | LONG | 62.5% | +$0.05 | 8 | +$0.006 |
-| r2-trend-long5 | LONG | 66.7% | +$0.02 | 3 | +$0.007 |
-| r2-trend-long7 | LONG | 50.0% | +$0.02 | 2 | +$0.010 |
-| hzscore- | SHORT | 66.7% | -$0.01 | 3 | -$0.003 |
+---
 
-## LOSERS (negative performers)
-| Signal | Dir | WR | PnL | Trades | Avg PnL |
-|--------|-----|-----|-----|--------|---------|
-| return_exhaustion_long | LONG | 33.3% | -$0.28 | 6 | -$0.047 |
-| r2-trend-long3 | LONG | 42.9% | -$0.16 | 14 | -$0.011 |
-| ct-hot+ | LONG | 0% | -$0.13 | 3 | -$0.043 |
-| range_breakout_short | SHORT | 0% | -$0.17 | 2 | -$0.085 |
-| bb_bounce+ (standalone) | LONG | 0% | -$0.08 | 3 | -$0.027 |
+## WATCH LIST
+
+| Signal | Dir | 24h T | 24h WR | 7d WR | 7d PnL | Status |
+|--------|-----|-------|--------|-------|--------|--------|
+| r2-trend-long4 | LONG | 4 | 50% | 53.8% | -$0.13 | Monitor |
+| r2-trend-long3 | LONG | 3 | 33.3% | 52% | -$0.23 | Monitor |
+| mover+ | LONG | — | — | 28.6% | -$0.15 | Low WR, needs review |
+
+---
 
 ## ISSUES
-- **No direction inversions detected** — all trades match signal direction
-- **Low trade volume in6h window** — only2 signals closed (r2-trend-long4 at50% WR, -$0.06). System is quiet.
-- **return_exhaustion_long** is the closest to kill threshold — if next cycle pushes it below30% WR, it dies
-- **r2-trend-long3** has14 trades but negative PnL — high frequency, low quality. Consider adding minimum confidence threshold
-- **bb_bounce+ combos winning, standalone losing** — hl_copy_trader is the differentiator, standalone bb_bounce without copy trader confirmation is bleeding
 
-## Auto-Killed Signals (already disabled)
-- range_breakout_short — AUTO_KILLED 2026-08-17 (0% WR,3T)
-- return_exhaustion (bare) — auto_1hr 2026-08-18 (3T/0%WR)
-- All combos in NEVER_REENABLE_FLAGS remain dead
+- **mover+** has 28.6% WR (7d) — borderline kill candidate. Not in hermes_constants.py (composite signal). Needs next cycle data to confirm.
+- 24h very quiet (17 trades) — no actionable signal data. Rely on 7d numbers.
+- r2-trend-long3 and long4 slightly negative but 7d WR is 52-54% — noise, not edge loss.
 
-## Summary
-System is quiet with low volume. No kills needed this cycle. The biggest risk is return_exhaustion_long drifting toward kill threshold. Boosted signals (bb_bounce+hl_copy_trader, stop_hunt_reversal_long+, r2-trend-long4) are performing well — these should stay in hot-set.
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-08-19 | 3d90495 | CEO run 135: NO CHANGES — system healthy, PM_TRAIL 92.9% WR ... |
+| 2026-08-19 | dea5b15 | CEO run 134: RAISED R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3 |
+| 2026-08-19 | a4b55d0 | Daily trading system update (2026-08-19) |
+| 2026-08-18 | 37b90e1 | signals: disable return_exhaustion_long (3T/0%WR auto-kill) |
+| 2026-08-18 | 15dc023 | CEO run 112: NO CHANGES — system strong, PM_TRAIL carrying, ... |
+| 2026-08-18 | b004ff6 | CEO: Run 97 — NO CHANGES, system STRONG. Verified DB 24h 27T... |
+| 2026-08-18 | 1325eb9 | CEO: Run 96 — NO CHANGES, system STRONG. Verified DB: 24h 27... |
+| 2026-08-18 | 342e7b7 | CEO: Run 89 — NO CHANGES, system strong, verified 24h 33T +/... |
+| 2026-08-17 | 9a2293a | CEO: 83rd run — NO CHANGES, system STRONG, ct-hot+ CLEARED. ... |
+| 2026-08-17 | 22b8e99 | CEO: 74th run — NO CHANGES, system STRONG. 24h 41T +/usr/bin... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
