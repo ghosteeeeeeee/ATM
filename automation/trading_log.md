@@ -10931,3 +10931,37 @@ None — system stable, previous fixes settling in.
 - Trade frequency
 - ATR SL trend
 - r2-trend-long3 performance (2T, close to threshold)
+
+## [2026-08-19 16:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 (quiet hour)
+
+**24h Summary:** 22T | 63.6% WR | +$0.08
+- profit-monster-trail: 14T +$0.77 (63.6%, avg +$0.055) — dominant, all winners
+- atr_sl_hit: 7T -$0.58 (31.8%, avg -$0.083) — DOWN from 53%
+- cut_loser: 1T -$0.11
+
+**Signal Performance (24h):**
+- r2-trend-long4: 6T 67% WR +$0.06 — best performer
+- r2-trend-long3: 2T 50% WR -$0.08 — borderline
+- spike_exhaustion_short-: 2T 50% WR -$0.06 — borderline
+- Various bb_bounce+ combos: mixed single trades
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 0 trades this hour — quiet period
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL declining (53% → 31.8%) — improvement continuing
+- Trade frequency normal (22/24h)
+- 0 open positions
+
+**Open Questions:**
+- SL floor bug persists but not safe to patch without full code audit
+- r2-trend-long3 at 2T — one more loss triggers review
+
+**Watch Next Hour:**
+- Trade activity resumption
+- r2-trend-long3 performance
+- ATR SL trend
