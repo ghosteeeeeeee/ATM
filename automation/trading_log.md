@@ -10713,3 +10713,26 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - ATR SL rate if new trades occur
 - WLFI open trade resolution
+
+## [2026-08-19 04:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+**Open:** 1
+
+**24h:** 14T | 50% WR | -$0.35
+- profit-monster-trail: 7T +$0.25 (dominant winner)
+- atr_sl_hit: 7T -$0.60 (50% of closes)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour (quiet early morning)
+- ATR SL 50% persistent but ATR_SL_MAX already widened Aug 16
+- return_exhaustion_long already killed
+- No signal crosses 3T/0%WR auto-kill
+- Trade frequency normal (14/24h)
+
+**Watch Next Hour:**
+- ATR SL rate if new trades occur
+- Open trade resolution
