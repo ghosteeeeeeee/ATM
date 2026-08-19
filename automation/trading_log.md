@@ -10769,3 +10769,44 @@ None — system stable, previous fixes settling in.
 - SL floor enforcement — needs tpsl_utils.py audit
 - Open trade resolutions (ICP, BIGTIME)
 - Trade frequency if market opens up
+
+## [2026-08-19 06:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet morning)
+**Open:** 1 (ME r2-trend-long4 -$0.04, SL 1.0% from entry — properly protected)
+
+**24h:** 17T | 47% WR | -$0.46
+- atr_sl_hit: 9T -$0.74 (53% of closes, avg -$0.082)
+- profit-monster-trail: 8T +$0.28 (captures winners)
+
+**7d:** 359T | ATR_SL=145 (40%), PM_Trail=185 (52%), PnL=-$2.35
+
+**SL Floor Bug — Still Present:**
+- Recent ATR SL hit SL distances: 0.32%, 0.43%, 0.50%, 0.75%, 0.82%, 0.94%, 1.00%
+- All below ATR_SL_MIN (1.0%) except last one
+- tpsl_utils.py line 509 should enforce floor but trades getting tighter SLs
+- Possible bypass: position_manager.py or brain.py initial SL setting
+- Root cause of ATR SL dominance (40% of all closes over 7d)
+
+**Auto-Kill Check:**
+- ct-hot-: 4T/0%WR — ALREADY KILLED (COIN_TRACKER_HOT_MINUS_ENABLED=False since Aug 17)
+- No new signals crossing 3T/0%WR threshold
+- return_exhaustion_long already killed
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet early morning
+- No signal crosses auto-kill threshold
+- SL floor bug identified but needs deeper tpsl_utils.py audit (not safe to patch blindly)
+- Trade frequency normal (17/24h)
+
+**Open Questions:**
+- Where is SL floor being bypassed? tpsl_utils.py line 509 looks correct but trades get <1.0% SLs
+- Is position_manager.py setting initial SL without tpsl_utils.py floor?
+- Should we add a hard SQL-level guard: UPDATE trades SET stop_loss = GREATEST(stop_loss, entry_price * (1 - ATR_SL_MIN)) WHERE direction='LONG'?
+
+**Watch Next Hour:**
+- SL floor enforcement — needs code audit (tpsl_utils.py + position_manager.py)
+- ME trade resolution
+- Trade frequency
