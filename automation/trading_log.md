@@ -10894,3 +10894,40 @@ None — system stable, previous fixes settling in.
 - SL floor enforcement — needs code audit (tpsl_utils.py lines 531-570)
 - ME trade resolution
 - Trade frequency
+
+## [2026-08-19 15:07 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4 wins, 0 losses) — ALL profit-monster-trail
+**PnL:** +$0.36 (100% WR)
+
+**24h:** 22T | 63.6% WR | +$0.08
+- profit-monster-trail: 14T +$0.77 (63.6% of closes, avg +$0.055)
+- atr_sl_hit: 7T -$0.58 (32% of closes, avg -$0.083) — DOWN from 53%
+- cut_loser: 1T -$0.11
+
+**Signal Performance (24h):**
+- r2-trend-long4: 6T 4W +$0.06 (67% WR) — best performer
+- r2-trend-long3: 2T 1W -$0.08 (50% WR) — below kill threshold
+- spike_exhaustion_short-: 2T 1W -$0.06 (50% WR) — below kill threshold
+
+**SL Floor Bug:**
+- All 7 ATR SL hits: sl_distance=0.01 (initial SL correct), trailing_activated=False
+- SL tightening from 1.0% to ~0.32-0.94% still happening
+- Root cause: MINIMUM SL DISTANCE guard (lines 531-570) overriding eff_sl_pct floor
+
+**Changes:** None
+
+**No Change Needed:**
+- Last hour excellent (4/4 wins, system hot)
+- ATR SL % trending down (53% → 32%) — improvement visible
+- No signal crosses 3T/0%WR auto-kill threshold
+- Trade frequency normal (22/24h)
+
+**Open Questions:**
+- SL floor bug persists — needs code audit of tpsl_utils.py before patching
+- Will ATR SL continue declining or is 32% the new baseline?
+
+**Watch Next Hour:**
+- Trade frequency
+- ATR SL trend
+- r2-trend-long3 performance (2T, close to threshold)

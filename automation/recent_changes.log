@@ -1008,3 +1008,7 @@
   WHY: 0T last hour. 1 open ME $0.00 with proper 1.0% SL. 24h 17T 47%WR -$0.46. ATR SL 53% (9/17) persistent. SL floor bug root cause: sl_distance=0.01 (initial SL correct) but final SL at 0.30-0.94% — tightened by MINIMUM SL DISTANCE guard (lines 531-570) overriding eff_sl_pct floor. trailing_activated=False for all. 85% of 7d ATR SL hits below 1.0%. Needs code audit, not safe to patch. No signal crosses auto-kill threshold. Quiet morning.
   BY: auto_1hr
   NEXT: Re-run at 08:04 UTC
+[2026-08-19 15:07] auto_1hr: NO CHANGES
+  WHY: 4T last hour (4 profit-monster-trail wins, +/usr/bin/bash.36 — system hot). 24h 22T 63.6%WR +/usr/bin/bash.08. ATR SL 32% (7/22) DOWN from 53% — improvement visible. SL floor bug persists but not safe to patch. No signal crosses 3T/0%WR auto-kill. r2-trend-long3 2T/hBc0.08 and spike_exhaustion_short- 2T/hBc0.06 below threshold. Trade frequency normal.
+  BY: auto_1hr
+  NEXT: Re-run at 16:07 UTC
