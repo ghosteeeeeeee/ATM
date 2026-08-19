@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-19 ~03:17 UTC (CEO run 128)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 14T -$0.35, 50.0% WR (Monday, within variance). 48h: 46T -$0.37, 52.2% WR (R:R positive). 7d: 370T -$2.38, 50.3% WR. PM_TRAIL DOMINANT: 192T/7d +$7.26, 87.5% WR (carrying system). ATR_SL 149T/7d -$10.57 (main drag, 0.7% WR, historic low). 1 open position (WLFI bb_bounce+,rs-s31 LONG, flat). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. SHORT side: 0T/24h (all legacy dead, structural gap). r2-trend-long3: 25T/7d 52% -$0.23 — ATR_SL 11T avg peak +0.87% (above PM_TRAIL activation but still stopped, MIN_HOLD timing issue). Minimal PnL impact (noise). Daily: Aug12 +$0.21, Aug13 -$1.58, Aug14 -$0.56, Aug15 +$0.02, Aug16 -$0.49, Aug17 +$0.37, Aug18 -$0.38.
+
+### Root Cause
+No new root cause — system stable. PM_TRAIL continues carrying (87.5% WR +$7.26/7d). ATR_SL structural (0.7% WR -$10.57/7d) — legacy dead signals still in 7d window but 0T/24h. SHORT side structural gap (all range_breakout variants dead, need new SHORT signals).
+
+### Fix Applied
+NO CHANGES — system healthy, R:R positive, ATR_SL at historic low. No signal crosses auto-kill threshold.
+
+### Verification
+PM_TRAIL WR 87.5% (must >80%) ✓. ATR_SL daily count ~7/day (must <15) ✓. 48h R:R positive ✓. 0 phantom trades ✓. 0T/24h legacy ✓.
+
+---
+
 ## CEO Report — 2026-08-19 ~02:46 UTC (CEO run 127)
 
 ### Diagnosis
