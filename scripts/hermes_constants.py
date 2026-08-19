@@ -1655,7 +1655,7 @@ STOP_HUNT_REVERSAL_LONG_ENABLED = True
 STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED = True
 STOP_HUNT_REVERSAL_LONG_DROP_THRESHOLD = 0.005       # 0.5% min drop to qualify as stop hunt (backtested optimal)
 STOP_HUNT_REVERSAL_LONG_DROP_WINDOW = 5              # candles to look for the drop
-STOP_HUNT_REVERSAL_LONG_REVERSAL_BODY_MIN = 0.003    # 0.3% min green body for reversal
+STOP_HUNT_REVERSAL_LONG_REVERSAL_BODY_MIN = 0.005    # 0.5% min green body for reversal (RAISED from 0.3% — filters weak doji reversals that are noise, not conviction)
 STOP_HUNT_REVERSAL_LONG_CONF_BASE = 75               # base confidence
 STOP_HUNT_REVERSAL_LONG_CONF_STRONG_REVERSAL = 5     # +5 if reversal body > 1%
 STOP_HUNT_REVERSAL_LONG_CONF_CAP = 95                # max confidence
@@ -1674,6 +1674,8 @@ SPIKE_EXHAUSTION_SHORT_COOLDOWN_HOURS = 2            # per token+direction coold
 STOP_HUNT_REVERSAL_LONG_LARGE_HUNT = 0.02            # >2% drop = extra confidence
 STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL = 0.01       # >1% reversal body = extra confidence
 STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS = 2           # per token+direction cooldown
+STOP_HUNT_REVERSAL_LONG_TREND_SLOPE_MIN = 0.0        # min 1m slope over last 30 candles — block LONG when slope < 0 (downtrend)
+STOP_HUNT_REVERSAL_LONG_TREND_WINDOW = 30            # candles for linear regression slope check — 30 balances responsiveness vs noise (20 filters valid reversals, 50 too sluggish)
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',

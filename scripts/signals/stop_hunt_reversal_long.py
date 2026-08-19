@@ -39,6 +39,8 @@ from hermes_constants import (
     STOP_HUNT_REVERSAL_LONG_LARGE_HUNT,
     STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL,
     STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS,
+    STOP_HUNT_REVERSAL_LONG_TREND_SLOPE_MIN,
+    STOP_HUNT_REVERSAL_LONG_TREND_WINDOW,
     LONG_BLACKLIST,
 )
 import sqlite3
@@ -133,6 +135,20 @@ def detect(token):
     current_price = closes[-1]
     if current_price < rev_close:
         return None  # price hasn't confirmed the reversal
+
+    # ── Trend filter: block LONG when 1m slope is negative (downtrend) ──
+    # Same principle as r2_trend_long: don't fight the trend.
+    # Uses linear regression on last N candles to measure slope direction.
+    trend_n = min(STOP_HUNT_REVERSAL_LONG_TREND_WINDOW, len(closes))
+    if trend_n >= 10:
+        trend_y = closes[-trend_n:]
+        x_mean = (trend_n - 1) / 2.0
+        y_mean = sum(trend_y) / trend_n
+        cov = sum((i - x_mean) * (trend_y[i] - y_mean) for i in range(trend_n))
+        var = sum((i - x_mean) ** 2 for i in range(trend_n))
+        slope = cov / var if var > 0 else 0.0
+        if slope < STOP_HUNT_REVERSAL_LONG_TREND_SLOPE_MIN:
+            return None  # downtrend — don't catch falling knife
 
     # Confidence
     conf = STOP_HUNT_REVERSAL_LONG_CONF_BASE
