@@ -337,6 +337,26 @@
       "related_bugs": [
         "BUG-017"
       ]
+    },
+    {
+      "id": "BUG-019",
+      "title": "r2_trend_short RSI filter comparison inverted \u2014 blocked low RSI instead of overbought",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/r2_trend_short.py"
+      ],
+      "symptom": "r2_trend_short signal almost never fired. RSI filter blocked candidates with RSI < 65 (the majority of downtrend candidates). In confirmed downtrends RSI is typically 30-50, so the inverted comparison killed nearly every candidate.",
+      "root_cause": "Line 292 used rsi < R2_TREND_SHORT_MAX_RSI (blocks LOW RSI) instead of rsi > R2_TREND_SHORT_MAX_RSI (blocks overbought). The comment also said \"don't short oversold\" which matched the wrong logic. In a downtrend, RSI is naturally low (30-50), so blocking low RSI meant almost nothing passed.",
+      "fix": "Changed rsi < R2_TREND_SHORT_MAX_RSI to rsi > R2_TREND_SHORT_MAX_RSI. Fixed stale comment on line 280 from \"don't short oversold\" to \"don't short overbought\". Logic now matches r2_trend_long.py RSI filter pattern.",
+      "verified_by": "Bug hunter: confirmed fix matches LONG version logic, constant is consistent, other filters are correctly oriented.",
+      "date_found": "2026-08-19",
+      "date_fixed": "2026-08-19",
+      "found_by": "agent",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-016"
+      ]
     }
   ],
   "schema": {

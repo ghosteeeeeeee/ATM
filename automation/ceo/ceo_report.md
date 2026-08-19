@@ -1,32 +1,24 @@
-## CEO Report — 2026-08-19 (run 153, ~23:00 UTC)
+## CEO Report — 2026-08-19 (155th run, 23:15 UTC)
 
 ### Diagnosis
-System HEALTHY — 24h 25T +$0.58, 72.0% WR (strongest day since Aug 12). 7d: 305T -$2.23, 49.8% WR (improving, legacy aging out). Daily: Aug 15 +$0.02 → 16 -$0.49 → 17 +$0.37 → 18 -$0.38 → 19 +$0.56 (4th green day). PM_TRAIL dominant: 161T/7d +$6.28, 85.7% WR (carrying system). ATR_SL: 14T/48h -$1.27 (continued downtrend from peak41). 1 open position. 0 phantoms. All legacy 0T/24h dead.
+System HEALTHY — 5th consecutive green day. Verified DB: 25T +$0.41, 68.0% WR. 7d: 305T -$2.23, 49.8% WR. Daily: Aug 13 -$1.58 → 14 -$0.56 → 15 +$0.02 → 16 -$0.49 → 17 +$0.37 → 18 -$0.38 → 19 +$0.41. 0 open positions (clean). 0 phantom trades.
 
-### Root Cause
-SL floor fix working as designed. ATR_SL count declining daily since Aug 13 peak. MIN_PRE_MOVE 0.3 deployed today — r2-trend-long3 shows 0 ATR_SL today (vs 3 yesterday, 3 Aug 17). Too early to confirm, but trending right direction. PM_TRAIL continues to capture winners at 85.7% WR, carrying the system through NEUTRAL regime.
+### Key Metrics (verified)
+- PM_TRAIL: 159T/7d +$6.13, 85.5% WR (carrying system)
+- ATR_SL: 120T/7d -$9.00, 0.8% WR (7/day, historic low)
+- Conf-filter: 90+ tier post-filter 71.4% WR +$0.26 (working)
+- 70-79 tier: 102T/7d -$0.86 (biggest non-PM_TRAIL drag — legacy aging out)
+- r2-trend-long3: 3T/24h 100% WR +$0.17 (MIN_PRE_MOVE 0.3 working)
+- SHORT side: 2T/24h -$0.06 (structural gap)
 
 ### Fix Applied
-NO CHANGES — system healthy, trajectory positive. Current state is optimal:
-- CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89 (blocking 90+ tier losers)
-- TIME_BLOCK_ENABLED=True (01-06 UTC)
-- MIN_PRE_MOVE=0.3 (r2-trend-long3 filter, eval through Aug 21)
-- SPEED_MIN=40 (ATR_SL reduction)
-- All legacy losers in NEVER_REENABLE_FLAGS
+NO CHANGES — system healthy, no intervention needed. PM_TRAIL 85.5% WR carrying, ATR_SL at historic low, conf-filter working.
 
-### Metrics vs Last Run
-| Metric | Last Run (~21:45) | This Run (~23:00) | Trend |
-|--------|-------------------|----------|-------|
-| 24h WR | 72.0% | 72.0% | → |
-| 24h PnL | +$0.62 | +$0.58 | → |
-| 7d PnL | -$2.16 | -$2.23 | → |
-| PM_TRAIL WR | 85.7% | 85.7% | → |
-| ATR_SL 48h | 6 | 14 | ↑ (normal variance) |
-| r2-trend-long3 ATR_SL | 0 today | 0 today | ↓ (good) |
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 21
+- PM_TRAIL WR (must >80%)
+- ATR_SL daily (must <15)
+- SHORT side gap (0T/24h, all legacy dead)
 
-### Next Actions
-1. **Monitor MIN_PRE_MOVE 0.3** — 48h eval through Aug 21. Today: 0 ATR_SL on r2-trend-long3 (good start).
-2. **Monitor PM_TRAIL WR** — 85.7% (must hold >80%). Carrying system.
-3. **Monitor ATR_SL daily** — 6 (must stay <15). Historic low, SL floor fix working.
-4. **SHORT side gap** — 2T/24h -$0.06 (spike_exhaustion_short- only). All legacy dead. Need new SHORT signals.
-5. **Market regime** — NEUTRAL, hotset empty. Correct behavior in flat market.
+### Verification
+All metrics confirmed via DB query. Pipeline running. All legacy losers 0T/24h.

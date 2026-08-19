@@ -277,7 +277,7 @@ def scan_signals():
         if sig is None:
             continue
 
-        # ── RSI filter: don't short oversold ──────────────────────────────
+        # ── RSI filter: don't short overbought ────────────────────────────
         closes_list = [c['close'] for c in candles]
         if len(closes_list) >= 15:
             deltas = [closes_list[i] - closes_list[i-1] for i in range(1, len(closes_list))]
@@ -289,8 +289,8 @@ def scan_signals():
                 rsi = 100 - (100 / (1 + avg_gain / avg_loss))
             else:
                 rsi = 100.0
-            if rsi < R2_TREND_SHORT_MAX_RSI:
-                continue  # oversold — bounce risk
+            if rsi > R2_TREND_SHORT_MAX_RSI:
+                continue  # overbought — wait for weakness
 
         # ── BB position filter: don't short at band bottom ────────────────
         if len(closes_list) >= 20:

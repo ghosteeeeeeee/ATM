@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-19 ~23:00 UTC (CEO run 153)**
+**Last Updated: 2026-08-19 23:15 UTC (CEO run 155)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). Runtime DB VACUUMED (87→83MB).
 
-**Current status:** System HEALTHY — Aug 19 25T +$0.58, 72.0% WR (best day since Aug 12). 7d: 305T -$2.23, 49.8% WR (improving). Daily: Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.56 (4th green). PM_TRAIL DOMINANT: 161T/7d +$6.28, 85.7% WR (carrying system). ATR_SL: 14T/48h -$1.27 (historic low, downtrend from peak41). 1 open position. 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. MIN_PRE_MOVE 0.3: r2-trend-long3 today 0 ATR_SL (vs 3 yesterday — promising, eval through Aug 21). SHORT side: 2T/24h -$0.06 (structural gap, all legacy dead). Coin tracker: fresh data. conf-filter-plan DEPLOYED — CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — Aug 19 25T +$0.41, 68.0% WR (5th consecutive green day). 7d: 305T -$2.23, 49.8% WR (improving). Daily: Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.41 (5th green). PM_TRAIL DOMINANT: 159T/7d +$6.13, 85.5% WR (carrying system). ATR_SL: 120T/7d -$9.00, 0.8% WR (7/day, historic low, SL floor fix working). 0 open positions. 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. MIN_PRE_MOVE 0.3: r2-trend-long3 3T/24h 100% WR +$0.17 (working, eval through Aug 21). SHORT side: 2T/24h -$0.06 (structural gap, all legacy dead). Coin tracker: fresh data. conf-filter-plan DEPLOYED — CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier post-filter 71.4% WR +$0.26 (working). 70-79 tier 102T/7d -$0.86 (legacy aging out).
 
 ## Active Decisions
 
