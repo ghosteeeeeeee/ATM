@@ -10736,3 +10736,36 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - ATR SL rate if new trades occur
 - Open trade resolution
+
+## [2026-08-19 05:04 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.06 (WLFI bb_bounce+,rs-s31 ATR SL)
+**Open:** 2 (ICP +$0.01, BIGTIME -$0.04)
+
+**24h:** 15T | 46.7% WR | -$0.41
+- atr_sl_hit: 8T -$0.66 (53% of closes, avg -$0.083)
+- profit-monster-trail: 7T +$0.25 (captures winners)
+
+**Key Finding — SL Floor Bug:**
+- ATR_SL_MIN = 1.0% but actual SL distances: 0.32%, 0.43%, 0.50%
+- Floor not enforcing in tpsl_utils.py update path
+- Trades stopped out before PM_TRAIL activation (+0.40%)
+- This is the root cause of ATR SL dominance
+
+**Changes:** None (max 1/hr rule — SL floor bug needs investigation)
+
+**No Change Needed:**
+- return_exhaustion_long already killed (line 1202)
+- No signal crosses 3T/0%WR auto-kill threshold
+- r2-trend-long3 3T/33%WR has 1 win (not 0%WR)
+
+**Open Questions:**
+- Where is SL floor being bypassed? Line 509 sets max(..., ATR_SL_MIN) but trades get tighter SLs
+- Is the floor only applied on initial set, not on updates?
+- Should PM_TRAIL_ACTIVATE_PCT be lowered from 0.40% to survive tighter stops?
+
+**Watch Next Hour:**
+- SL floor enforcement — needs tpsl_utils.py audit
+- Open trade resolutions (ICP, BIGTIME)
+- Trade frequency if market opens up

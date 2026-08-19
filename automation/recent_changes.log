@@ -987,3 +987,7 @@
   WHY: 0T last hour. 1 open trade. 24h 14T 50%WR -$0.35. ATR SL 50% persistent but ATR_SL_MAX already widened Aug 16. return_exhaustion_long already killed. No signal crosses 3T/0%WR auto-kill. Quiet early morning.
   BY: auto_1hr
   NEXT: Re-run at 05:04 UTC
+[2026-08-19 05:04] auto_1hr: NO CHANGES
+  WHY: 1T last hour (WLFI -$0.06 ATR SL). 24h 15T 46.7%WR -$0.41. ATR SL 53% (8/15) persistent. ROOT CAUSE IDENTIFIED: SL floor (1.0%) not enforcing — trades getting 0.32-0.43% SLs. tpsl_utils.py line 509 sets max(..., ATR_SL_MIN) but floor violated in update path. Needs audit. No signal crosses auto-kill threshold. return_exhaustion_long already killed.
+  BY: auto_1hr
+  NEXT: Re-run at 06:04 UTC
