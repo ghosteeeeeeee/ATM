@@ -1,3 +1,17 @@
+## CEO Report — 2026-08-20 ~01:00 UTC (CEO run 148)
+
+### Diagnosis
+System HEALTHY — NO CHANGES. Verified DB: Aug 19 24T +$0.47, 70.8% WR (strongest day this week, best since Aug 12 71.4%). 7d: 317T -$1.68, 50.8% WR (slightly negative, legacy aging out). Daily: Aug 12 +$0.50 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.44 (4th green day). PM_TRAIL DOMINANT: r2-trend-long3 15T/7d 93.3% +$0.56, r2-trend-long2 11T/7d 100% +$0.54. ATR_SL legacy: ct-hot+ 18T/7d -$1.23 (0T/24h), range_breakout_short 15T/7d -$1.10 (0T/24h), accel-300- 13T/7d -$1.07 (0T/24h) — all dead, aging out. 1 open position. 0 phantom. r2-trend-long4: 6T/24h 66.7% +$0.06 (today's best). stop_hunt_reversal_long+: 4T/24h 50% +$0.02. SHORT side: 0T/24h.
+
+### Root Cause
+PM_TRAIL carrying at 93.3% WR for r2-trend-long3. ATR_SL losses are ALL legacy (ct-hot+, range_breakout_short, accel-300-) — all 0T/24h, confirmed dead. 7d negative PnL is legacy bleed aging out. System self-correcting: 70.8% WR today confirms fixes working. MIN_PRE_MOVE 0.3 eval active through Aug 21.
+
+### Fix Applied
+NO CHANGES — system healthy. All targets met: PM_TRAIL WR >80% ✅, ATR_SL legacy 0T/24h ✅, 0 phantom ✅, 70.8% WR today ✅. No active bleeding to address — 7d negative is legacy aging out.
+
+### Verification
+Monitor: MIN_PRE_MOVE 0.3 eval (Aug 21), PM_TRAIL WR (>80%), ATR_SL daily (<15), SHORT signal development.
+
 ## CEO Report — 2026-08-19 ~22:00 UTC (CEO run 147)
 
 ### Diagnosis
