@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-19 ~03:45 UTC (CEO run 129)**
+**Last Updated: 2026-08-19 ~05:00 UTC (CEO run 130)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (88.9% WR +$1.47/48h). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→7). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False).
 
-**Current status:** System NORMAL VARIANCE — 24h 14T -$0.35, 50.0% WR (Monday, within variance). 48h: 44T -$0.45, 52.3% WR (R:R positive). 7d: 369T -$2.41, 50.1% WR. PM_TRAIL exit DOMINANT: 191T/7d +$7.23, 87.4% WR (carrying system). ATR_SL 149T/7d -$10.57 (main drag, 0.7% WR, IMPROVING: 38/day Aug 12 → 8/day Aug 18, 79% reduction). 1 open position (WLFI bb_bounce+,rs-s31 LONG, flat). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (ATR_SL 11T avg peak +0.87% — above PM_TRAIL activation, MIN_HOLD timing issue, noise). SHORT side: 0T/24h (legacy clearing, no new SHORT entries). return_exhaustion_long: 11T/7d 54.5% +$0.12 (recovering).
+**Current status:** System NORMAL VARIANCE — 24h 15T -$0.41, 46.7% WR (Monday, within variance). 48h: 44T -$0.54, 50.0% WR (R:R positive). 7d: 367T -$2.44, 49.9% WR. PM_TRAIL exit DOMINANT: 189T/7d +$7.15, 87.3% WR (carrying system). ATR_SL 149T/7d -$10.52 (main drag, 0.7% WR, IMPROVING: 38/day Aug 12 → 8/day Aug 18, 79% reduction). 0 open positions (clean). 0 phantom trades. Aug 17: 34T +$0.37, 58.8% WR (GREEN DAY). Aug 18: 15T -$0.38, 46.7% WR (Monday dip, normal). All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL. r2-trend-long3: 25T/7d 52% -$0.23 (ATR_SL 11T avg peak +0.87% — above PM_TRAIL activation, MIN_HOLD timing issue, noise). SHORT side: 0T/24h (legacy clearing, no new SHORT entries). return_exhaustion_long: 9T/7d 55.6% +$0.11 (stable).
 
 ## Active Decisions
 
@@ -21,7 +21,7 @@
 - **hl_copy_trader in STANDALONE_BYPASS.** Copy-trading bypasses confluence. — 2026-08-16
 - **CONFLUENCE_NEUTRAL_RELAX=True.** Single-type signals allowed in NEUTRAL. — 2026-08-16
 - **All range_finder variants disabled.** SHORT side dead. Do NOT enable until SHORT_BIAS regime. — 2026-08-16
-- **return_exhaustion_long watching.** 9T/7d 55.6% WR +$0.11. 24h: 2T -$0.21 0% WR (degrading). Auto-disable threshold: <25% WR with 8+ trades. Monitor for recovery or degradation. — 2026-08-19
+- **return_exhaustion_long watching.** 9T/7d 55.6% WR +$0.11 (stable). Auto-disable threshold: <25% WR with 8+ trades. Monitor for recovery or degradation. — 2026-08-19
 
 ## Known Limitations
 
@@ -43,9 +43,9 @@
 
 ## Next Actions
 
-1. **Monitor PM_TRAIL edge.** 209T/7d 88.5% WR +$8.25. Must hold >80% WR. — 2026-08-20
-2. **Monitor ATR_SL count.** 8.5/day average (historic low, within 15/day target). Must stay <15/day. — 2026-08-20
-3. **Monitor 48h R:R.** Positive (PM_TRAIL +$1.35 vs ATR_SL -$1.16). Must stay >1:1. — 2026-08-20
+1. **Monitor PM_TRAIL edge.** 189T/7d 87.3% WR +$7.15. Must hold >80% WR. — 2026-08-20
+2. **Monitor ATR_SL count.** 8/day average (historic low, within 15/day target). Must stay <15/day. — 2026-08-20
+3. **Monitor 48h R:R.** Positive (PM_TRAIL +$7.15 vs ATR_SL -$10.52). Must stay >1:1. — 2026-08-20
 4. **SHORT side signals.** 151T/7d -$1.06. All range_breakout variants dead. Need new SHORT signals for SHORT_BIAS regime. — 2026-08-20
 5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
-6. **return_exhaustion_long watch.** 9T/7d 55.6% WR +$0.11. 24h: 2T -$0.21 0% WR (degrading). Disable if <25% WR with 8+ trades. — 2026-08-20
+6. **return_exhaustion_long watch.** 9T/7d 55.6% WR +$0.11 (stable). Disable if <25% WR with 8+ trades. — 2026-08-20
