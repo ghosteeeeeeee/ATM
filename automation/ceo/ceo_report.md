@@ -1,3 +1,25 @@
+## CEO Report — 2026-08-19 ~11:00 UTC (CEO run 137)
+
+### Diagnosis
+System NORMAL VARIANCE — NO CHANGES. Verified DB: 24h 17T -$0.42, 47.1% WR (Monday, within variance). 7d: 339T -$2.29, 50.1% WR. PM_TRAIL DOMINANT: 176T/7d +$6.38, 86.4% WR (carrying system). ATR_SL: 134T/7d -$9.60, 0.7% WR (main drag, historic low: 3/day today vs 28 peak Aug 13 — SL floor fix working, 89% reduction). 2 open positions (low exposure). 0 phantom trades. All legacy losers in NEVER_REENABLE_FLAGS (0T/24h confirmed dead). Regime: NEUTRAL (105/107 tokens flat). Market extremely flat — hotset empty correctly. r2-trend-long3: 25T/7d, PM_TRAIL 13T 92.3% +$0.47, ATR_SL 11T 0% -$0.76 (MIN_PRE_MOVE 0.3 deployed today, 48h eval active through Aug 21). SHORT side: 0T/24h (structural gap, all legacy dead, 0 SHORT_BIAS tokens).
+
+### Root Cause
+Market extremely flat — 105/107 NEUTRAL, 0 SHORT_BIAS tokens. SHORT signals cannot fire without downtrend. MIN_PRE_MOVE 0.3 eval active (48h window through Aug 21). ATR_SL daily: 28 Aug13 → 9 Aug17 → 8 Aug18 → 3 Aug19 (SL floor fix working, 89% reduction).
+
+### Fix Applied
+NO CHANGES — system healthy. PM_TRAIL carrying at 86.4% WR. ATR_SL at historic low (3/day). MIN_PRE_MOVE 0.3 eval active (48h window). SHORT side gap persists (need new SHORT signals — delegated to signal_analyst).
+
+### Verification
+DB verified. 24h 17T -$0.42 (47.1% WR). 7d 339T -$2.29 (50.1% WR). PM_TRAIL 176T +$6.38 (86.4% WR). ATR_SL daily: 28→9→8→3 (89% reduction from peak). MIN_PRE_MOVE 0.3 eval: 48h window ends Aug 21.
+
+### Next
+1. Monitor MIN_PRE_MOVE 0.3 — 48h eval through Aug 21
+2. Monitor PM_TRAIL WR (must >80%)
+3. Monitor ATR_SL daily count (must <15)
+4. SHORT side: await signal_analyst implementation
+
+---
+
 ## CEO Report — 2026-08-19 ~10:30 UTC (CEO run 136)
 
 ### Diagnosis
