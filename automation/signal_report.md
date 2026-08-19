@@ -1,86 +1,54 @@
 === Signal Performance Report ===
-Period: 2026-08-18 23:00 UTC — Last 6h / 24h / 7d
-Generated: 2026-08-18 23:08 UTC
-
-## Summary
-- **24h**: 15 trades, all LONG, -$0.38 total PnL (46.7% WR)
-- **7d**: 200+ trades across all signals. System slightly negative overall.
-- **30d**: 1455 trades, -$3.20, 39% WR
-- **Inversions**: PASS — no direction mismatches found (24h or 7d)
-
----
+Generated: 2026-08-19 05:08 UTC | Period: 6h / 24h / 72h
 
 ## KILLED (executed this cycle)
+None — no signal meets all kill criteria (WR<30%, 5+ trades24h, active>24h, PnL<-$0.10).
 
-None — all previous losers already disabled.
+## WATCH LIST (active losers — monitor next cycle)
+| Signal | Dir | WR | PnL | Trades (72h) | Avg PnL | Status |
+|--------|-----|-----|-----|--------|---------|--------|
+| return_exhaustion_long | LONG | 33.3% | -$0.28 | 6 | -$0.047 | BORDERLINE — WR just above 30% threshold, 3 of6 losses. Kill if drops below30% next cycle |
+| r2-trend-long3 | LONG | 42.9% | -$0.16 | 14 | -$0.011 | HIGH VOLUME underperformer —14 trades, small avg loss. Consider tightening entry criteria |
+| ct-hot+ | LONG | 0% | -$0.13 | 3 | -$0.043 | INSUFFICIENT DATA — only3 trades, needs 5+ to qualify for kill. Already killed by CEO on 8/16, these are combos |
+| bb_bounce+ (standalone) | LONG | 0% | -$0.08 | 3 | -$0.027 | INSUFFICIENT DATA — standalone underperforming but combos winning (bb_bounce+,hl_copy_trader at75% WR) |
 
-| Signal | Dir | WR | PnL | Trades | Action |
+## BOOSTED (executed this cycle)
+| Signal | Dir | WR | PnL | Trades (72h) | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No new kills needed |
+| bb_bounce+,hl_copy_trader | LONG | 75.0% | +$0.24 | 4 | CONFIRMED winner — hot-set priority |
+| stop_hunt_reversal_long+ | LONG | 75.0% | +$0.06 | 4 | CONFIRMED winner — hot-set priority |
+| r2-trend-long4 | LONG | 62.5% | +$0.05 | 8 | SOLID — 8 trades, positive PnL |
 
----
+## WINNERS (positive performers)
+| Signal | Dir | WR | PnL | Trades | Avg PnL |
+|--------|-----|-----|-----|--------|---------|
+| bb_bounce+,hl_copy_trader | LONG | 75.0% | +$0.24 | 4 | +$0.060 |
+| stop_hunt_reversal_long+ | LONG | 75.0% | +$0.06 | 4 | +$0.015 |
+| r2-trend-long4 | LONG | 62.5% | +$0.05 | 8 | +$0.006 |
+| r2-trend-long5 | LONG | 66.7% | +$0.02 | 3 | +$0.007 |
+| r2-trend-long7 | LONG | 50.0% | +$0.02 | 2 | +$0.010 |
+| hzscore- | SHORT | 66.7% | -$0.01 | 3 | -$0.003 |
 
-## PREVIOUSLY KILLED (confirmed still disabled)
-
-| Signal | Dir | 7d WR | 7d PnL | Status |
-|--------|-----|-------|--------|--------|
-| ct-hot+ | LONG | 42.4% | -$0.42 | DISABLED — COIN_TRACKER_HOT_PLUS_ENABLED=False, NEVER_REENABLE |
-| wave_catcher+ | LONG | 37.5% | -$0.42 | DISABLED — WAVE_CATCHER_PLUS_ENABLED=False, NEVER_REENABLE |
-| range_breakout+ | LONG | 25.0% | -$0.41 | DISABLED — RANGE_BREAKOUT_PLUS_ENABLED=False, NEVER_REENABLE |
-| accel-300- | SHORT | 55.0% | -$0.30 | NEVER_REENABLE (55% WR but net negative, inverted R:R) |
-| hzscore+ | LONG | 25.0% | -$0.14 | DISABLED — NEVER_REENABLE |
-| hzscore- | SHORT | 56.3% | -$0.14 | DISABLED — NEVER_REENABLE (inverted R:R) |
-| continuation+ | LONG | 40.0% | -$0.17 | DISABLED — CONTINUATION_ENABLED=False |
-| range_breakout_short | SHORT | 46.4% | -$0.21 | DISABLED — NEVER_REENABLE |
-| inv-accel-300+ | LONG | 14.3% | -$0.31 | NEVER_REENABLE |
-| inv-accel-300- | SHORT | 22.4% | -$0.30 | NEVER_REENABLE |
-
----
-
-## WATCH LIST (tuning candidates)
-
-| Signal | Dir | 7d WR | 7d PnL | Trades | Avg PnL | Notes |
-|--------|-----|-------|--------|--------|---------|-------|
-| r2-trend-long3 | LONG | 52.0% | -$0.23 | 25 | -$0.009 | High WR but inverted R:R — avg win small, avg loss large. Tuning candidate, not kill. |
-| range_finder+ | LONG | 33.3% | -$0.14 | 9 | -$0.016 | DISABLED — R:R 0.12:1. Already killed. |
-| mover+ | LONG | 28.6% | -$0.15 | 7 | -$0.021 | Momentum leaderboard — PLUS already killed. MINUS still active. |
-
----
-
-## WINNERS (7d, >=5 trades)
-
-| Signal | Dir | 7d WR | 7d PnL | Trades | Status |
-|--------|-----|-------|--------|--------|--------|
-| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 | ACTIVE — strong performer |
-| bb_bounce+,hl_copy_trader | LONG | 42.9% | +$0.19 | 7 | ACTIVE |
-| wave_catcher+ | SHORT | 42.9% | +$0.15 | 7 | KILLED (master switch) — SHORT was profitable but master killed |
-| return_exhaustion_long | LONG | 55.6% | +$0.11 | 9 | ACTIVE |
-| bb_bounce+ | LONG | 56.3% | +$0.09 | 16 | ACTIVE |
-| r2-trend-long6 | LONG | 100.0% | +$0.20 | 4 | ACTIVE — small sample but perfect |
-
-### 30d top performers (>=10 trades, WR>50%)
-
-| Signal | Dir | 30d WR | 30d PnL | Trades |
-|--------|-----|--------|---------|--------|
-| bb_bounce+,range_finder+ | LONG | 58.5% | +$0.71 | 53 |
-| bb_bounce | LONG | 57.1% | +$0.24 | 14 |
-| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 |
-| bb_bounce+ | LONG | 56.0% | +$0.17 | 25 |
-| bb-bounce-short,hzscore- | SHORT | 61.1% | +$0.14 | 18 |
-
----
+## LOSERS (negative performers)
+| Signal | Dir | WR | PnL | Trades | Avg PnL |
+|--------|-----|-----|-----|--------|---------|
+| return_exhaustion_long | LONG | 33.3% | -$0.28 | 6 | -$0.047 |
+| r2-trend-long3 | LONG | 42.9% | -$0.16 | 14 | -$0.011 |
+| ct-hot+ | LONG | 0% | -$0.13 | 3 | -$0.043 |
+| range_breakout_short | SHORT | 0% | -$0.17 | 2 | -$0.085 |
+| bb_bounce+ (standalone) | LONG | 0% | -$0.08 | 3 | -$0.027 |
 
 ## ISSUES
+- **No direction inversions detected** — all trades match signal direction
+- **Low trade volume in6h window** — only2 signals closed (r2-trend-long4 at50% WR, -$0.06). System is quiet.
+- **return_exhaustion_long** is the closest to kill threshold — if next cycle pushes it below30% WR, it dies
+- **r2-trend-long3** has14 trades but negative PnL — high frequency, low quality. Consider adding minimum confidence threshold
+- **bb_bounce+ combos winning, standalone losing** — hl_copy_trader is the differentiator, standalone bb_bounce without copy trader confirmation is bleeding
 
-1. **Low trade volume** — Only 15 trades in 24h. Market may be in consolidation.
-2. **r2-trend-long3 inverted R:R** — 52% WR but -$0.23/7d. Wins average +$0.04, losses average -$0.08. Needs ATR SL tuning or profit target adjustment.
-3. **No direction inversions** — system health OK.
-4. **30d system slightly negative** — -$3.20 across 1455 trades. Edge is thin.
+## Auto-Killed Signals (already disabled)
+- range_breakout_short — AUTO_KILLED 2026-08-17 (0% WR,3T)
+- return_exhaustion (bare) — auto_1hr 2026-08-18 (3T/0%WR)
+- All combos in NEVER_REENABLE_FLAGS remain dead
 
----
-
-## ACTIONS TAKEN
-
-- No kills executed (all losers already disabled)
-- No boosts executed (winners already active)
-- Report generated — next run in 6h
+## Summary
+System is quiet with low volume. No kills needed this cycle. The biggest risk is return_exhaustion_long drifting toward kill threshold. Boosted signals (bb_bounce+hl_copy_trader, stop_hunt_reversal_long+, r2-trend-long4) are performing well — these should stay in hot-set.
