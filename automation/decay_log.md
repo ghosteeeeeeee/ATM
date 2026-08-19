@@ -557,3 +557,7 @@
 [2026-08-19 05:07 UTC] === Signal Decay Detector ===
 [2026-08-19 05:07 UTC]   🟢 r2-trend-long3: 3 trades, 33.3% WR, PnL=-1.24
 [2026-08-19 05:07 UTC] Done. Disabled 0 signals.
+[2026-08-19 11:07 UTC] === Signal Decay Detector ===
+[2026-08-19 11:07 UTC]   🟢 r2-trend-long3: 3 trades, 33.3% WR, PnL=-1.24
+[2026-08-19 11:07 UTC]   🟢 r2-trend-long4: 4 trades, 50.0% WR, PnL=-1.24
+[2026-08-19 11:07 UTC] Done. Disabled 0 signals.
