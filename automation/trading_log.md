@@ -11219,3 +11219,37 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - Asia session trade activity
 - stop_hunt_reversal_long+ (6T 50%WR -$0.10 — watch but not at kill)
+
+## [2026-08-20 02:07 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (dead hours, Asia)
+**24h:** 26T | 65.4% WR | +$0.42
+
+**24h by exit reason:**
+- profit-monster-trail: 17T 100%WR +$1.30
+- atr_sl_hit: 7T 0%WR -$0.78 (27% — stable, well below 40%)
+- cut_loser: 1T -$0.11
+- regime_bear_flip: 1T +$0.01
+
+**24h by signal:**
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (unchanged, not at kill)
+- r2-trend-long3: 4T 100%WR +$0.18
+- r2-trend-long4: 4T 75%WR +$0.12
+- r2-trend-long6: 2T 100%WR +$0.23
+- spike_exhaustion_short-: 2T 50%WR -$0.06
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL at 27% — stable, well below 40% threshold
+- profit-monster-trail dominant (65% of closes, 100% WR)
+- Trade frequency normal (1/hr avg)
+- 0 open positions — flat going into Asia morning
+- tpsl_utils SL floor fix deployed and holding
+
+**Open Questions:** None
+
+**Watch Next Hour:**
+- Asia session trade activity
+- stop_hunt_reversal_long+ (6T 50%WR -$0.10 — continue watching)
