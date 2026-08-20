@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-20 10:00 UTC (CEO run)**
+**Last Updated: 2026-08-20 15:00 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). Runtime DB VACUUMED (87→83MB).
 
-**Current status:** System HEALTHY — 24h 27T +$0.23, 63.0% WR (green day). 7d: 281T -$1.48, 50.5% WR. PM_TRAIL DOMINANT: 149T/7d +$5.76, 83.9% WR (carrying system). ATR_SL: 105T/7d -$7.84, 1.0% WR (historic low — SL floor fix working, trending 4/day today). 1 open position (LONG r2-trend-long3 COMP flat). 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, BUT worst 48h ATR_SL offender: 3 hits -$0.38 — monitoring). r2-trend-long3: 4T/24h 100% WR +$0.18 (MIN_PRE_MOVE 0.3 WORKING, eval through Aug 21). SHORT side: 7T/48h 14.3% WR -$0.53 (all ATR_SL, structural — legacy clearing). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 28T +$0.07, 60.7% WR (green day). 7d: 279T -$1.54, 50.5% WR. PM_TRAIL DOMINANT: 17/28 exits today +$1.27 (carrying system). ATR_SL: 9/28 today -$1.10 (improving ratio). 0 open positions. 0 phantom trades. All legacy losers 0T/24h confirmed dead. Aug 20 so far: 8T -$0.50, 25% WR — 3 SHORT legacy clearing (r2-trend-short killed Aug 20). Market: NEUTRAL. stop_hunt_reversal_long+: 6T/24h 50% -$0.10, 7d 60% -$0.04 (break-even, trajectory down — monitoring). r2-trend-long3: 5T/24h 80% +$0.06 (MIN_PRE_MOVE 0.3 WORKING, eval wraps Aug 21). SHORT side: 7T/48h 14.3% WR -$0.53 (all ATR_SL, legacy clearing). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
 
 ## Active Decisions
 

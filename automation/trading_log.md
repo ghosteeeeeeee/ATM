@@ -11491,3 +11491,23 @@ None — system stable, previous fixes settling in.
 - stop_hunt_reversal_long+ approaching 7T threshold for evaluation
 - Quiet period — 1T in last hour
 - Pipeline healthy, 7th green day trajectory
+
+## [2026-08-20 11:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses) — APT r2-trend-long6 +$0.02
+**PnL:** +$0.02 (100% WR last hour)
+**24h:** 28T / 17W (60.7% WR) / +$0.07
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 32.1% (9/28) — below 40% kill threshold ✅
+- stop_hunt_reversal_long+ 6T 50%WR -$0.10 — borderline but flat, not degrading
+- spike_exhaustion_short- 2T 50%WR -$0.06 — too few trades to call
+- Trade freq 28/24h ≈ 1.2/hr — normal
+- 0 open positions — clean slate
+- All new r2-trend-long variants profitable
+
+**Watch Next Hour:**
+- stop_hunt_reversal_long+ now at 6T — 1 more loss triggers 7T eval
+- Pipeline healthy, 7th green day trajectory continues
