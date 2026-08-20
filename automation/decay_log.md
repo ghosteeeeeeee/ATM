@@ -586,3 +586,7 @@
 [2026-08-20 17:07 UTC]   🟢 stop_hunt_reversal_long+: 5 trades, 60.0% WR, PnL=0.79
 [2026-08-20 17:07 UTC]   🟢 r2-trend-long6: 3 trades, 100.0% WR, PnL=2.37
 [2026-08-20 17:07 UTC] Done. Disabled 0 signals.
+[2026-08-20 23:07 UTC] === Signal Decay Detector ===
+[2026-08-20 23:07 UTC]   🟢 r2-trend-short2: 3 trades, 33.3% WR, PnL=-2.12
+[2026-08-20 23:07 UTC]   🟢 r2-trend-long3: 6 trades, 50.0% WR, PnL=-1.65
+[2026-08-20 23:07 UTC] Done. Disabled 0 signals.

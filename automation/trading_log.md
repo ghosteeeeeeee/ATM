@@ -1,5 +1,48 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-20 21:04 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (r2-trend-long3 +$0.04 win)
+**24h:** 19T | 10W (52.6% WR) | -$0.53
+**Open:** 0
+
+**24h Close Reasons:**
+- profit-monster-trail: 10T +$0.27 (52.6% of closes — dominant, profitable)
+- atr_sl_hit: 8T -$0.81 (42.1% of closes — just above 40% threshold)
+- regime_bear_flip: 1T +$0.01
+
+**Signal Performance 24h:**
+- r2-trend-long4: 2T/2W +$0.04 (100% WR)
+- r2-trend-long16: 1T/1W +$0.02
+- r2-trend-long13: 1T/1W +$0.03
+- bb_bounce+: 1T/1W +$0.07
+- r2-trend-long6: 1T/1W +$0.02
+- r2-trend-long11: 1T/1W +$0.04
+- r2-trend-long3: 6T/3W -$0.17 (50% WR — worst performer, not auto-kill)
+- r2-trend-long8: 1T/0W -$0.11
+- r2-trend-short10: 1T/0W -$0.11
+- r2-trend-short13: 1T/0W -$0.13
+- r2-trend-short2: 3T/0W -$0.23 (already killed by CEO)
+
+**Auto-Kill Check:**
+- r2-trend-short2: 3T/0%WR -$0.23 — already disabled
+- No other signal crosses 3T/0%WR threshold
+
+**Hourly Frequency:** Max 4T/hr (08:00), average ~1.4T/hr — normal
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 1 trade last hour — quiet, system healthy
+- ATR_SL at 42.1% — just above 40% threshold but within 7-day variance (26.9%-53.3%)
+- profit-monster-trail dominant and profitable (+$0.27/24h)
+- Trade frequency normal (19/24h)
+- No signal crosses auto-kill threshold
+- r2-trend-long3 6T/50%WR -$0.17 — worst performer but not critical
+- System within parameters
+
+---
+
 ## [2026-08-20 19:04 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour
