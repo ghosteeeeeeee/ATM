@@ -11150,3 +11150,38 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - Trade activity
 - ATR SL trend
+
+## [2026-08-20 00:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (3 in last 3h)
+**24h:** 26T | 69.2% WR | +$0.42
+
+**24h by exit reason:**
+- profit-monster-trail: 17T 100%WR +$1.30
+- atr_sl_hit: 7T 0%WR -$0.78 (27% of closes ↓ from 53% baseline)
+- cut_loser: 1T -$0.11
+- regime_bear_flip: 1T +$0.01
+
+**24h by signal:**
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (weakest, not at kill threshold)
+- r2-trend-long3: 4T 100%WR +$0.18
+- r2-trend-long4: 4T 75%WR +$0.12
+- r2-trend-long6: 2T 100%WR +$0.23
+- spike_exhaustion_short-: 2T 50%WR -$0.06
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal crosses 3T/0%WR auto-kill threshold
+- ATR SL at 27% — well below 40% threshold, continued improvement from 53%
+- profit-monster-trail dominant (65% of closes, 100% WR)
+- Trade frequency normal (1.1/hr avg)
+- 0 open positions
+- All 26 trades live (not paper)
+- tpsl_utils.py SL floor fix deployed
+
+**Open Questions:** None
+
+**Watch Next Hour:**
+- Trade activity (slow period)
+- stop_hunt_reversal_long+ (6T 50%WR -$0.10 — approaching concern but not kill threshold)

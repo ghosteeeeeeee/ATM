@@ -792,7 +792,7 @@ WRONG_SIDE_AVG_PCT_THRESH = 1.0   # wrong-side trigger: avg counter move >= 1.5%
 
 # ── Pause switches ─────────────────────────────────────────────────────────────
 # Flip to True to disable without restarting anything. Flip back to False to re-enable.
-MACD_EXIT_PAUSED = False   # Disable macd_rules.py exit signals (ATR TP/SL handles closes)
+MACD_EXIT_PAUSED = True   # Disable macd_rules.py exit signals (ATR TP/SL handles closes)
 REGIME_BULL_FLIP_ENABLED = False  # Disable regime_bull_flip exit (fires too often on short timeframe)
 
 # ── HH_HL Signal (Higher Highs / Higher Lows structure) ────────────────────────
