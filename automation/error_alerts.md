@@ -33,3 +33,30 @@ No WARN or CRITICAL issues detected.
 - **OK** Disk: 78% used (26G free)
 - **OK** Hotset: empty (expected — no signals above 50% confidence)
 - **OK** No errors in last 30min
+
+## Health Report — 2026-08-20 11:19 UTC
+
+PIPELINE: OK
+- Status: running (last run 11:18:19, 18.7s duration)
+- Signals (1h): 0 generated (hotset empty — no signals above 50% confidence)
+- Trades: 0 open, 28 closed today, +1.10% PnL
+- Errors: 0
+
+MARKET:
+- Regime: 5 LONG_BIAS / 0 SHORT / 99 NEUTRAL (overall: LONG_BIAS)
+- Speed: 185 tokens tracked
+- Notable: CRV, ORD, CHIP, ENA, MEGA in LONG_BIAS
+
+SYSTEM:
+- Timers: 45 active, all firing
+- Disk: 79% used (25G free)
+- Prices: 239 tokens in speed tracker
+- HL Copy DB: 1.4G
+
+AUTO-FIXES APPLIED:
+- Restarted hermes-hl-volume.service (was failed — 429 rate limit from Hyperliquid, transient)
+
+ALERTS:
+- **[WARN]** 3 phantom trades in PostgreSQL (id 10211-10213): empty status, 2 missing token — stale/orphaned records
+- **[WARN]** 5 services in failed state: hl-volume (429 rate limit, transient), better-coder, bug-hunter, trading-checklist, wasp (non-critical)
+- **[INFO]** Hotset empty — expected in neutral market, pipeline correctly filtering low-confidence signals
