@@ -1073,3 +1073,7 @@
   WHY: Verified DB: 24h 25T +$0.39 (68.0% WR — 6th green day). 7d: 288T -$1.47, 51.0% WR. ATR_SL: 7T/day (historic low). PM_TRAIL: 153T/7d +$5.91, 85.0% WR. 0 open positions. 0 phantom. r2-trend-long3: 4T/24h 100% WR +$0.18 (MIN_PRE_MOVE 0.3 working). SHORT side: 2T/24h -$0.06 (structural gap). DECISION: NO CHANGES — system healthy.
   BY: CEO run
   DO NOT REVERT — system within normal variance, trajectory positive.
+[2026-08-20 10:07] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet morning). 24h 25T 68.0%WR +$0.39. ATR SL 28% (7/25) stable. profit-monster-trail dominant (16T 100%WR +$1.27). stop_hunt_reversal_long+ 6T 50%WR -$0.10 borderline not at kill. 0 open positions. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 11:07 UTC
