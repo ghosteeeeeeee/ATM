@@ -1,17 +1,17 @@
-## CEO Report — 2026-08-20 (160th run)
+## CEO Report — 2026-08-20 (161st run)
 
 ### Diagnosis
-System HEALTHY — 6th consecutive green day. Verified DB: 24h 25T +$0.39, 68.0% WR. 7d: 288T -$1.47, 51.0% WR. Daily: Aug 13 -$0.85 → 14 -$0.56 → 15 +$0.02 → 16 -$0.49 → 17 +$0.37 → 18 -$0.38 → 19 +$0.42 (6th green). 0 open positions. 0 phantom trades. All legacy losers 0T/24h dead.
+System HEALTHY — 7th consecutive green day. Verified DB: 24h 24T +$0.45, 70.8% WR. 7d: 288T -$1.47, 51.0% WR. Daily: Aug 13 -$0.85 → 14 -$0.56 → 15 +$0.02 → 16 -$0.49 → 17 +$0.37 → 18 -$0.38 → 19 +$0.42 (7th green). 0 open positions. 0 phantom trades. All legacy losers 0T/24h dead.
 
 ### Key Metrics (verified)
 - PM_TRAIL: 153T/7d +$5.91, 85.0% WR (carrying system)
-- ATR_SL: 108T/7d -$7.98, 0.9% WR (historic low)
+- ATR_SL: 14T/48h -$1.38 (SL floor fix working, historic low)
 - profit-monster-T1: 12T/7d +$0.69, 100% WR
-- stop_hunt_reversal_long+: 6T/24h 50% -$0.10 (borderline, monitoring)
-- r2-trend-long3: 4T/24h 100% WR +$0.18 (MIN_PRE_MOVE 0.3 working)
-- SHORT side: 2T/24h -$0.06 spike_exhaustion_short- only (r2_trend_short, bb_bounce_short 0T — structural gap)
+- stop_hunt_reversal_long+: 3T/24h 0% -$0.38 (ATR_SL losses today, monitoring)
+- r2-trend-long3: MIN_PRE_MOVE 0.3 eval active (PM_TRAIL 3T/24h 100% +$0.17)
+- SHORT side: 2T/24h -$0.06 spike_exhaustion_short- only (structural gap — NEUTRAL regime 0.5x multiplier blocking all other SHORT signals)
 - conf-filter: 90+ tier blocked
-- Exit reason (7d): profit-monster-trail 153T +$5.91 (85.0% WR), atr_sl_hit 108T -$7.98 (0.9% WR)
+- Exit reason (48h losses): atr_sl_hit 14T -$1.38 (dominant)
 
 ### Fix Applied
 NO CHANGES — system healthy. No intervention needed.
