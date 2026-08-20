@@ -11463,3 +11463,31 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - stop_hunt_reversal_long+ approaching borderline (6T 50%WR)
 - Quiet period — 0 trades in 50min
+
+## [2026-08-20 10:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+- COMP LONG r2-trend-long3: -$0.12 (ATR_SL hit)
+
+**24h:** 27T / ~17W (63% WR) / +$0.11
+- profit-monster-trail: 16T +$1.25 (system engine)
+- atr_sl_hit: 9T (33.3% — below 40%) ✅
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (borderline, stable)
+- r2-trend-long3: 5T 80%WR +$0.06 (healthy)
+- r2-trend-short*: killed by CEO, legacy losers
+
+**Open:** 0 positions
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 33.3% — below 40% kill threshold
+- stop_hunt_reversal_long+ 50%WR — borderline but flat PnL, stable
+- Trade freq 1/hr — no overtrading
+- No open positions — clean slate
+- All active signals profitable or near breakeven
+
+**Watch Next Hour:**
+- stop_hunt_reversal_long+ approaching 7T threshold for evaluation
+- Quiet period — 1T in last hour
+- Pipeline healthy, 7th green day trajectory
