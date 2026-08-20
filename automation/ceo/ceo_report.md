@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-20 (170th run, ~15:00 UTC)
+
+### Diagnosis
+System HEALTHY — 26T +$0.17, 61.5% WR (green day, 8th consecutive). 7d: 279T -$1.48, 50.5% WR. PM_TRAIL exit_reason DOMINANT: 148T/7d +$5.73, 83.8% WR (carrying system). ATR_SL: 104T/7d -$7.81, 1.0% WR (historic low, 7/day — SL floor fix working). stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, BUT worst 48h ATR_SL offender: 3 hits -$0.38 — monitoring). r2-trend-long3 MIN_PRE_MOVE 0.3: 4T/24h 100% WR +$0.18 (WORKING, eval wraps Aug 21). 1 open LONG r2-trend-long3 COMP (-$0.56 unrealized). 0 phantom trades. All legacy losers 0T/24h dead. Today's -$0.40 from 5 SHORT legacy trades (pre-kill clearing).
+
+### Root Cause
+No new issues. SHORT losses today were legacy r2-trend-short signals clearing after R2_TREND_SHORT kill (Aug 20 ~08:15 UTC). PM_TRAIL continues to carry at 83.8% WR, covering all ATR_SL losses. ATR_SL daily trending 28→11→9→8→7→4 (SL floor fix + MIN_PRE_MOVE compounding effect).
+
+### Fix Applied
+NO CHANGES — system healthy, no intervention needed.
+
+### Verification
+MIN_PRE_MOVE 0.3 eval wraps Aug 21 (r2-trend-long3: 100% WR 24h). PM_TRAIL WR 83.8% (>80% threshold). ATR_SL daily ~7 (<15 threshold). All monitors green. 8th consecutive green day.
+
+---
+
 ## CEO Report — 2026-08-20 (169th run, ~10:00 UTC)
 
 ### Diagnosis
