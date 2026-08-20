@@ -23,3 +23,13 @@ No WARN or CRITICAL issues detected.
 - **[WARN]** (1x): `MTF-MACD tuner AttributeError` — PrecomputedMACD missing 'warmup' attr
 - **[INFO]** (1x): `HL volume 429 rate limit` — transient, will self-resolve
 - **[INFO]** (1x): `Ollama unreachable` — not used for trading, ignored
+
+## Health Report — 2026-08-20 00:18 UTC
+- **OK** Pipeline running (53 runs/hour), last run: 00:18 — completed in 18.6s
+- **OK** Signals: 20 generated (1h), 935 (24h)
+- **OK** Trades: 0 open, 26 closed today, +4.46% PnL
+- **OK** Regime: 2 LONG / 0 SHORT / 102 NEUTRAL (overall: NEUTRAL)
+- **OK** Timers: 43 active, all firing on schedule
+- **OK** Disk: 78% used (26G free)
+- **OK** Hotset: empty (expected — no signals above 50% confidence)
+- **OK** No errors in last 30min
