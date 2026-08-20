@@ -262,8 +262,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('continuation_short', 'continuation-'):  1.15,
     # trend_momentum_near_sma — uptrend + momentum + near SMA (47.8% WR, +$9.66/14d)
     ('trend_momentum_near_sma', 'trend_momentum_near_sma+'): 1.0,
-    # stop_hunt_reversal_long — catch violent long after stop hunt
-    ('stop_hunt_reversal_long', 'stop_hunt_reversal_long+'): 1.3,  # boosted 2026-08-13
+    # stop_hunt_reversal_long — CEO KILLED 2026-08-21, 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10
+    ('stop_hunt_reversal_long', 'stop_hunt_reversal_long+'): 0.0,  # DEAD — NEVER_REENABLE
     # spike_exhaustion_short — fade violent spike after exhaustion
     ('spike_exhaustion_short', 'spike_exhaustion_short-'): 1.0,
     # wave_catcher — catch violent spikes in both directions

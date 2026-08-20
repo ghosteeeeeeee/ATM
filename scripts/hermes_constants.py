@@ -948,6 +948,8 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_PLUS_ENABLED', # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48 (24h 20T).
     'COIN_TRACKER_HOT_MINUS_ENABLED',# SIGNAL REPORTER 2026-08-16 — 0% WR, -$0.19 (48h 4T).
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
+    'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
+    'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1653,8 +1655,8 @@ TREND_MOMENTUM_NEAR_SMA_CONF_CLOSE_SMA = 5          # +5 if within 0.2% of SMA
 TREND_MOMENTUM_NEAR_SMA_CONF_CAP = 95               # max confidence
 
 # ── stop_hunt_reversal_long — catch violent long after stop hunt ──────────
-STOP_HUNT_REVERSAL_LONG_ENABLED = True
-STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED = True
+STOP_HUNT_REVERSAL_LONG_ENABLED = False   # CEO KILLED 2026-08-21 — 10T/7d 60% WR -$0.04 (break-even), 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE.
+STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED = False  # CEO KILLED 2026-08-21 — same as master. NEVER_REENABLE.
 STOP_HUNT_REVERSAL_LONG_DROP_THRESHOLD = 0.005       # 0.5% min drop to qualify as stop hunt (backtested optimal)
 STOP_HUNT_REVERSAL_LONG_DROP_WINDOW = 5              # candles to look for the drop
 STOP_HUNT_REVERSAL_LONG_REVERSAL_BODY_MIN = 0.005    # 0.5% min green body for reversal (RAISED from 0.3% — filters weak doji reversals that are noise, not conviction)

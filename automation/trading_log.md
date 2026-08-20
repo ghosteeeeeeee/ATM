@@ -1,5 +1,49 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-20 19:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 1 (KAS r2-trend-long13 -$0.04)
+**24h:** 23T | 12W (52.2% WR) | -$0.40
+**7d:** 270T | 50.7% WR | -$1.46
+
+**24h Close Reasons:**
+- profit-monster-trail: 13T +$0.68 (avg +$0.05) — dominant, profitable
+- atr_sl_hit: 9T -$1.09 (avg -$0.12) — 39.1% of closes (just below 40%)
+- regime_bear_flip: 1T +$0.01
+
+**Signal Performance 24h:**
+- r2-trend-long6: 3T/3W +$0.25 (100% WR — excellent)
+- bb_bounce+: 1T/1W +$0.07
+- r2-trend-long4: 2T/2W +$0.04
+- r2-trend-long16: 1T/1W +$0.02
+- stop_hunt_reversal_long+: 3T/2W +$0.02 (66.7% WR — improved)
+- r2-trend-long3: 6T/4W -$0.09 (66.7% WR — inverted R:R persists)
+- r2-trend-long8: 1T/0W -$0.11 (below threshold)
+- r2-trend-short10: 1T/0W -$0.11 (below threshold)
+- hl_copy_trader,stop_hunt_reversal_long+: 1T/0W -$0.13 (below threshold)
+- r2-trend-short13: 1T/0W -$0.13 (below threshold)
+- r2-trend-short2: 3T/0W -$0.23 (already killed by CEO)
+
+**Auto-Kill Check:**
+- r2-trend-short2: 3T/0%WR -$0.23 — already disabled
+- No other signal crosses 3T/0%WR threshold
+
+**Hourly Frequency:** Max 4T/hr (08:00), average ~1.4T/hr — normal
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 0 trades last hour — quiet evening
+- ATR_SL at 39.1% — just below 40% threshold, SL floor fix holding
+- profit-monster-trail dominant and profitable (+$0.68/24h)
+- Trade frequency normal (23/24h)
+- No signal crosses auto-kill threshold
+- r2-trend-long3 inverted R:R persists (66.7% WR but -$0.09) — monitored, not critical
+- System within parameters
+
+---
+
 ## [2026-08-20 18:30 UTC] Daily Orchestrator Run
 
 **Status:** System HEALTHY — no changes needed
