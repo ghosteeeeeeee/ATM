@@ -101,3 +101,9 @@ ALERTS:
 - **[WARN]** 5 services in failed state: hl-volume (429 rate limit, transient), better-coder, bug-hunter, trading-checklist (all non-critical for trading)
 - **[WARN]** `pipeline.log` at 93MB — approaching rotation threshold
 - **[WARN]** Signals DB at 84MB — signal-purge timer active, should self-clean
+
+## Error Alerts — 2026-08-20 22:20 UTC
+- **WARN** (continuous): `signals: only 2-3 signals in last 5 min (min 20)` — pipeline_watchdog
+- **WARN**: `hotset.json is empty — no signals survived compaction` — 0 signals above 50% confidence threshold
+- **INFO**: Live trading kill switch: ON (re-enabled by CEO, 52.9% WR)
+- **AUTO-FIX**: None required — all systems nominal, no crashes detected
