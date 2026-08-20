@@ -28,7 +28,7 @@ from hermes_constants import (
     R2_TREND_SHORT_ENABLED,
     R2_TREND_SHORT_MIN_SLOPE,
     R2_TREND_SHORT_MIN_R2,
-    R2_TREND_SHORT_MAX_RSI,
+    R2_TREND_SHORT_MIN_RSI,
     R2_TREND_SHORT_MIN_SPEED,
     R2_TREND_SHORT_MIN_BB_POS,
     R2_TREND_SHORT_BLOCK_STALE,
@@ -41,11 +41,10 @@ from hermes_constants import (
 
 # ── Constants ─────────────────────────────────────────────────────────────
 R2_WINDOW            = 16
-R2_THRESHOLD         = 0.60
+R2_THRESHOLD         = 0.70
 SIGNAL_TYPE          = 'r2_trend_short'
 SOURCE_PREFIX        = 'r2-trend-short'
 LOOKBACK_CANDLES     = 50
-COOLDOWN_MINUTES     = 15
 MIN_CONFIDENCE       = 50
 MAX_CONFIDENCE       = 88
 BASE_CONFIDENCE      = 65
@@ -94,8 +93,8 @@ def detect_r2_short(token, candles, price):
     y = closes[-R2_WINDOW:]
     slope, intercept, r2 = _ols_params(y)
 
-    # SHORT conditions: slope < 0, price below line, R² strong enough
-    if r2 < R2_TREND_SHORT_MIN_R2 or slope >= 0 or closes[-1] >= intercept:
+    # SHORT conditions: slope < -MIN_SLOPE (meaningful downtrend), price below line, R² strong enough
+    if r2 < R2_TREND_SHORT_MIN_R2 or slope >= -abs(R2_TREND_SHORT_MIN_SLOPE) or closes[-1] >= intercept:
         return None
 
     # ── Gap300 filter — don't SHORT when price too far below EMA300 ─────
@@ -222,13 +221,15 @@ def _get_candles_1m(token, lookback=LOOKBACK_CANDLES):
 
 # ── Scanner ─────────────────────────────────────────────────────────────
 
-def scan_signals():
+def scan_signals(prices_dict=None):
     if not R2_TREND_ENABLED or not R2_TREND_SHORT_ENABLED:
         return 0
 
-    from signal_schema import get_all_latest_prices
+    if prices_dict is None:
+        from signal_schema import get_all_latest_prices
+        prices_dict = get_all_latest_prices()
 
-    prices = get_all_latest_prices()
+    prices = prices_dict
     added = 0
 
     for token, data in prices.items():
@@ -277,7 +278,7 @@ def scan_signals():
         if sig is None:
             continue
 
-        # ── RSI filter: don't short overbought ────────────────────────────
+        # ── RSI filter: don't short oversold (bounce risk) ──────────────────
         closes_list = [c['close'] for c in candles]
         if len(closes_list) >= 15:
             deltas = [closes_list[i] - closes_list[i-1] for i in range(1, len(closes_list))]
@@ -289,8 +290,8 @@ def scan_signals():
                 rsi = 100 - (100 / (1 + avg_gain / avg_loss))
             else:
                 rsi = 100.0
-            if rsi > R2_TREND_SHORT_MAX_RSI:
-                continue  # overbought — wait for weakness
+            if rsi < R2_TREND_SHORT_MIN_RSI:
+                continue  # oversold — bounce risk, skip SHORT
 
         # ── BB position filter: don't short at band bottom ────────────────
         if len(closes_list) >= 20:
@@ -316,6 +317,7 @@ def scan_signals():
         )
         if sid:
             added += 1
+            set_cooldown(token, direction='SHORT', hours=3)
             print(f'  SHORT {token:8s} conf={sig["confidence"]:.0f}% '
                   f'slope={sig["slope"]:.6f} r2={sig["r2"]:.4f} '
                   f'price={price:.6f} intercept={sig["intercept"]:.6f} '
@@ -332,7 +334,7 @@ def run(prices_dict=None):
     if prices_dict is None:
         from signal_schema import get_all_latest_prices
         prices_dict = get_all_latest_prices()
-    return scan_signals()
+    return scan_signals(prices_dict)
 
 
 if __name__ == '__main__':

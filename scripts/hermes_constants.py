@@ -1103,16 +1103,16 @@ R2_REV_ENABLED           = False  # r2_rev — blocked in blacklist
 R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT
 R2_TREND_ENABLED         = True   # master kill switch for r2_trend SHORT
-R2_TREND_SHORT_ENABLED   = False  # CEO KILLED 2026-08-20 — 3T/48h 0% WR -$0.23 (all ATR_SL, NEUTRAL market too sideways)
+R2_TREND_SHORT_ENABLED   = True   # RE-ENABLED 2026-08-20 — RSI inversion fix + MIN_SLOPE enforcement + threshold tightening. CEO_PROTECTED
 R2_TREND_SHORT_MIN_SLOPE    = -0.003  # maximum slope % (negative = downtrend) — mirrors LONG but inverted
-R2_TREND_SHORT_MIN_R2       = 0.60    # minimum R² threshold (lower than LONG 0.70 — SHORT trends are sharper)
-R2_TREND_SHORT_MAX_RSI      = 65      # max RSI — don't short overbought (wait for weakness)
+R2_TREND_SHORT_MIN_R2       = 0.70    # minimum R² threshold (raised from 0.60 — match LONG, filter weak trends)
+R2_TREND_SHORT_MIN_RSI      = 30      # min RSI — don't short when oversold (bounce risk). FIXED: was MAX_RSI=65 (inverted, blocked best short setups)
 R2_TREND_SHORT_MIN_SPEED    = 30      # min speed percentile — require downward momentum
 R2_TREND_SHORT_MIN_BB_POS   = 0.15    # min BB position — don't short at band bottom (bounce risk)
 R2_TREND_SHORT_BLOCK_STALE  = True    # block signals on stale tokens
 R2_TREND_SHORT_MAX_ACCEL    = 0.005   # block SHORT when price_acceleration > this (overextended)
 R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT when price rising before entry
-R2_TREND_SHORT_MIN_BARS     = 2       # min bars since trend started — don't enter too early
+R2_TREND_SHORT_MIN_BARS     = 3       # min bars since trend started — raised from 2, match LONG (2 = fading moves)
 R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope % to fire (filters noise, only fires on meaningful trends)
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
@@ -1170,6 +1170,7 @@ CEO_PROTECTED_FLAGS = {
     'RANGE_BREAKOUT_SHORT_ENABLED': ('Winning SHORT signal — 11-win streak Aug 12. CEO killed, user re-enabled', '2026-08-17'),
     'R2_TREND_LONG_ENABLED': ('Winning LONG signal — 8/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
+    'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────

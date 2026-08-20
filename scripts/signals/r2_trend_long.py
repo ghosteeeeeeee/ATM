@@ -39,11 +39,10 @@ from hermes_constants import (
 
 # ── Constants ─────────────────────────────────────────────────────────────
 R2_WINDOW            = 16
-R2_THRESHOLD         = 0.60
+R2_THRESHOLD         = 0.70
 SIGNAL_TYPE          = 'r2_trend_long'
 SOURCE_PREFIX        = 'r2-trend-long'
 LOOKBACK_CANDLES     = 50
-COOLDOWN_MINUTES     = 15
 MIN_CONFIDENCE       = 50
 MAX_CONFIDENCE       = 88
 BASE_CONFIDENCE      = 65
@@ -92,8 +91,8 @@ def detect_r2_long(token, candles, price):
     y = closes[-R2_WINDOW:]
     slope, intercept, r2 = _ols_params(y)
 
-    # LONG conditions: slope > 0, price above line, R² strong enough
-    if r2 < R2_TREND_LONG_MIN_R2 or slope <= 0 or closes[-1] <= intercept:
+    # LONG conditions: slope > MIN_SLOPE (meaningful uptrend), price above line, R² strong enough
+    if r2 < R2_TREND_LONG_MIN_R2 or slope <= R2_TREND_LONG_MIN_SLOPE or closes[-1] <= intercept:
         return None
 
     # ── Gap300 filter (2026-08-14) ──────────────────────────────────────
@@ -176,7 +175,7 @@ def detect_r2_long(token, candles, price):
         return None
 
     # Confidence scoring
-    r2_bonus = min((r2 - R2_THRESHOLD) / (1.0 - R2_THRESHOLD) * R2_BONUS_MAX, R2_BONUS_MAX)
+    r2_bonus = min((r2 - R2_TREND_LONG_MIN_R2) / (1.0 - R2_TREND_LONG_MIN_R2) * R2_BONUS_MAX, R2_BONUS_MAX)
     recency_bonus = max(RECENCY_BONUS_MAX - bars_since, 0)
 
     confidence = int(min(
