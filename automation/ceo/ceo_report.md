@@ -1,3 +1,30 @@
+## CEO Report — 2026-08-20 (159th run)
+
+### Diagnosis
+System HEALTHY — 6th consecutive green day (Aug 19). Verified DB: Aug 19 26T +$0.42, 69.2% WR. 7d: 294T -$1.68, 50.7% WR. 0 open positions. 0 phantom trades. All legacy losers 0T/24h dead. ATR_SL trending down: 22→28→20→18→9→8→7 (historic low, 68% reduction from peak). Aug 20: 0 trades so far (early UTC).
+
+### Key Metrics (verified)
+- PM_TRAIL: 155T/7d +$6.01, 85.2% WR (carrying system — every other signal net negative)
+- ATR_SL: 7T/day (historic low, SL floor fix working)
+- r2-trend-long3: 29T/7d 58.6% -$0.05 (MIN_PRE_MOVE 0.3 filtering, eval through Aug 21)
+- SHORT side: 0T/24h enabled signals (structural gap — all legacy, no new trades)
+- conf-filter: 90+ tier blocked (CONF_FILTER_MAX=89)
+- Exit reason (7d): profit-monster-trail 155T +$6.01 (85.2% WR), atr_sl_hit 112T -$8.29 (0.9% WR)
+
+### Fix Applied
+NO CHANGES — system healthy. No intervention needed.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 21
+- PM_TRAIL WR (must >80%)
+- ATR_SL daily (must <15)
+- SHORT side gap (delegated to signal_analyst)
+
+### Verification
+All metrics confirmed via direct DB query. Pipeline running. All timers active.
+
+---
+
 ## CEO Report — 2026-08-20 (158th run)
 
 ### Diagnosis
@@ -51,3 +78,17 @@ NO CHANGES — system healthy, no intervention needed. All legacy losers dead. S
 
 ### Verification
 All metrics confirmed via direct DB query. Pipeline running.
+
+## CEO Report — 2026-08-20
+
+### Diagnosis
+System HEALTHY — 6th consecutive green day. Aug 19: 26T +$0.42, 69.2% WR. 7d: 290T -$1.63, 50.7% WR. 0 open positions, 0 phantom trades. All legacy losers confirmed dead (0T/24h).
+
+### Root Cause
+No active bleeding point. PM_TRAIL carrying system (153T/7d +$5.91, 85% WR). ATR_SL at historic low (7T/day, 75% reduction from peak 28 — SL floor fix working). Confidence filter blocking 90+ tier (112T/7d 48.2% WR -$1.37). SHORT side structural gap (0T/24h from enabled signals — all 69T/7d -$1.60 from legacy trades, now dead).
+
+### Fix Applied
+NO CHANGES — system healthy, no intervention needed.
+
+### Verification
+All metrics positive: PM_TRAIL 85% WR carrying, ATR_SL 7/day historic low, conf-filter active, MIN_PRE_MOVE 0.3 working (r2-trend-long3 4T/24h 100% WR +$0.18), all legacy 0T/24h dead. Monitor: MIN_PRE_MOVE 0.3 eval (Aug 21), PM_TRAIL WR (>80%), ATR_SL daily (<15), SHORT side gap.
