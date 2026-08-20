@@ -237,6 +237,7 @@ def write_to_hotset_retro(signals: List[dict], dry: bool = False):
         }
     
     if not dry:
+        fd = None
         try:
             fd = open(HOTSET_PATH + '.lock', 'w')
             fcntl.flock(fd, fcntl.LOCK_EX)
@@ -253,8 +254,9 @@ def write_to_hotset_retro(signals: List[dict], dry: bool = False):
         except Exception as e:
             log(f"RETRO hotset write error: {e}")
         finally:
-            fcntl.flock(fd, fcntl.LOCK_UN)
-            fd.close()
+            if fd is not None:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+                fd.close()
 ```
 
 ### DB Cooldown Query
@@ -265,16 +267,19 @@ def _retro_on_cooldown(token: str) -> bool:
     import sqlite3
     from paths import RUNTIME_DB
     conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-    c = conn.cursor()
-    cutoff = time.time() - (RETRO_COOLDOWN_MIN * 60)
-    c.execute("""
-        SELECT COUNT(*) FROM signals
-        WHERE token = ? AND signal_type = 'retroactive_breakout'
-          AND created_at >= ?
-    """, (token.upper(), cutoff))
-    count = c.fetchone()[0]
-    conn.close()
-    return count > 0
+    try:
+        c = conn.cursor()
+        cutoff = time.time() - (RETRO_COOLDOWN_MIN * 60)
+        c.execute("""
+            SELECT COUNT(*) FROM signals
+            WHERE token = ? AND signal_type = 'retroactive_breakout'
+              AND created_at >= ?
+        """, (token.upper(), cutoff))
+        return c.fetchone()[0] > 0
+    except Exception:
+        return False
+    finally:
+        conn.close()
 
 
 def _retro_has_opposing_signal(token: str, direction: str) -> bool:
@@ -283,16 +288,19 @@ def _retro_has_opposing_signal(token: str, direction: str) -> bool:
     from paths import RUNTIME_DB
     opposing = 'SHORT' if direction == 'LONG' else 'LONG'
     conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-    c = conn.cursor()
-    cutoff = time.time() - 300  # 5 minutes
-    c.execute("""
-        SELECT COUNT(*) FROM signals
-        WHERE token = ? AND direction = ?
-          AND created_at >= ?
-    """, (token.upper(), opposing, cutoff))
-    count = c.fetchone()[0]
-    conn.close()
-    return count > 0
+    try:
+        c = conn.cursor()
+        cutoff = time.time() - 300  # 5 minutes
+        c.execute("""
+            SELECT COUNT(*) FROM signals
+            WHERE token = ? AND direction = ?
+              AND created_at >= ?
+        """, (token.upper(), opposing, cutoff))
+        return c.fetchone()[0] > 0
+    except Exception:
+        return False
+    finally:
+        conn.close()
 ```
 
 ## 6. Risk Management
