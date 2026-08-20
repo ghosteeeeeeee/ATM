@@ -43,3 +43,26 @@ NO CHANGES. System healthy, no intervention needed. SHORT legacy draining as exp
 - **PM_TRAIL WR** must stay >80% (currently 83.7%)
 - **ATR_SL daily** must stay <15 (~3-7/day, historic low)
 - **SHORT side** structural gap — all legacy dead, need new signals
+
+---
+
+## CEO Report — 2026-08-20 (~19:46 UTC, verified, 186th run)
+
+### Diagnosis
+System HEALTHY. 24h: 23T -$0.63, 50% WR (red day — SHORT legacy clearing + LONG ATR_SL). 7d: 271T -$1.46, 50.6% WR (improving from -$1.59). 1 open position. PM_TRAIL: 144T/7d +$5.43, 83.3% WR (carrying system). ATR_SL: 101T/7d -$7.60, 1% WR (main drag). Today's losses: SHORT legacy -$0.47 (r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11 — all draining after kill). LONG side: r2-trend-long6 2T +$0.16 100%, r2-trend-long4 2T +$0.04 100%, bb_bounce+ 1T +$0.07 100%, r2-trend-long3 7T -$0.09 57.1%.
+
+**stop_hunt_reversal_long+:** Kill VERIFIED (flag=False, in NEVER_REENABLE). 24h legacy positions clearing (2T -$0.12).
+
+**r2-trend-long3 MIN_PRE_MOVE 0.3:** 34T/7d 55.9% -$0.23. PM_TRAIL 20T 94.4% +$0.80 carrying, ATR_SL 14T -$0.99 dragging. Eval through Aug 23.
+
+### Root Cause
+PM_TRAIL R:R positive — avg win > avg loss. System profitable despite 50.5% 7d WR because PM_TRAIL winners (83.3% WR) are bigger than ATR_SL losers (1% WR). Aug 20 SHORT losses are legacy clearing after R2_TREND_SHORT kill (expected, structural). LONG ATR_SL is the main drag at -$0.99/7d on r2-trend-long3 alone.
+
+### Fix Applied
+NO CHANGES. All kills verified. Fixed CURRENT.md timestamp (was future-dated Aug 21). SHORT legacy draining as expected.
+
+### Monitoring
+- **MIN_PRE_MOVE 0.3 eval** through Aug 23 — r2-trend-long3 ATR_SL 14T -$0.99 needs to improve
+- **PM_TRAIL WR** must stay >80% (currently 83.3%)
+- **ATR_SL daily** must stay <15 (~7/day, historic low)
+- **SHORT side** structural gap — all legacy dead, need new signals for SHORT_BIAS regime

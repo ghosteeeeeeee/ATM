@@ -73,3 +73,31 @@ ALERTS:
 - **[WARN]** (6x): Phantom trades with |pnl|<0.01% — POL, SYRUP, CFX, HYPE×2. Likely spread/slippage noise. Consider minimum PnL filter in position manager.
 - **[WARN]** (1x): `pipeline.log` at 91MB — approaching rotation threshold.
 - **AUTO-FIX**: None needed — no crashes, all timers firing, system operational. Market neutral (2L/1S/101N), 0 signals above threshold is expected behavior.
+
+## Health Report — 2026-08-20 19:19 UTC
+
+PIPELINE: OK
+- Status: running (last run 19:18:19, 19.2s duration)
+- Signals (1h): 0 breakout + 1 rs (HYPER) generated, 0 survived compaction
+- Trades: 1 open (KAS LONG, +0.26%), 24 closed today, -3.29% PnL
+- Errors: 0 in pipeline logs
+
+MARKET:
+- Regime: 0 LONG / 3 SHORT / 101 NEUTRAL (overall: SHORT_BIAS)
+- Short tokens: DOGE (-4.08%), XRP (-7.6%), KAITO (-3.48%)
+- Hotset: empty (no signals above50% confidence)
+
+SYSTEM:
+- Timers: all active, firing on schedule
+- Disk: 79% used (88G/118G)
+- Prices: 97 tokens tracked (coin_tracker)
+- pipeline.log: 93MB (growing, rotate soon)
+- signals DB: 84MB (67821 records, signal-purge active)
+
+AUTO-FIXES APPLIED:
+- **hermes-coding-mcp.service**: Disabled — was in infinite restart loop (92235+ restarts), `ModuleNotFoundError: No module named 'server'`. Not used for trading.
+
+ALERTS:
+- **[WARN]** 5 services in failed state: hl-volume (429 rate limit, transient), better-coder, bug-hunter, trading-checklist (all non-critical for trading)
+- **[WARN]** `pipeline.log` at 93MB — approaching rotation threshold
+- **[WARN]** Signals DB at 84MB — signal-purge timer active, should self-clean
