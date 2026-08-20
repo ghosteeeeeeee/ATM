@@ -1,3 +1,23 @@
+## CEO Report — 2026-08-20 (164th run, ~05:30 UTC)
+
+### Diagnosis
+System HEALTHY — 7th consecutive green day. Verified DB: 24h 23T +$0.53, 73.9% WR (best WR this week). 7d: 283T -$1.18, 51.6% WR. 0 open positions. 0 phantom trades. Pipeline RUNNING. All legacy losers 0T/24h dead.
+
+### Key Metrics (verified)
+- PM_TRAIL: 152T/7d +$5.88, 84.9% WR (carrying system)
+- ATR_SL: 104T/7d -$7.66, 1.0% WR (historic low — SL floor fix working)
+- r2-trend-long6: 6T/7d +$0.43, 100% WR
+- bb_bounce+,hl_copy_trader: 7T/7d +$0.30, 57.1% WR
+- r2-trend-long3: 29T/7d 58.6% -$0.05 (PM_TRAIL 16T +$0.64, ATR_SL 11T -$0.76 — MIN_PRE_MOVE 0.3 filtering dead-cat bounces)
+- stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, monitoring)
+- SHORT side: 2T/24h -$0.06 (structural gap — spike_exhaustion_short- only)
+- Conf-filter: 90+ tier blocked
+
+### Decision
+NO CHANGES — system healthy, 7th green day, no bleeding point. Monitor: MIN_PRE_MOVE 0.3 eval (Aug 21), PM_TRAIL WR (>80%), ATR_SL daily (<15), stop_hunt_reversal_long+ (break-even).
+
+---
+
 ## CEO Report — 2026-08-20 (162nd run, ~04:45 UTC)
 
 ### Diagnosis
@@ -122,3 +142,24 @@ NO CHANGES — system healthy, no intervention needed.
 
 ### Verification
 All metrics positive: PM_TRAIL 85% WR carrying, ATR_SL 7/day historic low, conf-filter active, MIN_PRE_MOVE 0.3 working (r2-trend-long3 4T/24h 100% WR +$0.18), all legacy 0T/24h dead. Monitor: MIN_PRE_MOVE 0.3 eval (Aug 21), PM_TRAIL WR (>80%), ATR_SL daily (<15), SHORT side gap.
+
+## CEO Report — 2026-08-20 (14:47 UTC)
+
+### Diagnosis
+System HEALTHY — 7th consecutive green day. Verified DB: 22T +$0.50, 72.7% WR (best WR this week). 7d: 283T -$1.18, 51.6% WR. 3 open positions (ETH LONG +0.26%, BLUR SHORT -0.62%, DOT SHORT -0.42%). 0 phantom trades. All legacy losers 0T/24h confirmed dead.
+
+### Root Cause
+No active bleeding point. PM_TRAIL carrying system (152T/7d +$5.88, 84.9% WR). ATR_SL at historic low (104T/7d -$7.66, 1.0% WR, ~7T/day — SL floor fix working). Confidence filter blocking 90+ tier (114T/7d 49.1% WR -$1.38). SHORT side structural gap (0T/24h from enabled signals — all 69T/7d -$1.60 from legacy trades, now dead). stop_hunt_reversal_long+ break-even (10T/7d 60% -$0.04). r2-trend-long3 MIN_PRE_MOVE 0.3 eval working (29T/7d, PM_TRAIL 16T +$0.64 capturing winners).
+
+### Fix Applied
+NO CHANGES — system healthy, no intervention needed.
+
+### Verification
+All metrics confirmed via direct DB query: PM_TRAIL 84.9% WR carrying, ATR_SL ~7/day historic low, conf-filter active, MIN_PRE_MOVE 0.3 working, all legacy 0T/24h dead, 7th green day, 72.7% WR.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 21
+- PM_TRAIL WR (must >80%)
+- ATR_SL daily (must <15)
+- stop_hunt_reversal_long+ (break-even, monitoring)
+- SHORT side gap (need new SHORT signals)

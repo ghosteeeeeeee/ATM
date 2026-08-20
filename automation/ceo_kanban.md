@@ -6,3 +6,4 @@
 
 ## TEAM UPDATES
 - [2026-08-20 10:07 UTC] auto_1hr: NO CHANGES — 0T last hour, 24h 25T/68%WR/+$0.39, system stable
+- [2026-08-20 08:00 UTC] signal_reporter: Killed mover+ (MOMENTUM_LEADERBOARD) — 28.6% WR, -$0.15 (7d). Master + SHORT disabled, added to NEVER_REENABLE. All other 7d losers already killed. Winners: r2-trend-long6 (100% WR), r2-trend-long2 (64.7% WR). No inversions.

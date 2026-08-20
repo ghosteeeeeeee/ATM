@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-19 21:12:32",
+  "timestamp": "2026-08-20 05:12:33",
   "total_checks": 20,
-  "passed": 11,
+  "passed": 10,
   "critical_count": 9,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -60,5 +60,12 @@
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "trade_frequency",
+      "msg": "1 trades in 6h (0.2/hr)",
+      "file": "",
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
+    }
+  ]
 }

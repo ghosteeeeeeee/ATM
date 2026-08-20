@@ -1,5 +1,30 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-20 06:30 UTC] Daily Orchestrator Report
+
+**Pipeline Status:** HEALTHY — all automations running clean
+**Open Positions:** 3 (ETH LONG +0.26%, BLUR SHORT -0.62%, DOT SHORT -0.42%)
+**Today Closed:** 22 | PnL: +4.37%
+**24h:** ~23T | ~73.9% WR | +$0.53
+
+**Signal Reporter (08:00 UTC):**
+- Killed `mover+` (MOMENTUM_LEADERBOARD) — 28.6% WR, -$0.15 (7d). Master + SHORT disabled, added to NEVER_REENABLE_FLAGS.
+- All other 7d losers already killed (range_breakout_short, wave_catcher+, ct-hot+, hzscore-, range_finder+, continuation+).
+- Top performers: r2-trend-long6 (100% WR), r2-trend-long2 (64.7% WR), bb_bounce+,hl_copy_trader (57.1% WR).
+
+**Auto-1hr:** No changes needed all day. System stable — 70.8% WR, ATR_SL 25%, no kill signals.
+
+**Health Monitor:** All green. 38 active timers, disk 78%, no errors.
+
+**SHORT Side:** Signals firing (NEAR SHORT via tl_break_short, ONDO SHORT via r2-trend-short2) but blocked by vol gate (ATR > storm threshold). Structural — confirmed by2026-08-19 short-bias-fix plan as market condition, not bug.
+
+**No Implementation Needed Today.** All critical items resolved. Monitoring continues:
+- MIN_PRE_MOVE 0.3 eval through Aug 21
+- PM_TRAIL edge (152T/7d +$5.88, 84.9% WR)
+- ATR_SL count (historic low, SL floor fix working)
+
+---
+
 ## [2026-08-19 08:04 UTC] Hourly Analysis
 
 **Trades:** 0 closed (quiet early morning)
@@ -11306,3 +11331,83 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - Trade frequency (quiet morning pattern)
 - stop_hunt_reversal_long+ 6T/50%WR/-$0.10 — continue monitoring
+
+## [2026-08-20 11:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet morning)
+**Open:** 0
+
+**24h:** 24T | 70.8% WR | +$0.45
+- profit-monster-trail: 16T +$1.27 (dominant, 100% WR) ✅
+- atr_sl_hit: 6T -$0.72 (25% of closes — stable, well below 40%)
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (borderline, not at kill)
+- r2-trend signals: 12T positive (all green)
+- spike_exhaustion_short-: 2T -$0.06 (small sample)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet morning pattern continues
+- 24h WR 70.8% — system healthy
+- ATR_SL 25% well below 40% threshold
+- No signal crosses auto-kill (3T/0%WR)
+- CEO changes from Aug 20 ~04:45 holding (NO CHANGES decision)
+
+**Open Questions:** None
+
+**Watch Next Hour:**
+- Trade frequency (quiet morning pattern)
+- stop_hunt_reversal_long+ 6T/50%WR/-$0.10 — continue monitoring
+
+## [2026-08-20 12:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet period continues)
+**Open:** 1 (DOT SHORT r2-trend-short13, $11)
+
+**24h:** 22T / 16W (72.7%) / +$0.50
+- r2-trend signals: 12T, 83-100% WR, +$0.62 ✅
+- stop_hunt_reversal_long+: 6T, 50% WR, -$0.10 (borderline)
+- atr_sl_hit: 5/22 = 22.7% (well below 40%)
+
+**7d:** 284T, 51.4% WR, -$0.68 (6 of 7 days green)
+- profit-monster-trail: 152T +$5.88 (system engine)
+- atr_sl_hit: 104T -$7.66 (improved from historic)
+
+**Changes:** None
+
+**No Change Needed:**
+- System healthy: 72.7% WR 24h
+- ATR_SL 22.7% — well below 40% kill threshold
+- No signal crosses auto-kill (3T/0%WR)
+- stop_hunt_reversal_long+ at 50% borderline — continuing to monitor
+- CEO changes from Aug 20 morning holding (NO CHANGES)
+
+**Watch Next Hour:**
+- Quiet period pattern
+- stop_hunt_reversal_long+ 6T/50%WR
+- DOT SHORT open position
+
+## [2026-08-20 07:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet period)
+**Open:** 2 (BLUR SHORT -73.22%, DOT SHORT -43.15%)
+
+**24h:** 22T / 17W (77.3% WR) / +$0.50
+- profit-monster-trail: 15T 100%WR +$1.24 (dominant exit) ✅
+- atr_sl_hit: 5T (22.7% of closes — well below 40%) ✅
+- r2-trend signals: 12T, all profitable ✅
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (borderline, monitoring)
+
+**7d:** 282T / 145W (51% WR) / -$1.17
+
+**Changes:** None
+
+**No Change Needed:**
+- System healthy: 77.3% WR 24h (improving)
+- ATR_SL 22.7% — well below 40% kill threshold
+- No signal crosses auto-kill (3T/0%WR)
+- 0 trades last hour — quiet period
+- 2 open SHORT positions with large unrealized losses — TPSL logic monitoring
+
+**Open Questions:**
+- BLUR SHORT -73.22% and DOT SHORT -43.15% — are these phantom or real?

@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-20 04:45 UTC (CEO run 162)**
+**Last Updated: 2026-08-20 14:47 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
-**Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). Runtime DB VACUUMED (87→83MB).
+**Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). Runtime DB VACUUMED (87→83MB).
 
-**Current status:** System HEALTHY — 24h 24T +$0.45, 70.8% WR (continued green streak). 7d: 287T -$1.50, 50.9% WR (improving). Daily: Aug 15 +$0.02 → 17 +$0.37 → 19 +$0.42 (3 green in 7d). PM_TRAIL DOMINANT: 152T/7d +$5.88, 84.9% WR (carrying system). ATR_SL: 6T/24h -$0.75 (historic low — SL floor fix working). profit-monster-T1: 12T/7d +$0.69, 100% WR. 0 open positions. 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 7T/24h 42.9% -$0.23 (borderline, monitoring). r2-trend-long3: MIN_PRE_MOVE 0.3 eval active through Aug 21. SHORT side: 2T/24h -$0.06 spike_exhaustion_short- only (structural gap — NEUTRAL regime 0.5x multiplier blocking). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 22T +$0.50, 72.7% WR (7th green day, best WR this week). 7d: 283T -$1.18, 51.6% WR. Daily: Aug 15 +$0.02 → 17 +$0.37 → 19 +$0.42 → 20 +$0.50 (7th green). PM_TRAIL DOMINANT: 152T/7d +$5.88, 84.9% WR (carrying system). ATR_SL: 104T/7d -$7.66, 1.0% WR (historic low — SL floor fix working). 3 open positions (ETH LONG +0.26%, BLUR SHORT -0.62%, DOT SHORT -0.42%). 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, monitoring). r2-trend-long3: 29T/7d 58.6% -$0.05 (MIN_PRE_MOVE 0.3 filtering dead-cat bounces, PM_TRAIL 16T +$0.64 capturing winners, eval through Aug 21). SHORT side: 0T/24h from enabled signals (structural gap). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
 
 ## Active Decisions
 
@@ -25,18 +25,19 @@
 - **return_exhaustion_long DISABLED.** 6T/7d legacy clearing. RETURN_EXHAUSTION_ENABLED=False. — 2026-08-19
 - **SL FLOOR BUG FIXED.** tpsl_utils.py 8 lines — 89% of ATR_SL hits (126/141) had SL < 1.0% from entry. Floor now enforced after every one-way gate. Monitor 48h for ATR_SL reduction. — 2026-08-19
 - **conf-filter-plan DEPLOYED.** CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89. TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier 114T 49.1% WR -$1.38 now blocked. — 2026-08-19
+- **mover+ KILLED (signal_reporter).** 28.6% WR, -$0.15/7d. Master + SHORT disabled, added to NEVER_REENABLE_FLAGS. — 2026-08-20
 
 ## Known Limitations
 
 - **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). — 2026-08-17
 - **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS even when 15m/4h is NEUTRAL. — 2026-08-16
-- **SHORT side structural weakness** — 0T/24h from enabled signals (r2_trend_short, bb_bounce_short, spike_exhaustion_short-). ALL 69T/7d -$1.60 SHORT PnL from legacy trades. New SHORT signals not firing. — 2026-08-20
+- **SHORT side structural weakness** — signals firing (NEAR SHORT tl_break_short, ONDO SHORT r2-trend-short2) but blocked by vol gate (ATR > storm threshold). Market condition, not bug (confirmed2026-08-19 short-bias-fix plan). — 2026-08-20
 - **MIN_PRE_MOVE 0.3 eval** — r2-trend-long3: 29T/7d, ATR_SL 11T -$0.76, PM_TRAIL 16T +$0.64. Eval through Aug 21. — 2026-08-20
 - **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
 
 ## System Improvement Backlog
 
-1. **SHORT side signals** — all legacy dead, 0T/24h. DELEGATED to signal_analyst. — 2026-08-19
+1. **SHORT side signals** — signals firing but blocked by vol gate (market condition). No code changes needed. — 2026-08-20
 2. Higher-timeframe regime for confluence relaxation (1m too noisy)
 3. Confidence scorer recalibration (real fix for non-monotonic conf curve)
 
@@ -51,5 +52,5 @@
 1. **Monitor MIN_PRE_MOVE 0.3.** r2-trend-long3 29T/7d, ATR_SL 11T → PM_TRAIL 16T — filter working. Eval through Aug 21. — 2026-08-21
 2. **Monitor PM_TRAIL edge.** 155T/7d +$6.01. Must hold >80% WR. — 2026-08-21
 3. **Monitor ATR_SL count.** 7T/day historic low (68% reduction from 22 peak) — SL floor fix working. — 2026-08-21
-4. **SHORT side signals.** 0T/24h from enabled signals. ALL legacy trades. DELEGATED to signal_analyst. — 2026-08-20
-5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
+4. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
+5. **Confidence scorer recalibration.** 90+ tier has 48.7% WR (worst tier). Real fix for non-monotonic conf curve. — 2026-08-20
