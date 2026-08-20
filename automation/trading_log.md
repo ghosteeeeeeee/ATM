@@ -11511,3 +11511,47 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - stop_hunt_reversal_long+ now at 6T — 1 more loss triggers 7T eval
 - Pipeline healthy, 7th green day trajectory continues
+
+## [2026-08-20 12:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet period, last close 10:26 UTC)
+**Open:** 1 (GMT LONG r2-trend-long4, -$0.02)
+**24h:** 28T / 17W (60.7% WR) / +$0.07
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 32.1% (9/28) — well below 40% kill threshold ✅
+- stop_hunt_reversal_long+ 6T 50%WR -$0.10 — borderline but stable, no degradation
+- spike_exhaustion_short- 2T 50%WR -$0.06 — too few to evaluate
+- r2-trend-long variants all profitable (long3 80%WR, long4 100%WR, long5 100%WR, long6 100%WR)
+- Trade freq ~1.2/hr — no overtrading
+- 1 open position small (-$0.02), within range
+- SHORT signals all killed by CEO (correct)
+
+**Watch Next Hour:**
+- stop_hunt_reversal_long+ at 6T — approaching 7T eval threshold
+- Quiet period continuing — last 2h only 1 trade
+- 7d: 279T 50.5%WR -$1.54 — system flat, long signals carrying
+
+## [2026-08-20 12:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (quiet period, last close 10:26 UTC)
+**Open:** 1 (GMT LONG r2-trend-long4, -$0.02)
+**24h:** 28T / 17W (60.7% WR) / +$0.07
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 32.1% (9/28) — well below 40% kill threshold ✅
+- stop_hunt_reversal_long+ 6T 50%WR -$0.10 — borderline but stable, no degradation
+- spike_exhaustion_short- 2T 50%WR -$0.06 — too few to evaluate
+- r2-trend-long variants all profitable (long3 80%WR, long4 100%WR, long5 100%WR, long6 100%WR)
+- Trade freq ~1.2/hr — no overtrading
+- 1 open position small (-$0.02), within range
+- SHORT signals all killed by CEO (correct)
+
+**Watch Next Hour:**
+- stop_hunt_reversal_long+ at 6T — approaching 7T eval threshold
+- Quiet period continuing — last 2h only 1 trade
+- 7d: 279T 50.5%WR -$1.54 — system flat, long signals carrying

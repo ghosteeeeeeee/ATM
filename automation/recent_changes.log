@@ -1117,3 +1117,7 @@
   WHY: 1T last hour (APT r2-trend-long6 WIN +$0.02). 24h 28T 60.7%WR +$0.07. ATR SL 32.1% (9/28) below 40%. stop_hunt_reversal_long+ 6T 50%WR -$0.10 borderline stable. spike_exhaustion_short- 2T 50%WR -$0.06 too few to call. 0 open positions. System healthy, 7th green day.
   BY: auto_1hr
   NEXT: Re-run at 12:05 UTC
+[2026-08-20 12:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet, last close 10:26). 24h 28T 60.7%WR +$0.07. ATR SL 32.1% (9/28) well below 40%. stop_hunt_reversal_long+ 6T 50%WR borderline stable. spike_exhaustion_short- 2T 50%WR too few to call. 1 open GMT LONG -$0.02. 7d 279T 50.5%WR -$1.54 (flat, long signals carrying). No overtrading, no kill candidates. System healthy, 7th green day trajectory.
+  BY: auto_1hr
+  NEXT: Re-run at 13:05 UTC
