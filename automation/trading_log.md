@@ -11897,3 +11897,24 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None — 8th green day trajectory, system healthy
+
+## [2026-08-20 22:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.04 (100% WR)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL 25% (5/20) well below 40% kill threshold
+- Overall 45% ATR_SL inflated by SHORT legacy (4/9)
+- r2-trend-long3 6T 50%WR -$0.028 borderline, not kill-worthy
+- stop_hunt_reversal_long+ 1T 24h, lifetime 10T 60%WR stable
+- 1 trade/hr frequency normal
+- 0 open positions, pipeline running 10 signals
+
+**Watch Next Hour:**
+- r2-trend-long3: monitor ATR_SL dominance
+- SHORT legacy exits aging out of 24h window
+
+**Open Questions:** None — system healthy, 8th green day

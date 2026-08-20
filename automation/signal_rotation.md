@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-20 17:17 UTC
+# Signal Rotation — 2026-08-20 21:17 UTC
 
 ## Market Regime: LONG_BIAS
 
@@ -12,7 +12,7 @@
 | 4 | r2-trend-long5 | 67% | 0.190 | 0.190 | ❓ |  |
 | 5 | r2-trend-long4 | 60% | 0.124 | 0.124 | ❓ |  |
 | 6 | r2-trend-long2 | 59% | 0.087 | 0.087 | ❓ |  |
-| 7 | stop_hunt_reversal_long+ | 60% | 0.038 | 0.038 | ✅ |  |
+| 7 | stop_hunt_reversal_long+ | 60% | 0.038 | 0.038 | ❌ |  |
 | 8 | r2-trend-long3 | 55% | -0.062 | -0.062 | ❓ |  |
 | 9 | r2-trend-long1 | 57% | -0.076 | -0.076 | ❓ |  |
 | 10 | hzscore- | 58% | -0.112 | -0.168 | ❌ |  |
