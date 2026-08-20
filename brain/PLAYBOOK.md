@@ -18,7 +18,7 @@ how to do something, not just what to do.
 | Logs | `/var/www/hermes/logs/` | pipeline.log, signals.log |
 | Brain/lessons | `brain/DECISIONS.md`, `brain/tradingnotes.md` | Persistent learnings |
 | Skills | `skills/` — each has `SKILL.md` + `references/` | Modular, self-contained |
-| SOPs | `SOPs.md` (root) | Plans, commits, signals, debugging, memory |
+| SOPs | `brain/SOPs.md` | Plans, commits, signals, debugging, memory |
 | Playbook | `brain/PLAYBOOK.md` (this file) | Do's/don'ts, lessons, file conventions |
 
 ## Skills

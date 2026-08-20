@@ -8,7 +8,7 @@
 - **Test a single script:** `python3 scripts/price_collector.py` (or any step in isolation)
 - **Logs:** `tail -100 /root/.hermes/logs/pipeline.log`
 - **Architecture detail:** `/root/.hermes/ATM/ATM-Architecture.md`
-- **SOPs:** `SOPs.md` — standard operating procedures (plans, commits, signals, debugging, memory)
+- **SOPs:** `brain/SOPs.md` — standard operating procedures (plans, commits, signals, debugging, memory)
 
 ## Two Data Directories
 
