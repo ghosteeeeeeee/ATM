@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-20 16:00 UTC (CEO run)**
+**Last Updated: 2026-08-20 17:00 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
@@ -30,7 +30,7 @@
 
 ## Known Limitations
 
-- **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). — 2026-08-17
+- **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). 3 stale records cleaned (ids 10211-10213). — 2026-08-17
 - **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS even when 15m/4h is NEUTRAL. — 2026-08-16
 - **SHORT side structural weakness** — signals firing (NEAR SHORT tl_break_short, ONDO SHORT r2-trend-short2) but blocked by vol gate (ATR > storm threshold). Market condition, not bug (confirmed2026-08-19 short-bias-fix plan). — 2026-08-20
 - **MIN_PRE_MOVE 0.3 eval** — r2-trend-long3: 29T/7d, ATR_SL 11T -$0.76, PM_TRAIL 16T +$0.64. Eval through Aug 21. — 2026-08-20

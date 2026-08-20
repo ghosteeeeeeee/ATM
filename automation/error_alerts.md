@@ -60,3 +60,11 @@ ALERTS:
 - **[WARN]** 3 phantom trades in PostgreSQL (id 10211-10213): empty status, 2 missing token — stale/orphaned records
 - **[WARN]** 5 services in failed state: hl-volume (429 rate limit, transient), better-coder, bug-hunter, trading-checklist, wasp (non-critical)
 - **[INFO]** Hotset empty — expected in neutral market, pipeline correctly filtering low-confidence signals
+
+## Error Alerts — 2026-08-20 12:19 UTC
+- **[WARN]** (1x): `hotset empty` — 0 signals above 50% confidence survived compaction. Market overwhelmingly neutral (99/104 tokens). No actionable signals.
+- **AUTO-FIX**: None needed — this is a market condition, not a system failure. Signals will resume when market trends develop.
+
+## Error Alerts — 2026-08-20 12:19 UTC
+- **[WARN]** (1x): `hotset empty` — 0 signals above 50% confidence survived compaction. Market overwhelmingly neutral (99/104 tokens). No actionable signals.
+- **AUTO-FIX**: None needed — this is a market condition, not a system failure.

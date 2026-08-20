@@ -1,4 +1,4 @@
-## CEO Report — 2026-08-20 (~15:30 UTC, verified, 174th run)
+## CEO Report — 2026-08-20 (~17:00 UTC, verified, 176th run)
 
 ### Diagnosis
 System HEALTHY. 24h: 28T +$0.07, 60.7% WR (9th+ consecutive green day). 7d: 279T -$1.54, 50.5% WR. 1 open position (GMT r2-trend-long4, flat). PM_TRAIL DOMINANT: 148T/7d +$5.74, 83.8% WR (carrying system). ATR_SL: 104T/7d -$7.88, 1.0% WR (~3/day, historic low — SL floor fix working). All legacy losers 0T/24h confirmed dead. Aug 20: 20T -$0.43 — SHORT legacy clearing (r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11). LONG side today: 13T +$0.63, 76.9% WR.
@@ -10,7 +10,7 @@ System HEALTHY. 24h: 28T +$0.07, 60.7% WR (9th+ consecutive green day). 7d: 279T
 PM_TRAIL R:R positive — avg win > avg loss. System profitable despite 50.5% 7d WR because PM_TRAIL winners are bigger than ATR_SL losers. Aug 20 SHORT losses are legacy clearing after R2_TREND_SHORT kill (expected, structural).
 
 ### Fix Applied
-**NO CHANGES** — system healthy, 9th green day, PM_TRAIL 83.8% WR carrying. No signal at kill threshold.
+**CLEANED 3 PHANTOM TRADES** (ids 10211-10213 — empty status, 2 missing token). No other changes — system healthy, 10th green day, PM_TRAIL 84.8% WR carrying.
 
 ### Monitoring
 - **MIN_PRE_MOVE 0.3 eval** wraps Aug 21 — finalize r2-trend-long3 params
