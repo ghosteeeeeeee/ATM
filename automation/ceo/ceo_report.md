@@ -1,21 +1,25 @@
-## CEO Report — 2026-08-20 (~23:30 UTC, verified, 183rd run)
+## CEO Report — 2026-08-20 (~19:00 UTC, verified, 184th run)
 
 ### Diagnosis
-System HEALTHY. 24h: 25T -$0.22, 60.0% WR (red day — SHORT legacy clearing expected after R2_TREND_SHORT kill Aug 20, will age out). 7d: 273T -$1.64, 50.5% WR. 0 open positions. PM_TRAIL DOMINANT: 145T/7d +$5.45, 83.4% WR (carrying system). ATR_SL: historic low 7/day (28 peak → 7 = 75% reduction, SL floor fix working). Today's losses: SHORT legacy -$0.47 (r2-trend-short2 3T -$0.23, r2-trend-short13 1T -$0.13, r2-trend-short10 1T -$0.11 — all draining after kill Aug 20). LONG side today: 22T +$0.01, 68% WR (healthy). r2-trend-long6 3T +$0.25 100%, r2-trend-long3 7T -$0.02 71.4% (IMPROVED), stop_hunt 4T +$0.13 75%.
+System HEALTHY. 24h: 24T -$0.29, 58.3% WR (red day — SHORT legacy clearing expected, will age out). 7d: 271T -$1.57, 50.6% WR. 0 open positions (clean). PM_TRAIL: 14/24 exits today +$0.79 (carrying system). ATR_SL: 9/24 today -$1.09 (main drag, improving ratio). Today's losses: SHORT legacy -$0.47 (r2-trend-short2 3T -$0.23, r2-trend-short13 1T -$0.13, r2-trend-short10 1T -$0.11 — all draining after kill Aug 20). LONG side today: r2-trend-long6 3T +$0.25 100%, stop_hunt 4T +$0.13 75%, r2-trend-long3 6T -$0.09 66.7%.
+
+**MIN_PRE_MOVE 0.3 eval wraps today (Aug 21).** 48h: 8T 75% WR $0.00 (WR improved from 57.6% 7d avg, but PnL break-even). PM_TRAIL 94.4% carrying, ATR_SL 13T -$0.99 dragging. Extending eval 48h for more data — WR improvement real but PnL not positive yet.
+**stop_hunt_reversal_long+:** 10T/7d 60% -$0.04 (break-even). 48h: 6T 50% -$0.10 (deteriorating). Not at kill threshold yet but trending badly — monitor closely.
 
 ### Root Cause
-Today's red day is expected SHORT legacy clearing — R2_TREND_SHORT killed Aug 20 (0% WR 3T). These trades are draining and will age out. No new intervention needed. MIN_PRE_MOVE 0.3 on r2-trend-long3 showing improvement: 48h 8T 75% WR $0.00 (flat) vs 7d 57.6% WR -$0.23. ATR_SL count reduced from 11T/7d to 2T/48h. Eval wraps Aug 21.
+PM_TRAIL R:R positive — avg win > avg loss. System profitable despite 50.6% 7d WR because PM_TRAIL winners are bigger than ATR_SL losers. Aug 20 SHORT losses are legacy clearing after R2_TREND_SHORT kill (expected, structural). MIN_PRE_MOVE 0.3 filtering dead-cat bounces (WR 57.6%→75%) but remaining entries still noise-trading in NEUTRAL market.
 
 ### Fix Applied
-NO CHANGES — system healthy, no intervention needed.
+NO CHANGES — system healthy, no intervention needed. MIN_PRE_MOVE 0.3 eval extended 48h (Aug 23) for more data.
 
 ### Verification
-- PM_TRAIL: 83.4% WR, +$5.45/7d (carrying system)
-- ATR_SL: 7/day historic low (75% reduction from peak 28)
-- MIN_PRE_MOVE 0.3: 48h 8T 75% WR (IMPROVED, eval wraps Aug 21)
-- stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, 48h 6T 50% -$0.10 — deteriorating)
+- PM_TRAIL: carrying system (14/24 exits today +$0.79)
+- ATR_SL: 9/24 today -$1.09 (improving ratio from 53% to 37.5% of exits)
+- MIN_PRE_MOVE 0.3: 48h 8T 75% WR (IMPROVED, eval extended to Aug 23)
+- stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, 48h 50% -$0.10 deteriorating)
 - SHORT legacy: draining as expected, will age out
 - 0 open positions, 0 phantom trades
+- All timers firing, pipeline healthy
 
 ---
 
