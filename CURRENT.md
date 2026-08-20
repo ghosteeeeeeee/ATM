@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-20 23:00 UTC (CEO run)**
+**Last Updated: 2026-08-20 23:30 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB).
 
-**Current status:** System HEALTHY — 24h 26T -$0.34, 57.7% WR (red day — SHORT legacy clearing expected after R2_TREND_SHORT kill Aug 20, will age out). 7d: 275T -$1.59, 50.5% WR. PM_TRAIL DOMINANT: r2-trend-long3 18T/7d 94.4% +$0.69 (carrying system). ATR_SL: r2-trend-long3 13T/7d -$0.99 (main active offender). 0 open positions. SHORT legacy clearing: r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11 = -$0.47 total (draining after kill Aug 20). LONG side today: r2-trend-long6 3T +$0.25 100%, r2-trend-long3 7T -$0.02 71.4% (IMPROVED), stop_hunt 5T +$0.01 60%, bb_bounce+ 1T +$0.07 100%. stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, 48h ATR_SL 3T -$0.38 worst offender). r2-trend-long3 MIN_PRE_MOVE 0.3: 7T/24h 71.4% -$0.02 (IMPROVED from 57.6% 7d avg, eval wraps Aug 21). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 25T -$0.22, 60.0% WR (red day — SHORT legacy clearing expected after R2_TREND_SHORT kill Aug 20, will age out). 7d: 273T -$1.64, 50.5% WR. PM_TRAIL: 145T/7d +$5.45, 83.4% WR (carrying system). ATR_SL: 7/day historic low (75% reduction from peak 28, SL floor fix working). 0 open positions. SHORT legacy clearing: r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11 = -$0.47 total (draining after kill Aug 20). LONG side today: 22T +$0.01, 68% WR (healthy). r2-trend-long6 3T +$0.25 100%, r2-trend-long3 7T -$0.02 71.4% (IMPROVED), stop_hunt 4T +$0.13 75%. stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, 48h 6T 50% -$0.10 deteriorating). r2-trend-long3 MIN_PRE_MOVE 0.3: 48h 8T 75% WR $0.00 (IMPROVED from 57.6% 7d avg, eval wraps Aug 21). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
 
 ## Active Decisions
 
