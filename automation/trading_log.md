@@ -11618,3 +11618,30 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - JUP ATR_SL at exact 1.01% — ATR_SL_MIN working as designed, trade just didn't have enough follow-through
+
+## [2026-08-20 15:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win)
+- AVAX r2-trend-long3: profit-monster-trail +$0.03 (28.7%)
+
+**24h:** 24T / ~16W (66.7% WR) / +$0.46 (LONG side +$0.91)
+**LONG 24h:** 19T / 26.3% ATR_SL / +$0.91 ✅
+**SHORT 24h:** 5T / 100% ATR_SL / -$0.70 (all pre-kill, CEO 08:15)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL at 26.3% (5/19) — well below 40% kill threshold
+- SHORT ATR_SL resolved — CEO already killed all SHORT signals
+- stop_hunt_reversal_long+ at 6T 50%WR -$0.10 — 1T from eval threshold, stable
+- r2-trend-long8 at 1T — too early to evaluate
+- Trade freq 1.0/hr — no overtrading
+- 1 open CAKE LONG $0.00
+- profit-monster-trail 13T 92%WR +$0.82 — dominant exit, working well
+
+**Watch Next Hour:**
+- stop_hunt_reversal_long+ hits 7T eval threshold next cycle — will evaluate for kill
+- 7d: 279T 50.5%WR -$1.59 (flat, LONG signals carrying)
+
+**Open Questions:**
+- None — system operating within parameters
