@@ -11719,3 +11719,41 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None — system operating within parameters
+
+## [2026-08-20 18:03 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (last close 16:21 UTC, quiet market)
+**PnL:** $0.00 (no trades)
+**Open Positions:** 0
+
+**24h:** 25T (60% WR, -$0.22)
+- LONG: 20T / 75%WR / +$0.25 ✅
+- SHORT: 5T / 0%WR / -$0.47 (all pre-kill legacy)
+- LONG ATR_SL: 30% (3/10 today) — healthy, below 40%
+- Profit-monster-trail: 8/15 closes today, dominant exit
+
+**Signal Performance (24h):**
+- r2-trend-long6: 3T 100%WR +$0.25 — best performer
+- stop_hunt_reversal_long+: 4T 75%WR +$0.13 — solid
+- r2-trend-long3: 7T 71.4%WR -$0.02 — high volume, flat (losses > wins)
+- r2-trend-short2: 3T 0%WR -$0.23 — legacy pre-kill
+
+**Regime:** LONG_BIAS (macro gate)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades = quiet market, not a system issue
+- LONG ATR_SL 30% well below 40% kill threshold
+- SHORT losses all legacy (CEO killed at 08:15), 0 SHORT opens in 12h
+- r2-trend-long3 borderline flat but 71.4% WR is acceptable
+- stop_hunt_reversal_long+ 4T stable — no kill needed
+- Trade freq ~1/hr — normal
+- Pipeline running, 10 signals active
+
+**Watch Next Hour:**
+- r2-trend-long3 — monitor if negative PnL persists (7T 24h, flat)
+- 7d trend: mostly flat (LONG carrying)
+
+**Open Questions:**
+- None — system operating within parameters
