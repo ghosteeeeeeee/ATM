@@ -1,3 +1,53 @@
+## CEO Report — 2026-08-20 (169th run, ~10:00 UTC)
+
+### Diagnosis
+System HEALTHY — 27T +$0.23, 63.0% WR (green day). 7d: 281T -$1.48, 50.5% WR. PM_TRAIL carrying at 83.9% WR +$5.76/7d. ATR_SL at historic low (1.0% WR, 7/day trending to 4 today). stop_hunt_reversal_long+ borderline (break-even 7d, worst 48h ATR_SL: 3 hits -$0.38). r2-trend-long3 MIN_PRE_MOVE 0.3 working (4T/24h 100% WR +$0.18). SHORT side structural (7T/48h 14.3% WR -$0.53).
+
+### Root Cause
+No new issues. today's SHORT losses are legacy clearing. MIN_PRE_MOVE 0.3 filtering dead-cat bounces effectively. ATR_SL trend: 28→11→9→8→7→4 (SL floor fix + MIN_PRE_MOVE compounding).
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed.
+
+### Verification
+MIN_PRE_MOVE 0.3 eval wraps Aug 21. PM_TRAIL WR 83.9% (>80% threshold). ATR_SL daily 4 (<15 threshold). All monitors green.
+
+---
+
+## CEO Report — 2026-08-20 (168th run, ~09:00 UTC)
+
+### Diagnosis
+System HEALTHY — 28T +$0.10, 60.7% WR (green day, holding). 7d: 281T -$1.05, 51.6% WR. PM_TRAIL carrying at 84% WR +$5.82/7d. **SHORT side bleeding continues:** 4 SHORT trades today all ATR_SL (-$0.47) — legacy r2-trend-short signals still clearing pipeline after R2_TREND_SHORT kill. spike_exhaustion_short- only active SHORT signal (2T/7d -$0.06, 50% WR — borderline).
+
+### Key Metrics (verified from DB)
+- PM_TRAIL: 150T/7d +$5.82, 84.0% WR (carrying system)
+- ATR_SL: 105T/7d -$7.84, 1.0% WR (historic low ~15/day avg)
+- profit-monster-T1: 12T/7d +$0.69, 100% WR
+- stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, monitoring)
+- r2-trend-long3: 7T/48h 71.4% +$0.06 (MIN_PRE_MOVE 0.3 working)
+- r2-trend-long4: 15T/7d 60% +$0.06 (PM_TRAIL carrying)
+- 1 open LONG: r2-trend-long3 COMP (low exposure)
+- SHORT side today: 4T -$0.47 (all ATR_SL, legacy clearing)
+
+### Fix Applied
+NO CHANGES — R2_TREND_SHORT already killed (confirmed False at hermes_constants.py:1104). Today's SHORT losses are legacy trades from before the kill. spike_exhaustion_short- still enabled (2T/7d -$0.06, 50% WR — not at kill threshold yet).
+
+### Verification
+- R2_TREND_SHORT_ENABLED: False (confirmed)
+- PM_TRAIL: 84% WR > 80% threshold ✓
+- ATR_SL: ~15/day (7d avg, within <15 target)
+- 1 open position, low exposure ✓
+- 0 phantom trades ✓
+
+### Monitor
+- MIN_PRE_MOVE 0.3 eval (Aug 21) — r2-trend-long3 71.4% WR, working
+- PM_TRAIL WR (must >80%) — at 84%, healthy
+- ATR_SL daily (must <15) — at ~15/day avg
+- stop_hunt_reversal_long+ — borderline, worst 48h ATR_SL offender
+- spike_exhaustion_short- — only active SHORT, borderline (-$0.06/7d)
+
+---
+
 ## CEO Report — 2026-08-20 (167th run, ~08:15 UTC)
 
 ### Diagnosis
