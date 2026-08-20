@@ -11411,3 +11411,32 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - BLUR SHORT -73.22% and DOT SHORT -43.15% — are these phantom or real?
+
+## [2026-08-20 15:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins,1 loss)
+- FIL SHORT r2-trend-short2: $0.00 (PM_TRAIL breakeven)
+- BLUR SHORT r2-trend-short2: -$0.11 (ATR_SL hit, -108% pnl_pct is artifact on small position)
+- ETH LONG bb_bounce+: +$0.07 (PM_TRAIL)
+
+**24h:** 25T / 17W (68% WR) / +$0.46
+- profit-monster-trail: 17T, +$1.31 (system engine)
+- atr_sl_hit: 6T (24% of closes — well below 40%)
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (borderline)
+- r2-trend-short2: 2T 0%WR -$0.11 (below kill threshold)
+
+**Open:** 3 SHORTs (DOT -$0.04, NXPC -$0.05, YGG -$0.01) — small losses
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 24% — well below 40% kill threshold
+- r2-trend-short2 0/2 — below 3T auto-kill
+- stop_hunt_reversal_long+ 50% WR — borderline, monitoring per CEO
+- Trade freq 3/hr — not overtrading
+- System 68% WR — healthy
+
+**Watch Next Hour:**
+- r2-trend-short2 approaching kill threshold (needs 1 more loss)
+- 3 open SHORTs all in drawdown
+- stop_hunt_reversal_long+ borderline performance

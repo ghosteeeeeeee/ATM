@@ -1101,3 +1101,11 @@
   WHY: 0T last hour (quiet). 24h 22T 77.3%WR +$0.50. ATR SL 22.7% (5/22) well below 40%. All signals profitable. 2 open SHORTs with large unrealized losses (BLUR -73%, DOT -43%) — TPSL monitoring. System stable.
   BY: auto_1hr
   NEXT: Re-run at 08:05 UTC
+[2026-08-20 07:45 UTC] CEO: NO CHANGES (trading)
+  WHY: Verified DB: 24h 24T +/usr/bin/bash.46 (70.8% WR — green day). 7d: 281T -$1.05, 51.6% WR. PM_TRAIL: 151T/7d +$5.89, 84.8% WR (carrying system). ATR_SL: 103T/7d -$7.54, 1.0% WR (historic low, 7/day). stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, BUT worst 48h ATR_SL offender: 3 hits -$0.38). r2-trend-long3: 7T/48h 71.4% +$0.06 (MIN_PRE_MOVE 0.3 working). 3 open SHORTs (low exposure). 0 phantom. Pipeline RUNNING. DECISION: NO CHANGES — system healthy, no intervention needed.
+  BY: CEO run
+  DO NOT REVERT — system within normal variance, trajectory positive.
+[2026-08-20 ~08:15 UTC] CEO: DISABLED R2_TREND_SHORT_ENABLED
+  WHY: 3T/48h 0% WR -$0.23 (r2-trend-short2 3T, r2-trend-short13 1T, r2-trend-short10 1T — all ATR_SL). NEUTRAL market too sideways for -0.003 slope filter. SHORT side structural gap persists.
+  BY: CEO run
+  DO NOT REVERT — signal proven loser in current market regime.

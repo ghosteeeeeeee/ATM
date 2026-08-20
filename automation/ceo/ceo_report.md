@@ -1,3 +1,35 @@
+## CEO Report — 2026-08-20 (167th run, ~08:15 UTC)
+
+### Diagnosis
+System HEALTHY — 28T +$0.10, 60.7% WR (green day, slowing). 7d: 281T -$1.05, 51.6% WR. SHORT side bleeding: 7T/48h 14.3% WR -$0.53 (all ATR_SL hits). r2-trend-short signals 0% WR — firing into NEUTRAL sideways market.
+
+### Key Metrics (verified from DB)
+- PM_TRAIL: 151T/7d +$5.89, 84.8% WR (carrying system)
+- ATR_SL: 103T/7d -$7.54, 1.0% WR (historic low, 7/day)
+- r2-trend-short2: 3T/48h 0% WR -$0.23 (all ATR_SL)
+- r2-trend-short13: 1T/48h 0% WR -$0.13 (ATR_SL)
+- r2-trend-short10: 1T/48h 0% WR -$0.11 (ATR_SL)
+- stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, monitoring)
+- r2-trend-long3: 7T/48h 71.4% +$0.06 (MIN_PRE_MOVE 0.3 working)
+- 1 open LONG: COMP r2-trend-long3 -$0.02 (low exposure)
+- SHORT side: 7T/48h 14.3% WR -$0.53 (R2_TREND_SHORT killed)
+
+### Fix Applied
+DISABLED R2_TREND_SHORT_ENABLED — 3T/48h 0% WR, all ATR_SL. NEUTRAL market too sideways for -0.003 slope filter. The slope threshold fires on weak downtrends that immediately reverse in range-bound markets. All 3 trades hit stops with no profit opportunity. Added to NEVER_REENABLE_FLAGS.
+
+### Verification
+- R2_TREND_SHORT_ENABLED: False (confirmed in hermes_constants.py:1104)
+- Expected impact: Eliminate ~$0.10/day SHORT bleeding from r2-trend-short signals
+- System still has SHORT gap: need new SHORT signals for SHORT_BIAS regime (not NEUTRAL)
+
+### Monitor
+- MIN_PRE_MOVE 0.3 eval (Aug 21) — r2-trend-long3 71.4% WR, working
+- PM_TRAIL WR (>80%) — at 84.8%, healthy
+- ATR_SL daily (<15) — at 7/day, historic low
+- stop_hunt_reversal_long+ — borderline, worst 48h ATR_SL offender, watch for degradation
+
+---
+
 ## CEO Report — 2026-08-20 (165th run, ~06:00 UTC)
 
 ### Diagnosis

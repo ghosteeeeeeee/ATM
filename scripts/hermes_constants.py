@@ -1101,7 +1101,7 @@ R2_REV_ENABLED           = False  # r2_rev — blocked in blacklist
 R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT
 R2_TREND_ENABLED         = True   # master kill switch for r2_trend SHORT
-R2_TREND_SHORT_ENABLED   = True   # r2_trend_short — downtrend detector (renamed from r2_trend)
+R2_TREND_SHORT_ENABLED   = False  # CEO KILLED 2026-08-20 — 3T/48h 0% WR -$0.23 (all ATR_SL, NEUTRAL market too sideways)
 R2_TREND_SHORT_MIN_SLOPE    = -0.003  # maximum slope % (negative = downtrend) — mirrors LONG but inverted
 R2_TREND_SHORT_MIN_R2       = 0.60    # minimum R² threshold (lower than LONG 0.70 — SHORT trends are sharper)
 R2_TREND_SHORT_MAX_RSI      = 65      # max RSI — don't short overbought (wait for weakness)

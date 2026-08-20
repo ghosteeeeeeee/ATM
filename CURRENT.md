@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-20 14:47 UTC (CEO run)**
+**Last Updated: 2026-08-20 08:15 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). Runtime DB VACUUMED (87→83MB).
 
-**Current status:** System HEALTHY — 24h 22T +$0.50, 72.7% WR (7th green day, best WR this week). 7d: 283T -$1.18, 51.6% WR. Daily: Aug 15 +$0.02 → 17 +$0.37 → 19 +$0.42 → 20 +$0.50 (7th green). PM_TRAIL DOMINANT: 152T/7d +$5.88, 84.9% WR (carrying system). ATR_SL: 104T/7d -$7.66, 1.0% WR (historic low — SL floor fix working). 3 open positions (ETH LONG +0.26%, BLUR SHORT -0.62%, DOT SHORT -0.42%). 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, monitoring). r2-trend-long3: 29T/7d 58.6% -$0.05 (MIN_PRE_MOVE 0.3 filtering dead-cat bounces, PM_TRAIL 16T +$0.64 capturing winners, eval through Aug 21). SHORT side: 0T/24h from enabled signals (structural gap). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 28T +$0.10, 60.7% WR (green day). 7d: 281T -$1.05, 51.6% WR. PM_TRAIL DOMINANT: 151T/7d +$5.89, 84.8% WR (carrying system). ATR_SL: 103T/7d -$7.54, 1.0% WR (historic low — SL floor fix working, 7/day). 1 open position (LONG r2-trend-long3 COMP -$0.02). 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 10T/7d 60% -$0.04 (break-even, BUT worst 48h ATR_SL offender: 3 hits -$0.38 — monitoring). r2-trend-long3: 7T/48h 71.4% +$0.06 (MIN_PRE_MOVE 0.3 working, 2 ATR_SL -$0.20). SHORT side: 7T/48h 14.3% WR -$0.53 (CEO KILLED R2_TREND_SHORT_ENABLED — 0% WR, all ATR_SL). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
 
 ## Active Decisions
 
@@ -26,6 +26,7 @@
 - **SL FLOOR BUG FIXED.** tpsl_utils.py 8 lines — 89% of ATR_SL hits (126/141) had SL < 1.0% from entry. Floor now enforced after every one-way gate. Monitor 48h for ATR_SL reduction. — 2026-08-19
 - **conf-filter-plan DEPLOYED.** CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89. TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier 114T 49.1% WR -$1.38 now blocked. — 2026-08-19
 - **mover+ KILLED (signal_reporter).** 28.6% WR, -$0.15/7d. Master + SHORT disabled, added to NEVER_REENABLE_FLAGS. — 2026-08-20
+- **R2_TREND_SHORT_ENABLED False (CEO KILLED Aug 20).** 3T/48h 0% WR -$0.23. NEUTRAL market too sideways for -0.003 slope filter. All ATR_SL hits. Added to NEVER_REENABLE_FLAGS. — 2026-08-20
 
 ## Known Limitations
 
@@ -37,7 +38,7 @@
 
 ## System Improvement Backlog
 
-1. **SHORT side signals** — signals firing but blocked by vol gate (market condition). No code changes needed. — 2026-08-20
+1. **SHORT side signals** — R2_TREND_SHORT killed (0% WR in NEUTRAL). Need new SHORT signals for SHORT_BIAS regime. — 2026-08-20
 2. Higher-timeframe regime for confluence relaxation (1m too noisy)
 3. Confidence scorer recalibration (real fix for non-monotonic conf curve)
 
@@ -49,8 +50,9 @@
 
 ## Next Actions
 
-1. **Monitor MIN_PRE_MOVE 0.3.** r2-trend-long3 29T/7d, ATR_SL 11T → PM_TRAIL 16T — filter working. Eval through Aug 21. — 2026-08-21
-2. **Monitor PM_TRAIL edge.** 155T/7d +$6.01. Must hold >80% WR. — 2026-08-21
-3. **Monitor ATR_SL count.** 7T/day historic low (68% reduction from 22 peak) — SL floor fix working. — 2026-08-21
-4. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
-5. **Confidence scorer recalibration.** 90+ tier has 48.7% WR (worst tier). Real fix for non-monotonic conf curve. — 2026-08-20
+1. **Monitor MIN_PRE_MOVE 0.3.** r2-trend-long3: 7T/48h 71.4% +$0.06, 2 ATR_SL -$0.20. Eval through Aug 21. — 2026-08-21
+2. **Monitor PM_TRAIL edge.** 151T/7d +$5.89, 84.8% WR. Must hold >80%. — 2026-08-21
+3. **Monitor ATR_SL count.** 7T/day historic low (75% reduction from 28 peak) — SL floor fix working. — 2026-08-21
+4. **Monitor stop_hunt_reversal_long+.** Borderline (break-even 7d), worst 48h ATR_SL offender (3 hits -$0.38). Watch for degradation. — 2026-08-21
+5. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
+6. **Confidence scorer recalibration.** 90+ tier has 48.7% WR (worst tier). Real fix for non-monotonic conf curve. — 2026-08-20
