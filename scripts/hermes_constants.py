@@ -941,6 +941,8 @@ NEVER_REENABLE_FLAGS = {
     'WAVE_CATCHER_MINUS_ENABLED', # CEO KILLED 2026-08-16 — 25% WR -$0.09. No edge.
     'WAVE_CATCHER_ENABLED',       # CEO KILLED 2026-08-17 — both variants dead. Master switch.
     'MOMENTUM_LEADERBOARD_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 28.6% WR, -$0.15 (24h). LONG dead.
+    'MOMENTUM_LEADERBOARD_ENABLED',       # SIGNAL REPORTER 2026-08-20 — 28.6% WR, -$0.15 (7d). Both directions dead.
+    'MOMENTUM_LEADERBOARD_MINUS_ENABLED', # SIGNAL REPORTER 2026-08-20 — SHORT never produced meaningful trades.
     'RANGE_BREAKOUT_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 25% WR, -$0.41 (7d). LONG dead.
     'COIN_TRACKER_HOT_ENABLED',      # SIGNAL REPORTER 2026-08-16 — ct-hot+ 35% WR, -$0.48 (24h). ct-hot- 0% WR.
     'COIN_TRACKER_HOT_PLUS_ENABLED', # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48 (24h 20T).
@@ -1616,9 +1618,9 @@ HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 
 # ── Momentum Leaderboard Signal ─────────────────────────────────────────────
 # momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
-MOMENTUM_LEADERBOARD_ENABLED = True            # master switch — enabled for paper testing
-MOMENTUM_LEADERBOARD_PLUS_ENABLED = False      # SIGNAL REPORTER 2026-08-15 — 7T 28.6% WR -$0.15 (24h). Kill LONG, keep SHORT.
-MOMENTUM_LEADERBOARD_MINUS_ENABLED = True      # SHORT direction
+MOMENTUM_LEADERBOARD_ENABLED = False           # SIGNAL REPORTER 2026-08-20 — 28.6% WR, -$0.15 (7d). Both directions dead. NEVER_REENABLE.
+MOMENTUM_LEADERBOARD_PLUS_ENABLED = False      # SIGNAL REPORTER 2026-08-15 — 7T 28.6% WR -$0.15 (24h). LONG dead.
+MOMENTUM_LEADERBOARD_MINUS_ENABLED = False     # SIGNAL REPORTER 2026-08-20 — SHORT never produced meaningful trades. Kill with master.
 MOMENTUM_LEADERBOARD_TOP_N = 10               # top movers to evaluate
 MOMENTUM_LEADERBOARD_MOVE_MIN = 1.0           # min move_score % — lowered from 3.0 (was too strict)
 MOMENTUM_LEADERBOARD_COOLDOWN_MIN = 30        # per token+direction cooldown
