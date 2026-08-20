@@ -155,6 +155,43 @@ ATR_SPIKE_COOLDOWN_MIN         = 60      # minutes between fires per token
 - Momentum entry, not reversal — catches breakouts but doesn't tell you when to exit (position_manager's ATR engine handles that)
 - 19% false positive rate (6/31 signals failed in cross-token test). Typical failure: immediate reversal on next candle.
 - No way to distinguish a real breakout from a fake-out until after the fact. The compression duration helps but isn't foolproof.
+- **Clean vs staggered setups** — see below.
+
+### Clean vs Staggered Setups
+
+Not all signals are equal. Two distinct shapes emerge from the backtest:
+
+**Clean (PURR, IMX) — the target pattern:**
+```
+pre:  ▇▇▇▇▇▇▇▇▇█▇▇▇▇▇▁   ← price elevated, ATR compressed
+post: █▇▇▄▃▃▁▂▁▁▁▂▂▃▃   ← breakdown, no retest, continuous grind lower
+```
+- 25-30/30 candles below entry after signal
+- Max bounce < 0.15% (price never retests breakdown level)
+- Compression: 22-122 min
+- These are the high-conviction trades
+
+**Staggered (SEI, BCH) — acceptable but noisier:**
+```
+pre:  ▅▆▆▆▇▆▆▇█▇▇▇▇▇▆▁   ← price elevated, ATR compressed
+post: █▇▅▄▁▁▂▃▁▂▃▃▃▃▃▁   ← breakdown, retests level, then continues
+```
+- 0-25/30 candles below entry (bounces back periodically)
+- Max bounce > 0.3% (retests breakdown level)
+- Compression: 108-335 min (longer compression = more retests)
+- Still profitable but choppy
+
+**How to tell at entry:** You can't — retest behavior happens after the signal. Shorter compression duration (22-122 min) is a weak proxy for clean setups. The signal fires the same for both; the difference is in follow-through quality.
+
+**Typical winners (backtest, SHORT PnL > 0.5%):**
+
+| Token | Date | Comp | PnL | Below/30 | Max Bounce | Quality |
+|-------|------|------|-----|----------|------------|---------|
+| IMX | 08/19 03:01 | 57m | +1.80% | 25/30 | +0.12% | Clean |
+| PURR | 08/20 21:33 | 22m | +1.52% | 30/30 | -0.07% | Clean |
+| PURR | 08/18 16:13 | 80m | +1.46% | 30/30 | -0.13% | Clean |
+| SEI | 08/18 02:45 | 335m | +1.42% | 30/30 | -0.07% | Clean |
+| BCH | 08/20 03:01 | 108m | +1.25% | 25/30 | +0.13% | Clean |
 
 ## Verification
 
