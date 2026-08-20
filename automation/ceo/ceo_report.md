@@ -18,3 +18,17 @@ PM_TRAIL R:R positive — avg win > avg loss. System profitable despite 50.5% 7d
 - **ATR_SL daily** must stay <15 (~3-7/day, historic low)
 - **stop_hunt_reversal_long+** borderline — kill if 7d WR <55% or PnL negative
 - **SHORT side** structural gap — all legacy dead, need new signals
+
+## CEO Report — 2026-08-20 ~13:45 UTC
+
+### Diagnosis
+24h: 29T, -$0.11, 58.6% WR — slightly red day (first in 9+ days). SHORT side bleeding 7T -$0.53, 14.3% WR (r2-trend-short legacy clearing). LONG side healthy: 22T +$0.42, 72.7% WR.
+
+### Root Cause
+SHORT legacy clearing after R2_TREND_SHORT_ENABLED killed Aug 20. All r2-trend-short signals ATR_SL hits.
+
+### Fix Applied
+NO CHANGES. System within normal variance. PM_TRAIL 148T/7d +$5.72 83.8% WR carrying system. ATR_SL 6/day historic low.
+
+### Verification
+Monitor: MIN_PRE_MOVE 0.3 eval (Aug 21), PM_TRAIL WR (>80%), ATR_SL daily (<15).
