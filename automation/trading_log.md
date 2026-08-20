@@ -11589,3 +11589,32 @@ None — system stable, previous fixes settling in.
 - stop_hunt_reversal_long+ at 6T — approaching 7T eval threshold
 - Quiet period continuing — last 2h only 1 trade
 - 7d: 279T 50.5%WR -$1.54 — system flat, long signals carrying
+
+## [2026-08-20 14:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (2 wins, 1 loss)
+- JUP r2-trend-long8: ATR_SL -$0.11 (entry 0.1880 → SL 0.1861, 1.01% stop)
+- XPL r2-trend-long4: PM_TRAIL +$0.01
+- GMT r2-trend-long4: PM_TRAIL +$0.03
+
+**24h:** 27T / 16W (59.3% WR) / ~$0 PnL (flat)
+**LONG 24h:** 22T / 27.3% ATR_SL / +$0.42 ✅
+**SHORT 24h:** 5T / 100% ATR_SL / -$0.47 (all pre-kill, CEO disabled at 08:15)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL at 27.3% — well below 40% kill threshold
+- SHORT losses all pre-kill (CEO already acted)
+- r2-trend-long8: 2T lifetime, too early to evaluate
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (borderline, stable)
+- Trade freq 3/hr — normal
+- 2 open positions (AVAX, CAKE), $0.00
+
+**Watch Next Hour:**
+- r2-trend-long8 needs 5+ trades before evaluation
+- stop_hunt_reversal_long+ at 7T after next cycle — approaching eval threshold
+- 7d: 279T 50.5%WR -$1.59 (flat, LONG signals carrying)
+
+**Open Questions:**
+- JUP ATR_SL at exact 1.01% — ATR_SL_MIN working as designed, trade just didn't have enough follow-through
