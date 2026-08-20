@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-20 04:15 UTC (CEO run 161)**
+**Last Updated: 2026-08-20 04:45 UTC (CEO run 162)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). Runtime DB VACUUMED (87→83MB).
 
-**Current status:** System HEALTHY — 24h 24T +$0.45, 70.8% WR (7th consecutive green day). 7d: 288T -$1.47, 51.0% WR (improving). Daily: Aug 13 -$0.85 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.42 (7th green). PM_TRAIL DOMINANT: 153T/7d +$5.91, 85.0% WR (carrying system). ATR_SL: 14T/48h -$1.38 (SL floor fix working, historic low). profit-monster-T1: 12T/7d +$0.69, 100% WR. 0 open positions. 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 3T/24h 0% -$0.38 (ATR_SL losses today, monitoring). r2-trend-long3: MIN_PRE_MOVE 0.3 eval active (PM_TRAIL 3T/24h 100% +$0.17). SHORT side: 2T/24h -$0.06 spike_exhaustion_short- only (r2_trend_short, bb_bounce_short still 0T — structural gap, NEUTRAL 0.5x multiplier blocking). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 24T +$0.45, 70.8% WR (continued green streak). 7d: 287T -$1.50, 50.9% WR (improving). Daily: Aug 15 +$0.02 → 17 +$0.37 → 19 +$0.42 (3 green in 7d). PM_TRAIL DOMINANT: 152T/7d +$5.88, 84.9% WR (carrying system). ATR_SL: 6T/24h -$0.75 (historic low — SL floor fix working). profit-monster-T1: 12T/7d +$0.69, 100% WR. 0 open positions. 0 phantom trades. All legacy losers 0T/24h confirmed dead. Market: NEUTRAL. stop_hunt_reversal_long+: 7T/24h 42.9% -$0.23 (borderline, monitoring). r2-trend-long3: MIN_PRE_MOVE 0.3 eval active through Aug 21. SHORT side: 2T/24h -$0.06 spike_exhaustion_short- only (structural gap — NEUTRAL regime 0.5x multiplier blocking). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
 
 ## Active Decisions
 
