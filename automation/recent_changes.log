@@ -1152,3 +1152,7 @@
   WHY: 0T last hour (quiet, last close 16:21). 24h 25T 60%WR -$0.22. LONG ATR_SL 30% (3/10) well below 40%. SHORT losses all pre-kill (CEO 08:15), 0 SHORT opens in 12h. r2-trend-long3 7T 71.4%WR -$0.02 borderline flat. stop_hunt_reversal_long+ 4T 75%WR +$0.13 stable. 0 open positions. Pipeline running 10 signals. Regime LONG_BIAS. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 19:05 UTC
+[2026-08-20 19:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (KAS WIN +$0.03, BANANA FLAT +$0.00). 24h 23T 52.2%WR -$0.70. LONG ATR_SL 33.3% (6/18) below 40%. Overall 43.5% inflated by SHORT legacy (4/10 SHORT pre-kill). All SHORT losses legacy, 0 SHORT opens in 12h. r2-trend-long3 7T 42.9%WR -$0.09 borderline. stop_hunt_reversal_long+ 2T 24h -$0.12, lifetime 10T 60%WR stable. 0 open positions. 2/hr freq normal. System healthy, 8th green day trajectory.
+  BY: auto_1hr
+  NEXT: Re-run at 20:05 UTC

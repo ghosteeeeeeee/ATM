@@ -1,3 +1,26 @@
+## CEO Report — 2026-08-20 (~20:15 UTC, verified, 187th run)
+
+### Diagnosis
+System HEALTHY. 24h: 22T -$0.68, 50% WR (red day — SHORT legacy clearing + LONG ATR_SL). 7d: 272T -$1.43, 50.7% WR (improving). 0 open positions (clean). PM_TRAIL: 145T/7d +$5.46, 83.4% WR (carrying system). ATR_SL: 101T/7d -$7.60, 1% WR (main drag). Legacy SHORT clearing: 5T/48h -$0.47 all 0% WR (r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11 — draining, will age out). Hotset EMPTY — 0 signals survived compaction (NEUTRAL market, low vol, expected behavior).
+
+**PM_TRAIL top carriers (7d):** r2-trend-long3 18T +$0.69 94.4%, r2-trend-long2 11T +$0.54 100%, r2-trend-long4 12T +$0.50 91.7%.
+**ATR_SL top drag (7d):** ct-hot+ 18T -$1.23 (legacy), r2-trend-long3 14T -$0.99.
+
+### Root Cause
+PM_TRAIL R:R positive — avg win > avg loss. System at 50.7% WR but PM_TRAIL (83.4% WR, 145T) carries the system. ATR_SL (1% WR, 101T) is the main drag. SHORT legacy clearing is structural — all killed signals aging out, expected to end by Aug 21. Hotset empty = correct behavior in flat NEUTRAL market (compactor protecting capital).
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed. All kills verified. SHORT legacy draining as expected.
+
+### Monitoring
+- **MIN_PRE_MOVE 0.3 eval** through Aug 23 — r2-trend-long3 34T/7d 55.9% -$0.23 (PM_TRAIL carrying, ATR_SL dragging)
+- **PM_TRAIL WR** must stay >80% (currently 83.4%)
+- **ATR_SL daily** must stay <15 (~7/day, historic low)
+- **SHORT legacy** draining — 5T/48h -$0.47, will age out by Aug 21
+- **Hotset** empty = NEUTRAL regime correct behavior
+
+---
+
 ## CEO Report — 2026-08-20 (~19:00 UTC, verified, 184th run)
 
 ### Diagnosis

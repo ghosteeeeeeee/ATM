@@ -11817,3 +11817,41 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None — system operating within parameters
+
+## [2026-08-20 19:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L: KAS r2-trend-long13 WIN +$0.03 PM_TRAIL, BANANA r2-trend-long3 FLAT +$0.00 ATR_SL)
+**PnL:** ~$0.03 (2 trades, 1 hr freq)
+
+**24h:** 23T 52.2%WR -$0.70
+- profit-monster-trail: 12T 75%WR +$0.48 (dominant exit, profitable)
+- atr_sl_hit: 10T 43.5% — but 4/10 are SHORT legacy (pre-kill), LONG-only 33.3% ✅
+
+**Signal Performance (24h):**
+- r2-trend-long6: 2T 100%WR +$0.16
+- r2-trend-long4: 2T 100%WR +$0.04
+- r2-trend-long13: 1T 100%WR +$0.03
+- bb_bounce+: 1T 100%WR +$0.07
+- r2-trend-long3: 7T 42.9%WR -$0.09 (3 SL hits, borderline)
+- stop_hunt_reversal_long+: 2T 50%WR -$0.12 (lifetime 10T 60%WR, borderline)
+- r2-trend-long8: 1T -$0.11 (too early)
+- SHORT signals: all pre-kill legacy, age out of 24h window soon
+
+**Regime:** LONG_BIAS (macro gate)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL 33.3% well below 40% kill threshold
+- Overall 43.5% is SHORT legacy skew — no NEW SHORT trades in 12h+
+- stop_hunt_reversal_long+ 2T 24h too few to kill; lifetime 10T 60%WR borderline
+- r2-trend-long3 7T 42.9%WR is borderline but not kill-worthy (needs 0%WR with 3+T)
+- 2/hr trade freq — normal
+- 0 open positions, pipeline running
+
+**Watch Next Hour:**
+- r2-trend-long3: monitor if ATR_SL dominance continues (currently 3/7 = 42.9%)
+- stop_hunt_reversal_long+: 10T lifetime at 60%WR — stable
+
+**Open Questions:**
+- None
