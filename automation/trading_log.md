@@ -1,5 +1,21 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-20 18:30 UTC] Daily Orchestrator Run
+
+**Status:** System HEALTHY — no changes needed
+**24h:** 23T, 56.5% WR, -$0.40 (quiet day, SHORT legacy clearing)
+**7d:** 271T, 50.6% WR, -$1.57
+
+**Exit Breakdown (24h):** PM_TRAIL 13T 92.3% +$0.68, ATR_SL 9T 0% -$1.09, regime_bear_flip 1T +$0.01
+
+**Key Findings:**
+- ATR_SL count steady at 7/day (historic low, SL floor fix holding)
+- r2-trend-long3 inverted R:R persists (57.6% WR but avg_loss 1.73x avg_win)
+- stop_hunt_reversal_long+ break-even (R:R 0.60), borderline
+- PM_TRAIL carrying system (83.3% WR +$5.43/7d)
+
+**No changes implemented** — system within parameters, all automations nominal.
+
 ## [2026-08-20 16:04 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (CAKE r2-trend-long3 PM_TRAIL +$0.02)
