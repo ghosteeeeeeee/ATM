@@ -1,7 +1,7 @@
 # Plan: Retroactive Breakout Scan / Delayed Entry
 
 **Date:** 2026-08-20
-**Status:** Open (v2 — audited, all bugs fixed)
+**Status:** Open (v3 — audited, all bugs fixed)
 **Priority:** High — safety net for missed breakouts (IMX +2.72% case)
 **Parent:** `plans/imx-spike-detection.md` (Fix 3)
 
@@ -239,7 +239,7 @@ def write_to_hotset_retro(signals: List[dict], dry: bool = False):
     if not dry:
         try:
             fd = open(HOTSET_PATH + '.lock', 'w')
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_TIMEOUT)
+            fcntl.flock(fd, fcntl.LOCK_EX)
             # Read existing hotset, merge retro tokens
             existing = {}
             if os.path.exists(HOTSET_PATH):
@@ -449,7 +449,7 @@ def write_signals_to_db_retro(signals: List[dict], dry: bool = False):
             value=sig.get('atr'),
             price=sig['price'],
             timeframe='1m',
-            metadata={'retro_trade_size_mult': RETRO_SIZE_MULTIPLIER},
+            signal_metadata={'retro_trade_size_mult': RETRO_SIZE_MULTIPLIER},
         )
 ```
 
@@ -495,16 +495,18 @@ def scan_retroactive(token, existing_signal_tokens, open_tokens, dry=False):
     if token in open_tokens:
         return None
     
-    # Blacklist check
+    # Blacklist check (direction-aware)
     from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
     if token.upper() in SHORT_BLACKLIST and token.upper() in LONG_BLACKLIST:
-        return None
+        return None  # fully blacklisted, skip entirely
     
-    # Loss cooldown check
+    # Note: direction-specific blacklist is checked AFTER direction is determined
+    
+    # Loss cooldown check — keys are "TOKEN:DIRECTION" format
     try:
         with open(os.path.join(HERMES_DATA, 'loss_cooldowns.json')) as f:
             loss_cooldowns = json.load(f)
-        if token.upper() in loss_cooldowns:
+        if any(k.startswith(token.upper() + ':') for k in loss_cooldowns):
             return None
     except Exception:
         pass
@@ -518,7 +520,8 @@ def scan_retroactive(token, existing_signal_tokens, open_tokens, dry=False):
     if not candles or len(candles) < RETRO_LOOKBACK_BARS + 5:
         return None
     
-    # Only scan closed candles (exclude developing)
+    # Only scan closed candles (get_candles returns dicts without is_closed,
+    # but DB candles are pre-closed — this filter is a safety no-op)
     closed = [c for c in candles if c.get('is_closed', True)]
     if len(closed) < RETRO_LOOKBACK_BARS + 5:
         return None
@@ -541,6 +544,12 @@ def scan_retroactive(token, existing_signal_tokens, open_tokens, dry=False):
     
     spike = recent[spike_idx]
     direction = 'LONG' if spike['close'] > spike['open'] else 'SHORT'
+    
+    # Direction-specific blacklist check
+    if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
+        return None
+    if direction == 'LONG' and token.upper() in LONG_BLACKLIST:
+        return None
     
     # Body filter (reject dojis)
     body_pct = abs(spike['close'] - spike['open']) / spike['open'] * 100
