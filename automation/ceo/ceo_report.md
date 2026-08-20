@@ -142,3 +142,26 @@ NO CHANGES. All kills verified. Fixed CURRENT.md timestamp (was future-dated Aug
 - **PM_TRAIL WR** must stay >80% (currently 83.3%)
 - **ATR_SL daily** must stay <15 (~7/day, historic low)
 - **SHORT side** structural gap — all legacy dead, need new signals for SHORT_BIAS regime
+
+---
+
+## CEO Report — 2026-08-20 (~23:45 UTC, verified, 191st run)
+
+### Diagnosis
+System HEALTHY. Verified DB: 24h 18T -$0.54, 50.0% WR. 7d: 271T -$1.25, 51.3% WR. PM_TRAIL: 146T/7d +$5.50, 83.6% WR (carrying system). ATR_SL: 14T/48h -$1.59 (dominant drag). 0 open positions (clean). Daily: Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54 (red after 2 green, SHORT legacy clearing expected).
+
+**r2-trend-long3 MIN_PRE_MOVE 0.3 (48h eval):** 9T, $0.00 PnL, 66.7% WR — break-even. PM_TRAIL 5T +$0.22 100% WR capturing winners. ATR_SL 3T -$0.23 0% WR still hitting. Net flat. Eval wraps Aug 23.
+
+**continuation+:** 5T/7d -$0.17, 40% WR — tiny sample, 0T/24h (no recent trades). Too early to kill.
+
+### Root Cause
+PM_TRAIL positive R:R (83.6% WR, avg win +0.47% vs avg loss -0.74%). Red day = SHORT legacy clearing (all killed signals, aging out Aug 21-22) + ATR_SL cluster on r2-trend-long3. System breakeven because PM_TRAIL gain ($5.50) offsets ATR_SL drag ($7.46).
+
+### Fix Applied
+NO CHANGES. System healthy, PM_TRAIL 83.6% WR carrying, ATR_SL at historic low count, MIN_PRE_MOVE 0.3 eval ongoing (break-even 48h, needs more data through Aug 23). All legacy losers confirmed dead or aging out.
+
+### Monitoring
+- **MIN_PRE_MOVE 0.3 eval** through Aug 23 — 48h break-even, PM_TRAIL capturing but ATR_SL still hitting
+- **PM_TRAIL WR** must stay >80% (currently 83.6%)
+- **ATR_SL daily** must stay <15 (~7/day, historic low)
+- **SHORT side** structural gap — all legacy dead, need new signals for SHORT_BIAS regime
