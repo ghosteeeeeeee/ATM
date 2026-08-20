@@ -17,7 +17,6 @@ import sys
 import os
 import time
 import numpy as np
-from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
@@ -41,7 +40,6 @@ from hermes_constants import (
 
 # ── Constants ─────────────────────────────────────────────────────────────
 R2_WINDOW            = 16
-R2_THRESHOLD         = 0.70
 SIGNAL_TYPE          = 'r2_trend_short'
 SOURCE_PREFIX        = 'r2-trend-short'
 LOOKBACK_CANDLES     = 50
@@ -143,10 +141,10 @@ def detect_r2_short(token, candles, price):
     if len(closes) >= R2_WINDOW + 3:
         y_prev = closes[-(R2_WINDOW + 3):-3]
         _, _, r2_prev = _ols_params(y_prev)
-        if not (r2_prev < R2_THRESHOLD and r2 >= R2_THRESHOLD):
-            if r2 < R2_THRESHOLD or (r2 - r2_prev) < 0.05:
+        if not (r2_prev < R2_TREND_SHORT_MIN_R2 and r2 >= R2_TREND_SHORT_MIN_R2):
+            if r2 < R2_TREND_SHORT_MIN_R2 or (r2 - r2_prev) < 0.05:
                 return None
-    elif r2 < R2_THRESHOLD:
+    elif r2 < R2_TREND_SHORT_MIN_R2:
         return None
 
     # Find how many bars since slope flipped negative (trend started)
@@ -346,5 +344,5 @@ if __name__ == '__main__':
     if not test_tokens:
         test_tokens = dict(list(prices.items())[:10])
     print(f"[r2_trend_short] Testing on {len(test_tokens)} tokens...")
-    n = scan_signals()
+    n = scan_signals(test_tokens)
     print(f"[r2_trend_short] Done. {n} signals emitted.")

@@ -17,7 +17,6 @@ Source: r2l-long{N}
 
 import sys, os, sqlite3, time
 import numpy as np
-from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
@@ -39,7 +38,6 @@ from hermes_constants import (
 
 # ── Constants ─────────────────────────────────────────────────────────────
 R2_WINDOW            = 16
-R2_THRESHOLD         = 0.70
 SIGNAL_TYPE          = 'r2_trend_long'
 SOURCE_PREFIX        = 'r2-trend-long'
 LOOKBACK_CANDLES     = 50
@@ -79,7 +77,7 @@ def detect_r2_long(token, candles, price):
     """Detect confirmed uptrend on 1m candles via R² regression.
 
     Fires LONG when:
-      - R² >= R2_THRESHOLD (confirmed trend, not chop)
+      - R² >= R2_TREND_LONG_MIN_R2 (confirmed trend, not chop)
       - Slope > 0 (uptrend)
       - Price > regression intercept (bullish alignment)
     """
@@ -147,11 +145,11 @@ def detect_r2_long(token, candles, price):
         y_prev = closes[-(R2_WINDOW + 3):-3]
         _, _, r2_prev = _ols_params(y_prev)
         # R² must have been below threshold recently and now rising above it
-        if not (r2_prev < R2_THRESHOLD and r2 >= R2_THRESHOLD):
+        if not (r2_prev < R2_TREND_LONG_MIN_R2 and r2 >= R2_TREND_LONG_MIN_R2):
             # Also allow if R² is rising strongly (even if already above threshold)
-            if r2 < R2_THRESHOLD or (r2 - r2_prev) < 0.05:
+            if r2 < R2_TREND_LONG_MIN_R2 or (r2 - r2_prev) < 0.05:
                 return None
-    elif r2 < R2_THRESHOLD:
+    elif r2 < R2_TREND_LONG_MIN_R2:
         return None
 
     # Find how many bars since slope flipped negative (trend started)
@@ -160,7 +158,7 @@ def detect_r2_long(token, candles, price):
     for i in range(n - R2_WINDOW, -1, -1):
         y_i = closes[i:i + R2_WINDOW]
         b_i, a_i, r2_i = _ols_params(y_i)
-        if b_i <= 0 or r2_i < R2_THRESHOLD:
+        if b_i <= 0 or r2_i < R2_TREND_LONG_MIN_R2:
             break
         bars_since = n - R2_WINDOW - i
         entry_idx = i
