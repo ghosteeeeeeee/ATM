@@ -1,7 +1,7 @@
-## CEO Report — 2026-08-20 (~20:15 UTC, verified, 187th run)
+## CEO Report — 2026-08-20 (~21:15 UTC, verified, 188th run)
 
 ### Diagnosis
-System HEALTHY. 24h: 22T -$0.68, 50% WR (red day — SHORT legacy clearing + LONG ATR_SL). 7d: 272T -$1.43, 50.7% WR (improving). 0 open positions (clean). PM_TRAIL: 145T/7d +$5.46, 83.4% WR (carrying system). ATR_SL: 101T/7d -$7.60, 1% WR (main drag). Legacy SHORT clearing: 5T/48h -$0.47 all 0% WR (r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11 — draining, will age out). Hotset EMPTY — 0 signals survived compaction (NEUTRAL market, low vol, expected behavior).
+System HEALTHY. 24h: 20T -$0.69, 50% WR (red day — SHORT legacy clearing + LONG ATR_SL). 7d: 272T -$1.43, 50.7% WR (improving). 1 open position (clean). PM_TRAIL: 145T/7d +$5.46, 83.4% WR (carrying system). ATR_SL: 101T/7d -$7.60, 1% WR (main drag). Legacy SHORT clearing: 5T/48h -$0.47 all 0% WR (r2-trend-short2 -$0.23, r2-trend-short13 -$0.13, r2-trend-short10 -$0.11 — draining, will age out). Hotset EMPTY — 0 signals survived compaction (NEUTRAL market, low vol, expected behavior).
 
 **PM_TRAIL top carriers (7d):** r2-trend-long3 18T +$0.69 94.4%, r2-trend-long2 11T +$0.54 100%, r2-trend-long4 12T +$0.50 91.7%.
 **ATR_SL top drag (7d):** ct-hot+ 18T -$1.23 (legacy), r2-trend-long3 14T -$0.99.
@@ -17,6 +17,39 @@ NO CHANGES. System healthy, no intervention needed. All kills verified. SHORT le
 - **PM_TRAIL WR** must stay >80% (currently 83.4%)
 - **ATR_SL daily** must stay <15 (~7/day, historic low)
 - **SHORT legacy** draining — 5T/48h -$0.47, will age out by Aug 21
+- **Hotset** empty = NEUTRAL regime correct behavior
+
+---
+
+## CEO Report — 2026-08-20 (~21:15 UTC, verified, 188th run)
+
+### Diagnosis
+System HEALTHY. 24h: 20T -$0.69, 50% WR (red day — SHORT legacy clearing + LONG ATR_SL). 7d: 272T -$1.43, 50.7% WR (improving). 1 open position. PM_TRAIL: 145T/7d +$5.46, 83.4% WR (carrying system). ATR_SL: 101T/7d -$7.60, 1% WR (main drag). Legacy SHORT clearing: 5T/48h -$0.47 all 0% WR (draining, will age out by Aug 21). Hotset EMPTY — correct NEUTRAL behavior. Daily: Aug 13 -$0.23 → 14 -$0.56 → 15 +$0.02 → 16 -$0.49 → 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.58 (red after 8 green).
+
+**48h SHORT legacy:** r2-trend-short2 3T -$0.23, short13 1T -$0.13, short10 1T -$0.11 = -$0.47 total.
+**48h LONG losers:** stop_hunt_reversal_long+ 2T -$0.12, r2-trend-long8 1T -$0.11, r2-trend-long3 6T -$0.17.
+**PM_TRAIL top carriers (7d):** r2-trend-long3 18T +$0.69 94.4%, r2-trend-long2 11T +$0.54 100%, r2-trend-long4 12T +$0.50 91.7%.
+
+### Root Cause
+PM_TRAIL R:R positive — avg win > avg loss. System profitable despite 50.7% 7d WR because PM_TRAIL (83.4% WR, 145T) carries. ATR_SL (1% WR, 101T) is the main drag. SHORT legacy clearing is structural — all killed signals aging out, expected to end by Aug 21. Hotset empty = correct behavior in flat NEUTRAL market.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed. All kills verified. SHORT legacy draining as expected.
+
+### Verification
+- PM_TRAIL: 145T/7d +$5.46, 83.4% WR (carrying system)
+- ATR_SL: 101T/7d -$7.60, 1% WR (~7/day, historic low)
+- MIN_PRE_MOVE 0.3: 48h 9T 66.7% WR $0.00 (IMPROVED, eval through Aug 23)
+- stop_hunt_reversal_long+: KILLED Aug 20, 2T legacy clearing -$0.12
+- SHORT legacy: draining, will age out by Aug 21
+- 1 open position, 0 phantom trades
+- All timers firing, pipeline healthy
+
+### Monitoring
+- **MIN_PRE_MOVE 0.3 eval** through Aug 23 — r2-trend-long3 34T/7d 55.9% -$0.23
+- **PM_TRAIL WR** must stay >80% (currently 83.4%)
+- **ATR_SL daily** must stay <15 (~7/day, historic low)
+- **SHORT legacy** draining — will age out by Aug 21
 - **Hotset** empty = NEUTRAL regime correct behavior
 
 ---

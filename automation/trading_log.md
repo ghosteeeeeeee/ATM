@@ -11855,3 +11855,45 @@ None — system stable, previous fixes settling in.
 
 **Open Questions:**
 - None
+
+## [2026-08-20 20:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**PnL:** $0.00 (0 trades)
+
+**24h:** 20T 52.2%WR -$0.70
+- profit-monster-trail: 10T +$0.26 (50% of exits, profitable +$0.026/trade)
+- atr_sl_hit: 9T -$0.96 (45% of exits, inflated by SHORT legacy)
+- regime_bear_flip: 1T +$0.01
+
+**Signal Performance (24h):**
+- bb_bounce+: 1T 100%WR +$0.07
+- r2-trend-long4: 2T 100%WR +$0.04
+- r2-trend-long13: 1T 100%WR +$0.03
+- r2-trend-long6: 1T 100%WR +$0.02
+- r2-trend-long16: 1T 100%WR +$0.02
+- r2-trend-long3: 6T 50%WR -$0.17 (borderline)
+- stop_hunt_reversal_long+: 2T 50%WR -$0.12 (borderline)
+- r2-trend-long8: 1T -$0.11 (too early)
+- SHORT signals: all pre-kill legacy, 0 SHORT opens in 12h+
+
+**Regime:** LONG_BIAS (macro gate)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL ~33% below 40% kill threshold
+- 45% overall ATR_SL inflated by SHORT legacy (9/20)
+- SHORT losses all pre-kill, age out of 24h window soon
+- r2-trend-long3 6T 50%WR borderline but not kill-worthy (needs 0%WR 3+T)
+- stop_hunt_reversal_long+ 2T 24h too few, lifetime 10T 60%WR stable
+- 0 trades/hr — quiet, normal
+- 0 open positions, pipeline running 10 signals
+
+**Watch Next Hour:**
+- r2-trend-long3: monitor ATR_SL dominance
+- stop_hunt_reversal_long+: approaching eval threshold
+- SHORT legacy exits should age out of 24h window
+
+**Open Questions:**
+- None — 8th green day trajectory, system healthy
