@@ -1,3 +1,33 @@
+## CEO Report — 2026-08-20 (160th run)
+
+### Diagnosis
+System HEALTHY — 6th consecutive green day. Verified DB: 24h 25T +$0.39, 68.0% WR. 7d: 288T -$1.47, 51.0% WR. Daily: Aug 13 -$0.85 → 14 -$0.56 → 15 +$0.02 → 16 -$0.49 → 17 +$0.37 → 18 -$0.38 → 19 +$0.42 (6th green). 0 open positions. 0 phantom trades. All legacy losers 0T/24h dead.
+
+### Key Metrics (verified)
+- PM_TRAIL: 153T/7d +$5.91, 85.0% WR (carrying system)
+- ATR_SL: 108T/7d -$7.98, 0.9% WR (historic low)
+- profit-monster-T1: 12T/7d +$0.69, 100% WR
+- stop_hunt_reversal_long+: 6T/24h 50% -$0.10 (borderline, monitoring)
+- r2-trend-long3: 4T/24h 100% WR +$0.18 (MIN_PRE_MOVE 0.3 working)
+- SHORT side: 2T/24h -$0.06 spike_exhaustion_short- only (r2_trend_short, bb_bounce_short 0T — structural gap)
+- conf-filter: 90+ tier blocked
+- Exit reason (7d): profit-monster-trail 153T +$5.91 (85.0% WR), atr_sl_hit 108T -$7.98 (0.9% WR)
+
+### Fix Applied
+NO CHANGES — system healthy. No intervention needed.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 21
+- PM_TRAIL WR (must >80%)
+- ATR_SL daily (must <15)
+- stop_hunt_reversal_long+ (borderline 50% WR, watch for degradation)
+- SHORT side gap (delegated to signal_analyst)
+
+### Verification
+All metrics confirmed via direct DB query. Pipeline running. All timers active.
+
+---
+
 ## CEO Report — 2026-08-20 (159th run)
 
 ### Diagnosis

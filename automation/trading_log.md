@@ -11253,3 +11253,30 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - Asia session trade activity
 - stop_hunt_reversal_long+ (6T 50%WR -$0.10 — continue watching)
+
+---
+
+## [2026-08-20 09:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet morning)
+**Open:** 0
+
+**24h:** 25T | 68% WR | +$0.39
+- profit-monster-trail: 16T +$1.27 (avg +$0.079) ✅ dominant
+- atr_sl_hit: 7T -$0.78 (28% of closes — down from 53%)
+- stop_hunt_reversal_long+: 6T 50%WR -$0.10 (borderline)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet morning
+- 24h WR 68% — healthy system
+- ATR_SL 28% well below 40% threshold
+- No signal crosses auto-kill (3T/0%WR)
+- CEO changes from Aug 20 ~01:00 holding (NO CHANGES decision)
+
+**Open Questions:** None — system stable
+
+**Watch Next Hour:**
+- Trade frequency (quiet morning pattern)
+- stop_hunt_reversal_long+ 6T/50%WR/-$0.10 — monitor if it degrades further
