@@ -8,6 +8,7 @@
 - **Test a single script:** `python3 scripts/price_collector.py` (or any step in isolation)
 - **Logs:** `tail -100 /root/.hermes/logs/pipeline.log`
 - **Architecture detail:** `/root/.hermes/ATM/ATM-Architecture.md`
+- **SOPs:** `SOPs.md` — standard operating procedures (plans, commits, signals, debugging, memory)
 
 ## Two Data Directories
 
@@ -60,7 +61,13 @@ All file/DB paths are defined in **`scripts/paths.py`** — import with `from pa
 - **Mandatory subagent code review** — after any major change (new feature, bug fix, refactor), call a subagent to audit the diff. Look for bugs, scoping issues, edge cases, connection leaks, and future failure modes. Never skip this.
 - **Mandatory bug_hunter verification** — after any major change, call the bug_hunter subagent to verify the fix. This is always the last step. No exceptions.
 
-See `LESSONS.md` for hard-won bug patterns and parsing traps.
+## Do's and Don'ts
+
+**Full playbook:** `brain/PLAYBOOK.md` — file locations, skills, do's/don'ts, hard-earned lessons.
+
+Quick version:
+- **Do:** Search before building, close cursors in `finally`, commit after each task, query OpenMemory first.
+- **Don't:** Hardcode constants, `git push` directly, skip bug_hunter, call ai_decider.py.
 
 ## Git Operations
 
