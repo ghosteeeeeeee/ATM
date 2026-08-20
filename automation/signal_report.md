@@ -1,47 +1,56 @@
 # Signal Performance Report
-**Generated:** 2026-08-20 11:15 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-20 19:00 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **24h trades:** 28 | **WR:** 60.7% | **PnL:** +$0.23
-- **7d trades:** 268 | **WR:** 53.0% | **PnL:** -$1.70
-- **Active signals (7d):** 64 distinct types
+---
+
+## 6h Performance (min 2 trades)
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| r2-trend-long3 | LONG | 3 | 66.7% | -$0.06 |
+| r2-trend-long4 | LONG | 2 | 100% | +$0.04 |
+
+## 24h Performance (min 3 trades)
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| r2-trend-long3 | LONG | 7 | 71.4% | -$0.02 |
+| stop_hunt_reversal_long+ | LONG | 5 | 60.0% | +$0.01 |
+| r2-trend-long6 | LONG | 3 | 100% | +$0.25 |
+| r2-trend-short2 | SHORT | 3 | 0.0% | -$0.23 |
+
+---
 
 ## KILLED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | All known losers already disabled |
+
+None — no signals meet kill threshold (5+ trades, WR < 30%, PnL < -$0.10 over 24h).
 
 ## BOOSTED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long6 | LONG | 100.0% | +$0.49 | 7 (7d) | Top performer, carrying system |
-| bb_bounce+,hl_copy_trader | LONG | 57.1% | +$0.30 | 7 (7d) | Combo winner |
-| return_exhaustion_long | LONG | 66.7% | +$0.21 | 9 (7d) | Consistent edge |
-| r2-trend-long4 | LONG | 60.0% | +$0.12 | 15 (7d) | Volume + consistency |
-| r2-trend-long2 | LONG | 58.8% | +$0.12 | 17 (7d) | Volume + consistency |
+
+None — no signals meet boost threshold (5+ trades, WR > 55%, PnL > $0.05) with enough trade volume.
 
 ## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long3 | LONG | 53.3% | -$0.13 | 30 (7d) | Neutral R:R, not bleeding hard |
-| r2-trend-short2 | SHORT | 33.3% | -$0.21 | 3 (24h) | Below kill threshold (needs 5+) |
-| stop_hunt_reversal_long+ | LONG | 50.0% | -$0.007 | 6 (24h) | Breakeven, watch |
+
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| r2-trend-short2 | SHORT | 3 | 0.0% | -$0.23 | WATCH — 0% WR, 3 trades. Kill if 5+ trades stay 0%. |
 
 ## WINNERS
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long6 | LONG | 100.0% | +$0.49 | 7 (7d) | Dominant |
-| bb_bounce+,hl_copy_trader | LONG | 57.1% | +$0.30 | 7 (7d) | Strong combo |
-| return_exhaustion_long | LONG | 66.7% | +$0.21 | 9 (7d) | Reliable |
-| r2-trend-long4 | LONG | 60.0% | +$0.12 | 15 (7d) | Workhorse |
-| r2-trend-long2 | LONG | 58.8% | +$0.12 | 17 (7d) | Workhorse |
-| r2-trend-long0 | LONG | 100.0% | +$0.09 | 3 (7d) | Small sample, perfect |
 
-## ISSUES
-- **No direction inversions detected** — signal-to-direction alignment is clean
-- **7d system PnL is -$1.70** — dragged by now-killed losers (ct-hot, range_breakout, mover+, wave_catcher+, continuation+, range_finder+). All disabled.
-- **SHORT signals underperforming** — most SHORT variants killed. Only r2-trend-short2 still active with 3 trades below kill threshold. Consider monitoring.
-- **Low 24h volume (28 trades)** — expected, system filtering well after mass kills.
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| r2-trend-long6 | LONG | 3 | 100% | +$0.25 | Strong — monitor for consistency |
+| r2-trend-long4 | LONG | 2 | 100% | +$0.04 | Early winner — needs more trades |
+| r2-trend-long3 | LONG | 7 | 71.4% | -$0.02 | INVERTED R:R — avg_win=$0.042, avg_loss=$0.115 (2.7:1 against). Tighten stops. |
+| stop_hunt_reversal_long+ | LONG | 5 | 60.0% | +$0.01 | Positive, meeting criteria |
 
-## Previously Killed (confirmed disabled)
-ct-hot+, ct-hot-, range_breakout_short, range_breakout+, mover+, wave_catcher+, wave_catcher-, wave_catcher+, continuation+, range_finder+, hzscore-, r2_trend_short — all set to False in hermes_constants.py.
+## SIGNAL INVERSIONS
+
+None found.
+
+## NOTES
+
+- Overall volume is low this period — 24 total closed trades across all signals.
+- r2-trend-short2 is the only clear loser but needs 5+ trades before kill.
+- r2-trend-long3 has 71.4% WR but -$0.02 PnL — winners are small, losers are big. Worth investigating avg win vs avg loss.
+- No bugs or anomalies detected.

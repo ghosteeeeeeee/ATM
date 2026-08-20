@@ -68,3 +68,8 @@ ALERTS:
 ## Error Alerts — 2026-08-20 12:19 UTC
 - **[WARN]** (1x): `hotset empty` — 0 signals above 50% confidence survived compaction. Market overwhelmingly neutral (99/104 tokens). No actionable signals.
 - **AUTO-FIX**: None needed — this is a market condition, not a system failure.
+
+## Error Alerts — 2026-08-20 16:19 UTC
+- **[WARN]** (6x): Phantom trades with |pnl|<0.01% — POL, SYRUP, CFX, HYPE×2. Likely spread/slippage noise. Consider minimum PnL filter in position manager.
+- **[WARN]** (1x): `pipeline.log` at 91MB — approaching rotation threshold.
+- **AUTO-FIX**: None needed — no crashes, all timers firing, system operational. Market neutral (2L/1S/101N), 0 signals above threshold is expected behavior.

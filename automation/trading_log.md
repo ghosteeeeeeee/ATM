@@ -1,5 +1,52 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-20 16:04 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CAKE r2-trend-long3 PM_TRAIL +$0.02)
+**Open:** 2 (AIXBT r2-trend-long3 -$0.19, BANANA r2-trend-long16 +$0.22)
+**24h:** 25T | 14W (56% WR) | -$0.36
+
+**24h Close Reasons:**
+- PM_TRAIL: 14T +$0.84 (avg +$0.06) — dominant, profitable
+- ATR_SL: 10T -$1.21 (avg -$0.12) — 40% of closes (exactly at threshold)
+- regime_bear_flip: 1T +$0.01
+
+**Signal Performance 24h:**
+- r2-trend-long6: 3T/3W +$0.25 (100% WR — excellent)
+- r2-trend-long3: 6T/5W +$0.09 (83% WR — excellent, improved)
+- r2-trend-long4: 2T/2W +$0.04 (100% WR — excellent)
+- bb_bounce+: 1T/1W +$0.07
+- stop_hunt_reversal_long+: 6T/3W -$0.10 (50% WR — marginal)
+- r2-trend-short2: 3T/0W -$0.23 (0% WR — already killed by CEO)
+- r2-trend-long8: 1T/0W -$0.11 (below threshold)
+- hl_copy_trader,stop_hunt_reversal_long+: 1T/0W -$0.13 (below threshold)
+- r2-trend-short10: 1T/0W -$0.11 (below threshold)
+- r2-trend-short13: 1T/0W -$0.13 (below threshold)
+
+**ATR_SL Trend (last 6h):**
+- 15:00: 1T, 0 SL (0%)
+- 14:00: 1T, 0 SL (0%)
+- 13:00: 3T, 1 SL (33.3%)
+- 10:00: 1T, 0 SL (0%)
+→ SL rate improving in recent hours
+
+**Auto-Kill Check:**
+- r2-trend-short2: 3T/0%WR -$0.23 — already killed by CEO
+- stop_hunt_reversal_long+: 6T/50%WR -$0.10 — marginal but not at kill threshold
+- No other signals cross 3T/0%WR threshold
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 1 trade last hour — normal activity
+- ATR_SL at 40% — exactly at threshold, but last 6h shows 0% SL rate (improving trend)
+- PM_TRAIL dominant and profitable (+$0.84)
+- Trade frequency normal (25/24h)
+- No signal crosses auto-kill threshold
+- r2-trend-long3 improved: 83% WR (was 52% on Aug 18)
+
+---
+
 ## [2026-08-20 13:04 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour
@@ -11642,6 +11689,33 @@ None — system stable, previous fixes settling in.
 **Watch Next Hour:**
 - stop_hunt_reversal_long+ hits 7T eval threshold next cycle — will evaluate for kill
 - 7d: 279T 50.5%WR -$1.59 (flat, LONG signals carrying)
+
+**Open Questions:**
+- None — system operating within parameters
+
+## [2026-08-20 17:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L)
+- AIXBT r2-trend-long3: ATR_SL -$0.11
+- BANANA r2-trend-long16: PM_TRAIL +$0.02
+
+**24h:** 27T (22 LONG) / ~16W / ~$0 flat
+**LONG 24h:** 21T / 28.6% ATR_SL (6/21) / +$0.13 ✅
+**SHORT 24h:** 5T / 100% ATR_SL / -$0.56 (all pre-kill, CEO 08:15)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL 28.6% — well below 40% kill threshold
+- SHORT losses all pre-kill (CEO already acted)
+- stop_hunt_reversal_long+ 6T 24h 50%WR -$0.10 — at eval threshold, lifetime 10T 60%WR -$0.04 borderline
+- Trade freq 2.7/hr — normal
+- 0 open positions
+- 7d: 274T 50.7%WR -$1.60 (flat, LONG signals carrying)
+
+**Watch Next Hour:**
+- stop_hunt_reversal_long+ approaching 7T eval threshold — will evaluate for kill if 50%WR persists
+- r2-trend-long8 at 1T — too early to evaluate
 
 **Open Questions:**
 - None — system operating within parameters
