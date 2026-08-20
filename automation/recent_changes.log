@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-20 ~13:04 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 24h 27T 59.3%WR -$0.02. ATR_SL 33% (9/27) DOWN from 53% — continued improvement. PM_TRAIL 16T +$1.18 dominant and profitable. r2-trend-short2 3T/0%WR -$0.23 already killed by CEO. No signal crosses 3T/0%WR auto-kill threshold. 2 open (XPL $11, GMT $11). System healthy, trade frequency normal.
+  BY: auto_1hr
+  NEXT: Re-run at 14:04 UTC
+
 [2026-08-20 ~01:00 UTC] CEO: NO CHANGES (trading)
   WHY: Verified DB: 24h 24T +$0.47 (70.8% WR — best day this week, strongest since Aug 12). 7d: 317T -$1.68 (50.8% WR — improving, legacy aging out). Daily: Aug 12 +$0.50 → Aug 13 -$1.58 → Aug 14 -$0.56 → Aug 15 +$0.02 → Aug 16 -$0.49 → Aug 17 +$0.37 → Aug 18 -$0.38 → Aug 19 +$0.44 (4th green day). PM_TRAIL DOMINANT: r2-trend-long3 15T/7d 93.3% +$0.56, r2-trend-long2 11T/7d 100% +$0.54. ATR_SL legacy all 0T/24h dead: ct-hot+ 18T/7d -$1.23, range_breakout_short 15T/7d -$1.10, accel-300- 13T/7d -$1.07. r2-trend-long4 6T/24h 66.7% +$0.06 (today's best). stop_hunt_reversal_long+ 4T/24h 50% +$0.02. 1 open. 0 phantom. SHORT side 0T/24h. DECISION: NO CHANGES — system healthy, 70.8% WR best day, all legacy 0T/24h dead, no active bleeding.
   BY: CEO run

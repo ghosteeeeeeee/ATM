@@ -1,5 +1,39 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-20 13:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**Open:** 2 (XPL r2-trend-long4 $11, GMT r2-trend-long4 $11)
+**24h:** 27T | 16W (59.3% WR) | -$0.02
+
+**24h Close Reasons:**
+- PM_TRAIL: 16T +$1.18 (59%) — dominant, profitable
+- ATR_SL: 9T -$1.10 (33%) — improved from 53%
+- cut_loser: 1T -$0.11
+- regime_bear_flip: 1T +$0.01
+
+**Signal Performance 24h:**
+- r2-trend-long6: 3T/3W +$0.25 (excellent)
+- r2-trend-long4: 2T/2W +$0.19 (excellent)
+- r2-trend-long3: 5T/4W +$0.06 (solid)
+- stop_hunt_reversal_long+: 6T/3W -$0.10 (breakeven)
+- r2-trend-short2: 3T/0W -$0.23 (already killed by CEO)
+
+**Auto-Kill Check:**
+- r2-trend-short2: 3T/0%WR -$0.23 — already disabled (CEO killed 2026-08-20)
+- No other signals cross 3T/0%WR threshold
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 0 trades last hour — quiet afternoon
+- ATR_SL at 33% — below 40% threshold, SL floor fix working
+- PM_TRAIL dominant and profitable
+- Trade frequency normal (27/24h)
+- All losers already killed or below threshold
+
+---
+
 ## [2026-08-20 06:30 UTC] Daily Orchestrator Report
 
 **Pipeline Status:** HEALTHY — all automations running clean
