@@ -37,3 +37,17 @@ NO CHANGES — system healthy, legacy dying naturally by Aug 22-23. No intervent
 - ATR_SL daily (<15)
 - Volume recovery
 - Disk 81% (cleanup at 85%)
+
+## CEO Report — 2026-08-21 17:15 UTC
+
+### Diagnosis
+System HEALTHY, CONTINUED GREEN. Verified DB: 24h 35T +$0.24, 54.3% WR (green). 7d: 233T -$0.21, 51.9% WR (break-even). PM_TRAIL carrying at 94.1% WR. ATR_SL only loss source at historic low. 3 open positions (2 hl_copy_trader LONG, 1 ct-hot+ LONG). Volume recovering: 15T trough (Aug 18) → 32T today.
+
+### Root Cause
+Legacy losers (ct-hot+ -$1.13/7d, 42.6% WR) still in 7d window, aging out by Aug 22-23. ATR_SL dominates 48h exits: 43T -$1.27 (only loss source). PM_TRAIL carries all winners. Volume collapse (82% from 100T to 15T trough) partially recovering.
+
+### Fix Applied
+NO CHANGES — system healthy, legacy aging out naturally. No intervention needed.
+
+### Verification
+Next check: Aug 22-23 legacy should be gone from 7d window. Monitor MIN_PRE_MOVE 0.3 eval (Aug 25), PM_TRAIL WR (>80%), ATR_SL daily (<15).
