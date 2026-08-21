@@ -12067,3 +12067,21 @@ None — system stable, previous fixes settling in.
 - System healthy, 8th green day trajectory
 
 **Open Questions:** None
+
+## [2026-08-21 05:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet night, 6h since last close)
+**PnL:** $0.00
+**24h:** 18T 50%WR -$0.54 (10 profit-monster-trail +$0.27, 8 atr_sl_hit -$0.81)
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL 30.8% (4/13) well below 40% threshold
+- Overall 44.4% ATR_SL inflated by SHORT legacy (4/8)
+- SHORT signals 5T 0%WR -$0.47 — R2_TREND_SHORT re-enabled Aug 20, only 5T of data, too early to evaluate
+- r2-trend-long3 5T 40%WR -$0.18 borderline, lifetime 34T 55.9%WR -$0.23 acceptable
+- 0 open positions, 0.75/hr freq normal
+- 7d 250T 50.4%WR -$1.25 flat, system healthy, 8th green day
+
+**Open Questions:** None
