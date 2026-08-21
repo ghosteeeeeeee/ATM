@@ -144,11 +144,15 @@ def main():
             calc_entry_px = entry_px if entry_px > 0 else float(entry_price)
 
             # Compute hype_pnl_pct from actual exit price and entry price
-            # Use calc_notional (actual HL notional) if available; default to amount_usdt
-            cur.execute("SELECT amount_usdt, hl_notional_usdt FROM trades WHERE id = %s", (trade_id,))
+            # Use calc_notional (actual HL notional) if available; default to amount_usdt * leverage
+            cur.execute("SELECT amount_usdt, hl_notional_usdt, leverage FROM trades WHERE id = %s", (trade_id,))
             amt_row = cur.fetchone()
             amount  = float(amt_row[0]) if amt_row and amt_row[0] else DEFAULT_TRADE_SIZE_USDT
-            calc_notional = float(amt_row[1]) if amt_row and amt_row[1] else amount
+            if amt_row and amt_row[1] is not None:
+                calc_notional = float(amt_row[1])
+            else:
+                lev = float(amt_row[2]) if amt_row and amt_row[2] else 10
+                calc_notional = amount * lev
 
             if calc_entry_px > 0 and exit_px > 0:
                 if direction == 'SHORT':

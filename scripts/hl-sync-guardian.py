@@ -558,6 +558,96 @@ def _retry_phantom_close_fills():
             pass
 
 
+def _backfill_hl_pnl_recent_closes():
+    """
+    FIX (2026-08-21): Position_manager closes trades BEFORE guardian runs,
+    setting pnl_usdt from computed values (amount_usdt as notional). Guardian
+    then can't find the trade (status='closed') to overwrite with HL ground truth.
+
+    This backfill finds trades closed in the last 5 minutes by position_manager
+    (is_guardian_close=FALSE), fetches HL fills, and overwrites pnl_usdt/pnl_pct
+    with HL realized PnL when available.
+
+    Only processes up to 5 trades per cycle to avoid slow cycles.
+    """
+    import psycopg2
+    from _secrets import BRAIN_DB_DICT
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT id, token, direction, entry_price, amount_usdt, leverage,
+                   EXTRACT(EPOCH FROM (NOW() - close_time)) as age_seconds
+            FROM trades
+            WHERE status = 'closed'
+              AND server = 'Hermes'
+              AND is_guardian_close = FALSE
+              AND close_time > NOW() - INTERVAL '5 minutes'
+              AND pnl_usdt IS NOT NULL
+            ORDER BY close_time DESC
+            LIMIT 5
+        ''')
+        recent = cur.fetchall()
+        if not recent:
+            conn.close()
+            return
+
+        log(f'HL PNL backfill: found {len(recent)} recently closed trades to check', 'INFO')
+        updated = 0
+        for trade_row in recent:
+            trade_id, token, direction, entry_price, amount_usdt, leverage, age_seconds = trade_row
+            if age_seconds < 30:
+                continue  # Too fresh — HL fills may not have propagated
+
+            entry_px = float(entry_price)
+            amt = float(amount_usdt) if amount_usdt else 11.0
+            lev = float(leverage) if leverage else 10
+
+            # Fetch HL fills for this token
+            window_end = int(time.time() * 1000)
+            window_start = window_end - 300_000
+            fills = _get_fills_cached(token.upper(), window_start, window_end)
+            close_fills = [f for f in fills
+                          if f['coin'].upper() == token.upper() and 'Close' in str(f.get('dir', ''))]
+            if not close_fills:
+                continue
+
+            # Compute HL ground truth PnL
+            total_pnl = sum(f.get('closed_pnl', 0) or 0 for f in close_fills)
+            if total_pnl == 0:
+                continue
+
+            # Compute HL-based pnl_pct from actual fill prices
+            total_sz = sum(f['sz'] for f in close_fills)
+            wavg_exit = sum(f['px'] * f['sz'] for f in close_fills) / total_sz
+            if direction == 'SHORT':
+                hl_pnl_pct = ((entry_px - wavg_exit) / entry_px) * 100
+            else:
+                hl_pnl_pct = ((wavg_exit - entry_px) / entry_px) * 100
+            hl_pnl_pct = round(hl_pnl_pct, 4)
+
+            # Update trade with HL ground truth
+            cur.execute('''
+                UPDATE trades
+                SET pnl_usdt = %s, pnl_pct = %s,
+                    hype_realized_pnl_usdt = %s, hype_realized_pnl_pct = %s,
+                    exit_price = %s
+                WHERE id = %s AND is_guardian_close = FALSE
+            ''', (round(total_pnl, 4), hl_pnl_pct,
+                  round(total_pnl, 6), hl_pnl_pct,
+                  wavg_exit, trade_id))
+            conn.commit()
+            updated += 1
+            log(f'  {token}#{trade_id} HL PNL backfill: pnl_usdt {total_pnl:+.4f} (was computed) '
+                f'exit={wavg_exit:.4f}', 'PASS')
+
+        if updated:
+            log(f'HL PNL backfill complete: {updated}/{len(recent)} updated', 'INFO')
+        conn.close()
+    except Exception as e:
+        log(f'HL PNL backfill error: {e}', 'FAIL')
+
+
 # ── BUG-4/15: Persistent closed-trade dedup set ─────────────────────────────────
 _CLOSED_SET_FILE = os.path.join(DATA_DIR, 'guardian-closed-set.json')
 _KILL_SWITCH_FILE = os.path.join(DATA_DIR, 'guardian_kill_switch.json')
@@ -4575,6 +4665,11 @@ def main():
         # the real HL fill prices without making extra API calls.
         # Only retry trades where: close_reason=PHANTOM_CLOSE AND exit_price=0.
         _retry_phantom_close_fills()
+
+        # ── HL PNL backfill for position_manager closes ────────────────────────
+        # FIX (2026-08-21): Position_manager closes trades before guardian runs,
+        # using computed PnL. This backfills HL ground truth for recent closes.
+        _backfill_hl_pnl_recent_closes()
 
         try:
             sync()

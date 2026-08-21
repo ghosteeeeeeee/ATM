@@ -918,10 +918,16 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # Bug-fix (2026-05-20): `or` treated 0.0 as falsy → phantom $50 fee base.
         # Use explicit None check so 0.0 is kept as real data.
         amount_usdt = float(row['amount_usdt']) if row['amount_usdt'] is not None else DEFAULT_TRADE_SIZE_USDT
-        # calc_notional: use actual HL notional if recorded, else fall back to amount_usdt.
+        # calc_notional: use actual HL notional if recorded, else fall back to amount_usdt * leverage.
         # Bug-fix (2026-05-20): `if row['hl_notional_usdt']` treated 0.0 as falsy — 
         # an HL trade with $0 notional (theoretical) or NULL both need the fallback.
-        calc_notional = float(row['hl_notional_usdt']) if row['hl_notional_usdt'] is not None else amount_usdt
+        # Bug-fix (2026-08-21): amount_usdt is MARGIN, not notional. Multiply by leverage
+        # to get actual position size when hl_notional_usdt is missing.
+        leverage = float(row.get('leverage') or 10)
+        if row['hl_notional_usdt'] is not None:
+            calc_notional = float(row['hl_notional_usdt'])
+        else:
+            calc_notional = amount_usdt * leverage
         experiment = row['experiment']
         sl_dist = row['sl_distance']
         signal_type = row['signal']  # fallback for record_signal_outcome
@@ -957,7 +963,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # pnl_pct = raw % price change (e.g., 10 = 10% move)
         # pnl_usdt = calc_notional * |pnl_pct|/100 (proportional to actual HL capital)
         # Use actual HL notional (calc_notional) when available for accurate PnL math.
-        # calc_notional = hl_notional_usdt when set (≈$7 from HL), else amount_usdt (≈$50 legacy).
+        # calc_notional = hl_notional_usdt when set, else amount_usdt * leverage.
         if direction == 'LONG':
             pnl_pct = ((current_price - entry_price) / entry_price * 100) if entry_price > 0 else 0
         else:

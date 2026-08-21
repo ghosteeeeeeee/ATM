@@ -67,7 +67,11 @@ def close_brain(coin, exit_price):
             log(f"Brain: no open trade for {coin}", "WARN")
             return
         trade_id, direction, entry_price, amount_usdt_raw = row
-        calc_notional = float(amount_usdt_raw) if amount_usdt_raw else DEFAULT_TRADE_SIZE_USDT
+        # Bug-fix (2026-08-21): amount_usdt is MARGIN, not notional. Need leverage.
+        cur.execute("SELECT leverage FROM trades WHERE id=%s", (trade_id,))
+        lev_row = cur.fetchone()
+        leverage = float(lev_row[0]) if lev_row and lev_row[0] else 10
+        calc_notional = float(amount_usdt_raw) * leverage if amount_usdt_raw else DEFAULT_TRADE_SIZE_USDT
         pnl_pct = 0.0
         if entry_price and float(entry_price) != 0 and exit_price:
             if direction == 'LONG':

@@ -764,7 +764,12 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # Bug-Fix (2026-05-20): was `if hl_notional_usdt` which treated 0.0 as falsy,
     # falling back to amount_usdt (~50) and inflating PnL by ~5x for small positions.
     # Use `is not None` so 0.0 is treated as a real value (valid for tiny positions).
-    calc_notional = float(hl_notional_usdt) if hl_notional_usdt is not None else amount_usdt
+    # Bug-Fix (2026-08-21): amount_usdt is MARGIN, not notional. Multiply by leverage
+    # to get actual position size when hl_notional_usdt is missing.
+    if hl_notional_usdt is not None:
+        calc_notional = float(hl_notional_usdt)
+    else:
+        calc_notional = amount_usdt * lev
 
     # ── Get HL realized PnL (ground truth) — skip if skip_hl ───────────────────
     hype_pnl_usdt = None

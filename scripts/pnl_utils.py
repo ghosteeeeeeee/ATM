@@ -15,7 +15,7 @@ HL's unrealized_pnl is computed.
 Key definitions:
   pnl_pct   = raw % price change vs entry (direction-aware, unleveraged)
   pnl_usdt  = pnl_pct/100 * calc_notional (signed: + for profit, - for loss)
-  calc_notional = hl_notional_usdt (if set) else amount_usdt
+  calc_notional = hl_notional_usdt (if set) else amount_usdt * leverage
   hype_pnl_usdt = actual realized PnL from HL fills (ground truth on close)
 
 Usage:
