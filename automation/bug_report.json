@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-21 13:12:34",
+  "timestamp": "2026-08-21 21:12:34",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "115 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "116 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
       "file": "study_winning_combos.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -31,7 +31,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "84 bare except clauses in 29 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "msg": "87 bare except clauses in 30 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },

@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 22:30 UTC (CEO run)**
+**Last Updated: 2026-08-21 23:00 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
@@ -39,13 +39,13 @@
 - **MIN_PRE_MOVE 0.3 eval EXTENDED** — r2-trend-long3 48h: 9T $0.00 66.7% WR (WR improved 55.9%→66.7% but PnL break-even). PM_TRAIL captures winners, ATR_SL hits losers. EXTENDED through Aug 25 (needs PnL positive to justify filter). — 2026-08-21
 - **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
 - **Coin tracker Wyckoff detection BROKEN** — 0/109 tokens have phase detected (all 'none'). detect_wyckoff_phase() returns 'none' for all despite sufficient 1h candle data. Coin tracker intelligence non-functional. DELEGATED to bug_hunter. — 2026-08-21
-- **4h candles stale since May 28** — price_collector.py line 565 disabled. Elliott Wave detection using stale data. Need to re-enable 4h candle collection. — 2026-08-21
+- **4h candles re-enabled** — price_collector.py line 565 re-enabled (CEO Aug 21). Will populate on next price_collector run. Elliott Wave detection will have fresh data. — 2026-08-21
 
 ## System Improvement Backlog
 
 1. **Coin tracker Wyckoff detection fix (CEO PRIORITY)** — 0/109 tokens have phase detected. detect_wyckoff_phase() broken. DELEGATED to bug_hunter. — 2026-08-21
 2. **SHORT side signals (CEO PRIORITY)** — R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h. Need new SHORT signal with edge for SHORT_BIAS regime. DELEGATED to signal_analyst. — 2026-08-21
-3. **Re-enable 4h candle collection** — price_collector.py line 365 disabled. Elliott Wave detection stale. — 2026-08-21
+3. ~~**Re-enable 4h candle collection**~~ — DONE. price_collector.py line 565 re-enabled (CEO Aug 21). — 2026-08-21
 4. Higher-timeframe regime for confluence relaxation (1m too noisy)
 5. Confidence scorer recalibration (real fix for non-monotonic conf curve)
 
@@ -59,11 +59,10 @@
 
 1. **Monitor bug_hunter Wyckoff fix.** 0/109 tokens detected. Coin tracker intelligence non-functional. — 2026-08-21
 2. **Monitor signal_analyst SHORT signal build.** Need new SHORT signal for SHORT_BIAS regime. — 2026-08-21
-3. **Re-enable 4h candle collection.** Uncomment price_collector.py line 565. — 2026-08-21
-4. **Monitor ct-hot+ stay killed.** 42.6% WR 7d, MIN_COMPOSITE now 70. Only T can re-enable. — 2026-08-21
-5. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21
-6. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-21
-7. **Monitor R2_TREND_SHORT.** Re-enabled Aug 20, 0 trades/48h. No edge found yet. — 2026-08-21
-8. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. Plan ready. CEO to approve or defer. — 2026-08-21
-9. **Higher-TF regime for confluence.** 1m regime too noisy. — 2026-08-20
-10. **Confidence scorer recalibration.** 90+ tier worst WR. — 2026-08-20
+3. **Monitor ct-hot+ stay killed.** 42.6% WR 7d, MIN_COMPOSITE now 70. Only T can re-enable. — 2026-08-21
+4. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21
+5. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-21
+6. **Monitor R2_TREND_SHORT.** Re-enabled Aug 20, 0 trades/48h. No edge found yet. — 2026-08-21
+7. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. Plan ready. CEO to approve or defer. — 2026-08-21
+8. **Higher-TF regime for confluence.** 1m regime too noisy. — 2026-08-20
+9. **Confidence scorer recalibration.** 90+ tier worst WR. — 2026-08-20

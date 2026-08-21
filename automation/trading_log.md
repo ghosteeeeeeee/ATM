@@ -12501,3 +12501,30 @@ None — system stable, previous fixes settling in.
 - 2 open positions healthy
 
 **Open Questions:** None
+
+## [2026-08-21 19:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 38T 20W 52.6%WR +$0.37
+
+**Close reasons (24h):**
+- atr_sl_hit: 36T +$0.73 (trailing SL profitable)
+- atr_tp_hit: 1T +$0.18
+- profit-monster-trail: 1T +$0.04
+
+**Top signals (24h):**
+- hl_copy_trader: 21T 11W +$0.37 — star (only active signal)
+- ct-hot+: 15T 6W +$0.26 — DISABLED (residual draining)
+
+**Open:** HYPE/ETH/BTC (3 positions, all hl_copy_trader LONG)
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader still star at +$0.37
+- atr_sl_hit 95% of closes but net profitable — trailing SL working
+- 0 trades last hour = normal quiet period
+- 3 open positions healthy
+- System stable, no dead signals
+
+**Open Questions:** None

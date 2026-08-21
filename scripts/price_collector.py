@@ -562,8 +562,7 @@ def main():
     candle_conn.execute("PRAGMA journal_mode=WAL")
     candle_conn.execute("PRAGMA synchronous=NORMAL")
 
-    for tf_sec, table in [(300, 'candles_5m'), (900, 'candles_15m'), (3600, 'candles_1h'),]:  # (14400, 'candles_4h')  # disabled — not used by any active signal
-        # (14400, 'candles_4h'),  # disabled — not used by any active signal
+    for tf_sec, table in [(300, 'candles_5m'), (900, 'candles_15m'), (3600, 'candles_1h'), (14400, 'candles_4h')]:
         try:
             last = _aggregate_tf(ph_conn, candle_conn, tf_sec, table)
             dt = time.strftime('%H:%M:%S', time.localtime(last)) if last else 'N/A'
