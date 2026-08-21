@@ -13,7 +13,7 @@ from pathlib import Path
 from paths import HERMES_DATA, HL_COPY_REPORT
 from hl_copy_db import get_db, init_db
 from hl_leaderboard import scan_leaderboard, get_user_fills
-from hl_fill_monitor import monitor_once, get_recent_fills, get_active_traders
+from hl_fill_monitor import monitor_once, get_recent_fills, get_active_traders, check_trader_exits
 from hl_signal_notifier import check_for_signals
 from hl_copy_signal import run_hl_copy_signal
 from hermes_constants import (
@@ -116,7 +116,7 @@ def run_once():
     print('='*60)
     
     # Step 1: Monitor fills from tracked traders
-    print("\n[1/4] Monitoring fills...")
+    print("\n[1/5] Monitoring fills...")
     new_fills = monitor_once()
     
     if new_fills:
@@ -124,8 +124,12 @@ def run_once():
     else:
         print("  No new fills")
     
+    # Step 1b: Check for trader exits to close our copy trades
+    print("\n[1b/5] Checking for trader exits...")
+    check_trader_exits(new_fills)
+    
     # Step 2: Check for pro trader signals
-    print("\n[2/4] Checking for pro trader signals...")
+    print("\n[2/5] Checking for pro trader signals...")
     signals = check_for_signals()
     
     if signals:
@@ -134,7 +138,7 @@ def run_once():
         print("  No new pro trader signals")
     
     # Step 3: Generate pipeline signals from pro trades
-    print("\n[3/4] Generating pipeline signals...")
+    print("\n[3/5] Generating pipeline signals...")
     pipeline_signals = run_hl_copy_signal()
     
     if pipeline_signals:

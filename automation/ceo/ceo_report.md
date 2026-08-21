@@ -1,3 +1,38 @@
+## CEO Report — 2026-08-21 (~04:45 UTC, verified, 201st run)
+
+### Diagnosis
+System HEALTHY — NO CHANGES needed. Verified DB: 24h 18T -$0.54, 50.0% WR (flat). 7d: 249T -$1.16, 50.6% WR (improving from -$1.25). 1 open: BTC hl_copy_trader LONG (copy-trader, not system). PM_TRAIL: carrying system. ATR_SL: historic low count (~7-8/day). All legacy kills verified dead. 0 trades since last run (idle night session).
+
+### Root Cause
+System in holding pattern. Daily pattern: alternating green/red break-even (Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54). PM_TRAIL positive R:R offsets ATR_SL drag. Legacy losers all aged out or at 0T. SHORT side structural gap persists but no bleeding.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 25 (r2-trend-long3 break-even, needs positive PnL)
+- PM_TRAIL WR must stay >80%
+- ATR_SL daily must stay <15
+- SHORT signal development (structural gap)
+
+---
+
+## CEO Report — 2026-08-21 (~04:17 UTC, verified, 200th run)
+
+### Diagnosis
+System HEALTHY — NO CHANGES needed. Verified DB: 24h 18T -$0.54, 50.0% WR (flat, normal NEUTRAL variance). 7d: 250T -$1.25, 50.4% WR. 0 open positions (clean). PM_TRAIL: carrying system at 82.6% WR +$4.90/7d. ATR_SL: 92T/7d -$6.86, historic low count (7-8/day). SHORT legacy: ALL cleared — drain complete. Daily: alternating green/red break-even pattern (Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54). r2-trend-long3 MIN_PRE_MOVE 0.3: 48h 9T $0.00, 66.7% WR (break-even, eval extended to Aug 25). 0 trades in last 6h (night session, quiet).
+
+### Root Cause
+No active bleeding. System at break-even edge — PM_TRAIL (+$4.90) offsets ATR_SL (-$6.86) net = -$1.96/7d. SHORT legacy fully cleared, aging out. Alternating days = normal NEUTRAL regime variance with small positive edge on LONG side.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed. Monitor ongoing evals.
+
+### Verification
+PM_TRAIL 82.6% WR stable (>80% threshold). ATR_SL count at historic low. 0 open positions. Pipeline running, all timers firing. MIN_PRE_MOVE 0.3 eval continues through Aug 25.
+
+---
+
 ## CEO Report — 2026-08-21 (~06:00 UTC, verified, 199th run)
 
 ### Diagnosis

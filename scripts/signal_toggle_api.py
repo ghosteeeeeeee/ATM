@@ -86,7 +86,15 @@ def _regenerate_config():
             'ma_100_cross_short': 'MA_100_CROSS_MINUS_ENABLED',
         }
         import hermes_constants as hc
-        bypass_normalized = {s.replace('-', '_') for s in getattr(hc, 'STANDALONE_BYPASS_SIGNALS', ())}
+        bypass_raw = {s.replace('-', '_') for s in getattr(hc, 'STANDALONE_BYPASS_SIGNALS', ())}
+        _BYPASS_ALIASES = {
+            'ct_hot': 'coin_tracker_hot',
+            'tl_break_long': 'tl_break', 'tl_break_short': 'tl_break',
+            'return_exhaustion_long': 'return_exhaustion',
+            'continuation_long': 'continuation', 'continuation_short': 'continuation',
+            'r2l_long': 'r2_trend_long',
+        }
+        bypass_normalized = {_BYPASS_ALIASES.get(s, s) for s in bypass_raw}
         config = []
         for s in SIGNAL_REGISTRY:
             name = s['name']

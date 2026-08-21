@@ -8,7 +8,7 @@ import time
 import os
 import urllib.request
 from hl_copy_db import get_db, init_db
-from paths import HERMES_DATA
+from paths import HERMES_DATA, CANDLES_DB, PRICES_FILE
 
 BASE_URL = "https://api.hyperliquid.xyz/info"
 LAST_FILLS_FILE = os.path.join(HERMES_DATA, 'hl_copy_last_fills.json')
@@ -236,6 +236,187 @@ def get_trader_positions(wallet: str) -> list:
         return [dict(p) for p in positions]
     finally:
         conn.close()
+
+
+# ── Copy Trader Exit Correlation ──────────────────────────────────────────────
+
+def get_open_copy_trade(wallet: str, coin: str) -> dict | None:
+    """Find open copy trade for this wallet+coin in trader_performance."""
+    conn = get_db()
+    try:
+        row = conn.execute("""
+            SELECT * FROM trader_performance
+            WHERE wallet = ? AND token = ? AND status = 'open'
+            LIMIT 1
+        """, (wallet, coin.upper())).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def is_trader_full_exit(wallet: str, coin: str) -> bool:
+    """Check if trader has no remaining position (not just partial close)."""
+    conn = get_db()
+    try:
+        row = conn.execute("""
+            SELECT sz FROM trader_positions
+            WHERE wallet = ? AND coin = ?
+        """, (wallet, coin.upper())).fetchone()
+        if not row:
+            return True  # No position record = fully exited
+        return abs(float(row['sz'])) < 0.0001  # Effectively zero
+    finally:
+        conn.close()
+
+
+def get_current_price(coin: str) -> float | None:
+    """Get current price from candles DB or prices cache."""
+    try:
+        import sqlite3
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        row = conn.execute("""
+            SELECT close FROM candles
+            WHERE token = ? ORDER BY ts DESC LIMIT 1
+        """, (coin.upper(),)).fetchone()
+        conn.close()
+        if row:
+            return float(row[0])
+    except Exception:
+        pass
+
+    # Fallback: prices.json cache
+    try:
+        with open(PRICES_FILE) as f:
+            prices = json.load(f)
+        return float(prices.get(coin.upper(), {}).get('price', 0))
+    except Exception:
+        return None
+
+
+def _update_trader_aggregates(conn, wallet: str):
+    """Recompute copy_trades, copy_wins, copy_pnl, copy_weight for a trader."""
+    try:
+        from hermes_constants import COPY_TRADE_WEIGHT_MIN, COPY_TRADE_WEIGHT_MAX, COPY_TRADE_WEIGHT_MIN_TRADES
+    except ImportError:
+        COPY_TRADE_WEIGHT_MIN, COPY_TRADE_WEIGHT_MAX, COPY_TRADE_WEIGHT_MIN_TRADES = 0.1, 2.0, 5
+
+    stats = conn.execute("""
+        SELECT COUNT(*) as total,
+               SUM(CASE WHEN status = 'closed_win' THEN 1 ELSE 0 END) as wins,
+               SUM(COALESCE(pnl_pct, 0)) as total_pnl
+        FROM trader_performance
+        WHERE wallet = ? AND status LIKE 'closed_%'
+    """, (wallet,)).fetchone()
+
+    total = stats['total'] or 0
+    wins = stats['wins'] or 0
+    total_pnl = stats['total_pnl'] or 0
+    wr = wins / total if total > 0 else 0.5
+
+    # Weight calculation
+    weight = 1.0
+    if total >= COPY_TRADE_WEIGHT_MIN_TRADES:
+        wr_bonus = (wr - 0.5) * 2.0
+        pnl_bonus = max(-0.5, min(0.5, total_pnl / 10))
+        sample_adj = max(0, 1.0 - total / 20)
+        weight = max(COPY_TRADE_WEIGHT_MIN, min(COPY_TRADE_WEIGHT_MAX,
+                      1.0 + wr_bonus + pnl_bonus + sample_adj))
+
+    conn.execute("""
+        UPDATE traders SET copy_weight = ?, copy_trades = ?, copy_wins = ?, copy_pnl = ?
+        WHERE wallet = ?
+    """, (weight, total, wins, total_pnl, wallet))
+
+
+def update_trader_performance(trade_id: int, exit_price: float, close_reason: str):
+    """Close a trader_performance row and update trader stats."""
+    conn = get_db()
+    try:
+        row = conn.execute("""
+            SELECT * FROM trader_performance WHERE trade_id = ? AND status = 'open'
+        """, (trade_id,)).fetchone()
+        if not row:
+            return
+
+        entry = float(row['entry_price'])
+        direction = row['direction']
+        wallet = row['wallet']
+
+        # Compute PnL
+        if direction == 'LONG':
+            pnl_pct = ((exit_price - entry) / entry) * 100 if entry > 0 else 0
+        else:
+            pnl_pct = ((entry - exit_price) / entry) * 100 if entry > 0 else 0
+
+        status = ('closed_win' if pnl_pct > 0.1
+                  else 'closed_loss' if pnl_pct < -0.1
+                  else 'closed_breakeven')
+
+        conn.execute("""
+            UPDATE trader_performance
+            SET exit_price = ?, pnl_pct = ?, status = ?, close_reason = ?, closed_at = ?
+            WHERE trade_id = ? AND status = 'open'
+        """, (exit_price, pnl_pct, status, close_reason, int(time.time()), trade_id))
+
+        _update_trader_aggregates(conn, wallet)
+        conn.commit()
+        print(f"[copy_exit] trade #{trade_id} {row['token']} {direction} → {status} "
+              f"({pnl_pct:+.2f}%) reason={close_reason}")
+    finally:
+        conn.close()
+
+
+def check_trader_exits(new_fills: list):
+    """When a tracked trader FULLY CLOSES a position, close our corresponding copy trade."""
+    try:
+        from hermes_constants import COPY_TRADE_EXIT_ENABLED
+    except ImportError:
+        COPY_TRADE_EXIT_ENABLED = False
+
+    if not COPY_TRADE_EXIT_ENABLED:
+        return
+
+    closed_fills = [f for f in new_fills if f.get('is_open') == 0]
+
+    for fill in closed_fills:
+        wallet = fill['wallet']
+        coin = fill['coin']
+
+        # Verify full exit (not partial close)
+        if not is_trader_full_exit(wallet, coin):
+            continue
+
+        # Find our open trade
+        perf = get_open_copy_trade(wallet, coin)
+        if not perf:
+            continue
+
+        # Prevent race with profit_monster/cut_loser
+        try:
+            from cut_loser import is_token_being_closed_by_profit_monster
+            if is_token_being_closed_by_profit_monster(coin):
+                continue
+        except ImportError:
+            pass
+
+        # Get current market price
+        current_price = get_current_price(coin)
+        if not current_price or current_price <= 0:
+            print(f"[copy_exit] {coin}: no price available, skipping")
+            continue
+
+        # Close our trade
+        try:
+            from brain import close_trade
+            close_trade(
+                trade_id=perf['trade_id'],
+                exit_price=current_price,
+                close_reason='trader_exit',
+                notes=f"Trader {wallet[:10]}... exited {coin}"
+            )
+            update_trader_performance(perf['trade_id'], current_price, 'trader_exit')
+        except Exception as e:
+            print(f"[copy_exit] Error closing trade #{perf['trade_id']}: {e}")
 
 if __name__ == "__main__":
     init_db()

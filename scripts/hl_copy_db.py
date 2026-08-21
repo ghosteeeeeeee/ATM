@@ -105,12 +105,46 @@ def init_db():
             )
         """)
         
+        # Copy trade performance tracking
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS trader_performance (
+                wallet TEXT NOT NULL,
+                trade_id INTEGER,
+                token TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                signal_time INTEGER,
+                entry_price REAL,
+                exit_price REAL,
+                pnl_usdt REAL DEFAULT 0,
+                pnl_pct REAL DEFAULT 0,
+                status TEXT DEFAULT 'open',
+                close_reason TEXT,
+                created_at INTEGER,
+                closed_at INTEGER,
+                PRIMARY KEY (wallet, trade_id)
+            )
+        """)
+
         # Indexes for faster queries
         c.execute("CREATE INDEX IF NOT EXISTS idx_fills_wallet ON trader_fills(wallet)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_fills_time ON trader_fills(time)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_positions_wallet ON trader_positions(wallet)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_trades_time ON copy_trades(time)")
-        
+        c.execute("CREATE INDEX IF NOT EXISTS idx_perf_wallet_coin_status ON trader_performance(wallet, token, status)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_perf_trade_id ON trader_performance(trade_id)")
+
+        # Add copy performance columns to traders table (idempotent)
+        for col, default in [
+            ('copy_weight', '1.0'),
+            ('copy_trades', '0'),
+            ('copy_wins', '0'),
+            ('copy_pnl', '0.0'),
+        ]:
+            try:
+                c.execute(f"ALTER TABLE traders ADD COLUMN {col} REAL DEFAULT {default}")
+            except sqlite3.OperationalError:
+                pass  # column already exists
+
         conn.commit()
     finally:
         conn.close()

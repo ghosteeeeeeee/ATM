@@ -132,6 +132,45 @@ def calculate_score(trader: dict) -> float:
     
     return round(score, 1)
 
+
+def compute_copy_weight(trader_wallet: str) -> float:
+    """Compute copy weight 0.1–2.0 based on our copy performance for this trader.
+    
+    Uses exponential moving average for recent-performance sensitivity.
+    New traders start at 1.0; weight only adjusts after ≥COPY_TRADE_WEIGHT_MIN_TRADES.
+    """
+    try:
+        from hermes_constants import COPY_TRADE_WEIGHT_MIN, COPY_TRADE_WEIGHT_MAX, COPY_TRADE_WEIGHT_MIN_TRADES
+    except ImportError:
+        COPY_TRADE_WEIGHT_MIN, COPY_TRADE_WEIGHT_MAX, COPY_TRADE_WEIGHT_MIN_TRADES = 0.1, 2.0, 5
+
+    conn = get_db()
+    try:
+        stats = conn.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN status = 'closed_win' THEN 1 ELSE 0 END) as wins,
+                   SUM(COALESCE(pnl_pct, 0)) as total_pnl
+            FROM trader_performance
+            WHERE wallet = ? AND status LIKE 'closed_%'
+        """, (trader_wallet,)).fetchone()
+    finally:
+        conn.close()
+
+    total = stats['total'] or 0
+    if total < COPY_TRADE_WEIGHT_MIN_TRADES:
+        return 1.0
+
+    wins = stats['wins'] or 0
+    total_pnl = stats['total_pnl'] or 0
+    wr = wins / total
+
+    wr_bonus = (wr - 0.5) * 2.0
+    pnl_bonus = max(-0.5, min(0.5, total_pnl / 10))
+    sample_adj = max(0, 1.0 - total / 20)
+    weight = 1.0 + wr_bonus + pnl_bonus + sample_adj
+
+    return max(COPY_TRADE_WEIGHT_MIN, min(COPY_TRADE_WEIGHT_MAX, weight))
+
 def detect_pattern(fills: list) -> str:
     """Classify trader style based on actual trade patterns."""
     if not fills or len(fills) < 10:
@@ -223,8 +262,10 @@ def save_trader(trader: dict):
         conn.execute("""
             INSERT OR REPLACE INTO traders 
             (wallet, pnl_all_time, win_rate, trade_count, volume_30d, 
-             max_drawdown, score, pattern, last_updated, active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+             max_drawdown, score, pattern, last_updated, active,
+             copy_weight, copy_trades, copy_wins, copy_pnl)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1,
+                    ?, ?, ?, ?)
         """, (
             trader['wallet'],
             trader['pnl_all_time'],
@@ -234,7 +275,11 @@ def save_trader(trader: dict):
             trader['max_drawdown'],
             trader['score'],
             trader['pattern'],
-            trader['last_updated']
+            trader['last_updated'],
+            trader.get('copy_weight', 1.0),
+            trader.get('copy_trades', 0),
+            trader.get('copy_wins', 0),
+            trader.get('copy_pnl', 0.0),
         ))
         conn.commit()
     finally:

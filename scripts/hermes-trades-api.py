@@ -871,8 +871,16 @@ def write_signal_config():
         'ma_100_cross_long': 'MA_100_CROSS_PLUS_ENABLED',
         'ma_100_cross_short': 'MA_100_CROSS_MINUS_ENABLED',
     }
-    # Normalize bypass list to underscores for comparison
-    bypass_normalized = {s.replace('-', '_') for s in STANDALONE_BYPASS_SIGNALS}
+    # Normalize bypass list to underscores, then map shorthands to registry names
+    bypass_raw = {s.replace('-', '_') for s in STANDALONE_BYPASS_SIGNALS}
+    _BYPASS_ALIASES = {
+        'ct_hot': 'coin_tracker_hot',
+        'tl_break_long': 'tl_break', 'tl_break_short': 'tl_break',
+        'return_exhaustion_long': 'return_exhaustion',
+        'continuation_long': 'continuation', 'continuation_short': 'continuation',
+        'r2l_long': 'r2_trend_long',
+    }
+    bypass_normalized = {_BYPASS_ALIASES.get(s, s) for s in bypass_raw}
     config = []
     for s in SIGNAL_REGISTRY:
         name = s['name']

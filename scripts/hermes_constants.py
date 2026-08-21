@@ -892,6 +892,7 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # Matches any signal containing the prefix (e.g. 'atr-spike+,rs-s36' matches 'atr-spike').
 PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike', 'r2-trend-long', 'ct-hot+',
+    'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -1655,6 +1656,14 @@ HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
 HL_COPY_SIGNAL_LOOKBACK_MINUTES = 5 # How far back to look for trades
 HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
+
+# ── Copy Trader Exit Correlation & Weighting ─────────────────────────────────
+COPY_TRADE_EXIT_ENABLED = True          # master switch for trader exit correlation
+COPY_TRADE_EXIT_TIMEOUT_MIN = 120       # fallback to normal exit after 2 hours
+COPY_TRADE_MAX_OPEN = 10               # max concurrent copy trades
+COPY_TRADE_WEIGHT_MIN = 0.1           # minimum copy weight (heavily penalized traders)
+COPY_TRADE_WEIGHT_MAX = 2.0           # maximum copy weight (best performers)
+COPY_TRADE_WEIGHT_MIN_TRADES = 5      # minimum trades before weight adjusts
 
 # ── Momentum Leaderboard Signal ─────────────────────────────────────────────
 # momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension

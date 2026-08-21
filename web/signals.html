@@ -486,7 +486,10 @@
       try {
         const r = await fetch('/data/signal_config.json?t=' + Date.now());
         const d = await r.json();
-        const signals = d.signals || [];
+        const signals = (d.signals || []).sort((a, b) => {
+          if (a.enabled !== b.enabled) return b.enabled - a.enabled;
+          return a.name.localeCompare(b.name);
+        });
         const on = signals.filter(s => s.enabled).length;
         const off = signals.length - on;
         document.getElementById('signalBadges').innerHTML =

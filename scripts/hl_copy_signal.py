@@ -46,16 +46,16 @@ def get_trader_performance(wallet: str) -> dict:
         conn.close()
 
 def calculate_confidence(trader_score: float, trader_win_rate: float, 
-                         trade_side: str, coin: str) -> float:
-    """Calculate signal confidence based on trader performance."""
+                         trade_side: str, coin: str, copy_weight: float = 1.0) -> float:
+    """Calculate signal confidence based on trader performance and copy weight."""
     # Base confidence from trader score (0-100)
     base_confidence = min(trader_score, 100)
     
     # Win rate adjustment
     wr_adjustment = (trader_win_rate - 0.5) * 40  # ±20 points
     
-    # Combine
-    confidence = base_confidence + wr_adjustment
+    # Combine and apply copy weight
+    confidence = (base_confidence + wr_adjustment) * copy_weight
     
     # Clamp to configured range
     confidence = max(HL_COPY_SIGNAL_MIN_CONFIDENCE, min(HL_COPY_SIGNAL_MAX_CONFIDENCE, confidence))
@@ -64,15 +64,18 @@ def calculate_confidence(trader_score: float, trader_win_rate: float,
 
 def generate_hl_signal(trade: dict, trader_score: float) -> dict:
     """Generate a signal in Hermes format."""
-    # Get trader performance
+    # Get trader performance and copy weight
     perf = get_trader_performance(trade['wallet'])
+    from hl_leaderboard import compute_copy_weight
+    copy_weight = compute_copy_weight(trade['wallet'])
     
-    # Calculate confidence
+    # Calculate confidence (weighted by copy performance)
     confidence = calculate_confidence(
         trader_score, 
         perf['win_rate'],
         trade['side'],
-        trade['coin']
+        trade['coin'],
+        copy_weight=copy_weight,
     )
     
     # Determine direction
@@ -140,6 +143,7 @@ def write_signal_to_pipeline(signal: dict):
         price=signal['price'],
         exchange='hyperliquid',
         timeframe='1h',
+        signal_metadata=signal.get('meta'),  # pass trader_wallet through to trade record
     )
 
 def run_hl_copy_signal():
