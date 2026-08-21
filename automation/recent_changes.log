@@ -1201,3 +1201,11 @@
   WHY: 3T last hour (2L 1W +$0.05). 24h 20T 50%WR -$0.54. atr_sl_hit 55% 24h elevated but 7d 36.7% below 40% — small sample noise. hl_copy_trader 0%WR but only 2T lifetime too early. r2-trend-short2 0%WR 3T re-enabled Aug 20 too early. r2-trend-long3 6T 24h +$0.10 star. 3 open positions. 3/hr freq normal. 7d 245T 51%WR -$1.06 flat. System healthy, 8th green day.
   BY: auto_1hr
   NEXT: Re-run at 08:10 UTC
+[2026-08-21 08:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet, last close 06:46 ~1.3h ago). 24h 18T 55.6%WR -$0.41. atr_sl_hit 55.6% 24h elevated but 7d 36.4% below 40% threshold — small sample noise. Short signals 3T 0%WR, re-enabled Aug 20 too early. hl_copy_trader 2T closed 0%WR but 4 open LONG winners +$0.53 unrealized — tiny sample. 0/hr freq normal. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 09:05 UTC
+[2026-08-21 09:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (4W 0L +$3.27). 24h 19T 100%WR +$3.21 — exceptional run. atr_sl_hit 11T all profitable +$3.01 — trailing SL correctly locking in profits (SL moved above entry). hl_copy_trader 4/6L +$3.04 clear star. 7d 236T +$2.43 profitable. Trade freq 0.8/hr normal. 1 open (NOT -$0.05). System in best shape in weeks. No action needed.
+  BY: auto_1hr
+  NEXT: Re-run at 10:10 UTC

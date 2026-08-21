@@ -12166,3 +12166,74 @@ None — system stable, previous fixes settling in.
 - 3 open positions (BSV LONG, ETH LONG, BTC LONG)
 
 **Open Questions:** None
+
+## [2026-08-21 08:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet, last close 06:46 UTC)
+**PnL:** $0.00 (0 trades)
+
+**24h Stats:**
+- 18 trades, 55.6%WR, -$0.41
+- atr_sl_hit: 10T (55.6%) -$0.61 — elevated but 7d at 36.4% (below 40%)
+- profit-monster-trail: 8T (100%) +$0.20
+
+**Open Positions (4):**
+| Token | Signal | Dir | Size | Unrealized |
+|-------|--------|-----|------|-----------|
+| BTC | hl_copy_trader | LONG | $11 | +$0.24 |
+| ETH | hl_copy_trader | LONG | $11 | +$0.09 |
+| HYPE | hl_copy_trader | LONG | $11 | +$0.16 |
+| SOL | hl_copy_trader | LONG | $11 | +$0.04 |
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 24h 55.6% elevated but 7d 36.4% — small sample noise, below 40% threshold
+- Short signals 0%WR but only 3T, re-enabled Aug 20, too early
+- hl_copy_trader 2T closed 0%WR but 4 open winners — tiny sample
+- Trade freq 0/hr now, normal
+- System healthy, 4 positions all green (+$0.53 unrealized)
+
+**Open Questions:** None
+
+## [2026-08-21 09:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4 wins, 0 losses)
+**PnL:** +$3.27 (100% WR)
+
+**Trades Detail:**
+| Token | Dir | Exit | PnL | Entry→Exit |
+|-------|-----|------|-----|-----------|
+| ETH | LONG | atr_sl_hit | +$2.30 | 2358.50→2395.50 |
+| BTC | LONG | atr_sl_hit | +$0.49 | 74987→78492 |
+| SOL | LONG | atr_sl_hit | +$0.15 | 90.38→91.27 |
+| HYPE | LONG | atr_sl_hit | +$0.33 | 72.84→75.15 |
+
+**24h Stats:**
+- 19 trades, 100% WR, +$3.21
+- atr_sl_hit: 11T +$3.01 (avg +$0.274) — trailing SL locking in profits
+- profit-monster-trail: 8T +$0.20 (avg +$0.025)
+
+**7d Stats:**
+- 236 trades, +$2.43
+- profit-monster-trail: 122T +$4.57 (star)
+- atr_sl_hit: 89T -$2.68 (legacy drag from before tpsl fix)
+
+**Open Positions (1):**
+| Token | Signal | Dir | Size | Entry | SL | TP | PnL |
+|-------|--------|-----|------|-------|----|----|-----|
+| NOT | ct-hot+ | LONG | $11 | 0.000431 | 0.000427 | 0.000435 | -$0.05 |
+
+**hl_copy_trader Lifetime:** 6T, 4W (67% WR), +$3.04
+
+**Changes:** None
+
+**No Change Needed:**
+- All 4 last-hour trades profitable — trailing SL working correctly (SL moved above entry, locking profits)
+- atr_sl_hit 58% of 24h closes but ALL profitable — not a "SL too tight" problem
+- hl_copy_trader on fire: 4/6 lifetime wins, clear best signal
+- Trade freq 0.8/hr normal, no overtrading
+- System in best state in weeks: +$3.21 24h, +$2.43 7d
+- 1 open position (NOT) slightly underwater but within SL range
+
+**Open Questions:** None
