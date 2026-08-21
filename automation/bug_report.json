@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-21 05:12:34",
+  "timestamp": "2026-08-21 13:12:34",
   "total_checks": 20,
-  "passed": 10,
+  "passed": 11,
   "critical_count": 9,
-  "warning_count": 1,
+  "warning_count": 0,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "114 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "115 files: study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py, apply_fixes.py",
       "file": "study_winning_combos.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -60,12 +60,5 @@
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
-  "warnings": [
-    {
-      "name": "trade_frequency",
-      "msg": "0 trades in 6h (0.0/hr)",
-      "file": "",
-      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
-    }
-  ]
+  "warnings": []
 }

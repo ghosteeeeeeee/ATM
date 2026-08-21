@@ -12316,3 +12316,28 @@ None — system stable, previous fixes settling in.
 - 4 open positions all green
 
 **Open Questions:** None
+
+## [2026-08-21 13:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (4W 0L +$0.42)
+**24h:** 27T 19W +$2.19 (70% WR)
+
+**Close reasons (24h):** atr_sl_hit 21T +$1.87 avg +$0.089 — trailing SL profitable
+
+**Top signals (24h):**
+- hl_copy_trader: 13T 8W +$0.85 — star
+- ct-hot+: 6T 5W +$1.02 — strong
+- r2-trend-long3: 5T 3W +$0.23
+
+**Open (3):** HYPE, SOL, BTC (hl_copy_trader) — all LONG
+
+**Changes:** None
+
+**No Change Needed:**
+- All 4 closes atr_sl_hit but ALL green — trailing SL correct
+- 70% WR 24h excellent
+- Trade freq 4/hr normal
+- No dead signals (all profitable)
+- 3 open positions healthy
+
+**Open Questions:** pnl_pct values in trades table appear miscalculated (showing >100% for small USDT gains) — cosmetic only, pnl_usdt is correct

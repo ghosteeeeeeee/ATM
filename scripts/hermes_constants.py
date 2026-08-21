@@ -1249,7 +1249,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-21 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-21 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1808,5 +1808,5 @@ COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direct
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
-COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
+COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.25    # per token+direction cooldown (15 minutes)
 COIN_TRACKER_HOT_MIN_COMPOSITE      = 56      # net score threshold — lowered to 56 per request

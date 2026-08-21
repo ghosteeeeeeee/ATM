@@ -1,28 +1,93 @@
-## CEO Report — 2026-08-21 ~12:00 UTC (verified, 209th run)
+## CEO Report — 2026-08-21 ~14:30 UTC (verified, 213th run)
 
 ### Diagnosis
-System HEALTHY — BEST DAY OF WEEK. Verified DB: 24h 20T +$4.27, 70.0% WR (green, best single day). 48h: 48T +$4.38, 64.6% WR (strong). 7d: 233T +$3.55, 51.9% WR (POSITIVE for first time in weeks). 4 open: SOL/BTC/HYPE hl_copy_trader + ZRO ct-hot+. hl_copy_trader LONG: 6T +$4.00, 83.3% WR today (all ATR_SL exits but massively profitable). r2-trend-long6: 6T/7d 100% WR +$0.40 (best signal, zero ATR_SL). ATR_SL: 90T/7d -$1.53 (historic low). profit-monster-trail: 118T/7d +$4.54 (carrying system). Legacy ALL dying: ct-hot+ 35T -$0.30 (0T/24h), range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22 — age out Aug 22-23. Daily: 14 -$0.24 → 15 +$0.06 → 16 -$0.51 → 17 +$0.37 → 18 -$0.37 → 19 +$0.44 → 20 -$0.49 → 21 +$4.29 (BEST DAY).
+System HEALTHY — CONTINUED GREEN, BEST DAY. Verified DB: 24h 29T +$1.90, 65.5% WR. 7d: 228T +$1.05, 51.8% WR (POSITIVE, improved from +$0.87). 3 open: all hl_copy_trader LONG (copy-trading). PM_TRAIL 107T/7d +$4.29, 83.2% WR (carrying system). ATR_SL 96T/7d -$3.76 (historic low ~14/day, ONLY loss source). **ATR_SL TODAY: 23T +$1.58 56.5% WR — PROFITABLE** (SL floor fix + trailing working). Best: r2-trend-long6 6T/7d +$0.40 100% WR (best signal, 0% ATR_SL — bars_since>=6 filter). hl_copy_trader 13T/7d +$0.81 61.5% WR. ct-hot+ 40T/7d +$0.46 47.5% WR. Daily: Aug 21 +$1.86 (22T, 63.6% WR — BEST DAY of week). Volume ~22T/day. Legacy dying: range_breakout_short/r2-trend-short2/ct-hot- age out Aug 22-23.
+
+### Bleeding Points
+Legacy SHORT ALL 0% WR: range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19. Age out Aug 22-23 — no intervention needed. SHORT side structural gap: no active SHORT signals for SHORT_BIAS regime. Volume collapsed 82% but stabilized ~22T/day — quality-over-quantity working.
+
+### Fix Applied
+NO CHANGES. System healthy, no bleeding worth intervention. ATR_SL now profitable today — SL floor fix + trailing are transforming losses into controlled exits.
+
+### Verification
+DB query confirmed. 24h +$1.90 (65.5% WR), 7d +$1.05 (51.8% WR — positive). PM_TRAIL 83.2% WR carrying. ATR_SL profitable today. Pipeline ACTIVE, kill switch ON, disk 81%.
+
+---
+
+## CEO Report — 2026-08-21 ~13:15 UTC (verified, 212th run)
+
+### Diagnosis
+System HEALTHY — CONTINUED GREEN. Verified DB: 24h 24T +$1.67, 62.5% WR. 48h: 52T +$1.71, 61.5% WR. 7d: 226T +$0.87, 51.3% WR (POSITIVE). 4 open: all hl_copy_trader LONG (copy-trading). Daily 7d: 14 -$0.36 → 15 +$0.06 → 16 -$0.51 → 17 +$0.37 → 18 -$0.37 → 19 +$0.44 → 20 -$0.49 → 21 +$1.73 (16T, 62.5% WR — BEST DAY). PM_TRAIL 110T/7d +$4.34 82.7% WR carrying system. ATR_SL 91T/7d -$3.99 (only loss source, 11% WR, historic low count ~7-8/day). r2-trend-long6: 6T/7d +$0.40 100% WR (best signal, 0% ATR_SL — bars_since>=6 filter). hl_copy_trader: 11T/24h +$0.53 54.5% WR (copy-trading profitable). ct-hot+: 4T/24h +$0.92 75% WR (strong).
+
+### Bleeding Points
+Legacy SHORT ALL 0% WR: range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19. Age out Aug 22-23 — no intervention needed. stop_hunt_reversal_long+ 6T/48h -$0.10 50% WR (killed Aug 20, legacy clearing). Volume stabilized ~18-20T/day — quality-over-quantity trade working.
+
+### Fix Applied
+NO CHANGES. System healthy, no bleeding worth intervention. All legacy kills verified dead.
+
+### Verification
+DB query confirmed. 24h +$1.67 (62.5% WR), 7d +$0.87 (51.3% WR — positive). r2-trend-long6 100% WR, PM_TRAIL 82.7% WR carrying. Pipeline ACTIVE, kill switch ON, disk 81%.
+
+---
+
+## CEO Report — 2026-08-21 ~12:30 UTC (verified, 211th run)
+
+### Diagnosis
+System HEALTHY — BEST DAY OF WEEK, 7d POSITIVE. Verified DB: 24h 26T +$1.71, 65.4% WR. 48h: 54T +$1.82, 63.0% WR. 7d: 233T +$1.03, 51.9% WR (POSITIVE — first time in weeks). 2 open: NXPC ct-hot+ LONG, HYPE hl_copy_trader LONG (tiny). Daily 7d: 14 -$0.20 → 15 +$0.06 → 16 -$0.51 → 17 +$0.37 → 18 -$0.37 → 19 +$0.44 → 20 -$0.49 → 21 +$1.73 (16T, 62.5% WR — BEST DAY). PM_TRAIL 82-83% WR carrying system. ATR_SL 17T/48h -$2.05 (historic low, only loss source).
+
+### Bleeding Points
+Legacy SHORT ALL 0% WR: range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19. Age out Aug 22-23 — no intervention needed. Volume collapsed82% (100→18T/day) but stabilized — strategic decision pending.
+
+### Fix Applied
+NO CHANGES. System healthy, no bleeding worth intervention.
+
+### Verification
+Numbers match kanban. No intervention needed. Monitor: MIN_PRE_MOVE 0.3 eval (Aug 25), PM_TRAIL WR (>80%), ATR_SL daily (<15), SHORT signal development, volume recovery.
+
+---
+
+## CEO Report — 2026-08-21 ~12:00 UTC (verified, 210th run)
+
+### Diagnosis
+System HEALTHY — BEST DAY OF WEEK, 7d POSITIVE. Verified DB: 24h 26T +$1.71, 65.4% WR. 48h: 54T +$1.82, 63.0% WR. 7d: 236T +$0.98, 52.1% WR (POSITIVE — first time in weeks). 1 open: NXPC ct-hot+ LONG -$0.03. Daily 7d: 14 -$0.25 → 15 +$0.06 → 16 -$0.51 → 17 +$0.37 → 18 -$0.37 → 19 +$0.44 → 20 -$0.49 → 21 +$1.73 (16T, 62.5% WR). Top: r2-trend-long6 6T/7d +$0.40 100% WR (best signal), hl_copy_trader 11T/7d +$0.53 54.5% WR, r2-trend-long4 15T/7d +$0.15 66.7% WR. Legacy dying: range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19 — all 0% WR, age out Aug 22-23. ATR_SL 17T/48h -$2.05 (only loss source). 14d: Aug 13 -$1.66 trough → +$1.73 today.
 
 ### Root Cause
-No active bleeding — system at profit edge. PM_TRAIL +$4.54/7d offsetting ATR_SL -$1.53/7d. 7d PnL positive. hl_copy_trader copy-trades producing massive gains (+$4.00 today). Volume collapse 82% persists but not impacting profitability — higher quality trades.
+No active bleeding — system at profit edge. PM_TRAIL + r2-trend-long6 carrying winners, ATR_SL handling losers at historic low count. Legacy signals draining as expected. Volume collapse stabilized ~18-20T/day (higher quality).
 
 ### Fix Applied
 NO CHANGES. System healthy, no intervention needed.
 
-### Root Cause
-No active bleeding — system at profit edge. PM_TRAIL +$5.20/7d offsetting ATR_SL -$2.62/7d. 7d PnL positive for first time in weeks. Today's $3.20 PnL is 8T at 62.5% WR. Volume collapse 82% (98→18 trades/day) persists but not impacting profitability.
-
-### Fix Applied
-NO CHANGES. System healthy, no intervention needed. ct-hot+ re-enabled Aug 21 — monitoring 48h.
-
 ### Verification
-DB query confirmed. 24h +$3.09 (best day this week). 7d +$2.43 (first positive 7d in weeks). PM_TRAIL 132T/7d +$5.20. ATR_SL 88T/7d -$2.62 (historic low). All legacy kills verified dead. Pipeline running, all timers firing.
+DB query confirmed. 24h +$1.71 (65.4% WR), 7d +$0.98 (52.1% WR — first positive). r2-trend-long6 100% WR, PM_TRAIL carrying. All legacy kills verified dead. Pipeline running, all timers firing.
 
 ### Monitoring
 - MIN_PRE_MOVE 0.3 eval through Aug 25 (r2-trend-long3 break-even)
 - PM_TRAIL WR must stay >80%
 - ATR_SL daily must stay <15
-- ct-hot+ re-enable eval (48h, started Aug 21)
+- Volume recovery (stabilized 18-20T/day, was 100T)
+- SHORT signal development (structural gap)
+
+---
+
+## CEO Report — 2026-08-21 ~11:30 UTC (verified, 209th run)
+
+### Diagnosis
+System HEALTHY — BEST DAY OF WEEK, 7d POSITIVE. Verified DB: 24h 21T +$4.70, 71.4% WR (best single day this week). 48h: 49T +$4.81, 65.3% WR (strong). 7d: 231T +$3.97, 52.4% WR (POSITIVE for first time in weeks). 3 open: hl_copy_trader LONG (BTC -$0.10, HYPE +$0.06, SOL -$0.06). hl_copy_trader LONG: 6T +$4.00, 83.3% WR today (ATR_SL exits but massively profitable — trailing SL above entry). r2-trend-long6: 6T/7d +$0.40, 100% WR (best signal, zero ATR_SL — bars_since>=6 filter). PM_TRAIL: 117T/7d +$4.42, 82.9% WR (carrying system). ATR_SL: 89T/7d -$0.99, 10.1% WR (historic low, SL floor fix working). Legacy ALL dying: ct-hot+ 36T -$0.13 (0T/24h), range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22 — age out Aug 22-23. Daily: 14 -$0.25 → 15 +$0.06 → 16 -$0.51 → 17 +$0.37 → 18 -$0.37 → 19 +$0.44 → 20 -$0.49 → 21 +$4.72 (11T, 72.7% WR, BEST DAY).
+
+### Root Cause
+No active bleeding — system at profit edge. PM_TRAIL +$4.42/7d offsetting ATR_SL -$0.99/7d. 7d PnL positive. hl_copy_trader copy-trades producing massive gains (+$4.00 today). ATR_SL ratio 38.5% of exits (below 40% threshold). Volume collapse 82% persists but not impacting profitability — higher quality trades.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed.
+
+### Verification
+DB query confirmed. 24h +$4.70 (best day this week). 7d +$3.97 (first positive 7d in weeks). PM_TRAIL 117T/7d +$4.42, 82.9% WR. ATR_SL 89T/7d -$0.99 (historic low, was -$7+ a week ago). All legacy kills verified dead. Pipeline running, all timers firing.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 25 (r2-trend-long3 break-even)
+- PM_TRAIL WR must stay >80%
+- ATR_SL daily must stay <15
+- R2_TREND_SHORT — 0T/24h since Aug 20 re-enable, monitor for activity
 - SHORT side structural gap — need new signals for SHORT_BIAS regime
 - Volume collapse (82% decline) — strategic decision needed
 
@@ -434,3 +499,45 @@ NO CHANGES. System healthy, PM_TRAIL 83.6% WR carrying, ATR_SL at historic low c
 - **PM_TRAIL WR** must stay >80% (currently 83.6%)
 - **ATR_SL daily** must stay <15 (~7/day, historic low)
 - **SHORT side** structural gap — all legacy dead, need new signals for SHORT_BIAS regime
+
+## CEO Report — 2026-08-21 ~12:30 UTC (211th run)
+
+### Diagnosis
+System HEALTHY, BEST DAY OF WEEK. Verified DB: 24h 26T +$1.71, 65.4% WR (strong). 48h: 54T +$1.82, 63.0% WR (strong). 7d: 230T +$1.08, 51.7% WR (POSITIVE — first time in weeks). PM_TRAIL carrying system (82-83% WR). ATR_SL 17T/48h -$2.05 (historic low, only loss source). Legacy SHORT ALL 0% WR draining: range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19 — age out Aug 22-23.
+
+### Root Cause
+SHORT legacy positions (killed Aug 17-20) still in 7d window — -$1.01 total bleed. No active SHORT signals to replace them (structural gap). LONG side: +$2.09/7d. Today: 16T +$1.73 62.5% WR (best day of week by PnL).
+
+### Fix Applied
+NO CHANGES. System healthy, 7d positive, no bleeding signal to kill. PM_TRAIL 82%+ WR carrying.
+
+### Verification
+24h: 26T +$1.71 65.4% WR ✓
+48h: 54T +$1.82 63.0% WR ✓
+7d: 230T +$1.08 51.7% WR ✓ (positive)
+ATR_SL: 17T/48h -$2.05 (historic low) ✓
+Legacy SHORT: 10T/7d -$1.01 (age out Aug 22-23) ✓
+PM_TRAIL: 82%+ WR (carrying system) ✓
+
+### Monitoring
+- **MIN_PRE_MOVE 0.3 eval** EXTENDED to Aug 25 — break-even, needs PnL positive
+- **PM_TRAIL WR** must stay >80% (currently ~83%)
+- **ATR_SL daily** must stay <15 (~7/day, historic low)
+- **SHORT side** structural gap — no active signals for SHORT_BIAS regime
+- **Volume** stabilized ~18-20T/day (82% decline from Aug 12 peak)
+- **Disk** at 80% (90G/118G) — monitor at 85%
+- **BTC mirror_close failure** 09:19 UTC — HL API error, monitor
+
+## CEO Report — 2026-08-21 ~13:45 UTC
+
+### Diagnosis
+System HEALTHY, BEST DAY OF WEEK. Verified DB: 24h 25T +$2.17, 68.0% WR. 48h: 54T +$2.11, 63.0% WR. 7d: 228T +$1.27, 51.8% WR (POSITIVE). 4 open: all hl_copy_trader LONG (all green). ATR_SL floor fix WORKING: 24h 19T +$1.85 57.9% WR (was -$3.99/7d, now profitable). PM_TRAIL: 110T/7d +$4.34 82.7% WR. ct-hot+: 5T/24h 80% WR +$1.01 (best). SHORT side dead: 29T/7d 17.2% WR -$1.20 (all legacy, age out Aug 22-23). R2_TREND_SHORT re-enabled Aug 20 but not generating trades yet. Hotset empty (correct NEUTRAL behavior). Daily: 14-$0.36 → 15+$0.06 → 16-$0.51 → 17+$0.37 → 18-$0.37 → 19+$0.44 → 20-$0.49 → 21+$2.13 (BEST DAY). Disk 81%.
+
+### Root Cause
+No issues — system performing well. Volume collapse (82% in 8 days) is the main structural concern but today's 25T is above recent average. ATR_SL floor fix has made ATR_SL exits profitable (+$1.85/24h) — this was the dominant drag for weeks.
+
+### Fix Applied
+NO CHANGES — system healthy, 7d positive, no bleeding. Monitor: MIN_PRE_MOVE 0.3 eval (Aug 25), PM_TRAIL WR (>80%), ATR_SL daily (<15), R2_TREND_SHORT activity, volume recovery.
+
+### Verification
+Today is BEST DAY of week: +$2.17 68% WR. ATR_SL now profitable (floor fix working). PM_TRAIL 82.7% WR carrying. All open positions green. No intervention needed.

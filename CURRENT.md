@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 06:30 UTC (daily orchestrator)**
-**Updated by: daily-orchestrator**
+**Last Updated: 2026-08-21 14:30 UTC (CEO run)**
+**Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE.
 
-**Current status:** System HEALTHY — 24h 20T -3.04% PnL, 60% WR (night session). 7d: 231T -$1.25, 53.2% WR. PM_TRAIL carrying system. ATR_SL at historic low count. 0 open positions (short legacy drain COMPLETE). R2_TREND_SHORT re-enabled Aug 20: 5T/48h 0% WR -$0.47 (legacy clears, too early to evaluate). continuation+ DISABLED (CONTINUATION_ENABLED=False, cleanup). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked. **Volume collapsed 82% in 8 days (98→18 trades/day) — signal generation healthy but execution pipeline heavily filtered.** Disk at 80% (90G/118G).
+**Current status:** System HEALTHY, CONTINUED GREEN, BEST DAY. Verified DB: 24h 29T +$1.90, 65.5% WR (strong). 7d: 228T +$1.05, 51.8% WR (POSITIVE, improved). 3 open: all hl_copy_trader LONG (copy-trading). Top: r2-trend-long6 6T/7d +$0.40 100% WR (best signal, 0% ATR_SL — bars_since>=6 filter), hl_copy_trader 13T/7d +$0.81 61.5% WR, ct-hot+ 40T/7d +$0.46 47.5% WR. PM_TRAIL carrying system: 107T/7d +$4.29 83.2% WR (dominant exit). ATR_SL: 96T/7d -$3.76 (historic low ~14/day, ONLY loss source). **ATR_SL TODAY: 23T +$1.58 56.5% WR — PROFITABLE** (SL floor fix + trailing working). Legacy ALL dying: range_breakout_short 3T -$0.27, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19 — age out Aug 22-23. Daily 7d: 14 -$0.31 → 15 +$0.06 → 16 -$0.51 → 17 +$0.37 → 18 -$0.37 → 19 +$0.44 → 20 -$0.49 → 21 +$1.86 (BEST DAY). Volume stabilized ~22T/day. Disk at 81% (90G/118G).
 
 ## Active Decisions
 

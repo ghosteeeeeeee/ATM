@@ -1217,3 +1217,7 @@
   WHY: 0T last hour (quiet). 24h 26T 65.4%WR +$1.71 strong. atr_sl_hit 69% ALL profitable +$1.35 trailing SL correct. No dead signals. Freq 2.8/hr normal. 4 open all green. 7d 226T 51.3%WR +$0.87 recovering. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 13:10 UTC
+[2026-08-21 13:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (4W 0L +$0.42). 24h 27T 70%WR +$2.19 strong. atr_sl_hit 21T ALL profitable +$1.87 trailing SL correct. hl_copy_trader 13T 8W star, ct-hot+ 6T 5W +$1.02 strong. No dead signals. Freq 4/hr normal. 3 open all LONG (hl_copy_trader). System healthy, 70% WR 24h is best in weeks. No action needed.
+  BY: auto_1hr
+  NEXT: Re-run at 14:10 UTC

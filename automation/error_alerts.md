@@ -128,3 +128,11 @@ ALERTS:
 ## Error Alerts — 2026-08-21 09:19 UTC
 - **WARN** (1x): `HYPE mirror_close FAILED (DB committed, HL still open): mirror_close(BTC): HL API failed — Unknown error` — BTC ATR SL hit at 09:02, DB committed close but HL API rejected. Position potentially still open on Hyperliquid.
 - **WARN**: pipeline.log at 99MB (219MB total logs). Consider log rotation if growing unbounded.
+
+## Error Alerts — 2026-08-21 11:20 UTC
+- **[INFO]** Pipeline: OK — completed 11:18 UTC, 4 open, 21 closed today, +181.17% PnL
+- **[INFO]** Timers: 44 active, none missed
+- **[INFO]** Services: pipeline, hl-sync-guardian, price-collector, 1m-candle, CEO: all OK
+- **[WARN]** pipeline.log at 101MB — consider log rotation
+- **[INFO]** Previous BTC mirror_close failure (09:19) — HL API error, monitor
+- **AUTO-FIX**: None required — all trading systems nominal
