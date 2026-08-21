@@ -66,6 +66,7 @@
     .coin-icon-fallback { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 8px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 4px; border: 1px solid #00ff8833; }
     .pm-badge { color: #00ff88; font-size: 1.2em; margin-left: 2px; vertical-align: middle; }
     .pm-row { background: #00ff8811 !important; }
+    .fav-star { color: #ffd700; font-size: 0.85em; margin-left: 3px; vertical-align: middle; }
     .sortable { cursor: pointer; user-select: none; }
     .sortable:hover { background: #00ff8822; }
     .sort-arrow { font-size: 0.7em; margin-left: 2px; }
@@ -195,6 +196,10 @@
       const src = ICON_MAP[sym];
       if (src) return `<img class="coin-icon" src="${src}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" loading="lazy"><span class="coin-icon-fallback" style="display:none">${(sym||'?').slice(0,2)}</span>`;
       return `<span class="coin-icon-fallback">${(sym||'?').slice(0,2)}</span>`;
+    }
+    const FAVORITES = new Set(['CAKE','ME','BLUR','GMT','BANANA','FIL','ZRO','MNT']);
+    function favHtml(sym) {
+      return FAVORITES.has(sym) ? '<span class="fav-star" title="Favorite">★</span>' : '';
     }
 
     async function load() {
@@ -376,7 +381,7 @@
         const closedTime = (t.closed || '').replace('T', ' ').slice(0, 19);
         return `<tr>
           <td style="color:#444;font-size:0.75em">${globalIdx}</td>
-          <td>${iconHtml(t.coin)}${t.coin || '--'}</td>
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${(t.entry||0).toFixed(4)}</td>
           <td>$${(t.exit||0).toFixed(4)}</td>
@@ -478,7 +483,7 @@
         const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
         const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
         return `<tr class="${trailState[t.id] ? 'pm-row' : ''}">
-          <td>${iconHtml(t.coin)}${t.coin || '--'}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}</td>
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${entry.toFixed(4)}</td>
           <td>$${current.toFixed(4)}</td>
