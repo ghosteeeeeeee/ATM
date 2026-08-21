@@ -1,16 +1,28 @@
 #!/usr/bin/env python3
 """Signal Toggle API — flip *_ENABLED flags in hermes_constants.py."""
-import re, sys, os, shutil, tempfile, importlib
+import re, sys, os, shutil, tempfile, importlib, fcntl, logging
 sys.path.insert(0, '/root/.hermes/scripts')
 
 from flask import Flask, request, jsonify
 from pathlib import Path
 
 app = Flask(__name__)
+_log = logging.getLogger('signal_toggle')
 
 CONSTANTS_FILE = Path('/root/.hermes/scripts/hermes_constants.py')
+_CONSTANTS_LOCK = CONSTANTS_FILE.parent / '.hermes_constants.lock'
 
-# Load protected flags at startup
+
+def _reload_constants():
+    """Reload hermes_constants and return fresh protection sets."""
+    import hermes_constants
+    importlib.reload(hermes_constants)
+    never = getattr(hermes_constants, 'NEVER_REENABLE_FLAGS', set())
+    ceo = set(getattr(hermes_constants, 'CEO_PROTECTED_FLAGS', {}).keys())
+    return never, ceo
+
+
+# Load once at startup, refreshed after every write
 import hermes_constants as _hc
 NEVER_REENABLE = getattr(_hc, 'NEVER_REENABLE_FLAGS', set())
 CEO_PROTECTED = set(getattr(_hc, 'CEO_PROTECTED_FLAGS', {}).keys())
@@ -21,7 +33,7 @@ def _read_constants():
 
 
 def _write_constants(content):
-    """Backup → atomic write → reload module."""
+    """Backup → atomic write → reload module → refresh protections."""
     shutil.copy2(CONSTANTS_FILE, CONSTANTS_FILE.with_suffix('.py.bak'))
     fd, tmp = tempfile.mkstemp(dir=CONSTANTS_FILE.parent, suffix='.tmp')
     try:
@@ -31,9 +43,8 @@ def _write_constants(content):
     except Exception:
         os.unlink(tmp)
         raise
-    # Reload so other imports see the new values
-    import hermes_constants
-    importlib.reload(hermes_constants)
+    global NEVER_REENABLE, CEO_PROTECTED
+    NEVER_REENABLE, CEO_PROTECTED = _reload_constants()
 
 
 def _find_real_assignment(content, flag):
@@ -68,7 +79,7 @@ def _regenerate_config():
         from signals import SIGNAL_REGISTRY, _resolve_enabled
         from paths import SIGNAL_CONFIG_JSON
         from datetime import datetime, timezone
-        import json, fcntl
+        import json
         _FLAG_OVERRIDES = {
             'ma300_candle_confirm': 'MA300_CANDLE_ENABLED',
             'ma_100_cross_long': 'MA_100_CROSS_PLUS_ENABLED',
@@ -94,8 +105,8 @@ def _regenerate_config():
             with open(SIGNAL_CONFIG_JSON, 'w') as f:
                 json.dump(result, f, indent=2)
             fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
-    except Exception:
-        pass
+    except Exception as e:
+        _log.warning('signal_config regeneration failed: %s', e)
 
 
 @app.route('/toggle', methods=['POST'])
@@ -111,16 +122,23 @@ def toggle():
     if flag in CEO_PROTECTED:
         return jsonify({'error': f'{flag} is CEO-protected'}), 403
 
-    content = _read_constants()
-    old_val = _get_value(content, flag)
-    if old_val is None:
-        return jsonify({'error': f'flag {flag} not found'}), 404
+    # File lock prevents concurrent read-modify-write races
+    with open(_CONSTANTS_LOCK, 'w') as lf:
+        fcntl.flock(lf.fileno(), fcntl.LOCK_EX)
+        try:
+            content = _read_constants()
+            old_val = _get_value(content, flag)
+            if old_val is None:
+                return jsonify({'error': f'flag {flag} not found'}), 404
 
-    new_content, new_val = _toggle_flag(content, flag)
-    if new_content is None:
-        return jsonify({'error': f'failed to toggle {flag}'}), 500
+            new_content, new_val = _toggle_flag(content, flag)
+            if new_content is None:
+                return jsonify({'error': f'failed to toggle {flag}'}), 500
 
-    _write_constants(new_content)
+            _write_constants(new_content)
+        finally:
+            fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
+
     _regenerate_config()
     return jsonify({'flag': flag, 'old': old_val, 'new': new_val})
 
@@ -139,15 +157,21 @@ def set_flag():
     if flag in CEO_PROTECTED:
         return jsonify({'error': f'{flag} is CEO-protected'}), 403
 
-    content = _read_constants()
-    old_val = _get_value(content, flag)
-    if old_val is None:
-        return jsonify({'error': f'flag {flag} not found'}), 404
+    with open(_CONSTANTS_LOCK, 'w') as lf:
+        fcntl.flock(lf.fileno(), fcntl.LOCK_EX)
+        try:
+            content = _read_constants()
+            old_val = _get_value(content, flag)
+            if old_val is None:
+                return jsonify({'error': f'flag {flag} not found'}), 404
 
-    new_val_str = 'True' if value else 'False'
-    m = _find_real_assignment(content, flag)
-    new_content = content[:m.start(3)] + new_val_str + content[m.end(3):]
-    _write_constants(new_content)
+            m = _find_real_assignment(content, flag)
+            new_val_str = 'True' if value else 'False'
+            new_content = content[:m.start(3)] + new_val_str + content[m.end(3):]
+            _write_constants(new_content)
+        finally:
+            fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
+
     _regenerate_config()
     return jsonify({'flag': flag, 'old': old_val, 'new': bool(value)})
 

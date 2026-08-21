@@ -92,6 +92,9 @@
     .signal-badge.on { background: #00ff8815; border-color: #00ff8844; color: #00ff88; }
     .signal-badge.on.short { background: #ff444415; border-color: #ff444444; color: #ff4444; }
     .signal-badge.off { background: #1a1a2e; border-color: #333; color: #555; }
+    .signal-badges.hide-off .signal-badge.off { display: none; }
+    .signal-badges .show-toggle { background: none; border: 1px dashed #444; color: #666; padding: 2px 7px; border-radius: 3px; font-size: 0.65em; cursor: pointer; font-family: monospace; }
+    .signal-badges .show-toggle:hover { border-color: #00ff88; color: #00ff88; }
     .signal-badge .bp { color: #ffd700; font-size: 0.9em; margin-left: 3px; text-shadow: 0 0 4px #ffd70066; }
   </style>
 </head>
@@ -128,7 +131,7 @@
     </div>
   </div>
 
-  <div class="signal-badges" id="signalBadges"></div>
+  <div class="signal-badges hide-off" id="signalBadges"></div>
 
   <div id="status" style="margin-bottom:5px">Loading...</div>
 
@@ -477,20 +480,32 @@
       } catch(e) { document.getElementById('rawEmpty').textContent = 'Error: ' + e.message; }
     }
 
+    let showAll = false;
+
     async function loadSignalConfig() {
       try {
         const r = await fetch('/data/signal_config.json?t=' + Date.now());
         const d = await r.json();
         const signals = d.signals || [];
         const on = signals.filter(s => s.enabled).length;
+        const off = signals.length - on;
         document.getElementById('signalBadges').innerHTML =
           signals.map(s => {
             const cls = s.enabled ? ('on' + (s.name.includes('_short') ? ' short' : '')) : 'off';
             const bp = s.bypass ? '<span class="bp" title="standalone bypass">🪙</span>' : '';
             return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}${bp}</span>`;
           }).join('') +
-          `<span style="color:#666;font-size:0.65em;margin-left:6px">${on}/${signals.length} enabled</span>`;
+          `<button class="show-toggle" onclick="toggleShowAll(this)">${showAll ? 'hide off' : `+${off} off`}</button>` +
+          `<span style="color:#666;font-size:0.65em;margin-left:4px">${on}/${signals.length}</span>`;
+        const container = document.getElementById('signalBadges');
+        container.classList.toggle('hide-off', !showAll);
       } catch {}
+    }
+
+    function toggleShowAll(btn) {
+      showAll = !showAll;
+      document.getElementById('signalBadges').classList.toggle('hide-off', !showAll);
+      loadSignalConfig();
     }
 
     async function toggleSignal(el) {

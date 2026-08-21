@@ -864,6 +864,7 @@ def write_signal_config():
     """Write signal_config.json — list of signal names + enabled status + flag name for toggling."""
     from signals import SIGNAL_REGISTRY, _resolve_enabled
     import re as _re
+    import hermes_constants as _hc
     # Explicit overrides for signals whose flag name doesn't follow the pattern
     _FLAG_OVERRIDES = {
         'ma300_candle_confirm': 'MA300_CANDLE_ENABLED',
@@ -878,7 +879,6 @@ def write_signal_config():
         flag_name = s['enabled'] if isinstance(s['enabled'], str) else None
         if not flag_name:
             flag_name = _FLAG_OVERRIDES.get(name, name.upper() + '_ENABLED')
-            import hermes_constants as _hc
             if not hasattr(_hc, flag_name):
                 base = _re.sub(r'_(PLUS|MINUS|LONG|SHORT|NEW)$', '', flag_name)
                 if hasattr(_hc, base):
