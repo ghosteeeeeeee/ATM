@@ -1,6 +1,6 @@
 # Upgrade Audit Trail
 
-**Last scanned:** 2026-08-21 05:50
+**Last scanned:** 2026-08-21 07:20
 
 ---
 
@@ -13,12 +13,12 @@
 - **Reason:** Added CONF_FILTER_MAX=89 and TIME_BLOCK 01-06 UTC to hermes_constants.py. Early-return in _score_signal(). Expected: 326T → 152T, WR 51.8% → 59.2%, PnL -$1.37 → +$0.85.
 
 ## Plan: coin_tracker_setup_improvements.md
-- **Date scanned:** 2026-08-19
+- **Date scanned:** 2026-08-21 07:20
 - **Core request:** Fix coin_tracker_hot signal (42.4% WR) with regime gate, confirmations, MIN_COMPOSITE raise
 - **Difficulty:** Level 2
-- **Value:** LOW — coin_tracker_hot is KILLED (disabled 2026-08-17), fixes are theoretical
-- **Status:** SKIPPED
-- **Reason:** Signal killed after 42.4% WR. All 3 flags False in NEVER_REENABLE_FLAGS. Fixes only relevant if signal is re-enabled, which requires new testing first.
+- **Value:** MEDIUM — signal re-enabled 2026-08-21 but killed again at 17:00 (0W-7L last 3h)
+- **Status:** PARTIALLY IMPLEMENTED
+- **Reason:** Fix #1 (regime gate) was already done. Implemented Fix #3 (MIN_COMPOSITE 60→70) and Fix #5 (kill warm bypass). Remaining: Fix #2 (confirming analyses) and Fix #4 (age decay). Signal needs re-testing after these changes.
 
 ## Plan: 2026-08-12_directional-outcome-tracker-spec.md
 - **Date scanned:** 2026-08-18
@@ -141,9 +141,25 @@
 - **Reason:** `trader_performance` table exists in hl_copy_db.py. `check_trader_exits()` and `update_trader_performance()` exist in hl_fill_monitor.py. COPY_TRADE_EXIT_ENABLED=True. Bypass `'hl_copy_trader'` added to PROFIT_MONSTER_BYPASS_SIGNALS.
 
 ## Plan: retroactive-scan-delayed-entry.md
-- **Date scanned:** 2026-08-21 05:50
+- **Date scanned:** 2026-08-21 07:20
 - **Core request:** Secondary scan for missed breakouts — retroactive signals with lower confidence
 - **Difficulty:** Level 3
 - **Value:** HIGH
 - **Status:** NOT IMPLEMENTED
 - **Reason:** 0 RETRO_ constants in hermes_constants.py. Nothing in breakout_engine.py. This is the only major plan still pending. Requires ~200 LOC in breakout_engine.py + constants + hotset writer.
+
+---
+
+## Implementations (2026-08-21 07:20)
+
+### 1. coin_tracker_hot MIN_COMPOSITE raise (Level 1)
+- **File:** `scripts/hermes_constants.py:929`
+- **Change:** `COIN_TRACKER_HOT_MIN_COMPOSITE` 60 → 70
+- **Why:** Signal killed at 17:00 with 0W-7L, composite 56 too loose. Raising to 70 gates weak setups harder.
+- **Risk:** LOW — only affects coin_tracker_hot signal, not live yet (COIN_TRACKER_HOT_PLUS_ENABLED=False)
+
+### 2. coin_tracker_hot warm bypass removal (Level 1)
+- **File:** `scripts/signals/coin_tracker_hot.py:145-146`
+- **Change:** Removed 'warm' from allowed health states (now hot/ready only)
+- **Why:** Warm health letting garbage setups through. If composite is truly strong, health should be hot or ready.
+- **Risk:** LOW — same as above, signal is disabled for live trading

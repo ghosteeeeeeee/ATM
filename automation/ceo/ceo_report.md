@@ -1,53 +1,41 @@
-## CEO Report — 2026-08-21 ~17:00 UTC (216th run)
+## CEO Report — 2026-08-21 ~18:30 UTC (217th run)
 
 ### Diagnosis
-System HEALTHY, CONTINUED GREEN. Verified DB: 24h 35T +$0.39, 57.1% WR (green). 7d: 231T -$0.21, 51.9% WR (break-even — tiny red, legacy losers dragging). 2 open: 1 ct-hot+ LONG, 1 hl_copy_trader LONG. PM_TRAIL carrying: 105T/7d +$4.22, 83.8% WR. ATR_SL: 101T/7d -$4.95, 16.8% WR (only loss source). Today: 30T +$0.40, 56.7% WR. Legacy losers in 7d window: ct-hot+ 45T -$0.90, r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19, range_breakout_short 2T -$0.17, range_finder+ 9T -$0.14 = -$1.62 total. All legacy age out Aug 22-23 (tomorrow).
+System HEALTHY, FLAT. Verified DB: 24h 37T +$0.01, 51.4% WR (breakeven). 7d: 235T -$0.67, 51.1% WR (slight loss, legacy dragging). 2 open: BTC hl_copy_trader LONG, ETH hl_copy_trader LONG. PM_TRAIL carrying: 16T/48h +$0.86, 93.8% WR. ATR_SL: 43T/48h -$1.27, 37.2% WR (ONLY loss source). Today: 34T -$0.06, 50% WR (flat). ct-hot+ KILLED by auto_1hr at 17:00 (0W-7L last 3h, COIN_TRACKER_HOT_PLUS_ENABLED=False, MIN_COMPOSITE raised 60→70). SHORT side dead: 27T/7d 18.5% WR -$1.09 (ALL legacy, draining).
 
 ### Root Cause
-7d slightly red due to legacy losers in window (-$1.62 from 5 dead signals). Without legacy, 7d would be ~+$1.41. PM_TRAIL continues to carry system. ATR_SL count at historic low. Today solid but not peak (+$0.40 vs yesterday's +$1.69).
+Two issues: (1) ct-hot+ re-enabled today at composite 56, immediately went 0-7 — auto_1hr killed it, correct call. (2) SHORT side structural weakness — 27T/7d 18.5% WR, all legacy signals (r2-trend-short2/10/13). R2_TREND_SHORT re-enabled Aug 20 has 0 trades in 48h — not firing in current market. Volume recovering: 15T trough (Aug 18) → 34T today.
 
 ### Fix Applied
-NO CHANGES — system healthy, legacy dying naturally by Aug 22-23. No intervention needed.
+NO CHANGES — auto_1hr already killed ct-hot+ (COIN_TRACKER_HOT_PLUS_ENABLED=False, MIN_COMPOSITE 70). System healthy, no CEO intervention needed.
 
 ### Key Numbers (Verified)
-| Metric | 24h | 7d |
-|--------|-----|----|
-| Trades | 35 | 231 |
-| PnL | +$0.39 | -$0.21 |
-| WR | 57.1% | 51.9% |
+| Metric | 24h | 48h | 7d |
+|--------|-----|-----|----|
+| Trades | 37 | 61 | 235 |
+| PnL | +$0.01 | +$0.43 | -$0.67 |
+| WR | 51.4% | 57.4% | 51.1% |
 
-### Exit Breakdown (7d)
-- profit-monster-trail: 105T +$4.22, 83.8% WR ✅
-- profit-monster-T1: 12T +$0.69, 100% WR ✅
-- atr_sl_hit: 101T -$4.95, 16.8% WR (main drag)
+### Exit Breakdown (48h)
+- profit-monster-trail: 16T +$0.86, 93.8% WR ✅
+- atr_sl_hit: 43T -$1.27, 37.2% WR (ONLY loss source)
 
 ### Top Signals (7d)
-- r2-trend-long6: 6T +$0.40, 100% WR (best, 0% ATR_SL — bars_since>=6 filter)
-- hl_copy_trader: 16T +$0.71, 62.5% WR
+- r2-trend-long6: 6T +$0.40, 100% WR (best, 0% ATR_SL)
+- hl_copy_trader: 17T +$0.58, 58.8% WR (carrying LONG side)
 - r2-trend-long4: 15T +$0.15, 66.7% WR
-- r2-trend-long3: 26T +$0.19, 53.8% WR (MIN_PRE_MOVE 0.3 working — 48h 9T +$0.28, 77.8% WR)
+- r2-trend-long3: 26T +$0.19, 53.8% WR
+
+### Worst Signals (7d)
+- ct-hot+: 48T -$1.23, 41.7% WR (killed again by auto_1hr)
+- r2-trend-short2: 3T -$0.22, 0% WR (legacy, draining)
+- ct-hot-: 4T -$0.19, 0% WR (legacy, draining)
 
 ### Monitoring
-- MIN_PRE_MOVE 0.3 eval (Aug 25) — 48h improving
-- PM_TRAIL WR (>80%) — at 83.8%
-- Legacy age out (Aug 22-23) — will clear ~-$1.62 from 7d
-- Volume collapse — 82% drop unresolved
-- Disk at 81%
-- PM_TRAIL WR (>80%)
-- ATR_SL daily (<15)
-- Volume recovery
-- Disk 81% (cleanup at 85%)
-
-## CEO Report — 2026-08-21 17:15 UTC
-
-### Diagnosis
-System HEALTHY, CONTINUED GREEN. Verified DB: 24h 35T +$0.24, 54.3% WR (green). 7d: 233T -$0.21, 51.9% WR (break-even). PM_TRAIL carrying at 94.1% WR. ATR_SL only loss source at historic low. 3 open positions (2 hl_copy_trader LONG, 1 ct-hot+ LONG). Volume recovering: 15T trough (Aug 18) → 32T today.
-
-### Root Cause
-Legacy losers (ct-hot+ -$1.13/7d, 42.6% WR) still in 7d window, aging out by Aug 22-23. ATR_SL dominates 48h exits: 43T -$1.27 (only loss source). PM_TRAIL carries all winners. Volume collapse (82% from 100T to 15T trough) partially recovering.
-
-### Fix Applied
-NO CHANGES — system healthy, legacy aging out naturally. No intervention needed.
-
-### Verification
-Next check: Aug 22-23 legacy should be gone from 7d window. Monitor MIN_PRE_MOVE 0.3 eval (Aug 25), PM_TRAIL WR (>80%), ATR_SL daily (<15).
+- ct-hot+ stay killed — 42.6% WR 7d, MIN_COMPOSITE now 70
+- MIN_PRE_MOVE 0.3 eval (Aug 25)
+- PM_TRAIL WR (>80%) — at 93.8%
+- ATR_SL daily (<15) — at ~21/day (48h avg)
+- SHORT side: R2_TREND_SHORT 0 trades/48h, no edge found
+- Volume recovery: 34T today (up from 15T trough)
+- Disk at 81% (cleanup at 85%)

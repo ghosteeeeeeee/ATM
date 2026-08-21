@@ -598,3 +598,7 @@
 [2026-08-21 11:07 UTC]   🟢 hl_copy_trader: 7 trades, 71.4% WR, PnL=8.63
 [2026-08-21 11:07 UTC]   🟢 r2-trend-long3: 5 trades, 80.0% WR, PnL=2.13
 [2026-08-21 11:07 UTC] Done. Disabled 0 signals.
+[2026-08-21 17:07 UTC] === Signal Decay Detector ===
+[2026-08-21 17:07 UTC]   🟢 ct-hot+: 14 trades, 42.9% WR, PnL=1.27
+[2026-08-21 17:07 UTC]   🟢 hl_copy_trader: 17 trades, 58.8% WR, PnL=6.98
+[2026-08-21 17:07 UTC] Done. Disabled 0 signals.

@@ -12400,3 +12400,59 @@ None — system stable, previous fixes settling in.
 - No dead signals
 
 **Open Questions:** None
+
+## [2026-08-21 17:00 UTC] Hourly Analysis
+
+**Trades:** 6 closed (1W 5L -$1.38)
+**24h:** 35T 19W 54.3%WR +$0.24
+
+**Close reasons (24h):**
+- atr_sl_hit: 32T -$0.01 (break-even)
+- profit-monster-trail: 2T +$0.07
+- atr_tp_hit: 1T +$0.18
+
+**Top signals (24h):**
+- hl_copy_trader: 17T 10W +$0.60 — star
+- ct-hot+: 14T 6W -$0.71 — DISABLED (see below)
+
+**Open:** HYPE/PURR/BTC/ETH (4 positions)
+
+**Changes:**
+1. Disabled ct-hot+ (`COIN_TRACKER_HOT_PLUS_ENABLED = False`) — went 0W-7L in last 3h after re-enable. Composite threshold 56 was too loose. Raised `COIN_TRACKER_HOT_MIN_COMPOSITE` to 60.
+
+**No Change Needed:**
+- hl_copy_trader still star (17T 10W +$0.60)
+- atr_sl_hit 91% but break-even overall — trailing SL working but market choppy
+- Trade freq 6/hr normal
+- 4 open positions healthy
+- r2-trend-long variants all green
+
+**Open Questions:**
+- ct-hot+ re-enabled today with composite 56, lost money within hours — need T approval before re-enabling at 60+
+
+## [2026-08-21 18:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.23)
+**24h:** 37T 19W 51.4%WR -$0.24
+
+**Close reasons (24h):**
+- atr_sl_hit: 34T -$0.24 (break-even)
+- profit-monster-trail: 2T +$0.07
+- atr_tp_hit: 1T +$0.18
+
+**Top signals (24h):**
+- hl_copy_trader: 18T 10W +$0.47 — star
+- ct-hot+: 15T 6W -$0.81 — DISABLED (draining residual positions)
+
+**Open:** BTC/ETH (hl_copy_trader LONG)
+
+**Changes:** None
+
+**No Change Needed:**
+- ct-hot+ already disabled at 17:00 — last hour's PURR loss is residual open position
+- hl_copy_trader still star at +$0.47
+- atr_sl_hit 92% but break-even — trailing SL correct
+- Trade freq 2/hr normal
+- 2 open positions healthy
+
+**Open Questions:** None

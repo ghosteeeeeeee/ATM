@@ -1229,3 +1229,11 @@
   WHY: 1T last hour (ONDO ct-hot+ atr_sl_hit +$0.09 win). 24h 31T 61.3%WR +$1.68 strong. All signals profitable. hl_copy_trader 15T 9W star, ct-hot+ 10T 6W +$0.76 strong. atr_sl_hit 87% 24h ALL profitable +$1.41 trailing SL correct. Freq 1-6/hr normal. No dead signals. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 17:00 UTC
+[2026-08-21 17:00 UTC] auto_1hr: DISABLED ct-hot+ (COIN_TRACKER_HOT_PLUS_ENABLED=False), raised composite threshold 56→60
+  WHY: 0W-7L last 3h after re-enable. ct-hot+ was re-enabled today with composite 56 but immediately started losing. 7d 47T 20W 42.6%WR -$1.13 — losing signal. ONDO -$1.12 was biggest single loss. hl_copy_trader (17T 10W +$0.60) remains star. 24h dropped from +$1.68 to +$0.24 in one bad hour. System needs T approval to re-enable at composite 60+.
+  BY: auto_1hr
+  NEXT: Re-run at 18:00 UTC
+[2026-08-21 18:00 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -/usr/bin/bash.23) — both small atr_sl_hit. ct-hot+ residual positions draining (disabled 17:00). hl_copy_trader 18T 10W +/usr/bin/bash.47 star. 24h 37T 51.4%WR -/usr/bin/bash.24 flat. 2 open BTC/ETH healthy. Freq 2/hr normal. No dead signals. System stable, no action.
+  BY: auto_1hr
+  NEXT: Re-run at 19:00 UTC
