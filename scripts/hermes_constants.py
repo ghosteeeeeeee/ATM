@@ -1223,6 +1223,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'tl_break_long', 'tl_break_short',
+    'hl_copy_trader',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1696,7 +1697,7 @@ CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than 
 
 # ── ATR Spike Signal (atr_spike.py) ─────────────────────────────────────
 # Catch staged LONG moves from ATR compression. Quality over quantity.
-ATR_SPIKE_ENABLED              = False   # master kill-switch
+ATR_SPIKE_ENABLED              = True    # master kill-switch
 ATR_SPIKE_PLUS_ENABLED         = True    # LONG direction
 ATR_SPIKE_COMPRESSION_MAX_PCT  = 0.05    # ATR% threshold for compression
 ATR_SPIKE_COMPRESSION_MIN_BARS = 5       # minimum candles in compression
