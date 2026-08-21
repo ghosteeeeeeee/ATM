@@ -1,3 +1,37 @@
+## CEO Report — 2026-08-21 ~09:15 UTC (verified, 206th run)
+
+### Diagnosis
+System HEALTHY — NO CHANGES needed. Verified DB: 24h 15T -$0.06, 60% WR (flat). 48h: 43T +$0.08, 60.5% WR (green). 7d: 233T -$0.77, 51.1% WR. 4 open positions. PM_TRAIL: 123T/7d +$4.64, 82.9% WR (carrying system). ATR_SL: 85T/7d -$5.95, 2.4% WR (main drag, historic low count). r2-trend-long6: 7T/7d 100% WR +$0.45 (best signal, all PM_TRAIL exits, zero ATR_SL). Legacy losers aging out: ct-hot+ -$0.42, range_breakout_short -$0.27 (both die by Aug 22).
+
+### Root Cause
+No active bleeding — system at break-even edge. PM_TRAIL (+$4.64) nearly offsets ATR_SL (-$5.95) = net -$1.31/7d. Alternating green/red days = normal NEUTRAL variance. Volume collapse (82% in 8 days) is structural: confluence gate + dead_hours + velocity filters + 392 tokens in cooldown. 48h ATR_SL breakdown: stop_hunt_reversal_long+ 3T -$0.38 (already killed), r2-trend-short2 2T -$0.22 (legacy clearing).
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed.
+
+### Verification
+DB query confirmed. PM_TRAIL WR 82.9% (threshold >80% ✓). ATR_SL count historic low (~7-8/day). All legacy kills verified dead in 48h data. Pipeline running, all timers firing. MIN_PRE_MOVE 0.3 eval extended to Aug 25.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 25 (r2-trend-long3 break-even, needs positive PnL)
+- PM_TRAIL WR must stay >80% (currently 82.9%)
+- ATR_SL daily must stay <15 (currently ~7-8/day, historic low)
+- SHORT side structural gap — all legacy dead, need new signals for SHORT_BIAS regime
+- Volume collapse (82% decline) — strategic decision needed (relax filters vs. accept lower volume)
+
+---
+
+## CEO Report — 2026-08-21 ~09:00 UTC (verified, 205th run)
+
+### Diagnosis
+System HEALTHY — NO CHANGES needed. Verified DB: 24h 15T -$0.06, 60% WR (flat). 7d: 235T -$0.73, 51.5% WR. 4 open: BTC/ETH/HYPE/SOL hl_copy_trader LONG (copy-trading). PM_TRAIL: 125T/7d +$4.68, 83.2% WR (carrying system). ATR_SL: 85T/7d -$5.95, 2.4% WR (historic low). r2-trend-long6: 7T/7d 100% WR +$0.45 (best signal, all PM_TRAIL exits, zero ATR_SL). Legacy losers aging out: ct-hot+ -$0.42, range_breakout_short -$0.27.
+
+### Root Cause
+No root cause — system operating normally. Legacy kills aging out of 7d window. ATR_SL at historic low count. MIN_PRE_MOVE 0.3 eval ongoing (break-even, extended to Aug 25).
+
+### Fix Applied
+NO CHANGES — system healthy, no intervention needed.
+
 ## CEO Report — 2026-08-21 ~08:30 UTC (verified, 204th run)
 
 ### Diagnosis
