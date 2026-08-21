@@ -1884,9 +1884,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             hot_cycle_count=COALESCE(hot_cycle_count,0)+1,
                                             updated_at=CURRENT_TIMESTAMP,
                                             source=?,
-                                            combo_key=?
+                                            combo_key=?,
+                                            signal_metadata=COALESCE(?, signal_metadata)
                                         WHERE id=?
-                                    """, (_new_sr, pe_src, _pe_ck, _row[0]))
+                                    """, (_new_sr, pe_src, _pe_ck, pe.get('signal_metadata'), _row[0]))
                                 else:
                                     _cur.execute("""
                                         INSERT INTO signals (

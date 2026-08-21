@@ -1799,4 +1799,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 60      # net score threshold — was 70, lowered to 60 per request
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 57      # net score threshold — lowered to 57 per request

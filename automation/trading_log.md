@@ -12136,3 +12136,33 @@ None — system stable, previous fixes settling in.
 2. Monitor MIN_PRE_MOVE 0.3 through Aug 25
 3. Monitor PM_TRAIL edge (>80% WR)
 4. retroactive-scan-delayed-entry pending CEO approval
+
+## [2026-08-21 07:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** +$0.05 (WR: 33.3%)
+
+**Last Hour Closes:**
+| Token | Signal | Dir | Exit | PnL |
+|-------|--------|-----|------|-----|
+| BSV | r2-trend-long3 | LONG | atr_sl_hit | +$0.28 |
+| SOL | hl_copy_trader | LONG | atr_sl_hit | -$0.12 |
+| HYPE | hl_copy_trader | SHORT | atr_sl_hit | -$0.11 |
+
+**24h Stats:**
+- 20 trades, 50% WR, -$0.54
+- atr_sl_hit: 11T (55%) -$0.76 avg -$0.069
+- profit-monster-trail: 10T (50%) +$0.27 avg +$0.027
+- 7d ATR_SL: 36.7% (below 40% threshold)
+
+**Changes:** None
+
+**No Change Needed:**
+- ATR_SL 24h at 55% elevated but 7d at 36.7% — small sample noise
+- hl_copy_trader 0%WR but only 2T lifetime — too early to kill
+- r2-trend-short2 0%WR 3T — re-enabled Aug 20, need more data
+- r2-trend-long3 continues winning: 6T 24h +$0.10
+- Trade freq 3/hr normal, no overtrading
+- 3 open positions (BSV LONG, ETH LONG, BTC LONG)
+
+**Open Questions:** None

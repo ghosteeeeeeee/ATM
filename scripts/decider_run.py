@@ -1530,24 +1530,25 @@ def execute_trade(token, direction, price, confidence, source,
                     try:
                         _trader_wallet = signal_metadata.get('trader_wallet')
                         if _trader_wallet:
-                            import sys as _sys
-                            _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
                             from hl_copy_db import get_db as _get_hl_db
                             _hl_conn = _get_hl_db()
-                            _hl_conn.execute("""
-                                INSERT OR IGNORE INTO trader_performance
-                                (wallet, trade_id, token, direction, signal_time, entry_price,
-                                 status, created_at)
-                                VALUES (?, ?, ?, ?, ?, ?, 'open', ?)
-                            """, (
-                                _trader_wallet, int(tid), token.upper(), direction.upper(),
-                                int(time.time()), round(price, 6), int(time.time()),
-                            ))
-                            _hl_conn.commit()
-                            _hl_conn.close()
-                            log(f'  [COPY-PERF] Recorded trade #{tid} for trader {_trader_wallet[:10]}...')
+                            try:
+                                _hl_conn.execute("""
+                                    INSERT OR IGNORE INTO trader_performance
+                                    (wallet, trade_id, token, direction, signal_time, entry_price,
+                                     status, created_at)
+                                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?)
+                                """, (
+                                    _trader_wallet, int(tid), token.upper(), direction.upper(),
+                                    int(time.time()), round(price, 6), int(time.time()),
+                                ))
+                                _hl_conn.commit()
+                                log(f'  [COPY-PERF] Recorded trade #{tid} for trader {_trader_wallet[:10]}...')
+                            finally:
+                                _hl_conn.close()
                     except Exception as _cp_err:
-                        log(f'  [COPY-PERF] Failed to record trader_performance: {_cp_err}')
+                        import traceback
+                        log(f'  [COPY-PERF] Failed: {_cp_err}\n{traceback.format_exc()[:300]}')
                 return True, f'trade #{tid}'
             # RC=0 but no 'trade #' found in stdout — DB INSERT may have failed silently.
             # Do NOT mark signal EXECUTED — return failure so decider_run retries.

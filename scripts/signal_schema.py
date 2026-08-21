@@ -2375,7 +2375,13 @@ def get_approved_signals(hours=24):
                       AND s3.executed = 0
                     ORDER BY created_at DESC LIMIT 1), 1.0
                )) as learned_sl_multiplier,
-               MAX(signal_metadata) as signal_metadata
+               (SELECT signal_metadata FROM signals s4
+                WHERE s4.token=signals.token
+                  AND s4.direction=signals.direction
+                  AND s4.decision='APPROVED' AND s4.executed=0
+                  AND s4.signal_metadata IS NOT NULL AND s4.signal_metadata != '{}'
+                ORDER BY s4.created_at DESC LIMIT 1
+               ) as signal_metadata
         FROM signals
         WHERE decision='APPROVED' AND executed=0
           AND created_at > datetime('now','-'||?||' hours')

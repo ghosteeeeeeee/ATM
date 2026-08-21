@@ -1197,3 +1197,7 @@
   WHY: 0T last hour (quiet night, 7h since last close). 24h 18T 50%WR -$0.54. LONG ATR_SL 30.8% (4/13) well below 40%. SHORT signals 5T 0%WR -$0.47 all from Aug 20 re-enable day, too early to evaluate. r2-trend-long3 5T 40%WR borderline, lifetime acceptable. 4 open positions. 0.25/hr freq normal. 7d 245T 51%WR -$1.06 flat. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 07:05 UTC
+[2026-08-21 07:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2L 1W +$0.05). 24h 20T 50%WR -$0.54. atr_sl_hit 55% 24h elevated but 7d 36.7% below 40% — small sample noise. hl_copy_trader 0%WR but only 2T lifetime too early. r2-trend-short2 0%WR 3T re-enabled Aug 20 too early. r2-trend-long3 6T 24h +$0.10 star. 3 open positions. 3/hr freq normal. 7d 245T 51%WR -$1.06 flat. System healthy, 8th green day.
+  BY: auto_1hr
+  NEXT: Re-run at 08:10 UTC
