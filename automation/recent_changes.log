@@ -2,6 +2,11 @@
 # Updated by human sessions and automated processes
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
+[2026-08-21 ~22:04 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (ETH hl_copy_trader +$0.90, HYPE -$0.11). 24h 39T 48.7%WR ~+$0.62. atr_sl_hit 92.3% (36/39) but 17/36 (47%) are profitable trailing stop exits — net +$0.55. hl_copy_trader 20T/11W +$1.26 strong performer. ct-hot+ 15T/6W -$0.81 underperforming but not at 0%WR auto-kill threshold. No signal crosses 3T/0%WR threshold. 2 open (BTC -$0.01, ETH +$0.03). Trade frequency normal (~2.6/hr). Regime NEUTRAL (99/104 tokens ranging). 7-day ~238T 50.8%WR breakeven. Today 37T/18W +$0.62. System within parameters.
+  BY: auto_1hr
+  NEXT: Re-run at 23:04 UTC
+
 [2026-08-20 ~21:04 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (r2-trend-long3 +$0.04 win). 24h 19T 52.6%WR -$0.53. ATR_SL 42.1% (8/19) just above 40% threshold but within 7-day variance (26.9%-53.3%). profit-monster-trail 10T +$0.27 dominant and profitable. r2-trend-long3 6T/3W -$0.17 worst performer but 50% WR not auto-kill. r2-trend-short2 3T/0%WR -$0.23 already killed by CEO. No signal crosses 3T/0%WR auto-kill threshold. 0 open trades. Trade frequency normal (~1.4T/hr avg). System within parameters.
   BY: auto_1hr

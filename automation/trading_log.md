@@ -1,5 +1,50 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-21 22:04 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (ETH hl_copy_trader +$0.90, HYPE hl_copy_trader -$0.11)
+**24h:** 39T | 19W (48.7% WR) | ~+$0.62
+**Open:** 2 (BTC hl_copy_trader -$0.01, ETH hl_copy_trader +$0.03)
+
+**24h Close Reasons:**
+- atr_sl_hit: 36T +$0.55 (92.3% of closes — dominant, but 17/36 profitable)
+- profit-monster-trail: 2T +$0.07
+- atr_tp_hit: 1T +$0.18
+
+**Signal Performance 24h:**
+- hl_copy_trader: 20T/11W +$1.26 (55% WR — strong performer)
+- ct-hot+: 15T/6W -$0.81 (40% WR — underperforming, main drag)
+- r2-trend-long3: 2T/1W +$0.28
+- r2-trend-long11: 1T/1W +$0.04
+- r2-trend-long13: 1T/1W +$0.03
+
+**Auto-Kill Check:**
+- ct-hot+: 15T/6W (40% WR) -$0.81 — not at 0% WR threshold
+- No signal crosses 3T/0%WR threshold
+
+**Hourly Frequency:** ~2.6T/hr avg today — normal
+
+**Market Regime:** NEUTRAL (99/104 tokens ranging)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 2 trades last hour, net +$0.79 — system profitable
+- atr_sl_hit at 92.3% is high but 17/36 (47%) are profitable trailing stop exits
+- hl_copy_trader strong at 55% WR +$1.26/24h
+- ct-hot+ underperforming but not at auto-kill threshold (40% WR, not 0%)
+- Trade frequency normal (~2.6/hr)
+- Open positions healthy (BTC -$0.01, ETH +$0.03)
+- 7-day trend: ~238T, 50.8% WR, roughly breakeven
+- Today: 37T/18W (48.6% WR) +$0.62 — slightly positive
+
+**Open Questions:**
+- ct-hot+ at -$0.81/24h — monitor, may need kill if continues
+- High atr_sl_hit rate (92.3%) but net positive from profitable trailing exits
+- NEUTRAL regime = ranging market, trailing stops catching small profits
+
+---
+
 ## [2026-08-20 21:04 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (r2-trend-long3 +$0.04 win)
