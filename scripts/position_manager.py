@@ -1150,7 +1150,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
                         row = cur2.fetchone()
                         # Bug-fix (2026-05-20): same 0.0-falsy issue — use explicit None check.
                         amt = float(row[0]) if row and row[0] is not None else DEFAULT_TRADE_SIZE_USDT
-                        calc_notional = float(row[1]) if row and row[1] is not None else amt
+                        # Bug-fix (2026-08-21): fallback must include leverage (amt alone = margin, not notional)
+                        calc_notional = float(row[1]) if row and row[1] is not None else amt * leverage
                         hype_pct = round(hl_rp / calc_notional * 100, 4) if calc_notional else 0
                         cur2.execute("""
                             UPDATE trades SET

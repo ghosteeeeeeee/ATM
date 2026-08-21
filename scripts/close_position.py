@@ -73,18 +73,20 @@ def close_brain(coin, exit_price):
         else:
             calc_notional = float(amount_usdt_raw) * leverage if amount_usdt_raw is not None else DEFAULT_TRADE_SIZE_USDT
         pnl_pct = 0.0
+        raw_move = 0.0
         if entry_price and float(entry_price) != 0 and exit_price:
             if direction == 'LONG':
-                pnl_pct = round((exit_price - float(entry_price)) / float(entry_price) * 100, 4)
+                raw_move = ((exit_price - float(entry_price)) / float(entry_price) * 100)
             else:
-                pnl_pct = round((float(entry_price) - exit_price) / float(entry_price) * 100, 4)
-            pnl_pct = round(pnl_pct * leverage, 4)  # leveraged return
+                raw_move = ((float(entry_price) - exit_price) / float(entry_price) * 100)
+            pnl_pct = round(raw_move * leverage, 4)  # leveraged return
         # BUG-FIX (2026-04-19): pnl_usdt was hardcoded to 0 — manual_close trades
         # showed exit prices that differed from entry but pnl=0.00 was recorded.
         # Fix: compute pnl_usdt from entry/exit/amount and direction-aware formula.
-        pnl_usdt_calc = 0.0
-        if entry_price and float(entry_price) != 0 and exit_price:
-            pnl_usdt_calc = round(pnl_pct / 100 * calc_notional, 4)
+        # BUG-FIX (2026-08-21): Use raw_move (unleveraged) × calc_notional instead of
+        # pnl_pct (leveraged) × calc_notional — the latter double-leverages since
+        # calc_notional = amount_usdt × leverage already includes leverage.
+        pnl_usdt_calc = round(raw_move / 100 * calc_notional, 4)
         cur.execute("""
             UPDATE trades SET
                 status='closed', close_time=NOW(), exit_price=%s,
