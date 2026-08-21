@@ -134,6 +134,35 @@ openmemory_openmemory_store(
 
 If you skip this, the next session starts blind.
 
+## Shared Skills & MCP Servers
+
+**Single source of truth:** Skills and MCP servers are shared with OpenCode via symlinks.
+**Location:** `/root/.hermes/skills/shared/` (symlinks to `/root/.config/opencode/skills/`)
+**MCP Config:** `/root/.hermes/config/shared-mcp.json`
+
+### Available Shared Skills (37)
+- **Verification:** `post-change`, `bug-hunter`
+- **Trading:** `signal-lab`, `signal-backtest`, `signal-quality-tuner`, `signal-combo-analyzer`, `trade-analysis`, `trade-stats`, `winrate-calculator`, `hotset-debug`, `phantom-trades`
+- **System:** `decisions`, `handoff`, `ceo-comm`, `pipeline-visualizer`
+- **Content:** `graphify`, `transcript-miner`, `youtube-watch`, `download-pdfs`
+- **Books:** 16 trading books (Wyckoff, Price Action, etc.)
+
+### Shared MCP Servers
+| Server | Purpose |
+|--------|---------|
+| `openmemory` | Cross-session memory (port 8080) |
+| `sequential-thinking` | Step-by-step reasoning |
+| `fetcher` | Web page fetching |
+
+### Command Guard
+Dangerous bash patterns: `/root/.agents/hooks/dangerous-patterns.txt`
+Shared across all agents (OpenCode, DSH, Cursor, Claude Code).
+
+**Rules:**
+- **Never copy** skills — always use symlinks
+- **Edit originals** at `/root/.config/opencode/skills/` — changes propagate everywhere
+- See `skills/shared/README.md` for full documentation
+
 ## Reference (query OpenMemory for details)
 
 | Topic | Query |
