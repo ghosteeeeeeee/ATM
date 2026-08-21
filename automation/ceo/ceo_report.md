@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-21 (~04:00 UTC, verified, 196th run)
+
+### Diagnosis
+System HEALTHY. 24h: 18T -$0.54, 50.0% WR (flat — normal NEUTRAL variance). 7d: 260T -$1.39, 50.4% WR. 0 open positions (clean). PM_TRAIL: 138T/7d +$5.11, 82.6% WR (carrying system). ATR_SL: 96T/7d -$7.21, 1% WR (dominant drag, historic low count). SHORT legacy: ALL cleared — 0 remaining open positions, drain complete. Daily: Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54 (alternating pattern, green days getting greener). r2-trend-long3 MIN_PRE_MOVE 0.3: 48h 9T $0.00, 66.7% WR (break-even — WR improved from 54.5% 7d but PnL flat). continuation+ 4T/7d -$0.24, 25% WR (tiny sample, too early to kill).
+
+### Root Cause
+No new root causes. SHORT legacy drain complete —0 remaining positions. ATR_SL remains dominant drag at -$7.21/7d but count at historic low (96/7d vs peak). PM_TRAIL continues carrying at 82.6% WR. Coin tracker wyckoff detection gap: 0/109 coins have non-none phase.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed.
+
+### Verification
+PM_TRAIL 82.6% WR stable (>80% threshold). ATR_SL count at historic low. 0 open positions. Legacy SHORT drain complete. Pipeline running, all timers firing. MIN_PRE_MOVE 0.3 eval extended to Aug 25.
+
+---
+
 ## CEO Report — 2026-08-21 (~03:00 UTC, verified, 195th run)
 
 ### Diagnosis

@@ -46,7 +46,7 @@ __all__ = [
     # HL Copy Trading
     'HL_COPY_DB', 'HL_COPY_REPORT', 'HL_COPY_TRADERS',
     # Signal version tracking
-    'SIGNAL_VERSIONS_FILE',
+    'SIGNAL_VERSIONS_FILE', 'SIGNAL_CONFIG_JSON',
 ]
 
 # ── Base directories ──────────────────────────────────────────────────────────
@@ -128,3 +128,4 @@ HL_COPY_TRADERS = os.path.join(WWW_DATA, 'hl_copy_traders.json')
 
 # ── Signal version tracking ────────────────────────────────────────────────────
 SIGNAL_VERSIONS_FILE = os.path.join(HERMES_DATA, 'signal_versions.json')
+SIGNAL_CONFIG_JSON   = os.path.join(WWW_DATA, 'signal_config.json')

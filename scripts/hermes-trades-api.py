@@ -860,10 +860,23 @@ def write_signals():
     _atomic_write(result, OUT_SIGNALS)
 
 
+def write_signal_config():
+    """Write signal_config.json — list of signal names + enabled status."""
+    from signals import SIGNAL_REGISTRY, _resolve_enabled
+    config = []
+    for s in SIGNAL_REGISTRY:
+        config.append({
+            'name': s['name'],
+            'enabled': _resolve_enabled(s),
+        })
+    _atomic_write({'signals': config, 'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')}, SIGNAL_CONFIG_JSON)
+
+
 def main():
     write_trades()
     write_signals()
-    print(f"trades.json: written | signals.json: written")
+    write_signal_config()
+    print(f"trades.json: written | signals.json: written | signal_config.json: written")
 
 
 if __name__ == '__main__':
