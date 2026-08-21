@@ -861,9 +861,9 @@ PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s 
 PM_DRY_RUN          = False  # global kill switch
 PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB amount_usdt unavailable
 # Signals bypassed by profit_monster — these trades get regular ATR SL/TP only.
-# Matches any signal containing the prefix (e.g. 'atr_spike+,rs-s36' matches 'atr_spike').
+# Matches any signal containing the prefix (e.g. 'atr-spike+,rs-s36' matches 'atr-spike').
 PROFIT_MONSTER_BYPASS_SIGNALS = (
-    'atr_spike', 'r2-trend-long',
+    'atr-spike', 'r2-trend-long',
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
