@@ -1891,6 +1891,12 @@ def _run_hot_set():
             # but price has still run too far. Example: SKR +0.8% in 1hr → bad entry.
             # Exception: bottoming + LONG or falling + SHORT (the move IS the signal).
             _chg_30m = hot_sig.get('price_change_30m', 0.0) or 0.0
+            # FIX 2026-08-21: fall back to fresh speed_tracker data (hotset data goes stale
+            # between compaction and execution — especially problematic for 5m candle granularity)
+            if _chg_30m == 0.0 and speed_tracker_dr is not None:
+                spd_chg = speed_tracker_dr.get_token_speed(token)
+                if spd_chg:
+                    _chg_30m = spd_chg.get('price_change_30m', 0.0) or 0.0
             if abs(_chg_30m) > MOMENTUM_EXHAUSTION_THRESHOLD:
                 if direction == 'LONG' and _chg_30m > 0:
                     log(f'  ⚡ [HOT-SET] {token} {direction} BLOCKED: momentum exhausted '

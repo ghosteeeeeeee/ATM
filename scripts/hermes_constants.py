@@ -408,6 +408,8 @@ SPEED_HOTSET_BONUS   = 0.15  # +15% score boost for pctl >= 80 (legacy, used in 
 VEL_5M_WINDOW  = 5    # candles to average for 5m velocity  (5 = 5 min for 1m data)
 VEL_15M_WINDOW = 15   # candles to average for 15m velocity (15 = 15 min for 1m data)
 VEL_30M_WINDOW = 6    # candles to average for 30m velocity (6 × 5m candle = 30 min)
+                        # NOTE: speed_tracker reads candles_5m, so 6 candles = 30min correctly.
+                        # Do NOT change to 30 — that would make it 150min on 5m data.
 VEL_STALE_THRESHOLD_PCT = 0.05  # % per candle — below this = "flat" for stale detection
                                         # 0.05%/candle × 5 candles ≈ 0.25% total = old 0.2% feel
                                         # but smooths micro-noise from single ref candles
