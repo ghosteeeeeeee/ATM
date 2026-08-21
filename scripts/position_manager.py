@@ -959,7 +959,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         fee_total = entry_fee_paid + exit_fee
 
         # Calculate pnl_usdt at close (direction-aware)
-        # pnl_pct = return on margin (pnl_usdt / amount_usdt * 100)
+        # pnl_pct = leveraged return (raw price move × leverage)
         # pnl_usdt = calc_notional * raw_price_move (proportional to actual HL capital)
         # calc_notional = hl_notional_usdt when set, else amount_usdt * leverage.
         if direction == 'LONG':
@@ -968,8 +968,8 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
             raw_move = ((entry_price - current_price) / entry_price * 100) if entry_price > 0 else 0
         pnl_usdt = calc_notional * (abs(raw_move) / 100) * (1 if raw_move >= 0 else -1)
         pnl_usdt_val = float(pnl_usdt or 0)
-        # pnl_pct = return on margin (what HL shows, what dashboard displays)
-        pnl_pct = (pnl_usdt_val / amount_usdt * 100) if amount_usdt > 0 else 0
+        # pnl_pct = leveraged return (what dashboard displays)
+        pnl_pct = raw_move * leverage
 
         # Net PnL after fees
         net_pnl = pnl_usdt_val - fee_total
