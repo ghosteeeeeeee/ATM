@@ -13,7 +13,7 @@ from hermes_constants import (
     PM_TIER1_MIN_PCT, PM_TIER1_MAX_PCT, PM_TIER1_MAX_CLOSE, PM_TIER1_SKIP_TOP_PCT, PM_TIER1_FIRE_WINDOWS,
     PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT, PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT, PM_TIER2_FIRE_WINDOWS,
     PM_TRAIL_ENABLED, PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT, PM_TRAIL_MIN_HOLD, PM_TRAIL_FIRE_WINDOWS,
-    PM_DRY_RUN, PM_DEFAULT_NOTIONAL,
+    PM_DRY_RUN, PM_DEFAULT_NOTIONAL, PROFIT_MONSTER_BYPASS_SIGNALS,
 )
 # FIX: constants are in decimal (0.006=0.60%) but live_pnl_pct is in percent (0.01=0.01%)
 # Convert to percent so comparisons are correct: pnl(%) >= ACTIVATE(%)
@@ -61,13 +61,21 @@ def get_all_open_positions():
         conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
                                 password=BRAIN_PASSWORD, connect_timeout=10)
         cur = conn.cursor()
-        cur.execute("""
+        # Build NOT LIKE conditions for bypass signals
+        bypass_clauses = ""
+        params = []
+        if PROFIT_MONSTER_BYPASS_SIGNALS:
+            or_parts = ["signal LIKE %s"] * len(PROFIT_MONSTER_BYPASS_SIGNALS)
+            bypass_clauses = "AND NOT (" + " OR ".join(or_parts) + ")"
+            params = [f"%{s}%" for s in PROFIT_MONSTER_BYPASS_SIGNALS]
+        cur.execute(f"""
             SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time
             FROM trades
             WHERE server = 'Hermes' AND status = 'open'
               AND entry_price > 0 AND current_price > 0
+              {bypass_clauses}
             ORDER BY pnl_pct DESC
-        """)
+        """, params)
         rows = cur.fetchall()
         return [
             {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),

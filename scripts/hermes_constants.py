@@ -860,6 +860,11 @@ PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s 
 
 PM_DRY_RUN          = False  # global kill switch
 PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB amount_usdt unavailable
+# Signals bypassed by profit_monster — these trades get regular ATR SL/TP only.
+# Matches any signal containing the prefix (e.g. 'atr_spike+,rs-s36' matches 'atr_spike').
+PROFIT_MONSTER_BYPASS_SIGNALS = (
+    'atr_spike',
+)
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
 # ── Time / Peak Exit Kill Switches ──────────────────────────────────────────────
@@ -1223,7 +1228,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'tl_break_long', 'tl_break_short',
-    'hl_copy_trader',
+    'hl_copy_trader', 'atr_spike',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
