@@ -228,6 +228,27 @@ LONG_BLACKLIST = {
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
+# Favorites — proven performers (high WR + profitable + decent sample).
+# Future use: extra weight in scoring, priority in hotset, position sizing boost.
+FAVORITES = {
+    # High conviction: high WR + high volume + profitable
+    'SKR',     # 115T 55.7% WR +$2.10
+    '2Z',      # 105T 55.2% WR +$1.98
+    'CAKE',    # 50T  60.0% WR +$0.88
+    'ME',      # 90T  54.4% WR +$1.25
+    'BLUR',    # 86T  53.5% WR +$1.49
+    # High WR, lower sample
+    'GMT',     # 6T   83.3% WR +$0.25
+    'BANANA',  # 9T   77.8% WR +$0.17
+    'FIL',     # 7T   71.4% WR +$0.23
+    # Reliable + profitable
+    'ZRO',     # 13T  69.2% WR +$0.37
+    'MNT',     # 17T  64.7% WR +$0.36
+    'XLM',     # 38T  52.6% WR +$0.51
+    'STBL',    # 57T  50.9% WR +$0.84
+    'XRP',     # 30T  50.0% WR +$0.68
+}
+
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset
 SIGNAL_SOURCE_BLACKLIST = {
