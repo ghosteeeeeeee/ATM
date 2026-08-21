@@ -123,7 +123,7 @@ _HL_BLOCKLIST = {
     # the signals queue and block legitimate tokens. Added 2026-04-06.
     'KPEPE', 'KSHIB', 'KLUNC', 'KSHIBA', 'KLOKI', 'KNEIRO', 'KFLOKI', 'KBONK',
     # Other confirmed non-tradable
-    'WCT', 'SAGA', 'GOAT', 'IOTA', 'ZORA', 'AZTEC',
+    'WCT', 'SAGA', 'GOAT', 'IOTA', 'AZTEC',
     'TRX', 'RESOLV', 'HEMI', 'GMX', 'ALGO', 'HYPER',
     'SUPER',  # regime blindspot + HL blindspot
 }
