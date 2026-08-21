@@ -861,13 +861,30 @@ def write_signals():
 
 
 def write_signal_config():
-    """Write signal_config.json — list of signal names + enabled status."""
+    """Write signal_config.json — list of signal names + enabled status + flag name for toggling."""
     from signals import SIGNAL_REGISTRY, _resolve_enabled
+    import re as _re
+    # Explicit overrides for signals whose flag name doesn't follow the pattern
+    _FLAG_OVERRIDES = {
+        'ma300_candle_confirm': 'MA300_CANDLE_ENABLED',
+        'ma_100_cross_long': 'MA_100_CROSS_PLUS_ENABLED',
+        'ma_100_cross_short': 'MA_100_CROSS_MINUS_ENABLED',
+    }
     config = []
     for s in SIGNAL_REGISTRY:
+        name = s['name']
+        flag_name = s['enabled'] if isinstance(s['enabled'], str) else None
+        if not flag_name:
+            flag_name = _FLAG_OVERRIDES.get(name, name.upper() + '_ENABLED')
+            import hermes_constants as _hc
+            if not hasattr(_hc, flag_name):
+                base = _re.sub(r'_(PLUS|MINUS|LONG|SHORT|NEW)$', '', flag_name)
+                if hasattr(_hc, base):
+                    flag_name = base
         config.append({
-            'name': s['name'],
+            'name': name,
             'enabled': _resolve_enabled(s),
+            'flag': flag_name,
         })
     _atomic_write({'signals': config, 'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')}, SIGNAL_CONFIG_JSON)
 

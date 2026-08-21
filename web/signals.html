@@ -87,8 +87,10 @@
     .page-btn:disabled { opacity: 0.3; cursor: default; }
     .page-info { color: #666; font-size: 0.8em; }
     .signal-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; padding: 6px 0; border-bottom: 1px solid #1a1a2e; }
-    .signal-badge { padding: 2px 7px; border-radius: 3px; font-size: 0.65em; border: 1px solid; white-space: nowrap; }
+    .signal-badge { padding: 2px 7px; border-radius: 3px; font-size: 0.65em; border: 1px solid; white-space: nowrap; cursor: pointer; transition: opacity 0.15s; }
+    .signal-badge:hover { opacity: 0.7; }
     .signal-badge.on { background: #00ff8815; border-color: #00ff8844; color: #00ff88; }
+    .signal-badge.on.short { background: #ff444415; border-color: #ff444444; color: #ff4444; }
     .signal-badge.off { background: #1a1a2e; border-color: #333; color: #555; }
   </style>
 </head>
@@ -481,9 +483,28 @@
         const signals = d.signals || [];
         const on = signals.filter(s => s.enabled).length;
         document.getElementById('signalBadges').innerHTML =
-          signals.map(s => `<span class="signal-badge ${s.enabled ? 'on' : 'off'}">${s.name}</span>`).join('') +
+          signals.map(s => {
+            const cls = s.enabled ? ('on' + (s.name.includes('_short') ? ' short' : '')) : 'off';
+            return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}</span>`;
+          }).join('') +
           `<span style="color:#666;font-size:0.65em;margin-left:6px">${on}/${signals.length} enabled</span>`;
       } catch {}
+    }
+
+    async function toggleSignal(el) {
+      const flag = el.dataset.flag;
+      el.style.opacity = '0.4';
+      el.style.pointerEvents = 'none';
+      try {
+        const r = await fetch('/api/signal-toggle/toggle', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({flag})
+        });
+        const d = await r.json();
+        if (d.error) { el.style.opacity = '1'; el.style.pointerEvents = ''; return; }
+        loadSignalConfig();
+      } catch { el.style.opacity = '1'; el.style.pointerEvents = ''; }
     }
 
     load();
