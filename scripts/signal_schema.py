@@ -2349,6 +2349,7 @@ def get_approved_signals(hours=24):
     c = conn.cursor()
 
     # BUG-26 fix: select id so callers can do atomic claim with signal_id
+    # FIX: include signal_metadata so trader_wallet/score/win_rate flow to decider_run → brain.py
     c.execute('''
         SELECT id, token, direction,
                COUNT(*) as count,
@@ -2373,7 +2374,8 @@ def get_approved_signals(hours=24):
                       AND s3.decision = 'APPROVED'
                       AND s3.executed = 0
                     ORDER BY created_at DESC LIMIT 1), 1.0
-               )) as learned_sl_multiplier
+               )) as learned_sl_multiplier,
+               MAX(signal_metadata) as signal_metadata
         FROM signals
         WHERE decision='APPROVED' AND executed=0
           AND created_at > datetime('now','-'||?||' hours')

@@ -1892,9 +1892,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         INSERT INTO signals (
                                             token, direction, signal_type, source, confidence,
                                             decision, executed, z_score, survival_rounds,
-                                            hot_cycle_count, combo_key, price, created_at,
-                                            updated_at
-                                        ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?,
+                                            hot_cycle_count, combo_key, price, signal_metadata,
+                                            created_at, updated_at
+                                        ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?, ?,
                                             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                                     """, (
                                         pe['token'], pe.get('direction',''),
@@ -1905,6 +1905,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         int(pe.get('rounds', 1)),
                                         _pe_ck,
                                         pe.get('price') or 0,
+                                        pe.get('signal_metadata') or '{}',
                                     ))
                                 log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
                             except Exception as _e:
@@ -2250,6 +2251,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'price_acceleration': e['price_acceleration'],
                 'momentum_score': e['momentum_score'],
                 'speed_percentile': e['speed_percentile'],
+                'signal_metadata': e.get('signal_metadata'),     # FIX: carry trader metadata (wallet, score, etc.) to hotset.json
                 'timestamp': time.time(),
             })
 

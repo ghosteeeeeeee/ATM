@@ -947,10 +947,9 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         TAKER_FEE = 0.00045
         leverage = float(row.get('leverage') or 10)
         entry_fee_paid = float(row.get('entry_fee') or 0)
-        # BUG-FIX (2026-05-18): Fees must be calculated from actual HL notional
-        # (calc_notional ≈ $7), not signal-level amount_usdt (≈ $50).
-        # Using amount_usdt inflates fees by ~7x and understates net PnL.
-        notional = calc_notional * leverage
+        # calc_notional already includes leverage (amount_usdt * leverage when
+        # hl_notional_usdt is NULL, or hl_notional_usdt which is the actual notional).
+        notional = calc_notional
 
         # If entry_fee was never recorded, calculate it now
         if entry_fee_paid == 0 and notional > 0:

@@ -1,6 +1,6 @@
 # Upgrade Audit Trail
 
-**Last scanned:** 2026-08-20
+**Last scanned:** 2026-08-21 05:50
 
 ---
 
@@ -83,3 +83,67 @@
 - **Value:** HIGH
 - **Status:** KILLED (signal tested, 42.4% WR -$0.42/7d, in NEVER_REENABLE_FLAGS)
 - **Reason:** Phase 2 EXISTS as `signals/coin_tracker_hot.py`. Tested and killed 2026-08-17. ct-hot+ 35% WR, ct-hot- 0% WR. MIN_COMPOSITE raised to 75 during testing but signal still underperformed. All 3 flags (COIN_TRACKER_HOT_ENABLED, _PLUS, _MINUS) set False.
+
+## Plan: atr-spike-signal-build.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Build ATR Spike signal v5 — catch staged moves from ATR compression with quality gates
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** `scripts/signals/atr_spike.py` exists and is live (ATR_SPIKE_ENABLED=True). Quality gates (trend, EMA proximity, volatility, regime) all in place. Backtested 83% WR raw, 78.5% with gates.
+
+## Plan: atr-spike-backtest-results.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Backtest results and token quality ratings for ATR spike signal
+- **Difficulty:** Level 1 (analysis only)
+- **Value:** MEDIUM
+- **Status:** IMPLEMENTED
+- **Reason:** Backtest complete. Signal live. Token tiers rated (WCT/IMX/IO/W = Tier 1).
+
+## Plan: imx-spike-detection.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Detect ATR compression → breakout on IMX (parent plan for atr_spike)
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** Parent plan for atr_spike signal. All components delivered.
+
+## Plan: sl-tuning.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Tune SL for ATR spike signal — 0.75% recommended, two signal modes
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** ANALYSIS COMPLETE
+- **Reason:** 0.75% SL already implemented in atr_spike.py. Two-mode recommendation (breakout + trend) is a future enhancement, not a bug fix. No code changes needed.
+
+## Plan: 2026-08-19_short-bias-fix.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Fix short bias — revert EMA penalty (dead code), keep STANDALONE_BYPASS
+- **Difficulty:** Level 1
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** EMA penalty reverted (not found in tl_break.py). STANDALONE_BYPASS retained for tl_break_long/short. Trend Alignment confirmed as primary filter (counter-trend SHORTs = 26% WR).
+
+## Plan: confidence-calibration-plan.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Fix non-monotonic confidence curve — proposed fix rejected
+- **Difficulty:** Level 2
+- **Value:** LOW
+- **Status:** INVESTIGATION COMPLETE (no action needed)
+- **Reason:** CONF_FILTER_MAX=89 already blocks raw conf ≥ 90. Non-monotonic curve is noise (15 trades per extreme tier, CIs overlap 50%). Proposed fix was redundant and risky. Highest ROI: per-signal-type quality analysis.
+
+## Plan: copy-trader-evolution-spec.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Per-trader performance tracking + trader exit correlation
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** IMPLEMENTED
+- **Reason:** `trader_performance` table exists in hl_copy_db.py. `check_trader_exits()` and `update_trader_performance()` exist in hl_fill_monitor.py. COPY_TRADE_EXIT_ENABLED=True. Bypass `'hl_copy_trader'` added to PROFIT_MONSTER_BYPASS_SIGNALS.
+
+## Plan: retroactive-scan-delayed-entry.md
+- **Date scanned:** 2026-08-21 05:50
+- **Core request:** Secondary scan for missed breakouts — retroactive signals with lower confidence
+- **Difficulty:** Level 3
+- **Value:** HIGH
+- **Status:** NOT IMPLEMENTED
+- **Reason:** 0 RETRO_ constants in hermes_constants.py. Nothing in breakout_engine.py. This is the only major plan still pending. Requires ~200 LOC in breakout_engine.py + constants + hotset writer.

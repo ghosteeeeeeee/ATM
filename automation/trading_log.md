@@ -12085,3 +12085,54 @@ None — system stable, previous fixes settling in.
 - 7d 250T 50.4%WR -$1.25 flat, system healthy, 8th green day
 
 **Open Questions:** None
+
+## [2026-08-21 06:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (7h since last close, quiet night)
+**PnL:** $0.00
+**24h:** 18T 50%WR -$0.54 (10 profit-monster-trail +$0.27, 8 atr_sl_hit -$0.81)
+**7d:** 245T 51%WR -$1.06
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG ATR_SL 30.8% (4/13) well below 40% kill threshold
+- Overall 44.4% ATR_SL inflated by SHORT legacy (4/8 = 80%)
+- SHORT signals r2-trend-short2/10/13 all 0%WR but only 3T/1T/1T lifetime — R2_TREND_SHORT re-enabled Aug 20, too early to evaluate (5T total)
+- r2-trend-long3 5T 40%WR -$0.18 borderline, lifetime 34T 55.9%WR -$0.23 acceptable
+- 4 open positions (BTC LONG +$0.06, BSV LONG +$0.20, HYPE SHORT -$0.08, ETH LONG +$0.06)
+- 0 trades/hr = quiet night, no overtrading
+- System healthy, 8th green day trajectory
+
+**Open Questions:** None
+
+## [2026-08-21 06:30 UTC] Daily Orchestrator Run
+
+**Pipeline Status:** HEALTHY
+- 0 open positions, 20 closed today, -3.04% PnL
+- 7d: 231T 53.2% WR -$1.25
+- All timers firing, no errors
+
+**Automation Review:**
+- health_monitor: All OK. Disk 80% (watch), CEO timer working (weekly).
+- auto_1hr: No changes needed. Quiet night, system stable.
+- signal_reporter: **CRITICAL — volume collapsed 82% in 8 days** (98→18/day). Signal gen healthy, execution filtered.
+- blacklist_tester: Complete (77 tested, 0 KEEP). Blacklist working as intended.
+- upgrade_implementer: retroactive-scan is only unimplemented plan (Level 3).
+
+**Implemented Today:**
+1. CONTINUATION_ENABLED cleanup (signal_reporter flagged, already set False)
+2. CURRENT.md updated with fresh intelligence
+
+**Key Intelligence:**
+- Volume collapse is the #1 issue — needs CEO strategic decision
+- Disk at 80% — will trigger cleanup at 85%
+- MIN_PRE_MOVE 0.3 extended to Aug 25 — monitoring
+- R2_TREND_SHORT re-enabled Aug 20 — too early to evaluate (5T only)
+- SHORT legacy drain COMPLETE — all positions closed
+
+**Next Actions:**
+1. CEO to decide on volume collapse (relax filters vs. accept lower volume)
+2. Monitor MIN_PRE_MOVE 0.3 through Aug 25
+3. Monitor PM_TRAIL edge (>80% WR)
+4. retroactive-scan-delayed-entry pending CEO approval

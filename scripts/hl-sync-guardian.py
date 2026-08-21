@@ -572,6 +572,7 @@ def _backfill_hl_pnl_recent_closes():
     """
     import psycopg2
     from _secrets import BRAIN_DB_DICT
+    conn = None
     try:
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
@@ -589,7 +590,6 @@ def _backfill_hl_pnl_recent_closes():
         ''')
         recent = cur.fetchall()
         if not recent:
-            conn.close()
             return
 
         log(f'HL PNL backfill: found {len(recent)} recently closed trades to check', 'INFO')
@@ -600,8 +600,6 @@ def _backfill_hl_pnl_recent_closes():
                 continue  # Too fresh — HL fills may not have propagated
 
             entry_px = float(entry_price)
-            amt = float(amount_usdt) if amount_usdt else 11.0
-            lev = float(leverage) if leverage else 10
 
             # Fetch HL fills for this token
             window_end = int(time.time() * 1000)
@@ -619,6 +617,8 @@ def _backfill_hl_pnl_recent_closes():
 
             # Compute HL-based pnl_pct from actual fill prices
             total_sz = sum(f['sz'] for f in close_fills)
+            if total_sz == 0:
+                continue
             wavg_exit = sum(f['px'] * f['sz'] for f in close_fills) / total_sz
             if direction == 'SHORT':
                 hl_pnl_pct = ((entry_px - wavg_exit) / entry_px) * 100
@@ -643,9 +643,14 @@ def _backfill_hl_pnl_recent_closes():
 
         if updated:
             log(f'HL PNL backfill complete: {updated}/{len(recent)} updated', 'INFO')
-        conn.close()
     except Exception as e:
         log(f'HL PNL backfill error: {e}', 'FAIL')
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 # ── BUG-4/15: Persistent closed-trade dedup set ─────────────────────────────────

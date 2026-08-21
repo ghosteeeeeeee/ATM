@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 06:00 UTC (CEO run)**
-**Updated by: CEO**
+**Last Updated: 2026-08-21 06:30 UTC (daily orchestrator)**
+**Updated by: daily-orchestrator**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE.
 
-**Current status:** System HEALTHY — 24h 18T -$0.54, 50.0% WR (flat, SHORT legacy fully cleared). 7d: 250T -$1.25, 50.4% WR. PM_TRAIL: 132T/7d +$4.90, 82.6% WR (carrying system). ATR_SL: 92T/7d -$6.86, historic low count. 0 open positions (clean). SHORT legacy drain COMPLETE — all positions closed. continuation+ 0T since Aug 16 kill (legacy only). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 20T -3.04% PnL, 60% WR (night session). 7d: 231T -$1.25, 53.2% WR. PM_TRAIL carrying system. ATR_SL at historic low count. 0 open positions (short legacy drain COMPLETE). R2_TREND_SHORT re-enabled Aug 20: 5T/48h 0% WR -$0.47 (legacy clears, too early to evaluate). continuation+ DISABLED (CONTINUATION_ENABLED=False, cleanup). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked. **Volume collapsed 82% in 8 days (98→18 trades/day) — signal generation healthy but execution pipeline heavily filtered.** Disk at 80% (90G/118G).
 
 ## Active Decisions
 
@@ -26,12 +26,14 @@
 - **SL FLOOR BUG FIXED.** tpsl_utils.py 8 lines — 89% of ATR_SL hits (126/141) had SL < 1.0% from entry. Floor now enforced after every one-way gate. Monitor 48h for ATR_SL reduction. — 2026-08-19
 - **conf-filter-plan DEPLOYED.** CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89. TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier 114T 49.1% WR -$1.38 now blocked. — 2026-08-19
 - **mover+ KILLED (signal_reporter).** 28.6% WR, -$0.15/7d. Master + SHORT disabled, added to NEVER_REENABLE_FLAGS. — 2026-08-20
-- **R2_TREND_SHORT_ENABLED False (CEO KILLED Aug 20).** 3T/48h 0% WR -$0.23. NEUTRAL market too sideways for -0.003 slope filter. All ATR_SL hits. Added to NEVER_REENABLE_FLAGS. — 2026-08-20
+- **R2_TREND_SHORT re-enabled (CEO Aug 20).** RSI inversion fix + MIN_SLOPE enforcement + threshold tightening. 5T/48h 0% WR -$0.47 — all legacy clears from pre-kill, too early to evaluate new signals. CEO_PROTECTED. — 2026-08-20
 - **stop_hunt_reversal_long+ KILLED (CEO KILLED Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38/48h. Break-even not good enough — system needs edge. NEVER_REENABLE. — 2026-08-20
 - **SHORT legacy drain COMPLETE.** All remaining SHORT positions (r2-trend-short2/10/13) closed. 0 open positions. — 2026-08-21
 
 ## Known Limitations
 
+- **Volume collapse (CRITICAL)** — Trade volume dropped 82% in 8 days (98→18 trades/day). Signal generation healthy (hl_copy_plus: 209 signals/day) but execution pipeline heavily filtered. Root causes: confluence gate, dead_hours, velocity filters, broad_market_z gate, 392 tokens in cooldown. Strategic decision needed: tighten filters vs. accept lower volume. — 2026-08-21
+- **Disk at 80%** — 90G/118G used. Will trigger cleanup at 85%. Monitor. — 2026-08-21
 - **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). 3 stale records cleaned (ids 10211-10213). — 2026-08-17
 - **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS even when 15m/4h is NEUTRAL. — 2026-08-16
 - **SHORT side structural weakness** — ALL legacy SHORT positions now closed (0 open). Gap remains: no active SHORT signals for SHORT_BIAS regime. — 2026-08-21
@@ -40,7 +42,7 @@
 
 ## System Improvement Backlog
 
-1. **SHORT side signals** — R2_TREND_SHORT killed (0% WR in NEUTRAL). Need new SHORT signals for SHORT_BIAS regime. — 2026-08-20
+1. **SHORT side signals** — R2_TREND_SHORT re-enabled Aug 20 (RSI fix). Monitor for edge. Need more SHORT signals for SHORT_BIAS regime. — 2026-08-21
 2. Higher-timeframe regime for confluence relaxation (1m too noisy)
 3. Confidence scorer recalibration (real fix for non-monotonic conf curve)
 
@@ -52,8 +54,10 @@
 
 ## Next Actions
 
-1. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 48h: 9T $0.00 66.7% WR (break-even, WR improved but PnL flat). If still break-even by Aug 25, filter is noise-reducing not edge-creating — consider removing. — 2026-08-21
-2. **Monitor PM_TRAIL edge.** 138T/7d +$5.11, 82.6% WR. Must hold >80%. — 2026-08-21
-3. **Monitor ATR_SL count.** 96T/7d -$7.21, 1% WR. SL floor fix active. — 2026-08-21
-4. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20
-5. **Confidence scorer recalibration.** 90+ tier has 48.7% WR (worst tier). Real fix for non-monotonic conf curve. — 2026-08-20
+1. **Address volume collapse (CEO decision required).** 82% drop in 8 days. Signal generation healthy, execution pipeline filtered. Options: (a) relax filters (confluence, dead_hours, velocity), (b) accept lower volume with higher quality, (c) add more signals to offset filtering. — 2026-08-21
+2. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21
+3. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-21
+4. **Monitor R2_TREND_SHORT.** Re-enabled Aug 20, only 5T data. Too early to evaluate. — 2026-08-21
+5. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. Plan ready. CEO to approve or defer. — 2026-08-21
+6. **Higher-TF regime for confluence.** 1m regime too noisy. — 2026-08-20
+7. **Confidence scorer recalibration.** 90+ tier worst WR. — 2026-08-20

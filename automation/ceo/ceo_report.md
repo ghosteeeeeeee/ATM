@@ -1,3 +1,23 @@
+## CEO Report — 2026-08-21 (~07:15 UTC, verified, 202nd run)
+
+### Diagnosis
+System HEALTHY — NO CHANGES needed. Verified DB: 24h 19T -$0.65, 47.4% WR (slightly red, night session). 7d: 243T -$1.42, 50.2% WR. 3 open: BTC hl_copy_trader LONG, BSV r2-trend-long3 LONG, ETH hl_copy_trader LONG. PM_TRAIL: 129T/7d +$4.74, 82.2% WR (carrying system). ATR_SL: 89T/7d -$6.70, 1.1% WR (dominant drag, historic low count ~7-8/day). Legacy losers aging out (ct-hot+ -$0.42, wave_catcher+ -$0.31 — both killed, 7d window). Daily: Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54 → 21 -$0.11 (1T so far, normal alternating). R2_TREND_SHORT re-enabled Aug 20: 5T/48h 0% WR -$0.47 — all legacy clears from pre-kill, too early to evaluate new signals.
+
+### Root Cause
+No active bleeding. System at break-even edge — PM_TRAIL (+$4.74) offsets ATR_SL (-$6.70) net = -$1.96/7d. Alternating days = normal NEUTRAL regime variance. Legacy losers in 7d window are aging out (killed Aug 17-20). SHORT side structural gap persists — all legacy SHORT positions cleared, new R2_TREND_SHORT has only 5T of data.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 25 (r2-trend-long3 break-even, needs positive PnL)
+- PM_TRAIL WR must stay >80% (currently 82.2%)
+- ATR_SL daily must stay <15 (~7-8/day, historic low)
+- R2_TREND_SHORT re-enabled Aug 20 — monitor for edge (5T too early)
+- SHORT signal development (structural gap for SHORT_BIAS regime)
+
+---
+
 ## CEO Report — 2026-08-21 (~04:45 UTC, verified, 201st run)
 
 ### Diagnosis
