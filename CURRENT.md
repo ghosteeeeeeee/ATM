@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 22:00 UTC (CEO run)**
+**Last Updated: 2026-08-21 22:30 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE.
 
-**Current status:** System HEALTHY, FLAT. Verified DB: 24h 38T +$0.95, 50% WR (slightly green). 48h: 60T +$0.33, 50% WR (flat). 7d: 237T +$0.27, 50.6% WR (barely positive). 3 open: hl_copy_trader LONG BTC/ETH/HYPE (all positive copy-trades). ATR_SL: 28T/48h -$3.41 (ONLY loss source, historic low count). r2-trend-long6 6T/7d +$0.40 100% WR (best signal, 0% ATR_SL — bars_since>=6 filter). ct-hot+ ages out Aug 22-23. Legacy SHORT 0% WR draining. Disk: 81%.
+**Current status:** System HEALTHY, FLAT. Verified DB: 24h 38T +$0.95, 50% WR (flat). 7d: 237T +$0.27, 50.6% WR (barely positive). ATR_SL 27T/48h -$3.29 (ONLY loss source). PM_TRAIL 103T/7d +$4.18, 83% WR (carrying system). r2-trend-long6 6T/7d +$0.40 100% WR (best signal). Legacy SHORT ALL 0% WR draining (die Aug 22-23). **DISCOVERY: Coin tracker Wyckoff detection BROKEN — 0/109 tokens have phase detected (all 'none'). 4h candles stale since May 28.** Disk: 81%.
 
 ## Active Decisions
 
@@ -38,12 +38,16 @@
 - **SHORT side structural weakness** — ALL legacy SHORT positions draining (27T/7d 18.5% WR -$1.09). R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h — no edge found. — 2026-08-21
 - **MIN_PRE_MOVE 0.3 eval EXTENDED** — r2-trend-long3 48h: 9T $0.00 66.7% WR (WR improved 55.9%→66.7% but PnL break-even). PM_TRAIL captures winners, ATR_SL hits losers. EXTENDED through Aug 25 (needs PnL positive to justify filter). — 2026-08-21
 - **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
+- **Coin tracker Wyckoff detection BROKEN** — 0/109 tokens have phase detected (all 'none'). detect_wyckoff_phase() returns 'none' for all despite sufficient 1h candle data. Coin tracker intelligence non-functional. DELEGATED to bug_hunter. — 2026-08-21
+- **4h candles stale since May 28** — price_collector.py line 565 disabled. Elliott Wave detection using stale data. Need to re-enable 4h candle collection. — 2026-08-21
 
 ## System Improvement Backlog
 
-1. **SHORT side signals (CEO PRIORITY)** — R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h. Need new SHORT signal with edge for SHORT_BIAS regime. Delegate to signal_analyst. — 2026-08-21
-2. Higher-timeframe regime for confluence relaxation (1m too noisy)
-3. Confidence scorer recalibration (real fix for non-monotonic conf curve)
+1. **Coin tracker Wyckoff detection fix (CEO PRIORITY)** — 0/109 tokens have phase detected. detect_wyckoff_phase() broken. DELEGATED to bug_hunter. — 2026-08-21
+2. **SHORT side signals (CEO PRIORITY)** — R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h. Need new SHORT signal with edge for SHORT_BIAS regime. DELEGATED to signal_analyst. — 2026-08-21
+3. **Re-enable 4h candle collection** — price_collector.py line 365 disabled. Elliott Wave detection stale. — 2026-08-21
+4. Higher-timeframe regime for confluence relaxation (1m too noisy)
+5. Confidence scorer recalibration (real fix for non-monotonic conf curve)
 
 ## What NOT To Do
 
@@ -53,11 +57,13 @@
 
 ## Next Actions
 
-1. **Monitor ct-hot+ stay killed.** 42.6% WR 7d, MIN_COMPOSITE now 70. Only T can re-enable. — 2026-08-21
-2. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21
-3. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-21
-4. **Monitor R2_TREND_SHORT.** Re-enabled Aug 20, 0 trades/48h. No edge found yet. — 2026-08-21
-5. **SHORT side signal development (CEO priority).** 27T/7d 18.5% WR -$1.09. Structural weakness. Need new SHORT signal for SHORT_BIAS regime. — 2026-08-21
-6. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. Plan ready. CEO to approve or defer. — 2026-08-21
-7. **Higher-TF regime for confluence.** 1m regime too noisy. — 2026-08-20
-8. **Confidence scorer recalibration.** 90+ tier worst WR. — 2026-08-20
+1. **Monitor bug_hunter Wyckoff fix.** 0/109 tokens detected. Coin tracker intelligence non-functional. — 2026-08-21
+2. **Monitor signal_analyst SHORT signal build.** Need new SHORT signal for SHORT_BIAS regime. — 2026-08-21
+3. **Re-enable 4h candle collection.** Uncomment price_collector.py line 565. — 2026-08-21
+4. **Monitor ct-hot+ stay killed.** 42.6% WR 7d, MIN_COMPOSITE now 70. Only T can re-enable. — 2026-08-21
+5. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21
+6. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-21
+7. **Monitor R2_TREND_SHORT.** Re-enabled Aug 20, 0 trades/48h. No edge found yet. — 2026-08-21
+8. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. Plan ready. CEO to approve or defer. — 2026-08-21
+9. **Higher-TF regime for confluence.** 1m regime too noisy. — 2026-08-20
+10. **Confidence scorer recalibration.** 90+ tier worst WR. — 2026-08-20
