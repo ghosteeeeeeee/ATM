@@ -1198,6 +1198,7 @@ CEO_PROTECTED_FLAGS = {
     'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 60+, standalone bypass. Only T can change', '2026-08-21'),
     'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-21 — LONG direction for coin_tracker_hot. Only T can change', '2026-08-21'),
     'COIN_TRACKER_HOT_MINUS_ENABLED': ('SHORT disabled — long only for now. Only T can change', '2026-08-21'),
+    'TIME_BLOCK_ENABLED': ('Disabled 2026-08-21 — was blocking all signals 01-06 UTC. Only T can change', '2026-08-21'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
