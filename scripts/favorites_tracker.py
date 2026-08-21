@@ -67,7 +67,7 @@ def get_favorites_stats():
         """, (list(FAVORITES),))
 
         columns = [desc[0] for desc in cur.description]
-        favorites_stats = [dict(zip(columns, row)) for row in cur.fetchall()]
+        favorites_stats = [dict(zip(columns, [float(v) if hasattr(v, '__float__') else v for v in row])) for row in cur.fetchall()]
 
         # Field comparison (non-favorites)
         cur.execute(f"""
@@ -86,7 +86,11 @@ def get_favorites_stats():
         """, (list(FAVORITES),))
 
         field_row = cur.fetchone()
-        field_stats = dict(zip(['trades', 'wins', 'winrate', 'avg_pnl_pct', 'total_pnl_usdt'], field_row)) if field_row else {}
+        if field_row:
+            raw = dict(zip(['trades', 'wins', 'winrate', 'avg_pnl_pct', 'total_pnl_usdt'], field_row))
+            field_stats = {k: float(v) if hasattr(v, '__float__') else v for k, v in raw.items()}
+        else:
+            field_stats = {}
 
         return favorites_stats, field_stats
 
