@@ -884,7 +884,7 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # Signals bypassed by profit_monster — these trades get regular ATR SL/TP only.
 # Matches any signal containing the prefix (e.g. 'atr-spike+,rs-s36' matches 'atr-spike').
 PROFIT_MONSTER_BYPASS_SIGNALS = (
-    'atr-spike', 'r2-trend-long',
+    'atr-spike', 'r2-trend-long', 'ct-hot+',
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
