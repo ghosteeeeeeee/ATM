@@ -80,9 +80,14 @@ def compute_close_pnl(
     exit_price: float,
     direction: Direction,
     calc_notional: float,
+    amount_usdt: float = 0,
 ) -> tuple[float, float, float]:
     """
     Compute pnl_pct and pnl_usdt at position close.
+
+    pnl_pct = return on margin (pnl_usdt / amount_usdt * 100) when amount_usdt provided,
+              else raw price move % (fallback for legacy callers).
+    pnl_usdt = calc_notional * raw_price_move.
 
     Returns:
         (pnl_pct, pnl_usdt, net_pnl) — net_pnl subtracts standard HL fees (0.045% × 2)
@@ -90,8 +95,14 @@ def compute_close_pnl(
     if entry_price <= 0:
         return (0.0, 0.0, 0.0)
 
-    pnl_pct = compute_live_pnl(entry_price, exit_price, direction)
-    pnl_usdt = compute_pnl_usdt(pnl_pct, calc_notional)
+    raw_move = compute_live_pnl(entry_price, exit_price, direction)
+    pnl_usdt = compute_pnl_usdt(raw_move, calc_notional)
+
+    # pnl_pct = return on margin when amount_usdt provided
+    if amount_usdt > 0:
+        pnl_pct = round(pnl_usdt / amount_usdt * 100, 4)
+    else:
+        pnl_pct = raw_move  # fallback: raw price move
 
     # HL fees: 0.045% per side, so 0.09% total for a round trip
     fee_total = calc_notional * 0.0009

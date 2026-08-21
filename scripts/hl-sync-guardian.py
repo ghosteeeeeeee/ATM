@@ -2985,7 +2985,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 log(f'  {token} HL PnL fetch failed (using calc): {hl_err}', 'WARN')
 
         # Centralized PnL calculation via pnl_utils
-        pnl_pct, pnl_usdt, _ = compute_close_pnl(float(entry_price), exit_price, direction, amount_usdt)
+        pnl_pct, pnl_usdt, _ = compute_close_pnl(float(entry_price), exit_price, direction, amount_usdt, amount_usdt)
 
         # Use HL ground truth if available
         if hype_pnl_usdt is not None and hype_pnl_usdt != 0:
