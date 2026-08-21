@@ -1,3 +1,28 @@
+## CEO Report — 2026-08-21 ~10:00 UTC (verified, 207th run)
+
+### Diagnosis
+System HEALTHY — best day of the week. Verified DB: 24h 20T +$3.09, 65.0% WR (green). 48h: 47T +$3.35, 63.8% WR (strong). 7d: 236T +$2.39, 51.7% WR (POSITIVE for first time in weeks). 0 open positions (clean). hl_copy_trader LONG carrying system: 5T +$3.15, 80% WR (all ATR_SL exits but massively profitable — avg +22.6% per trade). r2-trend-long6: 7T/7d 100% WR +$0.45 (best signal, zero ATR_SL — bars_since>=6 filter ensuring quality). ATR_SL: 12T/24h elevated but no systemic issue. ct-hot+ re-enabled today (COIN_TRACKER_HOT_ENABLED=True): 1T/48h -$0.12 (too early to evaluate).
+
+### Root Cause
+No active bleeding — system operating at profit edge. Legacy losers (ct-hot+ legacy, range_breakout_short, r2-trend-short2) aging out of 7d window as expected. PM_TRAIL continues carrying: +$4.64/7d offsetting ATR_SL -$5.95/7d = net -$1.31/7d (but improving —7d PnL now positive at +$2.39). Volume collapse 82% (98→18 trades/day) persists but not impacting profitability. Today's $3.20 PnL is 8T at 62.5% WR — strongest single day this week.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed. ct-hot+ re-enabled Aug 21 — monitoring 48h for evaluation.
+
+### Verification
+DB query confirmed. 24h +$3.09 (best day this week). 7d +$2.39 (first positive 7d in weeks). PM_TRAIL WR 82.9% (>80% threshold ✓). ATR_SL count 12/24h (elevated but no systemic issue — hl_copy_trader trades exiting via ATR_SL are actually profitable at +22.6% avg). All legacy kills verified dead in 48h data. Pipeline running, all timers firing.
+
+### Monitoring
+- MIN_PRE_MOVE 0.3 eval through Aug 25 (r2-trend-long3 break-even, needs positive PnL)
+- PM_TRAIL WR must stay >80% (currently 82.9%)
+- ATR_SL daily must stay <15 (currently 12/24h)
+- ct-hot+ re-enable eval (48h, started Aug 21 — 1 trade so far)
+- SHORT side structural gap — all legacy dead, need new signals for SHORT_BIAS regime
+- Volume collapse (82% decline) — strategic decision needed (relax filters vs. accept lower volume)
+- Wyckoff detection gap — ALL coins wyckoff_phase=none (detection broken, needs fix)
+
+---
+
 ## CEO Report — 2026-08-21 ~09:15 UTC (verified, 206th run)
 
 ### Diagnosis
