@@ -754,7 +754,7 @@ CONF_FILTER_MAX = 89                    # block if confidence >= this value
 # Block entries between 01:00-06:00 UTC (Asian session close, low-liquidity
 # pre-market). 83T 33W (39.8%) -$1.34 in this window.
 # Plan: conf-filter-plan.md (2026-08-19)
-TIME_BLOCK_ENABLED = True
+TIME_BLOCK_ENABLED = False  # Disabled 2026-08-21 — blocking all signals during 01-06 UTC
 TIME_BLOCK_START = 1                    # UTC hour (inclusive)
 TIME_BLOCK_END = 6                      # UTC hour (exclusive: blocks 01:00-05:59)
 
