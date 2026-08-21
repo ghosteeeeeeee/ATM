@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.WARNING,
                     datefmt='%Y-%m-%d %H:%M:%S')
 _log = logging.getLogger(__name__)
 try:
-    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, DEFAULT_TRADE_SIZE_USDT
+    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, DEFAULT_TRADE_SIZE_USDT, STANDALONE_BYPASS_SIGNALS
     from tokens import is_solana_only
 except Exception as e:
     # [FIX-BUG4] Don't silently redefine constants — fail visibly so the missing
@@ -870,6 +870,8 @@ def write_signal_config():
         'ma_100_cross_long': 'MA_100_CROSS_PLUS_ENABLED',
         'ma_100_cross_short': 'MA_100_CROSS_MINUS_ENABLED',
     }
+    # Normalize bypass list to underscores for comparison
+    bypass_normalized = {s.replace('-', '_') for s in STANDALONE_BYPASS_SIGNALS}
     config = []
     for s in SIGNAL_REGISTRY:
         name = s['name']
@@ -885,6 +887,7 @@ def write_signal_config():
             'name': name,
             'enabled': _resolve_enabled(s),
             'flag': flag_name,
+            'bypass': name in bypass_normalized,
         })
     _atomic_write({'signals': config, 'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')}, SIGNAL_CONFIG_JSON)
 

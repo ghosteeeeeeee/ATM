@@ -14,6 +14,7 @@ from hermes_constants import (
     CL_TIER1_MIN_PCT, CL_TIER1_MAX_PCT, CL_TIER1_MAX_CLOSE, CL_TIER1_SKIP_BOTTOM_PCT, CL_TIER1_FIRE_WINDOWS,
     CL_TIER2_MIN_PCT, CL_TIER2_MAX_PCT, CL_TIER2_MAX_CLOSE, CL_TIER2_SKIP_BOTTOM_PCT, CL_TIER2_FIRE_WINDOWS,
     CL_TRAIL_ENABLED, CL_TRAIL_ACTIVATE_PCT, CL_TRAIL_RECOVER_PCT, CL_TRAIL_MIN_HOLD, CL_TRAIL_FIRE_WINDOWS,
+    PROFIT_MONSTER_BYPASS_SIGNALS,
 )
 import sys, os, json, time, random, argparse
 from datetime import datetime
@@ -56,13 +57,21 @@ def get_losing_positions():
         conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
                                 password=BRAIN_PASSWORD, connect_timeout=10)
         cur = conn.cursor()
-        cur.execute("""
+        # Build NOT LIKE conditions for bypass signals
+        bypass_clauses = ""
+        params = []
+        if PROFIT_MONSTER_BYPASS_SIGNALS:
+            or_parts = ["signal LIKE %s"] * len(PROFIT_MONSTER_BYPASS_SIGNALS)
+            bypass_clauses = "AND NOT (" + " OR ".join(or_parts) + ")"
+            params = [f"%{s}%" for s in PROFIT_MONSTER_BYPASS_SIGNALS]
+        cur.execute(f"""
             SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time
             FROM trades
             WHERE server = 'Hermes' AND status = 'open'
               AND entry_price > 0 AND current_price > 0
+              {bypass_clauses}
             ORDER BY pnl_pct ASC
-        """)
+        """, params)
         rows = cur.fetchall()
         conn.close()
         return [

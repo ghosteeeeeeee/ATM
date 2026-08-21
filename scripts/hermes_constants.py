@@ -863,7 +863,7 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # Signals bypassed by profit_monster — these trades get regular ATR SL/TP only.
 # Matches any signal containing the prefix (e.g. 'atr_spike+,rs-s36' matches 'atr_spike').
 PROFIT_MONSTER_BYPASS_SIGNALS = (
-    'atr_spike',
+    'atr_spike', 'r2-trend-long',
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -1228,7 +1228,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'tl_break_long', 'tl_break_short',
-    'hl_copy_trader', 'atr_spike',
+    'hl_copy_trader', 'atr-spike',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1368,7 +1368,7 @@ PHASE_ACCEL_MINUS_ENABLED  = True   # phase-accel- — PASS (was not blacklisted
 PUMP_HUNTER_ENABLED        = False  # set False to block pump_hunter from firing
 # DEPRECATED — zscore_pump_hunter.py is disabled.
 # Pipeline-integrated version is signals/zscore_pump.py (uses tpsl_utils via signal_compactor).
-ZSCORE_PUMP_ENABLED        = False  # True = old standalone would fire (BLOCKED — use signals/zscore_pump.py)
+ZSCORE_PUMP_ENABLED        = True  # True = old standalone would fire (BLOCKED — use signals/zscore_pump.py)
 # Z-Score Pump (pipeline-integrated signal — migrated from standalone zscore_pump_hunter.py)
 ZSCORE_PUMP_NEW_ENABLED    = False   # master kill-switch for signals/zscore_pump.py (new pipeline)
 ZSCORE_PUMP_PLUS_ENABLED   = True   # zscore-pump+ LONG — PASS

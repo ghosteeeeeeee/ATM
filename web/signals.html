@@ -92,6 +92,7 @@
     .signal-badge.on { background: #00ff8815; border-color: #00ff8844; color: #00ff88; }
     .signal-badge.on.short { background: #ff444415; border-color: #ff444444; color: #ff4444; }
     .signal-badge.off { background: #1a1a2e; border-color: #333; color: #555; }
+    .signal-badge .bp { color: #ffd700; font-size: 0.9em; margin-left: 3px; text-shadow: 0 0 4px #ffd70066; }
   </style>
 </head>
 <body>
@@ -485,7 +486,8 @@
         document.getElementById('signalBadges').innerHTML =
           signals.map(s => {
             const cls = s.enabled ? ('on' + (s.name.includes('_short') ? ' short' : '')) : 'off';
-            return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}</span>`;
+            const bp = s.bypass ? '<span class="bp" title="standalone bypass">🪙</span>' : '';
+            return `<span class="signal-badge ${cls}" data-flag="${s.flag}" onclick="toggleSignal(this)">${s.name}${bp}</span>`;
           }).join('') +
           `<span style="color:#666;font-size:0.65em;margin-left:6px">${on}/${signals.length} enabled</span>`;
       } catch {}

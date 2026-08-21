@@ -75,6 +75,7 @@ def _regenerate_config():
             'ma_100_cross_short': 'MA_100_CROSS_MINUS_ENABLED',
         }
         import hermes_constants as hc
+        bypass_normalized = {s.replace('-', '_') for s in getattr(hc, 'STANDALONE_BYPASS_SIGNALS', ())}
         config = []
         for s in SIGNAL_REGISTRY:
             name = s['name']
@@ -85,7 +86,7 @@ def _regenerate_config():
                     base = re.sub(r'_(PLUS|MINUS|LONG|SHORT|NEW)$', '', flag_name)
                     if hasattr(hc, base):
                         flag_name = base
-            config.append({'name': name, 'enabled': _resolve_enabled(s), 'flag': flag_name})
+            config.append({'name': name, 'enabled': _resolve_enabled(s), 'flag': flag_name, 'bypass': name in bypass_normalized})
         result = {'signals': config, 'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')}
         lock_path = SIGNAL_CONFIG_JSON + '.lock'
         with open(lock_path, 'w') as lf:
