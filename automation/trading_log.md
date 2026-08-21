@@ -12341,3 +12341,62 @@ None — system stable, previous fixes settling in.
 - 3 open positions healthy
 
 **Open Questions:** pnl_pct values in trades table appear miscalculated (showing >100% for small USDT gains) — cosmetic only, pnl_usdt is correct
+
+## [2026-08-21 15:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0W 4L -$0.37)
+**24h:** 31T 14W 45.2%WR +$1.64
+**7d:** 231T 118W 51.1%WR +$0.82
+
+**Close reasons (24h):**
+- atr_sl_hit: 26T +$1.35 (avg +$0.052) — trailing SL profitable, 84% of closes
+- profit-monster-trail: 4T +$0.11 (avg +$0.028)
+- atr_tp_hit: 1T +$0.18
+
+**Top signals (24h):**
+- hl_copy_trader: 15T 8W +$0.70 — star
+- ct-hot+: 9T 5W +$0.65 — strong
+- r2-trend-long3: 4T 2W +$0.20
+
+**Open (4):** ONDO (ct-hot+), HYPE/ETH/SOL (hl_copy_trader) — all LONG
+
+**Changes:** None
+
+**No Change Needed:**
+- ct-hot+ hit 0%WR with 3T last hour but 24h 55%WR +$0.65 — all losses small SL hits (-$0.12, -$0.11, -$0.14), normal market noise, not signal failure
+- atr_sl_hit 84% 24h but ALL profitable +$1.35 — trailing SL working correctly
+- hl_copy_trader still star (15T 8W)
+- Trade freq 4-6/hr normal
+- 4 open positions healthy
+- No signal at 0%WR with 3+T that warrants killing (ct-hot+ 0%WR is false positive — small sample, small losses)
+
+**Open Questions:** None
+
+## [2026-08-21 16:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.09)
+**24h:** 31T 19W 61.3%WR +$1.68
+
+**Close reasons (24h):**
+- atr_sl_hit: 27T +$1.41 (avg +$0.052) — trailing SL profitable
+- profit-monster-trail: 3T +$0.09
+- atr_tp_hit: 1T +$0.18
+
+**Top signals (24h):**
+- hl_copy_trader: 15T 9W +$0.65 — star
+- ct-hot+: 10T 6W +$0.76 — strong
+- r2-trend-long variants: all green
+
+**Open:** ONDO (ct-hot+), HYPE/ETH/SOL (hl_copy_trader) — all LONG
+
+**Changes:** None
+
+**No Change Needed:**
+- 1T last hour all green — normal
+- All signals profitable 24h
+- atr_sl_hit 87% but ALL profitable — trailing SL correct
+- Freq 1-6/hr normal
+- 24h 61.3%WR strong
+- No dead signals
+
+**Open Questions:** None

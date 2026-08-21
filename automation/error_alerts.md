@@ -136,3 +136,30 @@ ALERTS:
 - **[WARN]** pipeline.log at 101MB — consider log rotation
 - **[INFO]** Previous BTC mirror_close failure (09:19) — HL API error, monitor
 - **AUTO-FIX**: None required — all trading systems nominal
+
+## Health Report — 2026-08-21 15:20 UTC
+
+PIPELINE: OK
+- Status: running (last run 15:18:14, 13.8s duration)
+- Signals (1h): 19 generated, 0 approved (filtered by compactor)
+- Trades: 4 open, 31 closed today, +99.70% PnL
+- Errors: 0 in pipeline logs
+
+MARKET:
+- Regime: 9 LONG_BIAS / 2 SHORT / 93 NEUTRAL (overall: LONG_BIAS)
+- Hotset: 1 token (ASTER)
+- Speed: 185 tokens tracked
+
+SYSTEM:
+- Timers: 44 active, pipeline firing every 1min
+- Disk: 81% used (22G free)
+- Prices: 97 tokens in coin_tracker
+- HL Sync Guardian: ACTIVE
+
+AUTO-FIXES APPLIED:
+- **hermes-coding-mcp.service**: Stopped — was crash-looping (98641+ restarts), `ModuleNotFoundError: No module named 'server'`. Not used for trading.
+
+ALERTS:
+- **[WARN]** 5 services failed: better-coder (ModuleNotFoundError: dispatcher), bug-hunter, git-release, mtf-macd-tuner, trading-checklist, wasp (all non-critical for trading)
+- **[WARN]** pipeline.log at 103MB — consider log rotation
+- **[INFO]** Phantom trade write blocked correctly (ETH SL too tight)
