@@ -949,9 +949,7 @@ NEVER_REENABLE_FLAGS = {
     'MOMENTUM_LEADERBOARD_ENABLED',       # SIGNAL REPORTER 2026-08-20 — 28.6% WR, -$0.15 (7d). Both directions dead.
     'MOMENTUM_LEADERBOARD_MINUS_ENABLED', # SIGNAL REPORTER 2026-08-20 — SHORT never produced meaningful trades.
     'RANGE_BREAKOUT_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 25% WR, -$0.41 (7d). LONG dead.
-    'COIN_TRACKER_HOT_ENABLED',      # SIGNAL REPORTER 2026-08-16 — ct-hot+ 35% WR, -$0.48 (24h). ct-hot- 0% WR.
-    'COIN_TRACKER_HOT_PLUS_ENABLED', # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48 (24h 20T).
-    'COIN_TRACKER_HOT_MINUS_ENABLED',# SIGNAL REPORTER 2026-08-16 — 0% WR, -$0.19 (48h 4T).
+
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
@@ -1176,6 +1174,9 @@ CEO_PROTECTED_FLAGS = {
     'R2_TREND_LONG_ENABLED': ('Winning LONG signal — 8/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
+    'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 60+, standalone bypass. Only T can change', '2026-08-21'),
+    'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-21 — LONG direction for coin_tracker_hot. Only T can change', '2026-08-21'),
+    'COIN_TRACKER_HOT_MINUS_ENABLED': ('SHORT disabled — long only for now. Only T can change', '2026-08-21'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
@@ -1229,6 +1230,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'tl_break_long', 'tl_break_short',
     'hl_copy_trader', 'atr-spike',
+    'ct-hot',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1750,13 +1752,13 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = False  # TESTING ENDED 2026-08-17. 42.4% WR -$0.42/7d. In NEVER_REENABLE_FLAGS.
-COIN_TRACKER_HOT_PLUS_ENABLED       = False  # TESTING ENDED 2026-08-17. 42.4% WR -$0.42/7d. In NEVER_REENABLE_FLAGS.
-COIN_TRACKER_HOT_MINUS_ENABLED      = False  # TESTING ENDED 2026-08-17. 0% WR -$0.19/48h. In NEVER_REENABLE_FLAGS.
+COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 60+, standalone bypass
+COIN_TRACKER_HOT_PLUS_ENABLED       = True   # LONG only
+COIN_TRACKER_HOT_MINUS_ENABLED      = False  # SHORT disabled — long only for now
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 2       # per token+direction cooldown
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 70      # Raised from 55 — marginal composites were the 42.4% WR root cause.
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 60      # net score threshold — was 70, lowered to 60 per request

@@ -270,8 +270,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('wave_catcher', 'wave_catcher+'): 1.0,
     ('wave_catcher', 'wave_catcher-'): 1.0,
     # coin_tracker_hot — signal when coin_tracker detects hot setup
-    ('coin_tracker_hot_long', 'ct-hot+'): 0.5,   # SIGNAL REPORTER 2026-08-16 — 35% WR, -$0.48. Suppressed.
-    ('coin_tracker_hot_short', 'ct-hot-'): 0.3,  # SIGNAL REPORTER 2026-08-16 — 0% WR, -$0.19. Heavy suppress.
+    ('coin_tracker_hot_long', 'ct-hot+'): 1.0,   # Re-enabled 2026-08-21 — LONG only, composite 60+
+    ('coin_tracker_hot_short', 'ct-hot-'): 1.0,
     # return_exhaustion_long — extreme negative reversal signal
     ('return_exhaustion_long', 'return_exhaustion_long'): 1.5,  # SIGNAL REPORTER 2026-08-16 — 100% WR, $0.43 (24h). Boosted.
     # engulfing: large single-candle momentum moves
