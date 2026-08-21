@@ -107,3 +107,17 @@ ALERTS:
 - **WARN**: `hotset.json is empty — no signals survived compaction` — 0 signals above 50% confidence threshold
 - **INFO**: Live trading kill switch: ON (re-enabled by CEO, 52.9% WR)
 - **AUTO-FIX**: None required — all systems nominal, no crashes detected
+
+## Error Alerts — 2026-08-21 01:20 UTC
+- **[INFO]** Pipeline: ACTIVE, running every minute, no crashes
+- **[INFO]** Timers: 3 critical timers active (pipeline, price-collector, 1m-candle)
+- **[WARN]** Hotset: Empty — 0 signals survived compaction (market NEUTRAL, 100/104 tokens)
+- **[WARN]** Signals: 590 in 24h, 0 APPROVED (418 EXPIRED, 171 SKIPPED)
+- **[INFO]** Trades: 0 open, 18 closed today, -5.00% PnL (9W/7L, avg -$0.03)
+- **[INFO]** Market: 3 LONG_BIAS, 1 SHORT_BIAS, 100 NEUTRAL
+- **[INFO]** Kill switch: Live trading ON
+- **[INFO]** Disk: 80% (89G/118G) — 24G free
+- **[INFO]** pipeline.log: 95M (growing)
+- **[INFO]** Services: hermes-hl-copy, hermes-hl-sync-guardian, hermes-metrics: ACTIVE
+- **[WARN]** 5 services failed: better-coder, bug-hunter, mtf-macd-tuner, trading-checklist, wasp (non-critical for trading)
+- **AUTO-FIX**: None required — all trading systems nominal
