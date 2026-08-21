@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-20 21:12:34",
+  "timestamp": "2026-08-21 05:12:34",
   "total_checks": 20,
-  "passed": 11,
+  "passed": 10,
   "critical_count": 9,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -13,7 +13,7 @@
     },
     {
       "name": "sql_injection",
-      "msg": "38 files with f-string SQL",
+      "msg": "42 files with f-string SQL",
       "file": "token_performance_monitor.py:28",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
@@ -43,7 +43,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "74 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, hyperliquid_exchange.py, coin_tracker_api.py, ab_optimizer.py",
+      "msg": "76 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, hyperliquid_exchange.py, coin_tracker_api.py, ab_optimizer.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },
@@ -60,5 +60,12 @@
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "trade_frequency",
+      "msg": "0 trades in 6h (0.0/hr)",
+      "file": "",
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
+    }
+  ]
 }

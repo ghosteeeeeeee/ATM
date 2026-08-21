@@ -1,91 +1,58 @@
-# Signal Performance Report
-**Generated:** 2026-08-20 23:02 UTC | **Period:** Last 6h + 24h + 7d context
+=== Signal Performance Report ===
+Period: Last 6h | 24h | 7d
+Generated: 2026-08-21
 
-## Overall Stats (24h)
-- **Total closed trades:** 19 | **Total PnL:** -$0.53
-- **Active signals:** r2-trend-long (multiple variants), bb_bounce+, r2-trend-short2 (re-enabled today)
-- **No open trades** at time of report
+## 24h Summary
+- **18 trades, 61.1% WR, -$0.48 PnL**
+- Volume significantly down (was 98 trades/day on Aug 12)
 
----
+## 7d Summary
+- **236 trades, 53.4% WR, -$1.47 PnL**
 
 ## KILLED (executed)
+None — all kill candidates already disabled or stale (no trades in 7d).
 
-None. All clear losers already disabled.
+## KILL CANDIDATES (already handled)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| wave_catcher+ | LONG | 37.5% | -$0.32 | 8 | DISABLED (Aug 17) |
+| range_finder+ | LONG | 33.3% | -$0.24 | 9 | DISABLED (Aug 16) |
+| mover+ | LONG | 16.7% | -$0.35 | 6 | STALE (last Aug 14) |
+| ct-hot+ | LONG | 39.4% | -$0.57 | 33 | RE-ENABLED today (CEO_PROTECTED) |
 
----
+## BOOSTED (executed)
+None — winners already performing well, no param changes needed.
 
-## BOOSTED (candidates)
+## WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| r2-trend-long6 | LONG | 100.0% | +$0.49 | 7 | ACTIVE — best performer |
+| r2-trend-long4 | LONG | 64.7% | +$0.17 | 17 | ACTIVE |
+| return_exhaustion_long | LONG | 66.7% | +$0.21 | 9 | ACTIVE |
+| bb_bounce+,hl_copy_trader | LONG | 57.1% | +$0.30 | 7 | ACTIVE |
+| r2-trend-long5 | LONG | 66.7% | +$0.08 | 6 | ACTIVE |
+| wave_catcher+ | SHORT | 50.0% | +$0.09 | 6 | DISABLED (master killed) |
 
-| Signal | Dir | 7d WR | 7d PnL | 7d Trades | Status |
-|--------|-----|-------|--------|-----------|--------|
-| r2-trend-long6 | LONG | 100% | +$0.45 | 7 | Top performer |
-| bb_bounce+,hl_copy_trader | LONG | 57.1% | +$0.30 | 7 | Strong combo |
-| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 | Consistent |
-| return_exhaustion_long | LONG | 55.6% | +$0.11 | 9 | Consistent |
-| r2-trend-long4 | LONG | 64.7% | +$0.10 | 17 | Consistent |
+## ISSUES:
+1. **CRITICAL: Trade volume collapsed 82% in 8 days** (98→18 trades/day). Signal generation healthy (hl_copy_plus: 209 signals today) but execution pipeline heavily filtered. Root causes: confluence gate, dead_hours, velocity filters, broad_market_z gate.
 
-These are already enabled. r2-trend-long6 and r2-trend-long4 have high WR with good sample size.
+2. **No inversions found** — no direction mismatches detected.
 
----
+3. **392 tokens in cooldown** — high cooldown count may be contributing to volume decline.
 
-## LOSERS (watch list)
+4. **r2-trend-long3 is the volume leader (31T/7d) but negative PnL (-$0.15)** — 54.8% WR but losses exceed wins. Fires on blacklisted tokens (ORDI, BABY, ZEN, PUMP, AIXBT, COMP all lost).
 
-| Signal | Dir | 7d WR | 7d PnL | 7d Trades | Status |
-|--------|-----|-------|--------|-----------|--------|
-| r2-trend-long3 | LONG | 55.9% | -$0.23 | 34 | R:R problem — wins avg +$0.03, losses avg -$0.09 |
-| r2-trend-short2 | SHORT | 0% | -$0.23 | 3 | Re-enabled today, too few trades |
+5. **CONTINUATION_ENABLED=True but PLUS/MINUS both False** — effectively dead. Consider setting master to False for clarity.
 
-**r2-trend-long3 root cause:** Good win rate (55.9%) but losses are ~3x bigger than wins. The ATR stop loss fires at -$0.10 while profit-monster-trail averages +$0.03. This is a parameter tuning issue, not a signal quality issue.
-
----
-
-## WINNERS
-
-| Signal | Dir | 7d WR | 7d PnL | 7d Trades | Status |
-|--------|-----|-------|--------|-----------|--------|
-| r2-trend-long6 | LONG | 100% | +$0.45 | 7 | Enabled |
-| bb_bounce+,hl_copy_trader | LONG | 57.1% | +$0.30 | 7 | Enabled |
-| r2-trend-long2 | LONG | 64.7% | +$0.19 | 17 | Enabled |
-| return_exhaustion_long | LONG | 55.6% | +$0.11 | 9 | Enabled |
-| r2-trend-long4 | LONG | 64.7% | +$0.10 | 17 | Enabled |
-| r2-trend-long5 | LONG | 66.7% | +$0.08 | 6 | Enabled |
-| bb_bounce+ | LONG | 40.0% | +$0.03 | 5 | Enabled |
-
----
-
-## SIGNAL INVERSIONS
-
-**No inversions found** in 24h or 7d.
-
----
-
-## ISSUES
-
-1. **r2-trend-long3 R:R imbalance** — 55.9% WR but -$0.23 PnL (34 trades). Avg win +$0.03 vs avg loss -$0.09. Consider tightening ATR stop loss or widening profit target. This is the single biggest active loser.
-2. **r2-trend-short2 too early to judge** — 0% WR with only 3 trades. Was re-enabled today with RSI inversion fix + threshold tightening. Monitor next cycle.
-3. **Low trade volume** — 19 trades in 24h across all signals. System is conservative by design.
-
----
-
-## 7d LOBBY (already killed, confirm stays dead)
-
-| Signal | 7d WR | 7d PnL | 7d Trades | Status |
-|--------|-------|--------|-----------|--------|
-| ct-hot+ | 42.4% | -$0.42 | 33 | DISABLED |
-| range_breakout_short | 20.0% | -$0.28 | 5 | DISABLED |
-| wave_catcher+ | 40.0% | -$0.27 | 15 | NEVER_REENABLE |
-| continuation+ | 40.0% | -$0.17 | 5 | DISABLED |
-| mover+ | 28.6% | -$0.15 | 7 | DISABLED |
-| range_finder+ | 33.3% | -$0.14 | 9 | DISABLED |
-
----
-
-## RECOMMENDATIONS
-
-1. **[TUNE] r2-trend-long3** — R:R is broken. Wins +$0.03 avg, losses -$0.09 avg. Tighten ATR_SL or widen profit-monster target. 34 trades is enough data.
-2. **[WATCH] r2-trend-short2** — Re-enabled today with fixes. 3 trades only. Give it 48h before judging.
-3. **No kills needed** — All clear losers already disabled. System is clean.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
+## DAILY TREND:
+| Date | Trades | WR | PnL |
+|------|--------|-----|-----|
+| Aug 20 | 18 | 61.1% | -$0.48 |
+| Aug 19 | 26 | 65.4% | +$0.58 |
+| Aug 18 | 15 | 46.7% | -$0.35 |
+| Aug 17 | 33 | 66.7% | +$0.28 |
+| Aug 16 | 36 | 44.4% | -$0.52 |
+| Aug 15 | 52 | 48.1% | -$0.19 |
+| Aug 14 | 79 | 54.4% | -$0.65 |
+| Aug 13 | 53 | 43.4% | -$1.69 |
+| Aug 12 | 98 | 58.2% | +$0.56 |
