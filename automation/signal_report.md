@@ -1,58 +1,87 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h | 7d
-Generated: 2026-08-21
+# Signal Performance Report
+**Generated:** 2026-08-21 11:30 UTC | **Period:** Last 6h + 24h
 
-## 24h Summary
-- **18 trades, 61.1% WR, -$0.48 PnL**
-- Volume significantly down (was 98 trades/day on Aug 12)
+## Overall Stats
+- **Total trades (7d):** 154 | **Daily avg:** ~22 trades
+- **Date range:** 2026-08-14 → 2026-08-21
 
-## 7d Summary
-- **236 trades, 53.4% WR, -$1.47 PnL**
+---
+
+## 6h Performance (min 2 trades)
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| hl_copy_trader | LONG | 6 | 83.3% | +$4.00 |
+| ct-hot+ | LONG | 2 | 50.0% | +$0.12 |
+
+## 24h Performance (all signals)
+
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| hl_copy_trader | LONG | 6 | 83.3% | +$4.00 |
+| r2-trend-long3 | LONG | 5 | 60.0% | +$0.23 |
+| r2-trend-long4 | LONG | 2 | 100.0% | +$0.04 |
+| r2-trend-long13 | LONG | 1 | 100.0% | +$0.03 |
+| r2-trend-long16 | LONG | 1 | 100.0% | +$0.02 |
+| r2-trend-long11 | LONG | 1 | 100.0% | +$0.04 |
+| ct-hot+ | LONG | 2 | 50.0% | +$0.12 |
+| r2-trend-long8 | LONG | 1 | 0% | -$0.10 |
+| hl_copy_trader | SHORT | 1 | 0% | -$0.11 |
+
+**24h total:** 10 trades, +$4.29 PnL
+
+---
+
+## 7d Performance (min 3 trades)
+
+### Losers
+
+| Signal | Dir | Trades | WR | PnL | Avg PnL |
+|--------|-----|--------|-----|-----|---------|
+| ct-hot+ | LONG | 35 | 42.9% | -$0.30 | -$0.009 |
+| range_breakout_short | SHORT | 3 | 0.0% | -$0.27 | -$0.090 |
+| r2-trend-short2 | SHORT | 3 | 0.0% | -$0.22 | -$0.073 |
+| ct-hot- | SHORT | 4 | 0.0% | -$0.19 | -$0.048 |
+| range_finder+ | LONG | 9 | 33.3% | -$0.14 | -$0.016 |
+| wave_catcher- | SHORT | 4 | 25.0% | -$0.10 | -$0.025 |
+| wave_catcher+ | SHORT | 3 | 33.3% | -$0.04 | -$0.013 |
+
+### Winners
+
+| Signal | Dir | Trades | WR | PnL | Avg PnL |
+|--------|-----|--------|-----|-----|---------|
+| r2-trend-long6 | LONG | 6 | 100.0% | +$0.40 | +$0.067 |
+| r2-trend-long2 | LONG | 9 | 66.7% | +$0.10 | +$0.011 |
+| return_exhaustion_long | LONG | 9 | 55.6% | +$0.12 | +$0.013 |
+| r2-trend-long4 | LONG | 15 | 66.7% | +$0.15 | +$0.010 |
+| r2-trend-long3 | LONG | 31 | 58.1% | +$0.20 | +$0.006 |
+
+---
 
 ## KILLED (executed)
-None — all kill candidates already disabled or stale (no trades in 7d).
-
-## KILL CANDIDATES (already handled)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| wave_catcher+ | LONG | 37.5% | -$0.32 | 8 | DISABLED (Aug 17) |
-| range_finder+ | LONG | 33.3% | -$0.24 | 9 | DISABLED (Aug 16) |
-| mover+ | LONG | 16.7% | -$0.35 | 6 | STALE (last Aug 14) |
-| ct-hot+ | LONG | 39.4% | -$0.57 | 33 | RE-ENABLED today (CEO_PROTECTED) |
+None. 24h volume too low (10 trades) — no signal hits kill threshold.
 
 ## BOOSTED (executed)
-None — winners already performing well, no param changes needed.
+None. 24h volume too low for boost validation.
 
-## WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| r2-trend-long6 | LONG | 100.0% | +$0.49 | 7 | ACTIVE — best performer |
-| r2-trend-long4 | LONG | 64.7% | +$0.17 | 17 | ACTIVE |
-| return_exhaustion_long | LONG | 66.7% | +$0.21 | 9 | ACTIVE |
-| bb_bounce+,hl_copy_trader | LONG | 57.1% | +$0.30 | 7 | ACTIVE |
-| r2-trend-long5 | LONG | 66.7% | +$0.08 | 6 | ACTIVE |
-| wave_catcher+ | SHORT | 50.0% | +$0.09 | 6 | DISABLED (master killed) |
+## WATCH LIST (7d losers, monitoring)
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| ct-hot+ | LONG | 35 | 42.9% | -$0.30 | Borderline — needs monitoring |
+| range_finder+ | LONG | 9 | 33.3% | -$0.14 | Watch |
+| range_breakout_short | SHORT | 3 | 0% | -$0.27 | Watch — insufficient sample |
+| r2-trend-short2 | SHORT | 3 | 0% | -$0.22 | Watch — insufficient sample |
 
-## ISSUES:
-1. **CRITICAL: Trade volume collapsed 82% in 8 days** (98→18 trades/day). Signal generation healthy (hl_copy_plus: 209 signals today) but execution pipeline heavily filtered. Root causes: confluence gate, dead_hours, velocity filters, broad_market_z gate.
+## WINNERS
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| hl_copy_trader | LONG | 6 | 83.3% | +$4.00 | Dominant |
+| r2-trend-long6 | LONG | 6 | 100% | +$0.40 | Perfect |
+| r2-trend-long4 | LONG | 15 | 66.7% | +$0.15 | Consistent |
+| r2-trend-long3 | LONG | 31 | 58.1% | +$0.20 | Workhorse |
 
-2. **No inversions found** — no direction mismatches detected.
-
-3. **392 tokens in cooldown** — high cooldown count may be contributing to volume decline.
-
-4. **r2-trend-long3 is the volume leader (31T/7d) but negative PnL (-$0.15)** — 54.8% WR but losses exceed wins. Fires on blacklisted tokens (ORDI, BABY, ZEN, PUMP, AIXBT, COMP all lost).
-
-5. **CONTINUATION_ENABLED=True but PLUS/MINUS both False** — effectively dead. Consider setting master to False for clarity.
-
-## DAILY TREND:
-| Date | Trades | WR | PnL |
-|------|--------|-----|-----|
-| Aug 20 | 18 | 61.1% | -$0.48 |
-| Aug 19 | 26 | 65.4% | +$0.58 |
-| Aug 18 | 15 | 46.7% | -$0.35 |
-| Aug 17 | 33 | 66.7% | +$0.28 |
-| Aug 16 | 36 | 44.4% | -$0.52 |
-| Aug 15 | 52 | 48.1% | -$0.19 |
-| Aug 14 | 79 | 54.4% | -$0.65 |
-| Aug 13 | 53 | 43.4% | -$1.69 |
-| Aug 12 | 98 | 58.2% | +$0.56 |
+## ISSUES
+- **Signal inversions:** None found in 24h
+- **SHORT signals are dead:** All 7d SHORT signals have negative PnL (range_breakout_short 0% WR, r2-trend-short2 0% WR, ct-hot- 0% WR, wave_catcher- 25% WR). Consider blocking or retuning SHORT signal sources.
+- **Low volume:** Only 10 trades in 24h — system is operating well below capacity. Pipeline may be starved of signals or market is quiet.
+- **hl_copy_trader SHORT:** 1T, 0% WR, -$0.11 — but sample too small to act on.
