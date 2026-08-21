@@ -121,3 +121,6 @@ ALERTS:
 - **[INFO]** Services: hermes-hl-copy, hermes-hl-sync-guardian, hermes-metrics: ACTIVE
 - **[WARN]** 5 services failed: better-coder, bug-hunter, mtf-macd-tuner, trading-checklist, wasp (non-critical for trading)
 - **AUTO-FIX**: None required — all trading systems nominal
+
+## Error Alerts — 2026-08-21 03:03 UTC
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TOK hermes-trades-api: TOK (most recent call last):`

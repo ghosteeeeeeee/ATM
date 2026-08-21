@@ -12026,3 +12026,26 @@ None — system stable, previous fixes settling in.
 - System healthy, quiet nighttime
 
 **Open Questions:** None
+
+## [2026-08-21 03:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet night, last close 21:21 UTC ~5h ago)
+**PnL:** $0.00
+**24h:** 18T 50%WR -$0.54 (10 profit-monster-trail +$0.27, 8 atr_sl_hit -$0.81)
+
+**Diagnosis:**
+- **Entry quality:** N/A — 0 trades last hour
+- **SL behavior:** LONG ATR_SL 30.8% (4/13) well below 40% kill threshold. Overall 44.4% inflated by SHORT legacy (4/8)
+- **Signal quality:** r2-trend-long3 5T 40%WR -$0.18 borderline but not kill-worthy
+- **Trade frequency:** 0/hr — quiet nighttime, normal
+- **7d:** 255T -$1.26 flat, 0 open positions
+
+**Changes:** None
+
+**No Change Needed:**
+- r2-trend-long3: 5T 24h, 60% ATR_SL (3/5) — concerning but lifetime 34T 41.2% ATR_SL, not kill-worthy
+- r2-trend-short2/short10/short13: all legacy pre-kill, no SHORT opens in 12h+
+- 0 trades/hr = quiet night, no overtrading
+- System healthy, 8th green day trajectory
+
+**Open Questions:** None
