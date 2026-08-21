@@ -75,6 +75,7 @@ REGIME_SIGNALS = {
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors
         'mover', 'mover+', 'mover-',  # momentum spike detector
+        'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
