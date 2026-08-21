@@ -244,7 +244,6 @@ FAVORITES = {
     # Reliable + profitable
     'ZRO',     # 13T  69.2% WR +$0.37
     'MNT',     # 17T  64.7% WR +$0.36
-    'XLM',     # 38T  52.6% WR +$0.51
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -982,7 +981,7 @@ PCT_HERMES_MINUS_ENABLED = False  # CEO 2026-08-09 — 25% WR, -$0.15/7d. All SH
 VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 7d), -$1.61. No edge.
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
-HZSCORE_ENABLED          = False  # CEO KILLED 2026-08-17 — both directions dead. Plus: 32T ~38% WR -$0.47/7d (standalone + combos). Minus: 35T 54.3% WR -$0.22/7d.
+HZSCORE_ENABLED          = True  # CEO KILLED 2026-08-17 — both directions dead. Plus: 32T ~38% WR -$0.47/7d (standalone + combos). Minus: 35T 54.3% WR -$0.22/7d.
 HZSCORE_PLUS_ENABLED     = False  # CEO KILLED 2026-08-17 — 32T ~38% WR -$0.47/7d. Standalone 12T 41.7% -$0.12 + bb_bounce+,hzscore+ 20T 35% -$0.35. Inverted R:R. Combos bleeding. NEVER_REENABLE.
 HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-17 — 35T 54.3% WR -$0.22/7d. Inverted R:R (+0.25% avg win vs -0.43% avg loss). Testing failed. NEVER_REENABLE.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -1669,7 +1668,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 
 # ── Continuation (re-entry after profitable close) ──────────────────────
 # continuation.py — re-enter same direction after profit-monster exit
-CONTINUATION_ENABLED = False   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). Re-entry after profit-monster not working.
+CONTINUATION_ENABLED = True   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). Re-entry after profit-monster not working.
 CONTINUATION_PLUS_ENABLED = False # re-enter LONG after LONG close
 CONTINUATION_MINUS_ENABLED = False # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
