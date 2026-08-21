@@ -1801,7 +1801,7 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 60+, standalone bypass
-COIN_TRACKER_HOT_PLUS_ENABLED       = True   # LONG only
+COIN_TRACKER_HOT_PLUS_ENABLED       = False  # DISABLED 2026-08-21 17:00 — 0W-7L last 3h after re-enable, composite 56 too loose, 42.6% WR 7d
 COIN_TRACKER_HOT_MINUS_ENABLED      = False  # SHORT disabled — long only for now
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
@@ -1809,4 +1809,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.25    # per token+direction cooldown (15 minutes)
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 56      # net score threshold — lowered to 56 per request
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 60      # net score threshold — raised back to 60 (56 was too loose)
