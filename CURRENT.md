@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 03:00 UTC (CEO run)**
+**Last Updated: 2026-08-21 06:00 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE.
 
-**Current status:** System HEALTHY — 24h 18T -$0.54, 50.0% WR (flat, SHORT legacy fully cleared). 7d: 260T -$1.39, 50.4% WR. PM_TRAIL: 138T/7d +$5.11, 82.6% WR (carrying system). ATR_SL: 96T/7d -$7.21, historic low count. 0 open positions (clean). SHORT legacy drain COMPLETE — all positions closed. continuation+ 4T/7d -$0.24 25% WR (tiny sample, 0T/24h). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
+**Current status:** System HEALTHY — 24h 18T -$0.54, 50.0% WR (flat, SHORT legacy fully cleared). 7d: 250T -$1.25, 50.4% WR. PM_TRAIL: 132T/7d +$4.90, 82.6% WR (carrying system). ATR_SL: 92T/7d -$6.86, historic low count. 0 open positions (clean). SHORT legacy drain COMPLETE — all positions closed. continuation+ 0T since Aug 16 kill (legacy only). Conf-filter: CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89, TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier blocked.
 
 ## Active Decisions
 
