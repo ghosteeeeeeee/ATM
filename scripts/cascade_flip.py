@@ -269,11 +269,14 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
             row_old = cur_old.fetchone()
             cur_old.close(); conn_old.close()
             old_amount = float(row_old['amount_usdt']) if row_old else DEFAULT_TRADE_SIZE_USDT
+            old_lev = float(row_old['leverage'] or 10) if row_old else 10
         else:
             old_amount = DEFAULT_TRADE_SIZE_USDT
+            old_lev = 10
     except Exception:
         old_amount = DEFAULT_TRADE_SIZE_USDT
-    close_pnl_usdt = compute_pnl_usdt(live_pnl, old_amount)   # pnl_utils
+        old_lev = 10
+    close_pnl_usdt = compute_pnl_usdt(live_pnl, old_amount * old_lev)   # pnl_utils — use notional
 
     # ── 1. Close the losing position ────────────────────────────────────────
     close_ok = _close_paper_position(trade_id, f"cascade_flip_{live_pnl:+.2f}%")

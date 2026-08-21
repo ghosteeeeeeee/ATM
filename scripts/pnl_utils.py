@@ -8,13 +8,9 @@ scattered across:
   - hl-sync-guardian.py (_close_paper_trade_db close PnL)
   - profit_monster.py (live filter PnL)
 
-All PnL is "unleveraged" = raw market return % (entry-based, not margin-based).
-This makes it comparable across all leverage levels and consistent with how
-HL's unrealized_pnl is computed.
-
 Key definitions:
-  pnl_pct   = raw % price change vs entry (direction-aware, unleveraged)
-  pnl_usdt  = pnl_pct/100 * calc_notional (signed: + for profit, - for loss)
+  pnl_pct   = leveraged return % (raw price move × leverage, direction-aware)
+  pnl_usdt  = calc_notional * |raw_price_move|/100 (signed: + for profit, - for loss)
   calc_notional = hl_notional_usdt (if set) else amount_usdt * leverage
   hype_pnl_usdt = actual realized PnL from HL fills (ground truth on close)
 

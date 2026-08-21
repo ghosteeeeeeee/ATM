@@ -159,6 +159,7 @@ def main():
                     hype_pnl_pct_raw = ((calc_entry_px - exit_px) / calc_entry_px) * 100
                 else:
                     hype_pnl_pct_raw = ((exit_px - calc_entry_px) / calc_entry_px) * 100
+                hype_pnl_pct_raw = round(hype_pnl_pct_raw * lev, 4)  # leveraged
             else:
                 hype_pnl_pct_raw = 0.0
 

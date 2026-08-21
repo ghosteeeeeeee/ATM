@@ -2995,7 +2995,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
 
         # Use HL ground truth if available
         if hype_pnl_usdt is not None and hype_pnl_usdt != 0:
-            hype_pnl_pct = round(hype_pnl_usdt / amount_usdt * 100, 4)
+            hype_pnl_pct = round(hype_pnl_usdt / calc_notional * 100, 4) if calc_notional else 0
             final_pnl_usdt = round(hype_pnl_usdt, 4)
             final_pnl_pct = hype_pnl_pct
         else:
@@ -3114,8 +3114,13 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
             conn_lookup.close()
 
     # Calculate PnL — prefer HL realized_pnl, fall back to price-based calc
+    # calc_notional: use HL notional if override provided, else amount_usdt * leverage
+    if amount_usdt_override is not None:
+        calc_notional_orphan = float(amount_usdt_override)
+    else:
+        calc_notional_orphan = amount_usdt * lev
     if realized_pnl is not None and realized_pnl != 0:
-        computed_pnl_pct = round(realized_pnl / amount_usdt * 100, 4)
+        computed_pnl_pct = round(realized_pnl / calc_notional_orphan * 100, 4) if calc_notional_orphan else 0
         computed_pnl_usdt = round(realized_pnl, 4)
     else:
         # Fallback: price-based calculation
@@ -3123,7 +3128,8 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
             computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
         else:
             computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
-        computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+        computed_pnl_pct = round(computed_pnl_pct * lev, 4)  # leveraged
+        computed_pnl_usdt = round(computed_pnl_pct / 100 * calc_notional_orphan, 4)
 
     is_win = float(computed_pnl_pct or 0) > 0
 
@@ -3545,17 +3551,21 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                         time.sleep(6)  # Wait for HL fills to appear before polling
                         hl_exit_px, realized_pnl = _poll_hl_fills_for_close(coin, close_start_ms)
                         entry_px_sc = float(trade_record.get('entry_price', 0))
-                        amount_usdt = trade_record.get('amount_usdt', 50.0)
+                        amount_usdt_sc = trade_record.get('amount_usdt', 50.0)
+                        lev_sc = float(trade_record.get('leverage', 1) or 1)
                         direction_sc = trade_record.get('direction', 'LONG')
+                        hl_notional_sc = trade_record.get('hl_notional_usdt')
+                        calc_notional_sc = float(hl_notional_sc) if hl_notional_sc is not None else amount_usdt_sc * lev_sc
                         if realized_pnl is not None and realized_pnl != 0:
-                            computed_pnl_pct = round(realized_pnl / amount_usdt * 100, 4)
+                            computed_pnl_pct = round(realized_pnl / calc_notional_sc * 100, 4) if calc_notional_sc else 0
                             computed_pnl_usdt = round(realized_pnl, 4)
                         elif hl_exit_px > 0:
                             if direction_sc.upper() == 'SHORT':
-                                computed_pnl_pct = round((entry_px_sc - hl_exit_px) / entry_px_sc * 100, 4)
+                                raw_move_sc = round((entry_px_sc - hl_exit_px) / entry_px_sc * 100, 4)
                             else:
-                                computed_pnl_pct = round((hl_exit_px - entry_px_sc) / entry_px_sc * 100, 4)
-                            computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                                raw_move_sc = round((hl_exit_px - entry_px_sc) / entry_px_sc * 100, 4)
+                            computed_pnl_pct = round(raw_move_sc * lev_sc, 4)
+                            computed_pnl_usdt = round(computed_pnl_pct / 100 * calc_notional_sc, 4)
                         else:
                             # No fill data — use current price as proxy (best available estimate)
                             if direction_sc.upper() == 'SHORT':
@@ -3706,23 +3716,27 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
 
             amount_usdt = db_trade.get('amount_usdt', 50.0)
             lev = db_trade.get('leverage', 1)
+            hl_notional_db = db_trade.get('hl_notional_usdt')
+            calc_notional_db = float(hl_notional_db) if hl_notional_db is not None else amount_usdt * lev
 
             if realized_pnl is not None and realized_pnl != 0:
-                computed_pnl_pct = round(realized_pnl / amount_usdt * 100, 4)
+                computed_pnl_pct = round(realized_pnl / calc_notional_db * 100, 4) if calc_notional_db else 0
                 computed_pnl_usdt = round(realized_pnl, 4)
             elif hl_exit_px > 0:
                 if direction.upper() == 'SHORT':
-                    computed_pnl_pct = round((entry_px - hl_exit_px) / entry_px * 100, 4)
+                    raw_move_db = round((entry_px - hl_exit_px) / entry_px * 100, 4)
                 else:
-                    computed_pnl_pct = round((hl_exit_px - entry_px) / entry_px * 100, 4)
-                computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                    raw_move_db = round((hl_exit_px - entry_px) / entry_px * 100, 4)
+                computed_pnl_pct = round(raw_move_db * lev, 4)
+                computed_pnl_usdt = round(computed_pnl_pct / 100 * calc_notional_db, 4)
             else:
                 # No fill data — close at current price as estimate
                 if direction.upper() == 'SHORT':
-                    computed_pnl_pct = round((entry_px - curr) / entry_px * 100, 4)
+                    raw_move_db = round((entry_px - curr) / entry_px * 100, 4)
                 else:
-                    computed_pnl_pct = round((curr - entry_px) / entry_px * 100, 4)
-                computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                    raw_move_db = round((curr - entry_px) / entry_px * 100, 4)
+                computed_pnl_pct = round(raw_move_db * lev, 4)
+                computed_pnl_usdt = round(computed_pnl_pct / 100 * calc_notional_db, 4)
                 hl_exit_px = curr
 
             if trade_id:
