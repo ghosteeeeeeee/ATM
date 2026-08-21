@@ -12237,3 +12237,31 @@ None — system stable, previous fixes settling in.
 - 1 open position (NOT) slightly underwater but within SL range
 
 **Open Questions:** None
+
+## [2026-08-21 10:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet, last close NOT at 09:07)
+**24h:** 19 closed (14 wins, 5 losses) — +$3.20 (74% WR)
+
+**24h Breakdown:**
+- atr_sl_hit: 11T +$3.00 (avg +$0.27) — trailing SL locking in profits, all profitable
+- profit-monster-trail: 8T +$0.20 (avg +$0.025)
+
+**Top Signals (24h):**
+- hl_copy_trader: 6T 4W +$3.04 — star signal
+- r2-trend-long3: 5T 3W +$0.23
+- Others: small samples, neutral
+
+**Open Positions (4):** SOL, BTC, ENS, HYPE — total unrealized +$0.64
+
+**7d:** 233T 51.5% WR +$2.43
+
+**Changes:** None
+
+**No Change Needed:**
+- atr_sl_hit 58% of closes but ALL profitable — trailing SL working correctly
+- Trade freq 0.8/hr normal, no overtrading
+- hl_copy_trader dominant and profitable
+- System in good state, 4 open positions green
+
+**Open Questions:** None

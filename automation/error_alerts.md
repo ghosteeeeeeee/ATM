@@ -124,3 +124,7 @@ ALERTS:
 
 ## Error Alerts — 2026-08-21 03:03 UTC
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TOK hermes-trades-api: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-21 09:19 UTC
+- **WARN** (1x): `HYPE mirror_close FAILED (DB committed, HL still open): mirror_close(BTC): HL API failed — Unknown error` — BTC ATR SL hit at 09:02, DB committed close but HL API rejected. Position potentially still open on Hyperliquid.
+- **WARN**: pipeline.log at 99MB (219MB total logs). Consider log rotation if growing unbounded.
