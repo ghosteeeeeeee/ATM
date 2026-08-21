@@ -210,7 +210,7 @@ def _get_hotset_last_updated():
     return 0
 
 
-from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT
+from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVORITES, FAVORITES_SIZE_MULT
 
 from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
@@ -557,8 +557,10 @@ def process_delayed_entries(paper=False):
             exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
             exp_arg = ['--experiment', exp_json]
 
+        _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES else 1.0)
+
         cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
-                token, cmd_side, str(POSITION_SIZE_USD), str(round(cur_price, 6)),
+                token, cmd_side, str(_trade_size), str(round(cur_price, 6)),
                 '--exchange', 'Hyperliquid',
                 '--strategy', 'delayed-entry',
                 '--paper' if paper else '--real',
@@ -1419,8 +1421,10 @@ def execute_trade(token, direction, price, confidence, source,
     # --paper when live_trading=False, --real when live_trading=True
     paper_flag = '--paper' if not live_trading else '--real'
 
+    _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES else 1.0)
+
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
-           token, cmd_side, str(POSITION_SIZE_USD), str(round(price, 6)),
+           token, cmd_side, str(_trade_size), str(round(price, 6)),
            '--exchange', 'Hyperliquid',
            '--strategy', f'Hermes-{source}',
            paper_flag,

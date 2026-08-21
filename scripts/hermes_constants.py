@@ -228,12 +228,12 @@ LONG_BLACKLIST = {
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
-# Favorites — proven performers (high WR + profitable + decent sample).
-# Future use: extra weight in scoring, priority in hotset, position sizing boost.
+# ── Favorites ─────────────────────────────────────────────────────────────────
+# Proven performers — high WR + profitable + decent sample.
+# Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
+# AUTO-UPDATED weekly by favorites_updater.py (Phase 2).
 FAVORITES = {
-    # High conviction: high WR + high volume + profitable
-    'SKR',     # 115T 55.7% WR +$2.10
-    '2Z',      # 105T 55.2% WR +$1.98
+    # High conviction: high WR + volume + profitable
     'CAKE',    # 50T  60.0% WR +$0.88
     'ME',      # 90T  54.4% WR +$1.25
     'BLUR',    # 86T  53.5% WR +$1.49
@@ -245,9 +245,10 @@ FAVORITES = {
     'ZRO',     # 13T  69.2% WR +$0.37
     'MNT',     # 17T  64.7% WR +$0.36
     'XLM',     # 38T  52.6% WR +$0.51
-    'STBL',    # 57T  50.9% WR +$0.84
-    'XRP',     # 30T  50.0% WR +$0.68
 }
+
+FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
+FAVORITES_SIZE_MULT = 1.5     # Position size multiplier in decider_run ($11 → $16.50)
 
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset

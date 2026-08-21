@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -754,7 +754,10 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Surfing.md quadrant filter: z-score + acceleration alignment
     zscore_accel_mult = get_zscore_accel_penalty(token, direction)
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult
+    # Favorites score boost — proven tokens get higher ranking
+    favorites_mult = FAVORITES_MULT if FAVORITES and token in FAVORITES else 1.0
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult
     return final_score
 
 
