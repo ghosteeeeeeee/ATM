@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes HL Reconciliation — compare DB trades vs HL fills
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/hl_reconciliation.py
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env

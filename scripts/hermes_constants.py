@@ -730,6 +730,16 @@ WEATHER_VANE_SHIELD_TRAILING_PCT = 0.0030   # 0.30% tightened from default 2.00%
 WEATHER_VANE_SHIELD_MAX_HOLD_MIN = 30       # force-close if still open after this
 WEATHER_VANE_SHIELD_LOSING_ONLY = True      # only shield positions with pnl < 0
 
+# ── HL Reconciliation Post-Mortem ──────────────────────────────────────────
+# Automated PnL reconciliation: compare DB trades against HL fills every N hours.
+# Auto-corrects divergences > threshold. Catches calc_notional bugs, fee errors,
+# and any other PnL discrepancies between local DB and HL ground truth.
+HL_RECONCILIATION_ENABLED = True
+HL_RECONCILIATION_INTERVAL_HOURS = 4        # how often to run
+HL_RECONCILIATION_DIVERGENCE_THRESHOLD = 5.0  # % divergence to auto-fix
+HL_RECONCILIATION_LOOKBACK_HOURS = 6        # DB trade window to check
+HL_RECONCILIATION_MATCH_WINDOW_MINUTES = 5  # HL fill matching tolerance
+
 # ── Tide Detection (Weather Vane v4) ───────────────────────────────────────
 # BTC 3h momentum as fastest lagging indicator for regime shift detection.
 # Bearish tide: BTC 3h falling + SHORT WR > 55% → suppress LONG

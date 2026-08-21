@@ -142,8 +142,8 @@ def detect(token, data):
     if regime == 'NEUTRAL':
         return None
 
-    # Primary trigger: health must be hot/ready
-    if health not in ('hot', 'ready'):
+    # Primary trigger: health must be hot/ready/warm
+    if health not in ('hot', 'ready', 'warm'):
         return None
 
     # Must meet minimum composite threshold

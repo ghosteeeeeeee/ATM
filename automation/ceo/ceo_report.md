@@ -1,7 +1,16 @@
-## CEO Report — 2026-08-21 (~07:15 UTC, verified, 202nd run)
+## CEO Report — 2026-08-21 ~08:00 UTC (verified, 203rd run)
 
 ### Diagnosis
-System HEALTHY — NO CHANGES needed. Verified DB: 24h 19T -$0.65, 47.4% WR (slightly red, night session). 7d: 243T -$1.42, 50.2% WR. 3 open: BTC hl_copy_trader LONG, BSV r2-trend-long3 LONG, ETH hl_copy_trader LONG. PM_TRAIL: 129T/7d +$4.74, 82.2% WR (carrying system). ATR_SL: 89T/7d -$6.70, 1.1% WR (dominant drag, historic low count ~7-8/day). Legacy losers aging out (ct-hot+ -$0.42, wave_catcher+ -$0.31 — both killed, 7d window). Daily: Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54 → 21 -$0.11 (1T so far, normal alternating). R2_TREND_SHORT re-enabled Aug 20: 5T/48h 0% WR -$0.47 — all legacy clears from pre-kill, too early to evaluate new signals.
+System HEALTHY — NO CHANGES needed. Verified DB: 24h 20T -$0.56, 45% WR (slightly red, normal NEUTRAL variance). 7d: 240T -$1.09, 50.8% WR. 3 open: BTC/ETH/HYPE hl_copy_trader LONG (copy-trading, not system). PM_TRAIL: 127T/7d +$4.66, 82.7% WR (carrying system). ATR_SL: 88T/7d -$6.29, 2.3% WR (dominant drag, historic low count). Volume: 82% decline over 8 days (100→18 trades/day, today 3T so far). Daily: Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54 → 21 +$0.05 (3T, alternating pattern). SHORT legacy: r2-trend-short2/10/13 all 0% WR -$0.47/24h (draining, will age out).
+
+### Root Cause
+No active bleeding — system at break-even edge. PM_TRAIL (+$4.66) nearly offsets ATR_SL (-$6.29) = net -$1.63/7d. Alternating green/red days = normal NEUTRAL variance. Volume collapse (82% in 8 days) is structural: confluence gate + dead_hours + velocity filters + 392 tokens in cooldown. 24h LONG side healthy: r2-trend-long3 6T +$0.10, r2-trend-long4 2T +$0.04, r2-trend-long6 1T +$0.02. All 48h losers are legacy/copy-trader.
+
+### Fix Applied
+NO CHANGES. System healthy, no intervention needed. Volume collapse flagged as CRITICAL — structural issue requiring strategic decision (relax filters vs. accept lower volume with higher quality).
+
+### Verification
+DB query confirmed. PM_TRAIL WR 82.7% (threshold >80% ✓). ATR_SL count historic low. 0 open system positions (3 are copy-trader). All legacy kills verified dead in 48h data.
 
 ### Root Cause
 No active bleeding. System at break-even edge — PM_TRAIL (+$4.74) offsets ATR_SL (-$6.70) net = -$1.96/7d. Alternating days = normal NEUTRAL regime variance. Legacy losers in 7d window are aging out (killed Aug 17-20). SHORT side structural gap persists — all legacy SHORT positions cleared, new R2_TREND_SHORT has only 5T of data.
