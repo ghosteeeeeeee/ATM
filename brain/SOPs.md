@@ -127,6 +127,31 @@ When: After any change to trades.html, signals.html, or coin_tracker.html.
 
 ---
 
+## 7. Copy Trading Philosophy
+
+When: Always — this is a core system principle.
+
+### 24/7 Live Trading
+- We are **24/7 live** — markets never close, we never stop
+- If LONG isn't working, SHORT should — don't block directions, improve entry quality
+- Don't filter by time of day — improve the signal instead
+- Every hour is an opportunity, not a risk
+
+### Copy Trader Rules
+1. **Track pro traders by recent performance**, not lifetime metrics
+2. **Attribution matters** — every copy trade must have `trader_wallet` in `_signal_metadata`
+3. **Stats must accumulate** — `trader_performance` table tracks our copy trade results
+4. **Exit correlation** — when a pro trader exits, we should too (via `check_trader_exits`)
+5. **Score is not skill** — high leaderboard score can mean old wins, not recent skill
+
+### What Makes a Good Copy Trader
+- Consistent recent HYPE performance (last 30 days)
+- Position_trader pattern with high win rate
+- Not a market maker (tiny fills at fixed prices)
+- Active on multiple tokens (diversified)
+
+---
+
 ## Key Gotchas
 
 - **Two data directories:** `HERMES_DATA=/root/.hermes/data` (local) and `WWW_DATA=/var/www/hermes/data` (served)

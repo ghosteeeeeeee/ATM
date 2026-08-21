@@ -851,6 +851,16 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
 
     conn.commit()
 
+    # ── Copy trader performance tracking (close) ──────────────────────────
+    # When a copy trade closes, update trader_performance in hl_copy.db
+    # so exit correlation and aggregate stats stay current.
+    if signal and 'hl_copy_trader' in str(signal):
+        try:
+            from hl_fill_monitor import update_trader_performance as _update_cp
+            _update_cp(int(trade_id), float(final_exit), str(close_reason_val))
+        except Exception as _cp_err:
+            print(f"[close_trade] COPY-PERF update failed (non-fatal): {_cp_err}")
+
     # ── AUDIT: Log trade close ───────────────────────────────────────────
     try:
         from audit_logger import trade_close

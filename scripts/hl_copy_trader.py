@@ -128,6 +128,15 @@ def run_once():
     print("\n[1b/5] Checking for trader exits...")
     check_trader_exits(new_fills)
     
+    # Step 1c: Sync trader_performance with closed trades
+    print("\n[1c/5] Syncing trader performance...")
+    from hl_fill_monitor import sync_trader_performance
+    synced = sync_trader_performance()
+    if synced:
+        print(f"  Synced {synced} records")
+    else:
+        print("  All up to date")
+    
     # Step 2: Check for pro trader signals
     print("\n[2/5] Checking for pro trader signals...")
     signals = check_for_signals()

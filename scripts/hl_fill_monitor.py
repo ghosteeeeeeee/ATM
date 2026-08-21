@@ -418,6 +418,230 @@ def check_trader_exits(new_fills: list):
         except Exception as e:
             print(f"[copy_exit] Error closing trade #{perf['trade_id']}: {e}")
 
+
+def sync_trader_performance():
+    """Sync trader_performance with closed trades in PostgreSQL.
+    
+    Catches any trades that were closed outside of brain.py (e.g., by guardian,
+    hl-sync, profit-monster) and updates the trader_performance table.
+    Called periodically by hl_copy_trader daemon.
+    """
+    try:
+        from _secrets import BRAIN_DB_DICT
+        import psycopg2 as _pg
+
+        DB_CONFIG = BRAIN_DB_DICT.copy()
+        DB_CONFIG.setdefault('port', 5432)
+        pg = _pg.connect(**DB_CONFIG)
+        pg.autocommit = True
+        cur = pg.cursor()
+
+        # Find closed copy trades that don't have an updated trader_performance
+        # First get trade IDs that already have trader_performance records (from SQLite)
+        hl_conn = get_db()
+        existing_ids = set()
+        try:
+            rows = hl_conn.execute("SELECT trade_id FROM trader_performance").fetchall()
+            existing_ids = {r['trade_id'] for r in rows}
+        finally:
+            hl_conn.close()
+
+        # Then find closed copy trades in PostgreSQL
+        cur.execute('''
+            SELECT id, token, exit_price, close_reason, _signal_metadata
+            FROM trades
+            WHERE signal LIKE '%hl_copy_trader%'
+              AND status = 'closed'
+              AND exit_price IS NOT NULL
+              AND id > 14060
+        ''')
+        all_closed = cur.fetchall()
+        cur.close()
+        pg.close()
+
+        # Case 1: Trades with NO trader_performance record (orphans) — need INSERT
+        orphans = [(r[0], r[1], r[2], r[3], r[4]) for r in all_closed
+                   if r[0] not in existing_ids]
+
+        # Case 2: Trades with "open" trader_performance record — need UPDATE
+        hl_conn2 = get_db()
+        open_rows = hl_conn2.execute(
+            "SELECT trade_id FROM trader_performance WHERE status = 'open'"
+        ).fetchall()
+        open_ids = {r['trade_id'] for r in open_rows}
+        hl_conn2.close()
+
+        to_update = [(r[0], r[1], r[2], r[3], r[4]) for r in all_closed
+                     if r[0] in open_ids]
+
+        if not orphans and not to_update:
+            return 0
+
+        updated = 0
+        for trade_id, token, exit_price, close_reason, meta_raw in orphans:
+            try:
+                meta = meta_raw if isinstance(meta_raw, dict) else {}
+                if isinstance(meta_raw, str):
+                    import json as _j
+                    try:
+                        meta = _j.loads(meta_raw)
+                    except Exception:
+                        meta = {}
+
+                wallet = meta.get('trader_wallet', '')
+                if not wallet:
+                    continue
+
+                # Insert trader_performance record if not exists
+                conn = get_db()
+                try:
+                    # Check if record exists
+                    existing = conn.execute(
+                        "SELECT trade_id FROM trader_performance WHERE trade_id = ?",
+                        (trade_id,)
+                    ).fetchone()
+
+                    if not existing:
+                        # Get trade info from PostgreSQL
+                        pg2 = _pg.connect(**DB_CONFIG)
+                        pg2.autocommit = True
+                        cur2 = pg2.cursor()
+                        cur2.execute('''
+                            SELECT direction FROM trades WHERE id = %s
+                        ''', (trade_id,))
+                        row = cur2.fetchone()
+                        cur2.close()
+                        pg2.close()
+
+                        if row:
+                            direction = row[0]
+                            conn.execute("""
+                                INSERT OR IGNORE INTO trader_performance
+                                (wallet, trade_id, token, direction, entry_price,
+                                 exit_price, pnl_pct, status, close_reason,
+                                 created_at, closed_at)
+                                VALUES (?, ?, ?, ?, 0, ?, 0, ?, ?, ?, ?)
+                            """, (
+                                wallet, trade_id, token.upper(), direction,
+                                float(exit_price), 'closed',
+                                close_reason, int(time.time()), int(time.time()),
+                            ))
+
+                    # Update existing record
+                    update_row = conn.execute(
+                        "SELECT trade_id FROM trader_performance WHERE trade_id = ? AND status = 'open'",
+                        (trade_id,)
+                    ).fetchone()
+
+                    if update_row:
+                        # Get direction for PnL calc
+                        pg3 = _pg.connect(**DB_CONFIG)
+                        pg3.autocommit = True
+                        cur3 = pg3.cursor()
+                        cur3.execute('SELECT direction, entry_price FROM trades WHERE id = %s', (trade_id,))
+                        trow = cur3.fetchone()
+                        cur3.close()
+                        pg3.close()
+
+                        if trow:
+                            direction, entry_price = trow
+                            entry = float(entry_price or 0)
+                            exit_p = float(exit_price)
+                            if direction == 'LONG' and entry > 0:
+                                pnl_pct = ((exit_p - entry) / entry) * 100
+                            elif entry > 0:
+                                pnl_pct = ((entry - exit_p) / entry) * 100
+                            else:
+                                pnl_pct = 0
+
+                            status = ('closed_win' if pnl_pct > 0.1
+                                      else 'closed_loss' if pnl_pct < -0.1
+                                      else 'closed_breakeven')
+
+                            conn.execute("""
+                                UPDATE trader_performance
+                                SET exit_price = ?, pnl_pct = ?, status = ?,
+                                    close_reason = ?, closed_at = ?
+                                WHERE trade_id = ? AND status = 'open'
+                            """, (exit_p, pnl_pct, status, close_reason,
+                                  int(time.time()), trade_id))
+
+                            # Update aggregates
+                            _update_trader_aggregates(conn, wallet)
+
+                    conn.commit()
+                    updated += 1
+                finally:
+                    conn.close()
+
+            except Exception as e:
+                print(f"[sync_perf] Error syncing trade #{trade_id}: {e}")
+
+        # Process trades with "open" trader_performance that should be closed
+        for trade_id, token, exit_price, close_reason, meta_raw in to_update:
+            try:
+                conn = get_db()
+                try:
+                    # Get direction for PnL calc
+                    pg2 = _pg.connect(**DB_CONFIG)
+                    pg2.autocommit = True
+                    cur2 = pg2.cursor()
+                    cur2.execute('SELECT direction, entry_price FROM trades WHERE id = %s', (trade_id,))
+                    trow = cur2.fetchone()
+                    cur2.close()
+                    pg2.close()
+
+                    if not trow:
+                        continue
+
+                    direction, entry_price = trow
+                    entry = float(entry_price or 0)
+                    exit_p = float(exit_price)
+                    if direction == 'LONG' and entry > 0:
+                        pnl_pct = ((exit_p - entry) / entry) * 100
+                    elif entry > 0:
+                        pnl_pct = ((entry - exit_p) / entry) * 100
+                    else:
+                        pnl_pct = 0
+
+                    status = ('closed_win' if pnl_pct > 0.1
+                              else 'closed_loss' if pnl_pct < -0.1
+                              else 'closed_breakeven')
+
+                    # Get wallet from trader_performance
+                    row = conn.execute(
+                        "SELECT wallet FROM trader_performance WHERE trade_id = ?",
+                        (trade_id,)
+                    ).fetchone()
+
+                    if row:
+                        wallet = row['wallet']
+                        conn.execute("""
+                            UPDATE trader_performance
+                            SET exit_price = ?, pnl_pct = ?, status = ?,
+                                close_reason = ?, closed_at = ?
+                            WHERE trade_id = ? AND status = 'open'
+                        """, (exit_p, pnl_pct, status, close_reason,
+                              int(time.time()), trade_id))
+                        _update_trader_aggregates(conn, wallet)
+
+                    conn.commit()
+                    updated += 1
+                finally:
+                    conn.close()
+
+            except Exception as e:
+                print(f"[sync_perf] Error updating trade #{trade_id}: {e}")
+
+        if updated:
+            print(f"[sync_perf] Synced {updated} trader_performance records")
+        return updated
+
+    except Exception as e:
+        print(f"[sync_perf] Error: {e}")
+        return 0
+
+
 if __name__ == "__main__":
     init_db()
     print("[fill_monitor] Starting monitor...")

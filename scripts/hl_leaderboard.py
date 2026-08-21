@@ -256,31 +256,54 @@ def scan_wallet(wallet: str) -> dict | None:
         return None
 
 def save_trader(trader: dict):
-    """Save trader to database."""
+    """Save trader to database. Preserves copy stats (copy_weight, copy_trades, copy_wins, copy_pnl)
+    when the trader already exists — these are updated by hl_fill_monitor, not by leaderboard scans."""
     conn = get_db()
     try:
-        conn.execute("""
-            INSERT OR REPLACE INTO traders 
-            (wallet, pnl_all_time, win_rate, trade_count, volume_30d, 
-             max_drawdown, score, pattern, last_updated, active,
-             copy_weight, copy_trades, copy_wins, copy_pnl)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1,
-                    ?, ?, ?, ?)
-        """, (
-            trader['wallet'],
-            trader['pnl_all_time'],
-            trader['win_rate'],
-            trader['trade_count'],
-            trader['volume_30d'],
-            trader['max_drawdown'],
-            trader['score'],
-            trader['pattern'],
-            trader['last_updated'],
-            trader.get('copy_weight', 1.0),
-            trader.get('copy_trades', 0),
-            trader.get('copy_wins', 0),
-            trader.get('copy_pnl', 0.0),
-        ))
+        # Check if trader exists
+        existing = conn.execute(
+            "SELECT copy_weight, copy_trades, copy_wins, copy_pnl FROM traders WHERE wallet = ?",
+            (trader['wallet'],)
+        ).fetchone()
+
+        if existing:
+            # UPDATE: preserve copy stats from existing record
+            conn.execute("""
+                UPDATE traders SET
+                    pnl_all_time = ?, win_rate = ?, trade_count = ?,
+                    volume_30d = ?, max_drawdown = ?, score = ?,
+                    pattern = ?, last_updated = ?, active = 1
+                WHERE wallet = ?
+            """, (
+                trader['pnl_all_time'],
+                trader['win_rate'],
+                trader['trade_count'],
+                trader['volume_30d'],
+                trader['max_drawdown'],
+                trader['score'],
+                trader['pattern'],
+                trader['last_updated'],
+                trader['wallet'],
+            ))
+        else:
+            # INSERT: new trader with default copy stats
+            conn.execute("""
+                INSERT INTO traders
+                (wallet, pnl_all_time, win_rate, trade_count, volume_30d,
+                 max_drawdown, score, pattern, last_updated, active,
+                 copy_weight, copy_trades, copy_wins, copy_pnl)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1.0, 0, 0, 0.0)
+            """, (
+                trader['wallet'],
+                trader['pnl_all_time'],
+                trader['win_rate'],
+                trader['trade_count'],
+                trader['volume_30d'],
+                trader['max_drawdown'],
+                trader['score'],
+                trader['pattern'],
+                trader['last_updated'],
+            ))
         conn.commit()
     finally:
         conn.close()
