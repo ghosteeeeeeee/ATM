@@ -12265,3 +12265,54 @@ None — system stable, previous fixes settling in.
 - System in good state, 4 open positions green
 
 **Open Questions:** None
+
+## [2026-08-21 11:10 UTC] Hourly Analysis
+
+**Trades:** 6 closed (3 wins, 3 losses)
+**PnL:** $0.26 (50% WR)
+
+**24h:** 26T 17W +$1.71 (65.4% WR)
+
+**hl_copy_trader:** 3 correlated L1 SL hits (ETH/BTC/SOL) — normal, 24h still +$0.53 (11T 6W)
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader losses correlated (major L1s dropped together), not signal decay
+- atr_sl_hit 69% of 24h but ALL profitable — trailing SL correct
+- Trade freq 6/hr normal
+- 24h 65.4% WR strong
+
+**Open Questions:** None
+
+## [2026-08-21 12:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet period)
+**24h:** 26T 17W +$1.71 (65.4% WR)
+
+**24h Breakdown:**
+- atr_sl_hit: 18T +$1.35 (avg +$0.075) — trailing SL profitable, 69% of closes
+- profit-monster-trail: 7T +$0.18 (avg +$0.026)
+- atr_tp_hit: 1T +$0.18
+
+**Top Signals (24h):**
+- hl_copy_trader: 11T 6W +$0.53 — star signal
+- ct-hot+: 4T 3W +$0.92 — strong
+- r2-trend-long3: 5T 3W +$0.23
+- Others: small samples, all positive
+
+**Open Positions (4):** ETH, BTC, HYPE (hl_copy_trader) + NXPC (ct-hot+) — all green +$0.39 unrealized
+
+**7d:** 226T 116W 51.3%WR +$0.87 (recovering)
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 closes last hour — quiet market, no data to act on
+- atr_sl_hit 69% of 24h but ALL profitable — trailing SL working correctly
+- No signal at 0%WR with 3+T last hour
+- Trade freq 2.8/hr normal
+- 24h 65.4% WR strong, 7d recovering
+- 4 open positions all green
+
+**Open Questions:** None
