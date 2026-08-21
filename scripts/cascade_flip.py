@@ -147,7 +147,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
         entry_fee = notional * TAKER_FEE
         exit_fee = notional * TAKER_FEE
         fee_total = entry_fee + exit_fee
-        pnl_pct, pnl_usdt_val, net_pnl = compute_close_pnl(entry_price, current_price, direction, amount_usdt)
+        pnl_pct, pnl_usdt_val, net_pnl = compute_close_pnl(entry_price, current_price, direction, notional, leverage)
         cur.execute("""
             UPDATE trades
             SET status = 'closed',

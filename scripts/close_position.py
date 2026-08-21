@@ -78,6 +78,7 @@ def close_brain(coin, exit_price):
                 pnl_pct = round((exit_price - float(entry_price)) / float(entry_price) * 100, 4)
             else:
                 pnl_pct = round((float(entry_price) - exit_price) / float(entry_price) * 100, 4)
+            pnl_pct = round(pnl_pct * leverage, 4)  # leveraged return
         # BUG-FIX (2026-04-19): pnl_usdt was hardcoded to 0 — manual_close trades
         # showed exit prices that differed from entry but pnl=0.00 was recorded.
         # Fix: compute pnl_usdt from entry/exit/amount and direction-aware formula.

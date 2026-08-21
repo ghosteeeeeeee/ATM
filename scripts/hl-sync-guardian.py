@@ -615,16 +615,17 @@ def _backfill_hl_pnl_recent_closes():
             if total_pnl == 0:
                 continue
 
-            # Compute HL-based pnl_pct from actual fill prices
+            # Compute HL-based pnl_pct from actual fill prices (leveraged)
             total_sz = sum(f['sz'] for f in close_fills)
             if total_sz == 0:
                 continue
             wavg_exit = sum(f['px'] * f['sz'] for f in close_fills) / total_sz
             if direction == 'SHORT':
-                hl_pnl_pct = ((entry_px - wavg_exit) / entry_px) * 100
+                hl_raw_move = ((entry_px - wavg_exit) / entry_px) * 100
             else:
-                hl_pnl_pct = ((wavg_exit - entry_px) / entry_px) * 100
-            hl_pnl_pct = round(hl_pnl_pct, 4)
+                hl_raw_move = ((wavg_exit - entry_px) / entry_px) * 100
+            lev = float(leverage) if leverage else 10
+            hl_pnl_pct = round(hl_raw_move * lev, 4)
 
             # Update trade with HL ground truth
             cur.execute('''
@@ -2919,7 +2920,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         cur = conn.cursor()
         # Look up entry price, direction, amount, leverage, paper flag, and open_time for PnL calc
         cur.execute(
-            "SELECT entry_price, direction, amount_usdt, leverage, paper, open_time FROM trades WHERE id=%s AND status='open'",
+            "SELECT entry_price, direction, amount_usdt, leverage, paper, open_time, hl_notional_usdt FROM trades WHERE id=%s AND status='open'",
             (trade_id,))
         row = cur.fetchone()
         if not row:
@@ -2927,7 +2928,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
             cur.close(); conn.close()
             return
 
-        entry_price, direction, amount_usdt, leverage, is_paper, open_time = row
+        entry_price, direction, amount_usdt, leverage, is_paper, open_time, hl_notional_usdt = row
 
         # FIX (2026-04-05): Sanity-check entry_price against current market price.
         # If entry_price is <10% or >10x current market, the entry was corrupted (e.g.
@@ -2985,7 +2986,12 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 log(f'  {token} HL PnL fetch failed (using calc): {hl_err}', 'WARN')
 
         # Centralized PnL calculation via pnl_utils
-        pnl_pct, pnl_usdt, _ = compute_close_pnl(float(entry_price), exit_price, direction, amount_usdt, leverage)
+        # calc_notional: use actual HL notional if recorded, else amount_usdt * leverage
+        if hl_notional_usdt is not None:
+            calc_notional = float(hl_notional_usdt)
+        else:
+            calc_notional = amount_usdt * leverage
+        pnl_pct, pnl_usdt, _ = compute_close_pnl(float(entry_price), exit_price, direction, calc_notional, leverage)
 
         # Use HL ground truth if available
         if hype_pnl_usdt is not None and hype_pnl_usdt != 0:

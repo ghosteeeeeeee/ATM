@@ -127,12 +127,14 @@ def compute_divergence(trade, hl_pnl, hl_exit):
         100.0 if abs(db_val) > 0.001 else 0.0
     )
 
-    # Compute correct pnl_pct from HL exit
+    # Compute correct pnl_pct from HL exit (leveraged)
     entry_px = float(entry_price)
+    lev = float(leverage) if leverage else 10
     if direction == 'SHORT':
-        hl_pct = ((entry_px - hl_exit) / entry_px) * 100
+        hl_raw = ((entry_px - hl_exit) / entry_px) * 100
     else:
-        hl_pct = ((hl_exit - entry_px) / entry_px) * 100
+        hl_raw = ((hl_exit - entry_px) / entry_px) * 100
+    hl_pct = round(hl_raw * lev, 4)
 
     return {
         'trade_id': trade_id,

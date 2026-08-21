@@ -817,9 +817,9 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
         # (≈$7). When not set (legacy trades), falls back to amount_usdt (≈$50).
         # Centralized via pnl_utils (direction-aware, unleveraged).
         pnl_pct, hype_pnl_usdt, _ = compute_close_pnl(
-            float(entry_price or 1), float(exit_price), direction, calc_notional
+            float(entry_price or 1), float(exit_price), direction, calc_notional, lev
         )
-        # pnl_pct from compute_close_pnl is already unleveraged. hype_pnl_usdt is
+        # pnl_pct from compute_close_pnl is leveraged (raw move × leverage).
         # signed (positive for profit, negative for loss). For brain.py we store
         # hype_pnl_usdt and derive hype_pnl_pct from it to stay consistent.
         hype_pnl_pct = (hype_pnl_usdt / calc_notional * 100) if calc_notional else 0
