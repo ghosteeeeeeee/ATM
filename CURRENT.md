@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 02:00 UTC (CEO run)**
+**Last Updated: 2026-08-21 03:00 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
@@ -34,7 +34,7 @@
 - **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). 3 stale records cleaned (ids 10211-10213). — 2026-08-17
 - **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS even when 15m/4h is NEUTRAL. — 2026-08-16
 - **SHORT side structural weakness** — signals firing (NEAR SHORT tl_break_short, ONDO SHORT r2-trend-short2) but blocked by vol gate (ATR > storm threshold). Market condition, not bug (confirmed2026-08-19 short-bias-fix plan). — 2026-08-20
-- **MIN_PRE_MOVE 0.3 eval** — r2-trend-long3: 34T/7d, ATR_SL 14T -$0.99, PM_TRAIL 20T +$0.80. Eval through Aug 23. — 2026-08-20
+- **MIN_PRE_MOVE 0.3 eval EXTENDED** — r2-trend-long3 48h: 9T $0.00 66.7% WR (WR improved 55.9%→66.7% but PnL break-even). PM_TRAIL captures winners, ATR_SL hits losers. EXTENDED through Aug 25 (needs PnL positive to justify filter). — 2026-08-21
 - **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
 
 ## System Improvement Backlog
@@ -51,7 +51,7 @@
 
 ## Next Actions
 
-1. **Monitor MIN_PRE_MOVE 0.3.** r2-trend-long3: 34T/7d 55.9% -$0.23 (PM_TRAIL 20T 94.4% +$0.80 carrying, ATR_SL 14T -$0.99 dragging). Eval through Aug 23. — 2026-08-20
+1. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 48h: 9T $0.00 66.7% WR (break-even, WR improved but PnL flat). If still break-even by Aug 25, filter is noise-reducing not edge-creating — consider removing. — 2026-08-21
 2. **Monitor PM_TRAIL edge.** 144T/7d +$5.43, 83.3% WR. Must hold >80%. — 2026-08-20
 3. **Monitor ATR_SL count.** 101T/7d -$7.60, 1% WR. SL floor fix active. — 2026-08-20
 4. **Higher-TF regime for confluence.** 1m regime too noisy, causes false NEUTRAL relax triggers. — 2026-08-20

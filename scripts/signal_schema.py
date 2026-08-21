@@ -1435,6 +1435,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # atr-spike
+            if _comp == 'atr-spike+':
+                try:
+                    from hermes_constants import ATR_SPIKE_PLUS_ENABLED
+                    if not ATR_SPIKE_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_SPIKE_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'atr-spike':
+                try:
+                    from hermes_constants import ATR_SPIKE_ENABLED
+                    if not ATR_SPIKE_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_SPIKE_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 

@@ -320,6 +320,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('bb_bounce',   'bb_bounce,range_finder'):            0.5,  # 6T 33% WR -$0.03
     # Preserve winning + variants (must come before shorter prefixes)
     ('bb_bounce',   'bb_bounce,ma100-cross+'):            1.0,  # 3T 67% WR +$0.06
+    # atr_spike — catch staged moves from ATR compression
+    ('atr_spike_long', 'atr-spike+'):  1.0,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

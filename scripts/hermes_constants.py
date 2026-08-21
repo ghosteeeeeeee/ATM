@@ -1694,6 +1694,21 @@ CONTINUATION_CONF_FLOOR = 65
 CONTINUATION_CONF_CAP = 90
 CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)
 
+# ── ATR Spike Signal (atr_spike.py) ─────────────────────────────────────
+# Catch staged LONG moves from ATR compression. Quality over quantity.
+ATR_SPIKE_ENABLED              = False   # master kill-switch
+ATR_SPIKE_PLUS_ENABLED         = True    # LONG direction
+ATR_SPIKE_COMPRESSION_MAX_PCT  = 0.05    # ATR% threshold for compression
+ATR_SPIKE_COMPRESSION_MIN_BARS = 5       # minimum candles in compression
+ATR_SPIKE_BREAKOUT_MIN_PCT     = 0.3     # minimum candle % move to trigger
+ATR_SPIKE_TREND_FILTER         = True    # require EMA20 > EMA50 on 15m
+ATR_SPIKE_EMA_PROXIMITY_PCT    = 0.5     # max distance from EMA20 (15m)
+ATR_SPIKE_SL_PCT               = 0.75    # hard stop-loss %
+ATR_SPIKE_CONF_BASE            = 70      # base confidence
+ATR_SPIKE_CONF_PCT_BOOST       = 10      # extra conf per 0.1% above breakout threshold
+ATR_SPIKE_CONF_CAP             = 88      # max confidence (system ceiling)
+ATR_SPIKE_COOLDOWN_MIN         = 60      # minutes between fires per token
+
 # ── Hebbian autonomous gate ─────────────────────────────────────────────
 HEBBIAN_GATE_ENABLED = True                   # master switch for autonomous decisions
 HEBBIAN_AUTO_APPROVE_WR = 0.60               # WR >= this → auto-approve

@@ -12008,3 +12008,21 @@ None — system stable, previous fixes settling in.
 - Legacy SHORT exits aging out of 24h window
 
 **Open Questions:** None — system healthy, quiet night
+
+## [2026-08-21 02:04 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet night, last close 21:21 UTC)
+**PnL:** $0.00
+**24h:** 18T 50%WR -$0.54
+
+**Changes:** None
+
+**No Change Needed:**
+- LONG 13T 69.2%WR -$0.07 — solid performance
+- SHORT 5T 0%WR -$0.47 — all legacy pre-kill, aging out
+- LONG ATR_SL 30.8% (4/13) well below 40% threshold
+- r2-trend-long3 5T 40%WR -$0.18 borderline, not kill-worthy
+- 0 open positions, 0.25/hr frequency normal
+- System healthy, quiet nighttime
+
+**Open Questions:** None

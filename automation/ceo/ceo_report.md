@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-21 (~03:00 UTC, verified, 195th run)
+
+### Diagnosis
+System HEALTHY. 24h: 18T -$0.54, 50.0% WR (flat — SHORT legacy aging out). 7d: 266T -$1.08, 51.5% WR (improved). 0 open positions (clean). PM_TRAIL: 144T/7d +$5.42, 83.3% WR (carrying system). ATR_SL: 14T/48h -$1.59 (dominant drag). Daily: Aug 17 +$0.37 → 18 -$0.38 → 19 +$0.42 → 20 -$0.54 (alternating). Coin tracker: 113 coins tracked, ALL wyckoff_phase=none (detection gap confirmed — BTC shows accumulation in raw data but phase not propagating).
+
+### Root Cause
+No new root causes. System stable. SHORT legacy losses (-$0.47/48h) aging out by Aug 22. ATR_SL dominant at 14T/48h -$1.59. r2-trend-long3 MIN_PRE_MOVE 0.3: 48h 9T $0.00 66.7% WR — WR improved (55.9%→66.7%) but PnL flat. PM_TRAIL captures winners, ATR_SL hits losers = break-even. Coin tracker Wyckoff detection not producing actionable phases.
+
+### Fix Applied
+EXTENDED MIN_PRE_MOVE 0.3 eval through Aug 25 (was Aug 23). Break-even not enough — filter needs to produce positive PnL to justify keeping. If still flat by Aug 25, remove filter. No other changes.
+
+### Verification
+PM_TRAIL 83.3% WR stable. ATR_SL at historic low. 0 open positions. Legacy SHORT clearing on track. Pipeline running, all timers firing.
+
+---
+
 ## CEO Report — 2026-08-21 (~02:00 UTC, verified, 194th run)
 
 ### Diagnosis

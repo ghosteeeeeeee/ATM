@@ -1177,3 +1177,7 @@
   WHY: 0T last hour (quiet night, last close 21:21). 24h 18T 50%WR -$0.54. LONG ATR_SL ~30% well below 40%. Overall 44.4% inflated by SHORT legacy (4/8). All SHORT losses pre-kill (5T -$0.47), 0 SHORT opens 12h+. r2-trend-long3 5T 40%WR -$0.18 borderline. 0 open positions. 0.75/hr freq normal. 7d 268T 51.5%WR -$1.06 flat. System healthy, 8th green day.
   BY: auto_1hr
   NEXT: Re-run at 02:05 UTC
+[2026-08-21 02:04 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (quiet night, last close 21:21). 24h 18T 50%WR -$0.54. LONG 13T 69.2%WR -$0.07 solid. SHORT 5T 0%WR -$0.47 all legacy pre-kill. LONG ATR_SL 30.8% (4/13) well below 40%. r2-trend-long3 5T 40%WR borderline. 0 open positions. 0.25/hr freq normal. System healthy.
+  BY: auto_1hr
+  NEXT: Re-run at 03:05 UTC

@@ -68,6 +68,8 @@ from hermes_constants import (
     TREND_MOMENTUM_NEAR_SMA_ENABLED, TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED,
     STOP_HUNT_REVERSAL_LONG_ENABLED, STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED,
     SPIKE_EXHAUSTION_SHORT_ENABLED, SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED,
+    # atr_spike
+    ATR_SPIKE_ENABLED, ATR_SPIKE_PLUS_ENABLED,
 )
 
 
@@ -358,6 +360,11 @@ except Exception:
     _coin_tracker_hot_run = None
 
 try:
+    from signals.atr_spike import run as _atr_spike_run
+except Exception:
+    _atr_spike_run = None
+
+try:
     from signals.spike_exhaustion_short import run as _spike_exhaustion_short_run
 except Exception:
     _spike_exhaustion_short_run = None
@@ -435,6 +442,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'spike_exhaustion_short', 'enabled': 'SPIKE_EXHAUSTION_SHORT_ENABLED', 'run': _spike_exhaustion_short_run},
     {'name': 'wave_catcher', 'enabled': 'WAVE_CATCHER_ENABLED', 'run': _wave_catcher_run},
     {'name': 'coin_tracker_hot', 'enabled': 'COIN_TRACKER_HOT_ENABLED', 'run': _coin_tracker_hot_run},
+    {'name': 'atr_spike', 'enabled': 'ATR_SPIKE_ENABLED', 'run': _atr_spike_run},
 ]
 
 
