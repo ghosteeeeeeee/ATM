@@ -248,6 +248,13 @@ FAVORITES = {
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
 FAVORITES_SIZE_MULT = 1.5     # Position size multiplier in decider_run ($11 → $16.50)
+FAVORITES_RESIDENCY_DECAY = 0.12  # Staleness decay rate for favorites (default 0.2 → 5min, 0.12 → ~8.3min)
+
+# Penalty list — consistent underperformers get deprioritized (not blacklisted).
+# Blacklist = never trade. Penalty = tradeable but low priority.
+# Auto-updated by favorites_updater.py.
+PENALTY_TOKENS = set()
+PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_signal()
 
 # Signal source blocklist — block ENTIRE signal sources that are broken/baselined
 # Blocked sources will be filtered out at the signal_schema.py level before hotset

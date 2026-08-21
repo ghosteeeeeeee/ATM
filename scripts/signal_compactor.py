@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -757,7 +757,10 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Favorites score boost — proven tokens get higher ranking
     favorites_mult = FAVORITES_MULT if FAVORITES and token in FAVORITES else 1.0
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult
+    # Penalty list — underperformers get deprioritized
+    penalty_mult = PENALTY_MULT if PENALTY_TOKENS and token in PENALTY_TOKENS else 1.0
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult
     return final_score
 
 
@@ -2511,7 +2514,8 @@ def _filter_safe_prev_hotset(prev_hotset):
             entry['entry_origin_ts'] = entry_origin_ts
         entry['timestamp'] = current_ts
         age_min = (current_ts - entry_origin_ts) / 60.0
-        entry['staleness'] = max(0.0, 1.0 - age_min * 0.2)
+        decay_rate = FAVORITES_RESIDENCY_DECAY if tok in FAVORITES else 0.2
+        entry['staleness'] = max(0.0, 1.0 - age_min * decay_rate)
         # Expire entries with staleness <= 0.01 (5+ minutes old from entry_origin_ts)
         if entry['staleness'] <= 0.01:
             continue
