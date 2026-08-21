@@ -23,7 +23,7 @@ MIN_TRADES = 3
 
 
 def log(msg):
-    ts = datetime.now(timezone.utc).strftime('%Y-%d-%m %H:%M UTC')
+    ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     line = f"[{ts}] {msg}"
     print(line)
     try:
@@ -36,6 +36,7 @@ def log(msg):
 
 def get_favorites_stats():
     """Query rolling 7d stats for FAVORITES tokens from brain DB."""
+    conn = None
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
@@ -87,12 +88,15 @@ def get_favorites_stats():
         field_row = cur.fetchone()
         field_stats = dict(zip(['trades', 'wins', 'winrate', 'avg_pnl_pct', 'total_pnl_usdt'], field_row)) if field_row else {}
 
-        conn.close()
         return favorites_stats, field_stats
 
     except Exception as e:
         log(f"DB query error: {e}")
         return [], {}
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 def run():

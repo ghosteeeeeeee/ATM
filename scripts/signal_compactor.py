@@ -2556,7 +2556,8 @@ def _preserve_previous_hotset(dry=False):
                     origin = s.get('entry_origin_ts')
                     if origin:
                         age_m = (time.time() - origin) / 60.0
-                        s['staleness'] = max(0.0, 1.0 - age_m * 0.2)
+                        decay_rate = FAVORITES_RESIDENCY_DECAY if s.get('token', '') in FAVORITES else 0.2
+                        s['staleness'] = max(0.0, 1.0 - age_m * decay_rate)
                     prev_hotset[f"{s['token']}:{s['direction']}"] = s
         except Exception as e:
             pass
