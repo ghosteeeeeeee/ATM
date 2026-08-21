@@ -85,6 +85,7 @@ REGIME_SIGNALS = {
         'mover+', 'mover-',  # momentum spike detector
         'bb_bounce',
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
+        'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — allowed in all regimes
     },
 }
 
