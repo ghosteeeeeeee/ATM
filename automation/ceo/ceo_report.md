@@ -1,27 +1,28 @@
-## CEO Report — 2026-08-21 ~19:00 UTC (219th run)
+## CEO Report — 2026-08-21 ~20:00 UTC (220th run)
 
 ### Diagnosis
-System FLAT, HEALTHY. 24h: 37T +$0.01, 51.4% WR (breakeven). 7d: 235T -$0.67, 51.1% WR (slight legacy drag). 4 open: hl_copy_trader LONG (BTC/ETH/HYPE/SOL). ct-hot+ KILLED by auto_1hr at 17:00 (0W-7L last 3h, COIN_TRACKER_HOT_PLUS_ENABLED=False, MIN_COMPOSITE 60→70). PM_TRAIL: 15T/48h +$0.75, 93.3% WR (carrying system). ATR_SL: 43T/48h -$1.27, 37.2% WR (ONLY loss source). ATR_SL today improved: 33T -$0.24 (avg -$0.007/trade, historic low per-trade loss). SHORT legacy dead: r2-trend-short2/10/13 0% WR -$0.47/7d (draining). Volume: 15T trough (Aug 18) → 34T today. Disk: 81%.
+System FLAT, HEALTHY. Verified DB: 24h 39T +$0.69, 51.3% WR (slightly green). 48h: 63T +$0.35, 52.4% WR (flat). 7d: 238T +$0.01, 50.8% WR (breakeven). 2 open positions. Today: 37T +$0.62, 48.6% WR. hl_copy_trader 21T/24h +$1.15 52.4% WR (carrying system, all ATR_SL exits profitable — trailing SL above entry). ct-hot+ 15T/24h -$0.81 40% WR (all pre-kill trades closing — COIN_TRACKER_HOT_PLUS_ENABLED=False at 17:00, MIN_COMPOSITE 70). ATR_SL: 28T/48h -$4.44 (ONLY loss source, but today +$0.44 profitable — SL floor fix working). r2-trend-long6 6T/7d +$0.40 100% WR (best signal). SHORT legacy dead: 27T/7d 18.5% WR -$1.09 (ALL legacy, die Aug 22-23). Disk: 81%.
 
 ### Root Cause
-Legacy SHORT signals and ct-hot+ still in 7d window. ATR_SL remains only loss source but per-trade loss improving (SL floor fix working). System is break-even, not losing.
+Legacy SHORT signals and ct-hot+ still in 7d window. ATR_SL remains only loss source but today profitable (trailing SL above entry, SL floor fix working). System is break-even, not losing. Legacy positions aging out naturally (Aug 22-23).
 
 ### Fix Applied
-NO CHANGES. auto_1hr already handled ct-hot+ kill. Legacy aging out naturally (Aug 22-23). PM_TRAIL 93.3% WR carrying system.
+NO CHANGES. System healthy, flat, no bleeding. auto_1hr correctly handled ct-hot+ kill at 17:00. Legacy aging out naturally. PM_TRAIL 83-84% WR carrying system. ATR_SL today actually profitable (+$0.44) — SL floor fix working as designed.
 
 ### Metrics
 | Metric | Current | Trend |
 |--------|---------|-------|
-| 24h WR | 51.4% | Flat |
-| 7d PnL | -$0.67 | Improving from -$1.50+ |
-| PM_TRAIL 48h WR | 93.3% | Carrying system |
-| ATR_SL per-trade loss | -$0.007 | Historic low (SL floor fix) |
-| ct-hot+ | KILLED | Never re-enable at composite <70 |
+| 24h PnL | +$0.69 | Slightly green |
+| 7d PnL | +$0.01 | Breakeven (improving from -$1.50+) |
+| PM_TRAIL WR | 83-84% | Carrying system |
+| ATR_SL today | +$0.44 | Profitable (trailing above entry) |
+| ct-hot+ | KILLED | COIN_TRACKER_HOT_PLUS_ENABLED=False, MIN_COMPOSITE 70 |
+| SHORT legacy | Dying | Aug 22-23 age out |
 
 ### Next Actions
-1. Monitor MIN_PRE_MOVE 0.3 eval (Aug 25)
-2. Monitor PM_TRAIL WR (>80%)
-3. Monitor ATR_SL daily (<15 trades)
-4. Monitor R2_TREND_SHORT (0 trades/48h, no edge yet)
-5. SHORT signal development (CEO priority — structural gap)
-6. retroactive-scan-delayed-entry plan (Level 3, ~200 LOC)
+1. Monitor ct-hot+ stay killed (COIN_TRACKER_HOT_PLUS_ENABLED=False, MIN_COMPOSITE 70)
+2. Monitor MIN_PRE_MOVE 0.3 eval (extended to Aug 25)
+3. Monitor PM_TRAIL WR (>80%)
+4. Monitor ATR_SL daily (<15 trades)
+5. Monitor disk (85% cleanup trigger)
+6. Legacy age out (Aug 22-23)
