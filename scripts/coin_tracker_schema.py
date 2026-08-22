@@ -257,6 +257,7 @@ _NEW_COLUMNS = [
     ('clustering_bullish', 'REAL'),
     ('clustering_bearish', 'REAL'),
     ('recency', 'REAL'),
+    ('liquidation', 'REAL'),
 ]
 
 def migrate_tables():
@@ -330,15 +331,16 @@ def write_score(symbol, ts, health, score, momentum, volume, volatility, spread,
                 wyckoff_phase=None, ewave_count=None, ewave_degree=None, ewave_direction=None,
                 trend_quality=None, trend_direction=None, sr_levels=None, vol_profile=None,
                 setup_score=None, setup_type=None, setup_details=None,
-                clustering_bullish=None, clustering_bearish=None, recency=None):
+                clustering_bullish=None, clustering_bearish=None, recency=None, liquidation=None):
     """Write composite score for a coin. Upserts into agg_scores."""
     with _db() as conn:
         conn.execute("""
             INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
                                     wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
                                     trend_quality, trend_direction, sr_levels, vol_profile,
-                                    setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency,
+                                    liquidation)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(symbol) DO UPDATE SET
                 ts = excluded.ts,
                 health = excluded.health,
@@ -363,11 +365,13 @@ def write_score(symbol, ts, health, score, momentum, volume, volatility, spread,
                 setup_details = COALESCE(excluded.setup_details, agg_scores.setup_details),
                 clustering_bullish = COALESCE(excluded.clustering_bullish, agg_scores.clustering_bullish),
                 clustering_bearish = COALESCE(excluded.clustering_bearish, agg_scores.clustering_bearish),
-                recency = COALESCE(excluded.recency, agg_scores.recency)
+                recency = COALESCE(excluded.recency, agg_scores.recency),
+                liquidation = COALESCE(excluded.liquidation, agg_scores.liquidation)
         """, (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
               wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
               trend_quality, trend_direction, sr_levels, vol_profile,
-              setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency))
+              setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency,
+              liquidation))
         conn.commit()
 
 def update_registry_health(symbol, health, health_score):

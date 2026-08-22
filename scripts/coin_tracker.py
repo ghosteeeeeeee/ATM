@@ -351,6 +351,19 @@ def collect():
                 recency_val = setup.get('recency')
                 s_recency = (recency_val if recency_val is not None else 0.5) * 100
 
+                # ── Liquidation score (from liquidation_map.py data) ──
+                liq_clusters = liq_data.get('liquidation_clusters', {}).get(symbol.upper(), [])
+                liq_stop_hunts = liq_data.get('stop_hunt_signals', [])
+                has_stop_hunt = any(sh.get('coin', '').upper() == symbol.upper() for sh in liq_stop_hunts)
+                # Get order book imbalance for this coin
+                ob_data = liq_data.get('order_books', {}).get(symbol.upper(), {})
+                coin_liq = {
+                    '_coin_clusters': liq_clusters,
+                    '_has_stop_hunt': has_stop_hunt,
+                    '_imbalance': ob_data.get('imbalance', 1.0),
+                }
+                s_liquidation = _score_liquidation(price, coin_liq)
+
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +
                     s_volume * WEIGHTS['volume'] +
@@ -363,7 +376,8 @@ def collect():
                     s_trend_quality * WEIGHTS['trend'] +
                     s_setup * WEIGHTS['setup'] +
                     s_clustering * WEIGHTS['clustering'] +
-                    s_recency * WEIGHTS['recency']
+                    s_recency * WEIGHTS['recency'] +
+                    s_liquidation * WEIGHTS['liquidation']
                 )
 
                 # No candle data = no real activity → force cold/dead
@@ -417,8 +431,9 @@ def collect():
                     INSERT INTO agg_scores (symbol, ts, health, score, momentum, volume, volatility, spread, signals, regime, composite,
                                             wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
                                             trend_quality, trend_direction, sr_levels, vol_profile,
-                                            setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                            setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency,
+                                            liquidation)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(symbol) DO UPDATE SET
                         ts=excluded.ts, health=excluded.health, score=excluded.score,
                         momentum=excluded.momentum, volume=excluded.volume, volatility=excluded.volatility,
@@ -437,7 +452,8 @@ def collect():
                         setup_details=COALESCE(excluded.setup_details, agg_scores.setup_details),
                         clustering_bullish=COALESCE(excluded.clustering_bullish, agg_scores.clustering_bullish),
                         clustering_bearish=COALESCE(excluded.clustering_bearish, agg_scores.clustering_bearish),
-                        recency=COALESCE(excluded.recency, agg_scores.recency)
+                        recency=COALESCE(excluded.recency, agg_scores.recency),
+                        liquidation=COALESCE(excluded.liquidation, agg_scores.liquidation)
                 """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite,
                       wyckoff.get('phase'),
                       ewave.get('wave') if isinstance(ewave.get('wave'), int) else None,
@@ -452,7 +468,8 @@ def collect():
                       setup.get('setup_details'),
                       clustering.get('bullish_clusters'),
                       clustering.get('bearish_clusters'),
-                      setup.get('recency')))
+                      setup.get('recency'),
+                      s_liquidation))
 
                 # Registry
                 write_conn.execute("""
