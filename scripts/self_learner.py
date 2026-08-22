@@ -39,6 +39,7 @@ try:
         SELF_LEARNER_MAX_ADJUSTMENTS as MAX_ADJUSTMENTS_PER_DAY,
         SELF_LEARNER_MIN_BETWEEN as MIN_TRADES_BETWEEN,
         CEO_PROTECTED_FLAGS,
+        RESEARCH_FLAGS,
     )
 except ImportError:
     MIN_WR = 0.30
@@ -46,6 +47,7 @@ except ImportError:
     MAX_ADJUSTMENTS_PER_DAY = 3
     MIN_TRADES_BETWEEN = 15
     CEO_PROTECTED_FLAGS = set()
+    RESEARCH_FLAGS = set()
 
 CRITICAL_WR = 0.25  # Below this = emergency disable
 GOAL_PROGRESS_FILE = '/root/.hermes/data/goal_progress.json'
@@ -408,6 +410,11 @@ def _disable_signal(signal_type):
             # HARD CHECK: Skip CEO-protected flags — non-negotiable
             if flag in CEO_PROTECTED_FLAGS:
                 _log(f"  BLOCKED {flag}: CEO_PROTECTED — cannot disable (human approval required)")
+                return False
+            
+            # HARD CHECK: Skip research/testing flags — NOBODY can touch these
+            if flag in RESEARCH_FLAGS:
+                _log(f"  BLOCKED {flag}: RESEARCH/TESTING — cannot disable (human only)")
                 return False
             
             pattern = rf'^({re.escape(flag)}\s*=\s*)(True|False)'

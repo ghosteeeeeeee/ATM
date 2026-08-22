@@ -1241,11 +1241,21 @@ CEO_PROTECTED_FLAGS = {
     'R2_TREND_LONG_ENABLED': ('Winning LONG signal — 8/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
-    'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. Only T can change', '2026-08-21'),
-    'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED', '2026-08-22'),
-    'COIN_TRACKER_HOT_MINUS_ENABLED': ('Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED', '2026-08-22'),
-    'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Composite threshold — raised to 70 from 56 (CEO killed ct-hot+ 2026-08-22). CEO_PROTECTED', '2026-08-22'),
     'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
+}
+
+# ── Research/Testing Flags — NOBODY CAN TOUCH ──────────────────────────────
+# These flags are in research/testing mode. NO automation can modify them.
+# Only human (T) can change these. CEO, signal reporter, self_learner all blocked.
+# Format: flag_name -> (reason, date_added)
+RESEARCH_FLAGS = {
+    'COIN_TRACKER_HOT_ENABLED': ('Research/testing — momentum filters active, monitoring performance', '2026-08-22'),
+    'COIN_TRACKER_HOT_PLUS_ENABLED': ('Research/testing — MACD%, Z-score, BB, speed, accel filters', '2026-08-22'),
+    'COIN_TRACKER_HOT_MINUS_ENABLED': ('Research/testing — SHORT enabled with same filters', '2026-08-22'),
+    'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Research/testing — composite threshold 57', '2026-08-22'),
+    'COIN_TRACKER_HOT_MIN_SPEED_PCT': ('Research/testing — speed filter min 30%', '2026-08-22'),
+    'COIN_TRACKER_HOT_MAX_SPEED_PCT': ('Research/testing — speed filter max 85%', '2026-08-22'),
+    'COIN_TRACKER_HOT_MIN_ACCEL': ('Research/testing — acceleration filter -0.01', '2026-08-22'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
@@ -1860,9 +1870,9 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = False  # SIGNAL REPORTER 2026-08-22 — entire family dead (62T/7d 32.3% WR -$4.04). PLUS/MINUS already False.
-COIN_TRACKER_HOT_PLUS_ENABLED       = False   # DISABLED 2026-08-22 09:00 UTC — 0% WR last hour (3T, -$0.58). Kill criteria: 3+ trades 0% WR
-COIN_TRACKER_HOT_MINUS_ENABLED      = False   # SIGNAL REPORTER 2026-08-22 — 3T/7d 0% WR -$0.17. SHORT dead. Killed with PLUS.
+COIN_TRACKER_HOT_ENABLED            = True   # RESEARCH/TESTING — momentum filters active, monitoring performance. RESEARCH_FLAGS
+COIN_TRACKER_HOT_PLUS_ENABLED       = True    # RESEARCH/TESTING — MACD%, Z-score, BB, speed, accel filters. RESEARCH_FLAGS
+COIN_TRACKER_HOT_MINUS_ENABLED      = True    # RESEARCH/TESTING — SHORT enabled with same filters. RESEARCH_FLAGS
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 3.0     # minimum cluster count for direction (raised from 1.0 — CEO Aug 22, reduces bleed)
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.6     # minimum recency weight (0-1) (raised from 0.35 — CEO Aug 22, requires fresher data)

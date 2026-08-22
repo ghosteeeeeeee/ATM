@@ -1,0 +1,11 @@
+{
+  "date": "2026-08-22",
+  "topic": "weather-station",
+  "content": "Market Weather Station deployed. Files: web/weather_station.html, scripts/weather_station_api.py, config/weather-station-api.timer. Dashboard at http://127.0.0.1:54321/weather_station.html. Key finding: only Copy Trader and Bollinger signals profitable. 117 tokens consistently lose.",
+  "files": [
+    "web/weather_station.html",
+    "scripts/weather_station_api.py",
+    "config/weather-station-api.timer",
+    "config/weather-station-api.service"
+  ]
+}
