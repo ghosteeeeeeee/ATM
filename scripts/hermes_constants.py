@@ -234,7 +234,6 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'BANANA',
-    'BLUR',
     'CAKE',
     'ETH',
     'FIL',
