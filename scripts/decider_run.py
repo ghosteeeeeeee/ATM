@@ -30,6 +30,7 @@ from hermes_constants import (
     TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT,
     CONFLUENCE_REQUIRED,
     MOMENTUM_EXHAUSTION_THRESHOLD,
+    BTC_CRASH_BLOCK_THRESHOLD,
     SIGNAL_INVERSION_ENABLED, SIGNAL_INVERSION_MAP,
     DYNAMIC_INVERSION_ENABLED, INVERT_WR_THRESHOLD, INVERT_MIN_TRADES,
     INVERT_LOOKBACK_HOURS, INVERT_CACHE_TTL, INVERT_SIGNALS,
@@ -1758,6 +1759,34 @@ def _run_hot_set():
         if speed_tracker_dr is not None:
             speed_tracker_dr.update()
 
+        # ── BTC FLASH CRASH FILTER (2026-08-22) ────────────────────────────────────
+        # Cascade crash at 05:08-05:11 UTC dropped BTC ~2% in 3 minutes, wiping out
+        # all open LONG positions. Some trades were even OPENED during the crash.
+        # This filter checks BTC 1m candles and blocks new entries during sharp drops.
+        _btc_crash_blocked = False
+        try:
+            import sqlite3 as _sqlite3_crash
+            _crash_conn = _sqlite3_crash.connect(CANDLES_DB, timeout=5)
+            _crash_cur = _crash_conn.cursor()
+            _crash_cur.execute("""
+                SELECT close FROM candles_1m
+                WHERE token = 'BTC' ORDER BY ts DESC LIMIT 6
+            """)
+            _btc_closes = [r[0] for r in _crash_cur.fetchall()]
+            _crash_conn.close()
+            if len(_btc_closes) >= 6:
+                _btc_now = _btc_closes[0]
+                _btc_5m_ago = _btc_closes[5]
+                if _btc_5m_ago > 0:
+                    _btc_chg_5m = (_btc_now - _btc_5m_ago) / _btc_5m_ago * 100
+                    # Block LONG entries when BTC dropped >1.5% in 5 minutes
+                    if _btc_chg_5m < BTC_CRASH_BLOCK_THRESHOLD:
+                        log(f'  🚨 [BTC-CRASH] ALL ENTRIES BLOCKED: BTC {BTC_CRASH_BLOCK_THRESHOLD}% '
+                            f'in 5m ({_btc_chg_5m:+.2f}%)')
+                        _btc_crash_blocked = True
+        except Exception:
+            pass  # never crash on filter failure
+
         # ── HOT-SET ITERATION ORDER: survival rounds first ────────────────────────
         # Tokens that survived more compaction cycles have proven themselves against
         # market volatility. Approve them FIRST so rate limits don't block veterans.
@@ -1775,6 +1804,12 @@ def _run_hot_set():
             z_score = hot_sig.get('z_score', 0.0) or 0.0
 
             if not token or not direction:
+                continue
+
+            # BTC FLASH CRASH: block all new entries during cascade
+            if _btc_crash_blocked:
+                log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — BTC flash crash in progress')
+                _record_hotset_failure(token, direction, failures)
                 continue
 
             # SAFETY: blacklist filter (defense-in-depth — hotset.json should already be clean)

@@ -753,6 +753,16 @@ TIDE_SHORT_WR_WINDOW = 10        # trades for confirmation
 TIDE_SHORT_WR_THRESHOLD_HIGH = 55
 TIDE_SHORT_WR_THRESHOLD_LOW = 45
 
+# ── BTC Flash Crash Filter (2026-08-22) ──────────────────────────────────────
+# Cascade crash at 05:08-05:11 UTC dropped BTC ~2% in 3 minutes, wiping out
+# all open LONG positions. This filter checks BTC 1m candles and blocks new
+# entries during sharp drops to prevent buying into cascades.
+# Backtest: would have blocked 3/7 cascade trades (opened during crash),
+# saved ~$2.00 in losses. Existing open positions still hit SL but no NEW
+# entries during the crash.
+BTC_CRASH_BLOCK_ENABLED = True
+BTC_CRASH_BLOCK_THRESHOLD = -1.5  # % — block all entries if BTC drops more than this in 5 minutes
+
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.
 # Backtested 14d: SHORT vol<0.30% → blocks 78T (41% WR), keeps 47T (74% WR), net +$1.79.
