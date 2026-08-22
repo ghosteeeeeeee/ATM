@@ -102,14 +102,19 @@ def generate_hl_signal(trade: dict, trader_score: float) -> dict:
     return signal
 
 def get_recent_pro_trades(minutes: int = None) -> list:
-    """Get recent trades from pro traders."""
+    """Get recent trades from pro traders.
+
+    FIX (2026-08-22): Deduplicate by coin+direction — only keep the MOST RECENT
+    fill per coin+side. Without this, a pro trader buying BTC 3 times in 5 min
+    generates 3 separate signals → 3 positions on HL (multi-fire glitch).
+    """
     if minutes is None:
         minutes = HL_COPY_SIGNAL_LOOKBACK_MINUTES
-    
+
     conn = get_db()
     try:
         cutoff = int(time.time() * 1000) - (minutes * 60 * 1000)
-        
+
         # Get all trades from pro traders
         trades = conn.execute("""
             SELECT f.*, t.score
@@ -118,13 +123,20 @@ def get_recent_pro_trades(minutes: int = None) -> list:
             WHERE f.time > ? AND t.score >= ?
             ORDER BY f.time DESC
         """, (cutoff, HL_COPY_SIGNAL_MIN_SCORE)).fetchall()
-        
+
         # Filter to only tradable coins (exclude xyz: HIP-3 stocks)
+        # AND deduplicate by coin+side — keep only the most recent fill per coin+direction
+        seen = set()  # (coin, side) -> only keep first (most recent due to DESC order)
         tradable = []
         for t in trades:
-            if not t['coin'].startswith('xyz:'):
-                tradable.append(dict(t))
-        
+            if t['coin'].startswith('xyz:'):
+                continue
+            key = (t['coin'].upper(), t['side'].upper())
+            if key in seen:
+                continue  # already have a more recent fill for this coin+direction
+            seen.add(key)
+            tradable.append(dict(t))
+
         return tradable
     finally:
         conn.close()
@@ -146,22 +158,45 @@ def write_signal_to_pipeline(signal: dict):
         signal_metadata=signal.get('meta'),  # pass trader_wallet through to trade record
     )
 
+def _get_open_hl_tokens() -> set:
+    """Query PostgreSQL for tokens with open positions (defense-in-depth)."""
+    try:
+        import psycopg2
+        from _secrets import BRAIN_DB_DICT
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes'")
+        tokens = {row[0] for row in cur.fetchall()}
+        cur.close(); conn.close()
+        return tokens
+    except Exception:
+        return set()
+
+
 def run_hl_copy_signal():
     """Main function: detect pro trades and generate pipeline signals."""
     if not HL_COPY_SIGNAL_ENABLED:
         return []
-    
+
     trades = get_recent_pro_trades()
-    
+
+    # Defense-in-depth: skip signals for tokens already open
+    open_tokens = _get_open_hl_tokens()
+
     signals = []
     for trade in trades:
         # Skip if too many signals (avoid noise)
         if len(signals) >= HL_COPY_SIGNAL_MAX_PER_CYCLE:
             break
-        
+
+        # Skip if already have an open position for this coin
+        if trade['coin'].lower() in open_tokens:
+            print(f"[hl_signal] SKIP {trade['coin']} — already has open position")
+            continue
+
         # Generate signal
         signal = generate_hl_signal(trade, trade['score'])
-        
+
         # ── Per-direction kill-switch ─────────────────────────────────────────
         try:
             from hermes_constants import HL_COPY_SIGNAL_PLUS_ENABLED, HL_COPY_SIGNAL_MINUS_ENABLED
@@ -171,14 +206,14 @@ def run_hl_copy_signal():
                 continue
         except ImportError:
             pass
-        
+
         # Write to pipeline
         write_signal_to_pipeline(signal)
         signals.append(signal)
-        
+
         print(f"[hl_signal] {trade['coin']} {trade['side']} | "
               f"Score: {trade['score']} | Conf: {signal['confidence']}")
-    
+
     return signals
 
 if __name__ == "__main__":
