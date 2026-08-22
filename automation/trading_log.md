@@ -13049,3 +13049,23 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - No kill criteria triggered (no signal at 3+ trades 0% WR in last hour)
 
 **Open Questions:** None
+
+## [2026-08-22 21:00 UTC] Hourly Analysis
+
+**Trades:** 5 closed (3 wins, 2 losses)
+**PnL:** +$0.23 (60% WR)
+**Open:** 5 (BTC, HYPE, ENA, DASH, CASHCAT — all hl_copy_trader)
+
+**24h:** hl_copy_trader 26T 15W 57.7% +$1.82 (healthy only active signal) | ct-hot+ killed 09:00 | atr_sl_hit 61.5% exits avg -$0.013 | guardian_hard_sl 9.6% | hard_sl 3.8% avg -$0.285 | MAE-GUARD 9.6%
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader healthy: 57.7% WR, +$1.82/24h, only active signal
+- atr_sl_hit dominant = trailing SL working as designed
+- Guardian hard SL / MAE-GUARD safety nets functioning
+- Trade freq 5/hr = slightly elevated but normal range
+- No kill criteria triggered
+- 5 open trades running normally
+
+**Open Questions:** None

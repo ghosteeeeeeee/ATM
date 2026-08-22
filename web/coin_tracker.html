@@ -374,7 +374,7 @@ function fmtPrice(n) {
 
 function pctClass(v) { return v >= 0 ? 'up' : 'down'; }
 
-function sparkline(events, health) {
+function sparkline(events, health, sym) {
     if (!events || events.length < 2) return '';
     const sorted = [...events].reverse(); // oldest first
     const prices = sorted.map(e => e.price).filter(p => p != null);
@@ -419,14 +419,15 @@ function sparkline(events, health) {
         }
     });
 
+    const gid = 'g-' + (sym || health);
     return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
         '<defs>' +
-        '<linearGradient id="g-' + health + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0%" stop-color="' + (HEALTH_COLORS[health] || '#00ff88') + '" stop-opacity="0.25"/>' +
         '<stop offset="100%" stop-color="' + (HEALTH_COLORS[health] || '#00ff88') + '" stop-opacity="0.02"/>' +
         '</linearGradient>' +
         '</defs>' +
-        '<path d="' + fillPath + '" fill="url(#g-' + health + ')" />' +
+        '<path d="' + fillPath + '" fill="url(#' + gid + ')" />' +
         '<path d="' + path + '" fill="none" stroke="' + (HEALTH_COLORS[health] || '#00ff88') + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
         markers +
         '</svg>';
@@ -518,7 +519,7 @@ function renderCard(c) {
             <span class="score-val score-${health}">${parseFloat(score).toFixed(0)}</span>
             <span style="color:#666;font-size:11px">/ 100</span>
         </div>
-        <div class="chart-container" id="chart-${c.symbol}">${sparkline(events, health)}</div>
+        <div class="chart-container" id="chart-${c.symbol}">${sparkline(events, health, c.symbol)}</div>
         <div class="stats-row">
             <span>${fmtPrice(price)}</span>
             ${change != null ? `<span class="${pctClass(change)}">${parseFloat(change) >= 0 ? '+' : ''}${parseFloat(change).toFixed(1)}%</span>` : ''}
@@ -780,10 +781,11 @@ function filterAndRender() {
 
     const grid = document.getElementById('grid');
     // Limit to 200 for performance
-    grid.innerHTML = coins.slice(0, 200).map(renderCard).join('');
+    const rendered = coins.slice(0, 200);
+    grid.innerHTML = rendered.map(renderCard).join('');
 
-    // Load charts for all visible coins
-    loadCharts(coins);
+    // Load charts only for rendered coins
+    loadCharts(rendered);
 }
 
 async function loadCharts(coins) {
@@ -794,7 +796,7 @@ async function loadCharts(coins) {
             const data = await r.json();
             c.events = data.events;
             const el = document.getElementById('chart-' + c.symbol);
-            if (el) el.innerHTML = sparkline(data.events, c.health);
+            if (el) el.innerHTML = sparkline(data.events, c.health, c.symbol);
         } catch (e) {}
     }));
 }

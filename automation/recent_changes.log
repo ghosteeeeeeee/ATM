@@ -1327,3 +1327,7 @@
   WHY: 2T last hour (PHANTOM_CLOSE $0.00 + guardian_orphan -$0.01). 24h hl_copy_trader 23T 14W 60.9% +$1.63 healthy only active signal. ct-hot+ killed. Open: 4. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 21:00 UTC
+[2026-08-22 21:00 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last hour (3W 2L +$0.23). 24h hl_copy_trader 26T 15W 57.7% +$1.82 healthy only active signal. ct-hot+ killed. Open: 5. atr_sl_hit 61.5% trailing SL working. hard_sl 2T avg -$0.285 guardian safety net. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 22:00 UTC

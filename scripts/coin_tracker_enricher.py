@@ -12,7 +12,7 @@ Adds to each coin:
 
 Run after coin_tracker_api.py and weather_station_api.py.
 """
-import sys, os, json, time
+import sys, os, json
 sys.path.insert(0, os.path.dirname(__file__))
 
 WWW_HTML = '/var/www/html'
@@ -39,12 +39,6 @@ def enrich():
                 'signal_trades': t.get('trades'),
             }
 
-    # Also build from signal performance data
-    signal_lookup = {}
-    for s in weather.get('signals', []):
-        # signals are keyed by type, not token — skip for now
-        pass
-
     # Load coin tracker data
     if not os.path.exists(COIN_DATA):
         print(f'[enricher] {COIN_DATA} not found')
@@ -61,7 +55,9 @@ def enrich():
 
     enriched = 0
     for coin in data.get('coins', []):
-        sym = coin['symbol']
+        sym = coin.get('symbol')
+        if not sym:
+            continue
 
         # Merge token data
         if sym in token_data:
