@@ -267,7 +267,34 @@ def run():
         for token in list(current_favs):
             token_stats = next((s for s in stats if s['token'] == token), None)
             if not token_stats:
-                # No recent trades — not enough data to evaluate, keep
+                # No recent trades — inactivity demotion after 7 days
+                # Check how long since last trade
+                try:
+                    import psycopg2
+                    from _secrets import BRAIN_DB_DICT
+                    conn = psycopg2.connect(**BRAIN_DB_DICT)
+                    cur = conn.cursor()
+                    cur.execute("""
+                        SELECT MAX(close_time) FROM trades
+                        WHERE token = %s AND server = 'Hermes' AND status = 'closed'
+                    """, (token,))
+                    row = cur.fetchone()
+                    conn.close()
+                    if row and row[0]:
+                        last_trade = row[0]
+                        if last_trade.tzinfo is None:
+                            from datetime import timezone as tz
+                            last_trade = last_trade.replace(tzinfo=tz.utc)
+                        days_inactive = (datetime.now(timezone.utc) - last_trade).days
+                        if days_inactive >= 7:
+                            new_favs.discard(token)
+                            changes.append(f"DEMOTE {token} (inactive {days_inactive}d, no trades)")
+                    else:
+                        # Never traded — demote
+                        new_favs.discard(token)
+                        changes.append(f"DEMOTE {token} (no trade history)")
+                except Exception as e:
+                    log(f"  Inactivity check failed for {token}: {e}")
                 continue
 
             # Apply regime adjustment to demotion threshold

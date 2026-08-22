@@ -129,7 +129,8 @@ def learn_regime_associations(engine, regime_matrix, min_wr=60.0):
 
 
 def weaken_anti_correlations(engine, corr_pairs, threshold=-0.5):
-    """Weaken synapses between negatively correlated coins."""
+    """Weaken synapses between negatively correlated coins.
+    Only weakens existing synapses to avoid creating noise entries."""
     weakened = 0
     for pair in corr_pairs:
         corr = pair.get('correlation', 0)
@@ -137,6 +138,11 @@ def weaken_anti_correlations(engine, corr_pairs, threshold=-0.5):
             continue
 
         a, b = pair['a'], pair['b']
+        # Only weaken if synapse already exists (avoid noise creation)
+        weight, count = engine.synapse_weight(a, b)
+        if count == 0:
+            continue  # Skip — no existing relationship to weaken
+
         # Scale weakening with correlation strength
         increment = min(2.0, abs(corr) * 2)
         engine.weaken_pair(a, b, increment=increment)

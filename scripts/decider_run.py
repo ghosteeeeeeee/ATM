@@ -227,6 +227,25 @@ _RATE_LIMIT_CACHE = {"last_entry": None, "cached_at": 0}
 _RATE_LIMIT_TTL    = 300  # seconds
 
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+
+
+def _has_enough_trades(token, min_trades=5, days=7):
+    """Check if token has enough recent trades to justify FAVORITES_SIZE_MULT."""
+    try:
+        import psycopg2
+        from _secrets import BRAIN_DB_DICT
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) FROM trades
+            WHERE token = %s AND server = 'Hermes' AND status = 'closed'
+              AND close_time > NOW() - INTERVAL '%s days'
+        """, (token, days))
+        count = cur.fetchone()[0]
+        conn.close()
+        return count >= min_trades
+    except Exception:
+        return True  # fail open — apply multiplier if DB check fails
 os.makedirs(os.path.dirname(DELAYED_FILE), exist_ok=True)
 
 # ─── Guardian Closing Marker Check ─────────────────────────────────────────────
@@ -557,7 +576,7 @@ def process_delayed_entries(paper=False):
             exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
             exp_arg = ['--experiment', exp_json]
 
-        _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES else 1.0)
+        _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
 
         cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
                 token, cmd_side, str(_trade_size), str(round(cur_price, 6)),
@@ -1421,7 +1440,7 @@ def execute_trade(token, direction, price, confidence, source,
     # --paper when live_trading=False, --real when live_trading=True
     paper_flag = '--paper' if not live_trading else '--real'
 
-    _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES else 1.0)
+    _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
 
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),

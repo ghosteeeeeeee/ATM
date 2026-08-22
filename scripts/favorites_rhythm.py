@@ -25,11 +25,17 @@ from math import sqrt
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 
 LOCK_FILE = '/tmp/hermes-favorites-rhythm.lock'
 OUTPUT_FILE = os.path.join(HERMES_DATA, 'favorites_rhythm.json')
 LOG_FILE = '/root/.hermes/logs/favorites_rhythm.log'
 LOOKBACK_DAYS = 30
+
+
+def is_blacklisted(token):
+    """Check if token is in any blacklist."""
+    return token in SHORT_BLACKLIST or token in LONG_BLACKLIST
 
 
 def log(msg):
@@ -78,7 +84,7 @@ def analyze_temporal_cooccurrence(conn):
             # Use the opening window
             token_windows[token].add(int(w_start) // (4 * 3600))
 
-    tokens = list(token_windows.keys())
+    tokens = [t for t in token_windows.keys() if not is_blacklisted(t)]
     if len(tokens) < 2:
         return {'pairs': [], 'groups': []}
 
@@ -159,7 +165,7 @@ def analyze_signal_clustering(conn):
         primary = signal.split(',')[0].strip()
         token_signals[token][primary] += cnt
 
-    tokens = list(token_signals.keys())
+    tokens = [t for t in token_signals.keys() if not is_blacklisted(t)]
     if len(tokens) < 2:
         return {'groups': []}
 
@@ -219,11 +225,12 @@ def analyze_regime_correlation(conn):
 
     matrix = defaultdict(dict)
     for token, regime, trades, avg_pnl, wr in cur.fetchall():
-        matrix[token][regime] = {
-            'trades': int(trades),
-            'avg_pnl': float(avg_pnl) if avg_pnl else 0,
-            'wr': float(wr) if wr else 0
-        }
+        if not is_blacklisted(token):
+            matrix[token][regime] = {
+                'trades': int(trades),
+                'avg_pnl': float(avg_pnl) if avg_pnl else 0,
+                'wr': float(wr) if wr else 0
+            }
 
     return {'matrix': dict(matrix)}
 
@@ -249,14 +256,14 @@ def analyze_return_correlation(conn):
     for token, day, pnl in cur.fetchall():
         token_daily[token][str(day)] = float(pnl)
 
-    tokens = list(token_daily.keys())
+    tokens = [t for t in token_daily.keys() if not is_blacklisted(t)]
     if len(tokens) < 2:
         return {'top_pairs': []}
 
     def pearson(a_days, b_days):
         """Compute Pearson correlation between two daily series."""
         common = sorted(set(a_days.keys()) & set(b_days.keys()))
-        if len(common) < 5:  # need at least 5 data points
+        if len(common) < 10:  # need at least 10 overlapping days for meaningful correlation
             return None
         vals_a = [a_days[d] for d in common]
         vals_b = [b_days[d] for d in common]
