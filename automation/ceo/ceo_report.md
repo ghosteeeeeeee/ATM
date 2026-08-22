@@ -1,3 +1,20 @@
+## CEO Report — 2026-08-22 ~03:00 UTC (229th run)
+
+### Diagnosis
+System FLAT, BARELY POSITIVE. Verified DB: 24h 45T +$1.43, 51.1% WR. 48h: 63T +$0.94, 50.8% WR. 7d: 234T +$0.86, 50.9% WR. **SHORT signals 7d: 24T -$1.12, 12.5% WR (ALL losing — 0% WR on 9/13 signal combos).** LONG signals 7d: 210T +$1.98, 54.3% WR. ATR_SL 114T/7d -$3.72 (ONLY loss source). PM_TRAIL 96T/7d +$4.13, 86.5% WR (carrying system). 2 open: hl_copy_trader LONG (tiny). Current regime: NEUTRAL.
+
+### Root Cause
+SHORT signals have no edge in NEUTRAL regime. 24 SHORT trades in 7d, ALL losing. The compactor allows SHORT in NEUTRAL (only blocks in LONG_BIAS). Most SHORT signals are caught by slope/spike/vel filters, but some slip through — especially legacy r2-trend-short variants and hl_copy_trader SHORT copy-trades.
+
+### Fix Applied
+1. **BLOCKED SHORT IN NEUTRAL** — Added SHORT_NEUTRAL_BLOCK_ENABLED=True in hermes_constants.py, block in signal_compactor.py after regime detection. SHORT signals in NEUTRAL regime are now skipped entirely. Expected impact: eliminates -$1.12/7d SHORT drag. If regime shifts to SHORT_BIAS, SHORT signals will still be allowed (block only applies in NEUTRAL).
+
+### Verification
+- DB verified: 7d SHORT 24T -$1.12, 12.5% WR (confirmed losing)
+- SHORT signals that slipped through: r2-trend-short2 3T -$0.22, ct-hot- 4T -$0.19, range_breakout_short 2T -$0.17, hl_copy_trader SHORT 2T -$0.24
+- Block placed at signal_compactor.py:1198 — after get_regime_1m(), before confluence gate
+- No SHORT signals should fire in NEUTRAL regime after this change
+
 ## CEO Report — 2026-08-22 ~02:30 UTC (228th run)
 
 ### Diagnosis

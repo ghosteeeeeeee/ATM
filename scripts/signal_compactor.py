@@ -23,7 +23,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPTS_DIR)
 
 from hermes_file_lock import FileLock
-from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT
+from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST, SPEED_HOTSET_BONUS, SPEED_HOTSET_THRESHOLD, CONFLUENCE_REQUIRED, CONFLUENCE_NEUTRAL_RELAX, ACCEL_300_STANDALONE_BYPASS_ENABLED, ACCEL_300_STANDALONE_BYPASS_CONFIDENCE, ACCEL_300_REGIME_SLOPE_PCT, TOKEN_WR_THRESHOLD, TOKEN_WR_MIN_SAMPLE, STANDALONE_BYPASS_SIGNALS, FAVORITES, FAVORITES_MULT, FAVORITES_RESIDENCY_DECAY, PENALTY_TOKENS, PENALTY_MULT, SHORT_NEUTRAL_BLOCK_ENABLED
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
@@ -1194,6 +1194,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # single-type signals can't find co-signals. Allow them through.
             _regime, _regime_conf = get_regime_1m(token)
             _neutral_relax = CONFLUENCE_NEUTRAL_RELAX and _regime == 'NEUTRAL'
+            # SHORT-in-NEUTRAL block: no SHORT edge in flat market (0% WR -$1.12/7d)
+            if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime == 'NEUTRAL':
+                log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — NEUTRAL regime, no SHORT edge")
+                continue
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
                 pass_gate = True

@@ -1158,6 +1158,7 @@ R2_TREND_SHORT_BLOCK_STALE  = True    # block signals on stale tokens
 R2_TREND_SHORT_MAX_ACCEL    = 0.005   # block SHORT when price_acceleration > this (overextended)
 R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT when price rising before entry
 R2_TREND_SHORT_MIN_BARS     = 3       # min bars since trend started — raised from 2, match LONG (2 = fading moves)
+SHORT_NEUTRAL_BLOCK_ENABLED = True    # CEO 2026-08-22 — block SHORT in NEUTRAL regime (0% WR, -1.12/7d). No SHORT edge in flat market.
 R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
 R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope % to fire (filters noise, only fires on meaningful trends)
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
