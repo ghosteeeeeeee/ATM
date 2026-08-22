@@ -57,29 +57,31 @@ def get_losing_positions():
         from _secrets import BRAIN_PASSWORD, BRAIN_HOST
         conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
                                 password=BRAIN_PASSWORD, connect_timeout=10)
-        cur = conn.cursor()
-        # Build NOT LIKE conditions for bypass signals
-        bypass_clauses = ""
-        params = []
-        if PROFIT_MONSTER_BYPASS_SIGNALS:
-            or_parts = ["signal LIKE %s"] * len(PROFIT_MONSTER_BYPASS_SIGNALS)
-            bypass_clauses = "AND NOT (" + " OR ".join(or_parts) + ")"
-            params = [f"%{s}%" for s in PROFIT_MONSTER_BYPASS_SIGNALS]
-        cur.execute(f"""
-            SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time
-            FROM trades
-            WHERE server = 'Hermes' AND status = 'open'
-              AND entry_price > 0 AND current_price > 0
-              {bypass_clauses}
-            ORDER BY pnl_pct ASC
-        """, params)
-        rows = cur.fetchall()
-        conn.close()
-        return [
-            {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
-             "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6]}
-            for r in rows
-        ]
+        try:
+            cur = conn.cursor()
+            # Build NOT LIKE conditions for bypass signals
+            bypass_clauses = ""
+            params = []
+            if PROFIT_MONSTER_BYPASS_SIGNALS:
+                or_parts = ["signal LIKE %s"] * len(PROFIT_MONSTER_BYPASS_SIGNALS)
+                bypass_clauses = "AND NOT (" + " OR ".join(or_parts) + ")"
+                params = [f"%{s}%" for s in PROFIT_MONSTER_BYPASS_SIGNALS]
+            cur.execute(f"""
+                SELECT id, token, direction, entry_price, current_price, pnl_pct, open_time
+                FROM trades
+                WHERE server = 'Hermes' AND status = 'open'
+                  AND entry_price > 0 AND current_price > 0
+                  {bypass_clauses}
+                ORDER BY pnl_pct ASC
+            """, params)
+            rows = cur.fetchall()
+            return [
+                {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
+                 "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6]}
+                for r in rows
+            ]
+        finally:
+            conn.close()
     except Exception as e:
         log(f"DB query error: {e}", "ERROR")
         return []
@@ -262,39 +264,45 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
 
 # ── MAE Guard ───────────────────────────────────────────────────────────────
 def get_positions_for_mae_guard():
-    """Return all open positions with highest_price for MAE guard."""
+    """Return all open LONG positions with highest_price for MAE guard."""
     try:
         import psycopg2
         from _secrets import BRAIN_PASSWORD, BRAIN_HOST
         conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
                                 password=BRAIN_PASSWORD, connect_timeout=10)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT id, token, direction, entry_price, current_price, highest_price,
-                   pnl_pct, open_time
-            FROM trades
-            WHERE server = 'Hermes' AND status = 'open'
-              AND entry_price > 0 AND current_price > 0
-            ORDER BY open_time DESC
-        """)
-        rows = cur.fetchall()
-        conn.close()
-        return [
-            {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
-             "current_price": float(r[4]), "highest_price": float(r[5]) if r[5] else float(r[3]),
-             "pnl_pct": float(r[6]), "opened_at": r[7]}
-            for r in rows
-        ]
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT id, token, direction, entry_price, current_price, highest_price,
+                       pnl_pct, open_time
+                FROM trades
+                WHERE server = 'Hermes' AND status = 'open'
+                  AND entry_price > 0 AND current_price > 0
+                  AND direction = 'LONG'
+                ORDER BY open_time DESC
+            """)
+            rows = cur.fetchall()
+            return [
+                {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
+                 "current_price": float(r[4]), "highest_price": float(r[5]) if r[5] else float(r[3]),
+                 "pnl_pct": float(r[6]), "opened_at": r[7]}
+                for r in rows
+            ]
+        finally:
+            conn.close()
     except Exception as e:
         log(f"MAE guard DB query error: {e}", "ERROR")
         return []
 
 
 def run_mae_guard(positions, dry_run):
-    """MAE Guard — cut if price drops more than threshold from peak.
+    """MAE Guard — cut LONG if price drops more than threshold from peak.
 
     Runs every wake (no fire windows). Immediate crash protection.
     Catches mass crashes before ATR SL triggers.
+
+    LONG only: highest_price = peak. Drop from peak = bad → cut.
+    SHORT excluded: highest_price = worst point. Drop from peak = recovery.
     """
     if not CL_MAE_GUARD_ENABLED:
         return 0
@@ -304,25 +312,29 @@ def run_mae_guard(positions, dry_run):
         highest = pos.get("highest_price", 0)
         current = pos["current_price"]
         entry = pos["entry_price"]
+        direction = pos["direction"]
 
         if highest <= 0 or current <= 0:
             continue
 
-        # MAE from peak: how far price has dropped from highest
-        mae_from_peak = (highest - current) / highest
+        # LONG only: MAE from peak = how far price has dropped from highest
+        if direction == "LONG":
+            mae_from_peak = (highest - current) / highest
+        else:
+            # SHORT: lowest_price tracks trough; skip — different logic needed
+            continue
 
         if mae_from_peak >= CL_MAE_GUARD_THRESHOLD:
             # Price dropped threshold% from peak — cut immediately
-            # Calculate PnL at current price
             from pnl_utils import compute_live_pnl
-            live_pnl = compute_live_pnl(entry, current, pos["direction"])
+            live_pnl = compute_live_pnl(entry, current, direction)
 
             log(f"  [MAE-GUARD] {pos['token']} triggered: "
                 f"peak=${highest:.6f} current=${current:.6f} "
                 f"drop={mae_from_peak*100:.2f}% > {CL_MAE_GUARD_THRESHOLD*100:.1f}% "
                 f"pnl={live_pnl:+.2f}%")
 
-            ok = close_position(pos["id"], pos["token"], pos["direction"],
+            ok = close_position(pos["id"], pos["token"], direction,
                                 live_pnl, current, dry_run, "MAE-GUARD")
             if ok:
                 closed += 1
