@@ -231,19 +231,19 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # ── Favorites ─────────────────────────────────────────────────────────────────
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
-# AUTO-UPDATED weekly by favorites_updater.py (Phase 2).
+# AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
-    # High conviction: high WR + volume + profitable
-    'CAKE',    # 50T  60.0% WR +$0.88
-    'ME',      # 90T  54.4% WR +$1.25
-    'BLUR',    # 86T  53.5% WR +$1.49
-    # High WR, lower sample
-    'GMT',     # 6T   83.3% WR +$0.25
-    'BANANA',  # 9T   77.8% WR +$0.17
-    'FIL',     # 7T   71.4% WR +$0.23
-    # Reliable + profitable
-    'ZRO',     # 13T  69.2% WR +$0.37
-    'MNT',     # 17T  64.7% WR +$0.36
+    'BANANA',
+    'BLUR',
+    'CAKE',
+    'ETH',
+    'FIL',
+    'GMT',
+    'LDO',
+    'ME',
+    'MNT',
+    'SYRUP',
+    'ZRO'
 }
 
 FAVORITES_MULT = 1.2          # Score multiplier in signal_compactor _score_signal()
@@ -374,7 +374,7 @@ SIGNAL_SOURCE_BLACKLIST = {
     'return_exhaustion-',
 }
 SERVER_NAME = 'Hermes'
-MAX_OPEN_POSITIONS = 4   # max open paper positions
+MAX_OPEN_POSITIONS = 6   # max open paper positions
 
 # ── Scanner Position Limits ─────────────────────────────────────────────────────
 # Unified limits for scanner slot allocation (unified_scanner.py)
