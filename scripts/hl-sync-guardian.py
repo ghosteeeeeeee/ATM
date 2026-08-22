@@ -1978,25 +1978,17 @@ def _check_hard_stops(prices: dict):
                 if hl_pos and token.upper() not in hl_pos:
                     log(f'  [HARD-{hit_reason.upper()}] {token} trade#{trade_id} — '
                         f'NOT on HL (position_manager already closed) — skipping', 'INFO')
-                    # Mark as closed in DB to prevent re-check
-                    try:
-                        conn_skip = get_db_connection()
-                        if conn_skip:
-                            cur_skip = conn_skip.cursor()
-                            cur_skip.execute("""
-                                UPDATE trades SET status='closed', guardian_closed=TRUE,
-                                    close_reason=%s, exit_reason=%s,
-                                    exit_price=%s, pnl_pct=%s, close_time=NOW()
-                                WHERE id=%s AND status='open'
-                            """, (f'position_manager_{hit_reason}', f'pm_{hit_reason}',
-                                  cur_price, pnl_pct, trade_id))
-                            conn_skip.commit()
-                            cur_skip.close()
-                            conn_skip.close()
-                    except Exception as e:
-                        log(f'  [HARD-{hit_reason.upper()}] DB update failed for '
-                            f'trade#{trade_id}: {e}', 'FAIL')
+                    # FIX: Use _close_paper_trade_db instead of direct UPDATE.
+                    # The old UPDATE skipped pnl_usdt (stayed 0.00) and wrote
+                    # unleveraged pnl_pct (missing * leverage). _close_paper_trade_db
+                    # properly computes both and records loss cooldown.
                     _CLOSED_HL_COINS.add(token.upper())
+                    try:
+                        _close_paper_trade_db(trade_id, token, cur_price,
+                                               f'position_manager_{hit_reason}')
+                    except Exception as e:
+                        log(f'  [HARD-{hit_reason.upper()}] DB close failed for '
+                            f'trade#{trade_id}: {e}', 'FAIL')
                     continue
                 elif not hl_pos:
                     log(f'  [HARD-{hit_reason.upper()}] {token} — HL API returned empty '
@@ -2037,41 +2029,17 @@ def _check_hard_stops(prices: dict):
                 if closed_ok:
                     # Use HL fill price if available, otherwise fall back to position_manager price
                     exit_price = hl_fill_price if hl_fill_price else cur_price
-                    # Recompute PnL from actual fill price
-                    if entry_px > 0 and exit_price > 0:
-                        if direction == 'SHORT':
-                            actual_pnl_pct = round((entry_px - exit_price) / entry_px * 100, 2)
-                        else:
-                            actual_pnl_pct = round((exit_price - entry_px) / entry_px * 100, 2)
-                    else:
-                        actual_pnl_pct = pnl_pct
-                    # FIX: Add to _CLOSED_HL_COINS so _check_and_close_breached_trades
-                    # (Step 11) skips this token — prevents duplicate close in same cycle.
+                    # FIX: Use _close_paper_trade_db instead of direct UPDATE.
+                    # The old UPDATE had two bugs:
+                    #   1. pnl_usdt was never written (stayed 0.00 from open state)
+                    #   2. pnl_pct was unleveraged (missing * leverage multiplier)
+                    # _close_paper_trade_db properly computes leveraged pnl_pct,
+                    # fetches HL fills for ground truth pnl_usdt, records loss
+                    # cooldown, and clears reconciled state.
                     _CLOSED_HL_COINS.add(token.upper())
-                    # Close DB trade
-                    conn2 = get_db_connection()
-                    if conn2:
-                        try:
-                            cur2 = conn2.cursor()
-                            cur2.execute("""
-                                UPDATE trades SET status='closed', guardian_closed=TRUE,
-                                    close_reason=%s, exit_reason=%s,
-                                    exit_price=%s, pnl_pct=%s, close_time=NOW()
-                                WHERE id=%s AND status='open'
-                            """, (hit_reason, f'guardian_{hit_reason}',
-                                  exit_price, actual_pnl_pct, trade_id))
-                            conn2.commit()
-                            cur2.close()
-                        finally:
-                            conn2.close()
+                    _close_paper_trade_db(trade_id, token, exit_price, hit_reason)
                     log(f'  [HARD-{hit_reason.upper()}] {token} closed at {exit_price:.6f} '
-                        f'({actual_pnl_pct:.2f}%) [hl_fill={hl_fill_price}]', 'PASS')
-                    # FIX (2026-04-25): Record loss cooldown after successful HL close.
-                    # The direct UPDATE above skips _close_paper_trade_db, which is where
-                    # _record_loss_cooldown is normally called. Without this, hard-stop
-                    # closes never populate loss_cooldowns.json, allowing immediate re-entry.
-                    if actual_pnl_pct < 0:
-                        _record_loss_cooldown(token, direction)
+                        f'[hl_fill={hl_fill_price}]', 'PASS')
                 else:
                     # BUG-FIX (2026-04-20): When HL close fails after 2 attempts,
                     # force-close the paper trade to prevent it from becoming an orphan.
@@ -2754,17 +2722,11 @@ def close_orphan_paper_trades(hl_pos, prices):
                         close_reason = 'HL_CLOSED'
                     log(f'  [LIVE-MISS] {token} close reason: {close_reason} (exit={exit_f}, sl={sl_f}, tp={tp_f})', 'INFO')
                     # Close this stale DB trade
+                    # FIX: Use _close_paper_trade_db for proper PnL computation.
+                    # The old direct UPDATE skipped pnl_pct and pnl_usdt entirely.
                     try:
-                        conn_close = get_db_connection()
-                        cur_close = conn_close.cursor()
-                        cur_close.execute("""
-                            UPDATE trades SET status='closed', exit_price=%s,
-                                close_time=NOW(), close_reason=%s,
-                                exit_reason=%s, guardian_closed=TRUE
-                            WHERE id=%s AND status='open'
-                        """, (hl_exit_px, close_reason, close_reason, trade_id))
-                        conn_close.commit()
-                        cur_close.close(); conn_close.close()
+                        _CLOSED_HL_COINS.add(token.upper())
+                        _close_paper_trade_db(trade_id, token, hl_exit_px, close_reason)
                         log(f'  [LIVE-MISS] Closed stale trade #{trade_id} {token}', 'PASS')
                     except Exception as close_err:
                         log(f'  [LIVE-MISS] Failed to close stale trade #{trade_id}: {close_err}', 'FAIL')
