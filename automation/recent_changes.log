@@ -1278,3 +1278,11 @@
   WHY: 3T last hour (1W 2L -$0.09) hl_copy_trader HYPE/WLFI. 24h 67T 33W 49.3%WR +$0.65. hl_copy_trader 33T 20W +$4.87 star. atr_sl_hit 88% net -$0.41 trailing SL correct. Freq 3/hr normal. System stable, no action.
   BY: auto_1hr
   NEXT: Re-run at 09:00 UTC
+[2026-08-22 09:00 UTC] auto_1hr: KILLED COIN_TRACKER_HOT_PLUS_ENABLED = False
+  WHY: 0% WR last hour (3 trades, -$0.58). Kill criteria: 3+ trades 0% WR. 24h ct-hot+ 34T 11W 32.4% -$3.14. hl_copy_trader 35T 20W 57.1% +$1.02 star. Signal killed to stop bleeding.
+  BY: auto_1hr
+  NEXT: Re-run at 10:00 UTC
+[2026-08-22 10:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.14) ct-hot+ pre-kill holdover. 24h 69T 31W 44.9%WR -$2.07. hl_copy_trader 35T 20W 57.1% +$1.02 star. ct-hot+ killed at 09:00 confirmed working. Open: 2 hl_copy_trader healthy. Freq 1/hr quiet. System stable, no action needed.
+  BY: auto_1hr
+  NEXT: Re-run at 11:00 UTC

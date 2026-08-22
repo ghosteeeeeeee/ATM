@@ -12805,3 +12805,41 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - No kill criteria triggered
 
 **Open Questions:** None
+
+## [2026-08-22 09:00 UTC] Hourly Analysis
+
+**Trades:** 6 closed (3 wins, 3 losses)
+**PnL:** -$0.41 (WR: 50.0%)
+**24h:** 69T 34W 49.3% +$0.24 | hl_copy_trader 35T 20W +$1.02 | ct-hot+ 34T 11W -$3.14
+
+**Changes:**
+1. KILLED COIN_TRACKER_HOT_PLUS_ENABLED → False — 0% WR last hour (3T, -$0.58). Kill criteria triggered: 3+ trades 0% WR.
+
+**No Change Needed:**
+- hl_copy_trader 3/3 wins this hour, +$0.17 — performing well
+- Trade freq 6/hr normal
+- 3 open trades healthy
+
+**Open Questions:**
+- ct-hot+ was CEO_PROTECTED — auto_1hr killed based on kill criteria. CEO may override.
+
+## [2026-08-22 10:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.14 (WR: 0%)
+
+**24h:** 69T 31W 44.9% WR -$2.07 | hl_copy_trader 35T 20W 57.1% +$1.02 star | ct-hot+ 34T 11W 32.4% -$3.09 (KILLED)
+
+**Open:** 2 (BTC LONG hl_copy_trader $11 0.95% SL, ETH LONG hl_copy_trader $16.50 1.20% SL)
+
+**Changes:** None
+
+**No Change Needed:**
+- ct-hot+ kill confirmed: COIN_TRACKER_HOT_PLUS_ENABLED=False. Last trade this hour was pre-kill holdover.
+- hl_copy_trader healthy: 57% WR, +$1.02/24h, 2 open trades with proper SL distances
+- Trade freq 1/hr — quiet period, no overtrading
+- atr_sl_hit 84% of closes but trailing SL correct, net acceptable
+- Hour 05:00 cluster issue (11T 2W -$2.85) addressed by ct-hot+ kill
+
+**Open Questions:**
+- None
