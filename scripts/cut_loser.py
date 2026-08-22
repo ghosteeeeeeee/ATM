@@ -14,6 +14,7 @@ from hermes_constants import (
     CL_TIER1_MIN_PCT, CL_TIER1_MAX_PCT, CL_TIER1_MAX_CLOSE, CL_TIER1_SKIP_BOTTOM_PCT, CL_TIER1_FIRE_WINDOWS,
     CL_TIER2_MIN_PCT, CL_TIER2_MAX_PCT, CL_TIER2_MAX_CLOSE, CL_TIER2_SKIP_BOTTOM_PCT, CL_TIER2_FIRE_WINDOWS,
     CL_TRAIL_ENABLED, CL_TRAIL_ACTIVATE_PCT, CL_TRAIL_RECOVER_PCT, CL_TRAIL_MIN_HOLD, CL_TRAIL_FIRE_WINDOWS,
+    CL_MAE_GUARD_ENABLED, CL_MAE_GUARD_THRESHOLD,
     PROFIT_MONSTER_BYPASS_SIGNALS,
 )
 import sys, os, json, time, random, argparse
@@ -259,6 +260,76 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
         return False
 
 
+# ── MAE Guard ───────────────────────────────────────────────────────────────
+def get_positions_for_mae_guard():
+    """Return all open positions with highest_price for MAE guard."""
+    try:
+        import psycopg2
+        from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+        conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
+                                password=BRAIN_PASSWORD, connect_timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, token, direction, entry_price, current_price, highest_price,
+                   pnl_pct, open_time
+            FROM trades
+            WHERE server = 'Hermes' AND status = 'open'
+              AND entry_price > 0 AND current_price > 0
+            ORDER BY open_time DESC
+        """)
+        rows = cur.fetchall()
+        conn.close()
+        return [
+            {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
+             "current_price": float(r[4]), "highest_price": float(r[5]) if r[5] else float(r[3]),
+             "pnl_pct": float(r[6]), "opened_at": r[7]}
+            for r in rows
+        ]
+    except Exception as e:
+        log(f"MAE guard DB query error: {e}", "ERROR")
+        return []
+
+
+def run_mae_guard(positions, dry_run):
+    """MAE Guard — cut if price drops more than threshold from peak.
+
+    Runs every wake (no fire windows). Immediate crash protection.
+    Catches mass crashes before ATR SL triggers.
+    """
+    if not CL_MAE_GUARD_ENABLED:
+        return 0
+
+    closed = 0
+    for pos in positions:
+        highest = pos.get("highest_price", 0)
+        current = pos["current_price"]
+        entry = pos["entry_price"]
+
+        if highest <= 0 or current <= 0:
+            continue
+
+        # MAE from peak: how far price has dropped from highest
+        mae_from_peak = (highest - current) / highest
+
+        if mae_from_peak >= CL_MAE_GUARD_THRESHOLD:
+            # Price dropped threshold% from peak — cut immediately
+            # Calculate PnL at current price
+            from pnl_utils import compute_live_pnl
+            live_pnl = compute_live_pnl(entry, current, pos["direction"])
+
+            log(f"  [MAE-GUARD] {pos['token']} triggered: "
+                f"peak=${highest:.6f} current=${current:.6f} "
+                f"drop={mae_from_peak*100:.2f}% > {CL_MAE_GUARD_THRESHOLD*100:.1f}% "
+                f"pnl={live_pnl:+.2f}%")
+
+            ok = close_position(pos["id"], pos["token"], pos["direction"],
+                                live_pnl, current, dry_run, "MAE-GUARD")
+            if ok:
+                closed += 1
+
+    return closed
+
+
 # ── Tier Runner ──────────────────────────────────────────────────────────────
 def run_tier(tier_name, min_pct, max_pct, max_close, skip_bottom_pct, fire_windows, positions, dry_run, trail_state=None):
     """Run one tier: check fire timing, filter positions, close picks."""
@@ -425,10 +496,17 @@ def run(dry_run=False):
 
     log(f"Firing — group {ab_group}" + (" [DRY RUN]" if effective_dry_run else ""))
 
+    # ── MAE Guard — runs first, immediate crash protection ──
+    mae_positions = get_positions_for_mae_guard()
+    log(f"MAE guard: {len(mae_positions)} positions to check")
+    mae_closed = run_mae_guard(mae_positions, effective_dry_run)
+
     positions = get_losing_positions()
     log(f"Found {len(positions)} open positions")
 
     if not positions:
+        if mae_closed > 0:
+            log(f"Total closed: {mae_closed} (MAE guard)")
         return
 
     # Compute live PnL for all positions (prevents stale DB values in trail tier)
@@ -455,9 +533,9 @@ def run(dry_run=False):
                          CL_TIER2_MAX_CLOSE, CL_TIER2_SKIP_BOTTOM_PCT,
                          CL_TIER2_FIRE_WINDOWS, positions, effective_dry_run, trail_state)
 
-    total = trail_closed + t1_closed + t2_closed
+    total = mae_closed + trail_closed + t1_closed + t2_closed
     if total > 0:
-        log(f"Total closed: {total} (trail={trail_closed}, T1={t1_closed}, T2={t2_closed})")
+        log(f"Total closed: {total} (MAE={mae_closed}, trail={trail_closed}, T1={t1_closed}, T2={t2_closed})")
 
 
 if __name__ == "__main__":

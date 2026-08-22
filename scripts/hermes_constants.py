@@ -954,6 +954,12 @@ CL_TRAIL_RECOVER_PCT    = 0.15   # cut if recovers 0.15% from worst then drops b
 CL_TRAIL_MIN_HOLD       = 2      # minimum minutes before trailing activates
 CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
 
+# MAE Guard — cut_loser.py (runs every wake, immediate crash protection)
+# If price drops more than MAE_GUARD_THRESHOLD from highest_price, cut immediately.
+# Catches mass crashes (WLFI -41%, MET -21%, ETH -13%) before ATR SL triggers.
+# Runs BEFORE tiers — highest priority.
+CL_MAE_GUARD_ENABLED    = True   # master switch for MAE guard
+CL_MAE_GUARD_THRESHOLD  = 0.015  # 1.5% — cut if price drops 1.5% from peak
 # Legacy constants (keep for backward compat / guardian)
 LOSS_MIN_PCT           = -3.0   # deprecated → use CL_TIER2_MIN_PCT
 LOSS_MAX_PCT           = -0.5   # deprecated → use CL_TIER1_MAX_PCT
