@@ -1256,6 +1256,8 @@ RESEARCH_FLAGS = {
     'COIN_TRACKER_HOT_MIN_SPEED_PCT': ('Research/testing — speed filter min 30%', '2026-08-22'),
     'COIN_TRACKER_HOT_MAX_SPEED_PCT': ('Research/testing — speed filter max 85%', '2026-08-22'),
     'COIN_TRACKER_HOT_MIN_ACCEL': ('Research/testing — acceleration filter -0.01', '2026-08-22'),
+    'COIN_TRACKER_HOT_CLUSTER_MIN': ('Research/testing — cluster count 1.0', '2026-08-22'),
+    'COIN_TRACKER_HOT_RECENCY_MIN': ('Research/testing — recency weight 0.35', '2026-08-22'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
@@ -1288,7 +1290,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1871,12 +1873,12 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # RESEARCH/TESTING — momentum filters active, monitoring performance. RESEARCH_FLAGS
-COIN_TRACKER_HOT_PLUS_ENABLED       = True    # RESEARCH/TESTING — MACD%, Z-score, BB, speed, accel filters. RESEARCH_FLAGS
-COIN_TRACKER_HOT_MINUS_ENABLED      = True    # RESEARCH/TESTING — SHORT enabled with same filters. RESEARCH_FLAGS
+COIN_TRACKER_HOT_ENABLED            = False   # KILLED 2026-08-22 — 27.7% WR, -$3.92 PnL (7d, 47 trades). NEVER_REENABLE.
+COIN_TRACKER_HOT_PLUS_ENABLED       = False    # KILLED 2026-08-22 — same family. NEVER_REENABLE.
+COIN_TRACKER_HOT_MINUS_ENABLED      = False    # KILLED 2026-08-22 — same family. NEVER_REENABLE.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
-COIN_TRACKER_HOT_CLUSTER_MIN        = 3.0     # minimum cluster count for direction (raised from 1.0 — CEO Aug 22, reduces bleed)
-COIN_TRACKER_HOT_RECENCY_MIN        = 0.6     # minimum recency weight (0-1) (raised from 0.35 — CEO Aug 22, requires fresher data)
+COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction (lowered from 3.0 — was blocking valid signals). RESEARCH_FLAGS
+COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered from 0.6 — was blocking valid signals). RESEARCH_FLAGS
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.167   # per token+direction cooldown (10 minutes)
@@ -1886,6 +1888,6 @@ COIN_TRACKER_HOT_MIN_MACD_PCT      = -0.00005 # MACD histogram as % of price mus
 COIN_TRACKER_HOT_MAX_Z_SCORE        = 1.2      # Z-score must be < this for LONG (avoids overbought entries — tightened from 1.8)
 COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.75     # BB position must be < this for LONG (avoids upper band entries — tightened from 0.85)
 # Speed & acceleration filters — prevent chasing extremes (added 2026-08-22)
-COIN_TRACKER_HOT_MIN_SPEED_PCT      = 30       # Speed percentile must be > this (avoid catching falling knives)
-COIN_TRACKER_HOT_MAX_SPEED_PCT      = 85       # Speed percentile must be < this (avoid chasing pumps)
+COIN_TRACKER_HOT_MIN_SPEED_PCT      = 20       # Speed percentile must be > this (widened from 30 — was blocking valid signals). RESEARCH_FLAGS
+COIN_TRACKER_HOT_MAX_SPEED_PCT      = 95       # Speed percentile must be < this (widened from 85 — was blocking valid signals). RESEARCH_FLAGS
 COIN_TRACKER_HOT_MIN_ACCEL          = -0.01    # Price acceleration must be > this (avoid decelerating entries)
