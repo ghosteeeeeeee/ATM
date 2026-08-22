@@ -784,16 +784,22 @@ SZ_DECIMALS = {
 }
 
 # ─── Mirroring Config ─────────────────────────────────────────────────────────
-MARGIN_USAGE_PCT = 0.07    # 7% of withdrawable margin per trade
-MIN_TRADE_USDT   = 11.0    # HL minimum order value ($10) + $1 buffer for safety
-MIN_ORDER_BUFFER = 0.10    # extra $ to ensure we comfortably clear HL min ($11.10 vs $11.00)
+MARGIN_USAGE_PCT = 0.07    # 7% of withdrawable balance per trade (NOTIONAL, not margin)
+MIN_TRADE_USDT   = 11.0    # HL minimum NOTIONAL ($10 + $1 buffer)
+                            # At 5x leverage: $11 notional = $2.20 margin risked
+                            # At 3x leverage: $11 notional = $3.67 margin risked
+MIN_ORDER_BUFFER = 0.10    # extra $ to guarantee we clear HL min ($11.10 vs $11.00)
 
 
 def _get_trade_size_usdt() -> float:
-    """Return USDT amount to trade (7% of withdrawable, min $11).
+    """Return NOTIONAL amount to trade (7% of withdrawable, min $11).
 
     Dynamic sizing: as account balance grows, position sizes grow proportionally.
-    Example: $150 balance → $10.50, $300 balance → $21.00, $500 balance → $35.00
+    This is NOTIONAL (including leverage), not margin (risked amount).
+    Example at 5x leverage:
+        $150 balance → $10.50 → $11 (min) → $2.20 margin risked
+        $300 balance → $21.00 notional → $4.20 margin risked
+        $500 balance → $35.00 notional → $7.00 margin risked
     """
     state = get_account_value_curl()
     withdrawable = float(state.get("withdrawable", 0) or 0)

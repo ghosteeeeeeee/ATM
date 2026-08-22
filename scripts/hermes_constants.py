@@ -426,10 +426,12 @@ CASCADE_FLIP_MAX     = 3      # max flips per token before permanent lockout
 # ── Trade Sizing Constants ──────────────────────────────────────────────────────
 DEFAULT_TRADE_SIZE_USDT = 11.0  # FALLBACK only — actual sizing uses _get_trade_size_usdt()
                                  # (7% of withdrawable balance, scales with account growth).
+                                 # This is NOTIONAL (including leverage), not margin.
+                                 # At 5x: $11 notional = $2.20 margin risked.
                                  # NOTE: do NOT use this for PnL calculations — use
                                  # hl_notional_usdt (actual HL notional) or
                                  # hype_realized_pnl_usdt (HL ground-truth) instead.
-HL_MIN_NOTIONAL_USDT     = 11.0 # HL minimum notional ($10 + $1 buffer)
+HL_MIN_NOTIONAL_USDT     = 11.0 # HL minimum NOTIONAL ($10 + $1 buffer)
 
 # ── Kelly Criterion Sizing (from Trading Books) ──────────────────────────────
 KELLY_ENABLED = False           # Disabled until 50+ trades per signal
