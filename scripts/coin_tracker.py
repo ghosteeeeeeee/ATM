@@ -31,6 +31,7 @@ from coin_tracker_score import (
     compute_coin_regime as _compute_coin_regime,
     score_wyckoff as _score_wyckoff, score_ewave as _score_ewave,
     score_trend_quality as _score_trend_quality,
+    score_liquidation as _score_liquidation,
 )
 from coin_tracker_analysis import analyze_coin
 
@@ -138,6 +139,18 @@ def collect():
         return
 
     regime, broad_z = _read_regime()
+
+    # Load liquidation cluster data (written by liquidation_map.py every 5min)
+    liq_data = {}
+    try:
+        liq_path = os.path.join(HERMES_DATA, 'liquidation_clusters.json')
+        with open(liq_path) as f:
+            liq_data = json.load(f)
+        # Check freshness (older than 15 min = stale)
+        if time.time() - liq_data.get('timestamp', 0) > 900:
+            liq_data = {}  # stale, ignore
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        pass  # no liquidation data yet — fine
 
     # Build universe lookup
     universe_map = {u['name']: u for u in universe if u.get('name')}

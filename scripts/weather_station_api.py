@@ -8,7 +8,7 @@ import sqlite3
 import json
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -262,7 +262,7 @@ def main():
     conn = get_db()
     try:
         data = {
-            'generated': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+            'generated': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC'),
             'tide': analyze_tide(conn),
             'waves': analyze_waves(conn),
             'wind': analyze_wind(conn),

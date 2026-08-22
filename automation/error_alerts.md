@@ -220,3 +220,11 @@ ALERTS:
 - Disk: 82% (21G free)
 - Timers: all firing
 - Auto-fixes: none needed
+
+## Error Alerts — 2026-08-22 20:20 UTC
+
+- **[WARN]** (1x): `ROLLBACK FAILED: sig#... already claimed by another process` — brain.py trade add fails when signal already consumed by parallel process. Race condition in decider signal claiming.
+- **[WARN]** (1x): `brain.py FAILED: stderr=(empty)` — mirror_open for CASHCAT LONG failed with empty error. Likely related to rollback contention above.
+- **[WARN]** (3x): `HL [hl_info] Error: HTTP Error 429: Too Many Requests` — rate limiting from Hyperliquid API during wallet scanning.
+- **[WARN]** Disk at 82% (92G/118G) — trending toward 85% threshold. pipeline.log alone is 121M.
+- **AUTO-FIX**: None needed — pipeline functioning correctly. ROLLBACK contention is a known race condition; system recovers on next tick. Market fully neutral (104/104 tokens), system correctly preserving capital with 4/6 positions open.

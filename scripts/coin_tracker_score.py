@@ -11,18 +11,19 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.16,
+    'momentum': 0.14,
     'volume': 0.10,
-    'volatility': 0.08,
-    'spread': 0.08,
+    'volatility': 0.07,
+    'spread': 0.07,
     'signals': 0.04,    # reduced to prevent echo
     'regime': 0.04,
     'wyckoff': 0.14,
     'ewave': 0.09,
     'trend': 0.07,
-    'setup': 0.10,
-    'clustering': 0.05,
+    'setup': 0.08,
+    'clustering': 0.04,
     'recency': 0.05,
+    'liquidation': 0.07,  # NEW: liquidation cluster proximity + stop hunt signals
 }
 # ponytail: weights sum to 1.0 — verified
 
@@ -272,6 +273,88 @@ def score_trend_quality(trend_score):
         return 50.0
     return max(0, min(100, trend_score))
 
+def score_liquidation(price, liq_data):
+    """
+    Liquidation cluster proximity score 0-100.
+
+    High score = there's a liquidation cluster nearby = explosive move imminent.
+    This is the SETUP quality from liquidation data.
+
+    Scoring:
+    - Active stop hunt signal → 90-100 (best setup, cascade imminent)
+    - Cluster within 0.5% → 80-90 (very close, high energy)
+    - Cluster within 1% → 65-80 (close, good setup)
+    - Cluster within 2% → 50-65 (moderate proximity)
+    - Cluster > 2% away → 40-50 (far, low energy)
+    - No clusters at all → 50 (default neutral)
+    """
+    if not price or price <= 0 or not liq_data:
+        return 50.0
+
+    # Check for active stop hunt signal
+    stop_hunts = liq_data.get('stop_hunt_signals', [])
+    for sh in stop_hunts:
+        if sh.get('coin', '').upper() == '':
+            continue
+        # We'll match by caller — this function receives pre-filtered data
+        break
+
+    # Get clusters for this coin (pre-filtered by caller)
+    clusters = liq_data.get('_coin_clusters', [])
+
+    if not clusters:
+        return 50.0  # No data = neutral
+
+    # Find nearest cluster by distance
+    nearest_dist = min(abs(c.get('distance_pct', 100)) for c in clusters)
+    nearest = next(c for c in clusters if abs(c.get('distance_pct', 100)) == nearest_dist)
+
+    # Active stop hunt = highest score
+    if liq_data.get('_has_stop_hunt'):
+        score = 95.0
+        # Bonus for cluster size
+        size_bonus = min(5, nearest.get('total_notional_usd', 0) / 500_000_000)
+        score += size_bonus
+        return min(100, score)
+
+    # Distance-based scoring
+    if nearest_dist <= 0.5:
+        score = 85.0
+    elif nearest_dist <= 1.0:
+        score = 72.0
+    elif nearest_dist <= 1.5:
+        score = 62.0
+    elif nearest_dist <= 2.0:
+        score = 55.0
+    else:
+        score = 45.0
+
+    # Cluster size bonus (bigger cluster = more energy)
+    size = nearest.get('total_notional_usd', 0)
+    if size > 1_000_000_000:
+        score += 8  # Massive cluster
+    elif size > 500_000_000:
+        score += 5
+    elif size > 100_000_000:
+        score += 3
+
+    # High leverage bonus (more forced selling = bigger cascade)
+    max_lev = nearest.get('max_leverage', 0)
+    if max_lev >= 40:
+        score += 3
+    elif max_lev >= 20:
+        score += 2
+
+    # Order book imbalance bonus
+    imbalance = liq_data.get('_imbalance', 1.0)
+    if imbalance > 3.0:
+        score += 3  # Heavy bid imbalance = support forming
+    elif imbalance < 0.33:
+        score += 3  # Heavy ask imbalance = resistance forming
+
+    return max(0, min(100, score))
+
+
 def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=None):
     """Compute per-coin regime based on individual price action."""
     if not closes or len(closes) < 20:
@@ -344,10 +427,14 @@ def health_from_score(composite):
 
 def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
                closes_1h=None, volumes_1h=None,
-               price=None, signal_count=0, avg_confidence=None, regime='NEUTRAL'):
+               price=None, signal_count=0, avg_confidence=None, regime='NEUTRAL',
+               liq_data=None):
     """
     Compute all component scores and composite for a coin.
     Returns dict with all scores and health state.
+
+    liq_data: optional dict with liquidation cluster data for this coin
+              (pre-filtered: _coin_clusters, _has_stop_hunt, _imbalance keys)
     """
     closes_5m = closes_5m or []
     highs_5m = highs_5m or []
@@ -390,6 +477,9 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
     s_clustering = 50.0
     s_recency = 75.0  # assume decent recency
 
+    # Liquidation score (NEW — uses liquidation cluster data)
+    s_liquidation = score_liquidation(price, liq_data) if liq_data else 50.0
+
     composite = (
         s_momentum * WEIGHTS['momentum'] +
         s_volume * WEIGHTS['volume'] +
@@ -402,7 +492,8 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
         s_trend_quality * WEIGHTS['trend'] +
         s_setup * WEIGHTS['setup'] +
         s_clustering * WEIGHTS['clustering'] +
-        s_recency * WEIGHTS['recency']
+        s_recency * WEIGHTS['recency'] +
+        s_liquidation * WEIGHTS['liquidation']
     )
 
     return {
@@ -414,6 +505,7 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
         'spread': round(s_spread, 2),
         'signals': round(s_signals, 2),
         'regime': round(s_regime, 2),
+        'liquidation': round(s_liquidation, 2),
         'indicators': {
             'ema_9': ema_9,
             'ema_20': ema_20,
