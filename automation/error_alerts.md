@@ -209,3 +209,14 @@ ALERTS:
 - **[WARN]** -95.92% cumulative PnL today (37 trades, bad day)
 - **[WARN]** 44 stale tokens in speed tracker
 - **[INFO]** Disk at 82% — monitor, approaching 85% threshold
+
+## Health Check — 2026-08-22 17:19 UTC
+- **STATUS**: ALL CLEAR
+- Pipeline: OK (completed 17:18, 0 errors)
+- Open: 2 trades (HYPE +1.15%, BTC +0.01%)
+- Signals: 41/hour, 31034 active
+- Regime: 98 NEUTRAL / 5 LONG / 1 SHORT
+- Speed: 95/187 tokens >= 50%
+- Disk: 82% (21G free)
+- Timers: all firing
+- Auto-fixes: none needed

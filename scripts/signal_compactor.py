@@ -659,12 +659,13 @@ def _score_signal(token, direction, conf, source, signal_type,
     if CONF_FILTER_ENABLED and conf >= CONF_FILTER_MAX:
         return 0.0  # hard block
 
-    # ── Time block: skip 01-06 UTC (low-liquidity pre-market) ─────────────
-    from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_START, TIME_BLOCK_END
+    # ── Time block: penalty during 01-06 UTC (low-liquidity pre-market) ───
+    from hermes_constants import TIME_BLOCK_ENABLED, TIME_BLOCK_START, TIME_BLOCK_END, TIME_BLOCK_PENALTY
+    time_block_mult = 1.0
     if TIME_BLOCK_ENABLED:
         utc_hour = datetime.now(timezone.utc).hour
         if TIME_BLOCK_START <= utc_hour < TIME_BLOCK_END:
-            return 0.0  # hard block
+            time_block_mult = TIME_BLOCK_PENALTY  # soft penalty (was hard block, re-enabled 2026-08-22)
 
     score = float(conf)
 
@@ -760,7 +761,7 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Penalty list — underperformers get deprioritized
     penalty_mult = PENALTY_MULT if PENALTY_TOKENS and token in PENALTY_TOKENS else 1.0
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult
     return final_score
 
 

@@ -785,12 +785,13 @@ CONF_FILTER_ENABLED = True
 CONF_FILTER_MAX = 89                    # block if confidence >= this value
 
 # ── Time-of-Day Block ────────────────────────────────────────────────────────
-# Block entries between 01:00-06:00 UTC (Asian session close, low-liquidity
-# pre-market). 83T 33W (39.8%) -$1.34 in this window.
-# Plan: conf-filter-plan.md (2026-08-19)
-TIME_BLOCK_ENABLED = False  # Disabled 2026-08-21 — blocking all signals during 01-06 UTC
+# Penalty during 01:00-06:00 UTC (Asian session close, low-liquidity pre-market).
+# 83T 33W (39.8%) -$1.34 in this window (conf-filter-plan.md, 2026-08-19).
+# Changed from hard block to 0.7x penalty (2026-08-22) — hard block was too aggressive.
+TIME_BLOCK_ENABLED = True               # Penalty during 01-06 UTC (was hard block, re-enabled as penalty 2026-08-22)
 TIME_BLOCK_START = 1                    # UTC hour (inclusive)
 TIME_BLOCK_END = 6                      # UTC hour (exclusive: blocks 01:00-05:59)
+TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
 # Block tokens with WR below this threshold AND >= MIN_SAMPLE trades.
@@ -1015,7 +1016,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
-    'COIN_TRACKER_HOT_ENABLED',             # CEO 2026-08-22 — entire family 62T/7d 32.3% WR -$4.04. NEEDS T TO SET False.
+    'COIN_TRACKER_HOT_ENABLED',             # SIGNAL REPORTER 2026-08-22 — entire family dead. NEVER_REENABLE.
     'COIN_TRACKER_HOT_PLUS_ENABLED',        # CEO 2026-08-22 — killed by auto_1hr. NEVER_REENABLE.
     'COIN_TRACKER_HOT_MINUS_ENABLED',       # CEO 2026-08-22 — same family. NEEDS T TO SET False.
 }
@@ -1244,7 +1245,7 @@ CEO_PROTECTED_FLAGS = {
     'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED', '2026-08-22'),
     'COIN_TRACKER_HOT_MINUS_ENABLED': ('Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED', '2026-08-22'),
     'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Composite threshold — raised to 70 from 56 (CEO killed ct-hot+ 2026-08-22). CEO_PROTECTED', '2026-08-22'),
-    'TIME_BLOCK_ENABLED': ('Disabled 2026-08-21 — was blocking all signals 01-06 UTC. Only T can change', '2026-08-21'),
+    'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
 }
 
 # ── Session Lock ────────────────────────────────────────────────────────────
@@ -1277,7 +1278,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1847,7 +1848,7 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-22 with momentum filters and CEO protection. CEO_PROTECTED
+COIN_TRACKER_HOT_ENABLED            = False  # SIGNAL REPORTER 2026-08-22 — entire family dead (62T/7d 32.3% WR -$4.04). PLUS/MINUS already False.
 COIN_TRACKER_HOT_PLUS_ENABLED       = False   # DISABLED 2026-08-22 09:00 UTC — 0% WR last hour (3T, -$0.58). Kill criteria: 3+ trades 0% WR
 COIN_TRACKER_HOT_MINUS_ENABLED      = False   # SIGNAL REPORTER 2026-08-22 — 3T/7d 0% WR -$0.17. SHORT dead. Killed with PLUS.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire

@@ -116,3 +116,30 @@ If any WARN or CRITICAL issue found, append to `automation/error_alerts.md`:
 - Signal DB: `data/signals_hermes_runtime.db`
 - Speed DB: via RUNTIME_DB
 - Regime: `/var/www/hermes/data/regime_5m.json`
+
+## Database Reference (USE THESE TABLE NAMES)
+
+**Signal DB:** `data/signals_hermes_runtime.db`
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `signal_outcomes` | ALL trade outcomes (open + closed) | token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, created_at, trade_id |
+| `signals` | Current active signals | token, direction, signal_type, confidence, created_at |
+| `signal_history` | Historical signals | same as signals |
+| `token_speeds` | Token momentum speeds | token, speed_pct |
+| `decisions` | Signal compactor decisions | token, direction, decision, created_at |
+
+**DO NOT query a table called `trades` — it does not exist.** Use `signal_outcomes` for trade data.
+
+### Example queries:
+```sql
+-- Trades today
+SELECT signal_type, direction, COUNT(*), SUM(pnl_usdt), SUM(CASE WHEN is_win=1 THEN 1 ELSE 0 END)*100.0/COUNT(*)
+FROM signal_outcomes WHERE created_at > date('now') GROUP BY signal_type, direction;
+
+-- Open trades (trade_id NOT in closed set)
+SELECT COUNT(*) FROM signal_outcomes WHERE trade_id NOT IN (SELECT trade_id FROM signal_outcomes WHERE pnl_usdt IS NOT NULL AND trade_id IS NOT NULL);
+
+-- Recent signals
+SELECT token, direction, signal_type, confidence, created_at FROM signals ORDER BY created_at DESC LIMIT 10;
+```

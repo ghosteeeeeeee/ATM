@@ -45,6 +45,32 @@ def generate_data():
             ''')
             trades = cur.fetchall()
             cols = [desc[0] for desc in cur.description]
+
+            # Regime performance
+            regime_stats = {}
+            cur_r = pg.cursor()
+            cur_r.execute('''
+                SELECT regime, direction, COUNT(*),
+                       AVG(CASE WHEN pnl_pct > 0.05 THEN 1.0 ELSE 0.0 END) * 100 as wr,
+                       SUM(pnl_pct) as total_pnl,
+                       AVG(pnl_pct) as avg_pnl
+                FROM trades
+                WHERE signal LIKE '%hl_copy_trader%%'
+                GROUP BY regime, direction
+                ORDER BY regime, direction
+            ''')
+            for row in cur_r.fetchall():
+                reg = row[0] or 'unknown'
+                d = row[1]
+                if reg not in regime_stats:
+                    regime_stats[reg] = {}
+                regime_stats[reg][d] = {
+                    'count': int(row[2]),
+                    'wr': round(float(row[3] or 0), 1),
+                    'pnl': round(float(row[4] or 0), 2),
+                    'avg_pnl': round(float(row[5] or 0), 3),
+                }
+            cur_r.close()
         finally:
             cur.close()
     finally:
@@ -360,6 +386,7 @@ def generate_data():
         'by_reason': reason_stats,
         'by_wallet': wallet_stats,
         'by_hour': hour_stats,
+        'by_regime': regime_stats,
         'hold_dist': hold_dist,
         'equity_curve': equity_curve,
         'leaderboard': leaderboard[:30],  # Top 30 by score

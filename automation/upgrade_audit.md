@@ -1,225 +1,108 @@
 # Upgrade Audit Trail
 
-**Last scanned:** 2026-08-22 05:30
+Scanned: 22 plans
+Implemented: 9 | Partial: 2 | Resolved: 3 | Not Implemented: 1 | Superseded/Draft: 4 | Unknown: 3
 
 ---
 
-## Plan: conf-filter-plan.md
-- **Date scanned:** 2026-08-19
-- **Core request:** Block confidence >= 90 trades (48.7% WR, -$1.45) + block 01-06 UTC (39.8% WR, -$1.34)
-- **Difficulty:** Level 1
-- **Value:** HIGH — turns losing system into break-even (+$2.22 combined)
-- **Status:** IMPLEMENTED
-- **Reason:** Added CONF_FILTER_MAX=89 and TIME_BLOCK 01-06 UTC to hermes_constants.py. Early-return in _score_signal(). Expected: 326T → 152T, WR 51.8% → 59.2%, PnL -$1.37 → +$0.85.
+## IMPLEMENTED (9)
 
-## Plan: coin_tracker_setup_improvements.md
-- **Date scanned:** 2026-08-21 07:20
-- **Core request:** Fix coin_tracker_hot signal (42.4% WR) with regime gate, confirmations, MIN_COMPOSITE raise
-- **Difficulty:** Level 2
-- **Value:** MEDIUM — signal re-enabled 2026-08-21 but killed again at 17:00 (0W-7L last 3h)
-- **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** Fix #1 (regime gate) was already done. Implemented Fix #3 (MIN_COMPOSITE 60→70) and Fix #5 (kill warm bypass). Remaining: Fix #2 (confirming analyses) and Fix #4 (age decay). Signal needs re-testing after these changes.
+### btc-crash-filter-plan.md
+- Difficulty: Level 2 | Value: HIGH
+- BTC crash detection + acceleration filter. Phase 1 (absolute threshold) + Phase 2 (acceleration detection) deployed.
 
-## Plan: 2026-08-12_directional-outcome-tracker-spec.md
-- **Date scanned:** 2026-08-18
-- **Core request:** Real-time regime shift detector using trade outcomes as leading indicator
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** Component 1 (Signal Gate), Component 2 (Position Shield), Component 3 (Recovery) all live. Velocity tiers, integral, hysteresis, direction lock all deployed.
+### weather-vane-v4-tide-detection.md
+- Difficulty: Level 2 | Value: MEDIUM
+- BTC 3h momentum + SHORT WR tide indicator. TIDE_ENABLED + get_tide_penalty() in signal_compactor.py.
 
-## Plan: 2026-08-13_weather-vane-v2-spec.md
-- **Date scanned:** 2026-08-18
-- **Core request:** Autopilot-inspired improvements: hysteresis, derivative, integral, off-course alarm, direction lock
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** All active layers deployed (hysteresis, derivative, integral, off-course alarm, direction lock). Gain scheduling and watchdog skipped (YAGNI).
+### weather-vane-v5-volatility-floor.md
+- Difficulty: Level 1 | Value: HIGH
+- Block low-volatility entries. VOL_FLOOR_THRESHOLD=0.15% in signal_compactor.py.
 
-## Plan: 2026-08-13_weather-vane-v3-spec.md
-- **Date scanned:** 2026-08-18
-- **Core request:** Z-Score + Acceleration filter based on surfing.md quadrants
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** `get_zscore_accel_penalty()` live in signal_compactor.py. ZSCORE_ACCEL_* params in hermes_constants.py. CEO backtested — 52pt WR gap between best/worst quadrants.
+### hl-reconciliation-postmortem-spec.md
+- Difficulty: Level 2 | Value: HIGH
+- Automated HL reconciliation. Status: IMPLEMENTED per plan.
 
-## Plan: 2026-08-15_weather-vane-v4-tide-detection.md
-- **Date scanned:** 2026-08-18
-- **Core request:** BTC 3h momentum + SHORT WR confirmation for tide detection
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** `get_tide_penalty()` live in signal_compactor.py. TIDE_* params in hermes_constants.py. BTC momentum is fastest lagging indicator (3h shift window).
+### favorites-daily-update-spec.md
+- Difficulty: Level 3 | Value: MEDIUM
+- Daily favorites + rhythm + hebbian sync. All scripts exist.
 
-## Plan: 2026-08-15_weather-vane-v5-volatility-floor.md
-- **Date scanned:** 2026-08-18
-- **Core request:** Filter out low-volatility entries (no energy = no trade)
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** `check_volatility_floor()` live in signal_compactor.py. VOL_FLOOR_* params in hermes_constants.py. CEO tuned threshold to 0.15% (STARVATION FIX).
+### directional-outcome-tracker-spec.md
+- Difficulty: Level 2 | Value: HIGH
+- Weather vane trade outcome suppression. DIRECTIONAL_OUTCOME_ENABLED=True.
 
-## Plan: r2-trend-long-trailing-sl-tuning.md
-- **Date scanned:** 2026-08-18
-- **Core request:** Widen trailing SL from 0.80% to 2.00% for trend signals
-- **Difficulty:** Level 1
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** TRAILING_DISTANCE_PCT = 0.0200 (2.00%) confirmed in hermes_constants.py. Accel filter (R2_TREND_LONG_MAX_ACCEL=0.005) added. Stale block bug fixed.
+### imx-spike-detection.md / atr-spike-signal-build.md
+- Difficulty: Level 2 | Value: HIGH
+- ATR compression breakout signal. atr_spike.py enabled.
 
-## Plan: progressive-context-shaping-spec.md
-- **Date scanned:** 2026-08-18
-- **Core request:** CURRENT.md + contextmap.md for agent session continuity
-- **Difficulty:** Level 1
-- **Value:** MEDIUM
-- **Status:** IMPLEMENTED
-- **Reason:** CURRENT.md exists and maintained by CEO. contextmap.md (signal registry map) exists with 62 signals mapped. All components delivered.
+### short-bias-fix.md
+- Difficulty: Level 1 | Value: MEDIUM
+- SHORT starvation investigation. EMA penalty reverted, Trend Alignment confirmed.
 
-## Plan: coin_tracker_analysis_expansion.md
-- **Date scanned:** 2026-08-18
-- **Core request:** Expand coin_tracker into signal generator (Phase 2: coin_tracker_signal)
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** KILLED (signal tested, 42.4% WR -$0.42/7d, in NEVER_REENABLE_FLAGS)
-- **Reason:** Phase 2 EXISTS as `signals/coin_tracker_hot.py`. Tested and killed 2026-08-17. ct-hot+ 35% WR, ct-hot- 0% WR. MIN_COMPOSITE raised to 75 during testing but signal still underperformed. All 3 flags (COIN_TRACKER_HOT_ENABLED, _PLUS, _MINUS) set False.
-
-## Plan: atr-spike-signal-build.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Build ATR Spike signal v5 — catch staged moves from ATR compression with quality gates
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** `scripts/signals/atr_spike.py` exists and is live (ATR_SPIKE_ENABLED=True). Quality gates (trend, EMA proximity, volatility, regime) all in place. Backtested 83% WR raw, 78.5% with gates.
-
-## Plan: atr-spike-backtest-results.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Backtest results and token quality ratings for ATR spike signal
-- **Difficulty:** Level 1 (analysis only)
-- **Value:** MEDIUM
-- **Status:** IMPLEMENTED
-- **Reason:** Backtest complete. Signal live. Token tiers rated (WCT/IMX/IO/W = Tier 1).
-
-## Plan: imx-spike-detection.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Detect ATR compression → breakout on IMX (parent plan for atr_spike)
-- **Difficulty:** Level 2
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** Parent plan for atr_spike signal. All components delivered.
-
-## Plan: sl-tuning.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Tune SL for ATR spike signal — 0.75% recommended, two signal modes
-- **Difficulty:** Level 1
-- **Value:** MEDIUM
-- **Status:** ANALYSIS COMPLETE
-- **Reason:** 0.75% SL already implemented in atr_spike.py. Two-mode recommendation (breakout + trend) is a future enhancement, not a bug fix. No code changes needed.
-
-## Plan: 2026-08-19_short-bias-fix.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Fix short bias — revert EMA penalty (dead code), keep STANDALONE_BYPASS
-- **Difficulty:** Level 1
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** EMA penalty reverted (not found in tl_break.py). STANDALONE_BYPASS retained for tl_break_long/short. Trend Alignment confirmed as primary filter (counter-trend SHORTs = 26% WR).
-
-## Plan: confidence-calibration-plan.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Fix non-monotonic confidence curve — proposed fix rejected
-- **Difficulty:** Level 2
-- **Value:** LOW
-- **Status:** INVESTIGATION COMPLETE (no action needed)
-- **Reason:** CONF_FILTER_MAX=89 already blocks raw conf ≥ 90. Non-monotonic curve is noise (15 trades per extreme tier, CIs overlap 50%). Proposed fix was redundant and risky. Highest ROI: per-signal-type quality analysis.
-
-## Plan: copy-trader-evolution-spec.md
-- **Date scanned:** 2026-08-21 05:50
-- **Core request:** Per-trader performance tracking + trader exit correlation
-- **Difficulty:** Level 3
-- **Value:** HIGH
-- **Status:** IMPLEMENTED
-- **Reason:** `trader_performance` table exists in hl_copy_db.py. `check_trader_exits()` and `update_trader_performance()` exist in hl_fill_monitor.py. COPY_TRADE_EXIT_ENABLED=True. Bypass `'hl_copy_trader'` added to PROFIT_MONSTER_BYPASS_SIGNALS.
-
-## Plan: retroactive-scan-delayed-entry.md
-- **Date scanned:** 2026-08-21 07:20
-- **Core request:** Secondary scan for missed breakouts — retroactive signals with lower confidence
-- **Difficulty:** Level 3
-- **Value:** HIGH
-- **Status:** NOT IMPLEMENTED
-- **Reason:** 0 RETRO_ constants in hermes_constants.py. Nothing in breakout_engine.py. This is the only major plan still pending. Requires ~200 LOC in breakout_engine.py + constants + hotset writer.
+### sl-tuning.md
+- Difficulty: Level 1 | Value: MEDIUM
+- ATR spike SL tuning. 0.75% SL applied (ATR_SPIKE_SL_PCT=0.75).
 
 ---
 
-## Plan: 2026-08-21_copy-trader-entry-timing-deep-dive.md
-- **Date scanned:** 2026-08-22 05:30
-- **Core request:** Fix copy trader entry timing — disable SHORT copy + time-of-day filter
-- **Difficulty:** Level 1
-- **Value:** HIGH — turns $0.89 system into projected $91.19 (72% WR from 56%)
-- **Status:** PARTIALLY IMPLEMENTED (Phase 1 quick wins done)
-- **Reason:** HL_COPY_SIGNAL_MINUS_ENABLED=False (SHORT copy disabled). COPY_BAD_HOURS=[14,18,20] filter added to decider_run.py. Remaining: Phase 2 (leaderboard scoring), Phase 3 (regime-aware).
+## PARTIAL (2)
 
-## Plan: btc-crash-filter-plan.md
-- **Date scanned:** 2026-08-22 05:30
-- **Core request:** Upgrade BTC crash filter with acceleration detection
-- **Difficulty:** Level 2
-- **Value:** HIGH — catches crashes 2-3 min earlier (would have saved 3 trades on Aug 22)
-- **Status:** IMPLEMENTED
-- **Reason:** BTC_ACCEL_* constants added to hermes_constants.py. Acceleration check (velocity + acceleration) in decider_run.py. Blocks entries for 5 min when BTC velocity < -0.15% and accelerating. Keeps existing absolute threshold as backup.
+### conf-filter-plan.md
+- Difficulty: Level 1 | Value: HIGH
+- CONF_FILTER_MAX=89 working. TIME_BLOCK disabled (was hard block killing all signals 01-06 UTC). Needs rework: per-signal penalty instead of blanket block.
 
-## Plan: favorites-daily-update-spec.md
-- **Date scanned:** 2026-08-22 05:30
-- **Core request:** Daily favorites updater + weekly rhythm analysis + Hebbian integration
-- **Difficulty:** Level 2-3
-- **Value:** MEDIUM — faster promote/demote cycle, wave pattern detection
-- **Status:** PARTIALLY IMPLEMENTED (Part 1-2 done, Part 3 Hebbian pending)
-- **Reason:** Daily updater and rhythm analysis scripts exist. Hebbian sync not implemented.
-
-## Plan: 2026-08-22_copy-trader-dashboard-enhancements.md
-- **Date scanned:** 2026-08-22 05:30
-- **Core request:** Dashboard enhancements — copy delay, portfolio view, trader scoring
-- **Difficulty:** Level 2-3
-- **Value:** MEDIUM — better visibility, not direct PnL improvement
-- **Status:** Phase 1 DONE, Phase 2-4 NOT IMPLEMENTED
-- **Reason:** Dashboard exists with core features. Advanced analytics (delay analysis, scoring) pending.
-
-## Plan: retroactive-scan-delayed-entry.md
-- **Date scanned:** 2026-08-22 05:30
-- **Core request:** Secondary scan for missed breakouts — retroactive signals
-- **Difficulty:** Level 3
-- **Value:** HIGH — catches missed entries
-- **Status:** NOT IMPLEMENTED
-- **Reason:** Only major plan still pending. Requires ~200 LOC. Deferred to Level 3 work.
+### copy-trader-dashboard-enhancements.md
+- Difficulty: Level 2-4 | Value: MEDIUM
+- Phase 1 complete (stats, trader cards, equity curve). Phase 2-4 not started.
 
 ---
 
-## Implementations (2026-08-22 05:30)
+## RESOLVED / NO ACTION NEEDED (3)
 
-### 1. Disable SHORT copy signals (Level 1)
-- **File:** `scripts/hermes_constants.py:1675`
-- **Change:** `HL_COPY_SIGNAL_MINUS_ENABLED` True → False
-- **Why:** SHORT copy trades are net negative (36% WR, -$0.17 PnL per 54-trade analysis)
-- **Risk:** LOW — eliminates 11 losing trades, no impact on LONG copy
+### confidence-calibration-plan.md
+- Difficulty: Level 2 | Value: LOW
+- Investigation complete. CONF_FILTER already blocks worst cases. Non-monotonic curve is noise.
 
-### 2. Copy trader bad-hours filter (Level 1)
-- **Files:** `scripts/hermes_constants.py:1689-1690`, `scripts/decider_run.py:2712-2721`
-- **Change:** Added `COPY_BAD_HOURS_ENABLED=True`, `COPY_BAD_HOURS=[14,18,20]` + filter in decider_run.py
-- **Why:** Hours 14/18/20 UTC have 25-40% WR on copy trades. Blocks copy signals during these hours.
-- **Risk:** LOW — only affects hl_copy source signals, ~10 trades eliminated
+### coin_tracker_setup_improvements.md
+- Difficulty: Level 2 | Value: LOW
+- Signal killed (32.3% WR). Setup improvements irrelevant.
 
-### 3. BTC acceleration detection (Level 2)
-- **Files:** `scripts/hermes_constants.py:765-768`, `scripts/decider_run.py:1792-1845`
-- **Change:** Added `BTC_ACCEL_ENABLED`, `BTC_ACCEL_VEL_THRESHOLD=-0.15`, `BTC_ACCEL_WINDOW=2`, `BTC_ACCEL_BLOCK_DURATION=5`. Acceleration check computes velocity from 1m candles, blocks when velocity < -0.15% AND accelerating (vel_now < vel_prev).
-- **Why:** Absolute threshold (-1.5%/5m) only fires after crash is complete. Acceleration detection catches the build-up phase 2-3 min earlier. Would have caught WLFI/BIGTIME/MET during Aug 22 crash.
-- **Risk:** MEDIUM — may have false positives in normal vol. Conservative threshold (-0.15%) + acceleration requirement (2 consecutive negative bars) mitigates.
+### progressive-context-shaping-spec.md
+- Difficulty: Level 1 | Value: LOW
+- DRAFT. Awaiting CEO feedback.
 
-### 1. coin_tracker_hot MIN_COMPOSITE raise (Level 1)
-- **File:** `scripts/hermes_constants.py:929`
-- **Change:** `COIN_TRACKER_HOT_MIN_COMPOSITE` 60 → 70
-- **Why:** Signal killed at 17:00 with 0W-7L, composite 56 too loose. Raising to 70 gates weak setups harder.
-- **Risk:** LOW — only affects coin_tracker_hot signal, not live yet (COIN_TRACKER_HOT_PLUS_ENABLED=False)
+---
 
-### 2. coin_tracker_hot warm bypass removal (Level 1)
-- **File:** `scripts/signals/coin_tracker_hot.py:145-146`
-- **Change:** Removed 'warm' from allowed health states (now hot/ready only)
-- **Why:** Warm health letting garbage setups through. If composite is truly strong, health should be hot or ready.
-- **Risk:** LOW — same as above, signal is disabled for live trading
+## NOT IMPLEMENTED (1)
+
+### retroactive-scan-delayed-entry.md
+- Difficulty: Level 3 | Value: MEDIUM
+- Retroactive breakout scan. Plan v3 exists but no code found. atr_spike.py covers some overlap.
+
+---
+
+## SUPERSEDED (2)
+
+### weather-vane-v2-spec.md / v3-spec.md
+- Superseded by v4/v5.
+
+---
+
+## UNKNOWN (3)
+
+### coin_tracker_analysis_expansion.md
+- ct-hot dead. Likely irrelevant.
+
+### r2-trend-long-trailing-sl-tuning.md
+- Need to check if applied.
+
+### copy-trader-evolution-spec.md / entry-timing-deep-dive.md
+- Need to check status.
+
+---
+
+## Next Candidates (Level 1)
+
+1. **conf-filter-plan.md TIME_BLOCK rework** — Change hard block to 0.7x penalty during 01-06 UTC. HIGH value, already coded, just needs tweak.
+2. **BTC accel debug logging** — Add velocity values to crash filter log output. Easy, improves observability.
+3. **COPY_BAD_HOURS** — Check if copy signal time blocking is optimal.
