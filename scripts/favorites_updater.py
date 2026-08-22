@@ -180,18 +180,36 @@ def get_regime_adjustment(token, rhythm, current_regime):
         return 0
 
     # Get token's performance in current regime vs average across all regimes
-    current_perf = token_regimes.get(current_regime)
-    if current_perf is None:
+    # Regime values are dicts: {'trades': N, 'avg_pnl': X, 'wr': Y}
+    current_regime_data = token_regimes.get(current_regime)
+    if current_regime_data is None:
         return 0
 
-    all_perfs = [v for v in token_regimes.values() if v is not None and not isnan(v)]
-    if not all_perfs:
+    # Extract WR from regime data (handle both dict and plain float formats)
+    if isinstance(current_regime_data, dict):
+        current_wr = current_regime_data.get('wr', 0)
+    else:
+        current_wr = current_regime_data
+
+    if isnan(current_wr):
         return 0
 
-    avg_perf = sum(all_perfs) / len(all_perfs)
-    if current_perf > avg_perf:
+    all_wrs = []
+    for v in token_regimes.values():
+        if isinstance(v, dict):
+            wr = v.get('wr', 0)
+        else:
+            wr = v
+        if wr is not None and not isnan(wr):
+            all_wrs.append(wr)
+
+    if not all_wrs:
+        return 0
+
+    avg_wr = sum(all_wrs) / len(all_wrs)
+    if current_wr > avg_wr:
         return -RHYTHM_REGIME_ADJUSTMENT  # lower WR threshold (easier to promote)
-    elif current_perf < avg_perf * 0.7:
+    elif current_wr < avg_wr * 0.7:
         return RHYTHM_REGIME_ADJUSTMENT   # raise WR threshold (harder to promote)
     return 0
 
