@@ -867,6 +867,11 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
         cur.close()
         conn.close()
         log(f'  Created orphan recovery trade #{trade_id}: {token} {direction} @ {entry_price} x{leverage}', 'PASS')
+        # Record entry features (RSI, MACD, etc.)
+        try:
+            record_entry_features(int(trade_id), token.upper())
+        except Exception as _feat_err:
+            log(f'  Feature record failed for {token}: {_feat_err}', 'WARN')
         return trade_id
     except Exception as e:
         try:
@@ -1674,6 +1679,11 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                     except Exception:
                         pass
                 log(f'  [FLIP] Done: opened trade #{trade_id} opposite direction', 'INFO')
+                # Record entry features for flipped trade
+                try:
+                    record_entry_features(int(trade_id), token.upper())
+                except Exception as _feat_err:
+                    log(f'  [FLIP] Feature record failed for {token}: {_feat_err}', 'WARN')
             else:
                 log(f'  [FLIP] FAILED: {open_result.get("error")}', 'FAIL')
 
@@ -2292,44 +2302,122 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
 
 def get_token_intel(token: str) -> dict:
     """
-    Simplified token intel: reads from brain DB momentum cache.
-    Returns the same dict structure as combined-trading's get_token_intel().
+    Token intel: reads from momentum_cache, falls back to computing from price_history.
+    Returns dict with rsi_14, macd_hist, atr_14, bb_position, slope_4h, regime_4h, trend.
     """
+    # Try momentum_cache first
     conn = get_db_connection()
-    if conn is None:
-        return {}
-
-    try:
-        cur = conn.cursor()
-        # Check for momentum_cache data in the brain DB
-        cur.execute("""
-            SELECT rsi_14, macd_hist, atr_14, bb_position, slope_4h, regime_4h, trend
-            FROM momentum_cache
-            WHERE token=%s
-            ORDER BY updated_at DESC LIMIT 1
-        """, (token,))
-        row = cur.fetchone()
-        conn.close()
-
-        if row and row[0] is not None:
-            return {
-                'rsi_14': float(row[0]) if row[0] else None,
-                'macd_hist': float(row[1]) if row[1] else None,
-                'atr_14': float(row[2]) if row[2] else None,
-                'bb_position': float(row[3]) if row[3] else None,
-                'slope_4h': float(row[4]) if row[4] else None,
-                'regime_4h': row[5] if row[5] else None,
-                'trend': row[6] if row[6] else None,
-            }
-    except Exception as e:
+    if conn is not None:
         try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT rsi_14, macd_hist, atr_14, bb_position, slope_4h, regime_4h, trend
+                FROM momentum_cache
+                WHERE token=%s
+                ORDER BY updated_at DESC LIMIT 1
+            """, (token,))
+            row = cur.fetchone()
             conn.close()
-        except:
-            pass
-        # momentum_cache table might not exist — return empty
+
+            if row and row[0] is not None:
+                return {
+                    'rsi_14': float(row[0]) if row[0] else None,
+                    'macd_hist': float(row[1]) if row[1] else None,
+                    'atr_14': float(row[2]) if row[2] else None,
+                    'bb_position': float(row[3]) if row[3] else None,
+                    'slope_4h': float(row[4]) if row[4] else None,
+                    'regime_4h': row[5] if row[5] else None,
+                    'trend': row[6] if row[6] else None,
+                }
+        except Exception:
+            try:
+                conn.close()
+            except:
+                pass
+
+    # Fallback: compute from price_history
+    return _compute_intel_from_prices(token)
+
+
+def _compute_intel_from_prices(token: str) -> dict:
+    """Compute indicators from price_history and candles_5m."""
+    import sqlite3
+    from paths import STATIC_DB, CANDLES_DB
+
+    result = {
+        'rsi_14': None, 'macd_hist': None, 'atr_14': None,
+        'bb_position': None, 'slope_4h': None, 'regime_4h': None, 'trend': None,
+    }
+
+    # Get 1m close prices
+    try:
+        with sqlite3.connect(STATIC_DB, timeout=5) as db:
+            rows = db.execute(
+                'SELECT price FROM price_history WHERE token=? ORDER BY timestamp DESC LIMIT 60',
+                (token.upper(),)
+            ).fetchall()
+        prices = [r[0] for r in reversed(rows)] if rows else []
+    except Exception:
+        prices = []
+
+    if len(prices) < 26:
+        return result
+
+    # RSI
+    if len(prices) >= 15:
+        changes = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+        gains = [c for c in changes[-14:] if c > 0]
+        losses = [-c for c in changes[-14:] if c < 0]
+        ag = sum(gains) / 14 if gains else 0
+        al = sum(losses) / 14 if losses else 0
+        result['rsi_14'] = round(100.0 if al == 0 else 100 - 100 / (1 + ag / al), 2)
+
+    # MACD
+    def _ema(vals, period):
+        k = 2 / (period + 1)
+        e = sum(vals[:period]) / period
+        for v in vals[period:]:
+            e = v * k + e * (1 - k)
+        return e
+
+    if len(prices) >= 35:
+        ml = _ema(prices[-35:], 12) - _ema(prices[-35:], 26)
+        mvs = []
+        for i in range(26, len(prices) + 1):
+            chunk = prices[max(0, i - 35):i]
+            if len(chunk) >= 26:
+                mvs.append(_ema(chunk, 12) - _ema(chunk, 26))
+        if len(mvs) >= 9:
+            sig = _ema(mvs, 9)
+            result['macd_hist'] = round(ml - sig, 8)
+
+    # BB position
+    w = prices[-20:]
+    mean = sum(w) / len(w)
+    var = sum((p - mean) ** 2 for p in w) / len(w)
+    std = var ** 0.5
+    if std > 0:
+        result['bb_position'] = round((prices[-1] - (mean - 2 * std)) / (4 * std), 4)
+
+    # ATR from 5m candles
+    try:
+        with sqlite3.connect(CANDLES_DB, timeout=5) as db:
+            rows = db.execute(
+                'SELECT high, low, close FROM candles_5m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 15',
+                (token.upper(),)
+            ).fetchall()
+        if len(rows) >= 2:
+            trs = []
+            for i in range(1, len(rows)):
+                h, l, c = rows[i-1]
+                prev_c = rows[i][2]
+                tr = max(h - l, abs(h - prev_c), abs(l - prev_c))
+                trs.append(tr)
+            result['atr_14'] = round(sum(trs[:14]) / min(len(trs), 14), 8) if trs else None
+    except Exception:
         pass
 
-    return {}
+    return result
 
 
 # ─── Feature Logging (migrated from combined-trading.py) ──────────────────────

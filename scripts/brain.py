@@ -681,6 +681,12 @@ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                                signal=signal or '', source='add_trade')
         except Exception as _a:
             pass
+        # ── Record entry features (RSI, MACD, etc.) ──────────────────────────
+        try:
+            from hl_sync_guardian import record_entry_features
+            record_entry_features(int(trade_id), token.upper())
+        except Exception as _feat_err:
+            print(f"[brain.py] ⚠️ Feature record failed: {_feat_err}")
     except Exception as e:
         # CRITICAL: mirror_open already succeeded — HL has this position live.
         # If DB write fails we MUST roll back the HL position to avoid a phantom live trade.

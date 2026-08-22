@@ -310,6 +310,12 @@ def add_orphan_recovery_trade(token: str, direction: str, entry_price: float,
         conn.commit()
         cur.close(); conn.close()
         log(f'  Created orphan recovery trade #{trade_id}: {token} {direction} @ {entry_price} x{leverage}', 'PASS')
+        # Record entry features (RSI, MACD, etc.)
+        try:
+            from hl_sync_guardian import record_entry_features
+            record_entry_features(int(trade_id), token.upper())
+        except Exception as _feat_err:
+            log(f'  Feature record failed for {token}: {_feat_err}', 'WARN')
         return trade_id
     except Exception as e:
         log(f'  add_orphan_recovery_trade failed for {token}: {e}', 'FAIL')
