@@ -1814,3 +1814,7 @@ COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.25    # per token+direction cooldown (15 minutes)
 COIN_TRACKER_HOT_MIN_COMPOSITE      = 70      # net score threshold — raised from 56 (CEO killed ct-hot+ 2026-08-22, 42.6% WR). CEO_PROTECTED
+# Momentum filters — prevent entries against the trend (added 2026-08-22)
+COIN_TRACKER_HOT_MIN_MACD_HIST     = -0.0005  # MACD histogram must be > this for LONG (avoids bearish entries)
+COIN_TRACKER_HOT_MAX_Z_SCORE        = 1.8      # Z-score must be < this for LONG (avoids overbought entries)
+COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.85     # BB position must be < this for LONG (avoids upper band entries)
