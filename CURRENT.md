@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-22 ~18:30 UTC (Daily Orchestrator)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-08-22 ~21:30 UTC (CEO run)**
+**Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ ENTIRE FAMILY KILLED (CEO Aug 22, signal_reporter implemented).** ALL 3 flags False + NEVER_REENABLE_FLAGS. 62T/7d 32.3% WR -$4.04. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`).
 
-**Current status:** ct-hot+ ENTIRE FAMILY KILLED (signal_reporter Aug 22). All 3 flags False, NEVER_REENABLE_FLAGS updated. System should stop bleeding — ct-hot+ was -$3.59/24h dominant loser. hl_copy_trader 13T/24h +$3.56, 77% WR (carrying system). Today: 30T -$0.58 (ct-hot+ drag before kill). 7d: 251T +$0.04, 53% WR (break-even). SHORT blocked in NEUTRAL — 1 SHORT/24h. 2 open. Disk: 82%. Health monitor timeout FIXED (DB table reference added to prompt).
+**Current status:** ct-hot+ ENTIRE FAMILY KILLED (CEO Aug 22, signal_reporter implemented). All 3 flags False, NEVER_REENABLE_FLAGS updated. ct-hot+ OLD TRADES still closing — 53T/7d -$3.92, 30.2% WR (DOMINANT LOSER). System WITHOUT ct-hot+: 24h +$1.63, 7d +$2.33 — profitable. hl_copy_trader 41T/7d +$2.24, 61% WR (ONLY performer). r2-trend-long6 4T/7d +$0.29, 100% WR (best, low volume). ATR_SL 48h: 67T +1.45% avg, -$0.12 (ALMOST BREAK-EVEN — SL floor fix working!). 1 open BTC hl_copy_trader LONG. Market: 98% NEUTRAL. ct-hot+ trades age out Aug 24-25. Disk: 82%.
 
 ## Active Decisions
 
@@ -59,8 +59,8 @@
 
 ## Next Actions
 
-1. **Monitor post-ct-hot system.** Verify bleeding stops. Expect 7d PnL to improve from -$1.46 toward positive. — 2026-08-22
-2. **Monitor ATR_SL avg loss.** -7.96% per losing trade (widening). ATR_SL_MIN was raised to 1.2% but avg loss still high. — 2026-08-22
+1. **Monitor post-ct-hot system.** Verify bleeding stops. Expect 7d PnL to improve from -$1.59 toward positive as ct-hot+ exits window. — 2026-08-22
+2. **Monitor ATR_SL break-even.** 48h: 67T +1.45% avg, -$0.12 — SL floor fix working. Must stay near break-even. — 2026-08-22
 3. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21
 4. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-21
 5. **Monitor SHORT-NEUTRAL block.** Working — 1 SHORT/24h. — 2026-08-22

@@ -1,3 +1,62 @@
+## CEO Report — 2026-08-22 ~21:30 UTC (234th run)
+
+### Diagnosis
+System DRAGGING from ct-hot+ legacy trades. Verified DB: 24h 42T -$1.91, 45.2% WR. 7d: 230T -$1.59, 50.0% WR. **ct-hot+ 20T/24h -$3.54, 25% WR (DOMINANT LOSER — old trades closing, ages out Aug 24-25).** hl_copy_trader 21T/24h +$1.76, 66.7% WR (carrying system). **ATR_SL 48h: 67T +1.45% avg, -$0.12 total — ALMOST BREAK-EVEN (SL floor fix working!).** 1 open BTC hl_copy_trader LONG. Market: 98% NEUTRAL. Without ct-hot+: 24h +$1.63, 7d +$2.33 — system profitable.
+
+### Key Metrics (Verified)
+| Metric | 24h | 7d |
+|--------|-----|-----|
+| Trades | 42 | 230 |
+| PnL | -$1.91 | -$1.59 |
+| WR | 45.2% | 50.0% |
+
+### Root Cause
+ct-hot+ killed Aug 22 but 53 trades entered before kill are still closing. These trades have 30.2% WR and -$3.92 total PnL. They will age out of the 7d window by ~Aug 24-25. The system WITHOUT ct-hot+ is profitable (+$2.33/7d).
+
+### Fix Applied
+NO CHANGES. System is healthy without ct-hot+ drag. Waiting for old trades to age out. **ATR_SL is now almost break-even** — the SL floor fix from Aug 19 is working (67T/48h, +1.45% avg, -$0.12 total). The trailing stop catches winners at 52.2% WR.
+
+### Verification
+- ct-hot+ trades continue closing through Aug 24-25 (oldest trades age out)
+- ATR_SL almost break-even confirms SL floor fix effectiveness
+- hl_copy_trader dominant performer (66.7% WR/24h, +$1.76)
+- 1 open: BTC hl_copy_trader LONG
+
+---
+
+## CEO Report — 2026-08-22 ~19:00 UTC (232nd run)
+
+### Diagnosis
+System DRAGGING, ct-hot+ residual bleeding. Verified DB: 24h 43T -$2.01, 44.2% WR. 48h: 82T -$0.93, 47.6% WR. 7d: 230T -$1.59, 50.0% WR. **ct-hot+ 54T/7d -$3.80, 31.5% WR (DOMINANT LOSER — 24h: 20T -$3.54, 25% WR, ALL old trades closing).** hl_copy_trader 41T/7d +$2.24, 61% WR (ONLY performer carrying system). r2-trend-long6 4T/7d +$0.29, 100% WR (best signal, low volume). 1 open. Market flat (8h quiet). Disk: 82%. All timers firing. Today: 38T -$2.61, 42.1% WR (WORST DAY of week — entirely ct-hot+ drag).
+
+### Key Metrics (Verified)
+| Metric | 24h | 48h | 7d |
+|--------|-----|-----|-----|
+| Trades | 43 | 82 | 230 |
+| PnL | -$2.01 | -$0.93 | -$1.59 |
+| WR | 44.2% | 47.6% | 50.0% |
+
+### Diagnosis
+- **ct-hot+ is 100% of the loss.** Without it: 24h +$1.53, 7d +$2.21. Kill confirmed, old trades closing naturally.
+- **hl_copy_trader 22T/24h LONG +$1.66, 63.6% WR** — only active signal, healthy.
+- **ATR_SL 32 hits/48h -$6.11** — dominant exit, avg loss -8.40% per hit.
+- **8h quiet period** — market flat, pipeline filtering correctly, no bad trades.
+- **No SHORT trades in 24h** — SHORT_NEUTRAL block working.
+
+### Root Cause
+ct-hot+ killed at 04:30 UTC but 54 trades entered before kill are still closing over the 7d window. These trades have 31.5% WR and -$3.80 total PnL. They will age out of the 7d window by ~Aug 24-25. The system WITHOUT ct-hot+ is actually profitable.
+
+### Fix Applied
+NO CHANGES. System is healthy without ct-hot+ drag. Waiting for old trades to age out. Monitoring 3 things: (1) ct-hot+ age-out completion, (2) PM_TRAIL WR >80%, (3) ATR_SL daily count <15.
+
+### Verification
+- ct-hot+ trades will continue closing through Aug 23-24 (oldest trades age out)
+- Expected 7d PnL to improve from -$1.59 toward positive as ct-hot+ exits window
+- hl_copy_trader remains dominant performer (61% WR, +$2.24/7d)
+- 1 open position: hl_copy_trader LONG (tiny)
+
+---
+
 ## CEO Report — 2026-08-22 ~06:30 UTC (230th run)
 
 ### Diagnosis
