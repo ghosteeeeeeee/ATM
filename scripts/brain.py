@@ -573,10 +573,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         # CRITICAL: column numbers in _col_map MUST match SQL column ordinal position (1-45)
         # SQL has 45 columns: 11 before open_time, open_time=DEFAULT, 33 after
         # TOTAL = 11 + 1 + 33 = 45 columns, 45 placeholders (open_time uses DEFAULT keyword, not %s)
-        # Store the ACTUAL boosted amount_usdt in DB (base × cluster multiplier)
-        _actual_amount = amount_usdt
-        if _size_mult > 1.0 and amount_usdt:
-            _actual_amount = round(float(amount_usdt) * _size_mult, 2)
+        # Store the ACTUAL HL trade size in DB — NOT the hardcoded signal-level amount_usdt.
+        # mirror_open() calculates size from _get_trade_size_usdt() (7% of withdrawable),
+        # so this reflects the real position sizing that scales with account balance.
+        _actual_amount = float(result.get('usdt', 0) or 0)
+        if _actual_amount <= 0:
+            # Fallback: use signal amount × cluster multiplier
+            _actual_amount = float(amount_usdt or 0)
+            if _size_mult > 1.0 and _actual_amount > 0:
+                _actual_amount = round(_actual_amount * _size_mult, 2)
+        print(f"[brain.py]    💰 amount_usdt: signal=${float(amount_usdt or 0):.2f} → actual=${_actual_amount:.2f} (7% of withdrawable)")
 
         _col_map = [
             # Col  Name                   Value

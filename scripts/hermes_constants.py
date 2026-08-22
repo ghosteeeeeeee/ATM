@@ -424,7 +424,8 @@ CASCADE_FLIP_ENABLED = False  # Master toggle — set True to enable cascade fli
 CASCADE_FLIP_MAX     = 3      # max flips per token before permanent lockout
 
 # ── Trade Sizing Constants ──────────────────────────────────────────────────────
-DEFAULT_TRADE_SIZE_USDT = 11.0  # local DB signal-level default for amount_usdt
+DEFAULT_TRADE_SIZE_USDT = 11.0  # FALLBACK only — actual sizing uses _get_trade_size_usdt()
+                                 # (7% of withdrawable balance, scales with account growth).
                                  # NOTE: do NOT use this for PnL calculations — use
                                  # hl_notional_usdt (actual HL notional) or
                                  # hype_realized_pnl_usdt (HL ground-truth) instead.

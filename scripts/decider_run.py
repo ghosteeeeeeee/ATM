@@ -219,7 +219,23 @@ from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 SERVER          = 'Hermes'
 MAX_POS         = MAX_OPEN_POSITIONS
-POSITION_SIZE_USD = DEFAULT_TRADE_SIZE_USDT   # FIX (2026-05-19): was hardcoded 50.0 — now from hermes_constants
+POSITION_SIZE_USD = DEFAULT_TRADE_SIZE_USDT   # fallback — overwritten by _get_dynamic_position_size()
+
+
+def _get_dynamic_position_size() -> float:
+    """Get position size as % of account balance (scales with account growth).
+
+    Uses 7% of withdrawable balance with HL minimum floor ($11).
+    Falls back to DEFAULT_TRADE_SIZE_USDT on API error.
+    """
+    try:
+        from hyperliquid_exchange import _get_trade_size_usdt
+        dynamic = _get_trade_size_usdt()
+        if dynamic >= HL_MIN_NOTIONAL_USDT:
+            return round(dynamic, 2)
+    except Exception as e:
+        print(f"[decider_run] WARN: dynamic sizing failed ({e}), using default")
+    return DEFAULT_TRADE_SIZE_USDT
 LOG_FILE        = '/var/www/hermes/logs/signals.log'
 DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
 AB_CONFIG_FILE  = '/root/.hermes/data/ab-test-config.json'
@@ -583,7 +599,8 @@ def process_delayed_entries(paper=False):
             exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
             exp_arg = ['--experiment', exp_json]
 
-        _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
+        _base_size = _get_dynamic_position_size()
+        _trade_size = _base_size * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
 
         cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
                 token, cmd_side, str(_trade_size), str(round(cur_price, 6)),
@@ -1447,7 +1464,8 @@ def execute_trade(token, direction, price, confidence, source,
     # --paper when live_trading=False, --real when live_trading=True
     paper_flag = '--paper' if not live_trading else '--real'
 
-    _trade_size = POSITION_SIZE_USD * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
+    _base_size = _get_dynamic_position_size()
+    _trade_size = _base_size * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
 
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),

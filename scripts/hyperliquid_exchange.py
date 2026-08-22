@@ -785,12 +785,16 @@ SZ_DECIMALS = {
 
 # ─── Mirroring Config ─────────────────────────────────────────────────────────
 MARGIN_USAGE_PCT = 0.07    # 7% of withdrawable margin per trade
-MIN_TRADE_USDT   = 10.0    # Hyperliquid minimum order value ($10)
-MIN_ORDER_BUFFER = 0.10    # extra $ to ensure we comfortably clear HL min ($10.10 vs $10.00)
+MIN_TRADE_USDT   = 11.0    # HL minimum order value ($10) + $1 buffer for safety
+MIN_ORDER_BUFFER = 0.10    # extra $ to ensure we comfortably clear HL min ($11.10 vs $11.00)
 
 
 def _get_trade_size_usdt() -> float:
-    """Return USDT amount to trade (7% of withdrawable, min $10)."""
+    """Return USDT amount to trade (7% of withdrawable, min $11).
+
+    Dynamic sizing: as account balance grows, position sizes grow proportionally.
+    Example: $150 balance → $10.50, $300 balance → $21.00, $500 balance → $35.00
+    """
     state = get_account_value_curl()
     withdrawable = float(state.get("withdrawable", 0) or 0)
     if withdrawable <= 0:
