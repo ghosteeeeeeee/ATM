@@ -904,7 +904,7 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         cur.execute("""
             SELECT token, direction, entry_price, current_price,
                    pnl_pct, experiment, sl_distance, amount_usdt, signal,
-                   hl_notional_usdt
+                   hl_notional_usdt, leverage
             FROM trades WHERE id = %s
         """, (trade_id,))
         row = cur.fetchone()
@@ -923,7 +923,10 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # an HL trade with $0 notional (theoretical) or NULL both need the fallback.
         # Bug-fix (2026-08-21): amount_usdt is MARGIN, not notional. Multiply by leverage
         # to get actual position size when hl_notional_usdt is missing.
-        leverage = float(row.get('leverage') or 10)
+        # Bug-fix (2026-08-22): SELECT now includes 'leverage' column.
+        # Previous SELECT was missing it, so row.get('leverage') returned None
+        # and defaulted to 10 — inflating pnl_pct by 2x for 5x trades.
+        leverage = float(row['leverage']) if row['leverage'] is not None else 10
         if row['hl_notional_usdt'] is not None:
             calc_notional = float(row['hl_notional_usdt'])
         else:
@@ -945,7 +948,10 @@ def close_paper_position(trade_id: int, reason: str) -> bool:
         # ── Fee calculation ──────────────────────────────────────────
         # Hyperliquid charges 0.045% per side on NOTIONAL value
         TAKER_FEE = 0.00045
-        leverage = float(row.get('leverage') or 10)
+        # Bug-fix (2026-08-22): SELECT now includes 'leverage' column.
+        # Previous SELECT was missing it, so row.get('leverage') returned None
+        # and defaulted to 10 — inflating pnl_pct by 2x for 5x trades.
+        leverage = float(row['leverage']) if row['leverage'] is not None else 10
         entry_fee_paid = float(row.get('entry_fee') or 0)
         # calc_notional already includes leverage (amount_usdt * leverage when
         # hl_notional_usdt is NULL, or hl_notional_usdt which is the actual notional).
