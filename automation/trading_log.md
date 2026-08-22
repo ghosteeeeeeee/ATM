@@ -12942,3 +12942,70 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - Open BTC trade running normally, -$0.08 unrealized
 
 **Open Questions:** None
+
+## [2026-08-22 16:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+
+**24h:** 52T | hl_copy_trader 27T 15W 55.6% +$1.16 (healthy) | ct-hot+ 25T 5W 20% -$4.10 (killed 09:00, legacy)
+**Open:** 2 — BTC LONG hl_copy_trader $77331, -$0.11 | HYPE LONG hl_copy_trader $77.35, +$0.02
+
+**Changes:** None
+
+**No Change Needed:**
+- 7h quiet period — 0 trades last 7 hours
+- hl_copy_trader healthy: 55.6% WR, +$1.16/24h, only active signal
+- ct-hot+ kill confirmed — no new trades since 09:00
+- atr_sl_hit 75.5% = trailing SL working as designed, not SL too tight
+- guardian_hard_sl 9.3% = correct safety net
+- MAE-GUARD 7.4% = proper adverse excursion cuts
+- No kill criteria triggered
+- Trade freq 0/hr — no overtrading
+- Open trades running normally
+
+**Open Questions:** None
+
+## [2026-08-22 17:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet since 10:04 UTC)
+**PnL:** $0.00
+
+**24h:** 46T 19W 41.3% WR -$2.45 | hl_copy_trader 25T 14W 56% +$1.20 (healthy) | ct-hot+ 21T 5W 23.8% -$3.65 (killed 09:00, fully settled)
+**Open:** 2 — BTC LONG hl_copy_trader $77331 +$0.01 | HYPE LONG hl_copy_trader $77.35 +$0.16
+
+**Changes:** None
+
+**No Change Needed:**
+- 7h quiet period — 0 trades since 10:04 UTC
+- hl_copy_trader healthy: 56% WR, +$1.20/24h, only active signal
+- ct-hot+ fully settled — last close ETH MAE-GUARD at 10:04, no new entries since kill at 09:00
+- atr_sl_hit 76% of exits = trailing SL working as designed for hl_copy_trader (+$1.27 from atr_sl_hit)
+- No kill criteria triggered
+- No overtrading
+- Open trades running normally, tiny unrealized gains
+
+**Open Questions:** None
+
+## [2026-08-22 18:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+
+**24h:** 44T 19W 43.2% WR -$2.22 | hl_copy_trader 24T 14W 58.3% +$1.32 (healthy only active signal) | ct-hot+ 20T 5W 25% -$3.54 (killed 09:00)
+**Open:** 2 — BTC LONG hl_copy_trader $77331 $0.00 | HYPE LONG hl_copy_trader $77.35 $0.00
+
+**Changes:** None
+
+**No Change Needed:**
+- 8h quiet period — 0 trades since 10:04 UTC
+- hl_copy_trader healthy: 58.3% WR, +$1.32/24h, only active signal
+- ct-hot+ fully settled — last close 10:04, no new entries since kill at 09:00
+- atr_sl_hit 75% of exits = trailing SL working as designed
+- guardian_hard_sl 11.4% = correct safety net
+- cut-loser-MAE-GUARD 9.1% = proper adverse excursion cuts
+- No kill criteria triggered (no signal at 3+ trades 0% WR in last hour)
+- Trade freq 0/hr — no overtrading
+- Open trades running normally
+
+**Open Questions:** None
