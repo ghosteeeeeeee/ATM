@@ -187,4 +187,35 @@ CUT_LOSER_PNL = -2.0              # % PnL hard stop
 |------|----------|-----------|
 | 2026-08-22 | Deploy -1.5%/5m absolute filter | Quick win, catches post-crash entries |
 | 2026-08-22 | Plan acceleration filter | Catches build-up phase (2-3 min earlier) |
+| 2026-08-22 | REJECT post-crash cool-down | Blocks strong winners (SOL +14.68%, HYPE +12.12%, POL +36.67%) |
 | TBD | Optimize via backtest | Data-driven threshold selection |
+
+---
+
+## Critical Finding: Post-Crash Cool-Down is WRONG
+
+### Backtest Results (Aug 22)
+
+| Category | Trades | W/L | Net PnL |
+|----------|--------|-----|---------|
+| During crash (05:08-05:12) | 21 | 8W/13L | Mixed |
+| After crash (06:13+) | 16 | 7W/9L | -$0.43 |
+
+### Why Post-Crash Cool-Down Fails
+
+The post-crash period (06:13+) produced **strong winning trades**:
+- SOL: +14.68% ($0.30)
+- HYPE: +12.12% ($0.25)
+- POL: +36.67% ($0.75)
+
+A cool-down filter would have **blocked these winners** while only saving some losers. Net impact: **NEGATIVE**.
+
+### Correct Approach
+
+1. **BTC crash filter (during crash)**: ✅ RIGHT — blocks entries during cascades
+2. **Post-crash cool-down**: ❌ WRONG — blocks strong winning trades
+3. **Individual trade protection** (MAE-GUARD, ATR SL): ✅ WORKING — already cutting losses
+
+### Recommendation
+
+Focus on improving the **during-crash filter** (acceleration detection), NOT adding post-crash restrictions. The post-crash period is where the system captures strong recovery trades.
