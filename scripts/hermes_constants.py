@@ -240,7 +240,6 @@ FAVORITES = {
     'GMT',
     'LDO',
     'ME',
-    'MNT',
     'SYRUP',
     'ZRO'
 }

@@ -12676,3 +12676,34 @@ None — system stable, previous fixes settling in.
 - PROMOTE LDO (WR=80.0%, AvgPnL=0.23%, Trades=5)
 
 Final set: ['BANANA', 'BLUR', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'MNT', 'SYRUP', 'ZRO']
+
+## FAVORITES Update — 2026-08-22 05:04 UTC
+- Regime: NEUTRAL
+- DEMOTE MNT (inactive 9d, no trades)
+
+Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
+
+## [2026-08-22 05:00 UTC] Hourly Analysis
+
+**Trades:** 8 closed (5W 3L) — 4 ct-hot+ (2W 2L -$1.47), 4 hl_copy_trader (3W 1L +$3.78)
+**PnL:** +$2.31 (62.5% WR)
+
+**24h:** 54T 29W 53.7%WR +$3.77
+- hl_copy_trader: 31T 18W 58.1% +$4.84 (star)
+- ct-hot+: 22T 10W 45.5% -$1.35 (losing, CEO_PROTECTED)
+- r2-trend-long3: 1T 1W +$0.28
+
+**Close reasons (24h):** atr_sl_hit 52T +$3.23 (dominant, net profitable trailing SL correct)
+
+**Changes:** None
+
+**No Change Needed:**
+- System net profitable +$3.77 in 24h
+- hl_copy_trader performing well at 58% WR
+- No signal hit kill criteria (0% WR, 3+ trades/hr)
+- atr_sl_hit dominant but profitable — trailing SL working correctly
+- Trade freq 8/hr elevated but below overtrading threshold (20/hr)
+- ct-hot+ losing but CEO_PROTECTED (composite=57, CEO lowered from 70)
+- MET -$1.38 loss was tight SL hit (1.2% stop) — entry quality issue, not system bug
+
+**Open Questions:** None

@@ -23,6 +23,7 @@ from hermes_constants import (
 )
 
 REPORT_INTERVAL = 3600  # 1 hour
+LEADERBOARD_REFRESH_INTERVAL = 21600  # 6 hours
 
 def generate_report():
     """Generate markdown report for dashboard."""
@@ -136,6 +137,27 @@ def run_once():
         print(f"  Synced {synced} records")
     else:
         print("  All up to date")
+    
+    # Step 1d: Refresh leaderboard (every 6 hours)
+    last_leaderboard_file = os.path.join(HERMES_DATA, 'hl_copy_last_leaderboard.txt')
+    try:
+        with open(last_leaderboard_file) as f:
+            last_leaderboard = int(f.read().strip())
+    except (FileNotFoundError, ValueError, OSError):
+        last_leaderboard = 0
+    
+    if time.time() - last_leaderboard > LEADERBOARD_REFRESH_INTERVAL:
+        print("\n[1d/5] Refreshing leaderboard...")
+        try:
+            traders = scan_leaderboard()
+            print(f"  Scanned {len(traders)} traders")
+            with open(last_leaderboard_file, 'w') as f:
+                f.write(str(int(time.time())))
+        except Exception as e:
+            print(f"  Leaderboard refresh failed: {e}")
+    else:
+        remaining = int((LEADERBOARD_REFRESH_INTERVAL - (time.time() - last_leaderboard)) / 60)
+        print(f"\n[1d/5] Leaderboard refresh in {remaining}m")
     
     # Step 2: Check for pro trader signals
     print("\n[2/5] Checking for pro trader signals...")

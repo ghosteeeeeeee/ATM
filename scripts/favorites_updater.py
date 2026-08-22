@@ -97,6 +97,7 @@ def load_rhythm():
 
 def get_all_token_stats():
     """Query 7d stats for all tokens with enough trades."""
+    conn = None
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
@@ -122,12 +123,15 @@ def get_all_token_stats():
 
         columns = [desc[0] for desc in cur.description]
         stats = [dict(zip(columns, row)) for row in cur.fetchall()]
-        conn.close()
         return stats
 
     except Exception as e:
         log(f"DB query error: {e}")
         return []
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 def get_current_regime():
@@ -295,6 +299,7 @@ def run():
             if not token_stats:
                 # No recent trades — inactivity demotion after 7 days
                 # Check how long since last trade
+                conn = None
                 try:
                     import psycopg2
                     from _secrets import BRAIN_DB_DICT
@@ -305,7 +310,6 @@ def run():
                         WHERE token = %s AND server = 'Hermes' AND status = 'closed'
                     """, (token,))
                     row = cur.fetchone()
-                    conn.close()
                     if row and row[0]:
                         last_trade = row[0]
                         if last_trade.tzinfo is None:
@@ -321,6 +325,10 @@ def run():
                         changes.append(f"DEMOTE {token} (no trade history)")
                 except Exception as e:
                     log(f"  Inactivity check failed for {token}: {e}")
+                finally:
+                    if conn:
+                        try: conn.close()
+                        except Exception: pass
                 continue
 
             # Apply regime adjustment to demotion threshold

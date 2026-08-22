@@ -401,6 +401,7 @@ def generate_recommendations(clusters, cadence, current_favs):
 
 def run():
     lock_fd = None
+    conn = None
     try:
         lock_fd = open(LOCK_FILE, 'w')
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -474,6 +475,9 @@ def run():
         import traceback
         traceback.print_exc()
     finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
         if lock_fd:
             fcntl.flock(lock_fd, fcntl.LOCK_UN)
             lock_fd.close()
