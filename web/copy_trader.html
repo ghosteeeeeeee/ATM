@@ -63,7 +63,12 @@
   <div class="stats-bar" id="stats-bar"></div>
 
   <div class="section">
-    <h2>👥 Trader Performance</h2>
+    <h2>🏆 Leaderboard <span id="leaderboard-meta" style="font-size:0.7em; color:#666; font-weight:normal;"></span></h2>
+    <div id="leaderboard-table"></div>
+  </div>
+
+  <div class="section">
+    <h2>👥 Trader Performance (Our Copies)</h2>
     <div id="trader-cards"></div>
   </div>
 
@@ -125,11 +130,44 @@
         <div class="stat"><div class="label">W / L</div><div class="value">${s.wins} / ${s.losses}</div></div>
         <div class="stat ${s.total_pnl >= 0 ? '' : 'warn'}"><div class="label">PNL %</div><div class="value ${s.total_pnl >= 0 ? '' : 'neg'}">${s.total_pnl >= 0 ? '+' : ''}${s.total_pnl.toFixed(2)}%</div></div>
         <div class="stat ${s.total_usdt >= 0 ? '' : 'warn'}"><div class="label">PNL $</div><div class="value ${s.total_usdt >= 0 ? '' : 'neg'}">$${s.total_usdt >= 0 ? '+' : ''}${s.total_usdt.toFixed(3)}</div></div>
+        <div class="stat"><div class="label">TRACKED</div><div class="value neutral">${s.tracked_traders || 0}</div></div>
         <div class="stat"><div class="label">AVG HOLD</div><div class="value neutral">${s.avg_hold}h</div></div>
-        <div class="stat"><div class="label">AVG SIZE</div><div class="value neutral">$${s.avg_notional.toFixed(0)}</div></div>
         <div class="stat"><div class="label">STREAKS</div><div class="value"><span class="streak win">W${s.max_win_streak}</span> <span class="streak loss">L${s.max_loss_streak}</span></div></div>
         <div class="stat"><div class="label">OPEN</div><div class="value neutral">${s.open}</div></div>
       `;
+
+      // Leaderboard meta
+      if (s.last_leaderboard_refresh) {
+        const refreshAgo = Math.round((Date.now() - new Date(s.last_leaderboard_refresh).getTime()) / 60000);
+        document.getElementById('leaderboard-meta').textContent = `${s.tracked_traders} traders tracked | Last refresh: ${refreshAgo}m ago`;
+      }
+
+      // Leaderboard table (top 15)
+      if (DATA.leaderboard && DATA.leaderboard.length > 0) {
+        const lb = DATA.leaderboard.slice(0, 15);
+        let lbHtml = '<table><tr><th>#</th><th>Wallet</th><th>Score</th><th>Pattern</th><th>Lifetime PnL</th><th>WR</th><th>Trades</th><th>Copied</th><th>Our WR</th></tr>';
+        for (let i = 0; i < lb.length; i++) {
+          const t = lb[i];
+          const w = t.wallet.slice(0, 10) + '...';
+          const pnlCls = t.pnl >= 0 ? 'win' : 'loss';
+          const copied = t.copy_trades > 0 ? `<span class="win">${t.copy_trades}</span>` : '<span class="neutral">-</span>';
+          const ourWr = t.copy_trades > 0 ? `<span class="${t.copy_wr >= 50 ? 'win' : 'loss'}">${t.copy_wr}%</span>` : '<span class="neutral">-</span>';
+          lbHtml += `<tr>
+            <td>${i + 1}</td>
+            <td title="${t.wallet}">${w}</td>
+            <td><strong>${t.score}</strong></td>
+            <td>${t.pattern}</td>
+            <td class="${pnlCls}">$${t.pnl >= 0 ? '+' : ''}${t.pnl.toLocaleString()}</td>
+            <td class="${t.wr >= 50 ? 'win' : 'loss'}">${t.wr}%</td>
+            <td>${t.trades}</td>
+            <td>${copied}</td>
+            <td>${ourWr}</td>
+          </tr>`;
+        }
+        document.getElementById('leaderboard-table').innerHTML = lbHtml + '</table>';
+      } else {
+        document.getElementById('leaderboard-table').innerHTML = '<div class="empty">No leaderboard data</div>';
+      }
 
       // Token table
       const tokens = Object.entries(DATA.by_token).sort((a, b) => b[1].pnl - a[1].pnl);

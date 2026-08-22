@@ -192,7 +192,41 @@ def generate_data():
         FROM trader_fills
         WHERE coin = 'HYPE'
     ''').fetchall()
+
+    # Get all tracked traders (leaderboard)
+    all_traders = hl_conn.execute('''
+        SELECT wallet, score, pnl_all_time, win_rate, trade_count, pattern,
+               copy_weight, copy_trades, copy_wins, copy_pnl, last_updated
+        FROM traders
+        WHERE active = 1
+        ORDER BY score DESC
+    ''').fetchall()
     hl_conn.close()
+
+    # Build leaderboard summary
+    leaderboard = []
+    for r in all_traders:
+        d = dict(r)
+        leaderboard.append({
+            'wallet': d['wallet'],
+            'score': round(float(d['score'] or 0), 1),
+            'pnl': round(float(d['pnl_all_time'] or 0), 2),
+            'wr': round(float(d['win_rate'] or 0) * 100),
+            'trades': int(d['trade_count'] or 0),
+            'pattern': d['pattern'] or '?',
+            'copy_trades': int(d['copy_trades'] or 0),
+            'copy_wr': round(float(d['copy_wins'] or 0) / max(float(d['copy_trades'] or 1), 1) * 100),
+            'copy_pnl': round(float(d['copy_pnl'] or 0), 2),
+            'last_updated': d['last_updated'],
+        })
+
+    # Last leaderboard refresh
+    last_leaderboard_file = os.path.join('/root/.hermes/data', 'hl_copy_last_leaderboard.txt')
+    try:
+        with open(last_leaderboard_file) as f:
+            last_leaderboard_ts = int(f.read().strip())
+    except:
+        last_leaderboard_ts = 0
 
     # Compute pro trader HYPE stats
     pro_hype = {}
@@ -312,6 +346,8 @@ def generate_data():
             'avg_notional': round(avg_notional, 2),
             'max_win_streak': max_win_streak,
             'max_loss_streak': max_loss_streak,
+            'tracked_traders': len(leaderboard),
+            'last_leaderboard_refresh': datetime.fromtimestamp(last_leaderboard_ts).isoformat() if last_leaderboard_ts else None,
         },
         'by_token': token_stats,
         'by_reason': reason_stats,
@@ -319,6 +355,7 @@ def generate_data():
         'by_hour': hour_stats,
         'hold_dist': hold_dist,
         'equity_curve': equity_curve,
+        'leaderboard': leaderboard[:30],  # Top 30 by score
         'trades': list(reversed(parsed)),  # newest first for display
     }
 
