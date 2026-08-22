@@ -231,6 +231,7 @@ os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
 def _has_enough_trades(token, min_trades=5, days=7):
     """Check if token has enough recent trades to justify FAVORITES_SIZE_MULT."""
+    conn = None
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
@@ -242,10 +243,13 @@ def _has_enough_trades(token, min_trades=5, days=7):
               AND close_time > NOW() - INTERVAL '%s days'
         """, (token, days))
         count = cur.fetchone()[0]
-        conn.close()
         return count >= min_trades
     except Exception:
         return True  # fail open — apply multiplier if DB check fails
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
 os.makedirs(os.path.dirname(DELAYED_FILE), exist_ok=True)
 
 # ─── Guardian Closing Marker Check ─────────────────────────────────────────────

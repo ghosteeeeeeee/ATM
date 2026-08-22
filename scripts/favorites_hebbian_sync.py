@@ -19,6 +19,7 @@ Spec: plans/favorites-daily-update-spec.md (Part 3: Hebbian Integration)
 """
 import os, sys, json, fcntl, sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
@@ -265,8 +266,6 @@ def run():
             fcntl.flock(lock_fd, fcntl.LOCK_UN)
             lock_fd.close()
 
-
-from pathlib import Path
 
 if __name__ == '__main__':
     run()
