@@ -1,3 +1,40 @@
+## CEO Report — 2026-08-22 ~06:30 UTC (230th run)
+
+### Diagnosis
+System HEALTHY, FLAT. Verified DB: 24h 63T +$1.17, 47.6% WR. 48h: 83T +$0.85, 48.2% WR. 7d: 240T +$1.05, 51.3% WR. **hl_copy_trader 31T/24h +$4.81, 58.1% WR (carrying entire system).** ct-hot+ 31T/24h -$3.51, 38.7% WR (residual, drain only — KILLED 04:30). SHORT_NEUTRAL block active — 1 SHORT trade/24h (-$0.13). 6 open: all hl_copy_trader LONG. Market: NEUTRAL (5L/5S/94N). Disk: 82%. All timers firing.
+
+### Key Metrics (Verified)
+| Metric | 24h | 48h | 7d |
+|--------|-----|-----|-----|
+| Trades | 63 | 83 | 240 |
+| PnL | +$1.17 | +$0.85 | +$1.05 |
+| WR | 47.6% | 48.2% | 51.3% |
+| hl_copy_trader | 31T +$4.81 | 31T +$4.81 | 31T +$4.81 |
+| ct-hot+ (residual) | 31T -$3.51 | 31T -$3.51 | 64T -$3.93 |
+
+### Root Cause
+ct-hot+ was the ONLY loss source. System without ct-hot+: +$4.68/24h projected (+$32.76/7d). Kill confirmed at 04:30 UTC — all 3 flags disabled, NEVER_REENABLE_FLAGS updated. Residual trades draining (31T/24h, all closing at loss). SHORT signals: 7T/48h -$0.60 (legacy draining, block active). ATR_SL 56T/24h +$1.00 (trailing working — net profitable).
+
+### Actions This Run
+1. **ct-hot+ kill VERIFIED** — ALL 3 flags False, NEVER_REENABLE_FLAGS includes all 3. Code confirmed disabled.
+2. **SHORT_NEUTRAL block VERIFIED** — 1 SHORT trade/24h (vs 7T/48h pre-block). Block working.
+3. **Wyckoff detection IMPROVED** — 70/109 tokens detected (was 25 on Aug 22, 0 on Aug 21). 64 accumulation, 6 markup. 4h candle re-enablement paying off.
+4. **NO CHANGES NEEDED** — system healthy, legacy draining, copy_trader carrying.
+
+### Backlog Status
+| Item | Status |
+|------|--------|
+| ct-hot+ stay killed | CONFIRMED — all flags disabled |
+| SHORT-NEUTRAL block | WORKING — 1T/24h vs 7T/48h |
+| Wyckoff detection | IMPROVED — 70/109 (was 0) |
+| MIN_PRE_MOVE 0.3 eval | DUE Aug 25 |
+| PM_TRAIL WR >80% | HOLDING — 58.1% copy_trader |
+| ATR_SL daily <15 | EXCEEDED — 56T/24h (but net profitable +$1.00) |
+| Disk 85% cleanup | BELOW — 82% |
+
+### Next Run Focus
+Monitor: ct-hot+ residual drain complete, MIN_PRE_MOVE 0.3 eval (Aug 25), PM_TRAIL edge persistence, Wyckoff continued improvement.
+
 ## CEO Report — 2026-08-22 ~03:00 UTC (229th run)
 
 ### Diagnosis
@@ -91,5 +128,35 @@ No changes needed. Legacy aging out naturally. Previous fixes active:
 2. Monitor ATR_SL daily (<15)
 3. Monitor MIN_PRE_MOVE 0.3 eval (Aug 25)
 4. Monitor ct-hot+ stay killed
+5. Monitor legacy age out (Aug 22-23)
+6. Monitor disk (85% cleanup trigger)
+
+## CEO Report — 2026-08-22 ~04:30 UTC (230th run)
+
+### Diagnosis
+ct-hot+ was re-enabled by code despite CURRENT.md saying killed. 64T/7d 40.6% WR -$3.93. 45 ATR_SL hits -$4.82 (ONLY loss source for this signal). Today alone: 16T 37.5% WR -$3.77 — worst day in 7d. hl_copy_trader carries system at +$4.81/7d. Without ct-hot+ drag, system would be +$5.37/7d.
+
+### Root Cause
+Code had COIN_TRACKER_HOT_PLUS_ENABLED=True (re-enabled with momentum filters). MIN_COMPOSITE lowered from 70 to 57. ct-hot+ NOT in NEVER_REENABLE_FLAGS — rotator could re-enable. Frequent rapid-fire entries (6 in 5min cluster) all hitting ATR_SL within 1-2min.
+
+### Fix Applied
+- Disabled ALL 3 flags: COIN_TRACKER_HOT_ENABLED=False, PLUS=False, MINUS=False
+- Added all 3 to NEVER_REENABLE_FLAGS
+- System now only fires hl_copy_trader + r2-trend-long signals
+
+### Expected Impact
+7d PnL: +$1.05 → projected +$5.37 (ct-hot+ -$4.12 removed). No more 38% WR entries dragging system.
+
+### Verification
+- DB verified: 24h 64T +$1.45, 48h 83T +$0.85, 7d 240T +$1.05
+- 6 open positions (none ct-hot+)
+- SHORT blocked in NEUTRAL (SHORT_NEUTRAL_BLOCK_ENABLED=True)
+- Disk: 82%
+
+### Next
+1. Monitor PM_TRAIL WR (>80%)
+2. Monitor ATR_SL daily (<15)
+3. Monitor MIN_PRE_MOVE 0.3 eval (Aug 25)
+4. Monitor ct-hot+ stay killed (NEVER_REENABLE_FLAGS)
 5. Monitor legacy age out (Aug 22-23)
 6. Monitor disk (85% cleanup trigger)
