@@ -26,7 +26,7 @@ from hermes_constants import (
     COIN_TRACKER_HOT_CONF_CAP,
     COIN_TRACKER_HOT_COOLDOWN_HOURS,
     COIN_TRACKER_HOT_MIN_COMPOSITE,
-    COIN_TRACKER_HOT_MIN_MACD_HIST,
+    COIN_TRACKER_HOT_MIN_MACD_PCT,
     COIN_TRACKER_HOT_MAX_Z_SCORE,
     COIN_TRACKER_HOT_MAX_BB_POSITION,
     LONG_BLACKLIST,
@@ -196,26 +196,31 @@ def detect(token, data):
     else:
         return None
 
-    # Momentum filter — prevent entries against the trend (added 2026-08-22)
+    # Momentum filter — prevent entries against the trend (added 2026-08-22, scaled 2026-08-22)
     # Fetch current indicators to avoid overbought/overextended entries
     indicators = _enrich_indicators(token)
     if indicators:
         macd_hist = indicators.get('macd_hist')
         z_score = indicators.get('z_score')
         bb_position = indicators.get('bb_position')
+        price = _get_price(token)
 
         if direction == 'LONG':
             # For LONG: MACD must not be too negative (bearish), Z-score not too high, BB not overbought
-            if macd_hist is not None and macd_hist < COIN_TRACKER_HOT_MIN_MACD_HIST:
-                return None  # MACD bearish — don't go long
+            if macd_hist is not None and price and price > 0:
+                macd_pct = macd_hist / price  # Normalize to percentage of price
+                if macd_pct < COIN_TRACKER_HOT_MIN_MACD_PCT:
+                    return None  # MACD bearish — don't go long
             if z_score is not None and z_score > COIN_TRACKER_HOT_MAX_Z_SCORE:
                 return None  # Price extended above mean — overbought
             if bb_position is not None and bb_position > COIN_TRACKER_HOT_MAX_BB_POSITION:
                 return None  # Near upper Bollinger Band — overbought
         elif direction == 'SHORT':
             # For SHORT: MACD must not be too positive (bullish), Z-score not too low, BB not oversold
-            if macd_hist is not None and macd_hist > -COIN_TRACKER_HOT_MIN_MACD_HIST:
-                return None  # MACD bullish — don't go short
+            if macd_hist is not None and price and price > 0:
+                macd_pct = macd_hist / price  # Normalize to percentage of price
+                if macd_pct > -COIN_TRACKER_HOT_MIN_MACD_PCT:
+                    return None  # MACD bullish — don't go short
             if z_score is not None and z_score < -COIN_TRACKER_HOT_MAX_Z_SCORE:
                 return None  # Price extended below mean — oversold
             if bb_position is not None and bb_position < (1 - COIN_TRACKER_HOT_MAX_BB_POSITION):
