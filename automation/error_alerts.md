@@ -173,3 +173,39 @@ ALERTS:
 
 ## Error Alerts — 2026-08-22 09:03 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3419s left, N failures)`
+
+## Error Alerts — 2026-08-22 11:20 UTC
+- **[WARN]** (1x): `1 phantom trade today` — atr_sl_hit with near-zero PnL (micro-slip SL hit)
+- **[WARN]** (1x): `Disk at 82%` — 91G/118G, 3% from 85% threshold
+- **[INFO]** Pipeline: OK — timer active, last run 11:19, 0 errors, 1 open trade (BTC -0.62%)
+- **[INFO]** Market: LONG_BIAS (3/104), mostly neutral/ranging — low signal volume expected
+- **[INFO]** No auto-fixes required
+
+## Health Report — 2026-08-22 12:20 UTC
+
+PIPELINE: OK
+- Status: running (last cycle 12:19:23, next running at 12:20:00)
+- Signals (1h): 29,132 generated, 0 approved
+- Trades: 1 open (BTC LONG -0.09%), 37 closed today
+- PnL today: -95.92% (17W/20L)
+- Errors: 0 in pipeline logs
+
+MARKET:
+- Regime: 7 LONG_BIAS / 0 SHORT_BIAS / 97 NEUTRAL (104 tokens)
+- Speed: 91% tokens >= 50%
+- Long bias: BLUR, CRV, TRB, AAVE, ENA, PUMP, HEMI
+
+SYSTEM:
+- Timers: pipeline.timer (1min) + hl-sync-guardian: ACTIVE
+- Disk: 82% used (21G free, 3% from 85% threshold)
+- Prices: fresh (12:19:12 UTC), 44 stale tokens
+- Logs: pipeline.log 116M
+
+AUTO-FIXES APPLIED:
+- None needed — all systems operational
+
+ALERTS:
+- **[WARN]** 0 decisions approved in last 1h despite 29K signals generated
+- **[WARN]** -95.92% cumulative PnL today (37 trades, bad day)
+- **[WARN]** 44 stale tokens in speed tracker
+- **[INFO]** Disk at 82% — monitor, approaching 85% threshold
