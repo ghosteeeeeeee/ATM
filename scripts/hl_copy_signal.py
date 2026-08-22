@@ -151,16 +151,30 @@ def get_recent_pro_trades(minutes: int = None) -> list:
 
         # Filter to only tradable coins (exclude xyz: HIP-3 stocks)
         # AND deduplicate by coin+side — keep only the most recent fill per coin+direction
-        seen = set()  # (coin, side) -> only keep first (most recent due to DESC order)
-        tradable = []
+
+        # FIRST: count unique traders per (coin, side) for cluster bonus
+        from collections import defaultdict
+        trader_counts = defaultdict(set)  # (coin, side) -> set of unique wallets
+        tradable_fills = []
         for t in trades:
             if t['coin'].startswith('xyz:'):
                 continue
             key = (t['coin'].upper(), t['side'].upper())
+            wallet = t['wallet'] if 'wallet' in t.keys() else ''
+            if wallet:
+                trader_counts[key].add(wallet)
+            tradable_fills.append({k: t[k] for k in t.keys()})
+
+        # THEN: dedup — keep only most recent fill per (coin, side)
+        seen = set()
+        tradable = []
+        for t in tradable_fills:
+            key = (t['coin'].upper(), t['side'].upper())
             if key in seen:
                 continue  # already have a more recent fill for this coin+direction
             seen.add(key)
-            tradable.append(dict(t))
+            t['cluster_size'] = len(trader_counts[key])  # inject cluster count
+            tradable.append(t)
 
         return tradable
     finally:
@@ -241,8 +255,11 @@ def run_hl_copy_signal():
             print(f"[hl_signal] SKIP {trade['coin']} — already has open position")
             continue
 
-        # Generate signal
-        signal = generate_hl_signal(trade, trade['score'])
+        # Generate signal (pass cluster_size for confidence/size bonus)
+        cluster_size = trade.get('cluster_size', 1)
+        signal = generate_hl_signal(trade, trade['score'], cluster_size=cluster_size)
+        if cluster_size > 1:
+            print(f"[hl_signal] 🔥 CLUSTER: {trade['coin']} {trade['side']} — {cluster_size} traders agree")
 
         # ── Per-direction kill-switch ─────────────────────────────────────────
         try:
