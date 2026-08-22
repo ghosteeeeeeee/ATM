@@ -10,7 +10,7 @@ for catastrophic failures (WR < 15% with 5+ trades in 24h).
 Run via: python3 scripts/signal_decay_detector.py
 Timer: hermes-signal-decay-detector.timer (every 6h)
 """
-import sys, os, sqlite3, fcntl, re, tempfile
+import sys, os, sqlite3, fcntl, re
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
