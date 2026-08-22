@@ -204,6 +204,7 @@ def get_all_active_traders() -> list:
 
 BULK_SCAN_FILE = os.path.join(HERMES_DATA, 'hl_copy_bulk_scan.json')
 BULK_SCAN_INTERVAL = 300  # 5 minutes
+BULK_SCAN_DELAY = 1.0  # 1s between API calls (reduced from 0.5s to avoid 429s)
 
 
 def bulk_scan_all_traders() -> dict:
@@ -226,7 +227,7 @@ def bulk_scan_all_traders() -> dict:
         cached = {}
 
     all_traders = get_all_active_traders()
-    print(f"[bulk_scan] Scanning {len(all_traders)} traders (0.5s delay between calls)...")
+    print(f"[bulk_scan] Scanning {len(all_traders)} traders (1s delay between calls)...")
 
     result = {'_meta': {'last_scan': time.time(), 'trader_count': len(all_traders)}}
     errors = 0
@@ -238,7 +239,7 @@ def bulk_scan_all_traders() -> dict:
         fills = _hl_info({"type": "userFills", "user": wallet})
         if fills is None:
             errors += 1
-            time.sleep(0.5)
+            time.sleep(BULK_SCAN_DELAY)
             continue
 
         # Get positions
@@ -262,8 +263,8 @@ def bulk_scan_all_traders() -> dict:
             'positions': pos_list,
         }
 
-        # Rate limit: 0.5s between calls
-        time.sleep(0.5)
+        # Rate limit: 1s between calls
+        time.sleep(BULK_SCAN_DELAY)
 
         # Progress every 50 traders
         if (i + 1) % 50 == 0:
