@@ -501,8 +501,18 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         pass  # non-fatal
 
     # ── Step 3: mirror_open on HL ──────────────────────────────────────
-    print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage})")
-    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage)
+    # Cluster size multiplier: multiple pro traders agreeing = bigger position
+    _cluster_size = 1
+    if signal_metadata and isinstance(signal_metadata, dict):
+        _cluster_size = int(signal_metadata.get('cluster_size', 1) or 1)
+    _size_mult = 1.0
+    if _cluster_size > 1:
+        from hermes_constants import HL_COPY_CLUSTER_SIZE_MULT
+        _size_mult = 1.0 + (_cluster_size - 1) * HL_COPY_CLUSTER_SIZE_MULT
+        print(f"[brain.py] 📊 Cluster bonus: {_cluster_size} traders → size_mult={_size_mult:.2f}")
+
+    print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult})")
+    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult)
     print(f"[brain.py] ← mirror_open returned: success={result.get('success')}, "
           f"size={result.get('size')}, total_sz={result.get('total_sz')}, "
           f"notional_usdt={result.get('notional_usdt')}, entry_price={result.get('entry_price')}")
@@ -563,11 +573,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         # CRITICAL: column numbers in _col_map MUST match SQL column ordinal position (1-45)
         # SQL has 45 columns: 11 before open_time, open_time=DEFAULT, 33 after
         # TOTAL = 11 + 1 + 33 = 45 columns, 45 placeholders (open_time uses DEFAULT keyword, not %s)
+        # Store the ACTUAL boosted amount_usdt in DB (base × cluster multiplier)
+        _actual_amount = amount_usdt
+        if _size_mult > 1.0 and amount_usdt:
+            _actual_amount = round(float(amount_usdt) * _size_mult, 2)
+
         _col_map = [
             # Col  Name                   Value
             (1,   'token',               token),
             (2,   'direction',           direction),
-            (3,   'amount_usdt',          amount_usdt),
+            (3,   'amount_usdt',          _actual_amount),
             (4,   'entry_price',          hl_entry),
             (5,   'exchange',             exchange),
             (6,   'strategy',             strategy),

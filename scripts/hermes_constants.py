@@ -1686,6 +1686,14 @@ HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
 HL_COPY_SIGNAL_LOOKBACK_MINUTES = 5 # How far back to look for trades
 HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 
+# ── Copy Trader Cluster Bonus ────────────────────────────────────────────────
+# When multiple pro traders all buy the same coin within the lookback window,
+# boost confidence AND position size — it's higher conviction (cluster confluence).
+HL_COPY_CLUSTER_ENABLED = True      # master switch for cluster bonus
+HL_COPY_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional trader in cluster
+HL_COPY_CLUSTER_MAX_BONUS = 15       # cap cluster bonus at +15 (prevents overconfidence)
+HL_COPY_CLUSTER_SIZE_MULT = 0.25    # +25% position size per additional trader (e.g., 3 traders → 1.5x)
+
 # ── Copy Trader Exit Correlation & Weighting ─────────────────────────────────
 COPY_TRADE_EXIT_ENABLED = True          # master switch for trader exit correlation
 COPY_TRADE_EXIT_TIMEOUT_MIN = 120       # fallback to normal exit after 2 hours
@@ -1831,7 +1839,7 @@ COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.167   # per token+direction cooldown (10 minutes)
 COIN_TRACKER_HOT_MIN_COMPOSITE      = 57      # net score threshold — lowered to 57 per request (was 70). CEO_PROTECTED
-# Momentum filters — prevent entries against the trend (added 2026-08-22, scaled 2026-08-22)
+# Momentum filters — prevent entries against the trend (added 2026-08-22, scaled 2026-08-22, tightened 2026-08-22)
 COIN_TRACKER_HOT_MIN_MACD_PCT      = -0.00005 # MACD histogram as % of price must be > this for LONG (avoids bearish entries)
-COIN_TRACKER_HOT_MAX_Z_SCORE        = 1.8      # Z-score must be < this for LONG (avoids overbought entries)
-COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.85     # BB position must be < this for LONG (avoids upper band entries)
+COIN_TRACKER_HOT_MAX_Z_SCORE        = 1.2      # Z-score must be < this for LONG (avoids overbought entries — tightened from 1.8)
+COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.75     # BB position must be < this for LONG (avoids upper band entries — tightened from 0.85)

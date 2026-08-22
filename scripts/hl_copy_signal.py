@@ -16,7 +16,10 @@ from hermes_constants import (
     HL_COPY_SIGNAL_MIN_CONFIDENCE,
     HL_COPY_SIGNAL_MAX_CONFIDENCE,
     HL_COPY_SIGNAL_LOOKBACK_MINUTES,
-    HL_COPY_SIGNAL_MAX_PER_CYCLE
+    HL_COPY_SIGNAL_MAX_PER_CYCLE,
+    HL_COPY_CLUSTER_ENABLED,
+    HL_COPY_CLUSTER_BONUS_PER_TRADER,
+    HL_COPY_CLUSTER_MAX_BONUS,
 )
 
 def get_trader_performance(wallet: str) -> dict:
@@ -46,42 +49,62 @@ def get_trader_performance(wallet: str) -> dict:
     finally:
         conn.close()
 
-def calculate_confidence(trader_score: float, trader_win_rate: float, 
-                         trade_side: str, coin: str, copy_weight: float = 1.0) -> float:
-    """Calculate signal confidence based on trader performance and copy weight."""
+def calculate_confidence(trader_score: float, trader_win_rate: float,
+                         trade_side: str, coin: str, copy_weight: float = 1.0,
+                         cluster_size: int = 1) -> float:
+    """Calculate signal confidence based on trader performance, copy weight, and cluster size.
+
+    Cluster bonus: when multiple pro traders all buy the same coin, it's higher conviction.
+    E.g., 3 traders buy BTC → +6 confidence (2 extra traders × 3 each).
+    """
     # Base confidence from trader score (0-100)
     base_confidence = min(trader_score, 100)
-    
+
     # Win rate adjustment
     wr_adjustment = (trader_win_rate - 0.5) * 40  # ±20 points
-    
+
     # Combine and apply copy weight
     confidence = (base_confidence + wr_adjustment) * copy_weight
-    
+
+    # Cluster bonus: +3 per additional trader beyond the first
+    if HL_COPY_CLUSTER_ENABLED and cluster_size > 1:
+        cluster_bonus = min(
+            HL_COPY_CLUSTER_MAX_BONUS,
+            (cluster_size - 1) * HL_COPY_CLUSTER_BONUS_PER_TRADER
+        )
+        confidence += cluster_bonus
+
     # Clamp to configured range
     confidence = max(HL_COPY_SIGNAL_MIN_CONFIDENCE, min(HL_COPY_SIGNAL_MAX_CONFIDENCE, confidence))
-    
+
     return round(confidence, 1)
 
-def generate_hl_signal(trade: dict, trader_score: float) -> dict:
-    """Generate a signal in Hermes format."""
+def generate_hl_signal(trade: dict, trader_score: float, cluster_size: int = 1) -> dict:
+    """Generate a signal in Hermes format.
+
+    Args:
+        trade: pro trader fill dict
+        trader_score: leaderboard score for this trader
+        cluster_size: number of pro traders who made the same trade (coin+side)
+    """
     # Get trader performance and copy weight
     perf = get_trader_performance(trade['wallet'])
     from hl_leaderboard import compute_copy_weight
     copy_weight = compute_copy_weight(trade['wallet'])
-    
-    # Calculate confidence (weighted by copy performance)
+
+    # Calculate confidence (weighted by copy performance + cluster confluence)
     confidence = calculate_confidence(
-        trader_score, 
+        trader_score,
         perf['win_rate'],
         trade['side'],
         trade['coin'],
         copy_weight=copy_weight,
+        cluster_size=cluster_size,
     )
-    
+
     # Determine direction
     direction = 'LONG' if trade['side'] == 'B' else 'SHORT'
-    
+
     # Create signal
     signal = {
         'coin': trade['coin'],
@@ -96,10 +119,11 @@ def generate_hl_signal(trade: dict, trader_score: float) -> dict:
             'trader_score': trader_score,
             'trader_win_rate': perf['win_rate'],
             'trade_size': trade['sz'],
-            'trade_pnl': trade['closed_pnl']
+            'trade_pnl': trade['closed_pnl'],
+            'cluster_size': cluster_size,  # how many traders agreed
         }
     }
-    
+
     return signal
 
 def get_recent_pro_trades(minutes: int = None) -> list:
