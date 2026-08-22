@@ -13069,3 +13069,23 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - 5 open trades running normally
 
 **Open Questions:** None
+
+## [2026-08-22 22:00 UTC] Hourly Analysis
+
+**Trades:** 6 closed (1W 5L)
+**PnL:** -$0.40 (16.7% WR)
+**Open:** 6
+
+**24h:** hl_copy_trader 30T 14W 46.7% +$1.14 (only active signal, still net positive) | atr_sl_hit 62% exits avg -$0.026 | cut-loser-MAE-GUARD 17% | guardian_hard_sl 9.4% | hard_sl 3.8%
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader 5T 0W last hour but +$1.14/24h — one bad hour ≠ broken signal. 0% WR criteria met but killing only active signal = zero trades. Skip.
+- Consecutive neg hours: only 1 (21:00 UTC -$0.59). 20:00 was +$0.42.
+- MAE-GUARD catching adverse entries early (4/6 last hour) — working as designed.
+- Trade freq 6/hr = normal range.
+- No regime change data available to justify size reduction.
+
+**Open Questions:**
+- PUMP, WLFI, ENA all hitting MAE-GUARD — small-cap entries going against us fast. Watch if this persists next hour.
