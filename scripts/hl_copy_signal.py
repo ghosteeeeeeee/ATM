@@ -6,6 +6,7 @@ Flows into the Hermes signal pipeline.
 """
 import time
 import json
+import os
 from datetime import datetime
 from hl_copy_db import get_db
 from paths import HERMES_DATA
@@ -159,7 +160,12 @@ def write_signal_to_pipeline(signal: dict):
     )
 
 def _get_open_hl_tokens() -> set:
-    """Query PostgreSQL for tokens with open positions (defense-in-depth)."""
+    """Query PostgreSQL for tokens with open positions (defense-in-depth).
+
+    Also checks guardian-closing-markers.json to block tokens the guardian
+    is actively closing (same logic as signal_compactor._get_open_tokens).
+    """
+    tokens = set()
     try:
         import psycopg2
         from _secrets import BRAIN_DB_DICT
@@ -168,9 +174,26 @@ def _get_open_hl_tokens() -> set:
         cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes'")
         tokens = {row[0] for row in cur.fetchall()}
         cur.close(); conn.close()
-        return tokens
+    except Exception as e:
+        print(f"[hl_signal] WARN: Could not query open positions from PostgreSQL: {e}")
+        # Fail-open on DB error — but log it so we know the guard is disabled
+
+    # Guardian-closing-markers: tokens the guardian is actively closing on HL
+    # (HL position closed but PostgreSQL not yet updated → race window)
+    try:
+        import json as _json
+        from paths import HERMES_DATA
+        closing_file = os.path.join(HERMES_DATA, 'guardian-closing-markers.json')
+        if os.path.exists(closing_file):
+            with open(closing_file) as f:
+                data = _json.load(f)
+            if isinstance(data, dict):
+                guardian_closing = {k.lower() for k in data.get('tokens', {})}
+                tokens.update(guardian_closing)
     except Exception:
-        return set()
+        pass  # non-fatal
+
+    return tokens
 
 
 def run_hl_copy_signal():
