@@ -145,17 +145,20 @@
       // Leaderboard table (top 15)
       if (DATA.leaderboard && DATA.leaderboard.length > 0) {
         const lb = DATA.leaderboard.slice(0, 15);
-        let lbHtml = '<table><tr><th>#</th><th>Wallet</th><th>Score</th><th>Pattern</th><th>Lifetime PnL</th><th>WR</th><th>Trades</th><th>Copied</th><th>Our WR</th></tr>';
+        let lbHtml = '<table><tr><th>#</th><th>Wallet</th><th>Score</th><th>Account</th><th>Pattern</th><th>Lifetime PnL</th><th>WR</th><th>Trades</th><th>Copied</th><th>Our WR</th></tr>';
         for (let i = 0; i < lb.length; i++) {
           const t = lb[i];
           const w = t.wallet.slice(0, 10) + '...';
           const pnlCls = t.pnl >= 0 ? 'win' : 'loss';
           const copied = t.copy_trades > 0 ? `<span class="win">${t.copy_trades}</span>` : '<span class="neutral">-</span>';
           const ourWr = t.copy_trades > 0 ? `<span class="${t.copy_wr >= 50 ? 'win' : 'loss'}">${t.copy_wr}%</span>` : '<span class="neutral">-</span>';
+          const acct = t.account_value >= 1000 ? `$${(t.account_value / 1000).toFixed(1)}K` : `$${t.account_value.toFixed(0)}`;
+          const acctCls = t.account_value >= 50000 ? 'win' : t.account_value >= 10000 ? '' : 'neutral';
           lbHtml += `<tr>
             <td>${i + 1}</td>
             <td title="${t.wallet}">${w}</td>
             <td><strong>${t.score}</strong></td>
+            <td class="${acctCls}">${acct}</td>
             <td>${t.pattern}</td>
             <td class="${pnlCls}">$${t.pnl >= 0 ? '+' : ''}${t.pnl.toLocaleString()}</td>
             <td class="${t.wr >= 50 ? 'win' : 'loss'}">${t.wr}%</td>

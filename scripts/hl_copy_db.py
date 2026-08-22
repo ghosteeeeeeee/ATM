@@ -139,6 +139,7 @@ def init_db():
             ('copy_trades', '0'),
             ('copy_wins', '0'),
             ('copy_pnl', '0.0'),
+            ('account_value', '0.0'),
         ]:
             try:
                 c.execute(f"ALTER TABLE traders ADD COLUMN {col} REAL DEFAULT {default}")

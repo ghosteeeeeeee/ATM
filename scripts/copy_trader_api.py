@@ -217,6 +217,7 @@ def generate_data():
             'copy_trades': int(d['copy_trades'] or 0),
             'copy_wr': round(float(d['copy_wins'] or 0) / max(float(d['copy_trades'] or 1), 1) * 100),
             'copy_pnl': round(float(d['copy_pnl'] or 0), 2),
+            'account_value': round(float(d.get('account_value', 0) or 0), 2),
             'last_updated': d['last_updated'],
         })
 

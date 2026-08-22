@@ -95,7 +95,15 @@ def get_user_portfolio(wallet: str) -> dict | None:
     return result if isinstance(result, dict) else None
 
 def calculate_score(trader: dict) -> float:
-    """Calculate trader score based on multiple factors."""
+    """Calculate trader score based on multiple factors.
+    
+    Scoring weights:
+    - Win rate: 0-30 points
+    - Profit factor: 0-20 points
+    - Trade count: 0-15 points
+    - Account size: 0-20 points (bigger accounts = more skin in the game)
+    - Recency: 0-15 points
+    """
     score = 0
     
     # Win rate (0-30 points)
@@ -116,19 +124,35 @@ def calculate_score(trader: dict) -> float:
     tc = trader.get('trade_count', 0)
     score += min(15, tc / 20)
     
-    # Volume (0-15 points)
-    vol = trader.get('volume_30d', 0)
-    score += min(15, vol / 100000)
+    # Account size (0-20 points) — bigger accounts have more skin in the game
+    # $10K+ accounts are serious traders, $100K+ are whales
+    account_value = trader.get('account_value', 0)
+    if account_value >= 100000:
+        score += 20  # Whale tier
+    elif account_value >= 50000:
+        score += 17
+    elif account_value >= 25000:
+        score += 14
+    elif account_value >= 10000:
+        score += 11
+    elif account_value >= 5000:
+        score += 8
+    elif account_value >= 1000:
+        score += 5
+    else:
+        score += 2
     
-    # Recency (0-20 points)
+    # Recency (0-15 points)
     last = trader.get('last_updated', 0)
     hours_since = (time.time() - last) / 3600
     if hours_since < 1:
-        score += 20
-    elif hours_since < 24:
         score += 15
+    elif hours_since < 24:
+        score += 12
     elif hours_since < 168:
-        score += 10
+        score += 8
+    elif hours_since < 720:
+        score += 4
     
     return round(score, 1)
 
@@ -243,6 +267,7 @@ def scan_wallet(wallet: str) -> dict | None:
             'win_rate': win_rate,
             'trade_count': len(fills),
             'volume_30d': account_value * 10,  # Rough estimate
+            'account_value': account_value,  # Actual account value for scoring
             'max_drawdown': max_dd,
             'last_updated': int(time.time()),
             'pattern': detect_pattern(fills)
@@ -272,7 +297,8 @@ def save_trader(trader: dict):
                 UPDATE traders SET
                     pnl_all_time = ?, win_rate = ?, trade_count = ?,
                     volume_30d = ?, max_drawdown = ?, score = ?,
-                    pattern = ?, last_updated = ?, active = 1
+                    pattern = ?, last_updated = ?, active = 1,
+                    account_value = ?
                 WHERE wallet = ?
             """, (
                 trader['pnl_all_time'],
@@ -283,6 +309,7 @@ def save_trader(trader: dict):
                 trader['score'],
                 trader['pattern'],
                 trader['last_updated'],
+                trader.get('account_value', 0),
                 trader['wallet'],
             ))
         else:
@@ -291,8 +318,8 @@ def save_trader(trader: dict):
                 INSERT INTO traders
                 (wallet, pnl_all_time, win_rate, trade_count, volume_30d,
                  max_drawdown, score, pattern, last_updated, active,
-                 copy_weight, copy_trades, copy_wins, copy_pnl)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1.0, 0, 0, 0.0)
+                 copy_weight, copy_trades, copy_wins, copy_pnl, account_value)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1.0, 0, 0, 0.0, ?)
             """, (
                 trader['wallet'],
                 trader['pnl_all_time'],
@@ -303,6 +330,7 @@ def save_trader(trader: dict):
                 trader['score'],
                 trader['pattern'],
                 trader['last_updated'],
+                trader.get('account_value', 0),
             ))
         conn.commit()
     finally:
