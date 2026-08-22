@@ -31,11 +31,13 @@ from hermes_constants import (
     CONFLUENCE_REQUIRED,
     MOMENTUM_EXHAUSTION_THRESHOLD,
     BTC_CRASH_BLOCK_THRESHOLD,
+    BTC_ACCEL_ENABLED, BTC_ACCEL_VEL_THRESHOLD, BTC_ACCEL_WINDOW, BTC_ACCEL_BLOCK_DURATION,
     SIGNAL_INVERSION_ENABLED, SIGNAL_INVERSION_MAP,
     DYNAMIC_INVERSION_ENABLED, INVERT_WR_THRESHOLD, INVERT_MIN_TRADES,
     INVERT_LOOKBACK_HOURS, INVERT_CACHE_TTL, INVERT_SIGNALS,
     DEAD_HOURS_ENABLED, DEAD_HOURS_START, DEAD_HOURS_END,
     DEAD_HOURS_SIGNALS, DEAD_HOURS_DEFAULT,
+    COPY_BAD_HOURS_ENABLED, COPY_BAD_HOURS,
      CONTEXT_GATE_ENABLED, CONTEXT_GATE_LLM_ENABLED, CONTEXT_GATE_LLM_MODEL,
      CONTEXT_GATE_SPEED_MIN, CONTEXT_GATE_Z_COUNTER_TREND,
      CONTEXT_GATE_Z_RANGING, CONTEXT_GATE_RANGING_SPEED,
@@ -1787,6 +1789,24 @@ def _run_hot_set():
         except Exception:
             pass  # never crash on filter failure
 
+        # ── BTC ACCELERATION DETECTION (2026-08-22) ─────────────────────────────
+        # Catches crashes 2-3 min earlier than absolute threshold.
+        # If BTC velocity is negative AND accelerating (vel_now < vel_prev), block entries.
+        # Uses 3 candles: now, -1m, -2m (already fetched above).
+        _btc_accel_blocked = False
+        _btc_accel_block_time = 0
+        if BTC_ACCEL_ENABLED and not _btc_crash_blocked:
+            try:
+                if len(_btc_closes) >= 3:
+                    _vel_now = (_btc_closes[0] - _btc_closes[1]) / _btc_closes[1] * 100 if _btc_closes[1] > 0 else 0
+                    _vel_prev = (_btc_closes[1] - _btc_closes[2]) / _btc_closes[2] * 100 if _btc_closes[2] > 0 else 0
+                    if _vel_now < BTC_ACCEL_VEL_THRESHOLD and _vel_now < _vel_prev:
+                        log(f'  🚨 [BTC-ACCEL] ALL ENTRIES BLOCKED: BTC velocity {_vel_now:+.3f}% (prev {_vel_prev:+.3f}%) — accelerating down')
+                        _btc_accel_blocked = True
+                        _btc_accel_block_time = __import__('time').time()
+            except Exception:
+                pass
+
         # ── HOT-SET ITERATION ORDER: survival rounds first ────────────────────────
         # Tokens that survived more compaction cycles have proven themselves against
         # market volatility. Approve them FIRST so rate limits don't block veterans.
@@ -1811,6 +1831,16 @@ def _run_hot_set():
                 log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — BTC flash crash in progress')
                 _record_hotset_failure(token, direction, failures)
                 continue
+
+            # BTC ACCELERATION: block entries for BLOCK_DURATION minutes after trigger
+            if _btc_accel_blocked:
+                _elapsed_min = (__import__('time').time() - _btc_accel_block_time) / 60
+                if _elapsed_min < BTC_ACCEL_BLOCK_DURATION:
+                    log(f'  🚨 [BTC-ACCEL] {token} {direction} BLOCKED — BTC accelerating down ({_elapsed_min:.1f}/{BTC_ACCEL_BLOCK_DURATION}min)')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
+                else:
+                    _btc_accel_blocked = False  # block expired
 
             # SAFETY: blacklist filter (defense-in-depth — hotset.json should already be clean)
             if direction == 'SHORT' and token in SHORT_BLACKLIST:
@@ -2704,6 +2734,19 @@ def run(dry_run=False):
                         mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                     skipped += 1
                     continue
+
+        # ── Copy Trader Bad-Hours Filter ─────────────────────────────────
+        # Block copy signals during hours with historically poor WR.
+        # Data: 14/18/20 UTC have 25-40% WR on copy trades (deep-dive analysis).
+        if COPY_BAD_HOURS_ENABLED and source and 'hl_copy' in source:
+            import datetime as _dt
+            _utc_hour = _dt.datetime.utcnow().hour
+            if _utc_hour in COPY_BAD_HOURS:
+                log(f'  ⏰ [COPY-BAD-HOUR] {token} {direction} blocked: {_utc_hour:02d}:XX UTC (copy signal, bad hour)')
+                if sig_id:
+                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                skipped += 1
+                continue
 
         # FIX (2026-04-05): speed=0% = stale token — hard ban
         sp_exec = speed_tracker_dr.get_token_speed(token) if speed_tracker_dr else None

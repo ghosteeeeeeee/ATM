@@ -1,6 +1,6 @@
 # Upgrade Audit Trail
 
-**Last scanned:** 2026-08-21 07:20
+**Last scanned:** 2026-08-22 05:30
 
 ---
 
@@ -150,7 +150,67 @@
 
 ---
 
-## Implementations (2026-08-21 07:20)
+## Plan: 2026-08-21_copy-trader-entry-timing-deep-dive.md
+- **Date scanned:** 2026-08-22 05:30
+- **Core request:** Fix copy trader entry timing — disable SHORT copy + time-of-day filter
+- **Difficulty:** Level 1
+- **Value:** HIGH — turns $0.89 system into projected $91.19 (72% WR from 56%)
+- **Status:** PARTIALLY IMPLEMENTED (Phase 1 quick wins done)
+- **Reason:** HL_COPY_SIGNAL_MINUS_ENABLED=False (SHORT copy disabled). COPY_BAD_HOURS=[14,18,20] filter added to decider_run.py. Remaining: Phase 2 (leaderboard scoring), Phase 3 (regime-aware).
+
+## Plan: btc-crash-filter-plan.md
+- **Date scanned:** 2026-08-22 05:30
+- **Core request:** Upgrade BTC crash filter with acceleration detection
+- **Difficulty:** Level 2
+- **Value:** HIGH — catches crashes 2-3 min earlier (would have saved 3 trades on Aug 22)
+- **Status:** IMPLEMENTED
+- **Reason:** BTC_ACCEL_* constants added to hermes_constants.py. Acceleration check (velocity + acceleration) in decider_run.py. Blocks entries for 5 min when BTC velocity < -0.15% and accelerating. Keeps existing absolute threshold as backup.
+
+## Plan: favorites-daily-update-spec.md
+- **Date scanned:** 2026-08-22 05:30
+- **Core request:** Daily favorites updater + weekly rhythm analysis + Hebbian integration
+- **Difficulty:** Level 2-3
+- **Value:** MEDIUM — faster promote/demote cycle, wave pattern detection
+- **Status:** PARTIALLY IMPLEMENTED (Part 1-2 done, Part 3 Hebbian pending)
+- **Reason:** Daily updater and rhythm analysis scripts exist. Hebbian sync not implemented.
+
+## Plan: 2026-08-22_copy-trader-dashboard-enhancements.md
+- **Date scanned:** 2026-08-22 05:30
+- **Core request:** Dashboard enhancements — copy delay, portfolio view, trader scoring
+- **Difficulty:** Level 2-3
+- **Value:** MEDIUM — better visibility, not direct PnL improvement
+- **Status:** Phase 1 DONE, Phase 2-4 NOT IMPLEMENTED
+- **Reason:** Dashboard exists with core features. Advanced analytics (delay analysis, scoring) pending.
+
+## Plan: retroactive-scan-delayed-entry.md
+- **Date scanned:** 2026-08-22 05:30
+- **Core request:** Secondary scan for missed breakouts — retroactive signals
+- **Difficulty:** Level 3
+- **Value:** HIGH — catches missed entries
+- **Status:** NOT IMPLEMENTED
+- **Reason:** Only major plan still pending. Requires ~200 LOC. Deferred to Level 3 work.
+
+---
+
+## Implementations (2026-08-22 05:30)
+
+### 1. Disable SHORT copy signals (Level 1)
+- **File:** `scripts/hermes_constants.py:1675`
+- **Change:** `HL_COPY_SIGNAL_MINUS_ENABLED` True → False
+- **Why:** SHORT copy trades are net negative (36% WR, -$0.17 PnL per 54-trade analysis)
+- **Risk:** LOW — eliminates 11 losing trades, no impact on LONG copy
+
+### 2. Copy trader bad-hours filter (Level 1)
+- **Files:** `scripts/hermes_constants.py:1689-1690`, `scripts/decider_run.py:2712-2721`
+- **Change:** Added `COPY_BAD_HOURS_ENABLED=True`, `COPY_BAD_HOURS=[14,18,20]` + filter in decider_run.py
+- **Why:** Hours 14/18/20 UTC have 25-40% WR on copy trades. Blocks copy signals during these hours.
+- **Risk:** LOW — only affects hl_copy source signals, ~10 trades eliminated
+
+### 3. BTC acceleration detection (Level 2)
+- **Files:** `scripts/hermes_constants.py:765-768`, `scripts/decider_run.py:1792-1845`
+- **Change:** Added `BTC_ACCEL_ENABLED`, `BTC_ACCEL_VEL_THRESHOLD=-0.15`, `BTC_ACCEL_WINDOW=2`, `BTC_ACCEL_BLOCK_DURATION=5`. Acceleration check computes velocity from 1m candles, blocks when velocity < -0.15% AND accelerating (vel_now < vel_prev).
+- **Why:** Absolute threshold (-1.5%/5m) only fires after crash is complete. Acceleration detection catches the build-up phase 2-3 min earlier. Would have caught WLFI/BIGTIME/MET during Aug 22 crash.
+- **Risk:** MEDIUM — may have false positives in normal vol. Conservative threshold (-0.15%) + acceleration requirement (2 consecutive negative bars) mitigates.
 
 ### 1. coin_tracker_hot MIN_COMPOSITE raise (Level 1)
 - **File:** `scripts/hermes_constants.py:929`

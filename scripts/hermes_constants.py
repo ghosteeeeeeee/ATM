@@ -762,6 +762,10 @@ TIDE_SHORT_WR_THRESHOLD_LOW = 45
 # entries during the crash.
 BTC_CRASH_BLOCK_ENABLED = True
 BTC_CRASH_BLOCK_THRESHOLD = -1.5  # % — block all entries if BTC drops more than this in 5 minutes
+BTC_ACCEL_ENABLED = True           # acceleration detection — catches crashes 2-3 min earlier
+BTC_ACCEL_VEL_THRESHOLD = -0.15    # % — min velocity per 1m candle to trigger
+BTC_ACCEL_WINDOW = 2               # bars to compare acceleration (vel_now < vel_prev)
+BTC_ACCEL_BLOCK_DURATION = 5       # minutes to block entries after trigger
 
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.
@@ -1002,6 +1006,9 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_PLUS_ENABLED',  # CEO 2026-08-22 — 64T/7d 40.6% WR -$3.93. 27 ATR_SL hits. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_MINUS_ENABLED', # CEO 2026-08-22 — 4T/7d 0% WR -$0.19. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_ENABLED',       # CEO 2026-08-22 — 68T/7d 38.2% WR -$4.12. Both directions dead. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1588,7 +1595,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.28 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.2793 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
@@ -1672,7 +1679,7 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 # hl_copy_signal.py — Generates signals from pro trader activity
 HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
 HL_COPY_SIGNAL_PLUS_ENABLED = True     # hl_copy_signal+ LONG
-HL_COPY_SIGNAL_MINUS_ENABLED = True    # hl_copy_signal- SHORT
+HL_COPY_SIGNAL_MINUS_ENABLED = False   # hl_copy_signal- SHORT — net negative (36% WR, -$0.17)
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
@@ -1686,6 +1693,8 @@ COPY_TRADE_MAX_OPEN = 10               # max concurrent copy trades
 COPY_TRADE_WEIGHT_MIN = 0.1           # minimum copy weight (heavily penalized traders)
 COPY_TRADE_WEIGHT_MAX = 2.0           # maximum copy weight (best performers)
 COPY_TRADE_WEIGHT_MIN_TRADES = 5      # minimum trades before weight adjusts
+COPY_BAD_HOURS_ENABLED = True           # block copy signals during bad hours
+COPY_BAD_HOURS = [14, 18, 20]           # UTC hours with poor copy WR (25-40%)
 
 # ── Momentum Leaderboard Signal ─────────────────────────────────────────────
 # momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
@@ -1812,9 +1821,9 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. CEO_PROTECTED
-COIN_TRACKER_HOT_PLUS_ENABLED       = True    # Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED
-COIN_TRACKER_HOT_MINUS_ENABLED      = True    # Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED
+COIN_TRACKER_HOT_ENABLED            = False  # CEO KILLED 2026-08-22 — 68T/7d 38.2% WR -$4.12. Both directions dead. NEVER_REENABLE.
+COIN_TRACKER_HOT_PLUS_ENABLED       = False   # CEO KILLED 2026-08-22 — 64T/7d 40.6% WR -$3.93. 31T/24h 38.7% -$3.51. 27 ATR_SL hits -$4.82. NEVER_REENABLE.
+COIN_TRACKER_HOT_MINUS_ENABLED      = False   # CEO KILLED 2026-08-22 — 4T/7d 0% WR -$0.19. NEVER_REENABLE.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)

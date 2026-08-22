@@ -1266,3 +1266,7 @@
   WHY: 8T last hour (5W 3L +$2.31). 24h 54T 29W 53.7%WR +$3.77. hl_copy_trader 31T 18W 58.1% +$4.84 star. ct-hot+ 22T 10W 45.5% -$1.35 losing but CEO_PROTECTED (composite=57). atr_sl_hit 96.3% but net +$3.23 trailing SL correct. Freq 8/hr elevated but below 20/hr threshold. 6 open (5 ct-hot+ 1 hl_copy_trader). MET -$1.38 tight SL hit. No kill criteria triggered. System profitable, no action.
   BY: auto_1hr
   NEXT: Re-run at 06:00 UTC
+[2026-08-22 06:04 UTC] auto_1hr: NO CHANGES
+  WHY: 10T last hour (2W 8L -$1.73) worst hour. ct-hot+ cluster 6 entries in 5min all SL 1-2min. 24h 64T 31W 48.4%WR +$1.04. hl_copy_trader 32T 18W 56.2% +$4.57 star. ct-hot+ 31T 12W 38.7% -$3.51 losing but CEO_PROTECTED (composite=57). atr_sl_hit 90.6% net +$1.17 trailing SL correct. Freq 10/hr below threshold. System net profitable, no kill criteria. ct-hot+ rapid entries concerning but CEO_PROTECTED.
+  BY: auto_1hr
+  NEXT: Re-run at 07:00 UTC

@@ -12707,3 +12707,31 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - MET -$1.38 loss was tight SL hit (1.2% stop) — entry quality issue, not system bug
 
 **Open Questions:** None
+
+## [2026-08-22 06:04 UTC] Hourly Analysis
+
+**Trades:** 10 closed (2W 8L) — 9 ct-hot+ (2W 7L -$1.46), 1 hl_copy_trader (0W 1L -$0.27)
+**PnL:** -$1.73 (20.0% WR) — worst hour in recent history
+
+**24h:** 64T 31W 48.4%WR +$1.04
+- hl_copy_trader: 32T 18W 56.2% +$4.57 (star)
+- ct-hot+: 31T 12W 38.7% -$3.51 (losing, CEO_PROTECTED)
+- r2-trend-long3: 1T 1W +$0.28
+
+**7d:** 64T 26W 40.6% -$3.93 (ct-hot+) vs 32T 18W 56.2% +$4.57 (hl_copy_trader)
+
+**Close reasons:** atr_sl_hit 58T +$1.17 (net profitable trailing SL correct), guardian_hard_sl 5T -$0.01
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria triggered (no signal at 0% WR with 3+ trades/hr)
+- System net profitable $+1.04 (24h), $+0.86 (7d)
+- hl_copy_trader performing well at 56.2% WR
+- ct-hot+ losing but CEO_PROTECTED (composite=57, CEO lowered from 70)
+- Trade freq 10/hr below overtrading threshold (20/hr)
+- Last hour cluster (6 entries in 5 min, all SL within 1-2 min) is concerning but below threshold
+
+**Open Questions:**
+- ct-hot+ rapid-fire entries (5-60 sec hold times) suggest over-fitting to short-term momentum — but CEO_PROTECTED
+- Should CEO consider re-raising COIN_TRACKER_HOT_MIN_COMPOSITE back to 70?
