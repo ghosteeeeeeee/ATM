@@ -384,7 +384,10 @@ def _kill_underperformers():
 
 
 def _disable_signal(signal_type):
-    """Disable a signal by setting its _ENABLED flag to False in hermes_constants.py."""
+    """Disable a signal by setting its _ENABLED flag to False in hermes_constants.py.
+    
+    HARD RULE: Will NOT disable CEO_PROTECTED_FLAGS. This is non-negotiable.
+    """
     try:
         with open(HERMES_CONSTANTS) as f:
             content = f.read()
@@ -402,6 +405,11 @@ def _disable_signal(signal_type):
             candidates = [f'{base}_ENABLED']
         
         for flag in candidates:
+            # HARD CHECK: Skip CEO-protected flags — non-negotiable
+            if flag in CEO_PROTECTED_FLAGS:
+                _log(f"  BLOCKED {flag}: CEO_PROTECTED — cannot disable (human approval required)")
+                return False
+            
             pattern = rf'^({re.escape(flag)}\s*=\s*)(True|False)'
             match = re.search(pattern, content, re.MULTILINE)
             if match and match.group(2) == 'True':

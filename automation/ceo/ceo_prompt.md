@@ -90,11 +90,21 @@ cat automation/recent_changes.log
 # If a fix was applied, DO NOT revert it
 ```
 
-### 3. Protected Flags — NEVER TOGGLE THESE
+### 3. Protected Flags — NEVER TOGGLE THESE (ABSOLUTE RULE — NO EXCEPTIONS)
+**This is a HARD RULE, not a guideline. Even if performance is bad, you MUST NOT touch these flags.**
+
 - `CONFLUENCE_REQUIRED` — core quality gate, must stay True
 - `LIVE_TRADING_ENABLED` — runtime kill switch, only T can change
 - `ROTATOR_PROTECTED_FLAGS` — prevents stale data kills
-- Any flag in `CEO_PROTECTED_FLAGS` dict in hermes_constants.py
+- **ANY flag in `CEO_PROTECTED_FLAGS` dict in hermes_constants.py — these are HUMAN-PROTECTED, you cannot override them**
+
+**If a signal in CEO_PROTECTED_FLAGS is losing money:**
+1. LOG the problem in ceo_kanban.md
+2. RECOMMEND the user disable it
+3. DO NOT disable it yourself
+4. WAIT for human approval
+
+**The system will crash or lose money if you violate this rule. This is non-negotiable.**
 
 ## MEASURABLE GOALS (update each run)
 
