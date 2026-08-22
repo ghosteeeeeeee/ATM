@@ -94,6 +94,29 @@
         .health-setup { background: #ff880022; color: #ff8800; }
         .health-ready { background: #00ff8833; color: #00ff88; border: 1px solid #00ff8866; }
 
+        /* Regime badges (reef/sandbar/deep) */
+        .regime-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .regime-reef { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8844; }
+        .regime-sandbar { background: #ffaa0022; color: #ffaa00; border: 1px solid #ffaa0044; }
+        .regime-deep { background: #ff444422; color: #ff4444; border: 1px solid #ff444444; }
+        .regime-unknown { background: #44444422; color: #666; }
+
+        /* Signal PnL badge */
+        .signal-pnl {
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .signal-pnl.positive { background: #00ff8822; color: #00ff88; }
+        .signal-pnl.negative { background: #ff444422; color: #ff4444; }
+
         /* Score */
         .score-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
         .score-val { font-size: 22px; font-weight: bold; }
@@ -297,6 +320,12 @@
         <option value="cold">Cold</option>
         <option value="dead">Dead</option>
     </select>
+    <select id="regime-filter">
+        <option value="">All Regimes</option>
+        <option value="reef">🪸 Reef (Winners)</option>
+        <option value="sandbar">🏖️ Sandbar (Mixed)</option>
+        <option value="deep">🌊 Deep Water (Losers)</option>
+    </select>
     <select id="sort">
         <option value="composite">Score</option>
         <option value="setup_score">Setup Strength</option>
@@ -478,6 +507,7 @@ function renderCard(c) {
                 </div>
             </div>
             <div style="display:flex;gap:4px;align-items:center">
+                ${c.regime_class && c.regime_class !== 'unknown' ? `<span class="regime-badge regime-${c.regime_class}">${c.regime_class === 'reef' ? '🪸' : c.regime_class === 'sandbar' ? '🏖️' : '🌊'} ${c.regime_class}</span>` : ''}
                 <span class="setup-badge ${setupClass}">${setupLabel}</span>
                 ${ewaveBadge}
                 <span class="wyckoff-badge ${wyckoffClass}">${wyckoffLabel}</span>
@@ -494,6 +524,8 @@ function renderCard(c) {
             ${change != null ? `<span class="${pctClass(change)}">${parseFloat(change) >= 0 ? '+' : ''}${parseFloat(change).toFixed(1)}%</span>` : ''}
             ${c.vol_1h != null ? `<span>Vol: ${fmt(c.vol_1h)}</span>` : ''}
             ${c.spread_bps != null ? `<span>Spread: ${parseFloat(c.spread_bps).toFixed(0)}bps</span>` : ''}
+            ${c.signal_pnl != null ? `<span class="signal-pnl ${c.signal_pnl >= 0 ? 'positive' : 'negative'}">Sig: ${c.signal_pnl >= 0 ? '+' : ''}${c.signal_pnl.toFixed(1)}%</span>` : ''}
+            ${c.signal_winrate != null ? `<span style="color:${c.signal_winrate > 50 ? '#00ff88' : '#ff4444'}">${c.signal_winrate.toFixed(0)}% WR</span>` : ''}
         </div>
         ${c.signal_type ? `<div class="signals-row"><span class="signal-tag">${c.signal_type}</span>${c.signal_confidence ? `<span class="signal-tag">${parseFloat(c.signal_confidence).toFixed(0)}%</span>` : ''}</div>` : ''}
         <div class="breakdown">
@@ -617,6 +649,39 @@ async function loadDetail(sym) {
 
         html += `</div>`;
 
+        // Weather & Signal Performance section
+        html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">`;
+
+        // Regime class
+        const regimeClass = coin.regime_class || 'unknown';
+        const regimeEmoji = regimeClass === 'reef' ? '🪸' : regimeClass === 'sandbar' ? '🏖️' : regimeClass === 'deep' ? '🌊' : '❓';
+        const regimeColor = regimeClass === 'reef' ? '#00ff88' : regimeClass === 'sandbar' ? '#ffaa00' : regimeClass === 'deep' ? '#ff4444' : '#666';
+        html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+            <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Token Regime</div>
+            <div style="font-size:16px;font-weight:bold;color:${regimeColor}">${regimeEmoji} ${regimeClass.toUpperCase()}</div>
+            <div style="color:#666;font-size:10px;margin-top:4px">${regimeClass === 'reef' ? 'Consistent winner' : regimeClass === 'deep' ? 'Consistent loser' : 'Inconsistent'}</div>
+        </div>`;
+
+        // Signal performance
+        const signalPnl = coin.signal_pnl;
+        const signalWr = coin.signal_winrate;
+        const signalTrades = coin.signal_trades;
+        html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+            <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Signal Performance</div>
+            ${signalPnl != null ? `<div style="font-size:16px;font-weight:bold;color:${signalPnl >= 0 ? '#00ff88' : '#ff4444'}">${signalPnl >= 0 ? '+' : ''}${signalPnl.toFixed(1)}%</div>` : '<div style="color:#666">No data</div>'}
+            <div style="color:#666;font-size:10px;margin-top:4px">${signalWr != null ? `${signalWr.toFixed(0)}% win rate` : ''} ${signalTrades != null ? `(${signalTrades} trades)` : ''}</div>
+        </div>`;
+
+        // Weather context
+        const weather = DATA.weather || {};
+        html += `<div style="background:#1a1a2e;padding:10px;border-radius:4px">
+            <div style="color:#666;font-size:10px;text-transform:uppercase;margin-bottom:4px">Market Weather</div>
+            <div style="font-size:12px;color:${weather.tide_24h === 'BULLISH' ? '#00ff88' : weather.tide_24h === 'BEARISH' ? '#ff4444' : '#ffaa00'}">${weather.tide_24h || 'N/A'} tide</div>
+            <div style="color:#666;font-size:10px;margin-top:4px">Sea: ${weather.sea_winrate || 0}% winrate</div>
+        </div>`;
+
+        html += `</div>`;
+
         // S/R levels
         if (coin.sr_levels) {
             try {
@@ -666,6 +731,9 @@ function render() {
 
     // Stats bar
     const bar = document.getElementById('stats-bar');
+    const weather = DATA.weather || {};
+    const byRegime = DATA.by_regime || {};
+    const tideEmoji = weather.tide_24h === 'BULLISH' ? '📈' : weather.tide_24h === 'BEARISH' ? '📉' : '➡️';
     bar.innerHTML = `
         <div class="stat"><div class="stat-val">${DATA.total}</div><div class="stat-label">Coins Tracked</div></div>
         <div class="stat"><div class="stat-val" style="color:#00ff88">${DATA.by_health.ready || 0}</div><div class="stat-label">Ready</div></div>
@@ -675,6 +743,9 @@ function render() {
         <div class="stat"><div class="stat-val" style="color:#388bfd">${DATA.by_health.cold || 0}</div><div class="stat-label">Cold</div></div>
         <div class="stat"><div class="stat-val" style="color:#484f58">${DATA.by_health.dead || 0}</div><div class="stat-label">Dead</div></div>
         <div class="stat"><div class="stat-val">${parseFloat(DATA.avg_score).toFixed(0)}</div><div class="stat-label">Avg Score</div></div>
+        ${weather.tide_24h ? `<div class="stat" style="border-left-color:${weather.tide_24h === 'BULLISH' ? '#00ff88' : weather.tide_24h === 'BEARISH' ? '#ff4444' : '#ffaa00'}"><div class="stat-val" style="font-size:14px">${tideEmoji} ${weather.tide_24h}</div><div class="stat-label">24h Tide</div></div>` : ''}
+        ${byRegime.reef ? `<div class="stat" style="border-left-color:#00ff88"><div class="stat-val" style="color:#00ff88;font-size:14px">🪸 ${byRegime.reef}</div><div class="stat-label">Reef</div></div>` : ''}
+        ${byRegime.deep ? `<div class="stat" style="border-left-color:#ff4444"><div class="stat-val" style="color:#ff4444;font-size:14px">🌊 ${byRegime.deep}</div><div class="stat-label">Deep Water</div></div>` : ''}
     `;
 
     // Health distribution bar
@@ -693,11 +764,13 @@ function filterAndRender() {
     if (!DATA) return;
     const search = document.getElementById('search').value.toUpperCase();
     const healthFilter = document.getElementById('health-filter').value;
+    const regimeFilter = document.getElementById('regime-filter').value;
     const sortKey = document.getElementById('sort').value;
 
     let coins = DATA.coins.filter(c => {
         if (search && !c.symbol.includes(search) && !(c.name || '').toUpperCase().includes(search)) return false;
         if (healthFilter && c.health !== healthFilter) return false;
+        if (regimeFilter && c.regime_class !== regimeFilter) return false;
         return true;
     });
 
@@ -729,6 +802,7 @@ async function loadCharts(coins) {
 // Event listeners
 document.getElementById('search').addEventListener('input', filterAndRender);
 document.getElementById('health-filter').addEventListener('change', filterAndRender);
+document.getElementById('regime-filter').addEventListener('change', filterAndRender);
 document.getElementById('sort').addEventListener('change', filterAndRender);
 
 // Load data

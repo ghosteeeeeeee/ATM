@@ -132,5 +132,12 @@ def export_all():
     finally:
         conn.close()
 
+    # Enrich with weather station data
+    try:
+        from coin_tracker_enricher import enrich
+        enrich()
+    except Exception as e:
+        print(f'[coin_tracker_api] Enricher failed: {e}')
+
 if __name__ == '__main__':
     export_all()
