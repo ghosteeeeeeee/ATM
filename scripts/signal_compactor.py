@@ -322,6 +322,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('bb_bounce',   'bb_bounce,ma100-cross+'):            1.0,  # 3T 67% WR +$0.06
     # atr_spike — catch staged moves from ATR compression
     ('atr_spike_long', 'atr-spike+'):  1.0,
+    # liquidation_hunt — contrarian entry at liquidation clusters
+    ('liquidation_hunt_long', 'liq-hunt+'):  1.0,
+    ('liquidation_hunt_short', 'liq-hunt-'): 1.0,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

@@ -1452,6 +1452,18 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # liq-hunt (liquidation_hunt)
+            if _comp in ('liq-hunt+', 'liq-hunt-'):
+                try:
+                    from hermes_constants import LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED
+                    if direction == 'LONG' and not LIQUIDATION_HUNT_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" LIQUIDATION_HUNT_PLUS_ENABLED=False', flush=True)
+                        return None
+                    if direction == 'SHORT' and not LIQUIDATION_HUNT_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" LIQUIDATION_HUNT_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 

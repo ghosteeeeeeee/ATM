@@ -17,15 +17,15 @@ from signal_schema import add_signal, get_cooldown, set_cooldown
 from paths import HERMES_DATA
 
 from hermes_constants import (
-    LIQUIDATION_HUNT_ENABLED,
     LIQUIDATION_HUNT_PLUS_ENABLED,
     LIQUIDATION_HUNT_MINUS_ENABLED,
     LIQUIDATION_HUNT_COOLDOWN_HOURS,
     LIQUIDATION_HUNT_MIN_CLUSTER_USD,
     LIQUIDATION_HUNT_MIN_SCORE,
+    LIQUIDATION_HUNT_CONF_BASE,
+    LIQUIDATION_HUNT_CONF_CAP,
+    LIQUIDATION_HUNT_STALE_SECONDS,
     STOP_HUNT_DISTANCE_PCT,
-    STOP_HUNT_MIN_CLUSTER_USD,
-    STOP_HUNT_MIN_SCORE,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -43,9 +43,9 @@ def _load_liquidation_data():
     try:
         with open(_LIQ_CLUSTERS_FILE) as f:
             data = json.load(f)
-        # Check freshness — data older than 15 min is stale
+        # Check freshness — data older than threshold is stale
         age = time.time() - data.get('timestamp', 0)
-        if age > 900:
+        if age > LIQUIDATION_HUNT_STALE_SECONDS:
             print(f'[liq_hunt] Data stale ({age/60:.0f}min old), skipping')
             return {}
         return data
@@ -73,9 +73,9 @@ def detect(token, data):
         return None
 
     # Filter by thresholds
-    if hunt['score'] < STOP_HUNT_MIN_SCORE:
+    if hunt['score'] < LIQUIDATION_HUNT_MIN_SCORE:
         return None
-    if hunt['cluster_size_usd'] < STOP_HUNT_MIN_CLUSTER_USD:
+    if hunt['cluster_size_usd'] < LIQUIDATION_HUNT_MIN_CLUSTER_USD:
         return None
     if abs(hunt['distance_pct']) > STOP_HUNT_DISTANCE_PCT:
         return None
@@ -96,11 +96,11 @@ def detect(token, data):
     else:
         return None
 
-    # Compute confidence (50-88 range)
-    base_conf = min(85, 50 + hunt['score'] * 0.4)
+    # Compute confidence (uses hermes_constants for base/cap)
+    base_conf = min(LIQUIDATION_HUNT_CONF_CAP - 3, LIQUIDATION_HUNT_CONF_BASE + hunt['score'] * 0.4)
     book_bonus = 5 if hunt.get('book_thin') else 0
     cluster_bonus = min(10, hunt['cluster_size_usd'] / 100000)
-    confidence = round(min(88, base_conf + book_bonus + cluster_bonus))
+    confidence = round(min(LIQUIDATION_HUNT_CONF_CAP, base_conf + book_bonus + cluster_bonus))
 
     # Risk/reward
     rr = round(abs(take_profit - entry_zone) / max(abs(entry_zone - stop_loss), 0.001), 2)

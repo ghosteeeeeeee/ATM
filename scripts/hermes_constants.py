@@ -1778,7 +1778,18 @@ STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS = 2           # per token+direction coold
 STOP_HUNT_REVERSAL_LONG_TREND_SLOPE_MIN = 0.0        # min 1m slope over last 30 candles — block LONG when slope < 0 (downtrend)
 STOP_HUNT_REVERSAL_LONG_TREND_WINDOW = 30            # candles for linear regression slope check — 30 balances responsiveness vs noise (20 filters valid reversals, 50 too sluggish)
 
-# ── Liquidation Map / Stop Hunt Detection (liquidation_map.py + signals/liquidation_hunt.py) ──
+# ── Liquidation Hunt Signal (signals/liquidation_hunt.py) ────────────────────
+LIQUIDATION_HUNT_ENABLED              = True    # master kill-switch
+LIQUIDATION_HUNT_PLUS_ENABLED         = True    # LONG direction
+LIQUIDATION_HUNT_MINUS_ENABLED        = True    # SHORT direction
+LIQUIDATION_HUNT_COOLDOWN_HOURS       = 3       # per token+direction cooldown
+LIQUIDATION_HUNT_MIN_CLUSTER_USD      = 5000    # minimum cluster notional value ($) to fire
+LIQUIDATION_HUNT_MIN_SCORE            = 30      # minimum composite score (0-100) to fire
+LIQUIDATION_HUNT_CONF_BASE            = 70      # base confidence
+LIQUIDATION_HUNT_CONF_CAP             = 88      # max confidence (system ceiling)
+LIQUIDATION_HUNT_STALE_SECONDS        = 900     # data older than this (sec) is stale (15 min)
+
+# ── Liquidation Map Scanner (liquidation_map.py) ────────────────────────────
 STOP_HUNT_DISTANCE_PCT = 2.0                 # max distance (%) from price to cluster to trigger signal
 STOP_HUNT_MIN_CLUSTER_USD = 5000             # minimum cluster notional value ($) to matter
 STOP_HUNT_MIN_SCORE = 30                     # minimum composite score (0-100) to fire signal

@@ -70,6 +70,8 @@ from hermes_constants import (
     SPIKE_EXHAUSTION_SHORT_ENABLED, SPIKE_EXHAUSTION_SHORT_MINUS_ENABLED,
     # atr_spike
     ATR_SPIKE_ENABLED, ATR_SPIKE_PLUS_ENABLED,
+    # liquidation_hunt
+    LIQUIDATION_HUNT_ENABLED, LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED,
 )
 
 
@@ -369,6 +371,11 @@ try:
 except Exception:
     _spike_exhaustion_short_run = None
 
+try:
+    from signals.liquidation_hunt import run as _liquidation_hunt_run
+except Exception:
+    _liquidation_hunt_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -443,6 +450,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'wave_catcher', 'enabled': 'WAVE_CATCHER_ENABLED', 'run': _wave_catcher_run},
     {'name': 'coin_tracker_hot', 'enabled': 'COIN_TRACKER_HOT_ENABLED', 'run': _coin_tracker_hot_run},
     {'name': 'atr_spike', 'enabled': 'ATR_SPIKE_ENABLED', 'run': _atr_spike_run},
+    {'name': 'liquidation_hunt', 'enabled': 'LIQUIDATION_HUNT_ENABLED', 'run': _liquidation_hunt_run},
 ]
 
 
