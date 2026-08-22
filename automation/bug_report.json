@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-22 05:12:35",
+  "timestamp": "2026-08-22 13:12:37",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "118 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
+      "msg": "117 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -31,7 +31,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "89 bare except clauses in 31 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "msg": "90 bare except clauses in 31 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
@@ -43,7 +43,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "79 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py, coin_tracker_api.py",
+      "msg": "80 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py, coin_tracker_api.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },

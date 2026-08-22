@@ -141,8 +141,9 @@ def detect(token, data):
     wyckoff = data.get('wyckoff_phase') or 'none'
 
     # Regime gate: skip NEUTRAL (no directional edge — root cause of 42.4% WR)
-    regime = data.get('regime') or 'NEUTRAL'
-    if regime == 'NEUTRAL':
+    # NOTE: regime in agg_scores is numeric (50.0=NEUTRAL, 60.0=LONG_BIAS, 40.0=SHORT_BIAS)
+    regime = data.get('regime')
+    if regime is None or regime == 'NEUTRAL' or regime == 50.0:
         return None
 
     # Primary trigger: health must be hot/ready/warm (warm added 2026-08-21 — broadens signal flow)

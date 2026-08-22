@@ -12860,3 +12860,85 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - atr_sl_hit 81% of closes, trailing SL correct
 
 **Open Questions:** None
+
+## [2026-08-22 12:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+
+**24h:** 62T closed | hl_copy_trader 31T 18W 58.1% +$1.35 | ct-hot+ 31T 8W 25.8% -$4.20 (KILLED 09:00)
+**Open:** 1 (BTC LONG hl_copy_trader $77331 entry, SL $76980, -$0.07)
+
+**Close reasons 24h:** atr_sl_hit 51 (82%), guardian_hard_sl 5, MAE-GUARD 4, hard_sl 1
+
+**Changes:** None
+
+**No Change Needed:**
+- Quiet hour — 0 trades, 1 open, normal frequency (6/3/4 prior hours)
+- hl_copy_trader performing well: 58% WR, +$1.35/24h, only active signal
+- ct-hot+ kill confirmed — no new trades since 09:00
+- atr_sl_hit 82% = trailing SL working as designed, not SL too tight
+- No kill criteria triggered
+- Trade freq 0/hr — no overtrading
+
+**Open Questions:** None
+
+## [2026-08-22 13:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+
+**24h:** hl_copy_trader 31T 18W 58.1% +$1.35 | ct-hot+ 31T 8W 25.8% -$4.20 (KILLED 09:00)
+**Open:** 1 BTC LONG hl_copy_trader $77331 entry, SL $77009, -$0.03
+
+**Changes:** None
+
+**No Change Needed:**
+- Quiet hour — 0 trades, 1 open
+- hl_copy_trader healthy: 58% WR, +$1.35/24h
+- atr_sl_hit 82% = trailing SL correct
+- No kill criteria triggered
+
+**Open Questions:** None
+
+## [2026-08-22 14:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+
+**24h:** 57T closed | hl_copy_trader 28T 16W 57.1% +$1.17 | ct-hot+ 29T 6W 20.7% -$4.32 (KILLED 09:00)
+**Open:** 1 BTC LONG hl_copy_trader $77331 entry, SL $77069, -$0.02
+
+**Changes:** None
+
+**No Change Needed:**
+- Quiet period — 0 trades last 3 hours (6/1/1 prior hours winding down)
+- hl_copy_trader healthy: 57% WR, +$1.17/24h, only active signal
+- ct-hot+ kill confirmed — no new trades since 09:00
+- atr_sl_hit 81% = trailing SL working as designed, not SL too tight
+- No kill criteria triggered (no signal at 3+ trades 0% WR in last hour)
+- Trade freq 0/hr — no overtrading
+
+**Open Questions:** None
+
+## [2026-08-22 15:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00
+
+**24h:** 53T | hl_copy_trader 27T 15W 55.6% +$1.16 (healthy) | ct-hot+ 26T 6W 23.1% -$3.95 (killed 09:00, legacy)
+**Open:** 1 BTC LONG hl_copy_trader $77331 entry, SL $76909, target $78956, $11, -$0.08
+
+**Changes:** None
+
+**No Change Needed:**
+- Quiet period — 0 trades last hour, only 1 trade in last 6h
+- hl_copy_trader healthy: 55.6% WR, +$1.16/24h, only active signal
+- ct-hot+ kill confirmed — no new trades since 09:00
+- atr_sl_hit 79% of exits = trailing SL working as designed, not SL too tight
+- guardian_hard_sl 9% = correct safety net
+- No kill criteria triggered (no signal at 3+ trades 0% WR in last hour)
+- Trade freq 0/hr — no overtrading
+- Open BTC trade running normally, -$0.08 unrealized
+
+**Open Questions:** None

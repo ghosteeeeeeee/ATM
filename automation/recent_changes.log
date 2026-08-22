@@ -1286,7 +1286,24 @@
   WHY: 1T last hour (0W 1L -$0.14) ct-hot+ pre-kill holdover. 24h 69T 31W 44.9%WR -$2.07. hl_copy_trader 35T 20W 57.1% +$1.02 star. ct-hot+ killed at 09:00 confirmed working. Open: 2 hl_copy_trader healthy. Freq 1/hr quiet. System stable, no action needed.
   BY: auto_1hr
   NEXT: Re-run at 11:00 UTC
+[2026-08-22 12:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 24h 62T closed | hl_copy_trader 31T 18W 58.1% +$1.35 | ct-hot+ 31T 8W 25.8% -$4.20 (KILLED 09:00). Open: 1 BTC LONG hl_copy_trader. Quiet period. No kill criteria. atr_sl_hit 82% = trailing SL working as designed. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 13:00 UTC
+
 [2026-08-22 11:00 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour (0W 1L -$0.04) hl_copy_trader MAE-GUARD exit. 24h 70T 31W 44.3%WR -$2.11. hl_copy_trader 36T 20W 55.6% +$0.93 healthy. ct-hot+ killed. Freq 1/hr quiet. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 12:00 UTC
+[2026-08-22 13:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 24h hl_copy_trader 31T 18W 58.1% +$1.35 healthy only active signal. ct-hot+ killed 09:00. Open: 1 BTC LONG hl_copy_trader -$0.03. Quiet period. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 14:00 UTC
+[2026-08-22 14:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 24h 57T closed | hl_copy_trader 28T 16W 57.1% +$1.17 healthy only active signal. ct-hot+ killed 09:00. Open: 1 BTC LONG hl_copy_trader -$0.02. 3hr quiet period. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 15:00 UTC
+[2026-08-22 15:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 24h 53T | hl_copy_trader 27T 15W 55.6% +$1.16 healthy only active signal. ct-hot+ killed 09:00 legacy. Open: 1 BTC LONG hl_copy_trader -$0.08. 6h quiet period. atr_sl_hit 79% = trailing SL working. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 16:00 UTC
