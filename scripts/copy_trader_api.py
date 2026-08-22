@@ -30,22 +30,25 @@ def generate_data():
     DB_CONFIG.setdefault('port', 5432)
     pg = psycopg2.connect(**DB_CONFIG)
     pg.autocommit = True
-    cur = pg.cursor()
-
-    # Get all copy trades with more fields
-    cur.execute('''
-        SELECT id, token, direction, entry_price, hl_entry_price, pnl_pct, pnl_usdt,
-               close_reason, _signal_metadata, open_time, close_time, status, leverage,
-               signal, confidence, amount_usdt, hl_notional_usdt,
-               mfe_pct, mae_pct, highest_price, lowest_price
-        FROM trades
-        WHERE signal LIKE '%hl_copy_trader%'
-        ORDER BY id
-    ''')
-    trades = cur.fetchall()
-    cols = [desc[0] for desc in cur.description]
-    cur.close()
-    pg.close()
+    try:
+        cur = pg.cursor()
+        try:
+            # Get all copy trades with more fields
+            cur.execute('''
+                SELECT id, token, direction, entry_price, hl_entry_price, pnl_pct, pnl_usdt,
+                       close_reason, _signal_metadata, open_time, close_time, status, leverage,
+                       signal, confidence, amount_usdt, hl_notional_usdt,
+                       mfe_pct, mae_pct, highest_price, lowest_price
+                FROM trades
+                WHERE signal LIKE '%hl_copy_trader%'
+                ORDER BY id
+            ''')
+            trades = cur.fetchall()
+            cols = [desc[0] for desc in cur.description]
+        finally:
+            cur.close()
+    finally:
+        pg.close()
 
     # Parse trades
     parsed = []
@@ -178,30 +181,33 @@ def generate_data():
 
     # Per-wallet stats from trader_performance + pro trader fills
     hl_conn = get_db()
-    tp_rows = hl_conn.execute('''
-        SELECT tp.wallet, tp.token, tp.status, tp.pnl_pct, tp.close_reason,
-               tp.trade_id, t.score, t.pattern
-        FROM trader_performance tp
-        LEFT JOIN traders t ON tp.wallet = t.wallet
-        ORDER BY tp.created_at DESC
-    ''').fetchall()
+    try:
+        tp_rows = hl_conn.execute('''
+            SELECT tp.wallet, tp.token, tp.status, tp.pnl_pct, tp.close_reason,
+                   tp.trade_id, t.score, t.pattern
+            FROM trader_performance tp
+            LEFT JOIN traders t ON tp.wallet = t.wallet
+            ORDER BY tp.created_at DESC
+        ''').fetchall()
 
-    # Get pro trader's own HYPE fills
-    pro_fills = hl_conn.execute('''
-        SELECT wallet, coin, closed_pnl, sz, px, is_open
-        FROM trader_fills
-        WHERE coin = 'HYPE'
-    ''').fetchall()
+        # Get pro trader's own HYPE fills
+        pro_fills = hl_conn.execute('''
+            SELECT wallet, coin, closed_pnl, sz, px, is_open
+            FROM trader_fills
+            WHERE coin = 'HYPE'
+        ''').fetchall()
 
-    # Get all tracked traders (leaderboard)
-    all_traders = hl_conn.execute('''
-        SELECT wallet, score, pnl_all_time, win_rate, trade_count, pattern,
-               copy_weight, copy_trades, copy_wins, copy_pnl, last_updated
-        FROM traders
-        WHERE active = 1
-        ORDER BY score DESC
-    ''').fetchall()
-    hl_conn.close()
+        # Get all tracked traders (leaderboard)
+        all_traders = hl_conn.execute('''
+            SELECT wallet, score, pnl_all_time, win_rate, trade_count, pattern,
+                   copy_weight, copy_trades, copy_wins, copy_pnl, last_updated,
+                   account_value
+            FROM traders
+            WHERE active = 1
+            ORDER BY score DESC
+        ''').fetchall()
+    finally:
+        hl_conn.close()
 
     # Build leaderboard summary
     leaderboard = []

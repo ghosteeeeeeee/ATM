@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-22 05:17 UTC
+# Signal Rotation — 2026-08-22 05:27 UTC
 
 ## Market Regime: SHORT_BIAS
 
@@ -6,19 +6,15 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | r2-trend-long6 | 100% | 1.691 | 1.691 | ❓ |  |
-| 2 | bb_bounce+,hl_copy_trader | 67% | 0.823 | 0.823 | ✅ |  |
-| 3 | return_exhaustion_long | 67% | 0.409 | 0.409 | ❓ |  |
-| 4 | r2-trend-long4 | 65% | 0.200 | 0.200 | ❓ |  |
-| 5 | r2-trend-long5 | 67% | 0.190 | 0.190 | ❓ |  |
-| 6 | stop_hunt_reversal_long+ | 60% | 0.038 | 0.038 | ❌ |  |
-| 7 | bb_bounce+ | 40% | -0.138 | -0.138 | ✅ | DISABLE |
-| 8 | r2-trend-long2 | 53% | -0.174 | -0.174 | ❓ |  |
-| 9 | r2-trend-long3 | 55% | -0.185 | -0.185 | ❓ |  |
-| 10 | mover+ | 17% | -0.231 | -0.231 | ❓ |  |
-| 11 | range_finder+ | 33% | -0.259 | -0.259 | ❌ |  |
-| 12 | wave_catcher+ | 43% | -0.283 | -0.283 | ❌ |  |
-| 13 | ct-hot+ | 39% | -0.452 | -0.452 | ❓ |  |
+| 1 | hl_copy_trader | 60% | 1.787 | 1.787 | ❓ |  |
+| 2 | r2-trend-long6 | 100% | 1.448 | 1.448 | ❓ |  |
+| 3 | bb_bounce+,hl_copy_trader | 67% | 0.823 | 0.823 | ❌ | ENABLE |
+| 4 | r2-trend-long4 | 71% | 0.464 | 0.464 | ❓ |  |
+| 5 | return_exhaustion_long | 67% | 0.409 | 0.409 | ❓ |  |
+| 6 | r2-trend-long3 | 54% | 0.135 | 0.135 | ❓ |  |
+| 7 | stop_hunt_reversal_long+ | 60% | 0.038 | 0.038 | ❌ |  |
+| 8 | bb_bounce+ | 40% | -0.138 | -0.138 | ❌ |  |
+| 9 | ct-hot+ | 38% | -1.480 | -1.480 | ❓ |  |
 
 ## Changes Applied
-- **DISABLE**: BB_BOUNCE_PLUS_ENABLED (WR=40%, edge=-0.138, bleeding capital)
+- **ENABLE**: BB_BOUNCE_PLUS_ENABLED (WR=67%, edge=0.823, regime-aligned)

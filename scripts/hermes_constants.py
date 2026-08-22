@@ -1226,7 +1226,7 @@ CEO_PROTECTED_FLAGS = {
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
     'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. Only T can change', '2026-08-21'),
     'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED', '2026-08-22'),
-    'COIN_TRACKER_HOT_MINUS_ENABLED': ('SHORT disabled — long only for now. Only T can change', '2026-08-21'),
+    'COIN_TRACKER_HOT_MINUS_ENABLED': ('Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED', '2026-08-22'),
     'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Composite threshold — raised to 70 from 56 (CEO killed ct-hot+ 2026-08-22). CEO_PROTECTED', '2026-08-22'),
     'TIME_BLOCK_ENABLED': ('Disabled 2026-08-21 — was blocking all signals 01-06 UTC. Only T can change', '2026-08-21'),
 }
@@ -1261,7 +1261,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
