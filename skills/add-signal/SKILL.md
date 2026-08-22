@@ -547,7 +547,7 @@ This prevents `signal_rotator.py` from auto-re-enabling it.
 
 13. **Staleness thresholds must match candle timeframe** — 1h candles update hourly, so a 15-minute staleness check kills all tokens. Use: 1m→120s, 5m→600s, 15m→1800s, 1h→5400s, 4h→21600s.
 
-14. **Don't let short-TF noise dilute strong moves** — if your signal is a "leaderboard" or "mover" signal, weight the primary timeframe heavily (0.7+) in move_score. A 5%1h move with -0.5%5m shouldn't score below threshold because of5m noise.
+14. **Don't let short-TF noise dilute strong moves** — if your signal is a "leaderboard" or "mover" signal, weight the primary timeframe heavily (0.7+) in move_score. A 5%1h move with -0.5%5m shouldn't score below threshold because of 5m noise.
 
 15. **Combo weights** — after your signal has 5+ trades, self_learner.py auto-tunes its weight in `data/combo_weights.json`. signal_compactor.py loads these on startup. You don't need to manually set `SIGNAL_SOURCE_WEIGHTS` for combos — the system does it automatically.
 
