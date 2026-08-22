@@ -1848,28 +1848,12 @@ def sync_pnl_from_hype(prices):
                             except Exception as db_err:
                                 log(f'  [CUT-LOSER] Paper force-close also failed for {token}: {db_err}', 'FAIL')
                         else:
-                            # Only mark DB closed AFTER fill confirmed on HL
-                            try:
-                                conn_cut = get_db_connection()
-                                if conn_cut:
-                                    cur_cut = conn_cut.cursor()
-                                    cur_cut.execute(
-                                        "UPDATE trades SET guardian_closed=TRUE, status='closed', "
-                                        "close_reason='CUT_LOSER', exit_reason='CUT_LOSER_PNL' "
-                                        "WHERE id=%s AND status='open'",
-                                        (trade_id,))
-                                    conn_cut.commit()
-                                    cur_cut.close()
-                                    conn_cut.close()
-                                    log(f'  [CUT-LOSER] DB updated for {token} trade #{trade_id}', 'PASS')
-                            except Exception as cut_err:
-                                log(f'  Cut-loser DB update error: {cut_err}', 'FAIL')
-                            # FIX (2026-04-25): Record loss cooldown after successful HL close.
-                            # The direct UPDATE above skips _close_paper_trade_db, which is where
-                            # _record_loss_cooldown is normally called. Without this, cut-loser
-                            # closes never populate loss_cooldowns.json, allowing immediate re-entry.
-                            if pnl_pct < 0:
-                                _record_loss_cooldown(token, direction)
+                            # FIX: Use _close_paper_trade_db instead of direct UPDATE.
+                            # The old UPDATE skipped pnl_pct (unleveraged), exit_price,
+                            # and _clear_reconciled_token — same bug as hard_sl path.
+                            _CLOSED_HL_COINS.add(token.upper())
+                            _close_paper_trade_db(trade_id, token, curr_price_hl, 'CUT_LOSER')
+                            log(f'  [CUT-LOSER] {token} trade #{trade_id} closed via _close_paper_trade_db', 'PASS')
                         continue  # Skip flip check — already closing
 
         conn.commit()
@@ -3530,11 +3514,14 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                             computed_pnl_usdt = round(computed_pnl_pct / 100 * calc_notional_sc, 4)
                         else:
                             # No fill data — use current price as proxy (best available estimate)
+                            # FIX: Multiply by lev_sc for leveraged pnl_pct, use calc_notional_sc
+                            # for pnl_usdt (was using amount_usdt=margin, missing leverage).
                             if direction_sc.upper() == 'SHORT':
-                                computed_pnl_pct = round((entry_px_sc - curr) / entry_px_sc * 100, 4)
+                                raw_move_sc = round((entry_px_sc - curr) / entry_px_sc * 100, 4)
                             else:
-                                computed_pnl_pct = round((curr - entry_px_sc) / entry_px_sc * 100, 4)
-                            computed_pnl_usdt = round(computed_pnl_pct / 100 * amount_usdt, 4)
+                                raw_move_sc = round((curr - entry_px_sc) / entry_px_sc * 100, 4)
+                            computed_pnl_pct = round(raw_move_sc * lev_sc, 4)
+                            computed_pnl_usdt = round(raw_move_sc / 100 * calc_notional_sc, 4)
                             hl_exit_px = curr
                         conn_sc = get_db_connection()
                         cur_sc = conn_sc.cursor()
