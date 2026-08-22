@@ -12599,3 +12599,28 @@ None — system stable, previous fixes settling in.
 - 3 open positions healthy
 
 **Open Questions:** None
+
+## [2026-08-22 02:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 3 open (HYPE SHORT, ETH LONG, SOL LONG — hl_copy_trader).
+**24h:** 44T 22W 50%WR +$1.57
+
+**Close reasons (24h):**
+- atr_sl_hit: 43T +$1.38 avg $0.032 — trailing SL working correctly
+- atr_tp_hit: 1T +$0.18
+
+**Signals (24h):**
+- hl_copy_trader: 26T 15W 57.7% +$1.19 — star, only active
+- ct-hot+: 17T 7W 41.2% +$0.09 — residual, disabled 17:00
+- r2-trend-long3: 1T 1W +$0.28
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader performing well (57.7% WR, only active signal)
+- atr_sl_hit 97.7% but net profitable — trailing SL correct
+- Trade freq 0-2/hr normal, quiet period
+- All 3 open positions healthy with 1% SL distances
+- ct-hot+ residual positions draining as expected
+
+**Open Questions:** None

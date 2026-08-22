@@ -163,6 +163,30 @@ Shared across all agents (OpenCode, DSH, Cursor, Claude Code).
 - **Edit originals** at `/root/.config/opencode/skills/` — changes propagate everywhere
 - See `skills/shared/README.md` for full documentation
 
+## Web Dashboards
+
+All dashboards served by nginx on port 54321.
+
+| Dashboard | URL | Data Source | Refresh |
+|-----------|-----|-------------|---------|
+| Trades | `/trades.html` | `trades.json` | 1min |
+| Signals | `/signals.html` | `signals.json` | 1min |
+| Copy Trader | `/copy_trader.html` | `copy_trader.json` | 1min |
+| Coin Tracker | `/coin_tracker.html` | `coin_tracker_data.json` | 5min |
+
+**File locations:**
+- HTML: `/root/.hermes/web/*.html` → copied to `/var/www/hermes/*.html`
+- Data: `/root/.hermes/scripts/*_api.py` → writes to `/var/www/hermes/data/*.json`
+- Nginx: `/etc/nginx/sites-enabled/trading`
+
+**To add a new dashboard:**
+1. Create HTML in `web/`
+2. Create API script in `scripts/` to generate JSON
+3. Add systemd timer in `config/`
+4. Add nginx location in `/etc/nginx/sites-enabled/trading`
+5. Copy HTML to `/var/www/hermes/`
+6. Update this file
+
 ## Reference (query OpenMemory for details)
 
 | Topic | Query |

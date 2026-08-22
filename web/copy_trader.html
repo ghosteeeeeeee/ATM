@@ -22,28 +22,38 @@
     .open-badge { background: #00ff8833; color: #00ff88; padding: 2px 6px; border-radius: 3px; font-size: 0.75em; }
     .closed-badge { color: #666; font-size: 0.75em; }
     #status { color: #666; font-size: 0.75em; margin-bottom: 15px; }
-    .stats-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat { background: #1a1a2e; padding: 10px 15px; border-radius: 4px; border-left: 3px solid #00ff88; min-width: 120px; }
-    .stat .label { color: #666; font-size: 0.75em; }
-    .stat .value { color: #00ff88; font-size: 1.2em; font-weight: bold; }
+    .stats-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat { background: #1a1a2e; padding: 10px 14px; border-radius: 4px; border-left: 3px solid #00ff88; min-width: 100px; }
+    .stat .label { color: #666; font-size: 0.7em; }
+    .stat .value { color: #00ff88; font-size: 1.1em; font-weight: bold; }
     .stat .value.neg { color: #ff4444; }
     .stat .value.neutral { color: #888; }
     .stat.warn { border-left-color: #ff8844; }
     .stat.warn .value { color: #ff8844; }
     .section { margin-bottom: 25px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+    @media (max-width: 1100px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 900px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
     .card { background: #0d0d15; border: 1px solid #1a1a2e; border-radius: 6px; padding: 15px; }
     .card h3 { color: #4488ff; font-size: 0.9em; margin-bottom: 10px; }
     .empty { color: #444; text-align: center; padding: 20px; }
     .trader-card { background: #0d0d15; border: 1px solid #1a1a2e; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
-    .trader-card .wallet { color: #ffd700; font-size: 0.85em; }
+    .trader-card .wallet { color: #ffd700; font-size: 0.85em; font-weight: bold; }
     .trader-card .meta { color: #666; font-size: 0.75em; margin-top: 4px; }
-    .trader-card .stats { display: flex; gap: 15px; margin-top: 8px; }
-    .trader-card .stat-item { font-size: 0.8em; }
-    .trader-card .stat-item .lbl { color: #666; }
+    .trader-card .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    .trader-card .stat-item { font-size: 0.78em; }
+    .trader-card .stat-item .lbl { color: #666; display: block; }
     .trader-card .stat-item .val { color: #00ff88; font-weight: bold; }
     .trader-card .stat-item .val.neg { color: #ff4444; }
+    .trader-card .pro-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #333; }
+    .trader-card .pro-label { color: #4488ff; font-size: 0.7em; margin-bottom: 4px; }
+    .bar { height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .bar-fill { height: 100%; background: #00ff88; border-radius: 3px; }
+    .bar-fill.neg { background: #ff4444; }
+    .streak { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 0.75em; margin-left: 5px; }
+    .streak.win { background: #00ff8822; color: #00ff88; }
+    .streak.loss { background: #ff444422; color: #ff4444; }
   </style>
 </head>
 <body>
@@ -52,20 +62,35 @@
 
   <div class="stats-bar" id="stats-bar"></div>
 
-  <div class="section">
-    <h2>📈 Per-Token Performance</h2>
-    <div id="token-table"></div>
-  </div>
-
-  <div class="grid">
+  <div class="grid-3">
     <div class="card">
-      <h3>🎯 Exit Reason Analysis</h3>
+      <h3>📈 Per-Token</h3>
+      <div id="token-table"></div>
+    </div>
+    <div class="card">
+      <h3>🎯 Exit Reasons</h3>
       <div id="reason-table"></div>
     </div>
     <div class="card">
-      <h3>👥 Trader Performance</h3>
-      <div id="trader-cards"></div>
+      <h3>⏰ By Hour (UTC)</h3>
+      <div id="hour-table"></div>
     </div>
+  </div>
+
+  <div class="grid" style="margin-top: 15px;">
+    <div class="card">
+      <h3>⏱️ Hold Time Distribution</h3>
+      <div id="hold-table"></div>
+    </div>
+    <div class="card">
+      <h3>📈 Equity Curve</h3>
+      <div id="equity-chart" style="height: 120px; position: relative;"></div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top: 20px;">
+    <h2>👥 Trader Performance</h2>
+    <div id="trader-cards"></div>
   </div>
 
   <div class="section" style="margin-top: 20px;">
@@ -85,7 +110,7 @@
         render();
         document.getElementById('status').textContent = 'Updated: ' + new Date(DATA.updated).toLocaleString();
       } catch (e) {
-        document.getElementById('status').textContent = 'Error loading data: ' + e.message;
+        document.getElementById('status').textContent = 'Error: ' + e.message;
       }
     }
 
@@ -95,46 +120,77 @@
 
       // Stats bar
       document.getElementById('stats-bar').innerHTML = `
-        <div class="stat"><div class="label">TOTAL TRADES</div><div class="value">${s.total}</div></div>
+        <div class="stat"><div class="label">TRADES</div><div class="value">${s.total}</div></div>
         <div class="stat"><div class="label">WIN RATE</div><div class="value ${s.win_rate >= 50 ? '' : 'neg'}">${s.win_rate}%</div></div>
-        <div class="stat"><div class="label">WINS / LOSSES</div><div class="value">${s.wins} / ${s.losses}</div></div>
-        <div class="stat ${s.total_pnl >= 0 ? '' : 'warn'}"><div class="label">TOTAL PNL%</div><div class="value ${s.total_pnl >= 0 ? '' : 'neg'}">${s.total_pnl >= 0 ? '+' : ''}${s.total_pnl.toFixed(2)}%</div></div>
-        <div class="stat ${s.total_usdt >= 0 ? '' : 'warn'}"><div class="label">TOTAL PNL $</div><div class="value ${s.total_usdt >= 0 ? '' : 'neg'}">$${s.total_usdt >= 0 ? '+' : ''}${s.total_usdt.toFixed(3)}</div></div>
+        <div class="stat"><div class="label">W / L</div><div class="value">${s.wins} / ${s.losses}</div></div>
+        <div class="stat ${s.total_pnl >= 0 ? '' : 'warn'}"><div class="label">PNL %</div><div class="value ${s.total_pnl >= 0 ? '' : 'neg'}">${s.total_pnl >= 0 ? '+' : ''}${s.total_pnl.toFixed(2)}%</div></div>
+        <div class="stat ${s.total_usdt >= 0 ? '' : 'warn'}"><div class="label">PNL $</div><div class="value ${s.total_usdt >= 0 ? '' : 'neg'}">$${s.total_usdt >= 0 ? '+' : ''}${s.total_usdt.toFixed(3)}</div></div>
+        <div class="stat"><div class="label">AVG HOLD</div><div class="value neutral">${s.avg_hold}h</div></div>
+        <div class="stat"><div class="label">AVG SIZE</div><div class="value neutral">$${s.avg_notional.toFixed(0)}</div></div>
+        <div class="stat"><div class="label">STREAKS</div><div class="value"><span class="streak win">W${s.max_win_streak}</span> <span class="streak loss">L${s.max_loss_streak}</span></div></div>
         <div class="stat"><div class="label">OPEN</div><div class="value neutral">${s.open}</div></div>
       `;
 
       // Token table
       const tokens = Object.entries(DATA.by_token).sort((a, b) => b[1].pnl - a[1].pnl);
-      let tokenHtml = '<table><tr><th>Token</th><th>Trades</th><th>W/L</th><th>Win Rate</th><th>PnL%</th><th>PnL $</th></tr>';
+      let html = '<table><tr><th>Token</th><th>N</th><th>W/L</th><th>WR</th><th>PnL%</th><th>Avg Hold</th></tr>';
       for (const [tok, s] of tokens) {
-        const cls = s.pnl >= 0 ? 'win' : 'loss';
-        tokenHtml += `<tr>
-          <td><strong>${tok}</strong></td>
-          <td>${s.count}</td>
-          <td>${s.wins}/${s.losses}</td>
+        html += `<tr><td><strong>${tok}</strong></td><td>${s.count}</td><td>${s.wins}/${s.losses}</td>
           <td class="${s.wr >= 50 ? 'win' : 'loss'}">${s.wr}%</td>
-          <td class="${cls}">${s.pnl >= 0 ? '+' : ''}${s.pnl.toFixed(2)}%</td>
-          <td class="${cls}">$${s.usdt >= 0 ? '+' : ''}${s.usdt.toFixed(3)}</td>
-        </tr>`;
+          <td class="${s.pnl >= 0 ? 'win' : 'loss'}">${s.pnl >= 0 ? '+' : ''}${s.pnl.toFixed(2)}%</td>
+          <td class="neutral">${s.avg_hold}h</td></tr>`;
       }
-      tokenHtml += '</table>';
-      document.getElementById('token-table').innerHTML = tokenHtml;
+      document.getElementById('token-table').innerHTML = html + '</table>';
 
       // Reason table
       const reasons = Object.entries(DATA.by_reason).sort((a, b) => b[1].pnl - a[1].pnl);
-      let reasonHtml = '<table><tr><th>Exit Reason</th><th>Count</th><th>W/L</th><th>WR</th><th>PnL%</th></tr>';
+      html = '<table><tr><th>Reason</th><th>N</th><th>WR</th><th>PnL%</th></tr>';
       for (const [r, s] of reasons) {
-        const cls = s.pnl >= 0 ? 'win' : 'loss';
-        reasonHtml += `<tr>
-          <td>${r}</td>
-          <td>${s.count}</td>
-          <td>${s.wins}/${s.losses}</td>
+        html += `<tr><td>${r}</td><td>${s.count}</td>
           <td class="${s.wr >= 50 ? 'win' : 'loss'}">${s.wr}%</td>
-          <td class="${cls}">${s.pnl >= 0 ? '+' : ''}${s.pnl.toFixed(2)}%</td>
-        </tr>`;
+          <td class="${s.pnl >= 0 ? 'win' : 'loss'}">${s.pnl >= 0 ? '+' : ''}${s.pnl.toFixed(2)}%</td></tr>`;
       }
-      reasonHtml += '</table>';
-      document.getElementById('reason-table').innerHTML = reasonHtml;
+      document.getElementById('reason-table').innerHTML = html + '</table>';
+
+      // Hour table
+      const hours = Object.entries(DATA.by_hour).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+      html = '<table><tr><th>Hour</th><th>N</th><th>WR</th><th>PnL%</th></tr>';
+      for (const [h, s] of hours) {
+        const barWidth = Math.min(100, Math.abs(s.pnl) * 5);
+        const barCls = s.pnl >= 0 ? '' : 'neg';
+        html += `<tr><td>${h}:00</td><td>${s.count}</td>
+          <td class="${s.wr >= 50 ? 'win' : 'loss'}">${s.wr}%</td>
+          <td class="${s.pnl >= 0 ? 'win' : 'loss'}">${s.pnl >= 0 ? '+' : ''}${s.pnl.toFixed(2)}%
+            <div class="bar"><div class="bar-fill ${barCls}" style="width:${barWidth}%"></div></div></td></tr>`;
+      }
+      document.getElementById('hour-table').innerHTML = html + '</table>';
+
+      // Hold time distribution
+      const holds = Object.entries(DATA.hold_dist);
+      html = '<table><tr><th>Hold Time</th><th>N</th><th>WR</th></tr>';
+      for (const [bucket, s] of holds) {
+        html += `<tr><td>${bucket}</td><td>${s.count}</td>
+          <td class="${s.wr >= 50 ? 'win' : 'loss'}">${s.wr}%</td></tr>`;
+      }
+      document.getElementById('hold-table').innerHTML = html + '</table>';
+
+      // Equity curve (simple ASCII-style bar chart)
+      if (DATA.equity_curve.length > 0) {
+        const ec = DATA.equity_curve;
+        const minPnl = Math.min(0, ...ec.map(e => e.pnl));
+        const maxPnl = Math.max(0.01, ...ec.map(e => e.pnl));
+        const range = maxPnl - minPnl || 1;
+        let chartHtml = '<div style="display:flex;align-items:end;height:100px;gap:1px;">';
+        for (const e of ec) {
+          const h = Math.max(2, ((e.pnl - minPnl) / range) * 100);
+          const color = e.pnl >= 0 ? '#00ff88' : '#ff4444';
+          chartHtml += `<div style="flex:1;background:${color};height:${h}%;min-width:3px;border-radius:1px 1px 0 0;" title="#${e.id} ${e.token} $${e.pnl.toFixed(3)}"></div>`;
+        }
+        chartHtml += '</div>';
+        chartHtml += `<div style="display:flex;justify-content:space-between;font-size:0.7em;color:#666;margin-top:4px;">
+          <span>$${minPnl.toFixed(2)}</span><span>Trade #${ec[0]?.id}</span><span>$${maxPnl.toFixed(2)}</span></div>`;
+        document.getElementById('equity-chart').innerHTML = chartHtml;
+      }
 
       // Trader cards
       const wallets = Object.entries(DATA.by_wallet).sort((a, b) => b[1].total_pnl - a[1].total_pnl);
@@ -142,48 +198,52 @@
       for (const [w, s] of wallets) {
         const wShort = w === 'unknown' ? 'UNKNOWN (pre-fix)' : w.slice(0, 14) + '...';
         const cls = s.total_pnl >= 0 ? '' : 'neg';
+        const total = s.wins + s.losses;
+        const wrBar = s.wr;
         traderHtml += `
           <div class="trader-card">
             <div class="wallet">${wShort}</div>
-            <div class="meta">Score: ${s.score} | Pattern: ${s.pattern}</div>
+            <div class="meta">Score: ${s.score} | Pattern: ${s.pattern} | Pro HYPE WR: ${s.pro_hype_wr}% (${s.pro_hype_trades} trades)</div>
             <div class="stats">
-              <div class="stat-item"><span class="lbl">Trades:</span> <span class="val">${s.wins + s.losses + s.be}</span></div>
-              <div class="stat-item"><span class="lbl">W/L:</span> <span class="val">${s.wins}/${s.losses}</span></div>
-              <div class="stat-item"><span class="lbl">WR:</span> <span class="val ${s.wr >= 50 ? '' : 'neg'}">${s.wr}%</span></div>
-              <div class="stat-item"><span class="lbl">PnL:</span> <span class="val ${cls}">${s.total_pnl >= 0 ? '+' : ''}${s.total_pnl.toFixed(2)}%</span></div>
-              <div class="stat-item"><span class="lbl">Open:</span> <span class="val neutral">${s.open}</span></div>
+              <div class="stat-item"><span class="lbl">Our Trades</span><span class="val">${total}</span></div>
+              <div class="stat-item"><span class="lbl">W / L / BE</span><span class="val">${s.wins} / ${s.losses} / ${s.be}</span></div>
+              <div class="stat-item"><span class="lbl">Win Rate</span><span class="val ${s.wr >= 50 ? '' : 'neg'}">${s.wr}%</span></div>
+              <div class="stat-item"><span class="lbl">Our PnL</span><span class="val ${cls}">${s.total_pnl >= 0 ? '+' : ''}${s.total_pnl.toFixed(2)}%</span></div>
+              <div class="stat-item"><span class="lbl">Avg Position</span><span class="val">$${s.avg_position.toFixed(0)}</span></div>
+              <div class="stat-item"><span class="lbl">Total Volume</span><span class="val neutral">$${s.total_volume.toFixed(0)}</span></div>
+              <div class="stat-item"><span class="lbl">Open</span><span class="val neutral">${s.open}</span></div>
+              <div class="stat-item"><span class="lbl">Pro Avg Size</span><span class="val neutral">$${s.pro_avg_position.toFixed(0)}</span></div>
             </div>
+            <div class="bar" style="margin-top:6px;"><div class="bar-fill ${s.wr >= 50 ? '' : 'neg'}" style="width:${wrBar}%"></div></div>
           </div>`;
       }
       document.getElementById('trader-cards').innerHTML = traderHtml || '<div class="empty">No trader data yet</div>';
 
-      // Trades table (last 30)
-      const trades = DATA.trades.slice(0, 30);
-      let tradeHtml = '<table><tr><th>#</th><th>Token</th><th>Dir</th><th>Entry</th><th>PnL%</th><th>PnL $</th><th>Reason</th><th>Hold</th><th>Status</th><th>Trader</th></tr>';
+      // Trades table (last 25)
+      const trades = DATA.trades.slice(0, 25);
+      html = '<table><tr><th>#</th><th>Token</th><th>Dir</th><th>Entry</th><th>PnL%</th><th>PnL $</th><th>MFE</th><th>MAE</th><th>Reason</th><th>Hold</th><th>Status</th></tr>';
       for (const t of trades) {
         const cls = t.pnl_pct > 0.05 ? 'win' : t.pnl_pct < -0.05 ? 'loss' : 'neutral';
         const dirCls = t.direction === 'LONG' ? 'long' : 'short';
-        const trader = t.trader_wallet ? t.trader_wallet.slice(0, 10) + '...' : '-';
-        const score = t.trader_score || '';
-        tradeHtml += `<tr>
+        html += `<tr>
           <td>${t.id}</td>
           <td><strong>${t.token}</strong></td>
           <td class="${dirCls}">${t.direction}</td>
           <td>$${t.entry.toFixed(2)}</td>
           <td class="${cls}">${t.pnl_pct >= 0 ? '+' : ''}${t.pnl_pct.toFixed(2)}%</td>
           <td class="${cls}">$${t.pnl_usdt >= 0 ? '+' : ''}${t.pnl_usdt.toFixed(3)}</td>
+          <td class="${t.mfe_pct > 0 ? 'win' : 'neutral'}">${t.mfe_pct > 0 ? '+' : ''}${t.mfe_pct.toFixed(2)}%</td>
+          <td class="${t.mae_pct < 0 ? 'loss' : 'neutral'}">${t.mae_pct.toFixed(2)}%</td>
           <td>${t.close_reason}</td>
           <td>${t.hold_hours}h</td>
           <td>${t.status === 'open' ? '<span class="open-badge">OPEN</span>' : '<span class="closed-badge">closed</span>'}</td>
-          <td title="${t.trader_wallet || ''}">${trader} ${score ? '(' + score + ')' : ''}</td>
         </tr>`;
       }
-      tradeHtml += '</table>';
-      document.getElementById('trades-table').innerHTML = tradeHtml;
+      document.getElementById('trades-table').innerHTML = html + '</table>';
     }
 
     loadData();
-    setInterval(loadData, 30000); // Refresh every 30s
+    setInterval(loadData, 30000);
   </script>
 </body>
 </html>
