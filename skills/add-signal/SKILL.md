@@ -322,6 +322,34 @@ In `SIGNAL_SOURCE_WEIGHTS` (~line 177-253):
 
 ---
 
+## Step 5b: Volatility floor filter (understand it)
+
+**File**: `/root/.hermes/scripts/signal_compactor.py` — `check_volatility_floor()`
+
+The volatility floor is a **Layer 3 filter** in the signal compactor that blocks signals when a token's price has insufficient volatility (< `VOL_FLOOR_THRESHOLD` = 0.15%). It uses std/mean of the last 20 5m closes as its metric.
+
+**How it affects your signal:**
+- Your signal fires in Layer 1 (scan_signals → add_signal) and enters the `signals` table
+- The compactor then filters the hotset — if the token's 5m volatility is below threshold, your signal gets blocked at Layer 3 regardless of confidence
+- This is CORRECT behavior — low-vol tokens don't move enough to profit from
+
+**What you need to do:**
+1. **Nothing** if your signal reads from candles DB — the vol floor already has the data it needs
+2. **If your signal reads from a non-candle source** (JSON, API, etc.) — the vol floor STILL applies because it checks the token's candle data, not your signal's data source. No special handling needed.
+3. **Verify your source isn't accidentally blacklisted** — run:
+   ```python
+   from signal_schema import validate_source
+   print(validate_source('your-signal+'))  # should print 'your-signal+', not 'unknown'
+   ```
+
+**Edge case:** If your signal is for a newly listed token with < 20 5m candles, `check_volatility_floor()` fails open (returns 1.0) — your signal passes through. This is intentional.
+
+**Tuning:** If your signal consistently fires on low-vol tokens and gets blocked, consider:
+- Adding your own vol check in Layer 1 (skip tokens below threshold early)
+- Adjusting `VOL_FLOOR_THRESHOLD` in hermes_constants.py (affects ALL signals)
+
+---
+
 ## Step 6: Verification
 
 ```bash
@@ -348,6 +376,8 @@ tail -100 /root/.hermes/logs/pipeline.log | grep your_signal
 | **Cooldown set** | Uses `set_cooldown()` or `get_cooldown()` | Spam signals on same token |
 | **Not in _DEAD_SIGNALS** | `grep -n '_DEAD_SIGNALS\|DEAD_SOURCES' signal_schema.py` | Signal silently killed by add_signal() |
 | **Source format consistent** | Uses `+`/`-` suffix consistently, not mixed bare+directional | Layer 2 checks may be dead code |
+| **Source not blacklisted** | `python3 -c "from signal_schema import validate_source; print(validate_source('your-signal+'))"` | Signal enters DB but gets blocked in hotset |
+| **Vol floor understood** | Signal will be blocked by Layer 3 if token vol < 0.15% — this is correct behavior | Low-vol tokens don't move enough to profit |
 
 ---
 
