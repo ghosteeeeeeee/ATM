@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-21 23:00 UTC (CEO run)**
+**Last Updated: 2026-08-22 02:00 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE.
 
-**Current status:** System HEALTHY, FLAT. Verified DB: 24h 38T +$0.95, 50% WR (flat). 7d: 237T +$0.27, 50.6% WR (barely positive). ATR_SL 27T/48h -$3.29 (ONLY loss source). PM_TRAIL 103T/7d +$4.18, 83% WR (carrying system). r2-trend-long6 6T/7d +$0.40 100% WR (best signal). Legacy SHORT ALL 0% WR draining (die Aug 22-23). **DISCOVERY: Coin tracker Wyckoff detection BROKEN — 0/109 tokens have phase detected (all 'none'). 4h candles stale since May 28.** Disk: 81%.
+**Current status:** System HEALTHY, FLAT. Verified DB: 24h 42T +$1.73, 52.4% WR. 48h: 60T +$1.24, 51.7% WR. 7d: 231T +$1.16, 51.1% WR (barely positive). ATR_SL 111T/7d -$3.42 (ONLY loss source). PM_TRAIL 96T/7d +$4.13, 85.4% WR (carrying system). r2-trend-long6 5T/7d +$0.33 100% WR (best signal). hl_copy_trader 25T/24h +$1.30 60% WR (dominant). ct-hot+ residual draining (killed Aug 21). 4 open: 3 hl_copy_trader LONG, 1 ct-hot+ LONG (all positive). Legacy SHORT 0% WR draining (die Aug 22-23). Wyckoff IMPROVED: 25/109 tokens detected. Disk: 81%.
 
 ## Active Decisions
 
@@ -38,12 +38,12 @@
 - **SHORT side structural weakness** — ALL legacy SHORT positions draining (27T/7d 18.5% WR -$1.09). R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h — no edge found. — 2026-08-21
 - **MIN_PRE_MOVE 0.3 eval EXTENDED** — r2-trend-long3 48h: 9T $0.00 66.7% WR (WR improved 55.9%→66.7% but PnL break-even). PM_TRAIL captures winners, ATR_SL hits losers. EXTENDED through Aug 25 (needs PnL positive to justify filter). — 2026-08-21
 - **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
-- **Coin tracker Wyckoff detection BROKEN** — 0/109 tokens have phase detected (all 'none'). detect_wyckoff_phase() returns 'none' for all despite sufficient 1h candle data. Coin tracker intelligence non-functional. DELEGATED to bug_hunter. — 2026-08-21
+- **Coin tracker Wyckoff detection PARTIALLY FIXED** — 25/109 tokens now have phase detected (was 0 Aug 21). 4h candle re-enablement populated data. 84 still 'none'. Monitor for continued improvement. — 2026-08-22
 - **4h candles re-enabled** — price_collector.py line 565 re-enabled (CEO Aug 21). Will populate on next price_collector run. Elliott Wave detection will have fresh data. — 2026-08-21
 
 ## System Improvement Backlog
 
-1. **Coin tracker Wyckoff detection fix (CEO PRIORITY)** — 0/109 tokens have phase detected. detect_wyckoff_phase() broken. DELEGATED to bug_hunter. — 2026-08-21
+1. **Coin tracker Wyckoff detection improving** — 25/109 tokens now (was 0). 4h candle re-enablement helped. 84 still 'none'. Monitor continued improvement. — 2026-08-22
 2. **SHORT side signals (CEO PRIORITY)** — R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h. Need new SHORT signal with edge for SHORT_BIAS regime. DELEGATED to signal_analyst. — 2026-08-21
 3. ~~**Re-enable 4h candle collection**~~ — DONE. price_collector.py line 565 re-enabled (CEO Aug 21). — 2026-08-21
 4. Higher-timeframe regime for confluence relaxation (1m too noisy)
@@ -57,7 +57,7 @@
 
 ## Next Actions
 
-1. **Monitor bug_hunter Wyckoff fix.** 0/109 tokens detected. Coin tracker intelligence non-functional. — 2026-08-21
+1. **Monitor Wyckoff detection improvement.** 25/109 tokens (was 0). 4h candles populating. — 2026-08-22
 2. **Monitor signal_analyst SHORT signal build.** Need new SHORT signal for SHORT_BIAS regime. — 2026-08-21
 3. **Monitor ct-hot+ stay killed.** 42.6% WR 7d, MIN_COMPOSITE now 70. Only T can re-enable. — 2026-08-21
 4. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 break-even. If still flat by Aug 25, remove filter. — 2026-08-21

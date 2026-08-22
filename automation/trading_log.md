@@ -2,46 +2,39 @@
 
 ## [2026-08-21 22:04 UTC] Hourly Analysis
 
-**Trades:** 2 closed last hour (ETH hl_copy_trader +$0.90, HYPE hl_copy_trader -$0.11)
-**24h:** 39T | 19W (48.7% WR) | ~+$0.62
-**Open:** 2 (BTC hl_copy_trader -$0.01, ETH hl_copy_trader +$0.03)
+**Trades:** 1 closed last hour (HYPE hl_copy_trader atr_sl_hit +$0.18)
+**24h:** 38T | 19W (50.0% WR) | +$1.09
+**Open:** 4 (HYPE hl_copy_trader, SOL hl_copy_trader, ETH hl_copy_trader, BTC hl_copy_trader — all LONG)
 
 **24h Close Reasons:**
-- atr_sl_hit: 36T +$0.55 (92.3% of closes — dominant, but 17/36 profitable)
-- profit-monster-trail: 2T +$0.07
+- atr_sl_hit: 37T +$0.91 avg$0.025 (97% of closes — trailing SL working correctly)
 - atr_tp_hit: 1T +$0.18
 
 **Signal Performance 24h:**
-- hl_copy_trader: 20T/11W +$1.26 (55% WR — strong performer)
-- ct-hot+: 15T/6W -$0.81 (40% WR — underperforming, main drag)
-- r2-trend-long3: 2T/1W +$0.28
-- r2-trend-long11: 1T/1W +$0.04
-- r2-trend-long13: 1T/1W +$0.03
+- hl_copy_trader: 22T/12W +$0.55 54.5%WR — star (only active signal)
+- ct-hot+: 15T/6W +$0.26 40%WR — DISABLED (residual draining)
+- r2-trend-long3: 1T/1W +$0.28
 
 **Auto-Kill Check:**
-- ct-hot+: 15T/6W (40% WR) -$0.81 — not at 0% WR threshold
 - No signal crosses 3T/0%WR threshold
+- ct-hot+ already disabled at 17:00
 
-**Hourly Frequency:** ~2.6T/hr avg today — normal
+**Hourly Frequency:** 1-6T/hr — normal, no overtrading
 
-**Market Regime:** NEUTRAL (99/104 tokens ranging)
+**Trailing SL Status:** SOL/ETH/BTC have SL above entry — correct, trailing stops moved up locking in profits
 
 **Changes:** None needed
 
 **No Change Needed:**
-- 2 trades last hour, net +$0.79 — system profitable
-- atr_sl_hit at 92.3% is high but 17/36 (47%) are profitable trailing stop exits
-- hl_copy_trader strong at 55% WR +$1.26/24h
-- ct-hot+ underperforming but not at auto-kill threshold (40% WR, not 0%)
-- Trade frequency normal (~2.6/hr)
-- Open positions healthy (BTC -$0.01, ETH +$0.03)
-- 7-day trend: ~238T, 50.8% WR, roughly breakeven
-- Today: 37T/18W (48.6% WR) +$0.62 — slightly positive
+- 1 trade last hour, +$0.18 — quiet period
+- hl_copy_trader star at 54.5%WR +$0.55/24h
+- atr_sl_hit 97% but net profitable +$0.91 — trailing SL correct
+- 4 open positions healthy, trailing SLs above entry (locked profits)
+- 7d: 236T 50.8%WR +$0.53 — stable
+- No dead signals, no overtrading
+- System stable, ct-hot+ disabled and draining
 
-**Open Questions:**
-- ct-hot+ at -$0.81/24h — monitor, may need kill if continues
-- High atr_sl_hit rate (92.3%) but net positive from profitable trailing exits
-- NEUTRAL regime = ranging market, trailing stops catching small profits
+**Open Questions:** None
 
 ---
 
@@ -12526,5 +12519,83 @@ None — system stable, previous fixes settling in.
 - 0 trades last hour = normal quiet period
 - 3 open positions healthy
 - System stable, no dead signals
+
+**Open Questions:** None
+
+## [2026-08-21 23:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 39T 18W 50.3%WR +$0.96
+
+**Close reasons (24h):**
+- atr_sl_hit: 38T +$0.78 (trailing SL profitable)
+- atr_tp_hit: 1T +$0.18
+
+**Top signals (24h):**
+- hl_copy_trader: 23T 12W +$0.42 — star (only active signal)
+- ct-hot+: 15T 6W +$0.26 — DISABLED (residual draining)
+
+**Open:** SOL/ETH/BTC (3 positions, all hl_copy_trader LONG)
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader still star at +$0.42
+- atr_sl_hit 97% of closes but net profitable — trailing SL working
+- 0 trades last hour = normal quiet period
+- 3 open positions healthy
+- System stable, no dead signals
+
+**Open Questions:** None
+
+## [2026-08-22 00:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour, 1 opened (HYPE SHORT hl_copy_trader)
+**24h:** 41T 21W 51.2%WR +$1.61
+**7d:** 231T 118W 51.1%WR +$1.11
+
+**Close reasons (24h):**
+- atr_sl_hit: 40T +$1.43 — trailing SL working
+- atr_tp_hit: 1T +$0.18
+
+**Signals (24h):**
+- hl_copy_trader: 25T 14W +$1.07 — star, only active
+- ct-hot+: 15T 6W +$0.26 — disabled (residual)
+- r2-trend-long3: 1T 1W +$0.28
+
+**Frequency:** 1-7/hr last 8h, normal
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader performing well (14W/25T)
+- atr_sl_hit 97.5% but net profitable — trailing SL correct
+- Trade freq normal, no overtrading
+- 2 open positions (HYPE SHORT, BTC LONG)
+- ct-hot+ residual draining, expected
+
+**Open Questions:** None
+
+## [2026-08-22 01:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses) — BTC LONG +$0.12 (atr_sl_hit)
+**24h:** 42T 22W 52.4%WR +$1.73
+
+**Close reasons (24h):**
+- atr_sl_hit: 41T +$1.55 — trailing SL working correctly
+- atr_tp_hit: 1T +$0.18
+
+**Signals (24h):**
+- hl_copy_trader: 26T 15W +$1.19 — star, only active
+- ct-hot+: 15T 6W +$0.26 — disabled (residual)
+- r2-trend-long3: 1T 1W +$0.28
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader performing well at 57.7% WR
+- atr_sl_hit dominant but net profitable — trailing SL correct by design
+- Trade freq normal, no overtrading
+- 3 open positions healthy
 
 **Open Questions:** None

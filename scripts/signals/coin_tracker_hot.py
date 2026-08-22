@@ -142,8 +142,8 @@ def detect(token, data):
     if regime == 'NEUTRAL':
         return None
 
-    # Primary trigger: health must be hot/ready (warm bypass killed — let weak setups through)
-    if health not in ('hot', 'ready'):
+    # Primary trigger: health must be hot/ready/warm (warm added 2026-08-21 — broadens signal flow)
+    if health not in ('hot', 'ready', 'warm'):
         return None
 
     # Must meet minimum composite threshold

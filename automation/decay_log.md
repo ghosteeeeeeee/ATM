@@ -602,3 +602,7 @@
 [2026-08-21 17:07 UTC]   🟢 ct-hot+: 14 trades, 42.9% WR, PnL=1.27
 [2026-08-21 17:07 UTC]   🟢 hl_copy_trader: 17 trades, 58.8% WR, PnL=6.98
 [2026-08-21 17:07 UTC] Done. Disabled 0 signals.
+[2026-08-21 23:07 UTC] === Signal Decay Detector ===
+[2026-08-21 23:07 UTC]   🟢 ct-hot+: 15 trades, 40.0% WR, PnL=0.15
+[2026-08-21 23:07 UTC]   🟢 hl_copy_trader: 23 trades, 52.2% WR, PnL=4.34
+[2026-08-21 23:07 UTC] Done. Disabled 0 signals.

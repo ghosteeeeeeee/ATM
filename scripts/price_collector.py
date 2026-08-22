@@ -185,11 +185,13 @@ def _seed_universe_candles(universe: list):
             cursor += 1
             continue  # Already fresh, skip
 
-        # Fetch 5m candles only (volume data for signals). Other TFs already
-        # populated by historical seeding — skip to avoid Binance API blocking.
-        candles = _fetch_binance_candles(token, '5m', 100)
-        if candles:
-            _store_candles(token, '5m', candles)
+        # Fetch 5m, 1h, 4h candles from Binance (volume data for Wyckoff/analysis).
+        # 1h/4h candles from price_history have volume=0 (no volume column).
+        # Binance candles have real volume, enabling Wyckoff climax detection.
+        for tf, limit in [('5m', 100), ('1h', 100), ('4h', 100)]:
+            candles = _fetch_binance_candles(token, tf, limit)
+            if candles:
+                _store_candles(token, tf, candles)
 
         seeded += 1
         cursor += 1

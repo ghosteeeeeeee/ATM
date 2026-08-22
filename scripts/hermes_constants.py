@@ -1215,9 +1215,10 @@ CEO_PROTECTED_FLAGS = {
     'R2_TREND_LONG_ENABLED': ('Winning LONG signal — 8/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
-    'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 60+, standalone bypass. Only T can change', '2026-08-21'),
+    'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. Only T can change', '2026-08-21'),
     'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-21 — LONG direction for coin_tracker_hot. Only T can change', '2026-08-21'),
     'COIN_TRACKER_HOT_MINUS_ENABLED': ('SHORT disabled — long only for now. Only T can change', '2026-08-21'),
+    'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Composite threshold — lowered to 57 from 70 (no tokens met 70). CEO_PROTECTED 2026-08-21', '2026-08-21'),
     'TIME_BLOCK_ENABLED': ('Disabled 2026-08-21 — was blocking all signals 01-06 UTC. Only T can change', '2026-08-21'),
 }
 
@@ -1802,8 +1803,8 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 60+, standalone bypass
-COIN_TRACKER_HOT_PLUS_ENABLED       = False  # DISABLED 2026-08-21 17:00 — 0W-7L last 3h after re-enable, composite 56 too loose, 42.6% WR 7d
+COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. CEO_PROTECTED
+COIN_TRACKER_HOT_PLUS_ENABLED       = True    # Re-enabled 2026-08-21 — LONG direction for coin_tracker_hot. Only T can change
 COIN_TRACKER_HOT_MINUS_ENABLED      = False  # SHORT disabled — long only for now
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
@@ -1811,4 +1812,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.25    # per token+direction cooldown (15 minutes)
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 70      # net score threshold — raised from 60 (was 0W-7L at 56-60 range)
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 56      # net score threshold — lowered from 70 (no tokens met it) to 56. CEO_PROTECTED

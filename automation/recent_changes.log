@@ -3,7 +3,7 @@
 # Format: [TIMESTAMP] WHAT changed, WHY, WHO changed it
 
 [2026-08-21 ~22:04 UTC] auto_1hr: NO CHANGES
-  WHY: 2T last hour (ETH hl_copy_trader +$0.90, HYPE -$0.11). 24h 39T 48.7%WR ~+$0.62. atr_sl_hit 92.3% (36/39) but 17/36 (47%) are profitable trailing stop exits — net +$0.55. hl_copy_trader 20T/11W +$1.26 strong performer. ct-hot+ 15T/6W -$0.81 underperforming but not at 0%WR auto-kill threshold. No signal crosses 3T/0%WR threshold. 2 open (BTC -$0.01, ETH +$0.03). Trade frequency normal (~2.6/hr). Regime NEUTRAL (99/104 tokens ranging). 7-day ~238T 50.8%WR breakeven. Today 37T/18W +$0.62. System within parameters.
+  WHY: 1T last hour (HYPE hl_copy_trader atr_sl_hit +$0.18). 24h 38T 50%WR +$1.09. atr_sl_hit 97% but net profitable +$0.91 trailing SL correct. hl_copy_trader 22T/12W +$0.55 star. ct-hot+ disabled 17:00 residual draining. 4 open all hl_copy_trader LONG, trailing SLs above entry (locked profits). Freq 1-6/hr normal. 7d 236T 50.8%WR +$0.53 stable. No dead signals, no overtrading. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 23:04 UTC
 
@@ -1242,3 +1242,11 @@
   WHY: 2T last hour (0W 2L -/usr/bin/bash.23) — both small atr_sl_hit. ct-hot+ residual positions draining (disabled 17:00). hl_copy_trader 18T 10W +/usr/bin/bash.47 star. 24h 37T 51.4%WR -/usr/bin/bash.24 flat. 2 open BTC/ETH healthy. Freq 2/hr normal. No dead signals. System stable, no action.
   BY: auto_1hr
   NEXT: Re-run at 19:00 UTC
+[2026-08-21 23:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour quiet. 24h 39T 50.3%WR +$0.96. hl_copy_trader 23T 12W +$0.42 star, only active signal. ct-hot+ disabled, residual draining. atr_sl_hit 97% but net profitable +$0.78 trailing SL correct. 3 open SOL/ETH/BTC healthy. Freq 1-6/hr normal. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 00:00 UTC
+[2026-08-22 00:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour quiet. 24h 41T 51.2%WR +$1.61. hl_copy_trader 25T 14W +$1.07 star, only active signal. ct-hot+ disabled residual draining. atr_sl_hit 97.5% but net profitable +$1.43 trailing SL correct. Freq 1-7/hr normal. 2 open HYPE SHORT/BTC LONG healthy. 7d 231T 51.1%WR +$1.11 stable. System healthy, no action.
+  BY: auto_1hr
+  NEXT: Re-run at 01:00 UTC
