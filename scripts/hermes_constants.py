@@ -1772,6 +1772,15 @@ STOP_HUNT_REVERSAL_LONG_STRONG_REVERSAL = 0.01       # >1% reversal body = extra
 STOP_HUNT_REVERSAL_LONG_COOLDOWN_HOURS = 2           # per token+direction cooldown
 STOP_HUNT_REVERSAL_LONG_TREND_SLOPE_MIN = 0.0        # min 1m slope over last 30 candles — block LONG when slope < 0 (downtrend)
 STOP_HUNT_REVERSAL_LONG_TREND_WINDOW = 30            # candles for linear regression slope check — 30 balances responsiveness vs noise (20 filters valid reversals, 50 too sluggish)
+
+# ── Liquidation Map / Stop Hunt Detection (liquidation_map.py + signals/liquidation_hunt.py) ──
+STOP_HUNT_DISTANCE_PCT = 2.0                 # max distance (%) from price to cluster to trigger signal
+STOP_HUNT_MIN_CLUSTER_USD = 5000             # minimum cluster notional value ($) to matter
+STOP_HUNT_MIN_SCORE = 30                     # minimum composite score (0-100) to fire signal
+LIQ_MAP_SCAN_INTERVAL = 300                  # seconds between full liquidation map scans (5 min)
+LIQ_MAP_MAX_WALLETS = 200                    # cap wallet universe to avoid rate limits
+LIQ_MAP_BIN_PCT = 0.005                      # liquidation bin size as fraction of price (0.5%)
+
 CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',

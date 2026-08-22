@@ -12789,3 +12789,19 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 
 **Open Questions:**
 - None
+
+## [2026-08-22 08:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1 wins, 2 losses)
+**PnL:** -$0.09 (WR: 33.3%)
+**24h:** 67T 33W 49.3% +$0.65 | hl_copy_trader 33T 20W +$4.87 star
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader dominant, performing well
+- atr_sl_hit 88% of closes, net -$0.41/24h — SLs appropriate
+- Trade freq 3/hr normal
+- No kill criteria triggered
+
+**Open Questions:** None

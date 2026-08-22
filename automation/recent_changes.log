@@ -1274,3 +1274,7 @@
   WHY: 3T last hour (3W 0L +$0.07) all hl_copy_trader. 24h 64T 32W 50%WR +$1.36. hl_copy_trader 33T 20W 60.6% +$4.87 star. ct-hot+ 31T 12W 38.7% -$3.51 losing but CEO_PROTECTED (composite=57). atr_sl_hit 89% net profitable +$1.19 trailing SL correct. Freq 3/hr normal. 5 open healthy. System stable, no action.
   BY: auto_1hr
   NEXT: Re-run at 08:00 UTC
+[2026-08-22 08:00 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.09) hl_copy_trader HYPE/WLFI. 24h 67T 33W 49.3%WR +$0.65. hl_copy_trader 33T 20W +$4.87 star. atr_sl_hit 88% net -$0.41 trailing SL correct. Freq 3/hr normal. System stable, no action.
+  BY: auto_1hr
+  NEXT: Re-run at 09:00 UTC
