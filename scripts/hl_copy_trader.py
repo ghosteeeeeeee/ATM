@@ -115,39 +115,47 @@ def run_once():
     print(f"\n{'='*60}")
     print(f"[{datetime.now().strftime('%H:%M:%S')}] Running copy trading cycle")
     print('='*60)
-    
-    # Step 1: Monitor fills from tracked traders
-    print("\n[1/5] Monitoring fills...")
+
+    # Step 1: Monitor fills from top 20 traders (real-time, fast)
+    print("\n[1/6] Monitoring top traders (real-time)...")
     new_fills = monitor_once()
-    
+
     if new_fills:
         print(f"  Found {len(new_fills)} new fills")
     else:
         print("  No new fills")
-    
+
     # Step 1b: Check for trader exits to close our copy trades
-    print("\n[1b/5] Checking for trader exits...")
+    print("\n[1b/6] Checking for trader exits...")
     check_trader_exits(new_fills)
-    
+
     # Step 1c: Sync trader_performance with closed trades
-    print("\n[1c/5] Syncing trader performance...")
+    print("\n[1c/6] Syncing trader performance...")
     from hl_fill_monitor import sync_trader_performance
     synced = sync_trader_performance()
     if synced:
         print(f"  Synced {synced} records")
     else:
         print("  All up to date")
-    
-    # Step 1d: Refresh leaderboard (every 6 hours)
+
+    # Step 1d: Bulk scan ALL traders (every 5 min — full picture)
+    print("\n[1d/6] Bulk scan (all traders, every 5 min)...")
+    from hl_fill_monitor import bulk_scan_all_traders, get_bulk_scan
+    bulk = bulk_scan_all_traders()
+    bulk_traders = len([k for k in bulk if not k.startswith('_')])
+    bulk_errors = bulk.get('_meta', {}).get('errors', 0)
+    print(f"  Scanned {bulk_traders} traders, {bulk_errors} errors")
+
+    # Step 1e: Refresh leaderboard (every 6 hours)
     last_leaderboard_file = os.path.join(HERMES_DATA, 'hl_copy_last_leaderboard.txt')
     try:
         with open(last_leaderboard_file) as f:
             last_leaderboard = int(f.read().strip())
     except (FileNotFoundError, ValueError, OSError):
         last_leaderboard = 0
-    
+
     if time.time() - last_leaderboard > LEADERBOARD_REFRESH_INTERVAL:
-        print("\n[1d/5] Refreshing leaderboard...")
+        print("\n[1e/6] Refreshing leaderboard...")
         try:
             traders = scan_leaderboard()
             print(f"  Scanned {len(traders)} traders")
@@ -157,26 +165,26 @@ def run_once():
             print(f"  Leaderboard refresh failed: {e}")
     else:
         remaining = int((LEADERBOARD_REFRESH_INTERVAL - (time.time() - last_leaderboard)) / 60)
-        print(f"\n[1d/5] Leaderboard refresh in {remaining}m")
-    
+        print(f"\n[1e/6] Leaderboard refresh in {remaining}m")
+
     # Step 2: Check for pro trader signals
-    print("\n[2/5] Checking for pro trader signals...")
+    print("\n[2/6] Checking for pro trader signals...")
     signals = check_for_signals()
-    
+
     if signals:
         print(f"  🚨 {len(signals)} signal(s) fired!")
     else:
         print("  No new pro trader signals")
-    
+
     # Step 3: Generate pipeline signals from pro trades
-    print("\n[3/5] Generating pipeline signals...")
+    print("\n[3/6] Generating pipeline signals...")
     pipeline_signals = run_hl_copy_signal()
-    
+
     if pipeline_signals:
         print(f"  📊 {len(pipeline_signals)} signal(s) written to pipeline")
     else:
         print("  No new pipeline signals")
-    
+
     # Step 4: Generate report (every hour)
     last_report_file = os.path.join(HERMES_DATA, 'hl_copy_last_report.txt')
     try:
@@ -184,20 +192,21 @@ def run_once():
             last_report = int(f.read().strip())
     except (FileNotFoundError, ValueError, OSError):
         last_report = 0
-    
+
     if time.time() - last_report > REPORT_INTERVAL:
-        print("\n[4/5] Generating report...")
+        print("\n[4/6] Generating report...")
         generate_report()
         with open(last_report_file, 'w') as f:
             f.write(str(int(time.time())))
     else:
-        print(f"\n[4/5] Report next in {int((REPORT_INTERVAL - (time.time() - last_report)) / 60)}m")
-    
+        print(f"\n[4/6] Report next in {int((REPORT_INTERVAL - (time.time() - last_report)) / 60)}m")
+
     # Step 5: Summary
-    print("\n[5/5] Summary:")
+    print("\n[5/6] Summary:")
     active = get_active_traders()
-    print(f"  Active traders: {len(active)}")
-    
+    print(f"  Real-time traders: {len(active)} (top by score)")
+    print(f"  Bulk scan traders: {bulk_traders} (all, every 5 min)")
+
     # Get today's stats
     conn = get_db()
     try:
@@ -207,7 +216,7 @@ def run_once():
         ).fetchone()
     finally:
         conn.close()
-    
+
     print(f"  Today's fills: {today['cnt']}")
     print(f"  Today's PnL: ${today['pnl']:.2f}" if today['pnl'] else "  Today's PnL: $0.00")
 
