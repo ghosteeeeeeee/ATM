@@ -1863,3 +1863,7 @@ COIN_TRACKER_HOT_MIN_COMPOSITE      = 57      # net score threshold — lowered 
 COIN_TRACKER_HOT_MIN_MACD_PCT      = -0.00005 # MACD histogram as % of price must be > this for LONG (avoids bearish entries)
 COIN_TRACKER_HOT_MAX_Z_SCORE        = 1.2      # Z-score must be < this for LONG (avoids overbought entries — tightened from 1.8)
 COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.75     # BB position must be < this for LONG (avoids upper band entries — tightened from 0.85)
+# Speed & acceleration filters — prevent chasing extremes (added 2026-08-22)
+COIN_TRACKER_HOT_MIN_SPEED_PCT      = 30       # Speed percentile must be > this (avoid catching falling knives)
+COIN_TRACKER_HOT_MAX_SPEED_PCT      = 85       # Speed percentile must be < this (avoid chasing pumps)
+COIN_TRACKER_HOT_MIN_ACCEL          = -0.01    # Price acceleration must be > this (avoid decelerating entries)

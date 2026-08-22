@@ -29,6 +29,9 @@ from hermes_constants import (
     COIN_TRACKER_HOT_MIN_MACD_PCT,
     COIN_TRACKER_HOT_MAX_Z_SCORE,
     COIN_TRACKER_HOT_MAX_BB_POSITION,
+    COIN_TRACKER_HOT_MIN_SPEED_PCT,
+    COIN_TRACKER_HOT_MAX_SPEED_PCT,
+    COIN_TRACKER_HOT_MIN_ACCEL,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -204,6 +207,8 @@ def detect(token, data):
         macd_hist = indicators.get('macd_hist')
         z_score = indicators.get('z_score')
         bb_position = indicators.get('bb_position')
+        speed_pct = indicators.get('speed_percentile')
+        price_accel = indicators.get('price_acceleration')
         price = _get_price(token)
 
         if direction == 'LONG':
@@ -216,6 +221,15 @@ def detect(token, data):
                 return None  # Price extended above mean — overbought
             if bb_position is not None and bb_position > COIN_TRACKER_HOT_MAX_BB_POSITION:
                 return None  # Near upper Bollinger Band — overbought
+            # Speed filter — avoid chasing extremes (added 2026-08-22)
+            if speed_pct is not None:
+                if speed_pct < COIN_TRACKER_HOT_MIN_SPEED_PCT:
+                    return None  # Too slow — catching falling knife
+                if speed_pct > COIN_TRACKER_HOT_MAX_SPEED_PCT:
+                    return None  # Too fast — chasing pump
+            # Acceleration filter — avoid decelerating entries (added 2026-08-22)
+            if price_accel is not None and price_accel < COIN_TRACKER_HOT_MIN_ACCEL:
+                return None  # Momentum decelerating — don't enter
         elif direction == 'SHORT':
             # For SHORT: MACD must not be too positive (bullish), Z-score not too low, BB not oversold
             if macd_hist is not None and price and price > 0:
@@ -226,6 +240,15 @@ def detect(token, data):
                 return None  # Price extended below mean — oversold
             if bb_position is not None and bb_position < (1 - COIN_TRACKER_HOT_MAX_BB_POSITION):
                 return None  # Near lower Bollinger Band — oversold
+            # Speed filter — avoid chasing extremes (added 2026-08-22)
+            if speed_pct is not None:
+                if speed_pct > (100 - COIN_TRACKER_HOT_MIN_SPEED_PCT):
+                    return None  # Too fast for SHORT — avoid squeezing
+                if speed_pct < (100 - COIN_TRACKER_HOT_MAX_SPEED_PCT):
+                    return None  # Too slow for SHORT — momentum dead
+            # Acceleration filter — avoid decelerating entries (added 2026-08-22)
+            if price_accel is not None and price_accel > -COIN_TRACKER_HOT_MIN_ACCEL:
+                return None  # Momentum accelerating up — don't short
 
     # Compute confidence from composite + bonuses
     conf = COIN_TRACKER_HOT_CONF_BASE

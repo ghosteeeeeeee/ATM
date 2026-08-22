@@ -189,6 +189,109 @@ def get_active_traders() -> list:
     finally:
         conn.close()
 
+
+def get_all_active_traders() -> list:
+    """Get ALL active traders (no limit) for bulk scans."""
+    conn = get_db()
+    try:
+        traders = conn.execute(
+            "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY score DESC"
+        ).fetchall()
+        return [{'wallet': t['wallet'], 'score': t['score']} for t in traders]
+    finally:
+        conn.close()
+
+
+BULK_SCAN_FILE = os.path.join(HERMES_DATA, 'hl_copy_bulk_scan.json')
+BULK_SCAN_INTERVAL = 300  # 5 minutes
+
+
+def bulk_scan_all_traders() -> dict:
+    """Bulk scan ALL traders with rate limiting — runs every 5 minutes.
+
+    Uses 0.5s delay between API calls to stay within HL rate limits.
+    268 traders × 2 calls × 0.5s = ~268s (~4.5 min) — fits in 5 min window.
+
+    Returns: {wallet: {fills: [...], positions: [...], last_scan: timestamp}}
+    """
+    # Check if we scanned recently
+    try:
+        if os.path.exists(BULK_SCAN_FILE):
+            with open(BULK_SCAN_FILE) as f:
+                cached = json.load(f)
+            last_scan = cached.get('_meta', {}).get('last_scan', 0)
+            if time.time() - last_scan < BULK_SCAN_INTERVAL:
+                return cached  # skip — scanned recently
+    except (json.JSONDecodeError, OSError):
+        cached = {}
+
+    all_traders = get_all_active_traders()
+    print(f"[bulk_scan] Scanning {len(all_traders)} traders (0.5s delay between calls)...")
+
+    result = {'_meta': {'last_scan': time.time(), 'trader_count': len(all_traders)}}
+    errors = 0
+
+    for i, trader in enumerate(all_traders):
+        wallet = trader['wallet']
+
+        # Get fills
+        fills = _hl_info({"type": "userFills", "user": wallet})
+        if fills is None:
+            errors += 1
+            time.sleep(0.5)
+            continue
+
+        # Get positions
+        positions = _hl_info({"type": "clearinghouseState", "user": wallet})
+        pos_list = []
+        if positions and isinstance(positions, dict):
+            for p in positions.get('assetPositions', []):
+                pos = p.get('position', {})
+                sz = float(pos.get('szi', 0))
+                if sz != 0:
+                    pos_list.append({
+                        'coin': pos.get('coin', ''),
+                        'size': sz,
+                        'entry': float(pos.get('entryPx', 0)),
+                        'upl': float(pos.get('unrealizedPnl', 0)),
+                    })
+
+        result[wallet] = {
+            'score': trader['score'],
+            'recent_fills': fills[:10] if fills else [],  # last 10 fills
+            'positions': pos_list,
+        }
+
+        # Rate limit: 0.5s between calls
+        time.sleep(0.5)
+
+        # Progress every 50 traders
+        if (i + 1) % 50 == 0:
+            print(f"[bulk_scan] Progress: {i + 1}/{len(all_traders)} traders scanned")
+
+    # Save atomically
+    result['_meta']['last_scan'] = time.time()
+    result['_meta']['errors'] = errors
+    tmp = BULK_SCAN_FILE + '.tmp'
+    try:
+        with open(tmp, 'w') as f:
+            json.dump(result, f)
+        os.replace(tmp, BULK_SCAN_FILE)
+    except Exception as e:
+        print(f"[bulk_scan] Error saving: {e}")
+
+    print(f"[bulk_scan] Done: {len(all_traders)} traders, {errors} errors")
+    return result
+
+
+def get_bulk_scan() -> dict:
+    """Get cached bulk scan data (no API calls)."""
+    try:
+        with open(BULK_SCAN_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+
 def monitor_once() -> list:
     """Run one monitoring cycle. Returns list of new fills."""
     last_fills = load_last_fills()

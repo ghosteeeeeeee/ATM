@@ -1,165 +1,232 @@
 #!/usr/bin/env python3
 """
-Signal: Liquidation Stop Hunt
+liquidation_hunt — Contrarian signal from Hyperliquid liquidation clusters.
 
-Fires when:
-1. Price approaches a liquidation cluster from tracked wallets
-2. Order book shows thin liquidity on the hunt side
-3. Funding rate confirms crowded trade direction
+Thesis: When price approaches a cluster of liquidation levels (forced stops),
+a cascade is imminent. We front-run the cascade by entering CONTRARIAN to the
+hunt direction. If longs are about to get liquidated (price dropping toward
+their liq levels), we go LONG just above the cluster — the cascade of forced
+selling provides our liquidity, and the snap-back after cascade is our profit.
 
-Entry: Before the cascade (front-run the stop hunt)
-Exit: After cascade completes (cluster is consumed)
-
-This is a CONTRARIAN signal — we trade INTO the stop hunt, not with it.
+Data source: liquidation_clusters.json (built by liquidation_map.py every 5min)
 """
-
-import json
-import os
-import sys
-import time
-from pathlib import Path
+import sys, os, json, time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from paths import *
+from signal_schema import add_signal, get_cooldown, set_cooldown
+from paths import HERMES_DATA
 
 from hermes_constants import (
+    LIQUIDATION_HUNT_ENABLED,
+    LIQUIDATION_HUNT_PLUS_ENABLED,
+    LIQUIDATION_HUNT_MINUS_ENABLED,
+    LIQUIDATION_HUNT_COOLDOWN_HOURS,
+    LIQUIDATION_HUNT_MIN_CLUSTER_USD,
+    LIQUIDATION_HUNT_MIN_SCORE,
     STOP_HUNT_DISTANCE_PCT,
     STOP_HUNT_MIN_CLUSTER_USD,
     STOP_HUNT_MIN_SCORE,
+    LONG_BLACKLIST,
+    SHORT_BLACKLIST,
 )
 
-try:
-    LIQ_CLUSTERS_FILE = os.path.join(HERMES_DATA, "liquidation_clusters.json")
-except NameError:
-    LIQ_CLUSTERS_FILE = "/root/.hermes/data/liquidation_clusters.json"
+SIGNAL_TYPE_LONG  = 'liquidation_hunt_long'
+SIGNAL_TYPE_SHORT = 'liquidation_hunt_short'
+SOURCE_LONG       = 'liq-hunt+'
+SOURCE_SHORT      = 'liq-hunt-'
+
+_LIQ_CLUSTERS_FILE = os.path.join(HERMES_DATA, 'liquidation_clusters.json')
 
 
-def load_liquidation_data():
-    """Load latest liquidation cluster data."""
+def _load_liquidation_data():
+    """Load latest liquidation cluster data. Returns dict or empty dict."""
     try:
-        with open(LIQ_CLUSTERS_FILE) as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return None
+        with open(_LIQ_CLUSTERS_FILE) as f:
+            data = json.load(f)
+        # Check freshness — data older than 15 min is stale
+        age = time.time() - data.get('timestamp', 0)
+        if age > 900:
+            print(f'[liq_hunt] Data stale ({age/60:.0f}min old), skipping')
+            return {}
+        return data
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
 
 
-def get_signal(token: str, timeframe: str, **kwargs) -> list:
+def detect(token, data):
     """
-    Check for liquidation stop hunt opportunity for a token.
+    Check if token has a liquidation hunt opportunity.
 
-    Returns signal dict if conditions are met, None otherwise.
+    Returns {direction, confidence, value, price, notes} or None.
     """
-    data = load_liquidation_data()
-    if not data:
-        return []
-
     token_upper = token.upper()
-    clusters = data.get("liquidation_clusters", {}).get(token_upper, [])
-    stop_hunts = data.get("stop_hunt_signals", [])
 
-    # Check if there's a stop hunt signal for this token
+    # Check stop hunt signals
+    stop_hunts = data.get('stop_hunt_signals', [])
     hunt = None
     for sh in stop_hunts:
-        if sh["coin"] == token_upper:
+        if sh['coin'] == token_upper:
             hunt = sh
             break
 
     if not hunt:
-        return []
+        return None
 
-    # Filter by our thresholds
-    if hunt["score"] < STOP_HUNT_MIN_SCORE:
-        return []
-    if hunt["cluster_size_usd"] < STOP_HUNT_MIN_CLUSTER_USD:
-        return []
-    if abs(hunt["distance_pct"]) > STOP_HUNT_DISTANCE_PCT:
-        return []
+    # Filter by thresholds
+    if hunt['score'] < STOP_HUNT_MIN_SCORE:
+        return None
+    if hunt['cluster_size_usd'] < STOP_HUNT_MIN_CLUSTER_USD:
+        return None
+    if abs(hunt['distance_pct']) > STOP_HUNT_DISTANCE_PCT:
+        return None
 
-    # The signal: trade OPPOSITE to the hunt direction
-    # If hunt is DOWN (longs getting liquidated) → go LONG (contrarian)
-    # If hunt is UP (shorts getting liquidated) → go SHORT (contrarian)
-    if hunt["hunt_direction"] == "DOWN":
-        direction = "LONG"
-        entry_zone = hunt["cluster_price"] * 1.002  # Just above cluster
-        stop_loss = hunt["cluster_price"] * 0.985   # Below cluster
-        take_profit = hunt["current_price"] * 1.015  # Back to current + 1.5%
+    # Determine direction — CONTRARIAN to hunt
+    # If hunt is DOWN (longs getting liquidated) → go LONG (front-run cascade)
+    # If hunt is UP (shorts getting liquidated) → go SHORT
+    if hunt['hunt_direction'] == 'DOWN':
+        direction = 'LONG'
+        entry_zone = hunt['cluster_price'] * 1.002
+        stop_loss = hunt['cluster_price'] * 0.985
+        take_profit = hunt['current_price'] * 1.015
+    elif hunt['hunt_direction'] == 'UP':
+        direction = 'SHORT'
+        entry_zone = hunt['cluster_price'] * 0.998
+        stop_loss = hunt['cluster_price'] * 1.015
+        take_profit = hunt['current_price'] * 0.985
     else:
-        direction = "SHORT"
-        entry_zone = hunt["cluster_price"] * 0.998  # Just below cluster
-        stop_loss = hunt["cluster_price"] * 1.015   # Above cluster
-        take_profit = hunt["current_price"] * 0.985  # Back to current - 1.5%
+        return None
 
-    # Compute confidence from multiple factors
-    base_conf = min(0.8, hunt["score"] / 100)
-    book_bonus = 0.1 if hunt.get("book_thin") else 0
-    cluster_bonus = min(0.1, hunt["cluster_size_usd"] / 200000)
-    confidence = round(base_conf + book_bonus + cluster_bonus, 2)
+    # Compute confidence (50-88 range)
+    base_conf = min(85, 50 + hunt['score'] * 0.4)
+    book_bonus = 5 if hunt.get('book_thin') else 0
+    cluster_bonus = min(10, hunt['cluster_size_usd'] / 100000)
+    confidence = round(min(88, base_conf + book_bonus + cluster_bonus))
 
-    return [{
-        "token": token_upper,
-        "signal_name": "liquidation_hunt",
-        "direction": direction,
-        "timeframe": timeframe,
-        "confidence": confidence,
-        "value": hunt["score"],
-        "price": hunt["current_price"],
-        "exchange": "hyperliquid",
-        "notes": (
-            f"Stop hunt {hunt['signal']}: {hunt['hunt_direction']} "
-            f"cluster ${hunt['cluster_price']:.4f} "
-            f"({hunt['distance_pct']:+.2f}%) "
-            f"size=${hunt['cluster_size_usd']:,.0f} "
-            f"({hunt['position_count']} positions, "
-            f"max {hunt['max_leverage']}x leveraged) "
-            f"book_thin={hunt.get('book_thin', False)} "
-            f"imbalance={hunt.get('imbalance_ratio', 0):.2f}"
-        ),
-        "metadata": {
-            "cluster_price": hunt["cluster_price"],
-            "distance_pct": hunt["distance_pct"],
-            "cluster_size_usd": hunt["cluster_size_usd"],
-            "position_count": hunt["position_count"],
-            "max_leverage": hunt["max_leverage"],
-            "hunt_direction": hunt["hunt_direction"],
-            "book_thin": hunt.get("book_thin", False),
-            "imbalance_ratio": hunt.get("imbalance_ratio", 1.0),
-            "entry_zone": entry_zone,
-            "stop_loss": stop_loss,
-            "take_profit": take_profit,
-            "risk_reward": round(abs(take_profit - entry_zone) /
-                                 max(abs(entry_zone - stop_loss), 0.001), 2),
+    # Risk/reward
+    rr = round(abs(take_profit - entry_zone) / max(abs(entry_zone - stop_loss), 0.001), 2)
+
+    notes = (
+        f"Stop hunt {hunt['signal']}: {hunt['hunt_direction']} "
+        f"cluster ${hunt['cluster_price']:.4f} ({hunt['distance_pct']:+.2f}%) "
+        f"size=${hunt['cluster_size_usd']:,.0f} "
+        f"({hunt['position_count']} positions, max {hunt['max_leverage']}x) "
+        f"book_thin={hunt.get('book_thin', False)} RR={rr}"
+    )
+
+    return {
+        'direction': direction,
+        'confidence': confidence,
+        'value': hunt['score'],
+        'price': hunt['current_price'],
+        'notes': notes,
+        'metadata': {
+            'cluster_price': hunt['cluster_price'],
+            'distance_pct': hunt['distance_pct'],
+            'cluster_size_usd': hunt['cluster_size_usd'],
+            'position_count': hunt['position_count'],
+            'max_leverage': hunt['max_leverage'],
+            'hunt_direction': hunt['hunt_direction'],
+            'book_thin': hunt.get('book_thin', False),
+            'imbalance_ratio': hunt.get('imbalance_ratio', 1.0),
+            'entry_zone': entry_zone,
+            'stop_loss': stop_loss,
+            'take_profit': take_profit,
+            'risk_reward': rr,
         },
-    }]
+    }
+
+
+def scan_signals():
+    """Scan all tradeable tokens for liquidation hunt opportunities."""
+    data = _load_liquidation_data()
+    if not data:
+        return 0
+
+    # Import token list
+    from tokens import get_all_tradeable_tokens
+    tokens = get_all_tradeable_tokens()
+
+    added = 0
+    for token in tokens:
+        token_upper = token.upper()
+
+        sig = detect(token, data)
+        if not sig:
+            continue
+
+        direction = sig['direction']
+
+        # Layer 1: per-direction kill-switch
+        if direction == 'LONG' and not LIQUIDATION_HUNT_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not LIQUIDATION_HUNT_MINUS_ENABLED:
+            continue
+
+        # Layer 1: blacklists
+        if direction == 'LONG' and token_upper in LONG_BLACKLIST:
+            continue
+        if direction == 'SHORT' and token_upper in SHORT_BLACKLIST:
+            continue
+
+        # Cooldown
+        if get_cooldown(token_upper, direction=direction):
+            continue
+
+        sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
+        source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+
+        sid = add_signal(
+            token=token_upper,
+            direction=direction,
+            signal_type=sig_type,
+            source=source,
+            confidence=sig['confidence'],
+            value=sig.get('value'),
+            price=sig['price'],
+            exchange='hyperliquid',
+            timeframe='15m',
+            z_score=None,
+        )
+        if sid:
+            added += 1
+            set_cooldown(token_upper, direction, hours=LIQUIDATION_HUNT_COOLDOWN_HOURS)
+            print(f'[liq_hunt] {token_upper} {direction} conf={sig["confidence"]} '
+                  f'cluster=${sig["metadata"]["cluster_price"]:.4f} '
+                  f'({sig["metadata"]["distance_pct"]:+.2f}%) '
+                  f'RR={sig["metadata"]["risk_reward"]}')
+
+    return added
+
+
+def run():
+    """Entry point for signals_runner."""
+    return scan_signals()
 
 
 # ─── Standalone Test ─────────────────────────────────────────────────────────
 
-if __name__ == "__main__":
-    data = load_liquidation_data()
-    if not data:
-        print("No liquidation data found. Run liquidation_map.py first.")
-        sys.exit(1)
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Liquidation Hunt Signal')
+    parser.add_argument('--query', help='Query a specific token')
+    args = parser.parse_args()
 
-    print(f"Liquidation data age: {time.time() - data.get('timestamp', 0):.0f}s")
-    print(f"Total liq exposure: ${data.get('total_liquidation_exposure_usd', 0):,.0f}")
-    print()
+    if args.query:
+        data = _load_liquidation_data()
+        if not data:
+            print('No liquidation data. Run liquidation_map.py first.')
+            sys.exit(1)
 
-    # Check all coins we trade
-    signals = []
-    from tokens import get_tradeable_tokens
-    for token in get_tradeable_tokens():
-        sigs = get_signal(token, "15m")
-        signals.extend(sigs)
-
-    if signals:
-        print(f"🚨 Found {len(signals)} liquidation hunt signals:")
-        for sig in sorted(signals, key=lambda x: x["confidence"], reverse=True):
-            m = sig["metadata"]
-            print(f"  {sig['direction']:5} {sig['token']:8} "
-                  f"conf={sig['confidence']:.2f} "
-                  f"cluster=${m['cluster_price']:.4f} "
-                  f"({m['distance_pct']:+.2f}%) "
-                  f"RR={m['risk_reward']:.1f} "
-                  f"size=${m['cluster_size_usd']:,.0f}")
+        sig = detect(args.query, data)
+        if sig:
+            m = sig['metadata']
+            print(f'{sig["direction"]} {args.query.upper()} conf={sig["confidence"]}')
+            print(f'  cluster=${m["cluster_price"]:.4f} ({m["distance_pct"]:+.2f}%)')
+            print(f'  entry=${m["entry_zone"]:.4f} SL=${m["stop_loss"]:.4f} TP=${m["take_profit"]:.4f}')
+            print(f'  RR={m["risk_reward"]} score={sig["value"]}')
+            print(f'  {sig["notes"]}')
+        else:
+            print(f'No signal for {args.query.upper()}')
     else:
-        print("No liquidation hunt signals at this time.")
+        count = scan_signals()
+        print(f'\n[liq_hunt] Added {count} signals')
