@@ -222,6 +222,8 @@ def find_liquidation_clusters(positions: list, current_price: float,
     for cluster in clusters[:30]:
         price = cluster["price"]
         dist = (price - current_price) / current_price
+        # Dominant side = whichever has more size in this bin
+        dominant = "LONG" if cluster["long_size"] >= cluster["short_size"] else "SHORT"
         result.append({
             "price": round(price, 6),
             "distance_pct": round(dist * 100, 3),
@@ -231,6 +233,9 @@ def find_liquidation_clusters(positions: list, current_price: float,
             "wallets": cluster["wallets"][:10],
             "total_notional_usd": round(cluster["total_notional"], 2),
             "zone_type": "LIQUIDATION" if abs(dist) > 0.001 else "AT_MARK",
+            "side": dominant,
+            "long_size": round(cluster["long_size"], 4),
+            "short_size": round(cluster["short_size"], 4),
         })
 
     return result
