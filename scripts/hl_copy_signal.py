@@ -244,6 +244,12 @@ def run_hl_copy_signal():
     # Defense-in-depth: skip signals for tokens already open
     open_tokens = _get_open_hl_tokens()
 
+    # Cluster filter: minimum traders required to fire signal
+    try:
+        from hermes_constants import HL_COPY_CLUSTER_MIN_SIZE
+    except ImportError:
+        HL_COPY_CLUSTER_MIN_SIZE = 3  # default: require 3+ traders
+
     signals = []
     for trade in trades:
         # Skip if too many signals (avoid noise)
@@ -255,8 +261,13 @@ def run_hl_copy_signal():
             print(f"[hl_signal] SKIP {trade['coin']} — already has open position")
             continue
 
-        # Generate signal (pass cluster_size for confidence/size bonus)
+        # Cluster filter: require minimum number of traders agreeing
         cluster_size = trade.get('cluster_size', 1)
+        if cluster_size < HL_COPY_CLUSTER_MIN_SIZE:
+            print(f"[hl_signal] SKIP {trade['coin']} {trade['side']} — cluster={cluster_size} < {HL_COPY_CLUSTER_MIN_SIZE}")
+            continue
+
+        # Generate signal (pass cluster_size for confidence/size bonus)
         signal = generate_hl_signal(trade, trade['score'], cluster_size=cluster_size)
         if cluster_size > 1:
             print(f"[hl_signal] 🔥 CLUSTER: {trade['coin']} {trade['side']} — {cluster_size} traders agree")
