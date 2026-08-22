@@ -291,14 +291,6 @@ def score_liquidation(price, liq_data):
     if not price or price <= 0 or not liq_data:
         return 50.0
 
-    # Check for active stop hunt signal
-    stop_hunts = liq_data.get('stop_hunt_signals', [])
-    for sh in stop_hunts:
-        if sh.get('coin', '').upper() == '':
-            continue
-        # We'll match by caller — this function receives pre-filtered data
-        break
-
     # Get clusters for this coin (pre-filtered by caller)
     clusters = liq_data.get('_coin_clusters', [])
 
@@ -313,7 +305,7 @@ def score_liquidation(price, liq_data):
     if liq_data.get('_has_stop_hunt'):
         score = 95.0
         # Bonus for cluster size
-        size_bonus = min(5, nearest.get('total_notional_usd', 0) / 500_000_000)
+        size_bonus = min(5, (nearest.get('total_notional_usd') or 0) / 500_000_000)
         score += size_bonus
         return min(100, score)
 
@@ -330,7 +322,7 @@ def score_liquidation(price, liq_data):
         score = 45.0
 
     # Cluster size bonus (bigger cluster = more energy)
-    size = nearest.get('total_notional_usd', 0)
+    size = nearest.get('total_notional_usd') or 0
     if size > 1_000_000_000:
         score += 8  # Massive cluster
     elif size > 500_000_000:
@@ -339,14 +331,14 @@ def score_liquidation(price, liq_data):
         score += 3
 
     # High leverage bonus (more forced selling = bigger cascade)
-    max_lev = nearest.get('max_leverage', 0)
+    max_lev = nearest.get('max_leverage') or 0
     if max_lev >= 40:
         score += 3
     elif max_lev >= 20:
         score += 2
 
     # Order book imbalance bonus
-    imbalance = liq_data.get('_imbalance', 1.0)
+    imbalance = liq_data.get('_imbalance') or 1.0
     if imbalance > 3.0:
         score += 3  # Heavy bid imbalance = support forming
     elif imbalance < 0.33:

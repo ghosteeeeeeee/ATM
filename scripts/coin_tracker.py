@@ -147,7 +147,8 @@ def collect():
         with open(liq_path) as f:
             liq_data = json.load(f)
         # Check freshness (older than 15 min = stale)
-        if time.time() - liq_data.get('timestamp', 0) > 900:
+        ts = liq_data.get('timestamp') or 0
+        if time.time() - ts > 900:
             liq_data = {}  # stale, ignore
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         pass  # no liquidation data yet — fine
@@ -360,7 +361,7 @@ def collect():
                 coin_liq = {
                     '_coin_clusters': liq_clusters,
                     '_has_stop_hunt': has_stop_hunt,
-                    '_imbalance': ob_data.get('imbalance', 1.0),
+                    '_imbalance': ob_data.get('imbalance') or 1.0,
                 }
                 s_liquidation = _score_liquidation(price, coin_liq)
 
