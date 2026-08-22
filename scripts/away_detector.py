@@ -28,7 +28,7 @@ AWAY_FILE       = '/root/.hermes/data/last_user_message_at.json'
 DEBOUNCE_FILE   = '/root/.hermes/data/self_init_last_run.json'
 LOG_FILE        = '/root/.hermes/logs/away_detector.log'
 PIPELINE_HB     = PIPELINE_HB_FILE
-DEBOUNCE_HOURS  = 0.25  # 15 min between CEO calls
+DEBOUNCE_HOURS  = 4.0   # 4h between CEO calls (matches hermes-ceo.timer interval)
 AWAY_THRESHOLD  = 20    # minutes
 # ────────────────────────────────────────────────────────────────────────────
 
