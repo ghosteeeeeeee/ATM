@@ -193,10 +193,11 @@ def find_liquidation_clusters(positions: list, current_price: float,
     if not liq_levels:
         return []
 
-    # Bin liquidation levels
+    # Bin liquidation levels — track dominant side in each bin
     bins = defaultdict(lambda: {"total_size": 0, "count": 0,
                                  "wallets": [], "max_leverage": 0,
-                                 "total_notional": 0})
+                                 "total_notional": 0,
+                                 "long_size": 0, "short_size": 0})
 
     for lvl in liq_levels:
         price = lvl["price"]
@@ -208,6 +209,10 @@ def find_liquidation_clusters(positions: list, current_price: float,
         bins[key]["max_leverage"] = max(bins[key]["max_leverage"], lvl["leverage"])
         bins[key]["total_notional"] += lvl["size"] * price
         bins[key]["price"] = bin_idx
+        if lvl["side"] == "LONG":
+            bins[key]["long_size"] += lvl["size"]
+        else:
+            bins[key]["short_size"] += lvl["size"]
 
     # Sort by total size (biggest clusters first)
     clusters = sorted(bins.values(), key=lambda x: x["total_size"], reverse=True)

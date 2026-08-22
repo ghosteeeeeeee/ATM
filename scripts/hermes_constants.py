@@ -1015,6 +1015,9 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_ENABLED',             # CEO 2026-08-22 — entire family 62T/7d 32.3% WR -$4.04. NEEDS T TO SET False.
+    'COIN_TRACKER_HOT_PLUS_ENABLED',        # CEO 2026-08-22 — killed by auto_1hr. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_MINUS_ENABLED',       # CEO 2026-08-22 — same family. NEEDS T TO SET False.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1274,7 +1277,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1845,8 +1848,8 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-22 with momentum filters and CEO protection. CEO_PROTECTED
-COIN_TRACKER_HOT_PLUS_ENABLED       = True    # Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED
-COIN_TRACKER_HOT_MINUS_ENABLED      = True    # Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED
+COIN_TRACKER_HOT_PLUS_ENABLED       = False   # DISABLED 2026-08-22 09:00 UTC — 0% WR last hour (3T, -$0.58). Kill criteria: 3+ trades 0% WR
+COIN_TRACKER_HOT_MINUS_ENABLED      = False   # SIGNAL REPORTER 2026-08-22 — 3T/7d 0% WR -$0.17. SHORT dead. Killed with PLUS.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)

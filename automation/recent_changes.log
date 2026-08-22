@@ -1286,3 +1286,7 @@
   WHY: 1T last hour (0W 1L -$0.14) ct-hot+ pre-kill holdover. 24h 69T 31W 44.9%WR -$2.07. hl_copy_trader 35T 20W 57.1% +$1.02 star. ct-hot+ killed at 09:00 confirmed working. Open: 2 hl_copy_trader healthy. Freq 1/hr quiet. System stable, no action needed.
   BY: auto_1hr
   NEXT: Re-run at 11:00 UTC
+[2026-08-22 11:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.04) hl_copy_trader MAE-GUARD exit. 24h 70T 31W 44.3%WR -$2.11. hl_copy_trader 36T 20W 55.6% +$0.93 healthy. ct-hot+ killed. Freq 1/hr quiet. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 12:00 UTC

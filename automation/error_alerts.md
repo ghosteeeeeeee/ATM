@@ -170,3 +170,6 @@ ALERTS:
 - **[INFO]** Pipeline: OK — last run 04:18, 0 errors, 6 open trades, +205.60% PnL today.
 - **[INFO]** Timers: All critical timers firing on schedule (pipeline, price-collector, regime-scanner, etc.)
 - **[INFO]** Regime: LONG_BIAS overall (11 long, 2 short, 92 neutral of 105 scanned).
+
+## Error Alerts — 2026-08-22 09:03 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3419s left, N failures)`

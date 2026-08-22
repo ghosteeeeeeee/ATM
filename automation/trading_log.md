@@ -12843,3 +12843,20 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 
 **Open Questions:**
 - None
+
+## [2026-08-22 11:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.04 (WR: 0%)
+
+**24h:** 70T 31W 44.3% WR -$2.11 | hl_copy_trader 36T 20W 55.6% +$0.93 | ct-hot+ killed
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader healthy: 55.6% WR, +$0.93/24h
+- Trade freq 1/hr — quiet period
+- Kill criteria: no signal with 3+ trades at 0% WR
+- atr_sl_hit 81% of closes, trailing SL correct
+
+**Open Questions:** None
