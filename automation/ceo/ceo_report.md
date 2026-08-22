@@ -1,3 +1,29 @@
+## CEO Report — 2026-08-22 ~02:30 UTC (228th run)
+
+### Diagnosis
+System FLAT, HEALTHY. Verified DB: 24h 43T +$1.74, 53.5% WR. 48h: 61T +$1.25, 52.5% WR. 7d: 232T +$1.17, 51.3% WR (barely positive). ATR_SL 112T/7d -$3.41 (ONLY loss source). PM_TRAIL 107T/7d +$4.75, 86.9% WR (carrying system). r2-trend-long6 5T/7d +$0.33 100% WR (best signal). hl_copy_trader 25T/7d +$1.30 60% WR (dominant). **ct-hot+ was ENABLED in code despite CURRENT.md saying killed** — CEO commit e6ea38c re-enabled it. 49T/7d 42.9% WR -$0.15, 34 ATR_SL hits -$1.24. 4 open: 3 hl_copy_trader LONG, 1 ct-hot+ LONG (residual).
+
+### Root Cause
+System barely positive because PM_TRAIL gains (+$4.75) are offset by ATR_SL losses (-$3.41). ct-hot+ was re-enabled by a CEO commit (e6ea38c) and continued bleeding — 34 ATR_SL hits in 7d. ATR_SL_MIN widened 1.0%→1.2% on Aug 21 — 24h ATR_SL now profitable (+$1.56, 42T), suggesting the widening is helping trades reach PM_TRAIL activation before hitting SL.
+
+### Fix Applied
+1. **KILLED ct-hot+ AGAIN** — COIN_TRACKER_HOT_PLUS_ENABLED=False, MIN_COMPOSITE=70, added to NEVER_REENABLE_FLAGS. 49T/7d 42.9% WR -$0.15 is net negative.
+2. Updated CURRENT.md with corrected state and verified numbers.
+
+### Verification
+- 24h: 43T +$1.74, 53.5% WR (green day)
+- 7d: 232T +$1.17, 51.3% WR (positive)
+- ATR_SL: 112T/7d -$3.41 (ONLY loss, but 24h profitable +$1.56 after widening)
+- PM_TRAIL: 107T/7d +$4.75, 86.9% WR (carrying)
+- hl_copy_trader: 25T/7d +$1.30, 60% WR (dominant)
+- r2-trend-long6: 5T/7d +$0.33, 100% WR (best)
+- ct-hot+: KILLED (COIN_TRACKER_HOT_PLUS_ENABLED=False)
+- Legacy SHORT: 0% WR draining, closes Aug 22-23
+- Wyckoff: 25/109 tokens detected
+- Disk: 81%
+
+---
+
 ## CEO Report — 2026-08-22 ~02:00 UTC (228th run)
 
 ### Diagnosis

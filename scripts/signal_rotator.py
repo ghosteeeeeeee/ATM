@@ -26,9 +26,13 @@ ROTATION_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'a
 ROTATION_JSON = os.path.join(HERMES_DATA, 'signal_rotation.json')
 
 # Safety
+# NOTE: Kill/disable logic is coordinated with self_learner.py (daily) and
+# signal_decay_detector.py (rapid-response). This rotator handles REGIME-BASED
+# selection (enable/disable for current market conditions), not kill decisions.
+# Keep MIN_WR_TO_DISABLE conservative — self_learner handles the nuanced kills.
 MAX_CHANGES_PER_CYCLE = 2
-MIN_WR_TO_DISABLE = 50    # never disable signals with WR > 50%
-MIN_WR_TO_ENABLE = 35     # never enable signals with WR < 35% (wider dead zone vs decay_detector's 20%)
+MIN_WR_TO_DISABLE = 45    # only disable if WR < 45% AND negative edge (self_learner handles kills)
+MIN_WR_TO_ENABLE = 35     # never enable signals with WR < 35% (wider dead zone)
 MIN_TRADES = 5            # need at least 5 trades for decisions
 
 # Signal category mapping — which signals work best in which regime

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Entry Gate Utilities — quality filters applied before signal emission.
 
-Four shared gates that every signal calls before add_signal().
+Five shared gates that every signal calls before add_signal().
 All gates are fail-open: missing data = pass (don't kill the pipeline).
 
 Usage in signals:
-    from entry_gates import rr_gate, volume_gate, candle_close_gate, session_timing_gate
+    from entry_gates import rr_gate, volume_gate, candle_close_gate, session_timing_gate, hebbian_gate
 
     if not session_timing_gate():
         continue
@@ -14,6 +14,9 @@ Usage in signals:
         continue
     rr_pass, sl, tp, rr = rr_gate(token, direction, price)
     if not rr_pass:
+        continue
+    hebbian_ok, conf_adj = hebbian_gate(token, signal, direction)
+    if not hebbian_ok:
         continue
 """
 import time
@@ -313,6 +316,69 @@ def session_timing_gate():
         return True  # fail-open
 
 
+# ── Gate 5: Hebbian Memory Gate ─────────────────────────────────────────────
+
+# Lazy-load hebbian engine to avoid import overhead on every call
+_hebbian_engine = None
+
+def _get_hebbian():
+    """Lazy-load HebbianEngine singleton."""
+    global _hebbian_engine
+    if _hebbian_engine is None:
+        try:
+            from hebbian_engine import HebbianEngine
+            _hebbian_engine = HebbianEngine()
+        except Exception as e:
+            _log(f"HEBBIAN GATE: Could not load HebbianEngine: {e}")
+            return None
+    return _hebbian_engine
+
+
+def hebbian_gate(token, signal, direction):
+    """Hebbian associative memory gate — uses learned trade history to filter signals.
+
+    Queries the hebbian network for (token, signal) performance history.
+    Uses composite_score() which blends: decayed WR, exit quality, token WR,
+    combo part WR, and hour-of-day patterns.
+
+    Returns (allow_trade: bool, confidence_adjustment: float).
+    - allow_trade=False → suppress (signal historically bad for this token)
+    - confidence_adjustment: multiplier to apply to signal confidence
+      (0.7 = reduce confidence, 1.0 = no change, 1.2 = boost confidence)
+
+    Fail-open: any error → (True, 1.0).
+    """
+    engine = _get_hebbian()
+    if engine is None:
+        return True, 1.0  # fail-open
+
+    try:
+        score, breakdown = engine.composite_score(token, signal)
+
+        # Thresholds from composite_score docs:
+        # > 0.65 → strong positive history (auto-approve zone)
+        # < 0.35 → strong negative history (auto-reject zone)
+        if score < 0.30:
+            _log(f"HEBBIAN BLOCKED: {token} {signal} score={score:.2f} < 0.30")
+            return False, 0.0
+        elif score < 0.45:
+            # Weak signal — reduce confidence but allow
+            conf_adj = 0.7
+            _log(f"HEBBIAN REDUCE: {token} {signal} score={score:.2f} → conf×{conf_adj}")
+            return True, conf_adj
+        elif score > 0.70:
+            # Strong signal — boost confidence
+            conf_adj = 1.2
+            return True, conf_adj
+        else:
+            # Neutral zone — no adjustment
+            return True, 1.0
+
+    except Exception as e:
+        _log(f"HEBBIAN GATE ERROR (fail-open): {e}")
+        return True, 1.0  # fail-open
+
+
 # ── CLI test harness ────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
@@ -351,6 +417,18 @@ if __name__ == '__main__':
     elif cmd == 'session':
         passed = session_timing_gate()
         print(f"Session: passed={passed}")
+
+    elif cmd == 'hebbian':
+        token = sys.argv[2] if len(sys.argv) > 2 else 'ETH'
+        signal = sys.argv[3] if len(sys.argv) > 3 else 'bb_bounce+'
+        direction = sys.argv[4] if len(sys.argv) > 4 else 'LONG'
+        passed, conf_adj = hebbian_gate(token, signal, direction)
+        print(f"Hebbian: passed={passed} conf_adj={conf_adj}")
+        # Show raw score
+        engine = _get_hebbian()
+        if engine:
+            score, breakdown = engine.composite_score(token, signal)
+            print(f"  composite_score={score:.3f} breakdown={breakdown}")
 
     else:
         print(f"Unknown command: {cmd}")

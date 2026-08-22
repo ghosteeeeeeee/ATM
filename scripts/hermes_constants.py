@@ -994,6 +994,7 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_PLUS_ENABLED',        # CEO 2026-08-22 — 49T/7d 42.9% WR -$0.15. 34 ATR_SL hits -$1.24. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1216,9 +1217,9 @@ CEO_PROTECTED_FLAGS = {
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
     'COIN_TRACKER_HOT_ENABLED': ('Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. Only T can change', '2026-08-21'),
-    'COIN_TRACKER_HOT_PLUS_ENABLED': ('Re-enabled 2026-08-21 — LONG direction for coin_tracker_hot. Only T can change', '2026-08-21'),
+    'COIN_TRACKER_HOT_PLUS_ENABLED': ('CEO KILLED 2026-08-22 — 49T/7d 42.9% WR -$0.15. NEVER_REENABLE. Only T can change', '2026-08-22'),
     'COIN_TRACKER_HOT_MINUS_ENABLED': ('SHORT disabled — long only for now. Only T can change', '2026-08-21'),
-    'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Composite threshold — lowered to 57 from 70 (no tokens met 70). CEO_PROTECTED 2026-08-21', '2026-08-21'),
+    'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Composite threshold — raised to 70 from 56 (CEO killed ct-hot+ 2026-08-22). CEO_PROTECTED', '2026-08-22'),
     'TIME_BLOCK_ENABLED': ('Disabled 2026-08-21 — was blocking all signals 01-06 UTC. Only T can change', '2026-08-21'),
 }
 
@@ -1804,7 +1805,7 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. CEO_PROTECTED
-COIN_TRACKER_HOT_PLUS_ENABLED       = True    # Re-enabled 2026-08-21 — LONG direction for coin_tracker_hot. Only T can change
+COIN_TRACKER_HOT_PLUS_ENABLED       = False   # CEO KILLED 2026-08-22 — 49T/7d 42.9% WR -$0.15. 34 ATR_SL hits -$1.24. Inconsistent: good mornings, losing afternoons. NEVER_REENABLE without T approval.
 COIN_TRACKER_HOT_MINUS_ENABLED      = False  # SHORT disabled — long only for now
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
@@ -1812,4 +1813,4 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.25    # per token+direction cooldown (15 minutes)
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 56      # net score threshold — lowered from 70 (no tokens met it) to 56. CEO_PROTECTED
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 70      # net score threshold — raised from 56 (CEO killed ct-hot+ 2026-08-22, 42.6% WR). CEO_PROTECTED

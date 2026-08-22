@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
 """
-signal_decay_detector.py — Auto-detect and disable decaying signals.
+signal_decay_detector.py — Lightweight decay detection (delegates kill logic to self_learner).
 
-Queries signal_outcomes for each signal type (24h, dedup).
-If WR drops below threshold with sufficient sample size → auto-disables.
+This was originally a standalone kill system, but overlaps with self_learner.py's
+_kill_underperformers(). To avoid conflicting enable/disable decisions, this script
+now delegates kill logic to self_learner and only adds 24h rapid-response detection
+for catastrophic failures (WR < 15% with 5+ trades in 24h).
 
 Run via: python3 scripts/signal_decay_detector.py
 Timer: hermes-signal-decay-detector.timer (every 6h)
 """
-import sys, os, sqlite3, fcntl, shutil
+import sys, os, sqlite3, fcntl, re, tempfile
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import RUNTIME_DB, HERMES_DATA
 
 LOCK_FILE = '/tmp/hermes-signal-decay.lock'
-
-# ── Thresholds ─────────────────────────────────────────────────────────────────
-WR_HARD_BLOCK = 20      # disable immediately if WR < 20% AND trades >= 3
-WR_SOFT_BLOCK = 30      # flag for disable if WR < 30% AND trades >= 5
-MIN_TRADES = 3           # minimum trades before decay detection applies
+CONSTANTS_FILE = os.path.join(os.path.dirname(__file__), 'hermes_constants.py')
 LOG_FILE = os.path.join(HERMES_DATA, '..', 'automation', 'decay_log.md')
+
+# ── Rapid-response thresholds (catches things self_learner's daily cycle misses) ──
+RAPID_DISABLE_WR = 15      # catastrophic: WR < 15% with 5+ trades in 24h
+RAPID_DISABLE_TRADES = 5   # minimum trades for rapid disable
+SOFT_WARN_WR = 25          # warn but don't disable
 
 def log(msg):
     ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
@@ -33,85 +36,59 @@ def log(msg):
     except Exception:
         pass
 
-def get_signal_performance():
-    """Query signal_outcomes for 24h performance (dedup, trade_id IS NOT NULL)."""
-    conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    c.execute("""
-        SELECT signal_type, COUNT(*) as trades, SUM(is_win) as wins,
-               ROUND(CAST(SUM(is_win) AS FLOAT)/COUNT(*)*100, 1) as wr,
-               ROUND(SUM(pnl_pct), 2) as total_pnl
-        FROM signal_outcomes
-        WHERE created_at > datetime('now', '-24 hours')
-          AND trade_id IS NOT NULL
-        GROUP BY signal_type
-        HAVING COUNT(*) >= ?
-        ORDER BY wr ASC
-    """, (MIN_TRADES,))
-    results = c.fetchall()
-    conn.close()
-    return results
 
-def disable_signal(signal_type):
-    """Disable a signal by setting its flag to False in hermes_constants.py."""
-    const_file = os.path.join(os.path.dirname(__file__), 'hermes_constants.py')
-
-    # Map signal_type to hermes_constants flag name
-    flag_map = {
-        'inv-accel-300-': 'INVERSE_ACCEL_300_MINUS_ENABLED',
-        'inv-accel-300+': 'INVERSE_ACCEL_300_PLUS_ENABLED',
-        'accel-300-': 'ACCEL_300_MINUS_ENABLED',
-        'accel-300+': 'ACCEL_300_PLUS_ENABLED',
-        'accel-300-vel+': 'ACCEL_300_VELOCITY_PLUS_ENABLED',
-        'accel-300-vel-': 'ACCEL_300_VELOCITY_MINUS_ENABLED',
-        'accel-300-breakout': 'ACCEL_300_BREAKOUT_ENABLED',
-        'bb-squeeze-': 'BOLLINGER_SQUEEZE_MINUS_ENABLED',
-        'bb-squeeze+': 'BOLLINGER_SQUEEZE_PLUS_ENABLED',
-        'bb-squeeze': 'BOLLINGER_SQUEEZE_ENABLED',
-        'tl_break_long': 'TL_BREAK_PLUS_ENABLED',
-        'tl_break_short': 'TL_BREAK_MINUS_ENABLED',
-        'tl_break': 'TL_BREAK_ENABLED',
-        'vel-hermes+': 'VEL_HERMES_PLUS_ENABLED',
-        'vel-hermes-': 'VEL_HERMES_MINUS_ENABLED',
-        'pct-hermes+': 'PCT_HERMES_PLUS_ENABLED',
-        'pct-hermes-': 'PCT_HERMES_MINUS_ENABLED',
-        'fast-momentum+': 'FAST_MOMENTUM_PLUS_ENABLED',
-        'fast-momentum-': 'FAST_MOMENTUM_MINUS_ENABLED',
-        'zscore-rising+': 'ZSCORE_RISING_ENABLED',
-        'zscore-rising-': 'ZSCORE_RISING_ENABLED',
-    }
-
-    flag = flag_map.get(signal_type)
-    if not flag:
-        log(f"  SKIP: No flag mapping for {signal_type}")
-        return False
-
+def _get_signal_performance_24h():
+    """Query signal_outcomes for 24h performance."""
     try:
-        shutil.copy2(const_file, const_file + '.bak')
-
-        with open(const_file) as f:
-            content = f.read()
-
-        # Check if already disabled
-        if f'{flag} = False' in content or f'{flag}=False' in content:
-            log(f"  SKIP: {flag} already False")
-            return False
-
-        # Replace True with False
-        old = f'{flag} = True'
-        new = f'{flag} = False  # AUTO-DISABLED by signal_decay_detector'
-        if old in content:
-            content = content.replace(old, new, 1)
-            with open(const_file, 'w') as f:
-                f.write(content)
-            log(f"  DISABLED: {flag}")
-            return True
-        else:
-            log(f"  SKIP: {flag} not found as True in constants")
-            return False
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT signal_type, COUNT(*) as trades, SUM(is_win) as wins,
+                   ROUND(CAST(SUM(is_win) AS FLOAT)/COUNT(*)*100, 1) as wr,
+                   ROUND(SUM(pnl_pct), 2) as total_pnl
+            FROM signal_outcomes
+            WHERE created_at > datetime('now', '-24 hours')
+              AND trade_id IS NOT NULL
+            GROUP BY signal_type
+            HAVING COUNT(*) >= ?
+            ORDER BY wr ASC
+        """, (RAPID_DISABLE_TRADES,))
+        rows = cur.fetchall()
+        conn.close()
+        return rows
     except Exception as e:
-        log(f"  ERROR disabling {signal_type}: {e}")
+        log(f"Error querying performance: {e}")
+        return []
+
+
+def _is_signal_disabled(signal_type):
+    """Check if a signal is already disabled in hermes_constants.py."""
+    try:
+        with open(CONSTANTS_FILE) as f:
+            content = f.read()
+        norm = signal_type.upper()
+        norm = re.sub(r'\+$', '_PLUS', norm)
+        norm = re.sub(r'-$', '_MINUS', norm)
+        norm = norm.replace('-', '_')
+        # Check various flag patterns
+        for suffix in ['', '_ENABLED']:
+            flag = f'{norm}{suffix}'
+            if re.search(rf'^{re.escape(flag)}\s*=\s*False', content, re.MULTILINE):
+                return True
         return False
+    except Exception:
+        return False
+
+
+def _disable_signal_rapid(signal_type):
+    """Disable a signal via self_learner's unified function (import and call)."""
+    try:
+        from self_learner import _disable_signal
+        return _disable_signal(signal_type)
+    except ImportError:
+        log(f"  ERROR: Could not import self_learner._disable_signal")
+        return False
+
 
 def main():
     lock_fd = open(LOCK_FILE, 'w')
@@ -127,34 +104,32 @@ def main():
         fcntl.flock(lock_fd, fcntl.LOCK_UN)
         lock_fd.close()
 
-def _main_impl():
-    log("=== Signal Decay Detector ===")
 
-    performance = get_signal_performance()
+def _main_impl():
+    log("=== Signal Decay Detector (rapid-response) ===")
+
+    performance = _get_signal_performance_24h()
     if not performance:
         log("No signals with sufficient trades in 24h window")
         return
 
     disabled_count = 0
     for signal_type, trades, wins, wr, total_pnl in performance:
-        status = "OK"
-        action = ""
+        if _is_signal_disabled(signal_type):
+            continue
 
-        if wr < WR_HARD_BLOCK and trades >= MIN_TRADES:
-            status = "CRITICAL"
-            action = disable_signal(signal_type)
-        elif wr < WR_SOFT_BLOCK and trades >= 5:
-            status = "WARNING"
-            # Don't auto-disable at soft threshold, just log
+        if wr < RAPID_DISABLE_WR and trades >= RAPID_DISABLE_TRADES:
+            log(f"  🔴 RAPID DISABLE: {signal_type}: {trades} trades, {wr}% WR, PnL={total_pnl}")
+            if _disable_signal_rapid(signal_type):
+                disabled_count += 1
+        elif wr < SOFT_WARN_WR and trades >= RAPID_DISABLE_TRADES:
+            log(f"  🟡 WARNING: {signal_type}: {trades} trades, {wr}% WR, PnL={total_pnl}")
+        else:
+            log(f"  🟢 OK: {signal_type}: {trades} trades, {wr}% WR, PnL={total_pnl}")
 
-        marker = "🔴" if status == "CRITICAL" else "🟡" if status == "WARNING" else "🟢"
-        log(f"  {marker} {signal_type}: {trades} trades, {wr}% WR, PnL={total_pnl}")
-        if action:
-            disabled_count += 1
+    log(f"Done. Rapid-disabled {disabled_count} signals.")
+    log("Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)")
 
-    log(f"Done. Disabled {disabled_count} signals.")
-    return disabled_count
 
 if __name__ == '__main__':
     main()
-    # ponytail: lock file at /tmp/hermes-signal-decay.lock, removed when done

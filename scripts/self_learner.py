@@ -517,9 +517,9 @@ def _adjust_param(param_name, direction):
 
 
 def _log_change(signal_type, param, old_value, new_value, reason, wr_before):
-    """Log parameter change to file."""
+    """Log parameter change to file and record baseline for feedback evaluation."""
     log_data = _load_log()
-    
+
     change = {
         'timestamp': datetime.now(timezone.utc).isoformat(),
         'signal_type': signal_type,
@@ -529,10 +529,13 @@ def _log_change(signal_type, param, old_value, new_value, reason, wr_before):
         'reason': reason,
         'wr_before': wr_before,
     }
-    
+
     log_data['changes'].append(change)
     log_data['daily_count'] = log_data.get('daily_count', 0) + 1
     _save_log(log_data)
+
+    # Record baseline for feedback loop evaluation
+    _record_baseline(signal_type, param, old_value, new_value, wr_before)
 
 
 def _check_daily_limit():
