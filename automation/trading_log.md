@@ -12735,3 +12735,39 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 **Open Questions:**
 - ct-hot+ rapid-fire entries (5-60 sec hold times) suggest over-fitting to short-term momentum — but CEO_PROTECTED
 - Should CEO consider re-raising COIN_TRACKER_HOT_MIN_COMPOSITE back to 70?
+
+## Daily Orchestrator Report — 2026-08-22 ~06:30 UTC
+
+### Pipeline Status
+- **Trades (24h):** 63 closed, 6 open (all LONG)
+- **PnL:** +$97-98% (daily close performance)
+- **Hotset:** 2 tokens (BANANA, NEAR from hl_copy_trader)
+- **Regime:** SHORT_BIAS (0 LONG / 27 SHORT / 77 NEUTRAL)
+- **Pipeline cycle:** #165939, running every 1m
+
+### Intelligence Gathered
+- **Health monitor:** Pipeline OK, hotset transiently empty at 06:19 (recovered by 06:28)
+- **Auto-1hr:** No changes — system stable, hl_copy_trader performing well
+- **Signal reporter:** No kills, no inversions. hl_copy_trader 62% WR +$5.08. ct-hot+ legacy trades only (killed).
+- **Blacklist testing:** COMPLETE (77 tokens, 0 KEEP — blacklist working as intended)
+- **Upgrade audit:** All Level 1-2 tasks implemented. Only Level 3 retroactive-scan-delayed-entry pending.
+
+### Critical Findings
+1. **ct-hot+ confirmed KILLED** — all 3 flags False, NEVER_REENABLE_FLAGS set. 187 signals in signals.json are historical (DB dump), not active.
+2. **Hotset was transiently empty** — compactor found 0 tokens at 06:19, recovered to 2 by 06:28. Normal fluctuation, not a bug.
+3. **7 failed services** — all non-critical utilities (better-coder, bug-hunter, git-release, hl-volume, mtf-macd-tuner, trading-checklist, wasp). None affect core trading.
+
+### Implemented Today
+- None required. System operating as designed.
+
+### Monitoring Items Verified
+- SHORT-NEUTRAL block: ACTIVE (no SHORT signals in NEUTRAL)
+- Wyckoff detection: 25/109 tokens (improving)
+- MIN_PRE_MOVE 0.3: EXTENDED to Aug 25
+- PM_TRAIL: >80% WR threshold
+- ATR_SL_MIN 1.2%: Profitable (24h +$1.56)
+
+### Quality Metrics
+- Tasks completed: 0 (none needed)
+- First-attempt success: N/A
+- Critical issues found: 0
