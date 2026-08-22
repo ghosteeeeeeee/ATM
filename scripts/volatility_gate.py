@@ -40,6 +40,7 @@ REGIME_SIGNALS = {
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
+        'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
@@ -61,6 +62,7 @@ REGIME_SIGNALS = {
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
+        'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
     },
     'HIGH': {
         # Breakout works in big moves
@@ -80,6 +82,7 @@ REGIME_SIGNALS = {
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
+        'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
     },
     'EXTREME': {
         # Continuation works in storms
@@ -89,6 +92,7 @@ REGIME_SIGNALS = {
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches violent spikes in extreme vol
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
+        'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
     },
 }
 
