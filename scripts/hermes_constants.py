@@ -1814,7 +1814,7 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True   # Re-enabled 2026-08-21 — LONG only, composite 57+, warm health allowed. CEO_PROTECTED
 COIN_TRACKER_HOT_PLUS_ENABLED       = True    # Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED
-COIN_TRACKER_HOT_MINUS_ENABLED      = False  # SHORT disabled — long only for now
+COIN_TRACKER_HOT_MINUS_ENABLED      = True    # Re-enabled 2026-08-22 with momentum filters (MACD%, Z-score, BB). CEO_PROTECTED
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered to capture fast movers)
