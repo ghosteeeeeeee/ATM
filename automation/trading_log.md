@@ -13029,3 +13029,23 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - 1 open trade running normally
 
 **Open Questions:** None
+
+## [2026-08-22 20:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (DOGE LONG hl_copy_trader PHANTOM_CLOSE $0.00 | HYPE LONG guardian_orphan -$0.01)
+**PnL:** -$0.01
+
+**24h:** hl_copy_trader 23T 14W 60.9% +$1.63 (healthy only active signal) | ct-hot+ killed 09:00 | atr_sl_hit 70.5% exits, avg -$0.027 | guardian_hard_sl 11.4% | MAE-GUARD 9.1%
+**Open:** 4
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader healthy: 60.9% WR, +$1.63/24h, only active signal
+- guardian_orphan caught HYPE trade with no signal — closed tiny loss (-$0.01), safety net working
+- PHANTOM_CLOSE DOGE $0.00 — phantom detection working
+- atr_sl_hit dominant = trailing SL working as designed
+- Trade freq 2/hr = normal
+- No kill criteria triggered (no signal at 3+ trades 0% WR in last hour)
+
+**Open Questions:** None

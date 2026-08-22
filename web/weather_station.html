@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🌊 Market Weather Station</title>
+    <meta http-equiv="refresh" content="120">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: monospace;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.85em;
+        }
+        a { color: #00ff88; text-decoration: none; }
+        h1 { color: #00ff88; font-size: 22px; border-bottom: 1px solid #00ff8833; padding-bottom: 10px; margin-bottom: 16px; }
+        h2 { color: #00ff88; font-size: 14px; margin: 20px 0 10px; border-bottom: 1px solid #00ff8833; padding-bottom: 6px; }
+        h3 { color: #00ff88; font-size: 12px; margin: 12px 0 6px; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+        .timestamp { color: #666; font-size: 11px; }
+        .nav-links { display: flex; gap: 12px; }
+        .nav-links a { color: #666; font-size: 11px; padding: 4px 8px; border: 1px solid #333; border-radius: 4px; }
+        .nav-links a:hover { color: #00ff88; border-color: #00ff88; }
+
+        /* Weather Condition Banner */
+        .condition-banner {
+            background: linear-gradient(135deg, #0f0f18 0%, #1a1a2e 100%);
+            border: 1px solid #00ff8844;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .condition-emoji { font-size: 48px; margin-bottom: 8px; }
+        .condition-text { font-size: 16px; color: #00ff88; font-weight: bold; margin-bottom: 4px; }
+        .condition-sub { color: #666; font-size: 12px; }
+
+        /* Tide Gauge */
+        .gauge-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .gauge {
+            flex: 1;
+            min-width: 200px;
+            background: #0f0f18;
+            border: 1px solid #00ff8833;
+            border-radius: 6px;
+            padding: 16px;
+        }
+        .gauge-title { color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; }
+        .gauge-value { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
+        .gauge-sub { font-size: 11px; color: #666; }
+        .gauge-bar { height: 8px; border-radius: 4px; background: #1a1a2e; margin-top: 8px; overflow: hidden; }
+        .gauge-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+        /* Wave Chart */
+        .wave-chart {
+            background: #0f0f18;
+            border: 1px solid #00ff8833;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .wave-chart svg { width: 100%; height: 120px; }
+
+        /* Stat Cards Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .stat-card {
+            background: #0f0f18;
+            border: 1px solid #00ff8833;
+            border-radius: 6px;
+            padding: 14px;
+        }
+        .stat-card-title { color: #666; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .data-table th { color: #666; text-align: left; padding: 6px 8px; border-bottom: 1px solid #333; font-size: 10px; text-transform: uppercase; }
+        .data-table td { padding: 5px 8px; border-bottom: 1px solid #1a1a2e; }
+        .data-table tr:hover td { background: #1a1a2e; }
+        .positive { color: #00ff88; }
+        .negative { color: #ff4444; }
+        .neutral { color: #ffaa00; }
+
+        /* Token Chips */
+        .token-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .token-chip {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid;
+        }
+        .token-reef { background: #00ff8822; color: #00ff88; border-color: #00ff8844; }
+        .token-sandbar { background: #ffaa0022; color: #ffaa00; border-color: #ffaa0044; }
+        .token-deep { background: #ff444422; color: #ff4444; border-color: #ff444444; }
+
+        /* Horizontal bar chart */
+        .hbar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 11px; }
+        .hbar-label { width: 120px; text-align: right; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hbar-track { flex: 1; height: 14px; background: #1a1a2e; border-radius: 3px; overflow: hidden; position: relative; }
+        .hbar-fill { height: 100%; border-radius: 3px; min-width: 2px; }
+        .hbar-val { width: 70px; font-size: 10px; }
+
+        /* Heatmap grid */
+        .heatmap { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; margin-top: 8px; }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            cursor: default;
+            position: relative;
+        }
+        .heatmap-cell:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 10;
+            border: 1px solid #333;
+        }
+        .heatmap-labels { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; margin-top: 4px; }
+        .heatmap-labels span { text-align: center; font-size: 9px; color: #666; }
+
+        /* Category bars */
+        .cat-bar-container { margin-bottom: 8px; }
+        .cat-bar-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px; }
+        .cat-bar-track { height: 20px; background: #1a1a2e; border-radius: 4px; overflow: hidden; position: relative; }
+        .cat-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; font-size: 9px; font-weight: bold; }
+        .cat-bar-neg { position: absolute; right: 0; height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 9px; font-weight: bold; }
+
+        /* Loading */
+        .loading { text-align: center; padding: 60px; color: #666; }
+        .loading .spinner { font-size: 36px; animation: spin 2s linear infinite; display: inline-block; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Tooltip */
+        [data-tip] { cursor: default; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🌊 Market Weather Station</h1>
+            <span class="timestamp" id="ts">Loading...</span>
+        </div>
+        <div class="nav-links">
+            <a href="trades.html">Trades</a>
+            <a href="signals.html">Signals</a>
+            <a href="coin_tracker.html">Coin Tracker</a>
+        </div>
+    </div>
+
+    <div id="app">
+        <div class="loading"><div class="spinner">🌊</div><p>Loading weather data...</p></div>
+    </div>
+
+    <script>
+    const COLORS = {
+        green: '#00ff88', red: '#ff4444', orange: '#ffaa00', blue: '#4488ff',
+        bg: '#0f0f18', border: '#00ff8833', muted: '#666',
+    };
+
+    function pnlColor(v) { return v > 0 ? COLORS.green : v < 0 ? COLORS.red : COLORS.muted; }
+    function pnlClass(v) { return v > 0 ? 'positive' : v < 0 ? 'negative' : 'neutral'; }
+    function fmt(v, d=1) { return v != null ? parseFloat(v).toFixed(d) : '-'; }
+    function fmtPct(v) { return v != null ? (v > 0 ? '+' : '') + parseFloat(v).toFixed(2) + '%' : '-'; }
+
+    function conditionEmoji(data) {
+        const wr = data.sea_state?.winrate || 0;
+        const pnl = data.sea_state?.total_pnl || 0;
+        const tide = data.tide?.['24h']?.imbalance || 0;
+        const waves = data.waves?.avg || 0;
+
+        if (wr > 55 && pnl > 0) return { emoji: '☀️🌊', text: 'FAVORABLE', sub: 'Good conditions for trading', color: COLORS.green };
+        if (wr > 45) return { emoji: '⛅🌊', text: 'MODERATE', sub: 'Mixed conditions — be selective', color: COLORS.orange };
+        if (wr > 35) return { emoji: '🌧️🌊', text: 'ROUGH', sub: 'Difficult conditions — reduce exposure', color: COLORS.orange };
+        return { emoji: '⛈️🌊', text: 'STORM', sub: 'Very difficult — consider sitting out', color: COLORS.red };
+    }
+
+    function tideEmoji(imb) {
+        if (imb > 0.2) return '⚠️';
+        if (imb > 0.1) return '〰️';
+        return '✅';
+    }
+
+    function waveSvg(data, color) {
+        if (!data || !data.length) return '';
+        const max = Math.max(...data.map(d => d.count), 1);
+        const w = 100 / data.length;
+        const points = data.map((d, i) => `${i * w},${100 - (d.count / max * 90)}`).join(' ');
+        const fillPoints = `0,100 ${points} ${data.length * w},100`;
+        return `<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polygon points="${fillPoints}" fill="${color}15" />
+            <polyline points="${points}" fill="none" stroke="${color}" stroke-width="0.5" />
+        </svg>`;
+    }
+
+    function heatmapCell(val, max, label) {
+        const ratio = max > 0 ? val / max : 0;
+        const r = Math.round(255 * Math.min(1, ratio * 2));
+        const g = Math.round(255 * Math.min(1, (1 - ratio) * 2));
+        const bg = val < 0 ? `rgba(255,68,68,${Math.min(1, Math.abs(ratio) * 1.5)})` :
+                   val > 0 ? `rgba(0,255,136,${Math.min(1, ratio * 1.5)})` : '#1a1a2e';
+        return `<div class="heatmap-cell" style="background:${bg}" data-tip="${label}: ${fmtPct(val)}">${val !== 0 ? fmt(val, 0) : ''}</div>`;
+    }
+
+    function render(data) {
+        const cond = conditionEmoji(data);
+        const tide24 = data.tide?.['24h'] || {};
+        const tide7d = data.tide?.['7d'] || {};
+        const tide30d = data.tide?.['30d'] || {};
+        const wind = data.wind || {};
+        const sea = data.sea_state || {};
+        const cats = data.categories || [];
+        const tokens = data.tokens || {};
+        const time = data.time || {};
+        const lightning = data.lightning || {};
+
+        let html = '';
+
+        // CONDITION BANNER
+        html += `<div class="condition-banner">
+            <div class="condition-emoji">${cond.emoji}</div>
+            <div class="condition-text" style="color:${cond.color}">${cond.text}</div>
+            <div class="condition-sub">${cond.sub}</div>
+        </div>`;
+
+        // GAUGE ROW — Tide, Wind, Sea State
+        html += '<div class="gauge-row">';
+
+        // Tide gauge
+        const tideImb = tide24.imbalance || 0;
+        const tideDir = tide24.long_pct > 55 ? 'INCOMING' : tide24.short_pct > 55 ? 'OUTGOING' : 'SLACK';
+        const tideColor = tide24.long_pct > 55 ? COLORS.green : tide24.short_pct > 55 ? COLORS.red : COLORS.orange;
+        html += `<div class="gauge">
+            <div class="gauge-title">📊 Tide Direction (24h)</div>
+            <div class="gauge-value" style="color:${tideColor}">${tideDir}</div>
+            <div class="gauge-sub">Long ${fmt(tide24.long_pct, 1)}% / Short ${fmt(tide24.short_pct, 1)}% ${tideEmoji(tideImb)}</div>
+            <div class="gauge-bar"><div class="gauge-fill" style="width:${tide24.long_pct || 50}%;background:linear-gradient(90deg,${COLORS.green},${COLORS.green}88)"></div></div>
+            <div class="gauge-sub" style="margin-top:6px">7d: Long ${fmt(tide7d.long_pct, 1)}% | 30d: Long ${fmt(tide30d.long_pct, 1)}%</div>
+        </div>`;
+
+        // Wind gauge
+        const windSpeed = wind.avg_velocity || 0;
+        const windLabel = windSpeed > 1 ? 'STRONG GUSTS' : windSpeed > 0.5 ? 'MODERATE BREEZE' : windSpeed > 0.2 ? 'LIGHT AIR' : 'CALM';
+        const windColor = windSpeed > 1 ? COLORS.green : windSpeed > 0.5 ? COLORS.orange : COLORS.blue;
+        const stalePct = wind.total ? (wind.stale / wind.total * 100) : 0;
+        html += `<div class="gauge">
+            <div class="gauge-title">💨 Wind (Momentum)</div>
+            <div class="gauge-value" style="color:${windColor}">${windLabel}</div>
+            <div class="gauge-sub">Sustained: ${fmt(wind.sustained * 100, 1)}% | Gusts: ${fmt(wind.gusts * 100, 1)}%</div>
+            <div class="gauge-bar"><div class="gauge-fill" style="width:${Math.min(100, windSpeed * 50)}%;background:${windColor}"></div></div>
+            <div class="gauge-sub" style="margin-top:6px">Accel: ${wind.avg_accel > 0 ? '📈' : '📉'} ${fmt(wind.avg_accel * 100, 2)}% | Stale: ${fmt(stalePct, 0)}%</div>
+        </div>`;
+
+        // Sea state gauge
+        const seaColor = sea.winrate > 55 ? COLORS.green : sea.winrate > 45 ? COLORS.orange : COLORS.red;
+        html += `<div class="gauge">
+            <div class="gauge-title">⚓ Sea State (14d)</div>
+            <div class="gauge-value" style="color:${seaColor}">${fmt(sea.winrate, 1)}% Win</div>
+            <div class="gauge-sub">PnL: <span class="${pnlClass(sea.total_pnl)}">${fmtPct(sea.total_pnl)}</span> | ${sea.good_days || 0}W / ${sea.bad_days || 0}L</div>
+            <div class="gauge-bar"><div class="gauge-fill" style="width:${sea.winrate || 0}%;background:${seaColor}"></div></div>
+            <div class="gauge-sub" style="margin-top:6px">${sea.total_trades || 0} trades analyzed</div>
+        </div>`;
+
+        html += '</div>';
+
+        // WAVE CHART — Signal volume over 7 days
+        const waveData = data.waves?.hours || [];
+        if (waveData.length) {
+            html += `<div class="wave-chart">
+                <div class="gauge-title">🌊 Signal Volume (7 Days) — Avg: ${data.waves?.avg || 0}/hr | Peak: ${data.waves?.peak || 0} | CV: ${data.waves?.cv || 0}</div>
+                ${waveSvg(waveData, COLORS.green)}
+            </div>`;
+        }
+
+        // CATEGORY PERFORMANCE — Horizontal bars
+        html += '<h2>🏄 Signal Category Performance</h2>';
+        const maxAbsPnl = Math.max(...cats.map(c => Math.abs(c.pnl)), 1);
+        for (const c of cats) {
+            const isPos = c.pnl >= 0;
+            const barW = Math.min(100, Math.abs(c.pnl) / maxAbsPnl * 100);
+            const color = isPos ? COLORS.green : COLORS.red;
+            html += `<div class="cat-bar-container">
+                <div class="cat-bar-header">
+                    <span style="color:${isPos ? COLORS.green : COLORS.red}">${isPos ? '🟢' : '🔴'} ${c.category}</span>
+                    <span><span class="${pnlClass(c.pnl)}">${fmtPct(c.pnl)}</span> <span style="color:#666">(${c.trades} trades, ${fmt(c.winrate, 0)}% win)</span></span>
+                </div>
+                <div class="cat-bar-track">
+                    ${isPos
+                        ? `<div class="cat-bar-fill" style="width:${barW}%;background:${color}33;color:${color}">${fmtPct(c.pnl)}</div>`
+                        : `<div class="cat-bar-neg" style="width:${barW}%;background:${color}33;color:${color}">${fmtPct(c.pnl)}</div>`
+                    }
+                </div>
+            </div>`;
+        }
+
+        // TOKEN REGIME MAP
+        html += '<h2>🗺️ Token Regime Map</h2>';
+        html += '<div class="stat-grid">';
+
+        // Reef
+        html += `<div class="stat-card">
+            <div class="stat-card-title">🪸 REEF — Consistent Winners (${tokens.reef?.length || 0})</div>
+            <div class="token-grid">`;
+        for (const t of (tokens.reef || [])) {
+            html += `<div class="token-chip token-reef">${t.token} <span style="opacity:0.7">${fmtPct(t.total_pnl)}</span></div>`;
+        }
+        html += '</div></div>';
+
+        // Sandbar
+        html += `<div class="stat-card">
+            <div class="stat-card-title">🏖️ SANDBAR — Inconsistent (${tokens.sandbar?.length || 0})</div>
+            <div class="token-grid">`;
+        for (const t of (tokens.sandbar || []).slice(0, 12)) {
+            html += `<div class="token-chip token-sandbar">${t.token} <span style="opacity:0.7">${fmtPct(t.total_pnl)}</span></div>`;
+        }
+        html += '</div></div>';
+
+        // Deep Water
+        html += `<div class="stat-card">
+            <div class="stat-card-title">🌊 DEEP WATER — Consistent Losers (${tokens.deep?.length || 0})</div>
+            <div class="token-grid">`;
+        for (const t of (tokens.deep || []).slice(0, 12)) {
+            html += `<div class="token-chip token-deep">${t.token} <span style="opacity:0.7">${fmtPct(t.total_pnl)}</span></div>`;
+        }
+        html += '</div></div>';
+
+        html += '</div>';
+
+        // LIGHTNING — Extreme Events
+        html += '<h2>⚡ Lightning Strikes</h2>';
+        html += '<div class="stat-grid">';
+
+        html += `<div class="stat-card">
+            <div class="stat-card-title">Extreme Events (|PnL| > 2%)</div>
+            <div style="font-size:28px;font-weight:bold;color:${COLORS.orange}">${lightning.extreme_count || 0}</div>
+            <div style="font-size:11px;margin-top:4px"><span class="positive">Big Wins: ${lightning.big_wins || 0}</span> | <span class="negative">Big Losses: ${lightning.big_losses || 0}</span></div>
+        </div>`;
+
+        html += `<div class="stat-card">
+            <div class="stat-card-title">🔴 Crash Magnets</div>`;
+        for (const t of (lightning.crash_tokens || []).slice(0, 5)) {
+            html += `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:1px solid #1a1a2e">
+                <span style="color:#ff4444;font-weight:bold">${t.token}</span>
+                <span class="negative">${fmtPct(t.total_pnl)}</span>
+            </div>`;
+        }
+        html += '</div>';
+
+        html += `<div class="stat-card">
+            <div class="stat-card-title">🟢 Pump Magnets</div>`;
+        for (const t of (lightning.pump_tokens || []).slice(0, 5)) {
+            html += `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:1px solid #1a1a2e">
+                <span style="color:#00ff88;font-weight:bold">${t.token}</span>
+                <span class="positive">${fmtPct(t.total_pnl)}</span>
+            </div>`;
+        }
+        html += '</div>';
+
+        html += '</div>';
+
+        // TIME PATTERNS — Heatmap
+        html += '<h2>⏰ Time Patterns</h2>';
+
+        // Hourly heatmap
+        const hourlyData = time.hourly || [];
+        const maxHourPnl = Math.max(...hourlyData.map(h => Math.abs(h.pnl)), 1);
+        html += '<div style="background:#0f0f18;border:1px solid #00ff8833;border-radius:6px;padding:14px;margin-bottom:12px">';
+        html += '<div class="stat-card-title">Hourly PnL Heatmap (UTC)</div>';
+        html += '<div class="heatmap">';
+        for (let h = 0; h < 24; h++) {
+            const hd = hourlyData.find(x => x.hour === h);
+            const pnl = hd ? hd.pnl : 0;
+            const ratio = maxHourPnl > 0 ? pnl / maxHourPnl : 0;
+            const bg = pnl < 0 ? `rgba(255,68,68,${Math.min(0.8, Math.abs(ratio) * 0.8)})` :
+                       pnl > 0 ? `rgba(0,255,136,${Math.min(0.8, ratio * 0.8)})` : '#1a1a2e';
+            html += `<div class="heatmap-cell" style="background:${bg};width:100%;aspect-ratio:1;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:8px" data-tip="${h}:00 — ${fmtPct(pnl)}">${hd ? fmt(pnl, 0) : ''}</div>`;
+        }
+        html += '</div>';
+        html += '<div class="heatmap-labels">';
+        for (let h = 0; h < 24; h++) {
+            html += `<span>${h}</span>`;
+        }
+        html += '</div></div>';
+
+        // Weekly
+        const weeklyData = time.weekly || [];
+        html += '<div style="background:#0f0f18;border:1px solid #00ff8833;border-radius:6px;padding:14px">';
+        html += '<div class="stat-card-title">Day of Week Performance</div>';
+        html += '<div class="heatmap" style="grid-template-columns:repeat(7,1fr)">';
+        const maxWeekPnl = Math.max(...weeklyData.map(d => Math.abs(d.pnl)), 1);
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (const d of weeklyData) {
+            const ratio = maxWeekPnl > 0 ? d.pnl / maxWeekPnl : 0;
+            const bg = d.pnl < 0 ? `rgba(255,68,68,${Math.min(0.8, Math.abs(ratio) * 0.8)})` :
+                       d.pnl > 0 ? `rgba(0,255,136,${Math.min(0.8, ratio * 0.8)})` : '#1a1a2e';
+            html += `<div class="heatmap-cell" style="background:${bg};width:100%;aspect-ratio:1.5;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-direction:column" data-tip="${d.day}: ${fmtPct(d.pnl)} (${d.trades} trades)">
+                <div style="font-weight:bold">${d.day}</div>
+                <div>${fmtPct(d.pnl)}</div>
+            </div>`;
+        }
+        html += '</div></div>';
+
+        // TOP SIGNAL TYPES TABLE
+        html += '<h2>📊 Signal Type Performance</h2>';
+        html += '<div style="background:#0f0f18;border:1px solid #00ff8833;border-radius:6px;padding:14px;overflow-x:auto">';
+        html += '<table class="data-table"><thead><tr><th>Signal Type</th><th>Trades</th><th>Win%</th><th>Avg PnL</th><th>Total PnL</th><th>Confidence</th></tr></thead><tbody>';
+        for (const s of (data.signals || []).slice(0, 30)) {
+            html += `<tr>
+                <td style="color:${pnlClass(s.total_pnl)};font-weight:bold">${s.type}</td>
+                <td>${s.trades}</td>
+                <td>${fmt(s.winrate, 0)}%</td>
+                <td class="${pnlClass(s.avg_pnl)}">${fmtPct(s.avg_pnl)}</td>
+                <td class="${pnlClass(s.total_pnl)}">${fmtPct(s.total_pnl)}</td>
+                <td style="color:#666">${fmt(s.avg_conf, 0)}%</td>
+            </tr>`;
+        }
+        html += '</tbody></table></div>';
+
+        // FOOTER
+        html += `<div style="text-align:center;margin-top:24px;padding:16px;color:#666;font-size:10px;border-top:1px solid #333">
+            Generated: ${data.generated || 'unknown'} | Data: 30-day signal analysis | <a href="trades.html">Trades</a> | <a href="signals.html">Signals</a> | <a href="coin_tracker.html">Coin Tracker</a>
+        </div>`;
+
+        document.getElementById('app').innerHTML = html;
+    }
+
+    fetch('/data/weather_station.json')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('ts').textContent = `Updated: ${data.generated}`;
+            render(data);
+        })
+        .catch(err => {
+            document.getElementById('app').innerHTML = `<div class="loading"><p style="color:#ff4444">Failed to load weather data: ${err.message}</p><p style="margin-top:8px">Run: python3 scripts/weather_station_api.py</p></div>`;
+        });
+    </script>
+</body>
+</html>
