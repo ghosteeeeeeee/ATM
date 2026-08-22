@@ -5,11 +5,13 @@ Runs daily via systemd timer. Analyzes signal_outcomes, identifies underperformi
 signals, adjusts parameters using scientific method (one variable at a time).
 
 Flow:
-1. Analyze performance per signal type (rolling 30 trades)
-2. Check goals (WR > 40%, PnL > 0)
-3. If failing: identify weakest parameter
-4. Adjust ONE parameter (5% step)
-5. Log change (before/after values)
+1. Check if any pending adjustment has matured enough to evaluate
+2. If yes: measure before/after, revert if no improvement
+3. Analyze performance per signal type (rolling 30 trades)
+4. Check goals (WR > 40%, PnL > 0)
+5. If failing: identify weakest parameter
+6. Adjust ONE parameter (5% step)
+7. Log change with baseline snapshot for future evaluation
 """
 import json
 import os
@@ -52,6 +54,12 @@ GOAL_PROGRESS_FILE = '/root/.hermes/data/goal_progress.json'
 KILL_PNL_50 = -2.0    # 50-trade PnL below this → disable
 KILL_MAX_CONSEC = 10  # consecutive losses at or above this → disable
 KILL_MIN_TRADES = 50  # need at least this many trades to evaluate
+
+# ── Feedback loop config ──────────────────────────────────────────────
+FEEDBACK_FILE = '/root/.hermes/data/pending_adjustments.json'
+FEEDBACK_MIN_TRADES = 15   # trades needed before evaluating an adjustment
+FEEDBACK_IMPROVE_WR = 0.02 # WR must improve by at least 2% to keep adjustment
+FEEDBACK_IMPROVE_PNL = 0.0 # PnL must not worsen by more than $0
 
 # ── Combo weight tuning ────────────────────────────────────────────────
 COMBO_WEIGHTS_FILE = '/root/.hermes/data/combo_weights.json'
@@ -101,6 +109,122 @@ def _save_log(data):
             raise
     except Exception as e:
         _log(f"Error saving log: {e}")
+
+
+# ── Feedback Loop: Track & Evaluate Adjustments ──────────────────────────
+
+def _load_pending():
+    """Load pending adjustments awaiting evaluation."""
+    if os.path.exists(FEEDBACK_FILE):
+        try:
+            with open(FEEDBACK_FILE) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {'pending': [], 'evaluated': []}
+
+
+def _save_pending(data):
+    """Save pending adjustments atomically."""
+    try:
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(FEEDBACK_FILE), suffix='.tmp')
+        try:
+            with os.fdopen(fd, 'w') as f:
+                json.dump(data, f, indent=2)
+            os.replace(tmp, FEEDBACK_FILE)
+        except Exception:
+            os.unlink(tmp)
+            raise
+    except Exception as e:
+        _log(f"Error saving pending adjustments: {e}")
+
+
+def _record_baseline(signal_type, param, old_value, new_value, wr_before):
+    """Record a baseline snapshot before adjustment for future evaluation."""
+    # Get current PnL baseline
+    trades = _get_recent_trades(signal_type, limit=30)
+    pnl_before = _calculate_pnl(trades) if trades else 0
+    trade_count_before = len(trades) if trades else 0
+
+    pending = _load_pending()
+    pending['pending'].append({
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'signal_type': signal_type,
+        'parameter': param,
+        'old_value': old_value,
+        'new_value': new_value,
+        'wr_before': wr_before,
+        'pnl_before': pnl_before,
+        'trade_count_before': trade_count_before,
+    })
+    _save_pending(pending)
+    _log(f"  RECORDED BASELINE: {signal_type} WR={wr_before:.1%} PnL=${pnl_before:+.2f} trades={trade_count_before}")
+
+
+def _evaluate_pending():
+    """Evaluate pending adjustments: did they help? Revert if not."""
+    pending = _load_pending()
+    if not pending['pending']:
+        return 0
+
+    _log("--- Evaluating pending adjustments ---")
+    reverts = 0
+    still_pending = []
+
+    for adj in pending['pending']:
+        signal_type = adj['signal_type']
+        param = adj['parameter']
+        old_value = adj['old_value']
+        new_value = adj['new_value']
+        wr_before = adj['wr_before']
+        pnl_before = adj['pnl_before']
+        trade_count_before = adj['trade_count_before']
+        adj_time = datetime.fromisoformat(adj['timestamp'])
+
+        # Check if enough trades have happened since adjustment
+        trades_after = _get_recent_trades(signal_type, limit=50)
+        # Filter to trades after the adjustment timestamp
+        trades_since = [t for t in trades_after if t.get('created_at', '') > adj['timestamp']]
+        n_since = len(trades_since)
+
+        if n_since < FEEDBACK_MIN_TRADES:
+            _log(f"  {signal_type}: {n_since}/{FEEDBACK_MIN_TRADES} trades since adjustment — waiting")
+            still_pending.append(adj)
+            continue
+
+        # Measure outcome
+        wr_after = _calculate_wr(trades_since)
+        pnl_after = _calculate_pnl(trades_since)
+        wr_delta = wr_after - wr_before
+
+        _log(f"  {signal_type} {param}: WR {wr_before:.1%} → {wr_after:.1%} (delta={wr_delta:+.1%}), "
+             f"PnL ${pnl_before:+.2f} → ${pnl_after:+.2f}")
+
+        # Decision: keep or revert?
+        if wr_delta >= FEEDBACK_IMPROVE_WR:
+            # Improvement! Keep the adjustment.
+            _log(f"  ✅ KEPT: {param} {old_value} → {new_value} (WR improved {wr_delta:+.1%})")
+            pending['evaluated'].append({
+                **adj, 'outcome': 'kept', 'wr_after': wr_after,
+                'pnl_after': pnl_after, 'evaluated_at': datetime.now(timezone.utc).isoformat()
+            })
+        else:
+            # No improvement — revert to old value
+            _log(f"  🔄 REVERTING: {param} {new_value} → {old_value} (WR delta {wr_delta:+.1%}, no improvement)")
+            current = _get_current_value(param)
+            if current is not None and abs(current - new_value) < 0.01:
+                _set_param_value(param, old_value)
+                reverts += 1
+            pending['evaluated'].append({
+                **adj, 'outcome': 'reverted', 'wr_after': wr_after,
+                'pnl_after': pnl_after, 'evaluated_at': datetime.now(timezone.utc).isoformat()
+            })
+
+    pending['pending'] = still_pending
+    # Keep only last 50 evaluated for history
+    pending['evaluated'] = pending['evaluated'][-50:]
+    _save_pending(pending)
+    return reverts
 
 
 def _get_recent_trades(signal_type, limit=30):
@@ -606,12 +730,18 @@ def run():
         return 0
     try:
         _log("=== Self-learning cycle ===")
+        # Step 0: Evaluate pending adjustments (close the feedback loop)
+        reverts = _evaluate_pending()
+        # Step 1: Kill underperformers (unified — replaces decay_detector)
         kills = _kill_underperformers()
+        # Step 2: Analyze and adjust parameters
         adjustments = analyze_and_adjust()
+        # Step 3: Tune combo weights
         combo_changes = analyze_combo_weights()
+        # Step 4: Write goal progress
         _write_goal_progress()
-        _log(f"Completed: {kills} kills, {adjustments} param adjustments, {combo_changes} combo weight changes")
-        return kills + adjustments + combo_changes
+        _log(f"Completed: {reverts} reverts, {kills} kills, {adjustments} param adjustments, {combo_changes} combo weight changes")
+        return reverts + kills + adjustments + combo_changes
     finally:
         lock_fd.close()
 
