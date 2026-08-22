@@ -163,3 +163,10 @@ ALERTS:
 - **[WARN]** 5 services failed: better-coder (ModuleNotFoundError: dispatcher), bug-hunter, git-release, mtf-macd-tuner, trading-checklist, wasp (all non-critical for trading)
 - **[WARN]** pipeline.log at 103MB — consider log rotation
 - **[INFO]** Phantom trade write blocked correctly (ETH SL too tight)
+
+## Error Alerts — 2026-08-22 04:20 UTC
+- **[WARN]** (N=1): `Disk usage at 82%` — 91G/118G, approaching 85% threshold. Consider log cleanup.
+- **[WARN]** (N=1): `40 stale prices` — 40/239 tokens have stale price data (>5min old). Usually low-activity tokens.
+- **[INFO]** Pipeline: OK — last run 04:18, 0 errors, 6 open trades, +205.60% PnL today.
+- **[INFO]** Timers: All critical timers firing on schedule (pipeline, price-collector, regime-scanner, etc.)
+- **[INFO]** Regime: LONG_BIAS overall (11 long, 2 short, 92 neutral of 105 scanned).

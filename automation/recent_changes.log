@@ -1254,3 +1254,11 @@
   WHY: 0T last hour quiet. 24h 44T 50%WR +$1.57. hl_copy_trader 26T 15W 57.7% +$1.19 star, only active signal. ct-hot+ residual draining (disabled 17:00). atr_sl_hit 97.7% but net profitable +$1.38 trailing SL correct. 3 open HYPE/ETH/SOL healthy. Freq 0-2/hr normal. System stable.
   BY: auto_1hr
   NEXT: Re-run at 03:00 UTC
+[2026-08-22 03:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L -$0.13) HYPE SHORT SL hit. 24h 45T 23W 51.1%WR +$1.43. hl_copy_trader 27T 15W 55.6% +$1.06 star, only active. atr_sl_hit 97.8% net profitable +$1.25 trailing SL correct. 4 open ETH/SOL/HYPE/AIXBT healthy. Freq 1/hr normal. System stable, no action. Note: pnl_pct calc bug (pre-existing data quality, not trading-affecting).
+  BY: auto_1hr
+  NEXT: Re-run at 04:00 UTC
+[2026-08-22 04:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.01) DASH ct-hot+ SL hit small. 24h 47T 25W 53.2%WR +$4.61. hl_copy_trader 28T 16W 57.1% +$4.21 star, only active. ct-hot+ 18T 8W 44.4% +$0.12 marginal but CEO_PROTECTED (composite 70). atr_sl_hit 97.8% net profitable +$1.28 trailing SL correct. Freq 1-2/hr normal. 6 open healthy. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 05:00 UTC

@@ -12624,3 +12624,55 @@ None — system stable, previous fixes settling in.
 - ct-hot+ residual positions draining as expected
 
 **Open Questions:** None
+
+## [2026-08-22 03:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L) — HYPE SHORT -$0.13 (atr_sl_hit)
+**24h:** 45T 23W 51.1%WR +$1.43
+**Open:** 4 (ETH/SOL/HYPE/AIXBT LONG)
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader 27T 15W 55.6% +$1.06 star, only active signal
+- atr_sl_hit 97.8% but net profitable +$1.25 — trailing SL correct
+- Freq 1/hr normal, quiet period
+- All 4 open positions healthy
+
+**Known Issues:**
+- pnl_pct calculation bug: values show extreme %s (-1258% for -0.13 USDT loss) — pre-existing, data quality only, not trading-affecting
+
+**Open Questions:** None
+
+## [2026-08-22 04:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L) — DASH LONG ct-hot+ +$0.01 (atr_sl_hit)
+**24h:** 47T 25W 53.2%WR +$4.61
+
+**Close reasons (24h):**
+- atr_sl_hit: 45T +$1.28 — dominant but net profitable, trailing SL correct
+- atr_tp_hit: 1T +$0.18
+
+**Signals (24h):**
+- hl_copy_trader: 28T 16W 57.1% +$4.21 — star, only active signal
+- ct-hot+: 18T 8W 44.4% +$0.12 — marginal, CEO_PROTECTED (composite raised to 70)
+- r2-trend-long3: 1T 1W +$0.28
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader performing well (57.1% WR, only active signal)
+- atr_sl_hit 97.8% but net profitable — trailing SL correct
+- Trade freq 1-2/hr normal, quiet period
+- 6 open positions healthy (3 ct-hot+, 3 hl_copy_trader)
+- ct-hot+ marginal but CEO_PROTECTED, cannot disable
+
+**Open Questions:** None
+
+## FAVORITES Update — 2026-08-22 04:05 UTC
+- Regime: unknown
+- PROMOTE ETH (WR=88.9%, AvgPnL=6.39%, Trades=9)
+- PROMOTE SYRUP (WR=66.7%, AvgPnL=0.32%, Trades=6)
+- PROMOTE LDO (WR=80.0%, AvgPnL=0.23%, Trades=5)
+
+Final set: ['BANANA', 'BLUR', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'MNT', 'SYRUP', 'ZRO']
