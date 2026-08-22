@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes CEO Dashboard</title>
+<meta http-equiv="refresh" content="300">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --card: #12121a;
+  --border: #1e1e2e;
+  --text: #c0c0d0;
+  --dim: #666;
+  --accent: #4fc3f7;
+  --green: #4caf50;
+  --red: #ef5350;
+  --orange: #ff9800;
+  --purple: #ab47bc;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px; padding:12px; }
+h1 { color:var(--accent); font-size:18px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+h1 span { font-size:12px; color:var(--dim); font-weight:normal; }
+h2 { color:var(--accent); font-size:13px; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
+.grid { display:grid; gap:10px; margin-bottom:12px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.card { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:10px; }
+.metric { text-align:center; }
+.metric .value { font-size:22px; font-weight:bold; }
+.metric .label { font-size:11px; color:var(--dim); margin-top:2px; }
+.metric.green .value { color:var(--green); }
+.metric.red .value { color:var(--red); }
+.metric.orange .value { color:var(--orange); }
+.metric.accent .value { color:var(--accent); }
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th { text-align:left; color:var(--dim); font-weight:normal; padding:4px 6px; border-bottom:1px solid var(--border); }
+td { padding:4px 6px; border-bottom:1px solid #111; }
+tr:hover { background:#1a1a28; }
+.tag { display:inline-block; padding:1px 6px; border-radius:3px; font-size:11px; }
+.tag-green { background:#1b3a1b; color:var(--green); }
+.tag-red { background:#3a1b1b; color:var(--red); }
+.tag-orange { background:#3a2a1b; color:var(--orange); }
+.tag-blue { background:#1b2a3a; color:var(--accent); }
+.tag-purple { background:#2a1b3a; color:var(--purple); }
+pre { white-space:pre-wrap; word-wrap:break-word; font-size:12px; line-height:1.5; max-height:400px; overflow-y:auto; }
+pre::-webkit-scrollbar { width:6px; }
+pre::-webkit-scrollbar-track { background:var(--bg); }
+pre::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.section-title { color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px; margin:12px 0 6px; border-bottom:1px solid var(--border); padding-bottom:4px; }
+.status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+.status-dot.ok { background:var(--green); }
+.status-dot.warn { background:var(--orange); }
+.status-dot.error { background:var(--red); }
+.status-dot.off { background:#333; }
+.flex { display:flex; gap:10px; }
+.flex > * { flex:1; }
+.kanban-entry { border-left:3px solid var(--border); padding:6px 10px; margin-bottom:6px; background:#0e0e16; border-radius:0 4px 4px 0; }
+.kanban-entry.action { border-left-color:var(--orange); }
+.kanban-entry.no-change { border-left-color:var(--green); }
+.kanban-entry.delegate { border-left-color:var(--purple); }
+.kanban-ts { font-size:11px; color:var(--dim); }
+.kanban-summary { margin-top:2px; }
+#loading { text-align:center; padding:40px; color:var(--dim); }
+</style>
+</head>
+<body>
+
+<h1>🎯 CEO Dashboard <span id="generated">loading...</span></h1>
+
+<div id="dashboard">
+<div id="loading">Loading CEO data...</div>
+</div>
+
+<script>
+const DATA_URL = '/data/ceo_dashboard.json';
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL);
+    const d = await res.json();
+    render(d);
+  } catch(e) {
+    document.getElementById('dashboard').innerHTML = '<div class="card" style="color:var(--red)">Failed to load: ' + e.message + '</div>';
+  }
+}
+
+function render(d) {
+  document.getElementById('generated').textContent = 'Updated: ' + new Date(d.generated_at).toLocaleString();
+  const g = d.goal_progress;
+  const t = d.trading;
+  const cur = g.current || {};
+  const tgt = g.targets || {};
+
+  let html = '';
+
+  // ── KPI Cards ──
+  html += '<div class="grid grid-4">';
+  html += kpi('trades_24h', t.trades_24h, 'Trades 24h', t.trades_24h >= 15 ? 'green' : 'orange');
+  html += kpi('wr_24h', t.wr_24h + '%', 'Win Rate 24h', t.wr_24h >= 50 ? 'green' : t.wr_24h >= 40 ? 'orange' : 'red');
+  html += kpi('pnl_24h', '$' + (t.pnl_24h >= 0 ? '+' : '') + t.pnl_24h.toFixed(2), 'PnL 24h', t.pnl_24h >= 0 ? 'green' : 'red');
+  html += kpi('sharpe', cur.sharpe_30d !== null ? cur.sharpe_30d : 'N/A', 'Sharpe 30d', (cur.sharpe_30d || 0) >= 1.0 ? 'green' : 'red');
+  html += '</div>';
+
+  // ── Extended Metrics ──
+  html += '<div class="grid grid-4">';
+  html += kpi('wr_30d', ((cur.win_rate_30d || 0) * 100).toFixed(1) + '%', 'WR 30d (target ' + ((tgt.win_rate || 0) * 100) + '%)', (cur.win_rate_30d || 0) >= (tgt.win_rate || 0) ? 'green' : 'orange');
+  html += kpi('pnl_30d', '$' + (cur.pnl_30d >= 0 ? '+' : '') + (cur.pnl_30d || 0).toFixed(2), 'PnL 30d', (cur.pnl_30d || 0) >= 0 ? 'green' : 'red');
+  html += kpi('trades_30d', cur.total_trades_30d || 0, 'Trades 30d', 'accent');
+  html += kpi('consec', cur.consecutive_losses || 0, 'Consec Losses', (cur.consecutive_losses || 0) <= 3 ? 'green' : 'orange');
+  html += '</div>';
+
+  // ── Trend ──
+  const trend = g.trend || {};
+  if (trend.win_rate_delta_2d !== null && trend.win_rate_delta_2d !== undefined) {
+    const delta = (trend.win_rate_delta_2d * 100).toFixed(1);
+    const cls = trend.win_rate_delta_2d >= 0 ? 'green' : 'red';
+    html += '<div style="margin-bottom:10px;font-size:12px">WR Trend (2d vs 7d): <span class="tag tag-' + cls + '">' + (trend.win_rate_delta_2d >= 0 ? '+' : '') + delta + '%</span></div>';
+  }
+
+  // ── Two-column layout ──
+  html += '<div class="flex">';
+
+  // ── Left: CEO Kanban + Report ──
+  html += '<div>';
+
+  // CEO Report
+  html += '<div class="card" style="margin-bottom:10px">';
+  html += '<h2>📋 Latest CEO Report</h2>';
+  html += '<pre>' + escapeHtml(d.ceo_report || 'No report available') + '</pre>';
+  html += '</div>';
+
+  // Kanban
+  html += '<div class="card">';
+  html += '<h2>📌 CEO Kanban (Recent Decisions)</h2>';
+  for (const entry of d.kanban || []) {
+    const cls = entry.summary.includes('ACTION') ? 'action' : entry.summary.includes('DELEGATE') ? 'delegate' : 'no-change';
+    html += '<div class="kanban-entry ' + cls + '">';
+    html += '<div class="kanban-ts">' + escapeHtml(entry.timestamp) + '</div>';
+    html += '<div class="kanban-summary">' + escapeHtml(entry.summary.substring(0, 200)) + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  html += '</div>';
+
+  // ── Right: Signals + Self-Learning ──
+  html += '<div>';
+
+  // Top Signals
+  html += '<div class="card" style="margin-bottom:10px">';
+  html += '<h2>📊 Top Signals (7d)</h2>';
+  if (t.top_signals && t.top_signals.length > 0) {
+    html += '<table><tr><th>Signal</th><th>Trades</th><th>WR</th><th>PnL</th></tr>';
+    for (const s of t.top_signals) {
+      const cls = s.pnl >= 0 ? 'green' : 'red';
+      html += '<tr><td>' + escapeHtml(s.signal.substring(0, 25)) + '</td><td>' + s.trades + '</td><td>' + s.wr + '%</td><td class="tag tag-' + cls + '">$' + (s.pnl >= 0 ? '+' : '') + s.pnl.toFixed(2) + '</td></tr>';
+    }
+    html += '</table>';
+  } else {
+    html += '<div style="color:var(--dim)">No signal data</div>';
+  }
+  html += '</div>';
+
+  // Self-Learning
+  html += '<div class="card" style="margin-bottom:10px">';
+  html += '<h2>🧠 Self-Learning Changes</h2>';
+  if (d.pending_adjustments && d.pending_adjustments.pending && d.pending_adjustments.pending.length > 0) {
+    html += '<div style="margin-bottom:6px;font-size:11px;color:var(--orange)">⏳ ' + d.pending_adjustments.pending.length + ' pending evaluation</div>';
+  }
+  if (d.self_learning && d.self_learning.length > 0) {
+    html += '<table><tr><th>Time</th><th>Signal</th><th>Param</th><th>Change</th><th>Reason</th></tr>';
+    for (const c of d.self_learning) {
+      html += '<tr>';
+      html += '<td style="white-space:nowrap">' + c.timestamp.substring(5, 16) + '</td>';
+      html += '<td>' + escapeHtml(c.signal_type) + '</td>';
+      html += '<td>' + escapeHtml(c.parameter) + '</td>';
+      html += '<td>' + c.old_value + ' → ' + c.new_value + '</td>';
+      html += '<td style="color:var(--dim)">' + escapeHtml(c.reason) + '</td>';
+      html += '</tr>';
+    }
+    html += '</table>';
+  } else {
+    html += '<div style="color:var(--dim)">No recent changes</div>';
+  }
+  html += '</div>';
+
+  // Combo Weights
+  html += '<div class="card" style="margin-bottom:10px">';
+  html += '<h2>⚖️ Combo Weights</h2>';
+  const weights = d.combo_weights || {};
+  const sorted = Object.entries(weights).sort((a,b) => b[1] - a[1]);
+  if (sorted.length > 0) {
+    html += '<table><tr><th>Signal</th><th>Weight</th><th>Status</th></tr>';
+    for (const [sig, w] of sorted.slice(0, 15)) {
+      let status = '', cls = '';
+      if (w >= 1.2) { status = 'BOOST'; cls = 'green'; }
+      else if (w >= 1.0) { status = 'neutral'; cls = 'blue'; }
+      else { status = 'SUPPRESS'; cls = 'red'; }
+      html += '<tr><td>' + escapeHtml(sig.substring(0, 30)) + '</td><td>' + w.toFixed(2) + '</td><td><span class="tag tag-' + cls + '">' + status + '</span></td></tr>';
+    }
+    html += '</table>';
+  }
+  html += '</div>';
+
+  // Signal Lifecycle
+  html += '<div class="card">';
+  html += '<h2>🔄 Signal Lifecycle</h2>';
+  html += '<pre style="max-height:200px">' + escapeHtml(d.signal_lifecycle || 'No data') + '</pre>';
+  html += '</div>';
+
+  html += '</div>'; // right col
+  html += '</div>'; // flex
+
+  // ── Full-width: Error Alerts + Decay Log + Timers ──
+  html += '<div class="grid grid-3" style="margin-top:10px">';
+
+  // Error Alerts
+  html += '<div class="card">';
+  html += '<h2>🚨 Error Alerts</h2>';
+  html += '<pre style="max-height:250px">' + escapeHtml((d.error_alerts || []).join('\n\n') || 'No alerts') + '</pre>';
+  html += '</div>';
+
+  // Decay Log
+  html += '<div class="card">';
+  html += '<h2>📉 Decay Log (Recent)</h2>';
+  html += '<pre style="max-height:250px">' + escapeHtml((d.decay_log || []).join('\n') || 'No entries') + '</pre>';
+  html += '</div>';
+
+  // Timer Status
+  html += '<div class="card">';
+  html += '<h2>⏱️ Timer Status</h2>';
+  const timers = d.timers || {};
+  if (Object.keys(timers).length > 0) {
+    html += '<table><tr><th>Timer</th><th>Next</th><th>Last</th></tr>';
+    for (const [name, info] of Object.entries(timers)) {
+      const shortName = name.replace('hermes-', '').replace('.timer', '');
+      const lastClass = info.last === 'never' || info.last === 'inactive' ? 'error' : 'ok';
+      html += '<tr><td>' + shortName + '</td><td>' + info.next + '</td><td><span class="status-dot ' + lastClass + '"></span>' + info.last + '</td></tr>';
+    }
+    html += '</table>';
+  } else {
+    html += '<div style="color:var(--dim)">No timer data</div>';
+  }
+  html += '</div>';
+
+  html += '</div>'; // grid
+
+  document.getElementById('dashboard').innerHTML = html;
+}
+
+function kpi(id, value, label, color) {
+  return '<div class="card metric ' + color + '"><div class="value">' + value + '</div><div class="label">' + label + '</div></div>';
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+loadData();
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>
