@@ -469,9 +469,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
         return val        # already a small fraction like 0.005 (= 0.5%)
     trailing_activation = _norm_pct(raw_act) or TRAILING_ACTIVATION_PCT
     trailing_distance   = _norm_pct(raw_dist) or TRAILING_DISTANCE_PCT
-    trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
-    if trailing_phase2_dist is not None and trailing_phase2_dist > 1.0:
-        trailing_phase2_dist = trailing_phase2_dist / 100.0
+    trailing_phase2_dist = _norm_pct(ts_variant.get('config', {}).get('trailingPhase2DistancePct'))
 
     # Experiment metadata
     experiments = []
