@@ -218,7 +218,7 @@ def get_trades(status='open', limit=20, offset=0):
             SELECT id, token, direction, entry_price, current_price, pnl_pct, pnl_usdt,
                    stop_loss, target, exchange, open_time, close_time, status, close_reason,
                    signal, confidence, leverage, amount_usdt,
-                   trailing_activation, trailing_distance, exit_price
+                   trailing_activation, trailing_distance, exit_price, atr_managed
             FROM trades
             WHERE (server = 'Hermes' OR server IS NULL) AND status = %s
             ORDER BY
@@ -317,7 +317,8 @@ def write_trades():
             "confidence": float(r[15]) if r[15] else 0,
             "leverage": float(r[16]) if r[16] else 1,
             "amount_usdt": float(r[17]) if r[17] else DEFAULT_TRADE_SIZE_USDT,
-            "close_reason": r[13] if r[13] else ""
+            "close_reason": r[13] if r[13] else "",
+            "atr_managed": bool(r[21]) if r[21] else False
         } for r in closed_t]
     }
     _atomic_write(result, OUT_TRADES)
@@ -389,7 +390,8 @@ def _build_open_trades(open_t):
             "effective_size": round(amt * lev, 2),
             "trailing_activation": float(r[18]) if r[18] else 0.01,
             "trailing_distance": float(r[19]) if r[19] else 0.01,
-            "trailing_sl": _live_trailing_sl(r[0], direction, entry_px, current_px, float(r[18]) if r[18] else 0.01, float(r[19]) if r[19] else 0.01)
+            "trailing_sl": _live_trailing_sl(r[0], direction, entry_px, current_px, float(r[18]) if r[18] else 0.01, float(r[19]) if r[19] else 0.01),
+            "atr_managed": bool(r[21]) if r[21] else False
         })
     return out
 

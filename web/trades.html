@@ -66,6 +66,8 @@
     .coin-icon-fallback { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; color: #00ff88; font-size: 8px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 4px; border: 1px solid #00ff8833; }
     .pm-badge { color: #00ff88; font-size: 1.2em; margin-left: 2px; vertical-align: middle; }
     .pm-row { background: #00ff8811 !important; }
+    .atr-badge { color: #22dd88; font-size: 1.1em; margin-left: 2px; vertical-align: middle; }
+    .atr-profit-row { background: #22dd8810 !important; }
     .fav-star { color: #ff4488; font-size: 1.8em; margin-left: 3px; vertical-align: middle; }
     .sortable { cursor: pointer; user-select: none; }
     .sortable:hover { background: #00ff8822; }
@@ -379,9 +381,10 @@
         const leveragedPct = dir === 'SHORT' ? rawPct * -lev : rawPct * lev;
         const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
         const closedTime = (t.closed || '').replace('T', ' ').slice(0, 19);
-        return `<tr>
+        const atrProfit = t.atr_managed && pnlUsdt > 0;
+        return `<tr class="${atrProfit ? 'atr-profit-row' : ''}">
           <td style="color:#444;font-size:0.75em">${globalIdx}</td>
-          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}</td>
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${atrProfit ? '<span class="atr-badge" title="ATR SL monitored — closed in profit">💵</span>' : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${(t.entry||0).toFixed(4)}</td>
           <td>$${(t.exit||0).toFixed(4)}</td>
@@ -482,8 +485,8 @@
         else if (tp > 0 && Math.abs(tpDistPct) < 0.5) tpClass = 'near-tp';
         const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
         const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
-        return `<tr class="${trailState[t.id] ? 'pm-row' : ''}">
-          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}</td>
+        return `<tr class="${trailState[t.id] ? 'pm-row' : ''}${t.atr_managed && pnlUsdt > 0 ? ' atr-profit-row' : ''}">
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${trailState[t.id] ? '<span class="pm-badge">🐉</span>' : ''}${t.atr_managed && pnlUsdt > 0 ? '<span class="atr-badge" title="ATR SL monitored — in profit">💵</span>' : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${entry.toFixed(4)}</td>
           <td>$${current.toFixed(4)}</td>
