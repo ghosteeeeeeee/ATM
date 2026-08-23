@@ -1,70 +1,64 @@
-# Signal Performance Report
-**Generated:** 2026-08-23 05:02 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Date: 2026-08-23 05:00 UTC
+Period: Last 6h | 24h | 48h | 7d
 
-## Overall Stats
-- **Total trades (all time):** 1,264 | **WR:** 48.2% | **PnL:** -51.37%
-- **Date range:** 2026-07-29 → 2026-08-23
+## VOLUME
+- Last 6h: 0 closed trades
+- Last 24h: 8 closed trades (system heavily filtered or quiet market)
+- Last 48h: 102 closed trades, -$0.83 net
+- 7d: 45+ signals, ~3881 total closed trades all-time
 
----
+## KILLED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | - | - | - | - | No kills executed this cycle |
 
-## WINNERS (WR > 55%, PnL > 0)
+## KILL CANDIDATES (watch)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| ct-hot+ | LONG | 31.4% | -$3.28 | 35 (48h) | RESEARCH_FLAGS — T re-enabled 2026-08-22. Cannot kill. Deteriorating. |
+| return_exhaustion_long | LONG | 33.3% | -$0.27 | 6 (7d) | Below 5-trade threshold. Watch. |
 
-None found.
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | - | - | - | - | No boosts executed this cycle |
 
----
+## BOOST CANDIDATES (watch)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| hl_copy_trader | LONG | 54.4% | +$2.54 | 57 (7d) | Top performer. Already in PROFIT_MONSTER_BYPASS. |
+| hzscore- | SHORT | 83.3% | +$0.13 | 6 (7d) | Strong WR, small sample. |
+| r2-trend-long3 | LONG | 54.2% | +$0.14 | 24 (7d) | Consistent. |
+| r2-trend-long4 | LONG | 71.4% | +$0.22 | 14 (7d) | Strong. |
 
-## LOSERS (WR < 30%, PnL < -2%)
+## WINNERS (7d)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| hl_copy_trader | LONG | 54.4% | +$2.54 | 57 | TOP PERFORMER |
+| r2-trend-long6 | LONG | 100.0% | +$0.29 | 4 | Small sample |
+| r2-trend-long4 | LONG | 71.4% | +$0.22 | 14 | Strong |
+| r2-trend-long3 | LONG | 54.2% | +$0.14 | 24 | Consistent |
+| hzscore- | SHORT | 83.3% | +$0.13 | 6 | Strong WR |
+| bb_bounce+,hl_copy_trader | LONG | 80.0% | +$0.33 | 5 | Confluence winner |
+| r2-trend-long5 | LONG | 75.0% | +$0.10 | 4 | Good |
+| hl_copy_trader | SHORT | 0.0% | -$0.24 | 2 | Dead — too few trades |
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| ct-hot+ | LONG | — | —% | — | 10 | 10.0% | -24.64 | ❓ | **DISABLE** |
+## LOSERS (7d, 5+ trades)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| ct-hot+ | LONG | 28.9% | -$3.45 | 38 | WORST — RESEARCH_FLAGS, cannot kill |
+| return_exhaustion_long | LONG | 33.3% | -$0.27 | 6 | Below threshold |
+| bb_bounce+ | LONG | 25.0% | -$0.03 | 4 | Low sample |
+| stop_hunt_reversal_long+ | LONG | 60.0% | -$0.04 | 10 | Already in NEVER_REENABLE_FLAGS |
 
----
+## ISSUES
+- **Signal starvation**: Only 8 trades in 24h. System heavily filtered.
+- **ct-hot+ RESEARCH_FLAGS**: Worst performer (-$3.28/48h, 31.4% WR) but locked by RESEARCH_FLAGS (T re-enabled 2026-08-22). Cannot kill without T approval.
+- **No signal inversions** found.
+- **stop_hunt_reversal_long+**: Already killed (NEVER_REENABLE_FLAGS). Still firing? 10T/7d means it may be executing despite kill switch. Check signal_schema.py guard.
 
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| hl_copy_trader | LONG | 24 | 50.0% | +1.29 | ❓ | Borderline |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[DISABLE] ct-hot+ LONG** — WR=10.0%, PnL=-24.64% over 10 trades (24h).
-2. **[WATCH] hl_copy_trader LONG** — WR=50.0%, PnL=+1.29% over 24 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-08-23 | d46729a | fix: weather integration bugs found by bug_hunter |
-| 2026-08-23 | 53e8bc5 | fix: disable copy trader dead hours filter |
-| 2026-08-23 | cb20bac | fix: lower cluster min size from 3 to 2 |
-| 2026-08-23 | d631a98 | CEO: 237th run — ct-hot+ legacy draining, system recovering.... |
-| 2026-08-23 | affb9a9 | Signals: re-enable hzscore, coin_tracker_hot, raise slope th... |
-| 2026-08-22 | 0c5c8fd | signals: kill ct-hot+ family — 27.7% WR, -$3.92 PnL (7d, 47 ... |
-| 2026-08-22 | 5c3c657 | feat: cluster filter for copy trading signals |
-| 2026-08-22 | b21485a | config: add RESEARCH_FLAGS protection category |
-| 2026-08-22 | 912d764 | signals: liquidation_hunt — full pipeline integration |
-| 2026-08-22 | 5f5568e | signals: add speed and acceleration filters to ct-hot+ |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+## DECISIONS MADE
+1. No kills executed — ct-hot+ is the only candidate meeting kill criteria but is RESEARCH_FLAGS-protected.
+2. No boosts executed — top performers already optimized or in research mode.
+3. Signal starvation is the primary concern — 8 trades/24h is below viable threshold.
