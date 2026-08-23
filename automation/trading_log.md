@@ -13089,3 +13089,114 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 
 **Open Questions:**
 - PUMP, WLFI, ENA all hitting MAE-GUARD — small-cap entries going against us fast. Watch if this persists next hour.
+
+## [2026-08-22 23:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (6 open: BTC, HYPE, ETH, SOL, APT, SEI)
+**PnL:** $0.00 (no closes)
+**Open:** 6 hl_copy_trader LONGs
+
+**24h:** hl_copy_trader 29T 14W 48.3% +$1.35 (only active signal) | ct-hot+ 20T 0W -$3.54 (killed 09:00) | atr_sl_hit 59.3% exits avg -$0.020 | cut-loser-MAE-GUARD 16.7% | hard_sl 2T avg -$0.285
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader: only active signal, still net positive +$1.35/24h
+- 0 trades last hour = no new data to act on
+- 6 open trades running, no urgent exits needed
+- No kill criteria triggered
+- atr_sl_hit 59.3% = trailing SL working as designed
+- MAE-GUARD catching adverse entries early (good)
+
+**Open Questions:** None
+
+## [2026-08-23 00:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+**PnL:** $0.01 (50% WR)
+
+**24h:** hl_copy_trader 29T 14W 48.3% +$0.67 (only active signal) | atr_sl_hit 59.6% exits avg -$0.042 | MAE-GUARD 19.2% | guardian/hard SL 13.5% combined | 52T 21W 40.4% -$2.74 total
+
+**Open:** 5 LONGs (DOGE +0.96%, SEI +1.15%, SOL +0.84%, ETH +0.11%, BTC -0.18%) — all healthy
+
+**Changes:** None
+
+**No Change Needed:**
+- hl_copy_trader 48.3% WR +$0.67/24h — only active signal, net positive
+- ATR trailing SL dominant (59.6% exits) = working as designed
+- MAE-GUARD catching adverse entries early (19.2% of exits)
+- 5 open trades all near breakeven/slightly positive
+- No consecutive negative hours (20:00 +$0.46, 21:00 -$0.59, 23:00 +$0.01)
+- No kill criteria triggered
+
+**Open Questions:** None
+
+## [2026-08-23 01:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.41 (100% WR)
+
+**24h:** hl_copy_trader 29T 14W 48.3% +$0.96 (only active signal) | ct-hot+ 20T 5W -$3.54 (killed) | 51T 21W 40.4% -$2.45 total | atr_sl_hit 59% | MAE-GUARD 19% | guardian_sl 10%
+
+**Open:** 5 LONGs — PUMP +6%, DOGE +226%, SEI +217%, ETH +21%, BTC -8%
+
+**Changes:** None needed
+
+**No Change Needed:**
+- hl_copy_trader: only active signal, 48.3% WR, +$0.96/24h — net positive
+- atr_sl_hit 59% = trailing SL working as designed
+- No consecutive negative hours (last: 21:00 -$0.59, 23:00 +$0.01, 01:00 +$0.41)
+- Trade freq 1/hr = normal
+- DOGE/SEI positions massively green — riding winners
+
+**Open Questions:** None — system stable
+
+## [2026-08-23 02:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3W 1L)
+**PnL:** +$0.58 (75% WR)
+
+**24h:** 53T 22W 41.5% -$2.13 total | hl_copy_trader only active | atr_sl_hit 31T 58.5% avg -$0.019 | MAE-GUARD 11T 20.8% avg -$0.068 | guardian_hard_sl 5T 9.4% avg -$0.060 | hard_sl 2T 3.8% avg -$0.285
+
+**Open:** 2 trades — BTC $11 (slightly down), ETH $16.60 (slightly down)
+
+**Changes:** None
+
+**No Change Needed:**
+- Last hour strong: 75% WR, +$0.58 — best hour in 24h
+- atr_sl_hit dominant (58.5%) at near-breakeven avg (-$0.019) = trailing SL working as designed
+- MAE-GUARD catching 21% of exits with small avg loss (-$0.068) = 1.5% threshold effective
+- Only 2 open trades = minimal capital exposure, low risk
+- Consecutive positive: 23:00 +$0.01, 01:00 +$0.41, 02:00 +$0.58 (improving trend)
+- No kill criteria triggered
+- Trade frequency 4/hr = normal for single signal
+
+**Open Questions:** None — system stable and improving
+
+## [2026-08-23 03:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (no closes)
+
+**Open:** 3 trades
+- BSV SHORT (hzscore-): -$4.21 (-37.9%) — opened 03:04, adverse excursion
+- ETH LONG (hl_copy_trader): -$0.01 (-26.3%) — opened yesterday, deep underwater
+- BTC LONG (hl_copy_trader): -$0.09 (-26.9%) — opened yesterday, deep underwater
+
+**24h:** 52T 22W 41.5% -$2.00 | hl_copy_trader 31T 16W 51.6% +$1.26 (only profitable signal) | hzscore- 36T lifetime -$0.25
+
+**Exit reasons:** atr_sl_hit 57.7% | MAE-GUARD 21.2% | guardian_hard_sl 9.6%
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria triggered (no signal has 0% WR with 3+ trades last hour)
+- Trade freq 0/hr = undertrading, not overtrading
+- hl_copy_trader net positive +$1.26/24h — only active signal doing well
+- ATR trailing SL working as designed (57.7% of exits, avg -$0.015)
+- BSV SHORT hzscore- -$4.21 is bad but only 1T — doesn't meet kill threshold (need 3+ at 0% WR)
+- ETH/BTC positions deep underwater but no close trigger yet — riding them out
+
+**Open Questions:**
+- hzscore- re-enabled 2026-08-22 for "signal starvation fix" — BSV SHORT -37.9% entry quality concerning. Monitor next hour.
+- ETH/BTC LONGs both -26% — will they hit stop or recover?

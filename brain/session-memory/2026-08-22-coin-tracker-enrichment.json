@@ -1,0 +1,5 @@
+{
+  "date": "2026-08-22",
+  "topic": "coin-tracker-enrichment",
+  "content": "Enriched coin_tracker with weather station data. Added regime badges (reef/sandbar/deep), signal PnL/winrate, regime filter, detail view weather context. 29/109 coins enriched. Files: coin_tracker_enricher.py, coin_tracker_api.py, coin_tracker.html. Bugs fixed: dead code, null guards, loadCharts optimization, SVG gradient IDs."
+}

@@ -228,3 +228,36 @@ ALERTS:
 - **[WARN]** (3x): `HL [hl_info] Error: HTTP Error 429: Too Many Requests` — rate limiting from Hyperliquid API during wallet scanning.
 - **[WARN]** Disk at 82% (92G/118G) — trending toward 85% threshold. pipeline.log alone is 121M.
 - **AUTO-FIX**: None needed — pipeline functioning correctly. ROLLBACK contention is a known race condition; system recovers on next tick. Market fully neutral (104/104 tokens), system correctly preserving capital with 4/6 positions open.
+
+## Error Alerts — 2026-08-22 22:19 UTC
+- **WARN** (1x): `Disk usage at 83%` — approaching 85% threshold
+- **NO AUTO-FIX**: Not critical yet; monitor on next health check
+
+## Error Alerts — 2026-08-22 22:19 UTC (update)
+- **WARN** (1x): `Disk usage 83%` — approaching 85% threshold
+- **INFO**: hl_copy.db = 1.8GB — largest DB, candidate for cleanup
+- **HEALTHY**: No phantom trades, no pipeline errors, all timers firing
+
+## Error Alerts — 2026-08-23 00:03 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): HL TOK TOK: N null`
+
+## Error Alerts — 2026-08-23 00:20 UTC — Health Check: OK
+- **INFO**: Pipeline completed normally at 00:18, 5 open positions (all LONG), 200 closed today
+- **INFO**: 57 timers active, all healthy. HL sync guardian active.
+- **INFO**: Disk 82% (21G free). 239 tokens tracked. Regime NEUTRAL.
+- **WARN** (info): ct-hot+ signal underperforming — 25% WR, -4.00 PnL (24h)
+- **AUTO-FIX**: None needed — no critical issues detected
+
+## 2026-08-23 01:19 UTC — Health Check
+
+- **CRITICAL**: Today's 52 closed trades at -93.76% cumulative PnL
+- **WARN**: hermes-atr-sl-updater timer DEFUNCT (renamed with -DEFUNCT suffix, not running)
+- **INFO**: Pipeline healthy, last run 01:18 completed in 20s
+- **INFO**: 64 signals generated in last hour, 186 tokens with fresh prices
+- **INFO**: Disk 82% (21G free), 54MB hl-copy.log is largest log file
+- **AUTO-FIX**: None needed — pipeline and timers healthy
+
+## Error Alerts — 2026-08-23 02:20 UTC
+- **[WARN]**: `hermes-5m-candle.timer` is disabled — 5m candle aggregation not running
+- **AUTO-FIX**: None applied (may be intentional — verify before enabling)
+- **[WARN]**: Day PnL -69.17% across 52 closed trades

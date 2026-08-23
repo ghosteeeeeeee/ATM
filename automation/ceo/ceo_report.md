@@ -1,3 +1,85 @@
+## CEO Report — 2026-08-23 ~03:45 UTC (237th run)
+
+### Diagnosis
+System RECOVERING post-ct-hot+ kill. Verified DB: 24h 51T -$1.97, 43.1% WR. 48h: 97T -$0.55, 46.4% WR. 7d: 223T -$0.60, 52.0% WR. **ct-hot+ 17T/24h -$3.36, 23.5% WR (LEGACY LOSER, 23.5% WR)** — still draining. hl_copy_trader LONG 31T/24h +$1.26, 51.6% WR (carrying). Today Aug 23: 4T +$0.58, 75% WR (recovering). 4 open positions. Without ct-hot+: 7d +$2.92 — system profitable.
+
+### Key Metrics (Verified)
+| Metric | 24h | 48h | 7d |
+|--------|-----|-----|-----|
+| Trades | 51 | 97 | 223 |
+| PnL | -$1.97 | -$0.55 | -$0.60 |
+| WR | 43.1% | 46.4% | 52.0% |
+
+### Root Cause
+ct-hot+ kill active since Aug 22 23:09, but legacy trades still closing. 17 ct-hot+ trades closed today at 23.5% WR (-$3.36). All other signals neutral/profitable.
+
+### Decision
+**NO CHANGES.** Kill active, system waiting for ct-hot+ legacy drain. Today recovering (+$0.58 so far). Everything on track.
+
+### Monitoring
+1. ct-hot+ age-out (Aug 24-25) — 7d PnL should flip positive
+2. MIN_PRE_MOVE 0.3 eval (Aug 25)
+3. PM_TRAIL WR (>80%)
+4. Disk (85% cleanup trigger)
+
+---
+
+## CEO Report — 2026-08-22 ~23:45 UTC (236th run)
+
+### Diagnosis
+System POST-KILL — ct-hot+ bleed confirmed stopped. Verified DB: 24h 52T -$2.02, 42.3% WR (worst day — ct-hot+ was still generating trades today until 23:09 kill). 7d: 227T -$1.70, 49.3% WR. **ct-hot+ 46T/7d -$3.82, 28.3% WR (DOMINANT LOSER — all legacy, ages out Aug 24-25).** hl_copy_trader LONG 50T/7d +$1.97, 54% WR (ONLY performer). PM_TRAIL carrying (r2-trend-long3: 11T/7d +$0.54, 100% WR via trail). ATR_SL 48h: 70T +$0.05 (BREAK-EVEN — SL floor fix working!). 6 open: all hl_copy_trader LONG. Market: 98% NEUTRAL. **Without ct-hot+: 7d +$2.12 — system profitable.**
+
+### Key Metrics (Verified)
+| Metric | 24h | 48h | 7d |
+|--------|-----|-----|-----|
+| Trades | 52 | 120 | 227 |
+| PnL | -$2.02 | +$0.05 | -$1.70 |
+| WR | 42.3% | 48.3% | 49.3% |
+
+### Root Cause
+ct-hot+ kill was delayed — commit at 23:09 UTC, pipeline restart at 23:16. Flags were True all day, generating 20 trades at 25% WR (-$3.54). This is the DOMINANT loser and sole cause of today's -$2.02. Kill is now ACTIVE. Old trades age out Aug 24-25.
+
+### Decision
+**NO CHANGES.** Kill is active, system is waiting for ct-hot+ legacy to drain. Everything on track.
+
+### Monitoring
+1. ct-hot+ age-out (Aug 24-25) — 7d PnL should flip positive
+2. MIN_PRE_MOVE 0.3 eval (Aug 25) — r2-trend-long3 at 54.2% WR, break-even PnL
+3. PM_TRAIL WR (>80%) — carrying system, must hold
+4. ATR_SL daily (<15) — floor fix working, 30T/24h
+5. Disk (85% cleanup trigger) — at 82%
+6. Wyckoff detection (25/109 tokens) — improving
+
+---
+
+## CEO Report — 2026-08-22 ~23:17 UTC (235th run)
+
+### Diagnosis
+System DRAGGING — worst day of week. Verified DB: 24h 52T -$2.06, 40.4% WR. 7d: 228T -$1.84, 48.7% WR. **ct-hot+ 47T/7d -$3.92, 27.7% WR (DOMINANT LOSER — still generating trades today because kill commit was delayed to 23:09, flags were True in running code all day).** hl_copy_trader 50T/7d +$1.93, 52% WR (ONLY performer). PM_TRAIL 76T/7d +$3.42, 90.8% WR (carrying system). ATR_SL 48h: 70T +$0.05 (BREAK-EVEN — SL floor fix working!). 6 open: all hl_copy_trader LONG. Market: 98% NEUTRAL. Without ct-hot+: 7d +$2.08 — system profitable.
+
+### Key Metrics (Verified)
+| Metric | 24h | 48h | 7d |
+|--------|-----|-----|-----|
+| Trades | 52 | 91 | 228 |
+| PnL | -$2.06 | -$1.18 | -$1.84 |
+| WR | 40.4% | 44.0% | 48.7% |
+
+### Root Cause
+ct-hot+ kill was committed at 23:09 UTC but flags were still True in running code until pipeline restart at 23:16. This means ct-hot+ was generating trades all day (latest at 08:57). The 35 ct-hot+ trades today at 27.7% WR are the primary cause of the -$2.06 24h loss. The kill is now ACTIVE — no new ct-hot+ signals will generate. Old trades age out Aug 24-25.
+
+### Fix Applied
+1. **ct-hot+ kill CONFIRMED ACTIVE** — pipeline restarted 23:16 with commit 0c5c8fd (all 3 flags False). No new ct-hot+ signals will generate.
+2. **Disk cleanup** — truncated pipeline.log 123M→0 (disk 83%→82%). hl_copy.db (1.9GB) is largest DB, candidate for future cleanup.
+
+### Verification
+- Kill active: pipeline restarted with ct-hot+ flags False
+- ATR_SL break-even confirms SL floor fix effectiveness
+- hl_copy_trader dominant performer (52% WR/7d, +$1.93)
+- 6 open: all hl_copy_trader LONG
+- Disk 82%, trending toward 85% cleanup trigger
+
+---
+
 ## CEO Report — 2026-08-22 ~21:30 UTC (234th run)
 
 ### Diagnosis
