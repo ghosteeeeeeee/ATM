@@ -488,15 +488,15 @@
         const slDistStr = slDistPct === 0 ? '' : (slDistPct > 0 ? '+' : '') + slDistPct.toFixed(1) + '%';
         const tpDistStr = tpDistPct === 0 ? '' : (tpDistPct > 0 ? '+' : '') + tpDistPct.toFixed(1) + '%';
         // ATR guaranteed profit: trailing SL or ATR SL is past break-even
-        const trailingSl = t.trailing_sl || 0;
+        const trailingSl = t.trailing_sl || null;
         const atrSl = sl;  // ATR engine SL from DB
-        const guaranteedSl = (dirLower && (trailingSl > entry || atrSl > entry))
-                           || (!dirLower && (trailingSl < entry || atrSl < entry));
+        const guaranteedSl = (dirLower && ((trailingSl && trailingSl > entry) || (atrSl && atrSl > entry)))
+                           || (!dirLower && ((trailingSl && trailingSl < entry) || (atrSl && atrSl < entry)));
         const atrGuaranteed = t.atr_managed && guaranteedSl;
         // Use the better of the two SLs for the guaranteed % display
         const bestProfitSl = dirLower
           ? Math.max(trailingSl || 0, atrSl || 0)
-          : Math.min(trailingSl || Infinity, atrSl || Infinity);
+          : (trailingSl && atrSl) ? Math.min(trailingSl, atrSl) : (trailingSl || atrSl);
         const atrGuaranteedPct = atrGuaranteed && entry > 0
           ? Math.abs((bestProfitSl - entry) / entry * 100).toFixed(2)
           : null;
