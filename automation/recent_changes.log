@@ -95,3 +95,7 @@
   WHY: 3T last hour (0W 3L -$0.38). Small losses PUMP/WLFI/TURBO. 57T 24h ~38% WR +$0.26 net positive. atr_sl_hit 31T +$0.63 dominant profitable. cut-loser-MAE-GUARD 10T -$0.78 disabled. hzscore- 7T 43% -$0.21 persistent. ct-hot- 2T 0% below kill threshold. macd-div+ 4T 25% not killable. Trade freq normal 3/hr. No kill criteria met. System stable.
   BY: auto_1hr
   NEXT: Re-run at 21:00 UTC
+[2026-08-23 21:05 UTC] auto_1hr: KILLED hzscore-
+  WHY: 7T 43% WR -$0.21/24h, avg loser 2x avg winner ($0.085 vs $0.040). Persistent drag, no improvement trend. Signal starvation not a concern at 55T/24h. Disabled HZSCORE_MINUS_ENABLED = False in hermes_constants.py.
+  BY: auto_1hr
+  NEXT: Re-run at 22:05 UTC

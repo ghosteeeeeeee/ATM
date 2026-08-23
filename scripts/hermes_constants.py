@@ -1092,7 +1092,7 @@ VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True  # CEO KILLED 2026-08-17 — both directions dead. Plus: 32T ~38% WR -$0.47/7d (standalone + combos). Minus: 35T 54.3% WR -$0.22/7d.
 HZSCORE_PLUS_ENABLED     = True   # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 32T ~38% WR -$0.47/7d.
-HZSCORE_MINUS_ENABLED    = True   # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 35T 54.3% WR -$0.22/7d.
+HZSCORE_MINUS_ENABLED    = False  # auto_1hr 2026-08-23 — 7T 43% WR -$0.21/24h, avg loser 2x avg winner. Was RE-ENABLED 2026-08-22 for signal starvation (not starving: 55T/24h).
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
 HMACD_MINUS_ENABLED      = True   # hmacd_bare- and hmacd_mtf- SHORT — kill-switch for SHORT direction

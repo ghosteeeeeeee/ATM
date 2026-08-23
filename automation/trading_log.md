@@ -13698,3 +13698,24 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - ct-hot- approaching kill threshold — one more loss triggers kill
 - hzscore- persistent — losers consistently larger than winners. If 24h loss widens past -$0.30, consider param tuning.
 - hard_sl 3T -$0.153 avg vs profit-monster-trail +$0.037 — trailing exits vastly outperform hard stops
+
+## [2026-08-23 21:05 UTC] Hourly Analysis
+
+**Trades:** 6 closed in last 2h (1W 5L)
+**PnL:** -$0.23 (LDO -$0.17, ZRO -$0.15, GRASS +$0.17, PUMP -$0.11, WLFI -$0.14, TURBO -$0.13)
+**24h:** 55T 38% WR -$1.03 net
+
+**Changes:**
+1. KILLED hzscore- (HZSCORE_MINUS_ENABLED = False) — 7T 43% WR -$0.21/24h, avg loser $0.085 vs avg winner $0.040. Persistent drag with no improvement trend. Signal starvation concern not valid at 55T/24h.
+
+**No Change Needed:**
+- macd-div+ already killed (MACD_DIVERGENCE_PLUS_ENABLED = False) — 5T in 24h window from pre-kill trades
+- cut-loser-MAE-GUARD disabled — old trades only, 0 in last hour
+- atr_sl_hit 33T +$0.06 dominant, barely profitable — trailing SL healthy
+- Trade frequency normal (2-3/hr)
+- 3 open positions (BTC, ME, GMT) all slightly green
+
+**Open Questions:**
+- macd-div+ still generating trades after kill? ZRO closed 20:46 via atr_sl_hit — verify signal runner respects the flag
+- Overall 24h -$1.03 — system underperforming, need win rate improvement
+- hard_sl exits underperform trail exits significantly
