@@ -726,20 +726,9 @@ def compute_atr_sl_tp(
                 # Force update to correct it — this is a correction, not loosening.
                 result['needs_sl'] = True
                 result['_force_write'] = True
-            elif new_sl > current_sl:
-                # Bug-fix: new_sl is higher than current_sl
-                # For SHORT, higher SL = more protection (SL above entry is correct)
-                # Allow if new_sl is at trailing distance from entry (correct trailing)
-                sl_distance = abs(new_sl - entry_f) / entry_f if entry_f > 0 else 0
-                if abs(sl_distance - _trail_dist) < 0.001:  # within 0.1% of trailing distance
-                    result['needs_sl'] = True
-                    result['_force_write'] = True
-                else:
-                    # new_sl would loosen — block it
-                    new_sl = current_sl
-                    result['needs_sl'] = False
             else:
-                # new_sl would loosen — block it
+                # new_sl would loosen (go UP) — BLOCK IT
+                # For SHORT, SL should only go DOWN (tighten)
                 new_sl = current_sl
                 result['needs_sl'] = False
         else:
