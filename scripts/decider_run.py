@@ -459,16 +459,16 @@ def get_ab_params_for_trade(direction: str) -> dict:
     # Trailing stop test — ab_tests.json stores values like 0.5 (= 50%) or 1.0 (= 100%)
     # FIX (2026-04-02): old condition raw >= 1.0 never triggered for 0.5 → trailing = 50%!
     ts_variant = get_ab_variant('trailing-stop-test', direction)
-    raw_act  = ts_variant.get('config', {}).get('trailingActivationPct', 0.01)
-    raw_dist = ts_variant.get('config', {}).get('trailingDistancePct', 0.01)
-    def _norm_pct(val, default=0.01):
+    raw_act  = ts_variant.get('config', {}).get('trailingActivationPct')
+    raw_dist = ts_variant.get('config', {}).get('trailingDistancePct')
+    def _norm_pct(val, default=None):
         if val is None or val <= 0:
-            return default
+            return default  # None means use hermes_constants value
         if val > 0.01:   # value like 0.5 (= 50%) or 1.0 (= 100%) — divide by 100
             return val / 100.0
         return val        # already a small fraction like 0.005 (= 0.5%)
-    trailing_activation = _norm_pct(raw_act)
-    trailing_distance   = _norm_pct(raw_dist)
+    trailing_activation = _norm_pct(raw_act) or TRAILING_ACTIVATION_PCT
+    trailing_distance   = _norm_pct(raw_dist) or TRAILING_DISTANCE_PCT
     trailing_phase2_dist = ts_variant.get('config', {}).get('trailingPhase2DistancePct')
     if trailing_phase2_dist is not None and trailing_phase2_dist > 1.0:
         trailing_phase2_dist = trailing_phase2_dist / 100.0
