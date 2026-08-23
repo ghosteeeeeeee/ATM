@@ -7,7 +7,7 @@ TTL:  60 seconds
 Keys: allMids, meta
 """
 from paths import *
-import json, time, os, requests
+import json, time, os
 
 _CACHE_FILE = HL_CACHE_FILE
 _CACHE_TTL  = 55  # seconds — slightly less than 60s pipeline cycle to avoid double-fetchs
@@ -87,7 +87,12 @@ def fetch_and_cache() -> dict:
     except Exception as e:
         result["_errors"].append(f"meta: {e}")
 
-    _write(result)
+    # Only write cache if at least one fetch succeeded — prevents clobbering
+    # good cache with stale-broken data that fools cache_fresh()
+    if result["allMids"] or result["meta"]:
+        _write(result)
+    else:
+        result["_errors"].append("cache NOT written: both fetches failed")
     return result
 
 def get_allMids() -> dict:

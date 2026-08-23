@@ -28,17 +28,19 @@ MAX_TOKENS_PER_RUN = 50  # limit per run to avoid long execution
 def get_tokens_without_volume():
     """Find tokens in candles_1m that have volume=0."""
     conn = sqlite3.connect(CANDLES_DB, timeout=10)
-    c = conn.cursor()
-    c.execute("""
-        SELECT token, COUNT(*) as cnt
-        FROM candles_1m
-        WHERE volume = 0 OR volume IS NULL
-        GROUP BY token
-        ORDER BY cnt DESC
-    """)
-    rows = c.fetchall()
-    conn.close()
-    return [(r[0], r[1]) for r in rows]
+    try:
+        c = conn.cursor()
+        c.execute("""
+            SELECT token, COUNT(*) as cnt
+            FROM candles_1m
+            WHERE volume = 0 OR volume IS NULL
+            GROUP BY token
+            ORDER BY cnt DESC
+        """)
+        rows = c.fetchall()
+        return [(r[0], r[1]) for r in rows]
+    finally:
+        conn.close()
 
 
 def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100):
@@ -47,10 +49,8 @@ def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100):
     Uses the global rate limiter to prevent 429s.
     Tries uppercase token first, then original DB name (for k-prefix tokens).
     """
-    import time as _time
-
     # Calculate time range
-    end_time = int(_time.time() * 1000)
+    end_time = int(time.time() * 1000)
     tf_ms = {'1m': 60000, '5m': 300000, '15m': 900000}[timeframe]
     start_time = end_time - (limit * tf_ms)
 
@@ -89,25 +89,27 @@ def store_candles(token: str, interval: str, candles: list):
         return 0
     table = {'1m': 'candles_1m', '5m': 'candles_5m', '15m': 'candles_15m'}[interval]
     conn = sqlite3.connect(CANDLES_DB, timeout=30)
-    conn.execute("PRAGMA journal_mode=WAL")
-    c = conn.cursor()
-    
-    # Only store candles where volume=0 in existing data (don't overwrite good data)
-    stored = 0
-    for cd in candles:
-        c.execute(f"SELECT volume FROM {table} WHERE token=? AND ts=?", (token, cd['ts']))
-        existing = c.fetchone()
-        if existing is None or (existing[0] is not None and existing[0] == 0):
-            c.execute(
-                f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume) "
-                f"VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (token, cd['ts'], cd['open'], cd['high'], cd['low'], cd['close'], cd['volume'])
-            )
-            stored += 1
-    
-    conn.commit()
-    conn.close()
-    return stored
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+        c = conn.cursor()
+
+        # Only store candles where volume=0 in existing data (don't overwrite good data)
+        stored = 0
+        for cd in candles:
+            c.execute(f"SELECT volume FROM {table} WHERE token=? AND ts=?", (token, cd['ts']))
+            existing = c.fetchone()
+            if existing is None or (existing[0] is not None and existing[0] == 0):
+                c.execute(
+                    f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume) "
+                    f"VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (token, cd['ts'], cd['open'], cd['high'], cd['low'], cd['close'], cd['volume'])
+                )
+                stored += 1
+
+        conn.commit()
+        return stored
+    finally:
+        conn.close()
 
 
 def fill_volume_gaps(token: str, dry_run: bool = False):
@@ -125,8 +127,7 @@ def fill_volume_gaps(token: str, dry_run: bool = False):
     # Store 1m candles (will overwrite volume=0 rows)
     stored = store_candles(token, '1m', candles_1m)
 
-    # Fetch 5m candles too
-    time.sleep(RATE_LIMIT_DELAY)
+    # Fetch 5m candles too — _hl_info() already enforces 1s rate limit gap
     candles_5m = fetch_hl_candles(token, '5m', 100)
     if candles_5m:
         store_candles(token, '5m', candles_5m)
