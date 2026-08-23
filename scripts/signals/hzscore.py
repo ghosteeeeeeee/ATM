@@ -137,26 +137,10 @@ def run() -> int:
             pass
 
         # ── EMA200 trend filter (2026-08-13) ──────────────────────────────
-        # Don't SHORT when price is above EMA200 — uptrend, breakout likely pullback.
-        # Backtest: 0/12 winners blocked, 8/10 losers blocked (WR 54.5% → 85.7%)
-        try:
-            from hermes_constants import RANGE_BREAKOUT_SHORT_EMA_PERIOD
-            conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
-            rows_ema = conn_ema.execute(
-                "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT ?",
-                (token.upper(), RANGE_BREAKOUT_SHORT_EMA_PERIOD + 10)
-            ).fetchall()
-            conn_ema.close()
-            if rows_ema and len(rows_ema) >= RANGE_BREAKOUT_SHORT_EMA_PERIOD:
-                closes_ema = [r[0] for r in reversed(rows_ema)]
-                k_ema = 2.0 / (RANGE_BREAKOUT_SHORT_EMA_PERIOD + 1)
-                ema_val = closes_ema[0]
-                for p in closes_ema[1:]:
-                    ema_val = p * k_ema + ema_val * (1 - k_ema)
-                if closes_ema[-1] > ema_val:
-                    continue  # price above EMA200 — uptrend, skip SHORT
-        except Exception:
-            pass
+        # REMOVED (2026-08-23): z-score extremes ARE the signal — they fire when
+        # price is far from mean (above/below EMA200). Blocking SHORT above EMA200
+        # killed 2/6 valid signals. The trend filter in add_signal already handles
+        # counter-trend protection, and hzscore is now exempt from it.
 
         price = data['price']
 
@@ -205,11 +189,11 @@ def run() -> int:
             _prices = [r[0] for r in _cur.fetchall()]
             if len(_prices) >= 2 and _prices[0] > 0:
                 vel_5m = (_prices[-1] - _prices[0]) / _prices[0] * 100
-                # Momentum fade: wait for price to move in our direction
-                if local_dir == 'SHORT' and vel_5m > 0:
-                    continue  # price actively rising, wait for fade
-                if local_dir == 'LONG' and vel_5m < 0:
-                    continue  # price still falling, wait for bounce
+                # FIX (2026-08-23): Removed momentum fade direction gate.
+                # z-score extremes are LEADING indicators — they should fire before
+                # the move, not wait for confirmation. The old fade filter blocked
+                # ALL SHORT signals when 5m vel > 0, killing 10 valid signals/cycle.
+                # Spike exhaustion still blocks sharp moves.
                 # Spike exhaustion: skip after sharp 5m moves
                 if abs(vel_5m) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
                     continue  # spike exhaustion — skip
@@ -235,8 +219,10 @@ def run() -> int:
             except Exception:
                 pass  # non-fatal: BB filter is secondary
 
-        except Exception:
+        except Exception as _outer_err:
             # Velocity filter is MANDATORY — if it fails, skip the signal
+            import sys
+            print(f'  [HZSCORE-DEBUG] {token} OUTER EXCEPT: {_outer_err}', file=sys.stderr)
             continue
         finally:
             if _conn:

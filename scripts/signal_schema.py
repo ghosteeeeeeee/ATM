@@ -577,13 +577,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # Block counter-trend signals
             # CHoCH exemption: reversal signals are SUPPOSED to fire counter-trend
             # coin_tracker_hot exemption: uses its own momentum filters
+            # mtf_zscore exemption: z-score extremes are LEADING indicators, fire at extremes
             _choch_exempt = signal_type and 'choch' in signal_type.lower()
             _ct_hot_exempt = signal_type and 'coin_tracker_hot' in signal_type.lower()
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt:
+            _hzscore_exempt = signal_type and signal_type.lower() == 'mtf_zscore'
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
-            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt:
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
@@ -591,7 +593,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # ── 5m+15m Regime Confirmation (for SHORT) ────────────────────────
             # Only block SHORT if BOTH 5m AND 15m confirm BULLISH
             # This prevents SHORT in strong uptrends while allowing in weak/mixed
-            if direction.upper() == 'SHORT' and not _choch_exempt:
+            if direction.upper() == 'SHORT' and not _choch_exempt and not _hzscore_exempt:
                 try:
                     import sqlite3 as _sqlite3
                     from paths import CANDLES_DB

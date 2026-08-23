@@ -96,6 +96,18 @@ def compute_flip_score(
     if live_pnl > 0.01:
         return None  # In profit — never flip
 
+    # ── Gate 2: Minimum velocity — don't flip in dead markets ─────────────
+    # If price isn't moving, there's no reversal to flip into.
+    # This prevents flipping on noise when speed_pctl is very low.
+    if speed_tracker is not None:
+        try:
+            spd = speed_tracker.get_token_speed(token)
+            vel_5m = abs(spd.get('price_velocity_5m', 0) or 0)
+            if vel_5m < 0.15:
+                return None  # Market too quiet — no directional momentum
+        except Exception:
+            pass
+
     components = {}
     reasons = []
 
@@ -303,11 +315,13 @@ def _get_score_threshold(live_pnl: float) -> float:
     elif live_pnl > -0.03:
         return 75
     elif live_pnl > -0.06:
-        return 60
+        return 65   # Raised from 60 — don't flip easily at small losses
     elif live_pnl > -0.10:
-        return 50
+        return 55   # Raised from 50
+    elif live_pnl > -0.20:
+        return 50   # Raised from 40 — need real conviction at this loss
     else:
-        return 40   # Deep underwater — flip on moderate signal
+        return 45   # Deep underwater — still need moderate signal
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -752,7 +766,11 @@ def _record_cascade_sequence(parent_trade_id: int, token: str, entry_px: float,
 
 
 def _wait_for_hl_close(token: str, timeout: int = 15) -> bool:
-    """Wait for a position to disappear from HL."""
+    """
+    Wait for a position to disappear from HL.
+    Returns True if position is gone OR if we can't check (proceed with flip).
+    Returns False only if we can confirm position is STILL open on HL.
+    """
     try:
         import importlib
         hg_mod = importlib.import_module('hl-sync-guardian')
@@ -760,12 +778,15 @@ def _wait_for_hl_close(token: str, timeout: int = 15) -> bool:
         if _wait_fn is None:
             raise AttributeError("_wait_for_position_closed not found")
         return _wait_fn(token, timeout=timeout)
-    except (SystemExit, ImportError, Exception):
-        # SystemExit: guardian's lock check may sys.exit
-        # ImportError: guardian module not available
-        # Return False — abort flip rather than risk dual position
-        print(f"  [CFV2] ⚠️ _wait_for_hl_close failed for {token} — aborting flip")
-        return False
+    except SystemExit:
+        # Guardian's lock check sys.exit'd — guardian is running.
+        # mirror_close already closed HL, so proceed with flip.
+        print(f"  [CFV2] ⚠️ _wait_for_hl_close: guardian running for {token} — proceeding (mirror_close handled HL)")
+        return True
+    except Exception as e:
+        # Other error — proceed (mirror_close already handled HL)
+        print(f"  [CFV2] ⚠️ _wait_for_hl_close failed for {token}: {e} — proceeding")
+        return True
 
 
 def _set_loss_cooldown(token: str, direction: str, hours: float = None):
