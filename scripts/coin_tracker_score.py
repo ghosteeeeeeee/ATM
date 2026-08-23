@@ -1059,6 +1059,46 @@ def score_contrarian(health_dist, token_data):
     return 50.0  # Neutral
 
 
+def score_macd_divergence(closes):
+    """
+    Score based on MACD divergence detection.
+    
+    Uses the MACD divergence signal logic to detect reversals.
+    
+    Args:
+        closes: list of close prices (oldest first)
+    
+    Returns: dict with score, direction, and confidence
+    """
+    if not closes or len(closes) < 40:
+        return {'score': 50.0, 'direction': None, 'confidence': 0}
+    
+    try:
+        from signals.macd_divergence import detect_divergence
+        result = detect_divergence(closes)
+        
+        if result is None:
+            return {'score': 50.0, 'direction': None, 'confidence': 0}
+        
+        direction, confidence = result
+        
+        # Convert to score
+        if direction == 'LONG':
+            # Bullish divergence — favor LONG
+            score = 70 + (confidence - 70) * 0.5  # 70-100
+        else:
+            # Bearish divergence — favor SHORT
+            score = 30 - (confidence - 70) * 0.5  # 10-30
+        
+        return {
+            'score': max(0, min(100, score)),
+            'direction': direction,
+            'confidence': confidence,
+        }
+    except Exception:
+        return {'score': 50.0, 'direction': None, 'confidence': 0}
+
+
 # ── Weather Station Scoring Functions ─────────────────────────────────────────
 
 def score_tide(token_data, weather_data):

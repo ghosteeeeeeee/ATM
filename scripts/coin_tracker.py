@@ -48,6 +48,8 @@ from coin_tracker_score import (
     compute_health_distribution as _compute_health_distribution,
     detect_contrarian_signal as _detect_contrarian_signal,
     score_contrarian as _score_contrarian,
+    # MACD divergence
+    score_macd_divergence as _score_macd_divergence,
     # Weather station scoring functions
     score_tide as _score_tide, score_sea_state as _score_sea_state,
     score_wind as _score_wind, score_token_regime as _score_token_regime,
@@ -458,8 +460,11 @@ def collect():
                 s_wind = _score_wind(token_data, weather_data) if weather_data else 50.0
                 s_token_regime = _score_token_regime(symbol, weather_data) if weather_data else 50.0
                 
-                # Contrarian score — computed after all coins are processed
-                # For now, use 50 (neutral) — will be updated in second pass
+                # MACD divergence scoring
+                macd_div = _score_macd_divergence(closes_5m)
+                s_macd_div = macd_div['score']
+                
+                # Contrarian score — will be computed in second pass
                 s_contrarian = 50.0
 
                 composite = (
@@ -480,7 +485,8 @@ def collect():
                     s_sea_state * WEIGHTS['sea_state'] +
                     s_wind * WEIGHTS['wind'] +
                     s_token_regime * WEIGHTS['token_regime'] +
-                    s_contrarian * WEIGHTS['contrarian']
+                    s_contrarian * WEIGHTS['contrarian'] +
+                    s_macd_div * WEIGHTS.get('macd_div', 0.05)
                 )
 
                 # No candle data = no real activity → force cold/dead
@@ -642,7 +648,8 @@ def collect():
     print(f'  Hot%: {current_health_dist["hot_pct"]:.0f}%, Cold%: {current_health_dist["cold_pct"]:.0f}%')
     print(f'  Signal: {contrarian_signal["signal"]} (strength: {contrarian_signal["strength"]})')
     print(f'  Reason: {contrarian_signal["reason"]}')
-    print(f'  Action: {contrarian_signal["action"]}')
+    if contrarian_signal.get("action"):
+        print(f'  Action: {contrarian_signal["action"]}')
 
     # ── Prune old events (every 24h) ──
     from coin_tracker_schema import get_meta, set_meta
