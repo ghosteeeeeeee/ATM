@@ -382,9 +382,10 @@
         const cls = pnlUsdt > 0 ? 'win' : pnlUsdt < 0 ? 'loss' : 'neutral';
         const closedTime = (t.closed || '').replace('T', ' ').slice(0, 19);
         const atrProfit = t.atr_managed && pnlUsdt > 0;
+        const pmClose = (t.close_reason || '').includes('profit-monster') || (t.close_reason || '').includes('profit_monster');
         return `<tr class="${atrProfit ? 'atr-profit-row' : ''}">
           <td style="color:#444;font-size:0.75em">${globalIdx}</td>
-          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${atrProfit ? '<span class="atr-badge" title="ATR SL monitored — closed in profit">💵</span>' : ''}</td>
+          <td>${iconHtml(t.coin)}${t.coin || '--'}${favHtml(t.coin)}${pmClose ? '<span class="pm-badge" title="Profit Monster trail closed">🐉</span>' : ''}${atrProfit ? '<span class="atr-badge" title="ATR SL — closed in profit">💵</span>' : ''}</td>
           <td class="${dir==='LONG'?'long':'short'}">${dir}</td>
           <td>$${(t.entry||0).toFixed(4)}</td>
           <td>$${(t.exit||0).toFixed(4)}</td>
