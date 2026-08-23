@@ -67,3 +67,11 @@
   WHY: 4T last hour (2W 2L +$0.06). ENA winner offsets 3 small losses. 36T 14W 38.9% +$0.83/24h. atr_sl_hit 18T 50% dominant + profitable. hl_copy_trader only profitable signal +$0.10. ct-hot+ improving 6T 3W +$0.08. hzscore- 5T 3W 60% WR -$0.16 persistent losers > winners. ct-hot- 2T 0W at kill threshold. 5 open $0.27 unrealized green. Trade freq normal. System stable.
   BY: auto_1hr
   NEXT: Re-run at 12:00 UTC
+[2026-08-23 12:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (ICP ct-hot+ +$0.15). 38T 14W 36.8% +$0.12/24h breakeven. atr_sl_hit 20T +$0.92 dominant + profitable. hzscore- 6T 3W 50% -$0.20 persistent losers > winners. ct-hot- 2T 0W below kill threshold. 5 open ~$0.27 unrealized. Trade freq normal 1.6/hr. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 13:00 UTC
+[2026-08-23 14:04 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W +$0.44 HBAR/GMT via atr_sl_hit). 40T 14W 35% +$0.17/24h breakeven. atr_sl_hit 22T +$1.36 dominant profitable. cut-loser-MAE-GUARD 9T -$0.78 worst drag (disabled). profit-monster-trail 4T +$0.13 75% WR. hzscore- 6T 3W -$0.20 persistent. ct-hot- 2T 0W below kill threshold. 5 open (3 slightly underwater, 2 green). Trade freq normal 1.7/hr. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 15:00 UTC

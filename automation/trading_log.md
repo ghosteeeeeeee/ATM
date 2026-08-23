@@ -13464,3 +13464,72 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 
 **Open Questions:**
 - hzscore- continues high WR but negative PnL — losers consistently larger than winners. Monitor for 24h more before action.
+
+## [2026-08-23 12:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.15 (ICP ct-hot+ LONG atr_sl_hit)
+
+**24h Summary:** 38T 14W 36.8% WR, +$0.12 breakeven
+
+**24h by Exit Reason:**
+- atr_sl_hit: 20T +$0.92 (53%, profitable, structural)
+- cut-loser-MAE-GUARD: 9T -$0.78 (declining since disable)
+- hard_sl: 2T -$0.46 (micro-cap only)
+- profit-monster-trail: 4T +$0.13
+
+**24h by Signal:**
+- hl_copy_trader: 18T 7W 39% +$0.10 (volume driver)
+- ct-hot+: 7T 4W 57% +$0.23 (improving)
+- hzscore-: 6T 3W 50% -$0.20 (losers > winners, tracking)
+- ct-hot-: 2T 0W -$0.15 (below kill threshold)
+
+**Open:** 5 positions, ~$0.27 unrealized
+
+**Changes:** None
+
+**No Change Needed:**
+- 1 trade last hour — quiet, normal
+- No kill criteria (ct-hot- still at 2T, needs 3+)
+- atr_sl_hit 53% of closes but profitable avg — trailing SL healthy
+- Trade frequency normal (1.6/hr)
+- hzscore- pattern persistent but only 6T — monitoring
+
+**Open Questions:**
+- hzscore- 6T 3W 50% WR but -$0.20 — losers consistently larger than winners. Continue monitoring.
+
+## [2026-08-23 14:04 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L)
+**PnL:** +$0.44 (HBAR +$0.29, GMT +$0.15 — both atr_sl_hit)
+
+**24h Summary:** 40T 14W 35% WR, +$0.17 breakeven
+
+**24h by Exit Reason:**
+- atr_sl_hit: 22T +$1.36, 54.5% WR (structural, profitable)
+- cut-loser-MAE-GUARD: 9T -$0.78, 11.1% WR (worst drag)
+- profit-monster-trail: 4T +$0.13, 75% WR
+- hard_sl: 2T -$0.46, 0% WR (micro-cap)
+- guardian_orphan: 1T -$0.01
+- PHANTOM_CLOSE: 1T +$0.04
+
+**24h by Signal:**
+- ct-hot+: 9T 7W 66.7% +$0.67 (best performer)
+- hl_copy_trader: 18T 38.9% +$0.10 (volume driver)
+- hzscore-: 6T 3W 50% -$0.20 (losers > winners)
+- ct-hot-: 2T 0W -$0.15 (below kill threshold)
+
+**Open:** 5 positions (BANANA, ADA, IMX slightly underwater; LTC, BTC green)
+
+**Changes:** None
+
+**No Change Needed:**
+- 2 trades last hour — both winners via atr_sl_hit
+- No kill criteria (ct-hot- at 2T, needs 3+)
+- Trade freq normal (1.7/hr)
+- atr_sl_hit dominant and profitable — trailing SL healthy
+- hzscore- persistent but only 6T — monitoring
+
+**Open Questions:**
+- hzscore- 6T 3W 50% but -$0.20 — losers consistently larger than winners. Continue monitoring.
+- 5 open positions with 3 slightly underwater — normal for trailing SL entries.
