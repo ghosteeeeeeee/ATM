@@ -70,7 +70,8 @@ Implemented: 13 | Partial: 3 | Resolved: 3 | Pending Level 1: 3 | Pending Level 
 ### atr-sl-widen.md — features_recorded bug
 - Difficulty: Level 1 | Value: HIGH
 - record_entry_features() writes data but features_recorded column stays FALSE.
-- **Action:** Fix the UPDATE query (features_recorded = TRUE is already there — verify column default), run SQL backfill.
+- **Root cause (2026-08-23):** momentum_cache stores slope/regime/trend but NOT rsi_14/macd_hist/atr_14/bb_position. record_entry_features() gets all-NULL row → falls back to _compute_intel_from_prices() → often insufficient data (<26 prices) → returns False. Only 3/38 recent trades recorded.
+- **Fix needed:** Populate momentum_cache with full indicators in 15m/4h regime scanners, OR modify record_entry_features() to compute directly from price_history when momentum_cache is empty.
 
 ### r2-trend-long-trailing-sl-tuning.md
 - Difficulty: Level 1 | Value: MEDIUM

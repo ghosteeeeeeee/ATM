@@ -1,5 +1,23 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-23 06:30 UTC] Daily Orchestrator Run
+
+**Pipeline Status:** 5 open | 39 closed today | -6.05% PnL
+**24h:** 35T 17W 48.6% +$0.05 (break-even)
+**Market:** NEUTRAL regime
+
+**Key Metrics:**
+- hl_copy_trader: 25T/24h 48% +$0.22 (ONLY profitable signal)
+- hzscore-: 3T/24h 100% +$0.18 (perfect, small)
+- ct-hot+: 3T/24h 0% -$0.32 (dormant, clearing)
+- MAE-GUARD: DISABLED today (was -$5.43/week)
+
+**System Health:** OK — 0 errors, 51 timers active, disk 82%
+**Implemented Today:** Nothing — system stable, no CEO decisions pending
+**Root Cause Found:** features_recorded bug — momentum_cache missing RSI/MACD/ATR/BB indicators
+
+**Action:** No changes needed. Continue monitoring ct-hot+ wind-down (trades age out Aug 24-25).
+
 ## [2026-08-21 22:04 UTC] Hourly Analysis
 
 **Trades:** 1 closed last hour (HYPE hl_copy_trader atr_sl_hit +$0.18)
