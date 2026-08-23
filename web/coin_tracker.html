@@ -149,20 +149,24 @@
         .signal-tag.long { background: #00ff8822; color: #00ff88; }
         .signal-tag.short { background: #ff444422; color: #ff4444; }
 
-        /* Signal overlay on card */
+        /* Signal overlay on card - centered */
         .signal-overlay {
             position: absolute;
-            top: 8px;
-            left: 8px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: bold;
             z-index: 10;
             animation: signalPulse 2s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .signal-overlay.long {
             background: #00ff8833;
@@ -495,10 +499,10 @@ function renderCard(c) {
     const hasSignal = (isLong || isShort) && signalConf > 0 && (health === 'hot' || health === 'ready');
     const signalClass = isLong ? 'long' : isShort ? 'short' : '';
     const signalArrow = isLong ? '▲' : isShort ? '▼' : '';
-    const signalLabel = signalType.replace(/_/g, ' ').replace(/(long|short)/i, '').trim();
+    const signalLabel = isLong ? 'LONG' : isShort ? 'SHORT' : '';
 
     return `<div class="coin-card" data-sym="${c.symbol}" onclick="toggleDetail(this)">
-        ${hasSignal ? `<div class="signal-overlay ${signalClass}"><span class="signal-arrow">${signalArrow}</span> ${signalLabel} ${signalConf.toFixed(0)}%</div>` : ''}
+        ${hasSignal ? `<div class="signal-overlay ${signalClass}"><span class="signal-arrow">${signalArrow}</span> ${signalLabel}</div>` : ''}
         <div class="card-top">
             <div class="card-top-left">
                 ${iconHtml(c.symbol)}
