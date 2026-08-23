@@ -388,10 +388,13 @@ def collect():
                 # Get price acceleration from token_speeds table
                 price_accel = None
                 try:
-                    speed_row = signals_conn.execute(
+                    # Open fresh connection for token_speeds query
+                    speed_conn = sqlite3.connect(RUNTIME_DB, timeout=10)
+                    speed_row = speed_conn.execute(
                         'SELECT price_acceleration FROM token_speeds WHERE token = ?',
                         (symbol.upper(),)
                     ).fetchone()
+                    speed_conn.close()
                     if speed_row:
                         price_accel = speed_row[0]
                 except Exception:

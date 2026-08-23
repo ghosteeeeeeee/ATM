@@ -921,6 +921,7 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike', 'r2-trend-long', 'ct-hot+',
     'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
+    'hzscore',  # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 

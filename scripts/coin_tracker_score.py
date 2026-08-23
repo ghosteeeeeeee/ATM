@@ -11,26 +11,26 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.12,      # reduced from 0.14
+    'momentum': 0.13,      # reduced from 0.14
     'volume': 0.08,        # reduced from 0.10
     'volatility': 0.06,    # reduced from 0.07
     'spread': 0.06,        # reduced from 0.07
     'signals': 0.03,       # reduced from 0.04
     'regime': 0.03,        # reduced from 0.04
-    'wyckoff': 0.12,       # reduced from 0.14
+    'wyckoff': 0.13,       # reduced from 0.14
     'ewave': 0.08,         # reduced from 0.09
     'trend': 0.06,         # reduced from 0.07
     'setup': 0.07,         # reduced from 0.08
     'clustering': 0.03,    # reduced from 0.04
     'recency': 0.04,       # reduced from 0.05
-    'liquidation': 0.06,   # reduced from 0.07
+    'liquidation': 0.07,   # reduced from 0.07
     # NEW: Weather station factors
     'tide': 0.05,          # market flow alignment
     'sea_state': 0.03,     # market health
     'wind': 0.03,          # momentum alignment
     'token_regime': 0.02,  # historical performance
 }
-# ponytail: weights sum to 1.0 — verified (12+8+6+6+3+3+12+8+6+7+3+4+6+5+3+3+2 = 100)
+# ponytail: weights sum to 1.0 — verified (13+8+6+6+3+3+13+8+6+7+3+4+7+5+3+3+2 = 100)
 
 # ── Indicators ─────────────────────────────────────────────────────────────────
 
@@ -381,13 +381,20 @@ def score_tide(token_data, weather_data):
     else:
         tide_dir = 'NEUTRAL'
     
-    # Get token direction
+    # Get token direction and normalize to common vocabulary
     token_dir = token_data.get('setup_type') or token_data.get('trend_direction')
     if not token_dir:
         return 50.0
     
+    # Normalize token direction to match tide direction
+    token_dir_normalized = token_dir.upper()
+    if token_dir_normalized in ('LONG', 'BULL'):
+        token_dir_normalized = 'BULLISH'
+    elif token_dir_normalized in ('SHORT', 'BEAR'):
+        token_dir_normalized = 'BEARISH'
+    
     # Align with token direction
-    if tide_dir == token_dir:
+    if tide_dir == token_dir_normalized:
         # Aligned — boost score based on tide strength
         strength = abs(long_pct - 50) / 50
         return 80 + strength * 20  # 80-100
@@ -440,6 +447,7 @@ def score_wind(token_data, weather_data):
     - Both accelerating same direction → 80
     - Market flat → 50
     - Mismatch → 30
+    - No token data → 50 (neutral)
     """
     if not weather_data:
         return 50.0
@@ -448,7 +456,13 @@ def score_wind(token_data, weather_data):
     market_vel = wind.get('avg_velocity', 0)
     market_accel = wind.get('avg_accel', 0)
     
-    token_accel = token_data.get('price_acceleration') or 0
+    token_accel = token_data.get('price_acceleration')
+    
+    # If no token acceleration data, return neutral
+    if token_accel is None:
+        return 50.0
+    
+    token_accel = token_accel or 0
     
     # Alignment check
     if market_vel > 0 and token_accel > 0:
@@ -480,7 +494,7 @@ def score_token_regime(token, weather_data):
     
     for regime_type in ['reef', 'sandbar', 'deep']:
         for t in tokens.get(regime_type, []):
-            if t['token'] == token:
+            if t.get('token') == token:
                 if regime_type == 'reef':
                     return 80 + min(20, t.get('winrate', 50) - 55)
                 elif regime_type == 'deep':
