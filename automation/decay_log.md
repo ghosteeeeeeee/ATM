@@ -647,3 +647,9 @@
 [2026-08-23 11:07 UTC]   🟢 OK: hzscore-: 5 trades, 60.0% WR, PnL=-1.01
 [2026-08-23 11:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-08-23 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-08-23 17:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-23 17:07 UTC]   🟢 OK: hl_copy_trader: 18 trades, 38.9% WR, PnL=2.22
+[2026-08-23 17:07 UTC]   🟢 OK: hzscore-: 7 trades, 42.9% WR, PnL=-1.42
+[2026-08-23 17:07 UTC]   🟢 OK: ct-hot+: 14 trades, 57.1% WR, PnL=3.96
+[2026-08-23 17:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-08-23 17:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

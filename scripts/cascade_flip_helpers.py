@@ -188,6 +188,7 @@ def insert_post_flip_trade(
     The INSERT uses a CTE with a NOT EXISTS guard so it is idempotent —
     if guardian runs before or at the same time, one of the two will succeed.
     """
+    conn = None
     try:
         from position_manager import get_db_connection
 
@@ -200,14 +201,14 @@ def insert_post_flip_trade(
                 amount_usdt, leverage, exchange, paper, status, open_time,
                 stop_loss, target, atr_managed, signal, signal_reason,
                 sl_distance, trailing_activation, trailing_distance,
-                guardian_closed, is_guardian_close
+                guardian_closed, is_guardian_close, server
             )
             SELECT
                 %s, %s, %s, %s,
                 %s, %s, 'Hyperliquid', true, 'open', NOW(),
                 %s, %s, TRUE, %s, %s,
                 0.03, 0.01, 0.01,
-                FALSE, FALSE
+                FALSE, FALSE, 'Hermes'
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades
                 WHERE token = %s AND status = 'open'
@@ -226,7 +227,6 @@ def insert_post_flip_trade(
         row = cur.fetchone()
         conn.commit()
         cur.close()
-        conn.close()
 
         if row:
             return row[0]
@@ -234,19 +234,27 @@ def insert_post_flip_trade(
             # Either we inserted OR guardian already inserted — both are fine.
             # Try to fetch the existing trade_id so callers can use it.
             conn2 = get_db_connection()
-            cur2  = conn2.cursor()
-            cur2.execute(
-                "SELECT id FROM trades WHERE token=%s AND status='open' AND server='Hermes' ORDER BY id DESC LIMIT 1",
-                (token,)
-            )
-            row2 = cur2.fetchone()
-            cur2.close()
-            conn2.close()
-            return row2[0] if row2 else None
+            try:
+                cur2  = conn2.cursor()
+                cur2.execute(
+                    "SELECT id FROM trades WHERE token=%s AND status='open' AND server='Hermes' ORDER BY id DESC LIMIT 1",
+                    (token,)
+                )
+                row2 = cur2.fetchone()
+                cur2.close()
+                return row2[0] if row2 else None
+            finally:
+                conn2.close()
 
     except Exception as e:
         print(f"  [Post-Flip DB] ⚠️ Failed to insert post-flip trade for {token}: {e}")
         return None
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 # ── V2: Post-Flip Cycle Tracking ──────────────────────────────────────────────

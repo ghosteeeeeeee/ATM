@@ -79,3 +79,7 @@
   WHY: 3T last hour (1W 2L +$0.10). LDO winner +$0.34 offsets ENA -$0.22 (macd-div+ new) and LTC -$0.02 (cascade_flip). 46T 18W 39% +$0.34/24h positive. atr_sl_hit 29T dominant profitable. hl_copy_trader best PnL +$0.44. ct-hot+ improving 15T 8W 53% +$0.18. hzscore- 6T 3W 50% -$0.20 persistent losers > winners. ct-hot- 2T 0W below kill threshold. macd-div+ 1T 0W -$0.22 too early. 1 open BTC +$0.58 green. Trade freq normal 3/hr. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 17:00 UTC
+[2026-08-23 17:00 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (1W 3L -$0.15). Small losses, no blowups. 50T 20W 40% +$0.59/24h positive. atr_sl_hit 29T dominant profitable. hl_copy_trader best PnL +$0.42. ct-hot+ improving 15T 8W 53% +$0.18. hzscore- 7T 3W 43% -$0.21 persistent. macd-div+ 2T 0W -$0.36 needs 3+ to kill. ct-hot- 2T 0W needs 3+ to kill. 1 open BTC +$0.58 green. Trade freq normal 4/hr. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 18:00 UTC

@@ -13592,3 +13592,36 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - hzscore- 6T 3W 50% but -$0.20 — losers consistently larger than winners.
 - macd-div+ new signal, 1T 0W -$0.22 — too early to judge, monitor next run.
+
+## [2026-08-23 17:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1W 3L)
+**PnL:** -$0.15 (NXPC +$0.02, ENA -$0.14, NXPC -$0.01, PUMP -$0.02)
+
+**24h Summary:** 50T 20W 40% WR, +$0.59
+- hl_copy_trader: 20T 8W 40% +$0.42 (best PnL)
+- ct-hot+: 15T 8W 53% +$0.18 (improving)
+- hzscore-: 7T 3W 43% -$0.21 (persistent)
+- ct-hot-: 2T 0W -$0.15 (at kill threshold - needs 3+)
+- macd-div+: 2T 0W -$0.36 (new, needs 3+ to kill)
+
+**24h by Exit Reason:**
+- atr_sl_hit: 29T +$1.01 (dominant, profitable)
+- cut-loser-MAE-GUARD: 9T -$0.78 (disabled correctly)
+- profit-monster-trail: 5T +$0.15
+- hard_sl: 2T -$0.46
+
+**Open:** 1 (BTC ct-hot+ +$0.58 green)
+
+**Changes:** None
+
+**No Change Needed:**
+- 4 trades last hour — small losses, no blowups
+- macd-div+ at 2T 0% WR — needs 3+ to trigger kill
+- ct-hot- at 2T 0% — needs 3+ to trigger kill
+- atr_sl_hit dominant and profitable — trailing SL healthy
+- Trade frequency normal (4/hr)
+
+**Open Questions:**
+- macd-div+ new signal, 2T 0% -$0.36 — one more loss triggers kill
+- hzscore- persistent 7T 43% -$0.21 — losers consistently larger than winners

@@ -305,3 +305,6 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2641s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2581s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2520s left, N failures)`
+
+## Error Alerts — 2026-08-23 17:03 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [CFV2] ⚠️ _wait_for_hl_close failed for TOK — aborting flip`

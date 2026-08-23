@@ -90,7 +90,7 @@ def _wait_for_hl_close(token: str, timeout: int = 15) -> bool:
     Wait for a position to actually disappear from HL.
     Uses _wait_for_position_closed from hl-sync-guardian.py (loaded via importlib
     since the filename has a dash).
-    Returns True if position is gone (closed/filled), False if still open.
+    Returns True if position is gone (closed/filled), or if we can't check (proceed).
     """
     try:
         import importlib
@@ -99,9 +99,13 @@ def _wait_for_hl_close(token: str, timeout: int = 15) -> bool:
         if _wait_fn is None:
             raise AttributeError("_wait_for_position_closed not found")
         return _wait_fn(token, timeout=timeout)
+    except SystemExit:
+        # Guardian's lock check sys.exit'd — mirror_close already handled HL
+        print(f"  [CASCADE FLIP] ⚠️ _wait_for_hl_close: guardian running — proceeding")
+        return True
     except Exception as e:
         print(f"  [CASCADE FLIP] ⚠️ _wait_for_hl_close failed: {e} — proceeding without wait")
-        return True  # Proceed on error (old behavior fallback)
+        return True
 
 
 def _get_db_connection():

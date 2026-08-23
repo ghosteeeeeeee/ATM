@@ -1,32 +1,42 @@
-=== Signal Performance Report ===
-Period: 2026-08-23 ~12:00 UTC | 6h + 24h
+# Signal Performance Report
+**Generated:** 2026-08-23 23:30 UTC | **Period:** Last 6h + 24h
 
-**24h Total:** 36 trades, -$0.23 PnL
+## KILLED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | No kill candidates — all losers have <5 trades or WR >30% |
 
-## KILLED (executed):
-None — no signals meet kill criteria (WR<30% AND PnL<-$0.10 AND >5 trades).
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | No boost candidates — no signal meets all 3 criteria (WR>55%, PnL>$0.05, 5+ trades) |
 
-## BOOSTED (executed):
-None — no signals meet boost criteria (WR>55% AND PnL>$0.05 AND 5+ trades AND consistent across tokens).
-
-## LOSERS (watch list):
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| hzscore- | SHORT | 60% | -$0.16 | 5 | R:R problem: losses 7x avg win |
-| ct-hot- | SHORT | 0% | -$0.15 | 2 | Too few trades to judge |
+| hzscore- | SHORT | 42.9% | -$0.21 | 7 | WATCH — re-enabled 08-22, -$0.03/trade avg. Below kill threshold (WR>30%) |
+| macd-div+ | LONG | 0.0% | -$0.36 | 2 | LOW VOL — too few trades to act |
+| ct-hot- | SHORT | 0.0% | -$0.15 | 2 | LOW VOL — too few trades to act |
 
-**hzscore- analysis:** High WR (60%) but 2 ATR SL hits (-$0.14, -$0.15) wipe out 3 profit-monster exits (+$0.06, +$0.05, +$0.02). Re-enabled Aug 22 by T for signal starvation — keep watching but no action yet.
-
-## WINNERS:
+## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| hl_copy_trader | LONG | 38.9% | +$0.10 | 18 | Below WR threshold, net positive |
-| ct-hot+ | LONG | 50% | +$0.08 | 6 | Marginal |
+| hl_copy_trader | LONG | 40.0% | +$0.42 | 20 | ACTIVE — highest volume, net positive despite sub-50% WR |
+| ct-hot+ | LONG | 53.3% | +$0.18 | 15 | ACTIVE — solid WR, consistent earner |
 
-## INVERSIONS:
-None found.
+## 6h Detail (for reference)
+| Signal | Dir | WR | PnL | Trades |
+|--------|-----|-----|-----|--------|
+| hl_copy_trader | LONG | 50.0% | +$0.32 | 2 |
+| ct-hot+ | LONG | 55.6% | +$0.10 | 9 |
+| hzscore- | SHORT | 0.0% | -$0.05 | 2 |
+| macd-div+ | LONG | 0.0% | -$0.36 | 2 |
 
-## ISSUES:
-- Total PnL negative (-$0.23) despite 36 trades — system generating trades but edge is thin
-- hzscore- R:R imbalance: wins small, losses big (ATR SL too wide or exits too tight)
-- No clear kill or boost candidates — signal quality is mediocre across the board
+## ISSUES
+- No signal inversions found (no LONG signals executing SHORT or vice versa)
+- hzscore- re-enabled 2 days ago for signal starvation — currently losing but within tolerance. Re-evaluate in 24h if trend continues.
+- Low trade volume overall — signal starvation may be affecting sample sizes.
+
+## Actions Taken
+- No flags changed this cycle (no kill candidates met criteria)
+- Next review: 6h
