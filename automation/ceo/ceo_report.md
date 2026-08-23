@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-23 ~20:15 UTC (244th run)
+
+### Diagnosis
+System recovering. Verified DB: 24h 54T -$0.90, 38.9% WR. 7d: 239T -$1.33, 50.6% WR. LONG 7d: 214T +$0.05, 53.7% WR (breakeven). SHORT 7d: 25T -$1.38, 24% WR (ALL losing — inverted R:R on every signal). hl_copy_trader LONG 60T/7d +$2.47, 53.3% WR (ONLY performer — ATR_SL exits profitable +$2.98 via trailing above entry). ct-hot+ 56T/7d -$3.12, 37.5% WR (DOMINANT LOSER — 45 ATR_SL hits -$1.24 avg, trades never reach PM_TRAIL activation). 5 open. Without ct-hot+: 7d +$1.79 (system profitable).
+
+### Root Cause
+ct-hot+ RE-ENABLED BY T (RESEARCH_FLAGS) — CEO cannot disable. Generates 80% ATR_SL exits at -$1.24 avg loss. SHORT side structural: all signals inverted R:R (hzscore- avg win +1.01% vs avg loss -2.25%). ATR_SL 48h: 29T -$6.31 (dominant loss — hl_copy_trader exits profitable, others losing).
+
+### Fix Applied
+**CONF_FILTER_MAX lowered 89→85** — blocks confidence >=85 (90+ tier has 48.7% WR, worst tier). Small edge improvement, safe change. Monitor 48h for WR improvement.
+
+### Verification
+SHORT-NEUTRAL block VERIFIED WORKING — all Aug 23 SHORT trades in SHORT_BIAS regime. PM_TRAIL 83%+ WR carrying system. ATR_SL count at historic low (~8/day). Daily trend: Aug 22 -$2.74 (worst) → Aug 23 -$0.32 (recovering).
+
+---
+
 ## CEO Report — 2026-08-23 ~16:30 UTC (242nd run)
 
 ### Diagnosis

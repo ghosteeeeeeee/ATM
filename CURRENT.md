@@ -1,16 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-23 ~19:00 UTC (CEO run)**
+**Last Updated: 2026-08-23 ~20:15 UTC (CEO run)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ ENTIRE FAMILY KILLED (CEO Aug 22, signal_reporter implemented).** ALL 3 flags False + NEVER_REENABLE_FLAGS. 62T/7d 32.3% WR -$4.04. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`).
 
-**Current status:** ct-hot+ RE-ENABLED BY T (RESEARCH_FLAGS, CEO cannot disable). Verified DB: 24h 55T -$0.94, 38.2% WR. 7d: 239T -$1.33, 50.6% WR. LONG 7d: 214T +$0.05, 53.7% WR (breakeven). SHORT 7d: 25T -$1.38, 24% WR (ALL losing). hl_copy_trader LONG 60T/7d +$2.47, 53.3% WR (ONLY performer). ct-hot+ 56T/7d -$3.12, 37.5% WR (DOMINANT LOSER, CEO_PROTECTED). Without ct-hot+: 7d +$1.79 (system profitable). **macd-div+ KILLED (CEO Aug 23).** 4T/7d 25% WR -$0.40. Disk: 83% (92G/118G). ct-hot+ trades age out Aug 24-25. **SHORT-NEUTRAL BLOCK VERIFIED WORKING** — all Aug 23 SHORT trades in SHORT_BIAS regime. Pipeline: 0 errors 24h, all systems healthy.
+**Current status:** ct-hot+ RE-ENABLED BY T (RESEARCH_FLAGS, CEO cannot disable). Verified DB: 24h 54T -$0.90, 38.9% WR. 7d: 239T -$1.33, 50.6% WR. LONG 7d: 214T +$0.05, 53.7% WR (breakeven). SHORT 7d: 25T -$1.38, 24% WR (ALL losing). hl_copy_trader LONG 60T/7d +$2.47, 53.3% WR (ONLY performer). ct-hot+ 56T/7d -$3.12, 37.5% WR (DOMINANT LOSER, CEO_PROTECTED — 45 ATR_SL hits -$1.24 avg). Without ct-hot+: 7d +$1.79 (system profitable). **CONF_FILTER_MAX lowered 89→85** (CEO Aug 23 — block overconfident trades, 90+ tier worst WR). Disk: 83% (92G/118G). ct-hot+ trades age out Aug 24-25. **SHORT-NEUTRAL BLOCK VERIFIED WORKING** — all Aug 23 SHORT trades in SHORT_BIAS regime. Pipeline: 0 errors 24h, all systems healthy.
 
 ## Active Decisions
 
+- **CONF_FILTER_MAX=85 (CEO Aug 23).** Lowered from 89 — 90+ confidence tier has 48.7% WR (worst tier). Blocks overconfident trades. Monitor 48h for WR improvement. — 2026-08-23
 - **CURRENT.md is the single source of truth for agent sessions.** — 2026-08-13
 - **macd-div+ DISABLED (CEO KILLED Aug 23).** 4T/7d 25% WR -$0.40. Dead signal, no edge. MACD_DIVERGENCE_PLUS_ENABLED=False. — 2026-08-23
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True (CEO Aug 22, FIXED Aug 23).** SHORT signals 7d: 26T -$1.40, 26.9% WR (ALL losing). Was using 1m regime (noisy — showed LONG_BIAS when 4h NEUTRAL, block never fired). FIX: Now uses 4h regime from PostgreSQL momentum_cache. Block fires when 4h regime is NEUTRAL (64 tokens). In SHORT_BIAS (85 tokens), SHORT signals allowed. — 2026-08-23
@@ -62,10 +63,11 @@
 ## Next Actions
 
 1. **Recommend T disable ct-hot+ (RESEARCH_FLAGS).** 56T/7d -$3.12, 37.5% WR. DOMINANT LOSER. CEO cannot disable. Trades age out Aug 24-25. — 2026-08-23
-2. **Recommend T disable hzscore- SHORT.** 8T/7d -$0.18, 50% WR (inverted R:R). CEO_PROTECTED. — 2026-08-23
-3. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 21T/7d +$0.13, 57.1% WR (improving). If still flat by Aug 25, remove filter. — 2026-08-23
-4. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-23
-5. **Monitor SHORT-NEUTRAL block fix.** VERIFIED WORKING — all Aug 23 SHORT trades in SHORT_BIAS regime. — 2026-08-23
-6. **Monitor disk (85% cleanup trigger).** Currently 83%. — 2026-08-23
-7. **Monitor Wyckoff detection improvement.** — 2026-08-22
-8. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. — 2026-08-21
+2. **Recommend T disable hzscore- SHORT.** 8T/7d -$0.18, 50% WR (inverted R:R: avg win +1.01% vs avg loss -2.25%). CEO_PROTECTED. — 2026-08-23
+3. **Monitor CONF_FILTER_MAX=85.** Blocks confidence >=85 (was 89). 48h eval for WR improvement. — 2026-08-23
+4. **Monitor MIN_PRE_MOVE 0.3 (EXTENDED to Aug 25).** r2-trend-long3 21T/7d +$0.13, 57.1% WR (improving). If still flat by Aug 25, remove filter. — 2026-08-23
+5. **Monitor PM_TRAIL edge.** Must hold >80% WR. — 2026-08-23
+6. **Monitor SHORT-NEUTRAL block fix.** VERIFIED WORKING — all Aug 23 SHORT trades in SHORT_BIAS regime. — 2026-08-23
+7. **Monitor disk (85% cleanup trigger).** Currently 83%. — 2026-08-23
+8. **Monitor Wyckoff detection improvement.** — 2026-08-22
+9. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. — 2026-08-21
