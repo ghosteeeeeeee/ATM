@@ -1,20 +1,36 @@
-## CEO Report — 2026-08-23 ~03:45 UTC (237th run)
+## CEO Report — 2026-08-23 ~08:30 UTC (238th run)
 
 ### Diagnosis
-System RECOVERING post-ct-hot+ kill. Verified DB: 24h 51T -$1.97, 43.1% WR. 48h: 97T -$0.55, 46.4% WR. 7d: 223T -$0.60, 52.0% WR. **ct-hot+ 17T/24h -$3.36, 23.5% WR (LEGACY LOSER, 23.5% WR)** — still draining. hl_copy_trader LONG 31T/24h +$1.26, 51.6% WR (carrying). Today Aug 23: 4T +$0.58, 75% WR (recovering). 4 open positions. Without ct-hot+: 7d +$2.92 — system profitable.
-
-### Key Metrics (Verified)
-| Metric | 24h | 48h | 7d |
-|--------|-----|-----|-----|
-| Trades | 51 | 97 | 223 |
-| PnL | -$1.97 | -$0.55 | -$0.60 |
-| WR | 43.1% | 46.4% | 52.0% |
+System BREAK-EVEN. Verified DB: 24h 36T -$0.64, 41.7% WR. 7d: 220T -$1.04, 52.3% WR. **ct-hot+ RE-ENABLED BY T** (RESEARCH_FLAGS, CEO cannot disable) — 35T/7d -$3.28, 31.4% WR (DOMINANT LOSER, ZRO LONG opened today 07:21). hl_copy_trader LONG 58T/7d +$2.15, 53.4% WR (ONLY performer). PM_TRAIL 76T/7d +$3.43, 90.8% WR (carrying). **SHORT 7d: 23T -$1.03, 30.4% WR (ALL losing — NEUTRAL block not catching trades).** 5 open: 1 ct-hot+ LONG, 2 hzscore- SHORT, 2 ct-hot- SHORT. Without ct-hot+: 7d +$2.24 (system profitable).
 
 ### Root Cause
-ct-hot+ kill active since Aug 22 23:09, but legacy trades still closing. 17 ct-hot+ trades closed today at 23.5% WR (-$3.36). All other signals neutral/profitable.
+1. ct-hot+ in RESEARCH_FLAGS — T re-enabled Aug 22 ("signal starvation fix"), NEVER_REENABLE_FLAGS has comments only (no entries). CEO cannot disable.
+2. SHORT_NEUTRAL_BLOCK not catching trades —1m regime shows LONG_BIAS when15m/4h is NEUTRAL (documented issue). hzscore- and ct-hot- SHORT still firing.
+3. MAE-GUARD exits today are pre-disable legacy (13T -$1.16, ages out).
+
+### Fix Applied
+NO CODE CHANGES — ct-hot+ in RESEARCH_FLAGS, only T can disable. Log problem, recommend T disable.
+
+### Verification
+- Without ct-hot+: 7d +$2.24 (profitable)
+- PM_TRAIL: 90.8% WR, +$3.43/7d (carrying)
+- hl_copy_trader: 53.4% WR, +$2.15/7d (only performer)
+- SHORT: 30.4% WR, -$1.03/7d (bleeding, no edge)
+
+### Key Metrics (Verified)
+| Metric | 24h | 7d |
+|--------|-----|-----|
+| Trades | 36 | 220 |
+| PnL | -$0.64 | -$1.04 |
+| WR | 41.7% | 52.3% |
+| LONG PnL | -$0.48 | -$0.01 |
+| SHORT PnL | -$0.16 | -$1.03 |
+| PM_TRAIL | +$0.13 (75% WR) | +$3.43 (90.8% WR) |
+| ct-hot+ | -$0.72 (0% WR) | -$3.28 (31.4% WR) |
+| hl_copy_trader | +$0.11 (43.5% WR) | +$2.15 (53.4% WR) |
 
 ### Decision
-**NO CHANGES.** Kill active, system waiting for ct-hot+ legacy drain. Today recovering (+$0.58 so far). Everything on track.
+**NO CODE CHANGES.** ct-hot+ in RESEARCH_FLAGS — CEO cannot disable. Recommend T disable. SHORT side bleeding (30.4% WR, -$1.03/7d) — NEUTRAL block not catching trades due to1m regime mismatch. System break-even without ct-hot+ drag.
 
 ### Monitoring
 1. ct-hot+ age-out (Aug 24-25) — 7d PnL should flip positive
