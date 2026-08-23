@@ -498,8 +498,8 @@ def collect():
                     s_wind * WEIGHTS['wind'] +
                     s_token_regime * WEIGHTS['token_regime'] +
                     s_contrarian * WEIGHTS['contrarian'] +
-                    s_macd_div * WEIGHTS.get('macd_div', 0.05) +
-                    s_rr * WEIGHTS.get('rr', 0.05)
+                    s_macd_div * WEIGHTS['macd_div'] +
+                    s_rr * WEIGHTS['rr']
                 )
 
                 # No candle data = no real activity → force cold/dead

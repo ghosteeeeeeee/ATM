@@ -11,26 +11,30 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.12,      # reduced from 0.13
-    'volume': 0.07,        # reduced from 0.08
-    'volatility': 0.05,    # reduced from 0.06
-    'spread': 0.05,        # reduced from 0.06
+    'momentum': 0.11,      # reduced from 0.12
+    'volume': 0.06,        # reduced from 0.07
+    'volatility': 0.05,    # same
+    'spread': 0.05,        # same
     'signals': 0.03,       # same
     'regime': 0.03,        # same
-    'wyckoff': 0.12,       # reduced from 0.13
-    'ewave': 0.07,         # reduced from 0.08
-    'trend': 0.05,         # reduced from 0.06
-    'setup': 0.06,         # reduced from 0.07
+    'wyckoff': 0.11,       # reduced from 0.12
+    'ewave': 0.06,         # reduced from 0.07
+    'trend': 0.05,         # same
+    'setup': 0.05,         # reduced from 0.06
     'clustering': 0.03,    # same
     'recency': 0.04,       # same
-    'liquidation': 0.06,   # reduced from 0.07
-    # NEW: Weather station factors
-    'tide': 0.04,          # reduced from 0.05
+    'liquidation': 0.05,   # reduced from 0.06
+    # Weather station factors
+    'tide': 0.04,          # same
     'sea_state': 0.03,     # same
     'wind': 0.03,          # same
     'token_regime': 0.02,  # same
-    # NEW: Contrarian indicator
+    # Contrarian indicator
     'contrarian': 0.05,    # market overheated/oversold signals
+    # MACD divergence
+    'macd_div': 0.04,      # momentum divergence signals
+    # Risk:Reward
+    'rr': 0.04,            # risk/reward ratio
 }
 # ponytail: weights sum to 1.0 (12+7+5+5+3+3+12+7+5+6+3+4+6+4+3+3+2+5 = 100)
 
@@ -1537,6 +1541,21 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
     s_wind = score_wind(token_data or {}, weather_data) if weather_data else 50.0
     s_token_regime = score_token_regime(token_symbol, weather_data) if weather_data and token_symbol else 50.0
 
+    # MACD divergence score
+    macd_div_result = score_macd_divergence(closes_5m)
+    s_macd_div = macd_div_result['score']
+
+    # R:R score
+    direction = token_data.get('setup_type') if token_data else None
+    if direction in ('LONG', 'SHORT'):
+        rr_data = calculate_rr(price, direction, None, atr_14, liq_data, None)
+        s_rr = score_rr(rr_data)
+    else:
+        s_rr = 50.0
+
+    # Contrarian score (neutral in simplified mode)
+    s_contrarian = 50.0
+
     composite = (
         s_momentum * WEIGHTS['momentum'] +
         s_volume * WEIGHTS['volume'] +
@@ -1554,7 +1573,10 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
         s_tide * WEIGHTS['tide'] +
         s_sea_state * WEIGHTS['sea_state'] +
         s_wind * WEIGHTS['wind'] +
-        s_token_regime * WEIGHTS['token_regime']
+        s_token_regime * WEIGHTS['token_regime'] +
+        s_macd_div * WEIGHTS['macd_div'] +
+        s_rr * WEIGHTS['rr'] +
+        s_contrarian * WEIGHTS['contrarian']
     )
 
     return {
