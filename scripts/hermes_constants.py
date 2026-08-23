@@ -1977,3 +1977,15 @@ COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.75     # BB position must be < this for 
 COIN_TRACKER_HOT_MIN_SPEED_PCT      = 20       # Speed percentile must be > this (widened from 30 — was blocking valid signals). RESEARCH_FLAGS
 COIN_TRACKER_HOT_MAX_SPEED_PCT      = 95       # Speed percentile must be < this (widened from 85 — was blocking valid signals). RESEARCH_FLAGS
 COIN_TRACKER_HOT_MIN_ACCEL          = -0.01    # Price acceleration must be > this (avoid decelerating entries)
+
+# ── Chain Fire — fire on follower tokens when leader tokens pump ─────────────
+# chain_fire.py — correlate engine learns which tokens pump together
+CHAIN_FIRE_ENABLED = True                # master kill-switch
+CHAIN_FIRE_PLUS_ENABLED = True           # LONG direction
+CHAIN_FIRE_MINUS_ENABLED = True          # SHORT direction
+CHAIN_FIRE_MIN_LIFT = 1.5               # minimum lift ratio (chain must be 50%+ better than base)
+CHAIN_FIRE_MIN_CONFIDENCE = 0.60         # minimum Bayesian confidence from correlation engine
+CHAIN_FIRE_MIN_CO_FIRES = 5             # minimum historical co-firings to trust the chain
+CHAIN_FIRE_MAX_LEADER_AGE_SECS = 1800    # leader must have fired within 30min (1800s)
+CHAIN_FIRE_COOLDOWN_HOURS = 4           # per-follower cooldown after chain fire
+CHAIN_FIRE_MAX_PER_CYCLE = 3            # max chain signals per pipeline run (prevent flooding)

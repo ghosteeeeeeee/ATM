@@ -74,6 +74,8 @@ from hermes_constants import (
     LIQUIDATION_HUNT_ENABLED, LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED,
     # macd_divergence
     MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
+    # chain_fire
+    CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
 )
 
 
@@ -383,6 +385,11 @@ try:
 except Exception:
     _macd_divergence_run = None
 
+try:
+    from signals.chain_fire import run as _chain_fire_run
+except Exception:
+    _chain_fire_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -459,6 +466,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'atr_spike', 'enabled': 'ATR_SPIKE_ENABLED', 'run': _atr_spike_run},
     {'name': 'liquidation_hunt', 'enabled': 'LIQUIDATION_HUNT_ENABLED', 'run': _liquidation_hunt_run},
     {'name': 'macd_divergence', 'enabled': 'MACD_DIVERGENCE_ENABLED', 'run': _macd_divergence_run},
+    {'name': 'chain_fire', 'enabled': 'CHAIN_FIRE_ENABLED', 'run': _chain_fire_run},
 ]
 
 

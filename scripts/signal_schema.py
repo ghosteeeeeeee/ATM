@@ -1489,6 +1489,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # chain_fire
+            if _comp == 'chain_fire':
+                try:
+                    from hermes_constants import CHAIN_FIRE_ENABLED
+                    if not CHAIN_FIRE_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CHAIN_FIRE_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'chain_fire+':
+                try:
+                    from hermes_constants import CHAIN_FIRE_PLUS_ENABLED
+                    if not CHAIN_FIRE_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CHAIN_FIRE_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'chain_fire-':
+                try:
+                    from hermes_constants import CHAIN_FIRE_MINUS_ENABLED
+                    if not CHAIN_FIRE_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" CHAIN_FIRE_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
