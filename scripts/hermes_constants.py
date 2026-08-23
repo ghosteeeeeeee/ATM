@@ -1169,6 +1169,21 @@ MA300_CANDLE_MINUS_ENABLED   = True    # ma300_candle_confirm- SHORT
 MACD_ACCEL_ENABLED       = False
 MACD_ACCEL_PLUS_ENABLED       = False    # macd_accel+ LONG
 MACD_ACCEL_MINUS_ENABLED      = True    # macd_accel- SHORT
+# ── MACD Divergence (5m pivot divergence) ─────────────────────────────────────
+# macd_divergence.py — detects price/MACD histogram pivot divergence on 5m candles
+MACD_DIVERGENCE_ENABLED          = True    # master kill-switch
+MACD_DIVERGENCE_PLUS_ENABLED     = True    # macd-div+ LONG (bullish divergence)
+MACD_DIVERGENCE_MINUS_ENABLED    = True    # macd-div- SHORT (bearish divergence)
+MACD_DIV_FAST                    = 12      # MACD fast EMA period
+MACD_DIV_SLOW                    = 26      # MACD slow EMA period
+MACD_DIV_SIGNAL_PERIOD           = 9       # MACD signal line period
+MACD_DIV_SWING_LOOKBACK          = 3       # bars on each side to confirm a pivot point
+MACD_DIV_MIN_PIVOT_DIST          = 5       # minimum bars between two pivots to count
+MACD_DIV_MIN_HIST_SLOPE          = 0.0     # minimum histogram slope for confirmation
+MACD_DIV_LOOKBACK_BARS           = 100     # 5m candles to fetch (~8h of data)
+MACD_DIV_CONF_BASE               = 75      # base confidence
+MACD_DIV_CONF_FLOOR              = 60      # min confidence
+MACD_DIV_CONF_CAP                = 88      # max confidence (system ceiling)
 R2_REV_ENABLED           = False  # r2_rev — blocked in blacklist
 R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT

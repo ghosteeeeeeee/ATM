@@ -459,11 +459,23 @@ def collect():
                     'trend_direction': trend.get('direction'),
                     'price_acceleration': price_accel,
                 }
-                predictive = _compute_predictive_score(composite, weather_data, coin_liq, token_data_for_predictive)
+                # Use pre-computed liquidation result to avoid double computation
+                predictive = _compute_predictive_score(composite, weather_data, coin_liq, token_data_for_predictive, liq_result)
                 predictive_score = predictive['predictive_score']
                 
                 # Predictive filter — adjust confidence based on predictions
                 allow_signal, conf_adj, filter_reason = _predictive_filter(composite, weather_data, coin_liq, token_data_for_predictive)
+                
+                # Apply predictive confidence adjustment to composite
+                # Positive adj = boost score, negative = reduce score
+                if conf_adj != 0:
+                    composite = max(0, min(100, composite + conf_adj))
+                    health = health_from_score(composite)
+                
+                # Optimal entry timing recommendations
+                entry_timing = _optimal_entry_timing(coin_liq, weather_data)
+                if entry_timing and processed <= 5:  # Log for first 5 coins only
+                    print(f'  [{symbol}] Timing: {"; ".join(entry_timing[:2])}')
 
                 # ── Write event + score + registry update using shared connection ──
                 table = _table_name(symbol)

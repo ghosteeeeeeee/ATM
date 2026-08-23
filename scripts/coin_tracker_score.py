@@ -514,7 +514,7 @@ def score_liquidation_enhanced(price, liq_data, weather_data=None, token_data=No
 
 # ── Predictive Scoring Functions ──────────────────────────────────────────────
 
-def compute_predictive_score(composite_score, weather_data, liq_data, token_data=None):
+def compute_predictive_score(composite_score, weather_data, liq_data, token_data=None, liq_result=None):
     """
     Compute predictive score that combines:
     - Current technical state (existing composite score)
@@ -527,6 +527,7 @@ def compute_predictive_score(composite_score, weather_data, liq_data, token_data
         weather_data: weather station data
         liq_data: liquidation cluster data
         token_data: optional token-specific data
+        liq_result: optional pre-computed liquidation result (avoids double computation)
     
     Returns: dict with predictive_score, components, and signals
     """
@@ -536,9 +537,10 @@ def compute_predictive_score(composite_score, weather_data, liq_data, token_data
     wind_score = score_wind(token_data or {}, weather_data) if weather_data else 50.0
     regime_score = score_token_regime(token_data.get('symbol') if token_data else None, weather_data) if weather_data else 50.0
     
-    # Liquidation setup (enhanced)
-    price = token_data.get('price') if token_data else None
-    liq_result = score_liquidation_enhanced(price, liq_data, weather_data, token_data)
+    # Liquidation setup (enhanced) — use pre-computed if available
+    if liq_result is None:
+        price = token_data.get('price') if token_data else None
+        liq_result = score_liquidation_enhanced(price, liq_data, weather_data, token_data)
     liq_score = liq_result['score']
     
     # Predictive signals
@@ -789,14 +791,15 @@ def score_wind(token_data, weather_data):
         return 50.0
     
     token_accel = token_accel or 0
+    market_accel = market_accel or 0
     
-    # Alignment check
-    if market_vel > 0 and token_accel > 0:
+    # Alignment check — compare acceleration to acceleration (not velocity)
+    if market_accel > 0 and token_accel > 0:
         return 80  # Both accelerating up
-    elif market_vel < 0 and token_accel < 0:
+    elif market_accel < 0 and token_accel < 0:
         return 80  # Both accelerating down
-    elif abs(market_vel) < 0.001:
-        return 50  # Market flat
+    elif abs(market_accel) < 0.001:
+        return 50  # Market flat (no acceleration)
     else:
         return 30  # Mismatch
 
