@@ -146,7 +146,8 @@ class CorrelationEngine:
         if not ts:
             return None
         try:
-            return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            return dt.replace(tzinfo=None)  # strip tz for consistent naive comparisons
         except (ValueError, TypeError):
             pass
         try:
@@ -222,6 +223,12 @@ class CorrelationEngine:
         trades.sort(key=lambda x: x[0])
         print(f"[ingest] {len(trades)} trades with valid timestamps")
 
+        if not trades:
+            print("[ingest] No trades with valid timestamps after parsing.")
+            self._set_state("last_ingest_time", rows[-1][5] if rows else "")
+            self._set_state("total_trades_processed", "0")
+            return
+
         # --- Build token chains using sliding window ---
         print("[ingest] Building token chains...")
         chain_counts = defaultdict(lambda: {
@@ -258,38 +265,9 @@ class CorrelationEngine:
                     chain_counts[key_fwd]['first_seen'] = trades[j][6]
                 chain_counts[key_fwd]['last_seen'] = trades[i][6]
 
-                # i → j (i fires first, j follows) — already in window
-                # Only count if j is actually AFTER i (which it isn't here — j < i)
-                # So we skip: the forward direction will be counted when j becomes i
-
-        # Also build forward chains: for each trade i, look ahead
-        j_end = 0
-        for i in range(len(trades)):
-            dt_i, tok_i = trades[i][0], trades[i][1]
-
-            # Advance j_end
-            if j_end <= i:
-                j_end = i + 1
-            while j_end < len(trades) and (trades[j_end][0] - dt_i) <= window:
-                j_end += 1
-
-            # trades[i+1..j_end-1] are ahead within window
-            for j in range(i + 1, j_end):
-                tok_j = trades[j][1]
-                if tok_j == tok_i:
-                    continue
-
-                won_j = trades[j][4]
-                pnl_j = trades[j][5]
-
-                key = (tok_i, tok_j)
-                chain_counts[key]['co_fires'] += 1
-                chain_counts[key]['b_wins'] += 1 if won_j else 0
-                chain_counts[key]['b_losses'] += 0 if won_j else 1
-                chain_counts[key]['b_pnl'] += pnl_j
-                if not chain_counts[key]['first_seen']:
-                    chain_counts[key]['first_seen'] = trades[i][6]
-                chain_counts[key]['last_seen'] = trades[j][6]
+        # NOTE: No forward pass needed — the backward pass above already captures
+        # ALL ordered pairs (j→i where j<i in time). Each unique (A,B) pair where
+        # A fires before B within the window is counted exactly once.
 
         print(f"[ingest] {len(chain_counts)} unique chain pairs found")
 
@@ -346,41 +324,73 @@ class CorrelationEngine:
 
         # --- Build signal effectiveness ---
         print("[ingest] Building signal effectiveness...")
-        sig_stats = defaultdict(lambda: {'trades': 0, 'wins': 0, 'pnl': 0.0})
+        sig_stats = defaultdict(lambda: {'trades': 0, 'wins': 0, 'pnl': 0.0, 'last_time': None})
         for t in trades:
             key = (t[1], t[2], t[3])  # token, signal, direction
             sig_stats[key]['trades'] += 1
             sig_stats[key]['wins'] += 1 if t[4] else 0
             sig_stats[key]['pnl'] += t[5]
+            sig_stats[key]['last_time'] = t[6]  # per-combo last trade time
 
         conn = sqlite3.connect(self.db_path)
         try:
             for (token, signal, direction), s in sig_stats.items():
                 t, w, p = s['trades'], s['wins'], s['pnl']
-                wr = w / t if t > 0 else 0.0
-                conf = self._bayesian_confidence(t, wr)
-                avg_pnl = p / t if t > 0 else 0.0
+                last_t = s['last_time']
 
+                # On first ingest (no existing row): INSERT with raw values
+                # On incremental (existing row): ACCUMULATE with excluded
                 conn.execute("""
                     INSERT INTO signal_effectiveness
                         (token, signal, direction, trades, wins, losses, total_pnl,
                          win_rate, avg_pnl, confidence, last_seen)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(token, signal, direction) DO UPDATE SET
-                        trades = ?, wins = ?, losses = ?, total_pnl = ?,
-                        win_rate = ?, avg_pnl = ?, confidence = ?, last_seen = ?
+                        trades = trades + excluded.trades,
+                        wins = wins + excluded.wins,
+                        losses = losses + excluded.losses,
+                        total_pnl = total_pnl + excluded.total_pnl,
+                        win_rate = (wins + excluded.wins) * 1.0 / (trades + excluded.trades),
+                        avg_pnl = (total_pnl + excluded.total_pnl) / (trades + excluded.trades),
+                        confidence = ?,
+                        last_seen = CASE WHEN excluded.last_seen > last_seen
+                                          THEN excluded.last_seen ELSE last_seen END
                 """, (
-                    token, signal, direction, t, w, t - w, p, wr, avg_pnl, conf,
-                    trades[-1][6],  # last trade time
-                    t, w, t - w, p, wr, avg_pnl, conf, trades[-1][6]
+                    token, signal, direction, t, w, t - w, p,
+                    w / t if t > 0 else 0.0,        # win_rate (insert)
+                    p / t if t > 0 else 0.0,        # avg_pnl (insert)
+                    self._bayesian_confidence(t, w / t if t > 0 else 0.0),
+                    last_t,
+                    # Recalculate confidence with accumulated totals
+                    # (computed after accumulate: we need old+new totals)
+                    0.0  # placeholder — will fix below
                 ))
+
+                # Recompute confidence with full accumulated stats
+                row = conn.execute(
+                    "SELECT trades, wins, total_pnl FROM signal_effectiveness "
+                    "WHERE token=? AND signal=? AND direction=?",
+                    (token, signal, direction)
+                ).fetchone()
+                if row:
+                    full_t, full_w, full_p = row
+                    full_wr = full_w / full_t if full_t > 0 else 0.0
+                    full_conf = self._bayesian_confidence(full_t, full_wr)
+                    full_avg = full_p / full_t if full_t > 0 else 0.0
+                    conn.execute(
+                        "UPDATE signal_effectiveness SET confidence=?, avg_pnl=? "
+                        "WHERE token=? AND signal=? AND direction=?",
+                        (full_conf, full_avg, token, signal, direction)
+                    )
             conn.commit()
         finally:
             conn.close()
 
         # --- Build cadence ---
         print("[ingest] Building cadence patterns...")
-        cadence_data = defaultdict(lambda: {'hours': [0] * 24, 'days': [0] * 7, 'times': []})
+        cadence_data = defaultdict(lambda: {
+            'hours': [0] * 24, 'days': [0] * 7, 'times': [], 'last_time': None
+        })
         day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
         for t in trades:
@@ -389,6 +399,7 @@ class CorrelationEngine:
             cadence_data[tok]['hours'][dt.hour] += 1
             cadence_data[tok]['days'][dt.weekday()] += 1
             cadence_data[tok]['times'].append(dt)
+            cadence_data[tok]['last_time'] = t[6]  # per-token last trade time
 
         conn = sqlite3.connect(self.db_path)
         try:
@@ -403,6 +414,7 @@ class CorrelationEngine:
                 day_norm = [d / total for d in days]
                 peak_hour = hours.index(max(hours))
                 peak_day = day_names[days.index(max(days))]
+                last_t = cd['last_time']
 
                 # Burstiness: stdev/mean of inter-trade intervals
                 times = sorted(cd['times'])
@@ -426,9 +438,9 @@ class CorrelationEngine:
                         peak_day = ?, last_updated = ?
                 """, (
                     tok, json.dumps(hour_norm), json.dumps(day_norm), mean_h, burst,
-                    total, peak_day, peak_day, trades[-1][6],
+                    total, peak_hour, peak_day, last_t,
                     json.dumps(hour_norm), json.dumps(day_norm), mean_h, burst,
-                    total, peak_day, peak_day, trades[-1][6]
+                    total, peak_hour, peak_day, last_t
                 ))
             conn.commit()
         finally:
@@ -533,13 +545,18 @@ class CorrelationEngine:
         }
 
         # Get base WR
-        with sqlite3.connect(f"file:{TRADE_LOG_DB}?mode=ro", uri=True, timeout=5) as conn:
-            row = conn.execute(
-                "SELECT COUNT(*), SUM(CASE WHEN won=1 THEN 1 ELSE 0 END) FROM trade_log WHERE token=?",
-                (token,)
-            ).fetchone()
-            if row and row[0] > 0:
-                result['base_wr'] = (row[1] or 0) / row[0]
+        if os.path.exists(TRADE_LOG_DB):
+            try:
+                with sqlite3.connect(f"file:{TRADE_LOG_DB}?mode=ro", uri=True, timeout=5) as conn:
+                    row = conn.execute(
+                        "SELECT COUNT(*), SUM(CASE WHEN won=1 THEN 1 ELSE 0 END) "
+                        "FROM trade_log WHERE token=?",
+                        (token,)
+                    ).fetchone()
+                    if row and row[0] > 0:
+                        result['base_wr'] = (row[1] or 0) / row[0]
+            except Exception:
+                pass  # use default 0.5
 
         # Signal effectiveness
         if signal:
@@ -583,7 +600,7 @@ class CorrelationEngine:
     def apply_decay(self):
         """Apply daily decay. Half-life: 14 days."""
         with sqlite3.connect(self.db_path) as conn:
-            now = datetime.utcnow()
+            now = datetime.utcnow().replace(tzinfo=None)  # naive for comparison
             rows = conn.execute("SELECT id, last_seen, co_fires, base_wr, win_rate FROM token_chains").fetchall()
             pruned = 0
             updated = 0
