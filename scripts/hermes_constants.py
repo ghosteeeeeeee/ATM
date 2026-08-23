@@ -1905,8 +1905,8 @@ COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lo
 COIN_TRACKER_HOT_CONF_BASE          = 72      # base confidence
 COIN_TRACKER_HOT_CONF_CAP           = 88      # max confidence
 COIN_TRACKER_HOT_COOLDOWN_HOURS     = 0.167   # per token+direction cooldown (10 minutes)
-COIN_TRACKER_HOT_MIN_COMPOSITE      = 57      # net score threshold — lowered to 57 per request (was 70). CEO_PROTECTED
-COIN_TRACKER_HOT_MIN_COMPOSITE_SHORT = 50     # SHORT-specific: lower bar (scores lag on bearish setups). Added 2026-08-22
+COIN_TRACKER_HOT_MIN_COMPOSITE      = 65      # net score threshold — raised to 65 (was 57). CEO_PROTECTED
+COIN_TRACKER_HOT_MIN_COMPOSITE_SHORT = 55     # SHORT-specific: raised to 55 (was 50). CEO_PROTECTED
 # Momentum filters — prevent entries against the trend (added 2026-08-22, scaled 2026-08-22, tightened 2026-08-22)
 COIN_TRACKER_HOT_MIN_MACD_PCT      = -0.00005 # MACD histogram as % of price must be > this for LONG (avoids bearish entries)
 COIN_TRACKER_HOT_MAX_Z_SCORE        = 1.2      # Z-score must be < this for LONG (avoids overbought entries — tightened from 1.8)

@@ -278,3 +278,14 @@ ALERTS:
 - **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner [TOK]: N done, N errors`
 - **REPEATED** (17x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: 'action'`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: 'macd_div'`
+
+## Error Alerts — 2026-08-23 13:20 UTC
+- **[CRITICAL]** (1x): `hermes-coding-mcp.service` — 120,146+ restart loops, `ModuleNotFoundError: No module named 'server'`. **AUTO-FIX**: Service stopped and disabled.
+- **[WARN]** (3x): `hermes-better-coder.service` — `ModuleNotFoundError: dispatcher.dispatcher`
+- **[WARN]** (1x): `hermes-bug-hunter.service` — 3 audit failures: 82 files non-atomic JSON, 5 hardcoded passwords, 16 dead imports
+- **[WARN]** (1x): `hermes-git-release.service` — Exit 1 during symlink cleanup
+- **[WARN]** (1x): `Disk at 83%` — 92G/118G, approaching 85% threshold
+- **INFO**: Pipeline OK — cycle #167787, 108 signals/hour, 7 hotset entries, 0 errors
+- **INFO**: Trades — 0 open, 23 closed today, +$0.33 PnL, 71.4% WR on ct-hot+ LONG
+- **INFO**: Market — 1 LONG / 0 SHORT / 103 NEUTRAL, 67% tokens above 50th percentile speed
+- **INFO**: All critical timers firing (pipeline, 1m-candle, watchdog, price-collector)
