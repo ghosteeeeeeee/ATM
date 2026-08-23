@@ -95,6 +95,7 @@ REGIME_SIGNALS = {
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
+        'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in EXTREME
     },
 }
 
