@@ -354,7 +354,7 @@ def score_liquidation(price, liq_data):
 
 # ── Enhanced Liquidation Prediction Functions ─────────────────────────────────
 
-def predict_stop_hunt(token_data, liq_data, weather_data):
+def predict_stop_hunt(liq_data, weather_data, token_data=None):
     """
     Predict imminent stop hunts using liquidation clusters.
     
@@ -362,6 +362,11 @@ def predict_stop_hunt(token_data, liq_data, weather_data):
     - Cluster within 0.5% + bearish tide → SHORT signal
     - Cluster within 0.5% + bullish tide → LONG signal
     - Cluster size > $500M → high confidence
+    
+    Args:
+        liq_data: liquidation cluster data for this coin
+        weather_data: weather station data
+        token_data: optional token-specific data (reserved for future use)
     
     Returns: dict with direction, confidence, cluster_distance, cluster_size
              or None if no stop hunt predicted
@@ -384,25 +389,28 @@ def predict_stop_hunt(token_data, liq_data, weather_data):
             tide_dir = 'BEARISH'
     
     # Find nearest cluster
-    nearest = min(clusters, key=lambda c: abs(c.get('distance_pct', 100)))
-    distance = abs(nearest.get('distance_pct', 100))
+    nearest = min(clusters, key=lambda c: abs(c.get('distance_pct') or 100))
+    distance = abs(nearest.get('distance_pct') or 100)
     
     if distance > 0.5:
         return None  # Too far
     
     # Determine direction based on cluster side and tide
-    if nearest.get('side') == 'long':
+    side = (nearest.get('side') or '').upper()
+    if side == 'LONG':
         # Long liquidations below = support, price likely to bounce
         direction = 'LONG'
-    else:
+    elif side == 'SHORT':
         # Short liquidations above = resistance, price likely to drop
         direction = 'SHORT'
+    else:
+        return None  # Unknown side, don't predict
     
     # Adjust confidence based on tide alignment
     confidence = 70
     if distance < 0.25:
         confidence += 15
-    if nearest.get('total_notional_usd', 0) > 500_000_000:
+    if (nearest.get('total_notional_usd') or 0) > 500_000_000:
         confidence += 10
     
     # Tide alignment bonus
@@ -418,7 +426,7 @@ def predict_stop_hunt(token_data, liq_data, weather_data):
     }
 
 
-def predict_cascade(token_data, liq_data, weather_data):
+def predict_cascade(liq_data, weather_data, token_data=None):
     """
     Predict liquidation cascades.
     
@@ -426,6 +434,11 @@ def predict_cascade(token_data, liq_data, weather_data):
     - Multiple clusters within 1% → cascade risk
     - High volatility + clusters → accelerated cascade
     - Low volume + clusters → delayed cascade
+    
+    Args:
+        liq_data: liquidation cluster data for this coin
+        weather_data: weather station data
+        token_data: optional token-specific data (reserved for future use)
     
     Returns: dict with probability, cluster_count, total_size, avg_distance
              or None if no cascade predicted
@@ -437,14 +450,14 @@ def predict_cascade(token_data, liq_data, weather_data):
     if not clusters:
         return None
     
-    close_clusters = [c for c in clusters if abs(c.get('distance_pct', 100)) < 1.0]
+    close_clusters = [c for c in clusters if abs(c.get('distance_pct') or 100) < 1.0]
     
     if len(close_clusters) < 2:
         return None  # Need multiple clusters for cascade
     
     # Calculate cascade probability
-    total_size = sum(c.get('total_notional_usd', 0) for c in close_clusters)
-    avg_distance = sum(abs(c.get('distance_pct', 100)) for c in close_clusters) / len(close_clusters)
+    total_size = sum(c.get('total_notional_usd') or 0 for c in close_clusters)
+    avg_distance = sum(abs(c.get('distance_pct') or 100) for c in close_clusters) / len(close_clusters)
     
     # Higher probability with more clusters and closer distance
     probability = min(90, 40 + len(close_clusters) * 10 + (1 - avg_distance) * 20)
@@ -452,11 +465,11 @@ def predict_cascade(token_data, liq_data, weather_data):
     # Weather adjustments
     if weather_data:
         sea = weather_data.get('sea_state', {})
-        if sea.get('winrate', 50) < 45:
+        if (sea.get('winrate') or 50) < 45:
             probability += 5  # Unhealthy market = more cascade risk
         
         wind = weather_data.get('wind', {})
-        if wind.get('gusts', 0) > wind.get('sustained', 1) * 2:
+        if (wind.get('gusts') or 0) > (wind.get('sustained') or 1) * 2:
             probability += 10  # High volatility = faster cascade
     
     return {
@@ -467,7 +480,7 @@ def predict_cascade(token_data, liq_data, weather_data):
     }
 
 
-def score_liquidation_enhanced(price, liq_data, weather_data=None):
+def score_liquidation_enhanced(price, liq_data, weather_data=None, token_data=None):
     """
     Enhanced liquidation score combining proximity, stop hunt, and cascade predictions.
     
@@ -477,13 +490,13 @@ def score_liquidation_enhanced(price, liq_data, weather_data=None):
     base_score = score_liquidation(price, liq_data)
     
     # Stop hunt prediction bonus
-    stop_hunt = predict_stop_hunt({}, liq_data, weather_data)
+    stop_hunt = predict_stop_hunt(liq_data, weather_data, token_data)
     stop_bonus = 0
     if stop_hunt:
         stop_bonus = (stop_hunt['confidence'] - 70) / 5  # 0-5 bonus
     
     # Cascade prediction bonus
-    cascade = predict_cascade({}, liq_data, weather_data)
+    cascade = predict_cascade(liq_data, weather_data, token_data)
     cascade_bonus = 0
     if cascade:
         cascade_bonus = (cascade['probability'] - 50) / 10  # 0-4.5 bonus
