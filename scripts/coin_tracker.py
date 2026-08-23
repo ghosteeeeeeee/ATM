@@ -385,10 +385,22 @@ def collect():
                 s_liquidation = _score_liquidation(price, coin_liq)
 
                 # Weather station scores (NEW)
+                # Get price acceleration from token_speeds table
+                price_accel = None
+                try:
+                    speed_row = signals_conn.execute(
+                        'SELECT price_acceleration FROM token_speeds WHERE token = ?',
+                        (symbol.upper(),)
+                    ).fetchone()
+                    if speed_row:
+                        price_accel = speed_row[0]
+                except Exception:
+                    pass
+                
                 token_data = {
                     'setup_type': setup.get('setup_type'),
                     'trend_direction': trend.get('direction'),
-                    'price_acceleration': token_speed.get('price_acceleration') if token_speed else None,
+                    'price_acceleration': price_accel,
                 }
                 s_tide = _score_tide(token_data, weather_data) if weather_data else 50.0
                 s_sea_state = _score_sea_state(weather_data) if weather_data else 50.0
@@ -467,8 +479,8 @@ def collect():
                                             wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
                                             trend_quality, trend_direction, sr_levels, vol_profile,
                                             setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency,
-                                            liquidation)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                            liquidation, tide, sea_state, wind, token_regime)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(symbol) DO UPDATE SET
                         ts=excluded.ts, health=excluded.health, score=excluded.score,
                         momentum=excluded.momentum, volume=excluded.volume, volatility=excluded.volatility,
@@ -488,7 +500,11 @@ def collect():
                         clustering_bullish=COALESCE(excluded.clustering_bullish, agg_scores.clustering_bullish),
                         clustering_bearish=COALESCE(excluded.clustering_bearish, agg_scores.clustering_bearish),
                         recency=COALESCE(excluded.recency, agg_scores.recency),
-                        liquidation=COALESCE(excluded.liquidation, agg_scores.liquidation)
+                        liquidation=COALESCE(excluded.liquidation, agg_scores.liquidation),
+                        tide=COALESCE(excluded.tide, agg_scores.tide),
+                        sea_state=COALESCE(excluded.sea_state, agg_scores.sea_state),
+                        wind=COALESCE(excluded.wind, agg_scores.wind),
+                        token_regime=COALESCE(excluded.token_regime, agg_scores.token_regime)
                 """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite,
                       wyckoff.get('phase'),
                       ewave.get('wave') if isinstance(ewave.get('wave'), int) else None,
@@ -504,7 +520,11 @@ def collect():
                       clustering.get('bullish_clusters'),
                       clustering.get('bearish_clusters'),
                       setup.get('recency'),
-                      s_liquidation))
+                      s_liquidation,
+                      s_tide,
+                      s_sea_state,
+                      s_wind,
+                      s_token_regime))
 
                 # Registry
                 write_conn.execute("""

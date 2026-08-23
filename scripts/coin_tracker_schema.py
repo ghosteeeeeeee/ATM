@@ -112,7 +112,12 @@ def init_db():
                 setup_details TEXT,
                 clustering_bullish REAL,
                 clustering_bearish REAL,
-                recency REAL
+                recency REAL,
+                liquidation REAL,
+                tide REAL,
+                sea_state REAL,
+                wind REAL,
+                token_regime REAL
             )
         """)
         cur.execute("CREATE INDEX IF NOT EXISTS idx_scores_composite ON agg_scores(composite DESC)")
@@ -258,6 +263,11 @@ _NEW_COLUMNS = [
     ('clustering_bearish', 'REAL'),
     ('recency', 'REAL'),
     ('liquidation', 'REAL'),
+    # Weather station columns
+    ('tide', 'REAL'),
+    ('sea_state', 'REAL'),
+    ('wind', 'REAL'),
+    ('token_regime', 'REAL'),
 ]
 
 def migrate_tables():
