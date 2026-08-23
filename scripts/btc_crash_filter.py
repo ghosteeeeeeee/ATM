@@ -268,6 +268,52 @@ def _check_acceleration(btc_closes: list) -> Tuple[bool, float, float]:
     return is_accel, vel_now, vel_prev
 
 
+# ── Layer 6: Multi-Alt Divergence ──────────────────────────────────────────
+
+def _check_multi_alt_divergence(btc_closes: list) -> Tuple[bool, int, list]:
+    """Check if multiple alts are weak while BTC is falling.
+
+    When 3+ alts show >0.3% 5m divergence below BTC, it signals
+    alt-specific selling pressure that could cascade into BTC.
+
+    Returns: (is_weak, weak_count, weak_alts_list)
+    """
+    from hermes_constants import (
+        MULTI_ALT_DIVERGENCE_ENABLED,
+        MULTI_ALT_BTC_5M_THRESHOLD,
+        MULTI_ALT_DIVERGENCE_THRESHOLD,
+        MULTI_ALT_MIN_WEAK_ALTS,
+        MULTI_ALT_REFERENCE_ALTS,
+    )
+
+    if not MULTI_ALT_DIVERGENCE_ENABLED:
+        return False, 0, []
+
+    if len(btc_closes) < 6:
+        return False, 0, []
+
+    # Only activate when BTC is falling
+    btc_chg_5m = (btc_closes[-1] - btc_closes[-6]) / btc_closes[-6] * 100
+    if btc_chg_5m > MULTI_ALT_BTC_5M_THRESHOLD:
+        return False, 0, []
+
+    weak_alts = []
+    for alt in MULTI_ALT_REFERENCE_ALTS:
+        alt_candles = _get_candles(alt, '1m', 10)
+        alt_closes = [c[4] for c in alt_candles]
+        if len(alt_closes) < 6:
+            continue
+
+        alt_chg_5m = (alt_closes[-1] - alt_closes[-6]) / alt_closes[-6] * 100
+        divergence = alt_chg_5m - btc_chg_5m
+
+        if divergence < MULTI_ALT_DIVERGENCE_THRESHOLD:
+            weak_alts.append(f"{alt}({divergence:+.2f}%)")
+
+    is_weak = len(weak_alts) >= MULTI_ALT_MIN_WEAK_ALTS
+    return is_weak, len(weak_alts), weak_alts
+
+
 # ── Main Crash Check ─────────────────────────────────────────────────────────
 
 def check_crash() -> CrashSignal:
@@ -348,6 +394,13 @@ def check_crash() -> CrashSignal:
         if accel:
             triggered_layers.append('ACCEL')
 
+    # Layer 6: Multi-Alt Divergence (cascade early warning)
+    multi_alt_blocked, weak_count, weak_alts = _check_multi_alt_divergence(btc_closes)
+    if multi_alt_blocked:
+        triggered_layers.append('MULTI_ALT')
+        signal.raw['weak_alt_count'] = weak_count
+        signal.raw['weak_alts'] = weak_alts
+
     # ── Severity Assessment ──────────────────────────────────────────────
     # EMERGENCY: Price crash + volume spike + contagion = confirmed cascade
     # CRITICAL:  Price crash + any 1 other layer
@@ -386,6 +439,28 @@ def check_crash() -> CrashSignal:
         signal.reason = f'BTC CRASH: {chg_5m:+.2f}% in 5m (threshold {dyn_thresh:.2f}%)'
         signal.layer = 'PRICE'
         signal.block_duration_sec = 300  # 5 min
+
+    # ── MULTI_ALT independent block (Layer 6) ────────────────────────────
+    # MULTI_ALT blocks independently with 10-minute duration.
+    # If PRICE also triggered, use the LONGER block duration.
+    if multi_alt_blocked:
+        from hermes_constants import MULTI_ALT_BLOCK_DURATION_MIN
+        multi_alt_block_sec = MULTI_ALT_BLOCK_DURATION_MIN * 60  # 10 min
+
+        if not signal.blocked:
+            # MULTI_ALT alone — set block
+            signal.blocked = True
+            signal.severity = 'WARNING'
+            signal.layer = 'MULTI_ALT'
+            signal.block_duration_sec = multi_alt_block_sec
+            signal.reason = (f'Multi-alt weakness: {weak_count} alts diverging '
+                           f'{MULTI_ALT_DIVERGENCE_THRESHOLD}%+ below BTC')
+        else:
+            # PRICE + MULTI_ALT — use longer block duration
+            if multi_alt_block_sec > signal.block_duration_sec:
+                signal.block_duration_sec = multi_alt_block_sec
+                signal.layer = '+'.join(triggered_layers)
+                signal.reason += f' | MULTI_ALT: {weak_count} weak alts'
 
     if signal.blocked:
         signal.block_until = time.time() + signal.block_duration_sec

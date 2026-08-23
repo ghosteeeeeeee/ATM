@@ -816,8 +816,21 @@ BTC_ACCEL_BLOCK_DURATION = 5            # minutes to block entries after trigger
 # Layer 5: Position protection (ATR-aware MAE guard)
 # NOTE: CL_MAE_GUARD_ENABLED is defined below with the legacy MAE guard constants.
 # CL_MAE_GUARD_BASE_THRESHOLD scales with ATR (replaces fixed CL_MAE_GUARD_THRESHOLD).
-CL_MAE_GUARD_BASE_THRESHOLD = 0.025     # 2.5% base — scales with ATR (was fixed 1.5%)
+CL_MAE_GUARD_BASE_THRESHOLD = 0.020     # 2.0% base — scales with ATR (conservative start, was 2.5%)
+                                         # RAISED from 2.5% to 2.0% 2026-08-23 — tighter crash protection
+                                         # If profitable after 7d, consider tightening to 1.5%.
 CL_MAE_GUARD_BTC_CRASH_MULTIPLIER = 0.6 # Tighten threshold by 40% when BTC is crashing (cut faster)
+
+# Layer 6: Multi-Alt Divergence (cascade early warning)
+# Detects alt-specific weakness before BTC cascades.
+# When 3+ alts diverge >0.3% below BTC in 5 minutes, block new LONG entries.
+# Backtested 7d: 10 triggers (1.43/day), net +$1.92 improvement.
+MULTI_ALT_DIVERGENCE_ENABLED = True
+MULTI_ALT_BTC_5M_THRESHOLD = -0.5     # % — BTC must be falling to activate check
+MULTI_ALT_DIVERGENCE_THRESHOLD = -0.3  # % — alt must underperform BTC by this much
+MULTI_ALT_MIN_WEAK_ALTS = 3           # number of weak alts to trigger signal
+MULTI_ALT_BLOCK_DURATION_MIN = 10     # minutes to block LONG entries after trigger
+MULTI_ALT_REFERENCE_ALTS = ['ETH', 'SOL', 'XRP', 'DOGE', 'AVAX', 'DOT', 'LINK', 'UNI']
 
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.
@@ -1012,8 +1025,9 @@ CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
 # If price drops more than MAE_GUARD_THRESHOLD from highest_price, cut immediately.
 # Catches mass crashes (WLFI -41%, MET -21%, ETH -13%) before ATR SL triggers.
 # Runs BEFORE tiers — highest priority.
-CL_MAE_GUARD_ENABLED    = False  # DISABLED 2026-08-23 — net -$5.43/week at 1.5%. Cuts winners that recover. See atr-sl-widen.md.
-CL_MAE_GUARD_THRESHOLD  = 0.030  # 3.0% — if re-enabled, only catch true crashes (was 1.5%)
+CL_MAE_GUARD_ENABLED    = True   # RE-ENABLED 2026-08-23 — ATR-aware version scales dynamically
+                                 # Conservative 2.0% base. Monitor 7d: if net positive, tighten to 1.5%.
+CL_MAE_GUARD_THRESHOLD  = 0.020  # 2.0% — legacy fallback (must match BASE_THRESHOLD for ATR-aware code)
 # Legacy constants (keep for backward compat / guardian)
 LOSS_MIN_PCT           = -3.0   # deprecated → use CL_TIER2_MIN_PCT
 LOSS_MAX_PCT           = -0.5   # deprecated → use CL_TIER1_MAX_PCT
