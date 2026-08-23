@@ -26,6 +26,7 @@ from hermes_constants import (
     COIN_TRACKER_HOT_CONF_CAP,
     COIN_TRACKER_HOT_COOLDOWN_HOURS,
     COIN_TRACKER_HOT_MIN_COMPOSITE,
+    COIN_TRACKER_HOT_MIN_COMPOSITE_SHORT,
     COIN_TRACKER_HOT_MIN_MACD_PCT,
     COIN_TRACKER_HOT_MAX_Z_SCORE,
     COIN_TRACKER_HOT_MAX_BB_POSITION,
@@ -153,9 +154,7 @@ def detect(token, data):
     if health not in ('hot', 'ready', 'warm'):
         return None
 
-    # Must meet minimum composite threshold
-    if composite < COIN_TRACKER_HOT_MIN_COMPOSITE:
-        return None
+    # Must meet minimum composite threshold (checked after direction is known)
 
     # Must have structure signal: wyckoff/ewave OR trend + clustering
     has_structure = (
@@ -198,6 +197,12 @@ def detect(token, data):
     elif trend_dir == 'BEAR':
         direction = 'SHORT'
     else:
+        return None
+
+    # Direction-aware composite threshold — SHORT gets a lower bar (50) since bearish
+    # setups score lower in the coin tracker's composite formula
+    min_composite = COIN_TRACKER_HOT_MIN_COMPOSITE if direction == 'LONG' else COIN_TRACKER_HOT_MIN_COMPOSITE_SHORT
+    if composite < min_composite:
         return None
 
     # Momentum filter — prevent entries against the trend (added 2026-08-22, scaled 2026-08-22)
