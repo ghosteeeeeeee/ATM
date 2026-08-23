@@ -13300,3 +13300,24 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - CC SHORT hzscore- -2.17% adverse but still inside, monitoring
 
 **Open Questions:** None — system stable, first red hour after streak
+
+## [2026-08-23 08:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (no activity)
+
+**24h:** 35T 14W 40% -$1.59 | hl_copy_trader 25T 11W 44% +$0.14 (only profitable) | ct-hot+ 4T 0W dormant since Aug 22 | hzscore- 3T 3W 100% +$0.13 | atr_sl_hit 15T +$1.06 avg +$0.071 (structural, healthy) | MAE-GUARD 13T -$1.16 (disabled)
+
+**Open:** 5 — KAS SHORT ct-hot- +$0.07, FOGO SHORT ct-hot- +$0.05, NXPC SHORT hzscore- -$0.09, BSV SHORT hzscore- $0.00, CC SHORT hzscore- +$0.22
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — quiet, normal
+- No kill criteria (ct-hot+ dormant, no 0% WR signals with 3+ trades)
+- Trade freq 7/4h = normal
+- 5 consecutive positive hours before last hour's -$0.54
+- NXPC SHORT -75.75% on $11 position = -$0.09, hzscore- stop will handle it
+- atr_sl_hit structural at +$0.066 avg — no SL adjustment needed
+
+**Open Questions:** None
