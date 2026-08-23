@@ -1235,7 +1235,7 @@ MACD_ACCEL_MINUS_ENABLED      = True    # macd_accel- SHORT
 # ── MACD Divergence (5m pivot divergence) ─────────────────────────────────────
 # macd_divergence.py — detects price/MACD histogram pivot divergence on 5m candles
 MACD_DIVERGENCE_ENABLED          = True    # master kill-switch
-MACD_DIVERGENCE_PLUS_ENABLED     = True    # macd-div+ LONG (bullish divergence)
+MACD_DIVERGENCE_PLUS_ENABLED     = False   # CEO KILLED 2026-08-23 — 4T/7d 25% WR -$0.40. Dead signal, no edge.
 MACD_DIVERGENCE_MINUS_ENABLED    = True    # macd-div- SHORT (bearish divergence)
 MACD_DIV_FAST                    = 12      # MACD fast EMA period
 MACD_DIV_SLOW                    = 26      # MACD slow EMA period

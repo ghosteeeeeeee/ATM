@@ -1,5 +1,34 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-23 18:00 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 52T 22W 42.3% -$0.20 (near breakeven)
+
+**24h Close Reasons:**
+- atr_sl_hit: 29T/20W +$1.01 — dominant, profitable, trailing SL working
+- cut-loser-MAE-GUARD: 9T -$0.78 — legacy (disabled)
+- profit-monster-trail: 5T +$0.15 — healthy
+- hard_sl: 2T -$0.46 — guardian safety net
+
+**Signal Performance 24h:**
+- hl_copy_trader: 20T/8W 40% +$0.42 (net positive, only active)
+- ct-hot+: 15T/8W 53.3% +$0.18 (healthy)
+- hzscore-: 7T/3W 42.9% -$0.21 (minor loss)
+- ct-hot-: 2T/0W 0% -$0.15 (below kill threshold)
+- macd-div+: 2T/0W 0% -$0.36 (below kill threshold)
+
+**Changes:** None
+**No Change Needed:**
+- 0 trades last hour — quiet period
+- atr_sl_hit 55.8% but net profitable +$1.01 — trailing SL correct
+- No signal crosses kill criteria (3+T/0%WR in last hour)
+- Trade frequency normal 1-5/hr
+- macd-div+ at 2T 0%WR — just below 3T kill threshold, monitor next hour
+
+**Open Questions:**
+- macd-div+ needs 1 more loss to trigger kill — watch closely
+
 ## [2026-08-23 11:45 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour | 1 entry (ct-hot+ LONG)
@@ -13625,3 +13654,47 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - macd-div+ new signal, 2T 0% -$0.36 — one more loss triggers kill
 - hzscore- persistent 7T 43% -$0.21 — losers consistently larger than winners
+
+## [2026-08-23 18:45 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L)
+**PnL:** +$0.15 (PUMP +$0.07, IMX +$0.08, ME $0.00, W $0.00)
+**24h:** ~55T 20W+ 37%+ WR, net positive
+
+**Changes:** None
+
+**No Change Needed:**
+- 4 trades last hour — normal frequency (4/hr), net positive
+- macd-div+ 3T 33% WR — not killable (kill requires 0% WR with 3+ trades in LAST HOUR; this signal won last hour)
+- ct-hot- 2T 0% — needs 3+ trades for kill threshold
+- hzscore- 7T 43% -$0.21 — persistent drag but not at kill threshold
+- atr_sl_hit 29T +$0.90 dominant and profitable — trailing SL healthy
+- hard_sl 3T -$0.46 — losses larger than wins but small sample
+- Hourly trend recovering: 18:00 +$0.15 vs 14:00 -$0.47
+
+**Open Questions:**
+- hzscore- persistent — losers consistently larger than winners. May need param tuning if 24h loss widens.
+- hard_sl avg -$0.153/trade vs profit-monster-trail +$0.037 — trailing exits vastly outperform hard stops.
+
+## [2026-08-23 20:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L)
+**PnL:** -$0.38 (PUMP -$0.11 macd-div+ cut-loser-CL-T1, WLFI -$0.14 ct-hot+ atr_sl_hit, TURBO -$0.13 ct-hot+ atr_sl_hit)
+**24h:** 57T ~38% WR +$0.26 net
+
+**Changes:** None
+
+**No Change Needed:**
+- 3 trades last hour — small losses, no blowups, normal frequency
+- atr_sl_hit 31T +$0.63 dominant and profitable — trailing SL healthy
+- ct-hot- 2T 0% — needs 3+ trades for kill threshold
+- macd-div+ 4T 25% — not killable (1W)
+- hzscore- 7T 43% -$0.21 — persistent drag but not at kill threshold
+- cut-loser-MAE-GUARD 10T -$0.78 — already disabled
+- Trade frequency normal (3/hr)
+- Hourly trend: recovering from 14:00 -$0.47 low, 19:00-20:00 -$0.38 (2 trades)
+
+**Open Questions:**
+- ct-hot- approaching kill threshold — one more loss triggers kill
+- hzscore- persistent — losers consistently larger than winners. If 24h loss widens past -$0.30, consider param tuning.
+- hard_sl 3T -$0.153 avg vs profit-monster-trail +$0.037 — trailing exits vastly outperform hard stops

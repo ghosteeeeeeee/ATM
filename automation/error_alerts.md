@@ -308,3 +308,8 @@ ALERTS:
 
 ## Error Alerts — 2026-08-23 17:03 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [CFV2] ⚠️ _wait_for_hl_close failed for TOK — aborting flip`
+
+## Error Alerts — 2026-08-23 18:20 UTC
+- **INFO**: Pipeline health check — all systems nominal
+- **WARN**: Disk usage at 83% (92G/118G) — monitor, clean logs if approaching 85%
+- **NO AUTO-FIXES REQUIRED**

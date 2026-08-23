@@ -1,3 +1,7 @@
+[2026-08-23 18:00 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 24h 52T 22W 42.3% -$0.20 near breakeven. atr_sl_hit 29T +$1.01 dominant profitable trailing SL working. MAE-GUARD 9T legacy disabled. macd-div+ 2T 0% -$0.36 below kill threshold (needs 3T). ct-hot- 2T 0% below kill threshold. 5 open. No kill criteria actionable. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 19:00 UTC
 [2026-08-23 11:45 UTC] auto_1hr: NO CHANGES
   WHY: 0T last hour, 1 entry ct-hot+ LONG. 24h 37T 15W 40.5% -$0.27 near breakeven. atr_sl_hit 19T +$0.77 dominant profitable. MAE-GUARD disabled correctly (last fire 05:08 UTC). 5 open all ct-hot+ LONGs small PnL. No kill criteria. System stable.
   BY: auto_1hr
@@ -83,3 +87,11 @@
   WHY: 4T last hour (1W 3L -$0.15). Small losses, no blowups. 50T 20W 40% +$0.59/24h positive. atr_sl_hit 29T dominant profitable. hl_copy_trader best PnL +$0.42. ct-hot+ improving 15T 8W 53% +$0.18. hzscore- 7T 3W 43% -$0.21 persistent. macd-div+ 2T 0W -$0.36 needs 3+ to kill. ct-hot- 2T 0W needs 3+ to kill. 1 open BTC +$0.58 green. Trade freq normal 4/hr. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 18:00 UTC
+[2026-08-23 18:45 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L +$0.15). Normal freq 4/hr. ~55T 24h net positive. atr_sl_hit 29T +$0.90 dominant profitable. hl_copy_trader +$0.23, ct-hot+ +$0.26 profitable signals. hzscore- 7T 43% -$0.21 persistent drag but not at kill. macd-div+ 3T 33% -$0.29 new signal, not killable (0% WR kill needs 3+ in LAST HOUR, won last hour). ct-hot- 2T 0% below kill threshold. hard_sl 3T -$0.46 underperforms trail exits. System stable, hourly trend recovering. No kill criteria met.
+  BY: auto_1hr
+  NEXT: Re-run at 19:45 UTC
+[2026-08-23 20:00 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.38). Small losses PUMP/WLFI/TURBO. 57T 24h ~38% WR +$0.26 net positive. atr_sl_hit 31T +$0.63 dominant profitable. cut-loser-MAE-GUARD 10T -$0.78 disabled. hzscore- 7T 43% -$0.21 persistent. ct-hot- 2T 0% below kill threshold. macd-div+ 4T 25% not killable. Trade freq normal 3/hr. No kill criteria met. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 21:00 UTC
