@@ -705,6 +705,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             R2_REV_ENABLED, R2_TREND_ENABLED, R2_TREND_LONG_ENABLED,
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
+            MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
         )
         from hermes_constants import SIGNAL_SOURCE_BLACKLIST as _BL
         # Fast path: if source is blocklisted, blacklist layer already caught it
@@ -1464,6 +1465,26 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # macd-div (MACD histogram divergence)
+            if _comp in ('macd-div+', 'macd-div-'):
+                try:
+                    from hermes_constants import MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED
+                    if direction == 'LONG' and not MACD_DIVERGENCE_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MACD_DIVERGENCE_PLUS_ENABLED=False', flush=True)
+                        return None
+                    if direction == 'SHORT' and not MACD_DIVERGENCE_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MACD_DIVERGENCE_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'macd-div':
+                try:
+                    from hermes_constants import MACD_DIVERGENCE_ENABLED
+                    if not MACD_DIVERGENCE_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MACD_DIVERGENCE_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -1946,6 +1967,7 @@ def is_component_disabled(component: str) -> bool:
             HH_HL_ENABLED, HH_HL_PLUS_ENABLED, HH_HL_MINUS_ENABLED,
             GUPPY_ENABLED, GUPPY_PLUS_ENABLED, GUPPY_MINUS_ENABLED,
             MACD_ACCEL_ENABLED, MACD_ACCEL_PLUS_ENABLED, MACD_ACCEL_MINUS_ENABLED,
+            MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
             TREND_PURITY_ENABLED, TREND_PURITY_PLUS_ENABLED, TREND_PURITY_MINUS_ENABLED,
             EMA9_SMA20_ENABLED, EMA9_SMA20_PLUS_ENABLED, EMA9_SMA20_MINUS_ENABLED,
             R2_REV_ENABLED, R2_REV_PLUS_ENABLED, R2_REV_MINUS_ENABLED,
@@ -2063,6 +2085,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'macd-accel+': return not MACD_ACCEL_PLUS_ENABLED
     if c == 'macd-accel-': return not MACD_ACCEL_MINUS_ENABLED
     if c == 'macd-accel': return not MACD_ACCEL_ENABLED
+    # macd-div
+    if c == 'macd-div+': return not MACD_DIVERGENCE_PLUS_ENABLED
+    if c == 'macd-div-': return not MACD_DIVERGENCE_MINUS_ENABLED
+    if c == 'macd-div': return not MACD_DIVERGENCE_ENABLED
     # trend-purity
     if c == 'trend-purity+': return not TREND_PURITY_PLUS_ENABLED
     if c == 'trend-purity-': return not TREND_PURITY_MINUS_ENABLED

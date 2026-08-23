@@ -184,6 +184,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # Backtest (3000 bars, 40 tokens): SHORT avg=+0.041%, LONG avg=-0.128%
     ('macd_accel_short', 'macd-accel-'):  1.0,  # SHORT: modest edge, moderate weight
     ('macd_accel_long',  'macd-accel+'):  0.8,  # LONG: negative avg, suppress
+    # macd_divergence — 5m pivot divergence between price and MACD histogram
+    ('macd_divergence_long',  'macd-div+'):  1.0,  # LONG: counter-trend, conservative start
+    ('macd_divergence_short', 'macd-div-'):  1.0,  # SHORT: counter-trend, conservative start
     ('momentum',  'momentum+'):    1.25,  # combined pct-hermes + accel LONG (77% hit rate)
     ('momentum',  'momentum-'):    1.25,  # combined pct-hermes + accel SHORT (77% hit rate)
     ('mtf_zscore','hzscore,pct-hermes,momentum'): 1.1,  # triple combo — slightly boosted

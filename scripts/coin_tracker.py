@@ -40,6 +40,10 @@ from coin_tracker_score import (
     compute_predictive_score as _compute_predictive_score,
     predictive_filter as _predictive_filter,
     optimal_entry_timing as _optimal_entry_timing,
+    # Smart alerts
+    generate_predictive_alerts as _generate_predictive_alerts,
+    generate_liquidation_heatmap as _generate_liquidation_heatmap,
+    detect_market_regime as _detect_market_regime,
     # Weather station scoring functions
     score_tide as _score_tide, score_sea_state as _score_sea_state,
     score_wind as _score_wind, score_token_regime as _score_token_regime,
@@ -598,6 +602,26 @@ def collect():
         set_meta('last_prune_ts', str(now_ts))
         if deleted:
             print(f'[coin_tracker] Pruned {deleted} old events', flush=True)
+
+    # Generate and log predictive alerts
+    if weather_data or liq_data:
+        alerts = _generate_predictive_alerts(liq_data, weather_data)
+        if alerts:
+            print(f'\n[coin_tracker] === PREDICTIVE ALERTS ({len(alerts)}) ===')
+            for alert in alerts[:10]:  # Log first 10 alerts
+                severity_icon = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢'}.get(alert['severity'], '⚪')
+                print(f'  {severity_icon} [{alert["type"]}] {alert["message"]} → {alert["action"]}')
+        
+        # Log market regime
+        regime = _detect_market_regime(weather_data)
+        print(f'[coin_tracker] Market regime: {regime}')
+        
+        # Log liquidation heatmap summary
+        heatmap = _generate_liquidation_heatmap(liq_data)
+        if heatmap:
+            total_clusters = sum(len(v.get('long_stops', []) + v.get('short_stops', [])) for v in heatmap.values())
+            cascade_zones = sum(len(v.get('cascade_zones', [])) for v in heatmap.values())
+            print(f'[coin_tracker] Liquidation heatmap: {len(heatmap)} coins, {total_clusters} clusters, {cascade_zones} cascade zones')
 
     print(f'[coin_tracker] Done: {processed} coins processed, {skipped} skipped, {errors} errors', flush=True)
 

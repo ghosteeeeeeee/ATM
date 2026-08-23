@@ -72,6 +72,8 @@ from hermes_constants import (
     ATR_SPIKE_ENABLED, ATR_SPIKE_PLUS_ENABLED,
     # liquidation_hunt
     LIQUIDATION_HUNT_ENABLED, LIQUIDATION_HUNT_PLUS_ENABLED, LIQUIDATION_HUNT_MINUS_ENABLED,
+    # macd_divergence
+    MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
 )
 
 
@@ -376,6 +378,11 @@ try:
 except Exception:
     _liquidation_hunt_run = None
 
+try:
+    from signals.macd_divergence import run as _macd_divergence_run
+except Exception:
+    _macd_divergence_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -451,6 +458,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'coin_tracker_hot', 'enabled': 'COIN_TRACKER_HOT_ENABLED', 'run': _coin_tracker_hot_run},
     {'name': 'atr_spike', 'enabled': 'ATR_SPIKE_ENABLED', 'run': _atr_spike_run},
     {'name': 'liquidation_hunt', 'enabled': 'LIQUIDATION_HUNT_ENABLED', 'run': _liquidation_hunt_run},
+    {'name': 'macd_divergence', 'enabled': 'MACD_DIVERGENCE_ENABLED', 'run': _macd_divergence_run},
 ]
 
 
@@ -458,7 +466,7 @@ SIGNAL_REGISTRY: list[dict] = [
 
 # Slow signals — scan 191 tokens and take >60s. Run separately on a 5-min cadence.
 # All other signals are fast (<10s each).
-_SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'momentum_leaderboard'}
+_SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'momentum_leaderboard', 'macd_divergence'}
 
 
 def _resolve_enabled(entry):

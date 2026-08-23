@@ -680,6 +680,212 @@ def optimal_entry_timing(liq_data, weather_data):
     return recommendations
 
 
+def generate_predictive_alerts(liq_data, weather_data, token_data=None):
+    """
+    Generate predictive alerts for high-probability setups.
+    
+    Alert Types:
+    - STOP_HUNT: Liquidation cluster within 0.5%
+    - CASCADE_RISK: Multiple clusters within 1%
+    - TIDE_SHIFT: Tide changing direction
+    - MOMENTUM_SURGE: Wind velocity spiking
+    - REGIME_CHANGE: Sea state shifting
+    
+    Args:
+        liq_data: liquidation cluster data
+        weather_data: weather station data
+        token_data: optional token-specific data
+    
+    Returns: list of alert dicts with type, severity, message, action
+    """
+    alerts = []
+    
+    # Stop hunt alert
+    if liq_data:
+        clusters = liq_data.get('_coin_clusters', [])
+        if clusters:
+            nearest = min(clusters, key=lambda c: abs(c.get('distance_pct') or 100))
+            distance = abs(nearest.get('distance_pct') or 100)
+            if distance < 0.5:
+                alerts.append({
+                    'type': 'STOP_HUNT',
+                    'severity': 'HIGH',
+                    'message': f"Liquidation cluster {distance:.2f}% away",
+                    'action': 'ENTER NOW',
+                    'cluster_size': nearest.get('total_notional_usd'),
+                })
+            elif distance < 1.0:
+                alerts.append({
+                    'type': 'STOP_HUNT',
+                    'severity': 'MEDIUM',
+                    'message': f"Liquidation cluster {distance:.2f}% away",
+                    'action': 'ENTER SOON',
+                    'cluster_size': nearest.get('total_notional_usd'),
+                })
+        
+        # Cascade risk alert
+        close_clusters = [c for c in clusters if abs(c.get('distance_pct') or 100) < 1.0]
+        if len(close_clusters) >= 2:
+            total_size = sum(c.get('total_notional_usd') or 0 for c in close_clusters)
+            alerts.append({
+                'type': 'CASCADE_RISK',
+                'severity': 'HIGH',
+                'message': f"{len(close_clusters)} clusters within 1%, total ${total_size/1e6:.0f}M",
+                'action': 'Reduce position size',
+                'cluster_count': len(close_clusters),
+                'total_size': total_size,
+            })
+    
+    # Weather alerts
+    if weather_data:
+        # Tide shift alert
+        tide_24h = weather_data.get('tide', {}).get('24h', {})
+        long_pct = tide_24h.get('long_pct', 50)
+        imbalance = abs(long_pct - 50) / 50
+        if imbalance > 0.2:
+            direction = 'BULLISH' if long_pct > 55 else 'BEARISH'
+            alerts.append({
+                'type': 'TIDE_SHIFT',
+                'severity': 'MEDIUM',
+                'message': f"Strong {direction} tide ({long_pct:.0f}% long)",
+                'action': f'Favor {direction} entries',
+            })
+        
+        # Momentum surge alert
+        wind = weather_data.get('wind', {})
+        gusts = wind.get('gusts') or 0
+        sustained = wind.get('sustained') or 1
+        if gusts > sustained * 2:
+            alerts.append({
+                'type': 'MOMENTUM_SURGE',
+                'severity': 'MEDIUM',
+                'message': f"Wind gusts {gusts:.4f} vs sustained {sustained:.4f}",
+                'action': 'Expect volatile moves',
+            })
+        
+        # Regime change alert
+        sea = weather_data.get('sea_state', {})
+        wr = sea.get('winrate') or 50
+        if wr < 45:
+            alerts.append({
+                'type': 'REGIME_CHANGE',
+                'severity': 'LOW',
+                'message': f"Market unhealthy (WR {wr:.0f}%)",
+                'action': 'Reduce exposure',
+            })
+        elif wr > 55:
+            alerts.append({
+                'type': 'REGIME_CHANGE',
+                'severity': 'LOW',
+                'message': f"Market healthy (WR {wr:.0f}%)",
+                'action': 'Full position sizing',
+            })
+    
+    return alerts
+
+
+def generate_liquidation_heatmap(liq_data):
+    """
+    Generate heatmap of liquidation clusters.
+    
+    Shows where stops are clustered, helping predict:
+    - Support/resistance levels
+    - Potential cascade zones
+    - Optimal entry/exit points
+    
+    Args:
+        liq_data: liquidation cluster data
+    
+    Returns: dict with heatmap data per coin
+    """
+    if not liq_data:
+        return {}
+    
+    clusters = liq_data.get('liquidation_clusters', {})
+    heatmap = {}
+    
+    for coin, coin_clusters in clusters.items():
+        heatmap[coin] = {
+            'long_stops': [],  # Support levels
+            'short_stops': [],  # Resistance levels
+            'cascade_zones': [],  # Areas with multiple clusters
+        }
+        
+        for cluster in coin_clusters:
+            price = cluster.get('price')
+            side = (cluster.get('side') or '').upper()
+            size = cluster.get('total_notional_usd') or 0
+            
+            if side == 'LONG':
+                heatmap[coin]['long_stops'].append({
+                    'price': price,
+                    'size': size,
+                    'distance_pct': cluster.get('distance_pct'),
+                })
+            elif side == 'SHORT':
+                heatmap[coin]['short_stops'].append({
+                    'price': price,
+                    'size': size,
+                    'distance_pct': cluster.get('distance_pct'),
+                })
+        
+        # Find cascade zones (clusters within 0.5% of each other)
+        all_stops = heatmap[coin]['long_stops'] + heatmap[coin]['short_stops']
+        all_stops.sort(key=lambda x: x.get('price') or 0)
+        
+        for i in range(len(all_stops) - 1):
+            price1 = all_stops[i].get('price') or 0
+            price2 = all_stops[i+1].get('price') or 0
+            if price1 > 0 and abs(price1 - price2) / price1 < 0.005:
+                heatmap[coin]['cascade_zones'].append({
+                    'price_range': (price1, price2),
+                    'total_size': (all_stops[i].get('size') or 0) + (all_stops[i+1].get('size') or 0),
+                })
+    
+    return heatmap
+
+
+def detect_market_regime(weather_data):
+    """
+    Detect market regime from weather data.
+    
+    Regimes:
+    - CALM: Low volatility, neutral tide, healthy sea
+    - STORMY: High volatility, extreme tide, unhealthy sea
+    - RECOVERY: Improving sea state, rising tide
+    - DECLINING: Worsening sea state, falling tide
+    
+    Args:
+        weather_data: weather station data
+    
+    Returns: regime string
+    """
+    if not weather_data:
+        return 'NEUTRAL'
+    
+    sea = weather_data.get('sea_state', {})
+    tide = weather_data.get('tide', {}).get('24h', {})
+    wind = weather_data.get('wind', {})
+    
+    # Calculate regime indicators
+    wr = sea.get('winrate') or 50
+    long_pct = tide.get('long_pct') or 50
+    gusts = wind.get('gusts') or 0
+    sustained = wind.get('sustained') or 1
+    volatility = gusts / sustained if sustained > 0 else 1
+    
+    if wr > 55 and abs(long_pct - 50) < 10 and volatility < 1.5:
+        return 'CALM'
+    elif wr < 45 or abs(long_pct - 50) > 20 or volatility > 2.0:
+        return 'STORMY'
+    elif wr > 50 and long_pct > 55:
+        return 'RECOVERY'
+    elif wr < 50 and long_pct < 45:
+        return 'DECLINING'
+    else:
+        return 'NEUTRAL'
+
+
 # ── Weather Station Scoring Functions ─────────────────────────────────────────
 
 def score_tide(token_data, weather_data):
