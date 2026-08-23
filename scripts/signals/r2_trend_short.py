@@ -315,7 +315,7 @@ def scan_signals(prices_dict=None):
         )
         if sid:
             added += 1
-            set_cooldown(token, direction='SHORT', hours=3)
+            set_cooldown(token, direction='SHORT', hours=0.25)
             print(f'  SHORT {token:8s} conf={sig["confidence"]:.0f}% '
                   f'slope={sig["slope"]:.6f} r2={sig["r2"]:.4f} '
                   f'price={price:.6f} intercept={sig["intercept"]:.6f} '
