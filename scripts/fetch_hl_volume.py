@@ -2,8 +2,8 @@
 """
 fetch_hl_volume.py — Fetch OHLCV volume data for Hyperliquid-only tokens.
 
-HL API doesn't provide volume directly, but ccxt can fetch candles with volume.
-This script fills gaps in candles.db for tokens that have volume=0.
+Uses _hl_info() from hyperliquid_exchange for rate limiting (1s gap between
+/info calls) — prevents 429s from concurrent processes.
 
 Usage:
     python3 fetch_hl_volume.py              # fill all tokens with volume=0
@@ -18,9 +18,10 @@ import argparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import CANDLES_DB
+from hyperliquid_exchange import _hl_info
 
-# Rate limiting: Hyperliquid /info endpoint ~10 req/s
-RATE_LIMIT_DELAY = 0.15  # 150ms between calls
+# Rate limiting: use _hl_info() which enforces 1s gap between /info calls
+RATE_LIMIT_DELAY = 1.0  # 1s between calls (matches _info_rate_limit)
 MAX_TOKENS_PER_RUN = 50  # limit per run to avoid long execution
 
 
@@ -41,25 +42,29 @@ def get_tokens_without_volume():
 
 
 def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100):
-    """Fetch OHLCV candles from Hyperliquid via hyperliquid package.
-    
+    """Fetch OHLCV candles from Hyperliquid via _hl_info() (rate-limited).
+
+    Uses the global rate limiter to prevent 429s.
     Tries uppercase token first, then original DB name (for k-prefix tokens).
     """
-    from hyperliquid.info import Info
     import time as _time
-    
-    info = Info('https://api.hyperliquid.xyz', skip_ws=True)
-    
+
     # Calculate time range
     end_time = int(_time.time() * 1000)
     tf_ms = {'1m': 60000, '5m': 300000, '15m': 900000}[timeframe]
     start_time = end_time - (limit * tf_ms)
-    
+
     # Try uppercase first, then original DB name (for k-prefix tokens like kPEPE)
     for token_variant in [token.upper(), token]:
         try:
-            candles = info.candles_snapshot(token_variant, timeframe, start_time, end_time)
-            if candles:
+            result = _hl_info({
+                "type": "candlesSnapshot",
+                "coin": token_variant,
+                "interval": timeframe,
+                "startTime": start_time,
+                "endTime": end_time,
+            })
+            if result and isinstance(result, list):
                 return [
                     {
                         'ts': int(c['t'] / 1000),
@@ -69,11 +74,11 @@ def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100):
                         'close': float(c['c']),
                         'volume': float(c['v']),
                     }
-                    for c in candles
+                    for c in result
                 ]
         except Exception:
             continue
-    
+
     print(f'[fetch_hl_candles] {token}: not found on Hyperliquid')
     return []
 

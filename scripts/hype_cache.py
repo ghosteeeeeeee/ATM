@@ -59,27 +59,31 @@ def fetch_and_cache() -> dict:
     """
     Fresh fetch of allMids + meta, write to cache.
     Called by price_collector only.
+    Uses _hl_info() from hyperliquid_exchange to respect the global rate limiter
+    (1s gap between /info calls) — prevents 429s from concurrent processes.
     Returns the fetched data.
     """
+    from hyperliquid_exchange import _hl_info
+
     result = {"allMids": None, "meta": None, "_ts": time.time(), "_errors": []}
 
-    # allMids
+    # allMids — goes through _hl_info() which enforces 1s rate limit gap
     try:
-        r = requests.post(_API_URL, json={"type": "allMids"}, timeout=10)
-        if r.ok:
-            result["allMids"] = r.json()
+        mids = _hl_info({"type": "allMids"})
+        if mids:
+            result["allMids"] = mids
         else:
-            result["_errors"].append(f"allMids HTTP {r.status_code}")
+            result["_errors"].append("allMids: empty response (rate-limited?)")
     except Exception as e:
         result["_errors"].append(f"allMids: {e}")
 
-    # meta
+    # meta — goes through _hl_info() which enforces 1s rate limit gap
     try:
-        r = requests.post(_API_URL, json={"type": "meta"}, timeout=15)
-        if r.ok:
-            result["meta"] = r.json()
+        meta = _hl_info({"type": "meta"})
+        if meta:
+            result["meta"] = meta
         else:
-            result["_errors"].append(f"meta HTTP {r.status_code}")
+            result["_errors"].append("meta: empty response (rate-limited?)")
     except Exception as e:
         result["_errors"].append(f"meta: {e}")
 
