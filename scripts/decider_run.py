@@ -1375,7 +1375,6 @@ def context_gate(token, direction, source, sig):
     try:
         from correlation_engine import CorrelationEngine
         _eng = CorrelationEngine()
-        _rec = _eng.should_trade(token, source)
         _chains = _eng.next_tokens(token, k=3)
         if _chains:
             _best = _chains[0]

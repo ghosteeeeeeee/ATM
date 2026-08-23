@@ -333,7 +333,7 @@ class CorrelationEngine:
                             "INSERT INTO cadence (token, hour_dist, day_dist, total_trades, "
                             "peak_hour_utc, peak_day, last_updated) VALUES (?, ?, ?, 1, ?, ?, ?)",
                             (token, json.dumps(hd), json.dumps(dd),
-                             peak_hour if 'peak_hour' in dir() else hour,
+                             hour,
                              day_names[day_idx], now_iso)
                         )
 

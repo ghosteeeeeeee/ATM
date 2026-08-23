@@ -947,21 +947,6 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             )
             print(f"[close_trade] Hebbian: {_heb_result}")
 
-            # ── Correlation engine: ingest for pump chain learning ──────
-            try:
-                from correlation_engine import CorrelationEngine
-                _corr = CorrelationEngine()
-                _corr.ingest_trade(
-                    token=token,
-                    signal=signal or "unknown",
-                    direction=direction or "unknown",
-                    won=bool(hype_pnl_pct > 0),
-                    pnl_pct=float(hype_pnl_pct or 0),
-                    close_time=datetime.now(_tz.utc).isoformat()
-                )
-            except Exception as _corr_err:
-                pass  # fail-open
-
             # Update circuit breaker stats with actual outcome
             try:
                 import json as _json
@@ -996,6 +981,24 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
                 pass
         except Exception as _heb_err:
             print(f"[close_trade] Hebbian error: {_heb_err}")
+            pass  # fail-open
+
+    # ── Correlation engine: ingest for pump chain learning ──────────────
+    # Independent of Hebbian — runs even if Hebbian fails.
+    if hype_pnl_pct is not None and signal:
+        try:
+            from correlation_engine import CorrelationEngine
+            from datetime import timezone as _tz_corr
+            _corr = CorrelationEngine()
+            _corr.ingest_trade(
+                token=token,
+                signal=signal or "unknown",
+                direction=direction or "unknown",
+                won=bool(hype_pnl_pct > 0),
+                pnl_pct=float(hype_pnl_pct or 0),
+                close_time=datetime.now(_tz_corr.utc).isoformat()
+            )
+        except Exception:
             pass  # fail-open
 
     return True
