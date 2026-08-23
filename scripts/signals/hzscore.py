@@ -219,10 +219,8 @@ def run() -> int:
             except Exception:
                 pass  # non-fatal: BB filter is secondary
 
-        except Exception as _outer_err:
+        except Exception:
             # Velocity filter is MANDATORY — if it fails, skip the signal
-            import sys
-            print(f'  [HZSCORE-DEBUG] {token} OUTER EXCEPT: {_outer_err}', file=sys.stderr)
             continue
         finally:
             if _conn:
