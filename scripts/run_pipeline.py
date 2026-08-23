@@ -186,6 +186,14 @@ def main():
     except Exception as e:
         log(f'  [Cycle] ⚠️ Could not increment cycle: {e}')
 
+    # Increment post-flip cycle counters (v2 anti-whipsaw window)
+    try:
+        from cascade_flip_helpers import increment_post_flip_cycles, cleanup_post_flip_state
+        increment_post_flip_cycles()
+        cleanup_post_flip_state()
+    except Exception:
+        pass  # Best-effort — v2 not critical
+
     import time as _t
     start = _t.time()
     # Every minute

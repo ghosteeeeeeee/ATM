@@ -422,8 +422,32 @@ STALE_LOSER_MAX_LOSS   = -0.6   # % loss required to be a "loser" (was -0.8%)
 
 # ── Cascade Flip Constants ──────────────────────────────────────────────────────
 # Used by cascade_flip.py and position_manager.py
-CASCADE_FLIP_ENABLED = False  # Master toggle — set True to enable cascade flip
+CASCADE_FLIP_ENABLED = True   # Master toggle — set True to enable cascade flip
 CASCADE_FLIP_MAX     = 3      # max flips per token before permanent lockout
+
+# ── Cascade Flip v2 Constants ──────────────────────────────────────────────────
+# v2: unified scoring engine with directional momentum + adaptive thresholds
+CASCADE_FLIP_V2_ENABLED = True   # v2 toggle — both this AND CASCADE_FLIP_ENABLED must be True
+
+# Scoring weights (sum = 100 max)
+CFV2_MTF_MAX_PTS       = 30   # MTF alignment component
+CFV2_CASCADE_MAX_PTS   = 25   # cascade active component
+CFV2_MACD_MAX_PTS      = 20   # MACD exit signal component
+CFV2_MOMENTUM_MAX_PTS  = 25   # momentum confirmation component
+
+# Momentum thresholds
+CFV2_VEL_STRONG        = 1.0  # velocity magnitude for full momentum pts
+CFV2_VEL_MODERATE      = 0.5  # velocity magnitude for moderate pts
+
+# Post-flip protection
+CFV2_POST_FLIP_MIN_CYCLES  = 3     # pipeline cycles before re-evaluation
+CFV2_POST_FLIP_COOLDOWN_M  = 15    # minutes between flips on same token
+
+# Flip budget thresholds (adaptive based on win rate)
+CFV2_BUDGET_WIN_RATE_HIGH  = 0.60  # above this → budget=5
+CFV2_BUDGET_WIN_RATE_LOW   = 0.40  # below this → budget=1
+CFV2_BUDGET_DEFAULT        = 3     # default when insufficient data
+CFV2_BUDGET_MIN_TRADES     = 3     # minimum trades before adaptive budget kicks in
 
 # ── Trade Sizing Constants ──────────────────────────────────────────────────────
 DEFAULT_TRADE_SIZE_USDT = 11.0  # FALLBACK only — actual sizing uses _get_trade_size_usdt()

@@ -32,7 +32,7 @@ from hermes_constants import (
     K_PHASE_EXT_STALL, K_PHASE_EXT_FAST,
     PHASE_ACCEL_FAST_THRESH,
     WRONG_SIDE_AVG_PCT_THRESH,
-    CASCADE_FLIP_ENABLED,
+    CASCADE_FLIP_ENABLED, CASCADE_FLIP_V2_ENABLED,
     ATR_UPDATE_THRESHOLD,
     TIME_EXIT_ENABLED, PEAK_EXIT_ENABLED,
     WEATHER_VANE_SHIELD_ENABLED, WEATHER_VANE_SHIELD_TRAILING_PCT,
@@ -2820,6 +2820,55 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 if cascade_flipped:
                     closed_count += 1
                     continue  # Position was flipped — skip remaining checks
+
+        # ── 3b. Cascade Flip V2 (unified scoring engine) ──────────────────────
+        # V2: directional momentum + confidence-weighted adaptive threshold.
+        # Runs AFTER v1 checks — if v1 already flipped, skip.
+        # Both CASCADE_FLIP_ENABLED AND CASCADE_FLIP_V2_ENABLED must be True.
+        if not cascade_flipped and CASCADE_FLIP_ENABLED and CASCADE_FLIP_V2_ENABLED:
+            try:
+                from cascade_flip_v2 import compute_flip_score, cascade_flip_v2
+                from cascade_flip_v2 import is_in_post_flip_window, get_flip_budget, get_current_flip_count
+
+                # Anti-whipsaw: skip if token is in post-flip cooldown window
+                if is_in_post_flip_window(token):
+                    log(f"  [CFV2] {token} in post-flip window — skipping evaluation")
+                else:
+                    # Adaptive budget: skip if token at flip limit
+                    budget = get_flip_budget(token)
+                    current_flips = get_current_flip_count(token)
+                    if current_flips >= budget:
+                        log(f"  [CFV2] {token} at flip budget ({current_flips}/{budget}) — skipped")
+                    else:
+                        flip_score = compute_flip_score(
+                            token, direction, live_pnl, SPEED_TRACKER
+                        )
+                        if flip_score and flip_score['flip_score'] >= flip_score['threshold']:
+                            flip_info_v2 = {
+                                'opposite_dir': flip_score['opposite_dir'],
+                                'conf': flip_score['flip_score'],
+                                'source': flip_score['source'],
+                                'sig_id': None,
+                                'price': flip_score.get('price', 0),
+                                'flip_score': flip_score['flip_score'],
+                                'threshold': flip_score['threshold'],
+                                'reasons': flip_score['reasons'],
+                            }
+                            cascade_flipped = cascade_flip_v2(
+                                token, direction, trade_id,
+                                live_pnl, flip_info_v2,
+                                entry_price=float(pos.get('entry_price') or 0)
+                            )
+                            if cascade_flipped:
+                                closed_count += 1
+                                continue
+                        elif flip_score:
+                            log(f"  [CFV2] {token} score={flip_score['flip_score']:.0f} "
+                                f"< threshold={flip_score['threshold']:.0f} — no flip")
+            except ImportError:
+                pass  # cascade_flip_v2 not available
+            except Exception as e:
+                log(f"  [CFV2] {token} error: {e}")
 
         # ── 5. Cut loser — immediate SL breach only ──────────────────────────────
         # Only fires when actual stop_loss price is breached (Priority 1 in should_cut_loser).

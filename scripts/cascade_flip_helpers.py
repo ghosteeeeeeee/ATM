@@ -6,11 +6,13 @@ Shared helpers for cascade-flip lifecycle:
   - Flip eviction metadata   (read/write flip_counts.json hotset_evicted flag)
   - Post-flip DB INSERT      (synchronous DB entry for post-flip positions)
   - Post-flip ATR k override (tokens that were recently flipped)
+  - Post-flip cycle tracking (v2: anti-whipsaw window management)
 
 Imported by:
   position_manager.py  (cascade_flip, _collect_atr_updates)
   signal_compactor.py  (hot-set builder)
   run_pipeline.py      (cycle counter increment)
+  cascade_flip_v2.py   (post-flip state management)
 """
 
 from typing import Optional
@@ -196,7 +198,7 @@ def insert_post_flip_trade(
             INSERT INTO trades (
                 token, direction, entry_price, hl_entry_price,
                 amount_usdt, leverage, exchange, paper, status, open_time,
-                stop_loss, target, atr_managed, signal, signal_source,
+                stop_loss, target, atr_managed, signal, signal_reason,
                 sl_distance, trailing_activation, trailing_distance,
                 guardian_closed, is_guardian_close
             )
@@ -245,3 +247,120 @@ def insert_post_flip_trade(
     except Exception as e:
         print(f"  [Post-Flip DB] ⚠️ Failed to insert post-flip trade for {token}: {e}")
         return None
+
+
+# ── V2: Post-Flip Cycle Tracking ──────────────────────────────────────────────
+
+# These functions manage the anti-whipsaw post-flip window for cascade_flip_v2.
+# They are called from run_pipeline.py (cycle increment) and signal_compactor.py (cleanup).
+
+POST_FLIP_STATE_FILE = '/var/www/hermes/data/post_flip_state.json'
+
+# Import from hermes_constants (single source of truth)
+try:
+    from hermes_constants import CFV2_POST_FLIP_COOLDOWN_M
+    POST_FLIP_COOLDOWN_M = CFV2_POST_FLIP_COOLDOWN_M
+except ImportError:
+    POST_FLIP_COOLDOWN_M = 15  # fallback if constants not available
+
+
+def _load_post_flip_state() -> dict:
+    """Load post-flip state from disk."""
+    try:
+        if os.path.exists(POST_FLIP_STATE_FILE):
+            with open(POST_FLIP_STATE_FILE) as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+
+def _save_post_flip_state(state: dict):
+    """Persist post-flip state to disk."""
+    try:
+        from hermes_file_lock import FileLock
+        with FileLock('post_flip_state'):
+            os.makedirs(os.path.dirname(POST_FLIP_STATE_FILE), exist_ok=True)
+            with open(POST_FLIP_STATE_FILE, 'w') as f:
+                json.dump(state, f, indent=2)
+    except Exception as e:
+        print(f"  [Post-Flip] ⚠️ Failed to persist state: {e}")
+
+
+def is_in_post_flip_window(token: str) -> bool:
+    """
+    Check if token is in the post-flip protection window.
+    Returns True if the token was flipped too recently for re-evaluation.
+    Called by position_manager.py before cascade flip v2 evaluation.
+    """
+    state = _load_post_flip_state()
+    entry = state.get(token.upper())
+    if not entry:
+        return False
+
+    flip_time_str = entry.get('flip_time')
+    if not flip_time_str:
+        return False
+
+    try:
+        flip_time = datetime.fromisoformat(flip_time_str)
+        if flip_time.tzinfo is None:
+            flip_time = flip_time.replace(tzinfo=timezone.utc)
+        elapsed_minutes = (datetime.now(timezone.utc) - flip_time).total_seconds() / 60
+        return elapsed_minutes < POST_FLIP_COOLDOWN_M
+    except Exception:
+        return False
+
+
+def record_post_flip(token: str):
+    """
+    Record that a token just underwent a cascade flip.
+    Called by cascade_flip_v2.py after a successful flip execution.
+    """
+    state = _load_post_flip_state()
+    state[token.upper()] = {
+        'flip_time': datetime.now(timezone.utc).isoformat(),
+        'cycles_seen': 0,
+    }
+    _save_post_flip_state(state)
+
+
+def increment_post_flip_cycles():
+    """
+    Called once per pipeline run (from run_pipeline.py).
+    Increments cycle count for all tokens in post-flip window.
+    """
+    state = _load_post_flip_state()
+    if not state:
+        return
+    for token, entry in state.items():
+        entry['cycles_seen'] = entry.get('cycles_seen', 0) + 1
+    _save_post_flip_state(state)
+
+
+def cleanup_post_flip_state():
+    """
+    Remove entries older than the cooldown window.
+    Called at the start of signal_compactor (or periodically).
+    """
+    state = _load_post_flip_state()
+    if not state:
+        return
+    changed = False
+    now = datetime.now(timezone.utc)
+    for token in list(state.keys()):
+        entry = state[token]
+        flip_time_str = entry.get('flip_time', '')
+        try:
+            flip_time = datetime.fromisoformat(flip_time_str)
+            if flip_time.tzinfo is None:
+                flip_time = flip_time.replace(tzinfo=timezone.utc)
+            elapsed_min = (now - flip_time).total_seconds() / 60
+            if elapsed_min > POST_FLIP_COOLDOWN_M + 5:  # 5 min grace
+                del state[token]
+                changed = True
+        except Exception:
+            del state[token]
+            changed = True
+    if changed:
+        _save_post_flip_state(state)

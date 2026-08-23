@@ -576,12 +576,14 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
 
             # Block counter-trend signals
             # CHoCH exemption: reversal signals are SUPPOSED to fire counter-trend
+            # coin_tracker_hot exemption: uses its own momentum filters
             _choch_exempt = signal_type and 'choch' in signal_type.lower()
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt:
+            _ct_hot_exempt = signal_type and 'coin_tracker_hot' in signal_type.lower()
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
-            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt:
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None

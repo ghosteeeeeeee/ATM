@@ -13533,3 +13533,62 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - hzscore- 6T 3W 50% but -$0.20 — losers consistently larger than winners. Continue monitoring.
 - 5 open positions with 3 slightly underwater — normal for trailing SL entries.
+
+## [2026-08-23 15:00 UTC] Hourly Analysis
+
+**Trades:** 5 closed (2W 3L)
+**PnL:** -$0.47 (all ct-hot+, all atr_sl_hit — BANANA -$0.26, COMP -$0.25, SUSHI -$0.32, IMX +$0.23, ADA +$0.13)
+
+**24h Summary:** 45T 18W 40% WR, ct-hot+ 14T 8W 57% +$0.20, hl_copy_trader 18T 7W 39% +$0.10, hzscore- 6T 3W 50% -$0.20, ct-hot- 2T 0W -$0.15
+
+**24h by Exit Reason:**
+- atr_sl_hit: 27T +$0.89 (dominant, profitable)
+- cut-loser-MAE-GUARD: 9T -$0.78 (worst drag, disabled correctly)
+- profit-monster-trail: 4T +$0.13
+- hard_sl: 2T -$0.46
+
+**Open:** 3 positions
+
+**Changes:** None
+
+**No Change Needed:**
+- 5 trades last hour — bad hour but ct-hot+ still profitable on 24h basis
+- No kill criteria (ct-hot- at 2T, needs 3+)
+- Trade frequency normal (5/hr within range)
+- atr_sl_hit dominant and profitable on 24h — trailing SL healthy
+- hzscore- persistent but only 6T — monitoring
+
+**Open Questions:**
+- hzscore- 6T 3W 50% but -$0.20 — losers consistently larger than winners.
+
+## [2026-08-23 16:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L)
+**PnL:** +$0.10 (LDO +$0.34, ENA -$0.22, LTC -$0.02 cascade_flip)
+
+**24h Summary:** 46T 18W 39% WR, +$0.34
+- hl_copy_trader: 19T 8W 42% +$0.44 (best PnL)
+- ct-hot+: 15T 8W 53% +$0.18 (improving)
+- hzscore-: 6T 3W 50% -$0.20 (persistent)
+- ct-hot-: 2T 0W -$0.15 (below kill threshold)
+- macd-div+: 1T 0W -$0.22 (too early)
+
+**24h by Exit Reason:**
+- atr_sl_hit: 29T +$0.14 avg (dominant, profitable)
+- cut-loser-MAE-GUARD: 9T -$0.78 (disabled correctly)
+- hard_sl: 2T -$0.46
+
+**Open:** 1 (BTC ct-hot+ +$0.58 green)
+
+**Changes:** None
+
+**No Change Needed:**
+- 3 trades last hour — good hour, LDO winner offsets 2 small losses
+- No kill criteria (ct-hot- at 2T, needs 3+; macd-div+ at 1T)
+- Trade freq normal (3/hr)
+- atr_sl_hit dominant and profitable — trailing SL healthy
+- hzscore- persistent but only 6T — monitoring
+
+**Open Questions:**
+- hzscore- 6T 3W 50% but -$0.20 — losers consistently larger than winners.
+- macd-div+ new signal, 1T 0W -$0.22 — too early to judge, monitor next run.

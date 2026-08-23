@@ -289,3 +289,19 @@ ALERTS:
 - **INFO**: Trades — 0 open, 23 closed today, +$0.33 PnL, 71.4% WR on ct-hot+ LONG
 - **INFO**: Market — 1 LONG / 0 SHORT / 103 NEUTRAL, 67% tokens above 50th percentile speed
 - **INFO**: All critical timers firing (pipeline, 1m-candle, watchdog, price-collector)
+
+## Error Alerts — 2026-08-23 15:03 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3540s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3480s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3421s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3360s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3300s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3001s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2939s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2879s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2821s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2705s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2690s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2641s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2581s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (2520s left, N failures)`
