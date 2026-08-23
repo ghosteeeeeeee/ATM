@@ -1,3 +1,7 @@
+[2026-08-23 11:45 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour, 1 entry ct-hot+ LONG. 24h 37T 15W 40.5% -$0.27 near breakeven. atr_sl_hit 19T +$0.77 dominant profitable. MAE-GUARD disabled correctly (last fire 05:08 UTC). 5 open all ct-hot+ LONGs small PnL. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 12:45 UTC
 [2026-08-22 19:00 UTC] auto_1hr: NO CHANGES
   WHY: 1T last hour. HYPE LONG hl_copy_trader +$0.19 trailing SL. 24h hl_copy_trader 23T 14W 60.9% +$1.53 healthy only active signal. ct-hot+ killed. Open: 1 BTC LONG hl_copy_trader $0.00. No kill criteria. System stable.
   BY: auto_1hr
@@ -50,4 +54,16 @@
   WHY: 0T last hour. 35T 14W 40% -$1.59/24h. hl_copy_trader only profitable +$0.14. hzscore- 3T 3W 100% +$0.13. ct-hot+ dormant since Aug 22. atr_sl_hit 15T +$1.06 avg +$0.071 structural. 5 open (4 green, NXPC -$0.09 tiny $11 pos). No kill criteria. Trade freq normal. System stable.
   BY: auto_1hr
   NEXT: Re-run at 09:00 UTC
+[2026-08-23 09:00 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L -$0.09). 32T 14W 43.8% +$0.06/24h breakeven. hl_copy_trader 19T 7W 36.8% +$0.06 only profitable. ct-hot+ 2T 2W +$0.20. hzscore- 5T 3W -$0.16 (losers > winners). ct-hot- 2T 0W -$0.15 (2T below kill threshold). atr_sl_hit 76% near-breakeven. 5 open $0.07 unrealized. Trade freq normal. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 10:00 UTC
 
+[2026-08-23 10:00 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (CASHCAT hard_sl -$0.27 micro-cap slippage). 24h 34T 14W 41% WR breakeven. atr_sl_hit 14T +$0.75 dominant + profitable. hzscore- 5T 3W 60% WR -$0.16 (losers > winners). ct-hot- 2T 0W below kill threshold. MAE-GUARD disabled correctly, no fires. 5 open (ENA +$0.47 best). Trade freq normal ~1.4/hr. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 11:00 UTC
+[2026-08-23 11:00 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L +$0.06). ENA winner offsets 3 small losses. 36T 14W 38.9% +$0.83/24h. atr_sl_hit 18T 50% dominant + profitable. hl_copy_trader only profitable signal +$0.10. ct-hot+ improving 6T 3W +$0.08. hzscore- 5T 3W 60% WR -$0.16 persistent losers > winners. ct-hot- 2T 0W at kill threshold. 5 open $0.27 unrealized green. Trade freq normal. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 12:00 UTC

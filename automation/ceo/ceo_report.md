@@ -1,21 +1,19 @@
-## CEO Report — 2026-08-23 ~08:30 UTC (238th run)
+## CEO Report — 2026-08-23 ~12:05 UTC (240th run)
 
 ### Diagnosis
-System BREAK-EVEN. Verified DB: 24h 36T -$0.64, 41.7% WR. 7d: 220T -$1.04, 52.3% WR. **ct-hot+ RE-ENABLED BY T** (RESEARCH_FLAGS, CEO cannot disable) — 35T/7d -$3.28, 31.4% WR (DOMINANT LOSER, ZRO LONG opened today 07:21). hl_copy_trader LONG 58T/7d +$2.15, 53.4% WR (ONLY performer). PM_TRAIL 76T/7d +$3.43, 90.8% WR (carrying). **SHORT 7d: 23T -$1.03, 30.4% WR (ALL losing — NEUTRAL block not catching trades).** 5 open: 1 ct-hot+ LONG, 2 hzscore- SHORT, 2 ct-hot- SHORT. Without ct-hot+: 7d +$2.24 (system profitable).
+System BREAK-EVEN. Verified DB: 24h 37T -$0.27, 40.5% WR. 7d: 229T -$1.33, 51.5% WR. **ct-hot+ DOMINANT LOSER** — 41T/7d -$3.20, 34.1% WR (RESEARCH_FLAGS, CEO cannot disable). Without ct-hot+: 7d +$1.70, 54.9% WR (system profitable). hl_copy_trader 60T/7d +$1.91, 51.7% WR (ONLY performer). PM_TRAIL 76T/7d +$3.43, 90.8% WR (carrying). **SHORT 7d: 26T -$1.40, 26.9% WR (ALL losing).** ATR_SL 123T/7d -$2.46 (only loss source).
 
 ### Root Cause
-1. ct-hot+ in RESEARCH_FLAGS — T re-enabled Aug 22 ("signal starvation fix"), NEVER_REENABLE_FLAGS has comments only (no entries). CEO cannot disable.
-2. SHORT_NEUTRAL_BLOCK not catching trades —1m regime shows LONG_BIAS when15m/4h is NEUTRAL (documented issue). hzscore- and ct-hot- SHORT still firing.
-3. MAE-GUARD exits today are pre-disable legacy (13T -$1.16, ages out).
+SHORT_NEUTRAL_BLOCK used 1m regime (`get_regime_1m()`) — 1m data too noisy, showed LONG_BIAS when 4h was NEUTRAL. Block never fired. hzscore-/ct-hot- SHORT signals slipped through in NEUTRAL market.
 
 ### Fix Applied
-NO CODE CHANGES — ct-hot+ in RESEARCH_FLAGS, only T can disable. Log problem, recommend T disable.
+**SHORT-NEUTRAL BLOCK FIXED** — Added `get_regime_4h()` reading from PostgreSQL `momentum_cache` (written by `4h_regime_scanner`). SHORT block now uses 4h regime: blocks in NEUTRAL (64 tokens), allows in SHORT_BIAS (85 tokens). 1m regime still used for NEUTRAL relax (correct — different purpose). Files: `signal_compactor.py` (2 changes: new function + updated block condition).
 
 ### Verification
-- Without ct-hot+: 7d +$2.24 (profitable)
-- PM_TRAIL: 90.8% WR, +$3.43/7d (carrying)
-- hl_copy_trader: 53.4% WR, +$2.15/7d (only performer)
-- SHORT: 30.4% WR, -$1.03/7d (bleeding, no edge)
+- 4h regime distribution: 85 SHORT_BIAS, 64 NEUTRAL, 23 LONG_BIAS
+- Block will fire for 64 NEUTRAL tokens (was: 0 tokens)
+- SHORT_BIAS tokens (85) still allowed to SHORT (correct)
+- Syntax verified: `py_compile` clean
 
 ### Key Metrics (Verified)
 | Metric | 24h | 7d |

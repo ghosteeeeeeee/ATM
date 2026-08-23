@@ -1,5 +1,32 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-23 11:45 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 entry (ct-hot+ LONG)
+**24h:** 37T 15W 40.5% WR -$0.27 (near breakeven)
+**Open:** 5 (all ct-hot+ LONGs, small PnL)
+
+**24h Close Reasons:**
+- atr_sl_hit: 19T/9W +$0.77 — dominant, profitable, trailing SL working
+- cut-loser-MAE-GUARD: 9T/1W -$0.78 — all from before disable (05:08 UTC last fire)
+- profit-monster-trail: 4T/3W +$0.13 — profitable, 75% WR
+- hard_sl: 2T/0W -$0.46 — guardian safety net
+- Other: 3T mixed
+
+**Signal Performance 24h:**
+- hl_copy_trader: 18T/7W 38.9% +$0.10 (only active signal, net positive)
+- ct-hot+: 6T/3W 50% +$0.08 (healthy)
+- hzscore-: 6T/3W 50% -$0.20 (losers > winners, minor)
+- ct-hot-: 4T/0W 0% -$0.38 (re-enabled by T for starvation fix, below kill threshold)
+
+**Changes:** None
+**No Change Needed:**
+- 0 trades last hour — quiet period
+- MAE-GUARD correctly disabled, no new fires
+- atr_sl_hit dominant and profitable — trailing SL working correctly
+- No signal crosses kill criteria (3+T/0%WR in last hour)
+- Trade frequency normal ~1.5/hr
+
 ## [2026-08-23 06:30 UTC] Daily Orchestrator Run
 
 **Pipeline Status:** 5 open | 39 closed today | -6.05% PnL
@@ -13321,3 +13348,119 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - atr_sl_hit structural at +$0.066 avg — no SL adjustment needed
 
 **Open Questions:** None
+
+## [2026-08-23 09:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L)
+**PnL:** -$0.09 (50% WR)
+
+**Trades Detail:**
+- ZRO ct-hot+ LONG atr_sl_hit +$0.10
+- ZRO ct-hot+ LONG atr_sl_hit +$0.10
+- FOGO ct-hot- SHORT atr_sl_hit -$0.14
+- BSV hzscore- SHORT atr_sl_hit -$0.15
+
+**24h:** 32T 14W 43.8% +$0.06 (breakeven)
+
+**24h by Signal:**
+- ct-hot+: 2T/2W 100% WR +$0.20 ✅
+- hl_copy_trader combo: 1T/1W 100% WR +$0.10 ✅
+- hl_copy_trader: 19T/7W 36.8% WR +$0.06 (only profitable)
+- hzscore-: 5T/3W 60% WR -$0.16 (losers bigger than winners)
+- ct-hot-: 2T/0W 0% WR -$0.15 (only 2T, below kill threshold)
+
+**24h by Exit Reason:**
+- atr_sl_hit: 73T -$0.67 (76% of exits, near-breakeven)
+- cut-loser-MAE-GUARD: 13T -$1.16 (residual from before disable)
+- guardian_hard_sl: 5T -$0.30
+
+**Open:** 5 (HBAR, CASHCAT, ICP ct-hot+, KAS ct-hot-, CC hzscore-)
+
+**Changes:** None
+
+**No Change Needed:**
+- 4 trades last hour — normal frequency (4/hr)
+- No kill criteria (ct-hot- only 2T, below 3T threshold)
+- hl_copy_trader still net positive despite low WR — winners larger than losers
+- atr_sl_hit dominant at 76% but near-breakeven avg — trailing SL healthy
+- 5 open positions manageable, $0.07 unrealized
+
+**Open Questions:**
+- hzscore- has 60% WR but negative total — is adverse excursion too high?
+
+## [2026-08-23 10:00 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L)
+**PnL:** -$0.27 (CASHCAT hard_sl micro-cap slippage)
+
+**24h Summary:** 34T 14W 41% WR, roughly breakeven (+$0.75 from atr_sl_hit dominates)
+
+**Trades Detail (last hour):**
+- CASHCAT ct-hot+ LONG hard_sl -$0.27 (micro-cap slippage, exit 2.4% below entry despite 1.2% SL)
+
+**24h by Signal:**
+- hl_copy_trader: 19T/7W 36.8% WR +$0.06 (volume driver, breakeven)
+- hzscore-: 5T/3W 60% WR -$0.16 (losers larger than winners)
+- ct-hot+: 3T/2W -$0.07 (slight negative)
+- ct-hot-: 2T/0W -$0.15 (below kill threshold at 2T)
+- combo signals: 2T/2W +$0.20
+
+**24h by Exit Reason:**
+- atr_sl_hit: 14T +$0.75 avg $0.054 (healthy, dominant exit)
+- profit-monster-trail: 4T +$0.13 (good)
+- cut-loser-MAE-GUARD: 10T -$0.82 (residual before disable, last fire 05:00 UTC)
+- hard_sl: 2T -$0.46 (micro-cap slippage: CASHCAT -$0.27, PUMP -$0.19)
+
+**Open:** 5 (ENA +$0.47, HBAR flat, ICP flat, KAS -$0.03, CC +$0.01)
+
+**Changes:** None
+
+**No Change Needed:**
+- 1 trade last hour — quiet, normal
+- No signal at kill threshold (ct-hot- 2T, need 3+)
+- MAE-GUARD disabled correctly, no fires since disable
+- atr_sl_hit is profitable and dominant — trailing SL working
+- Trade frequency normal (~1.4/hr avg)
+- ENA open position +$0.47 — let it ride
+
+**Open Questions:**
+- hzscore- negative with 60% WR — winners too small, losers too large. Monitor for next 24h before action.
+
+## [2026-08-23 11:00 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L)
+**PnL:** +$0.06 (ENA +$0.45, ZORA -$0.14, ENS -$0.16, KAS -$0.09)
+
+**24h Summary:** 36T 14W 38.9% WR, +$0.83 from atr_sl_hit dominance
+
+**Trades Detail (last hour):**
+- ZORA ct-hot+ LONG atr_sl_hit -$0.14
+- ENS ct-hot+ LONG atr_sl_hit -$0.16
+- KAS ct-hot- SHORT atr_sl_hit -$0.09
+- ENA ct-hot+ LONG atr_sl_hit +$0.45 (winner offset 3 losers)
+
+**24h by Exit Reason:**
+- atr_sl_hit: 18T +$0.81 (50%, profitable, structural)
+- cut-loser-MAE-GUARD: 9T -$0.78 (declining since disable)
+- profit-monster-trail: 4T +$0.13
+- hard_sl: 2T -$0.46 (micro-cap only)
+
+**24h by Signal:**
+- hl_copy_trader: 18T 7W 39% +$0.10 (volume driver)
+- ct-hot+: 6T 3W 50% +$0.08 (improving)
+- hzscore-: 5T 3W 60% WR -$0.16 (losers > winners persistent)
+- ct-hot-: 2T 0W -$0.15 (at kill threshold, need 1 more T)
+
+**Open:** 5 (HBAR +$0.09, ICP +$0.14, CC +$0.05, BTC +$0.01, GMT -$0.02)
+
+**Changes:** None
+
+**No Change Needed:**
+- 4 trades last hour — normal frequency (4/hr)
+- No kill criteria (ct-hot- at 2T, needs 3+)
+- atr_sl_hit 50% of closes but profitable avg — trailing SL healthy
+- 5 open positions manageable, $0.27 unrealized
+- hzscore- pattern persistent but only 5T — need more data
+
+**Open Questions:**
+- hzscore- continues high WR but negative PnL — losers consistently larger than winners. Monitor for 24h more before action.

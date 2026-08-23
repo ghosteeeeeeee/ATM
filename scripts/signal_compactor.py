@@ -171,6 +171,24 @@ def get_regime_1m(coin):
         return 'NEUTRAL', 0
 
 
+def get_regime_4h(coin):
+    """Get 4h regime from PostgreSQL momentum_cache (written by 4h_regime_scanner).
+    Returns (regime_str, confidence_int 0-100). Falls back to NEUTRAL if no data.
+    """
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', connect_timeout=3)
+        cur = conn.cursor()
+        cur.execute("SELECT regime_4h FROM momentum_cache WHERE token=%s", (coin.upper(),))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row and row[0]:
+            return row[0], 80
+        return 'NEUTRAL', 0
+    except Exception:
+        return 'NEUTRAL', 0
+
 # ── Signal source weights ────────────────────────────────────────────────────────
 # Source-specific multipliers applied during scoring.
 # > 1.0 = boost (trust more), < 1.0 = suppress (trust less).
@@ -1201,9 +1219,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # single-type signals can't find co-signals. Allow them through.
             _regime, _regime_conf = get_regime_1m(token)
             _neutral_relax = CONFLUENCE_NEUTRAL_RELAX and _regime == 'NEUTRAL'
-            # SHORT-in-NEUTRAL block: no SHORT edge in flat market (0% WR -$1.12/7d)
-            if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime == 'NEUTRAL':
-                log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — NEUTRAL regime, no SHORT edge")
+            # SHORT-in-NEUTRAL block: use 4h regime (1m too noisy, shows LONG_BIAS when 4h NEUTRAL)
+            _regime_4h, _ = get_regime_4h(token)
+            if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime_4h == 'NEUTRAL':
+                log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
                 continue
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
