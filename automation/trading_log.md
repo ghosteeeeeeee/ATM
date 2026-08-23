@@ -13225,3 +13225,27 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - Open positions manageable
 
 **Open Questions:** None — system stable
+
+## [2026-08-23 05:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L)
+**PnL:** $0.00 (50% WR)
+
+**Details:**
+- NXPC SHORT hzscore-: +$0.02 profit-monster-trail
+- ETH LONG hl_copy_trader: -$0.02 MAE-GUARD
+
+**24h:** 47T 20W 42.6% -$2.57 | hl_copy_trader 28T 46.4% +$0.33 (only profitable) | ct-hot+ 13T 15.4% -$3.16 (dormant since Aug 22) | hzscore- 3T 100% +$0.13 | atr_sl_hit 46.8% avg -$0.035 | MAE-GUARD 25.5% avg -$0.064
+
+**Open:** 5 — NXPC SHORT hzscore- +$0.05, BSV SHORT hzscore- +$0.09, CC SHORT hzscore- +$0.16, BANANA SHORT ct-hot- $0.00, BTC LONG hl_copy_trader -$0.32
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria (ct-hot+ dormant, no signal 0% WR with 3+ trades last hour)
+- Trade freq 2/hr = normal
+- atr_sl_hit 46.8% — structural, already widened to 3.0% max. Avg loss -$0.035 acceptable
+- 5 consecutive positive hours. System trending well.
+- hzscore- re-enable successful: 3T 3W 100% +$0.13
+
+**Open Questions:** None — system stable
