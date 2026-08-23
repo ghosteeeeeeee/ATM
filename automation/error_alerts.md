@@ -313,3 +313,12 @@ ALERTS:
 - **INFO**: Pipeline health check — all systems nominal
 - **WARN**: Disk usage at 83% (92G/118G) — monitor, clean logs if approaching 85%
 - **NO AUTO-FIXES REQUIRED**
+
+## Health Check — 2026-08-23 21:20 UTC
+- **[WARN]** Disk usage at 83% (20G free) — approaching 85% threshold
+- **NO AUTO-FIX NEEDED** — pipeline healthy, timers active, 0 errors in logs
+
+## Error Alerts — 2026-08-23 23:03 UTC
+- **REPEATED** (10x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] BSVUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=BSVUSDT&interval=15m&limit=N`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] BSVUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=BSVUSDT&interval=4h&limit=N`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] BSVUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=BSVUSDT&interval=1h&limit=N`

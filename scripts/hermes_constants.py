@@ -1083,6 +1083,7 @@ NEVER_REENABLE_FLAGS = {
     # COIN_TRACKER_HOT_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
     # COIN_TRACKER_HOT_PLUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
     # COIN_TRACKER_HOT_MINUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
+    'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1092,7 +1093,7 @@ VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True  # CEO KILLED 2026-08-17 — both directions dead. Plus: 32T ~38% WR -$0.47/7d (standalone + combos). Minus: 35T 54.3% WR -$0.22/7d.
 HZSCORE_PLUS_ENABLED     = True   # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 32T ~38% WR -$0.47/7d.
-HZSCORE_MINUS_ENABLED    = False  # auto_1hr 2026-08-23 — 7T 43% WR -$0.21/24h, avg loser 2x avg winner. Was RE-ENABLED 2026-08-22 for signal starvation (not starving: 55T/24h).
+HZSCORE_MINUS_ENABLED    = False  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. Auto-rotation failed (was re-enabled 2026-08-22). NEVER_REENABLE.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
 HMACD_MINUS_ENABLED      = True   # hmacd_bare- and hmacd_mtf- SHORT — kill-switch for SHORT direction
@@ -1374,7 +1375,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-23 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = True # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 

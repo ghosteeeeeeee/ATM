@@ -1,42 +1,61 @@
 # Signal Performance Report
-**Generated:** 2026-08-23 23:30 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-08-23 23:15 UTC | **Period:** Last 6h + 24h
 
-## KILLED (executed)
+## 6h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| macd-div+ | LONG | 3 | 33.3% | -$0.19 |
+| ct-hot+ | LONG | 8 | 37.5% | +$0.13 |
+
+## 24h Performance
+| Signal | Dir | Trades | WR | PnL | Status |
+|--------|-----|--------|-----|-----|--------|
+| macd-div+ | LONG | 5 | 20.0% | -$0.55 | KILLED (CEO, residual trades) |
+| hzscore- | SHORT | 8 | 37.5% | -$0.35 | KILLED (this report) |
+| ct-hot+ | LONG | 23 | 47.8% | +$0.31 | Active — marginal |
+| hl_copy_trader | LONG | 10 | 50.0% | +$0.50 | Active — best performer |
+
+---
+
+## KILLED (executed this cycle)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No kill candidates — all losers have <5 trades or WR >30% |
+| hzscore- | SHORT | 37.5% | -$0.35 | 8 | `HZSCORE_MINUS_ENABLED = False` + NEVER_REENABLE. Auto-rotation failed, avg loser 2x avg winner. |
 
-## BOOSTED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No boost candidates — no signal meets all 3 criteria (WR>55%, PnL>$0.05, 5+ trades) |
+**Note:** `macd-div+` was killed by CEO earlier today (2026-08-23 20:33 UTC). 5 residual trades were in progress at time of kill. Flag confirmed `= False`.
 
-## LOSERS (watch list)
+---
+
+## BOOSTED
+None. No signal meets boost criteria (WR > 55%, 5+ trades, multi-token consistency).
+
+---
+
+## WATCH LIST
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| hzscore- | SHORT | 42.9% | -$0.21 | 7 | WATCH — re-enabled 08-22, -$0.03/trade avg. Below kill threshold (WR>30%) |
-| macd-div+ | LONG | 0.0% | -$0.36 | 2 | LOW VOL — too few trades to act |
-| ct-hot- | SHORT | 0.0% | -$0.15 | 2 | LOW VOL — too few trades to act |
+| ct-hot+ | LONG | 47.8% | +$0.31 | 23 | Marginal — WR below 50%, monitor |
+| hl_copy_trader | LONG | 50.0% | +$0.50 | 10 | Best performer, but WR exactly 50% |
+| ct-hot- | SHORT | 0% | -$0.15 | 2 | Too few trades, watch |
+| ct-hot-,tl_break_short combo | SHORT | 0% | -$0.23 | 2 | Too few trades, watch |
 
-## WINNERS
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| hl_copy_trader | LONG | 40.0% | +$0.42 | 20 | ACTIVE — highest volume, net positive despite sub-50% WR |
-| ct-hot+ | LONG | 53.3% | +$0.18 | 15 | ACTIVE — solid WR, consistent earner |
+---
 
-## 6h Detail (for reference)
-| Signal | Dir | WR | PnL | Trades |
-|--------|-----|-----|-----|--------|
-| hl_copy_trader | LONG | 50.0% | +$0.32 | 2 |
-| ct-hot+ | LONG | 55.6% | +$0.10 | 9 |
-| hzscore- | SHORT | 0.0% | -$0.05 | 2 |
-| macd-div+ | LONG | 0.0% | -$0.36 | 2 |
+## SIGNAL INVERSIONS
+**None found.** All signals respect their direction labels.
+
+---
 
 ## ISSUES
-- No signal inversions found (no LONG signals executing SHORT or vice versa)
-- hzscore- re-enabled 2 days ago for signal starvation — currently losing but within tolerance. Re-evaluate in 24h if trend continues.
-- Low trade volume overall — signal starvation may be affecting sample sizes.
+- `hzscore-` was auto-rotated today (re-enabled 2026-08-22 for "signal starvation") but immediately started losing. Signal starvation argument invalid — 55T/24h total volume. Now permanently killed.
+- `macd-div+` trades continued for ~5 hours after kill flag was set. Expected — trades already in progress close normally.
 
-## Actions Taken
-- No flags changed this cycle (no kill candidates met criteria)
-- Next review: 6h
+---
+
+## ACTION SUMMARY
+1. **Killed** `hzscore-` SHORT — set `HZSCORE_MINUS_ENABLED = False`, added to `NEVER_REENABLE_FLAGS`
+2. **Verified** `macd-div+` kill — flag already `= False`, residual trades expected
+3. **No boosts** — no signal meets WR > 55% threshold
+4. **No inversions** detected
+
+*Next report: ~6h from now.*

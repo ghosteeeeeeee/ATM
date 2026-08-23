@@ -13719,3 +13719,45 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - macd-div+ still generating trades after kill? ZRO closed 20:46 via atr_sl_hit — verify signal runner respects the flag
 - Overall 24h -$1.03 — system underperforming, need win rate improvement
 - hard_sl exits underperform trail exits significantly
+
+## [2026-08-23 22:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L)
+**PnL:** +$0.32 (ME ct-hot+ atr_sl_hit)
+**24h:** 58T ~40% WR, net PnL mixed across signals
+
+**Changes:** None
+
+**No Change Needed:**
+- 1 trade last hour — winner, no blowups
+- hl_copy_trader best 24h signal: 10T 50% +$0.50
+- ct-hot+ solid: 23T 48% +$0.31
+- ct-hot- 2T 0W — at kill threshold, one more loss triggers kill
+- atr_sl_hit 32T +$0.63 dominant and healthy
+- Trade frequency normal (1/hr)
+- 2 open positions (GMT +$0.06, BTC +$0.15) both green
+- Hourly trend: stable, alternating +/-
+
+**Open Questions:**
+- ct-hot- approaching kill threshold — monitor next hour
+- 24h net slightly negative due to killed signals (macd-div+ -$0.55, hzscore- -$0.21) — should improve now that both are killed
+
+## [2026-08-23 23:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (0W 1L)
+**PnL:** -$0.14 (CC hzscore- atr_sl_hit)
+**24h:** 51T 41% WR -$0.45 net
+
+**No Change Needed:**
+- 1 trade last hour — small loss, no blowups
+- No signal at kill threshold in last hour
+- hzscore-/macd-div+ kills already deployed, pre-kill trades closing naturally
+- 4 open positions (BSV, BTC, NXPC, GMT) all slightly green
+- atr_sl_hit 33T +$0.49 dominant and healthy
+- hl_copy_trader +$0.50, ct-hot+ +$0.31 profitable
+- Trade frequency normal (1/hr)
+- System stable post-kill, 24h improving as old signals age out
+
+**Open Questions:**
+- BSV/NXPC hzscore- opens from before kill — will close via SL naturally
+- 24h -$0.45, should trend positive now that drag signals are killed
