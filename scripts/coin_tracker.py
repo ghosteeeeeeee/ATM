@@ -32,6 +32,10 @@ from coin_tracker_score import (
     score_wyckoff as _score_wyckoff, score_ewave as _score_ewave,
     score_trend_quality as _score_trend_quality,
     score_liquidation as _score_liquidation,
+    # Enhanced liquidation scoring
+    score_liquidation_enhanced as _score_liquidation_enhanced,
+    predict_stop_hunt as _predict_stop_hunt,
+    predict_cascade as _predict_cascade,
     # Weather station scoring functions
     score_tide as _score_tide, score_sea_state as _score_sea_state,
     score_wind as _score_wind, score_token_regime as _score_token_regime,
@@ -382,7 +386,14 @@ def collect():
                     '_has_stop_hunt': has_stop_hunt,
                     '_imbalance': ob_data.get('imbalance') or 1.0,
                 }
-                s_liquidation = _score_liquidation(price, coin_liq)
+                
+                # Enhanced liquidation scoring with predictions
+                liq_result = _score_liquidation_enhanced(price, coin_liq, weather_data)
+                s_liquidation = liq_result['score']
+                
+                # Store prediction data for alerts
+                stop_hunt_pred = liq_result.get('stop_hunt')
+                cascade_pred = liq_result.get('cascade')
 
                 # Weather station scores (NEW)
                 # Get price acceleration from token_speeds table
