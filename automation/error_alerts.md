@@ -261,3 +261,6 @@ ALERTS:
 - **[WARN]**: `hermes-5m-candle.timer` is disabled — 5m candle aggregation not running
 - **AUTO-FIX**: None applied (may be intentional — verify before enabling)
 - **[WARN]**: Day PnL -69.17% across 52 closed trades
+
+## Error Alerts — 2026-08-23 05:03 UTC
+- **REPEATED** (15x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: name 'token_speed' is not defined`

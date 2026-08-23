@@ -268,6 +268,8 @@ _NEW_COLUMNS = [
     ('sea_state', 'REAL'),
     ('wind', 'REAL'),
     ('token_regime', 'REAL'),
+    # Predictive scoring column
+    ('predictive_score', 'REAL'),
 ]
 
 def migrate_tables():

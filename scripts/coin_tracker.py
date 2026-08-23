@@ -36,6 +36,10 @@ from coin_tracker_score import (
     score_liquidation_enhanced as _score_liquidation_enhanced,
     predict_stop_hunt as _predict_stop_hunt,
     predict_cascade as _predict_cascade,
+    # Predictive scoring
+    compute_predictive_score as _compute_predictive_score,
+    predictive_filter as _predictive_filter,
+    optimal_entry_timing as _optimal_entry_timing,
     # Weather station scoring functions
     score_tide as _score_tide, score_sea_state as _score_sea_state,
     score_wind as _score_wind, score_token_regime as _score_token_regime,
@@ -447,6 +451,20 @@ def collect():
 
                 health = health_from_score(composite)
 
+                # Predictive scoring (NEW)
+                token_data_for_predictive = {
+                    'symbol': symbol,
+                    'price': price,
+                    'setup_type': setup.get('setup_type'),
+                    'trend_direction': trend.get('direction'),
+                    'price_acceleration': price_accel,
+                }
+                predictive = _compute_predictive_score(composite, weather_data, coin_liq, token_data_for_predictive)
+                predictive_score = predictive['predictive_score']
+                
+                # Predictive filter — adjust confidence based on predictions
+                allow_signal, conf_adj, filter_reason = _predictive_filter(composite, weather_data, coin_liq, token_data_for_predictive)
+
                 # ── Write event + score + registry update using shared connection ──
                 table = _table_name(symbol)
                 # Event
@@ -493,8 +511,8 @@ def collect():
                                             wyckoff_phase, ewave_count, ewave_degree, ewave_direction,
                                             trend_quality, trend_direction, sr_levels, vol_profile,
                                             setup_score, setup_type, setup_details, clustering_bullish, clustering_bearish, recency,
-                                            liquidation, tide, sea_state, wind, token_regime)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                            liquidation, tide, sea_state, wind, token_regime, predictive_score)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(symbol) DO UPDATE SET
                         ts=excluded.ts, health=excluded.health, score=excluded.score,
                         momentum=excluded.momentum, volume=excluded.volume, volatility=excluded.volatility,
@@ -518,7 +536,8 @@ def collect():
                         tide=COALESCE(excluded.tide, agg_scores.tide),
                         sea_state=COALESCE(excluded.sea_state, agg_scores.sea_state),
                         wind=COALESCE(excluded.wind, agg_scores.wind),
-                        token_regime=COALESCE(excluded.token_regime, agg_scores.token_regime)
+                        token_regime=COALESCE(excluded.token_regime, agg_scores.token_regime),
+                        predictive_score=COALESCE(excluded.predictive_score, agg_scores.predictive_score)
                 """, (symbol, now, health, composite, s_momentum, s_volume, s_volatility, s_spread, s_signals, s_regime, composite,
                       wyckoff.get('phase'),
                       ewave.get('wave') if isinstance(ewave.get('wave'), int) else None,
@@ -538,7 +557,8 @@ def collect():
                       s_tide,
                       s_sea_state,
                       s_wind,
-                      s_token_regime))
+                      s_token_regime,
+                      predictive_score))
 
                 # Registry
                 write_conn.execute("""

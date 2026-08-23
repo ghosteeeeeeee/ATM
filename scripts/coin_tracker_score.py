@@ -512,6 +512,172 @@ def score_liquidation_enhanced(price, liq_data, weather_data=None, token_data=No
     }
 
 
+# ── Predictive Scoring Functions ──────────────────────────────────────────────
+
+def compute_predictive_score(composite_score, weather_data, liq_data, token_data=None):
+    """
+    Compute predictive score that combines:
+    - Current technical state (existing composite score)
+    - Weather alignment (tide, sea state, wind, token regime)
+    - Liquidation setup (enhanced)
+    - Predictive signals (stop hunt, cascade)
+    
+    Args:
+        composite_score: current composite score from existing system (0-100)
+        weather_data: weather station data
+        liq_data: liquidation cluster data
+        token_data: optional token-specific data
+    
+    Returns: dict with predictive_score, components, and signals
+    """
+    # Weather alignment scores
+    tide_score = score_tide(token_data or {}, weather_data) if weather_data else 50.0
+    sea_score = score_sea_state(weather_data) if weather_data else 50.0
+    wind_score = score_wind(token_data or {}, weather_data) if weather_data else 50.0
+    regime_score = score_token_regime(token_data.get('symbol') if token_data else None, weather_data) if weather_data else 50.0
+    
+    # Liquidation setup (enhanced)
+    price = token_data.get('price') if token_data else None
+    liq_result = score_liquidation_enhanced(price, liq_data, weather_data, token_data)
+    liq_score = liq_result['score']
+    
+    # Predictive signals
+    stop_hunt = predict_stop_hunt(liq_data, weather_data, token_data)
+    cascade = predict_cascade(liq_data, weather_data, token_data)
+    
+    # Weighted combination
+    predictive_score = (
+        composite_score * 0.55 +           # Existing technical factors (reduced to make room)
+        tide_score * 0.10 +               # Market flow alignment
+        sea_score * 0.05 +                # Market health
+        wind_score * 0.05 +               # Momentum alignment
+        regime_score * 0.05 +             # Historical performance
+        liq_score * 0.10 +                # Liquidation proximity + predictions
+        (80 if stop_hunt else 50) * 0.05  # Stop hunt prediction
+        # Cascade prediction affects confidence, not score directly
+    )
+    
+    return {
+        'predictive_score': round(predictive_score, 1),
+        'components': {
+            'composite': composite_score,
+            'tide': tide_score,
+            'sea': sea_score,
+            'wind': wind_score,
+            'regime': regime_score,
+            'liquidation': liq_score,
+            'stop_hunt': stop_hunt,
+            'cascade': cascade,
+        },
+        'signals': {
+            'stop_hunt_imminent': stop_hunt is not None,
+            'cascade_risk': cascade is not None and (cascade.get('probability') or 0) > 60,
+            'tide_aligned': tide_score > 70,
+            'market_healthy': sea_score > 60,
+        }
+    }
+
+
+def predictive_filter(composite_score, weather_data, liq_data, token_data=None):
+    """
+    Filter signals based on predictive analysis.
+    
+    Logic:
+    - High predictive score (>60) → allow
+    - Stop hunt imminent → boost confidence
+    - Cascade risk → reduce position size
+    - Market unhealthy → reduce confidence
+    
+    Args:
+        composite_score: current composite score
+        weather_data: weather station data
+        liq_data: liquidation cluster data
+        token_data: optional token-specific data
+    
+    Returns: tuple (allow_signal, confidence_adjustment, reason)
+    """
+    predictive = compute_predictive_score(composite_score, weather_data, liq_data, token_data)
+    score = predictive['predictive_score']
+    signals = predictive['signals']
+    
+    if score < 50:
+        return False, 0, f"Low predictive score ({score})"
+    
+    confidence_adj = 0
+    reasons = []
+    
+    if signals['stop_hunt_imminent']:
+        confidence_adj += 10
+        reasons.append("Stop hunt imminent")
+    
+    if signals['cascade_risk']:
+        confidence_adj -= 5
+        reasons.append("Cascade risk — reduce size")
+    
+    if signals['tide_aligned']:
+        confidence_adj += 5
+        reasons.append("Tide aligned")
+    
+    if signals['market_healthy']:
+        confidence_adj += 5
+        reasons.append("Market healthy")
+    else:
+        confidence_adj -= 5
+        reasons.append("Market unhealthy")
+    
+    return True, confidence_adj, ', '.join(reasons) if reasons else 'Normal conditions'
+
+
+def optimal_entry_timing(liq_data, weather_data):
+    """
+    Determine optimal entry timing based on:
+    - Liquidation cluster proximity
+    - Tide direction
+    - Wind momentum
+    
+    Args:
+        liq_data: liquidation cluster data
+        weather_data: weather station data
+    
+    Returns: list of timing recommendations
+    """
+    recommendations = []
+    
+    if not liq_data:
+        return recommendations
+    
+    clusters = liq_data.get('_coin_clusters', [])
+    
+    # Check liquidation proximity
+    if clusters:
+        nearest = min(clusters, key=lambda c: abs(c.get('distance_pct') or 100))
+        distance = abs(nearest.get('distance_pct') or 100)
+        
+        if distance < 0.5:
+            recommendations.append("ENTER NOW — liquidation cluster within 0.5%")
+        elif distance < 1.0:
+            recommendations.append("ENTER SOON — cluster within 1%")
+    
+    # Check tide alignment
+    if weather_data:
+        tide_24h = weather_data.get('tide', {}).get('24h', {})
+        long_pct = tide_24h.get('long_pct', 50)
+        if long_pct > 60:
+            recommendations.append("BULLISH TIDE — favor LONG entries")
+        elif long_pct < 40:
+            recommendations.append("BEARISH TIDE — favor SHORT entries")
+        
+        # Check wind momentum
+        wind = weather_data.get('wind', {})
+        avg_vel = wind.get('avg_velocity') or 0
+        if avg_vel > 0.01:
+            recommendations.append("STRONG MOMENTUM — ride the wave")
+        elif avg_vel < -0.01:
+            recommendations.append("WEAK MOMENTUM — wait for reversal")
+    
+    return recommendations
+
+
 # ── Weather Station Scoring Functions ─────────────────────────────────────────
 
 def score_tide(token_data, weather_data):
