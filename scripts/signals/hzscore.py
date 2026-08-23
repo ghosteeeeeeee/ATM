@@ -202,11 +202,15 @@ def run() -> int:
             # Backtest (54 hzscore- trades): bb_width < 0.4% blocks 46% losers,
             # keeps 68% winners. Catches bullish flag breakdowns (BSV 2026-08-16).
             try:
-                _cur.execute("""
+                from paths import CANDLES_DB as _candles_db
+                _bb_conn = _sqlite3.connect(_candles_db, timeout=5)
+                _bb_cur = _bb_conn.cursor()
+                _bb_cur.execute("""
                     SELECT close FROM candles_1m
                     WHERE token = ? ORDER BY ts DESC LIMIT 20
                 """, (token.upper(),))
-                _closes = [r[0] for r in _cur.fetchall()]
+                _closes = [r[0] for r in _bb_cur.fetchall()]
+                _bb_conn.close()
                 if len(_closes) >= 20:
                     import statistics as _stat
                     _sma = _stat.mean(_closes)

@@ -16,7 +16,7 @@ Exports:
 """
 
 import sys, os, time, json, sqlite3, argparse, re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 # ── Resolve scripts dir for imports ──────────────────────────────────────────
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +27,7 @@ from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLAC
 from signal_schema import is_component_disabled
 from tokens import is_solana_only
 from hyperliquid_exchange import is_delisted
-from paths import RUNTIME_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON, CANDLES_DB
+from paths import RUNTIME_DB, STATIC_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON, CANDLES_DB
 
 from hermes_log import log
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
