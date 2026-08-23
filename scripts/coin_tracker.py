@@ -50,6 +50,9 @@ from coin_tracker_score import (
     score_contrarian as _score_contrarian,
     # MACD divergence
     score_macd_divergence as _score_macd_divergence,
+    # R:R calculation
+    calculate_rr as _calculate_rr,
+    score_rr as _score_rr,
     # Weather station scoring functions
     score_tide as _score_tide, score_sea_state as _score_sea_state,
     score_wind as _score_wind, score_token_regime as _score_token_regime,
@@ -464,6 +467,15 @@ def collect():
                 macd_div = _score_macd_divergence(closes_5m)
                 s_macd_div = macd_div['score']
                 
+                # R:R calculation and scoring
+                direction = setup.get('setup_type') or trend.get('direction') or 'NEUTRAL'
+                if direction in ('LONG', 'SHORT'):
+                    rr_data = _calculate_rr(price, direction, sr_levels, atr_14, coin_liq, vol_profile)
+                    s_rr = _score_rr(rr_data)
+                else:
+                    rr_data = None
+                    s_rr = 50.0
+                
                 # Contrarian score — will be computed in second pass
                 s_contrarian = 50.0
 
@@ -486,7 +498,8 @@ def collect():
                     s_wind * WEIGHTS['wind'] +
                     s_token_regime * WEIGHTS['token_regime'] +
                     s_contrarian * WEIGHTS['contrarian'] +
-                    s_macd_div * WEIGHTS.get('macd_div', 0.05)
+                    s_macd_div * WEIGHTS.get('macd_div', 0.05) +
+                    s_rr * WEIGHTS.get('rr', 0.05)
                 )
 
                 # No candle data = no real activity → force cold/dead

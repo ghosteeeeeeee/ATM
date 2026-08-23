@@ -888,6 +888,156 @@ def detect_market_regime(weather_data):
         return 'NEUTRAL'
 
 
+# ── Risk:Reward Calculation Functions ─────────────────────────────────────────
+
+def calculate_rr(price, direction, sr_levels=None, atr_14=None, liq_data=None, vol_profile=None):
+    """
+    Calculate Risk:Reward ratio for a potential trade.
+    
+    R:R = Potential Reward / Potential Risk
+    
+    For LONG:
+    - Risk = Entry - Stop Loss (below entry)
+    - Reward = Take Profit - Entry (above entry)
+    
+    For SHORT:
+    - Risk = Stop Loss - Entry (above entry)
+    - Reward = Entry - Take Profit (below entry)
+    
+    Args:
+        price: current price
+        direction: 'LONG' or 'SHORT'
+        sr_levels: list of support/resistance levels
+        atr_14: ATR(14) value
+        liq_data: liquidation cluster data
+        vol_profile: volume profile data
+    
+    Returns: dict with rr_ratio, stop_loss, take_profit, risk_pct, reward_pct
+    """
+    if not price or price <= 0:
+        return None
+    
+    direction = direction.upper()
+    
+    # Calculate stop loss using ATR
+    if atr_14 and atr_14 > 0:
+        atr_stop = atr_14 * 1.5  # 1.5x ATR for stop loss
+    else:
+        atr_stop = price * 0.02  # 2% default stop loss
+    
+    # Calculate take profit using S/R levels or ATR
+    if sr_levels:
+        if direction == 'LONG':
+            # Find nearest resistance above entry
+            resistances = [s['price'] for s in sr_levels if s.get('price', 0) > price]
+            if resistances:
+                take_profit = min(resistances)
+            else:
+                take_profit = price + atr_stop * 2  # 2:1 R:R default
+        else:
+            # Find nearest support below entry
+            supports = [s['price'] for s in sr_levels if s.get('price', 0) < price]
+            if supports:
+                take_profit = max(supports)
+            else:
+                take_profit = price - atr_stop * 2  # 2:1 R:R default
+    else:
+        take_profit = price + (atr_stop * 2 if direction == 'LONG' else -atr_stop * 2)
+    
+    # Adjust take profit using liquidation clusters
+    if liq_data:
+        clusters = liq_data.get('_coin_clusters', [])
+        if clusters:
+            if direction == 'LONG':
+                # Find clusters above (profit targets)
+                above_clusters = [c for c in clusters if c.get('price', 0) > price]
+                if above_clusters:
+                    nearest_above = min(above_clusters, key=lambda c: c.get('price', float('inf')))
+                    liq_target = nearest_above.get('price', 0)
+                    if liq_target > 0:
+                        take_profit = min(take_profit, liq_target * 0.99)  # 1% before cluster
+            else:
+                # Find clusters below (profit targets)
+                below_clusters = [c for c in clusters if c.get('price', 0) < price]
+                if below_clusters:
+                    nearest_below = max(below_clusters, key=lambda c: c.get('price', 0))
+                    liq_target = nearest_below.get('price', 0)
+                    if liq_target > 0:
+                        take_profit = max(take_profit, liq_target * 1.01)  # 1% after cluster
+    
+    # Adjust take profit using volume profile
+    if vol_profile:
+        poc = vol_profile.get('poc')
+        va_high = vol_profile.get('va_high')
+        va_low = vol_profile.get('va_low')
+        
+        if direction == 'LONG' and poc and poc > price:
+            # POC acts as magnet
+            take_profit = min(take_profit, poc)
+        elif direction == 'SHORT' and poc and poc < price:
+            take_profit = max(take_profit, poc)
+    
+    # Calculate R:R
+    if direction == 'LONG':
+        risk = price - (price - atr_stop)  # Stop is below entry
+        reward = take_profit - price
+        stop_loss = price - atr_stop
+    else:
+        risk = (price + atr_stop) - price  # Stop is above entry
+        reward = price - take_profit
+        stop_loss = price + atr_stop
+    
+    risk_pct = (risk / price) * 100
+    reward_pct = (reward / price) * 100
+    
+    if risk <= 0:
+        rr_ratio = 0
+    else:
+        rr_ratio = reward / risk
+    
+    return {
+        'rr_ratio': round(rr_ratio, 2),
+        'stop_loss': round(stop_loss, 6),
+        'take_profit': round(take_profit, 6),
+        'risk_pct': round(risk_pct, 2),
+        'reward_pct': round(reward_pct, 2),
+        'direction': direction,
+    }
+
+
+def score_rr(rr_data):
+    """
+    Score based on R:R ratio.
+    
+    Scoring:
+    - R:R > 3.0 → 90-100 (excellent)
+    - R:R > 2.0 → 70-90 (good)
+    - R:R > 1.5 → 50-70 (acceptable)
+    - R:R > 1.0 → 30-50 (poor)
+    - R:R < 1.0 → 10-30 (bad)
+    
+    Args:
+        rr_data: dict from calculate_rr()
+    
+    Returns: 0-100 score
+    """
+    if not rr_data:
+        return 50.0
+    
+    rr = rr_data.get('rr_ratio', 1.0)
+    
+    if rr >= 3.0:
+        return 90 + min(10, (rr - 3.0) * 5)  # 90-100
+    elif rr >= 2.0:
+        return 70 + (rr - 2.0) * 20  # 70-90
+    elif rr >= 1.5:
+        return 50 + (rr - 1.5) * 40  # 50-70
+    elif rr >= 1.0:
+        return 30 + (rr - 1.0) * 40  # 30-50
+    else:
+        return max(10, 30 - (1.0 - rr) * 20)  # 10-30
+
+
 # ── Contrarian Indicator Functions ────────────────────────────────────────────
 
 def compute_health_distribution(coin_tracker_data):
