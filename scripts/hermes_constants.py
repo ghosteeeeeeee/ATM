@@ -1358,6 +1358,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'tl_break_long', 'tl_break_short',
     'hl_copy_trader', 'atr-spike',
     'ct-hot',
+    'macd-div',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
