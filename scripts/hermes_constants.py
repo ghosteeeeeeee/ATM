@@ -758,19 +758,41 @@ TIDE_SHORT_WR_WINDOW = 10        # trades for confirmation
 TIDE_SHORT_WR_THRESHOLD_HIGH = 55
 TIDE_SHORT_WR_THRESHOLD_LOW = 45
 
-# ── BTC Flash Crash Filter (2026-08-22) ──────────────────────────────────────
-# Cascade crash at 05:08-05:11 UTC dropped BTC ~2% in 3 minutes, wiping out
-# all open LONG positions. This filter checks BTC 1m candles and blocks new
-# entries during sharp drops to prevent buying into cascades.
-# Backtest: would have blocked 3/7 cascade trades (opened during crash),
-# saved ~$2.00 in losses. Existing open positions still hit SL but no NEW
-# entries during the crash.
+# ── BTC Flash Crash Filter v2 (2026-08-22, overhaul 2026-08-24) ──────────────
+# Multi-layer crash detection using leading indicators:
+#   Layer 1: Dynamic price crash (ATR-scaled, not fixed %)
+#   Layer 2: Volume spike detection (selling pressure before price breaks)
+#   Layer 3: Multi-asset contagion (ETH/SOL leading BTC down)
+#   Layer 4: Price acceleration (velocity increasing downward)
+#   Layer 5: Position protection (ATR-aware MAE guard for existing LONGs)
+# Module: btc_crash_filter.py
 BTC_CRASH_BLOCK_ENABLED = True
-BTC_CRASH_BLOCK_THRESHOLD = -1.5  # % — block all entries if BTC drops more than this in 5 minutes
-BTC_ACCEL_ENABLED = True           # acceleration detection — catches crashes 2-3 min earlier
-BTC_ACCEL_VEL_THRESHOLD = -0.15    # % — min velocity per 1m candle to trigger
-BTC_ACCEL_WINDOW = 2               # bars to compare acceleration (vel_now < vel_prev)
-BTC_ACCEL_BLOCK_DURATION = 5       # minutes to block entries after trigger
+
+# Layer 1: Dynamic price threshold (ATR-scaled)
+BTC_CRASH_BLOCK_BASE_THRESHOLD = -1.5   # % — base threshold at baseline ATR
+BTC_CRASH_BLOCK_BASELINE_ATR = 0.8      # % — ATR% at which base threshold applies
+BTC_CRASH_BLOCK_MIN_THRESHOLD = -1.0    # % — tightest threshold (low vol, crashes hurt more)
+BTC_CRASH_BLOCK_MAX_THRESHOLD = -2.5    # % — widest threshold (high vol, normal swings)
+BTC_CRASH_BLOCK_THRESHOLD = -1.5        # DEPRECATED — kept for backward compat, use BASE_THRESHOLD
+
+# Layer 2: Volume spike detection
+BTC_CRASH_VOL_SPIKE_ENABLED = True
+BTC_CRASH_VOL_SPIKE_THRESHOLD = 3.0     # x — current volume must be 3x+ of 20-bar average
+
+# Layer 3: Multi-asset contagion
+BTC_CRASH_CONTAGION_ENABLED = True
+BTC_CRASH_CONTAGION_THRESHOLD = 0.30    # % — ETH must fall 0.30%+ more than BTC in 5m
+
+# Layer 4: Acceleration detection
+BTC_ACCEL_ENABLED = True
+BTC_ACCEL_VEL_THRESHOLD = -0.15         # % — min velocity per 1m candle to trigger
+BTC_ACCEL_WINDOW = 2                    # bars to compare acceleration (vel_now < vel_prev)
+BTC_ACCEL_BLOCK_DURATION = 5            # minutes to block entries after trigger
+
+# Layer 5: Position protection (ATR-aware MAE guard)
+CL_MAE_GUARD_ENABLED = False            # DISABLED 2026-08-23 — re-enable with new ATR-aware logic when ready
+CL_MAE_GUARD_BASE_THRESHOLD = 0.025     # 2.5% base — scales with ATR (was fixed 1.5%)
+CL_MAE_GUARD_BTC_CRASH_MULTIPLIER = 0.6 # Tighten threshold by 40% when BTC is crashing (cut faster)
 
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.

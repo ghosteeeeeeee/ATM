@@ -1779,51 +1779,23 @@ def _run_hot_set():
         if speed_tracker_dr is not None:
             speed_tracker_dr.update()
 
-        # ── BTC FLASH CRASH FILTER (2026-08-22) ────────────────────────────────────
-        # Cascade crash at 05:08-05:11 UTC dropped BTC ~2% in 3 minutes, wiping out
-        # all open LONG positions. Some trades were even OPENED during the crash.
-        # This filter checks BTC 1m candles and blocks new entries during sharp drops.
+        # ── BTC CRASH FILTER v2 (2026-08-24) ─────────────────────────────────────
+        # Multi-layer crash detection: price + volume + contagion + acceleration.
+        # Module: btc_crash_filter.py — replaces inline crash/accel logic.
         _btc_crash_blocked = False
-        try:
-            import sqlite3 as _sqlite3_crash
-            _crash_conn = _sqlite3_crash.connect(CANDLES_DB, timeout=5)
-            _crash_cur = _crash_conn.cursor()
-            _crash_cur.execute("""
-                SELECT close FROM candles_1m
-                WHERE token = 'BTC' ORDER BY ts DESC LIMIT 6
-            """)
-            _btc_closes = [r[0] for r in _crash_cur.fetchall()]
-            _crash_conn.close()
-            if len(_btc_closes) >= 6:
-                _btc_now = _btc_closes[0]
-                _btc_5m_ago = _btc_closes[5]
-                if _btc_5m_ago > 0:
-                    _btc_chg_5m = (_btc_now - _btc_5m_ago) / _btc_5m_ago * 100
-                    # Block LONG entries when BTC dropped >1.5% in 5 minutes
-                    if _btc_chg_5m < BTC_CRASH_BLOCK_THRESHOLD:
-                        log(f'  🚨 [BTC-CRASH] ALL ENTRIES BLOCKED: BTC {BTC_CRASH_BLOCK_THRESHOLD}% '
-                            f'in 5m ({_btc_chg_5m:+.2f}%)')
-                        _btc_crash_blocked = True
-        except Exception:
-            pass  # never crash on filter failure
-
-        # ── BTC ACCELERATION DETECTION (2026-08-22) ─────────────────────────────
-        # Catches crashes 2-3 min earlier than absolute threshold.
-        # If BTC velocity is negative AND accelerating (vel_now < vel_prev), block entries.
-        # Uses 3 candles: now, -1m, -2m (already fetched above).
         _btc_accel_blocked = False
         _btc_accel_block_time = 0
-        if BTC_ACCEL_ENABLED and not _btc_crash_blocked:
-            try:
-                if len(_btc_closes) >= 3:
-                    _vel_now = (_btc_closes[0] - _btc_closes[1]) / _btc_closes[1] * 100 if _btc_closes[1] > 0 else 0
-                    _vel_prev = (_btc_closes[1] - _btc_closes[2]) / _btc_closes[2] * 100 if _btc_closes[2] > 0 else 0
-                    if _vel_now < BTC_ACCEL_VEL_THRESHOLD and _vel_now < _vel_prev:
-                        log(f'  🚨 [BTC-ACCEL] ALL ENTRIES BLOCKED: BTC velocity {_vel_now:+.3f}% (prev {_vel_prev:+.3f}%) — accelerating down')
-                        _btc_accel_blocked = True
-                        _btc_accel_block_time = __import__('time').time()
-            except Exception:
-                pass
+        _crash_signal = None
+        try:
+            from btc_crash_filter import check_crash
+            _crash_signal = check_crash()
+            if _crash_signal.blocked:
+                log(f'  🚨 [{_crash_signal.severity}] {_crash_signal.reason}')
+                _btc_crash_blocked = True
+                _btc_accel_blocked = True
+                _btc_accel_block_time = time.time()
+        except Exception:
+            pass  # never crash on filter failure
 
         # ── HOT-SET ITERATION ORDER: survival rounds first ────────────────────────
         # Tokens that survived more compaction cycles have proven themselves against
@@ -1846,15 +1818,19 @@ def _run_hot_set():
 
             # BTC FLASH CRASH: block all new entries during cascade
             if _btc_crash_blocked:
-                log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — BTC flash crash in progress')
+                _crash_msg = f'BTC crash detected'
+                if _crash_signal and _crash_signal.severity:
+                    _crash_msg = f'{_crash_signal.severity} — {_crash_signal.layer}'
+                log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash_msg}')
                 _record_hotset_failure(token, direction, failures)
                 continue
 
             # BTC ACCELERATION: block entries for BLOCK_DURATION minutes after trigger
             if _btc_accel_blocked:
-                _elapsed_min = (__import__('time').time() - _btc_accel_block_time) / 60
-                if _elapsed_min < BTC_ACCEL_BLOCK_DURATION:
-                    log(f'  🚨 [BTC-ACCEL] {token} {direction} BLOCKED — BTC accelerating down ({_elapsed_min:.1f}/{BTC_ACCEL_BLOCK_DURATION}min)')
+                _block_dur = (_crash_signal.block_duration_sec / 60) if _crash_signal and _crash_signal.block_duration_sec > 0 else BTC_ACCEL_BLOCK_DURATION
+                _elapsed_min = (time.time() - _btc_accel_block_time) / 60
+                if _elapsed_min < _block_dur:
+                    log(f'  🚨 [BTC-ACCEL] {token} {direction} BLOCKED — BTC accelerating down ({_elapsed_min:.1f}/{_block_dur:.1f}min)')
                     _record_hotset_failure(token, direction, failures)
                     continue
                 else:
