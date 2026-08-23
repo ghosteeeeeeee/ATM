@@ -919,7 +919,7 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # Signals bypassed by profit_monster — these trades get regular ATR SL/TP only.
 # Matches any signal containing the prefix (e.g. 'atr-spike+,rs-s36' matches 'atr-spike').
 PROFIT_MONSTER_BYPASS_SIGNALS = (
-    'atr-spike', 'r2-trend-long', 'ct-hot+',
+    'atr-spike', 'r2-trend-long', 'ct-hot+', 'ct-hot-',
     'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',  # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
 )
@@ -1177,13 +1177,18 @@ MACD_DIVERGENCE_MINUS_ENABLED    = True    # macd-div- SHORT (bearish divergence
 MACD_DIV_FAST                    = 12      # MACD fast EMA period
 MACD_DIV_SLOW                    = 26      # MACD slow EMA period
 MACD_DIV_SIGNAL_PERIOD           = 9       # MACD signal line period
-MACD_DIV_SWING_LOOKBACK          = 3       # bars on each side to confirm a pivot point
-MACD_DIV_MIN_PIVOT_DIST          = 5       # minimum bars between two pivots to count
+MACD_DIV_SWING_LOOKBACK          = 5       # bars on each side to confirm a pivot (5m needs wider window)
+MACD_DIV_MIN_PIVOT_DIST          = 10      # minimum bars between two pivots (50min for 5m candles)
+MACD_DIV_MIN_PRICE_CHANGE_PCT    = 0.01    # minimum price change between pivots (1%)
 MACD_DIV_MIN_HIST_SLOPE          = 0.0     # minimum histogram slope for confirmation
 MACD_DIV_LOOKBACK_BARS           = 100     # 5m candles to fetch (~8h of data)
-MACD_DIV_CONF_BASE               = 75      # base confidence
+MACD_DIV_CONF_BASE               = 72      # base confidence (counter-trend = lower base)
 MACD_DIV_CONF_FLOOR              = 60      # min confidence
 MACD_DIV_CONF_CAP                = 88      # max confidence (system ceiling)
+MACD_DIV_STRONG_PRICE_PCT        = 0.03    # strong divergence: >3% price change
+MACD_DIV_STRONG_HIST_RATIO       = 0.5     # strong divergence: >50% hist recovery/decline
+MACD_DIV_MEDIUM_PRICE_PCT        = 0.015   # medium divergence: >1.5% price change
+MACD_DIV_MEDIUM_HIST_RATIO       = 0.3     # medium divergence: >30% hist recovery/decline
 R2_REV_ENABLED           = False  # r2_rev — blocked in blacklist
 R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT

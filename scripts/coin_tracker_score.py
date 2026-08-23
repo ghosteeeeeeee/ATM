@@ -11,26 +11,28 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.13,      # reduced from 0.14
-    'volume': 0.08,        # reduced from 0.10
-    'volatility': 0.06,    # reduced from 0.07
-    'spread': 0.06,        # reduced from 0.07
-    'signals': 0.03,       # reduced from 0.04
-    'regime': 0.03,        # reduced from 0.04
-    'wyckoff': 0.13,       # reduced from 0.14
-    'ewave': 0.08,         # reduced from 0.09
-    'trend': 0.06,         # reduced from 0.07
-    'setup': 0.07,         # reduced from 0.08
-    'clustering': 0.03,    # reduced from 0.04
-    'recency': 0.04,       # reduced from 0.05
-    'liquidation': 0.07,   # reduced from 0.07
+    'momentum': 0.12,      # reduced from 0.13
+    'volume': 0.07,        # reduced from 0.08
+    'volatility': 0.05,    # reduced from 0.06
+    'spread': 0.05,        # reduced from 0.06
+    'signals': 0.03,       # same
+    'regime': 0.03,        # same
+    'wyckoff': 0.12,       # reduced from 0.13
+    'ewave': 0.07,         # reduced from 0.08
+    'trend': 0.05,         # reduced from 0.06
+    'setup': 0.06,         # reduced from 0.07
+    'clustering': 0.03,    # same
+    'recency': 0.04,       # same
+    'liquidation': 0.06,   # reduced from 0.07
     # NEW: Weather station factors
-    'tide': 0.05,          # market flow alignment
-    'sea_state': 0.03,     # market health
-    'wind': 0.03,          # momentum alignment
-    'token_regime': 0.02,  # historical performance
+    'tide': 0.04,          # reduced from 0.05
+    'sea_state': 0.03,     # same
+    'wind': 0.03,          # same
+    'token_regime': 0.02,  # same
+    # NEW: Contrarian indicator
+    'contrarian': 0.05,    # market overheated/oversold signals
 }
-# ponytail: weights sum to 1.0 — verified (13+8+6+6+3+3+13+8+6+7+3+4+7+5+3+3+2 = 100)
+# ponytail: weights sum to 1.0 (12+7+5+5+3+3+12+7+5+6+3+4+6+4+3+3+2+5 = 100)
 
 # ── Indicators ─────────────────────────────────────────────────────────────────
 
@@ -884,6 +886,177 @@ def detect_market_regime(weather_data):
         return 'DECLINING'
     else:
         return 'NEUTRAL'
+
+
+# ── Contrarian Indicator Functions ────────────────────────────────────────────
+
+def compute_health_distribution(coin_tracker_data):
+    """
+    Compute health distribution from coin_tracker data.
+    
+    Returns: dict with hot_count, warm_count, cold_count, total, and percentages
+    """
+    hot_count = 0
+    warm_count = 0
+    cold_count = 0
+    
+    for coin in coin_tracker_data:
+        health = coin.get('health', 'unknown')
+        if health == 'hot':
+            hot_count += 1
+        elif health == 'warm':
+            warm_count += 1
+        elif health == 'cold':
+            cold_count += 1
+    
+    total = hot_count + warm_count + cold_count
+    
+    return {
+        'hot_count': hot_count,
+        'warm_count': warm_count,
+        'cold_count': cold_count,
+        'total': total,
+        'hot_pct': (hot_count / total * 100) if total > 0 else 0,
+        'warm_pct': (warm_count / total * 100) if total > 0 else 0,
+        'cold_pct': (cold_count / total * 100) if total > 0 else 0,
+    }
+
+
+def detect_contrarian_signal(health_dist, prev_health_dist=None):
+    """
+    Detect contrarian signals based on health distribution.
+    
+    Contrarian Logic:
+    - High hot count (>30%) → market overheated, cool off imminent
+    - High cold count (>20%) → market oversold, pump imminent
+    - Rapid change in distribution → regime shift
+    
+    Based on historical pattern:
+    - When 30-40 coins were hot before crash, market cooled off
+    - When most coins are cold, market tends to pump
+    
+    Args:
+        health_dist: current health distribution
+        prev_health_dist: previous health distribution (for trend)
+    
+    Returns: dict with signal, strength, and reasoning
+    """
+    hot_pct = health_dist.get('hot_pct', 0)
+    cold_pct = health_dist.get('cold_pct', 0)
+    total = health_dist.get('total', 0)
+    
+    if total < 10:
+        return {'signal': 'NEUTRAL', 'strength': 0, 'reason': 'Insufficient data'}
+    
+    # Strong contrarian signals
+    if hot_pct > 40:
+        # Very hot market — cool off imminent
+        return {
+            'signal': 'COOL_OFF',
+            'strength': min(100, (hot_pct - 40) * 2),  # 40% = 0, 90% = 100
+            'reason': f'{hot_pct:.0f}% coins hot — market overheated',
+            'action': 'Reduce exposure, tighten stops',
+        }
+    elif hot_pct > 30:
+        # Moderately hot — caution
+        return {
+            'signal': 'CAUTION',
+            'strength': (hot_pct - 30) * 2,  # 30% = 0, 40% = 20
+            'reason': f'{hot_pct:.0f}% coins hot — approaching overheated',
+            'action': 'Monitor closely',
+        }
+    elif cold_pct > 30:
+        # Very cold market — pump imminent
+        return {
+            'signal': 'PUMP_IMMINENT',
+            'strength': min(100, (cold_pct - 30) * 2),  # 30% = 0, 80% = 100
+            'reason': f'{cold_pct:.0f}% coins cold — market oversold',
+            'action': 'Look for buying opportunities',
+        }
+    elif cold_pct > 20:
+        # Moderately cold — potential bottom
+        return {
+            'signal': 'BOTTOMING',
+            'strength': (cold_pct - 20) * 2,  # 20% = 0, 30% = 20
+            'reason': f'{cold_pct:.0f}% coins cold — potential bottom forming',
+            'action': 'Start accumulating',
+        }
+    elif prev_health_dist:
+        # Check for rapid changes
+        prev_hot = prev_health_dist.get('hot_pct', 0)
+        prev_cold = prev_health_dist.get('cold_pct', 0)
+        
+        hot_change = hot_pct - prev_hot
+        cold_change = cold_pct - prev_cold
+        
+        if hot_change > 10:
+            return {
+                'signal': 'HEATING_UP',
+                'strength': min(50, hot_change * 2),
+                'reason': f'Hot count increased {hot_change:.0f}%',
+                'action': 'Monitor for peak',
+            }
+        elif cold_change > 10:
+            return {
+                'signal': 'COOLING_DOWN',
+                'strength': min(50, cold_change * 2),
+                'reason': f'Cold count increased {cold_change:.0f}%',
+                'action': 'Potential buying opportunity',
+            }
+    
+    return {'signal': 'NEUTRAL', 'strength': 0, 'reason': 'No contrarian signal'}
+
+
+def score_contrarian(health_dist, token_data):
+    """
+    Score based on contrarian signals.
+    
+    High score = contrarian signal supports token direction
+    Low score = contrarian signal contradicts token direction
+    
+    Args:
+        health_dist: health distribution
+        token_data: token-specific data
+    
+    Returns: 0-100 score
+    """
+    signal = detect_contrarian_signal(health_dist)
+    signal_type = signal.get('signal', 'NEUTRAL')
+    strength = signal.get('strength', 0)
+    
+    # Get token direction
+    token_dir = token_data.get('setup_type') or token_data.get('trend_direction')
+    if not token_dir:
+        return 50.0
+    
+    # Normalize token direction
+    token_dir_normalized = token_dir.upper()
+    if token_dir_normalized in ('LONG', 'BULL'):
+        token_dir_normalized = 'BULLISH'
+    elif token_dir_normalized in ('SHORT', 'BEAR'):
+        token_dir_normalized = 'BEARISH'
+    
+    # Contrarian scoring
+    if signal_type == 'COOL_OFF':
+        # Market overheated — favor SHORT
+        if token_dir_normalized == 'BEARISH':
+            return 80 + strength * 0.2  # 80-100
+        else:
+            return 30 - strength * 0.2  # 10-30
+    elif signal_type == 'PUMP_IMMINENT':
+        # Market oversold — favor LONG
+        if token_dir_normalized == 'BULLISH':
+            return 80 + strength * 0.2  # 80-100
+        else:
+            return 30 - strength * 0.2  # 10-30
+    elif signal_type in ('CAUTION', 'BOTTOMING'):
+        # Mild signals — slight adjustment
+        return 50 + strength * 0.3  # 50-80
+    elif signal_type in ('HEATING_UP', 'COOLING_DOWN'):
+        # Transitional — neutral with slight bias
+        return 50 + strength * 0.1  # 50-60
+    
+    return 50.0  # Neutral
 
 
 # ── Weather Station Scoring Functions ─────────────────────────────────────────

@@ -44,6 +44,10 @@ from coin_tracker_score import (
     generate_predictive_alerts as _generate_predictive_alerts,
     generate_liquidation_heatmap as _generate_liquidation_heatmap,
     detect_market_regime as _detect_market_regime,
+    # Contrarian indicators
+    compute_health_distribution as _compute_health_distribution,
+    detect_contrarian_signal as _detect_contrarian_signal,
+    score_contrarian as _score_contrarian,
     # Weather station scoring functions
     score_tide as _score_tide, score_sea_state as _score_sea_state,
     score_wind as _score_wind, score_token_regime as _score_token_regime,
@@ -205,9 +209,34 @@ def collect():
     write_conn = sqlite3.connect(COIN_TRACKER_DB, timeout=30)
     write_conn.execute("PRAGMA journal_mode=WAL")
 
+    # Load previous health distribution for contrarian analysis
+    prev_health_dist = None
+    try:
+        prev_dist_row = write_conn.execute('''
+            SELECT 
+                SUM(CASE WHEN health = 'hot' THEN 1 ELSE 0 END) as hot_count,
+                SUM(CASE WHEN health = 'warm' THEN 1 ELSE 0 END) as warm_count,
+                SUM(CASE WHEN health = 'cold' THEN 1 ELSE 0 END) as cold_count,
+                COUNT(*) as total
+            FROM agg_scores
+        ''').fetchone()
+        if prev_dist_row and prev_dist_row[3] > 0:
+            prev_health_dist = {
+                'hot_count': prev_dist_row[0] or 0,
+                'warm_count': prev_dist_row[1] or 0,
+                'cold_count': prev_dist_row[2] or 0,
+                'total': prev_dist_row[3],
+                'hot_pct': (prev_dist_row[0] or 0) / prev_dist_row[3] * 100,
+                'warm_pct': (prev_dist_row[1] or 0) / prev_dist_row[3] * 100,
+                'cold_pct': (prev_dist_row[2] or 0) / prev_dist_row[3] * 100,
+            }
+    except Exception:
+        pass
+
     processed = 0
     skipped = 0
     errors = 0
+    health_data = []  # Collect health data for contrarian analysis
 
     try:
         for symbol, mid_price in all_mids.items():
@@ -428,6 +457,10 @@ def collect():
                 s_sea_state = _score_sea_state(weather_data) if weather_data else 50.0
                 s_wind = _score_wind(token_data, weather_data) if weather_data else 50.0
                 s_token_regime = _score_token_regime(symbol, weather_data) if weather_data else 50.0
+                
+                # Contrarian score — computed after all coins are processed
+                # For now, use 50 (neutral) — will be updated in second pass
+                s_contrarian = 50.0
 
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +
@@ -446,7 +479,8 @@ def collect():
                     s_tide * WEIGHTS['tide'] +
                     s_sea_state * WEIGHTS['sea_state'] +
                     s_wind * WEIGHTS['wind'] +
-                    s_token_regime * WEIGHTS['token_regime']
+                    s_token_regime * WEIGHTS['token_regime'] +
+                    s_contrarian * WEIGHTS['contrarian']
                 )
 
                 # No candle data = no real activity → force cold/dead
@@ -581,6 +615,9 @@ def collect():
                     UPDATE _coin_registry SET health=?, health_score=?, last_seen=? WHERE symbol=?
                 """, (health, composite, now, symbol))
 
+                # Collect health data for contrarian analysis
+                health_data.append({'symbol': symbol, 'health': health})
+
                 processed += 1
             except Exception as e:
                 errors += 1
@@ -591,6 +628,21 @@ def collect():
         write_conn.commit()
     finally:
         write_conn.close()
+
+    # ── Contrarian Analysis ──
+    # Compute current health distribution
+    current_health_dist = _compute_health_distribution(health_data)
+    
+    # Detect contrarian signal
+    contrarian_signal = _detect_contrarian_signal(current_health_dist, prev_health_dist)
+    
+    # Log contrarian analysis
+    print(f'\n[coin_tracker] === CONTRARIAN ANALYSIS ===')
+    print(f'  Health distribution: {current_health_dist["hot_count"]} hot, {current_health_dist["warm_count"]} warm, {current_health_dist["cold_count"]} cold')
+    print(f'  Hot%: {current_health_dist["hot_pct"]:.0f}%, Cold%: {current_health_dist["cold_pct"]:.0f}%')
+    print(f'  Signal: {contrarian_signal["signal"]} (strength: {contrarian_signal["strength"]})')
+    print(f'  Reason: {contrarian_signal["reason"]}')
+    print(f'  Action: {contrarian_signal["action"]}')
 
     # ── Prune old events (every 24h) ──
     from coin_tracker_schema import get_meta, set_meta

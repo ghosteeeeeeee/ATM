@@ -24,9 +24,10 @@ from typing import Optional, Tuple, List
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_schema import add_signal, price_age_minutes, get_cooldown, set_cooldown
+from paths import HERMES_DATA
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-_CANDLES_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'candles.db')
+_CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
 
 # ── Signal metadata ─────────────────────────────────────────────────────────────
 SIGNAL_TYPE_LONG  = 'macd_divergence_long'
@@ -171,7 +172,9 @@ def detect_divergence(closes, swing_lookback=3, min_pivot_distance=5):
         MACD_DIV_CONF_BASE, MACD_DIV_CONF_FLOOR, MACD_DIV_CONF_CAP,
         MACD_DIV_FAST, MACD_DIV_SLOW, MACD_DIV_SIGNAL_PERIOD,
         MACD_DIV_SWING_LOOKBACK, MACD_DIV_MIN_PIVOT_DIST,
-        MACD_DIV_MIN_HIST_SLOPE,
+        MACD_DIV_MIN_HIST_SLOPE, MACD_DIV_MIN_PRICE_CHANGE_PCT,
+        MACD_DIV_STRONG_PRICE_PCT, MACD_DIV_STRONG_HIST_RATIO,
+        MACD_DIV_MEDIUM_PRICE_PCT, MACD_DIV_MEDIUM_HIST_RATIO,
     )
 
     fast = MACD_DIV_FAST
@@ -199,25 +202,28 @@ def detect_divergence(closes, swing_lookback=3, min_pivot_distance=5):
         p1_idx, p1_val = price_lows[-2]
         p2_idx, p2_val = price_lows[-1]
         if p2_idx - p1_idx >= min_dist and p2_val < p1_val:
-            # Find hist lows near the price pivot points
-            h1 = _find_nearest_hist_extreme(hist_lows, p1_idx, swing_lookback * 3)
-            h2 = _find_nearest_hist_extreme(hist_lows, p2_idx, swing_lookback * 3)
-            if h1 is not None and h2 is not None:
-                h1_idx, h1_val = h1
-                h2_idx, h2_val = h2
-                # MACD hist higher low = bullish divergence
-                if h2_val > h1_val:
-                    # Confirm histogram is turning up (current hist > last hist low)
-                    cur_hist = hist[-1]
-                    prev_hist = hist[-2] if len(hist) >= 2 else None
-                    if cur_hist is not None and prev_hist is not None and cur_hist > prev_hist:
-                        # Confidence based on divergence strength
-                        price_drop = abs(p2_val - p1_val) / max(abs(p1_val), 1e-10)
-                        hist_recovery = abs(h2_val - h1_val) / max(abs(h1_val), 1e-10) if h1_val != 0 else 0
-                        slope = MACD_DIV_MIN_HIST_SLOPE
-                        conf = int(MACD_DIV_CONF_BASE + min(12, price_drop * 100 + hist_recovery * 50))
-                        conf = min(MACD_DIV_CONF_CAP, max(MACD_DIV_CONF_FLOOR, conf))
-                        return ('LONG', conf)
+            price_change_pct = abs(p2_val - p1_val) / max(abs(p1_val), 1e-10)
+            if price_change_pct >= MACD_DIV_MIN_PRICE_CHANGE_PCT:
+                # Find hist lows near the price pivot points
+                h1 = _find_nearest_hist_extreme(hist_lows, p1_idx, swing_lookback * 2)
+                h2 = _find_nearest_hist_extreme(hist_lows, p2_idx, swing_lookback * 2)
+                if h1 is not None and h2 is not None:
+                    h1_idx, h1_val = h1
+                    h2_idx, h2_val = h2
+                    if h2_val > h1_val:
+                        # Confirm histogram is turning up
+                        cur_hist = hist[-1]
+                        prev_hist = hist[-2] if len(hist) >= 2 else None
+                        if cur_hist is not None and prev_hist is not None and cur_hist > prev_hist:
+                            hist_recovery = abs(h2_val - h1_val) / max(abs(h1_val), 1e-10) if h1_val != 0 else 0
+                            if price_change_pct > MACD_DIV_STRONG_PRICE_PCT and hist_recovery > MACD_DIV_STRONG_HIST_RATIO:
+                                conf = MACD_DIV_CONF_CAP
+                            elif price_change_pct > MACD_DIV_MEDIUM_PRICE_PCT or hist_recovery > MACD_DIV_MEDIUM_HIST_RATIO:
+                                conf = MACD_DIV_CONF_BASE + 5
+                            else:
+                                conf = MACD_DIV_CONF_BASE
+                            conf = min(MACD_DIV_CONF_CAP, max(MACD_DIV_CONF_FLOOR, conf))
+                            return ('LONG', conf)
 
     # ── Bearish divergence (SHORT) ─────────────────────────────────────
     # Price makes higher high, MACD hist makes lower high
@@ -225,22 +231,26 @@ def detect_divergence(closes, swing_lookback=3, min_pivot_distance=5):
         p1_idx, p1_val = price_highs[-2]
         p2_idx, p2_val = price_highs[-1]
         if p2_idx - p1_idx >= min_dist and p2_val > p1_val:
-            h1 = _find_nearest_hist_extreme(hist_highs, p1_idx, swing_lookback * 3)
-            h2 = _find_nearest_hist_extreme(hist_highs, p2_idx, swing_lookback * 3)
-            if h1 is not None and h2 is not None:
-                h1_idx, h1_val = h1
-                h2_idx, h2_val = h2
-                # MACD hist lower high = bearish divergence
-                if h2_val < h1_val:
-                    # Confirm histogram is turning down
-                    cur_hist = hist[-1]
-                    prev_hist = hist[-2] if len(hist) >= 2 else None
-                    if cur_hist is not None and prev_hist is not None and cur_hist < prev_hist:
-                        price_rise = abs(p2_val - p1_val) / max(abs(p1_val), 1e-10)
-                        hist_decline = abs(h1_val - h2_val) / max(abs(h1_val), 1e-10) if h1_val != 0 else 0
-                        conf = int(MACD_DIV_CONF_BASE + min(12, price_rise * 100 + hist_decline * 50))
-                        conf = min(MACD_DIV_CONF_CAP, max(MACD_DIV_CONF_FLOOR, conf))
-                        return ('SHORT', conf)
+            price_change_pct = abs(p2_val - p1_val) / max(abs(p1_val), 1e-10)
+            if price_change_pct >= MACD_DIV_MIN_PRICE_CHANGE_PCT:
+                h1 = _find_nearest_hist_extreme(hist_highs, p1_idx, swing_lookback * 2)
+                h2 = _find_nearest_hist_extreme(hist_highs, p2_idx, swing_lookback * 2)
+                if h1 is not None and h2 is not None:
+                    h1_idx, h1_val = h1
+                    h2_idx, h2_val = h2
+                    if h2_val < h1_val:
+                        cur_hist = hist[-1]
+                        prev_hist = hist[-2] if len(hist) >= 2 else None
+                        if cur_hist is not None and prev_hist is not None and cur_hist < prev_hist:
+                            hist_decline = abs(h1_val - h2_val) / max(abs(h1_val), 1e-10) if h1_val != 0 else 0
+                            if price_change_pct > MACD_DIV_STRONG_PRICE_PCT and hist_decline > MACD_DIV_STRONG_HIST_RATIO:
+                                conf = MACD_DIV_CONF_CAP
+                            elif price_change_pct > MACD_DIV_MEDIUM_PRICE_PCT or hist_decline > MACD_DIV_MEDIUM_HIST_RATIO:
+                                conf = MACD_DIV_CONF_BASE + 5
+                            else:
+                                conf = MACD_DIV_CONF_BASE
+                            conf = min(MACD_DIV_CONF_CAP, max(MACD_DIV_CONF_FLOOR, conf))
+                            return ('SHORT', conf)
 
     return None
 

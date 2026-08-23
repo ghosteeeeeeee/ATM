@@ -264,3 +264,10 @@ ALERTS:
 
 ## Error Alerts — 2026-08-23 05:03 UTC
 - **REPEATED** (15x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: name 'token_speed' is not defined`
+
+## Error Alerts — 2026-08-23 05:20 UTC
+- **WARN** (1x): `disk 82%` — 92G/118G used, approaching 85% threshold
+- **INFO**: `BTC-ACCEL guard active` — blocking new SHORT entries, BTC accelerating down
+- **INFO**: `SEI SHORT cooldown` — 2 failures, 3539s remaining
+- **WARN**: `All-time WR 15.9%` — 9704 trades, -1783.49 USDT overall
+- **AUTO-FIX**: none required — all systems nominal
