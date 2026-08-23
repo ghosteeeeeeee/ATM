@@ -42,3 +42,8 @@
   WHY: 2T last hour (1W 1L $0.00). 47T 20W 42.6% -$2.57/24h. hl_copy_trader only profitable +$0.33. hzscore- 3T 3W 100% +$0.13. ct-hot+ dormant. atr_sl_hit 46.8% structural. 5 open mostly green. 5 consecutive pos hours. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 06:00 UTC
+[2026-08-23 07:00 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.54). First red hour after streak. 39T 14W 35.9% -$1.59/24h. hl_copy_trader only profitable signal +$0.21. ct-hot+ 4T 0W dormant. hzscore- 3T 3W +$0.13. atr_sl_hit profitable avg +$0.066. MAE-GUARD already disabled today. 5 open flat/slight green. No kill criteria. Trade freq normal.
+  BY: auto_1hr
+  NEXT: Re-run at 08:00 UTC
+

@@ -234,12 +234,14 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'BANANA',
+    'BTC',
     'CAKE',
     'ETH',
     'FIL',
     'GMT',
     'LDO',
     'ME',
+    'NXPC',
     'SYRUP',
     'ZRO'
 }
@@ -963,8 +965,8 @@ CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
 # If price drops more than MAE_GUARD_THRESHOLD from highest_price, cut immediately.
 # Catches mass crashes (WLFI -41%, MET -21%, ETH -13%) before ATR SL triggers.
 # Runs BEFORE tiers — highest priority.
-CL_MAE_GUARD_ENABLED    = True   # master switch for MAE guard
-CL_MAE_GUARD_THRESHOLD  = 0.015  # 1.5% — cut if price drops 1.5% from peak
+CL_MAE_GUARD_ENABLED    = False  # DISABLED 2026-08-23 — net -$5.43/week at 1.5%. Cuts winners that recover. See atr-sl-widen.md.
+CL_MAE_GUARD_THRESHOLD  = 0.030  # 3.0% — if re-enabled, only catch true crashes (was 1.5%)
 # Legacy constants (keep for backward compat / guardian)
 LOSS_MIN_PCT           = -3.0   # deprecated → use CL_TIER2_MIN_PCT
 LOSS_MAX_PCT           = -0.5   # deprecated → use CL_TIER1_MAX_PCT
@@ -1638,7 +1640,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.2793 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.2786 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────

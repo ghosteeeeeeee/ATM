@@ -1,11 +1,11 @@
 # Upgrade Audit Trail
 
-Scanned: 22 plans
-Implemented: 9 | Partial: 2 | Resolved: 3 | Not Implemented: 1 | Superseded/Draft: 4 | Unknown: 3
+Scanned: 24 plans (2026-08-23)
+Implemented: 13 | Partial: 3 | Resolved: 3 | Pending Level 1: 3 | Pending Level 2+: 2
 
 ---
 
-## IMPLEMENTED (9)
+## IMPLEMENTED (13)
 
 ### btc-crash-filter-plan.md
 - Difficulty: Level 2 | Value: HIGH
@@ -31,78 +31,93 @@ Implemented: 9 | Partial: 2 | Resolved: 3 | Not Implemented: 1 | Superseded/Draf
 - Difficulty: Level 2 | Value: HIGH
 - Weather vane trade outcome suppression. DIRECTIONAL_OUTCOME_ENABLED=True.
 
-### imx-spike-detection.md / atr-spike-signal-build.md
+### imx-spike-detection.md / atr-spike-signal-build.md / atr-spike-backtest-results.md
 - Difficulty: Level 2 | Value: HIGH
-- ATR compression breakout signal. atr_spike.py enabled.
+- ATR compression breakout signal. atr_spike.py enabled with trend filter + EMA proximity.
 
 ### short-bias-fix.md
 - Difficulty: Level 1 | Value: MEDIUM
-- SHORT starvation investigation. EMA penalty reverted, Trend Alignment confirmed.
+- SHORT starvation investigation. EMA penalty reverted, Trend Alignment confirmed as hard block.
 
 ### sl-tuning.md
 - Difficulty: Level 1 | Value: MEDIUM
-- ATR spike SL tuning. 0.75% SL applied (ATR_SPIKE_SL_PCT=0.75).
+- ATR spike SL tuning. 0.75% SL applied (ATR_SPIKE_SL_PCT=0.75). Best params confirmed.
 
----
-
-## PARTIAL (2)
-
-### conf-filter-plan.md
+### conf-filter-plan.md (partial)
 - Difficulty: Level 1 | Value: HIGH
-- CONF_FILTER_MAX=89 working. TIME_BLOCK disabled (was hard block killing all signals 01-06 UTC). Needs rework: per-signal penalty instead of blanket block.
-
-### copy-trader-dashboard-enhancements.md
-- Difficulty: Level 2-4 | Value: MEDIUM
-- Phase 1 complete (stats, trader cards, equity curve). Phase 2-4 not started.
-
----
-
-## RESOLVED / NO ACTION NEEDED (3)
+- CONF_FILTER_MAX=89 deployed. TIME_BLOCK deployed as penalty (0.7x during 01-06 UTC).
 
 ### confidence-calibration-plan.md
 - Difficulty: Level 2 | Value: LOW
 - Investigation complete. CONF_FILTER already blocks worst cases. Non-monotonic curve is noise.
 
+### weather-vane-v2-spec.md / v3-spec.md
+- Superseded by v4/v5. No action needed.
+
+### coin_tracker_analysis_expansion.md
+- Difficulty: Level 3 | Value: MEDIUM
+- Phase 1 complete (Wyckoff, Elliott Wave, S/R, Trend, Volume Profile). ct-hot signal killed but analysis feeds dashboard.
+
+---
+
+## PENDING — LEVEL 1 (3 quick wins)
+
+### atr-sl-widen.md — MAE Guard disable (net -$5.43/week)
+- Difficulty: Level 1 | Value: HIGH
+- MAE Guard at 1.5% is HURTING: kills winners that would recover. 7-day sim shows -$5.43/week.
+- **Action:** Set CL_MAE_GUARD_ENABLED = False in hermes_constants.py
+
+### atr-sl-widen.md — features_recorded bug
+- Difficulty: Level 1 | Value: HIGH
+- record_entry_features() writes data but features_recorded column stays FALSE.
+- **Action:** Fix the UPDATE query (features_recorded = TRUE is already there — verify column default), run SQL backfill.
+
+### r2-trend-long-trailing-sl-tuning.md
+- Difficulty: Level 1 | Value: MEDIUM
+- TRAILING_DISTANCE_PCT already widened to 2.0% — APPLIED. No further action.
+
+---
+
+## PENDING — LEVEL 2+ (2 candidates)
+
+### copy-trader-dashboard-enhancements.md
+- Difficulty: Level 2-4 | Value: MEDIUM
+- Phase 1 complete (stats, trader cards, equity curve). Phase 2-4 not started.
+
+### retroactive-scan-delayed-entry.md
+- Difficulty: Level 3 | Value: MEDIUM
+- Retroactive breakout scan. atr_spike.py covers some overlap. Full plan not implemented.
+
+---
+
+## RESOLVED / NO ACTION (3)
+
 ### coin_tracker_setup_improvements.md
 - Difficulty: Level 2 | Value: LOW
-- Signal killed (32.3% WR). Setup improvements irrelevant.
+- ct-hot signal killed. Setup improvements irrelevant (dashboard only).
 
 ### progressive-context-shaping-spec.md
 - Difficulty: Level 1 | Value: LOW
 - DRAFT. Awaiting CEO feedback.
 
----
-
-## NOT IMPLEMENTED (1)
-
-### retroactive-scan-delayed-entry.md
-- Difficulty: Level 3 | Value: MEDIUM
-- Retroactive breakout scan. Plan v3 exists but no code found. atr_spike.py covers some overlap.
+### favorites-daily-update-spec.md (rhythm part)
+- Already implemented. favorites_rhythm.py + favorites_hebbian_sync.py exist.
 
 ---
 
-## SUPERSEDED (2)
+## Summary
 
-### weather-vane-v2-spec.md / v3-spec.md
-- Superseded by v4/v5.
+| Category | Count |
+|----------|-------|
+| Implemented | 13 |
+| Pending Level 1 | 3 (MAE guard, features_recorded, trailing SL verify) |
+| Pending Level 2+ | 2 (copy-trader, retroactive scan) |
+| Resolved/No Action | 3 |
+| Superseded | 2 |
+| **Total scanned** | **24** |
 
----
+## Next Candidates
 
-## UNKNOWN (3)
-
-### coin_tracker_analysis_expansion.md
-- ct-hot dead. Likely irrelevant.
-
-### r2-trend-long-trailing-sl-tuning.md
-- Need to check if applied.
-
-### copy-trader-evolution-spec.md / entry-timing-deep-dive.md
-- Need to check status.
-
----
-
-## Next Candidates (Level 1)
-
-1. **conf-filter-plan.md TIME_BLOCK rework** — Change hard block to 0.7x penalty during 01-06 UTC. HIGH value, already coded, just needs tweak.
-2. **BTC accel debug logging** — Add velocity values to crash filter log output. Easy, improves observability.
-3. **COPY_BAD_HOURS** — Check if copy signal time blocking is optimal.
+1. **MAE Guard disable** — Level 1 — HIGH value — saves ~$5.43/week
+2. **features_recorded backfill** — Level 1 — HIGH value — enables entry feature analysis
+3. **Copy-trader dashboard Phase 2** — Level 2 — MEDIUM value — copy delay analysis

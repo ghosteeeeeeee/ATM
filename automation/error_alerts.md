@@ -271,3 +271,10 @@ ALERTS:
 - **INFO**: `SEI SHORT cooldown` — 2 failures, 3539s remaining
 - **WARN**: `All-time WR 15.9%` — 9704 trades, -1783.49 USDT overall
 - **AUTO-FIX**: none required — all systems nominal
+
+## Error Alerts — 2026-08-23 06:03 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3539s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3478s left, N failures)`
+- **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner [TOK]: N done, N errors`
+- **REPEATED** (17x): `Aug N N:N:N python3[TOK]: TS   [coin_tracker] TOK: 'action'`
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: [coin_tracker] TOK processing TOK: 'macd_div'`

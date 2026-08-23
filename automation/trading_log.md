@@ -13249,3 +13249,36 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 - hzscore- re-enable successful: 3T 3W 100% +$0.13
 
 **Open Questions:** None — system stable
+
+## FAVORITES Update — 2026-08-23 06:00 UTC
+- Regime: NEUTRAL
+- PROMOTE NXPC (WR=80.0%, AvgPnL=0.85%, Trades=5)
+- PROMOTE BTC (WR=66.7%, AvgPnL=3.59%, Trades=6)
+
+Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', 'SYRUP', 'ZRO']
+
+## [2026-08-23 07:00 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L)
+**PnL:** -$0.54 (0% WR)
+
+**Details:**
+- CFX SHORT ct-hot-: -$0.15 (atr_sl_hit)
+- BANANA SHORT ct-hot-: $0.00 (profit-monster-trail)
+- BTC LONG hl_copy_trader: -$0.39 (cut-loser-MAE-GUARD)
+
+**24h:** 39T 14W 35.9% -$1.59 | hl_copy_trader 28T 13W 46.4% +$0.21 (only profitable) | ct-hot+ 4T 0W 0% -$0.72 (dormant) | hzscore- 3T 3W 100% +$0.13 | atr_sl_hit 17T avg +$0.066 | MAE-GUARD 13T avg -$0.089
+
+**Open:** 5 — KAS SHORT ct-hot- +$0.06, FOGO SHORT ct-hot- +$0.08, NXPC SHORT hzscore- +$0.03, BSV SHORT hzscore- +$0.09, CC SHORT hzscore- +$0.25 (all flat/slight green)
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria (ct-hot+ dormant, no signal 0% WR with 3+ trades last hour)
+- Trade freq 3/hr = normal
+- MAE-GUARD already disabled today — correct, was net -$5.43/week
+- atr_sl_hit profitable at +$0.066 avg — structural, no fix needed
+- 1 negative hour, not consecutive
+- CC SHORT hzscore- -2.17% adverse but still inside, monitoring
+
+**Open Questions:** None — system stable, first red hour after streak

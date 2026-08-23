@@ -165,6 +165,7 @@ def main():
                 set_vals.append(v)
             set_cols.append("_signal_metadata=%s")
             set_vals.append(metadata)
+            set_cols.append("features_recorded = TRUE")
             set_vals.append(trade_id)
             c.execute(f"UPDATE trades SET {', '.join(set_cols)} WHERE id=%s", set_vals)
 

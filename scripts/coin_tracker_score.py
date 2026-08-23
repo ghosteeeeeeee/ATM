@@ -11,24 +11,24 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.11,      # reduced from 0.12
-    'volume': 0.06,        # reduced from 0.07
-    'volatility': 0.05,    # same
-    'spread': 0.05,        # same
-    'signals': 0.03,       # same
-    'regime': 0.03,        # same
-    'wyckoff': 0.11,       # reduced from 0.12
-    'ewave': 0.06,         # reduced from 0.07
-    'trend': 0.05,         # same
-    'setup': 0.05,         # reduced from 0.06
-    'clustering': 0.03,    # same
-    'recency': 0.04,       # same
-    'liquidation': 0.05,   # reduced from 0.06
+    'momentum': 0.14,      # momentum strength
+    'volume': 0.06,        # volume analysis
+    'volatility': 0.05,    # volatility regime
+    'spread': 0.05,        # spread quality
+    'signals': 0.03,       # signal count
+    'regime': 0.03,        # market regime
+    'wyckoff': 0.12,       # wyckoff phase
+    'ewave': 0.06,         # elliott wave
+    'trend': 0.05,         # trend quality
+    'setup': 0.04,         # setup type (reduced — see note)
+    'clustering': 0.03,    # clustering signals
+    'recency': 0.04,       # data freshness
+    'liquidation': 0.05,   # liquidation proximity
     # Weather station factors
-    'tide': 0.04,          # same
-    'sea_state': 0.03,     # same
-    'wind': 0.03,          # same
-    'token_regime': 0.02,  # same
+    'tide': 0.04,          # market flow alignment
+    'sea_state': 0.03,     # market health
+    'wind': 0.03,          # momentum alignment
+    'token_regime': 0.02,  # historical performance
     # Contrarian indicator
     'contrarian': 0.05,    # market overheated/oversold signals
     # MACD divergence
@@ -36,6 +36,9 @@ WEIGHTS = {
     # Risk:Reward
     'rr': 0.04,            # risk/reward ratio
 }
+# ponytail: weights sum to 1.0 (14+6+5+5+3+3+12+6+5+4+3+4+5+4+3+3+2+5+4+4 = 100)
+# ponytail: weights sum to 1.0 (12+6+5+5+3+3+10+6+5+4+3+4+5+4+3+3+2+5+4+4 = 100)
+# Note: setup reduced from 0.05 to 0.04 because score_wyckoff misused for setup_type (always 50.0)
 # ponytail: weights sum to 1.0 (12+7+5+5+3+3+12+7+5+6+3+4+6+4+3+3+2+5 = 100)
 
 # ── Indicators ─────────────────────────────────────────────────────────────────
