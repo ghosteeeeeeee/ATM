@@ -599,7 +599,7 @@ def save_map(data: dict):
         json.dump(data, f, indent=2)
     os.replace(tmp, LIQ_MAP_FILE)
 
-    # For signals (smaller, just clusters + stop hunts)
+    # For signals (smaller, just clusters + stop hunts + order book)
     signal_data = {
         "timestamp": data["timestamp"],
         "total_liquidation_exposure_usd": data["total_liquidation_exposure_usd"],
@@ -607,6 +607,7 @@ def save_map(data: dict):
         "stop_hunt_signals": data["stop_hunt_signals"],
         "support_resistance": data["support_resistance"],
         "position_summary": data["position_summary"],
+        "order_books": data.get("order_books", {}),
     }
     tmp2 = LIQ_CLUSTERS_FILE + ".tmp"
     with open(tmp2, "w") as f:
