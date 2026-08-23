@@ -1785,17 +1785,23 @@ def _run_hot_set():
         _btc_crash_blocked = False
         _btc_accel_blocked = False
         _btc_accel_block_time = 0
+        _btc_block_until = 0  # absolute timestamp when block expires
         _crash_signal = None
         try:
             from btc_crash_filter import check_crash
             _crash_signal = check_crash()
             if _crash_signal.blocked:
                 log(f'  🚨 [{_crash_signal.severity}] {_crash_signal.reason}')
-                _btc_crash_blocked = True
-                _btc_accel_blocked = True
-                _btc_accel_block_time = time.time()
-        except Exception:
-            pass  # never crash on filter failure
+                if 'ACCEL' in (_crash_signal.layer or '') and 'PRICE' not in (_crash_signal.layer or ''):
+                    # Accel-only trigger (no price crash) — use time-based expiry
+                    _btc_accel_blocked = True
+                    _btc_accel_block_time = time.time()
+                    _btc_block_until = _crash_signal.block_until
+                else:
+                    # Price crash or multi-layer — block for this entire pipeline run
+                    _btc_crash_blocked = True
+        except Exception as e:
+            log(f'  ⚠️ [BTC-CRASH] filter failed: {e}')
 
         # ── HOT-SET ITERATION ORDER: survival rounds first ────────────────────────
         # Tokens that survived more compaction cycles have proven themselves against
@@ -1825,12 +1831,11 @@ def _run_hot_set():
                 _record_hotset_failure(token, direction, failures)
                 continue
 
-            # BTC ACCELERATION: block entries for BLOCK_DURATION minutes after trigger
+            # BTC ACCELERATION: block entries until block_until expires
             if _btc_accel_blocked:
-                _block_dur = (_crash_signal.block_duration_sec / 60) if _crash_signal and _crash_signal.block_duration_sec > 0 else BTC_ACCEL_BLOCK_DURATION
-                _elapsed_min = (time.time() - _btc_accel_block_time) / 60
-                if _elapsed_min < _block_dur:
-                    log(f'  🚨 [BTC-ACCEL] {token} {direction} BLOCKED — BTC accelerating down ({_elapsed_min:.1f}/{_block_dur:.1f}min)')
+                if time.time() < _btc_block_until:
+                    _remaining = (_btc_block_until - time.time()) / 60
+                    log(f'  🚨 [BTC-ACCEL] {token} {direction} BLOCKED — BTC accelerating down ({_remaining:.1f}min remaining)')
                     _record_hotset_failure(token, direction, failures)
                     continue
                 else:

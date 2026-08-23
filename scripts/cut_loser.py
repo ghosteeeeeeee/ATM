@@ -313,37 +313,42 @@ def run_mae_guard(positions, dry_run):
 
     # Try new ATR-aware logic first, fall back to fixed threshold
     try:
-        from btc_crash_filter import check_position_protection
-        protections = check_position_protection([{
-            'token': p.get('token', ''),
-            'direction': p.get('direction', ''),
-            'highest_price': p.get('highest_price', 0),
-            'current_price': p.get('current_price', 0),
-            'entry_price': p.get('entry_price', 0),
-        } for p in positions])
-
-        closed = 0
-        for prot in protections:
-            if not prot.should_cut:
-                continue
-            # Find matching position
-            for pos in positions:
-                if pos.get('token') == prot.token and pos.get('direction') == prot.direction:
-                    from pnl_utils import compute_live_pnl
-                    live_pnl = compute_live_pnl(pos['entry_price'], pos['current_price'], pos['direction'])
-                    log(f"  [MAE-GUARD] {prot.token} triggered: "
-                        f"peak=${pos.get('highest_price', 0):.6f} current=${pos['current_price']:.6f} "
-                        f"drop={prot.mae_from_peak*100:.2f}% > {prot.atr_scaled_threshold*100:.1f}% "
-                        f"{'(BTC crash)' if 'BTC crash' in prot.reason else ''} "
-                        f"pnl={live_pnl:+.2f}%")
-                    ok = close_position(pos['id'], pos['token'], pos['direction'],
-                                        live_pnl, pos['current_price'], dry_run, "MAE-GUARD")
-                    if ok:
-                        closed += 1
-                    break
-        return closed
+        from btc_crash_filter import check_position_protection as _cpp
     except ImportError:
-        pass  # Fall back to legacy fixed-threshold logic below
+        _cpp = None  # Module not available — fall through to legacy
+
+    if _cpp is not None:
+        try:
+            protections = _cpp([{
+                'token': p.get('token', ''),
+                'direction': p.get('direction', ''),
+                'highest_price': p.get('highest_price', 0),
+                'current_price': p.get('current_price', 0),
+                'entry_price': p.get('entry_price', 0),
+            } for p in positions])
+
+            closed = 0
+            for prot in protections:
+                if not prot.should_cut:
+                    continue
+                # Find matching position
+                for pos in positions:
+                    if pos.get('token') == prot.token and pos.get('direction') == prot.direction:
+                        from pnl_utils import compute_live_pnl
+                        live_pnl = compute_live_pnl(pos['entry_price'], pos['current_price'], pos['direction'])
+                        log(f"  [MAE-GUARD] {prot.token} triggered: "
+                            f"peak=${pos.get('highest_price', 0):.6f} current=${pos['current_price']:.6f} "
+                            f"drop={prot.mae_from_peak*100:.2f}% > {prot.atr_scaled_threshold*100:.1f}% "
+                            f"{'(BTC crash)' if 'BTC crash' in prot.reason else ''} "
+                            f"pnl={live_pnl:+.2f}%")
+                        ok = close_position(pos['id'], pos['token'], pos['direction'],
+                                            live_pnl, pos['current_price'], dry_run, "MAE-GUARD")
+                        if ok:
+                            closed += 1
+                        break
+            return closed
+        except Exception as e:
+            log(f"  [MAE-GUARD] ATR-aware check failed: {e} — falling back to legacy")
 
     # Legacy fallback: fixed threshold
     closed = 0

@@ -790,7 +790,8 @@ BTC_ACCEL_WINDOW = 2                    # bars to compare acceleration (vel_now 
 BTC_ACCEL_BLOCK_DURATION = 5            # minutes to block entries after trigger
 
 # Layer 5: Position protection (ATR-aware MAE guard)
-CL_MAE_GUARD_ENABLED = False            # DISABLED 2026-08-23 — re-enable with new ATR-aware logic when ready
+# NOTE: CL_MAE_GUARD_ENABLED is defined below with the legacy MAE guard constants.
+# CL_MAE_GUARD_BASE_THRESHOLD scales with ATR (replaces fixed CL_MAE_GUARD_THRESHOLD).
 CL_MAE_GUARD_BASE_THRESHOLD = 0.025     # 2.5% base — scales with ATR (was fixed 1.5%)
 CL_MAE_GUARD_BTC_CRASH_MULTIPLIER = 0.6 # Tighten threshold by 40% when BTC is crashing (cut faster)
 

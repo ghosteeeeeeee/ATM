@@ -68,6 +68,7 @@ def _get_candles(token: str, tf: str = '1m', limit: int = 30) -> list:
     """Fetch candles from local DB. Returns list of (ts, open, high, low, close, volume)."""
     table_map = {'1m': 'candles_1m', '5m': 'candles_5m', '15m': 'candles_15m', '1h': 'candles_1h'}
     table = table_map.get(tf, 'candles_1m')
+    conn = None
     try:
         conn = sqlite3.connect(CANDLES_DB, timeout=5)
         cur = conn.cursor()
@@ -78,12 +79,14 @@ def _get_candles(token: str, tf: str = '1m', limit: int = 30) -> list:
             ORDER BY ts DESC LIMIT ?
         """, (token.upper(), limit))
         rows = cur.fetchall()
-        conn.close()
         # Reverse to oldest-first
         rows.reverse()
         return rows
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_atr_pct(token: str) -> Optional[float]:
@@ -310,6 +313,11 @@ def check_crash() -> CrashSignal:
 
     triggered_layers = []
 
+    # Safe defaults for layer data (used in reason strings even if layers disabled)
+    vol_ratio = 1.0
+    eth_div = 0.0
+    sol_div = 0.0
+
     # Layer 1: Price crash
     price_blocked, chg_5m, dyn_thresh = _check_price_crash(btc_closes, atr_pct)
     signal.price_chg_5m = chg_5m
@@ -319,16 +327,16 @@ def check_crash() -> CrashSignal:
 
     # Layer 2: Volume spike
     if BTC_CRASH_VOL_SPIKE_ENABLED:
-        vol_spike, vol_ratio = _check_volume_spike(btc_candles)
+        is_vol_spike, vol_ratio = _check_volume_spike(btc_candles)
         signal.volume_spike = vol_ratio
-        if vol_spike:
+        if is_vol_spike:
             triggered_layers.append('VOLUME')
 
     # Layer 3: Contagion
     if BTC_CRASH_CONTAGION_ENABLED:
-        contagion, eth_div, sol_div = _check_contagion(btc_closes, eth_closes, sol_closes)
+        is_contagion, eth_div, sol_div = _check_contagion(btc_closes, eth_closes, sol_closes)
         signal.eth_divergence = eth_div
-        if contagion:
+        if is_contagion:
             triggered_layers.append('CONTAGION')
 
     # Layer 4: Acceleration
@@ -380,8 +388,7 @@ def check_crash() -> CrashSignal:
         signal.block_duration_sec = 300  # 5 min
 
     if signal.blocked:
-        import time as _time_mod
-        signal.block_until = _time_mod.time() + signal.block_duration_sec
+        signal.block_until = time.time() + signal.block_duration_sec
 
     return signal
 
