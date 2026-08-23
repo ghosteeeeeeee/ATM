@@ -1001,8 +1001,8 @@ NEVER_REENABLE_FLAGS = {
     'ZSCORE_RISING_ENABLED',      # CEO 2026-08-07 — 38.6% WR (44 trades 7d), -$1.37. No edge.
     'ZSCORE_RISING_PLUS_ENABLED', # CEO 2026-08-07 — master ZSCORE_RISING killed
     'ZSCORE_RISING_MINUS_ENABLED',# CEO 2026-08-07 — master ZSCORE_RISING killed
-    'HZSCORE_MINUS_ENABLED',      # CEO 2026-08-07 — 15.8% WR, -$53.50 (76 trades 7d). hemorrhaging.
-    'HZSCORE_PLUS_ENABLED',       # CEO 2026-08-17 — 32T ~38% WR -$0.47/7d. Combos bleeding. NEVER_REENABLE.
+    # HZSCORE_MINUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
+    # HZSCORE_PLUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
     'PCT_HERMES_PLUS_ENABLED',    # CEO 2026-08-07 — historical 100% WR, but combo signals bleeding (-$33.83 standalone)
     'VORTEX_BREAK_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-09 — vortex_break_long: 22.2% WR (9 trades 24h), -$0.18. Compounds hemorrhaging.
     'WAVE_CATCHER_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-15 — 33.3% WR, -$0.34 (24h). LONG dead.
@@ -1016,9 +1016,9 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
-    'COIN_TRACKER_HOT_ENABLED',             # SIGNAL REPORTER 2026-08-22 — entire family dead. NEVER_REENABLE.
-    'COIN_TRACKER_HOT_PLUS_ENABLED',        # CEO 2026-08-22 — killed by auto_1hr. NEVER_REENABLE.
-    'COIN_TRACKER_HOT_MINUS_ENABLED',       # CEO 2026-08-22 — same family. NEEDS T TO SET False.
+    # COIN_TRACKER_HOT_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
+    # COIN_TRACKER_HOT_PLUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
+    # COIN_TRACKER_HOT_MINUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1027,8 +1027,8 @@ VEL_HERMES_ENABLED       = False  # CEO 2026-08-04 — KILLED. 0% WR (12 trades 
 VEL_HERMES_PLUS_ENABLED  = False  # vel-hermes+ — 31% WR, avg=-0.127%, blocked
 VEL_HERMES_MINUS_ENABLED = False  # AUTO-DISABLED by signal_decay_detector   # RE-ENABLED 2026-08-04 — signal diversity, zscore_rising at 0   # vel-hermes- — 45% WR, +0.404% avg, re-test enabled
 HZSCORE_ENABLED          = True  # CEO KILLED 2026-08-17 — both directions dead. Plus: 32T ~38% WR -$0.47/7d (standalone + combos). Minus: 35T 54.3% WR -$0.22/7d.
-HZSCORE_PLUS_ENABLED     = False  # CEO KILLED 2026-08-17 — 32T ~38% WR -$0.47/7d. Standalone 12T 41.7% -$0.12 + bb_bounce+,hzscore+ 20T 35% -$0.35. Inverted R:R. Combos bleeding. NEVER_REENABLE.
-HZSCORE_MINUS_ENABLED    = False  # CEO KILLED 2026-08-17 — 35T 54.3% WR -$0.22/7d. Inverted R:R (+0.25% avg win vs -0.43% avg loss). Testing failed. NEVER_REENABLE.
+HZSCORE_PLUS_ENABLED     = True   # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 32T ~38% WR -$0.47/7d.
+HZSCORE_MINUS_ENABLED    = True   # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 35T 54.3% WR -$0.22/7d.
 HMACD_ENABLED            = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 HMACD_PLUS_ENABLED       = True   # hmacd_bare+ and hmacd_mtf+ LONG — kill-switch for LONG direction
 HMACD_MINUS_ENABLED      = True   # hmacd_bare- and hmacd_mtf- SHORT — kill-switch for SHORT direction
@@ -1059,7 +1059,7 @@ ACCEL_300_COOLDOWN_BARS   = 10   # dedup: only fire once per N bars per token+di
 ACCEL_300_LOOKBACK_1M     = 700  # 1m prices to fetch per token (warmup + detection window)
 ACCEL_300_ENABLED        = False  # DISABLED 2026-08-13 10:30 — 19T today 36.8% WR -$0.73, 12/19 ATR SL hits. Re-enabled yesterday but deteriorated.
 ACCEL_300_COOLDOWN_MIN    = 1    # minutes between signals per token+direction
-ACCEL_300_REGIME_SLOPE_PCT = 0.0005  # Backtested: slope filter doesn't differentiate winners/losers. 0.0005% blocks only strongly uptrending SHORTs.
+ACCEL_300_REGIME_SLOPE_PCT = 0.005   # RE-RAISED 2026-08-22 by T — was 0.0005%, blocked SHORTs on noise. 0.005% = real micro-trend.
 ACCEL_300_SLOPE_WINDOW     = 20    # bars over which to compute regime slope (simple linear regression)
 ACCEL_300_MIN_ATR_PCT      = 0  # disabled — backtest shows ATR alone can't separate winners from losers (overlap 0.07-0.25%)
 ACCEL_300_STALE_BARS = 15   # max bars since EMA cross for LONG (was 25 — fresher signals, catch moves earlier)
@@ -1290,7 +1290,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # confluence signal — 100% WR with hzscore+ (3/3 trades)
-BB_BOUNCE_PLUS_ENABLED = True  # AUTO-ROTATED 2026-08-22 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
+BB_BOUNCE_PLUS_ENABLED = False  # AUTO-ROTATED 2026-08-23 # RE-ENABLED 2026-08-17 per user. Part of winning LONG streaks.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1873,9 +1873,9 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = False   # KILLED 2026-08-22 — 27.7% WR, -$3.92 PnL (7d, 47 trades). NEVER_REENABLE.
-COIN_TRACKER_HOT_PLUS_ENABLED       = False    # KILLED 2026-08-22 — same family. NEVER_REENABLE.
-COIN_TRACKER_HOT_MINUS_ENABLED      = False    # KILLED 2026-08-22 — same family. NEVER_REENABLE.
+COIN_TRACKER_HOT_ENABLED            = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 27.7% WR, -$3.92.
+COIN_TRACKER_HOT_PLUS_ENABLED       = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix.
+COIN_TRACKER_HOT_MINUS_ENABLED      = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction (lowered from 3.0 — was blocking valid signals). RESEARCH_FLAGS
 COIN_TRACKER_HOT_RECENCY_MIN        = 0.35    # minimum recency weight (0-1) (lowered from 0.6 — was blocking valid signals). RESEARCH_FLAGS
