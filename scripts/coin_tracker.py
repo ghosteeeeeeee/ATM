@@ -32,6 +32,9 @@ from coin_tracker_score import (
     score_wyckoff as _score_wyckoff, score_ewave as _score_ewave,
     score_trend_quality as _score_trend_quality,
     score_liquidation as _score_liquidation,
+    # Weather station scoring functions
+    score_tide as _score_tide, score_sea_state as _score_sea_state,
+    score_wind as _score_wind, score_token_regime as _score_token_regime,
 )
 from coin_tracker_analysis import analyze_coin
 
@@ -152,6 +155,22 @@ def collect():
             liq_data = {}  # stale, ignore
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         pass  # no liquidation data yet — fine
+
+    # Load weather station data (written by weather_station_api.py)
+    weather_data = {}
+    try:
+        weather_path = os.path.join(WWW_DATA, 'weather_station.json')
+        with open(weather_path) as f:
+            weather_data = json.load(f)
+        # Check freshness (older than 30 min = stale)
+        ts_str = weather_data.get('generated', '')
+        if ts_str:
+            from datetime import datetime
+            ts = datetime.fromisoformat(ts_str.replace(' UTC', '+00:00')).timestamp()
+            if time.time() - ts > 1800:
+                weather_data = {}  # stale, ignore
+    except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
+        pass  # no weather data yet — fine
 
     # Build universe lookup
     universe_map = {u['name']: u for u in universe if u.get('name')}
@@ -365,6 +384,17 @@ def collect():
                 }
                 s_liquidation = _score_liquidation(price, coin_liq)
 
+                # Weather station scores (NEW)
+                token_data = {
+                    'setup_type': setup.get('setup_type'),
+                    'trend_direction': trend.get('direction'),
+                    'price_acceleration': token_speed.get('price_acceleration') if token_speed else None,
+                }
+                s_tide = _score_tide(token_data, weather_data) if weather_data else 50.0
+                s_sea_state = _score_sea_state(weather_data) if weather_data else 50.0
+                s_wind = _score_wind(token_data, weather_data) if weather_data else 50.0
+                s_token_regime = _score_token_regime(symbol, weather_data) if weather_data else 50.0
+
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +
                     s_volume * WEIGHTS['volume'] +
@@ -378,7 +408,11 @@ def collect():
                     s_setup * WEIGHTS['setup'] +
                     s_clustering * WEIGHTS['clustering'] +
                     s_recency * WEIGHTS['recency'] +
-                    s_liquidation * WEIGHTS['liquidation']
+                    s_liquidation * WEIGHTS['liquidation'] +
+                    s_tide * WEIGHTS['tide'] +
+                    s_sea_state * WEIGHTS['sea_state'] +
+                    s_wind * WEIGHTS['wind'] +
+                    s_token_regime * WEIGHTS['token_regime']
                 )
 
                 # No candle data = no real activity → force cold/dead

@@ -13200,3 +13200,28 @@ Final set: ['BANANA', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'SYRUP', 'ZRO']
 **Open Questions:**
 - hzscore- re-enabled 2026-08-22 for "signal starvation fix" — BSV SHORT -37.9% entry quality concerning. Monitor next hour.
 - ETH/BTC LONGs both -26% — will they hit stop or recover?
+
+## [2026-08-23 04:00 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L)
+**PnL:** +$0.11 (100% WR)
+
+**Details:**
+- BSV SHORT hzscore- profit-monster-trail +$0.05
+- NXPC SHORT hzscore- profit-monster-trail +$0.06
+
+**24h:** 51T 23W 45.1% -$1.89 | hl_copy_trader 30T 15W 50% +$0.96 (only profitable) | hzscore- 2T 2W 100% +$0.11 (just re-enabled) | atr_sl_hit 54.9% avg -$0.026 | MAE-GUARD 21.6% avg -$0.068
+
+**Open:** 3 trades — CC SHORT hzscore- -$0.01 (just opened), ETH LONG hl_copy_trader -$0.01, BTC LONG hl_copy_trader -$0.17
+
+**Changes:** None
+
+**No Change Needed:**
+- No kill criteria triggered
+- Trade freq 2/hr = normal
+- hzscore- 2/2 wins since re-enable — profit-monster-trail exit working
+- ATR trailing SL healthy at 54.9% of exits
+- No consecutive negative hours
+- Open positions manageable
+
+**Open Questions:** None — system stable

@@ -11,21 +11,26 @@ Usage:
 import time
 
 WEIGHTS = {
-    'momentum': 0.14,
-    'volume': 0.10,
-    'volatility': 0.07,
-    'spread': 0.07,
-    'signals': 0.04,    # reduced to prevent echo
-    'regime': 0.04,
-    'wyckoff': 0.14,
-    'ewave': 0.09,
-    'trend': 0.07,
-    'setup': 0.08,
-    'clustering': 0.04,
-    'recency': 0.05,
-    'liquidation': 0.07,  # NEW: liquidation cluster proximity + stop hunt signals
+    'momentum': 0.12,      # reduced from 0.14
+    'volume': 0.08,        # reduced from 0.10
+    'volatility': 0.06,    # reduced from 0.07
+    'spread': 0.06,        # reduced from 0.07
+    'signals': 0.03,       # reduced from 0.04
+    'regime': 0.03,        # reduced from 0.04
+    'wyckoff': 0.12,       # reduced from 0.14
+    'ewave': 0.08,         # reduced from 0.09
+    'trend': 0.06,         # reduced from 0.07
+    'setup': 0.07,         # reduced from 0.08
+    'clustering': 0.03,    # reduced from 0.04
+    'recency': 0.04,       # reduced from 0.05
+    'liquidation': 0.06,   # reduced from 0.07
+    # NEW: Weather station factors
+    'tide': 0.05,          # market flow alignment
+    'sea_state': 0.03,     # market health
+    'wind': 0.03,          # momentum alignment
+    'token_regime': 0.02,  # historical performance
 }
-# ponytail: weights sum to 1.0 — verified
+# ponytail: weights sum to 1.0 — verified (12+8+6+6+3+3+12+8+6+7+3+4+6+5+3+3+2 = 100)
 
 # ── Indicators ─────────────────────────────────────────────────────────────────
 
@@ -347,6 +352,145 @@ def score_liquidation(price, liq_data):
     return max(0, min(100, score))
 
 
+# ── Weather Station Scoring Functions ─────────────────────────────────────────
+
+def score_tide(token_data, weather_data):
+    """
+    Tide score — market flow alignment 0-100.
+    
+    High score = token direction aligns with market tide.
+    Low score = token direction contradicts market tide.
+    
+    Scoring:
+    - Tide aligned with token direction → 80-100
+    - Tide neutral → 50
+    - Tide contradicts direction → 10-30
+    """
+    if not weather_data:
+        return 50.0
+    
+    tide_24h = weather_data.get('tide', {}).get('24h', {})
+    long_pct = tide_24h.get('long_pct', 50)
+    short_pct = tide_24h.get('short_pct', 50)
+    
+    # Determine tide direction
+    if long_pct > 55:
+        tide_dir = 'BULLISH'
+    elif short_pct > 55:
+        tide_dir = 'BEARISH'
+    else:
+        tide_dir = 'NEUTRAL'
+    
+    # Get token direction
+    token_dir = token_data.get('setup_type') or token_data.get('trend_direction')
+    if not token_dir:
+        return 50.0
+    
+    # Align with token direction
+    if tide_dir == token_dir:
+        # Aligned — boost score based on tide strength
+        strength = abs(long_pct - 50) / 50
+        return 80 + strength * 20  # 80-100
+    elif tide_dir == 'NEUTRAL':
+        return 50  # Neutral
+    else:
+        # Contradicts — penalty based on tide strength
+        strength = abs(long_pct - 50) / 50
+        return 30 - strength * 20  # 10-30
+
+
+def score_sea_state(weather_data):
+    """
+    Sea state score — market health 0-100.
+    
+    High score = market is healthy (high WR, positive PnL).
+    Low score = market is sick (low WR, negative PnL).
+    
+    Scoring:
+    - WR >55% + PnL >0 → 80-100 (healthy)
+    - WR >50% → 60-80 (okay)
+    - WR >45% → 40-60 (caution)
+    - WR <45% → 20-40 (unhealthy)
+    """
+    if not weather_data:
+        return 50.0
+    
+    sea = weather_data.get('sea_state', {})
+    wr = sea.get('winrate', 50)
+    pnl = sea.get('total_pnl', 0)
+    
+    if wr > 55 and pnl > 0:
+        return 80 + min(20, (wr - 55) * 2)  # 80-100
+    elif wr > 50:
+        return 60 + (wr - 50) * 4  # 60-80
+    elif wr > 45:
+        return 40 + (wr - 45) * 4  # 40-60
+    else:
+        return 20 + max(0, (wr - 30) * 1.33)  # 20-40
+
+
+def score_wind(token_data, weather_data):
+    """
+    Wind score — momentum alignment 0-100.
+    
+    High score = token momentum aligns with market momentum.
+    Low score = mismatch between token and market momentum.
+    
+    Scoring:
+    - Both accelerating same direction → 80
+    - Market flat → 50
+    - Mismatch → 30
+    """
+    if not weather_data:
+        return 50.0
+    
+    wind = weather_data.get('wind', {})
+    market_vel = wind.get('avg_velocity', 0)
+    market_accel = wind.get('avg_accel', 0)
+    
+    token_accel = token_data.get('price_acceleration') or 0
+    
+    # Alignment check
+    if market_vel > 0 and token_accel > 0:
+        return 80  # Both accelerating up
+    elif market_vel < 0 and token_accel < 0:
+        return 80  # Both accelerating down
+    elif abs(market_vel) < 0.001:
+        return 50  # Market flat
+    else:
+        return 30  # Mismatch
+
+
+def score_token_regime(token, weather_data):
+    """
+    Token regime score — historical performance 0-100.
+    
+    High score = token historically performs well (reef).
+    Low score = token historically performs poorly (deep).
+    
+    Scoring:
+    - Reef (WR >55%, PnL >$0.1) → 80-100
+    - Sandbar → 50
+    - Deep (WR <35%, PnL <-$0.5) → 20-40
+    """
+    if not weather_data:
+        return 50.0
+    
+    tokens = weather_data.get('tokens', {})
+    
+    for regime_type in ['reef', 'sandbar', 'deep']:
+        for t in tokens.get(regime_type, []):
+            if t['token'] == token:
+                if regime_type == 'reef':
+                    return 80 + min(20, t.get('winrate', 50) - 55)
+                elif regime_type == 'deep':
+                    return 20 + max(0, t.get('winrate', 35) - 20)
+                else:
+                    return 50
+    
+    return 50  # Unknown = neutral
+
+
 def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=None):
     """Compute per-coin regime based on individual price action."""
     if not closes or len(closes) < 20:
@@ -420,13 +564,16 @@ def health_from_score(composite):
 def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
                closes_1h=None, volumes_1h=None,
                price=None, signal_count=0, avg_confidence=None, regime='NEUTRAL',
-               liq_data=None):
+               liq_data=None, weather_data=None, token_data=None, token_symbol=None):
     """
     Compute all component scores and composite for a coin.
     Returns dict with all scores and health state.
 
     liq_data: optional dict with liquidation cluster data for this coin
               (pre-filtered: _coin_clusters, _has_stop_hunt, _imbalance keys)
+    weather_data: optional dict with weather station data (tide, sea_state, wind, tokens)
+    token_data: optional dict with token-specific data (setup_type, price_acceleration, etc.)
+    token_symbol: optional string with token symbol (e.g., 'BTC')
     """
     closes_5m = closes_5m or []
     highs_5m = highs_5m or []
@@ -472,6 +619,12 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
     # Liquidation score (NEW — uses liquidation cluster data)
     s_liquidation = score_liquidation(price, liq_data) if liq_data else 50.0
 
+    # Weather station scores (NEW — uses weather station data)
+    s_tide = score_tide(token_data or {}, weather_data) if weather_data else 50.0
+    s_sea_state = score_sea_state(weather_data) if weather_data else 50.0
+    s_wind = score_wind(token_data or {}, weather_data) if weather_data else 50.0
+    s_token_regime = score_token_regime(token_symbol, weather_data) if weather_data and token_symbol else 50.0
+
     composite = (
         s_momentum * WEIGHTS['momentum'] +
         s_volume * WEIGHTS['volume'] +
@@ -485,7 +638,11 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
         s_setup * WEIGHTS['setup'] +
         s_clustering * WEIGHTS['clustering'] +
         s_recency * WEIGHTS['recency'] +
-        s_liquidation * WEIGHTS['liquidation']
+        s_liquidation * WEIGHTS['liquidation'] +
+        s_tide * WEIGHTS['tide'] +
+        s_sea_state * WEIGHTS['sea_state'] +
+        s_wind * WEIGHTS['wind'] +
+        s_token_regime * WEIGHTS['token_regime']
     )
 
     return {
@@ -498,6 +655,10 @@ def score_coin(closes_5m=None, highs_5m=None, lows_5m=None, volumes_5m=None,
         'signals': round(s_signals, 2),
         'regime': round(s_regime, 2),
         'liquidation': round(s_liquidation, 2),
+        'tide': round(s_tide, 2),
+        'sea_state': round(s_sea_state, 2),
+        'wind': round(s_wind, 2),
+        'token_regime': round(s_token_regime, 2),
         'indicators': {
             'ema_9': ema_9,
             'ema_20': ema_20,

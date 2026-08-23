@@ -1713,7 +1713,7 @@ HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 # When multiple pro traders all buy the same coin within the lookback window,
 # boost confidence AND position size — it's higher conviction (cluster confluence).
 HL_COPY_CLUSTER_ENABLED = True      # master switch for cluster bonus
-HL_COPY_CLUSTER_MIN_SIZE = 3        # minimum traders in cluster to fire signal (>2 = at least 3 traders agree)
+HL_COPY_CLUSTER_MIN_SIZE = 2        # minimum traders in cluster to fire signal (2+ = at least 2 traders agree)
 HL_COPY_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional trader in cluster
 HL_COPY_CLUSTER_MAX_BONUS = 15       # cap cluster bonus at +15 (prevents overconfidence)
 HL_COPY_CLUSTER_SIZE_MULT = 0.25    # +25% position size per additional trader (e.g., 3 traders → 1.5x)
