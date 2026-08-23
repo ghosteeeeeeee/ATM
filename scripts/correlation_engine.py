@@ -168,6 +168,183 @@ class CorrelationEngine:
             return row[0] if row else None
 
     # -----------------------------------------------------------------------
+    # Single Trade Ingestion (called from brain.py on trade close)
+    # -----------------------------------------------------------------------
+    def ingest_trade(self, token: str, signal: str, direction: str,
+                     won: bool, pnl_pct: float, close_time: str):
+        """
+        Process a single closed trade. Updates all matrices incrementally.
+        Called from brain.py close_trade(). Fail-open — never raises.
+        """
+        now_iso = close_time or datetime.utcnow().isoformat()
+        won_int = 1 if won else 0
+
+        try:
+            conn = sqlite3.connect(self.db_path)
+            try:
+                # 1. Update signal effectiveness
+                row = conn.execute(
+                    "SELECT trades, wins, total_pnl FROM signal_effectiveness "
+                    "WHERE token=? AND signal=? AND direction=?",
+                    (token, signal, direction)
+                ).fetchone()
+
+                if row:
+                    t, w, p = row
+                    t += 1
+                    w += won_int
+                    p += pnl_pct
+                    wr = w / t if t > 0 else 0.0
+                    conf = self._bayesian_confidence(t, wr)
+                    avg_pnl = p / t if t > 0 else 0.0
+                    conn.execute(
+                        "UPDATE signal_effectiveness SET trades=?, wins=?, losses=?, "
+                        "total_pnl=?, win_rate=?, avg_pnl=?, confidence=?, last_seen=? "
+                        "WHERE token=? AND signal=? AND direction=?",
+                        (t, w, t - w, p, wr, avg_pnl, conf, now_iso,
+                         token, signal, direction)
+                    )
+                else:
+                    conf = self._bayesian_confidence(1, 1.0 if won else 0.0)
+                    conn.execute(
+                        "INSERT INTO signal_effectiveness "
+                        "(token, signal, direction, trades, wins, losses, total_pnl, "
+                        "win_rate, avg_pnl, confidence, last_seen) "
+                        "VALUES (?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?)",
+                        (token, signal, direction, won_int, 0 if won else 1,
+                         pnl_pct, 1.0 if won else 0.0, pnl_pct, conf, now_iso)
+                    )
+
+                # 2. Find recent trades within window to update chains
+                close_dt = self._parse_time(close_time)
+                if close_dt:
+                    window = timedelta(seconds=DEFAULT_WINDOW_SECS)
+                    lookback = close_dt - window
+
+                    # Read from SOURCE trade_log (associative_memory.db), not correlations.db
+                    src_db = str(TRADE_LOG_DB)
+                    if os.path.exists(src_db):
+                        src_conn = sqlite3.connect(f"file:{src_db}?mode=ro", uri=True, timeout=5)
+                        try:
+                            # Get recent trades (excluding this token and test tokens)
+                            recent = src_conn.execute(
+                                "SELECT token, won, pnl_pct, close_time FROM trade_log "
+                                "WHERE close_time IS NOT NULL AND close_time > ? "
+                                "AND close_time <= ? AND token != ? "
+                                "AND token NOT LIKE 'TEST%' AND token NOT LIKE 'HTT%'",
+                                (lookback.isoformat(), close_dt.isoformat(), token)
+                            ).fetchall()
+
+                            # Get base WR for this token
+                            base_row = src_conn.execute(
+                                "SELECT COUNT(*), SUM(CASE WHEN won=1 THEN 1 ELSE 0 END) "
+                                "FROM trade_log WHERE token=?", (token,)
+                            ).fetchone()
+                        finally:
+                            src_conn.close()
+                    else:
+                        recent = []
+                        base_row = None
+
+                    base_wr = (base_row[1] or 0) / base_row[0] if base_row and base_row[0] > 0 else 0.5
+
+                    for r in recent:
+                        tok_a = r[0]  # earlier token
+                        won_a = bool(r[1])
+                        pnl_a = r[2]
+                        dt_a_str = r[3]
+
+                        # Build chain: tok_a → this token (tok_a fired first)
+                        chain_row = conn.execute(
+                            "SELECT id, co_fires, b_wins_after_a, b_pnl_after_a "
+                            "FROM token_chains WHERE token_a=? AND token_b=? AND window_secs=?",
+                            (tok_a, token, DEFAULT_WINDOW_SECS)
+                        ).fetchone()
+
+                        if chain_row:
+                            cid, co, bw, bp = chain_row
+                            co += 1
+                            bw += won_int
+                            bp += pnl_pct
+                            wr_c = bw / co
+                            lift = wr_c / base_wr if base_wr > 0 else 1.0
+                            conf_c = self._bayesian_confidence(co, wr_c)
+                            conn.execute(
+                                "UPDATE token_chains SET co_fires=?, b_wins_after_a=?, "
+                                "b_pnl_after_a=?, win_rate=?, lift=?, confidence=?, "
+                                "b_total=?, last_seen=? WHERE id=?",
+                                (co, bw, bp, wr_c, lift, conf_c, base_row[0] if base_row else 0,
+                                 now_iso, cid)
+                            )
+                        else:
+                            # New chain
+                            conf_c = self._bayesian_confidence(1, 1.0 if won else 0.0)
+                            conn.execute(
+                                "INSERT INTO token_chains "
+                                "(token_a, token_b, window_secs, co_fires, b_wins_after_a, "
+                                "b_losses_after_a, b_pnl_after_a, b_total, win_rate, base_wr, "
+                                "lift, confidence, avg_pnl_after_a, first_seen, last_seen) "
+                                "VALUES (?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                (tok_a, token, DEFAULT_WINDOW_SECS, won_int,
+                                 0 if won else 1, pnl_pct,
+                                 base_row[0] if base_row else 0,
+                                 1.0 if won else 0.0, base_wr,
+                                 (1.0 if won else 0.0) / base_wr if base_wr > 0 else 1.0,
+                                 conf_c, pnl_pct, dt_a_str, now_iso)
+                            )
+
+                # 3. Update cadence
+                if close_dt:
+                    hour = close_dt.hour
+                    day_idx = close_dt.weekday()
+                    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday",
+                                 "Friday", "Saturday", "Sunday"]
+
+                    cad_row = conn.execute(
+                        "SELECT id, hour_dist, day_dist, total_trades FROM cadence WHERE token=?",
+                        (token,)
+                    ).fetchone()
+
+                    if cad_row:
+                        cid, hd_json, dd_json, total = cad_row
+                        total += 1
+                        hd = json.loads(hd_json) if hd_json else [0.0] * 24
+                        dd = json.loads(dd_json) if dd_json else [0.0] * 7
+                        hd[hour] += 1
+                        dd[day_idx] += 1
+                        hd_sum = sum(hd) or 1
+                        dd_sum = sum(dd) or 1
+                        hd_norm = [x / hd_sum for x in hd]
+                        dd_norm = [x / dd_sum for x in dd]
+                        peak_hour = hd.index(max(hd))
+                        peak_day = day_names[dd.index(max(dd))]
+                        conn.execute(
+                            "UPDATE cadence SET hour_dist=?, day_dist=?, total_trades=?, "
+                            "peak_hour_utc=?, peak_day=?, last_updated=? WHERE id=?",
+                            (json.dumps(hd_norm), json.dumps(dd_norm), total,
+                             peak_hour, peak_day, now_iso, cid)
+                        )
+                    else:
+                        hd = [0.0] * 24
+                        dd = [0.0] * 7
+                        hd[hour] = 1
+                        dd[day_idx] = 1
+                        conn.execute(
+                            "INSERT INTO cadence (token, hour_dist, day_dist, total_trades, "
+                            "peak_hour_utc, peak_day, last_updated) VALUES (?, ?, ?, 1, ?, ?, ?)",
+                            (token, json.dumps(hd), json.dumps(dd),
+                             peak_hour if 'peak_hour' in dir() else hour,
+                             day_names[day_idx], now_iso)
+                        )
+
+                conn.commit()
+            finally:
+                conn.close()
+        except Exception:
+            # Fail-open: never block trade close
+            pass
+
+    # -----------------------------------------------------------------------
     # Bulk Ingestion (efficient — loads all trades, processes in memory)
     # -----------------------------------------------------------------------
     def ingest_all(self):

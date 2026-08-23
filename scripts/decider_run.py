@@ -1368,6 +1368,28 @@ def context_gate(token, direction, source, sig):
                 if total_conf_adj != 0:
                     log(f'  [HEBBIAN-GATE] uncertain: WR={wr_pct:.0f}% → adj={total_conf_adj}, escalate to LLM')
 
+    # ── Correlation engine: pump chain suggestions ──────────────────────
+    # When a token fires, check if correlated tokens tend to follow.
+    # Logs chain suggestions for visibility. Does NOT block trades —
+    # chain data is advisory only until we have enough volume to trust.
+    try:
+        from correlation_engine import CorrelationEngine
+        _eng = CorrelationEngine()
+        _rec = _eng.should_trade(token, source)
+        _chains = _eng.next_tokens(token, k=3)
+        if _chains:
+            _best = _chains[0]
+            if _best['lift'] > 1.3 and _best['confidence'] > 0.55:
+                log(f'  [CORRELATION] {token} → {_best["token_b"]} tends to follow '
+                    f'(wr={_best["win_rate"]:.0%}, lift={_best["lift"]:.1f}x, n={_best["co_fires"]})')
+                # Log all chain suggestions for downstream use
+                for _c in _chains:
+                    if _c['co_fires'] >= 3:
+                        log(f'  [CORRELATION]   chain: {token} → {_c["token_b"]} '
+                            f'wr={_c["win_rate"]:.0%} lift={_c["lift"]:.1f}x n={_c["co_fires"]}')
+    except Exception as _corr_err:
+        pass  # fail-open, never block trade
+
     # Still ambiguous → LLM (soft advisory or hard block)
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
     if verdict == 'WARN':
