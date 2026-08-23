@@ -1222,10 +1222,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             _regime, _regime_conf = get_regime_1m(token)
             _neutral_relax = CONFLUENCE_NEUTRAL_RELAX and _regime == 'NEUTRAL'
             # SHORT-in-NEUTRAL block: use 4h regime (1m too noisy, shows LONG_BIAS when 4h NEUTRAL)
+            # FIX (2026-08-23): Allow SHORT when 1m shows SHORT_BIAS — 4h NEUTRAL with 1m SHORT_BIAS
+            # means short-term downtrend in flat broader market, valid SHORT setup.
             _regime_4h, _ = get_regime_4h(token)
             if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime_4h == 'NEUTRAL':
-                log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
-                continue
+                if _regime == 'SHORT_BIAS':
+                    log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but 1m SHORT_BIAS, allowed")
+                else:
+                    log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
+                    continue
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
                 pass_gate = True
