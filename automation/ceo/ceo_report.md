@@ -1,3 +1,37 @@
+## CEO Report — 2026-08-24 ~18:00 UTC (250th run)
+
+### Diagnosis
+System SLIGHTLY RED. Verified DB: 24h 97T -$0.44, 57.7% WR. 7d: 290T -$2.14, 52.1% WR. Today 85T -$0.24, 61.2% WR. 4 open positions near breakeven (-$0.25 unrealized). ct-hot family STILL bleeding despite ct-hot+ LONG kill: 66T/7d -$3.65, 36.4% WR (DOMINANT LOSER). Winners: hl_copy_trader LONG +$2.30 (53.2% WR), bb_bounce+ +$0.98 (86.7% WR), r2-trend-long6 +$0.25 (100% WR). SHORT side mixed: tl_break_short +$0.11 (71.4% WR) but many combos 0% WR.
+
+### Root Cause
+ct-hot family still generating losing trades. COIN_TRACKER_HOT_ENABLED=True (base) and COIN_TRACKER_HOT_MINUS_ENABLED=True (SHORT) still active — both part of same coin_tracker family that killed ct-hot+ LONG. Combined ct-hot family 7d: ~$4.15 losses across 80+ trades. Without ct-hot: 7d ~$2.01 (system profitable).
+
+### Fix Applied
+**NO CODE CHANGES — RECOMMEND T DISABLE:**
+1. `COIN_TRACKER_HOT_ENABLED` (ct-hot base) — same family as killed ct-hot+
+2. `COIN_TRACKER_HOT_MINUS_ENABLED` (ct-hot SHORT) — same edge problem
+Both in RESEARCH_FLAGS, CEO cannot touch. Recommend T set both False and add to NEVER_REENABLE_FLAGS.
+
+### What's Working
+- CONF_FILTER_MAX=89 (raised from 85 Aug 24) — 90+ tier recovered to profitable without ct-hot+
+- bb_bounce+ emerging winner (15T/7d +$0.98, 86.7% WR)
+- hl_copy_trader LONG backbone (62T/7d +$2.30, 53.2% WR)
+- tl_break_short best SHORT (14T/7d +$0.11, 71.4% WR)
+- ATR_SL SL floor fix working (losses near zero)
+
+### Recommendations
+1. **DISABLE ct-hot base + SHORT** (RESEARCH_FLAGS — T must do this)
+2. Monitor bb_bounce+ WR (>70% threshold)
+3. Monitor disk (84%, threshold 85%)
+4. Monitor CONF_FILTER_MAX=89 eval (through Aug 26)
+
+### Verification
+- All numbers verified via direct DB query
+- Pipeline active, 4 open positions, 0 errors
+- Timers firing normally
+
+---
+
 ## CEO Report — 2026-08-24 ~16:00 UTC (Acknowledgment)
 
 ### Signal Reporter Action: ct-hot+ LONG Killed

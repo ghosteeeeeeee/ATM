@@ -314,6 +314,43 @@ def _check_multi_alt_divergence(btc_closes: list) -> Tuple[bool, int, list]:
     return is_weak, len(weak_alts), weak_alts
 
 
+# ── Layer 7: BTC 30m Momentum Filter ───────────────────────────────────────
+
+def _check_btc_momentum() -> Tuple[bool, str, float]:
+    """Check BTC 30m momentum to block entries during rapid regime shifts.
+
+    When BTC 30m momentum is rising fast, SHORT entries get destroyed by V-reversals.
+    When BTC 30m momentum is falling fast, LONG entries get destroyed by cascades.
+
+    Returns: (should_block, direction_blocked, momentum_pct)
+    """
+    from hermes_constants import (
+        BTC_MOMENTUM_FILTER_ENABLED,
+        BTC_MOMENTUM_WINDOW,
+        BTC_MOMENTUM_RISING_THRESHOLD,
+        BTC_MOMENTUM_FALLING_THRESHOLD,
+    )
+
+    if not BTC_MOMENTUM_FILTER_ENABLED:
+        return False, '', 0.0
+
+    # Fetch 1m BTC candles — need enough for 30m window
+    btc_candles = _get_candles('BTC', '1m', BTC_MOMENTUM_WINDOW + 5)
+    if len(btc_candles) < BTC_MOMENTUM_WINDOW:
+        return False, '', 0.0
+
+    closes = [c[4] for c in btc_candles]
+    # Momentum = % change over the window
+    momentum_pct = (closes[-1] - closes[-BTC_MOMENTUM_WINDOW]) / closes[-BTC_MOMENTUM_WINDOW] * 100
+
+    if momentum_pct > BTC_MOMENTUM_RISING_THRESHOLD:
+        return True, 'SHORT', momentum_pct
+    elif momentum_pct < BTC_MOMENTUM_FALLING_THRESHOLD:
+        return True, 'LONG', momentum_pct
+
+    return False, '', momentum_pct
+
+
 # ── Main Crash Check ─────────────────────────────────────────────────────────
 
 def check_crash() -> CrashSignal:
@@ -401,6 +438,13 @@ def check_crash() -> CrashSignal:
         signal.raw['weak_alt_count'] = weak_count
         signal.raw['weak_alts'] = weak_alts
 
+    # Layer 7: BTC 30m Momentum Filter (regime-transition detection)
+    momentum_blocked, momentum_dir, momentum_pct = _check_btc_momentum()
+    signal.raw['btc_30m_momentum'] = momentum_pct
+    if momentum_blocked:
+        triggered_layers.append('MOMENTUM')
+        signal.raw['momentum_dir'] = momentum_dir
+
     # ── Severity Assessment ──────────────────────────────────────────────
     # EMERGENCY: Price crash + volume spike + contagion = confirmed cascade
     # CRITICAL:  Price crash + any 1 other layer
@@ -461,6 +505,27 @@ def check_crash() -> CrashSignal:
                 signal.block_duration_sec = multi_alt_block_sec
                 signal.layer = '+'.join(triggered_layers)
                 signal.reason += f' | MULTI_ALT: {weak_count} weak alts'
+
+    # ── MOMENTUM independent block (Layer 7) ──────────────────────────────
+    # BTC 30m momentum blocks entries in ONE direction only.
+    # Rising momentum → block SHORT; falling momentum → block LONG.
+    # Independent of other layers — applies its own block duration.
+    if momentum_blocked:
+        from hermes_constants import BTC_MOMENTUM_BLOCK_DURATION_MIN
+        momentum_block_sec = BTC_MOMENTUM_BLOCK_DURATION_MIN * 60  # 10 min
+
+        if not signal.blocked:
+            signal.blocked = True
+            signal.severity = 'WARNING'
+            signal.layer = 'MOMENTUM'
+            signal.block_duration_sec = momentum_block_sec
+            signal.reason = (f'BTC 30m momentum {momentum_pct:+.2f}% — '
+                           f'blocking {momentum_dir} entries')
+        else:
+            if momentum_block_sec > signal.block_duration_sec:
+                signal.block_duration_sec = momentum_block_sec
+                signal.layer = '+'.join(triggered_layers)
+                signal.reason += f' | MOMENTUM: {momentum_pct:+.2f}% ({momentum_dir} blocked)'
 
     if signal.blocked:
         signal.block_until = time.time() + signal.block_duration_sec

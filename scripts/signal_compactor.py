@@ -773,7 +773,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         if long_losses >= DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD:
             dir_outcome_mult = min(dir_outcome_mult, DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY)
 
-    # Direction Lock: after catastrophic loss (4+/5), suppress for N minutes
+    # Direction Lock: after severe loss (3+/5), suppress for N minutes
     # Overrides all other weather vane logic — no unsuppression during lock
     if _is_direction_locked(direction):
         dir_outcome_mult = 0.0

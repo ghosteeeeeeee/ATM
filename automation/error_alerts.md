@@ -441,3 +441,10 @@ ALERTS:
 - [WARN] 6 failed services (non-critical: better-coder, git-release, wasp, trading-checklist, mtf-macd-tuner, bug-hunter)
 - [WARN] signal_compactor 4 transient errors at 15:28-15:46 (self-recovered)
 ```
+
+## Error Alerts — 2026-08-24 17:20 UTC
+- **[WARN]**: Disk at 84% — approaching 85% threshold. data/ dir is 4.5G.
+- **[WARN]**: hermes-hl-copy.timer stuck 1+ week → AUTO-FIX: restarted timer
+- **[WARN]**: hermes-ma-cross-5m-tuner.timer enabled but never fired
+- **[WARN]**: hermes-zscore-momentum-tuner.timer enabled but never fired
+- **AUTO-FIX**: Compressed/truncated old logs (freed ~127M)

@@ -736,20 +736,19 @@ DIRECTIONAL_OUTCOME_RECOVERY_WR = 45      # hysteresis: WR% required to deactiva
 # Higher velocity = faster deterioration = stronger penalty.
 DIRECTIONAL_OUTCOME_VELOCITY_ENABLED = True
 DIRECTIONAL_OUTCOME_VELOCITY_TIERS = {
-    0.8: 0.0,   # catastrophic (4+/5 losses) → hard block
-    0.6: 0.5,   # severe (3/5) → strong penalty
-    0.4: 0.7,   # moderate (2/5) → mild penalty (matches DIRECTIONAL_OUTCOME_PENALTY)
+    0.6: 0.0,   # severe (3+/5 losses) → hard block (upgraded from 0.5x penalty — regime-transition-analysis-2026-08-24)
+    0.4: 0.5,   # moderate (2/5) → strong penalty (upgraded from 0.7x)
 }
 # Integral: long-window catch for slow bleeds that don't hit short-window threshold.
 DIRECTIONAL_OUTCOME_INTEGRAL_ENABLED = True
 DIRECTIONAL_OUTCOME_INTEGRAL_WINDOW = 240     # minutes (4 hours)
 DIRECTIONAL_OUTCOME_INTEGRAL_THRESHOLD = 5    # losses in long window to trigger
 DIRECTIONAL_OUTCOME_INTEGRAL_PENALTY = 0.8    # milder than short-window penalty
-# Direction Lock: after catastrophic loss (4+/5), lock direction for N minutes.
+# Direction Lock: after severe loss (3+/5), lock direction for N minutes.
 # Prevents re-entry during clear bad streaks — no unsuppression during lock.
 DIRECTIONAL_OUTCOME_LOCK_ENABLED = True
-DIRECTIONAL_OUTCOME_LOCK_MINUTES = 30         # lock duration after catastrophic failure
-DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.8       # loss_velocity threshold for lock activation
+DIRECTIONAL_OUTCOME_LOCK_MINUTES = 30         # lock duration after severe failure
+DIRECTIONAL_OUTCOME_LOCK_VELOCITY = 0.6       # loss_velocity threshold for lock activation (matches 0.6 tier)
 
 # ── Position Shield (Weather Vane Component 2) ─────────────────────────────
 # Tighten trailing stops on counter-regime LOSING positions when Weather Vane fires.
@@ -831,6 +830,16 @@ MULTI_ALT_DIVERGENCE_THRESHOLD = -0.3  # % — alt must underperform BTC by this
 MULTI_ALT_MIN_WEAK_ALTS = 3           # number of weak alts to trigger signal
 MULTI_ALT_BLOCK_DURATION_MIN = 10     # minutes to block LONG entries after trigger
 MULTI_ALT_REFERENCE_ALTS = ['ETH', 'SOL', 'XRP', 'DOGE', 'AVAX', 'DOT', 'LINK', 'UNI']
+
+# Layer 7: BTC 30m Momentum Filter (regime-transition-analysis-2026-08-24)
+# Blocks entries when BTC 30m momentum is rising (SHORT) or falling (LONG).
+# Catches V-reversals that TIDE (3h window) misses entirely.
+# Would have prevented 3/6 losing SHORT entries in Aug 24 incident.
+BTC_MOMENTUM_FILTER_ENABLED = True
+BTC_MOMENTUM_WINDOW = 30                    # minutes — momentum lookback
+BTC_MOMENTUM_RISING_THRESHOLD = 0.15        # % — block SHORT if BTC 30m momentum > this
+BTC_MOMENTUM_FALLING_THRESHOLD = -0.15      # % — block LONG if BTC 30m momentum < this
+BTC_MOMENTUM_BLOCK_DURATION_MIN = 10        # minutes to block entries after trigger
 
 # ── Volatility Floor Filter ───────────────────────────────────────────────────
 # Block low-volatility entries — no energy = no trade.
