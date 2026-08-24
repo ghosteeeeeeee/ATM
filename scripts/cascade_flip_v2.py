@@ -566,6 +566,22 @@ def cascade_flip_v2(
     if ok and ok.get('success'):
         print(f"  [CFV2] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
 
+        # ── 2a. Write guardian marker — prevent guardian from closing as orphan ──
+        try:
+            import time as _time
+            _marker_path = os.path.join(os.environ.get('HERMES_DATA', '/root/.hermes/data'),
+                                         'guardian_recently_opened.json')
+            _marker = {}
+            if os.path.exists(_marker_path):
+                with open(_marker_path) as f:
+                    _marker = json.load(f)
+            _marker[token.upper()] = _time.time()
+            os.makedirs(os.path.dirname(_marker_path), exist_ok=True)
+            with open(_marker_path, 'w') as f:
+                json.dump(_marker, f)
+        except Exception:
+            pass  # Best-effort — guardian may still close, but we tried
+
         # ── 2a. Record cascade entry ─────────────────────────────────────────
         try:
             import psycopg2

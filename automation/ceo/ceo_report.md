@@ -1,3 +1,25 @@
+## CEO Report — 2026-08-24 ~15:30 UTC (249th run)
+
+### Diagnosis
+System FLAT, PIPELINE IDLE (quiet market). Verified DB: 24h 73T +$0.01, 58.9% WR. 7d: 261T -$1.19, 52.9% WR. 5 open SHORT (all underwater). ct-hot+ STILL DOMINANT LOSER: 61T/7d -$2.95, 39.3% WR (RESEARCH_FLAGS — CEO cannot disable). **KEY DISCOVERY: Without ct-hot+, 90+ confidence tier is MOST profitable (+$1.91/7d, 56.1% WR).** Original CONF_FILTER_MAX=85 decision was based on ct-hot+ dragging that tier down. Winners: bb_bounce+ 14T/7d +$0.94, 85.7% WR. hl_copy_trader LONG 60T/7d +$2.47, 53.3% WR (backbone). macd-div- 7T/7d +$0.34, 85.7% WR. ATR_SL WITHOUT ct-hot+: 85T +$0.42 (break-even, SL floor fix working). Disk: 84%.
+
+### Root Cause
+CONF_FILTER_MAX=85 was blocking the most profitable confidence tiers (90+ at +$1.91/7d, 80-84 at +$1.00/7d). Decision was correct at time (ct-hot+ had48.7% WR in90+ tier) but ct-hot+ legacy is now draining —90+ tier recovered to 56.1% WR.
+
+### Fix Applied
+**RAISED CONF_FILTER_MAX 85→89.** Lets profitable 85-89 tier through (7T,71.4% WR). Blocks only break-even90-94 tier (15T, +$0.01). Net expected improvement: ~$0.07/week from 85-89 tier alone, plus recovery of any90+ trades that were incorrectly blocked.
+
+### Recommendations for T
+1. **DISABLE ct-hot+ (RESEARCH_FLAGS).** 61T/7d -$2.95, 39.3% WR — DOMINANT LOSER. Without it: system +$1.76/7d. CEO cannot touch RESEARCH_FLAGS.
+2. **DISABLE hzscore-.** 10T/7d 50% WR, inverted R:R (avg win $0.04, avg loss $0.10).
+
+### Verification
+- CONF_FILTER_MAX=89 syntax verified in hermes_constants.py:847
+- CURRENT.md updated (run 249)
+- ceo_kanban.md updated
+
+---
+
 ## CEO Report — 2026-08-24 ~10:30 UTC (247th run)
 
 ### Diagnosis

@@ -339,6 +339,22 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
     if ok and ok.get('success'):
         print(f"  [CASCADE FLIP] ✅ {token} {opposite_dir} entered @ ${current_price:.6f}")
 
+        # ── 2a. Write guardian marker — prevent guardian from closing as orphan ──
+        try:
+            import time as _time
+            _marker_path = os.path.join(os.environ.get('HERMES_DATA', '/root/.hermes/data'),
+                                         'guardian_recently_opened.json')
+            _marker = {}
+            if os.path.exists(_marker_path):
+                with open(_marker_path) as f:
+                    _marker = json.load(f)
+            _marker[token.upper()] = _time.time()
+            os.makedirs(os.path.dirname(_marker_path), exist_ok=True)
+            with open(_marker_path, 'w') as f:
+                json.dump(_marker, f)
+        except Exception:
+            pass
+
         # ── 2a. Record cascade entry ─────────────────────────────────────────
         try:
             conn_seq = _get_db_connection()

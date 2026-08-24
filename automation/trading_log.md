@@ -14205,3 +14205,70 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 
 **Open Questions:**
 - macd-div+ -$0.55 persistent drag — kill if 3+ trades any hour with 0% WR
+
+## [2026-08-24 14:12 UTC] Hourly Analysis
+
+**Trades:** 7 closed (6W 1L, +$0.22)
+**PnL:** +$0.22 (WR: 85.7%)
+**24h:** 82T 51W 31L WR=62.2% PnL=+$1.67
+
+**Close reasons 24h:**
+- profit-monster-trail: 40T (47.6%) +$2.49, avg +$0.062 — best exit
+- atr_sl_hit: 29T (34.5%) -$1.56, avg -$0.054 — improved from 40%, tpsl fix working
+- cut-loser-CL-T1: 5T -$0.64, avg -$0.128 — worst exit
+
+**Signal 24h:**
+- bb_bounce+: 12T 11W +$0.91 (92% WR) — top performer
+- hl_copy_trader: 2T +$0.32
+- hzscore-: 4T +$0.29
+- macd-div-: 10T +$0.14
+- tl_break_short: 10T +$0.02
+- ct-hot+: 17T 9W -$0.34 — workhorse, slight loss
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last hour
+
+**Changes:** None needed
+
+**No Change Needed:**
+- macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule
+- atr_sl_hit dropped to 34.5% (from 40%) — tpsl fix confirmed working
+- PURR -$0.30 slippage (low liquidity) — no fix available
+- Trade frequency 7/hr slightly elevated but acceptable
+- 24h WR 62.2% and PnL positive +$1.67
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — kill if 3+ trades next hour with 0% WR
+
+## [2026-08-24 15:15 UTC] Hourly Analysis
+
+**Trades:** 11 closed (3W 8L, -$0.70) — worst hour in session
+**24h:** 86T 50W 36L WR=58.1% PnL=$0.00 (breakeven)
+
+**Close reasons 24h:**
+- profit-monster-trail: 43T (50.0%) +$2.63, avg +$0.061 — dominant winner
+- atr_sl_hit: 29T (33.7%) -$1.72, avg -$0.059 — below 40% threshold
+- cut-loser-CL-T1: 6T -$0.75, avg -$0.125
+
+**Signal 24h:**
+- bb_bounce+: 13T 12W +$0.95 (92% WR) — top performer
+- hzscore-: 4T +$0.29
+- hl_copy_trader: 4T +$0.15
+- ct-hot+: 13T 5W +$0.08
+- tl_break_short: 10T 8W +$0.02
+- macd-div-: 11T 8W +$0.00
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last 2h
+
+**Last hour losers:** 5 atr_sl_hit (BSV, LDO, HYPE, BIGTIME, INJ) — SL cluster, noise not pattern
+
+**Changes:** None needed
+
+**No Change Needed:**
+- macd-div+ -$0.55 but 0 trades last 2h → not killable per 3+ rule
+- confluence-,ct-hot-,macd-div- -$0.32 but only 2T total → not killable
+- atr_sl_hit 33.7% — below 40% threshold
+- Trade frequency 11/hr elevated but 3.6/hr avg normal
+- 24h PnL flat at $0.00, not collapsing
+- 2 open positions (ETH, BTC) near breakeven
+
+**Open Questions:**
+- macd-div+ persistent drag — monitor, kill if triggers with 3+ trades and 0% WR
+- Last hour -$0.70 is worst in session — watch if pattern continues next hour

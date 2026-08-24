@@ -151,3 +151,11 @@
   WHY: 3T last hour (2W 1L -$0.10). bb_bounce+ +$0.03, macd-div- -$0.13 (1W 1L). 75T 24h 60% WR +$0.45 net. atr_sl_hit 30T (40.0%) exactly at threshold, avg loss -$0.027 — tpsl fix confirmed working. profit-monster-trail 34T +$1.97 best exit. macd-div+ -$0.55 persistent but 0 trades last 6h, not killable per 3+ rule. 0 open positions — fully flat. Trade freq 3/hr normal. No kill criteria. System stable, 24h WR 60% and PnL positive.
   BY: auto_1hr
   NEXT: Re-run at 14:12 UTC
+[2026-08-24 14:12 UTC] auto_1hr: NO CHANGES
+  WHY: 7T last hour (6W 1L +$0.22). Best session hour — 85.7% WR. profit-monster-trail 5 winners (SEI, BANANA, JUP, ENA, LDO). PURR -$0.30 slippage (low liq). 82T 24h 62.2% WR +$1.67 net (improved from +$0.45). atr_sl_hit dropped to 34.5% (from 40%) — tpsl fix confirmed working. profit-monster-trail 40T +$2.49 best exit. macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. 0 open positions — fully flat. Trade freq 7/hr slightly elevated but acceptable. No kill criteria — no signal with 0% WR and 3+ trades last hour. System stable, 24h trend strong and improving.
+  BY: auto_1hr
+  NEXT: Re-run at 15:12 UTC
+[2026-08-24 15:15 UTC] auto_1hr: NO CHANGES
+  WHY: 11T last hour (3W 8L -$0.70) — worst hour in session. 5 atr_sl_hit losses cluster (BSV, LDO, HYPE, BIGTIME, INJ). But 24h flat ($0.00) with 86T 58.1% WR. profit-monster-trail +$2.63 carrying system. macd-div+ -$0.55 persistent but 0 trades last 2h, not killable per 3+ rule. confluence-,ct-hot-,macd-div- -$0.32 only 2T, not killable. atr_sl_hit 33.7% below threshold. 2 open (ETH, BTC) breakeven. Trade freq 3.6/hr avg normal. No kill criteria met. System range-bound.
+  BY: auto_1hr
+  NEXT: Re-run at 16:15 UTC
