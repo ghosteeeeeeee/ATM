@@ -24,7 +24,6 @@ from paths import HERMES_DATA
 
 from hermes_constants import (
     R2_TREND_LONG_ENABLED,
-    R2_TREND_LONG_MIN_SLOPE,
     R2_TREND_LONG_MIN_SLOPE_PCT,
     R2_TREND_LONG_MIN_R2,
     R2_TREND_LONG_MAX_RSI,

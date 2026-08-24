@@ -25,7 +25,7 @@ from paths import HERMES_DATA, CANDLES_DB
 from hermes_constants import (
     R2_TREND_ENABLED,
     R2_TREND_SHORT_ENABLED,
-    R2_TREND_SHORT_MIN_SLOPE,
+    R2_TREND_SHORT_MIN_SLOPE_PCT,
     R2_TREND_SHORT_MIN_R2,
     R2_TREND_SHORT_MIN_RSI,
     R2_TREND_SHORT_MIN_SPEED,
@@ -92,7 +92,9 @@ def detect_r2_short(token, candles, price):
     slope, intercept, r2 = _ols_params(y)
 
     # SHORT conditions: slope < -MIN_SLOPE (meaningful downtrend), price below line, R² strong enough
-    if r2 < R2_TREND_SHORT_MIN_R2 or slope >= -abs(R2_TREND_SHORT_MIN_SLOPE) or closes[-1] >= intercept:
+    # Slope normalized by price — absolute threshold biased toward mid-priced tokens
+    slope_pct = slope / closes[-1] if closes[-1] > 0 else 0
+    if r2 < R2_TREND_SHORT_MIN_R2 or slope_pct >= -R2_TREND_SHORT_MIN_SLOPE_PCT or closes[-1] >= intercept:
         return None
 
     # ── Gap300 filter — don't SHORT when price too far below EMA300 ─────
