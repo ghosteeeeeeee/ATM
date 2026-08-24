@@ -1,5 +1,39 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-24 10:05 UTC] Hourly Analysis
+
+**Trades:** 6 closed last hour (3W 3L -$0.01)
+**PnL:** -$0.01 (WR: 50.0%)
+**24h:** 70T 38W 54.3% +$0.64 (net positive, improving)
+
+**24h Close Reasons:**
+- profit-monster-trail: 28T +$1.68 avg+$0.060 — dominant profitable exit
+- atr_sl_hit: 32T +$0.15 avg+$0.005 — >40% but PnL positive, tpsl fix confirmed
+- cut-loser-CL-T1: 4T -$0.49 avg-$0.123 — minor drag
+- cut-loser-MAE-GUARD: 1T $0.00 — disabled, isolated fire
+- hard_sl: 1T $0.00 — guardian safety net
+- cascade_flip: 3T -$0.05 — minor
+
+**Signal Performance 24h:**
+- bb_bounce+: strong performer, new star
+- tl_break_short: consistent wins
+- ct-hot+: solid
+- confluence- combos: small, mixed
+
+**Changes:** None
+**No Change Needed:**
+- 6T last hour — normal frequency
+- atr_sl_hit 51% >40% threshold BUT PnL positive +$0.15 — tpsl fix confirmed working
+- profit-monster-trail 28T +$1.68 dominant and profitable
+- No signal crosses kill criteria (3+T/0%WR)
+- Trade frequency normal ~3.5/hr
+- 2 open positions (ETH SHORT, BTC SHORT) flat, riding with trail SL
+- 24h 54.3% WR +$0.64 — system healthy and improving
+
+**Open Questions:** None
+
+---
+
 ## [2026-08-24 07:05 UTC] Hourly Analysis
 
 **Trades:** 4 closed last hour (3W 1L +$0.04)

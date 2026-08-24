@@ -1,3 +1,7 @@
+[2026-08-24 10:05 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (3W 3L -$0.01 flat). 24h 70T 38W 54.3% +$0.64 net positive improving. atr_sl_hit 32T 51% >40% threshold but PnL positive +$0.15, tpsl fix confirmed. profit-monster-trail 28T +$1.68 dominant profitable. bb_bounce+ strong. No kill criteria — no signal with 0% WR and 3+ trades last hour. 2 open (ETH/BTC SHORT) flat riding trail SL. Trade freq 3/hr normal. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 11:05 UTC
 [2026-08-24 07:05 UTC] auto_1hr: NO CHANGES
   WHY: 4T last hour (3W 1L +$0.04). 24h 61T 31W 50.8% +$0.46 net positive. atr_sl_hit recovered to +$0.23 (was -$0.36 at 02:04, back positive). profit-monster-trail 18T +$1.01 dominant profitable. bb_bounce+ 6T 83%WR +$0.53 strong. tl_break_short 9T 89%WR +$0.21 strong. 3 open SHORTs (BTC -$2.26, ETH -$7.84, CAKE -$1.44) all $11.10 riding. No kill criteria. System stable.
   BY: auto_1hr
