@@ -48,7 +48,7 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',  # 58.8% WR all-time
-        'tl_break',
+        'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'trend_momentum_near_sma',
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
@@ -70,7 +70,7 @@ REGIME_SIGNALS = {
         # Breakout works in big moves
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
-        'tl_break',
+        'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'accel-300-vel',
         'continuation', 'continuation+',  # re-entry after close
         'hzscore', 'range_finder',  # individual parts
@@ -96,6 +96,7 @@ REGIME_SIGNALS = {
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in EXTREME
+        'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks — structural
     },
 }
 
