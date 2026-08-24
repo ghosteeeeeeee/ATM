@@ -1788,7 +1788,7 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 # hl_copy_signal.py — Generates signals from pro trader activity
 HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
 HL_COPY_SIGNAL_PLUS_ENABLED = True     # hl_copy_signal+ LONG
-HL_COPY_SIGNAL_MINUS_ENABLED = False   # hl_copy_signal- SHORT — net negative (36% WR, -$0.17)
+HL_COPY_SIGNAL_MINUS_ENABLED = True    # hl_copy_signal- SHORT — enabled (24/7 live, cluster filter protects)
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal

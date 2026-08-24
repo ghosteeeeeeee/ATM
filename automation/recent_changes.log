@@ -99,3 +99,7 @@
   WHY: 7T 43% WR -$0.21/24h, avg loser 2x avg winner ($0.085 vs $0.040). Persistent drag, no improvement trend. Signal starvation not a concern at 55T/24h. Disabled HZSCORE_MINUS_ENABLED = False in hermes_constants.py.
   BY: auto_1hr
   NEXT: Re-run at 22:05 UTC
+[2026-08-24 00:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour, quiet period. 49T 24h 41% WR -$0.46 net. hl_copy_trader +$0.49 best. ct-hot+ +$0.31 solid. macd-div+ -$0.55 killed signal closing. ct-hot- 2T 0W at threshold. cut-loser-MAE-GUARD -$0.53 underperforming. 4 open positions green/mixed. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 01:05 UTC

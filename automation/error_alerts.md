@@ -322,3 +322,7 @@ ALERTS:
 - **REPEATED** (10x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] BSVUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=BSVUSDT&interval=15m&limit=N`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] BSVUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=BSVUSDT&interval=4h&limit=N`
 - **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] BSVUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=BSVUSDT&interval=1h&limit=N`
+
+## Error Alerts — 2026-08-24 01:03 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS TOK breakout_engine: timed out`

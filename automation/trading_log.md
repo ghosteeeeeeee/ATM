@@ -13761,3 +13761,23 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - BSV/NXPC hzscore- opens from before kill — will close via SL naturally
 - 24h -$0.45, should trend positive now that drag signals are killed
+
+## [2026-08-24 00:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**24h:** 49T 41% WR net -$0.46
+
+**No Change Needed:**
+- 0 trades last hour — quiet period, no action needed
+- hl_copy_trader +$0.49 best 24h signal, 50% WR
+- ct-hot+ +$0.31 solid, 48% WR
+- macd-div+ -$0.55 drag — killed earlier, old trades closing
+- ct-hot- 2T 0W at kill threshold, needs 3+ to kill
+- cut-loser-MAE-GUARD 4T -$0.53 underperforming exits
+- atr_sl_hit 32T dominant and profitable
+- 4 open positions: NXPC/BSV (hzscore- closing naturally), GMT/BTC (ct-hot+)
+- Trade frequency normal, system stable
+
+**Open Questions:**
+- ct-hot- one more loss triggers kill — monitor next hour
+- 24h net slightly negative, should improve as killed signals age out
