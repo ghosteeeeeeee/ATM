@@ -2005,7 +2005,7 @@ SIGNAL_CONFLUENCE_WINDOW_MINUTES       = 30     # rolling lookback window
 SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN = 0.03  # 3% — price move against kills the signal
 SIGNAL_CONFLUENCE_MIN_COMPOUND         = 2      # min unique sources to fire
 SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD = 45     # min score to fire
-SIGNAL_CONFLUENCE_COMPOUND_WEIGHT      = 20     # points per unique source (must be ≥ (FLOOR-survived-recency)/MIN_COMPOUND to pass add_signal floor)
+SIGNAL_CONFLUENCE_COMPOUND_WEIGHT      = 30     # points per unique source (2 sources = 75 conf, 3+ = 88 capped)
 SIGNAL_CONFLUENCE_SURVIVED_BONUS       = 10     # points if earliest signal survived
 SIGNAL_CONFLUENCE_RECENCY_BONUS        = 5      # points if most recent signal < 10 min old
 SIGNAL_CONFLUENCE_COOLDOWN_HOURS       = 1      # per-token+direction cooldown after fire
