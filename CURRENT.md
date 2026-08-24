@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-24 ~06:30 UTC (daily orchestrator)**
-**Updated by: daily-orchestrator**
+**Last Updated: 2026-08-24 ~09:05 UTC (CEO run 246)**
+**Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ ENTIRE FAMILY KILLED (CEO Aug 22, signal_reporter implemented).** ALL 3 flags False + NEVER_REENABLE_FLAGS. 62T/7d 32.3% WR -$4.04. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`). **CONF_FILTER_MAX lowered 89→85 (CEO Aug 23)** — blocks overconfident trades (90+ tier worst WR 48.7%). **hzscore- KILLED (auto_1hr Aug 23 21:05 + signal_reporter, NEVER_REENABLE).**
 
-**Current status:** System HEALTHY. Health monitor 06:22 UTC: 5 open, 20 closed today, +$1.16 (85% WR). Pipeline 06:27 UTC: 5 open, 58 closed today, +36% PnL. 24h net improved from -$0.32 to +$0.47 (auto-1hr). CONF_FILTER_MAX=85 working. Winners: bb_bounce+ (80% WR, +$0.32), tl_break_short (83% WR, +$0.11). ct-hot+ trades aging out Aug 24-25. signal_compactor tracebacks were transient DB lock contention (self-healed). Disk: 83% (2% from warning). Pipeline: 0 errors, all timers active.
+**Current status:** System HEALTHY and IMPROVING. CEO run 246 (09:05 UTC): 24h 67T +$0.99, 58.2% WR. **Today Aug 24: 34T +$1.37, 79.4% WR — BEST day this week.** CONF_FILTER_MAX=85 working. Winners: bb_bounce+ (80% WR, +$0.71/7d), tl_break_short (88.9% WR, +$0.21/7d). hl_copy_trader LONG backbone (53.3% WR, +$2.47/7d). ct-hot+ legacy draining (38.3% WR, -$3.05/7d, age-out Aug 24-25). signal_compactor tracebacks transient DB lock contention. Disk: 83%. Pipeline: 0 errors, all timers active.
 
 ## Active Decisions
 
