@@ -20,7 +20,6 @@ Output: /var/www/hermes/data/liquidation_map.json (for dashboard)
 
 import json
 import os
-import sys
 import time
 from collections import defaultdict
 from pathlib import Path

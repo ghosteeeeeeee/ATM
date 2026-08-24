@@ -8,7 +8,6 @@ import json
 import os
 import time
 import subprocess
-import re
 from datetime import datetime
 from pathlib import Path
 from hl_copy_db import get_db
