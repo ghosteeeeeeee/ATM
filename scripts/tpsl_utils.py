@@ -536,10 +536,11 @@ def compute_atr_sl_tp(
                 trail_floor = round(highest_price * (1 - _trail_dist), 8)
                 # Ensure SL is at least ATR_SL_MIN from entry (initial SL level)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
-                # When trail_floor > entry (low ATR token, trail too wide), use ATR from highest
-                # This ensures SL trails the peak even for low-ATR tokens
+                # When trail_floor > entry (low ATR token), use tighter of trail_dist and ATR_SL_MIN
+                # This ensures SL trails at trail_dist when it's tighter than ATR_SL_MIN
                 if trail_floor >= entry_f:
-                    new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
+                    _eff_dist = min(ATR_SL_MIN, _trail_dist)  # use tighter of the two
+                    new_sl = round(highest_price * (1 - _eff_dist), 8)
                 else:
                     new_sl = min(trail_floor, min_from_entry)  # trail from peak, enforce floor
                 # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
@@ -739,9 +740,10 @@ def compute_atr_sl_tp(
             if in_profit:
                 trail_floor = round(highest_price * (1 - _trail_dist), 8)
                 min_from_entry = round(entry_f * (1 - ATR_SL_MIN), 8)
-                # When trail_floor > entry (low ATR token), use ATR from highest
+                # When trail_floor > entry (low ATR token), use tighter of trail_dist and ATR_SL_MIN
                 if trail_floor >= entry_f:
-                    new_sl = round(highest_price * (1 - ATR_SL_MIN), 8)  # ATR floor from highest
+                    _eff_dist = min(ATR_SL_MIN, _trail_dist)  # use tighter of the two
+                    new_sl = round(highest_price * (1 - _eff_dist), 8)
                 else:
                     new_sl = min(trail_floor, min_from_entry)  # trail from peak, enforce floor
                 if current_sl > 0:
