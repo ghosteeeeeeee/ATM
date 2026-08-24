@@ -8,11 +8,11 @@ signal on the follower token.
 Example: ASTER fires → correlation engine says 2Z follows (100% WR, 1.8x lift)
 → chain_fire fires on 2Z.
 """
-import sys, os, sqlite3
+import sys, os, sqlite3, time
 from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, get_cooldown, set_cooldown, price_age_minutes
+from signal_schema import add_signal, price_age_minutes
 from paths import HERMES_DATA, RUNTIME_DB, STATIC_DB
 
 from hermes_constants import (
@@ -80,6 +80,39 @@ def _compute_confidence(chain_conf, lift, n):
 
     raw = base + lift_bonus + sample_bonus + conf_bonus
     return max(65, min(88, raw))
+
+
+def _is_chain_cooling(token, direction):
+    """Check if token+direction is in chain-fire cooldown."""
+    try:
+        from correlation_engine import CORRELATIONS_DB
+        with sqlite3.connect(f"file:{CORRELATIONS_DB}?mode=ro", uri=True, timeout=3) as conn:
+            row = conn.execute(
+                "SELECT value FROM engine_state WHERE key=?",
+                (f"chain_cool:{token.upper()}:{direction}",)
+            ).fetchone()
+            if not row:
+                return False
+            expires = float(row[0])
+            return time.time() < expires
+    except Exception:
+        return False
+
+
+def _set_chain_cooldown(token, direction, hours):
+    """Set chain-fire cooldown for token+direction."""
+    try:
+        from correlation_engine import CORRELATIONS_DB
+        expires = time.time() + hours * 3600
+        with sqlite3.connect(CORRELATIONS_DB) as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO engine_state (key, value, updated_at) VALUES (?, ?, ?)",
+                (f"chain_cool:{token.upper()}:{direction}", str(expires),
+                 datetime.utcnow().isoformat())
+            )
+            conn.commit()
+    except Exception:
+        pass
 
 
 def scan_signals():
@@ -150,8 +183,8 @@ def scan_signals():
             if direction == 'SHORT' and follower in SHORT_BLACKLIST:
                 continue
 
-            # Cooldown
-            if get_cooldown(follower, direction=direction):
+            # Cooldown — use correlation engine's own state table (not loss_cooldown)
+            if _is_chain_cooling(follower, direction):
                 continue
 
             # Price freshness
@@ -198,7 +231,7 @@ def scan_signals():
 
             if sid:
                 added += 1
-                set_cooldown(follower, direction, hours=CHAIN_FIRE_COOLDOWN_HOURS)
+                _set_chain_cooldown(follower, direction, CHAIN_FIRE_COOLDOWN_HOURS)
                 print(f"  [CHAIN-FIRE] {leader_token} → {follower} "
                       f"(lift={lift:.1f}x, wr={wr:.0%}, n={n}, conf={confidence})")
 
