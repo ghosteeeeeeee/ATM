@@ -355,10 +355,11 @@ _EXCHANGE_RATE_FILE = "/var/www/hermes/data/hype_exchange_rate.json"
 
 def _exchange_rate_limit():
     """Block until 10s have passed since last exchange call (HL rate limit: 10s between /exchange calls).
-    Uses FileLock to prevent concurrent processes from racing and all hitting HL at once."""
+    Uses FileLock to prevent concurrent processes from racing and all hitting HL at once.
+    Uses interval=0.1s for fast lock acquisition."""
     from hermes_file_lock import FileLock
     _os.makedirs(_os.path.dirname(_EXCHANGE_RATE_FILE), exist_ok=True)
-    with FileLock('exchange_rate'):
+    with FileLock('exchange_rate', interval=0.1):
         try:
             with open(_EXCHANGE_RATE_FILE) as f:
                 data = json.load(f)
@@ -378,10 +379,11 @@ _INFO_RATE_FILE = "/var/www/hermes/data/hype_info_rate.json"
 def _info_rate_limit():
     """Block until 1s has passed since last /info API call (HL ~10 req/s, 1s gap is safe).
     Uses FileLock to prevent concurrent processes from racing and all hitting HL at once.
+    Uses interval=0.1s for fast lock acquisition (default 60s is too slow for rate limiting).
     """
     from hermes_file_lock import FileLock
     _os.makedirs(_os.path.dirname(_INFO_RATE_FILE), exist_ok=True)
-    with FileLock('info_rate'):
+    with FileLock('info_rate', interval=0.1):
         try:
             with open(_INFO_RATE_FILE) as f:
                 data = json.load(f)
