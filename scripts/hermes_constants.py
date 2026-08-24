@@ -717,7 +717,7 @@ ZSCORE_ACCEL_PENALTY = 0.7           # used if soft penalty mode enabled
 # Backtested: vel>0.1% OR last3_green>=3 → 12% WR (losers), kept → 89% WR.
 # SHORT-only filter — does NOT apply to LONG.
 SHORT_VEL_FILTER_ENABLED = True
-SHORT_VEL_FILTER_VEL_THRESHOLD = 0.1   # % — block SHORT if 5h velocity > this
+SHORT_VEL_FILTER_VEL_THRESHOLD = 0.3   # % — block SHORT if 5h velocity > this (raised from 0.1% — was blocking SHORTs on noise)
 SHORT_VEL_FILTER_GREEN_THRESHOLD = 5   # CEO 2026-08-16 — STARVATION FIX: 3 green candles blocked BCH SHORT (vel=-0.056%, last3g=3). 5 green candles = stronger signal SHORT is counter-trend. Monitor: SHORT WR (should stay ≥50%), daily trades (must ↑).
 
 # ── Weather Vane: Directional Outcome Tracker ─────────────────────────────
