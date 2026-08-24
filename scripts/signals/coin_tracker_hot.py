@@ -33,6 +33,10 @@ from hermes_constants import (
     COIN_TRACKER_HOT_MIN_SPEED_PCT,
     COIN_TRACKER_HOT_MAX_SPEED_PCT,
     COIN_TRACKER_HOT_MIN_ACCEL,
+    COIN_TRACKER_HOT_MIN_ZSCORE_LONG,
+    COIN_TRACKER_HOT_MAX_ZSCORE_SHORT,
+    COIN_TRACKER_HOT_MIN_BB_LONG,
+    COIN_TRACKER_HOT_MAX_BB_SHORT,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -226,6 +230,11 @@ def detect(token, data):
                 return None  # Price extended above mean — overbought
             if bb_position is not None and bb_position > COIN_TRACKER_HOT_MAX_BB_POSITION:
                 return None  # Near upper Bollinger Band — overbought
+            # Extension filter — avoid catching falling knives (added 2026-08-24)
+            if z_score is not None and z_score < COIN_TRACKER_HOT_MIN_ZSCORE_LONG:
+                return None  # Price already extended down — catching falling knife
+            if bb_position is not None and bb_position < COIN_TRACKER_HOT_MIN_BB_LONG:
+                return None  # Price near lower band — catching falling knife
             # Speed filter — avoid chasing extremes (added 2026-08-22)
             if speed_pct is not None:
                 if speed_pct < COIN_TRACKER_HOT_MIN_SPEED_PCT:
@@ -245,6 +254,11 @@ def detect(token, data):
                 return None  # Price extended below mean — oversold
             if bb_position is not None and bb_position < (1 - COIN_TRACKER_HOT_MAX_BB_POSITION):
                 return None  # Near lower Bollinger Band — oversold
+            # Extension filter — avoid shorting oversold (added 2026-08-24)
+            if z_score is not None and z_score < COIN_TRACKER_HOT_MAX_ZSCORE_SHORT:
+                return None  # Price already oversold — don't short
+            if bb_position is not None and bb_position < COIN_TRACKER_HOT_MAX_BB_SHORT:
+                return None  # Price near lower band — don't short
             # Speed filter — avoid chasing extremes (added 2026-08-22)
             if speed_pct is not None:
                 if speed_pct > (100 - COIN_TRACKER_HOT_MIN_SPEED_PCT):

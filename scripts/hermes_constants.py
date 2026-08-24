@@ -1081,7 +1081,7 @@ NEVER_REENABLE_FLAGS = {
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
     # COIN_TRACKER_HOT_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
-    # COIN_TRACKER_HOT_PLUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
+    'COIN_TRACKER_HOT_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-24 — 28.6% WR, -$0.49 (24h), 14T. 0% WR -$0.57 (6h). NEVER_REENABLE.
     # COIN_TRACKER_HOT_MINUS_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
     'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
 }
@@ -1985,7 +1985,7 @@ WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
 COIN_TRACKER_HOT_ENABLED            = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 27.7% WR, -$3.92.
-COIN_TRACKER_HOT_PLUS_ENABLED       = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix.
+COIN_TRACKER_HOT_PLUS_ENABLED       = False   # KILLED 2026-08-24 — 28.6% WR, -$0.49 (24h), 14T. 0% WR -$0.57 (6h).
 COIN_TRACKER_HOT_MINUS_ENABLED      = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
 COIN_TRACKER_HOT_CLUSTER_MIN        = 1.0     # minimum cluster count for direction (lowered from 3.0 — was blocking valid signals). RESEARCH_FLAGS

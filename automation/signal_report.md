@@ -1,39 +1,44 @@
 === Signal Performance Report ===
-Period: 2026-08-24 | Last 6h + 24h
+Period: Last 6h | 24h
+Generated: 2026-08-24 17:10 UTC
 
-## KILLED (executed this run)
-None — all kill candidates already handled:
-- `macd-div+` LONG: CEO killed 2026-08-23 (20% WR, -$0.55)
-- `hzscore-` SHORT: Signal reporter killed 2026-08-23 (40% WR, -$0.35)
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| ct-hot+ | LONG | 28.6% | -$0.49 | 14 | DISABLED COIN_TRACKER_HOT_PLUS_ENABLED, added to NEVER_REENABLE_FLAGS |
 
-## BOOSTED (executed this run)
-None — winners performing well but no confident boost case yet.
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb_bounce+ | LONG | 92.3% | +$0.95 | 13 | WATCH — consistent winner, consider weight increase |
 
-## LOSERS (watch list — 24h)
-| Signal | Dir | Trades | WR | PnL | Status |
-|--------|-----|--------|-----|-----|--------|
-| macd-div+ | LONG | 5 | 20.0% | -$0.55 | DEAD (CEO killed) |
-| hzscore- | SHORT | 5 | 40.0% | +$0.25 | NEVER_REENABLE |
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| confluence-,ct-hot-,macd-div- | SHORT | 0.0% | -$0.32 | 2 | INSUFFICIENT — needs 5+ trades for kill |
+| macd-div+ | LONG | 33.3% | -$0.19 | 3 | INSUFFICIENT — needs 5+ trades for kill |
+| hl_copy_trader | LONG | 50.0% | -$0.17 | 2 | INSUFFICIENT — needs 5+ trades for kill |
+| hl_copy_trader | SHORT | 50.0% | -$0.13 | 2 | INSUFFICIENT — needs 5+ trades for kill |
+| bb-bounce-short,confluence- | SHORT | 50.0% | -$0.11 | 2 | INSUFFICIENT — needs 5+ trades for kill |
+| confluence-,macd-div- | SHORT | 50.0% | -$0.03 | 2 | INSUFFICIENT — needs 5+ trades for kill |
 
-## WINNERS (24h)
-| Signal | Dir | Trades | WR | PnL | Token Spread |
-|--------|-----|--------|-----|-----|-------------|
-| bb_bounce+ | LONG | 9 | 88.9% | +$0.72 | 7/8 tokens green |
-| tl_break_short | SHORT | 9 | 88.9% | +$0.21 | 8/9 tokens green |
-| macd-div- | SHORT | 4 | 100.0% | +$0.32 | — |
-| ct-hot+ | LONG | 20 | 50.0% | +$0.25 | — |
-| hzscore- | SHORT | 5 | 40.0% | +$0.25 | watch (lifetime bad) |
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb_bounce+ | LONG | 92.3% | +$0.95 | 13 | EXCELLENT — 92% WR, consistent |
+| tl_break_short | SHORT | 80.0% | +$0.02 | 10 | GOOD WR, low PnL per trade |
+| macd-div- | SHORT | 75.0% | +$0.02 | 12 | GOOD WR, low PnL per trade |
+| hzscore- | SHORT | 66.7% | +$0.30 | 3 | INSUFFICIENT — needs more trades |
+| bb_bounce+ | LONG | 100.0% | +$0.23 | 4 | EXCELLENT — 100% WR (6h) |
 
-## LIFETIME CONTEXT
-| Signal | Trades | WR | PnL | Note |
-|--------|--------|-----|-----|------|
-| bb_bounce+ | 35 | 65.7% | +$0.93 | Re-enabled 2026-08-05. Solid. |
-| tl_break_short | 107 | 35.5% | +$0.38 | Lifetime WR weak, 24h spike. Watch. |
+ISSUES:
+- ct-hot+ LONG killed: 28.6% WR with 14 trades (24h), 0% WR with 4 trades (6h)
+- No signal inversions detected
+- Multiple signals have insufficient trade count (<5) for kill decisions
 
-## ISSUES
-- No direction inversions detected.
-- `tl_break_short` has 88.9% WR over 24h but only 35.5% lifetime — possible regime-specific. Keep monitoring.
-- All systems nominal. No action required.
-
-## NEXT REVIEW
-In 6 hours. Kill candidates: none pending. Boost candidates: none confident.
+SUMMARY:
+- Total 24h trades: 88
+- Total 24h winners: 51
+- Total 24h PnL: -$0.54
+- Kill executed: ct-hot+ LONG (28.6% WR, -$0.49)
+- Boost candidate: bb_bounce+ LONG (92.3% WR, +$0.95)

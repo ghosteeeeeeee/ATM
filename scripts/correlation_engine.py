@@ -125,12 +125,33 @@ class CorrelationEngine:
                     last_updated TIMESTAMP
                 );
 
+                CREATE TABLE IF NOT EXISTS signal_chains (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    signal_a TEXT NOT NULL,
+                    signal_b TEXT NOT NULL,
+                    window_secs INTEGER DEFAULT 1800,
+                    co_fires INTEGER DEFAULT 0,
+                    b_total INTEGER DEFAULT 0,
+                    b_wins_after_a INTEGER DEFAULT 0,
+                    win_rate REAL DEFAULT 0.0,
+                    lift REAL DEFAULT 0.0,
+                    confidence REAL DEFAULT 0.0,
+                    last_seen TIMESTAMP,
+                    UNIQUE(signal_a, signal_b, window_secs)
+                );
+
                 CREATE TABLE IF NOT EXISTS engine_state (
                     key TEXT PRIMARY KEY,
                     value TEXT,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
+
+            # Add half_life_weight column if missing (migration)
+            try:
+                conn.execute("ALTER TABLE token_chains ADD COLUMN half_life_weight REAL DEFAULT 1.0")
+            except Exception:
+                pass  # column already exists
 
     # -----------------------------------------------------------------------
     # Helpers
@@ -683,6 +704,19 @@ class CorrelationEngine:
             results = [dict(r) for r in as_follower] + [dict(r) for r in as_leader]
             results.sort(key=lambda x: x['confidence'] * x['lift'], reverse=True)
             return results[:k]
+
+    def next_signals(self, fired_signal: str, k: int = 5) -> list:
+        """What signals tend to fire after this signal? (signal co-occurrence)"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT signal_b, co_fires, win_rate, lift, confidence, last_seen
+                FROM signal_chains
+                WHERE signal_a = ? AND co_fires >= ?
+                ORDER BY confidence * lift DESC
+                LIMIT ?
+            """, (fired_signal, MIN_CO_FIRES, k)).fetchall()
+            return [dict(r) for r in rows]
 
     def signal_effectiveness(self, token: str = None, signal: str = None,
                              min_n: int = 3) -> list:

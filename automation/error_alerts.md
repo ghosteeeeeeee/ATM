@@ -386,3 +386,58 @@ ALERTS:
 - **WARN**: `PURRUSDT` Binance 400 errors (repeated) — symbol likely delisted, non-blocking
 - **WARN**: Disk at 84% (threshold 85%) — monitor, compress old logs if needed
 - **INFO**: position_manager crashed 6x between 13:55-13:57 UTC, self-recovered by 14:01 when cascade flip stopped triggering. Bug was latent until next flip attempt.
+
+## Health Report — 2026-08-24 16:20 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-24 16:20 UTC
+
+PIPELINE: OK
+- Status: running (cycle #169404)
+- Signals (1h): 118 generated
+- Signals (30m): 63 generated
+- Hotset: 0 tokens approved (all filtered by macro gate)
+- Errors: 0 in last 30min (4 transient ERRs at 15:28-15:46 self-recovered)
+
+TRADING:
+- Open trades: 0
+- Closed today: 28 total across 13 signal types
+- Best: bb_bounce+ LONG 92.3% WR (13 trades, +1.03 USDT)
+- Worst: hl_copy_trader SHORT 50% WR (-0.81 USDT)
+- Win rate overall: ~65% (weighted)
+
+MARKET:
+- Regime: NEUTRAL (1 long_bias, 3 short_bias, 102 neutral)
+- BTC: $79,488 (range: -0.35% slope)
+- Tide: BEARISH (20% long)
+- Regime detail: STORMY (strong bearish tide, momentum surge)
+
+SPEED:
+- Tokens tracked: 239
+- Hot (momentum >=70): 0
+- Top momentum: kLUNC 60.8, kBONK 55.8, PURR 53.4
+- Market momentum: very low, no tokens above 70
+
+SYSTEM:
+- Timers: 45 active, 1 running (pipeline)
+- Disk: 84% used (19G free of118G)
+- Logs: 187M total, 53M hl-copy.log (largest)
+- Services OK: pipeline, hl-sync-guardian, hl-copy, metrics
+- Services FAILED: better-coder (ModuleNotFoundError), git-release (symlink issue), wasp (exit 1), trading-checklist (exit 2)
+- Price collector: running (last: 16:19, 26s CPU)
+
+SIGNAL COMPACTOR:
+- Status: running, 2.65s avg cycle
+- Hotset: 0 entries (macro gate=FULL, regime=NEUTRAL)
+- Note: 4 transient ERR tracebacks 15:28-15:46, self-recovered
+
+AUTO-FIXES APPLIED:
+- None needed (pipeline healthy, no critical issues)
+
+ALERTS:
+- [WARN] Disk 84% — approaching 85% threshold, monitor
+- [WARN] 0 hotset tokens — market too quiet for entries (all filtered)
+- [WARN] 6 failed services (non-critical: better-coder, git-release, wasp, trading-checklist, mtf-macd-tuner, bug-hunter)
+- [WARN] signal_compactor 4 transient errors at 15:28-15:46 (self-recovered)
+```
