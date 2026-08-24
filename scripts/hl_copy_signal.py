@@ -261,6 +261,12 @@ def run_hl_copy_signal():
             print(f"[hl_signal] SKIP {trade['coin']} — already has open position")
             continue
 
+        # Skip invalid coin names — @ = wallet index, xyz: = synthetic instrument
+        # These are not tradeable on HL and get filtered by compactor anyway
+        coin = trade['coin']
+        if coin.startswith('@') or coin.startswith('xyz:') or ':' in coin:
+            continue
+
         # Cluster filter: require minimum number of traders agreeing
         cluster_size = trade.get('cluster_size', 1)
         if cluster_size < HL_COPY_CLUSTER_MIN_SIZE:
