@@ -1792,7 +1792,7 @@ HL_COPY_SIGNAL_MINUS_ENABLED = True    # hl_copy_signal- SHORT — enabled (24/7
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
-HL_COPY_SIGNAL_LOOKBACK_MINUTES = 5 # How far back to look for trades
+HL_COPY_SIGNAL_LOOKBACK_MINUTES = 30 # How far back to look for trades (30min catches more clusters)
 HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 
 # ── Copy Trader Cluster Bonus ────────────────────────────────────────────────
