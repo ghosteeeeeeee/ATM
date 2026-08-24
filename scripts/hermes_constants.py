@@ -246,7 +246,6 @@ FAVORITES = {
     'FIL',
     'GMT',
     'LDO',
-    'ME',
     'NXPC',
     'SYRUP',
     'ZRO'
