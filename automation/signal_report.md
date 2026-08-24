@@ -1,76 +1,40 @@
-# Signal Performance Report
-**Generated:** 2026-08-24 05:02 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-08-24 | Period: 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 1,320 | **WR:** 48.3% | **PnL:** -49.76%
-- **Date range:** 2026-07-29 → 2026-08-24
+## KILLED (executed): None
+No signals met strict kill thresholds (WR<30%, 5+ trades, PnL<-$0.10, 24h active).
 
----
+## DEAD (already killed, residual trades in window):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| macd-div+ | LONG | 20.0% | -$0.55 | 5 | KILLED 2026-08-23 (pre-kill trades) |
+| hzscore- | SHORT | 28.6% | -$0.04 | 7 | KILLED + NEVER_REENABLE (pre-kill trades) |
 
-## WINNERS (WR > 55%, PnL > 0)
+## BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb_bounce+ | LONG | 80.0% | +$0.32 | 5 | Weight 1.35 — maintained |
+| tl_break_short | SHORT | 83.3% | +$0.11 | 6 | Weight 1.2 — maintained |
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb_bounce+ | LONG | 5 | 80.0% | +2.82 | 5 | 80.0% | +2.82 | ENABLED |
-| tl_break_short | SHORT | 6 | 83.3% | +1.11 | 6 | 83.3% | +1.11 | ENABLED |
+## WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb_bounce+ | LONG | 80.0% | +$0.32 | 5 | Strong, weight already boosted |
+| tl_break_short | SHORT | 83.3% | +$0.11 | 6 | Strong, weight already boosted |
+| ct-hot+ | LONG | 48.0% | +$0.23 | 25 | Profitable, high volume, weight 1.0 |
 
----
+## WATCH LIST (no kill yet):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| ct-hot- | SHORT | 0.0% | -$0.15 | 2 | Low volume, monitor |
+| hl_copy_trader | LONG | 33.3% | -$0.07 | 3 | Below threshold, weight already 0.3 |
 
-## LOSERS (WR < 30%, PnL < -2%)
+## LOSERS (no action needed):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| hl_copy_trader | LONG | 33.3% | -$0.07 | 3 | Watch, below kill threshold |
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| macd-div+ | LONG | — | —% | — | 5 | 20.0% | -5.00 | ❓ | **DISABLE** |
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| ct-hot- | SHORT | 2 | 50.0% | -1.29 | ❓ | Needs more data |
-| hl_copy_trader | LONG | 3 | 33.3% | +1.24 | ❓ | Needs more data |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[DISABLE] macd-div+ LONG** — WR=20.0%, PnL=-5.00% over 5 trades (24h).
-2. **[WATCH] ct-hot- SHORT** — WR=50.0%, PnL=-1.29% over 2 trades. Monitor next cycle.
-3. **[WATCH] hl_copy_trader LONG** — WR=33.3%, PnL=+1.24% over 3 trades. Monitor next cycle.
-4. **[KEEP] 2 winning combos** — bb_bounce+, tl_break_short. LONG side dominant.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-08-24 | 7d80a1e | fix: SHORT signals blocked by two filters |
-| 2026-08-24 | d8f202e | fix: bb_bounce signal dead — 3 blockers removed |
-| 2026-08-24 | 8984c49 | signals: remove macd-div from STANDALONE_BYPASS — no trade d... |
-| 2026-08-24 | e67c837 | signals: normalize r2_trend_long slope by price (fixes micro... |
-| 2026-08-24 | 2565099 | fix: increase copy signal lookback from 5 to 30 minutes |
-| 2026-08-24 | 628459d | fix: enable SHORT copy signals |
-| 2026-08-23 | b1400fb | config: tighten trailing distance from 2.0% to 1.0% |
-| 2026-08-23 | 467e3ad | signals: kill hzscore- — 37.5% WR, -$0.35/24h, avg loser 2x ... |
-| 2026-08-23 | 8229727 | auto_1hr: kill hzscore- signal (7T 43% WR -$0.21/24h) |
-| 2026-08-23 | 9bf2370 | CEO: Lower CONF_FILTER_MAX 89→85 (block overconfident trades... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+## ISSUES:
+- Composite signals appearing: `ct-hot-,tl_break_short,tl_break_short` (2T, 0% WR, -$0.23) — multi-signal combo with poor performance
+- `macd-div+` trades still in 24h window despite kill — likely pre-kill closures
+- No signal inversions detected

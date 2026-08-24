@@ -13874,3 +13874,35 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - macd-div+ persistent -$0.55 drag — will kill if 3+ trades next hour with 0% WR
 - BABY -44% drawdown — largest open loss, but position size managed
 - tl_break_short burst — 5 trades in one hour, monitor sustainability like bb_bounce+ burst earlier
+
+## [2026-08-24 04:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, 50% WR)
+**PnL:** -$0.08 (bb_bounce+ +$0.04 WIN, tl_break_short -$0.12 LOSS on BABY)
+
+**24h:** 58T, 46.6% WR, -$0.32 net
+
+**Signal perf 24h (worst):**
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last hour
+- ct-hot-: 2T 0W -$0.15 — at threshold, not killable
+- hl_copy_trader: 3T 1W -$0.07 — slight drag, not killable
+- ct-hot+: 25T 12W +$0.23 — solid contributor
+- bb_bounce+: 5T 4W +$0.32 — top performer
+
+**Close reasons 24h:**
+- profit-monster-trail: 14T +$0.69 — best exit (avg +$0.049)
+- atr_sl_hit: 33T (57%) +$0.08 — >40% threshold, tpsl fix deployed
+- cut-loser-CL-T1: 3T -$0.37 — worst exit
+- cut-loser-MAE-GUARD: 2T -$0.39 — worst avg
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates: macd-div+ (0 trades last hour), ct-hot- (2 trades last hour) — neither meets 3+ trade kill threshold
+- Trade frequency 2/hr normal
+- 24h net negative stable at -$0.32, trend flat
+- BABY closed at -$0.12 (cut-loser-CL-T1), position managed
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — will kill if 3+ trades next hour with 0% WR
+- cut-loser-CL-T1 new exit reason appearing — may need investigation if losses continue

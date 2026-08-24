@@ -115,3 +115,7 @@
   WHY: 6T last hour (6W 0L +$0.27). Best session hour. tl_break_short 5T 5W +$0.23 perfect. cascade-reverse-v2 1T 1W +$0.04. 58T 24h 47% WR -$0.24 net (improved from -$0.47). atr_sl_hit 33T (57%) >40% but tpsl_utils.py fix deployed, PnL positive +$0.08. profit-monster-trail 14T +$0.67 best exit. No kill criteria — macd-div+ 5T -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. ct-hot- 2T 0W at threshold. BABY open -44% but position managed by TPSL. Trade freq 6/hr normal. System stable, hourly trend improving.
   BY: auto_1hr
   NEXT: Re-run at 04:05 UTC
+[2026-08-24 04:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.08). bb_bounce+ +$0.04, tl_break_short -$0.12 on BABY. 58T 24h 46.6% WR -$0.32 net. profit-monster-trail +$0.69 best exit. atr_sl_hit 33T (57%) >40% but tpsl fix deployed, PnL positive +$0.08. macd-div+ -$0.55 persistent but 0 trades last hour, not killable. ct-hot- 2T 0W at threshold. Trade freq 2/hr normal. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 05:05 UTC

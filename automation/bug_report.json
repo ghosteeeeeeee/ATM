@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-23 21:12:38",
+  "timestamp": "2026-08-24 05:12:39",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -7,7 +7,7 @@
   "criticals": [
     {
       "name": "sqlite_leaks",
-      "msg": "104 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "105 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Move conn.close() to a finally block or use context manager"
     },
@@ -31,13 +31,13 @@
     },
     {
       "name": "bare_except",
-      "msg": "90 bare except clauses in 31 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "msg": "91 bare except clauses in 32 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
     {
       "name": "connection_leaks",
-      "msg": "112 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
+      "msg": "113 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },
