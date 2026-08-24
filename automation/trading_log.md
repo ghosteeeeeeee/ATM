@@ -13812,3 +13812,65 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - ct-hot- one more loss triggers kill — monitor next hour
 - 24h net slightly negative, should improve as killed signals age out
+
+## [2026-08-24 02:05 UTC] Hourly Analysis
+
+**Trades:** 8 closed (6W 2L, 75% WR)
+**PnL:** +$0.70 (best hour this session)
+
+**24h:** 55T, ~42% WR, +$0.47 net positive
+
+**Top signals last hour:**
+- bb_bounce+: 5T 3W +$0.27 (3 profit-monster-trail exits, new signal performing well)
+- hzscore-: 2T 2W +$0.44 (old positions closing profitably, already killed)
+
+**24h close reasons:**
+- atr_sl_hit: 33T (60% of closes) +$0.08 — >40% threshold but fix deployed in tpsl_utils.py, PnL positive
+- profit-monster-trail: 10T +$0.51 — best exit method
+- cut-loser-MAE-GUARD: 3T -$0.41 — worst exit
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates: no signal had 0% WR with 3+ trades in last hour
+- Trade frequency 8/hr elevated but from well-performing bb_bounce+
+- atr_sl_hit >40% of closes but tpsl_utils.py fixes deployed and PnL positive
+- 5 open positions (BLUR/BTC/ONDO/AVAX/KAS) mostly green
+- ct-hot- 4T 0% WR in 24h but only2 trades last hour — not killable per3+ rule
+
+**Open Questions:**
+- bb_bounce+ burst — 5 trades in one hour from new signal, monitor sustainability
+- LDO guardian_orphan with None signal — minor anomaly, orphan handling working correctly
+- 24h net positive (+$0.47), improving trend as killed signals age out
+
+## [2026-08-24 03:05 UTC] Hourly Analysis
+
+**Trades:** 6 closed (6W 0L, 100% WR)
+**PnL:** +$0.27 (tl_break_short 5/5 perfect, cascade-reverse-v2 1/1)
+
+**24h:** 58T, 47% WR, -$0.24 net (improved from -$0.47)
+
+**Top signals last hour:**
+- tl_break_short: 5T 5W +$0.23 — excellent performance, all profit-monster-trail exits
+- cascade-reverse-v2: 1T 1W +$0.04 — small but clean
+
+**24h close reasons:**
+- atr_sl_hit: 33T (57%) +$0.08 — >40% but tpsl fix deployed, PnL positive
+- profit-monster-trail: 14T +$0.67 — best exit method, expanding lead
+- cut-loser-MAE-GUARD: 3T -$0.41 — worst exit method
+- hard_sl: 2T -$0.27 — underperforms trail exits
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates: macd-div+ 5T -$0.55 persistent drag but 0 trades last hour, not killable
+- ct-hot- 2T 0W at kill threshold (needs 3+ trades in last hour)
+- hl_copy_trader 4T -$0.09 slight drag, not at kill threshold
+- BABY open position at -44.71% — monitored by TPSL, no manual intervention needed
+- Trade frequency 6/hr normal
+- 24h trend improving, net negative shrinking
+
+**Open Questions:**
+- macd-div+ persistent -$0.55 drag — will kill if 3+ trades next hour with 0% WR
+- BABY -44% drawdown — largest open loss, but position size managed
+- tl_break_short burst — 5 trades in one hour, monitor sustainability like bb_bounce+ burst earlier

@@ -107,3 +107,11 @@
   WHY: 0T last hour, quiet period. 49T 24h 41% WR -$0.46 net. hl_copy_trader +$0.49 best. ct-hot+ +$0.31 solid. macd-div+ -$0.55 killed signal closing. ct-hot- 2T 0W at threshold. cut-loser-MAE-GUARD -$0.53 underperforming. 4 open positions green/mixed. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 01:05 UTC
+[2026-08-24 02:05 UTC] auto_1hr: NO CHANGES
+  WHY: 8T last hour (6W 2L +/usr/bin/bash.70). Best hour this session. bb_bounce+ 5T 3W 60% +/usr/bin/bash.27 new signal performing well. hzscore- 2T 2W old positions closing profitably. 55T 24h ~42% WR +/usr/bin/bash.47 net positive. atr_sl_hit 33T (60%) >40% threshold but tpsl_utils.py fix deployed, PnL positive +/usr/bin/bash.08. profit-monster-trail 10T +/usr/bin/bash.51 best exit. cut-loser-MAE-GUARD 3T -/usr/bin/bash.41 worst. No kill criteria — no signal with 0% WR and 3+ trades last hour. 5 open positions mostly green. Trade freq 8/hr elevated from bb_bounce+ burst but signal performing. No changes needed.
+  BY: auto_1hr
+  NEXT: Re-run at 03:05 UTC
+[2026-08-24 03:05 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (6W 0L +$0.27). Best session hour. tl_break_short 5T 5W +$0.23 perfect. cascade-reverse-v2 1T 1W +$0.04. 58T 24h 47% WR -$0.24 net (improved from -$0.47). atr_sl_hit 33T (57%) >40% but tpsl_utils.py fix deployed, PnL positive +$0.08. profit-monster-trail 14T +$0.67 best exit. No kill criteria — macd-div+ 5T -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. ct-hot- 2T 0W at threshold. BABY open -44% but position managed by TPSL. Trade freq 6/hr normal. System stable, hourly trend improving.
+  BY: auto_1hr
+  NEXT: Re-run at 04:05 UTC
