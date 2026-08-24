@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-24 ~09:05 UTC (246th run)
+
+### Diagnosis
+System HEALTHY and IMPROVING. Verified DB: 24h 67T +$0.99, 58.2% WR. **Today Aug 24: 34T +$1.37, 79.4% WR — BEST day this week.** auto_1hr best hour: 6T +$0.29, 100% WR. 7d improving rapidly as ct-hot+ legacy drains. hl_copy_trader LONG 60T/7d +$2.47, 53.3% WR (backbone). bb_bounce+ 10T/7d +$0.71, 80% WR (emerging winner, PM_TRAIL 80%). tl_break_short 9T/7d +$0.21, 88.9% WR (best SHORT). ct-hot+ 60T/7d -$3.05, 38.3% WR (DOMINANT LOSER, CEO_PROTECTED — age-out happening). ATR_SL 44.6% exits but net profitable +$0.33/24h (SL floor fix working). Open: 3 flat. Disk: 83%. Pipeline: 0 errors.
+
+### Root Cause
+Prior losses driven by ct-hot+ (DOMINANT LOSER, CEO_PROTECTED). Without it: 7d approximately breakeven. CONF_FILTER_MAX=85 confirmed working — blocking overconfident trades. SL floor fix confirmed — ATR_SL net profitable. System improving as legacy ct-hot+ trades age out (Aug 24-25).
+
+### Fix Applied
+**NO CHANGES** — system on right trajectory. All prior fixes verified working (CONF_FILTER=85, SL floor, SHORT_NEUTRAL_BLOCK). Monitor: CONF_FILTER 85 eval (Aug 25 08:00), MIN_PRE_MOVE 0.3 eval (Aug 25), bb_bounce+ WR (>70%), disk (85%). Recommend T: disable ct-hot+ (RESEARCH_FLAGS), disable hzscore- (50% WR 10T inverted R:R).
+
+### Verification
+DB verified 24h: 67T +$0.99, 58.2% WR. Today Aug 24: 34T +$1.37, 79.4% WR. 3 open positions flat. Pipeline healthy. auto_1hr 09:04 UTC: system stable, trend strong and improving.
+
+---
+
 ## CEO Report — 2026-08-24 ~04:30 UTC (245th run)
 
 ### Diagnosis
