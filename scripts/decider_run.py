@@ -269,6 +269,51 @@ def _has_enough_trades(token, min_trades=5, days=7):
         if conn:
             try: conn.close()
             except Exception: pass
+
+
+def _get_favorite_size_mult(token):
+    """Get position size multiplier for favorites based on winrate.
+    - 75%+ WR: 1.8x (extra bump for proven performers)
+    - 50%+ WR: 1.5x (standard favorites boost)
+    - <50% WR: 1.2x (reduced size for underperformers)
+    Returns 1.0 for non-favorites.
+    """
+    if token.upper() not in FAVORITES:
+        return 1.0
+    if not _has_enough_trades(token):
+        return 1.0
+
+    conn = None
+    try:
+        import psycopg2
+        from _secrets import BRAIN_DB_DICT
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT 
+                ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+            FROM trades
+            WHERE token = %s AND server = 'Hermes' AND status = 'closed'
+              AND close_time > NOW() - INTERVAL '7 days'
+        """, (token,))
+        row = cur.fetchone()
+        if row and row[0] is not None:
+            wr = float(row[0])
+            if wr >= 75:
+                return 1.8  # High conviction — extra bump
+            elif wr >= 50:
+                return 1.5  # Standard favorite
+            else:
+                return 1.2  # Underperformer — reduced size
+        return FAVORITES_SIZE_MULT  # Default if no data
+    except Exception:
+        return FAVORITES_SIZE_MULT  # Fail open
+    finally:
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
+
 os.makedirs(os.path.dirname(DELAYED_FILE), exist_ok=True)
 
 # ─── Guardian Closing Marker Check ─────────────────────────────────────────────
@@ -598,7 +643,7 @@ def process_delayed_entries(paper=False):
             exp_arg = ['--experiment', exp_json]
 
         _base_size = _get_dynamic_position_size()
-        _trade_size = _base_size * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
+        _trade_size = _base_size * _get_favorite_size_mult(token)
 
         # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
         try:
@@ -1497,7 +1542,7 @@ def execute_trade(token, direction, price, confidence, source,
     paper_flag = '--paper' if not live_trading else '--real'
 
     _base_size = _get_dynamic_position_size()
-    _trade_size = _base_size * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
+    _trade_size = _base_size * _get_favorite_size_mult(token)
 
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),
