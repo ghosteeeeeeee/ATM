@@ -25,6 +25,8 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_COMPOUND_WEIGHT,
     SIGNAL_CONFLUENCE_SURVIVED_BONUS,
     SIGNAL_CONFLUENCE_RECENCY_BONUS,
+    SIGNAL_CONFLUENCE_COOLDOWN_HOURS,
+    SIGNAL_CONFLUENCE_MAX_PRICE_AGE,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -101,15 +103,6 @@ def _normalize_source(source):
 
 def _score_group(token, direction, signals):
     """Score a (token, direction) group for confluence."""
-    from hermes_constants import (
-        SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN,
-        SIGNAL_CONFLUENCE_COMPOUND_WEIGHT,
-        SIGNAL_CONFLUENCE_SURVIVED_BONUS,
-        SIGNAL_CONFLUENCE_RECENCY_BONUS,
-        SIGNAL_CONFLUENCE_MIN_COMPOUND,
-        SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD,
-    )
-
     # Get current price
     current_price = _get_current_price(token)
     if current_price is None:
@@ -212,7 +205,7 @@ def scan_signals() -> int:
             continue
 
         # Price freshness
-        if price_age_minutes(token) > 10:
+        if price_age_minutes(token) > SIGNAL_CONFLUENCE_MAX_PRICE_AGE:
             continue
 
         # Cooldown
@@ -239,7 +232,7 @@ def scan_signals() -> int:
         )
         if sid:
             added += 1
-            set_cooldown(token, direction, hours=1)
+            set_cooldown(token, direction, hours=SIGNAL_CONFLUENCE_COOLDOWN_HOURS)
             _log(f'FIRED: {token} {direction} conf={result["confidence"]:.0f} '
                  f'compound={result["compound_count"]} sources={result["unique_sources"]}')
 
