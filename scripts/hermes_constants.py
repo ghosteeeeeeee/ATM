@@ -1399,6 +1399,8 @@ STANDALONE_BYPASS_SIGNALS = (
     'tl_break_long', 'tl_break_short',
     'hl_copy_trader', 'atr-spike',
     'ct-hot',
+    'liq-hunt',  # liquidation cluster contrarian — structural, regime-agnostic
+    'macd-div',  # MACD divergence — counter-trend, works solo
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)

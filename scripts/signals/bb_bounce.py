@@ -26,11 +26,11 @@ BB_MIN_BARS = 30
 RSI_PERIOD = 14
 RSI_OVERSOLD = 40        # tightened 2026-08-07 — CEO: filter weak bounces
 RSI_OVERBOUGHT = 60      # tightened 2026-08-07 — CEO: filter weak bounces
-BOUNCE_MIN_PCT = 0.08    # tightened 2026-08-12 — filter weak bounces
+BOUNCE_MIN_PCT = 0.05    # relaxed 2026-08-24 — was 0.08%, still filters weak bounces
 # Solo-specific (stricter when no co-signal present)
 SOLO_RSI_OVERSOLD = 30   # tightened 2026-08-12 — require deeper oversold for standalone
 SOLO_RSI_OVERBOUGHT = 70 # tightened 2026-08-12 — require deeper overbought for standalone
-SOLO_BOUNCE_MIN_PCT = 0.15  # tightened 2026-08-12 — require stronger bounce confirmation
+SOLO_BOUNCE_MIN_PCT = 0.03  # relaxed 2026-08-24 — was 0.15%, then 0.08%. Any bounce above band qualifies.
 COOLDOWN_MIN = 5         # was 10 — faster re-entries
 
 # ── State ───────────────────────────────────────────────────────────────
@@ -221,7 +221,11 @@ def detect_bb_bounce(token, closes):
     trend = _get_15m_trend(token)
 
     # LONG: lower band + RSI oversold + bullish/neutral trend + bounce up
-    if dist_from_lower <= BB_TOUCH_PCT and current > prev:
+    # FIX (2026-08-24): Removed current > prev requirement.
+    # Price near band + above band + RSI oversold is sufficient.
+    # The old requirement killed ALL signals because price at the band
+    # is typically still falling on the current candle.
+    if dist_from_lower <= BB_TOUCH_PCT:
         solo_l = _is_solo(token, 'LONG')
         rsi_thresh = SOLO_RSI_OVERSOLD if solo_l else RSI_OVERSOLD
         bounce_thresh = SOLO_BOUNCE_MIN_PCT if solo_l else BOUNCE_MIN_PCT
@@ -240,15 +244,10 @@ def detect_bb_bounce(token, closes):
         if bounce_pct < bounce_thresh:
             return None  # Bounce too weak
 
-        # Momentum fade: require 5m velocity positive (price already rising)
-        try:
-            from speed_tracker import get_token_speed
-            spd = get_token_speed(token)
-            vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
-            if vel_5m < 0:
-                return None  # price still falling, bounce not confirmed
-        except Exception:
-            pass
+        # FIX (2026-08-24): Removed momentum fade velocity gate.
+        # Same issue as hzscore — requiring vel_5m >= 0 means price must already be rising,
+        # but by then the bounce is over. The BB touch + RSI + bounce_pct filters are
+        # sufficient quality gates. The old velocity gate killed ALL bb_bounce signals.
 
         return {
             'direction': 'LONG',
@@ -263,7 +262,8 @@ def detect_bb_bounce(token, closes):
         }
 
     # SHORT: upper band + RSI overbought + bearish/neutral trend + bounce down
-    if dist_from_upper <= BB_TOUCH_PCT and current < prev:
+    # FIX (2026-08-24): Removed current < prev requirement for SHORT.
+    if dist_from_upper <= BB_TOUCH_PCT:
         solo_s = _is_solo(token, 'SHORT')
         rsi_thresh = SOLO_RSI_OVERBOUGHT if solo_s else RSI_OVERBOUGHT
         bounce_thresh = SOLO_BOUNCE_MIN_PCT if solo_s else BOUNCE_MIN_PCT
@@ -281,15 +281,8 @@ def detect_bb_bounce(token, closes):
         if bounce_pct < bounce_thresh:
             return None
 
-        # Momentum fade: require 5m velocity negative (price already falling)
-        try:
-            from speed_tracker import get_token_speed
-            spd = get_token_speed(token)
-            vel_5m = spd.get('price_velocity_5m', 0.0) if spd else 0.0
-            if vel_5m > 0:
-                return None  # price still rising, fade not confirmed
-        except Exception:
-            pass
+        # FIX (2026-08-24): Removed momentum fade velocity gate for SHORT.
+        # Same fix as LONG — velocity confirmation comes too late.
 
         return {
             'direction': 'SHORT',
