@@ -1880,12 +1880,14 @@ def _run_hot_set():
         _btc_accel_blocked = False
         _btc_accel_block_time = 0
         _btc_block_until = 0  # absolute timestamp when block expires
+        _btc_block_direction = ''  # '' = all directions, 'LONG'/'SHORT' = direction-specific
         _crash_signal = None
         try:
             from btc_crash_filter import check_crash
             _crash_signal = check_crash()
             if _crash_signal.blocked:
                 log(f'  🚨 [{_crash_signal.severity}] {_crash_signal.reason}')
+                _btc_block_direction = _crash_signal.blocked_direction or ''
                 if 'ACCEL' in (_crash_signal.layer or '') and 'PRICE' not in (_crash_signal.layer or ''):
                     # Accel-only trigger (no price crash) — use time-based expiry
                     _btc_accel_blocked = True
@@ -1916,14 +1918,18 @@ def _run_hot_set():
             if not token or not direction:
                 continue
 
-            # BTC FLASH CRASH: block all new entries during cascade
+            # BTC FLASH CRASH: block new entries during cascade
             if _btc_crash_blocked:
-                _crash_msg = f'BTC crash detected'
-                if _crash_signal and _crash_signal.severity:
-                    _crash_msg = f'{_crash_signal.severity} — {_crash_signal.layer}'
-                log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash_msg}')
-                _record_hotset_failure(token, direction, failures)
-                continue
+                # Direction-specific block: only block if direction matches (or block all)
+                if _btc_block_direction and direction != _btc_block_direction:
+                    pass  # direction doesn't match — allow this entry
+                else:
+                    _crash_msg = f'BTC crash detected'
+                    if _crash_signal and _crash_signal.severity:
+                        _crash_msg = f'{_crash_signal.severity} — {_crash_signal.layer}'
+                    log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash_msg}')
+                    _record_hotset_failure(token, direction, failures)
+                    continue
 
             # BTC ACCELERATION: block entries until block_until expires
             if _btc_accel_blocked:

@@ -40,6 +40,7 @@ class CrashSignal:
     reason: str = ''
     severity: str = ''       # 'WARNING', 'CRITICAL', 'EMERGENCY'
     layer: str = ''          # which layer triggered
+    blocked_direction: str = ''  # '' = all directions, 'LONG' = only LONG blocked, 'SHORT' = only SHORT blocked
     price_chg_5m: float = 0.0
     price_chg_1m: float = 0.0
     volume_spike: float = 0.0
@@ -518,12 +519,14 @@ def check_crash() -> CrashSignal:
             signal.blocked = True
             signal.severity = 'WARNING'
             signal.layer = 'MOMENTUM'
+            signal.blocked_direction = momentum_dir  # block SHORT when rising, LONG when falling
             signal.block_duration_sec = momentum_block_sec
             signal.reason = (f'BTC 30m momentum {momentum_pct:+.2f}% — '
                            f'blocking {momentum_dir} entries')
         else:
             if momentum_block_sec > signal.block_duration_sec:
                 signal.block_duration_sec = momentum_block_sec
+                signal.blocked_direction = momentum_dir
                 signal.layer = '+'.join(triggered_layers)
                 signal.reason += f' | MOMENTUM: {momentum_pct:+.2f}% ({momentum_dir} blocked)'
 

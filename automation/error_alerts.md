@@ -448,3 +448,8 @@ ALERTS:
 - **[WARN]**: hermes-ma-cross-5m-tuner.timer enabled but never fired
 - **[WARN]**: hermes-zscore-momentum-tuner.timer enabled but never fired
 - **AUTO-FIX**: Compressed/truncated old logs (freed ~127M)
+
+## Error Alerts — 2026-08-24 18:04 UTC
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=15m&limit=N`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=4h&limit=N`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=1h&limit=N`

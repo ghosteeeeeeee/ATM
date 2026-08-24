@@ -146,6 +146,9 @@ SHORT_BLACKLIST = {
     'SKR',    # 15T 33% WR SHORT, 15T 33% WR LONG — -$1.08
     # 2026-08-15: 96h both-direction loser
     '2Z',     # 3T 33% WR SHORT, 7T 29% WR LONG — -$0.28
+    # 2026-08-24: tl_break SHORT losers — selling the bottom after sharp drops
+    'BSV',    # 5T 20% WR, -$0.12. ext=4.4x, entered at bottom of -2.7% drop
+    'DASH',   # 4T 25% WR, -$0.02. ext=5.4-5.8x, entered at bottom of -4.6% drop
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
@@ -225,6 +228,9 @@ LONG_BLACKLIST = {
     'SKR',    # 15T 33% WR LONG, 15T 33% WR SHORT — -$1.08
     # 2026-08-15: 96h both-direction loser
     '2Z',     # 7T 29% WR LONG, 3T 33% WR SHORT — -$0.28
+    # 2026-08-24: tl_break losers — block both directions
+    'BSV',    # 5T 20% WR, -$0.12
+    'DASH',   # 4T 25% WR, -$0.02
 }
 BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT', 'LINK', 'MATIC', 'UNI', 'ATOM'}
 
@@ -726,7 +732,7 @@ SHORT_VEL_FILTER_GREEN_THRESHOLD = 5   # CEO 2026-08-16 — STARVATION FIX: 3 gr
 # Faster than regime scanners (leading indicator vs lagging slope).
 DIRECTIONAL_OUTCOME_ENABLED = True
 DIRECTIONAL_OUTCOME_WINDOW = 5            # last N trades per direction
-DIRECTIONAL_OUTCOME_TIME_WINDOW = 30      # minutes (rolling window)
+DIRECTIONAL_OUTCOME_TIME_WINDOW = 15      # minutes (rolling window — tightened from 30 for faster detection)
 DIRECTIONAL_OUTCOME_LOSS_THRESHOLD = 3    # N losses in window to trigger
 DIRECTIONAL_OUTCOME_WR_THRESHOLD = 40     # backup: WR below this also triggers
 DIRECTIONAL_OUTCOME_PENALTY = 0.7         # score multiplier (milder for first deploy)

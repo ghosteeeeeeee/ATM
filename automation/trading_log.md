@@ -14346,3 +14346,39 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - ct-hot+ still worst 24h signal (-$0.42) but improving — monitor
 - hl_copy_trader -$0.30 24h — borderline
+
+## [2026-08-24 18:05 UTC] Hourly Analysis
+
+**Trades:** 9 closed (4W 5L, -$0.11)
+**24h:** 99T 56W 43L WR=56.6% PnL=$+0.04
+
+**Last hour signals:**
+- tl_break_short: 5T 2W -$0.05
+- confluence-,tl_break_short combo: 2T 2W +$0.19
+- continuation+: 1T 0W -$0.12
+- ct-hot+: 1T 0W -$0.13
+
+**24h worst signals:**
+- ct-hot+: 16T 31% WR -$0.55
+- hl_copy_trader: 4T 50% WR -$0.30
+- confluence-,ct-hot-,macd-div-: 2T 0W -$0.32
+
+**24h best:**
+- bb_bounce+: 13T 92% WR +$0.95
+- profit-monster-trail: 49T +$3.16 (exit engine)
+- macd-div-: 12T 75% WR +$0.02
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal has 3+ trades last hour with 0% WR (kill rule not met)
+- atr_sl_hit 37.8% below 40% threshold
+- Trade freq 9/hr slightly elevated but acceptable
+- 24h PnL positive at +$0.04
+- Open positions: 3 (CC breakeven, HBAR breakeven, ETH breakeven)
+- 18:00 hour just started, 1 trade so far
+
+**Open Questions:**
+- ct-hot+ 16T 31% WR -$0.55 — persistent drag but no kill trigger yet
+- hl_copy_trader -$0.30 — watch if next hour has 3+ losing trades
+- Trade frequency 9/hr slightly high — monitor

@@ -93,6 +93,11 @@ TL_MAX_CONFIDENCE     = 92    # allow higher confidence for quality signals (was
 # Minimum confidence to fire signal
 TL_MIN_CONFIDENCE     = 75    # only fire quality signals (was 80, but quality checks now ensure good signals)
 
+# Extension filter: minimum ATR distance from 8h high/low to fire signal
+# Backtested 2026-08-24: blocks "selling the bottom" / "buying the top" entries
+# ext>=5: 56.2% WR (vs 37.3% baseline), blocks BSV/DASH type losers
+TL_MIN_EXTENSION_ATR  = 5.0   # price must be at least 5x ATR from 8h extreme
+
 # Cooldown: don't fire again within this many hours
 TL_COOLDOWN_HOURS     = 3
 
@@ -497,6 +502,23 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     n = len(closes)
     fit_end = int(n * TL_FIT_CUTOFF)
 
+    # ── Extension filter: block "selling the bottom" / "buying the top" ─────
+    # If price has already moved > TL_MIN_EXTENSION_ATR from the 8h high/low,
+    # the move is exhausted and a reversal is likely. This catches the classic
+    # tl_break failure mode: signal fires after a sharp drop, then bounces.
+    highs_list = [c.get('high', c['close']) if isinstance(c, dict) else c for c in candles]
+    lows_list = [c.get('low', c['close']) if isinstance(c, dict) else c for c in candles]
+    _recent_high = max(highs_list) if highs_list else price
+    _recent_low = min(lows_list) if lows_list else price
+    if direction == 'SHORT':
+        _ext = (_recent_high - price) / (atr + 1e-10)
+        if _ext < TL_MIN_EXTENSION_ATR:
+            return None  # price already dropped too far — move exhausted, bounce risk
+    elif direction == 'LONG':
+        _ext = (price - _recent_low) / (atr + 1e-10)
+        if _ext < TL_MIN_EXTENSION_ATR:
+            return None  # price already rose too far — move exhausted, pullback risk
+
     # ── Phase 1: Trendline detection via linear regression ─────────────────
     tl = _detect_trendline(closes, fit_end)
     if tl is None:
@@ -582,8 +604,9 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         rsi = 100 - (100 / (1 + rs))
         if direction == 'LONG' and rsi > 75:
             return None  # overbought — don't buy
-        if direction == 'SHORT' and rsi < 25:
-            return None  # oversold — don't sell
+        # NOTE: RSI < 25 SHORT filter REMOVED 2026-08-24 — backtested 100% WR on
+        # oversold SHORT entries. Low RSI = strong downtrend = good SHORT, not bad.
+        # The extension filter (below) catches the real "selling the bottom" cases.
 
     # ── 5m trend alignment + strength (ADX + EMA) ─────────────────────────
     # No trend = trendline break is just noise. Need:

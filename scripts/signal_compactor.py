@@ -1209,6 +1209,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
             unique_signal_types = len(set(_signal_type_key(p) for p in source_parts))
             source_count = len(source_parts)
+            bare_source = source.rstrip('+-0123456789') if source else ''
 
             # ══ CONFLUENCE REQUIRED ══ — 2026-05-08
             # Rule: 2+ unique signal types required (when CONFLUENCE_REQUIRED=True).
