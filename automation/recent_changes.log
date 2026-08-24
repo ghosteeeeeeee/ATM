@@ -1,3 +1,7 @@
+[2026-08-24 07:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L +$0.04). 24h 61T 31W 50.8% +$0.46 net positive. atr_sl_hit recovered to +$0.23 (was -$0.36 at 02:04, back positive). profit-monster-trail 18T +$1.01 dominant profitable. bb_bounce+ 6T 83%WR +$0.53 strong. tl_break_short 9T 89%WR +$0.21 strong. 3 open SHORTs (BTC -$2.26, ETH -$7.84, CAKE -$1.44) all $11.10 riding. No kill criteria. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 08:05 UTC
 [2026-08-24 02:04 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (1W 1L +$0.07). 24h 48T 19W 39.6% -$0.10 near breakeven. atr_sl_hit 31T -$0.36 now net negative (was +$1.01 yesterday, market variance). hl_copy_trader 4T -$0.023 below kill threshold. ct-hot- 2T 0% -$0.075 below kill threshold. macd-div+ 5T 20% CEO killed, draining. hzscore- 8T 37.5% killed, draining. 2 open hzscore- SHORTs (BSV/NXPC) orphaned. No kill criteria actionable. System stable.
   BY: auto_1hr

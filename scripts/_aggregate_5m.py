@@ -129,12 +129,20 @@ def aggregate_5m():
                 (token, last_ts)
             ).fetchone()
             if open_row and close_row:
+                # Only write if candle doesn't exist yet or is still open (is_closed=0).
+                # Never overwrite closed candles from Binance — they have correct OHLCV.
                 candle_cur.execute(f"""
-                    INSERT OR REPLACE INTO {TABLE}
+                    INSERT INTO {TABLE}
                         (token, ts, open, high, low, close, volume, is_closed)
-                    VALUES (?, ?, ?, ?, ?, ?, 0, 1)
-                """, (token, window_ts, open_row[0], high, low, close_row[0]))
-                filled += 1
+                    SELECT ?, ?, ?, ?, ?, ?, 0, 1
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM {TABLE}
+                        WHERE token = ? AND ts = ? AND is_closed = 1
+                    )
+                """, (token, window_ts, open_row[0], high, low, close_row[0],
+                      token, window_ts))
+                if candle_cur.rowcount > 0:
+                    filled += 1
 
     # Developing candle
     dev_rows = ph_cur.execute(f"""

@@ -88,6 +88,7 @@ REGIME_SIGNALS = {
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
+        'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
     },
     'EXTREME': {
         # Continuation works in storms

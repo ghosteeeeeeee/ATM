@@ -1,5 +1,41 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-24 07:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed last hour (3W 1L +$0.04)
+**24h:** 61T 31W 50.8% +$0.46 (net positive)
+**Entries:** 2 last hour
+
+**24h Close Reasons:**
+- profit-monster-trail: 18T +$1.01 — dominant profitable exit
+- atr_sl_hit: 32T +$0.23 — recovered from -$0.36 (02:04 UTC), back to positive
+- cut-loser-CL-T1: 4T -$0.49 — small drag
+- hard_sl: 2T -$0.27 — guardian safety net
+- cascade_flip: 4T -$0.06 — minor
+
+**Signal Performance 24h:**
+- bb_bounce+: 6T/5W 83% +$0.53 — strong, new star
+- tl_break_short: 9T/8W 89% +$0.21 — strong, new star
+- ct-hot+: 25T/12W 48% +$0.23 — largest signal, healthy
+- hl_copy_trader: 2T/1W +$0.32 — fine
+- hzscore-: 7T/2W -$0.04 — killed, draining orphaned trades
+- macd-div+: 5T/1W -$0.55 — CEO killed, draining orphaned trades
+- confluence-: 2T/1W +$0.01 — small, just started
+
+**Open:** 3 SHORTs (BTC -$2.26, ETH -$7.84, CAKE -$1.44) — all $11.10 positions, riding with trail SL
+
+**Changes:** None
+**No Change Needed:**
+- 4T last hour — normal frequency
+- atr_sl_hit recovered to +$0.23 (was -$0.36 at 02:04 UTC) — no param review needed
+- No signal crosses kill criteria (3+T/0%WR)
+- bb_bounce+ and tl_break_short performing excellently — no tuning needed
+- Trade frequency normal ~4/hr
+- Open trades have trail SL active, riding
+
+**Open Questions:**
+- ETH SHORT at -$7.84 (entry $2442, SL $2467) — largest open loss, monitoring
+
 ## [2026-08-24 02:04 UTC] Hourly Analysis
 
 **Trades:** 2 closed last hour (1W 1L +$0.07)

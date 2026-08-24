@@ -341,3 +341,6 @@ ALERTS:
 ## Error Alerts — 2026-08-24 05:19 UTC
 - **WARN** (129x): `phantom_trades` — trades with |pnl| < $0.01, likely noise fills
 - **INFO**: All systems nominal. Market fully NEUTRAL, no regime signals firing.
+
+## Error Alerts — 2026-08-24 07:04 UTC
+- **REPEATED** (7x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
