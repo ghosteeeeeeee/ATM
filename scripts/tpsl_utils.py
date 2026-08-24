@@ -556,15 +556,12 @@ def compute_atr_sl_tp(
         elif direction == 'SHORT' and lowest_price > 0:
             in_profit = current_price < entry_f
             if in_profit:
-                # In profit: SL trails from nadir at trailing distance, max ATR_SL_MIN from entry
+                # In profit: SL trails from nadir at trailing distance, capped at entry + ATR_SL_MIN
                 trail_ceil = round(lowest_price * (1 + _trail_dist), 8)
                 # Ceiling: SL never goes above entry + ATR_SL_MIN (initial SL level)
                 ceil_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                # When trail_ceil <= entry (low ATR token, trail too tight), use entry-based ceiling
-                if trail_ceil <= entry_f:
-                    new_sl = ceil_from_entry  # entry-based ceiling (always above entry)
-                else:
-                    new_sl = min(trail_ceil, ceil_from_entry)  # trail from nadir, enforce ceiling
+                # Always use min() — trail_ceil below entry = locks in profit (good!)
+                new_sl = min(trail_ceil, ceil_from_entry)
                 # NOTE: No one-way gate here — the trailing gate handles one-way + correction.
             else:
                 # In loss: entry ceiling is absolute floor — SL must stay at least ATR_SL_MIN from entry
@@ -767,12 +764,9 @@ def compute_atr_sl_tp(
             in_profit = current_price < entry_f
             if in_profit:
                 trail_ceil = round(lowest_price * (1 + _trail_dist), 8)
-                min_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
-                # When trail_ceil <= entry (low ATR token, trail too tight), use entry-based ceiling
-                if trail_ceil <= entry_f:
-                    new_sl = min_from_entry  # entry-based ceiling (always above entry)
-                else:
-                    new_sl = max(trail_ceil, min_from_entry)  # trail from nadir, enforce ceiling
+                ceil_from_entry = round(entry_f * (1 + ATR_SL_MIN), 8)
+                # Always use min() — trail_ceil below entry = locks in profit (good!)
+                new_sl = min(trail_ceil, ceil_from_entry)
                 if current_sl > 0:
                     # Only enforce one-way when current_sl is correct-side (above entry for SHORT).
                     # If current_sl is wrong-sided (below entry), trailing gate's correction must stick.
