@@ -31,6 +31,7 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_3SRC_CONFIDENCE,
     SIGNAL_CONFLUENCE_4SRC_CONFIDENCE,
     SIGNAL_CONFLUENCE_RECENCY_WINDOW_MINUTES,
+    SIGNAL_CONFLUENCE_MAX_FAVORABLE_MOVE,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -123,6 +124,18 @@ def _score_group(token, direction, signals):
     else:
         worst_entry = max(entry_prices)
         survived = current_price <= worst_entry * (1 + SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN)
+
+    # Echo prevention — skip if price already moved significantly in our favor
+    # (the move happened, entering now is chasing)
+    best_entry = max(entry_prices) if direction == 'LONG' else min(entry_prices)
+    if best_entry > 0:
+        if direction == 'LONG':
+            favorable_move = (current_price - best_entry) / best_entry
+        else:
+            favorable_move = (best_entry - current_price) / best_entry
+
+        if favorable_move > SIGNAL_CONFLUENCE_MAX_FAVORABLE_MOVE:
+            return None  # Too late — move already happened
 
     # Compounding: count unique source types (split comma-separated merged sources)
     unique_sources = set()

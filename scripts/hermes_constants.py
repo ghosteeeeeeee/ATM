@@ -2003,6 +2003,7 @@ SIGNAL_CONFLUENCE_PLUS_ENABLED         = True   # LONG direction
 SIGNAL_CONFLUENCE_MINUS_ENABLED        = True   # SHORT direction
 SIGNAL_CONFLUENCE_WINDOW_MINUTES       = 30     # rolling lookback window
 SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN = 0.03  # 3% — price move against kills the signal
+SIGNAL_CONFLUENCE_MAX_FAVORABLE_MOVE = 0.02  # 2% — if price already moved this much in our favor, skip (echo prevention)
 SIGNAL_CONFLUENCE_MIN_COMPOUND         = 2      # min unique sources to fire (2=low conf, 3+=high conf)
 SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD = 45     # min score to fire
 SIGNAL_CONFLUENCE_2SRC_CONFIDENCE      = 55     # confidence for 2-source compounding (lower quality)
