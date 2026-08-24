@@ -28,7 +28,7 @@ if _SCRIPT_DIR not in sys.path:
 
 from hermes_constants import RUNTIME_DB, FLIP_COUNTS_FILE, LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, CASCADE_FLIP_ENABLED, DEFAULT_TRADE_SIZE_USDT
 from hermes_file_lock import FileLock
-from pnl_utils import compute_close_pnl
+from pnl_utils import compute_close_pnl, compute_pnl_usdt
 
 
 # ── Constants ──────────────────────────────────────────────────────────────────

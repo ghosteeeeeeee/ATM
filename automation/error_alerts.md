@@ -373,3 +373,16 @@ ALERTS:
 - **WARN** (1): 42 stale tokens (>10min no price update)
 - **INFO**: Live trading ON, kill switch enabled
 - **NO AUTO-FIX**: pipeline healthy, signal_compactor errors transient
+
+## Error Alerts — 2026-08-24 14:04 UTC
+- **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] PURRUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PURRUSDT&interval=4h&limit=N`
+- **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] PURRUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PURRUSDT&interval=1h&limit=N`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TOK position_manager: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-24 14:21 UTC
+- **CRITICAL** (6x): `position_manager FATAL: name 'compute_pnl_usdt' is not defined` — cascade_flip.py:283 calls compute_pnl_usdt but only imports compute_close_pnl from pnl_utils
+- **AUTO-FIX**: Added `compute_pnl_usdt` to cascade_flip.py import line. Verified import works. Next cascade flip will not crash.
+- **WARN**: `signal_compactor` traceback at line 2800 (1x) — truncated, non-fatal, pipeline recovered
+- **WARN**: `PURRUSDT` Binance 400 errors (repeated) — symbol likely delisted, non-blocking
+- **WARN**: Disk at 84% (threshold 85%) — monitor, compress old logs if needed
+- **INFO**: position_manager crashed 6x between 13:55-13:57 UTC, self-recovered by 14:01 when cascade flip stopped triggering. Bug was latent until next flip attempt.
