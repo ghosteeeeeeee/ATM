@@ -14093,3 +14093,36 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - macd-div+ -$0.55 persistent drag — will kill if 3+ trades next hour with 0% WR
 - HYPE/WLD open shorts deep underwater — TPSL should manage but monitor
+
+## [2026-08-24 11:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, -$0.24)
+**PnL:** -$0.24 (WR: 50%)
+**24h:** 68T 35W 33L WR=51.5% PnL=+$0.98
+
+**Close reasons 24h:**
+- atr_sl_hit: 29T (42.6%) -$0.19 — just above 40% but avg loss -$0.007 (tpsl fix working)
+- profit-monster-trail: 29T +$1.72 — best exit, avg +$0.059
+- cut-loser-CL-T1: 4T -$0.49 — worst exit avg -$0.123
+
+**Signal 24h:**
+- bb_bounce+: 9T 8W +$0.72 — top performer (89% WR)
+- tl_break_short: 9T 8W +$0.21 — consistent
+- macd-div-: 4T 4W +$0.32 — perfect
+- ct-hot+: 20T 10W +$0.25 — workhorse
+- macd-div+: 5T 1W -$0.55 — persistent drag, needs 3+ hourly trades to kill
+
+**Open positions:** 3 shorts underwater (CFX -0.36%, ETH -0.90%, BTC -0.57%) — TPSL managed
+
+**Changes:** None needed
+
+**No Change Needed:**
+- macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule
+- atr_sl_hit 42.6% >40% but avg loss only -$0.007 — tpsl fix confirmed
+- PURR slippage: -2.52% loss vs 1.19% SL — low liquidity token, no fix available
+- Trade frequency 2.8/hr normal
+- 24h PnL positive and stable
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — kill if 3+ trades next hour with 0% WR
+- 3 open shorts underwater — TPSL should manage but monitor ETH specifically
