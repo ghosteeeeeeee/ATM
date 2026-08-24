@@ -43,7 +43,6 @@ from hermes_constants import (
     CONTINUATION_EMA_PERIOD,
     CONTINUATION_SLOPE_PERIOD,
     CONTINUATION_VELOCITY_PERIOD,
-    CONTINUATION_GAP_THRESHOLD,
     CONTINUATION_SLOPE_THRESHOLD,
     CONTINUATION_VELOCITY_THRESHOLD,
     CONTINUATION_EXHAUST_RSI_LONG,
@@ -59,6 +58,12 @@ from hermes_constants import (
     CONTINUATION_CONF_TREND_BONUS,
     CONTINUATION_CONF_WAVE_PENALTY,
     CONTINUATION_COOLDOWN_MIN,
+    # V2 additional tunables
+    CONTINUATION_PULLBACK_THRESHOLD,
+    CONTINUATION_CONF_ORIG_HIGH,
+    CONTINUATION_CONF_ORIG_MED,
+    CONTINUATION_CONF_1H_ALIGN,
+    CONTINUATION_CONF_1H_RET_THRESHOLD,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -70,6 +75,7 @@ SOURCE_LONG       = 'continuation+'
 SOURCE_SHORT      = 'continuation-'
 
 _CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
+_VALID_TABLES = frozenset({'candles_1m', 'candles_5m', 'candles_15m', 'candles_1h', 'candles_4h'})
 
 # ── Logging ───────────────────────────────────────────────────────────────
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
@@ -94,6 +100,8 @@ DRY_RUN = '--dry' in sys.argv
 
 def _get_closes(token, table, limit):
     """Fetch close prices from candles.db, oldest first."""
+    if table not in _VALID_TABLES:
+        return []
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
@@ -115,6 +123,8 @@ def _get_closes(token, table, limit):
 
 def _get_candle_range(token, table, limit):
     """Fetch (ts, open, high, low, close) from candles.db, oldest first."""
+    if table not in _VALID_TABLES:
+        return []
     conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
@@ -441,8 +451,8 @@ def detect_continuation(token, direction, close_info):
     else:
         pullback = (current_price - exit_price) / exit_price * 100 if exit_price > 0 else 0
     
-    # If price moved against us more than 1% since close, skip
-    if pullback > 1.0:
+    # If price moved against us more than threshold since close, skip
+    if pullback > CONTINUATION_PULLBACK_THRESHOLD:
         return None
     
     # ── Confidence scoring ──────────────────────────────────────────────
@@ -464,17 +474,20 @@ def detect_continuation(token, direction, close_info):
     
     # Original signal confidence bonus
     if close_info['confidence'] >= 90:
-        conf += 3
+        conf += CONTINUATION_CONF_ORIG_HIGH
     elif close_info['confidence'] >= 85:
-        conf += 1
+        conf += CONTINUATION_CONF_ORIG_MED
     
     # 1h trend aligned bonus
     ret_1h = trend.get('ret_1h', 0)
-    if (direction == 'LONG' and ret_1h > 0.5) or (direction == 'SHORT' and ret_1h < -0.5):
-        conf += 3
+    if (direction == 'LONG' and ret_1h > CONTINUATION_CONF_1H_RET_THRESHOLD) or \
+       (direction == 'SHORT' and ret_1h < -CONTINUATION_CONF_1H_RET_THRESHOLD):
+        conf += CONTINUATION_CONF_1H_ALIGN
     
-    # Wave penalty: diminishing returns after wave 2+
+    # Wave penalty + hard cap
     wave_count = _count_recent_continuations(token, direction)
+    if wave_count >= CONTINUATION_WAVE_MAX:
+        return None  # hard cap — too many waves, no edge
     if wave_count >= 2:
         conf -= CONTINUATION_CONF_WAVE_PENALTY * (wave_count - 1)
     

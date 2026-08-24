@@ -1927,6 +1927,12 @@ CONTINUATION_CONF_EXHAUST_BONUS = 5           # +5 for exhaustion fade (high con
 CONTINUATION_CONF_TREND_BONUS = 4             # +4 for strong trend continuation
 CONTINUATION_CONF_WAVE_PENALTY = 5            # -5 per wave beyond wave 1 (diminishing returns)
 CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)
+# V2 additional tunables
+CONTINUATION_PULLBACK_THRESHOLD = 1.0         # % — max pullback since close to still fire
+CONTINUATION_CONF_ORIG_HIGH = 3               # +conf when original signal conf >= 90
+CONTINUATION_CONF_ORIG_MED = 1                # +conf when original signal conf >= 85
+CONTINUATION_CONF_1H_ALIGN = 3                # +conf when 1h trend aligned
+CONTINUATION_CONF_1H_RET_THRESHOLD = 0.5      # % — 1h return threshold for alignment bonus
 
 # ── ATR Spike Signal (atr_spike.py) ─────────────────────────────────────
 # Catch staged LONG moves from ATR compression. Quality over quantity.

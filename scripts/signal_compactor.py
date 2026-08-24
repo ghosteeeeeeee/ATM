@@ -1155,7 +1155,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # These combos have poor WR or negative PnL in 7d data.
             has_range_finder = any(p.startswith('range_finder') for p in source_parts)
             has_range_breakout = any(p.startswith('range_breakout') for p in source_parts)
-            has_continuation_neg = 'continuation-' in source_parts
             has_rs = any(p.startswith('rs-') for p in source_parts)
 
             # BLOCK: range_finder+/rs-* — weak RS confirmation with range finder
