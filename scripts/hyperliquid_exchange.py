@@ -377,7 +377,8 @@ _INFO_RATE_FILE = "/var/www/hermes/data/hype_info_rate.json"
 
 
 def _info_rate_limit():
-    """Block until 1s has passed since last /info API call (HL ~10 req/s, 1s gap is safe).
+    """Block until 2s has passed since last /info API call.
+    CloudFront CDN returns 429 at ~1 req/s per IP — 2s gap is safe.
     Uses FileLock to prevent concurrent processes from racing and all hitting HL at once.
     Uses interval=0.1s for fast lock acquisition (default 60s is too slow for rate limiting).
     """
@@ -390,8 +391,8 @@ def _info_rate_limit():
         except (FileNotFoundError, json.JSONDecodeError):
             data = {"last_call": 0}
         elapsed = time.time() - data.get("last_call", 0)
-        if elapsed < 1.0:
-            time.sleep(1.0 - elapsed)
+        if elapsed < 2.0:
+            time.sleep(2.0 - elapsed)
         with open(_INFO_RATE_FILE, "w") as f:
             json.dump({"last_call": time.time()}, f)
 
