@@ -600,6 +600,19 @@ def process_delayed_entries(paper=False):
         _base_size = _get_dynamic_position_size()
         _trade_size = _base_size * (FAVORITES_SIZE_MULT if token.upper() in FAVORITES and _has_enough_trades(token) else 1.0)
 
+        # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
+        try:
+            _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
+            _marker = {}
+            if os.path.exists(_marker_path):
+                _marker = json.loads(open(_marker_path).read())
+            _marker[token.upper()] = time.time()
+            _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+            with open(_marker_path, 'w') as _f:
+                json.dump(_marker, _f)
+        except Exception:
+            pass
+
         cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
                 token, cmd_side, str(_trade_size), str(round(cur_price, 6)),
                 '--exchange', 'Hyperliquid',
@@ -1553,6 +1566,23 @@ def execute_trade(token, direction, price, confidence, source,
     except Exception as dup_err:
         log(f'  [WARN] Duplicate-entry guard DB check failed for {token}: {dup_err}')
         # Don't block on DB errors — proceed with the trade
+
+    # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────────
+    # Guardian's orphan sweep may run between brain.py subprocess start and its
+    # internal marker write (line 495). Write the marker HERE first so guardian
+    # sees it immediately and skips orphan creation for this token.
+    try:
+        _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
+        _marker = {}
+        if os.path.exists(_marker_path):
+            _marker = json.loads(open(_marker_path).read())
+        _marker[token.upper()] = time.time()
+        # Prune entries older than 60s
+        _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+        with open(_marker_path, 'w') as _f:
+            json.dump(_marker, _f)
+    except Exception:
+        pass  # non-fatal
 
     try:
         log(f'  [brain.py] EXEC: {" ".join(cmd[:8])}... [{paper_flag}]')
