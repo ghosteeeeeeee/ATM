@@ -1,6 +1,6 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-24 ~15:30 UTC (CEO run 249)**
+**Last Updated: 2026-08-24 ~16:00 UTC (CEO run 250)**
 **Updated by: CEO**
 
 ## What We're Working On
@@ -16,7 +16,7 @@
 - **macd-div+ DISABLED (CEO KILLED Aug 23).** 4T/7d 25% WR -$0.40. Dead signal, no edge. MACD_DIVERGENCE_PLUS_ENABLED=False. — 2026-08-23
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True (CEO Aug 22, FIXED Aug 23).** SHORT signals 7d: 26T -$1.40, 26.9% WR (ALL losing). Was using 1m regime (noisy — showed LONG_BIAS when 4h NEUTRAL, block never fired). FIX: Now uses 4h regime from PostgreSQL momentum_cache. Block fires when 4h regime is NEUTRAL (64 tokens). In SHORT_BIAS (85 tokens), SHORT signals allowed. — 2026-08-23
 - **R2_TREND_LONG_MIN_PRE_MOVE 0.3 active.** Dead-cat bounce filter. r2-trend-long3 losers peak +0.12% MFE, winners +0.65%. Monitor 48h for ATR_SL reduction and WR improvement. — 2026-08-19
-- **ct-hot+ RE-ENABLED BY T (RESEARCH_FLAGS).** CEO killed Aug 22, T re-enabled same day ("signal starvation fix"). Flags True, NEVER_REENABLE_FLAGS has comments only (no entries). 35T/7d -$3.28, 31.4% WR — DOMINANT LOSER. CEO cannot disable (RESEARCH_FLAGS). Recommend T disable if bleeding continues. Trades age out Aug 24-25. — 2026-08-23
+- **ct-hot+ KILLED by signal_reporter (Aug 24).** COIN_TRACKER_HOT_PLUS_ENABLED=False, added to NEVER_REENABLE_FLAGS. 98T all-time 38.8% WR -$3.94. CEO verified. — 2026-08-24
 - **hzscore+ False (CEO KILLED).** 32T ~38% WR -$0.47/7d. Combos bleeding (bb_bounce+,hzscore+ 20T 35% -$0.35). Added NEVER_REENABLE_FLAGS. — 2026-08-17
 - **hzscore- RE-ENABLED BY T (Aug 22, signal starvation).** SHORT 7d: 8T -$0.18, 50% WR (inverted R:R — avg win small, avg loss large). CEO_PROTECTED. Recommend T disable. — 2026-08-23
 - **wave_catcher+ DISABLED (CEO KILLED Aug 17).** Both variants dead (+37.5% WR -$0.42, -25% WR -$0.09). Master switch False. In NEVER_REENABLE_FLAGS. — 2026-08-17
@@ -62,7 +62,7 @@
 
 ## Next Actions
 
-1. **Recommend T: disable ct-hot+ (RESEARCH_FLAGS).** 61T/7d -$2.95, 39.3% WR — DOMINANT LOSER, 85% of total loss. CEO cannot disable. — 2026-08-24
+1. **Recommend T: disable COIN_TRACKER_HOT_ENABLED and COIN_TRACKER_HOT_MINUS_ENABLED.** Same coin_tracker family as ct-hot+ LONG (killed), same edge problem. — 2026-08-24
 2. **Monitor CONF_FILTER_MAX=89 (48h eval ending ~Aug 26 15:30 UTC).** Raised from 85 —90+ tier now +$1.91/7d without ct-hot+. Monitor PnL improvement. — 2026-08-24
 3. **Monitor MAE-Guard impact.** 10 hl_copy_trader hits/7d -$1.04. Cutting losers at avg -4.18%. If WR drops on hl_copy_trader, recommend disable. — 2026-08-24
 4. **Monitor MIN_PRE_MOVE 0.3 (eval extended to Aug 25).** If still flat, remove filter. — 2026-08-23

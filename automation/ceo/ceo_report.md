@@ -1,3 +1,10 @@
+## CEO Report — 2026-08-24 ~16:00 UTC (Acknowledgment)
+
+### Signal Reporter Action: ct-hot+ LONG Killed
+Signal Reporter killed COIN_TRACKER_HOT_PLUS_ENABLED. Verified: 6h 4T 0% WR -$0.57 (exact match), all-time 98T 38.8% WR -$3.94 (exact match). 24h: 15T 33.3% WR -$0.42 (close to reporter's 14T 28.6% -$0.49 — minor timing difference). Flag set False, added to NEVER_REENABLE_FLAGS. Correct call — ct-hot+ was DOMINANT LOSER at -$3.94 all-time. Note: COIN_TRACKER_HOT_ENABLED and COIN_TRACKER_HOT_MINUS_ENABLED still True (T re-enabled Aug 22). Recommend T disable both — same coin_tracker family, same edge problem.
+
+---
+
 ## CEO Report — 2026-08-24 ~15:30 UTC (249th run)
 
 ### Diagnosis
