@@ -1269,7 +1269,8 @@ R2_TREND_SHORT_MIN_PRE_MOVE = 0.0     # min pre-entry move % — block SHORT whe
 R2_TREND_SHORT_MIN_BARS     = 3       # min bars since trend started — raised from 2, match LONG (2 = fading moves)
 SHORT_NEUTRAL_BLOCK_ENABLED = True    # CEO 2026-08-22 — block SHORT in NEUTRAL regime (0% WR, -1.12/7d). No SHORT edge in flat market.
 R2_TREND_LONG_ENABLED        = True    # r2_trend_long — new LONG variant, catches slow grinds (R²>0.6, slope>0)
-R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope % to fire (filters noise, only fires on meaningful trends)
+R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEGACY, now overridden by normalized check
+R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
 R2_TREND_LONG_MAX_RSI       = 75      # max RSI — don't buy overbought (chasing)
 R2_TREND_LONG_MIN_SPEED     = 30      # min speed percentile — require some momentum
