@@ -4193,6 +4193,22 @@ def sync():
     if orphans:
         log(f'Closing {len(orphans)} orphan HL position(s)...', 'WARN')
         for coin in orphans:
+            # RACE CONDITION FIX: Skip orphan close if signal pipeline just opened
+            # this token (marker file). The DB record may not have committed yet.
+            # reconcile_hype_to_paper's marker check skipped it, but Step 6 would
+            # still close it — must check here too.
+            try:
+                _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
+                if os.path.exists(_marker_path):
+                    _marker = json.loads(open(_marker_path).read())
+                    if coin.upper() in _marker:
+                        _age = time.time() - _marker[coin.upper()]
+                        if _age < 60:
+                            log(f'  ⏩ Step 6: {coin} recently opened by signal ({_age:.0f}s ago) — skipping close', 'WARN')
+                            continue
+            except Exception:
+                pass
+
             _CLOSED_HL_COINS.add(coin.upper())
             p = hl_pos.get(coin, {})
             entry_px = float(p.get('entry_px', 0))
