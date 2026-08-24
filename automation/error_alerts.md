@@ -491,3 +491,14 @@ AUTO-FIXES APPLIED:
 ALERTS:
 - Disk 84% — clean logs if >85%
 - CCUSDT 400 errors — invalid Binance symbol, non-critical
+
+## Error Alerts — 2026-08-24 19:04 UTC
+- **REPEATED** (26x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=15m&limit=N`
+- **REPEATED** (13x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=4h&limit=N`
+- **REPEATED** (13x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=1h&limit=N`
+
+## Error Alerts — 2026-08-24 21:04 UTC
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3540s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] W TOK BLOCKED — TOK in cooldown (3540s left, N failures)`

@@ -14382,3 +14382,182 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - ct-hot+ 16T 31% WR -$0.55 — persistent drag but no kill trigger yet
 - hl_copy_trader -$0.30 — watch if next hour has 3+ losing trades
 - Trade frequency 9/hr slightly high — monitor
+
+## [2026-08-24 19:05 UTC] Hourly Analysis
+
+**Trades:** 10 closed since 17:00 (6W 4L, -$0.14)
+**24h:** 95T 57W 38L WR=60% PnL=+$0.73
+
+**Last 2h signals:**
+- tl_break_short: 7T 5W -$0.14 (4 profit-monster-trail wins, 2 atr_sl_hit losses)
+- ct-hot+: 1T 0W -$0.13
+- continuation+: 1T 0W -$0.12
+
+**24h exit breakdown:**
+- profit-monster-trail: 48T +$3.09 (system engine)
+- atr_sl_hit: 36T -$2.86 (37.9% below 40% threshold)
+- cut-loser-CL-T1: 7T -$0.81
+
+**24h worst signals:**
+- ct-hot+: 13T 31% WR -$0.63
+- hl_copy_trader: 4T 50% WR -$0.30
+- macd-div+: 2T 0W -$0.26
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal has 3+ trades last 2h with 0% WR — kill rule not met
+- atr_sl_hit 37.9% below 40% threshold
+- Trade freq 5/hr normal
+- 4 open positions all breakeven (CC, ETH, BTC, HYPE)
+- 24h PnL positive at +$0.73
+
+**Open Questions:**
+- ct-hot+ 13T 31% WR -$0.63 persistent drag — keep monitoring but no kill trigger
+- hl_copy_trader -$0.30 borderline — watch next hour
+- tl_break_short 16T net -$0.11 despite 62% WR — win size vs loss size issue?
+
+## [2026-08-24 20:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CC bb_bounce+ LONG, atr_sl_hit, +$0.02)
+**24h:** 93T 55W 38L WR=59.1% PnL=-$0.41
+
+**Hourly breakdown (last 6h):**
+- 19:00: 1T +$0.02
+- 18:00: 2T -$0.22
+- 17:00: 8T +$0.03
+- 16:00: 6T -$0.05
+- 15:00: 4T -$0.47
+- 14:00: 11T -$0.70
+
+**24h exit breakdown:**
+- profit-monster-trail: 48T +$3.09 (system engine)
+- atr_sl_hit: 35T -$2.57 (37.6% below 40% threshold)
+- cut-loser-CL-T1: 6T -$0.70
+
+**24h signal leaders:**
+- bb_bounce+: 14T 93% WR +$0.97
+- hzscore-: 3T 67% WR +$0.30
+- tl_break_short: 16T 63% WR -$0.11
+- ct-hot+: 11T 36% WR -$0.36 (persistent drag)
+
+**Open positions:** 4 (ETH SHORT, BTC LONG, HYPE SHORT, CAKE SHORT) — all ~breakeven
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal has 3+ trades last 2h with 0% WR — kill rule not met
+- atr_sl_hit 37.6% below 40% threshold
+- Trade freq 1.3/hr last 2h — very quiet, not overtrading
+- 24h PnL -$0.41 slightly negative but system engine (profit-monster-trail) carrying +$3.09
+
+**Open Questions:**
+- 24h PnL dropped from +$0.73 to -$0.41 — older winners fell out of window
+- ct-hot+ 11T 36% WR -$0.36 persistent but 0 trades last 2h — not killable
+- hl_copy_trader 4T -$0.30 — only 0 trades last 2h, not killable
+- Very low activity (3 trades in 3 hours) — normal weekend/late-session behavior
+
+## [2026-08-24 21:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L, -$0.10)
+- NEO bb_bounce+ LONG: profit-monster-trail +$0.08 ✓
+- HYPE hl_copy_trader SHORT: atr_sl_hit -$0.18
+
+**24h:** 92T, 59% WR, net -$0.41
+- profit-monster-trail: 49T +$3.17 (engine carrying system)
+- atr_sl_hit: 33T -$2.60 (35.9% — below 40% ✓)
+- cut-loser-CL-T1: 6T -$0.70
+
+**Signal leaders (24h):**
+- bb_bounce+: 15T 93% WR +$1.05 (star)
+- macd-div-: 12T 75% WR +$0.02
+- hzscore-: 3T 67% WR +$0.30
+- tl_break_short: 16T 62% WR -$0.11
+- ct-hot+: 9T 33% WR -$0.36 (persistent drag)
+- hl_copy_trader: 5T 40% WR -$0.48 (persistent drag)
+
+**Open:** 4 positions (ZORA LONG bb_bounce+, CAKE SHORT ct-hot-, BTC LONG hl_copy_trader, ETH SHORT hl_copy_trader)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- atr_sl_hit 35.9% below 40% threshold
+- No signal has 3+ trades last hour with 0% WR — kill rule not met
+- Trade freq 2/hr very low (late session, normal)
+- hl_copy_trader (-$0.48) and ct-hot+ (-$0.36) persistent but not killable (0 trades last hour for ct-hot+, hl_copy_trader 40% WR not 0%)
+
+**Open Questions:**
+- hl_copy_trader 5T 40% WR -$0.48 persistent — watch next hour, kill if 3+ trades with 0% WR
+- ct-hot+ 9T 33% WR -$0.36 — same, watch next session
+- Very low activity — late session, system quiet
+
+## [2026-08-24 21:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L)
+- NEO bb_bounce+ LONG: +$0.08 (profit-monster-trail) ✓
+- HYPE hl_copy_trader SHORT: -$0.18 (atr_sl_hit)
+
+**24h:** 92T, 59% WR, -$0.41 net
+
+**24h exit breakdown:**
+- profit-monster-trail: 49T +$3.17 (system engine)
+- atr_sl_hit: 33T -$2.60 (35.9% — below 40% threshold ✓)
+- cut-loser-CL-T1: 6T -$0.70
+
+**24h signal leaders:**
+- bb_bounce+: 15T 93% WR +$1.05 (star)
+- macd-div-: 12T 75% WR +$0.02
+- hzscore-: 3T 67% WR +$0.30
+- tl_break_short: 16T 62% WR -$0.11
+- ct-hot+: 9T 33% WR -$0.36 (persistent)
+- hl_copy_trader: 5T 40% WR -$0.48 (persistent)
+
+**Open:** 4 (ZORA LONG, CAKE SHORT, BTC LONG, ETH SHORT)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal has 3+ trades last hour with 0% WR — kill rule not met
+- atr_sl_hit 35.9% below 40% threshold
+- Trade freq 2/hr very low (late session, normal)
+- hl_copy_trader and ct-hot+ persistent drags but not killable (0 trades last 2h for ct-hot+, hl_copy_trader 40% WR)
+
+**Open Questions:**
+- hl_copy_trader 5T 40% WR -$0.48 persistent — watch next hour
+- ct-hot+ 9T 33% WR -$0.36 persistent — watch next session
+- Very low activity (2T/hr) — late session quiet
+
+## [2026-08-24 22:05 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L)
+- ZORA bb_bounce+ LONG: +$0.03 (profit-monster-trail) ✓
+
+**24h:** 92T, ~59% WR, -$0.41 net
+
+**24h exit breakdown:**
+- profit-monster-trail: 50T +$3.20 (system engine)
+- atr_sl_hit: 32T -$2.92 (34.8% — below 40% threshold ✓)
+- cut-loser-CL-T1: 6T -$0.70
+
+**24h signal leaders:**
+- bb_bounce+: 16T 93.8% WR +$1.08 (star)
+- macd-div-: 12T 75% WR +$0.02
+- hzscore-: 3T 67% WR +$0.30
+- tl_break_short: 16T 62.5% WR -$0.11
+- ct-hot+: 8T 25% WR -$0.68 (persistent, not killable)
+- hl_copy_trader: 5T 40% WR -$0.48 (persistent, not killable)
+
+**Open:** 4 (SYRUP LONG, CAKE SHORT, BTC LONG, ETH SHORT)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- atr_sl_hit 34.8% below 40% threshold
+- No signal has 3+ trades last hour with 0% WR — kill rule not met
+- Trade freq 1/hr very low (late session, normal)
+- ct-hot+ and hl_copy_trader persistent but not killable (0 trades last 2h)
+
+**Open Questions:**
+- ct-hot+ 8T 25% WR -$0.68 — watch next session, kill if 3+ trades with 0% WR
+- hl_copy_trader 5T 40% WR -$0.48 — same
+- Very low activity (1T/hr) — late session quiet
