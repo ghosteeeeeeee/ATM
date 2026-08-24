@@ -1258,7 +1258,8 @@ R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT
 R2_TREND_ENABLED         = True   # master kill switch for r2_trend SHORT
 R2_TREND_SHORT_ENABLED   = True   # RE-ENABLED 2026-08-20 — RSI inversion fix + MIN_SLOPE enforcement + threshold tightening. CEO_PROTECTED
-R2_TREND_SHORT_MIN_SLOPE    = -0.003  # maximum slope % (negative = downtrend) — mirrors LONG but inverted
+R2_TREND_SHORT_MIN_SLOPE    = -0.003  # maximum slope % (negative = downtrend) — LEGACY, now overridden by normalized check
+R2_TREND_SHORT_MIN_SLOPE_PCT = 0.0001  # minimum slope magnitude as % of price per candle (0.01%) — normalized, fair across all price levels
 R2_TREND_SHORT_MIN_R2       = 0.70    # minimum R² threshold (raised from 0.60 — match LONG, filter weak trends)
 R2_TREND_SHORT_MIN_RSI      = 30      # min RSI — don't short when oversold (bounce risk). FIXED: was MAX_RSI=65 (inverted, blocked best short setups)
 R2_TREND_SHORT_MIN_SPEED    = 30      # min speed percentile — require downward momentum
@@ -1398,7 +1399,6 @@ STANDALONE_BYPASS_SIGNALS = (
     'tl_break_long', 'tl_break_short',
     'hl_copy_trader', 'atr-spike',
     'ct-hot',
-    'macd-div',
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
