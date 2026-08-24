@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-24 01:17 UTC
+# Signal Rotation — 2026-08-24 05:27 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,13 +6,15 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | hl_copy_trader | 55% | 1.218 | 1.218 | ❓ |  |
-| 2 | bb_bounce+,hl_copy_trader | 80% | 1.093 | 1.093 | ✅ |  |
-| 3 | hzscore- | 83% | 0.515 | 0.515 | ❌ |  |
-| 4 | r2-trend-long4 | 71% | 0.464 | 0.464 | ❓ |  |
-| 5 | r2-trend-long3 | 54% | 0.135 | 0.135 | ❓ |  |
-| 6 | stop_hunt_reversal_long+ | 60% | 0.038 | 0.038 | ❌ |  |
-| 7 | return_exhaustion_long | 50% | -0.448 | -0.448 | ❓ |  |
-| 8 | ct-hot+ | 29% | -1.482 | -1.482 | ❓ |  |
+| 1 | bb_bounce+ | 75% | 1.396 | 1.396 | ✅ |  |
+| 2 | hl_copy_trader | 54% | 1.358 | 1.358 | ❓ |  |
+| 3 | r2-trend-long4 | 73% | 0.383 | 0.383 | ❓ |  |
+| 4 | tl_break_short | 83% | 0.376 | 0.376 | ✅ |  |
+| 5 | hzscore- | 50% | 0.278 | 0.278 | ❌ |  |
+| 6 | r2-trend-long3 | 53% | 0.000 | 0.000 | ❓ |  |
+| 7 | stop_hunt_reversal_long+ | 57% | -0.011 | -0.011 | ❌ |  |
+| 8 | macd-div+ | 20% | -0.447 | -0.447 | ❓ |  |
+| 9 | return_exhaustion_long | 40% | -0.472 | -0.472 | ❓ |  |
+| 10 | ct-hot+ | 41% | -1.254 | -1.254 | ❓ |  |
 
 ## No changes applied

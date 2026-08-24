@@ -119,3 +119,7 @@
   WHY: 2T last hour (1W 1L -$0.08). bb_bounce+ +$0.04, tl_break_short -$0.12 on BABY. 58T 24h 46.6% WR -$0.32 net. profit-monster-trail +$0.69 best exit. atr_sl_hit 33T (57%) >40% but tpsl fix deployed, PnL positive +$0.08. macd-div+ -$0.55 persistent but 0 trades last hour, not killable. ct-hot- 2T 0W at threshold. Trade freq 2/hr normal. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 05:05 UTC
+[2026-08-24 05:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.25). Best session hour — 100% WR. bb_bounce+ +$0.21, tl_break_short +$0.04. 57T 24h 50.9% WR +$0.47 net (turned positive from -$0.32). profit-monster-trail +$0.94 best exit. atr_sl_hit 32T (56%) >40% but PnL positive +$0.23, tpsl fix confirmed working. macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. No kill criteria — no signal with 0% WR and 3+ trades last hour. Trade freq 2/hr normal. System stable, 24h trend positive.
+  BY: auto_1hr
+  NEXT: Re-run at 06:05 UTC

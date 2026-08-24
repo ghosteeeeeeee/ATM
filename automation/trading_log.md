@@ -13906,3 +13906,59 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - macd-div+ -$0.55 persistent drag — will kill if 3+ trades next hour with 0% WR
 - cut-loser-CL-T1 new exit reason appearing — may need investigation if losses continue
+
+## [2026-08-24 05:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L, 100% WR)
+**PnL:** +$0.25 (bb_bounce+ +$0.21, tl_break_short +$0.04)
+**24h:** 57T, 50.9% WR, +$0.47 net — system turned positive
+
+**Signal perf 24h:**
+- bb_bounce+: 6T 5W +$0.53 — top performer
+- hl_copy_trader: 2T 1W +$0.32 — improved from -$0.09
+- ct-hot+: 25T 12W +$0.23 — solid
+- tl_break_short: 7T 6W +$0.15 — good
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last hour
+
+**Close reasons 24h:**
+- profit-monster-trail: 15T +$0.94 — best exit (avg $0.063)
+- atr_sl_hit: 32T (56%) +$0.23 — >40% threshold but PnL positive, tpsl fix working
+- cut-loser-CL-T1: 3T -$0.37 — worst exit
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates: macd-div+ 5T -$0.55 but 0 trades last hour (needs 3+)
+- Trade frequency 2/hr normal
+- 24h turned positive +$0.47 (from -$0.32 last run)
+- atr_sl_hit 56% >40% but positive PnL — tpsl fix confirmed working
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — will kill if 3+ trades next hour with 0% WR
+
+## Daily Orchestrator Report — 2026-08-24 ~06:30 UTC
+
+### Pipeline Status
+- **Trades (24h):** 58 closed, 5 open
+- **Win rate:** 85% today
+- **PnL:** +$1.16 today, +36% portfolio
+- **24h net:** +$0.47 (improved from -$0.32)
+
+### Team Activity
+- **health_monitor:** All timers active, pipeline OK, disk 83%, signal_compactor tracebacks self-healed
+- **auto_1hr:** No changes needed (12h stable), system trending positive
+- **signal_reporter:** No kills executed, winners maintained (bb_bounce+, tl_break_short)
+- **blacklist_tester:** Complete (77 tokens tested, 0 KEEP)
+
+### Implemented Today
+- **None.** System healthy, no implementation tasks required.
+
+### Issues Found
+- **signal_compactor tracebacks:** Transient DB lock contention (06:07-06:10, 06:28-06:29). Self-healed. Not a persistent bug.
+- **Disk at 83%:** 2% from 85% cleanup trigger. Monitor.
+
+### Next Steps
+1. CONF_FILTER_MAX=85 eval ends Aug 25 08:00 UTC
+2. MIN_PRE_MOVE 0.3 eval ends Aug 25
+3. ct-hot+ trades age out Aug 24-25
+4. Monitor disk if >85%

@@ -147,7 +147,7 @@
 - **Difficulty:** Level 1-2
 - **Value:** MEDIUM — signal quality improvement
 - **Status:** PARTIALLY IMPLEMENTED
-- **Reason:** MIN_COMPOSITE raised to 63 ✅. Coin tracker hot re-enabled ✅. Regime gate and confirming analyses not explicitly added, but MIN_COMPOSITE raise serves similar purpose.
+- **Reason:** MIN_COMPOSITE raised to 63 ✅. Coin tracker hot re-enabled ✅. Regime gate ✅. Warm bypass removed ✅ (2026-08-24). Confirming analyses and age decay still pending (Level 2-3).
 
 ## Plan: r2-trend-long-trailing-sl-tuning.md
 - **Date scanned:** 2026-08-23 17:45
@@ -165,19 +165,35 @@
 - **Status:** PARTIALLY IMPLEMENTED
 - **Reason:** Phase 1 (analysis) complete ✅. Phase 2 (signal generation) in progress. Phase 3 (autonomous trading) future work.
 
+## Plan: signal_confluence_spec.md
+- **Date scanned:** 2026-08-24 05:30
+- **Core request:** Meta-signal detecting persistence + compounding of first-order signals over 30-min rolling window
+- **Difficulty:** Level 2
+- **Value:** HIGH — filters noise, catches multi-source agreement
+- **Status:** IMPLEMENTED
+- **Reason:** All 6 files done: signal_confluence.py ✅, hermes_constants.py constants ✅, __init__.py registry ✅, signal_schema.py Layer 2 ✅, signal_compactor.py weights ✅, volatility_gate.py all regimes ✅.
+
 ---
 
-## Summary
+## Summary (Updated 2026-08-24)
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| IMPLEMENTED | 14 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long |
+| IMPLEMENTED | 15 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence |
 | PARTIALLY IMPLEMENTED | 3 | favorites-daily-update, coin_tracker_setup, coin_tracker_expansion |
 | PENDING | 3 | btc-crash-filter, dashboard-enhancements, retroactive-scan |
 
-**Scanned: 20 plans**
-**Implemented: 14 (70%)**
-**Partially implemented: 3 (15%)**
-**Pending: 3 (15%)**
+**Scanned: 21 plans**
+**Implemented: 15 (71%)**
+**Partially implemented: 3 (14%)**
+**Pending: 3 (14%)**
 
-All Level 1 tasks are DONE. Remaining pending items are Level 2-3 (btc-crash-filter needs 30d backtest, retroactive-scan is complex new feature, dashboard enhancements are cosmetic).
+### Level 1 actions taken this session:
+- Removed `warm` health bypass from coin_tracker_hot.py (was letting weak setups through)
+
+### Remaining items are all Level 2-3:
+- btc-crash-filter: needs 30d backtest before acceleration detection
+- retroactive-scan: complex new feature (Level 3)
+- dashboard-enhancements: cosmetic (Level 2-3)
+- coin_tracker confirming analyses: Level 2
+- coin_tracker age decay: Level 2-3

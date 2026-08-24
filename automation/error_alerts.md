@@ -337,3 +337,7 @@ ALERTS:
 
 ## Error Alerts — 2026-08-24 05:03 UTC
 - **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-24 05:19 UTC
+- **WARN** (129x): `phantom_trades` — trades with |pnl| < $0.01, likely noise fills
+- **INFO**: All systems nominal. Market fully NEUTRAL, no regime signals firing.

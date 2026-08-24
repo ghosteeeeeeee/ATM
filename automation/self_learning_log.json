@@ -260,8 +260,17 @@
       "new_value": 0.2786,
       "reason": "WR=73.3% (loosening)",
       "wr_before": 0.7333333333333333
+    },
+    {
+      "timestamp": "2026-08-24T06:00:00.902758+00:00",
+      "signal_type": "tl_break",
+      "parameter": "TREND_FILTER_NEUTRAL_PCT",
+      "old_value": 0.2786,
+      "new_value": 0.2925,
+      "reason": "WR=80.0% (loosening)",
+      "wr_before": 0.8
     }
   ],
-  "daily_count": 2,
-  "last_reset": 1787464800.416173
+  "daily_count": 1,
+  "last_reset": 1787551200.866281
 }
