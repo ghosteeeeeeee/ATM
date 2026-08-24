@@ -1250,7 +1250,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # ── Accel-300 Standalone Bypass ───────────────────────────────────
                 # Strong standalone accel-300 (no RS co-signal needed) — fire on
                 # high-confidence accel-300 alone when the momentum is very strong.
-                bare_source = source.rstrip('+-0123456789') if source else ''
                 if (ACCEL_300_STANDALONE_BYPASS_ENABLED
                         and unique_signal_types == 1
                         and source.startswith('accel-300')

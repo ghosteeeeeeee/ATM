@@ -453,3 +453,41 @@ ALERTS:
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=15m&limit=N`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=4h&limit=N`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] TOK: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=TOK&interval=1h&limit=N`
+
+## Error Alerts — 2026-08-24 18:20 UTC
+- **[CRITICAL]** (4x in 30min): `signal_compactor.py:1232 UnboundLocalError: cannot access local variable 'bare_source'` — compactor crashed every cycle
+- **AUTO-FIX**: Moved `bare_source = source.rstrip('+-0123456789')` before the confluence gate check (line 1212). Compactor now runs clean.
+- **[WARN]**: CCUSDT 400 errors recurring (invalid symbol on Binance — non-critical)
+- **[WARN]**: Disk at 84% — 1% from threshold
+
+## Health Report — 2026-08-24 18:20 UTC
+
+PIPELINE: OK (after fix)
+- Status: running (active)
+- Cycle: #169524
+- Compactor: CRASHED → FIXED (UnboundLocalError: bare_source)
+- Signals in DB: 72,165 total
+- Signals (1h): 114 generated
+- Hotset: 1 entry (BTC:LONG hl_copy_trader)
+- Open positions: 0
+
+MARKET:
+- Regime: SHORT_BIAS (4 short, 101 neutral, 0 long)
+- 1m regime: NEUTRAL/SHORT_BIAS mix
+- Predictive alerts: BEARISH tide (23% long), momentum surge
+
+TRADES TODAY:
+- Closed: 86 trades, -$1.11 PnL, 61.6% WR
+
+SYSTEM:
+- Pipeline service: active
+- Timers: 47 hermes timers active, all firing on schedule
+- Disk: 84% used (19G free) — WARN
+- Logs: largest is sync-guardian.log at 11M
+
+AUTO-FIXES APPLIED:
+- Fixed UnboundLocalError in signal_compactor.py:1232 — bare_source now computed before use
+
+ALERTS:
+- Disk 84% — clean logs if >85%
+- CCUSDT 400 errors — invalid Binance symbol, non-critical
