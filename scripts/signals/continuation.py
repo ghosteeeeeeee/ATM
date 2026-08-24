@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 """
-continuation.py — Re-entry After Profitable Close.
+continuation.py V2 — Smart Re-entry After Profitable Close.
 
-When a trade closes in profit (profit-monster, T1, trail), scan for re-entry
-in the same direction within a short window. The theory: momentum in the
-current waters means more fish are likely around.
+After a trade closes in profit, assess whether to:
+  1. Re-enter SAME direction (momentum alive, trend strong = catch next wave)
+  2. Re-enter OPPOSITE direction (move exhausted, overextended = fade the exhaustion)
 
-Data: PostgreSQL (trades) + candles.db (5m, 1h)
-Speed: Fast (single-token poll, not full scan)
+V1 failed (40% WR) because it only fired same-direction with a 5-min window.
+V2 adds:
+  - Extended window (30min-1hr configurable)
+  - Trend strength analysis (EMA slope, velocity, gap)
+  - Exhaustion detection (overextension + velocity death = reverse)
+  - Smart direction decision based on market state
+  - Wave counting (diminishing returns after wave 2+)
 
 Signal types:
-  - continuation_long  : LONG re-entry after LONG profit close
-  - continuation_short : SHORT re-entry after SHORT profit close
+  - continuation_long  : LONG re-entry (same or reversal)
+  - continuation_short : SHORT re-entry (same or reversal)
+
+Data: PostgreSQL (trades) + candles.db (1m, 5m, 1h)
+Speed: Fast (single-token poll per recent close)
 """
 
 import os
@@ -31,13 +39,25 @@ from hermes_constants import (
     CONTINUATION_MIN_PNL,
     CONTINUATION_WINDOW_SEC,
     CONTINUATION_TRIGGER_REASONS,
-    CONTINUATION_RSI_MAX_LONG,
-    CONTINUATION_RSI_MIN_SHORT,
-    CONTINUATION_ZSCORE_MAX,
-    CONTINUATION_PULLBACK_MAX_PCT,
+    # V2 params
+    CONTINUATION_EMA_PERIOD,
+    CONTINUATION_SLOPE_PERIOD,
+    CONTINUATION_VELOCITY_PERIOD,
+    CONTINUATION_GAP_THRESHOLD,
+    CONTINUATION_SLOPE_THRESHOLD,
+    CONTINUATION_VELOCITY_THRESHOLD,
+    CONTINUATION_EXHAUST_RSI_LONG,
+    CONTINUATION_EXHAUST_RSI_SHORT,
+    CONTINUATION_EXHAUST_ZSCORE,
+    CONTINUATION_EXHAUST_GAP_PCT,
+    CONTINUATION_WAVE_COOLDOWN_SEC,
+    CONTINUATION_WAVE_MAX,
     CONTINUATION_CONF_BASE,
     CONTINUATION_CONF_FLOOR,
     CONTINUATION_CONF_CAP,
+    CONTINUATION_CONF_EXHAUST_BONUS,
+    CONTINUATION_CONF_TREND_BONUS,
+    CONTINUATION_CONF_WAVE_PENALTY,
     CONTINUATION_COOLDOWN_MIN,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
@@ -148,8 +168,173 @@ def _compute_zscore(closes, period=20):
     return (closes[-1] - mean) / std
 
 
+def _compute_ema(closes, period):
+    """Compute EMA of closes, return latest value."""
+    if len(closes) < period:
+        return None
+    k = 2.0 / (period + 1)
+    ema = closes[0]
+    for p in closes[1:]:
+        ema = p * k + ema * (1 - k)
+    return ema
+
+
+def _compute_slope(closes, period):
+    """Linear regression slope over last `period` bars, normalized as % per bar."""
+    if len(closes) < period:
+        return None
+    chunk = closes[-period:]
+    x_mean = (period - 1) / 2.0
+    y_mean = sum(chunk) / period
+    denom = sum((i - x_mean) ** 2 for i in range(period))
+    if denom == 0 or y_mean == 0:
+        return 0
+    numer = sum((i - x_mean) * (chunk[i] - y_mean) for i in range(period))
+    return (numer / denom) / y_mean * 100
+
+
+def _compute_velocity(closes, period):
+    """Velocity: rate of change over last `period` bars, % per bar."""
+    if len(closes) < period + 1:
+        return None
+    ret = (closes[-1] - closes[-period - 1]) / closes[-period - 1] * 100
+    return ret / period  # % per bar
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
-# Detection
+# Trend analysis — the core V2 intelligence
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _analyze_trend(token):
+    """Analyze current trend state for a token.
+    
+    Returns dict with trend metrics or None if insufficient data.
+    """
+    # 1m candles for velocity/slope (fast reacting)
+    closes_1m = _get_closes(token, 'candles_1m', 120)
+    # 5m candles for medium-term context
+    closes_5m = _get_closes(token, 'candles_5m', 50)
+    # 1h candles for exhaustion checks
+    closes_1h = _get_closes(token, 'candles_1h', 30)
+    
+    if not closes_1m or len(closes_1m) < 60:
+        return None
+    
+    result = {}
+    
+    # ── 1m trend metrics ────────────────────────────────────────────────
+    # EMA gap: price vs EMA (positive = above, negative = below)
+    ema = _compute_ema(closes_1m, CONTINUATION_EMA_PERIOD)
+    if ema and ema > 0:
+        result['gap_pct'] = (closes_1m[-1] - ema) / ema * 100
+    else:
+        result['gap_pct'] = 0
+    
+    # Slope: trend direction and strength
+    result['slope'] = _compute_slope(closes_1m, CONTINUATION_SLOPE_PERIOD) or 0
+    
+    # Velocity: recent momentum direction and speed
+    result['velocity'] = _compute_velocity(closes_1m, CONTINUATION_VELOCITY_PERIOD) or 0
+    
+    # ── 5m trend context ────────────────────────────────────────────────
+    if closes_5m and len(closes_5m) >= 10:
+        result['ret_5m'] = (closes_5m[-1] - closes_5m[-10]) / closes_5m[-10] * 100
+        result['slope_5m'] = _compute_slope(closes_5m, 10) or 0
+    else:
+        result['ret_5m'] = 0
+        result['slope_5m'] = 0
+    
+    # ── 1h exhaustion metrics ───────────────────────────────────────────
+    if closes_1h and len(closes_1h) >= 20:
+        result['rsi'] = _compute_rsi(closes_1h)
+        result['zscore'] = _compute_zscore(closes_1h)
+        result['ret_1h'] = (closes_1h[-1] - closes_1h[-5]) / closes_1h[-5] * 100 if len(closes_1h) >= 5 else 0
+    else:
+        result['rsi'] = None
+        result['zscore'] = None
+        result['ret_1h'] = 0
+    
+    result['price'] = closes_1m[-1]
+    return result
+
+
+def _is_exhausted(trend, direction):
+    """Check if the move is exhausted (overextended + velocity dying).
+    
+    Returns True if exhaustion detected — signal should REVERSE.
+    """
+    rsi = trend.get('rsi')
+    zscore = trend.get('zscore')
+    gap = trend.get('gap_pct', 0)
+    velocity = trend.get('velocity', 0)
+    
+    if direction == 'LONG':
+        # Exhausted LONG: overbought + extended above EMA + velocity dying
+        if rsi is not None and rsi > CONTINUATION_EXHAUST_RSI_LONG:
+            return True
+        if zscore is not None and zscore > CONTINUATION_EXHAUST_ZSCORE:
+            return True
+        if gap > CONTINUATION_EXHAUST_GAP_PCT and velocity < 0:
+            return True
+    else:  # SHORT
+        # Exhausted SHORT: oversold + extended below EMA + velocity dying
+        if rsi is not None and rsi < CONTINUATION_EXHAUST_RSI_SHORT:
+            return True
+        if zscore is not None and zscore < -CONTINUATION_EXHAUST_ZSCORE:
+            return True
+        if gap < -CONTINUATION_EXHAUST_GAP_PCT and velocity > 0:
+            return True
+    
+    return False
+
+
+def _is_trend_alive(trend, direction):
+    """Check if the trend is still alive in the given direction.
+    
+    Returns True if momentum is healthy and trend is intact.
+    """
+    slope = trend.get('slope', 0)
+    velocity = trend.get('velocity', 0)
+    slope_5m = trend.get('slope_5m', 0)
+    ret_5m = trend.get('ret_5m', 0)
+    
+    if direction == 'LONG':
+        # Trend alive if slope positive, velocity positive, or 5m showing strength
+        return (slope > CONTINUATION_SLOPE_THRESHOLD or
+                velocity > CONTINUATION_VELOCITY_THRESHOLD or
+                (slope_5m > 0 and ret_5m > 0))
+    else:  # SHORT
+        return (slope < -CONTINUATION_SLOPE_THRESHOLD or
+                velocity < -CONTINUATION_VELOCITY_THRESHOLD or
+                (slope_5m < 0 and ret_5m < 0))
+
+
+def _decide_direction(trend, original_direction):
+    """Smart direction decision based on trend state.
+    
+    Returns (direction, reason):
+      - (original, 'continuation') if trend alive in original direction
+      - (opposite, 'exhaustion') if move is exhausted
+      - (None, 'skip') if unclear/no edge
+    """
+    exhausted = _is_exhausted(trend, original_direction)
+    alive = _is_trend_alive(trend, original_direction)
+    
+    if exhausted:
+        # Move is maxed out — fade it
+        opposite = 'SHORT' if original_direction == 'LONG' else 'LONG'
+        return opposite, 'exhaustion'
+    
+    if alive:
+        # Trend still has juice — ride it
+        return original_direction, 'continuation'
+    
+    # Neither clearly alive nor clearly exhausted — no edge
+    return None, 'skip'
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Trade close lookup
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def find_recent_close(token, direction):
@@ -196,117 +381,111 @@ def find_recent_close(token, direction):
     return None
 
 
-def detect_continuation(token, direction, close_info):
-    """Check if re-entry conditions are met after a profitable close.
+def _count_recent_continuations(token, direction):
+    """Count how many continuation signals fired for this token recently.
     
-    Returns {direction, confidence, value, price} or None.
+    Used for wave penalty — diminishing returns after wave 2+.
     """
-    exit_price = close_info['exit_price']
+    conn = None
+    try:
+        from paths import RUNTIME_DB
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        cur = conn.cursor()
+        # Count signals in the last WAVE_COOLDOWN period
+        cur.execute("""
+            SELECT COUNT(*) FROM signals
+            WHERE token = ? AND direction = ?
+            AND signal_type LIKE 'continuation%'
+            AND created_at > datetime('now', ? || ' seconds')
+        """, (token.upper(), direction, -CONTINUATION_WAVE_COOLDOWN_SEC))
+        row = cur.fetchone()
+        return row[0] if row else 0
+    except Exception:
+        return 0
+    finally:
+        if conn:
+            conn.close()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Detection — V2 core logic
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def detect_continuation(token, direction, close_info):
+    """V2: Smart re-entry detection after profitable close.
     
-    # ── 5m check: is momentum still alive? ───────────────────────────────
-    candles_5m = _get_candle_range(token, 'candles_5m', 4)
-    if not candles_5m or len(candles_5m) < 2:
+    Analyzes trend state to decide:
+    1. Same direction (continuation) — if trend alive
+    2. Opposite direction (exhaustion fade) — if move maxed out
+    3. Skip — if no edge
+    
+    Returns {direction, confidence, value, price, decision} or None.
+    """
+    # ── Analyze current trend state ─────────────────────────────────────
+    trend = _analyze_trend(token)
+    if not trend:
         return None
     
-    # Current price vs exit price
-    current_price = candles_5m[-1][4]  # latest close
+    # ── Smart direction decision ────────────────────────────────────────
+    new_direction, decision = _decide_direction(trend, direction)
     
-    # Pullback check: has price reversed more than CONTINUATION_PULLBACK_MAX_PCT?
+    if new_direction is None:
+        return None  # no edge
+    
+    # ── Pullback guard: don't enter if price reversed too far ───────────
+    exit_price = close_info['exit_price']
+    current_price = trend['price']
+    
     if direction == 'LONG':
         pullback = (exit_price - current_price) / exit_price * 100 if exit_price > 0 else 0
     else:
         pullback = (current_price - exit_price) / exit_price * 100 if exit_price > 0 else 0
     
-    # If price moved further in our direction, great — no pullback concern
-    # If price pulled back against us, check threshold
-    if pullback > CONTINUATION_PULLBACK_MAX_PCT * (close_info['pnl_pct'] / 100):
-        return None  # pulled back too much
-
-    # ── Gap300 + Slope + Mom filter (2026-08-14) ──────────────────────────
-    # LONG: block when price extended above EMA300 AND rising fast AND momentum negative
-    # (pullback in uptrend = bad entry). Backtest: 3/8 losers, 0/9 winners.
-    # SHORT: block JUP (0% WR, 2 losses).
-    try:
-        from paths import CANDLES_DB
-        conn_ema = sqlite3.connect(CANDLES_DB, timeout=5)
-        rows_ema = conn_ema.execute(
-            "SELECT close FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 350",
-            (token.upper(),)
-        ).fetchall()
-        conn_ema.close()
-        if rows_ema and len(rows_ema) >= 310:
-            closes_ema = [r[0] for r in reversed(rows_ema)]
-            # Gap300
-            k300 = 2.0 / 301
-            ema300 = closes_ema[0]
-            for p in closes_ema[1:]:
-                ema300 = p * k300 + ema300 * (1 - k300)
-            gap300 = (closes_ema[-1] - ema300) / ema300 * 100 if ema300 > 0 else 0
-            # Slope (20-bar)
-            chunk = closes_ema[-20:]
-            x_mean = 9.5
-            y_mean = sum(chunk) / 20
-            denom = sum((i - x_mean) ** 2 for i in range(20))
-            numer = sum((i - x_mean) * (chunk[i] - y_mean) for i in range(20))
-            slope = (numer / denom) / y_mean * 100 if denom > 0 and y_mean != 0 else 0
-            # Mom5
-            mom5 = (closes_ema[-1] - closes_ema[-5]) / closes_ema[-5] * 100 if len(closes_ema) >= 5 else 0
-            # LONG filter: pullback in uptrend
-            if direction == 'LONG' and gap300 > 0.5 and slope > 0.05 and mom5 < 0:
-                return None
-            # SHORT filter: block JUP (0% WR)
-            if direction == 'SHORT' and token.upper() == 'JUP':
-                return None
-    except Exception:
-        pass
+    # If price moved against us more than 1% since close, skip
+    if pullback > 1.0:
+        return None
     
-    # ── 1h check: not exhausted ──────────────────────────────────────────
-    closes_1h = _get_closes(token, 'candles_1h', 25)
-    if closes_1h and len(closes_1h) >= 15:
-        rsi = _compute_rsi(closes_1h)
-        zscore = _compute_zscore(closes_1h)
-        
-        if rsi is not None:
-            if direction == 'LONG' and rsi > CONTINUATION_RSI_MAX_LONG:
-                return None  # overbought — don't re-enter LONG
-            if direction == 'SHORT' and rsi < CONTINUATION_RSI_MIN_SHORT:
-                return None  # oversold — don't re-enter SHORT
-        
-        if zscore is not None and abs(zscore) > CONTINUATION_ZSCORE_MAX:
-            return None  # extreme z-score — mean reversion likely
-    else:
-        rsi = None
-        zscore = None
-    
-    # ── Confidence ───────────────────────────────────────────────────────
+    # ── Confidence scoring ──────────────────────────────────────────────
     conf = CONTINUATION_CONF_BASE
     
-    # Bonus: original signal confidence was high
+    # Decision type bonus
+    if decision == 'exhaustion':
+        conf += CONTINUATION_CONF_EXHAUST_BONUS
+    elif decision == 'continuation':
+        # Trend alive bonus — stronger trend = higher confidence
+        slope = abs(trend.get('slope', 0))
+        velocity = abs(trend.get('velocity', 0))
+        if slope > CONTINUATION_SLOPE_THRESHOLD * 2:
+            conf += CONTINUATION_CONF_TREND_BONUS
+        elif slope > CONTINUATION_SLOPE_THRESHOLD:
+            conf += CONTINUATION_CONF_TREND_BONUS // 2
+        if velocity > CONTINUATION_VELOCITY_THRESHOLD * 2:
+            conf += CONTINUATION_CONF_TREND_BONUS // 2
+    
+    # Original signal confidence bonus
     if close_info['confidence'] >= 90:
         conf += 3
     elif close_info['confidence'] >= 85:
         conf += 1
     
-    # Bonus: 1h trend aligned
-    if closes_1h and len(closes_1h) >= 5:
-        ret_1h = (closes_1h[-1] - closes_1h[-5]) / closes_1h[-5] * 100
-        if (direction == 'LONG' and ret_1h > 0.5) or (direction == 'SHORT' and ret_1h < -0.5):
-            conf += 3
+    # 1h trend aligned bonus
+    ret_1h = trend.get('ret_1h', 0)
+    if (direction == 'LONG' and ret_1h > 0.5) or (direction == 'SHORT' and ret_1h < -0.5):
+        conf += 3
     
-    # Penalty: RSI approaching extremes
-    if rsi is not None:
-        if direction == 'LONG' and rsi > 65:
-            conf -= 5
-        if direction == 'SHORT' and rsi < 35:
-            conf -= 5
+    # Wave penalty: diminishing returns after wave 2+
+    wave_count = _count_recent_continuations(token, direction)
+    if wave_count >= 2:
+        conf -= CONTINUATION_CONF_WAVE_PENALTY * (wave_count - 1)
     
     conf = max(CONTINUATION_CONF_FLOOR, min(CONTINUATION_CONF_CAP, conf))
     
     return {
-        'direction': direction,
+        'direction': new_direction,
         'confidence': conf,
         'value': close_info['pnl_pct'],
         'price': current_price,
+        'decision': decision,
     }
 
 
@@ -354,7 +533,7 @@ def scan_continuation_signals():
         if price_age_minutes(token) > 5:
             continue
         
-        # Layer 1: per-direction kill-switch
+        # Layer 1: per-direction kill-switch (check ORIGINAL direction's kill-switch)
         if direction == 'LONG' and not CONTINUATION_PLUS_ENABLED:
             continue
         if direction == 'SHORT' and not CONTINUATION_MINUS_ENABLED:
@@ -375,24 +554,41 @@ def scan_continuation_signals():
         if not close_info:
             continue
         
-        # Detect continuation
+        # V2: Smart detection
         sig = detect_continuation(token, direction, close_info)
         if not sig:
             continue
         
-        sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
-        source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+        # Use the DECIDED direction (may be continuation or reversal)
+        decided_direction = sig['direction']
+        
+        # Layer 1: check decided direction's kill-switch
+        if decided_direction == 'LONG' and not CONTINUATION_PLUS_ENABLED:
+            continue
+        if decided_direction == 'SHORT' and not CONTINUATION_MINUS_ENABLED:
+            continue
+        
+        # Layer 1: check decided direction's blacklist
+        if decided_direction == 'LONG' and token in LONG_BLACKLIST:
+            continue
+        if decided_direction == 'SHORT' and token in SHORT_BLACKLIST:
+            continue
+        
+        sig_type = SIGNAL_TYPE_LONG if decided_direction == 'LONG' else SIGNAL_TYPE_SHORT
+        source = SOURCE_LONG if decided_direction == 'LONG' else SOURCE_SHORT
+        
+        decision_tag = sig.get('decision', 'unknown')
         
         if DRY_RUN:
-            _log(f"  [DRY] {direction:5s}-continuation {token:8s} "
+            _log(f"  [DRY] {decision_tag:11s} {decided_direction:5s} {token:8s} "
                  f"from_pnl={close_info['pnl_pct']:+.2f}% conf={sig['confidence']}% "
-                 f"src={close_info['signal']} [{source}]")
+                 f"orig_dir={direction} [{source}]")
             continue
         
         try:
             sid = add_signal(
                 token=token,
-                direction=direction,
+                direction=decided_direction,
                 signal_type=sig_type,
                 source=source,
                 confidence=sig['confidence'],
@@ -404,9 +600,12 @@ def scan_continuation_signals():
             if sid:
                 added += 1
                 set_cooldown(token, direction, hours=CONTINUATION_COOLDOWN_MIN / 60.0)
-                _log(f"  {direction:5s}-continuation {token:8s} "
+                # Also cooldown the decided direction if different
+                if decided_direction != direction:
+                    set_cooldown(token, decided_direction, hours=CONTINUATION_COOLDOWN_MIN / 60.0)
+                _log(f"  {decision_tag:11s} {decided_direction:5s} {token:8s} "
                      f"from_pnl={close_info['pnl_pct']:+.2f}% conf={sig['confidence']}% "
-                     f"src={close_info['signal']} [{source}]")
+                     f"orig_dir={direction} [{source}]")
         except Exception as e:
             _log(f"[continuation] add_signal error for {token}: {e}")
     

@@ -280,7 +280,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('mover_short', 'mover-'):  1.0,
     # hzscore+mover+ combo — star performer (80% WR, +$0.17)
     ('mtf_zscore',  'hzscore+,mover+'): 1.3,  # boosted 2026-08-14
-    # continuation — re-entry after profitable close (65% WR in backtest)
+    # continuation V2 — smart re-entry with exhaustion detection (re-enabled 2026-08-25)
     ('continuation_long',  'continuation+'):  1.15,
     ('continuation_short', 'continuation-'):  1.15,
     # trend_momentum_near_sma — uptrend + momentum + near SMA (47.8% WR, +$9.66/14d)
@@ -1170,11 +1170,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🛡️  [WEAK-COMBO] {token} {direction}: range_breakout++rs-* blocked (weak RS confirmation)")
                 continue
 
-            # BLOCK: continuation- standalone — continuation signal alone is weak
-            # Currently open: continuation-,hzscore- SHORT BSV -$0.23
-            if has_continuation_neg and len(source_parts) == 1:
-                log(f"  🛡️  [WEAK-COMBO] {token} {direction}: continuation- standalone blocked (weak standalone)")
-                continue
+            # NOTE: continuation- standalone block REMOVED 2026-08-25
+            # V2 continuation.py has exhaustion detection — continuation-
+            # standalone may now be a valid exhaustion fade, not just noise.
 
             # ── CONFLUENCE: collapse same-type multi-level sources (e.g. rs-s386,rs-s406) ─
             # Different bars_since values for the SAME signal type are NOT real confluence.

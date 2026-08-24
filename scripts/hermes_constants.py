@@ -1835,13 +1835,13 @@ MOMENTUM_LEADERBOARD_CONF_BASE = 80           # base confidence — higher for h
 MOMENTUM_LEADERBOARD_CONF_FLOOR = 60          # minimum confidence
 MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches system ceiling)
 
-# ── Continuation (re-entry after profitable close) ──────────────────────
-# continuation.py — re-enter same direction after profit-monster exit
-CONTINUATION_ENABLED = False   # CEO KILLED 2026-08-16 — 5T 40% WR -$0.17 (7d). PLUS/MINUS both False — effectively dead. Cleanup 2026-08-21.
-CONTINUATION_PLUS_ENABLED = False # re-enter LONG after LONG close
-CONTINUATION_MINUS_ENABLED = False # re-enter SHORT after SHORT close
+# ── Continuation V2 (smart re-entry after profitable close) ─────────────
+# continuation.py V2 — assess trend state, fire same-dir or fade exhaustion
+CONTINUATION_ENABLED = True   # V2 re-enabled 2026-08-25 — smart direction, exhaustion detection
+CONTINUATION_PLUS_ENABLED = True   # re-enter LONG after LONG close
+CONTINUATION_MINUS_ENABLED = True  # re-enter SHORT after SHORT close
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
-CONTINUATION_WINDOW_SEC = 300                 # seconds after close to scan (5 min)
+CONTINUATION_WINDOW_SEC = 1800                # seconds after close to scan (30 min, was 300s/5min in V1)
 TREND_MOMENTUM_NEAR_SMA_ENABLED = False      # KILLED 2026-08-12 13:05 UTC — 4T 0W 0% WR -$0.37 in 24h. Contrarian flip didn't help.
 TREND_MOMENTUM_NEAR_SMA_PLUS_ENABLED = False  # LONG direction — killed with base (2026-08-12 13:05)
 TREND_MOMENTUM_NEAR_SMA_MINUS_ENABLED = False # SHORT direction — killed with base (2026-08-12 13:05)
@@ -1904,13 +1904,28 @@ CONTINUATION_TRIGGER_REASONS = (              # which close reasons trigger scan
     'profit-monster', 'profit-monster-T1', 'profit-monster-trail',
     'profit_monster', 'atr_tp_hit',
 )
-CONTINUATION_RSI_MAX_LONG = 75                # don't re-enter LONG if 1h RSI > this
-CONTINUATION_RSI_MIN_SHORT = 25               # don't re-enter SHORT if 1h RSI < this
-CONTINUATION_ZSCORE_MAX = 2.0                 # don't re-enter if |z-score| > this
-CONTINUATION_PULLBACK_MAX_PCT = 50            # max pullback % of the move to still qualify
+# V2 trend analysis parameters
+CONTINUATION_EMA_PERIOD = 50                  # EMA period for gap calculation (1m candles)
+CONTINUATION_SLOPE_PERIOD = 20                # bars for linear regression slope (1m)
+CONTINUATION_VELOCITY_PERIOD = 10             # bars for velocity (rate of change, 1m)
+CONTINUATION_GAP_THRESHOLD = 0.3              # % — gap above/below EMA to consider "extended"
+CONTINUATION_SLOPE_THRESHOLD = 0.01           # % per bar — min slope to consider trend alive
+CONTINUATION_VELOCITY_THRESHOLD = 0.005       # % per bar — min velocity to consider momentum alive
+# V2 exhaustion detection
+CONTINUATION_EXHAUST_RSI_LONG = 75            # RSI > this on 1h = LONG exhaustion → reverse
+CONTINUATION_EXHAUST_RSI_SHORT = 25           # RSI < this on 1h = SHORT exhaustion → reverse
+CONTINUATION_EXHAUST_ZSCORE = 2.0             # |z| > this on 1h = exhaustion → reverse
+CONTINUATION_EXHAUST_GAP_PCT = 1.5            # % — gap above EMA + velocity dying = exhaustion
+# V2 wave control
+CONTINUATION_WAVE_COOLDOWN_SEC = 7200         # seconds to count recent continuations (2 hours)
+CONTINUATION_WAVE_MAX = 3                     # max continuation signals per token in window
+# V2 confidence
 CONTINUATION_CONF_BASE = 80
 CONTINUATION_CONF_FLOOR = 65
 CONTINUATION_CONF_CAP = 90
+CONTINUATION_CONF_EXHAUST_BONUS = 5           # +5 for exhaustion fade (high conviction reversal)
+CONTINUATION_CONF_TREND_BONUS = 4             # +4 for strong trend continuation
+CONTINUATION_CONF_WAVE_PENALTY = 5            # -5 per wave beyond wave 1 (diminishing returns)
 CONTINUATION_COOLDOWN_MIN = 60                # per-token cooldown (longer than normal)
 
 # ── ATR Spike Signal (atr_spike.py) ─────────────────────────────────────
