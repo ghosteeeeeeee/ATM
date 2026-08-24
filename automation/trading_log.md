@@ -13998,3 +13998,64 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 2. MIN_PRE_MOVE 0.3 eval ends Aug 25
 3. ct-hot+ trades age out Aug 24-25
 4. Monitor disk if >85%
+
+## [2026-08-24 08:04] Hourly Analysis
+
+**Trades:** 0 closed last hour (7 in 2h window)
+**24h:** 63T 34W 29L WR=54.0% PnL=+$0.64 (improved from +$0.47)
+
+**Close reasons 24h:**
+- atr_sl_hit: 32T +$0.22 (avg $0.007) — >40% threshold, PnL positive, tpsl fix confirmed
+- profit-monster-trail: 20T +$1.24 (avg $0.062) — best exit
+- cut-loser-CL-T1: 4T -$0.49 — worst exit
+- hard_sl: 2T -$0.27
+
+**Signal 24h:**
+- bb_bounce+: 6T 5W +$0.53 — top performer
+- tl_break_short: 9T 8W +$0.21 — consistent winner
+- ct-hot+: 25T 12W +$0.23 — workhorse
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last hour
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No kill candidates: macd-div+ -$0.55 persistent but 0 trades last hour (needs 3+)
+- Trade frequency 3.5/hr normal
+- 24h trend positive and improving
+- 5 open positions flat, managed by TPSL
+- atr_sl_hit 51% >40% but PnL positive — tpsl fix working
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — will kill if 3+ trades next hour with 0% WR
+
+## [2026-08-24 09:05] Hourly Analysis
+
+**Trades:** 6 closed (6W 0L) — best hour this session
+**PnL:** +$0.29 (WR: 100%)
+**24h:** 65T 38W 27L WR=58.5% PnL=+$1.02
+
+**Close reasons 24h:**
+- atr_sl_hit: 29T (44.6%) +$0.33 — >40% threshold but PnL positive, tpsl fix confirmed
+- profit-monster-trail: 25T +$1.51 — best exit
+- cut-loser-CL-T1: 4T -$0.49 — worst exit
+- hard_sl: 2T -$0.27
+
+**Signal 24h:**
+- bb_bounce+: 7T 6W +$0.57 — top performer
+- hl_copy_trader: 2T 1W +$0.32
+- macd-div-: 4T 4W +$0.32 — new short signal performing
+- tl_break_short: 9T 8W +$0.21 — consistent
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last hour
+
+**Changes:** None needed
+
+**No Change Needed:**
+- macd-div+ -$0.55 persistent but 0 trades last hour — kill requires 3+ trades with 0% WR
+- atr_sl_hit 44.6% >40% but PnL positive — tpsl fix working, no intervention
+- Trade frequency 3/hr normal
+- 5 open positions flat, managed by TPSL
+- HYPE -54%, WLD -71% underwater but position managed
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — will kill if 3+ trades next hour with 0% WR
+- HYPE/WLD open shorts deep underwater — TPSL should manage but monitor

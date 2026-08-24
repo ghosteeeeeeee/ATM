@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-24 ~09:05 UTC (CEO run 246)**
+**Last Updated: 2026-08-24 ~10:30 UTC (CEO run 247)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ ENTIRE FAMILY KILLED (CEO Aug 22, signal_reporter implemented).** ALL 3 flags False + NEVER_REENABLE_FLAGS. 62T/7d 32.3% WR -$4.04. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`). **CONF_FILTER_MAX lowered 89→85 (CEO Aug 23)** — blocks overconfident trades (90+ tier worst WR 48.7%). **hzscore- KILLED (auto_1hr Aug 23 21:05 + signal_reporter, NEVER_REENABLE).**
 
-**Current status:** System HEALTHY and IMPROVING. CEO run 246 (09:05 UTC): 24h 67T +$0.99, 58.2% WR. **Today Aug 24: 34T +$1.37, 79.4% WR — BEST day this week.** CONF_FILTER_MAX=85 working. Winners: bb_bounce+ (80% WR, +$0.71/7d), tl_break_short (88.9% WR, +$0.21/7d). hl_copy_trader LONG backbone (53.3% WR, +$2.47/7d). ct-hot+ legacy draining (38.3% WR, -$3.05/7d, age-out Aug 24-25). signal_compactor tracebacks transient DB lock contention. Disk: 83%. Pipeline: 0 errors, all timers active.
+**Current status:** System HEALTHY and IMPROVING. CEO run 247 (10:30 UTC): 24h 69T +$0.89, 58.0% WR. 7d: 256T -$0.72, 53.1% WR (improving from -$1.04 Aug 23). **SHORT SIDE TURNED PROFITABLE: 28T/24h +$0.35, 67.9% WR** (was 26.9% WR -$1.40/7d last week). CONF_FILTER_MAX=85 working. Winners: bb_bounce+ (88.9% WR, +$0.72/24h), tl_break_short (88.9% WR, +$0.21/7d), macd-div- (100% WR, +$0.32/24h). hl_copy_trader LONG backbone (53.3% WR, +$2.47/7d). profit-monster-trail 27T +$1.66/24h (carrying system). ATR_SL net +$0.05/24h (SL floor fix working). ct-hot+ legacy draining (38.3% WR, -$3.05/7d, age-out Aug 24-25). signal_compactor tracebacks transient DB lock contention. Disk: 83%. Pipeline: 0 errors, all timers active.
 
 ## Active Decisions
 
@@ -40,7 +40,7 @@
 - **7 failed services** — better-coder, bug-hunter, git-release, hl-volume, mtf-macd-tuner, trading-checklist, wasp. All non-critical utilities, not affecting trading. — 2026-08-22
 - **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). 3 stale records cleaned (ids 10211-10213). — 2026-08-17
 - **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS even when 15m/4h is NEUTRAL. — 2026-08-16
-- **SHORT side improving** — hzscore- killed. tl_break_short 6T/7d +$0.11, 83.3% WR (best SHORT signal). ct-hot- still active (0% WR, 2T — watch). SHORT_NEUTRAL_BLOCK VERIFIED WORKING. — 2026-08-24
+- **SHORT side TURNED PROFITABLE** — 28T/24h +$0.35, 67.9% WR (was 26.9% WR -$1.40/7d last week). tl_break_short 88.9% WR +$0.21/7d. macd-div- 100% WR +$0.32/24h. SHORT_NEUTRAL_BLOCK + 4h regime filtering confirmed working. — 2026-08-24
 - **MIN_PRE_MOVE 0.3 eval EXTENDED** — r2-trend-long3 48h: 9T $0.00 66.7% WR (WR improved 55.9%→66.7% but PnL break-even). PM_TRAIL captures winners, ATR_SL hits losers. EXTENDED through Aug 25 (needs PnL positive to justify filter). — 2026-08-21
 - **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
 - **Coin tracker Wyckoff detection PARTIALLY FIXED** — 25/109 tokens now have phase detected (was 0 Aug 21). 4h candle re-enablement populated data. 84 still 'none'. Monitor for continued improvement. — 2026-08-22

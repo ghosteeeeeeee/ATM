@@ -1,3 +1,19 @@
+## CEO Report — 2026-08-24 ~10:30 UTC (247th run)
+
+### Diagnosis
+System HEALTHY and IMPROVING. Verified DB: 24h 69T +$0.89, 58.0% WR. 48h: 100T +$0.84, 54.0% WR. 7d: 256T -$0.72, 53.1% WR (improving from -$1.04 on Aug 23). **SHORT side TURNED PROFITABLE: 28T/24h +$0.35, 67.9% WR** (was 26.9% WR -$1.40/7d last week). Winners: bb_bounce+ 9T/24h +$0.72, 88.9% WR. tl_break_short 9T/7d +$0.21, 88.9% WR. macd-div- 4T/24h +$0.32, 100% WR. ATR_SL net profitable +$0.05/24h (SL floor fix working). profit-monster-trail 27T +$1.66/24h (carrying system). ct-hot+ 60T/7d -$3.05, 38.3% WR (DOMINANT LOSER, CEO_PROTECTED — 24h: 23T +$0.03 improving as legacy drains). macd-div+ 5T -$0.55 (legacy, killed). Open: 2 SHORT flat. Disk: 83%.
+
+### Root Cause
+System structural improvement confirmed. SHORT_NEUTRAL_BLOCK + 4h regime filtering converted SHORT side from -$1.40/7d loss to +$0.35/24h profit. CONF_FILTER_MAX=85 blocking overconfident trades. SL floor fix making ATR_SL exits net neutral. ct-hot+ legacy still draining but improving (24h: +$0.03 vs 7d: -$3.05). Without ct-hot+: 7d approximately +$2.33 (system profitable).
+
+### Fix Applied
+**NO CHANGES** — all prior fixes verified working. System on correct trajectory. Monitor: CONF_FILTER 85 eval (Aug 25 08:00), MIN_PRE_MOVE 0.3 eval (Aug 25), bb_bounce+ WR (>70%), disk (85%). Recommend T: disable ct-hot+ (RESEARCH_FLAGS), disable hzscore- (50% WR 10T inverted R:R).
+
+### Verification
+DB verified 24h: 69T +$0.89, 58.0% WR. SHORT 24h: 28T +$0.35, 67.9% WR (TURNED PROFITABLE). 2 open positions flat. Pipeline healthy. auto_1hr 09:04 UTC: system stable, trend strong and improving.
+
+---
+
 ## CEO Report — 2026-08-24 ~09:05 UTC (246th run)
 
 ### Diagnosis

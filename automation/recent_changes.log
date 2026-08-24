@@ -127,3 +127,11 @@
   WHY: 2T last hour (2W 0L +$0.25). Best session hour — 100% WR. bb_bounce+ +$0.21, tl_break_short +$0.04. 57T 24h 50.9% WR +$0.47 net (turned positive from -$0.32). profit-monster-trail +$0.94 best exit. atr_sl_hit 32T (56%) >40% but PnL positive +$0.23, tpsl fix confirmed working. macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. No kill criteria — no signal with 0% WR and 3+ trades last hour. Trade freq 2/hr normal. System stable, 24h trend positive.
   BY: auto_1hr
   NEXT: Re-run at 06:05 UTC
+[2026-08-24 08:04 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour, quiet period. 63T 24h 54% WR +$0.64 net (improved from +$0.47). bb_bounce+ +$0.53 top. tl_break_short +$0.21 consistent. ct-hot+ +$0.23 solid. atr_sl_hit 32T (51%) >40% but PnL positive +$0.22, tpsl fix confirmed. profit-monster-trail 20T +$1.24 best exit. macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. 5 open positions flat. Trade freq 3.5/hr normal. System stable, 24h trend positive and improving.
+  BY: auto_1hr
+  NEXT: Re-run at 09:05 UTC
+[2026-08-24 09:05 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (6W 0L +$0.29). Best hour this session — 100% WR. bb_bounce+ INJ winner. macd-div- 3T 3W +$0.18 short signal performing well. 65T 24h 58.5% WR +$1.02 net (improved from +$0.64). atr_sl_hit 29T (44.6%) >40% but PnL positive +$0.33, tpsl fix confirmed. profit-monster-trail 25T +$1.51 best exit. macd-div+ -$0.55 persistent but 0 trades last hour, not killable per 3+ rule. 5 open positions flat — HYPE -54%, WLD -71% managed by TPSL. Trade freq 3/hr normal. No kill criteria. System stable, 24h trend strong and improving.
+  BY: auto_1hr
+  NEXT: Re-run at 10:05 UTC

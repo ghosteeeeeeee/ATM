@@ -350,3 +350,6 @@ ALERTS:
 - **WARN** (1): 53 tokens stale (>10min no price update)
 - **INFO** (6): Non-critical services failed: better-coder (missing module), bug-hunter (audit exit), git-release, mtf-macd-tuner, trading-checklist, wasp
 - **AUTO-FIX**: None required — pipeline running normally
+
+## Error Alerts — 2026-08-24 09:04 UTC
+- **REPEATED** (8x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
