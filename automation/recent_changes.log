@@ -159,3 +159,7 @@
   WHY: 11T last hour (3W 8L -$0.70) — worst hour in session. 5 atr_sl_hit losses cluster (BSV, LDO, HYPE, BIGTIME, INJ). But 24h flat ($0.00) with 86T 58.1% WR. profit-monster-trail +$2.63 carrying system. macd-div+ -$0.55 persistent but 0 trades last 2h, not killable per 3+ rule. confluence-,ct-hot-,macd-div- -$0.32 only 2T, not killable. atr_sl_hit 33.7% below threshold. 2 open (ETH, BTC) breakeven. Trade freq 3.6/hr avg normal. No kill criteria met. System range-bound.
   BY: auto_1hr
   NEXT: Re-run at 16:15 UTC
+[2026-08-24 16:05 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (1W 3L -$0.47). ct-hot+ 2T 0W -$0.31 but not 3+ trades so not killable per 3+ rule. hl_copy_trader 1T 0W -$0.18. macd-div- 1T 1W +$0.02 (only winner). 87T 24h 57.5% WR -$0.57 (nearly flat). atr_sl_hit 30T (34.5%) below threshold. profit-monster-trail +$2.65 carrying system. 2 consecutive negative hours but not 3+. No kill criteria met. 5 open positions (HYPE SHORT +$0.10, AVAX/YGG +$0.02, BIGTIME -$0.03, BTC -$0.07). Trade freq 4/hr normal. Watching ct-hot+ — kill if 3+ trades next hour with 0% WR.
+  BY: auto_1hr
+  NEXT: Re-run at 17:05 UTC

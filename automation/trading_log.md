@@ -14272,3 +14272,77 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - macd-div+ persistent drag — monitor, kill if triggers with 3+ trades and 0% WR
 - Last hour -$0.70 is worst in session — watch if pattern continues next hour
+
+## [2026-08-24 16:05 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1W 3L, -$0.47)
+**24h:** 87T 50W 37L WR=57.5% PnL=$-0.57
+
+**Close reasons 24h:**
+- profit-monster-trail: 44T (50.6%) +$2.65, avg +$0.060 — system engine
+- atr_sl_hit: 30T (34.5%) -$2.33, avg -$0.078 — below 40% threshold (tpsl fix working)
+- cut-loser-CL-T1: 6T -$0.75, avg -$0.125
+
+**Signal 24h:**
+- bb_bounce+: 13T 12W +$0.95 (92% WR) — top performer
+- hzscore-: 4T +$0.29
+- macd-div-: 12T 9W +$0.02
+- tl_break_short: 10T 8W +$0.02
+- ct-hot+: 14T 5W -$0.21 — worst signal, 2T 0W last hour
+- hl_copy_trader: 4T 1W -$0.37
+- macd-div+: 4T 1W -$0.33 — persistent drag
+
+**Last hour detail:**
+- ct-hot+: 2T 0W -$0.31 (SUSHI, AIXBT — both atr_sl_hit LONGs)
+- hl_copy_trader: 1T 0W -$0.18 (ETH atr_sl_hit LONG)
+- macd-div-: 1T 1W +$0.02 (GRASS profit-monster-trail SHORT)
+
+**Hourly trend:** 2 consecutive negative hours (-$0.47, -$0.70). Before that 13:00 was 88% WR +$0.25. Looks like noise, not regime shift.
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal has 3+ trades last hour with 0% WR (ct-hot+ at 2T, closest)
+- atr_sl_hit 34.5% — below 40% threshold
+- Trade frequency 4/hr normal
+- 24h PnL -$0.57 nearly flat
+- 2 consecutive negative hours (not 3+)
+- 5 open positions, HYPE SHORT +$0.10 best, AVAX LONG +$0.02, YGG LONG +$0.02
+
+**Open Questions:**
+- ct-hot+ 2T 0W last hour — kill if 3+ trades next hour with 0% WR
+- 2h drawdown -$1.17 — watch if continues next hour
+- cut-loser-CL-T1 avg -$0.125 — largest per-trade loss, but only 6T/24h
+
+## [2026-08-24 17:05 UTC] Hourly Analysis
+
+**Trades:** 6 closed (3W 3L, -$0.05)
+**24h:** 93T 53W 40L WR=57.0% PnL=$+0.14
+
+**Close reasons 24h:**
+- profit-monster-trail: 44T (47.3%) +$2.73, avg +$0.062 — system engine
+- atr_sl_hit: 34T (36.6%) -$2.36, avg -$0.069 — below 40% threshold
+- cut-loser: 7T -$0.66, avg -$0.094
+
+**Last hour:**
+- YGG: +$0.27 (ct-hot+ atr_sl_hit LONG — small position, positive PnL)
+- AVAX: +$0.10 (bb_bounce+ profit-monster-trail LONG)
+- HYPE: +$0.05 (hl_copy_trader atr_sl_hit SHORT)
+- TURBO: -$0.21 (ct-hot+ atr_sl_hit LONG)
+- BIGTIME: -$0.14 (confluence- atr_sl_hit SHORT)
+- BTC: -$0.12 (confluence+ cut-loser-MAE-GUARD LONG)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- No signal has 3+ trades last hour with 0% WR
+- ct-hot+: 2T 50% WR last hour (improving from prior hour)
+- hl_copy_trader: 2T 50% WR last hour
+- atr_sl_hit 36.6% below threshold
+- 1 open position (AVAX LONG -$0.05)
+- Trade freq 6/hr normal
+- 24h PnL positive +$0.14
+
+**Open Questions:**
+- ct-hot+ still worst 24h signal (-$0.42) but improving — monitor
+- hl_copy_trader -$0.30 24h — borderline
