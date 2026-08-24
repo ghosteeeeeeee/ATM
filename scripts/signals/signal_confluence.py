@@ -27,6 +27,8 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_RECENCY_BONUS,
     SIGNAL_CONFLUENCE_COOLDOWN_HOURS,
     SIGNAL_CONFLUENCE_MAX_PRICE_AGE,
+    SIGNAL_CONFLUENCE_2SRC_CONFIDENCE,
+    SIGNAL_CONFLUENCE_3SRC_CONFIDENCE,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -157,9 +159,17 @@ def _score_group(token, direction, signals):
     if score < SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD or compound_count < SIGNAL_CONFLUENCE_MIN_COMPOUND:
         return None
 
+    # Tiered confidence: 3+ sources get high confidence, 2 sources get lower
+    if compound_count >= 4:
+        confidence = 88  # max — very rare, very strong
+    elif compound_count >= 3:
+        confidence = SIGNAL_CONFLUENCE_3SRC_CONFIDENCE  # 75 — high quality
+    else:
+        confidence = SIGNAL_CONFLUENCE_2SRC_CONFIDENCE  # 55 — lower quality,2-source
+
     return {
         'direction': direction,
-        'confidence': min(88, score),  # add_signal() caps at 88
+        'confidence': confidence,
         'value': compound_count,
         'price': current_price,
         'survived': survived,
