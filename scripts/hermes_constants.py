@@ -1981,6 +1981,11 @@ COIN_TRACKER_HOT_MAX_BB_POSITION    = 0.75     # BB position must be < this for 
 # Speed & acceleration filters — prevent chasing extremes (added 2026-08-22)
 COIN_TRACKER_HOT_MIN_SPEED_PCT      = 20       # Speed percentile must be > this (widened from 30 — was blocking valid signals). RESEARCH_FLAGS
 COIN_TRACKER_HOT_MAX_SPEED_PCT      = 95       # Speed percentile must be < this (widened from 85 — was blocking valid signals). RESEARCH_FLAGS
+# Extension filters — prevent entries when price already extended (added 2026-08-24)
+COIN_TRACKER_HOT_MIN_ZSCORE_LONG    = -0.5     # For LONG: Z-score must be > this (avoid catching falling knives)
+COIN_TRACKER_HOT_MAX_ZSCORE_SHORT   = -0.5     # For SHORT: Z-score must be < this (avoid shorting oversold)
+COIN_TRACKER_HOT_MIN_BB_LONG        = 0.4      # For LONG: BB position must be > this (avoid lower band entries)
+COIN_TRACKER_HOT_MAX_BB_SHORT       = 0.6      # For SHORT: BB position must be < this (avoid upper band entries)
 COIN_TRACKER_HOT_MIN_ACCEL          = -0.01    # Price acceleration must be > this (avoid decelerating entries)
 
 # ── Chain Fire — fire on follower tokens when leader tokens pump ─────────────
@@ -2002,8 +2007,8 @@ SIGNAL_CONFLUENCE_ENABLED              = True   # master kill-switch
 SIGNAL_CONFLUENCE_PLUS_ENABLED         = True   # LONG direction
 SIGNAL_CONFLUENCE_MINUS_ENABLED        = True   # SHORT direction
 SIGNAL_CONFLUENCE_WINDOW_MINUTES       = 30     # rolling lookback window
-SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN = 0.03  # 3% — price move against kills the signal
-SIGNAL_CONFLUENCE_MAX_FAVORABLE_MOVE = 0.02  # 2% — if price already moved this much in our favor, skip (echo prevention)
+SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN = 0.03  # 3% — price reversal kills the signal
+SIGNAL_CONFLUENCE_MIN_FAVORABLE_MOVE = 0.005  # 0.5% — price must move this much in favorable direction to confirm
 SIGNAL_CONFLUENCE_MIN_COMPOUND         = 2      # min unique sources to fire (2=low conf, 3+=high conf)
 SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD = 45     # min score to fire
 SIGNAL_CONFLUENCE_2SRC_CONFIDENCE      = 55     # confidence for 2-source compounding (lower quality)

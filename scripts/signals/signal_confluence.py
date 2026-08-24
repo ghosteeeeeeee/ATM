@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""signal_confluence — meta-signal detecting persistence + compounding of first-order signals.
+"""signal_confluence — second-chance signal for missed moves.
 
 Looks backward over a 30-minute rolling window of first-order signals and fires when:
-1. Multiple independent signal sources have fired in the same direction (compounding)
-2. Price hasn't moved against those signals (persistence)
+1. Multiple independent signal sources fired in the same direction (compounding)
+2. Price moved FURTHER in the favorable direction (confirmation — the move got ripe)
+3. Price hasn't reversed (still valid)
+
+This catches tokens where signals fired, we didn't take the trade, and the move
+became even MORE confirmed by price action.
 
 Cadence: slow signal — runs every 5 minutes (in _SLOW_SIGNALS).
 """
@@ -31,7 +35,7 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_3SRC_CONFIDENCE,
     SIGNAL_CONFLUENCE_4SRC_CONFIDENCE,
     SIGNAL_CONFLUENCE_RECENCY_WINDOW_MINUTES,
-    SIGNAL_CONFLUENCE_MAX_FAVORABLE_MOVE,
+    SIGNAL_CONFLUENCE_MIN_FAVORABLE_MOVE,  # price must move at least this much to confirm
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -107,37 +111,48 @@ def _normalize_source(source):
 
 
 def _score_group(token, direction, signals):
-    """Score a (token, direction) group for confluence."""
+    """Score a (token, direction) group for second-chance confluence."""
     # Get current price
     current_price = _get_current_price(token)
     if current_price is None:
         return None
 
-    # Persistence check — price hasn't moved against the original direction
+    # Get entry prices from original signals
     entry_prices = [s['price'] for s in signals if s['price'] and s['price'] > 0]
     if not entry_prices:
         return None
 
+    # 1. PERSISTENCE CHECK — price hasn't reversed against the original direction
+    #    For SHORT: price shouldn't have risen above the worst entry
+    #    For LONG: price shouldn't have fallen below the worst entry
     if direction == 'LONG':
         worst_entry = min(entry_prices)
-        survived = current_price >= worst_entry * (1 - SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN)
+        reversed = current_price < worst_entry * (1 - SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN)
     else:
         worst_entry = max(entry_prices)
-        survived = current_price <= worst_entry * (1 + SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN)
+        reversed = current_price > worst_entry * (1 + SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN)
 
-    # Echo prevention — skip if price already moved significantly in our favor
-    # (the move happened, entering now is chasing)
+    if reversed:
+        return None  # Move is dead — price reversed
+
+    # 2. CONFIRMATION CHECK — price moved FURTHER in the favorable direction
+    #    This is the KEY difference from the old design. We WANT the price to have
+    #    moved in our favor as confirmation that the signals were correct.
+    #    For SHORT: price should have DROPPED from the best entry
+    #    For LONG: price should have RISEN from the best entry
     best_entry = max(entry_prices) if direction == 'LONG' else min(entry_prices)
-    if best_entry > 0:
-        if direction == 'LONG':
-            favorable_move = (current_price - best_entry) / best_entry
-        else:
-            favorable_move = (best_entry - current_price) / best_entry
+    if best_entry <= 0:
+        return None
 
-        if favorable_move > SIGNAL_CONFLUENCE_MAX_FAVORABLE_MOVE:
-            return None  # Too late — move already happened
+    if direction == 'LONG':
+        favorable_move = (current_price - best_entry) / best_entry
+    else:
+        favorable_move = (best_entry - current_price) / best_entry
 
-    # Compounding: count unique source types (split comma-separated merged sources)
+    if favorable_move < SIGNAL_CONFLUENCE_MIN_FAVORABLE_MOVE:
+        return None  # Not confirmed yet — price hasn't moved enough
+
+    # 3. COMPOUNDING — count unique source types
     unique_sources = set()
     for s in signals:
         bases = _normalize_source(s.get('source', ''))
@@ -147,7 +162,7 @@ def _score_group(token, direction, signals):
 
     compound_count = len(unique_sources)
 
-    # Recency bonus — fresher signals = more relevant
+    # 4. RECENCY — most recent signal should be recent
     now = datetime.now(timezone.utc)
     most_recent = None
     for s in signals:
@@ -164,30 +179,34 @@ def _score_group(token, direction, signals):
         if minutes_ago < SIGNAL_CONFLUENCE_RECENCY_WINDOW_MINUTES:
             recency_bonus = SIGNAL_CONFLUENCE_RECENCY_BONUS
 
-    # Final score
+    # 5. FINAL SCORE
     score = (
         compound_count * SIGNAL_CONFLUENCE_COMPOUND_WEIGHT
-        + (SIGNAL_CONFLUENCE_SURVIVED_BONUS if survived else 0)
+        + SIGNAL_CONFLUENCE_SURVIVED_BONUS  # survived = not reversed (always true if we get here)
         + recency_bonus
     )
 
     if score < SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD or compound_count < SIGNAL_CONFLUENCE_MIN_COMPOUND:
         return None
 
-    # Tiered confidence: 3+ sources get high confidence, 2 sources get lower
+    # Tiered confidence: more sources + more confirmation = higher confidence
     if compound_count >= 4:
         confidence = SIGNAL_CONFLUENCE_4SRC_CONFIDENCE  # 88 — max, very rare
     elif compound_count >= 3:
         confidence = SIGNAL_CONFLUENCE_3SRC_CONFIDENCE  # 75 — high quality
     else:
-        confidence = SIGNAL_CONFLUENCE_2SRC_CONFIDENCE  # 55 — lower quality,2-source
+        confidence = SIGNAL_CONFLUENCE_2SRC_CONFIDENCE  # 55 — lower quality, 2-source
+
+    # Bonus for strong confirmation (price moved a lot in our favor)
+    if favorable_move >= 0.03:  # 3%+ confirmation
+        confidence = min(88, confidence + 5)
 
     return {
         'direction': direction,
         'confidence': confidence,
         'value': compound_count,
         'price': current_price,
-        'survived': survived,
+        'favorable_move': favorable_move,
         'compound_count': compound_count,
         'unique_sources': list(unique_sources),
     }
@@ -259,7 +278,8 @@ def scan_signals() -> int:
             added += 1
             set_cooldown(token, direction, hours=SIGNAL_CONFLUENCE_COOLDOWN_HOURS)
             _log(f'FIRED: {token} {direction} conf={result["confidence"]:.0f} '
-                 f'compound={result["compound_count"]} sources={result["unique_sources"]}')
+                 f'compound={result["compound_count"]} sources={result["unique_sources"]} '
+                 f'favorable={result["favorable_move"]*100:.1f}%')
 
     _log(f'Added {added} confluence signals')
     return added
