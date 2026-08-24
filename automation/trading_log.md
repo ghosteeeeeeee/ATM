@@ -1,5 +1,36 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-24 02:04 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L +$0.07)
+**24h:** 48T 19W 39.6% WR -$0.10 (near breakeven)
+
+**24h Close Reasons:**
+- atr_sl_hit: 31T -$0.36 — dominant but now net negative (was +$1.01 yesterday)
+- profit-monster-trail: 7T +$0.22 — healthy, only profitable exit
+- cut-loser-MAE-GUARD: 3T -$0.41 — legacy, disabled
+- cut-loser-CL-T1: 2T -$0.25 — underperforming
+- hard_sl: 2T -$0.27 — underperforming
+
+**Signal Performance 24h:**
+- ct-hot+: 25T/12W 48% +$0.009 — breakeven, largest signal
+- hzscore-: 8T/3W 37.5% -$0.044 — killed, orphaned trades draining
+- macd-div+: 5T/1W 20% -$0.110 — CEO killed, draining
+- hl_copy_trader: 4T/1W 25% -$0.023 — below kill threshold
+- ct-hot-: 2T/0W 0% -$0.075 — below kill threshold
+
+**Changes:** None
+**No Change Needed:**
+- 2T last hour — quiet period, normal freq
+- hzscore- and macd-div+ already killed, just draining orphaned trades
+- hl_copy_trader and ct-hot- below kill threshold (need 3+T/0%WR)
+- atr_sl_hit flipped to -$0.36 — market variance, trail SL was fixed earlier
+- 2 open hzscore- SHORTs (BSV/NXPC) at $0.00 PnL — riding, trail SL active
+- No kill criteria actionable
+
+**Open Questions:**
+- atr_sl_hit net negative for first time — monitor next 24h, if persistent may need trail SL param review
+
 ## [2026-08-23 18:00 UTC] Hourly Analysis
 
 **Trades:** 0 closed last hour

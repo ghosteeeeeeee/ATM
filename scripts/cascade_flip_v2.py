@@ -96,15 +96,15 @@ def compute_flip_score(
     if live_pnl > 0.01:
         return None  # In profit — never flip
 
-    # ── Gate 2: Minimum velocity — don't flip in dead markets ─────────────
-    # If price isn't moving, there's no reversal to flip into.
-    # This prevents flipping on noise when speed_pctl is very low.
+    # ── Gate 2: Minimum velocity — don't flip in dead/weak markets ────────
+    # If price isn't moving strongly, there's no reversal to flip into.
+    # This prevents flipping on noise when momentum is marginal.
     if speed_tracker is not None:
         try:
             spd = speed_tracker.get_token_speed(token)
             vel_5m = abs(spd.get('price_velocity_5m', 0) or 0)
-            if vel_5m < 0.15:
-                return None  # Market too quiet — no directional momentum
+            if vel_5m < 0.30:
+                return None  # Market too quiet — need real momentum to flip
         except Exception:
             pass
 
@@ -287,14 +287,14 @@ def _score_momentum(
 
     reasons = []
 
-    if vel_magnitude > CFV2_VEL_STRONG and confirms_reversal:
+    if vel_magnitude >= CFV2_VEL_STRONG and confirms_reversal:
         pts = CFV2_MOMENTUM_MAX_PTS
         reasons.append(f'momentum: STRONG reversal (vel={vel_5m:+.3f}%/candle, accel={accel:+.5f})')
-    elif vel_magnitude > CFV2_VEL_MODERATE and confirms_reversal:
-        pts = CFV2_MOMENTUM_MAX_PTS * 0.6
+    elif vel_magnitude >= CFV2_VEL_MODERATE and confirms_reversal:
+        pts = CFV2_MOMENTUM_MAX_PTS * 0.4  # Was 0.6 — moderate is not enough alone
         reasons.append(f'momentum: moderate reversal (vel={vel_5m:+.3f}%, accel={accel:+.5f})')
-    elif vel_magnitude > CFV2_VEL_MODERATE:
-        pts = CFV2_MOMENTUM_MAX_PTS * 0.2
+    elif vel_magnitude >= CFV2_VEL_MODERATE:
+        pts = CFV2_MOMENTUM_MAX_PTS * 0.15
         reasons.append(f'momentum: some speed but NOT confirming reversal (vel={vel_5m:+.3f}%)')
     else:
         pts = 0
@@ -313,15 +313,15 @@ def _get_score_threshold(live_pnl: float) -> float:
     if live_pnl > -0.01:
         return 90   # Near breakeven — only ultra-strong reversal
     elif live_pnl > -0.03:
-        return 75
+        return 80   # Strong signal needed
     elif live_pnl > -0.06:
-        return 65   # Raised from 60 — don't flip easily at small losses
+        return 70   # Need clear reversal, not noise
     elif live_pnl > -0.10:
-        return 55   # Raised from 50
+        return 60   # Moderate conviction required
     elif live_pnl > -0.20:
-        return 50   # Raised from 40 — need real conviction at this loss
+        return 50   # Standard flip zone
     else:
-        return 45   # Deep underwater — still need moderate signal
+        return 40   # Deep underwater — flip on moderate signal
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
