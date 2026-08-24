@@ -326,3 +326,6 @@ ALERTS:
 ## Error Alerts — 2026-08-24 01:03 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS TOK signal_compactor: timed out`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS TOK breakout_engine: timed out`
+
+## Error Alerts — 2026-08-24 04:03 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
