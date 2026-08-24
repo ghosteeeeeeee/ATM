@@ -219,15 +219,14 @@ def fetch_all_prices():
             return tokens, prices, universe
 
     # Cache miss or stale — do fresh fetch + write cache
-    headers = {'Content-Type': 'application/json'}
+    # Use _hl_info() for rate limiting (prevents 429s from concurrent processes)
+    from hyperliquid_exchange import _hl_info
     try:
-        r1 = requests.post(API, json={'type': 'meta'}, headers=headers, timeout=30)
-        r1.raise_for_status()
-        universe = r1.json().get('universe', [])
+        meta_result = _hl_info({"type": "meta"})
+        universe = meta_result.get('universe', []) if meta_result else []
 
-        r2 = requests.post(API, json={'type': 'allMids'}, headers=headers, timeout=30)
-        r2.raise_for_status()
-        mids = r2.json()
+        mids_result = _hl_info({"type": "allMids"})
+        mids = mids_result if mids_result else {}
 
         tokens={u['name']: u.get('maxLeverage', 10) for u in universe if mids.get(u['name'])}
         prices = {k: float(v) for k, v in mids.items() if v}
