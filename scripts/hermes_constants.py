@@ -2007,6 +2007,8 @@ SIGNAL_CONFLUENCE_MIN_COMPOUND         = 2      # min unique sources to fire (2=
 SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD = 45     # min score to fire
 SIGNAL_CONFLUENCE_2SRC_CONFIDENCE      = 55     # confidence for 2-source compounding (lower quality)
 SIGNAL_CONFLUENCE_3SRC_CONFIDENCE      = 75     # confidence for 3-source compounding (high quality)
+SIGNAL_CONFLUENCE_4SRC_CONFIDENCE      = 88     # confidence for 4+ source compounding (max quality)
+SIGNAL_CONFLUENCE_RECENCY_WINDOW_MINUTES = 10   # most recent signal must be < N min old for bonus
 SIGNAL_CONFLUENCE_COMPOUND_WEIGHT      = 30     # points per unique source (2 sources = 75 conf, 3+ = 88 capped)
 SIGNAL_CONFLUENCE_SURVIVED_BONUS       = 10     # points if earliest signal survived
 SIGNAL_CONFLUENCE_RECENCY_BONUS        = 5      # points if most recent signal < 10 min old

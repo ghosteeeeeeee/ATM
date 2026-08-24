@@ -29,6 +29,8 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_MAX_PRICE_AGE,
     SIGNAL_CONFLUENCE_2SRC_CONFIDENCE,
     SIGNAL_CONFLUENCE_3SRC_CONFIDENCE,
+    SIGNAL_CONFLUENCE_4SRC_CONFIDENCE,
+    SIGNAL_CONFLUENCE_RECENCY_WINDOW_MINUTES,
     LONG_BLACKLIST, SHORT_BLACKLIST,
 )
 
@@ -146,7 +148,7 @@ def _score_group(token, direction, signals):
     recency_bonus = 0
     if most_recent:
         minutes_ago = (now - most_recent).total_seconds() / 60
-        if minutes_ago < 10:
+        if minutes_ago < SIGNAL_CONFLUENCE_RECENCY_WINDOW_MINUTES:
             recency_bonus = SIGNAL_CONFLUENCE_RECENCY_BONUS
 
     # Final score
@@ -161,7 +163,7 @@ def _score_group(token, direction, signals):
 
     # Tiered confidence: 3+ sources get high confidence, 2 sources get lower
     if compound_count >= 4:
-        confidence = 88  # max — very rare, very strong
+        confidence = SIGNAL_CONFLUENCE_4SRC_CONFIDENCE  # 88 — max, very rare
     elif compound_count >= 3:
         confidence = SIGNAL_CONFLUENCE_3SRC_CONFIDENCE  # 75 — high quality
     else:
