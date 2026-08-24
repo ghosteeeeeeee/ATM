@@ -1514,6 +1514,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # confluence (meta-signal)
+            if _comp == 'confluence+':
+                try:
+                    from hermes_constants import SIGNAL_CONFLUENCE_PLUS_ENABLED
+                    if not SIGNAL_CONFLUENCE_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SIGNAL_CONFLUENCE_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'confluence-':
+                try:
+                    from hermes_constants import SIGNAL_CONFLUENCE_MINUS_ENABLED
+                    if not SIGNAL_CONFLUENCE_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SIGNAL_CONFLUENCE_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'confluence':
+                try:
+                    from hermes_constants import SIGNAL_CONFLUENCE_ENABLED
+                    if not SIGNAL_CONFLUENCE_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SIGNAL_CONFLUENCE_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 
@@ -2024,6 +2049,7 @@ def is_component_disabled(component: str) -> bool:
             WYCKOFF_ENABLED, WYCKOFF_PLUS_ENABLED, WYCKOFF_MINUS_ENABLED,
             RETURN_EXHAUSTION_SHORT_ENABLED,
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
+            SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2219,6 +2245,10 @@ def is_component_disabled(component: str) -> bool:
     if c == 'ct-hot+': return not COIN_TRACKER_HOT_PLUS_ENABLED
     if c == 'ct-hot-': return not COIN_TRACKER_HOT_MINUS_ENABLED
     if c == 'ct-hot': return not COIN_TRACKER_HOT_ENABLED
+    # confluence (meta-signal)
+    if c == 'confluence+': return not SIGNAL_CONFLUENCE_PLUS_ENABLED
+    if c == 'confluence-': return not SIGNAL_CONFLUENCE_MINUS_ENABLED
+    if c == 'confluence': return not SIGNAL_CONFLUENCE_ENABLED
     return False  # unknown component — allow (don't block what we can't identify)
 
 

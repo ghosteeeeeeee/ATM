@@ -76,6 +76,8 @@ from hermes_constants import (
     MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
     # chain_fire
     CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
+    # signal_confluence (meta-signal)
+    SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
 )
 
 
@@ -390,6 +392,11 @@ try:
 except Exception:
     _chain_fire_run = None
 
+try:
+    from signals.signal_confluence import run as _signal_confluence_run
+except Exception:
+    _signal_confluence_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -467,6 +474,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'liquidation_hunt', 'enabled': 'LIQUIDATION_HUNT_ENABLED', 'run': _liquidation_hunt_run},
     {'name': 'macd_divergence', 'enabled': 'MACD_DIVERGENCE_ENABLED', 'run': _macd_divergence_run},
     {'name': 'chain_fire', 'enabled': 'CHAIN_FIRE_ENABLED', 'run': _chain_fire_run},
+    {'name': 'signal_confluence', 'enabled': 'SIGNAL_CONFLUENCE_ENABLED', 'run': _signal_confluence_run},
 ]
 
 
@@ -474,7 +482,7 @@ SIGNAL_REGISTRY: list[dict] = [
 
 # Slow signals — scan 191 tokens and take >60s. Run separately on a 5-min cadence.
 # All other signals are fast (<10s each).
-_SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'momentum_leaderboard', 'macd_divergence'}
+_SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'momentum_leaderboard', 'macd_divergence', 'signal_confluence'}
 
 
 def _resolve_enabled(entry):

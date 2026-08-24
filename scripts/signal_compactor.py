@@ -348,6 +348,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     # liquidation_hunt — contrarian entry at liquidation clusters
     ('liquidation_hunt_long', 'liq-hunt+'):  1.0,
     ('liquidation_hunt_short', 'liq-hunt-'): 1.0,
+    # signal_confluence — meta-signal (persistence + compounding of first-order signals)
+    ('signal_confluence', 'confluence+'): 1.5,
+    ('signal_confluence', 'confluence-'): 1.5,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

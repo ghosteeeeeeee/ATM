@@ -1401,6 +1401,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'ct-hot',
     'liq-hunt',  # liquidation cluster contrarian — structural, regime-agnostic
     'macd-div',  # MACD divergence — counter-trend, works solo
+    'confluence',  # meta-signal — validates persistence + compounding of first-order signals
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
@@ -1993,3 +1994,17 @@ CHAIN_FIRE_MIN_CO_FIRES = 5             # minimum historical co-firings to trust
 CHAIN_FIRE_MAX_LEADER_AGE_SECS = 1800    # leader must have fired within 30min (1800s)
 CHAIN_FIRE_COOLDOWN_HOURS = 4           # per-follower cooldown after chain fire
 CHAIN_FIRE_MAX_PER_CYCLE = 3            # max chain signals per pipeline run (prevent flooding)
+
+# ── signal_confluence (meta-signal) ────────────────────────────────────────
+# signal_confluence.py — detects persistence + compounding of first-order signals
+# over a 30-minute rolling window. Fires every 5 min (slow signal).
+SIGNAL_CONFLUENCE_ENABLED              = True   # master kill-switch
+SIGNAL_CONFLUENCE_PLUS_ENABLED         = True   # LONG direction
+SIGNAL_CONFLUENCE_MINUS_ENABLED        = True   # SHORT direction
+SIGNAL_CONFLUENCE_WINDOW_MINUTES       = 30     # rolling lookback window
+SIGNAL_CONFLUENCE_PERSISTENCE_MAX_DRAWDOWN = 0.03  # 3% — price move against kills the signal
+SIGNAL_CONFLUENCE_MIN_COMPOUND         = 2      # min unique sources to fire
+SIGNAL_CONFLUENCE_CONFIDENCE_THRESHOLD = 45     # min score to fire
+SIGNAL_CONFLUENCE_COMPOUND_WEIGHT      = 15     # points per unique source
+SIGNAL_CONFLUENCE_SURVIVED_BONUS       = 10     # points if earliest signal survived
+SIGNAL_CONFLUENCE_RECENCY_BONUS        = 5      # points if most recent signal < 10 min old

@@ -42,6 +42,7 @@ REGIME_SIGNALS = {
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in range-bound
+        'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
     },
     'NORMAL': {
         # Trend following + mean reversion in steady markets
@@ -65,6 +66,7 @@ REGIME_SIGNALS = {
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — trend exhaustion detector
+        'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
     },
     'HIGH': {
         # Breakout works in big moves
@@ -85,6 +87,7 @@ REGIME_SIGNALS = {
         'return_exhaustion_long',  # extreme negative return reversal
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
+        'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
     },
     'EXTREME': {
         # Continuation works in storms
@@ -97,6 +100,7 @@ REGIME_SIGNALS = {
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in EXTREME
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks — structural
+        'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
     },
 }
 
