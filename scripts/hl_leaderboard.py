@@ -6,28 +6,10 @@ Scans Hyperliquid for top traders and ranks them by performance.
 import json
 import time
 import os
-import urllib.request
-import urllib.error
 from pathlib import Path
 from hl_copy_db import get_db, init_db
 from paths import HL_COPY_TRADERS
-
-BASE_URL = "https://api.hyperliquid.xyz/info"
-
-def _hl_info(payload: dict):
-    """Make a POST request to HL info endpoint. Returns dict or list based on expected type."""
-    data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        BASE_URL,
-        data=data,
-        headers={"Content-Type": "application/json"}
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return json.loads(resp.read())
-    except Exception as e:
-        print(f"[hl_info] Error: {e}")
-        return None
+from hyperliquid_exchange import _hl_info
 
 def get_leaderboard() -> list:
     """Fetch leaderboard from Hyperliquid using web scraping."""

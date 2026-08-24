@@ -13,6 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from hl_copy_db import get_db
 from paths import HERMES_DATA, WWW_DATA
+from hyperliquid_exchange import _hl_info
 
 # Known sources we've already scraped
 KNOWN_SOURCES = {
@@ -102,28 +103,18 @@ def discover_from_social_media() -> list:
 
 def evaluate_wallet(wallet: str) -> dict | None:
     """Evaluate if a wallet is worth tracking."""
-    import urllib.request
-    
-    BASE_URL = 'https://api.hyperliquid.xyz/info'
-    
-    def hl_info(payload):
-        data = json.dumps(payload).encode()
-        req = urllib.request.Request(BASE_URL, data=data, headers={'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return json.loads(resp.read())
-    
     try:
         # Check account value
-        state = hl_info({'type': 'clearinghouseState', 'user': wallet})
+        state = _hl_info({'type': 'clearinghouseState', 'user': wallet})
         if not state or 'marginSummary' not in state:
             return None
-        
+
         account_value = float(state['marginSummary'].get('accountValue', 0))
         if account_value < 1000:  # Skip small accounts
             return None
-        
+
         # Get fills
-        fills = hl_info({'type': 'userFills', 'user': wallet})
+        fills = _hl_info({'type': 'userFills', 'user': wallet})
         if not fills or not isinstance(fills, list):
             return None
         

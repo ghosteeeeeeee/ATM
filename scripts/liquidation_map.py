@@ -22,14 +22,12 @@ import json
 import os
 import sys
 import time
-import urllib.request
-import urllib.error
 from collections import defaultdict
 from pathlib import Path
 
 from paths import *
+from hyperliquid_exchange import _hl_info
 
-BASE_URL = "https://api.hyperliquid.xyz/info"
 LIQ_MAP_FILE = os.path.join(WWW_DATA, "liquidation_map.json")
 LIQ_CLUSTERS_FILE = os.path.join(HERMES_DATA, "liquidation_clusters.json")
 SCAN_INTERVAL = 300  # 5 minutes between full scans
@@ -41,22 +39,6 @@ SCAN_TOKENS = [
     "FIL", "APT", "SEI", "TIA", "INJ", "FET", "RENDER", "ONDO",
     "PUMP", "HYPE", "FARTCOIN", "WLD", "AAVE", "ENA", "TRUMP",
 ]
-
-
-def _hl_info(payload: dict, timeout: int = 10):
-    """POST to HL /info endpoint."""
-    data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        BASE_URL,
-        data=data,
-        headers={"Content-Type": "application/json"}
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return json.loads(resp.read())
-    except Exception as e:
-        print(f"[hl_info] Error: {e}")
-        return None
 
 
 # ─── Wallet Universe ─────────────────────────────────────────────────────────

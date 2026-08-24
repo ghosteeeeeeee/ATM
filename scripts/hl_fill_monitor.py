@@ -6,27 +6,11 @@ Tracks real-time fills from monitored wallets.
 import json
 import time
 import os
-import urllib.request
 from hl_copy_db import get_db, init_db
 from paths import HERMES_DATA, CANDLES_DB, PRICES_FILE
+from hyperliquid_exchange import _hl_info
 
-BASE_URL = "https://api.hyperliquid.xyz/info"
 LAST_FILLS_FILE = os.path.join(HERMES_DATA, 'hl_copy_last_fills.json')
-
-def _hl_info(payload: dict):
-    """Make a POST request to HL info endpoint. Returns dict or list."""
-    data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        BASE_URL,
-        data=data,
-        headers={"Content-Type": "application/json"}
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return json.loads(resp.read())
-    except Exception as e:
-        print(f"[hl_info] Error: {e}")
-        return None
 
 def load_last_fills() -> dict:
     """Load last known fill times per wallet."""

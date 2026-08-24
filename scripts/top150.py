@@ -25,20 +25,9 @@ _sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import _get_meta, get_tradeable_tokens
 
 from paths import *
-HL_INFO_URL = "https://api.hyperliquid.xyz/info"
 BINANCE_VOL_URL = "https://api.binance.com/api/v3/ticker/24hr"
 CACHE_FILE = TOP150_FILE
 CACHE_TTL = 3600  # 1 hour
-
-
-def hl_info(payload):
-    req = urllib.request.Request(
-        HL_INFO_URL,
-        data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"}
-    )
-    with urllib.request.urlopen(req, timeout=15) as r:
-        return json.loads(r.read())
 
 
 def get_hl_universe():
