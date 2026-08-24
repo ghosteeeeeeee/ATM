@@ -220,6 +220,18 @@ def run_once():
     print(f"  Today's fills: {today['cnt']}")
     print(f"  Today's PnL: ${today['pnl']:.2f}" if today['pnl'] else "  Today's PnL: $0.00")
 
+def cleanup_old_fills():
+    """Clean up fills older than 7 days to prevent DB bloat."""
+    conn = get_db()
+    try:
+        cutoff = int(time.time() * 1000) - (7 * 24 * 60 * 60 * 1000)
+        result = conn.execute("DELETE FROM trader_fills WHERE time < ?", (cutoff,))
+        if result.rowcount > 0:
+            print(f"[cleanup] Removed {result.rowcount} old fills (>7 days)")
+            conn.commit()
+    finally:
+        conn.close()
+
 def run_daemon():
     """Run as daemon with periodic cycles."""
     print("[daemon] Starting HL Copy Trading daemon...")
@@ -227,9 +239,16 @@ def run_daemon():
     print(f"[daemon] Report interval: {REPORT_INTERVAL}s")
     print(f"[daemon] Press Ctrl+C to stop\n")
     
+    cycle_count = 0
     while True:
         try:
             run_once()
+            cycle_count += 1
+            
+            # Cleanup old fills every 100 cycles (~50 minutes)
+            if cycle_count % 100 == 0:
+                cleanup_old_fills()
+            
             print(f"\n[daemon] Next cycle in {HL_COPY_POLL_INTERVAL}s...")
             time.sleep(HL_COPY_POLL_INTERVAL)
         except KeyboardInterrupt:
