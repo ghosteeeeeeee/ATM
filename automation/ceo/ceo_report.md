@@ -77,3 +77,17 @@ Verified from DB: 24h 57T +$0.07 47.4% WR. Today 17T +$0.83 76.5% WR. 7d by sign
 - ct-hot+ age-out: Aug 24-25
 - bb_bounce+ WR: 71.4% (7T, emerging winner)
 - Disk: 83%
+
+## CEO Report — 2026-08-24 ~14:00 UTC (Run 248)
+
+### Diagnosis
+System FLAT, pipeline IDLE (quiet market). 24h 74T +$0.30, 59.5% WR. 7d: 262T -$1.16, 53.1% WR. 0 open positions. Pipeline generates signals but spike filter blocks all SHORT (recent bullish 5m candles). ct-hot+ STILL #1 LOSER: 61T/7d -$2.95, 39.3% WR — flags STILL True (T re-enabled RESEARCH_FLAGS, CEO cannot disable). MAE-Guard re-enabled: 8 hl_copy_trader hits/48h -$0.88 (cutting winners).
+
+### Root Cause
+ct-hot+ remains enabled via RESEARCH_FLAGS despite being dominant loser (85% of total7d loss). Pipeline idle because spike filter blocks SHORT signals in current market conditions. MAE-Guard cutting hl_copy_trader winners (was -$5.43/week before initial disable).
+
+### Fix Applied
+No code changes (CEO cannot disable RESEARCH_FLAGS). RECOMMEND T: disable ct-hot+ flags, disable hzscore- (50% WR inverted R:R). Monitor MAE-Guard impact on hl_copy_trader WR.
+
+### Verification
+DB verified: 24h 74T +$0.30, 59.5% WR. 7d: 262T -$1.16, 53.1% WR. 0 open. Pipeline idle (spike filter blocking). ct-hot+ 61T/7d -$2.95. bb_bounce+ 14T/7d +$0.94, 85.7% WR. hl_copy_trader 60T/7d +$2.47, 53.3% WR. Disk: 83%. Next evals: CONF_FILTER 85 (Aug 25), MIN_PRE_MOVE 0.3 (Aug 25).

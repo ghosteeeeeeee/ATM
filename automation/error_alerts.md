@@ -353,3 +353,23 @@ ALERTS:
 
 ## Error Alerts — 2026-08-24 09:04 UTC
 - **REPEATED** (8x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-24 10:19 UTC
+- **WARN** (6x): `service_failed` — better-coder, bug-hunter, git-release, mtf-macd-tuner, wasp, trading-checklist
+- **WARN** (1x): `disk_near_threshold` — 84% used (93G/118G)
+- **INFO** (1x): `purrusdt_400` — recurring 400 errors, token likely delisted
+- **INFO** (130x): `phantom_trades` — trades with <$0.01 PnL in signal_outcomes
+- **NO AUTO-FIX**: pipeline healthy, failed services are auxiliary
+
+## Error Alerts — 2026-08-24 11:04 UTC
+- **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] PURRUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=PURRUSDT&interval=15m&limit=N`
+
+## Error Alerts — 2026-08-24 12:04 UTC
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-24 13:20 UTC
+- **WARN** (3x): `signal_compactor traceback` — recurring at line 2800 (13:06-13:08), self-resolved by 13:19
+- **WARN** (1): `disk_near_threshold` — 84% used (93G/118G), 19G free
+- **WARN** (1): 42 stale tokens (>10min no price update)
+- **INFO**: Live trading ON, kill switch enabled
+- **NO AUTO-FIX**: pipeline healthy, signal_compactor errors transient

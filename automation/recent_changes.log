@@ -1,3 +1,7 @@
+[2026-08-24 12:05 UTC] auto_1hr: NO CHANGES
+  WHY: 6T last hour (2W 4L -$0.30). 24h 73T 42W 57.5% +$0.70 net positive. 3 consecutive negative hours (09-11 UTC) -$0.55 total — small, system flat (0 open). atr_sl_hit regressed to -$0.52 (was +$0.15 at 10:05) — monitoring, likely variance. bb_bounce+ 91%WR +$0.88 star. macd-div+ CEO killed draining. NEUTRAL regime dominant (64/109). No kill criteria — no signal 3+T/0%WR last hour. Trade freq 6/hr normal. Watch: atr_sl_hit next 2h, consecutive neg hours.
+  BY: auto_1hr
+  NEXT: Re-run at 13:05 UTC
 [2026-08-24 10:05 UTC] auto_1hr: NO CHANGES
   WHY: 6T last hour (3W 3L -$0.01 flat). 24h 70T 38W 54.3% +$0.64 net positive improving. atr_sl_hit 32T 51% >40% threshold but PnL positive +$0.15, tpsl fix confirmed. profit-monster-trail 28T +$1.68 dominant profitable. bb_bounce+ strong. No kill criteria — no signal with 0% WR and 3+ trades last hour. 2 open (ETH/BTC SHORT) flat riding trail SL. Trade freq 3/hr normal. System stable.
   BY: auto_1hr
@@ -143,3 +147,7 @@
   WHY: 2T last hour (1W 1L -$0.24). PURR -$0.28 slippage (low liq), ENA +$0.04 profit-monster-trail. 68T 24h 51.5% WR +$0.98 net. atr_sl_hit 29T (42.6%) >40% but avg loss only -$0.007 — tpsl fix confirmed. profit-monster-trail 29T +$1.72 best exit. macd-div+ 5T 1W -$0.55 persistent drag but 0 trades last hour, not killable per 3+ rule. Trade freq 2.8/hr normal. 3 open shorts underwater (CFX -0.36%, ETH -0.90%, BTC -0.57%) managed by TPSL. No kill criteria. System stable.
   BY: auto_1hr
   NEXT: Re-run at 12:05 UTC
+[2026-08-24 13:12 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L -$0.10). bb_bounce+ +$0.03, macd-div- -$0.13 (1W 1L). 75T 24h 60% WR +$0.45 net. atr_sl_hit 30T (40.0%) exactly at threshold, avg loss -$0.027 — tpsl fix confirmed working. profit-monster-trail 34T +$1.97 best exit. macd-div+ -$0.55 persistent but 0 trades last 6h, not killable per 3+ rule. 0 open positions — fully flat. Trade freq 3/hr normal. No kill criteria. System stable, 24h WR 60% and PnL positive.
+  BY: auto_1hr
+  NEXT: Re-run at 14:12 UTC

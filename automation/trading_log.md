@@ -1,5 +1,52 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-24 12:05 UTC] Hourly Analysis
+
+**Trades:** 6 closed last hour (2W 4L -$0.30)
+**PnL:** -$0.30 (WR: 33.3%)
+**24h:** 73T 42W 57.5% +$0.70 (net positive)
+**Open:** 0 positions (system flat)
+
+**24h Close Reasons:**
+- profit-monster-trail: 32T +$1.92 avg+$0.060 — dominant profitable exit
+- atr_sl_hit: 30T -$0.52 avg-$0.017 — REGRESSED (was +$0.15 at 10:05 UTC)
+- cut-loser-CL-T1: 5T -$0.64 avg-$0.128 — small drag
+- cascade_flip: 4T -$0.06 — minor
+- hard_sl: 1T $0.00 — guardian safety net
+
+**Signal Performance 24h:**
+- bb_bounce+: 11T/10W 91% +$0.88 — STAR
+- macd-div-: 4T/4W 100% +$0.32 — perfect
+- hl_copy_trader: 2T/1W +$0.32 — fine
+- hzscore-: 4T/2W +$0.29 — fine
+- ct-hot+: 20T/10W 50% +$0.25 — healthy
+- tl_break_short: 10T/8W 80% +$0.02 — high WR, tiny PnL
+- macd-div+: 5T/1W 20% -$0.55 — CEO killed, draining
+
+**Hourly PnL (last 6h):**
+- 06:00: -$0.05 | 07:00: +$0.08 | 08:00: +$0.27
+- 09:00: -$0.03 | 10:00: -$0.22 | 11:00: -$0.30
+- 3 consecutive negative hours (09-11) — escalating losses
+
+**Market Regime:** 64 NEUTRAL / 34 SHORT_BIAS / 9 LONG_BIAS (4h) — predominantly NEUTRAL
+
+**Changes:** None
+
+**No Change Needed:**
+- 3 consecutive negative hours noted — but losses are small (-$0.55 total), system is flat (0 open positions), 24h still +$0.70
+- atr_sl_hit regressed from +$0.15 to -$0.52 in 2h — concerning but was positive earlier, likely variance
+- No signal crosses kill criteria (3+T/0%WR in last hour)
+- macd-div+ already killed by CEO, draining orphaned trades
+- bb_bounce+ 91% WR star performer — no tuning needed
+- Trade frequency 6T/hr normal
+- NEUTRAL regime reduces edge for directional signals — expected, doesn't require param changes yet
+
+**Open Questions:**
+- atr_sl_hit regression: monitor next 2 hours. If still negative at 14:05 UTC, investigate tpsl params
+- 3 consecutive negative hours: if extends to 5+ hours, consider position size reduction
+
+---
+
 ## [2026-08-24 10:05 UTC] Hourly Analysis
 
 **Trades:** 6 closed last hour (3W 3L -$0.01)
@@ -14126,3 +14173,35 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - macd-div+ -$0.55 persistent drag — kill if 3+ trades next hour with 0% WR
 - 3 open shorts underwater — TPSL should manage but monitor ETH specifically
+
+## [2026-08-24 13:12 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2W 1L, -$0.10)
+**PnL:** -$0.10 (WR: 66.7%)
+**24h:** 75T 45W 30L WR=60.0% PnL=+$0.45
+
+**Close reasons 24h:**
+- profit-monster-trail: 34T (45.3%) +$1.97, avg +$0.058 — best exit
+- atr_sl_hit: 30T (40.0%) -$0.82, avg -$0.027 — exactly at threshold, tpsl fix working
+- cut-loser-CL-T1: 5T -$0.64, avg -$0.128 — worst exit
+
+**Signal 24h:**
+- bb_bounce+: 12T 11W +$0.91 (92% WR) — top performer
+- hl_copy_trader: 2T 1W +$0.32
+- hzscore-: 4T 2W +$0.29
+- macd-div-: 6T 5W +$0.19
+- ct-hot+: 19T 9W +$0.10 — workhorse
+- tl_break_short: 10T 8W +$0.02
+- macd-div+: 5T 1W -$0.55 — persistent drag, 0 trades last 6h
+
+**Changes:** None needed
+
+**No Change Needed:**
+- macd-div+ -$0.55 persistent but 0 trades last 6h, not killable per 3+ rule
+- atr_sl_hit exactly 40.0% at threshold, avg loss only -$0.027 — tpsl fix confirmed
+- Trade frequency 3/hr normal
+- 0 open positions — fully flat
+- 24h WR 60% and PnL positive
+
+**Open Questions:**
+- macd-div+ -$0.55 persistent drag — kill if 3+ trades any hour with 0% WR

@@ -667,3 +667,10 @@
 [2026-08-24 05:07 UTC]   🟢 OK: tl_break_short: 6 trades, 83.3% WR, PnL=1.11
 [2026-08-24 05:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-08-24 05:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-08-24 11:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-24 11:07 UTC]   🟡 WARNING: macd-div+: 5 trades, 20.0% WR, PnL=-5.0
+[2026-08-24 11:07 UTC]   🟢 OK: ct-hot+: 19 trades, 52.6% WR, PnL=2.04
+[2026-08-24 11:07 UTC]   🟢 OK: bb_bounce+: 9 trades, 88.9% WR, PnL=6.9
+[2026-08-24 11:07 UTC]   🟢 OK: tl_break_short: 9 trades, 88.9% WR, PnL=2.13
+[2026-08-24 11:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-08-24 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
