@@ -1253,6 +1253,7 @@ MACD_DIV_STRONG_PRICE_PCT        = 0.03    # strong divergence: >3% price change
 MACD_DIV_STRONG_HIST_RATIO       = 0.5     # strong divergence: >50% hist recovery/decline
 MACD_DIV_MEDIUM_PRICE_PCT        = 0.015   # medium divergence: >1.5% price change
 MACD_DIV_MEDIUM_HIST_RATIO       = 0.3     # medium divergence: >30% hist recovery/decline
+MACD_DIV_RSI_FLOOR               = 40      # don't SHORT when RSI 5m < 40 (oversold = bounce risk)
 R2_REV_ENABLED           = False  # r2_rev — blocked in blacklist
 R2_REV_PLUS_ENABLED           = False   # r2_rev+ LONG
 R2_REV_MINUS_ENABLED          = False   # r2_rev- SHORT

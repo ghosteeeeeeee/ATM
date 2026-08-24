@@ -295,6 +295,27 @@ def _get_5m_closes(token, lookback):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# RSI helper
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _compute_rsi(closes, period=14):
+    """Compute RSI on a closes list. Returns float or None."""
+    if len(closes) < period + 1:
+        return None
+    gains = []
+    losses = []
+    for i in range(1, len(closes)):
+        change = closes[i] - closes[i - 1]
+        gains.append(max(0, change))
+        losses.append(max(0, -change))
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+    if avg_loss == 0:
+        return 100.0
+    return 100 - (100 / (1 + avg_gain / avg_loss))
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Scanner
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -303,7 +324,7 @@ def scan_signals():
     from hermes_constants import (
         MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
         LONG_BLACKLIST, SHORT_BLACKLIST,
-        MACD_DIV_LOOKBACK_BARS,
+        MACD_DIV_LOOKBACK_BARS, MACD_DIV_RSI_FLOOR,
     )
 
     if not MACD_DIVERGENCE_ENABLED:
@@ -350,6 +371,12 @@ def scan_signals():
             continue
         if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
             continue
+
+        # Layer 1: RSI guard — don't SHORT when oversold (bounce risk)
+        if direction == 'SHORT':
+            rsi = _compute_rsi(closes)
+            if rsi is not None and rsi < MACD_DIV_RSI_FLOOR:
+                continue
 
         sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
         source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
