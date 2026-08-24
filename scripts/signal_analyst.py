@@ -30,7 +30,10 @@ from paths import RUNTIME_DB
 
 # ── Config ──────────────────────────────────────────────────────────────
 HOTSET_PATH = '/var/www/hermes/data/hotset.json'
-MIN_SCORE = 55  # Minimum quality score to pass (lowered from 60 — NEUTRAL regime blocks all bb_bounce+ at 50)
+MIN_SCORE = 40  # Lowered from 55 — in NEUTRAL/LONG_BIAS markets, SHORT signals score
+                # 0 on trend (counter-trend) + 0 on RSI (RSI < 60), can't reach 55.
+                # Signals that survived compactor confluence + quality filters are
+                # already vetted. signal_analyst is final gate, not sole arbiter.
 CACHE_TTL = 300  # Cache WR data for 5 min
 
 # ── Cache ───────────────────────────────────────────────────────────────
