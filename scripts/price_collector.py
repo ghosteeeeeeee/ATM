@@ -231,8 +231,13 @@ def fetch_all_prices():
         tokens={u['name']: u.get('maxLeverage', 10) for u in universe if mids.get(u['name'])}
         prices = {k: float(v) for k, v in mids.items() if v}
 
-        # Write shared cache for other scripts
-        hc.fetch_and_cache()
+        # Write shared cache directly from fetched data (avoids redundant 2nd fetch)
+        hc._write({
+            "allMids": mids,
+            "meta": meta_result,
+            "_ts": time.time(),
+            "_errors": []
+        })
 
         return tokens, prices, universe
     except Exception as e:
