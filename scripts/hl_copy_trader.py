@@ -10,10 +10,10 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from paths import HERMES_DATA, HL_COPY_REPORT
+from paths import HERMES_DATA
 from hl_copy_db import get_db, init_db
-from hl_leaderboard import scan_leaderboard, get_user_fills
-from hl_fill_monitor import monitor_once, get_recent_fills, get_active_traders, check_trader_exits
+from hl_leaderboard import scan_leaderboard
+from hl_fill_monitor import monitor_once, get_active_traders, check_trader_exits
 from hl_signal_notifier import check_for_signals
 from hl_copy_signal import run_hl_copy_signal
 from hermes_constants import (
@@ -158,7 +158,7 @@ def run_once():
 
     # Step 4: Bulk scan ALL traders (every 5 min — full picture)
     print("\n[4/7] Bulk scan (all traders, every 5 min)...")
-    from hl_fill_monitor import bulk_scan_all_traders, get_bulk_scan
+    from hl_fill_monitor import bulk_scan_all_traders
     bulk = bulk_scan_all_traders()
     bulk_traders = len([k for k in bulk if not k.startswith('_')])
     bulk_errors = bulk.get('_meta', {}).get('errors', 0)

@@ -329,3 +329,8 @@ ALERTS:
 
 ## Error Alerts — 2026-08-24 04:03 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TOK signal_compactor: TOK (most recent call last):`
+
+## Error Alerts — 2026-08-24 04:20 UTC
+- **WARN** (7x): `hermes-{better-coder,bug-hunter,ceo,git-release,mtf-macd-tuner,trading-checklist,wasp}.service` = failed
+  - **AUTO-FIX**: None — these are auxiliary services, not blocking pipeline or trading. Pipeline active with 5 open positions +10.18% PnL today.
+- **INFO**: No phantom trades, no stale prices, no disk pressure. System core healthy.
