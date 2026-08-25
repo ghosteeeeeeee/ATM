@@ -511,6 +511,7 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     intercept = tl['intercept']
     r2 = tl['r2']
     direction = tl['direction']
+    avg_price = tl['avg_price']
 
     # ── Extension filter: block "selling the bottom" / "buying the top" ─────
     # If price has already moved > TL_MIN_EXTENSION_ATR from the 8h high/low,

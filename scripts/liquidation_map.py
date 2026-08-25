@@ -29,7 +29,7 @@ from paths import *
 
 LIQ_MAP_FILE = os.path.join(WWW_DATA, "liquidation_map.json")
 LIQ_CLUSTERS_FILE = os.path.join(HERMES_DATA, "liquidation_clusters.json")
-SCAN_INTERVAL = 300  # 5 minutes between full scans
+SCAN_INTERVAL = 600  # 10 minutes between full scans (was 5min — scanner was timing out)
 BASE_URL = "https://api.hyperliquid.xyz/info"
 
 
