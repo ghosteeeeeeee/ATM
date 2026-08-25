@@ -14561,3 +14561,59 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - ct-hot+ 8T 25% WR -$0.68 — watch next session, kill if 3+ trades with 0% WR
 - hl_copy_trader 5T 40% WR -$0.48 — same
 - Very low activity (1T/hr) — late session quiet
+
+## [2026-08-24 23:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet late session)
+
+**24h:** 91T, 60.4% WR, -$0.51 net
+- profit-monster-trail: 50T +$3.20 (system engine)
+- atr_sl_hit: 31T -$2.78 (34.1% — below 40% threshold ✓)
+- cut-loser-CL-T1: 6T -$0.70
+
+**24h signal leaders:**
+- bb_bounce+: 16T 93.8% WR +$1.08 (star)
+- macd-div-: 12T 75% WR +$0.02
+- tl_break_short: 16T 62.5% WR -$0.11
+- ct-hot+: 8T 25% WR -$0.68 (persistent, not killable)
+- hl_copy_trader: 5T 40% WR -$0.48 (persistent, not killable)
+
+**Open:** 5 (SYRUP LONG, IMX LONG, CAKE SHORT, BTC LONG, ETH SHORT)
+
+**Changes:** None needed
+
+**No Change Needed:**
+- 0 trades last hour — nothing to diagnose
+- atr_sl_hit 34.1% below 40% threshold
+- No signal has 3+ trades last hour with 0% WR — kill rule not met
+- Trade freq 0/hr very low (late session, normal)
+
+**Open Questions:**
+- ct-hot+ 8T 25% WR -$0.68 — persistent drag, watch next session
+- hl_copy_trader 5T 40% WR -$0.48 — same
+- 5 open positions all breakeven — watch for morning session moves
+
+## [2026-08-25 01:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, net -$0.06)
+- WLD bb_bounce+ profit-monster-trail +$0.07
+- IMX bb_bounce+ atr_sl_hit -$0.13
+
+**24h:** 93T, ~60% WR, -$0.51 net
+- profit-monster-trail: 51T +$3.27 (system engine)
+- atr_sl_hit: 32T -$2.91 (33.7% — below 40% threshold ✓)
+- bb_bounce+: 18T 88.9% WR +$1.02 (star)
+
+**Kill criteria:** None met
+- atr_sl_hit 33.7% < 40%
+- No signal has 3+ trades last hour with 0% WR
+- Trade freq 2/hr (late session normal)
+- No 3 consecutive negative hours
+
+**Open:** 4 (ETH SHORT, BTC LONG, CAKE SHORT, SYRUP LONG)
+
+**Changes:** None needed
+
+**Open Questions:**
+- ct-hot+ 8T 25% WR -$0.68 persistent but 0 trades last 2h
+- hl_copy_trader 5T 40% WR -$0.48 same
