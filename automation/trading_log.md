@@ -15151,3 +15151,107 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 **Open Questions:**
 - hl_copy_trader standalone LONG: master switch still on. PLUS/MINUS killed but standalone fires remain. 24h performance 25% WR -$1.13. Recommend CEO review whether to kill master switch.
 - ATR_SL_MIN 1.5%: early data inconclusive. Re-evaluate at 08:05 UTC Aug 26 (24h post-deploy).
+
+## [2026-08-25 20:20 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L -$0.12)
+**PnL:** -$0.12 (0% WR)
+**24h:** 37T 37.8% WR -$1.72
+
+**Last Hour:**
+- BTC hl_copy_trader LONG → atr_sl_hit -$0.12 (legacy trade, signal already killed)
+
+**24h by Exit Reason:**
+- atr_sl_hit: 23T (62.2%) -$1.55 avg -$0.067
+- profit-monster-trail: 7T +$0.42 avg +$0.060 (only profitable exit)
+- cut-loser-MAE-GUARD: 2T -$0.30
+- cascade_flip: 3T -$0.14
+- guardian_orphan: 1T -$0.01
+
+**ATR SL Trend (improving):**
+- 12-16h ago: 8/11 = 73% hit rate
+- 8-12h ago: 3/4 = 75% hit rate
+- 4-8h ago: 2/6 = 33% hit rate
+- 0-4h ago: 1/3 = 33% hit rate
+→ ATR_SL_MIN revert to 1.2% showing improvement
+
+**Signal Performance 24h:**
+- bb_bounce+: 15T/8W 53.3% WR -$0.20 (8 atr_sl, 5 PM_TRAIL)
+- hl_copy_trader: 12T/3W 25% WR -$1.07 (10 atr_sl, 2 MAE_GUARD) — KILLED
+- Single-trade signals: continuation-, macd-div-, ct-hot-,rs-r70, r2-trend-long3, bb_bounce+,rs-s31, bb_bounce+,rs-s44 — all losers
+
+**Open Positions (5):**
+- BLUR bb_bounce+ LONG (entry 0.0165, SL 0.0163, $11.10)
+- WLFI bb_bounce+ LONG (entry 0.0577, SL 0.0570, $11.10)
+- ETH hl_copy_trader SHORT (entry 2469.60, SL 2457.58, $13.85) — legacy, signal killed
+- GMT cascade-reverse-v2 SHORT (entry 0.0074, SL 0.0073, $11.00)
+- HBAR cascade-reverse-v2 SHORT (entry 0.0806, SL 0.0791, $11.00)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: No signal has 3+ trades with 0% WR last hour (only 1T total)
+- HL copy trader already killed — ETH SHORT is legacy position
+- ATR_SL_MIN at 1.2% — atr_sl_hit rate improving (73% → 33%)
+- Trade freq 1/hr normal for NEUTRAL regime
+- No overtrading
+
+**Open Questions:**
+- ETH hl_copy_trader SHORT still open — legacy from before kill. Will exit naturally.
+- ATR_SL hit rate still 62% over 24h but trending down — continue monitoring.
+
+## [2026-08-25 21:20 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0W 3L)
+**PnL:** -$0.10 (0% WR)
+**24h:** 39T 35.9% WR -$1.85
+
+**Last Hour:**
+- ETH hl_copy_trader,rs-r170,rs-r194 SHORT → atr_sl_hit +$0.16 (trailing SL in profit)
+- BLUR bb_bounce+ LONG → atr_sl_hit -$0.10
+- WLFI bb_bounce+ LONG → atr_sl_hit -$0.16
+
+**24h by Exit Reason:**
+- atr_sl_hit: 26T (66.7%) -$1.65 avg -$0.063
+- profit-monster-trail: 6T +$0.39 avg +$0.065 (only profitable exit)
+- cut-loser-MAE-GUARD: 2T -$0.30
+- cascade_flip: 3T -$0.14
+- guardian_orphan: 1T -$0.01
+
+**ATR SL Trend (REVERSAL — worsening):**
+- 16-20h ago: 4/4 = 100%
+- 12-16h ago: 9/13 = 69%
+- 8-12h ago: 4/5 = 80%
+- 4-8h ago: 0/4 = 0% (anomaly — 4 trades, none SL hit)
+- 0-4h ago: 4/5 = 80% ← BACK TO BAD
+→ Previous "improvement" narrative was wrong. 0-4h bucket at 80% confirms ATR_SL_MIN 1.2% NOT improving.
+
+**Signal Performance 24h:**
+- bb_bounce+: 16T/7W 43.8% WR -$0.49 (degraded from 53.3% last hour — 2 new losses)
+- hl_copy_trader: 12T/3W 25% WR -$1.07 (KILLED, legacy trades)
+- cascade-reverse-v2: 1T/0W -$0.04 (2 open positions)
+
+**Open Positions (2):**
+- GMT cascade-reverse-v2 SHORT (entry 0.0074, SL 0.0072, $11.00)
+- HBAR cascade-reverse-v2 SHORT (entry 0.0806, SL 0.0792, $11.00)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: No signal has 3+ trades with 0% WR last hour (bb_bounce+ had 2T/0W, not 3+)
+- ATR_SL_MIN: Widening to 1.5% was PROVEN WORSE (49.4%→60% hit rate). Reverting made no difference either. Problem is entry quality, not SL width.
+- Entry filters: All recently tightened (SPEED_MIN=40, CONFIDENCE=88, VEL_THRESHOLD=0.15). Further tightening risks killing trade frequency entirely.
+- Trade freq 3/hr normal for current regime
+
+**Open Questions:**
+- ATR_SL hit rate back to 80% in 0-4h bucket despite all param adjustments. Is this a market regime issue (high volatility choppiness)?
+- bb_bounce+ degraded from 53.3% to 43.8% WR in one hour. If next hour has 1+ more loss (3+T/0%WR), will kill.
+- ETH SHORT atr_sl_hit showing +$0.16 — trailing SL caught profit on bounce. Good behavior, but minority of SL hits are profitable.
+
+**Diagnosis:**
+1. **Entry quality**: Mediocre. 2/3 entries last hour stopped out. Only the multi-signal ETH SHORT profited.
+2. **SL behavior**: atr_sl_hit still dominant at 66.7% of all exits. ATR_SL_MIN at 1.2% not helping.
+3. **Signal quality**: bb_bounce+ is the only active signal with volume, declining WR. cascade-reverse-v2 has2 opens but no closed trades yet.
+4. **Trade frequency**: Normal (3/hr).
+
+**Root Cause:** ATR_SL hit rate oscillating between 60-100% across all time buckets suggests high-volatility choppy market where mean-reversion entries (bb_bounce+) get caught in whipsaws. The only profitable exit type (profit-monster-trail) needs0.4%+ moves that aren't happening in current regime.
