@@ -132,7 +132,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
         cur.execute("""
             SELECT token, direction, entry_price, current_price,
                    amount_usdt, leverage, signal, confidence
-            FROM trades WHERE id = %s
+            FROM trades WHERE id = ?
         """, (trade_id,))
         row = cur.fetchone()
         if not row:
@@ -165,7 +165,7 @@ def _close_paper_position(trade_id: int, reason: str) -> bool:
                 is_guardian_close = FALSE,
                 hype_realized_pnl_usdt = ?,
                 hype_realized_pnl_pct = ?
-            WHERE id = %s AND status = 'open'
+            WHERE id = ? AND status = 'open'
         """, (now, reason, reason, current_price,
               round(pnl_pct, 4), round(pnl_usdt_val, 4),
               json.dumps({'entry_fee': round(entry_fee, 6), 'exit_fee': round(exit_fee, 6),

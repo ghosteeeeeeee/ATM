@@ -612,3 +612,49 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3298s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] AR TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3541s left, N failures)`
+
+## Error Alerts — 2026-08-25 08:04 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3478s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3362s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3303s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3242s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3122s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1802s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1742s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1684s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1620s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1741s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1681s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1559s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1619s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1498s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] AR TOK BLOCKED — TOK in cooldown (3539s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] AR TOK BLOCKED — TOK in cooldown (3481s left, N failures)`
+- **REPEATED** (14x): `Aug N N:N:N python3[TOK]: TS   [CASCADE TOK] ⚠️ _close_paper_position TOK: near "%": syntax TOK`
+- **REPEATED** (25x): `Aug N N:N:N python3[TOK]: TS   [CASCADE TOK] ❌ Failed to close TOK #N`
+
+## Health Report — 2026-08-25 08:21 UTC
+
+**PIPELINE:** OK
+- Status: running (37 runs in last 5min)
+- Signals: 115 generated (1h), 115 active signals
+- Trades: 0 open, 17 closed today, -0.52% PnL overall
+- Errors: CASCADE FLIP `_close_paper_position` SQL syntax error (FIXED)
+
+**MARKET:**
+- Regime: SHORT_BIAS (5 short, 100 neutral, 0 long)
+- Speed: 72% hot — market overheated (COOL_OFF signal)
+- Regime status: STORMY
+
+**SYSTEM:**
+- Timers: 43 active, 0 missed
+- Disk: 82% used (22G free)
+- Pipeline: OK
+- HL Sync Guardian: OK
+
+**AUTO-FIXES APPLIED:**
+- **FIXED** `cascade_flip.py:135,168` — Changed `%s` to `?` for SQLite placeholder (was causing `_close_paper_position` syntax error on every cascade flip close attempt for IMX #14320)
+
+**ALERTS:**
+- **WARN**: Cascade flip was unable to close IMX #14320 positions for ~30min due to SQL syntax bug — now fixed
+- **WARN**: Market overheated (72% hot) — COOL_OFF regime active, reduce exposure
