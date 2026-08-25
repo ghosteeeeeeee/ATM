@@ -80,6 +80,8 @@ from hermes_constants import (
     SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
     # pump_catcher (momentum breakout)
     PUMP_CATCHER_ENABLED, PUMP_CATCHER_PLUS_ENABLED, PUMP_CATCHER_MINUS_ENABLED,
+    # slow_grind_short
+    SLOW_GRIND_SHORT_ENABLED,
 )
 
 
@@ -325,6 +327,11 @@ except Exception:
     _vortex_break_run = None
 
 try:
+    from signals.slow_grind_short import run as _slow_grind_short_run
+except Exception:
+    _slow_grind_short_run = None
+
+try:
     from signals.return_exhaustion import scan_return_exhaustion_signals as _return_exhaustion_run
 except Exception:
     _return_exhaustion_run = None
@@ -483,6 +490,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'chain_fire', 'enabled': 'CHAIN_FIRE_ENABLED', 'run': _chain_fire_run},
     {'name': 'signal_confluence', 'enabled': 'SIGNAL_CONFLUENCE_ENABLED', 'run': _signal_confluence_run},
     {'name': 'pump_catcher', 'enabled': 'PUMP_CATCHER_ENABLED', 'run': _pump_catcher_run},
+    {'name': 'slow_grind_short', 'enabled': 'SLOW_GRIND_SHORT_ENABLED', 'run': _slow_grind_short_run},
 ]
 
 
@@ -490,7 +498,7 @@ SIGNAL_REGISTRY: list[dict] = [
 
 # Slow signals — scan 191 tokens and take >60s. Run separately on a 5-min cadence.
 # All other signals are fast (<10s each).
-_SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'momentum_leaderboard', 'macd_divergence', 'signal_confluence'}
+_SLOW_SIGNALS = {'momentum', 'mtf_momentum', 'momentum_leaderboard', 'macd_divergence', 'signal_confluence', 'slow_grind_short'}
 
 
 def _resolve_enabled(entry):

@@ -22,7 +22,6 @@ import json
 import os
 import time
 import urllib.request
-import urllib.error
 from collections import defaultdict
 from pathlib import Path
 
@@ -35,7 +34,7 @@ BASE_URL = "https://api.hyperliquid.xyz/info"
 
 
 def _hl_info(payload: dict, timeout: int = 10):
-    """POST to HL /info endpoint with OUR OWN rate limiting (0.2s, not hyperliquid_exchange's 2s)."""
+    """POST to HL /info endpoint. Rate limiting is enforced in the scan loops (1s gap)."""
     data = json.dumps(payload).encode()
     req = urllib.request.Request(
         BASE_URL,
@@ -61,7 +60,8 @@ SCAN_TOKENS = [
 # ─── Wallet Universe ─────────────────────────────────────────────────────────
 
 def get_tracked_wallets(max_wallets: int = None) -> list:
-    """Load tracked wallets from hl_copy.db + leaderboard. Capped to avoid API timeouts."""
+    """Load tracked wallets from hl_copy.db + leaderboard. Capped to avoid API timeouts.
+    Preserves score ordering — highest-scored wallets first."""
     if max_wallets is None:
         try:
             from hermes_constants import LIQ_MAP_MAX_WALLETS
@@ -69,18 +69,24 @@ def get_tracked_wallets(max_wallets: int = None) -> list:
         except ImportError:
             max_wallets = 200
 
-    wallets = set()
+    seen = set()
+    wallets = []
 
-    # From copy trading DB
+    # From copy trading DB (ordered by score DESC)
     try:
         from hl_copy_db import get_db
         conn = get_db()
-        rows = conn.execute(
-            "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY score DESC"
-        ).fetchall()
-        conn.close()
-        for r in rows:
-            wallets.add(r["wallet"].lower())
+        try:
+            rows = conn.execute(
+                "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY score DESC"
+            ).fetchall()
+            for r in rows:
+                w = r["wallet"].lower()
+                if w not in seen:
+                    seen.add(w)
+                    wallets.append(w)
+        finally:
+            conn.close()
     except Exception as e:
         print(f"[wallets] DB load failed: {e}")
 
@@ -98,15 +104,17 @@ def get_tracked_wallets(max_wallets: int = None) -> list:
         "0xac487c027ffe3e7c5b6c0e1a5518b1ea1a9c4f4f",  # $1.3M trader
     ]
     for w in LEADERBOARD:
-        wallets.add(w.lower())
+        wl = w.lower()
+        if wl not in seen:
+            seen.add(wl)
+            wallets.append(wl)
 
     # Cap to avoid API timeouts (DB wallets first, then leaderboard)
-    result = list(wallets)
-    if len(result) > max_wallets:
-        print(f"[wallets] Capping {len(result)} wallets → {max_wallets}")
-        result = result[:max_wallets]
+    if len(wallets) > max_wallets:
+        print(f"[wallets] Capping {len(wallets)} wallets → {max_wallets}")
+        wallets = wallets[:max_wallets]
 
-    return result
+    return wallets
 
 
 # ─── Position Scanner ────────────────────────────────────────────────────────
@@ -154,20 +162,27 @@ def scan_all_positions(wallets: list) -> dict:
     by_coin = defaultdict(list)
     total_wallets = len(wallets)
 
+    failed = 0
     for i, wallet in enumerate(wallets):
         if i > 0 and i % 20 == 0:
-            time.sleep(0.5)  # Brief pause every 20 wallets
+            time.sleep(1.0)  # Pause every 20 wallets (CloudFront ~1 req/s limit)
         elif i > 0:
-            time.sleep(0.2)  # Our own rate limit (0.2s, not hyperliquid_exchange's 2s)
+            time.sleep(1.0)  # Rate limit: 1s gap (CloudFront CDN limit)
 
         positions = scan_wallet_positions(wallet)
+        if positions is None:
+            failed += 1
+            continue
         for pos in positions:
             by_coin[pos["coin"]].append(pos)
 
         if (i + 1) % 25 == 0:
-            print(f"[scan] {i+1}/{total_wallets} wallets scanned...")
+            print(f"[scan] {i+1}/{total_wallets} wallets scanned... ({failed} failed)")
 
-    return dict(by_coin)
+    if failed:
+        print(f"[scan] {failed}/{total_wallets} wallets failed (rate limited or error)")
+
+    return dict(by_coin), failed
 
 
 # ─── Liquidation Cluster Analysis ───────────────────────────────────────────

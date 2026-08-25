@@ -1301,6 +1301,27 @@ R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band 
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
 R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-19 from 0.2 — r2-trend-long3 11T/7d ATR_SL avg MFE +0.12% (dead-cat bounces peaking 0.12% then stopping out). Winners peak 0.65%. RAISED 2026-08-18 from 0.1. RAISED 2026-08-15 from 0.0.
+# ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
+# slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
+SLOW_GRIND_SHORT_ENABLED = True    # master kill-switch
+SLOW_GRIND_SHORT_MIN_R2 = 0.55    # minimum R² threshold (confirmed trend, not chop)
+SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0002  # minimum slope magnitude as % of price per candle (0.02%)
+SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking
+SLOW_GRIND_SHORT_RSI_MIN = 35      # min RSI — don't short oversold (bounce risk)
+SLOW_GRIND_SHORT_RSI_MAX = 55      # max RSI — don't short overbought (not a grind)
+SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.1  # min % separation below EMA20 (not just barely below)
+SLOW_GRIND_SHORT_CONF_BASE = 65    # base confidence
+SLOW_GRIND_SHORT_CONF_CAP = 88     # max confidence (system ceiling)
+SLOW_GRIND_SHORT_COOLDOWN_HOURS = 3  # per token cooldown
+SLOW_GRIND_SHORT_R2_BONUS_MAX = 15   # max R² bonus in confidence scoring
+SLOW_GRIND_SHORT_SLOPE_BONUS_MAX = 10  # max slope bonus in confidence scoring
+SLOW_GRIND_SHORT_SLOPE_NORM = 0.001  # slope normalization factor (0.1%)
+SLOW_GRIND_SHORT_EMA_BONUS_MAX = 10  # max EMA separation bonus
+SLOW_GRIND_SHORT_EMA_NORM = 0.5    # EMA separation normalization factor (0.5%)
+SLOW_GRIND_SHORT_ATR_LOW_THRESHOLD = 0.3  # ATR% below this gets bonus (pure grind)
+SLOW_GRIND_SHORT_ATR_LOW_BONUS = 5   # bonus for low ATR
+SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY_THRESHOLD = 40  # RSI below this gets penalty
+SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY = 5  # penalty for oversold RSI
 TREND_PURITY_ENABLED     = False
 TREND_PURITY_PLUS_ENABLED    = False    # trend_purity+ LONG
 TREND_PURITY_MINUS_ENABLED   = True    # trend_purity- SHORT

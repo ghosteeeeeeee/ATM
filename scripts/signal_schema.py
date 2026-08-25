@@ -707,6 +707,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             HH_HL_ENABLED, GUPPY_ENABLED, MACD_ACCEL_ENABLED,
             TREND_PURITY_ENABLED, EMA9_SMA20_ENABLED,
             R2_REV_ENABLED, R2_TREND_ENABLED, R2_TREND_LONG_ENABLED,
+            SLOW_GRIND_SHORT_ENABLED,
             VOLUME_HL_ENABLED, MA300_CANDLE_ENABLED,
             ATR_COMPRESSION_ENABLED, EXHAUSTION_ENABLED,
             MACD_DIVERGENCE_ENABLED, MACD_DIVERGENCE_PLUS_ENABLED, MACD_DIVERGENCE_MINUS_ENABLED,
@@ -845,6 +846,10 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # r2_trend_long — R² trend confirmation for LONG (slow grinds)
             if _comp == 'r2l-long' and not R2_TREND_LONG_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" R2_TREND_LONG_ENABLED=False', flush=True)
+                return None
+            # slow_grind_short — slow grinding downtrend detector
+            if _comp == 'slow-grind-' and not SLOW_GRIND_SHORT_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" SLOW_GRIND_SHORT_ENABLED=False', flush=True)
                 return None
             # oc-mtf-macd — OpenClaw signals
             if _comp == 'oc-mtf-macd+' and not OC_MTF_MACD_ENABLED:
@@ -2075,6 +2080,7 @@ def is_component_disabled(component: str) -> bool:
             RETURN_EXHAUSTION_SHORT_ENABLED,
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
+            SLOW_GRIND_SHORT_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -2184,6 +2190,8 @@ def is_component_disabled(component: str) -> bool:
     # r2-trend-short
     if c == 'r2-trend-short': return not R2_TREND_SHORT_ENABLED
     if c == 'r2-trend': return not R2_TREND_ENABLED
+    # slow-grind-short
+    if c == 'slow-grind-': return not SLOW_GRIND_SHORT_ENABLED
     # volume-hl
     if c == 'volume-hl+': return not VOLUME_HL_PLUS_ENABLED
     if c == 'volume-hl-': return not VOLUME_HL_MINUS_ENABLED
