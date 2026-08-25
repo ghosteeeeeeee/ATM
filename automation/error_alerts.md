@@ -17,6 +17,14 @@ No WARN or CRITICAL issues detected.
 - **[INFO]** 18 closed trades today at -5.00% PnL. 0 open positions.
 - **AUTO-FIX**: None needed — pipeline functioning correctly. Empty hotset is expected behavior when market is flat.
 
+## Error Alerts — 2026-08-25 19:20 UTC
+
+- **[WARN]** 100% neutral market — 0/105 tokens with directional regime. 0% tokens at speed >= 50%. Extremely flat conditions limiting signal generation.
+- **[INFO]** 31 closed trades today at 41.9% WR, -1.38 USDT PnL. Expected in flat market.
+- **[WARN]** 7 non-critical services in failed state (better-coder, bug-hunter, git-release, mtf-macd-tuner, session-learner, signal-reporter, upgrade-implementer, wasp).
+- **[WARN]** Disk at 82% — 21GB free. Monitor for growth.
+- **AUTO-FIX**: None needed — pipeline functioning correctly. Flat market is external condition, not system failure.
+
 ## Error Alerts — 2026-08-19 12:20 UTC
 - **[WARN]** (1x): `4h candles 83 days stale` — candles.db 4h table last updated Apr 17
 - **[WARN]** (1x): `Runtime DB 86MB` — exceeds 50MB threshold, needs VACUUM
@@ -730,3 +738,26 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (417s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (358s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (294s left, N failures)`
+
+## Error Alerts — 2026-08-25 16:21 UTC
+- **WARN** (1x): `36% coins hot — approaching overheated` — Coin tracker CAUTION signal. Market momentum surge detected (wind gusts 0.37 vs sustained 0.06). Watch for reversals.
+- **WARN** (1x): `40% win rate today` — 30 trades closed, 12 wins, 18 losses. hl_copy_trader and ct-hot+ signals underperforming.
+- **No auto-fixes applied** — all systems nominal, no crashes or errors.
+
+## Error Alerts — 2026-08-25 17:04 UTC
+- **REPEATED** (12x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3416s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3289s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3238s left, N failures)`
+
+## Error Alerts — 2026-08-25 18:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2336s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2276s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2215s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2155s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2097s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1979s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1919s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1859s left, N failures)`
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] BIGTIME TOK BLOCKED — TOK in cooldown (3533s left, N failures)`

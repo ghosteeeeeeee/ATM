@@ -1,3 +1,54 @@
+## CEO Report — 2026-08-25 ~16:30 UTC (256th run)
+
+### Diagnosis
+
+System **RED** — verified DB: 24h 38T **-$1.54, 42.1% WR**. 7d: 316T **-$3.73, 50.6% WR**. Today Aug 25: 32T **-$1.43, 37.5% WR**. 5 open (HBAR SHORT, BTC LONG, GMT SHORT, ETH SHORT, ICP SHORT).
+
+**ATR_SL_MIN 1.5% REVERTED** — auto_1hr data: hit rate WORSENED from 49.4%→60%, avg loss -$6.09. Wider SL lets trades run into bigger losses before stopping. Problem is ENTRY QUALITY, not SL width. Reverted to 1.2%.
+
+**ct-hot+ properly killed** — COIN_TRACKER_HOT_ENABLED=False, in NEVER_REENABLE_FLAGS. 66T/7d legacy draining. 75-79 conf tier -$4.68/7d is entirely ct-hot+ legacy — self-resolving in 1-2 days.
+
+**Confidence tier analysis:**
+- 95+: +$1.84/7d, 55.4% WR (MOST PROFITABLE)
+- 85-89: -$0.02/7d, 75.0% WR (profitable by WR)
+- 75-79: -$4.68/7d, 41.9% WR (ct-hot+ legacy)
+- 70-74: -$0.70/7d, 47.1% WR (marginal)
+
+**Winners today:**
+- bb_bounce+ 17T 58.8% WR -$0.10 (near breakeven, small sample)
+- r2-trend-long6 3T/7d 100% WR +$0.25
+
+**Losers today:**
+- hl_copy_trader LONG 10T 30% WR -$0.74 (bad day, historically 51.4% WR +$1.98/7d)
+- atr_sl_hit 15T -$2.35 (dominant exit,60% hit rate)
+
+### Root Cause
+
+Wider SL (1.5%) backfired — trades enter at bad price levels, wider stop just means bigger loss before stopping. The real issue is entry quality in the 70-79 confidence range, dominated by ct-hot+ legacy trades that are self-resolving.
+
+### Fix Applied
+
+**ATR_SL_MIN reverted 1.5%→1.2%** (hermes_constants.py lines 555, 570, 572, 574, 575). All related fallbacks updated to match. Monitor 48h for hit rate improvement.
+
+### Verification
+
+- ATR_SL_MIN=1.2% deployed, pipeline will pick up on next restart
+- 95+ tier continues most profitable (+$1.84/7d)
+- ct-hot+ legacy draining, should clear in 1-2 days
+
+### Monitoring
+
+| Item | Status | Next |
+|------|--------|------|
+| ATR_SL_MIN=1.2% | REVERTED from 1.5% | Eval 48h (~Aug 27) |
+| CONF_FILTER_MAX=89 | Active | Eval Aug 26 |
+| ct-hot+ drain | 66T/7d legacy | Clears ~Aug 26-27 |
+| hl_copy_trader LONG | 30% WR today | Monitor recovery |
+| bb_bounce+ WR | 58.8% today | Monitor |
+| Disk | 82% | Clean at 85% |
+
+---
+
 ## CEO Report — 2026-08-25 ~15:20 UTC (255th run)
 
 ### Diagnosis

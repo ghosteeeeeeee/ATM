@@ -552,7 +552,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.015   # 1.5% floor — widened from 1.2% (2026-08-25). 1.2% was binding on 49.4% of exits (atr_sl_hit). 100% of bb_bounce+ SL hits were at 1.2% floor. 1.5% gives mean-reversion trades room to breathe. Monitor: atr_sl_hit %, avg loss.
+ATR_SL_MIN             = 0.012   # 1.2% floor — REVERTED from 1.5% (CEO Aug 25). auto_1hr data: 1.5% WORSENED hit rate 49.4%→60%, avg loss -$6.09. Wider SL = trades run into bigger losses before stopping. Problem is entry quality, not SL width. Monitor: atr_sl_hit %, avg loss.
 ATR_SL_MAX             = 0.030  # 3.0% cap — widened from 2.5% 2026-08-16. ATR_SL dominant drag: 45T -$3.32 (avg loss -0.75%). Wider SL gives trades room to reach PM_TRAIL activation (+0.40%). Monitor: ATR_SL hit count (should ↓ from 45/48h), PM_TRAIL capture rate (should ↑). Revert if avg loss widens without fewer hits.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
@@ -567,12 +567,12 @@ ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits.
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.015  # 1.5% — widened from 1.2% (2026-08-25). MUST match ATR_SL_MIN
+ATR_SL_MIN_INIT    = 0.012  # 1.2% — REVERTED from 1.5%. MUST match ATR_SL_MIN
 ATR_SL_MAX_INIT    = 0.030  # 3.0% — widened from 2.5%. MUST match ATR_SL_MAX
-SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN)
+SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN)
 TP_PCT_FALLBACK    = 0.030  # 3.0% fallback target (2:1 R:R with 1.5% SL)
-STOP_LOSS_DEFAULT  = 0.015  # 1.5% hard fallback (matched to ATR_SL_MIN)
-SL_PCT_MIN        = 0.015  # 1.5% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
+STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN)
+SL_PCT_MIN        = 0.012  # 1.2% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py

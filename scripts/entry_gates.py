@@ -112,8 +112,12 @@ def _find_nearest_sr(token, price, direction, candles_5m):
         return price - max(targets)
 
 
-def rr_gate(token, direction, price, candles_5m=None):
-    """R:R pre-check gate.
+def rr_gate(token, direction, price, candles_5m=None, signal_type=None):
+    """R:R pre-check gate — now uses structural risk-reward engine.
+
+    When RR_ENGINE_ENABLED=True, delegates to risk_reward_engine.evaluate_rr()
+    for multi-source S/R, liquidity clusters, and volatility-aware R:R scoring.
+    Falls back to legacy ATR-based R:R if engine is disabled or fails.
 
     Returns (pass, sl_price, tp_price, rr_ratio).
     pass=True → signal should emit. pass=False → suppress.
@@ -122,6 +126,23 @@ def rr_gate(token, direction, price, candles_5m=None):
         if price <= 0:
             return False, 0, 0, 0  # reject degenerate prices
 
+        # Try the structural R:R engine first
+        try:
+            from hermes_constants import RR_ENGINE_ENABLED
+            if RR_ENGINE_ENABLED:
+                from risk_reward_engine import evaluate_rr
+                result = evaluate_rr(
+                    token, direction, price,
+                    candles_5m=candles_5m,
+                    signal_type=signal_type,
+                )
+                return result['pass'], result['sl_price'], result['tp_price'], result['rr_ratio']
+        except ImportError:
+            pass  # engine not available, fall through to legacy
+        except Exception as e:
+            _log(f"RR ENGINE ERROR (fail-open): {e}")
+
+        # Legacy fallback: ATR-based R:R
         from hermes_constants import ATR_SL_MIN, ATR_TP_MIN, ATR_PCT_FALLBACK
 
         # Get ATR%
