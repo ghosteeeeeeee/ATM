@@ -45,6 +45,8 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
     },
     'NORMAL': {
+        # pump_catcher — momentum breakout (velocity + acceleration)
+        'pump-catcher+', 'pump-catcher-',
         # Trend following + mean reversion in steady markets
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
@@ -70,6 +72,7 @@ REGIME_SIGNALS = {
     },
     'HIGH': {
         # Breakout works in big moves
+        'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks

@@ -1539,6 +1539,31 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # pump-catcher
+            if _comp in ('pump-catcher+', 'pump-catcher-'):
+                try:
+                    from hermes_constants import PUMP_CATCHER_ENABLED
+                    if not PUMP_CATCHER_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_CATCHER_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'pump-catcher+':
+                try:
+                    from hermes_constants import PUMP_CATCHER_PLUS_ENABLED
+                    if not PUMP_CATCHER_PLUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_CATCHER_PLUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'pump-catcher-':
+                try:
+                    from hermes_constants import PUMP_CATCHER_MINUS_ENABLED
+                    if not PUMP_CATCHER_MINUS_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_CATCHER_MINUS_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
     except ImportError:
         pass  # hermes_constants may not be available in all contexts
 

@@ -285,19 +285,18 @@ def detect_pump(token, closes):
         if direction == 'SHORT' and rsi_val < PUMP_CATCHER_RSI_MIN:
             return None  # oversold — too late
 
-    # ── 7. Follow-through filter: at least 2 of 3 individual candles ───────────
-    # Count how many of the last 3 candles closed higher/lower than their open.
-    # This catches real follow-through, not just one huge candle.
+    # ── 7. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
+    # Check that recent closes show follow-through momentum, not a single spike.
+    # Uses close-to-close comparisons (we only have close prices, not OHLC).
     recent_3 = closes[-3:]
     if direction == 'LONG':
-        green_count = sum(1 for i in range(len(recent_3)) if i > 0 and recent_3[i] > recent_3[i - 1])
-        # Also count the last candle closing above its open-like reference (prev close)
-        if green_count < 2:
-            return None  # not enough follow-through
+        green_count = sum(1 for i in range(1, len(recent_3)) if recent_3[i] > recent_3[i - 1])
+        if green_count < 1:
+            return None  # no follow-through
     else:
-        red_count = sum(1 for i in range(len(recent_3)) if i > 0 and recent_3[i] < recent_3[i - 1])
-        if red_count < 2:
-            return None  # not enough follow-through
+        red_count = sum(1 for i in range(1, len(recent_3)) if recent_3[i] < recent_3[i - 1])
+        if red_count < 1:
+            return None  # no follow-through
 
     # ── Confidence scoring ─────────────────────────────────────────────────────
     conf = PUMP_CATCHER_CONFIDENCE_BASE
@@ -321,14 +320,14 @@ def detect_pump(token, closes):
     if rsi_val is not None and 40 <= rsi_val <= 65:
         conf += 5
 
-    # Consistency bonus: all 3 recent candles in same direction
+    # Consistency bonus: both adjacent pairs in same direction (strong follow-through)
     if direction == 'LONG':
-        all_green = all(recent_3[i] > recent_3[i - 1] for i in range(1, len(recent_3)))
-        if all_green:
+        green_count = sum(1 for i in range(1, len(recent_3)) if recent_3[i] > recent_3[i - 1])
+        if green_count >= 2:
             conf += 3
     else:
-        all_red = all(recent_3[i] < recent_3[i - 1] for i in range(1, len(recent_3)))
-        if all_red:
+        red_count = sum(1 for i in range(1, len(recent_3)) if recent_3[i] < recent_3[i - 1])
+        if red_count >= 2:
             conf += 3
 
     conf = min(PUMP_CATCHER_CONFIDENCE_CAP, max(PUMP_CATCHER_CONFIDENCE_BASE, conf))
@@ -377,16 +376,8 @@ def run(prices_dict=None):
     except Exception:
         pass
 
-    # Count existing pump_catcher positions (enforce MAX_POSITIONS)
+    # Count existing pump_catcher signals via cooldown file entries
     pump_position_count = 0
-    try:
-        from signals import signal_compactor as _sc
-        # Count signals with pump_catcher source that are in hotset
-    except Exception:
-        pass
-    # Fallback: count by checking recent signals with pump_catcher source
-    # that haven't expired yet. This is approximate — exact count needs DB query.
-    # For safety, we track our own count via cooldown file entries.
     cooldowns = _load_cooldowns()
     # Each cooldown entry represents a recent signal — count non-expired ones
     now = time.time()
