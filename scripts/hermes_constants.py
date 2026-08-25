@@ -1404,7 +1404,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # CEO 2026-08-17 — removed 'accel-300' (40T/7d 55% WR -$0.30, net negative), 'wave_catcher' (killed), 'range_breakout_short' (killed)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
-    'spike_exhaustion_short', 'bb_bounce',
+    'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',
