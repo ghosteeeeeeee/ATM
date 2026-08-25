@@ -14728,3 +14728,58 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - 5 open positions (3 bb_bounce+, 2 hl_copy_trader)
 
 **Open Questions:** None
+
+## [2026-08-25 05:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (late night)
+**Open:** 5 positions (3 bb_bounce+, 2 hl_copy_trader)
+
+**24h Summary:** 86T 58% WR -$0.61
+- profit-monster-trail 41T +$2.77 ⭐ | atr_sl_hit 36T (41.9%) -$3.50 | cut-loser-CL-T1 5T -$0.58
+
+**Signal Leaders (24h):** bb_bounce+ 16T 87.5% WR +$0.86 ⭐ | macd-div- 13T 69.2% WR -$0.14 | hl_copy_trader 10T 50% WR -$0.50 | ct-hot+ 6T 16.7% WR -$0.60
+
+**Kill criteria:** None met (0T last hour = no killable signals)
+**Changes:** None needed
+- Zero trades last hour — no data for decisions
+- atr_sl_hit 41.9% above threshold but trailing SL working (profitable exits)
+- 3 consecutive positive hours, system stable
+
+**Open Questions:** Watch atr_sl_hit when market wakes
+
+## 2026-08-25 Signal Performance Report
+- 86 trades 24h, 55.8% WR, -$1.54 PnL
+- ct-hot+ already killed (residual trades in 24h window)
+- macd-div+ already killed
+- hl_copy_trader SHORT: 25% WR, 4T, -$0.52 — one trade from kill threshold
+- bb_bounce+: 87.5% WR, +$0.86 — top performer, consistent across 14 tokens
+- No signal inversions
+- Issue: negative PnL despite 55.8% WR — position sizing too small
+
+## FAVORITES Update — 2026-08-25 06:00 UTC
+- Regime: NEUTRAL
+- PROMOTE ENA (WR=60.0%, AvgPnL=0.58%, Trades=10)
+- PROMOTE IMX (WR=60.0%, AvgPnL=0.38%, Trades=5)
+
+Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SYRUP', 'ZRO']
+
+## [2026-08-25 06:49 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L -$0.08)
+**24h:** 83T 57.8% WR ~-$1.00
+
+**Top signals (24h):** bb_bounce+ 17T 82.4% WR +$0.57 ⭐ | macd-div- 13T 69.2% WR -$0.14 | hl_copy_trader 11T 45.5% WR -$0.50 | ct-hot+ 6T 16.7% WR -$0.60
+
+**Close reasons (24h):** atr_sl_hit 39T (47%) -$3.58 | profit-monster-trail 36T +$2.45 | cut-loser-CL-T1 4T -$0.46
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR last hour
+- bb_bounce+ and hl_copy_trader both 60% WR last 6h
+
+**Changes:** None needed
+- atr_sl_hit 47% above 40% threshold but 25.6% of exits profitable (trailing SL working)
+- ATR_SL_MIN=1.2% already widened — no further tuning needed
+- Trade freq 2/hr normal
+- 5 open positions (3 bb_bounce+, 2 hl_copy_trader)
+
+**Open Questions:** None

@@ -173,27 +173,36 @@
 - **Status:** IMPLEMENTED
 - **Reason:** All 6 files done: signal_confluence.py ✅, hermes_constants.py constants ✅, __init__.py registry ✅, signal_schema.py Layer 2 ✅, signal_compactor.py weights ✅, volatility_gate.py all regimes ✅.
 
+## Plan: regime-transition-analysis-2026-08-24.md
+- **Date scanned:** 2026-08-25 12:00
+- **Core request:** Fix regime transition detection — V-reversals bypass TIDE and DIRECTIONAL_OUTCOME too slowly
+- **Difficulty:** Level 1-2
+- **Value:** HIGH — would have prevented $34.78 in losses during Aug 24 incident
+- **Status:** IMPLEMENTED
+- **Reason:** All 5 recommendations done: velocity tiers upgraded (3+/5 = hard block) ✅, BTC momentum filter ✅, DIRECTIONAL_OUTCOME time window 15min ✅, BTC accel filter ✅. BTC level filter deferred (Level 2, new module).
+
 ---
 
-## Summary (Updated 2026-08-24)
+## Summary (Updated 2026-08-25)
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| IMPLEMENTED | 15 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence |
+| IMPLEMENTED | 16 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence, regime-transition |
 | PARTIALLY IMPLEMENTED | 3 | favorites-daily-update, coin_tracker_setup, coin_tracker_expansion |
 | PENDING | 3 | btc-crash-filter, dashboard-enhancements, retroactive-scan |
 
-**Scanned: 21 plans**
-**Implemented: 15 (71%)**
+**Scanned: 22 plans**
+**Implemented: 16 (73%)**
 **Partially implemented: 3 (14%)**
 **Pending: 3 (14%)**
 
-### Level 1 actions taken this session:
+### Level 1-2 actions taken this session:
 - Removed `warm` health bypass from coin_tracker_hot.py (was letting weak setups through)
+- regime-transition-analysis: all constant-level fixes already deployed
 
-### Remaining items are all Level 2-3:
-- btc-crash-filter: needs 30d backtest before acceleration detection
+### Remaining items:
+- btc-crash-filter: needs 30d backtest before acceleration detection (Level 2)
 - retroactive-scan: complex new feature (Level 3)
 - dashboard-enhancements: cosmetic (Level 2-3)
-- coin_tracker confirming analyses: Level 2
-- coin_tracker age decay: Level 2-3
+- coin_tracker confirming analyses: Level 2 ← **NEXT**
+- coin_tracker age decay: Level 2-3 ← **NEXT**

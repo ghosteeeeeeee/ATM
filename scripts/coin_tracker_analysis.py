@@ -1040,6 +1040,29 @@ def compute_setup_strength(wyckoff: Dict, ewave: Dict, trend: Dict, sr_testing: 
         score += 15
         factors.append('strong_clustering')
 
+    # Count full-weight confirming analyses per direction
+    bullish_conf = 0
+    bearish_conf = 0
+    if wyckoff.get('phase') in ('accumulation', 'markup'):
+        bullish_conf += 1
+    elif wyckoff.get('phase') in ('distribution', 'markdown'):
+        bearish_conf += 1
+    if ewave.get('direction') == 'up' and ewave.get('wave') in [1, 2, 3]:
+        bullish_conf += 1
+    elif ewave.get('direction') == 'down' and ewave.get('wave') in [1, 2, 3]:
+        bearish_conf += 1
+    if trend.get('direction') == 'BULL':
+        bullish_conf += 1
+    elif trend.get('direction') == 'BEAR':
+        bearish_conf += 1
+
+    # Require 2+ confirming analyses for non-NEUTRAL setups
+    MIN_CONFIRMATIONS = 2
+    max_conf = max(bullish_conf, bearish_conf)
+    if max_conf < MIN_CONFIRMATIONS:
+        score *= 0.5  # penalize weak single-indicator setups
+        factors.append(f'weak_confirmations({bullish_conf}B/{bearish_conf}R)')
+
     # Recency multiplier
     score = score * (0.7 + 0.3 * recency)
 
@@ -1050,6 +1073,11 @@ def compute_setup_strength(wyckoff: Dict, ewave: Dict, trend: Dict, sr_testing: 
         setup_type = 'SHORT'
     else:
         setup_type = 'NEUTRAL'
+
+    # Force NEUTRAL if insufficient confirmations
+    if max_conf < MIN_CONFIRMATIONS and setup_type != 'NEUTRAL':
+        setup_type = 'NEUTRAL'
+        factors.append('forced_neutral_insufficient_confirmations')
 
     return {
         'score': min(100, score),
