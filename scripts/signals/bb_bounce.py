@@ -42,27 +42,27 @@ def _log(msg):
 
 
 def _get_15m_velocity(token):
-    """15m price velocity (% change over last 15 minutes). Returns float or None."""
-    from paths import HERMES_DATA
+    """15m price velocity (% change over last 15 minutes).
+    Reads from candles_1m (accurate, real-time) instead of price_history (stale).
+    FIX (2026-08-25): price_history lag caused BLUR/WLFI entries — signal saw
+    'price rising' while candles showed price falling hard. Returns float or None."""
     import sqlite3
     conn = None
     try:
-        conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
         c = conn.cursor()
         c.execute("""
-            SELECT price FROM (
-                SELECT price, timestamp FROM price_history
-                WHERE token = ?
-                ORDER BY timestamp DESC LIMIT 15
-            ) sub ORDER BY timestamp ASC
+            SELECT close FROM candles_1m
+            WHERE token = ?
+            ORDER BY ts DESC LIMIT 15
         """, (token.upper(),))
         rows = c.fetchall()
         if len(rows) < 5:
             return None
-        prices = [r[0] for r in rows]
-        if prices[0] <= 0:
+        closes = [r[0] for r in reversed(rows)]
+        if closes[0] <= 0:
             return None
-        return (prices[-1] - prices[0]) / prices[0] * 100
+        return (closes[-1] - closes[0]) / closes[0] * 100
     except Exception:
         return None
     finally:
@@ -352,23 +352,21 @@ def scan_bb_bounce_signals(prices_dict):
                     continue
 
         # Spike exhaustion filter: block entries after sharp 5m moves
+        # FIX (2026-08-25): switched from price_history (stale) to candles_1m (accurate)
         _conn_se = None
         try:
             from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
-            from paths import HERMES_DATA
             import sqlite3 as _sqlite3
-            _conn_se = _sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=10)
+            _conn_se = _sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
             _cur_se = _conn_se.cursor()
             _cur_se.execute("""
-                SELECT price FROM (
-                    SELECT price, timestamp FROM price_history
-                    WHERE token = ?
-                    ORDER BY timestamp DESC LIMIT 6
-                ) sub ORDER BY timestamp ASC
+                SELECT close FROM candles_1m
+                WHERE token = ?
+                ORDER BY ts DESC LIMIT 6
             """, (token.upper(),))
-            _prices_se = [r[0] for r in _cur_se.fetchall()]
-            if len(_prices_se) >= 2 and _prices_se[0] > 0:
-                _vel_se = (_prices_se[-1] - _prices_se[0]) / _prices_se[0] * 100
+            _closes_se = [r[0] for r in _cur_se.fetchall()]
+            if len(_closes_se) >= 2 and _closes_se[-1] > 0:
+                _vel_se = (_closes_se[0] - _closes_se[-1]) / _closes_se[-1] * 100
                 if abs(_vel_se) > SPIKE_EXHAUSTION_VEL_5M_THRESHOLD:
                     _log(f"{token} {direction} BLOCKED spike exhaustion vel_5m={_vel_se:+.3f}%")
                     continue
