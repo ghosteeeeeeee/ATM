@@ -1,3 +1,7 @@
+[2026-08-25 20:10 UTC] auto_1hr: KILLED hl_copy_trader
+  WHY: 1T last hour (0W 1L -$0.14). 24h 38T 15W 39% -$1.70. hl_copy_trader #1 loser: 12T 25%WR -$1.13/24h (PLUS/MINUS already CEO-killed, base was last standing). atr_sl_hit 60.5% of all closes (threshold 40%) — hl_copy_trader responsible for 10T of those. bb_bounce+ degraded 89%→43%WR but still 56% overall, -$0.12/24h — monitoring. Set HL_COPY_SIGNAL_ENABLED=False. 5 open positions (2 orphaned hl_copy_trader riding SLs). Trade freq 1.6/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 21:10 UTC
 [2026-08-24 12:05 UTC] auto_1hr: NO CHANGES
   WHY: 6T last hour (2W 4L -$0.30). 24h 73T 42W 57.5% +$0.70 net positive. 3 consecutive negative hours (09-11 UTC) -$0.55 total — small, system flat (0 open). atr_sl_hit regressed to -$0.52 (was +$0.15 at 10:05) — monitoring, likely variance. bb_bounce+ 91%WR +$0.88 star. macd-div+ CEO killed draining. NEUTRAL regime dominant (64/109). No kill criteria — no signal 3+T/0%WR last hour. Trade freq 6/hr normal. Watch: atr_sl_hit next 2h, consecutive neg hours.
   BY: auto_1hr

@@ -1,5 +1,48 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-25 20:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (0W 1L -$0.14). 5 closed in last 6h (3W 2L +$0.08).
+**24h:** 38T 15W 39% -$1.70 (net negative)
+**7d:** 314T 159W 51% -$3.76
+**Open:** 5 positions (3 SHORT, 2 LONG). 2 hl_copy_trader orphaned positions riding.
+
+**24h Close Reasons:**
+- atr_sl_hit: 23T 60.5% of closes (threshold: 40%) — CRITICAL
+- profit-monster-trail: 8T +$0.50 avg+$0.063 — only profitable exit
+- cut-loser-MAE-GUARD: 2T -$0.30 avg-$0.150
+- cascade_flip: 3T -$0.14 — minor
+- cut-loser-CL-T1: 1T -$0.14
+- guardian_orphan: 1T -$0.01
+
+**Signal Performance (24h):**
+- hl_copy_trader: 12T 3W 25% -$1.13 — KILLED (PLUS/MINUS already CEO-killed, base was last standing)
+- bb_bounce+: 16T 9W 56% -$0.12 — degraded (was 89% WR Aug 24, now 43% today). Monitor.
+- All others: <3T each, noise
+
+**Hourly PnL (last 12h):**
+- 08:00: +$0.10 | 09:00: -$0.40 | 11:00: -$0.04 | 12:00: -$0.20
+- 13:00: -$0.44 | 14:00: +$0.07 | 15:00: +$0.08 | 17:00: +$0.07 | 19:00: -$0.14
+- Mixed: 4W 5L in hourly buckets. Losses concentrated in 09:00-13:00.
+
+**Market Regime:** Predominantly NEUTRAL — reduced edge for directional signals.
+
+**Changes:**
+1. **KILL hl_copy_trader** — `HL_COPY_SIGNAL_ENABLED = False`. PLUS and MINUS variants already killed by CEO. Base signal 12T/25%WR/-$1.13/24h, #1 loser. atr_sl_hit dominates (10T/30%WR/-$0.83). Copy delay = enters after move over. NEVER_REENABLE.
+
+**No Change Needed:**
+- atr_sl_hit at 60.5% — driven by hl_copy_trader (10T) + bb_bounce+ (8T). Disabling hl_copy_trader addresses the majority. bb_bounce+ SL behavior is normal for its entry type (bounce trades get stopped on continuation).
+- bb_bounce+ degradation: was 89% Aug 24, now 43% Aug 25. Could be regime variance (NEUTRAL dominant). One more bad day before action. At -$0.12/24h it's marginal, not fatal.
+- Trade frequency: ~1.6/hr normal. No overtrading.
+- 3 consecutive negative hours (09-13 UTC) already ended with +$0.07 at 14:00.
+- Open positions: 5 open, all small size ($11-19), riding SLs. BTC LONG -$0.07, ETH SHORT +$0.08.
+
+**Open Questions:**
+- bb_bounce+ degradation: if still <50% WR tomorrow, investigate regime sensitivity
+- hl_copy_trader orphaned positions: 2 open (BTC LONG, ETH SHORT) — will exit via existing SLs/trails. No manual intervention needed.
+
+---
+
 ## [2026-08-24 12:05 UTC] Hourly Analysis
 
 **Trades:** 6 closed last hour (2W 4L -$0.30)
