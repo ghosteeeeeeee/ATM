@@ -819,7 +819,7 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
             WHERE token = ?
               AND direction = ?
               AND decision IN ('PENDING', 'APPROVED')
-              AND created_at > datetime('now', '-5 minutes')
+              AND created_at > datetime('now', '-10 minutes')
               AND confidence >= 60
         """, (token.upper(), opp_direction))
         opp_sources = [row[0] for row in c.fetchall() if row[0]]
@@ -912,7 +912,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             FROM signals
             WHERE decision IN ('PENDING', 'APPROVED')
               AND executed = 0
-              AND created_at > datetime('now', '-5 minutes')
+              AND created_at > datetime('now', '-10 minutes')
               AND confidence >= 60
               AND token NOT LIKE '@%'
               AND combo_key IS NOT NULL
@@ -2192,7 +2192,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                               WHERE decision = 'PENDING'
                                 AND executed = 0
                                 AND combo_key IS NOT NULL
-                                AND created_at > datetime('now', '-5 minutes')
+                                AND created_at > datetime('now', '-10 minutes')
                           ))
                           -- No combo_key (null signals never expire — FIX: now they do)
                           OR (combo_key IS NULL)
@@ -2216,7 +2216,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                               WHERE decision = 'PENDING'
                                 AND executed = 0
                               AND combo_key IS NOT NULL
-                              AND created_at > datetime('now', '-5 minutes')
+                              AND created_at > datetime('now', '-10 minutes')
                           ))
                           OR (combo_key IS NULL)
                       )
