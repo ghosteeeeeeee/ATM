@@ -52,6 +52,8 @@ REGIME_SIGNALS = {
         'bb_bounce', 'bb_bounce+',  # standalone parts — compound forms already below
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',  # 58.8% WR all-time
+        'bb-bounce-short',  # standalone SHORT bounce signal
+        'bb-bounce-short',  # standalone SHORT bounce signal
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'trend_momentum_near_sma',
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
