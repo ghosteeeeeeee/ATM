@@ -26,6 +26,7 @@ from hermes_constants import (
     ATR_SPIKE_COMPRESSION_MIN_BARS,
     ATR_SPIKE_BREAKOUT_MIN_PCT,
     ATR_SPIKE_TREND_FILTER,
+    ATR_SPIKE_TREND_TIMEFRAME,
     ATR_SPIKE_EMA_PROXIMITY_PCT,
     ATR_SPIKE_SL_PCT,
     ATR_SPIKE_CONF_BASE,
@@ -84,17 +85,26 @@ def _compute_atr(closes: list, period: int = 14) -> float:
     return atr
 
 
+def _get_trend_table() -> str:
+    """Return the candle table name for the trend filter timeframe."""
+    tf = getattr(__builtins__, '__import__', None)  # no-op, just for safety
+    if ATR_SPIKE_TREND_TIMEFRAME == '1h':
+        return 'candles_1h'
+    return 'candles_15m'
+
+
 def _check_trend_alignment(token: str) -> bool:
-    """Check if EMA20 > EMA50 on 15m candles (uptrend)."""
+    """Check if EMA20 > EMA50 on configured timeframe (default: 1h, was 15m)."""
     if not ATR_SPIKE_TREND_FILTER:
         return True
     try:
         from paths import CANDLES_DB
+        table = _get_trend_table()
         conn = sqlite3.connect(CANDLES_DB, timeout=5)
         try:
             cur = conn.cursor()
-            cur.execute("""
-                SELECT close FROM candles_15m
+            cur.execute(f"""
+                SELECT close FROM {table}
                 WHERE token = ? ORDER BY ts DESC LIMIT 60
             """, (token.upper(),))
             rows = cur.fetchall()
@@ -122,16 +132,17 @@ def _check_trend_alignment(token: str) -> bool:
 
 
 def _check_ema_proximity(token: str) -> bool:
-    """Check if price is within ATR_SPIKE_EMA_PROXIMITY_PCT of EMA20 on 15m."""
+    """Check if price is within ATR_SPIKE_EMA_PROXIMITY_PCT of EMA20 on 1h (stable trend)."""
     if ATR_SPIKE_EMA_PROXIMITY_PCT <= 0:
         return True
     try:
         from paths import CANDLES_DB
+        table = _get_trend_table()
         conn = sqlite3.connect(CANDLES_DB, timeout=5)
         try:
             cur = conn.cursor()
-            cur.execute("""
-                SELECT close FROM candles_15m
+            cur.execute(f"""
+                SELECT close FROM {table}
                 WHERE token = ? ORDER BY ts DESC LIMIT 30
             """, (token.upper(),))
             rows = cur.fetchall()
@@ -186,10 +197,10 @@ def detect(token: str) -> dict | None:
     if not recent_atrs:
         return None
 
-    # Current ATR must be below threshold
-    current_atr = _compute_atr(closes[-15:])
-    current_atr_pct = current_atr / current_price * 100 if current_price > 0 else 999
-    if current_atr_pct >= ATR_SPIKE_COMPRESSION_MAX_PCT:
+    # ATR BEFORE breakout (exclude current bar — breakout candle inflates ATR)
+    pre_breakout_atr = _compute_atr(closes[-16:-1]) if len(closes) >= 16 else _compute_atr(closes[:-1])
+    pre_breakout_atr_pct = pre_breakout_atr / prev_price * 100 if prev_price > 0 else 999
+    if pre_breakout_atr_pct >= ATR_SPIKE_COMPRESSION_MAX_PCT:
         return None
 
     # Must have been compressed for minimum duration
