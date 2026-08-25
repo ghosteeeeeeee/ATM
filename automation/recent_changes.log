@@ -203,3 +203,15 @@
   WHY: 2T last hour (1W 1L -$0.08). bb_bounce+ 2 LONGs both atr_sl_hit — ZEN +$0.06, WLFI -$0.14. 83T 24h 57.8% WR. atr_sl_hit 39T (47%) above 40% threshold but 25.6% profitable exits — trailing SL working. ATR_SL_MIN=1.2% already widened. profit-monster-trail 36T +$2.45 carrying system. No signal has 3+ trades last hour with 0% WR — no kill criteria. Trade freq 2/hr normal. 5 open positions. System stable.
   BY: auto_1hr
   NEXT: Re-run at 07:49 UTC
+[2026-08-25 08:05 UTC] auto_1hr: ATR_SL_MIN 1.2%→1.5%
+  WHY: 49.4% of 24h exits were atr_sl_hit. 100% of bb_bounce+ SL hits at 1.2% floor. Mean-reversion needs room. Updated matching fallbacks (INIT, FALLBACK, DEFAULT, MIN, TP_FALLBACK→3.0%). Committed: 1350ec3.
+  BY: auto_1hr
+  NEXT: Re-run at 09:05 UTC
+[2026-08-25 09:05 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.05). cascade_flip exits on ALT/HBAR (-$0.11) and IMX atr_sl_hit win (+$0.16). 85T 24h 54.1% WR. atr_sl_hit 42T (49.4%) still above 40% threshold — ATR_SL_MIN 1.5% change from 08:05 needs more time. bb_bounce+ 20T 70% WR +$0.23 star. hl_copy_trader 12T 41.7% WR -$0.66 persistent but has wins. tl_break_short 7T 28.6% WR -$0.32 concerning but combo signal (not standalone killable). ct-hot+ 6T 16.7% WR -$0.60 persistent. No signal has 3+ trades with 0% WR last hour. 5 open positions (3 hl_copy_trader, 2 cascade-reverse-v2). Trade freq 3/hr normal. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 10:05 UTC
+[2026-08-25 10:05 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.35). Both hl_copy_trader (BTC cut-loser-MAE-GUARD -$0.14, INJ atr_sl_hit -$0.21). 83T 24h 54.1% WR ~-$2.63. atr_sl_hit 40T (48.2%) still above 40% threshold — ATR_SL_MIN 1.5% from 08:05 needs more data (only 5T since). profit-monster-trail 26T +$1.78 carrying system. bb_bounce+ 18T 66.7% WR +$0.08 barely positive (down from +$0.27). hl_copy_trader 14T 35.7% WR -$1.01 biggest loser (legacy). ct-hot+ 5T 0% WR -$0.70 persistent but 0T last hour — not killable by 3+T/hour rule. No signal has 3+ trades with 0% WR last hour. Trade freq 2/hr normal. 3 open positions. System stable, waiting for ATR_SL_MIN evaluation window.
+  BY: auto_1hr
+  NEXT: Re-run at 11:05 UTC

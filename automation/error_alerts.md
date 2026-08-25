@@ -658,3 +658,9 @@ ALERTS:
 **ALERTS:**
 - **WARN**: Cascade flip was unable to close IMX #14320 positions for ~30min due to SQL syntax bug — now fixed
 - **WARN**: Market overheated (72% hot) — COOL_OFF regime active, reduce exposure
+
+## Error Alerts — 2026-08-25 09:04 UTC
+- **REPEATED** (19x): `Aug N N:N:N python3[TOK]: TS   [CASCADE TOK] ⚠️ _close_paper_position TOK: no such table: trades`
+
+## Error Alerts — 2026-08-25 10:04 UTC
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — WARNING — MOMENTUM`

@@ -14783,3 +14783,79 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 - 5 open positions (3 bb_bounce+, 2 hl_copy_trader)
 
 **Open Questions:** None
+
+## [2026-08-25 08:05 UTC] Hourly Analysis
+
+**Trades:** 5 closed (1W 4L -$0.46)
+**24h:** 85T 50% WR ~-$1.00
+
+**Top signals (24h):** bb_bounce+ 21T 71.4% WR +$0.27 ⭐ | macd-div- 12T 66.7% WR -$0.28 | hl_copy_trader 12T 41.7% WR -$0.66
+
+**Close reasons (24h):** atr_sl_hit 42T (49.4%) -$3.73 | profit-monster-trail 34T +$2.22 | cut-loser-CL-T1 4T -$0.46
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR last hour
+- hl_copy_trader SHORT trades are legacy (pre-flag-disable, all before 2026-08-25 14:00 UTC)
+- ct-hot+ 6T 16.7% WR -$0.60 persistent but only 6T total (not killable)
+
+**Changes:**
+1. Widened ATR_SL_MIN 1.2%→1.5% — 49.4% of exits were atr_sl_hit, 100% of bb_bounce+ SL hits were at the 1.2% floor. Mean-reversion signals need room for normal pullbacks. Updated all matching fallbacks (INIT, FALLBACK, DEFAULT, MIN, TP_PCT_FALLBACK→3.0%).
+
+**No Change Needed:**
+- hl_copy_trader SHORT: flag already disabled (2026-08-25), legacy trades clearing
+- Trade freq 5/hr normal
+- bb_bounce+ still profitable despite drawdown (71.4% WR 24h)
+- 1 open position (IMX atr-spike+,r2-trend-long3)
+
+**Open Questions:**
+- Will 1.5% ATR_SL_MIN reduce atr_sl_hit % without increasing avg loss?
+- Watch bb_bounce+ performance — if still hitting SL, consider signal-level override
+
+## [2026-08-25 09:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.05)
+**24h:** 85T 54.1% WR ~-$2.40
+
+**Top signals (24h):** bb_bounce+ 20T 70% WR +$0.23 ⭐ | hl_copy_trader 12T 41.7% WR -$0.66 | macd-div- 9T 55.6% WR -$0.46 | tl_break_short 7T 28.6% WR -$0.32 | ct-hot+ 6T 16.7% WR -$0.60
+
+**Close reasons (24h):** atr_sl_hit 42T (49.4%) -$3.57 | profit-monster-trail 29T +$1.95 | cut-loser-CL-T1 4T -$0.46 | cascade_flip 3T -$0.17
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR last hour
+- hl_copy_trader persistent but has wins
+
+**Changes:** None needed
+- ATR_SL_MIN 1.5% deployed at 08:05 UTC — need more time to measure effect on atr_sl_hit %
+- Trade freq 3/hr normal
+- 5 open positions (3 hl_copy_trader, 2 cascade-reverse-v2)
+
+**Open Questions:**
+- Will atr_sl_hit % drop from 49.4% after ATR_SL_MIN widens? Watch next 2-3 hours
+
+## [2026-08-25 10:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0W 2L -$0.35)
+**24h:** ~83T 54.1% WR ~-$2.63
+
+**Top signals (24h):** bb_bounce+ 18T 66.7% WR +$0.08 ⭐ | hl_copy_trader 14T 35.7% WR -$1.01 | macd-div- 9T 55.6% WR -$0.46 | ct-hot+ 5T 0% WR -$0.70
+
+**Close reasons (24h):** atr_sl_hit 40T (48.2%) -$3.60 | profit-monster-trail 26T +$1.78 | cut-loser-CL-T1 4T -$0.46 | cut-loser-MAE-GUARD 3T -$0.42
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR last hour
+- ct-hot+ 5T 0% WR persistent but 0T last hour (not killable by rule)
+
+**Changes:** None needed
+- ATR_SL_MIN 1.5% deployed at 08:05 UTC — only 5 trades since, too early to evaluate
+- Trade freq 2/hr normal
+- 3 open positions (ALT SHORT, HBAR SHORT, ETH LONG)
+
+**No Change Needed:**
+- ATR_SL_MIN widening needs 3-4 more hours of data
+- hl_copy_trader legacy trades still clearing
+- Trade frequency within bounds
+- No signal meets kill threshold
+
+**Open Questions:**
+- Will atr_sl_hit % drop from 48.2%? Monitor at next 2-3 runs
+- ETH LONG position at -71% pnl_pct with 0 pnl_usdt — possible data staleness (position opened 08:37 UTC, check if live price feed active)
