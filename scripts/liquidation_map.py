@@ -21,15 +21,33 @@ Output: /var/www/hermes/data/liquidation_map.json (for dashboard)
 import json
 import os
 import time
+import urllib.request
+import urllib.error
 from collections import defaultdict
 from pathlib import Path
 
 from paths import *
-from hyperliquid_exchange import _hl_info
 
 LIQ_MAP_FILE = os.path.join(WWW_DATA, "liquidation_map.json")
 LIQ_CLUSTERS_FILE = os.path.join(HERMES_DATA, "liquidation_clusters.json")
 SCAN_INTERVAL = 300  # 5 minutes between full scans
+BASE_URL = "https://api.hyperliquid.xyz/info"
+
+
+def _hl_info(payload: dict, timeout: int = 10):
+    """POST to HL /info endpoint with OUR OWN rate limiting (0.2s, not hyperliquid_exchange's 2s)."""
+    data = json.dumps(payload).encode()
+    req = urllib.request.Request(
+        BASE_URL,
+        data=data,
+        headers={"Content-Type": "application/json"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read())
+    except Exception as e:
+        print(f"[hl_info] Error: {e}")
+        return None
 
 # Tokens to scan (top volume + our traded tokens)
 SCAN_TOKENS = [
@@ -42,8 +60,15 @@ SCAN_TOKENS = [
 
 # ─── Wallet Universe ─────────────────────────────────────────────────────────
 
-def get_tracked_wallets() -> list:
-    """Load all tracked wallets from hl_copy.db + leaderboard."""
+def get_tracked_wallets(max_wallets: int = None) -> list:
+    """Load tracked wallets from hl_copy.db + leaderboard. Capped to avoid API timeouts."""
+    if max_wallets is None:
+        try:
+            from hermes_constants import LIQ_MAP_MAX_WALLETS
+            max_wallets = LIQ_MAP_MAX_WALLETS
+        except ImportError:
+            max_wallets = 200
+
     wallets = set()
 
     # From copy trading DB
@@ -51,7 +76,7 @@ def get_tracked_wallets() -> list:
         from hl_copy_db import get_db
         conn = get_db()
         rows = conn.execute(
-            "SELECT wallet FROM traders WHERE active = 1"
+            "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY score DESC"
         ).fetchall()
         conn.close()
         for r in rows:
@@ -75,7 +100,13 @@ def get_tracked_wallets() -> list:
     for w in LEADERBOARD:
         wallets.add(w.lower())
 
-    return list(wallets)
+    # Cap to avoid API timeouts (DB wallets first, then leaderboard)
+    result = list(wallets)
+    if len(result) > max_wallets:
+        print(f"[wallets] Capping {len(result)} wallets → {max_wallets}")
+        result = result[:max_wallets]
+
+    return result
 
 
 # ─── Position Scanner ────────────────────────────────────────────────────────
@@ -124,10 +155,10 @@ def scan_all_positions(wallets: list) -> dict:
     total_wallets = len(wallets)
 
     for i, wallet in enumerate(wallets):
-        if i > 0 and i % 10 == 0:
-            time.sleep(1)  # Rate limit every 10 wallets
+        if i > 0 and i % 20 == 0:
+            time.sleep(0.5)  # Brief pause every 20 wallets
         elif i > 0:
-            time.sleep(0.3)
+            time.sleep(0.2)  # Our own rate limit (0.2s, not hyperliquid_exchange's 2s)
 
         positions = scan_wallet_positions(wallet)
         for pos in positions:
