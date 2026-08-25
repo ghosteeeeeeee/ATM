@@ -1558,6 +1558,37 @@ PHASE_ACCEL_MINUS_ENABLED  = True   # phase-accel- — PASS (was not blacklisted
 # positions and bypass the signal pipeline. Killswitches here prevent them from
 # firing if enabled/disabled state gets out of sync after reboot.
 PUMP_HUNTER_ENABLED        = False  # set False to block pump_hunter from firing
+
+# ── Pump Catcher (momentum breakout signal) ────────────────────────────────────
+# Catches early-stage momentum breakouts by detecting price acceleration.
+# Unlike pump_hunter (reversion/fade), this RIDES the spike via LONG entries.
+# Replaces dead volume-based detection with price-based velocity + acceleration.
+PUMP_CATCHER_ENABLED        = True   # master kill-switch
+PUMP_CATCHER_PLUS_ENABLED   = True   # LONG entries
+PUMP_CATCHER_MINUS_ENABLED  = False  # SHORT entries — disabled initially (catch pumps only)
+# Detection thresholds
+PUMP_CATCHER_VELOCITY_MIN   = 0.5    # min % move in 3 bars to qualify as explosive
+PUMP_CATCHER_VELOCITY_BARS  = 3      # bar window for velocity computation
+PUMP_CATCHER_ACCEL_MIN      = 0.0    # min acceleration (current velocity - prior velocity)
+PUMP_CATCHER_TREND_EMA      = 20     # EMA period for trend filter (price must be above)
+PUMP_CATCHER_RSI_MAX        = 75     # max RSI — skip if overbought
+PUMP_CATCHER_RSI_MIN        = 30     # min RSI — skip if oversold
+PUMP_CATCHER_RSI_PERIOD     = 14     # RSI computation period
+# TP/SL — asymmetric (ride winners, cut losers)
+PUMP_CATCHER_TP_PCT         = 3.0    # take profit at 3% from entry
+PUMP_CATCHER_SL_PCT         = 1.0    # stop loss at 1% from entry
+PUMP_CATCHER_TRAILING_ACTIVATE = 1.5 # activate trailing stop at +1.5%
+PUMP_CATCHER_TRAILING_DISTANCE = 0.8 # trail by 0.8% from peak
+# Confidence scoring
+PUMP_CATCHER_CONFIDENCE_BASE = 60    # base confidence
+PUMP_CATCHER_CONFIDENCE_CAP  = 88    # max confidence
+# Dedup and risk
+PUMP_CATCHER_COOLDOWN_BARS  = 10     # bars between signals per token (~10 min on 1m)
+PUMP_CATCHER_MAX_POSITIONS  = 3      # max concurrent pump-catcher positions
+PUMP_CATCHER_MIN_PRICE_ROWS = 30     # minimum 1m bars for EMA/RSI computation
+# Price position filter — allow entries at top of range (unlike accel_300 which blocks)
+PUMP_CATCHER_ALLOW_RANGE_BREAKOUT = True  # True = enter even at range top (momentum)
+
 # DEPRECATED — zscore_pump_hunter.py is disabled.
 # Pipeline-integrated version is signals/zscore_pump.py (uses tpsl_utils via signal_compactor).
 ZSCORE_PUMP_ENABLED        = True  # True = old standalone would fire (BLOCKED — use signals/zscore_pump.py)

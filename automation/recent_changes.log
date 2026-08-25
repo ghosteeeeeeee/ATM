@@ -219,3 +219,7 @@
   WHY: 0T last hour (system quiet). 76T 24h 44.7% WR -$2.68. atr_sl_hit 39T (51.3%) still above 40% — ATR_SL_MIN 1.5% from 08:05 only has 5T since, needs more data. ct-hot+ 5T 0% WR -$0.70 persistent but 0T last hour — not killable by 3+T/hour rule. hl_copy_trader 14T 35.7% WR -$1.01 biggest systematic bleed but has wins. No signal has 3+ trades with 0% WR last hour. 5 open positions. System stable, market lull.
   BY: auto_1hr
   NEXT: Re-run at 12:05 UTC
+[2026-08-25 14:08 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.44). hl_copy_trader 2T (0% WR -$0.42), bb_bounce+ 1T (0% WR -$0.03). 65T 24h 35.4% WR -$3.17. atr_sl_hit 39T (60%) — ATR_SL_MIN 1.5% from 08:05 shows 10T 60% hit rate, WORSE than pre-change 49.4%. SL consistently at 1.50% — floor binding but widening didn't help. Problem is entry quality, not SL tightness. No signal has 3+ trades with 0% WR last hour — kill criteria not met. 5 open positions. Trade freq 3/hr normal. System stable but losing.
+  BY: auto_1hr
+  NEXT: Re-run at 15:08 UTC

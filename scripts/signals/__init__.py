@@ -78,6 +78,8 @@ from hermes_constants import (
     CHAIN_FIRE_ENABLED, CHAIN_FIRE_PLUS_ENABLED, CHAIN_FIRE_MINUS_ENABLED,
     # signal_confluence (meta-signal)
     SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
+    # pump_catcher (momentum breakout)
+    PUMP_CATCHER_ENABLED, PUMP_CATCHER_PLUS_ENABLED, PUMP_CATCHER_MINUS_ENABLED,
 )
 
 
@@ -397,6 +399,11 @@ try:
 except Exception:
     _signal_confluence_run = None
 
+try:
+    from signals.pump_catcher import run as _pump_catcher_run
+except Exception:
+    _pump_catcher_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -475,6 +482,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'macd_divergence', 'enabled': 'MACD_DIVERGENCE_ENABLED', 'run': _macd_divergence_run},
     {'name': 'chain_fire', 'enabled': 'CHAIN_FIRE_ENABLED', 'run': _chain_fire_run},
     {'name': 'signal_confluence', 'enabled': 'SIGNAL_CONFLUENCE_ENABLED', 'run': _signal_confluence_run},
+    {'name': 'pump_catcher', 'enabled': 'PUMP_CATCHER_ENABLED', 'run': _pump_catcher_run},
 ]
 
 

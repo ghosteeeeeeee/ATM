@@ -14919,3 +14919,34 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 - Will atr_sl_hit % drop below 50% as ATR_SL_MIN 1.5% accumulates more trades?
 - hl_copy_trader 12/15 exits are atr_sl_hit — signal itself may need tuning or disabling via non-rule path
 - bb_bounce+ down from star (+$0.27) to barely positive (-$0.10) — is profit-monster-trail carrying it?
+
+## [2026-08-25 14:08 UTC] Hourly Analysis
+
+**Trades:** 3 closed last hour (0W 3L, -$0.44)
+**24h:** 65T 35.4% WR -$3.17
+
+**Close reasons (24h):** atr_sl_hit 39T (60%) -$3.16 | profit-monster-trail 14T +$0.97 | cut-loser-* 6T -$0.73 | guardian_orphan 2T -$0.06 | cascade_flip 4T -$0.19
+
+**Since ATR_SL_MIN 1.5% (08:05):** 10T, 1W (10% WR), 6 atr_sl_hit (60%), -$0.98
+- SL consistently at 1.50% — floor is binding but hit rate WORSE (60% vs 49.4% pre-change)
+- Conclusion: problem is entry quality, not SL tightness
+
+**Kill criteria:** None met
+- 3T last hour, no signal has 3+T with 0% WR in that window
+- hl_copy_trader 2T last hour (0% WR) — below 3T threshold
+- ct-hot+ 0T last hour — below threshold
+
+**Changes:** None needed
+- ATR_SL_MIN 1.5% needs more data (10T sample) — but early signal is it's not helping
+- No kill criteria triggered
+- 5 open positions still running
+
+**No Change Needed:**
+- Kill rule requires 3+T with 0% WR in last hour — not met
+- ATR_SL_MIN change from 08:05: sample too small (10T) to conclude it's harmful
+- Trade frequency normal (~1.5/hr)
+
+**Open Questions:**
+- Should ATR_SL_MIN widen further to 2.0%? Early data suggests widening doesn't reduce atr_sl_hit % — entries may be the issue
+- hl_copy_trader 78T all-time +$0.80 but 24h 16T -$1.43 — recent regime shift?
+- ct-hot+ 99T all-time -$4.07 — persistent systematic bleed but has wins, not killable
