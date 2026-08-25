@@ -485,3 +485,47 @@ Of the 26:
 - `scripts/analysis/abandoned_trade_root_cause.py --days 14` — full wrong-side / tight SL dump
 - `scripts/analysis/trace_trade.py <trade_id>` — single-trade deep dive
 
+---
+
+## r2_trend_long Signal Investigation (2026-08-24)
+
+### Problem
+r2_trend_long was returning 0 signals for hours. Two independent auditors investigated.
+
+### Root Cause
+Signal is NOT dead from over-tuning — it's **dormant due to market regime**. 92/96 tokens have negative slopes (correction). Even reverting all parameters wouldn't help — the binding constraint is `slope > 0` (no uptrends exist).
+
+### Historical Performance (verified)
+- 114 trades: 75W/39L, **65.8% WR**, +8.59% PnL
+- Best day: Aug 19 — 13 trades, 11W/2L, **84.6% WR**, +6.92%
+- Last trade: Aug 21 (BSV +2.72%)
+- Aug 13 tuning HELPED — WR improved from 58% to 75%+ (filtered dead-cat bounces)
+
+### Golden Window (Aug 19 14:00-21:00 UTC)
+- BTC pumped +7.15% daily, with a **6.64% hourly candle** at 15:00
+- Signal caught 4 wins in 3 minutes: DYDX +0.76%, USUAL +0.68%, ENA +1.59%
+- **Key insight:** Signal enters at START of volatility expansion, not after
+- **Trigger:** BTC hourly range jumps from <0.5% to >2%
+- Market conditions: 11/96 tokens had positive slopes during golden window (similar to today's 51%)
+
+### Code Changes Made
+1. **Cooldown reduced: 3h → 15min** (both LONG and SHORT)
+2. **Slope normalized by price** (both LONG and SHORT):
+   - OLD: slope > 0.003 (absolute, biased toward mid-priced tokens)
+   - NEW: slope/price > 0.01% per candle (fair across all price levels)
+   - Fixes micro-cap bias: $0.001 tokens no longer need 300%/candle slope
+3. Added `R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001` and `R2_TREND_SHORT_MIN_SLOPE_PCT = 0.0001`
+
+### Key Files
+- Signal: `scripts/signals/r2_trend_long.py`
+- Constants: `scripts/hermes_constants.py`
+- Audit report: `/root/.hermes/data/r2_trend_long_audit_report.md`
+
+### Commits
+- `fc4c9d2`: cooldown 3h→15min
+- `e67c837`: slope normalization LONG
+- `21ce112`: slope normalization LONG+SHORT cleanup
+
+### Status (2026-08-24)
+Signal is working correctly. Will resume firing when uptrends return. Watch for volatility expansion (BTC hourly range >2%) as the trigger.
+
