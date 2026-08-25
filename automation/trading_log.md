@@ -14859,3 +14859,31 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 **Open Questions:**
 - Will atr_sl_hit % drop from 48.2%? Monitor at next 2-3 runs
 - ETH LONG position at -71% pnl_pct with 0 pnl_usdt — possible data staleness (position opened 08:37 UTC, check if live price feed active)
+
+## [2026-08-25 11:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (system quiet)
+**24h:** 76T 44.7% WR -$2.68
+
+**Close reasons (24h):** atr_sl_hit 39T (51.3%) -$3.32 | profit-monster-trail 25T +$1.74 | cut-loser-* 7T -$0.88 | cascade_flip 3T -$0.17
+
+**Top signals (24h):** bb_bounce+ 18T 66.7% WR +$0.08 ⭐ | hl_copy_trader 14T 35.7% WR -$1.01 | macd-div- 9T 55.6% WR -$0.46 | tl_break_short 7T 28.6% WR -$0.32 | ct-hot+ 5T 0% WR -$0.70
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR last hour (0 trades closed)
+- ct-hot+ 5T 0% WR persistent but 0T last hour — not killable by rule
+
+**Changes:** None needed
+- ATR_SL_MIN 1.5% deployed at 08:05 — only 5T since, needs more data
+- 0 trades last hour — market lull, nothing to react to
+- 5 open positions (3 hl_copy_trader, 2 cascade-reverse-v2)
+
+**No Change Needed:**
+- 0 trades = no kill criteria triggerable
+- ATR_SL_MIN evaluation continues — need 10+ more trades
+- hl_copy_trader persistent but has wins, not killable
+
+**Open Questions:**
+- Will atr_sl_hit % drop from 51.3% after ATR_SL_MIN widens? Need more trades
+- ct-hot+ next trigger = kill (5T 0% WR already accumulated)
+- hl_copy_trader systematic bleed at -$1.01 — monitor for disable if persists

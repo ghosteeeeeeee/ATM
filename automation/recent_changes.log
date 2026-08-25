@@ -215,3 +215,7 @@
   WHY: 2T last hour (0W 2L -$0.35). Both hl_copy_trader (BTC cut-loser-MAE-GUARD -$0.14, INJ atr_sl_hit -$0.21). 83T 24h 54.1% WR ~-$2.63. atr_sl_hit 40T (48.2%) still above 40% threshold — ATR_SL_MIN 1.5% from 08:05 needs more data (only 5T since). profit-monster-trail 26T +$1.78 carrying system. bb_bounce+ 18T 66.7% WR +$0.08 barely positive (down from +$0.27). hl_copy_trader 14T 35.7% WR -$1.01 biggest loser (legacy). ct-hot+ 5T 0% WR -$0.70 persistent but 0T last hour — not killable by 3+T/hour rule. No signal has 3+ trades with 0% WR last hour. Trade freq 2/hr normal. 3 open positions. System stable, waiting for ATR_SL_MIN evaluation window.
   BY: auto_1hr
   NEXT: Re-run at 11:05 UTC
+[2026-08-25 11:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (system quiet). 76T 24h 44.7% WR -$2.68. atr_sl_hit 39T (51.3%) still above 40% — ATR_SL_MIN 1.5% from 08:05 only has 5T since, needs more data. ct-hot+ 5T 0% WR -$0.70 persistent but 0T last hour — not killable by 3+T/hour rule. hl_copy_trader 14T 35.7% WR -$1.01 biggest systematic bleed but has wins. No signal has 3+ trades with 0% WR last hour. 5 open positions. System stable, market lull.
+  BY: auto_1hr
+  NEXT: Re-run at 12:05 UTC
