@@ -198,8 +198,10 @@ def detect_slow_grind_short(token):
     if slope_pct >= -SLOW_GRIND_SHORT_MIN_SLOPE_PCT:
         return None  # not declining fast enough
     
-    # Price must be below regression line (bearish alignment)
-    if closes_1m[-1] >= intercept:
+    # Price must be below regression line at current point (bearish alignment)
+    # intercept is at x=0 (start of window), regression at current point is lower
+    regression_at_current = slope * (R2_WINDOW - 1) + intercept
+    if closes_1m[-1] >= regression_at_current:
         return None
     
     # ── EMA Check (bearish alignment) ──────────────────────────────────
@@ -227,13 +229,12 @@ def detect_slow_grind_short(token):
     # Use 5m candles for ATR (better representation of grinding)
     closes_5m = _get_closes(token, 'candles_5m', CANDLES_5M_LOOKBACK)
     
-    if len(closes_5m) >= 15:
-        # Compute ATR from 5m closes
-        atr_pct = _compute_atr(closes_5m, period=14)
-        if atr_pct is None:
-            atr_pct = 0.5  # default if can't compute
-    else:
-        atr_pct = 0.5
+    if len(closes_5m) < 15:
+        return None  # insufficient data to verify volatility
+    
+    atr_pct = _compute_atr(closes_5m, period=14)
+    if atr_pct is None:
+        return None  # can't compute ATR — don't fire without volatility confirmation
     
     # Filter: need low volatility (grinding, not spiking)
     if atr_pct > SLOW_GRIND_SHORT_MAX_ATR_PCT:
