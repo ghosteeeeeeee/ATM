@@ -476,8 +476,8 @@ def collect():
                     rr_data = None
                     s_rr = 50.0
                 
-                # Contrarian score — will be computed in second pass
-                s_contrarian = 50.0
+                # Contrarian score — use previous health distribution
+                s_contrarian = _score_contrarian(prev_health_dist, token_data) if prev_health_dist else 50.0
 
                 composite = (
                     s_momentum * WEIGHTS['momentum'] +

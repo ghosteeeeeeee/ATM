@@ -14617,3 +14617,32 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 **Open Questions:**
 - ct-hot+ 8T 25% WR -$0.68 persistent but 0 trades last 2h
 - hl_copy_trader 5T 40% WR -$0.48 same
+
+## [2026-08-25 01:05 UTC] Hourly Analysis
+
+**Trades:** 5 closed in 3h (1W 4L, net -$0.35)
+- W: WLD bb_bounce+ profit-monster-trail +$0.07
+- L: ETH hl_copy_trader atr_sl_hit -$0.21, CAKE ct-hot- atr_sl_hit -$0.12, XPL macd-div- atr_sl_hit -$0.16, IMX bb_bounce+ atr_sl_hit -$0.13
+
+**12h Close Reasons:** atr_sl_hit 22T (46.8%) — slightly above 40% threshold, profit-monster-trail 19T (40.4%)
+
+**24h Signal Leaders:**
+- bb_bounce+: 18T 88.9% WR +$1.02 ⭐
+- hl_copy_trader: 6T 33.3% WR -$0.69 ⚠️ persistent
+- ct-hot+: 7T 28.6% WR -$0.53 ⚠️ persistent
+
+**Trend:** 3 consecutive negative hours (21:00, 23:00, 00:00 UTC) but total loss only -$0.62
+
+**Kill criteria check:** None met — no signal has 3+ trades in last 3h with 0% WR
+
+**Changes:** None needed
+- atr_sl_hit 46.8% slightly above 40% but ATR_K_INITIAL=1.2 already tuned (reverted to original per comment), trailing SL deployed. This is a regime condition (late-night vol), not structural.
+- hl_copy_trader and ct-hot+ persistent drags but 0 trades last 3h — not killable by rule
+- Trade freq 1.7/hr normal
+
+**Open Positions:** 4 (HYPE, SOL, SYRUP, BTC — all HL/bb_bounce+)
+
+**Open Questions:**
+- hl_copy_trader persistent negative — watch next active session for kill criteria
+- ct-hot+ persistent negative — same
+- If atr_sl_hit stays >40% through next active session, consider widening ATR_K_INITIAL from 1.2→1.4

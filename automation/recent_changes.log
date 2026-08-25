@@ -183,3 +183,7 @@
   WHY: 2T last hour (1W 1L -$0.06). bb_bounce+ split: WLD winner +$0.07, IMX loser -$0.13 (atr_sl_hit). 93T 24h ~60% WR -$0.51. profit-monster-trail 51T +$3.27 carrying system. atr_sl_hit 32T (33.7%) below 40% threshold. No signal has 3+ trades last hour with 0% WR — no kill criteria. Trade freq 2/hr very low (late session). 4 open positions (ETH SHORT, BTC LONG, CAKE SHORT, SYRUP LONG). System stable, quiet night session.
   BY: auto_1hr
   NEXT: Re-run at 02:05 UTC
+[2026-08-25 01:05 UTC] auto_1hr: NO CHANGES
+  WHY: 5T last 3h (1W 4L -$0.35). atr_sl_hit 46.8% of 12h — slightly above 40% threshold but ATR_K_INITIAL=1.2 already tuned (reverted to original). Trailing SL deployed and working. 12h: 47T ~59% WR -$0.51. bb_bounce+ 18T 88.9% WR +$1.02 star. hl_copy_trader 6T 33% WR -$0.69 persistent, ct-hot+ 7T 29% WR -$0.53 persistent — both 0 trades last 3h, not killable. 3 consecutive negative hours but tiny losses (-$0.62 total). Trade freq 1.7/hr normal. 4 open positions (HYPE, SOL, SYRUP, BTC). System stable, late-night regime.
+  BY: auto_1hr
+  NEXT: Re-run at 02:05 UTC
