@@ -502,6 +502,16 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
     n = len(closes)
     fit_end = int(n * TL_FIT_CUTOFF)
 
+    # ── Phase 1: Trendline detection via linear regression ─────────────────
+    tl = _detect_trendline(closes, fit_end)
+    if tl is None:
+        return None
+
+    slope = tl['slope']
+    intercept = tl['intercept']
+    r2 = tl['r2']
+    direction = tl['direction']
+
     # ── Extension filter: block "selling the bottom" / "buying the top" ─────
     # If price has already moved > TL_MIN_EXTENSION_ATR from the 8h high/low,
     # the move is exhausted and a reversal is likely. This catches the classic
@@ -518,16 +528,6 @@ def detect_tl_break(token: str, candles: list, price: float) -> Optional[Dict]:
         _ext = (price - _recent_low) / (atr + 1e-10)
         if _ext < TL_MIN_EXTENSION_ATR:
             return None  # price already rose too far — move exhausted, pullback risk
-
-    # ── Phase 1: Trendline detection via linear regression ─────────────────
-    tl = _detect_trendline(closes, fit_end)
-    if tl is None:
-        return None
-
-    slope = tl['slope']
-    intercept = tl['intercept']
-    r2 = tl['r2']
-    direction = tl['direction']
 
     # Minimum trendline duration: at least 30 candles of consistent trend
     if fit_end < 30:
