@@ -381,32 +381,6 @@ def find_sr_from_book(book: dict, current_price: float) -> list:
     return levels[:20]
 
 
-# ─── Open Interest & Funding Context ─────────────────────────────────────────
-
-def get_market_context(coin: str) -> dict:
-    """Get OI, funding, and meta context for a coin."""
-    ctxs = _hl_info({"type": "metaAndAssetCtxs"})
-    if not ctxs or len(ctxs) < 2:
-        return {}
-
-    for i, asset in enumerate(ctxs[0].get("universe", [])):
-        if asset.get("name", "").upper() == coin.upper():
-            ctx = ctxs[1][i] if i < len(ctxs[1]) else {}
-            return {
-                "coin": coin,
-                "open_interest": float(ctx.get("openInterest", 0)),
-                "funding_rate": float(ctx.get("funding", 0)),
-                "mark_px": float(ctx.get("markPx", 0)),
-                "oracle_px": float(ctx.get("oraclePx", 0)),
-                "day_ntl_vlm": float(ctx.get("dayNtlVlm", 0)),
-                "day_base_vlm": float(ctx.get("dayBaseVlm", 0)),
-                "prev_day_px": float(ctx.get("prevDayPx", 0)),
-                "premium": float(ctx.get("premium", 0)),
-            }
-
-    return {}
-
-
 # ─── Stop Hunt Detection ────────────────────────────────────────────────────
 
 def detect_stop_hunt(prices: dict, clusters: dict, book_data: dict) -> list:
@@ -499,10 +473,10 @@ def build_liquidation_map(coins: list = None) -> dict:
 
     # 1. Scan all positions
     print("[liq_map] Scanning wallet positions...")
-    all_positions = scan_all_positions(wallets)
+    all_positions, scan_failed = scan_all_positions(wallets)
     scan_time = time.time() - t0
     print(f"[liq_map] Position scan complete in {scan_time:.1f}s, "
-          f"found positions on {len(all_positions)} coins")
+          f"found positions on {len(all_positions)} coins ({scan_failed} failed)")
 
     # 2. Get prices from all positions
     prices = {}
@@ -512,7 +486,7 @@ def build_liquidation_map(coins: list = None) -> dict:
     book_data = {}
     sr_levels = {}
     for coin in coins:
-        time.sleep(0.3)
+        time.sleep(1.0)  # CloudFront ~1 req/s limit
         book = get_order_book_depth(coin)
         if book:
             book_data[coin] = book
@@ -533,14 +507,30 @@ def build_liquidation_map(coins: list = None) -> dict:
         if price and price > 0:
             clusters[coin] = find_liquidation_clusters(positions, price)
 
-    # 5. Get market context (OI, funding)
+    # 5. Get market context (OI, funding) — fetch metaAndAssetCtxs ONCE
     print("[liq_map] Fetching market context...")
     market_ctx = {}
-    for coin in coins[:20]:  # Top 20 for rate limits
-        time.sleep(0.3)
-        ctx = get_market_context(coin)
-        if ctx:
-            market_ctx[coin] = ctx
+    meta_ctxs = _hl_info({"type": "metaAndAssetCtxs"})
+    time.sleep(1.0)  # CloudFront ~1 req/s limit
+    if meta_ctxs and len(meta_ctxs) >= 2:
+        universe = meta_ctxs[0].get("universe", [])
+        ctxs = meta_ctxs[1]
+        for coin in coins[:20]:  # Top 20 for rate limits
+            for i, asset in enumerate(universe):
+                if asset.get("name", "").upper() == coin.upper():
+                    ctx = ctxs[i] if i < len(ctxs) else {}
+                    market_ctx[coin] = {
+                        "coin": coin,
+                        "open_interest": float(ctx.get("openInterest", 0)),
+                        "funding_rate": float(ctx.get("funding", 0)),
+                        "mark_px": float(ctx.get("markPx", 0)),
+                        "oracle_px": float(ctx.get("oraclePx", 0)),
+                        "day_ntl_vlm": float(ctx.get("dayNtlVlm", 0)),
+                        "day_base_vlm": float(ctx.get("dayBaseVlm", 0)),
+                        "prev_day_px": float(ctx.get("prevDayPx", 0)),
+                        "premium": float(ctx.get("premium", 0)),
+                    }
+                    break
 
     # 6. Detect stop hunts
     print("[liq_map] Detecting stop hunt setups...")
@@ -588,6 +578,7 @@ def build_liquidation_map(coins: list = None) -> dict:
         "timestamp": int(time.time()),
         "scan_duration_sec": round(time.time() - t0, 1),
         "wallets_scanned": total_wallets_scanned,
+        "wallets_failed": scan_failed,
         "coins_scanned": len(coins),
         "total_positions_found": total_positions,
         "total_liquidation_exposure_usd": round(total_liquidation_usd, 2),
