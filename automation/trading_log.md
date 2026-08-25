@@ -14950,3 +14950,31 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 - Should ATR_SL_MIN widen further to 2.0%? Early data suggests widening doesn't reduce atr_sl_hit % — entries may be the issue
 - hl_copy_trader 78T all-time +$0.80 but 24h 16T -$1.43 — recent regime shift?
 - ct-hot+ 99T all-time -$4.07 — persistent systematic bleed but has wins, not killable
+
+## [2026-08-25 15:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L, +$0.08)
+**24h:** 53T 41.5% WR -$1.85
+
+**Close reasons (24h):** atr_sl_hit 31T (58.5%) -$2.04 | profit-monster-trail 13T +$0.96 | cut-loser-MAE-GUARD 3T -$0.42 | cut-loser-CL-T1 2T -$0.20 | cascade_flip 3T -$0.14
+
+**Since ATR_SL_MIN 1.5% (08:05):** ~45T, atr_sl_hit still ~58%. No improvement from widening. Problem is entry quality.
+
+**Kill criteria:** None met
+- hl_copy_trader 13T 24h but only 0T last hour — below 3T/hour threshold
+- ct-hot+ 2T 24h 0% WR but 0T last hour — below threshold
+
+**Changes:** None needed
+- No kill criteria triggered
+- ATR_SL_MIN 1.5% evaluation continues but early signal: widening SL doesn't reduce hit rate
+- Trade frequency normal
+
+**No Change Needed:**
+- Kill rule requires 3+T with 0% WR in last hour — not met
+- hl_copy_trader persistent bleed but has wins (4/13)
+- System was quiet (1T/hr)
+
+**Open Questions:**
+- hl_copy_trader all-time 78T +$0.80 but 24h 13T -$1.08 — regime mismatch? Signal may be outdated
+- Should entry filters be tightened to improve quality instead of adjusting SL?
+- bb_bounce+ 17T 58.8% WR but -$0.10 — slightly negative despite good WR, implies losing trades are larger
