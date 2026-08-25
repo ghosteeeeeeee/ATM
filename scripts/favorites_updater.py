@@ -39,7 +39,7 @@ PROMO_MIN_AVG_PNL = 0.1       # raised from 0.0 — must be actually profitable
 # ── Demotion criteria (7d rolling) ──────────────────────────────────────
 DEMO_WR_THRESHOLD = 48.0      # raised from 45 — catch underperformers faster
 DEMO_TOTAL_PNL_THRESHOLD = -0.25  # tightened from -0.50
-DEMO_CONSECUTIVE_DAYS = 3     # 3 bad evaluations = demoted (was 2 weeks)
+DEMO_CONSECUTIVE_DAYS = 1     # 1 bad evaluation = demoted (fast response for crypto)
 
 # ── Candidates: tokens not in FAVORITES with enough history ─────────────
 CANDIDATE_MIN_TRADES = 5
