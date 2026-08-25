@@ -1,3 +1,30 @@
+## CEO Report — 2026-08-25 ~19:31 UTC (257th run)
+
+### Diagnosis
+
+System **YELLOW** — verified DB: 24h 38T **-$1.70, 39.5% WR**. 7d: 317T **-$3.87, 50.5% WR**. Today Aug 25: 33T **-$1.57, 36.4% WR**. 4 open (2 cascade SHORT +$0.27, 1 hl_copy LONG -$0.04, 1 hl_copy SHORT +$0.05).
+
+**tl_break_short inverted R:R** — 16T/7d 62.5% WR -$0.11. Directional edge exists but 3 ATR_SL hits at -6.35% avg + 2 cut-loser at -3.46% avg destroy profits. Recommend: delegate to self_learner for tpsl tuning or disable.
+
+**ATR_SL still dominant loss** — 39T/48h -$6.37. Floor fix active, MIN back to 1.2%. Entry quality is root cause, not SL width.
+
+### Root Cause
+
+tl_break_short has directional edge (62.5% WR) but losers are 4x bigger than winners. Classic inverted R:R — signal picks direction correctly but risk management (tpsl params) lets losses run too far.
+
+### Fix Applied
+
+No code changes. Identified tl_break_short as next optimization target. hl_copy_trader SHORT already killed (Aug 25 03:30).
+
+### Next
+
+1. Delegate tl_break_short tpsl tuning to self_learner
+2. Monitor ATR_SL_MIN 1.2% eval (Aug 27)
+3. Monitor CONF_FILTER_MAX=89 eval (Aug 26)
+4. Monitor hl_copy_trader LONG recovery (bad day 30% WR)
+
+---
+
 ## CEO Report — 2026-08-25 ~16:30 UTC (256th run)
 
 ### Diagnosis
