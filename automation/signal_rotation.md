@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-25 09:17 UTC
+# Signal Rotation — 2026-08-25 13:17 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -12,7 +12,7 @@
 | 4 | hzscore- | 50% | 0.278 | 0.278 | ❌ |  |
 | 5 | r2-trend-long3 | 62% | 0.251 | 0.251 | ❓ |  |
 | 6 | stop_hunt_reversal_long+ | 50% | -0.061 | -0.061 | ❌ |  |
-| 7 | tl_break_short | 69% | -0.156 | -0.156 | ✅ |  |
+| 7 | tl_break_short | 69% | -0.156 | -0.156 | ❌ |  |
 | 8 | macd-div- | 62% | -0.394 | -0.394 | ❓ |  |
 | 9 | macd-div+ | 20% | -0.447 | -0.447 | ❓ |  |
 | 10 | ct-hot+ | 38% | -1.386 | -1.386 | ❓ |  |

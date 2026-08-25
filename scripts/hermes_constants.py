@@ -1000,7 +1000,6 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike', 'r2-trend-long', 'ct-hot+', 'ct-hot-',
     'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',  # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
-    'bb_bounce',  # bb_bounce trades get regular ATR SL/TP only — mean reversion exits handled by signal logic
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -1406,6 +1405,7 @@ BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regi
 # Used in signal_compactor.py at 7 locations (confluence gate + preserve filter).
 # CEO 2026-08-12 — removed 'hzscore' (standalone LONG 11T -$0.16 36.4% WR 24h, combos profitable)
 # CEO 2026-08-17 — removed 'accel-300' (40T/7d 55% WR -$0.30, net negative), 'wave_catcher' (killed), 'range_breakout_short' (killed)
+# CEO 2026-08-25 — removed 'hl_copy_trader' (5T/8h 0% WR -$2.41. Copy delay = enters after move over. Requires confluence to fire.)
 STANDALONE_BYPASS_SIGNALS = (
     'stop_hunt_reversal_long',
     'spike_exhaustion_short', 'bb_bounce', 'bb-bounce-short',
@@ -1416,7 +1416,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'hzscore', 'return_exhaustion_long',
     'r2l-long', 'r2-trend-long', 'r2-trend-short',
     'tl_break_long', 'tl_break_short',
-    'hl_copy_trader', 'atr-spike',
+    'atr-spike',
     'ct-hot',
     'liq-hunt',  # liquidation cluster contrarian — structural, regime-agnostic
     'macd-div',  # MACD divergence — counter-trend, works solo
@@ -1454,7 +1454,7 @@ RANGE_BREAKOUT_RSI_SHORT_MIN = 30    # Skip SHORT if RSI below this (overextende
 
 # Mean-reversion velocity gate — block entries when price still trending against signal
 MEAN_REVERSION_VEL_ENABLED = True
-MEAN_REVERSION_VEL_THRESHOLD = 0.3   # block LONG if 15m velocity < -0.3% (price falling against LONG)
+MEAN_REVERSION_VEL_THRESHOLD = 0.15   # CEO 2026-08-25 — tightened from 0.3. bb_bounce+ 8T/8h 12.5% WR -$2.02 — catches dead cat bounces in downtrends. 0.3% was too loose.
 MEAN_REVERSION_VEL_THRESHOLD_SHORT = 0.6  # block SHORT if 15m velocity > 0.6% (price spiking against SHORT — higher threshold because spikes reverse faster)
 
 # Spike exhaustion filter — block entries after sharp 5m moves (likely exhausted)

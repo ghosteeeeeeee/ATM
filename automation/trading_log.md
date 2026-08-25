@@ -14887,3 +14887,35 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 - Will atr_sl_hit % drop from 51.3% after ATR_SL_MIN widens? Need more trades
 - ct-hot+ next trigger = kill (5T 0% WR already accumulated)
 - hl_copy_trader systematic bleed at -$1.01 — monitor for disable if persists
+
+## [2026-08-25 12:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (system quiet)
+**24h:** 69T 42% WR -$2.51
+
+**Close reasons (24h):** atr_sl_hit 38T (55.1%) -$3.05 | profit-monster-trail 20T +$1.49 | cut-loser-* 6T -$0.73 | guardian_orphan 2T -$0.06 | cascade_flip 3T -$0.16
+
+**Top signals (24h):** hl_copy_trader 15T 33.3% WR -$1.21 ⚠️ | bb_bounce+ 15T 60% WR -$0.10 | macd-div- 7T 57.1% WR -$0.33 | tl_break_short 6T 33.3% WR -$0.13 | ct-hot+ 5T 0% WR -$0.70
+
+**ATR_SL_MIN 1.5% evaluation (since 08:05):** 7T, 4 atr_sl_hit (57%), -$0.54. Sample too small — atr_sl_hit % slightly worse (57% vs 51.3% pre-change). Need 15+ more trades to evaluate.
+
+**Kill criteria:** None met
+- 0 trades last hour → no 3+T/0% WR triggers
+- ct-hot+ 5T 0% WR persistent but 0T last hour
+- hl_copy_trader 15T 33.3% WR — has wins, not killable by rule
+
+**Changes:** None needed
+- ATR_SL_MIN 1.5% deployed 4h ago, only 7T since — needs more data
+- hl_copy_trader biggest systematic bleed (-$1.21) but has wins (5/15)
+- 1 trade/hr frequency normal, no overtrading
+- 5 open positions (micro-size, all pnl_usdt=0.00)
+
+**No Change Needed:**
+- Kill criteria require 3+T with 0% WR in last hour — 0T closed
+- ATR_SL_MIN evaluation continues
+- hl_copy_trader persistent but not killable by rule
+
+**Open Questions:**
+- Will atr_sl_hit % drop below 50% as ATR_SL_MIN 1.5% accumulates more trades?
+- hl_copy_trader 12/15 exits are atr_sl_hit — signal itself may need tuning or disabling via non-rule path
+- bb_bounce+ down from star (+$0.27) to barely positive (-$0.10) — is profit-monster-trail carrying it?

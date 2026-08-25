@@ -664,3 +664,62 @@ ALERTS:
 
 ## Error Alerts — 2026-08-25 10:04 UTC
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — WARNING — MOMENTUM`
+
+## Health Report — 2026-08-25 11:20 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-25 11:20 UTC
+
+PIPELINE: OK
+- Status: running (last run 11:19, cycle #170544)
+- Duration: 28.2s CPU
+- Signals (1h): 77 generated
+- Hotset: 0 (all filtered by compactor)
+- Approved: 0 signals above 50% confidence
+- Errors: 0 in last 30min
+
+TRADING:
+- Open: 5 positions (BTC, ETH, HBAR, HYPE, ALT)
+- Closed today: 22
+- PnL today: -$0.96 (LONG -$0.46, SHORT -$0.50)
+- Win rate: 40.9% (LONG 47.4%, SHORT 0%)
+- All-time WR: ~15.9% (concerning)
+
+MARKET:
+- Regime: NEUTRAL (0 long, 0 short, 105 neutral)
+- BTC: $79,309 (-0.65% 16-candle)
+- ETH: $2,481 (-0.23% 16-candle)
+- No tokens with directional bias
+
+SPEED:
+- Tokens tracked: 239
+- >= 50th percentile: 126 (53%)
+- Stale: 46 tokens (19%)
+
+SYSTEM:
+- Timers: 48 active, all firing
+- Disk: 82% used (27G free)
+- Logs: 79M total (pipeline.log 19M)
+- HL Copy DB: 1.9G (largest)
+- Coin Tracker DB: 1.1G
+- Signals DB: 89M
+
+AUTO-FIXES APPLIED:
+- None needed — pipeline healthy
+
+ALERTS:
+- [WARN] 46 stale speed tokens (19% of tracked)
+- [WARN] Daily PnL -$0.96 (40.9% WR) — bad day but small absolute loss
+- [WARN] SHORT trades: 0% win rate (3 trades, all losses)
+- [INFO] Market fully neutral — system correctly protecting capital
+- [INFO] hermes-hl-copy.timer fires on boot only (daemon), working as designed
+```
+
+## Error Alerts — 2026-08-25 12:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3482s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3365s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3304s left, N failures)`
+
+## Error Alerts — 2026-08-25 13:04 UTC
+- **REPEATED** (15x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
