@@ -12,8 +12,12 @@ You are analyzing signal performance for the Hermes trading system. Run every 6 
 
 ```python
 import psycopg2
+from datetime import datetime, timedelta, timezone
 conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
 cur = conn.cursor()
+now = datetime.now(timezone.utc)
+h6 = now - timedelta(hours=6)
+h24 = now - timedelta(hours=24)
 
 # Last 6h performance by signal+direction
 cur.execute("""
@@ -21,11 +25,11 @@ cur.execute("""
            ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
            ROUND(SUM(pnl_usdt),2) as pnl
     FROM trades 
-    WHERE close_time > NOW() - INTERVAL '6 hours' AND status = 'closed'
+    WHERE close_time > %s AND status = 'closed'
     GROUP BY signal, direction 
     HAVING COUNT(*) >= 2
     ORDER BY pnl
-""")
+""", (h6,))
 print("=== 6h Performance ===")
 for r in cur.fetchall():
     print(r)
@@ -36,11 +40,11 @@ cur.execute("""
            ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
            ROUND(SUM(pnl_usdt),2) as pnl
     FROM trades 
-    WHERE close_time > NOW() - INTERVAL '24 hours' AND status = 'closed'
+    WHERE close_time > %s AND status = 'closed'
     GROUP BY signal, direction 
     HAVING COUNT(*) >= 3
     ORDER BY pnl
-""")
+""", (h24,))
 print("\n=== 24h Performance ===")
 for r in cur.fetchall():
     print(r)
@@ -94,14 +98,16 @@ Boost by increasing confidence weight in `signal_compactor.py` or adding to hot-
 
 ## Step 5: Check for Signal Inversions
 
-```sql
--- Direction mismatches
-SELECT token, signal, direction, close_reason, pnl_usdt
-FROM trades 
-WHERE close_time > NOW() - INTERVAL '24 hours'
-  AND ((signal LIKE '%long%' AND direction = 'SHORT')
-    OR (signal LIKE '%short%' AND direction = 'LONG'))
-ORDER BY created_at DESC LIMIT 10;
+```python
+# Direction mismatches (use Python timestamp, not SQL INTERVAL)
+cur.execute("""
+    SELECT token, signal, direction, close_reason, pnl_usdt
+    FROM trades 
+    WHERE close_time > %s
+      AND ((signal LIKE '%%long%%' AND direction = 'SHORT')
+        OR (signal LIKE '%%short%%' AND direction = 'LONG'))
+    ORDER BY created_at DESC LIMIT 10
+""", (h24,))
 ```
 
 If inversions found → CRITICAL bug, fix immediately.

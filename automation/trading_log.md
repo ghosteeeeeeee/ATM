@@ -14978,3 +14978,85 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 - hl_copy_trader all-time 78T +$0.80 but 24h 13T -$1.08 — regime mismatch? Signal may be outdated
 - Should entry filters be tightened to improve quality instead of adjusting SL?
 - bb_bounce+ 17T 58.8% WR but -$0.10 — slightly negative despite good WR, implies losing trades are larger
+
+## [2026-08-25 17:08 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L, +$0.07)
+**24h:** 39T 43.6% WR -$1.28
+
+**Close reasons (24h):** atr_sl_hit 24T (61.5%) -$1.59 | profit-monster-trail 8T +$0.50 | cut-loser-MAE-GUARD 2T -$0.30 | cascade_flip 3T -$0.14 | cut-loser-CL-T1 1T -$0.08
+
+**24h by signal:** hl_copy_trader 12T 25% WR -$1.13 | bb_bounce+ 17T 58.8% WR -$0.10 | Others 1-2T each
+
+**Kill criteria:** None met
+- hl_copy_trader 12T 24h but 0T last hour — below 3T/hour threshold
+- No signal has 3+ trades with 0% WR last hour
+
+**Changes:** None needed
+- No kill criteria triggered
+- ATR_SL_MIN 1.5% evaluation: atr_sl_hit still 61.5% (worse than pre-change 49.4%). Problem is entry quality.
+- Trade frequency normal (~1/hr)
+- System stable but losing
+
+**No Change Needed:**
+- Kill rule requires 3+T with 0% WR in last hour — not met
+- hl_copy_trader persistent bleed but has wins (3/12)
+- Trade freq normal, no overtrading
+
+**Open Questions:**
+- hl_copy_trader all-time 78T +$0.80 but 24h 12T -$1.13 — regime mismatch
+- Entry quality is the root cause, not SL tightness
+- bb_bounce+ good WR (58.8%) but slightly negative PnL — losing trades are larger
+
+## [2026-08-25 18:35 UTC] Daily Orchestrator Run
+
+### Intelligence Gathered
+- **Health Monitor:** Pipeline OK, cycle #170963. 38 signals/hr. 0 errors. Disk 82%. 48 timers active.
+- **Auto-1hr:** No changes needed all day. CRITICAL SL RULES reminder at 14:10.
+- **Signal Reporter:** FAILED (timeout). Root cause: SQL `INTERVAL '6 hours'` syntax error — opencode mangles the string. FIXED.
+- **Blacklist Testing:** Complete (77 tokens, 0 KEEP). Blacklist working as intended.
+- **Upgrade Audit:** 16/22 plans implemented (73%). 3 pending.
+
+### Trades Today (Aug 25)
+- **32 closed**, total PnL **-$1.43**, avg -$0.04
+- **5 open** (ICP SHORT, ETH SHORT, GMT SHORT, BTC LONG, HBAR SHORT)
+- **7d total:** 316T 50.6% WR -$3.73
+- **7d WITHOUT ct-hot+:** 235T **57.0% WR +$1.30** (system profitable!)
+
+### Today By Signal
+| Signal | Trades | PnL | WR |
+|--------|--------|-----|-----|
+| hl_copy_trader | 11 | -$0.95 | 27.3% |
+| bb_bounce+ | 12 | -$0.17 | 50.0% |
+| bb_bounce+,rs-s31 | 1 | -$0.19 | 0% |
+| macd-div- | 1 | -$0.16 | 0% |
+| ct-hot- combos | 3 | -$0.39 | 0% |
+| r2-trend-long3 | 1 | -$0.06 | 0% |
+| r2-trend-short3 | 1 | +$0.07 | 100% |
+| confluence+,continuation+ | 1 | +$0.08 | 100% |
+| atr-spike+,r2-trend-long3 | 1 | +$0.16 | 100% |
+
+### Changes Implemented
+
+1. **COIN_TRACKER_HOT_ENABLED = False** (hermes_constants.py:2040)
+   - Was True since Aug 22 (signal starvation fix)
+   - 66T/7d 36.4% WR -$3.65 — biggest single-signal loser
+   - Without it: 7d system +$1.30 (profitable)
+   - Added to NEVER_REENABLE_FLAGS
+   - REARCH_FLAGS comment updated
+
+2. **Signal Reporter SQL Fix** (signal_reporter_prompt.md)
+   - Replaced `NOW() - INTERVAL '6 hours'` with Python `datetime.now() - timedelta(hours=6)`
+   - Also fixed Step 5 SQL query (direction mismatches)
+   - Root cause: opencode mangles PostgreSQL interval string literals
+
+### Critical Issues
+- **hl_copy_trader SHORT** bleeding: 11T today 27.3% WR -$0.95. LONG profitable (+$1.98/7d) but SHORT drags. Monitor.
+- **70-79 conf tier** dominant loss: 5T today 0% WR -$0.77. ct-hot+ was primary driver — should improve now.
+- **Signal reporter** was failing for 3 days (SQL syntax error). Fixed this run.
+
+### Next Steps
+1. Monitor system PnL after ct-hot+ kill (expect ~$1.30/7d improvement)
+2. Monitor ATR_SL_MIN=1.5% (48h eval ending Aug 27)
+3. Monitor CONF_FILTER_MAX=89 (48h eval ending Aug 26)
+4. hl_copy_trader SHORT investigation — is it a regime mismatch?

@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-25 ~11:00 UTC (CEO Run 254)**
-**Updated by: CEO**
+**Last Updated: 2026-08-25 ~18:35 UTC (Orchestrator Run)**
+**Updated by: Orchestrator**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ LONG KILLED (signal_reporter Aug 24).** COIN_TRACKER_HOT_PLUS_ENABLED=False, NEVER_REENABLE_FLAGS. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`). **CONF_FILTER_MAX raised 85→89 (CEO Aug 23)** — blocks overconfident trades, 90+ tier now +$1.91/7d. **hzscore- KILLED (auto_1hr Aug 23 21:05 + signal_reporter, NEVER_REENABLE).** **signal_compactor FIXED (health monitor Aug 24).** UnboundLocalError bare_source — was crashing every pipeline cycle. **Disk cleaned (orchestrator Aug 24).** Journal vacuum freed 3GB (84%→81%).
 
-**Current status:** System RED. CEO verified (11:00 UTC): 24h 76T 44.7% WR -$2.68. 7d: 312T 50.6% WR -$3.45. Today Aug 25: 23T 34.8% WR -$0.98. 5 open -$0.09 unrealized (ETH LONG, HBAR SHORT, ALT SHORT, HYPE LONG, BTC LONG). ct-hot+ STILL GENERATING TRADES (COIN_TRACKER_HOT_ENABLED=True in RESEARCH_FLAGS): 24h 5T 0% WR -$0.70, 7d 66T 36.4% WR -$3.65. All ATR_SL hits at 1.2% floor (old SL). Without ct-hot+: 7d ~+$0.20 (system profitable). 70-79 conf tier DOMINANT LOSS: 139T/7d 44.6% WR -$5.18. 90+ tier MOST PROFITABLE: 83T/7d 55.4% WR +$1.46. ATR_SL_MIN=1.5% deployed 08:05 (only 1 trade has new SL). Winners: bb_bounce+ 29T/7d 72.4% WR +$0.83, hl_copy_trader LONG 70T/7d 51.4% WR +$1.98, profit-monster-trail carrying. Disk: 82%. Pipeline: 0 errors.
+**Current status:** System YELLOW. Orchestrator verified (18:35 UTC): 24h 38T 42.1% WR -$1.54. 7d: 316T 50.6% WR -$3.73. Today Aug 25: 32T closed -$1.43. 5 open (ICP SHORT, ETH SHORT, GMT SHORT, BTC LONG, HBAR SHORT). **ct-hot+ KILLED (orchestrator)** — COIN_TRACKER_HOT_ENABLED=False, in NEVER_REENABLE_FLAGS. Without ct-hot+: 7d 235T 57.0% WR +$1.30 (system profitable). **hl_copy_trader SHORT** worst performer today: 11T 27.3% WR -$0.95. bb_bounce+ 12T 50% WR -$0.17 (mixed day). 70-79 conf tier DOMINANT LOSS today: 5T 0% WR -$0.77. 90+ tier: 16T 50% WR -$0.25. Signal reporter FIXED (SQL INTERVAL syntax error — switched to Python timestamps). Disk: 82%. Pipeline: active, 0 errors.
 
 ## Active Decisions
 
@@ -17,7 +17,7 @@
 - **macd-div+ DISABLED (CEO KILLED Aug 23).** 4T/7d 25% WR -$0.40. Dead signal, no edge. MACD_DIVERGENCE_PLUS_ENABLED=False. — 2026-08-23
 - **SHORT_NEUTRAL_BLOCK_ENABLED=True (CEO Aug 22, FIXED Aug 23).** SHORT signals 7d: 26T -$1.40, 26.9% WR (ALL losing). Was using 1m regime (noisy — showed LONG_BIAS when 4h NEUTRAL, block never fired). FIX: Now uses 4h regime from PostgreSQL momentum_cache. Block fires when 4h regime is NEUTRAL (64 tokens). In SHORT_BIAS (85 tokens), SHORT signals allowed. — 2026-08-23
 - **R2_TREND_LONG_MIN_PRE_MOVE 0.3 active.** Dead-cat bounce filter. r2-trend-long3 losers peak +0.12% MFE, winners +0.65%. Monitor 48h for ATR_SL reduction and WR improvement. — 2026-08-19
-- **ct-hot+ LONG KILLED (signal_reporter Aug 24).** COIN_TRACKER_HOT_PLUS_ENABLED=False, added to NEVER_REENABLE_FLAGS. But **COIN_TRACKER_HOT_ENABLED (base) and COIN_TRACKER_HOT_MINUS_ENABLED (SHORT) still True** — same family, same edge problem. CEO cannot touch RESEARCH_FLAGS. Recommend T disable both. — 2026-08-24
+- **ct-hot+ LONG KILLED (signal_reporter Aug 24, orchestrator Aug 25).** All COIN_TRACKER_HOT variants disabled. COIN_TRACKER_HOT_ENABLED=False, in NEVER_REENABLE_FLAGS. 66T/7d 36.4% WR -$3.65. Without it: system +$1.30/7d. — 2026-08-25
 - **hzscore+ False (CEO KILLED).** 32T ~38% WR -$0.47/7d. Combos bleeding (bb_bounce+,hzscore+ 20T 35% -$0.35). Added NEVER_REENABLE_FLAGS. — 2026-08-17
 - **hzscore- RE-ENABLED BY T (Aug 22, signal starvation).** SHORT 7d: 8T -$0.18, 50% WR (inverted R:R — avg win small, avg loss large). CEO_PROTECTED. Recommend T disable. — 2026-08-23
 - **wave_catcher+ DISABLED (CEO KILLED Aug 17).** Both variants dead (+37.5% WR -$0.42, -25% WR -$0.09). Master switch False. In NEVER_REENABLE_FLAGS. — 2026-08-17
@@ -63,12 +63,11 @@
 
 ## Next Actions
 
-1. **URGENT: Recommend T disable COIN_TRACKER_HOT_ENABLED.** Base flag still True in RESEARCH_FLAGS, generating ct-hot+ trades (5T/24h 0% WR -$0.70). Without it: 7d system ~+$0.20 (profitable). CEO cannot touch RESEARCH_FLAGS. — 2026-08-25
-2. **Monitor ATR_SL_MIN=1.5% (48h eval ending ~Aug 27 08:05 UTC).** Raised from 1.2% today. Only 1 trade has new SL so far. — 2026-08-25
-3. **Monitor CONF_FILTER_MAX=89 (48h eval ending ~Aug 26 15:30 UTC).** 90+ tier +$1.46/7d. 70-79 tier -$5.18/7d (dominant loss, ct-hot+ driven). — 2026-08-25
-4. **Monitor MIN_PRE_MOVE 0.3 (eval today Aug 25).** Check if filter producing results. — 2026-08-24
-5. **Monitor bb_bounce+ performance.** 72.4% WR +$0.83/7d (today 66.7% — small sample). — 2026-08-25
-6. **Monitor hl_copy_trader LONG.** 51.4% WR +$1.98/7d (today 40% — small sample). — 2026-08-25
-7. **Monitor disk (85% cleanup trigger).** Currently 82%. — 2026-08-25
-8. **DELEGATE to signal_analyst: Build new SHORT signal with edge for SHORT_BIAS regime.** — 2026-08-24
-9. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. — 2026-08-21
+1. **Monitor ATR_SL_MIN=1.5% (48h eval ending ~Aug 27 08:05 UTC).** Raised from 1.2% today. Only 1 trade has new SL so far. — 2026-08-25
+2. **Monitor CONF_FILTER_MAX=89 (48h eval ending ~Aug 26 15:30 UTC).** 90+ tier +$1.46/7d. 70-79 tier -$5.18/7d (dominant loss, ct-hot+ driven). — 2026-08-25
+3. **Monitor MIN_PRE_MOVE 0.3 (eval today Aug 25).** Check if filter producing results. — 2026-08-24
+4. **Monitor bb_bounce+ performance.** 72.4% WR +$0.83/7d (today 66.7% — small sample). — 2026-08-25
+5. **Monitor hl_copy_trader LONG.** 51.4% WR +$1.98/7d (today 40% — small sample). — 2026-08-25
+6. **Monitor disk (85% cleanup trigger).** Currently 82%. — 2026-08-25
+7. **DELEGATE to signal_analyst: Build new SHORT signal with edge for SHORT_BIAS regime.** — 2026-08-24
+8. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. — 2026-08-21

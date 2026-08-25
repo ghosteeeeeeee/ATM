@@ -1000,6 +1000,9 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike', 'r2-trend-long', 'ct-hot+', 'ct-hot-',
     'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',  # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
+    'bb_bounce+',   # 71.9% WR, +0.89% avg — proven, ride ATR SL not PM Trail
+    'confluence',   # meta-signal, proven — persistence + compounding validation
+    'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -1097,10 +1100,11 @@ NEVER_REENABLE_FLAGS = {
     'ACCEL_300_STANDALONE_BYPASS_ENABLED',  # CEO 2026-08-17 — 40T/7d 55% WR -$0.30. Net negative. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_ENABLED',      # CEO 2026-08-21 — 10T/7d 60% WR -$0.04 break-even, 48h 50% -$0.10 deteriorating. NEVER_REENABLE.
     'STOP_HUNT_REVERSAL_LONG_PLUS_ENABLED', # CEO 2026-08-21 — same. NEVER_REENABLE.
-    # COIN_TRACKER_HOT_ENABLED — RE-ENABLED 2026-08-22 by T (signal starvation fix)
-    'COIN_TRACKER_HOT_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-24 — 28.6% WR, -$0.49 (24h), 14T. 0% WR -$0.57 (6h). NEVER_REENABLE.
-    'COIN_TRACKER_HOT_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-24 — 0% WR (6T), -$0.34. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_ENABLED',         # ORCHESTRATOR 2026-08-25 — 36.4% WR, -$3.65/7d. Without it: system +$1.30/7d. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_PLUS_ENABLED',    # SIGNAL REPORTER 2026-08-24 — 28.6% WR, -$0.49 (24h), 14T. NEVER_REENABLE.
+    'COIN_TRACKER_HOT_MINUS_ENABLED',   # SIGNAL REPORTER 2026-08-24 — 0% WR (6T), -$0.34. NEVER_REENABLE.
     'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
+    'HL_COPY_SIGNAL_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1354,7 +1358,7 @@ CEO_PROTECTED_FLAGS = {
 # Only human (T) can change these. CEO, signal reporter, self_learner all blocked.
 # Format: flag_name -> (reason, date_added)
 RESEARCH_FLAGS = {
-    'COIN_TRACKER_HOT_ENABLED': ('Research/testing — momentum filters active, monitoring performance', '2026-08-22'),
+    'COIN_TRACKER_HOT_ENABLED': ('KILLED 2026-08-25 — 36.4% WR, -$3.65/7d. NEVER_REENABLE.', '2026-08-25'),
     'COIN_TRACKER_HOT_PLUS_ENABLED': ('Research/testing — MACD%, Z-score, BB, speed, accel filters', '2026-08-22'),
     'COIN_TRACKER_HOT_MINUS_ENABLED': ('Research/testing — SHORT enabled with same filters', '2026-08-22'),
     'COIN_TRACKER_HOT_MIN_COMPOSITE': ('Research/testing — composite threshold 57', '2026-08-22'),
@@ -1839,7 +1843,7 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 # ── HL Copy Trading Signal ────────────────────────────────────────────────────
 # hl_copy_signal.py — Generates signals from pro trader activity
 HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
-HL_COPY_SIGNAL_PLUS_ENABLED = True     # hl_copy_signal+ LONG
+HL_COPY_SIGNAL_PLUS_ENABLED = False  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay = enters after move over. NEVER_REENABLE.
 HL_COPY_SIGNAL_MINUS_ENABLED = False   # CEO KILLED 2026-08-25 — 6T/7d 0% WR -$0.76, ALL ATR_SL exits. LONG side is backbone (+$2.07/7d 52.4% WR). SHORT has no edge in copy-trading.
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
@@ -2033,7 +2037,7 @@ WAVE_CATCHER_COOLDOWN_HOURS     = 0.5     # 30 min cooldown
 WAVE_CATCHER_TREND_FILTER_BARS  = 30      # bars to check trend direction (30min for 1m candles) — blocks dead-cat bounces
 
 # ── Coin Tracker Hot — signal when coin_tracker detects hot setup ────────────
-COIN_TRACKER_HOT_ENABLED            = True    # RE-ENABLED 2026-08-22 by T — signal starvation fix. Was: 27.7% WR, -$3.92.
+COIN_TRACKER_HOT_ENABLED            = False   # KILLED 2026-08-25 orchestrator — 36.4% WR, -$3.65/7d. Without it: system +$1.30/7d. NEVER_REENABLE.
 COIN_TRACKER_HOT_PLUS_ENABLED       = False   # KILLED 2026-08-24 — 28.6% WR, -$0.49 (24h), 14T. 0% WR -$0.57 (6h).
 COIN_TRACKER_HOT_MINUS_ENABLED      = False   # KILLED 2026-08-24 — 0% WR (6T), -$0.34. NEVER_REENABLE.
 COIN_TRACKER_HOT_SETUP_THRESHOLD    = 25      # minimum setup_score to fire
@@ -2090,3 +2094,57 @@ SIGNAL_CONFLUENCE_SURVIVED_BONUS       = 10     # points if earliest signal surv
 SIGNAL_CONFLUENCE_RECENCY_BONUS        = 5      # points if most recent signal < 10 min old
 SIGNAL_CONFLUENCE_COOLDOWN_HOURS       = 1      # per-token+direction cooldown after fire
 SIGNAL_CONFLUENCE_MAX_PRICE_AGE        = 10     # skip tokens with price data older than N minutes
+
+# ── Risk-Reward Engine ─────────────────────────────────────────────────────
+# risk_reward_engine.py — structural R:R evaluation gate (replaces basic rr_gate)
+# Uses multi-source S/R map + liquidity clusters + volatility width for smarter
+# R:R assessment. Shadow mode for initial rollout.
+#
+# Data sources: volatility_gate.get_atr_pct(), candles.db, liquidation_clusters.json
+# Reuses: rs_signals._find_swing_highs_lows(), liquidation_map.get_sr_levels()
+RR_ENGINE_ENABLED            = True    # master switch
+RR_ENGINE_SHADOW             = True    # True = log only, don't block (validate thresholds)
+RR_ENGINE_FORCE              = False   # True = actually block (switch after shadow period)
+RR_ENGINE_FAIL_OPEN          = True    # missing data = pass (never kill pipeline)
+
+# R:R minimums (regime-adjusted)
+RR_ENGINE_MIN_RATIO_FLAT     = 2.5     # FLAT regime (<0.48% ATR) — low energy, need bigger reward
+RR_ENGINE_MIN_RATIO_NORMAL   = 2.0     # NORMAL regime (0.48-1.0% ATR) — standard
+RR_ENGINE_MIN_RATIO_HIGH     = 1.5     # HIGH regime (1.0-1.5% ATR) — volatile, wider SL OK
+RR_ENGINE_MIN_RATIO_EXTREME  = 2.0     # EXTREME regime (>1.5% ATR) — only specific signals trade here
+
+# SL placement
+RR_ENGINE_SL_ATR_MULT        = 1.0     # base SL = 1.0 × ATR
+RR_ENGINE_SL_STRUCTURAL_BUFFER = 0.002 # extend SL 0.2% beyond structural level (avoid stop hunts)
+
+# TP placement
+RR_ENGINE_TP_MIN_PCT         = 0.005   # 0.5% minimum TP distance
+RR_ENGINE_TP_MAX_PCT_NORMAL  = 0.025   # 2.5% max for NORMAL regime
+RR_ENGINE_TP_MAX_PCT_FLAT    = 0.030   # 3.0% max for FLAT regime (low vol = wider structural range)
+RR_ENGINE_TP_MAX_PCT_HIGH    = 0.020   # 2.0% max for HIGH regime
+RR_ENGINE_TP_MAX_PCT_EXTREME = 0.020   # 2.0% max for EXTREME regime
+RR_ENGINE_TP_ATR_MULT        = 2.0     # fallback TP = 2.0 × ATR (when no S/R target)
+
+# S/R detection (candle swings)
+RR_ENGINE_SR_CLUSTER_ATR     = 1.0     # merge levels within 1.0 × ATR of each other
+RR_ENGINE_SR_LOOKBACK        = 300     # candles for swing detection (same as RS_LOOKBACK_CANDLES)
+RR_ENGINE_SR_MIN_TOUCHES     = 3       # minimum touches for valid level (lower than RS signal's 5 — engine needs richer data)
+RR_ENGINE_SR_RECENCY_HALF_LIFE = 100   # candles for exponential recency decay
+
+# Liquidity proximity
+RR_ENGINE_LIQ_MAX_DIST       = 2.0     # % — only consider clusters within 2% of price
+RR_ENGINE_LIQ_CASCADE_RISK_THRESH = 0.5 # cascade risk above this → widen SL
+RR_ENGINE_LIQ_MAGNET_BONUS   = 10      # score bonus for trading toward cluster
+RR_ENGINE_LIQ_FIGHT_PENALTY  = -10     # score penalty for fighting cluster flow
+
+# Scoring
+RR_ENGINE_MIN_SCORE          = 50      # minimum composite score to pass (C grade)
+RR_ENGINE_BLOCK_SCORE        = 35      # hard block below this (D/F grade)
+
+# Bollinger Band width (for volatility assessment)
+RR_ENGINE_BB_PERIOD          = 20
+RR_ENGINE_BB_STDDEV          = 1.8     # matches range_finder.py and bb_bounce.py
+RR_ENGINE_BB_SQUEEZE_THRESH  = 0.04    # BB width < 4% = squeeze
+
+# Caching
+RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width per token
