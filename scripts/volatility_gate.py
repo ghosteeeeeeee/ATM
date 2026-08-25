@@ -88,7 +88,6 @@ REGIME_SIGNALS = {
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
-        'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
     },
     'EXTREME': {
         # Continuation works in storms
@@ -99,7 +98,6 @@ REGIME_SIGNALS = {
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot — EXTREME only (stormy)
         'hl_copy_trader',  # pro trader copy — works in all regimes
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',  # liquidation cluster contrarian — structural, regime-agnostic
-        'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend, works in EXTREME
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks — structural
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
     },
