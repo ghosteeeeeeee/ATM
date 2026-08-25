@@ -1,32 +1,32 @@
-## CEO Report — 2026-08-25 ~11:00 UTC (254th run)
+## CEO Report — 2026-08-25 ~15:20 UTC (255th run)
 
 ### Diagnosis
 
-System **RED** — verified DB: 24h 76T **-$2.68, 44.7% WR**. 7d: 312T **-$3.45, 50.6% WR**. Today Aug 25: 23T **-$0.98, 34.8% WR**. 5 open positions -$0.09 unrealized (ETH LONG, HBAR SHORT, ALT SHORT, HYPE LONG, BTC LONG).
+System **RED** — verified DB: 24h 56T **-$2.40, 39.3% WR**. 7d: 316T **-$3.96, 50.3% WR**. Today Aug 25: 30T **-$1.58, 33.3% WR**. 5 open positions near breakeven (BTC LONG, ETH SHORT, GMT SHORT +1.37%, HBAR SHORT +0.57%, WLFI LONG).
 
-**ct-hot+ STILL GENERATING TRADES** — COIN_TRACKER_HOT_ENABLED still True (RESEARCH_FLAGS). 24h: 5T, 0% WR, **-$0.70**. 7d: 66T, 36.4% WR, **-$3.65**. ALL ATR_SL hits at 1.2% floor (old SL). Without ct-hot+: 7d system ~+$0.20 (profitable).
+**ct-hot+ STILL GENERATING TRADES** — COIN_TRACKER_HOT_ENABLED=True in RESEARCH_FLAGS. 7d: 66T, 36.4% WR, **-$3.65** (dominant loss). Without ct-hot+: 7d system ~+$0.20 (profitable). CEO cannot touch RESEARCH_FLAGS.
 
-**ATR_SL_MIN=1.5% deployed** — auto_1hr raised at 08:05. Only 1 trade (INJ at 09:48) has new 1.5% SL. All other 48h hits still at 1.2% floor. Needs 48h eval.
+**ATR_SL hit dominant exit** — 24h: 23 trades, 57.4% of exits, **-$3.61**. ATR_SL_MIN=1.5% deployed 08:05 but too early to evaluate (few trades since change). Previous 48h: atr_sl_hit 39T 60% avg -$5.74. Problem is entry quality (ct-hot+ low-confidence entries), not SL tightness.
 
-**70-79 confidence tier DOMINANT LOSS** — 139T/7d, 44.6% WR, **-$5.18**. Root cause: ct-hot+ trades land here (low confidence). 90+ tier most profitable: 83T/7d, 55.4% WR, **+$1.46**.
+**Winners unchanged:**
+- bb_bounce+ 32T/7d 71.9% WR +$0.88
+- hl_copy_trader 78T/7d 47.4% WR +$0.80
+- r2-trend-long6 3T/7d 100% WR +$0.25
 
-**SHORT side 24h:**
-- hl_copy_trader SHORT: 4T, 25% WR, -$0.52 (legacy, killed Aug 25 03:30)
-- macd-div- SHORT: 9T, 55.6% WR, -$0.46
-- tl_break_short: 7T, 28.6% WR, -$0.32
+**SHORT side:** hl_copy_trader SHORT killed (Aug 25 03:30), legacy draining. tl_break_short 7d 28.6% WR -$0.32 (concerning). macd-div- 69.2% WR -$0.14 (slight negative despite good WR — R:R issue).
 
 ### Root Cause
 
-COIN_TRACKER_HOT_ENABLED=True in RESEARCH_FLAGS. ct-hot+ generates ~5 trades/day in 70-79 conf tier. Combined with ATR_SL exits (68 hits/48h, -$3.53), system cannot overcome the drag.
+COIN_TRACKER_HOT_ENABLED=True in RESEARCH_FLAGS generates ~1 trade/day. Combined with ATR_SL exits (23 hits/24h), system cannot overcome drag. Today's 33.3% WR = ct-hot+ 0% + atr_sl_hit 57% of exits.
 
 ### Fix Applied
 
-**NO CODE CHANGES** — RESEARCH_FLAGS protected. ATR_SL_MIN 1.5% deployed by auto_1hr (needs eval window).
+**NO CODE CHANGES** — RESEARCH_FLAGS protected. ATR_SL_MIN 1.5% deployed by auto_1hr (eval window ends ~Aug 27). CONF_FILTER_MAX=89 active (eval ends Aug 26).
 
 ### Recommendation to T (URGENT)
 
-1. **Disable COIN_TRACKER_HOT_ENABLED** — base flag still True, generating ct-hot+ trades. Add to NEVER_REENABLE_FLAGS. Without it: system profitable.
-2. **Consider CONF_FILTER_MIN=75** — blocks 70-74 tier (bleeding -$5.18/7d). Requires code change.
+1. **Disable COIN_TRACKER_HOT_ENABLED** — base flag True in RESEARCH_FLAGS, generating ct-hot+ trades. Without it: system profitable.
+2. **Monitor tl_break_short** — 7d 28.6% WR -$0.32. If persists, consider disabling.
 
 ### Monitoring
 
@@ -34,8 +34,7 @@ COIN_TRACKER_HOT_ENABLED=True in RESEARCH_FLAGS. ct-hot+ generates ~5 trades/day
 |------|--------|------|
 | ATR_SL_MIN=1.5% | Deployed 08:05 | Eval 48h (~Aug 27) |
 | CONF_FILTER_MAX=89 | Active | Eval Aug 26 |
-| MIN_PRE_MOVE 0.3 | Due today | Check results |
-| bb_bounce+ WR | 72.4% 7d, 66.7% today | Monitor |
-| hl_copy_trader WR | 51.4% 7d, 40% today | Monitor |
-| ct-hot+ drain | 5T/24h, 0% WR | Until flag disabled |
+| ct-hot+ drain | 66T/7d 36.4% WR | Until flag disabled |
+| bb_bounce+ WR | 71.9% 7d | Monitor |
+| hl_copy_trader WR | 47.4% 7d | Monitor |
 | Disk | 82% | Clean at 85% |
