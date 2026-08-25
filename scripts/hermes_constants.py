@@ -998,6 +998,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'atr-spike', 'r2-trend-long', 'ct-hot+', 'ct-hot-',
     'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
     'hzscore',  # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
+    'bb_bounce',  # bb_bounce trades get regular ATR SL/TP only — mean reversion exits handled by signal logic
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -1807,7 +1808,7 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 # hl_copy_signal.py — Generates signals from pro trader activity
 HL_COPY_SIGNAL_ENABLED = True      # Master kill-switch for HL signals
 HL_COPY_SIGNAL_PLUS_ENABLED = True     # hl_copy_signal+ LONG
-HL_COPY_SIGNAL_MINUS_ENABLED = True    # hl_copy_signal- SHORT — enabled (24/7 live, cluster filter protects)
+HL_COPY_SIGNAL_MINUS_ENABLED = False   # CEO KILLED 2026-08-25 — 6T/7d 0% WR -$0.76, ALL ATR_SL exits. LONG side is backbone (+$2.07/7d 52.4% WR). SHORT has no edge in copy-trading.
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal

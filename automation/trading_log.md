@@ -14701,3 +14701,30 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - hl_copy_trader: 5L of 8 trades are atr_sl_hit — entries poor quality in this regime
 - ct-hot+: 5L of 6 trades atr_sl_hit — same pattern
 - Both persistent drags need active-session data for kill criteria
+
+## [2026-08-25 04:05 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.39 (WR: 100%)
+
+**24h Summary:** 88T 58% WR -$1.74
+**Close Reasons:** profit-monster-trail 42T (47.7%) +$2.81 | atr_sl_hit 36T (40.9%) -$3.50
+
+**Signal Leaders (24h):**
+- bb_bounce+: 17T 88.2% WR +$0.90 ⭐
+- macd-div-: 13T 69.2% WR -$0.14
+- tl_break_short: 11T 45.5% WR -$0.34
+- hl_copy_trader: 10T 50% WR -$0.50 (2W last hr — trailing SL working)
+- ct-hot+: 6T 16.7% WR -$0.60
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR last hour
+
+**Changes:** None needed
+- 2 hl_copy_trader LONGs closed via atr_sl_hit but both profitable (+$0.39)
+- Trailing SL converting what would be losses into small wins
+- atr_sl_hit at 40.9% slightly above threshold but exits are profitable
+- Trade freq 2/hr normal late night session
+- 5 open positions (3 bb_bounce+, 2 hl_copy_trader)
+
+**Open Questions:** None
