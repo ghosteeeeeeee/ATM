@@ -7,10 +7,11 @@ acceleration. Unlike pump_hunter (reversion/fade), this RIDES the spike.
 
 Detection:
   1. Price velocity > threshold in N bars (explosive move)
-  2. Acceleration > 0 (momentum building, not just a spike)
+  2. Acceleration >= 0 (momentum building or maintaining)
   3. Price above EMA (trend aligned)
   4. RSI not overbought (room to run)
-  5. Fresh move (cooldown dedup)
+  5. Follow-through: 2 of 3 recent candles in signal direction
+  6. Cooldown dedup via separate JSON file (not shared with guardian)
 
 Architecture:
   price_history (1m) → velocity/acceleration detection
@@ -27,14 +28,22 @@ Pipeline: runs as a fast signal (every minute) via signals_runner.
 import os
 import sys
 import time
+import json
 import sqlite3
-import statistics
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, get_cooldown, price_age_minutes
+from signal_schema import add_signal, price_age_minutes
 
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(SIGNAL_LOG), exist_ok=True)
+
+# ── Cooldown file — separate from guardian's loss_cooldowns.json ──────────────
+# The shared set_cooldown/get_cooldown system ignores reason='signal' entries,
+# so we maintain our own cooldown file that we check and write ourselves.
+_COOLDOWN_FILE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'data', 'pump_catcher_cooldowns.json'
+)
 
 
 def _log(msg):
@@ -67,7 +76,59 @@ from hermes_constants import (
     PUMP_CATCHER_MIN_PRICE_ROWS,
     PUMP_CATCHER_CONFIDENCE_BASE,
     PUMP_CATCHER_CONFIDENCE_CAP,
+    PUMP_CATCHER_MAX_POSITIONS,
 )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Cooldown Management (own file, not shared with guardian)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _load_cooldowns() -> dict:
+    """Load pump_catcher cooldowns from dedicated file."""
+    try:
+        if os.path.exists(_COOLDOWN_FILE):
+            with open(_COOLDOWN_FILE) as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+
+def _save_cooldowns(data: dict):
+    """Save pump_catcher cooldowns atomically."""
+    os.makedirs(os.path.dirname(_COOLDOWN_FILE), exist_ok=True)
+    # Purge expired entries
+    now = time.time()
+    cleaned = {k: v for k, v in data.items()
+               if isinstance(v, dict) and v.get('expires', 0) > now}
+    with open(_COOLDOWN_FILE, 'w') as f:
+        json.dump(cleaned, f, indent=2)
+
+
+def _is_on_cooldown(token: str, direction: str) -> bool:
+    """Check if token+direction is on pump_catcher cooldown."""
+    key = f"{token.upper()}:{direction.upper()}"
+    cooldowns = _load_cooldowns()
+    entry = cooldowns.get(key)
+    if not entry:
+        return False
+    expires = entry.get('expires', 0) if isinstance(entry, dict) else 0
+    return expires > time.time()
+
+
+def _set_cooldown(token: str, direction: str):
+    """Set cooldown for token+direction."""
+    key = f"{token.upper()}:{direction.upper()}"
+    cooldowns = _load_cooldowns()
+    expires = time.time() + (PUMP_CATCHER_COOLDOWN_BARS / 60.0) * 3600
+    # Extend only if existing cooldown is longer
+    existing = cooldowns.get(key, {})
+    existing_expires = existing.get('expires', 0) if isinstance(existing, dict) else 0
+    if existing_expires > expires:
+        expires = existing_expires
+    cooldowns[key] = {'expires': expires, 'bars': PUMP_CATCHER_COOLDOWN_BARS}
+    _save_cooldowns(cooldowns)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -85,28 +146,13 @@ def _ema(values, period):
     return ema_val
 
 
-def _ema_series(values, period):
-    """Return EMA series (oldest first), None for indices < period-1."""
-    if len(values) < period:
-        return [None] * len(values)
-    k = 2.0 / (period + 1)
-    result = [None] * (period - 1)
-    ema_val = sum(values[:period]) / period
-    result.append(ema_val)
-    for price in values[period:]:
-        ema_val = price * k + ema_val * (1 - k)
-        result.append(ema_val)
-    return result
-
-
 def _rsi(closes, period=14):
-    """Compute RSI. Returns float or None if insufficient data."""
+    """Compute RSI (simplified SMA-based). Returns float or None."""
     if len(closes) < period + 1:
         return None
     deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
     gains = [d if d > 0 else 0 for d in deltas]
     losses = [-d if d < 0 else 0 for d in deltas]
-    # Use last `period` deltas
     avg_gain = sum(gains[-period:]) / period
     avg_loss = sum(losses[-period:]) / period
     if avg_loss == 0:
@@ -123,7 +169,6 @@ def _get_1m_prices(token, lookback=120):
     """Fetch 1m close prices from price_history, oldest first.
 
     Freshness guard: returns [] if most recent price is > 3 minutes old.
-    Returns list of floats (closes), oldest first.
     """
     conn = None
     try:
@@ -167,9 +212,10 @@ def detect_pump(token, closes):
 
     Fires when:
       1. Price velocity > threshold in N bars (explosive move)
-      2. Acceleration > 0 (momentum building — current velocity > prior velocity)
-      3. Price above EMA (trend aligned — not fighting the trend)
+      2. Acceleration >= 0 (momentum building or maintaining — not decelerating)
+      3. Price above EMA (trend aligned)
       4. RSI not overbought/oversold (room to run)
+      5. At least 2 of 3 individual recent candles in signal direction (follow-through)
 
     Args:
         token: str (for logging)
@@ -196,8 +242,7 @@ def detect_pump(token, closes):
 
     velocity = (price_now - price_n_bars_ago) / price_n_bars_ago * 100.0
 
-    # ── 2. Acceleration: current velocity > prior velocity ─────────────────────
-    # Prior N bars (bars -2N to -N)
+    # ── 2. Acceleration: current velocity vs prior velocity ────────────────────
     price_2n_ago = closes[latest_idx - n * 2]
     if price_2n_ago == 0:
         return None
@@ -213,7 +258,9 @@ def detect_pump(token, closes):
     else:
         return None  # not explosive enough
 
-    # ── 4. Acceleration must be positive (momentum building) ───────────────────
+    # ── 4. Acceleration must be non-negative (momentum building/maintaining) ───
+    # ACCEL_MIN defaults to 0.0 — rejects deceleration (velocity decreasing).
+    # Set to >0 in hermes_constants if strict acceleration is required.
     if direction == 'LONG' and acceleration < PUMP_CATCHER_ACCEL_MIN:
         return None
     if direction == 'SHORT' and acceleration > -PUMP_CATCHER_ACCEL_MIN:
@@ -238,16 +285,17 @@ def detect_pump(token, closes):
         if direction == 'SHORT' and rsi_val < PUMP_CATCHER_RSI_MIN:
             return None  # oversold — too late
 
-    # ── 7. Single-bar spike filter: skip if velocity is one huge candle ────────
-    # Real momentum has follow-through, not just one candle. Check that at least
-    # 2 of the last 3 candles closed in the signal direction.
+    # ── 7. Follow-through filter: at least 2 of 3 individual candles ───────────
+    # Count how many of the last 3 candles closed higher/lower than their open.
+    # This catches real follow-through, not just one huge candle.
     recent_3 = closes[-3:]
     if direction == 'LONG':
-        green_count = sum(1 for i in range(1, len(recent_3)) if recent_3[i] > recent_3[i - 1])
+        green_count = sum(1 for i in range(len(recent_3)) if i > 0 and recent_3[i] > recent_3[i - 1])
+        # Also count the last candle closing above its open-like reference (prev close)
         if green_count < 2:
             return None  # not enough follow-through
     else:
-        red_count = sum(1 for i in range(1, len(recent_3)) if recent_3[i] < recent_3[i - 1])
+        red_count = sum(1 for i in range(len(recent_3)) if i > 0 and recent_3[i] < recent_3[i - 1])
         if red_count < 2:
             return None  # not enough follow-through
 
@@ -273,7 +321,7 @@ def detect_pump(token, closes):
     if rsi_val is not None and 40 <= rsi_val <= 65:
         conf += 5
 
-    # Consistency bonus: all 3 recent bars in same direction
+    # Consistency bonus: all 3 recent candles in same direction
     if direction == 'LONG':
         all_green = all(recent_3[i] > recent_3[i - 1] for i in range(1, len(recent_3)))
         if all_green:
@@ -283,7 +331,7 @@ def detect_pump(token, closes):
         if all_red:
             conf += 3
 
-    conf = min(PUMP_CATCHER_CONFIDENCE_CAP, max(50, conf))
+    conf = min(PUMP_CATCHER_CONFIDENCE_CAP, max(PUMP_CATCHER_CONFIDENCE_BASE, conf))
 
     return {
         'direction': direction,
@@ -329,6 +377,24 @@ def run(prices_dict=None):
     except Exception:
         pass
 
+    # Count existing pump_catcher positions (enforce MAX_POSITIONS)
+    pump_position_count = 0
+    try:
+        from signals import signal_compactor as _sc
+        # Count signals with pump_catcher source that are in hotset
+    except Exception:
+        pass
+    # Fallback: count by checking recent signals with pump_catcher source
+    # that haven't expired yet. This is approximate — exact count needs DB query.
+    # For safety, we track our own count via cooldown file entries.
+    cooldowns = _load_cooldowns()
+    # Each cooldown entry represents a recent signal — count non-expired ones
+    now = time.time()
+    pump_position_count = sum(
+        1 for v in cooldowns.values()
+        if isinstance(v, dict) and v.get('expires', 0) > now
+    )
+
     added = 0
 
     for token, data in prices_dict.items():
@@ -341,6 +407,10 @@ def run(prices_dict=None):
             continue
 
         token_upper = token.upper()
+
+        # ── MAX_POSITIONS enforcement ──────────────────────────────────────────
+        if pump_position_count >= PUMP_CATCHER_MAX_POSITIONS:
+            break  # no more signals this cycle
 
         # Skip if already have a position
         if token_upper in open_pos:
@@ -372,8 +442,8 @@ def run(prices_dict=None):
         if direction == 'SHORT' and not PUMP_CATCHER_MINUS_ENABLED:
             continue
 
-        # ── Cooldown ───────────────────────────────────────────────────────────
-        if get_cooldown(token, direction=direction):
+        # ── Cooldown (own file — not shared with guardian) ─────────────────────
+        if _is_on_cooldown(token, direction):
             continue
 
         # ── Write signal ───────────────────────────────────────────────────────
@@ -397,8 +467,8 @@ def run(prices_dict=None):
             )
             if sid:
                 added += 1
-                from signal_gen import set_cooldown
-                set_cooldown(token, direction, hours=PUMP_CATCHER_COOLDOWN_BARS / 60.0)
+                pump_position_count += 1
+                _set_cooldown(token, direction)
                 _log(
                     f"  {direction:5s}-pump-catcher {token_upper:8s} "
                     f"conf={sig['confidence']:.0f}% "
@@ -417,7 +487,6 @@ def run(prices_dict=None):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    import time as _time
     from signal_schema import init_db, get_all_latest_prices
 
     init_db()

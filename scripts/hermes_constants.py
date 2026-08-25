@@ -1586,8 +1586,6 @@ PUMP_CATCHER_CONFIDENCE_CAP  = 88    # max confidence
 PUMP_CATCHER_COOLDOWN_BARS  = 10     # bars between signals per token (~10 min on 1m)
 PUMP_CATCHER_MAX_POSITIONS  = 3      # max concurrent pump-catcher positions
 PUMP_CATCHER_MIN_PRICE_ROWS = 30     # minimum 1m bars for EMA/RSI computation
-# Price position filter — allow entries at top of range (unlike accel_300 which blocks)
-PUMP_CATCHER_ALLOW_RANGE_BREAKOUT = True  # True = enter even at range top (momentum)
 
 # DEPRECATED — zscore_pump_hunter.py is disabled.
 # Pipeline-integrated version is signals/zscore_pump.py (uses tpsl_utils via signal_compactor).
@@ -1988,11 +1986,12 @@ CONTINUATION_CONF_1H_RET_THRESHOLD = 0.5      # % — 1h return threshold for al
 # Catch staged LONG moves from ATR compression. Quality over quantity.
 ATR_SPIKE_ENABLED              = True    # master kill-switch
 ATR_SPIKE_PLUS_ENABLED         = True    # LONG direction
-ATR_SPIKE_COMPRESSION_MAX_PCT  = 0.05    # ATR% threshold for compression
-ATR_SPIKE_COMPRESSION_MIN_BARS = 5       # minimum candles in compression
-ATR_SPIKE_BREAKOUT_MIN_PCT     = 0.3     # minimum candle % move to trigger
-ATR_SPIKE_TREND_FILTER         = True    # require EMA20 > EMA50 on 15m
-ATR_SPIKE_EMA_PROXIMITY_PCT    = 0.5     # max distance from EMA20 (15m)
+ATR_SPIKE_COMPRESSION_MAX_PCT  = 0.10    # ATR% threshold for compression (relaxed from 0.05 — was too tight, 0 signals)
+ATR_SPIKE_COMPRESSION_MIN_BARS = 3       # minimum candles in compression (relaxed from 5)
+ATR_SPIKE_BREAKOUT_MIN_PCT     = 0.15    # minimum candle % move to trigger (relaxed from 0.3)
+ATR_SPIKE_TREND_FILTER         = True    # require EMA20 > EMA50 on 1h (changed from 15m — too noisy)
+ATR_SPIKE_TREND_TIMEFRAME      = '1h'    # timeframe for trend filter ('1h' or '15m')
+ATR_SPIKE_EMA_PROXIMITY_PCT    = 1.5     # max distance from EMA20 (relaxed from 0.5)
 ATR_SPIKE_SL_PCT               = 0.75    # hard stop-loss %
 ATR_SPIKE_CONF_BASE            = 70      # base confidence
 ATR_SPIKE_CONF_PCT_BOOST       = 10      # extra conf per 0.1% above breakout threshold
