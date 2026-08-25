@@ -15060,3 +15060,51 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 2. Monitor ATR_SL_MIN=1.5% (48h eval ending Aug 27)
 3. Monitor CONF_FILTER_MAX=89 (48h eval ending Aug 26)
 4. hl_copy_trader SHORT investigation — is it a regime mismatch?
+
+---
+
+## [2026-08-25 15:08 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet session)
+**PnL:** $0.00 (no activity)
+**24h:** 38T ~47% WR -$1.13
+
+**24h Close Reasons:**
+- atr_sl_hit: 24T -$1.59 avg-$0.066 — **63% of all exits** (WORSE than pre-change 49.4%)
+- profit-monster-trail: 8T +$0.50 avg+$0.063 — only profitable exit
+- cut-loser-MAE-GUARD: 2T -$0.30 — legacy drag
+- cascade_flip variants: 3T -$0.14 — minor
+- guardian_orphan: 1T -$0.01 — minor
+
+**Signal Performance 24h:**
+- hl_copy_trader: 12T/3W 25% WR -$1.13 — **BIGGEST DRAG** (7/12 atr_sl_hit)
+- bb_bounce+: 17T/10W 58.8% WR -$0.10 — mixed, near breakeven
+- confluence+ combos: 2T/2W 100% WR +$0.24 — fine
+- r2-trend-long3: 1T/0W -$0.06 — below threshold
+- macd-div-: 1T/0W -$0.16 — below threshold
+
+**ATR_SL_MIN 1.5% Evaluation (deployed 08:05 UTC):**
+- Pre-change (24h through 08:05): 49.4% atr_sl_hit rate
+- Post-change (6h since): atr_sl_hit at 63% of exits — **WORSE, not better**
+- Recent hours (14:00-17:00): 0% hit rate — improving trend, but early hours were 80-100%
+- **Verdict: inconclusive.** 6h is too short. The early-hours spike (02:00-06:00 100% hits) is likely from overnight entries before the change took effect. Need 24h+ post-change data.
+
+**Diagnosis:**
+1. **Entry quality:** hl_copy_trader 25% WR with 7/12 atr_sl_hit — copy-trading enters AFTER the move, guaranteeing adverse excursion. Structural problem, not a param issue.
+2. **SL behavior:** ATR_SL 63% dominant. 1.5% widening hasn't reduced hit rate yet (too early, overnight trades skewed).
+3. **Signal quality:** hl_copy_trader is the clear drag. Already killed PLUS and MINUS sub-signals, but master HL_COPY_SIGNAL_ENABLED still True — remaining LONG/SHORT standalone fires are the losers.
+4. **Trade frequency:** 38T/24h = 1.6/hr — low but normal for NEUTRAL regime.
+
+**Changes:** None
+
+**No Change Needed:**
+- 0 trades last hour — no kill criteria (needs 3+T/0%WR in last hour)
+- hl_copy_trader 12T 25% WR -$1.13 — persistent drag, but PLUS/MINUS already killed. Master switch still enabled for LONG side (52.4% WR/7d historically). Needs CEO decision on standalone LONG.
+- ATR_SL_MIN 1.5% — deployed 7h ago, needs 24h+ eval window. Do NOT revert yet.
+- bb_bounce+ 58.8% WR near breakeven — fine
+- Trade frequency low — NEUTRAL regime, no overtrading
+- 5 open positions (3 hl_copy_trader, 2 cascade)
+
+**Open Questions:**
+- hl_copy_trader standalone LONG: master switch still on. PLUS/MINUS killed but standalone fires remain. 24h performance 25% WR -$1.13. Recommend CEO review whether to kill master switch.
+- ATR_SL_MIN 1.5%: early data inconclusive. Re-evaluate at 08:05 UTC Aug 26 (24h post-deploy).
