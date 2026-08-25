@@ -187,3 +187,11 @@
   WHY: 5T last 3h (1W 4L -$0.35). atr_sl_hit 46.8% of 12h — slightly above 40% threshold but ATR_K_INITIAL=1.2 already tuned (reverted to original). Trailing SL deployed and working. 12h: 47T ~59% WR -$0.51. bb_bounce+ 18T 88.9% WR +$1.02 star. hl_copy_trader 6T 33% WR -$0.69 persistent, ct-hot+ 7T 29% WR -$0.53 persistent — both 0 trades last 3h, not killable. 3 consecutive negative hours but tiny losses (-$0.62 total). Trade freq 1.7/hr normal. 4 open positions (HYPE, SOL, SYRUP, BTC). System stable, late-night regime.
   BY: auto_1hr
   NEXT: Re-run at 02:05 UTC
+[2026-08-25 02:05 UTC] auto_1hr: NO CHANGES
+  WHY: 11T last 6h (3W 8L -$0.46). Quiet night session 1.8T/hr. bb_bounce+ 20T 85% WR +$1.11 carrying system. atr_sl_hit 34T (35.4%) below 40% threshold. hl_copy_trader 7T 28.6% WR -$0.92 persistent but has wins (not killable). ct-hot+ 6T 16.7% WR -$0.60 same. No signal has 3+ trades with 0% WR. 3 open positions (ETH, HYPE, BTC all hl_copy_trader LONG). System stable, late-night regime.
+  BY: auto_1hr
+  NEXT: Re-run at 03:05 UTC
+[2026-08-25 03:05 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (late night 02:05-03:05). 92T 24h 57.6% WR -$1.74. atr_sl_hit 34T (37%) below 40% threshold. profit-monster-trail 48T +$3.08 carrying system. bb_bounce+ 17T 88.2% WR +$0.90 star. hl_copy_trader 8T 37.5% WR -$0.89 persistent (5L all atr_sl_hit entries), ct-hot+ 6T 16.7% WR -$0.60 persistent (5L all atr_sl_hit entries). macd-div- 13T 69.2% WR -$0.14, tl_break_short 16T 62.5% WR -$0.11 both slightly negative despite good WR. No signal has 3+ trades with 0% WR last hour (0T total) — no kill criteria. 3 open positions (HYPE/BTC/BANANA). Trade freq 0/hr late night. System stable.
+  BY: auto_1hr
+  NEXT: Re-run at 04:05 UTC

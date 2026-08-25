@@ -14646,3 +14646,58 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ETH', 'FIL', 'GMT', 'LDO', 'ME', 'NXPC', '
 - hl_copy_trader persistent negative — watch next active session for kill criteria
 - ct-hot+ persistent negative — same
 - If atr_sl_hit stays >40% through next active session, consider widening ATR_K_INITIAL from 1.2→1.4
+
+## [2026-08-25 02:05 UTC] Hourly Analysis
+
+**Trades:** 11 closed in 6h (3W 8L, net -$0.46)
+- W: SYRUP bb_bounce+ profit-monster-trail +$0.10, WLD bb_bounce+ profit-monster-trail +$0.07, ZORA/NEO bb_bounce+ +$0.11
+- L: SOL hl_copy_trader atr_sl_hit -$0.23, ETH hl_copy_trader atr_sl_hit -$0.21, CAKE ct-hot- atr_sl_hit -$0.12, XPL macd-div- atr_sl_hit -$0.16, IMX bb_bounce+ atr_sl_hit -$0.13, HYPE hl_copy_trader atr_sl_hit -$0.18, MERL bb_bounce+ guardian_orphan -$0.01
+
+**24h Close Reasons:** atr_sl_hit 34T (35.4% ✓), profit-monster-trail 51T (53.1%)
+
+**24h Signal Leaders:**
+- bb_bounce+: 20T 85% WR +$1.11 ⭐
+- hl_copy_trader: 7T 28.6% WR -$0.92 ⚠️ persistent
+- ct-hot+: 6T 16.7% WR -$0.60 ⚠️ persistent
+
+**Kill criteria:** None met
+- No signal has 3+ trades with 0% WR
+- hl_copy_trader and ct-hot+ have wins despite low WR
+
+**Changes:** None needed
+- Quiet night session (1.8T/hr)
+- System stable, bb_bounce+ carrying
+
+**Open Positions:** 3 (ETH LONG, HYPE LONG, BTC LONG — all hl_copy_trader)
+
+**Open Questions:**
+- hl_copy_trader persistent negative — watch active session for kill criteria
+- ct-hot+ persistent negative — same
+
+## [2026-08-25 03:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed (late night session, 02:05–03:05)
+**Open Positions:** 3 (HYPE LONG hl_copy_trader, BTC LONG hl_copy_trader, BANANA LONG bb_bounce+)
+
+**24h Summary:** 92T 57.6% WR -$1.74
+**Close Reasons:** profit-monster-trail 48T (52.2%) +$3.08 | atr_sl_hit 34T (37.0%) -$3.89
+
+**Signal Leaders (24h):**
+- bb_bounce+: 17T 88.2% WR +$0.90 ⭐
+- hl_copy_trader: 8T 37.5% WR -$0.89 ⚠️ persistent
+- ct-hot+: 6T 16.7% WR -$0.60 ⚠️ persistent
+- macd-div-: 13T 69.2% WR -$0.14 (good WR, small avg loss)
+- tl_break_short: 16T 62.5% WR -$0.11 (same pattern)
+
+**Kill criteria:** None met — no signal has 3+ trades with 0% WR in last hour (0T total)
+
+**Changes:** None needed
+- Late night session, zero activity
+- hl_copy_trader/ct-hot+ persistent drags but both have wins (not killable)
+- atr_sl_hit at 37% below 40% threshold
+- bb_bounce+ remains star performer
+
+**Open Questions:**
+- hl_copy_trader: 5L of 8 trades are atr_sl_hit — entries poor quality in this regime
+- ct-hot+: 5L of 6 trades atr_sl_hit — same pattern
+- Both persistent drags need active-session data for kill criteria
