@@ -1445,6 +1445,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'ct-hot',
     'liq-hunt',  # liquidation cluster contrarian — structural, regime-agnostic
     'macd-div',  # MACD divergence — counter-trend, works solo
+    'slow-grind-',  # slow grinding downtrend — works solo in low-volatility markets
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
 )
 
