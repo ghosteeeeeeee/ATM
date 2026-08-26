@@ -119,6 +119,7 @@ def _ema(prices: list, period: int) -> float:
 
 def _get_1m_prices(token: str, lookback: int = V2_LOOKBACK_1M) -> list:
     """Fetch 1m close prices from price_history, oldest first."""
+    conn = None
     try:
         conn = sqlite3.connect(_PRICE_DB, timeout=10)
         c = conn.cursor()
@@ -133,7 +134,6 @@ def _get_1m_prices(token: str, lookback: int = V2_LOOKBACK_1M) -> list:
             ORDER BY timestamp ASC
         """, (token.upper(), lookback))
         rows = c.fetchall()
-        conn.close()
 
         if not rows:
             return []
@@ -157,11 +157,15 @@ def _get_1m_prices(token: str, lookback: int = V2_LOOKBACK_1M) -> list:
 
     except Exception as e:
         print(f"  [inverse-accel-300-v2] price_history error for {token}: {e}")
-    return []
+        return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _get_1m_volume(token: str, lookback: int = V2_VOLUME_LOOKBACK + 10) -> list:
     """Fetch 1m volume from candles_1m, oldest first. Returns list of volume values."""
+    conn = None
     try:
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
@@ -176,11 +180,13 @@ def _get_1m_volume(token: str, lookback: int = V2_VOLUME_LOOKBACK + 10) -> list:
             ORDER BY ts ASC
         """, (token.upper(), lookback))
         rows = c.fetchall()
-        conn.close()
         return [r[0] for r in rows if r[0] is not None]
     except Exception as e:
         print(f"  [inverse-accel-300-v2] volume error for {token}: {e}")
-    return []
+        return []
+    finally:
+        if conn:
+            conn.close()
 
 
 def _check_1h_trend(token: str, current_price: float) -> bool:
@@ -188,6 +194,7 @@ def _check_1h_trend(token: str, current_price: float) -> bool:
     
     Returns True if trade should be BLOCKED (strong uptrend = not exhausted).
     """
+    conn = None
     try:
         now = time.time()
         conn = sqlite3.connect(_PRICE_DB, timeout=10)
@@ -198,7 +205,6 @@ def _check_1h_trend(token: str, current_price: float) -> bool:
             ORDER BY timestamp ASC LIMIT 1
         """, (token.upper(), now - 3600, now - 3500))
         row = c.fetchone()
-        conn.close()
         
         if not row or not row[0]:
             return False  # no data — don't block
@@ -216,6 +222,9 @@ def _check_1h_trend(token: str, current_price: float) -> bool:
         return False
     except Exception:
         return False  # on error, don't block
+    finally:
+        if conn:
+            conn.close()
 
 
 def _check_volume_confirmation(token: str, volumes: list) -> bool:
@@ -505,30 +514,38 @@ def scan_inverse_accel_300_v2_signals(prices_dict: dict) -> int:
 if __name__ == '__main__':
     from signal_schema import init_db
 
-    conn = sqlite3.connect(_PRICE_DB, timeout=10)
-    c = conn.cursor()
-    c.execute("""
-        SELECT DISTINCT token FROM price_history
-        WHERE timestamp > ?
-        ORDER BY token
-    """, (int(time.time()) - 600,))
-    tokens = [r[0] for r in c.fetchall()]
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT DISTINCT token FROM price_history
+            WHERE timestamp > ?
+            ORDER BY token
+        """, (int(time.time()) - 600,))
+        tokens = [r[0] for r in c.fetchall()]
+    finally:
+        if conn:
+            conn.close()
 
     prices = {}
-    conn = sqlite3.connect(_PRICE_DB, timeout=10)
-    c = conn.cursor()
-    c.execute("""
-        SELECT token, price FROM price_history
-        WHERE (token, timestamp) IN (
-            SELECT token, MAX(timestamp) FROM price_history
-            WHERE timestamp > ?
-            GROUP BY token
-        )
-    """, (int(time.time()) - 600,))
-    for row in c.fetchall():
-        prices[row[0]] = {'price': row[1]}
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(_PRICE_DB, timeout=10)
+        c = conn.cursor()
+        c.execute("""
+            SELECT token, price FROM price_history
+            WHERE (token, timestamp) IN (
+                SELECT token, MAX(timestamp) FROM price_history
+                WHERE timestamp > ?
+                GROUP BY token
+            )
+        """, (int(time.time()) - 600,))
+        for row in c.fetchall():
+            prices[row[0]] = {'price': row[1]}
+    finally:
+        if conn:
+            conn.close()
 
     mode = "DRY" if DRY_RUN else "LIVE"
     print(f"[inverse-accel-300-v2] Testing on {len(prices)} tokens ({mode} mode)...")
