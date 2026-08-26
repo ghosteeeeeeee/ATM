@@ -1625,6 +1625,7 @@ PUMP_CATCHER_ZSCORE_MAX     = 2.0    # max z-score — skip if overextended (MER
 PUMP_CATCHER_BB_MAX         = 1.0    # max BB position — skip if above upper band (MERL had 1.08)
 PUMP_CATCHER_BB_PERIOD      = 20     # Bollinger Band period
 PUMP_CATCHER_BB_STDDEV      = 2.0    # Bollinger Band standard deviation
+PUMP_CATCHER_VOL_MAX_5BAR   = 2.0    # max 5-bar price change % — skip if too volatile (CASHCAT had 4.5%)
 # TP/SL — asymmetric (ride winners, cut losers)
 PUMP_CATCHER_TP_PCT         = 3.0    # take profit at 3% from entry
 PUMP_CATCHER_SL_PCT         = 1.0    # stop loss at 1% from entry

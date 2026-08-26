@@ -76,6 +76,7 @@ from hermes_constants import (
     PUMP_CATCHER_BB_MAX,
     PUMP_CATCHER_BB_PERIOD,
     PUMP_CATCHER_BB_STDDEV,
+    PUMP_CATCHER_VOL_MAX_5BAR,
     PUMP_CATCHER_COOLDOWN_BARS,
     PUMP_CATCHER_MIN_PRICE_ROWS,
     PUMP_CATCHER_CONFIDENCE_BASE,
@@ -325,7 +326,14 @@ def detect_pump(token, closes):
     else:
         bb_position = 0.5
 
-    # ── 9. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
+    # ── 9. Volatility filter: skip if recent price movement is too extreme ─────
+    # CASHCAT had 4.5% 5-bar move — too volatile to enter safely.
+    if len(closes) >= 6:
+        change_5bar = abs(closes[-1] - closes[-6]) / closes[-6] * 100.0
+        if change_5bar > PUMP_CATCHER_VOL_MAX_5BAR:
+            return None  # too volatile — price likely to reverse
+
+    # ── 10. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
     # Check that recent closes show follow-through momentum, not a single spike.
     # Uses close-to-close comparisons (we only have close prices, not OHLC).
     recent_3 = closes[-3:]
