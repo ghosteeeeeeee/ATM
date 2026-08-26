@@ -115,10 +115,44 @@ The daily timer catches anything missed, but **immediate commits are the default
 
 Explicit memory system — no background collection. Query before tasks, store after discoveries.
 
+### MCP Function Calls (when MCP is available)
+
 ```
 openmemory_openmemory_query(query="topic of current task")
 openmemory_openmemory_store(content="...", tags=["topic", "context"])
 ```
+
+### Direct HTTP API (when MCP functions aren't available)
+
+Endpoint: `POST http://localhost:8080/mcp`
+Auth: `x-api-key: dev-key-123`
+Protocol: JSON-RPC 2.0
+
+```bash
+# Query
+curl -s -X POST http://localhost:8080/mcp \
+  -H "x-api-key: dev-key-123" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"openmemory_query","arguments":{"query":"your query here"}}}'
+
+# Store
+curl -s -X POST http://localhost:8080/mcp \
+  -H "x-api-key: dev-key-123" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"openmemory_store","arguments":{"content":"What was done: ...","tags":["topic","date"],"type":"contextual"}}}'
+
+# List all memories
+curl -s -X POST http://localhost:8080/mcp \
+  -H "x-api-key: dev-key-123" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"openmemory_list","arguments":{}}}'
+```
+
+### Config
+
+- MCP config: `/root/.hermes/config/shared-mcp.json`
+- Full docs: `brain/openmemory-mcp-access.md`
+- Must be running: `curl -s http://localhost:8080/mcp` (check with `systemctl status openmemory`)
 
 ## Default Final Step: Update Memory
 
