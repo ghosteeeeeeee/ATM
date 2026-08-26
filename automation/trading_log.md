@@ -15722,3 +15722,43 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - bb_bounce+ at 12.5%WR/-$0.55 needs CEO decision to kill (CEO_PROTECTED flag).
 - slow-grind- accounts for 4/5 open positions — if market turns, could amplify losses.
+
+## [2026-08-26 18:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (0W 4L -$0.27)
+**24h:** 48T 24W 50%WR -$0.19 (near breakeven)
+
+**Key Metrics:**
+- atr_sl_hit: 26T 56.5% (slightly elevated, stable range)
+- profit-monster-trail: 15T +$0.68 (only profitable exit type)
+- 3 open positions remaining
+
+**Last Hour Detail:**
+- CHIP pump-catcher+ atr_sl_hit -$0.03
+- MERL pump-catcher+ atr_sl_hit -$0.11
+- ETC slow-grind- atr_sl_hit -$0.14
+- MET slow-grind- atr_sl_hit +$0.01
+
+**Signal Perf (24h):**
+- cascade-reverse-v2-mtf_alignment: 3T 67%WR +$0.48 — strong
+- macd-div-: 3T 100%WR +$0.21 — strong
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- slow-grind-: 10T 40%WR -$0.47 — 2nd biggest drag
+- bb_bounce+: 8T 12.5%WR -$0.55 — DEGRADED (CEO_PROTECTED)
+
+**Changes:** None needed.
+
+**Kill Criteria Check:**
+- continuation-: 3T 0%WR -$0.37 — already killed
+- bb_bounce+: 8T 12.5%WR -$0.55 — MEETS CRITERIA but CEO_PROTECTED. Flagged.
+- slow-grind-: 10T 40%WR -$0.47 — no kill threshold met
+
+**No Change Needed:**
+- Trade freq 4/hr normal.
+- atr_sl_hit 56.5% elevated but stable (trailing SL deployed).
+- No signals at 0%WR with 3+T that aren't already killed/protected.
+- System near breakeven — no regime change warranted.
+
+**Open Questions:**
+- atr_sl_hit trending 56.5% — trailing SL may need review but within normal range.
+- slow-grind- accounts for most open positions — monitor if market reverses.

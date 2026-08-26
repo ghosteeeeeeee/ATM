@@ -24,6 +24,7 @@ from signal_schema import _is_loss_cooldown_active
 from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hermes_constants import (
     SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS, HOTSET_ENABLED,
+    PUMP_CATCHER_MAX_STALENESS_MIN,
     RS_DECIDER_MIN_TOUCHES, RS_DECIDER_ZBONUS_TOUCHES, RS_DECIDER_ZBONUS_ZSCORE,
     RS_DECIDER_CONF_PENALTY, RS_DECIDER_CONF_FLOOR,
     RS_TOUCH_HARD_CAP,
@@ -1962,6 +1963,17 @@ def _run_hot_set():
                 continue
 
             if is_position_open(token) or get_position_count() >= MAX_POS:
+                continue
+
+            # ── Staleness check: skip if hotset entry is too old ──────────────────
+            # Prevents executing stale signals that sat in hotset waiting for fill.
+            # entry_origin_ts is set when the combo first enters the hotset.
+            _entry_origin = hot_sig.get('entry_origin_ts', 0)
+            _hotset_age_min = (time.time() - _entry_origin) / 60.0 if _entry_origin else 0
+            _is_pump_src = 'pump-' in (hot_sig.get('source', '') or '')
+            if _is_pump_src and _hotset_age_min > PUMP_CATCHER_MAX_STALENESS_MIN:
+                log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED — pump signal stale ({_hotset_age_min:.1f}min > {PUMP_CATCHER_MAX_STALENESS_MIN}min)')
+                _record_hotset_failure(token, direction, failures)
                 continue
 
             # Check: is this token+direction already APPROVED (don't double-approve)?

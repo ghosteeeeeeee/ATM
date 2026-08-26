@@ -821,9 +821,10 @@ BTC_ACCEL_BLOCK_DURATION = 5            # minutes to block entries after trigger
 # Layer 5: Position protection (ATR-aware MAE guard)
 # NOTE: CL_MAE_GUARD_ENABLED is defined below with the legacy MAE guard constants.
 # CL_MAE_GUARD_BASE_THRESHOLD scales with ATR (replaces fixed CL_MAE_GUARD_THRESHOLD).
-CL_MAE_GUARD_BASE_THRESHOLD = 0.020     # 2.0% base — scales with ATR (conservative start, was 2.5%)
-                                         # RAISED from 2.5% to 2.0% 2026-08-23 — tighter crash protection
-                                         # If profitable after 7d, consider tightening to 1.5%.
+CL_MAE_GUARD_BASE_THRESHOLD = 0.030     # 3.0% base — scales with ATR (widened from 2.0%)
+                                         # UPDATED 2026-08-26 — atr-sl-widen backtest showed:
+                                         # 1.5% = -$5.43/wk, 2.0% = -$2.82/wk, 3.0% = -$2.69/wk
+                                         # Only catches true crashes (WLFI/MET/BIGTIME). Monitor 7d.
 CL_MAE_GUARD_BTC_CRASH_MULTIPLIER = 0.6 # Tighten threshold by 40% when BTC is crashing (cut faster)
 
 # Layer 6: Multi-Alt Divergence (cascade early warning)
@@ -995,16 +996,22 @@ PM_DRY_RUN          = False  # global kill switch
 PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB amount_usdt unavailable
 # Signals bypassed by profit_monster — these trades get regular ATR SL/TP only.
 # Matches any signal containing the prefix (e.g. 'atr-spike+,rs-s36' matches 'atr-spike').
+# Also used by cut_loser.py to EXCLUDE signals from loss cutting.
+# UPDATED 2026-08-26: Removed ct-hot+/ct-hot- (losing signals, PM Trail should help).
+# Added bb_bounce+/confluence (proven signals, shouldn't have PM Trail interference).
 PROFIT_MONSTER_BYPASS_SIGNALS = (
-    'atr-spike', 'r2-trend-long', 'ct-hot+', 'ct-hot-',
-    'hl_copy_trader',  # copy trader exit correlation — handled by hl_fill_monitor
-    'hzscore',  # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
-    'bb_bounce+',   # 71.9% WR, +0.89% avg — proven, ride ATR SL not PM Trail
-    'confluence',   # meta-signal, proven — persistence + compounding validation
+    'atr-spike',           # proven momentum breakout
+    'r2-trend-long',       # proven trend signal
+    'hl_copy_trader',      # copy trader exit correlation — handled by hl_fill_monitor
+    'hzscore',             # CEO: bypass profit_monster trail — hzscore trades get regular ATR SL/TP only
+    'bb_bounce+',          # 71.9% WR, +0.89% avg — proven, ride ATR SL not PM Trail
+    'confluence',          # meta-signal, proven — persistence + compounding validation
     'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
-    'slow-grind',  # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
+    'slow-grind',          # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
+    # REMOVED: 'ct-hot+', 'ct-hot-' — losing signals (37% WR, -1.26% avg).
+    # PM Trail + cut_loser should manage these for quick profit/loss exits.
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
@@ -1046,9 +1053,9 @@ CL_TRAIL_FIRE_WINDOWS   = {"A": (0.5, 1), "B": (1, 2)}
 # If price drops more than MAE_GUARD_THRESHOLD from highest_price, cut immediately.
 # Catches mass crashes (WLFI -41%, MET -21%, ETH -13%) before ATR SL triggers.
 # Runs BEFORE tiers — highest priority.
-CL_MAE_GUARD_ENABLED    = True   # RE-ENABLED 2026-08-23 — ATR-aware version scales dynamically
-                                 # Conservative 2.0% base. Monitor 7d: if net positive, tighten to 1.5%.
-CL_MAE_GUARD_THRESHOLD  = 0.020  # 2.0% — legacy fallback (must match BASE_THRESHOLD for ATR-aware code)
+CL_MAE_GUARD_ENABLED    = True   # RE-ENABLED 2026-08-23, widened 2026-08-26 to 3.0%
+                                 # ATR-aware version scales dynamically. Only catches true crashes.
+CL_MAE_GUARD_THRESHOLD  = 0.030  # 3.0% — legacy fallback (must match BASE_THRESHOLD for ATR-aware code)
 # Legacy constants (keep for backward compat / guardian)
 LOSS_MIN_PCT           = -3.0   # deprecated → use CL_TIER2_MIN_PCT
 LOSS_MAX_PCT           = -0.5   # deprecated → use CL_TIER1_MAX_PCT
@@ -1624,6 +1631,7 @@ PUMP_CATCHER_CONFIDENCE_CAP  = 88    # max confidence
 PUMP_CATCHER_COOLDOWN_BARS  = 10     # bars between signals per token (~10 min on 1m)
 PUMP_CATCHER_MAX_POSITIONS  = 3      # max concurrent pump-catcher positions
 PUMP_CATCHER_MIN_PRICE_ROWS = 30     # minimum 1m bars for EMA/RSI computation
+PUMP_CATCHER_MAX_STALENESS_MIN = 5   # max minutes hotset entry can be old before blocking execution
 
 # DEPRECATED — zscore_pump_hunter.py is disabled.
 # Pipeline-integrated version is signals/zscore_pump.py (uses tpsl_utils via signal_compactor).

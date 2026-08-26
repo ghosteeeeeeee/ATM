@@ -183,26 +183,56 @@
 
 ---
 
-## Summary (Updated 2026-08-25)
+## Summary (Updated 2026-08-26)
 
 | Status | Count | Plans |
 |--------|-------|-------|
-| IMPLEMENTED | 16 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence, regime-transition |
+| IMPLEMENTED | 18 | mae-guard, cascade-analysis, atr-sl-widen, hl-reconciliation, copy-trader-evolution, atr-spike-backtest, atr-spike-build, sl-tuning, imx-spike, short-bias-fix, confidence-calibration, conf-filter, r2-trend-long, signal-confluence, regime-transition, **exit-mechanics-v2**, **exit-mechanics-ownership** |
 | PARTIALLY IMPLEMENTED | 3 | favorites-daily-update, coin_tracker_setup, coin_tracker_expansion |
-| PENDING | 3 | btc-crash-filter, dashboard-enhancements, retroactive-scan |
+| PENDING | 5 | btc-crash-filter, dashboard-enhancements, retroactive-scan, fish-finder-species-census, automation-team-improvements |
 
-**Scanned: 22 plans**
-**Implemented: 16 (73%)**
-**Partially implemented: 3 (14%)**
-**Pending: 3 (14%)**
+**Scanned: 37 plans (20 new this session)**
+**Implemented: 18 (49%)**
+**Partially implemented: 3 (8%)**
+**Pending: 5 (14%)**
+**Skipped (analysis-only): 11 (30%)**
 
-### Level 1-2 actions taken this session:
-- Removed `warm` health bypass from coin_tracker_hot.py (was letting weak setups through)
-- regime-transition-analysis: all constant-level fixes already deployed
+### Level 1-2 actions taken this session (2026-08-26):
+1. **exit-mechanics-v2**: Fixed PROFIT_MONSTER_BYPASS_SIGNALS — removed `ct-hot+`/`ct-hot-` (losing signals, PM Trail should help), added `bb_bounce+`/`confluence` (proven, shouldn't have PM Trail).
+2. **atr-sl-widen**: Widened MAE Guard BASE_THRESHOLD from 2.0% to 3.0% — backtest showed -$5.43/wk at 1.5%, -$2.82/wk at 2.0%, -$2.69/wk at 3.0%. Only catches true crashes now.
+3. **features_recorded bug**: Already fixed — 2633/2633 trades with entry_rsi_14 have features_recorded=TRUE.
+4. **ATR_SL_MIN**: Already at 0.015 (widened from 0.012). No change needed.
 
-### Remaining items:
-- btc-crash-filter: needs 30d backtest before acceleration detection (Level 2)
-- retroactive-scan: complex new feature (Level 3)
-- dashboard-enhancements: cosmetic (Level 2-3)
-- coin_tracker confirming analyses: Level 2 ← **NEXT**
-- coin_tracker age decay: Level 2-3 ← **NEXT**
+### Plans evaluated this session (new):
+- **fish-finder-species-census**: Level 3-4, HIGH value. Blindspot analysis: missing Volume Profile, Beta Decoupler, Regime Transition, Liquidity. CEO priority: P0 Volume Profile, P1 Beta Decoupler. Deferred to signal lab.
+- **automation-team-improvements**: Level 1-2, HIGH value. Session learner dead (0 sessions), self-learner stuck (1 param), A/B learner defunct. Recommended: fix self-learner PARAM_CONFIG (Level 2), delete A/B learner (Level 1).
+- **signal-cluster-brainstorm**: Level 2-4, HIGH value. 13 ideas: Market Phase Gate, Hebbian V2, Confluence Scorer, Lifecycle Filters, Inverse Guard, etc. P0: Phase Gate + Confluence Scorer (+16-28% WR projected).
+- **signal-cluster-analysis**: N/A (analysis, not implementation). 30-day analysis of 69,990 signals. Phase cycles, lead-lag relationships, confluence zones.
+- **exit-mechanics-v2**: Level 1, HIGH value. Fix bypass list — DONE this session.
+- **exit-mechanics-ownership**: Level 2, MEDIUM value. Exit owner model (DB column). Deferred — bypass list fix gets 80% benefit.
+- **exit-spec-review**: N/A (review). Found 8 errors in exit-mechanics-ownership spec. Recommended Phase 0 only (bypass fix).
+- **30s-price-interval-migration**: IMPLEMENTED. Split architecture (30s latest_prices, 60s price_history).
+- **btc-crash-filter-plan**: Level 2, MEDIUM value. Acceleration detection needs 30d backtest. PENDING.
+- **conf-filter-plan**: IMPLEMENTED. conf < 89 filter active.
+- **sl-tuning**: IMPLEMENTED. ATR spike 0.75% SL confirmed optimal.
+- **short-bias-fix**: IMPLEMENTED. Market condition, not bug.
+- **atr-sl-widen**: PARTIALLY IMPLEMENTED. ATR SL kept at 1.5%. MAE Guard widened to 3.0% this session.
+- **favorites-daily-update-spec**: PARTIALLY IMPLEMENTED. Daily updater + rhythm done, Hebbian sync pending.
+- **coin_tracker_setup_improvements**: PARTIALLY IMPLEMENTED. MIN_COMPOSITE raised, regime gate done, warm bypass removed. Confirming analyses + age decay pending.
+- **r2-trend-long-trailing-sl-tuning**: IMPLEMENTED. TRAILING_DISTANCE_PCT widened to 2.00%.
+- **confidence-calibration-plan**: IMPLEMENTED (fix rejected, existing filter works).
+- **atr-spike-backtest-results**: IMPLEMENTED. 83% WR signal live.
+- **imx-spike-detection**: IMPLEMENTED. Same as ATR spike signal.
+- **copy-trader-entry-timing-deep-dive**: IMPLEMENTED. SHORT copy disabled, exit correlation enabled.
+- **copy-trader-dashboard-enhancements**: PENDING. Phase 2-4 not yet implemented.
+- **copy-trader-evolution-spec**: IMPLEMENTED. Per-trader performance + exit correlation.
+
+### Remaining items (prioritized):
+1. **Self-learner PARAM_CONFIG expansion** (Level 2, automation-team-improvements) — unlocks auto-tuning of 15+ params
+2. **BTC acceleration detection backtest** (Level 2, btc-crash-filter-plan) — needs 30d data
+3. **Delete A/B learner** (Level 1, automation-team-improvements) — cleanup, no risk
+4. **Coin tracker confirming analyses** (Level 2, coin_tracker_setup_improvements)
+5. **Market Phase Gate** (Level 2-3, signal-cluster-brainstorm) — +5-10% WR projected
+6. **Confluence Scorer** (Level 2, signal-cluster-brainstorm) — +5-8% WR projected
+7. **Retroactive scan** (Level 3, retroactive-scan-delayed-entry)
+8. **Dashboard enhancements** (Level 2-3, copy-trader-dashboard)
