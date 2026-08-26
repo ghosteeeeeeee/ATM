@@ -293,3 +293,7 @@
   WHY: 4T last hour (0W 4L -$0.27). All atr_sl_hit. 48T 24h 50%WR -$0.19. atr_sl_hit 56.5% stable. bb_bounce+ 8T/12.5%WR/-$0.55 MEETS KILL CRITERIA but CEO_PROTECTED. slow-grind- 10T/40%WR/-$0.47 no kill criteria. 3 open positions. continuation-/hl_copy_trader already killed. Kill criteria not triggered. Trade freq 4/hr normal.
   BY: auto_1hr
   NEXT: Re-run at 19:10 UTC
+[2026-08-26 19:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (0W 2L -$0.27). Both atr_sl_hit. 50T 24h 50%WR -$0.19. atr_sl_hit 56% stable. slow-grind- biggest drag (11T/36.4%WR/-$0.62) but not at kill criteria (needs 0%WR). pump-catcher+ 6T/33.3%WR/-$0.27. continuation-/bb_bounce+ already killed/protected. No other signals at kill threshold. Trade freq 2/hr normal. 4 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 20:10 UTC

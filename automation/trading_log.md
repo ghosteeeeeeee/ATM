@@ -15797,3 +15797,20 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 2. Investigate why all signals scoring 0 confidence (NEUTRAL regime + filters blocking)
 3. Monitor lifecycle filter impact (48h eval ending ~Aug 28)
 4. ct-hot+ ages out Aug 27 — system should improve after drain
+
+## [2026-08-26 19:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.27 (WR: 0%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: slow-grind- (36.4% WR), pump-catcher+ (33.3% WR) both above 0% threshold
+- atr_sl_hit 56% of 24h closes — elevated but trailing SL deployed, stable from prior hours
+- Trade freq 2/hr normal
+- 4 open positions, system near breakeven (-$0.19/24h)
+
+**Open Questions:**
+- slow-grind- continues to be largest drag (-$0.62, 11T) but doesn't meet kill criteria
+- Signal starvation ongoing — all signals scoring 0 confidence in NEUTRAL regime
