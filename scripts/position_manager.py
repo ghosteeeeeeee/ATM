@@ -2363,6 +2363,13 @@ def refresh_current_prices(server: str = SERVER_NAME):
                     existing_high = entry  # SHORT: start tracking from entry
                 if existing_low <= 0 and direction == "LONG":
                     existing_low = entry   # LONG: start tracking from entry
+                # FIX (2026-08-26): Initialize missing peaks to current_price
+                # SHORT needs lowest_price (nadir) for trailing — without it, SL anchors to current
+                # LONG needs highest_price (peak) for trailing — without it, SL anchors to current
+                if existing_low <= 0 and direction == "SHORT":
+                    existing_low = cur_price  # SHORT: start tracking lowest from current
+                if existing_high <= 0 and direction == "LONG":
+                    existing_high = cur_price  # LONG: start tracking highest from current
 
                 if direction == "SHORT":
                     new_high = max(existing_high, cur_price)
