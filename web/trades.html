@@ -117,9 +117,10 @@
 
   <!-- Hot Set Section -->
   <div class="hot-section" id="hotSection">
-    <div class="hot-header">
+    <div class="hot-header" style="cursor:pointer;user-select:none" onclick="toggleHot()">
       <span class="fish">🎣</span>
       Hot Set — survived AI compaction rounds
+      <span id="hotToggle" style="font-size:0.7em;color:#666;margin-left:8px">▼</span>
     </div>
     <div id="hotTableContainer">
       <div class="hot-empty" id="hotEmpty">No hot signals yet — run a few compaction cycles first</div>
@@ -546,6 +547,14 @@
       renderPagination();
       renderClosedPage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    let hotHidden = false;
+    function toggleHot() {
+      hotHidden = !hotHidden;
+      document.getElementById('hotTableContainer').style.display = hotHidden ? 'none' : '';
+      document.getElementById('hotEmpty').style.display = hotHidden ? 'none' : (hotSet.length === 0 ? 'block' : 'none');
+      document.getElementById('hotToggle').textContent = hotHidden ? '▶' : '▼';
     }
 
     load();
