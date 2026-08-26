@@ -1448,7 +1448,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'macd-div',  # MACD divergence — counter-trend, works solo
     'slow-grind',  # slow grinding downtrend — works solo in low-volatility markets
     'confluence',  # meta-signal — validates persistence + compounding of first-order signals
-    'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
+    'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — fires on explosive moves, standalone
 )
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
