@@ -21,7 +21,7 @@ from hermes_constants import (
     MTF_MOMENTUM_ENABLED, MTF_MOMENTUM_PLUS_ENABLED, MTF_MOMENTUM_MINUS_ENABLED,
     PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
     FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
-    ACCEL_300_ENABLED, INVERSE_ACCEL_300_ENABLED,
+    ACCEL_300_ENABLED, INVERSE_ACCEL_300_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
     EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
     RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
     MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
@@ -148,6 +148,11 @@ try:
     from signals.inverse_accel_300 import scan_inverse_accel_300_signals as _inverse_accel_300_run
 except Exception:
     _inverse_accel_300_run = None
+
+try:
+    from signals.inverse_accel_300_v2 import scan_inverse_accel_300_v2_signals as _inverse_accel_300_v2_run
+except Exception:
+    _inverse_accel_300_v2_run = None
 
 try:
     from signals.ma_100_cross import run as _ma_100_cross_run
@@ -439,6 +444,7 @@ SIGNAL_REGISTRY: list[dict] = [
     # These use their *_ENABLED boolean directly
     {'name': 'accel_300',            'enabled': ACCEL_300_ENABLED,           'run': _accel_300_run},
     {'name': 'inverse_accel_300',    'enabled': INVERSE_ACCEL_300_ENABLED,   'run': _inverse_accel_300_run},
+    {'name': 'inverse_accel_300_v2', 'enabled': INVERSE_ACCEL_300_V2_ENABLED, 'run': _inverse_accel_300_v2_run},
     {'name': 'ema_angle',            'enabled': EMA_ANGLE_ENABLED,            'run': _ema_angle_run},
     {'name': 'rs',                   'enabled': RS_ENABLED,                   'run': _rs_run},
     {'name': 'gap_300',              'enabled': GAP_300_ENABLED,             'run': _gap_300_run},
@@ -589,6 +595,7 @@ def run_all_signals(signal_list=None):
         'hzscore': 'run', 'hmacd': 'run',
         'phase_accel': 'run', 'fast_momentum': 'run',
         'accel_300': 'scan_accel_300_signals', 'inverse_accel_300': 'scan_inverse_accel_300_signals',
+        'inverse_accel_300_v2': 'scan_inverse_accel_300_v2_signals',
         'ema_angle': 'scan_ema_angle_signals',
         'rs': 'scan_rs_signals',
         'ma_cross': 'scan_ma_cross_signals', 'ma_cross_5m': 'scan_ma_cross_5m_signals',

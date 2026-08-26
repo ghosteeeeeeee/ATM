@@ -308,6 +308,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     # inv_accel_300: suppress so accel_300 SHORT wins when both fire for same token
     ('inverse_accel_300_long',  'inv-accel-300+'):  0.7,  # LONG: lower priority than accel-300 SHORT
     ('inverse_accel_300_short', 'inv-accel-300-'):  0.6,  # SHORT: 31% WR, -$0.27 (7d) — suppressed
+    # inv_accel_300_v2: SHORT-only mean reversion (2026-08-26)
+    ('inverse_accel_300_v2_short', 'inv-accel-300-v2-'): 0.9,  # V2 SHORT: new improved signal
     # hh_hl_choch: Change of Character — structure flip signals (HH_HL↔LH_LL)
     # Higher weight than breakout/pullback — CHoCH is a stronger reversal signal
     ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
@@ -856,19 +858,20 @@ def _score_signal(token, direction, conf, source, signal_type,
             lifecycle_mult = combined_mult  # V2's combined output
         except Exception:
             # Fallback to separate multipliers
+            family = None
             if _PHASE_GATE_ENABLED:
                 try:
                     family = _signal_family(signal_type)
                     phase_mult = get_phase_mult(family)
                 except Exception:
                     phase_mult = 1.0
-                try:
-                    from market_phase_gate import inverse_penalty, detect_phase as _detect_phase
-                    _phase_info = _detect_phase()
-                    _dom_fams = _phase_info.get('dominant_families', [])
-                    inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
-                except Exception:
-                    inverse_mult = 1.0
+                if family:
+                    try:
+                        _phase_info = detect_phase()
+                        _dom_fams = _phase_info.get('dominant_families', [])
+                        inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
+                    except Exception:
+                        inverse_mult = 1.0
             if _LIFECYCLE_ENABLED:
                 try:
                     lifecycle_mult = _get_lifecycle_mult(signal_type)
@@ -876,19 +879,20 @@ def _score_signal(token, direction, conf, source, signal_type,
                     lifecycle_mult = 1.0
     else:
         # Original separate multipliers (fallback)
+        family = None
         if _PHASE_GATE_ENABLED:
             try:
                 family = _signal_family(signal_type)
                 phase_mult = get_phase_mult(family)
             except Exception:
                 phase_mult = 1.0
-            try:
-                from market_phase_gate import inverse_penalty, detect_phase as _detect_phase
-                _phase_info = _detect_phase()
-                _dom_fams = _phase_info.get('dominant_families', [])
-                inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
-            except Exception:
-                inverse_mult = 1.0
+            if family:
+                try:
+                    _phase_info = detect_phase()
+                    _dom_fams = _phase_info.get('dominant_families', [])
+                    inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
+                except Exception:
+                    inverse_mult = 1.0
         if _LIFECYCLE_ENABLED:
             try:
                 lifecycle_mult = _get_lifecycle_mult(signal_type)

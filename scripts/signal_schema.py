@@ -968,6 +968,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # inv-accel-300-v2 (V2 mean reversion SHORT)
+            if _comp in ('inv-accel-300-v2-', 'inv-accel-300-v2'):
+                try:
+                    from hermes_constants import INVERSE_ACCEL_300_V2_ENABLED
+                    if not INVERSE_ACCEL_300_V2_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" INVERSE_ACCEL_300_V2_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # accel-300-breakout (ultra-fast breakout)
             if _comp == 'accel-300-breakout':
                 try:
@@ -2277,6 +2286,9 @@ def is_component_disabled(component: str) -> bool:
     if c in ('inverse-accel-300+', 'inv-accel-300+'): return not INVERSE_ACCEL_300_PLUS_ENABLED
     if c in ('inverse-accel-300-', 'inv-accel-300-'): return not INVERSE_ACCEL_300_MINUS_ENABLED
     if c in ('inverse-accel-300', 'inv-accel-300'): return not INVERSE_ACCEL_300_ENABLED
+    # inverse-accel-300-v2
+    if c in ('inverse-accel-300-v2-', 'inv-accel-300-v2-'): return not INVERSE_ACCEL_300_V2_ENABLED
+    if c in ('inverse-accel-300-v2', 'inv-accel-300-v2'): return not INVERSE_ACCEL_300_V2_ENABLED
     # squeeze-cross
     if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
     if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED

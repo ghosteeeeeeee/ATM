@@ -45,7 +45,7 @@ REGIME_SIGNAL_AFFINITY = {
         'penalize': ['inv_accel_300', 'exhaustion', 'counter_flip'],
     },
     'SHORT_BIAS': {
-        'boost': ['inv_accel_300', 'exhaustion', 'counter_flip', 'tl_break',
+        'boost': ['inv_accel_300', 'inv_accel_300_v2', 'exhaustion', 'counter_flip', 'tl_break',
                   'pct_hermes', 'vel_hermes', 'hzscore'],
         'penalize': ['accel_300', 'momentum', 'fast_momentum', 'gap_300', 'phase_accel'],
     },

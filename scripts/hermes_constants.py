@@ -1341,6 +1341,7 @@ ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
+INVERSE_ACCEL_300_V2_ENABLED   = True    # V2 SHORT-only mean reversion — 2026-08-26. Catches exhausted prices far above EMA300.
 COUNTER_FLIP_PLUS_ENABLED     = True    # counter_flip+ LONG
 COUNTER_FLIP_MINUS_ENABLED    = True    # counter_flip- SHORT
 HMACD_MTF_PLUS_ENABLED        = True    # hmacd_mtf+ LONG

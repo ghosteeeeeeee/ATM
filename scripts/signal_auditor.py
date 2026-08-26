@@ -135,6 +135,7 @@ def map_signal_to_flag(signal_type):
     exact_overrides = {
         'accel_300_vel': 'ACCEL_300_VELOCITY',
         'inv_accel_300': 'INVERSE_ACCEL_300',
+        'inv_accel_300_v2': 'INVERSE_ACCEL_300_V2',
         'tl_break_long': 'TL_BREAK_PLUS',   # long → plus
         'tl_break_short': 'TL_BREAK_MINUS',  # short → minus
         'ema9_sma20': 'EMA9_SMA20',
