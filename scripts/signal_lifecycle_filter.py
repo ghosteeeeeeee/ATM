@@ -85,8 +85,8 @@ SIGNAL_LIFECYCLE = {
     'stop_hunt_reversal_long': 'lagging',
     'liquidation_hunt_long': 'lagging',
     'liquidation_hunt_short': 'lagging',
-    'bb_bounce': 'lagging',         # mean reversion after move
-    'bb_bounce_short': 'lagging',   # mean reversion after move
+    'bb_bounce': 'concurrent',      # fires DURING bounce, not after — lagging SL was killing it
+    'bb_bounce_short': 'concurrent',  # same — normal SL needed
     'macd_divergence_long': 'lagging',
     'macd_divergence_short': 'lagging',
     'slow_grind_short': 'lagging',
