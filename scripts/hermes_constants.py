@@ -1323,6 +1323,7 @@ SLOW_GRIND_SHORT_RSI_MAX = 45      # max RSI — don't short when momentum fadin
 SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.2  # min % separation below EMA20 (was 0.1, require stronger bearish alignment)
 SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT = 0.15  # max % price can rise from 10-bar low before entry (block chasing)
 SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL = True  # require 5m velocity negative (don't short into strength)
+SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT = 1.0  # max % decline from 60-bar high (block shorting bottoms — GRAM was -2.38%)
 SLOW_GRIND_SHORT_CONF_BASE = 65    # base confidence
 SLOW_GRIND_SHORT_CONF_CAP = 88     # max confidence (system ceiling)
 SLOW_GRIND_SHORT_COOLDOWN_HOURS = 3  # per token cooldown

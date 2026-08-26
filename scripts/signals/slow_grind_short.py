@@ -52,6 +52,7 @@ from hermes_constants import (
     SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY,
     SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT,
     SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL,
+    SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT,
     SHORT_BLACKLIST,
 )
 
@@ -279,6 +280,16 @@ def detect_slow_grind_short(token):
         vel_5m = (closes_1m[-1] - closes_1m[-6]) / closes_1m[-6] * 100
         if vel_5m > 0:
             return None  # price rising on 5m — don't short into strength
+
+    # ── Decline From High Filter ───────────────────────────────────────
+    # Block if price has already declined too much from recent high (shorting bottoms)
+    # GRAM trade: entry at -2.38% from high — trend was exhausted
+    if len(closes_1m) >= 60:
+        recent_high = max(closes_1m[-60:])
+        if recent_high > 0:
+            decline_from_high_pct = (recent_high - closes_1m[-1]) / recent_high * 100
+            if decline_from_high_pct > SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT:
+                return None  # price already declined too much — don't short the bottom
 
     # ── Confidence Scoring ─────────────────────────────────────────────
     conf = SLOW_GRIND_SHORT_CONF_BASE
