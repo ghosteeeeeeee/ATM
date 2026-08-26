@@ -301,3 +301,7 @@
   WHY: 2T last hour (0W 2L -$0.27). Both atr_sl_hit. 50T 24h 50%WR -$0.19. atr_sl_hit 56% stable. slow-grind- biggest drag (11T/36.4%WR/-$0.62) but not at kill criteria (needs 0%WR). pump-catcher+ 6T/33.3%WR/-$0.27. continuation-/bb_bounce+ already killed/protected. No other signals at kill threshold. Trade freq 2/hr normal. 4 open positions.
   BY: auto_1hr
   NEXT: Re-run at 20:10 UTC
+[2026-08-26 20:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -/usr/bin/bash.10). HBAR r2-trend-short3 profit-monster-trail +/usr/bin/bash.05, ALT cascade-reverse-v2 atr_sl_hit -/usr/bin/bash.14, ENS macd-div- cascade_flip -/usr/bin/bash.01. 53T 24h 50%WR -/usr/bin/bash.22. atr_sl_hit 53.7% stable. slow-grind- 11T/36.4%WR/-/usr/bin/bash.62 biggest drag but no kill criteria (36.4%WR > 0%). pump-catcher+ 7T/28.6%WR/-/usr/bin/bash.41. bb_bounce+ 8T/12.5%WR/-/usr/bin/bash.69 CEO_PROTECTED. continuation-/hl_copy_trader already killed. 6 consecutive negative hours but losses shrinking (recovering trend). 4 open positions. Trade freq 3/hr normal. Kill criteria not triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 21:10 UTC

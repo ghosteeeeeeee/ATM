@@ -1394,15 +1394,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # If no co-signal within 5 min → staleness=0 → EXPIRED.
             pass_gate = False
             gate_msg = ''
-            # NEUTRAL regime relaxation: when market is flat (102/104 NEUTRAL),
-            # single-type signals can't find co-signals. Allow them through.
+            # Regime detection: use 4h for confluence decisions (1m too noisy)
             _regime, _regime_conf = get_regime_1m(token)
-            _neutral_relax = CONFLUENCE_NEUTRAL_RELAX and _regime == 'NEUTRAL'
+            _regime_4h, _ = get_regime_4h(token)
+            # NEUTRAL regime relaxation: when market is flat (4h NEUTRAL),
+            # single-type signals can't find co-signals. Allow them through.
+            # FIX (CEO Aug 26): Use 4h regime instead of 1m — 1m shows LONG_BIAS
+            # when 4h is NEUTRAL, preventing relax from firing.
+            _neutral_relax = CONFLUENCE_NEUTRAL_RELAX and _regime_4h == 'NEUTRAL'
             # SHORT-in-NEUTRAL block: use 4h regime
             # FIX (2026-08-23): Allow SHORT when 1m shows SHORT_BIAS
             # FIX (2026-08-24): Also allow SHORT when confluence is strong (2+ types)
             # or source is standalone bypass — NEUTRAL market doesn't mean no SHORT edge
-            _regime_4h, _ = get_regime_4h(token)
             if SHORT_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'SHORT' and _regime_4h == 'NEUTRAL':
                 if _regime == 'SHORT_BIAS':
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but 1m SHORT_BIAS, allowed")
