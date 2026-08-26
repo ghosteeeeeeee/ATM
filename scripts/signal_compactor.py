@@ -1246,6 +1246,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # These combos have poor WR or negative PnL in 7d data.
             has_range_finder = any(p.startswith('range_finder') for p in source_parts)
             has_range_breakout = any(p.startswith('range_breakout') for p in source_parts)
+            has_continuation_neg = 'continuation-' in source_parts
             has_rs = any(p.startswith('rs-') for p in source_parts)
 
             # BLOCK: range_finder+/rs-* — weak RS confirmation with range finder
@@ -1260,9 +1261,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 log(f"  🛡️  [WEAK-COMBO] {token} {direction}: range_breakout++rs-* blocked (weak RS confirmation)")
                 continue
 
-            # NOTE: continuation- standalone block REMOVED 2026-08-25
-            # V2 continuation.py has exhaustion detection — continuation-
-            # standalone may now be a valid exhaustion fade, not just noise.
+            # BLOCK: continuation- standalone — 3/3 standalone continuation- trades lost
+            # V2 pre-entry filters catch most, but this is defense-in-depth
+            if has_continuation_neg and len(source_parts) == 1:
+                log(f"  🛡️  [WEAK-COMBO] {token} {direction}: continuation- standalone blocked")
+                continue
 
             # ── CONFLUENCE: collapse same-type multi-level sources (e.g. rs-s386,rs-s406) ─
             # Different bars_since values for the SAME signal type are NOT real confluence.
