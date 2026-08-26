@@ -239,3 +239,8 @@
   WHY: 3T last hour (0W 3L -/usr/bin/bash.10). All atr_sl_hit — BLUR/WLFI bb_bounce+ losses, ETH hl_copy_trader SHORT profit. 39T 24h 35.9% WR -.85. atr_sl_hit 26T (66.7%) dominant -.65. Previous 'improvement' narrative WRONG — 0-4h bucket back to 80% SL hit rate. ATR_SL_MIN 1.2% not helping. Widening to 1.5% was proven worse. bb_bounce+ degraded 53.3%→43.8% WR in one hour (2 new losses). 2T last hour, not 3+ — kill criteria not met. cascade-reverse-v2 2 open positions, no closed trades yet. All entry filters recently tightened (SPEED_MIN=40, CONFIDENCE=88, VEL_THRESHOLD=0.15). Trade freq 3/hr normal. System stable but losing. Next hour: if bb_bounce+ has 1+ more loss → kill.
   BY: auto_1hr
   NEXT: Re-run at 22:20 UTC
+
+[2026-08-26 00:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (1W +$0.03). 24h 34T 15W 44.1% -$1.16 net negative but improving since hl_copy_trader kill. hl_copy_trader still 11T/27%WR/-$0.86 in 24h window (legacy, signal killed 20:10 UTC). bb_bounce+ degraded 42.9%WR but -$0.031/trade marginal, not fatal. atr_sl_hit 64.7% driven by hl_copy_trader (10/22 losses). Post-kill this normalizes. Trade freq 1.2/hr normal. Consecutive neg hours (19-21 UTC) broken. No kill criteria triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 01:10 UTC

@@ -15276,3 +15276,43 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 - ATR SL hit rate oscillating 53-100% across time buckets. High-volatility choppy regime punishing mean-reversion entries.
 - bb_bounce+ WR degraded from 53.3% → 42.9% over last 2 hours. Monitoring — if next trades are losses, may need to kill.
 - Trade frequency very low (0/hr) — regime may be transitioning. Will watch next hour for activity.
+
+---
+
+## [2026-08-26 00:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (1W 0L +$0.03). 5 in last 6h (2W 3L -$0.23).
+**24h:** 34T 15W 44.1% -$1.16 (net negative)
+**Open:** Watching — orphaned hl_copy_trader positions mostly unwound.
+
+**24h Close Reasons:**
+- atr_sl_hit: 22T 64.7% of closes (threshold: 40%) — hl_copy_trader legacy (10T, 27%WR, -$0.83) is the #1 driver. Kill at 20:10 UTC removes this going forward.
+- profit-monster-trail: 6T +$0.35 — only profitable exit
+- cut-loser-MAE-GUARD: 2T -$0.30
+- cascade_flip: 3T -$0.14
+- cut-loser-CL-T1: 1T -$0.14
+- guardian_orphan: 1T -$0.01
+
+**Signal Performance (24h):**
+- hl_copy_trader: 11T 3W 27.3% -$0.86 — KILLED last hour, legacy trades unwinding. atr_sl_hit dominant (9T). 11 of 22 atr_sl_hit losses are hl_copy_trader.
+- bb_bounce+: 14T 6W 42.9% -$0.43 — degraded (was 89% Aug 24, now 43% Aug 25). -$0.031/trade. Not fatal yet.
+- All others: <2T each, noise.
+
+**Hourly PnL (last 6h):**
+- 19:00: -$0.14 | 20:00: -$0.12 | 21:00: -$0.26 | 22:00: +$0.16 | 00:00: +$0.03
+- 3 consecutive negative hours (19-21 UTC) already broken. System stabilizing.
+
+**Market Regime:** NEUTRAL dominant — reduced edge for directional signals.
+
+**Changes:** None.
+
+**No Change Needed:**
+- hl_copy_trader kill confirmed. Legacy trades still in 24h stats but signal disabled. Will age out of window.
+- atr_sl_hit at 64.7%: 10/22 losses are hl_copy_trader. Post-kill, this should drop to ~55% (12 remaining). Normal range.
+- bb_bounce+ degradation: 42.9% WR but -$0.031/trade is marginal, not fatal. Monitor tomorrow. Kill threshold: <40% WR with 3+ trades in a day.
+- Trade frequency: ~1.2/hr normal. No overtrading.
+- Consecutive neg hours broken. No action needed.
+
+**Open Questions:**
+- bb_bounce+ regime sensitivity: If still <50% WR tomorrow (Aug 26), investigate if NEUTRAL regime is causing bounce trades to fail on continuation.
+- hl_copy_trader orphaned positions: Should be fully unwound by now. Verify tomorrow.
