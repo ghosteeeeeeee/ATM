@@ -468,6 +468,37 @@
 ---
 
 *Format: `## YYYY-MM-DD | Short title` — append new decisions to the top, above this line.*
+
+## 2026-08-26 | bb_bounce Execution-Time Staleness Gate
+
+**Decision:** APPROVE execution-time velocity check + price drift check. DEFER momentum filter.
+
+**Why:**
+- 5 losing bb_bounce+ trades (CRV, IO, SYRUP, CFX + ARAR not in DB) all share "falling knife" pattern
+- Root cause: velocity gate fires at detection time, not execution time. Signals sit 17+ minutes in hotset while market deteriorates.
+- Velocity data source fix already completed (candles_1m instead of stale price_history)
+- Momentum > -0.005 filter improves WR 57.2% → 78.9% but kills 16 winners (needs more analysis)
+- Combined filter too aggressive (only 14 trades survive)
+
+**What to implement:**
+1. Execution-time velocity check in `decider_run.py` — re-check 15m velocity before placing trade, skip if vel_15m < -0.3%
+2. Price drift check in `decider_run.py` — skip if price moved >0.25% since signal (uses existing SIGNAL_STALENESS_PRICE_PCT)
+3. Monitor first week closely after deployment
+
+**What to defer:**
+- Momentum > -0.005 filter — kills 16 winners, needs analysis on which winners are acceptable to lose
+- Signal staleness limit — lower priority, can add later if needed
+
+**Backtest:**
+- Execution-time velocity check: catches CRV (-0.658%), IO (-0.573%), SYRUP (-0.238%), CFX (-0.392%)
+- Price drift check: catches CFX (0.71% > 0.25%)
+- Net impact: ~4 losers killed, minimal winner damage
+
+**Risk:** MEDIUM — new filters at execution time. Monitor WR and skip rate first week.
+
+**Revisit:** 2026-09-02 (1 week after deployment)
+
+**Owner:** CEO
 ## 2026-08-26: Split Architecture for 30s Price Collector
 
 **Decision:** Option A — Split architecture (CEO approved)
