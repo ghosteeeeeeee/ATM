@@ -1970,7 +1970,7 @@ def _run_hot_set():
             # entry_origin_ts is set when the combo first enters the hotset.
             _entry_origin = hot_sig.get('entry_origin_ts', 0)
             _hotset_age_min = (time.time() - _entry_origin) / 60.0 if _entry_origin else 0
-            _is_pump_src = 'pump-' in (hot_sig.get('source', '') or '')
+            _is_pump_src = 'pump-catcher' in (hot_sig.get('source', '') or '')
             if _is_pump_src and _hotset_age_min > PUMP_CATCHER_MAX_STALENESS_MIN:
                 log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED — pump signal stale ({_hotset_age_min:.1f}min > {PUMP_CATCHER_MAX_STALENESS_MIN}min)')
                 _record_hotset_failure(token, direction, failures)
