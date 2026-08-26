@@ -2,8 +2,8 @@
 """
 fetch_hl_volume.py — Fetch OHLCV volume data for Hyperliquid-only tokens.
 
-Uses _hl_info() from hyperliquid_exchange for rate limiting (1s gap between
-/cache reads) — prevents 429s from concurrent processes.
+Uses _hl_info() from hyperliquid_exchange for rate limiting (2s gap between
+/info calls) — prevents 429s from concurrent processes.
 
 Usage:
     python3 fetch_hl_volume.py              # fill all tokens with volume=0
@@ -13,6 +13,7 @@ Usage:
 import sys
 import os
 import time
+import json
 import sqlite3
 import argparse
 
@@ -25,30 +26,25 @@ RATE_LIMIT_DELAY = 1.0  # 1s between tokens (rate limiter handles per-call gap)
 MAX_TOKENS_PER_RUN = 50  # limit per run to avoid long execution
 
 
-def get_hl_tokens() -> set:
-    """Get set of tokens with active markets on Hyperliquid (from allMids cache).
-    Returns BOTH original case and uppercase for matching."""
+def get_hl_tokens() -> dict:
+    """Get mapping of uppercase → original HL name from allMids cache.
+    Returns dict like {'KBONK': 'kBONK', 'BTC': 'BTC'} for case-correct API calls."""
     try:
         with open(HL_CACHE_FILE) as f:
             data = json.load(f)
-        # Use allMids — only tokens with active trading pairs
         all_mids = data.get('allMids', {})
-        # Return both original and uppercase for case-insensitive matching
-        tokens = set()
-        for k in all_mids.keys():
-            if k and not k.startswith('@') and not k.startswith('#'):
-                tokens.add(k)
-                tokens.add(k.upper())
-        return tokens
+        # Build mapping: uppercase key → original key (for case-correct API calls)
+        return {k.upper(): k for k in all_mids.keys()
+                if k and not k.startswith('@') and not k.startswith('#')}
     except Exception as e:
         print(f'[hl-volume] WARNING: Could not load HL tokens from cache: {e}')
-        return set()
+        return {}
 
 
 def get_tokens_without_volume():
     """Find tokens in candles_1m that have volume=0, filtered to HL-only tokens."""
-    hl_tokens = get_hl_tokens()
-    if not hl_tokens:
+    hl_map = get_hl_tokens()  # {uppercase: original}
+    if not hl_map:
         print('[hl-volume] WARNING: Could not load HL token universe from cache')
 
     conn = sqlite3.connect(CANDLES_DB, timeout=10)
@@ -64,10 +60,10 @@ def get_tokens_without_volume():
         rows = c.fetchall()
         tokens = [(r[0], r[1]) for r in rows]
 
-        # Filter to HL-only tokens (skip non-existent tokens like KBONK, KFLOKI)
-        if hl_tokens:
+        # Filter to HL-only tokens (skip tokens without active Hyperliquid markets)
+        if hl_map:
             before = len(tokens)
-            tokens = [(t, c) for t, c in tokens if t.upper() in hl_tokens]
+            tokens = [(t, c) for t, c in tokens if t.upper() in hl_map]
             skipped = before - len(tokens)
             if skipped:
                 print(f'[hl-volume] Filtered {skipped} non-HL tokens → {len(tokens)} HL tokens')
@@ -77,22 +73,28 @@ def get_tokens_without_volume():
         conn.close()
 
 
-import json
-
-
-def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100):
+def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100, hl_name: str = None):
     """Fetch OHLCV candles from Hyperliquid via _hl_info() (rate-limited).
 
     Uses the global rate limiter to prevent 429s.
-    Tries uppercase token first, then original DB name (for k-prefix tokens).
+    If hl_name is provided, uses it directly (case-correct from allMids cache).
+    Otherwise tries uppercase then original DB name.
     """
     # Calculate time range
     end_time = int(time.time() * 1000)
     tf_ms = {'1m': 60000, '5m': 300000, '15m': 900000}[timeframe]
     start_time = end_time - (limit * tf_ms)
 
-    # Try uppercase first, then original DB name (for k-prefix tokens like kPEPE)
-    for token_variant in [token.upper(), token]:
+    # Build token variants to try: hl_name first (if provided), then uppercase, then original
+    variants = []
+    if hl_name:
+        variants.append(hl_name)
+    if token.upper() not in variants:
+        variants.append(token.upper())
+    if token not in variants:
+        variants.append(token)
+
+    for token_variant in variants:
         try:
             result = _hl_info({
                 "type": "candlesSnapshot",
@@ -149,10 +151,10 @@ def store_candles(token: str, interval: str, candles: list):
         conn.close()
 
 
-def fill_volume_gaps(token: str, dry_run: bool = False):
+def fill_volume_gaps(token: str, dry_run: bool = False, hl_name: str = None):
     """Fill volume gaps for a single token."""
     # Fetch 1m candles
-    candles_1m = fetch_hl_candles(token, '1m', 100)
+    candles_1m = fetch_hl_candles(token, '1m', 100, hl_name=hl_name)
     if not candles_1m:
         return 0
 
@@ -164,8 +166,8 @@ def fill_volume_gaps(token: str, dry_run: bool = False):
     # Store 1m candles (will overwrite volume=0 rows)
     stored = store_candles(token, '1m', candles_1m)
 
-    # Fetch 5m candles too — _hl_info() already enforces 1s rate limit gap
-    candles_5m = fetch_hl_candles(token, '5m', 100)
+    # Fetch 5m candles too — _hl_info() already enforces 2s rate limit gap
+    candles_5m = fetch_hl_candles(token, '5m', 100, hl_name=hl_name)
     if candles_5m:
         store_candles(token, '5m', candles_5m)
 
@@ -188,13 +190,17 @@ def main():
         print('No tokens with volume=0 found')
         return
 
+    # Get HL name mapping for case-correct API calls
+    hl_map = get_hl_tokens()
+
     print(f'Tokens needing volume: {len(tokens)}')
     tokens = tokens[:args.limit]
 
     total_stored = 0
     for i, (token, cnt) in enumerate(tokens):
+        hl_name = hl_map.get(token.upper())  # e.g., 'KBONK' → 'kBONK'
         print(f'[{i+1}/{len(tokens)}] {token} ({cnt} rows with volume=0)...', end=' ')
-        stored = fill_volume_gaps(token, args.dry_run)
+        stored = fill_volume_gaps(token, args.dry_run, hl_name=hl_name)
         total_stored += stored
         print(f'stored={stored}')
 
