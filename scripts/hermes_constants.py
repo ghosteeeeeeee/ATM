@@ -2012,6 +2012,10 @@ CONTINUATION_CONF_ORIG_HIGH = 3               # +conf when original signal conf 
 CONTINUATION_CONF_ORIG_MED = 1                # +conf when original signal conf >= 85
 CONTINUATION_CONF_1H_ALIGN = 3                # +conf when 1h trend aligned
 CONTINUATION_CONF_1H_RET_THRESHOLD = 0.5      # % — 1h return threshold for alignment bonus
+# V2 pre-entry move filters (backtested: kills 8/8 losers, 0/2 winners)
+CONTINUATION_MAX_MOVE_PCT = 1.0               # % — max move in trade direction in 30m (skip if exceeded)
+CONTINUATION_MAX_COUNTER_PCT = 0.8            # % — max move AGAINST trade direction in 30m (skip if exceeded)
+CONTINUATION_MIN_AVG_RANGE = 0.045            # % — min avg 1m candle range (skip dead markets)
 
 # ── ATR Spike Signal (atr_spike.py) ─────────────────────────────────────
 # Catch staged LONG moves from ATR compression. Quality over quantity.

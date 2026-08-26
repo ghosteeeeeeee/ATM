@@ -15627,3 +15627,35 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - BANANA pnl_pct=616% data anomaly — pnl_usdt correct (+$0.23).
 - pump-catcher+ watching — if next trade is loss, kill it.
+
+## [2026-08-26 15:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L -$0.12)
+**24h:** 40T 21W 52.5%WR -$0.02
+
+**Key Metrics:**
+- atr_sl_hit: 20T 50% (stable, improving from 63% earlier)
+- profit-monster-trail: 16T +$0.68 (only profitable exit type)
+- 5 open positions
+
+**Signal Perf (24h):**
+- cascade-reverse-v2-mtf_alignment: 2T 100%WR +$0.58 — strongest
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- macd-div-: 2T 100%WR +$0.06 — strong
+- pump-catcher+: 4T 50%WR -$0.04 — recovered from near-kill
+- slow-grind-: 5T 40%WR -$0.17 — stable
+- bb_bounce+: 9T 22%WR -$0.69 — DEGRADED (all atr_sl hits, only DYDX/BANANA ran long enough to profit)
+- continuation+: 2T 50%WR -$0.05 (BABY duplicate entry with pump-catcher+)
+- continuation-/hl_copy_trader: killed
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 3+T/0%WR in last hour.
+- bb_bounce+ at 22%WR/9T is degraded but has 2W — doesn't meet strict kill criteria.
+- Trade freq 4/hr normal.
+- atr_sl_hit 50% stable. System near breakeven.
+
+**Open Questions:**
+- bb_bounce+ is biggest system drag (-$0.69). All trades hit atr_sl — SL too tight for this signal's hold times. Monitor; if 0%WR appears in any hour, kill immediately.
+- BABY had duplicate entries (pump-catcher+ won, continuation+ lost). Check if same-token dedup guard exists.

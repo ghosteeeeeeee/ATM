@@ -277,3 +277,7 @@
   WHY: 2T last hour (2W 0L +$0.26). BANANA bb_bounce+ atr_sl_hit +$0.23, NEAR slow-grind- profit-monster-trail +$0.03. 34T 24h 52.9%WR -$0.08 (near breakeven). atr_sl_hit 50% improving from earlier hours. pump-catcher+ 2T 0%WR -$0.17 near kill threshold. continuation-/hl_copy_trader already killed. Kill criteria not triggered. Trade freq 2/hr normal. 5 open positions.
   BY: auto_1hr
   NEXT: Re-run at 14:10 UTC
+[2026-08-26 15:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L -$0.12). CFX bb_bounce+ atr_sl_hit -$0.14, BABY continuation+ cut-loser -$0.13, NEO r2-trend-long3 atr_sl_hit +$0.08, BABY pump-catcher+ profit-monster-trail +$0.07. 40T 24h 52.5%WR -$0.02 (breakeven). atr_sl_hit 50% stable. bb_bounce+ degraded (9T/22%WR/-$0.69) but has 2W so no kill criteria met. pump-catcher+ recovered to 50%WR. continuation-/hl_copy_trader already killed. Kill criteria not triggered. Trade freq 4/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 16:10 UTC
