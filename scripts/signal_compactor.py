@@ -952,7 +952,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                     "SELECT signal_type FROM signals WHERE token=? AND created_at>=?",
                     (token_key, cutoff)
                 ).fetchall()
-                if rows:
+                if rows and _signal_family is not None:
                     families = list(set(_signal_family(r[0]) for r in rows))
                     confluence_mult = get_confluence_mult(families)
             except Exception:

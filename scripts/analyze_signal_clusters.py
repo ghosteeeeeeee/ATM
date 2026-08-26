@@ -16,20 +16,24 @@ from paths import RUNTIME_DB
 
 def get_signal_data():
     """Get all signals from last 30 days with timestamps."""
-    conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT signal_type, token, direction, confidence, created_at, 
-               decision, z_score, momentum_state, price
-        FROM signals 
-        WHERE created_at >= date('now', '-30 days')
-        ORDER BY created_at ASC
-    ''')
-    
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB)
+        c = conn.cursor()
+        
+        c.execute('''
+            SELECT signal_type, token, direction, confidence, created_at, 
+                   decision, z_score, momentum_state, price
+            FROM signals 
+            WHERE created_at >= date('now', '-30 days')
+            ORDER BY created_at ASC
+        ''')
+        
+        rows = c.fetchall()
+        return rows
+    finally:
+        if conn:
+            conn.close()
 
 def group_by_day(rows):
     """Group signals by day."""
@@ -237,19 +241,22 @@ def analyze_co_signal_patterns(daily):
     token_signals = defaultdict(list)
     
     # Re-read to get per-token per-day data
-    conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    c.execute('''
-        SELECT token, signal_type, created_at
-        FROM signals 
-        WHERE created_at >= date('now', '-30 days')
-    ''')
-    
-    for token, sig_type, created_at in c.fetchall():
-        day = created_at[:10]
-        token_signals[(token, day)].append(sig_type)
-    
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB)
+        c = conn.cursor()
+        c.execute('''
+            SELECT token, signal_type, created_at
+            FROM signals 
+            WHERE created_at >= date('now', '-30 days')
+        ''')
+        
+        for token, sig_type, created_at in c.fetchall():
+            day = created_at[:10]
+            token_signals[(token, day)].append(sig_type)
+    finally:
+        if conn:
+            conn.close()
     
     # Count co-occurrences
     co_signal_counts = Counter()
@@ -364,19 +371,22 @@ def analyze_confidence_trends(daily):
     print("🎯 CONFIDENCE PATTERNS — Average confidence by day and signal family")
     print("="*120)
     
-    conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    c.execute('''
-        SELECT signal_type, confidence, created_at
-        FROM signals 
-        WHERE created_at >= date('now', '-30 days')
-    ''')
-    
-    family_conf = defaultdict(list)
-    for sig_type, conf, created_at in c.fetchall():
-        family_conf[signal_family(sig_type)].append(conf)
-    
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB)
+        c = conn.cursor()
+        c.execute('''
+            SELECT signal_type, confidence, created_at
+            FROM signals 
+            WHERE created_at >= date('now', '-30 days')
+        ''')
+        
+        family_conf = defaultdict(list)
+        for sig_type, conf, created_at in c.fetchall():
+            family_conf[signal_family(sig_type)].append(conf)
+    finally:
+        if conn:
+            conn.close()
     
     print(f"\n  {'Family':30s} | {'Avg Conf':>8s} | {'# Signals':>10s} | {'Min':>6s} | {'Max':>6s}")
     print("  " + "-"*70)
@@ -445,7 +455,7 @@ def main():
     analyze_daily_dominance(daily)
     analyze_signal_waves(daily)
     analyze_sequential_patterns(daily)
-    analyze_co_signal_patterns(rows)
+    analyze_co_signal_patterns(daily)
     analyze_market_regime_signals(daily)
     analyze_pairwise_family_correlations(daily)
     analyze_time_of_day_patterns(rows)

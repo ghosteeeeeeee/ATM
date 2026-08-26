@@ -14,26 +14,30 @@ from paths import RUNTIME_DB
 
 def get_daily_family_data():
     """Get daily family counts for analysis."""
-    conn = sqlite3.connect(RUNTIME_DB)
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT signal_type, created_at
-        FROM signals 
-        WHERE created_at >= date('now', '-30 days')
-        ORDER BY created_at ASC
-    ''')
-    
-    daily = defaultdict(lambda: defaultdict(int))
-    days_set = set()
-    
-    for sig_type, created_at in c.fetchall():
-        day = created_at[:10]
-        days_set.add(day)
-        daily[day][sig_type] += 1
-    
-    conn.close()
-    return daily, sorted(days_set)
+    conn = None
+    try:
+        conn = sqlite3.connect(RUNTIME_DB)
+        c = conn.cursor()
+        
+        c.execute('''
+            SELECT signal_type, created_at
+            FROM signals 
+            WHERE created_at >= date('now', '-30 days')
+            ORDER BY created_at ASC
+        ''')
+        
+        daily = defaultdict(lambda: defaultdict(int))
+        days_set = set()
+        
+        for sig_type, created_at in c.fetchall():
+            day = created_at[:10]
+            days_set.add(day)
+            daily[day][sig_type] += 1
+        
+        return daily, sorted(days_set)
+    finally:
+        if conn:
+            conn.close()
 
 def signal_family(sig_type):
     """Categorize signals into families."""
