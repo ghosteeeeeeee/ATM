@@ -63,6 +63,15 @@ try:
 except ImportError as e:
     _VOL_GATE_V2_ENABLED = False
     log(f"[INIT] Volatility Gate V2 disabled (import error: {e})", 'WARN')
+
+try:
+    from tide_detector import get_weather_vane_adjustment as _get_tide_wv_adj, detect_tide_change as _detect_tide_change
+    _TIDE_DETECTOR_ENABLED = True
+    log("[INIT] Tide Detector loaded (clustering-enhanced weather vane)")
+except ImportError as e:
+    _TIDE_DETECTOR_ENABLED = False
+    log(f"[INIT] Tide Detector disabled (import error: {e})", 'WARN')
+
 # ── Confluence token cache (avoids per-signal DB queries) ─────────────────────
 _confluence_token_cache = {}  # token_upper -> confluence_mult
 _CONFLUENCE_CACHE_TTL = 120   # 2 min cache
@@ -824,6 +833,20 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Overrides all other weather vane logic — no unsuppression during lock
     if _is_direction_locked(direction):
         dir_outcome_mult = 0.0
+
+    # ── Tide Detector: clustering-enhanced weather vane ──────────────────────
+    # When signal clustering detects a phase transition, adjust the weather vane
+    # to reduce penalties for the incoming phase's favored direction
+    if _TIDE_DETECTOR_ENABLED and dir_outcome_mult > 0.0:  # Don't override direction lock
+        try:
+            tide_wv = _get_tide_wv_adj(direction, dir_outcome_mult)
+            if tide_wv['tide_boost'] != 1.0:
+                old_mult = dir_outcome_mult
+                dir_outcome_mult = tide_wv['adjusted_mult']
+                if old_mult != dir_outcome_mult:
+                    log(f"  🌊 [TIDE-WV] {token} {direction}: weather vane adjusted {old_mult:.2f} → {dir_outcome_mult:.2f} ({tide_wv['reason']})")
+        except Exception:
+            pass
 
     # Tide detection: BTC 3h momentum + SHORT WR confirmation
     tide_mult = get_tide_penalty(token, direction)
