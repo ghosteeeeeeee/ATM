@@ -715,6 +715,11 @@ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                 print(f"[brain.py]    ✅ HL rollback succeeded for {hype_token}")
             else:
                 print(f"[brain.py]    ⚠️ HL rollback returned: {result}")
+            # CRITICAL: Always exit with failure after HL rollback attempt.
+            # Without this, code falls through to line 748 where trade_id is
+            # undefined (NameError), producing a misleading "line 748" traceback
+            # that hides the real INSERT error. (USUAL 08-26, INJ 08-24)
+            sys.exit(1)
         except Exception as mc_err:
             print(f"[brain.py]    ⚠️ HL rollback failed: {mc_err} — {hype_token} may be orphaned on HL!")
             # ── AUDIT: Log failure with orphan flag ─────────────────────────
