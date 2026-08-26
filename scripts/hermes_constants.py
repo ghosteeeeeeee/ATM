@@ -1003,6 +1003,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'bb_bounce+',   # 71.9% WR, +0.89% avg — proven, ride ATR SL not PM Trail
     'confluence',   # meta-signal, proven — persistence + compounding validation
     'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
+    'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
