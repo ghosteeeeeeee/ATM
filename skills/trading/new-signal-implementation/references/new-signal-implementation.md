@@ -94,7 +94,101 @@ Exhaustion signals fire at the MOMENT price crosses EMA. **Fix:** Historical sim
 
 ---
 
-## 3. Key Files
+## 3. Signal Clustering Integration (REQUIRED)
+
+**Every new signal MUST be added to the signal clustering system.** This ensures the tide detector, phase gate, and volatility gate can properly categorize and weight the signal.
+
+### Step 1: Add to FAMILY_MAP
+
+Edit `scripts/market_phase_gate.py` and add the new signal to the appropriate family:
+
+```python
+FAMILY_MAP = {
+    'Trendline': ['tl_break', 'tl_break_long', 'tl_break_short', 'your_new_signal'],  # ← Add here
+    'Bollinger': ['bb_bounce', 'bb_bounce_short'],
+    'Momentum': ['momentum', 'fast_momentum', 'velocity', 'phase_accel'],
+    # ... etc
+}
+```
+
+**Which family?** Match the signal's logic:
+- Breakout/trend signals → `Trendline`
+- Mean reversion → `Bollinger`
+- Speed/acceleration → `Momentum` or `Accelerate`
+- Exhaustion/reversal → `Exhaustion`
+- Copy-trading → `HL_Copy`
+- Support/resistance levels → `Support_Resistance`
+
+### Step 2: Add to signal_lifecycle_filter.py (if applicable)
+
+Edit `scripts/signal_lifecycle_filter.py` and add the signal's lifecycle role:
+
+```python
+SIGNAL_LIFECYCLE = {
+    # EARLY: fires before the move (needs wider SL)
+    'your_early_signal': 'early',
+    
+    # CONCURRENT: fires during the move (normal SL)
+    'your_concurrent_signal': 'concurrent',
+    
+    # LAGGING: fires after the move (tight SL)
+    'your_lagging_signal': 'lagging',
+}
+```
+
+### Step 3: Add to volatility_gate.py REGIME_SIGNALS (if applicable)
+
+Edit `scripts/volatility_gate.py` and add the signal to the appropriate regime(s):
+
+```python
+REGIME_SIGNALS = {
+    'FLAT': {'your_signal', ...},     # Works in low volatility
+    'NORMAL': {'your_signal', ...},   # Works in normal volatility
+    'HIGH': {'your_signal', ...},     # Works in high volatility
+    'EXTREME': {'your_signal', ...},  # Works in extreme volatility
+}
+```
+
+### Step 4: Add to tide_detector.py (if it has lead-lag patterns)
+
+If the new signal has predictive relationships with other families, add to `scripts/tide_detector.py`:
+
+```python
+LEAD_LAG_RULES = [
+    ...
+    {'leader': 'YourFamily', 'follower': 'Bollinger', 'lag_days': 1, 'corr': 0.8},
+]
+
+PHASE_TRANSITIONS = {
+    'YourFamily': {'next_phase': 'explosion', 'lag_days': 1, 'confidence': 0.8},
+}
+```
+
+### Verification Checklist
+
+After adding a new signal, verify clustering integration:
+
+```bash
+# 1. Test family mapping
+python3 -c "from market_phase_gate import signal_family; print(signal_family('your_new_signal'))"
+# Should print: Trendline (or whichever family you assigned)
+
+# 2. Test lifecycle role
+python3 -c "from signal_lifecycle_filter import get_lifecycle_params; print(get_lifecycle_params('your_new_signal'))"
+# Should print: {'role': 'concurrent', ...}
+
+# 3. Test volatility gate
+python3 -c "from volatility_gate import should_trade; print(should_trade('BTC', 'your_new_signal'))"
+# Should print: ('TRADE', 'NORMAL') or similar
+
+# 4. Run tide auto-learner (if available)
+python3 tide_auto_learner.py --dry
+# Should NOT list your signal as "unknown"
+```
+
+---
+
+## 4. Key Files
 
 - `/root/.hermes/scripts/signal_gen.py` — main pipeline (ALWAYS check this for which signal files it imports directly)
 - `/root/.hermes/scripts/signal_compactor.py` — hot-set scoring
@@ -102,8 +196,12 @@ Exhaustion signals fire at the MOMENT price crosses EMA. **Fix:** Historical sim
 - `/root/.hermes/data/candles.db` — local candle data (`candles_1m`, `candles_5m`, etc.)
 - `/root/.hermes/data/signals_hermes_runtime.db` — signals output
 - `/root/.hermes/scripts/hermes_constants.py` — `SIGNAL_SOURCE_BLACKLIST`, `SHORT_BLACKLIST`
+- `/root/.hermes/scripts/market_phase_gate.py` — **FAMILY_MAP** (signal → family mapping)
+- `/root/.hermes/scripts/signal_lifecycle_filter.py` — **SIGNAL_LIFECYCLE** (signal → role mapping)
+- `/root/.hermes/scripts/volatility_gate.py` — **REGIME_SIGNALS** (regime → signal sets)
+- `/root/.hermes/scripts/tide_detector.py` — **LEAD_LAG_RULES** (predictive correlations)
 
-## 4. References
+## 5. References
 
 - `references/new-signal-implementation.md` — fixed-param implementation guide
 - `references/rs-signal-implementation.md` — support/resistance signal
