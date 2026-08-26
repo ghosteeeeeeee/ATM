@@ -1,6 +1,6 @@
-# Signal Rotation — 2026-08-25 21:17 UTC
+# Signal Rotation — 2026-08-26 01:17 UTC
 
-## Market Regime: SHORT_BIAS
+## Market Regime: NEUTRAL
 
 ## Signals Ranked by Regime-Adjusted Score
 
@@ -8,8 +8,8 @@
 |---|--------|-----|------|-------------|---------|--------|
 | 1 | bb_bounce+ | 86% | 2.171 | 2.171 | ✅ |  |
 | 2 | hl_copy_trader | 54% | 1.012 | 1.012 | ❓ |  |
-| 3 | hzscore- | 50% | 0.278 | 0.417 | ❌ |  |
-| 4 | r2-trend-long4 | 75% | 0.309 | 0.309 | ❓ |  |
+| 3 | r2-trend-long4 | 75% | 0.309 | 0.309 | ❓ |  |
+| 4 | hzscore- | 50% | 0.278 | 0.278 | ❌ |  |
 | 5 | r2-trend-long3 | 62% | 0.251 | 0.251 | ❓ |  |
 | 6 | stop_hunt_reversal_long+ | 50% | -0.061 | -0.061 | ❌ |  |
 | 7 | tl_break_short | 69% | -0.156 | -0.156 | ❌ |  |
