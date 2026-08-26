@@ -555,11 +555,11 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.012   # 1.2% floor — REVERTED from 1.5% (CEO Aug 25). auto_1hr data: 1.5% WORSENED hit rate 49.4%→60%, avg loss -$6.09. Wider SL = trades run into bigger losses before stopping. Problem is entry quality, not SL width. Monitor: atr_sl_hit %, avg loss.
-ATR_SL_MAX             = 0.030  # 3.0% cap — widened from 2.5% 2026-08-16. ATR_SL dominant drag: 45T -$3.32 (avg loss -0.75%). Wider SL gives trades room to reach PM_TRAIL activation (+0.40%). Monitor: ATR_SL hit count (should ↓ from 45/48h), PM_TRAIL capture rate (should ↑). Revert if avg loss widens without fewer hits.
+ATR_SL_MIN             = 0.008   # 0.8% floor — CEO Aug 26: simulation shows 0.8% SL = +$1.86 vs -$27.80 at 1.2%. Tighter SL = smaller losses. Monitor: atr_sl_hit %, avg loss, WR. REVERT if WR drops >5pp.
+ATR_SL_MAX             = 0.015  # 1.5% cap — CEO Aug 26: tightened from 3.0%. Max loss now bounded at 1.5%. Monitor: ATR_SL hit count, avg loss.
 ATR_TP_MIN             = 0.008   # 0.80% floor — match realistic MFE (was 1.2%, too far)
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
-ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-08-16 eval: REVERTED from 2.5. 2.5x made TP unreachable (only 1 ATR_TP hit/48h). 2.0x more realistic. PM_TRAIL handles profit-taking, but ATR_TP as secondary exit needs reachable target. Monitor: ATR_TP hit count (should ↑ from 1), R:R (should hold >0.75:1).
+ATR_TP_K_MULT          = 1.5    # TP = 1.5x SL — CEO Aug 26: only 5 trades hit TP in 30d at 2.0x. Reducing to 1.5x makes TP reachable as secondary exit. PM_TRAIL handles most profit-taking.
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
@@ -570,12 +570,12 @@ ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits.
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.012  # 1.2% — REVERTED from 1.5%. MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.030  # 3.0% — widened from 2.5%. MUST match ATR_SL_MAX
-SL_PCT_FALLBACK    = 0.012  # 1.2% if ATR unavailable (matched to ATR_SL_MIN)
+ATR_SL_MIN_INIT    = 0.008  # 0.8% — CEO Aug 26. MUST match ATR_SL_MIN
+ATR_SL_MAX_INIT    = 0.015  # 1.5% — CEO Aug 26. MUST match ATR_SL_MAX
+SL_PCT_FALLBACK    = 0.008  # 0.8% if ATR unavailable (matched to ATR_SL_MIN)
 TP_PCT_FALLBACK    = 0.030  # 3.0% fallback target (2:1 R:R with 1.5% SL)
-STOP_LOSS_DEFAULT  = 0.012  # 1.2% hard fallback (matched to ATR_SL_MIN)
-SL_PCT_MIN        = 0.012  # 1.2% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
+STOP_LOSS_DEFAULT  = 0.008  # 0.8% hard fallback (matched to ATR_SL_MIN)
+SL_PCT_MIN        = 0.008  # 0.8% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
 CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guardian hard-stop)
 
 # ── Trailing Activation — brain.py / decider_run.py
@@ -585,7 +585,7 @@ CUT_LOSER_PNL     = -2.0   # close trade at -2.0% PnL (used by cut_loser + guard
 #   distance: 0.80%→2.00% (survives 1.88% max drawdown observed in 2Z wave analysis)
 #   R:R improved from 0.39:1 to ~1.25:1 on trailing exits
 TRAILING_ACTIVATION_PCT = 0.0040  # 0.40% — FINALIZED 2026-08-16 eval: kept. PM_TRAIL handles most exits; this is fallback for non-PM_TRAIL trades.
-TRAILING_DISTANCE_PCT   = 0.0100  # 1.00% — trailing SL distance from peak (tightened from 2.0% — 2.0% was too far, only 29% of trades locked profit. 1.0% locks profit on 59% of trades)
+TRAILING_DISTANCE_PCT   = 0.0050  # 0.50% — CEO Aug 26: simulation shows 0.5% = +$2,383 vs +$2,313 at 1.0%. Tighter trail locks profits faster. Monitor: PM_TRAIL capture rate, WR.
 
 # ── Loss Cooldown Constants
 # Incremental: streak=1 → 10min, streak=2 → 20min, streak=3 → 40min, ...
@@ -871,8 +871,8 @@ CONF_FILTER_MAX = 89                    # block if confidence >= this value (rai
 # 83T 33W (39.8%) -$1.34 in this window (conf-filter-plan.md, 2026-08-19).
 # Changed from hard block to 0.7x penalty (2026-08-22) — hard block was too aggressive.
 TIME_BLOCK_ENABLED = True               # Penalty during 01-06 UTC (was hard block, re-enabled as penalty 2026-08-22)
-TIME_BLOCK_START = 1                    # UTC hour (inclusive)
-TIME_BLOCK_END = 6                      # UTC hour (exclusive: blocks 01:00-05:59)
+TIME_BLOCK_START = 5                    # UTC hour (inclusive) — CEO Aug 26: narrowed from 1. Hour 3 is BEST (+$1.14, 60%WR), hour 5 is WORST (-$3.42, 40%WR)
+TIME_BLOCK_END = 7                      # UTC hour (exclusive: blocks 05:00-06:59)
 TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone (matches tide penalty)
 
 # ── Per-Token WR Filter ──────────────────────────────────────────────────────
