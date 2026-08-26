@@ -271,6 +271,19 @@ def detect_pump(token, closes):
     if direction == 'SHORT' and acceleration > -PUMP_CATCHER_ACCEL_MIN:
         return None
 
+    # ── 4b. Wave phase filter: skip if price is falling ───────────────────────
+    # Compare recent 3-bar avg vs earlier 3-bar avg to determine trend direction.
+    # "falling" = bad entry (price declining). "bottoming"/"accelerating" = good.
+    if len(closes) >= 6:
+        recent_avg = sum(closes[-3:]) / 3
+        earlier_avg = sum(closes[-6:-3]) / 3
+        if earlier_avg > 0:
+            wave_pct = (recent_avg - earlier_avg) / earlier_avg * 100.0
+            if direction == 'LONG' and wave_pct < -0.15:
+                return None  # price declining — not a good entry
+            if direction == 'SHORT' and wave_pct > 0.15:
+                return None  # price rising — not a good entry
+
     # ── 5. Trend alignment: price above/below EMA ─────────────────────────────
     ema_period = PUMP_CATCHER_TREND_EMA
     ema_val = _ema(closes[-ema_period - 10:], ema_period)

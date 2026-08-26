@@ -54,3 +54,18 @@
 
 [2026-08-02 23:29 UTC] CEO FREEZE: skip ATR_SL_MIN until 2026-08-04T23:15:00+00:00
 [2026-08-02 23:42 UTC] CEO FREEZE: skip ATR_SL_MIN_INIT until 2026-08-04T23:15:00+00:00
+[2026-08-26 23:34 UTC] [DRY RUN] === Parameter Auto-Tuner ===
+[2026-08-26 23:34 UTC] Fetched 50 closed trades
+[2026-08-26 23:34 UTC] Stats: WR=48%, MFE=0.0095, MAE=0.0096, MAE/MFE=1.00, Whipsaw=32%
+[2026-08-26 23:34 UTC] No parameter changes needed
+
+## Tuner Run — 2026-08-26 23:34 UTC
+- Trades analyzed: 50
+- Win rate: 48%
+- Avg MFE: 0.0095%
+- Avg MAE: 0.0096%
+- MAE/MFE ratio: 1.00
+- MFE/SL ratio: 0.85
+- Whipsaw rate: 32%
+- No changes needed
+
