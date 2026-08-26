@@ -50,6 +50,8 @@ from hermes_constants import (
     SLOW_GRIND_SHORT_ATR_LOW_BONUS,
     SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY_THRESHOLD,
     SLOW_GRIND_SHORT_RSI_OVERSOLD_PENALTY,
+    SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT,
+    SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL,
     SHORT_BLACKLIST,
 )
 
@@ -257,11 +259,27 @@ def detect_slow_grind_short(token):
         window2 = closes_1m[-15:]
         avg1 = sum(window1) / len(window1)
         avg2 = sum(window2) / len(window2)
-        
+
         # Recent average should be lower (grinding down)
         if avg2 >= avg1:
             return None
-    
+
+    # ── Pre-Entry Move Filter ──────────────────────────────────────────
+    # Block if price already rose too much from recent low (chasing)
+    if len(closes_1m) >= 10:
+        recent_low = min(closes_1m[-10:])
+        if recent_low > 0:
+            pre_entry_move_pct = (closes_1m[-1] - recent_low) / recent_low * 100
+            if pre_entry_move_pct > SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT:
+                return None  # price already rising — don't chase
+
+    # ── Velocity Filter ────────────────────────────────────────────────
+    # Require negative 5m velocity (price declining, not rising)
+    if SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL and len(closes_1m) >= 6:
+        vel_5m = (closes_1m[-1] - closes_1m[-6]) / closes_1m[-6] * 100
+        if vel_5m > 0:
+            return None  # price rising on 5m — don't short into strength
+
     # ── Confidence Scoring ─────────────────────────────────────────────
     conf = SLOW_GRIND_SHORT_CONF_BASE
     

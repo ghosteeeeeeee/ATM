@@ -1308,8 +1308,10 @@ SLOW_GRIND_SHORT_MIN_R2 = 0.55    # minimum R² threshold (confirmed trend, not 
 SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0002  # minimum slope magnitude as % of price per candle (0.02%)
 SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking
 SLOW_GRIND_SHORT_RSI_MIN = 35      # min RSI — don't short oversold (bounce risk)
-SLOW_GRIND_SHORT_RSI_MAX = 55      # max RSI — don't short overbought (not a grind)
-SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.1  # min % separation below EMA20 (not just barely below)
+SLOW_GRIND_SHORT_RSI_MAX = 45      # max RSI — don't short when momentum fading (was 55, BCH had RSI=62.8 at entry)
+SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.2  # min % separation below EMA20 (was 0.1, require stronger bearish alignment)
+SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT = 0.15  # max % price can rise from 10-bar low before entry (block chasing)
+SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL = True  # require 5m velocity negative (don't short into strength)
 SLOW_GRIND_SHORT_CONF_BASE = 65    # base confidence
 SLOW_GRIND_SHORT_CONF_CAP = 88     # max confidence (system ceiling)
 SLOW_GRIND_SHORT_COOLDOWN_HOURS = 3  # per token cooldown
