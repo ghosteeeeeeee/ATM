@@ -11,6 +11,42 @@
 
 ---
 
+## [2026-08-26 20:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed in last hour (0W 1L -$0.14). 18 closed in last 6h (6W 12L -$0.87).
+**24h:** 51T 23W 45.1% -$0.78. 3 consecutive negative hours (17-19 UTC).
+**Open:** 4 positions (HBAR SHORT, BTC SHORT, WLFI SHORT, ALT LONG).
+
+**24h Close Reasons:**
+- atr_sl_hit: 29T 56.9% of closes (threshold: 40%) — STILL elevated
+- profit-monster-trail: 15T +$0.68 avg+$0.045 — only profitable exit
+- Others: minor (cut-loser, cascade_flip, hard_sl)
+
+**Signal Performance (24h):**
+- slow-grind-: 11T 36%WR -$0.62 — #1 money loser
+- bb_bounce+: 8T 12%WR -$0.55 — catastrophic degradation (was 89% Aug 24)
+- pump-catcher+: 7T 29%WR -$0.41
+- macd-div-: 3T 100%WR +$0.21 — good
+- cascade-reverse-v2: 3T 67%WR +$0.48 — good
+- bb-bounce-short: 3T 100%WR +$0.07 — good
+
+**Root Cause:** Lifecycle filter deployed at 06:40 UTC classified bb_bounce as 'lagging' (0.8x SL mult). But it fires DURING bounces, not after. Tighter SL → more premature exits. Before filter: 2T 1W 50%. After filter: 6T 0W 0%.
+
+**Changes:**
+1. **FIXED bb_bounce lifecycle classification** — Changed from 'lagging' to 'concurrent' in signal_lifecycle_filter.py. Normal SL (1.0x) instead of tight SL (0.8x). Should reduce premature atr_sl_hit exits. Monitor next 24h.
+
+**No Change Needed:**
+- Trade frequency: ~3/hr normal. No overtrading.
+- No signal met strict kill criteria (0% WR, 3+ trades in last hour — only 1 trade last hour).
+- slow-grind- at 36%WR/-$0.62 is bad but not fatal. Lagging classification also tightened its SL — may need same fix next hour if it continues losing.
+
+**Open Questions:**
+- Will bb_bounce+ recover with normal SL? If still <40% WR by next analysis, kill it.
+- slow-grind- also classified as lagging — same SL tightening issue. Watch closely.
+- atr_sl_hit at 56.9% still above 40% threshold — profit-monster-trail (15T) is the only offset.
+
+---
+
 ## [2026-08-25 20:10 UTC] Hourly Analysis
 
 **Trades:** 1 closed in last hour (0W 1L -$0.14). 5 closed in last 6h (3W 2L +$0.08).

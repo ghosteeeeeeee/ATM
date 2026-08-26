@@ -1,3 +1,7 @@
+[2026-08-26 20:10 UTC] auto_1hr: FIXED bb_bounce lifecycle classification
+  WHY: bb_bounce+ 8T 12%WR -$0.55/24h — catastrophic degradation (was 89% Aug 24). Root cause: lifecycle filter (deployed 06:40 UTC) classified bb_bounce as 'lagging' → 0.8x SL mult (tighter SL). But bb_bounce fires DURING bounces, not after — tighter SL = more premature exits. Before filter: 2T 1W 50%. After filter: 6T 0W 0%. Changed to 'concurrent' (1.0x SL). Also: 4T 0W 0% continuation- below kill threshold. slow-grind- 11T 36%WR -$0.62 also lagging-classified — may need same fix. 4 open positions. atr_sl_hit still 56.9% (threshold 40%). 3 consecutive negative hours 17-19 UTC.
+  BY: auto_1hr
+  NEXT: Re-run at 21:10 UTC
 [2026-08-25 20:10 UTC] auto_1hr: KILLED hl_copy_trader
   WHY: 1T last hour (0W 1L -$0.14). 24h 38T 15W 39% -$1.70. hl_copy_trader #1 loser: 12T 25%WR -$1.13/24h (PLUS/MINUS already CEO-killed, base was last standing). atr_sl_hit 60.5% of all closes (threshold 40%) — hl_copy_trader responsible for 10T of those. bb_bounce+ degraded 89%→43%WR but still 56% overall, -$0.12/24h — monitoring. Set HL_COPY_SIGNAL_ENABLED=False. 5 open positions (2 orphaned hl_copy_trader riding SLs). Trade freq 1.6/hr normal.
   BY: auto_1hr
