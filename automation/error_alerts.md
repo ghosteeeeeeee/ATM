@@ -1071,3 +1071,8 @@ ALERTS:
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3474s left, N failures)`
 - **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'INVERSE_ACCEL_300_V2_ENABLED' is not defined`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (3475s left, N failures)`
+
+## Error Alerts — 2026-08-26 17:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (657s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (599s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (422s left, N failures)`

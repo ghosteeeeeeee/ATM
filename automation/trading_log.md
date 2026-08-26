@@ -15688,3 +15688,37 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - slow-grind- at 7T/3W/-$0.29 is system's biggest drag. All losses from atr_sl_hit. Monitor but no kill criteria met.
 - ALT had cascade_flip loss (-$0.03) — cascade entries causing friction. Signal itself profitable (+$0.48).
+
+## [2026-08-26 17:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**24h:** 46T 23W 50%WR -$0.12 (near breakeven)
+
+**Key Metrics:**
+- atr_sl_hit: 22T 48% (stable, below40% threshold)
+- profit-monster-trail: 16T +$0.75 (only profitable exit)
+- 5 open positions (4x slow-grind- SHORT, 1x ALT LONG)
+
+**Signal Perf (24h):**
+- cascade-reverse-v2-mtf_alignment: 3T 67%WR +$0.48 — strong
+- macd-div-: 3T 100%WR +$0.21 — strong
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- pump-catcher+: 4T 50%WR -$0.04 — near breakeven
+- slow-grind-: 8T 37.5%WR -$0.34 — system's biggest drag
+- bb_bounce+: 8T 12.5%WR -$0.55 — DEGRADED (CEO_PROTECTED, can't auto-kill)
+- continuation-: 3T 0%WR -$0.37 — already killed
+
+**Changes:** None — bb_bounce+ meets kill criteria but is CEO_PROTECTED.
+
+**Kill Criteria Check:**
+- bb_bounce+: 3+T/0%WR in 6h — MEETS CRITERIA but CEO_PROTECTED. Flagged to CEO.
+- No other signals at kill threshold.
+
+**No Change Needed:**
+- Trade freq 0/hr normal (quiet market).
+- atr_sl_hit 48% stable, tpsl_utils.py trailing SL deployed.
+- slow-grind- 37.5%WR not at 0% kill threshold.
+
+**Open Questions:**
+- bb_bounce+ at 12.5%WR/-$0.55 needs CEO decision to kill (CEO_PROTECTED flag).
+- slow-grind- accounts for 4/5 open positions — if market turns, could amplify losses.
