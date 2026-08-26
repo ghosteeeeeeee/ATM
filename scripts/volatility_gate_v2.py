@@ -291,6 +291,7 @@ def get_combined_multiplier(signal_type, regime, phase):
     Returns: float multiplier (0.3 to 2.0 range)
     """
     mult = 1.0
+    family = None
     
     # 1. Volatility-phase combined multiplier
     if _CLUSTERING_ENABLED:
@@ -309,18 +310,18 @@ def get_combined_multiplier(signal_type, regime, phase):
         except Exception:
             pass
     
-    # 3. Inverse correlation penalty
-    if _CLUSTERING_ENABLED:
+    # 3. Inverse correlation penalty (uses cached family from step 1)
+    if _CLUSTERING_ENABLED and family:
         try:
             info = detect_phase()
             dom_fams = info.get('dominant_families', [])
-            family = signal_family(signal_type)
             inv_mult = inverse_penalty(family, dom_fams)
             mult *= inv_mult
         except Exception:
             pass
     
-    return mult
+    # Clamp to reasonable range (prevent extreme multipliers from crushing scores)
+    return max(0.3, min(2.0, mult))
 
 
 def should_trade_v2(token, signal=None):
@@ -461,7 +462,7 @@ if __name__ == '__main__':
     print("=== Volatility Gate V2 — Self Test ===\n")
     
     test_tokens = ['BTC', 'ETH', 'SOL', 'ALGO', 'CC', 'AVNT']
-    test_signals = ['bb_bounce+', 'tl_break_long', 'accel_300_long', 'mover+', 'exhaustion']
+    test_signals = ['bb_bounce+', 'tl_break_long', 'accel-300', 'mover+', 'return_exhaustion_long']
     
     phase = get_current_phase()
     print(f"Current Market Phase: {phase}\n")

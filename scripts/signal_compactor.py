@@ -67,6 +67,9 @@ except ImportError as e:
 _confluence_token_cache = {}  # token_upper -> confluence_mult
 _CONFLUENCE_CACHE_TTL = 120   # 2 min cache
 _confluence_cache_ts = {}     # token_upper -> timestamp
+# ── ATR cache (avoids per-signal DB queries to candles.db) ────────────────────
+_atr_cache = {}               # token_upper -> (atr_pct, timestamp)
+_ATR_CACHE_TTL = 120          # 2 min cache, matches confluence
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
 _open_pos_cache = {}  # token_upper -> True/False, refreshed each run
 _dir_wr_cache = {}    # (token, direction) -> (wr, count, timestamp)
@@ -843,8 +846,17 @@ def _score_signal(token, direction, conf, source, signal_type,
     
     if _VOL_GATE_V2_ENABLED:
         try:
-            # Get volatility regime for this token
-            _atr_pct = _get_atr_pct(token)
+            # Get volatility regime for this token (with ATR caching)
+            _token_key = token.upper()
+            _now_ts = time.time()
+            _atr_pct = None
+            if _token_key in _atr_cache:
+                _cached_atr, _cached_atr_ts = _atr_cache[_token_key]
+                if (_now_ts - _cached_atr_ts) < _ATR_CACHE_TTL:
+                    _atr_pct = _cached_atr
+            if _atr_pct is None:
+                _atr_pct = _get_atr_pct(token)
+                _atr_cache[_token_key] = (_atr_pct, _now_ts)
             _regime = _classify_volatility(_atr_pct) if _atr_pct is not None else 'NORMAL'
             _phase = _get_v2_phase()
             
