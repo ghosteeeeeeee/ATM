@@ -179,7 +179,7 @@ def learn_lead_lag_patterns(lookback_days: int = 30) -> list:
                     if 0 < lag_hours <= 48:  # Within 2 days
                         lag_days = round(lag_hours / 24)
                         family_pairs[(fam_a, fam_b, lag_days)] += 1
-                except:
+                except Exception:
                     pass
     
     # Find significant patterns

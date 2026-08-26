@@ -99,6 +99,7 @@ def get_family_activity(lookback_days: int = 3) -> dict:
     if not _CLUSTERING_ENABLED:
         return {}
     
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         cutoff = (datetime.now() - timedelta(days=lookback_days)).strftime('%Y-%m-%d')
@@ -109,9 +110,11 @@ def get_family_activity(lookback_days: int = 3) -> dict:
             WHERE created_at >= ?
             ORDER BY created_at ASC
         ''', (cutoff,)).fetchall()
-        conn.close()
     except Exception:
         return {}
+    finally:
+        if conn:
+            conn.close()
     
     if not rows:
         return {}

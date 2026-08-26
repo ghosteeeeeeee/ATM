@@ -136,9 +136,9 @@ SIGNAL_LIFECYCLE = {
 }
 ```
 
-### Step 3: Add to volatility_gate.py REGIME_SIGNALS (if applicable)
+### Step 3: Add to volatility_gate REGIME_SIGNALS (if applicable)
 
-Edit `scripts/volatility_gate.py` and add the signal to the appropriate regime(s):
+Edit `scripts/volatility_gate.py` (or `volatility_gate_v2.py` if V2 is active) and add the signal to the appropriate regime(s):
 
 ```python
 REGIME_SIGNALS = {
@@ -162,6 +162,30 @@ LEAD_LAG_RULES = [
 PHASE_TRANSITIONS = {
     'YourFamily': {'next_phase': 'explosion', 'lag_days': 1, 'confidence': 0.8},
 }
+```
+
+### Step 5: Add to SIGNAL_SOURCE_WEIGHTS (for scoring)
+
+Edit `scripts/signal_compactor.py` and add the signal to `_get_source_weight()` or the source weight logic. This controls how the signal is scored in the hot-set:
+
+```python
+def _get_source_weight(signal_type, source):
+    # Add your signal to the appropriate weight category
+    if 'your_signal' in signal_type:
+        return 1.2  # Boost (or 0.8 for penalty)
+    ...
+```
+
+### Step 6: Add to STANDALONE_BYPASS_SIGNALS (if standalone)
+
+If the signal should bypass the confluence gate (works alone, not just in combos), add to `hermes_constants.py`:
+
+```python
+STANDALONE_BYPASS_SIGNALS = [
+    'bb_bounce+', 'r2-trend-long6', 'pump-catcher+',
+    'your_signal',  # ← Add here
+    ...
+]
 ```
 
 ### Verification Checklist

@@ -32,7 +32,7 @@ from paths import RUNTIME_DB, STATIC_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_
 from hermes_log import log
 # ── Market Phase Gate & Confluence Scorer ──────────────────────────────────────
 try:
-    from market_phase_gate import signal_family as _signal_family, get_phase_mult, detect_phase, get_phase_info
+    from market_phase_gate import signal_family as _signal_family, get_phase_mult, detect_phase, get_phase_info, inverse_penalty
     _PHASE_GATE_ENABLED = True
     log("[INIT] Market Phase Gate loaded")
 except ImportError as e:
