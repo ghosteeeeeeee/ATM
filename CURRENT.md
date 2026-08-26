@@ -1,16 +1,17 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-26 ~13:00 UTC (CEO)**
+**Last Updated: 2026-08-26 ~17:00 UTC (CEO)**
 **Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ LONG KILLED (signal_reporter Aug 24).** COIN_TRACKER_HOT_PLUS_ENABLED=False, NEVER_REENABLE_FLAGS. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`). **CONF_FILTER_MAX raised 85→89 (CEO Aug 23)** — blocks overconfident trades, 90+ tier now +$1.91/7d. **hzscore- KILLED (auto_1hr Aug 23 21:05 + signal_reporter, NEVER_REENABLE).** **signal_compactor FIXED (health monitor Aug 24).** UnboundLocalError bare_source — was crashing every pipeline cycle. **Disk cleaned (orchestrator Aug 24).** Journal vacuum freed 3GB (84%→81%). **SIGNAL LIFECYCLE FILTERS DEPLOYED (orchestrator Aug 26).** Early/concurrent/lagging roles wired into tpsl_utils SL/TP computation. Early signals get wider SL (+50%) and bigger TP (+100%), lagging signals get tighter SL (-20%) and smaller TP (-20%). Already had score penalties in signal_compactor. 2h build.
 
-**Current status:** System GREEN. CEO verified (14:30 UTC): 24h 33T 51.5% WR +$0.31. 7d: 330T 50.6% WR -$3.58. Today Aug 26: 20T 55% WR +$0.24. 5 open (+$0.39: 4 bb_bounce+ LONG, 1 cascade-reverse-v2 SHORT). **hl_copy_trader ALL KILLED (auto_1hr Aug 25).** Was backbone +$1.44/7d 49.3% WR. System now single-signal dependent on bb_bounce+ (36T/7d +$0.80, 66.7% WR). **Legacy draining** — ct-hot+ 66T/7d -$3.65 (ages out Aug 27). continuation- 3T/7d 0% WR -$0.37 (auto_1hr watching, kill on next loss). ATR_SL dominant: 39T/48h -$5.88. Signal lifecycle filters LIVE today. All kills active. System positive but fragile — single-signal dependency. Disk: 83%. Pipeline: active, 0 errors. Market: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS.
+**Current status:** System GREEN. CEO verified (17:00 UTC): 24h 46T 50.0% WR -$0.17. 7d: 341T 49.6% WR -$4.14. Today Aug 26: 40T 52.5% WR +$0.12. 5 open (-$0.04: 3 SHORT ETC/GRAM/MET, 1 LONG ALT, 1 SHORT WLFI). **slow-grind- KILLED (CEO Aug 26).** 8T/24h 37.5% WR -$0.34, inverted R:R. NEVER_REENABLE_FLAGS. bb_bounce+ degraded today (8T 12.5% WR -$0.55) — 9 ATR_SL hits,7/9 losses on low-liquidity tokens. Still +$0.37/7d 61.5% WR net positive — today is variance. hl_copy_trader ALL KILLED (auto_1hr Aug 25). System single-signal dependent on bb_bounce+. ct-hot+ 66T/7d -$3.65 legacy draining, ages out Aug 27. Coin tracker: 69/109 tokens in Wyckoff accumulation (bullish). ATR_SL dominant: 34T/48h -$4.87. All kills active. Disk: 83%. Pipeline: active, 0 errors. Market: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS.
 
 ## Active Decisions
 
+- **slow-grind- KILLED (CEO KILLED Aug 26).** 8T/24h 37.5% WR -$0.34, inverted R:R (big losses -5-6%, small wins +1-4). SLOW_GRIND_SHORT_ENABLED=False, in NEVER_REENABLE_FLAGS. — 2026-08-26
 - **CONF_FILTER_MAX=89 (CEO Aug 24).** Raised from 85 — original decision based on ct-hot+ dragging90+ tier. Without ct-hot+, 90+ tier now +$1.91/7d (most profitable). 85-89 tier7T,71.4% WR also profitable. Blocks only break-even90-94 tier. Monitor48h for PnL improvement. — 2026-08-24
 - **ATR_SL_MIN=1.2% (CEO REVERTED Aug 25).** auto_1hr data: 1.5% WORSENED hit rate 49.4%→60%, avg loss -$6.09. Wider SL = trades run into bigger losses. Problem is entry quality, not SL width. Reverted to 1.2%. Monitor48h. — 2026-08-25
 - **CURRENT.md is the single source of truth for agent sessions.** — 2026-08-13
@@ -66,10 +67,9 @@
 ## Next Actions
 
 1. **RECOMMEND T: Build new backbone signal to replace hl_copy_trader.** hl_copy_trader ALL killed (auto_1hr Aug 25). Was +$1.44/7d, 49.3% WR — system's #2 performer. Now single-signal dependent on bb_bounce+. Need new signal with similar volume + edge. — 2026-08-26
-2. **Monitor bb_bounce+ recovery.** 24h degraded to 37.5% WR -$0.08 (was 66.7% 7d). If degrades further, investigate entry quality. — 2026-08-26
+2. **Monitor bb_bounce+ recovery.** 24h degraded to 12.5% WR -$0.55 (was 61.5% 7d). All 9 ATR_SL hits today —7/9 losses on low-liquidity tokens. Signal still net positive 7d. If degrades further, investigate entry quality. — 2026-08-26
 3. **Monitor lifecycle filter impact (48h eval ending ~Aug 28).** Watch ATR_SL hit rate, lagging signal WR, early signal hold times. — 2026-08-26
-4. **Monitor continuation- (3T 0% WR, kill threshold).** auto_1hr watching, kill on next loss. — 2026-08-26
-5. **Monitor pump-catcher+ (2T 0% WR, 1 loss from kill).** — 2026-08-26
-6. **Monitor disk (85% cleanup trigger).** Currently 83%. — 2026-08-26
-7. **ct-hot+ legacy ages out Aug 27.** 66T/7d -$3.65 draining. After age-out, system should be net positive. — 2026-08-26
-8. **retroactive-scan-delayed-entry** — Only unimplemented plan. Level 3, ~200 LOC. — 2026-08-21
+4. **Monitor pump-catcher+ (4T/24h 50% WR -$0.04, near breakeven).** — 2026-08-26
+5. **Monitor disk (85% cleanup trigger).** Currently 83%. — 2026-08-26
+6. **ct-hot+ legacy ages out Aug 27.** 66T/7d -$3.65 draining. After age-out, system should be net positive. — 2026-08-26
+7. **Coin tracker: 69/109 tokens in Wyckoff accumulation.** Bullish signal — build LONG-focused signals for accumulation phase. — 2026-08-26
