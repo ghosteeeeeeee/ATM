@@ -15404,3 +15404,22 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 **Open Questions:**
 - macd-div- signals new (2T, 100% WR). Monitor for sustainability.
 - bb_bounce+ continues degraded — next session with 3+ losses triggers kill.
+
+## [2026-08-26 04:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour
+**24h:** 34T 15W 44.1% WR -$1.21
+**Trend:** 6 consecutive winning hours
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill criteria not met: no signal 3+T/0%WR last hour (0 trades closed).
+- ATR SL hit rate improving (63.6%→57.6%) as hl_copy_trader legacy fades.
+- bb_bounce+ 36.4% WR mixed results — needs 3+ daily trades at 0%WR to trigger kill.
+- macd-div- new signal 2T 100% WR +$0.05, promising.
+- System stabilizing with consecutive green hours.
+
+**Open Questions:**
+- bb_bounce+ continues degraded — next session with 3+ losses triggers kill.
+- 5 open positions (DYDX bb_bounce+, ETH bb-bounce-short, BANANA continuation-, CAKE continuation-, HBAR cascade-reverse-v2).
