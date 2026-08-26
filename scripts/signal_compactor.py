@@ -30,6 +30,15 @@ from hyperliquid_exchange import is_delisted
 from paths import RUNTIME_DB, STATIC_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_FILE, SIGNALS_JSON, CANDLES_DB
 
 from hermes_log import log
+# ── Market Phase Gate & Confluence Scorer ──────────────────────────────────────
+try:
+    from market_phase_gate import signal_family as _signal_family, get_phase_mult, detect_phase, inverse_penalty, get_phase_info
+    from confluence_scorer import score_confluence, get_confluence_mult
+    _PHASE_GATE_ENABLED = True
+    log("[INIT] Market Phase Gate + Confluence Scorer loaded")
+except ImportError as e:
+    _PHASE_GATE_ENABLED = False
+    log(f"[INIT] Market Phase Gate disabled (import error: {e})", 'WARN')
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
 _open_pos_cache = {}  # token_upper -> True/False, refreshed each run
 _dir_wr_cache = {}    # (token, direction) -> (wr, count, timestamp)
@@ -795,7 +804,34 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Penalty list — underperformers get deprioritized
     penalty_mult = PENALTY_MULT if PENALTY_TOKENS and token in PENALTY_TOKENS else 1.0
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult
+    # ── Market Phase Gate: phase-specific signal multipliers ──────────────
+    phase_mult = 1.0
+    if _PHASE_GATE_ENABLED:
+        try:
+            family = _signal_family(signal_type)
+            phase_mult = get_phase_mult(family)
+        except Exception:
+            phase_mult = 1.0
+
+    # ── Confluence Scorer: multi-family agreement bonus ───────────────────
+    confluence_mult = 1.0
+    if _PHASE_GATE_ENABLED:
+        try:
+            # Get all signals for this token in last 24h to check confluence
+            conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+            cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
+            rows = conn.execute(
+                "SELECT signal_type FROM signals WHERE token=? AND created_at>=?",
+                (token.upper(), cutoff)
+            ).fetchall()
+            conn.close()
+            if rows:
+                families = list(set(_signal_family(r[0]) for r in rows))
+                confluence_mult = get_confluence_mult(families)
+        except Exception:
+            confluence_mult = 1.0
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult
     return final_score
 
 
