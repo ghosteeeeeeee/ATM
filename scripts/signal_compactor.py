@@ -825,6 +825,17 @@ def _score_signal(token, direction, conf, source, signal_type,
         except Exception:
             phase_mult = 1.0
 
+    # ── Inverse Correlation Guard: penalize contradictory families ────────
+    inverse_mult = 1.0
+    if _PHASE_GATE_ENABLED:
+        try:
+            from market_phase_gate import inverse_penalty, detect_phase as _detect_phase
+            _phase_info = _detect_phase()
+            _dom_fams = _phase_info.get('dominant_families', [])
+            inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
+        except Exception:
+            inverse_mult = 1.0
+
     # ── Confluence Scorer: multi-family agreement bonus ───────────────────
     confluence_mult = 1.0
     if _CONFLUENCE_ENABLED:
@@ -854,7 +865,7 @@ def _score_signal(token, direction, conf, source, signal_type,
             _confluence_token_cache[token_key] = confluence_mult
             _confluence_cache_ts[token_key] = now_ts
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult
     return final_score
 
 
