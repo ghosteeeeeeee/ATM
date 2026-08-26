@@ -244,3 +244,7 @@
   WHY: 1T last hour (1W +$0.03). 24h 34T 15W 44.1% -$1.16 net negative but improving since hl_copy_trader kill. hl_copy_trader still 11T/27%WR/-$0.86 in 24h window (legacy, signal killed 20:10 UTC). bb_bounce+ degraded 42.9%WR but -$0.031/trade marginal, not fatal. atr_sl_hit 64.7% driven by hl_copy_trader (10/22 losses). Post-kill this normalizes. Trade freq 1.2/hr normal. Consecutive neg hours (19-21 UTC) broken. No kill criteria triggered.
   BY: auto_1hr
   NEXT: Re-run at 01:10 UTC
+[2026-08-26 02:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W +$0.32). Both atr_sl_hit with positive PnL — SL trailed to profit correctly. 33T 24h 42.4% WR -$0.90 (improving). atr_sl_hit 63.6% driven by hl_copy_trader legacy (killed). bb_bounce+ 36.4% WR degraded but 0T last hour — kill criteria not met. 5 open positions. Trade freq 2/hr normal. Consecutive green hours. System stabilizing.
+  BY: auto_1hr
+  NEXT: Re-run at 03:10 UTC

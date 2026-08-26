@@ -1608,7 +1608,7 @@ PUMP_CATCHER_SL_PCT         = 1.0    # stop loss at 1% from entry
 PUMP_CATCHER_TRAILING_ACTIVATE = 1.5 # activate trailing stop at +1.5%
 PUMP_CATCHER_TRAILING_DISTANCE = 0.8 # trail by 0.8% from peak
 # Confidence scoring
-PUMP_CATCHER_CONFIDENCE_BASE = 60    # base confidence
+PUMP_CATCHER_CONFIDENCE_BASE = 70    # base confidence (boosted for hotset competitiveness)
 PUMP_CATCHER_CONFIDENCE_CAP  = 88    # max confidence
 # Dedup and risk
 PUMP_CATCHER_COOLDOWN_BARS  = 10     # bars between signals per token (~10 min on 1m)

@@ -354,8 +354,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('signal_confluence', 'confluence+'): 1.5,
     ('signal_confluence', 'confluence-'): 1.5,
     # pump_catcher — momentum breakout (early-stage velocity + acceleration)
-    ('pump_catcher_long', 'pump-catcher+'):  1.3,
-    ('pump_catcher_short', 'pump-catcher-'): 1.3,
+    ('pump_catcher_long', 'pump-catcher+'):  1.6,  # boosted for hotset competitiveness
+    ('pump_catcher_short', 'pump-catcher-'): 1.6,
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 

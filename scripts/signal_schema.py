@@ -3443,13 +3443,16 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
                 (sym_upper, price, now, lev)
             )
 
-            # price_history: write CURRENT price before backfill
-            # (so current price survives even if backfill hits a 429)
+            # price_history: write on MINUTE boundaries only (60s bars for signals).
+            # latest_prices (above) gets every 30s tick for exit management freshness.
+            # price_history drives EMA/slope/z-score calculations — signals assume 1 bar = 60s.
+            minute_ts = (now // 60) * 60
             c.execute(
                 'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
-                (sym_upper, price, now)
+                (sym_upper, price, minute_ts)
             )
-            rows += 1
+            if minute_ts == now:  # only count actual writes (not skipped half-minutes)
+                rows += 1
 
             # Backfill any missing minutes since last collection
             # Each missed minute gets the LAST KNOWN price (carry-forward),

@@ -31,6 +31,10 @@
 - **continuation- SHORT** — 2 open, 1 closed (-$0.14), re-enabled Aug 25
 - **Phantom trade ALT SHORT #14327** — flagged, likely stale
 
+### DECISION: 30s Price Interval
+
+**A — Split Architecture.** System at 39.4% WR / -$1.36 — no time for risky full migration. Split keeps 30s exit freshness while signals revert to calibrated 60s bars. One line change, zero signal rewrites.
+
 ### Next Actions
 1. **Monitor CONF_FILTER_MAX=89** — eval window closes Aug 26
 2. **Monitor MIN_PRE_MOVE=0.3** — check filter impact today

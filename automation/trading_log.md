@@ -15316,3 +15316,60 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 **Open Questions:**
 - bb_bounce+ regime sensitivity: If still <50% WR tomorrow (Aug 26), investigate if NEUTRAL regime is causing bounce trades to fail on continuation.
 - hl_copy_trader orphaned positions: Should be fully unwound by now. Verify tomorrow.
+
+## [2026-08-26 01:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1W 0L +$0.01)
+**24h:** 33T 14W 42.4% WR -$1.12
+**Open:** 5 positions (HBAR SHORT 17h, GMT SHORT 12.2h, CAKE SHORT 117m, WLFI LONG 113m, BANANA SHORT 28m)
+
+**24h Close Reasons:**
+- atr_sl_hit: 21T 63.6% -$0.80 — hl_copy_trader legacy (10T). 0 in last hour.
+- profit-monster-trail: 6T +$0.26 — only profitable exit
+- cut-loser-MAE-GUARD: 2T -$0.30
+- cascade_flip: 3T -$0.14
+- cut-loser-CL-T1: 1T -$0.14
+
+**Signal Perf (24h):**
+- bb_bounce+: 12T 41.7% WR -$0.52 — degraded, monitoring
+- hl_copy_trader: 10T 30% WR -$0.63 — killed, legacy fading
+- bb-bounce-short: 2T 100% WR +$0.04
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill criteria not met: no signal 3+T/0%WR last hour (only 1T total).
+- Consecutive green hours (22h-01h). System stabilizing.
+- HBAR/GMT old cascade positions (12-17h) — within normal hold window, no action needed.
+- bb_bounce+ at 41.7% but 0T last hour — need 3+ daily trades at 0%WR to trigger kill.
+
+**Open Questions:**
+- HBAR SHORT SL is inverted (stop above entry at 0.0806 vs entry 0.0788). Guardian should handle this.
+
+## [2026-08-26 02:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.32)
+**24h:** 33T 14W 42.4% WR -$0.90
+**Open:** 5 positions (HBAR SHORT, CAKE SHORT, BANANA SHORT, USUAL SHORT, ETH SHORT)
+
+**24h Close Reasons:**
+- atr_sl_hit: 21T 63.6% -$0.58 — dominant, but last 2 trades SL trailed to profit (+PnL)
+- profit-monster-trail: 6T +$0.26 — only profitable exit type
+- cut-loser-MAE-GUARD: 2T -$0.30
+
+**Signal Perf (24h):**
+- bb_bounce+: 11T 36.4% WR -$0.59 — degrading (was 41.7% 1h ago)
+- hl_copy_trader: 9T 22.2% WR -$0.66 — killed, legacy fading
+- cascade-reverse-v2: 2T 50% WR +$0.17
+- bb-bounce-short: 2T 100% WR +$0.04
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill criteria not met: no signal 3+T/0%WR last hour (only 2T total).
+- 2 consecutive green hours. System stabilizing.
+- ATR SL behavior correct — both trades trailed into profit before exit.
+- bb_bounce+ at 36.4% but 0T last hour — needs 3+ daily trades at 0%WR to trigger kill.
+
+**Open Questions:**
+- bb_bounce+ continues degrading. If next session produces 3+ losses, will trigger kill.
