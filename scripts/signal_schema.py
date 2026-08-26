@@ -3411,70 +3411,73 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
         return 0
     now = int(time.time())
     conn = _get_conn(STATIC_DB)
-    c = conn.cursor()
+    try:
+        c = conn.cursor()
 
-    # Batch-fetch last timestamp per token (one query instead of N)
-    syms = [s for s in allMids.keys() if not s.startswith('@')]
-    last_ts = {}
-    if syms:
-        placeholders = ','.join('?' * len(syms))
-        c.execute(
-            f'SELECT token, MAX(timestamp) FROM price_history WHERE token IN ({placeholders}) GROUP BY token',
-            syms
-        )
-        last_ts = {row[0]: row[1] for row in c.fetchall()}
+        # Batch-fetch last timestamp per token (one query instead of N)
+        syms = [s for s in allMids.keys() if not s.startswith('@')]
+        last_ts = {}
+        if syms:
+            placeholders = ','.join('?' * len(syms))
+            c.execute(
+                f'SELECT token, MAX(timestamp) FROM price_history WHERE token IN ({placeholders}) GROUP BY token',
+                syms
+            )
+            last_ts = {row[0]: row[1] for row in c.fetchall()}
 
-    rows = 0
-    prev_price = {}  # {token: last_price} for backfill carry-forward
-    for sym, price_str in allMids.items():
-        # SAFETY: reject @XXX numeric coin IDs
-        if sym.startswith('@'):
-            continue
-        try:
-            price = float(price_str)
-            if price <= 0:
+        rows = 0
+        prev_price = {}  # {token: last_price} for backfill carry-forward
+        for sym, price_str in allMids.items():
+            # SAFETY: reject @XXX numeric coin IDs
+            if sym.startswith('@'):
                 continue
-            lev = tokens.get(sym, 10) if tokens else 10
-            sym_upper = sym.upper()
+            try:
+                price = float(price_str)
+                if price <= 0:
+                    continue
+                lev = tokens.get(sym, 10) if tokens else 10
+                sym_upper = sym.upper()
 
-            # latest_prices: upsert first (most important data)
-            c.execute(
-                'INSERT OR REPLACE INTO latest_prices(token, price, updated_at, max_leverage) VALUES(?, ?, ?, ?)',
-                (sym_upper, price, now, lev)
-            )
+                # latest_prices: upsert first (most important data)
+                c.execute(
+                    'INSERT OR REPLACE INTO latest_prices(token, price, updated_at, max_leverage) VALUES(?, ?, ?, ?)',
+                    (sym_upper, price, now, lev)
+                )
 
-            # price_history: write on MINUTE boundaries only (60s bars for signals).
-            # latest_prices (above) gets every 30s tick for exit management freshness.
-            # price_history drives EMA/slope/z-score calculations — signals assume 1 bar = 60s.
-            minute_ts = (now // 60) * 60
-            c.execute(
-                'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
-                (sym_upper, price, minute_ts)
-            )
-            if c.rowcount > 0:  # INSERT OR IGNORE actually inserted a new row
-                rows += 1
+                # price_history: write on MINUTE boundaries only (60s bars for signals).
+                # latest_prices (above) gets every 30s tick for exit management freshness.
+                # price_history drives EMA/slope/z-score calculations — signals assume 1 bar = 60s.
+                minute_ts = (now // 60) * 60
+                c.execute(
+                    'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
+                    (sym_upper, price, minute_ts)
+                )
+                if c.rowcount > 0:  # INSERT OR IGNORE actually inserted a new row
+                    rows += 1
 
-            # Backfill any missing minutes since last collection
-            # Each missed minute gets the LAST KNOWN price (carry-forward),
-            # which is the price from the previous iteration for this symbol
-            prev_ts = last_ts.get(sym_upper)
-            if prev_ts is not None:
-                gap_seconds = now - prev_ts
-                if gap_seconds > 75:  # Missed at least one full cycle
-                    backfill_price = prev_price.get(sym_upper, price)
-                    for t in range(prev_ts + 60, now, 60):
-                        c.execute(
-                            'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
-                            (sym_upper, backfill_price, t)
-                        )
+                # Backfill any missing minutes since last collection.
+                # Stops at minute_ts (not now) to avoid near-duplicates with the
+                # current-minute write above. After first run, prev_ts is always
+                # minute-aligned so backfill produces clean 60s intervals.
+                prev_ts = last_ts.get(sym_upper)
+                if prev_ts is not None:
+                    gap_seconds = now - prev_ts
+                    if gap_seconds > 75:  # Missed at least one full cycle
+                        backfill_price = prev_price.get(sym_upper, price)
+                        for t in range(prev_ts + 60, minute_ts, 60):
+                            c.execute(
+                                'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
+                                (sym_upper, backfill_price, t)
+                            )
 
-            # Track previous price for next iteration's backfill
-            prev_price[sym_upper] = price
-        except (ValueError, TypeError):
-            continue
+                # Track previous price for next iteration's backfill
+                prev_price[sym_upper] = price
+            except (ValueError, TypeError):
+                continue
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+    finally:
+        conn.close()
     return rows
 
 
