@@ -3392,10 +3392,11 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
     known price for each token. Backfills use INSERT OR IGNORE so they are
     collision-safe — if a row already exists it is silently skipped.
 
-    Write-order: current price is written BEFORE backfill rows. This means
-    if a rate-limit or other error hits mid-batch, the current price is
-    already committed and only the backfill is lost. The next collection
-    cycle will catch remaining gaps.
+    Write-order: current price and backfill share a single transaction.
+    If an uncaught error hits mid-batch, the entire batch is rolled back
+    (no partial commits). ValueErrors in price parsing are caught per-token
+    and skip only that token's writes. The next collection cycle will
+    catch remaining gaps.
 
     This is called by price_collector.py on every run.
     Any script that fetches allMids should call this afterward.
