@@ -72,6 +72,10 @@ from hermes_constants import (
     PUMP_CATCHER_RSI_MAX,
     PUMP_CATCHER_RSI_MIN,
     PUMP_CATCHER_RSI_PERIOD,
+    PUMP_CATCHER_ZSCORE_MAX,
+    PUMP_CATCHER_BB_MAX,
+    PUMP_CATCHER_BB_PERIOD,
+    PUMP_CATCHER_BB_STDDEV,
     PUMP_CATCHER_COOLDOWN_BARS,
     PUMP_CATCHER_MIN_PRICE_ROWS,
     PUMP_CATCHER_CONFIDENCE_BASE,
@@ -285,7 +289,43 @@ def detect_pump(token, closes):
         if direction == 'SHORT' and rsi_val < PUMP_CATCHER_RSI_MIN:
             return None  # oversold — too late
 
-    # ── 7. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
+    # ── 7. Z-score filter: skip if overextended ────────────────────────────────
+    # Z-score > 2.0 means price is 2 std devs above mean — chasing, not catching.
+    if len(closes) >= 20:
+        mean_20 = sum(closes[-20:]) / 20
+        std_20 = (sum((p - mean_20) ** 2 for p in closes[-20:]) / 20) ** 0.5
+        if std_20 > 0:
+            z_now = (price_now - mean_20) / std_20
+            if direction == 'LONG' and z_now > PUMP_CATCHER_ZSCORE_MAX:
+                return None  # overextended — move already happened
+            if direction == 'SHORT' and z_now < -PUMP_CATCHER_ZSCORE_MAX:
+                return None  # overextended — move already happened
+        else:
+            z_now = 0
+    else:
+        z_now = 0
+
+    # ── 8. Bollinger Band position filter: skip if above upper band ────────────
+    # BB position > 1.0 means price is above upper band — exhaustion risk.
+    if len(closes) >= PUMP_CATCHER_BB_PERIOD:
+        bb_closes = closes[-PUMP_CATCHER_BB_PERIOD:]
+        bb_middle = sum(bb_closes) / len(bb_closes)
+        bb_std = (sum((p - bb_middle) ** 2 for p in bb_closes) / len(bb_closes)) ** 0.5
+        bb_upper = bb_middle + PUMP_CATCHER_BB_STDDEV * bb_std
+        bb_lower = bb_middle - PUMP_CATCHER_BB_STDDEV * bb_std
+        bb_width = bb_upper - bb_lower
+        if bb_width > 0:
+            bb_position = (price_now - bb_lower) / bb_width  # 0=lower, 0.5=middle, 1=upper
+            if direction == 'LONG' and bb_position > PUMP_CATCHER_BB_MAX:
+                return None  # above upper band — exhaustion risk
+            if direction == 'SHORT' and bb_position < (1.0 - PUMP_CATCHER_BB_MAX):
+                return None  # below lower band — exhaustion risk
+        else:
+            bb_position = 0.5
+    else:
+        bb_position = 0.5
+
+    # ── 9. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
     # Check that recent closes show follow-through momentum, not a single spike.
     # Uses close-to-close comparisons (we only have close prices, not OHLC).
     recent_3 = closes[-3:]

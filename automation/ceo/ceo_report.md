@@ -1,3 +1,104 @@
+## CEO Report — 2026-08-26 ~21:00 UTC — Fish-Finder Species Recommendation
+
+### 48h Verified Numbers
+| Signal | Trades | WR | PnL | Status |
+|--------|--------|-----|-----|--------|
+| hl_copy_trader | 13 | 23.1% | -$1.25 | KILLED |
+| bb_bounce+ | 25 | 44.0% | -$0.65 | DEGRADED |
+| continuation- | 3 | 0% | -$0.37 | KILLED |
+| slow-grind- | 9 | 44.4% | -$0.33 | KILLED |
+| macd-div- | 4 | 75% | +$0.05 | ACTIVE |
+| bb-bounce-short | 3 | 100% | +$0.07 | ACTIVE |
+
+**Pattern:** All 4 legacy losers are killed. bb_bounce+ degraded on low-liquidity tokens (WLFI, BLUR, AR, CRV). Winners: SHORT-side signals (macd-div-, bb-bounce-short).
+
+### Species Build Priority
+
+**1. Regime Transition Fish (BUILD FIRST — lowest hanging fruit)**
+- **Data:** Already in coin_tracker.db (Wyckoff phases, regime scores, momentum)
+- **What it does:** Fires the MOMENT a token transitions from accumulation→markup (LONG) or distribution→markdown (SHORT)
+- **Why first:** 69/109 tokens in Wyckoff accumulation RIGHT NOW. We're sitting on a goldmine but not mining it. Catching the transition = catching the move.
+- **Impact:** Very high — replaces the regime blindspot we currently have
+- **Effort:** Low — coin_tracker already computes Wyckoff phases, just need transition detection + add_signal()
+- **Architecture:** Script in `scripts/signals/regime_transition.py`, reads coin_tracker.db, fires on phase change events, registered in signals_runner FAST mode
+
+**2. Decay Detector Enhancement (BUILD SECOND — the #1 systemic problem)**
+- **Data:** Already in signal_outcomes table (RUNTIME_DB)
+- **Current state:** signal_decay_detector.py runs every 6h, only catches catastrophic (WR < 15%, 5+ trades). Too slow.
+- **What to build:** REAL-TIME decay detection — monitor trailing 10-trade WR per signal, auto-reduce confidence when WR drops below 50%
+- **Why:** Signal Decay Pattern is THE root cause of our losses. bb_bounce+ went from 61.5% WR to 12.5% in one day. We need to catch this in hours, not days.
+- **Impact:** Very high — prevents the next bb_bounce+ collapse
+- **Effort:** Medium — enhance existing signal_decay_detector.py to run every cycle (1min) with trailing window
+- **Architecture:** Add `compute_decay_score(signal_type)` function that queries last N trades, returns decay multiplier. Wire into signal_compactor.py score computation.
+
+**3. Volume Profile Fish (BUILD THIRD)**
+- **Data:** Already in candles.db (5m, 15m, 1h, 4h candles)
+- **What it does:** Computes POC (Point of Control), VAH (Value Area High), VAL (Value Area Low) from candle volume
+- **Why:** These are key S/R levels. Currently we have pivot-based S/R but no volume-based. Volume profile = where the most trading happened = where price will react.
+- **Impact:** Medium-high — better entry/exit levels, fewer ATR_SL hits
+- **Effort:** Medium — need volume profile calculation (POC = price with highest volume, VAH/VAL = 70% volume range)
+- **Architecture:** Script in `scripts/signals/volume_profile.py`, computes from candles.db, outputs levels to coin_tracker.db, used by other signals for entry quality
+
+**4. Beta Decoupler (BUILD FOURTH)**
+- **Data:** Already in candles.db (BTC + all tokens)
+- **What it does:** Detects when a token's correlation with BTC drops below threshold (about to go independent)
+- **Why:** Tokens that decouple from BTC are about to make big moves (either direction). Currently we have no correlation-based signals.
+- **Impact:** Medium — useful for regime detection and avoiding BTC-correlated noise
+- **Effort:** Medium — compute rolling correlation (20-period) between token and BTC returns
+- **Architecture:** Script in `scripts/signals/beta_decoupler.py`, reads candles.db, fires when correlation drops below 0.3
+
+### 5. Liquidity Filter Fish (NEW — MISSING SPECIES)
+**This is the blindspot that's killing us RIGHT NOW.** bb_bounce+ lost $0.55 today because it entered WLFI, BLUR, AR, CRV — all low-liquidity micro-caps with wide spreads.
+
+- **What it does:** BLOCKS trades on tokens with insufficient liquidity (low volume, wide spread, thin order book)
+- **Data:** Already available — spread_bps computed in coin_tracker_score.py, volume data in candles.db
+- **Impact:** HIGH — directly prevents the bb_bounce+ low-liquidity losses
+- **Effort:** Low — threshold filter, not a signal. Add to entry_gates.py.
+- **Architecture:** Add `check_liquidity_gate(token)` to entry_gates.py. Block if: spread > 50bps OR 24h volume < $100K OR avg candle volume < threshold.
+
+### Architecture Integration
+
+All new fish follow the existing signal pattern:
+```
+scripts/signals/<species_name>.py
+  - compute(token, candles_df) → dict of levels/scores
+  - fire_signal(token, direction, metadata) → calls add_signal()
+  - registered in signals/__init__.py as FAST or SLOW signal
+```
+
+Data flow:
+```
+candles.db → coin_tracker.py → coin_tracker.db → fish signals → add_signal() → RUNTIME_DB
+```
+
+No new dependencies. No new DB tables. All data already exists.
+
+### Recommended Execution Order
+
+| Week | Species | Owner | Depends On |
+|------|---------|-------|------------|
+| Aug 27-28 | Liquidity Filter Fish | CEO (entry_gates.py edit) | None |
+| Aug 27-28 | Regime Transition Fish | signal_analyst | coin_tracker.db |
+| Aug 29-30 | Decay Detector Enhancement | bug_hunter | signal_decay_detector.py |
+| Sep 1-2 | Volume Profile Fish | signal_analyst | candles.db |
+| Sep 3-4 | Beta Decoupler | signal_analyst | candles.db + BTC data |
+
+### Other Blindspots We're Missing
+
+1. **Liquidity Filter** (above) — the #1 blindspot causing real losses right now
+2. **Spread Quality Gate** — tokens with >50bps spread should be auto-blocked
+3. **Volume Confirmation** — signals should require volume spike (not just price move)
+4. **Multi-Timeframe Alignment** — 5m, 15m, 1h, 4h all agreeing = high conviction
+5. **Momentum Exhaustion Detector** — when RSI >70 AND volume declining AND price stalling = reversal coming
+
+### Verification
+- Liquidity Filter: bb_bounce+ low-liquidity losses should drop to 0 within 24h
+- Regime Transition: should fire 5-10 signals/day on accumulation→markup transitions
+- Decay Detector: should catch next signal degradation within 2h (not 6h)
+- Volume Profile: should improve ATR_SL hit rate by providing better entry levels
+
+---
+
 ## CEO Report — 2026-08-26 ~20:00 UTC (264th run)
 
 ### Diagnosis
@@ -162,3 +263,4 @@ No code changes. All kills active. ATR_SL_MIN reverted to1.2% (Aug 25 16:30). Po
 ### DECISION: Signal Cluster — Build option A (Inverse Correlation Guard, 15 min). Rationale: ATR_SL dominant (55% exits -.10/7d) but signal-level correlation bleed is a separate problem — contradictory families (e.g. bb_bounce+ LONG vs SHORT) fire simultaneously, creating hedged losses. Quick win, 15 min, clears confluence noise before tackling lifecycle filters.
 
 DECISION: Build option A (Inverse Guard)
+DECISION: Fish-Finder — Build Volume Profile Fish first (POC/VAH/VAL from local candles.db, Medium difficulty, +5-8% WR). Then Beta Decoupler (BTC correlation breaks, Medium, +3-5% WR). Decay Detector exists at scripts/signal_decay_detector.py — integrate into fish-finder. Regime Transition Fish is P2 — wait for phase gate data to mature. Liquidity Whale is P3 — needs L2 API work. Skip: Funding Rate (low impact), On-Chain (too complex), Microstructure (very high complexity).

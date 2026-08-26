@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-26 13:17 UTC
+# Signal Rotation — 2026-08-26 17:17 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,7 +6,7 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | bb_bounce+ | 72% | 0.829 | 0.829 | ✅ |  |
+| 1 | bb_bounce+ | 72% | 0.829 | 0.829 | ❌ |  |
 | 2 | r2-trend-long4 | 83% | 0.605 | 0.605 | ❓ |  |
 | 3 | hl_copy_trader | 50% | 0.433 | 0.433 | ❓ |  |
 | 4 | r2-trend-long3 | 64% | 0.421 | 0.421 | ❓ |  |

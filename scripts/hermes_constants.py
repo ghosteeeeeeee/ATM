@@ -1605,9 +1605,13 @@ PUMP_CATCHER_VELOCITY_MIN   = 0.5    # min % move in 3 bars to qualify as explos
 PUMP_CATCHER_VELOCITY_BARS  = 3      # bar window for velocity computation
 PUMP_CATCHER_ACCEL_MIN      = 0.0    # min acceleration (current velocity - prior velocity)
 PUMP_CATCHER_TREND_EMA      = 20     # EMA period for trend filter (price must be above)
-PUMP_CATCHER_RSI_MAX        = 75     # max RSI — skip if overbought
+PUMP_CATCHER_RSI_MAX        = 65     # max RSI — skip if overbought (lowered from 75 after MERL loss)
 PUMP_CATCHER_RSI_MIN        = 30     # min RSI — skip if oversold
 PUMP_CATCHER_RSI_PERIOD     = 14     # RSI computation period
+PUMP_CATCHER_ZSCORE_MAX     = 2.0    # max z-score — skip if overextended (MERL had 2.31)
+PUMP_CATCHER_BB_MAX         = 1.0    # max BB position — skip if above upper band (MERL had 1.08)
+PUMP_CATCHER_BB_PERIOD      = 20     # Bollinger Band period
+PUMP_CATCHER_BB_STDDEV      = 2.0    # Bollinger Band standard deviation
 # TP/SL — asymmetric (ride winners, cut losers)
 PUMP_CATCHER_TP_PCT         = 3.0    # take profit at 3% from entry
 PUMP_CATCHER_SL_PCT         = 1.0    # stop loss at 1% from entry
