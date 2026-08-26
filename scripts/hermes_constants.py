@@ -1004,6 +1004,7 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'stop_hunt_reversal',  # 50% WR, -0.15% avg — break-even, no PM Trail benefit
     'cascade-reverse-v2',  # v2 cascade flip — all variants managed via ATR SL
     'pump-catcher', 'pump-catcher+', 'pump-catcher-',  # momentum breakout — own TP/SL/trailing
+    'slow-grind',  # slow grinding downtrend — own ATR SL/TP, no PM Trail benefit
 )
 STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggressively, needs tuning
 
