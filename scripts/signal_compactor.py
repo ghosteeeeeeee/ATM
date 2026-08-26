@@ -47,6 +47,14 @@ try:
 except ImportError as e:
     _CONFLUENCE_ENABLED = False
     log(f"[INIT] Confluence Scorer disabled (import error: {e})", 'WARN')
+
+try:
+    from signal_lifecycle_filter import get_lifecycle_mult as _get_lifecycle_mult, get_lifecycle_params as _get_lifecycle_params
+    _LIFECYCLE_ENABLED = True
+    log("[INIT] Signal Lifecycle Filter loaded")
+except ImportError as e:
+    _LIFECYCLE_ENABLED = False
+    log(f"[INIT] Signal Lifecycle Filter disabled (import error: {e})", 'WARN')
 # ── Confluence token cache (avoids per-signal DB queries) ─────────────────────
 _confluence_token_cache = {}  # token_upper -> confluence_mult
 _CONFLUENCE_CACHE_TTL = 120   # 2 min cache
@@ -865,7 +873,15 @@ def _score_signal(token, direction, conf, source, signal_type,
             _confluence_token_cache[token_key] = confluence_mult
             _confluence_cache_ts[token_key] = now_ts
 
-    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult
+    # ── Signal Lifecycle Filter: early/concurrent/lagging adjustment ──────
+    lifecycle_mult = 1.0
+    if _LIFECYCLE_ENABLED:
+        try:
+            lifecycle_mult = _get_lifecycle_mult(signal_type)
+        except Exception:
+            lifecycle_mult = 1.0
+
+    final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult
     return final_score
 
 
