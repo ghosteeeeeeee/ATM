@@ -34,7 +34,6 @@ from paths import RUNTIME_DB, HERMES_DATA
 # ── Import clustering modules ─────────────────────────────────────────────────
 try:
     from market_phase_gate import detect_phase, signal_family, FAMILY_MAP
-    from signal_lifecycle_filter import SIGNAL_LIFECYCLE
     _CLUSTERING_ENABLED = True
 except ImportError:
     _CLUSTERING_ENABLED = False
@@ -188,9 +187,11 @@ def get_family_activity(lookback_days: int = 3) -> dict:
         second_count = second_half_families.get(fam, 0)
         
         # Trend: rising, falling, or stable
-        if second_count > first_count * 1.2:
+        # Minimum 20 signals per half for reliable trend detection
+        min_half_signals = 10
+        if second_count > first_count * 1.2 and (first_count + second_count) >= min_half_signals * 2:
             trend = 'rising'
-        elif second_count < first_count * 0.8:
+        elif second_count < first_count * 0.8 and (first_count + second_count) >= min_half_signals * 2:
             trend = 'falling'
         else:
             trend = 'stable'

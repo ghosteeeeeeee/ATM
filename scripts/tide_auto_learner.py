@@ -15,7 +15,7 @@ Usage:
     python3 tide_auto_learner.py --dry     # Dry run (show suggestions)
 """
 
-import sys, os, json, sqlite3
+import sys, os, json, sqlite3, math
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
@@ -177,7 +177,7 @@ def learn_lead_lag_patterns(lookback_days: int = 30) -> list:
                     lag_hours = (dt_b - dt_a).total_seconds() / 3600
                     
                     if 0 < lag_hours <= 48:  # Within 2 days
-                        lag_days = round(lag_hours / 24)
+                        lag_days = max(1, math.ceil(lag_hours / 24))  # Minimum 1 day lag
                         family_pairs[(fam_a, fam_b, lag_days)] += 1
                 except Exception:
                     pass
@@ -211,8 +211,8 @@ def save_learned_data(data: dict):
     try:
         with open(LEARNED_DATA_FILE, 'w') as f:
             json.dump(data, f, indent=2)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[tide_auto_learner] ERROR saving learned data: {e}", file=sys.stderr)
 
 
 def suggest_family_mapping(unknown_signals: dict) -> list:
@@ -313,11 +313,20 @@ def run_learning_cycle(dry_run: bool = False):
         print('='*60)
         print(actionable)
     
-    # 5. Save learned data
+    # 5. Save learned data (merge with existing, don't overwrite)
     if not dry_run and (suggestions or patterns):
         learned = load_learned_data()
         learned['unknown_families'] = {s['signal_type']: s['suggested_family'] for s in suggestions}
-        learned['learned_patterns'] = patterns
+        
+        # Merge new patterns with existing (keep higher co-occurrence counts)
+        existing = {p['leader']+'_'+p['follower']+'_'+str(p['lag_days']): p 
+                    for p in learned.get('learned_patterns', [])}
+        for p in patterns:
+            key = p['leader']+'_'+p['follower']+'_'+str(p['lag_days'])
+            if key not in existing or p['n_co_occurrences'] > existing[key].get('n_co_occurrences', 0):
+                existing[key] = p
+        learned['learned_patterns'] = list(existing.values())
+        
         learned['actionable_suggestions'] = actionable
         save_learned_data(learned)
         print(f"\nSaved learned data to {LEARNED_DATA_FILE}")
