@@ -15473,3 +15473,63 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 - continuation- at 2T 0%WR — monitor closely.
 - bb_bounce+ degraded 36.4% WR but 13 different tokens — not concentrated.
 - Next hour: if continuation- has loss → kill it.
+
+## [2026-08-26 09:10 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour. 3 in last 2h (1W 2L -$0.22).
+**24h:** 30T 14W 46.7% WR -$1.31
+
+**Key Metrics:**
+- atr_sl_hit: 16T 53.3% (down from 57.6%)
+- profit-monster-trail: 11T +$0.41 (only profitable exit)
+- Open positions: 5 (HBAR, CAKE, DYDX, SYRUP + 1)
+
+**Signal Perf (24h):**
+- bb_bounce+: 6T 33.3%WR -$0.36 — degraded, not killable
+- continuation-: 3T 0%WR -$0.37 — ALREADY KILLED by prior auto_1hr
+- hl_copy_trader: 5T 0%WR -$0.89 — legacy, killed
+- macd-div-: 2T 100%WR +$0.06 — strong
+
+**Changes:** None needed — continuation- already killed.
+
+**No Change Needed:**
+- Kill criteria not met this hour: 0T closed.
+- continuation- already killed (CONTINUATION_MINUS_ENABLED = False).
+- atr_sl_hit rate improving (57.6% → 53.3%).
+- No signal at 3+T/0%WR with new kills needed.
+- System has 3 consecutive negative hours (06-08 UTC) after 7 green hours — regime shift?
+
+**Open Questions:**
+- bb_bounce+ degraded 33.3%WR — monitor, next loss-heavy hour may trigger.
+- 3 consecutive negative hours (06-08 UTC) — check regime.
+- Open positions: HBAR, CAKE, DYDX, SYRUP (favorites).
+
+## [2026-08-26 10:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L +$0.28)
+**24h:** 37T 17W 45.9%WR -$0.78
+
+**Key Metrics:**
+- atr_sl_hit: 17T 56.7% (dominant, declining from 57.6% earlier)
+- profit-monster-trail: 11T +$0.41 (only profitable exit type)
+- Open positions: 5 (BCH SHORT, ALT SHORT, AR LONG, CRV LONG, HBAR SHORT)
+
+**Signal Perf (24h):**
+- bb_bounce+: 8T 37%WR -$0.08 — degraded but not killable (mixed WR)
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- macd-div-: 2T 100%WR +$0.06 — strong
+- continuation-: 3T 0%WR -$0.37 — KILLED previously
+- hl_copy_trader: 3T 0%WR -$0.54 — KILLED previously
+- pump-catcher+: 1T 0%WR -$0.17 — below kill threshold
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 3+T/0%WR with new kills needed.
+- continuation- and hl_copy_trader already killed in prior hours.
+- Trade frequency normal (1-2/hr).
+- 3 consecutive negative hours (06-08 UTC) broken by green hour at 09:00.
+
+**Open Questions:**
+- bb_bounce+ degraded 37%WR — wide SLs perform better ($0.083/T vs $0.013/T for tight SLs).
+- atr_sl_hit still 56.7% of all closes — monitor if trailing SL logic improving.

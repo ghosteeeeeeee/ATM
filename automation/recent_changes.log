@@ -257,3 +257,7 @@
   WHY: 1T last hour (0W 1L -$0.08). BANANA continuation- SHORT atr_sl_hit. 36T 24h 41.7%WR -$1.29. atr_sl_hit 55.6% (down from 63.6% — improving). profit-monster-trail 10T only profitable exit. continuation- 2T 0%WR -$0.22 — near kill threshold but not 3+T yet. bb_bounce+ 11T 36.4%WR -$0.59 degraded but mixed WR not killable. 4 open positions (HBAR, CAKE, DYDX, SYRUP). 7 consecutive green hours. Kill criteria not triggered. Next: if continuation- has 1 more loss → kill.
   BY: auto_1hr
   NEXT: Re-run at 07:10 UTC
+[2026-08-26 09:10 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour. 30T 24h 46.7%WR -$1.31. continuation- 3T 0%WR -$0.37 already killed (CONTINUATION_MINUS_ENABLED=False). atr_sl_hit 53.3% (improving). bb_bounce+ 6T 33.3%WR -$0.36 degraded but not killable. macd-div- 2T 100%WR +$0.06 strong. 3 consecutive negative hours (06-08) after 7 green. No kill criteria triggered this hour.
+  BY: auto_1hr
+  NEXT: Re-run at 10:10 UTC
