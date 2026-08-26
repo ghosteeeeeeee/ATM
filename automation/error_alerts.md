@@ -800,3 +800,7 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2159s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1975s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2102s left, N failures)`
+
+## Error Alerts — 2026-08-26 03:20 UTC
+- **WARN** (1x): `signal_compactor: timed out` at 03:15:02 — recovered on next cycle, no action taken
+- **WARN**: hl_copy_trader signal win rate 33.3% (4/12 trades, last 24h) — worst performing signal type

@@ -608,24 +608,24 @@ def cascade_flip_v2(
         except Exception as e:
             print(f"  [CFV2] ⚠️ Could not record cascade entry: {e}")
 
-        # ── 2b. Fetch SL/TP values ───────────────────────────────────────────
-        sl_val = tp_val = leverage_db = 0.0
+        # ── 2b. Fetch SL/TP values from OLD trade ────────────────────────────
+        # Use old trade's leverage (SHORT not inserted yet when this runs)
+        sl_val = tp_val = 0.0
+        leverage_db = old_lev  # from the OLD trade we already fetched
         try:
             import psycopg2
             conn_sl = psycopg2.connect(**DB_CONFIG)
             try:
                 cur_sl = conn_sl.cursor()
                 cur_sl.execute("""
-                    SELECT stop_loss, target, leverage
+                    SELECT stop_loss, target
                     FROM trades
-                    WHERE token = %s AND status = 'open'
-                    ORDER BY id DESC LIMIT 1
-                """, (token.upper(),))
+                    WHERE id = %s
+                """, (trade_id,))
                 sl_row = cur_sl.fetchone()
                 if sl_row:
                     sl_val = float(sl_row[0] or 0)
                     tp_val = float(sl_row[1] or 0)
-                    leverage_db = int(sl_row[2] or 10)
                 cur_sl.close()
             finally:
                 conn_sl.close()
