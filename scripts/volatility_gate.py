@@ -110,6 +110,7 @@ REGIME_SIGNALS = {
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks — structural
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
+        'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
     },
 }
 
