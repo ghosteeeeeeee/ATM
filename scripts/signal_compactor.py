@@ -32,13 +32,19 @@ from paths import RUNTIME_DB, STATIC_DB, HOTSET_FILE, HERMES_DATA, REGIME_CACHE_
 from hermes_log import log
 # ── Market Phase Gate & Confluence Scorer ──────────────────────────────────────
 try:
-    from market_phase_gate import signal_family as _signal_family, get_phase_mult, detect_phase, inverse_penalty, get_phase_info
+    from market_phase_gate import signal_family as _signal_family, get_phase_mult, detect_phase, get_phase_info
     from confluence_scorer import score_confluence, get_confluence_mult
     _PHASE_GATE_ENABLED = True
+    _CONFLUENCE_ENABLED = True
     log("[INIT] Market Phase Gate + Confluence Scorer loaded")
 except ImportError as e:
     _PHASE_GATE_ENABLED = False
-    log(f"[INIT] Market Phase Gate disabled (import error: {e})", 'WARN')
+    _CONFLUENCE_ENABLED = False
+    log(f"[INIT] Market Phase Gate + Confluence Scorer disabled (import error: {e})", 'WARN')
+# ── Confluence token cache (avoids per-signal DB queries) ─────────────────────
+_confluence_token_cache = {}  # token_upper -> confluence_mult
+_CONFLUENCE_CACHE_TTL = 120   # 2 min cache
+_confluence_cache_ts = {}     # token_upper -> timestamp
 # ── Open-position cache (avoid re-querying PostgreSQL every compaction) ─────────
 _open_pos_cache = {}  # token_upper -> True/False, refreshed each run
 _dir_wr_cache = {}    # (token, direction) -> (wr, count, timestamp)

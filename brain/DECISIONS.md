@@ -468,3 +468,18 @@
 ---
 
 *Format: `## YYYY-MM-DD | Short title` — append new decisions to the top, above this line.*
+## 2026-08-26: Split Architecture for 30s Price Collector
+
+**Decision:** Option A — Split architecture (CEO approved)
+**What:** price_history quantized to minute boundaries, latest_prices at 30s
+**File:** scripts/signal_schema.py
+**Bugs fixed:** row counter (c.rowcount), backfill range (minute_ts), connection lifecycle (try/finally)
+**Pre-existing:** casing mismatch k* tokens, prev_price dead code, no try/finally
+**Impact:** Exit management gets 30s freshness, signals stay at 60s bars, zero signal code changes
+
+## 2026-08-26: OpenMemory HTTP API documented in AGENTS.md
+
+**What:** Added direct curl examples for OpenMemory query/store/list when MCP functions aren't available.
+**Endpoint:** POST http://localhost:8080/mcp (x-api-key: dev-key-123)
+**Accept header required:** application/json, text/event-stream
+**Config:** /root/.hermes/config/shared-mcp.json

@@ -248,3 +248,8 @@
   WHY: 2T last hour (2W +$0.32). Both atr_sl_hit with positive PnL — SL trailed to profit correctly. 33T 24h 42.4% WR -$0.90 (improving). atr_sl_hit 63.6% driven by hl_copy_trader legacy (killed). bb_bounce+ 36.4% WR degraded but 0T last hour — kill criteria not met. 5 open positions. Trade freq 2/hr normal. Consecutive green hours. System stabilizing.
   BY: auto_1hr
   NEXT: Re-run at 03:10 UTC
+
+[2026-08-26 03:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W +$0.05). Both profit-monster-trail exits. 33T 24h 42.4%WR -$1.25. atr_sl_hit rate declining (57.6% from 63.6%). hl_copy_trader legacy fading (7T from 10T). macd-div- new signal 2T 100%WR +$0.05. bb_bounce+ 11T 36.4%WR -$0.59 degraded but mixed WR not killable. No kill criteria met — no signal 3+T/0%WR. Consecutive green hours. System stabilizing.
+  BY: auto_1hr
+  NEXT: Re-run at 04:10 UTC

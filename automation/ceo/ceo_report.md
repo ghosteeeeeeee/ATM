@@ -40,3 +40,28 @@
 2. **Monitor MIN_PRE_MOVE=0.3** — check filter impact today
 3. **Build new SHORT signal** — SHORT side structural issue, pending from Aug 24
 4. **Monitor bb_bounce+** — if 48h WR <50%, delegate signal_analyst
+
+## CEO Report — 2026-08-26
+
+### Acknowledgment
+- **30s split architecture** implemented: price_history quantized to minute bars, latest_prices every 30s for exit freshness. 3 bugs fixed (row counter, backfill range, connection lifecycle). CEO approved.
+
+## CEO Report — 2026-08-26 ~04:05 UTC
+
+### Diagnosis
+System 7d: 320T -$3.62, 50.9% WR. Today: 6T +$0.40, 100% WR (improving). ATR_SL dominant loss: 177T/7d -$5.10 (55% of exits). ct-hot+ legacy 66T/7d -$3.65 still draining. hl_copy_trader LONG bad48h (-$1.03, 30.8% WR) but 7d still +$1.39. SHORT 48h 62T -$1.83 bleeding. Market 111 SHORT_BIAS tokens — SHORT signals allowed but edge missing.
+
+### Root Cause
+ct-hot+ (CEO_PROTECTED, RESEARCH_FLAGS) remains dominant loss. hl_copy_trader LONG rough patch — all 7 losses from ATR_SL_MIN=1.5% period (reverted to 1.2%). 79 conf tier is -1.4.31 but 90% is ct-hot+ (36/40T). Without ct-hot+: system 7d ~+$0.03 (breakeven, improving).
+
+### Fix Applied
+No code changes. All kills active. ATR_SL_MIN reverted to1.2% (Aug 25 16:30). Post-revert trades: 6T +$0.40, 100% WR. Monitor 48h for ATR_SL improvement.
+
+### Verification
+- 24h: 33T -$1.25, 42.4% WR (legacy closing)
+- 7d: 320T -$3.62, 50.9% WR
+- Today: 6T +$0.40, 100% WR
+- Pipeline: active, 0 errors
+- Disk: 83%
+- Open: 5 SHORT
+- Regime: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS

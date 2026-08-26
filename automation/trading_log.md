@@ -15373,3 +15373,34 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 
 **Open Questions:**
 - bb_bounce+ continues degrading. If next session produces 3+ losses, will trigger kill.
+
+## [2026-08-26 03:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.05)
+**24h:** 33T 14W 42.4% WR -$1.25
+**Open:** 5 positions
+
+**24h Close Reasons:**
+- atr_sl_hit: 19T 57.6% -$0.98 — declining rate (was 63.6%)
+- profit-monster-trail: 8T +$0.31 — only profitable exit
+- cut-loser-MAE-GUARD: 2T -$0.30
+- cascade_flip variants: 3T -$0.14
+
+**Signal Perf (24h):**
+- bb_bounce+: 11T 36.4% WR -$0.59 — degraded but mixed WR, not killable
+- hl_copy_trader: 7T 0% WR -$1.05 — legacy fading (was 10T)
+- bb-bounce-short: 2T 100% WR +$0.04
+- cascade-reverse-v2: 2T 50% WR +$0.16
+- macd-div-: 2T 100% WR +$0.05 — new, promising
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill criteria not met: no signal 3+T/0%WR last hour (only 2T total).
+- Consecutive green hours. System stabilizing.
+- ATR SL hit rate improving (63.6%→57.6%) as hl_copy_trader legacy fades.
+- bb_bounce+ mixed WR — needs 3+ daily trades at 0%WR to trigger kill.
+
+**Open Questions:**
+- macd-div- signals new (2T, 100% WR). Monitor for sustainability.
+- bb_bounce+ continues degraded — next session with 3+ losses triggers kill.
