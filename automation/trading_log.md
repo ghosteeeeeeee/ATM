@@ -15533,3 +15533,97 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - bb_bounce+ degraded 37%WR — wide SLs perform better ($0.083/T vs $0.013/T for tight SLs).
 - atr_sl_hit still 56.7% of all closes — monitor if trailing SL logic improving.
+
+## [2026-08-26 11:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (1W 2L -$0.04)
+**24h:** 33T 48.5%WR -$0.58
+
+**Key Metrics:**
+- atr_sl_hit: 18T 55.2% (dominant, declining from earlier)
+- profit-monster-trail: 11T +$0.41 (only profitable exit type)
+- Open positions: 5 (BCH SHORT, ALT SHORT, AR LONG, CRV LONG, HBAR SHORT)
+
+**Signal Perf (24h):**
+- bb_bounce+: 8T 37.5%WR -$0.08 — degraded but mixed WR not killable
+- continuation-: 3T 0%WR -$0.37 — KILLED
+- hl_copy_trader: 3T 0%WR -$0.54 — KILLED
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- cascade-reverse-v2-mtf_alignment: 3T 66.7%WR +$0.54 — strong
+- macd-div-: 2T 100%WR +$0.06 — strong
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 3+T/0%WR with new kills.
+- continuation-/hl_copy_trader already killed.
+- Trade freq normal (3/hr).
+- atr_sl_hit 55.2% declining from prior hours.
+
+**Open Questions:**
+- bb_bounce+ degraded 37.5%WR — monitor.
+- slow-grind-, confluence-, pump-catcher+ all 1T/0%WR — below kill threshold.
+
+## [2026-08-26 12:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L +$0.00)
+**24h:** 33T 48.5%WR -$0.54
+
+**Key Metrics:**
+- atr_sl_hit: 17T 51.5% (stable, down from 56.7% earlier)
+- profit-monster-trail: 12T +$0.41 (only profitable exit type)
+- Open positions: 5 (CRV, AR, BANANA, DOGE, NEAR)
+
+**Signal Perf (24h):**
+- cascade-reverse-v2-mtf_alignment: 2T 100%WR +$0.58 — strongest
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- macd-div-: 2T 100%WR +$0.06 — strong
+- bb_bounce+: 8T 37.5%WR -$0.08 — degraded but mixed WR
+- pump-catcher+: 2T 0%WR -$0.17 — MONITOR (1 more loss → kill)
+- slow-grind-: 1T 0%WR -$0.13 — below threshold
+- continuation-: 3T 0%WR -$0.37 — already killed
+- hl_copy_trader: 3T 0%WR -$0.54 — already killed
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 3+T/0%WR with new kills.
+- pump-catcher+ at 2T/0%WR — one more loss triggers kill.
+- Trade freq 1/hr normal.
+- atr_sl_hit 51.5% stable and improving from earlier 63%.
+
+**Open Questions:**
+- pump-catcher+ watching — if next trade is loss, kill it.
+- bb_bounce+ wide SLs outperforming tight SLs — no param change needed.
+
+## [2026-08-26 13:10 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L +$0.26)
+**24h:** 34T 52.9%WR -$0.08
+
+**Key Metrics:**
+- atr_sl_hit: 17T 50% (improving from 55-63% earlier)
+- profit-monster-trail: 13T +$0.44 (only profitable exit)
+- 5 open positions (LDO, BIGTIME, DOGE, AR, CRV)
+
+**Signal Perf (24h):**
+- cascade-reverse-v2-mtf_alignment: 2T 100%WR +$0.58 — strongest
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- macd-div-: 2T 100%WR +$0.06 — strong
+- bb_bounce+: 8T 37.5%WR -$0.08 — degraded but mixed WR
+- pump-catcher+: 2T 0%WR -$0.17 — MONITOR (1 more loss → kill)
+- slow-grind-: 2T 50%WR -$0.10 — breakeven
+- continuation-: 3T 0%WR -$0.37 — already killed
+- hl_copy_trader: 2T 0%WR -$0.34 — already killed
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 3+T/0%WR.
+- pump-catcher+ at 2T/0%WR — one more loss triggers kill.
+- Trade freq 2/hr normal.
+- atr_sl_hit 50% improving. System near breakeven.
+
+**Open Questions:**
+- BANANA pnl_pct=616% data anomaly — pnl_usdt correct (+$0.23).
+- pump-catcher+ watching — if next trade is loss, kill it.

@@ -261,3 +261,19 @@
   WHY: 0T last hour. 30T 24h 46.7%WR -$1.31. continuation- 3T 0%WR -$0.37 already killed (CONTINUATION_MINUS_ENABLED=False). atr_sl_hit 53.3% (improving). bb_bounce+ 6T 33.3%WR -$0.36 degraded but not killable. macd-div- 2T 100%WR +$0.06 strong. 3 consecutive negative hours (06-08) after 7 green. No kill criteria triggered this hour.
   BY: auto_1hr
   NEXT: Re-run at 10:10 UTC
+[2026-08-26 10:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L +$0.28). bb_bounce+ DYDX wide SL trailed to +$0.29, IO tight SL -$0.01. 37T 24h 45.9%WR -$0.78. atr_sl_hit 56.7% (declining). profit-monster-trail only profitable exit. No signal at 3+T/0%WR. continuation-/hl_copy_trader already killed. Trade freq 1-2/hr normal. 5 open positions. bb_bounce+ wide SLs > tight SLs ($0.083/T vs $0.013/T). Kill criteria not triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 11:10 UTC
+[2026-08-26 11:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (1W 2L -$0.04). BH slow-grind- cut-loser-CL-T1, HBAR cascade cut_loser +$0.38, ALT confluence- atr_sl_hit. 33T 24h 48.5%WR -$0.58. atr_sl_hit 55.2% (declining). profit-monster-trail only profitable exit. continuation-/hl_copy_trader already killed. No signal at 3+T/0%WR. Kill criteria not triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 12:10 UTC
+[2026-08-26 12:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L +$0.00). AIXBT pump-catcher+ profit-monster-trail breakeven. 33T 24h 48.5%WR -$0.54. atr_sl_hit 51.5% stable. pump-catcher+ 2T 0%WR -$0.17 near kill threshold (1 more loss). continuation-/hl_copy_trader already killed. Kill criteria not triggered. Trade freq 1/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 13:10 UTC
+[2026-08-26 13:10 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.26). BANANA bb_bounce+ atr_sl_hit +$0.23, NEAR slow-grind- profit-monster-trail +$0.03. 34T 24h 52.9%WR -$0.08 (near breakeven). atr_sl_hit 50% improving from earlier hours. pump-catcher+ 2T 0%WR -$0.17 near kill threshold. continuation-/hl_copy_trader already killed. Kill criteria not triggered. Trade freq 2/hr normal. 5 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 14:10 UTC
