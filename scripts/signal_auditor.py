@@ -119,6 +119,12 @@ def map_signal_to_flag(signal_type):
     elif base.endswith('-'):
         suffix = '_MINUS'
         base = base[:-1]
+    elif base.endswith('_long'):
+        suffix = '_PLUS'
+        base = base[:-5]
+    elif base.endswith('_short'):
+        suffix = '_MINUS'
+        base = base[:-6]
 
     # Normalize base to underscore form for lookup
     base_underscore = base.replace('-', '_')
@@ -135,7 +141,7 @@ def map_signal_to_flag(signal_type):
     exact_overrides = {
         'accel_300_vel': 'ACCEL_300_VELOCITY',
         'inv_accel_300': 'INVERSE_ACCEL_300',
-        'inv_accel_300_v2': 'INVERSE_ACCEL_300_V2',
+        'inverse_accel_300_v2': 'INVERSE_ACCEL_300_V2',
         'tl_break_long': 'TL_BREAK_PLUS',   # long → plus
         'tl_break_short': 'TL_BREAK_MINUS',  # short → minus
         'ema9_sma20': 'EMA9_SMA20',
@@ -143,6 +149,8 @@ def map_signal_to_flag(signal_type):
         'gap_300': 'GAP_300',
         'mtp_zscore': 'MTP_ZSCORE',
     }
+    # Signals with a single flag (no PLUS/MINUS variants) — ignore directional suffix
+    _single_flag_overrides = {'inverse_accel_300_v2'}
 
     # Check master overrides first — use directional flag when suffix present
     if base_underscore in master_overrides:
@@ -152,10 +160,9 @@ def map_signal_to_flag(signal_type):
     # Check exact overrides (ignore suffix)
     if base_underscore in exact_overrides:
         flag_base = exact_overrides[base_underscore]
-        if suffix:
-            return f'{flag_base}{suffix}_ENABLED'
-        else:
+        if base_underscore in _single_flag_overrides or not suffix:
             return f'{flag_base}_ENABLED'
+        return f'{flag_base}{suffix}_ENABLED'
 
     # Default: convert base to uppercase, apply suffix
     flag_base = base_underscore.upper()
