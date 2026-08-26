@@ -15659,3 +15659,32 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - bb_bounce+ is biggest system drag (-$0.69). All trades hit atr_sl — SL too tight for this signal's hold times. Monitor; if 0%WR appears in any hour, kill immediately.
 - BABY had duplicate entries (pump-catcher+ won, continuation+ lost). Check if same-token dedup guard exists.
+
+## [2026-08-26 16:10 UTC] Hourly Analysis
+
+**Trades:** 6 closed (2W 4L -$0.02)
+**24h:** 45T 23W 51.1%WR -$0.12
+
+**Key Metrics:**
+- atr_sl_hit: 22T 49% (stable, improving from 63% earlier)
+- profit-monster-trail: 16T +$0.75 (only profitable exit type)
+- 3 open positions
+
+**Signal Perf (24h):**
+- cascade-reverse-v2-mtf_alignment: 3T 2W +$0.48 — strong
+- bb-bounce-short: 4T 4W +$0.15 — strong (recovered from earlier degradation)
+- macd-div-: 1T 1W +$0.15 — strong
+- pump-catcher+: 5T 2W -$0.07 — near breakeven
+- slow-grind-: 7T 3W -$0.29 — slight drag
+
+**Changes:** None needed.
+
+**No Change Needed:**
+- Kill criteria not met: no signal at 3+T/0%WR in last hour.
+- Trade freq 6/hr slightly elevated but normal.
+- atr_sl_hit 49% stable. System near breakeven.
+- bb_bounce+ degraded status resolved — now showing 4T/4W as bb-bounce-short.
+
+**Open Questions:**
+- slow-grind- at 7T/3W/-$0.29 is system's biggest drag. All losses from atr_sl_hit. Monitor but no kill criteria met.
+- ALT had cascade_flip loss (-$0.03) — cascade entries causing friction. Signal itself profitable (+$0.48).

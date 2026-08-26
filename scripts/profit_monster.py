@@ -417,6 +417,17 @@ def run(dry_run=False):
     if not positions:
         return
 
+    # Refresh current_price from live allMids (DB price can be up to 60s stale)
+    try:
+        import hype_cache as hc
+        mids = hc.get_allMids()
+        for pos in positions:
+            token = pos["token"].upper()
+            if token in mids:
+                pos["current_price"] = float(mids[token])
+    except Exception as e:
+        log(f"Failed to refresh mids: {e}", "WARN")
+
     # Compute live PnL for all positions (needed by trail tier)
     from pnl_utils import compute_live_pnl
     for pos in positions:
@@ -437,6 +448,19 @@ def run(dry_run=False):
     # Tier 2: Runner (re-check positions after tier 1 closes)
     if t1_closed > 0:
         positions = get_all_open_positions()
+        # Refresh prices + PnL for re-fetched positions (same as initial load)
+        try:
+            import hype_cache as hc
+            mids = hc.get_allMids()
+            for pos in positions:
+                token = pos["token"].upper()
+                if token in mids:
+                    pos["current_price"] = float(mids[token])
+        except Exception as e:
+            log(f"Failed to refresh mids for T2: {e}", "WARN")
+        for pos in positions:
+            if pos["entry_price"] > 0 and pos["current_price"] > 0:
+                pos["live_pnl_pct"] = compute_live_pnl(pos["entry_price"], pos["current_price"], pos["direction"])
     t2_closed = run_tier("tier2", PM_TIER2_MIN_PCT, PM_TIER2_MAX_PCT,
                          PM_TIER2_MAX_CLOSE, PM_TIER2_SKIP_TOP_PCT,
                          PM_TIER2_FIRE_WINDOWS, positions, effective_dry_run, trail_state)

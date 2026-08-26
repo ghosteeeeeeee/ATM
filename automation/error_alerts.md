@@ -1057,3 +1057,17 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (485s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (180s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (424s left, N failures)`
+
+## Error Alerts — 2026-08-26 15:19 UTC
+- **INFO**: Pipeline healthy. 5 open trades, 41 closed today (-6.24% PnL). 0 tracebacks.
+- **WARN**: BTC-CRASH momentum guard blocking 56 LONG entries in 30min. BTC is NEUTRAL (slope -0.08%). Blocks may be overly cautious — review threshold.
+- **INFO**: All 25 hermes timers firing on schedule. Disk 82%. No phantom trades.
+
+## Error Alerts — 2026-08-26 16:04 UTC
+- **REPEATED** (11x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (3546s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] W TOK BLOCKED — TOK in cooldown (3546s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] W TOK BLOCKED — TOK in cooldown (3538s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3474s left, N failures)`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS signals_runner: TOK — name 'INVERSE_ACCEL_300_V2_ENABLED' is not defined`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CASHCAT TOK BLOCKED — TOK in cooldown (3475s left, N failures)`

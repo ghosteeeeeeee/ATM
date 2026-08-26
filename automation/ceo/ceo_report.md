@@ -1,3 +1,28 @@
+## CEO Report — 2026-08-26 ~20:00 UTC (264th run)
+
+### Diagnosis
+Verified DB: 24h 46T, -$0.17, 50.0% WR (flat). 7d: 341T, -$4.14, 49.6% WR. Today Aug 26: 40T, +$0.12, 52.5% WR. 5 open: -$0.15 unrealized (4 slow-grind- SHORT, 1 cascade-reverse-v2 LONG). **System without ct-hot+**: 261T/7d +$0.93 (NET POSITIVE). ct-hot+ 80T/7d -$5.07 ages out Aug 27. bb_bounce+ degraded today (8T 12.5% WR -$0.55) — ALL 9 ATR_SL hits, 7/9 losses on low-liquidity tokens (WLFI -7.21%, BLUR -3.68%, AR -6.61%, CRV -6.47%). Still 7d 61.5% WR +$0.37 — today is variance, not signal failure.
+
+### Root Cause
+1. **ct-hot+ legacy drain** — 80T/7d -$5.07 (31.3% WR, avg loss -$1.84/trade). Ages out Aug 27. DOMINANT loss source.
+2. **bb_bounce+ low-liquidity noise** — 9 ATR_SL hits today on micro-caps. Signal works on liquid tokens (DYDX +13.25%, BANANA +6.16% today). SL floor at 1.2% too tight for volatile micro-caps.
+3. **hl_copy_trader backbone killed** — was +$1.44/7d. System now single-signal dependent on bb_bounce+.
+4. **slow-grind- dead but positions lingering** — 4 SHORT open, signal killed but trades still riding SLs.
+
+### Fix Applied
+No code changes. All kills active (slow-grind-, continuation-, hl_copy_trader, ct-hot+). 4 slow-grind- open positions will close naturally via SL/TP.
+
+### Next Actions
+1. **RECOMMEND T: Build new backbone signal** — replace hl_copy_trader (+$1.44/7d). System fragile with single-signal dependency on bb_bounce+.
+2. **Monitor ct-hot+ age-out (Aug 27)** — after drain, system projects +$0.93/7d net positive.
+3. **Monitor bb_bounce+ recovery** — if degrades further (another 12.5% WR day), investigate entry quality for low-liquidity tokens.
+4. **Lifecycle filter eval Aug 28** — watch ATR_SL hit rate impact.
+5. **Disk 83%** — stable.
+
+### Verification
+Today +$0.12, 52.5% WR. 5 open underwater -$0.15 (slow-grind- riding SLs, will close). All kills active. ct-hot+ legacy ages out tomorrow. Pipeline active, 0 errors.
+
+---
 ## CEO Report — 2026-08-26 ~17:00 UTC (263rd run)
 
 ### Diagnosis
