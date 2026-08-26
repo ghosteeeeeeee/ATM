@@ -75,9 +75,38 @@ COMBO_SUPPRESS_MIN = 0.5
 
 # Parameter config: name -> {min, max, step, tighten_dir}
 # Only params that exist in hermes_constants.py
+# CEO_PROTECTED params are checked at adjustment time — skipped if protected
 PARAM_CONFIG = {
+    # ── Signal Entry Filters ─────────────────────────────────────────────
     'TREND_FILTER_NEUTRAL_PCT': {'min': 0.20, 'max': 0.60, 'step': 0.05, 'tighten': 'down'},
-    'SPEED_MIN_THRESHOLD': {'min': 20, 'max': 40, 'step': 0.05, 'tighten': 'up'},
+    'SPEED_MIN_THRESHOLD': {'min': 20, 'max': 60, 'step': 5, 'tighten': 'up'},
+    'SIGNAL_FILTER_RSI_MAX': {'min': 60, 'max': 85, 'step': 5, 'tighten': 'down'},
+    'SIGNAL_FILTER_RSI_MIN': {'min': 20, 'max': 40, 'step': 5, 'tighten': 'up'},
+    'SIGNAL_FILTER_SPEED_MIN': {'min': 30, 'max': 60, 'step': 5, 'tighten': 'up'},
+    
+    # ── R2 Trend Long ────────────────────────────────────────────────────
+    'R2_TREND_LONG_MIN_R2': {'min': 0.50, 'max': 0.85, 'step': 0.05, 'tighten': 'up'},
+    'R2_TREND_LONG_MIN_SLOPE': {'min': 0.001, 'max': 0.008, 'step': 0.001, 'tighten': 'up'},
+    'R2_TREND_LONG_MAX_RSI': {'min': 60, 'max': 85, 'step': 5, 'tighten': 'down'},
+    'R2_TREND_LONG_MIN_SPEED': {'min': 20, 'max': 50, 'step': 5, 'tighten': 'up'},
+    'R2_TREND_LONG_MAX_BB_POS': {'min': 0.70, 'max': 0.95, 'step': 0.05, 'tighten': 'down'},
+    'R2_TREND_LONG_MIN_PRE_MOVE': {'min': 0.1, 'max': 0.5, 'step': 0.05, 'tighten': 'up'},
+    'R2_TREND_LONG_MAX_ACCEL': {'min': 0.003, 'max': 0.010, 'step': 0.001, 'tighten': 'down'},
+    
+    # ── Coin Tracker Hot ─────────────────────────────────────────────────
+    'COIN_TRACKER_HOT_MIN_COMPOSITE': {'min': 50, 'max': 75, 'step': 2, 'tighten': 'up'},
+    'COIN_TRACKER_HOT_RECENCY_MIN': {'min': 0.20, 'max': 0.50, 'step': 0.05, 'tighten': 'down'},
+    'COIN_TRACKER_HOT_CLUSTER_MIN': {'min': 0.5, 'max': 2.0, 'step': 0.5, 'tighten': 'up'},
+    
+    # ── Exit Parameters (global — affect all signals) ────────────────────
+    'ATR_SL_MIN': {'min': 0.008, 'max': 0.025, 'step': 0.002, 'tighten': 'down'},
+    'ATR_SL_MAX': {'min': 0.020, 'max': 0.050, 'step': 0.005, 'tighten': 'up'},
+    'ATR_TP_MIN': {'min': 0.005, 'max': 0.015, 'step': 0.001, 'tighten': 'up'},
+    'ATR_TP_MAX': {'min': 0.015, 'max': 0.040, 'step': 0.005, 'tighten': 'up'},
+    'PM_TRAIL_ACTIVATE_PCT': {'min': 0.003, 'max': 0.008, 'step': 0.001, 'tighten': 'down'},
+    'PM_TRAIL_DISTANCE_PCT': {'min': 0.001, 'max': 0.005, 'step': 0.001, 'tighten': 'up'},
+    
+    # ── Macro / Kill Thresholds ──────────────────────────────────────────
     'MACRO_HIGH_VOL_THRESHOLD': {'min': 0.03, 'max': 0.08, 'step': 0.05, 'tighten': 'down'},
     'MACRO_LOW_WR_THRESHOLD': {'min': 20, 'max': 40, 'step': 0.05, 'tighten': 'up'},
 }
@@ -484,12 +513,38 @@ def _set_param_value(param_name, new_value):
 
 
 def _find_weakest_param(signal_type):
-    """Find the parameter most correlated with poor performance."""
+    """Find the parameter most correlated with poor performance.
+    
+    Expanded to cover all active signals. Each signal maps to its most
+    impactful tunable parameters. The first param in the list is tried first.
+    """
     param_map = {
+        # ── Active Signal Families ────────────────────────────────────────
         'bb_bounce': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        'bb_bounce_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        'r2_trend_long': ['R2_TREND_LONG_MIN_R2', 'R2_TREND_LONG_MIN_SLOPE', 'R2_TREND_LONG_MAX_RSI', 'R2_TREND_LONG_MIN_PRE_MOVE'],
+        'r2_trend_short': ['R2_TREND_LONG_MIN_R2', 'R2_TREND_LONG_MIN_SLOPE', 'R2_TREND_LONG_MAX_RSI'],
+        'coin_tracker_hot': ['COIN_TRACKER_HOT_MIN_COMPOSITE', 'COIN_TRACKER_HOT_RECENCY_MIN', 'COIN_TRACKER_HOT_CLUSTER_MIN'],
+        'hzscore': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'tl_break': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        'stop_hunt_reversal_long': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'return_exhaustion': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'return_exhaustion_short': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'spike_exhaustion_short': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'wave_catcher': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'continuation': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'atr_spike': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'vortex_break': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'engulfing': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        'rs': ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'],
+        # ── Legacy / less active ──────────────────────────────────────────
         'pattern_wolf': ['SPEED_MIN_THRESHOLD'],
         'accel_300': ['SPEED_MIN_THRESHOLD'],
-        'tl_break': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        'tl_break_short': ['TREND_FILTER_NEUTRAL_PCT', 'SPEED_MIN_THRESHOLD'],
+        # ── Global exit params (applied to all signals) ───────────────────
+        '_global_exit': ['ATR_SL_MIN', 'ATR_SL_MAX', 'PM_TRAIL_ACTIVATE_PCT', 'PM_TRAIL_DISTANCE_PCT'],
+        # ── Global filter params (applied to all signals) ─────────────────
+        '_global_filter': ['SIGNAL_FILTER_RSI_MAX', 'SIGNAL_FILTER_RSI_MIN', 'SIGNAL_FILTER_SPEED_MIN'],
     }
     params = param_map.get(signal_type, ['SPEED_MIN_THRESHOLD', 'TREND_FILTER_NEUTRAL_PCT'])
     return params[0] if params else None
@@ -684,7 +739,10 @@ def _get_all_trades_recent(limit=100):
 
 
 def analyze_and_adjust():
-    """Main analysis and adjustment cycle."""
+    """Main analysis and adjustment cycle.
+    
+    Expanded to cover all active signal families + global exit/filter params.
+    """
     log_data = _load_log()
     
     if _check_daily_limit():
@@ -692,14 +750,30 @@ def analyze_and_adjust():
         return 0
     
     adjustments = 0
-    signal_types = ['bb_bounce', 'pattern_wolf', 'accel_300', 'tl_break']
+    
+    # ── Step 1: Tune signal-specific parameters ──────────────────────────
+    # All active signal families that have enough trades
+    signal_types = [
+        'bb_bounce', 'bb_bounce_short',
+        'r2_trend_long', 'r2_trend_short',
+        'coin_tracker_hot',
+        'hzscore', 'tl_break', 'tl_break_short',
+        'stop_hunt_reversal_long',
+        'return_exhaustion', 'return_exhaustion_short',
+        'spike_exhaustion_short',
+        'wave_catcher', 'continuation', 'atr_spike',
+        'vortex_break', 'engulfing', 'rs',
+    ]
     
     for signal_type in signal_types:
+        if adjustments >= MAX_ADJUSTMENTS_PER_DAY:
+            _log(f"Hit max adjustments ({MAX_ADJUSTMENTS_PER_DAY}), stopping")
+            break
+        
         trades = _get_recent_trades(signal_type, limit=30)
         
         if len(trades) < MIN_TRADES_BETWEEN:
-            _log(f"  {signal_type}: {len(trades)} trades (need {MIN_TRADES_BETWEEN})")
-            continue
+            continue  # Silent skip — too many signals to log each one
         
         wr = _calculate_wr(trades)
         pnl = _calculate_pnl(trades)
@@ -733,6 +807,38 @@ def analyze_and_adjust():
                         _log_change(signal_type, param, old_value, new_value,
                                    f'WR={wr:.1%} (loosening)', wr)
                         _log(f"  ADJUSTED: {param} {old_value} → {new_value}")
+                        adjustments += 1
+    
+    # ── Step 2: Tune global exit parameters (once per day) ───────────────
+    # Only if we have enough overall trades and haven't hit limit
+    if adjustments < MAX_ADJUSTMENTS_PER_DAY:
+        overall_trades = _get_all_trades_recent(limit=100)
+        if len(overall_trades) >= 50:
+            overall_wr = _calculate_wr(overall_trades)
+            overall_pnl = _calculate_pnl(overall_trades)
+            
+            # If overall WR is below target, try tightening SL (smaller losses)
+            if overall_wr < GOAL_WR and overall_pnl < 0:
+                param = 'ATR_SL_MIN'
+                new_value = _adjust_param(param, direction='tighten')
+                if new_value:
+                    old_value = _get_current_value(param)
+                    if _set_param_value(param, new_value):
+                        _log_change('_global', param, old_value, new_value,
+                                   f'overall WR={overall_wr:.1%}, PnL=${overall_pnl:.2f}', overall_wr)
+                        _log(f"  GLOBAL ADJUSTED: {param} {old_value} → {new_value}")
+                        adjustments += 1
+            
+            # If overall WR is good but PnL is flat, try tightening trail (lock profits faster)
+            elif overall_wr > 0.50 and abs(overall_pnl) < 1.0:
+                param = 'PM_TRAIL_ACTIVATE_PCT'
+                new_value = _adjust_param(param, direction='tighten')
+                if new_value:
+                    old_value = _get_current_value(param)
+                    if _set_param_value(param, new_value):
+                        _log_change('_global', param, old_value, new_value,
+                                   f'overall WR={overall_wr:.1%}, PnL=${overall_pnl:.2f}', overall_wr)
+                        _log(f"  GLOBAL ADJUSTED: {param} {old_value} → {new_value}")
                         adjustments += 1
     
     return adjustments
