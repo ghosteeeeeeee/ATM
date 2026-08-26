@@ -3,7 +3,7 @@
 fetch_hl_volume.py — Fetch OHLCV volume data for Hyperliquid-only tokens.
 
 Uses _hl_info() from hyperliquid_exchange for rate limiting (1s gap between
-/info calls) — prevents 429s from concurrent processes.
+/cache reads) — prevents 429s from concurrent processes.
 
 Usage:
     python3 fetch_hl_volume.py              # fill all tokens with volume=0
@@ -17,16 +17,40 @@ import sqlite3
 import argparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import CANDLES_DB
+from paths import CANDLES_DB, HL_CACHE_FILE
 from hyperliquid_exchange import _hl_info
 
-# Rate limiting: use _hl_info() which enforces 1s gap between /info calls
-RATE_LIMIT_DELAY = 1.0  # 1s between calls (matches _info_rate_limit)
+# Rate limiting: use _hl_info() which enforces 2s gap between /info calls
+RATE_LIMIT_DELAY = 1.0  # 1s between tokens (rate limiter handles per-call gap)
 MAX_TOKENS_PER_RUN = 50  # limit per run to avoid long execution
 
 
+def get_hl_tokens() -> set:
+    """Get set of tokens with active markets on Hyperliquid (from allMids cache).
+    Returns BOTH original case and uppercase for matching."""
+    try:
+        with open(HL_CACHE_FILE) as f:
+            data = json.load(f)
+        # Use allMids — only tokens with active trading pairs
+        all_mids = data.get('allMids', {})
+        # Return both original and uppercase for case-insensitive matching
+        tokens = set()
+        for k in all_mids.keys():
+            if k and not k.startswith('@') and not k.startswith('#'):
+                tokens.add(k)
+                tokens.add(k.upper())
+        return tokens
+    except Exception as e:
+        print(f'[hl-volume] WARNING: Could not load HL tokens from cache: {e}')
+        return set()
+
+
 def get_tokens_without_volume():
-    """Find tokens in candles_1m that have volume=0."""
+    """Find tokens in candles_1m that have volume=0, filtered to HL-only tokens."""
+    hl_tokens = get_hl_tokens()
+    if not hl_tokens:
+        print('[hl-volume] WARNING: Could not load HL token universe from cache')
+
     conn = sqlite3.connect(CANDLES_DB, timeout=10)
     try:
         c = conn.cursor()
@@ -38,9 +62,22 @@ def get_tokens_without_volume():
             ORDER BY cnt DESC
         """)
         rows = c.fetchall()
-        return [(r[0], r[1]) for r in rows]
+        tokens = [(r[0], r[1]) for r in rows]
+
+        # Filter to HL-only tokens (skip non-existent tokens like KBONK, KFLOKI)
+        if hl_tokens:
+            before = len(tokens)
+            tokens = [(t, c) for t, c in tokens if t.upper() in hl_tokens]
+            skipped = before - len(tokens)
+            if skipped:
+                print(f'[hl-volume] Filtered {skipped} non-HL tokens → {len(tokens)} HL tokens')
+
+        return tokens
     finally:
         conn.close()
+
+
+import json
 
 
 def fetch_hl_candles(token: str, timeframe: str = '1m', limit: int = 100):
