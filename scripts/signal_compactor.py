@@ -33,14 +33,20 @@ from hermes_log import log
 # ── Market Phase Gate & Confluence Scorer ──────────────────────────────────────
 try:
     from market_phase_gate import signal_family as _signal_family, get_phase_mult, detect_phase, get_phase_info
-    from confluence_scorer import score_confluence, get_confluence_mult
     _PHASE_GATE_ENABLED = True
-    _CONFLUENCE_ENABLED = True
-    log("[INIT] Market Phase Gate + Confluence Scorer loaded")
+    log("[INIT] Market Phase Gate loaded")
 except ImportError as e:
     _PHASE_GATE_ENABLED = False
+    _signal_family = None
+    log(f"[INIT] Market Phase Gate disabled (import error: {e})", 'WARN')
+
+try:
+    from confluence_scorer import score_confluence, get_confluence_mult
+    _CONFLUENCE_ENABLED = True
+    log("[INIT] Confluence Scorer loaded")
+except ImportError as e:
     _CONFLUENCE_ENABLED = False
-    log(f"[INIT] Market Phase Gate + Confluence Scorer disabled (import error: {e})", 'WARN')
+    log(f"[INIT] Confluence Scorer disabled (import error: {e})", 'WARN')
 # ── Confluence token cache (avoids per-signal DB queries) ─────────────────────
 _confluence_token_cache = {}  # token_upper -> confluence_mult
 _CONFLUENCE_CACHE_TTL = 120   # 2 min cache
@@ -821,21 +827,32 @@ def _score_signal(token, direction, conf, source, signal_type,
 
     # ── Confluence Scorer: multi-family agreement bonus ───────────────────
     confluence_mult = 1.0
-    if _PHASE_GATE_ENABLED:
-        try:
-            # Get all signals for this token in last 24h to check confluence
-            conn = sqlite3.connect(RUNTIME_DB, timeout=5)
-            cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
-            rows = conn.execute(
-                "SELECT signal_type FROM signals WHERE token=? AND created_at>=?",
-                (token.upper(), cutoff)
-            ).fetchall()
-            conn.close()
-            if rows:
-                families = list(set(_signal_family(r[0]) for r in rows))
-                confluence_mult = get_confluence_mult(families)
-        except Exception:
-            confluence_mult = 1.0
+    if _CONFLUENCE_ENABLED:
+        token_key = token.upper()
+        now_ts = time.time()
+        # Check token-level cache first (avoids per-signal DB queries)
+        cached_ts = _confluence_cache_ts.get(token_key, 0)
+        if token_key in _confluence_token_cache and (now_ts - cached_ts) < _CONFLUENCE_CACHE_TTL:
+            confluence_mult = _confluence_token_cache[token_key]
+        else:
+            conn = None
+            try:
+                conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+                cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
+                rows = conn.execute(
+                    "SELECT signal_type FROM signals WHERE token=? AND created_at>=?",
+                    (token_key, cutoff)
+                ).fetchall()
+                if rows:
+                    families = list(set(_signal_family(r[0]) for r in rows))
+                    confluence_mult = get_confluence_mult(families)
+            except Exception:
+                confluence_mult = 1.0
+            finally:
+                if conn:
+                    conn.close()
+            _confluence_token_cache[token_key] = confluence_mult
+            _confluence_cache_ts[token_key] = now_ts
 
     final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult
     return final_score

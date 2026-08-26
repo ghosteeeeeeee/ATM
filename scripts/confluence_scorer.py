@@ -87,16 +87,16 @@ STRONG_CONFLUENCES = [
 
 WEAK_CONFLUENCES = [
     # Trendline vs Bollinger (r=-0.386) — trending vs mean-reverting
-    {'families': ['Trendline', 'Bollinger'], 'penalty': -15, 'reason': 'trending vs mean-reverting'},
+    {'families': ['Trendline', 'Bollinger'], 'penalty': -15, 'reason': 'trending vs mean-reverting', 'min_families': 2},
     
     # Squeeze vs HL_Copy (r=-0.266) — compression vs defensive
-    {'families': ['Squeeze', 'HL_Copy'], 'penalty': -10, 'reason': 'compression vs defensive'},
+    {'families': ['Squeeze', 'HL_Copy'], 'penalty': -10, 'reason': 'compression vs defensive', 'min_families': 2},
     
     # Trendline vs HL_Copy (r=-0.374) — trend vs copy-trading
-    {'families': ['Trendline', 'HL_Copy'], 'penalty': -10, 'reason': 'trend vs copy-trading'},
+    {'families': ['Trendline', 'HL_Copy'], 'penalty': -10, 'reason': 'trend vs copy-trading', 'min_families': 2},
     
     # Momentum vs Exhaustion — contradictory
-    {'families': ['Momentum', 'Exhaustion'], 'penalty': -12, 'reason': 'momentum vs exhaustion'},
+    {'families': ['Momentum', 'Exhaustion'], 'penalty': -12, 'reason': 'momentum vs exhaustion', 'min_families': 2},
 ]
 
 # ── Known Strong Coin-Specific Combos ────────────────────────────────────────
@@ -146,7 +146,8 @@ def score_confluence(families: list, verbose: bool = False) -> dict:
     # Check weak combos
     for combo in WEAK_CONFLUENCES:
         overlap = families_set.intersection(set(combo['families']))
-        if len(overlap) >= 2:
+        min_fams = combo.get('min_families', 2)
+        if len(overlap) >= min_fams:
             total_bonus += combo['penalty']
             weak_matches.append({
                 'combo': combo['families'],
@@ -204,6 +205,7 @@ def get_coin_confluence(token: str, lookback_hours: int = 24) -> dict:
     Returns:
         Same as score_confluence() but coin-specific.
     """
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         cutoff = (datetime.now() - timedelta(hours=lookback_hours)).strftime('%Y-%m-%d %H:%M:%S')
@@ -213,9 +215,11 @@ def get_coin_confluence(token: str, lookback_hours: int = 24) -> dict:
             FROM signals
             WHERE token = ? AND created_at >= ?
         ''', (token.upper(), cutoff)).fetchall()
-        conn.close()
     except Exception:
         return {'bonus': 0, 'level': 'none', 'error': 'db_read_failed'}
+    finally:
+        if conn:
+            conn.close()
     
     if not rows:
         return {'bonus': 0, 'level': 'none', 'family_count': 0}
@@ -245,6 +249,7 @@ def detect_confluence_zone(lookback_days: int = 1) -> list:
     
     Returns list of coins with high confluence.
     """
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         cutoff = (datetime.now() - timedelta(days=lookback_days)).strftime('%Y-%m-%d')
@@ -254,9 +259,11 @@ def detect_confluence_zone(lookback_days: int = 1) -> list:
             FROM signals
             WHERE created_at >= ?
         ''', (cutoff,)).fetchall()
-        conn.close()
     except Exception:
         return []
+    finally:
+        if conn:
+            conn.close()
     
     # Group by token
     token_signals = defaultdict(list)

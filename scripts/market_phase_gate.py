@@ -34,7 +34,7 @@ _PHASE_CACHE_TTL = 300  # 5 min cache
 FAMILY_MAP = {
     'Momentum': ['momentum', 'fast_momentum', 'mtf_momentum', 'velocity', 'phase_accel'],
     'MACD': ['hmacd', 'macd_accel', 'macd_1m', 'mtf_macd', 'macd_divergence_short', 'macd_divergence_long'],
-    'Bollinger': ['bb_bounce', 'bb_bounce_short', 'bollinger_squeeze_long', 'bollinger_squeeze_short'],
+    'Bollinger': ['bb_bounce', 'bb_bounce_short'],
     'Trend_MA': ['ma_cross', 'ma_cross_5m', 'ema9_sma20', 'ema20_50', 'ema_angle',
                   'ma_100_cross', 'ma_100_cross_long', 'ma_100_cross_short', 'ma_100_bounce'],
     'Range': ['range_finder', 'range_finder_short', 'range_breakout', 'range_breakout_short'],
@@ -94,6 +94,7 @@ def detect_phase(lookback_days: int = 3) -> dict:
     if _phase_cache and (now - _phase_cache_time) < _PHASE_CACHE_TTL:
         return _phase_cache
     
+    conn = None
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         cutoff = (datetime.now() - timedelta(days=lookback_days)).strftime('%Y-%m-%d')
@@ -104,9 +105,11 @@ def detect_phase(lookback_days: int = 3) -> dict:
             WHERE created_at >= ?
             ORDER BY created_at ASC
         ''', (cutoff,)).fetchall()
-        conn.close()
     except Exception:
         return {'phase': 'quiet', 'dominant_families': [], 'family_pcts': {}, 'confidence': 0.0, 'total_signals': 0}
+    finally:
+        if conn:
+            conn.close()
     
     if not rows:
         return {'phase': 'quiet', 'dominant_families': [], 'family_pcts': {}, 'confidence': 0.0, 'total_signals': 0}
@@ -320,14 +323,13 @@ INVERSE_FAMILIES = {
 }
 
 
-def inverse_penalty(family: str, dominant_families: list, threshold: float = 15.0) -> float:
+def inverse_penalty(family: str, dominant_families: list) -> float:
     """
     Return penalty multiplier if this family contradicts the dominant families.
     
     Args:
         family: Signal family to check
         dominant_families: List of dominant families in current market
-        threshold: Minimum % a family must have to be considered "dominant" (default 15%)
     
     Returns:
         float: 0.5 if contradicting, 1.0 if not
