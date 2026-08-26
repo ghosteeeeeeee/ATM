@@ -77,12 +77,11 @@ SIGNAL_LIFECYCLE = {
     'hl_copy_plus': 'concurrent',
     'hl_copy_minus': 'concurrent',
     
-    # ── LAGGING: Expect reversal or exhaustion ─────────────────────────────
-    # These fire AFTER the move. Tight SL (catch reversals fast).
-    'return_exhaustion_long': 'lagging',
-    'return_exhaustion_short': 'lagging',
-    'spike_exhaustion_short': 'lagging',
-    'exhaustion': 'lagging',
+    # ── CONCURRENT: Exhaustion fires DURING events (auditor verified) ──────
+    'return_exhaustion_long': 'concurrent',
+    'return_exhaustion_short': 'concurrent',
+    'spike_exhaustion_short': 'concurrent',
+    'exhaustion': 'concurrent',
     'stop_hunt_reversal_long': 'lagging',
     'liquidation_hunt_long': 'lagging',
     'liquidation_hunt_short': 'lagging',
