@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-26 13:12:42",
+  "timestamp": "2026-08-26 21:12:43",
   "total_checks": 20,
   "passed": 11,
   "critical_count": 9,
@@ -7,7 +7,7 @@
   "criticals": [
     {
       "name": "sqlite_leaks",
-      "msg": "107 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
+      "msg": "106 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, macd_accel_signals.py, apply_fixes.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Move conn.close() to a finally block or use context manager"
     },
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "117 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
+      "msg": "116 files: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -31,19 +31,19 @@
     },
     {
       "name": "bare_except",
-      "msg": "94 bare except clauses in 35 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
+      "msg": "100 bare except clauses in 37 files (worst: hl-sync-guardian.py(18), context-compactor.py(9), unified_scanner.py(9))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
     {
       "name": "connection_leaks",
-      "msg": "115 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
+      "msg": "114 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, backtest_rs_signals.py, backfill_5m_from_ph.py, macd_accel_signals.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },
     {
       "name": "non_atomic_json",
-      "msg": "86 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py, dsh_sessions_to_openmemory.py",
+      "msg": "88 files write JSON without atomic pattern: cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, hyperliquid_exchange.py, dsh_sessions_to_openmemory.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },

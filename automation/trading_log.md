@@ -15869,3 +15869,47 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 - slow-grind- continues to be largest drag (-$0.62, 11T) but doesn't meet kill criteria
 - Signal starvation ongoing — all signals scoring 0 confidence in NEUTRAL regime
 - bb_bounce+ (8T/12.5%WR/-$0.69) still CEO_PROTECTED, needs CEO decision
+
+## [2026-08-26 21:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** +$0.18 (WR: 0% but positive due to sizing)
+- GRASS pump-catcher+ LONG atr_sl_hit +$0.18
+
+**24h:** 51T, 50%WR, -$0.22 total PnL
+- atr_sl_hit 53% (27/51) — stable, trailing SL helping
+- profit-monster-trail 16T, +$0.73 avg — clear winner
+- slow-grind- 11T, -$0.62 total — biggest drag but 36.4%WR avoids kill
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: slow-grind- (36.4%WR), pump-catcher+ (28.6%WR) both above 0%
+- Trade freq 1/hr normal
+- 4 open positions at breakeven (SAND LONG, ENS LONG, BTC SHORT, WLFI SHORT)
+- Trailing SL performing well — profit-monster-trail the only profitable exit reason
+
+**Open Questions:**
+- slow-grind- drag (-$0.62) persists but no kill path
+- Signal starvation — NEUTRAL regime blocking confidence scores
+- bb_bounce+ CEO_PROTECTED, needs CEO decision
+
+## [2026-08-26 22:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.18 (WR: 66.7%)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: slow-grind- (36.4%WR, 11T), pump-catcher+ (40%WR, 10T) both above 0% threshold
+- atr_sl_hit 55.6% of 24h closes — elevated but trailing SL deployed, profit-monster-trail avg +$0.046 clear winner
+- Trade freq 3/hr normal
+- 5 open positions at breakeven (CAKE, BABY, SAND, BTC, WLFI)
+- Positive hour broke 6-hour negative streak (recovering trend)
+- 24h: 54T, 50%WR, -$0.04 (near breakeven)
+
+**Open Questions:**
+- slow-grind- continues to be largest drag (-$0.62, 11T) but 36.4%WR avoids kill
+- Signal starvation ongoing — NEUTRAL regime blocking confidence scores
+- bb_bounce+ (6T/16.7%WR/-$0.29) still CEO_PROTECTED, needs CEO decision

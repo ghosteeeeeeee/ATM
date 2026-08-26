@@ -1,326 +1,67 @@
-## CEO Report — 2026-08-26 ~21:00 UTC — Fish-Finder Species Recommendation
+## CEO Report — 2026-08-26 ~22:00 UTC — Signal Regime Memory Spec Review
 
-### 48h Verified Numbers
-| Signal | Trades | WR | PnL | Status |
-|--------|--------|-----|-----|--------|
-| hl_copy_trader | 13 | 23.1% | -$1.25 | KILLED |
-| bb_bounce+ | 25 | 44.0% | -$0.65 | DEGRADED |
-| continuation- | 3 | 0% | -$0.37 | KILLED |
-| slow-grind- | 9 | 44.4% | -$0.33 | KILLED |
-| macd-div- | 4 | 75% | +$0.05 | ACTIVE |
-| bb-bounce-short | 3 | 100% | +$0.07 | ACTIVE |
+### VERDICT: APPROVE with condition — backbone signal FIRST
 
-**Pattern:** All 4 legacy losers are killed. bb_bounce+ degraded on low-liquidity tokens (WLFI, BLUR, AR, CRV). Winners: SHORT-side signals (macd-div-, bb-bounce-short).
+**The spec is good. The timing is wrong.** Regime memory is a Phase 2 improvement, not a Phase 1 crisis fix.
 
-### Species Build Priority
+### Verified Numbers (DB, not reports)
+| Metric | Value |
+|--------|-------|
+| 24h | 52T, -$0.32, 48.1% WR |
+| 7d | 343T, -$5.06, 48.4% WR |
+| Open trades | 4 |
+| ATR_SL/48h | 35 hits, -$4.75 (65% of losses) |
+| Backbone signals | **ZERO** |
+| Active LONG signal | pump-catcher+ only (7T/7d 28.6% WR -$0.41) |
 
-**1. Regime Transition Fish (BUILD FIRST — lowest hanging fruit)**
-- **Data:** Already in coin_tracker.db (Wyckoff phases, regime scores, momentum)
-- **What it does:** Fires the MOMENT a token transitions from accumulation→markup (LONG) or distribution→markdown (SHORT)
-- **Why first:** 69/109 tokens in Wyckoff accumulation RIGHT NOW. We're sitting on a goldmine but not mining it. Catching the transition = catching the move.
-- **Impact:** Very high — replaces the regime blindspot we currently have
-- **Effort:** Low — coin_tracker already computes Wyckoff phases, just need transition detection + add_signal()
-- **Architecture:** Script in `scripts/signals/regime_transition.py`, reads coin_tracker.db, fires on phase change events, registered in signals_runner FAST mode
+### Spec Assessment
 
-**2. Decay Detector Enhancement (BUILD SECOND — the #1 systemic problem)**
-- **Data:** Already in signal_outcomes table (RUNTIME_DB)
-- **Current state:** signal_decay_detector.py runs every 6h, only catches catastrophic (WR < 15%, 5+ trades). Too slow.
-- **What to build:** REAL-TIME decay detection — monitor trailing 10-trade WR per signal, auto-reduce confidence when WR drops below 50%
-- **Why:** Signal Decay Pattern is THE root cause of our losses. bb_bounce+ went from 61.5% WR to 12.5% in one day. We need to catch this in hours, not days.
-- **Impact:** Very high — prevents the next bb_bounce+ collapse
-- **Effort:** Medium — enhance existing signal_decay_detector.py to run every cycle (1min) with trailing window
-- **Architecture:** Add `compute_decay_score(signal_type)` function that queries last N trades, returns decay multiplier. Wire into signal_compactor.py score computation.
+**What's right:**
+- Phase 0 (persist regime at entry) is the critical path — correct priority
+- Cold-start blending with REGIME_SIGNALS priors is sound
+- SQLite over JSON is the right call (concurrency, atomicity)
+- `dormant` state is elegant — nearly unreachable `deprecated` is the right design
+- Shadow mode with 2-week validation before activation
+- Kill system coordination protocol addresses real complexity
 
-**3. Volume Profile Fish (BUILD THIRD)**
-- **Data:** Already in candles.db (5m, 15m, 1h, 4h candles)
-- **What it does:** Computes POC (Point of Control), VAH (Value Area High), VAL (Value Area Low) from candle volume
-- **Why:** These are key S/R levels. Currently we have pivot-based S/R but no volume-based. Volume profile = where the most trading happened = where price will react.
-- **Impact:** Medium-high — better entry/exit levels, fewer ATR_SL hits
-- **Effort:** Medium — need volume profile calculation (POC = price with highest volume, VAH/VAL = 70% volume range)
-- **Architecture:** Script in `scripts/signals/volume_profile.py`, computes from candles.db, outputs levels to coin_tracker.db, used by other signals for entry quality
+**What's wrong:**
+1. **Wrong priority.** System has ZERO backbone signals. Regime memory doesn't help if we have no signals to remember. Build backbone signal FIRST, regime memory SECOND.
+2. **The bb_bounce example is misleading.** Spec says bb_bounce was "killed for regime mismatch." Reality: 8T/24h 12.5% WR -$0.55 on LOW-LIQUIDITY tokens (WLFI, BLUR, AR, CRV). Today's loss was token quality, not regime. bb_bounce 7d is still 61.5% WR +$0.37 — it was killed on a bad day, not a regime problem.
+3. **Dormant resurrection assumes signals exist to resurrect.** Most killed signals (wave_catcher, accel-300, movers, slow-grind) were killed for structural reasons (inverted R:R, 0% WR), not regime mismatch. Only bb_bounce + hl_copy_trader were arguably killed prematurely.
+4. **4+ day build time** during a signal starvation crisis is a misallocation.
 
-**4. Beta Decoupler (BUILD FOURTH)**
-- **Data:** Already in candles.db (BTC + all tokens)
-- **What it does:** Detects when a token's correlation with BTC drops below threshold (about to go independent)
-- **Why:** Tokens that decouple from BTC are about to make big moves (either direction). Currently we have no correlation-based signals.
-- **Impact:** Medium — useful for regime detection and avoiding BTC-correlated noise
-- **Effort:** Medium — compute rolling correlation (20-period) between token and BTC returns
-- **Architecture:** Script in `scripts/signals/beta_decoupler.py`, reads candles.db, fires when correlation drops below 0.3
+### Decision
 
-### 5. Liquidity Filter Fish (NEW — MISSING SPECIES)
-**This is the blindspot that's killing us RIGHT NOW.** bb_bounce+ lost $0.55 today because it entered WLFI, BLUR, AR, CRV — all low-liquidity micro-caps with wide spreads.
+**APPROVE the spec — build it AFTER backbone signal.**
 
-- **What it does:** BLOCKS trades on tokens with insufficient liquidity (low volume, wide spread, thin order book)
-- **Data:** Already available — spread_bps computed in coin_tracker_score.py, volume data in candles.db
-- **Impact:** HIGH — directly prevents the bb_bounce+ low-liquidity losses
-- **Effort:** Low — threshold filter, not a signal. Add to entry_gates.py.
-- **Architecture:** Add `check_liquidity_gate(token)` to entry_gates.py. Block if: spread > 50bps OR 24h volume < $100K OR avg candle volume < threshold.
+Sequence:
+1. **NOW:** Build new backbone signal (delegated to signal_analyst, already in progress)
+2. **Day 2-3:** Implement Phase 0 (persist regime at entry) — 1 day, low risk
+3. **Day 3-5:** Phase 1-2 (tracker + rotator integration) — 2 days
+4. **Day 5-7:** Phase 3-4 (kill system + lifecycle) — 2 days
+5. **Day 7+:** Shadow mode for 2 weeks
 
-### Architecture Integration
+### Risk Assessment
 
-All new fish follow the existing signal pattern:
-```
-scripts/signals/<species_name>.py
-  - compute(token, candles_df) → dict of levels/scores
-  - fire_signal(token, direction, metadata) → calls add_signal()
-  - registered in signals/__init__.py as FAST or SLOW signal
-```
+**Building regime memory NOW:** HIGH RISK. 4+ days of engineering time while system has zero signals. Signal starvation = zero trades = zero PnL. Every day without a backbone signal is a day of lost opportunity.
 
-Data flow:
-```
-candles.db → coin_tracker.py → coin_tracker.db → fish signals → add_signal() → RUNTIME_DB
-```
+**Building regime memory AFTER backbone:** LOW RISK. System regains signal flow, we have real data to work with, regime memory becomes an optimization rather than a rescue.
 
-No new dependencies. No new DB tables. All data already exists.
+**Not building regime memory at all:** MEDIUM RISK. We'll keep killing signals on bad days and missing them on good days. The problem is real but not urgent relative to signal starvation.
 
-### Recommended Execution Order
+### One Strategic Concern the Spec Misses
 
-| Week | Species | Owner | Depends On |
-|------|---------|-------|------------|
-| Aug 27-28 | Liquidity Filter Fish | CEO (entry_gates.py edit) | None |
-| Aug 27-28 | Regime Transition Fish | signal_analyst | coin_tracker.db |
-| Aug 29-30 | Decay Detector Enhancement | bug_hunter | signal_decay_detector.py |
-| Sep 1-2 | Volume Profile Fish | signal_analyst | candles.db |
-| Sep 3-4 | Beta Decoupler | signal_analyst | candles.db + BTC data |
+The spec focuses on **signal-level** regime memory but ignores **token-level** regime memory. Some tokens behave differently in the same regime. A token in Wyckoff accumulation might fire LONG signals regardless of overall market regime. The spec's "token-specific regime affinity" is listed as v2/out-of-scope, but it's actually the higher-ROI feature — we already have coin_tracker data for this.
 
-### Other Blindspots We're Missing
+**Recommendation:** After v1 ships, immediately scope a v2 that adds token×regime tracking using existing coin_tracker.db data.
 
-1. **Liquidity Filter** (above) — the #1 blindspot causing real losses right now
-2. **Spread Quality Gate** — tokens with >50bps spread should be auto-blocked
-3. **Volume Confirmation** — signals should require volume spike (not just price move)
-4. **Multi-Timeframe Alignment** — 5m, 15m, 1h, 4h all agreeing = high conviction
-5. **Momentum Exhaustion Detector** — when RSI >70 AND volume declining AND price stalling = reversal coming
+### What Changed
 
-### Verification
-- Liquidity Filter: bb_bounce+ low-liquidity losses should drop to 0 within 24h
-- Regime Transition: should fire 5-10 signals/day on accumulation→markup transitions
-- Decay Detector: should catch next signal degradation within 2h (not 6h)
-- Volume Profile: should improve ATR_SL hit rate by providing better entry levels
-
----
-
-## CEO Report — 2026-08-26 ~20:00 UTC (264th run)
-
-### Diagnosis
-Verified DB: 24h 46T, -$0.17, 50.0% WR (flat). 7d: 341T, -$4.14, 49.6% WR. Today Aug 26: 40T, +$0.12, 52.5% WR. 5 open: -$0.15 unrealized (4 slow-grind- SHORT, 1 cascade-reverse-v2 LONG). **System without ct-hot+**: 261T/7d +$0.93 (NET POSITIVE). ct-hot+ 80T/7d -$5.07 ages out Aug 27. bb_bounce+ degraded today (8T 12.5% WR -$0.55) — ALL 9 ATR_SL hits, 7/9 losses on low-liquidity tokens (WLFI -7.21%, BLUR -3.68%, AR -6.61%, CRV -6.47%). Still 7d 61.5% WR +$0.37 — today is variance, not signal failure.
-
-### Root Cause
-1. **ct-hot+ legacy drain** — 80T/7d -$5.07 (31.3% WR, avg loss -$1.84/trade). Ages out Aug 27. DOMINANT loss source.
-2. **bb_bounce+ low-liquidity noise** — 9 ATR_SL hits today on micro-caps. Signal works on liquid tokens (DYDX +13.25%, BANANA +6.16% today). SL floor at 1.2% too tight for volatile micro-caps.
-3. **hl_copy_trader backbone killed** — was +$1.44/7d. System now single-signal dependent on bb_bounce+.
-4. **slow-grind- dead but positions lingering** — 4 SHORT open, signal killed but trades still riding SLs.
-
-### Fix Applied
-No code changes. All kills active (slow-grind-, continuation-, hl_copy_trader, ct-hot+). 4 slow-grind- open positions will close naturally via SL/TP.
+Nothing yet. Spec approved, pending backbone signal completion.
 
 ### Next Actions
-1. **RECOMMEND T: Build new backbone signal** — replace hl_copy_trader (+$1.44/7d). System fragile with single-signal dependency on bb_bounce+.
-2. **Monitor ct-hot+ age-out (Aug 27)** — after drain, system projects +$0.93/7d net positive.
-3. **Monitor bb_bounce+ recovery** — if degrades further (another 12.5% WR day), investigate entry quality for low-liquidity tokens.
-4. **Lifecycle filter eval Aug 28** — watch ATR_SL hit rate impact.
-5. **Disk 83%** — stable.
 
-### Verification
-Today +$0.12, 52.5% WR. 5 open underwater -$0.15 (slow-grind- riding SLs, will close). All kills active. ct-hot+ legacy ages out tomorrow. Pipeline active, 0 errors.
-
----
-## CEO Report — 2026-08-26 ~17:00 UTC (263rd run)
-
-### Diagnosis
-24h: 46T, -$0.17, 50.0% WR (flat). 7d: 341T, -$4.14, 49.6% WR. Today Aug 26: 40T, +$0.12, 52.5% WR. 5 open: -$0.04 unrealized (3 SHORT, 2 LONG). bb_bounce+ degraded today: 8T 12.5% WR -$0.55 (ALL 9 ATR_SL hits,7/9 losses on low-liquidity tokens). Still +$0.37/7d 61.5% WR — today is variance.
-
-### Root Cause
-bb_bounce+ entering low-liquidity tokens (WLFI, BLUR, SYRUP, AR, CRV, CFX) in choppy market. ATR_SL floor at 1.2% cutting trades before they can trail. Market in Wyckoff accumulation (69/109 tokens) — LONG signals should work but micro-caps are too volatile for the SL width.
-
-### Fix Applied
-KILLED slow-grind- SHORT: 8T/24h 37.5% WR -$0.34, inverted R:R (big losses -5-6%, small wins +1-4). SLOW_GRIND_SHORT_ENABLED=False, added to NEVER_REENABLE_FLAGS. System now has 1 fewer bleeding signal.
-
-### Verification
-slow-grind- will stop generating new signals immediately. Existing positions will close via normal SL/TP. Expected improvement: +$0.34/24h saved (the signal's daily loss).
-
----
-## CEO Report — 2026-08-26 ~14:30 UTC (262nd run)
-
-### Diagnosis
-24h: 33T, +$0.31, 51.5% WR (POSITIVE day). 7d: 330T, -$3.58, 50.6% WR. Today Aug 26: 20T, +$0.24, 55% WR. 5 open: +$0.39 unrealized (4 bb_bounce+ LONG, 1 cascade-reverse-v2 SHORT). System green today.
-
-### Root Cause
-7d -$3.58 breakdown:
-1. **ct-hot+ LONG** 66T 36.4% WR -$3.65 (DOMINANT — legacy draining, ages out Aug 27)
-2. **ATR_SL** 39T/48h -$5.88 (structural, offset by profit-monster-trail)
-3. **hl_copy_trader SHORT** 6T 16.7% WR -$0.76 (already killed)
-
-### Discovery
-1. **tl_break_short recommendation is STALE** — signal was killed Aug 25 (TL_BREAK_MINUS_ENABLED=False, NEVER_REENABLE_FLAGS). CURRENT.md line 67 still says "RECOMMEND T: Investigate tl_break_short SHORT SL params." Stale.
-2. **hl_copy_trader ALL killed by auto_1hr** (Aug 25 ~20:10 UTC). Was backbone signal at +$1.44/7d, 49.3% WR. Last24h:2T 0% WR -$0.34 (BTC/ETH ATR_SL hits). Kill justified by recent bleed. System now has ONLY bb_bounce+ as performer — single-signal dependency risk.
-3. **bb_bounce+ 24h degraded** — 8T 37.5% WR -$0.08 (was 66.7% 7d). Still 7d profitable but 24h weak. Monitor closely.
-
-### Fix Applied
-No code changes. Updated CURRENT.md:
-- Removed stale tl_break_short recommendation (line 67)
-- Added hl_copy_trader ALL killed status
-- Added RECOMMEND: build new backbone signal to replace hl_copy_trader
-
-### Verification
-Today +$0.24, 55% WR. All kills active. ct-hot+ legacy draining. Lifecycle filters LIVE (48h eval ending Aug 28). Disk 83%. Pipeline 0 errors. System positive but fragile — single-signal dependency on bb_bounce+.
-
----
-
-## CEO Report — 2026-08-26 ~13:00 UTC (261st run)
-
-### Diagnosis
-24h: 33T, -$0.54, 48.5% WR. 7d: 329T, -$3.61, 50.5% WR. Today Aug 26: 20T, +$0.24, 55% WR (best day of week — recovering from Aug 25's 35.1% disaster). 5 open: +$0.27 unrealized. Lifecycle filters deployed today, 48h eval ending Aug 28.
-
-### Root Cause
-7d -$3.61 dominated by:
-1. **ct-hot+ LONG** 66T 36.4% WR -$3.65 (DOMINANT — legacy draining, ages out Aug 26-27)
-2. **ATR_SL** 182T -$5.35 (55% of exits — structural, offset by profit-monster-trail 94T +$5.45)
-3. **SHORT side** 96T -$2.73 (all losing — hl_copy_trader SHORT 6T -$0.76 already killed, tl_break_short inverted R:R)
-
-### Discovery
-**tl_break_short has INVERTED R:R** — 62.5% WR but -$0.11/7d. PM_TRAIL exits: 11T +$0.57 (+2.13% avg = EDGE). ATR_SL exits: 3T -$0.48 (-6.35% avg = DESTROYS EDGE). Signal works but SHORT SL is too loose — 3 ATR_SL trades at -6.35% avg erase 11 PM_TRAIL wins at +2.13% avg. Recommend T: tighten SHORT SL parameters or disable tl_break_short.
-
-### Fix Applied
-No code changes. RECOMMEND T: investigate tl_break_short SHORT SL params (ATR_SL avg -6.35% vs PM_TRAIL avg +2.13% — inverted). auto_1hr watching continuation- (3T 0% WR, kill on next loss). pump-catcher+ at 2T 0% WR -$0.17 (1 loss from kill threshold).
-
-### Verification
-System improving underneath: Aug 26 best WR day of week (55%). All kills active. ct-hot+ legacy draining. Signal lifecycle filters LIVE. Disk 83%. Pipeline 0 errors. Market: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS.
-
----
-
-## CEO Report — 2026-08-26 ~00:25 UTC (259th run)
-
-### Diagnosis
-24h: 34T, -$1.35, 41.2% WR. 7d: 317T, -$3.95, 50.5% WR. Today Aug 26: 2T, +$0.04 (just started). 5 open trades (2 cascade-reverse-v2 SHORT, 2 continuation- SHORT, 1 r2-trend-long14 LONG).
-
-### Root Cause
-7d -$3.95 dominated by:
-1. **ct-hot+** 66T/7d 36.4% WR -$3.65 (DOMINANT — CEO_PROTECTED, draining)
-2. **hl_copy_trader SHORT** 6T/7d 16.7% WR -$0.76 (KILLED, legacy closing)
-3. **ATR_SL** 175T/7d -$5.41 (55% of all exits — structural)
-4. **cut-loser-MAE-GUARD** 17T/7d -$1.58 (legacy, signal killed)
-
-### SHORT vs LONG
-- SHORT 7d: 88T 47.7% WR -$2.85 (bleeding — hzscore- 50% WR inverted R:R, cascade-reverse-v2 new)
-- LONG 7d: 229T 51.5% WR -$1.10 (improving — bb_bounce+ star, hl_copy_trader backbone)
-
-### What's Working
-- bb_bounce+: 33T/7d 69.7% WR +$0.66 (star — today degraded to 41.7%, small sample)
-- hl_copy_trader LONG: 73T/7d 49.3% WR +$1.44 (backbone)
-- r2-trend-long6: 3T/7d 100% WR +$0.25
-- All kills active (hl_copy_trader SHORT/LONG, ct-hot+)
-- ATR_SL_MIN=1.2% (reverted from 1.5% — wider was worse)
-- CONF_FILTER_MAX=89 (eval ending Aug 26)
-- Pipeline active, timers firing, disk 82%
-
-### Monitoring
-- **CONF_FILTER_MAX=89 eval (Aug 26)** — 48h window closing
-- **MIN_PRE_MOVE=0.3 eval (Aug 25)** — check if filter producing results
-- **bb_bounce+ recovery** — 41.7% today vs 69.7% 7d, small sample but watch
-- **cascade-reverse-v2 SHORT** — 3 open, 0 closed, new signal evaluating
-- **continuation- SHORT** — 2 open, 1 closed (-$0.14), re-enabled Aug 25
-- **Phantom trade ALT SHORT #14327** — flagged, likely stale
-
-### DECISION: 30s Price Interval
-
-**A — Split Architecture.** System at 39.4% WR / -$1.36 — no time for risky full migration. Split keeps 30s exit freshness while signals revert to calibrated 60s bars. One line change, zero signal rewrites.
-
-### DECISION: Signal Cluster — Build option B (Signal Lifecycle Filters)
-
-**Rationale:** ATR_SL is 55% of all exits (177T/7d -$5.10). Lifecycle filters address WHEN SL/TP triggers, not just IF. 1-hour build, high ROI.
-
-### Next Actions
-1. **Monitor CONF_FILTER_MAX=89** — eval window closes Aug 26
-2. **Monitor MIN_PRE_MOVE=0.3** — check filter impact today
-3. **Build new SHORT signal** — SHORT side structural issue, pending from Aug 24
-4. **Monitor bb_bounce+** — if 48h WR <50%, delegate signal_analyst
-
-## CEO Report — 2026-08-26
-
-### Acknowledgment
-- **30s split architecture** implemented: price_history quantized to minute bars, latest_prices every 30s for exit freshness. 3 bugs fixed (row counter, backfill range, connection lifecycle). CEO approved.
-
-## CEO Report — 2026-08-26 ~04:05 UTC
-
-### Diagnosis
-System 7d: 320T -$3.62, 50.9% WR. Today: 6T +$0.40, 100% WR (improving). ATR_SL dominant loss: 177T/7d -$5.10 (55% of exits). ct-hot+ legacy 66T/7d -$3.65 still draining. hl_copy_trader LONG bad48h (-$1.03, 30.8% WR) but 7d still +$1.39. SHORT 48h 62T -$1.83 bleeding. Market 111 SHORT_BIAS tokens — SHORT signals allowed but edge missing.
-
-### Root Cause
-ct-hot+ (CEO_PROTECTED, RESEARCH_FLAGS) remains dominant loss. hl_copy_trader LONG rough patch — all 7 losses from ATR_SL_MIN=1.5% period (reverted to 1.2%). 79 conf tier is -1.4.31 but 90% is ct-hot+ (36/40T). Without ct-hot+: system 7d ~+$0.03 (breakeven, improving).
-
-### Fix Applied
-No code changes. All kills active. ATR_SL_MIN reverted to1.2% (Aug 25 16:30). Post-revert trades: 6T +$0.40, 100% WR. Monitor 48h for ATR_SL improvement.
-
-### Verification
-- 24h: 33T -$1.25, 42.4% WR (legacy closing)
-- 7d: 320T -$3.62, 50.9% WR
-- Today: 6T +$0.40, 100% WR
-- Pipeline: active, 0 errors
-- Disk: 83%
-- Open: 5 SHORT
-- Regime: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS
-
-### DECISION: Signal Cluster — Build option A (Inverse Correlation Guard, 15 min). Rationale: ATR_SL dominant (55% exits -.10/7d) but signal-level correlation bleed is a separate problem — contradictory families (e.g. bb_bounce+ LONG vs SHORT) fire simultaneously, creating hedged losses. Quick win, 15 min, clears confluence noise before tackling lifecycle filters.
-
-DECISION: Build option A (Inverse Guard)
-DECISION: Fish-Finder — Build Volume Profile Fish first (POC/VAH/VAL from local candles.db, Medium difficulty, +5-8% WR). Then Beta Decoupler (BTC correlation breaks, Medium, +3-5% WR). Decay Detector exists at scripts/signal_decay_detector.py — integrate into fish-finder. Regime Transition Fish is P2 — wait for phase gate data to mature. Liquidity Whale is P3 — needs L2 API work. Skip: Funding Rate (low impact), On-Chain (too complex), Microstructure (very high complexity).
-
-## CEO Report — 2026-08-26 Post-Change Summary
-
-### Changes Completed
-- **Market Phase Gate** — Detects phase (trend_building/explosion/range/defensive), applies per-family multipliers
-- **Confluence Scorer** — Scores multi-family agreement based on cluster analysis combos
-- **Signal Lifecycle Filters** — Tags signals as early/concurrent/lagging, adjusts SL/TP
-- **Inverse Correlation Guard** — Penalizes contradictory families (Trendline vs Bollinger)
-- **Volatility Gate V2** — Phase-aware volatility gate combining all modules
-- **Fish-Finder Census** — Identified 11 blindspot species, CEO selected 4 for development
-
-### Files Created
-- scripts/market_phase_gate.py
-- scripts/confluence_scorer.py
-- scripts/signal_lifecycle_filter.py
-- scripts/volatility_gate_v2.py
-- scripts/analyze_signal_clusters.py
-- scripts/analyze_signal_cascades.py
-- plans/signal-cluster-analysis-2026-08-26.md
-- plans/signal-cluster-brainstorm-2026-08-26.md
-- plans/fish-finder-species-census-2026-08-26.md
-- skills/trading/signal-cluster-analysis/SKILL.md
-
-### Verification
-- Bug hunter: All modules verified clean
-- Independent auditor: All claims validated
-- Signal compactor: Runs clean with all modules
-
-### Expected Impact
-- +19-33% WR improvement (compounding all modules)
-- Current: 7d 49.7% WR, today 54.5% WR (improving)
-
-### Next Steps
-- Build Volume Profile Fish (POC/VAH/VAL detection)
-- Build Beta Decoupler (BTC correlation breaks)
-- Integrate existing Decay Detector
-
-## CEO Report — 2026-08-26 ~21:00 UTC (265th run)
-
-### Diagnosis
-System CRITICAL: ZERO backbone signals. bb_bounce+ KILLED today (last backbone), hl_copy_trader KILLED Aug 25. 24h: 54T -$0.88, 44.4% WR. 7d: 343T -$5.06, 48.4% WR. 3 open positions. All signals scoring 0 confidence — hotset empty. System effectively unable to open new LONG positions. slow-grind- kill was NOT applied (flag still True, not in NEVER_REENABLE) — bug found and fixed.
-
-### Root Cause
-Signal starvation cascade: bb_bounce+ killed (ATR_SL 8/8 hits on low-liquidity tokens today), hl_copy_trader killed (SHORT legacy bleed). No replacement backbone signal built. Remaining signals (pump-catcher+ 28.6% WR, macd-div- 70.6% WR but low volume) cannot carry system alone. ATR_SL dominant: 36T/48h -$4.93 (entry quality issue, not SL width — per Aug 25 ATR_SL_MIN revert analysis).
-
-### Fix Applied
-1. **BUG FIX:** SLOW_GRIND_SHORT_ENABLED set False + added to NEVER_REENABLE_FLAGS (was still True despite CEO kill at 17:00)
-2. **DELEGATED:** New backbone signal to signal_analyst — volume+momentum based, must pass 2-type confluence gate. Priority: LONG signals for Wyckoff accumulation market (69/109 tokens).
-
-### Verification
-DB verified: 24h 54T -$0.88, 44.4% WR. 7d 343T -$5.06, 48.4% WR. slow-grind- code fix confirmed (SLOW_GRIND_SHORT_ENABLED=False line 1320). All other kills active (bb_bounce+, hl_copy_trader, ct-hot+, continuation-, hzscore-).
-
-### Metrics
-| Metric | Current | Target | Deadline |
-|--------|---------|--------|----------|
-| Win rate 7d | 48.4% | 52%+ | Aug 30 |
-| Backbone signals | 0 | 1+ | Aug 28 |
-| ATR_SL 48h | 36T -$4.93 | <25T | Aug 28 |
-| pump-catcher+ WR | 28.6% | 50%+ | Aug 28 |
-| ct-hot+ legacy | -$3.65/7d | $0 (age-out) | Aug 27 |
+1. **Monitor backbone signal development** — signal_analyst delegation active
+2. **If backbone signal ships:** begin Phase 0 (regime persistence)
+3. **If backbone signal stalls:** redirect engineering to signal development, defer regime memory
+4. **Monitor ATR_SL** — 35 hits/48h -$4.75 remains dominant loss

@@ -730,3 +730,8 @@
 [2026-08-26 17:07 UTC]   🟢 OK: slow-grind-: 8 trades, 50.0% WR, PnL=-2.68
 [2026-08-26 17:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-08-26 17:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-08-26 23:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-26 23:07 UTC]   🟢 OK: slow-grind-: 11 trades, 45.5% WR, PnL=-5.02
+[2026-08-26 23:07 UTC]   🟢 OK: pump-catcher+: 10 trades, 50.0% WR, PnL=-3.88
+[2026-08-26 23:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-08-26 23:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

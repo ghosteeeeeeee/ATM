@@ -128,7 +128,7 @@
   BY: auto_1hr
   NEXT: Re-run at 01:05 UTC
 [2026-08-24 02:05 UTC] auto_1hr: NO CHANGES
-  WHY: 8T last hour (6W 2L +/usr/bin/bash.70). Best hour this session. bb_bounce+ 5T 3W 60% +/usr/bin/bash.27 new signal performing well. hzscore- 2T 2W old positions closing profitably. 55T 24h ~42% WR +/usr/bin/bash.47 net positive. atr_sl_hit 33T (60%) >40% threshold but tpsl_utils.py fix deployed, PnL positive +/usr/bin/bash.08. profit-monster-trail 10T +/usr/bin/bash.51 best exit. cut-loser-MAE-GUARD 3T -/usr/bin/bash.41 worst. No kill criteria — no signal with 0% WR and 3+ trades last hour. 5 open positions mostly green. Trade freq 8/hr elevated from bb_bounce+ burst but signal performing. No changes needed.
+  WHY: 8T last hour (6W 2L +$0.70). Best hour this session. bb_bounce+ 5T 3W 60% +$0.27 new signal performing well. hzscore- 2T 2W old positions closing profitably. 55T 24h ~42% WR +$0.47 net positive. atr_sl_hit 33T (60%) >40% threshold but tpsl_utils.py fix deployed, PnL positive +$0.08. profit-monster-trail 10T +$0.51 best exit. cut-loser-MAE-GUARD 3T -$0.41 worst. No kill criteria — no signal with 0% WR and 3+ trades last hour. 5 open positions mostly green. Trade freq 8/hr elevated from bb_bounce+ burst but signal performing. No changes needed.
   BY: auto_1hr
   NEXT: Re-run at 03:05 UTC
 [2026-08-24 03:05 UTC] auto_1hr: NO CHANGES
@@ -240,7 +240,7 @@
   BY: auto_1hr
   NEXT: Re-run at 21:20 UTC
 [2026-08-25 21:20 UTC] auto_1hr: NO CHANGES
-  WHY: 3T last hour (0W 3L -/usr/bin/bash.10). All atr_sl_hit — BLUR/WLFI bb_bounce+ losses, ETH hl_copy_trader SHORT profit. 39T 24h 35.9% WR -.85. atr_sl_hit 26T (66.7%) dominant -.65. Previous 'improvement' narrative WRONG — 0-4h bucket back to 80% SL hit rate. ATR_SL_MIN 1.2% not helping. Widening to 1.5% was proven worse. bb_bounce+ degraded 53.3%→43.8% WR in one hour (2 new losses). 2T last hour, not 3+ — kill criteria not met. cascade-reverse-v2 2 open positions, no closed trades yet. All entry filters recently tightened (SPEED_MIN=40, CONFIDENCE=88, VEL_THRESHOLD=0.15). Trade freq 3/hr normal. System stable but losing. Next hour: if bb_bounce+ has 1+ more loss → kill.
+  WHY: 3T last hour (0W 3L -$0.10). All atr_sl_hit — BLUR/WLFI bb_bounce+ losses, ETH hl_copy_trader SHORT profit. 39T 24h 35.9% WR -$0.85. atr_sl_hit 26T (66.7%) dominant -$0.65. Previous 'improvement' narrative WRONG — 0-4h bucket back to 80% SL hit rate. ATR_SL_MIN 1.2% not helping. Widening to 1.5% was proven worse. bb_bounce+ degraded 53.3%→43.8% WR in one hour (2 new losses). 2T last hour, not 3+ — kill criteria not met. cascade-reverse-v2 2 open positions, no closed trades yet. All entry filters recently tightened (SPEED_MIN=40, CONFIDENCE=88, VEL_THRESHOLD=0.15). Trade freq 3/hr normal. System stable but losing. Next hour: if bb_bounce+ has 1+ more loss → kill.
   BY: auto_1hr
   NEXT: Re-run at 22:20 UTC
 
@@ -302,6 +302,14 @@
   BY: auto_1hr
   NEXT: Re-run at 20:10 UTC
 [2026-08-26 20:10 UTC] auto_1hr: NO CHANGES
-  WHY: 3T last hour (1W 2L -/usr/bin/bash.10). HBAR r2-trend-short3 profit-monster-trail +/usr/bin/bash.05, ALT cascade-reverse-v2 atr_sl_hit -/usr/bin/bash.14, ENS macd-div- cascade_flip -/usr/bin/bash.01. 53T 24h 50%WR -/usr/bin/bash.22. atr_sl_hit 53.7% stable. slow-grind- 11T/36.4%WR/-/usr/bin/bash.62 biggest drag but no kill criteria (36.4%WR > 0%). pump-catcher+ 7T/28.6%WR/-/usr/bin/bash.41. bb_bounce+ 8T/12.5%WR/-/usr/bin/bash.69 CEO_PROTECTED. continuation-/hl_copy_trader already killed. 6 consecutive negative hours but losses shrinking (recovering trend). 4 open positions. Trade freq 3/hr normal. Kill criteria not triggered.
+  WHY: 3T last hour (1W 2L -$0.10). HBAR r2-trend-short3 profit-monster-trail +$0.05, ALT cascade-reverse-v2 atr_sl_hit -$0.14, ENS macd-div- cascade_flip -$0.01. 53T 24h 50%WR -$0.22. atr_sl_hit 53.7% stable. slow-grind- 11T/36.4%WR/-$0.62 biggest drag but no kill criteria (36.4%WR > 0%). pump-catcher+ 7T/28.6%WR/-$0.41. bb_bounce+ 8T/12.5%WR/-$0.69 CEO_PROTECTED. continuation-/hl_copy_trader already killed. 6 consecutive negative hours but losses shrinking (recovering trend). 4 open positions. Trade freq 3/hr normal. Kill criteria not triggered.
   BY: auto_1hr
   NEXT: Re-run at 21:10 UTC
+[2026-08-26 21:10 UTC] auto_1hr: NO CHANGES
+  WHY: 1T last hour (0W 1L +$0.18). GRASS pump-catcher+ atr_sl_hit +$0.18 (positive due to trailing SL). 51T 24h 50%WR -$0.22. atr_sl_hit 53% (27/51) stable. profit-monster-trail 16T +$0.73 avg — clear winner. slow-grind- 11T/36.4%WR/-$0.62 biggest drag but no kill criteria. pump-catcher+ 8T/28.6%WR/-$0.23. bb_bounce+ CEO_PROTECTED. continuation-/hl_copy_trader already killed. 4 open positions (SAND, ENS, BTC, WLFI) at breakeven. Trade freq 1/hr normal. Kill criteria not triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 22:10 UTC
+[2026-08-26 22:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (2W 1L +$0.18). ENA pump-catcher+ +$0.02, ENS cascade-reverse-v2 +$0.33, CASHCAT pump-catcher+ -$0.17. 54T 24h 50%WR -$0.04. atr_sl_hit 55.6% stable with trailing SL. profit-monster-trail 16T +$0.046 avg clear winner. slow-grind- 11T/36.4%WR/-$0.62 biggest drag but no kill criteria. pump-catcher+ 10T/40%WR/-$0.38 improved from 28.6%. bb_bounce+ CEO_PROTECTED. 5 open positions at breakeven. Trade freq 3/hr normal. Positive hour broke 6-hour negative streak. Kill criteria not triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 23:10 UTC

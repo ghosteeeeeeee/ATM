@@ -1,31 +1,30 @@
 === Signal Performance Report ===
-Period: 2026-08-26 ~12:00 UTC | Last 6h + 24h
+Period: Last 6h | 24h | Generated: 2026-08-26 ~23:10 UTC
 
 KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| bb_bounce+ | LONG | 12.5% | -$0.55 | 8 | KILLED — WR<30%, PnL<-$0.10, 5+ trades. Added to NEVER_REENABLE_FLAGS. |
+| bb_bounce+ | LONG | 16.7% | -$0.29 | 6 (24h) | BB_BOUNCE_ENABLED=False + NEVER_REENABLE. Trades bypass BB_BOUNCE_PLUS_ENABLED check. |
 
 BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signals meet all boost criteria (WR>55%, 5+ trades, PnL>$0.05) |
+| (none) | - | - | - | - | No candidates meet 5+ trade threshold |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| continuation- | SHORT | 0.0% | -$0.37 | 3 | WATCH — 0% WR but only 3 trades (below 5 threshold). Monitor next 6h. |
-| slow-grind- | SHORT | 37.5% | -$0.34 | 8 | Already killed by CEO 2026-08-26. Confirmed in NEVER_REENABLE_FLAGS. |
-| pump-catcher+ | LONG | 50.0% | -$0.04 | 4 | BORDERLINE — break-even PnL, needs more data. |
+| slow-grind- | SHORT | 36.4% | -$0.62 | 11 (24h) | ALREADY KILLED — flag=False, NEVER_REENABLE. Bypass suspected. |
+| pump-catcher+ | LONG | 40.0% | -$0.38 | 10 (24h) | Watch — new signal (today), may need tuning |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| cascade-reverse-v2-mtf_alignment+cascade_active | SHORT | 66.7% | +$0.48 | 3 | Good but <5 trades, can't boost yet. |
-| macd-div- | SHORT | 100.0% | +$0.21 | 3 | Perfect but <5 trades, watch for consistency. |
-| bb-bounce-short | SHORT | 100.0% | +$0.07 | 3 | Perfect but <5 trades. |
-| r2-trend-short4 | SHORT | 100.0% | +$0.15 | 2 | Perfect, too few trades. |
+| bb-bounce-short | SHORT | 100% | +$0.07 | 3 | Small sample, keep watching |
+| macd-div- | SHORT | 75% | +$0.20 | 4 | Strong, small sample |
+| cascade-reverse-v2... | SHORT | 66.7% | +$0.48 | 3 | Strong, small sample |
 
 ISSUES:
-- No direction inversions detected (clean).
-- continuation- SHORT at 0% WR needs monitoring — if next 6h has more losses, kill.
+- CRITICAL: bb_bounce+ trades bypass BB_BOUNCE_PLUS_ENABLED=False check. Root cause: bb_bounce.py sets signal_type='bb_bounce' (bare) but source='bb_bounce+'. The signal_schema.py check for _comp=='bb_bounce' only checks BB_BOUNCE_ENABLED (was True). Fixed by setting BB_BOUNCE_ENABLED=False.
+- slow-grind- trades still appearing despite SLOW_GRIND_SHORT_ENABLED=False. May be pre-disable trades in 24h window, or bypass bug similar to bb_bounce.
+- No signal inversions detected (24h).

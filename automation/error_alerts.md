@@ -1120,3 +1120,7 @@ ALERTS:
 - **INFO**: BTC-CRASH protection triggered — YGG SHORT blocked at 19:12
 - **WARN**: Disk at 83% — 20G free, approaching threshold
 - **INFO**: No auto-fixes needed — system running normally
+
+## Error Alerts — 2026-08-26 23:04 UTC
+- **REPEATED** (28x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — MOMENTUM`
