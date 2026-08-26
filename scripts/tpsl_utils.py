@@ -261,6 +261,7 @@ def compute_atr_sl_tp(
     volatility_regime: str = 'NORMAL',
     sl_multiplier: float = 1.0,
     trailing_distance: Optional[float] = None,
+    lifecycle_role: str = 'concurrent',
 ) -> dict:
     """
     Compute trailing ATR SL and TP for a position.
@@ -419,6 +420,7 @@ def compute_atr_sl_tp(
         'atr': atr or 0.0,
         'atr_pct': 0.0,
         'is_init_to_accel_migration': False,
+        'lifecycle_role': lifecycle_role,
     }
 
     if not ref_price or ref_price <= 0:
@@ -501,6 +503,19 @@ def compute_atr_sl_tp(
         eff_sl_pct = min(eff_sl_pct * sl_multiplier, ATR_SL_MAX)
         eff_tp_pct = min(eff_tp_pct * sl_multiplier, ATR_TP_MAX)
         log(f'  [VOL-GATE] {token}: HIGH vol — SL widened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
+
+    # ── Lifecycle role adjustment ────────────────────────────────────────────
+    # early: wider SL (room to develop), bigger TP (bigger move expected)
+    # lagging: tighter SL (catch reversal fast), smaller TP (limited upside)
+    # concurrent: normal (no adjustment)
+    if lifecycle_role == 'early':
+        eff_sl_pct = min(eff_sl_pct * 1.5, ATR_SL_MAX)
+        eff_tp_pct = min(eff_tp_pct * 2.0, ATR_TP_MAX)
+        log(f'  [LIFECYCLE] {token}: EARLY — SL widened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
+    elif lifecycle_role == 'lagging':
+        eff_sl_pct = max(eff_sl_pct * 0.8, MIN_SL_PCT)
+        eff_tp_pct = max(eff_tp_pct * 0.8, MIN_TP_PCT)
+        log(f'  [LIFECYCLE] {token}: LAGGING — SL tightened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
 
     # For established trades: cap SL at trailing distance so trailing can lock profits
     # Without this, the ATR-based floor (0.15-0.50%) overrides the trailing distance (0.20%)

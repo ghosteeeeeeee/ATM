@@ -240,15 +240,14 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES = {
     'BANANA',
-    'BTC',
     'CAKE',
     'ENA',
-    'ETH',
     'FIL',
     'GMT',
     'IMX',
     'LDO',
     'NXPC',
+    'SEI',
     'SYRUP',
     'ZRO'
 }
@@ -1783,7 +1782,7 @@ TREND_FILTER_ENABLED = True
 TREND_FILTER_TIMEFRAME = '15m'
 TREND_FILTER_EMA_FAST = 20
 TREND_FILTER_EMA_SLOW = 50
-TREND_FILTER_NEUTRAL_PCT = 0.3225 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
+TREND_FILTER_NEUTRAL_PCT = 0.3555 # EMA spread % for neutral zone — narrowed from 0.5 by self_learner (more restrictive)
 TREND_FILTER_CACHE_TTL = 300    # cache EMA values for 5 min
 
 # ── Macro Deployment Gate ─────────────────────────────────────────────────
@@ -1915,7 +1914,7 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # continuation.py V2 — assess trend state, fire same-dir or fade exhaustion
 CONTINUATION_ENABLED = True   # V2 re-enabled 2026-08-25 — smart direction, exhaustion detection
 CONTINUATION_PLUS_ENABLED = True   # re-enter LONG after LONG close
-CONTINUATION_MINUS_ENABLED = True  # re-enter SHORT after SHORT close
+CONTINUATION_MINUS_ENABLED = False  # auto_1hr KILLED 2026-08-26 — 3T/0W/0%WR/-$0.37. All SHORT entries hit SL or cut-loser. NEVER_REENABLE without regime filter.
 CONTINUATION_MIN_PNL = 0.3                    # % — minimum PnL to trigger re-entry
 CONTINUATION_WINDOW_SEC = 1800                # seconds after close to scan (30 min, was 300s/5min in V1)
 TREND_MOMENTUM_NEAR_SMA_ENABLED = False      # KILLED 2026-08-12 13:05 UTC — 4T 0W 0% WR -$0.37 in 24h. Contrarian flip didn't help.

@@ -1,69 +1,44 @@
-# Signal Performance Report
-**Generated:** 2026-08-25 23:02 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-08-26 05:30 UTC
 
-## Overall Stats
-- **Total trades (all time):** 1,431 | **WR:** 48.6% | **PnL:** -76.40%
-- **Date range:** 2026-07-29 → 2026-08-25
+## Summary
+- **24h**: 34 trades closed, 44.1% WR, **-$1.21 PnL**
+- **6h**: 7 trades closed, **100% WR**, **+$0.44 PnL** (strong recovery)
 
----
+## KILLED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none new) | | | | | |
 
-## WINNERS (WR > 55%, PnL > 0)
+All recent losers (hl_copy_trader, coin_tracker_hot, macd-div+) are already killed. 24h trades from these signals are pre-kill opens.
 
-None found.
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-short | SHORT | 100% | +$0.07 | 3 | On watch |
+| r2-trend-short | SHORT | 100% | +$11 | 2 | On watch |
+| macd-div- | SHORT | 100% | +$0.05 | 2 | On watch |
 
----
+## LOSERS (watch list)
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb_bounce+ | LONG | 36.4% | -$0.59 | 11 | WATCH — bad 24h, but 7d is 69.7% WR +$0.66 |
+| bb_bounce+,rs-s31 | LONG | 0% | -$0.19 | 1 | rs- filter noise |
+| bb_bounce+,rs-s44 | LONG | 0% | -$0.05 | 1 | rs- filter noise |
+| continuation- | SHORT | 0% | -$0.14 | 1 | Too few trades |
 
-## LOSERS (WR < 30%, PnL < -2%)
+## WINNERS
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-short | SHORT | 100% | +$0.07 | 3 | Strong |
+| r2-trend-short | SHORT | 100% | +$0.11 | 2 | Strong |
+| macd-div- | SHORT | 100% | +$0.05 | 2 | Strong |
+| cascade-reverse-v2 | SHORT | 50% | +$0.16 | 2 | On watch |
+| atr-spike+,r2-trend-long3 | LONG | 100% | +$0.16 | 1 | Strong |
+| confluence+ | LONG | 100% | +$0.08 | 1 | Strong |
 
-None found.
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| hl_copy_trader | LONG | 11 | 36.4% | -6.44 | ❓ | Borderline |
-| bb_bounce+ | LONG | 15 | 46.7% | -4.53 | ENABLED | Borderline |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[WATCH] hl_copy_trader LONG** — WR=36.4%, PnL=-6.44% over 11 trades. Monitor next cycle.
-2. **[WATCH] bb_bounce+ LONG** — WR=46.7%, PnL=-4.53% over 15 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-08-25 | 4845662 | signals: slow_grind_short + signal starvation fixes (post-ch... |
-| 2026-08-25 | c62afc0 | auto_1hr: Kill hl_copy_trader signal (12T/25%WR/-$1.13/24h).... |
-| 2026-08-25 | c9f55aa | CEO: REVERT ATR_SL_MIN 1.5%→1.2% — wider SL worsened hit rat... |
-| 2026-08-25 | 397a940 | orchestrator: kill ct-hot+ (-.65/7d), fix signal reporter SQ... |
-| 2026-08-25 | f187671 | signals: relax atr-spike params for more frequent signals |
-| 2026-08-25 | 3276349 | Signals: Fix pump_catcher review findings |
-| 2026-08-25 | b621e21 | Signals: Add pump_catcher — momentum breakout signal |
-| 2026-08-25 | 67c8abd | signals: mitigate losing streak — kill hl_copy_trader standa... |
-| 2026-08-25 | 3890c64 | signals: kill tl_break_short — 28.6% WR, $-0.32 (24h), 7T |
-| 2026-08-25 | 1350ec3 | scripts: widen ATR_SL_MIN 1.2%→1.5% — reduce atr_sl_hit domi... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+## ISSUES
+- **bb_bounce+ LONG** had a rough 24h (36.4% WR, -$0.59) but 7d performance is healthy (65.8% WR, +$0.53). This is variance, not a kill candidate. Monitor next report.
+- **No direction inversions** found in 24h.
+- **hl_copy_trader** trades in 24h window are from pre-kill opens — signal is disabled.
+- **Today (2026-08-26)**: Only 2 trades closed so far, both bb-bounce-short SHORT winners. Clean start to the day.

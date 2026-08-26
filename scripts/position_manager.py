@@ -1778,6 +1778,16 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         except Exception:
             pass
 
+        # ── Lifecycle role for SL/TP adjustment ─────────────────────────────
+        _lifecycle_role = 'concurrent'
+        try:
+            from signal_lifecycle_filter import get_lifecycle_role
+            _sig = pos.get('signal', '')
+            if _sig:
+                _lifecycle_role = get_lifecycle_role(_sig)
+        except Exception:
+            pass
+
         result = compute_atr_sl_tp(
             token=token,
             direction=direction,
@@ -1795,6 +1805,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
             volatility_regime=vol_regime,
             sl_multiplier=sl_mult,
             trailing_distance=pos.get('trailing_distance'),
+            lifecycle_role=_lifecycle_role,
         )
 
         new_sl = result['new_sl']

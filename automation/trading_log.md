@@ -1,5 +1,16 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-26 06:40 UTC] Orchestrator — Signal Lifecycle Filters Deployed
+
+**What:** Integrated `signal_lifecycle_filter.py` into the SL/TP computation path.
+**Files changed:** `tpsl_utils.py` (added `lifecycle_role` param + adjustment block), `position_manager.py` (wired signal lookup into `_collect_atr_updates`).
+**How it works:** Each signal is tagged as early/concurrent/lagging. Early signals (accel, momentum) get wider SL (+50%) and bigger TP (+100%). Lagging signals (bb_bounce, macd_div) get tighter SL (-20%) and smaller TP (-20%). Concurrent signals unchanged. Score penalties already existed in signal_compactor.
+**Expected impact:** +3-5% WR from appropriate position sizing. Fewer premature stop-outs on early signals, faster exits on lagging signals.
+**Validation:** Self-test passed, import chain verified, functional test confirmed adjustments apply correctly.
+**Monitor:** 48h eval for ATR_SL hit rate reduction and WR improvement.
+
+---
+
 ## [2026-08-25 20:10 UTC] Hourly Analysis
 
 **Trades:** 1 closed in last hour (0W 1L -$0.14). 5 closed in last 6h (3W 2L +$0.08).
@@ -15423,3 +15434,42 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 **Open Questions:**
 - bb_bounce+ continues degraded — next session with 3+ losses triggers kill.
 - 5 open positions (DYDX bb_bounce+, ETH bb-bounce-short, BANANA continuation-, CAKE continuation-, HBAR cascade-reverse-v2).
+
+## FAVORITES Update — 2026-08-26 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ETH (WR=50.0%, PnL=$-0.33, 1 consecutive bad days, regime=NEUTRAL)
+- DEMOTE BTC (WR=50.0%, PnL=$-0.27, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE SEI (WR=80.0%, AvgPnL=0.78%, Trades=5)
+
+Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 'SYRUP', 'ZRO']
+
+## [2026-08-26 06:10 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L -$0.08). 7T in 6h (6W 1L +$0.39).
+**24h:** 36T 15W 41.7% WR -$1.29
+
+**Key Metrics:**
+- atr_sl_hit: 20T 55.6% (down from 63.6%)
+- profit-monster-trail: 10T +$0.38 (only profitable exit)
+- Open positions: 4 (HBAR, CAKE, DYDX, SYRUP — all favorites)
+
+**Signal Perf (24h):**
+- bb_bounce+: 11T 36.4%WR -$0.59 — degraded, 13 tokens hit (WLFI worst: 3T 1W -$0.25)
+- hl_copy_trader: 7T 0%WR -$1.05 — killed, legacy fading
+- bb-bounce-short: 3T 100%WR +$0.07 — strong
+- continuation-: 2T 0%WR -$0.22 — near kill threshold
+- cascade-reverse-v2: 2T 50%WR +$0.16 — ok
+- macd-div-: 1T 100%WR +$0.03 — promising
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill criteria not met: no signal 3+T/0%WR last hour (1T closed).
+- atr_sl_hit declining (57.6%→55.6%) — trend improving.
+- 7 consecutive green hours (00-06 UTC).
+- continuation- at 2T 0%WR — 1 more loss triggers kill.
+
+**Open Questions:**
+- continuation- at 2T 0%WR — monitor closely.
+- bb_bounce+ degraded 36.4% WR but 13 different tokens — not concentrated.
+- Next hour: if continuation- has loss → kill it.

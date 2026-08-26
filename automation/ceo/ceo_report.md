@@ -35,6 +35,10 @@
 
 **A — Split Architecture.** System at 39.4% WR / -$1.36 — no time for risky full migration. Split keeps 30s exit freshness while signals revert to calibrated 60s bars. One line change, zero signal rewrites.
 
+### DECISION: Signal Cluster — Build option B (Signal Lifecycle Filters)
+
+**Rationale:** ATR_SL is 55% of all exits (177T/7d -$5.10). Lifecycle filters address WHEN SL/TP triggers, not just IF. 1-hour build, high ROI.
+
 ### Next Actions
 1. **Monitor CONF_FILTER_MAX=89** — eval window closes Aug 26
 2. **Monitor MIN_PRE_MOVE=0.3** — check filter impact today
@@ -65,3 +69,7 @@ No code changes. All kills active. ATR_SL_MIN reverted to1.2% (Aug 25 16:30). Po
 - Disk: 83%
 - Open: 5 SHORT
 - Regime: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS
+
+### DECISION: Signal Cluster — Build option A (Inverse Correlation Guard, 15 min). Rationale: ATR_SL dominant (55% exits -.10/7d) but signal-level correlation bleed is a separate problem — contradictory families (e.g. bb_bounce+ LONG vs SHORT) fire simultaneously, creating hedged losses. Quick win, 15 min, clears confluence noise before tackling lifecycle filters.
+
+DECISION: Build option A (Inverse Guard)
