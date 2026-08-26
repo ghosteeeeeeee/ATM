@@ -608,29 +608,25 @@ def cascade_flip_v2(
         except Exception as e:
             print(f"  [CFV2] ⚠️ Could not record cascade entry: {e}")
 
-        # ── 2b. Fetch SL/TP values from OLD trade ────────────────────────────
-        # Use old trade's leverage (SHORT not inserted yet when this runs)
+        # ── 2b. Calculate SL/TP for NEW direction ─────────────────────────────
+        # CRITICAL FIX: Do NOT copy SL/TP from the OLD trade — LONG's SL is below
+        # entry, SHORT's SL must be above entry. Copying causes immediate hard_sl
+        # trigger (ALT 08-26, all cascade flips had this bug).
         sl_val = tp_val = 0.0
         leverage_db = old_lev  # from the OLD trade we already fetched
         try:
-            import psycopg2
-            conn_sl = psycopg2.connect(**DB_CONFIG)
-            try:
-                cur_sl = conn_sl.cursor()
-                cur_sl.execute("""
-                    SELECT stop_loss, target
-                    FROM trades
-                    WHERE id = %s
-                """, (trade_id,))
-                sl_row = cur_sl.fetchone()
-                if sl_row:
-                    sl_val = float(sl_row[0] or 0)
-                    tp_val = float(sl_row[1] or 0)
-                cur_sl.close()
-            finally:
-                conn_sl.close()
-        except Exception:
-            pass
+            from hermes_constants import ATR_SL_MIN_INIT, ATR_TP_MIN
+            if opposite_dir == 'LONG':
+                sl_val = round(current_price * (1 - ATR_SL_MIN_INIT), 8)
+                tp_val = round(current_price * (1 + ATR_TP_MIN), 8)
+            else:  # SHORT
+                sl_val = round(current_price * (1 + ATR_SL_MIN_INIT), 8)
+                tp_val = round(current_price * (1 - ATR_TP_MIN), 8)
+            print(f"  [CFV2] SL/TP for {opposite_dir}: SL={sl_val:.6f} TP={tp_val:.6f} "
+                  f"(entry={current_price:.6f}, ATR_SL={ATR_SL_MIN_INIT*100:.1f}%, ATR_TP={ATR_TP_MIN*100:.1f}%)")
+        except Exception as e:
+            print(f"  [CFV2] ⚠️ Could not calculate SL/TP: {e} — using 0.0")
+            sl_val = tp_val = 0.0
 
         # ── 2c. Sync DB entry for post-flip position ──────────────────────────
         try:
