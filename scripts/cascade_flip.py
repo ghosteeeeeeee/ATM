@@ -378,23 +378,34 @@ def cascade_flip(token: str, position_direction: str, trade_id: int,
         except Exception as e:
             print(f"  [CASCADE FLIP] ⚠️ Could not record cascade entry: {e}")
 
-        # ── 2b. Fetch SL/TP values ───────────────────────────────────────────
-        conn_sl = _get_db_connection()
+        # ── 2b. Calculate SL/TP for NEW direction ─────────────────────────────
+        # CRITICAL FIX: Do NOT copy SL/TP from the OLD trade — LONG's SL is below
+        # entry, SHORT's SL must be above entry. Copying causes immediate hard_sl.
         sl_val = tp_val = leverage_db = 0.0
+        try:
+            from hermes_constants import ATR_SL_MIN_INIT, ATR_TP_MIN
+            if opposite_dir == 'LONG':
+                sl_val = round(current_price * (1 - ATR_SL_MIN_INIT), 8)
+                tp_val = round(current_price * (1 + ATR_TP_MIN), 8)
+            else:  # SHORT
+                sl_val = round(current_price * (1 + ATR_SL_MIN_INIT), 8)
+                tp_val = round(current_price * (1 - ATR_TP_MIN), 8)
+            print(f"  [CASCADE] SL/TP for {opposite_dir}: SL={sl_val:.6f} TP={tp_val:.6f}")
+        except Exception:
+            pass
+        # Still need leverage from DB
+        conn_sl = _get_db_connection()
         if conn_sl:
             try:
                 cur_sl = conn_sl.cursor()
                 cur_sl.execute("""
-                    SELECT stop_loss, target, leverage
-                    FROM trades
+                    SELECT leverage FROM trades
                     WHERE token = %s AND status = 'open'
                     ORDER BY id DESC LIMIT 1
                 """, (token.upper(),))
-                sl_row = cur_sl.fetchone()
-                if sl_row:
-                    sl_val = float(sl_row['stop_loss'] or 0)
-                    tp_val = float(sl_row['target'] or 0)
-                    leverage_db = int(sl_row['leverage'] or 10)
+                lev_row = cur_sl.fetchone()
+                if lev_row:
+                    leverage_db = int(lev_row['leverage'] or 10)
                 cur_sl.close()
             except Exception:
                 pass
