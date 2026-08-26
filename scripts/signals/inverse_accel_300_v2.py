@@ -171,7 +171,7 @@ def _get_1m_volume(token: str, lookback: int = V2_VOLUME_LOOKBACK + 10) -> list:
         c = conn.cursor()
         c.execute("""
             SELECT volume FROM (
-                SELECT volume
+                SELECT ts, volume
                 FROM candles_1m
                 WHERE token = ? AND is_closed = 1
                 ORDER BY ts DESC
@@ -230,15 +230,16 @@ def _check_1h_trend(token: str, current_price: float) -> bool:
 def _check_volume_confirmation(token: str, volumes: list) -> bool:
     """Check if current volume is above average (selling pressure for SHORT).
     
-    Returns True if volume confirms the move.
+    Returns True if volume confirms the move, or if volume data is stale/unavailable
+    (graceful degradation — don't block signals on missing data).
     """
     if not volumes or len(volumes) < V2_VOLUME_LOOKBACK:
-        return False  # not enough data — conservative, don't confirm
+        return True  # not enough data — don't block (graceful degradation)
     
     recent = volumes[-V2_VOLUME_LOOKBACK:]
     avg_vol = sum(recent) / len(recent)
     if avg_vol <= 0:
-        return False
+        return True  # all zeros — data stale, don't block
     
     # Current volume (last bar) should be above average
     current_vol = volumes[-1]
