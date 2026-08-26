@@ -1082,3 +1082,41 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2038s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1915s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3302s left, N failures)`
+
+## Health Report — 2026-08-26 19:21 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-26 19:21 UTC
+
+PIPELINE: OK
+- Status: running (completed 19:19:26, 18s runtime)
+- Timer: active (1min interval)
+- Signals (1h): 61 generated, 0 entered (max positions 5/5)
+- Trades today: 45 closed, +1.23 USDT, 53.3% WR
+- Errors: 0
+
+MARKET:
+- Regime: 0 LONG / 0 SHORT / 106 NEUTRAL (overall: NEUTRAL)
+- Top speeds: S=100%, BLZ=100%, MERL=99.5%, MKR=99.1%
+- BTC crash protection: ACTIVE (YGG SHORT blocked at 19:12)
+
+SYSTEM:
+- Timers: ~30 active (all hermes timers firing)
+- hl-sync-guardian: active
+- Disk: 83% (20G free, under 85% threshold)
+- Open positions: 5/5 (at capacity)
+- Phantom trades: 0
+
+ALERTS:
+- [INFO] All 106 tokens in NEUTRAL regime — no directional bias
+- [INFO] BTC crash protection blocking shorts on momentum
+- [WARN] Disk at 83% — monitor, compress logs if >85%
+- [INFO] Pipeline fully blocked new entries (5/5 positions full)
+```
+
+### Error Alerts — 2026-08-26 19:21 UTC
+- **INFO**: All 106 tokens NEUTRAL regime — system in low-activity mode
+- **INFO**: BTC-CRASH protection triggered — YGG SHORT blocked at 19:12
+- **WARN**: Disk at 83% — 20G free, approaching threshold
+- **INFO**: No auto-fixes needed — system running normally
