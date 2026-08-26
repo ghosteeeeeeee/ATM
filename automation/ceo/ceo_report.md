@@ -1,3 +1,52 @@
+## CEO Report — 2026-08-26 ~14:30 UTC (262nd run)
+
+### Diagnosis
+24h: 33T, +$0.31, 51.5% WR (POSITIVE day). 7d: 330T, -$3.58, 50.6% WR. Today Aug 26: 20T, +$0.24, 55% WR. 5 open: +$0.39 unrealized (4 bb_bounce+ LONG, 1 cascade-reverse-v2 SHORT). System green today.
+
+### Root Cause
+7d -$3.58 breakdown:
+1. **ct-hot+ LONG** 66T 36.4% WR -$3.65 (DOMINANT — legacy draining, ages out Aug 27)
+2. **ATR_SL** 39T/48h -$5.88 (structural, offset by profit-monster-trail)
+3. **hl_copy_trader SHORT** 6T 16.7% WR -$0.76 (already killed)
+
+### Discovery
+1. **tl_break_short recommendation is STALE** — signal was killed Aug 25 (TL_BREAK_MINUS_ENABLED=False, NEVER_REENABLE_FLAGS). CURRENT.md line 67 still says "RECOMMEND T: Investigate tl_break_short SHORT SL params." Stale.
+2. **hl_copy_trader ALL killed by auto_1hr** (Aug 25 ~20:10 UTC). Was backbone signal at +$1.44/7d, 49.3% WR. Last24h:2T 0% WR -$0.34 (BTC/ETH ATR_SL hits). Kill justified by recent bleed. System now has ONLY bb_bounce+ as performer — single-signal dependency risk.
+3. **bb_bounce+ 24h degraded** — 8T 37.5% WR -$0.08 (was 66.7% 7d). Still 7d profitable but 24h weak. Monitor closely.
+
+### Fix Applied
+No code changes. Updated CURRENT.md:
+- Removed stale tl_break_short recommendation (line 67)
+- Added hl_copy_trader ALL killed status
+- Added RECOMMEND: build new backbone signal to replace hl_copy_trader
+
+### Verification
+Today +$0.24, 55% WR. All kills active. ct-hot+ legacy draining. Lifecycle filters LIVE (48h eval ending Aug 28). Disk 83%. Pipeline 0 errors. System positive but fragile — single-signal dependency on bb_bounce+.
+
+---
+
+## CEO Report — 2026-08-26 ~13:00 UTC (261st run)
+
+### Diagnosis
+24h: 33T, -$0.54, 48.5% WR. 7d: 329T, -$3.61, 50.5% WR. Today Aug 26: 20T, +$0.24, 55% WR (best day of week — recovering from Aug 25's 35.1% disaster). 5 open: +$0.27 unrealized. Lifecycle filters deployed today, 48h eval ending Aug 28.
+
+### Root Cause
+7d -$3.61 dominated by:
+1. **ct-hot+ LONG** 66T 36.4% WR -$3.65 (DOMINANT — legacy draining, ages out Aug 26-27)
+2. **ATR_SL** 182T -$5.35 (55% of exits — structural, offset by profit-monster-trail 94T +$5.45)
+3. **SHORT side** 96T -$2.73 (all losing — hl_copy_trader SHORT 6T -$0.76 already killed, tl_break_short inverted R:R)
+
+### Discovery
+**tl_break_short has INVERTED R:R** — 62.5% WR but -$0.11/7d. PM_TRAIL exits: 11T +$0.57 (+2.13% avg = EDGE). ATR_SL exits: 3T -$0.48 (-6.35% avg = DESTROYS EDGE). Signal works but SHORT SL is too loose — 3 ATR_SL trades at -6.35% avg erase 11 PM_TRAIL wins at +2.13% avg. Recommend T: tighten SHORT SL parameters or disable tl_break_short.
+
+### Fix Applied
+No code changes. RECOMMEND T: investigate tl_break_short SHORT SL params (ATR_SL avg -6.35% vs PM_TRAIL avg +2.13% — inverted). auto_1hr watching continuation- (3T 0% WR, kill on next loss). pump-catcher+ at 2T 0% WR -$0.17 (1 loss from kill threshold).
+
+### Verification
+System improving underneath: Aug 26 best WR day of week (55%). All kills active. ct-hot+ legacy draining. Signal lifecycle filters LIVE. Disk 83%. Pipeline 0 errors. Market: 111 SHORT_BIAS, 41 NEUTRAL, 20 LONG_BIAS.
+
+---
+
 ## CEO Report — 2026-08-26 ~00:25 UTC (259th run)
 
 ### Diagnosis
