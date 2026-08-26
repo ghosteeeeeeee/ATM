@@ -223,17 +223,22 @@ def suggest_family_mapping(unknown_signals: dict) -> list:
     """
     suggestions = []
     
-    # Name pattern matching
+    # Name pattern matching (more comprehensive)
     patterns = {
-        'Trendline': ['tl_break', 'trendline', 'trend_break'],
+        'ZScore': ['zscore', 'z_score', 'z-score', 'percentile', 'hzscore'],
+        'Trendline': ['tl_break', 'trendline', 'trend_break', 'vortex'],
         'Bollinger': ['bb_', 'bollinger', 'squeeze'],
-        'Momentum': ['momentum', 'velocity', 'accel'],
+        'Momentum': ['momentum', 'velocity', 'accel', 'grind', 'slow_grind'],
         'Exhaustion': ['exhaust', 'return'],
         'R2': ['r2_', 'r_squared'],
         'Range': ['range', 'channel'],
-        'Mover': ['mover', 'hot', 'pump'],
+        'Mover': ['mover', 'hot', 'pump', 'chain'],
         'HL_Copy': ['hl_copy', 'copy'],
         'Support_Resistance': ['support', 'resistance', 'sr_'],
+        'Confluence': ['confluence', 'combo'],
+        'ATR': ['atr'],
+        'Volume': ['volume', 'vol'],
+        'Wave': ['wave'],
     }
     
     for sig_type, count in unknown_signals.items():
@@ -252,6 +257,30 @@ def suggest_family_mapping(unknown_signals: dict) -> list:
                     break
     
     return suggestions
+
+
+def generate_actionable_suggestions(unknown_signals: dict, patterns: list) -> str:
+    """Generate actionable code changes for the user."""
+    lines = []
+    
+    # FAMILY_MAP updates
+    if unknown_signals:
+        lines.append("# ACTION: Add to FAMILY_MAP in market_phase_gate.py:")
+        suggestions = suggest_family_mapping(unknown_signals)
+        for s in suggestions:
+            lines.append(f"#   '{s['suggested_family']}': [..., '{s['signal_type']}'],  # {s['reason']}")
+        lines.append("")
+    
+    # LEAD_LAG_RULES updates
+    significant_patterns = [p for p in patterns if p['n_co_occurrences'] >= 100 and p['leader'] != p['follower']]
+    if significant_patterns:
+        lines.append("# ACTION: Add to LEAD_LAG_RULES_STATIC in tide_detector.py:")
+        for p in sorted(significant_patterns, key=lambda x: -x['n_co_occurrences'])[:5]:
+            corr = min(0.9, p['n_co_occurrences'] / 200)
+            lines.append(f"#   {{'leader': '{p['leader']}', 'follower': '{p['follower']}', 'lag_days': {p['lag_days']}, 'corr': {corr:.3f}}},")
+        lines.append("")
+    
+    return "\n".join(lines)
 
 
 def run_learning_cycle(dry_run: bool = False):
@@ -276,11 +305,20 @@ def run_learning_cycle(dry_run: bool = False):
     for p in sorted(patterns, key=lambda x: -x['n_co_occurrences'])[:10]:
         print(f"  {p['leader']} → {p['follower']} (+{p['lag_days']}d, n={p['n_co_occurrences']})")
     
-    # 4. Save learned data
+    # 4. Generate actionable suggestions
+    actionable = generate_actionable_suggestions(unknown, patterns)
+    if actionable:
+        print(f"\n{'='*60}")
+        print("ACTIONABLE SUGGESTIONS:")
+        print('='*60)
+        print(actionable)
+    
+    # 5. Save learned data
     if not dry_run and (suggestions or patterns):
         learned = load_learned_data()
         learned['unknown_families'] = {s['signal_type']: s['suggested_family'] for s in suggestions}
         learned['learned_patterns'] = patterns
+        learned['actionable_suggestions'] = actionable
         save_learned_data(learned)
         print(f"\nSaved learned data to {LEARNED_DATA_FILE}")
     

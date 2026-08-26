@@ -24,6 +24,7 @@ Usage:
 
 import sqlite3
 import os
+import json
 import time
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
@@ -43,10 +44,11 @@ _tide_cache = None
 _tide_cache_time = 0
 _TIDE_CACHE_TTL = 300  # 5 min
 
-# ── Lead-Lag Rules (from cluster analysis) ───────────────────────────────────
+# ── Lead-Lag Rules (from cluster analysis + learned patterns) ─────────────────
 # These define which families predict which other families, and with what lag.
+# Static rules from 30-day analysis + dynamically learned patterns.
 
-LEAD_LAG_RULES = [
+LEAD_LAG_RULES_STATIC = [
     # Leader → Follower, lag in days, correlation strength
     {'leader': 'ZScore', 'follower': 'Pattern', 'lag_days': 1, 'corr': 0.905},
     {'leader': 'Wave', 'follower': 'R2', 'lag_days': 3, 'corr': 0.904},
@@ -59,6 +61,44 @@ LEAD_LAG_RULES = [
     {'leader': 'Trendline', 'follower': 'Accelerate', 'lag_days': 2, 'corr': 0.710},
     {'leader': 'Momentum', 'follower': 'Bollinger', 'lag_days': 3, 'corr': 0.704},
 ]
+
+# Learned patterns loaded from tide_learned_patterns.json (updated by tide_auto_learner.py)
+LEARNED_PATTERNS_FILE = os.path.join(HERMES_DATA, 'tide_learned_patterns.json')
+
+def _load_learned_rules() -> list:
+    """Load learned lead-lag rules from tide_auto_learner.py output."""
+    try:
+        with open(LEARNED_PATTERNS_FILE) as f:
+            data = json.load(f)
+            learned = data.get('learned_patterns', [])
+            # Filter to significant patterns (n_co_occurrences >= 50, different families)
+            return [p for p in learned if p.get('n_co_occurrences', 0) >= 50 
+                    and p.get('leader') != p.get('follower')]
+    except Exception:
+        return []
+
+def get_lead_lag_rules() -> list:
+    """Get combined static + learned lead-lag rules."""
+    static = LEAD_LAG_RULES_STATIC.copy()
+    learned = _load_learned_rules()
+    
+    # Merge: learned rules supplement static rules
+    # Avoid duplicates (same leader+ollower+lag)
+    seen = {(r['leader'], r['follower'], r['lag_days']) for r in static}
+    for rule in learned:
+        key = (rule['leader'], rule['follower'], rule['lag_days'])
+        if key not in seen:
+            # Normalize learned rule format
+            static.append({
+                'leader': rule['leader'],
+                'follower': rule['follower'],
+                'lag_days': rule['lag_days'],
+                'corr': min(0.9, rule.get('n_co_occurrences', 100) / 200),  # Normalize
+                'learned': True,  # Mark as learned
+            })
+            seen.add(key)
+    
+    return static
 
 # ── Phase Transition Rules ───────────────────────────────────────────────────
 # Map which families appearing means a transition is coming.
@@ -199,7 +239,7 @@ def detect_tide_change() -> dict:
     # Get family activity
     family_activity = get_family_activity(lookback_days=3)
     
-    # Detect early-warning signals
+    # Detect early-warning signals using PHASE_TRANSITIONS
     early_signals = []
     predictions = []
     
@@ -212,7 +252,25 @@ def detect_tide_change() -> dict:
                 'lag_days': transition['lag_days'],
                 'confidence': transition['confidence'] * (data['pct'] / 20),  # Scale by activity
                 'leader': fam,
+                'source': 'phase_transition',
             })
+    
+    # Also check LEAD_LAG_RULES for additional predictions
+    lead_lag_rules = get_lead_lag_rules()
+    for rule in lead_lag_rules:
+        leader = rule['leader']
+        if leader in family_activity and family_activity[leader]['trend'] == 'rising':
+            # This leader is rising — predict its follower
+            if rule['follower'] in PHASE_TRANSITIONS:
+                transition = PHASE_TRANSITIONS[rule['follower']]
+                predictions.append({
+                    'next_phase': transition['next_phase'],
+                    'lag_days': rule['lag_days'],
+                    'confidence': rule['corr'] * (family_activity[leader]['pct'] / 20),
+                    'leader': leader,
+                    'follower': rule['follower'],
+                    'source': 'lead_lag_rule',
+                })
     
     # Find the strongest prediction
     changing = False
