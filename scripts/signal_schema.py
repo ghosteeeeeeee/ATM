@@ -3451,7 +3451,7 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
                 'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
                 (sym_upper, price, minute_ts)
             )
-            if minute_ts == now:  # only count actual writes (not skipped half-minutes)
+            if c.rowcount > 0:  # INSERT OR IGNORE actually inserted a new row
                 rows += 1
 
             # Backfill any missing minutes since last collection
