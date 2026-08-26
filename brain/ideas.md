@@ -56,6 +56,30 @@
 
 ---
 
+### 2026-08-26 Signal Cluster Brainstorm
+**Source:** 30-day signal cluster analysis (69,990 signals, 63 types, 21 families)
+**Plan:** plans/signal-cluster-brainstorm-2026-08-26.md
+
+#### Top Priority Ideas:
+1. **[P] Market Phase Gate** — Detect current phase (trend/range/explosion/defensive) from signal composition. Apply phase-specific multipliers to signals. Expected: +5-10% WR. Implementation: `market_phase_gate.py`
+2. **[P] Confluence Scorer** — Weight multi-family agreement based on known strong combos (bb_bounce+SR=444 co-occurrences). Expected: +5-8% WR. Implementation: `confluence_scorer.py`
+3. **[ ] Signal Lifecycle Filters** — Tag signals as early/concurrent/lagging and adjust SL/TP. Early signals (Accelerate, Momentum) get wider SL. Lagging (Exhaustion) get tight SL. Expected: +3-5% WR.
+4. **[ ] Inverse Correlation Guard** — Penalize signals contradicting dominant families (Trendline vs Bollinger r=-0.386). Expected: +3-5% WR.
+5. **[ ] Hebbian V2 Family Correlations** — Track which families co-occur on winning trades. Add `family_chains` table to correlations.db. Expected: +3-5% WR.
+6. **[ ] Predictive Sequencing** — Use lead-lag rules (ZScore floods → Bollinger bounces in 2 days, r=0.727). Pre-position for upcoming phases. Expected: +3-5% WR.
+7. **[ ] Token Preferences** — Per-token signal effectiveness (SOL prefers Bollinger, BTC prefers Trendline). Expected: +5-8% WR.
+8. **[ ] New Signals** — phase_breakout, exhaustion_reversal, confluence_hunter. Expected: Variable.
+
+#### Key Findings:
+- Signals follow a market lifecycle: Squeeze/Trendline → Momentum → ZScore → Bollinger → Exhaustion → Range → S/R → HL_Copy
+- Accelerate/Momentum are EARLY indicators (2-3 days before events)
+- ZScore is CONCURRENT (the event itself)
+- Exhaustion/Stop_Hunt are LAGGING (after the move)
+- Strongest co-signal: bb_bounce_short + support_resistance (444 co-occurrences)
+- Confluence zones (3+ families spiking) = highest-probability setups
+
+---
+
 _Last updated: 2026-04-06_
 
 ### 2026-04-08 07:46 UTC
