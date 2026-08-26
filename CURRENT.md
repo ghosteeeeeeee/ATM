@@ -1,13 +1,13 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-25 ~18:35 UTC (Orchestrator Run)**
-**Updated by: Orchestrator**
+**Last Updated: 2026-08-25 ~22:20 UTC (CEO Run)**
+**Updated by: CEO**
 
 ## What We're Working On
 
 **Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ LONG KILLED (signal_reporter Aug 24).** COIN_TRACKER_HOT_PLUS_ENABLED=False, NEVER_REENABLE_FLAGS. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`). **CONF_FILTER_MAX raised 85→89 (CEO Aug 23)** — blocks overconfident trades, 90+ tier now +$1.91/7d. **hzscore- KILLED (auto_1hr Aug 23 21:05 + signal_reporter, NEVER_REENABLE).** **signal_compactor FIXED (health monitor Aug 24).** UnboundLocalError bare_source — was crashing every pipeline cycle. **Disk cleaned (orchestrator Aug 24).** Journal vacuum freed 3GB (84%→81%).
 
-**Current status:** System YELLOW. CEO verified (16:30 UTC): 24h 38T 42.1% WR -$1.54. 7d: 316T 50.6% WR -$3.73. Today Aug 25: 32T closed -$1.43. 5 open (HBAR SHORT, BTC LONG, GMT SHORT, ETH SHORT, ICP SHORT). **ATR_SL_MIN REVERTED 1.5%→1.2%** — auto_1hr data showed wider SL worsened hit rate 49.4%→60%. ct-hot+ properly killed (COIN_TRACKER_HOT_ENABLED=False). 75-79 conf tier -$4.68/7d is ct-hot+ legacy, self-resolving. 95+ tier +$1.84/7d most profitable. Winners: bb_bounce+ 7d 71.9% WR +$0.88, hl_copy_trader LONG 7d 50% WR +$1.56. hl_copy_trader LONG bad day: 10T 30% WR -$0.74 (historically 51.4% WR). Disk: 82%. Pipeline: active, 0 errors.
+**Current status:** System YELLOW. CEO verified (22:20 UTC): 24h 38T 36.8% WR -$1.72. 7d: 317T 50.5% WR -$3.87. Today Aug 25: 37T -$1.79. 3 open SHORT (2 cascade-reverse-v2, 1 bb-bounce-short). **Legacy drain day** — hl_copy_trader SHORT 12T -$1.07 (signal killed, trades closing) + bb_bounce+ noisy 14T 42.9% -$0.43 (9/14 ATR_SL hits, was 88.9% yesterday). ATR_SL dominant: 25T/24h -$1.52 (65.8% of exits). All kills active. ATR_SL_MIN=1.2% reverted. System improving underneath. Disk: 82%. Pipeline: active, 0 errors.
 
 ## Active Decisions
 

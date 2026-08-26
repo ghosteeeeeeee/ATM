@@ -761,3 +761,9 @@ ALERTS:
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1859s left, N failures)`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING — MOMENTUM`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] BIGTIME TOK BLOCKED — TOK in cooldown (3533s left, N failures)`
+
+## Error Alerts — 2026-08-26 00:21 UTC (Health Check)
+- **WARN** (8x): Support services in failed state: better-coder, bug-hunter, git-release, mtf-macd-tuner, session-learner, trading-checklist, upgrade-implementer, wasp
+- **WARN** (1x): Phantom trade detected: ALT SHORT #14327 — $0.00 PnL (-0.33%)
+- **INFO**: Full neutral market (106 tokens) — reduced signal generation expected
+- **AUTO-FIX**: None applied — all failures are non-critical support services

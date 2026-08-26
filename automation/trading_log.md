@@ -15255,3 +15255,24 @@ Final set: ['BANANA', 'BTC', 'CAKE', 'ENA', 'ETH', 'FIL', 'GMT', 'IMX', 'LDO', '
 4. **Trade frequency**: Normal (3/hr).
 
 **Root Cause:** ATR_SL hit rate oscillating between 60-100% across all time buckets suggests high-volatility choppy market where mean-reversion entries (bb_bounce+) get caught in whipsaws. The only profitable exit type (profit-monster-trail) needs0.4%+ moves that aren't happening in current regime.
+
+## [2026-08-25 23:00 UTC] Hourly Analysis
+
+**Trades:** 0T closed (system quiet — no closes since 22:01 UTC)
+**PnL:** $0.00 (0 trades)
+**24h:** 37T, ~43% WR, ~$-1.60
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria: No signal has 3+ trades with 0% WR last hour
+- ATR_SL_MIN 1.2%: Reverted from failed 1.5%. Problem is entry quality, not SL width. 67.6% hit rate 24h but 0T last hour to evaluate further.
+- bb_bounce+: 14T 42.9% WR -$0.43 24h. Degrading but still has wins, not killable by 3+T/0%WR rule.
+- hl_copy_trader: 12T 25% WR -$1.07 — already KILLED, legacy trades only.
+- Trade freq: 0/hr last hour (quiet session). Normal.
+- 3 open positions: HBAR SHORT (cascade, ~14h old), GMT SHORT (cascade, ~10h old), CAKE SHORT (bb-bounce-short, ~40min old).
+
+**Open Questions:**
+- ATR SL hit rate oscillating 53-100% across time buckets. High-volatility choppy regime punishing mean-reversion entries.
+- bb_bounce+ WR degraded from 53.3% → 42.9% over last 2 hours. Monitoring — if next trades are losses, may need to kill.
+- Trade frequency very low (0/hr) — regime may be transitioning. Will watch next hour for activity.
