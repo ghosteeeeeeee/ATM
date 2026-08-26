@@ -74,12 +74,14 @@ def _was_migration_done():
     """Check if legacy migration has already run (idempotent — safe to call on every init_db)."""
     try:
         sc = _get_conn(STATIC_DB)
-        sc.execute("""
-            CREATE TABLE IF NOT EXISTS _meta (key TEXT PRIMARY KEY, val TEXT)
-        """)
-        row = sc.execute("SELECT val FROM _meta WHERE key='migration_done'").fetchone()
-        sc.close()
-        return row is not None
+        try:
+            sc.execute("""
+                CREATE TABLE IF NOT EXISTS _meta (key TEXT PRIMARY KEY, val TEXT)
+            """)
+            row = sc.execute("SELECT val FROM _meta WHERE key='migration_done'").fetchone()
+            return row is not None
+        finally:
+            sc.close()
     except Exception:
         return False
 
@@ -87,9 +89,11 @@ def _mark_migration_done():
     """Persist that legacy migration has completed."""
     try:
         sc = _get_conn(STATIC_DB)
-        sc.execute("INSERT OR REPLACE INTO _meta VALUES ('migration_done','1')")
-        sc.commit()
-        sc.close()
+        try:
+            sc.execute("INSERT OR REPLACE INTO _meta VALUES ('migration_done','1')")
+            sc.commit()
+        finally:
+            sc.close()
     except Exception:
         pass
 
@@ -102,235 +106,239 @@ def init_db():
 
     # ── Static DB ──
     sc = _get_conn(STATIC_DB)
-    sc.execute("""
-        CREATE TABLE IF NOT EXISTS price_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            price REAL NOT NULL,
-            timestamp INTEGER NOT NULL,
-            UNIQUE(token, timestamp)
-        )""")
-    sc.execute('CREATE INDEX IF NOT EXISTS idx_ph_token ON price_history(token)')
-    sc.execute('CREATE INDEX IF NOT EXISTS idx_ph_ts ON price_history(timestamp)')
-    sc.execute("""
-        CREATE TABLE IF NOT EXISTS latest_prices (
-            token TEXT PRIMARY KEY,
-            price REAL NOT NULL,
-            updated_at INTEGER NOT NULL,
-            max_leverage INTEGER DEFAULT 10
-        )""")
-    sc.execute("""
-        CREATE TABLE IF NOT EXISTS regime_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            regime TEXT NOT NULL,
-            broad_z REAL NOT NULL,
-            long_mult REAL NOT NULL,
-            short_mult REAL NOT NULL,
-            timestamp INTEGER NOT NULL
-        )""")
-    sc.execute("""
-        CREATE TABLE IF NOT EXISTS ohlcv_1m (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            open_time INTEGER NOT NULL,
-            open REAL NOT NULL,
-            high REAL NOT NULL,
-            low REAL NOT NULL,
-            close REAL NOT NULL,
-            volume REAL NOT NULL,
-            close_time INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL,
-            UNIQUE(token, open_time)
-        )""")
-    sc.execute('CREATE INDEX IF NOT EXISTS idx_ohlcv_token_time ON ohlcv_1m(token, open_time)')
-    sc.execute('CREATE INDEX IF NOT EXISTS idx_ohlcv_ts ON ohlcv_1m(open_time)')
-    sc.commit()
-    sc.close()
+    try:
+        sc.execute("""
+            CREATE TABLE IF NOT EXISTS price_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL,
+                price REAL NOT NULL,
+                timestamp INTEGER NOT NULL,
+                UNIQUE(token, timestamp)
+            )""")
+        sc.execute('CREATE INDEX IF NOT EXISTS idx_ph_token ON price_history(token)')
+        sc.execute('CREATE INDEX IF NOT EXISTS idx_ph_ts ON price_history(timestamp)')
+        sc.execute("""
+            CREATE TABLE IF NOT EXISTS latest_prices (
+                token TEXT PRIMARY KEY,
+                price REAL NOT NULL,
+                updated_at INTEGER NOT NULL,
+                max_leverage INTEGER DEFAULT 10
+            )""")
+        sc.execute("""
+            CREATE TABLE IF NOT EXISTS regime_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                regime TEXT NOT NULL,
+                broad_z REAL NOT NULL,
+                long_mult REAL NOT NULL,
+                short_mult REAL NOT NULL,
+                timestamp INTEGER NOT NULL
+            )""")
+        sc.execute("""
+            CREATE TABLE IF NOT EXISTS ohlcv_1m (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL,
+                open_time INTEGER NOT NULL,
+                open REAL NOT NULL,
+                high REAL NOT NULL,
+                low REAL NOT NULL,
+                close REAL NOT NULL,
+                volume REAL NOT NULL,
+                close_time INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                UNIQUE(token, open_time)
+            )""")
+        sc.execute('CREATE INDEX IF NOT EXISTS idx_ohlcv_token_time ON ohlcv_1m(token, open_time)')
+        sc.execute('CREATE INDEX IF NOT EXISTS idx_ohlcv_ts ON ohlcv_1m(open_time)')
+        sc.commit()
+    finally:
+        sc.close()
 
     # ── Runtime DB ──
     rc = _get_conn(RUNTIME_DB)
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS signals (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            direction TEXT NOT NULL,
-            signal_type TEXT NOT NULL,
-            source TEXT,
-            confidence REAL NOT NULL,
-            value REAL, price REAL,
-            exchange TEXT DEFAULT 'hyperliquid',
-            timeframe TEXT DEFAULT '1h',
-            decision TEXT DEFAULT 'PENDING',
-            decision_reason TEXT,
-            executed INTEGER DEFAULT 0,
-            z_score REAL, z_score_tier TEXT,
-            momentum_state TEXT,
-            rsi_14 REAL, macd_value REAL,
-            macd_signal REAL, macd_hist REAL,
-            leverage INTEGER DEFAULT 10,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )""")
-    # Add columns for hot-set signal tracking (compact_rounds, survival_score).
-    # Safe to run on every init — ADD COLUMN is idempotent if column exists.
-    # SQLite 3.35+ supports IF NOT EXISTS; fallback to try/except for older versions.
     try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS compact_rounds INTEGER DEFAULT 0")
-    except Exception:
+        rc.execute("""
+            CREATE TABLE IF NOT EXISTS signals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                signal_type TEXT NOT NULL,
+                source TEXT,
+                confidence REAL NOT NULL,
+                value REAL, price REAL,
+                exchange TEXT DEFAULT 'hyperliquid',
+                timeframe TEXT DEFAULT '1h',
+                decision TEXT DEFAULT 'PENDING',
+                decision_reason TEXT,
+                executed INTEGER DEFAULT 0,
+                z_score REAL, z_score_tier TEXT,
+                momentum_state TEXT,
+                rsi_14 REAL, macd_value REAL,
+                macd_signal REAL, macd_hist REAL,
+                leverage INTEGER DEFAULT 10,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""")
+        # Add columns for hot-set signal tracking (compact_rounds, survival_score).
+        # Safe to run on every init — ADD COLUMN is idempotent if column exists.
+        # SQLite 3.35+ supports IF NOT EXISTS; fallback to try/except for older versions.
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN compact_rounds INTEGER DEFAULT 0")
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS compact_rounds INTEGER DEFAULT 0")
         except Exception:
-            pass  # column already exists
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS survival_score REAL DEFAULT 0")
-    except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN compact_rounds INTEGER DEFAULT 0")
+            except Exception:
+                pass  # column already exists
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN survival_score REAL DEFAULT 0")
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS survival_score REAL DEFAULT 0")
         except Exception:
-            pass
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN last_compact_at TEXT")
-    except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN survival_score REAL DEFAULT 0")
+            except Exception:
+                pass
         try:
             rc.execute("ALTER TABLE signals ADD COLUMN last_compact_at TEXT")
         except Exception:
-            pass
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS learned_sl_multiplier REAL DEFAULT 1.0")
-    except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN last_compact_at TEXT")
+            except Exception:
+                pass
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN learned_sl_multiplier REAL DEFAULT 1.0")
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS learned_sl_multiplier REAL DEFAULT 1.0")
         except Exception:
-            pass
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN review_count INTEGER DEFAULT 0")
-    except Exception:
-        pass  # column may already exist
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN rejected_at TEXT")
-    except Exception:
-        pass  # column may already exist
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN rejection_reason TEXT")
-    except Exception:
-        pass  # column may already exist
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS signal_types TEXT")
-    except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN learned_sl_multiplier REAL DEFAULT 1.0")
+            except Exception:
+                pass
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN signal_types TEXT")
+            rc.execute("ALTER TABLE signals ADD COLUMN review_count INTEGER DEFAULT 0")
         except Exception:
-            pass  # column already exists
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS deescalation_reason TEXT")
-    except Exception:
+            pass  # column may already exist
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN deescalation_reason TEXT")
+            rc.execute("ALTER TABLE signals ADD COLUMN rejected_at TEXT")
         except Exception:
-            pass
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS hot_cycle_count INTEGER DEFAULT 0")
-    except Exception:
+            pass  # column may already exist
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN hot_cycle_count INTEGER DEFAULT 0")
+            rc.execute("ALTER TABLE signals ADD COLUMN rejection_reason TEXT")
         except Exception:
-            pass
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS counter_detected INTEGER DEFAULT 0")
-    except Exception:
+            pass  # column may already exist
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN counter_detected INTEGER DEFAULT 0")
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS signal_types TEXT")
         except Exception:
-            pass
-    try:
-        rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS last_hot_at TEXT")
-    except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN signal_types TEXT")
+            except Exception:
+                pass  # column already exists
         try:
-            rc.execute("ALTER TABLE signals ADD COLUMN last_hot_at TEXT")
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS deescalation_reason TEXT")
         except Exception:
-            pass
-    rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
-    rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
-    rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN deescalation_reason TEXT")
+            except Exception:
+                pass
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS hot_cycle_count INTEGER DEFAULT 0")
+        except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN hot_cycle_count INTEGER DEFAULT 0")
+            except Exception:
+                pass
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS counter_detected INTEGER DEFAULT 0")
+        except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN counter_detected INTEGER DEFAULT 0")
+            except Exception:
+                pass
+        try:
+            rc.execute("ALTER TABLE signals ADD COLUMN IF NOT EXISTS last_hot_at TEXT")
+        except Exception:
+            try:
+                rc.execute("ALTER TABLE signals ADD COLUMN last_hot_at TEXT")
+            except Exception:
+                pass
+        rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_decision ON signals(decision)')
+        rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_token ON signals(token)')
+        rc.execute('CREATE INDEX IF NOT EXISTS idx_sig_created ON signals(created_at)')
 
-    # ── Signal History (compaction tracking for self-learning) ───────────────
-    # ai-decider.py writes to this table during signal compaction.
-    # Without it, all INSERT INTO signal_history calls silently fail.
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS signal_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            direction TEXT NOT NULL,
-            signal_type TEXT NOT NULL,
-            compact_round INTEGER NOT NULL,
-            survived INTEGER NOT NULL,
-            score_before REAL,
-            score_after REAL,
-            reason TEXT,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    rc.execute("CREATE INDEX IF NOT EXISTS idx_sighist_token ON signal_history(token, direction)")
-    rc.execute("CREATE INDEX IF NOT EXISTS idx_sh_round ON signal_history(compact_round)")
+        # ── Signal History (compaction tracking for self-learning) ───────────────
+        # ai-decider.py writes to this table during signal compaction.
+        # Without it, all INSERT INTO signal_history calls silently fail.
+        rc.execute("""
+            CREATE TABLE IF NOT EXISTS signal_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                signal_type TEXT NOT NULL,
+                compact_round INTEGER NOT NULL,
+                survived INTEGER NOT NULL,
+                score_before REAL,
+                score_after REAL,
+                reason TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        rc.execute("CREATE INDEX IF NOT EXISTS idx_sighist_token ON signal_history(token, direction)")
+        rc.execute("CREATE INDEX IF NOT EXISTS idx_sh_round ON signal_history(compact_round)")
 
-    # ── Token Speeds (speed_tracker.py persistence) ───────────────────────────
-    # Updated every pipeline run from speed_tracker.py
-    # Used by position_manager, decider-run, ai_decider, and signal_gen
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS token_speeds (
-            token TEXT PRIMARY KEY,
-            price_velocity_5m REAL DEFAULT 0,
-            price_velocity_15m REAL DEFAULT 0,
-            price_acceleration REAL DEFAULT 0,
-            speed_percentile REAL DEFAULT 50,
-            is_stale INTEGER DEFAULT 0,
-            last_move_at TEXT,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    rc.execute("CREATE INDEX IF NOT EXISTS idx_tokspd_updated ON token_speeds(updated_at)")
+        # ── Token Speeds (speed_tracker.py persistence) ───────────────────────────
+        # Updated every pipeline run from speed_tracker.py
+        # Used by position_manager, decider-run, ai_decider, and signal_gen
+        rc.execute("""
+            CREATE TABLE IF NOT EXISTS token_speeds (
+                token TEXT PRIMARY KEY,
+                price_velocity_5m REAL DEFAULT 0,
+                price_velocity_15m REAL DEFAULT 0,
+                price_acceleration REAL DEFAULT 0,
+                speed_percentile REAL DEFAULT 50,
+                is_stale INTEGER DEFAULT 0,
+                last_move_at TEXT,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        rc.execute("CREATE INDEX IF NOT EXISTS idx_tokspd_updated ON token_speeds(updated_at)")
 
-    # ── decisions — audit trail for every trading decision ──────────────────────
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS decisions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            direction TEXT NOT NULL,
-            confidence REAL,
-            entry_price REAL,
-            exchange TEXT,
-            decision TEXT NOT NULL,
-            reason TEXT,
-            server TEXT DEFAULT 'Hermes',
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+        # ── decisions — audit trail for every trading decision ──────────────────────
+        rc.execute("""
+            CREATE TABLE IF NOT EXISTS decisions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                confidence REAL,
+                entry_price REAL,
+                exchange TEXT,
+                decision TEXT NOT NULL,
+                reason TEXT,
+                server TEXT DEFAULT 'Hermes',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
-    # ── token_intel — per-token feature/intel snapshot ─────────────────────────
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS token_intel (
-            token TEXT PRIMARY KEY,
-            exchange TEXT,
-            max_leverage INTEGER,
-            base_position_size REAL,
-            open_positions INTEGER DEFAULT 0,
-            last_signal_at TEXT,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+        # ── token_intel — per-token feature/intel snapshot ─────────────────────────
+        rc.execute("""
+            CREATE TABLE IF NOT EXISTS token_intel (
+                token TEXT PRIMARY KEY,
+                exchange TEXT,
+                max_leverage INTEGER,
+                base_position_size REAL,
+                open_positions INTEGER DEFAULT 0,
+                last_signal_at TEXT,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
-    # ── cooldown_tracker — prevent over-trading same token+direction ──────────
-    rc.execute("""
-        CREATE TABLE IF NOT EXISTS cooldown_tracker (
-            token TEXT NOT NULL,
-            direction TEXT NOT NULL,
-            expires_at INTEGER NOT NULL,
-            PRIMARY KEY(token, direction)
-        )
-    """)
+        # ── cooldown_tracker — prevent over-trading same token+direction ──────────
+        rc.execute("""
+            CREATE TABLE IF NOT EXISTS cooldown_tracker (
+                token TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                expires_at INTEGER NOT NULL,
+                PRIMARY KEY(token, direction)
+            )
+        """)
 
-    rc.commit()
-    rc.close()
+        rc.commit()
+    finally:
+        rc.close()
     # ── Migrate legacy backfill data to static DB (once, persisted) ──
     global _migration_done
     if _migration_done or _was_migration_done():
@@ -338,27 +346,28 @@ def init_db():
     elif os.path.exists(LEGACY_DB) and os.path.getsize(LEGACY_DB) > 0:
         sc = _get_conn(STATIC_DB)
         leg = _get_conn(LEGACY_DB)
-        lc = leg.cursor()
-        # Guard: only migrate if LEGACY_DB actually has price_history table
-        lc.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='price_history'")
-        if not lc.fetchone():
-            leg.close()
+        try:
+            lc = leg.cursor()
+            # Guard: only migrate if LEGACY_DB actually has price_history table
+            lc.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='price_history'")
+            if not lc.fetchone():
+                pass  # nothing to migrate
+            else:
+                lc.execute('SELECT COUNT(*) FROM price_history')
+                before = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
+                sc.execute('ATTACH DATABASE ? AS leg', (LEGACY_DB,))
+                sc.execute('''
+                    INSERT OR IGNORE INTO price_history(token, price, timestamp)
+                    SELECT token, price, timestamp FROM leg.price_history
+                ''')
+                sc.commit()
+                sc.execute('DETACH DATABASE leg')
+                after = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
+                if after > before:
+                    print(f'DB migration: +{after - before} rows migrated to {STATIC_DB}')
+        finally:
             sc.close()
-        else:
-            lc.execute('SELECT COUNT(*) FROM price_history')
-            before = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
-            sc.execute('ATTACH DATABASE ? AS leg', (LEGACY_DB,))
-            sc.execute('''
-                INSERT OR IGNORE INTO price_history(token, price, timestamp)
-                SELECT token, price, timestamp FROM leg.price_history
-            ''')
-            sc.commit()
-            sc.execute('DETACH DATABASE leg')
-            after = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
-            sc.close()
             leg.close()
-            if after > before:
-                print(f'DB migration: +{after - before} rows migrated to {STATIC_DB}')
         _migration_done = True
         _mark_migration_done()
     else:
@@ -370,23 +379,25 @@ def init_db():
     seed_path = os.path.join(os.path.dirname(__file__), '..', 'seed', 'signals_hermes.sql')
     if os.path.exists(seed_path):
         sc = _get_conn(STATIC_DB)
-        count = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
-        if count == 0:
-            print(f'Loading backfill seed from {seed_path} ...')
-            with open(seed_path) as f:
-                try:
-                    sc.executescript(f.read())
-                except sqlite3.OperationalError as e:
-                    if 'already exists' in str(e):
-                        print(f'  Seed table already exists (concurrent init) — skipping')
-                    else:
-                        raise
-            sc.commit()
-            new_count = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
-            print(f'Seed loaded: {new_count} rows')
-        else:
-            print(f'Static DB already has {count} price_history rows')
-        sc.close()
+        try:
+            count = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
+            if count == 0:
+                print(f'Loading backfill seed from {seed_path} ...')
+                with open(seed_path) as f:
+                    try:
+                        sc.executescript(f.read())
+                    except sqlite3.OperationalError as e:
+                        if 'already exists' in str(e):
+                            print(f'  Seed table already exists (concurrent init) — skipping')
+                        else:
+                            raise
+                sc.commit()
+                new_count = sc.execute('SELECT COUNT(*) FROM price_history').fetchone()[0]
+                print(f'Seed loaded: {new_count} rows')
+            else:
+                print(f'Static DB already has {count} price_history rows')
+        finally:
+            sc.close()
     else:
         print(f'No seed file at {seed_path}')
 
@@ -2684,34 +2695,40 @@ def cleanup_stale_approved(hours=1):
 # ── Price History & Indicators (static DB) ────────────────────────────────────
 def get_price_history(token, lookback_minutes=60*24):
     conn = _get_conn(_static())
-    c = conn.cursor()
-    cutoff = int(time.time()) - (lookback_minutes * 60)
-    c.execute('''
-        SELECT timestamp, price FROM price_history
-        WHERE token=? AND timestamp>?
-        ORDER BY timestamp ASC
-        LIMIT 2000
-    ''', (token.upper(), cutoff))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    try:
+        c = conn.cursor()
+        cutoff = int(time.time()) - (lookback_minutes * 60)
+        c.execute('''
+            SELECT timestamp, price FROM price_history
+            WHERE token=? AND timestamp>?
+            ORDER BY timestamp ASC
+            LIMIT 2000
+        ''', (token.upper(), cutoff))
+        rows = c.fetchall()
+        return rows
+    finally:
+        conn.close()
 
 def get_latest_price(token):
     conn = _get_conn(_static())
-    c = conn.cursor()
-    c.execute('SELECT price FROM latest_prices WHERE token=?', (token.upper(),))
-    row = c.fetchone()
-    conn.close()
-    return row[0] if row else None
+    try:
+        c = conn.cursor()
+        c.execute('SELECT price FROM latest_prices WHERE token=?', (token.upper(),))
+        row = c.fetchone()
+        return row[0] if row else None
+    finally:
+        conn.close()
 
 @lru_cache(maxsize=4)
 def get_all_latest_prices():
     conn = _get_conn(_static())
-    c = conn.cursor()
-    c.execute('SELECT token, price FROM latest_prices')
-    rows = c.fetchall()
-    conn.close()
-    return {r[0]: {'price': r[1]} for r in rows}
+    try:
+        c = conn.cursor()
+        c.execute('SELECT token, price FROM latest_prices')
+        rows = c.fetchall()
+        return {r[0]: {'price': r[1]} for r in rows}
+    finally:
+        conn.close()
 
 def compute_rsi(token, period=14, lookback_minutes=60*24):
     rows = get_price_history(token, lookback_minutes)
@@ -2840,16 +2857,18 @@ def get_macd_signals_from_db(min_history_minutes=60*24):
 
 def price_age_minutes(token):
     conn = _get_conn(_static())
-    c = conn.cursor()
-    c.execute('SELECT updated_at FROM latest_prices WHERE token=?', (token.upper(),))
-    row = c.fetchone()
-    conn.close()
-    if not row:
-        return 999
     try:
-        return (time.time() - row[0]) / 60
-    except:
-        return 999
+        c = conn.cursor()
+        c.execute('SELECT updated_at FROM latest_prices WHERE token=?', (token.upper(),))
+        row = c.fetchone()
+        if not row:
+            return 999
+        try:
+            return (time.time() - row[0]) / 60
+        except:
+            return 999
+    finally:
+        conn.close()
 
 # ── Cooldowns ─────────────────────────────────────────────────────────────────
 # Note: LOSS_COOLDOWN_FILE is imported from paths.py (SINGLE SOURCE).
@@ -3416,7 +3435,9 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
         c = conn.cursor()
 
         # Batch-fetch last timestamp per token (one query instead of N)
-        syms = [s for s in allMids.keys() if not s.startswith('@')]
+        # NOTE: DB stores tokens as uppercase via sym.upper(), so we must
+        # uppercase the HL keys here — SQLite TEXT comparisons are case-sensitive.
+        syms = [s.upper() for s in allMids.keys() if not s.startswith('@')]
         last_ts = {}
         if syms:
             placeholders = ','.join('?' * len(syms))
@@ -3427,7 +3448,6 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
             last_ts = {row[0]: row[1] for row in c.fetchall()}
 
         rows = 0
-        prev_price = {}  # {token: last_price} for backfill carry-forward
         for sym, price_str in allMids.items():
             # SAFETY: reject @XXX numeric coin IDs
             if sym.startswith('@'):
@@ -3464,15 +3484,13 @@ def upsert_prices_from_allMids(allMids: dict, tokens: dict = None) -> int:
                 if prev_ts is not None:
                     gap_seconds = now - prev_ts
                     if gap_seconds > 75:  # Missed at least one full cycle
-                        backfill_price = prev_price.get(sym_upper, price)
+                        backfill_price = price  # carry forward current price for gap-filling
                         for t in range(prev_ts + 60, minute_ts, 60):
                             c.execute(
                                 'INSERT OR IGNORE INTO price_history(token, price, timestamp) VALUES(?, ?, ?)',
                                 (sym_upper, backfill_price, t)
                             )
 
-                # Track previous price for next iteration's backfill
-                prev_price[sym_upper] = price
             except (ValueError, TypeError):
                 continue
 
@@ -3516,36 +3534,38 @@ def fetch_binance_candles(symbol: str, interval: str = '1m', limit: int = 240) -
 
     now = int(time.time())
     conn = _get_conn(STATIC_DB)
-    c = conn.cursor()
-    candles = []
-    for k in raw:
-        # Binance kline format:
-        # [open_time, open, high, low, close, volume, close_time, ...]
-        try:
-            ot = int(k[0])
-            ct = int(k[6])
-            o, h, l, c_, v = float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])
-            # Derive HL symbol (strip USDT suffix)
-            hl_sym = symbol.replace('USDT', '').upper()
-            c.execute("""
-                INSERT OR REPLACE INTO ohlcv_1m
-                (token, open_time, open, high, low, close, volume, close_time, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (hl_sym, ot, o, h, l, c_, v, ct, now))
-            candles.append({
-                'token': hl_sym,
-                'open_time': ot,
-                'open': o,
-                'high': h,
-                'low': l,
-                'close': c_,
-                'volume': v,
-                'close_time': ct,
-            })
-        except (ValueError, TypeError):
-            continue
-    conn.commit()
-    conn.close()
+    try:
+        c = conn.cursor()
+        candles = []
+        for k in raw:
+            # Binance kline format:
+            # [open_time, open, high, low, close, volume, close_time, ...]
+            try:
+                ot = int(k[0])
+                ct = int(k[6])
+                o, h, l, c_, v = float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])
+                # Derive HL symbol (strip USDT suffix)
+                hl_sym = symbol.replace('USDT', '').upper()
+                c.execute("""
+                    INSERT OR REPLACE INTO ohlcv_1m
+                    (token, open_time, open, high, low, close, volume, close_time, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (hl_sym, ot, o, h, l, c_, v, ct, now))
+                candles.append({
+                    'token': hl_sym,
+                    'open_time': ot,
+                    'open': o,
+                    'high': h,
+                    'low': l,
+                    'close': c_,
+                    'volume': v,
+                    'close_time': ct,
+                })
+            except (ValueError, TypeError):
+                continue
+        conn.commit()
+    finally:
+        conn.close()
     if candles:
         print(f'[fetch_binance_candles] {symbol} → {len(candles)} candles written '
               f'({interval}, {candles[0]["open_time"]} → {candles[-1]["open_time"]})')
@@ -3569,19 +3589,21 @@ def get_ohlcv_1m(token: str, lookback_minutes: int = 60) -> list:
     """
     cutoff = int(time.time()) - (lookback_minutes * 60)
     conn = _get_conn(STATIC_DB)
-    c = conn.cursor()
-    c.execute("""
-        SELECT open_time, open, high, low, close, volume
-        FROM ohlcv_1m
-        WHERE token=? AND open_time > ?
-        ORDER BY open_time ASC
-    """, (token.upper(), cutoff))
-    rows = c.fetchall()
-    conn.close()
-    return [
-        {'open_time': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5]}
-        for r in rows
-    ]
+    try:
+        c = conn.cursor()
+        c.execute("""
+            SELECT open_time, open, high, low, close, volume
+            FROM ohlcv_1m
+            WHERE token=? AND open_time > ?
+            ORDER BY open_time ASC
+        """, (token.upper(), cutoff))
+        rows = c.fetchall()
+        return [
+            {'open_time': r[0], 'open': r[1], 'high': r[2], 'low': r[3], 'close': r[4], 'volume': r[5]}
+            for r in rows
+        ]
+    finally:
+        conn.close()
 
 
 def get_latest_price(token: str) -> float | None:
@@ -3591,11 +3613,13 @@ def get_latest_price(token: str) -> float | None:
     ALL price reads MUST use this (local DB first).
     """
     conn = _get_conn(STATIC_DB)
-    c = conn.cursor()
-    c.execute('SELECT price FROM latest_prices WHERE token=?', (token.upper(),))
-    row = c.fetchone()
-    conn.close()
-    return row[0] if row else None
+    try:
+        c = conn.cursor()
+        c.execute('SELECT price FROM latest_prices WHERE token=?', (token.upper(),))
+        row = c.fetchone()
+        return row[0] if row else None
+    finally:
+        conn.close()
 
 
 def get_price_history(token: str, lookback_minutes: int = 60*24) -> list:
@@ -3605,17 +3629,19 @@ def get_price_history(token: str, lookback_minutes: int = 60*24) -> list:
     ALL price reads for historical analysis (RSI, z-score, etc.) MUST use this.
     """
     conn = _get_conn(STATIC_DB)
-    c = conn.cursor()
-    cutoff = int(time.time()) - (lookback_minutes * 60)
-    c.execute("""
-        SELECT timestamp, price FROM price_history
-        WHERE token=? AND timestamp>?
-        ORDER BY timestamp ASC
-        LIMIT 25000
-    """, (token.upper(), cutoff))
-    rows = c.fetchall()
-    conn.close()
-    return rows
+    try:
+        c = conn.cursor()
+        cutoff = int(time.time()) - (lookback_minutes * 60)
+        c.execute("""
+            SELECT timestamp, price FROM price_history
+            WHERE token=? AND timestamp>?
+            ORDER BY timestamp ASC
+            LIMIT 25000
+        """, (token.upper(), cutoff))
+        rows = c.fetchall()
+        return rows
+    finally:
+        conn.close()
 
 
 @lru_cache(maxsize=4)
@@ -3626,8 +3652,10 @@ def get_all_latest_prices() -> dict:
     ALL bulk price reads MUST use this (local DB first).
     """
     conn = _get_conn(STATIC_DB)
-    c = conn.cursor()
-    c.execute('SELECT token, price FROM latest_prices')
-    rows = c.fetchall()
-    conn.close()
-    return {r[0]: {'price': r[1]} for r in rows}
+    try:
+        c = conn.cursor()
+        c.execute('SELECT token, price FROM latest_prices')
+        rows = c.fetchall()
+        return {r[0]: {'price': r[1]} for r in rows}
+    finally:
+        conn.close()
