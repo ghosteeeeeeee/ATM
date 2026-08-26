@@ -1693,8 +1693,8 @@ def execute_trade(token, direction, price, confidence, source,
             log(f'  [brain.py] ⚠️ RC=0 but no trade ID in stdout — treating as failure. stdout={result.stdout[:100]}')
             return False, f'brain.py RC=0 but no trade ID in stdout'
         else:
-            log(f'  [brain.py] ❌ FAILED: stderr={result.stderr.strip()[:200] if result.stderr else "(empty)"}')
-            return False, result.stderr.strip()[:80]
+            log(f'  [brain.py] ❌ FAILED: stderr={result.stderr.strip()[:800] if result.stderr else "(empty)"}')
+            return False, result.stderr.strip()[:200]
     except Exception as e:
         return False, str(e)[:80]
 
