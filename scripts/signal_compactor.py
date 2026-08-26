@@ -55,6 +55,14 @@ try:
 except ImportError as e:
     _LIFECYCLE_ENABLED = False
     log(f"[INIT] Signal Lifecycle Filter disabled (import error: {e})", 'WARN')
+
+try:
+    from volatility_gate_v2 import get_atr_pct as _get_atr_pct, classify_volatility as _classify_volatility, get_current_phase as _get_v2_phase, get_combined_multiplier as _get_combined_mult, get_sl_multiplier_v2 as _get_sl_mult_v2, get_tp_multiplier_v2 as _get_tp_mult_v2
+    _VOL_GATE_V2_ENABLED = True
+    log("[INIT] Volatility Gate V2 loaded (phase-aware)")
+except ImportError as e:
+    _VOL_GATE_V2_ENABLED = False
+    log(f"[INIT] Volatility Gate V2 disabled (import error: {e})", 'WARN')
 # ── Confluence token cache (avoids per-signal DB queries) ─────────────────────
 _confluence_token_cache = {}  # token_upper -> confluence_mult
 _CONFLUENCE_CACHE_TTL = 120   # 2 min cache
@@ -824,25 +832,68 @@ def _score_signal(token, direction, conf, source, signal_type,
     # Penalty list — underperformers get deprioritized
     penalty_mult = PENALTY_MULT if PENALTY_TOKENS and token in PENALTY_TOKENS else 1.0
 
-    # ── Market Phase Gate: phase-specific signal multipliers ──────────────
+    # ── Volatility Gate V2: combined phase+lifecycle+inverse multiplier ──
+    # When V2 is enabled, it replaces the separate phase/inverse/lifecycle multipliers
+    # with a single combined multiplier that considers volatility regime + market phase
     phase_mult = 1.0
-    if _PHASE_GATE_ENABLED:
-        try:
-            family = _signal_family(signal_type)
-            phase_mult = get_phase_mult(family)
-        except Exception:
-            phase_mult = 1.0
-
-    # ── Inverse Correlation Guard: penalize contradictory families ────────
     inverse_mult = 1.0
-    if _PHASE_GATE_ENABLED:
+    lifecycle_mult = 1.0
+    
+    if _VOL_GATE_V2_ENABLED:
         try:
-            from market_phase_gate import inverse_penalty, detect_phase as _detect_phase
-            _phase_info = _detect_phase()
-            _dom_fams = _phase_info.get('dominant_families', [])
-            inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
+            # Get volatility regime for this token
+            _atr_pct = _get_atr_pct(token)
+            _regime = _classify_volatility(_atr_pct) if _atr_pct is not None else 'NORMAL'
+            _phase = _get_v2_phase()
+            
+            # Compute combined multiplier (replaces phase + inverse + lifecycle)
+            combined_mult = _get_combined_mult(signal_type, _regime, _phase)
+            
+            # Decompose for logging (combined = phase * inverse * lifecycle)
+            # We keep the individual multipliers as 1.0 since V2 handles them
+            phase_mult = 1.0  # Handled by V2
+            inverse_mult = 1.0  # Handled by V2
+            lifecycle_mult = combined_mult  # V2's combined output
         except Exception:
-            inverse_mult = 1.0
+            # Fallback to separate multipliers
+            if _PHASE_GATE_ENABLED:
+                try:
+                    family = _signal_family(signal_type)
+                    phase_mult = get_phase_mult(family)
+                except Exception:
+                    phase_mult = 1.0
+                try:
+                    from market_phase_gate import inverse_penalty, detect_phase as _detect_phase
+                    _phase_info = _detect_phase()
+                    _dom_fams = _phase_info.get('dominant_families', [])
+                    inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
+                except Exception:
+                    inverse_mult = 1.0
+            if _LIFECYCLE_ENABLED:
+                try:
+                    lifecycle_mult = _get_lifecycle_mult(signal_type)
+                except Exception:
+                    lifecycle_mult = 1.0
+    else:
+        # Original separate multipliers (fallback)
+        if _PHASE_GATE_ENABLED:
+            try:
+                family = _signal_family(signal_type)
+                phase_mult = get_phase_mult(family)
+            except Exception:
+                phase_mult = 1.0
+            try:
+                from market_phase_gate import inverse_penalty, detect_phase as _detect_phase
+                _phase_info = _detect_phase()
+                _dom_fams = _phase_info.get('dominant_families', [])
+                inverse_mult = inverse_penalty(family, _dom_fams) if _dom_fams else 1.0
+            except Exception:
+                inverse_mult = 1.0
+        if _LIFECYCLE_ENABLED:
+            try:
+                lifecycle_mult = _get_lifecycle_mult(signal_type)
+            except Exception:
+                lifecycle_mult = 1.0
 
     # ── Confluence Scorer: multi-family agreement bonus ───────────────────
     confluence_mult = 1.0
@@ -872,14 +923,6 @@ def _score_signal(token, direction, conf, source, signal_type,
                     conn.close()
             _confluence_token_cache[token_key] = confluence_mult
             _confluence_cache_ts[token_key] = now_ts
-
-    # ── Signal Lifecycle Filter: early/concurrent/lagging adjustment ──────
-    lifecycle_mult = 1.0
-    if _LIFECYCLE_ENABLED:
-        try:
-            lifecycle_mult = _get_lifecycle_mult(signal_type)
-        except Exception:
-            lifecycle_mult = 1.0
 
     final_score = score * survival_bonus * staleness_mult * reg_mult * dir_outcome_mult * source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult * penalty_mult * time_block_mult * phase_mult * confluence_mult * inverse_mult * lifecycle_mult
     return final_score
