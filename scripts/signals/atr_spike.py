@@ -28,6 +28,8 @@ from hermes_constants import (
     ATR_SPIKE_TREND_FILTER,
     ATR_SPIKE_TREND_TIMEFRAME,
     ATR_SPIKE_EMA_PROXIMITY_PCT,
+    ATR_SPIKE_MOMENTUM_FILTER,
+    ATR_SPIKE_MOMENTUM_BARS,
     ATR_SPIKE_SL_PCT,
     ATR_SPIKE_CONF_BASE,
     ATR_SPIKE_CONF_PCT_BOOST,
@@ -165,6 +167,21 @@ def _check_ema_proximity(token: str) -> bool:
         return True  # fail open
 
 
+def _check_momentum(closes: list) -> bool:
+    """Check if price is above SMA(N) — confirms short-term uptrend at breakout.
+
+    Filters dead-cat bounces where a single green candle appears in a downtrend.
+    3 out of 5 losing atr-spike trades had wave_phase='falling' (momentum fading).
+    """
+    if not ATR_SPIKE_MOMENTUM_FILTER:
+        return True
+    n = ATR_SPIKE_MOMENTUM_BARS
+    if len(closes) < n:
+        return True  # not enough data, fail open
+    sma = sum(closes[-n:]) / n
+    return closes[-1] > sma
+
+
 def detect(token: str) -> dict | None:
     """Detect ATR compression breakout for a single token.
     Returns {direction, confidence, value, price} or None.
@@ -206,6 +223,10 @@ def detect(token: str) -> dict | None:
     # Must have been compressed for minimum duration
     compressed_count = sum(1 for a in recent_atrs if a < ATR_SPIKE_COMPRESSION_MAX_PCT)
     if compressed_count < ATR_SPIKE_COMPRESSION_MIN_BARS:
+        return None
+
+    # Momentum gate: price must be above SMA(N) — filters fading breakouts
+    if not _check_momentum(closes):
         return None
 
     # Quality gates
