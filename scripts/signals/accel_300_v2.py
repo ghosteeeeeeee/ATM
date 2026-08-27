@@ -49,8 +49,6 @@ _PRICE_DB = STATIC_DB
 _CANDLES_DB = CANDLES_DB
 
 # ── V2 Signal constants ──────────────────────────────────────────────────────
-V2_MIN_GAP_PCT = 1.5           # min gap from EMA300 to fire — raised from 0.8 (too noisy)
-V2_MAX_GAP_PCT = 3.5           # max gap — entering >3.5% = too extended (profitable sweet spot 1.5-3.5%)
 V2_MIN_GAP_ACCEL = 0.10        # min gap acceleration — production cooldown handles over-firing
 V2_GAP_ACCEL_WINDOW = 10       # bars to measure gap acceleration
 V2_VELOCITY_WINDOW = 5         # bars to measure price velocity
@@ -65,7 +63,11 @@ V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (lower = earlier entry)
 # Fresh cross mode: catch the FIRST momentum bar after EMA300 cross
 V2_FRESH_CROSS_BARS = 8        # max bars since cross to qualify for fresh entry
 V2_FRESH_CROSS_MIN_GAP = 0.50  # raised from 0.30 (too many false signals)
-V2_LONG_ONLY = True            # SHORT side had 23% WR — LONG only
+# Direction-specific gap thresholds (from hermes_constants.py)
+from hermes_constants import (
+    ACCEL_300_V2_LONG_MIN_GAP, ACCEL_300_V2_LONG_MAX_GAP,
+    ACCEL_300_V2_SHORT_MIN_GAP, ACCEL_300_V2_SHORT_MAX_GAP,
+)
 
 PERIOD = 300  # EMA300 period
 DRY_RUN = '--dry' in sys.argv
@@ -259,9 +261,13 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     direction = 'LONG' if gap_now > 0 else 'SHORT'
     abs_gap = abs(gap_now)
 
-    # ── FILTER 1: Gap not too extreme ──────────────────────────────────────
-    if abs_gap > V2_MAX_GAP_PCT:
-        return None
+    # ── FILTER 1: Gap in valid range (direction-specific) ──────────────────
+    if direction == 'LONG':
+        if abs_gap < ACCEL_300_V2_LONG_MIN_GAP or abs_gap > ACCEL_300_V2_LONG_MAX_GAP:
+            return None
+    else:  # SHORT
+        if abs_gap < ACCEL_300_V2_SHORT_MIN_GAP or abs_gap > ACCEL_300_V2_SHORT_MAX_GAP:
+            return None
 
     # ── FILTER 2: Gap acceleration (10-bar window) ────────────────────────
     accel_start = latest_idx - V2_GAP_ACCEL_WINDOW
@@ -272,10 +278,30 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
         return None
     gap_acceleration = gap_now - gap_then  # positive = gap widening for LONG
 
-    if direction == 'LONG' and gap_acceleration < V2_MIN_GAP_ACCEL:
-        return None
-    if direction == 'SHORT' and gap_acceleration > -V2_MIN_GAP_ACCEL:
-        return None
+    # For fresh cross SHORT, skip accel check — cross itself is the signal
+    # (gap just started forming, hasn't had time to accelerate yet)
+    is_fresh_cross_short = False
+    cross_bar = None
+    for idx in range(latest_idx, PERIOD - 1, -1):
+        prev_idx = idx - 1
+        if prev_idx < 0 or ema300[idx] is None or ema300[prev_idx] is None:
+            continue
+        if direction == 'LONG':
+            crossed = closes[idx] > ema300[idx] and closes[prev_idx] <= ema300[prev_idx]
+        else:
+            crossed = closes[idx] < ema300[idx] and closes[prev_idx] >= ema300[prev_idx]
+        if crossed:
+            cross_bar = idx
+            break
+    bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
+    is_fresh_cross_short = bars_since_cross <= V2_FRESH_CROSS_BARS and direction == 'SHORT'
+
+    if not is_fresh_cross_short:
+        # Standard accel check
+        if direction == 'LONG' and gap_acceleration < V2_MIN_GAP_ACCEL:
+            return None
+        if direction == 'SHORT' and gap_acceleration > -V2_MIN_GAP_ACCEL:
+            return None
 
     # ── FILTER 4: Price velocity (must be moving in direction) ────────────
     if latest_idx < V2_VELOCITY_WINDOW:
@@ -333,33 +359,14 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     if direction == 'SHORT' and gap_velocity > 0.05:
         return None
 
-    # ── FILTER 8: Fresh cross detection — catch the FIRST momentum bar ─────
-    # Find most recent EMA300 cross (price crossing from below to above for LONG)
-    fresh_cross = False
-    cross_bar = None
-    for idx in range(latest_idx, PERIOD - 1, -1):
-        prev_idx = idx - 1
-        if prev_idx < 0 or ema300[idx] is None or ema300[prev_idx] is None:
-            continue
-        if direction == 'LONG':
-            crossed = closes[idx] > ema300[idx] and closes[prev_idx] <= ema300[prev_idx]
-        else:
-            crossed = closes[idx] < ema300[idx] and closes[prev_idx] >= ema300[prev_idx]
-        if crossed:
-            cross_bar = idx
-            break
-
-    bars_since_cross = latest_idx - cross_bar if cross_bar is not None else 999
-    if bars_since_cross <= V2_FRESH_CROSS_BARS:
-        fresh_cross = True
+    # ── FILTER 8: Fresh cross gap check ───────────────────────────────────
+    # cross_bar and bars_since_cross already computed above (for accel check)
+    fresh_cross = bars_since_cross <= V2_FRESH_CROSS_BARS
 
     # For fresh cross entries, relax the gap threshold (catch early)
-    if fresh_cross and abs_gap < V2_FRESH_CROSS_MIN_GAP:
+    fresh_min_gap = V2_FRESH_CROSS_MIN_GAP if direction == 'LONG' else 0.20
+    if fresh_cross and abs_gap < fresh_min_gap:
         return None  # even fresh cross needs SOME gap
-
-    # For mature moves (not fresh cross), keep the higher gap threshold
-    if not fresh_cross and abs_gap < V2_MIN_GAP_PCT:
-        return None
 
     return {
         'direction': direction,
@@ -419,10 +426,6 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
             continue
 
         direction = sig['direction']
-
-        # LONG_ONLY mode — SHORT side had 23% WR in backtest
-        if V2_LONG_ONLY and direction == 'SHORT':
-            continue
 
         if get_cooldown(token, direction=direction):
             continue
