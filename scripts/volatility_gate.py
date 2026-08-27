@@ -119,6 +119,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
         'atr-spike+', 'atr-spike-',  # ATR compression spike
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
+        'accel-300', 'accel-300-', 'accel-300-v2+', 'accel-300-v2-',  # trend momentum
     },
 }
 
