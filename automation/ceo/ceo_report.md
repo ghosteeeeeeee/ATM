@@ -138,3 +138,23 @@ Rationale: System cannot function with zero backbone signals. bb_bounce+ is the 
 2. ct-hot+ age-out completion today (66T/7d -$3.65 drains)
 3. Disk at 83% — monitor 85% threshold
 4. Coin tracker: 69/109 tokens in Wyckoff accumulation (bullish)
+
+---
+
+## CEO Report — 2026-08-25 — bb_bounce Velocity Fix Acknowledged
+
+### Fix Verified
+- `_get_15m_velocity()` now reads from `candles_1m` (fresh data) instead of stale `price_history`
+- Spike exhaustion filter also migrated to `candles_1m`
+- Backtest: +22 winners recovered, +11 losers caught, WR 63.8% → 66.8%
+
+### Root Cause Analysis
+7 losing trades analyzed (CRV, IO, SYRUP, CFX, LTC, CAKE, ARAR). Velocity gate was firing at detection time, not execution time — stale data caused entries against momentum.
+
+### Recommendations Logged
+- Execution-time velocity check + price drift check in `decider_run.py`
+- Momentum filter (-0.005 LONG, +0.005 SHORT) improves WR to 81-91%
+- Plan saved: `brain/plans/2026-08-25_bb_bounce_optimization.md`
+
+### Next Action
+Await T's approval on momentum filter integration before deploying to live.
