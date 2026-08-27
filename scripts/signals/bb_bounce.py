@@ -16,7 +16,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(__file__))
-from paths import RUNTIME_DB
+from paths import RUNTIME_DB, CANDLES_DB
 
 # ── Config ──────────────────────────────────────────────────────────────
 BB_PERIOD = 20
@@ -49,7 +49,7 @@ def _get_15m_velocity(token):
     import sqlite3
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
         c = conn.cursor()
         c.execute("""
             SELECT close FROM candles_1m
@@ -100,7 +100,7 @@ def _get_15m_trend(token):
     """Check 15m EMA trend. Returns 'BULLISH', 'BEARISH', or 'NEUTRAL'."""
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
             SELECT close FROM candles_15m
@@ -136,7 +136,7 @@ def _get_15m_trend(token):
 def _get_candles(token, lookback=100):
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
         cur.execute("""
             SELECT close FROM candles_5m
@@ -157,7 +157,7 @@ def _get_ohlcv_candles(token, lookback=100):
     """Get full OHLCV candle data for pattern recognition."""
     conn = None
     try:
-        conn = sqlite3.connect('/root/.hermes/data/candles.db', timeout=10)
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
         cur = conn.cursor()
         cur.execute("""
             SELECT ts, open, high, low, close, volume
@@ -180,8 +180,8 @@ def _get_ohlcv_candles(token, lookback=100):
 
 def _is_solo(token, direction):
     """Check if this token+direction has any other active signals in DB (no co-signal)."""
+    conn = None
     try:
-        from paths import RUNTIME_DB
         conn = sqlite3.connect(RUNTIME_DB, timeout=5)
         cur = conn.cursor()
         cur.execute("""
@@ -190,10 +190,12 @@ def _is_solo(token, direction):
               AND created_at > datetime('now', '-10 minutes')
         """, (token.upper(), direction))
         count = cur.fetchone()[0]
-        conn.close()
         return count == 0
     except Exception:
         return True  # assume solo if DB check fails
+    finally:
+        if conn:
+            conn.close()
 
 
 def detect_bb_bounce(token, closes):
@@ -357,7 +359,7 @@ def scan_bb_bounce_signals(prices_dict):
         try:
             from hermes_constants import SPIKE_EXHAUSTION_VEL_5M_THRESHOLD
             import sqlite3 as _sqlite3
-            _conn_se = _sqlite3.connect('/root/.hermes/data/candles.db', timeout=5)
+            _conn_se = _sqlite3.connect(CANDLES_DB, timeout=5)
             _cur_se = _conn_se.cursor()
             _cur_se.execute("""
                 SELECT close FROM candles_1m
