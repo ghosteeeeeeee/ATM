@@ -592,7 +592,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             _choch_exempt = signal_type and 'choch' in signal_type.lower()
             _ct_hot_exempt = signal_type and 'coin_tracker_hot' in signal_type.lower()
             _hzscore_exempt = signal_type and signal_type.lower() == 'mtf_zscore'
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt:
+            _reversion_exempt = signal_type and 'inverse_accel_300' in signal_type.lower()  # mean reversion fires INTO trend
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
@@ -651,7 +652,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     _regime_15m = _get_regime('15m')
 
                     # Block SHORT only if BOTH 5m AND 15m are BULLISH
-                    if _regime_5m == 'BULLISH' and _regime_15m == 'BULLISH':
+                    # Reversion signals (inv-accel-300) are exempt — they fire INTO the trend
+                    if _regime_5m == 'BULLISH' and _regime_15m == 'BULLISH' and not _reversion_exempt:
                         print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                               f'5m={_regime_5m} 15m={_regime_15m} [regime_confirmation]', flush=True)
                         return None

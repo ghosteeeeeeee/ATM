@@ -475,6 +475,7 @@ def scan_inverse_accel_300_v2_signals(prices_dict: dict) -> int:
                   f"price={signal_price:.8g} gap={sig['gap_pct']:.3f}% "
                   f"reversion={sig['gap_change']:.3f}% "
                   f"gap_vel={sig['gap_velocity']:.3f}% [{SOURCE_SHORT}]")
+            added += 1
             continue
 
         try:
