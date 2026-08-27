@@ -19,12 +19,12 @@ def _ema_series(values, period):
 def detect(token, prices):
     PERIOD = 300
     V2_GAP_ACCEL_WINDOW = 10
-    V2_MIN_GAP_ACCEL = 0.06
+    V2_MIN_GAP_ACCEL = 0.10
     V2_VELOCITY_WINDOW = 5
-    V2_PERSISTENCE_BARS = 2
-    V2_MIN_GAP_PCT = 0.8
+    V2_PERSISTENCE_BARS = 3
+    V2_MIN_GAP_PCT = 1.5
     V2_FRESH_CROSS_BARS = 8
-    V2_FRESH_CROSS_MIN_GAP = 0.30
+    V2_FRESH_CROSS_MIN_GAP = 0.50
 
     if len(prices) < PERIOD + 30:
         return None
