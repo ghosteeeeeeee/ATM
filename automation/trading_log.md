@@ -16484,3 +16484,34 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - pump-catcher+ accelerating bleed (-$0.22 → -$0.35)
 - atr-spike+ new loser at -$0.15,28.6%WR — monitor next hour
+
+## [2026-08-27 19:05 UTC] Hourly Analysis
+
+**Trades:** 5 closed last hour (3W 1L 1BE, +$0.06)
+- GMT rs-r34,rs-r35,rs-r37 SHORT: +$0.05 (atr_sl_hit)
+- DYDX rs-r38,rs-r40 SHORT: +$0.02 (atr_sl_hit)
+- USUAL macd-div- SHORT: +$0.04 (atr_sl_hit)
+- MERL accel-300-v2+ LONG: -$0.05 (atr_sl_hit)
+- WLD accel-300-v2+ LONG: $0.00 (atr_sl_hit)
+
+**24h:** 64T, near breakeven, 5 open positions
+
+**Key Metrics:**
+- atr_sl_hit: 49T (76.6%), avg -$0.008 — trailing SL working as designed
+- profit-monster-trail: 12T, 100%WR, avg +$0.048 — clear winner
+- macd-div-: 6T, 83.3%WR, +$0.28 — second winner
+- pump-catcher+: 15T, 33.3%WR, -$0.12 — bleed reduced from -$0.35 yesterday
+- accel-300-v2+: 3T, 0%WR, -$0.14 — below3T hourly kill threshold
+
+**Changes:** None — no kill criteria triggered
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- Trade frequency: 5/hr normal (NEUTRAL market)
+- atr_sl_hit dominant with tiny avg loss — trailing SL catching losers quickly
+- Open positions: 5 (3 SHORT, 2 LONG)
+- accel-300-v2+ 0%WR but 0T last hour — doesn't trigger hourly kill
+
+**Open Questions:**
+- accel-300-v2+ 3T/0%WR in 24h — below kill threshold but trending poorly
+- pump-catcher+ bleed reduced — monitor to confirm stabilization
