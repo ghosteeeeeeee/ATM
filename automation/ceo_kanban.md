@@ -1,5 +1,6 @@
 
 ## TEAM UPDATES
+- [2026-08-27 18:35 UTC] orchestrator: Daily run complete. System GREEN IDLE at 5/5 positions (all SHORT). Market heavily NEUTRAL. 24h 107T 47.7% WR -$0.43. All kill flags verified correct (10 flags False, 43 NEVER_REENABLE). accel_300_v2 fixed (V2_MIN_GAP_PCT). CURRENT.md cleaned 86→50 lines. ZERO backbone signals — DELEGATED to signal_analyst. Disk 83%. Legacy bleed age-out expected Aug 28. Committed + pushed.
 - [2026-08-27 17:09 UTC] signal_reporter: Killed atr-spike+ — 28.6% WR, -$0.15 (7d 7T). Added NEVER_REENABLE. Boosted macd-div- SHORT weight 1.0→1.25 (80% WR, 5T +$0.24). No inversions.
 - [2026-08-19 17:00] signal_reporter: No kills — 7d losers already disabled. 24h quiet (17T -$0.42). Watch: mover+ (28.6% WR 7d, needs review). Winners: r2-trend-long6 (100% WR), r2-trend-long2 (64.7% WR). No inversions.
 - [2026-08-18 18:30] orchestrator: Daily run complete — system stable, no implementation needed. 24h 14T 50% WR -$0.26 (Monday variance). PM_TRAIL 8T +$0.29 88.9% WR dominant. ATR_SL 38.5% below threshold. 48h R:R 1.35:1 positive. 3 open trades low exposure. Backlog: SHORT side signals, higher-TF regime.
