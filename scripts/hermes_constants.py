@@ -1315,8 +1315,10 @@ R2_TREND_LONG_MIN_SLOPE     = 0.003   # minimum slope (absolute) to fire — LEG
 R2_TREND_LONG_MIN_SLOPE_PCT = 0.0001  # minimum slope as % of price per candle (0.01%) — normalized, fair across all price levels
 R2_TREND_LONG_MIN_R2        = 0.70    # minimum R² threshold (raised from 0.60 — filter weaker trends)
 R2_TREND_LONG_MAX_RSI       = 75      # max RSI — don't buy overbought (chasing)
+R2_TREND_LONG_MIN_RSI       = 20      # min RSI — don't buy when oversold (falling knife risk). Losers avg RSI=27, winners avg RSI=58. RSI>=20 blocks 17/42 losses, 0/77 wins.
 R2_TREND_LONG_MIN_SPEED     = 30      # min speed percentile — require some momentum
 R2_TREND_LONG_MAX_BB_POS    = 0.85    # max BB position — don't chase at band top
+R2_TREND_LONG_MIN_BB_POS    = 0.10    # min BB position — don't buy at band bottom (already dropping). Losers avg BB=0.02, winners avg BB=0.51. BB>=0.10 blocks 32/42 losses, 11/77 wins.
 R2_TREND_LONG_BLOCK_STALE   = True    # block signals on stale tokens (no momentum)
 R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this (overextended, about to reverse)
 R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-19 from 0.2 — r2-trend-long3 11T/7d ATR_SL avg MFE +0.12% (dead-cat bounces peaking 0.12% then stopping out). Winners peak 0.65%. RAISED 2026-08-18 from 0.1. RAISED 2026-08-15 from 0.0.
@@ -2047,11 +2049,13 @@ CONTINUATION_MIN_AVG_RANGE = 0.045            # % — min avg 1m candle range (s
 ATR_SPIKE_ENABLED              = True    # master kill-switch
 ATR_SPIKE_PLUS_ENABLED         = True    # LONG direction
 ATR_SPIKE_COMPRESSION_MAX_PCT  = 0.07    # ATR% threshold for compression (relaxed from 0.05; catches genuinely compressed tokens)
-ATR_SPIKE_COMPRESSION_MIN_BARS = 4       # minimum candles in compression (relaxed from 5)
+ATR_SPIKE_COMPRESSION_MIN_BARS = 8       # minimum candles in compression (raised from 4 — filters dead-cat bounces)
 ATR_SPIKE_BREAKOUT_MIN_PCT     = 0.15    # minimum candle % move to trigger (relaxed from 0.3; ~93rd percentile for BTC)
 ATR_SPIKE_TREND_FILTER         = True    # require EMA20 > EMA50 on 1h (changed from 15m — too noisy)
 ATR_SPIKE_TREND_TIMEFRAME      = '1h'    # timeframe for trend filter ('1h' or '15m')
 ATR_SPIKE_EMA_PROXIMITY_PCT    = 1.0     # max distance from EMA20 (relaxed from 0.5; still selective)
+ATR_SPIKE_MOMENTUM_FILTER      = True    # require price > SMA(10) at breakout (filters fading momentum)
+ATR_SPIKE_MOMENTUM_BARS        = 10      # bars for momentum SMA check
 ATR_SPIKE_SL_PCT               = 0.75    # hard stop-loss %
 ATR_SPIKE_CONF_BASE            = 70      # base confidence
 ATR_SPIKE_CONF_PCT_BOOST       = 10      # extra conf per 0.1% above breakout threshold

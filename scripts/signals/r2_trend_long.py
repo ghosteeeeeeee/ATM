@@ -27,8 +27,10 @@ from hermes_constants import (
     R2_TREND_LONG_MIN_SLOPE_PCT,
     R2_TREND_LONG_MIN_R2,
     R2_TREND_LONG_MAX_RSI,
+    R2_TREND_LONG_MIN_RSI,
     R2_TREND_LONG_MIN_SPEED,
     R2_TREND_LONG_MAX_BB_POS,
+    R2_TREND_LONG_MIN_BB_POS,
     R2_TREND_LONG_BLOCK_STALE,
     R2_TREND_LONG_MAX_ACCEL,
     R2_TREND_LONG_MIN_PRE_MOVE,
@@ -299,8 +301,10 @@ def scan_signals():
                 rsi = 100.0
             if rsi > R2_TREND_LONG_MAX_RSI:
                 continue
+            if rsi < R2_TREND_LONG_MIN_RSI:
+                continue  # oversold — falling knife risk, skip LONG
 
-        # ── BB position filter: don't chase at band top ──────────────────
+        # ── BB position filter: don't chase at band top, don't buy at bottom ──
         if len(closes_list) >= 20:
             mean_20 = np.mean(closes_list[-20:])
             std_20 = np.std(closes_list[-20:])
@@ -308,6 +312,8 @@ def scan_signals():
                 bb_pos = (closes_list[-1] - (mean_20 - 2 * std_20)) / (4 * std_20)
                 if bb_pos > R2_TREND_LONG_MAX_BB_POS:
                     continue
+                if bb_pos < R2_TREND_LONG_MIN_BB_POS:
+                    continue  # at band bottom — already dropping, skip LONG
 
         sid = add_signal(
             token=token.upper(),
