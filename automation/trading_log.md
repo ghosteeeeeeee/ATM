@@ -1,5 +1,35 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-27 16:15 UTC] Hourly Analysis
+
+**Trades:** 5 closed (3W, 2L) — **+$0.16**
+- BANANA bb-bounce-short SHORT profit-monster-trail +$0.04
+- MNT atr-spike+,engulfing+ LONG atr_sl_hit +$0.12 (trailing SL locked profit)
+- ARB r2-trend-long4 LONG atr_sl_hit +$0.06 (trailing SL locked profit)
+- CC r2-trend-short6 SHORT atr_sl_hit -$0.11
+- STX macd-div- SHORT profit-monster-trail +$0.05
+
+**24h:** 65T, 44.6% WR, -$0.26 (near breakeven)
+- atr_sl_hit 46T 71% of closes — still elevated but PnL -$0.58 (trailing working)
+- profit-monster-trail 12T +$0.70 — only profitable exit type
+- pump-catcher+ 17T 29%WR -$0.35 — highest SL hit volume (15T)
+- slow-grind- 7T 29%WR -$0.47 — 0 trades since lifecycle fix (03:05 UTC), can't evaluate
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour with 0% WR
+- Trade freq ~2.7/hr normal
+- 1 open position (LTC LONG, $0.00 PnL)
+- slow-grind- lifecycle fix needs more time — 0 trades since deployment, market-dependent
+- pump-catcher+ at -$0.02/trade avg — marginal but not actionable
+- atr_sl_hit 71% elevated but trailing SL is working as designed (many exits are profit-taking)
+
+**Open Questions:**
+- slow-grind- dormant since fix — will it recover on next downtrend? If not, signal logic may need deeper fix
+- pump-catcher+ continues as volume leader for SL hits — ATR_SL_MIN (0.8%) floor prevents tightening
+- bb-bounce-short 3T/33%WR/-$0.14 — degraded but below kill threshold
+
 ## [2026-08-27 04:06 UTC] Hourly Analysis
 
 **Trades:** 4 closed (2W, 2L) — **-$0.47**
