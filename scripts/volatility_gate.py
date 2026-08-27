@@ -93,6 +93,7 @@ REGIME_SIGNALS = {
         'mover', 'mover+', 'mover-',  # momentum spike detector
         'ct-hot', 'ct-hot+', 'ct-hot-',  # coin_tracker_hot momentum
         'hl_copy_trader',  # pro trader copy — works in all regimes
+        'atr-spike+', 'atr-spike-',  # ATR compression spike
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',  # stop hunt reversal
         'return_exhaustion_long',  # extreme negative return reversal
         'spike_exhaustion_short', 'spike_exhaustion_short-',  # spike fade SHORT

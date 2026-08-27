@@ -1979,10 +1979,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} accel-300 standalone ({src}) allowed at final guard")
                 elif CONFLUENCE_NEUTRAL_RELAX:
                     _r4h, _ = get_regime_4h(tkn)
-                    if _r4h == 'NEUTRAL':
-                        log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} NEUTRAL-relax: single-type allowed at final guard (4h={_r4h})")
+                    bare_src_final = src.rstrip('+-') if src else ''
+                    if _r4h == 'NEUTRAL' and bare_src_final in STANDALONE_BYPASS_SIGNALS:
+                        log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} NEUTRAL-relax: standalone bypass ({bare_src_final}) at final guard (4h={_r4h})")
                     else:
-                        log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (4h={_r4h}, not NEUTRAL)")
+                        log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (4h={_r4h}, not standalone bypass)")
                         continue
                 else:
                     log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — src='{src}' (this should never happen — investigate confluence gate or preservation path)")
