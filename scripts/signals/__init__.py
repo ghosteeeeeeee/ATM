@@ -145,6 +145,11 @@ except Exception:
     _accel_300_run = None
 
 try:
+    from signals.accel_300_v2 import scan_accel_300_v2_signals as _accel_300_v2_run
+except Exception:
+    _accel_300_v2_run = None
+
+try:
     from signals.inverse_accel_300 import scan_inverse_accel_300_signals as _inverse_accel_300_run
 except Exception:
     _inverse_accel_300_run = None
@@ -443,6 +448,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'fast_momentum',        'enabled': 'FAST_MOMENTUM_ENABLED',      'run': _fast_momentum_run},
     # These use their *_ENABLED boolean directly
     {'name': 'accel_300',            'enabled': ACCEL_300_ENABLED,           'run': _accel_300_run},
+    {'name': 'accel_300_v2',         'enabled': True,                        'run': _accel_300_v2_run},
     {'name': 'inverse_accel_300',    'enabled': INVERSE_ACCEL_300_ENABLED,   'run': _inverse_accel_300_run},
     {'name': 'inverse_accel_300_v2', 'enabled': INVERSE_ACCEL_300_V2_ENABLED, 'run': _inverse_accel_300_v2_run},
     {'name': 'ema_angle',            'enabled': EMA_ANGLE_ENABLED,            'run': _ema_angle_run},
@@ -594,7 +600,8 @@ def run_all_signals(signal_list=None):
         'pct_hermes': 'run', 'vel_hermes': 'run',
         'hzscore': 'run', 'hmacd': 'run',
         'phase_accel': 'run', 'fast_momentum': 'run',
-        'accel_300': 'scan_accel_300_signals', 'inverse_accel_300': 'scan_inverse_accel_300_signals',
+        'accel_300': 'scan_accel_300_signals', 'accel_300_v2': 'scan_accel_300_v2_signals',
+        'inverse_accel_300': 'scan_inverse_accel_300_signals',
         'inverse_accel_300_v2': 'scan_inverse_accel_300_v2_signals',
         'ema_angle': 'scan_ema_angle_signals',
         'rs': 'scan_rs_signals',
