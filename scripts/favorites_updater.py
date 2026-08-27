@@ -37,7 +37,7 @@ PROMO_MIN_WR = 58.0           # raised from 55 — need stronger signal for dail
 PROMO_MIN_AVG_PNL = 0.1       # raised from 0.0 — must be actually profitable
 
 # ── Demotion criteria (7d rolling) ──────────────────────────────────────
-DEMO_WR_THRESHOLD = 48.0      # raised from 45 — catch underperformers faster
+DEMO_WR_THRESHOLD = 60.0      # raised from 48 — only coins with 60%+ WR stay in favs
 DEMO_TOTAL_PNL_THRESHOLD = -0.25  # tightened from -0.50
 DEMO_CONSECUTIVE_DAYS = 1     # 1 bad evaluation = demoted (fast response for crypto)
 
