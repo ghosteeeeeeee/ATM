@@ -1,5 +1,34 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-27 04:06 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W, 2L) — **-$0.47**
+- ENA cascade-reverse-v2 SHORT atr_sl_hit -$0.45 (entry 0.14414, SL 0.14529, stopped by $0.00001)
+- CHIP pump-catcher+ LONG atr_sl_hit -$0.11
+- AVNT atr-spike+ LONG atr_sl_hit +$0.03
+- IO macd-div- SHORT profit-monster-trail +$0.06
+
+**24h:** 67T, 41.8% WR, -$0.95
+- atr_sl_hit 62.7% (42/67) — trailing SL working as designed
+- profit-monster-trail 15T +$0.77 — clear winner signal
+- pump-catcher+ 21T/33.3%WR/-$0.39 — volume leader but marginal
+- cascade-reverse-v2 5T mixed — this hour's biggest drag
+- macd-div- 4T 75%WR +$0.23 — strong
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour with 0% WR
+- continuation- 2T/0%WR in 24h but only 2T (needs 3+ in last hour to kill)
+- pump-catcher+ 33.3%WR above 0% threshold
+- Trade freq 4/hr normal
+- ENA -$0.45 was isolated trade loss, not signal-level pattern
+- 3 open positions
+
+**Open Questions:**
+- ENA cascade-reverse-v2 SHORT entry very tight (SL 0.79% from entry) — check if entry timing was suboptimal
+- pump-catcher+ remains marginal at -$0.006 avg PnL over 24h
+
 ## [2026-08-27 03:05 UTC] Hourly Analysis
 
 **Trades:** 3 closed in last hour (1W 2L -$0.16). 65 closed in 24h (28W 37L -$0.43).

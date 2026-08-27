@@ -325,6 +325,10 @@
   WHY: 5T last hour (3W 2L +$0.33). SAND/ENA/BABY/WLD/NEO all atr_sl_hit. BABY +$0.29, SAND +$0.18 winners via trailing SL. 61T 24h 47.5%WR -$0.12. atr_sl_hit 60.7% stable with trailing SL deployed. profit-monster-trail 15T +$0.047 avg clear winner. cascade-reverse-v2 3T +$0.48, macd-div- 4T +$0.20 strong. pump-catcher+ 15T/33.3%WR/-$0.25 volume leader but losing. slow-grind- 12T/33.3%WR/-$0.64 biggest drag, kill bug fixed. bb_bounce+ CEO_PROTECTED. 3 open positions. Trade freq 3/hr normal. Kill criteria not triggered.
   BY: auto_1hr
   NEXT: Re-run at 01:10 UTC
+[2026-08-27 04:06 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (2W 2L -$0.47). ENA cascade-reverse-v2 -$0.45 biggest loss (SL hit by $0.00001). CHIP pump-catcher+ -$0.11, AVNT atr-spike+ +$0.03, IO macd-div- +$0.06. 67T 24h 41.8%WR -$0.95. atr_sl_hit 62.7% (42/67) trailing SL working. profit-monster-trail 15T +$0.77 clear winner. pump-catcher+ 21T/33.3%WR/-$0.39 volume leader but marginal. continuation- 2T/0%WR below 3T kill threshold. Kill criteria not triggered. Trade freq 4/hr normal. 3 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 05:10 UTC
 [2026-08-27 02:10 UTC] auto_1hr: NO CHANGES
   WHY: 4T last hour (3W 1L +$0.20). CASHCAT pump-catcher+ +$0.15/$0.08 trailing SL wins, CAKE r2-trend-short3 profit-monster-trail +$0.06, MON pump-catcher+ -$0.09. 64T 24h 45.3%WR +$0.04 breakeven. atr_sl_hit 62.5% (40/64) trailing SL working. profit-monster-trail 15T +$0.75 clear winner. pump-catcher+ 18T/38.9%WR/-$0.11 volume leader but marginal (-$0.006 avg). cascade-reverse-v2 5T +$0.67, macd-div- 4T/75%WR +$0.20 strong. slow-grind-/bb_bounce+ already killed (NEVER_REENABLE) legacy decaying. continuation- 2T/0%WR below 3T threshold. Hourly trend positive (2 consecutive profitable hours). Trade freq 4/hr normal. Kill criteria not triggered.
   BY: auto_1hr
