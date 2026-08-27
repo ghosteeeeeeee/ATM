@@ -65,3 +65,42 @@ Nothing yet. Spec approved, pending backbone signal completion.
 2. **If backbone signal ships:** begin Phase 0 (regime persistence)
 3. **If backbone signal stalls:** redirect engineering to signal development, defer regime memory
 4. **Monitor ATR_SL** — 35 hits/48h -$4.75 remains dominant loss
+
+---
+
+## CEO Report — 2026-08-27 ~01:10 UTC
+
+### Diagnosis
+NEUTRAL relax fix from yesterday (Aug 26) passed signals through the confluence gate but the final guard (Step 11) blocked them — missing the same NEUTRAL relax exception. Pipeline confirmed: 5 signals approved at gate, only 1 reached hotset. System has ZERO backbone signals. ct-hot+ legacy 80T/7d -$5.07 aging out today.
+
+### Verified Numbers
+| Metric | Value | Trend |
+|--------|-------|-------|
+| 24h | 61T, -$0.15, 44.3% WR | Flat (was -$0.45 yesterday) |
+| 7d | 351T, -$4.55, 47.9% WR | Improving (was -$5.06) |
+| Today Aug 27 | 5T, +$0.33, 40% WR | Early, positive |
+| Open trades | 2 SHORT | Near breakeven |
+| ATR_SL/48h | 37 hits, -$4.57 | Dominant loss (65%) |
+| ct-hot+ legacy | 80T/7d, -$5.07 | Aging out today |
+| Coin tracker | 69/109 accumulation | Bullish |
+
+### Fix Applied
+**signal_compactor.py final guard** — Added NEUTRAL relax check (lines 1971-1977). When CONFLUENCE_NEUTRAL_RELAX=True and 4h regime is NEUTRAL, single-type signals now pass the final guard instead of being blocked. This was the second half of yesterday's NEUTRAL relax fix (first half: confluence gate check at line 1404).
+
+### Root Cause
+Yesterday's fix addressed the confluence gate (Step 2) but not the final guard (Step 11). The final guard was designed as a safety net against single-source signals slipping through, but it didn't account for NEUTRAL relax — a legitimate exception to the 2-type confluence requirement.
+
+### Active Signal Performance (7d)
+| Signal | Trades | PnL | WR | Status |
+|--------|--------|-----|-----|--------|
+| cascade-reverse-v2 SHORT | 5 | +$0.39 | 40% | Active, emerging winner |
+| macd-div- SHORT | 17 | +$0.06 | 70.6% | Active, best WR |
+| r2-trend-long3 LONG | 8 | +$0.24 | 50% | Active |
+| pump-catcher+ LONG | 15 | -$0.25 | 33.3% | Active, ATR_SL 11 hits |
+| hzscore- SHORT | 10 | +$0.09 | 50% | Active, marginal |
+
+### Next Actions
+1. **Monitor hotset population** after NEUTRAL relax final guard fix — next pipeline cycle
+2. **ct-hot+ age-out** should complete today — system projected net positive after
+3. **Build backbone signal** — still delegated to signal_analyst (LONG, volume+momentum)
+4. **Monitor disk** — 83%, approaching 85% cleanup threshold
