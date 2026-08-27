@@ -15913,3 +15913,31 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 - slow-grind- continues to be largest drag (-$0.62, 11T) but 36.4%WR avoids kill
 - Signal starvation ongoing — NEUTRAL regime blocking confidence scores
 - bb_bounce+ (6T/16.7%WR/-$0.29) still CEO_PROTECTED, needs CEO decision
+
+## [2026-08-26 23:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** -$0.15 (WR: 0%)
+- BTC SHORT liq-hunt- atr_sl_hit -$0.11
+- CASHCAT LONG pump-catcher+ hard_sl -$0.02
+- WLFI SHORT slow-grind- atr_sl_hit -$0.02
+
+**24h:** 57T, 45.6%WR, -$0.45 total PnL
+- atr_sl_hit 56.1% (32/57) — elevated but stable, trailing SL helping winners
+- profit-monster-trail 16T, +$0.73 avg — clear winner
+- slow-grind- 12T/33.3%WR/-$0.64 — biggest drag but kill bug fixed at 20:50 UTC, no new trades since
+- pump-catcher+ 11T/36.4%WR/-$0.40
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: pump-catcher+ (36.4%WR), slow-grind- (33.3%WR) both above 0% threshold
+- slow-grind- kill bug FIXED at 20:50 UTC (commit 3ad6126) — flag was True despite kill, now correctly False
+- All 5 slow-grind- trades (15:04-16:21 UTC) were from BEFORE the fix — no new trades generated after 20:50
+- atr_sl_hit 56.1% stable — trailing SL performing as designed for winners
+- Trade freq 3/hr normal
+- 3 open positions (CAKE SHORT, BABY LONG, SAND LONG)
+
+**Open Questions:**
+- slow-grind- drag (-$0.64) will decay as old trades close — no action needed
+- bb_bounce+ (6T/16.7%WR/-$0.29) still CEO_PROTECTED, needs CEO decision
