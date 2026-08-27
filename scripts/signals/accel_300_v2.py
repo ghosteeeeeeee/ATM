@@ -259,15 +259,11 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     direction = 'LONG' if gap_now > 0 else 'SHORT'
     abs_gap = abs(gap_now)
 
-    # ── FILTER 1: Gap must be large enough ─────────────────────────────────
-    if abs_gap < V2_MIN_GAP_PCT:
-        return None
-
-    # ── FILTER 2: Gap not too extreme ──────────────────────────────────────
+    # ── FILTER 1: Gap not too extreme ──────────────────────────────────────
     if abs_gap > V2_MAX_GAP_PCT:
         return None
 
-    # ── FILTER 3: Gap acceleration (10-bar window) ────────────────────────
+    # ── FILTER 2: Gap acceleration (10-bar window) ────────────────────────
     accel_start = latest_idx - V2_GAP_ACCEL_WINDOW
     if accel_start < 0:
         return None
