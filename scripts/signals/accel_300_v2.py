@@ -50,13 +50,13 @@ _PRICE_DB = STATIC_DB
 _CANDLES_DB = CANDLES_DB
 
 # ── V2 Signal constants ──────────────────────────────────────────────────────
-V2_MIN_GAP_PCT = 0.8           # min gap from EMA300 to fire — catch early breakout
+V2_MIN_GAP_PCT = 1.5           # min gap from EMA300 to fire — raised from 0.8 (too noisy)
 V2_MAX_GAP_PCT = 10.0          # don't fire if gap too extreme (structural)
-V2_MIN_GAP_ACCEL = 0.06        # min gap acceleration over 10 bars — detect start of move
+V2_MIN_GAP_ACCEL = 0.10        # min gap acceleration over 10 bars — raised from 0.06
 V2_GAP_ACCEL_WINDOW = 10       # bars to measure gap acceleration
 V2_VELOCITY_WINDOW = 5         # bars to measure price velocity
-V2_PERSISTENCE_BARS = 2        # min bars price must stay on same side of EMA (was 3)
-V2_MIN_ATR_PCT = 0.02          # min ATR% — skip ultra-low-vol tokens (lowered from 0.05)
+V2_PERSISTENCE_BARS = 3        # min bars price must stay on same side of EMA (raised from 2)
+V2_MIN_ATR_PCT = 0.02          # min ATR% — skip ultra-low-vol tokens
 V2_VOLUME_LOOKBACK = 30        # bars for average volume
 V2_VOLUME_MULT = 1.0           # volume must be >= average (any volume OK)
 V2_COOLDOWN_BARS = 15          # cooldown between signals per token
@@ -65,7 +65,8 @@ V2_SLOPE_WINDOW = 20           # bars for linear regression slope
 V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (lower = earlier entry)
 # Fresh cross mode: catch the FIRST momentum bar after EMA300 cross
 V2_FRESH_CROSS_BARS = 8        # max bars since cross to qualify for fresh entry
-V2_FRESH_CROSS_MIN_GAP = 0.30  # lower gap threshold for fresh cross entries
+V2_FRESH_CROSS_MIN_GAP = 0.50  # raised from 0.30 (too many false signals)
+V2_LONG_ONLY = True            # SHORT side had 23% WR — LONG only
 
 PERIOD = 300  # EMA300 period
 DRY_RUN = '--dry' in sys.argv
@@ -422,6 +423,11 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
             continue
 
         direction = sig['direction']
+
+        # LONG_ONLY mode — SHORT side had 23% WR in backtest
+        if V2_LONG_ONLY and direction == 'SHORT':
+            continue
+
         if get_cooldown(token, direction=direction):
             continue
 
