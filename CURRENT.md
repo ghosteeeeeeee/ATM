@@ -1,74 +1,36 @@
 # Current State — System Improvement Focus
 
-**Last Updated: 2026-08-27 ~18:20 UTC (CEO)**
-**Updated by: CEO**
+**Last Updated: 2026-08-27 ~18:35 UTC (Orchestrator)**
+**Updated by: Orchestrator (daily run)**
 
-## What We're Working On
+## Current Status
 
-**Completed:** PM_TRAIL dist 0.20% WORKING (92.9% WR +$14.47/7d). All legacy losers killed (ct-hot+ CLEARED Aug 17, hzscore+ Aug 17, wave_catcher+ Aug 17, range_breakout+ Aug 15, trend_momentum_near_sma+ Aug 12, accel-300- Aug 17). range_breakout_short KILLED (0% WR 3T, auto-1hr Aug 17). Signal starvation fix (hl_copy_trader bypass, NEUTRAL relax). SPEED_MIN 40 deployed (ATR_SL daily: 41→3). Phantom trades FIXED (0T, was 9T/7d -$0.06). Blacklist testing COMPLETE (77 tokens tested, 0 KEEP — blacklist is working as intended). return_exhaustion_long DISABLED (auto_1hr killed, RETURN_EXHAUSTION_ENABLED=False). **SL FLOOR BUG FIXED** (tpsl_utils.py 8 lines — 89% of ATR_SL hits had SL < 1.0% from entry, floor now enforced after every one-way gate). **R2_TREND_LONG_MIN_PRE_MOVE 0.2→0.3** (dead-cat bounce filter, r2-trend-long3 losers peak +0.12% MFE). mover+ KILLED (signal_reporter, 28.6% WR -$0.15/7d, NEVER_REENABLE). R2_TREND_SHORT KILLED (0% WR 3T, Aug 20). Runtime DB VACUUMED (87→83MB). **stop_hunt_reversal_long+ KILLED (CEO Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38. NEVER_REENABLE. **ct-hot+ LONG KILLED (signal_reporter Aug 24).** COIN_TRACKER_HOT_PLUS_ENABLED=False, NEVER_REENABLE_FLAGS. **Health monitor DB fix** — added correct table references to prompt (was crashing on `no such table: trades`). **CONF_FILTER_MAX raised 85→89 (CEO Aug 23)** — blocks overconfident trades, 90+ tier now +$1.91/7d. **hzscore- KILLED (auto_1hr Aug 23 21:05 + signal_reporter, NEVER_REENABLE).** **signal_compactor FIXED (health monitor Aug 24).** UnboundLocalError bare_source — was crashing every pipeline cycle. **Disk cleaned (orchestrator Aug 24).** Journal vacuum freed 3GB (84%→81%). **SIGNAL LIFECYCLE FILTERS DEPLOYED (orchestrator Aug 26).** Early/concurrent/lagging roles wired into tpsl_utils SL/TP computation. Early signals get wider SL (+50%) and bigger TP (+100%), lagging signals get tighter SL (-20%) and smaller TP (-20%). Already had score penalties in signal_compactor. 2h build. **NEUTRAL RELAX BUG FIXED (CEO Aug 26).** signal_compactor.py: NEUTRAL relax was checking 1m regime (noisy, shows LONG_BIAS when 4h is NEUTRAL) instead of 4h regime. 15 tokens now have 4h NEUTRAL — single-type signals will pass confluence in flat market.
+System GREEN, IDLE. 5/5 positions open (all SHORT). Pipeline running, all timers firing.
 
-**Current status:** System GREEN, IDLE. CEO verified (18:20 UTC): 24h 61T -$0.08, 47.5% WR. 7d: 380T -$4.25, 48.4% WR. Today: 50T +$0.02, 50% WR (flat). 4 open ($0.00). **SLOW_GRIND- KILLED (CEO BUG FIX 18:20)** — flag was still True despite kill documented Aug 26/7. 12T/7d 33.3% WR -$0.64. SLOW_GRIND_SHORT_ENABLED=False + NEVER_REENABLE_FLAGS. **bb_bounce+ KILLED AGAIN (CEO 18:04)** — 48h 9T/11.1%WR/-$0.74, NEVER_REENABLE. **System has ZERO backbone signals.** DELEGATED to signal_analyst: build new backbone. Winners: macd-div- SHORT 21T/7d +$0.31, 76.2% WR (STAR), r2-trend-short4 3T +$0.20 100%WR, cascade-reverse-v2 SHORT +$0.30/7d. Losers: ct-hot+ legacy -$3.65/7d (aging out), hl_copy SHORT -$0.76/7d (legacy). ATR_SL dominant: 48 hits/48h -$5.12 (trailing working). Coin tracker: 71/109 tokens in Wyckoff accumulation (bullish). Disk: 83%. Pipeline: active, timer firing. Market: NEUTRAL.
+- **24h:** 107T, 47.7% WR, -$0.43 (near breakeven)
+- **7d:** 366T, 51.1% WR, +$0.10 (flat)
+- **Today (Aug 27):** 62 closed. Kill actions: atr-spike+ (signal_reporter), slow-grind- (CEO), bb_bounce+ (CEO, twice), pump-catcher+ (CEO).
+- **Market:** 104 NEUTRAL / 1 LONG / 1 SHORT — heavily neutral, low directional activity.
+- **Disk:** 83% (20G free)
+- **Open positions:** POL SHORT (accel-300-v2-), ALT SHORT (r2-trend), USUAL SHORT (macd-div-), GMT SHORT (rs-r34), DYDX SHORT (rs-r38)
+
+**System has ZERO backbone signals.** DELEGATED to signal_analyst: build new backbone.
+
+## Today's Changes (Aug 27)
+
+1. **slow-grind- KILLED (CEO 18:20)** — Flag still True despite kill documented Aug 26. SLOW_GRIND_SHORT_ENABLED=False + NEVER_REENABLE. Second time kill was documented but not applied.
+2. **bb_bounce+ KILLED AGAIN (CEO 18:04)** — 48h 9T/11.1%WR/-$0.74 after CEO re-enable at 14:00. BB_BOUNCE_PLUS_ENABLED=False, BB_BOUNCE_ENABLED=False, NEVER_REENABLE.
+3. **pump-catcher+ KILLED (CEO 14:30)** — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. PUMP_CATCHER_ENABLED=False, NEVER_REENABLE.
+4. **atr-spike+ KILLED (signal_reporter 17:09)** — 7T/7d 28.6% WR -$0.15. ATR_SPIKE_PLUS_ENABLED=False, NEVER_REENABLE. macd-div- weight boosted 1.0→1.25.
+5. **accel_300_v2 FIXED (health monitor 18:20)** — V2_MIN_GAP_PCT was undefined (NameError), signal emitting 0 signals. Added V2_MIN_GAP_PCT = 1.5.
 
 ## Active Decisions
 
-- **slow-grind- KILLED (CEO BUG FIX 18:20).** Flag was still True despite CEO kill documented Aug 26/27. 12T/7d 33.3% WR -$0.64 actively generating losing trades. SLOW_GRIND_SHORT_ENABLED=False, added to NEVER_REENABLE_FLAGS. This was the second time the kill was documented but not applied — first at 17:00 UTC Aug 26 (fixed Aug 27 21:00), now again at 18:20 Aug 27. Root cause: CEO documented kill in kanban/CURRENT.md but forgot to edit hermes_constants.py. — 2026-08-27
-- **bb_bounce+ KILLED AGAIN (CEO 18:04).** 48h 9T/11.1%WR/-$0.74 — severely degraded after CEO re-enable at 14:00 UTC. Was killed by auto_1hr at 10:15 (3T/0%WR), CEO overrode based on 7d 60.5%WR. 48h data confirms ongoing bleed. BB_BOUNCE_PLUS_ENABLED=False, BB_BOUNCE_ENABLED=False, in NEVER_REENABLE_FLAGS. System has ZERO backbone signals — DELEGATED to signal_analyst. — 2026-08-27
-- **pump-catcher+ KILLED (CEO Aug 27 14:30).** 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate (16/21 trades). Entries after exhausted moves. PUMP_CATCHER_ENABLED=False, added to NEVER_REENABLE_FLAGS. Was tightened earlier today (VELOCITY_MIN 0.5→0.8, RSI_MAX 65→55) but still bleeding. — 2026-08-27
-- **bb_bounce+ CEO OVERRIDE (CEO Aug 27 14:00).** auto_1hr killed at 10:15 UTC (3T/0%WR -$0.43 on low-liq tokens). CEO override: 7d 38T 60.5% WR +$0.30 — signal fundamentally sound, kill was variance. BB_BOUNCE_PLUS_ENABLED=True. Monitor 48h for WR>55%. — 2026-08-27
-- **tl_break_short FLAGGED TO T (CEO Aug 27 14:00).** 16T/7d 62.5% WR -$0.11 — INVERTED R:R (avg win +2.32%, avg loss -5.19%). CEO_PROTECTED, cannot disable. Recommend T tighten SHORT SL or disable signal. — 2026-08-27
-- **bb_bounce+ RE-ENABLED (CEO Aug 27).** 38T/7d 60.5% WR +$0.30 — backbone signal. Kill was single bad day (Aug 26: 8T 12.5% WR -$0.55 on low-liquidity tokens). Signal fundamentally sound. BB_BOUNCE_ENABLED=True, BB_BOUNCE_PLUS_ENABLED=True. Removed from NEVER_REENABLE_FLAGS. Monitor 48h for WR>55%. — 2026-08-27
-- **slow-grind- KILLED (CEO Aug 27).** 12T/7d 33.3% WR -$0.64, inverted R:R. SLOW_GRIND_SHORT_ENABLED=False, NEVER_REENABLE_FLAGS. Was still True despite previous kill attempt (signal_reporter didn't apply). — 2026-08-27
-- **pump-catcher+ TIGHTENED (CEO Aug 27).** VELOCITY_MIN 0.5→0.8, RSI_MAX 65→55. 76.2% ATR_SL hit rate (16/21 trades). Entries after exhausted moves. Tighter filters should reduce false positives. Monitor 48h for ATR_SL reduction. — 2026-08-27
-- **bb_bounce+ KILLED (signal_reporter Aug 26 17:09).** 8T/24h 12.5% WR -$0.55. BB_BOUNCE_PLUS_ENABLED=False, in NEVER_REENABLE_FLAGS. Was LAST backbone signal — system now ZERO backbone signals. RECOMMEND: build new backbone signal immediately. — 2026-08-26
-- **continuation- SHORT KILLED (auto_1hr Aug 26).** 3T/0W/0%WR/-$0.37. CONTINUATION_MINUS_ENABLED=False. All SHORT entries hit SL or cut-loser. — 2026-08-26
-- **slow-grind- KILLED (CEO KILLED Aug 26, FINALIZED Aug 27).** 12T/7d 33.3% WR -$0.64, inverted R:R. SLOW_GRIND_SHORT_ENABLED=False, NEVER_REENABLE_FLAGS. Kill was NOT applied at 17:00 UTC Aug 26 — flag still True. CEO set False + added NEVER_REENABLE Aug 27. — 2026-08-27
-- **DELEGATED to signal_analyst: build new backbone signal.** Volume+momentum based, must pass 2-type confluence gate. Priority: LONG for Wyckoff accumulation market (69/109 tokens). System has ZERO backbone signals. — 2026-08-26
-- **CONF_FILTER_MAX=89 (CEO Aug 24).** Raised from 85 — original decision based on ct-hot+ dragging90+ tier. Without ct-hot+, 90+ tier now +$1.91/7d (most profitable). 85-89 tier7T,71.4% WR also profitable. Blocks only break-even90-94 tier. Monitor48h for PnL improvement. — 2026-08-24
-- **ATR_SL_MIN=1.2% (CEO REVERTED Aug 25).** auto_1hr data: 1.5% WORSENED hit rate 49.4%→60%, avg loss -$6.09. Wider SL = trades run into bigger losses. Problem is entry quality, not SL width. Reverted to 1.2%. Monitor48h. — 2026-08-25
-- **CURRENT.md is the single source of truth for agent sessions.** — 2026-08-13
-- **macd-div+ DISABLED (CEO KILLED Aug 23).** 4T/7d 25% WR -$0.40. Dead signal, no edge. MACD_DIVERGENCE_PLUS_ENABLED=False. — 2026-08-23
-- **SHORT_NEUTRAL_BLOCK_ENABLED=True (CEO Aug 22, FIXED Aug 23).** SHORT signals 7d: 26T -$1.40, 26.9% WR (ALL losing). Was using 1m regime (noisy — showed LONG_BIAS when 4h NEUTRAL, block never fired). FIX: Now uses 4h regime from PostgreSQL momentum_cache. Block fires when 4h regime is NEUTRAL (64 tokens). In SHORT_BIAS (85 tokens), SHORT signals allowed. — 2026-08-23
-- **R2_TREND_LONG_MIN_PRE_MOVE 0.3 active.** Dead-cat bounce filter. r2-trend-long3 losers peak +0.12% MFE, winners +0.65%. Monitor 48h for ATR_SL reduction and WR improvement. — 2026-08-19
-- **ct-hot+ LONG KILLED (signal_reporter Aug 24, orchestrator Aug 25).** All COIN_TRACKER_HOT variants disabled. COIN_TRACKER_HOT_ENABLED=False, in NEVER_REENABLE_FLAGS. 66T/7d 36.4% WR -$3.65. Without it: system +$1.30/7d. — 2026-08-25
-- **hzscore+ False (CEO KILLED).** 32T ~38% WR -$0.47/7d. Combos bleeding (bb_bounce+,hzscore+ 20T 35% -$0.35). Added NEVER_REENABLE_FLAGS. — 2026-08-17
-- **hzscore- RE-ENABLED BY T (Aug 22, signal starvation).** SHORT 7d: 8T -$0.18, 50% WR (inverted R:R — avg win small, avg loss large). CEO_PROTECTED. Recommend T disable. — 2026-08-23
-- **wave_catcher+ DISABLED (CEO KILLED Aug 17).** Both variants dead (+37.5% WR -$0.42, -25% WR -$0.09). Master switch False. In NEVER_REENABLE_FLAGS. — 2026-08-17
-- **accel-300- standalone bypass DISABLED (CEO KILLED Aug 17).** 40T/7d 55% WR -$0.30 — net negative despite PM_TRAIL capturing winners. Removed from STANDALONE_BYPASS. In NEVER_REENABLE_FLAGS. — 2026-08-17
-- **SPEED_MIN 40 active.** ATR_SL daily 41→8.5 (79% reduction, historic low). — 2026-08-16
-- **hl_copy_trader in STANDALONE_BYPASS.** Copy-trading bypasses confluence. — 2026-08-16
-- **CONFLUENCE_NEUTRAL_RELAX=True.** Single-type signals allowed in NEUTRAL. — 2026-08-16
-- **All range_finder variants disabled.** SHORT side dead. Do NOT enable until SHORT_BIAS regime. — 2026-08-16
-- **return_exhaustion_long DISABLED.** 6T/7d legacy clearing. RETURN_EXHAUSTION_ENABLED=False. — 2026-08-19
-- **SL FLOOR BUG FIXED.** tpsl_utils.py 8 lines — 89% of ATR_SL hits (126/141) had SL < 1.0% from entry. Floor now enforced after every one-way gate. Monitor 48h for ATR_SL reduction. — 2026-08-19
-- **conf-filter-plan DEPLOYED.** CONF_FILTER_ENABLED=True, CONF_FILTER_MAX=89. TIME_BLOCK_ENABLED=True (01-06 UTC). 90+ tier 114T 49.1% WR -$1.38 now blocked. — 2026-08-19
-- **mover+ KILLED (signal_reporter).** 28.6% WR, -$0.15/7d. Master + SHORT disabled, added to NEVER_REENABLE_FLAGS. — 2026-08-20
-- **R2_TREND_SHORT re-enabled (CEO Aug 20).** RSI inversion fix + MIN_SLOPE enforcement + threshold tightening. 5T/48h 0% WR -$0.47 — all legacy clears from pre-kill, too early to evaluate new signals. CEO_PROTECTED. — 2026-08-20
-- **stop_hunt_reversal_long+ KILLED (CEO KILLED Aug 20).** 10T/7d 60% WR -$0.04 break-even, 48h deteriorating to 50% -$0.10. Worst ATR_SL offender: 3 hits -$0.38/48h. Break-even not good enough — system needs edge. NEVER_REENABLE. — 2026-08-20
-- **SHORT legacy drain COMPLETE.** All remaining SHORT positions (r2-trend-short2/10/13) closed. 0 open positions. — 2026-08-21
-- **MAE-Guard ACTIVE (auto_1hr re-enabled Aug 23).** 8 hl_copy_trader hits/48h -$0.88. Was -$5.43/week at 1.5% threshold before disable. ATR-aware version now (BASE_THRESHOLD=2.0%). Monitor hl_copy_trader WR — if drops, recommend disable. — 2026-08-24
-- **hl_copy_trader ALL KILLED (auto_1hr Aug 25).** HL_COPY_SIGNAL_ENABLED=False, HL_COPY_TRADING_ENABLED=False. Was backbone +$1.44/7d 49.3% WR. Last24h:2T 0%WR -$0.34 (BTC/ETH ATR_SL). Kill justified by recent bleed. System now single-signal dependent on bb_bounce+. RECOMMEND: build new backbone signal. — 2026-08-26
-
-## Known Limitations
-
-- **slow-grind- BUG FIX APPLIED (2nd time).** Kill was NOT applied at 17:00 UTC Aug 26 — fixed Aug 27 21:00. Kill was NOT applied at 18:04 Aug 27 — fixed Aug 27 18:20. SLOW_GRIND_SHORT_ENABLED=False + NEVER_REENABLE_FLAGS. — 2026-08-27
-- **Disk at 83%** — 92G/118G used, 20G free. Approaching 85% cleanup threshold. — 2026-08-26
-- **7 failed services** — better-coder, bug-hunter, git-release, hl-volume, mtf-macd-tuner, trading-checklist, wasp. All non-critical utilities, not affecting trading. — 2026-08-22
-- **Phantom trades FIXED.** guardian_orphan 0T/7d (was 9T/7d -$0.06). 3 stale records cleaned (ids 10211-10213). — 2026-08-17
-- **NEUTRAL relax not triggering** — 1m regime shows LONG_BIAS even when 15m/4h is NEUTRAL. — 2026-08-16
-- **SHORT side mixed** — 7d: macd-div- 15T +$0.08, 73.3% WR. bb-bounce-short 3T +$0.07, 100% WR. cascade-reverse-v2 SHORT 4T +$0.49, 50% WR. Legacy SHORT drains continue (ct-hot- combos). SHORT_NEUTRAL_BLOCK + 4h regime filtering working. — 2026-08-26
-- **MIN_PRE_MOVE 0.3 eval** — r2-trend-long3: signals generating (CRV, ICP in last hour) but 0 closed trades in 48h. Filter may be too aggressive OR trades still open. Eval extended to Aug 25 — check if PnL positive. — 2026-08-24
-- **Confidence scorer miscalibrated** — 90+ tier has 48.7% WR (worst tier). conf-filter-plan addresses this. — 2026-08-19
-- **Coin tracker Wyckoff detection PARTIALLY FIXED** — 25/109 tokens now have phase detected (was 0 Aug 21). 4h candle re-enablement populated data. 84 still 'none'. Monitor for continued improvement. — 2026-08-22
-- **4h candles re-enabled** — price_collector.py line 565 re-enabled (CEO Aug 21). Will populate on next price_collector run. Elliott Wave detection will have fresh data. — 2026-08-21
-
-## System Improvement Backlog
-
-1. ~~**Signal Lifecycle Filters**~~ — DONE (orchestrator Aug 26). Early/concurrent/lagging wired into tpsl_utils SL/TP + signal_compactor score mult. — 2026-08-26
-2. **Coin tracker Wyckoff detection improving** — 25/109 tokens now (was 0). 4h candle re-enablement helped. 84 still 'none'. Monitor continued improvement. — 2026-08-22
-3. **SHORT side signals (CEO PRIORITY)** — R2_TREND_SHORT re-enabled Aug 20 but 0 trades/48h. Need new SHORT signal with edge for SHORT_BIAS regime. DELEGATED to signal_analyst. — 2026-08-21
-4. ~~**Re-enable 4h candle collection**~~ — DONE. price_collector.py line 565 re-enabled (CEO Aug 21). — 2026-08-21
-5. Higher-timeframe regime for confluence relaxation (1m too noisy)
-6. Confidence scorer recalibration (real fix for non-monotonic conf curve)
+- **DELEGATED to signal_analyst: build new backbone signal.** Volume+momentum based, must pass 2-type confluence gate. Priority: LONG for Wyckoff accumulation market (71/109 tokens). — 2026-08-26
+- **CONF_FILTER_MAX=89.** Blocks overconfident trades, 90+ tier now +$1.91/7d. — 2026-08-24
+- **SHORT_NEUTRAL_BLOCK_ENABLED=True.** Uses 4h regime from PostgreSQL momentum_cache. — 2026-08-23
+- **tl_break_short INVERTED R:R.** 16T/7d 62.5% WR -$0.11 (avg win +2.32%, avg loss -5.19%). CEO_PROTECTED. — 2026-08-27
+- **hzscore- RE-ENABLED BY T.** SHORT 7d 8T -$0.18, 50% WR (inverted R:R). CEO_PROTECTED. Recommend T disable. — 2026-08-23
 
 ## What NOT To Do
 
@@ -78,9 +40,8 @@
 
 ## Next Actions
 
-1. **DELEGATE to signal_analyst: build new backbone signal.** System has ZERO backbone signals after bb_bounce+ kill. Volume+momentum based, must pass 2-type confluence gate. Priority: LONG for Wyckoff accumulation market (71/109 tokens). — 2026-08-27
-2. **Monitor legacy bleed age-out.** ct-hot+ -$3.65/7d, slow-grind- -$0.64/7d, hl_copy SHORT -$0.76/7d — all dead signals with legacy trades closing. Should fully age out by Aug 28. — 2026-08-27
-3. **Monitor macd-div- performance.** 8T/48h 87.5%WR +$0.45 — STAR signal. Monitor for regime dependency. — 2026-08-27
-4. **Monitor signal starvation.** ZERO backbone signals = reduced trade volume. Hotset may be empty until new backbone built. — 2026-08-27
-5. **Monitor disk (85% cleanup trigger).** Currently 83%, 20G free. — 2026-08-27
-6. **Monitor lifecycle filter impact (48h eval ending ~Aug 28).** Watch ATR_SL hit rate, lagging signal WR, early signal hold times. — 2026-08-26
+1. **DELEGATE to signal_analyst: build new backbone signal.** System has ZERO backbone signals. — 2026-08-27
+2. **Monitor legacy bleed age-out.** ct-hot+ -$3.65/7d, slow-grind- -$0.64/7d, hl_copy SHORT -$0.76/7d — all dead, should age out by Aug 28. — 2026-08-27
+3. **Monitor macd-div- performance.** 21T/7d 76.2% WR +$0.31 — STAR signal, now boosted. — 2026-08-27
+4. **Monitor disk (85% cleanup trigger).** Currently 83%, 20G free. — 2026-08-27
+5. **Monitor lifecycle filter impact (48h eval ending ~Aug 28).** Watch ATR_SL hit rate. — 2026-08-26
