@@ -89,7 +89,6 @@ def _compute_atr(closes: list, period: int = 14) -> float:
 
 def _get_trend_table() -> str:
     """Return the candle table name for the trend filter timeframe."""
-    tf = getattr(__builtins__, '__import__', None)  # no-op, just for safety
     if ATR_SPIKE_TREND_TIMEFRAME == '1h':
         return 'candles_1h'
     return 'candles_15m'
@@ -267,7 +266,11 @@ def scan_signals() -> int:
         if get_cooldown(token, direction='LONG'):
             continue
 
-        sig = detect(token)
+        try:
+            sig = detect(token)
+        except Exception as e:
+            print(f"[atr_spike] detect() failed for {token}: {e}")
+            continue
         if not sig:
             continue
 
@@ -288,7 +291,7 @@ def scan_signals() -> int:
         )
         if sid:
             added += 1
-            set_cooldown(token, direction='LONG', hours=1)
+            set_cooldown(token, direction='LONG', hours=ATR_SPIKE_COOLDOWN_MIN / 60)
 
     return added
 
