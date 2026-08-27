@@ -324,7 +324,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('inverse_accel_300_long',  'inv-accel-300+'):  0.7,  # LONG: lower priority than accel-300 SHORT
     ('inverse_accel_300_short', 'inv-accel-300-'):  0.6,  # SHORT: 31% WR, -$0.27 (7d) — suppressed
     # inv_accel_300_v2: SHORT-only mean reversion (2026-08-26)
-    ('inverse_accel_300_v2_short', 'inv-accel-300-v2-'): 0.9,  # V2 SHORT: new improved signal
+    ('inverse_accel_300_v2_short', 'inv-accel-300-v2-'): 0.7,  # V2 SHORT: marginal edge, cautious weight
     # hh_hl_choch: Change of Character — structure flip signals (HH_HL↔LH_LL)
     # Higher weight than breakout/pullback — CHoCH is a stronger reversal signal
     ('hh_hl_choch', 'choch+'):  1.3,   # bullish flip (LH_LL→HH_HL)
@@ -1427,9 +1427,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 pass_gate = True
                 gate_msg = f'{unique_signal_types} unique types'
             elif _neutral_relax:
-                # NEUTRAL regime: allow single-type signals (starvation fix)
-                pass_gate = True
-                gate_msg = f'NEUTRAL-relax: single-type allowed (regime={_regime})'
+                # NEUTRAL regime: allow single-type standalone bypass signals only
+                bare_src = source.rstrip('+-') if source else ''
+                if bare_src in STANDALONE_BYPASS_SIGNALS:
+                    pass_gate = True
+                    gate_msg = f'NEUTRAL-relax: standalone bypass ({bare_src})'
+                else:
+                    gate_msg = f'single-type not in standalone bypass (regime={_regime})'
             else:
                 # ── Accel-300 Standalone Bypass ───────────────────────────────────
                 # Strong standalone accel-300 (no RS co-signal needed) — fire on

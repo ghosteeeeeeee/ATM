@@ -57,24 +57,22 @@ _CANDLES_DB = CANDLES_DB  # candles.db — has volume data
 from hermes_constants import (
     ACCEL_300_PERIOD,
     ACCEL_300_BAR_GAP_THRESH_SEC,
+    INVERSE_ACCEL_300_V2_MIN_GAP_PCT as V2_MIN_GAP_PCT,
+    INVERSE_ACCEL_300_V2_MAX_GAP_PCT as V2_MAX_GAP_PCT,
+    INVERSE_ACCEL_300_V2_REVERSION_BARS as V2_REVERSION_BARS,
+    INVERSE_ACCEL_300_V2_REVERSION_THRESHOLD as V2_REVERSION_THRESHOLD,
+    INVERSE_ACCEL_300_V2_GAP_VELOCITY_WINDOW as V2_GAP_VELOCITY_WINDOW,
+    INVERSE_ACCEL_300_V2_STABILIZATION_WINDOW as V2_STABILIZATION_WINDOW,
+    INVERSE_ACCEL_300_V2_STABILIZATION_TOLERANCE as V2_STABILIZATION_TOLERANCE,
+    INVERSE_ACCEL_300_V2_VOLUME_LOOKBACK as V2_VOLUME_LOOKBACK,
+    INVERSE_ACCEL_300_V2_VOLUME_MULT as V2_VOLUME_MULT,
+    INVERSE_ACCEL_300_V2_VELOCITY_WINDOW as V2_VELOCITY_WINDOW,
+    INVERSE_ACCEL_300_V2_TREND_FILTER_PCT as V2_TREND_FILTER_PCT,
+    INVERSE_ACCEL_300_V2_COOLDOWN_BARS as V2_COOLDOWN_BARS,
+    INVERSE_ACCEL_300_V2_LOOKBACK_1M as V2_LOOKBACK_1M,
+    INVERSE_ACCEL_300_V2_MAX_SLIPPAGE_PCT as V2_MAX_SLIPPAGE_PCT,
+    INVERSE_ACCEL_300_V2_SLIPPAGE_BARS as V2_SLIPPAGE_BARS,
 )
-
-# V2-specific params (defined here, tunable)
-V2_MIN_GAP_PCT = 2.0          # min gap above EMA300 to fire SHORT (was 1.5 in V1)
-V2_MAX_GAP_PCT = 8.0          # don't fire if gap too extreme (structural, not reversion)
-V2_REVERSION_BARS = 3         # bars of gap narrowing to confirm (was 2 in V1)
-V2_REVERSION_THRESHOLD = 0.15 # min gap narrowing % (was 0.05 in V1 — too loose)
-V2_GAP_VELOCITY_WINDOW = 5    # bars to measure gap velocity (was 3 in V1)
-V2_STABILIZATION_WINDOW = 15  # bars to check for turning point
-V2_STABILIZATION_TOLERANCE = 0.015  # 1.5% — must be near recent high (loosened: reversion confirmation requires some downside movement)
-V2_VOLUME_LOOKBACK = 30       # bars to compute average volume
-V2_VOLUME_MULT = 1.2          # volume must be 1.2x average (selling pressure)
-V2_VELOCITY_WINDOW = 5        # bars to measure price velocity
-V2_TREND_FILTER_PCT = 2.5     # max 1h move — for mean reversion, the rally IS the setup, not a blocker
-V2_COOLDOWN_BARS = 5          # cooldown between signals per token (5 min)
-V2_LOOKBACK_1M = 700          # 1m prices to fetch per token
-V2_MAX_SLIPPAGE_PCT = 0.30    # max slippage from detection price (was 0.5%)
-V2_SLIPPAGE_BARS = 3          # bars to check for slippage
 
 PERIOD = ACCEL_300_PERIOD
 DRY_RUN = '--dry' in sys.argv
