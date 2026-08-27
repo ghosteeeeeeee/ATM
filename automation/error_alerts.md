@@ -1216,3 +1216,11 @@ ALERTS:
 ## Error Alerts — 2026-08-27 17:04 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1019s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (960s left, N failures)`
+
+## Error Alerts — 2026-08-27 18:04 UTC
+- **REPEATED** (5x): `Aug N N:N:N python3[TOK]: TS   TS   [TOK-SIGNALS] write failed: name 'ACCEL_300_V2_ENABLED' is not defined`
+- **REPEATED** (12x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] MERLUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=MERLUSDT&interval=15m&limit=N`
+- **NEW** (2x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3457s left, N failures)`
+- **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] MERLUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=MERLUSDT&interval=1h&limit=N`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3174s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3001s left, N failures)`

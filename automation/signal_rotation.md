@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-27 13:17 UTC
+# Signal Rotation — 2026-08-27 17:17 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -7,7 +7,7 @@
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
 | 1 | hl_copy_trader | 50% | 0.433 | 0.433 | ❓ |  |
-| 2 | bb_bounce+ | 63% | 0.401 | 0.401 | ❌ | ENABLE |
+| 2 | bb_bounce+ | 63% | 0.401 | 0.401 | ✅ |  |
 | 3 | hzscore- | 50% | 0.278 | 0.278 | ❌ |  |
 | 4 | r2-trend-long3 | 56% | 0.239 | 0.239 | ❓ |  |
 | 5 | macd-div- | 67% | 0.001 | 0.001 | ❓ |  |
@@ -17,5 +17,4 @@
 | 9 | slow-grind- | 42% | -0.776 | -0.776 | ❓ |  |
 | 10 | ct-hot+ | 38% | -1.386 | -1.386 | ❓ |  |
 
-## Changes Applied
-- **ENABLE**: BB_BOUNCE_PLUS_ENABLED (WR=63%, edge=0.401, regime-aligned)
+## No changes applied
