@@ -201,8 +201,8 @@
       if (src) return `<img class="coin-icon" src="${src}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" loading="lazy"><span class="coin-icon-fallback" style="display:none">${(sym||'?').slice(0,2)}</span>`;
       return `<span class="coin-icon-fallback">${(sym||'?').slice(0,2)}</span>`;
     }
-    const FAVORITES = new Set(['BANANA','BTC','CAKE','ETH','FIL','GMT','LDO','ME','NXPC','SYRUP','ZRO']);
-    const TOP_FAVS = ['ETH','ZRO','LDO','ME','GMT'];  // Top 5 by performance
+    const FAVORITES = new Set(['BABY','CAKE','CHIP','DOGE','FIL','GMT','HBAR','LDO','NXPC','SEI','SYRUP','ZRO']);
+    const TOP_FAVS = ['HBAR','DOGE','GMT','ZRO','NXPC'];  // Top 5 by performance
     function favHtml(sym) {
       if (TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="Top Favorite">⭐</span>';
       if (FAVORITES.has(sym)) return '<span class="fav-star" title="Favorite">❤</span>';
