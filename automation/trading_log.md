@@ -16255,3 +16255,38 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - pump-catcher+ 7d bleed continues — if next hour shows 0%WR with 3+ trades, will kill
 - slow-grind- legacy decay — will drop below 3T threshold soon
+
+## [2026-08-27 10:15 UTC] Hourly Analysis
+
+**Trades:** 4 closed (2W 2L, net +$0.09)
+- NOT atr-spike+: +$0.11 (trailing SL win)
+- GMT r2-trend-long4: +$0.06 (trailing SL win)
+- DYDX r2-trend combo: +$0.02 (profit-monster)
+- MERL atr-spike+: -$0.10 (SL hit)
+
+**24h:** 70T, 41.4%WR, net -$0.43
+- atr_sl_hit: 47T (67%), avg -$0.019 — trailing SL working
+- profit-monster-trail: 15T, +$0.73 — clear winner
+- hard_sl: 2T, -$0.12
+- cut-loser variants: 4T, mixed
+
+**Signal Health (24h, 3+ trades):**
+- slow-grind-: 12T/33%WR/-$0.64 — legacy decay (already killed)
+- bb_bounce+: 3T/0%WR/-$0.43 — KILLED (re-enabled today, immediately failed)
+- pump-catcher+: 20T/35%WR/-$0.22 — volume leader, bleeding
+- atr-spike+: 7T/28.6%WR/-$0.15 — losing
+- cascade-reverse-v2: 3T/33%WR/+$0.19 — winner
+- macd-div-: 3T/66.7%WR/+$0.20 — winner
+
+**Changes:**
+1. Killed bb_bounce+ (BB_BOUNCE_PLUS_ENABLED = False) — 3T/0%WR, re-enabled today and immediately failed. signal_version logged.
+
+**No Change Needed:**
+- Kill criteria: bb_bounce+ triggered (3T/0%WR) — killed
+- Trade frequency: 4/hr normal
+- atr_sl_hit dominant but avg loss tiny -$0.019 — trailing SL working
+- profit-monster-trail continues winning at +$0.049 avg
+
+**Open Questions:**
+- pump-catcher+ 20T/35%WR/-$0.22 — persistent bleed, approaching kill threshold
+- slow-grind- legacy decay — will drop below 3T soon

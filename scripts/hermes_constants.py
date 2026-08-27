@@ -1443,7 +1443,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # CEO RE-ENABLED 2026-08-27 — 38T/7d 60.5% WR +$0.30 backbone signal. Kill was single bad day (low-liq tokens).
-BB_BOUNCE_PLUS_ENABLED = True    # CEO RE-ENABLED 2026-08-27 — backbone signal, 60.5% WR 7d. Monitor 48h.
+BB_BOUNCE_PLUS_ENABLED = False   # auto_1hr KILLED 2026-08-27 — 3T/0%WR 24h, re-enabled today and immediately failing. -$0.43.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 

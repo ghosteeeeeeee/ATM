@@ -1161,3 +1161,6 @@ ALERTS:
 - **WARN** (1x): `disk 83%` — approaching 85% threshold, 20G free
 - **AUTO-FIX**: None applied — monitoring, will clean logs if >85%
 - **INFO** (1x): `hotset fallback 0 tokens` — no hotset data returned
+
+## Error Alerts — 2026-08-27 10:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+MOMENTUM`
