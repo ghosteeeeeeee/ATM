@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-08-27 01:17 UTC
+# Signal Rotation — 2026-08-27 05:27 UTC
 
 ## Market Regime: NEUTRAL
 
@@ -6,15 +6,16 @@
 
 | # | Signal | WR | Edge | Regime Score | Enabled | Action |
 |---|--------|-----|------|-------------|---------|--------|
-| 1 | bb_bounce+ | 72% | 0.829 | 0.829 | ❌ |  |
-| 2 | r2-trend-long4 | 83% | 0.605 | 0.605 | ❓ |  |
-| 3 | hl_copy_trader | 50% | 0.433 | 0.433 | ❓ |  |
-| 4 | r2-trend-long3 | 64% | 0.421 | 0.421 | ❓ |  |
-| 5 | hzscore- | 50% | 0.278 | 0.278 | ❌ |  |
-| 6 | stop_hunt_reversal_long+ | 50% | -0.061 | -0.061 | ❌ |  |
-| 7 | tl_break_short | 69% | -0.156 | -0.156 | ❌ |  |
-| 8 | macd-div- | 64% | -0.343 | -0.343 | ❓ |  |
-| 9 | macd-div+ | 20% | -0.447 | -0.447 | ❓ |  |
+| 1 | hl_copy_trader | 50% | 0.433 | 0.433 | ❓ |  |
+| 2 | bb_bounce+ | 63% | 0.401 | 0.401 | ❌ |  |
+| 3 | hzscore- | 50% | 0.278 | 0.278 | ❌ |  |
+| 4 | r2-trend-long3 | 56% | 0.239 | 0.239 | ❓ |  |
+| 5 | macd-div- | 67% | 0.001 | 0.001 | ❓ |  |
+| 6 | tl_break_short | 69% | -0.156 | -0.156 | ❌ |  |
+| 7 | pump-catcher+ | 40% | -0.407 | -0.407 | ✅ | DISABLE |
+| 8 | macd-div+ | 20% | -0.447 | -0.447 | ❓ |  |
+| 9 | slow-grind- | 42% | -0.776 | -0.776 | ❓ |  |
 | 10 | ct-hot+ | 38% | -1.386 | -1.386 | ❓ |  |
 
-## No changes applied
+## Changes Applied
+- **DISABLE**: PUMP_CATCHER_PLUS_ENABLED (WR=40%, edge=-0.407, bleeding capital)
