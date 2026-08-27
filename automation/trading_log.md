@@ -16290,3 +16290,70 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - pump-catcher+ 20T/35%WR/-$0.22 — persistent bleed, approaching kill threshold
 - slow-grind- legacy decay — will drop below 3T soon
+
+## [2026-08-27 11:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (2W 0L, net +$0.22)
+- SYRUP macd-div- SHORT: +$0.12 (profit-monster-trail)
+- GMT r2-trend-short6 SHORT: +$0.10 (profit-monster-trail)
+
+**24h:** 71T, 43.7%WR, net -$0.31 (near breakeven)
+- atr_sl_hit: 46T (64.8%), avg -$0.016 — trailing SL working
+- profit-monster-trail: 17T, +$0.95, avg +$0.056 — clear winner
+
+**Changes:** None — no kill criteria triggered
+
+**No Change Needed:**
+- Kill criteria: bb_bounce+ already killed last hour. pump-catcher+ 24T/33%WR above kill threshold.
+- Trade frequency: 2/hr normal (slow hour)
+- profit-monster-trail continues winning
+- atr_sl_hit dominant with tiny avg loss — working as designed
+
+**Open Questions:**
+- pump-catcher+ 7d bleed continues (-$0.22) — monitoring
+- slow-grind- legacy decay — will drop below 3T threshold soon
+
+## [2026-08-27 12:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (2h quiet, NEUTRAL market)
+**24h:** 70T, ~41%WR, net -$0.31 (near breakeven)
+
+**Key Metrics:**
+- atr_sl_hit: 46T (65.7%), avg -$0.016 — trailing SL working (tiny avg loss)
+- profit-monster-trail: 16T, +$0.95, avg +$0.059 — clear winner
+- pump-catcher+: 22T, 36.4%WR, -$0.05 — improved from -$0.22 last week
+
+**Changes:** None — no kill criteria triggered
+
+**No Change Needed:**
+- Kill criteria: bb_bounce+ killed yesterday. pump-catcher+ improving (36.4%WR, -$0.05 avg), no trigger.
+- Trade frequency: 0/hr (quiet NEUTRAL market, expected)
+- System near breakeven — trailing SL catching small losers, profit-monster-trail printing
+
+**Open Questions:**
+- pump-catcher+ improvement may be noise — continue monitoring
+- 3 open positions, none stuck
+
+## [2026-08-27 13:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed (1W 1L, net -$0.05)
+- DOGE engulfing+,r2-trend-long4 LONG: -$0.14 (atr_sl_hit)
+- BABY atr-spike+,engulfing+ LONG: +$0.09 (atr_sl_hit)
+
+**24h:** ~70T, ~42%WR, near breakeven
+- atr_sl_hit: 47T (64.4%), avg -$0.022 — trailing SL working
+- profit-monster-trail: 15T, +$0.92, avg +$0.061 — clear winner
+- macd-div-: 4T, +$0.32, avg +$0.080 — second winner
+- pump-catcher+: 19T, -$0.22 — stable (not worsening)
+
+**Changes:** None — no kill criteria triggered
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- Trade frequency: 2/hr normal (NEUTRAL market)
+- atr_sl_hit dominant with tiny avg loss — trailing SL working as designed
+- profit-monster-trail continues winning
+
+**Open Questions:**
+- pump-catcher+ 7d bleed stable at -$0.22 (was -$0.22 last check)
+- slow-grind- legacy decay continues (already killed)

@@ -345,3 +345,15 @@
   WHY: 4T last hour (1W 3L +$0.13). APT r2-trend combo +$0.25 winner, LTC bb-bounce-short -$0.10, BTC liq-hunt combo -$0.02, ENS atr-spike+ $0.00. 68T 24h ~41%WR ~-$0.24. atr_sl_hit 67.6% (46/68) trailing SL working as designed with tiny avg loss -$0.015. profit-monster-trail 14T +$0.71 clear winner. pump-catcher+ 20T/35%WR/-$0.22 volume leader bleeding but above kill threshold. slow-grind- 12T/33%WR/-$0.64 already killed (legacy decay). macd-div- 3T/67%WR/+$0.20, cascade-reverse-v2 3T/33%WR/+$0.19 winners. Kill criteria not triggered. Trade freq 4/hr normal. 2 open positions.
   BY: auto_1hr
   NEXT: Re-run at 10:15 UTC
+[2026-08-27 10:15 UTC] auto_1hr: KILLED bb_bounce+ (BB_BOUNCE_PLUS_ENABLED = False)
+  WHY: 3T/0%WR 24h, re-enabled today (CEO RE-ENABLED 2026-08-27) and immediately failed. -$0.43. Kill criteria triggered (3T/0%WR). signal_version logged.
+  BY: auto_1hr
+  NEXT: Re-run at 11:15 UTC
+[2026-08-27 11:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (2W 0L +$0.22). SYRUP macd-div- +$0.12, GMT r2-trend-short6 +$0.10 — both profit-monster-trail exits. 71T 24h 43.7%WR -$0.31 near breakeven. atr_sl_hit 64.8% (46/71) trailing SL working with tiny avg loss -$0.016. profit-monster-trail 17T +$0.95 clear winner. pump-catcher+ 24T/33%WR/-$0.22 over 7d still bleeding but above kill threshold. Kill criteria not triggered. Trade freq 2/hr (slow hour, NEUTRAL market). 1 open position.
+  BY: auto_1hr
+  NEXT: Re-run at 12:15 UTC
+[2026-08-27 13:15 UTC] auto_1hr: NO CHANGES
+  WHY: 2T last hour (1W 1L -$0.05). DOGE engulfing+ -$0.14, BABY atr-spike+ +$0.09. ~70T 24h ~42%WR near breakeven. atr_sl_hit 64.4% trailing SL working with tiny avg loss -$0.022. profit-monster-trail 15T +$0.92 clear winner. macd-div- 4T +$0.32 second winner. pump-catcher+ 19T/36.8%WR/-$0.22 stable. Kill criteria not triggered. Trade freq 2/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 14:15 UTC

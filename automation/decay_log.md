@@ -740,3 +740,8 @@
 [2026-08-27 05:07 UTC]   🟢 OK: slow-grind-: 12 trades, 41.7% WR, PnL=-6.45
 [2026-08-27 05:07 UTC] Done. Rapid-disabled 0 signals.
 [2026-08-27 05:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-08-27 11:07 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-08-27 11:07 UTC]   🟢 OK: atr-spike+: 7 trades, 28.6% WR, PnL=-1.52
+[2026-08-27 11:07 UTC]   🟢 OK: slow-grind-: 11 trades, 45.5% WR, PnL=-5.3
+[2026-08-27 11:07 UTC] Done. Rapid-disabled 0 signals.
+[2026-08-27 11:07 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

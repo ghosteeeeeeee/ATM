@@ -1164,3 +1164,45 @@ ALERTS:
 
 ## Error Alerts — 2026-08-27 10:04 UTC
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+MOMENTUM`
+
+## Health Report — 2026-08-27 10:20 UTC
+
+```
+=== Health Report ===
+Time: 2026-08-27 10:20 UTC
+
+PIPELINE: OK
+- Status: running (last run 10:19, 17.9s CPU, 60 runs/hour)
+- Signals (1h): 67 generated
+- Trades: 1 open (GMT SHORT), 32 closed today
+- PnL today: +$0.17
+- Errors: 0 in last 30min
+
+MARKET:
+- Regime: 105 tokens scanned, long_bias=0
+- BTC-CRASH guard: ACTIVE (blocked ETC LONG at 10:19)
+
+SYSTEM:
+- Timers: 20+ active (all firing on schedule)
+- Disk: 83% (93G/118G) — approaching 85% threshold
+- HL Sync Guardian: active
+
+AUTO-FIXES APPLIED:
+- None needed
+
+ALERTS:
+- [WARN] PHANTOM TRADE: GMT SHORT (trade_id=14426) — SL at entry (dist=0.001%), blocked every run by guardian. Position stuck.
+- [WARN] Disk at 83% — monitor for growth.
+```
+
+## Error Alerts — 2026-08-27 11:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3356s left, N failures)`
+
+## Error Alerts — 2026-08-27 12:04 UTC
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS   ⚠️ ROLLBACK TOK: sig#N already claimed by another process`
+- **REPEATED** (6x): `Aug N N:N:N python3[TOK]: TS   TS   → TOK:`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK: stderr=(empty)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] CC TOK BLOCKED — TOK in cooldown (1618s left, N failures)`
+
+## Error Alerts — 2026-08-27 13:04 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`

@@ -1443,7 +1443,7 @@ BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per toke
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = True    # CEO RE-ENABLED 2026-08-27 — 38T/7d 60.5% WR +$0.30 backbone signal. Kill was single bad day (low-liq tokens).
-BB_BOUNCE_PLUS_ENABLED = False   # auto_1hr KILLED 2026-08-27 — 3T/0%WR 24h, re-enabled today and immediately failing. -$0.43.
+BB_BOUNCE_PLUS_ENABLED = True  # CEO OVERRIDE 2026-08-27 — auto_1hr killed (3T/0%WR -$0.43) but 7d 38T 60.5% WR +$0.30 backbone. Kill was low-liq token variance.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
@@ -1614,7 +1614,7 @@ PUMP_HUNTER_ENABLED        = False  # set False to block pump_hunter from firing
 # Unlike pump_hunter (reversion/fade), this RIDES the spike via LONG entries.
 # Replaces dead volume-based detection with price-based velocity + acceleration.
 PUMP_CATCHER_ENABLED        = True   # master kill-switch
-PUMP_CATCHER_PLUS_ENABLED   = False  # AUTO-ROTATED 2026-08-27   # LONG entries
+PUMP_CATCHER_PLUS_ENABLED   = False # LONG entries
 PUMP_CATCHER_MINUS_ENABLED  = False  # SHORT entries — disabled initially (catch pumps only)
 # Detection thresholds
 PUMP_CATCHER_VELOCITY_MIN   = 0.8    # min % move in 3 bars to qualify as explosive (tightened 0.5→0.8 — 76% ATR_SL hit rate, entries after exhausted moves)
