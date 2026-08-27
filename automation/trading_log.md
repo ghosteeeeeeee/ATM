@@ -16190,3 +16190,68 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - Signal starvation continues — NEUTRAL market + context gate blocking. Not a bug, just no edge available.
 - pump-catcher+ 7d bleed (-$0.45) but no last-hour activity to trigger kill
+
+## [2026-08-27 08:15 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (CAKE bb-bounce-short, -$0.08, atr_sl_hit)
+**24h:** 66T, 27W, 40.9% WR, -$0.37
+
+**Close Reasons (24h):**
+- atr_sl_hit: 42T (63.6%), -$0.82 — dominant, trailing SL working
+- profit-monster-trail: 14T, +$0.71 — clear winner
+- cut-loser variants: 3T, -$0.15
+- hard_sl: 2T, -$0.12
+
+**Signal Health (3+ trades, 24h):**
+- pump-catcher+: 20T/35%WR/-$0.22 — volume leader, bleeding
+- slow-grind-: 12T/33%WR/-$0.64 — killed legacy drain
+- bb_bounce+: 5T/20%WR/-$0.15 — losing
+- atr-spike+: 4T/25%WR/-$0.16 — small sample
+- macd-div-: 3T/67%WR/+$0.20 — winner
+- cascade-reverse-v2: 3T/+$.19 — winner
+
+**Changes:** None — no kill criteria triggered
+**No Change Needed:**
+- Kill criteria: 0T last hour, no 3T/0%WR signal
+- Trade frequency: 1/hr (starvation, not overtrading)
+- 5 open positions, reasonable size
+- pump-catcher+ 7d bleed -$0.39 but no last-hour activity
+
+**Open Questions:**
+- pump-catcher+ approaching kill threshold — monitor next cycle
+- NEUTRAL market continues, signal starvation expected
+
+## [2026-08-27 09:15 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1W 3L, net +$0.13)
+- APT r2-trend combo: +$0.25 (only winner)
+- LTC bb-bounce-short: -$0.10
+- BTC liq-hunt combo: -$0.02
+- ENS atr-spike+: $0.00
+
+**24h:** 68T, ~41%WR, net ~-$0.24
+- atr_sl_hit: 46T (67.6%), avg -$0.015 — trailing SL working as designed
+- profit-monster-trail: 14T, +$0.71 — clear winner
+- hard_sl: 2T, -$0.12
+- cut-loser variants: 4T, mixed
+
+**Signal Health (24h, 3+ trades):**
+- pump-catcher+: 20T/35%WR/-$0.22 — volume leader, bleeding but above kill threshold
+- slow-grind-: 12T/33%WR/-$0.64 — already killed (legacy decay)
+- bb_bounce+: 5T/20%WR/-$0.15 — losing
+- atr-spike+: 5T/20%WR/-$0.16 — losing
+- macd-div-: 3T/67%WR/+$0.20 — winner
+- cascade-reverse-v2: 3T/33%WR/+$0.19 — winner
+
+**pump-catcher+ 7d:** 21T/33.3%WR/-$0.39 — persistent bleed, monitoring
+
+**Changes:** None — no kill criteria triggered
+**No Change Needed:**
+- Kill criteria: 0 trades from any signal with 3T+ and 0%WR
+- Trade frequency: 4/hr normal
+- Open positions: 2 (low)
+- atr_sl_hit dominant but avg loss only -$0.015 — trailing SL working
+
+**Open Questions:**
+- pump-catcher+ 7d bleed continues — if next hour shows 0%WR with 3+ trades, will kill
+- slow-grind- legacy decay — will drop below 3T threshold soon

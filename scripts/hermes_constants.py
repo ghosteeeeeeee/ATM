@@ -1122,8 +1122,7 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_MINUS_ENABLED',   # SIGNAL REPORTER 2026-08-24 — 0% WR (6T), -$0.34. NEVER_REENABLE.
     'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
     'HL_COPY_SIGNAL_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay. NEVER_REENABLE.
-    'BB_BOUNCE_PLUS_ENABLED',       # SIGNAL REPORTER 2026-08-26 — 8T/24h 12.5% WR -$0.55. NEVER_REENABLE.
-    'BB_BOUNCE_ENABLED',            # SIGNAL REPORTER 2026-08-26 — 6T/24h 16.7% WR -$0.29. Trades bypass PLUS check. NEVER_REENABLE.
+    # BB_BOUNCE re-enabled 2026-08-27 (CEO) — backbone signal, 60.5% WR 7d +$0.30. Removed from NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
@@ -1443,8 +1442,8 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = False   # SIGNAL REPORTER 2026-08-26 — 6T/24h 16.7% WR -$0.29. Trades bypass BB_BOUNCE_PLUS_ENABLED check.
-BB_BOUNCE_PLUS_ENABLED = False  # SIGNAL REPORTER 2026-08-26 — 8T/24h 12.5% WR -$0.55. NEVER_REENABLE.
+BB_BOUNCE_ENABLED = True    # CEO RE-ENABLED 2026-08-27 — 38T/7d 60.5% WR +$0.30 backbone signal. Kill was single bad day (low-liq tokens).
+BB_BOUNCE_PLUS_ENABLED = True    # CEO RE-ENABLED 2026-08-27 — backbone signal, 60.5% WR 7d. Monitor 48h.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 

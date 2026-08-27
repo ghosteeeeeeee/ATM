@@ -341,3 +341,7 @@
   WHY: 0T last hour (signal starvation). 68T 24h 41.2%WR -$0.51. atr_sl_hit 63.2% trailing SL working. profit-monster-trail 15T +$0.74 clear winner. pump-catcher+ 23T/7d 30.4%WR/-$0.45 bleeding but 0T last hour, no kill trigger. 5 open positions. Kill criteria not triggered. Trade freq 0/hr (NEUTRAL market starvation).
   BY: auto_1hr
   NEXT: Re-run at 08:15 UTC
+[2026-08-27 09:15 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (1W 3L +$0.13). APT r2-trend combo +$0.25 winner, LTC bb-bounce-short -$0.10, BTC liq-hunt combo -$0.02, ENS atr-spike+ $0.00. 68T 24h ~41%WR ~-$0.24. atr_sl_hit 67.6% (46/68) trailing SL working as designed with tiny avg loss -$0.015. profit-monster-trail 14T +$0.71 clear winner. pump-catcher+ 20T/35%WR/-$0.22 volume leader bleeding but above kill threshold. slow-grind- 12T/33%WR/-$0.64 already killed (legacy decay). macd-div- 3T/67%WR/+$0.20, cascade-reverse-v2 3T/33%WR/+$0.19 winners. Kill criteria not triggered. Trade freq 4/hr normal. 2 open positions.
+  BY: auto_1hr
+  NEXT: Re-run at 10:15 UTC
