@@ -1,69 +1,35 @@
-# Signal Performance Report
-**Generated:** 2026-08-27 17:09 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Generated: 2026-08-27 ~22:30 UTC
 
----
+KILLED (executed):
+| Signal             | Dir  | WR    | PnL   | Trades | Action                      |
+|--------------------|------|-------|-------|--------|-----------------------------|
+| accel-300-v2+      | LONG | 33.3% | -$0.16| 6/48h  | Killed — never reenable     |
 
-## KILLED (executed this cycle)
+ALREADY DISABLED (CEO kills today):
+| Signal             | Dir  | WR    | PnL   | Trades | Action                      |
+|--------------------|------|-------|-------|--------|-----------------------------|
+| pump-catcher+      | LONG | 33.3% | -$0.39| 21/7d  | CEO killed — regime needed  |
+| atr-spike+         | LONG | 28.6% | -$0.15| 7/7d   | Killed — never reenable     |
+| bb-bounce (all)    | LONG | 11.1% | -$0.74| 9/48h  | CEO killed — never reenable |
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Action |
-|--------|-----|-------|--------|---------|--------|
-| atr-spike+ | LONG | 7 | 28.6% | -$0.15 | DISABLED + NEVER_REENABLE |
+WINNERS (keep enabled):
+| Signal             | Dir  | WR    | PnL   | Trades | Status        |
+|--------------------|------|-------|-------|--------|---------------|
+| macd-div-          | SHORT| 100%  | +$0.29| 5/24h  | Hot — keep    |
+| accel-300-v2-      | SHORT| 55.6% | +$0.15| 9/24h  | Good — keep   |
+| r2-trend-long4     | LONG | 66.7% | +$0.01| 3/24h  | Neutral       |
 
-**Reason:** WR<30% with 7+ trades, net PnL -$0.15. Also 7d: 7T 28.6% WR -$0.15.
+LOSERS (watch list):
+| Signal             | Dir  | WR    | PnL   | Trades | Status             |
+|--------------------|------|-------|-------|--------|--------------------|
+| accel-300-v2+      | LONG | 33.3% | -$0.16| 6/48h  | NOW DISABLED       |
+| atr-spike+         | LONG | 28.6% | -$0.15| 7/24h  | NOW DISABLED       |
+| bb-bounce-short     | SHORT| 66.7% | -$0.07| 6/48h  | Profitable WR, neg PnL. Watch. |
+| bb_bounce+         | LONG | 14.3% | -$0.48| 7/48h  | CEO killed         |
+| slow-grind-        | SHORT| 33.3% | -$0.64| 12/48h | CEO killed today   |
 
----
-
-## BOOSTED (executed this cycle)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Action |
-|--------|-----|-------|--------|---------|--------|
-| macd-div- | SHORT | 5 | 80.0% | +$0.24 | Weight 1.0 → 1.25 |
-
-**Reason:** WR>55% with 5+ trades, net PnL +$0.24. Consistent performer.
-
----
-
-## WINNERS (WR > 55%, PnL > 0, 24h)
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| macd-div- | SHORT | 2 | 100% | +$0.07 | 5 | 80.0% | +$0.24 | ✅ BOOSTED |
-| r2-trend-long4 | LONG | 2 | 50% | -$0.05 | 3 | 66.7% | +$0.01 | OK |
-
----
-
-## LOSERS (WR < 30%, PnL < -$0.10, 24h)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| pump-catcher+ | LONG | 17 | 29.4% | -$0.35 | ALREADY KILLED (NEVER_REENABLE) |
-| slow-grind- | SHORT | 4 | 25.0% | -$0.30 | ALREADY KILLED (NEVER_REENABLE) |
-| atr-spike+ | LONG | 7 | 28.6% | -$0.15 | KILLED THIS CYCLE |
-
----
-
-## MARGINAL (30-50% WR, 24h)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|-------|--------|---------|--------|
-| bb-bounce-short | SHORT | 3 | 33.3% | -$0.14 | ENABLED — needs more data |
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## ACTIONS TAKEN
-
-1. **KILL:** `ATR_SPIKE_PLUS_ENABLED = False` in hermes_constants.py (line 2056)
-2. **NEVER_REENABLE:** Added `ATR_SPIKE_PLUS_ENABLED` to NEVER_REENABLE_FLAGS
-3. **BOOST:** `macd-div-` SHORT weight 1.0 → 1.25 in signal_compactor.py (line 256)
-
----
-
-## WATCH LIST
-
-- `bb-bounce-short` SHORT — 3T, 33.3% WR, -$0.14. Low sample size. Monitor next cycle.
+ISSUES:
+- No signal inversions detected (24h).
+- accel-300-v2 LONG variant killed; SHORT variant (55.6% WR) remains profitable.
+- macd-div- at 100% WR with 5 trades — small sample but strong signal. Monitor.

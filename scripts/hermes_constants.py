@@ -1125,6 +1125,7 @@ NEVER_REENABLE_FLAGS = {
     'PUMP_CATCHER_ENABLED',        # CEO 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
     'ATR_SPIKE_PLUS_ENABLED',     # SIGNAL REPORTER 2026-08-27 — 7T/7d 28.6% WR -$0.15. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',   # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
+    'ACCEL_300_V2_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-27 — 6T/48h 33.3% WR -$0.16. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1360,7 +1361,7 @@ MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
 ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13-win streak Aug 12.
 ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — 2026-08-27. Catches accelerating moves.
-ACCEL_300_V2_PLUS_ENABLED     = True    # V2 LONG — catches early breakouts above EMA300
+ACCEL_300_V2_PLUS_ENABLED     = False   # SIGNAL REPORTER 2026-08-27 — 6T/48h 33.3% WR -$0.16. NEVER_REENABLE.
 ACCEL_300_V2_MINUS_ENABLED    = True    # V2 SHORT — catches early breakdowns below EMA300
 # ── accel-300-v2 LONG params (backtested: +4.79% over 7d) ─────────────────
 ACCEL_300_V2_LONG_MIN_GAP = 1.5     # LONG: min gap above EMA300
