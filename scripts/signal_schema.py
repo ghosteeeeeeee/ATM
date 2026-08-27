@@ -2039,6 +2039,7 @@ def is_component_disabled(component: str) -> bool:
             COIN_TRACKER_HOT_ENABLED, COIN_TRACKER_HOT_PLUS_ENABLED, COIN_TRACKER_HOT_MINUS_ENABLED,
             SIGNAL_CONFLUENCE_ENABLED, SIGNAL_CONFLUENCE_PLUS_ENABLED, SIGNAL_CONFLUENCE_MINUS_ENABLED,
             SLOW_GRIND_SHORT_ENABLED,
+            ACCEL_300_V2_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
