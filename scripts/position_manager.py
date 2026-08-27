@@ -2372,11 +2372,6 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
 
     positions = refresh_current_prices()
 
-    # ── Volume cache warm-up ──────────────────────────────────────────────
-    # Pre-fetch volume data for all open positions before trailing SL evaluation.
-    # Lazy-warms the cache so subsequent has_volume_confirmation() calls are instant.
-    _warmup_volume_cache_pm([p.get("token") for p in positions])
-
     # SPEED FEATURE: update speed tracker once per pipeline run (<2s)
     if SPEED_TRACKER is not None:
         SPEED_TRACKER.update()

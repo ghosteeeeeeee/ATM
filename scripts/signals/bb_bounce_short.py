@@ -266,7 +266,8 @@ def detect_bb_bounce_short(token, closes):
 def scan_bb_bounce_short_signals(prices_dict):
     """Scan tokens for BB bounce SHORT signals."""
     from signal_schema import add_signal, get_cooldown, set_cooldown
-    from signal_gen import is_delisted, SHORT_BLACKLIST
+    from hyperliquid_exchange import is_delisted
+    from hermes_constants import SHORT_BLACKLIST
 
     added = 0
     now = time.time()

@@ -70,16 +70,38 @@ def run() -> int:
     # guard handles per-source filtering.
 
     # Imports needed for guards and signal generation
-    from signal_gen import (
-        get_tf_zscores,
-        get_momentum_stats,
-        recent_trade_exists,
-        is_delisted,
-        SHORT_BLACKLIST,
-        MIN_TRADE_INTERVAL_MINUTES,
-    )
+    from hyperliquid_exchange import is_delisted
+    from hermes_constants import SHORT_BLACKLIST
+    from signals.fast_momentum import get_momentum_stats, recent_trade_exists, MIN_TRADE_INTERVAL_MINUTES
     from position_manager import get_open_positions as _get_open_pos
     from signal_schema import get_all_latest_prices
+
+    # get_tf_zscores was in signal_gen.py (deleted). Inline a minimal version.
+    def get_tf_zscores(token):
+        """Get z-scores across timeframes from local candle DB."""
+        import sqlite3 as _sqlite3
+        from paths import CANDLES_DB
+        result = {}
+        try:
+            _conn = _sqlite3.connect(CANDLES_DB, timeout=10)
+            _cur = _conn.cursor()
+            for tf in ['4h', '1h', '15m']:
+                _cur.execute("""
+                    SELECT close FROM candles
+                    WHERE token = ? AND timeframe = ?
+                    ORDER BY ts DESC LIMIT 500
+                """, (token.upper(), tf))
+                rows = [r[0] for r in _cur.fetchall()]
+                if len(rows) >= 20:
+                    import statistics
+                    mean = statistics.mean(rows)
+                    stdev = statistics.stdev(rows) if len(rows) > 1 else 1
+                    z = (rows[0] - mean) / stdev if stdev > 0 else 0
+                    result[tf] = (z, 0)
+            _conn.close()
+        except Exception:
+            pass
+        return result
 
     prices_dict = get_all_latest_prices()
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
