@@ -57,6 +57,7 @@ REGIME_SIGNALS = {
         'tl_break', 'tl_break_long', 'tl_break_short',  # trendline breaks
         'trend_momentum_near_sma',
         'hzscore', 'range_finder', 'range_breakout',  # individual parts
+        'rs',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: works in steady markets
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'r2-trend-long', 'r2l',  # R² trend LONG (slow grinds)
@@ -83,6 +84,7 @@ REGIME_SIGNALS = {
         'accel-300-vel',
         'continuation', 'continuation+',  # re-entry after close
         'hzscore', 'range_finder',  # individual parts
+        'rs',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves
@@ -112,6 +114,7 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
         'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
         'atr-spike+', 'atr-spike-',  # ATR compression spike
+        'rs',  # support/resistance — structural
     },
 }
 
