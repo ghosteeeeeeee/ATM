@@ -1147,3 +1147,7 @@ ALERTS:
 - **[WARN]** (1x): Daily PnL -30.09% on 57 closed trades — heavy drawdown day
 - **[INFO]** (1x): `hermes-4h-regime-scanner.service` not-found — needs cleanup or recreation
 - **[INFO]** (1x): 36 stale records in signal_outcomes without pnl_usdt — pipeline reports 5 open but DB shows 0
+
+## Error Alerts — 2026-08-27 02:04 UTC
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=1h&limit=N`
+- **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=15m&limit=N`

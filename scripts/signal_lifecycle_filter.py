@@ -89,7 +89,7 @@ SIGNAL_LIFECYCLE = {
     'bb_bounce_short': 'concurrent',  # same — normal SL needed
     'macd_divergence_long': 'lagging',
     'macd_divergence_short': 'lagging',
-    'slow_grind_short': 'lagging',
+    'slow_grind_short': 'concurrent',  # fires DURING grind, not after — lagging SL was killing it (like bb_bounce)
 }
 
 # Strip suffixes for lookup

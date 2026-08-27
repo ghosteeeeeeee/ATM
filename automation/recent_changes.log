@@ -1,3 +1,7 @@
+[2026-08-27 03:05 UTC] auto_1hr: FIXED slow_grind_short lifecycle classification
+  WHY: slow-grind- 12T 33%WR -$0.64/24h — #1 money loser. Root cause: lifecycle filter classified slow_grind_short as 'lagging' → 0.8x SL mult (tighter SL). But slow_grind fires DURING grinding downtrends, not after — tighter SL = premature exits. Same issue bb_bounce had (fixed 20:10 UTC Aug 26). Changed to 'concurrent' (1.0x SL). Also: pump-catcher+ 20T 35%WR -$0.28, 74% hit atr_sl_hit (SL at 0.8% floor — can't tighten). bb_bounce+ still degraded (17%WR) but 6T below kill threshold. 4 open positions. atr_sl_hit 60% (threshold 40%). No consecutive negative hours. Trade freq 2.7/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 04:05 UTC
 [2026-08-26 20:10 UTC] auto_1hr: FIXED bb_bounce lifecycle classification
   WHY: bb_bounce+ 8T 12%WR -$0.55/24h — catastrophic degradation (was 89% Aug 24). Root cause: lifecycle filter (deployed 06:40 UTC) classified bb_bounce as 'lagging' → 0.8x SL mult (tighter SL). But bb_bounce fires DURING bounces, not after — tighter SL = more premature exits. Before filter: 2T 1W 50%. After filter: 6T 0W 0%. Changed to 'concurrent' (1.0x SL). Also: 4T 0W 0% continuation- below kill threshold. slow-grind- 11T 36%WR -$0.62 also lagging-classified — may need same fix. 4 open positions. atr_sl_hit still 56.9% (threshold 40%). 3 consecutive negative hours 17-19 UTC.
   BY: auto_1hr
@@ -321,3 +325,7 @@
   WHY: 5T last hour (3W 2L +$0.33). SAND/ENA/BABY/WLD/NEO all atr_sl_hit. BABY +$0.29, SAND +$0.18 winners via trailing SL. 61T 24h 47.5%WR -$0.12. atr_sl_hit 60.7% stable with trailing SL deployed. profit-monster-trail 15T +$0.047 avg clear winner. cascade-reverse-v2 3T +$0.48, macd-div- 4T +$0.20 strong. pump-catcher+ 15T/33.3%WR/-$0.25 volume leader but losing. slow-grind- 12T/33.3%WR/-$0.64 biggest drag, kill bug fixed. bb_bounce+ CEO_PROTECTED. 3 open positions. Trade freq 3/hr normal. Kill criteria not triggered.
   BY: auto_1hr
   NEXT: Re-run at 01:10 UTC
+[2026-08-27 02:10 UTC] auto_1hr: NO CHANGES
+  WHY: 4T last hour (3W 1L +$0.20). CASHCAT pump-catcher+ +$0.15/$0.08 trailing SL wins, CAKE r2-trend-short3 profit-monster-trail +$0.06, MON pump-catcher+ -$0.09. 64T 24h 45.3%WR +$0.04 breakeven. atr_sl_hit 62.5% (40/64) trailing SL working. profit-monster-trail 15T +$0.75 clear winner. pump-catcher+ 18T/38.9%WR/-$0.11 volume leader but marginal (-$0.006 avg). cascade-reverse-v2 5T +$0.67, macd-div- 4T/75%WR +$0.20 strong. slow-grind-/bb_bounce+ already killed (NEVER_REENABLE) legacy decaying. continuation- 2T/0%WR below 3T threshold. Hourly trend positive (2 consecutive profitable hours). Trade freq 4/hr normal. Kill criteria not triggered.
+  BY: auto_1hr
+  NEXT: Re-run at 03:10 UTC

@@ -1,5 +1,41 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-27 03:05 UTC] Hourly Analysis
+
+**Trades:** 3 closed in last hour (1W 2L -$0.16). 65 closed in 24h (28W 37L -$0.43).
+**24h:** 65T 28W 43.1% -$0.43. No consecutive negative hours (system alternating).
+**Open:** 4 positions (BTC SHORT, LTC SHORT, IO SHORT, ENA SHORT).
+
+**24h Close Reasons:**
+- atr_sl_hit: 39T 60% of closes (threshold: 40%) — STILL elevated, -$0.93
+- profit-monster-trail: 16T +$0.76 — only profitable exit
+- Others: minor (hard_sl, cut-loser, cascade_flip)
+
+**Signal Performance (24h):**
+- slow-grind-: 12T 33%WR -$0.64 — #1 money loser
+- bb_bounce+: 6T 17%WR -$0.29 — still degraded after lifecycle fix
+- pump-catcher+: 20T 35%WR -$0.28 — 74% hit atr_sl_hit (SL at 0.8% floor)
+- macd-div-: 4T 75%WR +$0.20 — good
+- r2-trend variants: mostly positive
+
+**Root Cause:** slow_grind_short classified as 'lagging' (0.8x SL mult) in lifecycle filter. But it fires DURING grinding downtrends, not after. Tighter SL → premature exits. Same issue bb_bounce had before fix.
+
+**Changes:**
+1. **FIXED slow_grind_short lifecycle classification** — Changed from 'lagging' to 'concurrent' in signal_lifecycle_filter.py. Normal SL (1.0x) instead of tight SL (0.8x). Should reduce premature atr_sl_hit exits. Monitor next 24h.
+
+**No Change Needed:**
+- Trade frequency: ~2.7/hr normal. No overtrading.
+- No signal met strict kill criteria (0% WR with 3+ trades in last hour — only 1 trade last hour).
+- pump-catcher+ 74% atr_sl_hit is concerning but SL is at ATR_SL_MIN floor (0.8%) — can't tighten further without affecting all signals. Would need ATR_SL_MIN increase (CEO decision).
+- bb_bounce+ still degraded (17%WR) but only 6T in 24h — below kill threshold.
+
+**Open Questions:**
+- Will slow-grind- recover with normal SL? If still <40% WR by next analysis, kill it.
+- pump-catcher+ atr_sl_hit at 74% — is ATR_SL_MIN (0.8%) too tight for microcap tokens?
+- bb_bounce+ lifecycle fix didn't recover it — signal logic may need deeper fix.
+
+---
+
 ## [2026-08-26 06:40 UTC] Orchestrator — Signal Lifecycle Filters Deployed
 
 **What:** Integrated `signal_lifecycle_filter.py` into the SL/TP computation path.
@@ -15973,3 +16009,35 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - pump-catcher+ has highest volume (15T) but 33.3% WR — monitor for further degradation
 - slow-grind- drag will decay as old trades cycle out post-fix
+
+## [2026-08-27 02:10 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** +$0.20 (WR: 75%)
+
+- CASHCAT pump-catcher+ atr_sl_hit +$0.15 (trailing SL locked profit)
+- CASHCAT pump-catcher+ atr_sl_hit +$0.08 (trailing SL locked profit)
+- CAKE r2-trend-short3 profit-monster-trail +$0.06
+- MON pump-catcher+ atr_sl_hit -$0.09
+
+**24h:** 64T, 45.3%WR, +$0.04 total PnL (breakeven)
+- atr_sl_hit 62.5% (40/64) — trailing SL working, winners captured via profit-monster-trail
+- profit-monster-trail 15T +$0.75 total — clear winner signal
+- pump-catcher+ 18T/38.9%WR/-$0.11 — volume leader but marginal (-$0.006 avg)
+- cascade-reverse-v2 5T +$0.67 — strong
+- macd-div- 4T 75%WR +$0.20 — strong
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades in last hour
+- slow-grind- (12T) and bb_bounce+ (6T) already killed (NEVER_REENABLE) — legacy trades decaying naturally
+- continuation- (2T, 0%WR) below 3-trade threshold
+- pump-catcher+ 38.9%WR above 0% threshold
+- Hourly trend positive: last 2 hours both profitable (+$0.33, +$0.20)
+- Trade freq 4/hr normal
+- 4 open positions (NEO, HBAR, LTC, BTC)
+
+**Open Questions:**
+- pump-catcher+ remains marginal at -$0.006 avg — monitor if degrades further
+- continuation- 0%WR (2T) if next trade loses would total 3T/0%WR → would trigger kill criteria
