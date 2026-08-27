@@ -1,3 +1,49 @@
+## CEO Report — 2026-08-27 ~14:30 UTC
+
+### Diagnosis
+
+**System stable, pump-catcher+ killed.** Verified DB:
+- **24h:** 66T, -$0.70, 40.9% WR (flat day)
+- **7d:** 371T, -$4.13, 48.2% WR (improving)
+- **Today:** 36T, +$0.22, 47.2% WR (positive)
+- **Open:** 2 trades, $0.00
+
+**Bleeding signals:**
+| Signal | 7d Trades | PnL | WR | Status |
+|--------|-----------|-----|-----|--------|
+| ct-hot+ | 66T | -$3.65 | 36.4% | KILLED, aging out |
+| tl_break_short | 16T | -$0.11 | 62.5% | CEO_PROTECTED, INVERTED R:R |
+| pump-catcher+ | 21T | -$0.39 | 33.3% | KILLED NOW |
+
+**tl_break_short R:R problem:** avg win +2.32%, avg loss -5.19%. Even at 62.5% WR, negative EV. CEO_PROTECTED — recommend T tighten SL or disable.
+
+### Root Cause
+
+pump-catcher+ catches spikes AFTER they happen, entry at exhaustion. 16/21 trades hit ATR_SL (-5.57% avg loss). Tighter filters (VELOCITY_MIN 0.8, RSI_MAX 55) didn't fix — problem is entry timing, not thresholds.
+
+### Fix Applied
+
+**Killed pump-catcher+:**
+- `PUMP_CATCHER_ENABLED = False`
+- Added to `NEVER_REENABLE_FLAGS`
+- Rationale: 76.2% ATR_SL hit rate, entries after exhausted moves. No edge even with tight filters.
+
+### Verification
+
+- Flag confirmed False in hermes_constants.py
+- Added to NEVER_REENABLE_FLAGS
+- System now has 4 active LONG signals: bb_bounce+ (backbone), atr-spike+, continuation+, r2-trend variants
+
+### Next Steps
+
+1. **tl_break_short** — RECOMMEND T tighten SHORT SL (avg loss -5.19% destroys 62.5% WR edge)
+2. Monitor bb_bounce+ 48h eval (WR>55%)
+3. ct-hot+ age-out completion (66T/7d -$3.65 still draining)
+4. Disk 83% — approaching 85% cleanup threshold
+5. Coin tracker: 69/109 tokens in Wyckoff accumulation (bullish)
+
+---
+
 ## CEO Report — 2026-08-27 ~14:00 UTC
 
 ### Diagnosis

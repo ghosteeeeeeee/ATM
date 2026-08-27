@@ -1124,6 +1124,7 @@ NEVER_REENABLE_FLAGS = {
     'HL_COPY_SIGNAL_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay. NEVER_REENABLE.
     # BB_BOUNCE re-enabled 2026-08-27 (CEO) — backbone signal, 60.5% WR 7d +$0.30. Removed from NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
+    'PUMP_CATCHER_ENABLED',        # CEO 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1615,7 +1616,7 @@ PUMP_HUNTER_ENABLED        = False  # set False to block pump_hunter from firing
 # Catches early-stage momentum breakouts by detecting price acceleration.
 # Unlike pump_hunter (reversion/fade), this RIDES the spike via LONG entries.
 # Replaces dead volume-based detection with price-based velocity + acceleration.
-PUMP_CATCHER_ENABLED        = True   # master kill-switch
+PUMP_CATCHER_ENABLED        = False  # CEO KILLED 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
 PUMP_CATCHER_PLUS_ENABLED   = False # LONG entries
 PUMP_CATCHER_MINUS_ENABLED  = False  # SHORT entries — disabled initially (catch pumps only)
 # Detection thresholds
