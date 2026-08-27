@@ -51,7 +51,7 @@ _CANDLES_DB = CANDLES_DB
 
 # ── V2 Signal constants ──────────────────────────────────────────────────────
 V2_MIN_GAP_PCT = 1.5           # min gap from EMA300 to fire — raised from 0.8 (too noisy)
-V2_MAX_GAP_PCT = 10.0          # don't fire if gap too extreme (structural)
+V2_MAX_GAP_PCT = 3.5           # max gap — entering >3.5% = too extended (profitable sweet spot 1.5-3.5%)
 V2_MIN_GAP_ACCEL = 0.10        # min gap acceleration over 10 bars — raised from 0.06
 V2_GAP_ACCEL_WINDOW = 10       # bars to measure gap acceleration
 V2_VELOCITY_WINDOW = 5         # bars to measure price velocity
