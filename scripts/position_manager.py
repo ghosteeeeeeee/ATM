@@ -1404,7 +1404,8 @@ def _atr_sl_k_scaled(
     Returns k multiplier to apply on top of base _dr_atr().
     momentum_stats: from get_momentum_stats(token) — {percentile_long, percentile_short, velocity, phase}
     """
-    from signal_gen import PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME, detect_phase
+    from hermes_constants import PHASE_BUILDING, PHASE_ACCELERATING, PHASE_EXHAUSTION, PHASE_EXTREME
+    from market_phase_gate import detect_phase
 
     base_k = _dr_atr(token, atr_pct)
 
@@ -1930,128 +1931,6 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
         conn.close()
 
 
-def _execute_atr_bulk_updates(updates: List[Dict]) -> dict:
-    """
-    DISABLED 2026-05-15 — TP/SL is managed LOCALLY by guardian via DB read.
-    No HL trigger orders are placed. position_manager writes to DB only.
-    """
-    return {'cancelled': 0, 'placed': 0, 'errors': ['disabled — guardian manages TP/SL via DB']}
-    if not updates:
-        return {'cancelled': 0, 'placed': 0, 'errors': []}
-
-    from hyperliquid_exchange import (
-        get_exchange, get_open_hype_positions,
-        _HL_TICK_DECIMALS, _hl_tick_round,
-        cancel_bulk_orders, place_bulk_orders, build_order,
-        MAIN_ACCOUNT_ADDRESS,
-    )
-
-    exchange = get_exchange()
-
-    # ── 1. Get position sizes — read from shared cache if available ─────────────
-    # The cache is populated by check_and_manage_positions() before this is called.
-    # Falls back to direct API call only if cache is cold.
-    try:
-        import hype_cache as hc
-        positions = hc.get_cached_positions()
-    except Exception:
-        positions = {}
-    if not positions:
-        positions = get_open_hype_positions()
-    if not positions:
-        return {'cancelled': 0, 'placed': 0, 'errors': ['no positions on HL']}
-
-    sz_map: Dict[str, float] = {}
-    for coin_name, p in positions.items():
-        sz_map[coin_name.upper()] = abs(float(p.get('size', 0) or 0))
-
-    # ── 2. Build set of trade_ids being updated ───────────────────────────────
-    updated_trade_ids = {u['trade_id'] for u in updates}
-
-    # ── 3. Find stale order IDs to cancel — SELECTIVE per trade_id ───────────
-    all_open = exchange.info.open_orders(MAIN_ACCOUNT_ADDRESS)
-    stale_order_reqs = []
-    for order in all_open:
-        coin = order.get('coin', '').upper()
-        oid = order.get('oid')
-        if not oid or not coin:
-            continue
-        # Check if this order belongs to any of the affected trades
-        # We check by matching token AND by checking the order's trigger price
-        # matches either the SL or TP of one of our updates
-        for u in updates:
-            if u['token'].upper() != coin:
-                continue
-            # For this update's token, check if this OID's trigger price matches
-            # the old SL or TP (indicating it belongs to this trade)
-            order_trigger = float(order.get('triggerPrice', 0) or 0)
-            if order.get('reduceOnly', False):
-                # Match by trigger price proximity to old SL or TP
-                if order_trigger > 0:
-                    if (abs(order_trigger - u['old_sl']) < 0.001 or
-                        abs(order_trigger - u['old_tp']) < 0.001):
-                        stale_order_reqs.append({'oid': oid, 'coin': coin})
-                        break
-
-    # ── 3. Cancel all stale orders (one bulk call) ─────────────────────────────
-    if stale_order_reqs:
-        cancel_bulk_orders(stale_order_reqs)
-
-    # ── 4. Build and place all new SL+TP orders (one bulk call) ───────────────
-    new_orders = []
-    for u in updates:
-        token = u['token']
-        direction = u['direction']
-        sz = sz_map.get(token.upper(), 0)
-        if sz <= 0:
-            continue
-
-        decimals = _HL_TICK_DECIMALS.get(token.upper(), 6)
-        is_short = direction == 'SHORT'
-
-        if u['needs_sl']:
-            sl_px = _hl_tick_round(u['new_sl'], decimals)
-            sl_type = {"trigger": {"triggerPx": sl_px, "isMarket": True, "tpsl": "sl"}}
-            buy_side = "SELL" if not is_short else "BUY"
-            new_orders.append(build_order(
-                token, buy_side, sz, sl_px, sl_type, reduce_only=True
-            ))
-
-        if u['needs_tp']:
-            tp_px = _hl_tick_round(u['new_tp'], decimals)
-            tp_type = {"trigger": {"triggerPx": tp_px, "isMarket": True, "tpsl": "tp"}}
-            buy_side = "SELL" if not is_short else "BUY"
-            new_orders.append(build_order(
-                token, buy_side, sz, tp_px, tp_type, reduce_only=True
-            ))
-
-    placed = 0
-    errors = []
-    if new_orders:
-        # HL batch endpoint has limits with large order counts.
-        # Chunk into sub-batches of MAX_BATCH_ORDERS to avoid rejections.
-        MAX_BATCH_ORDERS = 10  # 5 positions × 2 orders (SL+TP)
-        for i in range(0, len(new_orders), MAX_BATCH_ORDERS):
-            chunk = new_orders[i:i + MAX_BATCH_ORDERS]
-            result = place_bulk_orders(chunk)
-            if result.get('success') or result.get('status') == 'ok':
-                placed += len(chunk)
-            else:
-                # Collect ALL error fields: 'errors' (API-level) and 'error' (exception)
-                errs = result.get('errors', [])
-                if isinstance(errs, list):
-                    errors.extend([str(e) for e in errs])
-                # Also catch the 'error' key set by exception handler
-                single_err = result.get('error')
-                if single_err:
-                    errors.append(str(single_err))
-
-    return {
-        'cancelled': len(stale_order_reqs),
-        'placed': placed,
-        'errors': errors,
-    }
-
 
 def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVERAGE,
                      token: str = '', sl_pct_fallback: float = SL_PCT_FALLBACK) -> Dict:
@@ -2113,68 +1992,6 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
 # ─── Volume Confirmation Cache (HL candles via ccxt) ────────────────────────────
 # One fetch per 60s — shared across all trades in the same pipeline run.
 # NOTE: Volume confirmation is unused by the new ATR-adaptive TP/SL system but
-# _warmup_volume_cache_pm still calls _fetch_volume_data, so keep these functions.
-TRAILING_VOL_LOOKBACK = 24  # candles for volume MA (used by _fetch_volume_data)
-VOLUME_CACHE_FILE  = '/var/www/hermes/data/volume_cache.json'
-VOLUME_CACHE_TTL  = 60       # seconds — one fetch per pipeline minute
-
-def _load_volume_cache() -> dict:
-    """Load cached volume data. Returns {token: {ts, vol_last, vol_ma, confirmed}}"""
-    try:
-        if os.path.exists(VOLUME_CACHE_FILE):
-            with open(VOLUME_CACHE_FILE) as f:
-                return json.load(f)
-    except Exception:
-        pass
-    return {}
-
-
-def _save_volume_cache(data: dict) -> None:
-    """Save volume cache to disk atomically."""
-    try:
-        os.makedirs(os.path.dirname(VOLUME_CACHE_FILE), exist_ok=True)
-        tmp = VOLUME_CACHE_FILE + f".{os.getpid()}.tmp"
-        with open(tmp, "w") as f:
-            json.dump(data, f, default=str)
-        os.rename(tmp, VOLUME_CACHE_FILE)
-    except Exception:
-        pass
-
-
-def _fetch_volume_data(token: str) -> dict:
-    """
-    Fetch last 24h of 1h candles for token via ccxt+Hyperliquid.
-    Returns {vol_last, vol_ma, confirmed} or empty dict on failure.
-    Hard timeout of 5s — failures are silent (volume confirmation = False).
-    """
-    try:
-        import ccxt
-        import time as _time
-    except Exception:
-        return {}
-
-    try:
-        ex = ccxt.hyperliquid()
-        ex.http_timeout = 5  # hard cap — don't block the pipeline
-        # HL uses /USDC suffix for perps
-        symbol = f"{token.upper()}/USDC:USDC"
-        candles = ex.fetch_ohlcv(symbol, "1h", limit=TRAILING_VOL_LOOKBACK)
-        if not candles or len(candles) < 2:
-            return {}
-        # candles: [ts, open, high, low, close, volume]
-        vols = [float(c[5]) for c in candles]
-        vol_last = vols[-1]
-        vol_ma = sum(vols[:-1]) / len(vols[:-1])  # MA excluding current candle
-        return {
-            "vol_last": vol_last,
-            "vol_ma": vol_ma,
-            "confirmed": vol_last > vol_ma,
-            "ratio": round(vol_last / vol_ma, 2) if vol_ma > 0 else 0,
-            "ts": _time.time(),
-        }
-    except Exception:
-        # Fail silent — volume confirmation defaults to False (tighter SL)
-        return {}
 
 
 # ─── Position Management ──────────────────────────────────────────────────────
@@ -2444,38 +2261,6 @@ def refresh_current_prices(server: str = SERVER_NAME):
     if updated:
         log(f"  [Position Manager] Updated {updated} position prices from HL")
     return positions
-
-
-def _warmup_volume_cache_pm(tokens: List[str]):
-    """
-    Pre-fetch HL volume data for a list of tokens — non-blocking.
-    Reads existing cache, fetches only stale/missing entries (one HL call per token).
-    Each fetch has a 5s timeout — failures are silent, cache stays fresh for existing entries.
-    This is called at the START of check_and_manage_positions so the cache is warm
-    by the time we evaluate trailing SLs in the loop below.
-    """
-    if not tokens:
-        return
-    import threading, time as _time
-
-    def _fetch_one(token: str):
-        data = _fetch_volume_data(token)
-        if data:
-            cache = _load_volume_cache()
-            cache[token.upper()] = data
-            _save_volume_cache(cache)
-
-    cache = _load_volume_cache()
-    now = _time.time()
-    stale = [t.upper() for t in tokens
-             if t.upper() not in cache or (now - cache.get(t.upper(), {}).get("ts", 0)) >= VOLUME_CACHE_TTL]
-    if not stale:
-        return
-
-    # Fire one thread per stale token — threads die on timeout, no blocking
-    for token in stale:
-        t = threading.Thread(target=_fetch_one, args=(token,), daemon=True)
-        t.start()
 
 
 def _apply_weather_vane_shield(positions: List[Dict]) -> int:

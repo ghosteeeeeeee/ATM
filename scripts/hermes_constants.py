@@ -1647,6 +1647,8 @@ PUMP_CATCHER_COOLDOWN_BARS  = 10     # bars between signals per token (~10 min o
 PUMP_CATCHER_MAX_POSITIONS  = 3      # max concurrent pump-catcher positions
 PUMP_CATCHER_MIN_PRICE_ROWS = 30     # minimum 1m bars for EMA/RSI computation
 PUMP_CATCHER_MAX_STALENESS_MIN = 5   # max minutes hotset entry can be old before blocking execution
+PUMP_SL_PCT = 0.015   # 1.5% stop loss for pump catcher (moved from signal_gen.py 2026-08-27)
+PUMP_TP_PCT = 0.025   # 2.5% take profit for pump catcher (moved from signal_gen.py 2026-08-27)
 
 # DEPRECATED — zscore_pump_hunter.py is disabled.
 # Pipeline-integrated version is signals/zscore_pump.py (uses tpsl_utils via signal_compactor).

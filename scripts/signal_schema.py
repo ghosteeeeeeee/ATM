@@ -1814,51 +1814,6 @@ def get_pending_signals(hours=24, limit=50):
 
 get_pending_signals_as_dict = get_pending_signals  # alias
 
-def expire_pending_signals():
-    """EXPIRED signals safety-net — DEPRECATED for primary PENDING/APPROVED lifecycle.
-
-    Primary expiry is handled by signal_compactor deterministically:
-    - PENDING: marked EXPIRED when staleness reaches 0 (no firing for 5 min)
-    - APPROVED: marked EXPIRED when combo falls out of top-10 AND no recent PENDING
-
-    This function is a SAFETY NET for edge cases (crash mid-cycle, missed compaction):
-    - Hard PENDING cap: 60 minutes max
-    - Hard APPROVED cap: 5 minutes max
-
-    Called by: nothing (dead function, safe to keep for manual cleanup).
-    """
-    conn = _get_conn(_runtime())
-    c = conn.cursor()
-
-    # Safety net: expire PENDING signals older than 60 minutes
-    # (signal_compactor should have already handled these at 5 min)
-    c.execute("""
-        UPDATE signals
-        SET decision = 'EXPIRED'
-        WHERE decision = 'PENDING'
-          AND created_at < datetime('now', '-60 minutes')
-          AND executed = 0
-    """)
-    pending_expired = c.rowcount
-
-    # Safety net: expire APPROVED signals older than 5 minutes
-    # (signal_compactor handles this when combo falls out of top-10)
-    c.execute("""
-        UPDATE signals
-        SET decision = 'EXPIRED', executed = 1
-        WHERE decision = 'APPROVED'
-          AND executed = 0
-          AND created_at < datetime('now', '-5 minutes')
-    """)
-    approved_expired = c.rowcount
-
-    conn.commit()
-    c.close()
-    total_expired = pending_expired + approved_expired
-    if total_expired > 0:
-        print(f'  [Signal Expiry] Safety-net cleared {pending_expired} PENDING + {approved_expired} APPROVED')
-    return total_expired
-
 
 def get_confluence_signals(hours=24, min_signals=2, signal_types=None):
     """Return tokens where ≥min_signals PENDING signal types agree (Hermes-only).
@@ -2022,42 +1977,6 @@ def add_confluence_signal(token, direction, confidence, num_signals, price, z_sc
         rsi_14=rsi_14,
         macd_hist=macd_hist,
     )
-
-# BUG-26 fix: approved source whitelist — prevents malformed source fields
-# from routing to unintended A/B variants in get_ab_params().
-ALLOWED_SIGNAL_SOURCES = frozenset({
-    # Confluence sources
-    'conf-1s', 'conf-2s', 'conf-3s', 'conf-4s', 'conf-5s',
-    'fallback-conf-2s', 'fallback-conf-3s', 'fallback-conf-4s', 'fallback-conf-5s',
-    # Indicator sources
-    'rsi-local', 'rsi-confluence', 'macd-local', 'macd-confluence',
-    'momentum', 'momentum-mtf', 'zscore-local', 'zscore-confluence',
-    # Multi-timeframe
-    'mtf-rsi', 'mtf-macd', 'mtf-momentum',
-    # FIX (2026-04-05): Add hmacd sources — these are valid indicator sources used by
-    # hot-set auto-approval. Without these, all hot-set signals are blocked as 'unknown'.
-    # The hmacd-* sources come from merged signals where source='hmacd-,hzscore,...'
-    # (comma-separated list of sources). The individual components are valid signals.
-    'hmacd-', 'hmacd-mtf_macd', 'hmacd-mtf_zscore', 'hmacd-default',
-    'hzscore', 'pct-hermes', 'vel-hermes', 'rsi-hermes',
-    'counter-hermes', 'counter-mtf_macd', 'counter-mtf_zscore',
-    # Merged indicator sources (comma-separated from GROUP_CONCAT)
-    'hmacd-,hzscore', 'hmacd-,hzscore,pct-hermes', 'hmacd-,hzscore,vel-hermes',
-    'hmacd-,pct-hermes', 'hmacd-,vel-hermes',
-    'hzscore,pct-hermes', 'hzscore,vel-hermes',
-    'mtf_macd,hzscore', 'mtf_macd,pct-hermes',
-    'rsi-confluence,hzscore', 'rsi-confluence,pct-hermes',
-    # Pattern scanner signals
-    'pattern_scanner',
-    # Standard signal types used throughout the system
-    'mtf_macd', 'mtf_zscore', 'mtf_rsi', 'mtf_momentum',
-    'percentile_rank', 'velocity', 'rsi_local', 'macd_local',
-    'macd_crossover', 'rsi_confluence', 'macd_confluence', 'zscore_confluence',
-    # Pump modes
-    'pump-momentum', 'pump-rsi', 'pump-confluence',
-    # Legacy
-    'hot-set', 'ai-decider', 'r1', 'r2', 'r3',
-})
 
 
 def is_component_disabled(component: str) -> bool:

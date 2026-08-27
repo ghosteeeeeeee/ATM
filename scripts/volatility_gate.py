@@ -84,7 +84,7 @@ REGIME_SIGNALS = {
         'accel-300-vel',
         'continuation', 'continuation+',  # re-entry after close
         'hzscore', 'range_finder',  # individual parts
-        'rs',  # support/resistance — structural
+        'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-',  # SHORT: catches sharp reversals
         'range_breakout+', 'range_breakout_short',  # LONG/SHORT breakout
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',  # catches velocity spikes in big moves

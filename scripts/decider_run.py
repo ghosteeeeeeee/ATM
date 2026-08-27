@@ -21,10 +21,9 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               get_trade_params, set_loss_cooldown,
                               is_wrong_side_risky)
 from signal_schema import _is_loss_cooldown_active
-from signal_gen import PUMP_SL_PCT, PUMP_TP_PCT
 from hermes_constants import (
     SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS, HOTSET_ENABLED,
-    PUMP_CATCHER_MAX_STALENESS_MIN,
+    PUMP_CATCHER_MAX_STALENESS_MIN, PUMP_SL_PCT, PUMP_TP_PCT,
     RS_DECIDER_MIN_TOUCHES, RS_DECIDER_ZBONUS_TOUCHES, RS_DECIDER_ZBONUS_ZSCORE,
     RS_DECIDER_CONF_PENALTY, RS_DECIDER_CONF_FLOOR,
     RS_TOUCH_HARD_CAP,
