@@ -1153,7 +1153,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Block SHORT signals when price is trending UP (positive slope).
             # Catches hzscore-, range_breakout_short, continuation- chasing upward moves.
             # Uses 20-bar linear regression on 1m candles.
-            if direction.upper() == 'SHORT':
+            # Exempt: inv-accel-300-v2 (mean reversion fires INTO the trend)
+            _is_reversion = source and 'inv-accel-300-v2' in source
+            if direction.upper() == 'SHORT' and not _is_reversion:
                 try:
                     conn_slope = sqlite3.connect(CANDLES_DB, timeout=5)
                     rows_slope = conn_slope.execute(
