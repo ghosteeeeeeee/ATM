@@ -16515,3 +16515,68 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - accel-300-v2+ 3T/0%WR in 24h — below kill threshold but trending poorly
 - pump-catcher+ bleed reduced — monitor to confirm stabilization
+
+## [2026-08-27 21:55 UTC] Hourly Analysis
+
+**Trades:** 9 closed in last 2h (6W 3L) — **+$0.06**
+- MERL accel-300-v2+ LONG atr_sl_hit +$0.06
+- STX accel-300-v2- SHORT atr_sl_hit +$0.07
+- BLUR accel-300-v2- SHORT atr_sl_hit +$0.00
+- ALT r2-trend-short3 SHORT atr_sl_hit -$0.01
+- SAND accel-300-v2- SHORT atr_sl_hit -$0.01
+- ME accel-300-v2- SHORT atr_sl_hit +$0.03
+- AVNT r2-trend-long3 LONG cascade_flip -$0.06
+- POL accel-300-v2- SHORT atr_sl_hit -$0.07
+- JUP accel-300-v2+ LONG atr_sl_hit -$0.12
+
+**24h:** 69T, 34W, 49.3% WR, +$0.23 (flat/slightly positive)
+- atr_sl_hit 55T 79.7% of exits, avg -$0.003 (structural, trailing working)
+- profit-monster-trail 11T +$0.52 avg +$0.047 — only profitable exit type
+- pump-catcher+ 14T 5W $0.001 avg — marginal
+- macd-div- 5T 5W +$0.29 — star
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+ trades in last hour with 0% WR (0 trades in strict last hour)
+- Trade freq ~4.5/hr normal
+- 5 open positions all flat
+- atr_sl_hit 79.7% elevated but avg PnL essentially breakeven — trailing SL working as designed
+- System flat (24h +$0.23) — no action warranted
+- Previous lifecycle fixes (bb_bounce+, slow-grind-) already deployed
+
+**Open Questions:**
+- pump-catcher+ remains marginal ($0.001 avg over 24h) — below kill threshold but not contributing
+- accel-300-v2+ 5T/1W/20%WR/-$0.20/7d — degraded but low volume, monitor
+- ct-hot+ legacy -$3.65/7d should age out soon
+
+## [2026-08-27 22:55 UTC] Hourly Analysis
+
+**Trades:** 5 closed (2W 3L) — ~$0.00
+- MON accel-300-v2- SHORT atr_sl_hit -$0.10
+- FIL accel-300-v2- SHORT atr_sl_hit +$0.07
+- INJ accel-300-v2- SHORT atr_sl_hit $0.00
+- AVNT cascade-reverse-v2 SHORT atr_sl_hit -$0.09
+- ME accel-300-v2- SHORT atr_sl_hit +$0.11
+
+**24h:** 73T, 42W (57.5% WR), ~+$0.21
+- atr_sl_hit 59T/80.8%, avg -$0.006 — trailing SL structural, working
+- profit-monster-trail 11T +$0.52 avg — only profitable exit
+- accel-300-v2- 8T/50%WR/+$0.10 — solid
+- accel-300-v2+ 5T/20%WR/-$0.20 — bleeding
+- atr-spike+ 7T/28.6%WR/-$0.15 — bleeding
+- macd-div- 5T/100%WR/+$0.29 — star
+- pump-catcher+ 13T/30.8%WR/-$0.16 — marginal
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 3+T/0%WR in last hour
+- Trade freq ~5/hr normal
+- 4 open positions (3 SHORT, 1 LONG)
+- System flat/healthy — no intervention needed
+- accel-300-v2+ 5T/20%WR bleeding but below kill threshold
+
+**Open Questions:**
+- accel-300-v2+ 5T/20%WR/-$0.20 24h — trending poorly, monitor
+- atr-spike+ 7T/28.6%WR/-$0.15 — below kill threshold but persistent bleed
