@@ -143,6 +143,15 @@ def run():
         with open(OUTPUT_FILE, 'w') as f:
             json.dump(output, f, indent=2)
 
+        # Also write to served directory for dashboard access
+        SERVED_FILE = '/var/www/hermes/data/favorites_performance.json'
+        try:
+            os.makedirs(os.path.dirname(SERVED_FILE), exist_ok=True)
+            with open(SERVED_FILE, 'w') as f:
+                json.dump(output, f, indent=2)
+        except Exception:
+            pass
+
         log(f"Written {len(favorites_stats)} favorites, {field_stats.get('trades', 0)} field trades")
 
     except Exception as e:

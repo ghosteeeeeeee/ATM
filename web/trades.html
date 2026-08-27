@@ -201,8 +201,26 @@
       if (src) return `<img class="coin-icon" src="${src}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" loading="lazy"><span class="coin-icon-fallback" style="display:none">${(sym||'?').slice(0,2)}</span>`;
       return `<span class="coin-icon-fallback">${(sym||'?').slice(0,2)}</span>`;
     }
-    const FAVORITES = new Set(['BABY','CAKE','CHIP','DOGE','FIL','GMT','HBAR','LDO','NXPC','SEI','SYRUP','ZRO']);
-    const TOP_FAVS = ['HBAR','DOGE','GMT','ZRO','NXPC'];  // Top 5 by performance
+    let FAVORITES = new Set();
+    let TOP_FAVS = [];
+
+    async function loadFavorites() {
+      try {
+        const r = await fetch('/data/favorites_performance.json?t=' + Date.now());
+        const data = await r.json();
+        const favs = data.favorites || [];
+        FAVORITES = new Set(favs.map(f => f.token));
+        // Top 5 by PnL
+        TOP_FAVS = favs.sort((a, b) => b.total_pnl_usdt - a.total_pnl_usdt)
+                        .slice(0, 5)
+                        .map(f => f.token);
+      } catch(e) {
+        // Fallback if fetch fails
+        FAVORITES = new Set(['BABY','CAKE','CHIP','DOGE','FIL','GMT','HBAR','LDO','NXPC','SEI','SYRUP','ZRO']);
+        TOP_FAVS = ['HBAR','DOGE','GMT','ZRO','NXPC'];
+      }
+    }
+
     function favHtml(sym) {
       if (TOP_FAVS.includes(sym)) return '<span class="fav-star-top" title="Top Favorite">⭐</span>';
       if (FAVORITES.has(sym)) return '<span class="fav-star" title="Favorite">❤</span>';
@@ -211,6 +229,7 @@
 
     async function load() {
       try {
+        await loadFavorites();
         const [tradesR, signalsR] = await Promise.all([
           fetch('/data/trades.json?t=' + Date.now()),
           fetch('/data/signals.json?t=' + Date.now()),
