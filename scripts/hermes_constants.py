@@ -1122,6 +1122,7 @@ NEVER_REENABLE_FLAGS = {
     # BB_BOUNCE re-enabled 2026-08-27 (CEO) — backbone signal, 60.5% WR 7d +$0.30. Removed from NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
     'PUMP_CATCHER_ENABLED',        # CEO 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
+    'ATR_SPIKE_PLUS_ENABLED',     # SIGNAL REPORTER 2026-08-27 — 7T/7d 28.6% WR -$0.15. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -2052,7 +2053,7 @@ CONTINUATION_MIN_AVG_RANGE = 0.045            # % — min avg 1m candle range (s
 # ── ATR Spike Signal (atr_spike.py) ─────────────────────────────────────
 # Catch staged LONG moves from ATR compression. Quality over quantity.
 ATR_SPIKE_ENABLED              = True    # master kill-switch
-ATR_SPIKE_PLUS_ENABLED         = True    # LONG direction
+ATR_SPIKE_PLUS_ENABLED         = False   # SIGNAL REPORTER 2026-08-27 — 7T/7d 28.6% WR -$0.15. NEVER_REENABLE.
 ATR_SPIKE_COMPRESSION_MAX_PCT  = 0.07    # ATR% threshold for compression (relaxed from 0.05; catches genuinely compressed tokens)
 ATR_SPIKE_COMPRESSION_MIN_BARS = 8       # minimum candles in compression (raised from 4 — filters dead-cat bounces)
 ATR_SPIKE_BREAKOUT_MIN_PCT     = 0.15    # minimum candle % move to trigger (relaxed from 0.3; ~93rd percentile for BTC)

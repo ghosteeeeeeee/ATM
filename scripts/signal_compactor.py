@@ -253,7 +253,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('macd_accel_long',  'macd-accel+'):  0.8,  # LONG: negative avg, suppress
     # macd_divergence — 5m pivot divergence between price and MACD histogram
     ('macd_divergence_long',  'macd-div+'):  1.0,  # LONG: counter-trend, conservative start
-    ('macd_divergence_short', 'macd-div-'):  1.0,  # SHORT: counter-trend, conservative start
+    ('macd_divergence_short', 'macd-div-'):  1.25, # SHORT: 80% WR, 5T/24h +$0.24 — boosted 2026-08-27
     ('chain_fire_long',  'chain_fire+'):  1.2,  # data-driven chain signal — slightly boosted
     ('chain_fire_short', 'chain_fire-'):  1.2,  # data-driven chain signal — slightly boosted
     ('momentum',  'momentum+'):    1.25,  # combined pct-hermes + accel LONG (77% hit rate)
