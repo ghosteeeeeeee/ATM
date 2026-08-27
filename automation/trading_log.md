@@ -16070,3 +16070,123 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - pump-catcher+ remains marginal at -$0.006 avg — monitor if degrades further
 - continuation- 0%WR (2T) if next trade loses would total 3T/0%WR → would trigger kill criteria
+
+## FAVORITES Update — 2026-08-27 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ENA (WR=45.5%, PnL=$0.02, 1 consecutive bad days, regime=NEUTRAL)
+- PROMOTE ENS (WR=60.0%, AvgPnL=4.31%, Trades=5)
+- PROMOTE DOGE (WR=100.0%, AvgPnL=5.30%, Trades=5)
+- PROMOTE HBAR (WR=66.7%, AvgPnL=2.14%, Trades=6)
+- PROMOTE BABY (WR=66.7%, AvgPnL=1.18%, Trades=6)
+- PROMOTE CHIP (WR=60.0%, AvgPnL=1.21%, Trades=5)
+
+Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR', 'IMX', 'LDO', 'NXPC', 'SEI', 'SYRUP', 'ZRO']
+
+## [2026-08-27 07:10 UTC] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** -$0.08 (WR: 0%)
+
+- NEO atr-spike+ LONG atr_sl_hit -$0.10
+- ME r2-trend-short5 SHORT profit-monster-trail +$0.02
+- WLD atr-spike+ LONG atr_sl_hit $0.00
+
+**24h:** 69T, 40.6%WR, -$0.73 total
+- atr_sl_hit 63.8% (44/69) — trailing SL working
+- profit-monster-trail 15T +$0.74 clear winner
+- macd-div- 4T 75%WR +$0.23 strong
+- pump-catcher+ 21T 33.3%WR -$0.39 biggest loser (marginal, not killed)
+- slow-grind- 12T 33.3%WR -$0.64 legacy, already killed
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0%WR with 3+T in last hour
+- continuation- (1T 0%WR), continuation+ (1T 0%WR), liq-hunt- (1T 0%WR) all below 3T threshold
+- pump-catcher+ 33.3%WR above 0% threshold
+- Trade freq 3/hr normal
+- atr_sl_hit dominant but by design (trailing SL)
+
+**Open Questions:**
+- pump-catcher+ 21T/33.3%WR/$-0.39 remains biggest drag — monitor
+- 24h PnL negative for 3+ hours? Check next run
+
+## Daily Orchestrator Report — 2026-08-27 ~06:30 UTC
+
+### Pipeline Status
+- **Open:** 4 trades (APT LONG, NOT LONG, BTC SHORT, CAKE SHORT)
+- **Closed today:** 19 trades, -$0.51 USDT, 36.8% WR
+- **7d:** 365 trades, -$4.72 USDT, 47.9% WR
+- **Market:** NEUTRAL (1 LONG / 1 SHORT / 104 NEUTRAL)
+- **Hotset:** 0 tokens (signal starvation — correctly filtered by context gate)
+- **Errors:** 0
+- **Disk:** 83% (20G free)
+
+### Intelligence Summary
+
+**Signal Performance (7d):**
+| Signal | Trades | PnL | WR | Status |
+|--------|--------|-----|-----|--------|
+| ct-hot+ | 66 | -$3.65 | 36.4% | KILLED (legacy drain) |
+| slow-grind- | 12 | -$0.64 | 33.3% | KILLED (legacy drain) |
+| pump-catcher+ | 21 | -$0.39 | 33.3% | ACTIVE — tightened, monitoring |
+| macd-div- | 18 | +$0.12 | 72.2% | WINNER — small sample |
+| cascade-reverse-v2 | 9 | +$0.51 | 33.3% | WINNER |
+| hl_copy_trader | 79 | +$0.68 | 46.8% | KILLED (legacy) |
+
+**Auto-1hr:** No kill criteria triggered. system trending positive last 2 hours.
+
+**Signal Reporter:** No kills or boosts. pump-catcher+ approaching kill threshold (21T, 33.3% WR).
+
+### Issues Found
+
+1. **CRITICAL: Signal starvation.** Hotset empty for 4+ consecutive cycles. Root cause: market NEUTRAL + context gate blocking the few signals that fire (JUP SHORT blocked by volatility gate, ATR 2.1% > 1.5%). System is correctly filtering — not a bug, but no edge available in current market.
+
+2. **pump-catcher+ bleeding.** 21T/7d 33.3% WR -$0.39. Only active LONG signal. Tightened (VELOCITY_MIN 0.8→0.8, RSI_MAX 65→55) on Aug 27 but still generating losses. Aug 27 specifically: 9T 22.2% WR -$0.28. Approaching auto-1hr kill threshold.
+
+3. **Disk at 83%.** 20G free. Journal 1.7G, DBs total ~5GB. Not critical yet but approaching 85% cleanup threshold.
+
+4. **Legacy trades still in system.** bb_bounce+, slow-grind-, continuation- trades from before kills still decaying in PnL.
+
+### Implemented Today
+- Nothing new — monitoring mode. All active automations running normally.
+
+### Recommendations
+1. **Monitor pump-catcher+** — if next auto-1hr finds kill criteria, implement the kill immediately
+2. **Disk cleanup** — vacuum journals if >85%, currently safe
+3. **Backbone signal** — still delegated to signal_analyst. System has zero backbone signals.
+4. **NEUTRAL relax monitoring** — fix deployed Aug 27, JUP SHORT passed compaction but blocked by vol-gate (not the relax fix). Need more cycles to evaluate.
+
+### Quality Metrics
+- Tasks completed: 0 (monitoring only)
+- First-attempt success: N/A
+- Average retries: N/A
+
+## [2026-08-27 07:15 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (signal starvation — NEUTRAL market)
+**24h:** 68T, 28W, -$0.51 (41.2% WR)
+**6h:** 17T, 8W, ~break-even
+
+**Close Reasons (24h):**
+- atr_sl_hit: 43T, -$0.99 (63.2% of closes)
+- profit-monster-trail: 15T, +$0.74 (trailing SL winner)
+- hard_sl: 2T, -$0.12
+- cascade/cut_loser: 5T, mixed
+
+**Signal Health (24h):**
+- slow-grind-: 12T/33%WR/-$0.64 — KILLED legacy drain
+- pump-catcher+: 20T/35%WR/-$0.22 — bleeding but above kill threshold
+- macd-div-: 4T/75%WR/+$0.23 — winner
+- cascade-reverse-v2: 5T/+$0.38 — winner
+- atr-spike+: 4T/25%WR/-$0.16 — small sample
+
+**Changes:** None — no kill criteria triggered
+**No Change Needed:**
+- Kill criteria: 0 trades closed last hour, no 3T/0%WR signal
+- Trade frequency: 0/hr (starvation, not overtrading)
+- 5 open positions all reasonable size
+
+**Open Questions:**
+- Signal starvation continues — NEUTRAL market + context gate blocking. Not a bug, just no edge available.
+- pump-catcher+ 7d bleed (-$0.45) but no last-hour activity to trigger kill

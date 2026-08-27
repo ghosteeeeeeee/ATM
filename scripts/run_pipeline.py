@@ -38,7 +38,7 @@ STEPS_EVERY_MIN  = ['signal_compactor', 'signal_analyst', 'breakout_engine', 'si
 #   - Now runs exclusively via hermes-price-collector.timer (standalone, every 1 min)
 #   - Pipeline no longer blocked by ~26s aggregation; other steps get faster execution
 STEPS_EVERY_5M   = ['signals_runner_slow']  # slow signals: momentum, mtf_momentum (>60s per run)
-STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer', 'ab_learner']
+STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer']
 
 # Per-step timeouts (seconds)
 STEP_TIMEOUTS = {
@@ -52,7 +52,6 @@ STEP_TIMEOUTS = {
     'position_manager': 120,
     'strategy_optimizer': 300,
     'ab_optimizer': 300,
-    'ab_learner': 300,
     'live_decider': 240,
     'hermes-trades-api': 60,
 }
@@ -211,7 +210,7 @@ def main():
         for step in STEPS_EVERY_5M:
             run(step)
 
-    # Every 10 minutes: strategy_optimizer, ab_optimizer, ab_learner
+    # Every 10 minutes: strategy_optimizer, ab_optimizer
     if every_10:
         for step in STEPS_EVERY_10M:
             run(step)

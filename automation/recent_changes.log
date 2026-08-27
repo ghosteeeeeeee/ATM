@@ -333,3 +333,11 @@
   WHY: 4T last hour (3W 1L +$0.20). CASHCAT pump-catcher+ +$0.15/$0.08 trailing SL wins, CAKE r2-trend-short3 profit-monster-trail +$0.06, MON pump-catcher+ -$0.09. 64T 24h 45.3%WR +$0.04 breakeven. atr_sl_hit 62.5% (40/64) trailing SL working. profit-monster-trail 15T +$0.75 clear winner. pump-catcher+ 18T/38.9%WR/-$0.11 volume leader but marginal (-$0.006 avg). cascade-reverse-v2 5T +$0.67, macd-div- 4T/75%WR +$0.20 strong. slow-grind-/bb_bounce+ already killed (NEVER_REENABLE) legacy decaying. continuation- 2T/0%WR below 3T threshold. Hourly trend positive (2 consecutive profitable hours). Trade freq 4/hr normal. Kill criteria not triggered.
   BY: auto_1hr
   NEXT: Re-run at 03:10 UTC
+[2026-08-27 07:10 UTC] auto_1hr: NO CHANGES
+  WHY: 3T last hour (0W 3L -$0.08). NEO atr-spike+ -$0.10, ME r2-trend-short5 +$0.02, WLD atr-spike+ $0.00. 69T 24h 40.6%WR -$0.73. atr_sl_hit 63.8% (44/69) trailing SL working. profit-monster-trail 15T +$0.74 clear winner. pump-catcher+ 21T/33.3%WR/-$0.39 biggest loser but above kill threshold. macd-div- 4T/75%WR/+$0.23 strong. Kill criteria not triggered. Trade freq 3/hr normal.
+  BY: auto_1hr
+  NEXT: Re-run at 08:10 UTC
+[2026-08-27 07:15 UTC] auto_1hr: NO CHANGES
+  WHY: 0T last hour (signal starvation). 68T 24h 41.2%WR -$0.51. atr_sl_hit 63.2% trailing SL working. profit-monster-trail 15T +$0.74 clear winner. pump-catcher+ 23T/7d 30.4%WR/-$0.45 bleeding but 0T last hour, no kill trigger. 5 open positions. Kill criteria not triggered. Trade freq 0/hr (NEUTRAL market starvation).
+  BY: auto_1hr
+  NEXT: Re-run at 08:15 UTC

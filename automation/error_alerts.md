@@ -1151,3 +1151,13 @@ ALERTS:
 ## Error Alerts — 2026-08-27 02:04 UTC
 - **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=1h&limit=N`
 - **REPEATED** (4x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] CASHCATUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=CASHCATUSDT&interval=15m&limit=N`
+
+## Error Alerts — 2026-08-27 06:04 UTC
+- **REPEATED** (10x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3534s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3352s left, N failures)`
+
+## Error Alerts — 2026-08-27 06:20 UTC
+- **WARN** (1x): `disk 83%` — approaching 85% threshold, 20G free
+- **AUTO-FIX**: None applied — monitoring, will clean logs if >85%
+- **INFO** (1x): `hotset fallback 0 tokens` — no hotset data returned
