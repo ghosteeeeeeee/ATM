@@ -16387,3 +16387,27 @@ Final set: ['BABY', 'BANANA', 'CAKE', 'CHIP', 'DOGE', 'ENS', 'FIL', 'GMT', 'HBAR
 **Open Questions:**
 - pump-catcher+ 7d bleed stable at -$0.22 (was -$0.22 last check)
 - slow-grind- legacy decay continues (already killed)
+
+## [2026-08-27 16:15 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (2W 0L, +$0.05)
+- WLD macd-div- SHORT: +$0.02 (profit-monster-trail)
+- LTC engulfing+,r2-trend-long4 LONG: +$0.03 (atr_sl_hit)
+
+**24h:** 61T, 45.9% WR, net -$0.19 (near breakeven)
+
+**Key Metrics:**
+- atr_sl_hit: 45T (73.8%), avg -$0.014 — trailing SL working as designed
+- profit-monster-trail: 12T, 100% WR, avg +$0.048 — clear winner
+- pump-catcher+: 17T, 29.4%WR, -$0.35 — worst performer but above kill threshold
+
+**Changes:** None — no kill criteria triggered
+
+**No Change Needed:**
+- Kill criteria: No signal has 0%WR with 3+ trades last hour
+- Trade frequency: 2/hr normal (NEUTRAL market)
+- atr_sl_hit dominant with tiny avg loss — trailing SL catching losers quickly
+- Open position: 1 (CC, flat)
+
+**Open Questions:**
+- pump-catcher+ 24h bleed at -$0.35 — continues monitoring
