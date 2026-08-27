@@ -1,29 +1,41 @@
 === Signal Performance Report ===
-Period: 2026-08-27 ~04:00 UTC | Last 6h + 24h
+Generated: 2026-08-27 11:04 UTC
+Period: Last 6h | 24h
 
-KILLED (executed):
-None — no signals meet strict kill criteria (WR<30%, 5+ trades, >24h active, PnL<-$0.10)
+## System Performance
+- **6h:** 15 trades, 46.7% WR, $+0.19 PnL ✅ (profitable)
+- **24h:** 71 trades, 43.7% WR, $-0.31 PnL ⚠️ (breakeven)
 
-BOOSTED (executed):
+## KILLED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| macd-div- | SHORT | 75.0% | +$0.23 | 4 | Watch — positive, needs more data |
+| — | — | — | — | — | None — all losers already disabled |
 
-TUNE CANDIDATES (next review):
-| Signal | Dir | WR | PnL | Trades | Active | Status |
-|--------|-----|-----|-----|--------|--------|--------|
-| slow-grind- | SHORT | 33.3% | -$0.64 | 12 | ~7h | Below 24h threshold — monitor |
-| pump-catcher+ | LONG | 33.3% | -$0.39 | 21 | ~21h | Approaching 24h — will kill if no improvement |
-| bb_bounce+ | LONG | 16.7% | -$0.29 | 6 | — | Already killed (BB_BOUNCE_PLUS_ENABLED=False) |
+## BOOSTED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | None — no signal meets all boost criteria (WR>55%, 5+ trades, PnL>$0.05) |
 
-WINNERS:
+## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| macd-div- | SHORT | 75.0% | +$0.23 | 4 | Healthy — needs more data |
-| r2-trend-long3 | LONG | 50.0% | +$0.09 | 2 | Small sample |
-| cascade-reverse-v2-mtf_alignment+cascade_active | SHORT | 33.3% | +$0.19 | 3 | Positive despite low WR |
+| slow-grind- | SHORT | 36.4% | -$0.51 | 11 | Already disabled — closing legacy trades |
+| bb_bounce+ | LONG | 0.0% | -$0.43 | 3 | Already disabled — closing legacy trades |
+| pump-catcher+ | LONG | 35.0% | -$0.22 | 20 | Already disabled — closing legacy trades |
+| atr-spike+ | LONG | 28.6% | -$0.15 | 7 | Active <24h — needs more data before kill |
+| cascade-reverse | SHORT | 0.0% | -$0.19 | 2 | Too few trades — watching |
 
-ISSUES:
-- No signal inversions found
-- pump-catcher+ approaching kill threshold — 21 trades at 33.3% WR, will re-evaluate at next 6h report
-- slow-grind- needs more time to reach statistical significance (>24h active)
+## WINNERS
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| macd-div- | SHORT | 75.0% | $+0.32 | 4 | Best performer — already enabled |
+| r2-trend-short3 | SHORT | 100% | $+0.07 | 2 | Clean but low volume |
+| r2-trend-long3 | LONG | 50% | $+0.09 | 2 | Inconsistent |
+| bb_bounce+ & pump-catcher+ combo | LONG | 100% | $+0.23 | 1 | Single trade — too early |
+
+## ISSUES
+- **No signal inversions found** ✅
+- **No kill actions taken** — all losers are already disabled; `atr-spike+` is too new (<24h) to kill
+- **System is essentially breakeven** — 24h PnL is -$0.31 on 71 trades ($-0.004/trade avg)
+- **6h is profitable** — $+0.19 on 15 trades — suggesting recent filtering is working
+- **Legacy trades still closing** — several disabled signals still have open positions draining PnL
