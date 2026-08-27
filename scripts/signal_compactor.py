@@ -2692,6 +2692,11 @@ def _filter_safe_prev_hotset(prev_hotset):
         live_open = _get_open_tokens()
         if tok.lower() in live_open:
             continue
+        # Staleness check: drop entries that are too old
+        # (recomputed in _preserve_previous_hotset, but must be checked here too)
+        entry_staleness = entry.get('staleness', 0)
+        if entry_staleness <= 0.01:
+            continue  # too old — don't preserve
         src_str = src.strip() if src else ''
         # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
         from signal_schema import validate_source
