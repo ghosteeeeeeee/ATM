@@ -346,7 +346,18 @@ def detect_pump(token, closes):
         if change_5bar > PUMP_CATCHER_VOL_MAX_5BAR:
             return None  # too volatile — price likely to reverse
 
-    # ── 10. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
+    # ── 10. Local high/low filter: skip if price at extreme ───────────────────
+    # ENA signal fired at local high (0.144645), then price reversed.
+    # Don't enter LONG if price is at the top of recent range.
+    if len(closes) >= 10:
+        recent_high = max(closes[-10:])
+        recent_low = min(closes[-10:])
+        if direction == 'LONG' and price_now >= recent_high * 0.998:
+            return None  # at or near local high — likely to reverse
+        if direction == 'SHORT' and price_now <= recent_low * 1.002:
+            return None  # at or near local low — likely to reverse
+
+    # ── 11. Follow-through filter: at least 1 of 2 adjacent pairs in direction ─
     # Check that recent closes show follow-through momentum, not a single spike.
     # Uses close-to-close comparisons (we only have close prices, not OHLC).
     recent_3 = closes[-3:]
