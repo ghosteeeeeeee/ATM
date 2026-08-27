@@ -1124,6 +1124,7 @@ NEVER_REENABLE_FLAGS = {
     'BB_BOUNCE_ENABLED',       # CEO 2026-08-27 — 48h 9T/11.1%WR/-$0.74. NEVER_REENABLE.
     'PUMP_CATCHER_ENABLED',        # CEO 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
     'ATR_SPIKE_PLUS_ENABLED',     # SIGNAL REPORTER 2026-08-27 — 7T/7d 28.6% WR -$0.15. NEVER_REENABLE.
+    'SLOW_GRIND_SHORT_ENABLED',   # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
 }
 PCT_HERMES_ENABLED       = False  # disabled 2026-05-06 — signals now fire via signals_runner (scripts/signals/)
 PCT_HERMES_PLUS_ENABLED  = False   # pct-hermes+ — 100% WR, +$2.31, only good pct variant
@@ -1324,7 +1325,7 @@ R2_TREND_LONG_MAX_ACCEL    = 0.005   # block LONG when price_acceleration > this
 R2_TREND_LONG_MIN_PRE_MOVE = 0.3     # min pre-entry move % — block LONG when price dropping before entry (dead-cat bounces). RAISED 2026-08-19 from 0.2 — r2-trend-long3 11T/7d ATR_SL avg MFE +0.12% (dead-cat bounces peaking 0.12% then stopping out). Winners peak 0.65%. RAISED 2026-08-18 from 0.1. RAISED 2026-08-15 from 0.0.
 # ── Slow Grind SHORT (catches gradual downtrends with low volatility) ──────
 # slow_grind_short.py — detects grinding declines (GMT, HBAR patterns)
-SLOW_GRIND_SHORT_ENABLED = True    # TESTING — new filters: MAX_DECLINE_FROM_HIGH=1.5%, velocity, RSI tightened. Monitor WR.
+SLOW_GRIND_SHORT_ENABLED = False   # CEO KILLED 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
 SLOW_GRIND_SHORT_MIN_R2 = 0.55    # minimum R² threshold (confirmed trend, not chop)
 SLOW_GRIND_SHORT_MIN_SLOPE_PCT = 0.0002  # minimum slope magnitude as % of price per candle (0.02%)
 SLOW_GRIND_SHORT_MAX_ATR_PCT = 0.8  # max ATR% — grinding = low volatility, not spiking

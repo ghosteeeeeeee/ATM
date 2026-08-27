@@ -1224,3 +1224,7 @@ ALERTS:
 - **REPEATED** (9x): `Aug N N:N:N python3[TOK]: TS   [fetch_binance_candles] MERLUSDT: N Client TOK: Bad Request for url: https://api.binance.com/api/v3/klines?symbol=MERLUSDT&interval=1h&limit=N`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3174s left, N failures)`
 - **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3001s left, N failures)`
+
+## Error Alerts — 2026-08-27 18:20 UTC
+- **CRITICAL** (1x): `accel_300_v2.py:467` — `V2_MIN_GAP_PCT` not defined, signal emitting 0 signals
+- **AUTO-FIX**: Added `V2_MIN_GAP_PCT = 1.5` constant (matches LONG entry gate). Verified via --dry run.

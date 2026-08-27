@@ -1,3 +1,27 @@
+## CEO Report — 2026-08-27 ~18:20 UTC (273rd run)
+
+### Diagnosis
+slow-grind- flag was still True despite CEO kill documented Aug 26/27. 12T/7d 33.3% WR -$0.64 actively generating losing trades. This is the second time the kill was documented but not applied — first at 17:00 UTC Aug 26 (fixed Aug 27 21:00), now again at 18:20 Aug 27. System 24h: 61T -$0.08, 47.5% WR (flat). 7d: 380T -$4.25, 48.4% WR. ZERO backbone signals.
+
+### Root Cause
+CEO documented kill in kanban/CURRENT.md but forgot to edit hermes_constants.py. No verification step — flag never toggled.
+
+### Fix Applied
+1. Set SLOW_GRIND_SHORT_ENABLED=False
+2. Added SLOW_GRIND_SHORT_ENABLED to NEVER_REENABLE_FLAGS
+3. Cleared .pyc cache (fixed transient ACCEL_300_V2_ENABLED NameError in signal_compactor)
+
+### Verification
+```python
+SLOW_GRIND_SHORT_ENABLED: False
+slow-grind- disabled: True
+```
+
+### Next
+Monitor: legacy age-out (ct-hot+ -$3.65, hl_copy SHORT -$0.76), disk 85%, backbone signal delegation.
+
+---
+
 ## CEO Report — 2026-08-27 (Ponytail Audit Assessment)
 
 ### Verdict: Execute Phase 1 now. Phase 2 after spot-check. Phase 3 deferred.

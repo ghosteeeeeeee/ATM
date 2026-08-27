@@ -60,6 +60,7 @@ V2_COOLDOWN_BARS = 15          # cooldown between signals per token
 V2_LOOKBACK_1M = 700           # 1m prices to fetch
 V2_SLOPE_WINDOW = 20           # bars for linear regression slope
 V2_MIN_SLOPE_PCT = 0.0005      # min slope % per bar (lower = earlier entry)
+V2_MIN_GAP_PCT = 1.5           # min gap % for confidence bonus (matches LONG entry gate)
 # Fresh cross mode: catch the FIRST momentum bar after EMA300 cross
 V2_FRESH_CROSS_BARS = 8        # max bars since cross to qualify for fresh entry
 V2_FRESH_CROSS_MIN_GAP = 0.50  # raised from 0.30 (too many false signals)
