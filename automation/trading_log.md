@@ -15941,3 +15941,35 @@ Final set: ['BANANA', 'CAKE', 'ENA', 'FIL', 'GMT', 'IMX', 'LDO', 'NXPC', 'SEI', 
 **Open Questions:**
 - slow-grind- drag (-$0.64) will decay as old trades close — no action needed
 - bb_bounce+ (6T/16.7%WR/-$0.29) still CEO_PROTECTED, needs CEO decision
+
+## [2026-08-27 00:10 UTC] Hourly Analysis
+
+**Trades:** 5 closed (3 wins, 2 losses)
+**PnL:** +$0.33 (WR: 60%)
+
+- SAND r2-trend-long3 atr_sl_hit +$0.18 (trailing SL locked profit)
+- BABY pump-catcher+ atr_sl_hit +$0.29 (trailing SL locked profit)
+- ENA pump-catcher+ atr_sl_hit -$0.01
+- WLD pump-catcher+ atr_sl_hit -$0.03
+- NEO pump-catcher+ atr_sl_hit -$0.10
+
+**24h:** 61T, 47.5%WR, -$0.12 total PnL
+- atr_sl_hit 60.7% (37/61) — trailing SL deployed and working, expected behavior
+- profit-monster-trail 15T +$0.47 total, +$0.047 avg — clear winner
+- cascade-reverse-v2 3T +$0.48 total, 66.7% WR — strong
+- macd-div- 4T +$0.20 total, 75% WR — strong
+- pump-catcher+ 15T/33.3%WR/-$0.25 — volume leader but losing
+- slow-grind- 12T/33.3%WR/-$0.64 — biggest drag, kill bug fixed, no new trades since fix
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: slow-grind- (33.3%WR), pump-catcher+ (33.3%WR) both above 0% threshold
+- atr_sl_hit 60.7% — trailing SL working as designed, profit-monster-trail captures gains on winners
+- Trade freq 3/hr normal
+- Current hour profitable (+$0.33) after alternating win/loss streak
+- 3 open positions (SAND, BABY, CAKE)
+
+**Open Questions:**
+- pump-catcher+ has highest volume (15T) but 33.3% WR — monitor for further degradation
+- slow-grind- drag will decay as old trades cycle out post-fix
