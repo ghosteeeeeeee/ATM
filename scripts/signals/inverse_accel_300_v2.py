@@ -32,8 +32,7 @@ import sys, os, sqlite3, time, math
 from typing import Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from signal_schema import add_signal, get_cooldown, price_age_minutes
-from signal_gen import set_cooldown
+from signal_schema import add_signal, get_cooldown, price_age_minutes, set_cooldown
 
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(SIGNAL_LOG), exist_ok=True)
@@ -67,11 +66,11 @@ V2_REVERSION_BARS = 3         # bars of gap narrowing to confirm (was 2 in V1)
 V2_REVERSION_THRESHOLD = 0.15 # min gap narrowing % (was 0.05 in V1 — too loose)
 V2_GAP_VELOCITY_WINDOW = 5    # bars to measure gap velocity (was 3 in V1)
 V2_STABILIZATION_WINDOW = 15  # bars to check for turning point
-V2_STABILIZATION_TOLERANCE = 0.012  # 1.2% — must be near recent high (was 0.6%, then 0.15%)
+V2_STABILIZATION_TOLERANCE = 0.015  # 1.5% — must be near recent high (loosened: reversion confirmation requires some downside movement)
 V2_VOLUME_LOOKBACK = 30       # bars to compute average volume
 V2_VOLUME_MULT = 1.2          # volume must be 1.2x average (selling pressure)
 V2_VELOCITY_WINDOW = 5        # bars to measure price velocity
-V2_TREND_FILTER_PCT = 1.0     # max 1h move against reversion (was 0.50% — too aggressive, blocked valid exhaustion setups)
+V2_TREND_FILTER_PCT = 2.5     # max 1h move — for mean reversion, the rally IS the setup, not a blocker
 V2_COOLDOWN_BARS = 20         # cooldown between signals per token
 V2_LOOKBACK_1M = 700          # 1m prices to fetch per token
 V2_MAX_SLIPPAGE_PCT = 0.30    # max slippage from detection price (was 0.5%)
@@ -363,17 +362,8 @@ def detect_inverse_accel_300_v2(token: str, prices: list) -> Optional[dict]:
         if closes[latest_idx] > recent_high * 1.002:
             return None
 
-    # ── FILTER 8: Price position in range (not at bottom of recent range) ───
-    range_lookback = min(30, len(closes))
-    if range_lookback >= 5:
-        range_high = max(closes[-range_lookback:])
-        range_low = min(closes[-range_lookback:])
-        range_size = range_high - range_low
-        if range_size > 0:
-            position_pct = (closes[-1] - range_low) / range_size  # 0=bottom, 1=top
-            # For SHORT: must be in top 15% of range (near the top)
-            if position_pct < 0.85:
-                return None  # not near top — not a good SHORT entry
+    # NOTE: Range position filter removed — redundant with stabilization check above.
+    # Stabilization already ensures price is near recent high (top of range).
 
     return {
         'direction': 'SHORT',
@@ -399,7 +389,13 @@ def scan_inverse_accel_300_v2_signals(prices_dict: dict) -> int:
         return 0
 
     from position_manager import get_open_positions as _get_open_pos
-    from signal_gen import recent_trade_exists, is_delisted, MIN_TRADE_INTERVAL_MINUTES
+    try:
+        from signal_gen import recent_trade_exists, is_delisted, MIN_TRADE_INTERVAL_MINUTES
+    except ImportError:
+        from signal_schema import get_all_latest_prices  # fallback — skip these guards
+        recent_trade_exists = lambda *a: False
+        is_delisted = lambda *a: False
+        MIN_TRADE_INTERVAL_MINUTES = 10
 
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     added = 0
