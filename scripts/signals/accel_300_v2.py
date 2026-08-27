@@ -389,16 +389,13 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
 def scan_accel_300_v2_signals(prices_dict: dict) -> int:
     """Scan tokens for accel_300_v2 (strong trend momentum) signals."""
     from hermes_constants import (
-        INVERSE_ACCEL_300_V2_ENABLED,  # reuse — accel_300_v2_enabled not yet in constants
+        ACCEL_300_V2_ENABLED,
+        ACCEL_300_V2_PLUS_ENABLED,
+        ACCEL_300_V2_MINUS_ENABLED,
         SHORT_BLACKLIST,
     )
-    # Use a separate flag — check if it exists, default to True for new signal
-    try:
-        from hermes_constants import ACCEL_300_V2_ENABLED
-        if not ACCEL_300_V2_ENABLED:
-            return 0
-    except ImportError:
-        pass  # flag doesn't exist yet — signal is enabled by default
+    if not ACCEL_300_V2_ENABLED:
+        return 0
 
     from position_manager import get_open_positions as _get_open_pos
     from signal_gen import recent_trade_exists, is_delisted, MIN_TRADE_INTERVAL_MINUTES
@@ -434,20 +431,10 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
             continue
 
         # Per-direction kill-switch
-        if direction == 'LONG':
-            try:
-                from hermes_constants import ACCEL_300_PLUS_ENABLED
-                if not ACCEL_300_PLUS_ENABLED:
-                    continue
-            except ImportError:
-                pass
-        if direction == 'SHORT':
-            try:
-                from hermes_constants import ACCEL_300_MINUS_ENABLED
-                if not ACCEL_300_MINUS_ENABLED:
-                    continue
-            except ImportError:
-                pass
+        if direction == 'LONG' and not ACCEL_300_V2_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not ACCEL_300_V2_MINUS_ENABLED:
+            continue
 
         # Blacklist guard
         if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:

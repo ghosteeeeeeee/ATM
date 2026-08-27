@@ -1356,6 +1356,9 @@ MACD_1M_PLUS_ENABLED          = True    # macd_1m+ LONG
 MACD_1M_MINUS_ENABLED         = True    # macd_1m- SHORT
 ACCEL_300_PLUS_ENABLED        = False # self_learner 2026-08-05 — DISABLED. 0% WR over 48h. No edge.
 ACCEL_300_MINUS_ENABLED       = True    # RE-ENABLED 2026-08-17 per user. Had 13-win streak Aug 12.
+ACCEL_300_V2_ENABLED          = True    # V2 strong trend momentum — 2026-08-27. Catches accelerating moves.
+ACCEL_300_V2_PLUS_ENABLED     = True    # V2 LONG — catches early breakouts above EMA300
+ACCEL_300_V2_MINUS_ENABLED    = True    # V2 SHORT — catches early breakdowns below EMA300
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.
@@ -1844,7 +1847,7 @@ DECISION_LOG_CACHE_TTL = 300
 # vortex_break.py — Vortex Indicator + ADX trend confirmation
 # Uses true range (high-low) directional movement, not price closes.
 # Catches trend inception via VI crossover + ADX strength filter.
-VORTEX_BREAK_ENABLED = True    # master kill-switch — enabled for paper observation (self_learner 2026-08-05)
+VORTEX_BREAK_ENABLED = False   # CEO 2026-08-27 — zombie signal, master on but both directions off, consuming thread pool for zero output. NEVER REENABLE.
 VORTEX_BREAK_PLUS_ENABLED = False   # SIGNAL REPORTER 2026-08-09 — vortex_break_long LONG: 22.2% WR (9 trades 24h), -$0.18. 7d: 25 trades, 44% WR, -$0.19. Compounds hemorrhaging. KILLED.
 VORTEX_BREAK_MINUS_ENABLED = False   # CEO 2026-08-10 — sub-threshold, cluttering hotset. bb-bounce-short,hzscore- handles SHORT side.
 VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for paper testing

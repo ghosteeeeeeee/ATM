@@ -523,8 +523,9 @@ def check_stale_position(token: str, live_pnl: float, direction: str) -> Tuple[b
 SIGNAL_DB = RUNTIME_DB
 
 def _ensure_signal_outcomes_table():
-    """Create signal_outcomes table if it doesn't exist. Add trade_id column if missing."""
+    """Create signal_outcomes table if it doesn't exist. Add trade_id/regime columns if missing."""
     import sqlite3
+    conn = None
     try:
         conn = sqlite3.connect(SIGNAL_DB)
         c = conn.cursor()
@@ -539,6 +540,7 @@ def _ensure_signal_outcomes_table():
                 pnl_usdt REAL NOT NULL,
                 confidence REAL,
                 trade_id INTEGER,
+                regime TEXT,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 closed_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
@@ -548,16 +550,29 @@ def _ensure_signal_outcomes_table():
             c.execute("SELECT trade_id FROM signal_outcomes LIMIT 1")
         except Exception:
             c.execute("ALTER TABLE signal_outcomes ADD COLUMN trade_id INTEGER")
+        # Add regime column if missing from existing table (2026-09-01)
+        try:
+            c.execute("SELECT regime FROM signal_outcomes LIMIT 1")
+        except Exception:
+            c.execute("ALTER TABLE signal_outcomes ADD COLUMN regime TEXT")
         c.execute("""
             CREATE INDEX IF NOT EXISTS idx_sigout_token ON signal_outcomes(token, direction)
         """)
         c.execute("""
             CREATE INDEX IF NOT EXISTS idx_sigout_stype ON signal_outcomes(signal_type)
         """)
+        c.execute("""
+            CREATE INDEX IF NOT EXISTS idx_sigout_regime ON signal_outcomes(regime)
+        """)
         conn.commit()
-        conn.close()
     except Exception as e:
         log(f"[Position Manager] signal_outcomes table error: {e}")
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def get_signal_streak(token: str, direction: str, signal_type: str = None) -> Dict:

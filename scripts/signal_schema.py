@@ -977,6 +977,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # accel-300-v2 (V2 strong trend momentum)
+            if _comp in ('accel-300-v2+', 'accel-300-v2-'):
+                try:
+                    from hermes_constants import ACCEL_300_V2_ENABLED
+                    if not ACCEL_300_V2_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V2_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'accel-300-v2':
+                try:
+                    from hermes_constants import ACCEL_300_V2_ENABLED
+                    if not ACCEL_300_V2_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ACCEL_300_V2_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # accel-300-breakout (ultra-fast breakout)
             if _comp == 'accel-300-breakout':
                 try:
@@ -2289,6 +2306,9 @@ def is_component_disabled(component: str) -> bool:
     # inverse-accel-300-v2
     if c in ('inverse-accel-300-v2-', 'inv-accel-300-v2-'): return not INVERSE_ACCEL_300_V2_ENABLED
     if c in ('inverse-accel-300-v2', 'inv-accel-300-v2'): return not INVERSE_ACCEL_300_V2_ENABLED
+    # accel-300-v2
+    if c in ('accel-300-v2+', 'accel-300-v2-'): return not ACCEL_300_V2_ENABLED
+    if c == 'accel-300-v2': return not ACCEL_300_V2_ENABLED
     # squeeze-cross
     if c == 'squeeze-cross+': return not SQUEEZE_CROSS_PLUS_ENABLED
     if c == 'squeeze-cross-': return not SQUEEZE_CROSS_MINUS_ENABLED
@@ -3276,17 +3296,78 @@ def clear_cooldown_entry(token: str, direction: str) -> bool:
 # signal_outcomes — win/loss tracking on trade close (enhanced)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def _get_volatility_regime(token: str) -> str:
+    """Classify current volatility regime for a token from candles_1h ATR.
+    Returns: 'FLAT', 'NORMAL', 'HIGH', 'EXTREME', or 'UNKNOWN'.
+    Used as fallback when regime is not provided by caller.
+    """
+    conn = None
+    try:
+        from paths import HERMES_DATA
+        import sqlite3 as _sqlite3
+        conn = _sqlite3.connect(f'{HERMES_DATA}/candles.db', timeout=10)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT open, high, low, close
+            FROM candles_1h
+            WHERE token = ? AND is_closed = 1
+            ORDER BY ts DESC
+            LIMIT 20
+        """, (token.upper(),))
+        rows = cur.fetchall()
+        if len(rows) < 15:
+            return 'UNKNOWN'
+        # rows are newest-first, reverse for chronological
+        candles = list(reversed(rows))
+        trs = []
+        for i in range(1, len(candles)):
+            h, l, pc = candles[i][1], candles[i][2], candles[i-1][3]
+            tr = max(h - l, abs(h - pc), abs(l - pc))
+            trs.append(tr)
+        if len(trs) < 14:
+            return 'UNKNOWN'
+        atr = sum(trs[-14:]) / 14
+        close = candles[-1][3]
+        if close <= 0:
+            return 'UNKNOWN'
+        atr_pct = (atr / close) * 100
+        # Classify — same thresholds as volatility_gate.py
+        if atr_pct < 0.48:
+            return 'FLAT'
+        elif atr_pct < 1.0:
+            return 'NORMAL'
+        elif atr_pct < 1.5:
+            return 'HIGH'
+        else:
+            return 'EXTREME'
+    except Exception:
+        return 'UNKNOWN'
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
 def record_signal_outcome(token: str, direction: str,
                           pnl_pct: float, pnl_usdt: float,
                           signal_type: str = 'unknown',
                           confidence: float = None,
                           is_win: bool = None,
-                          trade_id: int = None) -> bool:
+                          trade_id: int = None,
+                          regime: str = None) -> bool:
     """
     Write one row to signal_outcomes when a trade closes.
     is_win is computed from pnl_usdt sign if not provided.
     trade_id prevents double-recording when both guardian and position_manager fire.
+    regime: volatility regime at trade entry ('FLAT','NORMAL','HIGH','EXTREME').
+            If None, computed from current ATR (best-effort fallback).
     """
+    # Auto-detect regime if not provided
+    if regime is None:
+        regime = _get_volatility_regime(token)
+
     conn = _get_conn(_runtime())
     c = conn.cursor()
     try:
@@ -3310,12 +3391,11 @@ def record_signal_outcome(token: str, direction: str,
                   AND created_at > datetime('now', '-5 minutes')
             """, (token.upper(), direction.upper(), float(pnl_pct or 0)))
         if c.fetchone():
-            conn.close()
-            return False  # dedup hit
+            return False  # dedup hit — finally block closes conn
         c.execute("""
             INSERT INTO signal_outcomes
-                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id, regime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             token.upper(), direction.upper(),
             signal_type, 1 if is_win else 0,
@@ -3323,6 +3403,7 @@ def record_signal_outcome(token: str, direction: str,
             round(float(pnl_usdt or 0), 4),
             round(float(confidence or 0), 1),
             trade_id,
+            regime,
         ))
         conn.commit()
         

@@ -1,160 +1,72 @@
-## CEO Report — 2026-08-27 ~14:30 UTC
+## CEO Report — 2026-08-27 (Ponytail Audit Assessment)
 
-### Diagnosis
-
-**System stable, pump-catcher+ killed.** Verified DB:
-- **24h:** 66T, -$0.70, 40.9% WR (flat day)
-- **7d:** 371T, -$4.13, 48.2% WR (improving)
-- **Today:** 36T, +$0.22, 47.2% WR (positive)
-- **Open:** 2 trades, $0.00
-
-**Bleeding signals:**
-| Signal | 7d Trades | PnL | WR | Status |
-|--------|-----------|-----|-----|--------|
-| ct-hot+ | 66T | -$3.65 | 36.4% | KILLED, aging out |
-| tl_break_short | 16T | -$0.11 | 62.5% | CEO_PROTECTED, INVERTED R:R |
-| pump-catcher+ | 21T | -$0.39 | 33.3% | KILLED NOW |
-
-**tl_break_short R:R problem:** avg win +2.32%, avg loss -5.19%. Even at 62.5% WR, negative EV. CEO_PROTECTED — recommend T tighten SL or disable.
-
-### Root Cause
-
-pump-catcher+ catches spikes AFTER they happen, entry at exhaustion. 16/21 trades hit ATR_SL (-5.57% avg loss). Tighter filters (VELOCITY_MIN 0.8, RSI_MAX 55) didn't fix — problem is entry timing, not thresholds.
-
-### Fix Applied
-
-**Killed pump-catcher+:**
-- `PUMP_CATCHER_ENABLED = False`
-- Added to `NEVER_REENABLE_FLAGS`
-- Rationale: 76.2% ATR_SL hit rate, entries after exhausted moves. No edge even with tight filters.
-
-### Verification
-
-- Flag confirmed False in hermes_constants.py
-- Added to NEVER_REENABLE_FLAGS
-- System now has 4 active LONG signals: bb_bounce+ (backbone), atr-spike+, continuation+, r2-trend variants
-
-### Next Steps
-
-1. **tl_break_short** — RECOMMEND T tighten SHORT SL (avg loss -5.19% destroys 62.5% WR edge)
-2. Monitor bb_bounce+ 48h eval (WR>55%)
-3. ct-hot+ age-out completion (66T/7d -$3.65 still draining)
-4. Disk 83% — approaching 85% cleanup threshold
-5. Coin tracker: 69/109 tokens in Wyckoff accumulation (bullish)
+### Verdict: Execute Phase 1 now. Phase 2 after spot-check. Phase 3 deferred.
 
 ---
 
-## CEO Report — 2026-08-27 ~14:00 UTC
+### Phase 1: Zero-Risk Deletions — **APPROVE**
 
-### Diagnosis
+| Item | Verdict | Rationale |
+|------|---------|-----------|
+| 80 dead scripts (21,077 lines) | **YES** | Spot-checked bb_bounce_filter_analysis, position_sizing, archive-trades — only referenced in graphify metadata, zero code imports. Safe to `git rm`. |
+| ai_decider.py + signal_gen.py (5,938 lines) | **YES** | Both DEFUNCT per AGENTS.md. ai_decider replaced by signal_compactor, signal_gen by signals_runner. 33+ stale import references need cleanup but won't break runtime (try/except imports). |
+| hyperliquid-trader.py (156 lines) | **YES** | Duplicates position_manager SL/TP monitoring. Conflicting close operations risk. Delete immediately. |
+| 47 dead signal registry entries (~2,500 lines) | **YES** | Registry has ~68 entries, only ~18 enabled. Dead families (MA cross, momentum variants, range trading, z-score, accel-300 v1, BB squeeze, old MACD, wave/coin tracker) all in NEVER_REENABLE_FLAGS. Remove registry entries + import blocks. Keep flags in hermes_constants.py as documentation. |
+| Dead code blocks in position_manager.py + signal_schema.py (~750 lines) | **YES** | `_execute_atr_bulk_updates()` has immediate return. Volume cache dead. `ALLOWED_SIGNAL_SOURCES` frozenset never referenced. `expire_pending_signals()` called by nothing. `_get_confluence_signals_legacy()` for unmigrated rows. Safe to remove. |
 
-**System stable, bb_bounce+ override needed.** Verified DB:
-- **24h:** 66T, -$0.70, 40.9% WR (flat day)
-- **7d:** 369T, -$4.04, 48.2% WR (improving)
-- **Today:** 36T, +$0.22, 47.2% WR (positive)
-- **Open:** 2 trades, $0.00
-
-**Key issue:** auto_1hr killed bb_bounce+ at 10:15 UTC (3T/0%WR -$0.43). But 7d: 38T 60.5% WR +$0.30 — signal is backbone. Kill was low-liq token variance.
-
-**Bleeding signals:**
-| Signal | 7d Trades | PnL | WR | Status |
-|--------|-----------|-----|-----|--------|
-| ct-hot+ | 73T | -$4.04 | 34.2% | KILLED, aging out |
-| slow-grind- | 12T | -$0.64 | 33.3% | KILLED |
-| tl_break_short | 16T | -$0.11 | 62.5% | CEO_PROTECTED, INVERTED R:R |
-| pump-catcher+ | 21T | -$0.39 | 33.3% | DISABLED |
-
-**tl_break_short R:R problem:** avg win +2.32%, avg loss -5.19%. Even at 62.5% WR, negative EV. CEO_PROTECTED — recommend T tighten SL or disable.
-
-### Fix Applied
-
-**Override auto_1hr kill on bb_bounce+:**
-- `BB_BOUNCE_PLUS_ENABLED = True` (was killed by auto_1hr)
-- Updated comment to reflect CEO override
-- Rationale: 7d 60.5% WR +$0.30 is backbone performance. 3T/0%WR was token-specific variance.
-
-### Verification
-
-- Flag confirmed True in hermes_constants.py
-- Next pipeline cycle will generate bb_bounce+ signals
-- Monitor 48h: WR>55% with 10+ trades = keep enabled
-
-### Next Steps
-
-1. **tl_break_short** — RECOMMEND T tighten SHORT SL (avg loss -5.19% destroys 62.5% WR edge)
-2. Monitor bb_bounce+ 48h eval post-override
-3. ct-hot+ age-out completion (73T/7d -$4.04 still draining)
-4. Disk 83% — approaching 85% cleanup threshold
-5. Coin tracker: 69/109 tokens in Wyckoff accumulation (bullish)
+**Phase 1 total: ~30,400 lines removed, zero functional impact.** Execute as single commit.
 
 ---
 
-## CEO Report — 2026-08-27 ~10:00 UTC
+### Phase 2: Timer Cleanup — **APPROVE WITH CAVEATS**
 
-### Diagnosis
+| Item | Verdict | Rationale |
+|------|---------|-----------|
+| Kill 7 failing timers (wasp, better-coder, git-release, etc.) | **YES** | Confirmed failing in CURRENT.md line 54. Non-critical utilities. |
+| Kill 3 stale timers (ma-cross-5m-tuner 13d, zscore-momentum-tuner 12d, hl-sync-guardian) | **YES** | Dead services, not affecting trading. |
+| Kill 1 defunct timer (atr-sl-updater-DEFUNCT) | **YES** | Name says DEFUNCT. Never triggered. |
+| Merge redundant groups (6→2) | **MAYBE** | Need to verify signal-report vs signal-reporter do exactly the same thing. Health-monitor + smoke-test + watchdog overlap needs manual review. Don't merge blindly. |
+| Reduce frequency (compactor 1→5min, watchdog 2→5min, dashboards 5→15min) | **MAYBE** | Compactor 1min is wasteful but signal freshness matters. Reduce watchdog to 5min (was already 2min, burning CPU). Dashboards 5→15min is fine — data doesn't change that fast. |
 
-**System recovering but signal-starved.** Verified DB:
-- **24h:** 70T, -$0.35, 41.4% WR (flat day)
-- **48h:** 102T, -$1.38, 43.1% WR
-- **7d:** 369T, -$4.26, 48.2% WR (improving from -$5.06)
-- **Open:** 2 trades, $0.00
-
-**Biggest problem: ZERO backbone signals.** bb_bounce+ killed Aug 26 based on single bad day (8T 12.5% WR -$0.55 on low-liquidity tokens). But 7d record: 38T 60.5% WR +$0.30 — signal fundamentally sound. Kill was overreaction to variance.
-
-**Active signal performance (7d):**
-| Signal | Trades | PnL | WR | Status |
-|--------|--------|-----|-----|--------|
-| macd-div- SHORT | 18T | +$0.12 | 72.2% | ACTIVE |
-| cascade-reverse-v2 | 9T | +$0.51 | 44.4% | ACTIVE |
-| r2-trend variants | 26T | +$0.69 | mixed | ACTIVE |
-| pump-catcher+ | 21T | -$0.39 | 33.3% | AUTO-ROTATED OFF |
-| ct-hot+ | 66T | -$3.65 | 36.4% | KILLED, ages out today |
-
-**ATR_SL dominant:** 44 hits/48h -$4.79 (85% of losses).
-
-### Root Cause
-
-bb_bounce+ was killed Aug 26 because 7/9 ATR_SL hits were on low-liquidity tokens (WLFI -7.21%, BLUR -3.68%, AR -6.61%, CRV -6.47%). But the signal itself works — 60.5% WR over 7d with +$0.30 PnL. The bad day was token-specific variance, not signal failure.
-
-### Fix Applied
-
-**Re-enabled bb_bounce+ as backbone signal:**
-- `BB_BOUNCE_ENABLED = True`
-- `BB_BOUNCE_PLUS_ENABLED = True`
-- Removed from `NEVER_REENABLE_FLAGS`
-
-Rationale: System cannot function with zero backbone signals. bb_bounce+ is the proven backbone (38T/7d, 60.5% WR). Single bad day does not invalidate weeks of performance.
-
-### Verification
-
-- Flags set correctly in hermes_constants.py
-- Removed from NEVER_REENABLE_FLAGS
-- Next pipeline cycle should generate bb_bounce+ signals
-- Monitor 48h: WR>55% with 10+ trades = keep enabled
-
-### Next Steps
-
-1. Monitor bb_bounce+ 48h eval (WR>55%)
-2. ct-hot+ age-out completion today (66T/7d -$3.65 drains)
-3. Disk at 83% — monitor 85% threshold
-4. Coin tracker: 69/109 tokens in Wyckoff accumulation (bullish)
+**Timer count:** Audit says 57, I count 64 hermes timers. Discrepancy suggests audit missed 7. Verify full list before executing.
 
 ---
 
-## CEO Report — 2026-08-25 — bb_bounce Velocity Fix Acknowledged
+### Phase 3: Core Function Refactoring — **DEFER**
 
-### Fix Verified
-- `_get_15m_velocity()` now reads from `candles_1m` (fresh data) instead of stale `price_history`
-- Spike exhaustion filter also migrated to `candles_1m`
-- Backtest: +22 winners recovered, +11 losers caught, WR 63.8% → 66.8%
+| Item | Verdict | Rationale |
+|------|---------|-----------|
+| add_signal() Layer 2 kill-switch (900→20 lines) | **DEFER** | Correct refactor but touches signal_schema.py which runs every pipeline cycle. Needs dedicated testing session with pipeline dry-run. |
+| is_component_disabled() duplicate (260 lines) | **DEFER** | Same — depends on Layer 2 refactor above. |
+| run_compaction() split (1,533 lines) | **DEFER** | Risky monolith refactor. signal_compactor is critical path. Needs comprehensive test coverage first. |
+| close_paper_position() split (391 lines) | **DEFER** | Position management is money-critical. Split without tests = potential for subtle bugs. |
+| check_and_manage_positions() split (495 lines) | **DEFER** | Same as above — money-critical path. |
+| Extract shared _ema(), RSI utilities | **DEFER** | Low risk but low ROI. Do alongside the larger refactors. |
 
-### Root Cause Analysis
-7 losing trades analyzed (CRV, IO, SYRUP, CFX, LTC, CAKE, ARAR). Velocity gate was firing at detection time, not execution time — stale data caused entries against momentum.
+**Phase 3 is the right thing to do but the wrong time.** System is barely net positive (+$0.22 today). Refactoring critical paths now risks breaking the fragile equilibrium. Defer until: (1) system is consistently profitable 7d, (2) test coverage exists for position_manager and signal_compactor.
 
-### Recommendations Logged
-- Execution-time velocity check + price drift check in `decider_run.py`
-- Momentum filter (-0.005 LONG, +0.005 SHORT) improves WR to 81-91%
-- Plan saved: `brain/plans/2026-08-25_bb_bounce_optimization.md`
+---
 
-### Next Action
-Await T's approval on momentum filter integration before deploying to live.
+### Signals Flagged Dead — Keep/Remove Decision
+
+| Signal | Audit Says | CEO Says | Action |
+|--------|-----------|----------|--------|
+| vortex_break | Dead (master on, directions off) | Confirmed — VORTEX_BREAK_ENABLED=True but PLUS/MINUS=False. Consumes thread pool for nothing. | **Kill now** — set VORTEX_BREAK_ENABLED=False |
+| 47 registry entries | Dead | Most confirmed dead per NEVER_REENABLE_FLAGS. | **Remove from registry** |
+| tl_break_short | Not flagged | CEO_PROTECTED, inverted R:R. | **Keep flagged to T** — cannot disable myself |
+
+---
+
+### Audit Methodology Concerns
+
+1. **Timer count off by 7** (audit: 57, actual: 64). Audit may have missed some timers or used different counting method. Verify before bulk deletion.
+2. **"80 dead scripts" needs one final spot-check** on 5 more scripts before bulk `git rm`. I checked 3 — all confirmed dead. Check 2 more to be safe.
+3. **Line count estimates are approximate** — actual savings may differ ±10%. Not a blocker.
+4. **Phase 3 risk assessment is correct** — the audit correctly notes these need careful testing. I concur with deferral.
+
+### Next Actions
+
+1. Execute Phase 1 as single commit (after spot-checking 2 more dead scripts)
+2. Spot-check timer list before Phase 2 execution
+3. Defer Phase 3 to when system is stable + test coverage exists
+4. Kill vortex_break (VORTEX_BREAK_ENABLED=False) — immediate, no risk

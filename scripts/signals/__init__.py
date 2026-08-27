@@ -22,6 +22,7 @@ from hermes_constants import (
     PHASE_ACCEL_ENABLED, PHASE_ACCEL_PLUS_ENABLED, PHASE_ACCEL_MINUS_ENABLED,
     FAST_MOMENTUM_ENABLED, FAST_MOMENTUM_PLUS_ENABLED, FAST_MOMENTUM_MINUS_ENABLED,
     ACCEL_300_ENABLED, INVERSE_ACCEL_300_ENABLED, INVERSE_ACCEL_300_V2_ENABLED,
+    ACCEL_300_V2_ENABLED,
     EMA_ANGLE_ENABLED, EMA_ANGLE_PLUS_ENABLED, EMA_ANGLE_MINUS_ENABLED,
     RS_ENABLED, GAP_300_ENABLED, GAP_300_PLUS_ENABLED, GAP_300_MINUS_ENABLED,
     MA_CROSS_ENABLED, MA_CROSS_PLUS_ENABLED, MA_CROSS_MINUS_ENABLED,
@@ -448,7 +449,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'fast_momentum',        'enabled': 'FAST_MOMENTUM_ENABLED',      'run': _fast_momentum_run},
     # These use their *_ENABLED boolean directly
     {'name': 'accel_300',            'enabled': ACCEL_300_ENABLED,           'run': _accel_300_run},
-    {'name': 'accel_300_v2',         'enabled': True,                        'run': _accel_300_v2_run},
+    {'name': 'accel_300_v2',         'enabled': ACCEL_300_V2_ENABLED,        'run': _accel_300_v2_run},
     {'name': 'inverse_accel_300',    'enabled': INVERSE_ACCEL_300_ENABLED,   'run': _inverse_accel_300_run},
     {'name': 'inverse_accel_300_v2', 'enabled': INVERSE_ACCEL_300_V2_ENABLED, 'run': _inverse_accel_300_v2_run},
     {'name': 'ema_angle',            'enabled': EMA_ANGLE_ENABLED,            'run': _ema_angle_run},
