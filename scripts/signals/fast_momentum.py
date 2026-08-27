@@ -55,7 +55,6 @@ from signal_schema import (
     add_signal,
     price_age_minutes,
     get_latest_price,
-    expire_pending_signals,
 )
 from position_manager import get_open_positions as _get_open_pos
 from hyperliquid_exchange import is_delisted

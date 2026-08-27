@@ -1206,3 +1206,9 @@ ALERTS:
 
 ## Error Alerts — 2026-08-27 13:04 UTC
 - **REPEATED** (3x): `Aug N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-08-27 16:20 UTC
+- **RESOLVED** (2x): `name '_warmup_volume_cache_pm' is not defined` in position_manager.py:3315
+  - Occurred: 15:48, 15:49 UTC
+  - Auto-resolved: pipeline recovered by 15:50, no action needed
+- **WARN**: Disk at 83% (93G/118G) — will hit 85% threshold soon
