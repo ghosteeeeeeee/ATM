@@ -389,13 +389,8 @@ def scan_inverse_accel_300_v2_signals(prices_dict: dict) -> int:
         return 0
 
     from position_manager import get_open_positions as _get_open_pos
-    try:
-        from signal_gen import recent_trade_exists, is_delisted, MIN_TRADE_INTERVAL_MINUTES
-    except ImportError:
-        from signal_schema import get_all_latest_prices  # fallback — skip these guards
-        recent_trade_exists = lambda *a: False
-        is_delisted = lambda *a: False
-        MIN_TRADE_INTERVAL_MINUTES = 10
+    from hyperliquid_exchange import is_delisted
+    from signals.fast_momentum import recent_trade_exists, MIN_TRADE_INTERVAL_MINUTES
 
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     added = 0

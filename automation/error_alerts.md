@@ -1212,3 +1212,7 @@ ALERTS:
   - Occurred: 15:48, 15:49 UTC
   - Auto-resolved: pipeline recovered by 15:50, no action needed
 - **WARN**: Disk at 83% (93G/118G) — will hit 85% threshold soon
+
+## Error Alerts — 2026-08-27 17:04 UTC
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1019s left, N failures)`
+- **NEW** (1x): `Aug N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (960s left, N failures)`

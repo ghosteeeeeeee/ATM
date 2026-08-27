@@ -393,7 +393,8 @@ def scan_accel_300_v2_signals(prices_dict: dict) -> int:
         return 0
 
     from position_manager import get_open_positions as _get_open_pos
-    from signal_gen import recent_trade_exists, is_delisted, MIN_TRADE_INTERVAL_MINUTES
+    from hyperliquid_exchange import is_delisted
+    from signals.fast_momentum import recent_trade_exists, MIN_TRADE_INTERVAL_MINUTES
 
     open_pos = {p['token']: p['direction'] for p in _get_open_pos()}
     added = 0
