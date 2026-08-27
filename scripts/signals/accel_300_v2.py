@@ -27,8 +27,7 @@ import sys, os, sqlite3, time
 from typing import Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from signal_schema import add_signal, get_cooldown, price_age_minutes
-from signal_gen import set_cooldown
+from signal_schema import add_signal, get_cooldown, set_cooldown, price_age_minutes
 
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(SIGNAL_LOG), exist_ok=True)
