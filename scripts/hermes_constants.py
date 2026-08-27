@@ -1119,7 +1119,9 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_MINUS_ENABLED',   # SIGNAL REPORTER 2026-08-24 — 0% WR (6T), -$0.34. NEVER_REENABLE.
     'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
     'HL_COPY_SIGNAL_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay. NEVER_REENABLE.
-    # BB_BOUNCE re-enabled 2026-08-27 (CEO) — backbone signal, 60.5% WR 7d +$0.30. Removed from NEVER_REENABLE.
+    # BB_BOUNCE KILLED 2026-08-27 (CEO) — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
+    'BB_BOUNCE_PLUS_ENABLED',  # CEO 2026-08-27 — 48h 9T/11.1%WR/-$0.74. NEVER_REENABLE.
+    'BB_BOUNCE_ENABLED',       # CEO 2026-08-27 — 48h 9T/11.1%WR/-$0.74. NEVER_REENABLE.
     'SLOW_GRIND_SHORT_ENABLED',    # CEO 2026-08-27 — 12T/7d 33.3% WR -$0.64, inverted R:R. NEVER_REENABLE.
     'PUMP_CATCHER_ENABLED',        # CEO 2026-08-27 — 21T/7d 33.3% WR -$0.39, 76.2% ATR_SL hit rate. Entries after exhausted moves. NEVER_REENABLE without regime filter.
     'ATR_SPIKE_PLUS_ENABLED',     # SIGNAL REPORTER 2026-08-27 — 7T/7d 28.6% WR -$0.15. NEVER_REENABLE.
@@ -1332,7 +1334,7 @@ SLOW_GRIND_SHORT_RSI_MAX = 45      # max RSI — don't short when momentum fadin
 SLOW_GRIND_SHORT_MIN_EMA_SEPARATION = 0.2  # min % separation below EMA20 (was 0.1, require stronger bearish alignment)
 SLOW_GRIND_SHORT_MAX_PRE_ENTRY_MOVE_PCT = 0.15  # max % price can rise from 10-bar low before entry (block chasing)
 SLOW_GRIND_SHORT_REQUIRE_NEGATIVE_5M_VEL = True  # require 5m velocity negative (don't short into strength)
-SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT = 1.0  # max % decline from 60-bar high (block shorting bottoms — GRAM was -2.38%)
+SLOW_GRIND_SHORT_MAX_DECLINE_FROM_HIGH_PCT = 1.5  # max % decline from 60-bar high (was 1.0, raised to catch CC-style moves — GRAM was -2.38%)
 SLOW_GRIND_SHORT_CONF_BASE = 65    # base confidence
 SLOW_GRIND_SHORT_CONF_CAP = 88     # max confidence (system ceiling)
 SLOW_GRIND_SHORT_COOLDOWN_HOURS = 3  # per token cooldown
@@ -1462,8 +1464,8 @@ BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze forma
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 
 # bb_bounce.py — mean reversion for ranging markets
-BB_BOUNCE_ENABLED = True    # CEO RE-ENABLED 2026-08-27 — 38T/7d 60.5% WR +$0.30 backbone signal. Kill was single bad day (low-liq tokens).
-BB_BOUNCE_PLUS_ENABLED = True  # CEO OVERRIDE 2026-08-27 — auto_1hr killed (3T/0%WR -$0.43) but 7d 38T 60.5% WR +$0.30 backbone. Kill was low-liq token variance.
+BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
+BB_BOUNCE_PLUS_ENABLED = False  # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
 BB_BOUNCE_MINUS_ENABLED = False   # bb_bounce- SHORT — DISABLED 2026-08-07: 40% WR, -$4.61% over 7d. Confluence (bb_bounce+hzscore+) stays enabled.
 BB_BOUNCE_SHORT_ENABLED = True    # bb_bounce_short — SHORT-specific with regime filter, tighter RSI, volume confirm
 
