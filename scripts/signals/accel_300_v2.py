@@ -56,7 +56,7 @@ V2_MIN_GAP_ACCEL = 0.06        # min gap acceleration over 10 bars — detect st
 V2_GAP_ACCEL_WINDOW = 10       # bars to measure gap acceleration
 V2_VELOCITY_WINDOW = 5         # bars to measure price velocity
 V2_PERSISTENCE_BARS = 2        # min bars price must stay on same side of EMA (was 3)
-V2_MIN_ATR_PCT = 0.05          # min ATR% — skip ultra-low-vol tokens
+V2_MIN_ATR_PCT = 0.02          # min ATR% — skip ultra-low-vol tokens (lowered from 0.05)
 V2_VOLUME_LOOKBACK = 30        # bars for average volume
 V2_VOLUME_MULT = 1.0           # volume must be >= average (any volume OK)
 V2_COOLDOWN_BARS = 15          # cooldown between signals per token
@@ -240,13 +240,8 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
 
     closes = [float(p['price']) for p in prices]
 
-    # ── ATR floor: skip ultra-low-vol tokens ──────────────────────────────
-    if len(closes) >= 15:
-        changes = [abs(closes[i] - closes[i-1]) for i in range(max(1, len(closes)-14), len(closes))]
-        atr = sum(changes) / len(changes) if changes else 0
-        atr_pct = atr / closes[-1] if closes[-1] > 0 else 0
-        if atr_pct < V2_MIN_ATR_PCT:
-            return None
+    # ATR floor: REMOVED — signal fires at the START of a move when last 14 bars are quiet
+    # The gap acceleration filter already handles volatility filtering
 
     ema300 = _ema_series(closes, PERIOD)
     gap_pcts = [
