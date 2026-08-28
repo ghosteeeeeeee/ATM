@@ -1,5 +1,26 @@
 # Trading Log — Learnings & Decisions
 
+## [2026-08-28 12:05 UTC] Hourly Analysis
+
+**Trades:** 0 closed in last hour (8 in last 2h)
+**24h:** 81T, 42W, 51.9% WR, -$0.07 (breakeven)
+**Open:** 3 SHORT (ONDO, ME, BABY)
+
+**Changes:** None
+
+**No Change Needed:**
+- Kill criteria not triggered: no signal has 0% WR with 3+ trades in last 3h
+- 4 consecutive negative hours (08-11 UTC) at -$0.40 total — small, not alarming
+- Trade freq 3.5/hr normal
+- Pipeline healthy (both timers active)
+- accel-300-v2- 41T 49%WR +$0.11 only profitable signal but not a kill candidate
+
+**Open Questions:**
+- accel-300-v2- 50% of all trades (41/81) — signal diversity could improve
+- 4 consecutive negative hours trending wrong — watch next cycle
+
+---
+
 ## [2026-08-28 02:15 UTC] Hourly Analysis
 
 **Trades:** 4 closed (4W, 0L) — **+$0.80**
