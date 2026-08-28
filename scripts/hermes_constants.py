@@ -1369,8 +1369,8 @@ ACCEL_300_V2_MINUS_ENABLED    = True    # V2 SHORT — catches early breakdowns 
 ACCEL_300_V2_LONG_MIN_GAP = 1.5     # LONG: min gap above EMA300
 ACCEL_300_V2_LONG_MAX_GAP = 3.5     # LONG: max gap (sweet spot 1.5-3.5%)
 # ── accel-300-v2 SHORT params (NEW: catch moves like CC 16:52) ────────────
-ACCEL_300_V2_SHORT_MIN_GAP = 0.7    # SHORT: min gap below EMA300 (filters marginal losers, keeps winners)
-ACCEL_300_V2_SHORT_MAX_GAP = 2.0    # SHORT: max gap (smaller range for SHORT)
+ACCEL_300_V2_SHORT_MIN_GAP = 1.0    # SHORT: min gap below EMA300 — raised from 0.7 CEO 2026-08-28, filters noise entries (94% ATR_SL exit rate)
+ACCEL_300_V2_SHORT_MAX_GAP = 4.5    # SHORT: max gap — raised from 2.0 (was blocking biggest winners: COMP +25%, ZRO +16%, BCH +8.6%)
 INVERSE_ACCEL_300_ENABLED     = False    # CEO KILLED 2026-08-04 21:05 — 11% WR combined, -$2.78 in 7d. NEVER_REENABLE.
 INVERSE_ACCEL_300_PLUS_ENABLED  = False  # PERMANENT — 0% WR (0/2 dedup), -$0.51. Falling knife catcher.
 INVERSE_ACCEL_300_MINUS_ENABLED = False   # CEO KILLED 2026-08-04 21:05 — 11% WR, -$22.91 in 7d. In NEVER_REENABLE.

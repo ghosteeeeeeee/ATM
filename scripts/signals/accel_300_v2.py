@@ -357,11 +357,11 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
     if gap_prev is None:
         return None
     gap_velocity = gap_now - gap_prev
-    # Allow tiny narrowing (noise) but velocity should generally confirm
-    # 0.02 tolerance — 0.05 was too loose (allowed fading momentum entries)
-    if direction == 'LONG' and gap_velocity < -0.02:
+    # Allow small noise but velocity should generally confirm
+    # 0.05 tolerance — balances noise filtering vs not blocking winners (BTC had +0.064% gap_vel and won)
+    if direction == 'LONG' and gap_velocity < -0.05:
         return None  # gap narrowing — reversal risk
-    if direction == 'SHORT' and gap_velocity > 0.02:
+    if direction == 'SHORT' and gap_velocity > 0.05:
         return None  # gap narrowing — momentum fading
 
     # ── FILTER 8: Multi-bar gap confirmation ──────────────────────────────
@@ -372,10 +372,10 @@ def detect_accel_300_v2(token: str, prices: list) -> Optional[dict]:
         if gap_3_ago is not None:
             gap_change_3 = gap_now - gap_3_ago
             # For SHORT: gap_now and gap_3_ago are negative. Gap widening = gap_change_3 < 0
-            # If gap_change_3 > 0.03, gap narrowed by >0.03% over 3 bars — momentum fading
-            if direction == 'SHORT' and gap_change_3 > 0.03:
+            # If gap_change_3 > 0.05, gap narrowed by >0.05% over 3 bars — momentum fading
+            if direction == 'SHORT' and gap_change_3 > 0.05:
                 return None  # gap narrowing over 3 bars — momentum fading
-            if direction == 'LONG' and gap_change_3 < -0.03:
+            if direction == 'LONG' and gap_change_3 < -0.05:
                 return None  # gap narrowing over 3 bars — momentum fading
 
     # ── FILTER 9: Fresh cross gap check ───────────────────────────────────
